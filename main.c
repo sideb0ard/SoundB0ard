@@ -42,14 +42,16 @@ char *sbsh_read_line(void)
 
     if (!buffer) {
         fprintf(stderr, "sbsh: allocation errrrror\n");
-        exit(-1);
+        exit(EXIT_FAILURE);
     }
 
     while (1) {
         c = getchar();
-        if ( c == EOF || c == '\n' ) {
+        if ( c == '\n' ) {
             buffer[position] = '\0';
             return buffer;
+        } else if ( c == EOF ) {
+            exit(EXIT_SUCCESS);
         } else {
             buffer[position] = c;
         }
@@ -60,7 +62,7 @@ char *sbsh_read_line(void)
             buffer = realloc(buffer, bufsize);
             if (!buffer) {
                 fprintf(stderr, "sbsh:  realloc errrror!\n");
-                exit(-1);
+                exit(EXIT_FAILURE);
             }
         }
     }
@@ -178,10 +180,9 @@ int sbsh_execute(char **args)
     if ( args[0] == NULL ) 
         return 1;
 
-    for ( i = 0; i < sbsh_num_builtins(); i++ ) {
-        if (strcmp(args[0], builtin_str[i]) == 0) {
+    for ( i = 0; i < sbsh_num_builtins(); i++ )
+        if (!strcmp(args[0], builtin_str[i]))
             return (*builtin_func[i]) (args);
-        }
-    }
+
     return sbsh_launch(args);
 }
