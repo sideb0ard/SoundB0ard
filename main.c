@@ -1,8 +1,11 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+
+#include "mixer.h"
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
@@ -21,6 +24,7 @@ int sbsh_execute(char **args);
 int sbsh_cd(char **args);
 int sbsh_help(char **args);
 int sbsh_exit(char **args);
+int sbsh_newmixer(char **args);
 
 int main(int argc, char **argv)
 {
@@ -64,7 +68,7 @@ char *sbsh_read_line(void)
             buffer[position] = '\0';
             return buffer;
         } else if ( c == EOF ) {
-            printf("\nLater, l0ser...\n");
+            printf("\nLater, ya val jerk...\n");
             exit(EXIT_SUCCESS);
         } else {
             buffer[position] = c;
@@ -138,14 +142,33 @@ int sbsh_launch(char **args)
 char *builtin_str[] = {
     "cd",
     "help",
+    "mixer",
     "exit"
 };
 
 int (*builtin_func[]) (char **) = {
     &sbsh_cd,
     &sbsh_help,
+    &sbsh_newmixer,
     &sbsh_exit
 };
+
+int sbsh_newmixer(char **args)
+{
+  mixer *mixr = new_mixer();
+  if (mixr == NULL) {
+    printf("Oh, mixer is NULL :(\n");
+    return -1;
+  } 
+  printf("mixer is YAY!\n");
+  pthread_t mixer_thread;
+  if (pthread_create(&mixer_thread, NULL, &mixer_run, NULL)) {
+    printf("Barfed i think!\n");
+    return -1;
+  }
+  printf("All good!\n");
+  return 1;
+}
 
 int sbsh_num_builtins() {
     return sizeof(builtin_str) / sizeof(char *);
@@ -178,7 +201,7 @@ int sbsh_help(char **args)
 
 int sbsh_exit(char **args)
 {
-    printf("\nLater, l0ser...\n");
+    printf("\nLater, ya val jerk...\n");
     return 0;
 }
 
