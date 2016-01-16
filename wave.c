@@ -1,32 +1,32 @@
-#include <stdint.h>
-#include <stdlib.h>
 #include <math.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "defjams.h"
 #include "wave.h"
 
-OSCIL* new_oscil(uint32_t srate)
+OSCIL* new_oscil(uint32_t freq)
 {
   OSCIL *p_osc;
 
   p_osc = calloc(1, sizeof(OSCIL));
   if (p_osc == NULL) 
     return NULL;
-  p_osc->twopiovrsr = TWO_PI / (double) srate;
-  p_osc->curfreq = 0.0;
+  p_osc->freq = freq;
   p_osc->curphase = 0.0;
   p_osc->incr = 0.0;
 
   return p_osc;
 }
 
-double sinetick(OSCIL *p_osc, double freq)
+double sinetick(OSCIL *p_osc, uint32_t freq)
 {
   double val;
   val = sin(p_osc->curphase);
-  if (p_osc->curfreq != freq) {
-    p_osc->curfreq = freq;
-    p_osc->incr = p_osc->twopiovrsr * freq;
+  if (p_osc->freq != freq) {
+    p_osc->freq = freq;
+    p_osc->incr = FREQRAD * freq;
   }
   p_osc->curphase += p_osc->incr;
   if (p_osc->curphase >= TWO_PI)
@@ -34,4 +34,14 @@ double sinetick(OSCIL *p_osc, double freq)
   if (p_osc->curphase < 0.0)
     p_osc->curphase += TWO_PI;
   return val;
+}
+
+void status(OSCIL *p_osc, char *status_string)
+{
+  printf("Calling me up! I gots an OSC at %p\n", p_osc);
+  printf("FREQy! %f\n", p_osc->freq);
+  //sprintf(sstatus, "freq: %f curphase: %f", p_osc->freq, p_osc->curphase);
+  sprintf(status_string, "freq: %f", p_osc->freq);
+
+  //return "jobbie";
 }

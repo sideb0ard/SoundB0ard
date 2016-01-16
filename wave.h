@@ -1,14 +1,20 @@
 /* wave.h */
 
+#ifndef WAVE_H
+#define WAVE_H
+
 #include <stdint.h>
 
 typedef struct t_oscil
 {
-  double twopiovrsr;
-  double curfreq;
+  double freq;
   double curphase;
   double incr;
 } OSCIL;
 
-OSCIL* new_oscil(uint32_t srate);
-double sinetick(OSCIL *p_osc, double freq);
+OSCIL* new_oscil(uint32_t freq);
+
+double sinetick(OSCIL *p_osc, uint32_t freq);
+void status(OSCIL *p_osc, char *status_string);
+
+#endif // WAVE_H
