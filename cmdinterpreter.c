@@ -98,17 +98,17 @@ char **cmd_split_line(char *line)
 }
 
 char *builtin_str[] = {
-    "cd",
     "help",
     "ps",
+    "next",
     "osc",
     "exit"
 };
 
 int (*builtin_func[]) (char **) = {
-    &cmd_cd,
     &cmd_help,
     &cmd_ps,
+    &cmd_gen,
     &cmd_osc,
     &cmd_exit
 };
@@ -116,6 +116,12 @@ int (*builtin_func[]) (char **) = {
 int cmd_ps(char **args) 
 {
   mixer_ps(mixr);
+  return 1;
+}
+
+int cmd_gen(char **args) 
+{
+  gen_next(mixr);
   return 1;
 }
 
@@ -127,18 +133,6 @@ int cmd_osc(char **args)
 
 int cmd_num_builtins() {
     return sizeof(builtin_str) / sizeof(char *);
-}
-
-int cmd_cd(char **args)
-{
-    if (args[1] == NULL) {
-        fprintf(stderr, "cmd: expected argument to \"cd\"\n");
-    } else {
-        if ( chdir(args[1]) != 0 ) {
-            perror("cmd cd");
-        }
-    }
-    return 1;
 }
 
 int cmd_help(char **args)

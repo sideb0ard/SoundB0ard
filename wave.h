@@ -14,7 +14,7 @@ typedef struct t_oscil
 
 OSCIL* new_oscil(uint32_t freq);
 
-double sinetick(OSCIL *p_osc, uint32_t freq);
+double sinetick(OSCIL *p_osc);
 void status(OSCIL *p_osc, char *status_string);
 
 #endif // WAVE_H

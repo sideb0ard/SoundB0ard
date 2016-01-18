@@ -15,19 +15,15 @@ OSCIL* new_oscil(uint32_t freq)
     return NULL;
   p_osc->freq = freq;
   p_osc->curphase = 0.0;
-  p_osc->incr = 0.0;
+  p_osc->incr = FREQRAD * freq;
 
   return p_osc;
 }
 
-double sinetick(OSCIL *p_osc, uint32_t freq)
+double sinetick(OSCIL *p_osc)
 {
   double val;
   val = sin(p_osc->curphase);
-  if (p_osc->freq != freq) {
-    p_osc->freq = freq;
-    p_osc->incr = FREQRAD * freq;
-  }
   p_osc->curphase += p_osc->incr;
   if (p_osc->curphase >= TWO_PI)
     p_osc->curphase -= TWO_PI;

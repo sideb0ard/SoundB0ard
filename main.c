@@ -22,11 +22,12 @@ int main(int argc, char **argv)
 
   // run da mixer
   mixr = new_mixer();
-  pthread_t mixr_run;
-  if ( pthread_create (&mixr_run, NULL, mixer_run, NULL)) {
+  pthread_t mixrrun_th;
+  if ( pthread_create (&mixrrun_th, NULL, mixer_run, (void*) mixr)) {
     fprintf(stderr, "Error running mixer_run thread\n");
     return 1;
   }
+  pthread_detach(mixrrun_th);
 
   // interactive loop
   cmd_loopy();

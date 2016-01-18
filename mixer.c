@@ -9,6 +9,7 @@
 #include "wave.h"
 
 typedef struct {
+  mixer *mixr;
   float left_phase;
   float right_phase;
 } paData;
@@ -25,12 +26,10 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
   (void) inputBuffer;
   for (i = 0; i < framesPerBuffer; i++)
   {
-    *out++ = data->left_phase;
-    *out++ = data->right_phase;
-    data->left_phase += 0.01f;
-    if (data->left_phase >= 0.1f) data->left_phase -= 2.0f;
-    data->right_phase += 0.03f;
-    if (data->right_phase >= 0.1f) data->right_phase -= 2.0f;
+
+    float val = gen_next(data->mixr);
+    *out++ = val;
+    *out++ = val;
   }
   return 0;
 }
@@ -46,11 +45,12 @@ mixer *new_mixer()
   return mixr;
 }
 
-void *mixer_run(void *args)
+void *mixer_run(void *mixr_p)
 {
   PaStream *stream;
   PaError err;
   paData data;
+  data.mixr = (mixer*) mixr_p;
 
   err = Pa_OpenDefaultStream( &stream, 
                               0, // no input channels
@@ -68,16 +68,15 @@ void *mixer_run(void *args)
     exit(-1);
   }
 
-  //err = Pa_StartStream( stream );
-  //if ( err != paNoError) {
-  //  printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
-  //  exit(-1);
-  //}
-  //while(1)
-  //{
-  //  printf("Mixingg away...\n");
-  //  sleep(2);
-  //}
+  err = Pa_StartStream( stream );
+  if ( err != paNoError) {
+    printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
+    exit(-1);
+  }
+
+  // keep thread active
+  while(1) {}
+
   return NULL;
 }
 
@@ -109,7 +108,7 @@ void add_osc(mixer *mixr, uint32_t freq)
     new_signals = realloc(mixr->signals, mixr->sig_size *
                         sizeof(OSCIL*));
     if (new_signals == NULL) {
-      printf("Unable to allocate more paths");
+      printf("Unable to allocate more signalszzz");
       return;
     } else {
       mixr->signals = new_signals;
@@ -120,4 +119,18 @@ void add_osc(mixer *mixr, uint32_t freq)
   mixr->signals[mixr->num_sig] = new_osc;
   mixr->num_sig++;
 }
+
+double gen_next(mixer *mixr)
+{
+  double output_val = 0.0;
+  if (mixr->num_sig > 0) {
+    for (int i = 0; i < mixr->num_sig; i++) {
+      output_val += sinetick(mixr->signals[i]);
+      //printf("[%d] - %f\n", i, output_val);
+    }
+  }
+  return output_val;
+}
+
+      
 
