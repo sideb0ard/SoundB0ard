@@ -24,6 +24,8 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
   float *out = (float*)outputBuffer;
   unsigned int i;
   (void) inputBuffer;
+  (void) timeInfo;
+  (void) statusFlags;
   for (i = 0; i < framesPerBuffer; i++)
   {
 
@@ -60,8 +62,6 @@ void *mixer_run(void *mixr_p)
                               paFramesPerBufferUnspecified,
                               paCallback,
                               &data );
-
-  printf("OPENED STREAM FINE YO!\n");
 
   if ( err != paNoError) {
     printf("Errrrr! couldn't open Portaudio default stream: %s\n", Pa_GetErrorText(err));

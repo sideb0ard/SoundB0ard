@@ -13,7 +13,7 @@ typedef struct t_mixer
   double volume;
 } mixer;
 
-mixer *new_mixer();
+mixer *new_mixer(void);
 void *mixer_run(void *);
 void mixer_ps(mixer *mixr);
 double gen_next(mixer *mixr);
