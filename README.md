@@ -1,3 +1,3 @@
-# SBShell
+# Soundb0ard Shell
 
-taken from http://stephen-brennan.com/2015/01/16/write-a-shell-in-c/
+yup yup, git on them sine waves.
