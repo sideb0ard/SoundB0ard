@@ -91,7 +91,7 @@ void mixer_ps(mixer *mixr)
   }
 }
 
-void add_osc(mixer *mixr, uint32_t freq)
+void add_osc(mixer *mixr, uint32_t freq, tickfunc tic)
 {
   OSCIL **new_signals = NULL;
   /* check if we need to allocate more space for OSCILs */
@@ -115,7 +115,7 @@ void add_osc(mixer *mixr, uint32_t freq)
       printf("BOOM! realloced singals: %p\n", mixr->signals);
     }
   }
-  OSCIL *new_osc = new_oscil(freq);
+  OSCIL *new_osc = new_oscil(freq, tic);
   mixr->signals[mixr->num_sig] = new_osc;
   mixr->num_sig++;
 }
@@ -125,12 +125,10 @@ double gen_next(mixer *mixr)
   double output_val = 0.0;
   if (mixr->num_sig > 0) {
     for (int i = 0; i < mixr->num_sig; i++) {
-      output_val += sinetick(mixr->signals[i]);
+      //output_val += sinetick(mixr->signals[i]);
+      output_val += mixr->signals[i]->tick(mixr->signals[i]);
       //printf("[%d] - %f\n", i, output_val);
     }
   }
   return output_val;
 }
-
-      
-

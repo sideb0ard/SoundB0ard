@@ -1,4 +1,5 @@
 #ifndef DEFJAMS_H
+#define DEFJAMS_H
 
 #define SAMPLE_RATE   (44100)
 #define FRAMES_PER_BUFFER  (64)

@@ -6,7 +6,7 @@
 #include "defjams.h"
 #include "wave.h"
 
-OSCIL* new_oscil(uint32_t freq)
+OSCIL* new_oscil(uint32_t freq, tickfunc tic)
 {
   OSCIL *p_osc;
 
@@ -17,6 +17,8 @@ OSCIL* new_oscil(uint32_t freq)
   p_osc->curphase = 0.0;
   p_osc->incr = FREQRAD * freq;
 
+  p_osc->tick = tic;
+
   return p_osc;
 }
 
@@ -24,6 +26,60 @@ double sinetick(OSCIL *p_osc)
 {
   double val;
   val = sin(p_osc->curphase);
+  p_osc->curphase += p_osc->incr;
+  if (p_osc->curphase >= TWO_PI)
+    p_osc->curphase -= TWO_PI;
+  if (p_osc->curphase < 0.0)
+    p_osc->curphase += TWO_PI;
+  return val;
+}
+
+double sqtick(OSCIL *p_osc)
+{
+  double val;
+  if (p_osc->curphase <= M_PI)
+    val = 1.0;
+  else
+    val = -1;
+  p_osc->curphase += p_osc->incr;
+  if (p_osc->curphase >= TWO_PI)
+    p_osc->curphase -= TWO_PI;
+  if (p_osc->curphase < 0.0)
+    p_osc->curphase += TWO_PI;
+  return val;
+}
+
+double sawdtick(OSCIL *p_osc)
+{
+  double val;
+  val = 1.0 - 2.0 * (p_osc->curphase * (1.0 / TWO_PI));
+  p_osc->curphase += p_osc->incr;
+  if (p_osc->curphase >= TWO_PI)
+    p_osc->curphase -= TWO_PI;
+  if (p_osc->curphase < 0.0)
+    p_osc->curphase += TWO_PI;
+  return val;
+}
+
+double sawutick(OSCIL *p_osc)
+{
+  double val;
+  val = (2.0 * (p_osc->curphase * (1.0 / TWO_PI))) - 1.0;
+  p_osc->curphase += p_osc->incr;
+  if (p_osc->curphase >= TWO_PI)
+    p_osc->curphase -= TWO_PI;
+  if (p_osc->curphase < 0.0)
+    p_osc->curphase += TWO_PI;
+  return val;
+}
+
+double tritick(OSCIL *p_osc)
+{
+  double val;
+  val = (2.0 * (p_osc->curphase * (1.0 / TWO_PI))) - 1.0;
+  if(val < 0.0)
+    val = -val;
+  val = 2.0 * (val - 0.5);
   p_osc->curphase += p_osc->incr;
   if (p_osc->curphase >= TWO_PI)
     p_osc->curphase -= TWO_PI;

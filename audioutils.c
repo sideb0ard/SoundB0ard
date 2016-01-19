@@ -24,4 +24,5 @@ void pa_teardown(void)
     printf("Errrrr while terminating Portaudio: %s\n", Pa_GetErrorText(err));
     exit(-1);
   }
+  exit(0);
 }

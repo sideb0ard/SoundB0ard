@@ -17,6 +17,6 @@ mixer *new_mixer(void);
 void *mixer_run(void *);
 void mixer_ps(mixer *mixr);
 double gen_next(mixer *mixr);
-void add_osc(mixer *mixr, uint32_t freq);
+void add_osc(mixer *mixr, uint32_t freq, tickfunc tic);
 
 #endif // MIXER_H

@@ -9,11 +9,11 @@ TARGET = sbsh
 .PHONE: depend clean
 
 all: $(TARGET)
-	@echo "\x1b[37mBoom! make some noise...\x1b[0m"
+	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(LIBS)
 
 clean:
 	rm -f *.o *~ $(TARGET)
-	@echo "\x1b[37mCleannnnd..!\x1b[0m"
+	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
