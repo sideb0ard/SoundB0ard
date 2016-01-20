@@ -8,6 +8,8 @@
 #define M_PI  (3.14159265358897932)
 #endif
 
+#define DEFAULT_BPM 80
+
 #define TWO_PI (2.0 * M_PI)
 
 #define FREQRAD (TWO_PI / SAMPLE_RATE)
