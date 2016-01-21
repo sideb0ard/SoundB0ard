@@ -1,6 +1,8 @@
 #ifndef MIXER_H
 #define MIXER_H
 
+#include <portaudio.h>
+
 #include "wave.h"
 
 #define INITIAL_SIGNAL_SIZE 4
@@ -18,5 +20,11 @@ void *mixer_run(void *);
 void mixer_ps(mixer *mixr);
 double gen_next(mixer *mixr);
 void add_osc(mixer *mixr, uint32_t freq, tickfunc tic);
+
+static int paCallback( const void *inputBuffer, void *outputBuffer,
+                       unsigned long framesPerBuffer,
+                       const PaStreamCallbackTimeInfo* timeInfo,
+                       PaStreamCallbackFlags statusFlags,
+                       void *userData );
 
 #endif // MIXER_H

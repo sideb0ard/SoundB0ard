@@ -9,11 +9,13 @@
 #include <readline/history.h>
 
 #include "audioutils.h"
+#include "bpmrrr.h"
 #include "defjams.h"
 #include "cmdloop.h"
 #include "mixer.h"
 
 extern mixer *mixr;
+extern bpmrrr *b;
 
 void loopy(void)
 {
@@ -29,6 +31,7 @@ void loopy(void)
 void ps() 
 {
   mixer_ps(mixr);
+  bpm_info(b);
 }
 
 void gen() 
@@ -58,22 +61,24 @@ void interpret(char *line)
   // SINE|SAW|TRI (FREQ)
   regmatch_t pmatch[3];
   regex_t sigtype_rx;
-  regcomp(&sigtype_rx, "(sine|sawd|sawu|tri|square) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
+  regcomp(&sigtype_rx, "(bpm|sine|sawd|sawu|tri|square) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
 
   if (regexec(&sigtype_rx, line, 3, pmatch, 0) == 0) {
-    int freq = 0;
+    int val = 0;
     char sig_type[10];
-    sscanf(line, "%s %d", sig_type, &freq);
-    if (strcmp(sig_type, "sine") == 0) {
-        add_osc(mixr, freq, &sinetick);
+    sscanf(line, "%s %d", sig_type, &val);
+    if (strcmp(sig_type, "bpm") == 0) {
+      bpm_change(b, val);
+    } else if (strcmp(sig_type, "sine") == 0) {
+        add_osc(mixr, val, &sinetick);
     } else if (strcmp(sig_type, "sawd") == 0) {
-        add_osc(mixr, freq, &sawdtick);
+        add_osc(mixr, val, &sawdtick);
     } else if (strcmp(sig_type, "sawu") == 0) {
-        add_osc(mixr, freq, &sawutick);
+        add_osc(mixr, val, &sawutick);
     } else if (strcmp(sig_type, "tri") == 0) {
-        add_osc(mixr, freq, &tritick);
+        add_osc(mixr, val, &tritick);
     } else if (strcmp(sig_type, "square") == 0) {
-        add_osc(mixr, freq, &sqtick);
+        add_osc(mixr, val, &sqtick);
     }
   }
 }

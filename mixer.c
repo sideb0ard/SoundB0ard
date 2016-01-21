@@ -14,28 +14,6 @@ typedef struct {
   float right_phase;
 } paData;
 
-static int paCallback( const void *inputBuffer, void *outputBuffer,
-                           unsigned long framesPerBuffer,
-                           const PaStreamCallbackTimeInfo* timeInfo,
-                           PaStreamCallbackFlags statusFlags,
-                           void *userData )
-{
-  paData *data = (paData*)userData;
-  float *out = (float*)outputBuffer;
-  unsigned int i;
-  (void) inputBuffer;
-  (void) timeInfo;
-  (void) statusFlags;
-  for (i = 0; i < framesPerBuffer; i++)
-  {
-
-    float val = gen_next(data->mixr);
-    *out++ = val;
-    *out++ = val;
-  }
-  return 0;
-}
-
 mixer *new_mixer()
 {
   mixer *mixr = NULL;
@@ -82,9 +60,9 @@ void *mixer_run(void *mixr_p)
 
 void mixer_ps(mixer *mixr)
 {
-  printf("::::: Mixing Desk :::::\n");
+  printf(ANSI_COLOR_WHITE "::::: Mixing Desk :::::\n" ANSI_COLOR_RESET);
   for ( int i = 0; i < mixr->num_sig; i++) {
-    printf("calling status on osc at %p\n", mixr->signals[i]);
+    // printf("calling status on osc at %p\n", mixr->signals[i]);
     char ss[80];
     status(mixr->signals[i], ss);
     printf("SB [%d] - %s\n", i, ss); 
@@ -95,14 +73,14 @@ void add_osc(mixer *mixr, uint32_t freq, tickfunc tic)
 {
   OSCIL **new_signals = NULL;
   /* check if we need to allocate more space for OSCILs */
-  printf("BZZT! signals at mem: %p\n", mixr->signals);
+  //printf("BZZT! signals at mem: %p\n", mixr->signals);
   if (mixr->sig_size <= mixr->num_sig) {
     if (mixr->sig_size == 0) {
       mixr->sig_size = INITIAL_SIGNAL_SIZE;
-      printf("YEY! sigsize is now inital size: %d\n", mixr->sig_size);
+      //printf("YEY! sigsize is now inital size: %d\n", mixr->sig_size);
     } else {
       mixr->sig_size *= 2;
-      printf("OYEY! sigsize now doubled: %d\n", mixr->sig_size);
+      //printf("OYEY! sigsize now doubled: %d\n", mixr->sig_size);
     }
 
     new_signals = realloc(mixr->signals, mixr->sig_size *
@@ -112,7 +90,7 @@ void add_osc(mixer *mixr, uint32_t freq, tickfunc tic)
       return;
     } else {
       mixr->signals = new_signals;
-      printf("BOOM! realloced singals: %p\n", mixr->signals);
+      //printf("BOOM! realloced singals: %p\n", mixr->signals);
     }
   }
   OSCIL *new_osc = new_oscil(freq, tic);
@@ -132,3 +110,26 @@ double gen_next(mixer *mixr)
   }
   return output_val;
 }
+
+static int paCallback( const void *inputBuffer, void *outputBuffer,
+                           unsigned long framesPerBuffer,
+                           const PaStreamCallbackTimeInfo* timeInfo,
+                           PaStreamCallbackFlags statusFlags,
+                           void *userData )
+{
+  paData *data = (paData*)userData;
+  float *out = (float*)outputBuffer;
+  unsigned int i;
+  (void) inputBuffer;
+  (void) timeInfo;
+  (void) statusFlags;
+  for (i = 0; i < framesPerBuffer; i++)
+  {
+
+    float val = gen_next(data->mixr);
+    *out++ = val;
+    *out++ = val;
+  }
+  return 0;
+}
+

@@ -27,8 +27,13 @@ void bpm_change(bpmrrr *b, int bpm)
 {
   if (bpm > 60) { // the sleeptime calculation would bring if this was under 60
     b->bpm = bpm;
-    b->sleeptime = (60 / b->bpm / 4 ) * 1000000000;
+    b->sleeptime = (60.0 / b->bpm / 4 ) * 1000000000;
   }
+}
+
+void bpm_info(bpmrrr *b)
+{
+  printf("BPM: %d // Current Tick: %d\n", b->bpm, b->cur_tick);
 }
 
 void bpm_run(void *bp)
@@ -36,7 +41,7 @@ void bpm_run(void *bp)
   bpmrrr *b = (bpmrrr*) bp; 
   while (1)
   {
-    printf("TICK: %d\n", (b->cur_tick%4 + 1)); 
+    // printf("TICK: %d\n", (b->cur_tick%4 + 1)); 
     b->cur_tick++;
 
     struct timespec ts;
