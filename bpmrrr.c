@@ -33,10 +33,10 @@ void bpm_change(bpmrrr *b, int bpm)
 
 void bpm_info(bpmrrr *b)
 {
-  printf("BPM: %d // Current Tick: %d\n", b->bpm, b->cur_tick);
+  printf(ANSI_COLOR_WHITE "BPM: %d // Current Tick: %d\n" ANSI_COLOR_RESET, b->bpm, b->cur_tick);
 }
 
-void bpm_run(void *bp)
+void *bpm_run(void *bp)
 {
   bpmrrr *b = (bpmrrr*) bp; 
   while (1)

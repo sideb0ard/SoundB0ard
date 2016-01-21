@@ -1,4 +1,4 @@
-/* wave.h */
+/* oscil.h */
 
 #ifndef WAVE_H
 #define WAVE_H

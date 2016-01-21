@@ -4,7 +4,7 @@
 #include <stdlib.h>
 
 #include "defjams.h"
-#include "wave.h"
+#include "oscil.h"
 
 OSCIL* new_oscil(uint32_t freq, tickfunc tic)
 {
@@ -90,8 +90,8 @@ double tritick(OSCIL *p_osc)
 
 void status(OSCIL *p_osc, char *status_string)
 {
-  printf("Calling me up! I gots an OSC at %p\n", p_osc);
-  printf("FREQy! %f\n", p_osc->freq);
+  //printf("Calling me up! I gots an OSC at %p\n", p_osc);
+  //printf("FREQy! %f\n", p_osc->freq);
   //sprintf(sstatus, "freq: %f curphase: %f", p_osc->freq, p_osc->curphase);
   sprintf(status_string, "freq: %f", p_osc->freq);
 

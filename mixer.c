@@ -6,7 +6,7 @@
 
 #include "defjams.h"
 #include "mixer.h"
-#include "wave.h"
+#include "oscil.h"
 
 typedef struct {
   mixer *mixr;
@@ -25,39 +25,6 @@ mixer *new_mixer()
   return mixr;
 }
 
-void *mixer_run(void *mixr_p)
-{
-  PaStream *stream;
-  PaError err;
-  paData data;
-  data.mixr = (mixer*) mixr_p;
-
-  err = Pa_OpenDefaultStream( &stream, 
-                              0, // no input channels
-                              2, // stereo output
-                              paFloat32, // 32bit fp output
-                              SAMPLE_RATE,
-                              paFramesPerBufferUnspecified,
-                              paCallback,
-                              &data );
-
-  if ( err != paNoError) {
-    printf("Errrrr! couldn't open Portaudio default stream: %s\n", Pa_GetErrorText(err));
-    exit(-1);
-  }
-
-  err = Pa_StartStream( stream );
-  if ( err != paNoError) {
-    printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
-    exit(-1);
-  }
-
-  // keep thread active
-  while(1) {}
-
-  return NULL;
-}
-
 void mixer_ps(mixer *mixr)
 {
   printf(ANSI_COLOR_WHITE "::::: Mixing Desk :::::\n" ANSI_COLOR_RESET);
@@ -65,7 +32,7 @@ void mixer_ps(mixer *mixr)
     // printf("calling status on osc at %p\n", mixr->signals[i]);
     char ss[80];
     status(mixr->signals[i], ss);
-    printf("SB [%d] - %s\n", i, ss); 
+    printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
   }
 }
 
@@ -133,3 +100,35 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
   return 0;
 }
 
+void *mixer_run(void *mixr_p)
+{
+  PaStream *stream;
+  PaError err;
+  paData data;
+  data.mixr = (mixer*) mixr_p;
+
+  err = Pa_OpenDefaultStream( &stream, 
+                              0, // no input channels
+                              2, // stereo output
+                              paFloat32, // 32bit fp output
+                              SAMPLE_RATE,
+                              paFramesPerBufferUnspecified,
+                              paCallback,
+                              &data );
+
+  if ( err != paNoError) {
+    printf("Errrrr! couldn't open Portaudio default stream: %s\n", Pa_GetErrorText(err));
+    exit(-1);
+  }
+
+  err = Pa_StartStream( stream );
+  if ( err != paNoError) {
+    printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
+    exit(-1);
+  }
+
+  // keep thread active
+  while(1) {}
+
+  return NULL;
+}
