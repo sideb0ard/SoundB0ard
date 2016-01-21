@@ -11,8 +11,10 @@
 #define DEFAULT_BPM 80
 
 #define TWO_PI (2.0 * M_PI)
-
 #define FREQRAD (TWO_PI / SAMPLE_RATE)
+
+#define TABLEN (1024)
+#define TABRAD (TABLEN / SAMPLE_RATE)
 
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
