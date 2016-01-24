@@ -7,7 +7,6 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "oscil.h"
-#include "oscilt.h"
 
 typedef struct {
   mixer *mixr;
@@ -35,15 +34,9 @@ void mixer_ps(mixer *mixr)
     status(mixr->signals[i], ss);
     printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
   }
-  for ( int i = 0; i < mixr->num_tsig; i++) {
-    // printf("calling status on osc at %p\n", mixr->signals[i]);
-    char ss[80];
-    tstatus(mixr->tsignals[i], ss);
-    printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
-  }
 }
 
-void add_osc(mixer *mixr, uint32_t freq, tickfunc tic)
+void add_osc(mixer *mixr, int freq, GTABLE *gt)
 {
   OSCIL **new_signals = NULL;
   /* check if we need to allocate more space for OSCILs */
@@ -67,35 +60,11 @@ void add_osc(mixer *mixr, uint32_t freq, tickfunc tic)
       //printf("BOOM! realloced singals: %p\n", mixr->signals);
     }
   }
-  OSCIL *new_osc = new_oscil(freq, tic);
+  OSCIL *new_osc = new_oscil(freq, gt);
   mixr->signals[mixr->num_sig] = new_osc;
   mixr->num_sig++;
 }
 
-void add_tosc(mixer *mixr, uint32_t freq, ttickfunc tic)
-{
-  OSCILT **new_tsignals = NULL;
-  if (mixr->tsig_size <= mixr->num_tsig) {
-    if (mixr->tsig_size == 0) {
-      mixr->tsig_size = INITIAL_SIGNAL_SIZE;
-    } else {
-      mixr->tsig_size *= 2;
-    }
-
-    new_tsignals = realloc(mixr->tsignals, mixr->tsig_size *
-                        sizeof(OSCILT*));
-    if (new_tsignals == NULL) {
-      printf("Unable to allocate more signalszzz");
-      return;
-    } else {
-      mixr->tsignals = new_tsignals;
-      //printf("BOOM! realloced singals: %p\n", mixr->signals);
-    }
-  }
-  OSCILT *new_tosc = new_oscilt(freq, tic);
-  mixr->tsignals[mixr->num_tsig] = new_tosc;
-  mixr->num_tsig++;
-}
 
 double gen_next(mixer *mixr)
 {
@@ -104,13 +73,6 @@ double gen_next(mixer *mixr)
     for (int i = 0; i < mixr->num_sig; i++) {
       //output_val += sinetick(mixr->signals[i]);
       output_val += mixr->signals[i]->tick(mixr->signals[i]);
-      //printf("[%d] - %f\n", i, output_val);
-    }
-  }
-  if (mixr->num_tsig > 0) {
-    for (int i = 0; i < mixr->num_tsig; i++) {
-      //output_val += sinetick(mixr->signals[i]);
-      output_val += mixr->tsignals[i]->tick(mixr->tsignals[i]);
       //printf("[%d] - %f\n", i, output_val);
     }
   }

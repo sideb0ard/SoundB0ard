@@ -13,12 +13,12 @@
 #include "cmdloop.h"
 #include "defjams.h"
 #include "mixer.h"
-#include "oscilt.h"
+//#include "oscil.h"
 #include "table.h"
 
 extern mixer *mixr;
 extern bpmrrr *b;
-extern GTABLE *gtable;
+extern GTABLE *sine_table;
 
 void loopy(void)
 {
@@ -74,17 +74,17 @@ void interpret(char *line)
     if (strcmp(sig_type, "bpm") == 0) {
       bpm_change(b, val);
     } else if (strcmp(sig_type, "sine") == 0) {
-        add_osc(mixr, val, &sinetick);
-    } else if (strcmp(sig_type, "sawd") == 0) {
-        add_osc(mixr, val, &sawdtick);
-    } else if (strcmp(sig_type, "sawu") == 0) {
-        add_osc(mixr, val, &sawutick);
-    } else if (strcmp(sig_type, "tri") == 0) {
-        add_osc(mixr, val, &tritick);
-    } else if (strcmp(sig_type, "square") == 0) {
-        add_osc(mixr, val, &sqtick);
-    } else if (strcmp(sig_type, "tsine") == 0) {
-        add_tosc(mixr, val, &tabitick);
+        add_osc(mixr, val, sine_table);
+    //} else if (strcmp(sig_type, "sawd") == 0) {
+    //    add_osc(mixr, val, &sawdtick);
+    //} else if (strcmp(sig_type, "sawu") == 0) {
+    //    add_osc(mixr, val, &sawutick);
+    //} else if (strcmp(sig_type, "tri") == 0) {
+    //    add_osc(mixr, val, &tritick);
+    //} else if (strcmp(sig_type, "square") == 0) {
+    //    add_osc(mixr, val, &sqtick);
+    //} else if (strcmp(sig_type, "tsine") == 0) {
+    //    add_tosc(mixr, val, sine_table);
     }
   }
 }

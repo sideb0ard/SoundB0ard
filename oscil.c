@@ -1,118 +1,67 @@
-#include <math.h>
-#include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 #include "defjams.h"
 #include "oscil.h"
+#include "table.h"
 
-OSCIL* new_oscil(uint32_t freq, tickfunc tic)
+OSCIL* new_oscil(double freq, GTABLE *gt)
 {
-  OSCIL *p_osc;
-
-  p_osc = calloc(1, sizeof(OSCIL));
-  if (p_osc == NULL) 
+  OSCIL* p_osc;
+  p_osc = (OSCIL *) calloc(1, sizeof(OSCIL));
+  if (p_osc == NULL)
     return NULL;
   p_osc->freq = freq;
-  p_osc->curphase = 0.0;
-  p_osc->incr = FREQRAD * freq;
+  p_osc->incr = TABRAD * freq;
+  printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
+  p_osc->gtable = gt;
+  p_osc->dtablen = (double) TABLEN;
 
-  //unsigned long i, len = TABLEN;
-  //double step;
-
-  //step = TWO_PI / len;
-  //for (i=0 ; i < len; i++) {
-  //  p_osc->table[i] = sin(step * i);
-  //}
-  //p_osc->table[i] = p_osc->table[0]; // guard point is copy of first val
-
-  p_osc->tick = tic;
+  p_osc->tick = &tabitick;
 
   return p_osc;
 }
 
-double sinetick(OSCIL *p_osc)
+// TODO: do i need this?
+double tabtick(OSCIL* p_osc)
 {
-  double val;
-  //double tablen = (double) TABLEN;
-  val = sin(p_osc->curphase);
-  
-  //int index = (int) p_osc->curphase;
-  //val = (float) p_osc->table[index];
-
-  p_osc->curphase += p_osc->incr;
-  if (p_osc->curphase >= TWO_PI)
-    p_osc->curphase -= TWO_PI;
-  if (p_osc->curphase < 0.0)
-    p_osc->curphase += TWO_PI;
-  //while (p_osc->curphase >= tablen)
-  //  p_osc->curphase -= tablen;
-  //while (p_osc->curphase < tablen)
-  //  p_osc->curphase += tablen;
-
-  return val;
+  printf("TAB tick called!\n");
+  int index = (int) (p_osc->curphase);
+  double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
+  double* table = p_osc->gtable->table;
+  curphase += p_osc->incr;
+  while ( curphase >= dtablen)
+    curphase += dtablen;
+  while ( curphase < 0.0)
+    curphase -= dtablen;
+  p_osc->curphase = curphase;
+  return table[index];
 }
 
-double sqtick(OSCIL *p_osc)
+double tabitick(OSCIL* p_osc) // interpolating
 {
-  double val;
-  if (p_osc->curphase <= M_PI)
-    val = 1.0;
-  else
-    val = -1;
-  p_osc->curphase += p_osc->incr;
-  if (p_osc->curphase >= TWO_PI)
-    p_osc->curphase -= TWO_PI;
-  if (p_osc->curphase < 0.0)
-    p_osc->curphase += TWO_PI;
-  return val;
-}
+  int base_index = (int) (p_osc->curphase);
+  unsigned long next_index = base_index + 1;
+  double frac, slope, val;
+  double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
+  double* table = p_osc->gtable->table;
+ 
+  frac = curphase - base_index;
+  val = table[base_index];
+  slope = table[next_index] - val;
 
-double sawdtick(OSCIL *p_osc)
-{
-  double val;
-  val = 1.0 - 2.0 * (p_osc->curphase * (1.0 / TWO_PI));
-  p_osc->curphase += p_osc->incr;
-  if (p_osc->curphase >= TWO_PI)
-    p_osc->curphase -= TWO_PI;
-  if (p_osc->curphase < 0.0)
-    p_osc->curphase += TWO_PI;
-  return val;
-}
+  val += (frac * slope);
+  curphase += p_osc->incr;
 
-double sawutick(OSCIL *p_osc)
-{
-  double val;
-  val = (2.0 * (p_osc->curphase * (1.0 / TWO_PI))) - 1.0;
-  p_osc->curphase += p_osc->incr;
-  if (p_osc->curphase >= TWO_PI)
-    p_osc->curphase -= TWO_PI;
-  if (p_osc->curphase < 0.0)
-    p_osc->curphase += TWO_PI;
-  return val;
-}
+  while ( curphase >= dtablen)
+    curphase -= dtablen;
+  while ( curphase < 0.0)
+    curphase += dtablen;
 
-double tritick(OSCIL *p_osc)
-{
-  double val;
-  val = (2.0 * (p_osc->curphase * (1.0 / TWO_PI))) - 1.0;
-  if(val < 0.0)
-    val = -val;
-  val = 2.0 * (val - 0.5);
-  p_osc->curphase += p_osc->incr;
-  if (p_osc->curphase >= TWO_PI)
-    p_osc->curphase -= TWO_PI;
-  if (p_osc->curphase < 0.0)
-    p_osc->curphase += TWO_PI;
+  p_osc->curphase = curphase;
   return val;
 }
 
 void status(OSCIL *p_osc, char *status_string)
 {
-  //printf("Calling me up! I gots an OSC at %p\n", p_osc);
-  //printf("FREQy! %f\n", p_osc->freq);
-  //sprintf(sstatus, "freq: %f curphase: %f", p_osc->freq, p_osc->curphase);
-  sprintf(status_string, "freq: %f", p_osc->freq);
-
-  //return "jobbie";
+  sprintf(status_string, "freq: %f incr: %f cur: %f", p_osc->freq, p_osc->incr, p_osc->curphase);
 }

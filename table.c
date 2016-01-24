@@ -5,12 +5,12 @@
 #include "defjams.h"
 #include "table.h"
 
-GTABLE* new_sine_table()
-{
-  unsigned long i;
-  double step;
-  GTABLE* gtable = NULL;
+static GTABLE* new_gtable(void);
+static void norm_gtable(GTABLE* gtable);
 
+static GTABLE* new_gtable(void)
+{
+  GTABLE* gtable = NULL;
   gtable = (GTABLE*) calloc(1, sizeof(GTABLE));
   if (gtable == NULL)
     return NULL;
@@ -20,10 +20,21 @@ GTABLE* new_sine_table()
     return NULL;
   }
   gtable->length = TABLEN;
+  return gtable;
+}
+
+GTABLE* new_sine_table()
+{
+  unsigned long i;
+  double step;
+  
+  GTABLE* gtable = new_gtable();
+
   step = TWO_PI / TABLEN;
   for (i = 0; i < TABLEN; i++)
     gtable->table[i] = sin(step * i);
   gtable->table[i] = gtable->table[0]; // guard point
+
   return gtable;
 }
 
@@ -34,11 +45,26 @@ void table_info(GTABLE* gtable)
     printf("%f", gtable->table[(int)i]);
 }
 
-//void gtable_free(GTABLE** gtable)
-//{
-//  if (gtable && *gtable && (*gtable)->table) {
-//    free((*gtable)->table);
-//    free(*gtable);
-//    *gtable = NULL;
-//  }
-//}
+void gtable_free(GTABLE** gtable)
+{
+  if (gtable && *gtable && (*gtable)->table) {
+    free((*gtable)->table);
+    free(*gtable);
+    *gtable = NULL;
+  }
+}
+
+static void norm_gtable(GTABLE* gtable) 
+{
+  unsigned long i;
+  double val, maxamp = 0.0;
+  for (i = 0; i < gtable->length; i++) {
+    val = fabs(gtable->table[i]);
+    if ( maxamp < val)
+      maxamp = val;
+  }
+  maxamp = 1.0 / maxamp;
+  for (i=0; i < gtable->length; i++)
+    gtable->table[i] *= maxamp;
+  gtable->table[i] = gtable->table[0];
+}

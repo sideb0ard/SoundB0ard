@@ -9,7 +9,7 @@
 
 mixer *mixr;
 bpmrrr *b;
-GTABLE *gtable;
+GTABLE *sine_table;
 
 int main()
 {
@@ -17,7 +17,8 @@ int main()
   pa_setup();
 
   // lookup table for wavs
-  gtable = new_sine_table();
+  sine_table = new_sine_table();
+  // TODO: more tables
 
   // run da mixer
   mixr = new_mixer();

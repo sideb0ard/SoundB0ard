@@ -1,14 +1,12 @@
-/* oscil.h */
-
 #ifndef OSCIL_H
 #define OSCIL_H
 
-#include <stdint.h>
-
-#include "defjams.h"
+#include <stdio.h>
+#include "oscil.h"
+#include "table.h"
 
 typedef struct t_oscil OSCIL;
-typedef double (*tickfunc)( OSCIL* osc);
+typedef double (*tickfunc) (OSCIL* osc);
 
 typedef struct t_oscil
 {
@@ -16,16 +14,17 @@ typedef struct t_oscil
   double curphase;
   double incr;
 
+  const GTABLE* gtable;
+  double dtablen;
+
   tickfunc tick;
 } OSCIL;
 
-OSCIL* new_oscil(uint32_t freq, tickfunc tic);
+typedef double (*tickfunc) (OSCIL* tosc);
 
-double sinetick(OSCIL *p_osc);
-double sawdtick(OSCIL *p_osc);
-double sawutick(OSCIL *p_osc);
-double tritick(OSCIL *p_osc);
-double sqtick(OSCIL *p_osc);
+OSCIL* new_oscil(double freq, GTABLE *gt);
+double tabtick(OSCIL* p_osc);
+double tabitick(OSCIL* p_osc);
 
 void status(OSCIL *p_osc, char *status_string);
 
