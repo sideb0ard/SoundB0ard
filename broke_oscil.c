@@ -17,14 +17,14 @@ OSCIL* new_oscil(uint32_t freq, tickfunc tic)
   p_osc->curphase = 0.0;
   p_osc->incr = FREQRAD * freq;
 
-  //unsigned long i, len = TABLEN;
-  //double step;
+  unsigned long i, len = TABLEN;
+  double step;
 
-  //step = TWO_PI / len;
-  //for (i=0 ; i < len; i++) {
-  //  p_osc->table[i] = sin(step * i);
-  //}
-  //p_osc->table[i] = p_osc->table[0]; // guard point is copy of first val
+  step = TWO_PI / len;
+  for (i=0 ; i < len; i++) {
+    p_osc->table[i] = sin(step * i);
+  }
+  p_osc->table[i] = p_osc->table[0]; // guard point is copy of first val
 
   p_osc->tick = tic;
 
@@ -34,21 +34,20 @@ OSCIL* new_oscil(uint32_t freq, tickfunc tic)
 double sinetick(OSCIL *p_osc)
 {
   double val;
-  //double tablen = (double) TABLEN;
-  val = sin(p_osc->curphase);
+  double tablen = (double) TABLEN;
+  // val = sin(p_osc->curphase);
   
-  //int index = (int) p_osc->curphase;
-  //val = (float) p_osc->table[index];
-
+  int index = (int) p_osc->curphase;
+  val = (float) p_osc->table[index];
   p_osc->curphase += p_osc->incr;
-  if (p_osc->curphase >= TWO_PI)
-    p_osc->curphase -= TWO_PI;
-  if (p_osc->curphase < 0.0)
-    p_osc->curphase += TWO_PI;
-  //while (p_osc->curphase >= tablen)
-  //  p_osc->curphase -= tablen;
-  //while (p_osc->curphase < tablen)
-  //  p_osc->curphase += tablen;
+  //if (p_osc->curphase >= TWO_PI)
+  //  p_osc->curphase -= TWO_PI;
+  //if (p_osc->curphase < 0.0)
+  //  p_osc->curphase += TWO_PI;
+  while (p_osc->curphase >= tablen)
+    p_osc->curphase -= tablen;
+  while (p_osc->curphase < tablen)
+    p_osc->curphase += tablen;
 
   return val;
 }

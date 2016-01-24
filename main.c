@@ -9,11 +9,15 @@
 
 mixer *mixr;
 bpmrrr *b;
+GTABLE *gtable;
 
 int main()
 {
   // PortAudio start me up!
   pa_setup();
+
+  // lookup table for wavs
+  gtable = new_sine_table();
 
   // run da mixer
   mixr = new_mixer();

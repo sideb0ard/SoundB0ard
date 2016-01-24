@@ -13,7 +13,7 @@
 #define TWO_PI (2.0 * M_PI)
 #define FREQRAD (TWO_PI / SAMPLE_RATE)
 
-#define TABLEN (1024)
+#define TABLEN (1024.00)
 #define TABRAD (TABLEN / SAMPLE_RATE)
 
 #define ANSI_COLOR_RED     "\x1b[31m"

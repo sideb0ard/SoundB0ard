@@ -10,12 +10,15 @@
 
 #include "audioutils.h"
 #include "bpmrrr.h"
-#include "defjams.h"
 #include "cmdloop.h"
+#include "defjams.h"
 #include "mixer.h"
+#include "oscilt.h"
+#include "table.h"
 
 extern mixer *mixr;
 extern bpmrrr *b;
+extern GTABLE *gtable;
 
 void loopy(void)
 {
@@ -32,6 +35,7 @@ void ps()
 {
   mixer_ps(mixr);
   bpm_info(b);
+  //table_info(gtable);
 }
 
 void gen() 
@@ -79,6 +83,8 @@ void interpret(char *line)
         add_osc(mixr, val, &tritick);
     } else if (strcmp(sig_type, "square") == 0) {
         add_osc(mixr, val, &sqtick);
+    } else if (strcmp(sig_type, "tsine") == 0) {
+        add_tosc(mixr, val, &tabitick);
     }
   }
 }

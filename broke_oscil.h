@@ -15,6 +15,7 @@ typedef struct t_oscil
   double freq;
   double curphase;
   double incr;
+  double table[TABLEN + 1]; // +1 is a guard point
 
   tickfunc tick;
 } OSCIL;
