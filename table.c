@@ -29,10 +29,30 @@ GTABLE* new_sine_table()
   double step;
   
   GTABLE* gtable = new_gtable();
+  if (gtable == NULL)
+    return NULL;
 
   step = TWO_PI / TABLEN;
   for (i = 0; i < TABLEN; i++)
     gtable->table[i] = sin(step * i);
+  gtable->table[i] = gtable->table[0]; // guard point
+
+  return gtable;
+}
+
+GTABLE* new_tri_table()
+{
+  unsigned long i, j;
+  double step, amp;
+  int harmonic = 1;
+  
+  GTABLE* gtable = new_gtable();
+  if (gtable == NULL)
+    return NULL;
+
+  step = TWO_PI / TABLEN;
+  for (i = 0; i < TABLEN; i++)
+    gtable->table[i] = cos(step * i);
   gtable->table[i] = gtable->table[0]; // guard point
 
   return gtable;

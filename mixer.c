@@ -36,6 +36,20 @@ void mixer_ps(mixer *mixr)
   }
 }
 
+void vol_change(mixer *mixr, int sig, float vol)
+{
+  if (sig > (mixr->sig_size - 1))
+    return;
+  mixr->signals[sig]->voladj(mixr->signals[sig], vol);
+}
+
+void freq_change(mixer *mixr, int sig, float freq)
+{
+  if (sig > (mixr->sig_size - 1))
+    return;
+  mixr->signals[sig]->freqadj(mixr->signals[sig], freq);
+}
+
 void add_osc(mixer *mixr, int freq, GTABLE *gt)
 {
   OSCIL **new_signals = NULL;

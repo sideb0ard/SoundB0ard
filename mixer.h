@@ -23,6 +23,8 @@ mixer *new_mixer(void);
 void *mixer_run(void *); // TODO: need this?
 void mixer_ps(mixer *mixr);
 void add_osc(mixer *mixr, int freq, GTABLE *gt);
+void vol_change(mixer *mixr, int sig, float vol);
+void freq_change(mixer *mixr, int sig, float freq);
 
 double gen_next(mixer *mixr);
 

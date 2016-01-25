@@ -18,7 +18,12 @@
 
 extern mixer *mixr;
 extern bpmrrr *b;
+
+// TODO: make into a single array of lookup tables
 extern GTABLE *sine_table;
+extern GTABLE *tri_table;
+//extern GTABLE *square_table;
+//extern GTABLE *saw_table;
 
 void loopy(void)
 {
@@ -79,12 +84,30 @@ void interpret(char *line)
     //    add_osc(mixr, val, &sawdtick);
     //} else if (strcmp(sig_type, "sawu") == 0) {
     //    add_osc(mixr, val, &sawutick);
-    //} else if (strcmp(sig_type, "tri") == 0) {
-    //    add_osc(mixr, val, &tritick);
+    } else if (strcmp(sig_type, "tri") == 0) {
+        add_osc(mixr, val, tri_table);
     //} else if (strcmp(sig_type, "square") == 0) {
     //    add_osc(mixr, val, &sqtick);
     //} else if (strcmp(sig_type, "tsine") == 0) {
     //    add_tosc(mixr, val, sine_table);
+    }
+  }
+
+  regmatch_t tpmatch[4];
+  regex_t tsigtype_rx;
+  regcomp(&tsigtype_rx, "(vol|freq) ([[:digit:]]+) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
+  if (regexec(&tsigtype_rx, line, 3, tpmatch, 0) == 0) {
+    int sig = 0;
+    int val = 0;
+    char cmd_type[10];
+    sscanf(line, "%s %d %d", cmd_type, &sig, &val);
+    if (strcmp(cmd_type, "vol") == 0) {
+      vol_change(mixr, sig, val);
+      printf("VOL! %s %d %d\n", cmd_type, sig, val);
+    }
+    if (strcmp(cmd_type, "freq") == 0) {
+      freq_change(mixr, sig, val);
+      printf("FREQ! %s %d %d\n", cmd_type, sig, val);
     }
   }
 }

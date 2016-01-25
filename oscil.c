@@ -12,13 +12,27 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
     return NULL;
   p_osc->freq = freq;
   p_osc->incr = TABRAD * freq;
+  p_osc->vol = 1.0;
   printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
   p_osc->gtable = gt;
   p_osc->dtablen = (double) TABLEN;
 
   p_osc->tick = &tabitick;
+  p_osc->voladj = &volfunc;
+  p_osc->freqadj = &freqfunc;
 
   return p_osc;
+}
+
+void volfunc(OSCIL* p_osc, double v)
+{
+  p_osc->vol = v;
+}
+
+void freqfunc(OSCIL* p_osc, double f)
+{
+  p_osc->freq = f;
+  p_osc->incr = TABRAD * f;
 }
 
 // TODO: do i need this?
@@ -44,6 +58,7 @@ double tabitick(OSCIL* p_osc) // interpolating
   double frac, slope, val;
   double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
   double* table = p_osc->gtable->table;
+  double vol = p_osc->vol;
  
   frac = curphase - base_index;
   val = table[base_index];
@@ -58,7 +73,7 @@ double tabitick(OSCIL* p_osc) // interpolating
     curphase += dtablen;
 
   p_osc->curphase = curphase;
-  return val;
+  return val * vol;
 }
 
 void status(OSCIL *p_osc, char *status_string)
