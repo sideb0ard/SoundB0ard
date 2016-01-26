@@ -26,6 +26,10 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
 
 void volfunc(OSCIL* p_osc, double v)
 {
+  if (v < 0.0 || v > 1.0) {
+    printf("oi, don't take the piss!\n");
+    return;
+  }
   p_osc->vol = v;
 }
 
@@ -78,5 +82,5 @@ double tabitick(OSCIL* p_osc) // interpolating
 
 void status(OSCIL *p_osc, char *status_string)
 {
-  sprintf(status_string, "freq: %f incr: %f cur: %f", p_osc->freq, p_osc->incr, p_osc->curphase);
+  sprintf(status_string, "freq: %f vol: %f incr: %f cur: %f", p_osc->freq, p_osc->vol, p_osc->incr, p_osc->curphase);
 }

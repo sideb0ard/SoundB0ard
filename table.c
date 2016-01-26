@@ -5,10 +5,10 @@
 #include "defjams.h"
 #include "table.h"
 
-static GTABLE* new_gtable(void);
-static void norm_gtable(GTABLE* gtable);
+static GTABLE* _new_gtable(void);
+// static void norm_gtable(GTABLE* gtable);
 
-static GTABLE* new_gtable(void)
+static GTABLE* _new_gtable(void)
 {
   GTABLE* gtable = NULL;
   gtable = (GTABLE*) calloc(1, sizeof(GTABLE));
@@ -23,12 +23,14 @@ static GTABLE* new_gtable(void)
   return gtable;
 }
 
+// TABLE GENERATION SIGNALS
+//
 GTABLE* new_sine_table()
 {
   unsigned long i;
   double step;
   
-  GTABLE* gtable = new_gtable();
+  GTABLE* gtable = _new_gtable();
   if (gtable == NULL)
     return NULL;
 
@@ -42,21 +44,62 @@ GTABLE* new_sine_table()
 
 GTABLE* new_tri_table()
 {
-  unsigned long i, j;
-  double step, amp;
-  int harmonic = 1;
+  unsigned long i;
+  double step;
   
-  GTABLE* gtable = new_gtable();
+  GTABLE* gtable = _new_gtable();
   if (gtable == NULL)
     return NULL;
 
   step = TWO_PI / TABLEN;
   for (i = 0; i < TABLEN; i++)
-    gtable->table[i] = cos(step * i);
+    gtable->table[i] = (2.0 * ((step * i) * (1.0 / TWO_PI) )) - 1.0;
   gtable->table[i] = gtable->table[0]; // guard point
 
   return gtable;
 }
+
+GTABLE* new_square_table()
+{
+  unsigned long i;
+  
+  GTABLE* gtable = _new_gtable();
+  if (gtable == NULL)
+    return NULL;
+
+  for (i = 0; i < TABLEN; i++)
+    if (i < M_PI)
+      gtable->table[i] = 1.0;
+    else
+      gtable->table[i] = -1;
+
+  gtable->table[i] = gtable->table[0]; // guard point
+
+  return gtable;
+}
+
+GTABLE* new_saw_table(int up)
+{
+  unsigned long i;
+  float step;
+  
+  GTABLE* gtable = _new_gtable();
+  if (gtable == NULL)
+    return NULL;
+
+  step = TWO_PI / TABLEN;
+  if (up) {
+    for (i = 0; i < TABLEN; i++)
+      gtable->table[i] = (2.0 * ((step * i) * (1.0 / TWO_PI) )) - 1.0;
+  } else {
+    for (i = 0; i < TABLEN; i++)
+      gtable->table[i] = 1.0 - 2.0 * ((step * i) * (1.0 / TWO_PI) );
+  }
+  gtable->table[i] = gtable->table[0]; // guard point
+
+  return gtable;
+}
+// END TABLE GENERATION SIGNALS
 
 void table_info(GTABLE* gtable)
 {
@@ -74,17 +117,17 @@ void gtable_free(GTABLE** gtable)
   }
 }
 
-static void norm_gtable(GTABLE* gtable) 
-{
-  unsigned long i;
-  double val, maxamp = 0.0;
-  for (i = 0; i < gtable->length; i++) {
-    val = fabs(gtable->table[i]);
-    if ( maxamp < val)
-      maxamp = val;
-  }
-  maxamp = 1.0 / maxamp;
-  for (i=0; i < gtable->length; i++)
-    gtable->table[i] *= maxamp;
-  gtable->table[i] = gtable->table[0];
-}
+// static void norm_gtable(GTABLE* gtable) 
+// {
+//   unsigned long i;
+//   double val, maxamp = 0.0;
+//   for (i = 0; i < gtable->length; i++) {
+//     val = fabs(gtable->table[i]);
+//     if ( maxamp < val)
+//       maxamp = val;
+//   }
+//   maxamp = 1.0 / maxamp;
+//   for (i=0; i < gtable->length; i++)
+//     gtable->table[i] *= maxamp;
+//   gtable->table[i] = gtable->table[0];
+// }
