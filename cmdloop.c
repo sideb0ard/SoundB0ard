@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,12 +9,12 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
+#include "algoriddim.h"
 #include "audioutils.h"
 #include "bpmrrr.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "mixer.h"
-//#include "oscil.h"
 #include "table.h"
 
 extern mixer *mixr;
@@ -63,6 +64,13 @@ void interpret(char *line)
   if (strcmp(line, "ps") == 0) {
     ps();
     return;
+  } else if (strcmp(line, "song") == 0) {
+    pthread_t songrun_th;
+    if ( pthread_create (&songrun_th, NULL, algo_run, NULL)) {
+      fprintf(stderr, "Errr running song\n");
+      return;
+    }
+    pthread_detach(songrun_th);
   } else if (strcmp(line, "exit") == 0) {
     exxit();
   }
