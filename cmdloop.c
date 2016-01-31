@@ -12,6 +12,7 @@
 #include "algoriddim.h"
 #include "audioutils.h"
 #include "bpmrrr.h"
+#include "breakpoint.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "mixer.h"
@@ -19,6 +20,7 @@
 
 extern mixer *mixr;
 extern bpmrrr *b;
+extern BRKSTREAM *ampstream;
 
 // TODO: make into a single array of lookup tables
 extern GTABLE *sine_table;
@@ -42,6 +44,7 @@ void ps()
 {
   mixer_ps(mixr);
   bpm_info(b);
+  ps_stream(ampstream);
   //table_info(gtable);
 }
 

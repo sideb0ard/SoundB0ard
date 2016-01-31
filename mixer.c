@@ -4,6 +4,7 @@
 
 #include <portaudio.h>
 
+#include "breakpoint.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "oscil.h"
@@ -13,6 +14,8 @@ typedef struct {
   float left_phase;
   float right_phase;
 } paData;
+
+extern BRKSTREAM* ampstream;
 
 mixer *new_mixer()
 {
@@ -90,7 +93,8 @@ double gen_next(mixer *mixr)
       //printf("[%d] - %f\n", i, output_val);
     }
   }
-  return output_val;
+  double amp = bps_tick(ampstream);
+  return amp * output_val;
 }
 
 static int paCallback( const void *inputBuffer, void *outputBuffer,

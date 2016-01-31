@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #include "audioutils.h"
+#include "breakpoint.h"
 #include "bpmrrr.h"
 #include "cmdloop.h"
 #include "defjams.h"
@@ -15,6 +16,8 @@ GTABLE *square_table;
 GTABLE *saw_up_table;
 GTABLE *saw_down_table;
 
+BRKSTREAM* ampstream = NULL;
+
 int main()
 {
   // PortAudio start me up!
@@ -26,6 +29,8 @@ int main()
   square_table = new_square_table();
   saw_up_table = new_saw_table(1);
   saw_down_table = new_saw_table(0);
+
+  ampstream = bps_newstream();
 
   // run da mixer
   mixr = new_mixer();

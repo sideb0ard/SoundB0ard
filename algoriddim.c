@@ -31,17 +31,17 @@ void *algo_run(void *a)
 
   //int num_sigs = 0;
 
-  int melody[] = {180, 170, 150};
+  int melody[] = {180, 180, 170, 150};
 
   add_osc(mixr, 227, sine_table);
   add_osc(mixr, 230, sine_table);
   add_osc(mixr, 180, sine_table);
-  while (1)
+  for (int i = 1; ; i = (i+1) %4)
   {
-    if (b->cur_tick % 16 == 0) {
+    if (b->cur_tick % 8 == 0) {
       if (!sleep) {
         sleep = 1;
-        freq_change(mixr, 2, (melody[rand() %3]));
+        freq_change(mixr, 2, (melody[i]));
       }
     } else if (sleep)
       sleep = 0;
