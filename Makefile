@@ -1,7 +1,7 @@
 CC = clang
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
-LIBS = -lportaudio -lreadline
 SRC = main.c mixer.c oscil.c breakpoint.c cmdloop.c audioutils.c bpmrrr.c table.c algoriddim.c
+LIBS = -lportaudio -lreadline -lm -lpthread
 OBJ = $(SRC:.c=.o)
 
 TARGET = sbsh
