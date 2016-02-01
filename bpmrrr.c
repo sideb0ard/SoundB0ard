@@ -25,7 +25,7 @@ bpmrrr *new_bpmrrr()
 
 void bpm_change(bpmrrr *b, int bpm)
 {
-  if (bpm > 60) { // the sleeptime calculation would bring if this was under 60
+  if (bpm > 60) { // my sleeptime calculation would break if this was under 60
     b->bpm = bpm;
     b->sleeptime = (60.0 / b->bpm / 4 ) * 1000000000;
   }

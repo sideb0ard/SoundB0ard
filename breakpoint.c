@@ -1,8 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "defjams.h"
 #include "breakpoint.h"
+#include "bpmrrr.h"
+#include "defjams.h"
+#include "mixer.h"
+
+extern mixer *mixr;
+extern bpmrrr *b;
 
 static void _bps_updatepoints(BRKSTREAM *stream)
 {
@@ -20,6 +25,13 @@ static void _bps_reset(BRKSTREAM *stream)
   _bps_updatepoints(stream);
 
 }
+
+void update_stream_bpm(BRKSTREAM *stream)
+{
+  stream->incr = 100.0 / (60.0 / (b->bpm) * SAMPLE_RATE * 4.0);
+  printf("called me - BPM IS NOW %d\n", b->bpm);
+}
+
 
 BREAKPOINT maxpoint(const BREAKPOINT* points, long npoints)
 {
@@ -46,11 +58,11 @@ BREAKPOINT* newpoints()
     return NULL;
   points[0].time = 0.0; 
   points[0].value = 0.0;
-  points[1].time = 0.900;
+  points[1].time = 15.00;
   points[1].value = 1.0;
-  points[2].time = 5.10; 
+  points[2].time = 85.00; 
   points[2].value = 1.0;
-  points[3].time = 6.0;
+  points[3].time = 99.0;
   points[3].value = 0.0;
   return points;
 }
@@ -66,7 +78,7 @@ BRKSTREAM* bps_newstream()
     return NULL;
   stream->points = points;
   stream->npoints = npoints;
-  stream->incr = 6.0 / SAMPLE_RATE;
+  stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * 4); // 4 bars long
 
   _bps_reset(stream);
 

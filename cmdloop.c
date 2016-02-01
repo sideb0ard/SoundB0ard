@@ -90,6 +90,7 @@ void interpret(char *line)
     sscanf(line, "%s %d", sig_type, &val);
     if (strcmp(sig_type, "bpm") == 0) {
       bpm_change(b, val);
+      update_stream_bpm(ampstream, val);
     } else if (strcmp(sig_type, "sine") == 0) {
         add_osc(mixr, val, sine_table);
     } else if (strcmp(sig_type, "sawd") == 0) {

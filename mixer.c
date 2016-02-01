@@ -93,8 +93,15 @@ double gen_next(mixer *mixr)
       //printf("[%d] - %f\n", i, output_val);
     }
   }
+
   double amp = bps_tick(ampstream);
-  return amp * output_val;
+  output_val *= amp;
+
+  if (output_val > 1.0)
+    return 1.0;
+  else
+    return output_val;
+  //return output_val;
 }
 
 static int paCallback( const void *inputBuffer, void *outputBuffer,

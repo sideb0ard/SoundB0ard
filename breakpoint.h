@@ -24,5 +24,6 @@ void free_stream(BRKSTREAM* stream);
 double bps_tick(BRKSTREAM* stream);
 
 void ps_stream(BRKSTREAM *stream);
+void update_stream_bpm(BRKSTREAM *stream);
 
 #endif

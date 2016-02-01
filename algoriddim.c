@@ -31,17 +31,21 @@ void *algo_run(void *a)
 
   //int num_sigs = 0;
 
-  int melody[] = {180, 180, 170, 150};
+  int melody[] = {150, 180};
 
-  add_osc(mixr, 227, sine_table);
-  add_osc(mixr, 230, sine_table);
+  //add_osc(mixr, 227, sine_table);
+  //add_osc(mixr, 230, sine_table);
   add_osc(mixr, 180, sine_table);
-  for (int i = 1; ; i = (i+1) %4)
+  int i = 0;
+  //for (int i = 1; ; i = (i+1) %4)
+  while (1)
   {
-    if (b->cur_tick % 8 == 0) {
+    if (b->cur_tick % 16 == 0) {
       if (!sleep) {
+        i = 1 - i;
         sleep = 1;
-        freq_change(mixr, 2, (melody[i]));
+        freq_change(mixr, 0, (melody[i]));
+        //printf("I iszz %d\n", i);
       }
     } else if (sleep)
       sleep = 0;
