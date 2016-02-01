@@ -12,7 +12,7 @@
 #include "algoriddim.h"
 #include "audioutils.h"
 #include "bpmrrr.h"
-#include "breakpoint.h"
+#include "envelope.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "mixer.h"
@@ -20,7 +20,7 @@
 
 extern mixer *mixr;
 extern bpmrrr *b;
-extern BRKSTREAM *ampstream;
+extern ENVSTREAM *ampstream;
 
 // TODO: make into a single array of lookup tables
 extern GTABLE *sine_table;
@@ -44,7 +44,7 @@ void ps()
 {
   mixer_ps(mixr);
   bpm_info(b);
-  ps_stream(ampstream);
+  ps_envelope_stream(ampstream);
   //table_info(gtable);
 }
 
@@ -90,7 +90,7 @@ void interpret(char *line)
     sscanf(line, "%s %d", sig_type, &val);
     if (strcmp(sig_type, "bpm") == 0) {
       bpm_change(b, val);
-      update_stream_bpm(ampstream, val);
+      update_envelope_stream_bpm(ampstream);
     } else if (strcmp(sig_type, "sine") == 0) {
         add_osc(mixr, val, sine_table);
     } else if (strcmp(sig_type, "sawd") == 0) {

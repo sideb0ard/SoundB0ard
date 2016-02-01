@@ -4,7 +4,7 @@
 
 #include <portaudio.h>
 
-#include "breakpoint.h"
+#include "envelope.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "oscil.h"
@@ -15,7 +15,7 @@ typedef struct {
   float right_phase;
 } paData;
 
-extern BRKSTREAM* ampstream;
+extern ENVSTREAM* ampstream;
 
 mixer *new_mixer()
 {
@@ -94,7 +94,7 @@ double gen_next(mixer *mixr)
     }
   }
 
-  double amp = bps_tick(ampstream);
+  double amp = envelope_stream_tick(ampstream);
   output_val *= amp;
 
   if (output_val > 1.0)

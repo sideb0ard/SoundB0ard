@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "breakpoint.h"
+#include "envelope.h"
 #include "bpmrrr.h"
 #include "defjams.h"
 #include "mixer.h"
@@ -9,7 +9,7 @@
 extern mixer *mixr;
 extern bpmrrr *b;
 
-static void _bps_updatepoints(BRKSTREAM *stream)
+static void _env_updatepoints(ENVSTREAM *stream)
 {
   stream->leftpoint = stream->points[stream->ileft];
   stream->rightpoint = stream->points[stream->iright];
@@ -17,25 +17,25 @@ static void _bps_updatepoints(BRKSTREAM *stream)
   stream->height = stream->rightpoint.value - stream->leftpoint.value;
 }
 
-static void _bps_reset(BRKSTREAM *stream)
+static void _env_reset(ENVSTREAM *stream)
 {
   stream->curpos = 0.0;
   stream->ileft = 0;
   stream->iright = 1;
-  _bps_updatepoints(stream);
+  _env_updatepoints(stream);
 
 }
 
-void update_stream_bpm(BRKSTREAM *stream)
+void update_envelope_stream_bpm(ENVSTREAM *stream)
 {
   stream->incr = 100.0 / (60.0 / (b->bpm) * SAMPLE_RATE * 4.0);
   printf("called me - BPM IS NOW %d\n", b->bpm);
 }
 
 
-BREAKPOINT maxpoint(const BREAKPOINT* points, long npoints)
+ENVELOPE maxpoint(const ENVELOPE* points, long npoints)
 {
-  BREAKPOINT point;
+  ENVELOPE point;
 
   point.value = points[0].value;
   point.time = points[0].time;
@@ -49,11 +49,11 @@ BREAKPOINT maxpoint(const BREAKPOINT* points, long npoints)
   return point;
 }
 
-BREAKPOINT* newpoints()
+ENVELOPE* newpoints()
 {
 
-  BREAKPOINT *points = NULL;
-  points = (BREAKPOINT*) calloc(4, sizeof(BREAKPOINT));
+  ENVELOPE *points = NULL;
+  points = (ENVELOPE*) calloc(4, sizeof(ENVELOPE));
   if (points == NULL)
     return NULL;
   points[0].time = 0.0; 
@@ -67,25 +67,25 @@ BREAKPOINT* newpoints()
   return points;
 }
 
-BRKSTREAM* bps_newstream()
+ENVSTREAM* new_envelope_stream()
 {
-  BRKSTREAM* stream;
-  BREAKPOINT *points = newpoints();
+  ENVSTREAM* stream;
+  ENVELOPE *points = newpoints();
 
   unsigned long npoints = 4;
-  stream = (BRKSTREAM*) calloc(1, sizeof(BRKSTREAM));
+  stream = (ENVSTREAM*) calloc(1, sizeof(ENVSTREAM));
   if (stream == NULL)
     return NULL;
   stream->points = points;
   stream->npoints = npoints;
   stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * 4); // 4 bars long
 
-  _bps_reset(stream);
+  _env_reset(stream);
 
   return stream;
 }
 
-void free_stream(BRKSTREAM* stream)
+void free_stream(ENVSTREAM* stream)
 {
   if (stream && stream->points) {
     free(stream->points);
@@ -93,7 +93,7 @@ void free_stream(BRKSTREAM* stream)
   }
 }
 
-double bps_tick(BRKSTREAM* stream)
+double envelope_stream_tick(ENVSTREAM* stream)
 {
   double thisval, frac;
   frac = (stream->curpos - stream->leftpoint.time) / stream->width;
@@ -103,25 +103,25 @@ double bps_tick(BRKSTREAM* stream)
   if(stream->curpos > stream->rightpoint.time) {
     stream->ileft++; stream->iright++;
     if (stream->iright < stream->npoints) {
-      _bps_updatepoints(stream);
+      _env_updatepoints(stream);
     } else {
-      _bps_reset(stream);
+      _env_reset(stream);
     }
   }
   return thisval;
 }
 
-void printbp(BREAKPOINT *bp)
+void printbp(ENVELOPE *bp)
 {
   printf("Time: %f Val: %f\n", bp->time, bp->value);
 }
 
-void ps_stream(BRKSTREAM *stream)
+void ps_envelope_stream(ENVSTREAM *stream)
 {
-    //BREAKPOINT tmp = maxpoint(stream->points, 4);
+    //ENVELOPE tmp = maxpoint(stream->points, 4);
     //for (int i = 0; i < 4; i++)
     //  printbp(&stream->points[0]);
     //printf("Max: %f\n", tmp.value);
     
-    printf("Cur: %f Incr: %f Val: %f\n", stream->curpos, stream->incr, bps_tick(stream));
+    printf("Cur: %f Incr: %f Val: %f\n", stream->curpos, stream->incr, envelope_stream_tick(stream));
 }

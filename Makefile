@@ -1,6 +1,6 @@
 CC = clang
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
-SRC = main.c mixer.c oscil.c breakpoint.c cmdloop.c audioutils.c bpmrrr.c table.c algoriddim.c
+SRC = main.c mixer.c oscil.c envelope.c cmdloop.c audioutils.c bpmrrr.c table.c algoriddim.c
 LIBS = -lportaudio -lreadline -lm -lpthread
 OBJ = $(SRC:.c=.o)
 
