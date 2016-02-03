@@ -53,7 +53,7 @@ void freq_change(mixer *mixr, int sig, float freq)
   mixr->signals[sig]->freqadj(mixr->signals[sig], freq);
 }
 
-void add_osc(mixer *mixr, int freq, GTABLE *gt)
+int add_osc(mixer *mixr, int freq, GTABLE *gt)
 {
   OSCIL **new_signals = NULL;
   /* check if we need to allocate more space for OSCILs */
@@ -71,7 +71,7 @@ void add_osc(mixer *mixr, int freq, GTABLE *gt)
                         sizeof(OSCIL*));
     if (new_signals == NULL) {
       printf("Unable to allocate more signalszzz");
-      return;
+      return mixr->num_sig;
     } else {
       mixr->signals = new_signals;
       //printf("BOOM! realloced singals: %p\n", mixr->signals);
@@ -79,7 +79,8 @@ void add_osc(mixer *mixr, int freq, GTABLE *gt)
   }
   OSCIL *new_osc = new_oscil(freq, gt);
   mixr->signals[mixr->num_sig] = new_osc;
-  mixr->num_sig++;
+  //mixr->num_sig++;
+  return mixr->num_sig++;
 }
 
 
@@ -97,9 +98,9 @@ double gen_next(mixer *mixr)
   double amp = envelope_stream_tick(ampstream);
   output_val *= amp;
 
-  if (output_val > 1.0)
-    return 1.0;
-  else
+  //if (output_val > 1.0)
+  //  return 1.0;
+  //else
     return output_val;
   //return output_val;
 }

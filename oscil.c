@@ -12,7 +12,7 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
     return NULL;
   p_osc->freq = freq;
   p_osc->incr = TABRAD * freq;
-  p_osc->vol = 1.0;
+  p_osc->vol = 0.0;
   printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
   p_osc->gtable = gt;
   p_osc->dtablen = (double) TABLEN;
@@ -27,7 +27,6 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
 void volfunc(OSCIL* p_osc, double v)
 {
   if (v < 0.0 || v > 1.0) {
-    printf("oi, don't take the piss!\n");
     return;
   }
   p_osc->vol = v;

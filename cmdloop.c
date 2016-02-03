@@ -17,6 +17,7 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "table.h"
+#include "utils.h"
 
 extern mixer *mixr;
 extern bpmrrr *b;
@@ -94,7 +95,16 @@ void interpret(char *line)
     } else if (strcmp(sig_type, "sine") == 0) {
         add_osc(mixr, val, sine_table);
     } else if (strcmp(sig_type, "sawd") == 0) {
-        add_osc(mixr, val, saw_down_table);
+        //add_osc(mixr, val, saw_down_table);
+        pthread_t timed_start_th;
+        sig_msg *params = calloc(1, sizeof(sig_msg));
+        strncpy(params->sig_type, sig_type, 10);
+        printf("SIGTYPE is %s\n", params->sig_type);
+        params->freq = val;
+        if ( pthread_create (&timed_start_th, NULL, timed_sig_start, params)) {
+          printf("Ooft!\n");
+        }
+        //timed_sig_start(sig_type, val, 0);
     } else if (strcmp(sig_type, "sawu") == 0) {
         add_osc(mixr, val, saw_up_table);
     } else if (strcmp(sig_type, "tri") == 0) {
