@@ -82,37 +82,33 @@ void interpret(char *line)
   // TODO: move regex outside function to compile once
   // SINE|SAW|TRI (FREQ)
   regmatch_t pmatch[3];
-  regex_t sigtype_rx;
-  regcomp(&sigtype_rx, "(bpm|sine|sawd|sawu|tri|square) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
+  regex_t cmdtype_rx;
+  regcomp(&cmdtype_rx, "(bpm|stop|sine|sawd|sawu|tri|square) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
 
-  if (regexec(&sigtype_rx, line, 3, pmatch, 0) == 0) {
+  if (regexec(&cmdtype_rx, line, 3, pmatch, 0) == 0) {
+
     int val = 0;
-    char sig_type[10];
-    sscanf(line, "%s %d", sig_type, &val);
-    if (strcmp(sig_type, "bpm") == 0) {
+    char cmd[20];
+    sbmsg *msg = calloc(1, sizeof(sbmsg));
+
+    sscanf(line, "%s %d", cmd, &val);
+
+    if (strcmp(cmd, "bpm") == 0) {
       bpm_change(b, val);
       update_envelope_stream_bpm(ampstream);
-    } else if (strcmp(sig_type, "sine") == 0) {
-        add_osc(mixr, val, sine_table);
-    } else if (strcmp(sig_type, "sawd") == 0) {
-        //add_osc(mixr, val, saw_down_table);
-        pthread_t timed_start_th;
-        sig_msg *params = calloc(1, sizeof(sig_msg));
-        strncpy(params->sig_type, sig_type, 10);
-        printf("SIGTYPE is %s\n", params->sig_type);
-        params->freq = val;
-        if ( pthread_create (&timed_start_th, NULL, timed_sig_start, params)) {
-          printf("Ooft!\n");
-        }
-        //timed_sig_start(sig_type, val, 0);
-    } else if (strcmp(sig_type, "sawu") == 0) {
-        add_osc(mixr, val, saw_up_table);
-    } else if (strcmp(sig_type, "tri") == 0) {
-        add_osc(mixr, val, tri_table);
-    } else if (strcmp(sig_type, "square") == 0) {
-        add_osc(mixr, val, square_table);
-    //} else if (strcmp(sig_type, "tsine") == 0) {
-    //    add_tosc(mixr, val, sine_table);
+    } else if (strcmp(cmd, "stop") == 0) {
+      strncpy(msg->cmd, "faderrr", 19);
+      thrunner(msg);
+    } else {
+      strncpy(msg->cmd, "timed_sig_start", 19);
+      strncpy(msg->params, cmd, 10);
+      msg->freq = val;
+      thrunner(msg);
+
+
+      //if ( pthread_create (&timed_start_th, NULL, timed_sig_start, params)) {
+      //  printf("Ooft!\n");
+      //}
     }
   }
 
