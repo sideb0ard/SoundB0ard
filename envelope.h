@@ -22,6 +22,9 @@ ENVSTREAM *new_envelope_stream(void);
 void free_stream(ENVSTREAM* stream);
 double envelope_stream_tick(ENVSTREAM* stream);
 
+ENVELOPE* newpoints(void);
+void printbp(ENVELOPE *bp);
+
 void ps_envelope_stream(ENVSTREAM *stream);
 void update_envelope_stream_bpm(ENVSTREAM *stream);
 

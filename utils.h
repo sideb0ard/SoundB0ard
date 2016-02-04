@@ -1,14 +1,3 @@
-typedef struct {
-  char cmd[20];
-  char params[20];
-  int freq;
-} sbmsg;
-
-typedef enum {
-  UP,
-  DOWN
-} direction;
-
 void thrunner(sbmsg *msg);
 void *timed_sig_start(void *arg);
 void *fade_runrrr(void *arg);

@@ -28,7 +28,8 @@ static void _env_reset(ENVSTREAM *stream)
 
 void update_envelope_stream_bpm(ENVSTREAM *stream)
 {
-  stream->incr = 100.0 / (60.0 / (b->bpm) * SAMPLE_RATE * 4.0);
+  // 100 is for percent - time of envelope is measured as percent of loop len
+  stream->incr = 100.0 / (60.0 / (b->bpm) * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
   printf("called me - BPM IS NOW %d\n", b->bpm);
 }
 
@@ -78,7 +79,7 @@ ENVSTREAM* new_envelope_stream()
     return NULL;
   stream->points = points;
   stream->npoints = npoints;
-  stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * 4); // 4 bars long
+  stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * DEFAULT_ENV_LENGTH); 
 
   _env_reset(stream);
 
