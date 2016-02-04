@@ -73,6 +73,7 @@ void *algo_run(void *a)
   sleep(3);
 
   mk_sbmsg_sine(299);
+  sleep(3);
 
   while (1)
   {
