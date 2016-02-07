@@ -126,9 +126,9 @@ double gen_next(mixer *mixr)
   double amp = envelope_stream_tick(ampstream);
   output_val *= amp;
 
-  //if (output_val > 1.0)
-  //  return 1.0;
-  //else
+  if (output_val > 1.0)
+    return 1.0;
+  else
     return output_val;
   //return output_val;
 }

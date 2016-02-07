@@ -27,20 +27,20 @@ algo *new_algo()
   return a;
 }
 
-sbmsg* new_sb_msg()
-{
-  sbmsg *msg = calloc(1, sizeof(sbmsg));
-  return msg;
-}
-
-void mk_sbmsg_sine(int freq)
-{
-  sbmsg *m = new_sb_msg();
-  strncpy(m->cmd, "timed_sig_start", 19);
-  strncpy(m->params, "sine", 19);
-  m->freq = freq;
-  thrunner(m);
-}
+//sbmsg* new_sb_msg()
+//{
+//  sbmsg *msg = calloc(1, sizeof(sbmsg));
+//  return msg;
+//}
+//
+//void mk_sbmsg_sine(int freq)
+//{
+//  sbmsg *m = new_sb_msg();
+//  strncpy(m->cmd, "timed_sig_start", 19);
+//  strncpy(m->params, "sine", 19);
+//  m->freq = freq;
+//  thrunner(m);
+//}
 
 
 void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int note_len)
@@ -49,8 +49,7 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
 
     *mlock = 1;
 
-    if (rand() % 100 < 30) {
-      printf("30%%!\n");
+    if (rand() % 100 < 20) {
       //fade_runrrr(
       //vol_change(mixr, osc_num, 0.0);
       if (mixr->signals[osc_num]->vol >= 0.5) 
@@ -65,13 +64,13 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
   }
 }
 
-melody_msg* new_melody_msg(int osc_num)
+melody_msg* new_melody_msg(int freq1, int freq2, int melody_len)
 {
   melody_msg* m = calloc(1, sizeof(melody_msg));
-  m->melody[0] = 440;
-  m->melody[1] = 550;
+  m->melody[0] = freq1;
+  m->melody[1] = freq2;
   m->osc_num = 0;
-  m->melody_len = 2;
+  m->melody_len = melody_len;
   m->melody_play_lock = 0;
   m->melody_cur_note = 0;
   return m;
@@ -86,15 +85,18 @@ void *algo_run(void *a)
 
   printf("ALGO RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_len);
 
-  mk_sbmsg_sine(mmsg->melody[0]);
+  //mk_sbmsg_sine(mmsg->melody[0]);
+  int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
+  mmsg->osc_num = osc_num;
+  do {} while (b->cur_tick % 16 != 0);
+  faderrr(osc_num, UP);
   sleep(3);
 
   while (1)
   {
-    if (b->cur_tick % 4 == 0) {
+    if (b->cur_tick % 16 == 0) {
       play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, 2);
     } else if (mmsg->melody_play_lock) {
-      printf("LOKIN\n");
       mmsg->melody_play_lock = 0;
     }
   }

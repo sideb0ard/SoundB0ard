@@ -145,7 +145,7 @@ void interpret(char *line)
     int len_loop; // bars
     sscanf(line, "%s %s %lf %lf %d", loop, cmd_type, &freq_one, &freq_two, &len_loop);
     printf("%s %s %f %f %d\n", loop, cmd_type, freq_one, freq_two, len_loop);
-    melody_msg *mm = new_melody_msg();
+    melody_msg *mm = new_melody_msg(freq_one, freq_two, len_loop);
     pthread_t melody_th;
     if ( pthread_create (&melody_th, NULL, algo_run, mm)) {
       fprintf(stderr, "Errr running melody\n");
