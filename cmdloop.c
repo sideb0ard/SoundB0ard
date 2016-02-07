@@ -84,7 +84,7 @@ void interpret(char *line)
   // SINE|SAW|TRI (FREQ)
   regmatch_t pmatch[3];
   regex_t cmdtype_rx;
-  regcomp(&cmdtype_rx, "(bpm|stop|sine|sawd|sawu|tri|square) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
+  regcomp(&cmdtype_rx, "^(bpm|stop|sine|sawd|sawu|tri|square) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
 
   if (regexec(&cmdtype_rx, line, 3, pmatch, 0) == 0) {
 
@@ -115,7 +115,7 @@ void interpret(char *line)
 
   regmatch_t tpmatch[4];
   regex_t tsigtype_rx;
-  regcomp(&tsigtype_rx, "(vol|freq|fm) ([[:digit:]]+) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
+  regcomp(&tsigtype_rx, "^(vol|freq|fm) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
   if (regexec(&tsigtype_rx, line, 3, tpmatch, 0) == 0) {
     int sig = 0;
     double val = 0;
@@ -133,5 +133,24 @@ void interpret(char *line)
       add_fm(mixr, sig, val);
       printf("FML!\n");
     }
+  }
+  regmatch_t lmatch[5];
+  regex_t loop_rx;
+  regcomp(&loop_rx, "^loop (sine|sawd|sawu|tri|square) ([[:digit:]]+) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+  if (regexec(&loop_rx, line, 5, lmatch, 0) == 0) {
+    char loop[10];
+    char cmd_type[10];
+    double freq_one;
+    double freq_two;
+    int len_loop; // bars
+    sscanf(line, "%s %s %lf %lf %d", loop, cmd_type, &freq_one, &freq_two, &len_loop);
+    printf("%s %s %f %f %d\n", loop, cmd_type, freq_one, freq_two, len_loop);
+    melody_msg *mm = new_melody_msg();
+    pthread_t melody_th;
+    if ( pthread_create (&melody_th, NULL, algo_run, mm)) {
+      fprintf(stderr, "Errr running melody\n");
+      return;
+    }
+    pthread_detach(melody_th);
   }
 }

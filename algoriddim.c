@@ -33,6 +33,16 @@ sbmsg* new_sb_msg()
   return msg;
 }
 
+void mk_sbmsg_sine(int freq)
+{
+  sbmsg *m = new_sb_msg();
+  strncpy(m->cmd, "timed_sig_start", 19);
+  strncpy(m->params, "sine", 19);
+  m->freq = freq;
+  thrunner(m);
+}
+
+
 void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int note_len)
 {
   if (!*mlock) {
@@ -55,50 +65,37 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
   }
 }
 
-void mk_sbmsg_sine(int freq)
+melody_msg* new_melody_msg(int osc_num)
 {
-  sbmsg *m = new_sb_msg();
-  strncpy(m->cmd, "timed_sig_start", 19);
-  strncpy(m->params, "sine", 19);
-  m->freq = freq;
-  thrunner(m);
+  melody_msg* m = calloc(1, sizeof(melody_msg));
+  m->melody[0] = 440;
+  m->melody[1] = 550;
+  m->osc_num = 0;
+  m->melody_len = 2;
+  m->melody_play_lock = 0;
+  m->melody_cur_note = 0;
+  return m;
 }
+
+//void mk_mmsg(int freq)
 
 void *algo_run(void *a)
 {
-  (void) a;
+  //(void) a;
+  melody_msg *mmsg = (melody_msg*) a;
 
-  int melody[] = {299, 270, 399, 356};
-  int melody_play_lock = 0;
-  int melody_cur_note = 0;
+  printf("ALGO RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_len);
 
-  int bass_melody[] = {180, 150};
-  int bass_play_lock = 0;
-  int bass_cur_note = 0;
-
-  mk_sbmsg_sine(227);
-  sleep(3);
-
-  mk_sbmsg_sine(230);
-  sleep(3);
-
-  mk_sbmsg_sine(180);
-  sleep(3);
-
-  mk_sbmsg_sine(299);
+  mk_sbmsg_sine(mmsg->melody[0]);
   sleep(3);
 
   while (1)
   {
-    if (b->cur_tick % 32 == 0) {
-      play_melody(2, &bass_play_lock, &bass_cur_note, bass_melody, 2);
-    } else if (bass_play_lock) {
-      bass_play_lock = 0;
-    }
-    if (b->cur_tick % 16 == 0) {
-      play_melody(3, &melody_play_lock, &melody_cur_note, melody, 4);
-    } else if (melody_play_lock) {
-      melody_play_lock = 0;
+    if (b->cur_tick % 4 == 0) {
+      play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, 2);
+    } else if (mmsg->melody_play_lock) {
+      printf("LOKIN\n");
+      mmsg->melody_play_lock = 0;
     }
   }
 }
