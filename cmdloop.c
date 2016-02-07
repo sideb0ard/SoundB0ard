@@ -92,6 +92,7 @@ void interpret(char *line)
     sbmsg *msg = calloc(1, sizeof(sbmsg));
 
     sscanf(line, "%s %d", cmd, &val);
+    msg->freq = val;
 
     if (strcmp(cmd, "bpm") == 0) {
       bpm_change(b, val);
@@ -102,7 +103,6 @@ void interpret(char *line)
     } else {
       strncpy(msg->cmd, "timed_sig_start", 19);
       strncpy(msg->params, cmd, 10);
-      msg->freq = val;
       thrunner(msg);
 
 

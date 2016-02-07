@@ -21,6 +21,7 @@ mixer *new_mixer()
 {
   mixer *mixr = NULL;
   mixr = calloc(1, sizeof(mixer));
+  mixr->volume = 0.8;
   if (mixr == NULL) {
     printf("Nae mixer, fucked up!\n");
     return NULL;
@@ -30,7 +31,7 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-  printf(ANSI_COLOR_WHITE "::::: Mixing Desk :::::\n" ANSI_COLOR_RESET);
+  printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) :::::\n" ANSI_COLOR_RESET, mixr->volume);
   for ( int i = 0; i < mixr->num_sig; i++) {
     // printf("calling status on osc at %p\n", mixr->signals[i]);
     char ss[80];
@@ -57,14 +58,11 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt)
 {
   OSCIL **new_signals = NULL;
   /* check if we need to allocate more space for OSCILs */
-  //printf("BZZT! signals at mem: %p\n", mixr->signals);
   if (mixr->sig_size <= mixr->num_sig) {
     if (mixr->sig_size == 0) {
       mixr->sig_size = INITIAL_SIGNAL_SIZE;
-      //printf("YEY! sigsize is now inital size: %d\n", mixr->sig_size);
     } else {
       mixr->sig_size *= 2;
-      //printf("OYEY! sigsize now doubled: %d\n", mixr->sig_size);
     }
 
     new_signals = realloc(mixr->signals, mixr->sig_size *
@@ -74,12 +72,10 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt)
       return mixr->num_sig;
     } else {
       mixr->signals = new_signals;
-      //printf("BOOM! realloced singals: %p\n", mixr->signals);
     }
   }
   OSCIL *new_osc = new_oscil(freq, gt);
   mixr->signals[mixr->num_sig] = new_osc;
-  //mixr->num_sig++;
   return mixr->num_sig++;
 }
 
@@ -89,9 +85,7 @@ double gen_next(mixer *mixr)
   double output_val = 0.0;
   if (mixr->num_sig > 0) {
     for (int i = 0; i < mixr->num_sig; i++) {
-      //output_val += sinetick(mixr->signals[i]);
-      output_val += mixr->signals[i]->tick(mixr->signals[i]);
-      //printf("[%d] - %f\n", i, output_val);
+      output_val += (mixr->signals[i]->tick(mixr->signals[i]) / 1.53);
     }
   }
 
@@ -154,6 +148,7 @@ void *mixer_run(void *mixr_p)
     exit(-1);
   }
 
+  // TODO: do i need this in a thread?
   // keep thread active
   while(1) {}
 

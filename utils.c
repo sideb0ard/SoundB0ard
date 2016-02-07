@@ -88,20 +88,20 @@ void faderrr(int sig_num, direction d)
 {
   struct timespec ts;
   ts.tv_sec = 0;
-  ts.tv_nsec = 5000000;
+  ts.tv_nsec = 500000;
   double vol = 0;
 
   if (d == UP) {
-    while (vol < 1.0) {
-      vol += 0.001;
+    while (vol < 0.5) {
+      vol += 0.0001;
       volfunc(mixr->signals[sig_num], vol);
       nanosleep(&ts, NULL);
     }
-    volfunc(mixr->signals[sig_num], 1.0);
+    volfunc(mixr->signals[sig_num], 0.5);
   } else {
     double vol = mixr->signals[sig_num]->vol;
     while (vol > 0.0) {
-      vol -= 0.001;
+      vol -= 0.0001;
       volfunc(mixr->signals[sig_num], vol);
       nanosleep(&ts, NULL);
     }

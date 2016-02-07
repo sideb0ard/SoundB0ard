@@ -36,9 +36,22 @@ sbmsg* new_sb_msg()
 void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int note_len)
 {
   if (!*mlock) {
-    *note = (*note + 1) % note_len;
+
     *mlock = 1;
-    freq_change(mixr, osc_num, (notes[*note]));
+
+    if (rand() % 100 < 30) {
+      printf("30%%!\n");
+      //fade_runrrr(
+      //vol_change(mixr, osc_num, 0.0);
+      if (mixr->signals[osc_num]->vol >= 0.5) 
+        faderrr(osc_num, DOWN);
+    } else {
+      if (mixr->signals[osc_num]->vol < 0.5) 
+        faderrr(osc_num, UP);
+      // vol_change(mixr, osc_num, 0.7);
+      *note = (*note + 1) % note_len;
+      freq_change(mixr, osc_num, (notes[*note])); 
+    }
   }
 }
 
