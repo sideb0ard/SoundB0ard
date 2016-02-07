@@ -5,6 +5,7 @@
 #include <portaudio.h>
 
 #include "envelope.h"
+#include "fm.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "oscil.h"
@@ -32,11 +33,14 @@ mixer *new_mixer()
 void mixer_ps(mixer *mixr)
 {
   printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) :::::\n" ANSI_COLOR_RESET, mixr->volume);
-  for ( int i = 0; i < mixr->num_sig; i++) {
+  for ( int i = 0; i < mixr->sig_num; i++) {
     // printf("calling status on osc at %p\n", mixr->signals[i]);
     char ss[80];
     status(mixr->signals[i], ss);
     printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
+  }
+  for ( int i = 0; i < mixr->fmsig_num; i++) {
+    fm_status(mixr->fmsignals[i]);
   }
 }
 
@@ -58,7 +62,7 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt)
 {
   OSCIL **new_signals = NULL;
   /* check if we need to allocate more space for OSCILs */
-  if (mixr->sig_size <= mixr->num_sig) {
+  if (mixr->sig_size <= mixr->sig_num) {
     if (mixr->sig_size == 0) {
       mixr->sig_size = INITIAL_SIGNAL_SIZE;
     } else {
@@ -69,26 +73,56 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt)
                         sizeof(OSCIL*));
     if (new_signals == NULL) {
       printf("Unable to allocate more signalszzz");
-      return mixr->num_sig;
+      return mixr->sig_num;
     } else {
       mixr->signals = new_signals;
     }
   }
   OSCIL *new_osc = new_oscil(freq, gt);
-  mixr->signals[mixr->num_sig] = new_osc;
-  return mixr->num_sig++;
+  mixr->signals[mixr->sig_num] = new_osc;
+  return mixr->sig_num++;
 }
 
+int add_fm(mixer *mixr, int ffreq, int cfreq)
+{
+  FM **new_fmsignals = NULL;
+  /* check if we need to allocate more space for OSCILs */
+  if (mixr->fmsig_size <= mixr->fmsig_num) {
+    if (mixr->fmsig_size == 0) {
+      mixr->fmsig_size = INITIAL_SIGNAL_SIZE;
+    } else {
+      mixr->fmsig_size *= 2;
+    }
+
+    new_fmsignals = realloc(mixr->fmsignals, mixr->fmsig_size *
+                        sizeof(FM*));
+    if (new_fmsignals == NULL) {
+      printf("Unable to allocate more FMsignalszzz");
+      return mixr->fmsig_num;
+    } else {
+      mixr->fmsignals = new_fmsignals;
+    }
+  }
+  FM *nfm = new_fm(ffreq, cfreq);
+  mixr->fmsignals[mixr->fmsig_num] = nfm;
+  return mixr->fmsig_num++;
+}
 
 double gen_next(mixer *mixr)
 {
   double output_val = 0.0;
-  if (mixr->num_sig > 0) {
-    for (int i = 0; i < mixr->num_sig; i++) {
-      output_val += (mixr->signals[i]->tick(mixr->signals[i]) / 1.53);
+
+  if (mixr->sig_num > 0) {
+    for (int i = 0; i < mixr->sig_num; i++) {
+      output_val += mixr->signals[i]->tick(mixr->signals[i]);
     }
   }
 
+  if (mixr->fmsig_num > 0) {
+    for (int i = 0; i < mixr->fmsig_num; i++) {
+      output_val += mixr->fmsignals[i]->gen_next(mixr->fmsignals[i]);
+    }
+  }
   double amp = envelope_stream_tick(ampstream);
   output_val *= amp;
 

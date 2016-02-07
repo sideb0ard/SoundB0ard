@@ -13,6 +13,7 @@
 #include "audioutils.h"
 #include "bpmrrr.h"
 #include "envelope.h"
+#include "fm.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "mixer.h"
@@ -114,7 +115,7 @@ void interpret(char *line)
 
   regmatch_t tpmatch[4];
   regex_t tsigtype_rx;
-  regcomp(&tsigtype_rx, "(vol|freq) ([[:digit:]]+) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
+  regcomp(&tsigtype_rx, "(vol|freq|fm) ([[:digit:]]+) ([[:digit:]]+)", REG_EXTENDED|REG_ICASE);
   if (regexec(&tsigtype_rx, line, 3, tpmatch, 0) == 0) {
     int sig = 0;
     double val = 0;
@@ -127,6 +128,10 @@ void interpret(char *line)
     if (strcmp(cmd_type, "freq") == 0) {
       freq_change(mixr, sig, val);
       printf("FREQ! %s %d %lf\n", cmd_type, sig, val);
+    }
+    if (strcmp(cmd_type, "fm") == 0) {
+      add_fm(mixr, sig, val);
+      printf("FML!\n");
     }
   }
 }
