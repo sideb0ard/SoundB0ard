@@ -38,22 +38,6 @@ void freqfunc(OSCIL* p_osc, double f)
   p_osc->incr = TABRAD * f;
 }
 
-// TODO: do i need this?
-double tabtick(OSCIL* p_osc)
-{
-  printf("TAB tick called!\n");
-  int index = (int) (p_osc->curphase);
-  double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
-  double* table = p_osc->gtable->table;
-  curphase += p_osc->incr;
-  while ( curphase >= dtablen)
-    curphase += dtablen;
-  while ( curphase < 0.0)
-    curphase -= dtablen;
-  p_osc->curphase = curphase;
-  return table[index];
-}
-
 double tabitick(OSCIL* p_osc) // interpolating
 {
   int base_index = (int) (p_osc->curphase);

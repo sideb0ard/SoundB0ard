@@ -23,7 +23,7 @@ void *timed_sig_start(void * arg)
   sbmsg *msg = arg;
   int osc_num = 0;
 
-  do {} while (b->cur_tick % 16 != 0);
+  //do {} while (b->cur_tick % 16 != 0);
 
   if (strcmp(msg->params, "sine") == 0) {
       osc_num = add_osc(mixr, msg->freq, sine_table);
@@ -107,4 +107,29 @@ void faderrr(int sig_num, direction d)
     }
     volfunc(mixr->signals[sig_num], 0.0);
   }
+}
+
+freaky* new_freqs_from_string(char* string)
+{
+  //char * freaks = strdup(string);
+
+  char **ap, *fargv[8];
+  int freq_count = 0;
+  //for (ap = fargv; (*ap = strsep(&freaks, " ")) != NULL;) {
+  for (ap = fargv; (*ap = strsep(&string, " ")) != NULL;) {
+    freq_count++;
+    if (**ap != '\0')
+      if (++ap >= &fargv[8])
+        break;
+  }
+  //free(freaks);
+
+  freaky* f = calloc(1, sizeof(freaky));
+  f->num_freaks = freq_count;
+  f->freaks = calloc(freq_count, sizeof(int));
+
+  for (int i = 0; i < freq_count; i++) {
+    f->freaks[i] = atoi(fargv[i]);
+  }
+  return f;
 }

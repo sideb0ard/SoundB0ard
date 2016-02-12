@@ -49,28 +49,29 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
 
     *mlock = 1;
 
-    if (rand() % 100 < 20) {
-      //fade_runrrr(
-      //vol_change(mixr, osc_num, 0.0);
-      if (mixr->signals[osc_num]->vol >= 0.5) 
-        faderrr(osc_num, DOWN);
-    } else {
-      if (mixr->signals[osc_num]->vol < 0.5) 
-        faderrr(osc_num, UP);
+    //if (rand() % 100 < 20) {
+    //  //fade_runrrr(
+    //  //vol_change(mixr, osc_num, 0.0);
+    //  if (mixr->signals[osc_num]->vol >= 0.5) 
+    //    faderrr(osc_num, DOWN);
+    //} else {
+      //if (mixr->signals[osc_num]->vol < 0.5) 
+      //  faderrr(osc_num, UP);
       // vol_change(mixr, osc_num, 0.7);
       *note = (*note + 1) % note_len;
       freq_change(mixr, osc_num, (notes[*note])); 
-    }
+    //}
+    /// play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
   }
 }
 
-melody_msg* new_melody_msg(int freq1, int freq2, int melody_len)
+melody_msg* new_melody_msg(int* freqs, int melody_note_len, int loop_len)
 {
   melody_msg* m = calloc(1, sizeof(melody_msg));
-  m->melody[0] = freq1;
-  m->melody[1] = freq2;
+  m->melody = freqs;
   m->osc_num = 0;
-  m->melody_len = melody_len;
+  m->melody_note_len = melody_note_len;
+  m->melody_loop_len = loop_len;
   m->melody_play_lock = 0;
   m->melody_cur_note = 0;
   return m;
@@ -83,7 +84,7 @@ void *algo_run(void *a)
   //(void) a;
   melody_msg *mmsg = (melody_msg*) a;
 
-  printf("ALGO RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_len);
+  printf("ALGO RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len);
 
   //mk_sbmsg_sine(mmsg->melody[0]);
   int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
@@ -94,8 +95,8 @@ void *algo_run(void *a)
 
   while (1)
   {
-    if (b->cur_tick % 16 == 0) {
-      play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, 2);
+    if (b->cur_tick % (4*(mmsg->melody_loop_len)) == 0) {
+      play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
     } else if (mmsg->melody_play_lock) {
       mmsg->melody_play_lock = 0;
     }

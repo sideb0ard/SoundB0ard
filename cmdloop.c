@@ -134,18 +134,31 @@ void interpret(char *line)
       printf("FML!\n");
     }
   }
-  regmatch_t lmatch[5];
+  regmatch_t lmatch[3];
   regex_t loop_rx;
-  regcomp(&loop_rx, "^loop (sine|sawd|sawu|tri|square) ([[:digit:]]+) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
-  if (regexec(&loop_rx, line, 5, lmatch, 0) == 0) {
-    char loop[10];
-    char cmd_type[10];
-    double freq_one;
-    double freq_two;
-    int len_loop; // bars
-    sscanf(line, "%s %s %lf %lf %d", loop, cmd_type, &freq_one, &freq_two, &len_loop);
-    printf("%s %s %f %f %d\n", loop, cmd_type, freq_one, freq_two, len_loop);
-    melody_msg *mm = new_melody_msg(freq_one, freq_two, len_loop);
+  //regcomp(&loop_rx, "^loop ([[:digit:]]+) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+  regcomp(&loop_rx, "loop ([[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
+  if (regexec(&loop_rx, line, 3, lmatch, 0) == 0) {
+
+    int loop_match_len = lmatch[2].rm_eo - lmatch[2].rm_so;
+    char loop_len_char[loop_match_len];
+    strncpy(loop_len_char, line+lmatch[2].rm_so, loop_match_len);
+    int loop_len = atoi(loop_len_char);
+
+    int frq_len = lmatch[1].rm_eo - lmatch[1].rm_so;
+    char freaks[frq_len];
+    strncpy(freaks, line+lmatch[1].rm_so, frq_len);
+    printf("Freaks! %s\n", freaks);
+
+    freaky* freqs = new_freqs_from_string(freaks);
+
+    printf("LOOP LEN IS %d\n", loop_len);
+    printf("NUM OF FREAKS IN HERE IS %d\n", freqs->num_freaks);
+    for (int i = 0; i < freqs->num_freaks; i++) {
+      printf("FREQ[%d] = %d\n", i, freqs->freaks[i]);
+    }
+
+    melody_msg *mm = new_melody_msg(freqs->freaks, freqs->num_freaks, loop_len);
     pthread_t melody_th;
     if ( pthread_create (&melody_th, NULL, algo_run, mm)) {
       fprintf(stderr, "Errr running melody\n");

@@ -8,15 +8,16 @@ typedef struct t_algoriddim
 } algo;
 
 typedef struct melody_msg {
-  int melody[4];
+  int *melody;
   int osc_num;
-  int melody_len;
+  int melody_note_len;
+  int melody_loop_len;
   int melody_play_lock;
   int melody_cur_note;
 } melody_msg;
 
 
-melody_msg* new_melody_msg(int freq1, int freq2, int melody_len);
+melody_msg* new_melody_msg(int *freqs, int melody_note_len, int loop_len);
 
 sbmsg* new_sb_msg(void);
 algo *new_algo(void);

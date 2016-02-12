@@ -1,3 +1,4 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -86,7 +87,7 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt)
 int add_fm(mixer *mixr, int ffreq, int cfreq)
 {
   FM **new_fmsignals = NULL;
-  /* check if we need to allocate more space for OSCILs */
+  /* check if we need to allocate more space for FMszz */
   if (mixr->fmsig_size <= mixr->fmsig_num) {
     if (mixr->fmsig_size == 0) {
       mixr->fmsig_size = INITIAL_SIGNAL_SIZE;
@@ -111,26 +112,60 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
 double gen_next(mixer *mixr)
 {
   double output_val = 0.0;
+  double amp_totes = 0.0;
+  //int sigsize = mixr->sig_num + mixr->fmsig_num;
 
   if (mixr->sig_num > 0) {
     for (int i = 0; i < mixr->sig_num; i++) {
-      output_val += mixr->signals[i]->tick(mixr->signals[i]);
+        output_val += mixr->signals[i]->tick(mixr->signals[i]);
     }
   }
 
-  if (mixr->fmsig_num > 0) {
-    for (int i = 0; i < mixr->fmsig_num; i++) {
-      output_val += mixr->fmsignals[i]->gen_next(mixr->fmsignals[i]);
-    }
-  }
-  double amp = envelope_stream_tick(ampstream);
-  output_val *= amp;
+      //if (mixr->sig_num > 1) {
+      //  double ampz[mixr->sig_num];
+      //  for (int i = 0; i < mixr->sig_num; i++) {
+      //    //output_val += mixr->signals[j]->tick(mixr->signals[j]);
+      //    ampz[i] = mixr->signals[i]->tick(mixr->signals[i]);
+      //    amp_totes += ampz[i];
+      //  }
+      //  //printf("amp_totes_BEFORE = %f\n", amp_totes);
+      //  if (amp_totes >= 1.0) {
+      //    amp_totes = 1.0 / amp_totes;
+      //  } else {
+      //    amp_totes = 1.0;
+      //  }
+      //  //printf("amp_totes = %f\n", amp_totes);
+      //  for (int i = 0; i < mixr->sig_num; i++) {
+      //    output_val += ((ampz[i]) * amp_totes);
+      //    //printf("OUTP+INC: %f\n", output_val);
+      //    if (output_val > 1)
+      //      output_val = 1;
+      //  }
+      //} else if (mixr->sig_num == 1) {
+      //  output_val = mixr->signals[0]->tick(mixr->signals[0]);
+      //}
 
-  if (output_val > 1.0)
-    return 1.0;
-  else
-    return output_val;
+
+
+      //if (mixr->fmsig_num > 0) {
+      //  for (int j = 0; j < mixr->fmsig_num; j++) {
+      //    output_val += mixr->fmsignals[j]->gen_next(mixr->fmsignals[j]);
+      //  }
+      //}
+
+  //  }
+  //}
+  //double amp = envelope_stream_tick(ampstream);
+  //output_val *= amp;
+
+
+  //printf("OUTPUTVAL_ %f\n", output_val);
+  //if (output_val > 1.0)
+  //  return 1.0;
+  //else
+  //  return output_val;
   //return output_val;
+  return output_val;
 }
 
 static int paCallback( const void *inputBuffer, void *outputBuffer,
