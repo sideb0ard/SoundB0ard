@@ -48,8 +48,6 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
   if (!*mlock) {
 
     *mlock = 1;
-
-    //if (rand() % 100 < 20) {
     //  //fade_runrrr(
     //  //vol_change(mixr, osc_num, 0.0);
     //  if (mixr->signals[osc_num]->vol >= 0.5) 
@@ -81,24 +79,31 @@ melody_msg* new_melody_msg(int* freqs, int melody_note_len, int loop_len)
 
 void *algo_run(void *a)
 {
-  //(void) a;
-  melody_msg *mmsg = (melody_msg*) a;
+  (void) a;
+  int osc_one_lock = 0;
+  int osc_two_lock = 0;
+  int osc_one = add_osc(mixr, 427, sine_table);
+  int osc_two = add_osc(mixr, 427, sine_table);
 
-  printf("ALGO RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len);
-
-  //mk_sbmsg_sine(mmsg->melody[0]);
-  int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
-  mmsg->osc_num = osc_num;
   do {} while (b->cur_tick % 16 != 0);
-  faderrr(osc_num, UP);
+
+  faderrr(osc_one, UP);
+  faderrr(osc_two, UP);
   sleep(3);
 
   while (1)
   {
-    if (b->cur_tick % (4*(mmsg->melody_loop_len)) == 0) {
-      play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
-    } else if (mmsg->melody_play_lock) {
-      mmsg->melody_play_lock = 0;
+    if ((b->cur_tick % (4*4) == 0) && !osc_one_lock) {
+      freq_change(mixr, osc_one, rand() % 100 + 400);
+      osc_one_lock = 1;
+    } else if (osc_one_lock == 1) {
+      osc_one_lock = 0;
+    }
+    if ((b->cur_tick % (4*8) == 0) && !osc_two_lock) {
+      freq_change(mixr, osc_two, rand() % 100 + 400);
+      osc_two_lock = 1;
+    } else if (osc_two_lock == 1) {
+      osc_two_lock = 0;
     }
   }
 }
