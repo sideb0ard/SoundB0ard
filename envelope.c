@@ -58,13 +58,13 @@ ENVELOPE* newpoints()
   if (points == NULL)
     return NULL;
   points[0].time = 0.0; 
-  points[0].value = 0.0;
+  points[0].value = 0.1;
   points[1].time = 15.00;
   points[1].value = 1.0;
   points[2].time = 85.00; 
   points[2].value = 1.0;
   points[3].time = 99.0;
-  points[3].value = 0.0;
+  points[3].value = 0.1;
   return points;
 }
 

@@ -8,7 +8,11 @@ extern GTABLE *sine_table;
 
 float fm_gen_next(FM *fm)
 {
-  float val = fm->cmod_osc->tick(fm->cmod_osc) * fm->fmod_osc->tick(fm->fmod_osc);
+  //float val = fm->cmod_osc->tick(fm->cmod_osc) * fm->fmod_osc->tick(fm->fmod_osc);
+  float val = fm->cmod_osc->tick(fm->cmod_osc);
+  float mod_val = 100 * fm->fmod_osc->tick(fm->fmod_osc);
+  fm->cmod_osc->incradj(fm->cmod_osc, TABRAD * (fm->cmod_osc->freq + mod_val));
+
   return val;
 }
 

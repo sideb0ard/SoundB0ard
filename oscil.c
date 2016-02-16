@@ -20,8 +20,14 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
   p_osc->tick = &tabitick;
   p_osc->voladj = &volfunc;
   p_osc->freqadj = &freqfunc;
+  p_osc->incradj = &incrfunc;
 
   return p_osc;
+}
+
+void incrfunc(OSCIL* p_osc, double v)
+{
+  p_osc->incr = v;
 }
 
 void volfunc(OSCIL* p_osc, double v)

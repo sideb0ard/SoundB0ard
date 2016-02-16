@@ -45,6 +45,14 @@ void mixer_ps(mixer *mixr)
   }
 }
 
+void mixer_vol_change(mixer *mixr, float vol)
+{
+  printf("MIXER VOL CHANGE!\n");
+  if (vol >= 0.0 && vol <= 1.0) {
+    printf("PASSED THA CHALLEND WITH %F!\n", vol);
+    mixr->volume = vol;
+  }
+}
 void vol_change(mixer *mixr, int sig, float vol)
 {
   if (sig > (mixr->sig_size - 1))
@@ -113,7 +121,6 @@ double gen_next(mixer *mixr)
 {
   double output_val = 0.0;
   double amp_totes = 0.0;
-  //int sigsize = mixr->sig_num + mixr->fmsig_num;
 
   if (mixr->sig_num > 0) {
     for (int i = 0; i < mixr->sig_num; i++) {
@@ -121,51 +128,16 @@ double gen_next(mixer *mixr)
     }
   }
 
-      //if (mixr->sig_num > 1) {
-      //  double ampz[mixr->sig_num];
-      //  for (int i = 0; i < mixr->sig_num; i++) {
-      //    //output_val += mixr->signals[j]->tick(mixr->signals[j]);
-      //    ampz[i] = mixr->signals[i]->tick(mixr->signals[i]);
-      //    amp_totes += ampz[i];
-      //  }
-      //  //printf("amp_totes_BEFORE = %f\n", amp_totes);
-      //  if (amp_totes >= 1.0) {
-      //    amp_totes = 1.0 / amp_totes;
-      //  } else {
-      //    amp_totes = 1.0;
-      //  }
-      //  //printf("amp_totes = %f\n", amp_totes);
-      //  for (int i = 0; i < mixr->sig_num; i++) {
-      //    output_val += ((ampz[i]) * amp_totes);
-      //    //printf("OUTP+INC: %f\n", output_val);
-      //    if (output_val > 1)
-      //      output_val = 1;
-      //  }
-      //} else if (mixr->sig_num == 1) {
-      //  output_val = mixr->signals[0]->tick(mixr->signals[0]);
-      //}
+  if (mixr->fmsig_num > 0) {
+    for (int j = 0; j < mixr->fmsig_num; j++) {
+      output_val += mixr->fmsignals[j]->gen_next(mixr->fmsignals[j]);
+    }
+  }
 
-
-
-      //if (mixr->fmsig_num > 0) {
-      //  for (int j = 0; j < mixr->fmsig_num; j++) {
-      //    output_val += mixr->fmsignals[j]->gen_next(mixr->fmsignals[j]);
-      //  }
-      //}
-
-  //  }
-  //}
-  //double amp = envelope_stream_tick(ampstream);
-  //output_val *= amp;
-
-
-  //printf("OUTPUTVAL_ %f\n", output_val);
-  //if (output_val > 1.0)
-  //  return 1.0;
-  //else
-  //  return output_val;
-  //return output_val;
-  return output_val;
+  // global envelope -- for the moment
+  double mix_amp = envelope_stream_tick(ampstream);
+  output_val *= mix_amp;
+  return mixr->volume * (output_val / 1.53);
 }
 
 static int paCallback( const void *inputBuffer, void *outputBuffer,

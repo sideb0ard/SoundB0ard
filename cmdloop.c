@@ -84,20 +84,23 @@ void interpret(char *line)
   // SINE|SAW|TRI (FREQ)
   regmatch_t pmatch[3];
   regex_t cmdtype_rx;
-  regcomp(&cmdtype_rx, "^(bpm|stop|sine|sawd|sawu|tri|square) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+  regcomp(&cmdtype_rx, "^(bpm|stop|sine|sawd|sawu|tri|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
 
   if (regexec(&cmdtype_rx, line, 3, pmatch, 0) == 0) {
 
-    int val = 0;
+    float val = 0;
     char cmd[20];
     sbmsg *msg = calloc(1, sizeof(sbmsg));
 
-    sscanf(line, "%s %d", cmd, &val);
+    sscanf(line, "%s %f", cmd, &val);
     msg->freq = val;
 
     if (strcmp(cmd, "bpm") == 0) {
       bpm_change(b, val);
       update_envelope_stream_bpm(ampstream);
+    } else if (strcmp(cmd, "vol") == 0) {
+      printf("VOLLY BALL\n");
+      mixer_vol_change(mixr, val);
     } else if (strcmp(cmd, "stop") == 0) {
       strncpy(msg->cmd, "faderrr", 19);
       thrunner(msg);
