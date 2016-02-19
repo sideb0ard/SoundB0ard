@@ -41,9 +41,11 @@ SAMPLER* new_sampler(char * filename)
   data->gen_next = &f_gennext;
   data->vol = 0.7;
   data->pattern[0] = 1;
+  data->pattern[4] = 1;
   data->pattern[8] = 1;
   data->pattern[16] = 1;
   data->pattern[24] = 1;
+  data->pattern[28] = 1;
 
   return data;
 }
