@@ -13,7 +13,7 @@ float fm_gen_next(FM *fm)
   float mod_val = 100 * fm->fmod_osc->tick(fm->fmod_osc);
   fm->cmod_osc->incradj(fm->cmod_osc, TABRAD * (fm->cmod_osc->freq + mod_val));
 
-  return val;
+  return fm->vol * val;
 }
 
 FM* new_fm(double fmod, double cmod)
@@ -25,6 +25,7 @@ FM* new_fm(double fmod, double cmod)
   fm->fmod_osc = new_oscil(fmod, sine_table);
   fm->cmod_osc = new_oscil(cmod, sine_table);
 
+  fm->vol = 0.7;
   fm->fmod_osc->voladj(fm->fmod_osc, 0.7);
   fm->cmod_osc->voladj(fm->cmod_osc, 0.7);
 

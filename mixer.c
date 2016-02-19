@@ -5,11 +5,12 @@
 
 #include <portaudio.h>
 
+#include "defjams.h"
 #include "envelope.h"
 #include "fm.h"
-#include "defjams.h"
 #include "mixer.h"
 #include "oscil.h"
+#include "sampler.h"
 
 typedef struct {
   mixer *mixr;
@@ -117,6 +118,30 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
   return mixr->fmsig_num++;
 }
 
+int add_sample(mixer *mixr)
+{
+  SAMPLER **new_sample_signals = NULL;
+  /* check if we need to allocate more space for SAMPLEs */
+  if (mixr->sample_sig_size <= mixr->sample_sig_num) {
+    if (mixr->sample_sig_size == 0) {
+      mixr->sample_sig_size = INITIAL_SIGNAL_SIZE;
+    } else {
+      mixr->sample_sig_size *= 2;
+    }
+
+    new_sample_signals = realloc(mixr->sample_signals, mixr->sample_sig_size *
+                        sizeof(SAMPLER*));
+    if (new_sample_signals == NULL) {
+      printf("Unable to allocate more SAMPLE signalszzz");
+      return mixr->sample_sig_num;
+    } else {
+      mixr->sample_signals = new_sample_signals;
+    }
+  }
+  SAMPLER *nsample = new_sampler("/Users/sideboard/NewCodez/Codetraxx/wavs/Hihat0004.aif");
+  mixr->sample_signals[mixr->sample_sig_num] = nsample;
+  return mixr->sample_sig_num++;
+}
 double gen_next(mixer *mixr)
 {
   double output_val = 0.0;
@@ -129,8 +154,14 @@ double gen_next(mixer *mixr)
   }
 
   if (mixr->fmsig_num > 0) {
-    for (int j = 0; j < mixr->fmsig_num; j++) {
-      output_val += mixr->fmsignals[j]->gen_next(mixr->fmsignals[j]);
+    for (int i = 0; i < mixr->fmsig_num; i++) {
+      output_val += mixr->fmsignals[i]->gen_next(mixr->fmsignals[i]);
+    }
+  }
+
+  if (mixr->sample_sig_num > 0) {
+    for (int i = 0; i < mixr->sample_sig_num; i++) {
+      output_val += mixr->sample_signals[i]->gen_next(mixr->sample_signals[i]);
     }
   }
 

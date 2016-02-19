@@ -76,6 +76,9 @@ void interpret(char *line)
       return;
     }
     pthread_detach(songrun_th);
+  } else if (strcmp(line, "hat") == 0) {
+    printf("SAMPLER!\n");
+    add_sample(mixr);
   } else if (strcmp(line, "exit") == 0) {
     exxit();
   }
