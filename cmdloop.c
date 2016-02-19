@@ -119,6 +119,24 @@ void interpret(char *line)
     }
   }
 
+	// Modify an FM
+	regex_t mfm_rx;
+	regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+	if (regexec(&mfm_rx, line, 0, NULL, 0) == 0) {
+		char mfm_cmd[3]; // TODO: this is redundant, only here so i can do the sscanf below - can prob get rid somehow
+		int fm_no = 0;
+		char osc[3];
+		int freq = 0;
+		sscanf(line, "%s %d %s %d", mfm_cmd, &fm_no, osc, &freq);
+		if (fm_no + 1 <= mixr->fmsig_num) {
+			printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fm_no, osc, freq);
+			mfm(mixr->fmsignals[fm_no], osc, freq);
+		} else {
+		  printf("Beat it, ya chancer - gimme an FM number for one that exists!\n");
+		}
+
+	}
+
   regmatch_t tpmatch[4];
   regex_t tsigtype_rx;
   regcomp(&tsigtype_rx, "^(vol|freq|fm) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
