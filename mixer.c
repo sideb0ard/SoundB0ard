@@ -1,6 +1,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <unistd.h>
 
 #include <portaudio.h>
@@ -120,8 +121,10 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
   return mixr->fmsig_num++;
 }
 
-int add_sample(mixer *mixr)
+int add_sample(mixer *mixr, char *filename)
 {
+  printf("Going to play %s\n", filename);
+  printf("Length of %s is %ld\n", filename, strlen(filename));
   SAMPLER **new_sample_signals = NULL;
   /* check if we need to allocate more space for SAMPLEs */
   if (mixr->sample_sig_size <= mixr->sample_sig_num) {
@@ -140,9 +143,25 @@ int add_sample(mixer *mixr)
       mixr->sample_signals = new_sample_signals;
     }
   }
-  SAMPLER *nsample = new_sampler("/Users/sideboard/NewCodez/Codetraxx/wavs/Hihat0004.aif");
-  mixr->sample_signals[mixr->sample_sig_num] = nsample;
-  return mixr->sample_sig_num++;
+
+  char cwd[1024];
+  getcwd(cwd, 1024);
+  printf("DUR IS %s and lenny is %ld\n", cwd, strlen(cwd));
+  char full_filename[strlen(filename) + strlen(cwd) + 7]; // 7 == '/wavs/' is 6 and 1 for '\0'
+  strcpy(full_filename, cwd);
+  strcat(full_filename, "/wavs/");
+  strcat(full_filename, filename);
+
+  printf("FULL PATH TO FILE IS %s\n", full_filename);
+
+  SAMPLER *nsample = new_sampler(full_filename);
+  if (nsample != NULL) {
+    mixr->sample_signals[mixr->sample_sig_num] = nsample;
+    return mixr->sample_sig_num++;
+  } else {
+    printf("NEarly segfaulted there, pal.\n");
+    return -1;
+  }
 }
 double gen_next(mixer *mixr)
 {

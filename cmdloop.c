@@ -76,9 +76,6 @@ void interpret(char *line)
       return;
     }
     pthread_detach(songrun_th);
-  } else if (strcmp(line, "hat") == 0) {
-    printf("SAMPLER!\n");
-    add_sample(mixr);
   } else if (strcmp(line, "exit") == 0) {
     exxit();
   }
@@ -131,8 +128,6 @@ void interpret(char *line)
                 int freq;
                 char osc[4];
 		sscanf(line, "mfm %d %s %d", &fmno, osc, &freq);
-
-                printf("FM no. %d\n", fmno);
 		if (fmno + 1 <= mixr->fmsig_num) {
 			printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fmno, osc, freq);
 			mfm(mixr->fmsignals[fmno], osc, freq);
@@ -196,22 +191,23 @@ void interpret(char *line)
     pthread_detach(melody_th);
   }
 
-  regmatch_t fmatch[2];
+  regmatch_t fmatch[3];
   regex_t file_rx;
   regcomp(&file_rx, "file ([[:alpha:]\\.]+)$", REG_EXTENDED|REG_ICASE);
-  if (regexec(&file_rx, line, 2, fmatch, 0) == 0) {
+  if (regexec(&file_rx, line, 3, fmatch, 0) == 0) {
 
-    int filename_len = fmatch[1].rm_eo - fmatch[1].rm_so;
+    int filename_len = fmatch[1].rm_eo - fmatch[1].rm_so + 1;
     char filename[filename_len];
     strncpy(filename, line+fmatch[1].rm_so, filename_len);
 
-    printf("FILE DRUM! %s\n", filename);
 
-    //pthread_t melody_th;
-    //if ( pthread_create (&melody_th, NULL, algo_run, mm)) {
-    //  fprintf(stderr, "Errr running melody\n");
-    //  return;
-    //}
-    //pthread_detach(melody_th);
+    //int pattern_len = fmatch[2].rm_eo - fmatch[2].rm_so + 1;
+    //char pattern[pattern_len];
+    //strncpy(pattern, line+fmatch[2].rm_so, pattern_len);
+    //printf("PATTERN! %s\n", pattern);
+
+    printf("FILE DRUM! %s\n", filename);
+    add_sample(mixr, filename);
+
   }
 }

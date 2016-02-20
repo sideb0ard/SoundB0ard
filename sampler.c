@@ -11,14 +11,16 @@ SAMPLER* new_sampler(char * filename)
   SAMPLER *data = calloc(1, sizeof(SAMPLER));
   data->position = 0;
 
+  printf("Gonna open %s\n", filename);
+
   SNDFILE *snd_file;
   SF_INFO sf_info;
 
   sf_info.format = 0;
   snd_file = sf_open(filename, SFM_READ, &sf_info);
   if (!snd_file) {
-    printf("Err opening file mate\n");
-    exit(-1);
+    printf("Err opening file mate : %d\n", sf_error(snd_file));
+    return (void*) NULL;
   }
   printf("Filename:: %s\n", filename);
   printf("SR: %d\n", sf_info.samplerate);
