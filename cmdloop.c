@@ -123,14 +123,19 @@ void interpret(char *line)
 	regex_t mfm_rx;
 	regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
 	if (regexec(&mfm_rx, line, 0, NULL, 0) == 0) {
-		char mfm_cmd[3]; // TODO: this is redundant, only here so i can do the sscanf below - can prob get rid somehow
-		int fm_no = 0;
-		char osc[3];
-		int freq = 0;
-		sscanf(line, "%s %d %s %d", mfm_cmd, &fm_no, osc, &freq);
-		if (fm_no + 1 <= mixr->fmsig_num) {
-			printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fm_no, osc, freq);
-			mfm(mixr->fmsignals[fm_no], osc, freq);
+		//char osc[3];
+		//int fmno;
+		//int freq = 0;
+                //printf("ORIG LINE: %s\n", line);
+                int fmno;
+                int freq;
+                char osc[4];
+		sscanf(line, "mfm %d %s %d", &fmno, osc, &freq);
+
+                printf("FM no. %d\n", fmno);
+		if (fmno + 1 <= mixr->fmsig_num) {
+			printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fmno, osc, freq);
+			mfm(mixr->fmsignals[fmno], osc, freq);
 		} else {
 		  printf("Beat it, ya chancer - gimme an FM number for one that exists!\n");
 		}
@@ -184,10 +189,29 @@ void interpret(char *line)
 
     melody_msg *mm = new_melody_msg(freqs->freaks, freqs->num_freaks, loop_len);
     pthread_t melody_th;
-    if ( pthread_create (&melody_th, NULL, algo_run, mm)) {
+    if ( pthread_create (&melody_th, NULL, loop_run, mm)) {
       fprintf(stderr, "Errr running melody\n");
       return;
     }
     pthread_detach(melody_th);
+  }
+
+  regmatch_t fmatch[2];
+  regex_t file_rx;
+  regcomp(&file_rx, "file ([[:alpha:]\\.]+)$", REG_EXTENDED|REG_ICASE);
+  if (regexec(&file_rx, line, 2, fmatch, 0) == 0) {
+
+    int filename_len = fmatch[1].rm_eo - fmatch[1].rm_so;
+    char filename[filename_len];
+    strncpy(filename, line+fmatch[1].rm_so, filename_len);
+
+    printf("FILE DRUM! %s\n", filename);
+
+    //pthread_t melody_th;
+    //if ( pthread_create (&melody_th, NULL, algo_run, mm)) {
+    //  fprintf(stderr, "Errr running melody\n");
+    //  return;
+    //}
+    //pthread_detach(melody_th);
   }
 }

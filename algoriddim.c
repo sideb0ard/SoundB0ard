@@ -78,14 +78,11 @@ melody_msg* new_melody_msg(int* freqs, int melody_note_len, int loop_len)
 
 //void mk_mmsg(int freq)
 
-void *algo_run(void *a)
+void *loop_run(void *m)
 {
-  //(void) a;
-  melody_msg *mmsg = (melody_msg*) a;
+  melody_msg *mmsg = (melody_msg*) m;
+  printf("LOOP RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len);
 
-  printf("ALGO RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len);
-
-  //mk_sbmsg_sine(mmsg->melody[0]);
   int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
   mmsg->osc_num = osc_num;
   do {} while (b->cur_tick % 16 != 0);
@@ -100,32 +97,35 @@ void *algo_run(void *a)
       mmsg->melody_play_lock = 0;
     }
   }
+}
 
-  //(void) a;
-  //int osc_one_lock = 0;
-  //int osc_two_lock = 0;
-  //int osc_one = add_osc(mixr, 427, sine_table);
-  //int osc_two = add_osc(mixr, 427, sine_table);
+void *algo_run(void *a)
+{
+  (void) a;
+  int osc_one_lock = 0;
+  int osc_two_lock = 0;
+  int osc_one = add_osc(mixr, 427, sine_table);
+  int osc_two = add_osc(mixr, 427, sine_table);
 
-  //do {} while (b->cur_tick % 16 != 0);
+  do {} while (b->cur_tick % 16 != 0);
 
-  //faderrr(osc_one, UP);
-  //faderrr(osc_two, UP);
-  //sleep(3);
+  faderrr(osc_one, UP);
+  faderrr(osc_two, UP);
+  sleep(3);
 
-  //while (1)
-  //{
-  //  if ((b->cur_tick % (4*4) == 0) && !osc_one_lock) {
-  //    freq_change(mixr, osc_one, rand() % 100 + 400);
-  //    osc_one_lock = 1;
-  //  } else if (osc_one_lock == 1) {
-  //    osc_one_lock = 0;
-  //  }
-  //  if ((b->cur_tick % (4*8) == 0) && !osc_two_lock) {
-  //    freq_change(mixr, osc_two, rand() % 100 + 400);
-  //    osc_two_lock = 1;
-  //  } else if (osc_two_lock == 1) {
-  //    osc_two_lock = 0;
-  //  }
-  //}
+  while (1)
+  {
+    if ((b->cur_tick % (4*4) == 0) && !osc_one_lock) {
+      freq_change(mixr, osc_one, rand() % 100 + 400);
+      osc_one_lock = 1;
+    } else if (osc_one_lock == 1) {
+      osc_one_lock = 0;
+    }
+    if ((b->cur_tick % (4*8) == 0) && !osc_two_lock) {
+      freq_change(mixr, osc_two, rand() % 100 + 400);
+      osc_two_lock = 1;
+    } else if (osc_two_lock == 1) {
+      osc_two_lock = 0;
+    }
+  }
 }

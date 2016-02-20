@@ -17,7 +17,7 @@ typedef struct FM {
 
 FM* new_fm(double modf, double carf);
 float fm_gen_next(FM *fm);
-void fm_status(FM *fm);
+void fm_status(FM *fm, char *status_string);
 void mfm(FM *fm, char *osc, double val);
 
 #endif

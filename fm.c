@@ -35,9 +35,9 @@ FM* new_fm(double modf, double carf)
   return fm;
 }
 
-void fm_status(FM *fm)
+void fm_status(FM *fm, char *status_string)
 {
-  printf("FM! modulator: %f %f // carrier: %f %f\n", fm->mod_osc->freq, fm->mod_osc->curphase, fm->car_osc->freq, fm->car_osc->curphase);
+  sprintf(status_string, "FM! modulator: %f %f // carrier: %f %f", fm->mod_osc->freq, fm->mod_osc->curphase, fm->car_osc->freq, fm->car_osc->curphase);
 }
 
 void mfm(FM *fm, char *osc, double val)

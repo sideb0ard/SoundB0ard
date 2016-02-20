@@ -42,7 +42,9 @@ void mixer_ps(mixer *mixr)
     printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
   }
   for ( int i = 0; i < mixr->fmsig_num; i++) {
-    fm_status(mixr->fmsignals[i]);
+    char ss[80];
+    fm_status(mixr->fmsignals[i], ss);
+    printf(ANSI_COLOR_GREEN "FM [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
   }
 }
 
@@ -145,7 +147,6 @@ int add_sample(mixer *mixr)
 double gen_next(mixer *mixr)
 {
   double output_val = 0.0;
-  double amp_totes = 0.0;
 
   if (mixr->sig_num > 0) {
     for (int i = 0; i < mixr->sig_num; i++) {
