@@ -1,12 +1,14 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
 
+#define SAMPLE_PATTERN_LEN 16
+
 typedef struct t_sampler SAMPLER;
 typedef double (*fp_gennext) (SAMPLER* sampler);
 
 typedef struct t_sampler
 {
-  int pattern[32];
+  int pattern[SAMPLE_PATTERN_LEN];
   int *buffer;
   int bufsize;
   int position;
@@ -19,7 +21,7 @@ typedef struct t_sampler
 
 } SAMPLER;
 
-SAMPLER* new_sampler(char * filename);
+SAMPLER* new_sampler(char *filename, char *pattern);
 
 double f_gennext(SAMPLER *sampler);
 

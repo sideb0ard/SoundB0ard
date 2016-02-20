@@ -1,17 +1,36 @@
 #include <sndfile.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "bpmrrr.h"
 #include "sampler.h"
 
 extern bpmrrr *b;
 
-SAMPLER* new_sampler(char * filename)
+SAMPLER* new_sampler(char *filename, char *pattern)
 {
   SAMPLER *data = calloc(1, sizeof(SAMPLER));
   data->position = 0;
 
   printf("Gonna open %s\n", filename);
+  printf("My pattern is %s\n", pattern);
+  
+  char **sp, *spattern[32];
+  int sp_count = 0;
+  //for (ap = fargv; (*ap = strsep(&freaks, " ")) != NULL;) {
+  for (sp = spattern; (*sp = strsep(&pattern, " ")) != NULL;) {
+    sp_count++;
+    if (**sp != '\0')
+      if (++sp >= &spattern[32])
+        break;
+  }
+  for (int i = 0; i < sp_count; i++) {
+    int pat_num = atoi(spattern[i]);
+    if (pat_num < SAMPLE_PATTERN_LEN) {
+      printf("PATTERNNNN: %d\n", pat_num);
+      data->pattern[pat_num] = 1;
+    }
+  }
 
   SNDFILE *snd_file;
   SF_INFO sf_info;
@@ -42,13 +61,12 @@ SAMPLER* new_sampler(char * filename)
   data->channels = sf_info.channels;
   data->gen_next = &f_gennext;
   data->vol = 0.7;
-  data->pattern[0] = 1;
-  data->pattern[4] = 1;
-  data->pattern[8] = 1;
-  data->pattern[16] = 1;
-  data->pattern[24] = 1;
-  data->pattern[28] = 1;
+  //data->pattern[0] = 1;
+  //data->pattern[5] = 1;
+  //data->pattern[9] = 1;
+  //data->pattern[13] = 1;
 
+  printf("Returning, yo!\n");
   return data;
 }
 
@@ -57,7 +75,7 @@ double f_gennext(SAMPLER *sampler)
   //double val = 0.0;
   double val = sampler->buffer[sampler->position++];
 
-  if (sampler->pattern[b->cur_tick % 32]) {
+  if (sampler->pattern[b->cur_tick % 8]) {
     sampler->playing = 1;
   }
 

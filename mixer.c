@@ -121,7 +121,7 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
   return mixr->fmsig_num++;
 }
 
-int add_sample(mixer *mixr, char *filename)
+int add_sample(mixer *mixr, char *filename, char *pattern)
 {
   printf("Going to play %s\n", filename);
   printf("Length of %s is %ld\n", filename, strlen(filename));
@@ -154,7 +154,8 @@ int add_sample(mixer *mixr, char *filename)
 
   printf("FULL PATH TO FILE IS %s\n", full_filename);
 
-  SAMPLER *nsample = new_sampler(full_filename);
+  SAMPLER *nsample = new_sampler(full_filename, pattern);
+  //printf("AM Back here, yo!\n");
   if (nsample != NULL) {
     mixr->sample_signals[mixr->sample_sig_num] = nsample;
     return mixr->sample_sig_num++;
