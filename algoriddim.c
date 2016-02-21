@@ -27,40 +27,13 @@ algo *new_algo()
   return a;
 }
 
-//sbmsg* new_sb_msg()
-//{
-//  sbmsg *msg = calloc(1, sizeof(sbmsg));
-//  return msg;
-//}
-//
-//void mk_sbmsg_sine(int freq)
-//{
-//  sbmsg *m = new_sb_msg();
-//  strncpy(m->cmd, "timed_sig_start", 19);
-//  strncpy(m->params, "sine", 19);
-//  m->freq = freq;
-//  thrunner(m);
-//}
-
-
 void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int note_len)
-//void *play_melody(void *mm)
 {
   if (!*mlock) {
 
     *mlock = 1;
-    //  //fade_runrrr(
-    //  //vol_change(mixr, osc_num, 0.0);
-    //  if (mixr->signals[osc_num]->vol >= 0.5) 
-    //    faderrr(osc_num, DOWN);
-    //} else {
-      //if (mixr->signals[osc_num]->vol < 0.5) 
-      //  faderrr(osc_num, UP);
-      // vol_change(mixr, osc_num, 0.7);
-      *note = (*note + 1) % note_len;
-      freq_change(mixr, osc_num, (notes[*note])); 
-    //}
-    /// play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
+    *note = (*note + 1) % note_len;
+    freq_change(mixr, osc_num, (notes[*note])); 
   }
 }
 
@@ -75,8 +48,6 @@ melody_msg* new_melody_msg(int* freqs, int melody_note_len, int loop_len)
   m->melody_cur_note = 0;
   return m;
 }
-
-//void mk_mmsg(int freq)
 
 void *loop_run(void *m)
 {
@@ -102,30 +73,31 @@ void *loop_run(void *m)
 void *algo_run(void *a)
 {
   (void) a;
-  int osc_one_lock = 0;
-  int osc_two_lock = 0;
-  int osc_one = add_osc(mixr, 427, sine_table);
-  int osc_two = add_osc(mixr, 427, sine_table);
 
-  do {} while (b->cur_tick % 16 != 0);
+  int fm_one_lock = 0;
+  int fm_one = add_fm(mixr, 420, 576);
 
-  faderrr(osc_one, UP);
-  faderrr(osc_two, UP);
-  sleep(3);
+  char *sigtype[2] = {"car", "mod"};
+
+  int notes[] = {135, 576, 23, 47, 74, 22, 21, 13, 7, 4, 432, 288, 173, 648, 260, 162, 720, 270, 691};
 
   while (1)
   {
-    if ((b->cur_tick % (4*4) == 0) && !osc_one_lock) {
-      freq_change(mixr, osc_one, rand() % 100 + 400);
-      osc_one_lock = 1;
-    } else if (osc_one_lock == 1) {
-      osc_one_lock = 0;
+    if (b->cur_tick % (16) == 0)  {
+      if (!fm_one_lock) {
+        fm_one_lock = 1;
+        if (rand()%2)
+          mfm(mixr->fmsignals[fm_one], sigtype[rand()%2], notes[rand() % 19]);
+      }
+    } else {
+      fm_one_lock = 0;
     }
-    if ((b->cur_tick % (4*8) == 0) && !osc_two_lock) {
-      freq_change(mixr, osc_two, rand() % 100 + 400);
-      osc_two_lock = 1;
-    } else if (osc_two_lock == 1) {
-      osc_two_lock = 0;
-    }
+      
+    //  ///  && fm_one_lock == 0) {
+    //  fm_one_lock = 1;
+    //} else if (fm_one_lock == 1) {
+    //  mfm(mixr->fmsignals[fm_one], "mod", rand() % 100 + 300);
+    //  fm_one_lock = 0;
+    //}
   }
 }

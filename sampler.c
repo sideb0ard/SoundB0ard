@@ -63,7 +63,7 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   data->samplerate = sf_info.samplerate;
   data->channels = sf_info.channels;
   data->gen_next = &f_gennext;
-  data->vol = 0.7;
+  data->vol = 0.9;
 
   return data;
 }

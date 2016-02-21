@@ -42,13 +42,11 @@ void fm_status(FM *fm, char *status_string)
 
 void mfm(FM *fm, char *osc, double val)
 {
-	if (!strcmp(osc, "mod")) {
-		printf("GOT A MOD!\n");
-		freqfunc(fm->mod_osc, val);
-	} else if (!strcmp(osc, "car")) {
-		printf("GOT A CAR!\n");
-		freqfunc(fm->car_osc, val);
-	} else {
-		return;
-	}
+  if (!strcmp(osc, "mod")) {
+    freqfunc(fm->mod_osc, val);
+  } else if (!strcmp(osc, "car")) {
+    freqfunc(fm->car_osc, val);
+  } else {
+    return;
+  }
 }
