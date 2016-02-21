@@ -15,6 +15,7 @@ bpmrrr *new_bpmrrr()
   }
 
   b->bpm = DEFAULT_BPM;
+  b->cur_tick = 0;
   //b->sleeptime = (60 / b->bpm / 4 ) * 1000000000; // 4 "microticks" per BPS as nanosec
   b->sleeptime = (60.0 / b->bpm / 4 ) * 1000000000; // 4 "microticks" per BPS as nanosec
   printf("SLEEPTIME IS %lf\n", b->sleeptime);

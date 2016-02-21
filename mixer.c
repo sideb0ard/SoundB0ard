@@ -47,6 +47,11 @@ void mixer_ps(mixer *mixr)
     fm_status(mixr->fmsignals[i], ss);
     printf(ANSI_COLOR_GREEN "FM [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
   }
+  for ( int i = 0; i < mixr->sample_sig_num; i++) {
+    char ss[120];
+    sample_status(mixr->sample_signals[i], ss);
+    printf(ANSI_COLOR_CYAN "Sample [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
+  }
 }
 
 void mixer_vol_change(mixer *mixr, float vol)
@@ -123,8 +128,6 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
 
 int add_sample(mixer *mixr, char *filename, char *pattern)
 {
-  printf("Going to play %s\n", filename);
-  printf("Length of %s is %ld\n", filename, strlen(filename));
   SAMPLER **new_sample_signals = NULL;
   /* check if we need to allocate more space for SAMPLEs */
   if (mixr->sample_sig_size <= mixr->sample_sig_num) {
@@ -146,16 +149,12 @@ int add_sample(mixer *mixr, char *filename, char *pattern)
 
   char cwd[1024];
   getcwd(cwd, 1024);
-  printf("DUR IS %s and lenny is %ld\n", cwd, strlen(cwd));
   char full_filename[strlen(filename) + strlen(cwd) + 7]; // 7 == '/wavs/' is 6 and 1 for '\0'
   strcpy(full_filename, cwd);
   strcat(full_filename, "/wavs/");
   strcat(full_filename, filename);
 
-  printf("FULL PATH TO FILE IS %s\n", full_filename);
-
   SAMPLER *nsample = new_sampler(full_filename, pattern);
-  //printf("AM Back here, yo!\n");
   if (nsample != NULL) {
     mixr->sample_signals[mixr->sample_sig_num] = nsample;
     return mixr->sample_sig_num++;

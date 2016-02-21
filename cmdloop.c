@@ -193,21 +193,18 @@ void interpret(char *line)
 
   regmatch_t fmatch[3];
   regex_t file_rx;
-  regcomp(&file_rx, "file ([.[:alpha:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE|REG_MINIMAL);
+  regcomp(&file_rx, "file ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE|REG_MINIMAL);
   if (regexec(&file_rx, line, 3, fmatch, 0) == 0) {
 
     int filename_len = fmatch[1].rm_eo - fmatch[1].rm_so;
-    printf("FILENAME_LEN is %d\n", filename_len);
     char filename[filename_len + 1];
     strncpy(filename, line+fmatch[1].rm_so, filename_len);
     filename[filename_len] = '\0';
-    printf("FILE DRUM! %s\n", filename);
 
     int pattern_len = fmatch[2].rm_eo - fmatch[2].rm_so;
     char pattern[pattern_len + 1];
     strncpy(pattern, line+fmatch[2].rm_so, pattern_len);
     pattern[pattern_len] = '\0';
-    printf("PATTERN! %s\n", pattern);
 
     add_sample(mixr, filename, pattern);
 
