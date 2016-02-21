@@ -35,7 +35,7 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   sf_info.format = 0;
   snd_file = sf_open(filename, SFM_READ, &sf_info);
   if (!snd_file) {
-    printf("Err opening file mate : %d\n", sf_error(snd_file));
+    printf("Err opening %s : %d\n", filename, sf_error(snd_file));
     return (void*) NULL;
   }
   printf("Filename:: %s\n", filename);

@@ -76,6 +76,8 @@ void interpret(char *line)
       return;
     }
     pthread_detach(songrun_th);
+  } else if (strcmp(line, "ls") == 0) {
+    list_sample_dir();
   } else if (strcmp(line, "exit") == 0) {
     exxit();
   }
@@ -191,19 +193,20 @@ void interpret(char *line)
     pthread_detach(melody_th);
   }
 
-  regmatch_t fmatch[3];
+  regmatch_t fmatch[4];
   regex_t file_rx;
-  regcomp(&file_rx, "file ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE|REG_MINIMAL);
-  if (regexec(&file_rx, line, 3, fmatch, 0) == 0) {
+  regcomp(&file_rx, "^(file|play) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE|REG_MINIMAL);
+  if (regexec(&file_rx, line, 4, fmatch, 0) == 0) {
+    printf("Boom, file or play!\n");
 
-    int filename_len = fmatch[1].rm_eo - fmatch[1].rm_so;
+    int filename_len = fmatch[2].rm_eo - fmatch[2].rm_so;
     char filename[filename_len + 1];
-    strncpy(filename, line+fmatch[1].rm_so, filename_len);
+    strncpy(filename, line+fmatch[2].rm_so, filename_len);
     filename[filename_len] = '\0';
 
-    int pattern_len = fmatch[2].rm_eo - fmatch[2].rm_so;
+    int pattern_len = fmatch[3].rm_eo - fmatch[3].rm_so;
     char pattern[pattern_len + 1];
-    strncpy(pattern, line+fmatch[2].rm_so, pattern_len);
+    strncpy(pattern, line+fmatch[3].rm_so, pattern_len);
     pattern[pattern_len] = '\0';
 
     add_sample(mixr, filename, pattern);

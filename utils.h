@@ -12,3 +12,4 @@ typedef struct freaky {
 } freaky;
 
 freaky* new_freqs_from_string(char* string);
+void list_sample_dir(void);

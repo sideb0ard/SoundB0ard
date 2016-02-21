@@ -1,3 +1,4 @@
+#include <dirent.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -133,3 +134,18 @@ freaky* new_freqs_from_string(char* string)
   }
   return f;
 }
+
+void list_sample_dir()
+{
+  DIR *dp;
+  struct dirent *ep;
+  dp = opendir("./wavs");
+  if (dp != NULL) {
+    while ((ep = readdir (dp)))
+      puts (ep->d_name);
+    (void) closedir (dp);
+  } else {
+    perror("Couldn't open wavs dir\n");
+  }
+}
+
