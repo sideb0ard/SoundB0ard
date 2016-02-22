@@ -71,7 +71,8 @@ SAMPLER* new_sampler(char *filename, char *pattern)
 double f_gennext(SAMPLER *sampler)
 {
   if (!sampler->playing && sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
-    sampler->playing = 1;
+    if (rand()%100 > 90)
+      sampler->playing = 1;
   }
 
   double val;
