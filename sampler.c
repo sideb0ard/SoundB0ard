@@ -1,5 +1,3 @@
-#define _BSD_SOURCE
-
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -65,26 +63,26 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   data->samplerate = sf_info.samplerate;
   data->channels = sf_info.channels;
   data->gen_next = &f_gennext;
-  data->vol = 0.9;
+  data->vol = 0.7;
 
   return data;
 }
 
 double f_gennext(SAMPLER *sampler)
 {
-  if (!sampler->playing && sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
-    if (rand()%100 > 90)
-      sampler->playing = 1;
-  }
+  static double val;
 
-  double val;
-  if (sampler->playing) {
-    val =  sampler->buffer[sampler->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+  if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
+    if (!sampler->playing) {
+      val =  sampler->buffer[sampler->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+    } else {
+      val = 0.0;
+    }
+    if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
+      sampler->position = 0;
+      sampler->playing = 0;
+    }
   } else {
-    val = 0.0;
-  }
-
-  if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
     sampler->position = 0;
     sampler->playing = 0;
   }
