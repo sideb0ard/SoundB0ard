@@ -5,5 +5,5 @@ sine 227
 loop 180 150 8
 loop 227 267 3
 loop 230 360 4
-loop 454 447 8
+loop 454 261 2
 fm 42 180

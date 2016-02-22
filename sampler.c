@@ -1,3 +1,5 @@
+#define _BSD_SOURCE
+
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>

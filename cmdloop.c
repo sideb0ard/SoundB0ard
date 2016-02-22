@@ -195,7 +195,7 @@ void interpret(char *line)
 
   regmatch_t fmatch[4];
   regex_t file_rx;
-  regcomp(&file_rx, "^(file|play) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE|REG_MINIMAL);
+  regcomp(&file_rx, "^(file|play) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE);
   if (regexec(&file_rx, line, 4, fmatch, 0) == 0) {
     printf("Boom, file or play!\n");
 
