@@ -14,17 +14,6 @@
 
 typedef struct t_mixer
 {
-  OSCIL **signals;
-  int sig_num; // actual number of signals
-  int sig_size; // number of memory slots referenced for sigs;
-
-  FM **fmsignals;
-  int fmsig_num; // actual number of signals
-  int fmsig_size; // number of memory slots referenced for sigs;
-
-  SAMPLER **sample_signals;
-  int sample_sig_num; // actual number of signals
-  int sample_sig_size; // number of memory slots referenced for sigs;
 
   SOUNDGEN **sound_generators;
   int soundgen_num; // actual number of SGs

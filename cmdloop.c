@@ -69,13 +69,13 @@ void interpret(char *line)
   if (strcmp(line, "ps") == 0) {
     ps();
     return;
-  } else if (strcmp(line, "song") == 0) {
-    pthread_t songrun_th;
-    if ( pthread_create (&songrun_th, NULL, algo_run, NULL)) {
-      fprintf(stderr, "Errr running song\n");
-      return;
-    }
-    pthread_detach(songrun_th);
+  //} else if (strcmp(line, "song") == 0) {
+  //  pthread_t songrun_th;
+  //  if ( pthread_create (&songrun_th, NULL, algo_run, NULL)) {
+  //    fprintf(stderr, "Errr running song\n");
+  //    return;
+  //  }
+  //  pthread_detach(songrun_th);
   } else if (strcmp(line, "ls") == 0) {
     list_sample_dir();
   } else if (strcmp(line, "exit") == 0) {
@@ -100,9 +100,9 @@ void interpret(char *line)
     if (strcmp(cmd, "bpm") == 0) {
       bpm_change(b, val);
       update_envelope_stream_bpm(ampstream);
-    } else if (strcmp(cmd, "vol") == 0) {
-      printf("VOLLY BALL\n");
-      mixer_vol_change(mixr, val);
+    //} else if (strcmp(cmd, "vol") == 0) {
+    //  printf("VOLLY BALL\n");
+    //  mixer_vol_change(mixr, val);
     } else if (strcmp(cmd, "stop") == 0) {
       strncpy(msg->cmd, "faderrr", 19);
       thrunner(msg);
@@ -118,26 +118,25 @@ void interpret(char *line)
     }
   }
 
-	// Modify an FM
-	regex_t mfm_rx;
-	regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
-	if (regexec(&mfm_rx, line, 0, NULL, 0) == 0) {
-		//char osc[3];
-		//int fmno;
-		//int freq = 0;
-                //printf("ORIG LINE: %s\n", line);
-                int fmno;
-                int freq;
-                char osc[4];
-		sscanf(line, "mfm %d %s %d", &fmno, osc, &freq);
-		if (fmno + 1 <= mixr->fmsig_num) {
-			printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fmno, osc, freq);
-			mfm(mixr->fmsignals[fmno], osc, freq);
-		} else {
-		  printf("Beat it, ya chancer - gimme an FM number for one that exists!\n");
-		}
-
-	}
+  // Modify an FM
+  //regex_t mfm_rx;
+  //regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+  //if (regexec(&mfm_rx, line, 0, NULL, 0) == 0) {
+  //  //char osc[3];
+  //  //int fmno;
+  //  //int freq = 0;
+  //  //printf("ORIG LINE: %s\n", line);
+  //  int fmno;
+  //  int freq;
+  //  char osc[4];
+  //  sscanf(line, "mfm %d %s %d", &fmno, osc, &freq);
+  //  if (fmno + 1 <= mixr->fmsig_num) {
+  //  	printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fmno, osc, freq);
+  //  	mfm(mixr->fmsignals[fmno], osc, freq);
+  //  } else {
+  //    printf("Beat it, ya chancer - gimme an FM number for one that exists!\n");
+  //  }
+  //}
 
   regmatch_t tpmatch[4];
   regex_t tsigtype_rx;
@@ -147,14 +146,14 @@ void interpret(char *line)
     double val = 0;
     char cmd_type[10];
     sscanf(line, "%s %d %lf", cmd_type, &sig, &val);
-    if (strcmp(cmd_type, "vol") == 0) {
-      vol_change(mixr, sig, val);
-      printf("VOL! %s %d %lf\n", cmd_type, sig, val);
-    }
-    if (strcmp(cmd_type, "freq") == 0) {
-      freq_change(mixr, sig, val);
-      printf("FREQ! %s %d %lf\n", cmd_type, sig, val);
-    }
+    //if (strcmp(cmd_type, "vol") == 0) {
+    //  vol_change(mixr, sig, val);
+    //  printf("VOL! %s %d %lf\n", cmd_type, sig, val);
+    //}
+    //if (strcmp(cmd_type, "freq") == 0) {
+    //  freq_change(mixr, sig, val);
+    //  printf("FREQ! %s %d %lf\n", cmd_type, sig, val);
+    //}
     if (strcmp(cmd_type, "fm") == 0) {
       add_fm(mixr, sig, val);
       printf("FML!\n");

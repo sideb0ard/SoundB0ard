@@ -15,7 +15,6 @@ typedef struct FM {
   OSCIL* car_osc;
   float vol;
 
-  //float (*gen_next)(FM*);
 } FM;
 
 FM* new_fm(double modf, double carf);

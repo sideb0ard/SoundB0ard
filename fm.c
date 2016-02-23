@@ -22,7 +22,6 @@ FM* new_fm(double modf, double carf)
 
   fm->sound_generator.gennext = &fm_gennext;
   fm->sound_generator.status = &fm_status;
-  //fm->gen_next = &fm_gen_next;
   
   return fm;
 }
@@ -30,7 +29,7 @@ FM* new_fm(double modf, double carf)
 double fm_gennext(void *self)
 {
   FM *fm = (FM *) self;
-  //float val = fm->cmod_osc->tick(fm->cmod_osc) * fm->fmod_osc->tick(fm->fmod_osc);
+
   double val = fm->car_osc->sound_generator.gennext(fm->car_osc);
   double mod_val = 100 * fm->mod_osc->sound_generator.gennext(fm->mod_osc);
   fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));

@@ -39,21 +39,10 @@ void mixer_ps(mixer *mixr)
 {
   printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) :::::\n" ANSI_COLOR_RESET, mixr->volume);
   for ( int i = 0; i < mixr->soundgen_num; i++) {
-    // printf("calling status on osc at %p\n", mixr->signals[i]);
     char ss[80];
     mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
     printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
   }
-  //for ( int i = 0; i < mixr->fmsig_num; i++) {
-  //  char ss[80];
-  //  fm_status(mixr->fmsignals[i], ss);
-  //  printf(ANSI_COLOR_GREEN "FM [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
-  //}
-  //for ( int i = 0; i < mixr->sample_sig_num; i++) {
-  //  char ss[120];
-  //  sample_status(mixr->sample_signals[i], ss);
-  //  printf(ANSI_COLOR_CYAN "Sample [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
-  //}
 }
 
 void mixer_vol_change(mixer *mixr, float vol)
@@ -64,51 +53,36 @@ void mixer_vol_change(mixer *mixr, float vol)
     mixr->volume = vol;
   }
 }
-void vol_change(mixer *mixr, int sig, float vol)
-{
-  if (sig > (mixr->sig_size - 1))
-    return;
-  mixr->signals[sig]->voladj(mixr->signals[sig], vol);
-}
 
-void freq_change(mixer *mixr, int sig, float freq)
-{
-  if (sig > (mixr->sig_size - 1))
-    return;
-  mixr->signals[sig]->freqadj(mixr->signals[sig], freq);
-}
+//void vol_change(mixer *mixr, int sig, float vol)
+//{
+//  if (sig > (mixr->sig_size - 1))
+//    return;
+//  mixr->signals[sig]->voladj(mixr->signals[sig], vol);
+//}
+//
+//void freq_change(mixer *mixr, int sig, float freq)
+//{
+//  if (sig > (mixr->sig_size - 1))
+//    return;
+//  mixr->signals[sig]->freqadj(mixr->signals[sig], freq);
+//}
 
 int add_osc(mixer *mixr, int freq, GTABLE *gt)
 {
-  //OSCIL **new_signals = NULL;
-  ///* check if we need to allocate more space for OSCILs */
-  //if (mixr->sig_size <= mixr->sig_num) {
-  //  if (mixr->sig_size == 0) {
-  //    mixr->sig_size = INITIAL_SIGNAL_SIZE;
-  //  } else {
-  //    mixr->sig_size *= 2;
-  //  }
 
-  //  new_signals = realloc(mixr->signals, mixr->sig_size *
-  //                      sizeof(OSCIL*));
-  //  if (new_signals == NULL) {
-  //    printf("Unable to allocate more signalszzz");
-  //    return mixr->sig_num;
-  //  } else {
-  //    mixr->signals = new_signals;
-  //  }
-  //}
   OSCIL *new_osc = new_oscil(freq, gt);
   if (new_osc == NULL) {
     printf("BARF!\n");
     return -1;
   }
+
   SBMSG *m = new_sbmsg();
   if (m == NULL) {
     printf("MBARF!\n");
     return -1;
   }
-  printf("HERE BEFORE CASTING!\n");
+
   m->sound_generator = (SOUNDGEN *) new_osc;
   m->freq = 1492;
   return add_sound_generator(mixr, m);
@@ -133,33 +107,13 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm)
       mixr->sound_generators = new_soundgens;
     }
   }
-  printf("gota message here - freq = %d\n", sbm->freq);
   mixr->sound_generators[mixr->soundgen_num] = sbm->sound_generator;
-  printf("AT END OF ADD_SOUND_GEN\n");
   return mixr->soundgen_num++;
 }
 
 
 int add_fm(mixer *mixr, int ffreq, int cfreq)
 {
-  //FM **new_fmsignals = NULL;
-  ///* check if we need to allocate more space for FMszz */
-  //if (mixr->fmsig_size <= mixr->fmsig_num) {
-  //  if (mixr->fmsig_size == 0) {
-  //    mixr->fmsig_size = INITIAL_SIGNAL_SIZE;
-  //  } else {
-  //    mixr->fmsig_size *= 2;
-  //  }
-
-  //  new_fmsignals = realloc(mixr->fmsignals, mixr->fmsig_size *
-  //                      sizeof(FM*));
-  //  if (new_fmsignals == NULL) {
-  //    printf("Unable to allocate more FMsignalszzz");
-  //    return mixr->fmsig_num;
-  //  } else {
-  //    mixr->fmsignals = new_fmsignals;
-  //  }
-  //}
   FM *nfm = new_fm(ffreq, cfreq);
   if (nfm == NULL) {
     printf("Barfed on FM creation\n");
@@ -172,21 +126,10 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
   }
   m->sound_generator = (SOUNDGEN *) nfm;
   return add_sound_generator(mixr, m);
-
-  //mixr->fmsignals[mixr->fmsig_num] = nfm;
-  //return mixr->fmsig_num++;
-
-  //OSCIL *new_osc = new_oscil(freq, gt);
-  //if (new_osc == NULL) {
-  //  printf("BARF!\n");
-  //  return -1;
-  //}
-  //printf("HERE BEFORE CASTING!\n");
 }
 
 int add_sample(mixer *mixr, char *filename, char *pattern)
 {
-
   // preliminary setup
   char cwd[1024];
   getcwd(cwd, 1024);
@@ -209,37 +152,11 @@ int add_sample(mixer *mixr, char *filename, char *pattern)
 
   m->sound_generator = (SOUNDGEN *) nsample;
   return add_sound_generator(mixr, m);
-
-  //if (nsample != NULL) {
-  //  mixr->sample_signals[mixr->sample_sig_num] = nsample;
-  //  return mixr->sample_sig_num++;
-  //} else {
-  //  printf("NEarly segfaulted there, pal.\n");
-  //  return -1;
-  //}
 }
+
 double gen_next(mixer *mixr)
 {
   double output_val = 0.0;
-
-  //if (mixr->sig_num > 0) {
-  //  for (int i = 0; i < mixr->sig_num; i++) {
-  //      output_val += mixr->signals[i]->tick(mixr->signals[i]);
-  //  }
-  //}
-
-  //if (mixr->fmsig_num > 0) {
-  //  for (int i = 0; i < mixr->fmsig_num; i++) {
-  //    output_val += mixr->fmsignals[i]->gen_next(mixr->fmsignals[i]);
-  //  }
-  //}
-
-  //if (mixr->sample_sig_num > 0) {
-  //  for (int i = 0; i < mixr->sample_sig_num; i++) {
-  //    output_val += mixr->sample_signals[i]->gen_next(mixr->sample_signals[i]);
-  //  }
-  //}
-
   if (mixr->soundgen_num > 0) {
     for (int i = 0; i < mixr->soundgen_num; i++) {
       output_val += mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
