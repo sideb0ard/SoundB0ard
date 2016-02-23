@@ -12,6 +12,7 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   SAMPLER *sampler = calloc(1, sizeof(SAMPLER));
   sampler->position = 0;
 
+  // sample pattern stuff
   char **sp, *spattern[32];
   int sp_count = 0;
 
@@ -29,6 +30,7 @@ SAMPLER* new_sampler(char *filename, char *pattern)
     }
   }
 
+  // soundfile part
   SNDFILE *snd_file;
   SF_INFO sf_info;
 
@@ -62,14 +64,17 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   sampler->bufsize = bufsize;
   sampler->samplerate = sf_info.samplerate;
   sampler->channels = sf_info.channels;
-  sampler->gen_next = &f_gennext;
   sampler->vol = 0.7;
+
+  sampler->sound_generator.gennext = &sample_gennext;
+  sampler->sound_generator.status = &sample_status;
 
   return sampler;
 }
 
-double f_gennext(SAMPLER *sampler)
+double sample_gennext(void *self)
 {
+  SAMPLER *sampler = self;
   static double val;
 
   if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
@@ -95,8 +100,9 @@ double f_gennext(SAMPLER *sampler)
   
 }
 
-void sample_status(SAMPLER *sampler, char *status_string)
+void sample_status(void *self, char *status_string)
 {
+  SAMPLER *sampler = self;
   char spattern[SAMPLE_PATTERN_LEN + 1] = "";
   for (int i = 0; i < SAMPLE_PATTERN_LEN; i++) {
     if (sampler->pattern[i]) {

@@ -8,7 +8,7 @@
 #include "table.h"
 
 typedef struct t_oscil OSCIL;
-typedef double (*tickfunc) (SOUNDGEN* p_sg);
+//typedef double (*tickfunc) (SOUNDGEN* p_sg);
 typedef void (*volly) (OSCIL* osc, double vol);
 typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*freqy) (OSCIL* osc, double freq);
@@ -27,7 +27,7 @@ typedef struct t_oscil
   const GTABLE* gtable;
   double dtablen;
 
-  tickfunc gennext;
+  //tickfunc gennext;
   volly voladj;
   freqy freqadj;
   incry incradj;
@@ -36,7 +36,7 @@ typedef struct t_oscil
 
 OSCIL* new_oscil(double freq, GTABLE *gt);
 //double tabtick(OSCIL* p_osc);
-double tabitick(void *self);
+double oscil_gennext(void *self);
 void volfunc(OSCIL* p_osc, double vol);
 void freqfunc(OSCIL* p_osc, double freq);
 void incrfunc(OSCIL* p_osc, double v);

@@ -7,16 +7,6 @@
 
 extern GTABLE *sine_table;
 
-float fm_gen_next(FM *fm)
-{
-  //float val = fm->cmod_osc->tick(fm->cmod_osc) * fm->fmod_osc->tick(fm->fmod_osc);
-  float val = fm->car_osc->gennext(fm->car_osc);
-  float mod_val = 100 * fm->mod_osc->gennext(fm->mod_osc);
-  fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));
-
-  return fm->vol * val;
-}
-
 FM* new_fm(double modf, double carf)
 {
   FM* fm;
@@ -30,13 +20,27 @@ FM* new_fm(double modf, double carf)
   fm->mod_osc->voladj(fm->mod_osc, 0.7);
   fm->car_osc->voladj(fm->car_osc, 0.7);
 
-  fm->gen_next = &fm_gen_next;
+  fm->sound_generator.gennext = &fm_gennext;
+  fm->sound_generator.status = &fm_status;
+  //fm->gen_next = &fm_gen_next;
   
   return fm;
 }
 
-void fm_status(FM *fm, char *status_string)
+double fm_gennext(void *self)
 {
+  FM *fm = (FM *) self;
+  //float val = fm->cmod_osc->tick(fm->cmod_osc) * fm->fmod_osc->tick(fm->fmod_osc);
+  double val = fm->car_osc->sound_generator.gennext(fm->car_osc);
+  double mod_val = 100 * fm->mod_osc->sound_generator.gennext(fm->mod_osc);
+  fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));
+
+  return fm->vol * val;
+}
+
+void fm_status(void *self, char *status_string)
+{
+  FM *fm = (FM *) self;
   sprintf(status_string, "FM! modulator: %f %f // carrier: %f %f", fm->mod_osc->freq, fm->mod_osc->curphase, fm->car_osc->freq, fm->car_osc->curphase);
 }
 

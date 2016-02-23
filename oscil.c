@@ -18,8 +18,9 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
   p_osc->gtable = gt;
   p_osc->dtablen = (double) TABLEN;
 
-  p_osc->sound_generator.gennext = &tabitick;
+  p_osc->sound_generator.gennext = &oscil_gennext;
   p_osc->sound_generator.status = &oscil_status;
+
   p_osc->voladj = &volfunc;
   p_osc->freqadj = &freqfunc;
   p_osc->incradj = &incrfunc;
@@ -46,7 +47,7 @@ void freqfunc(OSCIL* p_osc, double f)
   p_osc->incr = TABRAD * f;
 }
 
-double tabitick(void* self) // interpolating
+double oscil_gennext(void* self) // interpolating
 {
   OSCIL *p_osc = (OSCIL *) self;
   int base_index = (int) (p_osc->curphase);
