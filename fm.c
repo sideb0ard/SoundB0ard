@@ -10,8 +10,8 @@ extern GTABLE *sine_table;
 float fm_gen_next(FM *fm)
 {
   //float val = fm->cmod_osc->tick(fm->cmod_osc) * fm->fmod_osc->tick(fm->fmod_osc);
-  float val = fm->car_osc->tick(fm->car_osc);
-  float mod_val = 100 * fm->mod_osc->tick(fm->mod_osc);
+  float val = fm->car_osc->gennext(fm->car_osc);
+  float mod_val = 100 * fm->mod_osc->gennext(fm->mod_osc);
   fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));
 
   return fm->vol * val;

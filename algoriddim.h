@@ -19,7 +19,6 @@ typedef struct melody_msg {
 
 melody_msg* new_melody_msg(int *freqs, int melody_note_len, int loop_len);
 
-sbmsg* new_sb_msg(void);
 algo *new_algo(void);
 
 void *algo_run(void *);

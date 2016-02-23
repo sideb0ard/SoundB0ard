@@ -1,4 +1,4 @@
-void thrunner(sbmsg *msg);
+void thrunner(SBMSG *msg);
 void *timed_sig_start(void *arg);
 void *fade_runrrr(void *arg);
 //void startrrr(int sig_num);

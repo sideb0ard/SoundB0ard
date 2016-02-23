@@ -57,7 +57,7 @@ void *loop_run(void *m)
   int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
   mmsg->osc_num = osc_num;
   do {} while (b->cur_tick % 16 != 0);
-  faderrr(osc_num, UP);
+  //faderrr(osc_num, UP);
   sleep(3);
 
   while (1)
@@ -82,8 +82,7 @@ void *algo_run(void *a)
   prev_notes[1] = notes[rand() % 19];
   int fm_one = add_fm(mixr, notes[rand() % 19], notes[rand() % 19]);
 
-  char *sigtype[2] = {"car", "mod"};
-
+  //char *sigtype[2] = {"car", "mod"};
 
   while (1)
   {

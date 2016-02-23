@@ -92,7 +92,7 @@ void interpret(char *line)
 
     float val = 0;
     char cmd[20];
-    sbmsg *msg = calloc(1, sizeof(sbmsg));
+    SBMSG *msg = new_sbmsg();
 
     sscanf(line, "%s %f", cmd, &val);
     msg->freq = val;

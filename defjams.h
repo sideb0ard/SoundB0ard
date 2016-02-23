@@ -12,6 +12,8 @@
 
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 
+#define DEFAULT_ARRAY_SIZE 4
+
 #define TWO_PI (2.0 * M_PI)
 #define FREQRAD (TWO_PI / SAMPLE_RATE)
 
@@ -28,25 +30,9 @@
 #define ANSI_COLOR_WHITE   "\x1b[37m"
 #define ANSI_COLOR_RESET   "\x1b[0m"
 
-typedef struct sbmsg {
-  char cmd[20];
-  char params[20];
-  int freq;
-} sbmsg;
-
-//typedef struct t_soundgen SOUNDGEN;
-//typedef double (*fp_gennext) (SOUNDGEN* sg);
-//typedef void (*fp_voladj) (SOUNDGEN* sg, double vol);
-//
-//typedef struct t_soundgen {
-//  fp_gennext sg_gennext;
-//  fp_voladj  sg_voladj;
-//}
-
 typedef enum {
   UP,
   DOWN
 } direction;
-
 
 #endif

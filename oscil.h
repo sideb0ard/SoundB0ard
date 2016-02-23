@@ -2,11 +2,13 @@
 #define OSCIL_H
 
 #include <stdio.h>
+
 #include "oscil.h"
+#include "sound_generator.h"
 #include "table.h"
 
 typedef struct t_oscil OSCIL;
-typedef double (*tickfunc) (OSCIL* osc);
+typedef double (*tickfunc) (SOUNDGEN* p_sg);
 typedef void (*volly) (OSCIL* osc, double vol);
 typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*freqy) (OSCIL* osc, double freq);
@@ -14,6 +16,9 @@ typedef void (*incry) (OSCIL* osc, double freq);
 
 typedef struct t_oscil
 {
+
+  SOUNDGEN sound_generator;
+
   double freq;
   double curphase;
   double incr;
@@ -22,18 +27,16 @@ typedef struct t_oscil
   const GTABLE* gtable;
   double dtablen;
 
-  tickfunc tick;
+  tickfunc gennext;
   volly voladj;
   freqy freqadj;
   incry incradj;
 
 } OSCIL;
 
-typedef double (*tickfunc) (OSCIL* tosc);
-
 OSCIL* new_oscil(double freq, GTABLE *gt);
-double tabtick(OSCIL* p_osc);
-double tabitick(OSCIL* p_osc);
+//double tabtick(OSCIL* p_osc);
+double tabitick(void *self);
 void volfunc(OSCIL* p_osc, double vol);
 void freqfunc(OSCIL* p_osc, double freq);
 void incrfunc(OSCIL* p_osc, double v);

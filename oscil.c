@@ -2,6 +2,7 @@
 
 #include "defjams.h"
 #include "oscil.h"
+#include "sound_generator.h"
 #include "table.h"
 
 OSCIL* new_oscil(double freq, GTABLE *gt)
@@ -12,12 +13,12 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
     return NULL;
   p_osc->freq = freq;
   p_osc->incr = TABRAD * freq;
-  p_osc->vol = 0.0;
+  p_osc->vol = 0.7;
   printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
   p_osc->gtable = gt;
   p_osc->dtablen = (double) TABLEN;
 
-  p_osc->tick = &tabitick;
+  p_osc->sound_generator.gennext = &tabitick;
   p_osc->voladj = &volfunc;
   p_osc->freqadj = &freqfunc;
   p_osc->incradj = &incrfunc;
@@ -44,8 +45,9 @@ void freqfunc(OSCIL* p_osc, double f)
   p_osc->incr = TABRAD * f;
 }
 
-double tabitick(OSCIL* p_osc) // interpolating
+double tabitick(void* self) // interpolating
 {
+  OSCIL *p_osc = (OSCIL *) self;
   int base_index = (int) (p_osc->curphase);
   unsigned long next_index = base_index + 1;
   double frac, slope, val;

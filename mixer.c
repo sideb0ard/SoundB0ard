@@ -11,7 +11,9 @@
 #include "fm.h"
 #include "mixer.h"
 #include "oscil.h"
+#include "sbmsg.h"
 #include "sampler.h"
+#include "sound_generator.h"
 
 typedef struct {
   mixer *mixr;
@@ -78,28 +80,65 @@ void freq_change(mixer *mixr, int sig, float freq)
 
 int add_osc(mixer *mixr, int freq, GTABLE *gt)
 {
-  OSCIL **new_signals = NULL;
-  /* check if we need to allocate more space for OSCILs */
-  if (mixr->sig_size <= mixr->sig_num) {
-    if (mixr->sig_size == 0) {
-      mixr->sig_size = INITIAL_SIGNAL_SIZE;
+  //OSCIL **new_signals = NULL;
+  ///* check if we need to allocate more space for OSCILs */
+  //if (mixr->sig_size <= mixr->sig_num) {
+  //  if (mixr->sig_size == 0) {
+  //    mixr->sig_size = INITIAL_SIGNAL_SIZE;
+  //  } else {
+  //    mixr->sig_size *= 2;
+  //  }
+
+  //  new_signals = realloc(mixr->signals, mixr->sig_size *
+  //                      sizeof(OSCIL*));
+  //  if (new_signals == NULL) {
+  //    printf("Unable to allocate more signalszzz");
+  //    return mixr->sig_num;
+  //  } else {
+  //    mixr->signals = new_signals;
+  //  }
+  //}
+  OSCIL *new_osc = new_oscil(freq, gt);
+  if (new_osc == NULL) {
+    printf("BARF!\n");
+    return -1;
+  }
+  SBMSG *m = new_sbmsg();
+  if (m == NULL) {
+    printf("MBARF!\n");
+    return -1;
+  }
+  printf("HERE BEFORE CASTING!\n");
+  m->sound_generator = (SOUNDGEN *) new_osc;
+  m->freq = 1492;
+  return add_sound_generator(mixr, m);
+}
+
+int add_sound_generator(mixer *mixr, SBMSG *sbm)
+{
+  SOUNDGEN **new_soundgens = NULL;
+  if (mixr->soundgen_size <= mixr->soundgen_num) {
+    if (mixr->soundgen_size == 0) {
+      mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
     } else {
-      mixr->sig_size *= 2;
+    mixr->soundgen_size *= 2;
     }
 
-    new_signals = realloc(mixr->signals, mixr->sig_size *
-                        sizeof(OSCIL*));
-    if (new_signals == NULL) {
-      printf("Unable to allocate more signalszzz");
-      return mixr->sig_num;
+    new_soundgens = realloc(mixr->sound_generators, mixr->soundgen_size *
+                      sizeof(SOUNDGEN*));
+    if (new_soundgens == NULL) {
+      printf("Ooh, burney - cannae allocate memory for new sounds");
+      return -1;
     } else {
-      mixr->signals = new_signals;
+      mixr->sound_generators = new_soundgens;
     }
   }
-  OSCIL *new_osc = new_oscil(freq, gt);
-  mixr->signals[mixr->sig_num] = new_osc;
-  return mixr->sig_num++;
+  printf("gota message here - freq = %d\n", sbm->freq);
+  mixr->sound_generators[mixr->soundgen_num] = sbm->sound_generator;
+  printf("AT END OF ADD_SOUND_GEN\n");
+  return mixr->soundgen_num++;
 }
+
 
 int add_fm(mixer *mixr, int ffreq, int cfreq)
 {
@@ -167,11 +206,11 @@ double gen_next(mixer *mixr)
 {
   double output_val = 0.0;
 
-  if (mixr->sig_num > 0) {
-    for (int i = 0; i < mixr->sig_num; i++) {
-        output_val += mixr->signals[i]->tick(mixr->signals[i]);
-    }
-  }
+  //if (mixr->sig_num > 0) {
+  //  for (int i = 0; i < mixr->sig_num; i++) {
+  //      output_val += mixr->signals[i]->tick(mixr->signals[i]);
+  //  }
+  //}
 
   if (mixr->fmsig_num > 0) {
     for (int i = 0; i < mixr->fmsig_num; i++) {
@@ -185,6 +224,11 @@ double gen_next(mixer *mixr)
     }
   }
 
+  if (mixr->soundgen_num > 0) {
+    for (int i = 0; i < mixr->soundgen_num; i++) {
+      output_val += mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
+    }
+  }
   // global envelope -- for the moment
   double mix_amp = envelope_stream_tick(ampstream);
   output_val *= mix_amp;
