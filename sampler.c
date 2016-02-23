@@ -9,8 +9,8 @@ extern bpmrrr *b;
 
 SAMPLER* new_sampler(char *filename, char *pattern)
 {
-  SAMPLER *data = calloc(1, sizeof(SAMPLER));
-  data->position = 0;
+  SAMPLER *sampler = calloc(1, sizeof(SAMPLER));
+  sampler->position = 0;
 
   char **sp, *spattern[32];
   int sp_count = 0;
@@ -25,7 +25,7 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   for (int i = 0; i < sp_count; i++) {
     int pat_num = atoi(spattern[i]);
     if (pat_num < SAMPLE_PATTERN_LEN) {
-      data->pattern[pat_num] = 1;
+      sampler->pattern[pat_num] = 1;
     }
   }
 
@@ -55,17 +55,17 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   sf_readf_int(snd_file, buffer, bufsize);
 
   int fslen = strlen(filename);
-  data->filename = calloc(1, fslen + 1);
-  strncpy(data->filename, filename, fslen);
+  sampler->filename = calloc(1, fslen + 1);
+  strncpy(sampler->filename, filename, fslen);
 
-  data->buffer = buffer;
-  data->bufsize = bufsize;
-  data->samplerate = sf_info.samplerate;
-  data->channels = sf_info.channels;
-  data->gen_next = &f_gennext;
-  data->vol = 0.7;
+  sampler->buffer = buffer;
+  sampler->bufsize = bufsize;
+  sampler->samplerate = sf_info.samplerate;
+  sampler->channels = sf_info.channels;
+  sampler->gen_next = &f_gennext;
+  sampler->vol = 0.7;
 
-  return data;
+  return sampler;
 }
 
 double f_gennext(SAMPLER *sampler)
@@ -73,18 +73,22 @@ double f_gennext(SAMPLER *sampler)
   static double val;
 
   if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
-    if (!sampler->playing) {
+    if (!sampler->played) {
+      sampler->playing = 1;
+    }
+    if (sampler->playing) {
       val =  sampler->buffer[sampler->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
     } else {
       val = 0.0;
     }
     if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
-      sampler->position = 0;
+      sampler->played = 1;
       sampler->playing = 0;
+      sampler->position = 0;
     }
   } else {
     sampler->position = 0;
-    sampler->playing = 0;
+    sampler->played = 0;
   }
 
   return val * sampler->vol;

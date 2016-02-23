@@ -14,6 +14,7 @@ typedef struct t_sampler
   int bufsize;
   int position;
   int playing;
+  int played;
   int samplerate;
   int channels;
   double vol;

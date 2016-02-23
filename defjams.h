@@ -10,7 +10,7 @@
 
 #define DEFAULT_BPM 80
 
-#define DEFAULT_ENV_LENGTH 8.0 // two bars
+#define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 
 #define TWO_PI (2.0 * M_PI)
 #define FREQRAD (TWO_PI / SAMPLE_RATE)
@@ -33,6 +33,15 @@ typedef struct sbmsg {
   char params[20];
   int freq;
 } sbmsg;
+
+//typedef struct t_soundgen SOUNDGEN;
+//typedef double (*fp_gennext) (SOUNDGEN* sg);
+//typedef void (*fp_voladj) (SOUNDGEN* sg, double vol);
+//
+//typedef struct t_soundgen {
+//  fp_gennext sg_gennext;
+//  fp_voladj  sg_voladj;
+//}
 
 typedef enum {
   UP,
