@@ -19,6 +19,7 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
   p_osc->dtablen = (double) TABLEN;
 
   p_osc->sound_generator.gennext = &tabitick;
+  p_osc->sound_generator.status = &oscil_status;
   p_osc->voladj = &volfunc;
   p_osc->freqadj = &freqfunc;
   p_osc->incradj = &incrfunc;
@@ -71,7 +72,8 @@ double tabitick(void* self) // interpolating
   return val * vol;
 }
 
-void status(OSCIL *p_osc, char *status_string)
+void oscil_status(void *self, char *status_string)
 {
+  OSCIL *p_osc = self;
   sprintf(status_string, "freq: %f vol: %f incr: %f cur: %f", p_osc->freq, p_osc->vol, p_osc->incr, p_osc->curphase);
 }

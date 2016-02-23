@@ -38,10 +38,10 @@ mixer *new_mixer()
 void mixer_ps(mixer *mixr)
 {
   printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) :::::\n" ANSI_COLOR_RESET, mixr->volume);
-  for ( int i = 0; i < mixr->sig_num; i++) {
+  for ( int i = 0; i < mixr->soundgen_num; i++) {
     // printf("calling status on osc at %p\n", mixr->signals[i]);
     char ss[80];
-    status(mixr->signals[i], ss);
+    mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
     printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
   }
   for ( int i = 0; i < mixr->fmsig_num; i++) {

@@ -41,6 +41,6 @@ void volfunc(OSCIL* p_osc, double vol);
 void freqfunc(OSCIL* p_osc, double freq);
 void incrfunc(OSCIL* p_osc, double v);
 
-void status(OSCIL *p_osc, char *status_string);
+void oscil_status(void *self, char *status_string);
 
 #endif // OSCIL_H
