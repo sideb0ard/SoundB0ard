@@ -3,6 +3,7 @@
 #include <string.h>
 
 #include "bpmrrr.h"
+#include "defjams.h"
 #include "sampler.h"
 
 extern bpmrrr *b;
@@ -112,7 +113,7 @@ void sample_status(void *self, char *status_string)
     }
   }
   spattern[SAMPLE_PATTERN_LEN] = '\0';
-  snprintf(status_string, 80, "[%s]\t[%s]", sampler->filename, spattern);
+  snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s]" ANSI_COLOR_RESET, sampler->filename, spattern);
 }
 
 

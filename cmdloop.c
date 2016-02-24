@@ -104,6 +104,7 @@ void interpret(char *line)
     //  printf("VOLLY BALL\n");
     //  mixer_vol_change(mixr, val);
     } else if (strcmp(cmd, "stop") == 0) {
+      msg->sound_gen_num = val;
       strncpy(msg->cmd, "faderrr", 19);
       thrunner(msg);
     } else {
@@ -142,10 +143,10 @@ void interpret(char *line)
   regex_t tsigtype_rx;
   regcomp(&tsigtype_rx, "^(vol|freq|fm) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
   if (regexec(&tsigtype_rx, line, 3, tpmatch, 0) == 0) {
-    int sig = 0;
-    double val = 0;
+    double val1 = 0;
+    double val2 = 0;
     char cmd_type[10];
-    sscanf(line, "%s %d %lf", cmd_type, &sig, &val);
+    sscanf(line, "%s %lf %lf", cmd_type, &val1, &val2);
     //if (strcmp(cmd_type, "vol") == 0) {
     //  vol_change(mixr, sig, val);
     //  printf("VOL! %s %d %lf\n", cmd_type, sig, val);
@@ -155,8 +156,15 @@ void interpret(char *line)
     //  printf("FREQ! %s %d %lf\n", cmd_type, sig, val);
     //}
     if (strcmp(cmd_type, "fm") == 0) {
-      add_fm(mixr, sig, val);
       printf("FML!\n");
+      SBMSG *msg = new_sbmsg();
+      strncpy(msg->cmd, "timed_sig_start", 19);
+      strncpy(msg->params, cmd_type, 10);
+      msg->modfreq = val1;
+      msg->carfreq = val2;
+      thrunner(msg);
+
+      //add_fm(mixr, sig, val);
     }
   }
   regmatch_t lmatch[3];

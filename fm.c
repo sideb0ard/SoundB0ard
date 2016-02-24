@@ -31,6 +31,7 @@ FM* new_fm(double modf, double carf)
 
 void fm_setvol(void *self, double v)
 {
+  //printf("FM SETVOL CALL\n");
   FM *fm = (FM *) self;
   if (v < 0.0 || v > 1.0) {
     return;
@@ -40,8 +41,9 @@ void fm_setvol(void *self, double v)
 
 double fm_getvol(void *self)
 {
+  printf("FM GET VOL!\n");
   FM *fm = (FM *) self;
-  return fm->sound_generator.getvol(fm);
+  return fm->vol;
 }
 
 double fm_gennext(void *self)
@@ -58,7 +60,7 @@ double fm_gennext(void *self)
 void fm_status(void *self, char *status_string)
 {
   FM *fm = (FM *) self;
-  sprintf(status_string, "FM! modulator: %f %f // carrier: %f %f", fm->mod_osc->freq, fm->mod_osc->curphase, fm->car_osc->freq, fm->car_osc->curphase);
+  snprintf(status_string, 119, ANSI_COLOR_RED "FM! modulator: %.2f(freq) %.2f(phase) // carrier: %.2f %.2f // vol: %.2f" ANSI_COLOR_RESET, fm->mod_osc->freq, fm->mod_osc->curphase, fm->car_osc->freq, fm->car_osc->curphase, fm->vol);
 }
 
 void mfm(FM *fm, char *osc, double val)

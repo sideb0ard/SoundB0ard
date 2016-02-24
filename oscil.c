@@ -85,5 +85,5 @@ double oscil_gennext(void* self) // interpolating
 void oscil_status(void *self, char *status_string)
 {
   OSCIL *p_osc = self;
-  sprintf(status_string, "freq: %f vol: %f incr: %f cur: %f", p_osc->freq, p_osc->vol, p_osc->incr, p_osc->curphase);
+  snprintf(status_string, 119, ANSI_COLOR_YELLOW "freq: %f vol: %f incr: %f cur: %f" ANSI_COLOR_RESET, p_osc->freq, p_osc->vol, p_osc->incr, p_osc->curphase);
 }

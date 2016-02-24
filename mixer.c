@@ -39,9 +39,9 @@ void mixer_ps(mixer *mixr)
 {
   printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) :::::\n" ANSI_COLOR_RESET, mixr->volume);
   for ( int i = 0; i < mixr->soundgen_num; i++) {
-    char ss[80];
+    char ss[120];
     mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
-    printf(ANSI_COLOR_YELLOW "SB [%d] - %s\n" ANSI_COLOR_RESET, i, ss); 
+    printf("[%d] - %s\n", i, ss); 
   }
 }
 
@@ -68,26 +68,6 @@ void mixer_vol_change(mixer *mixr, float vol)
 //  mixr->signals[sig]->freqadj(mixr->signals[sig], freq);
 //}
 
-int add_osc(mixer *mixr, int freq, GTABLE *gt)
-{
-
-  OSCIL *new_osc = new_oscil(freq, gt);
-  if (new_osc == NULL) {
-    printf("BARF!\n");
-    return -1;
-  }
-
-  SBMSG *m = new_sbmsg();
-  if (m == NULL) {
-    printf("MBARF!\n");
-    return -1;
-  }
-
-  m->sound_generator = (SOUNDGEN *) new_osc;
-  m->freq = 1492;
-  return add_sound_generator(mixr, m);
-}
-
 int add_sound_generator(mixer *mixr, SBMSG *sbm)
 {
   SOUNDGEN **new_soundgens = NULL;
@@ -111,6 +91,25 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm)
   return mixr->soundgen_num++;
 }
 
+int add_osc(mixer *mixr, int freq, GTABLE *gt)
+{
+
+  OSCIL *new_osc = new_oscil(freq, gt);
+  if (new_osc == NULL) {
+    printf("BARF!\n");
+    return -1;
+  }
+
+  SBMSG *m = new_sbmsg();
+  if (m == NULL) {
+    printf("MBARF!\n");
+    return -1;
+  }
+
+  m->sound_generator = (SOUNDGEN *) new_osc;
+  m->freq = 1492;
+  return add_sound_generator(mixr, m);
+}
 
 int add_fm(mixer *mixr, int ffreq, int cfreq)
 {

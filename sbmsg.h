@@ -4,9 +4,15 @@
 #include "sound_generator.h"
 
 typedef struct sbmsg {
+  // this is a generic data structure to pass arguments
+  // at some point, i'll sure this will be too messy and
+  // need separated into message types.
   char cmd[20];
   char params[20];
   int freq;
+  int modfreq;
+  int carfreq;
+  int sound_gen_num;
   SOUNDGEN* sound_generator;
 } SBMSG;
 

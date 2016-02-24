@@ -23,24 +23,23 @@ extern GTABLE *square_table;
 void *timed_sig_start(void * arg)
 {
   SBMSG *msg = arg;
-  int osc_num = 0;
-
-  //do {} while (b->cur_tick % 16 != 0);
+  int sg = -1; // signal generator
 
   if (strcmp(msg->params, "sine") == 0) {
-      osc_num = add_osc(mixr, msg->freq, sine_table);
-      printf("MADE IT BACK IN HERE - with OSC num %d\n", osc_num);
+      sg = add_osc(mixr, msg->freq, sine_table);
   } else if (strcmp(msg->params, "sawd") == 0) {
-      osc_num = add_osc(mixr, msg->freq, saw_down_table);
+      sg = add_osc(mixr, msg->freq, saw_down_table);
   } else if (strcmp(msg->params, "sawu") == 0) {
-      osc_num = add_osc(mixr, msg->freq, saw_up_table);
+      sg = add_osc(mixr, msg->freq, saw_up_table);
   } else if (strcmp(msg->params, "tri") == 0) {
-      osc_num = add_osc(mixr, msg->freq, tri_table);
+      sg = add_osc(mixr, msg->freq, tri_table);
   } else if (strcmp(msg->params, "square") == 0) {
-      osc_num = add_osc(mixr, msg->freq, square_table);
+      sg = add_osc(mixr, msg->freq, square_table);
+  } else if (strcmp(msg->params, "fm") == 0) {
+      sg = add_fm(mixr, msg->modfreq, msg->carfreq);
   }
 
-  faderrr(osc_num, UP);
+  faderrr(sg, UP);
 
   free(msg);
   return NULL;
@@ -49,7 +48,7 @@ void *timed_sig_start(void * arg)
 void *fade_runrrr(void * arg)
 {
   SBMSG *msg = arg;
-  //faderrr(msg->freq, DOWN); // really this is the osc_num
+  faderrr(msg->sound_gen_num, DOWN);
 
   return NULL;
 }
@@ -90,7 +89,7 @@ void thrunner(SBMSG *msg)
 void faderrr(int sg_num, direction d)
 {
 
-  printf("FADER CALLED!\n");
+  printf("FADING CALLED: GOING %d!\n", d);
   struct timespec ts;
   ts.tv_sec = 0;
   ts.tv_nsec = 500000;
@@ -104,7 +103,9 @@ void faderrr(int sg_num, direction d)
     }
     mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.5);
   } else {
+    printf("GOING DOWN for %d\n", sg_num);
     double vol = mixr->sound_generators[sg_num]->getvol(mixr->sound_generators[sg_num]);
+    printf("STARTING VOL, GOING DOWN: %lf\n", vol);
     while (vol > 0.0) {
       vol -= 0.0001;
       mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
