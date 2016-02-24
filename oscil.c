@@ -13,7 +13,7 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
     return NULL;
   p_osc->freq = freq;
   p_osc->incr = TABRAD * freq;
-  p_osc->vol = 0.7;
+  p_osc->vol = 0.0;
   printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
   p_osc->gtable = gt;
   p_osc->dtablen = (double) TABLEN;

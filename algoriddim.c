@@ -33,7 +33,7 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
 
     *mlock = 1;
     *note = (*note + 1) % note_len;
-    //freq_change(mixr, osc_num, (notes[*note])); 
+    freq_change(mixr, osc_num, (notes[*note])); 
   }
 }
 
@@ -57,7 +57,7 @@ void *loop_run(void *m)
   int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
   mmsg->osc_num = osc_num;
   do {} while (b->cur_tick % 16 != 0);
-  //faderrr(osc_num, UP);
+  faderrr(osc_num, UP);
   sleep(3);
 
   while (1)

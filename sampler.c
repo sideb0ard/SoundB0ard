@@ -69,6 +69,8 @@ SAMPLER* new_sampler(char *filename, char *pattern)
 
   sampler->sound_generator.gennext = &sample_gennext;
   sampler->sound_generator.status = &sample_status;
+  sampler->sound_generator.getvol = &sample_getvol;
+  sampler->sound_generator.setvol = &sample_setvol;
 
   return sampler;
 }
@@ -113,7 +115,20 @@ void sample_status(void *self, char *status_string)
     }
   }
   spattern[SAMPLE_PATTERN_LEN] = '\0';
-  snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s]" ANSI_COLOR_RESET, sampler->filename, spattern);
+  snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf" ANSI_COLOR_RESET, sampler->filename, spattern, sampler->vol);
 }
 
+double sample_getvol(void *self)
+{
+  SAMPLER *sampler = self;
+  return sampler->vol;
+}
 
+void sample_setvol(void *self, double v)
+{
+  SAMPLER *sampler = self;
+  if (v < 0.0 || v > 1.0) {
+    return;
+  }
+  sampler->vol = v;
+}

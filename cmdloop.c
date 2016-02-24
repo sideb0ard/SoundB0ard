@@ -151,10 +151,10 @@ void interpret(char *line)
     //  vol_change(mixr, sig, val);
     //  printf("VOL! %s %d %lf\n", cmd_type, sig, val);
     //}
-    //if (strcmp(cmd_type, "freq") == 0) {
-    //  freq_change(mixr, sig, val);
-    //  printf("FREQ! %s %d %lf\n", cmd_type, sig, val);
-    //}
+    if (strcmp(cmd_type, "freq") == 0) {
+      freq_change(mixr, val1, val2);
+      printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
+    }
     if (strcmp(cmd_type, "fm") == 0) {
       printf("FML!\n");
       SBMSG *msg = new_sbmsg();

@@ -35,4 +35,9 @@ typedef enum {
   DOWN
 } direction;
 
+//typedef enum {
+//  OSCIL,
+//  FM,
+//  SAMPLER
+//} sound_generator_type;
 #endif
