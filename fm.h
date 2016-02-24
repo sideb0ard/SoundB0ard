@@ -21,6 +21,8 @@ FM* new_fm(double modf, double carf);
 
 double fm_gennext(void *self);
 void fm_status(void *self, char *status_string);
+double fm_getvol(void *self);
+void fm_setvol(void *self, double v);
 void mfm(FM *fm, char *osc, double val);
 
 #endif

@@ -17,13 +17,31 @@ FM* new_fm(double modf, double carf)
   fm->car_osc = new_oscil(carf, sine_table);
 
   fm->vol = 1.0;
-  fm->mod_osc->voladj(fm->mod_osc, 0.7);
-  fm->car_osc->voladj(fm->car_osc, 0.7);
+  fm->mod_osc->sound_generator.setvol(fm->mod_osc, 0.7);
+  fm->car_osc->sound_generator.setvol(fm->car_osc, 0.7);
+  //fm->car_osc->voladj(fm->car_osc, 0.7);
 
   fm->sound_generator.gennext = &fm_gennext;
   fm->sound_generator.status = &fm_status;
+  fm->sound_generator.setvol = &fm_setvol;
+  fm->sound_generator.getvol = &fm_getvol;
   
   return fm;
+}
+
+void fm_setvol(void *self, double v)
+{
+  FM *fm = (FM *) self;
+  if (v < 0.0 || v > 1.0) {
+    return;
+  }
+  fm->vol = v;
+}
+
+double fm_getvol(void *self)
+{
+  FM *fm = (FM *) self;
+  return fm->sound_generator.getvol(fm);
 }
 
 double fm_gennext(void *self)

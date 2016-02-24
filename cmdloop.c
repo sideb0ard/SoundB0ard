@@ -161,7 +161,6 @@ void interpret(char *line)
   }
   regmatch_t lmatch[3];
   regex_t loop_rx;
-  //regcomp(&loop_rx, "^loop ([[:digit:]]+) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
   regcomp(&loop_rx, "loop ([[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
   if (regexec(&loop_rx, line, 3, lmatch, 0) == 0) {
 

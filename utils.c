@@ -40,7 +40,7 @@ void *timed_sig_start(void * arg)
       osc_num = add_osc(mixr, msg->freq, square_table);
   }
 
-  //faderrr(osc_num, UP);
+  faderrr(osc_num, UP);
 
   free(msg);
   return NULL;
@@ -87,32 +87,32 @@ void thrunner(SBMSG *msg)
 //   volfunc(mixr->signals[sig_num], 1.0);
 // }
 
-//void faderrr(int sig_num, direction d)
-//{
-//
-//  printf("FADER CALLED!\n");
-//  struct timespec ts;
-//  ts.tv_sec = 0;
-//  ts.tv_nsec = 500000;
-//  double vol = 0;
-//
-//  if (d == UP) {
-//    while (vol < 0.5) {
-//      vol += 0.0001;
-//      volfunc(mixr->sound_generators[sig_num], vol);
-//      nanosleep(&ts, NULL);
-//    }
-//    volfunc(mixr->sound_generators[sig_num], 0.5);
-//  } else {
-//    double vol = mixr->sound_generators[sig_num]->vol;
-//    while (vol > 0.0) {
-//      vol -= 0.0001;
-//      volfunc(mixr->sound_generators[sig_num], vol);
-//      nanosleep(&ts, NULL);
-//    }
-//    volfunc(mixr->sound_generators[sig_num], 0.0);
-//  }
-//}
+void faderrr(int sg_num, direction d)
+{
+
+  printf("FADER CALLED!\n");
+  struct timespec ts;
+  ts.tv_sec = 0;
+  ts.tv_nsec = 500000;
+  double vol = 0;
+
+  if (d == UP) {
+    while (vol < 0.5) {
+      vol += 0.0001;
+      mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
+      nanosleep(&ts, NULL);
+    }
+    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.5);
+  } else {
+    double vol = mixr->sound_generators[sg_num]->getvol(mixr->sound_generators[sg_num]);
+    while (vol > 0.0) {
+      vol -= 0.0001;
+      mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
+      nanosleep(&ts, NULL);
+    }
+    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.0);
+  }
+}
 
 freaky* new_freqs_from_string(char* string)
 {

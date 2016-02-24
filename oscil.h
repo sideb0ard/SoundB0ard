@@ -9,7 +9,6 @@
 
 typedef struct t_oscil OSCIL;
 
-typedef void (*volly) (OSCIL* osc, double vol);
 typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*incry) (OSCIL* osc, double freq);
@@ -27,7 +26,6 @@ typedef struct t_oscil
   const GTABLE* gtable;
   double dtablen;
 
-  volly voladj;
   freqy freqadj;
   incry incradj;
 
@@ -36,7 +34,8 @@ typedef struct t_oscil
 OSCIL* new_oscil(double freq, GTABLE *gt);
 
 double oscil_gennext(void *self);
-void volfunc(OSCIL* p_osc, double vol);
+void oscil_setvol(void *self, double v);
+double oscil_getvol(void *self);
 void freqfunc(OSCIL* p_osc, double freq);
 void incrfunc(OSCIL* p_osc, double v);
 

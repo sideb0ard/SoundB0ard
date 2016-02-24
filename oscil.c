@@ -20,8 +20,10 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
 
   p_osc->sound_generator.gennext = &oscil_gennext;
   p_osc->sound_generator.status = &oscil_status;
+  p_osc->sound_generator.getvol = &oscil_getvol;
+  p_osc->sound_generator.setvol = &oscil_setvol;
 
-  p_osc->voladj = &volfunc;
+  //p_osc->voladj = &volfunc;
   p_osc->freqadj = &freqfunc;
   p_osc->incradj = &incrfunc;
 
@@ -33,8 +35,15 @@ void incrfunc(OSCIL* p_osc, double v)
   p_osc->incr = v;
 }
 
-void volfunc(OSCIL* p_osc, double v)
+double oscil_getvol(void *self)
 {
+  OSCIL *p_osc = (OSCIL *) self;
+  return p_osc->vol;
+}
+
+void oscil_setvol(void *self, double v)
+{
+  OSCIL *p_osc = (OSCIL *) self;
   if (v < 0.0 || v > 1.0) {
     return;
   }
