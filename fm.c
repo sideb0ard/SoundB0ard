@@ -49,7 +49,6 @@ double fm_getvol(void *self)
 double fm_gennext(void *self)
 {
   FM *fm = (FM *) self;
-
   double val = fm->car_osc->sound_generator.gennext(fm->car_osc);
   double mod_val = 100 * fm->mod_osc->sound_generator.gennext(fm->mod_osc);
   fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));
@@ -63,8 +62,9 @@ void fm_status(void *self, char *status_string)
   snprintf(status_string, 119, ANSI_COLOR_RED "FM! modulator: %.2f(freq) %.2f(phase) // carrier: %.2f %.2f // vol: %.2f" ANSI_COLOR_RESET, fm->mod_osc->freq, fm->mod_osc->curphase, fm->car_osc->freq, fm->car_osc->curphase, fm->vol);
 }
 
-void mfm(FM *fm, char *osc, double val)
+void mfm(void *self, char *osc, double val)
 {
+  FM *fm = (FM *) self;
   if (!strcmp(osc, "mod")) {
     freqfunc(fm->mod_osc, val);
   } else if (!strcmp(osc, "car")) {

@@ -47,12 +47,6 @@ void ps()
   mixer_ps(mixr);
   bpm_info(b);
   ps_envelope_stream(ampstream);
-  //table_info(gtable);
-}
-
-void gen() 
-{
-  gen_next(mixr);
 }
 
 int exxit()
@@ -60,7 +54,6 @@ int exxit()
     printf("\nBeat it, ya val jerk...\n");
     pa_teardown();
     exit(0);
-    //return 0;
 }
 
 void interpret(char *line)
@@ -86,7 +79,7 @@ void interpret(char *line)
   // SINE|SAW|TRI (FREQ)
   regmatch_t pmatch[3];
   regex_t cmdtype_rx;
-  regcomp(&cmdtype_rx, "^(bpm|stop|sine|sawd|sawu|tri|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+  regcomp(&cmdtype_rx, "^(bpm|duck|stop|sine|sawd|sawu|tri|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
 
   if (regexec(&cmdtype_rx, line, 3, pmatch, 0) == 0) {
 
@@ -107,37 +100,37 @@ void interpret(char *line)
       msg->sound_gen_num = val;
       strncpy(msg->cmd, "faderrr", 19);
       thrunner(msg);
+    } else if (strcmp(cmd, "duck") == 0) {
+      msg->sound_gen_num = val;
+      strncpy(msg->cmd, "duckrrr", 19);
+      thrunner(msg);
     } else {
       strncpy(msg->cmd, "timed_sig_start", 19);
       strncpy(msg->params, cmd, 10);
       thrunner(msg);
-
-
-      //if ( pthread_create (&timed_start_th, NULL, timed_sig_start, params)) {
-      //  printf("Ooft!\n");
-      //}
     }
   }
 
   // Modify an FM
-  //regex_t mfm_rx;
-  //regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
-  //if (regexec(&mfm_rx, line, 0, NULL, 0) == 0) {
-  //  //char osc[3];
-  //  //int fmno;
-  //  //int freq = 0;
-  //  //printf("ORIG LINE: %s\n", line);
-  //  int fmno;
-  //  int freq;
-  //  char osc[4];
-  //  sscanf(line, "mfm %d %s %d", &fmno, osc, &freq);
-  //  if (fmno + 1 <= mixr->fmsig_num) {
-  //  	printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fmno, osc, freq);
-  //  	mfm(mixr->fmsignals[fmno], osc, freq);
-  //  } else {
-  //    printf("Beat it, ya chancer - gimme an FM number for one that exists!\n");
-  //  }
-  //}
+  regex_t mfm_rx;
+  regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+  if (regexec(&mfm_rx, line, 0, NULL, 0) == 0) {
+    // TODO: check this can only work on an FM
+    //char osc[3];
+    //int fmno;
+    //int freq = 0;
+    //printf("ORIG LINE: %s\n", line);
+    int fmno;
+    int freq;
+    char osc[4];
+    sscanf(line, "mfm %d %s %d", &fmno, osc, &freq);
+    if (fmno + 1 <= mixr->soundgen_num) {
+    	printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fmno, osc, freq);
+    	mfm(mixr->sound_generators[fmno], osc, freq);
+    } else {
+      printf("Beat it, ya chancer - gimme an FM number for one that exists!\n");
+    }
+  }
 
   regmatch_t tpmatch[4];
   regex_t tsigtype_rx;
@@ -147,10 +140,10 @@ void interpret(char *line)
     double val2 = 0;
     char cmd_type[10];
     sscanf(line, "%s %lf %lf", cmd_type, &val1, &val2);
-    //if (strcmp(cmd_type, "vol") == 0) {
-    //  vol_change(mixr, sig, val);
-    //  printf("VOL! %s %d %lf\n", cmd_type, sig, val);
-    //}
+    if (strcmp(cmd_type, "vol") == 0) {
+      vol_change(mixr, val1, val2);
+      printf("VOL! %s %f %lf\n", cmd_type, val1, val2);
+    }
     if (strcmp(cmd_type, "freq") == 0) {
       freq_change(mixr, val1, val2);
       printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
@@ -172,6 +165,7 @@ void interpret(char *line)
   regcomp(&loop_rx, "loop ([[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
   if (regexec(&loop_rx, line, 3, lmatch, 0) == 0) {
 
+    // TODO: sure there shouldn't be a null terminator here?
     int loop_match_len = lmatch[2].rm_eo - lmatch[2].rm_so;
     char loop_len_char[loop_match_len];
     strncpy(loop_len_char, line+lmatch[2].rm_so, loop_match_len);
@@ -203,7 +197,6 @@ void interpret(char *line)
   regex_t file_rx;
   regcomp(&file_rx, "^(file|play) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE);
   if (regexec(&file_rx, line, 4, fmatch, 0) == 0) {
-    printf("Boom, file or play!\n");
 
     int filename_len = fmatch[2].rm_eo - fmatch[2].rm_so;
     char filename[filename_len + 1];

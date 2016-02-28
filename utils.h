@@ -1,6 +1,9 @@
+#include "sbmsg.h"
+
 void thrunner(SBMSG *msg);
 void *timed_sig_start(void *arg);
 void *fade_runrrr(void *arg);
+void *duck_runrrr(void *arg);
 //void startrrr(int sig_num);
 void faderrr(int sig_num, direction d);
 //void timed_sig_start(const char *sigtype, int freq, int freq2);
@@ -12,4 +15,6 @@ typedef struct freaky {
 } freaky;
 
 freaky* new_freqs_from_string(char* string);
+float freqval(char* n);
+int notelookup(char *n);
 void list_sample_dir(void);

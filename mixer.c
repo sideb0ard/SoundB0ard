@@ -54,13 +54,13 @@ void mixer_vol_change(mixer *mixr, float vol)
   }
 }
 
-//void vol_change(mixer *mixr, int sig, float vol)
-//{
-//  if (sig > (mixr->sig_size - 1))
-//    return;
-//  mixr->signals[sig]->voladj(mixr->signals[sig], vol);
-//}
-//
+void vol_change(mixer *mixr, int sg, float vol)
+{
+  if (sg > (mixr->soundgen_size - 1))
+    return;
+  mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
+}
+
 void freq_change(mixer *mixr, int sg, float freq)
 {
   // TODO: safety check for OSC
@@ -129,18 +129,14 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
 
 int add_sample(mixer *mixr, char *filename, char *pattern)
 {
-  printf("ADD SAMPLE START\n");
   // preliminary setup
   char cwd[1024];
   getcwd(cwd, 1024);
-  printf("IN %s\n", cwd);
   char full_filename[strlen(filename) + strlen(cwd) + 7]; // 7 == '/wavs/' is 6 and 1 for '\0'
   strcpy(full_filename, cwd);
-  printf("FIRST PART OF FILENAME IS %s\n", full_filename);
   strcat(full_filename, "/wavs/");
   strcat(full_filename, filename);
 
-  printf("SAMPLE STRING OPTS FINE - ABOUT TO ALLOC SAMPLER\n");
   SAMPLER *nsample = new_sampler(full_filename, pattern);
   if (nsample == NULL) {
     printf("Barfed on sample creation\n");
@@ -153,7 +149,6 @@ int add_sample(mixer *mixr, char *filename, char *pattern)
     return -1;
   }
 
-  printf("MAD YO BRO?\n");
   m->sound_generator = (SOUNDGEN *) nsample;
   return add_sound_generator(mixr, m);
 }
