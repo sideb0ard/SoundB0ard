@@ -78,31 +78,35 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   return sampler;
 }
 
-double sample_gennext(void *self)
+//double sample_gennext(void *self)
+void sample_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
   SAMPLER *sampler = self;
   static double val;
 
-  if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
-    if (!sampler->played) {
-      sampler->playing = 1;
-    }
-    if (sampler->playing) {
-      val =  sampler->buffer[sampler->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+  for (int i = 0; i < framesPerBuffer; i++) {
+    if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
+      if (!sampler->played) {
+        sampler->playing = 1;
+      }
+      if (sampler->playing) {
+        val =  sampler->buffer[sampler->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+      } else {
+        val = 0.0;
+      }
+      if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
+        sampler->played = 1;
+        sampler->playing = 0;
+        sampler->position = 0;
+      }
     } else {
-      val = 0.0;
-    }
-    if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
-      sampler->played = 1;
-      sampler->playing = 0;
       sampler->position = 0;
+      sampler->played = 0;
     }
-  } else {
-    sampler->position = 0;
-    sampler->played = 0;
+    frame_vals[i] += val * sampler->vol;
   }
 
-  return val * sampler->vol;
+  //return val * sampler->vol;
   
 }
 

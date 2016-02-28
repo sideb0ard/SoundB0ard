@@ -33,7 +33,8 @@ typedef struct t_oscil
 
 OSCIL* new_oscil(double freq, GTABLE *gt);
 
-double oscil_gennext(void *self);
+//double oscil_gennext(void *self);
+void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void oscil_setvol(void *self, double v);
 double oscil_getvol(void *self);
 void freqfunc(OSCIL* p_osc, double freq);

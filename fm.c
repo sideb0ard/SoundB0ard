@@ -46,14 +46,26 @@ double fm_getvol(void *self)
   return fm->vol;
 }
 
-double fm_gennext(void *self)
+void fm_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
   FM *fm = (FM *) self;
-  double val = fm->car_osc->sound_generator.gennext(fm->car_osc);
-  double mod_val = 100 * fm->mod_osc->sound_generator.gennext(fm->mod_osc);
-  fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));
 
-  return fm->vol * val;
+  double* local_osc_car_vals = calloc(framesPerBuffer, sizeof(double));
+  fm->car_osc->sound_generator.gennext(fm->car_osc, local_osc_car_vals, framesPerBuffer);
+
+  double* local_osc_mod_vals = calloc(framesPerBuffer, sizeof(double));
+  fm->mod_osc->sound_generator.gennext(fm->mod_osc, local_osc_car_vals, framesPerBuffer);
+
+  for (int i = 0; i < framesPerBuffer; i++) {
+    double val = local_osc_car_vals[i];
+    double mod_val = 100 * local_osc_mod_vals[i];
+    fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));
+
+    //return fm->vol * val;
+    frame_vals[i] += fm->vol * val;
+  }
+  free(local_osc_car_vals);
+  free(local_osc_mod_vals);
 }
 
 void fm_status(void *self, char *status_string)

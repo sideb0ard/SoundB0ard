@@ -153,18 +153,25 @@ int add_sample(mixer *mixr, char *filename, char *pattern)
   return add_sound_generator(mixr, m);
 }
 
-double gen_next(mixer *mixr)
+void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 {
-  double output_val = 0.0;
+  double* frame_vals = calloc(framesPerBuffer, sizeof(double));
   if (mixr->soundgen_num > 0) {
     for (int i = 0; i < mixr->soundgen_num; i++) {
-      output_val += mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
+      mixr->sound_generators[i]->gennext(mixr->sound_generators[i], frame_vals, framesPerBuffer);
     }
   }
-  // global envelope -- for the moment
-  double mix_amp = envelope_stream_tick(ampstream);
-  output_val *= mix_amp;
-  return mixr->volume * (output_val / 1.53);
+  for (int i = 0; i < framesPerBuffer; i++) {
+  
+    // global envelope -- for the moment
+    double mix_amp = envelope_stream_tick(ampstream);
+    //output_val *= mix_amp;
+    //return mixr->volume * (output_val / 1.53);
+    double output_val = ((frame_vals[i] * mix_amp) / 1.53); 
+    *out++ = mixr->volume * output_val;
+    *out++ = mixr->volume * output_val;
+  }
+  free(frame_vals);
 }
 
 static int paCallback( const void *inputBuffer, void *outputBuffer,
@@ -175,17 +182,12 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
 {
   paData *data = (paData*)userData;
   float *out = (float*)outputBuffer;
-  unsigned int i;
   (void) inputBuffer;
   (void) timeInfo;
   (void) statusFlags;
-  for (i = 0; i < framesPerBuffer; i++)
-  {
 
-    float val = gen_next(data->mixr);
-    *out++ = val;
-    *out++ = val;
-  }
+  gen_next(data->mixr, framesPerBuffer, out);
+
   return 0;
 }
 

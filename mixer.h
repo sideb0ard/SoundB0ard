@@ -35,6 +35,7 @@ void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
 void freq_change(mixer *mixr, int sig, float freq);
 
-double gen_next(mixer *mixr);
+// double gen_next(mixer *mixr);
+void gen_next(mixer* mixr, int framesPerBuffer, float* out);
 
 #endif // MIXER_H
