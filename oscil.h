@@ -12,6 +12,7 @@ typedef struct t_oscil OSCIL;
 typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*incry) (OSCIL* osc, double freq);
+typedef double (*genny) (void* self);
 
 typedef struct t_oscil
 {
@@ -28,12 +29,13 @@ typedef struct t_oscil
 
   freqy freqadj;
   incry incradj;
+  genny gennext;
 
 } OSCIL;
 
 OSCIL* new_oscil(double freq, GTABLE *gt);
 
-//double oscil_gennext(void *self);
+double oscil_gennext_single(void *self);
 void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void oscil_setvol(void *self, double v);
 double oscil_getvol(void *self);
