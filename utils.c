@@ -1,3 +1,4 @@
+#include <ctype.h>
 #include <dirent.h>
 #include <math.h>
 #include <pthread.h>
@@ -223,5 +224,30 @@ float freqval(char *n)
     return freqval;
   } else {
     return -1.0;
+  }
+}
+
+void strim(const char *input, char *result)
+{
+  int flag = 0;
+
+  while(*input) {
+    if (!isspace((unsigned char) *input) && flag == 0) {
+      *result++ = *input;
+      flag = 1;
+    }
+    input++;
+    if (flag == 1) {
+      *result++ = *input;
+    }
+  }
+
+  while (1) {
+    result--;
+    if (!isspace((unsigned char) *input) && flag == 0) {
+      break;
+    }
+    flag = 0;
+    *result = '\0';
   }
 }

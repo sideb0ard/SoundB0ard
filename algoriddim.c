@@ -70,45 +70,32 @@ void *loop_run(void *m)
   }
 }
 
-//void *algo_run(void *a)
-//{
-//  (void) a;
-//
-//  int fm_one_lock = 0;
-//  int notes[] = {135, 576, 23, 47, 74, 22, 21, 13, 7, 4, 432, 288, 173, 648, 260, 162, 720, 270, 691};
-//
-//  int prev_notes[2];
-//  prev_notes[0] = notes[rand() % 19];
-//  prev_notes[1] = notes[rand() % 19];
-//  int fm_one = add_fm(mixr, notes[rand() % 19], notes[rand() % 19]);
-//
-//  //char *sigtype[2] = {"car", "mod"};
-//
-//  while (1)
-//  {
-//    if (b->cur_tick % (16) == 0)  {
-//      if (!fm_one_lock) {
-//        fm_one_lock = 1;
-//        if (rand()%2) {
-//          int tmp = prev_notes[0];
-//          prev_notes[0] = prev_notes[1];
-//          prev_notes[1] = tmp + prev_notes[0];
-//          mfm(mixr->fmsignals[fm_one], "car", prev_notes[1]);
-//          if (prev_notes[1] > 800) {
-//            prev_notes[0] = notes[rand() % 19];
-//            prev_notes[1] = notes[rand() % 19];
-//          }
-//        }
-//      }
-//    } else {
-//      fm_one_lock = 0;
-//    }
-//      
-//    //  ///  && fm_one_lock == 0) {
-//    //  fm_one_lock = 1;
-//    //} else if (fm_one_lock == 1) {
-//    //  mfm(mixr->fmsignals[fm_one], "mod", rand() % 100 + 300);
-//    //  fm_one_lock = 0;
-//    //}
-//  }
-//}
+void *algo_run(void *a)
+{
+  (void) a;
+
+  int fm_one_lock = 0;
+  int notes[] = {311, 207, 466, 392, 261, 588, 466, 310, 699};
+
+  int note = notes[rand() % 9];
+  int fm_one = add_fm(mixr, note / 4, note *2);
+  faderrr(fm_one, UP);
+
+  //char *sigtype[2] = {"car", "mod"};
+
+  while (1)
+  {
+    if (b->cur_tick % (16) == 0)  {
+      if (!fm_one_lock) {
+        fm_one_lock = 1;
+        if (rand()%2) {
+          int new_note = notes[(rand() % 9)] / 4;
+          mfm(mixr->sound_generators[fm_one], "mod", new_note);
+          mfm(mixr->sound_generators[fm_one], "car", new_note * 2);
+        }
+      }
+    } else {
+      fm_one_lock = 0;
+    }
+  }
+}

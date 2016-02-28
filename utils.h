@@ -18,3 +18,4 @@ freaky* new_freqs_from_string(char* string);
 float freqval(char* n);
 int notelookup(char *n);
 void list_sample_dir(void);
+void strim(const char *input, char *result);
