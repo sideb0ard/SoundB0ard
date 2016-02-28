@@ -50,7 +50,7 @@ int main()
   }
   pthread_detach(bpmrun_th);
 
-  // interactive loop
+  // interactive loop - defined in cmdloop.c
   loopy();
 
   // all done, time to go home
