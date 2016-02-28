@@ -26,7 +26,6 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
   //p_osc->voladj = &volfunc;
   p_osc->freqadj = &freqfunc;
   p_osc->incradj = &incrfunc;
-  p_osc->gennext = &oscil_gennext_single;
 
   return p_osc;
 }
@@ -55,32 +54,6 @@ void freqfunc(OSCIL* p_osc, double f)
 {
   p_osc->freq = f;
   p_osc->incr = TABRAD * f;
-}
-
-double oscil_gennext_single(void *self)
-{
- OSCIL *p_osc = (OSCIL *) self;
- int base_index = (int) (p_osc->curphase);
- unsigned long next_index = base_index + 1;
- double frac, slope, val;
- double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
- double* table = p_osc->gtable->table;
- double vol = p_osc->vol;
- 
- frac = curphase - base_index;
- val = table[base_index];
- slope = table[next_index] - val;
-
- val += (frac * slope);
- curphase += p_osc->incr;
-
- while ( curphase >= dtablen)
-   curphase -= dtablen;
- while ( curphase < 0.0)
-   curphase += dtablen;
-
- p_osc->curphase = curphase;
- return val * vol;
 }
 
 void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer) // interpolating
