@@ -15,12 +15,6 @@
 #include "sampler.h"
 #include "sound_generator.h"
 
-typedef struct {
-  mixer *mixr;
-  float left_phase;
-  float right_phase;
-} paData;
-
 extern ENVSTREAM* ampstream;
 
 mixer *new_mixer()
@@ -102,12 +96,14 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt)
 
   SBMSG *m = new_sbmsg();
   if (m == NULL) {
+    free(new_osc);
     printf("MBARF!\n");
     return -1;
   }
 
   m->sound_generator = (SOUNDGEN *) new_osc;
   m->freq = 1492;
+  printf("Added sound gen!\n");
   return add_sound_generator(mixr, m);
 }
 
@@ -120,6 +116,7 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
   }
   SBMSG *m = new_sbmsg();
   if (m == NULL) {
+    free(nfm);
     printf("MBARF!\n");
     return -1;
   }
@@ -144,7 +141,7 @@ int add_sample(mixer *mixr, char *filename, char *pattern)
   }
   SBMSG *m = new_sbmsg();
   if (m == NULL) {
-    // TODO: free ^ nsample - do the same for FM and OSC
+    free(nsample);
     printf("MBARF!\n");
     return -1;
   }
@@ -165,62 +162,10 @@ void gen_next(mixer* mixr, int framesPerBuffer, float* out)
   
     // global envelope -- for the moment
     double mix_amp = envelope_stream_tick(ampstream);
-    //output_val *= mix_amp;
-    //return mixr->volume * (output_val / 1.53);
+
     double output_val = ((frame_vals[i] * mix_amp) / 1.53); 
     *out++ = mixr->volume * output_val;
     *out++ = mixr->volume * output_val;
   }
   free(frame_vals);
-}
-
-static int paCallback( const void *inputBuffer, void *outputBuffer,
-                           unsigned long framesPerBuffer,
-                           const PaStreamCallbackTimeInfo* timeInfo,
-                           PaStreamCallbackFlags statusFlags,
-                           void *userData )
-{
-  paData *data = (paData*)userData;
-  float *out = (float*)outputBuffer;
-  (void) inputBuffer;
-  (void) timeInfo;
-  (void) statusFlags;
-
-  gen_next(data->mixr, framesPerBuffer, out);
-
-  return 0;
-}
-
-void *mixer_run(void *mixr_p)
-{
-  PaStream *stream;
-  PaError err;
-  paData data;
-  data.mixr = (mixer*) mixr_p;
-
-  err = Pa_OpenDefaultStream( &stream, 
-                              0, // no input channels
-                              2, // stereo output
-                              paFloat32, // 32bit fp output
-                              SAMPLE_RATE,
-                              paFramesPerBufferUnspecified,
-                              paCallback,
-                              &data );
-
-  if ( err != paNoError) {
-    printf("Errrrr! couldn't open Portaudio default stream: %s\n", Pa_GetErrorText(err));
-    exit(-1);
-  }
-
-  err = Pa_StartStream( stream );
-  if ( err != paNoError) {
-    printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
-    exit(-1);
-  }
-
-  // TODO: do i need this in a thread?
-  // keep thread active
-  while(1) {}
-
-  return NULL;
 }

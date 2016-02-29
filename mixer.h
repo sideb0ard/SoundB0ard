@@ -23,6 +23,12 @@ typedef struct t_mixer
 
 } mixer;
 
+typedef struct {
+  mixer *mixr;
+  float left_phase;
+  float right_phase;
+} paData;
+
 mixer *new_mixer(void);
 
 void *mixer_run(void *); // TODO: need this?

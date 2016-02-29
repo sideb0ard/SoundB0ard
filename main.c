@@ -1,5 +1,6 @@
 #include <pthread.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "audioutils.h"
 #include "envelope.h"
@@ -18,10 +19,25 @@ GTABLE *saw_down_table;
 
 ENVSTREAM* ampstream = NULL;
 
+static int paCallback( const void *inputBuffer, void *outputBuffer,
+                           unsigned long framesPerBuffer,
+                           const PaStreamCallbackTimeInfo* timeInfo,
+                           PaStreamCallbackFlags statusFlags,
+                           void *userData )
+{
+  paData *data = (paData*)userData;
+  float *out = (float*)outputBuffer;
+  (void) inputBuffer;
+  (void) timeInfo;
+  (void) statusFlags;
+
+  gen_next(data->mixr, framesPerBuffer, out);
+
+  return 0;
+}
+
 int main()
 {
-  // PortAudio start me up!
-  pa_setup();
 
   // lookup table for wavs
   sine_table = new_sine_table();
@@ -32,15 +48,6 @@ int main()
 
   ampstream = new_envelope_stream();
 
-  // run da mixer
-  mixr = new_mixer();
-  pthread_t mixrrun_th;
-  if ( pthread_create (&mixrrun_th, NULL, mixer_run, (void*) mixr)) {
-    fprintf(stderr, "Error running mixer_run thread\n");
-    return 1;
-  }
-  pthread_detach(mixrrun_th);
-
   // run da BPM counterrr...
   b = new_bpmrrr();
   pthread_t bpmrun_th;
@@ -50,7 +57,36 @@ int main()
   }
   pthread_detach(bpmrun_th);
 
-  // interactive loop - defined in cmdloop.c
+  // PortAudio start me up!
+  pa_setup();
+
+  PaStream *stream;
+  PaError err;
+  paData data;
+  mixr = new_mixer();
+  data.mixr = mixr;
+
+  err = Pa_OpenDefaultStream( &stream, 
+                              0, // no input channels
+                              2, // stereo output
+                              paFloat32, // 32bit fp output
+                              SAMPLE_RATE,
+                              paFramesPerBufferUnspecified,
+                              paCallback,
+                              &data );
+
+  if ( err != paNoError) {
+    printf("Errrrr! couldn't open Portaudio default stream: %s\n", Pa_GetErrorText(err));
+    exit(-1);
+  }
+
+  err = Pa_StartStream( stream );
+  if ( err != paNoError) {
+    printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
+    exit(-1);
+  }
+
+
   loopy();
 
   // all done, time to go home
