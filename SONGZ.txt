@@ -36,3 +36,14 @@ loop 392 261 588 7
 loop 392 261 588 1
 loop 311 207 466 3, loop 466 310 699 4
 loop 466 310 699 2
+
+play wuk1.wav 0 4 12
+loop 261 622 391 3, loop 311 415 261 4
+play clap.aif 10 13
+play hihat1.aif 0 2 4 6 8 10
+loop 415 276 174 1
+// loop 311 415 261 4
+play wuhh184.wav 3 9
+loop 414 933 1
+stop ^
+duck 0, duck 2

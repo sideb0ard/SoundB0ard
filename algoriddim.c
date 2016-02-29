@@ -82,17 +82,22 @@ void *algo_run(void *a)
   faderrr(fm_one, UP);
 
   //char *sigtype[2] = {"car", "mod"};
+  //
+
+  int note_index = 0;
 
   while (1)
   {
     if (b->cur_tick % (16) == 0)  {
       if (!fm_one_lock) {
         fm_one_lock = 1;
-        if (rand()%2) {
-          int new_note = notes[(rand() % 9)] / 4;
+        //if (rand()%2) {
+          int new_note = notes[note_index++];
           mfm(mixr->sound_generators[fm_one], "mod", new_note);
           mfm(mixr->sound_generators[fm_one], "car", new_note * 2);
-        }
+          if (new_note >= 9)
+            new_note = 0;
+        //}
       }
     } else {
       fm_one_lock = 0;

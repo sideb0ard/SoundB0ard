@@ -55,9 +55,7 @@ SAMPLER* new_sampler(char *filename, char *pattern)
     return (void*) NULL;
   }
 
-  printf("ABOUT TO CALL SF_READF_INT\n");
   sf_readf_int(snd_file, buffer, bufsize);
-  printf("COPIED SND_FILE DATA INTO BUFFER\n");
 
   int fslen = strlen(filename);
   sampler->filename = calloc(1, fslen + 1);
@@ -74,7 +72,6 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   sampler->sound_generator.getvol = &sample_getvol;
   sampler->sound_generator.setvol = &sample_setvol;
 
-  printf("LEAVING NEW SAMPLER\n");
   return sampler;
 }
 
@@ -103,11 +100,10 @@ void sample_gennext(void* self, double* frame_vals, int framesPerBuffer)
       sampler->position = 0;
       sampler->played = 0;
     }
+    if (val > 1 || val < -1)
+      printf("BURNIE - SAMPLER OVERLOAD!\n");
     frame_vals[i] += val * sampler->vol;
   }
-
-  //return val * sampler->vol;
-  
 }
 
 void sample_status(void *self, char *status_string)

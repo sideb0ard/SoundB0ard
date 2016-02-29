@@ -162,8 +162,8 @@ void gen_next(mixer* mixr, int framesPerBuffer, float* out)
   
     // global envelope -- for the moment
     double mix_amp = envelope_stream_tick(ampstream);
-
     double output_val = ((frame_vals[i] * mix_amp) / 1.53); 
+
     *out++ = mixr->volume * output_val;
     *out++ = mixr->volume * output_val;
   }
