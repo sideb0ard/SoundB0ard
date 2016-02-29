@@ -31,7 +31,6 @@ typedef struct {
 
 mixer *new_mixer(void);
 
-void *mixer_run(void *); // TODO: need this?
 void mixer_ps(mixer *mixr);
 int add_osc(mixer *mixr, int freq, GTABLE *gt);
 int add_fm(mixer *mixr, int ffreq, int cfreq);
