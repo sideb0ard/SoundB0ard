@@ -75,35 +75,33 @@ SAMPLER* new_sampler(char *filename, char *pattern)
   return sampler;
 }
 
-//double sample_gennext(void *self)
-void sample_gennext(void* self, double* frame_vals, int framesPerBuffer)
+double sample_gennext(void *self)
+//void sample_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
   SAMPLER *sampler = self;
   static double val;
 
-  for (int i = 0; i < framesPerBuffer; i++) {
-    if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
-      if (!sampler->played) {
-        sampler->playing = 1;
-      }
-      if (sampler->playing) {
-        val =  sampler->buffer[sampler->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
-      } else {
-        val = 0.0;
-      }
-      if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
-        sampler->played = 1;
-        sampler->playing = 0;
-        sampler->position = 0;
-      }
-    } else {
-      sampler->position = 0;
-      sampler->played = 0;
+  if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
+    if (!sampler->played) {
+      sampler->playing = 1;
     }
-    if (val > 1 || val < -1)
-      printf("BURNIE - SAMPLER OVERLOAD!\n");
-    frame_vals[i] += val * sampler->vol;
+    if (sampler->playing) {
+      val =  sampler->buffer[sampler->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+    } else {
+      val = 0.0;
+    }
+    if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
+      sampler->played = 1;
+      sampler->playing = 0;
+      sampler->position = 0;
+    }
+  } else {
+    sampler->position = 0;
+    sampler->played = 0;
   }
+  if (val > 1 || val < -1)
+    printf("BURNIE - SAMPLER OVERLOAD!\n");
+  return val * sampler->vol;
 }
 
 void sample_status(void *self, char *status_string)

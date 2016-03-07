@@ -75,10 +75,13 @@ void *algo_run(void *a)
   (void) a;
 
   int fm_one_lock = 0;
-  int notes[] = {311, 207, 466, 392, 261, 588, 466, 310, 699};
+  // k_nuth
+  //int notes[] = {311, 207, 466, 392, 261, 588, 466, 310, 699};
+  int notes[] = {277, 184, 415};
+  int notes_len = 3;
 
-  int note = notes[rand() % 9];
-  int fm_one = add_fm(mixr, note / 4, note *2);
+  int note = notes[rand() % notes_len];
+  int fm_one = add_fm(mixr, 60, note);
   faderrr(fm_one, UP);
 
   //char *sigtype[2] = {"car", "mod"};
@@ -93,10 +96,9 @@ void *algo_run(void *a)
         fm_one_lock = 1;
         //if (rand()%2) {
           int new_note = notes[note_index++];
-          mfm(mixr->sound_generators[fm_one], "mod", new_note);
-          mfm(mixr->sound_generators[fm_one], "car", new_note * 2);
-          if (new_note >= 9)
-            new_note = 0;
+          mfm(mixr->sound_generators[fm_one], "car", new_note);
+          if (new_note >= notes_len)
+            note_index = 0;
         //}
       }
     } else {

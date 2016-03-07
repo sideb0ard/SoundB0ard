@@ -8,7 +8,8 @@
 
 typedef struct t_soundgen {
   // TODO : ENUM for type - i.e. OSC, FM or SAMPLE
-  void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);
+  //void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);
+  double (*gennext)(void *self);
   void (*status)(void *self, char *string);
   void (*setvol)(void *self, double val);
   double (*getvol)(void *self);

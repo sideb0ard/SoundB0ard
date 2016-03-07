@@ -150,22 +150,17 @@ int add_sample(mixer *mixr, char *filename, char *pattern)
   return add_sound_generator(mixr, m);
 }
 
-void gen_next(mixer* mixr, int framesPerBuffer, float* out)
+//void gen_next(mixer* mixr, int framesPerBuffer, float* out)
+double gen_next(mixer* mixr)
 {
-  double* frame_vals = calloc(framesPerBuffer, sizeof(double));
+  double output_val = 0.0;
   if (mixr->soundgen_num > 0) {
     for (int i = 0; i < mixr->soundgen_num; i++) {
-      mixr->sound_generators[i]->gennext(mixr->sound_generators[i], frame_vals, framesPerBuffer);
+      output_val += mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
     }
   }
-  for (int i = 0; i < framesPerBuffer; i++) {
-  
-    // global envelope -- for the moment
-    double mix_amp = envelope_stream_tick(ampstream);
-    double output_val = ((frame_vals[i] * mix_amp) / 1.53); 
-
-    *out++ = mixr->volume * output_val;
-    *out++ = mixr->volume * output_val;
-  }
-  free(frame_vals);
+  // global envelope -- for the moment
+  double mix_amp = envelope_stream_tick(ampstream);
+  output_val *= mix_amp;
+  return mixr->volume * (output_val / 1.53);
 }

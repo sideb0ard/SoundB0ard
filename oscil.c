@@ -56,34 +56,32 @@ void freqfunc(OSCIL* p_osc, double f)
   p_osc->incr = TABRAD * f;
 }
 
-void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer) // interpolating
+//void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer) // interpolating
+double oscil_gennext(void* self)
 {
  OSCIL *p_osc = (OSCIL *) self;
 
-  for (int i = 0; i < framesPerBuffer; i++) {
-    int base_index = (int) (p_osc->curphase);
-    unsigned long next_index = base_index + 1;
-    double frac, slope, val;
-    double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
-    double* table = p_osc->gtable->table;
-    double vol = p_osc->vol;
+  int base_index = (int) (p_osc->curphase);
+  unsigned long next_index = base_index + 1;
+  double frac, slope, val;
+  double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
+  double* table = p_osc->gtable->table;
+  double vol = p_osc->vol;
  
-    frac = curphase - base_index;
-    val = table[base_index];
-    slope = table[next_index] - val;
+  frac = curphase - base_index;
+  val = table[base_index];
+  slope = table[next_index] - val;
 
-    val += (frac * slope);
-    curphase += p_osc->incr;
+  val += (frac * slope);
+  curphase += p_osc->incr;
 
-    while ( curphase >= dtablen)
-      curphase -= dtablen;
-    while ( curphase < 0.0)
-      curphase += dtablen;
+  while ( curphase >= dtablen)
+    curphase -= dtablen;
+  while ( curphase < 0.0)
+    curphase += dtablen;
 
-    p_osc->curphase = curphase;
-    //return val * vol;
-    frame_vals[i] += val * vol;
-  }
+  p_osc->curphase = curphase;
+  return val * vol;
 }
 
 void oscil_status(void *self, char *status_string)

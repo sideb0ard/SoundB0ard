@@ -31,7 +31,11 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
   (void) timeInfo;
   (void) statusFlags;
 
-  gen_next(data->mixr, framesPerBuffer, out);
+  for (unsigned long i = 0; i < framesPerBuffer; i++) {
+    float val = gen_next(data->mixr);
+    *out++ = val;
+    *out++ = val;
+  }
 
   return 0;
 }

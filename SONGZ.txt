@@ -1,4 +1,4 @@
-fm 132 43
+
 fm 177 47
 sine 230
 sine 227
@@ -33,6 +33,7 @@ loop 329 219 493 4
 loop 392 261 588 7
 
 #// k_nuth
+# OCEAN1.WAV
 loop 392 261 588 1
 loop 311 207 466 3, loop 466 310 699 4
 loop 466 310 699 2
@@ -47,3 +48,19 @@ play wuhh184.wav 3 9
 loop 414 933 1
 stop ^
 duck 0, duck 2
+
+#BASSS/// c# f g#
+bpm 120
+loop 277 349 415 3, loop 277 349 415 4, play kick2.wav 0 3 6 8 14
+loop 184 232 276 4
+play snare.wav 4 12
+play hihat1.aif 2 4 6 8 9
+
+# WAVVVES.WAV
+loop 415 523 622 1
+play kick2.wav 0 3 6 8 14
+play snare.wav 4 12
+play hihat1.aif 2 4 6 8 9
+play wuhh184.wav 11 13 15
+duck 0, duck 1, duck 2, duck 3, duck 4, duck 5
+play clap.aif 11 15

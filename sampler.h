@@ -22,7 +22,8 @@ typedef struct t_sampler
 
 SAMPLER* new_sampler(char *filename, char *pattern);
 
-void sample_gennext(void* self, double* frame_vals, int framesPerBuffer);
+//void sample_gennext(void* self, double* frame_vals, int framesPerBuffer);
+double sample_gennext(void* self);
 void sample_status(void *self, char *ss);
 void sample_setvol(void *self, double v);
 double sample_getvol(void *self);
