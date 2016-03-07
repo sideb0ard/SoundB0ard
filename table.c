@@ -5,9 +5,6 @@
 #include "defjams.h"
 #include "table.h"
 
-static GTABLE* _new_gtable(void);
-// static void norm_gtable(GTABLE* gtable);
-
 static GTABLE* _new_gtable(void)
 {
   GTABLE* gtable = NULL;
@@ -22,6 +19,26 @@ static GTABLE* _new_gtable(void)
   gtable->length = TABLEN;
   return gtable;
 }
+
+static void norm_gtable(GTABLE* gtable)
+{
+  unsigned long i;
+  double val, maxamp = 0.0;
+
+  for (i=0; i < gtable->length; i++) {
+    val = fabs(gtable->table[i]);
+    if (maxamp < val)
+      maxamp = val;
+  }
+
+  maxamp = 1.0 / maxamp;
+
+  for (i = 0; i < gtable->length; i++)
+    gtable->table[i] *= maxamp;
+
+  gtable->table[i] = gtable->table[0];
+}
+
 
 // TABLE GENERATION SIGNALS
 //
@@ -44,59 +61,71 @@ GTABLE* new_sine_table()
 
 GTABLE* new_tri_table()
 {
-  unsigned long i;
-  double step;
+  unsigned long i, j;
+  double step, amp;
+  int harmonic = 1;
   
   GTABLE* gtable = _new_gtable();
   if (gtable == NULL)
     return NULL;
 
   step = TWO_PI / TABLEN;
-  for (i = 0; i < TABLEN; i++)
-    gtable->table[i] = (2.0 * ((step * i) * (1.0 / TWO_PI) )) - 1.0;
-  gtable->table[i] = gtable->table[0]; // guard point
-
+  for (i = 0; i < NHARMS; i++) {
+    amp = 1.0 / (harmonic * harmonic);
+    for ( j = 0; j < TABLEN; j++) {
+      gtable->table[j] += amp * cos(step*harmonic * j);
+    }
+    harmonic += 2;
+  }
+  norm_gtable(gtable);
   return gtable;
 }
 
 GTABLE* new_square_table()
 {
-  unsigned long i;
+  unsigned long i, j;
+  double step, amp;
+  int harmonic = 1;
   
   GTABLE* gtable = _new_gtable();
   if (gtable == NULL)
     return NULL;
 
-  for (i = 0; i < TABLEN; i++)
-    if (i < M_PI)
-      gtable->table[i] = 1.0;
-    else
-      gtable->table[i] = -1;
+  step = TWO_PI / TABLEN;
 
-  gtable->table[i] = gtable->table[0]; // guard point
+  for ( i = 0 ; i < NHARMS; i++) {
+    amp = 1.0 / harmonic;
+    for ( j = 0; j < TABLEN; j++) {
+      gtable->table[j] += amp * sin(step*harmonic * j);
+    }
+    harmonic +=2 ;
+  }
+  norm_gtable(gtable);
 
   return gtable;
 }
 
 GTABLE* new_saw_table(int up)
 {
-  unsigned long i;
-  float step;
+  unsigned long i, j;
+  double step, val, amp = 1.0;
+  int harmonic = 1;
   
   GTABLE* gtable = _new_gtable();
   if (gtable == NULL)
     return NULL;
 
   step = TWO_PI / TABLEN;
-  if (up) {
-    for (i = 0; i < TABLEN; i++)
-      gtable->table[i] = (2.0 * ((step * i) * (1.0 / TWO_PI) )) - 1.0;
-  } else {
-    for (i = 0; i < TABLEN; i++)
-      gtable->table[i] = 1.0 - 2.0 * ((step * i) * (1.0 / TWO_PI) );
-  }
-  gtable->table[i] = gtable->table[0]; // guard point
+  if (up)
+    amp = -1;
 
+  for (i = 0; i < NHARMS; i++) {
+    val = amp / harmonic;
+    for ( j = 0; j < gtable->length; j++)
+      gtable->table[j] += val * sin(step*harmonic * j);
+    harmonic++;
+  }
+  norm_gtable(gtable);
   return gtable;
 }
 // END TABLE GENERATION SIGNALS
@@ -116,18 +145,3 @@ void gtable_free(GTABLE** gtable)
     *gtable = NULL;
   }
 }
-
-// static void norm_gtable(GTABLE* gtable) 
-// {
-//   unsigned long i;
-//   double val, maxamp = 0.0;
-//   for (i = 0; i < gtable->length; i++) {
-//     val = fabs(gtable->table[i]);
-//     if ( maxamp < val)
-//       maxamp = val;
-//   }
-//   maxamp = 1.0 / maxamp;
-//   for (i=0; i < gtable->length; i++)
-//     gtable->table[i] *= maxamp;
-//   gtable->table[i] = gtable->table[0];
-// }

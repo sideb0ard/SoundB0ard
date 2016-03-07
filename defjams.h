@@ -20,6 +20,8 @@
 #define TABLEN (1024.00)
 #define TABRAD (TABLEN / SAMPLE_RATE)
 
+#define NHARMS 7 // number of harmonics
+
 #define ANSI_COLOR_RED     "\x1b[31m"
 #define ANSI_COLOR_GREEN   "\x1b[32m"
 #define COOL_COLOR_GREEN   "\x1b[38;5;47m"
