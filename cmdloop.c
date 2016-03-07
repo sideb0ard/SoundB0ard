@@ -168,20 +168,22 @@ void interpret(char *line)
         //add_fm(mixr, sig, val);
       }
     }
+    // loop sine waves
     regmatch_t lmatch[3];
     regex_t loop_rx;
-    regcomp(&loop_rx, "loop ([[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
+    regcomp(&loop_rx, "^loop ([[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
     if (regexec(&loop_rx, trim_tok, 3, lmatch, 0) == 0) {
 
-      // TODO: sure there shouldn't be a null terminator here?
       int loop_match_len = lmatch[2].rm_eo - lmatch[2].rm_so;
-      char loop_len_char[loop_match_len];
+      char loop_len_char[loop_match_len + 1];
       strncpy(loop_len_char, trim_tok+lmatch[2].rm_so, loop_match_len);
+      loop_len_char[loop_match_len] = '\0';
       int loop_len = atoi(loop_len_char);
 
       int frq_len = lmatch[1].rm_eo - lmatch[1].rm_so;
-      char freaks[frq_len];
+      char freaks[frq_len + 1];
       strncpy(freaks, trim_tok+lmatch[1].rm_so, frq_len);
+      freaks[frq_len] = '\0';
       printf("Freaks! %s\n", freaks);
 
       freaky* freqs = new_freqs_from_string(freaks);
@@ -201,6 +203,56 @@ void interpret(char *line)
       pthread_detach(melody_th);
     }
 
+    // loop FMs
+    regmatch_t flmatch[4];
+    regex_t floop_rx;
+    regcomp(&floop_rx, "^floop ([[:digit:]]+) ([[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&floop_rx, trim_tok, 4, flmatch, 0) == 0) {
+
+      printf("FLOOP CALLED\n");
+
+      int mod_freq_len = flmatch[1].rm_eo - flmatch[1].rm_so;
+      char mod_freq_char[mod_freq_len + 1];
+      strncpy(mod_freq_char, trim_tok+flmatch[1].rm_so, mod_freq_len);
+      mod_freq_char[mod_freq_len] = '\0';
+      int mod_freq = atoi(mod_freq_char);
+      printf("FLOOP PASSED #1 - modulator freq us %d\n", mod_freq);
+
+      int floop_match_len = flmatch[3].rm_eo - flmatch[3].rm_so;
+      printf("START: %lld, END: %lld\n", flmatch[3].rm_eo, flmatch[3].rm_so);
+      printf("FLOOP MATCH LEN is %d\n", floop_match_len);
+      char floop_len_char[floop_match_len + 1];
+      strncpy(floop_len_char, trim_tok+flmatch[3].rm_so, floop_match_len);
+      floop_len_char[floop_match_len] = '\0';
+      int floop_len = atoi(floop_len_char);
+      printf("FLOOP LEN %d\n", floop_len);
+
+      int frq_len = flmatch[2].rm_eo - flmatch[2].rm_so;
+      char freaks[frq_len + 1];
+      strncpy(freaks, trim_tok+flmatch[2].rm_so, frq_len);
+      freaks[frq_len] = '\0';
+      printf("FMreaks! %s\n", freaks);
+      printf("FLOOP PASSED #3\n");
+
+      freaky* freqs = new_freqs_from_string(freaks);
+
+      printf("FMLOOP LEN IS %d\n", floop_len);
+      printf("NUM OF FMMMM FREAKS IN HERE IS %d\n", freqs->num_freaks);
+      for (int i = 0; i < freqs->num_freaks; i++) {
+        printf("FMFREQ[%d] = %d\n", i, freqs->freaks[i]);
+      }
+
+      melody_msg *mm = new_melody_msg(freqs->freaks, freqs->num_freaks, floop_len);
+      mm->mod_freq = mod_freq;
+      pthread_t melody_th;
+      if ( pthread_create (&melody_th, NULL, floop_run, mm)) {
+        fprintf(stderr, "Errr running melody\n");
+        return;
+      }
+      pthread_detach(melody_th);
+    }
+
+    // file sample play
     regmatch_t fmatch[4];
     regex_t file_rx;
     regcomp(&file_rx, "^(file|play) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE);

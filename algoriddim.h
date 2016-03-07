@@ -14,6 +14,7 @@ typedef struct melody_msg {
   int melody_loop_len;
   int melody_play_lock;
   int melody_cur_note;
+  int mod_freq; // modulator for an FM message
 } melody_msg;
 
 
@@ -23,5 +24,7 @@ algo *new_algo(void);
 
 void *algo_run(void *);
 void *loop_run(void *);
+void *floop_run(void *);
 void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int note_len);
+void fplay_melody(const int sg_num, int *mlock, int *note, int *notes, const int note_len);
 void mk_sbmsg_sine(int freq);

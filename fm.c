@@ -7,6 +7,9 @@
 
 extern GTABLE *sine_table;
 extern GTABLE *square_table;
+extern GTABLE *tri_table;
+extern GTABLE *saw_up_table;
+extern GTABLE *saw_down_table;
 
 FM* new_fm(double modf, double carf)
 {
@@ -14,8 +17,11 @@ FM* new_fm(double modf, double carf)
   fm = (FM *) calloc(1, sizeof(FM));
   if (fm == NULL)
     return NULL;
+  //fm->mod_osc = new_oscil(modf, square_table);
+  //fm->mod_osc = new_oscil(modf, tri_table);
+  fm->mod_osc = new_oscil(modf, saw_up_table);
+  //fm->mod_osc = new_oscil(modf, saw_down_table);
   //fm->mod_osc = new_oscil(modf, sine_table);
-  fm->mod_osc = new_oscil(modf, sine_table);
   fm->car_osc = new_oscil(carf, sine_table);
 
   fm->vol = 0.0;

@@ -37,6 +37,17 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
   }
 }
 
+void fplay_melody(const int sg_num, int *mlock, int *note, int *notes, const int note_len)
+{
+  if (!*mlock) {
+
+    *mlock = 1;
+    *note = (*note + 1) % note_len;
+    //freq_change(mixr, osc_num, (notes[*note])); 
+    mfm(mixr->sound_generators[sg_num], "car", (notes[*note]));
+  }
+}
+
 melody_msg* new_melody_msg(int* freqs, int melody_note_len, int loop_len)
 {
   melody_msg* m = calloc(1, sizeof(melody_msg));
@@ -64,6 +75,27 @@ void *loop_run(void *m)
   {
     if (b->cur_tick % (4*(mmsg->melody_loop_len)) == 0) {
       play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
+    } else if (mmsg->melody_play_lock) {
+      mmsg->melody_play_lock = 0;
+    }
+  }
+}
+
+void *floop_run(void *m)
+{
+  melody_msg *mmsg = (melody_msg*) m;
+  printf("FLOOP RUN CALLED - got me a msg: %d, %d, %d MOD FREQ: %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len, mmsg->mod_freq);
+
+  int fm_one = add_fm(mixr, mmsg->mod_freq, mmsg->melody[0]);
+  mmsg->osc_num = fm_one;
+  do {} while (b->cur_tick % 16 != 0);
+  faderrr(fm_one, UP);
+  sleep(3);
+
+  while (1)
+  {
+    if (b->cur_tick % (4*(mmsg->melody_loop_len)) == 0) {
+      fplay_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
     } else if (mmsg->melody_play_lock) {
       mmsg->melody_play_lock = 0;
     }
