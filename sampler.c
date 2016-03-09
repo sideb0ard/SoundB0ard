@@ -79,7 +79,7 @@ double sample_gennext(void *self)
 //void sample_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
   SAMPLER *sampler = self;
-  static double val;
+  double val = 0;
 
   if (sampler->pattern[b->cur_tick % SAMPLE_PATTERN_LEN]) {
     if (!sampler->played) {

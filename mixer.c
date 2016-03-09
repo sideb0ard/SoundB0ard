@@ -41,8 +41,8 @@ void mixer_ps(mixer *mixr)
 
 void delay_toggle(mixer *mixr)
 {
-  printf("MIXER VOL DELAY: %d!\n", mixr->delay_on);
   mixr->delay_on = abs(1 - mixr->delay_on);
+  printf("MIXER VOL DELAY: %d!\n", mixr->delay_on);
 }
 
 void mixer_vol_change(mixer *mixr, float vol)
