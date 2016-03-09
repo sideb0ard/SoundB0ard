@@ -35,8 +35,11 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
   float *delay = data->delay;
 
   for (unsigned long i = 0; i < framesPerBuffer; i++) {
-    //float val = gen_next(data->mixr);
-    float val = delay[delay_p];
+    float val = 0;
+    if (data->mixr->delay_on)
+      val = delay[delay_p];
+    else
+      val = gen_next(data->mixr);
     delay[delay_p++] = gen_next(data->mixr) + val*0.5;
     if (delay_p >= SAMPLE_RATE/8) delay_p = 0; 
     *out++ = val;

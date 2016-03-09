@@ -31,12 +31,18 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-  printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) :::::\n" ANSI_COLOR_RESET, mixr->volume);
+  printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) (Delay On: %d) :::::\n" ANSI_COLOR_RESET, mixr->volume, mixr->delay_on);
   for ( int i = 0; i < mixr->soundgen_num; i++) {
     char ss[120];
     mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
     printf("[%d] - %s\n", i, ss); 
   }
+}
+
+void delay_toggle(mixer *mixr)
+{
+  printf("MIXER VOL DELAY: %d!\n", mixr->delay_on);
+  mixr->delay_on = abs(1 - mixr->delay_on);
 }
 
 void mixer_vol_change(mixer *mixr, float vol)

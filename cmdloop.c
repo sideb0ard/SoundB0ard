@@ -79,6 +79,8 @@ void interpret(char *line)
       pthread_detach(songrun_th);
     } else if (strcmp(trim_tok, "ls") == 0) {
       list_sample_dir();
+    } else if (strcmp(trim_tok, "delay") == 0) {
+      delay_toggle(mixr);
     } else if (strcmp(trim_tok, "exit") == 0) {
       exxit();
     }
