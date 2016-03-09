@@ -31,12 +31,18 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
   (void) timeInfo;
   (void) statusFlags;
 
+  int delay_p = data->delay_p;
+  float *delay = data->delay;
+
   for (unsigned long i = 0; i < framesPerBuffer; i++) {
-    float val = gen_next(data->mixr);
+    //float val = gen_next(data->mixr);
+    float val = delay[delay_p];
+    delay[delay_p++] = gen_next(data->mixr) + val*0.5;
+    if (delay_p >= SAMPLE_RATE/8) delay_p = 0; 
     *out++ = val;
     *out++ = val;
   }
-
+  data->delay_p = delay_p;
   return 0;
 }
 
@@ -66,9 +72,9 @@ int main()
 
   PaStream *stream;
   PaError err;
-  paData data;
+  paData *data = calloc(1, sizeof(paData));
   mixr = new_mixer();
-  data.mixr = mixr;
+  data->mixr = mixr;
 
   err = Pa_OpenDefaultStream( &stream, 
                               0, // no input channels
@@ -77,7 +83,7 @@ int main()
                               SAMPLE_RATE,
                               paFramesPerBufferUnspecified,
                               paCallback,
-                              &data );
+                              data );
 
   if ( err != paNoError) {
     printf("Errrrr! couldn't open Portaudio default stream: %s\n", Pa_GetErrorText(err));

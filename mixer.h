@@ -25,6 +25,8 @@ typedef struct t_mixer
 
 typedef struct {
   mixer *mixr;
+  float delay[(int) SAMPLE_RATE / 8];
+  int delay_p;
   float left_phase;
   float right_phase;
 } paData;
