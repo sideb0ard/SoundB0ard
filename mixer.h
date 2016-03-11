@@ -12,6 +12,11 @@
 
 #define INITIAL_SIGNAL_SIZE 4
 
+typedef struct {
+  float buffer[(int) SAMPLE_RATE / 8];
+  int buf_p;
+} effect;
+
 typedef struct t_mixer
 {
 
@@ -19,6 +24,10 @@ typedef struct t_mixer
   int soundgen_num; // actual number of SGs
   int soundgen_size; // number of memory slots reserved for SGszz
   int delay_on;
+
+  effect **effects;
+  int effects_num;
+  int effects_size;
 
   double volume;
 
@@ -39,6 +48,7 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt);
 int add_fm(mixer *mixr, int ffreq, int cfreq);
 int add_sample(mixer *mixr, char *filename, char *pattern);
 int add_sound_generator(mixer *mixr, SBMSG *sbm);
+int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
 void freq_change(mixer *mixr, int sig, float freq);

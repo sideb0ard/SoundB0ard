@@ -3,17 +3,27 @@
 
 #include "defjams.h"
 
-// abstract class
+//typedef enum 
+//{
+//  OSC,
+//  FM,
+//  SAMPLER
+//} sound_generator_type;
 //
 
 typedef struct t_soundgen {
-  // TODO : ENUM for type - i.e. OSC, FM or SAMPLE
   //void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);
   double (*gennext)(void *self);
   void (*status)(void *self, char *string);
   void (*setvol)(void *self, double val);
   double (*getvol)(void *self);
   //sound_generator_type type;
+
+  int effects_size; // size of array
+  int effects_num; // num of effects
+  int *effects;
 } SOUNDGEN;
+
+void link_effect(SOUNDGEN* sg, int effect_no);
 
 #endif // SOUNDGEN_H

@@ -32,6 +32,7 @@ mixer *new_mixer()
 void mixer_ps(mixer *mixr)
 {
   printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) (Delay On: %d) :::::\n" ANSI_COLOR_RESET, mixr->volume, mixr->delay_on);
+  printf(ANSI_COLOR_GREEN "::::: effects: %d :::::\n" ANSI_COLOR_RESET, mixr->effects_num);
   for ( int i = 0; i < mixr->soundgen_num; i++) {
     char ss[120];
     mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
@@ -66,6 +67,32 @@ void freq_change(mixer *mixr, int sg, float freq)
   // TODO: safety check for OSC
   OSCIL *osc = (OSCIL *) mixr->sound_generators[sg];
   osc->freqadj(osc, freq);
+}
+
+int add_effect(mixer *mixr)
+{
+  printf("Booya, adding a new effect!\n");
+  effect **new_effects = NULL;
+  if (mixr->effects_size <= mixr->effects_num) {
+    if (mixr->effects_size == 0) {
+      mixr->effects_size = DEFAULT_ARRAY_SIZE;
+    } else {
+    mixr->effects_size *= 2;
+    }
+
+    new_effects = realloc(mixr->effects, mixr->effects_size *
+                      sizeof(effect*));
+    if (new_effects == NULL) {
+      printf("Ooh, burney - cannae allocate memory for new sounds");
+      return -1;
+    } else {
+      mixr->effects = new_effects;
+    }
+  }
+
+  effect *e = calloc(1, sizeof(effect));
+  mixr->effects[mixr->effects_num] = e;
+  return mixr->effects_num++;
 }
 
 int add_sound_generator(mixer *mixr, SBMSG *sbm)
