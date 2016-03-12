@@ -105,6 +105,10 @@ void interpret(char *line)
       if (strcmp(cmd, "bpm") == 0) {
         bpm_change(b, val);
         update_envelope_stream_bpm(ampstream);
+        for ( int i = 0; i < mixr->soundgen_num; i++)
+          for ( int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++)
+            update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
+
         // TODO: update individual Envelopes
         // update_soundgen_envelope_bpm(mixr);
       //} else if (strcmp(cmd, "vol") == 0) {

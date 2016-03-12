@@ -200,7 +200,7 @@ double gen_next(mixer* mixr)
   }
 
   // global envelope -- for the moment
-  double mix_amp = envelope_stream_tick(ampstream);
-  output_val *= mix_amp;
+  //double mix_amp = envelope_stream_tick(ampstream);
+  //output_val *= mix_amp;
   return mixr->volume * (output_val / 1.53);
 }
