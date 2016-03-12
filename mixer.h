@@ -3,6 +3,7 @@
 
 #include <portaudio.h>
 
+#include "effect.h"
 #include "fm.h"
 #include "oscil.h"
 #include "sampler.h"
@@ -11,11 +12,6 @@
 #include "table.h"
 
 #define INITIAL_SIGNAL_SIZE 4
-
-typedef struct {
-  float buffer[(int) SAMPLE_RATE / 8];
-  int buf_p;
-} effect;
 
 typedef struct t_mixer
 {
@@ -26,7 +22,7 @@ typedef struct t_mixer
 
   int delay_on;
 
-  effect **effects;
+  EFFECT **effects;
   int effects_num;
   int effects_size;
 

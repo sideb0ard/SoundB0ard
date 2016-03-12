@@ -6,8 +6,9 @@
 
 #include <portaudio.h>
 
-#include "defjams.h"
+#include "effect.h"
 #include "envelope.h"
+#include "defjams.h"
 #include "fm.h"
 #include "mixer.h"
 #include "oscil.h"
@@ -72,7 +73,7 @@ void freq_change(mixer *mixr, int sg, float freq)
 int add_effect(mixer *mixr)
 {
   printf("Booya, adding a new effect!\n");
-  effect **new_effects = NULL;
+  EFFECT **new_effects = NULL;
   if (mixr->effects_size <= mixr->effects_num) {
     if (mixr->effects_size == 0) {
       mixr->effects_size = DEFAULT_ARRAY_SIZE;
@@ -81,7 +82,7 @@ int add_effect(mixer *mixr)
     }
 
     new_effects = realloc(mixr->effects, mixr->effects_size *
-                      sizeof(effect*));
+                      sizeof(EFFECT*));
     if (new_effects == NULL) {
       printf("Ooh, burney - cannae allocate memory for new sounds");
       return -1;
@@ -90,7 +91,11 @@ int add_effect(mixer *mixr)
     }
   }
 
-  effect *e = calloc(1, sizeof(effect));
+  EFFECT* e = new_effect(0.5);
+  if ( e == NULL ) {
+    perror("Couldn't create effect");
+    return -1;
+  }
   mixr->effects[mixr->effects_num] = e;
   printf("done adding effect\n");
   return mixr->effects_num++;

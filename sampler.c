@@ -101,6 +101,9 @@ double sample_gennext(void *self)
   }
   if (val > 1 || val < -1)
     printf("BURNIE - SAMPLER OVERLOAD!\n");
+
+  val = effector(&sampler->sound_generator, val);
+
   return val * sampler->vol;
 }
 

@@ -146,7 +146,7 @@ void interpret(char *line)
 
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
-    regcomp(&tsigtype_rx, "^(vol|freq|effect|fm) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&tsigtype_rx, "^(vol|freq|effect|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
       double val1 = 0;
       double val2 = 0;
@@ -161,11 +161,11 @@ void interpret(char *line)
         printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
       }
       if (strcmp(cmd_type, "effect") == 0) {
-        if ( mixr->soundgen_num > val1 && mixr->effects_num > val2) {
+        if ( mixr->soundgen_num > val1 ) {
           printf("EFFECT CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-          link_effect(mixr->sound_generators[(int)val1], val2);
+          add_effect_soundgen(mixr->sound_generators[(int)val1], val2);
         } else {
-          printf("Oofft mate, you don't have enough sound_gens or effects for that..\n");
+          printf("Oofft mate, you don't have enough sound_gens for that..\n");
         }
       }
       if (strcmp(cmd_type, "fm") == 0) {

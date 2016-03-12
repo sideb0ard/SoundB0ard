@@ -85,29 +85,14 @@ double oscil_gennext(void* self)
 
   p_osc->curphase = curphase;
 
-  if (p_osc->sound_generator.effects_num > 0) {
-
-    int delay_p = mixr->effects[0]->buf_p;
-    float *delay = mixr->effects[0]->buffer;
-
-    double delay_val_copy = val;
-
-    if (p_osc->sound_generator.effects_on) {
-      val = delay[delay_p];
-    }
-
-    delay[delay_p++] = val + delay_val_copy*0.5;
-
-    if (delay_p >= SAMPLE_RATE/8) delay_p = 0;
-
-    mixr->effects[0]->buf_p = delay_p;
-  }
+  val = effector(&p_osc->sound_generator, val);
 
   return val * vol;
+
 }
 
 void oscil_status(void *self, char *status_string)
 {
   OSCIL *p_osc = self;
-  snprintf(status_string, 119, ANSI_COLOR_YELLOW "freq: %f vol: %f incr: %f cur: %f" ANSI_COLOR_RESET, p_osc->freq, p_osc->vol, p_osc->incr, p_osc->curphase);
+  snprintf(status_string, 119, ANSI_COLOR_YELLOW "freq: %f vol: %f incr: %f cur: %f num_effects: %d" ANSI_COLOR_RESET, p_osc->freq, p_osc->vol, p_osc->incr, p_osc->curphase, p_osc->sound_generator.effects_num);
 }
