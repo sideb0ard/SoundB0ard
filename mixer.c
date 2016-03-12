@@ -13,7 +13,7 @@
 #include "mixer.h"
 #include "oscil.h"
 #include "sbmsg.h"
-#include "sampler.h"
+#include "drumr.h"
 #include "sound_generator.h"
 
 extern ENVSTREAM* ampstream;
@@ -163,7 +163,7 @@ int add_fm(mixer *mixr, int ffreq, int cfreq)
   return add_sound_generator(mixr, m);
 }
 
-int add_sample(mixer *mixr, char *filename, char *pattern)
+int add_drum(mixer *mixr, char *filename, char *pattern)
 {
   // preliminary setup
   char cwd[1024];
@@ -173,19 +173,19 @@ int add_sample(mixer *mixr, char *filename, char *pattern)
   strcat(full_filename, "/wavs/");
   strcat(full_filename, filename);
 
-  SAMPLER *nsample = new_sampler(full_filename, pattern);
-  if (nsample == NULL) {
-    printf("Barfed on sample creation\n");
+  DRUM *ndrum = new_drumr(full_filename, pattern);
+  if (ndrum == NULL) {
+    printf("Barfed on drum creation\n");
     return -1;
   }
   SBMSG *m = new_sbmsg();
   if (m == NULL) {
-    free(nsample);
+    free(ndrum);
     printf("MBARF!\n");
     return -1;
   }
 
-  m->sound_generator = (SOUNDGEN *) nsample;
+  m->sound_generator = (SOUNDGEN *) ndrum;
   return add_sound_generator(mixr, m);
 }
 

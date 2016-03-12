@@ -294,7 +294,7 @@ void interpret(char *line)
       strncpy(pattern, trim_tok+fmatch[3].rm_so, pattern_len);
       pattern[pattern_len] = '\0';
 
-      add_sample(mixr, filename, pattern);
+      add_drum(mixr, filename, pattern);
 
     }
   }

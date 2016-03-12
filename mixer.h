@@ -6,7 +6,7 @@
 #include "effect.h"
 #include "fm.h"
 #include "oscil.h"
-#include "sampler.h"
+#include "drumr.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
 #include "table.h"
@@ -43,7 +43,7 @@ mixer *new_mixer(void);
 void mixer_ps(mixer *mixr);
 int add_osc(mixer *mixr, int freq, GTABLE *gt);
 int add_fm(mixer *mixr, int ffreq, int cfreq);
-int add_sample(mixer *mixr, char *filename, char *pattern);
+int add_drum(mixer *mixr, char *filename, char *pattern);
 int add_sound_generator(mixer *mixr, SBMSG *sbm);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);
