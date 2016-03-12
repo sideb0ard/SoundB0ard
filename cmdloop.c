@@ -79,7 +79,7 @@ void interpret(char *line)
       pthread_detach(songrun_th);
     } else if (strcmp(trim_tok, "ls") == 0) {
       list_sample_dir();
-    } else if (strcmp(trim_tok, "addeffect") == 0) {
+    } else if (strcmp(trim_tok, "addeffect") == 0 || strcmp(trim_tok, "neweffect") == 0) {
       add_effect(mixr);
     } else if (strcmp(trim_tok, "delay") == 0) {
       delay_toggle(mixr);

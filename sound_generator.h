@@ -22,6 +22,7 @@ typedef struct t_soundgen {
   int effects_size; // size of array
   int effects_num; // num of effects
   int *effects;
+  int effects_on; // bool
 } SOUNDGEN;
 
 void link_effect(SOUNDGEN* sg, int effect_no);

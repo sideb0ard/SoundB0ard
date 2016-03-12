@@ -23,6 +23,7 @@ typedef struct t_mixer
   SOUNDGEN **sound_generators;
   int soundgen_num; // actual number of SGs
   int soundgen_size; // number of memory slots reserved for SGszz
+
   int delay_on;
 
   effect **effects;

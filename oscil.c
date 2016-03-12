@@ -1,9 +1,12 @@
 #include <stdlib.h>
 
 #include "defjams.h"
+#include "mixer.h"
 #include "oscil.h"
 #include "sound_generator.h"
 #include "table.h"
+
+extern mixer *mixr;
 
 OSCIL* new_oscil(double freq, GTABLE *gt)
 {
@@ -81,6 +84,22 @@ double oscil_gennext(void* self)
     curphase += dtablen;
 
   p_osc->curphase = curphase;
+
+  int delay_p = mixr->effects[0]->buf_p;
+  float *delay = mixr->effects[0]->buffer;
+
+  if (p_osc->sound_generator.effects_num > 0) {
+    if (p_osc->sound_generator.effects_on) {
+      //val += mixr->effects[0]->buffer[mixr->effects[0]->buf_p];
+      val += delay[delay_p];
+    }
+    //mixr->effects[0]->buffer[mixr->effects[0]->buf_p++] = val * 0.5;
+    delay[delay_p++] = val + val*0.5;
+    if (delay_p >= SAMPLE_RATE/8) delay_p = 0;
+    //mixr->effects[0]->buffer[mixr->effects[0]->buf_p++] = val * 0.5;
+    //if (mixr->effects[0]->buf_p >= SAMPLE_RATE/8) mixr->effects[0]->buf_p = 0;
+  }
+  mixr->effects[0]->buf_p = delay_p;
   return val * vol;
 }
 

@@ -92,6 +92,7 @@ int add_effect(mixer *mixr)
 
   effect *e = calloc(1, sizeof(effect));
   mixr->effects[mixr->effects_num] = e;
+  printf("done adding effect\n");
   return mixr->effects_num++;
 }
 
@@ -192,6 +193,14 @@ double gen_next(mixer* mixr)
       output_val += mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
     }
   }
+
+  //if (mixr->effects_num > 0) {
+  //  for (int i = 0; i < mixr->effects_num; i++) {
+  //    mixr->effects[i]->buf_p++;
+  //    if ( mixr->effects[i]->buf_p > SAMPLE_RATE / 8) mixr->effects[i]->buf_p = 0;
+  //  }
+  //}
+
   // global envelope -- for the moment
   double mix_amp = envelope_stream_tick(ampstream);
   output_val *= mix_amp;

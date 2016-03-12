@@ -31,21 +31,29 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
   (void) timeInfo;
   (void) statusFlags;
 
-  int delay_p = data->delay_p;
-  float *delay = data->delay;
+  //int delay_p = data->delay_p;
+  //float *delay = data->delay;
+  int delay_p = mixr->effects[0]->buf_p;
+  float *delay = mixr->effects[0]->buffer;
 
   for (unsigned long i = 0; i < framesPerBuffer; i++) {
     float val = 0;
     if (data->mixr->delay_on)
       val = delay[delay_p];
+      //val = mixr->effects[0]->buffer[mixr->effects[0]->buf_p];
     else
       val = gen_next(data->mixr);
     delay[delay_p++] = gen_next(data->mixr) + val*0.5;
     if (delay_p >= SAMPLE_RATE/8) delay_p = 0; 
+    //mixr->effects[0]->buffer[mixr->effects[0]->buf_p++] = gen_next(data->mixr) + val*0.5;
+    //if  (mixr->effects[0]->buf_p <= SAMPLE_RATE/8) mixr->effects[0]->buf_p = 0;
+    //val = mixr->effects[0]->buffer[mixr->effects[0]->buf_p];
+    //val = mixr->effects[0]->buffer[mixr->effects[0]->buf_p];
     *out++ = val;
     *out++ = val;
   }
-  data->delay_p = delay_p;
+  //data->delay_p = delay_p;
+  mixr->effects[0]->buf_p = delay_p;
   return 0;
 }
 
@@ -70,6 +78,7 @@ int main()
   }
   pthread_detach(bpmrun_th);
 
+
   // PortAudio start me up!
   pa_setup();
 
@@ -77,6 +86,7 @@ int main()
   PaError err;
   paData *data = calloc(1, sizeof(paData));
   mixr = new_mixer();
+  add_effect(mixr); // tmp
   data->mixr = mixr;
 
   err = Pa_OpenDefaultStream( &stream, 

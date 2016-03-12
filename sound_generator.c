@@ -6,7 +6,6 @@
 
 void link_effect(SOUNDGEN* sg, int effect_no) // effect no is where in mixer effect array
 {
-  printf("Effect added!\n");
   if (sg->effects_size <= sg->effects_num) {
     if (sg->effects_size == 0) {
       sg->effects_size = DEFAULT_ARRAY_SIZE;
@@ -23,4 +22,7 @@ void link_effect(SOUNDGEN* sg, int effect_no) // effect no is where in mixer eff
     }
   }
   sg->effects[sg->effects_num++] = effect_no;
+  sg->effects_on = 1;
+
+  printf("Effect added!\n");
 }
