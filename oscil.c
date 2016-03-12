@@ -85,21 +85,24 @@ double oscil_gennext(void* self)
 
   p_osc->curphase = curphase;
 
-  int delay_p = mixr->effects[0]->buf_p;
-  float *delay = mixr->effects[0]->buffer;
-
   if (p_osc->sound_generator.effects_num > 0) {
+
+    int delay_p = mixr->effects[0]->buf_p;
+    float *delay = mixr->effects[0]->buffer;
+
+    double delay_val_copy = val;
+
     if (p_osc->sound_generator.effects_on) {
-      //val += mixr->effects[0]->buffer[mixr->effects[0]->buf_p];
-      val += delay[delay_p];
+      val = delay[delay_p];
     }
-    //mixr->effects[0]->buffer[mixr->effects[0]->buf_p++] = val * 0.5;
-    delay[delay_p++] = val + val*0.5;
+
+    delay[delay_p++] = val + delay_val_copy*0.5;
+
     if (delay_p >= SAMPLE_RATE/8) delay_p = 0;
-    //mixr->effects[0]->buffer[mixr->effects[0]->buf_p++] = val * 0.5;
-    //if (mixr->effects[0]->buf_p >= SAMPLE_RATE/8) mixr->effects[0]->buf_p = 0;
+
+    mixr->effects[0]->buf_p = delay_p;
   }
-  mixr->effects[0]->buf_p = delay_p;
+
   return val * vol;
 }
 

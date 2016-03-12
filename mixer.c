@@ -196,8 +196,10 @@ double gen_next(mixer* mixr)
 
   //if (mixr->effects_num > 0) {
   //  for (int i = 0; i < mixr->effects_num; i++) {
-  //    mixr->effects[i]->buf_p++;
-  //    if ( mixr->effects[i]->buf_p > SAMPLE_RATE / 8) mixr->effects[i]->buf_p = 0;
+  //    int p = mixr->effects[i]->buf_p;
+  //    p++;
+  //    if ( p >= SAMPLE_RATE/8 ) p = 0;
+  //    mixr->effects[i]->buf_p = p;
   //  }
   //}
 
