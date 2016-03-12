@@ -68,7 +68,7 @@ ENVELOPE* newpoints()
   return points;
 }
 
-ENVSTREAM* new_envelope_stream()
+ENVSTREAM* new_envelope_stream(int env_len) // env_len is bars
 {
   ENVSTREAM* stream;
   ENVELOPE *points = newpoints();
@@ -79,7 +79,7 @@ ENVSTREAM* new_envelope_stream()
     return NULL;
   stream->points = points;
   stream->npoints = npoints;
-  stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * DEFAULT_ENV_LENGTH); 
+  stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * env_len); 
 
   _env_reset(stream);
 

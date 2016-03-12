@@ -59,7 +59,7 @@ int main()
   saw_up_table = new_saw_table(1);
   saw_down_table = new_saw_table(0);
 
-  ampstream = new_envelope_stream();
+  ampstream = new_envelope_stream(8);
 
   // run da BPM counterrr...
   b = new_bpmrrr();

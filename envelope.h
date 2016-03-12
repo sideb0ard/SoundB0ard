@@ -18,7 +18,7 @@ typedef struct envelope_stream {
 } ENVSTREAM;
 
 ENVELOPE maxpoint(const ENVELOPE* points, long npoints);
-ENVSTREAM *new_envelope_stream(void);
+ENVSTREAM *new_envelope_stream(int env_len); // env_len is bars
 void free_stream(ENVSTREAM* stream);
 double envelope_stream_tick(ENVSTREAM* stream);
 

@@ -62,6 +62,7 @@ double fm_gennext(void* self)
   fm->car_osc->incradj(fm->car_osc, TABRAD * (fm->car_osc->freq + mod_val));
 
   val = effector(&fm->sound_generator, val);
+  val = envelopor(&fm->sound_generator, val);
 
   return fm->vol * val;
 }

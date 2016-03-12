@@ -86,6 +86,7 @@ double oscil_gennext(void* self)
   p_osc->curphase = curphase;
 
   val = effector(&p_osc->sound_generator, val);
+  val = envelopor(&p_osc->sound_generator, val);
 
   return val * vol;
 

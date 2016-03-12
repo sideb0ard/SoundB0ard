@@ -199,15 +199,6 @@ double gen_next(mixer* mixr)
     }
   }
 
-  //if (mixr->effects_num > 0) {
-  //  for (int i = 0; i < mixr->effects_num; i++) {
-  //    int p = mixr->effects[i]->buf_p;
-  //    p++;
-  //    if ( p >= SAMPLE_RATE/8 ) p = 0;
-  //    mixr->effects[i]->buf_p = p;
-  //  }
-  //}
-
   // global envelope -- for the moment
   double mix_amp = envelope_stream_tick(ampstream);
   output_val *= mix_amp;

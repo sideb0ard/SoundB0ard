@@ -105,6 +105,8 @@ void interpret(char *line)
       if (strcmp(cmd, "bpm") == 0) {
         bpm_change(b, val);
         update_envelope_stream_bpm(ampstream);
+        // TODO: update individual Envelopes
+        // update_soundgen_envelope_bpm(mixr);
       //} else if (strcmp(cmd, "vol") == 0) {
       //  printf("VOLLY BALL\n");
       //  mixer_vol_change(mixr, val);
@@ -146,7 +148,7 @@ void interpret(char *line)
 
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
-    regcomp(&tsigtype_rx, "^(vol|freq|effect|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&tsigtype_rx, "^(vol|freq|env|effect|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
       double val1 = 0;
       double val2 = 0;
@@ -164,6 +166,14 @@ void interpret(char *line)
         if ( mixr->soundgen_num > val1 ) {
           printf("EFFECT CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
           add_effect_soundgen(mixr->sound_generators[(int)val1], val2);
+        } else {
+          printf("Oofft mate, you don't have enough sound_gens for that..\n");
+        }
+      }
+      if (strcmp(cmd_type, "env") == 0) {
+        if ( mixr->soundgen_num > val1 ) {
+          printf("ENV CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+          add_envelope_soundgen(mixr->sound_generators[(int)val1], val2);
         } else {
           printf("Oofft mate, you don't have enough sound_gens for that..\n");
         }

@@ -2,6 +2,7 @@
 #define SOUNDGEN_H
 
 #include "effect.h"
+#include "envelope.h"
 #include "defjams.h"
 
 //typedef enum 
@@ -24,9 +25,18 @@ typedef struct t_soundgen {
   int effects_num; // num of effects
   EFFECT **effects;
   int effects_on; // bool
+
+  int envelopes_size; // size of array
+  int envelopes_num; // num of effects
+  ENVSTREAM **envelopes;
+  int envelopes_on; // bool
+
 } SOUNDGEN;
 
 int add_effect_soundgen(SOUNDGEN* self, float duration);
 float effector(SOUNDGEN* self, float val);
+
+int add_envelope_soundgen(SOUNDGEN* self, int env_len);
+float envelopor(SOUNDGEN* self, float val);
 
 #endif // SOUNDGEN_H
