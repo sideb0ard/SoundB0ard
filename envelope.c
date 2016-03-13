@@ -110,15 +110,17 @@ ENVSTREAM* new_envelope_stream(int env_len, int type) // env_len is bars TODO: e
 
   ENVELOPE *points;
   switch(type) {
-    case 1 :
+    case 0 :
       points = newpoints();
       break;
-    case 2 :
+    case 1 :
       points = new_fadein_points();
       break;
-    case 3 :
+    case 2 :
       points = new_fadeout_points();
       break;
+    default:
+      points = newpoints();
   }
 
   unsigned long npoints = 4;
