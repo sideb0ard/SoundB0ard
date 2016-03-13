@@ -44,6 +44,7 @@ void mixer_ps(mixer *mixr);
 int add_osc(mixer *mixr, int freq, GTABLE *gt);
 int add_fm(mixer *mixr, int ffreq, int cfreq);
 int add_drum(mixer *mixr, char *filename, char *pattern);
+int add_sampler(mixer *mixr, char *filename, int loop_len);
 int add_sound_generator(mixer *mixr, SBMSG *sbm);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);

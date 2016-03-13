@@ -6,14 +6,15 @@
 
 #include <portaudio.h>
 
+#include "defjams.h"
+#include "drumr.h"
 #include "effect.h"
 #include "envelope.h"
-#include "defjams.h"
 #include "fm.h"
 #include "mixer.h"
 #include "oscil.h"
+#include "sampler.h"
 #include "sbmsg.h"
-#include "drumr.h"
 #include "sound_generator.h"
 
 extern ENVSTREAM* ampstream;
@@ -189,6 +190,31 @@ int add_drum(mixer *mixr, char *filename, char *pattern)
   return add_sound_generator(mixr, m);
 }
 
+int add_sampler(mixer *mixr, char *filename, int loop_len)
+{
+  // preliminary setup
+  char cwd[1024];
+  getcwd(cwd, 1024);
+  char full_filename[strlen(filename) + strlen(cwd) + 7]; // 7 == '/wavs/' is 6 and 1 for '\0'
+  strcpy(full_filename, cwd);
+  strcat(full_filename, "/wavs/");
+  strcat(full_filename, filename);
+
+  SAMPLER *nsampler = new_sampler(full_filename, loop_len);
+  if (nsampler == NULL) {
+    printf("Barfed on sampler creation\n");
+    return -1;
+  }
+  SBMSG *m = new_sbmsg();
+  if (m == NULL) {
+    free(nsampler);
+    printf("SAMPLMBARF!\n");
+    return -1;
+  }
+
+  m->sound_generator = (SOUNDGEN *) nsampler;
+  return add_sound_generator(mixr, m);
+}
 //void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer* mixr)
 {

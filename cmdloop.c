@@ -12,11 +12,12 @@
 #include "algoriddim.h"
 #include "audioutils.h"
 #include "bpmrrr.h"
-#include "envelope.h"
-#include "fm.h"
 #include "cmdloop.h"
 #include "defjams.h"
+#include "envelope.h"
+#include "fm.h"
 #include "mixer.h"
+#include "sampler.h"
 #include "table.h"
 #include "utils.h"
 
@@ -278,7 +279,7 @@ void interpret(char *line)
       pthread_detach(melody_th);
     }
 
-    // file sample play
+    // drum sample play
     regmatch_t fmatch[4];
     regex_t file_rx;
     regcomp(&file_rx, "^(file|play) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE);
@@ -296,6 +297,29 @@ void interpret(char *line)
 
       add_drum(mixr, filename, pattern);
 
+    }
+
+    // loop sample play
+    regmatch_t sfmatch[4];
+    regex_t sfile_rx;
+    regcomp(&sfile_rx, "^(sloop) ([.[:alnum:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&sfile_rx, trim_tok, 4, sfmatch, 0) == 0) {
+
+      printf("SLOOPY CMON!\n");
+      int filename_len = sfmatch[2].rm_eo - sfmatch[2].rm_so;
+      char filename[filename_len + 1];
+      strncpy(filename, trim_tok+sfmatch[2].rm_so, filename_len);
+      filename[filename_len] = '\0';
+
+      printf("SLOOPY FILE DONE - DOING LEN!\n");
+      int looplen_len = sfmatch[3].rm_eo - sfmatch[3].rm_so;
+      char looplen_char[looplen_len + 1];
+      strncpy(looplen_char, trim_tok+sfmatch[3].rm_so, looplen_len);
+      looplen_char[looplen_len] = '\0';
+      int looplen = atoi(looplen_char);
+
+      printf("LOOPYZZ %s %d\n", filename, looplen);
+      add_sampler(mixr, filename, looplen);
     }
   }
 }
