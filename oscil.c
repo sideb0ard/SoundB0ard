@@ -25,6 +25,7 @@ OSCIL* new_oscil(double freq, GTABLE *gt)
   p_osc->sound_generator.status = &oscil_status;
   p_osc->sound_generator.getvol = &oscil_getvol;
   p_osc->sound_generator.setvol = &oscil_setvol;
+  p_osc->sound_generator.type = OSCIL_TYPE;
 
   //p_osc->voladj = &volfunc;
   p_osc->freqadj = &freqfunc;

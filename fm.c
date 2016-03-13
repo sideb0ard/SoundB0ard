@@ -32,6 +32,7 @@ FM* new_fm(double modf, double carf)
   fm->sound_generator.status = &fm_status;
   fm->sound_generator.setvol = &fm_setvol;
   fm->sound_generator.getvol = &fm_getvol;
+  fm->sound_generator.type = FM_TYPE;
   
   return fm;
 }

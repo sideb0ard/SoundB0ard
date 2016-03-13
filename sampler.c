@@ -47,27 +47,32 @@ SAMPLER* new_sampler(char *filename, int loop_len)
   sampler->bufsize = bufsize;
   sampler->samplerate = sf_info.samplerate;
   sampler->channels = sf_info.channels;
+  sampler->loop_len = loop_len;
   sampler->vol = 0.7;
 
-  //int incr = bufsize / (60.0 / (b->bpm) * SAMPLE_RATE * loop_len);
-  int incr;
-  if ( bufsize > SAMPLE_RATE )
-    incr = (60.0 / (b->bpm)) * (bufsize / SAMPLE_RATE) * 4 * loop_len;
-  else
-    incr = (60.0 / (b->bpm)) * (SAMPLE_RATE / bufsize) * 4 * loop_len;
+  sampler_set_incr(sampler);
+  //int incr = (bufsize / (60.0 / (b->bpm) * SAMPLE_RATE)) * loop_len;
 
-  if (incr < 1) {
-    printf("WEE INCR!\n");
-    incr = 1;
-  }
-  sampler->incr = incr;
+  //if (incr < 1) {
+  //  printf("WEE INCR!\n");
+  //  incr = 1;
+  //}
+  //sampler->incr = incr;
 
   sampler->sound_generator.gennext = &sampler_gennext;
   sampler->sound_generator.status = &sampler_status;
   sampler->sound_generator.getvol = &sampler_getvol;
   sampler->sound_generator.setvol = &sampler_setvol;
+  sampler->sound_generator.type = SAMPLER_TYPE;
 
   return sampler;
+}
+
+void sampler_set_incr(void* self) 
+{
+  SAMPLER *sampler = self;
+  int incr = (sampler->bufsize / (60.0 / (b->bpm) * SAMPLE_RATE)) * sampler->loop_len;
+  sampler->incr = incr;
 }
 
 double sampler_gennext(void *self)

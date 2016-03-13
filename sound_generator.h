@@ -19,7 +19,7 @@ typedef struct t_soundgen {
   void (*status)(void *self, char *string);
   void (*setvol)(void *self, double val);
   double (*getvol)(void *self);
-  //sound_generator_type type;
+  sound_generator_type type;
 
   int effects_size; // size of array
   int effects_num; // num of effects
@@ -36,7 +36,7 @@ typedef struct t_soundgen {
 int add_effect_soundgen(SOUNDGEN* self, float duration);
 float effector(SOUNDGEN* self, float val);
 
-int add_envelope_soundgen(SOUNDGEN* self, int env_len);
+int add_envelope_soundgen(SOUNDGEN* self, int env_len, int type);
 float envelopor(SOUNDGEN* self, float val);
 
 #endif // SOUNDGEN_H

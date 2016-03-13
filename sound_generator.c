@@ -59,7 +59,7 @@ float effector(SOUNDGEN* self, float val)
   return val;
 }
 
-int add_envelope_soundgen(SOUNDGEN* self, int env_len)
+int add_envelope_soundgen(SOUNDGEN* self, int env_len, int type)
 {
   printf("Booya, adding a new envelope to SOUNDGEN!\n");
   ENVSTREAM **new_envelopes = NULL;
@@ -80,7 +80,7 @@ int add_envelope_soundgen(SOUNDGEN* self, int env_len)
     }
   }
 
-  ENVSTREAM* e = new_envelope_stream(env_len);
+  ENVSTREAM* e = new_envelope_stream(env_len, type);
   if ( e == NULL ) {
     perror("Couldn't create envelope");
     return -1;

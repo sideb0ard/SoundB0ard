@@ -71,6 +71,7 @@ DRUM* new_drumr(char *filename, char *pattern)
   drumr->sound_generator.status = &drum_status;
   drumr->sound_generator.getvol = &drum_getvol;
   drumr->sound_generator.setvol = &drum_setvol;
+  drumr->sound_generator.type = DRUM_TYPE;
 
   return drumr;
 }

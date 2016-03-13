@@ -68,10 +68,58 @@ ENVELOPE* newpoints()
   return points;
 }
 
-ENVSTREAM* new_envelope_stream(int env_len) // env_len is bars
+ENVELOPE* new_fadein_points()
+{
+
+  ENVELOPE *points = NULL;
+  points = (ENVELOPE*) calloc(4, sizeof(ENVELOPE));
+  if (points == NULL)
+    return NULL;
+  points[0].time = 0.0; 
+  points[0].value = 0.1;
+  points[1].time = 45.00;
+  points[1].value = 0.5;
+  points[2].time = 85.00; 
+  points[2].value = 1.0;
+  points[3].time = 99.0;
+  points[3].value = 0.1;
+  return points;
+}
+
+ENVELOPE* new_fadeout_points()
+{
+
+  ENVELOPE *points = NULL;
+  points = (ENVELOPE*) calloc(4, sizeof(ENVELOPE));
+  if (points == NULL)
+    return NULL;
+  points[0].time = 0.0; 
+  points[0].value = 0.1;
+  points[1].time = 10.00;
+  points[1].value = 1.0;
+  points[2].time = 35.00; 
+  points[2].value = 1.0;
+  points[3].time = 99.0;
+  points[3].value = 0.1;
+  return points;
+}
+
+ENVSTREAM* new_envelope_stream(int env_len, int type) // env_len is bars TODO: enum
 {
   ENVSTREAM* stream;
-  ENVELOPE *points = newpoints();
+
+  ENVELOPE *points;
+  switch(type) {
+    case 1 :
+      points = newpoints();
+      break;
+    case 2 :
+      points = new_fadein_points();
+      break;
+    case 3 :
+      points = new_fadeout_points();
+      break;
+  }
 
   unsigned long npoints = 4;
   stream = (ENVSTREAM*) calloc(1, sizeof(ENVSTREAM));

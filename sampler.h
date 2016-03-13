@@ -3,7 +3,7 @@
 
 #include "sound_generator.h"
 
-typedef struct t_samplerr
+typedef struct t_sampler
 {
   SOUNDGEN sound_generator;
   char *filename;
@@ -14,6 +14,7 @@ typedef struct t_samplerr
   int played;
   int samplerate;
   int channels;
+  int loop_len;
   double vol;
   int incr;
   int curtick;
@@ -26,5 +27,6 @@ double sampler_gennext(void* self);
 void sampler_status(void *self, char *ss);
 void sampler_setvol(void *self, double v);
 double sampler_getvol(void *self);
+void sampler_set_incr(void *self);
 
 #endif // SAMPLER_H

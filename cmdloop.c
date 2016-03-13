@@ -106,9 +106,15 @@ void interpret(char *line)
       if (strcmp(cmd, "bpm") == 0) {
         bpm_change(b, val);
         update_envelope_stream_bpm(ampstream);
-        for ( int i = 0; i < mixr->soundgen_num; i++)
-          for ( int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++)
+        for ( int i = 0; i < mixr->soundgen_num; i++) {
+          for ( int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
             update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
+          }
+          if (mixr->sound_generators[i]->type == SAMPLER_TYPE) {
+            sampler_set_incr(mixr->sound_generators[i]);
+          }
+        }
+
 
       //} else if (strcmp(cmd, "vol") == 0) {
       //  printf("VOLLY BALL\n");
@@ -151,7 +157,7 @@ void interpret(char *line)
 
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
-    regcomp(&tsigtype_rx, "^(vol|freq|env|effect|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&tsigtype_rx, "^(vol|freq|effect|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
       double val1 = 0;
       double val2 = 0;
@@ -173,14 +179,14 @@ void interpret(char *line)
           printf("Oofft mate, you don't have enough sound_gens for that..\n");
         }
       }
-      if (strcmp(cmd_type, "env") == 0) {
-        if ( mixr->soundgen_num > val1 ) {
-          printf("ENV CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-          add_envelope_soundgen(mixr->sound_generators[(int)val1], val2);
-        } else {
-          printf("Oofft mate, you don't have enough sound_gens for that..\n");
-        }
-      }
+      //if (strcmp(cmd_type, "env") == 0) {
+      //  if ( mixr->soundgen_num > val1 ) {
+      //    printf("ENV CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+      //    add_envelope_soundgen(mixr->sound_generators[(int)val1], val2);
+      //  } else {
+      //    printf("Oofft mate, you don't have enough sound_gens for that..\n");
+      //  }
+      //}
       if (strcmp(cmd_type, "fm") == 0) {
         printf("FML!\n");
         SBMSG *msg = new_sbmsg();
@@ -318,6 +324,32 @@ void interpret(char *line)
 
       printf("LOOPYZZ %s %d\n", filename, looplen);
       add_sampler(mixr, filename, looplen);
+    }
+
+    // envelope pattern
+    regmatch_t ematch[5];
+    regex_t env_rx;
+    regcomp(&env_rx, "^(env) ([[:digit:]]+) ([[:digit:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&env_rx, trim_tok, 5, ematch, 0) == 0) {
+      printf("ENVELOPeeee!\n");
+
+      double val1 = 0;
+      double val2 = 0;
+      double val3 = 0;
+      char cmd_type[10];
+      sscanf(trim_tok, "%s %lf %lf %lf", cmd_type, &val1, &val2, &val3);
+
+      if ( mixr->soundgen_num > val1 ) {
+        //printf("ENV CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+        if ( val3 >= 0 && val3 < 3 ) {
+          printf("Calling env with %lf %lf %lf\n", val1, val2, val3);
+          add_envelope_soundgen(mixr->sound_generators[(int)val1], val2, val3);
+        } else {
+          printf("Sorry, envelope type has to be between 0 and 2");
+        }
+      } else {
+        printf("Oofft mate, you don't have enough sound_gens for that..\n");
+      }
     }
   }
 }
