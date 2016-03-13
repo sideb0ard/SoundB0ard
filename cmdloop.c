@@ -110,8 +110,6 @@ void interpret(char *line)
           for ( int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++)
             update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
 
-        // TODO: update individual Envelopes
-        // update_soundgen_envelope_bpm(mixr);
       //} else if (strcmp(cmd, "vol") == 0) {
       //  printf("VOLLY BALL\n");
       //  mixer_vol_change(mixr, val);
