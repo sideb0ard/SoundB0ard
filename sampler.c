@@ -50,7 +50,16 @@ SAMPLER* new_sampler(char *filename, int loop_len)
   sampler->vol = 0.7;
 
   //int incr = bufsize / (60.0 / (b->bpm) * SAMPLE_RATE * loop_len);
-  int incr = (60.0 / (b->bpm)) * (SAMPLE_RATE / sampler->bufsize) * 4 * loop_len;
+  int incr;
+  if ( bufsize > SAMPLE_RATE )
+    incr = (60.0 / (b->bpm)) * (bufsize / SAMPLE_RATE) * 4 * loop_len;
+  else
+    incr = (60.0 / (b->bpm)) * (SAMPLE_RATE / bufsize) * 4 * loop_len;
+
+  if (incr < 1) {
+    printf("WEE INCR!\n");
+    incr = 1;
+  }
   sampler->incr = incr;
 
   sampler->sound_generator.gennext = &sampler_gennext;
