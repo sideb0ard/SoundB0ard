@@ -5,9 +5,8 @@
 #include "effect.h"
 #include "sound_generator.h"
 
-int add_delay_soundgen(SOUNDGEN* self, float duration)
-{
-  printf("Booya, adding a new effect to SOUNDGEN: %f!\n", duration);
+static int resize_effects_array(SOUNDGEN* self) {
+
   EFFECT **new_effects = NULL;
   if (self->effects_size <= self->effects_num) {
     if (self->effects_size == 0) {
@@ -25,6 +24,18 @@ int add_delay_soundgen(SOUNDGEN* self, float duration)
       self->effects = new_effects;
     }
   }
+  return 0;
+}
+
+int add_delay_soundgen(SOUNDGEN* self, float duration)
+{
+  printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
+
+  int res = resize_effects_array(self);
+  if ( res == -1 ) {
+    perror("Couldn't resize effects array");
+    return -1;
+  }
 
   EFFECT* e = new_delay(duration);
   if ( e == NULL ) {
@@ -37,24 +48,56 @@ int add_delay_soundgen(SOUNDGEN* self, float duration)
   return self->effects_num++;
 }
 
+int add_freq_pass_soundgen(SOUNDGEN* self, float freq, effect_type pass_type)
+{
+  printf("Booya, adding a new LOWPASS to SOUNDGEN: %f!\n", freq);
+  int res = resize_effects_array(self);
+  if ( res == -1 ) {
+    perror("Couldn't resize effects array");
+    return -1;
+  }
+
+  EFFECT* e = new_freq_pass(freq, pass_type);
+  if ( e == NULL ) {
+    perror("Couldn't create effect");
+    return -1;
+  }
+  self->effects[self->effects_num] = e;
+  self->effects_on = 1;
+  printf("done adding effect\n");
+  return self->effects_num++;
+}
+
 float effector(SOUNDGEN* self, float val)
 {
-  double delay_val_copy = val;
+  double val_copy = val;
 
-  if (self->effects_num > 0) {
+  if (self->effects_on) {
 
-    int delay_p = self->effects[0]->buf_p;
-    double *delay = self->effects[0]->buffer;
+    for ( int i = 0; i < self->effects_num; i++ ) {
 
-    if (self->effects_on) {
-      val += delay[delay_p];
+      int delay_p;
+
+      switch(self->effects[i]->type) {
+        case DELAY :
+          delay_p = self->effects[i]->buf_p;
+          double *delay = self->effects[i]->buffer;
+          val += delay[delay_p];
+          delay[delay_p++] = val_copy*0.5;
+          if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
+          self->effects[i]->buf_p = delay_p;
+          break;
+
+        case LOWPASS:
+          val = (val * ( 1 + self->effects[i]->coef) - self->effects[i]->buffer[0] * self->effects[i]->coef);
+          self->effects[i]->buffer[0] = val;
+          break;
+        case HIGHPASS:
+          val = (val * ( 1 - self->effects[i]->coef) - self->effects[i]->buffer[0] * self->effects[i]->coef);
+          self->effects[i]->buffer[0] = val;
+          break;
+      }
     }
-
-    delay[delay_p++] = delay_val_copy*0.5;
-
-    if (delay_p >= self->effects[0]->buf_length) delay_p = 0;
-
-    self->effects[0]->buf_p = delay_p;
   }
   return val;
 }

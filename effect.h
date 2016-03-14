@@ -2,18 +2,21 @@
 #define EFFECT_H
 
 typedef enum {
-  delay,
-  lowpass,
-  highpass
-} EFFECT_TYPE;
+  DELAY,
+  LOWPASS,
+  HIGHPASS
+} effect_type;
 
 typedef struct {
   double* buffer;
   int buf_p;
   int buf_length;
-  EFFECT_TYPE type;
+  double costh;
+  double coef;
+  effect_type type;
 } EFFECT;
 
 EFFECT* new_delay(double duration); 
+EFFECT* new_freq_pass(double freq, effect_type pass_type); 
 
 #endif
