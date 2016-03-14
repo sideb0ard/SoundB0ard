@@ -323,7 +323,14 @@ void interpret(char *line)
       int looplen = atoi(looplen_char);
 
       printf("LOOPYZZ %s %d\n", filename, looplen);
-      add_sampler(mixr, filename, looplen);
+      SBMSG *msg = new_sbmsg();
+      strncpy(msg->cmd, "timed_sig_start", 19);
+      strncpy(msg->params, "sloop", 10);
+      strncpy(msg->filename, filename, 99);
+      //msg->filename = filename;
+      msg->looplen = looplen;
+      thrunner(msg);
+      //add_sampler(mixr, filename, looplen);
     }
 
     // envelope pattern

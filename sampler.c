@@ -48,7 +48,7 @@ SAMPLER* new_sampler(char *filename, int loop_len)
   sampler->samplerate = sf_info.samplerate;
   sampler->channels = sf_info.channels;
   sampler->loop_len = loop_len;
-  sampler->vol = 0.7;
+  sampler->vol = 0.0;
 
   sampler_set_incr(sampler);
   //int incr = (bufsize / (60.0 / (b->bpm) * SAMPLE_RATE)) * loop_len;

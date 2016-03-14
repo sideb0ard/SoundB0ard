@@ -9,6 +9,8 @@ typedef struct sbmsg {
   // need separated into message types.
   char cmd[20];
   char params[20];
+  char filename[100];
+  int looplen;
   int freq;
   int modfreq;
   int carfreq;

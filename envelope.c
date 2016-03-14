@@ -72,17 +72,23 @@ ENVELOPE* new_fadein_points()
 {
 
   ENVELOPE *points = NULL;
-  points = (ENVELOPE*) calloc(4, sizeof(ENVELOPE));
+  points = (ENVELOPE*) calloc(7, sizeof(ENVELOPE));
   if (points == NULL)
     return NULL;
   points[0].time = 0.0; 
   points[0].value = 0.1;
   points[1].time = 45.00;
-  points[1].value = 0.5;
-  points[2].time = 85.00; 
-  points[2].value = 1.0;
-  points[3].time = 99.0;
-  points[3].value = 0.1;
+  points[1].value = 0.1;
+  points[2].time = 55.00; 
+  points[2].value = 0.4;
+  points[3].time = 60.0;
+  points[3].value = 1.0;
+  points[4].time = 80.0;
+  points[4].value = 1.0;
+  points[5].time = 85.0;
+  points[5].value = 0.5;
+  points[6].time = 99.0;
+  points[6].value = 0.1;
   return points;
 }
 
@@ -90,17 +96,19 @@ ENVELOPE* new_fadeout_points()
 {
 
   ENVELOPE *points = NULL;
-  points = (ENVELOPE*) calloc(4, sizeof(ENVELOPE));
+  points = (ENVELOPE*) calloc(5, sizeof(ENVELOPE));
   if (points == NULL)
     return NULL;
   points[0].time = 0.0; 
   points[0].value = 0.1;
-  points[1].time = 10.00;
+  points[1].time = 5.00;
   points[1].value = 1.0;
-  points[2].time = 35.00; 
+  points[2].time = 45.00; 
   points[2].value = 1.0;
-  points[3].time = 99.0;
+  points[3].time = 50.00; 
   points[3].value = 0.1;
+  points[4].time = 99.0;
+  points[4].value = 0.1;
   return points;
 }
 
@@ -129,7 +137,7 @@ ENVSTREAM* new_envelope_stream(int env_len, int type) // env_len is bars TODO: e
     return NULL;
   stream->points = points;
   stream->npoints = npoints;
-  stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * env_len); 
+  stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * env_len * 4); 
 
   _env_reset(stream);
 

@@ -97,7 +97,12 @@ float envelopor(SOUNDGEN* self, float val)
   if (self->envelopes_num > 0) {
     for ( int i = 0; i < self->envelopes_num; i++ ) {
       double mix_env = envelope_stream_tick(self->envelopes[i]);
-      val *= mix_env;
+      if ( self->envelopes[i]->started ) {
+        val *= mix_env;
+      } else if ( mix_env == 1 ) {
+        self->envelopes[i]->started = 1;
+        val *= mix_env;
+      }
     }
   }
   return val;

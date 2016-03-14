@@ -39,6 +39,8 @@ void *timed_sig_start(void * arg)
       sg = add_osc(mixr, msg->freq, square_table);
   } else if (strcmp(msg->params, "fm") == 0) {
       sg = add_fm(mixr, msg->modfreq, msg->carfreq);
+  } else if (strcmp(msg->params, "sloop") == 0) {
+      sg = add_sampler(mixr, msg->filename, msg->looplen);
   }
 
   faderrr(sg, UP);

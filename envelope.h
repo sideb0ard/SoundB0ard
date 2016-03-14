@@ -14,6 +14,7 @@ typedef struct envelope_stream {
   double incr;
   double width;
   double height;
+  int started;
   unsigned long ileft, iright;
 } ENVSTREAM;
 
