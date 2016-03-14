@@ -83,3 +83,7 @@ env 6 2 1, delay 5 7
 stop 5, stop 3
 stop 0, stop 1, stop 2
 stop 4, stop 6
+
+# BOX ELDER
+delay
+loop 440 277 329 1, loop 293 370 392 3, loop 392 494 293 4

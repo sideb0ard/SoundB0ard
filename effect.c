@@ -59,7 +59,7 @@ EFFECT* new_freq_pass(double freq, effect_type pass_type)
       e->costh = costh;
       break;
     case BANDPASS :
-      bw = 40; // bandwidth - completely random number??! (noidea)
+      bw = 50; // bandwidth - completely random number??! (noidea)
       rr = 2 * ( r = 1. - M_PI * ( bw / SAMPLE_RATE ));
       rsq = r * r;
       costh = ( rr / ( 1. + rsq )) * cos ( TWO_PI * freq / SAMPLE_RATE);
