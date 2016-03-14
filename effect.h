@@ -4,7 +4,8 @@
 typedef enum {
   DELAY,
   LOWPASS,
-  HIGHPASS
+  HIGHPASS,
+  BANDPASS
 } effect_type;
 
 typedef struct {
@@ -13,6 +14,9 @@ typedef struct {
   int buf_length;
   double costh;
   double coef;
+  double rr;
+  double rsq;
+  double scal;
   effect_type type;
 } EFFECT;
 

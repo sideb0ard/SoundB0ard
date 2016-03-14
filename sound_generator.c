@@ -87,13 +87,17 @@ float effector(SOUNDGEN* self, float val)
           if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
           self->effects[i]->buf_p = delay_p;
           break;
-
         case LOWPASS:
           val = (val * ( 1 + self->effects[i]->coef) - self->effects[i]->buffer[0] * self->effects[i]->coef);
           self->effects[i]->buffer[0] = val;
           break;
         case HIGHPASS:
           val = (val * ( 1 - self->effects[i]->coef) - self->effects[i]->buffer[0] * self->effects[i]->coef);
+          self->effects[i]->buffer[0] = val;
+          break;
+        case BANDPASS:
+          val = (val * self->effects[i]->scal + self->effects[i]->rr * self->effects[i]->costh * self->effects[i]->buffer[0] - self->effects[i]->rsq * self->effects[i]->buffer[1]);
+          self->effects[i]->buffer[1] = self->effects[i]->buffer[0];
           self->effects[i]->buffer[0] = val;
           break;
       }
