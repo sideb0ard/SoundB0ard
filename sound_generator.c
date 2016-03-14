@@ -5,7 +5,7 @@
 #include "effect.h"
 #include "sound_generator.h"
 
-int add_effect_soundgen(SOUNDGEN* self, float duration)
+int add_delay_soundgen(SOUNDGEN* self, float duration)
 {
   printf("Booya, adding a new effect to SOUNDGEN: %f!\n", duration);
   EFFECT **new_effects = NULL;
@@ -26,7 +26,7 @@ int add_effect_soundgen(SOUNDGEN* self, float duration)
     }
   }
 
-  EFFECT* e = new_effect(duration);
+  EFFECT* e = new_delay(duration);
   if ( e == NULL ) {
     perror("Couldn't create effect");
     return -1;

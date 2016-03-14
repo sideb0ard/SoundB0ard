@@ -80,8 +80,6 @@ void interpret(char *line)
       pthread_detach(songrun_th);
     } else if (strcmp(trim_tok, "ls") == 0) {
       list_sample_dir();
-    } else if (strcmp(trim_tok, "addeffect") == 0 || strcmp(trim_tok, "neweffect") == 0) {
-      add_effect(mixr);
     } else if (strcmp(trim_tok, "delay") == 0) {
       delay_toggle(mixr);
     } else if (strcmp(trim_tok, "exit") == 0) {
@@ -157,7 +155,7 @@ void interpret(char *line)
 
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
-    regcomp(&tsigtype_rx, "^(vol|freq|effect|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&tsigtype_rx, "^(vol|freq|delay|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
       double val1 = 0;
       double val2 = 0;
@@ -171,22 +169,14 @@ void interpret(char *line)
         freq_change(mixr, val1, val2);
         printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
       }
-      if (strcmp(cmd_type, "effect") == 0) {
+      if (strcmp(cmd_type, "delay") == 0) {
         if ( mixr->soundgen_num > val1 ) {
-          printf("EFFECT CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-          add_effect_soundgen(mixr->sound_generators[(int)val1], val2);
+          printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+          add_delay_soundgen(mixr->sound_generators[(int)val1], val2);
         } else {
           printf("Oofft mate, you don't have enough sound_gens for that..\n");
         }
       }
-      //if (strcmp(cmd_type, "env") == 0) {
-      //  if ( mixr->soundgen_num > val1 ) {
-      //    printf("ENV CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-      //    add_envelope_soundgen(mixr->sound_generators[(int)val1], val2);
-      //  } else {
-      //    printf("Oofft mate, you don't have enough sound_gens for that..\n");
-      //  }
-      //}
       if (strcmp(cmd_type, "fm") == 0) {
         printf("FML!\n");
         SBMSG *msg = new_sbmsg();
@@ -195,10 +185,9 @@ void interpret(char *line)
         msg->modfreq = val1;
         msg->carfreq = val2;
         thrunner(msg);
-
-        //add_fm(mixr, sig, val);
       }
     }
+
     // loop sine waves
     regmatch_t lmatch[3];
     regex_t loop_rx;
@@ -327,10 +316,8 @@ void interpret(char *line)
       strncpy(msg->cmd, "timed_sig_start", 19);
       strncpy(msg->params, "sloop", 10);
       strncpy(msg->filename, filename, 99);
-      //msg->filename = filename;
       msg->looplen = looplen;
       thrunner(msg);
-      //add_sampler(mixr, filename, looplen);
     }
 
     // envelope pattern
