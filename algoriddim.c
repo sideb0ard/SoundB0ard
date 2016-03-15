@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #include <unistd.h>
 
 #include "algoriddim.h"
@@ -33,7 +34,13 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
 
     *mlock = 1;
     *note = (*note + 1) % note_len;
-    freq_change(mixr, osc_num, (notes[*note])); 
+    int randy = rand() % 100;
+    if ( randy > 90 )
+      freq_change(mixr, osc_num, (2 * notes[*note])); 
+    else if ( randy < 10 )
+      freq_change(mixr, osc_num, 0);
+    else
+      freq_change(mixr, osc_num, notes[*note]); 
   }
 }
 
@@ -44,7 +51,11 @@ void fplay_melody(const int sg_num, int *mlock, int *note, int *notes, const int
     *mlock = 1;
     *note = (*note + 1) % note_len;
     //freq_change(mixr, osc_num, (notes[*note])); 
-    mfm(mixr->sound_generators[sg_num], "car", (notes[*note]));
+    int randy = rand() % 100;
+    if ( randy > 90 )
+      mfm(mixr->sound_generators[sg_num], "car", (2 * notes[*note]));
+    else
+      mfm(mixr->sound_generators[sg_num], "car", (notes[*note]));
   }
 }
 
@@ -69,7 +80,9 @@ void *loop_run(void *m)
   mmsg->osc_num = osc_num;
   do {} while (b->cur_tick % 16 != 0);
   faderrr(osc_num, UP);
-  sleep(3);
+  //sleep(3);
+
+  srand(time(NULL));
 
   while (1)
   {
@@ -90,7 +103,8 @@ void *floop_run(void *m)
   mmsg->osc_num = fm_one;
   do {} while (b->cur_tick % 16 != 0);
   faderrr(fm_one, UP);
-  sleep(3);
+  //sleep(3);
+  srand(time(NULL));
 
   while (1)
   {

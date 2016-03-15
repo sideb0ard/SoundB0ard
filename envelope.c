@@ -114,29 +114,32 @@ ENVELOPE* new_fadeout_points()
 
 ENVSTREAM* new_envelope_stream(int env_len, int type) // env_len is bars TODO: enum
 {
-  ENVSTREAM* stream;
+
+  //ENVSTREAM* stream;
+  ENVSTREAM *stream = (ENVSTREAM*) calloc(1, sizeof(ENVSTREAM));
+  if (stream == NULL)
+    return NULL;
 
   ENVELOPE *points;
   switch(type) {
     case 0 :
       points = newpoints();
+      stream->npoints = 4;
       break;
     case 1 :
       points = new_fadein_points();
+      stream->npoints = 7;
       break;
     case 2 :
       points = new_fadeout_points();
+      stream->npoints = 5;
       break;
     default:
       points = newpoints();
   }
 
-  unsigned long npoints = 4;
-  stream = (ENVSTREAM*) calloc(1, sizeof(ENVSTREAM));
-  if (stream == NULL)
-    return NULL;
+  //unsigned long npoints = 4;
   stream->points = points;
-  stream->npoints = npoints;
   stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * env_len * 4); 
 
   _env_reset(stream);
