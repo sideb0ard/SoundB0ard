@@ -90,7 +90,7 @@ void interpret(char *line)
     // SINE|SAW|TRI (FREQ)
     regmatch_t pmatch[3];
     regex_t cmdtype_rx;
-    regcomp(&cmdtype_rx, "^(bpm|duck|stop|sine|sawd|sawu|tri|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&cmdtype_rx, "^(bpm|duck|solo|stop|sine|sawd|sawu|tri|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
 
     if (regexec(&cmdtype_rx, trim_tok, 3, pmatch, 0) == 0) {
 
@@ -125,6 +125,16 @@ void interpret(char *line)
         msg->sound_gen_num = val;
         strncpy(msg->cmd, "duckrrr", 19);
         thrunner(msg);
+      } else if (strcmp(cmd, "solo") == 0) {
+        for ( int i = 0 ; i < mixr->soundgen_num ; i++ ) {
+          if ( i != val ) {
+            SBMSG *msg = new_sbmsg();
+            msg->sound_gen_num = i;
+            printf("Duckin' %d\n", i);
+            strncpy(msg->cmd, "duckrrr", 19);
+            thrunner(msg);
+          }
+        }
       } else {
         strncpy(msg->cmd, "timed_sig_start", 19);
         strncpy(msg->params, cmd, 10);

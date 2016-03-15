@@ -68,7 +68,7 @@ EFFECT* new_freq_pass(double freq, effect_type pass_type)
       e->rsq = rsq;
       e->costh = costh;
       e->scal = scal;
-      e->type = HIGHPASS;
+      e->type = BANDPASS;
       break;
     default:
       break;

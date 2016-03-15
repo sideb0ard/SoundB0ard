@@ -60,8 +60,9 @@ void *fade_runrrr(void * arg)
 void *duck_runrrr(void * arg)
 {
   SBMSG *msg = arg;
+  printf("Duckin' %d\n", msg->sound_gen_num);
   faderrr(msg->sound_gen_num, DOWN);
-  sleep(10);
+  sleep( rand() % 15);
   faderrr(msg->sound_gen_num, UP);
 
   return NULL;
