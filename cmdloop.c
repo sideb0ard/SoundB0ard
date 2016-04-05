@@ -16,6 +16,7 @@
 #include "defjams.h"
 #include "envelope.h"
 #include "fm.h"
+#include "help.h"
 #include "mixer.h"
 #include "sampler.h"
 #include "table.h"
@@ -84,6 +85,8 @@ void interpret(char *line)
       delay_toggle(mixr);
     } else if (strcmp(trim_tok, "exit") == 0) {
       exxit();
+    } else if (strcmp(trim_tok, "help") == 0) {
+      print_help();
     }
 
     // TODO: move regex outside function to compile once
