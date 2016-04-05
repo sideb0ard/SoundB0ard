@@ -14,16 +14,20 @@ DRUM* new_drumr(char *filename, char *pattern)
   drumr->position = 0;
 
   // drum pattern stuff
-  char **sp, *spattern[32];
   int sp_count = 0;
+  char *sp, *sp_last, *spattern[32];
+  char *sep = " ";
 
-  for (sp = spattern; (*sp = strsep(&pattern, " ")) != NULL;) {
-    sp_count++;
-    if (**sp != '\0')
-      if (++sp >= &spattern[32])
-        break;
+  // extract numbers from string into spattern
+  for ( sp = strtok_r(pattern, sep, &sp_last);
+        sp;
+        sp = strtok_r(NULL, sep, &sp_last))
+  {
+      spattern[sp_count++] = sp;
   }
 
+  // convert those spattern chars into real integers and use
+  // as index into DRUM*'s pattern
   for (int i = 0; i < sp_count; i++) {
     int pat_num = atoi(spattern[i]);
     if (pat_num < drum_PATTERN_LEN) {

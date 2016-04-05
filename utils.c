@@ -134,18 +134,16 @@ void faderrr(int sg_num, direction d)
 
 freaky* new_freqs_from_string(char* string)
 {
-  //char * freaks = strdup(string);
-
-  char **ap, *fargv[8];
+  char *ap, *ap_last, *fargv[8];
   int freq_count = 0;
-  //for (ap = fargv; (*ap = strsep(&freaks, " ")) != NULL;) {
-  for (ap = fargv; (*ap = strsep(&string, " ")) != NULL;) {
-    freq_count++;
-    if (**ap != '\0')
-      if (++ap >= &fargv[8])
-        break;
+  char *sep = " ";
+
+  for ( ap = strtok_r(string, sep, &ap_last);
+        ap;
+        ap = strtok_r(NULL, sep, &ap_last))
+  {
+      fargv[freq_count++] = ap;
   }
-  //free(freaks);
 
   freaky* f = calloc(1, sizeof(freaky));
   f->num_freaks = freq_count;
