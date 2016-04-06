@@ -94,6 +94,28 @@ void *loop_run(void *m)
   }
 }
 
+void *randdrum_run(void *m)
+{
+  SBMSG *msg = (SBMSG*) m;
+  int drum_num = msg->sound_gen_num;
+  int looplen = msg->looplen;
+  printf("RANDRUN CALLED - got me a msg: drumnum %d - with length of %d bars\n", drum_num, looplen);
+  int changed = 0;
+  while (1) 
+  {
+    if (b->cur_tick % (4*looplen) == 0) {
+        if ( !changed ) {
+            changed = 1;
+            int pattern = rand() % 65535; // max for an unsigned int
+            //printf("My rand num %d\n", pattern);
+            update_pattern(mixr->sound_generators[drum_num], pattern);
+        }
+    } else {
+        changed = 0;
+    }
+  }
+}
+
 void *floop_run(void *m)
 {
   melody_msg *mmsg = (melody_msg*) m;

@@ -30,8 +30,11 @@ DRUM* new_drumr(char *filename, char *pattern)
   // as index into DRUM*'s pattern
   for (int i = 0; i < sp_count; i++) {
     int pat_num = atoi(spattern[i]);
-    if (pat_num < drum_PATTERN_LEN) {
-      drumr->pattern[pat_num] = 1;
+    if (pat_num < DRUM_PATTERN_LEN) {
+      //drumr->pattern[pat_num] = 1;
+      printf("PAT_NUM: %d is %d\n", pat_num, ( 1 << pat_num));
+      drumr->pattern = ( 1 << pat_num ) | drumr->pattern;  /// bitmask!
+      printf("NOW SET %d\n", drumr->pattern);
     }
   }
 
@@ -77,7 +80,16 @@ DRUM* new_drumr(char *filename, char *pattern)
   drumr->sound_generator.setvol = &drum_setvol;
   drumr->sound_generator.type = DRUM_TYPE;
 
+  // TODO: do i need to free pattern ?
   return drumr;
+}
+
+void update_pattern(void *self, int newpattern)
+{
+    DRUM *drumr = self;
+    drumr->pattern = newpattern;
+
+    // TODO: do i need to free old pattern too?
 }
 
 double drum_gennext(void *self)
@@ -86,7 +98,8 @@ double drum_gennext(void *self)
   DRUM *drumr = self;
   double val = 0;
 
-  if (drumr->pattern[b->cur_tick % drum_PATTERN_LEN]) {
+  if (drumr->pattern & ( 1 << (b->cur_tick % DRUM_PATTERN_LEN))) {
+    //printf("IN HERE! pattern: %d // compare is %d -> result is %d\n", drumr->pattern, ( 1 << (b->cur_tick % DRUM_PATTERN_LEN)), drumr->pattern | ( 1 << (b->cur_tick & DRUM_PATTERN_LEN)));
     if (!drumr->played) {
       drumr->playing = 1;
     }
@@ -116,15 +129,15 @@ double drum_gennext(void *self)
 void drum_status(void *self, char *status_string)
 {
   DRUM *drumr = self;
-  char spattern[drum_PATTERN_LEN + 1] = "";
-  for (int i = 0; i < drum_PATTERN_LEN; i++) {
-    if (drumr->pattern[i]) {
+  char spattern[DRUM_PATTERN_LEN + 1] = "";
+  for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
+    if (drumr->pattern & ( 1 << i) ) {
       strncat(&spattern[i], "1", 1);
     } else {
       strncat(&spattern[i], "0", 1);
     }
   }
-  spattern[drum_PATTERN_LEN] = '\0';
+  spattern[DRUM_PATTERN_LEN] = '\0';
   snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf" ANSI_COLOR_RESET, drumr->filename, spattern, drumr->vol);
 }
 

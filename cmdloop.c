@@ -173,7 +173,7 @@ void interpret(char *line)
 
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
-    regcomp(&tsigtype_rx, "^(vol|freq|delay|lowpass|highpass|bandpass|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&tsigtype_rx, "^(vol|freq|delay|randdrum|lowpass|highpass|bandpass|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
       double val1 = 0;
       double val2 = 0;
@@ -204,6 +204,14 @@ void interpret(char *line)
         if (strcmp(cmd_type, "bandpass") == 0) {
             printf("BANDPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
             add_freq_pass_soundgen(mixr->sound_generators[(int)val1], val2, BANDPASS);
+        }
+        if (strcmp(cmd_type, "randdrum") == 0) {
+          printf("RANDY!\n");
+          SBMSG *msg = new_sbmsg();
+          strncpy(msg->cmd, "randdrum", 9);
+          msg->sound_gen_num = val1;
+          msg->looplen = val2;
+          thrunner(msg);
         }
         if (strcmp(cmd_type, "fm") == 0) {
           printf("FML!\n");

@@ -10,6 +10,7 @@
 #include <unistd.h>
 
 #include "bpmrrr.h"
+#include "algoriddim.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "utils.h"
@@ -81,6 +82,11 @@ void thrunner(SBMSG *msg)
   } else if (strcmp(msg->cmd, "faderrr") == 0) {
     if ( pthread_create (&pthrrrd, NULL, fade_runrrr, msg)) {
       fprintf(stderr, "Err, running phrrread..\n");
+      return;
+    }
+  } else if (strcmp(msg->cmd, "randdrum") == 0) {
+    if ( pthread_create (&pthrrrd, NULL, randdrum_run, msg)) {
+      fprintf(stderr, "Err, running RANDRUND phrrread..\n");
       return;
     }
   } else if (strcmp(msg->cmd, "duckrrr") == 0) {

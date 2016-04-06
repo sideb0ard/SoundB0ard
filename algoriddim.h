@@ -25,6 +25,7 @@ algo *new_algo(void);
 void *algo_run(void *);
 void *loop_run(void *);
 void *floop_run(void *);
+void *randdrum_run(void *m);
 void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int note_len);
 void fplay_melody(const int sg_num, int *mlock, int *note, int *notes, const int note_len);
 void mk_sbmsg_sine(int freq);
