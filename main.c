@@ -11,6 +11,10 @@
 
 mixer *mixr;
 bpmrrr *b;
+
+pthread_cond_t bpm_cond; // use broadcast to wake up threads when tick changes in bpm
+pthread_mutex_t bpm_lock;
+
 GTABLE *sine_table;
 GTABLE *tri_table;
 GTABLE *square_table;
@@ -60,6 +64,10 @@ int main()
   saw_down_table = new_saw_table(0);
 
   ampstream = new_envelope_stream(8, 1);
+
+  // algoriddim thread synchronization
+  pthread_mutex_init(&bpm_lock, NULL);
+  pthread_cond_init(&bpm_cond,NULL);
 
   // run da BPM counterrr...
   b = new_bpmrrr();

@@ -1,11 +1,15 @@
 #define _POSIX_C_SOURCE 199309L
 
+#include <pthread.h>
 #include <time.h>
 #include <stdlib.h>
 #include <stdio.h>
 
 #include "defjams.h"
 #include "bpmrrr.h"
+
+extern pthread_mutex_t bpm_lock;
+extern pthread_cond_t bpm_cond;
 
 bpmrrr *new_bpmrrr()
 {
@@ -18,10 +22,7 @@ bpmrrr *new_bpmrrr()
 
   b->bpm = DEFAULT_BPM;
   b->cur_tick = 0;
-  //b->sleeptime = (60 / b->bpm / 4 ) * 1000000000; // 4 "microticks" per BPS as nanosec
   b->sleeptime = (60.0 / b->bpm / 4 ) * 1000000000; // 4 "microticks" per BPS as nanosec
-  printf("SLEEPTIME IS %lf\n", b->sleeptime);
-  //b->sleeptime = 999999999L; // 4 "microticks" per BPS as nanosec
 
   return b;
 }
@@ -41,11 +42,13 @@ void bpm_info(bpmrrr *b)
 
 void *bpm_run(void *bp)
 {
-  bpmrrr *b = (bpmrrr*) bp; 
+  bpmrrr *b = (bpmrrr*) bp;
   while (1)
   {
-    // printf("TICK: %d\n", (b->cur_tick%4 + 1)); 
-    b->cur_tick++;
+    pthread_mutex_lock(&bpm_lock);
+    b->cur_tick++; // TICK TOCK!
+    pthread_cond_broadcast(&bpm_cond);
+    pthread_mutex_unlock(&bpm_lock);
 
     struct timespec ts;
     ts.tv_sec = 0;

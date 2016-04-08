@@ -53,7 +53,7 @@ void ps()
 
 int exxit()
 {
-    printf("\nBeat it, ya val jerk...\n");
+    printf(COOL_COLOR_GREEN "\nBeat it, ya val jerk...\n" ANSI_COLOR_RESET);
     pa_teardown();
     exit(0);
 }
@@ -104,6 +104,8 @@ void interpret(char *line)
       sscanf(trim_tok, "%s %f", cmd, &val);
       msg->freq = val;
 
+      int is_val_a_valid_sig_num = ( val >= 0 && val <= mixr->soundgen_num) ? 1 : 0 ;
+
       if (strcmp(cmd, "bpm") == 0) {
         bpm_change(b, val);
         update_envelope_stream_bpm(ampstream);
@@ -121,22 +123,28 @@ void interpret(char *line)
       //  printf("VOLLY BALL\n");
       //  mixer_vol_change(mixr, val);
       } else if (strcmp(cmd, "stop") == 0) {
-        msg->sound_gen_num = val;
-        strncpy(msg->cmd, "faderrr", 19);
-        thrunner(msg);
+        if ( is_val_a_valid_sig_num ) {
+            msg->sound_gen_num = val;
+            strncpy(msg->cmd, "faderrr", 19);
+            thrunner(msg);
+        }
       } else if (strcmp(cmd, "duck") == 0) {
-        msg->sound_gen_num = val;
-        strncpy(msg->cmd, "duckrrr", 19);
-        thrunner(msg);
-      } else if (strcmp(cmd, "solo") == 0) {
-        for ( int i = 0 ; i < mixr->soundgen_num ; i++ ) {
-          if ( i != val ) {
-            SBMSG *msg = new_sbmsg();
-            msg->sound_gen_num = i;
-            printf("Duckin' %d\n", i);
+        if ( is_val_a_valid_sig_num ) {
+            msg->sound_gen_num = val;
             strncpy(msg->cmd, "duckrrr", 19);
             thrunner(msg);
-          }
+        }
+      } else if (strcmp(cmd, "solo") == 0) {
+        if ( is_val_a_valid_sig_num ) {
+            for ( int i = 0 ; i < mixr->soundgen_num ; i++ ) {
+              if ( i != val ) {
+                SBMSG *msg = new_sbmsg();
+                msg->sound_gen_num = i;
+                printf("Duckin' %d\n", i);
+                strncpy(msg->cmd, "duckrrr", 19);
+                thrunner(msg);
+              }
+            }
         }
       } else {
         strncpy(msg->cmd, "timed_sig_start", 19);
@@ -173,45 +181,61 @@ void interpret(char *line)
 
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
-    regcomp(&tsigtype_rx, "^(vol|freq|delay|randdrum|lowpass|highpass|bandpass|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&tsigtype_rx, "^(vol|freq|delay|randd|lowpass|highpass|bandpass|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
       double val1 = 0;
       double val2 = 0;
       char cmd_type[10];
       sscanf(trim_tok, "%s %lf %lf", cmd_type, &val1, &val2);
 
+      int is_val_a_valid_sig_num = ( val1 >= 0 && val1 <= mixr->soundgen_num) ? 1 : 0 ;
+
       //if ( mixr->soundgen_num > val1 ) {
         if (strcmp(cmd_type, "vol") == 0) {
-          vol_change(mixr, val1, val2);
-          printf("VOL! %s %f %lf\n", cmd_type, val1, val2);
+            if ( is_val_a_valid_sig_num ) {
+                vol_change(mixr, val1, val2);
+                printf("VOL! %s %f %lf\n", cmd_type, val1, val2);
+            }
         }
         if (strcmp(cmd_type, "freq") == 0) {
-          freq_change(mixr, val1, val2);
-          printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
+            if ( is_val_a_valid_sig_num ) {
+                freq_change(mixr, val1, val2);
+                printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
+            }
         }
         if (strcmp(cmd_type, "delay") == 0) {
-            printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-            add_delay_soundgen(mixr->sound_generators[(int)val1], val2);
+            if ( is_val_a_valid_sig_num ) {
+                printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+                add_delay_soundgen(mixr->sound_generators[(int)val1], val2);
+            }
         }
         if (strcmp(cmd_type, "lowpass") == 0) {
-            printf("LOWPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-            add_freq_pass_soundgen(mixr->sound_generators[(int)val1], val2, LOWPASS);
+            if ( is_val_a_valid_sig_num ) {
+                printf("LOWPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+                add_freq_pass_soundgen(mixr->sound_generators[(int)val1], val2, LOWPASS);
+            }
         }
         if (strcmp(cmd_type, "highpass") == 0) {
-            printf("HIGHPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-            add_freq_pass_soundgen(mixr->sound_generators[(int)val1], val2, HIGHPASS);
+            if ( is_val_a_valid_sig_num ) {
+                printf("HIGHPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+                add_freq_pass_soundgen(mixr->sound_generators[(int)val1], val2, HIGHPASS);
+            }
         }
         if (strcmp(cmd_type, "bandpass") == 0) {
-            printf("BANDPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-            add_freq_pass_soundgen(mixr->sound_generators[(int)val1], val2, BANDPASS);
+            if ( is_val_a_valid_sig_num ) {
+                printf("BANDPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+                add_freq_pass_soundgen(mixr->sound_generators[(int)val1], val2, BANDPASS);
+            }
         }
-        if (strcmp(cmd_type, "randdrum") == 0) {
-          printf("RANDY!\n");
-          SBMSG *msg = new_sbmsg();
-          strncpy(msg->cmd, "randdrum", 9);
-          msg->sound_gen_num = val1;
-          msg->looplen = val2;
-          thrunner(msg);
+        if (strcmp(cmd_type, "randd") == 0) {
+            if ( is_val_a_valid_sig_num ) {
+                printf("RANDY!\n");
+                SBMSG *msg = new_sbmsg();
+                strncpy(msg->cmd, "randdrum", 9);
+                msg->sound_gen_num = val1;
+                msg->looplen = val2;
+                thrunner(msg);
+            }
         }
         if (strcmp(cmd_type, "fm") == 0) {
           printf("FML!\n");

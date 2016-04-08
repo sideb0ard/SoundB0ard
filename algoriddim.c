@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -16,6 +17,9 @@ extern GTABLE *tri_table;
 extern GTABLE *square_table;
 extern GTABLE *saw_up_table;
 extern GTABLE *saw_down_table;
+
+extern pthread_cond_t bpm_cond;
+extern pthread_mutex_t bpm_lock;
 
 algo *new_algo()
 {
@@ -80,7 +84,6 @@ void *loop_run(void *m)
   mmsg->osc_num = osc_num;
   do {} while (b->cur_tick % 16 != 0);
   faderrr(osc_num, UP);
-  //sleep(3);
 
   srand(time(NULL));
 
@@ -91,6 +94,9 @@ void *loop_run(void *m)
     } else if (mmsg->melody_play_lock) {
       mmsg->melody_play_lock = 0;
     }
+    pthread_mutex_lock(&bpm_lock);
+    pthread_cond_wait(&bpm_cond,&bpm_lock);
+    pthread_mutex_unlock(&bpm_lock);
   }
 }
 
@@ -101,6 +107,7 @@ void *randdrum_run(void *m)
   int looplen = msg->looplen;
   printf("RANDRUN CALLED - got me a msg: drumnum %d - with length of %d bars\n", drum_num, looplen);
   int changed = 0;
+
   while (1) 
   {
     if (b->cur_tick % (4*looplen) == 0) {
@@ -113,6 +120,9 @@ void *randdrum_run(void *m)
     } else {
         changed = 0;
     }
+    pthread_mutex_lock(&bpm_lock);
+    pthread_cond_wait(&bpm_cond,&bpm_lock);
+    pthread_mutex_unlock(&bpm_lock);
   }
 }
 
@@ -135,6 +145,9 @@ void *floop_run(void *m)
     } else if (mmsg->melody_play_lock) {
       mmsg->melody_play_lock = 0;
     }
+    pthread_mutex_lock(&bpm_lock);
+    pthread_cond_wait(&bpm_cond,&bpm_lock);
+    pthread_mutex_unlock(&bpm_lock);
   }
 }
 
@@ -172,5 +185,8 @@ void *algo_run(void *a)
     } else {
       fm_one_lock = 0;
     }
+    pthread_mutex_lock(&bpm_lock);
+    pthread_cond_wait(&bpm_cond,&bpm_lock);
+    pthread_mutex_unlock(&bpm_lock);
   }
 }
