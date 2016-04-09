@@ -335,6 +335,19 @@ void interpret(char *line)
       pthread_detach(melody_th);
     }
 
+    // chord info // TODO - simplify - don't need a regex here but whatevs
+    regmatch_t chmatch[2];
+    regex_t chord_rx;
+    regcomp(&chord_rx, "^chord ([[:alpha:]]+)$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&chord_rx, trim_tok, 2, chmatch, 0) == 0) {
+        int note_len = chmatch[1].rm_eo - chmatch[1].rm_so;
+        char note[note_len  + 1];
+        strncpy(note, trim_tok+chmatch[1].rm_so, note_len);
+        note[note_len] = '\0';
+        chordie(note);
+    }
+
+
     // drum sample play
     regmatch_t fmatch[4];
     regex_t file_rx;

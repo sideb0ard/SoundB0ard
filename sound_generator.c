@@ -83,6 +83,7 @@ float effector(SOUNDGEN* self, float val)
           delay_p = self->effects[i]->buf_p;
           double *delay = self->effects[i]->buffer;
           val += delay[delay_p];
+          //val = delay[delay_p];
           delay[delay_p++] = val_copy*0.5;
           if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
           self->effects[i]->buf_p = delay_p;

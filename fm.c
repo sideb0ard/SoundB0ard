@@ -19,9 +19,9 @@ FM* new_fm(double modf, double carf)
     return NULL;
   //fm->mod_osc = new_oscil(modf, square_table);
   //fm->mod_osc = new_oscil(modf, tri_table);
-  fm->mod_osc = new_oscil(modf, saw_up_table);
+  //fm->mod_osc = new_oscil(modf, saw_up_table);
   //fm->mod_osc = new_oscil(modf, saw_down_table);
-  //fm->mod_osc = new_oscil(modf, sine_table);
+  fm->mod_osc = new_oscil(modf, sine_table);
   fm->car_osc = new_oscil(carf, sine_table);
 
   fm->vol = 0.0;

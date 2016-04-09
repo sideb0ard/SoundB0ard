@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -138,7 +139,7 @@ void drum_status(void *self, char *status_string)
     }
   }
   spattern[DRUM_PATTERN_LEN] = '\0';
-  snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf" ANSI_COLOR_RESET, drumr->filename, spattern, drumr->vol);
+  snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf" ANSI_COLOR_RESET, basename(drumr->filename), spattern, drumr->vol);
 }
 
 double drum_getvol(void *self)

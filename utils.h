@@ -19,3 +19,4 @@ float freqval(char* n);
 int notelookup(char *n);
 void list_sample_dir(void);
 void strim(const char *input, char *result);
+void chordie(char *n);

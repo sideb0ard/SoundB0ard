@@ -23,6 +23,13 @@ extern GTABLE *saw_up_table;
 extern GTABLE *tri_table;
 extern GTABLE *square_table;
 
+
+static char* rev_lookup[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
+
+// these for freqval below..
+static float a4 = 440.0; // fixed note freq to use as baseline
+static const float twelfth_root_of_two = 1.059463094359;
+
 void *timed_sig_start(void * arg)
 {
   SBMSG *msg = arg;
@@ -175,6 +182,25 @@ void list_sample_dir()
   }
 }
 
+void chordie(char *n)
+{
+    int root_note_num = notelookup(n);
+    int second_note_num = (root_note_num + 4) % 12;
+    int third_note_num = (second_note_num + 3) % 12;
+    // TODO : cleanup - assuming always middle chord here:
+    char rootnote[4];
+    char sec_note[4];
+    char thr_note[4];
+    strcpy(rootnote, rev_lookup[root_note_num]);
+    strcpy(sec_note, rev_lookup[second_note_num]);
+    strcpy(thr_note, rev_lookup[third_note_num]);
+
+    printf("%s chord is %s(%.2f) %s(%.2f) %s(%.2f)\n",
+           n, rootnote, freqval(strcat(rootnote,"4")),
+           sec_note, freqval(strcat(sec_note,"4")),
+           thr_note, freqval(strcat(thr_note,"4")));
+}
+
 int notelookup(char *n)
 {
   // twelve semitones:
@@ -204,8 +230,6 @@ int notelookup(char *n)
 float freqval(char *n)
 {
   // algo from http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html
-  float a4 = 440.0; // fixed note freq to use as baseline
-  const float twelfth_root_of_two = 1.059463094359;
 
   regmatch_t nmatch[3];
   regex_t single_letter_rx;

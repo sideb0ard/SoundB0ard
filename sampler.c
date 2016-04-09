@@ -1,3 +1,4 @@
+#include <libgen.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -105,7 +106,7 @@ double sampler_gennext(void *self)
 void sampler_status(void *self, char *status_string)
 {
   SAMPLER *sampler = self;
-  snprintf(status_string, 119, COOL_COLOR_GREEN "[%s]\tvol: %.2lf" ANSI_COLOR_RESET, sampler->filename, sampler->vol);
+  snprintf(status_string, 119, COOL_COLOR_GREEN "[%s]\tvol: %.2lf" ANSI_COLOR_RESET, basename(sampler->filename), sampler->vol);
 }
 
 double sampler_getvol(void *self)
