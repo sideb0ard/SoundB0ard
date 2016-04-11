@@ -181,7 +181,7 @@ void interpret(char *line)
 
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
-    regcomp(&tsigtype_rx, "^(vol|freq|delay|res|randd|lowpass|highpass|bandpass|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&tsigtype_rx, "^(vol|freq|delay|reverb|res|randd|allpass|lowpass|highpass|bandpass|fm) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
       double val1 = 0;
       double val2 = 0;
@@ -206,13 +206,25 @@ void interpret(char *line)
         if (strcmp(cmd_type, "delay") == 0) {
             if ( is_val_a_valid_sig_num ) {
                 printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-                add_delay_soundgen(mixr->sound_generators[(int)val1], val2);
+                add_delay_soundgen(mixr->sound_generators[(int)val1], val2, DELAY);
             }
         }
         if (strcmp(cmd_type, "res") == 0) {
             if ( is_val_a_valid_sig_num ) {
                 printf("RESONATOR CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-                add_delay_soundgen(mixr->sound_generators[(int)val1], val2);
+                add_delay_soundgen(mixr->sound_generators[(int)val1], val2, RES);
+            }
+        }
+        if (strcmp(cmd_type, "reverb") == 0) {
+            if ( is_val_a_valid_sig_num ) {
+                printf("REVERB CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+                add_delay_soundgen(mixr->sound_generators[(int)val1], val2, REVERB);
+            }
+        }
+        if (strcmp(cmd_type, "allpass") == 0) {
+            if ( is_val_a_valid_sig_num ) {
+                printf("ALLPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+                add_delay_soundgen(mixr->sound_generators[(int)val1], val2, ALLPASS);
             }
         }
         if (strcmp(cmd_type, "lowpass") == 0) {

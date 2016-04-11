@@ -5,7 +5,7 @@
 #include "effect.h"
 #include "defjams.h"
 
-EFFECT* new_delay(double duration)
+EFFECT* new_delay(double duration, effect_type e_type)
 {
   EFFECT* e;
   e = (EFFECT*) calloc(1, sizeof(EFFECT));
@@ -22,7 +22,7 @@ EFFECT* new_delay(double duration)
   }
   e->buffer = buffer;
   e->buf_length = buf_length;
-  e->type = DELAY;
+  e->type = e_type;
 
   return e;
 }

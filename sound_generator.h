@@ -33,7 +33,7 @@ typedef struct t_soundgen {
 
 } SOUNDGEN;
 
-int add_delay_soundgen(SOUNDGEN* self, float duration);
+int add_delay_soundgen(SOUNDGEN* self, float duration, effect_type e_type);
 int add_freq_pass_soundgen(SOUNDGEN* self, float freq, effect_type pass_type);
 float effector(SOUNDGEN* self, float val);
 

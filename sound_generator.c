@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #include "defjams.h"
 #include "effect.h"
@@ -27,7 +28,7 @@ static int resize_effects_array(SOUNDGEN* self) {
   return 0;
 }
 
-int add_delay_soundgen(SOUNDGEN* self, float duration)
+int add_delay_soundgen(SOUNDGEN* self, float duration, effect_type e_type)
 {
   printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
 
@@ -37,7 +38,7 @@ int add_delay_soundgen(SOUNDGEN* self, float duration)
     return -1;
   }
 
-  EFFECT* e = new_delay(duration);
+  EFFECT* e = new_delay(duration, e_type);
   if ( e == NULL ) {
     perror("Couldn't create effect");
     return -1;
@@ -50,7 +51,7 @@ int add_delay_soundgen(SOUNDGEN* self, float duration)
 
 int add_freq_pass_soundgen(SOUNDGEN* self, float freq, effect_type pass_type)
 {
-  printf("Booya, adding a new LOWPASS to SOUNDGEN: %f!\n", freq);
+  printf("Booya, adding a new *PASS to SOUNDGEN: %f!\n", freq);
   int res = resize_effects_array(self);
   if ( res == -1 ) {
     perror("Couldn't resize effects array");
@@ -77,24 +78,49 @@ float effector(SOUNDGEN* self, float val)
     for ( int i = 0; i < self->effects_num; i++ ) {
 
       int delay_p;
-      int rdelay_p;
+      double *delay;
+      float val1 = 0;
+      float val2 = 0;
+      double loop_time = 0.04; // temp trial for reverb
+      double reverb_time = 1.5;
+      double decay = pow(0.001, loop_time / reverb_time);
+      float mix = 0.1;
+      float atten = 1.0;
 
       switch(self->effects[i]->type) {
         case DELAY :
           delay_p = self->effects[i]->buf_p;
-          double *delay = self->effects[i]->buffer;
+          delay = self->effects[i]->buffer;
           val += delay[delay_p];
           delay[delay_p++] = val_copy*0.5;
           if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
           self->effects[i]->buf_p = delay_p;
           break;
+        case REVERB:
+          delay_p = self->effects[i]->buf_p;
+          delay = self->effects[i]->buffer;
+          val = delay[delay_p] * decay;
+          delay[delay_p++] = (val_copy*atten) + val;
+          val = ( val_copy * (1-mix)) + ( val * mix);
+          if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
+          self->effects[i]->buf_p = delay_p;
         case RES :
-          rdelay_p = self->effects[i]->buf_p;
-          double *rdelay = self->effects[i]->buffer;
-          val = rdelay[rdelay_p];
-          rdelay[rdelay_p++] = (val_copy+val)*0.5;
-          if (rdelay_p >= self->effects[i]->buf_length) rdelay_p = 0;
-          self->effects[i]->buf_p = rdelay_p;
+          delay_p = self->effects[i]->buf_p;
+          delay = self->effects[i]->buffer;
+          val = delay[delay_p];
+          delay[delay_p++] = (val_copy+val)*0.5;
+          if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
+          self->effects[i]->buf_p = delay_p;
+          break;
+        case ALLPASS:
+          delay_p = self->effects[i]->buf_p;
+          delay = self->effects[i]->buffer;
+          val1 = delay[delay_p];
+          val2 = val - ( val1 * 0.5);
+          delay[delay_p++] = val2;
+          val = val1 + ( val2 * 0.2);
+          if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
+          self->effects[i]->buf_p = delay_p;
           break;
         case LOWPASS:
           val = (val * ( 1 + self->effects[i]->coef) - self->effects[i]->buffer[0] * self->effects[i]->coef);

@@ -4,6 +4,8 @@
 typedef enum {
   DELAY,
   RES,
+  REVERB,
+  ALLPASS,
   LOWPASS,
   HIGHPASS,
   BANDPASS
@@ -21,7 +23,7 @@ typedef struct {
   effect_type type;
 } EFFECT;
 
-EFFECT* new_delay(double duration); 
+EFFECT* new_delay(double duration, effect_type e_type); 
 EFFECT* new_freq_pass(double freq, effect_type pass_type); 
 
 #endif
