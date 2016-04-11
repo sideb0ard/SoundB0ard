@@ -3,6 +3,7 @@
 
 typedef enum {
   DELAY,
+  RES,
   LOWPASS,
   HIGHPASS,
   BANDPASS

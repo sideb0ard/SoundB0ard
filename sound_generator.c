@@ -77,16 +77,24 @@ float effector(SOUNDGEN* self, float val)
     for ( int i = 0; i < self->effects_num; i++ ) {
 
       int delay_p;
+      int rdelay_p;
 
       switch(self->effects[i]->type) {
         case DELAY :
           delay_p = self->effects[i]->buf_p;
           double *delay = self->effects[i]->buffer;
           val += delay[delay_p];
-          //val = delay[delay_p];
           delay[delay_p++] = val_copy*0.5;
           if (delay_p >= self->effects[i]->buf_length) delay_p = 0;
           self->effects[i]->buf_p = delay_p;
+          break;
+        case RES :
+          rdelay_p = self->effects[i]->buf_p;
+          double *rdelay = self->effects[i]->buffer;
+          val = rdelay[rdelay_p];
+          rdelay[rdelay_p++] = (val_copy+val)*0.5;
+          if (rdelay_p >= self->effects[i]->buf_length) rdelay_p = 0;
+          self->effects[i]->buf_p = rdelay_p;
           break;
         case LOWPASS:
           val = (val * ( 1 + self->effects[i]->coef) - self->effects[i]->buffer[0] * self->effects[i]->coef);

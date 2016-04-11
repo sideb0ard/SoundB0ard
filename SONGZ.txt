@@ -96,3 +96,13 @@ floop 32 32 64 55 55 3
 floop 32 32 64 0 55 1
 floop 32 32 0 1, env 0 3 0
 loop 160 0 1, env 4 3 1
+
+
+HAN##
+floop 130 130 0 130 164 4
+E G B
+floop 103 138 138 46 1
+floop 123 70 123 70 127 1
+
+floop 493 311 369 2, env 2 4 0, lowpass 2 493
+floop 35 70 140 70 140 4
