@@ -25,8 +25,8 @@ FM* new_fm(double modf, double carf)
   fm->car_osc = new_oscil(carf, sine_table);
 
   fm->vol = 0.0;
-  fm->mod_osc->sound_generator.setvol(fm->mod_osc, 0.7);
-  fm->car_osc->sound_generator.setvol(fm->car_osc, 0.7);
+  fm->mod_osc->sound_generator.setvol(fm->mod_osc, 0.5);
+  fm->car_osc->sound_generator.setvol(fm->car_osc, 0.5);
 
   fm->sound_generator.gennext = &fm_gennext;
   fm->sound_generator.status = &fm_status;

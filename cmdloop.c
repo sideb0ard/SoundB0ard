@@ -93,7 +93,7 @@ void interpret(char *line)
     // SINE|SAW|TRI (FREQ)
     regmatch_t pmatch[3];
     regex_t cmdtype_rx;
-    regcomp(&cmdtype_rx, "^(bpm|duck|solo|stop|sine|sawd|sawu|tri|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&cmdtype_rx, "^(bpm|duck|solo|stop|sine|sawd|sawu|tri|up|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
 
     if (regexec(&cmdtype_rx, trim_tok, 3, pmatch, 0) == 0) {
 
@@ -125,7 +125,13 @@ void interpret(char *line)
       } else if (strcmp(cmd, "stop") == 0) {
         if ( is_val_a_valid_sig_num ) {
             msg->sound_gen_num = val;
-            strncpy(msg->cmd, "faderrr", 19);
+            strncpy(msg->cmd, "fadedownrrr", 19);
+            thrunner(msg);
+        }
+      } else if (strcmp(cmd, "up") == 0) {
+        if ( is_val_a_valid_sig_num ) {
+            msg->sound_gen_num = val;
+            strncpy(msg->cmd, "fadeuprrr", 19);
             thrunner(msg);
         }
       } else if (strcmp(cmd, "duck") == 0) {

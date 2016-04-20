@@ -106,3 +106,27 @@ floop 123 70 123 70 127 1
 
 floop 493 311 369 2, env 2 4 0, lowpass 2 493
 floop 35 70 140 70 140 4
+
+
+VELOPES
+floop 65 87 37 4, env 0 4 0, env 0 1 2, reverb 0 3, delay 0 4
+floop 65 87 37 3, env 1 3 1, env 1 2 1, reverb 1 4, delay 1 5
+floop 164 109 82 3, env 2 7 0, env 2 1 1, delay 2 0.3, reverb 2 0.3
+floop 109 109 82 4, env 3 4 0, env 3 2 1, delay 3 0.4, reverb 3 0.7
+
+JOEY // E e chord is e4(329.63) g#4(415.30) b4(493.88)
+floop 110 110 0 4, delay 0 0.3, env 0 3 0, env 0 1 1
+floop 103 103 138 2, env 1 2 0, env 1 1 2, delay 1 1.2
+play wuhh184.wav 2 4 8 12, play hihat1.aif 3 9 11
+vol 2 0.1, vol 3 0.2
+play wuk1.wav 0 3 8 11, play clap.aif 4 12, floop 164 247 207 1, env 6 4 0, env 6 2 1
+vol 4 0.5, vol 5 0.6
+randd 4 2, sloop clapton2.wav 3, vol 7 0.4
+stop 4, play wuk1.wav 0 3 8 11, stop 5, vol 8 0.5
+floop 415 329 493 2, env 9 3 0, env 9 1 2, lowpass 9 415, delay 9 9
+randd 8 2, stop 0, stop 6
+solo 9
+stop 2, stop 3, stop 5, stop 4, stop 8, stop 7, stop 6
+stop 0
+stop 1, stop 9
+

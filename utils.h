@@ -2,7 +2,8 @@
 
 void thrunner(SBMSG *msg);
 void *timed_sig_start(void *arg);
-void *fade_runrrr(void *arg);
+void *fadeup_runrrr(void *arg);
+void *fadedown_runrrr(void *arg);
 void *duck_runrrr(void *arg);
 //void startrrr(int sig_num);
 void faderrr(int sig_num, direction d);

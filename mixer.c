@@ -23,7 +23,7 @@ mixer *new_mixer()
 {
   mixer *mixr = NULL;
   mixr = calloc(1, sizeof(mixer));
-  mixr->volume = 0.8;
+  mixr->volume = 0.7;
   if (mixr == NULL) {
     printf("Nae mixer, fucked up!\n");
     return NULL;

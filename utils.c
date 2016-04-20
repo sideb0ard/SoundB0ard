@@ -51,13 +51,20 @@ void *timed_sig_start(void * arg)
       sg = add_sampler(mixr, msg->filename, msg->looplen);
   }
 
-  faderrr(sg, UP);
+  //faderrr(sg, UP);
 
   free(msg);
   return NULL;
 }
 
-void *fade_runrrr(void * arg)
+void *fadeup_runrrr(void * arg)
+{
+  SBMSG *msg = arg;
+  faderrr(msg->sound_gen_num, UP);
+
+  return NULL;
+}
+void *fadedown_runrrr(void * arg)
 {
   SBMSG *msg = arg;
   faderrr(msg->sound_gen_num, DOWN);
@@ -86,8 +93,13 @@ void thrunner(SBMSG *msg)
       fprintf(stderr, "Err, running phrrread..\n");
       return;
     }
-  } else if (strcmp(msg->cmd, "faderrr") == 0) {
-    if ( pthread_create (&pthrrrd, NULL, fade_runrrr, msg)) {
+  } else if (strcmp(msg->cmd, "fadeuprrr") == 0) {
+    if ( pthread_create (&pthrrrd, NULL, fadeup_runrrr, msg)) {
+      fprintf(stderr, "Err, running phrrread..\n");
+      return;
+    }
+  } else if (strcmp(msg->cmd, "fadedownrrr") == 0) {
+    if ( pthread_create (&pthrrrd, NULL, fadedown_runrrr, msg)) {
       fprintf(stderr, "Err, running phrrread..\n");
       return;
     }
@@ -128,12 +140,12 @@ void faderrr(int sg_num, direction d)
   double vol = 0;
 
   if (d == UP) {
-    while (vol < 0.7) {
+    while (vol < 0.5) {
       vol += 0.0001;
       mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
       nanosleep(&ts, NULL);
     }
-    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.7);
+    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.5);
   } else {
     double vol = mixr->sound_generators[sg_num]->getvol(mixr->sound_generators[sg_num]);
     while (vol > 0.0) {

@@ -73,7 +73,7 @@ DRUM* new_drumr(char *filename, char *pattern)
   drumr->bufsize = bufsize;
   drumr->samplerate = sf_info.samplerate;
   drumr->channels = sf_info.channels;
-  drumr->vol = 0.7;
+  drumr->vol = 0.0;
 
   drumr->sound_generator.gennext = &drum_gennext;
   drumr->sound_generator.status = &drum_status;
