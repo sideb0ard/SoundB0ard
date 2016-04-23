@@ -21,6 +21,8 @@ extern GTABLE *saw_down_table;
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
 
+static char* rev_lookup[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
+
 algo *new_algo()
 {
   algo *a = NULL;
@@ -151,42 +153,98 @@ void *floop_run(void *m)
   }
 }
 
+
 void *algo_run(void *a)
 {
   (void) a;
 
-  int fm_one_lock = 0;
-  // k_nuth
-  //int notes[] = {311, 207, 466, 392, 261, 588, 466, 310, 699};
-  int notes[] = {277, 184, 415};
-  int notes_len = 3;
+  srand(time(NULL));
 
-  int note = notes[rand() % notes_len];
-  int fm_one = add_fm(mixr, 60, note);
-  faderrr(fm_one, UP);
+  static double ma_numbers[3];
+  double ma_notes[9];
 
-  //char *sigtype[2] = {"car", "mod"};
-  //
+  char *note = "c";
+  //chordie(note);
+  int root_note_num = notelookup(note);
+  int second_note_num = (root_note_num + 4) % 12;
+  int third_note_num = (second_note_num + 3) % 12;
 
-  int note_index = 0;
+  char rootnote[4];
+  char sec_note[4];
+  char thr_note[4];
+  strcpy(rootnote, rev_lookup[root_note_num]);
+  strcpy(sec_note, rev_lookup[second_note_num]);
+  strcpy(thr_note, rev_lookup[third_note_num]);
+  
+  ma_numbers[0] = freqval(strcat(rootnote,"4"));
+  ma_numbers[1] = freqval(strcat(sec_note,"4"));
+  ma_numbers[2] = freqval(strcat(thr_note,"4"));
+
+  int divs[3] = {7, 4, 3};
+  int notes_idx = 0;
+  for ( int i = 0; i < 3; i++ ) {
+    for ( int j = 0; j < 3; j++ ) {
+      //printf("[%d] %.2f = %d\n", notes_idx++, ma_numbers[i], divs[j]);
+      ma_notes[notes_idx++] = ma_numbers[i] / divs[j];
+    }
+  }
+
+  for ( int i = 0; i < 9; i++ ) {
+    printf("NOTESZZZ %.2f\n", ma_notes[i]);
+  }
+
+
+  int num_of_sigs = (rand() % 3) + 1;
+  printf("Num of sigs: %d\n", num_of_sigs);
+
+  for ( int i = 0; i < num_of_sigs; i++ ) {
+    int fm = add_fm(mixr, ma_notes[rand()%9], ma_notes[rand()%9]);
+    do {} while (b->cur_tick % 16 != 0);
+    faderrr(fm, UP);
+  }
+
+
+  int changed_lock;
 
   while (1)
   {
     if (b->cur_tick % (16) == 0)  {
-      if (!fm_one_lock) {
-        fm_one_lock = 1;
-        //if (rand()%2) {
-          int new_note = notes[note_index++];
-          mfm(mixr->sound_generators[fm_one], "car", new_note);
-          if (new_note >= notes_len)
-            note_index = 0;
-        //}
+      if (!changed_lock) {
+        changed_lock = 1;
+        int ma_sig = rand()%num_of_sigs;
+        double ma_new_note = ma_notes[rand()%9];
+        int car_or_mod = ( rand()%2 > 0 ) ? 1 : 0;
+        printf("Change sig %d to %.2f\n", ma_sig, ma_new_note);
+        if ( car_or_mod ) {
+          printf("CAR!\n");
+          mfm(mixr->sound_generators[ma_sig], "car", ma_new_note);
+        } else {
+          printf("MOD!\n");
+          mfm(mixr->sound_generators[ma_sig], "mod", ma_new_note);
+        }
+
+        if ( rand() % 100 > 30 ) {
+          ma_sig = rand()%num_of_sigs;
+          float delay_time = (float)(rand()%3);
+          add_delay_soundgen(mixr->sound_generators[ma_sig], delay_time, DELAY);
+          printf("Added delay for %d -> %.2f\n", ma_sig, delay_time);
+        }
+
+        // 1 pick random sig_gen, 2 pick random ma_note, pick rand car or mod, change
+        //
+        // pick > 70 duck one at random
+        // pick > 40 delay one at random
+        // pick > 60 env one at random
+        //new_note
+        //if (new_note >= notes_len)
+        //  note_index = 0;
       }
     } else {
-      fm_one_lock = 0;
+      changed_lock = 0;
     }
     pthread_mutex_lock(&bpm_lock);
     pthread_cond_wait(&bpm_cond,&bpm_lock);
     pthread_mutex_unlock(&bpm_lock);
   }
+  return NULL;
 }

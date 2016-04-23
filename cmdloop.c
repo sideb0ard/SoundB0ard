@@ -72,7 +72,7 @@ void interpret(char *line)
     if (strcmp(trim_tok, "ps") == 0) {
       ps();
       return;
-    } else if (strcmp(trim_tok, "song") == 0) {
+    } else if (strcmp(trim_tok, "algo") == 0) {
       pthread_t songrun_th;
       if ( pthread_create (&songrun_th, NULL, algo_run, NULL)) {
         fprintf(stderr, "Errr running song\n");
