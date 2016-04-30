@@ -92,7 +92,7 @@ int add_effect(mixer *mixr)
     }
   }
 
-  EFFECT* e = new_delay(0.5, DELAY);
+  EFFECT* e = new_delay(0.2, DELAY);
   if ( e == NULL ) {
     perror("Couldn't create effect");
     return -1;
@@ -125,7 +125,7 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm)
   return mixr->soundgen_num++;
 }
 
-int add_osc(mixer *mixr, int freq, GTABLE *gt)
+int add_osc(mixer *mixr, double freq, GTABLE *gt)
 {
 
   OSCIL *new_osc = new_oscil(freq, gt);
@@ -147,7 +147,7 @@ int add_osc(mixer *mixr, int freq, GTABLE *gt)
   return add_sound_generator(mixr, m);
 }
 
-int add_fm(mixer *mixr, int ffreq, int cfreq)
+int add_fm(mixer *mixr, double ffreq, double cfreq)
 {
   FM *nfm = new_fm(ffreq, cfreq);
   if (nfm == NULL) {

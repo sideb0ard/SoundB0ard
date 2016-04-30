@@ -12,7 +12,7 @@ void faderrr(int sig_num, direction d);
 //
 typedef struct freaky {
     int num_freaks;
-    int *freaks;
+    double *freaks;
 } freaky;
 
 freaky* new_freqs_from_string(char* string);

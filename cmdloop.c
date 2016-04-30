@@ -161,7 +161,7 @@ void interpret(char *line)
 
     // Modify an FM
     regex_t mfm_rx;
-    regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([.[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&mfm_rx, trim_tok, 0, NULL, 0) == 0) {
       // TODO: check this can only work on an FM
       //char osc[3];
@@ -169,13 +169,13 @@ void interpret(char *line)
       //int freq = 0;
       //printf("ORIG trim_tok: %s\n", trim_tok);
       int fmno;
-      int freq;
+      double freq;
       char osc[4];
-      sscanf(trim_tok, "mfm %d %s %d", &fmno, osc, &freq);
+      sscanf(trim_tok, "mfm %d %s %lf", &fmno, osc, &freq);
 
       if ( mixr->sound_generators[fmno]->type == FM_TYPE ) {
         if (fmno + 1 <= mixr->soundgen_num) {
-          printf("Ooh, gotsa an mfm for FM %d - changing %s to %d\n", fmno, osc, freq);
+          printf("Ooh, gotsa an mfm for FM %d - changing %s to %lf\n", fmno, osc, freq);
           mfm(mixr->sound_generators[fmno], osc, freq);
         } else {
           printf("Beat it, ya chancer - gimme an FM number for one that exists!\n");
@@ -298,7 +298,7 @@ void interpret(char *line)
       printf("LOOP LEN IS %d\n", loop_len);
       printf("NUM OF FREAKS IN HERE IS %d\n", freqs->num_freaks);
       for (int i = 0; i < freqs->num_freaks; i++) {
-        printf("FREQ[%d] = %d\n", i, freqs->freaks[i]);
+        printf("FREQ[%d] = %f\n", i, freqs->freaks[i]);
       }
 
       melody_msg *mm = new_melody_msg(freqs->freaks, freqs->num_freaks, loop_len);
@@ -313,7 +313,7 @@ void interpret(char *line)
     // loop FMs
     regmatch_t flmatch[4];
     regex_t floop_rx;
-    regcomp(&floop_rx, "^floop ([[:digit:]]+) ([[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
+    regcomp(&floop_rx, "^floop ([.[:digit:]]+) ([.[:digit:][:space:]]+) ([[:digit:]]{1,2})$", REG_EXTENDED|REG_ICASE);
     if (regexec(&floop_rx, trim_tok, 4, flmatch, 0) == 0) {
 
       printf("FLOOP CALLED\n");
@@ -322,8 +322,8 @@ void interpret(char *line)
       char mod_freq_char[mod_freq_len + 1];
       strncpy(mod_freq_char, trim_tok+flmatch[1].rm_so, mod_freq_len);
       mod_freq_char[mod_freq_len] = '\0';
-      int mod_freq = atoi(mod_freq_char);
-      printf("FLOOP PASSED #1 - modulator freq us %d\n", mod_freq);
+      double mod_freq = atof(mod_freq_char);
+      printf("FLOOP PASSED #1 - modulator freq us %f\n", mod_freq);
 
       int floop_match_len = flmatch[3].rm_eo - flmatch[3].rm_so;
       printf("START: %lld, END: %lld\n", flmatch[3].rm_eo, flmatch[3].rm_so);
@@ -346,7 +346,7 @@ void interpret(char *line)
       printf("FMLOOP LEN IS %d\n", floop_len);
       printf("NUM OF FMMMM FREAKS IN HERE IS %d\n", freqs->num_freaks);
       for (int i = 0; i < freqs->num_freaks; i++) {
-        printf("FMFREQ[%d] = %d\n", i, freqs->freaks[i]);
+        printf("FMFREQ[%d] = %f\n", i, freqs->freaks[i]);
       }
 
       melody_msg *mm = new_melody_msg(freqs->freaks, freqs->num_freaks, floop_len);

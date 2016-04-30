@@ -34,7 +34,7 @@ algo *new_algo()
   return a;
 }
 
-void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int note_len)
+void play_melody(const int osc_num, int *mlock, int *note, double *notes, const int note_len)
 {
   if (!*mlock) {
 
@@ -50,7 +50,7 @@ void play_melody(const int osc_num, int *mlock, int *note, int *notes, const int
   }
 }
 
-void fplay_melody(const int sg_num, int *mlock, int *note, int *notes, const int note_len)
+void fplay_melody(const int sg_num, int *mlock, int *note, double *notes, const int note_len)
 {
   if (!*mlock) {
 
@@ -65,7 +65,7 @@ void fplay_melody(const int sg_num, int *mlock, int *note, int *notes, const int
   }
 }
 
-melody_msg* new_melody_msg(int* freqs, int melody_note_len, int loop_len)
+melody_msg* new_melody_msg(double* freqs, int melody_note_len, int loop_len)
 {
   melody_msg* m = calloc(1, sizeof(melody_msg));
   m->melody = freqs;
@@ -80,14 +80,14 @@ melody_msg* new_melody_msg(int* freqs, int melody_note_len, int loop_len)
 void *loop_run(void *m)
 {
   melody_msg *mmsg = (melody_msg*) m;
-  printf("LOOP RUN CALLED - got me a msg: %d, %d, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len);
+  printf("LOOP RUN CALLED - got me a msg: %f, %f, %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len);
 
   int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
   mmsg->osc_num = osc_num;
   do {} while (b->cur_tick % 16 != 0);
   faderrr(osc_num, UP);
 
-  srand(time(NULL));
+  srand(time(0));
 
   while (1)
   {
@@ -131,7 +131,7 @@ void *randdrum_run(void *m)
 void *floop_run(void *m)
 {
   melody_msg *mmsg = (melody_msg*) m;
-  printf("FLOOP RUN CALLED - got me a msg: %d, %d, %d MOD FREQ: %d\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len, mmsg->mod_freq);
+  printf("FLOOP RUN CALLED - got me a msg: %f, %f, %d MOD FREQ: %f\n", mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len, mmsg->mod_freq);
 
   int fm_one = add_fm(mixr, mmsg->mod_freq, mmsg->melody[0]);
   mmsg->osc_num = fm_one;
@@ -158,7 +158,7 @@ void *algo_run(void *a)
 {
   (void) a;
 
-  srand(time(NULL));
+  srandom(time(0));
 
   static double ma_numbers[3];
   double ma_notes[9];
@@ -194,12 +194,15 @@ void *algo_run(void *a)
   }
 
 
-  int num_of_sigs = (rand() % 3) + 1;
+  int num_of_sigs = (random() % 4) + 1;
   printf("Num of sigs: %d\n", num_of_sigs);
 
   for ( int i = 0; i < num_of_sigs; i++ ) {
-    int fm = add_fm(mixr, ma_notes[rand()%9], ma_notes[rand()%9]);
-    do {} while (b->cur_tick % 16 != 0);
+    int fm = add_fm(mixr, ma_notes[random()%9], ma_notes[random()%9]);
+    int env_type = 0;
+    int bars = (random() % 3) + 1;
+    add_delay_soundgen(mixr->sound_generators[fm], bars, env_type);
+    do {} while (b->cur_tick % 8 != 0);
     faderrr(fm, UP);
   }
 
@@ -208,12 +211,16 @@ void *algo_run(void *a)
 
   while (1)
   {
-    if (b->cur_tick % (16) == 0)  {
+    if (b->cur_tick % (32) == 0)  {
       if (!changed_lock) {
         changed_lock = 1;
-        int ma_sig = rand()%num_of_sigs;
-        double ma_new_note = ma_notes[rand()%9];
-        int car_or_mod = ( rand()%2 > 0 ) ? 1 : 0;
+        int ma_sig = random()%num_of_sigs;
+        double ma_new_note = ma_notes[random()%9];
+        if ( random()%100 > 50 ) {
+          ma_new_note *= 2;
+          printf("DOUBLE! %.2f\n", ma_new_note);
+        }
+        int car_or_mod = ( random()%100 > 70 ) ? 0 : 1; // favor mod
         printf("Change sig %d to %.2f\n", ma_sig, ma_new_note);
         if ( car_or_mod ) {
           printf("CAR!\n");
@@ -223,11 +230,32 @@ void *algo_run(void *a)
           mfm(mixr->sound_generators[ma_sig], "mod", ma_new_note);
         }
 
-        if ( rand() % 100 > 30 ) {
-          ma_sig = rand()%num_of_sigs;
-          float delay_time = (float)(rand()%3);
-          add_delay_soundgen(mixr->sound_generators[ma_sig], delay_time, DELAY);
-          printf("Added delay for %d -> %.2f\n", ma_sig, delay_time);
+        // delay
+        //if ( random() % 100 > 30 ) {
+        //  ma_sig = random()%num_of_sigs;
+        //  float delay_time = (float)random()/RAND_MAX + (random() % 10);
+        //  add_delay_soundgen(mixr->sound_generators[ma_sig], delay_time, DELAY);
+        //  printf("Added delay for %d -> %.2f\n", ma_sig, delay_time);
+        //}
+
+        // envelope
+        //if ( random() % 100 > 40 ) {
+        //  ma_sig = random()%num_of_sigs;
+        //  //int env_type = random() % 3;
+        //  int env_type = 0;
+        //  int bars = (random() % 3) + 1;
+
+        //  add_delay_soundgen(mixr->sound_generators[ma_sig], bars, env_type);
+        //  printf("Added Env for %d - type %d for %d bars\n", ma_sig, env_type, bars);
+        //}
+
+        // duck
+        if ( random() % 100 > 60 ) {
+          ma_sig = random()%num_of_sigs;
+          SBMSG *msg = new_sbmsg();
+          msg->sound_gen_num = ma_sig;
+          strncpy(msg->cmd, "duckrrr", 19);
+          thrunner(msg);
         }
 
         // 1 pick random sig_gen, 2 pick random ma_note, pick rand car or mod, change

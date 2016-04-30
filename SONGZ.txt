@@ -1,71 +1,3 @@
-
-fm 177 47
-sine 230
-sine 227
-loop 180 150 8
-loop 227 267 3
-
-loop 220 261 4
-
-loop 230 360 4
-loop 454 261 2
-fm 42 180
-
-
-loop 261 329 392 4
-loop 293 370 440 4
-loop 392 494 587 4
-
-loop 261 293 392 2
-loop 329 370 494 4
-loop 392 440 587 8
-
-loop 293 658 7
-loop 195 439 4
-loop 293 146 3
-
-loop 293 195 439 3
-loop 392 261 588 4
-loop 261 174 391 7
-
-loop 261 174 391 3
-loop 329 219 493 4
-loop 392 261 588 7
-
-#// k_nuth
-# OCEAN1.WAV
-loop 392 261 588 1
-loop 311 207 466 3, loop 466 310 699 4
-loop 466 310 699 2
-
-play wuk1.wav 0 4 12
-loop 261 622 391 3, loop 311 415 261 4
-play clap.aif 10 13
-play hihat1.aif 0 2 4 6 8 10
-loop 415 276 174 1
-// loop 311 415 261 4
-play wuhh184.wav 3 9
-loop 414 933 1
-stop ^
-duck 0, duck 2
-
-#BASSS/// c# f g#
-bpm 120
-loop 277 349 415 3, loop 277 349 415 4, play kick2.wav 0 3 6 8 14
-loop 184 232 276 4
-play snare.wav 4 12
-play hihat1.aif 2 4 6 8 9
-
-# WAVVVES.WAV
-loop 415 523 622 1
-play kick2.wav 0 3 6 8 14
-play snare.wav 4 12
-play hihat1.aif 2 4 6 8 9
-play wuhh184.wav 11 13 15
-duck 0, duck 1, duck 2, duck 3, duck 4, duck 5
-play clap.aif 11 15
-
-
 # COFFEE TROUBLE
 floop 174 349 0 349 0 3, floop 349 0 349 0 0 4, delay 0 0.7, env 0 3 0, env 1 4 0, lowpass 0 450, lowpass 1 65, delay 1 0.3
 floop 174 349 0 349 0 3, floop 349 0 349 0 0 4, delay 2 0.7, env 3 3 1, lowpass 2 766, lowpass 3 234
@@ -82,12 +14,6 @@ stop 5, stop 3
 stop 0, stop 1, stop 2
 stop 4, stop 6
 
-# BOX ELDER
-delay
-loop 440 277 329 1, loop 293 370 392 3, loop 392 494 293 4, env 0 2 0, env 1 3 1, env 2 2 2
-floop 277 277 293 0 293 3, env 3 4 2
-floop 293 277 293 0 293 4, env 4 2 1
-
 # wit ERIC - F
 attilan.wav
 floop 86 0 0 86 43 2
@@ -98,7 +24,7 @@ floop 32 32 0 1, env 0 3 0
 loop 160 0 1, env 4 3 1
 
 
-HAN##
+## HAN##
 floop 130 130 0 130 164 4
 E G B
 floop 103 138 138 46 1
@@ -109,7 +35,7 @@ floop 493 311 369 2, env 2 4 0, lowpass 2 493
 floop 35 70 140 70 140 4
 
 
-VELOPES
+## VELOPES
 floop 65 87 37 4, env 0 4 0, env 0 1 2, reverb 0 3, delay 0 4
 floop 65 87 37 3, env 1 3 1, env 1 2 1, reverb 1 4, delay 1 5
 delay 0 12
@@ -117,36 +43,57 @@ delay 1 13
 floop 164 109 82 3, env 2 7 0, env 2 1 1, delay 2 0.3, reverb 2 0.3
 floop 109 109 82 4, env 3 4 0, env 3 2 1, delay 3 0.4, reverb 3 0.7
 
-JOEY // E e chord is e4(329.63) g#4(415.30) b4(493.88)
-floop 110 110 0 4, delay 0 0.3, env 0 3 0, env 0 1 1
-floop 103 103 138 2, env 1 2 0, env 1 1 2, delay 1 1.2
-play wuhh184.wav 2 4 8 12, play hihat1.aif 3 9 11
-vol 2 0.1, vol 3 0.2
-play wuk1.wav 0 3 8 11, play clap.aif 4 12, floop 164 247 207 1, env 6 4 0, env 6 2 1
-vol 4 0.5, vol 5 0.6
-randd 4 2, sloop clapton2.wav 3, vol 7 0.4
-stop 4, play wuk1.wav 0 3 8 11, stop 5, vol 8 0.5
-floop 415 329 493 2, env 9 3 0, env 9 1 2, lowpass 9 415, delay 9 9
-randd 8 2, stop 0, stop 6
-solo 9
-stop 2, stop 3, stop 5, stop 4, stop 8, stop 7, stop 6
-stop 0
-stop 1, stop 9
+##SAT
+floop 349 174 220 2, env 0 7 0, delay 0 3.4
+floop 110 55 330 1, env 1 3 1, delay 1 7.6
+floop 110 55 330 3, env 2 3 2, delay 2 76
+delay 1 13
+delay 0 2.3, delay 0 0.6
+
+
+
+## J0EY // E e chord is e4(329.63) g#4(415.30) b4(493.88)
+sundaymorning_birds.wav + ocean2.wav
+
+floop 109.87 109.87 0 4, delay 0 0.3, env 0 3 0, env 0 1 1, delay 0 56, lowpass 0 109
+floop 103.82 103.82 138.43 2, env 1 2 0, env 1 1 2, delay 1 1.2
+floop 415 329 493 2, env 2 3 0, env 2 1 2, lowpass 2 415, delay 2 9
 
 
 ## APRIL SHOWERSZZZ
+rainyday_crossing.wav + rain_on_jacket.wav
 b chord is b4(493.88) d#4(311.13) f#4(369.99)
-493/7 = 70 || 493 / 4 = 123.25 || 493 / 3 = 164.3333
-311 / 7 = 44 || 311 / 4 = 77.75 || 311 / 3 = 103.6666 
+493/7 = 70.42 || 493 / 4 = 123.25 || 493 / 3 = 164.3333
+311 / 7 = 44.428 || 311 / 4 = 77.75 || 311 / 3 = 103.6666 
 370 / 7 = 52.857 || 370 / 4 = 92.5 || 370 / 3 = 123.3333
 
-floop 164 123 103 3
-floop 164 164 123 4
-
-env 0 4 0, env 0 2 2, floop 164 123 103 123 3
-
-floop 123 77 123 1
-
+floop 164.33 123.25 103.666 3, env 0 4 0, delay 0 0.5, lowpass 0 100
+floop 164.33 164.33 123.25 4, env 1 3 0, env 1 2 2, delay 1 2.3, lowpass 1 164
+floop 164.33 164.33 123.25 2, env 2 4 0, env 2 2 1, delay 2 37, midpass 2 164
+env 0 4 0, env 0 2 2, floop 164.33 123.25 103.66 123.25 3
+delay 3 7.4
+floop 123.25 77.75 123.25 1
+mfm 2 car 328.66
 env 1 4 1
 env 3 7 0, env 3 1 2
+stop 1, stop 0
+stop 4
+
+
+## LG e4(329.63) g#4(415.30) b4(493.88)
+post_trouble_coffee.wav
+floop 70.55 164.62 82.4 3, env 0 5 0, delay 0 0.3, bandpass 0 230, delay 0 4.3, floop 54.87 82.31 246.94 1, env 1 1 2, lowpass 1 443
+floop 54.87 82.31 246.94 2, env 2 1 1, delay 2 0.7
+floop 141.10 70.55 141.10 35.27 4, env 3 4 2, delay 3 0.2
+stop 0, stop 2
+
+##  M01RA
+passing_talker.wav + sandwalk.wav
+floop 164.62 123.47 164.62 415.30 103.82 2, lowpass 0 138, delay 0 43, env 0 3 0, env 0 1 2, delay 0 4.3
+floop 82.31 61.73 82.31 207.65 3, lowpass 1 138, env 1 4 0, delay 1 4.3
+...
+env 1 7 2
+env 0 7 1
+stop 0
+stop 1
 

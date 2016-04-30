@@ -140,12 +140,12 @@ void faderrr(int sg_num, direction d)
   double vol = 0;
 
   if (d == UP) {
-    while (vol < 0.5) {
+    while (vol < 0.4) {
       vol += 0.0001;
       mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
       nanosleep(&ts, NULL);
     }
-    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.5);
+    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.4);
   } else {
     double vol = mixr->sound_generators[sg_num]->getvol(mixr->sound_generators[sg_num]);
     while (vol > 0.0) {
@@ -175,7 +175,7 @@ freaky* new_freqs_from_string(char* string)
   f->freaks = calloc(freq_count, sizeof(int));
 
   for (int i = 0; i < freq_count; i++) {
-    f->freaks[i] = atoi(fargv[i]);
+    f->freaks[i] = atof(fargv[i]);
   }
   return f;
 }
