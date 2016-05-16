@@ -3,13 +3,11 @@
 
 #include <stdio.h>
 
-#include "oscil.h"
 #include "sound_generator.h"
 #include "table.h"
 
 typedef struct t_oscil OSCIL;
 
-typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*freqy) (OSCIL* osc, double freq);
 typedef void (*incry) (OSCIL* osc, double freq);
 

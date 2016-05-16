@@ -97,3 +97,16 @@ env 0 7 1
 stop 0
 stop 1
 
+## MARY J
+em chord is b4(493.88) d#4(311.13) f#4(369.99)
+
+
+## DO WHILE -- F
+sloop dowhile.wav 2, sloop dowhile.wav 1, up 0, up 1
+play kick.wav 0 8, lowpass 2 230, delay 2 0.1, up 2
+randd 2 2, play kick2.wav 0 8, up 3, lowpass 3 110
+play hihat1.aif 0, randd 4, lowpass 4 780, up 4
+delay 0 7
+delay 1 2.3
+play clap.aif 4 12, lowpass 5 104, up 5
+floop 49.89 49.89 26.86 4

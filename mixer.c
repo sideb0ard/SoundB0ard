@@ -6,6 +6,7 @@
 
 #include <portaudio.h>
 
+#include "bitwize.h"
 #include "defjams.h"
 #include "drumr.h"
 #include "effect.h"
@@ -125,6 +126,26 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm)
   return mixr->soundgen_num++;
 }
 
+int add_bitwize(mixer *mixr)
+{
+
+  BITWIZE *new_bitw = new_bitwize();
+  if (new_bitw == NULL) {
+    printf("BITBARF!\n");
+    return -1;
+  }
+
+  SBMSG *m = new_sbmsg();
+  if (m == NULL) {
+    free(new_bitw);
+    printf("MBITBARF!\n");
+    return -1;
+  }
+
+  m->sound_generator = (SOUNDGEN *) new_bitw;
+  printf("Added bitwize gen!\n");
+  return add_sound_generator(mixr, m);
+}
 int add_osc(mixer *mixr, double freq, GTABLE *gt)
 {
 

@@ -5,14 +5,6 @@
 #include "envelope.h"
 #include "defjams.h"
 
-//typedef enum 
-//{
-//  OSC,
-//  FM,
-//  SAMPLER
-//} sound_generator_type;
-//
-
 typedef struct t_soundgen {
   //void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);
   double (*gennext)(void *self);
