@@ -50,7 +50,7 @@ void *timed_sig_start(void * arg)
   } else if (strcmp(msg->params, "sloop") == 0) {
       sg = add_sampler(mixr, msg->filename, msg->looplen);
   } else if (strcmp(msg->params, "bitwize") == 0) {
-      sg = add_bitwize(mixr);
+      sg = add_bitwize(mixr, msg->freq);
   }
 
   //faderrr(sg, UP);
@@ -142,12 +142,12 @@ void faderrr(int sg_num, direction d)
   double vol = 0;
 
   if (d == UP) {
-    while (vol < 0.4) {
+    while (vol < 0.6) {
       vol += 0.0001;
       mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
       nanosleep(&ts, NULL);
     }
-    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.4);
+    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.6);
   } else {
     double vol = mixr->sound_generators[sg_num]->getvol(mixr->sound_generators[sg_num]);
     while (vol > 0.0) {

@@ -13,10 +13,13 @@ typedef struct t_bitwize
   double incr;
   double vol;
 
+  int pattern;
+
 } BITWIZE;
 
-BITWIZE* new_bitwize(void);
+BITWIZE* new_bitwize(int pattern);
 
+char bitwize_process(int pattern, int t);
 double bitwize_gennext(void* self);
 void bitwize_setvol(void *self, double v);
 double bitwize_getvol(void *self);

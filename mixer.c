@@ -126,10 +126,10 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm)
   return mixr->soundgen_num++;
 }
 
-int add_bitwize(mixer *mixr)
+int add_bitwize(mixer *mixr, int pattern)
 {
 
-  BITWIZE *new_bitw = new_bitwize();
+  BITWIZE *new_bitw = new_bitwize(pattern);
   if (new_bitw == NULL) {
     printf("BITBARF!\n");
     return -1;

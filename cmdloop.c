@@ -395,7 +395,7 @@ void interpret(char *line)
     // loop sample play
     regmatch_t sfmatch[4];
     regex_t sfile_rx;
-    regcomp(&sfile_rx, "^(sloop) ([.[:alnum:]]+) ([[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&sfile_rx, "^(sloop) ([.[:alnum:]]+) ([.[:digit:]]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&sfile_rx, trim_tok, 4, sfmatch, 0) == 0) {
 
       printf("SLOOPY CMON!\n");

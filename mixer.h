@@ -41,7 +41,7 @@ typedef struct {
 mixer *new_mixer(void);
 
 void mixer_ps(mixer *mixr);
-int add_bitwize(mixer *mixr);
+int add_bitwize(mixer *mixr, int pattern);
 int add_osc(mixer *mixr, double freq, GTABLE *gt);
 int add_fm(mixer *mixr, double ffreq, double cfreq);
 int add_drum(mixer *mixr, char *filename, char *pattern);
