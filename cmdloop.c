@@ -435,11 +435,11 @@ void interpret(char *line)
 
       if ( mixr->soundgen_num > val1 ) {
         //printf("ENV CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-        if ( val3 >= 0 && val3 < 3 ) {
+        if ( val3 >= 0 && val3 < 4 ) {
           printf("Calling env with %lf %lf %lf\n", val1, val2, val3);
           add_envelope_soundgen(mixr->sound_generators[(int)val1], val2, val3);
         } else {
-          printf("Sorry, envelope type has to be between 0 and 2");
+          printf("Sorry, envelope type has to be between 0 and 3");
         }
       } else {
         printf("Oofft mate, you don't have enough sound_gens for that..\n");

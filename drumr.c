@@ -2,6 +2,7 @@
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
+#include <inttypes.h>
 
 #include "bpmrrr.h"
 #include "defjams.h"
@@ -52,6 +53,7 @@ DRUM* new_drumr(char *filename, char *pattern)
   printf("Filename:: %s\n", filename);
   printf("SR: %d\n", sf_info.samplerate);
   printf("Channels: %d\n", sf_info.channels);
+  printf("Format: %d\n", sf_info.format);
   printf("Frames: %lld\n", sf_info.frames);
 
   int bufsize = sf_info.channels * sf_info.frames;
@@ -63,7 +65,10 @@ DRUM* new_drumr(char *filename, char *pattern)
     return (void*) NULL;
   }
 
-  sf_readf_int(snd_file, buffer, bufsize);
+  printf("SFREADF_INT\n");
+  sf_count_t framecount = sf_readf_int(snd_file, buffer, bufsize);
+  printf("FRAMES READ/WRITTEN IS %" PRId64 "\n", framecount);
+  printf("POST SFREADF_INT\n");
 
   int fslen = strlen(filename);
   drumr->filename = calloc(1, fslen + 1);
@@ -104,20 +109,20 @@ double drum_gennext(void *self)
     if (!drumr->played) {
       drumr->playing = 1;
     }
-    if (drumr->playing) {
-      val =  drumr->buffer[drumr->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
-    } else {
-      val = 0.0;
-    }
-    if ((int)drumr->position == drumr->bufsize) { // end of playback - so reset
-      drumr->played = 1;
-      drumr->playing = 0;
-      drumr->position = 0;
-    }
-  } else {
-    drumr->position = 0;
-    drumr->played = 0;
   }
+
+  if (drumr->playing) {
+    val =  drumr->buffer[drumr->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+  }
+  if ((int)drumr->position == drumr->bufsize) { // end of playback - so reset
+    drumr->played = 0;
+    drumr->playing = 0;
+    drumr->position = 0;
+  }
+  //} else {
+  //  drumr->position = 0;
+  //  drumr->played = 0;
+  //}
   if (val > 1 || val < -1)
     printf("BURNIE - DRUM OVERLOAD!\n");
 

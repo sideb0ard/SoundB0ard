@@ -26,6 +26,7 @@ double envelope_stream_tick(ENVSTREAM* stream);
 ENVELOPE* newpoints(void);
 ENVELOPE* new_fadein_points(void);
 ENVELOPE* new_fadeout_points(void);
+ENVELOPE* new_wavey_points(void);
 void printbp(ENVELOPE *bp);
 
 void ps_envelope_stream(ENVSTREAM *stream);

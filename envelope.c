@@ -112,6 +112,32 @@ ENVELOPE* new_fadeout_points()
   return points;
 }
 
+ENVELOPE* new_wavey_points()
+{
+
+  ENVELOPE *points = NULL;
+  points = (ENVELOPE*) calloc(8, sizeof(ENVELOPE));
+  if (points == NULL)
+    return NULL;
+  points[0].time = 0.0; 
+  points[0].value = 0.3;
+  points[1].time = 12.00;
+  points[1].value = 0.6;
+  points[2].time = 24.00; 
+  points[2].value = 0.8;
+  points[3].time = 36.00; 
+  points[3].value = 0.5;
+  points[4].time = 48.0;
+  points[4].value = 0.4;
+  points[5].time = 60.0;
+  points[5].value = 0.6;
+  points[6].time = 72.0;
+  points[6].value = 0.4;
+  points[7].time = 85.0;
+  points[7].value = 0.3;
+  return points;
+}
+
 ENVSTREAM* new_envelope_stream(int env_len, int type) // env_len is bars TODO: enum
 {
 
@@ -133,6 +159,10 @@ ENVSTREAM* new_envelope_stream(int env_len, int type) // env_len is bars TODO: e
     case 2 :
       points = new_fadeout_points();
       stream->npoints = 5;
+      break;
+    case 3 :
+      points = new_wavey_points();
+      stream->npoints = 8;
       break;
     default:
       points = newpoints();
