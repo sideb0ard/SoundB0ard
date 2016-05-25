@@ -44,4 +44,5 @@ typedef enum {
   BITWIZE_TYPE,
   DRUM_TYPE
 } sound_generator_type;
+
 #endif

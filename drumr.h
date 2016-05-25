@@ -16,6 +16,7 @@ typedef struct t_drumr
   int position;
   int playing;
   int played;
+  int tick;
   int samplerate;
   int channels;
   double vol;
