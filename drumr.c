@@ -14,6 +14,7 @@ DRUM* new_drumr(char *filename, char *pattern)
 {
   DRUM *drumr = calloc(1, sizeof(DRUM));
   drumr->position = 0;
+  drumr->swing = 0;
 
   // drum pattern stuff
   int sp_count = 0;
@@ -90,6 +91,12 @@ DRUM* new_drumr(char *filename, char *pattern)
   return drumr;
 }
 
+void swingrrr(void *self)
+{
+    DRUM *drumr = self;
+    drumr->swing = 1 - drumr->swing; // toggle
+}
+
 void update_pattern(void *self, int newpattern)
 {
     DRUM *drumr = self;
@@ -104,34 +111,39 @@ double drum_gennext(void *self)
   DRUM *drumr = self;
   double val = 0;
 
-  if ( drumr->tick != b->cur_tick) {
-    drumr->tick = b->cur_tick;
-    //if ( drumr->tick % 2 ) { // odd beats
-    //  //printf("SWUNG TICK!\n");
-    //  drumr->position = -200;
-    //} else {
-    //  //printf("TICK!\n");
-    //}
+  if ( b->cur_tick % TICKS_PER_BEAT == 0 ) {
+    if (!drumr->tick_started) {
+      drumr->tick++;
+      drumr->tick_started = 1;
+    }
+  } else {
+    drumr->tick_started = 0;
   }
 
-
-  if (drumr->pattern & ( 1 << (b->cur_tick % DRUM_PATTERN_LEN))) {
-    if (!drumr->played) {
+  if (!drumr->swing) {
+    if (drumr->pattern & ( 1 << (drumr->tick % DRUM_PATTERN_LEN)) && 
+                                (b->cur_tick % TICKS_PER_BEAT == 0) ) {
       drumr->playing = 1;
+      drumr->position = 0;
+    }
+  } else {
+    if (drumr->pattern & ( 1 << (drumr->tick % DRUM_PATTERN_LEN))) {
+      if ( drumr->tick % 2 && b->cur_tick % TICKS_PER_BEAT == 7 ) {
+        drumr->playing = 1;
+        drumr->position = 0;
+      } else if (b->cur_tick % TICKS_PER_BEAT == 0) {
+        drumr->playing = 1;
+        drumr->position = 0;
+      }
     }
   }
 
   if (drumr->playing) {
-    //if (drumr->position > 0) {
-      val =  drumr->buffer[drumr->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
-    //} else {
-    //  val = 0; drumr->position++;
-    //}
+    val = drumr->buffer[drumr->position++] / 2147483648.0 ; // convert 16bit to double btw 0 and 1
   }
 
   if ((int)drumr->position == drumr->bufsize) { // end of playback - so reset
     drumr->playing = 0;
-    drumr->played = 0;
     drumr->position = 0;
   }
 

@@ -119,3 +119,7 @@ play 2shaker.aif 12 14, up 3
 bitwize 0, env 4 3 2, env 4 1 1, up 4, lowpass 4 180
 floop 110 55 110 4, env 5 4 0, lowpass 5 110
 bitwize 2, env 6 4 0, lowpass 6 110, delay 6 0.6, up 6
+
+
+play 2kick.aif 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15, up 0
+play 2hat.aif 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15, up 1

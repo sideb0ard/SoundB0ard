@@ -22,16 +22,17 @@ bpmrrr *new_bpmrrr()
 
   b->bpm = DEFAULT_BPM;
   b->cur_tick = 0;
-  b->sleeptime = (60.0 / b->bpm / 4 ) * 1000000000; // 4 "microticks" per BPS as nanosec
+  //b->sleeptime = (60.0 / b->bpm / TICKS_PER_BEAT ) * 1000000000; 
+  b->sleeptime = (60.0 / b->bpm / TICKS_PER_BEAT ) * 1000000000; 
 
   return b;
 }
 
 void bpm_change(bpmrrr *b, int bpm)
 {
-  if (bpm > 60) { // my sleeptime calculation would break if this was under 60
+  if (bpm >= 60) { // my sleeptime calculation would break if this was under 60
     b->bpm = bpm;
-    b->sleeptime = (60.0 / b->bpm / 4 ) * 1000000000;
+    b->sleeptime = (60.0 / b->bpm / TICKS_PER_BEAT ) * 1000000000;
   }
 }
 
@@ -51,8 +52,13 @@ void *bpm_run(void *bp)
     pthread_mutex_unlock(&bpm_lock);
 
     struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = b->sleeptime;
+    if ( b->sleeptime == 1000000000.000000 ) { // assuming won't go below 60bpm
+      ts.tv_sec = 1;
+      ts.tv_nsec = 0L;
+    } else {
+      ts.tv_sec = 0;
+      ts.tv_nsec = b->sleeptime;
+    }
     nanosleep(&ts, NULL);
   }
 }

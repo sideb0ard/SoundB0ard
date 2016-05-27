@@ -3,8 +3,6 @@
 
 #include "sound_generator.h"
 
-#define DRUM_PATTERN_LEN 16
-
 typedef struct t_drumr
 {
   SOUNDGEN sound_generator;
@@ -15,8 +13,9 @@ typedef struct t_drumr
   int bufsize;
   int position;
   int playing;
-  int played;
   int tick;
+  int swing;
+  int tick_started;
   int samplerate;
   int channels;
   double vol;
@@ -30,5 +29,6 @@ void drum_setvol(void *self, double v);
 double drum_gennext(void* self);
 double drum_getvol(void *self);
 void update_pattern(void *self, int newpattern);
+void swingrrr(void *self);
 
 #endif // DRUM_H
