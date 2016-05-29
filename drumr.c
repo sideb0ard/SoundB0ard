@@ -111,18 +111,20 @@ double drum_gennext(void *self)
   DRUM *drumr = self;
   double val = 0;
 
-  if ( b->cur_tick % TICKS_PER_BEAT == 0 ) {
+  if ( (b->cur_tick % (TICKS_PER_BEAT)) == 0 ) {
+  //if ( (b->cur_tick % TICKS_PER_BEAT) == 0 ) {
     if (!drumr->tick_started) {
       drumr->tick++;
       drumr->tick_started = 1;
+      //printf("TICK %d\n", drumr->tick);
     }
   } else {
     drumr->tick_started = 0;
   }
 
   if (!drumr->swing) {
-    if (drumr->pattern & ( 1 << (drumr->tick % DRUM_PATTERN_LEN)) && 
-                                (b->cur_tick % TICKS_PER_BEAT == 0) ) {
+    if (drumr->pattern & (1 << (drumr->tick % DRUM_PATTERN_LEN)) && 
+                          (b->cur_tick % (TICKS_PER_BEAT) == 0)) {
       drumr->playing = 1;
       drumr->position = 0;
     }
