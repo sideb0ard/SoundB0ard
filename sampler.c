@@ -72,7 +72,9 @@ SAMPLER* new_sampler(char *filename, int loop_len)
 void sampler_set_incr(void* self) 
 {
   SAMPLER *sampler = self;
-  int incr = (sampler->bufsize / (60.0 / (b->bpm) * SAMPLE_RATE)) * sampler->loop_len;
+  //int incr = (sampler->bufsize / (60.0 / (b->bpm) * SAMPLE_RATE * TICKS_PER_BAR)) * sampler->loop_len;
+  long incr = (sampler->bufsize / (60.0 / (b->bpm) * SAMPLE_RATE / TICKS_PER_BAR)) * sampler->loop_len;
+  printf("INCR is %ld\n", incr);
   sampler->incr = incr;
 }
 

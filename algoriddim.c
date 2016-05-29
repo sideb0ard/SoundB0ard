@@ -84,14 +84,14 @@ void *loop_run(void *m)
 
   int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
   mmsg->osc_num = osc_num;
-  do {} while (b->cur_tick % 16 != 0);
+  do {} while (b->cur_tick % TICKS_PER_BAR != 0);
   faderrr(osc_num, UP);
 
   srand(time(0));
 
   while (1)
   {
-    if (b->cur_tick % (4*(mmsg->melody_loop_len)) == 0) {
+    if (b->cur_tick % (TICKS_PER_BAR*(mmsg->melody_loop_len)) == 0) {
       play_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
     } else if (mmsg->melody_play_lock) {
       mmsg->melody_play_lock = 0;
@@ -112,7 +112,7 @@ void *randdrum_run(void *m)
 
   while (1) 
   {
-    if (b->cur_tick % (4*looplen) == 0) {
+    if (b->cur_tick % (TICKS_PER_BAR*looplen) == 0) {
         if ( !changed ) {
             changed = 1;
             int pattern = rand() % 65535; // max for an unsigned int
@@ -135,14 +135,14 @@ void *floop_run(void *m)
 
   int fm_one = add_fm(mixr, mmsg->mod_freq, mmsg->melody[0]);
   mmsg->osc_num = fm_one;
-  do {} while (b->cur_tick % 16 != 0);
+  do {} while (b->cur_tick % TICKS_PER_BAR != 0);
   faderrr(fm_one, UP);
   //sleep(3);
   srand(time(NULL));
 
   while (1)
   {
-    if (b->cur_tick % (4*(mmsg->melody_loop_len)) == 0) {
+    if (b->cur_tick % (TICKS_PER_BAR*(mmsg->melody_loop_len)) == 0) {
       fplay_melody(mmsg->osc_num, &mmsg->melody_play_lock, &mmsg->melody_cur_note, mmsg->melody, mmsg->melody_note_len);
     } else if (mmsg->melody_play_lock) {
       mmsg->melody_play_lock = 0;
@@ -202,7 +202,7 @@ void *algo_run(void *a)
     int env_type = 0;
     int bars = (random() % 3) + 1;
     add_delay_soundgen(mixr->sound_generators[fm], bars, env_type);
-    do {} while (b->cur_tick % 8 != 0);
+    do {} while (b->cur_tick % TICKS_PER_BAR != 0);
     faderrr(fm, UP);
   }
 
@@ -211,7 +211,7 @@ void *algo_run(void *a)
 
   while (1)
   {
-    if (b->cur_tick % (32) == 0)  {
+    if (b->cur_tick % TICKS_PER_BAR == 0)  {
       if (!changed_lock) {
         changed_lock = 1;
         int ma_sig = random()%num_of_sigs;
