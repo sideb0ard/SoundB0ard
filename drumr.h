@@ -15,6 +15,7 @@ typedef struct t_drumr
   int playing;
   int tick;
   int swing;
+  int swing_setting;
   int tick_started;
   int samplerate;
   int channels;
@@ -29,6 +30,6 @@ void drum_setvol(void *self, double v);
 double drum_gennext(void* self);
 double drum_getvol(void *self);
 void update_pattern(void *self, int newpattern);
-void swingrrr(void *self);
+void swingrrr(void *self, int swing_setting);
 
 #endif // DRUM_H

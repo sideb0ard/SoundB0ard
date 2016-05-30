@@ -217,7 +217,7 @@ void interpret(char *line)
         if (strcmp(cmd_type, "swing") == 0) {
             if ( mixr->sound_generators[(int)val1]->type == DRUM_TYPE ) {
               printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-              swingrrr(mixr->sound_generators[(int)val1]);
+              swingrrr(mixr->sound_generators[(int)val1], val2);
             } else {
               printf("SWING CALLED, BUT NO FO DRUM MACHINE! %s %.lf %.lf\n", cmd_type, val1, val2);
             }

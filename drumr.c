@@ -91,10 +91,11 @@ DRUM* new_drumr(char *filename, char *pattern)
   return drumr;
 }
 
-void swingrrr(void *self)
+void swingrrr(void *self, int swing_setting)
 {
     DRUM *drumr = self;
     drumr->swing = 1 - drumr->swing; // toggle
+    drumr->swing_setting = swing_setting;
 }
 
 void update_pattern(void *self, int newpattern)
@@ -112,11 +113,9 @@ double drum_gennext(void *self)
   double val = 0;
 
   if ( (b->cur_tick % (TICKS_PER_BEAT)) == 0 ) {
-  //if ( (b->cur_tick % TICKS_PER_BEAT) == 0 ) {
     if (!drumr->tick_started) {
       drumr->tick++;
       drumr->tick_started = 1;
-      //printf("TICK %d\n", drumr->tick);
     }
   } else {
     drumr->tick_started = 0;
@@ -130,10 +129,12 @@ double drum_gennext(void *self)
     }
   } else {
     if (drumr->pattern & ( 1 << (drumr->tick % DRUM_PATTERN_LEN))) {
-      if ( drumr->tick % 2 && b->cur_tick % TICKS_PER_BEAT == 7 ) {
+      if ( b->cur_tick % TICKS_PER_BEAT == 0 ){
+        //printf("SCHWING\n");
         drumr->playing = 1;
         drumr->position = 0;
-      } else if (b->cur_tick % TICKS_PER_BEAT == 0) {
+      } else if ( (drumr->tick % 2) && b->cur_tick % TICKS_PER_BEAT == drumr->swing_setting ){
+        //printf("SCHWUNG\n");
         drumr->playing = 1;
         drumr->position = 0;
       }
