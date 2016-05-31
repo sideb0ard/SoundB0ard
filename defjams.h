@@ -13,7 +13,7 @@
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 
 //#define TICKS_PER_BEAT 960 // standard for MIDI
-#define TICKS_PER_BAR 960
+#define TICKS_PER_BAR 32
 #define TICKS_PER_BEAT (TICKS_PER_BAR / 4)
 
 #define DRUM_PATTERN_LEN 16
