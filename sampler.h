@@ -9,18 +9,15 @@ typedef struct t_sampler
   char *filename;
   int *buffer;
   int bufsize;
-  int position;
-  int playing;
-  int played;
+  double position;
   int samplerate;
   int channels;
-  int loop_len;
+  double loop_len;
   double vol;
-  int incr;
-  int curtick;
+  double incr;
 } SAMPLER;
 
-SAMPLER* new_sampler(char *filename, int loop_len); // loop_len in bars
+SAMPLER* new_sampler(char *filename, double loop_len); // loop_len in bars
 
 //void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double sampler_gennext(void* self);

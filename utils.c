@@ -48,6 +48,7 @@ void *timed_sig_start(void * arg)
   } else if (strcmp(msg->params, "fm") == 0) {
       sg = add_fm(mixr, msg->modfreq, msg->carfreq);
   } else if (strcmp(msg->params, "sloop") == 0) {
+    printf("TIMED .... %f\n", msg->looplen);
       sg = add_sampler(mixr, msg->filename, msg->looplen);
   } else if (strcmp(msg->params, "bitwize") == 0) {
       sg = add_bitwize(mixr, msg->freq);

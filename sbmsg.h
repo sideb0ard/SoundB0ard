@@ -10,7 +10,7 @@ typedef struct sbmsg {
   char cmd[20];
   char params[20];
   char filename[100];
-  int looplen;
+  double looplen;
   int freq;
   int modfreq;
   int carfreq;

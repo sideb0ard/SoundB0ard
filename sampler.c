@@ -9,7 +9,7 @@
 
 extern bpmrrr *b;
 
-SAMPLER* new_sampler(char *filename, int loop_len)
+SAMPLER* new_sampler(char *filename, double loop_len)
 {
   SAMPLER *sampler = calloc(1, sizeof(SAMPLER));
   sampler->position = 0;
@@ -48,17 +48,12 @@ SAMPLER* new_sampler(char *filename, int loop_len)
   sampler->bufsize = bufsize;
   sampler->samplerate = sf_info.samplerate;
   sampler->channels = sf_info.channels;
+  printf("LOOP LEN IS %f\n", loop_len);
   sampler->loop_len = loop_len;
+  printf("SAMPLER LOOP LEN IS %f\n", sampler->loop_len);
   sampler->vol = 0.0;
 
   sampler_set_incr(sampler);
-  //int incr = (bufsize / (60.0 / (b->bpm) * SAMPLE_RATE)) * loop_len;
-
-  //if (incr < 1) {
-  //  printf("WEE INCR!\n");
-  //  incr = 1;
-  //}
-  //sampler->incr = incr;
 
   sampler->sound_generator.gennext = &sampler_gennext;
   sampler->sound_generator.status = &sampler_status;
@@ -72,9 +67,9 @@ SAMPLER* new_sampler(char *filename, int loop_len)
 void sampler_set_incr(void* self) 
 {
   SAMPLER *sampler = self;
-  //int incr = (sampler->bufsize / (60.0 / (b->bpm) * SAMPLE_RATE * TICKS_PER_BAR)) * sampler->loop_len;
-  long incr = (sampler->bufsize / (60.0 / (b->bpm) * SAMPLE_RATE / TICKS_PER_BAR)) * sampler->loop_len;
-  printf("INCR is %ld\n", incr);
+  printf("BUFSIZE is %d\n", sampler->bufsize);
+  double incr = sampler->bufsize / (SAMPLE_RATE * (60.0 / b->bpm * 4) / sampler->loop_len * sampler->channels);
+  printf("INCR is %f\n", incr);
   sampler->incr = incr;
 }
 
@@ -82,19 +77,30 @@ double sampler_gennext(void *self)
 //void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
   SAMPLER *sampler = self;
-  double val = 0;
+  //double val = 0;
 
-  //sampler->position = sampler->curtick % (sampler->bufsize / SAMPLE_RATE);
-  //if ( sampler->curtick % (SAMPLE_RATE / sampler->bufsize) == 0 )
-  if ( sampler->curtick % sampler->incr == 0 )
-    sampler->position++;
+  int base_index = (int) (sampler->position);
+  unsigned long next_index = base_index + 1;
+  double frac, slope, val;
+  double bufsize = sampler->bufsize, position = sampler->position;
+  int* table = sampler->buffer;
+ 
+  frac = position - base_index;
+  val = table[base_index];
+  slope = table[next_index] - val;
 
-  sampler->curtick++;
+  val += (frac * slope);
+  position += sampler->incr;
 
-  val =  sampler->buffer[sampler->position] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
-  if ((int)sampler->position == sampler->bufsize) { // end of playback - so reset
-    sampler->position = 0;
-  }
+  while ( position >= bufsize )
+    position -= bufsize;
+  while ( position < 0.0 )
+    position += bufsize;
+
+  sampler->position = position;
+  //val =  sampler->buffer[sampler->position] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+
+  val = val / 2147483648.0 ;
 
   if (val > 1 || val < -1)
     printf("BURNIE - SAMPLER OVERLOAD!\n");

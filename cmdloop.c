@@ -154,6 +154,7 @@ void interpret(char *line)
         }
       } else {
         strncpy(msg->cmd, "timed_sig_start", 19);
+        printf("PARAMZZZ %s", cmd);
         strncpy(msg->params, cmd, 10);
         thrunner(msg);
       }
@@ -275,7 +276,7 @@ void interpret(char *line)
       char loop_len_char[loop_match_len + 1];
       strncpy(loop_len_char, trim_tok+lmatch[2].rm_so, loop_match_len);
       loop_len_char[loop_match_len] = '\0';
-      int loop_len = atoi(loop_len_char);
+      double loop_len = atof(loop_len_char);
 
       int frq_len = lmatch[1].rm_eo - lmatch[1].rm_so;
       char freaks[frq_len + 1];
@@ -285,7 +286,6 @@ void interpret(char *line)
 
       freaky* freqs = new_freqs_from_string(freaks);
 
-      printf("LOOP LEN IS %d\n", loop_len);
       printf("NUM OF FREAKS IN HERE IS %d\n", freqs->num_freaks);
       for (int i = 0; i < freqs->num_freaks; i++) {
         printf("FREQ[%d] = %f\n", i, freqs->freaks[i]);
@@ -321,8 +321,7 @@ void interpret(char *line)
       char floop_len_char[floop_match_len + 1];
       strncpy(floop_len_char, trim_tok+flmatch[3].rm_so, floop_match_len);
       floop_len_char[floop_match_len] = '\0';
-      int floop_len = atoi(floop_len_char);
-      printf("FLOOP LEN %d\n", floop_len);
+      double floop_len = atof(floop_len_char);
 
       int frq_len = flmatch[2].rm_eo - flmatch[2].rm_so;
       char freaks[frq_len + 1];
@@ -333,7 +332,6 @@ void interpret(char *line)
 
       freaky* freqs = new_freqs_from_string(freaks);
 
-      printf("FMLOOP LEN IS %d\n", floop_len);
       printf("NUM OF FMMMM FREAKS IN HERE IS %d\n", freqs->num_freaks);
       for (int i = 0; i < freqs->num_freaks; i++) {
         printf("FMFREQ[%d] = %f\n", i, freqs->freaks[i]);
@@ -399,9 +397,9 @@ void interpret(char *line)
       char looplen_char[looplen_len + 1];
       strncpy(looplen_char, trim_tok+sfmatch[3].rm_so, looplen_len);
       looplen_char[looplen_len] = '\0';
-      int looplen = atoi(looplen_char);
+      double looplen = atof(looplen_char);
 
-      printf("LOOPYZZ %s %d\n", filename, looplen);
+      printf("LOOPYZZ %s %f\n", filename, looplen);
       SBMSG *msg = new_sbmsg();
       strncpy(msg->cmd, "timed_sig_start", 19);
       strncpy(msg->params, "sloop", 10);

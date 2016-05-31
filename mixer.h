@@ -45,7 +45,7 @@ int add_bitwize(mixer *mixr, int pattern);
 int add_osc(mixer *mixr, double freq, GTABLE *gt);
 int add_fm(mixer *mixr, double ffreq, double cfreq);
 int add_drum(mixer *mixr, char *filename, char *pattern);
-int add_sampler(mixer *mixr, char *filename, int loop_len);
+int add_sampler(mixer *mixr, char *filename, double loop_len);
 int add_sound_generator(mixer *mixr, SBMSG *sbm);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);

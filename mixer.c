@@ -211,7 +211,7 @@ int add_drum(mixer *mixr, char *filename, char *pattern)
   return add_sound_generator(mixr, m);
 }
 
-int add_sampler(mixer *mixr, char *filename, int loop_len)
+int add_sampler(mixer *mixr, char *filename, double loop_len)
 {
   // preliminary setup
   char cwd[1024];
@@ -221,6 +221,7 @@ int add_sampler(mixer *mixr, char *filename, int loop_len)
   strcat(full_filename, "/wavs/");
   strcat(full_filename, filename);
 
+  printf("ADD SAMPLER - LOOP LEN %f\n", loop_len);
   SAMPLER *nsampler = new_sampler(full_filename, loop_len);
   if (nsampler == NULL) {
     printf("Barfed on sampler creation\n");
