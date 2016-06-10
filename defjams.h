@@ -15,6 +15,7 @@
 //#define TICKS_PER_BEAT 960 // standard for MIDI
 #define TICKS_PER_BAR 32
 #define TICKS_PER_BEAT (TICKS_PER_BAR / 4)
+#define TICK_SIZE 32
 
 #define DRUM_PATTERN_LEN 16
 

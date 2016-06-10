@@ -13,6 +13,7 @@ typedef struct t_drumr
   int bufsize;
   int position;
   int playing;
+  int played;
   int tick;
   int swing;
   int swing_setting;

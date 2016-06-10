@@ -1,8 +1,6 @@
-#include <libgen.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
-#include <inttypes.h>
 
 #include "bpmrrr.h"
 #include "defjams.h"
@@ -14,7 +12,6 @@ DRUM* new_drumr(char *filename, char *pattern)
 {
   DRUM *drumr = calloc(1, sizeof(DRUM));
   drumr->position = 0;
-  drumr->swing = 0;
 
   // drum pattern stuff
   int sp_count = 0;
@@ -54,7 +51,6 @@ DRUM* new_drumr(char *filename, char *pattern)
   printf("Filename:: %s\n", filename);
   printf("SR: %d\n", sf_info.samplerate);
   printf("Channels: %d\n", sf_info.channels);
-  printf("Format: %d\n", sf_info.format);
   printf("Frames: %lld\n", sf_info.frames);
 
   int bufsize = sf_info.channels * sf_info.frames;
@@ -66,10 +62,7 @@ DRUM* new_drumr(char *filename, char *pattern)
     return (void*) NULL;
   }
 
-  printf("SFREADF_INT\n");
-  sf_count_t framecount = sf_readf_int(snd_file, buffer, bufsize);
-  printf("FRAMES READ/WRITTEN IS %" PRId64 "\n", framecount);
-  printf("POST SFREADF_INT\n");
+  sf_readf_int(snd_file, buffer, bufsize);
 
   int fslen = strlen(filename);
   drumr->filename = calloc(1, fslen + 1);
@@ -79,7 +72,7 @@ DRUM* new_drumr(char *filename, char *pattern)
   drumr->bufsize = bufsize;
   drumr->samplerate = sf_info.samplerate;
   drumr->channels = sf_info.channels;
-  drumr->vol = 0.0;
+  drumr->vol = 0.7;
 
   drumr->sound_generator.gennext = &drum_gennext;
   drumr->sound_generator.status = &drum_status;
@@ -89,13 +82,6 @@ DRUM* new_drumr(char *filename, char *pattern)
 
   // TODO: do i need to free pattern ?
   return drumr;
-}
-
-void swingrrr(void *self, int swing_setting)
-{
-    DRUM *drumr = self;
-    drumr->swing = 1 - drumr->swing; // toggle
-    drumr->swing_setting = swing_setting;
 }
 
 void update_pattern(void *self, int newpattern)
@@ -112,44 +98,30 @@ double drum_gennext(void *self)
   DRUM *drumr = self;
   double val = 0;
 
-  if ( (b->cur_tick % (TICKS_PER_BEAT)) == 0 ) {
-    if (!drumr->tick_started) {
-      drumr->tick++;
-      drumr->tick_started = 1;
-    }
-  } else {
-    drumr->tick_started = 0;
+  if ( b->cur_tick % (TICK_SIZE/4) == 0 ) {
+      drumr->tick = drumr->tick + 1;
+      //printf("My tick is %d\n", drumr->tick);
   }
-
-  if (!drumr->swing) {
-    if (drumr->pattern & (1 << (drumr->tick % DRUM_PATTERN_LEN)) && 
-                          (b->cur_tick % (TICKS_PER_BEAT) == 0)) {
+  if (drumr->pattern & ( 1 << (b->cur_tick % DRUM_PATTERN_LEN))) {
+  //if (drumr->pattern & ( 1 << (drumr->tick % DRUM_PATTERN_LEN))) {
+    //printf("IN HERE! pattern: %d // compare is %d -> result is %d\n", drumr->pattern, ( 1 << (b->cur_tick % DRUM_PATTERN_LEN)), drumr->pattern | ( 1 << (b->cur_tick & DRUM_PATTERN_LEN)));
+    if (!drumr->played) {
       drumr->playing = 1;
+    }
+    if (drumr->playing) {
+      val =  drumr->buffer[drumr->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+    } else {
+      val = 0.0;
+    }
+    if ((int)drumr->position == drumr->bufsize) { // end of playback - so reset
+      drumr->played = 1;
+      drumr->playing = 0;
       drumr->position = 0;
     }
   } else {
-    if (drumr->pattern & ( 1 << (drumr->tick % DRUM_PATTERN_LEN))) {
-      if ( b->cur_tick % TICKS_PER_BEAT == 0 ){
-        //printf("SCHWING\n");
-        drumr->playing = 1;
-        drumr->position = 0;
-      } else if ( (drumr->tick % 2) && b->cur_tick % TICKS_PER_BEAT == drumr->swing_setting ){
-        //printf("SCHWUNG\n");
-        drumr->playing = 1;
-        drumr->position = 0;
-      }
-    }
-  }
-
-  if (drumr->playing) {
-    val = drumr->buffer[drumr->position++] / 2147483648.0 ; // convert 16bit to double btw 0 and 1
-  }
-
-  if ((int)drumr->position == drumr->bufsize) { // end of playback - so reset
-    drumr->playing = 0;
     drumr->position = 0;
+    drumr->played = 0;
   }
-
   if (val > 1 || val < -1)
     printf("BURNIE - DRUM OVERLOAD!\n");
 
@@ -171,7 +143,7 @@ void drum_status(void *self, char *status_string)
     }
   }
   spattern[DRUM_PATTERN_LEN] = '\0';
-  snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf" ANSI_COLOR_RESET, basename(drumr->filename), spattern, drumr->vol);
+  snprintf(status_string, 119, ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf" ANSI_COLOR_RESET, drumr->filename, spattern, drumr->vol);
 }
 
 double drum_getvol(void *self)
