@@ -98,16 +98,16 @@ double drum_gennext(void *self)
   DRUM *drumr = self;
   double val = 0;
 
-  if ( b->cur_tick % (TICK_SIZE/4) == 0 ) {
-      drumr->tick = drumr->tick + 1;
-      //printf("My tick is %d\n", drumr->tick);
-  }
-  if (drumr->pattern & ( 1 << (b->cur_tick % DRUM_PATTERN_LEN))) {
-  //if (drumr->pattern & ( 1 << (drumr->tick % DRUM_PATTERN_LEN))) {
+  //if (drumr->pattern & ( 1 << (b->cur_tick % DRUM_PATTERN_LEN))) {
+  if (drumr->pattern & ( 1 << (b->quart_note_tick % DRUM_PATTERN_LEN))) {
     //printf("IN HERE! pattern: %d // compare is %d -> result is %d\n", drumr->pattern, ( 1 << (b->cur_tick % DRUM_PATTERN_LEN)), drumr->pattern | ( 1 << (b->cur_tick & DRUM_PATTERN_LEN)));
-    if (!drumr->played) {
+    if (!drumr->played && !drumr->played) {
       drumr->playing = 1;
+      drumr->played = 1;
+      printf("PLAYING!\n");
     }
+
+
     if (drumr->playing) {
       val =  drumr->buffer[drumr->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
     } else {

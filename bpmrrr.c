@@ -22,6 +22,7 @@ bpmrrr *new_bpmrrr()
 
   b->bpm = DEFAULT_BPM;
   b->cur_tick = 0;
+  b->quart_note_tick = 0;
   b->sleeptime = (60.0 / b->bpm / TICK_SIZE ) * 1000000000;
 
   return b;
@@ -43,6 +44,7 @@ void bpm_info(bpmrrr *b)
 void *bpm_run(void *bp)
 {
   bpmrrr *b = (bpmrrr*) bp;
+  int quart_note_scale = TICK_SIZE / 4;
   while (1)
   {
     pthread_mutex_lock(&bpm_lock);
@@ -53,8 +55,9 @@ void *bpm_run(void *bp)
     struct timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = b->sleeptime;
-    //if ( b->cur_tick % 8 == 0 )
-    //    printf("TICK %d\n", b->cur_tick);
+    if ( b->cur_tick % quart_note_scale == 0 )
+        b->quart_note_tick++;
+        //printf("TICK %d\n", b->cur_tick);
     nanosleep(&ts, NULL);
   }
 }
