@@ -13,8 +13,8 @@ typedef struct t_sample_pos
 typedef struct t_drumr
 {
   SOUNDGEN sound_generator;
-  char *filename;
   sample_pos sample_positions[DRUM_PATTERN_LEN];
+  char *filename;
   int pattern; // bitmask version!
   int *buffer;
   int bufsize;
