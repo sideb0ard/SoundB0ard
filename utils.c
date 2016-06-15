@@ -297,3 +297,14 @@ void strim(const char *input, char *result)
     *result = '\0';
   }
 }
+
+int conv_bitz(int num)
+{
+    for ( int i = 0 ; i < 16; i++) {
+        if ( (num & ( 1 << i )) == num ) {
+            printf("%d is %d\n", num, i);
+            return i;
+        }
+    }
+    return -1;
+}

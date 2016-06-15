@@ -3,11 +3,18 @@
 
 #include "sound_generator.h"
 
+typedef struct t_sample_pos 
+{
+    int position;
+    int playing;
+    int played;
+} sample_pos;
+
 typedef struct t_drumr
 {
   SOUNDGEN sound_generator;
   char *filename;
-  // int pattern[DRUM_PATTERN_LEN];
+  sample_pos sample_positions[DRUM_PATTERN_LEN];
   int pattern; // bitmask version!
   int *buffer;
   int bufsize;

@@ -5,6 +5,7 @@
 #include "bpmrrr.h"
 #include "defjams.h"
 #include "drumr.h"
+#include "utils.h"
 
 extern bpmrrr *b;
 
@@ -25,6 +26,7 @@ DRUM* new_drumr(char *filename, char *pattern)
   {
       spattern[sp_count++] = sp;
   }
+  printf("PATTERN %s\n", pattern);
 
   // convert those spattern chars into real integers and use
   // as index into DRUM*'s pattern
@@ -95,40 +97,53 @@ void update_pattern(void *self, int newpattern)
 double drum_gennext(void *self)
 //void drum_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
-  DRUM *drumr = self;
-  double val = 0;
+    DRUM *drumr = self;
+    double val = 0;
+  
+    int cur_pattern_part = 1 << (b->quart_note_tick % DRUM_PATTERN_LEN);
+    if (drumr->pattern & cur_pattern_part) {
 
-  //if (drumr->pattern & ( 1 << (b->cur_tick % DRUM_PATTERN_LEN))) {
-  if (drumr->pattern & ( 1 << (b->quart_note_tick % DRUM_PATTERN_LEN))) {
-    //printf("IN HERE! pattern: %d // compare is %d -> result is %d\n", drumr->pattern, ( 1 << (b->cur_tick % DRUM_PATTERN_LEN)), drumr->pattern | ( 1 << (b->cur_tick & DRUM_PATTERN_LEN)));
-    if (!drumr->played && !drumr->played) {
-      drumr->playing = 1;
-      drumr->played = 1;
-      printf("PLAYING!\n");
+        //if (!drumr->sample_positions[cur_pattern_part].playing && !drumr->sample_positions[cur_pattern_part].played) {
+        //if (!drumr->playing && !drumr->played) {
+        if (!drumr->playing) {
+            printf("Starting part %d\n", cur_pattern_part);
+            printf("Could be that it was all so simple then %d\n", conv_bitz(cur_pattern_part));
+            drumr->playing = 1;
+            //drumr->sample_positions[cur_pattern_part].playing = 1;
+        }
+  
+        //if (drumr->sample_positions[cur_pattern_part].playing) {
+        if (drumr->playing) {
+            //val +=  drumr->buffer[drumr->sample_positions[cur_pattern_part].position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+            val =  drumr->buffer[drumr->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+        } else {
+            val = 0.0;
+        }
+  
+        //if ((int)drumr->sample_positions[cur_pattern_part].position == drumr->bufsize) { // end of playback - so reset
+        if ((int)drumr->position == drumr->bufsize) { // end of playback - so reset
+            printf("End of buf - switching off..\n");
+            //drumr->played = 1;
+            drumr->playing = 0;
+            drumr->position = 0;
+            //drumr->sample_positions[cur_pattern_part].played = 1;
+            //drumr->sample_positions[cur_pattern_part].playing = 1;
+            //drumr->sample_positions[cur_pattern_part].position = 1;
+        }
+  
+    //} else {
+    //    //printf("Switching off part %d - cur_tick is %d\n", cur_pattern_part, b->cur_tick);
+    //    drumr->position = 0;
+    //    drumr->played = 0;
     }
 
-
-    if (drumr->playing) {
-      val =  drumr->buffer[drumr->position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
-    } else {
-      val = 0.0;
-    }
-    if ((int)drumr->position == drumr->bufsize) { // end of playback - so reset
-      drumr->played = 1;
-      drumr->playing = 0;
-      drumr->position = 0;
-    }
-  } else {
-    drumr->position = 0;
-    drumr->played = 0;
-  }
-  if (val > 1 || val < -1)
-    printf("BURNIE - DRUM OVERLOAD!\n");
-
-  val = effector(&drumr->sound_generator, val);
-  val = envelopor(&drumr->sound_generator, val);
-
-  return val * drumr->vol;
+    if (val > 1 || val < -1)
+        printf("BURNIE - DRUM OVERLOAD!\n");
+  
+    val = effector(&drumr->sound_generator, val);
+    val = envelopor(&drumr->sound_generator, val);
+  
+    return val * drumr->vol;
 }
 
 void drum_status(void *self, char *status_string)
