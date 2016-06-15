@@ -105,27 +105,23 @@ double drum_gennext(void *self)
     
     if (drumr->pattern & cur_pattern_part) {
 
-        if (!drumr->sample_positions[conv_part].playing && !drumr->sample_positions[conv_part].played) {
+        //if (!drumr->sample_positions[conv_part].playing && !drumr->sample_positions[conv_part].played) {
+        if (!drumr->sample_positions[conv_part].playing) {
             printf("Starting part %d\n", conv_part);
             drumr->sample_positions[conv_part].playing = 1;
         }
+    }
   
-        if (drumr->sample_positions[conv_part].playing) {
-            val +=  drumr->buffer[drumr->sample_positions[conv_part].position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
+    for ( int i = 0; i < DRUM_PATTERN_LEN ; i ++ ) {
+        if (drumr->sample_positions[i].playing) {
+            val +=  drumr->buffer[drumr->sample_positions[i].position++] / 2147483648.0 ; // convert from 16bit in to double between 0 and 1
         }
   
-        if ((int)drumr->sample_positions[conv_part].position == drumr->bufsize) { // end of playback - so reset
-            printf("End of buf - switching off %d..\n", conv_part);
-            drumr->sample_positions[conv_part].playing = 0;
-            drumr->sample_positions[conv_part].position = 0;
+        if ((int)drumr->sample_positions[i].position == drumr->bufsize) { // end of playback - so reset
+            printf("End of buf - switching off %d..\n", i);
+            drumr->sample_positions[i].playing = 0;
+            drumr->sample_positions[i].position = 0;
         }
-  
-    } else {
-        int prev = conv_part - 1;
-        if ( prev == -1 ) prev = 15;
-        drumr->sample_positions[prev].position = 0;
-        drumr->sample_positions[prev].playing = 0;
-        drumr->sample_positions[prev].played = 0;
     }
 
     if (val > 1 || val < -1)
