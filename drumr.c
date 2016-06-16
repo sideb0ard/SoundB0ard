@@ -112,6 +112,8 @@ double drum_gennext(void *self)
                     if ( b->cur_tick % QUART_TICK == drumr->swing_setting ) {
                         drumr->sample_positions[conv_part].playing = 1;
                         drumr->sample_positions[conv_part].played = 1;
+                        //// TEMP EXPERIMENT
+                        //drumr->swing_setting = (drumr->swing_setting + 3) % QUART_TICK;
                     }
                 } else {
                     drumr->sample_positions[conv_part].playing = 1;
@@ -140,6 +142,7 @@ double drum_gennext(void *self)
     if ( b->quart_note_tick != drumr->tick ) {
         int prev_note = conv_part - 1;
         if ( prev_note == -1 ) prev_note = 15;
+
         drumr->sample_positions[prev_note].played = 0;
         drumr->tick = b->quart_note_tick;
     }
