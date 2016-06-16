@@ -215,15 +215,17 @@ void interpret(char *line)
             printf("RESONATOR CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
             add_delay_soundgen(mixr->sound_generators[(int)val1], val2, RES);
         }
-        //if (strcmp(cmd_type, "swing") == 0) {
-        //    if ( mixr->sound_generators[(int)val1]->type == DRUM_TYPE ) {
-        //      printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
-        //      swingrrr(mixr->sound_generators[(int)val1], val2);
-        //    } else {
-        //      printf("SWING CALLED, BUT NO FO DRUM MACHINE! %s %.lf %.lf\n", cmd_type, val1, val2);
-        //    }
-        //    //add_delay_soundgen(mixr->sound_generators[(int)val1], val2, RES);
-        //}
+        if (strcmp(cmd_type, "swing") == 0) {
+            if ( mixr->sound_generators[(int)val1]->type == DRUM_TYPE ) {
+              printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
+              if ( val2 < QUART_TICK ) 
+                swingrrr(mixr->sound_generators[(int)val1], val2);
+              else 
+                  printf("value for swing has to be between 0 and %d\n", QUART_TICK);
+            } else {
+              printf("SWING CALLED, BUT NO FO DRUM MACHINE! %s %.lf %.lf\n", cmd_type, val1, val2);
+            }
+        }
         if (strcmp(cmd_type, "reverb") == 0) {
             printf("REVERB CALLED FOR! %s %.lf %.lf\n", cmd_type, val1, val2);
             add_delay_soundgen(mixr->sound_generators[(int)val1], val2, REVERB);

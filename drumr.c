@@ -12,7 +12,7 @@ extern bpmrrr *b;
 DRUM* new_drumr(char *filename, char *pattern)
 {
   DRUM *drumr = calloc(1, sizeof(DRUM));
-  drumr->position = 0;
+  //drumr->position = 0;
 
   // drum pattern stuff
   int sp_count = 0;
@@ -100,15 +100,23 @@ double drum_gennext(void *self)
     DRUM *drumr = self;
     double val = 0;
   
-    int cur_pattern_part = 1 << (b->quart_note_tick % DRUM_PATTERN_LEN);
-    int conv_part = conv_bitz(cur_pattern_part);
-    
+    int cur_pattern_part = 1 << (b->quart_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
+    int conv_part = conv_bitz(cur_pattern_part); // convert to an integer we can use as index below
+
     if (drumr->pattern & cur_pattern_part) {
 
-        //if (!drumr->sample_positions[conv_part].playing && !drumr->sample_positions[conv_part].played) {
-        if (!drumr->sample_positions[conv_part].playing) {
-            printf("Starting part %d\n", conv_part);
-            drumr->sample_positions[conv_part].playing = 1;
+        if (!drumr->sample_positions[conv_part].playing && !drumr->sample_positions[conv_part].played) {
+
+            if (b->quart_note_tick % 2) {
+                if ( b->cur_tick % QUART_TICK == 2 ) {
+                    drumr->sample_positions[conv_part].playing = 1;
+                    drumr->sample_positions[conv_part].played = 1;
+                }
+            } else {
+                drumr->sample_positions[conv_part].playing = 1;
+                drumr->sample_positions[conv_part].played = 1;
+            }
+
         }
     }
   
@@ -118,14 +126,21 @@ double drum_gennext(void *self)
         }
   
         if ((int)drumr->sample_positions[i].position == drumr->bufsize) { // end of playback - so reset
-            printf("End of buf - switching off %d..\n", i);
+            //printf("End of buf - switching off %d..\n", i);
             drumr->sample_positions[i].playing = 0;
             drumr->sample_positions[i].position = 0;
         }
     }
 
-    if (val > 1 || val < -1)
-        printf("BURNIE - DRUM OVERLOAD!\n");
+    if ( b->quart_note_tick != drumr->tick ) {
+        int prev_note = conv_part - 1;
+        if ( prev_note == -1 ) prev_note = 15;
+        drumr->sample_positions[prev_note].played = 0;
+        drumr->tick = b->quart_note_tick;
+    }
+
+    //if (val > 1 || val < -1)
+    //    printf("BURNIE - DRUM OVERLOAD!\n");
   
     val = effector(&drumr->sound_generator, val);
     val = envelopor(&drumr->sound_generator, val);
@@ -161,4 +176,10 @@ void drum_setvol(void *self, double v)
     return;
   }
   drumr->vol = v;
+}
+
+void swingrrr(void *self, int swing_setting)
+{
+    DRUM *drumr = self;
+    printf("SWING CALLED FOR %d\n", swing_setting);
 }

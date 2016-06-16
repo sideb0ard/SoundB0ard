@@ -18,13 +18,13 @@ typedef struct t_drumr
   int pattern; // bitmask version!
   int *buffer;
   int bufsize;
-  int position;
-  int playing;
-  int played;
+  //int position;
+  //int playing;
+  //int played;
   int tick;
   int swing;
   int swing_setting;
-  int tick_started;
+  // int tick_started;
   int samplerate;
   int channels;
   double vol;
