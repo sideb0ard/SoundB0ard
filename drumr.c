@@ -107,8 +107,13 @@ double drum_gennext(void *self)
 
         if (!drumr->sample_positions[conv_part].playing && !drumr->sample_positions[conv_part].played) {
 
-            if (b->quart_note_tick % 2) {
-                if ( b->cur_tick % QUART_TICK == 2 ) {
+            if ( drumr->swing ){
+                if (b->quart_note_tick % 2) {
+                    if ( b->cur_tick % QUART_TICK == drumr->swing_setting ) {
+                        drumr->sample_positions[conv_part].playing = 1;
+                        drumr->sample_positions[conv_part].played = 1;
+                    }
+                } else {
                     drumr->sample_positions[conv_part].playing = 1;
                     drumr->sample_positions[conv_part].played = 1;
                 }
@@ -181,5 +186,13 @@ void drum_setvol(void *self, double v)
 void swingrrr(void *self, int swing_setting)
 {
     DRUM *drumr = self;
-    printf("SWING CALLED FOR %d\n", swing_setting);
+    //printf("SWING CALLED FOR %d\n", swing_setting);
+    if ( drumr->swing ) {
+        printf("swing OFF\n");
+        drumr->swing = 0;
+    } else {
+        printf("Swing ON to %d\n", swing_setting);
+        drumr->swing = 1;
+        drumr->swing_setting = swing_setting;
+    }
 }
