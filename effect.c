@@ -27,6 +27,19 @@ EFFECT* new_delay(double duration, effect_type e_type)
   return e;
 }
 
+EFFECT* new_decimator()
+{
+    EFFECT* e;
+    e = (EFFECT*) calloc(1, sizeof(EFFECT));
+    if ( e == NULL )
+      return NULL;
+    e->cnt = 0;
+    e->bits = 16;
+    e->rate = 0.5;
+    e->m = 1 << (e->bits-1);
+    return e;
+}
+
 EFFECT* new_distortion()
 {
     EFFECT* e;

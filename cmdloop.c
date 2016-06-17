@@ -188,15 +188,19 @@ void interpret(char *line)
 
     regmatch_t  sxmatch[3];
     regex_t    sx_rx;
-    regcomp(&sx_rx, "^(distort) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&sx_rx, "^(distort|decimate) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&sx_rx, trim_tok, 2, sxmatch, 0) == 0) {
         double val = 0;
         char cmd_type[10];
         sscanf(trim_tok, "%s %lf", cmd_type, &val);
         int is_val_a_valid_sig_num = ( val >= 0 && val < mixr->soundgen_num) ? 1 : 0 ;
         if ( is_val_a_valid_sig_num ) {
-            printf("DISTORTTTTTTT!\n");
-            add_distortion_soundgen(mixr->sound_generators[(int)val]);
+                if ( strncmp(cmd_type, "distort", 10) == 0) {
+                    printf("DISTORTTTTTTT!\n");
+                    add_distortion_soundgen(mixr->sound_generators[(int)val]);
+                } else {
+                    printf("DECIMATE!\n");
+                }
         } else {
             printf("Cmonbuddy, playdagem, eh? Only valid signal nums allowed\n");
         }
