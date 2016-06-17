@@ -127,4 +127,12 @@ play 2kick.aif 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15, up 0
 play 2hat.aif 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15, up 1
 
 
-
+# GNAR
+play 2hat.aif 0 1 3 4 7 8 9, swing 0 2
+play wuhh184.wav 2 6 10 14
+play 808kick.aif 0, vol 2 1, distort 2
+play 808kick.aif, vol 3 1
+play wuk1.wav 0 3 6 11
+distort 3
+play clap.aif 4 12, play 2snare.aif 4 12
+play tambourine.aif 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15, swing 6 2, vol 6 0.2, env 6 2 3
