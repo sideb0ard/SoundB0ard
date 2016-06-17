@@ -18,6 +18,7 @@ typedef struct FM {
 } FM;
 
 FM* new_fm(double modf, double carf);
+FM* new_fm_x(char* m_osc, double modf, char* c_osc, double carf);
 
 double fm_gennext(void *self);
 //void fm_gennext(void* self, double* frame_vals, int framesPerBuffer);

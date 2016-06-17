@@ -45,6 +45,8 @@ void *timed_sig_start(void * arg)
       sg = add_osc(mixr, msg->freq, tri_table);
   } else if (strcmp(msg->params, "square") == 0) {
       sg = add_osc(mixr, msg->freq, square_table);
+  } else if (strcmp(msg->params, "fmx") == 0) {
+      sg = add_fm_x(mixr, msg->mod_osc, msg->modfreq, msg->car_osc, msg->carfreq);
   } else if (strcmp(msg->params, "fm") == 0) {
       sg = add_fm(mixr, msg->modfreq, msg->carfreq);
   } else if (strcmp(msg->params, "sloop") == 0) {
@@ -307,4 +309,22 @@ int conv_bitz(int num)
         }
     }
     return -1;
+}
+
+int is_valid_osc(char* string)
+{
+    if (strncmp(string, "square", 9) == 0) {
+        return 1;
+    } else if (strncmp(string, "saw_d", 9) == 0) {
+        return 1;
+    } else if (strncmp(string, "saw_u", 9) == 0) {
+        return 1;
+    } else if (strncmp(string, "tri", 9) == 0) {
+        return 1;
+    } else if (strncmp(string, "sine", 9) == 0) {
+        return 1;
+    } else {
+        return 0;
+    }
+
 }

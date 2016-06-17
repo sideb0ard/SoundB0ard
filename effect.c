@@ -27,6 +27,17 @@ EFFECT* new_delay(double duration, effect_type e_type)
   return e;
 }
 
+EFFECT* new_distortion()
+{
+    EFFECT* e;
+    e = (EFFECT*) calloc(1, sizeof(EFFECT));
+    if ( e == NULL )
+      return NULL;
+
+    return e;
+}
+
+
 EFFECT* new_freq_pass(double freq, effect_type pass_type)
 {
   EFFECT* e;

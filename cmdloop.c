@@ -186,6 +186,47 @@ void interpret(char *line)
       }
     }
 
+    regmatch_t  sxmatch[3];
+    regex_t    sx_rx;
+    regcomp(&sx_rx, "^(distort) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&sx_rx, trim_tok, 2, sxmatch, 0) == 0) {
+        double val = 0;
+        char cmd_type[10];
+        sscanf(trim_tok, "%s %lf", cmd_type, &val);
+        int is_val_a_valid_sig_num = ( val >= 0 && val < mixr->soundgen_num) ? 1 : 0 ;
+        if ( is_val_a_valid_sig_num ) {
+            printf("DISTORTTTTTTT!\n");
+            add_distortion_soundgen(mixr->sound_generators[(int)val]);
+        } else {
+            printf("Cmonbuddy, playdagem, eh? Only valid signal nums allowed\n");
+        }
+    }
+
+    regmatch_t  fmxmatch[6];
+    regex_t     fmx_rx;
+    regcomp(&fmx_rx, "^(fm) ([[:alpha:].]{1,9}) ([[:digit:].]+) ([[:alpha:].]{1,9}) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&fmx_rx, trim_tok, 5, fmxmatch, 0) == 0) {
+        char    cmd_type[10];
+        char    car_osc[10];
+        double  val1 = 0;
+        char    mod_osc[10];
+        double  val2 = 0;
+        sscanf(trim_tok, "%s %s %lf %s %lf", cmd_type, car_osc, &val1, mod_osc, &val2);
+        if ( is_valid_osc(car_osc) && is_valid_osc(mod_osc) ) {
+            printf("Jolly good ol' chap! FM with %s %lf and %s %lf\n", car_osc, val1, mod_osc, val2);
+            SBMSG *msg = new_sbmsg();
+            strncpy(msg->cmd, "timed_sig_start", 19);
+            strncpy(msg->params, "fmx", 10); // fm extended options
+            strncpy(msg->mod_osc, mod_osc, 10);
+            strncpy(msg->car_osc, car_osc, 10);
+            msg->modfreq = val1;
+            msg->carfreq = val2;
+            thrunner(msg);
+        } else {
+            printf("FM Oscilattors must be one of sine, square, sawd_d, saw_u, tri\n");
+        }
+    }
+
     regmatch_t tpmatch[4];
     regex_t tsigtype_rx;
     regcomp(&tsigtype_rx, "^(vol|freq|delay|reverb|res|randd|allpass|lowpass|highpass|bandpass|fm|swing) ([[:digit:].]+) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
@@ -195,7 +236,7 @@ void interpret(char *line)
       char cmd_type[10];
       sscanf(trim_tok, "%s %lf %lf", cmd_type, &val1, &val2);
 
-      int is_val_a_valid_sig_num = ( val1 >= 0 && val1 <= mixr->soundgen_num) ? 1 : 0 ;
+      int is_val_a_valid_sig_num = ( val1 >= 0 && val1 < mixr->soundgen_num) ? 1 : 0 ;
 
       if (is_val_a_valid_sig_num) {
 

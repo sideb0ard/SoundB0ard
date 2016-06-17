@@ -168,6 +168,23 @@ int add_osc(mixer *mixr, double freq, GTABLE *gt)
   return add_sound_generator(mixr, m);
 }
 
+int add_fm_x(mixer *mixr, char* f_osc, double ffreq, char* c_osc, double cfreq)
+{
+  FM *nfm = new_fm_x(f_osc, ffreq, c_osc, cfreq);
+  if (nfm == NULL) {
+    printf("Barfed on FM creation\n");
+    return -1;
+  }
+  SBMSG *m = new_sbmsg();
+  if (m == NULL) {
+    free(nfm);
+    printf("MBARF!\n");
+    return -1;
+  }
+  m->sound_generator = (SOUNDGEN *) nfm;
+  return add_sound_generator(mixr, m);
+}
+
 int add_fm(mixer *mixr, double ffreq, double cfreq)
 {
   FM *nfm = new_fm(ffreq, cfreq);

@@ -28,6 +28,25 @@ static int resize_effects_array(SOUNDGEN* self) {
   return 0;
 }
 
+int add_distortion_soundgen(SOUNDGEN* self)
+{
+    printf("BOOYA! Distortion all up in this kittycat\n");
+    int res = resize_effects_array(self);
+    if ( res == -1 ) {
+        perror("Couldn't resize effects array");
+        return -1;
+    }
+    EFFECT* e = new_distortion();
+    if ( e == NULL ) {
+      perror("Couldn't create DISTORTion effect");
+      return -1;
+    }
+    self->effects[self->effects_num] = e;
+    self->effects_on = 1;
+    printf("done adding effect\n");
+    return self->effects_num++;
+}
+
 int add_delay_soundgen(SOUNDGEN* self, float duration, effect_type e_type)
 {
   printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
@@ -88,6 +107,19 @@ float effector(SOUNDGEN* self, float val)
       float atten = 1.0;
 
       switch(self->effects[i]->type) {
+        case DISTORTION:
+            if ( val > 0.0 ) {
+                //printf("INVAL: %f\n", val);
+                val *= 2;
+                val = (val / (1.0 + 0.28 * (val * val)));
+                //if ( val > 0 ) {
+                //    val = 1 - exp(-val);
+                //} else {
+                //    val = -1 + exp(val);
+                //}
+                //printf("OUTVAL: %f\n", val);
+            }
+            break;
         case DELAY :
           delay_p = self->effects[i]->buf_p;
           delay = self->effects[i]->buffer;
