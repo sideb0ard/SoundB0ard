@@ -26,9 +26,6 @@ extern GTABLE *square_table;
 
 static char* rev_lookup[12] = {"c", "c#", "d", "d#", "e", "f", "f#", "g", "g#", "a", "a#", "b"};
 
-// these for freqval below..
-static float a4 = 440.0; // fixed note freq to use as baseline
-static const float twelfth_root_of_two = 1.059463094359;
 
 void *timed_sig_start(void * arg)
 {
@@ -244,9 +241,33 @@ int notelookup(char *n)
     return -1;
 }
 
+float chfreqlookup(int ch)
+{
+  if (ch == 97) return freqval("c3"); // 'a' key
+  else if ( ch == 119 ) return freqval("c#3"); // 'w'
+  else if ( ch == 115 ) return freqval("d3"); // 's'
+  else if ( ch == 101 ) return freqval("d#3"); // 'e'
+  else if ( ch == 100 ) return freqval("e3"); // 'd'
+  else if ( ch == 102 ) return freqval("f3"); // 'f'
+  else if ( ch == 116 ) return freqval("f#3"); // 't'
+  else if ( ch == 103 ) return freqval("g3"); // 'g'
+  else if ( ch == 121 ) return freqval("g#3"); // 'y'
+  else if ( ch == 104 ) return freqval("a#3"); // 'h'
+  else if ( ch == 117 ) return freqval("a#3"); // 'u'
+  else if ( ch == 106 ) return freqval("b3"); // 'j'
+  else if ( ch == 107 ) return freqval("c4"); // 'k'
+  else if ( ch == 111 ) return freqval("c#4"); // 'o'
+  else if ( ch == 108 ) return freqval("d3"); // 'l'
+  else
+    return -1;
+}
+
 float freqval(char *n)
 {
   // algo from http://www.phy.mtu.edu/~suits/NoteFreqCalcs.html
+
+  static float a4 = 440.0; // fixed note freq to use as baseline
+  static const float twelfth_root_of_two = 1.059463094359;
 
   regmatch_t nmatch[3];
   regex_t single_letter_rx;

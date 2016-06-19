@@ -14,6 +14,7 @@
 #include "bpmrrr.h"
 #include "cmdloop.h"
 #include "defjams.h"
+#include "keys.h"
 #include "envelope.h"
 #include "fm.h"
 #include "help.h"
@@ -93,7 +94,7 @@ void interpret(char *line)
     // SINE|SAW|TRI (FREQ)
     regmatch_t pmatch[3];
     regex_t cmdtype_rx;
-    regcomp(&cmdtype_rx, "^(bpm|bitwize|duck|solo|stop|sine|sawd|sawu|tri|up|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&cmdtype_rx, "^(bpm|bitwize|duck|keys|solo|stop|sine|sawd|sawu|tri|up|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
 
     if (regexec(&cmdtype_rx, trim_tok, 3, pmatch, 0) == 0) {
 
@@ -122,26 +123,26 @@ void interpret(char *line)
       //} else if (strcmp(cmd, "vol") == 0) {
       //  printf("VOLLY BALL\n");
       //  mixer_vol_change(mixr, val);
-      } else if (strcmp(cmd, "stop") == 0) {
-        if ( is_val_a_valid_sig_num ) {
+      } else if ( is_val_a_valid_sig_num ) {
+
+        if (strcmp(cmd, "keys") == 0) {
+            if ( mixr->sound_generators[(int)val]->type == FM_TYPE ) {
+                printf("KEYS!\n");
+                keys(val);
+            }
+        } else if (strcmp(cmd, "stop") == 0) {
             msg->sound_gen_num = val;
             strncpy(msg->cmd, "fadedownrrr", 19);
             thrunner(msg);
-        }
-      } else if (strcmp(cmd, "up") == 0) {
-        if ( is_val_a_valid_sig_num ) {
+        } else if (strcmp(cmd, "up") == 0) {
             msg->sound_gen_num = val;
             strncpy(msg->cmd, "fadeuprrr", 19);
             thrunner(msg);
-        }
-      } else if (strcmp(cmd, "duck") == 0) {
-        if ( is_val_a_valid_sig_num ) {
+        } else if (strcmp(cmd, "duck") == 0) {
             msg->sound_gen_num = val;
             strncpy(msg->cmd, "duckrrr", 19);
             thrunner(msg);
-        }
-      } else if (strcmp(cmd, "solo") == 0) {
-        if ( is_val_a_valid_sig_num ) {
+        } else if (strcmp(cmd, "solo") == 0) {
             for ( int i = 0 ; i < mixr->soundgen_num ; i++ ) {
               if ( i != val ) {
                 SBMSG *msg = new_sbmsg();
@@ -151,12 +152,12 @@ void interpret(char *line)
                 thrunner(msg);
               }
             }
+        } else {
+            strncpy(msg->cmd, "timed_sig_start", 19);
+            printf("PARAMZZZ %s", cmd);
+            strncpy(msg->params, cmd, 10);
+            thrunner(msg);
         }
-      } else {
-        strncpy(msg->cmd, "timed_sig_start", 19);
-        printf("PARAMZZZ %s", cmd);
-        strncpy(msg->params, cmd, 10);
-        thrunner(msg);
       }
     }
 
@@ -200,6 +201,7 @@ void interpret(char *line)
                     add_distortion_soundgen(mixr->sound_generators[(int)val]);
                 } else {
                     printf("DECIMATE!\n");
+                    add_decimator_soundgen(mixr->sound_generators[(int)val]);
                 }
         } else {
             printf("Cmonbuddy, playdagem, eh? Only valid signal nums allowed\n");

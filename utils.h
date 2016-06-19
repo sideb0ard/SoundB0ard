@@ -19,6 +19,7 @@ void    faderrr(int sig_num, direction d);
 freaky* new_freqs_from_string(char* string);
 float   freqval(char* n);
 int     notelookup(char *n);
+float   chfreqlookup(int ch);
 void    list_sample_dir(void);
 void    strim(const char *input, char *result);
 void    chordie(char *n);
