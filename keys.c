@@ -57,7 +57,7 @@ void play_note(double freq, int sg_num) {
 
     struct timespec ts;
     ts.tv_sec = 0;
-    ts.tv_nsec = 50000000;
+    ts.tv_nsec = 100000000;
     double vol = 0;
 
     printf("SETTING FREQ TO %f\n", freq);
@@ -65,7 +65,7 @@ void play_note(double freq, int sg_num) {
     
     printf("VOL UP TO SOUNDGEN %d\n", sg_num);
     while (vol < 0.6) {
-      vol += 0.0001;
+      vol += 0.00001;
       mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
     }
     mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.6);
@@ -75,7 +75,7 @@ void play_note(double freq, int sg_num) {
     
     printf("VOL DOWN\n");
     while (vol > 0.0) {
-      vol -= 0.0001;
+      vol -= 0.00001;
       mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], vol);
     }
     mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.0);

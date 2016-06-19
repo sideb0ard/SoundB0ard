@@ -27,6 +27,7 @@ typedef struct t_mixer
   int effects_size;
 
   double volume;
+  int keyboard_octave;
 
 } mixer;
 
