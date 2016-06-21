@@ -129,6 +129,8 @@ void interpret(char *line)
             if ( mixr->sound_generators[(int)val]->type == FM_TYPE ) {
                 printf("KEYS!\n");
                 keys(val);
+            } else {
+                printf("Can only run keys() on an FM Type, ya dafty\n");
             }
         } else if (strcmp(cmd, "stop") == 0) {
             msg->sound_gen_num = val;
