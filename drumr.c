@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -5,9 +6,14 @@
 #include "bpmrrr.h"
 #include "defjams.h"
 #include "drumr.h"
+#include "mixer.h"
 #include "utils.h"
 
 extern bpmrrr *b;
+extern mixer  *mixr;
+
+extern pthread_cond_t bpm_cond;
+extern pthread_mutex_t bpm_lock;
 
 DRUM* new_drumr(char *filename, char *pattern)
 {
@@ -198,4 +204,30 @@ void swingrrr(void *self, int swing_setting)
         drumr->swing = 1;
         drumr->swing_setting = swing_setting;
     }
+}
+
+void *randdrum_run(void *m)
+{
+  SBMSG *msg = (SBMSG*) m;
+  int drum_num = msg->sound_gen_num;
+  int looplen = msg->looplen;
+  printf("RANDRUN CALLED - got me a msg: drumnum %d - with length of %d bars\n", drum_num, looplen);
+  int changed = 0;
+
+  while (1) 
+  {
+    if (b->cur_tick % (TICKS_PER_BAR*looplen) == 0) {
+        if ( !changed ) {
+            changed = 1;
+            int pattern = rand() % 65535; // max for an unsigned int
+            //printf("My rand num %d\n", pattern);
+            update_pattern(mixr->sound_generators[drum_num], pattern);
+        }
+    } else {
+        changed = 0;
+    }
+    pthread_mutex_lock(&bpm_lock);
+    pthread_cond_wait(&bpm_cond,&bpm_lock);
+    pthread_mutex_unlock(&bpm_lock);
+  }
 }

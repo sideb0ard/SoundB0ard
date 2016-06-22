@@ -39,5 +39,6 @@ double drum_gennext(void* self);
 double drum_getvol(void *self);
 void update_pattern(void *self, int newpattern);
 void swingrrr(void *self, int swing_setting);
+void *randdrum_run(void *m);
 
 #endif // DRUM_H
