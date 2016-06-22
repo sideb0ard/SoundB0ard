@@ -126,10 +126,11 @@ void play_note(double freq, int sg_num, int recording, melody_loop* mloop) {
     ts.tv_nsec = 100000000;
     double vol = 0;
 
+    //printf("FREQ!(%d)[%f]\n", b->cur_tick, freq);
     if ( recording ) {
 
         melody_event* e = make_melody_event(freq, sg_num, b->cur_tick);
-        printf("FREQ!(%d)[%f]\n", b->cur_tick, freq);
+        printf("RECCCCFREQ!(%d)[%f]\n", b->cur_tick, freq);
         add_melody_event(mloop, e);
     }
 
@@ -180,11 +181,20 @@ void *play_melody_loop(void *m)
     int diff = final_len % TICK_SIZE;
     int diff2 = TICK_SIZE - diff;
     int final_totes = final_len + diff2;
+    printf("FINAL TOTES %d\n", final_totes);
+    printf("LOOP LEN in BARS %d\n", final_totes / TICK_SIZE);
 
     while (1) {
-        for ( int i = 0; i < loop.size; i++ ) {
-            if ( b->cur_tick % final_totes == loop.melody[i]->tick )
-                play_note(loop.melody[i]->mm.freq, loop.melody[i]->mm.sg_num, 0, NULL);
+        //for ( int i = 0 ;; i = i +1 % (TICK_SIZE*8) ) {
+        for ( int i = 0 ; i < loop.size ; i++ ) {
+            if ( b->cur_tick % final_totes == loop.melody[i]->tick ) {
+            //if ( i < loop.size ) {
+                if ( b->cur_tick % (TICK_SIZE*4) == loop.melody[i]->tick ) {
+                    if (!(loop.melody[i]->mm.freq == 0)) { // starting marker
+                        play_note(loop.melody[i]->mm.freq, loop.melody[i]->mm.sg_num, 0, NULL);
+                    }
+                }
+            }
         }
 
         //printf("TICKY! %d\n", b->cur_tick);

@@ -136,3 +136,29 @@ play wuk1.wav 0 3 6 11
 distort 3
 play clap.aif 4 12, play 2snare.aif 4 12
 play tambourine.aif 0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15, swing 6 2, vol 6 0.2, env 6 2 3
+
+## 
+play 808kick.aif 0
+play wuhh184.wav 0 1 2 3 4, delay 1 0.2
+sloop dowhile.wav 0.25, decimate 2, distort 2, up 2
+distort 2, sloop dowhile.wav 0.5, up 3
+play 2hat.aif 2 6 10 14, play wuk1.wav 0 3 8 11 14, decimate 5
+play tclap1.aif 4 12, stop 5
+
+
+## hop
+play 808kick.aif 0, distort 0, play 808kick.aif 0, play 808kick.aif 3, delay 1 0.2
+play 2snare.aif 4 12, play tclap1.aif 4 12
+play wuhh184.wav 0 1 2 3, delay 5 0.1
+play wuhh184.wav 0 1 2 3, delay 5 0.2
+play 2shaker.aif 8 9 11 13 14, distort 7
+sloop dowhile.wav 0.25, distort 8, distort 8, distort 8 decimate 8, up 8, delay 8 0.2
+stop 0, stop 1, stop 2
+fm sine 23 square 900
+fm sine 900 square 32
+play revcrash2.aif 9, play crash1.aif 11
+sloop dowhile.wav 0.5, distort 13, distort 13, distort 13 decimate 13, up 13, delay 13 0.2
+bitwize 2, decimate 14, env 14 1 1, env 14 4 0, delay 14 0.2, up 14, vol 14 0.2
+up 0, up 1, up 2
+play 2hat.aif 2 6 10 14
+
