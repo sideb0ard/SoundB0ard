@@ -82,11 +82,28 @@ void interpret(char *line)
       print_help();
     }
 
+    // SIGNAL START
+    regmatch_t ns_match[3];
+    regex_t ns_cmdtype_rx;
+    regcomp(&ns_cmdtype_rx, "^(bitwize|sine|sawd|sawu|tri|square) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&ns_cmdtype_rx, trim_tok, 3, ns_match, 0) == 0) {
+
+      float val = 0;
+      char cmd[20];
+      SBMSG *msg = new_sbmsg();
+      sscanf(trim_tok, "%s %f", cmd, &val);
+      msg->freq = val;
+
+      strncpy(msg->cmd, "timed_sig_start", 19);
+      printf("PARAMZZZ %s", cmd);
+      strncpy(msg->params, cmd, 10);
+      thrunner(msg);
+    }
+
     // TODO: move regex outside function to compile once
-    // SINE|SAW|TRI (FREQ)
     regmatch_t pmatch[3];
     regex_t cmdtype_rx;
-    regcomp(&cmdtype_rx, "^(bpm|bitwize|duck|keys|solo|stop|sine|sawd|sawu|tri|up|square|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&cmdtype_rx, "^(bpm|duck|keys|solo|stop|up|vol) ([[:digit:].]+)$", REG_EXTENDED|REG_ICASE);
 
     if (regexec(&cmdtype_rx, trim_tok, 3, pmatch, 0) == 0) {
 
@@ -110,7 +127,6 @@ void interpret(char *line)
             sampler_set_incr(mixr->sound_generators[i]);
           }
         }
-
 
       //} else if (strcmp(cmd, "vol") == 0) {
       //  printf("VOLLY BALL\n");
@@ -146,11 +162,6 @@ void interpret(char *line)
                 thrunner(msg);
               }
             }
-        } else {
-            strncpy(msg->cmd, "timed_sig_start", 19);
-            printf("PARAMZZZ %s", cmd);
-            strncpy(msg->params, cmd, 10);
-            thrunner(msg);
         }
       }
     }
