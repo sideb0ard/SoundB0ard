@@ -184,23 +184,34 @@ void *play_melody_loop(void *m)
     printf("FINAL TOTES %d\n", final_totes);
     printf("LOOP LEN in BARS %d\n", final_totes / TICK_SIZE);
 
-    while (1) {
-        //for ( int i = 0 ;; i = i +1 % (TICK_SIZE*8) ) {
-        for ( int i = 0 ; i < loop.size ; i++ ) {
-            if ( b->cur_tick % final_totes == loop.melody[i]->tick ) {
-            //if ( i < loop.size ) {
-                if ( b->cur_tick % (TICK_SIZE*4) == loop.melody[i]->tick ) {
-                    if (!(loop.melody[i]->mm.freq == 0)) { // starting marker
-                        play_note(loop.melody[i]->mm.freq, loop.melody[i]->mm.sg_num, 0, NULL);
-                    }
-                }
-            }
-        }
+    int loop_started = 0;
 
-        //printf("TICKY! %d\n", b->cur_tick);
+    while (!loop_started) {
         pthread_mutex_lock(&bpm_lock);
         pthread_cond_wait(&bpm_cond,&bpm_lock);
         pthread_mutex_unlock(&bpm_lock);
+        if ( b->cur_tick % TICK_SIZE == 0 ) {
+            loop_started = 1;
+        }
+    }
+
+    while (1) {
+        //for ( int i = 0 ;; i = i +1 % (TICK_SIZE*8) ) {
+        int note_played = 0;
+        for ( int i = 0 ; i < loop.size ; i++ ) {
+            while (!note_played) {
+                if ( b->cur_tick % final_totes == loop.melody[i]->tick ) {
+                    if (!(loop.melody[i]->mm.freq == 0)) { // starting marker so ignore.
+                        play_note(loop.melody[i]->mm.freq, loop.melody[i]->mm.sg_num, 0, NULL);
+                    }
+                    note_played = 1;
+                }
+                pthread_mutex_lock(&bpm_lock);
+                pthread_cond_wait(&bpm_cond,&bpm_lock);
+                pthread_mutex_unlock(&bpm_lock);
+            }
+            note_played = 0;
+        }
     }
     // TODO free all this memory!!
     return NULL;
