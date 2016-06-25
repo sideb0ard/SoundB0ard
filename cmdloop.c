@@ -336,16 +336,25 @@ void interpret(char *line)
     // drum sample play
     regmatch_t fmatch[4];
     regex_t file_rx;
-    regcomp(&file_rx, "^(play|addd) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&file_rx, "^(play|addd) ([.[:alnum:]]+) ((all|none|[[:digit:][:space:]]+))$", REG_EXTENDED|REG_ICASE);
     if (regexec(&file_rx, trim_tok, 4, fmatch, 0) == 0) {
 
         char cmd_type[10];
         sscanf(trim_tok, "%s", cmd_type);
 
         int pattern_len = fmatch[3].rm_eo - fmatch[3].rm_so;
-        char pattern[pattern_len + 1];
-        strncpy(pattern, trim_tok+fmatch[3].rm_so, pattern_len);
-        pattern[pattern_len] = '\0';
+        char tmp_pattern[pattern_len + 1];
+        strncpy(tmp_pattern, trim_tok+fmatch[3].rm_so, pattern_len);
+        tmp_pattern[pattern_len] = '\0';
+
+        char pattern[38];
+        if ( strcmp(tmp_pattern, "all") == 0 ) {
+            strncpy(pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 38);
+        } else if ( strcmp(tmp_pattern, "none") == 0 ) {
+            strncpy(pattern, "", 38);
+        } else {
+            strncpy(pattern, tmp_pattern, 38);
+        }
 
         int filename_len = fmatch[2].rm_eo - fmatch[2].rm_so;
         char filename[filename_len + 1];
