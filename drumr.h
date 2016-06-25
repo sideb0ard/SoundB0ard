@@ -16,21 +16,22 @@ typedef struct t_drumr
   SOUNDGEN sound_generator;
   sample_pos sample_positions[DRUM_PATTERN_LEN];
   char *filename;
-  int pattern; // bitmask version!
-  int *patterns;
-  int num_patterns;
-  int *buffer;
-  int bufsize;
-  //int position;
-  //int playing;
-  //int played;
-  int tick;
-  int swing;
-  int swing_setting;
-  // int tick_started;
   int samplerate;
   int channels;
   double vol;
+
+  int *buffer;
+  int bufsize;
+
+  int pattern; // bitmask version!
+
+  int *patterns;
+  int num_patterns;
+  int cur_pattern_num;
+
+  int tick;
+  int swing;
+  int swing_setting;
 } DRUM;
 
 
