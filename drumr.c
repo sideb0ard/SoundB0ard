@@ -15,62 +15,69 @@ extern mixer  *mixr;
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
 
-DRUM* new_drumr(char *filename, char *pattern)
+void pattern_char_to_int(char *char_pattern, int *final_pattern)
 {
-  DRUM *drumr = calloc(1, sizeof(DRUM));
-  //drumr->position = 0;
-
-  // drum pattern stuff
   int sp_count = 0;
   char *sp, *sp_last, *spattern[32];
   char *sep = " ";
 
   // extract numbers from string into spattern
-  for ( sp = strtok_r(pattern, sep, &sp_last);
+  for ( sp = strtok_r(char_pattern, sep, &sp_last);
         sp;
         sp = strtok_r(NULL, sep, &sp_last))
   {
       spattern[sp_count++] = sp;
   }
-  printf("PATTERN %s\n", pattern);
 
-  // convert those spattern chars into real integers and use
-  // as index into DRUM*'s pattern
   for (int i = 0; i < sp_count; i++) {
     int pat_num = atoi(spattern[i]);
     if (pat_num < DRUM_PATTERN_LEN) {
-      //drumr->pattern[pat_num] = 1;
       printf("PAT_NUM: %d is %d\n", pat_num, ( 1 << pat_num));
-      drumr->pattern = ( 1 << pat_num ) | drumr->pattern;  /// bitmask!
-      printf("NOW SET %d\n", drumr->pattern);
+      *final_pattern = ( 1 << pat_num ) | *final_pattern;
+      printf("NOW SET %d\n", *final_pattern);
     }
   }
+}
 
-  // soundfile part
-  SNDFILE *snd_file;
+int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
+{
+    SNDFILE *snd_file;
+    
+    sf_info->format = 0;
+    snd_file = sf_open(filename, SFM_READ, sf_info);
+    if (!snd_file) {
+      printf("Err opening %s : %d\n", filename, sf_error(snd_file));
+      return NULL;
+    }
+    printf("Filename:: %s\n", filename);
+    printf("SR: %d\n", sf_info->samplerate);
+    printf("Channels: %d\n", sf_info->channels);
+    printf("Frames: %lld\n", sf_info->frames);
+    
+    *bufsize = sf_info->channels * sf_info->frames;
+    printf("Making buffer size of %d\n", *bufsize);
+    
+    int *buffer = calloc(*bufsize, sizeof(int));
+    if (buffer == NULL) {
+      printf("Ooft, memory issues, mate!\n");
+      return NULL;
+    }
+    
+    sf_readf_int(snd_file, buffer, *bufsize);
+    return buffer;
+}
+
+    
+DRUM* new_drumr(char *filename, char *pattern)
+{
+  DRUM *drumr = calloc(1, sizeof(DRUM));
+
+  pattern_char_to_int(pattern, &drumr->pattern);
+
   SF_INFO sf_info;
-
-  sf_info.format = 0;
-  snd_file = sf_open(filename, SFM_READ, &sf_info);
-  if (!snd_file) {
-    printf("Err opening %s : %d\n", filename, sf_error(snd_file));
-    return (void*) NULL;
-  }
-  printf("Filename:: %s\n", filename);
-  printf("SR: %d\n", sf_info.samplerate);
-  printf("Channels: %d\n", sf_info.channels);
-  printf("Frames: %lld\n", sf_info.frames);
-
-  int bufsize = sf_info.channels * sf_info.frames;
-  printf("Making buffer size of %d\n", bufsize);
-
-  int *buffer = calloc(bufsize, sizeof(int));
-  if (buffer == NULL) {
-    printf("Ooft, memory issues, mate!\n");
-    return (void*) NULL;
-  }
-
-  sf_readf_int(snd_file, buffer, bufsize);
+  memset(&sf_info, 0, sizeof(SF_INFO));
+  int bufsize;
+  int *buffer = load_file_to_buffer(filename, &bufsize, &sf_info);
 
   int fslen = strlen(filename);
   drumr->filename = calloc(1, fslen + 1);
