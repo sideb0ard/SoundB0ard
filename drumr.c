@@ -72,7 +72,7 @@ DRUM* new_drumr(char *filename, char *pattern)
 {
   DRUM *drumr = calloc(1, sizeof(DRUM));
 
-  pattern_char_to_int(pattern, &drumr->pattern);
+  pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
 
   SF_INFO sf_info;
   memset(&sf_info, 0, sizeof(SF_INFO));
@@ -116,7 +116,7 @@ double drum_gennext(void *self)
     int cur_pattern_part = 1 << (b->quart_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
     int conv_part = conv_bitz(cur_pattern_part); // convert to an integer we can use as index below
 
-    if (drumr->pattern & cur_pattern_part) {
+    if (drumr->patterns[drumr->cur_pattern_num] & cur_pattern_part) {
 
         if (!drumr->sample_positions[conv_part].playing && !drumr->sample_positions[conv_part].played) {
 
@@ -152,16 +152,21 @@ double drum_gennext(void *self)
         }
     }
 
+    //if (val > 1 || val < -1)
+    //    printf("BURNIE - DRUM OVERLOAD!\n");
+    //
     if ( b->quart_note_tick != drumr->tick ) {
         int prev_note = conv_part - 1;
         if ( prev_note == -1 ) prev_note = 15;
 
         drumr->sample_positions[prev_note].played = 0;
         drumr->tick = b->quart_note_tick;
+
+        if ( drumr->tick % 16 == 0 ) {
+            drumr->cur_pattern_num = (drumr->cur_pattern_num + 1) % drumr->num_patterns;
+        }
     }
 
-    //if (val > 1 || val < -1)
-    //    printf("BURNIE - DRUM OVERLOAD!\n");
   
     val = effector(&drumr->sound_generator, val);
     val = envelopor(&drumr->sound_generator, val);
@@ -238,3 +243,10 @@ void *randdrum_run(void *m)
     pthread_mutex_unlock(&bpm_lock);
   }
 }
+
+void add_pattern(void *self, char *pattern)
+{
+    DRUM *drumr = self;
+    pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
+}
+

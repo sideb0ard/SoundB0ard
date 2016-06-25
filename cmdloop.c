@@ -336,20 +336,31 @@ void interpret(char *line)
     // drum sample play
     regmatch_t fmatch[4];
     regex_t file_rx;
-    regcomp(&file_rx, "^(file|play) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE);
+    regcomp(&file_rx, "^(play|addd) ([.[:alnum:]]+) ([[:digit:][:space:]]+)$", REG_EXTENDED|REG_ICASE);
     if (regexec(&file_rx, trim_tok, 4, fmatch, 0) == 0) {
 
-      int filename_len = fmatch[2].rm_eo - fmatch[2].rm_so;
-      char filename[filename_len + 1];
-      strncpy(filename, trim_tok+fmatch[2].rm_so, filename_len);
-      filename[filename_len] = '\0';
+        char cmd_type[10];
+        sscanf(trim_tok, "%s", cmd_type);
 
-      int pattern_len = fmatch[3].rm_eo - fmatch[3].rm_so;
-      char pattern[pattern_len + 1];
-      strncpy(pattern, trim_tok+fmatch[3].rm_so, pattern_len);
-      pattern[pattern_len] = '\0';
+        int pattern_len = fmatch[3].rm_eo - fmatch[3].rm_so;
+        char pattern[pattern_len + 1];
+        strncpy(pattern, trim_tok+fmatch[3].rm_so, pattern_len);
+        pattern[pattern_len] = '\0';
 
-      add_drum(mixr, filename, pattern);
+        int filename_len = fmatch[2].rm_eo - fmatch[2].rm_so;
+        char filename[filename_len + 1];
+        strncpy(filename, trim_tok+fmatch[2].rm_so, filename_len);
+        filename[filename_len] = '\0';
+
+        if (strcmp(cmd_type, "play") == 0) {
+            add_drum(mixr, filename, pattern);
+        } else {
+            int val = atoi(filename);
+            int is_val_a_valid_sig_num = ( val >= 0 && val < mixr->soundgen_num) ? 1 : 0 ;
+            if ( is_val_a_valid_sig_num && mixr->sound_generators[val]->type == DRUM_TYPE ) {
+                add_pattern(mixr->sound_generators[val], pattern);
+            }
+        }
 
     }
 

@@ -25,7 +25,7 @@ typedef struct t_drumr
 
   int pattern; // bitmask version!
 
-  int *patterns;
+  int patterns[10];
   int num_patterns;
   int cur_pattern_num;
 
@@ -41,7 +41,9 @@ DRUM* new_drumr(char *filename, char *pattern);
 void    drum_status(void *self, char *ss);
 void    drum_setvol(void *self, double v);
 void    update_pattern(void *self, int newpattern);
+void    add_pattern(void *self, char *pattern);
 void    swingrrr(void *self, int swing_setting);
+
 void    pattern_char_to_int(char* chpattern, int *pattern);
 int*    load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info);
 
