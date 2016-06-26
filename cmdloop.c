@@ -370,7 +370,47 @@ void interpret(char *line)
                 add_pattern(mixr->sound_generators[val], pattern);
             }
         }
+    }
 
+    // FM melody loop
+    regmatch_t fmm_match[4];
+    regex_t fmm_rx;
+    regcomp(&fmm_rx, "^(melody) ([[:digit:]]+) ([#[:alnum:][:space:]]+)$", REG_EXTENDED|REG_ICASE);
+    if (regexec(&fmm_rx, trim_tok, 4, fmm_match, 0) == 0) {
+        printf("MELODY MATCH\n");
+
+        char cmd_type[10];
+        sscanf(trim_tok, "%s", cmd_type);
+
+        int pattern_len = fmm_match[3].rm_eo - fmm_match[3].rm_so;
+        char tmp_pattern[pattern_len + 1];
+        strncpy(tmp_pattern, trim_tok+fmm_match[3].rm_so, pattern_len);
+        tmp_pattern[pattern_len] = '\0';
+        printf("MELODY PATTERN %s\n", tmp_pattern);
+
+        //char pattern[38];
+        //if ( strcmp(tmp_pattern, "all") == 0 ) {
+        //    strncpy(pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 38);
+        //} else if ( strcmp(tmp_pattern, "none") == 0 ) {
+        //    strncpy(pattern, "", 38);
+        //} else {
+        //    strncpy(pattern, tmp_pattern, 38);
+        //}
+
+        //int filename_len = fmatch[2].rm_eo - fmatch[2].rm_so;
+        //char filename[filename_len + 1];
+        //strncpy(filename, trim_tok+fmatch[2].rm_so, filename_len);
+        //filename[filename_len] = '\0';
+
+        //if (strcmp(cmd_type, "play") == 0) {
+        //    add_drum(mixr, filename, pattern);
+        //} else {
+        //    int val = atoi(filename);
+        //    int is_val_a_valid_sig_num = ( val >= 0 && val < mixr->soundgen_num) ? 1 : 0 ;
+        //    if ( is_val_a_valid_sig_num && mixr->sound_generators[val]->type == DRUM_TYPE ) {
+        //        add_pattern(mixr->sound_generators[val], pattern);
+        //    }
+        //}
     }
 
     // loop sample play
