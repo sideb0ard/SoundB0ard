@@ -5,22 +5,21 @@
 
 #include "sound_generator.h"
 
-typedef struct t_bitwize
-{
+typedef struct t_bitwize {
 
-  SOUNDGEN sound_generator;
+    SOUNDGEN sound_generator;
 
-  double incr;
-  double vol;
+    double incr;
+    double vol;
 
-  int pattern;
+    int pattern;
 
 } BITWIZE;
 
-BITWIZE* new_bitwize(int pattern);
+BITWIZE *new_bitwize(int pattern);
 
 char bitwize_process(int pattern, int t);
-double bitwize_gennext(void* self);
+double bitwize_gennext(void *self);
 void bitwize_setvol(void *self, double v);
 double bitwize_getvol(void *self);
 
