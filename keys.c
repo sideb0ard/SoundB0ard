@@ -160,7 +160,7 @@ void *play_melody_loop(void *m)
 {
     melody_loop* mloop = (melody_loop*) m;
 
-    printf("PLAY melody starting..\n");
+    printf("\nPLAY melody starting..\n");
 
     //int mnum = mloop->melody[0]->tick;
     //printf("Starting num is %d\n", mnum);
@@ -199,12 +199,13 @@ void *play_melody_loop(void *m)
         }
     }
 
+    printf("STARTED!!!!!\n\n");
     while (1) {
         //for ( int i = 0 ;; i = i +1 % (TICK_SIZE*8) ) {
         int note_played = 0;
-        for ( int i = 0 ; i < 16 ; i++ ) {
+        for ( int i = 0 ; i < mloop->size ; i++ ) {
             while (!note_played) {
-                if ( b->cur_tick % 16 == mloop->melody[i]->tick ) {
+                if ( b->cur_tick % 120 == mloop->melody[i]->tick ) {
                     play_note(mloop->sig_num, mloop->melody[i]->freq);
                     note_played = 1;
                 }
