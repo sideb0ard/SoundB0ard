@@ -94,7 +94,7 @@ void keys(int soundgen_num) {
                 // if (recording && !recording_started) {
                 //    recording_started = 1;
                 //}
-                play_note(soundgen_num, freq);
+                play_note(soundgen_num, freq, 0);
             }
         }
     }
@@ -119,38 +119,32 @@ void add_melody_event(melody_loop *mloop, melody_event *e) {
     }
 }
 
-void play_note(int sg_num, double freq) {
+void play_note(int sg_num, double freq, int drone) {
 
     struct timespec ts;
     ts.tv_sec = 0;
     ts.tv_nsec = 100000000;
     double vol = 0;
 
-    // printf("FREQ!(%d)[%f]\n", b->cur_tick, freq);
-    // if ( recording ) {
-
-    //    melody_event* e = make_melody_event(b->cur_tick, freq);
-    //    printf("RECCCCFREQ!(%d)[%f]\n", b->cur_tick, freq);
-    //    add_melody_event(mloop, e);
-    //}
-
     mfm(mixr->sound_generators[sg_num], "car", freq);
 
-    while (vol < 0.6) {
-        vol += 0.00001;
-        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-                                               vol);
-    }
-    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.6);
+    if (!drone) {
+        while (vol < 0.6) {
+            vol += 0.00001;
+            mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
+                                                   vol);
+        }
+        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.6);
 
-    nanosleep(&ts, NULL);
+        nanosleep(&ts, NULL);
 
-    while (vol > 0.0) {
-        vol -= 0.00001;
-        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-                                               vol);
+        while (vol > 0.0) {
+            vol -= 0.00001;
+            mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
+                                                   vol);
+        }
+        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.0);
     }
-    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.0);
 }
 
 void *play_melody_loop(void *m) {
@@ -158,35 +152,6 @@ void *play_melody_loop(void *m) {
 
     printf("\nPLAY melody starting..\n");
 
-    // int mnum = mloop->melody[0]->tick;
-    // printf("Starting num is %d\n", mnum);
-    // melody_loop loop;
-    // loop.size = 0;
-
-    // for ( int i = 0; i < mloop->size; i++ ) {
-    //    printf("EVENT: [%d] - %f\n", mloop->melody[i]->tick,
-    //    mloop->melody[i]->freq);
-    //    melody_event* me = (melody_event*) calloc(1, sizeof(melody_event));
-    //    me->tick = mloop->melody[i]->tick - mnum;
-    //    me->mm = mloop->melody[i]->mm;
-    //    loop.melody[i] = me;
-    //    printf("LOOP size %d\n", loop.size);
-    //    loop.size++;
-    //}
-
-    // for ( int i = 0; i < loop.size; i++) {
-    //    printf("NEW EVENT: [%d] - %f\n", loop.melody[i]->tick,
-    //    loop.melody[i]->mm.freq);
-    //}
-
-    // int final_len = loop.melody[loop.size-1]->tick;
-    // int diff = final_len % TICK_SIZE;
-    // int diff2 = TICK_SIZE - diff;
-    // int final_totes = final_len + diff2;
-    // printf("FINAL TOTES %d\n", final_totes);
-    // printf("LOOP LEN in BARS %d\n", final_totes / TICK_SIZE);
-
-    // detect the start of a new bar
     int loop_started = 0;
     while (!loop_started) {
         pthread_mutex_lock(&bpm_lock);
@@ -199,12 +164,11 @@ void *play_melody_loop(void *m) {
 
     printf("STARTED!!!!!\n\n");
     while (1) {
-        // for ( int i = 0 ;; i = i +1 % (TICK_SIZE*8) ) {
         int note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
             while (!note_played) {
                 if (b->cur_tick % 120 == mloop->melody[i]->tick) {
-                    play_note(mloop->sig_num, mloop->melody[i]->freq);
+                    play_note(mloop->sig_num, mloop->melody[i]->freq, mloop->drone);
                     note_played = 1;
                 }
                 pthread_mutex_lock(&bpm_lock);
@@ -218,8 +182,10 @@ void *play_melody_loop(void *m) {
     return NULL;
 }
 
-void keys_start_melody_player(int sig_num, char *pattern) {
+void keys_start_melody_player(int sig_num, char *pattern, int drone) {
+
     melody_loop *mloop = new_melody_loop(sig_num);
+    mloop->drone = drone;
 
     printf("KEYS START MELODY!\n");
     printf("SIG NUM %d - %s\n", sig_num, pattern);

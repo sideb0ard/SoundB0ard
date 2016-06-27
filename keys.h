@@ -10,6 +10,7 @@ typedef struct melody_loop {
     melody_event *melody[100];
     int size;
     int sig_num;
+    int drone; // i.e. no gaps between keys
 } melody_loop;
 
 void keys(int soundgen_num);
@@ -19,9 +20,9 @@ melody_event *make_melody_event(int tick, double freq);
 
 void add_melody_event(melody_loop *, melody_event *);
 
-void play_note(int sg_num, double freq);
+void play_note(int sg_num, double freq, int drone);
 void *play_melody_loop(void *m);
 
-void keys_start_melody_player(int sig_num, char *pattern);
+void keys_start_melody_player(int sig_num, char *pattern, int drone);
 
 #endif // KEYS_H_

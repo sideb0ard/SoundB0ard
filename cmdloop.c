@@ -416,7 +416,7 @@ void interpret(char *line) {
         // FM melody loop
         regmatch_t fmm_match[4];
         regex_t fmm_rx;
-        regcomp(&fmm_rx, "^(melody) ([[:digit:]]+) ([[:alnum:][:space:]:#]+)$",
+        regcomp(&fmm_rx, "^(melody|dmelody) ([[:digit:]]+) ([[:alnum:][:space:]:#]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&fmm_rx, trim_tok, 4, fmm_match, 0) == 0) {
             printf("MELODY MATCH\n");
@@ -424,8 +424,6 @@ void interpret(char *line) {
             char cmd_type[10];
             int sig_num;
             sscanf(trim_tok, "%s %d", cmd_type, &sig_num);
-
-            printf("OH, thats an %s for %d\n", cmd_type, sig_num);
 
             int pattern_len = fmm_match[3].rm_eo - fmm_match[3].rm_so;
             char pattern[pattern_len + 1];
@@ -435,8 +433,13 @@ void interpret(char *line) {
 
             int is_val_a_valid_sig_num =
                 (sig_num >= 0 && sig_num < mixr->soundgen_num) ? 1 : 0;
-            if (is_val_a_valid_sig_num)
-                keys_start_melody_player(sig_num, pattern);
+            if (is_val_a_valid_sig_num) {
+                if (strcmp(cmd_type, "melody") == 0) {
+                    keys_start_melody_player(sig_num, pattern, 0);
+                } else if (strcmp(cmd_type, "dmelody") == 0) {
+                    keys_start_melody_player(sig_num, pattern, 1);
+                }
+            }
         }
 
         // loop sample play
