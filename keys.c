@@ -81,7 +81,7 @@ void keys(int soundgen_num) {
                     printf("Recording Mode ON.\n");
                     mloop = new_melody_loop(soundgen_num);
                     // melody_event* e = make_melody_event(0, 0, b->cur_tick);
-                    melody_event *e = make_melody_event(b->cur_tick, 0);
+                    melody_event *e = make_melody_event(b->cur_tick, 0, NULL);
                     add_melody_event(mloop, e);
                 }
             }
@@ -99,12 +99,14 @@ void keys(int soundgen_num) {
 }
 
 // melody_event* make_melody_event(double freq, int sg_num, int tick)
-melody_event *make_melody_event(int tick, double freq) {
+melody_event *make_melody_event(int tick, double freq, char note[4]) {
     melody_event *me;
     me = (melody_event *)calloc(1, sizeof(melody_event));
     me->tick = tick;
 
     me->freq = freq;
+    strcpy(me->note, note);
+    //me->note = note;
 
     return me;
 }
@@ -161,11 +163,24 @@ void *play_melody_loop(void *m) {
 
     while (1) {
         int note_played = 0;
+        int rand_note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
             while (!note_played) {
+                double rel_note1, rel_note2;
+                related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
+                double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    play_note(mloop->sig_num, mloop->melody[i]->freq, mloop->drone);
+                    if ( (rand() % 100) > 5) {
+                        play_note(mloop->sig_num, mloop->melody[i]->freq, mloop->drone);
+                    }
                     note_played = 1;
+                } else if (!rand_note_played) {
+                    rand_note_played = 1;
+                    if ( (rand() % 100) > 75) {
+                        if ((rand()%2)==1) rel_note = rel_note1;
+                        else rel_note = rel_note2;
+                        play_note(mloop->sig_num, rel_note, mloop->drone);
+                    }
                 }
                 pthread_mutex_lock(&bpm_lock);
                 pthread_cond_wait(&bpm_cond, &bpm_lock);
@@ -173,6 +188,7 @@ void *play_melody_loop(void *m) {
                 //printf("MLOOPTICK %d\n", b->quart_note_tick);
             }
             note_played = 0;
+            rand_note_played = 0;
         }
     }
     // TODO free all this memory!!
@@ -198,7 +214,7 @@ void keys_start_melody_player(int sig_num, char *pattern, int drone) {
         printf("[%d] - %s\n", tick, ch_freq);
         double freq = freqval(ch_freq);
         if (freq != -1) {
-            melody_event *me = make_melody_event(tick, freq);
+            melody_event *me = make_melody_event(tick, freq, ch_freq);
             add_melody_event(mloop, me);
         }
     }

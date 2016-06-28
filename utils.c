@@ -113,20 +113,6 @@ void thrunner(SBMSG *msg) {
     }
 }
 
-// void startrrr(int sig_num)
-// {
-//   double vol = mixr->signals[sig_num]->vol;
-//   struct timespec ts;
-//   ts.tv_sec = 0;
-//   ts.tv_nsec = 5000000;
-//   while (vol < 1.0) {
-//     vol += 0.001;
-//     volfunc(mixr->signals[sig_num], vol);
-//     nanosleep(&ts, NULL);
-//   }
-//   volfunc(mixr->signals[sig_num], 1.0);
-// }
-
 void faderrr(int sg_num, direction d) {
 
     struct timespec ts;
@@ -206,6 +192,30 @@ void chordie(char *n) {
            freqval(strcat(rootnote, "4")), sec_note,
            freqval(strcat(sec_note, "4")), thr_note,
            freqval(strcat(thr_note, "4")));
+}
+
+void related_notes(char note[4], double *second_note, double *third_note)
+{
+    char root_note;
+    int scale;
+    sscanf(note, "%[a-z#]%d", &root_note, &scale);
+
+    char scale_ch[2];
+    sprintf(scale_ch, "%d", scale);
+    int second_note_num = (root_note + 4) % 12;
+    int third_note_num = (root_note + 3) % 12;
+
+    char sec_note[4];
+    char thr_note[4];
+
+    strcpy(sec_note, rev_lookup[second_note_num]);
+    strcpy(thr_note, rev_lookup[third_note_num]);
+
+    strcat(sec_note, scale_ch);
+    strcat(thr_note, scale_ch);
+    *second_note = freqval(sec_note);
+    *third_note = freqval(thr_note);
+
 }
 
 int notelookup(char *n) {

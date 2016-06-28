@@ -24,3 +24,4 @@ void strim(const char *input, char *result);
 void chordie(char *n);
 int conv_bitz(int num);
 int is_valid_osc(char *string);
+void related_notes(char root_note[4], double *second_note, double *third_note);
