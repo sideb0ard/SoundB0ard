@@ -20,9 +20,6 @@ extern bpmrrr *b;
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
 
-//// TODO - make this instance variable - not global
-// melody_loop mloop;
-
 melody_loop *new_melody_loop(int soundgen_num) {
     melody_loop *l;
     l = (melody_loop *)calloc(1, sizeof(melody_loop));
@@ -150,7 +147,7 @@ void play_note(int sg_num, double freq, int drone) {
 void *play_melody_loop(void *m) {
     melody_loop *mloop = (melody_loop *)m;
 
-    printf("\nPLAY melody starting..\n");
+    printf("PLAY melody starting..\n");
 
     int loop_started = 0;
     while (!loop_started) {
@@ -162,18 +159,18 @@ void *play_melody_loop(void *m) {
         }
     }
 
-    printf("STARTED!!!!!\n\n");
     while (1) {
         int note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
             while (!note_played) {
-                if (b->cur_tick % 120 == mloop->melody[i]->tick) {
+                if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
                     play_note(mloop->sig_num, mloop->melody[i]->freq, mloop->drone);
                     note_played = 1;
                 }
                 pthread_mutex_lock(&bpm_lock);
                 pthread_cond_wait(&bpm_cond, &bpm_lock);
                 pthread_mutex_unlock(&bpm_lock);
+                //printf("MLOOPTICK %d\n", b->quart_note_tick);
             }
             note_played = 0;
         }
