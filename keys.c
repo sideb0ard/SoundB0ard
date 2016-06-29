@@ -171,6 +171,8 @@ void *play_melody_loop(void *m) {
                 double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
                     if ( (rand() % 100) > 5) {
+                        if ((rand()%2)==1) rel_note = rel_note1;
+                        if ((rand()%10)==1) rel_note *= 3;
                         play_note(mloop->sig_num, mloop->melody[i]->freq, mloop->drone);
                     }
                     note_played = 1;
@@ -178,6 +180,7 @@ void *play_melody_loop(void *m) {
                     rand_note_played = 1;
                     if ( (rand() % 100) > 75) {
                         if ((rand()%2)==1) rel_note = rel_note1;
+                        if ((rand()%10)==1) rel_note *= 3;
                         else rel_note = rel_note2;
                         play_note(mloop->sig_num, rel_note, mloop->drone);
                     }
