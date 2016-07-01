@@ -4,7 +4,6 @@
 #include "defjams.h"
 #include "fm.h"
 #include "table.h"
-#include "lfo.h"
 #include "utils.h"
 
 extern GTABLE *sine_table;

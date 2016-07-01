@@ -3,7 +3,6 @@
 
 #include "envelope_generator.h"
 #include "oscil.h"
-#include "lfo.h"
 #include "sound_generator.h"
 
 typedef struct FM FM;

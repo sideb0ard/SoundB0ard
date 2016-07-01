@@ -13,7 +13,6 @@ SRC = main.c \
       fm.c \
       help.c \
       keys.c \
-      lfo.c \
       mixer.c \
       oscil.c \
       sampler.c \
