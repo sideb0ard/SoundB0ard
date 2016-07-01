@@ -16,7 +16,7 @@ typedef struct FM {
     envelope_generator *env;
     OSCIL *osc1;
     OSCIL *osc2;
-    LFO *lfo;
+    OSCIL *lfo;
     float vol;
 
 } FM;

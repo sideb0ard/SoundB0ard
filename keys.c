@@ -164,8 +164,6 @@ void *play_melody_loop(void *m)
                     if ((rand() % 100) > 5) {
                         if ((rand() % 2) == 1)
                             rel_note = rel_note1;
-                        if ((rand() % 10) == 1)
-                            rel_note *= 3;
                         play_note(mloop->sig_num, mloop->melody[i]->freq);
                     }
                     note_played = 1;

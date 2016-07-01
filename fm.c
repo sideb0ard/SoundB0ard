@@ -51,7 +51,7 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
         fm->osc2 = new_oscil(osc2_freq, tri_table);
 
     // lfo
-    fm->lfo = new_lfo(4, SQUARE);
+    fm->lfo = new_oscil(4, square_table);
 
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
@@ -90,13 +90,14 @@ double fm_gennext(void *self)
     FM *fm = (FM *)self;
 
 
-    double lfo_out = lfo_gennext(fm->lfo);
+    //double lfo_out = lfo_gennext(fm->lfo);
+    double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
 
-    //double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1) * pitch_shift_multiplier(lfo_out);
-    //double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2) * pitch_shift_multiplier(lfo_out);
+    double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1) * pitch_shift_multiplier(lfo_out);
+    double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2) * pitch_shift_multiplier(lfo_out);
 
-    double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
-    double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
+    //double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
+    //double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
     double val = 0.5*osc1_val + 0.5*osc2_val;
 
