@@ -33,7 +33,8 @@ extern GTABLE *square_table;
 extern GTABLE *saw_down_table;
 extern GTABLE *saw_up_table;
 
-void loopy(void) {
+void loopy(void)
+{
     char *line;
     while ((line = readline(ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET)) !=
            NULL) {
@@ -44,19 +45,22 @@ void loopy(void) {
     }
 }
 
-void ps() {
+void ps()
+{
     mixer_ps(mixr);
     bpm_info(b);
     ps_envelope_stream(ampstream);
 }
 
-int exxit() {
+int exxit()
+{
     printf(COOL_COLOR_GREEN "\nBeat it, ya val jerk...\n" ANSI_COLOR_RESET);
     pa_teardown();
     exit(0);
 }
 
-void interpret(char *line) {
+void interpret(char *line)
+{
     char *tok, *last_s;
     char *sep = ",";
     for (tok = strtok_r(line, sep, &last_s); tok;
@@ -67,13 +71,17 @@ void interpret(char *line) {
         if (strcmp(trim_tok, "ps") == 0) {
             ps();
             return;
-        } else if (strcmp(trim_tok, "ls") == 0) {
+        }
+        else if (strcmp(trim_tok, "ls") == 0) {
             list_sample_dir();
-        } else if (strcmp(trim_tok, "delay") == 0) {
+        }
+        else if (strcmp(trim_tok, "delay") == 0) {
             delay_toggle(mixr);
-        } else if (strcmp(trim_tok, "exit") == 0) {
+        }
+        else if (strcmp(trim_tok, "exit") == 0) {
             exxit();
-        } else if (strcmp(trim_tok, "help") == 0) {
+        }
+        else if (strcmp(trim_tok, "help") == 0) {
             print_help();
         }
 
@@ -133,28 +141,34 @@ void interpret(char *line) {
                 //} else if (strcmp(cmd, "vol") == 0) {
                 //  printf("VOLLY BALL\n");
                 //  mixer_vol_change(mixr, val);
-            } else if (is_val_a_valid_sig_num) {
+            }
+            else if (is_val_a_valid_sig_num) {
 
                 if (strcmp(cmd, "keys") == 0) {
                     if (mixr->sound_generators[(int)val]->type == FM_TYPE) {
                         printf("KEYS!\n");
                         keys(val);
-                    } else {
+                    }
+                    else {
                         printf("Can only run keys() on an FM Type, ya dafty\n");
                     }
-                } else if (strcmp(cmd, "stop") == 0) {
+                }
+                else if (strcmp(cmd, "stop") == 0) {
                     msg->sound_gen_num = val;
                     strncpy(msg->cmd, "fadedownrrr", 19);
                     thrunner(msg);
-                } else if (strcmp(cmd, "up") == 0) {
+                }
+                else if (strcmp(cmd, "up") == 0) {
                     msg->sound_gen_num = val;
                     strncpy(msg->cmd, "fadeuprrr", 19);
                     thrunner(msg);
-                } else if (strcmp(cmd, "duck") == 0) {
+                }
+                else if (strcmp(cmd, "duck") == 0) {
                     msg->sound_gen_num = val;
                     strncpy(msg->cmd, "duckrrr", 19);
                     thrunner(msg);
-                } else if (strcmp(cmd, "solo") == 0) {
+                }
+                else if (strcmp(cmd, "solo") == 0) {
                     for (int i = 0; i < mixr->soundgen_num; i++) {
                         if (i != val) {
                             SBMSG *msg = new_sbmsg();
@@ -188,11 +202,13 @@ void interpret(char *line) {
                     printf("Ooh, gotsa an mfm for FM %d - changing %s to %lf\n",
                            fmno, osc, freq);
                     mfm(mixr->sound_generators[fmno], osc, freq);
-                } else {
+                }
+                else {
                     printf("Beat it, ya chancer - gimme an FM number for one "
                            "that exists!\n");
                 }
-            } else {
+            }
+            else {
                 printf("SOrry pal, soundGen %d isnae an FM\n", fmno);
             }
         }
@@ -211,11 +227,13 @@ void interpret(char *line) {
                 if (strncmp(cmd_type, "distort", 10) == 0) {
                     printf("DISTORTTTTTTT!\n");
                     add_distortion_soundgen(mixr->sound_generators[(int)val]);
-                } else {
+                }
+                else {
                     printf("DECIMATE!\n");
                     add_decimator_soundgen(mixr->sound_generators[(int)val]);
                 }
-            } else {
+            }
+            else {
                 printf("Cmonbuddy, playdagem, eh? Only valid signal nums "
                        "allowed\n");
             }
@@ -245,7 +263,8 @@ void interpret(char *line) {
                 msg->modfreq = val1;
                 msg->carfreq = val2;
                 thrunner(msg);
-            } else {
+            }
+            else {
                 printf("FM Oscilattors must be one of sine, square, sawd_d, "
                        "saw_u, tri\n");
             }
@@ -298,7 +317,8 @@ void interpret(char *line) {
                             printf(
                                 "value for swing has to be between 0 and %d\n",
                                 QUART_TICK);
-                    } else {
+                    }
+                    else {
                         printf("SWING CALLED, BUT NO FO DRUM MACHINE! %s %.lf "
                                "%.lf\n",
                                cmd_type, val1, val2);
@@ -342,7 +362,8 @@ void interpret(char *line) {
                     msg->looplen = val2;
                     thrunner(msg);
                 }
-            } else {
+            }
+            else {
                 printf("Oofft mate, you don't have enough sound_gens for "
                        "that..\n");
             }
@@ -389,9 +410,11 @@ void interpret(char *line) {
             char pattern[38];
             if (strcmp(tmp_pattern, "all") == 0) {
                 strncpy(pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 38);
-            } else if (strcmp(tmp_pattern, "none") == 0) {
+            }
+            else if (strcmp(tmp_pattern, "none") == 0) {
                 strncpy(pattern, "", 38);
-            } else {
+            }
+            else {
                 strncpy(pattern, tmp_pattern, 38);
             }
 
@@ -402,7 +425,8 @@ void interpret(char *line) {
 
             if (strcmp(cmd_type, "play") == 0) {
                 add_drum(mixr, filename, pattern);
-            } else {
+            }
+            else {
                 int val = atoi(filename);
                 int is_val_a_valid_sig_num =
                     (val >= 0 && val < mixr->soundgen_num) ? 1 : 0;
@@ -416,7 +440,8 @@ void interpret(char *line) {
         // FM melody loop
         regmatch_t fmm_match[4];
         regex_t fmm_rx;
-        regcomp(&fmm_rx, "^(melody|dmelody) ([[:digit:]]+) ([[:alnum:][:space:]:#]+)$",
+        regcomp(&fmm_rx,
+                "^(melody|dmelody) ([[:digit:]]+) ([[:alnum:][:space:]:#]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&fmm_rx, trim_tok, 4, fmm_match, 0) == 0) {
             printf("MELODY MATCH\n");
@@ -434,11 +459,7 @@ void interpret(char *line) {
             int is_val_a_valid_sig_num =
                 (sig_num >= 0 && sig_num < mixr->soundgen_num) ? 1 : 0;
             if (is_val_a_valid_sig_num) {
-                if (strcmp(cmd_type, "melody") == 0) {
-                    keys_start_melody_player(sig_num, pattern, 0);
-                } else if (strcmp(cmd_type, "dmelody") == 0) {
-                    keys_start_melody_player(sig_num, pattern, 1);
-                }
+                keys_start_melody_player(sig_num, pattern);
             }
         }
 
@@ -492,10 +513,12 @@ void interpret(char *line) {
                     printf("Calling env with %lf %lf %lf\n", val1, val2, val3);
                     add_envelope_soundgen(mixr->sound_generators[(int)val1],
                                           val2, val3);
-                } else {
+                }
+                else {
                     printf("Sorry, envelope type has to be between 0 and 3");
                 }
-            } else {
+            }
+            else {
                 printf("Oofft mate, you don't have enough sound_gens for "
                        "that..\n");
             }

@@ -11,7 +11,8 @@ extern GTABLE *tri_table;
 extern GTABLE *saw_up_table;
 extern GTABLE *saw_down_table;
 
-FM *new_fm(double modf, double carf) {
+FM *new_fm(double modf, double carf)
+{
     FM *fm;
     fm = (FM *)calloc(1, sizeof(FM));
     if (fm == NULL)
@@ -24,6 +25,8 @@ FM *new_fm(double modf, double carf) {
 
     // fm->car_osc = new_oscil(carf, sine_table);
     fm->car_osc = new_oscil(carf, saw_down_table);
+
+    fm->env = new_envelope_generator();
 
     fm->vol = 0.0;
     fm->mod_osc->sound_generator.setvol(fm->mod_osc, 0.5);
@@ -38,7 +41,8 @@ FM *new_fm(double modf, double carf) {
     return fm;
 }
 
-FM *new_fm_x(char *m_osc, double modf, char *c_osc, double carf) {
+FM *new_fm_x(char *m_osc, double modf, char *c_osc, double carf)
+{
     FM *fm;
     fm = (FM *)calloc(1, sizeof(FM));
     if (fm == NULL)
@@ -81,7 +85,8 @@ FM *new_fm_x(char *m_osc, double modf, char *c_osc, double carf) {
     return fm;
 }
 
-void fm_setvol(void *self, double v) {
+void fm_setvol(void *self, double v)
+{
     FM *fm = (FM *)self;
     if (v < 0.0 || v > 1.0) {
         return;
@@ -89,13 +94,15 @@ void fm_setvol(void *self, double v) {
     fm->vol = v;
 }
 
-double fm_getvol(void *self) {
+double fm_getvol(void *self)
+{
     FM *fm = (FM *)self;
     return fm->vol;
 }
 
 // void fm_gennext(void* self, double* frame_vals, int framesPerBuffer)
-double fm_gennext(void *self) {
+double fm_gennext(void *self)
+{
     FM *fm = (FM *)self;
 
     double val = fm->car_osc->sound_generator.gennext(fm->car_osc);
@@ -106,10 +113,13 @@ double fm_gennext(void *self) {
     val = effector(&fm->sound_generator, val);
     val = envelopor(&fm->sound_generator, val);
 
+    val = val * generate(fm->env, 0);
+
     return fm->vol * val;
 }
 
-void fm_status(void *self, char *status_string) {
+void fm_status(void *self, char *status_string)
+{
     FM *fm = (FM *)self;
     snprintf(status_string, 119,
              ANSI_COLOR_RED "FM! modulator: %.2f(freq) %.2f(phase) // carrier: "
@@ -118,13 +128,22 @@ void fm_status(void *self, char *status_string) {
              fm->car_osc->curphase, fm->vol);
 }
 
-void mfm(void *self, char *osc, double val) {
+void mfm(void *self, char *osc, double val)
+{
     FM *fm = (FM *)self;
     if (!strcmp(osc, "mod")) {
         freqfunc(fm->mod_osc, val);
-    } else if (!strcmp(osc, "car")) {
+    }
+    else if (!strcmp(osc, "car")) {
         freqfunc(fm->car_osc, val);
-    } else {
+    }
+    else {
         return;
     }
+}
+
+void keypress(void *self)
+{
+    FM *fm = (FM *)self;
+    start_eg(fm->env);
 }

@@ -3,6 +3,7 @@
 
 #include "oscil.h"
 #include "sound_generator.h"
+#include "envelope_generator.h"
 
 typedef struct FM FM;
 
@@ -11,6 +12,7 @@ typedef struct FM {
     // int num_oscil;
     SOUNDGEN sound_generator;
 
+    envelope_generator *env;
     OSCIL *mod_osc;
     OSCIL *car_osc;
     float vol;
@@ -26,5 +28,6 @@ void fm_status(void *self, char *status_string);
 double fm_getvol(void *self);
 void fm_setvol(void *self, double v);
 void mfm(void *self, char *osc, double val);
+void keypress(void *self);
 
 #endif

@@ -20,14 +20,16 @@ extern bpmrrr *b;
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
 
-melody_loop *new_melody_loop(int soundgen_num) {
+melody_loop *new_melody_loop(int soundgen_num)
+{
     melody_loop *l;
     l = (melody_loop *)calloc(1, sizeof(melody_loop));
     l->sig_num = soundgen_num;
     return l;
 }
 
-void keys(int soundgen_num) {
+void keys(int soundgen_num)
+{
     printf("Entering Keys Mode for %d\n", soundgen_num);
     printf("Press 'q' or 'Esc' to go back to Run Mode\n");
     struct termios new_info, old_info;
@@ -64,7 +66,8 @@ void keys(int soundgen_num) {
             ch = getchar();
             if (ch == 27 || ch == 113) {
                 quit = 1;
-            } else if (ch == 32) {
+            }
+            else if (ch == 32) {
                 recording = 1 - recording;
                 switch (recording) {
                 case 0:
@@ -91,7 +94,7 @@ void keys(int soundgen_num) {
                 // if (recording && !recording_started) {
                 //    recording_started = 1;
                 //}
-                play_note(soundgen_num, freq, 0);
+                play_note(soundgen_num, freq);
             }
         }
     }
@@ -99,54 +102,61 @@ void keys(int soundgen_num) {
 }
 
 // melody_event* make_melody_event(double freq, int sg_num, int tick)
-melody_event *make_melody_event(int tick, double freq, char note[4]) {
+melody_event *make_melody_event(int tick, double freq, char note[4])
+{
     melody_event *me;
     me = (melody_event *)calloc(1, sizeof(melody_event));
     me->tick = tick;
 
     me->freq = freq;
     strcpy(me->note, note);
-    //me->note = note;
+    // me->note = note;
 
     return me;
 }
 
-void add_melody_event(melody_loop *mloop, melody_event *e) {
+void add_melody_event(melody_loop *mloop, melody_event *e)
+{
     printf("ADDING melody event..\n");
     if (mloop->size < 100) {
         mloop->melody[mloop->size++] = e;
     }
 }
 
-void play_note(int sg_num, double freq, int drone) {
+void play_note(int sg_num, double freq)
+{
 
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = 100000000;
-    double vol = 0;
+    // struct timespec ts;
+    // ts.tv_sec = 0;
+    // ts.tv_nsec = 100000000;
+    // double vol = 0;
 
     mfm(mixr->sound_generators[sg_num], "car", freq);
+    keypress(mixr->sound_generators[sg_num]);
 
-    if (!drone) {
-        while (vol < 0.6) {
-            vol += 0.00001;
-            mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-                                                   vol);
-        }
-        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.6);
+    // if (!drone) {
+    //    while (vol < 0.6) {
+    //        vol += 0.00001;
+    //        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
+    //                                               vol);
+    //    }
+    //    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
+    //    0.6);
 
-        nanosleep(&ts, NULL);
+    //    nanosleep(&ts, NULL);
 
-        while (vol > 0.0) {
-            vol -= 0.00001;
-            mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-                                                   vol);
-        }
-        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num], 0.0);
-    }
+    //    while (vol > 0.0) {
+    //        vol -= 0.00001;
+    //        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
+    //                                               vol);
+    //    }
+    //    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
+    //    0.0);
+    //}
 }
 
-void *play_melody_loop(void *m) {
+void *play_melody_loop(void *m)
+{
     melody_loop *mloop = (melody_loop *)m;
 
     printf("PLAY melody starting..\n");
@@ -170,25 +180,31 @@ void *play_melody_loop(void *m) {
                 related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
                 double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    if ( (rand() % 100) > 5) {
-                        if ((rand()%2)==1) rel_note = rel_note1;
-                        if ((rand()%10)==1) rel_note *= 3;
-                        play_note(mloop->sig_num, mloop->melody[i]->freq, mloop->drone);
+                    if ((rand() % 100) > 5) {
+                        if ((rand() % 2) == 1)
+                            rel_note = rel_note1;
+                        if ((rand() % 10) == 1)
+                            rel_note *= 3;
+                        play_note(mloop->sig_num, mloop->melody[i]->freq);
                     }
                     note_played = 1;
-                } else if (!rand_note_played) {
+                }
+                else if (!rand_note_played) {
                     rand_note_played = 1;
-                    if ( (rand() % 100) > 75) {
-                        if ((rand()%2)==1) rel_note = rel_note1;
-                        if ((rand()%10)==1) rel_note *= 3;
-                        else rel_note = rel_note2;
-                        play_note(mloop->sig_num, rel_note, mloop->drone);
+                    if ((rand() % 100) > 75) {
+                        if ((rand() % 2) == 1)
+                            rel_note = rel_note1;
+                        if ((rand() % 10) == 1)
+                            rel_note *= 3;
+                        else
+                            rel_note = rel_note2;
+                        play_note(mloop->sig_num, rel_note);
                     }
                 }
                 pthread_mutex_lock(&bpm_lock);
                 pthread_cond_wait(&bpm_cond, &bpm_lock);
                 pthread_mutex_unlock(&bpm_lock);
-                //printf("MLOOPTICK %d\n", b->quart_note_tick);
+                // printf("MLOOPTICK %d\n", b->quart_note_tick);
             }
             note_played = 0;
             rand_note_played = 0;
@@ -198,10 +214,10 @@ void *play_melody_loop(void *m) {
     return NULL;
 }
 
-void keys_start_melody_player(int sig_num, char *pattern, int drone) {
+void keys_start_melody_player(int sig_num, char *pattern)
+{
 
     melody_loop *mloop = new_melody_loop(sig_num);
-    mloop->drone = drone;
 
     printf("KEYS START MELODY!\n");
     printf("SIG NUM %d - %s\n", sig_num, pattern);

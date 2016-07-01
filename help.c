@@ -2,7 +2,8 @@
 #include "defjams.h"
 #include <stdio.h>
 
-void print_help() {
+void print_help()
+{
     printf(COOL_COLOR_GREEN "\n");
     printf(":::: SBSHELL - interactive music making shell :::::::::\n");
     printf(":::: \n");

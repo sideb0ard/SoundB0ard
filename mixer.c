@@ -20,7 +20,8 @@
 
 extern ENVSTREAM *ampstream;
 
-mixer *new_mixer() {
+mixer *new_mixer()
+{
     mixer *mixr = NULL;
     mixr = calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
@@ -32,7 +33,8 @@ mixer *new_mixer() {
     return mixr;
 }
 
-void mixer_ps(mixer *mixr) {
+void mixer_ps(mixer *mixr)
+{
     printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) (Delay On: %d) "
                             ":::::\n" ANSI_COLOR_RESET,
            mixr->volume, mixr->delay_on);
@@ -45,12 +47,14 @@ void mixer_ps(mixer *mixr) {
     }
 }
 
-void delay_toggle(mixer *mixr) {
+void delay_toggle(mixer *mixr)
+{
     mixr->delay_on = abs(1 - mixr->delay_on);
     printf("MIXER VOL DELAY: %d!\n", mixr->delay_on);
 }
 
-void mixer_vol_change(mixer *mixr, float vol) {
+void mixer_vol_change(mixer *mixr, float vol)
+{
     printf("MIXER VOL CHANGE!\n");
     if (vol >= 0.0 && vol <= 1.0) {
         printf("PASSED THA CHALLEND WITH %F!\n", vol);
@@ -58,25 +62,29 @@ void mixer_vol_change(mixer *mixr, float vol) {
     }
 }
 
-void vol_change(mixer *mixr, int sg, float vol) {
+void vol_change(mixer *mixr, int sg, float vol)
+{
     if (sg > (mixr->soundgen_size - 1))
         return;
     mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
 }
 
-void freq_change(mixer *mixr, int sg, float freq) {
+void freq_change(mixer *mixr, int sg, float freq)
+{
     // TODO: safety check for OSC
     OSCIL *osc = (OSCIL *)mixr->sound_generators[sg];
     osc->freqadj(osc, freq);
 }
 
-int add_effect(mixer *mixr) {
+int add_effect(mixer *mixr)
+{
     printf("Booya, adding a new effect!\n");
     EFFECT **new_effects = NULL;
     if (mixr->effects_size <= mixr->effects_num) {
         if (mixr->effects_size == 0) {
             mixr->effects_size = DEFAULT_ARRAY_SIZE;
-        } else {
+        }
+        else {
             mixr->effects_size *= 2;
         }
 
@@ -85,7 +93,8 @@ int add_effect(mixer *mixr) {
         if (new_effects == NULL) {
             printf("Ooh, burney - cannae allocate memory for new sounds");
             return -1;
-        } else {
+        }
+        else {
             mixr->effects = new_effects;
         }
     }
@@ -100,12 +109,14 @@ int add_effect(mixer *mixr) {
     return mixr->effects_num++;
 }
 
-int add_sound_generator(mixer *mixr, SBMSG *sbm) {
+int add_sound_generator(mixer *mixr, SBMSG *sbm)
+{
     SOUNDGEN **new_soundgens = NULL;
     if (mixr->soundgen_size <= mixr->soundgen_num) {
         if (mixr->soundgen_size == 0) {
             mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
-        } else {
+        }
+        else {
             mixr->soundgen_size *= 2;
         }
 
@@ -114,7 +125,8 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm) {
         if (new_soundgens == NULL) {
             printf("Ooh, burney - cannae allocate memory for new sounds");
             return -1;
-        } else {
+        }
+        else {
             mixr->sound_generators = new_soundgens;
         }
     }
@@ -122,7 +134,8 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm) {
     return mixr->soundgen_num++;
 }
 
-int add_bitwize(mixer *mixr, int pattern) {
+int add_bitwize(mixer *mixr, int pattern)
+{
 
     BITWIZE *new_bitw = new_bitwize(pattern);
     if (new_bitw == NULL) {
@@ -141,7 +154,8 @@ int add_bitwize(mixer *mixr, int pattern) {
     printf("Added bitwize gen!\n");
     return add_sound_generator(mixr, m);
 }
-int add_osc(mixer *mixr, double freq, GTABLE *gt) {
+int add_osc(mixer *mixr, double freq, GTABLE *gt)
+{
 
     OSCIL *new_osc = new_oscil(freq, gt);
     if (new_osc == NULL) {
@@ -162,8 +176,8 @@ int add_osc(mixer *mixr, double freq, GTABLE *gt) {
     return add_sound_generator(mixr, m);
 }
 
-int add_fm_x(mixer *mixr, char *f_osc, double ffreq, char *c_osc,
-             double cfreq) {
+int add_fm_x(mixer *mixr, char *f_osc, double ffreq, char *c_osc, double cfreq)
+{
     FM *nfm = new_fm_x(f_osc, ffreq, c_osc, cfreq);
     if (nfm == NULL) {
         printf("Barfed on FM creation\n");
@@ -179,7 +193,8 @@ int add_fm_x(mixer *mixr, char *f_osc, double ffreq, char *c_osc,
     return add_sound_generator(mixr, m);
 }
 
-int add_fm(mixer *mixr, double ffreq, double cfreq) {
+int add_fm(mixer *mixr, double ffreq, double cfreq)
+{
     FM *nfm = new_fm(ffreq, cfreq);
     if (nfm == NULL) {
         printf("Barfed on FM creation\n");
@@ -195,7 +210,8 @@ int add_fm(mixer *mixr, double ffreq, double cfreq) {
     return add_sound_generator(mixr, m);
 }
 
-int add_drum(mixer *mixr, char *filename, char *pattern) {
+int add_drum(mixer *mixr, char *filename, char *pattern)
+{
     // preliminary setup
     char cwd[1024];
     getcwd(cwd, 1024);
@@ -221,7 +237,8 @@ int add_drum(mixer *mixr, char *filename, char *pattern) {
     return add_sound_generator(mixr, m);
 }
 
-int add_sampler(mixer *mixr, char *filename, double loop_len) {
+int add_sampler(mixer *mixr, char *filename, double loop_len)
+{
     // preliminary setup
     char cwd[1024];
     getcwd(cwd, 1024);
@@ -248,7 +265,8 @@ int add_sampler(mixer *mixr, char *filename, double loop_len) {
     return add_sound_generator(mixr, m);
 }
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
-double gen_next(mixer *mixr) {
+double gen_next(mixer *mixr)
+{
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {
         for (int i = 0; i < mixr->soundgen_num; i++) {

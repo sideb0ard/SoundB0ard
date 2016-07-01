@@ -27,7 +27,8 @@ ENVSTREAM *ampstream = NULL;
 static int paCallback(const void *inputBuffer, void *outputBuffer,
                       unsigned long framesPerBuffer,
                       const PaStreamCallbackTimeInfo *timeInfo,
-                      PaStreamCallbackFlags statusFlags, void *userData) {
+                      PaStreamCallbackFlags statusFlags, void *userData)
+{
     paData *data = (paData *)userData;
     float *out = (float *)outputBuffer;
     (void)inputBuffer;
@@ -53,7 +54,8 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
     return 0;
 }
 
-int main() {
+int main()
+{
 
     // lookup table for wavs
     sine_table = new_sine_table();

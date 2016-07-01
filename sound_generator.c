@@ -6,13 +6,15 @@
 #include "effect.h"
 #include "sound_generator.h"
 
-static int resize_effects_array(SOUNDGEN *self) {
+static int resize_effects_array(SOUNDGEN *self)
+{
 
     EFFECT **new_effects = NULL;
     if (self->effects_size <= self->effects_num) {
         if (self->effects_size == 0) {
             self->effects_size = DEFAULT_ARRAY_SIZE;
-        } else {
+        }
+        else {
             self->effects_size *= 2;
         }
 
@@ -21,14 +23,16 @@ static int resize_effects_array(SOUNDGEN *self) {
         if (new_effects == NULL) {
             printf("Ooh, burney - cannae allocate memory for new effects");
             return -1;
-        } else {
+        }
+        else {
             self->effects = new_effects;
         }
     }
     return 0;
 }
 
-int add_decimator_soundgen(SOUNDGEN *self) {
+int add_decimator_soundgen(SOUNDGEN *self)
+{
     printf("RAR! DECIMATOR all up in this kittycat\n");
     int res = resize_effects_array(self);
     if (res == -1) {
@@ -46,7 +50,8 @@ int add_decimator_soundgen(SOUNDGEN *self) {
     return self->effects_num++;
 }
 
-int add_distortion_soundgen(SOUNDGEN *self) {
+int add_distortion_soundgen(SOUNDGEN *self)
+{
     printf("BOOYA! Distortion all up in this kittycat\n");
     int res = resize_effects_array(self);
     if (res == -1) {
@@ -64,7 +69,8 @@ int add_distortion_soundgen(SOUNDGEN *self) {
     return self->effects_num++;
 }
 
-int add_delay_soundgen(SOUNDGEN *self, float duration, effect_type e_type) {
+int add_delay_soundgen(SOUNDGEN *self, float duration, effect_type e_type)
+{
     printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
 
     int res = resize_effects_array(self);
@@ -84,7 +90,8 @@ int add_delay_soundgen(SOUNDGEN *self, float duration, effect_type e_type) {
     return self->effects_num++;
 }
 
-int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type) {
+int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type)
+{
     printf("Booya, adding a new *PASS to SOUNDGEN: %f!\n", freq);
     int res = resize_effects_array(self);
     if (res == -1) {
@@ -103,7 +110,8 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type) {
     return self->effects_num++;
 }
 
-float effector(SOUNDGEN *self, float val) {
+float effector(SOUNDGEN *self, float val)
+{
     double val_copy = val;
 
     if (self->effects_on) {
@@ -206,13 +214,15 @@ float effector(SOUNDGEN *self, float val) {
     return val;
 }
 
-int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type) {
+int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type)
+{
     printf("Booya, adding a new envelope to SOUNDGEN!\n");
     ENVSTREAM **new_envelopes = NULL;
     if (self->envelopes_size <= self->envelopes_num) {
         if (self->envelopes_size == 0) {
             self->envelopes_size = DEFAULT_ARRAY_SIZE;
-        } else {
+        }
+        else {
             self->envelopes_size *= 2;
         }
 
@@ -221,7 +231,8 @@ int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type) {
         if (new_envelopes == NULL) {
             printf("Ooh, burney - cannae allocate memory for new envelopes");
             return -1;
-        } else {
+        }
+        else {
             self->envelopes = new_envelopes;
         }
     }
@@ -237,14 +248,16 @@ int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type) {
     return self->envelopes_num++;
 }
 
-float envelopor(SOUNDGEN *self, float val) {
+float envelopor(SOUNDGEN *self, float val)
+{
 
     if (self->envelopes_num > 0) {
         for (int i = 0; i < self->envelopes_num; i++) {
             double mix_env = envelope_stream_tick(self->envelopes[i]);
             if (self->envelopes[i]->started) {
                 val *= mix_env;
-            } else if (mix_env == 1) {
+            }
+            else if (mix_env == 1) {
                 self->envelopes[i]->started = 1;
                 val *= mix_env;
             }

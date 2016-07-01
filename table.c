@@ -5,7 +5,8 @@
 #include "defjams.h"
 #include "table.h"
 
-static GTABLE *_new_gtable(void) {
+static GTABLE *_new_gtable(void)
+{
     GTABLE *gtable = NULL;
     gtable = (GTABLE *)calloc(1, sizeof(GTABLE));
     if (gtable == NULL)
@@ -19,7 +20,8 @@ static GTABLE *_new_gtable(void) {
     return gtable;
 }
 
-static void norm_gtable(GTABLE *gtable) {
+static void norm_gtable(GTABLE *gtable)
+{
     unsigned long i;
     double val, maxamp = 0.0;
 
@@ -39,7 +41,8 @@ static void norm_gtable(GTABLE *gtable) {
 
 // TABLE GENERATION SIGNALS
 //
-GTABLE *new_sine_table() {
+GTABLE *new_sine_table()
+{
     unsigned long i;
     double step;
 
@@ -55,7 +58,8 @@ GTABLE *new_sine_table() {
     return gtable;
 }
 
-GTABLE *new_tri_table() {
+GTABLE *new_tri_table()
+{
     unsigned long i, j;
     double step, amp;
     int harmonic = 1;
@@ -76,7 +80,8 @@ GTABLE *new_tri_table() {
     return gtable;
 }
 
-GTABLE *new_square_table() {
+GTABLE *new_square_table()
+{
     unsigned long i, j;
     double step, amp;
     int harmonic = 1;
@@ -99,7 +104,8 @@ GTABLE *new_square_table() {
     return gtable;
 }
 
-GTABLE *new_saw_table(int up) {
+GTABLE *new_saw_table(int up)
+{
     unsigned long i, j;
     double step, val, amp = 1.0;
     int harmonic = 1;
@@ -123,13 +129,15 @@ GTABLE *new_saw_table(int up) {
 }
 // END TABLE GENERATION SIGNALS
 
-void table_info(GTABLE *gtable) {
+void table_info(GTABLE *gtable)
+{
     printf("TABLE LEN: %lu\n", gtable->length);
     for (double i = 0; i < gtable->length; i++)
         printf("%f", gtable->table[(int)i]);
 }
 
-void gtable_free(GTABLE **gtable) {
+void gtable_free(GTABLE **gtable)
+{
     if (gtable && *gtable && (*gtable)->table) {
         free((*gtable)->table);
         free(*gtable);

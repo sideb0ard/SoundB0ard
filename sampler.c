@@ -9,7 +9,8 @@
 
 extern bpmrrr *b;
 
-SAMPLER *new_sampler(char *filename, double loop_len) {
+SAMPLER *new_sampler(char *filename, double loop_len)
+{
     SAMPLER *sampler = calloc(1, sizeof(SAMPLER));
     sampler->position = 0;
 
@@ -63,7 +64,8 @@ SAMPLER *new_sampler(char *filename, double loop_len) {
     return sampler;
 }
 
-void sampler_set_incr(void *self) {
+void sampler_set_incr(void *self)
+{
     SAMPLER *sampler = self;
     printf("BUFSIZE is %d\n", sampler->bufsize);
     double incr = sampler->bufsize / (SAMPLE_RATE * (60.0 / b->bpm * 4) /
@@ -111,19 +113,22 @@ double sampler_gennext(void *self)
     return val * sampler->vol;
 }
 
-void sampler_status(void *self, char *status_string) {
+void sampler_status(void *self, char *status_string)
+{
     SAMPLER *sampler = self;
     snprintf(status_string, 119,
              COOL_COLOR_GREEN "[%s]\tvol: %.2lf" ANSI_COLOR_RESET,
              basename(sampler->filename), sampler->vol);
 }
 
-double sampler_getvol(void *self) {
+double sampler_getvol(void *self)
+{
     SAMPLER *sampler = self;
     return sampler->vol;
 }
 
-void sampler_setvol(void *self, double v) {
+void sampler_setvol(void *self, double v)
+{
     SAMPLER *sampler = self;
     if (v < 0.0 || v > 1.0) {
         return;

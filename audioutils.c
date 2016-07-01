@@ -4,7 +4,8 @@
 
 #include "audioutils.h"
 
-void pa_setup(void) {
+void pa_setup(void)
+{
     // PA start me up!
     PaError err;
     err = Pa_Initialize();
@@ -15,7 +16,8 @@ void pa_setup(void) {
     }
 }
 
-void pa_teardown(void) {
+void pa_teardown(void)
+{
     //  time to go home!
     PaError err;
     err = Pa_Terminate();

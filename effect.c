@@ -5,7 +5,8 @@
 #include "defjams.h"
 #include "effect.h"
 
-EFFECT *new_delay(double duration, effect_type e_type) {
+EFFECT *new_delay(double duration, effect_type e_type)
+{
     EFFECT *e;
     e = (EFFECT *)calloc(1, sizeof(EFFECT));
     if (e == NULL)
@@ -26,7 +27,8 @@ EFFECT *new_delay(double duration, effect_type e_type) {
     return e;
 }
 
-EFFECT *new_decimator() {
+EFFECT *new_decimator()
+{
     EFFECT *e;
     e = (EFFECT *)calloc(1, sizeof(EFFECT));
     if (e == NULL)
@@ -38,7 +40,8 @@ EFFECT *new_decimator() {
     return e;
 }
 
-EFFECT *new_distortion() {
+EFFECT *new_distortion()
+{
     EFFECT *e;
     e = (EFFECT *)calloc(1, sizeof(EFFECT));
     if (e == NULL)
@@ -47,7 +50,8 @@ EFFECT *new_distortion() {
     return e;
 }
 
-EFFECT *new_freq_pass(double freq, effect_type pass_type) {
+EFFECT *new_freq_pass(double freq, effect_type pass_type)
+{
     EFFECT *e;
     e = (EFFECT *)calloc(1, sizeof(EFFECT));
     if (e == NULL)

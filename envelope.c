@@ -9,27 +9,31 @@
 extern mixer *mixr;
 extern bpmrrr *b;
 
-static void _env_updatepoints(ENVSTREAM *stream) {
+static void _env_updatepoints(ENVSTREAM *stream)
+{
     stream->leftpoint = stream->points[stream->ileft];
     stream->rightpoint = stream->points[stream->iright];
     stream->width = stream->rightpoint.time - stream->leftpoint.time;
     stream->height = stream->rightpoint.value - stream->leftpoint.value;
 }
 
-static void _env_reset(ENVSTREAM *stream) {
+static void _env_reset(ENVSTREAM *stream)
+{
     stream->curpos = 0.0;
     stream->ileft = 0;
     stream->iright = 1;
     _env_updatepoints(stream);
 }
 
-void update_envelope_stream_bpm(ENVSTREAM *stream) {
+void update_envelope_stream_bpm(ENVSTREAM *stream)
+{
     // 100 is for percent - time of envelope is measured as percent of loop len
     stream->incr = 100.0 / (60.0 / (b->bpm) * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
     printf("called me - BPM IS NOW %d\n", b->bpm);
 }
 
-ENVELOPE maxpoint(const ENVELOPE *points, long npoints) {
+ENVELOPE maxpoint(const ENVELOPE *points, long npoints)
+{
     ENVELOPE point;
 
     point.value = points[0].value;
@@ -44,7 +48,8 @@ ENVELOPE maxpoint(const ENVELOPE *points, long npoints) {
     return point;
 }
 
-ENVELOPE *newpoints() {
+ENVELOPE *newpoints()
+{
 
     ENVELOPE *points = NULL;
     points = (ENVELOPE *)calloc(4, sizeof(ENVELOPE));
@@ -61,7 +66,8 @@ ENVELOPE *newpoints() {
     return points;
 }
 
-ENVELOPE *new_fadein_points() {
+ENVELOPE *new_fadein_points()
+{
 
     ENVELOPE *points = NULL;
     points = (ENVELOPE *)calloc(7, sizeof(ENVELOPE));
@@ -84,7 +90,8 @@ ENVELOPE *new_fadein_points() {
     return points;
 }
 
-ENVELOPE *new_fadeout_points() {
+ENVELOPE *new_fadeout_points()
+{
 
     ENVELOPE *points = NULL;
     points = (ENVELOPE *)calloc(5, sizeof(ENVELOPE));
@@ -103,7 +110,8 @@ ENVELOPE *new_fadeout_points() {
     return points;
 }
 
-ENVELOPE *new_wavey_points() {
+ENVELOPE *new_wavey_points()
+{
 
     ENVELOPE *points = NULL;
     points = (ENVELOPE *)calloc(8, sizeof(ENVELOPE));
@@ -168,14 +176,16 @@ ENVSTREAM *new_envelope_stream(int env_len,
     return stream;
 }
 
-void free_stream(ENVSTREAM *stream) {
+void free_stream(ENVSTREAM *stream)
+{
     if (stream && stream->points) {
         free(stream->points);
         stream->points = NULL;
     }
 }
 
-double envelope_stream_tick(ENVSTREAM *stream) {
+double envelope_stream_tick(ENVSTREAM *stream)
+{
     double thisval, frac;
     frac = (stream->curpos - stream->leftpoint.time) / stream->width;
     thisval = stream->leftpoint.value + (stream->height * frac);
@@ -186,18 +196,21 @@ double envelope_stream_tick(ENVSTREAM *stream) {
         stream->iright++;
         if (stream->iright < stream->npoints) {
             _env_updatepoints(stream);
-        } else {
+        }
+        else {
             _env_reset(stream);
         }
     }
     return thisval;
 }
 
-void printbp(ENVELOPE *bp) {
+void printbp(ENVELOPE *bp)
+{
     printf("Time: %f Val: %f\n", bp->time, bp->value);
 }
 
-void ps_envelope_stream(ENVSTREAM *stream) {
+void ps_envelope_stream(ENVSTREAM *stream)
+{
     // ENVELOPE tmp = maxpoint(stream->points, 4);
     // for (int i = 0; i < 4; i++)
     //  printbp(&stream->points[0]);

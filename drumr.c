@@ -15,7 +15,8 @@ extern mixer *mixr;
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
 
-void pattern_char_to_int(char *char_pattern, int *final_pattern) {
+void pattern_char_to_int(char *char_pattern, int *final_pattern)
+{
     int sp_count = 0;
     char *sp, *sp_last, *spattern[32];
     char *sep = " ";
@@ -36,7 +37,8 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern) {
     }
 }
 
-int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info) {
+int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
+{
     SNDFILE *snd_file;
 
     sf_info->format = 0;
@@ -63,7 +65,8 @@ int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info) {
     return buffer;
 }
 
-DRUM *new_drumr(char *filename, char *pattern) {
+DRUM *new_drumr(char *filename, char *pattern)
+{
     DRUM *drumr = calloc(1, sizeof(DRUM));
 
     pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
@@ -93,7 +96,8 @@ DRUM *new_drumr(char *filename, char *pattern) {
     return drumr;
 }
 
-void update_pattern(void *self, int newpattern) {
+void update_pattern(void *self, int newpattern)
+{
     DRUM *drumr = self;
     drumr->pattern = newpattern;
 
@@ -125,11 +129,13 @@ double drum_gennext(void *self)
                         // drumr->swing_setting = (drumr->swing_setting + 3) %
                         // QUART_TICK;
                     }
-                } else {
+                }
+                else {
                     drumr->sample_positions[conv_part].playing = 1;
                     drumr->sample_positions[conv_part].played = 1;
                 }
-            } else {
+            }
+            else {
                 drumr->sample_positions[conv_part].playing = 1;
                 drumr->sample_positions[conv_part].played = 1;
             }
@@ -174,13 +180,15 @@ double drum_gennext(void *self)
     return val * drumr->vol;
 }
 
-void drum_status(void *self, char *status_string) {
+void drum_status(void *self, char *status_string)
+{
     DRUM *drumr = self;
     char spattern[DRUM_PATTERN_LEN + 1] = "";
     for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
         if (drumr->pattern & (1 << i)) {
             strncat(&spattern[i], "1", 1);
-        } else {
+        }
+        else {
             strncat(&spattern[i], "0", 1);
         }
     }
@@ -190,12 +198,14 @@ void drum_status(void *self, char *status_string) {
              drumr->filename, spattern, drumr->vol);
 }
 
-double drum_getvol(void *self) {
+double drum_getvol(void *self)
+{
     DRUM *drumr = self;
     return drumr->vol;
 }
 
-void drum_setvol(void *self, double v) {
+void drum_setvol(void *self, double v)
+{
     DRUM *drumr = self;
     if (v < 0.0 || v > 1.0) {
         return;
@@ -203,20 +213,23 @@ void drum_setvol(void *self, double v) {
     drumr->vol = v;
 }
 
-void swingrrr(void *self, int swing_setting) {
+void swingrrr(void *self, int swing_setting)
+{
     DRUM *drumr = self;
     // printf("SWING CALLED FOR %d\n", swing_setting);
     if (drumr->swing) {
         printf("swing OFF\n");
         drumr->swing = 0;
-    } else {
+    }
+    else {
         printf("Swing ON to %d\n", swing_setting);
         drumr->swing = 1;
         drumr->swing_setting = swing_setting;
     }
 }
 
-void *randdrum_run(void *m) {
+void *randdrum_run(void *m)
+{
     SBMSG *msg = (SBMSG *)m;
     int drum_num = msg->sound_gen_num;
     int looplen = msg->looplen;
@@ -233,7 +246,8 @@ void *randdrum_run(void *m) {
                 // printf("My rand num %d\n", pattern);
                 update_pattern(mixr->sound_generators[drum_num], pattern);
             }
-        } else {
+        }
+        else {
             changed = 0;
         }
         pthread_mutex_lock(&bpm_lock);
@@ -242,7 +256,8 @@ void *randdrum_run(void *m) {
     }
 }
 
-void add_pattern(void *self, char *pattern) {
+void add_pattern(void *self, char *pattern)
+{
     DRUM *drumr = self;
     pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
 }

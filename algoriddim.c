@@ -24,7 +24,8 @@ extern pthread_mutex_t bpm_lock;
 static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
                                "f#", "g",  "g#", "a",  "a#", "b"};
 
-algo *new_algo() {
+algo *new_algo()
+{
     algo *a = NULL;
     a = calloc(1, sizeof(algo));
     if (a == NULL) {
@@ -35,7 +36,8 @@ algo *new_algo() {
 }
 
 void play_melody(const int osc_num, int *mlock, int *note, double *notes,
-                 const int note_len) {
+                 const int note_len)
+{
     if (!*mlock) {
 
         *mlock = 1;
@@ -51,7 +53,8 @@ void play_melody(const int osc_num, int *mlock, int *note, double *notes,
 }
 
 void fplay_melody(const int sg_num, int *mlock, int *note, double *notes,
-                  const int note_len) {
+                  const int note_len)
+{
     if (!*mlock) {
 
         *mlock = 1;
@@ -65,7 +68,8 @@ void fplay_melody(const int sg_num, int *mlock, int *note, double *notes,
     }
 }
 
-melody_msg *new_melody_msg(double *freqs, int melody_note_len, int loop_len) {
+melody_msg *new_melody_msg(double *freqs, int melody_note_len, int loop_len)
+{
     melody_msg *m = calloc(1, sizeof(melody_msg));
     m->melody = freqs;
     m->osc_num = 0;
@@ -76,7 +80,8 @@ melody_msg *new_melody_msg(double *freqs, int melody_note_len, int loop_len) {
     return m;
 }
 
-void *loop_run(void *m) {
+void *loop_run(void *m)
+{
     melody_msg *mmsg = (melody_msg *)m;
     printf("LOOP RUN CALLED - got me a msg: %f, %f, %d\n", mmsg->melody[0],
            mmsg->melody[1], mmsg->melody_note_len);
@@ -94,7 +99,8 @@ void *loop_run(void *m) {
             play_melody(mmsg->osc_num, &mmsg->melody_play_lock,
                         &mmsg->melody_cur_note, mmsg->melody,
                         mmsg->melody_note_len);
-        } else if (mmsg->melody_play_lock) {
+        }
+        else if (mmsg->melody_play_lock) {
             mmsg->melody_play_lock = 0;
         }
         pthread_mutex_lock(&bpm_lock);
@@ -103,7 +109,8 @@ void *loop_run(void *m) {
     }
 }
 
-void *randdrum_run(void *m) {
+void *randdrum_run(void *m)
+{
     SBMSG *msg = (SBMSG *)m;
     int drum_num = msg->sound_gen_num;
     int looplen = msg->looplen;
@@ -120,7 +127,8 @@ void *randdrum_run(void *m) {
                 // printf("My rand num %d\n", pattern);
                 update_pattern(mixr->sound_generators[drum_num], pattern);
             }
-        } else {
+        }
+        else {
             changed = 0;
         }
         pthread_mutex_lock(&bpm_lock);
@@ -129,7 +137,8 @@ void *randdrum_run(void *m) {
     }
 }
 
-void *floop_run(void *m) {
+void *floop_run(void *m)
+{
     melody_msg *mmsg = (melody_msg *)m;
     printf("FLOOP RUN CALLED - got me a msg: %f, %f, %d MOD FREQ: %f\n",
            mmsg->melody[0], mmsg->melody[1], mmsg->melody_note_len,
@@ -148,7 +157,8 @@ void *floop_run(void *m) {
             fplay_melody(mmsg->osc_num, &mmsg->melody_play_lock,
                          &mmsg->melody_cur_note, mmsg->melody,
                          mmsg->melody_note_len);
-        } else if (mmsg->melody_play_lock) {
+        }
+        else if (mmsg->melody_play_lock) {
             mmsg->melody_play_lock = 0;
         }
         pthread_mutex_lock(&bpm_lock);
@@ -157,7 +167,8 @@ void *floop_run(void *m) {
     }
 }
 
-void *algo_run(void *a) {
+void *algo_run(void *a)
+{
     (void)a;
 
     srandom(time(0));
@@ -225,7 +236,8 @@ void *algo_run(void *a) {
                 if (car_or_mod) {
                     printf("CAR!\n");
                     mfm(mixr->sound_generators[ma_sig], "car", ma_new_note);
-                } else {
+                }
+                else {
                     printf("MOD!\n");
                     mfm(mixr->sound_generators[ma_sig], "mod", ma_new_note);
                 }
@@ -272,7 +284,8 @@ void *algo_run(void *a) {
                 // if (new_note >= notes_len)
                 //  note_index = 0;
             }
-        } else {
+        }
+        else {
             changed_lock = 0;
         }
         pthread_mutex_lock(&bpm_lock);

@@ -7,7 +7,8 @@
 
 extern mixer *mixr;
 
-BITWIZE *new_bitwize(int pattern) {
+BITWIZE *new_bitwize(int pattern)
+{
     BITWIZE *p_bitwize;
     p_bitwize = (BITWIZE *)calloc(1, sizeof(BITWIZE));
     if (p_bitwize == NULL)
@@ -27,12 +28,14 @@ BITWIZE *new_bitwize(int pattern) {
     return p_bitwize;
 }
 
-double bitwize_getvol(void *self) {
+double bitwize_getvol(void *self)
+{
     BITWIZE *p_bitwize = (BITWIZE *)self;
     return p_bitwize->vol;
 }
 
-void bitwize_setvol(void *self, double v) {
+void bitwize_setvol(void *self, double v)
+{
     BITWIZE *p_bitwize = (BITWIZE *)self;
     if (v < 0.0 || v > 0.2) {
         return;
@@ -40,7 +43,8 @@ void bitwize_setvol(void *self, double v) {
     p_bitwize->vol = v;
 }
 
-char bitwize_process(int pattern, int t) {
+char bitwize_process(int pattern, int t)
+{
     switch (pattern) {
     case 0:
         return t * ((t >> 9 | t >> 13) & 25 & t >> 6);
@@ -57,7 +61,8 @@ char bitwize_process(int pattern, int t) {
     }
 }
 
-double bitwize_gennext(void *self) {
+double bitwize_gennext(void *self)
+{
     BITWIZE *p_bitwize = (BITWIZE *)self;
     int t = p_bitwize->incr++;
     double vol = p_bitwize->vol;
@@ -70,7 +75,8 @@ double bitwize_gennext(void *self) {
     return scale_val * vol;
 }
 
-void bitwize_status(void *self, char *status_string) {
+void bitwize_status(void *self, char *status_string)
+{
     BITWIZE *p_bitwize = self;
     snprintf(status_string, 119,
              ANSI_COLOR_MAGENTA "BWIZE vol: %f pattern: %d" ANSI_COLOR_RESET,

@@ -8,7 +8,8 @@
 
 extern mixer *mixr;
 
-OSCIL *new_oscil(double freq, GTABLE *gt) {
+OSCIL *new_oscil(double freq, GTABLE *gt)
+{
     OSCIL *p_osc;
     p_osc = (OSCIL *)calloc(1, sizeof(OSCIL));
     if (p_osc == NULL)
@@ -35,12 +36,14 @@ OSCIL *new_oscil(double freq, GTABLE *gt) {
 
 void incrfunc(OSCIL *p_osc, double v) { p_osc->incr = v; }
 
-double oscil_getvol(void *self) {
+double oscil_getvol(void *self)
+{
     OSCIL *p_osc = (OSCIL *)self;
     return p_osc->vol;
 }
 
-void oscil_setvol(void *self, double v) {
+void oscil_setvol(void *self, double v)
+{
     OSCIL *p_osc = (OSCIL *)self;
     if (v < 0.0 || v > 1.0) {
         return;
@@ -48,14 +51,16 @@ void oscil_setvol(void *self, double v) {
     p_osc->vol = v;
 }
 
-void freqfunc(OSCIL *p_osc, double f) {
+void freqfunc(OSCIL *p_osc, double f)
+{
     p_osc->freq = f;
     p_osc->incr = TABRAD * f;
 }
 
 // void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer) //
 // interpolating
-double oscil_gennext(void *self) {
+double oscil_gennext(void *self)
+{
     OSCIL *p_osc = (OSCIL *)self;
 
     int base_index = (int)(p_osc->curphase);
@@ -85,7 +90,8 @@ double oscil_gennext(void *self) {
     return val * vol;
 }
 
-void oscil_status(void *self, char *status_string) {
+void oscil_status(void *self, char *status_string)
+{
     OSCIL *p_osc = self;
     snprintf(
         status_string, 119, ANSI_COLOR_YELLOW
