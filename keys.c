@@ -126,33 +126,14 @@ void add_melody_event(melody_loop *mloop, melody_event *e)
 void play_note(int sg_num, double freq)
 {
 
-    // struct timespec ts;
-    // ts.tv_sec = 0;
-    // ts.tv_nsec = 100000000;
-    // double vol = 0;
+    struct timespec ts;
+    ts.tv_sec = 0;
+    ts.tv_nsec = 100000000;
 
-    mfm(mixr->sound_generators[sg_num], "car", freq);
-    keypress(mixr->sound_generators[sg_num]);
-
-    // if (!drone) {
-    //    while (vol < 0.6) {
-    //        vol += 0.00001;
-    //        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-    //                                               vol);
-    //    }
-    //    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-    //    0.6);
-
-    //    nanosleep(&ts, NULL);
-
-    //    while (vol > 0.0) {
-    //        vol -= 0.00001;
-    //        mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-    //                                               vol);
-    //    }
-    //    mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-    //    0.0);
-    //}
+    mfm(mixr->sound_generators[sg_num], freq);
+    keypress_on(mixr->sound_generators[sg_num]);
+    nanosleep(&ts, NULL);
+    keypress_off(mixr->sound_generators[sg_num]);
 }
 
 void *play_melody_loop(void *m)

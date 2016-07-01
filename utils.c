@@ -413,3 +413,14 @@ int is_valid_osc(char *string)
         return 0;
     }
 }
+
+double pitch_shift_multiplier(double pitch_shift_semitones)
+// from Will Pirkle book 'Designing Software Synthesizer Plug-Ins...'
+{
+        if(pitch_shift_semitones == 0)
+                return 1.0;
+
+        // 2^(N/12)
+//      return fastPow(2.0, dPitchShiftSemitones/12.0);
+        return pow(2.0, pitch_shift_semitones/12.0);
+}

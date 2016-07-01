@@ -184,7 +184,7 @@ void interpret(char *line)
 
         // Modify an FM
         regex_t mfm_rx;
-        regcomp(&mfm_rx, "^mfm ([[:digit:]]+) (mod|car) ([.[:digit:]]+)$",
+        regcomp(&mfm_rx, "^mfm ([[:digit:]]+) ([.[:digit:]]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&mfm_rx, trim_tok, 0, NULL, 0) == 0) {
             // TODO: check this can only work on an FM
@@ -201,7 +201,7 @@ void interpret(char *line)
                 if (fmno + 1 <= mixr->soundgen_num) {
                     printf("Ooh, gotsa an mfm for FM %d - changing %s to %lf\n",
                            fmno, osc, freq);
-                    mfm(mixr->sound_generators[fmno], osc, freq);
+                    mfm(mixr->sound_generators[fmno], freq);
                 }
                 else {
                     printf("Beat it, ya chancer - gimme an FM number for one "

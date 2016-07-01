@@ -1,5 +1,4 @@
-#ifndef DEFJAMS_H
-#define DEFJAMS_H
+#pragma once
 
 #define SAMPLE_RATE (44100)
 #define FRAMES_PER_BUFFER (64)
@@ -53,4 +52,11 @@ typedef enum {
     DRUM_TYPE
 } sound_generator_type;
 
-#endif
+typedef enum {
+    NOISE,
+    SAWD,
+    SAWU,
+    SINE,
+    SQUARE,
+    TRI
+} oscil_type;
