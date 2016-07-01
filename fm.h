@@ -1,9 +1,9 @@
 #ifndef FM_H
 #define FM_H
 
+#include "envelope_generator.h"
 #include "oscil.h"
 #include "sound_generator.h"
-#include "envelope_generator.h"
 
 typedef struct FM FM;
 

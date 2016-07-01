@@ -17,6 +17,17 @@ envelope_generator *new_envelope_generator()
 
     eg->m_state = OFFF;
     eg->m_eg_mode = ANALOG;
+    eg->m_attack_time_msec = EG_DEFAULT_STATE;
+    eg->m_decay_time_msec = EG_DEFAULT_STATE;
+    eg->m_release_time_msec = EG_DEFAULT_STATE;
+    eg->m_shutdown_time_msec = 10.0;
+    eg->m_sustain_level = 1.0;
+    eg->m_output_eg = true;
+
+    set_eg_mode(eg, eg->m_eg_mode);
+
+    eg->m_legato_mode = false;
+    eg->m_reset_to_zero = false;
 
     return eg;
 }
@@ -70,8 +81,7 @@ void set_eg_mode(envelope_generator *self, eg_mode mode)
 
 void calculate_attack_time(envelope_generator *self)
 {
-    double d_samples =
-        self->m_samplerate * ((self->m_attack_time_msec) / 1000.0);
+    double d_samples = SAMPLE_RATE * ((self->m_attack_time_msec) / 1000.0);
     self->m_attack_coeff =
         exp(-log((1.0 + self->m_attack_tco) / self->m_attack_tco) / d_samples);
     self->m_attack_offset =
@@ -80,8 +90,7 @@ void calculate_attack_time(envelope_generator *self)
 
 void calculate_decay_time(envelope_generator *self)
 {
-    double d_samples =
-        self->m_samplerate * ((self->m_decay_time_msec) / 1000.0);
+    double d_samples = SAMPLE_RATE * ((self->m_decay_time_msec) / 1000.0);
     self->m_decay_coeff =
         exp(-log((1.0 + self->m_decay_tco) / self->m_decay_tco) / d_samples);
     self->m_decay_offset = (self->m_sustain_level - self->m_decay_tco) *
@@ -90,8 +99,7 @@ void calculate_decay_time(envelope_generator *self)
 
 void calculate_release_time(envelope_generator *self)
 {
-    double d_samples =
-        self->m_samplerate * ((self->m_release_time_msec) / 1000.0);
+    double d_samples = SAMPLE_RATE * ((self->m_release_time_msec) / 1000.0);
     self->m_release_coeff = exp(
         -log((1.0 + self->m_release_tco) / self->m_release_tco) / d_samples);
     self->m_release_offset =
@@ -122,14 +130,6 @@ void set_sustain_level(envelope_generator *self, double level)
     calculate_decay_time(self);
     if (self->m_state != RELEASE)
         calculate_release_time(self);
-}
-
-void set_sample_rate(envelope_generator *self, double samplerate)
-{
-    self->m_samplerate = samplerate;
-    calculate_attack_time(self);
-    calculate_decay_time(self);
-    calculate_release_time(self);
 }
 
 void start_eg(envelope_generator *self)

@@ -2,7 +2,9 @@
 
 typedef void (*tune)();
 
-typedef struct t_algoriddim { tune t; } algo;
+typedef struct t_algoriddim {
+    tune t;
+} algo;
 
 typedef struct melody_msg {
     double *melody;

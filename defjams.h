@@ -16,7 +16,7 @@
 #define TICKS_PER_BAR 32 // ignore this
 #define TICKS_PER_BEAT (TICKS_PER_BAR / 4)
 //
-#define TICK_SIZE 64 // this is per BAR 
+#define TICK_SIZE 64 // this is per BAR
 #define QUART_TICK (TICK_SIZE / 4)
 
 #define DRUM_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
