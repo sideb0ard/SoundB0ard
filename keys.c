@@ -126,14 +126,13 @@ void add_melody_event(melody_loop *mloop, melody_event *e)
 void play_note(int sg_num, double freq)
 {
 
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = 100000000;
+    //struct timespec ts;
+    //ts.tv_sec = 0;
+    //ts.tv_nsec = 100000000;
 
     mfm(mixr->sound_generators[sg_num], freq);
     keypress_on(mixr->sound_generators[sg_num]);
-    nanosleep(&ts, NULL);
-    keypress_off(mixr->sound_generators[sg_num]);
+    //nanosleep(&ts, NULL);
 }
 
 void *play_melody_loop(void *m)
@@ -169,6 +168,7 @@ void *play_melody_loop(void *m)
                     play_note(mloop->sig_num, mloop->melody[i]->freq);
                     note_played = 1;
                 }
+
                 // else if (!rand_note_played) {
                 //    rand_note_played = 1;
                 //    if ((rand() % 100) > 75) {

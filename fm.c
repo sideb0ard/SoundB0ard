@@ -55,6 +55,9 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
 
+    // Digitally Controlled Amplitude
+    fm->dca = new_dca();
+
     fm->vol = 0.0;
     fm->osc1->sound_generator.setvol(fm->osc1, 0.5);
     fm->osc2->sound_generator.setvol(fm->osc2, 0.5);
@@ -88,23 +91,27 @@ double fm_gennext(void *self)
 {
     FM *fm = (FM *)self;
 
-    // double lfo_out = lfo_gennext(fm->lfo);
-    double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
+    if (fm->note_on) {
+        double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
 
-    set_fq_mod_exp(fm->osc1, lfo_out);
-    set_fq_mod_exp(fm->osc2, lfo_out);
+        set_fq_mod_exp(fm->osc1, lfo_out);
+        set_fq_mod_exp(fm->osc2, lfo_out);
 
-    double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
-    double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
+        double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
+        double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
-    double val = 0.5 * osc1_val + 0.5 * osc2_val;
+        double val = 0.5 * osc1_val + 0.5 * osc2_val;
 
-    val = effector(&fm->sound_generator, val);
-    val = envelopor(&fm->sound_generator, val);
+        val = effector(&fm->sound_generator, val);
+        val = envelopor(&fm->sound_generator, val);
 
-    val = val * generate(fm->env, 0);
+        val = val * generate(fm->env, 0);
 
-    return fm->vol * val;
+        return fm->vol * val;
+    }
+    else {
+        return 0.0;
+    }
 }
 
 void fm_status(void *self, char *status_string)
@@ -127,11 +134,13 @@ void mfm(void *self, double val)
 void keypress_on(void *self)
 {
     FM *fm = (FM *)self;
+    fm->note_on = true;
     start_eg(fm->env);
 }
 
 void keypress_off(void *self)
 {
     FM *fm = (FM *)self;
+    fm->note_on = false;
     stop_eg(fm->env);
 }

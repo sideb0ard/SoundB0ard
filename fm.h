@@ -1,8 +1,10 @@
-#ifndef FM_H
-#define FM_H
+#pragma once
+
+#include <stdbool.h>
 
 #include "envelope_generator.h"
 #include "oscil.h"
+#include "dca.h"
 #include "sound_generator.h"
 
 typedef struct FM FM;
@@ -16,6 +18,8 @@ typedef struct FM {
     OSCIL *osc1;
     OSCIL *osc2;
     OSCIL *lfo;
+    DCA *dca;
+    bool note_on;
     float vol;
 
 } FM;
@@ -31,5 +35,3 @@ void fm_setvol(void *self, double v);
 void mfm(void *self, double val);
 void keypress_on(void *self);
 void keypress_off(void *self);
-
-#endif
