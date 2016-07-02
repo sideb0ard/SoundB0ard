@@ -3,8 +3,7 @@
 #include "defjams.h"
 #include "filter.h"
 
-typedef struct filter_onepole
-{
+typedef struct filter_onepole {
     FILTER bc_filter; // base class
 
     double m_alpha;
@@ -15,7 +14,6 @@ typedef struct filter_onepole
     double m_epsilon;
     double m_da0;
     double m_feedback;
-
 
 } FILTER_ONEPOLE;
 

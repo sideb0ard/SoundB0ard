@@ -5,7 +5,7 @@
 typedef struct dca {
 
     double m_gain;
-    double m_amplitude_db; // gui? 
+    double m_amplitude_db; // gui?
     double m_amplitude_control;
     double m_pan_control;
     double m_amp_mod_db;

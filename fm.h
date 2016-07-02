@@ -2,11 +2,11 @@
 
 #include <stdbool.h>
 
+#include "dca.h"
 #include "envelope_generator.h"
-#include "oscil.h"
 #include "filter.h"
 #include "filter_onepole.h"
-#include "dca.h"
+#include "oscil.h"
 #include "sound_generator.h"
 
 typedef struct FM FM;

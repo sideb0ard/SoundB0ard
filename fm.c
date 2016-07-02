@@ -2,10 +2,10 @@
 #include <string.h>
 
 #include "defjams.h"
+#include "filter_onepole.h"
 #include "fm.h"
 #include "table.h"
 #include "utils.h"
-#include "filter_onepole.h"
 
 extern GTABLE *sine_table;
 extern GTABLE *square_table;
@@ -110,7 +110,7 @@ double fm_gennext(void *self)
         double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
         double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
-        //if ( self->m_filter_key_track == ON )
+        // if ( self->m_filter_key_track == ON )
         //    self->m_filter
         //
         filter_set_fc_mod(fm->filter, FILTER_FC_MOD_RANGE * eg_out);

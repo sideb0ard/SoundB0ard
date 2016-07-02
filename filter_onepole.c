@@ -1,13 +1,14 @@
-#include <stdlib.h>
-#include <stdio.h>
 #include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "defjams.h"
 #include "filter_onepole.h"
 
 FILTER_ONEPOLE *new_filter_onepole(void)
 {
-    FILTER_ONEPOLE *filter = (FILTER_ONEPOLE *) calloc(1, sizeof(FILTER_ONEPOLE));
+    FILTER_ONEPOLE *filter =
+        (FILTER_ONEPOLE *)calloc(1, sizeof(FILTER_ONEPOLE));
 
     filter->bc_filter.gennext = &onepole_gennext;
     filter->bc_filter.update = &onepole_update;
@@ -33,8 +34,8 @@ void onepole_update(void *filter)
 
     double wd = 2 * M_PI * self->bc_filter.m_fc;
     double T = 1 / SAMPLE_RATE;
-    double wa = (2/T) * tan (wd*T/2);
-    double g = wa*T/2;
+    double wa = (2 / T) * tan(wd * T / 2);
+    double g = wa * T / 2;
     self->m_alpha = g / (1.0 + g);
 }
 
@@ -57,18 +58,16 @@ void onepole_reset(void *filter)
     self->m_feedback = 0;
 }
 
-
 double onepole_gennext(void *filter, double xn)
 {
     printf("GEN NEXT CALLED WITH %f\n", xn);
 
     FILTER_ONEPOLE *self = filter;
-    if ( self->bc_filter.m_type != LPF1
-            && self->bc_filter.m_type != HPF1)
+    if (self->bc_filter.m_type != LPF1 && self->bc_filter.m_type != HPF1)
         return xn;
 
-    xn = xn * self->m_gamma + self->m_feedback
-        + self->m_epsilon * onepole_get_feedback_output(self);
+    xn = xn * self->m_gamma + self->m_feedback +
+         self->m_epsilon * onepole_get_feedback_output(self);
     double vn = (self->m_da0 * xn - self->m_z1) * self->m_alpha;
 
     printf("VN is %f\n", vn);
@@ -83,9 +82,8 @@ double onepole_gennext(void *filter, double xn)
 
     if (self->bc_filter.m_type == LPF1)
         return lpf;
-    else if ( self->bc_filter.m_type == HPF1)
+    else if (self->bc_filter.m_type == HPF1)
         return hpf;
 
     return xn; // should never get here
 }
-
