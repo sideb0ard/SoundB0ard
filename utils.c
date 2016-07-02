@@ -304,7 +304,7 @@ float chfreqlookup(int ch)
     else if (ch == 121)
         return freqval("g#3"); // 'y'
     else if (ch == 104)
-        return freqval("a#3"); // 'h'
+        return freqval("a3"); // 'h'
     else if (ch == 117)
         return freqval("a#3"); // 'u'
     else if (ch == 106)

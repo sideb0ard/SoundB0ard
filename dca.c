@@ -29,7 +29,7 @@ void set_pan_control(DCA *self, double pan)
     self->m_pan_control = pan;
 }
 
-void reset(DCA *self)
+void dca_reset(DCA *self)
 {
     self->m_amp_mod_db = 0.0;
     self->m_eg_mod = 1.0;

@@ -6,6 +6,7 @@ SRC = main.c \
       bitwize.c \
       bpmrrr.c \
       cmdloop.c \
+      dca.c \
       drumr.c \
       effect.c \
       envelope.c \
