@@ -143,7 +143,7 @@ void start_eg(envelope_generator *self)
 
 void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
 
-double generate(envelope_generator *self, double *p_biased_output)
+double env_generate(envelope_generator *self, double *p_biased_output)
 {
     switch (self->m_state) {
     case OFFF: {

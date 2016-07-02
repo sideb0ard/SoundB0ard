@@ -5,6 +5,7 @@
 #include "fm.h"
 #include "table.h"
 #include "utils.h"
+#include "filter_onepole.h"
 
 extern GTABLE *sine_table;
 extern GTABLE *square_table;
@@ -49,11 +50,16 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     else // tri
         fm->osc2 = new_oscil(osc2_freq, tri_table);
 
+    fm->osc2->m_cents = 2.5; // +2.5 cents detuned
+
     // lfo
     fm->lfo = new_oscil(4, square_table);
 
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
+
+    // FILTER - VA ONEPOLE
+    fm->filter = new_filter_onepole();
 
     // Digitally Controlled Amplitude
     fm->dca = new_dca();
@@ -93,19 +99,30 @@ double fm_gennext(void *self)
 
     if (fm->note_on) {
         double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
+        double biased_eg = 0.0;
+        double eg_out = env_generate(fm->env, &biased_eg);
 
-        set_fq_mod_exp(fm->osc1, lfo_out);
-        set_fq_mod_exp(fm->osc2, lfo_out);
+        double eg_osc_mod = 10 * OSC_FQ_MOD_RANGE * biased_eg;
+
+        set_fq_mod_exp(fm->osc1, lfo_out + eg_osc_mod);
+        set_fq_mod_exp(fm->osc2, lfo_out + eg_osc_mod);
 
         double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
         double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
+        //if ( self->m_filter_key_track == ON )
+        //    self->m_filter
+        //
+        filter_set_fc_mod(fm->filter, FILTER_FC_MOD_RANGE * eg_out);
+        onepole_update(fm->filter);
+
         double val = 0.5 * osc1_val + 0.5 * osc2_val;
+        val = onepole_gennext(fm->filter, val);
 
         val = effector(&fm->sound_generator, val);
         val = envelopor(&fm->sound_generator, val);
 
-        val = val * generate(fm->env, 0);
+        val = val * env_generate(fm->env, 0); // amplitude envelope
 
         return fm->vol * val;
     }

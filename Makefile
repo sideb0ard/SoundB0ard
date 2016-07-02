@@ -12,6 +12,8 @@ SRC = main.c \
       envelope.c \
       envelope_generator.c \
       fm.c \
+      filter.c \
+      filter_onepole.c \
       help.c \
       keys.c \
       mixer.c \

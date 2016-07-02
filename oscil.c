@@ -92,6 +92,7 @@ double oscil_gennext(void *self)
 {
     OSCIL *p_osc = (OSCIL *)self;
 
+    // GET BASIC VAL
     int base_index = (int)(p_osc->curphase);
     unsigned long next_index = base_index + 1;
     double frac, slope, val;
@@ -112,9 +113,7 @@ double oscil_gennext(void *self)
         curphase += dtablen;
 
     p_osc->curphase = curphase;
-
-    // val = effector(&p_osc->sound_generator, val);
-    // val = envelopor(&p_osc->sound_generator, val);
+    // END BASIC VAL
 
     val = val * p_osc->m_fq_ratio *
           pitch_shift_multiplier(p_osc->m_fq_mod_exp + p_osc->m_octave * 12.0 +

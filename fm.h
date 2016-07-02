@@ -4,6 +4,8 @@
 
 #include "envelope_generator.h"
 #include "oscil.h"
+#include "filter.h"
+#include "filter_onepole.h"
 #include "dca.h"
 #include "sound_generator.h"
 
@@ -18,6 +20,7 @@ typedef struct FM {
     OSCIL *osc1;
     OSCIL *osc2;
     OSCIL *lfo;
+    FILTER_ONEPOLE *filter;
     DCA *dca;
     bool note_on;
     float vol;

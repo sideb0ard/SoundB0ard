@@ -33,8 +33,8 @@ typedef struct oscil {
     double incr;     // m_dInc
 
     int m_octave;
-    int m_semitones;
-    int m_cents;
+    double m_semitones;
+    double m_cents;
 
     bool m_note_on;
     double vol;

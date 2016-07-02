@@ -71,4 +71,4 @@ void set_sample_rate(envelope_generator *self, double samplerate);
 
 void start_eg(envelope_generator *self);
 void stop_eg(envelope_generator *self);
-double generate(envelope_generator *self, double *p_biased_output);
+double env_generate(envelope_generator *self, double *p_biased_output);
