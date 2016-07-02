@@ -5,6 +5,7 @@
 #include "oscil.h"
 #include "sound_generator.h"
 #include "table.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
@@ -14,9 +15,13 @@ OSCIL *new_oscil(double freq, GTABLE *gt)
     p_osc = (OSCIL *)calloc(1, sizeof(OSCIL));
     if (p_osc == NULL)
         return NULL;
+
     p_osc->freq = freq;
     p_osc->incr = TABRAD * freq;
-    p_osc->vol = 0.0;
+
+    p_osc->vol = 0.0; // TODO get rid of vol and use amp
+    p_osc->m_amp = 1.0;
+
     printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
     p_osc->gtable = gt;
     p_osc->dtablen = (double)TABLEN;
@@ -30,6 +35,27 @@ OSCIL *new_oscil(double freq, GTABLE *gt)
     // p_osc->voladj = &volfunc;
     p_osc->freqadj = &freqfunc;
     p_osc->incradj = &incrfunc;
+
+    p_osc->m_note_on = false;
+    p_osc->m_midi_note_number = 0;
+
+    p_osc->m_pulse_width = OSC_PULSEWIDTH_DEFAULT;
+    p_osc->m_pw_control = OSC_PULSEWIDTH_DEFAULT;
+    p_osc->m_pn_register = rand();
+
+    p_osc->m_rsh_counter = -1;
+    p_osc->m_rsh_value = 0.0;
+    p_osc->m_amp_mod = 1.0;
+    p_osc->m_fq_mod_exp = 0.0;
+    p_osc->m_fq_mod_lin = 0.0;
+    p_osc->m_phase_mod = 0.0;
+    p_osc->m_pitch_bend_mod = 0.0;
+    p_osc->m_pw_mod = 0.0;
+    p_osc->m_octave = 0.0;
+    p_osc->m_semitones = 0.0;
+    p_osc->m_cents = 0.0;
+    p_osc->m_fq_ratio = 1.0;
+    p_osc->m_lfo_mode = 0;
 
     return p_osc;
 }
@@ -57,8 +83,11 @@ void freqfunc(OSCIL *p_osc, double f)
     p_osc->incr = TABRAD * f;
 }
 
+void set_fq_mod_exp(OSCIL *self, double mod) { self->m_fq_mod_exp = mod; }
+
 // void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer) //
 // interpolating
+//
 double oscil_gennext(void *self)
 {
     OSCIL *p_osc = (OSCIL *)self;
@@ -84,8 +113,13 @@ double oscil_gennext(void *self)
 
     p_osc->curphase = curphase;
 
-    val = effector(&p_osc->sound_generator, val);
-    val = envelopor(&p_osc->sound_generator, val);
+    // val = effector(&p_osc->sound_generator, val);
+    // val = envelopor(&p_osc->sound_generator, val);
+
+    val = val * p_osc->m_fq_ratio *
+          pitch_shift_multiplier(p_osc->m_fq_mod_exp + p_osc->m_octave * 12.0 +
+                                 p_osc->m_semitones + p_osc->m_cents / 100.0);
+    val += p_osc->m_fq_mod_lin;
 
     return val * vol;
 }

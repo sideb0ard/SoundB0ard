@@ -88,17 +88,16 @@ double fm_gennext(void *self)
 {
     FM *fm = (FM *)self;
 
-
-    //double lfo_out = lfo_gennext(fm->lfo);
+    // double lfo_out = lfo_gennext(fm->lfo);
     double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
 
-    double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1) * pitch_shift_multiplier(lfo_out);
-    double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2) * pitch_shift_multiplier(lfo_out);
+    set_fq_mod_exp(fm->osc1, lfo_out);
+    set_fq_mod_exp(fm->osc2, lfo_out);
 
-    //double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
-    //double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
+    double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
+    double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
-    double val = 0.5*osc1_val + 0.5*osc2_val;
+    double val = 0.5 * osc1_val + 0.5 * osc2_val;
 
     val = effector(&fm->sound_generator, val);
     val = envelopor(&fm->sound_generator, val);
