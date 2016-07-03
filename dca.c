@@ -3,6 +3,7 @@
 
 #include "dca.h"
 #include "defjams.h"
+#include "utils.h"
 
 DCA *new_dca()
 {
@@ -50,13 +51,19 @@ void update(DCA *self)
     self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
 }
 
-void gennext(DCA *self)
+void gennext(DCA *self, double left_input, double right_input,
+             double *left_output, double *right_output)
 {
-    // TODO
-    // double pan_total = self->m_pan_control + self->pan_mod;
-    // pan_total = fmin(pan_total, 1.0);
-    // pan_total = fmax(pan_total, 1.0);
-    // double pan_left = 0.707;
-    // double pan_right = 0.707;
-    // calcula
+    double pan_total = self->m_pan_control + self->m_pan_mod;
+
+    pan_total = fmin(pan_total, 1.0);
+    pan_total = fmax(pan_total, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(pan_total, &pan_left, &pan_right);
+
+    *left_output =
+        pan_left * self->m_amplitude_control * left_input * self->m_gain;
+    *right_output =
+        pan_right * self->m_amplitude_control * right_input * self->m_gain;
 }

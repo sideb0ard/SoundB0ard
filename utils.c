@@ -424,3 +424,15 @@ double pitch_shift_multiplier(double pitch_shift_semitones)
     //      return fastPow(2.0, dPitchShiftSemitones/12.0);
     return pow(2.0, pitch_shift_semitones / 12.0);
 }
+
+void calculate_pan_values(double pan_total, double *pan_left, double *pan_right)
+{
+    *pan_left = cos((M_PI / 4.0) * (pan_total + 1.0));
+    *pan_right = sin((M_PI / 4.0) * (pan_total + 1.0));
+
+    *pan_left = fmax(*pan_left, (double)0.0);
+    *pan_left = fmin(*pan_left, (double)1.0);
+
+    *pan_right = fmax(*pan_right, (double)0.0);
+    *pan_right = fmin(*pan_right, (double)1.0);
+}

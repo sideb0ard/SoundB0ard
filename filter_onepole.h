@@ -4,15 +4,15 @@
 #include "filter.h"
 
 typedef struct filter_onepole {
-    FILTER bc_filter; // base class
 
+    FILTER *bc_filter; // base class
     double m_alpha;
     double m_beta;
     double m_z1;
     double m_gamma;
     double m_delta;
     double m_epsilon;
-    double m_da0;
+    double m_a0;
     double m_feedback;
 
 } FILTER_ONEPOLE;

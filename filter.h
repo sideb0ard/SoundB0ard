@@ -30,7 +30,7 @@ typedef struct filter {
     double m_aux_control; // a spare control, used in SEM and ladder filters
     double m_saturation;  // used in NLP
     filter_type m_type;
-    onoff m_nlp; // NLP on/off switch
+    onoff m_nlp; // Non Linear Processing on/off switch
 
     double m_fc;     // current filter cut-off val
     double m_q;      // current q value

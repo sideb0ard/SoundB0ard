@@ -26,3 +26,5 @@ int conv_bitz(int num);
 int is_valid_osc(char *string);
 void related_notes(char root_note[4], double *second_note, double *third_note);
 double pitch_shift_multiplier(double pitch_shift_semitones);
+void calculate_pan_values(double pan_total, double *pan_left,
+                          double *pan_right);
