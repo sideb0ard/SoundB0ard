@@ -19,9 +19,9 @@ DCA *new_dca()
     return dca;
 }
 
-void set_midi_velocity(DCA *self, int vel) { self->m_midi_velocity = vel; }
+void dca_set_midi_velocity(DCA *self, int vel) { self->m_midi_velocity = vel; }
 
-void set_pan_control(DCA *self, double pan) { self->m_pan_control = pan; }
+void dca_set_pan_control(DCA *self, double pan) { self->m_pan_control = pan; }
 
 void dca_reset(DCA *self)
 {
@@ -29,19 +29,19 @@ void dca_reset(DCA *self)
     self->m_eg_mod = 1.0;
 }
 
-void set_amplitude_db(DCA *self, double amp)
+void dca_set_amplitude_db(DCA *self, double amp)
 {
     self->m_amplitude_db = amp;
     self->m_amplitude_control = pow((double)10.0, amp / (double)20.0);
 }
 
-void set_amp_mod_db(DCA *self, double mod) { self->m_amp_mod_db = mod; }
+void dca_set_amp_mod_db(DCA *self, double mod) { self->m_amp_mod_db = mod; }
 
-void set_eg_mod(DCA *self, double mod) { self->m_eg_mod = mod; }
+void dca_set_eg_mod(DCA *self, double mod) { self->m_eg_mod = mod; }
 
-void set_pan_mod(DCA *self, double mod) { self->m_pan_mod = mod; }
+void dca_set_pan_mod(DCA *self, double mod) { self->m_pan_mod = mod; }
 
-void update(DCA *self)
+void dca_update(DCA *self)
 {
     if (self->m_eg_mod >= 0)
         self->m_gain = self->m_eg_mod;
@@ -51,7 +51,7 @@ void update(DCA *self)
     self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
 }
 
-void gennext(DCA *self, double left_input, double right_input,
+void dca_gennext(DCA *self, double left_input, double right_input,
              double *left_output, double *right_output)
 {
     double pan_total = self->m_pan_control + self->m_pan_mod;
