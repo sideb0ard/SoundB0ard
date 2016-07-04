@@ -25,4 +25,4 @@ void dca_set_eg_mod(DCA *self, double mod);
 void dca_set_pan_mod(DCA *self, double mod);
 void dca_update(DCA *self);
 void dca_gennext(DCA *self, double left_input, double right_input,
-             double *left_output, double *right_output);
+                 double *left_output, double *right_output);

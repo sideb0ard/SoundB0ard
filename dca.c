@@ -52,7 +52,7 @@ void dca_update(DCA *self)
 }
 
 void dca_gennext(DCA *self, double left_input, double right_input,
-             double *left_output, double *right_output)
+                 double *left_output, double *right_output)
 {
     double pan_total = self->m_pan_control + self->m_pan_mod;
 

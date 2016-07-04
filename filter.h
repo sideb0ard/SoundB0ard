@@ -29,7 +29,7 @@ typedef struct filter {
     double m_q_control;   // 'qualvity factor' 1-10
     double m_aux_control; // a spare control, used in SEM and ladder filters
 
-    double m_saturation;  // used in NLP
+    double m_saturation; // used in NLP
 
     filter_type m_type;
     onoff m_nlp; // Non Linear Processing on/off switch

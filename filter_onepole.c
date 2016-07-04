@@ -45,10 +45,6 @@ FILTER_ONEPOLE *new_filter_onepole(void)
     filter->m_a0 = 1.0;
     filter->m_z1 = 0.0;
 
-    //printf("Inital VALS:\n\n");
-    //print_vals(filter);
-    //printf("\n");
-
     return filter;
 }
 
@@ -56,13 +52,7 @@ void onepole_update(void *filter)
 {
     FILTER_ONEPOLE *self = filter;
 
-    //printf("[1] INSIDE VAL %f\n\n", self->m_delta);
     filter_update(self->bc_filter); // update base class
-    //printf("[2] INSIDE VAL %f\n\n", self->m_delta);
-
-    //printf("\nBASE CLASS UPDATE!\n");
-    //print_vals(self);
-    //printf("\n");
 
     double wd = 2 * M_PI * self->bc_filter->m_fc;
     double T = 1.0 / SAMPLE_RATE;
@@ -71,9 +61,6 @@ void onepole_update(void *filter)
 
     self->m_alpha = g / (1.0 + g);
 
-    //printf("\nUPDATE!\n");
-    //print_vals(self);
-    //printf("\n");
 }
 
 void onepole_set_feedback(void *filter, double fb)
@@ -97,8 +84,6 @@ void onepole_reset(void *filter)
 
 double onepole_gennext(void *filter, double xn)
 {
-    //static int count = 0;
-
     FILTER_ONEPOLE *self = filter;
     if (self->bc_filter->m_type != LPF1 && self->bc_filter->m_type != HPF1)
         return xn;
@@ -110,12 +95,6 @@ double onepole_gennext(void *filter, double xn)
 
     double lpf = vn + self->m_z1;
 
-    //printf("\n+++++++++++XN VAL %f\n\n", xn);
-    //printf("\nGEN NEXT!\n\n");
-    //print_vals(self);
-    //count++;
-    //if (count > 1)
-    //    exit(-1);
     if (lpf > 1.0) {
         print_vals(self);
     }
@@ -123,8 +102,6 @@ double onepole_gennext(void *filter, double xn)
     self->m_z1 = vn + lpf;
 
     double hpf = xn - lpf;
-
-    // printf("HPF is %f and LPF is %f\n", hpf, lpf);
 
     if (self->bc_filter->m_type == LPF1)
         return lpf;

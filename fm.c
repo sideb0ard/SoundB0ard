@@ -154,17 +154,16 @@ double fm_gennext(void *self)
         double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
         double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
-
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
         // printf("VAL %f\n", val);
         //
         double filter_out = onepole_gennext(fm->filter, osc_out);
-        //printf("FILTER VAL %f\n", filter_out);
+        // printf("FILTER VAL %f\n", filter_out);
 
         double out_left;
         double out_right;
         dca_gennext(fm->dca, filter_out, filter_out, &out_left, &out_right);
-        //dca_gennext(fm->dca, osc_out, osc_out, &out_left, &out_right);
+        // dca_gennext(fm->dca, osc_out, osc_out, &out_left, &out_right);
 
         double dca_out = (out_left + out_right) / 2;
 
