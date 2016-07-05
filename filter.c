@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "defjams.h"
@@ -23,6 +24,25 @@ FILTER *new_filter(void)
     return filter;
 }
 
+void filter_adj_fc_control(void *filter, int direction)
+{
+    FILTER *self = filter;
+    double val = self->m_fc_control;
+    if (direction == UP)
+        val += 100;
+    else
+        val -= 100;
+    filter_set_fc_control(self, val);
+    printf("Setting CUT OFF FREQ to %f\n", val);
+}
+
+void filter_set_fc_control(void *filter, double val)
+{
+    FILTER *self = filter;
+    self->m_fc_control = val;
+    printf("CUT OFF FREQ NOW %f\n", self->m_fc_control);
+}
+
 void filter_set_fc_mod(void *filter, double val)
 {
     FILTER *self = filter;
@@ -39,9 +59,12 @@ void filter_update(void *filter)
 {
     FILTER *self = filter;
     filter_set_q_control(self, self->m_q_control);
+    // printf("FC CONTROL %f AND MULTIPLIER %f\n", self->m_fc_control,
+    // pitch_shift_multiplier(self->m_fc_mod));
     self->m_fc = self->m_fc_control * pitch_shift_multiplier(self->m_fc_mod);
     if (self->m_fc > FILTER_FC_MAX)
         self->m_fc = FILTER_FC_MAX;
     if (self->m_fc < FILTER_FC_MIN)
         self->m_fc = FILTER_FC_MIN;
+    // printf("FILTER UPDATZZZ FCiz %f\n", self->m_fc);
 }

@@ -141,6 +141,12 @@ void start_eg(envelope_generator *self)
     self->m_state = ATTACK;
 }
 
+void eg_release(envelope_generator *self)
+{
+    if (self->m_state == SUSTAIN)
+        self->m_state = RELEASE;
+}
+
 void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
 
 double env_generate(envelope_generator *self, double *p_biased_output)

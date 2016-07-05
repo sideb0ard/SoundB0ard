@@ -18,7 +18,7 @@ void faderrr(int sig_num, direction d);
 freaky *new_freqs_from_string(char *string);
 float freqval(char *n);
 int notelookup(char *n);
-float chfreqlookup(int ch);
+float chfreqlookup(int ch, void *fm);
 void list_sample_dir(void);
 void strim(const char *input, char *result);
 void chordie(char *n);
@@ -28,3 +28,6 @@ void related_notes(char root_note[4], double *second_note, double *third_note);
 double pitch_shift_multiplier(double pitch_shift_semitones);
 void calculate_pan_values(double pan_total, double *pan_left,
                           double *pan_right);
+
+void itoa(int n, char s[]);
+void reverse(char s[]);

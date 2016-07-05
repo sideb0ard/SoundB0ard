@@ -44,8 +44,9 @@ typedef struct filter {
 
 } FILTER;
 
-void filter_set_fc_mod(void *self, double val);
+FILTER *new_filter(void);
 void filter_set_q_control(void *self, double val);
 void filter_update(void *self);
-
-FILTER *new_filter(void);
+void filter_set_fc_mod(void *self, double val);
+void filter_adj_fc_control(void *filter, int direction);
+void filter_set_fc_control(void *self, double val);

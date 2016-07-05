@@ -53,7 +53,7 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     fm->osc2->m_cents = 2.5; // +2.5 cents detuned
 
     // lfo
-    fm->lfo = new_oscil(4, square_table);
+    fm->lfo = new_oscil(4, sine_table);
 
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
@@ -65,8 +65,10 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     fm->dca = new_dca();
 
     fm->vol = 0.0;
-    fm->osc1->sound_generator.setvol(fm->osc1, 0.5);
-    fm->osc2->sound_generator.setvol(fm->osc2, 0.5);
+    fm->cur_octave = 2;
+    fm->wave_form = SAWD;
+    // fm->osc1->sound_generator.setvol(fm->osc1, 0.5);
+    // fm->osc2->sound_generator.setvol(fm->osc2, 0.5);
 
     fm->sound_generator.gennext = &fm_gennext;
     fm->sound_generator.status = &fm_status;
@@ -75,6 +77,59 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     fm->sound_generator.type = FM_TYPE;
 
     return fm;
+}
+
+void fm_change_osc_wave_form(void *self)
+{
+    FM *fm = (FM *)self;
+
+    int type = (fm->wave_form + 1) % 6;
+    printf("Changing wav types to %d\n", type);
+    fm->wave_form = type;
+
+    OSCIL *new_osc1 = NULL;
+    OSCIL *new_osc2 = NULL;
+    OSCIL *old_osc1 = fm->osc1;
+    OSCIL *old_osc2 = fm->osc2;
+    double freq = fm->osc1->freq;
+    printf("FREQY %f\n", freq);
+    switch (type) {
+    case SAWD: {
+        fm->osc1 = new_oscil(freq, saw_down_table);
+        fm->osc2 = new_oscil(freq, saw_down_table);
+        break;
+    }
+    case SAWU: {
+        fm->osc1 = new_oscil(freq, saw_up_table);
+        fm->osc2 = new_oscil(freq, saw_up_table);
+        break;
+    }
+    case TRI: {
+        fm->osc1 = new_oscil(freq, tri_table);
+        fm->osc2 = new_oscil(freq, tri_table);
+        break;
+    }
+    case SQUARE: {
+        new_osc1 = new_oscil(freq, square_table);
+        new_osc2 = new_oscil(freq, square_table);
+        break;
+    }
+    case SINE:
+    default: {
+        fm->osc1 = new_oscil(freq, sine_table);
+        fm->osc2 = new_oscil(freq, sine_table);
+        break;
+    }
+    }
+
+    new_osc1->sound_generator.setvol(new_osc1, 0.5);
+    new_osc2->sound_generator.setvol(new_osc2, 0.5);
+    new_osc2->m_cents = 2.5; // +2.5 cents detuned
+
+    fm->osc1 = new_osc1;
+    fm->osc2 = new_osc2;
+    free(old_osc1);
+    free(old_osc2);
 }
 
 void fm_setvol(void *self, double v)
@@ -90,6 +145,19 @@ double fm_getvol(void *self)
 {
     FM *fm = (FM *)self;
     return fm->vol;
+}
+
+void change_octave(void *self, int direction)
+{
+    FM *fm = (FM *)self;
+    int octave = fm->cur_octave;
+    if (direction == UP)
+        octave++;
+    else
+        octave--;
+
+    if (octave >= 0 && octave < 6)
+        fm->cur_octave = octave;
 }
 
 void fm_status(void *self, char *status_string)
@@ -118,6 +186,7 @@ void keypress_on(void *self)
 
 void keypress_off(void *self)
 {
+    printf("called me!\n");
     FM *fm = (FM *)self;
     fm->note_on = false;
     stop_eg(fm->env);
@@ -132,8 +201,10 @@ double fm_gennext(void *self)
 
         // ARTICULATION BLOCK
         double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
+        // printf("LFO out! %f\n", lfo_out);
         double biased_eg = 0.0;
         double eg_out = env_generate(fm->env, &biased_eg);
+        // printf("LFO: %f // EnvG: %f\n", lfo_out, eg_out);
 
         // CALC ENV GEN -> OSC MOD
         double eg_osc_mod = 1 * OSC_FQ_MOD_RANGE * biased_eg;
@@ -146,7 +217,7 @@ double fm_gennext(void *self)
         //    self->m_filter
         //
         filter_set_fc_mod(fm->filter->bc_filter, FILTER_FC_MOD_RANGE * eg_out);
-        onepole_update(fm->filter);
+        // onepole_update(fm->filter);
 
         dca_set_eg_mod(fm->dca, eg_out * 1.0);
         dca_update(fm->dca);
@@ -167,8 +238,9 @@ double fm_gennext(void *self)
 
         double dca_out = (out_left + out_right) / 2;
 
-        // val = effector(&fm->sound_generator, val);
-        // val = envelopor(&fm->sound_generator, val);
+        // my old schools..>
+        dca_out = effector(&fm->sound_generator, dca_out);
+        dca_out = envelopor(&fm->sound_generator, dca_out);
 
         return fm->vol * dca_out;
     }

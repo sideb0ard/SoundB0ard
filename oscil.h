@@ -1,5 +1,4 @@
-#ifndef OSCIL_H
-#define OSCIL_H
+#pragma once
 
 #include <stdio.h>
 
@@ -92,5 +91,4 @@ void osc_reset(OSCIL *self);
 void osc_update(OSCIL *self);
 
 void oscil_status(void *self, char *status_string);
-
-#endif // OSCIL_H
+void freqinc(OSCIL *p_osc, int direction);

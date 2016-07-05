@@ -19,7 +19,7 @@ OSCIL *new_oscil(double freq, GTABLE *gt)
     p_osc->freq = freq;
     p_osc->incr = TABRAD * freq;
 
-    p_osc->vol = 0.0; // TODO get rid of vol and use amp
+    p_osc->vol = 0.7; // TODO get rid of vol and use amp
     p_osc->m_amp = 1.0;
 
     printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
@@ -77,10 +77,25 @@ void oscil_setvol(void *self, double v)
     p_osc->vol = v;
 }
 
+void freqinc(OSCIL *p_osc, int direction)
+{
+    printf("FREQINC!\n");
+    int freq;
+    if (direction == UP)
+        freq = p_osc->freq + 2;
+    else
+        freq = p_osc->freq - 1;
+    freqfunc(p_osc, freq);
+}
+
 void freqfunc(OSCIL *p_osc, double f)
 {
-    p_osc->freq = f;
-    p_osc->incr = TABRAD * f;
+    printf("FREQFUNC!\n");
+    if (f >= OSC_FQ_MIN && f <= OSC_FQ_MAX) {
+        p_osc->freq = f;
+        p_osc->incr = TABRAD * f;
+        printf("New freak is %f\n", f);
+    }
 }
 
 void set_fq_mod_exp(OSCIL *self, double mod) { self->m_fq_mod_exp = mod; }

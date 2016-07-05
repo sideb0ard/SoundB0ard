@@ -283,38 +283,90 @@ int notelookup(char *n)
         return -1;
 }
 
-float chfreqlookup(int ch)
+float chfreqlookup(int ch, void *fm)
 {
-    if (ch == 97)
-        return freqval("c3"); // 'a' key
-    else if (ch == 119)
-        return freqval("c#3"); // 'w'
-    else if (ch == 115)
-        return freqval("d3"); // 's'
-    else if (ch == 101)
-        return freqval("d#3"); // 'e'
-    else if (ch == 100)
-        return freqval("e3"); // 'd'
-    else if (ch == 102)
-        return freqval("f3"); // 'f'
-    else if (ch == 116)
-        return freqval("f#3"); // 't'
-    else if (ch == 103)
-        return freqval("g3"); // 'g'
-    else if (ch == 121)
-        return freqval("g#3"); // 'y'
-    else if (ch == 104)
-        return freqval("a3"); // 'h'
-    else if (ch == 117)
-        return freqval("a#3"); // 'u'
-    else if (ch == 106)
-        return freqval("b3"); // 'j'
-    else if (ch == 107)
-        return freqval("c4"); // 'k'
-    else if (ch == 111)
-        return freqval("c#4"); // 'o'
-    else if (ch == 108)
-        return freqval("d3"); // 'l'
+    FM *self = (FM *)fm;
+    char cur_octave[2];
+    char cur_octave_plus_one[2];
+    itoa(self->cur_octave, cur_octave);
+    itoa(self->cur_octave + 1, cur_octave_plus_one);
+
+    char tmpval[4] = "";
+    if (ch == 97) {
+        strcat(tmpval, "c");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'a' key
+    }
+    else if (ch == 119) {
+        strcat(tmpval, "c#");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'w' key
+    }
+    else if (ch == 115) {
+        strcat(tmpval, "d");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 's' key
+    }
+    else if (ch == 101) {
+        strcat(tmpval, "d#");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'e' key
+    }
+    else if (ch == 100) {
+        strcat(tmpval, "e");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'd' key
+    }
+    else if (ch == 102) {
+        strcat(tmpval, "f");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'f' key
+    }
+    else if (ch == 116) {
+        strcat(tmpval, "f#");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 't' key
+    }
+    else if (ch == 103) {
+        strcat(tmpval, "g");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'g' key
+    }
+    else if (ch == 121) {
+        strcat(tmpval, "g#");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'y' key
+    }
+    else if (ch == 104) {
+        strcat(tmpval, "a");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'h' key
+    }
+    else if (ch == 117) {
+        strcat(tmpval, "a#");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'u' key
+    }
+    else if (ch == 106) {
+        strcat(tmpval, "b");
+        strcat(tmpval, cur_octave);
+        return freqval(tmpval); // 'j' key
+    }
+    else if (ch == 107) {
+        strcat(tmpval, "c");
+        strcat(tmpval, cur_octave_plus_one);
+        return freqval(tmpval); // 'k' key
+    }
+    else if (ch == 111) {
+        strcat(tmpval, "c");
+        strcat(tmpval, cur_octave_plus_one);
+        return freqval(tmpval); // 'o' key
+    }
+    else if (ch == 108) {
+        strcat(tmpval, "d");
+        strcat(tmpval, cur_octave_plus_one);
+        return freqval(tmpval); // 'l' key
+    }
     else
         return -1;
 }
@@ -435,4 +487,36 @@ void calculate_pan_values(double pan_total, double *pan_left, double *pan_right)
 
     *pan_right = fmax(*pan_right, (double)0.0);
     *pan_right = fmin(*pan_right, (double)1.0);
+}
+
+// From K&R C - cut n pasted from
+// https://en.wikibooks.org/wiki/C_Programming/C_Reference/stdlib.h/itoa
+/* itoa:  convert n to characters in s */
+void itoa(int n, char s[])
+{
+    int i, sign;
+
+    if ((sign = n) < 0) /* record sign */
+        n = -n;         /* make n positive */
+    i = 0;
+    do {                       /* generate digits in reverse order */
+        s[i++] = n % 10 + '0'; /* get next digit */
+    } while ((n /= 10) > 0);   /* delete it */
+    if (sign < 0)
+        s[i++] = '-';
+    s[i] = '\0';
+    reverse(s);
+}
+
+/* reverse:  reverse string s in place */
+void reverse(char s[])
+{
+    int i, j;
+    char c;
+
+    for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
+        c = s[i];
+        s[i] = s[j];
+        s[j] = c;
+    }
 }

@@ -60,7 +60,6 @@ void onepole_update(void *filter)
     double g = wa * T / 2;
 
     self->m_alpha = g / (1.0 + g);
-
 }
 
 void onepole_set_feedback(void *filter, double fb)

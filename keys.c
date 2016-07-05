@@ -28,6 +28,13 @@ melody_loop *new_melody_loop(int soundgen_num)
     return l;
 }
 
+static void alarm_handler(int signum)
+{
+    printf("TIMER!! %d\n", signum);
+    FM *fm = (FM *)mixr->sound_generators[0];
+    eg_release(fm->env);
+}
+
 void keys(int soundgen_num)
 {
     printf("Entering Keys Mode for %d\n", soundgen_num);
@@ -41,9 +48,13 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
+    FM *self = (FM *)mixr->sound_generators[soundgen_num];
+
+    signal(SIGALRM, alarm_handler);
+
     int ch = 0;
     int quit = 0;
-    int recording = 0;
+    // int recording = 0;
     // int recording_started = 0;
 
     struct pollfd fdz[1];
@@ -52,7 +63,7 @@ void keys(int soundgen_num)
     fdz[0].fd = STDIN_FILENO;
     fdz[0].events = POLLIN;
 
-    melody_loop *mloop;
+    // melody_loop *mloop;
 
     while (!quit) {
 
@@ -64,37 +75,40 @@ void keys(int soundgen_num)
 
         if (fdz[0].revents & POLLIN) {
             ch = getchar();
-            if (ch == 27 || ch == 113) {
+            if (ch == 27 || ch == 113) { // Esc or 'q'
                 quit = 1;
             }
-            else if (ch == 32) {
-                recording = 1 - recording;
-                switch (recording) {
-                case 0:
-                    printf("Recording Mode OFF.\n");
-                    pthread_t melody_looprrr;
-                    if (pthread_create(&melody_looprrr, NULL, play_melody_loop,
-                                       mloop)) {
-                        fprintf(stderr, "Err running loop\n");
-                    }
-                    pthread_detach(melody_looprrr);
-                    quit = 1;
-                    break;
-                case 1:
-                    printf("Recording Mode ON.\n");
-                    mloop = new_melody_loop(soundgen_num);
-                    // melody_event* e = make_melody_event(0, 0, b->cur_tick);
-                    melody_event *e = make_melody_event(b->cur_tick, 0, NULL);
-                    add_melody_event(mloop, e);
-                }
+            // WRONG! dangerous
+            // else if ( ch == 96 ) { // '`'
+            //    printf("Changing WAVE form of synth\n");
+            //    fm_change_osc_wave_form(self);
+            //}
+            else if (ch == 49) { // '1'
+                change_octave(mixr->sound_generators[soundgen_num], DOWN);
+            }
+            else if (ch == 50) { // '2'
+                change_octave(mixr->sound_generators[soundgen_num], UP);
+            }
+            else if (ch == 99) { // 'c'
+                freqinc(self->lfo, DOWN);
+            }
+            else if (ch == 67) { // 'C'
+                freqinc(self->lfo, UP);
+            }
+            else if (ch == 122) { // 'z'
+                filter_adj_fc_control(self->filter->bc_filter, DOWN);
+            }
+            else if (ch == 90) { // 'Z'
+                filter_adj_fc_control(self->filter->bc_filter, UP);
             }
 
-            double freq = chfreqlookup(ch);
-            if (freq != -1) {
-                // if (recording && !recording_started) {
-                //    recording_started = 1;
-                //}
-                play_note(soundgen_num, freq);
+            else { // try to play note
+                double freq =
+                    chfreqlookup(ch, mixr->sound_generators[soundgen_num]);
+                if (freq != -1) {
+                    play_note(soundgen_num, freq);
+                }
+                alarm(1);
             }
         }
     }
@@ -128,11 +142,13 @@ void play_note(int sg_num, double freq)
 
     // struct timespec ts;
     // ts.tv_sec = 0;
-    // ts.tv_nsec = 100000000;
+    // ts.tv_nsec = 10000;
 
     mfm(mixr->sound_generators[sg_num], freq);
     keypress_on(mixr->sound_generators[sg_num]);
     // nanosleep(&ts, NULL);
+    // mixr->sound_generators[sg_num];
+    // keypress_off(mixr->sound_generators[sg_num]);
 }
 
 void *play_melody_loop(void *m)
@@ -153,39 +169,22 @@ void *play_melody_loop(void *m)
 
     while (1) {
         int note_played = 0;
-        int rand_note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
             while (!note_played) {
-                // double rel_note1, rel_note2;
-                // related_notes(mloop->melody[i]->note, &rel_note1,
-                // &rel_note2);
-                // double rel_note;
+
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    // if ((rand() % 100) > 5) {
-                    //    play_note(mloop->sig_num, mloop->melody[i]->freq);
-                    //}
-                    // note_played = 1;
                     play_note(mloop->sig_num, mloop->melody[i]->freq);
                     note_played = 1;
                 }
 
-                // else if (!rand_note_played) {
-                //    rand_note_played = 1;
-                //    if ((rand() % 100) > 75) {
-                //        if ((rand() % 2) == 1)
-                //            rel_note = rel_note1;
-                //        else
-                //            rel_note = rel_note2;
-                //        play_note(mloop->sig_num, rel_note);
-                //    }
-                //}
+                // printf("WAITING\n");
                 pthread_mutex_lock(&bpm_lock);
                 pthread_cond_wait(&bpm_cond, &bpm_lock);
                 pthread_mutex_unlock(&bpm_lock);
+                // keypress_off(mixr->sound_generators[mloop->sig_num]);
                 // printf("MLOOPTICK %d\n", b->quart_note_tick);
             }
             note_played = 0;
-            rand_note_played = 0;
         }
     }
     // TODO free all this memory!!
