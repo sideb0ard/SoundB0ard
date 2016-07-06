@@ -176,8 +176,29 @@ void *play_melody_loop(void *m)
                 related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
                 double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    play_note(mloop->sig_num, mloop->melody[i]->freq);
+                    if ((rand() % 100) > 5) {
+                        if ((rand() % 100) > 95) {
+                            //rel_note = rel_note1;
+                            play_note(mloop->sig_num, rel_note1);
+                        } else {
+                            play_note(mloop->sig_num, mloop->melody[i]->freq);
+                        }
+                    }
                     note_played = 1;
+                    //play_note(mloop->sig_num, mloop->melody[i]->freq);
+                    //note_played = 1;
+                }
+                else if (!rand_note_played) {
+                    rand_note_played = 1;
+                    if ((rand() % 100) > 90) {
+                        if ((rand() % 2) == 1)
+                            rel_note = rel_note1;
+                        if ((rand() % 10) == 1)
+                            rel_note *= 3;
+                        else
+                            rel_note = rel_note2;
+                        play_note(mloop->sig_num, rel_note);
+                    }
                 }
 
                 // printf("WAITING\n");
@@ -188,6 +209,7 @@ void *play_melody_loop(void *m)
                 // printf("MLOOPTICK %d\n", b->quart_note_tick);
             }
             note_played = 0;
+            rand_note_played = 0;
         }
     }
     // TODO free all this memory!!
