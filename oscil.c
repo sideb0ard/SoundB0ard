@@ -90,11 +90,11 @@ void freqinc(OSCIL *p_osc, int direction)
 
 void freqfunc(OSCIL *p_osc, double f)
 {
-    printf("FREQFUNC!\n");
+    //printf("FREQFUNC!\n");
     if (f >= OSC_FQ_MIN && f <= OSC_FQ_MAX) {
         p_osc->freq = f;
         p_osc->incr = TABRAD * f;
-        printf("New freak is %f\n", f);
+        //printf("New freak is %f\n", f);
     }
 }
 

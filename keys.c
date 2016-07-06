@@ -108,7 +108,7 @@ void keys(int soundgen_num)
                 if (freq != -1) {
                     play_note(soundgen_num, freq);
                 }
-                alarm(1);
+                //alarm(2);
             }
         }
     }
@@ -169,9 +169,12 @@ void *play_melody_loop(void *m)
 
     while (1) {
         int note_played = 0;
+        int rand_note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
             while (!note_played) {
-
+                double rel_note1, rel_note2;
+                related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
+                double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
                     play_note(mloop->sig_num, mloop->melody[i]->freq);
                     note_played = 1;

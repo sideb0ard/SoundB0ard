@@ -7,7 +7,7 @@
 
 #define OSC_FQ_MOD_RANGE 2
 #define OSC_PITCHBEND_MOD_RANGE 12
-#define OSC_FQ_MIN 20
+#define OSC_FQ_MIN 2
 #define OSC_FQ_MAX 20480
 #define OSC_FQ_DEFAULT 440.0
 #define OSC_PULSEWIDTH_MIN 2

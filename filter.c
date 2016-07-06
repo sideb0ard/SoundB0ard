@@ -5,7 +5,7 @@
 #include "filter.h"
 #include "utils.h"
 
-// virtual class to be over ridden
+// base class to be embedded
 FILTER *new_filter(void)
 {
     FILTER *filter = (FILTER *)calloc(1, sizeof(FILTER));
@@ -33,14 +33,14 @@ void filter_adj_fc_control(void *filter, int direction)
     else
         val -= 100;
     filter_set_fc_control(self, val);
-    printf("Setting CUT OFF FREQ to %f\n", val);
 }
 
 void filter_set_fc_control(void *filter, double val)
 {
-    FILTER *self = filter;
-    self->m_fc_control = val;
-    printf("CUT OFF FREQ NOW %f\n", self->m_fc_control);
+    if ( val > FILTER_FC_MIN && val < FILTER_FC_MAX ) {
+        FILTER *self = filter;
+        self->m_fc_control = val;
+    }
 }
 
 void filter_set_fc_mod(void *filter, double val)
@@ -59,12 +59,13 @@ void filter_update(void *filter)
 {
     FILTER *self = filter;
     filter_set_q_control(self, self->m_q_control);
-    // printf("FC CONTROL %f AND MULTIPLIER %f\n", self->m_fc_control,
-    // pitch_shift_multiplier(self->m_fc_mod));
-    self->m_fc = self->m_fc_control * pitch_shift_multiplier(self->m_fc_mod);
+    double mod = pitch_shift_multiplier(self->m_fc_mod);
+    // books says mutliply like below, but then its always out of wack
+    //self->m_fc = self->m_fc_control * res;
+    // so i'm adding here so its a small offset from UI control
+    self->m_fc = self->m_fc_control + mod;
     if (self->m_fc > FILTER_FC_MAX)
         self->m_fc = FILTER_FC_MAX;
     if (self->m_fc < FILTER_FC_MIN)
         self->m_fc = FILTER_FC_MIN;
-    // printf("FILTER UPDATZZZ FCiz %f\n", self->m_fc);
 }

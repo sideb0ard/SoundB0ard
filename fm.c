@@ -53,7 +53,7 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     fm->osc2->m_cents = 2.5; // +2.5 cents detuned
 
     // lfo
-    fm->lfo = new_oscil(4, sine_table);
+    fm->lfo = new_oscil(7, sine_table);
 
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
@@ -201,10 +201,9 @@ double fm_gennext(void *self)
 
         // ARTICULATION BLOCK
         double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
-        // printf("LFO out! %f\n", lfo_out);
         double biased_eg = 0.0;
+        // TODO - biased - make sure its working
         double eg_out = env_generate(fm->env, &biased_eg);
-        // printf("LFO: %f // EnvG: %f\n", lfo_out, eg_out);
 
         // CALC ENV GEN -> OSC MOD
         double eg_osc_mod = 1 * OSC_FQ_MOD_RANGE * biased_eg;
@@ -217,7 +216,7 @@ double fm_gennext(void *self)
         //    self->m_filter
         //
         filter_set_fc_mod(fm->filter->bc_filter, FILTER_FC_MOD_RANGE * eg_out);
-        // onepole_update(fm->filter);
+        onepole_update(fm->filter);
 
         dca_set_eg_mod(fm->dca, eg_out * 1.0);
         dca_update(fm->dca);
@@ -226,17 +225,14 @@ double fm_gennext(void *self)
         double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
-        // printf("VAL %f\n", val);
-        //
+
         double filter_out = onepole_gennext(fm->filter, osc_out);
-        // printf("FILTER VAL %f\n", filter_out);
 
         double out_left;
         double out_right;
         dca_gennext(fm->dca, filter_out, filter_out, &out_left, &out_right);
-        // dca_gennext(fm->dca, osc_out, osc_out, &out_left, &out_right);
 
-        double dca_out = (out_left + out_right) / 2;
+        double dca_out = 0.5*out_left + 0.5*out_right;
 
         // my old schools..>
         dca_out = effector(&fm->sound_generator, dca_out);
