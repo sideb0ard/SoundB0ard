@@ -147,3 +147,28 @@ void oscil_status(void *self, char *status_string)
         p_osc->freq, p_osc->vol, p_osc->incr, p_osc->curphase,
         p_osc->sound_generator.effects_num);
 }
+
+void osc_reset(OSCIL *self)
+{
+    self->m_dpw_square_modulator = -1.0;
+    self->m_dpw_z1 = 0.0;
+    self->m_pn_register = rand();
+    self->m_rsh_counter = -1.0;
+    self->m_amp_mod = 1.0;
+    self->m_pw_mod = 0.0;
+    self->m_pitch_bend_mod = 0.0;
+    self->m_fq_mod_exp = 0.0;
+    self->m_fq_mod_lin = 0.0;
+    self->m_phase_mod = 0.0;
+}
+
+void osc_start(OSCIL *self)
+{
+    osc_reset(self);
+    self->m_note_on = true;
+}
+
+void osc_stop(OSCIL *self)
+{
+    self->m_note_on = false;
+}

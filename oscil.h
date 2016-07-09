@@ -82,10 +82,11 @@ void set_pitch_bend_mod(OSCIL *self, double bend);
 void set_phase_mod(OSCIL *self, double phase);
 void set_pw_mod(OSCIL *self, double pw);
 
-void start_oscilator();
-void stop_oscilator();
 
 double oscil_gennext(void *self);
+
+void osc_start(OSCIL *self);
+void osc_stop(OSCIL *self);
 
 void osc_reset(OSCIL *self);
 void osc_update(OSCIL *self);

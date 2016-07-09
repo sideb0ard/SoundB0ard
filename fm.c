@@ -177,19 +177,24 @@ void mfm(void *self, double val)
     freqfunc(fm->osc2, val);
 }
 
-void keypress_on(void *self)
+void keypress_on(void *self, double freq)
 {
     FM *fm = (FM *)self;
-    fm->note_on = true;
+    mfm(fm, freq);
+
+    osc_start(fm->osc1);
+    osc_start(fm->osc2);
+    osc_start(fm->lfo);
     start_eg(fm->env);
 }
 
 void keypress_off(void *self)
 {
-    printf("called me!\n");
-    FM *fm = (FM *)self;
-    fm->note_on = false;
-    stop_eg(fm->env);
+    //FM *fm = (FM *)self;
+    //osc_stop(fm->osc1);
+    //osc_stop(fm->osc2);
+    //osc_stop(fm->lfo);
+    //stop_eg(fm->env);
 }
 
 // void fm_gennext(void* self, double* frame_vals, int framesPerBuffer)
@@ -197,7 +202,7 @@ double fm_gennext(void *self)
 {
     FM *fm = (FM *)self;
 
-    if (fm->note_on) {
+    if (fm->osc1->m_note_on) {
 
         // ARTICULATION BLOCK
         double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);

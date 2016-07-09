@@ -38,7 +38,7 @@ void fm_status(void *self, char *status_string);
 double fm_getvol(void *self);
 void fm_setvol(void *self, double v);
 void mfm(void *self, double val);
-void keypress_on(void *self);
+void keypress_on(void *self, double freq);
 void keypress_off(void *self);
 void change_octave(void *self, int direction);
 void fm_change_osc_wave_form(void *self);

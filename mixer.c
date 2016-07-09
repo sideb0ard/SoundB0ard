@@ -26,6 +26,7 @@ mixer *new_mixer()
     mixr = calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
     mixr->keyboard_octave = 3;
+    mixr->has_active_fm = 0;
     if (mixr == NULL) {
         printf("Nae mixer, fucked up!\n");
         return NULL;

@@ -1,16 +1,23 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/types.h>
+#include <sys/event.h>
+#include <sys/time.h>
 
 #include "audioutils.h"
 #include "bpmrrr.h"
 #include "cmdloop.h"
+#include "midimaaan.h"
 #include "defjams.h"
 #include "envelope.h"
+#include "kqueuerrr.h"
 #include "mixer.h"
 
 mixer *mixr;
 bpmrrr *b;
+int kernelq;
+struct kevent synthz[10];
 
 // use broadcast to wake up threads when tick changes in bpm
 pthread_cond_t bpm_cond;
@@ -57,6 +64,10 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
 int main()
 {
 
+    // start kernel queue
+    if ((kernelq = kqueue()) == -1)
+        printf("Couldnae dae yer kernel queue, cap'n\n");
+
     // lookup table for wavs
     sine_table = new_sine_table();
     tri_table = new_tri_table();
@@ -78,6 +89,22 @@ int main()
         return 1;
     }
     pthread_detach(bpmrun_th);
+
+    // run the MIDI event looprrr...
+    pthread_t midi_th;
+    if (pthread_create(&midi_th, NULL, midiman, NULL)) {
+        fprintf(stderr, "Errrr, wit tha midi..\n");
+        return -1;
+    }
+
+    //// run da Kernel Queue Poller
+    //pthread_t kqueuerun_th;
+    ////if (pthread_create(&kqueuerun_th, NULL, kqueue_run, (void *)&kernelq)) {
+    //if (pthread_create(&kqueuerun_th, NULL, kqueue_run, (void *)&kernelq)) {
+    //    fprintf(stderr, "Error running KQueue_run thread\n");
+    //    return 1;
+    //}
+    //pthread_detach(kqueuerun_th);
 
     // PortAudio start me up!
     pa_setup();

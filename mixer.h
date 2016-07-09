@@ -25,6 +25,9 @@ typedef struct t_mixer {
     int effects_num;
     int effects_size;
 
+    int has_active_fm; // bool
+    int active_fm_soundgen_num;
+
     double volume;
     int keyboard_octave;
 

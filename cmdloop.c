@@ -109,7 +109,7 @@ void interpret(char *line)
         regmatch_t pmatch[3];
         regex_t cmdtype_rx;
         regcomp(&cmdtype_rx,
-                "^(bpm|duck|keys|solo|stop|up|vol) ([[:digit:].]+)$",
+                "^(bpm|duck|keys|midi|solo|stop|up|vol) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
 
         if (regexec(&cmdtype_rx, trim_tok, 3, pmatch, 0) == 0) {
@@ -148,6 +148,16 @@ void interpret(char *line)
                     if (mixr->sound_generators[(int)val]->type == FM_TYPE) {
                         printf("KEYS!\n");
                         keys(val);
+                    }
+                    else {
+                        printf("Can only run keys() on an FM Type, ya dafty\n");
+                    }
+                }
+                else if (strcmp(cmd, "midi") == 0) {
+                    if (mixr->sound_generators[(int)val]->type == FM_TYPE) {
+                        printf("MIDI fer %d\n", (int)val);
+                        mixr->has_active_fm = 1;
+                        mixr->active_fm_soundgen_num = val;
                     }
                     else {
                         printf("Can only run keys() on an FM Type, ya dafty\n");

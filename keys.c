@@ -16,6 +16,7 @@
 
 extern mixer *mixr;
 extern bpmrrr *b;
+extern int kernelq; // for timers
 
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
@@ -28,12 +29,12 @@ melody_loop *new_melody_loop(int soundgen_num)
     return l;
 }
 
-static void alarm_handler(int signum)
-{
-    printf("TIMER!! %d\n", signum);
-    FM *fm = (FM *)mixr->sound_generators[0];
-    eg_release(fm->env);
-}
+//static void alarm_handler(int signum)
+//{
+//    //printf("TIMER!! %d\n", signum);
+//    FM *fm = (FM *)mixr->sound_generators[0];
+//    eg_release(fm->env);
+//}
 
 void keys(int soundgen_num)
 {
@@ -50,7 +51,7 @@ void keys(int soundgen_num)
 
     FM *self = (FM *)mixr->sound_generators[soundgen_num];
 
-    signal(SIGALRM, alarm_handler);
+    //signal(SIGALRM, alarm_handler);
 
     int ch = 0;
     int quit = 0;
@@ -144,11 +145,11 @@ void play_note(int sg_num, double freq)
     // ts.tv_sec = 0;
     // ts.tv_nsec = 10000;
 
-    mfm(mixr->sound_generators[sg_num], freq);
-    keypress_on(mixr->sound_generators[sg_num]);
+    keypress_on(mixr->sound_generators[sg_num], freq);
     // nanosleep(&ts, NULL);
     // mixr->sound_generators[sg_num];
     // keypress_off(mixr->sound_generators[sg_num]);
+    //alarm(2);
 }
 
 void *play_melody_loop(void *m)
@@ -156,6 +157,7 @@ void *play_melody_loop(void *m)
     melody_loop *mloop = (melody_loop *)m;
 
     printf("PLAY melody starting..\n");
+    static int iteration = 1;
 
     int loop_started = 0;
     while (!loop_started) {
@@ -171,35 +173,36 @@ void *play_melody_loop(void *m)
         int note_played = 0;
         int rand_note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
+            if ( iteration > 4 ) iteration = 1;
             while (!note_played) {
                 double rel_note1, rel_note2;
                 related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
                 double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    if ((rand() % 100) > 5) {
-                        if ((rand() % 100) > 95) {
-                            //rel_note = rel_note1;
-                            play_note(mloop->sig_num, rel_note1);
-                        } else {
-                            play_note(mloop->sig_num, mloop->melody[i]->freq);
-                        }
-                    }
+                    //if ((rand() % 100) > 5) {
+                    //    if ((rand() % 100) > 95) {
+                    //        //rel_note = rel_note1;
+                    //        play_note(mloop->sig_num, rel_note1);
+                    //    } else {
+                    play_note(mloop->sig_num, mloop->melody[i]->freq);
+                    //    }
+                    //}
                     note_played = 1;
                     //play_note(mloop->sig_num, mloop->melody[i]->freq);
                     //note_played = 1;
                 }
-                else if (!rand_note_played) {
-                    rand_note_played = 1;
-                    if ((rand() % 100) > 90) {
-                        if ((rand() % 2) == 1)
-                            rel_note = rel_note1;
-                        if ((rand() % 10) == 1)
-                            rel_note *= 3;
-                        else
-                            rel_note = rel_note2;
-                        play_note(mloop->sig_num, rel_note);
-                    }
-                }
+                //else if (!rand_note_played) {
+                //    rand_note_played = 1;
+                //    if ((rand() % 100) > 90) {
+                //        if ((rand() % 2) == 1)
+                //            rel_note = rel_note1;
+                //        if ((rand() % 10) == 1)
+                //            rel_note *= 3;
+                //        else
+                //            rel_note = rel_note2;
+                //        play_note(mloop->sig_num, rel_note);
+                //    }
+                //}
 
                 // printf("WAITING\n");
                 pthread_mutex_lock(&bpm_lock);

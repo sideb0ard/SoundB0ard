@@ -358,7 +358,7 @@ float chfreqlookup(int ch, void *fm)
         return freqval(tmpval); // 'k' key
     }
     else if (ch == 111) {
-        strcat(tmpval, "c");
+        strcat(tmpval, "c#");
         strcat(tmpval, cur_octave_plus_one);
         return freqval(tmpval); // 'o' key
     }

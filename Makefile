@@ -16,6 +16,8 @@ SRC = main.c \
       filter_onepole.c \
       help.c \
       keys.c \
+      kqueuerrr.c \
+      midimaaan.c \
       mixer.c \
       oscil.c \
       sampler.c \
@@ -24,7 +26,7 @@ SRC = main.c \
       table.c \
       utils.c \
 
-LIBS = -lportaudio -lreadline -lm -lpthread -lsndfile
+LIBS = -lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 
 OBJ = $(SRC:.c=.o)
 
