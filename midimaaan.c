@@ -90,14 +90,21 @@ void *midiman()
 }
 
 void midinoteon(int midinote, int velocity) {
-    //printf("Note on! note: %d velocity: %d FREQ! %f\n", midinote, velocity, midi_freq_table[midinote]);
     double freq = midi_freq_table[midinote];
+    // TODO : put this somewhere else
+    FM *fm = (FM*) mixr->sound_generators[mixr->active_fm_soundgen_num];
+    set_midi_note_num(fm->osc1, midinote);
+    set_midi_note_num(fm->osc2, midinote);
     keypress_on(mixr->sound_generators[mixr->active_fm_soundgen_num], freq);
 }
 
 void midinoteoff(int midinote, int velocity) {
     //printf("Note OFF! note: %d velocity: %d\n", midinote, velocity);
-    keypress_off(mixr->sound_generators[mixr->active_fm_soundgen_num]);
+    //keypress_off(mixr->sound_generators[mixr->active_fm_soundgen_num]);
+    FM *fm = (FM*) mixr->sound_generators[mixr->active_fm_soundgen_num];
+    if ( midinote == fm->osc1->m_midi_note_number ) {
+        note_off(fm->env);
+    }
 }
 
 void midipitchbend(int data1, int data2) {

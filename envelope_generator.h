@@ -66,6 +66,8 @@ void set_attack_time_msec(envelope_generator *self, double time);
 void set_decay_time_msec(envelope_generator *self, double time);
 void set_release_time_msec(envelope_generator *self, double time);
 
+void note_off(envelope_generator *self);
+
 void set_sustain_level(envelope_generator *self, double level);
 void set_sample_rate(envelope_generator *self, double samplerate);
 

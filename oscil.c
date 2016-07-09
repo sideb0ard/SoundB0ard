@@ -172,3 +172,7 @@ void osc_stop(OSCIL *self)
 {
     self->m_note_on = false;
 }
+
+void set_midi_note_num(OSCIL *self, int midi_note_num) {
+    self->m_midi_note_number = midi_note_num;
+}

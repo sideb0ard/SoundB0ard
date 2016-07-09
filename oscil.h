@@ -74,6 +74,7 @@ double oscil_getvol(void *self);
 void freqfunc(OSCIL *p_osc, double freq);
 void incrfunc(OSCIL *p_osc, double v);
 
+void set_midi_note_num(OSCIL *self, int midi_note_num);
 void reset_modulo(OSCIL *self);
 void set_amp_modulo(OSCIL *self);
 void set_fq_mod_exp(OSCIL *self, double mod);

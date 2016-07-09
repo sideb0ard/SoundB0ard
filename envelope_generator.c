@@ -212,3 +212,10 @@ double env_generate(envelope_generator *self, double *p_biased_output)
 
     return self->m_envelope_output;
 }
+
+void note_off(envelope_generator *self) {
+    if ( self->m_envelope_output > 0 ) 
+        self->m_state = RELEASE;
+    else
+        self->m_state = OFFF;
+}

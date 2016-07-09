@@ -239,6 +239,13 @@ double fm_gennext(void *self)
 
         double dca_out = 0.5*out_left + 0.5*out_right;
 
+        if ((get_state(fm->env)) == 0 ) {
+            osc_stop(fm->osc1);
+            osc_stop(fm->osc2);
+            osc_stop(fm->lfo);
+            stop_eg(fm->env);
+        }
+
         // my old schools..>
         dca_out = effector(&fm->sound_generator, dca_out);
         dca_out = envelopor(&fm->sound_generator, dca_out);
