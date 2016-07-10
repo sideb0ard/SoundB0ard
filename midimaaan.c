@@ -4,10 +4,12 @@
 #include <string.h>
 
 #include "midimaaan.h"
+#include "oscil.h"
 #include "midi_freq_table.h"
 #include "bpmrrr.h"
 #include "mixer.h"
 #include "defjams.h"
+#include "utils.h"
 
 extern bpmrrr *b;
 extern mixer *mixr;
@@ -25,11 +27,8 @@ void *midiman()
     if ((cnt = Pm_CountDevices())) {
         for (int i=0; i<cnt; i++) {
             info = Pm_GetDeviceInfo(i);
-            if (info->input) {
-                if (strncmp(info->name, "MPKmini2", 8) == 0) {
-                    printf("Found MPKmini2 on port %d\n", i);
-                    dev = i;
-                }
+            if (info->input && (strncmp(info->name, "MPKmini2", 8) == 0)) {
+                dev = i;
             }
 
         }
@@ -113,4 +112,61 @@ void midipitchbend(int data1, int data2) {
 
 void midicontrol(int data1, int data2) {
     printf("MIDI Mind Control! %d %d\n", data1, data2);
+    FM *fm = (FM*) mixr->sound_generators[mixr->active_fm_soundgen_num];
+    double scaley_val;
+    switch(data1) {
+        case 1: // K1 - Envelope Attack Time Msec
+            printf("ENv attck time!\n");
+            scaley_val = scaleybum(0, 128, 
+                                   EG_MINTIME_MS, EG_MAXTIME_MS,
+                                   data2);
+            set_attack_time_msec(fm->env, scaley_val);
+            break;
+        case 2: // K2 - Envelope Decay Time Msec
+            printf("ENv decay time!\n");
+            scaley_val = scaleybum(0, 128, 
+                                   EG_MINTIME_MS, EG_MAXTIME_MS,
+                                   data2);
+            set_attack_time_msec(fm->env, scaley_val);
+            break;
+        case 3: // K3 - Envelope Sustain Level
+            printf("ENv sustain level !\n");
+            scaley_val = scaleybum(0, 128, 
+                                   0, 1,
+                                   data2);
+            set_sustain_level(fm->env, scaley_val);
+            break;
+        case 4: // K4 - Envelope Release Time Msec
+            printf("ENv attck time!\n");
+            scaley_val = scaleybum(0, 128, 
+                                   EG_MINTIME_MS, EG_MAXTIME_MS,
+                                   data2);
+            set_release_time_msec(fm->env, scaley_val);
+            break;
+        case 5: // K5 - LFO rate
+            printf("LFO rate!\n");
+            scaley_val = scaleybum(0, 128, 
+                                   MIN_LFO_RATE, MAX_LFO_RATE,
+                                   data2);
+            set_freq(fm->lfo, scaley_val);
+            break;
+        case 6: // K6 - LFO amplitude
+            printf("LFO amp!\n");
+            scaley_val = scaleybum(0, 128, 
+                                   0.0, 1.0,
+                                   data2);
+            //set_freq(fm->lfo, scaley_val);
+            oscil_setvol(fm->lfo, scaley_val);
+            break;
+        case 7: // K5 - Filter Frequency Cut ogg
+            printf("Filter Freq Cut!!\n");
+            scaley_val = scaleybum(0, 128, 
+                                   FILTER_FC_MIN, FILTER_FC_MAX,
+                                   data2);
+            //set_freq(fm->lfo, scaley_val);
+            filter_set_fc_control(fm->filter->bc_filter, scaley_val);
+            break;
+        default:
+            printf("SOMthing else\n");
+    }
 }

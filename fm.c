@@ -53,7 +53,7 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     fm->osc2->m_cents = 2.5; // +2.5 cents detuned
 
     // lfo
-    fm->lfo = new_oscil(7, sine_table);
+    fm->lfo = new_oscil(DEFAULT_LFO_RATE, sine_table);
 
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
@@ -64,7 +64,7 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     // Digitally Controlled Amplitude
     fm->dca = new_dca();
 
-    fm->vol = 0.0;
+    fm->vol = 0.7;
     fm->cur_octave = 2;
     fm->wave_form = SAWD;
     // fm->osc1->sound_generator.setvol(fm->osc1, 0.5);
@@ -173,8 +173,8 @@ void fm_status(void *self, char *status_string)
 void mfm(void *self, double val)
 {
     FM *fm = (FM *)self;
-    freqfunc(fm->osc1, val);
-    freqfunc(fm->osc2, val);
+    set_freq(fm->osc1, val);
+    set_freq(fm->osc2, val);
 }
 
 void keypress_on(void *self, double freq)

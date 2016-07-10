@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "sound_generator.h"
 #include "table.h"
@@ -13,6 +14,10 @@
 #define OSC_PULSEWIDTH_MIN 2
 #define OSC_PULSEWIDTH_MAX 98
 #define OSC_PULSEWIDTH_DEFAULT 50
+
+#define MIN_LFO_RATE 0.02
+#define MAX_LFO_RATE 10.0
+#define DEFAULT_LFO_RATE 0.5
 
 typedef struct oscil OSCIL;
 
@@ -71,7 +76,7 @@ OSCIL *new_oscil(double freq, GTABLE *gt);
 // void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void oscil_setvol(void *self, double v);
 double oscil_getvol(void *self);
-void freqfunc(OSCIL *p_osc, double freq);
+void set_freq(OSCIL *p_osc, double freq);
 void incrfunc(OSCIL *p_osc, double v);
 
 void set_midi_note_num(OSCIL *self, int midi_note_num);

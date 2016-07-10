@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#define EG_MINTIME_MS 50 // these two used for attacjtime, decay and release
+#define EG_MAXTIME_MS 5000
 #define EG_DEFAULT_STATE 1000
 
 typedef enum { ANALOG, DIGITAL } eg_mode;

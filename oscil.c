@@ -33,7 +33,7 @@ OSCIL *new_oscil(double freq, GTABLE *gt)
     p_osc->sound_generator.type = OSCIL_TYPE;
 
     // p_osc->voladj = &volfunc;
-    p_osc->freqadj = &freqfunc;
+    p_osc->freqadj = &set_freq;
     p_osc->incradj = &incrfunc;
 
     p_osc->m_note_on = false;
@@ -85,16 +85,14 @@ void freqinc(OSCIL *p_osc, int direction)
         freq = p_osc->freq + 2;
     else
         freq = p_osc->freq - 1;
-    freqfunc(p_osc, freq);
+    set_freq(p_osc, freq);
 }
 
-void freqfunc(OSCIL *p_osc, double f)
+void set_freq(OSCIL *p_osc, double f)
 {
-    //printf("FREQFUNC!\n");
     if (f >= OSC_FQ_MIN && f <= OSC_FQ_MAX) {
         p_osc->freq = f;
         p_osc->incr = TABRAD * f;
-        //printf("New freak is %f\n", f);
     }
 }
 
