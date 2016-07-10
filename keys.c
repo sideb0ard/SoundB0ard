@@ -177,7 +177,7 @@ void *play_melody_loop(void *m)
             while (!note_played) {
                 double rel_note1, rel_note2;
                 related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
-                double rel_note;
+                //double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
                     //if ((rand() % 100) > 5) {
                     //    if ((rand() % 100) > 95) {

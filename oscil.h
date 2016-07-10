@@ -80,6 +80,7 @@ void set_freq(OSCIL *p_osc, double freq);
 void incrfunc(OSCIL *p_osc, double v);
 
 void set_midi_note_num(OSCIL *self, int midi_note_num);
+void pitch_bend(OSCIL *self, double cents);
 void reset_modulo(OSCIL *self);
 void set_amp_modulo(OSCIL *self);
 void set_fq_mod_exp(OSCIL *self, double mod);

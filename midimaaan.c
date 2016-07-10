@@ -1,4 +1,5 @@
 #include <portmidi.h>
+#include <math.h>
 #include <porttime.h>
 #include <stdio.h>
 #include <string.h>
@@ -88,8 +89,9 @@ void *midiman()
     return NULL;
 }
 
-void midinoteon(int midinote, int velocity) {
+void midinoteon(unsigned int midinote, int velocity) {
     double freq = midi_freq_table[midinote];
+    (void)velocity;
     // TODO : put this somewhere else
     FM *fm = (FM*) mixr->sound_generators[mixr->active_fm_soundgen_num];
     set_midi_note_num(fm->osc1, midinote);
@@ -97,7 +99,8 @@ void midinoteon(int midinote, int velocity) {
     keypress_on(mixr->sound_generators[mixr->active_fm_soundgen_num], freq);
 }
 
-void midinoteoff(int midinote, int velocity) {
+void midinoteoff(unsigned int midinote, int velocity) {
+    (void)velocity;
     //printf("Note OFF! note: %d velocity: %d\n", midinote, velocity);
     //keypress_off(mixr->sound_generators[mixr->active_fm_soundgen_num]);
     FM *fm = (FM*) mixr->sound_generators[mixr->active_fm_soundgen_num];
@@ -108,6 +111,27 @@ void midinoteoff(int midinote, int velocity) {
 
 void midipitchbend(int data1, int data2) {
     printf("Pitch bend, babee: %d %d\n", data1, data2);
+    int actual_pitch_bent_val = (int) ((data1 & 0x7F) |
+                                      ((data2 & 0x7F) << 7));
+
+    FM *fm = (FM*) mixr->sound_generators[mixr->active_fm_soundgen_num];
+    if ( actual_pitch_bent_val != 8192 ) {
+        double normalized_pitch_bent_val = (float)(actual_pitch_bent_val -
+                                            0x2000) / (float) (0x2000);
+        printf("Actzl: %d and norm %f\n", actual_pitch_bent_val,
+                                          normalized_pitch_bent_val);
+        double scaley_val = scaleybum(-1, 1,
+                                      -1000, 1000,
+                                      normalized_pitch_bent_val);
+        printf("Cents to bend - %f\n", scaley_val);
+        fm->osc1->m_cents = scaley_val;
+        fm->osc2->m_cents = scaley_val + 2.5;
+    }
+    else {
+        fm->osc1->m_cents = 0;
+        fm->osc2->m_cents = 2.5;
+    }
+
 }
 
 void midicontrol(int data1, int data2) {
@@ -116,42 +140,36 @@ void midicontrol(int data1, int data2) {
     double scaley_val;
     switch(data1) {
         case 1: // K1 - Envelope Attack Time Msec
-            printf("ENv attck time!\n");
             scaley_val = scaleybum(0, 128, 
                                    EG_MINTIME_MS, EG_MAXTIME_MS,
                                    data2);
             set_attack_time_msec(fm->env, scaley_val);
             break;
         case 2: // K2 - Envelope Decay Time Msec
-            printf("ENv decay time!\n");
             scaley_val = scaleybum(0, 128, 
                                    EG_MINTIME_MS, EG_MAXTIME_MS,
                                    data2);
             set_attack_time_msec(fm->env, scaley_val);
             break;
         case 3: // K3 - Envelope Sustain Level
-            printf("ENv sustain level !\n");
             scaley_val = scaleybum(0, 128, 
                                    0, 1,
                                    data2);
             set_sustain_level(fm->env, scaley_val);
             break;
         case 4: // K4 - Envelope Release Time Msec
-            printf("ENv attck time!\n");
             scaley_val = scaleybum(0, 128, 
                                    EG_MINTIME_MS, EG_MAXTIME_MS,
                                    data2);
             set_release_time_msec(fm->env, scaley_val);
             break;
         case 5: // K5 - LFO rate
-            printf("LFO rate!\n");
             scaley_val = scaleybum(0, 128, 
                                    MIN_LFO_RATE, MAX_LFO_RATE,
                                    data2);
             set_freq(fm->lfo, scaley_val);
             break;
         case 6: // K6 - LFO amplitude
-            printf("LFO amp!\n");
             scaley_val = scaleybum(0, 128, 
                                    0.0, 1.0,
                                    data2);
@@ -159,7 +177,6 @@ void midicontrol(int data1, int data2) {
             oscil_setvol(fm->lfo, scaley_val);
             break;
         case 7: // K5 - Filter Frequency Cut ogg
-            printf("Filter Freq Cut!!\n");
             scaley_val = scaleybum(0, 128, 
                                    FILTER_FC_MIN, FILTER_FC_MAX,
                                    data2);

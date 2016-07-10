@@ -190,6 +190,7 @@ void keypress_on(void *self, double freq)
 
 void keypress_off(void *self)
 {
+    (void) self;
     //FM *fm = (FM *)self;
     //osc_stop(fm->osc1);
     //osc_stop(fm->osc2);

@@ -174,3 +174,9 @@ void osc_stop(OSCIL *self)
 void set_midi_note_num(OSCIL *self, int midi_note_num) {
     self->m_midi_note_number = midi_note_num;
 }
+
+//void set_pitch_bend_mod(OSCIL *self, double bend) {
+
+void pitch_bend(OSCIL *self, double cents) {
+    self->m_cents = cents;
+}
