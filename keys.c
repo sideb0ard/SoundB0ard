@@ -29,7 +29,7 @@ melody_loop *new_melody_loop(int soundgen_num)
     return l;
 }
 
-//static void alarm_handler(int signum)
+// static void alarm_handler(int signum)
 //{
 //    //printf("TIMER!! %d\n", signum);
 //    FM *fm = (FM *)mixr->sound_generators[0];
@@ -51,7 +51,7 @@ void keys(int soundgen_num)
 
     FM *self = (FM *)mixr->sound_generators[soundgen_num];
 
-    //signal(SIGALRM, alarm_handler);
+    // signal(SIGALRM, alarm_handler);
 
     int ch = 0;
     int quit = 0;
@@ -109,7 +109,7 @@ void keys(int soundgen_num)
                 if (freq != -1) {
                     play_note(soundgen_num, freq);
                 }
-                //alarm(2);
+                // alarm(2);
             }
         }
     }
@@ -149,7 +149,7 @@ void play_note(int sg_num, double freq)
     // nanosleep(&ts, NULL);
     // mixr->sound_generators[sg_num];
     // keypress_off(mixr->sound_generators[sg_num]);
-    //alarm(2);
+    // alarm(2);
 }
 
 void *play_melody_loop(void *m)
@@ -173,13 +173,14 @@ void *play_melody_loop(void *m)
         int note_played = 0;
         int rand_note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
-            if ( iteration > 4 ) iteration = 1;
+            if (iteration > 4)
+                iteration = 1;
             while (!note_played) {
                 double rel_note1, rel_note2;
                 related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
-                //double rel_note;
+                // double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    //if ((rand() % 100) > 5) {
+                    // if ((rand() % 100) > 5) {
                     //    if ((rand() % 100) > 95) {
                     //        //rel_note = rel_note1;
                     //        play_note(mloop->sig_num, rel_note1);
@@ -188,10 +189,10 @@ void *play_melody_loop(void *m)
                     //    }
                     //}
                     note_played = 1;
-                    //play_note(mloop->sig_num, mloop->melody[i]->freq);
-                    //note_played = 1;
+                    // play_note(mloop->sig_num, mloop->melody[i]->freq);
+                    // note_played = 1;
                 }
-                //else if (!rand_note_played) {
+                // else if (!rand_note_played) {
                 //    rand_note_played = 1;
                 //    if ((rand() % 100) > 90) {
                 //        if ((rand() % 2) == 1)

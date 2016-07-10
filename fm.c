@@ -190,12 +190,12 @@ void keypress_on(void *self, double freq)
 
 void keypress_off(void *self)
 {
-    (void) self;
-    //FM *fm = (FM *)self;
-    //osc_stop(fm->osc1);
-    //osc_stop(fm->osc2);
-    //osc_stop(fm->lfo);
-    //stop_eg(fm->env);
+    (void)self;
+    // FM *fm = (FM *)self;
+    // osc_stop(fm->osc1);
+    // osc_stop(fm->osc2);
+    // osc_stop(fm->lfo);
+    // stop_eg(fm->env);
 }
 
 // void fm_gennext(void* self, double* frame_vals, int framesPerBuffer)
@@ -238,9 +238,9 @@ double fm_gennext(void *self)
         double out_right;
         dca_gennext(fm->dca, filter_out, filter_out, &out_left, &out_right);
 
-        double dca_out = 0.5*out_left + 0.5*out_right;
+        double dca_out = 0.5 * out_left + 0.5 * out_right;
 
-        if ((get_state(fm->env)) == 0 ) {
+        if ((get_state(fm->env)) == 0) {
             osc_stop(fm->osc1);
             osc_stop(fm->osc2);
             osc_stop(fm->lfo);

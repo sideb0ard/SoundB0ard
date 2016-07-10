@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdio.h>
 #include <stdbool.h>
+#include <stdio.h>
 
 #include "sound_generator.h"
 #include "table.h"
@@ -88,7 +88,6 @@ void set_fq_mod_lin(OSCIL *self, double mod);
 void set_pitch_bend_mod(OSCIL *self, double bend);
 void set_phase_mod(OSCIL *self, double phase);
 void set_pw_mod(OSCIL *self, double pw);
-
 
 double oscil_gennext(void *self);
 

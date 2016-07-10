@@ -523,10 +523,11 @@ void reverse(char s[])
 
 // scales cur_val which is range of cur_min, cur_max, to be a new_val within
 // new_min, new_max
-// algo from http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
-double scaleybum(double cur_min, double cur_max,
-                 double new_min, double new_max,
-                 double cur_val) {
+// algo from
+// http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
+double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
+                 double cur_val)
+{
     double cur_range = cur_max - cur_min;
     double new_range = new_max - new_min;
     return (((cur_val - cur_min) / cur_range) * new_range) + new_min;

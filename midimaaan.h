@@ -1,4 +1,4 @@
-void *midiman(void*);
+void *midiman(void *);
 
 void midinoteon(unsigned int midinote, int velocity);
 void midinoteoff(unsigned int midinote, int velocity);

@@ -37,7 +37,7 @@ void filter_adj_fc_control(void *filter, int direction)
 
 void filter_set_fc_control(void *filter, double val)
 {
-    if ( val > FILTER_FC_MIN && val < FILTER_FC_MAX ) {
+    if (val > FILTER_FC_MIN && val < FILTER_FC_MAX) {
         FILTER *self = filter;
         self->m_fc_control = val;
     }
@@ -61,13 +61,13 @@ void filter_update(void *filter)
     filter_set_q_control(self, self->m_q_control);
     double mod = pitch_shift_multiplier(self->m_fc_mod);
     // books says mutliply like below, but then its always out of wack
-    //self->m_fc = self->m_fc_control * res;
+    // self->m_fc = self->m_fc_control * res;
     // so i'm adding here so its a small offset from UI control
-    //printf("MOD : %f\n", mod);
+    // printf("MOD : %f\n", mod);
     self->m_fc = self->m_fc_control + mod;
     if (self->m_fc > FILTER_FC_MAX)
         self->m_fc = FILTER_FC_MAX;
     if (self->m_fc < FILTER_FC_MIN)
         self->m_fc = FILTER_FC_MIN;
-    //printf("FC: %f\n", self->m_fc);
+    // printf("FC: %f\n", self->m_fc);
 }

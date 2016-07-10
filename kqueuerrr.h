@@ -1,1 +1,1 @@
-void *kqueue_run(void*);
+void *kqueue_run(void *);

@@ -31,8 +31,7 @@ void calculate_pan_values(double pan_total, double *pan_left,
 
 // scales cur_val which is range of cur_min, cur_max, to be a new_val within
 // new_min, new_max
-double scaleybum(double cur_min, double cur_max,
-                 double new_min, double new_max,
+double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
                  double cur_val);
 
 void itoa(int n, char s[]);

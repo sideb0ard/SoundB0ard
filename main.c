@@ -1,17 +1,17 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
 #include <sys/event.h>
 #include <sys/time.h>
+#include <sys/types.h>
 
 #include "audioutils.h"
 #include "bpmrrr.h"
 #include "cmdloop.h"
-#include "midimaaan.h"
 #include "defjams.h"
 #include "envelope.h"
 #include "kqueuerrr.h"
+#include "midimaaan.h"
 #include "mixer.h"
 
 mixer *mixr;
@@ -98,13 +98,13 @@ int main()
     }
 
     //// run da Kernel Queue Poller
-    //pthread_t kqueuerun_th;
+    // pthread_t kqueuerun_th;
     ////if (pthread_create(&kqueuerun_th, NULL, kqueue_run, (void *)&kernelq)) {
-    //if (pthread_create(&kqueuerun_th, NULL, kqueue_run, (void *)&kernelq)) {
+    // if (pthread_create(&kqueuerun_th, NULL, kqueue_run, (void *)&kernelq)) {
     //    fprintf(stderr, "Error running KQueue_run thread\n");
     //    return 1;
     //}
-    //pthread_detach(kqueuerun_th);
+    // pthread_detach(kqueuerun_th);
 
     // PortAudio start me up!
     pa_setup();
