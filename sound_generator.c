@@ -153,14 +153,16 @@ float effector(SOUNDGEN *self, float val)
                 }
                 break;
             case DELAY:
-                delay_p = self->effects[i]->buf_p;
-                delay = self->effects[i]->buffer;
-                val += delay[delay_p];
-                delay[delay_p++] = val_copy * 0.5;
-                if (delay_p >= self->effects[i]->buf_length)
-                    delay_p = 0;
-                self->effects[i]->buf_p = delay_p;
-                break;
+                val = self->effects[i]->m_delay_in_samples == 0 ? val_copy : read_delay(self->effects[i]);
+                write_delay_and_inc(self->effects[i], val_copy);
+                //delay_p = self->effects[i]->buf_p;
+                //delay = self->effects[i]->buffer;
+                //val += delay[delay_p];
+                //delay[delay_p++] = val_copy * 0.5;
+                //if (delay_p >= self->effects[i]->buf_length)
+                //    delay_p = 0;
+                //self->effects[i]->buf_p = delay_p;
+                //break;
             case REVERB:
                 delay_p = self->effects[i]->buf_p;
                 delay = self->effects[i]->buffer;

@@ -4,6 +4,7 @@
 
 #include "defjams.h"
 #include "effect.h"
+#include "utils.h"
 
 EFFECT *new_delay(double duration, effect_type e_type)
 {
@@ -20,6 +21,8 @@ EFFECT *new_delay(double duration, effect_type e_type)
         free(e);
         return NULL;
     }
+    e->m_duration = duration;
+    e->m_delay_in_samples = buf_length;
     e->buffer = buffer;
     e->buf_length = buf_length;
     e->type = e_type;
@@ -102,3 +105,26 @@ EFFECT *new_freq_pass(double freq, effect_type pass_type)
 
     return e;
 }
+
+void write_delay_and_inc(EFFECT *self, double val)
+{
+    self->buffer[self->buf_write_idx] = val;
+    self->buf_write_idx++;
+    if ( self->buf_write_idx >= self->buf_length )
+        self->buf_write_idx = 0;
+    self->buf_read_idx++;
+    if ( self->buf_read_idx >= self->buf_length )
+        self->buf_read_idx = 0;
+}
+
+double read_delay(EFFECT *self)
+{
+    double yn = self->buffer[self->buf_read_idx];
+    int read_idx_1 = self->buf_read_idx - 1;
+    if (read_idx_1 < 0)
+        read_idx_1 = self->buf_length - 1;
+    double yn_1 = self->buffer[read_idx_1];
+    double frac_delay = self->m_delay_in_samples - (int)self->m_delay_in_samples;
+    return scaleybum(0, 1, yn, yn_1, frac_delay);
+}
+

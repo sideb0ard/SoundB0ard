@@ -137,7 +137,7 @@ void start_eg(envelope_generator *self)
     if (self->m_legato_mode && self->m_state != OFFF &&
         self->m_state != RELEASE)
         return;
-    reset(self);
+    //reset(self);
     self->m_state = ATTACK;
 }
 

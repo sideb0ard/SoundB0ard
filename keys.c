@@ -157,7 +157,6 @@ void *play_melody_loop(void *m)
     melody_loop *mloop = (melody_loop *)m;
 
     printf("PLAY melody starting..\n");
-    static int iteration = 1;
 
     int loop_started = 0;
     while (!loop_started) {
@@ -171,49 +170,19 @@ void *play_melody_loop(void *m)
 
     while (1) {
         int note_played = 0;
-        int rand_note_played = 0;
         for (int i = 0; i < mloop->size; i++) {
-            if (iteration > 4)
-                iteration = 1;
             while (!note_played) {
-                double rel_note1, rel_note2;
-                related_notes(mloop->melody[i]->note, &rel_note1, &rel_note2);
-                // double rel_note;
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    // if ((rand() % 100) > 5) {
-                    //    if ((rand() % 100) > 95) {
-                    //        //rel_note = rel_note1;
-                    //        play_note(mloop->sig_num, rel_note1);
-                    //    } else {
+                    //printf("playing %f\n", mloop->melody[i]->freq);
                     play_note(mloop->sig_num, mloop->melody[i]->freq);
-                    //    }
-                    //}
                     note_played = 1;
-                    // play_note(mloop->sig_num, mloop->melody[i]->freq);
-                    // note_played = 1;
                 }
-                // else if (!rand_note_played) {
-                //    rand_note_played = 1;
-                //    if ((rand() % 100) > 90) {
-                //        if ((rand() % 2) == 1)
-                //            rel_note = rel_note1;
-                //        if ((rand() % 10) == 1)
-                //            rel_note *= 3;
-                //        else
-                //            rel_note = rel_note2;
-                //        play_note(mloop->sig_num, rel_note);
-                //    }
-                //}
 
-                // printf("WAITING\n");
                 pthread_mutex_lock(&bpm_lock);
                 pthread_cond_wait(&bpm_cond, &bpm_lock);
                 pthread_mutex_unlock(&bpm_lock);
-                // keypress_off(mixr->sound_generators[mloop->sig_num]);
-                // printf("MLOOPTICK %d\n", b->quart_note_tick);
             }
             note_played = 0;
-            rand_note_played = 0;
         }
     }
     // TODO free all this memory!!

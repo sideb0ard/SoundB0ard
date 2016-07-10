@@ -162,7 +162,7 @@ void osc_reset(OSCIL *self)
 
 void osc_start(OSCIL *self)
 {
-    osc_reset(self);
+    //osc_reset(self);
     self->m_note_on = true;
 }
 
