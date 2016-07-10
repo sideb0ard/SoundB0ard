@@ -165,12 +165,10 @@ void midicontrol(int data1, int data2)
         break;
     case 6: // K6 - LFO amplitude
         scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-        // set_freq(fm->lfo, scaley_val);
         oscil_setvol(fm->lfo, scaley_val);
         break;
-    case 7: // K5 - Filter Frequency Cut ogg
+    case 7: // K5 - Filter Frequency Cut
         scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        // set_freq(fm->lfo, scaley_val);
         filter_set_fc_control(fm->filter->bc_filter, scaley_val);
         break;
     default:
