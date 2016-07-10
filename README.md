@@ -4,8 +4,9 @@
 
 SBShell is an interactive music making environment, styled after a unix shell.  
 
-To compile and run, you will need to install PortAudio and libsndfile:  
+To compile and run, you will need to install PortAudio, PortMidi and libsndfile:  
 http://www.portaudio.com/  
+http://portmedia.sourceforge.net/portmidi/  
 http://www.mega-nerd.com/libsndfile/  
 
 then, `git clone git@github.com:sideb0ard/SBShell.git`,  
