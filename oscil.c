@@ -97,7 +97,8 @@ void set_freq(OSCIL *p_osc, double f)
     }
 }
 
-void set_fq_mod_exp(OSCIL *self, double mod) { self->m_fq_mod_exp = mod; }
+void set_fq_mod_exp(OSCIL *self, double mod) { 
+    self->m_fq_mod_exp = mod; }
 
 // void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer) //
 // interpolating
@@ -174,11 +175,14 @@ void osc_start(OSCIL *self)
 
 void osc_update(OSCIL *self)
 {
-    self->m_fq =
-        self->freq * self->m_fq_ratio *
+    double pitch_shifted_multi = 
         pitch_shift_multiplier(self->m_fq_mod_exp + self->m_pitch_bend_mod +
                                self->m_octave * 12.0 + self->m_semitones +
                                self->m_cents / 100.0);
+    self->m_fq = self->freq * self->m_fq_ratio * pitch_shifted_multi;
+        
+    //printf("freq %f * fq_ratio %f * pitch_shift_(fq_mod %f + pitch_bend_mod %f + octave %d * 12.0 + semis %f + cents %f / 100.0) = %f\n", self->freq, self->m_fq_ratio, self->m_fq_mod_exp, self->m_pitch_bend_mod, self->m_octave, self->m_semitones, self->m_cents, pitch_shifted_multi);
+    //printf("FINALNEWVAL %f\n", self->m_fq);
 
     // not used - including it in case i need reminder
     self->m_fq += self->m_fq_mod_lin;
@@ -187,6 +191,7 @@ void osc_update(OSCIL *self)
     if (self->m_fq < OSC_FQ_MIN)
         self->m_fq = OSC_FQ_MIN;
 
+    //printf("MFQ! %f and Freq %f\n", self->m_fq, self->freq);
     self->incr = self->m_fq * TABRAD;
 }
 

@@ -22,7 +22,6 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     if (fm == NULL)
         return NULL;
 
-    // modulator
     if (strncmp(osc1, "square", 10) == 0)
         fm->osc1 = new_oscil(osc1_freq, SQUARE);
     else if (strncmp(osc1, "saw_u", 10) == 0)
@@ -34,7 +33,6 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     else // tri
         fm->osc1 = new_oscil(osc1_freq, TRI);
 
-    // carrier
     if (strncmp(osc2, "square", 10) == 0)
         fm->osc2 = new_oscil(osc2_freq, SQUARE);
     else if (strncmp(osc2, "saw_u", 10) == 0)
@@ -46,10 +44,11 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     else // tri
         fm->osc2 = new_oscil(osc2_freq, TRI);
 
-    // fm->osc2->m_cents = 2.5; // +2.5 cents detuned
+    fm->osc2->m_cents = 2.5; // +2.5 cents detuned
 
     // lfo
     fm->lfo = new_oscil(DEFAULT_LFO_RATE, SINE);
+    oscil_setvol(fm->lfo, 0.0);
 
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
@@ -160,9 +159,6 @@ void keypress_on(void *self, double freq)
     FM *fm = (FM *)self;
     mfm(fm, freq);
 
-    // osc_update(fm->osc1);
-    // osc_update(fm->osc2);
-
     osc_start(fm->osc1);
     osc_start(fm->osc2);
     osc_start(fm->lfo);
@@ -188,6 +184,7 @@ double fm_gennext(void *self)
 
         // ARTICULATION BLOCK
         double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
+        //printf("LFO out! %f\n", lfo_out);
         double biased_eg = 0.0;
         // TODO - biased - make sure its working
         double eg_out = env_generate(fm->env, &biased_eg);
@@ -195,11 +192,13 @@ double fm_gennext(void *self)
         // CALC ENV GEN -> OSC MOD
         double eg_osc_mod = 1 * OSC_FQ_MOD_RANGE * biased_eg;
 
-        set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
-        set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
+        //set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
+        //set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
+        set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out);
+        set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out);
 
-        // osc_update(fm->osc1);
-        // osc_update(fm->osc2);
+        osc_update(fm->osc1);
+        osc_update(fm->osc2);
 
         // TODO implement:
         // if ( self->m_filter_key_track == ON )
