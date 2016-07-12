@@ -12,11 +12,7 @@
 
 extern mixer *mixr;
 extern bpmrrr *b;
-extern GTABLE *sine_table;
-extern GTABLE *tri_table;
-extern GTABLE *square_table;
-extern GTABLE *saw_up_table;
-extern GTABLE *saw_down_table;
+extern wtable *wave_tables[5];
 
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
@@ -86,7 +82,7 @@ void *loop_run(void *m)
     printf("LOOP RUN CALLED - got me a msg: %f, %f, %d\n", mmsg->melody[0],
            mmsg->melody[1], mmsg->melody_note_len);
 
-    int osc_num = add_osc(mixr, mmsg->melody[0], sine_table);
+    int osc_num = add_osc(mixr, mmsg->melody[0], SINE);
     mmsg->osc_num = osc_num;
     do {
     } while (b->cur_tick % TICKS_PER_BAR != 0);
@@ -235,7 +231,7 @@ void *algo_run(void *a)
                 printf("Change sig %d to %.2f\n", ma_sig, ma_new_note);
                 if (car_or_mod) {
                     printf("CAR!\n");
-                    mfm(mixr->sound_generators[ma_sig], "car", ma_new_note);
+                    mfm(mixr->sound_generators[ma_sig], ma_new_note);
                 }
                 else {
                     printf("MOD!\n");

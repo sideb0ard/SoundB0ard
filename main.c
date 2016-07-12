@@ -23,11 +23,7 @@ struct kevent synthz[10];
 pthread_cond_t bpm_cond;
 pthread_mutex_t bpm_lock;
 
-GTABLE *sine_table;
-GTABLE *tri_table;
-GTABLE *square_table;
-GTABLE *saw_up_table;
-GTABLE *saw_down_table;
+wtable *wave_tables[5];
 
 ENVSTREAM *ampstream = NULL;
 
@@ -69,11 +65,11 @@ int main()
         printf("Couldnae dae yer kernel queue, cap'n\n");
 
     // lookup table for wavs
-    sine_table = new_sine_table();
-    tri_table = new_tri_table();
-    square_table = new_square_table();
-    saw_up_table = new_saw_table(1);
-    saw_down_table = new_saw_table(0);
+    wave_tables[SINE] = new_sine_table();
+    wave_tables[TRI] = new_tri_table();
+    wave_tables[SQUARE] = new_square_table();
+    wave_tables[SAW_U] = new_saw_table(1);
+    wave_tables[SAW_D] = new_saw_table(0);
 
     ampstream = new_envelope_stream(8, 1);
 

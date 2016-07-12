@@ -155,10 +155,10 @@ int add_bitwize(mixer *mixr, int pattern)
     printf("Added bitwize gen!\n");
     return add_sound_generator(mixr, m);
 }
-int add_osc(mixer *mixr, double freq, GTABLE *gt)
+int add_osc(mixer *mixr, double freq, wave_type type)
 {
 
-    OSCIL *new_osc = new_oscil(freq, gt);
+    OSCIL *new_osc = new_oscil(freq, type);
     if (new_osc == NULL) {
         printf("BARF!\n");
         return -1;

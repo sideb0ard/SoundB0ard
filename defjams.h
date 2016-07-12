@@ -52,4 +52,4 @@ typedef enum {
     DRUM_TYPE
 } sound_generator_type;
 
-typedef enum { NOISE, SAWD, SAWU, SINE, SQUARE, TRI } oscil_type;
+typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;

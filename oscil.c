@@ -8,8 +8,9 @@
 #include "utils.h"
 
 extern mixer *mixr;
+extern wtable *wave_tables[5];
 
-OSCIL *new_oscil(double freq, GTABLE *gt)
+OSCIL *new_oscil(double freq, wave_type type)
 {
     OSCIL *p_osc;
     p_osc = (OSCIL *)calloc(1, sizeof(OSCIL));
@@ -23,7 +24,7 @@ OSCIL *new_oscil(double freq, GTABLE *gt)
     p_osc->m_amp = 1.0;
 
     printf("NEW OSCILT! - TABRAD IS %f // freq is %f\n", TABRAD, freq);
-    p_osc->gtable = gt;
+    p_osc->wtable = wave_tables[type];
     p_osc->dtablen = (double)TABLEN;
 
     p_osc->sound_generator.gennext = &oscil_gennext;
@@ -110,7 +111,7 @@ double oscil_gennext(void *self)
     unsigned long next_index = base_index + 1;
     double frac, slope, val;
     double dtablen = p_osc->dtablen, curphase = p_osc->curphase;
-    double *table = p_osc->gtable->table;
+    double *table = p_osc->wtable->table;
     double vol = p_osc->vol;
 
     frac = curphase - base_index;
@@ -128,10 +129,14 @@ double oscil_gennext(void *self)
     p_osc->curphase = curphase;
     // END BASIC VAL
 
-    val = val * p_osc->m_fq_ratio *
-          pitch_shift_multiplier(p_osc->m_fq_mod_exp + p_osc->m_octave * 12.0 +
-                                 p_osc->m_semitones + p_osc->m_cents / 100.0);
-    val += p_osc->m_fq_mod_lin;
+    //printf("VAL BEFORE %f\n", val);
+    //val = val * p_osc->m_fq_ratio *
+    //      pitch_shift_multiplier(p_osc->m_fq_mod_exp + p_osc->m_octave * 12.0 +
+    //                             p_osc->m_semitones + p_osc->m_cents / 100.0);
+    ////printf("VAL %f // cents %f\n", val, p_osc->m_cents);
+    //printf("VAL AFTER %f\n", val);
+    //val += p_osc->m_fq_mod_lin;
+    //printf("VAL AFTER2 %f\n\n", val);
 
     return val * vol;
 }
@@ -166,6 +171,26 @@ void osc_start(OSCIL *self)
     self->m_note_on = true;
 }
 
+void osc_update(OSCIL *self)
+{
+    self->m_fq = self->freq * self->m_fq_ratio *
+        pitch_shift_multiplier(self->m_fq_mod_exp +
+                               self->m_pitch_bend_mod +
+                               self->m_octave * 12.0 +
+                               self->m_semitones +
+                               self->m_cents / 100.0);
+
+    // not used - including it in case i need reminder
+    self->m_fq += self->m_fq_mod_lin;
+    if (self->m_fq > OSC_FQ_MAX)
+        self->m_fq = OSC_FQ_MAX;
+    if (self->m_fq < OSC_FQ_MIN)
+        self->m_fq = OSC_FQ_MIN;
+
+    self->incr = self->m_fq * TABRAD;
+
+}
+
 void osc_stop(OSCIL *self) { self->m_note_on = false; }
 
 void set_midi_note_num(OSCIL *self, int midi_note_num)
@@ -176,3 +201,8 @@ void set_midi_note_num(OSCIL *self, int midi_note_num)
 // void set_pitch_bend_mod(OSCIL *self, double bend) {
 
 void pitch_bend(OSCIL *self, double cents) { self->m_cents = cents; }
+
+void osc_set_wave(OSCIL *self, wave_type type)
+{
+    self->wtable = wave_tables[type];
+}

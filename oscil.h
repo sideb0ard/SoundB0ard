@@ -24,12 +24,13 @@ typedef struct oscil OSCIL;
 typedef void (*freqy)(OSCIL *osc, double freq);
 typedef void (*incry)(OSCIL *osc, double freq);
 
-typedef struct oscil {
+struct oscil {
 
     SOUNDGEN sound_generator;
 
     // "public"
     double freq; // m_dOscFo
+    double m_fq;
     double m_fq_ratio;
     double m_amplitude;
     double m_pw_control;
@@ -44,7 +45,8 @@ typedef struct oscil {
     double vol;
     double m_amp;
 
-    const GTABLE *gtable; // m_uWaveform
+    wave_type wav; // defined in defjams - NOISE, SAW etc.
+    wtable *wtable; // m_uWaveform 
     double dtablen;
 
     unsigned m_lfo_mode;
@@ -69,9 +71,10 @@ typedef struct oscil {
     freqy freqadj;
     incry incradj;
 
-} OSCIL;
+};
 
-OSCIL *new_oscil(double freq, GTABLE *gt);
+OSCIL *new_oscil(double freq, wave_type t);
+void osc_set_wave(OSCIL *self, wave_type t);
 
 // void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void oscil_setvol(void *self, double v);

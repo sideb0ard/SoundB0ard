@@ -1,19 +1,15 @@
-#ifndef GTABLE_H
-#define GTABLE_H
+#pragma once
 
-typedef struct t_gtable {
+typedef struct wtable {
     double *table;
     unsigned long length;
-} GTABLE;
+} wtable;
 
-GTABLE *new_sine_table(void);
-GTABLE *new_tri_table(void);
-GTABLE *new_square_table(void);
-GTABLE *new_saw_table(int up); // 1 for Saw Up, 0 for down
-GTABLE *new_env_table(void);
+wtable *new_sine_table(void);
+wtable *new_tri_table(void);
+wtable *new_square_table(void);
+wtable *new_saw_table(int up); // 1 for Saw Up, 0 for down
+wtable *new_env_table(void);
 
-void gtable_free(GTABLE **gtable);
-
-void table_info(GTABLE *gtable);
-
-#endif
+void wtable_free(wtable **table);
+void wtable_info(wtable *table);

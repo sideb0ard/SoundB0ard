@@ -17,11 +17,6 @@
 
 extern bpmrrr *b;
 extern mixer *mixr;
-extern GTABLE *sine_table;
-extern GTABLE *saw_down_table;
-extern GTABLE *saw_up_table;
-extern GTABLE *tri_table;
-extern GTABLE *square_table;
 
 static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
                                "f#", "g",  "g#", "a",  "a#", "b"};
@@ -32,19 +27,19 @@ void *timed_sig_start(void *arg)
     int sg = -1; // signal generator
 
     if (strcmp(msg->params, "sine") == 0) {
-        sg = add_osc(mixr, msg->freq, sine_table);
+        sg = add_osc(mixr, msg->freq, SINE);
     }
     else if (strcmp(msg->params, "sawd") == 0) {
-        sg = add_osc(mixr, msg->freq, saw_down_table);
+        sg = add_osc(mixr, msg->freq, SAW_D);
     }
     else if (strcmp(msg->params, "sawu") == 0) {
-        sg = add_osc(mixr, msg->freq, saw_up_table);
+        sg = add_osc(mixr, msg->freq, SAW_U);
     }
     else if (strcmp(msg->params, "tri") == 0) {
-        sg = add_osc(mixr, msg->freq, tri_table);
+        sg = add_osc(mixr, msg->freq, TRI);
     }
     else if (strcmp(msg->params, "square") == 0) {
-        sg = add_osc(mixr, msg->freq, square_table);
+        sg = add_osc(mixr, msg->freq, SQUARE);
     }
     else if (strcmp(msg->params, "fmx") == 0) {
         sg = add_fm_x(mixr, msg->mod_osc, msg->modfreq, msg->car_osc,

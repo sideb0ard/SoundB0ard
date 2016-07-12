@@ -5,89 +5,89 @@
 #include "defjams.h"
 #include "table.h"
 
-static GTABLE *_new_gtable(void)
+static wtable *_new_wtable(void)
 {
-    GTABLE *gtable = NULL;
-    gtable = (GTABLE *)calloc(1, sizeof(GTABLE));
-    if (gtable == NULL)
+    wtable *t = NULL;
+    t = (wtable *)calloc(1, sizeof(wtable));
+    if (t == NULL)
         return NULL;
-    gtable->table = (double *)calloc(1, (TABLEN + 1) * sizeof(double));
-    if (gtable->table == NULL) {
-        free(gtable);
+    t->table = (double *)calloc(1, (TABLEN + 1) * sizeof(double));
+    if (t->table == NULL) {
+        free(t);
         return NULL;
     }
-    gtable->length = TABLEN;
-    return gtable;
+    t->length = TABLEN;
+    return t;
 }
 
-static void norm_gtable(GTABLE *gtable)
+static void norm_wtable(wtable *t)
 {
     unsigned long i;
     double val, maxamp = 0.0;
 
-    for (i = 0; i < gtable->length; i++) {
-        val = fabs(gtable->table[i]);
+    for (i = 0; i < t->length; i++) {
+        val = fabs(t->table[i]);
         if (maxamp < val)
             maxamp = val;
     }
 
     maxamp = 1.0 / maxamp;
 
-    for (i = 0; i < gtable->length; i++)
-        gtable->table[i] *= maxamp;
+    for (i = 0; i < t->length; i++)
+        t->table[i] *= maxamp;
 
-    gtable->table[i] = gtable->table[0];
+    t->table[i] = t->table[0];
 }
 
 // TABLE GENERATION SIGNALS
 //
-GTABLE *new_sine_table()
+wtable *new_sine_table()
 {
     unsigned long i;
     double step;
 
-    GTABLE *gtable = _new_gtable();
-    if (gtable == NULL)
+    wtable *t = _new_wtable();
+    if (t == NULL)
         return NULL;
 
     step = TWO_PI / TABLEN;
     for (i = 0; i < TABLEN; i++)
-        gtable->table[i] = sin(step * i);
-    gtable->table[i] = gtable->table[0]; // guard point
+        t->table[i] = sin(step * i);
+    t->table[i] = t->table[0]; // guard point
 
-    return gtable;
+    return t;
 }
 
-GTABLE *new_tri_table()
+wtable *new_tri_table()
 {
     unsigned long i, j;
     double step, amp;
     int harmonic = 1;
 
-    GTABLE *gtable = _new_gtable();
-    if (gtable == NULL)
+    wtable *t = _new_wtable();
+    if (t == NULL)
         return NULL;
 
     step = TWO_PI / TABLEN;
     for (i = 0; i < NHARMS; i++) {
         amp = 1.0 / (harmonic * harmonic);
         for (j = 0; j < TABLEN; j++) {
-            gtable->table[j] += amp * cos(step * harmonic * j);
+            t->table[j] += amp * cos(step * harmonic * j);
         }
         harmonic += 2;
     }
-    norm_gtable(gtable);
-    return gtable;
+    norm_wtable(t);
+    return t;
 }
 
-GTABLE *new_square_table()
+wtable *new_square_table()
 {
     unsigned long i, j;
     double step, amp;
     int harmonic = 1;
 
-    GTABLE *gtable = _new_gtable();
-    if (gtable == NULL)
+    wtable *t = _new_wtable();
+    if (t == NULL)
         return NULL;
 
     step = TWO_PI / TABLEN;
@@ -95,23 +95,23 @@ GTABLE *new_square_table()
     for (i = 0; i < NHARMS; i++) {
         amp = 1.0 / harmonic;
         for (j = 0; j < TABLEN; j++) {
-            gtable->table[j] += amp * sin(step * harmonic * j);
+            t->table[j] += amp * sin(step * harmonic * j);
         }
         harmonic += 2;
     }
-    norm_gtable(gtable);
+    norm_wtable(t);
 
-    return gtable;
+    return t;
 }
 
-GTABLE *new_saw_table(int up)
+wtable *new_saw_table(int up)
 {
     unsigned long i, j;
     double step, val, amp = 1.0;
     int harmonic = 1;
 
-    GTABLE *gtable = _new_gtable();
-    if (gtable == NULL)
+    wtable *t = _new_wtable();
+    if (t == NULL)
         return NULL;
 
     step = TWO_PI / TABLEN;
@@ -120,23 +120,23 @@ GTABLE *new_saw_table(int up)
 
     for (i = 0; i < NHARMS; i++) {
         val = amp / harmonic;
-        for (j = 0; j < gtable->length; j++)
-            gtable->table[j] += val * sin(step * harmonic * j);
+        for (j = 0; j < t->length; j++)
+            t->table[j] += val * sin(step * harmonic * j);
         harmonic++;
     }
-    norm_gtable(gtable);
-    return gtable;
+    norm_wtable(t);
+    return t;
 }
 // END TABLE GENERATION SIGNALS
 
-void table_info(GTABLE *gtable)
+void wtable_info(wtable *t)
 {
-    printf("TABLE LEN: %lu\n", gtable->length);
-    for (double i = 0; i < gtable->length; i++)
-        printf("%f", gtable->table[(int)i]);
+    printf("TABLE LEN: %lu\n", t->length);
+    for (unsigned int i = 0; i < t->length; i++)
+        printf("%f", t->table[i]);
 }
 
-void gtable_free(GTABLE **gtable)
+void wtable_free(wtable **gtable)
 {
     if (gtable && *gtable && (*gtable)->table) {
         free((*gtable)->table);

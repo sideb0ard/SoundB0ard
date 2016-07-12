@@ -7,11 +7,7 @@
 #include "table.h"
 #include "utils.h"
 
-extern GTABLE *sine_table;
-extern GTABLE *square_table;
-extern GTABLE *tri_table;
-extern GTABLE *saw_up_table;
-extern GTABLE *saw_down_table;
+extern wtable *wave_tables[5];
 
 FM *new_fm(double freq1, double freq2)
 {
@@ -28,32 +24,32 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
 
     // modulator
     if (strncmp(osc1, "square", 10) == 0)
-        fm->osc1 = new_oscil(osc1_freq, square_table);
+        fm->osc1 = new_oscil(osc1_freq, SQUARE);
     else if (strncmp(osc1, "saw_u", 10) == 0)
-        fm->osc1 = new_oscil(osc1_freq, saw_up_table);
+        fm->osc1 = new_oscil(osc1_freq, SAW_U);
     else if (strncmp(osc1, "saw_d", 10) == 0)
-        fm->osc1 = new_oscil(osc1_freq, saw_down_table);
+        fm->osc1 = new_oscil(osc1_freq, SAW_D);
     else if (strncmp(osc1, "sine", 10) == 0)
-        fm->osc1 = new_oscil(osc1_freq, sine_table);
+        fm->osc1 = new_oscil(osc1_freq, SINE);
     else // tri
-        fm->osc1 = new_oscil(osc1_freq, tri_table);
+        fm->osc1 = new_oscil(osc1_freq, TRI);
 
     // carrier
     if (strncmp(osc2, "square", 10) == 0)
-        fm->osc2 = new_oscil(osc2_freq, square_table);
+        fm->osc2 = new_oscil(osc2_freq, SQUARE);
     else if (strncmp(osc2, "saw_u", 10) == 0)
-        fm->osc2 = new_oscil(osc2_freq, saw_up_table);
+        fm->osc2 = new_oscil(osc2_freq, SAW_U);
     else if (strncmp(osc2, "saw_d", 10) == 0)
-        fm->osc2 = new_oscil(osc2_freq, saw_down_table);
+        fm->osc2 = new_oscil(osc2_freq, SAW_D);
     else if (strncmp(osc2, "sine", 10) == 0)
-        fm->osc2 = new_oscil(osc2_freq, sine_table);
+        fm->osc2 = new_oscil(osc2_freq, SINE);
     else // tri
-        fm->osc2 = new_oscil(osc2_freq, tri_table);
+        fm->osc2 = new_oscil(osc2_freq, TRI);
 
-    fm->osc2->m_cents = 2.5; // +2.5 cents detuned
+    //fm->osc2->m_cents = 2.5; // +2.5 cents detuned
 
     // lfo
-    fm->lfo = new_oscil(DEFAULT_LFO_RATE, sine_table);
+    fm->lfo = new_oscil(DEFAULT_LFO_RATE, SINE);
 
     // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
@@ -66,7 +62,6 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
 
     fm->vol = 0.7;
     fm->cur_octave = 2;
-    fm->wave_form = SAWD;
     // fm->osc1->sound_generator.setvol(fm->osc1, 0.5);
     // fm->osc2->sound_generator.setvol(fm->osc2, 0.5);
 
@@ -79,57 +74,41 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     return fm;
 }
 
-void fm_change_osc_wave_form(void *self)
+void fm_change_osc_wave_form(FM *self, int oscil)
 {
-    FM *fm = (FM *)self;
-
-    int type = (fm->wave_form + 1) % 6;
+    OSCIL *o;
+    if (oscil == 0)
+        o = self->osc1;
+    else
+        o = self->osc2;
+    wave_type type = (o->wav + 1) % 5;
     printf("Changing wav types to %d\n", type);
-    fm->wave_form = type;
+    o->wav = type;
 
-    OSCIL *new_osc1 = NULL;
-    OSCIL *new_osc2 = NULL;
-    OSCIL *old_osc1 = fm->osc1;
-    OSCIL *old_osc2 = fm->osc2;
-    double freq = fm->osc1->freq;
-    printf("FREQY %f\n", freq);
     switch (type) {
-    case SAWD: {
-        fm->osc1 = new_oscil(freq, saw_down_table);
-        fm->osc2 = new_oscil(freq, saw_down_table);
+    case SAW_D: {
+        osc_set_wave(o, SAW_D);
         break;
     }
-    case SAWU: {
-        fm->osc1 = new_oscil(freq, saw_up_table);
-        fm->osc2 = new_oscil(freq, saw_up_table);
+    case SAW_U: {
+        osc_set_wave(o, SAW_U);
         break;
     }
     case TRI: {
-        fm->osc1 = new_oscil(freq, tri_table);
-        fm->osc2 = new_oscil(freq, tri_table);
+        osc_set_wave(o, TRI);
         break;
     }
     case SQUARE: {
-        new_osc1 = new_oscil(freq, square_table);
-        new_osc2 = new_oscil(freq, square_table);
+        osc_set_wave(o, SQUARE);
         break;
     }
     case SINE:
     default: {
-        fm->osc1 = new_oscil(freq, sine_table);
-        fm->osc2 = new_oscil(freq, sine_table);
+        osc_set_wave(o, SINE);
         break;
     }
     }
 
-    new_osc1->sound_generator.setvol(new_osc1, 0.5);
-    new_osc2->sound_generator.setvol(new_osc2, 0.5);
-    new_osc2->m_cents = 2.5; // +2.5 cents detuned
-
-    fm->osc1 = new_osc1;
-    fm->osc2 = new_osc2;
-    free(old_osc1);
-    free(old_osc2);
 }
 
 void fm_setvol(void *self, double v)
@@ -182,6 +161,9 @@ void keypress_on(void *self, double freq)
     FM *fm = (FM *)self;
     mfm(fm, freq);
 
+    //osc_update(fm->osc1);
+    //osc_update(fm->osc2);
+
     osc_start(fm->osc1);
     osc_start(fm->osc2);
     osc_start(fm->lfo);
@@ -216,6 +198,9 @@ double fm_gennext(void *self)
 
         set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
         set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
+
+        //osc_update(fm->osc1);
+        //osc_update(fm->osc2);
 
         // TODO implement:
         // if ( self->m_filter_key_track == ON )

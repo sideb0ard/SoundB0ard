@@ -45,7 +45,7 @@ mixer *new_mixer(void);
 
 void mixer_ps(mixer *mixr);
 int add_bitwize(mixer *mixr, int pattern);
-int add_osc(mixer *mixr, double freq, GTABLE *gt);
+int add_osc(mixer *mixr, double freq, wave_type w);
 int add_fm(mixer *mixr, double ffreq, double cfreq);
 int add_fm_x(mixer *mixr, char *f_osc, double ffreq, char *c_osc, double cfreq);
 int add_drum(mixer *mixr, char *filename, char *pattern);

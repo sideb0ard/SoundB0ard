@@ -26,12 +26,7 @@ extern mixer *mixr;
 extern bpmrrr *b;
 extern ENVSTREAM *ampstream;
 
-// TODO: make into a single array of lookup tables
-extern GTABLE *sine_table;
-extern GTABLE *tri_table;
-extern GTABLE *square_table;
-extern GTABLE *saw_down_table;
-extern GTABLE *saw_up_table;
+extern wtable *wave_tables[5];
 
 void loopy(void)
 {

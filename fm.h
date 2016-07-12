@@ -23,7 +23,6 @@ typedef struct FM {
     FILTER_ONEPOLE *filter;
     DCA *dca;
     int cur_octave;
-    int wave_form; // defined in defjams
     bool note_on;
     float vol;
 
@@ -41,4 +40,4 @@ void mfm(void *self, double val);
 void keypress_on(void *self, double freq);
 void keypress_off(void *self);
 void change_octave(void *self, int direction);
-void fm_change_osc_wave_form(void *self);
+void fm_change_osc_wave_form(FM *self, int oscil);
