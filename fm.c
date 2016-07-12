@@ -190,12 +190,12 @@ double fm_gennext(void *self)
         double eg_out = env_generate(fm->env, &biased_eg);
 
         // CALC ENV GEN -> OSC MOD
-        double eg_osc_mod = 1 * OSC_FQ_MOD_RANGE * biased_eg;
+        double eg_osc_mod = fm->env->m_eg1_osc_intensity * OSC_FQ_MOD_RANGE * biased_eg;
 
-        //set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
-        //set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
-        set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out);
-        set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out);
+        set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
+        set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
+        //set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out);
+        //set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out);
 
         osc_update(fm->osc1);
         osc_update(fm->osc2);

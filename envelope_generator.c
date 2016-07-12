@@ -24,6 +24,7 @@ envelope_generator *new_envelope_generator()
     eg->m_sustain_level = 0.707;
     eg->m_output_eg = true;
 
+    eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
     set_eg_mode(eg, eg->m_eg_mode);
 
     eg->m_legato_mode = false;

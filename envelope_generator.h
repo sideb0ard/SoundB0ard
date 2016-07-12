@@ -5,6 +5,9 @@
 #define EG_MINTIME_MS 50 // these two used for attacjtime, decay and release
 #define EG_MAXTIME_MS 5000
 #define EG_DEFAULT_STATE 1000
+#define EG1_DEFAULT_OSC_INTENSITY 0
+#define EG_MIN_OSC_INTENSITY 0
+#define EG_MAX_OSC_INTENSITY 0 // TODO - check this
 
 typedef enum { ANALOG, DIGITAL } eg_mode;
 
@@ -25,6 +28,7 @@ typedef struct envelope_generator {
 
     eg_mode m_eg_mode;
 
+    double m_eg1_osc_intensity;
     double m_envelope_output;
 
     double m_attack_coeff;
