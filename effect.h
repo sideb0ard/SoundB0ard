@@ -46,5 +46,4 @@ double read_delay_at(EFFECT *self, double msec);
 void write_delay_and_inc(EFFECT *self, double val);
 void delay_audio(double *input, double *output);
 
-
 #endif

@@ -85,27 +85,27 @@ void keys(int soundgen_num)
             else if (ch == 50) { // '2'
                 change_octave(mixr->sound_generators[soundgen_num], UP);
             }
-            //else if (ch == 99) { // 'c'
+            // else if (ch == 99) { // 'c'
             //    freqinc(self->lfo, DOWN);
             //}
-            //else if (ch == 67) { // 'C'
+            // else if (ch == 67) { // 'C'
             //    freqinc(self->lfo, UP);
             //}
-            //else if (ch == 122) { // 'z'
+            // else if (ch == 122) { // 'z'
             //    filter_adj_fc_control(self->filter->bc_filter, DOWN);
             //}
-            //else if (ch == 90) { // 'Z'
+            // else if (ch == 90) { // 'Z'
             //    filter_adj_fc_control(self->filter->bc_filter, UP);
             //}
-            else if ( ch == 122 ) { // '`'
+            else if (ch == 122) { // '`'
                 printf("Changing WAVE form of synth->osc1\n");
                 fm_change_osc_wave_form(self, 0);
             }
-            else if ( ch == 120 ) { // '`'
+            else if (ch == 120) { // '`'
                 printf("Changing WAVE form of synth->osc2\n");
                 fm_change_osc_wave_form(self, 0);
             }
-            else if ( ch == 99 ) { // '`'
+            else if (ch == 99) { // '`'
                 printf("Changing WAVE form of synth->lfo\n");
                 fm_change_osc_wave_form(self, 0);
             }
@@ -180,7 +180,7 @@ void *play_melody_loop(void *m)
         for (int i = 0; i < mloop->size; i++) {
             while (!note_played) {
                 if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    //printf("playing %f\n", mloop->melody[i]->freq);
+                    // printf("playing %f\n", mloop->melody[i]->freq);
                     play_note(mloop->sig_num, mloop->melody[i]->freq);
                     note_played = 1;
                 }
@@ -190,9 +190,9 @@ void *play_melody_loop(void *m)
                 pthread_mutex_unlock(&bpm_lock);
             }
             note_played = 0;
-            //FM *fm = (FM*)mixr->sound_generators[mloop->sig_num];
-            //printf("note off!\n");
-            //note_off(fm->env);
+            // FM *fm = (FM*)mixr->sound_generators[mloop->sig_num];
+            // printf("note off!\n");
+            // note_off(fm->env);
         }
     }
     // TODO free all this memory!!

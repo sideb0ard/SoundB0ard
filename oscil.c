@@ -129,14 +129,15 @@ double oscil_gennext(void *self)
     p_osc->curphase = curphase;
     // END BASIC VAL
 
-    //printf("VAL BEFORE %f\n", val);
-    //val = val * p_osc->m_fq_ratio *
-    //      pitch_shift_multiplier(p_osc->m_fq_mod_exp + p_osc->m_octave * 12.0 +
+    // printf("VAL BEFORE %f\n", val);
+    // val = val * p_osc->m_fq_ratio *
+    //      pitch_shift_multiplier(p_osc->m_fq_mod_exp + p_osc->m_octave * 12.0
+    //      +
     //                             p_osc->m_semitones + p_osc->m_cents / 100.0);
     ////printf("VAL %f // cents %f\n", val, p_osc->m_cents);
-    //printf("VAL AFTER %f\n", val);
-    //val += p_osc->m_fq_mod_lin;
-    //printf("VAL AFTER2 %f\n\n", val);
+    // printf("VAL AFTER %f\n", val);
+    // val += p_osc->m_fq_mod_lin;
+    // printf("VAL AFTER2 %f\n\n", val);
 
     return val * vol;
 }
@@ -167,17 +168,16 @@ void osc_reset(OSCIL *self)
 
 void osc_start(OSCIL *self)
 {
-    //osc_reset(self);
+    // osc_reset(self);
     self->m_note_on = true;
 }
 
 void osc_update(OSCIL *self)
 {
-    self->m_fq = self->freq * self->m_fq_ratio *
-        pitch_shift_multiplier(self->m_fq_mod_exp +
-                               self->m_pitch_bend_mod +
-                               self->m_octave * 12.0 +
-                               self->m_semitones +
+    self->m_fq =
+        self->freq * self->m_fq_ratio *
+        pitch_shift_multiplier(self->m_fq_mod_exp + self->m_pitch_bend_mod +
+                               self->m_octave * 12.0 + self->m_semitones +
                                self->m_cents / 100.0);
 
     // not used - including it in case i need reminder
@@ -188,7 +188,6 @@ void osc_update(OSCIL *self)
         self->m_fq = OSC_FQ_MIN;
 
     self->incr = self->m_fq * TABRAD;
-
 }
 
 void osc_stop(OSCIL *self) { self->m_note_on = false; }

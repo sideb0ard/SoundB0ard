@@ -45,8 +45,8 @@ struct oscil {
     double vol;
     double m_amp;
 
-    wave_type wav; // defined in defjams - NOISE, SAW etc.
-    wtable *wtable; // m_uWaveform 
+    wave_type wav;  // defined in defjams - NOISE, SAW etc.
+    wtable *wtable; // m_uWaveform
     double dtablen;
 
     unsigned m_lfo_mode;
@@ -70,7 +70,6 @@ struct oscil {
 
     freqy freqadj;
     incry incradj;
-
 };
 
 OSCIL *new_oscil(double freq, wave_type t);

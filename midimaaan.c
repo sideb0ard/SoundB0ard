@@ -121,12 +121,12 @@ void midipitchbend(int data1, int data2)
 
     FM *fm = (FM *)mixr->sound_generators[mixr->active_fm_soundgen_num];
     if (actual_pitch_bent_val != 8192) {
-        //double normalized_pitch_bent_val =
+        // double normalized_pitch_bent_val =
         //    (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
-        //printf("Actzl: %d and norm %f\n", actual_pitch_bent_val,
+        // printf("Actzl: %d and norm %f\n", actual_pitch_bent_val,
         //       normalized_pitch_bent_val);
         double scaley_val =
-            //scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
+            // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
         printf("Cents to bend - %f\n", scaley_val);
         fm->osc1->m_cents = scaley_val;

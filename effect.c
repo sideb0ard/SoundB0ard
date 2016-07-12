@@ -110,10 +110,10 @@ void write_delay_and_inc(EFFECT *self, double val)
 {
     self->buffer[self->buf_write_idx] = val;
     self->buf_write_idx++;
-    if ( self->buf_write_idx >= self->buf_length )
+    if (self->buf_write_idx >= self->buf_length)
         self->buf_write_idx = 0;
     self->buf_read_idx++;
-    if ( self->buf_read_idx >= self->buf_length )
+    if (self->buf_read_idx >= self->buf_length)
         self->buf_read_idx = 0;
 }
 
@@ -124,7 +124,7 @@ double read_delay(EFFECT *self)
     if (read_idx_1 < 0)
         read_idx_1 = self->buf_length - 1;
     double yn_1 = self->buffer[read_idx_1];
-    double frac_delay = self->m_delay_in_samples - (int)self->m_delay_in_samples;
+    double frac_delay =
+        self->m_delay_in_samples - (int)self->m_delay_in_samples;
     return scaleybum(0, 1, yn, yn_1, frac_delay);
 }
-
