@@ -22,6 +22,7 @@ bpmrrr *new_bpmrrr()
 
     b->bpm = DEFAULT_BPM;
     b->cur_tick = 0;
+    b->tick = 0; // MY NEW ONE
     b->quart_note_tick = 0;
     b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
 
@@ -34,6 +35,16 @@ void bpm_change(bpmrrr *b, int bpm)
         b->bpm = bpm;
         b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
     }
+}
+
+void bpm_inc_tick(bpmrrr *b)
+{
+    b->tick++;
+}
+
+int bpm_get_tick(bpmrrr *b)
+{
+    return b->tick;
 }
 
 void bpm_info(bpmrrr *b)
