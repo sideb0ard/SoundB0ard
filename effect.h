@@ -3,7 +3,8 @@
 
 typedef enum {
     DECIMATOR,
-    DELAY,
+    DELAY1,
+    DELAY2,
     DISTORTION,
     RES,
     REVERB,

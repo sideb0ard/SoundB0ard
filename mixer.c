@@ -102,7 +102,7 @@ int add_effect(mixer *mixr)
         }
     }
 
-    EFFECT *e = new_delay(0.2, DELAY);
+    EFFECT *e = new_delay(0.2, DELAY1);
     if (e == NULL) {
         perror("Couldn't create effect");
         return -1;
