@@ -100,7 +100,7 @@ void midinoteon(unsigned int midinote, int velocity)
     FM *fm = (FM *)mixr->sound_generators[mixr->active_fm_soundgen_num];
     set_midi_note_num(fm->osc1, midinote);
     set_midi_note_num(fm->osc2, midinote);
-    keypress_on(mixr->sound_generators[mixr->active_fm_soundgen_num], freq);
+    keypress_on(fm, freq);
 }
 
 void midinoteoff(unsigned int midinote, int velocity)

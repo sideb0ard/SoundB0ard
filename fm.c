@@ -167,15 +167,14 @@ void mfm(void *self, double val)
     set_freq(fm->osc2, val);
 }
 
-void keypress_on(void *self, double freq)
+void keypress_on(FM *self, double freq)
 {
-    FM *fm = (FM *)self;
-    mfm(fm, freq);
+    mfm(self, freq);
 
-    osc_start(fm->osc1);
-    osc_start(fm->osc2);
-    osc_start(fm->lfo);
-    start_eg(fm->env);
+    osc_start(self->osc1);
+    osc_start(self->osc2);
+    osc_start(self->lfo);
+    start_eg(self->env);
 }
 
 void keypress_off(void *self)
@@ -261,4 +260,11 @@ void fm_set_sustain(FM *self, int val)
 {
     self->sustain = val;
     printf("Set sustain to %d\n", val);
+}
+
+void fm_add_melody_loop(void *self, melody_loop *mloop)
+{
+    FM *fm = (FM *) self;
+    if ( fm->melody_loop_num < 10 )
+        fm->mloops[fm->melody_loop_num++] = mloop;
 }

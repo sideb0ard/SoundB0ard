@@ -7,6 +7,7 @@
 #include "filter.h"
 #include "filter_onepole.h"
 #include "oscil.h"
+#include "keys.h"
 #include "sound_generator.h"
 
 typedef struct FM FM;
@@ -15,6 +16,10 @@ typedef struct FM {
     // OSC **oscillators;
     // int num_oscil;
     SOUNDGEN sound_generator;
+
+    melody_loop *mloops[10];
+    int melody_loop_num;
+    int melody_loop_cur;
 
     envelope_generator *env;
     OSCIL *osc1;
@@ -41,8 +46,9 @@ void fm_status(void *self, char *status_string);
 double fm_getvol(void *self);
 void fm_setvol(void *self, double v);
 void mfm(void *self, double val);
-void keypress_on(void *self, double freq);
+void keypress_on(FM *self, double freq);
 void keypress_off(void *self);
 void change_octave(void *self, int direction);
 void fm_change_osc_wave_form(FM *self, int oscil);
 void fm_set_sustain(FM *self, int sustain_val);
+void fm_add_melody_loop(void *self, melody_loop *mloop);

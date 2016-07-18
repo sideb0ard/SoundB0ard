@@ -30,13 +30,11 @@ FILTER_ONEPOLE *new_filter_onepole(void)
 
     filter->bc_filter = new_filter();
 
-    // TODO - do i need these? don't think so
     filter->bc_filter->gennext = &onepole_gennext;
     filter->bc_filter->update = &onepole_update;
     filter->bc_filter->reset = &onepole_reset;
 
     filter->bc_filter->m_type = LPF1;
-    // filter->bc_filter->m_type = HPF1;
 
     filter->m_alpha = 1.0;
     filter->m_beta = 0.0;

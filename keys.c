@@ -21,11 +21,10 @@ extern int kernelq; // for timers
 extern pthread_cond_t bpm_cond;
 extern pthread_mutex_t bpm_lock;
 
-melody_loop *new_melody_loop(int soundgen_num)
+melody_loop *new_melody_loop()
 {
     melody_loop *l;
     l = (melody_loop *)calloc(1, sizeof(melody_loop));
-    l->sig_num = soundgen_num;
     return l;
 }
 
@@ -114,7 +113,7 @@ void keys(int soundgen_num)
                 double freq =
                     chfreqlookup(ch, mixr->sound_generators[soundgen_num]);
                 if (freq != -1) {
-                    play_note(soundgen_num, freq);
+                    play_note(self, freq);
                 }
                 // alarm(2);
             }
@@ -145,23 +144,26 @@ void add_melody_event(melody_loop *mloop, melody_event *e)
     }
 }
 
-void play_note(int sg_num, double freq)
+void play_note(void *self, double freq)
 {
+    FM *fm = (FM *) self;
 
     // struct timespec ts;
     // ts.tv_sec = 0;
     // ts.tv_nsec = 10000;
 
-    keypress_on(mixr->sound_generators[sg_num], freq);
+    keypress_on(fm, freq);
     // nanosleep(&ts, NULL);
     // mixr->sound_generators[sg_num];
     // keypress_off(mixr->sound_generators[sg_num]);
     // alarm(2);
 }
 
-void *play_melody_loop(void *m)
+void *play_melody_loop(void *f)
 {
-    melody_loop *mloop = (melody_loop *)m;
+    // melody_loop *mloop = (melody_loop *)m;
+    FM *fm = (FM *) f;
+
     int notes_played_time[32];
     for (int i = 0; i < 32; i++)
         notes_played_time[i] = 0;
@@ -178,51 +180,51 @@ void *play_melody_loop(void *m)
         }
     }
 
-    FM *fm = (FM *)mixr->sound_generators[mloop->sig_num];
+    //FM *fm = (FM *)mixr->sound_generators[mloop->sig_num];
 
     while (1) {
-        int note_played = 0;
-        for (int i = 0; i < mloop->size; i++) {
-            while (!note_played) {
-                if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
-                    // printf("playing %f\n", mloop->melody[i]->freq);
-                    play_note(mloop->sig_num, mloop->melody[i]->freq);
-                    note_played = 1;
-                    if ( fm->sustain > 0 ) // switched on
-                        notes_played_time[mloop->melody[i]->tick] = 1;
-                }
+        for ( int j = 0; j < fm->melody_loop_num; j++) {
+            melody_loop *mloop = fm->mloops[j];
+            int note_played = 0;
+            for (int i = 0; i < mloop->size; i++) {
+                while (!note_played) {
+                    if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
+                        // printf("playing %f\n", mloop->melody[i]->freq);
+                        play_note(fm, mloop->melody[i]->freq);
+                        note_played = 1;
+                        if ( fm->sustain > 0 ) // switched on
+                            notes_played_time[mloop->melody[i]->tick] = 1;
+                    }
 
-                pthread_mutex_lock(&bpm_lock);
-                pthread_cond_wait(&bpm_cond, &bpm_lock);
-                pthread_mutex_unlock(&bpm_lock);
-                for (int i = 0; i < 32; i++) {
-                    if ( notes_played_time[i] > 0 ) {
-                        notes_played_time[i]++;
-                        //printf("notes played time %d =  %d\n", i, notes_played_time[i]);
-                    }
-                    if ( notes_played_time[i] > fm->sustain ) {
-                        notes_played_time[i] = 0;
-                        note_off(fm->env);
+                    pthread_mutex_lock(&bpm_lock);
+                    pthread_cond_wait(&bpm_cond, &bpm_lock);
+                    pthread_mutex_unlock(&bpm_lock);
+                    for (int i = 0; i < 32; i++) {
+                        if ( notes_played_time[i] > 0 ) {
+                            notes_played_time[i]++;
+                            //printf("notes played time %d =  %d\n", i, notes_played_time[i]);
+                        }
+                        if ( notes_played_time[i] > fm->sustain ) {
+                            notes_played_time[i] = 0;
+                            note_off(fm->env);
+                        }
                     }
                 }
+                note_played = 0;
+                // FM *fm = (FM*)mixr->sound_generators[mloop->sig_num];
+                // printf("note off!\n");
+                // note_off(fm->env);
             }
-            note_played = 0;
-            // FM *fm = (FM*)mixr->sound_generators[mloop->sig_num];
-            // printf("note off!\n");
-            // note_off(fm->env);
         }
     }
     // TODO free all this memory!!
     return NULL;
 }
 
-void keys_start_melody_player(int sig_num, char *pattern)
+melody_loop *mloop_from_pattern(char *pattern)
 {
+    melody_loop *mloop = new_melody_loop();
 
-    melody_loop *mloop = new_melody_loop(sig_num);
-
-    printf("KEYS START MELODY!\n");
-    printf("SIG NUM %d - %s\n", sig_num, pattern);
     char *tok, *last_s;
     char *sep = " ";
     for (tok = strtok_r(pattern, sep, &last_s); tok;
@@ -239,8 +241,23 @@ void keys_start_melody_player(int sig_num, char *pattern)
             add_melody_event(mloop, me);
         }
     }
+    return mloop;
+}
+
+void keys_start_melody_player(int sig_num, char *pattern)
+{
+
+    //melody_loop *mloop = new_melody_loop(sig_num);
+    melody_loop *mloop = mloop_from_pattern(pattern);
+
+    printf("KEYS START MELODY!\n");
+    printf("SIG NUM %d - %s\n", sig_num, pattern);
+
+    FM *fm = (FM *) mixr->sound_generators[sig_num];
+    fm_add_melody_loop(fm, mloop);
+
     pthread_t melody_looprrr;
-    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, mloop)) {
+    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, fm)) {
         fprintf(stderr, "Err running loop\n");
     }
     pthread_detach(melody_looprrr);

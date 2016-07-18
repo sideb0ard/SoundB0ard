@@ -5,8 +5,7 @@
 #include "filter.h"
 #include "utils.h"
 
-// base class to be embedded
-FILTER *new_filter(void)
+FILTER *new_filter()
 {
     FILTER *filter = (FILTER *)calloc(1, sizeof(FILTER));
 
