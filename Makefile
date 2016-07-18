@@ -13,6 +13,7 @@ SRC = main.c \
       envelope_generator.c \
       fm.c \
       filter.c \
+      filter_csem.c \
       filter_onepole.c \
       help.c \
       keys.c \

@@ -168,9 +168,15 @@ void midicontrol(int data1, int data2)
         scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
         oscil_setvol(fm->lfo, scaley_val);
         break;
-    case 7: // K5 - Filter Frequency Cut
+    case 7: // K7 - Filter Frequency Cut
         scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        printf("FILTER CUTOFF! %f\n", scaley_val);
         filter_set_fc_control(fm->filter->bc_filter, scaley_val);
+        break;
+    case 8: // K8 - Filter Q control
+        scaley_val = scaleybum(0, 128, 1, 10, data2);
+        printf("FILTER Q control! %f\n", scaley_val);
+        filter_set_q_control(fm->filter->bc_filter, scaley_val);
         break;
     default:
         printf("SOMthing else\n");

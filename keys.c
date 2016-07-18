@@ -99,11 +99,11 @@ void keys(int soundgen_num)
             //}
             else if (ch == 122) { // '`'
                 printf("Changing WAVE form of synth->osc1\n");
-                fm_change_osc_wave_form(self, 0);
+                fm_change_osc_wave_form(self, 1);
             }
             else if (ch == 120) { // '`'
                 printf("Changing WAVE form of synth->osc2\n");
-                fm_change_osc_wave_form(self, 0);
+                fm_change_osc_wave_form(self, 2);
             }
             else if (ch == 99) { // '`'
                 printf("Changing WAVE form of synth->lfo\n");
@@ -188,7 +188,8 @@ void *play_melody_loop(void *m)
                     // printf("playing %f\n", mloop->melody[i]->freq);
                     play_note(mloop->sig_num, mloop->melody[i]->freq);
                     note_played = 1;
-                    notes_played_time[mloop->melody[i]->tick] = 1;
+                    if ( fm->sustain > 0 ) // switched on
+                        notes_played_time[mloop->melody[i]->tick] = 1;
                 }
 
                 pthread_mutex_lock(&bpm_lock);
@@ -199,7 +200,7 @@ void *play_melody_loop(void *m)
                         notes_played_time[i]++;
                         //printf("notes played time %d =  %d\n", i, notes_played_time[i]);
                     }
-                    if ( notes_played_time[i] > 100 ) {
+                    if ( notes_played_time[i] > fm->sustain ) {
                         notes_played_time[i] = 0;
                         note_off(fm->env);
                     }

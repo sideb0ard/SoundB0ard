@@ -192,11 +192,6 @@ void interpret(char *line)
         regcomp(&mfm_rx, "^mfm ([[:digit:]]+) ([.[:digit:]]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&mfm_rx, trim_tok, 0, NULL, 0) == 0) {
-            // TODO: check this can only work on an FM
-            // char osc[3];
-            // int fmno;
-            // int freq = 0;
-            // printf("ORIG trim_tok: %s\n", trim_tok);
             int fmno;
             double freq;
             char osc[4];
@@ -278,7 +273,7 @@ void interpret(char *line)
         regmatch_t tpmatch[4];
         regex_t tsigtype_rx;
         regcomp(&tsigtype_rx, "^(vol|freq|delay|reverb|res|randd|allpass|"
-                              "lowpass|highpass|bandpass|fm|swing) "
+                              "lowpass|highpass|bandpass|fm|sustain|swing) "
                               "([[:digit:].]+) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
@@ -299,6 +294,13 @@ void interpret(char *line)
                 if (strcmp(cmd_type, "freq") == 0) {
                     freq_change(mixr, val1, val2);
                     printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
+                }
+                if (strcmp(cmd_type, "sustain") == 0) {
+                    printf("SUSTAIN! %s %lf %lf\n", cmd_type, val1, val2);
+                    if (mixr->sound_generators[(int)val1]->type == FM_TYPE) {
+                        FM *fm = (FM *) mixr->sound_generators[(int)val1];
+                        fm_set_sustain(fm, val2);
+                    }
                 }
                 if (strcmp(cmd_type, "delay") == 0) {
                     printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,

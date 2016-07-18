@@ -20,10 +20,14 @@ typedef struct FM {
     OSCIL *osc1;
     OSCIL *osc2;
     OSCIL *lfo;
+    //FILTER_CSEM *filter;
     FILTER_ONEPOLE *filter;
     DCA *dca;
     int cur_octave;
+    int sustain; // in ticks TODO: make better!
     bool note_on;
+    bool m_filter_keytrack;
+    double m_filter_keytrack_intensity;
     float vol;
 
 } FM;
@@ -41,3 +45,4 @@ void keypress_on(void *self, double freq);
 void keypress_off(void *self);
 void change_octave(void *self, int direction);
 void fm_change_osc_wave_form(FM *self, int oscil);
+void fm_set_sustain(FM *self, int sustain_val);

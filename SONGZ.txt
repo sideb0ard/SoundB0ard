@@ -217,4 +217,9 @@ bpm 120
 melody 0 0:c1 2:e1 4:g1 16:c1 20:e1 24:c1 28:e2
 
 melody 0 0:c3 8:a3 16:c3 24:a3
-melody 0 0:c2 8:a2 16:c2 24:a2
+
+fm 2 2
+melody 1 0:c2 8:a2 16:c2 24:a2
+stop 0, melody 1 0:c2 8:a2 16:c2 24:a2
+
+env 0 4 0, env 0 7 2, delay 0 0.5, delay 0 5, lowpass 0 800

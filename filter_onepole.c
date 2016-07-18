@@ -30,6 +30,7 @@ FILTER_ONEPOLE *new_filter_onepole(void)
 
     filter->bc_filter = new_filter();
 
+    // TODO - do i need these? don't think so
     filter->bc_filter->gennext = &onepole_gennext;
     filter->bc_filter->update = &onepole_update;
     filter->bc_filter->reset = &onepole_reset;
@@ -46,6 +47,7 @@ FILTER_ONEPOLE *new_filter_onepole(void)
     filter->m_a0 = 1.0;
     filter->m_z1 = 0.0;
 
+    onepole_reset(filter); // seems redundant as they were set, but following the book here
     return filter;
 }
 
