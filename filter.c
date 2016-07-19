@@ -59,12 +59,7 @@ void filter_update(void *filter)
     FILTER *self = filter;
     filter_set_q_control(self, self->m_q_control);
     //printf("ORIG:FC: %f\n", self->m_fc);
-    double mod = pitch_shift_multiplier(self->m_fc_mod);
-    // books says mutliply like below, but then its always out of wack
-    // self->m_fc = self->m_fc_control * res;
-    // so i'm adding here so its a small offset from UI control
-    //printf("MOD : %f\n", mod);
-    self->m_fc = self->m_fc_control * mod;
+    self->m_fc = self->m_fc_control * pitch_shift_multiplier(self->m_fc_mod);
     if (self->m_fc > FILTER_FC_MAX)
         self->m_fc = FILTER_FC_MAX;
     if (self->m_fc < FILTER_FC_MIN)

@@ -55,10 +55,10 @@ void onepole_update(void *filter)
 
     filter_update(self->bc_filter); // update base class
 
-    double wd = 2 * M_PI * self->bc_filter->m_fc;
+    double wd = 2.0 * M_PI * self->bc_filter->m_fc;
     double T = 1.0 / SAMPLE_RATE;
-    double wa = (2 / T) * tan(wd * T / 2);
-    double g = wa * T / 2;
+    double wa = (2.0 / T) * tan(wd * T / 2.0);
+    double g = wa * T / 2.0;
 
     self->m_alpha = g / (1.0 + g);
 }
@@ -110,3 +110,10 @@ double onepole_gennext(void *filter, double xn)
 
     return xn; // should never get here
 }
+
+void onepole_set_filter_type(void *filter, filter_type ftype)
+{
+    FILTER_ONEPOLE *self = filter;
+    self->bc_filter->m_type = ftype;
+}
+

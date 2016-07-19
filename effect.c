@@ -13,6 +13,8 @@ EFFECT *new_delay(double duration, effect_type e_type)
     if (e == NULL)
         return NULL;
 
+    printf("Durrr! %f\n", duration);
+
     double *buffer;
     int buf_length = (int)(duration * SAMPLE_RATE);
     buffer = (double *)calloc(buf_length, sizeof(double));
