@@ -15,6 +15,8 @@
 extern bpmrrr *b;
 extern mixer *mixr;
 
+extern const float midi_freq_table[128];
+
 void *midiman()
 {
     printf("MIDI maaaaan!\n");

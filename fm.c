@@ -3,6 +3,7 @@
 
 #include "defjams.h"
 #include "filter_onepole.h"
+#include "filter_ckthreefive.h"
 #include "filter_csem.h"
 #include "fm.h"
 #include "table.h"
@@ -55,7 +56,10 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     fm->env = new_envelope_generator();
 
     // FILTER - VA ONEPOLE
-    fm->filter = new_filter_onepole();
+    //fm->filter = new_filter_onepole();
+
+    // FILTER - VA CK35
+    fm->filter = new_filter_ck35();
 
     // FILTER - VA CSEM
     //fm->filter = new_filter_csem();
@@ -194,6 +198,7 @@ double fm_gennext(void *self)
 
     if (fm->osc1->m_note_on) {
 
+        ///////////////////////////// MOD MATRIX START
         // ARTICULATION BLOCK
         double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
         //printf("LFO out! %f\n", lfo_out);
@@ -216,18 +221,22 @@ double fm_gennext(void *self)
                 fm->osc1->freq * fm->m_filter_keytrack_intensity;
         
         filter_set_fc_mod(fm->filter->bc_filter, FILTER_FC_MOD_RANGE * eg_out);
-        onepole_update(fm->filter);
+        //onepole_update(fm->filter);
+        ck_update(fm->filter);
         //csem_update(fm->filter);
 
         dca_set_eg_mod(fm->dca, eg_out * 1.0);
         dca_update(fm->dca);
+
+        ///////////////////////////// MOD MATRIX END
 
         double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
         double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        double filter_out = onepole_gennext(fm->filter, osc_out);
+        //double filter_out = onepole_gennext(fm->filter, osc_out);
+        double filter_out = ck_gennext(fm->filter, osc_out);
         //double filter_out = csem_gennext(fm->filter, osc_out);
 
         //printf("OSCOUT: %f // FILTEROUT: %f\n", osc_out, filter_out);

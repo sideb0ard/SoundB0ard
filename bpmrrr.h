@@ -1,3 +1,5 @@
+#pragma once
+
 typedef struct t_bpmrrr {
     int bpm;
     int tick; // THIS IS MY NEW ONE

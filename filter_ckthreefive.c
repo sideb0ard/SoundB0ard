@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 #include <math.h>
 
 #include "defjams.h"
@@ -25,13 +26,15 @@ FILTER_CK35 *new_filter_ck35(void)
 
     filter->m_filter_type = LPF2; // default
 
+    filter->m_k = 2; // can be between 1 - 10
+
     return filter;
 }
 
 void ck_set_qcontrol(void *filter, double qcontrol)
 {
     FILTER_CK35 *self = filter;
-    self->m_k = (2.0 - 0.01)*(self->bc_filter->m_q_control - 1.0)/(10.0 - 1.0) + 0.01;
+    self->m_k = (2.0 - 0.01)*(qcontrol - 1.0)/(10.0 - 1.0) + 0.01;
 }
 
 void ck_update(void *filter)
@@ -57,6 +60,8 @@ void ck_update(void *filter)
     {
         self->m_LPF2->m_beta = ( self->m_k - self->m_k * G ) / (1.0 + g);
         self->m_LPF1->m_beta = -1.0/(1.0 + g);
+        //printf("UPDATE LPF2 mmmbeta %f\n", self->m_LPF2->m_beta);
+        //printf("UPDATE LPF1 mmmbeta %f\n", self->m_LPF1->m_beta);
     }
     else // HPF
     {
@@ -83,16 +88,20 @@ double ck_gennext(void *filter, double xn)
     if ( self->m_filter_type == LPF2)
     {
         double y1 = onepole_gennext(self->m_LPF1, xn);
+        //printf("Y1! %f\n", y1);
 
         double S35 = onepole_get_feedback_output(self->m_HPF1) +
                      onepole_get_feedback_output(self->m_LPF2);
+        //printf("S35! %f\n", S35);
 
         double u = self->m_alpha0 *  (y1 + S35);
+        //printf("U! %f\n", u);
 
         if (self->bc_filter->m_nlp == ON)
             u = tanh(self->bc_filter->m_saturation * u);
 
         y = self->m_k * onepole_gennext(self->m_LPF2, u);
+        //printf("Y! %f\n", y);
 
         onepole_gennext(self->m_HPF1, y);
     }
@@ -113,5 +122,6 @@ double ck_gennext(void *filter, double xn)
     if (self->m_k > 0)
         y *= 1.0 / self->m_k;
 
+    //printf("CK Y2K beeeatch! - Y: %f\n", y);
     return y;
 }

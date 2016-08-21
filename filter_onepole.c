@@ -95,9 +95,9 @@ double onepole_gennext(void *filter, double xn)
 
     double lpf = vn + self->m_z1;
 
-    if (lpf > 1.0) {
-        print_vals(self);
-    }
+    //if (lpf > 1.0) {
+    //    print_vals(self);
+    //}
 
     self->m_z1 = vn + lpf;
 

@@ -1,3 +1,5 @@
+#pragma once
+
 void loopy(void);
 void interpret(char *line);
 // void gen(void);

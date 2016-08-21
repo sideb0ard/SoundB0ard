@@ -1,3 +1,5 @@
+#pragma once
+
 void *midiman(void *);
 
 void midinoteon(unsigned int midinote, int velocity);

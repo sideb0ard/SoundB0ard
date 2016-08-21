@@ -15,11 +15,13 @@ SRC = main.c \
       filter.c \
       filter_csem.c \
       filter_onepole.c \
+      filter_ckthreefive.c \
       help.c \
       keys.c \
       kqueuerrr.c \
       midimaaan.c \
       mixer.c \
+      modmatrix.c \
       oscil.c \
       sampler.c \
       sbmsg.c \

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "sbmsg.h"
 
 // void startrrr(int sig_num);

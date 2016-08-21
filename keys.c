@@ -79,9 +79,11 @@ void keys(int soundgen_num)
                 quit = 1;
             }
             else if (ch == 49) { // '1'
+                printf("Down an octave...\n");
                 change_octave(mixr->sound_generators[soundgen_num], DOWN);
             }
             else if (ch == 50) { // '2'
+                printf("Up an octave...\n");
                 change_octave(mixr->sound_generators[soundgen_num], UP);
             }
             // else if (ch == 99) { // 'c'
