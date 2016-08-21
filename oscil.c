@@ -58,6 +58,13 @@ OSCIL *new_oscil(double freq, wave_type type)
     p_osc->m_fq_ratio = 1.0;
     p_osc->m_lfo_mode = 0;
 
+    p_osc->global_modmatrix = NULL;
+    p_osc->m_mod_source_fq = DEST_NONE;
+    p_osc->m_mod_source_pulse_width = DEST_NONE;
+    p_osc->m_mod_source_amp = DEST_NONE;
+    p_osc->m_mod_dest_output1 = DEST_NONE;
+    p_osc->m_mod_dest_output2 = DEST_NONE;
+
     return p_osc;
 }
 
@@ -97,8 +104,7 @@ void set_freq(OSCIL *p_osc, double f)
     }
 }
 
-void set_fq_mod_exp(OSCIL *self, double mod) { 
-    self->m_fq_mod_exp = mod; }
+void set_fq_mod_exp(OSCIL *self, double mod) { self->m_fq_mod_exp = mod; }
 
 // void oscil_gennext(void* self, double* frame_vals, int framesPerBuffer) //
 // interpolating
@@ -107,7 +113,6 @@ double oscil_gennext(void *self)
 {
     OSCIL *p_osc = (OSCIL *)self;
 
-    // GET BASIC VAL
     int base_index = (int)(p_osc->curphase);
     unsigned long next_index = base_index + 1;
     double frac, slope, val;
@@ -128,19 +133,15 @@ double oscil_gennext(void *self)
         curphase += dtablen;
 
     p_osc->curphase = curphase;
-    // END BASIC VAL
 
-    // printf("VAL BEFORE %f\n", val);
-    // val = val * p_osc->m_fq_ratio *
-    //      pitch_shift_multiplier(p_osc->m_fq_mod_exp + p_osc->m_octave * 12.0
-    //      +
-    //                             p_osc->m_semitones + p_osc->m_cents / 100.0);
-    ////printf("VAL %f // cents %f\n", val, p_osc->m_cents);
-    // printf("VAL AFTER %f\n", val);
-    // val += p_osc->m_fq_mod_lin;
-    // printf("VAL AFTER2 %f\n\n", val);
+    if (p_osc->global_modmatrix) {
+        p_osc->global_modmatrix->m_sources[p_osc->m_mod_dest_output1] =
+            val * p_osc->vol * p_osc->m_amp_mod;
+        p_osc->global_modmatrix->m_sources[p_osc->m_mod_dest_output2] =
+            val * p_osc->vol * p_osc->m_amp_mod;
+    }
 
-    return val * vol;
+    return val * vol * p_osc->m_amp_mod;
 }
 
 void oscil_status(void *self, char *status_string)
@@ -175,14 +176,20 @@ void osc_start(OSCIL *self)
 
 void osc_update(OSCIL *self)
 {
-    double pitch_shifted_multi = 
-        pitch_shift_multiplier(self->m_fq_mod_exp + self->m_pitch_bend_mod +
-                               self->m_octave * 12.0 + self->m_semitones +
-                               self->m_cents / 100.0);
+    if (self->global_modmatrix) {
+        self->m_fq_mod_exp =
+            self->global_modmatrix->m_destinations[self->m_mod_source_fq];
+        self->m_pw_mod = self->global_modmatrix
+                             ->m_destinations[self->m_mod_source_pulse_width];
+        self->m_amp_mod =
+            self->global_modmatrix->m_destinations[self->m_mod_source_amp];
+        self->m_amp_mod = 1.0 - self->m_amp_mod;
+    }
+
+    double pitch_shifted_multi = pitch_shift_multiplier(
+        self->m_fq_mod_exp + self->m_pitch_bend_mod + self->m_octave * 12.0 +
+        self->m_semitones + self->m_cents / 100.0);
     self->m_fq = self->freq * self->m_fq_ratio * pitch_shifted_multi;
-        
-    //printf("freq %f * fq_ratio %f * pitch_shift_(fq_mod %f + pitch_bend_mod %f + octave %d * 12.0 + semis %f + cents %f / 100.0) = %f\n", self->freq, self->m_fq_ratio, self->m_fq_mod_exp, self->m_pitch_bend_mod, self->m_octave, self->m_semitones, self->m_cents, pitch_shifted_multi);
-    //printf("FINALNEWVAL %f\n", self->m_fq);
 
     // not used - including it in case i need reminder
     self->m_fq += self->m_fq_mod_lin;
@@ -191,7 +198,7 @@ void osc_update(OSCIL *self)
     if (self->m_fq < OSC_FQ_MIN)
         self->m_fq = OSC_FQ_MIN;
 
-    //printf("MFQ! %f and Freq %f\n", self->m_fq, self->freq);
+    // printf("MFQ! %f and Freq %f\n", self->m_fq, self->freq);
     self->incr = self->m_fq * TABRAD;
 }
 

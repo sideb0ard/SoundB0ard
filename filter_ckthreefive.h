@@ -16,7 +16,6 @@ typedef struct filter_ckthreefive {
     FILTER_ONEPOLE *m_HPF1;
     FILTER_ONEPOLE *m_HPF2;
 
-
 } FILTER_CK35;
 
 FILTER_CK35 *new_filter_ck35(void);

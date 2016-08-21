@@ -16,6 +16,12 @@ DCA *new_dca()
     dca->m_pan_mod = 0.0;
     dca->m_midi_velocity = 127;
 
+    dca->global_modmatrix = NULL;
+    dca->m_mod_source_eg = DEST_NONE;
+    dca->m_mod_source_amp_db = DEST_NONE;
+    dca->m_mod_source_velocity = DEST_NONE;
+    dca->m_mod_source_pan = DEST_NONE;
+
     return dca;
 }
 

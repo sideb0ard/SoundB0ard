@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defjams.h"
+#include "modmatrix.h"
 
 typedef struct dca {
 
@@ -12,6 +13,13 @@ typedef struct dca {
     double m_eg_mod;
     double m_pan_mod;
     int m_midi_velocity;
+
+    modmatrix *global_modmatrix;
+
+    unsigned m_mod_source_eg;
+    unsigned m_mod_source_amp_db;
+    unsigned m_mod_source_velocity;
+    unsigned m_mod_source_pan;
 
 } DCA;
 

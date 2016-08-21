@@ -37,15 +37,9 @@ void bpm_change(bpmrrr *b, int bpm)
     }
 }
 
-void bpm_inc_tick(bpmrrr *b)
-{
-    b->tick++;
-}
+void bpm_inc_tick(bpmrrr *b) { b->tick++; }
 
-int bpm_get_tick(bpmrrr *b)
-{
-    return b->tick;
-}
+int bpm_get_tick(bpmrrr *b) { return b->tick; }
 
 void bpm_info(bpmrrr *b)
 {

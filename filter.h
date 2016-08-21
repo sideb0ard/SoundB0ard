@@ -1,14 +1,15 @@
 #pragma once
 
 #include "defjams.h"
+#include "modmatrix.h"
 
 // 46.88.. = semitones between frequencies (80, 18000.0) / 2
 // taken from Will Pirkle book 'designing software synths..'
 #define FILTER_FC_MOD_RANGE 46.881879936465680
-#define FILTER_FC_MIN 80    // 80Hz
-#define FILTER_FC_MAX 18000 // 18 kHz
+#define FILTER_FC_MIN 80        // 80Hz
+#define FILTER_FC_MAX 18000     // 18 kHz
 #define FILTER_FC_DEFAULT 10000 // 10kHz
-#define FILTER_Q_DEFAULT 0.707 // butterworth?
+#define FILTER_Q_DEFAULT 0.707  // butterworth?
 #define FILTER_TYPE_DEFAULT LPF1
 
 typedef enum {
@@ -37,6 +38,11 @@ typedef struct filter {
     double m_fc;     // current filter cut-off val
     double m_q;      // current q value
     double m_fc_mod; // frequency cutoff modulation input
+
+    modmatrix *global_modmatrix;
+    // sources
+    unsigned m_mod_source_fc;
+    unsigned m_source_fc_control;
 
     double (*gennext)(void *self, double xn);
     void (*update)(void *self);

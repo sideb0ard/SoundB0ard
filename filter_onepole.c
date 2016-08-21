@@ -45,7 +45,8 @@ FILTER_ONEPOLE *new_filter_onepole(void)
     filter->m_a0 = 1.0;
     filter->m_z1 = 0.0;
 
-    onepole_reset(filter); // seems redundant as they were set, but following the book here
+    onepole_reset(filter); // seems redundant as they were set, but following
+                           // the book here
     return filter;
 }
 
@@ -95,7 +96,7 @@ double onepole_gennext(void *filter, double xn)
 
     double lpf = vn + self->m_z1;
 
-    //if (lpf > 1.0) {
+    // if (lpf > 1.0) {
     //    print_vals(self);
     //}
 
@@ -116,4 +117,3 @@ void onepole_set_filter_type(void *filter, filter_type ftype)
     FILTER_ONEPOLE *self = filter;
     self->bc_filter->m_type = ftype;
 }
-

@@ -30,6 +30,12 @@ envelope_generator *new_envelope_generator()
     eg->m_legato_mode = false;
     eg->m_reset_to_zero = false;
 
+    eg->global_modmatrix = NULL;
+    eg->m_mod_source_eg_attack_scaling = DEST_NONE;
+    eg->m_mod_source_eg_decay_scaling = DEST_NONE;
+    eg->m_mod_dest_eg_output = SOURCE_NONE;
+    eg->m_mod_dest_eg_biased_output = SOURCE_NONE;
+
     return eg;
 }
 

@@ -5,10 +5,10 @@
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"
-#include "filter_onepole.h"
 #include "filter_ckthreefive.h"
-#include "oscil.h"
+#include "filter_onepole.h"
 #include "keys.h"
+#include "oscil.h"
 #include "sound_generator.h"
 
 typedef struct FM FM;
@@ -26,8 +26,8 @@ typedef struct FM {
     OSCIL *osc1;
     OSCIL *osc2;
     OSCIL *lfo;
-    //FILTER_CSEM *filter;
-    //FILTER_ONEPOLE *filter;
+    // FILTER_CSEM *filter;
+    // FILTER_ONEPOLE *filter;
     FILTER_CK35 *filter;
     DCA *dca;
     int cur_octave;

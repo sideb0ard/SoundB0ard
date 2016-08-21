@@ -20,6 +20,10 @@ FILTER *new_filter()
     filter->m_q = FILTER_Q_DEFAULT;
     filter->m_fc_mod = 0.0;
 
+    filter->global_modmatrix = NULL;
+    filter->m_mod_source_fc = DEST_NONE;
+    filter->m_source_fc_control = DEST_NONE;
+
     return filter;
 }
 
@@ -58,11 +62,11 @@ void filter_update(void *filter)
 {
     FILTER *self = filter;
     filter_set_q_control(self, self->m_q_control);
-    //printf("ORIG:FC: %f\n", self->m_fc);
+    // printf("ORIG:FC: %f\n", self->m_fc);
     self->m_fc = self->m_fc_control * pitch_shift_multiplier(self->m_fc_mod);
     if (self->m_fc > FILTER_FC_MAX)
         self->m_fc = FILTER_FC_MAX;
     if (self->m_fc < FILTER_FC_MIN)
         self->m_fc = FILTER_FC_MIN;
-    //printf("ADJ:FC: %f\n", self->m_fc);
+    // printf("ADJ:FC: %f\n", self->m_fc);
 }

@@ -272,9 +272,10 @@ void interpret(char *line)
 
         regmatch_t tpmatch[4];
         regex_t tsigtype_rx;
-        regcomp(&tsigtype_rx, "^(vol|freq|delay1|delay2|reverb|res|randd|allpass|"
-                              "lowpass|highpass|bandpass|fm|sustain|swing) "
-                              "([[:digit:].]+) ([[:digit:].]+)$",
+        regcomp(&tsigtype_rx,
+                "^(vol|freq|delay1|delay2|reverb|res|randd|allpass|"
+                "lowpass|highpass|bandpass|fm|sustain|swing) "
+                "([[:digit:].]+) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
             double val1 = 0;
@@ -298,7 +299,7 @@ void interpret(char *line)
                 if (strcmp(cmd_type, "sustain") == 0) {
                     printf("SUSTAIN! %s %lf %lf\n", cmd_type, val1, val2);
                     if (mixr->sound_generators[(int)val1]->type == FM_TYPE) {
-                        FM *fm = (FM *) mixr->sound_generators[(int)val1];
+                        FM *fm = (FM *)mixr->sound_generators[(int)val1];
                         fm_set_sustain(fm, val2);
                     }
                 }
@@ -472,10 +473,11 @@ void interpret(char *line)
             int is_val_a_valid_sig_num =
                 (sig_num >= 0 && sig_num < mixr->soundgen_num) ? 1 : 0;
             if (is_val_a_valid_sig_num) {
-                if ( strncmp(cmd_type, "melody", 7) == 0 ) {
+                if (strncmp(cmd_type, "melody", 7) == 0) {
                     printf("First melody!\n");
                     keys_start_melody_player(sig_num, pattern);
-                } else {
+                }
+                else {
                     printf("Maaaaaddd for it!\n");
                     melody_loop *mloop = mloop_from_pattern(pattern);
                     fm_add_melody_loop(mixr->sound_generators[sig_num], mloop);

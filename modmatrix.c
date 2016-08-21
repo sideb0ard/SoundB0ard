@@ -1,27 +1,26 @@
 #include <stdlib.h>
 
-#include "modmatrix.h"
 #include "midi_freq_table.h"
+#include "modmatrix.h"
 
 extern const float midi_freq_table[128];
 
 modmatrix *new_modmatrix(void)
 {
     modmatrix *m;
-    m = (modmatrix*) calloc(1, sizeof(modmatrix));
+    m = (modmatrix *)calloc(1, sizeof(modmatrix));
     if (m == NULL)
         return NULL;
-    
+
     create_matrix_core(m);
 
     return m;
 }
 
-
 int get_matrix_size(modmatrix *self)
 {
     int sz = 0;
-    for ( int i = 0; i < MAX_SOURCES*MAX_DESTINATIONS; i++) {
+    for (int i = 0; i < MAX_SOURCES * MAX_DESTINATIONS; i++) {
         matrixrow *mr = self->m_matrix_core[i];
         if (mr)
             sz++;
@@ -29,19 +28,17 @@ int get_matrix_size(modmatrix *self)
     return sz;
 }
 
-
 void clear_sources(modmatrix *self)
 {
-    for ( int i = 0; i < MAX_SOURCES; i++) 
+    for (int i = 0; i < MAX_SOURCES; i++)
         self->m_sources[i] = 0.0;
 }
 
 void clear_destinations(modmatrix *self)
 {
-    for ( int i = 0; i < MAX_DESTINATIONS; i++) 
+    for (int i = 0; i < MAX_DESTINATIONS; i++)
         self->m_destinations[i] = 0.0;
 }
-
 
 void create_matrix_core(modmatrix *self)
 {
@@ -49,13 +46,14 @@ void create_matrix_core(modmatrix *self)
         delete_matrix_core(self);
     }
 
-    self->m_matrix_core = (matrixrow**) calloc(MAX_SOURCES*MAX_DESTINATIONS,
-                                             sizeof(matrixrow*));
+    self->m_matrix_core = (matrixrow **)calloc(MAX_SOURCES * MAX_DESTINATIONS,
+                                               sizeof(matrixrow *));
 }
 
 void clear_matrix_core(modmatrix *self)
 {
-    if (!self->m_matrix_core) return;
+    if (!self->m_matrix_core)
+        return;
     for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
         free(self->m_matrix_core[i]);
     }
@@ -68,10 +66,7 @@ void delete_matrix_core(modmatrix *self)
     free(self->m_matrix_core);
 }
 
-matrixrow **get_matrix_core(modmatrix *self)
-{
-    return self->m_matrix_core;
-}
+matrixrow **get_matrix_core(modmatrix *self) { return self->m_matrix_core; }
 
 void set_matrix_core(modmatrix *self, matrixrow **matrix)
 {
@@ -81,7 +76,6 @@ void set_matrix_core(modmatrix *self, matrixrow **matrix)
     }
     self->m_matrix_core = matrix;
 }
-
 
 void add_matrix_row(modmatrix *self, matrixrow *row)
 {
@@ -94,29 +88,30 @@ void add_matrix_row(modmatrix *self, matrixrow *row)
         free(row);
 }
 
-
 bool matrix_row_exists(modmatrix *self, unsigned sourceidx, unsigned destidx)
 {
-    if (!self->m_matrix_core) return false;
+    if (!self->m_matrix_core)
+        return false;
 
     for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
         matrixrow *mr = self->m_matrix_core[i];
-        if ( mr->m_source_index == sourceidx
-            && mr->m_destination_index == destidx)
+        if (mr->m_source_index == sourceidx &&
+            mr->m_destination_index == destidx)
             return true;
     }
     return false;
 }
 
-
-bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx, bool enable)
+bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
+                       bool enable)
 {
-    if (!self->m_matrix_core) return false;
+    if (!self->m_matrix_core)
+        return false;
 
-    for ( int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
+    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
         matrixrow *mr = self->m_matrix_core[i];
-        if ( mr->m_source_index == sourceidx
-            && mr->m_destination_index == destidx) {
+        if (mr->m_source_index == sourceidx &&
+            mr->m_destination_index == destidx) {
             mr->m_enable = enable;
             return true;
         }
@@ -124,12 +119,11 @@ bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx, bo
     return false;
 }
 
-
 bool check_destination_layer(unsigned layer, matrixrow *row)
 {
     bool layer0 = false;
-    if (row->m_destination_index >= DEST_LFO1_FQ 
-            && row->m_destination_index <= DEST_ALL_EG_SUSTAIN_OVERRIDE) 
+    if (row->m_destination_index >= DEST_LFO1_FQ &&
+        row->m_destination_index <= DEST_ALL_EG_SUSTAIN_OVERRIDE)
         layer0 = true;
 
     if (layer == 0)
@@ -140,12 +134,12 @@ bool check_destination_layer(unsigned layer, matrixrow *row)
     return false;
 }
 
-
 // this is the REAL mod matrix, yehhhhhh!
 void do_modulation_matrix(modmatrix *self, unsigned layer)
 {
 
-    if (!self->m_matrix_core) return;
+    if (!self->m_matrix_core)
+        return;
 
     clear_destinations(self);
 
@@ -153,33 +147,33 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
 
         matrixrow *mr = self->m_matrix_core[i];
 
-        if (!mr) continue; // shouldn't happen. but jist in case!
-        if (!mr->m_enable) continue;
-        if (!check_destination_layer(layer, mr)) continue;
+        if (!mr)
+            continue; // shouldn't happen. but jist in case!
+        if (!mr->m_enable)
+            continue;
+        if (!check_destination_layer(layer, mr))
+            continue;
 
         double src = self->m_sources[mr->m_source_index];
 
-        switch(mr->m_source_transform) {
-            //case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
-            //    src = midi_freq_table[(unsigned)src];
-            //    break;
-            default:
-                break;
+        switch (mr->m_source_transform) {
+        // case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
+        //    src = midi_freq_table[(unsigned)src];
+        //    break;
+        default:
+            break;
         }
 
         // destination += source*intensity*range
         double modval = src * (*mr->m_mod_intensity) * (*mr->m_mod_range);
 
-        switch(mr->m_destination_index) {
-            case DEST_ALL_OSC_FQ:
-                self->m_destinations[DEST_OSC1_FQ] += modval;
-                self->m_destinations[DEST_OSC2_FQ] += modval;
-                self->m_destinations[DEST_ALL_OSC_FQ] += modval;
-            default:
-                self->m_destinations[mr->m_destination_index] += modval;
+        switch (mr->m_destination_index) {
+        case DEST_ALL_OSC_FQ:
+            self->m_destinations[DEST_OSC1_FQ] += modval;
+            self->m_destinations[DEST_OSC2_FQ] += modval;
+            self->m_destinations[DEST_ALL_OSC_FQ] += modval;
+        default:
+            self->m_destinations[mr->m_destination_index] += modval;
         }
     }
-
 }
-
-

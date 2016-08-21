@@ -164,7 +164,7 @@ float effector(SOUNDGEN *self, float val)
                 val += delay[delay_p];
                 delay[delay_p++] = val_copy * 0.5;
                 if (delay_p >= self->effects[i]->buf_length)
-                   delay_p = 0;
+                    delay_p = 0;
                 self->effects[i]->buf_p = delay_p;
                 break;
             case REVERB:

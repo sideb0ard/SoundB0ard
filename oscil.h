@@ -3,12 +3,14 @@
 #include <stdbool.h>
 #include <stdio.h>
 
+#include "modmatrix.h"
 #include "sound_generator.h"
 #include "table.h"
 
 #define OSC_FQ_MOD_RANGE 2
+#define OSC_HARD_SYNC_RATIO_RANGE 4
 #define OSC_PITCHBEND_MOD_RANGE 12
-#define OSC_FQ_MIN 2
+#define OSC_FQ_MIN 20
 #define OSC_FQ_MAX 20480
 #define OSC_FQ_DEFAULT 440.0
 #define OSC_PULSEWIDTH_MIN 2
@@ -30,7 +32,7 @@ struct oscil {
 
     // "public"
     double freq; // m_dOscFo
-    double m_fq;
+    double m_fq; // m_dFoMod ? shirley..
     double m_fq_ratio;
     double m_amplitude;
     double m_pw_control;
@@ -41,8 +43,18 @@ struct oscil {
     double m_semitones;
     double m_cents;
 
+    // global modulation matrix
+    modmatrix *global_modmatrix;
+    // sources
+    unsigned m_mod_source_fq;
+    unsigned m_mod_source_pulse_width;
+    unsigned m_mod_source_amp;
+    // destinations
+    unsigned m_mod_dest_output1;
+    unsigned m_mod_dest_output2;
+
     bool m_note_on;
-    double vol;
+    double vol; // TODO - get rid of volume - replace with amp
     double m_amp;
 
     wave_type wav;  // defined in defjams - NOISE, SAW etc.

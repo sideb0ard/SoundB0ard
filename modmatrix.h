@@ -2,7 +2,6 @@
 
 #include <stdbool.h>
 
-
 typedef enum {
     SOURCE_NONE,
     SOURCE_LFO1,
@@ -12,7 +11,6 @@ typedef enum {
     SOURCE_MIDI_NOTE_NUM,
     MAX_SOURCES
 } matrix_sources;
-
 
 typedef enum {
     DEST_NONE,
@@ -28,27 +26,25 @@ typedef enum {
     DEST_OSC2_FQ,
     DEST_FILTER1_FC,
     DEST_DCA_EG_IN,
-    
+
     // universal dests
     DEST_ALL_OSC_FQ,
     MAX_DESTINATIONS
 } matrix_destinations;
 
-
 typedef enum {
-   TRANSFORM_NONE,
-   TRANSFORM_UNIPOLAR_TO_BIPOLAR,
-   TRANSFORM_BIPOLAR_TO_UNIPOLAR,
-   TRANSFORM_MIDI_NORMALIZE,
-   TRANSFORM_INVERT_MIDI_NORMALIZE,
-   TRANSFORM_MIDI_TO_BIPOLAR,
-   TRANSFORM_MIDI_TO_PAN,
-   TRANSFORM_MIDI_SWITCH,
-   TRANSFORM_MIDI_TO_ATTENUATION,
-   TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,
-   MAX_TRANSFORMS /* not needed? */
+    TRANSFORM_NONE,
+    TRANSFORM_UNIPOLAR_TO_BIPOLAR,
+    TRANSFORM_BIPOLAR_TO_UNIPOLAR,
+    TRANSFORM_MIDI_NORMALIZE,
+    TRANSFORM_INVERT_MIDI_NORMALIZE,
+    TRANSFORM_MIDI_TO_BIPOLAR,
+    TRANSFORM_MIDI_TO_PAN,
+    TRANSFORM_MIDI_SWITCH,
+    TRANSFORM_MIDI_TO_ATTENUATION,
+    TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,
+    MAX_TRANSFORMS /* not needed? */
 } matrix_transformations;
-
 
 typedef struct {
     unsigned m_source_index;
@@ -59,14 +55,12 @@ typedef struct {
     bool m_enable;
 } matrixrow;
 
-
 typedef struct {
     matrixrow **m_matrix_core;
     int m_num_rows_in_matrix_core;
     double m_sources[MAX_SOURCES];
     double m_destinations[MAX_DESTINATIONS];
 } modmatrix;
-
 
 modmatrix *new_modmatrix(void);
 
@@ -84,9 +78,8 @@ void set_matrix_core(modmatrix *self, matrixrow **matrix);
 
 void add_matrix_row(modmatrix *self, matrixrow *row);
 bool matrix_row_exists(modmatrix *self, unsigned sourceidx, unsigned destidx);
-bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx, bool enable);
+bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
+                       bool enable);
 
 bool check_destination_layer(unsigned layer, matrixrow *row);
 void do_modulation_matrix(modmatrix *self, unsigned layer);
-
-

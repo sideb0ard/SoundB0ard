@@ -2,9 +2,9 @@
 #include <string.h>
 
 #include "defjams.h"
-#include "filter_onepole.h"
 #include "filter_ckthreefive.h"
 #include "filter_csem.h"
+#include "filter_onepole.h"
 #include "fm.h"
 #include "table.h"
 #include "utils.h"
@@ -56,13 +56,13 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     fm->env = new_envelope_generator();
 
     // FILTER - VA ONEPOLE
-    //fm->filter = new_filter_onepole();
+    // fm->filter = new_filter_onepole();
 
     // FILTER - VA CK35
     fm->filter = new_filter_ck35();
 
     // FILTER - VA CSEM
-    //fm->filter = new_filter_csem();
+    // fm->filter = new_filter_csem();
 
     // Digitally Controlled Amplitude
     fm->dca = new_dca();
@@ -201,14 +201,15 @@ double fm_gennext(void *self)
         ///////////////////////////// MOD MATRIX START
         // ARTICULATION BLOCK
         double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
-        //printf("LFO out! %f\n", lfo_out);
+        // printf("LFO out! %f\n", lfo_out);
         double biased_eg = 0.0;
         double eg_out = env_generate(fm->env, &biased_eg);
 
         // CALC ENV GEN -> OSC MOD
         // TODO : implement a controller for eg1_osc_intensity
-        double eg_osc_mod = fm->env->m_eg1_osc_intensity * OSC_FQ_MOD_RANGE * biased_eg;
-        //double eg_osc_mod = 1 * OSC_FQ_MOD_RANGE * biased_eg;
+        double eg_osc_mod =
+            fm->env->m_eg1_osc_intensity * OSC_FQ_MOD_RANGE * biased_eg;
+        // double eg_osc_mod = 1 * OSC_FQ_MOD_RANGE * biased_eg;
 
         set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
         set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
@@ -216,14 +217,14 @@ double fm_gennext(void *self)
         osc_update(fm->osc1);
         osc_update(fm->osc2);
 
-         if ( fm->m_filter_keytrack == ON )
+        if (fm->m_filter_keytrack == ON)
             fm->filter->bc_filter->m_fc_control =
                 fm->osc1->freq * fm->m_filter_keytrack_intensity;
-        
+
         filter_set_fc_mod(fm->filter->bc_filter, FILTER_FC_MOD_RANGE * eg_out);
-        //onepole_update(fm->filter);
+        // onepole_update(fm->filter);
         ck_update(fm->filter);
-        //csem_update(fm->filter);
+        // csem_update(fm->filter);
 
         dca_set_eg_mod(fm->dca, eg_out * 1.0);
         dca_update(fm->dca);
@@ -235,11 +236,11 @@ double fm_gennext(void *self)
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        //double filter_out = onepole_gennext(fm->filter, osc_out);
+        // double filter_out = onepole_gennext(fm->filter, osc_out);
         double filter_out = ck_gennext(fm->filter, osc_out);
-        //double filter_out = csem_gennext(fm->filter, osc_out);
+        // double filter_out = csem_gennext(fm->filter, osc_out);
 
-        //printf("OSCOUT: %f // FILTEROUT: %f\n", osc_out, filter_out);
+        // printf("OSCOUT: %f // FILTEROUT: %f\n", osc_out, filter_out);
 
         double out_left;
         double out_right;
@@ -273,7 +274,7 @@ void fm_set_sustain(FM *self, int val)
 
 void fm_add_melody_loop(void *self, melody_loop *mloop)
 {
-    FM *fm = (FM *) self;
-    if ( fm->melody_loop_num < 10 )
+    FM *fm = (FM *)self;
+    if (fm->melody_loop_num < 10)
         fm->mloops[fm->melody_loop_num++] = mloop;
 }

@@ -2,6 +2,8 @@
 
 #include <stdbool.h>
 
+#include "modmatrix.h"
+
 #define EG_MINTIME_MS 50 // these two used for attacjtime, decay and release
 #define EG_MAXTIME_MS 5000
 #define EG_DEFAULT_STATE 1000
@@ -52,6 +54,12 @@ typedef struct envelope_generator {
     double m_inc_shutdown;
 
     state m_state;
+
+    modmatrix *global_modmatrix;
+    unsigned m_mod_source_eg_attack_scaling;
+    unsigned m_mod_source_eg_decay_scaling;
+    unsigned m_mod_dest_eg_output;
+    unsigned m_mod_dest_eg_biased_output;
 
 } envelope_generator;
 
