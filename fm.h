@@ -11,11 +11,7 @@
 #include "oscil.h"
 #include "sound_generator.h"
 
-typedef struct FM FM;
-
 typedef struct FM {
-    // OSC **oscillators;
-    // int num_oscil;
     SOUNDGEN sound_generator;
 
     melody_loop *mloops[10];
@@ -30,11 +26,15 @@ typedef struct FM {
     // FILTER_ONEPOLE *filter;
     FILTER_CK35 *filter;
     DCA *dca;
+
     int cur_octave;
     int sustain; // in ticks TODO: make better!
+
     bool note_on;
     bool m_filter_keytrack;
+
     double m_filter_keytrack_intensity;
+
     float vol;
 
 } FM;

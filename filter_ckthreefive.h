@@ -2,6 +2,7 @@
 
 #include "defjams.h"
 #include "filter.h"
+#include "filter_onepole.h"
 
 typedef struct filter_ckthreefive {
 
