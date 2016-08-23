@@ -5,8 +5,6 @@
 #include "defjams.h"
 #include "filter_onepole.h"
 
-#define DEBUG 0
-
 static inline void print_vals(FILTER_ONEPOLE *self)
 {
     printf("BASECLASS VALS\n");
@@ -99,7 +97,7 @@ double onepole_gennext(void *filter, double xn)
     double lpf = vn + self->m_z1;
 
 #ifdef DEBUG
-     if (lpf > 1.0) {
+    if (lpf > 1.0) {
         print_vals(self);
     }
 #endif

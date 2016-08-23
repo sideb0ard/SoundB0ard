@@ -131,6 +131,15 @@ void set_release_time_msec(envelope_generator *self, double time)
     calculate_release_time(self);
 }
 
+void set_sustain_override(envelope_generator *self, bool b)
+{
+    self->m_sustain_override = b;
+    if (self->m_release_pending && !self->m_sustain_override) {
+        self->m_release_pending = false;
+        note_off(self);
+    }
+}
+
 void set_sustain_level(envelope_generator *self, double level)
 {
     self->m_sustain_level = level;
@@ -155,6 +164,47 @@ void eg_release(envelope_generator *self)
 }
 
 void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
+
+void eg_update(envelope_generator *self)
+{
+    if (!self->global_modmatrix)
+        return;
+
+    // --- with mod matrix, when value is 0 there is NO modulation, so here
+    if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
+        self->m_attack_time_scalar == 1.0) {
+        double scale =
+            self->global_modmatrix
+                ->m_destinations[self->m_mod_source_eg_attack_scaling];
+        if (self->m_attack_time_scalar != 1.0 - scale) {
+            self->m_attack_time_scalar = 1.0 - scale;
+            calculate_attack_time(self);
+        }
+    }
+
+    // --- for vel->attack and note#->decay scaling modulation
+    //     NOTE: make sure this is only called ONCE during a new note event!
+    if (self->m_mod_source_eg_decay_scaling != DEST_NONE &&
+        self->m_decay_time_scalar == 1.0) {
+        double scale =
+            self->global_modmatrix
+                ->m_destinations[self->m_mod_source_eg_decay_scaling];
+        if (self->m_decay_time_scalar != 1.0 - scale) {
+            self->m_decay_time_scalar = 1.0 - scale;
+            calculate_decay_time(self);
+        }
+    }
+
+    if (self->m_mod_source_sustain_override != DEST_NONE) {
+        double sustain =
+            self->global_modmatrix
+                ->m_destinations[self->m_mod_source_sustain_override];
+        if (sustain == 0)
+            set_sustain_override(self, false);
+        else
+            set_sustain_override(self, true);
+    }
+}
 
 double env_generate(envelope_generator *self, double *p_biased_output)
 {

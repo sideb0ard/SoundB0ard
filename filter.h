@@ -42,7 +42,7 @@ typedef struct filter {
     modmatrix *global_modmatrix;
     // sources
     unsigned m_mod_source_fc;
-    unsigned m_source_fc_control;
+    unsigned m_mod_source_fc_control;
 
     double (*gennext)(void *self, double xn);
     void (*update)(void *self);

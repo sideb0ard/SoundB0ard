@@ -48,11 +48,9 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
 
     fm->osc2->m_cents = 2.5; // +2.5 cents detuned
 
-    // lfo
     fm->lfo = new_oscil(DEFAULT_LFO_RATE, SINE);
     oscil_setvol(fm->lfo, 0.0);
 
-    // ENVELOPE GENERATOR
     fm->env = new_envelope_generator();
 
     // FILTER - VA ONEPOLE
@@ -67,12 +65,84 @@ FM *new_fm_x(char *osc1, double osc1_freq, char *osc2, double osc2_freq)
     // Digitally Controlled Amplitude
     fm->dca = new_dca();
 
+    // mod matrix setup
+    fm->m_modmatrix = new_modmatrix();
+
+    fm->m_default_mod_intensity = 1.0;
+    fm->m_default_mod_range = 1.0;
+    fm->m_osc_fq_mod_range = OSC_FQ_MOD_RANGE;
+    fm->m_filter_mod_range = FILTER_FC_MOD_RANGE;
+    fm->m_eg1_dca_intensity = 1.0;
+    fm->m_eg1_osc_intensity = 0.0;
+
+    matrixrow *row = NULL;
+    // LFO -> ALL OSC FQ
+    row = create_matrix_row(SOURCE_LFO1, DEST_ALL_OSC_FQ,
+                            &fm->m_default_mod_intensity,
+                            &fm->m_osc_fq_mod_range, TRANSFORM_NONE, true);
+    add_matrix_row(fm->m_modmatrix, row);
+
+    // EG1 -> ALL OSC FQ
+    row = create_matrix_row(SOURCE_BIASED_EG1, DEST_ALL_OSC_FQ,
+                            &fm->m_eg1_osc_intensity, &fm->m_osc_fq_mod_range,
+                            TRANSFORM_NONE, true);
+    add_matrix_row(fm->m_modmatrix, row);
+
+    // EG1 -> FILTER1 FC
+    row = create_matrix_row(SOURCE_BIASED_EG1, DEST_ALL_FILTER_FC,
+                            &fm->m_default_mod_intensity,
+                            &fm->m_filter_mod_range, TRANSFORM_NONE, true);
+    add_matrix_row(fm->m_modmatrix, row);
+
+    // EG1 -> DCA EG
+    row = create_matrix_row(SOURCE_EG1, DEST_DCA_EG, &fm->m_eg1_dca_intensity,
+                            &fm->m_default_mod_range, TRANSFORM_NONE, true);
+    add_matrix_row(fm->m_modmatrix, row);
+
+    // NOTE NUMBER -> FILTER FC CONTROL
+    row = create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_FILTER_KEYTRACK,
+                            &fm->m_filter_keytrack_intensity,
+                            &fm->m_default_mod_range,
+                            TRANSFORM_NOTE_NUMBER_TO_FREQUENCY, true);
+    add_matrix_row(fm->m_modmatrix, row);
+
+    // end mod matrix setup ///////////////////////////////////
+    //
+    // mod matrix routings ////////////////////////////////////
+
+    fm->osc1->global_modmatrix = fm->m_modmatrix;
+    fm->osc1->m_mod_source_fq = DEST_OSC1_FQ;
+    fm->osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
+
+    fm->osc2->global_modmatrix = fm->m_modmatrix;
+    fm->osc2->m_mod_source_fq = DEST_OSC2_FQ;
+    fm->osc2->m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
+
+    fm->filter->bc_filter->global_modmatrix = fm->m_modmatrix;
+    fm->filter->bc_filter->m_mod_source_fc = DEST_FILTER1_FC;
+    fm->filter->bc_filter->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
+
+    // modulators - they write their outputs into
+    // what will be a Source for something else
+
+    fm->lfo->global_modmatrix = fm->m_modmatrix;
+    fm->lfo->m_mod_dest_output1 = SOURCE_LFO1;
+    fm->lfo->m_mod_dest_output2 = SOURCE_LFO1Q;
+
+    fm->env->global_modmatrix = fm->m_modmatrix;
+    fm->env->m_mod_dest_eg_output = SOURCE_EG1;
+    fm->env->m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
+
+    fm->dca->global_modmatrix = fm->m_modmatrix;
+    fm->dca->m_mod_source_eg = DEST_DCA_EG;
+    fm->dca->m_mod_source_amp_db = DEST_NONE;
+    fm->dca->m_mod_source_velocity = DEST_NONE;
+    fm->dca->m_mod_source_pan = DEST_NONE;
+
     fm->vol = 0.7;
     fm->cur_octave = 2;
     fm->sustain = 0;
-    // fm->osc1->sound_generator.setvol(fm->osc1, 0.5);
-    // fm->osc2->sound_generator.setvol(fm->osc2, 0.5);
-    //
+
     fm->m_filter_keytrack = true;
     fm->m_filter_keytrack_intensity = 1.0;
 
@@ -198,38 +268,25 @@ double fm_gennext(void *self)
 
     if (fm->osc1->m_note_on) {
 
-        ///////////////////////////// MOD MATRIX START
-        // ARTICULATION BLOCK
-        double lfo_out = fm->lfo->sound_generator.gennext(fm->lfo);
-        // printf("LFO out! %f\n", lfo_out);
+        //// NEW SHIT - moD MATRiX stYle /////////////////
+
+        do_modulation_matrix(fm->m_modmatrix, 0);
+
+        // layer one modulators
+        eg_update(fm->env);
+        osc_update(fm->lfo);
+
         double biased_eg = 0.0;
-        double eg_out = env_generate(fm->env, &biased_eg);
+        env_generate(fm->env, &biased_eg);
+        fm->lfo->sound_generator.gennext(fm->lfo);
 
-        // CALC ENV GEN -> OSC MOD
-        // TODO : implement a controller for eg1_osc_intensity
-        double eg_osc_mod =
-            fm->env->m_eg1_osc_intensity * OSC_FQ_MOD_RANGE * biased_eg;
-        // double eg_osc_mod = 1 * OSC_FQ_MOD_RANGE * biased_eg;
+        do_modulation_matrix(fm->m_modmatrix, 1);
 
-        set_fq_mod_exp(fm->osc1, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
-        set_fq_mod_exp(fm->osc2, OSC_FQ_MOD_RANGE * lfo_out + eg_osc_mod);
+        dca_update(fm->dca);
+        ck_update(fm->filter);
 
         osc_update(fm->osc1);
         osc_update(fm->osc2);
-
-        if (fm->m_filter_keytrack == ON)
-            fm->filter->bc_filter->m_fc_control =
-                fm->osc1->freq * fm->m_filter_keytrack_intensity;
-
-        filter_set_fc_mod(fm->filter->bc_filter, FILTER_FC_MOD_RANGE * eg_out);
-        // onepole_update(fm->filter);
-        ck_update(fm->filter);
-        // csem_update(fm->filter);
-
-        dca_set_eg_mod(fm->dca, eg_out * 1.0);
-        dca_update(fm->dca);
-
-        ///////////////////////////// MOD MATRIX END
 
         double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
         double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);

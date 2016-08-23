@@ -22,7 +22,7 @@ FILTER *new_filter()
 
     filter->global_modmatrix = NULL;
     filter->m_mod_source_fc = DEST_NONE;
-    filter->m_source_fc_control = DEST_NONE;
+    filter->m_mod_source_fc_control = DEST_NONE;
 
     return filter;
 }

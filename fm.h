@@ -8,6 +8,7 @@
 #include "filter_ckthreefive.h"
 #include "filter_onepole.h"
 #include "keys.h"
+#include "modmatrix.h"
 #include "oscil.h"
 #include "sound_generator.h"
 
@@ -18,7 +19,7 @@ typedef struct FM {
     int melody_loop_num;
     int melody_loop_cur;
 
-    envelope_generator *env;
+    envelope_generator *env; // TODO rename to eg
     OSCIL *osc1;
     OSCIL *osc2;
     OSCIL *lfo;
@@ -33,9 +34,17 @@ typedef struct FM {
     bool note_on;
     bool m_filter_keytrack;
 
-    double m_filter_keytrack_intensity;
-
     float vol;
+
+    modmatrix *m_modmatrix; // routing structure for sound generation
+    // need these for mod matrix
+    double m_default_mod_intensity; // 1.0
+    double m_default_mod_range;     // 1.0
+    double m_osc_fq_mod_range;
+    double m_filter_mod_range;
+    double m_eg1_dca_intensity;
+    double m_eg1_osc_intensity;
+    double m_filter_keytrack_intensity;
 
 } FM;
 

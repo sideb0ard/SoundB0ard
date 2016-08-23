@@ -134,6 +134,21 @@ bool check_destination_layer(unsigned layer, matrixrow *row)
     return false;
 }
 
+matrixrow *create_matrix_row(unsigned src, unsigned dest, double *intensity,
+                             double *range, unsigned transformation,
+                             bool enable)
+{
+    matrixrow *row = (matrixrow *)calloc(1, sizeof(matrixrow));
+    row->m_source_index = src;
+    row->m_destination_index = dest;
+    row->m_mod_intensity = intensity;
+    row->m_mod_range = range;
+    row->m_source_transform = transformation;
+    row->m_enable = enable;
+
+    return row;
+}
+
 // this is the REAL mod matrix, yehhhhhh!
 void do_modulation_matrix(modmatrix *self, unsigned layer)
 {

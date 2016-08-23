@@ -27,6 +27,8 @@ typedef struct envelope_generator {
     bool m_legato_mode;
     bool m_output_eg; // i.e. this instance is going direct to output, rather
                       // than into an intermediatery
+    bool m_sustain_override;
+    bool m_release_pending;
 
     eg_mode m_eg_mode;
 
@@ -53,11 +55,15 @@ typedef struct envelope_generator {
     double m_sustain_level;
     double m_inc_shutdown;
 
+    double m_attack_time_scalar; // for velocity -> attack time mod
+    double m_decay_time_scalar;  // for note# -> decay time mod
+
     state m_state;
 
     modmatrix *global_modmatrix;
     unsigned m_mod_source_eg_attack_scaling;
     unsigned m_mod_source_eg_decay_scaling;
+    unsigned m_mod_source_sustain_override;
     unsigned m_mod_dest_eg_output;
     unsigned m_mod_dest_eg_biased_output;
 
@@ -82,6 +88,7 @@ void set_release_time_msec(envelope_generator *self, double time);
 
 void note_off(envelope_generator *self);
 
+void set_sustain_override(envelope_generator *self, bool b);
 void set_sustain_level(envelope_generator *self, double level);
 void set_sample_rate(envelope_generator *self, double samplerate);
 
@@ -89,4 +96,5 @@ void start_eg(envelope_generator *self);
 void stop_eg(envelope_generator *self);
 double env_generate(envelope_generator *self, double *p_biased_output);
 
+void eg_update(envelope_generator *self);
 void eg_release(envelope_generator *self);
