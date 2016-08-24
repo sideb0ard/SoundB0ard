@@ -1,0 +1,159 @@
+#include <math.h>
+#include <stdbool.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+#include "modmatrix.h"
+#include "oscillator.h"
+#include "sound_generator.h"
+#include "utils.h"
+
+oscillator *osc_new()
+{
+    oscillator *osc;
+    osc = (oscillator *)calloc(1, sizeof(oscillator));
+    if (osc == NULL) {
+        printf("Nae mem for osc, go figure\n");
+        return NULL;
+    }
+
+    // --- default modulation matrix inits
+    osc->g_modmatrix = NULL;
+
+    // --- everything is disconnected unless you use mod matrix
+    osc->m_mod_source_fo = DEST_NONE;
+    osc->m_mod_source_pulse_width = DEST_NONE;
+    osc->m_mod_dest_output1 = SOURCE_NONE;
+    osc->m_mod_dest_output2 = SOURCE_NONE;
+    osc->m_mod_source_amp = DEST_NONE;
+
+    osc->m_note_on = false;
+    osc->m_midi_note_number = 0;
+    osc->m_modulo = 0.0;
+    osc->m_inc = 0.0;
+    osc->m_osc_fo = OSC_FO_DEFAULT; // GUI
+    osc->m_amplitude = 1.0;         // default ON
+    osc->m_square_edge_rising = false;
+    osc->m_pulse_width = OSC_PULSEWIDTH_DEFAULT;
+    osc->m_pulse_width_control = OSC_PULSEWIDTH_DEFAULT; // GUI
+    osc->m_fo = OSC_FO_DEFAULT;
+
+    // --- seed the random number generator
+    srand(time(NULL));
+    osc->m_pn_register = rand();
+
+    // --- continue inits
+    osc->m_rsh_counter = -1; // flag for reset condition
+    osc->m_rsh_value = 0.0;
+    osc->m_amp_mod = 1.0; // note default to 1 to avoid silent osc
+    osc->m_fo_mod_lin = 0.0;
+    osc->m_phase_mod = 0.0;
+    osc->m_fo_mod = 0.0;
+    osc->m_pitch_bend_mod = 0.0;
+    osc->m_pw_mod = 0.0;
+    osc->m_octave = 0.0;
+    osc->m_semitones = 0.0;
+    osc->m_cents = 0.0;
+    osc->m_fo_ratio = 1.0;
+    osc->m_lfo_mode = 0;
+
+    // --- pitched
+    osc->m_waveform = SINE;
+
+    // --- for hard sync
+    osc->m_buddy_oscillator = NULL;
+    osc->m_master_osc = false;
+
+    return osc;
+}
+
+// --- modulo functions for master/slave operation
+// --- increment the modulo counters
+void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }
+
+// --- check and wrap the modulo
+//     returns true if modulo wrapped
+bool osc_check_wrap_modulo(oscillator *self)
+{
+    if (self->m_inc > 0 && self->m_modulo >= 1.0) {
+        self->m_modulo -= 1.0;
+        return true;
+    }
+    if (self->m_inc < 0 && self->m_modulo <= 0.0) {
+        self->m_modulo += 1.0;
+        return true;
+    }
+    return false;
+}
+
+// --- reset the modulo (required for master->slave operations)
+void osc_reset_modulo(oscillator *self, double d) { self->m_modulo = d; }
+
+// --- update the frequency, amp mod and PWM
+void osc_update(oscillator *self)
+{
+
+    // --- ignore LFO mode for noise sources
+    if (self->m_waveform == rsh || self->m_waveform == qrsh)
+        self->m_lfo_mode = free;
+
+    // --- Modulation Matrix
+    //
+    // --- get from matrix Sources
+    if (self->g_modmatrix) {
+        // --- zero is norm for these
+        self->m_fo_mod =
+            self->g_modmatrix->m_destinations[self->m_mod_source_fo];
+        self->m_pw_mod =
+            self->g_modmatrix->m_destinations[self->m_mod_source_pulse_width];
+
+        // --- amp mod is 0->1
+        // --- invert for oscillator output mod
+        self->m_amp_mod =
+            self->g_modmatrix->m_destinations[self->m_mod_source_amp];
+        self->m_amp_mod = 1.0 - self->m_amp_mod;
+    }
+
+    // --- do the  complete frequency mod
+    self->m_fo =
+        self->m_osc_fo * self->m_fo_ratio *
+        pitch_shift_multiplier(self->m_fo_mod + self->m_pitch_bend_mod +
+                               self->m_octave * 12.0 + self->m_semitones +
+                               self->m_cents / 100.0);
+    // --- apply linear FM (not used in book projects)
+    self->m_fo += self->m_fo_mod_lin;
+
+    // --- bound Fo (can go outside for FM/PM mod)
+    //     +/- 20480 for FM/PM
+    if (self->m_fo > OSC_FO_MAX)
+        self->m_fo = OSC_FO_MAX;
+    if (self->m_fo < -OSC_FO_MAX)
+        self->m_fo = -OSC_FO_MAX;
+
+    // --- calculate increment (a.k.a. phase a.k.a. phaseIncrement, etc...)
+    self->m_inc = self->m_fo / SAMPLE_RATE;
+
+    // --- Pulse Width Modulation --- //
+
+    // --- limits are 2% and 98%
+    self->m_pulse_width = self->m_pulse_width_control +
+                          self->m_pw_mod *
+                              (OSC_PULSEWIDTH_MAX - OSC_PULSEWIDTH_MIN) /
+                              OSC_PULSEWIDTH_MIN;
+
+    // --- bound the PWM to the range
+    self->m_pulse_width = fmin(self->m_pulse_width, OSC_PULSEWIDTH_MAX);
+    self->m_pulse_width = fmax(self->m_pulse_width, OSC_PULSEWIDTH_MIN);
+}
+// --- reset counters, etc...
+void reset();
+
+//// TODO: implement these per subclass
+// void start_oscillator();
+// void stop_oscillator();
+// --- render a sample
+// for LFO:  pAuxOutput = QuadPhaseOutput
+// Pitched: pAuxOutput = Right channel (return value is left
+// Channel
+// double do_oscillate(double *pAuxOutput = NULL) = 0;
