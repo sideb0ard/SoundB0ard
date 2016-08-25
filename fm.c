@@ -245,9 +245,9 @@ void keypress_on(FM *self, double freq)
 {
     mfm(self, freq);
 
-    osc_start(self->osc1);
-    osc_start(self->osc2);
-    osc_start(self->lfo);
+    oscil_start(self->osc1);
+    oscil_start(self->osc2);
+    oscil_start(self->lfo);
     start_eg(self->env);
 }
 
@@ -274,7 +274,7 @@ double fm_gennext(void *self)
 
         // layer one modulators
         eg_update(fm->env);
-        osc_update(fm->lfo);
+        oscil_update(fm->lfo);
 
         double biased_eg = 0.0;
         env_generate(fm->env, &biased_eg);
@@ -285,8 +285,8 @@ double fm_gennext(void *self)
         dca_update(fm->dca);
         ck_update(fm->filter);
 
-        osc_update(fm->osc1);
-        osc_update(fm->osc2);
+        oscil_update(fm->osc1);
+        oscil_update(fm->osc2);
 
         double osc1_val = fm->osc1->sound_generator.gennext(fm->osc1);
         double osc2_val = fm->osc2->sound_generator.gennext(fm->osc2);
@@ -306,9 +306,9 @@ double fm_gennext(void *self)
         double dca_out = 0.5 * out_left + 0.5 * out_right;
 
         if ((get_state(fm->env)) == 0) {
-            osc_stop(fm->osc1);
-            osc_stop(fm->osc2);
-            osc_stop(fm->lfo);
+            oscil_stop(fm->osc1);
+            oscil_stop(fm->osc2);
+            oscil_stop(fm->lfo);
             stop_eg(fm->env);
         }
 

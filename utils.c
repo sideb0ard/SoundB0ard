@@ -21,6 +21,13 @@ extern mixer *mixr;
 static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
                                "f#", "g",  "g#", "a",  "a#", "b"};
 
+#define CONVEX_LIMIT 0.00398107
+#define CONCAVE_LIMIT 0.99601893
+#define ARC4RANDOMMAX 4294967295 // (2^32 - 1)
+
+#define EXTRACT_BITS(the_val, bits_start, bits_len)                            \
+    ((the_val >> (bits_start - 1)) & ((1 << bits_len) - 1))
+
 void *timed_sig_start(void *arg)
 {
     SBMSG *msg = arg;
@@ -526,4 +533,221 @@ double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
     double cur_range = cur_max - cur_min;
     double new_range = new_max - new_min;
     return (((cur_val - cur_min) / cur_range) * new_range) + new_min;
+}
+
+const double B = 4.0 / (float)M_PI;
+const double C = -4.0 / ((float)M_PI * (float)M_PI);
+const double P = 0.225;
+// http://devmaster.net/posts/9648/fast-and-accurate-sine-cosine
+// input is -pi to +pi
+// i took it from the Will Pirkle Synth book.
+double parabolic_sine(double x, bool high_precision)
+{
+    double y = B * x + C * x * fabs(x);
+
+    if (high_precision)
+        y = P * (y * fabs(y) - y) + y;
+    return y;
+}
+
+double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }
+
+double convex_transform(double value)
+{
+    if (value <= CONVEX_LIMIT)
+        return 0.0;
+
+    return 1.0 + (5.0 / 12.0) * log10(value);
+}
+
+/* convexInvertedTransform()
+
+        calculates the convexInvertedTransform of the input
+
+        value = the unipolar (0 -> 1) value to convert
+*/
+double convex_inverted_transform(double value)
+{
+    if (value >= CONCAVE_LIMIT)
+        return 0.0;
+
+    return 1.0 + (5.0 / 12.0) * log10(1.0 - value);
+}
+
+/* concaveTransform()
+
+        calculates the concaveTransform of the input
+
+        value = the unipolar (0 -> 1) value to convert
+*/
+double concave_transform(double value)
+{
+    if (value >= CONCAVE_LIMIT)
+        return 1.0;
+
+    return -(5.0 / 12.0) * log10(1.0 - value);
+}
+
+/* concaveInvertedTransform()
+
+        calculates the concaveInvertedTransform of the input
+
+        value = the unipolar (0 -> 1) value to convert
+*/
+double concave_inverted_transform(double value)
+{
+    if (value <= CONVEX_LIMIT)
+        return 1.0;
+
+    return -(5.0 / 12.0) * log10(value);
+}
+
+double do_white_noise()
+{
+    float noise = 0.0;
+
+    // fNoise is 0 -> ARC4RANDOMMAX
+    noise = (float)arc4random();
+
+    // normalize and make bipolar
+    noise = 2.0 * (noise / ARC4RANDOMMAX) - 1.0;
+
+    return noise;
+}
+
+double do_pn_sequence(unsigned *pn_register)
+{
+    // get the bits
+    unsigned b0 =
+        EXTRACT_BITS(*pn_register, 1, 1); // 1 = b0 is FIRST bit from right
+    unsigned b1 =
+        EXTRACT_BITS(*pn_register, 2, 1); // 1 = b1 is SECOND bit from right
+    unsigned b27 =
+        EXTRACT_BITS(*pn_register, 28, 1); // 28 = b27 is 28th bit from right
+    unsigned b28 =
+        EXTRACT_BITS(*pn_register, 29, 1); // 29 = b28 is 29th bit from right
+
+    // form the XOR
+    unsigned b31 = b0 ^ b1 ^ b27 ^ b28;
+
+    // form the mask to OR with the register to load b31
+    if (b31 == 1)
+        b31 = 0x10000000;
+
+    // shift one bit to right
+    *pn_register >>= 1;
+
+    // set the b31 bit
+    *pn_register |= b31;
+
+    // convert the output into a floating point number, scaled by
+    // experimentation
+    // to a range of o to +2.0
+    float out = (float)(*pn_register) / ((pow((float)2.0, (float)32.0)) / 16.0);
+
+    // shift down to form a result from -1.0 to +1.0
+    out -= 1.0;
+
+    return out;
+}
+
+void check_wrap_index(double *index)
+{
+    while (*index < 0.0)
+        *index += 1.0;
+
+    while (*index >= 1.0)
+        *index -= 1.0;
+}
+
+double do_blep_n(const double *blep_table, double table_len, double modulo,
+                 double inc, double height, bool rising_edge,
+                 double points_per_side, bool interpolate)
+{
+    // return value
+    double blep = 0.0;
+
+    // t = the distance from the discontinuity
+    double t = 0.0;
+
+    // --- find the center of table (discontinuity location)
+    double dTableCenter = table_len / 2.0 - 1;
+
+    // LEFT side of edge
+    // -1 < t < 0
+    for (int i = 1; i <= (int)points_per_side; i++) {
+        if (modulo > 1.0 - (double)i * inc) {
+            // --- calculate distance
+            t = (modulo - 1.0) / (points_per_side * inc);
+
+            // --- get index
+            float fIndex = (1.0 + t) * dTableCenter;
+
+            // --- truncation
+            if (interpolate) {
+                blep = blep_table[(int)fIndex];
+            }
+            else {
+                float fIndex = (1.0 + t) * dTableCenter;
+                float frac = fIndex - (int)fIndex;
+                blep = lin_terp(0, 1, blep_table[(int)fIndex],
+                                blep_table[(int)fIndex + 1], frac);
+            }
+
+            // --- subtract for falling, add for rising edge
+            if (!rising_edge)
+                blep *= -1.0;
+
+            return height * blep;
+        }
+    }
+
+    // RIGHT side of discontinuity
+    // 0 <= t < 1
+    for (int i = 1; i <= (int)points_per_side; i++) {
+        if (modulo < (double)i * inc) {
+            // calculate distance
+            t = modulo / (points_per_side * inc);
+
+            // --- get index
+            float fIndex = t * dTableCenter + (dTableCenter + 1.0);
+
+            // truncation
+            if (interpolate) {
+                blep = blep_table[(int)fIndex];
+            }
+            else {
+                float frac = fIndex - (int)fIndex;
+                if ((int)fIndex + 1 >= table_len)
+                    blep = lin_terp(0, 1, blep_table[(int)fIndex],
+                                    blep_table[0], frac);
+                else
+                    blep = lin_terp(0, 1, blep_table[(int)fIndex],
+                                    blep_table[(int)fIndex + 1], frac);
+            }
+
+            // subtract for falling, add for rising edge
+            if (!rising_edge)
+                blep *= -1.0;
+
+            return height * blep;
+        }
+    }
+
+    return 0.0;
+}
+
+float lin_terp(float x1, float x2, float y1, float y2, float x)
+{
+    float denom = x2 - x1;
+    if (denom == 0)
+        return y1; // should not ever happen
+
+    // calculate decimal position of x
+    float dx = (x - x1) / (x2 - x1);
+
+    // use weighted sum method of interpolating
+    float result = dx * y2 + (1 - dx) * y1;
+
+    return result;
 }

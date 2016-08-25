@@ -18,6 +18,15 @@ oscillator *osc_new()
         return NULL;
     }
 
+    void (*start_oscillator)();
+    void (*stop_oscillator)();
+
+    // --- render a sample
+    // for LFO:  pAuxOutput = QuadPhaseOutput
+    // Pitched: pAuxOutput = Right channel (return value is left
+    // Channel
+    double (*do_oscillate)(void *self, double *aux_output);
+
     // --- default modulation matrix inits
     osc->g_modmatrix = NULL;
 
@@ -147,13 +156,31 @@ void osc_update(oscillator *self)
     self->m_pulse_width = fmax(self->m_pulse_width, OSC_PULSEWIDTH_MIN);
 }
 // --- reset counters, etc...
-void reset();
+void osc_reset(oscillator *self)
+{
+    // --- Pitched modulos, wavetables start at 0.0
+    self->m_modulo = 0.0;
 
-//// TODO: implement these per subclass
-// void start_oscillator();
-// void stop_oscillator();
-// --- render a sample
-// for LFO:  pAuxOutput = QuadPhaseOutput
-// Pitched: pAuxOutput = Right channel (return value is left
-// Channel
-// double do_oscillate(double *pAuxOutput = NULL) = 0;
+    // --- needed fror triangle algorithm, DPW
+    self->m_dpw_square_modulator = -1.0;
+
+    // --- flush DPW registers
+    self->m_dpw_z1 = 0.0;
+
+    // --- for random stuff
+    srand(time(NULL));
+    self->m_pn_register = rand();
+    self->m_rsh_counter = -1; // flag for reset condition
+    self->m_rsh_value = 0.0;
+
+    // square state variable
+    self->m_square_edge_rising = false;
+
+    // modulation variables
+    self->m_amp_mod = 1.0; // note default to 1 to avoid silent osc
+    self->m_pw_mod = 0.0;
+    self->m_pitch_bend_mod = 0.0;
+    self->m_fo_mod = 0.0;
+    self->m_fo_mod_lin = 0.0;
+    self->m_phase_mod = 0.0;
+}

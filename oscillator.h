@@ -18,6 +18,17 @@
 typedef struct oscillator oscillator;
 
 struct oscillator {
+
+    // --- render a sample
+    // for LFO:  pAuxOutput = QuadPhaseOutput
+    // Pitched: pAuxOutput = Right channel (return value is left
+    // Channel
+    double (*do_oscillate)(oscillator *self, double *aux_output);
+    //// TODO: implement these per subclass
+    void (*start_oscillator)(oscillator *self);
+    void (*stop_oscillator)(oscillator *self);
+    void (*reset_oscillator)(oscillator *self);
+
     // global modulation matrix
     modmatrix *g_modmatrix;
     // sources that we read from
@@ -93,7 +104,7 @@ struct oscillator {
     double m_amp_mod; /* output amplitude modulation for AM 0 to +1 (not dB)*/
 };
 
-oscillator *osc_new();
+oscillator *osc_new(void);
 
 // --- modulo functions for master/slave operation
 // --- increment the modulo counters
@@ -101,21 +112,12 @@ void osc_inc_modulo(oscillator *self);
 
 // --- check and wrap the modulo
 //     returns true if modulo wrapped
-bool osc_check_wrap_modulo(oscillator *self)
- 
+bool osc_check_wrap_modulo(oscillator *self);
+
 // --- reset the modulo (required for master->slave operations)
 void osc_reset_modulo(oscillator *self, double d);
 
 // --- reset counters, etc...
-void reset(oscillator *self);
+void osc_reset(oscillator *self);
 // --- update the frequency, amp mod and PWM
 void osc_update(oscillator *self);
-
-// --- render a sample
-// for LFO:  pAuxOutput = QuadPhaseOutput
-// Pitched: pAuxOutput = Right channel (return value is left
-// Channel
-//double do_oscillate(double *pAuxOutput = NULL) = 0;
-//// TODO: implement these per subclass
-// void start_oscillator();
-// void stop_oscillator();

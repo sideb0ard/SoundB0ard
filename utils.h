@@ -1,6 +1,7 @@
 #pragma once
 
 #include "sbmsg.h"
+#include <stdbool.h>
 
 // void startrrr(int sig_num);
 // void timed_sig_start(const char *sigtype, int freq, int freq2);
@@ -30,6 +31,7 @@ void related_notes(char root_note[4], double *second_note, double *third_note);
 double pitch_shift_multiplier(double pitch_shift_semitones);
 void calculate_pan_values(double pan_total, double *pan_left,
                           double *pan_right);
+double parabolic_sine(double x, bool highprecision);
 
 // scales cur_val which is range of cur_min, cur_max, to be a new_val within
 // new_min, new_max
@@ -38,3 +40,19 @@ double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
 
 void itoa(int n, char s[]);
 void reverse(char s[]);
+
+double unipolar_to_bipolar(double value);
+
+double convex_transform(double value);
+double convex_inverted_transform(double value);
+double concave_transform(double value);
+double concave_inverted_transform(double value);
+
+double do_pn_sequence(unsigned *pn_register);
+double do_white_noise(void);
+void check_wrap_index(double *index);
+double do_blep_n(const double *blep_table, double table_len, double modulo,
+                 double inc, double height, bool rising_edge,
+                 double points_per_side, bool interpolate);
+
+float lin_terp(float x1, float x2, float y1, float y2, float x);

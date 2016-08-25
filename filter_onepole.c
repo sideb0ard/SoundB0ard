@@ -5,23 +5,23 @@
 #include "defjams.h"
 #include "filter_onepole.h"
 
-static inline void print_vals(FILTER_ONEPOLE *self)
-{
-    printf("BASECLASS VALS\n");
-    printf("NLP: %d\n", self->bc_filter->m_nlp);
-    printf("Freq Cutoff: %f\n", self->bc_filter->m_fc);
-    printf("Q: %f\n", self->bc_filter->m_q);
-    printf("FC Mod: %f\n", self->bc_filter->m_fc_mod);
-    printf("SELF\n");
-    printf("Alpha: %f\n", self->m_alpha);
-    printf("Beta: %f\n", self->m_beta);
-    printf("Z1: %f\n", self->m_z1);
-    printf("Gamma: %f\n", self->m_gamma);
-    printf("Delta: %f\n", self->m_delta);
-    printf("Epsilon: %f\n", self->m_epsilon);
-    printf("a0: %f\n", self->m_a0);
-    printf("Feedback: %f\n", self->m_feedback);
-}
+// static inline void print_vals(FILTER_ONEPOLE *self)
+//{
+//    printf("BASECLASS VALS\n");
+//    printf("NLP: %d\n", self->bc_filter->m_nlp);
+//    printf("Freq Cutoff: %f\n", self->bc_filter->m_fc);
+//    printf("Q: %f\n", self->bc_filter->m_q);
+//    printf("FC Mod: %f\n", self->bc_filter->m_fc_mod);
+//    printf("SELF\n");
+//    printf("Alpha: %f\n", self->m_alpha);
+//    printf("Beta: %f\n", self->m_beta);
+//    printf("Z1: %f\n", self->m_z1);
+//    printf("Gamma: %f\n", self->m_gamma);
+//    printf("Delta: %f\n", self->m_delta);
+//    printf("Epsilon: %f\n", self->m_epsilon);
+//    printf("a0: %f\n", self->m_a0);
+//    printf("Feedback: %f\n", self->m_feedback);
+//}
 
 FILTER_ONEPOLE *new_filter_onepole(void)
 {

@@ -105,11 +105,11 @@ void set_pw_mod(OSCIL *self, double pw);
 
 double oscil_gennext(void *self);
 
-void osc_start(OSCIL *self);
-void osc_stop(OSCIL *self);
+void oscil_start(OSCIL *self);
+void oscil_stop(OSCIL *self);
 
-void osc_reset(OSCIL *self);
-void osc_update(OSCIL *self);
+void oscil_reset(OSCIL *self);
+void oscil_update(OSCIL *self);
 
 void oscil_status(void *self, char *status_string);
 void freqinc(OSCIL *p_osc, int direction);

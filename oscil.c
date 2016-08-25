@@ -154,7 +154,7 @@ void oscil_status(void *self, char *status_string)
         p_osc->sound_generator.effects_num);
 }
 
-void osc_reset(OSCIL *self)
+void oscil_reset(OSCIL *self)
 {
     self->m_dpw_square_modulator = -1.0;
     self->m_dpw_z1 = 0.0;
@@ -168,13 +168,13 @@ void osc_reset(OSCIL *self)
     self->m_phase_mod = 0.0;
 }
 
-void osc_start(OSCIL *self)
+void oscil_start(OSCIL *self)
 {
     // osc_reset(self);
     self->m_note_on = true;
 }
 
-void osc_update(OSCIL *self)
+void oscil_update(OSCIL *self)
 {
     if (self->global_modmatrix) {
         self->m_fq_mod_exp =
@@ -202,7 +202,7 @@ void osc_update(OSCIL *self)
     self->incr = self->m_fq * TABRAD;
 }
 
-void osc_stop(OSCIL *self) { self->m_note_on = false; }
+void oscil_stop(OSCIL *self) { self->m_note_on = false; }
 
 void set_midi_note_num(OSCIL *self, int midi_note_num)
 {

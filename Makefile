@@ -23,6 +23,8 @@ SRC = main.c \
       mixer.c \
       modmatrix.c \
       oscil.c \
+      oscillator.c \
+      qblimited_oscillator.c \
       sampler.c \
       sbmsg.c \
       sound_generator.c \
