@@ -9,23 +9,23 @@
 #include "sound_generator.h"
 #include "utils.h"
 
-oscillator *osc_new()
+void osc_new_settings(oscillator *osc)
 {
-    oscillator *osc;
-    osc = (oscillator *)calloc(1, sizeof(oscillator));
-    if (osc == NULL) {
-        printf("Nae mem for osc, go figure\n");
-        return NULL;
-    }
+    //oscillator *osc;
+    //osc = (oscillator *)calloc(1, sizeof(oscillator));
+    //if (osc == NULL) {
+    //    printf("Nae mem for osc, go figure\n");
+    //    return NULL;
+    //}
 
-    void (*start_oscillator)();
-    void (*stop_oscillator)();
+    //void (*start_oscillator)();
+    //void (*stop_oscillator)();
 
     // --- render a sample
     // for LFO:  pAuxOutput = QuadPhaseOutput
     // Pitched: pAuxOutput = Right channel (return value is left
     // Channel
-    double (*do_oscillate)(void *self, double *aux_output);
+    //double (*do_oscillate)(void *self, double *aux_output);
 
     // --- default modulation matrix inits
     osc->g_modmatrix = NULL;
@@ -74,7 +74,6 @@ oscillator *osc_new()
     osc->m_buddy_oscillator = NULL;
     osc->m_master_osc = false;
 
-    return osc;
 }
 
 // --- modulo functions for master/slave operation
@@ -102,10 +101,9 @@ void osc_reset_modulo(oscillator *self, double d) { self->m_modulo = d; }
 // --- update the frequency, amp mod and PWM
 void osc_update(oscillator *self)
 {
-
     // --- ignore LFO mode for noise sources
     if (self->m_waveform == rsh || self->m_waveform == qrsh)
-        self->m_lfo_mode = free;
+        self->m_lfo_mode = rfree;
 
     // --- Modulation Matrix
     //
@@ -114,6 +112,7 @@ void osc_update(oscillator *self)
         // --- zero is norm for these
         self->m_fo_mod =
             self->g_modmatrix->m_destinations[self->m_mod_source_fo];
+
         self->m_pw_mod =
             self->g_modmatrix->m_destinations[self->m_mod_source_pulse_width];
 

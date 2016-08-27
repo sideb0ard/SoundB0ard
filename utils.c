@@ -33,29 +33,7 @@ void *timed_sig_start(void *arg)
     SBMSG *msg = arg;
     int sg = -1; // signal generator
 
-    if (strcmp(msg->params, "sine") == 0) {
-        sg = add_osc(mixr, msg->freq, SINE);
-    }
-    else if (strcmp(msg->params, "sawd") == 0) {
-        sg = add_osc(mixr, msg->freq, SAW_D);
-    }
-    else if (strcmp(msg->params, "sawu") == 0) {
-        sg = add_osc(mixr, msg->freq, SAW_U);
-    }
-    else if (strcmp(msg->params, "tri") == 0) {
-        sg = add_osc(mixr, msg->freq, TRI);
-    }
-    else if (strcmp(msg->params, "square") == 0) {
-        sg = add_osc(mixr, msg->freq, SQUARE);
-    }
-    else if (strcmp(msg->params, "fmx") == 0) {
-        sg = add_fm_x(mixr, msg->mod_osc, msg->modfreq, msg->car_osc,
-                      msg->carfreq);
-    }
-    else if (strcmp(msg->params, "fm") == 0) {
-        sg = add_fm(mixr, msg->modfreq, msg->carfreq);
-    }
-    else if (strcmp(msg->params, "sloop") == 0) {
+    if (strcmp(msg->params, "sloop") == 0) {
         printf("TIMED .... %f\n", msg->looplen);
         sg = add_sampler(mixr, msg->filename, msg->looplen);
     }
@@ -65,7 +43,7 @@ void *timed_sig_start(void *arg)
 
     // faderrr(sg, UP);
 
-    free(msg);
+    //free(msg);
     return NULL;
 }
 
@@ -285,13 +263,13 @@ int notelookup(char *n)
         return -1;
 }
 
-float chfreqlookup(int ch, void *fm)
+float chfreqlookup(int ch, void *p)
 {
-    FM *self = (FM *)fm;
+    nanosynth *ns = (nanosynth *)p;
     char cur_octave[2];
     char cur_octave_plus_one[2];
-    itoa(self->cur_octave, cur_octave);
-    itoa(self->cur_octave + 1, cur_octave_plus_one);
+    itoa(ns->cur_octave, cur_octave);
+    itoa(ns->cur_octave + 1, cur_octave_plus_one);
 
     char tmpval[4] = "";
     if (ch == 97) {

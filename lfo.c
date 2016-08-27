@@ -14,12 +14,14 @@ lfo *lfo_new()
         return NULL;
     }
 
-    l->osc = osc_new();
+    osc_new_settings(&l->osc);
 
-    l->osc->do_oscillate = &lfo_do_oscillate;
-    l->osc->start_oscillator = &lfo_start_oscillator;
-    l->osc->stop_oscillator = &lfo_stop_oscillator;
-    l->osc->reset_oscillator = &lfo_reset_oscillator;
+    l->osc.do_oscillate = &lfo_do_oscillate;
+    l->osc.start_oscillator = &lfo_start_oscillator;
+    l->osc.stop_oscillator = &lfo_stop_oscillator;
+    l->osc.reset_oscillator = &lfo_reset_oscillator;
+
+    return l;
 }
 
 double lfo_do_oscillate(oscillator *self, double *quad_phase_output)

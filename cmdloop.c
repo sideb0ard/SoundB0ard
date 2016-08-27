@@ -14,7 +14,7 @@
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
-#include "fm.h"
+#include "nanosynth.h"
 #include "help.h"
 #include "keys.h"
 #include "mixer.h"
@@ -66,6 +66,9 @@ void interpret(char *line)
         if (strcmp(trim_tok, "ps") == 0) {
             ps();
             return;
+        }
+        else if (strcmp(trim_tok, "nanosynth") == 0) {
+            add_nanosynth(mixr);
         }
         else if (strcmp(trim_tok, "ls") == 0) {
             list_sample_dir();
@@ -140,22 +143,22 @@ void interpret(char *line)
             else if (is_val_a_valid_sig_num) {
 
                 if (strcmp(cmd, "keys") == 0) {
-                    if (mixr->sound_generators[(int)val]->type == FM_TYPE) {
+                    if (mixr->sound_generators[(int)val]->type == NANOSYNTH_TYPE) {
                         printf("KEYS!\n");
                         keys(val);
                     }
                     else {
-                        printf("Can only run keys() on an FM Type, ya dafty\n");
+                        printf("Can only run keys() on an nanosynth Type, ya dafty\n");
                     }
                 }
                 else if (strcmp(cmd, "midi") == 0) {
-                    if (mixr->sound_generators[(int)val]->type == FM_TYPE) {
+                    if (mixr->sound_generators[(int)val]->type == NANOSYNTH_TYPE) {
                         printf("MIDI fer %d\n", (int)val);
-                        mixr->has_active_fm = 1;
-                        mixr->active_fm_soundgen_num = val;
+                        mixr->has_active_nanosynth = 1;
+                        mixr->active_nanosynth_soundgen_num = val;
                     }
                     else {
-                        printf("Can only run keys() on an FM Type, ya dafty\n");
+                        printf("Can only run keys() on an nanosynth Type, ya dafty\n");
                     }
                 }
                 else if (strcmp(cmd, "stop") == 0) {
@@ -187,31 +190,6 @@ void interpret(char *line)
             }
         }
 
-        // Modify an FM
-        regex_t mfm_rx;
-        regcomp(&mfm_rx, "^mfm ([[:digit:]]+) ([.[:digit:]]+)$",
-                REG_EXTENDED | REG_ICASE);
-        if (regexec(&mfm_rx, trim_tok, 0, NULL, 0) == 0) {
-            int fmno;
-            double freq;
-            char osc[4];
-            sscanf(trim_tok, "mfm %d %s %lf", &fmno, osc, &freq);
-
-            if (mixr->sound_generators[fmno]->type == FM_TYPE) {
-                if (fmno + 1 <= mixr->soundgen_num) {
-                    printf("Ooh, gotsa an mfm for FM %d - changing %s to %lf\n",
-                           fmno, osc, freq);
-                    mfm(mixr->sound_generators[fmno], freq);
-                }
-                else {
-                    printf("Beat it, ya chancer - gimme an FM number for one "
-                           "that exists!\n");
-                }
-            }
-            else {
-                printf("SOrry pal, soundGen %d isnae an FM\n", fmno);
-            }
-        }
 
         regmatch_t sxmatch[3];
         regex_t sx_rx;
@@ -239,42 +217,11 @@ void interpret(char *line)
             }
         }
 
-        regmatch_t fmxmatch[6];
-        regex_t fmx_rx;
-        regcomp(&fmx_rx, "^(fm) ([[:alpha:]_]{1,9}) ([[:digit:].]+) "
-                         "([[:alpha:]_]{1,9}) ([[:digit:].]+)$",
-                REG_EXTENDED | REG_ICASE);
-        if (regexec(&fmx_rx, trim_tok, 5, fmxmatch, 0) == 0) {
-            char cmd_type[10];
-            char car_osc[10];
-            double val1 = 0;
-            char mod_osc[10];
-            double val2 = 0;
-            sscanf(trim_tok, "%s %s %lf %s %lf", cmd_type, car_osc, &val1,
-                   mod_osc, &val2);
-            if (is_valid_osc(car_osc) && is_valid_osc(mod_osc)) {
-                printf("Jolly good ol' chap! FM with %s %lf and %s %lf\n",
-                       car_osc, val1, mod_osc, val2);
-                SBMSG *msg = new_sbmsg();
-                strncpy(msg->cmd, "timed_sig_start", 19);
-                strncpy(msg->params, "fmx", 10); // fm extended options
-                strncpy(msg->mod_osc, mod_osc, 10);
-                strncpy(msg->car_osc, car_osc, 10);
-                msg->modfreq = val1;
-                msg->carfreq = val2;
-                thrunner(msg);
-            }
-            else {
-                printf("FM Oscilattors must be one of sine, square, sawd_d, "
-                       "saw_u, tri\n");
-            }
-        }
-
         regmatch_t tpmatch[4];
         regex_t tsigtype_rx;
         regcomp(&tsigtype_rx,
                 "^(vol|freq|delay1|delay2|reverb|res|randd|allpass|"
-                "lowpass|highpass|bandpass|fm|sustain|swing) "
+                "lowpass|highpass|bandpass|nanosynth|sustain|swing) "
                 "([[:digit:].]+) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
@@ -292,15 +239,15 @@ void interpret(char *line)
                     vol_change(mixr, val1, val2);
                     printf("VOL! %s %f %lf\n", cmd_type, val1, val2);
                 }
-                if (strcmp(cmd_type, "freq") == 0) {
-                    freq_change(mixr, val1, val2);
-                    printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
-                }
+                //if (strcmp(cmd_type, "freq") == 0) {
+                //    freq_change(mixr, val1, val2);
+                //    printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
+                //}
                 if (strcmp(cmd_type, "sustain") == 0) {
                     printf("SUSTAIN! %s %lf %lf\n", cmd_type, val1, val2);
-                    if (mixr->sound_generators[(int)val1]->type == FM_TYPE) {
-                        FM *fm = (FM *)mixr->sound_generators[(int)val1];
-                        fm_set_sustain(fm, val2);
+                    if (mixr->sound_generators[(int)val1]->type == NANOSYNTH_TYPE) {
+                        nanosynth *ns = (nanosynth *)mixr->sound_generators[(int)val1];
+                        nanosynth_set_sustain(ns, val2);
                     }
                 }
                 if (strcmp(cmd_type, "delay1") == 0) {
@@ -381,8 +328,8 @@ void interpret(char *line)
                 printf("Oofft mate, you don't have enough sound_gens for "
                        "that..\n");
             }
-            if (strcmp(cmd_type, "fm") == 0) {
-                printf("FML!\n");
+            if (strcmp(cmd_type, "nanosynth") == 0) {
+                printf("nanosynthL!\n");
                 SBMSG *msg = new_sbmsg();
                 strncpy(msg->cmd, "timed_sig_start", 19);
                 strncpy(msg->params, cmd_type, 10);
@@ -451,7 +398,7 @@ void interpret(char *line)
             }
         }
 
-        // FM melody loop
+        // nanosynth melody loop
         regmatch_t fmm_match[4];
         regex_t fmm_rx;
         regcomp(&fmm_rx,
@@ -480,7 +427,7 @@ void interpret(char *line)
                 else {
                     printf("Maaaaaddd for it!\n");
                     melody_loop *mloop = mloop_from_pattern(pattern);
-                    fm_add_melody_loop(mixr->sound_generators[sig_num], mloop);
+                    nanosynth_add_melody_loop(mixr->sound_generators[sig_num], mloop);
                 }
             }
         }

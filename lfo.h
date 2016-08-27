@@ -5,8 +5,8 @@
 typedef struct lfo lfo;
 
 struct lfo {
-    oscillator *osc;
-}
+    oscillator osc;
+};
 
 lfo *lfo_new(void);
 

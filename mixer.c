@@ -12,9 +12,8 @@
 #include "drumr.h"
 #include "effect.h"
 #include "envelope.h"
-#include "fm.h"
+#include "nanosynth.h"
 #include "mixer.h"
-#include "oscil.h"
 #include "sampler.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
@@ -28,7 +27,7 @@ mixer *new_mixer()
     mixr = calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
     mixr->keyboard_octave = 3;
-    mixr->has_active_fm = 0;
+    mixr->has_active_nanosynth = 0;
     if (mixr == NULL) {
         printf("Nae mixer, fucked up!\n");
         return NULL;
@@ -72,12 +71,12 @@ void vol_change(mixer *mixr, int sg, float vol)
     mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
 }
 
-void freq_change(mixer *mixr, int sg, float freq)
-{
-    // TODO: safety check for OSC
-    OSCIL *osc = (OSCIL *)mixr->sound_generators[sg];
-    osc->freqadj(osc, freq);
-}
+//void freq_change(mixer *mixr, int sg, float freq)
+//{
+//    // TODO: safety check for OSC
+//    OSCIL *osc = (OSCIL *)mixr->sound_generators[sg];
+//    osc->freqadj(osc, freq);
+//}
 
 int add_effect(mixer *mixr)
 {
@@ -157,59 +156,23 @@ int add_bitwize(mixer *mixr, int pattern)
     printf("Added bitwize gen!\n");
     return add_sound_generator(mixr, m);
 }
-int add_osc(mixer *mixr, double freq, wave_type type)
+
+
+int add_nanosynth(mixer *mixr)
 {
-
-    OSCIL *new_osc = new_oscil(freq, type);
-    if (new_osc == NULL) {
-        printf("BARF!\n");
-        return -1;
-    }
-
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(new_osc);
-        printf("MBARF!\n");
-        return -1;
-    }
-
-    m->sound_generator = (SOUNDGEN *)new_osc;
-    m->freq = 1492;
-    printf("Added sound gen!\n");
-    return add_sound_generator(mixr, m);
-}
-
-int add_fm_x(mixer *mixr, char *f_osc, double ffreq, char *c_osc, double cfreq)
-{
-    FM *nfm = new_fm_x(f_osc, ffreq, c_osc, cfreq);
-    if (nfm == NULL) {
-        printf("Barfed on FM creation\n");
+    printf("Adding a Nanosynth...\n");
+    nanosynth *ns = new_nanosynth();
+    if (ns == NULL) {
+        printf("Barfed on nanosynth creation\n");
         return -1;
     }
     SBMSG *m = new_sbmsg();
     if (m == NULL) {
-        free(nfm);
+        free(ns);
         printf("MBARF!\n");
         return -1;
     }
-    m->sound_generator = (SOUNDGEN *)nfm;
-    return add_sound_generator(mixr, m);
-}
-
-int add_fm(mixer *mixr, double ffreq, double cfreq)
-{
-    FM *nfm = new_fm(ffreq, cfreq);
-    if (nfm == NULL) {
-        printf("Barfed on FM creation\n");
-        return -1;
-    }
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(nfm);
-        printf("MBARF!\n");
-        return -1;
-    }
-    m->sound_generator = (SOUNDGEN *)nfm;
+    m->sound_generator = (SOUNDGEN *)ns;
     return add_sound_generator(mixr, m);
 }
 
@@ -280,8 +243,5 @@ double gen_next(mixer *mixr)
         }
     }
 
-    // global envelope -- for the moment
-    // double mix_amp = envelope_stream_tick(ampstream);
-    // output_val *= mix_amp;
     return mixr->volume * (output_val / 1.53);
 }

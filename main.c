@@ -23,7 +23,7 @@ struct kevent synthz[10];
 pthread_cond_t bpm_cond;
 pthread_mutex_t bpm_lock;
 
-wtable *wave_tables[5];
+//wtable *wave_tables[5];
 
 ENVSTREAM *ampstream = NULL;
 
@@ -60,17 +60,6 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
 int main()
 {
 
-    // start kernel queue
-    if ((kernelq = kqueue()) == -1)
-        printf("Couldnae dae yer kernel queue, cap'n\n");
-
-    // lookup table for wavs
-    wave_tables[SINE] = new_sine_table();
-    wave_tables[TRI] = new_tri_table();
-    wave_tables[SQUARE] = new_square_table();
-    wave_tables[SAW_U] = new_saw_table(1);
-    wave_tables[SAW_D] = new_saw_table(0);
-
     ampstream = new_envelope_stream(8, 1);
 
     // algoriddim thread synchronization
@@ -86,12 +75,12 @@ int main()
     }
     pthread_detach(bpmrun_th);
 
-    // run the MIDI event looprrr...
-    pthread_t midi_th;
-    if (pthread_create(&midi_th, NULL, midiman, NULL)) {
-        fprintf(stderr, "Errrr, wit tha midi..\n");
-        return -1;
-    }
+    //// run the MIDI event looprrr...
+    //pthread_t midi_th;
+    //if (pthread_create(&midi_th, NULL, midiman, NULL)) {
+    //    fprintf(stderr, "Errrr, wit tha midi..\n");
+    //    return -1;
+    //}
 
     //// run da Kernel Queue Poller
     // pthread_t kqueuerun_th;

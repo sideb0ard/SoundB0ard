@@ -11,7 +11,7 @@ SRC = main.c \
       effect.c \
       envelope.c \
       envelope_generator.c \
-      fm.c \
+      nanosynth.c \
       filter.c \
       filter_csem.c \
       filter_onepole.c \
@@ -19,10 +19,9 @@ SRC = main.c \
       help.c \
       keys.c \
       kqueuerrr.c \
-      midimaaan.c \
+      lfo.c \
       mixer.c \
       modmatrix.c \
-      oscil.c \
       oscillator.c \
       qblimited_oscillator.c \
       sampler.c \

@@ -31,8 +31,8 @@ melody_loop *new_melody_loop()
 // static void alarm_handler(int signum)
 //{
 //    //printf("TIMER!! %d\n", signum);
-//    FM *fm = (FM *)mixr->sound_generators[0];
-//    eg_release(fm->env);
+//    nanosynth *ns = (nanosynth *)mixr->sound_generators[0];
+//    eg_release(ns->eg1);
 //}
 
 void keys(int soundgen_num)
@@ -48,7 +48,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    FM *self = (FM *)mixr->sound_generators[soundgen_num];
+    nanosynth *self = (nanosynth *)mixr->sound_generators[soundgen_num];
 
     // signal(SIGALRM, alarm_handler);
 
@@ -98,24 +98,25 @@ void keys(int soundgen_num)
             // else if (ch == 90) { // 'Z'
             //    filter_adj_fc_control(self->filter->bc_filter, UP);
             //}
-            else if (ch == 122) { // '`'
-                printf("Changing WAVE form of synth->osc1\n");
-                fm_change_osc_wave_form(self, 1);
-            }
-            else if (ch == 120) { // '`'
-                printf("Changing WAVE form of synth->osc2\n");
-                fm_change_osc_wave_form(self, 2);
-            }
-            else if (ch == 99) { // '`'
-                printf("Changing WAVE form of synth->lfo\n");
-                fm_change_osc_wave_form(self, 0);
-            }
+            //else if (ch == 122) { // '`'
+            //    printf("Changing WAVE form of synth->osc1\n");
+            //    ns_change_osc_wave_form(self, 1);
+            //}
+            //else if (ch == 120) { // '`'
+            //    printf("Changing WAVE form of synth->osc2\n");
+            //    nanosynth_change_osc_wave_form(self, 2);
+            //}
+            //else if (ch == 99) { // '`'
+            //    printf("Changing WAVE form of synth->lfo\n");
+            //    nanosynth_change_osc_wave_form(self, 0);
+            //}
 
             else { // try to play note
                 double freq =
                     chfreqlookup(ch, mixr->sound_generators[soundgen_num]);
                 if (freq != -1) {
-                    play_note(self, freq);
+                    printf("Freqy! %f\n", freq);
+                    note_on(self, freq);
                 }
                 // alarm(2);
             }
@@ -146,25 +147,10 @@ void add_melody_event(melody_loop *mloop, melody_event *e)
     }
 }
 
-void play_note(void *self, double freq)
-{
-    FM *fm = (FM *)self;
-
-    // struct timespec ts;
-    // ts.tv_sec = 0;
-    // ts.tv_nsec = 10000;
-
-    keypress_on(fm, freq);
-    // nanosleep(&ts, NULL);
-    // mixr->sound_generators[sg_num];
-    // keypress_off(mixr->sound_generators[sg_num]);
-    // alarm(2);
-}
-
-void *play_melody_loop(void *f)
+void *play_melody_loop(void *p)
 {
     // melody_loop *mloop = (melody_loop *)m;
-    FM *fm = (FM *)f;
+    nanosynth *ns = (nanosynth *)p;
 
     int notes_played_time[32];
     for (int i = 0; i < 32; i++)
@@ -182,19 +168,19 @@ void *play_melody_loop(void *f)
         }
     }
 
-    // FM *fm = (FM *)mixr->sound_generators[mloop->sig_num];
+    // nanosynth *ns = (nanosynth *)mixr->sound_generators[mloop->sig_num];
 
     while (1) {
-        for (int j = 0; j < fm->melody_loop_num; j++) {
-            melody_loop *mloop = fm->mloops[j];
+        for (int j = 0; j < ns->melody_loop_num; j++) {
+            melody_loop *mloop = ns->mloops[j];
             int note_played = 0;
             for (int i = 0; i < mloop->size; i++) {
                 while (!note_played) {
                     if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
                         // printf("playing %f\n", mloop->melody[i]->freq);
-                        play_note(fm, mloop->melody[i]->freq);
+                        note_on(ns, mloop->melody[i]->freq);
                         note_played = 1;
-                        if (fm->sustain > 0) // switched on
+                        if (ns->sustain > 0) // switched on
                             notes_played_time[mloop->melody[i]->tick] = 1;
                     }
 
@@ -207,16 +193,16 @@ void *play_melody_loop(void *f)
                             // printf("notes played time %d =  %d\n", i,
                             // notes_played_time[i]);
                         }
-                        if (notes_played_time[i] > fm->sustain) {
+                        if (notes_played_time[i] > ns->sustain) {
                             notes_played_time[i] = 0;
-                            note_off(fm->env);
+                            eg_note_off(ns->eg1);
                         }
                     }
                 }
                 note_played = 0;
-                // FM *fm = (FM*)mixr->sound_generators[mloop->sig_num];
+                // nanosynth *ns = (nanosynth*)mixr->sound_generators[mloop->sig_num];
                 // printf("note off!\n");
-                // note_off(fm->env);
+                // note_off(ns->env);
             }
         }
     }
@@ -256,11 +242,11 @@ void keys_start_melody_player(int sig_num, char *pattern)
     printf("KEYS START MELODY!\n");
     printf("SIG NUM %d - %s\n", sig_num, pattern);
 
-    FM *fm = (FM *)mixr->sound_generators[sig_num];
-    fm_add_melody_loop(fm, mloop);
+    nanosynth *ns = (nanosynth *)mixr->sound_generators[sig_num];
+    nanosynth_add_melody_loop(ns, mloop);
 
     pthread_t melody_looprrr;
-    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, fm)) {
+    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
         fprintf(stderr, "Err running loop\n");
     }
     pthread_detach(melody_looprrr);

@@ -45,8 +45,7 @@ typedef enum { OFF, ON } onoff;
 typedef enum { UP, DOWN } direction;
 
 typedef enum {
-    OSCIL_TYPE,
-    FM_TYPE,
+    NANOSYNTH_TYPE,
     SAMPLER_TYPE,
     BITWIZE_TYPE,
     DRUM_TYPE

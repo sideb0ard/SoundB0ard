@@ -136,7 +136,7 @@ void set_sustain_override(envelope_generator *self, bool b)
     self->m_sustain_override = b;
     if (self->m_release_pending && !self->m_sustain_override) {
         self->m_release_pending = false;
-        note_off(self);
+        eg_note_off(self);
     }
 }
 
@@ -206,7 +206,7 @@ void eg_update(envelope_generator *self)
     }
 }
 
-double env_generate(envelope_generator *self, double *p_biased_output)
+double eg_generate(envelope_generator *self, double *p_biased_output)
 {
     switch (self->m_state) {
     case OFFF: {
@@ -270,7 +270,7 @@ double env_generate(envelope_generator *self, double *p_biased_output)
     return self->m_envelope_output;
 }
 
-void note_off(envelope_generator *self)
+void eg_note_off(envelope_generator *self)
 {
     if (self->m_envelope_output > 0)
         self->m_state = RELEASE;

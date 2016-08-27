@@ -14,12 +14,12 @@ qb_osc *qb_osc_new()
         return NULL;
     }
 
-    qb->osc = osc_new();
+    osc_new_settings(&qb->osc);
 
-    qb->osc->do_oscillate = &qb_do_oscillate;
-    qb->osc->start_oscillator = &qb_start_oscillator;
-    qb->osc->stop_oscillator = &qb_stop_oscillator;
-    qb->osc->reset_oscillator = &qb_reset_oscillator;
+    qb->osc.do_oscillate = &qb_do_oscillate;
+    qb->osc.start_oscillator = &qb_start_oscillator;
+    qb->osc.stop_oscillator = &qb_stop_oscillator;
+    qb->osc.reset_oscillator = &qb_reset_oscillator;
 
     return qb;
 }

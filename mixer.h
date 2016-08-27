@@ -5,8 +5,7 @@
 
 #include "drumr.h"
 #include "effect.h"
-#include "fm.h"
-#include "oscil.h"
+#include "nanosynth.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
 #include "table.h"
@@ -25,8 +24,8 @@ typedef struct t_mixer {
     int effects_num;
     int effects_size;
 
-    int has_active_fm; // bool
-    int active_fm_soundgen_num;
+    int has_active_nanosynth; // bool
+    int active_nanosynth_soundgen_num;
 
     double volume;
     int keyboard_octave;
@@ -46,8 +45,7 @@ mixer *new_mixer(void);
 void mixer_ps(mixer *mixr);
 int add_bitwize(mixer *mixr, int pattern);
 int add_osc(mixer *mixr, double freq, wave_type w);
-int add_fm(mixer *mixr, double ffreq, double cfreq);
-int add_fm_x(mixer *mixr, char *f_osc, double ffreq, char *c_osc, double cfreq);
+int add_nanosynth(mixer *mixr);
 int add_drum(mixer *mixr, char *filename, char *pattern);
 int add_sampler(mixer *mixr, char *filename, double loop_len);
 int add_sound_generator(mixer *mixr, SBMSG *sbm);

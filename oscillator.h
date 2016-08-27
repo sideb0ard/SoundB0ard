@@ -65,7 +65,7 @@ struct oscillator {
     enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh };
 
     // --- for LFOs - MODE
-    enum { sync, shot, free };
+    enum { sync, shot, rfree };
     unsigned m_lfo_mode; // to store MODE
 
     // --- for hard sync or other dual-oscillator ideas
@@ -104,7 +104,7 @@ struct oscillator {
     double m_amp_mod; /* output amplitude modulation for AM 0 to +1 (not dB)*/
 };
 
-oscillator *osc_new(void);
+void osc_new_settings(oscillator *self);
 
 // --- modulo functions for master/slave operation
 // --- increment the modulo counters

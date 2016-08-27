@@ -86,7 +86,7 @@ void set_attack_time_msec(envelope_generator *self, double time);
 void set_decay_time_msec(envelope_generator *self, double time);
 void set_release_time_msec(envelope_generator *self, double time);
 
-void note_off(envelope_generator *self);
+void eg_note_off(envelope_generator *self);
 
 void set_sustain_override(envelope_generator *self, bool b);
 void set_sustain_level(envelope_generator *self, double level);
@@ -94,7 +94,7 @@ void set_sample_rate(envelope_generator *self, double samplerate);
 
 void start_eg(envelope_generator *self);
 void stop_eg(envelope_generator *self);
-double env_generate(envelope_generator *self, double *p_biased_output);
+double eg_generate(envelope_generator *self, double *p_biased_output);
 
 void eg_update(envelope_generator *self);
 void eg_release(envelope_generator *self);

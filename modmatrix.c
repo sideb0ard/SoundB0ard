@@ -1,4 +1,5 @@
 #include <stdlib.h>
+#include <stdio.h>
 
 #include "midi_freq_table.h"
 #include "modmatrix.h"
@@ -122,7 +123,7 @@ bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
 bool check_destination_layer(unsigned layer, matrixrow *row)
 {
     bool layer0 = false;
-    if (row->m_destination_index >= DEST_LFO1_FQ &&
+    if (row->m_destination_index >= DEST_LFO1_FO &&
         row->m_destination_index <= DEST_ALL_EG_SUSTAIN_OVERRIDE)
         layer0 = true;
 
@@ -183,10 +184,10 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         double modval = src * (*mr->m_mod_intensity) * (*mr->m_mod_range);
 
         switch (mr->m_destination_index) {
-        case DEST_ALL_OSC_FQ:
-            self->m_destinations[DEST_OSC1_FQ] += modval;
-            self->m_destinations[DEST_OSC2_FQ] += modval;
-            self->m_destinations[DEST_ALL_OSC_FQ] += modval;
+        case DEST_ALL_OSC_FO:
+            self->m_destinations[DEST_OSC1_FO] += modval;
+            self->m_destinations[DEST_OSC2_FO] += modval;
+            self->m_destinations[DEST_ALL_OSC_FO] += modval;
         default:
             self->m_destinations[mr->m_destination_index] += modval;
         }

@@ -5,7 +5,7 @@
 typedef struct qblimited_oscillator qb_osc;
 
 struct qblimited_oscillator {
-    oscillator *osc;
+    oscillator osc;
 };
 
 qb_osc *qb_osc_new(void);
