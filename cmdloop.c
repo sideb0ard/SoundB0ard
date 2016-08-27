@@ -326,15 +326,6 @@ void interpret(char *line)
                 printf("Oofft mate, you don't have enough sound_gens for "
                        "that..\n");
             }
-            if (strcmp(cmd_type, "nanosynth") == 0) {
-                printf("nanosynthL!\n");
-                SBMSG *msg = new_sbmsg();
-                strncpy(msg->cmd, "timed_sig_start", 19);
-                strncpy(msg->params, cmd_type, 10);
-                msg->modfreq = val1;
-                msg->carfreq = val2;
-                thrunner(msg);
-            }
         }
 
         // chord info // TODO - simplify - don't need a regex here but whatevs

@@ -61,6 +61,7 @@ int main()
         fprintf(stderr, "Errrr, wit tha midi..\n");
         return -1;
     }
+    pthread_detach(midi_th);
 
 
     // PortAudio start me up!

@@ -9,7 +9,6 @@
 #include "filter_onepole.h"
 #include "keys.h"
 #include "modmatrix.h"
-//#include "oscil.h"
 #include "sound_generator.h"
 #include "qblimited_oscillator.h"
 #include "lfo.h"
@@ -22,12 +21,11 @@ typedef struct nanosynth {
     int melody_loop_cur;
 
     envelope_generator *eg1;
+
     oscillator *osc1;
     oscillator *osc2;
-    //lfo *lfo;
-    //OSCIL *osc1;
-    //OSCIL *osc2;
     oscillator *lfo;
+
     // FILTER_CSEM *filter;
     // FILTER_ONEPOLE *filter;
     FILTER_CK35 *filter;

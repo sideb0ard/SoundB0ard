@@ -223,12 +223,12 @@ void note_on(nanosynth *self, double freq)
 
 void note_off(void *self)
 {
-    (void)self;
-    // nanosynth *nanosynth = (nanosynth *)self;
-    // osc_stop(nanosynth->osc1);
-    // osc_stop(nanosynth->osc2);
-    // osc_stop(nanosynth->lfo);
-    // stop_eg(nanosynth->eg1);
+    //(void)self;
+    nanosynth *ns = (nanosynth *)self;
+    qb_stop_oscillator(ns->osc1);
+    qb_stop_oscillator(ns->osc2);
+    lfo_stop_oscillator(ns->lfo);
+    stop_eg(ns->eg1);
 }
 
 // void nanosynth_gennext(void* self, double* frame_vals, int framesPerBuffer)
@@ -237,22 +237,18 @@ double nanosynth_gennext(void *self)
     nanosynth *ns = (nanosynth *)self;
 
     if (ns->osc1->m_note_on) {
-        //printf("OSX1 note on!\n");
 
-        //// NEW SHIT - moD MATRiX stYle /////////////////
-
+        // layer 0
         do_modulation_matrix(ns->m_modmatrix, 0);
 
-        // layer one modulators
         eg_update(ns->eg1);
-        //oscil_update(nanosynth->lfo);
         osc_update(ns->lfo);
 
         double biased_eg = 0.0;
         eg_generate(ns->eg1, &biased_eg);
-        //nanosynth->lfo->sound_generator.gennext(nanosynth->lfo);
         lfo_do_oscillate(ns->lfo, NULL);
 
+        // layer 1
         do_modulation_matrix(ns->m_modmatrix, 1);
 
         dca_update(ns->dca);
@@ -261,18 +257,14 @@ double nanosynth_gennext(void *self)
         osc_update(ns->osc1);
         osc_update(ns->osc2);
 
-        //double osc1_val = nanosynth->osc1->sound_generator.gennext(nanosynth->osc1);
-        //double osc2_val = nanosynth->osc2->sound_generator.gennext(nanosynth->osc2);
         double osc1_val = qb_do_oscillate(ns->osc1, NULL);
         double osc2_val = qb_do_oscillate(ns->osc2, NULL);
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
         // double filter_out = onepole_gennext(nanosynth->filter, osc_out);
-        double filter_out = ck_gennext(ns->filter, osc_out);
         // double filter_out = csem_gennext(nanosynth->filter, osc_out);
-
-        // printf("OSCOUT: %f // FILTEROUT: %f\n", osc_out, filter_out);
+        double filter_out = ck_gennext(ns->filter, osc_out);
 
         double out_left;
         double out_right;
@@ -286,10 +278,6 @@ double nanosynth_gennext(void *self)
             lfo_stop_oscillator(ns->lfo);
             stop_eg(ns->eg1);
         }
-
-        //// my old schools..>
-        //dca_out = effector(&nanosynth->sound_generator, dca_out);
-        //dca_out = envelopor(&nanosynth->sound_generator, dca_out);
 
         return ns->vol * dca_out;
         //return 0.0;
