@@ -4,8 +4,6 @@
 #include "midi_freq_table.h"
 #include "modmatrix.h"
 
-extern const float midi_freq_table[128];
-
 modmatrix *new_modmatrix(void)
 {
     modmatrix *m;
@@ -173,9 +171,9 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         double src = self->m_sources[mr->m_source_index];
 
         switch (mr->m_source_transform) {
-        // case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
-        //    src = midi_freq_table[(unsigned)src];
-        //    break;
+        case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
+           src = get_midi_freq(src);
+           break;
         default:
             break;
         }

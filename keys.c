@@ -48,7 +48,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    nanosynth *self = (nanosynth *)mixr->sound_generators[soundgen_num];
+    nanosynth *ns = (nanosynth *)mixr->sound_generators[soundgen_num];
 
     // signal(SIGALRM, alarm_handler);
 
@@ -80,11 +80,11 @@ void keys(int soundgen_num)
             }
             else if (ch == 49) { // '1'
                 printf("Down an octave...\n");
-                change_octave(mixr->sound_generators[soundgen_num], DOWN);
+                change_octave(ns, DOWN);
             }
             else if (ch == 50) { // '2'
                 printf("Up an octave...\n");
-                change_octave(mixr->sound_generators[soundgen_num], UP);
+                change_octave(ns, UP);
             }
             // else if (ch == 99) { // 'c'
             //    freqinc(self->lfo, DOWN);
@@ -113,10 +113,9 @@ void keys(int soundgen_num)
 
             else { // try to play note
                 double freq =
-                    chfreqlookup(ch, mixr->sound_generators[soundgen_num]);
+                    chfreqlookup(ch, ns);
                 if (freq != -1) {
-                    printf("Freqy! %f\n", freq);
-                    note_on(self, freq);
+                    note_on(ns, freq);
                 }
                 // alarm(2);
             }

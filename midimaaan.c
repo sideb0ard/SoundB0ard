@@ -8,14 +8,12 @@
 #include "defjams.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
+#include "nanosynth.h"
 #include "mixer.h"
-#include "oscil.h"
 #include "utils.h"
 
 extern bpmrrr *b;
 extern mixer *mixr;
-
-extern const float midi_freq_table[128];
 
 void *midiman()
 {
@@ -59,8 +57,8 @@ void *midiman()
                 int data2 = Pm_MessageData2(msg[i].message);
                 // double timestamp = msg[i].timestamp/1000.;
 
-                // printf("HAS ACTIVE FM? %d\n", mixr->has_active_fm);
-                if (mixr->has_active_fm) {
+                // printf("HAS ACTIVE nanosynth? %d\n", mixr->has_active_ns);
+                if (mixr->has_active_nanosynth) {
                     switch (status) {
                     case (144): { // Hex 0x80
                         midinoteon(data1, data2);
@@ -71,7 +69,7 @@ void *midiman()
                         break;
                     }
                     case (176): { // Hex 0xB0
-                        midicontrol(data1, data2);
+                        //midicontrol(data1, data2);
                         break;
                     }
                     case (224): { // Hex 0xE0
@@ -83,7 +81,7 @@ void *midiman()
                     }
                 }
                 else {
-                    printf("Got midi but not connected to FM\n");
+                    printf("Got midi but not connected to nanosynth\n");
                 }
             }
         }
@@ -96,23 +94,25 @@ void *midiman()
 
 void midinoteon(unsigned int midinote, int velocity)
 {
-    double freq = midi_freq_table[midinote];
+    double freq = get_midi_freq(midinote);
+    printf("MIDINOTE %d\n", midinote);
+    printf("FREQ %f\n", freq);
     (void)velocity;
     // TODO : put this somewhere else
-    FM *fm = (FM *)mixr->sound_generators[mixr->active_fm_soundgen_num];
-    set_midi_note_num(fm->osc1, midinote);
-    set_midi_note_num(fm->osc2, midinote);
-    keypress_on(fm, freq);
+    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+    //set_midi_note_num(ns->osc1, midinote);
+    //set_midi_note_num(ns->osc2, midinote);
+    note_on(ns, freq);
 }
 
 void midinoteoff(unsigned int midinote, int velocity)
 {
     (void)velocity;
     // printf("Note OFF! note: %d velocity: %d\n", midinote, velocity);
-    // keypress_off(mixr->sound_generators[mixr->active_fm_soundgen_num]);
-    FM *fm = (FM *)mixr->sound_generators[mixr->active_fm_soundgen_num];
-    if (midinote == fm->osc1->m_midi_note_number) {
-        note_off(fm->env);
+    // keypress_off(mixr->sound_generators[mixr->active_nanosynth_soundgen_num]);
+    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+    if (midinote == ns->osc1->m_midi_note_number) {
+        eg_note_off(ns->eg1);
     }
 }
 
@@ -121,7 +121,7 @@ void midipitchbend(int data1, int data2)
     printf("Pitch bend, babee: %d %d\n", data1, data2);
     int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
 
-    FM *fm = (FM *)mixr->sound_generators[mixr->active_fm_soundgen_num];
+    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     if (actual_pitch_bent_val != 8192) {
         // double normalized_pitch_bent_val =
         //    (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
@@ -131,56 +131,57 @@ void midipitchbend(int data1, int data2)
             // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
         printf("Cents to bend - %f\n", scaley_val);
-        fm->osc1->m_cents = scaley_val;
-        fm->osc2->m_cents = scaley_val + 2.5;
+        ns->osc1->m_cents = scaley_val;
+        ns->osc2->m_cents = scaley_val + 2.5;
     }
     else {
-        fm->osc1->m_cents = 0;
-        fm->osc2->m_cents = 2.5;
+        ns->osc1->m_cents = 0;
+        //ns->osc2->m_cents = 2.5;
+        ns->osc2->m_cents = 2;
     }
 }
 
-void midicontrol(int data1, int data2)
-{
-    printf("MIDI Mind Control! %d %d\n", data1, data2);
-    FM *fm = (FM *)mixr->sound_generators[mixr->active_fm_soundgen_num];
-    double scaley_val;
-    switch (data1) {
-    case 1: // K1 - Envelope Attack Time Msec
-        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        set_attack_time_msec(fm->env, scaley_val);
-        break;
-    case 2: // K2 - Envelope Decay Time Msec
-        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        set_attack_time_msec(fm->env, scaley_val);
-        break;
-    case 3: // K3 - Envelope Sustain Level
-        scaley_val = scaleybum(0, 128, 0, 1, data2);
-        set_sustain_level(fm->env, scaley_val);
-        break;
-    case 4: // K4 - Envelope Release Time Msec
-        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        set_release_time_msec(fm->env, scaley_val);
-        break;
-    case 5: // K5 - LFO rate
-        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-        set_freq(fm->lfo, scaley_val);
-        break;
-    case 6: // K6 - LFO amplitude
-        scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-        oscil_setvol(fm->lfo, scaley_val);
-        break;
-    case 7: // K7 - Filter Frequency Cut
-        scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        printf("FILTER CUTOFF! %f\n", scaley_val);
-        filter_set_fc_control(fm->filter->bc_filter, scaley_val);
-        break;
-    case 8: // K8 - Filter Q control
-        scaley_val = scaleybum(0, 128, 1, 10, data2);
-        printf("FILTER Q control! %f\n", scaley_val);
-        filter_set_q_control(fm->filter->bc_filter, scaley_val);
-        break;
-    default:
-        printf("SOMthing else\n");
-    }
-}
+//void midicontrol(int data1, int data2)
+//{
+//    printf("MIDI Mind Control! %d %d\n", data1, data2);
+//    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+//    double scaley_val;
+//    switch (data1) {
+//    case 1: // K1 - Envelope Attack Time Msec
+//        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+//        set_attack_time_msec(ns->eg1, scaley_val);
+//        break;
+//    case 2: // K2 - Envelope Decay Time Msec
+//        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+//        set_attack_time_msec(ns->eg1, scaley_val);
+//        break;
+//    case 3: // K3 - Envelope Sustain Level
+//        scaley_val = scaleybum(0, 128, 0, 1, data2);
+//        set_sustain_level(ns->eg1, scaley_val);
+//        break;
+//    case 4: // K4 - Envelope Release Time Msec
+//        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+//        set_release_time_msec(ns->eg1, scaley_val);
+//        break;
+//    case 5: // K5 - LFO rate
+//        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+//        set_freq(ns->lfo, scaley_val);
+//        break;
+//    case 6: // K6 - LFO amplitude
+//        scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
+//        oscil_setvol(ns->lfo, scaley_val);
+//        break;
+//    case 7: // K7 - Filter Frequency Cut
+//        scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+//        printf("FILTER CUTOFF! %f\n", scaley_val);
+//        filter_set_fc_control(ns->filter->bc_filter, scaley_val);
+//        break;
+//    case 8: // K8 - Filter Q control
+//        scaley_val = scaleybum(0, 128, 1, 10, data2);
+//        printf("FILTER Q control! %f\n", scaley_val);
+//        filter_set_q_control(ns->filter->bc_filter, scaley_val);
+//        break;
+//    default:
+//        printf("SOMthing else\n");
+//    }
+//}

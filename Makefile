@@ -1,8 +1,7 @@
 CC = clang
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g
 
-SRC = main.c \
-      audioutils.c \
+SRC = audioutils.c \
       bitwize.c \
       bpmrrr.c \
       cmdloop.c \
@@ -11,17 +10,19 @@ SRC = main.c \
       effect.c \
       envelope.c \
       envelope_generator.c \
-      nanosynth.c \
       filter.c \
+      filter_ckthreefive.c \
       filter_csem.c \
       filter_onepole.c \
-      filter_ckthreefive.c \
       help.c \
       keys.c \
-      kqueuerrr.c \
       lfo.c \
+      main.c \
+      midi_freq_table.c \
+      midimaaan.c \
       mixer.c \
       modmatrix.c \
+      nanosynth.c \
       oscillator.c \
       qblimited_oscillator.c \
       sampler.c \

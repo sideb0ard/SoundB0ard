@@ -24,7 +24,6 @@
 
 extern mixer *mixr;
 extern bpmrrr *b;
-extern ENVSTREAM *ampstream;
 
 extern wtable *wave_tables[5];
 
@@ -44,7 +43,6 @@ void ps()
 {
     mixer_ps(mixr);
     bpm_info(b);
-    ps_envelope_stream(ampstream);
 }
 
 int exxit()
@@ -67,7 +65,8 @@ void interpret(char *line)
             ps();
             return;
         }
-        else if (strcmp(trim_tok, "nanosynth") == 0) {
+        else if (strcmp(trim_tok, "nanosynth") == 0
+                || strcmp(trim_tok, "ns") == 0) {
             add_nanosynth(mixr);
         }
         else if (strcmp(trim_tok, "ls") == 0) {
@@ -124,7 +123,6 @@ void interpret(char *line)
 
             if (strcmp(cmd, "bpm") == 0) {
                 bpm_change(b, val);
-                update_envelope_stream_bpm(ampstream);
                 for (int i = 0; i < mixr->soundgen_num; i++) {
                     for (int j = 0;
                          j < mixr->sound_generators[i]->envelopes_num; j++) {

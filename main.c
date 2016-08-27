@@ -10,22 +10,15 @@
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
-#include "kqueuerrr.h"
 #include "midimaaan.h"
 #include "mixer.h"
 
 mixer *mixr;
 bpmrrr *b;
-int kernelq;
-struct kevent synthz[10];
 
 // use broadcast to wake up threads when tick changes in bpm
 pthread_cond_t bpm_cond;
 pthread_mutex_t bpm_lock;
-
-//wtable *wave_tables[5];
-
-ENVSTREAM *ampstream = NULL;
 
 static int paCallback(const void *inputBuffer, void *outputBuffer,
                       unsigned long framesPerBuffer,
@@ -38,31 +31,18 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
     (void)timeInfo;
     (void)statusFlags;
 
-    int delay_p = data->delay_p;
-    float *delay = data->delay;
-
     for (unsigned long i = 0; i < framesPerBuffer; i++) {
         float val = 0;
-        if (data->mixr->delay_on)
-            val = delay[delay_p];
-        else
-            val = gen_next(data->mixr);
-        delay[delay_p++] = gen_next(data->mixr) + val * 0.5;
-        if (delay_p >= SAMPLE_RATE / 8)
-            delay_p = 0;
+        val = gen_next(data->mixr);
         *out++ = val;
         *out++ = val;
     }
-    data->delay_p = delay_p;
     return 0;
 }
 
 int main()
 {
 
-    ampstream = new_envelope_stream(8, 1);
-
-    // algoriddim thread synchronization
     pthread_mutex_init(&bpm_lock, NULL);
     pthread_cond_init(&bpm_cond, NULL);
 
@@ -76,20 +56,12 @@ int main()
     pthread_detach(bpmrun_th);
 
     //// run the MIDI event looprrr...
-    //pthread_t midi_th;
-    //if (pthread_create(&midi_th, NULL, midiman, NULL)) {
-    //    fprintf(stderr, "Errrr, wit tha midi..\n");
-    //    return -1;
-    //}
+    pthread_t midi_th;
+    if (pthread_create(&midi_th, NULL, midiman, NULL)) {
+        fprintf(stderr, "Errrr, wit tha midi..\n");
+        return -1;
+    }
 
-    //// run da Kernel Queue Poller
-    // pthread_t kqueuerun_th;
-    ////if (pthread_create(&kqueuerun_th, NULL, kqueue_run, (void *)&kernelq)) {
-    // if (pthread_create(&kqueuerun_th, NULL, kqueue_run, (void *)&kernelq)) {
-    //    fprintf(stderr, "Error running KQueue_run thread\n");
-    //    return 1;
-    //}
-    // pthread_detach(kqueuerun_th);
 
     // PortAudio start me up!
     pa_setup();
