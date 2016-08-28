@@ -63,7 +63,6 @@ int main()
     }
     pthread_detach(midi_th);
 
-
     // PortAudio start me up!
     pa_setup();
 

@@ -9,9 +9,8 @@
 #include "filter_onepole.h"
 #include "keys.h"
 #include "modmatrix.h"
+#include "oscillator.h"
 #include "sound_generator.h"
-#include "qblimited_oscillator.h"
-#include "lfo.h"
 
 typedef struct nanosynth {
     SOUNDGEN sound_generator;
@@ -49,6 +48,13 @@ typedef struct nanosynth {
     double m_eg1_osc_intensity;
     double m_filter_keytrack_intensity;
 
+    // "gui" controls
+    unsigned m_osc_waveform;
+    unsigned m_lfo_waveform;
+    double m_lfo_amplitude;
+    double m_lfo_rate;
+    unsigned m_lfo_mode;
+
 } nanosynth;
 
 nanosynth *new_nanosynth(void);
@@ -64,3 +70,4 @@ void change_octave(void *self, int direction);
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);
 void nanosynth_add_melody_loop(void *self, melody_loop *mloop);
+void nanosynth_update(nanosynth *self);

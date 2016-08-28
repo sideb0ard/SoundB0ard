@@ -11,21 +11,21 @@
 
 void osc_new_settings(oscillator *osc)
 {
-    //oscillator *osc;
-    //osc = (oscillator *)calloc(1, sizeof(oscillator));
-    //if (osc == NULL) {
+    // oscillator *osc;
+    // osc = (oscillator *)calloc(1, sizeof(oscillator));
+    // if (osc == NULL) {
     //    printf("Nae mem for osc, go figure\n");
     //    return NULL;
     //}
 
-    //void (*start_oscillator)();
-    //void (*stop_oscillator)();
+    // void (*start_oscillator)();
+    // void (*stop_oscillator)();
 
     // --- render a sample
     // for LFO:  pAuxOutput = QuadPhaseOutput
     // Pitched: pAuxOutput = Right channel (return value is left
     // Channel
-    //double (*do_oscillate)(void *self, double *aux_output);
+    // double (*do_oscillate)(void *self, double *aux_output);
 
     // --- default modulation matrix inits
     osc->g_modmatrix = NULL;
@@ -73,12 +73,16 @@ void osc_new_settings(oscillator *osc)
     // --- for hard sync
     osc->m_buddy_oscillator = NULL;
     osc->m_master_osc = false;
-
 }
 
 // --- modulo functions for master/slave operation
 // --- increment the modulo counters
 void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }
+
+void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val)
+{
+    self->m_fo_mod = fo_mod_val;
+}
 
 // --- check and wrap the modulo
 //     returns true if modulo wrapped
@@ -108,20 +112,20 @@ void osc_update(oscillator *self)
     // --- Modulation Matrix
     //
     // --- get from matrix Sources
-    if (self->g_modmatrix) {
-        // --- zero is norm for these
-        self->m_fo_mod =
-            self->g_modmatrix->m_destinations[self->m_mod_source_fo];
+    // if (self->g_modmatrix) {
+    //    // --- zero is norm for these
+    //    self->m_fo_mod =
+    //        self->g_modmatrix->m_destinations[self->m_mod_source_fo];
 
-        self->m_pw_mod =
-            self->g_modmatrix->m_destinations[self->m_mod_source_pulse_width];
+    //    self->m_pw_mod =
+    //        self->g_modmatrix->m_destinations[self->m_mod_source_pulse_width];
 
-        // --- amp mod is 0->1
-        // --- invert for oscillator output mod
-        self->m_amp_mod =
-            self->g_modmatrix->m_destinations[self->m_mod_source_amp];
-        self->m_amp_mod = 1.0 - self->m_amp_mod;
-    }
+    //    // --- amp mod is 0->1
+    //    // --- invert for oscillator output mod
+    //    self->m_amp_mod =
+    //        self->g_modmatrix->m_destinations[self->m_mod_source_amp];
+    //    self->m_amp_mod = 1.0 - self->m_amp_mod;
+    //}
 
     // --- do the  complete frequency mod
     self->m_fo =

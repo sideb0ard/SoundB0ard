@@ -14,10 +14,10 @@
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
-#include "nanosynth.h"
 #include "help.h"
 #include "keys.h"
 #include "mixer.h"
+#include "nanosynth.h"
 #include "sampler.h"
 #include "table.h"
 #include "utils.h"
@@ -65,8 +65,8 @@ void interpret(char *line)
             ps();
             return;
         }
-        else if (strcmp(trim_tok, "nanosynth") == 0
-                || strcmp(trim_tok, "ns") == 0) {
+        else if (strcmp(trim_tok, "nanosynth") == 0 ||
+                 strcmp(trim_tok, "ns") == 0) {
             add_nanosynth(mixr);
         }
         else if (strcmp(trim_tok, "ls") == 0) {
@@ -141,22 +141,26 @@ void interpret(char *line)
             else if (is_val_a_valid_sig_num) {
 
                 if (strcmp(cmd, "keys") == 0) {
-                    if (mixr->sound_generators[(int)val]->type == NANOSYNTH_TYPE) {
+                    if (mixr->sound_generators[(int)val]->type ==
+                        NANOSYNTH_TYPE) {
                         printf("KEYS!\n");
                         keys(val);
                     }
                     else {
-                        printf("Can only run keys() on an nanosynth Type, ya dafty\n");
+                        printf("Can only run keys() on an nanosynth Type, ya "
+                               "dafty\n");
                     }
                 }
                 else if (strcmp(cmd, "midi") == 0) {
-                    if (mixr->sound_generators[(int)val]->type == NANOSYNTH_TYPE) {
+                    if (mixr->sound_generators[(int)val]->type ==
+                        NANOSYNTH_TYPE) {
                         printf("MIDI fer %d\n", (int)val);
                         mixr->has_active_nanosynth = 1;
                         mixr->active_nanosynth_soundgen_num = val;
                     }
                     else {
-                        printf("Can only run keys() on an nanosynth Type, ya dafty\n");
+                        printf("Can only run keys() on an nanosynth Type, ya "
+                               "dafty\n");
                     }
                 }
                 else if (strcmp(cmd, "stop") == 0) {
@@ -187,7 +191,6 @@ void interpret(char *line)
                 }
             }
         }
-
 
         regmatch_t sxmatch[3];
         regex_t sx_rx;
@@ -237,14 +240,16 @@ void interpret(char *line)
                     vol_change(mixr, val1, val2);
                     printf("VOL! %s %f %lf\n", cmd_type, val1, val2);
                 }
-                //if (strcmp(cmd_type, "freq") == 0) {
+                // if (strcmp(cmd_type, "freq") == 0) {
                 //    freq_change(mixr, val1, val2);
                 //    printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
                 //}
                 if (strcmp(cmd_type, "sustain") == 0) {
                     printf("SUSTAIN! %s %lf %lf\n", cmd_type, val1, val2);
-                    if (mixr->sound_generators[(int)val1]->type == NANOSYNTH_TYPE) {
-                        nanosynth *ns = (nanosynth *)mixr->sound_generators[(int)val1];
+                    if (mixr->sound_generators[(int)val1]->type ==
+                        NANOSYNTH_TYPE) {
+                        nanosynth *ns =
+                            (nanosynth *)mixr->sound_generators[(int)val1];
                         nanosynth_set_sustain(ns, val2);
                     }
                 }
@@ -416,7 +421,8 @@ void interpret(char *line)
                 else {
                     printf("Maaaaaddd for it!\n");
                     melody_loop *mloop = mloop_from_pattern(pattern);
-                    nanosynth_add_melody_loop(mixr->sound_generators[sig_num], mloop);
+                    nanosynth_add_melody_loop(mixr->sound_generators[sig_num],
+                                              mloop);
                 }
             }
         }

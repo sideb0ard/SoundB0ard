@@ -12,8 +12,8 @@
 #include "drumr.h"
 #include "effect.h"
 #include "envelope.h"
-#include "nanosynth.h"
 #include "mixer.h"
+#include "nanosynth.h"
 #include "sampler.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
@@ -71,7 +71,7 @@ void vol_change(mixer *mixr, int sg, float vol)
     mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
 }
 
-//void freq_change(mixer *mixr, int sg, float freq)
+// void freq_change(mixer *mixr, int sg, float freq)
 //{
 //    // TODO: safety check for OSC
 //    OSCIL *osc = (OSCIL *)mixr->sound_generators[sg];
@@ -156,7 +156,6 @@ int add_bitwize(mixer *mixr, int pattern)
     printf("Added bitwize gen!\n");
     return add_sound_generator(mixr, m);
 }
-
 
 int add_nanosynth(mixer *mixr)
 {

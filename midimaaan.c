@@ -8,8 +8,8 @@
 #include "defjams.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
-#include "nanosynth.h"
 #include "mixer.h"
+#include "nanosynth.h"
 #include "utils.h"
 
 extern bpmrrr *b;
@@ -69,7 +69,7 @@ void *midiman()
                         break;
                     }
                     case (176): { // Hex 0xB0
-                        //midicontrol(data1, data2);
+                        // midicontrol(data1, data2);
                         break;
                     }
                     case (224): { // Hex 0xE0
@@ -99,9 +99,11 @@ void midinoteon(unsigned int midinote, int velocity)
     printf("FREQ %f\n", freq);
     (void)velocity;
     // TODO : put this somewhere else
-    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
-    //set_midi_note_num(ns->osc1, midinote);
-    //set_midi_note_num(ns->osc2, midinote);
+    nanosynth *ns =
+        (nanosynth *)
+            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+    // set_midi_note_num(ns->osc1, midinote);
+    // set_midi_note_num(ns->osc2, midinote);
     note_on(ns, freq);
 }
 
@@ -110,7 +112,9 @@ void midinoteoff(unsigned int midinote, int velocity)
     (void)velocity;
     // printf("Note OFF! note: %d velocity: %d\n", midinote, velocity);
     // keypress_off(mixr->sound_generators[mixr->active_nanosynth_soundgen_num]);
-    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+    nanosynth *ns =
+        (nanosynth *)
+            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     if (midinote == ns->osc1->m_midi_note_number) {
         eg_note_off(ns->eg1);
     }
@@ -121,7 +125,9 @@ void midipitchbend(int data1, int data2)
     printf("Pitch bend, babee: %d %d\n", data1, data2);
     int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
 
-    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+    nanosynth *ns =
+        (nanosynth *)
+            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     if (actual_pitch_bent_val != 8192) {
         // double normalized_pitch_bent_val =
         //    (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
@@ -136,15 +142,16 @@ void midipitchbend(int data1, int data2)
     }
     else {
         ns->osc1->m_cents = 0;
-        //ns->osc2->m_cents = 2.5;
+        // ns->osc2->m_cents = 2.5;
         ns->osc2->m_cents = 2;
     }
 }
 
-//void midicontrol(int data1, int data2)
+// void midicontrol(int data1, int data2)
 //{
 //    printf("MIDI Mind Control! %d %d\n", data1, data2);
-//    nanosynth *ns = (nanosynth *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+//    nanosynth *ns = (nanosynth
+//    *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
 //    double scaley_val;
 //    switch (data1) {
 //    case 1: // K1 - Envelope Attack Time Msec

@@ -20,6 +20,7 @@ lfo *lfo_new()
     l->osc.start_oscillator = &lfo_start_oscillator;
     l->osc.stop_oscillator = &lfo_stop_oscillator;
     l->osc.reset_oscillator = &lfo_reset_oscillator;
+    l->osc.update_oscillator = &osc_update; // base clase impl
 
     return l;
 }
@@ -175,17 +176,17 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     // ok to inc modulo now
     osc_inc_modulo(self);
 
-    // self->m_amplitude & self->m_amp_mod is calculated in update() on base
-    // class
-    if (self->g_modmatrix) {
-        // write our outputs into their destinations
-        self->g_modmatrix->m_sources[self->m_mod_dest_output1] =
-            out * self->m_amplitude * self->m_amp_mod;
+    //// self->m_amplitude & self->m_amp_mod is calculated in update() on base
+    //// class
+    // if (self->g_modmatrix) {
+    //    // write our outputs into their destinations
+    //    self->g_modmatrix->m_sources[self->m_mod_dest_output1] =
+    //        out * self->m_amplitude * self->m_amp_mod;
 
-        // add quad phase/stereo output
-        self->g_modmatrix->m_sources[self->m_mod_dest_output2] =
-            qp_out * self->m_amplitude * self->m_amp_mod;
-    }
+    //    // add quad phase/stereo output
+    //    self->g_modmatrix->m_sources[self->m_mod_dest_output2] =
+    //        qp_out * self->m_amplitude * self->m_amp_mod;
+    //}
 
     if (quad_phase_output)
         *quad_phase_output = qp_out * self->m_amplitude * self->m_amp_mod;

@@ -98,22 +98,21 @@ void keys(int soundgen_num)
             // else if (ch == 90) { // 'Z'
             //    filter_adj_fc_control(self->filter->bc_filter, UP);
             //}
-            //else if (ch == 122) { // '`'
+            // else if (ch == 122) { // '`'
             //    printf("Changing WAVE form of synth->osc1\n");
             //    ns_change_osc_wave_form(self, 1);
             //}
-            //else if (ch == 120) { // '`'
+            // else if (ch == 120) { // '`'
             //    printf("Changing WAVE form of synth->osc2\n");
             //    nanosynth_change_osc_wave_form(self, 2);
             //}
-            //else if (ch == 99) { // '`'
+            // else if (ch == 99) { // '`'
             //    printf("Changing WAVE form of synth->lfo\n");
             //    nanosynth_change_osc_wave_form(self, 0);
             //}
 
             else { // try to play note
-                double freq =
-                    chfreqlookup(ch, ns);
+                double freq = chfreqlookup(ch, ns);
                 if (freq != -1) {
                     note_on(ns, freq);
                 }
@@ -199,7 +198,8 @@ void *play_melody_loop(void *p)
                     }
                 }
                 note_played = 0;
-                // nanosynth *ns = (nanosynth*)mixr->sound_generators[mloop->sig_num];
+                // nanosynth *ns =
+                // (nanosynth*)mixr->sound_generators[mloop->sig_num];
                 // printf("note off!\n");
                 // note_off(ns->env);
             }

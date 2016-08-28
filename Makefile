@@ -30,6 +30,7 @@ SRC = audioutils.c \
       sound_generator.c \
       table.c \
       utils.c \
+      wt_oscillator.c \
 
 LIBS = -lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 

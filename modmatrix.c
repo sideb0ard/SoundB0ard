@@ -1,5 +1,5 @@
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "midi_freq_table.h"
 #include "modmatrix.h"
@@ -172,8 +172,8 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
 
         switch (mr->m_source_transform) {
         case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
-           src = get_midi_freq(src);
-           break;
+            src = get_midi_freq(src);
+            break;
         default:
             break;
         }

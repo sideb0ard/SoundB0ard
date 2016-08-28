@@ -15,8 +15,8 @@
 #define OSC_PULSEWIDTH_MAX 98       // 98%
 #define OSC_PULSEWIDTH_DEFAULT 50   // 50%
 
-#define MIN_LFO_RATE -0.02        
-#define MAX_LFO_RATE 20.0        
+#define MIN_LFO_RATE -0.02
+#define MAX_LFO_RATE 20.0
 #define DEFAULT_LFO_RATE 0.5
 
 typedef struct oscillator oscillator;
@@ -32,6 +32,7 @@ struct oscillator {
     void (*start_oscillator)(oscillator *self);
     void (*stop_oscillator)(oscillator *self);
     void (*reset_oscillator)(oscillator *self);
+    void (*update_oscillator)(oscillator *self);
 
     // global modulation matrix
     modmatrix *g_modmatrix;
@@ -54,9 +55,9 @@ struct oscillator {
     double m_inc;    // phase inc = fo/fs
 
     // --- more pitch mods
-    int m_octave;    // octave tweak
-    int m_semitones; // semitones tweak
-    int m_cents;     // cents tweak
+    double m_octave;    // octave tweak
+    double m_semitones; // semitones tweak
+    double m_cents;     // cents tweak
 
     // ---  pulse width in % (sqr only) from GUI
     double m_pulse_width_control;
@@ -113,6 +114,8 @@ void osc_new_settings(oscillator *self);
 // --- modulo functions for master/slave operation
 // --- increment the modulo counters
 void osc_inc_modulo(oscillator *self);
+
+void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val);
 
 // --- check and wrap the modulo
 //     returns true if modulo wrapped
