@@ -263,92 +263,65 @@ int notelookup(char *n)
         return -1;
 }
 
-float chfreqlookup(int ch, void *p)
+//float chfreqlookup(int ch, void *p)
+int ch_midi_lookup(int ch, void *p)
 {
     nanosynth *ns = (nanosynth *)p;
-    char cur_octave[2];
-    char cur_octave_plus_one[2];
-    itoa(ns->cur_octave, cur_octave);
-    itoa(ns->cur_octave + 1, cur_octave_plus_one);
+    int cur_octave = ns->cur_octave * 12;
+    int next_octave = (ns->cur_octave+1) * 12;
 
-    char tmpval[4] = "";
-    if (ch == 97) {
-        strcat(tmpval, "c");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'a' key
+    int midi_num = 0;
+
+    switch (ch) {
+        case 97:
+            midi_num = 0 + cur_octave;
+            break;
+        case 119:
+            midi_num = 1 + cur_octave;
+            break;
+        case 115:
+            midi_num = 2 + cur_octave;
+            break;
+        case 101:
+            midi_num = 3 + cur_octave;
+            break;
+        case 100:
+            midi_num = 4 + cur_octave;
+            break;
+        case 102:
+            midi_num = 5 + cur_octave;
+            break;
+        case 116:
+            midi_num = 6 + cur_octave;
+            break;
+        case 103:
+            midi_num = 7 + cur_octave;
+            break;
+        case 121:
+            midi_num = 8 + cur_octave;
+            break;
+        case 104:
+            midi_num = 9 + cur_octave;
+            break;
+        case 117:
+            midi_num = 10 + cur_octave;
+            break;
+        case 106:
+            midi_num = 11 + cur_octave;
+            break;
+        case 107:
+            midi_num = 0 + next_octave;
+            break;
+        case 111:
+            midi_num = 1 + next_octave;
+            break;
+        case 108:
+            midi_num = 2 + next_octave;
+            break;
+        default:
+            midi_num = 01;
     }
-    else if (ch == 119) {
-        strcat(tmpval, "c#");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'w' key
-    }
-    else if (ch == 115) {
-        strcat(tmpval, "d");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 's' key
-    }
-    else if (ch == 101) {
-        strcat(tmpval, "d#");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'e' key
-    }
-    else if (ch == 100) {
-        strcat(tmpval, "e");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'd' key
-    }
-    else if (ch == 102) {
-        strcat(tmpval, "f");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'f' key
-    }
-    else if (ch == 116) {
-        strcat(tmpval, "f#");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 't' key
-    }
-    else if (ch == 103) {
-        strcat(tmpval, "g");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'g' key
-    }
-    else if (ch == 121) {
-        strcat(tmpval, "g#");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'y' key
-    }
-    else if (ch == 104) {
-        strcat(tmpval, "a");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'h' key
-    }
-    else if (ch == 117) {
-        strcat(tmpval, "a#");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'u' key
-    }
-    else if (ch == 106) {
-        strcat(tmpval, "b");
-        strcat(tmpval, cur_octave);
-        return freqval(tmpval); // 'j' key
-    }
-    else if (ch == 107) {
-        strcat(tmpval, "c");
-        strcat(tmpval, cur_octave_plus_one);
-        return freqval(tmpval); // 'k' key
-    }
-    else if (ch == 111) {
-        strcat(tmpval, "c#");
-        strcat(tmpval, cur_octave_plus_one);
-        return freqval(tmpval); // 'o' key
-    }
-    else if (ch == 108) {
-        strcat(tmpval, "d");
-        strcat(tmpval, cur_octave_plus_one);
-        return freqval(tmpval); // 'l' key
-    }
-    else
-        return -1;
+    return midi_num;
 }
 
 float freqval(char *n)

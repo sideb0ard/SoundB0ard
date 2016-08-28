@@ -112,9 +112,9 @@ void keys(int soundgen_num)
             //}
 
             else { // try to play note
-                double freq = chfreqlookup(ch, ns);
-                if (freq != -1) {
-                    note_on(ns, freq);
+                int midi_num = ch_midi_lookup(ch, ns);
+                if (midi_num != -1) {
+                note_on(ns, midi_num);
                 }
                 // alarm(2);
             }

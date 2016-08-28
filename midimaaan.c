@@ -94,9 +94,9 @@ void *midiman()
 
 void midinoteon(unsigned int midinote, int velocity)
 {
-    double freq = get_midi_freq(midinote);
-    printf("MIDINOTE %d\n", midinote);
-    printf("FREQ %f\n", freq);
+    //double freq = get_midi_freq(midinote);
+    //printf("MIDINOTE %d\n", midinote);
+    //printf("FREQ %f\n", freq);
     (void)velocity;
     // TODO : put this somewhere else
     nanosynth *ns =
@@ -104,7 +104,7 @@ void midinoteon(unsigned int midinote, int velocity)
             mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     // set_midi_note_num(ns->osc1, midinote);
     // set_midi_note_num(ns->osc2, midinote);
-    note_on(ns, freq);
+    note_on(ns, midinote);
 }
 
 void midinoteoff(unsigned int midinote, int velocity)

@@ -6,6 +6,7 @@
 #include "filter_ckthreefive.h"
 #include "filter_csem.h"
 #include "filter_onepole.h"
+#include "midi_freq_table.h"
 #include "nanosynth.h"
 #include "lfo.h"
 #include "wt_oscillator.h"
@@ -211,10 +212,10 @@ void nanosynth_status(void *self, char *status_string)
              ns->osc1->m_fo, ns->vol);
 }
 
-void note_on(nanosynth *self, double freq)
+void note_on(nanosynth *self, int midi_num)
 {
-    self->osc1->m_osc_fo = freq;
-    self->osc2->m_osc_fo = freq;
+    self->osc1->m_osc_fo = get_midi_freq(midi_num);
+    self->osc2->m_osc_fo = get_midi_freq(midi_num);
 
     self->osc1->update_oscillator(self->osc1);
     self->osc2->update_oscillator(self->osc2);

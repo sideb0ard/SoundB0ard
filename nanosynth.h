@@ -64,7 +64,7 @@ double nanosynth_gennext(void *self);
 void nanosynth_status(void *self, char *status_string);
 double nanosynth_getvol(void *self);
 void nanosynth_setvol(void *self, double v);
-void note_on(nanosynth *self, double freq);
+void note_on(nanosynth *self, int midi_num);
 void note_off(void *self);
 void change_octave(void *self, int direction);
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
