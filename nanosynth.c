@@ -249,9 +249,12 @@ double nanosynth_gennext(void *self)
         // eg_update(ns->eg1);
         // osc_update(ns->lfo);
 
-        // double biased_eg = 0.0;
-        // eg_generate(ns->eg1, &biased_eg);
+        double biased_eg = 0.0;
+        double eg_out = eg_generate(ns->eg1, &biased_eg);
         double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
+
+        dca_set_eg_mod(ns->dca, eg_out);
+        dca_update(ns->dca);
 
         // layer 1
         // do_modulation_matrix(ns->m_modmatrix, 1);
@@ -274,22 +277,22 @@ double nanosynth_gennext(void *self)
         //// double filter_out = csem_gennext(nanosynth->filter, osc_out);
         // double filter_out = ck_gennext(ns->filter, osc_out);
 
-        // double out_left;
-        // double out_right;
-        // dca_gennext(ns->dca, filter_out, filter_out, &out_left, &out_right);
+        double out_left;
+        double out_right;
+        dca_gennext(ns->dca, osc_out, osc_out, &out_left, &out_right);
 
         // double dca_out = 0.5 * out_left + 0.5 * out_right;
 
-        // if ((get_state(ns->eg1)) == 0) {
-        //    qb_stop_oscillator(ns->osc1);
-        //    qb_stop_oscillator(ns->osc2);
-        //    lfo_stop_oscillator(ns->lfo);
-        //    stop_eg(ns->eg1);
-        //}
+         if ((get_state(ns->eg1)) == 0) {
+            ns->osc1->stop_oscillator(ns->osc1);
+            ns->osc2->stop_oscillator(ns->osc2);
+            ns->lfo->stop_oscillator(ns->lfo);
+            stop_eg(ns->eg1);
+        }
 
         // return ns->vol * dca_out;
         // return 0.0;
-        return osc_out;
+        return out_left;
     }
     else {
         return 0.0;
