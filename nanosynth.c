@@ -249,21 +249,16 @@ double nanosynth_gennext(void *self)
         // eg_update(ns->eg1);
         // osc_update(ns->lfo);
 
-        double biased_eg = 0.0;
-        double eg_out = eg_generate(ns->eg1, &biased_eg);
         double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
 
-        dca_set_eg_mod(ns->dca, eg_out);
-        dca_update(ns->dca);
+        osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE);
+        osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE);
 
         // layer 1
         // do_modulation_matrix(ns->m_modmatrix, 1);
 
         // dca_update(ns->dca);
         // ck_update(ns->filter);
-
-        osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE);
-        osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE);
 
         ns->osc1->update_oscillator(ns->osc1);
         ns->osc2->update_oscillator(ns->osc2);
@@ -276,6 +271,12 @@ double nanosynth_gennext(void *self)
         //// double filter_out = onepole_gennext(nanosynth->filter, osc_out);
         //// double filter_out = csem_gennext(nanosynth->filter, osc_out);
         // double filter_out = ck_gennext(ns->filter, osc_out);
+
+        double biased_eg = 0.0;
+        double eg_out = eg_generate(ns->eg1, &biased_eg);
+
+        dca_set_eg_mod(ns->dca, eg_out);
+        dca_update(ns->dca);
 
         double out_left;
         double out_right;
@@ -292,7 +293,7 @@ double nanosynth_gennext(void *self)
 
         // return ns->vol * dca_out;
         // return 0.0;
-        return out_left;
+        return osc_out;
     }
     else {
         return 0.0;

@@ -69,7 +69,7 @@ void *midiman()
                         break;
                     }
                     case (176): { // Hex 0xB0
-                        // midicontrol(data1, data2);
+                        midicontrol(data1, data2);
                         break;
                     }
                     case (224): { // Hex 0xE0
@@ -147,48 +147,49 @@ void midipitchbend(int data1, int data2)
     }
 }
 
-// void midicontrol(int data1, int data2)
-//{
-//    printf("MIDI Mind Control! %d %d\n", data1, data2);
-//    nanosynth *ns = (nanosynth
-//    *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
-//    double scaley_val;
-//    switch (data1) {
-//    case 1: // K1 - Envelope Attack Time Msec
-//        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-//        set_attack_time_msec(ns->eg1, scaley_val);
-//        break;
-//    case 2: // K2 - Envelope Decay Time Msec
-//        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-//        set_attack_time_msec(ns->eg1, scaley_val);
-//        break;
-//    case 3: // K3 - Envelope Sustain Level
-//        scaley_val = scaleybum(0, 128, 0, 1, data2);
-//        set_sustain_level(ns->eg1, scaley_val);
-//        break;
-//    case 4: // K4 - Envelope Release Time Msec
-//        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-//        set_release_time_msec(ns->eg1, scaley_val);
-//        break;
-//    case 5: // K5 - LFO rate
-//        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-//        set_freq(ns->lfo, scaley_val);
-//        break;
-//    case 6: // K6 - LFO amplitude
-//        scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-//        oscil_setvol(ns->lfo, scaley_val);
-//        break;
-//    case 7: // K7 - Filter Frequency Cut
-//        scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-//        printf("FILTER CUTOFF! %f\n", scaley_val);
-//        filter_set_fc_control(ns->filter->bc_filter, scaley_val);
-//        break;
-//    case 8: // K8 - Filter Q control
-//        scaley_val = scaleybum(0, 128, 1, 10, data2);
-//        printf("FILTER Q control! %f\n", scaley_val);
-//        filter_set_q_control(ns->filter->bc_filter, scaley_val);
-//        break;
-//    default:
-//        printf("SOMthing else\n");
-//    }
-//}
+ void midicontrol(int data1, int data2)
+{
+    printf("MIDI Mind Control! %d %d\n", data1, data2);
+    nanosynth *ns = (nanosynth
+    *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+    double scaley_val;
+    switch (data1) {
+    case 1: // K1 - Envelope Attack Time Msec
+        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        set_attack_time_msec(ns->eg1, scaley_val);
+        break;
+    case 2: // K2 - Envelope Decay Time Msec
+        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        set_attack_time_msec(ns->eg1, scaley_val);
+        break;
+    case 3: // K3 - Envelope Sustain Level
+        scaley_val = scaleybum(0, 128, 0, 1, data2);
+        set_sustain_level(ns->eg1, scaley_val);
+        break;
+    case 4: // K4 - Envelope Release Time Msec
+        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        set_release_time_msec(ns->eg1, scaley_val);
+        break;
+    case 5: // K5 - LFO rate
+        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+        ns->m_lfo_rate = scaley_val;
+        break;
+    case 6: // K6 - LFO amplitude
+        scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
+        ns->m_lfo_amplitude = scaley_val;
+        break;
+    case 7: // K7 - Filter Frequency Cut
+        scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        printf("FILTER CUTOFF! %f\n", scaley_val);
+        filter_set_fc_control(ns->filter->bc_filter, scaley_val);
+        break;
+    case 8: // K8 - Filter Q control
+        scaley_val = scaleybum(0, 128, 1, 10, data2);
+        printf("FILTER Q control! %f\n", scaley_val);
+        filter_set_q_control(ns->filter->bc_filter, scaley_val);
+        break;
+    default:
+        printf("SOMthing else\n");
+    }
+    nanosynth_update(ns);
+}
