@@ -135,46 +135,30 @@ nanosynth *new_nanosynth()
     return ns;
 }
 
-// void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
-//{
-//    OSCIL *o;
-//    if (oscil == 0)
-//        o = self->lfo;
-//    else if (oscil == 1)
-//        o = self->osc1;
-//    else if (oscil == 2)
-//        o = self->osc2;
-//    else
-//        return;
-//
-//    wave_type type = (o->wav + 1) % 5;
-//    printf("Changing wav types to %d\n", type);
-//    o->wav = type;
-//
-//    switch (type) {
-//    case SAW_D: {
-//        osc_set_wave(o, SAW_D);
-//        break;
-//    }
-//    case SAW_U: {
-//        osc_set_wave(o, SAW_U);
-//        break;
-//    }
-//    case TRI: {
-//        osc_set_wave(o, TRI);
-//        break;
-//    }
-//    case SQUARE: {
-//        osc_set_wave(o, SQUARE);
-//        break;
-//    }
-//    case SINE:
-//    default: {
-//        osc_set_wave(o, SINE);
-//        break;
-//    }
-//    }
-//}
+ void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
+{
+
+
+    unsigned cur_type = 0;
+    unsigned next_type = 0;
+
+    if (oscil == 0) {
+        cur_type = self->osc1->m_waveform;
+        next_type = (cur_type + 1) % MAX_OSC;
+        self->osc1->m_waveform = next_type;
+    }
+    else if (oscil == 1) {
+        cur_type = self->osc2->m_waveform;
+        next_type = (cur_type + 1) % MAX_OSC;
+        self->osc2->m_waveform = next_type;
+    }
+    else if ( oscil == 2 ) {
+        cur_type = self->lfo->m_waveform;
+        next_type = (cur_type + 1) % MAX_LFO_OSC;
+        self->lfo->m_waveform = next_type;
+    }
+    printf("now set to %d\n", next_type);
+}
 
 void nanosynth_setvol(void *self, double v)
 {

@@ -63,11 +63,11 @@ struct oscillator {
     double m_pulse_width_control;
 
     // --- for PITCHED Oscillators
-    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE };
+    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };
     unsigned m_waveform; // to store type
 
     // --- for LFOs
-    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh };
+    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };
 
     // --- for LFOs - MODE
     enum { sync, shot, rfree };

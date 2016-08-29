@@ -98,18 +98,18 @@ void keys(int soundgen_num)
             // else if (ch == 90) { // 'Z'
             //    filter_adj_fc_control(self->filter->bc_filter, UP);
             //}
-            // else if (ch == 122) { // '`'
-            //    printf("Changing WAVE form of synth->osc1\n");
-            //    ns_change_osc_wave_form(self, 1);
-            //}
-            // else if (ch == 120) { // '`'
-            //    printf("Changing WAVE form of synth->osc2\n");
-            //    nanosynth_change_osc_wave_form(self, 2);
-            //}
-            // else if (ch == 99) { // '`'
-            //    printf("Changing WAVE form of synth->lfo\n");
-            //    nanosynth_change_osc_wave_form(self, 0);
-            //}
+             else if (ch == 122) { // 'z'
+                printf("Changing WAVE form of synth->osc1\n");
+                nanosynth_change_osc_wave_form(ns, 0);
+            }
+             else if (ch == 120) { // 'x'
+                printf("Changing WAVE form of synth->osc2\n");
+                nanosynth_change_osc_wave_form(ns, 1);
+            }
+             else if (ch == 99) { // 'c'
+                printf("Changing WAVE form of synth->lfo\n");
+                nanosynth_change_osc_wave_form(ns, 2);
+            }
 
             else { // try to play note
                 int midi_num = ch_midi_lookup(ch, ns);
@@ -124,15 +124,12 @@ void keys(int soundgen_num)
 }
 
 // melody_event* make_melody_event(double freq, int sg_num, int tick)
-melody_event *make_melody_event(int tick, double freq, char note[4])
+melody_event *make_melody_event(int tick, unsigned midi_num)
 {
     melody_event *me;
     me = (melody_event *)calloc(1, sizeof(melody_event));
     me->tick = tick;
-
-    me->freq = freq;
-    strcpy(me->note, note);
-    // me->note = note;
+    me->midi_num = midi_num;
 
     return me;
 }
@@ -176,7 +173,7 @@ void *play_melody_loop(void *p)
                 while (!note_played) {
                     if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
                         // printf("playing %f\n", mloop->melody[i]->freq);
-                        note_on(ns, mloop->melody[i]->freq);
+                        note_on(ns, mloop->melody[i]->midi_num);
                         note_played = 1;
                         if (ns->sustain > 0) // switched on
                             notes_played_time[mloop->melody[i]->tick] = 1;
@@ -217,15 +214,17 @@ melody_loop *mloop_from_pattern(char *pattern)
     char *sep = " ";
     for (tok = strtok_r(pattern, sep, &last_s); tok;
          tok = strtok_r(NULL, sep, &last_s)) {
-        printf("TOKEY! %s\n", tok);
         int tick;
-        char ch_freq[4];
-        sscanf(tok, "%d:%s", &tick, ch_freq);
-        ch_freq[3] = '\0';
-        printf("[%d] - %s\n", tick, ch_freq);
-        double freq = freqval(ch_freq);
-        if (freq != -1) {
-            melody_event *me = make_melody_event(tick, freq, ch_freq);
+        int octave;
+        char note[3];
+        sscanf(tok, "%d:%d:%s", &tick, &octave, note);
+        note[2] = '\0';
+
+        //i need to get midi number for ch_freq^
+        int midi_num = notelookup(note) + 12*octave;
+        //double freq = freqval(ch_freq);
+        if (midi_num != -1) {
+            melody_event *me = make_melody_event(tick, midi_num);
             add_melody_event(mloop, me);
         }
     }

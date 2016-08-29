@@ -3,8 +3,9 @@
 
 typedef struct melody_event {
     int tick;
-    double freq;
-    char note[4];
+    unsigned midi_num;
+    //double freq;
+    //char note[4];
 } melody_event;
 
 typedef struct melody_loop {
@@ -16,7 +17,7 @@ typedef struct melody_loop {
 void keys(int soundgen_num);
 
 melody_loop *new_melody_loop(void);
-melody_event *make_melody_event(int tick, double freq, char note[4]);
+melody_event *make_melody_event(int tick, unsigned midi_num);
 
 void add_melody_event(melody_loop *, melody_event *);
 
