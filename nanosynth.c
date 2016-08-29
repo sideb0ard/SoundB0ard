@@ -120,7 +120,7 @@ nanosynth *new_nanosynth()
     ns->dca->m_mod_source_pan = DEST_NONE;
 
     ns->vol = 0.7;
-    ns->cur_octave = 2;
+    ns->cur_octave = 4;
     ns->sustain = 0;
 
     ns->m_filter_keytrack = true;
@@ -214,28 +214,34 @@ void nanosynth_status(void *self, char *status_string)
 
 void note_on(nanosynth *self, int midi_num)
 {
+    self->osc1->m_midi_note_number = midi_num;
     self->osc1->m_osc_fo = get_midi_freq(midi_num);
-    self->osc2->m_osc_fo = get_midi_freq(midi_num);
-
     self->osc1->update_oscillator(self->osc1);
+
+    self->osc2->m_midi_note_number = midi_num;
+    self->osc2->m_osc_fo = get_midi_freq(midi_num);
     self->osc2->update_oscillator(self->osc2);
 
-    self->osc1->start_oscillator(self->osc1);
-    self->osc2->start_oscillator(self->osc2);
-    self->lfo->start_oscillator(self->lfo);
+    if ( !self->osc1->m_note_on)
+    {
+        self->osc1->start_oscillator(self->osc1);
+        self->osc2->start_oscillator(self->osc2);
+    }
 
+    self->lfo->start_oscillator(self->lfo);
     start_eg(self->eg1);
 }
 
-void note_off(void *self)
-{
-    //(void)self;
-    nanosynth *ns = (nanosynth *)self;
-    ns->osc1->stop_oscillator(ns->osc1);
-    ns->osc2->stop_oscillator(ns->osc2);
-    ns->lfo->stop_oscillator(ns->lfo);
-    stop_eg(ns->eg1);
-}
+//void note_off(void *self, int midi_num)
+//{
+//    //(void)self;
+//    nanosynth *ns = (nanosynth *)self;
+//    //ns->osc1->stop_oscillator(ns->osc1);
+//    //ns->osc2->stop_oscillator(ns->osc2);
+//    //ns->lfo->stop_oscillator(ns->lfo);
+//    if (midi_num == ns->osc1->m_midi_note_number)
+//        stop_eg(ns->eg1);
+//}
 
 // void nanosynth_gennext(void* self, double* frame_vals, int framesPerBuffer)
 double nanosynth_gennext(void *self)
@@ -251,6 +257,9 @@ double nanosynth_gennext(void *self)
         // osc_update(ns->lfo);
 
         double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
+        //double biased_eg = 0.0;
+        //double eg_out = eg_generate(ns->eg1, &biased_eg);
+        double eg_out = eg_generate(ns->eg1, NULL);
 
         osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE);
         osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE);
@@ -264,6 +273,9 @@ double nanosynth_gennext(void *self)
         ns->osc1->update_oscillator(ns->osc1);
         ns->osc2->update_oscillator(ns->osc2);
 
+        dca_set_eg_mod(ns->dca, eg_out * ns->m_eg1_dca_intensity);
+        dca_update(ns->dca);
+
         double osc1_val = ns->osc1->do_oscillate(ns->osc1, NULL);
         double osc2_val = ns->osc2->do_oscillate(ns->osc2, NULL);
 
@@ -272,12 +284,6 @@ double nanosynth_gennext(void *self)
         //// double filter_out = onepole_gennext(nanosynth->filter, osc_out);
         //// double filter_out = csem_gennext(nanosynth->filter, osc_out);
         // double filter_out = ck_gennext(ns->filter, osc_out);
-
-        double biased_eg = 0.0;
-        double eg_out = eg_generate(ns->eg1, &biased_eg);
-
-        dca_set_eg_mod(ns->dca, eg_out);
-        dca_update(ns->dca);
 
         double out_left;
         double out_right;
@@ -294,7 +300,7 @@ double nanosynth_gennext(void *self)
 
         // return ns->vol * dca_out;
         // return 0.0;
-        return osc_out;
+        return out_left;
     }
     else {
         return 0.0;
@@ -325,6 +331,18 @@ void nanosynth_update(nanosynth *self)
     self->lfo->m_amplitude = self->m_lfo_amplitude;
     self->lfo->m_osc_fo = self->m_lfo_rate;
     self->lfo->m_lfo_mode = self->m_lfo_mode;
-
     osc_update(self->lfo);
+
+    set_attack_time_msec(self->eg1, self->m_attack_time_msec);
+    set_decay_time_msec(self->eg1, self->m_decay_time_msec);
+    set_sustain_level(self->eg1, self->m_sustain_level);
+    set_release_time_msec(self->eg1, self->m_release_time_msec);
+
+    self->eg1->m_reset_to_zero = self->m_reset_to_zero;
+    self->eg1->m_legato_mode = self->m_legato_mode;
+
+    dca_set_pan_control(self->dca, self->m_volume_db);
+    dca_set_amplitude_db(self->dca, self->m_volume_db);
+    dca_update(self->dca);
+
 }

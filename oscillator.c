@@ -41,12 +41,12 @@ void osc_new_settings(oscillator *osc)
     osc->m_midi_note_number = 0;
     osc->m_modulo = 0.0;
     osc->m_inc = 0.0;
-    osc->m_osc_fo = OSC_FO_DEFAULT; // GUI
     osc->m_amplitude = 1.0;         // default ON
-    osc->m_square_edge_rising = false;
+    osc->m_osc_fo = OSC_FO_DEFAULT; // GUI
+    osc->m_fo = OSC_FO_DEFAULT;
     osc->m_pulse_width = OSC_PULSEWIDTH_DEFAULT;
     osc->m_pulse_width_control = OSC_PULSEWIDTH_DEFAULT; // GUI
-    osc->m_fo = OSC_FO_DEFAULT;
+    osc->m_square_edge_rising = false;
 
     // --- seed the random number generator
     srand(time(NULL));

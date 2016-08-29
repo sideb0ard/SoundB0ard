@@ -17,12 +17,12 @@ envelope_generator *new_envelope_generator()
 
     eg->m_state = OFFF;
     eg->m_eg_mode = ANALOG;
-    eg->m_attack_time_msec = EG_DEFAULT_STATE;
-    eg->m_decay_time_msec = EG_DEFAULT_STATE;
-    eg->m_release_time_msec = EG_DEFAULT_STATE;
-    eg->m_shutdown_time_msec = 100.0;
+    eg->m_attack_time_msec = EG_DEFAULT_STATE_TIME;
+    eg->m_decay_time_msec = EG_DEFAULT_STATE_TIME;
+    eg->m_release_time_msec = EG_DEFAULT_STATE_TIME;
+    eg->m_shutdown_time_msec = 10.0;
     eg->m_sustain_level = 0.707;
-    eg->m_output_eg = true;
+    eg->m_output_eg = false;
 
     eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
     set_eg_mode(eg, eg->m_eg_mode);
@@ -153,7 +153,7 @@ void start_eg(envelope_generator *self)
     if (self->m_legato_mode && self->m_state != OFFF &&
         self->m_state != RELEASE)
         return;
-    // reset(self);
+    reset(self);
     self->m_state = ATTACK;
 }
 
@@ -276,4 +276,12 @@ void eg_note_off(envelope_generator *self)
         self->m_state = RELEASE;
     else
         self->m_state = OFFF;
+}
+
+void eg_shutdown(envelope_generator *self)
+{
+    if (self->m_legato_mode)
+        return;
+    self->m_inc_shutdown = -(1000.0 * self->m_envelope_output)/self->m_shutdown_time_msec/SAMPLE_RATE;
+    self->m_state = SHUTDOWN;
 }

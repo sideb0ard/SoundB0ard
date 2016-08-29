@@ -6,7 +6,7 @@
 
 #define EG_MINTIME_MS 50 // these two used for attacjtime, decay and release
 #define EG_MAXTIME_MS 5000
-#define EG_DEFAULT_STATE 1000
+#define EG_DEFAULT_STATE_TIME 1000 // ms
 #define EG1_DEFAULT_OSC_INTENSITY 0
 #define EG_MIN_OSC_INTENSITY 0
 #define EG_MAX_OSC_INTENSITY 0 // TODO - check this
@@ -30,7 +30,7 @@ typedef struct envelope_generator {
     bool m_sustain_override;
     bool m_release_pending;
 
-    eg_mode m_eg_mode;
+    unsigned m_eg_mode;
 
     double m_eg1_osc_intensity;
     double m_envelope_output;
@@ -98,3 +98,5 @@ double eg_generate(envelope_generator *self, double *p_biased_output);
 
 void eg_update(envelope_generator *self);
 void eg_release(envelope_generator *self);
+
+void eg_shutdown(envelope_generator *self);

@@ -22,6 +22,8 @@ lfo *lfo_new()
     l->osc.reset_oscillator = &lfo_reset_oscillator;
     l->osc.update_oscillator = &osc_update; // base clase impl
 
+    l->osc.m_lfo_mode = sync;
+
     return l;
 }
 

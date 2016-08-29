@@ -48,12 +48,24 @@ typedef struct nanosynth {
     double m_eg1_osc_intensity;
     double m_filter_keytrack_intensity;
 
-    // "gui" controls
+    // "gui" controls for oscillators
     unsigned m_osc_waveform;
     unsigned m_lfo_waveform;
     double m_lfo_amplitude;
     double m_lfo_rate;
     unsigned m_lfo_mode;
+
+    // "gui" controls for Envelope Generator
+    double m_attack_time_msec;
+    double m_decay_time_msec;
+    double m_sustain_level;
+    double m_release_time_msec;
+    bool m_reset_to_zero;
+    unsigned m_legato_mode;
+
+    // "gui" controls for DCA
+    double m_pan_control;
+    double m_volume_db;
 
 } nanosynth;
 
@@ -65,7 +77,7 @@ void nanosynth_status(void *self, char *status_string);
 double nanosynth_getvol(void *self);
 void nanosynth_setvol(void *self, double v);
 void note_on(nanosynth *self, int midi_num);
-void note_off(void *self);
+//void note_off(void *self, int midi_num);
 void change_octave(void *self, int direction);
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);

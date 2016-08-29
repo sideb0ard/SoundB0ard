@@ -10,6 +10,7 @@ DCA *new_dca()
     DCA *dca = calloc(1, sizeof(DCA));
     dca->m_amplitude_control = 1.0;
     dca->m_amp_mod_db = 0.0;
+    dca->m_gain = 1.0;
     dca->m_amplitude_db = 0.0;
     dca->m_eg_mod = 1.0;
     dca->m_pan_control = 0.0;
@@ -31,8 +32,8 @@ void dca_set_pan_control(DCA *self, double pan) { self->m_pan_control = pan; }
 
 void dca_reset(DCA *self)
 {
+    self->m_eg_mod = 0.0;
     self->m_amp_mod_db = 0.0;
-    self->m_eg_mod = 1.0;
 }
 
 void dca_set_amplitude_db(DCA *self, double amp)
