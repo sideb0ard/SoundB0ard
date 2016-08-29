@@ -94,24 +94,16 @@ void *midiman()
 
 void midinoteon(unsigned int midinote, int velocity)
 {
-    //double freq = get_midi_freq(midinote);
-    //printf("MIDINOTE %d\n", midinote);
-    //printf("FREQ %f\n", freq);
     (void)velocity;
-    // TODO : put this somewhere else
     nanosynth *ns =
         (nanosynth *)
             mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
-    // set_midi_note_num(ns->osc1, midinote);
-    // set_midi_note_num(ns->osc2, midinote);
     note_on(ns, midinote);
 }
 
 void midinoteoff(unsigned int midinote, int velocity)
 {
     (void)velocity;
-    // printf("Note OFF! note: %d velocity: %d\n", midinote, velocity);
-    // keypress_off(mixr->sound_generators[mixr->active_nanosynth_soundgen_num]);
     nanosynth *ns =
         (nanosynth *)
             mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
@@ -142,8 +134,7 @@ void midipitchbend(int data1, int data2)
     }
     else {
         ns->osc1->m_cents = 0;
-        // ns->osc2->m_cents = 2.5;
-        ns->osc2->m_cents = 2;
+        ns->osc2->m_cents = 2.5;
     }
 }
 
@@ -160,7 +151,7 @@ void midipitchbend(int data1, int data2)
         break;
     case 2: // K2 - Envelope Decay Time Msec
         scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        set_attack_time_msec(ns->eg1, scaley_val);
+        set_decay_time_msec(ns->eg1, scaley_val);
         break;
     case 3: // K3 - Envelope Sustain Level
         scaley_val = scaleybum(0, 128, 0, 1, data2);
@@ -172,11 +163,13 @@ void midipitchbend(int data1, int data2)
         break;
     case 5: // K5 - LFO rate
         scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-        ns->m_lfo_rate = scaley_val;
+        ns->lfo->m_osc_fo = scaley_val;
+        osc_update(ns->lfo);
         break;
     case 6: // K6 - LFO amplitude
         scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-        ns->m_lfo_amplitude = scaley_val;
+        ns->lfo->m_amplitude = scaley_val;
+        osc_update(ns->lfo);
         break;
     case 7: // K7 - Filter Frequency Cut
         scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
@@ -191,5 +184,5 @@ void midipitchbend(int data1, int data2)
     default:
         printf("SOMthing else\n");
     }
-    nanosynth_update(ns);
+    //nanosynth_update(ns);
 }
