@@ -24,16 +24,18 @@ typedef enum {
     BPF4
 } filter_type;
 
-typedef struct filter {
+typedef struct filter filter;
+
+struct filter {
     // GUI controls
     double m_fc_control;  // filter cut-off
     double m_q_control;   // 'qualvity factor' 1-10
     double m_aux_control; // a spare control, used in SEM and ladder filters
 
+    unsigned m_nlp; // Non Linear Processing on/off switch
     double m_saturation; // used in NLP
 
-    filter_type m_type;
-    onoff m_nlp; // Non Linear Processing on/off switch
+    unsigned m_type;
 
     double m_fc;     // current filter cut-off val
     double m_q;      // current q value
@@ -44,15 +46,18 @@ typedef struct filter {
     unsigned m_mod_source_fc;
     unsigned m_mod_source_fc_control;
 
-    double (*gennext)(void *self, double xn);
-    void (*update)(void *self);
-    void (*reset)(void *self);
+    void (*set_fc_mod)(filter *self, double d);
+    void (*set_q_control)(filter *self, double d);
+    void (*update)(filter *self);
+    void (*reset)(filter *self);
 
-} FILTER;
+    double (*gennext)(filter *self, double xn); // do_filter
 
-FILTER *new_filter(void);
-void filter_set_q_control(void *self, double val);
-void filter_update(void *self);
-void filter_set_fc_mod(void *self, double val);
-void filter_adj_fc_control(void *filter, int direction);
-void filter_set_fc_control(void *self, double val);
+};
+
+void filter_setup(filter *self);
+
+void filter_set_fc_mod(filter *self, double val);
+void filter_set_q_control(filter *self, double val);
+void filter_update(filter *self);
+void filter_reset(filter *self);

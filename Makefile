@@ -12,7 +12,7 @@ SRC = audioutils.c \
       envelope_generator.c \
       filter.c \
       filter_ckthreefive.c \
-      filter_csem.c \
+      filter_sem.c \
       filter_onepole.c \
       help.c \
       keys.c \

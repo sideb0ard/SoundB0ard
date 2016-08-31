@@ -5,8 +5,6 @@
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"
-#include "filter_ckthreefive.h"
-#include "filter_onepole.h"
 #include "keys.h"
 #include "modmatrix.h"
 #include "oscillator.h"
@@ -27,7 +25,7 @@ typedef struct nanosynth {
 
     // FILTER_CSEM *filter;
     // FILTER_ONEPOLE *filter;
-    FILTER_CK35 *filter;
+    filter *f;
     DCA *dca;
 
     int cur_octave;

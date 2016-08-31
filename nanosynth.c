@@ -4,7 +4,7 @@
 
 #include "defjams.h"
 #include "filter_ckthreefive.h"
-#include "filter_csem.h"
+#include "filter_sem.h"
 #include "filter_onepole.h"
 #include "midi_freq_table.h"
 #include "nanosynth.h"
@@ -23,29 +23,20 @@ nanosynth *new_nanosynth()
     if (ns == NULL)
         return NULL;
 
-    //ns->osc1 = (oscillator *)qb_osc_new();
-    //ns->osc2 = (oscillator *)qb_osc_new();
-    ns->osc1 = (oscillator *)wt_osc_new();
-    ns->osc2 = (oscillator *)wt_osc_new();
-    ns->osc2->m_cents = 2.5; // +2.5 cents detuned
+    ns->osc1 = (oscillator *)qb_osc_new();
+    ns->osc2 = (oscillator *)qb_osc_new();
+    ns->osc2->m_cents = 2.5;
 
     ns->lfo = (oscillator *)lfo_new();
 
     ns->eg1 = new_envelope_generator();
 
-    // FILTER - VA ONEPOLE
-    // ns->filter = new_filter_onepole();
+    //ns->f = (filter *) new_filter_onepole();
+    //ns->f = (filter *) new_filter_sem();
+    ns->f = (filter *) new_filter_ck35();
 
-    // FILTER - VA CK35
-    ns->filter = new_filter_ck35();
-
-    // FILTER - VA CSEM
-    // ns->filter = new_filter_csem();
-
-    // Digitally Controlled Amplitude
     ns->dca = new_dca();
 
-    // mod matrix setup
     ns->m_modmatrix = new_modmatrix();
 
     ns->m_default_mod_intensity = 1.0;
@@ -90,7 +81,7 @@ nanosynth *new_nanosynth()
     //
     // mod matrix routings ////////////////////////////////////
 
-    // ns->osc1->g_modmatrix = ns->m_modmatrix;
+    ns->osc1->g_modmatrix = ns->m_modmatrix;
     ns->osc1->m_mod_source_fo = DEST_OSC1_FO;
     ns->osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
 
@@ -98,9 +89,9 @@ nanosynth *new_nanosynth()
     ns->osc2->m_mod_source_fo = DEST_OSC2_FO;
     ns->osc2->m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
 
-    ns->filter->bc_filter->global_modmatrix = ns->m_modmatrix;
-    ns->filter->bc_filter->m_mod_source_fc = DEST_FILTER1_FC;
-    ns->filter->bc_filter->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
+    ns->f->global_modmatrix = ns->m_modmatrix;
+    ns->f->m_mod_source_fc = DEST_FILTER1_FC;
+    ns->f->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
 
     // modulators - they write their outputs into
     // what will be a Source for something else
@@ -119,7 +110,7 @@ nanosynth *new_nanosynth()
     ns->dca->m_mod_source_velocity = DEST_NONE;
     ns->dca->m_mod_source_pan = DEST_NONE;
 
-    ns->vol = 0.7;
+    ns->vol = 1.0;
     ns->cur_octave = 4;
     ns->sustain = 0;
 
@@ -137,8 +128,6 @@ nanosynth *new_nanosynth()
 
  void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
 {
-
-
     unsigned cur_type = 0;
     unsigned next_type = 0;
 
@@ -216,43 +205,28 @@ void note_on(nanosynth *self, int midi_num)
     start_eg(self->eg1);
 }
 
-//void note_off(void *self, int midi_num)
-//{
-//    //(void)self;
-//    nanosynth *ns = (nanosynth *)self;
-//    //ns->osc1->stop_oscillator(ns->osc1);
-//    //ns->osc2->stop_oscillator(ns->osc2);
-//    //ns->lfo->stop_oscillator(ns->lfo);
-//    if (midi_num == ns->osc1->m_midi_note_number)
-//        stop_eg(ns->eg1);
-//}
-
-// void nanosynth_gennext(void* self, double* frame_vals, int framesPerBuffer)
 double nanosynth_gennext(void *self)
 {
     nanosynth *ns = (nanosynth *)self;
 
     if (ns->osc1->m_note_on) {
 
-        // layer 0
-        // do_modulation_matrix(ns->m_modmatrix, 0);
-
-        // eg_update(ns->eg1);
-        // osc_update(ns->lfo);
-
         double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
-        //double biased_eg = 0.0;
-        //double eg_out = eg_generate(ns->eg1, &biased_eg);
-        double eg_out = eg_generate(ns->eg1, NULL);
+        double biased_eg = 0.0;
+        double eg_out = eg_generate(ns->eg1, &biased_eg);
+        //double eg_out = eg_generate(ns->eg1, NULL);
 
-        osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE);
-        osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE);
+        double eg_osc_mod = ns->m_eg1_osc_intensity * OSC_FO_MOD_RANGE * biased_eg;
 
-        // layer 1
-        // do_modulation_matrix(ns->m_modmatrix, 1);
+        osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
+        osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
 
-        // dca_update(ns->dca);
-        // ck_update(ns->filter);
+        if (ns->m_filter_keytrack == ON) {
+            ns->f->m_fc_control = ns->osc1->m_osc_fo * ns->m_filter_keytrack_intensity;
+        }
+
+        ns->f->set_fc_mod(ns->f, FILTER_FC_MOD_RANGE * eg_out);
+        ns->f->update(ns->f);
 
         ns->osc1->update_oscillator(ns->osc1);
         ns->osc2->update_oscillator(ns->osc2);
@@ -265,15 +239,12 @@ double nanosynth_gennext(void *self)
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        //// double filter_out = onepole_gennext(nanosynth->filter, osc_out);
-        //// double filter_out = csem_gennext(nanosynth->filter, osc_out);
-        // double filter_out = ck_gennext(ns->filter, osc_out);
+        //double filter_out = osc_out;
+        double filter_out = ns->f->gennext(ns->f, osc_out);
 
         double out_left;
         double out_right;
-        dca_gennext(ns->dca, osc_out, osc_out, &out_left, &out_right);
-
-        // double dca_out = 0.5 * out_left + 0.5 * out_right;
+        dca_gennext(ns->dca, filter_out, filter_out, &out_left, &out_right);
 
          if ((get_state(ns->eg1)) == 0) {
             ns->osc1->stop_oscillator(ns->osc1);
@@ -282,9 +253,7 @@ double nanosynth_gennext(void *self)
             stop_eg(ns->eg1);
         }
 
-        // return ns->vol * dca_out;
-        // return 0.0;
-        return out_left;
+        return out_left * ns->vol;
     }
     else {
         return 0.0;

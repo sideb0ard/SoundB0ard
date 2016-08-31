@@ -23,99 +23,90 @@
 //    printf("Feedback: %f\n", self->m_feedback);
 //}
 
-FILTER_ONEPOLE *new_filter_onepole(void)
+filter_onepole *new_filter_onepole()
 {
-    FILTER_ONEPOLE *filter =
-        (FILTER_ONEPOLE *)calloc(1, sizeof(FILTER_ONEPOLE));
+    filter_onepole *op =
+        (filter_onepole *)calloc(1, sizeof(filter_onepole));
 
-    filter->bc_filter = new_filter();
+    filter_setup(&op->f);
+    onepole_setup(op);
 
-    filter->bc_filter->gennext = &onepole_gennext;
-    filter->bc_filter->update = &onepole_update;
-    filter->bc_filter->reset = &onepole_reset;
-
-    filter->bc_filter->m_type = LPF1;
-
-    filter->m_alpha = 1.0;
-    filter->m_beta = 0.0;
-    filter->m_gamma = 1.0;
-    filter->m_delta = 0.0;
-    filter->m_epsilon = 0.0;
-    filter->m_feedback = 0.0;
-    filter->m_a0 = 1.0;
-    filter->m_z1 = 0.0;
-
-    onepole_reset(filter); // seems redundant as they were set, but following
-                           // the book here
-    return filter;
+    return op;
 }
 
-void onepole_update(void *filter)
+void onepole_setup(filter_onepole *op)
 {
-    FILTER_ONEPOLE *self = filter;
+    op->f.set_fc_mod = &filter_set_fc_mod;
+    op->f.gennext = &onepole_gennext;
+    op->f.update = &onepole_update;
+    op->f.reset = &onepole_reset;
 
-    filter_update(self->bc_filter); // update base class
+    op->f.m_type = LPF1;
 
-    double wd = 2.0 * M_PI * self->bc_filter->m_fc;
+    op->m_alpha = 1.0;
+    op->m_beta = 0.0;
+    op->m_gamma = 1.0;
+    op->m_delta = 0.0;
+    op->m_epsilon = 0.0;
+    op->m_feedback = 0.0;
+    op->m_a0 = 1.0;
+    op->m_z1 = 0.0;
+}
+
+void onepole_update(filter *f)
+{
+    filter_update(f); // update base class
+
+    filter_onepole *op = (filter_onepole *) f;
+
+    double wd = 2.0 * M_PI * f->m_fc;
     double T = 1.0 / SAMPLE_RATE;
     double wa = (2.0 / T) * tan(wd * T / 2.0);
     double g = wa * T / 2.0;
 
-    self->m_alpha = g / (1.0 + g);
+    op->m_alpha = g / (1.0 + g);
 }
 
-void onepole_set_feedback(void *filter, double fb)
+void onepole_set_feedback(filter_onepole *op, double fb)
 {
-    FILTER_ONEPOLE *self = filter;
-    self->m_feedback = fb;
+    op->m_feedback = fb;
 }
 
-double onepole_get_feedback_output(void *filter)
+double onepole_get_feedback_output(filter_onepole *f)
 {
-    FILTER_ONEPOLE *self = filter;
-    return self->m_beta * (self->m_z1 + self->m_feedback * self->m_delta);
+    return f->m_beta * (f->m_z1 + f->m_feedback * f->m_delta);
 }
 
-void onepole_reset(void *filter)
+void onepole_reset(filter *self)
 {
-    FILTER_ONEPOLE *self = filter;
-    self->m_z1 = 0.0;
-    self->m_feedback = 0.0;
+    filter_onepole *f = (filter_onepole *) self;
+    f->m_z1 = 0.0;
+    f->m_feedback = 0.0;
 }
 
-double onepole_gennext(void *filter, double xn)
+double onepole_gennext(filter *f, double xn)
 {
-    FILTER_ONEPOLE *self = filter;
-    if (self->bc_filter->m_type != LPF1 && self->bc_filter->m_type != HPF1)
+    if (f->m_type != LPF1 && f->m_type != HPF1)
         return xn;
 
-    xn = xn * self->m_gamma + self->m_feedback +
-         self->m_epsilon * onepole_get_feedback_output(self);
+    filter_onepole *op = (filter_onepole *) f;
 
-    double vn = (self->m_a0 * xn - self->m_z1) * self->m_alpha;
+    xn = xn * op->m_gamma + op->m_feedback +
+         op->m_epsilon * onepole_get_feedback_output(op);
 
-    double lpf = vn + self->m_z1;
+    double vn = (op->m_a0 * xn - op->m_z1) * op->m_alpha;
 
-#ifdef DEBUG
-    if (lpf > 1.0) {
-        print_vals(self);
-    }
-#endif
+    double lpf = vn + op->m_z1;
 
-    self->m_z1 = vn + lpf;
+    op->m_z1 = vn + lpf;
 
     double hpf = xn - lpf;
 
-    if (self->bc_filter->m_type == LPF1)
+    if (f->m_type == LPF1)
         return lpf;
-    else if (self->bc_filter->m_type == HPF1)
+    else if (f->m_type == HPF1)
         return hpf;
 
     return xn; // should never get here
 }
 
-void onepole_set_filter_type(void *filter, filter_type ftype)
-{
-    FILTER_ONEPOLE *self = filter;
-    self->bc_filter->m_type = ftype;
-}

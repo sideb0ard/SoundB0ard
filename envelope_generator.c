@@ -21,7 +21,7 @@ envelope_generator *new_envelope_generator()
     eg->m_decay_time_msec = EG_DEFAULT_STATE_TIME;
     eg->m_release_time_msec = EG_DEFAULT_STATE_TIME;
     eg->m_shutdown_time_msec = 10.0;
-    eg->m_sustain_level = 0.707;
+    eg->m_sustain_level = 1;
     eg->m_output_eg = false;
 
     eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
@@ -221,6 +221,7 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
         if (self->m_envelope_output >= 1.0 || self->m_attack_time_msec <= 0.0) {
             self->m_envelope_output = 1.0;
             self->m_state = DECAY;
+            break;
         }
         break;
     }
@@ -228,9 +229,10 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
         self->m_envelope_output = self->m_decay_offset +
                                   self->m_envelope_output * self->m_decay_coeff;
         if (self->m_envelope_output <= self->m_sustain_level ||
-            self->m_decay_time_msec <= 1.0) {
+            self->m_decay_time_msec <= 0.0) {
             self->m_envelope_output = self->m_sustain_level;
             self->m_state = SUSTAIN;
+            break;
         }
         break;
     }
@@ -246,6 +248,7 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
             self->m_release_time_msec <= 0.0) {
             self->m_envelope_output = 0.0;
             self->m_state = OFFF;
+            break;
         }
         break;
     }

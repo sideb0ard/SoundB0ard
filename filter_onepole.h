@@ -5,7 +5,7 @@
 
 typedef struct filter_onepole {
 
-    FILTER *bc_filter; // base class
+    filter f; // base class
     double m_alpha;
     double m_beta;
     double m_z1;
@@ -15,13 +15,15 @@ typedef struct filter_onepole {
     double m_a0;
     double m_feedback;
 
-} FILTER_ONEPOLE;
+} filter_onepole;
 
-FILTER_ONEPOLE *new_filter_onepole(void);
-double onepole_gennext(void *filter, double xn);
-void onepole_update(void *filter);
-void onepole_set_feedback(void *filter, double fb);
-double onepole_get_feedback_output(void *filter);
-void onepole_reset(void *filter);
-void onepole_set_filter_type(void *filter,
+filter_onepole *new_filter_onepole(void);
+void onepole_setup(filter_onepole *op);
+
+double onepole_gennext(filter *f, double xn);
+void onepole_update(filter *f);
+void onepole_set_feedback(filter_onepole *f, double fb);
+double onepole_get_feedback_output(filter_onepole *f);
+void onepole_reset(filter *f);
+void onepole_set_filter_type(filter *f,
                              filter_type ftype); // ENUM in filter.h

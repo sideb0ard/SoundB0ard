@@ -174,12 +174,12 @@ void midipitchbend(int data1, int data2)
     case 7: // K7 - Filter Frequency Cut
         scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
         printf("FILTER CUTOFF! %f\n", scaley_val);
-        filter_set_fc_control(ns->filter->bc_filter, scaley_val);
+        ns->f->m_fc_control = scaley_val;
         break;
     case 8: // K8 - Filter Q control
         scaley_val = scaleybum(0, 128, 1, 10, data2);
         printf("FILTER Q control! %f\n", scaley_val);
-        filter_set_q_control(ns->filter->bc_filter, scaley_val);
+        filter_set_q_control(ns->f, scaley_val);
         break;
     default:
         printf("SOMthing else\n");
