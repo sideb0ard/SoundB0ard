@@ -32,7 +32,7 @@ struct filter {
     double m_q_control;   // 'qualvity factor' 1-10
     double m_aux_control; // a spare control, used in SEM and ladder filters
 
-    unsigned m_nlp; // Non Linear Processing on/off switch
+    unsigned m_nlp;      // Non Linear Processing on/off switch
     double m_saturation; // used in NLP
 
     unsigned m_type;
@@ -52,7 +52,6 @@ struct filter {
     void (*reset)(filter *self);
 
     double (*gennext)(filter *self, double xn); // do_filter
-
 };
 
 void filter_setup(filter *self);

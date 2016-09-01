@@ -2,7 +2,6 @@
 
 typedef struct t_bpmrrr {
     int bpm;
-    int tick; // THIS IS MY NEW ONE
     int cur_tick;
     int quart_note_tick;
     double sleeptime;

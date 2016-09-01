@@ -154,6 +154,7 @@ void start_eg(envelope_generator *self)
         self->m_state != RELEASE)
         return;
     reset(self);
+    // printf("Going into ATTACk\n");
     self->m_state = ATTACK;
 }
 
@@ -163,7 +164,11 @@ void eg_release(envelope_generator *self)
         self->m_state = RELEASE;
 }
 
-void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
+void stop_eg(envelope_generator *self)
+{
+    self->m_state = OFFF;
+    // printf("Going into OFFF via stop\n");
+}
 
 void eg_update(envelope_generator *self)
 {
@@ -221,6 +226,7 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
         if (self->m_envelope_output >= 1.0 || self->m_attack_time_msec <= 0.0) {
             self->m_envelope_output = 1.0;
             self->m_state = DECAY;
+            // printf("Going to DECAY state\n");
             break;
         }
         break;
@@ -232,6 +238,7 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
             self->m_decay_time_msec <= 0.0) {
             self->m_envelope_output = self->m_sustain_level;
             self->m_state = SUSTAIN;
+            // printf("Going to SUSTAIN state\n");
             break;
         }
         break;
@@ -248,6 +255,7 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
             self->m_release_time_msec <= 0.0) {
             self->m_envelope_output = 0.0;
             self->m_state = OFFF;
+            // printf("Going to OFFF state\n");
             break;
         }
         break;
@@ -263,6 +271,7 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
         }
         else {
             self->m_state = OFFF;
+            // printf("Going to OFFF state\n");
         }
         break;
     }
@@ -285,6 +294,7 @@ void eg_shutdown(envelope_generator *self)
 {
     if (self->m_legato_mode)
         return;
-    self->m_inc_shutdown = -(1000.0 * self->m_envelope_output)/self->m_shutdown_time_msec/SAMPLE_RATE;
+    self->m_inc_shutdown = -(1000.0 * self->m_envelope_output) /
+                           self->m_shutdown_time_msec / SAMPLE_RATE;
     self->m_state = SHUTDOWN;
 }

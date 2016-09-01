@@ -13,7 +13,6 @@ struct filter_sem {
     double m_rho;
     double m_z11;
     double m_z12;
-
 };
 
 filter_sem *new_filter_sem(void);

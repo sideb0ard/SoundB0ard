@@ -232,7 +232,7 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer *mixr)
 {
-    bpm_inc_tick(b); // TODO - maybe do this instead of BPMrrr
+    // bpm_inc_tick(b); // TODO - maybe do this instead of BPMrrr
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {

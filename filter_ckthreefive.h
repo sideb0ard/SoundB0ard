@@ -18,7 +18,6 @@ struct filter_ckthreefive {
     filter_onepole m_LPF2;
     filter_onepole m_HPF1;
     filter_onepole m_HPF2;
-
 };
 
 filter_ck35 *new_filter_ck35(void);

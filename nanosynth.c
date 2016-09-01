@@ -4,15 +4,15 @@
 
 #include "defjams.h"
 #include "filter_ckthreefive.h"
-#include "filter_sem.h"
 #include "filter_onepole.h"
+#include "filter_sem.h"
+#include "lfo.h"
 #include "midi_freq_table.h"
 #include "nanosynth.h"
-#include "lfo.h"
-#include "wt_oscillator.h"
 #include "qblimited_oscillator.h"
 #include "table.h"
 #include "utils.h"
+#include "wt_oscillator.h"
 
 extern wtable *wave_tables[5];
 
@@ -31,9 +31,9 @@ nanosynth *new_nanosynth()
 
     ns->eg1 = new_envelope_generator();
 
-    //ns->f = (filter *) new_filter_onepole();
-    //ns->f = (filter *) new_filter_sem();
-    ns->f = (filter *) new_filter_ck35();
+    // ns->f = (filter *) new_filter_onepole();
+    // ns->f = (filter *) new_filter_sem();
+    ns->f = (filter *)new_filter_ck35();
 
     ns->dca = new_dca();
 
@@ -126,7 +126,7 @@ nanosynth *new_nanosynth()
     return ns;
 }
 
- void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
+void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
 {
     unsigned cur_type = 0;
     unsigned next_type = 0;
@@ -141,7 +141,7 @@ nanosynth *new_nanosynth()
         next_type = (cur_type + 1) % MAX_OSC;
         self->osc2->m_waveform = next_type;
     }
-    else if ( oscil == 2 ) {
+    else if (oscil == 2) {
         cur_type = self->lfo->m_waveform;
         next_type = (cur_type + 1) % MAX_LFO_OSC;
         self->lfo->m_waveform = next_type;
@@ -195,8 +195,7 @@ void note_on(nanosynth *self, int midi_num)
     self->osc2->m_osc_fo = get_midi_freq(midi_num);
     self->osc2->update_oscillator(self->osc2);
 
-    if ( !self->osc1->m_note_on)
-    {
+    if (!self->osc1->m_note_on) {
         self->osc1->start_oscillator(self->osc1);
         self->osc2->start_oscillator(self->osc2);
     }
@@ -214,15 +213,17 @@ double nanosynth_gennext(void *self)
         double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
         double biased_eg = 0.0;
         double eg_out = eg_generate(ns->eg1, &biased_eg);
-        //double eg_out = eg_generate(ns->eg1, NULL);
+        // double eg_out = eg_generate(ns->eg1, NULL);
 
-        double eg_osc_mod = ns->m_eg1_osc_intensity * OSC_FO_MOD_RANGE * biased_eg;
+        double eg_osc_mod =
+            ns->m_eg1_osc_intensity * OSC_FO_MOD_RANGE * biased_eg;
 
         osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
         osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
 
         if (ns->m_filter_keytrack == ON) {
-            ns->f->m_fc_control = ns->osc1->m_osc_fo * ns->m_filter_keytrack_intensity;
+            ns->f->m_fc_control =
+                ns->osc1->m_osc_fo * ns->m_filter_keytrack_intensity;
         }
 
         ns->f->set_fc_mod(ns->f, FILTER_FC_MOD_RANGE * eg_out);
@@ -239,19 +240,19 @@ double nanosynth_gennext(void *self)
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        //double filter_out = osc_out;
+        // double filter_out = osc_out;
         double filter_out = ns->f->gennext(ns->f, osc_out);
 
         double out_left;
         double out_right;
         dca_gennext(ns->dca, filter_out, filter_out, &out_left, &out_right);
 
-         if ((get_state(ns->eg1)) == 0) {
-            ns->osc1->stop_oscillator(ns->osc1);
-            ns->osc2->stop_oscillator(ns->osc2);
-            ns->lfo->stop_oscillator(ns->lfo);
-            stop_eg(ns->eg1);
-        }
+        // if ((get_state(ns->eg1)) == 0) {
+        //    ns->osc1->stop_oscillator(ns->osc1);
+        //    ns->osc2->stop_oscillator(ns->osc2);
+        //    ns->lfo->stop_oscillator(ns->lfo);
+        //    stop_eg(ns->eg1);
+        //}
 
         return out_left * ns->vol;
     }
@@ -297,5 +298,4 @@ void nanosynth_update(nanosynth *self)
     dca_set_pan_control(self->dca, self->m_volume_db);
     dca_set_amplitude_db(self->dca, self->m_volume_db);
     dca_update(self->dca);
-
 }

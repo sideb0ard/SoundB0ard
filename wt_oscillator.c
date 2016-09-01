@@ -1,10 +1,10 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
 
 #include "defjams.h"
-#include "wt_oscillator.h"
 #include "utils.h"
+#include "wt_oscillator.h"
 
 wt_osc *wt_osc_new()
 {
@@ -47,7 +47,7 @@ double wt_do_oscillate(oscillator *self, double *aux_output)
 
         return 0.0;
     }
-    wt_osc *wt = (wt_osc *) self;
+    wt_osc *wt = (wt_osc *)self;
 
     // if square, it has its own routine
     if (self->m_waveform == SQUARE && wt->m_current_table_index >= 0) {
@@ -122,11 +122,12 @@ void wt_select_table(wt_osc *self)
     }
 
     // choose table
-    if (self->osc.m_waveform == SAW1 || self->osc.m_waveform == SAW2 || self->osc.m_waveform == SAW3 ||
-        self->osc.m_waveform == SQUARE)
+    if (self->osc.m_waveform == SAW1 || self->osc.m_waveform == SAW2 ||
+        self->osc.m_waveform == SAW3 || self->osc.m_waveform == SQUARE)
         self->m_current_table = self->m_saw_tables[self->m_current_table_index];
     else if (self->osc.m_waveform == TRI)
-        self->m_current_table = self->m_triangle_tables[self->m_current_table_index];
+        self->m_current_table =
+            self->m_triangle_tables[self->m_current_table_index];
 }
 
 void wt_create_wave_tables(wt_osc *self)
@@ -247,7 +248,7 @@ double wt_do_wave_table(wt_osc *self, double *read_index, double wt_inc)
 
     // interpolate the output
     out = lin_terp(0, 1, self->m_current_table[nReadIndex],
-                    self->m_current_table[nReadIndexNext], fFrac);
+                   self->m_current_table[nReadIndexNext], fFrac);
     // add the increment for next time
     *read_index += wt_inc;
 
@@ -302,4 +303,3 @@ void wt_check_wrap_index(double *index)
     while (*index >= WT_LENGTH)
         *index -= WT_LENGTH;
 }
-

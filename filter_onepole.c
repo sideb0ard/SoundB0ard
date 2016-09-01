@@ -25,8 +25,7 @@
 
 filter_onepole *new_filter_onepole()
 {
-    filter_onepole *op =
-        (filter_onepole *)calloc(1, sizeof(filter_onepole));
+    filter_onepole *op = (filter_onepole *)calloc(1, sizeof(filter_onepole));
 
     filter_setup(&op->f);
     onepole_setup(op);
@@ -57,7 +56,7 @@ void onepole_update(filter *f)
 {
     filter_update(f); // update base class
 
-    filter_onepole *op = (filter_onepole *) f;
+    filter_onepole *op = (filter_onepole *)f;
 
     double wd = 2.0 * M_PI * f->m_fc;
     double T = 1.0 / SAMPLE_RATE;
@@ -79,7 +78,7 @@ double onepole_get_feedback_output(filter_onepole *f)
 
 void onepole_reset(filter *self)
 {
-    filter_onepole *f = (filter_onepole *) self;
+    filter_onepole *f = (filter_onepole *)self;
     f->m_z1 = 0.0;
     f->m_feedback = 0.0;
 }
@@ -89,7 +88,7 @@ double onepole_gennext(filter *f, double xn)
     if (f->m_type != LPF1 && f->m_type != HPF1)
         return xn;
 
-    filter_onepole *op = (filter_onepole *) f;
+    filter_onepole *op = (filter_onepole *)f;
 
     xn = xn * op->m_gamma + op->m_feedback +
          op->m_epsilon * onepole_get_feedback_output(op);
@@ -109,4 +108,3 @@ double onepole_gennext(filter *f, double xn)
 
     return xn; // should never get here
 }
-

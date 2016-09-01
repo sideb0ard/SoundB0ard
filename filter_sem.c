@@ -31,22 +31,21 @@ filter_sem *new_filter_sem()
 
 void sem_reset(filter *f)
 {
-    filter_sem *self = (filter_sem *) f;
+    filter_sem *self = (filter_sem *)f;
     self->m_z11 = 0;
     self->m_z12 = 0;
 }
 
 void sem_set_qcontrol(filter *f, double qcontrol)
 {
-    f->m_q =
-        (25.0 - 0.5) * (qcontrol - 1.0) / (10.0 - 1.0) + 0.5;
+    f->m_q = (25.0 - 0.5) * (qcontrol - 1.0) / (10.0 - 1.0) + 0.5;
 }
 
 void sem_update(filter *f)
 {
     filter_update(f); // update base class
 
-    filter_sem *cs = (filter_sem *) f;
+    filter_sem *cs = (filter_sem *)f;
 
     double wd = 2 * M_PI * f->m_fc;
     double T = 1.0 / SAMPLE_RATE;
@@ -60,14 +59,13 @@ void sem_update(filter *f)
 
 double sem_gennext(filter *f, double xn)
 {
-    if (f->m_type != LPF2 && f->m_type != HPF2 &&
-        f->m_type != BPF2 && f->m_type != BSF2)
+    if (f->m_type != LPF2 && f->m_type != HPF2 && f->m_type != BPF2 &&
+        f->m_type != BSF2)
         return xn;
 
-    filter_sem *cs = (filter_sem *) f;
+    filter_sem *cs = (filter_sem *)f;
 
-    double hpf =
-        cs->m_alpha0 * (xn - cs->m_rho * cs->m_z11 - cs->m_z12);
+    double hpf = cs->m_alpha0 * (xn - cs->m_rho * cs->m_z11 - cs->m_z12);
 
     double bpf = cs->m_alpha * hpf + cs->m_z11;
 
@@ -76,12 +74,11 @@ double sem_gennext(filter *f, double xn)
 
     double lpf = cs->m_alpha * bpf + cs->m_z12;
 
-    double R = 1.0 / ( 2.0 * f->m_q);
+    double R = 1.0 / (2.0 * f->m_q);
 
     double bsf = xn - 2.0 * R * bpf; // hmm, this is unused - mistake?
 
-    double semBSF = f->m_aux_control * hpf +
-                    (1.0 - f->m_aux_control) * lpf;
+    double semBSF = f->m_aux_control * hpf + (1.0 - f->m_aux_control) * lpf;
 
     cs->m_z11 = cs->m_alpha * hpf + bpf;
     cs->m_z12 = cs->m_alpha * bpf + lpf;

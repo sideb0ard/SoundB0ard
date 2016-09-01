@@ -28,13 +28,6 @@ melody_loop *new_melody_loop()
     return l;
 }
 
-// static void alarm_handler(int signum)
-//{
-//    //printf("TIMER!! %d\n", signum);
-//    nanosynth *ns = (nanosynth *)mixr->sound_generators[0];
-//    eg_release(ns->eg1);
-//}
-
 void keys(int soundgen_num)
 {
     printf("Entering Keys Mode for %d\n", soundgen_num);
@@ -50,11 +43,11 @@ void keys(int soundgen_num)
 
     nanosynth *ns = (nanosynth *)mixr->sound_generators[soundgen_num];
 
-    // signal(SIGALRM, alarm_handler);
-
     int ch = 0;
     int quit = 0;
-    // int recording = 0;
+
+    int recording = 0;
+    int pattern_loop[32] = {0};
     // int recording_started = 0;
 
     struct pollfd fdz[1];
@@ -62,8 +55,6 @@ void keys(int soundgen_num)
 
     fdz[0].fd = STDIN_FILENO;
     fdz[0].events = POLLIN;
-
-    // melody_loop *mloop;
 
     while (!quit) {
 
@@ -75,48 +66,64 @@ void keys(int soundgen_num)
 
         if (fdz[0].revents & POLLIN) {
             ch = getchar();
-            if (ch == 27 || ch == 113) { // Esc or 'q'
+            switch (ch) {
+            case 27:
+            case 113:
                 quit = 1;
-            }
-            else if (ch == 49) { // '1'
+                break;
+            case 49:
                 printf("Down an octave...\n");
                 change_octave(ns, DOWN);
-            }
-            else if (ch == 50) { // '2'
+                break;
+            case 50:
                 printf("Up an octave...\n");
                 change_octave(ns, UP);
-            }
-            // else if (ch == 99) { // 'c'
-            //    freqinc(self->lfo, DOWN);
-            //}
-            // else if (ch == 67) { // 'C'
-            //    freqinc(self->lfo, UP);
-            //}
-            // else if (ch == 122) { // 'z'
-            //    filter_adj_fc_control(self->filter->bc_filter, DOWN);
-            //}
-            // else if (ch == 90) { // 'Z'
-            //    filter_adj_fc_control(self->filter->bc_filter, UP);
-            //}
-             else if (ch == 122) { // 'z'
+                break;
+            case 114:
+                printf("Now recording.\n");
+                recording = 1 - recording;
+                if ( !recording ) // i.e. must have just stopped
+                {
+                    melody_loop *mloop = new_melody_loop();
+                    for (int i = 0; i < 32; i++ ) {
+                        if ( pattern_loop[i] != 0 ) {
+                            printf("creating pattern event: [%d] : %d\n", i, pattern_loop[i]);
+                            melody_event *me = make_melody_event(i, pattern_loop[i]);
+                            add_melody_event(mloop, me);
+                        }
+                    }
+                    nanosynth_add_melody_loop(ns, mloop);
+
+                    pthread_t melody_looprrr;
+                    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
+                        fprintf(stderr, "Err running loop\n");
+                    }
+                    pthread_detach(melody_looprrr);
+                }
+                break;
+            case 122:
                 printf("Changing WAVE form of synth->osc1\n");
                 nanosynth_change_osc_wave_form(ns, 0);
-            }
-             else if (ch == 120) { // 'x'
+                break;
+            case 120:
                 printf("Changing WAVE form of synth->osc2\n");
                 nanosynth_change_osc_wave_form(ns, 1);
-            }
-             else if (ch == 99) { // 'c'
+                break;
+            case 99:
                 printf("Changing WAVE form of synth->lfo\n");
                 nanosynth_change_osc_wave_form(ns, 2);
-            }
-
-            else { // try to play note
+                break;
+            default: // play note
+                printf("default!\n");
                 int midi_num = ch_midi_lookup(ch, ns);
                 if (midi_num != -1) {
-                note_on(ns, midi_num);
+                    print_midi_event(midi_num);
+                    note_on(ns, midi_num);
+                    if ( recording ) {
+                        printf("noted.");
+                        pattern_loop[b->quart_note_tick % 32] = midi_num;
+                    }
                 }
-                // alarm(2);
             }
         }
     }
@@ -144,7 +151,6 @@ void add_melody_event(melody_loop *mloop, melody_event *e)
 
 void *play_melody_loop(void *p)
 {
-    // melody_loop *mloop = (melody_loop *)m;
     nanosynth *ns = (nanosynth *)p;
 
     int notes_played_time[32];
@@ -195,10 +201,6 @@ void *play_melody_loop(void *p)
                     }
                 }
                 note_played = 0;
-                // nanosynth *ns =
-                // (nanosynth*)mixr->sound_generators[mloop->sig_num];
-                // printf("note off!\n");
-                // note_off(ns->env);
             }
         }
     }
@@ -215,14 +217,12 @@ melody_loop *mloop_from_pattern(char *pattern)
     for (tok = strtok_r(pattern, sep, &last_s); tok;
          tok = strtok_r(NULL, sep, &last_s)) {
         int tick;
-        int octave;
-        char note[3];
-        sscanf(tok, "%d:%d:%s", &tick, &octave, note);
-        note[2] = '\0';
+        int midi_num;
+        sscanf(tok, "%d:%d", &tick, &midi_num);
 
-        //i need to get midi number for ch_freq^
-        int midi_num = notelookup(note) + 12*octave;
-        //double freq = freqval(ch_freq);
+        // i need to get midi number for ch_freq^
+        // int midi_num = notelookup(note) + 12*octave;
+        // double freq = freqval(ch_freq);
         if (midi_num != -1) {
             melody_event *me = make_melody_event(tick, midi_num);
             add_melody_event(mloop, me);

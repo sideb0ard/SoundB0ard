@@ -49,4 +49,3 @@ double wt_do_wave_table(wt_osc *self, double *read_index, double wt_inc);
 double wt_do_square_wave(wt_osc *self);
 
 void wt_check_wrap_index(double *index);
-

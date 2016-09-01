@@ -34,20 +34,19 @@ filter_ck35 *new_filter_ck35()
     ck35->f.update = &ck_update;
     ck35->f.reset = &filter_reset;
 
-
     return ck35;
 }
 
 void ck_set_qcontrol(filter *f, double qcontrol)
 {
-    filter_ck35 *self = (filter_ck35 *) f;
+    filter_ck35 *self = (filter_ck35 *)f;
     self->m_k = (2.0 - 0.01) * (qcontrol - 1.0) / (10.0 - 1.0) + 0.01;
 }
 
 void ck_update(filter *f)
 {
     filter_update(f); // update base class
-    filter_ck35 *ck35 = (filter_ck35 *) f;
+    filter_ck35 *ck35 = (filter_ck35 *)f;
 
     double wd = 2.0 * M_PI * f->m_fc;
     double T = 1.0 / SAMPLE_RATE;
@@ -78,11 +77,11 @@ void ck_update(filter *f)
 
 void ck_reset(filter *f)
 {
-    filter_ck35 *ck35 = (filter_ck35 *) f; 
-    onepole_reset((filter *) &ck35->m_LPF1); // ew, hacky abstraction leak
-    onepole_reset((filter *) &ck35->m_LPF2); // ew, hacky abstraction leak
-    onepole_reset((filter *) &ck35->m_HPF1); // ew, hacky abstraction leak
-    onepole_reset((filter *) &ck35->m_HPF2); // ew, hacky abstraction leak
+    filter_ck35 *ck35 = (filter_ck35 *)f;
+    onepole_reset((filter *)&ck35->m_LPF1); // ew, hacky abstraction leak
+    onepole_reset((filter *)&ck35->m_LPF2); // ew, hacky abstraction leak
+    onepole_reset((filter *)&ck35->m_HPF1); // ew, hacky abstraction leak
+    onepole_reset((filter *)&ck35->m_HPF2); // ew, hacky abstraction leak
 }
 
 double ck_gennext(filter *f, double xn)
@@ -90,11 +89,11 @@ double ck_gennext(filter *f, double xn)
     if (f->m_type != LPF2 && f->m_type != HPF2)
         return xn;
 
-    filter_ck35 *ck35 = (filter_ck35 *) f;
+    filter_ck35 *ck35 = (filter_ck35 *)f;
 
     double y = 0.0;
     if (f->m_type == LPF2) {
-        double y1 = onepole_gennext((filter *) &ck35->m_LPF1, xn);
+        double y1 = onepole_gennext((filter *)&ck35->m_LPF1, xn);
         // printf("Y1! %f\n", y1);
 
         double S35 = onepole_get_feedback_output(&ck35->m_HPF1) +
@@ -107,10 +106,10 @@ double ck_gennext(filter *f, double xn)
         if (f->m_nlp == ON)
             u = tanh(f->m_saturation * u);
 
-        y = ck35->m_k * onepole_gennext((filter *) &ck35->m_LPF2, u);
+        y = ck35->m_k * onepole_gennext((filter *)&ck35->m_LPF2, u);
         // printf("Y! %f\n", y);
 
-        onepole_gennext((filter *) &ck35->m_HPF1, y);
+        onepole_gennext((filter *)&ck35->m_HPF1, y);
     }
     else // HPF
     {
@@ -124,7 +123,8 @@ double ck_gennext(filter *f, double xn)
         if (f->m_nlp == ON)
             y = tanh(f->m_saturation * y);
 
-        onepole_gennext((filter*)&ck35->m_LPF1, onepole_gennext((filter*)&ck35->m_HPF2, y));
+        onepole_gennext((filter *)&ck35->m_LPF1,
+                        onepole_gennext((filter *)&ck35->m_HPF2, y));
     }
     if (ck35->m_k > 0)
         y *= 1.0 / ck35->m_k;

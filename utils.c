@@ -263,63 +263,63 @@ int notelookup(char *n)
         return -1;
 }
 
-//float chfreqlookup(int ch, void *p)
+// float chfreqlookup(int ch, void *p)
 int ch_midi_lookup(int ch, void *p)
 {
     nanosynth *ns = (nanosynth *)p;
     int cur_octave = ns->cur_octave * 12;
-    int next_octave = (ns->cur_octave+1) * 12;
+    int next_octave = (ns->cur_octave + 1) * 12;
 
-    int midi_num = 0;
+    int midi_num = -1;
 
     switch (ch) {
-        case 97:
-            midi_num = 0 + cur_octave;
-            break;
-        case 119:
-            midi_num = 1 + cur_octave;
-            break;
-        case 115:
-            midi_num = 2 + cur_octave;
-            break;
-        case 101:
-            midi_num = 3 + cur_octave;
-            break;
-        case 100:
-            midi_num = 4 + cur_octave;
-            break;
-        case 102:
-            midi_num = 5 + cur_octave;
-            break;
-        case 116:
-            midi_num = 6 + cur_octave;
-            break;
-        case 103:
-            midi_num = 7 + cur_octave;
-            break;
-        case 121:
-            midi_num = 8 + cur_octave;
-            break;
-        case 104:
-            midi_num = 9 + cur_octave;
-            break;
-        case 117:
-            midi_num = 10 + cur_octave;
-            break;
-        case 106:
-            midi_num = 11 + cur_octave;
-            break;
-        case 107:
-            midi_num = 0 + next_octave;
-            break;
-        case 111:
-            midi_num = 1 + next_octave;
-            break;
-        case 108:
-            midi_num = 2 + next_octave;
-            break;
-        default:
-            midi_num = 01;
+    case 97:
+        midi_num = 0 + cur_octave;
+        break;
+    case 119:
+        midi_num = 1 + cur_octave;
+        break;
+    case 115:
+        midi_num = 2 + cur_octave;
+        break;
+    case 101:
+        midi_num = 3 + cur_octave;
+        break;
+    case 100:
+        midi_num = 4 + cur_octave;
+        break;
+    case 102:
+        midi_num = 5 + cur_octave;
+        break;
+    case 116:
+        midi_num = 6 + cur_octave;
+        break;
+    case 103:
+        midi_num = 7 + cur_octave;
+        break;
+    case 121:
+        midi_num = 8 + cur_octave;
+        break;
+    case 104:
+        midi_num = 9 + cur_octave;
+        break;
+    case 117:
+        midi_num = 10 + cur_octave;
+        break;
+    case 106:
+        midi_num = 11 + cur_octave;
+        break;
+    case 107:
+        midi_num = 0 + next_octave;
+        break;
+    case 111:
+        midi_num = 1 + next_octave;
+        break;
+    case 108:
+        midi_num = 2 + next_octave;
+        break;
+        // default:
+        //    midi_num = -1;
     }
     return midi_num;
 }
@@ -701,4 +701,9 @@ float lin_terp(float x1, float x2, float y1, float y2, float x)
     float result = dx * y2 + (1 - dx) * y1;
 
     return result;
+}
+
+void print_midi_event(int midi_num)
+{
+    printf("tick: %d midi: %d\n", b->quart_note_tick % 32, midi_num);
 }

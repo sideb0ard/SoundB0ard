@@ -20,29 +20,22 @@ void filter_setup(filter *f)
     f->global_modmatrix = NULL;
     f->m_mod_source_fc = DEST_NONE;
     f->m_mod_source_fc_control = DEST_NONE;
-
 }
 
-//void filter_set_fc_control(filter *f, double val)
+// void filter_set_fc_control(filter *f, double val)
 //{
 //    if (val > FILTER_FC_MIN && val < FILTER_FC_MAX) {
 //        f->m_fc_control = val;
 //    }
 //}
 
-void filter_set_fc_mod(filter *f, double val)
-{
-    f->m_fc_mod = val;
-}
+void filter_set_fc_mod(filter *f, double val) { f->m_fc_mod = val; }
 
-void filter_set_q_control(filter *f, double val)
-{
-    f->m_q_control = val;
-}
+void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
 
 void filter_update(filter *f)
 {
-    //filter_set_q_control(f, f->m_q_control);
+    // filter_set_q_control(f, f->m_q_control);
     // printf("ORIG:FC: %f\n", self->m_fc);
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);
     if (f->m_fc > FILTER_FC_MAX)
@@ -53,5 +46,5 @@ void filter_update(filter *f)
 
 void filter_reset(filter *f)
 {
-    (void) f; // noop
+    (void)f; // noop
 }

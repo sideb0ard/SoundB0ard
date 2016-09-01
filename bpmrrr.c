@@ -22,7 +22,7 @@ bpmrrr *new_bpmrrr()
 
     b->bpm = DEFAULT_BPM;
     b->cur_tick = 0;
-    b->tick = 0; // MY NEW ONE
+    // b->tick = 0; // MY NEW ONE
     b->quart_note_tick = 0;
     b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
 
@@ -37,9 +37,9 @@ void bpm_change(bpmrrr *b, int bpm)
     }
 }
 
-void bpm_inc_tick(bpmrrr *b) { b->tick++; }
-
-int bpm_get_tick(bpmrrr *b) { return b->tick; }
+// void bpm_inc_tick(bpmrrr *b) { b->tick++; }
+//
+// int bpm_get_tick(bpmrrr *b) { return b->tick; }
 
 void bpm_info(bpmrrr *b)
 {
@@ -59,9 +59,10 @@ void *bpm_run(void *bp)
         struct timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = b->sleeptime;
-        if (b->cur_tick % QUART_TICK == 0)
+        if (b->cur_tick % QUART_TICK == 0) {
             b->quart_note_tick++;
-        // printf("TICK %d\n", b->cur_tick);
+            // printf("QTIC %d\n", b->quart_note_tick);
+        }
         nanosleep(&ts, NULL);
     }
 }

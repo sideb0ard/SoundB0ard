@@ -71,7 +71,7 @@ double qb_do_sawtooth(oscillator *self, double modulo, double dInc)
     // --- or do PolyBLEP
     // out = dTrivialSaw + doPolyBLEP_2(modulo,
     //								  abs(dInc),/*
-    //abs(dInc)
+    // abs(dInc)
     // is
     // for
     // FM

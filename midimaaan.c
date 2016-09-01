@@ -95,6 +95,7 @@ void *midiman()
 void midinoteon(unsigned int midinote, int velocity)
 {
     (void)velocity;
+    print_midi_event(midinote);
     nanosynth *ns =
         (nanosynth *)
             mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
@@ -138,11 +139,12 @@ void midipitchbend(int data1, int data2)
     }
 }
 
- void midicontrol(int data1, int data2)
+void midicontrol(int data1, int data2)
 {
     printf("MIDI Mind Control! %d %d\n", data1, data2);
-    nanosynth *ns = (nanosynth
-    *)mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+    nanosynth *ns =
+        (nanosynth *)
+            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     double scaley_val;
     switch (data1) {
     case 1: // K1 - Envelope Attack Time Msec
@@ -184,5 +186,5 @@ void midipitchbend(int data1, int data2)
     default:
         printf("SOMthing else\n");
     }
-    //nanosynth_update(ns);
+    // nanosynth_update(ns);
 }

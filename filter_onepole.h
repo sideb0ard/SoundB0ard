@@ -25,5 +25,4 @@ void onepole_update(filter *f);
 void onepole_set_feedback(filter_onepole *f, double fb);
 double onepole_get_feedback_output(filter_onepole *f);
 void onepole_reset(filter *f);
-void onepole_set_filter_type(filter *f,
-                             filter_type ftype); // ENUM in filter.h
+void onepole_set_filter_type(filter *f, filter_type ftype); // ENUM in filter.h

@@ -56,3 +56,4 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
                  double points_per_side, bool interpolate);
 
 float lin_terp(float x1, float x2, float y1, float y2, float x);
+void print_midi_event(int midi_num);

@@ -4,8 +4,8 @@
 typedef struct melody_event {
     int tick;
     unsigned midi_num;
-    //double freq;
-    //char note[4];
+    // double freq;
+    // char note[4];
 } melody_event;
 
 typedef struct melody_loop {
