@@ -159,15 +159,15 @@ void *play_melody_loop(void *p)
 
     printf("PLAY melody starting..\n");
 
-    int loop_started = 0;
-    while (!loop_started) {
-        pthread_mutex_lock(&bpm_lock);
-        pthread_cond_wait(&bpm_cond, &bpm_lock);
-        pthread_mutex_unlock(&bpm_lock);
-        if (b->cur_tick % TICK_SIZE == 0) {
-            loop_started = 1;
-        }
-    }
+    //int loop_started = 0;
+    //while (!loop_started) {
+    //    pthread_mutex_lock(&bpm_lock);
+    //    pthread_cond_wait(&bpm_cond, &bpm_lock);
+    //    pthread_mutex_unlock(&bpm_lock);
+    //    if (b->cur_tick % TICK_SIZE == 0) {
+    //        loop_started = 1;
+    //    }
+    //}
 
     // nanosynth *ns = (nanosynth *)mixr->sound_generators[mloop->sig_num];
 

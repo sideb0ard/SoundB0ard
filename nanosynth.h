@@ -17,12 +17,11 @@ typedef struct nanosynth {
     int melody_loop_num;
     int melody_loop_cur;
 
-    envelope_generator *eg1;
-
     oscillator *osc1;
     oscillator *osc2;
     oscillator *lfo;
 
+    envelope_generator *eg1;
     // FILTER_CSEM *filter;
     // FILTER_ONEPOLE *filter;
     filter *f;
@@ -61,9 +60,14 @@ typedef struct nanosynth {
     bool m_reset_to_zero;
     unsigned m_legato_mode;
 
+    // "gui" controls for Filter
+    double m_fc_control;
+    double m_q_control;
+
     // "gui" controls for DCA
     double m_pan_control;
     double m_volume_db;
+
 
 } nanosynth;
 

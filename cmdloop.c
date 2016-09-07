@@ -16,6 +16,7 @@
 #include "envelope.h"
 #include "help.h"
 #include "keys.h"
+#include "midimaaan.h"
 #include "mixer.h"
 #include "nanosynth.h"
 #include "sampler.h"
@@ -68,6 +69,15 @@ void interpret(char *line)
         else if (strcmp(trim_tok, "nanosynth") == 0 ||
                  strcmp(trim_tok, "ns") == 0) {
             add_nanosynth(mixr);
+        }
+        else if (strcmp(trim_tok, "midi") == 0) {
+            //// run the MIDI event looprrr...
+            pthread_t midi_th;
+            if (pthread_create(&midi_th, NULL, midiman, NULL)) {
+                fprintf(stderr, "Errrr, wit tha midi..\n");
+                return ;
+            }
+            pthread_detach(midi_th);
         }
         else if (strcmp(trim_tok, "ls") == 0) {
             list_sample_dir();

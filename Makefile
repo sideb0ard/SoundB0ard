@@ -12,8 +12,9 @@ SRC = audioutils.c \
       envelope_generator.c \
       filter.c \
       filter_ckthreefive.c \
-      filter_sem.c \
+      filter_moogladder.c \
       filter_onepole.c \
+      filter_sem.c \
       help.c \
       keys.c \
       lfo.c \

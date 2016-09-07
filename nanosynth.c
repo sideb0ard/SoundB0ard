@@ -6,6 +6,7 @@
 #include "filter_ckthreefive.h"
 #include "filter_onepole.h"
 #include "filter_sem.h"
+#include "filter_moogladder.h"
 #include "lfo.h"
 #include "midi_freq_table.h"
 #include "nanosynth.h"
@@ -33,7 +34,8 @@ nanosynth *new_nanosynth()
 
     // ns->f = (filter *) new_filter_onepole();
     // ns->f = (filter *) new_filter_sem();
-    ns->f = (filter *)new_filter_ck35();
+    //ns->f = (filter *)new_filter_ck35();
+    ns->f = (filter *)new_filter_moog();
 
     ns->dca = new_dca();
 
@@ -213,7 +215,6 @@ double nanosynth_gennext(void *self)
         double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
         double biased_eg = 0.0;
         double eg_out = eg_generate(ns->eg1, &biased_eg);
-        // double eg_out = eg_generate(ns->eg1, NULL);
 
         double eg_osc_mod =
             ns->m_eg1_osc_intensity * OSC_FO_MOD_RANGE * biased_eg;
@@ -298,4 +299,9 @@ void nanosynth_update(nanosynth *self)
     dca_set_pan_control(self->dca, self->m_volume_db);
     dca_set_amplitude_db(self->dca, self->m_volume_db);
     dca_update(self->dca);
+
+    self->f->m_fc_control = self->m_fc_control;
+    self->f->m_q_control = self->m_q_control;
+
+    filter_update(self->f);
 }
