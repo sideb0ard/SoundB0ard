@@ -222,10 +222,10 @@ double nanosynth_gennext(void *self)
         osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
         osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
 
-        if (ns->m_filter_keytrack == ON) {
-            ns->f->m_fc_control =
-                ns->osc1->m_osc_fo * ns->m_filter_keytrack_intensity;
-        }
+        //if (ns->m_filter_keytrack == ON) {
+        //    ns->f->m_fc_control =
+        //        ns->osc1->m_osc_fo * ns->m_filter_keytrack_intensity;
+        //}
 
         ns->f->set_fc_mod(ns->f, FILTER_FC_MOD_RANGE * eg_out);
         ns->f->update(ns->f);
@@ -241,7 +241,7 @@ double nanosynth_gennext(void *self)
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        // double filter_out = osc_out;
+        //double filter_out = osc_out;
         double filter_out = ns->f->gennext(ns->f, osc_out);
 
         double out_left;

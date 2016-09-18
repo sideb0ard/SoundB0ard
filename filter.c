@@ -36,12 +36,15 @@ void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
 void filter_update(filter *f)
 {
     // filter_set_q_control(f, f->m_q_control);
-    // printf("ORIG:FC: %f\n", self->m_fc);
+    //printf("ORIG:FC: %f\n", f->m_fc);
+    //printf("MY FC_CONTROL: %f\n", f->m_fc_control);
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);
     if (f->m_fc > FILTER_FC_MAX)
         f->m_fc = FILTER_FC_MAX;
     if (f->m_fc < FILTER_FC_MIN)
         f->m_fc = FILTER_FC_MIN;
+    //printf("NOW:FC: %f\n", f->m_fc);
+    //printf("NOW MY FC_CONTROL: %f\n", f->m_fc_control);
 }
 
 void filter_reset(filter *f)

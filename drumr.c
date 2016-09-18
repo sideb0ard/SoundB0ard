@@ -111,7 +111,7 @@ double drum_gennext(void *self)
     double val = 0;
 
     int cur_pattern_part =
-        1 << (b->quart_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
+        1 << (b->sixteenth_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
     int conv_part = conv_bitz(
         cur_pattern_part); // convert to an integer we can use as index below
 
@@ -121,7 +121,7 @@ double drum_gennext(void *self)
             !drumr->sample_positions[conv_part].played) {
 
             if (drumr->swing) {
-                if (b->quart_note_tick % 2) {
+                if (b->sixteenth_note_tick % 2) {
                     if (b->cur_tick % QUART_TICK == drumr->swing_setting) {
                         drumr->sample_positions[conv_part].playing = 1;
                         drumr->sample_positions[conv_part].played = 1;
@@ -160,14 +160,15 @@ double drum_gennext(void *self)
     // if (val > 1 || val < -1)
     //    printf("BURNIE - DRUM OVERLOAD!\n");
     //
-    if (b->quart_note_tick != drumr->tick) {
+    if (b->sixteenth_note_tick != drumr->tick) {
         int prev_note = conv_part - 1;
         if (prev_note == -1)
             prev_note = 15;
 
         drumr->sample_positions[prev_note].played = 0;
-        drumr->tick = b->quart_note_tick;
+        drumr->tick = b->sixteenth_note_tick;
 
+        // if (drumr->tick % 16 == 0) {
         if (drumr->tick % 16 == 0) {
             drumr->cur_pattern_num =
                 (drumr->cur_pattern_num + 1) % drumr->num_patterns;
@@ -238,22 +239,23 @@ void *randdrum_run(void *m)
         drum_num, looplen);
     int changed = 0;
 
-    while (1) {
-        if (b->cur_tick % (TICKS_PER_BAR * looplen) == 0) {
-            if (!changed) {
-                changed = 1;
-                int pattern = rand() % 65535; // max for an unsigned int
-                // printf("My rand num %d\n", pattern);
-                update_pattern(mixr->sound_generators[drum_num], pattern);
-            }
-        }
-        else {
-            changed = 0;
-        }
-        pthread_mutex_lock(&bpm_lock);
-        pthread_cond_wait(&bpm_cond, &bpm_lock);
-        pthread_mutex_unlock(&bpm_lock);
-    }
+    // while (1) {
+    //     if (b->cur_tick % (TICKS_PER_BAR * looplen) == 0) {
+    //         if (!changed) {
+    //             changed = 1;
+    //             int pattern = rand() % 65535; // max for an unsigned int
+    //             // printf("My rand num %d\n", pattern);
+    //             update_pattern(mixr->sound_generators[drum_num], pattern);
+    //         }
+    //     }
+    //     else {
+    //         changed = 0;
+    //     }
+    //     pthread_mutex_lock(&bpm_lock);
+    //     pthread_cond_wait(&bpm_cond, &bpm_lock);
+    //     pthread_mutex_unlock(&bpm_lock);
+    // }
+    return (void *) NULL;
 }
 
 void add_pattern(void *self, char *pattern)

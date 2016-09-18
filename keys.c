@@ -121,7 +121,7 @@ void keys(int soundgen_num)
                     note_on(ns, midi_num);
                     if ( recording ) {
                         printf("noted.");
-                        pattern_loop[b->quart_note_tick % 32] = midi_num;
+                        pattern_loop[b->sixteenth_note_tick % 32] = midi_num;
                     }
                 }
             }
@@ -177,7 +177,7 @@ void *play_melody_loop(void *p)
             int note_played = 0;
             for (int i = 0; i < mloop->size; i++) {
                 while (!note_played) {
-                    if (b->quart_note_tick % 32 == mloop->melody[i]->tick) {
+                    if (b->sixteenth_note_tick % 32 == mloop->melody[i]->tick) {
                         // printf("playing %f\n", mloop->melody[i]->freq);
                         note_on(ns, mloop->melody[i]->midi_num);
                         note_played = 1;

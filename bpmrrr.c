@@ -22,9 +22,9 @@ bpmrrr *new_bpmrrr()
 
     b->bpm = DEFAULT_BPM;
     b->cur_tick = 0;
-    // b->tick = 0; // MY NEW ONE
-    b->quart_note_tick = 0;
-    b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
+    b->sixteenth_note_tick = 0;
+    //b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
+    b->sleeptime = (60.0 / (b->bpm * PPQN)) * 1000000000;
 
     return b;
 }
@@ -33,7 +33,8 @@ void bpm_change(bpmrrr *b, int bpm)
 {
     if (bpm > 60) { // my sleeptime calculation would break if this was under 60
         b->bpm = bpm;
-        b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
+        //b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
+        b->sleeptime = (60.0 / (b->bpm * PPQN)) * 1000000000;
     }
 }
 
@@ -59,9 +60,9 @@ void *bpm_run(void *bp)
         struct timespec ts;
         ts.tv_sec = 0;
         ts.tv_nsec = b->sleeptime;
-        if (b->cur_tick % QUART_TICK == 0) {
-            b->quart_note_tick++;
-            // printf("QTIC %d\n", b->quart_note_tick);
+        if (b->cur_tick % (PPQN/4) == 0) {
+            b->sixteenth_note_tick++; // for drum machine resolution
+            //printf("QTIC %d\n", b->quart_note_tick);
         }
         nanosleep(&ts, NULL);
     }

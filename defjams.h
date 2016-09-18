@@ -12,10 +12,13 @@
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 
 //#define TICKS_PER_BEAT 960 // standard for MIDI
-#define TICKS_PER_BAR 32 // ignore this
-#define TICKS_PER_BEAT (TICKS_PER_BAR / 4)
+// #define TICKS_PER_BAR 32 // ignore this
+// #define TICKS_PER_BEAT (TICKS_PER_BAR / 4)
 //
 #define TICK_SIZE 64 // this is per BAR
+
+#define PPQN 768 // Pulses Per Quarter Note
+
 #define QUART_TICK (TICK_SIZE / 4)
 
 #define DRUM_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar

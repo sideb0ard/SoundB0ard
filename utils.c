@@ -705,7 +705,7 @@ float lin_terp(float x1, float x2, float y1, float y2, float x)
 
 void print_midi_event(int midi_num)
 {
-    printf("tick: %d midi: %d\n", b->quart_note_tick % 32, midi_num);
+    printf("tick: %d midi: %d\n", b->sixteenth_note_tick % 32, midi_num);
 }
 
 float fasttan (float x)
