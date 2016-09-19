@@ -47,6 +47,4 @@ int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info);
 double drum_gennext(void *self);
 double drum_getvol(void *self);
 
-void *randdrum_run(void *m);
-
 #endif // DRUM_H

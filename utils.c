@@ -96,12 +96,6 @@ void thrunner(SBMSG *msg)
             return;
         }
     }
-    else if (strcmp(msg->cmd, "randdrum") == 0) {
-        if (pthread_create(&pthrrrd, NULL, randdrum_run, msg)) {
-            fprintf(stderr, "Err, running RANDRUND phrrread..\n");
-            return;
-        }
-    }
     else if (strcmp(msg->cmd, "duckrrr") == 0) {
         if (pthread_create(&pthrrrd, NULL, duck_runrrr, msg)) {
             fprintf(stderr, "Err, running phrrread..\n");

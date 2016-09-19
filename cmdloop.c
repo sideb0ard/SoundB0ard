@@ -143,10 +143,6 @@ void interpret(char *line)
                         sampler_set_incr(mixr->sound_generators[i]);
                     }
                 }
-
-                //} else if (strcmp(cmd, "vol") == 0) {
-                //  printf("VOLLY BALL\n");
-                //  mixer_vol_change(mixr, val);
             }
             else if (is_val_a_valid_sig_num) {
 
@@ -250,10 +246,6 @@ void interpret(char *line)
                     vol_change(mixr, val1, val2);
                     printf("VOL! %s %f %lf\n", cmd_type, val1, val2);
                 }
-                // if (strcmp(cmd_type, "freq") == 0) {
-                //    freq_change(mixr, val1, val2);
-                //    printf("FREQ! %s %lf %lf\n", cmd_type, val1, val2);
-                //}
                 if (strcmp(cmd_type, "sustain") == 0) {
                     printf("SUSTAIN! %s %lf %lf\n", cmd_type, val1, val2);
                     if (mixr->sound_generators[(int)val1]->type ==
@@ -280,23 +272,6 @@ void interpret(char *line)
                            val1, val2);
                     add_delay_soundgen(mixr->sound_generators[(int)val1], val2,
                                        RES);
-                }
-                if (strcmp(cmd_type, "swing") == 0) {
-                    if (mixr->sound_generators[(int)val1]->type == DRUM_TYPE) {
-                        printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type,
-                               val1, val2);
-                        if (val2 < QUART_TICK)
-                            swingrrr(mixr->sound_generators[(int)val1], val2);
-                        else
-                            printf(
-                                "value for swing has to be between 0 and %d\n",
-                                QUART_TICK);
-                    }
-                    else {
-                        printf("SWING CALLED, BUT NO FO DRUM MACHINE! %s %.lf "
-                               "%.lf\n",
-                               cmd_type, val1, val2);
-                    }
                 }
                 if (strcmp(cmd_type, "reverb") == 0) {
                     printf("REVERB CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,

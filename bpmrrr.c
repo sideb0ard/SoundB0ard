@@ -23,7 +23,6 @@ bpmrrr *new_bpmrrr()
     b->bpm = DEFAULT_BPM;
     b->cur_tick = 0;
     b->sixteenth_note_tick = 0;
-    //b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
     b->sleeptime = (60.0 / (b->bpm * PPQN)) * 1000000000;
 
     return b;
@@ -33,7 +32,6 @@ void bpm_change(bpmrrr *b, int bpm)
 {
     if (bpm > 60) { // my sleeptime calculation would break if this was under 60
         b->bpm = bpm;
-        //b->sleeptime = (60.0 / b->bpm / TICK_SIZE) * 1000000000;
         b->sleeptime = (60.0 / (b->bpm * PPQN)) * 1000000000;
     }
 }
