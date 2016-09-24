@@ -27,6 +27,12 @@ typedef struct t_mixer {
     int has_active_nanosynth; // bool
     int active_nanosynth_soundgen_num;
 
+    int bpm; 
+    int samples_per_midi_tick;
+    int sixteenth_note_tick;
+    int cur_sample; // inverse of SAMPLE RATE
+    int tick; //
+
     double volume;
     int keyboard_octave;
 
@@ -43,6 +49,7 @@ typedef struct {
 mixer *new_mixer(void);
 
 void mixer_ps(mixer *mixr);
+void mixer_update_bpm(mixer *mixr, int bpm);
 int add_bitwize(mixer *mixr, int pattern);
 int add_osc(mixer *mixr, double freq, wave_type w);
 int add_nanosynth(mixer *mixr);

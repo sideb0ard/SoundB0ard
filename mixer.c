@@ -1,4 +1,5 @@
 #include <math.h>
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -7,7 +8,6 @@
 #include <portaudio.h>
 
 #include "bitwize.h"
-#include "bpmrrr.h"
 #include "defjams.h"
 #include "drumr.h"
 #include "effect.h"
@@ -18,14 +18,19 @@
 #include "sbmsg.h"
 #include "sound_generator.h"
 
-extern bpmrrr *b;
 extern ENVSTREAM *ampstream;
+extern pthread_mutex_t midi_tick_lock;
+extern pthread_cond_t midi_tick_cond;
 
 mixer *new_mixer()
 {
     mixer *mixr = NULL;
     mixr = calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
+    mixr->bpm = DEFAULT_BPM;
+    mixr->samples_per_midi_tick = (60.0 / DEFAULT_BPM * SAMPLE_RATE) / PPQN; 
+    mixr->tick = 0;
+    mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
     mixr->has_active_nanosynth = 0;
     if (mixr == NULL) {
@@ -47,6 +52,12 @@ void mixer_ps(mixer *mixr)
         mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
         printf("[%d] - %s\n", i, ss);
     }
+}
+
+void mixer_update_bpm(mixer *mixr, int bpm)
+{
+    mixr->bpm = bpm;
+    mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
 }
 
 void delay_toggle(mixer *mixr)
@@ -232,7 +243,17 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer *mixr)
 {
-    // bpm_inc_tick(b); // TODO - maybe do this instead of BPMrrr
+    mixr->cur_sample++; // called once ever SAMPLE_RATE
+    if ( mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
+        pthread_mutex_lock(&midi_tick_lock);
+        mixr->tick++; // 1 PULSE
+        if ( mixr->tick % (PPQN/4) == 0 ) { 
+            mixr->sixteenth_note_tick++; // for drum machine resolution
+            //printf("SIXTEENTH TICK: %d\n", mixr->tick);
+        }
+        pthread_cond_broadcast(&midi_tick_cond);
+        pthread_mutex_unlock(&midi_tick_lock);
+    }
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {

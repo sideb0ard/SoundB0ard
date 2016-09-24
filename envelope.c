@@ -1,13 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "bpmrrr.h"
 #include "defjams.h"
 #include "envelope.h"
 #include "mixer.h"
 
 extern mixer *mixr;
-extern bpmrrr *b;
 
 static void _env_updatepoints(ENVSTREAM *stream)
 {
@@ -28,8 +26,8 @@ static void _env_reset(ENVSTREAM *stream)
 void update_envelope_stream_bpm(ENVSTREAM *stream)
 {
     // 100 is for percent - time of envelope is measured as percent of loop len
-    stream->incr = 100.0 / (60.0 / (b->bpm) * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
-    printf("called me - BPM IS NOW %d\n", b->bpm);
+    stream->incr = 100.0 / (60.0 / (mixr->bpm) * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
+    printf("called me - BPM IS NOW %d\n", mixr->bpm);
 }
 
 ENVELOPE maxpoint(const ENVELOPE *points, long npoints)

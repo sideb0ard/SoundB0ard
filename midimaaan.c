@@ -4,7 +4,6 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "bpmrrr.h"
 #include "defjams.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
@@ -12,7 +11,6 @@
 #include "nanosynth.h"
 #include "utils.h"
 
-extern bpmrrr *b;
 extern mixer *mixr;
 
 void *midiman()

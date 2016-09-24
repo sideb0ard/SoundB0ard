@@ -10,7 +10,6 @@
 #include <readline/readline.h>
 
 #include "audioutils.h"
-#include "bpmrrr.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
@@ -24,7 +23,6 @@
 #include "utils.h"
 
 extern mixer *mixr;
-extern bpmrrr *b;
 
 extern wtable *wave_tables[5];
 
@@ -43,7 +41,6 @@ void loopy(void)
 void ps()
 {
     mixer_ps(mixr);
-    bpm_info(b);
 }
 
 int exxit()
@@ -132,7 +129,7 @@ void interpret(char *line)
                 (val >= 0 && val < mixr->soundgen_num) ? 1 : 0;
 
             if (strcmp(cmd, "bpm") == 0) {
-                bpm_change(b, val);
+                mixer_update_bpm(mixr, val);
                 for (int i = 0; i < mixr->soundgen_num; i++) {
                     for (int j = 0;
                          j < mixr->sound_generators[i]->envelopes_num; j++) {

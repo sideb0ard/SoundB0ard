@@ -7,13 +7,14 @@
 #define M_PI (3.14159265358897932)
 #endif
 
-#define DEFAULT_BPM 80
+#define DEFAULT_BPM 60
 
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 
 #define DEFAULT_ARRAY_SIZE 4
 
-#define PPQN 768 // Pulses Per Quarter Note
+// #define PPQN 768 // Pulses Per Quarter Note
+#define PPQN 384 // Pulses Per Quarter Note
 
 #define DRUM_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
 

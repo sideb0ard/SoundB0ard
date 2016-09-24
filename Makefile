@@ -3,7 +3,6 @@ CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototyp
 
 SRC = audioutils.c \
       bitwize.c \
-      bpmrrr.c \
       cmdloop.c \
       dca.c \
       drumr.c \

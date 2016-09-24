@@ -8,18 +8,14 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "bpmrrr.h"
 #include "defjams.h"
 #include "keys.h"
 #include "mixer.h"
 #include "utils.h"
 
 extern mixer *mixr;
-extern bpmrrr *b;
-extern int kernelq; // for timers
-
-extern pthread_cond_t bpm_cond;
-extern pthread_mutex_t bpm_lock;
+extern pthread_cond_t midi_tick_cond;
+extern pthread_mutex_t midi_tick_lock;
 
 melody_loop *new_melody_loop()
 {
@@ -121,7 +117,7 @@ void keys(int soundgen_num)
                     note_on(ns, midi_num);
                     if ( recording ) {
                         printf("noted.");
-                        pattern_loop[b->sixteenth_note_tick % 32] = midi_num;
+                        pattern_loop[mixr->sixteenth_note_tick % 32] = midi_num;
                     }
                 }
             }
@@ -161,9 +157,9 @@ void *play_melody_loop(void *p)
 
     //int loop_started = 0;
     //while (!loop_started) {
-    //    pthread_mutex_lock(&bpm_lock);
-    //    pthread_cond_wait(&bpm_cond, &bpm_lock);
-    //    pthread_mutex_unlock(&bpm_lock);
+    //    pthread_mutex_lock(&midi_tick_lock);
+    //    pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
+    //    pthread_mutex_unlock(&midi_tick_lock);
     //    if (b->cur_tick % TICK_SIZE == 0) {
     //        loop_started = 1;
     //    }
@@ -177,7 +173,7 @@ void *play_melody_loop(void *p)
             int note_played = 0;
             for (int i = 0; i < mloop->size; i++) {
                 while (!note_played) {
-                    if (b->sixteenth_note_tick % 32 == mloop->melody[i]->tick) {
+                    if (mixr->sixteenth_note_tick % 32 == mloop->melody[i]->tick) {
                         // printf("playing %f\n", mloop->melody[i]->freq);
                         note_on(ns, mloop->melody[i]->midi_num);
                         note_played = 1;
@@ -185,9 +181,9 @@ void *play_melody_loop(void *p)
                             notes_played_time[mloop->melody[i]->tick] = 1;
                     }
 
-                    pthread_mutex_lock(&bpm_lock);
-                    pthread_cond_wait(&bpm_cond, &bpm_lock);
-                    pthread_mutex_unlock(&bpm_lock);
+                    pthread_mutex_lock(&midi_tick_lock);
+                    pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
+                    pthread_mutex_unlock(&midi_tick_lock);
                     for (int i = 0; i < 32; i++) {
                         if (notes_played_time[i] > 0) {
                             notes_played_time[i]++;

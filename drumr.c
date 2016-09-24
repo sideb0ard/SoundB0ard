@@ -3,17 +3,12 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bpmrrr.h"
 #include "defjams.h"
 #include "drumr.h"
 #include "mixer.h"
 #include "utils.h"
 
-extern bpmrrr *b;
 extern mixer *mixr;
-
-extern pthread_cond_t bpm_cond;
-extern pthread_mutex_t bpm_lock;
 
 void pattern_char_to_int(char *char_pattern, int *final_pattern)
 {
@@ -110,18 +105,33 @@ double drum_gennext(void *self)
     DRUM *drumr = self;
     double val = 0;
 
-    int cur_pattern_part =
-        1 << (b->sixteenth_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
-    int conv_part = conv_bitz(
-        cur_pattern_part); // convert to an integer we can use as index below
+    int cur_pattern_position =
+        1 << (mixr->sixteenth_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
+    int sample_idx = conv_bitz(
+        cur_pattern_position); // convert to an integer we can use as index below
 
-    if (drumr->patterns[drumr->cur_pattern_num] & cur_pattern_part) {
+    if ((drumr->patterns[drumr->cur_pattern_num] & cur_pattern_position) &&
+            !drumr->sample_positions[sample_idx].played) {
 
-        if (!drumr->sample_positions[conv_part].playing &&
-            !drumr->sample_positions[conv_part].played) {
-            drumr->sample_positions[conv_part].playing = 1;
-            drumr->sample_positions[conv_part].played = 1;
-        }
+        //if (!drumr->sample_positions[sample_idx].playing &&
+        //    !drumr->sample_positions[sample_idx].played) {
+
+            //if (drumr->swing) {
+            //    if (b->sixteenth_note_tick % 2) {
+            //        drumr->sample_positions[sample_idx].playing = 1;
+            //        drumr->sample_positions[sample_idx].played = 1;
+            //    } 
+            //    else {
+            //        drumr->sample_positions[sample_idx].playing = 1;
+            //        drumr->sample_positions[sample_idx].played = 1;
+            //    }
+            //}
+            //else {
+                drumr->sample_positions[sample_idx].playing = 1;
+                drumr->sample_positions[sample_idx].played = 1;
+                printf("tick: %d\n", mixr->tick);
+            //}
+        //}
     }
 
     for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
@@ -129,26 +139,22 @@ double drum_gennext(void *self)
             val +=
                 drumr->buffer[drumr->sample_positions[i].position++] /
                 2147483648.0; // convert from 16bit in to double between 0 and 1
-        }
-
-        if ((int)drumr->sample_positions[i].position ==
-            drumr->bufsize) { // end of playback - so reset
-            // printf("End of buf - switching off %d..\n", i);
-            drumr->sample_positions[i].playing = 0;
-            drumr->sample_positions[i].position = 0;
+            if ((int)drumr->sample_positions[i].position ==
+                drumr->bufsize) { // end of playback - so reset
+              // printf("End of buf - switching off %d..\n", i);
+              drumr->sample_positions[i].playing = 0;
+              drumr->sample_positions[i].position = 0;
+            }
         }
     }
 
-    // if (val > 1 || val < -1)
-    //    printf("BURNIE - DRUM OVERLOAD!\n");
-    //
-    if (b->sixteenth_note_tick != drumr->tick) {
-        int prev_note = conv_part - 1;
+    if (mixr->sixteenth_note_tick != drumr->tick) {
+        int prev_note = sample_idx - 1;
         if (prev_note == -1)
             prev_note = 15;
 
         drumr->sample_positions[prev_note].played = 0;
-        drumr->tick = b->sixteenth_note_tick;
+        drumr->tick = mixr->sixteenth_note_tick;
 
         if (drumr->tick % 16 == 0) {
             drumr->cur_pattern_num =
@@ -156,8 +162,8 @@ double drum_gennext(void *self)
         }
     }
 
-    val = effector(&drumr->sound_generator, val);
-    val = envelopor(&drumr->sound_generator, val);
+    // val = effector(&drumr->sound_generator, val);
+    // val = envelopor(&drumr->sound_generator, val);
 
     return val * drumr->vol;
 }

@@ -6,7 +6,6 @@
 #include <sys/types.h>
 
 #include "audioutils.h"
-#include "bpmrrr.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
@@ -14,11 +13,10 @@
 #include "mixer.h"
 
 mixer *mixr;
-bpmrrr *b;
 
-// use broadcast to wake up threads when tick changes in bpm
-pthread_cond_t bpm_cond;
-pthread_mutex_t bpm_lock;
+// use broadcast to wake up threads when midi tick changes
+pthread_cond_t midi_tick_cond;
+pthread_mutex_t midi_tick_lock;
 
 static int paCallback(const void *inputBuffer, void *outputBuffer,
                       unsigned long framesPerBuffer,
@@ -43,17 +41,8 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
 int main()
 {
 
-    pthread_mutex_init(&bpm_lock, NULL);
-    pthread_cond_init(&bpm_cond, NULL);
-
-    // run da BPM counterrr...
-    b = new_bpmrrr();
-    pthread_t bpmrun_th;
-    if (pthread_create(&bpmrun_th, NULL, bpm_run, (void *)b)) {
-        fprintf(stderr, "Error running BPM_run thread\n");
-        return 1;
-    }
-    pthread_detach(bpmrun_th);
+    pthread_mutex_init(&midi_tick_lock, NULL);
+    pthread_cond_init(&midi_tick_cond, NULL);
 
     //// run the MIDI event looprrr...
     pthread_t midi_th;

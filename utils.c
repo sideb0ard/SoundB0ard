@@ -9,13 +9,10 @@
 #include <time.h>
 #include <unistd.h>
 
-#include "algoriddim.h"
-#include "bpmrrr.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "utils.h"
 
-extern bpmrrr *b;
 extern mixer *mixr;
 
 static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
@@ -699,7 +696,7 @@ float lin_terp(float x1, float x2, float y1, float y2, float x)
 
 void print_midi_event(int midi_num)
 {
-    printf("tick: %d midi: %d\n", b->sixteenth_note_tick % 32, midi_num);
+    printf("tick: %d midi: %d\n", mixr->sixteenth_note_tick % 32, midi_num);
 }
 
 float fasttan (float x)

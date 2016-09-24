@@ -3,11 +3,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bpmrrr.h"
 #include "defjams.h"
 #include "sampler.h"
+#include "mixer.h"
 
-extern bpmrrr *b;
+extern mixer *mixr;
 
 SAMPLER *new_sampler(char *filename, double loop_len)
 {
@@ -68,7 +68,7 @@ void sampler_set_incr(void *self)
 {
     SAMPLER *sampler = self;
     printf("BUFSIZE is %d\n", sampler->bufsize);
-    double incr = sampler->bufsize / (SAMPLE_RATE * (60.0 / b->bpm * 4) /
+    double incr = sampler->bufsize / (SAMPLE_RATE * (60.0 / mixr->bpm * 4) /
                                       sampler->loop_len * sampler->channels);
     printf("INCR is %f\n", incr);
     sampler->incr = incr;
