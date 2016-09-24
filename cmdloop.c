@@ -276,6 +276,12 @@ void interpret(char *line)
                     add_delay_soundgen(mixr->sound_generators[(int)val1], val2,
                                        REVERB);
                 }
+                if (strcmp(cmd_type, "swing") == 0) {
+                    printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
+                           val2);
+                    // TODO: check this is a drum machine
+                    swingrrr(mixr->sound_generators[(int)val1], val2);
+                }
                 if (strcmp(cmd_type, "allpass") == 0) {
                     printf("ALLPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
                            val2);

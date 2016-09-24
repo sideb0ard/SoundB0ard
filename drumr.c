@@ -113,25 +113,52 @@ double drum_gennext(void *self)
     if ((drumr->patterns[drumr->cur_pattern_num] & cur_pattern_position) &&
             !drumr->sample_positions[sample_idx].played) {
 
-        //if (!drumr->sample_positions[sample_idx].playing &&
-        //    !drumr->sample_positions[sample_idx].played) {
-
-            //if (drumr->swing) {
-            //    if (b->sixteenth_note_tick % 2) {
-            //        drumr->sample_positions[sample_idx].playing = 1;
-            //        drumr->sample_positions[sample_idx].played = 1;
-            //    } 
-            //    else {
-            //        drumr->sample_positions[sample_idx].playing = 1;
-            //        drumr->sample_positions[sample_idx].played = 1;
-            //    }
-            //}
-            //else {
+        if (drumr->swing) {
+            if (mixr->sixteenth_note_tick % 2) {
+                int swing_offset = 0;
+                switch (drumr->swing_setting) {
+                    case 1:
+                        swing_offset = (PPQN * 2 / 100.0 * 50) - PPQN;
+                        break;
+                    case 2:
+                        swing_offset = (PPQN * 2 / 100.0 * 54) - PPQN;
+                        break;
+                    case 3:
+                        swing_offset = (PPQN * 2 / 100.0 * 58) - PPQN;
+                        break;
+                    case 4:
+                        swing_offset = (PPQN * 2 / 100.0 * 62) - PPQN;
+                        break;
+                    case 5:
+                        swing_offset = (PPQN * 2 / 100.0 * 66) - PPQN;
+                        break;
+                    case 6:
+                        swing_offset = (PPQN * 2 / 100.0 * 71) - PPQN;
+                        break;
+                    default:
+                        swing_offset = (PPQN * 2 / 100.0 * 50) - PPQN;
+                }
+                // printf("SWIMGT OFFSET %d\n", swing_offset);
+                if (mixr->tick % (PPQN/4) == swing_offset) {
+                    drumr->sample_positions[sample_idx].playing = 1;
+                    drumr->sample_positions[sample_idx].played = 1;
+                    //printf("SWING SWUNG tick: %d\n", mixr->tick);
+                    //printf("SWING SWUNG tick %% (PPQN / 4): %d\n", mixr->tick % (PPQN / 4));
+                }
+            } 
+            else {
                 drumr->sample_positions[sample_idx].playing = 1;
                 drumr->sample_positions[sample_idx].played = 1;
-                //printf("tick: %d\n", mixr->tick);
-            //}
-        //}
+                //printf("SWING NORM tick: %d\n", mixr->tick);
+                //printf("SWUNG NORM tick %% (PPQN / 4): %d\n", mixr->tick % (PPQN / 4));
+            }
+        }
+        else {
+          drumr->sample_positions[sample_idx].playing = 1;
+          drumr->sample_positions[sample_idx].played = 1;
+          //printf("tick: %d\n", mixr->tick);
+          //printf("tick %% (PPQN / 4): %d\n", mixr->tick % (PPQN / 4));
+        }
     }
 
     for (int i = 0; i < DRUM_PATTERN_LEN; i++) {

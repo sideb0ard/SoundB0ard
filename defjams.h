@@ -13,8 +13,8 @@
 
 #define DEFAULT_ARRAY_SIZE 4
 
-// #define PPQN 768 // Pulses Per Quarter Note
-#define PPQN 384 // Pulses Per Quarter Note
+#define PPQN 768 // Pulses Per Quarter Note
+// #define PPQN 384 // Pulses Per Quarter Note
 
 #define DRUM_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
 
