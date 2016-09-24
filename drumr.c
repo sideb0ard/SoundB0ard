@@ -129,7 +129,7 @@ double drum_gennext(void *self)
             //else {
                 drumr->sample_positions[sample_idx].playing = 1;
                 drumr->sample_positions[sample_idx].played = 1;
-                printf("tick: %d\n", mixr->tick);
+                //printf("tick: %d\n", mixr->tick);
             //}
         //}
     }
@@ -162,8 +162,8 @@ double drum_gennext(void *self)
         }
     }
 
-    // val = effector(&drumr->sound_generator, val);
-    // val = envelopor(&drumr->sound_generator, val);
+    val = effector(&drumr->sound_generator, val);
+    val = envelopor(&drumr->sound_generator, val);
 
     return val * drumr->vol;
 }
