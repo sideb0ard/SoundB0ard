@@ -1,3 +1,4 @@
+#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -9,6 +10,7 @@
 #include "filter_moogladder.h"
 #include "lfo.h"
 #include "midi_freq_table.h"
+#include "mixer.h"
 #include "nanosynth.h"
 #include "qblimited_oscillator.h"
 #include "table.h"
@@ -16,6 +18,7 @@
 #include "wt_oscillator.h"
 
 extern wtable *wave_tables[5];
+extern mixer *mixr;
 
 nanosynth *new_nanosynth()
 {
@@ -38,6 +41,11 @@ nanosynth *new_nanosynth()
     ns->f = (filter *)new_filter_moog();
 
     ns->dca = new_dca();
+
+    // experimental - may break:
+    melody_loop *l;
+    l = (melody_loop *)calloc(1, sizeof(melody_loop));
+    ns->mloops[ns->melody_loop_num++] = l;
 
     ns->m_modmatrix = new_modmatrix();
 
@@ -125,6 +133,12 @@ nanosynth *new_nanosynth()
     ns->sound_generator.getvol = &nanosynth_getvol;
     ns->sound_generator.type = NANOSYNTH_TYPE;
 
+    pthread_t melody_looprrr;
+    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
+        fprintf(stderr, "Err running loop\n");
+    } else {
+        pthread_detach(melody_looprrr);
+    }
     return ns;
 }
 
@@ -204,7 +218,19 @@ void note_on(nanosynth *self, int midi_num)
 
     self->lfo->start_oscillator(self->lfo);
     start_eg(self->eg1);
+
 }
+
+void nanosynth_add_note(nanosynth *self, int midi_num)
+{
+    if (self->recording) {
+        printf("NOTE RECORDED\n");
+        melody_event *me = make_melody_event(mixr->sixteenth_note_tick % 32, midi_num);
+        add_melody_event(self->mloops[0], me);
+        // add recording event
+    }
+}
+
 
 double nanosynth_gennext(void *self)
 {
@@ -254,8 +280,14 @@ double nanosynth_gennext(void *self)
         //    ns->lfo->stop_oscillator(ns->lfo);
         //    stop_eg(ns->eg1);
         //}
+        //
 
-        return out_left * ns->vol;
+        double val = out_left * ns->vol;
+        val = effector(&ns->sound_generator, val);
+        val = envelopor(&ns->sound_generator, val);
+
+        return val;
+
     }
     else {
         return 0.0;

@@ -98,6 +98,9 @@ void midinoteon(unsigned int midinote, int velocity)
         (nanosynth *)
             mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     note_on(ns, midinote);
+    if (ns->recording) {
+        nanosynth_add_note(ns, midinote);
+    }
 }
 
 void midinoteoff(unsigned int midinote, int velocity)

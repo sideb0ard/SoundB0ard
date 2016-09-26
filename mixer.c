@@ -82,13 +82,6 @@ void vol_change(mixer *mixr, int sg, float vol)
     mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
 }
 
-// void freq_change(mixer *mixr, int sg, float freq)
-//{
-//    // TODO: safety check for OSC
-//    OSCIL *osc = (OSCIL *)mixr->sound_generators[sg];
-//    osc->freqadj(osc, freq);
-//}
-
 int add_effect(mixer *mixr)
 {
     printf("Booya, adding a new effect!\n");
@@ -240,16 +233,17 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
     m->sound_generator = (SOUNDGEN *)nsampler;
     return add_sound_generator(mixr, m);
 }
+
+
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer *mixr)
 {
-    mixr->cur_sample++; // called once ever SAMPLE_RATE
+    mixr->cur_sample++; // called once ever SAMPLE_RATE -> the basis of my clock
     if ( mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
         pthread_mutex_lock(&midi_tick_lock);
-        mixr->tick++; // 1 PULSE
+        mixr->tick++; // 1 midi tick (or pulse)
         if ( mixr->tick % (PPQN/4) == 0 ) { 
             mixr->sixteenth_note_tick++; // for drum machine resolution
-            //printf("SIXTEENTH TICK: %d\n", mixr->tick);
         }
         pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
@@ -257,9 +251,30 @@ double gen_next(mixer *mixr)
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {
+        double sg_vals[mixr->soundgen_num];
         for (int i = 0; i < mixr->soundgen_num; i++) {
-            output_val +=
+            sg_vals[i] =
                 mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
+        }
+        for (int i = 0; i < mixr->soundgen_num; i++) {
+            if (mixr->sound_generators[i]->sidechain_on) {
+                    double mod_val = 1 - fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]) ;
+                        //* mixr->sound_generators[i]->sidechain_amount;
+                    // printf("MOd val %f\n", mod_val);
+                    if (mod_val != 0) {
+                        //printf("before %f / after %f\n", sg_vals[i], sg_vals[i] * mod_val);
+                        output_val += (sg_vals[i] * mod_val);
+                    }
+                    else {
+                        output_val += sg_vals[i];
+                    }
+                    // printf("ABS %f\n", 0.01 * fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]));
+                // (sg_vals[mixr->sound_generators[i]->sidechain_input] 
+                // * mixr->sound_generators[i]->sidechain_amount);
+            }
+            else {
+                output_val += sg_vals[i];
+            }
         }
     }
 

@@ -30,6 +30,8 @@ typedef struct nanosynth {
     int cur_octave;
     int sustain; // in ticks TODO: make better!
 
+    bool recording;
+
     bool note_on;
     bool m_filter_keytrack;
 
@@ -85,3 +87,4 @@ void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);
 void nanosynth_add_melody_loop(void *self, melody_loop *mloop);
 void nanosynth_update(nanosynth *self);
+void nanosynth_add_note(nanosynth *self, int midi_num);

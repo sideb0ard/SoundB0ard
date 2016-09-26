@@ -139,7 +139,7 @@ double drum_gennext(void *self)
                     default:
                         swing_offset = swing_offset * 50 - PPQN;
                 }
-                if (mixr->tick % (PPQN/4) == (int)swing_offset/2) {
+                if (mixr->tick % (PPQN/4) == (int)swing_offset/4) {
                     drumr->sample_positions[sample_idx].playing = 1;
                     drumr->sample_positions[sample_idx].played = 1;
                     //printf("SWING SWUNG tick %% PPQN: %d\n", mixr->tick % PPQN);

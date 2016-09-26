@@ -42,10 +42,6 @@ void keys(int soundgen_num)
     int ch = 0;
     int quit = 0;
 
-    int recording = 0;
-    int pattern_loop[32] = {0};
-    // int recording_started = 0;
-
     struct pollfd fdz[1];
     int pollret;
 
@@ -75,28 +71,6 @@ void keys(int soundgen_num)
                 printf("Up an octave...\n");
                 change_octave(ns, UP);
                 break;
-            case 114:
-                printf("Now recording.\n");
-                recording = 1 - recording;
-                if ( !recording ) // i.e. must have just stopped
-                {
-                    melody_loop *mloop = new_melody_loop();
-                    for (int i = 0; i < 32; i++ ) {
-                        if ( pattern_loop[i] != 0 ) {
-                            printf("creating pattern event: [%d] : %d\n", i, pattern_loop[i]);
-                            melody_event *me = make_melody_event(i, pattern_loop[i]);
-                            add_melody_event(mloop, me);
-                        }
-                    }
-                    nanosynth_add_melody_loop(ns, mloop);
-
-                    pthread_t melody_looprrr;
-                    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
-                        fprintf(stderr, "Err running loop\n");
-                    }
-                    pthread_detach(melody_looprrr);
-                }
-                break;
             case 122:
                 printf("Changing WAVE form of synth->osc1\n");
                 nanosynth_change_osc_wave_form(ns, 0);
@@ -115,9 +89,8 @@ void keys(int soundgen_num)
                 if (midi_num != -1) {
                     print_midi_event(midi_num);
                     note_on(ns, midi_num);
-                    if ( recording ) {
-                        printf("noted.");
-                        pattern_loop[mixr->sixteenth_note_tick % 32] = midi_num;
+                    if (ns->recording) {
+                        nanosynth_add_note(ns, midi_num);
                     }
                 }
             }
@@ -155,18 +128,6 @@ void *play_melody_loop(void *p)
 
     printf("PLAY melody starting..\n");
 
-    //int loop_started = 0;
-    //while (!loop_started) {
-    //    pthread_mutex_lock(&midi_tick_lock);
-    //    pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
-    //    pthread_mutex_unlock(&midi_tick_lock);
-    //    if (b->cur_tick % TICK_SIZE == 0) {
-    //        loop_started = 1;
-    //    }
-    //}
-
-    // nanosynth *ns = (nanosynth *)mixr->sound_generators[mloop->sig_num];
-
     while (1) {
         for (int j = 0; j < ns->melody_loop_num; j++) {
             melody_loop *mloop = ns->mloops[j];
@@ -174,7 +135,6 @@ void *play_melody_loop(void *p)
             for (int i = 0; i < mloop->size; i++) {
                 while (!note_played) {
                     if (mixr->sixteenth_note_tick % 32 == mloop->melody[i]->tick) {
-                        // printf("playing %f\n", mloop->melody[i]->freq);
                         note_on(ns, mloop->melody[i]->midi_num);
                         note_played = 1;
                         if (ns->sustain > 0) // switched on
@@ -187,8 +147,6 @@ void *play_melody_loop(void *p)
                     for (int i = 0; i < 32; i++) {
                         if (notes_played_time[i] > 0) {
                             notes_played_time[i]++;
-                            // printf("notes played time %d =  %d\n", i,
-                            // notes_played_time[i]);
                         }
                         if (notes_played_time[i] > ns->sustain) {
                             notes_played_time[i] = 0;

@@ -197,7 +197,7 @@ void interpret(char *line)
 
         regmatch_t sxmatch[3];
         regex_t sx_rx;
-        regcomp(&sx_rx, "^(distort|decimate) ([[:digit:].]+)$",
+        regcomp(&sx_rx, "^(distort|decimate|rec) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sx_rx, trim_tok, 2, sxmatch, 0) == 0) {
             double val = 0;
@@ -210,6 +210,12 @@ void interpret(char *line)
                     printf("DISTORTTTTTTT!\n");
                     add_distortion_soundgen(mixr->sound_generators[(int)val]);
                 }
+                else if ((strncmp(cmd_type, "rec", 4) == 0)) {
+                    printf("Toggling REC for %d\n", (int)val);
+                    // TODO :check its a nanosynth
+                    nanosynth *ns = (nanosynth *) mixr->sound_generators[(int)val];
+                    ns->recording = 1 - ns->recording;
+                }
                 else {
                     printf("DECIMATE!\n");
                     add_decimator_soundgen(mixr->sound_generators[(int)val]);
@@ -219,6 +225,22 @@ void interpret(char *line)
                 printf("Cmonbuddy, playdagem, eh? Only valid signal nums "
                        "allowed\n");
             }
+        }
+
+        regmatch_t sc_match[5];
+        regex_t sc_rx;
+        //regcomp(&sc_rx, "^(sidechain) ([[:digit:].]+) ([[:digit:].]+) ([[:digit:].]+)$",
+        regcomp(&sc_rx, "^(sidechain) ([[:digit:]]) ([[:digit:]]) ([[:digit:]]+)$",
+                REG_EXTENDED | REG_ICASE);
+        if (regexec(&sc_rx, trim_tok, 4, sc_match, 0) == 0) {
+            int val1, val2, val3;
+            char cmd_type[10];
+            sscanf(trim_tok, "%s %d %d %d", cmd_type, &val1, &val2, &val3);
+            printf("SIDECHAIN! %d %d %d\n", val1, val2, val3);
+            // TODO: test signal num etc.
+            mixr->sound_generators[val1]->sidechain_on = true;
+            mixr->sound_generators[val1]->sidechain_input = val2;
+            mixr->sound_generators[val1]->sidechain_amount = val3 / 100.0;
         }
 
         regmatch_t tpmatch[4];
