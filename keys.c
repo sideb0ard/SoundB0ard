@@ -71,6 +71,10 @@ void keys(int soundgen_num)
                 printf("Up an octave...\n");
                 change_octave(ns, UP);
                 break;
+            case 114:
+                printf("Switching on REC\n");
+                ns->recording = true;
+                break;
             case 122:
                 printf("Changing WAVE form of synth->osc1\n");
                 nanosynth_change_osc_wave_form(ns, 0);
