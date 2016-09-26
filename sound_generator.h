@@ -37,7 +37,7 @@ int add_delay_soundgen(SOUNDGEN *self, float duration, effect_type e_type);
 int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type);
 float effector(SOUNDGEN *self, float val);
 
-int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type);
+int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e);
 float envelopor(SOUNDGEN *self, float val);
 
 #endif // SOUNDGEN_H

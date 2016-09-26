@@ -125,6 +125,12 @@ void interpret(char *line)
             int is_val_a_valid_sig_num =
                 (val >= 0 && val < mixr->soundgen_num) ? 1 : 0;
 
+            if (strcmp(cmd, "vol") == 0) {
+                if (val >= 0 && val <= 1) {
+                    mixr->volume = val;
+                }
+            }
+
             if (strcmp(cmd, "bpm") == 0) {
                 mixer_update_bpm(mixr, val);
                 for (int i = 0; i < mixr->soundgen_num; i++) {
@@ -232,8 +238,6 @@ void interpret(char *line)
 
         regmatch_t sc_match[5];
         regex_t sc_rx;
-        // regcomp(&sc_rx, "^(sidechain) ([[:digit:].]+) ([[:digit:].]+)
-        // ([[:digit:].]+)$",
         regcomp(&sc_rx,
                 "^(sidechain) ([[:digit:]]) ([[:digit:]]) ([[:digit:]]+)$",
                 REG_EXTENDED | REG_ICASE);
@@ -242,10 +246,16 @@ void interpret(char *line)
             char cmd_type[10];
             sscanf(trim_tok, "%s %d %d %d", cmd_type, &val1, &val2, &val3);
             printf("SIDECHAIN! %d %d %d\n", val1, val2, val3);
-            // TODO: test signal num etc.
-            mixr->sound_generators[val1]->sidechain_on = true;
-            mixr->sound_generators[val1]->sidechain_input = val2;
-            mixr->sound_generators[val1]->sidechain_amount = val3 / 100.0;
+            if (mixr->sound_generators[val2]->type == DRUM_TYPE) {
+                DRUM *d = (DRUM *) mixr->sound_generators[val2];
+                int pat_array[16];
+                int_pattern_to_array(d->patterns[d->cur_pattern_num], pat_array);
+                for (int i = 0; i < 16; i++) {
+                    printf("%d ", pat_array[i]);
+                }
+                ENVSTREAM *e = new_sidechain_stream(pat_array);
+                add_envelope_soundgen(mixr->sound_generators[(int)val1], e);
+            }
         }
 
         regmatch_t tpmatch[4];
@@ -494,8 +504,8 @@ void interpret(char *line)
                 // val2);
                 if (val3 >= 0 && val3 < 4) {
                     printf("Calling env with %lf %lf %lf\n", val1, val2, val3);
-                    add_envelope_soundgen(mixr->sound_generators[(int)val1],
-                                          val2, val3);
+                    ENVSTREAM *e = new_envelope_stream(val2, val3);
+                    add_envelope_soundgen(mixr->sound_generators[(int)val1], e);
                 }
                 else {
                     printf("Sorry, envelope type has to be between 0 and 3");

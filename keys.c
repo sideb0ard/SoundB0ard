@@ -99,7 +99,6 @@ void keys(int soundgen_num)
     tcsetattr(0, TCSANOW, &old_info);
 }
 
-// melody_event* make_melody_event(double freq, int sg_num, int tick)
 melody_event *make_melody_event(int tick, unsigned midi_num)
 {
     melody_event *me;
@@ -175,9 +174,6 @@ melody_loop *mloop_from_pattern(char *pattern)
         int midi_num;
         sscanf(tok, "%d:%d", &tick, &midi_num);
 
-        // i need to get midi number for ch_freq^
-        // int midi_num = notelookup(note) + 12*octave;
-        // double freq = freqval(ch_freq);
         if (midi_num != -1) {
             melody_event *me = make_melody_event(tick, midi_num);
             add_melody_event(mloop, me);
@@ -189,7 +185,6 @@ melody_loop *mloop_from_pattern(char *pattern)
 void keys_start_melody_player(int sig_num, char *pattern)
 {
 
-    // melody_loop *mloop = new_melody_loop(sig_num);
     melody_loop *mloop = mloop_from_pattern(pattern);
 
     printf("KEYS START MELODY!\n");

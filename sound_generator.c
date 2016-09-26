@@ -221,7 +221,8 @@ float effector(SOUNDGEN *self, float val)
     return val;
 }
 
-int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type)
+// int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type)
+int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
 {
     printf("Booya, adding a new envelope to SOUNDGEN!\n");
     ENVSTREAM **new_envelopes = NULL;
@@ -244,11 +245,12 @@ int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type)
         }
     }
 
-    ENVSTREAM *e = new_envelope_stream(env_len, type);
-    if (e == NULL) {
-        perror("Couldn't create envelope");
-        return -1;
-    }
+    // ENVSTREAM *e = new_envelope_stream(env_len, type);
+    // if (e == NULL) {
+    //     perror("Couldn't create envelope");
+    //     return -1;
+    // }
+    //
     self->envelopes[self->envelopes_num] = e;
     self->envelopes_on = 1;
     printf("done adding envelope\n");

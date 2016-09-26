@@ -10,6 +10,18 @@
 
 extern mixer *mixr;
 
+void int_pattern_to_array(int pattern, int *pat_array)
+{
+    for (int i = 0, p = 1; p < 65535; i++, p*=2 ) {
+        if ( pattern & p ) {
+            pat_array[i] = 1;
+        }
+        else {
+            pat_array[i] = 0;
+        }
+    }
+}
+
 void pattern_char_to_int(char *char_pattern, int *final_pattern)
 {
     int sp_count = 0;

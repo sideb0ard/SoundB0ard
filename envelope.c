@@ -109,6 +109,32 @@ ENVELOPE *new_fadeout_points()
     return points;
 }
 
+ENVSTREAM *new_sidechain_stream(int *pattern)
+{
+    ENVSTREAM *stream = (ENVSTREAM *)calloc(1, sizeof(ENVSTREAM));
+    if (stream == NULL)
+        return NULL;
+
+    ENVELOPE *points = NULL;
+    points = (ENVELOPE *) calloc(16, sizeof(ENVELOPE));
+    if (points == NULL)
+        return NULL;
+    for ( int i = 0, t = 0; i < 16; i++, t += 6.25 ) {
+        points[i].time = t;
+        if ( pattern[i] ) {
+            points[i].value = 0.0;
+        }
+        else {
+            points[i].value = 1.0;
+        }
+    }
+    stream->points = points;
+    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE);
+    _env_reset(stream);
+
+    return stream;
+}
+
 ENVELOPE *new_wavey_points()
 {
 
@@ -168,7 +194,7 @@ ENVSTREAM *new_envelope_stream(int env_len,
 
     // unsigned long npoints = 4;
     stream->points = points;
-    stream->incr = 100.0 / (60.0 / DEFAULT_BPM * SAMPLE_RATE * env_len * 4);
+    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * env_len * 4);
 
     _env_reset(stream);
 

@@ -41,6 +41,7 @@ void update_pattern(void *self, int newpattern);
 void add_pattern(void *self, char *pattern);
 void swingrrr(void *self, int swing_setting);
 
+void int_pattern_to_array(int pattern, int *pat_array);
 void pattern_char_to_int(char *chpattern, int *pattern);
 int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info);
 

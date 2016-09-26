@@ -42,7 +42,6 @@ nanosynth *new_nanosynth()
 
     ns->dca = new_dca();
 
-    // experimental - may break:
     melody_loop *l;
     l = (melody_loop *)calloc(1, sizeof(melody_loop));
     ns->mloops[ns->melody_loop_num++] = l;
@@ -133,6 +132,7 @@ nanosynth *new_nanosynth()
     ns->sound_generator.getvol = &nanosynth_getvol;
     ns->sound_generator.type = NANOSYNTH_TYPE;
 
+    // start loop player running
     pthread_t melody_looprrr;
     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
         fprintf(stderr, "Err running loop\n");
@@ -140,6 +140,7 @@ nanosynth *new_nanosynth()
     else {
         pthread_detach(melody_looprrr);
     }
+
     return ns;
 }
 
