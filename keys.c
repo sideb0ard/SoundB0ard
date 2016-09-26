@@ -134,7 +134,8 @@ void *play_melody_loop(void *p)
             int note_played = 0;
             for (int i = 0; i < mloop->size; i++) {
                 while (!note_played) {
-                    if (mixr->sixteenth_note_tick % 32 == mloop->melody[i]->tick) {
+                    if (mixr->sixteenth_note_tick % 32 ==
+                        mloop->melody[i]->tick) {
                         note_on(ns, mloop->melody[i]->midi_num);
                         note_played = 1;
                         if (ns->sustain > 0) // switched on

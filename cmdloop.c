@@ -38,10 +38,7 @@ void loopy(void)
     }
 }
 
-void ps()
-{
-    mixer_ps(mixr);
-}
+void ps() { mixer_ps(mixr); }
 
 int exxit()
 {
@@ -72,7 +69,7 @@ void interpret(char *line)
             pthread_t midi_th;
             if (pthread_create(&midi_th, NULL, midiman, NULL)) {
                 fprintf(stderr, "Errrr, wit tha midi..\n");
-                return ;
+                return;
             }
             pthread_detach(midi_th);
         }
@@ -211,10 +208,16 @@ void interpret(char *line)
                     add_distortion_soundgen(mixr->sound_generators[(int)val]);
                 }
                 else if ((strncmp(cmd_type, "rec", 4) == 0)) {
-                    printf("Toggling REC for %d\n", (int)val);
-                    // TODO :check its a nanosynth
-                    nanosynth *ns = (nanosynth *) mixr->sound_generators[(int)val];
-                    ns->recording = 1 - ns->recording;
+                    if (mixr->sound_generators[(int)val]->type !=
+                        NANOSYNTH_TYPE) {
+                        printf("Beat it, ya chancer\n");
+                    }
+                    else {
+                        printf("Toggling REC for %d\n", (int)val);
+                        nanosynth *ns =
+                            (nanosynth *)mixr->sound_generators[(int)val];
+                        ns->recording = 1 - ns->recording;
+                    }
                 }
                 else {
                     printf("DECIMATE!\n");
@@ -229,8 +232,10 @@ void interpret(char *line)
 
         regmatch_t sc_match[5];
         regex_t sc_rx;
-        //regcomp(&sc_rx, "^(sidechain) ([[:digit:].]+) ([[:digit:].]+) ([[:digit:].]+)$",
-        regcomp(&sc_rx, "^(sidechain) ([[:digit:]]) ([[:digit:]]) ([[:digit:]]+)$",
+        // regcomp(&sc_rx, "^(sidechain) ([[:digit:].]+) ([[:digit:].]+)
+        // ([[:digit:].]+)$",
+        regcomp(&sc_rx,
+                "^(sidechain) ([[:digit:]]) ([[:digit:]]) ([[:digit:]]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sc_rx, trim_tok, 4, sc_match, 0) == 0) {
             int val1, val2, val3;
@@ -299,10 +304,14 @@ void interpret(char *line)
                                        REVERB);
                 }
                 if (strcmp(cmd_type, "swing") == 0) {
-                    printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
-                           val2);
-                    // TODO: check this is a drum machine
-                    swingrrr(mixr->sound_generators[(int)val1], val2);
+                    if (mixr->sound_generators[(int)val1]->type != DRUM_TYPE) {
+                        printf("Beat it, ya chancer\n");
+                    }
+                    else {
+                        printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type,
+                               val1, val2);
+                        swingrrr(mixr->sound_generators[(int)val1], val2);
+                    }
                 }
                 if (strcmp(cmd_type, "allpass") == 0) {
                     printf("ALLPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,

@@ -7,7 +7,7 @@
 #define M_PI (3.14159265358897932)
 #endif
 
-#define DEFAULT_BPM 60
+#define DEFAULT_BPM 80
 
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 

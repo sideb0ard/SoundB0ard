@@ -4,8 +4,8 @@
 #include <string.h>
 
 #include "defjams.h"
-#include "sampler.h"
 #include "mixer.h"
+#include "sampler.h"
 
 extern mixer *mixr;
 

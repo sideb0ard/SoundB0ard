@@ -70,7 +70,6 @@ typedef struct nanosynth {
     double m_pan_control;
     double m_volume_db;
 
-
 } nanosynth;
 
 nanosynth *new_nanosynth(void);

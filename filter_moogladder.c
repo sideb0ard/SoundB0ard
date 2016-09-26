@@ -67,36 +67,63 @@ void moog_update(filter *f)
     moog->m_LPF3.m_alpha = G;
     moog->m_LPF4.m_alpha = G;
 
-    moog->m_LPF1.m_beta = G*G*G/(1.0 + g);
-    moog->m_LPF2.m_beta = G*G/(1.0 + g);
-    moog->m_LPF3.m_beta = G/(1.0 + g);
-    moog->m_LPF4.m_beta = 1.0/(1.0 + g);
+    moog->m_LPF1.m_beta = G * G * G / (1.0 + g);
+    moog->m_LPF2.m_beta = G * G / (1.0 + g);
+    moog->m_LPF3.m_beta = G / (1.0 + g);
+    moog->m_LPF4.m_beta = 1.0 / (1.0 + g);
 
-    moog->m_gamma  = G*G*G*G;
+    moog->m_gamma = G * G * G * G;
     moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * G + moog->m_k * G * G);
 
-    switch(moog->f.m_type)
-    {
+    switch (moog->f.m_type) {
     case LPF4:
-    moog->m_a = 0.0; moog->m_b = 0.0; moog->m_c = 0.0; moog->m_d = 0.0; moog->m_e = 1.0;
-    break;
+        moog->m_a = 0.0;
+        moog->m_b = 0.0;
+        moog->m_c = 0.0;
+        moog->m_d = 0.0;
+        moog->m_e = 1.0;
+        break;
     case LPF2:
-    moog->m_a = 0.0; moog->m_b = 0.0; moog->m_c = 1.0; moog->m_d = 0.0; moog->m_e = 0.0;
-    break;
+        moog->m_a = 0.0;
+        moog->m_b = 0.0;
+        moog->m_c = 1.0;
+        moog->m_d = 0.0;
+        moog->m_e = 0.0;
+        break;
     case BPF4:
-    moog->m_a = 0.0; moog->m_b = 0.0; moog->m_c = 4.0; moog->m_d = -8.0; moog->m_e = 4.0;
-    break;
+        moog->m_a = 0.0;
+        moog->m_b = 0.0;
+        moog->m_c = 4.0;
+        moog->m_d = -8.0;
+        moog->m_e = 4.0;
+        break;
     case BPF2:
-    moog->m_a = 0.0; moog->m_b = 2.0; moog->m_c = -2.0; moog->m_d = 0.0; moog->m_e = 0.0;
-    break;
+        moog->m_a = 0.0;
+        moog->m_b = 2.0;
+        moog->m_c = -2.0;
+        moog->m_d = 0.0;
+        moog->m_e = 0.0;
+        break;
     case HPF4:
-    moog->m_a = 1.0; moog->m_b = -4.0; moog->m_c = 6.0; moog->m_d = -4.0; moog->m_e = -1.0;
-    break;
+        moog->m_a = 1.0;
+        moog->m_b = -4.0;
+        moog->m_c = 6.0;
+        moog->m_d = -4.0;
+        moog->m_e = -1.0;
+        break;
     case HPF2:
-    moog->m_a = 1.0; moog->m_b = -2.0; moog->m_c = 1.0; moog->m_d = 0.0; moog->m_e = 0.0;
-    break;
+        moog->m_a = 1.0;
+        moog->m_b = -2.0;
+        moog->m_c = 1.0;
+        moog->m_d = 0.0;
+        moog->m_e = 0.0;
+        break;
     default:
-    moog->m_a = 0.0; moog->m_b = 0.0; moog->m_c = 0.0; moog->m_d = 0.0; moog->m_e = 1.0;
+        moog->m_a = 0.0;
+        moog->m_b = 0.0;
+        moog->m_c = 0.0;
+        moog->m_d = 0.0;
+        moog->m_e = 1.0;
     }
 }
 
@@ -120,11 +147,11 @@ double moog_gennext(filter *f, double xn)
                    onepole_get_feedback_output(&moog->m_LPF3) +
                    onepole_get_feedback_output(&moog->m_LPF4);
 
-    xn *= 1.0 + f->m_aux_control*moog->m_k;
+    xn *= 1.0 + f->m_aux_control * moog->m_k;
 
-    double u = (xn - moog->m_k*sigma)*moog->m_alpha_0;
-    if(f->m_nlp == ON) {
-        u = fasttanh(f->m_saturation*u);
+    double u = (xn - moog->m_k * sigma) * moog->m_alpha_0;
+    if (f->m_nlp == ON) {
+        u = fasttanh(f->m_saturation * u);
     }
 
     double LP1 = onepole_gennext((filter *)&moog->m_LPF1, u);
@@ -132,6 +159,6 @@ double moog_gennext(filter *f, double xn)
     double LP3 = onepole_gennext((filter *)&moog->m_LPF3, u);
     double LP4 = onepole_gennext((filter *)&moog->m_LPF4, u);
 
-    return moog->m_a*u + moog->m_b*LP1 + moog->m_c*LP2 + moog->m_d*LP3 +  moog->m_e*LP4;
-
+    return moog->m_a * u + moog->m_b * LP1 + moog->m_c * LP2 + moog->m_d * LP3 +
+           moog->m_e * LP4;
 }

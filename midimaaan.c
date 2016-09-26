@@ -176,12 +176,12 @@ void midicontrol(int data1, int data2)
         break;
     case 7: // K7 - Filter Frequency Cut
         scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        //printf("FILTER CUTOFF! %f\n", scaley_val);
-        //printf("FC ! %f\n", ns->f->m_fc);
-        //printf("MM FC CONTROL! %f\n", ns->f->m_fc_control);
+        // printf("FILTER CUTOFF! %f\n", scaley_val);
+        // printf("FC ! %f\n", ns->f->m_fc);
+        // printf("MM FC CONTROL! %f\n", ns->f->m_fc_control);
         ns->f->m_fc_control = scaley_val;
-        //printf("POST FC ! %f\n", ns->f->m_fc);
-        //printf("MM POST FC CONTROL! %f\n", ns->f->m_fc_control);
+        // printf("POST FC ! %f\n", ns->f->m_fc);
+        // printf("MM POST FC CONTROL! %f\n", ns->f->m_fc_control);
         break;
     case 8: // K8 - Filter Q control
         scaley_val = scaleybum(0, 128, 1, 10, data2);

@@ -27,11 +27,11 @@ typedef struct t_mixer {
     int has_active_nanosynth; // bool
     int active_nanosynth_soundgen_num;
 
-    int bpm; 
+    int bpm;
     int samples_per_midi_tick;
     int sixteenth_note_tick;
     int cur_sample; // inverse of SAMPLE RATE
-    int tick; //
+    int tick;       //
 
     double volume;
     int keyboard_octave;

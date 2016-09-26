@@ -699,13 +699,10 @@ void print_midi_event(int midi_num)
     printf("tick: %d midi: %d\n", mixr->sixteenth_note_tick % 32, midi_num);
 }
 
-float fasttan (float x)
+float fasttan(float x)
 {
     static const float halfpi = 1.5707963267948966f;
-    return sin (x) / sin (x + halfpi);
+    return sin(x) / sin(x + halfpi);
 }
 
-float fasttanh (float p)
-{
-    return p/(fabs(2*p)+3/(2+2*p*2*p));
-}
+float fasttanh(float p) { return p / (fabs(2 * p) + 3 / (2 + 2 * p * 2 * p)); }

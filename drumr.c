@@ -107,53 +107,54 @@ double drum_gennext(void *self)
 
     int cur_pattern_position =
         1 << (mixr->sixteenth_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
-    int sample_idx = conv_bitz(
-        cur_pattern_position); // convert to an integer we can use as index below
-
+    int sample_idx = conv_bitz(cur_pattern_position); // convert to an integer
+                                                      // we can use as index
+                                                      // below
 
     if ((drumr->patterns[drumr->cur_pattern_num] & cur_pattern_position) &&
-            !drumr->sample_positions[sample_idx].played) {
+        !drumr->sample_positions[sample_idx].played) {
 
         if (drumr->swing) {
             if (mixr->sixteenth_note_tick % 2) {
                 double swing_offset = PPQN * 2 / 100.0;
                 switch (drumr->swing_setting) {
-                    case 1:
-                        swing_offset = swing_offset * 50 - PPQN;
-                        break;
-                    case 2:
-                        swing_offset = swing_offset * 54 - PPQN;
-                        break;
-                    case 3:
-                        swing_offset = swing_offset * 58 - PPQN;
-                        break;
-                    case 4:
-                        swing_offset = swing_offset * 62 - PPQN;
-                        break;
-                    case 5:
-                        swing_offset = swing_offset * 66 - PPQN;
-                        break;
-                    case 6:
-                        swing_offset = swing_offset * 71 - PPQN;
-                        break;
-                    default:
-                        swing_offset = swing_offset * 50 - PPQN;
+                case 1:
+                    swing_offset = swing_offset * 50 - PPQN;
+                    break;
+                case 2:
+                    swing_offset = swing_offset * 54 - PPQN;
+                    break;
+                case 3:
+                    swing_offset = swing_offset * 58 - PPQN;
+                    break;
+                case 4:
+                    swing_offset = swing_offset * 62 - PPQN;
+                    break;
+                case 5:
+                    swing_offset = swing_offset * 66 - PPQN;
+                    break;
+                case 6:
+                    swing_offset = swing_offset * 71 - PPQN;
+                    break;
+                default:
+                    swing_offset = swing_offset * 50 - PPQN;
                 }
-                if (mixr->tick % (PPQN/4) == (int)swing_offset/4) {
+                if (mixr->tick % (PPQN / 4) == (int)swing_offset / 4) {
                     drumr->sample_positions[sample_idx].playing = 1;
                     drumr->sample_positions[sample_idx].played = 1;
-                    //printf("SWING SWUNG tick %% PPQN: %d\n", mixr->tick % PPQN);
+                    // printf("SWING SWUNG tick %% PPQN: %d\n", mixr->tick %
+                    // PPQN);
                 }
-            } 
+            }
             else {
                 drumr->sample_positions[sample_idx].playing = 1;
                 drumr->sample_positions[sample_idx].played = 1;
-                //printf("SWING NORM tick %% PPQN: %d\n", mixr->tick % PPQN);
+                // printf("SWING NORM tick %% PPQN: %d\n", mixr->tick % PPQN);
             }
         }
         else {
-          drumr->sample_positions[sample_idx].playing = 1;
-          drumr->sample_positions[sample_idx].played = 1;
+            drumr->sample_positions[sample_idx].playing = 1;
+            drumr->sample_positions[sample_idx].played = 1;
         }
     }
 
@@ -164,8 +165,8 @@ double drum_gennext(void *self)
                 2147483648.0; // convert from 16bit in to double between 0 and 1
             if ((int)drumr->sample_positions[i].position ==
                 drumr->bufsize) { // end of playback - so reset
-              drumr->sample_positions[i].playing = 0;
-              drumr->sample_positions[i].position = 0;
+                drumr->sample_positions[i].playing = 0;
+                drumr->sample_positions[i].position = 0;
             }
         }
     }

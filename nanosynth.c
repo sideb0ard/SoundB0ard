@@ -5,9 +5,9 @@
 
 #include "defjams.h"
 #include "filter_ckthreefive.h"
+#include "filter_moogladder.h"
 #include "filter_onepole.h"
 #include "filter_sem.h"
-#include "filter_moogladder.h"
 #include "lfo.h"
 #include "midi_freq_table.h"
 #include "mixer.h"
@@ -37,7 +37,7 @@ nanosynth *new_nanosynth()
 
     // ns->f = (filter *) new_filter_onepole();
     // ns->f = (filter *) new_filter_sem();
-    //ns->f = (filter *)new_filter_ck35();
+    // ns->f = (filter *)new_filter_ck35();
     ns->f = (filter *)new_filter_moog();
 
     ns->dca = new_dca();
@@ -136,7 +136,8 @@ nanosynth *new_nanosynth()
     pthread_t melody_looprrr;
     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
         fprintf(stderr, "Err running loop\n");
-    } else {
+    }
+    else {
         pthread_detach(melody_looprrr);
     }
     return ns;
@@ -218,19 +219,18 @@ void note_on(nanosynth *self, int midi_num)
 
     self->lfo->start_oscillator(self->lfo);
     start_eg(self->eg1);
-
 }
 
 void nanosynth_add_note(nanosynth *self, int midi_num)
 {
     if (self->recording) {
         printf("NOTE RECORDED\n");
-        melody_event *me = make_melody_event(mixr->sixteenth_note_tick % 32, midi_num);
+        melody_event *me =
+            make_melody_event(mixr->sixteenth_note_tick % 32, midi_num);
         add_melody_event(self->mloops[0], me);
         // add recording event
     }
 }
-
 
 double nanosynth_gennext(void *self)
 {
@@ -248,7 +248,7 @@ double nanosynth_gennext(void *self)
         osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
         osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
 
-        //if (ns->m_filter_keytrack == ON) {
+        // if (ns->m_filter_keytrack == ON) {
         //    ns->f->m_fc_control =
         //        ns->osc1->m_osc_fo * ns->m_filter_keytrack_intensity;
         //}
@@ -267,7 +267,7 @@ double nanosynth_gennext(void *self)
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        //double filter_out = osc_out;
+        // double filter_out = osc_out;
         double filter_out = ns->f->gennext(ns->f, osc_out);
 
         double out_left;
@@ -287,7 +287,6 @@ double nanosynth_gennext(void *self)
         val = envelopor(&ns->sound_generator, val);
 
         return val;
-
     }
     else {
         return 0.0;

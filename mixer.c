@@ -28,7 +28,7 @@ mixer *new_mixer()
     mixr = calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
     mixr->bpm = DEFAULT_BPM;
-    mixr->samples_per_midi_tick = (60.0 / DEFAULT_BPM * SAMPLE_RATE) / PPQN; 
+    mixr->samples_per_midi_tick = (60.0 / DEFAULT_BPM * SAMPLE_RATE) / PPQN;
     mixr->tick = 0;
     mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
@@ -42,9 +42,10 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(ANSI_COLOR_WHITE "::::: Mixing Desk (Volume: %f) (Delay On: %d) "
-                            ":::::\n" ANSI_COLOR_RESET,
-           mixr->volume, mixr->delay_on);
+    printf(ANSI_COLOR_WHITE
+           "::::: Mixing Desk (Volume: %f // BPM: %d) (Delay On: %d) "
+           ":::::\n" ANSI_COLOR_RESET,
+           mixr->volume, mixr->bpm, mixr->delay_on);
     printf(ANSI_COLOR_GREEN "::::: effects: %d :::::\n" ANSI_COLOR_RESET,
            mixr->effects_num);
     for (int i = 0; i < mixr->soundgen_num; i++) {
@@ -234,15 +235,14 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
     return add_sound_generator(mixr, m);
 }
 
-
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer *mixr)
 {
     mixr->cur_sample++; // called once ever SAMPLE_RATE -> the basis of my clock
-    if ( mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
+    if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
         pthread_mutex_lock(&midi_tick_lock);
         mixr->tick++; // 1 midi tick (or pulse)
-        if ( mixr->tick % (PPQN/4) == 0 ) { 
+        if (mixr->tick % (PPQN / 4) == 0) {
             mixr->sixteenth_note_tick++; // for drum machine resolution
         }
         pthread_cond_broadcast(&midi_tick_cond);
@@ -258,18 +258,22 @@ double gen_next(mixer *mixr)
         }
         for (int i = 0; i < mixr->soundgen_num; i++) {
             if (mixr->sound_generators[i]->sidechain_on) {
-                    double mod_val = 1 - fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]) ;
-                        //* mixr->sound_generators[i]->sidechain_amount;
-                    // printf("MOd val %f\n", mod_val);
-                    if (mod_val != 0) {
-                        //printf("before %f / after %f\n", sg_vals[i], sg_vals[i] * mod_val);
-                        output_val += (sg_vals[i] * mod_val);
-                    }
-                    else {
-                        output_val += sg_vals[i];
-                    }
-                    // printf("ABS %f\n", 0.01 * fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]));
-                // (sg_vals[mixr->sound_generators[i]->sidechain_input] 
+                double mod_val =
+                    1 -
+                    fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]);
+                //* mixr->sound_generators[i]->sidechain_amount;
+                // printf("MOd val %f\n", mod_val);
+                if (mod_val != 0) {
+                    // printf("before %f / after %f\n", sg_vals[i], sg_vals[i] *
+                    // mod_val);
+                    output_val += (sg_vals[i] * mod_val);
+                }
+                else {
+                    output_val += sg_vals[i];
+                }
+                // printf("ABS %f\n", 0.01 *
+                // fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]));
+                // (sg_vals[mixr->sound_generators[i]->sidechain_input]
                 // * mixr->sound_generators[i]->sidechain_amount);
             }
             else {
