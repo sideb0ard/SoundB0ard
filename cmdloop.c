@@ -200,7 +200,7 @@ void interpret(char *line)
 
         regmatch_t sxmatch[3];
         regex_t sx_rx;
-        regcomp(&sx_rx, "^(distort|decimate|rec) ([[:digit:].]+)$",
+        regcomp(&sx_rx, "^(distort|decimate|rec|env) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sx_rx, trim_tok, 2, sxmatch, 0) == 0) {
             double val = 0;
@@ -224,6 +224,11 @@ void interpret(char *line)
                             (nanosynth *)mixr->sound_generators[(int)val];
                         ns->recording = 1 - ns->recording;
                     }
+                }
+                else if ((strncmp(cmd_type, "env", 4) == 0)) {
+                        printf("Toggling ENV for %d\n", (int)val);
+                        mixr->sound_generators[(int)val]->envelopes_enabled =
+                            1 - mixr->sound_generators[(int)val]->envelopes_enabled;
                 }
                 else {
                     printf("DECIMATE!\n");
@@ -253,7 +258,7 @@ void interpret(char *line)
                 for (int i = 0; i < 16; i++) {
                     printf("%d ", pat_array[i]);
                 }
-                ENVSTREAM *e = new_sidechain_stream(pat_array);
+                ENVSTREAM *e = new_sidechain_stream(pat_array, val3);
                 add_envelope_soundgen(mixr->sound_generators[(int)val1], e);
             }
         }

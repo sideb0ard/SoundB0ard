@@ -15,10 +15,6 @@ typedef struct t_soundgen {
     double (*getvol)(void *self);
     sound_generator_type type;
 
-    bool sidechain_on;
-    int sidechain_input;
-    double sidechain_amount; // percent
-
     int effects_size; // size of array
     int effects_num;  // num of effects
     EFFECT **effects;
@@ -27,7 +23,7 @@ typedef struct t_soundgen {
     int envelopes_size; // size of array
     int envelopes_num;  // num of effects
     ENVSTREAM **envelopes;
-    int envelopes_on; // bool
+    int envelopes_enabled; // bool
 
 } SOUNDGEN;
 

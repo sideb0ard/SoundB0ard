@@ -20,7 +20,7 @@ typedef struct envelope_stream {
 
 ENVELOPE maxpoint(const ENVELOPE *points, long npoints);
 ENVSTREAM *new_envelope_stream(int env_len, int type); // env_len is bars
-ENVSTREAM *new_sidechain_stream(int *pattern);
+ENVSTREAM *new_sidechain_stream(int *pattern, int percent);
 void free_stream(ENVSTREAM *stream);
 double envelope_stream_tick(ENVSTREAM *stream);
 

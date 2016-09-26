@@ -251,34 +251,9 @@ double gen_next(mixer *mixr)
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {
-        double sg_vals[mixr->soundgen_num];
         for (int i = 0; i < mixr->soundgen_num; i++) {
-            sg_vals[i] =
+            output_val +=
                 mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
-        }
-        for (int i = 0; i < mixr->soundgen_num; i++) {
-            if (mixr->sound_generators[i]->sidechain_on) {
-                double mod_val =
-                    1 -
-                    fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]);
-                //* mixr->sound_generators[i]->sidechain_amount;
-                // printf("MOd val %f\n", mod_val);
-                if (mod_val != 0) {
-                    // printf("before %f / after %f\n", sg_vals[i], sg_vals[i] *
-                    // mod_val);
-                    output_val += (sg_vals[i] * mod_val);
-                }
-                else {
-                    output_val += sg_vals[i];
-                }
-                // printf("ABS %f\n", 0.01 *
-                // fabs(sg_vals[mixr->sound_generators[i]->sidechain_input]));
-                // (sg_vals[mixr->sound_generators[i]->sidechain_input]
-                // * mixr->sound_generators[i]->sidechain_amount);
-            }
-            else {
-                output_val += sg_vals[i];
-            }
         }
     }
 

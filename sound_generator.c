@@ -252,7 +252,7 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
     // }
     //
     self->envelopes[self->envelopes_num] = e;
-    self->envelopes_on = 1;
+    self->envelopes_enabled = 1;
     printf("done adding envelope\n");
     return self->envelopes_num++;
 }
@@ -260,7 +260,7 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
 float envelopor(SOUNDGEN *self, float val)
 {
 
-    if (self->envelopes_num > 0) {
+    if (self->envelopes_num > 0 && self->envelopes_enabled) {
         for (int i = 0; i < self->envelopes_num; i++) {
             double mix_env = envelope_stream_tick(self->envelopes[i]);
             if (self->envelopes[i]->started) {
