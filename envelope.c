@@ -139,7 +139,7 @@ ENVSTREAM *new_sidechain_stream(int *pattern, int percent)
     points[17].value = 0.0;
 
     stream->points = points;
-    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * 4);
+    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * 0.5 * 4);
 
     _env_reset(stream);
 

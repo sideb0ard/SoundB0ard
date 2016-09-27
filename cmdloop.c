@@ -200,7 +200,7 @@ void interpret(char *line)
 
         regmatch_t sxmatch[3];
         regex_t sx_rx;
-        regcomp(&sx_rx, "^(distort|decimate|rec|env) ([[:digit:].]+)$",
+        regcomp(&sx_rx, "^(distort|decimate|life|rec|env) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sx_rx, trim_tok, 2, sxmatch, 0) == 0) {
             double val = 0;
@@ -223,6 +223,20 @@ void interpret(char *line)
                         nanosynth *ns =
                             (nanosynth *)mixr->sound_generators[(int)val];
                         ns->recording = 1 - ns->recording;
+                    }
+                }
+                else if ((strncmp(cmd_type, "life", 5) == 0)) {
+                    if (mixr->sound_generators[(int)val]->type !=
+                        DRUM_TYPE) {
+                        printf("Beat it, ya chancer\n");
+                    }
+                    else {
+                        printf("Toggling LIFE for %d\n", (int)val);
+                        DRUM *d =
+                            (DRUM *) mixr->sound_generators[(int)val];
+                        d->game_of_life_on = 1 - d->game_of_life_on;
+                        // printf("LIFE now %d\n", d->game_of_life_on);
+                        // ps();
                     }
                 }
                 else if ((strncmp(cmd_type, "env", 4) == 0)) {

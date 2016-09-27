@@ -2,6 +2,8 @@
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <libgen.h>
 
 #include "defjams.h"
 #include "drumr.h"
@@ -87,6 +89,9 @@ DRUM *new_drumr(char *filename, char *pattern)
     drumr->filename = calloc(1, fslen + 1);
     strncpy(drumr->filename, filename, fslen);
 
+    memset(drumr->matrix1, 0, sizeof drumr->matrix1);
+    memset(drumr->matrix2, 0, sizeof drumr->matrix2);
+
     drumr->buffer = buffer;
     drumr->bufsize = bufsize;
     drumr->samplerate = sf_info.samplerate;
@@ -103,13 +108,100 @@ DRUM *new_drumr(char *filename, char *pattern)
     return drumr;
 }
 
-void update_pattern(void *self, int newpattern)
+// game of life algo helpers
+void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])
 {
-    DRUM *drumr = self;
-    drumr->pattern = newpattern;
+    int row = 0;
+    for ( int i =0, p=1; i < INTEGER_LENGTH; i++, p*=2) {
 
-    // TODO: do i need to free old pattern too?
+        if ( i != 0 && ( i % GRIDWIDTH == 0))
+            row++;
+
+        int col = i % GRIDWIDTH;
+        //printf("POS %d %d\n", row, col);
+        if ( pattern & p ) {
+            matrix[row][col] = 1;
+        }
+    }
 }
+
+int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
+{
+    int return_pattern = 0;
+
+    int row = 0;
+    for ( int i =0, p=1; i < DRUM_PATTERN_LEN; i++, p*=2) {
+
+        if ( i != 0 && ( i % GRIDWIDTH == 0))
+            row++;
+        int col = i % GRIDWIDTH;
+
+        if ( matrix[row][col] == 1 ) {
+            return_pattern = return_pattern | p;
+        }
+    }
+
+    return return_pattern;
+}
+
+// game of life algo
+void next_life_generation(void *d)
+{
+    // printf("NEXT LIFE GEN!\n");
+    DRUM *self = d;
+    memset(self->matrix1, 0, sizeof self->matrix1);
+    memset(self->matrix2, 0, sizeof self->matrix2);
+    int_to_matrix(self->patterns[self->cur_pattern_num], self->matrix1);
+
+    for (int y = 0; y < GRIDWIDTH; y++) {
+        for (int x = 0; x < GRIDWIDTH; x++ ) {
+
+            int neighbors = 0;
+
+            // printf("My co-ords y:%d x:%d\n", y, x);
+            for (int rel_y = y -1; rel_y <= y+1; rel_y++ ) {
+                 for (int rel_x = x -1; rel_x <= x+1; rel_x++ ) {
+                     int n_y = rel_y;
+                     int n_x = rel_x;
+                     if ( n_y < 0 ) n_y += GRIDWIDTH;
+                     if ( n_y == GRIDWIDTH) n_y -= GRIDWIDTH;
+                     if ( n_x < 0 ) n_x += GRIDWIDTH;
+                     if ( n_x == GRIDWIDTH) n_x -= GRIDWIDTH;
+                     if (!(n_x == x && n_y == y)) {
+                          //printf("My neighbs y:%d x:%d val - %d\n", n_y, n_x);
+                         if (self->matrix1[n_y][n_x] == 1)
+                             neighbors += 1;
+                     }
+                 }
+            }
+            //printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
+
+            // the RULES
+            if (self->matrix1[y][x] == 0 && neighbors == 3)
+                self->matrix2[y][x] = 1;
+
+            if (self->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
+                self->matrix2[y][x] = 1;
+
+            if (self->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
+                self->matrix2[y][x] = 0;
+        }
+    }
+    // matrix_print(4, matrix2);
+
+    // int return_pattern = matrix_to_int(self->matrix2);
+    int new_pattern = matrix_to_int(self->matrix2);
+    // printf("NEW PATTERN! %d\n", new_pattern);
+    if (new_pattern == 0) new_pattern = seed_pattern();
+    self->patterns[self->cur_pattern_num] = new_pattern;
+
+}
+
+// void update_pattern(void *self, int newpattern)
+// {
+//     DRUM *drumr = self;
+//     drumr->pattern = newpattern;
+// }
 
 double drum_gennext(void *self)
 // void drum_gennext(void* self, double* frame_vals, int framesPerBuffer)
@@ -194,6 +286,19 @@ double drum_gennext(void *self)
         if (drumr->tick % 16 == 0) {
             drumr->cur_pattern_num =
                 (drumr->cur_pattern_num + 1) % drumr->num_patterns;
+
+            // printf("MOD16LIFE CHANGE!\n");
+            // printf("GAMEOFLIFE_SETTING %d", drumr->game_of_life_on);
+            if (drumr->game_of_life_on) {
+                // printf("LIFE CHANGE!\n");
+                next_life_generation(drumr);
+                if (drumr->game_generation++ > 4) {
+                    drumr->patterns[drumr->cur_pattern_num] = seed_pattern();
+                    drumr->game_generation = 0;
+                }
+            } else {
+                // printf("NOT ON LIFE\n");
+            }
         }
     }
 
@@ -208,7 +313,7 @@ void drum_status(void *self, char *status_string)
     DRUM *drumr = self;
     char spattern[DRUM_PATTERN_LEN + 1] = "";
     for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
-        if (drumr->pattern & (1 << i)) {
+        if (drumr->patterns[drumr->cur_pattern_num] & (1 << i)) {
             strncat(&spattern[i], "1", 1);
         }
         else {
@@ -217,8 +322,8 @@ void drum_status(void *self, char *status_string)
     }
     spattern[DRUM_PATTERN_LEN] = '\0';
     snprintf(status_string, 119,
-             ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf" ANSI_COLOR_RESET,
-             drumr->filename, spattern, drumr->vol);
+             ANSI_COLOR_CYAN "[%s]\t[%s] vol: %.2lf life_on: %d" ANSI_COLOR_RESET,
+             basename(drumr->filename), spattern, drumr->vol, drumr->game_of_life_on);
 }
 
 double drum_getvol(void *self)
@@ -255,4 +360,17 @@ void add_pattern(void *self, char *pattern)
 {
     DRUM *drumr = self;
     pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
+}
+
+int seed_pattern()
+{
+    int pattern = 0;
+    for ( int i = 0; i < DRUM_PATTERN_LEN; i++) {
+        int randy = rand() % 100;
+        // printf("RANDY %d\n", randy);
+        if ( randy > 50 ) {
+            pattern = pattern | (1 << i);
+        }
+    }
+    return pattern;
 }
