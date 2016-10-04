@@ -39,6 +39,7 @@ void filter_update(filter *f)
     // printf("ORIG:FC: %f\n", f->m_fc);
     // printf("MY FC_CONTROL: %f\n", f->m_fc_control);
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);
+
     if (f->m_fc > FILTER_FC_MAX)
         f->m_fc = FILTER_FC_MAX;
     if (f->m_fc < FILTER_FC_MIN)

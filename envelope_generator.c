@@ -36,6 +36,11 @@ envelope_generator *new_envelope_generator()
     eg->m_mod_dest_eg_output = SOURCE_NONE;
     eg->m_mod_dest_eg_biased_output = SOURCE_NONE;
 
+    eg->m_attack_time_scalar = 1.0;
+    eg->m_decay_time_scalar = 1.0;
+    eg->m_sustain_override = false;
+    eg->m_release_pending = false;
+
     return eg;
 }
 
@@ -88,7 +93,7 @@ void set_eg_mode(envelope_generator *self, eg_mode mode)
 
 void calculate_attack_time(envelope_generator *self)
 {
-    double d_samples = SAMPLE_RATE * ((self->m_attack_time_msec) / 1000.0);
+    double d_samples = SAMPLE_RATE * ((self->m_attack_time_scalar * self->m_attack_time_msec) / 1000.0);
     self->m_attack_coeff =
         exp(-log((1.0 + self->m_attack_tco) / self->m_attack_tco) / d_samples);
     self->m_attack_offset =
@@ -97,7 +102,7 @@ void calculate_attack_time(envelope_generator *self)
 
 void calculate_decay_time(envelope_generator *self)
 {
-    double d_samples = SAMPLE_RATE * ((self->m_decay_time_msec) / 1000.0);
+    double d_samples = SAMPLE_RATE * ((self->m_decay_time_scalar * self->m_decay_time_msec) / 1000.0);
     self->m_decay_coeff =
         exp(-log((1.0 + self->m_decay_tco) / self->m_decay_tco) / d_samples);
     self->m_decay_offset = (self->m_sustain_level - self->m_decay_tco) *
@@ -172,7 +177,7 @@ void stop_eg(envelope_generator *self)
 
 void eg_update(envelope_generator *self)
 {
-    if (!self->global_modmatrix)
+    if (!self->global_modmatrix || !self->m_output_eg)
         return;
 
     // --- with mod matrix, when value is 0 there is NO modulation, so here
@@ -248,9 +253,15 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
         break;
     }
     case RELEASE: {
-        self->m_envelope_output =
-            self->m_release_offset +
-            self->m_envelope_output * self->m_release_coeff;
+        if ( self->m_sustain_override ) {
+            self->m_envelope_output = self->m_sustain_level;
+            break;
+        } else {
+            self->m_envelope_output =
+                self->m_release_offset +
+                self->m_envelope_output * self->m_release_coeff;
+        }
+
         if (self->m_envelope_output <= 0.0 ||
             self->m_release_time_msec <= 0.0) {
             self->m_envelope_output = 0.0;

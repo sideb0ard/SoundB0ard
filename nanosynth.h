@@ -34,15 +34,20 @@ typedef struct nanosynth {
 
     bool note_on;
     bool m_filter_keytrack;
+    bool m_velocity_to_attack_scaling;
+    bool m_note_number_to_decay_scaling;
 
     float vol;
 
     modmatrix *m_modmatrix; // routing structure for sound generation
     // need these for mod matrix
-    double m_default_mod_intensity; // 1.0
     double m_default_mod_range;     // 1.0
-    double m_osc_fq_mod_range;
+    double m_osc_fo_mod_range;
     double m_filter_mod_range;
+    double m_osc_fo_pitchbend_mod_range;
+    double m_amp_mod_range;
+
+    double m_default_mod_intensity; // 1.0
     double m_eg1_dca_intensity;
     double m_eg1_osc_intensity;
     double m_filter_keytrack_intensity;

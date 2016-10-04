@@ -87,6 +87,23 @@ void keys(int soundgen_num)
                 printf("Changing WAVE form of synth->lfo\n");
                 nanosynth_change_osc_wave_form(ns, 2);
                 break;
+            case 118:
+                ns->m_filter_keytrack = 1 - ns->m_filter_keytrack;
+                printf("Key tracking toggle - val is %d!\n",
+                        ns->m_filter_keytrack);
+                break;
+            case 98:
+                printf("Key tracking intensity toggle!\n");
+                if (ns->m_filter_keytrack_intensity == 0.5)
+                    ns->m_filter_keytrack_intensity = 2.0;
+                else if (ns->m_filter_keytrack_intensity == 2.0)
+                    ns->m_filter_keytrack_intensity = 1.0;
+                else
+                    ns->m_filter_keytrack_intensity = 0.5;
+                printf("Key tracking intensity toggle! Val is %f\n",
+                        ns->m_filter_keytrack_intensity);
+                break;
+
             default: // play note
                 printf("default!\n");
                 int midi_num = ch_midi_lookup(ch, ns);

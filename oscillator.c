@@ -33,9 +33,9 @@ void osc_new_settings(oscillator *osc)
     // --- everything is disconnected unless you use mod matrix
     osc->m_mod_source_fo = DEST_NONE;
     osc->m_mod_source_pulse_width = DEST_NONE;
+    osc->m_mod_source_amp = DEST_NONE;
     osc->m_mod_dest_output1 = SOURCE_NONE;
     osc->m_mod_dest_output2 = SOURCE_NONE;
-    osc->m_mod_source_amp = DEST_NONE;
 
     osc->m_note_on = false;
     osc->m_midi_note_number = 0;
@@ -112,20 +112,20 @@ void osc_update(oscillator *self)
     // --- Modulation Matrix
     //
     // --- get from matrix Sources
-    // if (self->g_modmatrix) {
-    //    // --- zero is norm for these
-    //    self->m_fo_mod =
-    //        self->g_modmatrix->m_destinations[self->m_mod_source_fo];
+    if (self->g_modmatrix) {
+        // --- zero is norm for these
+        self->m_fo_mod =
+            self->g_modmatrix->m_destinations[self->m_mod_source_fo];
 
-    //    self->m_pw_mod =
-    //        self->g_modmatrix->m_destinations[self->m_mod_source_pulse_width];
+        self->m_pw_mod =
+            self->g_modmatrix->m_destinations[self->m_mod_source_pulse_width];
 
-    //    // --- amp mod is 0->1
-    //    // --- invert for oscillator output mod
-    //    self->m_amp_mod =
-    //        self->g_modmatrix->m_destinations[self->m_mod_source_amp];
-    //    self->m_amp_mod = 1.0 - self->m_amp_mod;
-    //}
+        // --- amp mod is 0->1
+        // --- invert for oscillator output mod
+        self->m_amp_mod =
+            self->g_modmatrix->m_destinations[self->m_mod_source_amp];
+        self->m_amp_mod = 1.0 - self->m_amp_mod;
+    }
 
     // --- do the  complete frequency mod
     self->m_fo =

@@ -106,5 +106,6 @@ double onepole_gennext(filter *f, double xn)
     else if (f->m_type == HPF1)
         return hpf;
 
-    return xn; // should never get here
+    // should never get here
+    return xn;
 }

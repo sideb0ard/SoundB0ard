@@ -123,8 +123,9 @@ void midipitchbend(int data1, int data2)
         (nanosynth *)
             mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     if (actual_pitch_bent_val != 8192) {
-        // double normalized_pitch_bent_val =
-        //    (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
+        double normalized_pitch_bent_val =
+           (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
+        ns->m_modmatrix->m_sources[SOURCE_PITCHBEND] = normalized_pitch_bent_val;
         // printf("Actzl: %d and norm %f\n", actual_pitch_bent_val,
         //       normalized_pitch_bent_val);
         double scaley_val =
@@ -188,6 +189,8 @@ void midicontrol(int data1, int data2)
         printf("FILTER Q control! %f\n", scaley_val);
         filter_set_q_control(ns->f, scaley_val);
         break;
+    // case VOLUME_CC07:
+    //     ns->m_modmatrix->m_sources[SOURCE_MIDI_VOLUME_CC07] = (unsigned) data1;
     default:
         printf("SOMthing else\n");
     }

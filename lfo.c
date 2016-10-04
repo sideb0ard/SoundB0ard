@@ -180,15 +180,15 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
 
     //// self->m_amplitude & self->m_amp_mod is calculated in update() on base
     //// class
-    // if (self->g_modmatrix) {
-    //    // write our outputs into their destinations
-    //    self->g_modmatrix->m_sources[self->m_mod_dest_output1] =
-    //        out * self->m_amplitude * self->m_amp_mod;
+    if (self->g_modmatrix) {
+        // write our outputs into their destinations
+        self->g_modmatrix->m_sources[self->m_mod_dest_output1] =
+            out * self->m_amplitude * self->m_amp_mod;
 
-    //    // add quad phase/stereo output
-    //    self->g_modmatrix->m_sources[self->m_mod_dest_output2] =
-    //        qp_out * self->m_amplitude * self->m_amp_mod;
-    //}
+        // add quad phase/stereo output
+        self->g_modmatrix->m_sources[self->m_mod_dest_output2] =
+            qp_out * self->m_amplitude * self->m_amp_mod;
+    }
 
     if (quad_phase_output)
         *quad_phase_output = qp_out * self->m_amplitude * self->m_amp_mod;

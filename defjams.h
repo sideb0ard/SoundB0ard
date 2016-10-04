@@ -48,3 +48,4 @@ typedef enum {
 } sound_generator_type;
 
 typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;
+

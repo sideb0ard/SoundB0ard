@@ -48,10 +48,13 @@ nanosynth *new_nanosynth()
 
     ns->m_modmatrix = new_modmatrix();
 
-    ns->m_default_mod_intensity = 1.0;
     ns->m_default_mod_range = 1.0;
-    ns->m_osc_fq_mod_range = OSC_FO_MOD_RANGE;
+    ns->m_osc_fo_mod_range = OSC_FO_MOD_RANGE;
     ns->m_filter_mod_range = FILTER_FC_MOD_RANGE;
+    ns->m_osc_fo_pitchbend_mod_range = OSC_PITCHBEND_MOD_RANGE;
+    ns->m_amp_mod_range = AMP_MOD_RANGE;
+
+    ns->m_default_mod_intensity = 1.0;
     ns->m_eg1_dca_intensity = 1.0;
     ns->m_eg1_osc_intensity = 0.0;
 
@@ -59,12 +62,12 @@ nanosynth *new_nanosynth()
     // LFO -> ALL OSC FO
     row = create_matrix_row(SOURCE_LFO1, DEST_ALL_OSC_FO,
                             &ns->m_default_mod_intensity,
-                            &ns->m_osc_fq_mod_range, TRANSFORM_NONE, true);
+                            &ns->m_osc_fo_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // EG1 -> ALL OSC FO
     row = create_matrix_row(SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
-                            &ns->m_eg1_osc_intensity, &ns->m_osc_fq_mod_range,
+                            &ns->m_eg1_osc_intensity, &ns->m_osc_fo_mod_range,
                             TRANSFORM_NONE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
@@ -86,10 +89,64 @@ nanosynth *new_nanosynth()
                             TRANSFORM_NOTE_NUMBER_TO_FREQUENCY, true);
     add_matrix_row(ns->m_modmatrix, row);
 
+    // VELOCITY -> DCA VEL
+    row = create_matrix_row(SOURCE_VELOCITY, DEST_DCA_VELOCITY,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_default_mod_range,
+                            TRANSFORM_NONE, true);
+    add_matrix_row(ns->m_modmatrix, row);
+
+    // PITCHBEND -> PITCHBEND
+    row = create_matrix_row(SOURCE_PITCHBEND, DEST_ALL_OSC_FO,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_osc_fo_pitchbend_mod_range,
+                            TRANSFORM_NONE, true);
+    add_matrix_row(ns->m_modmatrix, row);
+
+    // MIDI Vol CC07
+    row = create_matrix_row(SOURCE_MIDI_VOLUME_CC07, DEST_DCA_AMP,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_amp_mod_range,
+                            TRANSFORM_INVERT_MIDI_NORMALIZE, true);
+    add_matrix_row(ns->m_modmatrix, row);
+
+    // MIDI Pan CC10
+    row = create_matrix_row(SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_default_mod_range,
+                            TRANSFORM_MIDI_TO_PAN, true);
+    add_matrix_row(ns->m_modmatrix, row);
+
+    // MIDI Sustain Pedal
+    row = create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_default_mod_range,
+                            TRANSFORM_MIDI_SWITCH, true);
+    add_matrix_row(ns->m_modmatrix, row);
+
+    // VELOCITY -> EG ATTACK SOURCE_VELOCITY
+    // 0 velocity -> scalar = 1, normal attack time
+    // 128 velocity -> scalar = 0, fastest (0) attack time:
+    row = create_matrix_row(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_default_mod_range,
+                            TRANSFORM_MIDI_NORMALIZE, false);
+    add_matrix_row(ns->m_modmatrix, row);
+
+    // NOTE NUMBER -> EG DECAY SCALING
+    row = create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_EG_DECAY_SCALING,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_default_mod_range,
+                            TRANSFORM_MIDI_NORMALIZE, false);
+    add_matrix_row(ns->m_modmatrix, row);
+
+    ns->m_modmatrix->m_sources[SOURCE_MIDI_VOLUME_CC07] = 127;
+    ns->m_modmatrix->m_sources[SOURCE_MIDI_PAN_CC10] = 64;
+
     // end mod matrix setup ///////////////////////////////////
     //
     // mod matrix routings ////////////////////////////////////
-
+    
     ns->osc1->g_modmatrix = ns->m_modmatrix;
     ns->osc1->m_mod_source_fo = DEST_OSC1_FO;
     ns->osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
@@ -112,19 +169,22 @@ nanosynth *new_nanosynth()
     ns->eg1->global_modmatrix = ns->m_modmatrix;
     ns->eg1->m_mod_dest_eg_output = SOURCE_EG1;
     ns->eg1->m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
+    ns->eg1->m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
+    ns->eg1->m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
+    ns->eg1->m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
 
     ns->dca->global_modmatrix = ns->m_modmatrix;
     ns->dca->m_mod_source_eg = DEST_DCA_EG;
     ns->dca->m_mod_source_amp_db = DEST_NONE;
-    ns->dca->m_mod_source_velocity = DEST_NONE;
-    ns->dca->m_mod_source_pan = DEST_NONE;
+    ns->dca->m_mod_source_velocity = DEST_DCA_VELOCITY;
+    ns->dca->m_mod_source_pan = DEST_DCA_PAN;
 
     ns->vol = 1.0;
     ns->cur_octave = 4;
     ns->sustain = 0;
 
     ns->m_filter_keytrack = true;
-    ns->m_filter_keytrack_intensity = 1.0;
+    ns->m_filter_keytrack_intensity = 0.5;
 
     ns->sound_generator.gennext = &nanosynth_gennext;
     ns->sound_generator.status = &nanosynth_status;
@@ -140,6 +200,8 @@ nanosynth *new_nanosynth()
     else {
         pthread_detach(melody_looprrr);
     }
+
+    nanosynth_update(ns);
 
     return ns;
 }
@@ -207,19 +269,25 @@ void note_on(nanosynth *self, int midi_num)
 {
     self->osc1->m_midi_note_number = midi_num;
     self->osc1->m_osc_fo = get_midi_freq(midi_num);
-    self->osc1->update_oscillator(self->osc1);
 
     self->osc2->m_midi_note_number = midi_num;
     self->osc2->m_osc_fo = get_midi_freq(midi_num);
-    self->osc2->update_oscillator(self->osc2);
+
+    self->lfo->start_oscillator(self->lfo);
+    start_eg(self->eg1);
 
     if (!self->osc1->m_note_on) {
         self->osc1->start_oscillator(self->osc1);
         self->osc2->start_oscillator(self->osc2);
     }
+    else {
+        self->osc1->update_oscillator(self->osc1);
+        self->osc2->update_oscillator(self->osc2);
+    }
 
-    self->lfo->start_oscillator(self->lfo);
-    start_eg(self->eg1);
+    self->m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midi_num;
+    // TODO: send velocity self->m_modmatrix->m_sources[SOURCE_VELOCITY] = velocity;
+
 }
 
 void nanosynth_add_note(nanosynth *self, int midi_num)
@@ -239,29 +307,21 @@ double nanosynth_gennext(void *self)
 
     if (ns->osc1->m_note_on) {
 
-        double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
-        double biased_eg = 0.0;
-        double eg_out = eg_generate(ns->eg1, &biased_eg);
+        do_modulation_matrix(ns->m_modmatrix, 0);
 
-        double eg_osc_mod =
-            ns->m_eg1_osc_intensity * OSC_FO_MOD_RANGE * biased_eg;
+        eg_update(ns->eg1);
+        ns->lfo->update_oscillator(ns->lfo);
 
-        osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
-        osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE + eg_osc_mod);
+        eg_generate(ns->eg1, NULL);
+        ns->lfo->do_oscillate(ns->lfo, NULL);
 
-        // if (ns->m_filter_keytrack == ON) {
-        //    ns->f->m_fc_control =
-        //        ns->osc1->m_osc_fo * ns->m_filter_keytrack_intensity;
-        //}
+        do_modulation_matrix(ns->m_modmatrix, 1);
 
-        ns->f->set_fc_mod(ns->f, FILTER_FC_MOD_RANGE * eg_out);
+        dca_update(ns->dca);
         ns->f->update(ns->f);
 
         ns->osc1->update_oscillator(ns->osc1);
         ns->osc2->update_oscillator(ns->osc2);
-
-        dca_set_eg_mod(ns->dca, eg_out * ns->m_eg1_dca_intensity);
-        dca_update(ns->dca);
 
         double osc1_val = ns->osc1->do_oscillate(ns->osc1, NULL);
         double osc2_val = ns->osc2->do_oscillate(ns->osc2, NULL);
@@ -271,18 +331,17 @@ double nanosynth_gennext(void *self)
         // double filter_out = osc_out;
         double filter_out = ns->f->gennext(ns->f, osc_out);
 
-        double out_left;
-        double out_right;
+        double out_left = 0.0;
+        double out_right = 0.0;
         dca_gennext(ns->dca, filter_out, filter_out, &out_left, &out_right);
 
-        // if ((get_state(ns->eg1)) == 0) {
-        //    ns->osc1->stop_oscillator(ns->osc1);
-        //    ns->osc2->stop_oscillator(ns->osc2);
-        //    ns->lfo->stop_oscillator(ns->lfo);
-        //    stop_eg(ns->eg1);
-        //}
-        //
-
+         if ((get_state(ns->eg1)) == 0) {
+            ns->osc1->stop_oscillator(ns->osc1);
+            ns->osc2->stop_oscillator(ns->osc2);
+            ns->lfo->stop_oscillator(ns->lfo);
+            stop_eg(ns->eg1);
+        }
+        
         double val = out_left * ns->vol;
         val = effector(&ns->sound_generator, val);
         val = envelopor(&ns->sound_generator, val);
@@ -311,14 +370,18 @@ void nanosynth_update(nanosynth *self)
 {
     self->osc1->m_waveform = self->m_osc_waveform;
     self->osc2->m_waveform = self->m_osc_waveform;
-    osc_update(self->osc1);
-    osc_update(self->osc2);
+    // osc_update(self->osc1);
+    // osc_update(self->osc2);
+
+    self->f->m_fc_control = self->m_fc_control;
+    self->f->m_q_control = self->m_q_control;
+    // filter_update(self->f);
 
     self->lfo->m_waveform = self->m_lfo_waveform;
     self->lfo->m_amplitude = self->m_lfo_amplitude;
     self->lfo->m_osc_fo = self->m_lfo_rate;
     self->lfo->m_lfo_mode = self->m_lfo_mode;
-    osc_update(self->lfo);
+    // osc_update(self->lfo);
 
     set_attack_time_msec(self->eg1, self->m_attack_time_msec);
     set_decay_time_msec(self->eg1, self->m_decay_time_msec);
@@ -330,10 +393,30 @@ void nanosynth_update(nanosynth *self)
 
     dca_set_pan_control(self->dca, self->m_volume_db);
     dca_set_amplitude_db(self->dca, self->m_volume_db);
-    dca_update(self->dca);
+    // dca_update(self->dca);
+    
+    if (self->m_filter_keytrack) {
+        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
+                          DEST_ALL_FILTER_KEYTRACK, true);
+    } else { 
+        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
+                          DEST_ALL_FILTER_KEYTRACK, false);
+    }
 
-    self->f->m_fc_control = self->m_fc_control;
-    self->f->m_q_control = self->m_q_control;
+    if (self->m_velocity_to_attack_scaling) {
+        enable_matrix_row(self->m_modmatrix, SOURCE_VELOCITY,
+                          DEST_ALL_EG_ATTACK_SCALING, true);
+    } else {
+        enable_matrix_row(self->m_modmatrix, SOURCE_VELOCITY,
+                          DEST_ALL_EG_ATTACK_SCALING, false);
+    }
 
-    filter_update(self->f);
+    if (self->m_note_number_to_decay_scaling) {
+        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
+                          DEST_ALL_EG_DECAY_SCALING, true);
+    } else {
+        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
+                          DEST_ALL_EG_DECAY_SCALING, false);
+    }
+
 }
