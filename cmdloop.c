@@ -464,13 +464,13 @@ void interpret(char *line)
             if (is_val_a_valid_sig_num) {
                 if (strncmp(cmd_type, "melody", 7) == 0) {
                     printf("First melody!\n");
-                    keys_start_melody_player(sig_num, pattern);
+                    //keys_start_melody_player(sig_num, pattern);
                 }
                 else {
                     printf("Maaaaaddd for it!\n");
-                    melody_loop *mloop = mloop_from_pattern(pattern);
-                    nanosynth_add_melody_loop(mixr->sound_generators[sig_num],
-                                              mloop);
+                    // melody_loop *mloop = mloop_from_pattern(pattern);
+                    // nanosynth_add_melody_loop(mixr->sound_generators[sig_num],
+                    //                           mloop);
                 }
             }
         }

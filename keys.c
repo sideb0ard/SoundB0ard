@@ -17,13 +17,6 @@ extern mixer *mixr;
 extern pthread_cond_t midi_tick_cond;
 extern pthread_mutex_t midi_tick_lock;
 
-melody_loop *new_melody_loop()
-{
-    melody_loop *l;
-    l = (melody_loop *)calloc(1, sizeof(melody_loop));
-    return l;
-}
-
 void keys(int soundgen_num)
 {
     printf("Entering Keys Mode for %d\n", soundgen_num);
@@ -111,7 +104,9 @@ void keys(int soundgen_num)
                     print_midi_event(midi_num);
                     note_on(ns, midi_num);
                     if (ns->recording) {
-                        nanosynth_add_note(ns, midi_num);
+                        printf("Adding note!\n");
+                        // nanosynth_add_note(ns, midi_num);
+                        ns->mloop[mixr->tick%PPL] = midi_num;
                     }
                 }
             }
@@ -120,103 +115,72 @@ void keys(int soundgen_num)
     tcsetattr(0, TCSANOW, &old_info);
 }
 
-melody_event *make_melody_event(int tick, unsigned midi_num)
-{
-    melody_event *me;
-    me = (melody_event *)calloc(1, sizeof(melody_event));
-    me->tick = tick;
-    me->midi_num = midi_num;
-
-    return me;
-}
-
-void add_melody_event(melody_loop *mloop, melody_event *e)
-{
-    printf("ADDING melody event..\n");
-    if (mloop->size < 100) {
-        mloop->melody[mloop->size++] = e;
-    }
-}
-
 void *play_melody_loop(void *p)
 {
     nanosynth *ns = (nanosynth *)p;
 
-    int notes_played_time[32];
-    for (int i = 0; i < 32; i++)
+    int notes_played_time[PPL];
+    for (int i = 0; i < PPL; i++)
         notes_played_time[i] = 0;
 
     printf("PLAY melody starting..\n");
 
     while (1) {
-        for (int j = 0; j < ns->melody_loop_num; j++) {
-            melody_loop *mloop = ns->mloops[j];
-            int note_played = 0;
-            for (int i = 0; i < mloop->size; i++) {
-                while (!note_played) {
-                    if (mixr->sixteenth_note_tick % 32 ==
-                        mloop->melody[i]->tick) {
-                        note_on(ns, mloop->melody[i]->midi_num);
-                        note_played = 1;
-                        if (ns->sustain > 0) // switched on
-                            notes_played_time[mloop->melody[i]->tick] = 1;
-                    }
+        pthread_mutex_lock(&midi_tick_lock);
+        pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
+        pthread_mutex_unlock(&midi_tick_lock);
 
-                    pthread_mutex_lock(&midi_tick_lock);
-                    pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
-                    pthread_mutex_unlock(&midi_tick_lock);
-                    for (int i = 0; i < 32; i++) {
-                        if (notes_played_time[i] > 0) {
-                            notes_played_time[i]++;
-                        }
-                        if (notes_played_time[i] > ns->sustain) {
-                            notes_played_time[i] = 0;
-                            eg_note_off(ns->eg1);
-                        }
-                    }
-                }
-                note_played = 0;
+        int idx = mixr->tick % PPL;
+        if ( ns->mloop[idx] != 0 ) {
+            note_on(ns, ns->mloop[idx]);
+            if (ns->sustain > 0) // switched on
+                notes_played_time[idx]++;
             }
-        }
+
+            if (notes_played_time[idx] > ns->sustain) {
+                notes_played_time[idx] = 0;
+                eg_note_off(ns->eg1);
+            }
     }
-    // TODO free all this memory!!
+
     return NULL;
 }
 
-melody_loop *mloop_from_pattern(char *pattern)
-{
-    melody_loop *mloop = new_melody_loop();
+// melody_loop *mloop_from_pattern(char *pattern)
+// {
+//     melody_loop *mloop = new_melody_loop();
+// 
+//     char *tok, *last_s;
+//     char *sep = " ";
+//     for (tok = strtok_r(pattern, sep, &last_s); tok;
+//          tok = strtok_r(NULL, sep, &last_s)) {
+//         int tick;
+//         int midi_num;
+//         sscanf(tok, "%d:%d", &tick, &midi_num);
+// 
+//         if (midi_num != -1) {
+// 
+//             melody_event *me = make_melody_event(tick, midi_num);
+//             add_melody_event(mloop, me);
+//         }
+//     }
+//     return mloop;
+// }
 
-    char *tok, *last_s;
-    char *sep = " ";
-    for (tok = strtok_r(pattern, sep, &last_s); tok;
-         tok = strtok_r(NULL, sep, &last_s)) {
-        int tick;
-        int midi_num;
-        sscanf(tok, "%d:%d", &tick, &midi_num);
-
-        if (midi_num != -1) {
-            melody_event *me = make_melody_event(tick, midi_num);
-            add_melody_event(mloop, me);
-        }
-    }
-    return mloop;
-}
-
-void keys_start_melody_player(int sig_num, char *pattern)
-{
-
-    melody_loop *mloop = mloop_from_pattern(pattern);
-
-    printf("KEYS START MELODY!\n");
-    printf("SIG NUM %d - %s\n", sig_num, pattern);
-
-    nanosynth *ns = (nanosynth *)mixr->sound_generators[sig_num];
-    nanosynth_add_melody_loop(ns, mloop);
-
-    pthread_t melody_looprrr;
-    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
-        fprintf(stderr, "Err running loop\n");
-    }
-    pthread_detach(melody_looprrr);
-}
+// void keys_start_melody_player(int sig_num, char *pattern)
+// {
+// 
+//     melody_loop *mloop = mloop_from_pattern(pattern);
+// 
+//     printf("KEYS START MELODY!\n");
+//     printf("SIG NUM %d - %s\n", sig_num, pattern);
+// 
+//     nanosynth *ns = (nanosynth *)mixr->sound_generators[sig_num];
+//     nanosynth_add_melody_loop(ns, mloop);
+// 
+//     pthread_t melody_looprrr;
+//     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
+//         fprintf(stderr, "Err running loop\n");
+//     }
+//     pthread_detach(melody_looprrr);
+// }

@@ -43,13 +43,14 @@ mixer *new_mixer()
 void mixer_ps(mixer *mixr)
 {
     printf(ANSI_COLOR_WHITE
-           "::::: Mixing Desk (Volume: %f // BPM: %d) (Delay On: %d) "
+           "::::: Mixing Desk (Volume: %f // BPM: %d // TICK: %d // Qtick: %d) "
+           "(Delay On: %d) "
            ":::::\n" ANSI_COLOR_RESET,
-           mixr->volume, mixr->bpm, mixr->delay_on);
+           mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick, mixr->delay_on);
     printf(ANSI_COLOR_GREEN "::::: effects: %d :::::\n" ANSI_COLOR_RESET,
            mixr->effects_num);
     for (int i = 0; i < mixr->soundgen_num; i++) {
-        char ss[120];
+        char ss[240];
         mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
         printf("[%d] - %s\n", i, ss);
     }

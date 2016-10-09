@@ -13,9 +13,9 @@
 typedef struct nanosynth {
     SOUNDGEN sound_generator;
 
-    melody_loop *mloops[10];
-    int melody_loop_num;
-    int melody_loop_cur;
+    int mloop[PPL];
+    // int melody_loop_num;
+    // int melody_loop_cur;
 
     oscillator *osc1;
     oscillator *osc2;
@@ -89,6 +89,7 @@ void note_on(nanosynth *self, int midi_num);
 void change_octave(void *self, int direction);
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);
-void nanosynth_add_melody_loop(void *self, melody_loop *mloop);
+// void nanosynth_add_melody_loop(void *self, melody_loop *mloop);
 void nanosynth_update(nanosynth *self);
 void nanosynth_add_note(nanosynth *self, int midi_num);
+void nanosynth_print_melodies(nanosynth *self);
