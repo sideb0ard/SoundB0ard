@@ -2,10 +2,10 @@
 #define DRUM_H
 
 #include "sound_generator.h"
-#include <stdbool.h>
 #include <sndfile.h>
+#include <stdbool.h>
 
-#define GRIDWIDTH ( DRUM_PATTERN_LEN / 4 )
+#define GRIDWIDTH (DRUM_PATTERN_LEN / 4)
 #define INTEGER_LENGTH pow(2, DRUM_PATTERN_LEN)
 
 typedef struct t_sample_pos {

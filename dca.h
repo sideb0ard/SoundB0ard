@@ -3,7 +3,7 @@
 #include "defjams.h"
 #include "modmatrix.h"
 
-#define AMP_MOD_RANGE -96    // -96dB
+#define AMP_MOD_RANGE -96 // -96dB
 
 typedef struct dca {
 

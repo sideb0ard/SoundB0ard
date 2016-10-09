@@ -46,7 +46,8 @@ void mixer_ps(mixer *mixr)
            "::::: Mixing Desk (Volume: %f // BPM: %d // TICK: %d // Qtick: %d) "
            "(Delay On: %d) "
            ":::::\n" ANSI_COLOR_RESET,
-           mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick, mixr->delay_on);
+           mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
+           mixr->delay_on);
     printf(ANSI_COLOR_GREEN "::::: effects: %d :::::\n" ANSI_COLOR_RESET,
            mixr->effects_num);
     for (int i = 0; i < mixr->soundgen_num; i++) {

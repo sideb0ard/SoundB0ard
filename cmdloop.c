@@ -226,23 +226,21 @@ void interpret(char *line)
                     }
                 }
                 else if ((strncmp(cmd_type, "life", 5) == 0)) {
-                    if (mixr->sound_generators[(int)val]->type !=
-                        DRUM_TYPE) {
+                    if (mixr->sound_generators[(int)val]->type != DRUM_TYPE) {
                         printf("Beat it, ya chancer\n");
                     }
                     else {
                         printf("Toggling LIFE for %d\n", (int)val);
-                        DRUM *d =
-                            (DRUM *) mixr->sound_generators[(int)val];
+                        DRUM *d = (DRUM *)mixr->sound_generators[(int)val];
                         d->game_of_life_on = 1 - d->game_of_life_on;
                         // printf("LIFE now %d\n", d->game_of_life_on);
                         // ps();
                     }
                 }
                 else if ((strncmp(cmd_type, "env", 4) == 0)) {
-                        printf("Toggling ENV for %d\n", (int)val);
-                        mixr->sound_generators[(int)val]->envelopes_enabled =
-                            1 - mixr->sound_generators[(int)val]->envelopes_enabled;
+                    printf("Toggling ENV for %d\n", (int)val);
+                    mixr->sound_generators[(int)val]->envelopes_enabled =
+                        1 - mixr->sound_generators[(int)val]->envelopes_enabled;
                 }
                 else {
                     printf("DECIMATE!\n");
@@ -266,9 +264,10 @@ void interpret(char *line)
             sscanf(trim_tok, "%s %d %d %d", cmd_type, &val1, &val2, &val3);
             printf("SIDECHAIN! %d %d %d\n", val1, val2, val3);
             if (mixr->sound_generators[val2]->type == DRUM_TYPE) {
-                DRUM *d = (DRUM *) mixr->sound_generators[val2];
+                DRUM *d = (DRUM *)mixr->sound_generators[val2];
                 int pat_array[16];
-                int_pattern_to_array(d->patterns[d->cur_pattern_num], pat_array);
+                int_pattern_to_array(d->patterns[d->cur_pattern_num],
+                                     pat_array);
                 for (int i = 0; i < 16; i++) {
                     printf("%d ", pat_array[i]);
                 }
@@ -464,7 +463,7 @@ void interpret(char *line)
             if (is_val_a_valid_sig_num) {
                 if (strncmp(cmd_type, "melody", 7) == 0) {
                     printf("First melody!\n");
-                    //keys_start_melody_player(sig_num, pattern);
+                    // keys_start_melody_player(sig_num, pattern);
                 }
                 else {
                     printf("Maaaaaddd for it!\n");

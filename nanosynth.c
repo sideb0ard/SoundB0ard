@@ -90,36 +90,32 @@ nanosynth *new_nanosynth()
     // VELOCITY -> DCA VEL
     row = create_matrix_row(SOURCE_VELOCITY, DEST_DCA_VELOCITY,
                             &ns->m_default_mod_intensity,
-                            &ns->m_default_mod_range,
-                            TRANSFORM_NONE, true);
+                            &ns->m_default_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // PITCHBEND -> PITCHBEND
-    row = create_matrix_row(SOURCE_PITCHBEND, DEST_ALL_OSC_FO,
-                            &ns->m_default_mod_intensity,
-                            &ns->m_osc_fo_pitchbend_mod_range,
-                            TRANSFORM_NONE, true);
+    row = create_matrix_row(
+        SOURCE_PITCHBEND, DEST_ALL_OSC_FO, &ns->m_default_mod_intensity,
+        &ns->m_osc_fo_pitchbend_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Vol CC07
     row = create_matrix_row(SOURCE_MIDI_VOLUME_CC07, DEST_DCA_AMP,
-                            &ns->m_default_mod_intensity,
-                            &ns->m_amp_mod_range,
+                            &ns->m_default_mod_intensity, &ns->m_amp_mod_range,
                             TRANSFORM_INVERT_MIDI_NORMALIZE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Pan CC10
-    row = create_matrix_row(SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN,
-                            &ns->m_default_mod_intensity,
-                            &ns->m_default_mod_range,
-                            TRANSFORM_MIDI_TO_PAN, true);
+    row = create_matrix_row(
+        SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN, &ns->m_default_mod_intensity,
+        &ns->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Sustain Pedal
     row = create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
                             &ns->m_default_mod_intensity,
-                            &ns->m_default_mod_range,
-                            TRANSFORM_MIDI_SWITCH, true);
+                            &ns->m_default_mod_range, TRANSFORM_MIDI_SWITCH,
+                            true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // VELOCITY -> EG ATTACK SOURCE_VELOCITY
@@ -127,15 +123,15 @@ nanosynth *new_nanosynth()
     // 128 velocity -> scalar = 0, fastest (0) attack time:
     row = create_matrix_row(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
                             &ns->m_default_mod_intensity,
-                            &ns->m_default_mod_range,
-                            TRANSFORM_MIDI_NORMALIZE, false);
+                            &ns->m_default_mod_range, TRANSFORM_MIDI_NORMALIZE,
+                            false);
     add_matrix_row(ns->m_modmatrix, row);
 
     // NOTE NUMBER -> EG DECAY SCALING
     row = create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_EG_DECAY_SCALING,
                             &ns->m_default_mod_intensity,
-                            &ns->m_default_mod_range,
-                            TRANSFORM_MIDI_NORMALIZE, false);
+                            &ns->m_default_mod_range, TRANSFORM_MIDI_NORMALIZE,
+                            false);
     add_matrix_row(ns->m_modmatrix, row);
 
     ns->m_modmatrix->m_sources[SOURCE_MIDI_VOLUME_CC07] = 127;
@@ -144,7 +140,7 @@ nanosynth *new_nanosynth()
     // end mod matrix setup ///////////////////////////////////
     //
     // mod matrix routings ////////////////////////////////////
-    
+
     ns->osc1->g_modmatrix = ns->m_modmatrix;
     ns->osc1->m_mod_source_fo = DEST_OSC1_FO;
     ns->osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
@@ -258,11 +254,10 @@ void change_octave(void *self, int direction)
         ns->cur_octave = octave;
 }
 
-
 void nanosynth_print_melodies(nanosynth *self)
 {
     for (int i = 0; i < PPL; i++) {
-        if ( self->mloop[i] != 0) {
+        if (self->mloop[i] != 0) {
             printf("%d: %d ", i, self->mloop[i]);
         }
     }
@@ -273,8 +268,7 @@ void nanosynth_status(void *self, char *status_string)
 {
     nanosynth *ns = (nanosynth *)self;
     snprintf(status_string, 119, ANSI_COLOR_RED "nanosynth! %.2f(freq) "
-                                                "vol: %.2f"
-                                                ANSI_COLOR_RESET,
+                                                "vol: %.2f" ANSI_COLOR_RESET,
              ns->osc1->m_fo, ns->vol);
     nanosynth_print_melodies(ns);
 }
@@ -302,8 +296,8 @@ void note_on(nanosynth *self, int midi_num)
     }
 
     self->m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midi_num;
-    // TODO: send velocity self->m_modmatrix->m_sources[SOURCE_VELOCITY] = velocity;
-
+    // TODO: send velocity self->m_modmatrix->m_sources[SOURCE_VELOCITY] =
+    // velocity;
 }
 
 // void nanosynth_add_note(nanosynth *self, int midi_num)
@@ -357,7 +351,7 @@ double nanosynth_gennext(void *self)
         //     ns->lfo->stop_oscillator(ns->lfo);
         //     stop_eg(ns->eg1);
         // }
-        
+
         double val = out_left * ns->vol;
         val = effector(&ns->sound_generator, val);
         val = envelopor(&ns->sound_generator, val);
@@ -410,11 +404,12 @@ void nanosynth_update(nanosynth *self)
     dca_set_pan_control(self->dca, self->m_volume_db);
     dca_set_amplitude_db(self->dca, self->m_volume_db);
     // dca_update(self->dca);
-    
+
     if (self->m_filter_keytrack) {
         enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_FILTER_KEYTRACK, true);
-    } else { 
+    }
+    else {
         enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_FILTER_KEYTRACK, false);
     }
@@ -422,7 +417,8 @@ void nanosynth_update(nanosynth *self)
     if (self->m_velocity_to_attack_scaling) {
         enable_matrix_row(self->m_modmatrix, SOURCE_VELOCITY,
                           DEST_ALL_EG_ATTACK_SCALING, true);
-    } else {
+    }
+    else {
         enable_matrix_row(self->m_modmatrix, SOURCE_VELOCITY,
                           DEST_ALL_EG_ATTACK_SCALING, false);
     }
@@ -430,9 +426,9 @@ void nanosynth_update(nanosynth *self)
     if (self->m_note_number_to_decay_scaling) {
         enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_EG_DECAY_SCALING, true);
-    } else {
+    }
+    else {
         enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_EG_DECAY_SCALING, false);
     }
-
 }

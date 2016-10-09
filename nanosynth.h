@@ -41,7 +41,7 @@ typedef struct nanosynth {
 
     modmatrix *m_modmatrix; // routing structure for sound generation
     // need these for mod matrix
-    double m_default_mod_range;     // 1.0
+    double m_default_mod_range; // 1.0
     double m_osc_fo_mod_range;
     double m_filter_mod_range;
     double m_osc_fo_pitchbend_mod_range;

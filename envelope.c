@@ -116,7 +116,7 @@ ENVSTREAM *new_sidechain_stream(int *pattern, int percent)
         return NULL;
 
     ENVELOPE *points = NULL;
-    points = (ENVELOPE *) calloc(18, sizeof(ENVELOPE));
+    points = (ENVELOPE *)calloc(18, sizeof(ENVELOPE));
     if (points == NULL)
         return NULL;
 
@@ -124,11 +124,11 @@ ENVSTREAM *new_sidechain_stream(int *pattern, int percent)
     points[0].value = 0.0;
 
     double t = 5.5;
-    for ( int i = 1; i < 17; i++, t += 5.55 ) {
+    for (int i = 1; i < 17; i++, t += 5.55) {
         points[i].time = t;
-        if ( pattern[i] ) {
+        if (pattern[i]) {
             // points[i].value = 0.0;
-            points[i].value = 1 / 100.0 * ( 100.0 - percent);
+            points[i].value = 1 / 100.0 * (100.0 - percent);
         }
         else {
             points[i].value = 1.0;

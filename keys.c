@@ -83,7 +83,7 @@ void keys(int soundgen_num)
             case 118:
                 ns->m_filter_keytrack = 1 - ns->m_filter_keytrack;
                 printf("Key tracking toggle - val is %d!\n",
-                        ns->m_filter_keytrack);
+                       ns->m_filter_keytrack);
                 break;
             case 98:
                 printf("Key tracking intensity toggle!\n");
@@ -94,7 +94,7 @@ void keys(int soundgen_num)
                 else
                     ns->m_filter_keytrack_intensity = 0.5;
                 printf("Key tracking intensity toggle! Val is %f\n",
-                        ns->m_filter_keytrack_intensity);
+                       ns->m_filter_keytrack_intensity);
                 break;
 
             default: // play note
@@ -106,7 +106,7 @@ void keys(int soundgen_num)
                     if (ns->recording) {
                         printf("Adding note!\n");
                         // nanosynth_add_note(ns, midi_num);
-                        ns->mloop[mixr->tick%PPL] = midi_num;
+                        ns->mloop[mixr->tick % PPL] = midi_num;
                     }
                 }
             }
@@ -131,16 +131,16 @@ void *play_melody_loop(void *p)
         pthread_mutex_unlock(&midi_tick_lock);
 
         int idx = mixr->tick % PPL;
-        if ( ns->mloop[idx] != 0 ) {
+        if (ns->mloop[idx] != 0) {
             note_on(ns, ns->mloop[idx]);
             if (ns->sustain > 0) // switched on
                 notes_played_time[idx]++;
-            }
+        }
 
-            if (notes_played_time[idx] > ns->sustain) {
-                notes_played_time[idx] = 0;
-                eg_note_off(ns->eg1);
-            }
+        if (notes_played_time[idx] > ns->sustain) {
+            notes_played_time[idx] = 0;
+            eg_note_off(ns->eg1);
+        }
     }
 
     return NULL;
@@ -149,7 +149,7 @@ void *play_melody_loop(void *p)
 // melody_loop *mloop_from_pattern(char *pattern)
 // {
 //     melody_loop *mloop = new_melody_loop();
-// 
+//
 //     char *tok, *last_s;
 //     char *sep = " ";
 //     for (tok = strtok_r(pattern, sep, &last_s); tok;
@@ -157,9 +157,9 @@ void *play_melody_loop(void *p)
 //         int tick;
 //         int midi_num;
 //         sscanf(tok, "%d:%d", &tick, &midi_num);
-// 
+//
 //         if (midi_num != -1) {
-// 
+//
 //             melody_event *me = make_melody_event(tick, midi_num);
 //             add_melody_event(mloop, me);
 //         }
@@ -169,15 +169,15 @@ void *play_melody_loop(void *p)
 
 // void keys_start_melody_player(int sig_num, char *pattern)
 // {
-// 
+//
 //     melody_loop *mloop = mloop_from_pattern(pattern);
-// 
+//
 //     printf("KEYS START MELODY!\n");
 //     printf("SIG NUM %d - %s\n", sig_num, pattern);
-// 
+//
 //     nanosynth *ns = (nanosynth *)mixr->sound_generators[sig_num];
 //     nanosynth_add_melody_loop(ns, mloop);
-// 
+//
 //     pthread_t melody_looprrr;
 //     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
 //         fprintf(stderr, "Err running loop\n");
