@@ -37,7 +37,8 @@ double bitwize_getvol(void *self)
 void bitwize_setvol(void *self, double v)
 {
     BITWIZE *p_bitwize = (BITWIZE *)self;
-    if (v < 0.0 || v > 0.2) {
+    if (v < 0.0 || v > 0.5) {
+        printf("Too loud! try 0.4\n");
         return;
     }
     p_bitwize->vol = v;

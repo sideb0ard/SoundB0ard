@@ -22,13 +22,15 @@ typedef struct nanosynth {
     oscillator *lfo;
 
     envelope_generator *eg1;
+
     // FILTER_CSEM *filter;
     // FILTER_ONEPOLE *filter;
     filter *f;
+
     DCA *dca;
 
     int cur_octave;
-    int sustain; // in ticks TODO: make better!
+    int sustain;
 
     bool recording;
 
@@ -40,6 +42,7 @@ typedef struct nanosynth {
     float vol;
 
     modmatrix *m_modmatrix; // routing structure for sound generation
+
     // need these for mod matrix
     double m_default_mod_range; // 1.0
     double m_osc_fo_mod_range;
@@ -91,5 +94,6 @@ void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);
 // void nanosynth_add_melody_loop(void *self, melody_loop *mloop);
 void nanosynth_update(nanosynth *self);
+void nanosynth_reset_melody(nanosynth *self);
 void nanosynth_add_note(nanosynth *self, int midi_num);
 void nanosynth_print_melodies(nanosynth *self);

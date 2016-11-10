@@ -101,7 +101,7 @@ void interpret(char *line)
             msg->freq = val;
 
             strncpy(msg->cmd, "timed_sig_start", 19);
-            printf("PARAMZZZ %s", cmd);
+            printf("PARAMZZZ %s\n", cmd);
             strncpy(msg->params, cmd, 10);
             thrunner(msg);
         }
@@ -110,7 +110,7 @@ void interpret(char *line)
         regmatch_t pmatch[3];
         regex_t cmdtype_rx;
         regcomp(&cmdtype_rx,
-                "^(bpm|duck|keys|midi|solo|stop|up|vol) ([[:digit:].]+)$",
+                "^(bpm|duck|keys|midi|reset|solo|stop|up|vol) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
 
         if (regexec(&cmdtype_rx, trim_tok, 3, pmatch, 0) == 0) {
@@ -163,6 +163,25 @@ void interpret(char *line)
                         printf("MIDI fer %d\n", (int)val);
                         mixr->has_active_nanosynth = 1;
                         mixr->active_nanosynth_soundgen_num = val;
+                    }
+                    else {
+                        printf("Can only run keys() on an nanosynth Type, ya "
+                               "dafty\n");
+                    }
+                }
+                else if (strcmp(cmd, "reset") == 0) {
+                    if (mixr->sound_generators[(int)val]->type ==
+                        NANOSYNTH_TYPE) {
+                        printf("RESET fer %d\n", (int)val);
+                        nanosynth *ns =
+                            (nanosynth *)mixr->sound_generators[(int)val];
+                        nanosynth_reset_melody(ns);
+                    }
+                    else if (mixr->sound_generators[(int)val]->type ==
+                             DRUM_TYPE) {
+                        DRUM *d = (DRUM *)mixr->sound_generators[(int)val];
+                        for (int i = 0; i < d->num_patterns; i++)
+                            d->patterns[i] = 0;
                     }
                     else {
                         printf("Can only run keys() on an nanosynth Type, ya "
@@ -271,6 +290,7 @@ void interpret(char *line)
                 for (int i = 0; i < 16; i++) {
                     printf("%d ", pat_array[i]);
                 }
+                printf("\n");
                 ENVSTREAM *e = new_sidechain_stream(pat_array, val3);
                 add_envelope_soundgen(mixr->sound_generators[(int)val1], e);
             }
@@ -437,6 +457,20 @@ void interpret(char *line)
                     add_pattern(mixr->sound_generators[val], pattern);
                 }
             }
+        }
+
+        // Byte beat
+        regmatch_t bytematch[3];
+        regex_t byte_rx;
+        regcomp(&byte_rx, "^(byte) (([t[:punct:][:digit:] ]+))$",
+                REG_EXTENDED | REG_ICASE);
+        if (regexec(&byte_rx, trim_tok, 3, bytematch, 0) == 0) {
+            int pattern_len = bytematch[2].rm_eo - bytematch[2].rm_so;
+            char pattern[pattern_len + 1];
+            strncpy(pattern, trim_tok + bytematch[2].rm_so, pattern_len);
+            pattern[pattern_len] = '\0';
+            printf("Byte pattern is %s\n", pattern);
+            // TODO validate byte pattern
         }
 
         // nanosynth melody loop

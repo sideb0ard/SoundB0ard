@@ -80,8 +80,11 @@ void mixer_vol_change(mixer *mixr, float vol)
 
 void vol_change(mixer *mixr, int sg, float vol)
 {
-    if (sg > (mixr->soundgen_size - 1))
+    printf("SG: %d // soungen_num : %d\n", sg, mixr->soundgen_num);
+    if (sg > (mixr->soundgen_num - 1)) {
+        printf("Nah mate, returning\n");
         return;
+    }
     mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
 }
 

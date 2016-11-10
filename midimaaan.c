@@ -151,19 +151,19 @@ void midicontrol(int data1, int data2)
     double scaley_val;
     switch (data1) {
     case 1: // K1 - Envelope Attack Time Msec
-        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
         set_attack_time_msec(ns->eg1, scaley_val);
         break;
     case 2: // K2 - Envelope Decay Time Msec
-        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
         set_decay_time_msec(ns->eg1, scaley_val);
         break;
     case 3: // K3 - Envelope Sustain Level
-        scaley_val = scaleybum(0, 128, 0, 1, data2);
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
         set_sustain_level(ns->eg1, scaley_val);
         break;
     case 4: // K4 - Envelope Release Time Msec
-        scaley_val = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
         set_release_time_msec(ns->eg1, scaley_val);
         break;
     case 5: // K5 - LFO rate
@@ -177,7 +177,7 @@ void midicontrol(int data1, int data2)
         osc_update(ns->lfo);
         break;
     case 7: // K7 - Filter Frequency Cut
-        scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
         // printf("FILTER CUTOFF! %f\n", scaley_val);
         // printf("FC ! %f\n", ns->f->m_fc);
         // printf("MM FC CONTROL! %f\n", ns->f->m_fc_control);
@@ -186,7 +186,7 @@ void midicontrol(int data1, int data2)
         // printf("MM POST FC CONTROL! %f\n", ns->f->m_fc_control);
         break;
     case 8: // K8 - Filter Q control
-        scaley_val = scaleybum(0, 128, 1, 10, data2);
+        scaley_val = scaleybum(1, 128, 1, 10, data2);
         printf("FILTER Q control! %f\n", scaley_val);
         filter_set_q_control(ns->f, scaley_val);
         break;

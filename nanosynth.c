@@ -42,17 +42,16 @@ nanosynth *new_nanosynth()
 
     ns->dca = new_dca();
 
-    // ns->mloop = (melody_loop *)calloc(1, sizeof(melody_loop));
-
     ns->m_modmatrix = new_modmatrix();
 
+    ns->m_default_mod_intensity = 1.0;
     ns->m_default_mod_range = 1.0;
     ns->m_osc_fo_mod_range = OSC_FO_MOD_RANGE;
     ns->m_filter_mod_range = FILTER_FC_MOD_RANGE;
+
     ns->m_osc_fo_pitchbend_mod_range = OSC_PITCHBEND_MOD_RANGE;
     ns->m_amp_mod_range = AMP_MOD_RANGE;
 
-    ns->m_default_mod_intensity = 1.0;
     ns->m_eg1_dca_intensity = 1.0;
     ns->m_eg1_osc_intensity = 0.0;
 
@@ -189,6 +188,8 @@ nanosynth *new_nanosynth()
     for (int i = 0; i < PPL; i++)
         ns->mloop[i] = 0;
 
+    // nanosynth_update(ns);
+
     // start loop player running
     pthread_t melody_looprrr;
     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
@@ -198,9 +199,13 @@ nanosynth *new_nanosynth()
         pthread_detach(melody_looprrr);
     }
 
-    nanosynth_update(ns);
-
     return ns;
+}
+
+void nanosynth_reset_melody(nanosynth *ns)
+{
+    for (int i = 0; i < PPL; i++)
+        ns->mloop[i] = 0;
 }
 
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
@@ -267,9 +272,10 @@ void nanosynth_print_melodies(nanosynth *self)
 void nanosynth_status(void *self, char *status_string)
 {
     nanosynth *ns = (nanosynth *)self;
-    snprintf(status_string, 119, ANSI_COLOR_RED "nanosynth! %.2f(freq) "
-                                                "vol: %.2f" ANSI_COLOR_RESET,
-             ns->osc1->m_fo, ns->vol);
+    snprintf(status_string, 119,
+             ANSI_COLOR_RED "nanosynth! %.2f(freq) sustain: %d "
+                            "vol: %.2f" ANSI_COLOR_RESET,
+             ns->osc1->m_fo, ns->sustain, ns->vol);
     nanosynth_print_melodies(ns);
 }
 
@@ -300,26 +306,17 @@ void note_on(nanosynth *self, int midi_num)
     // velocity;
 }
 
-// void nanosynth_add_note(nanosynth *self, int midi_num)
-// {
-//     if (self->recording) {
-//         printf("NOTE RECORDED\n");
-//         melody_event *me =
-//             make_melody_event(mixr->tick % PPL, midi_num);
-//         add_melody_event(self->mloop, me);
-//         // add recording event
-//     }
-// }
-
 double nanosynth_gennext(void *self)
 {
     nanosynth *ns = (nanosynth *)self;
+
+    // nanosynth_update(ns); // "GUI" controls
 
     if (ns->osc1->m_note_on) {
 
         do_modulation_matrix(ns->m_modmatrix, 0);
 
-        eg_update(ns->eg1);
+        // eg_update(ns->eg1);
         ns->lfo->update_oscillator(ns->lfo);
 
         eg_generate(ns->eg1, NULL);
@@ -345,12 +342,12 @@ double nanosynth_gennext(void *self)
         double out_right = 0.0;
         dca_gennext(ns->dca, filter_out, filter_out, &out_left, &out_right);
 
-        // if ((get_state(ns->eg1)) == 0) {
-        //     ns->osc1->stop_oscillator(ns->osc1);
-        //     ns->osc2->stop_oscillator(ns->osc2);
-        //     ns->lfo->stop_oscillator(ns->lfo);
-        //     stop_eg(ns->eg1);
-        // }
+        if ((get_state(ns->eg1)) == 0) {
+            ns->osc1->stop_oscillator(ns->osc1);
+            ns->osc2->stop_oscillator(ns->osc2);
+            ns->lfo->stop_oscillator(ns->lfo);
+            stop_eg(ns->eg1);
+        }
 
         double val = out_left * ns->vol;
         val = effector(&ns->sound_generator, val);
@@ -393,6 +390,7 @@ void nanosynth_update(nanosynth *self)
     self->lfo->m_lfo_mode = self->m_lfo_mode;
     // osc_update(self->lfo);
 
+    printf("CALLING SET ATTACK TIME...\n");
     set_attack_time_msec(self->eg1, self->m_attack_time_msec);
     set_decay_time_msec(self->eg1, self->m_decay_time_msec);
     set_sustain_level(self->eg1, self->m_sustain_level);
@@ -401,7 +399,7 @@ void nanosynth_update(nanosynth *self)
     self->eg1->m_reset_to_zero = self->m_reset_to_zero;
     self->eg1->m_legato_mode = self->m_legato_mode;
 
-    dca_set_pan_control(self->dca, self->m_volume_db);
+    dca_set_pan_control(self->dca, self->m_pan_control);
     dca_set_amplitude_db(self->dca, self->m_volume_db);
     // dca_update(self->dca);
 

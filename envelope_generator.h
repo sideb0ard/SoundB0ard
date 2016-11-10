@@ -4,9 +4,9 @@
 
 #include "modmatrix.h"
 
-#define EG_MINTIME_MS 50 // these two used for attacjtime, decay and release
+#define EG_MINTIME_MS 100 // these two used for attacjtime, decay and release
 #define EG_MAXTIME_MS 5000
-#define EG_DEFAULT_STATE_TIME 1000 // ms
+#define EG_DEFAULT_STATE_TIME 10000 // ms
 #define EG1_DEFAULT_OSC_INTENSITY 0
 #define EG_MIN_OSC_INTENSITY 0
 #define EG_MAX_OSC_INTENSITY 0 // TODO - check this
@@ -72,8 +72,6 @@ typedef struct envelope_generator {
 envelope_generator *new_envelope_generator(void);
 
 state get_state(envelope_generator *self);
-bool is_active(envelope_generator *self);
-bool can_note_off(envelope_generator *self);
 
 void reset(envelope_generator *self);
 void set_eg_mode(envelope_generator *self, eg_mode mode);

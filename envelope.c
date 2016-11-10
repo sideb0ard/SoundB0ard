@@ -121,12 +121,12 @@ ENVSTREAM *new_sidechain_stream(int *pattern, int percent)
         return NULL;
 
     points[0].time = 0.0;
-    points[0].value = 0.0;
+    points[0].value = 0.1;
 
     double t = 5.5;
     for (int i = 1; i < 17; i++, t += 5.55) {
         points[i].time = t;
-        if (pattern[i]) {
+        if (pattern[i - 1]) {
             // points[i].value = 0.0;
             points[i].value = 1 / 100.0 * (100.0 - percent);
         }
@@ -136,14 +136,17 @@ ENVSTREAM *new_sidechain_stream(int *pattern, int percent)
     }
 
     points[17].time = 99.0;
-    points[17].value = 0.0;
+    points[17].value = 0.1;
 
     stream->points = points;
-    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * 0.5 * 4);
+    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * 4);
 
     _env_reset(stream);
 
     stream->npoints = 18;
+
+    for (int i = 0; i < 18; i++)
+        printf("Time: %f Val: %f\n", points[i].time, points[i].value);
     return stream;
 }
 

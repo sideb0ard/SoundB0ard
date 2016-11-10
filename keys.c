@@ -51,6 +51,8 @@ void keys(int soundgen_num)
 
         if (fdz[0].revents & POLLIN) {
             ch = getchar();
+            printf("C %d\n", ch);
+            int midi_num;
             switch (ch) {
             case 27:
             case 113:
@@ -97,18 +99,18 @@ void keys(int soundgen_num)
                        ns->m_filter_keytrack_intensity);
                 break;
 
-            default: // play note
-                printf("default!\n");
-                int midi_num = ch_midi_lookup(ch, ns);
+            default:
+                // play note
+                midi_num = ch_midi_lookup(ch, ns);
                 if (midi_num != -1) {
                     print_midi_event(midi_num);
                     note_on(ns, midi_num);
                     if (ns->recording) {
-                        printf("Adding note!\n");
-                        // nanosynth_add_note(ns, midi_num);
+                        printf("Recording note!\n");
                         ns->mloop[mixr->tick % PPL] = midi_num;
                     }
                 }
+                printf("CCCC %d\n", ch);
             }
         }
     }
@@ -133,13 +135,21 @@ void *play_melody_loop(void *p)
         int idx = mixr->tick % PPL;
         if (ns->mloop[idx] != 0) {
             note_on(ns, ns->mloop[idx]);
-            if (ns->sustain > 0) // switched on
-                notes_played_time[idx]++;
         }
 
-        if (notes_played_time[idx] > ns->sustain) {
-            notes_played_time[idx] = 0;
-            eg_note_off(ns->eg1);
+        if (ns->sustain > 0) { // switched on
+            // printf("incrementing sustain timer\n");
+            for (int i = 0; i < PPL; i++) {
+                if (ns->mloop[i] > 0) {
+                    notes_played_time[i]++;
+                    // printf("played for %d\n", notes_played_time[i]);
+                    if (notes_played_time[i] > ns->sustain) {
+                        printf("switching off\n");
+                        notes_played_time[i] = 0;
+                        eg_note_off(ns->eg1);
+                    }
+                }
+            }
         }
     }
 
