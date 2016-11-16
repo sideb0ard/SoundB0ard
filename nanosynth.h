@@ -13,7 +13,7 @@
 typedef struct nanosynth {
     SOUNDGEN sound_generator;
 
-    int mloop[PPL];
+    int mloop[PPNS];
     // int melody_loop_num;
     // int melody_loop_cur;
 
@@ -77,6 +77,8 @@ typedef struct nanosynth {
     // "gui" controls for DCA
     double m_pan_control;
     double m_volume_db;
+
+    double last_val;
 
 } nanosynth;
 

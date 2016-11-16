@@ -324,7 +324,9 @@ void interpret(char *line)
                         NANOSYNTH_TYPE) {
                         nanosynth *ns =
                             (nanosynth *)mixr->sound_generators[(int)val1];
-                        nanosynth_set_sustain(ns, val2);
+                        // convert to midi ticks per millisec * val2
+                        int sustain_lev = (60.0 / mixr->bpm * PPQN / 1000) * val2;
+                        nanosynth_set_sustain(ns, sustain_lev);
                     }
                 }
                 if (strcmp(cmd_type, "delay1") == 0) {

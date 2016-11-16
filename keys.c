@@ -107,7 +107,7 @@ void keys(int soundgen_num)
                     note_on(ns, midi_num);
                     if (ns->recording) {
                         printf("Recording note!\n");
-                        ns->mloop[mixr->tick % PPL] = midi_num;
+                        ns->mloop[mixr->tick % PPNS] = midi_num;
                     }
                 }
                 printf("CCCC %d\n", ch);
@@ -132,19 +132,19 @@ void *play_melody_loop(void *p)
         pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
         pthread_mutex_unlock(&midi_tick_lock);
 
-        int idx = mixr->tick % PPL;
+        int idx = mixr->tick % PPNS;
         if (ns->mloop[idx] != 0) {
             note_on(ns, ns->mloop[idx]);
         }
 
         if (ns->sustain > 0) { // switched on
             // printf("incrementing sustain timer\n");
-            for (int i = 0; i < PPL; i++) {
+            for (int i = 0; i < PPNS; i++) {
                 if (ns->mloop[i] > 0) {
                     notes_played_time[i]++;
                     // printf("played for %d\n", notes_played_time[i]);
                     if (notes_played_time[i] > ns->sustain) {
-                        printf("switching off\n");
+                        printf("switching off %d - played for %d\n", i, notes_played_time[i]);
                         notes_played_time[i] = 0;
                         eg_note_off(ns->eg1);
                     }

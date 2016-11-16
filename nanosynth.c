@@ -185,7 +185,7 @@ nanosynth *new_nanosynth()
     ns->sound_generator.getvol = &nanosynth_getvol;
     ns->sound_generator.type = NANOSYNTH_TYPE;
 
-    for (int i = 0; i < PPL; i++)
+    for (int i = 0; i < PPNS; i++)
         ns->mloop[i] = 0;
 
     // nanosynth_update(ns);
@@ -199,12 +199,14 @@ nanosynth *new_nanosynth()
         pthread_detach(melody_looprrr);
     }
 
+    ns->last_val = 0;
+
     return ns;
 }
 
 void nanosynth_reset_melody(nanosynth *ns)
 {
-    for (int i = 0; i < PPL; i++)
+    for (int i = 0; i < PPNS; i++)
         ns->mloop[i] = 0;
 }
 
@@ -261,7 +263,7 @@ void change_octave(void *self, int direction)
 
 void nanosynth_print_melodies(nanosynth *self)
 {
-    for (int i = 0; i < PPL; i++) {
+    for (int i = 0; i < PPNS; i++) {
         if (self->mloop[i] != 0) {
             printf("%d: %d ", i, self->mloop[i]);
         }
@@ -290,6 +292,7 @@ void note_on(nanosynth *self, int midi_num)
     self->osc2->m_osc_fo = midi_freq;
 
     self->lfo->start_oscillator(self->lfo);
+
     start_eg(self->eg1);
 
     if (!self->osc1->m_note_on) {
@@ -316,7 +319,7 @@ double nanosynth_gennext(void *self)
 
         do_modulation_matrix(ns->m_modmatrix, 0);
 
-        // eg_update(ns->eg1);
+        eg_update(ns->eg1);
         ns->lfo->update_oscillator(ns->lfo);
 
         eg_generate(ns->eg1, NULL);
@@ -353,6 +356,8 @@ double nanosynth_gennext(void *self)
         val = effector(&ns->sound_generator, val);
         val = envelopor(&ns->sound_generator, val);
 
+        // printf("DIFF in VAL %f\n", val - ns->last_val);
+        ns->last_val = val;
         return val;
     }
     else {

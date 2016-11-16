@@ -13,8 +13,9 @@
 
 #define DEFAULT_ARRAY_SIZE 4
 
-#define PPQN 768       // Pulses Per Quarter Note
-#define PPL (PPQN * 4) // Pulses per loop - i.e 16 quart notes
+#define PPQN 768       // Pulses Per Quarter Note // one beat
+#define PPL (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
+#define PPNS (PPL * 2) //  2 bars
 
 #define DRUM_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
 
