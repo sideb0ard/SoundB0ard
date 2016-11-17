@@ -317,29 +317,37 @@ double nanosynth_gennext(void *self)
 
     if (ns->osc1->m_note_on) {
 
-        do_modulation_matrix(ns->m_modmatrix, 0);
+        // do_modulation_matrix(ns->m_modmatrix, 0);
 
         // eg_update(ns->eg1);
-        ns->lfo->update_oscillator(ns->lfo);
+        //ns->lfo->update_oscillator(ns->lfo);
 
-        eg_generate(ns->eg1, NULL);
-        ns->lfo->do_oscillate(ns->lfo, NULL);
+        double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
+        double eg_out = eg_generate(ns->eg1, NULL);
 
-        do_modulation_matrix(ns->m_modmatrix, 1);
+        // do_modulation_matrix(ns->m_modmatrix, 1);
+        osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE);
+        osc_update(ns->osc1);
 
+        osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE);
+        osc_update(ns->osc2);
+
+
+        dca_set_eg_mod(ns->dca, eg_out * ns->m_eg1_dca_intensity); 
         dca_update(ns->dca);
-        ns->f->update(ns->f);
 
-        ns->osc1->update_oscillator(ns->osc1);
-        ns->osc2->update_oscillator(ns->osc2);
+        //ns->f->update(ns->f);
+
+        //ns->osc1->update_oscillator(ns->osc1);
+        //ns->osc2->update_oscillator(ns->osc2);
 
         double osc1_val = ns->osc1->do_oscillate(ns->osc1, NULL);
         double osc2_val = ns->osc2->do_oscillate(ns->osc2, NULL);
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        // double filter_out = osc_out;
-        double filter_out = ns->f->gennext(ns->f, osc_out);
+        double filter_out = osc_out;
+        //double filter_out = ns->f->gennext(ns->f, osc_out);
 
         double out_left = 0.0;
         double out_right = 0.0;
