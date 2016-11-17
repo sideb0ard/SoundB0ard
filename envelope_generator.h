@@ -4,7 +4,7 @@
 
 #include "modmatrix.h"
 
-#define EG_MINTIME_MS 10 // these two used for attacjtime, decay and release
+#define EG_MINTIME_MS 0 // these two used for attacjtime, decay and release
 #define EG_MAXTIME_MS 5000
 #define EG_DEFAULT_STATE_TIME 1000 // ms
 #define EG1_DEFAULT_OSC_INTENSITY 0

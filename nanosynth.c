@@ -319,7 +319,7 @@ double nanosynth_gennext(void *self)
 
         do_modulation_matrix(ns->m_modmatrix, 0);
 
-        eg_update(ns->eg1);
+        // eg_update(ns->eg1);
         ns->lfo->update_oscillator(ns->lfo);
 
         eg_generate(ns->eg1, NULL);

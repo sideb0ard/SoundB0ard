@@ -19,35 +19,39 @@ envelope_generator *new_envelope_generator()
         return NULL;
     }
 
-    eg->m_state = OFFF;
-    eg->m_eg_mode = ANALOG;
-    eg->m_attack_time_msec = EG_DEFAULT_STATE_TIME;
-    printf("YO! new EG, attack time is %f\n", eg->m_attack_time_msec);
-    eg->m_decay_time_msec = EG_DEFAULT_STATE_TIME;
+    eg->m_attack_time_msec  = EG_DEFAULT_STATE_TIME;
+    eg->m_decay_time_msec   = EG_DEFAULT_STATE_TIME;
     eg->m_release_time_msec = EG_DEFAULT_STATE_TIME;
+
+    eg->m_attack_time_scalar = 1.0;
+    eg->m_decay_time_scalar = 1.0;
+
+    eg->m_sustain_level = 1.0;
+    eg->m_envelope_output = 0.0;
+
+    eg->m_inc_shutdown = 0.0;
+
     eg->m_shutdown_time_msec = 10.0;
-    eg->m_sustain_level = 0.9;
+
+    eg->m_state = OFFF;
+    eg->m_sustain_override = false;
+    eg->m_release_pending = false;
     eg->m_output_eg = false;
+    eg->m_eg_mode = ANALOG;
+    set_eg_mode(eg, eg->m_eg_mode);
+    eg->m_reset_to_zero = false;
+    eg->m_legato_mode = false;
+
+    eg->global_modmatrix = NULL;
 
     eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
 
-    eg->m_legato_mode = false;
-    eg->m_reset_to_zero = false;
-
-    eg->global_modmatrix = NULL;
-    eg->m_mod_source_eg_attack_scaling = DEST_NONE;
-    eg->m_mod_source_eg_decay_scaling = DEST_NONE;
     eg->m_mod_dest_eg_output = SOURCE_NONE;
     eg->m_mod_dest_eg_biased_output = SOURCE_NONE;
+    eg->m_mod_source_eg_attack_scaling = DEST_NONE;
+    eg->m_mod_source_eg_decay_scaling = DEST_NONE;
+    eg->m_mod_source_sustain_override = DEST_NONE;
 
-    eg->m_attack_time_scalar = 1.0;
-    printf("NEW EG - ATTACK SCALAR %f\n", eg->m_attack_time_scalar);
-    eg->m_decay_time_scalar = 1.0;
-
-    eg->m_sustain_override = false;
-    eg->m_release_pending = false;
-
-    set_eg_mode(eg, eg->m_eg_mode);
     return eg;
 }
 
@@ -60,7 +64,6 @@ void reset(envelope_generator *self)
     self->m_state = OFFF;
     self->m_release_pending = false;
     set_eg_mode(self, self->m_eg_mode);
-    calculate_release_time(self);
 
     if (self->m_reset_to_zero) {
         printf("RESET TO ZERO!\n");
@@ -90,6 +93,7 @@ void set_eg_mode(envelope_generator *self, eg_mode mode)
 
 void calculate_attack_time(envelope_generator *self)
 {
+    printf("CALC ATTK TIME!\n");
     double d_samples =
         SAMPLE_RATE *
         ((self->m_attack_time_scalar * self->m_attack_time_msec) / 1000.0);
@@ -101,6 +105,7 @@ void calculate_attack_time(envelope_generator *self)
 
 void calculate_decay_time(envelope_generator *self)
 {
+    printf("CALC DECAY TIME!\n");
     double d_samples =
         SAMPLE_RATE *
         ((self->m_decay_time_scalar * self->m_decay_time_msec) / 1000.0);
@@ -112,18 +117,16 @@ void calculate_decay_time(envelope_generator *self)
 
 void calculate_release_time(envelope_generator *self)
 {
-    double d_samples = SAMPLE_RATE * ((self->m_release_time_msec) / 1000.0);
+    printf("CALC RELEASE TIME!\n");
+    double d_samples = SAMPLE_RATE * (self->m_release_time_msec / 1000.0);
     self->m_release_coeff = exp(
         -log((1.0 + self->m_release_tco) / self->m_release_tco) / d_samples);
     self->m_release_offset =
-        self->m_release_tco * (1.0 - self->m_release_coeff);
-    printf("CAL_RELEASE %f %f\n", self->m_release_coeff,
-    self->m_release_offset);
+        - self->m_release_tco * (1.0 - self->m_release_coeff);
 }
 
 void set_attack_time_msec(envelope_generator *self, double time)
 {
-    printf("CALLED SET ATTACK_TIME with %f\n", time);
     self->m_attack_time_msec = time;
     calculate_attack_time(self);
 }
@@ -165,8 +168,8 @@ void start_eg(envelope_generator *self)
         return;
     }
 
-    //printf("STATE : %s\n", state_strings[self->m_state]);
-    // reset(self);
+    printf("STATE : %s\n", state_strings[self->m_state]);
+    reset(self);
     self->m_state = ATTACK;
 }
 
@@ -180,7 +183,7 @@ void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
 
 void eg_update(envelope_generator *self)
 {
-    // printf("CALLED EG UPDATE\n");
+    printf("CALLED EG UPDATE\n");
     if (!self->global_modmatrix || !self->m_output_eg) {
         return;
     }
@@ -282,9 +285,10 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
 
         if (self->m_envelope_output <= 0.0 ||
             self->m_release_time_msec <= 0.0) {
+            printf("Going to OFFF state via RELEASE - output was %f\n",
+                    self->m_envelope_output);
             self->m_envelope_output = 0.0;
             self->m_state = OFFF;
-            printf("Going to OFFF state via RELEASE\n");
             break;
         }
         break;
@@ -293,8 +297,8 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
         if (self->m_reset_to_zero) {
             self->m_envelope_output += self->m_inc_shutdown;
             if (self->m_envelope_output <= 0) {
-                self->m_state = OFFF;
                 self->m_envelope_output = 0.0;
+                self->m_state = OFFF;
                 break;
             }
         }
@@ -325,14 +329,14 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
 
 void eg_note_off(envelope_generator *self)
 {
-    printf("EG_NOTE_OFF called\n");
+    printf("EG NOTE OFF called\n");
     if (self->m_sustain_override) {
         self->m_release_pending = true;
         return;
     }
 
     if (self->m_envelope_output > 0) {
-        printf("RELEASE! %f\n", self->m_envelope_output);
+        printf("eg NOTE OFF - RELEASE! %f\n", self->m_envelope_output);
         self->m_state = RELEASE;
     }
     else {
