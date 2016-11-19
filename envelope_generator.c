@@ -169,7 +169,7 @@ void start_eg(envelope_generator *self)
     }
 
     //printf("STATE : %s\n", state_strings[self->m_state]);
-    reset(self);
+    //reset(self);
     self->m_state = ATTACK;
 }
 
@@ -331,6 +331,7 @@ void eg_note_off(envelope_generator *self)
         self->m_state = RELEASE;
     }
     else {
+        printf("STOPZZZ ZEE POP!\n");
         self->m_state = OFFF;
     }
 }

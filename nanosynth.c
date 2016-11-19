@@ -304,7 +304,7 @@ void note_on(nanosynth *self, int midi_num)
         self->osc2->update_oscillator(self->osc2);
     }
 
-    self->m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midi_num;
+    //self->m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midi_num;
     // TODO: send velocity self->m_modmatrix->m_sources[SOURCE_VELOCITY] =
     // velocity;
 }
@@ -357,15 +357,17 @@ double nanosynth_gennext(void *self)
             ns->osc1->stop_oscillator(ns->osc1);
             ns->osc2->stop_oscillator(ns->osc2);
             ns->lfo->stop_oscillator(ns->lfo);
-            stop_eg(ns->eg1);
+            // stop_eg(ns->eg1);
         }
 
         double val = out_left * ns->vol;
         val = effector(&ns->sound_generator, val);
         val = envelopor(&ns->sound_generator, val);
 
-        // printf("DIFF in VAL %f\n", val - ns->last_val);
+        //printf("DIFF in VAL %f\n", val - ns->last_val);
         ns->last_val = val;
+        if ( val >= 1.0)
+            printf("BARF! LOUT!LOUD!\n");
         return val;
     }
     else {
