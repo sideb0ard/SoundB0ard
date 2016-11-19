@@ -121,11 +121,11 @@ void *play_melody_loop(void *p)
 {
     nanosynth *ns = (nanosynth *)p;
 
-    int notes_played_time[PPL];
-    for (int i = 0; i < PPL; i++)
-        notes_played_time[i] = 0;
+    int note_played_time = 0;
 
     printf("PLAY melody starting..\n");
+
+    unsigned last_midi_num_played = 0;
 
     while (1) {
         pthread_mutex_lock(&midi_tick_lock);
@@ -135,20 +135,17 @@ void *play_melody_loop(void *p)
         int idx = mixr->tick % PPNS;
         if (ns->mloop[idx] != 0) {
             note_on(ns, ns->mloop[idx]);
+            last_midi_num_played = ns->mloop[idx];
+            note_played_time = 1;
         }
 
-        if (ns->sustain > 0) { // switched on
-            // printf("incrementing sustain timer\n");
-            for (int i = 0; i < PPNS; i++) {
-                if (ns->mloop[i] > 0) {
-                    notes_played_time[i]++;
-                    // printf("played for %d\n", notes_played_time[i]);
-                    if (notes_played_time[i] > ns->sustain) {
-                        printf("switching off %d - played for %d\n", i, notes_played_time[i]);
-                        notes_played_time[i] = 0;
-                        eg_note_off(ns->eg1);
-                    }
-                }
+        if (ns->sustain > 0 && note_played_time > 0) {
+            note_played_time++;
+            if ((note_played_time > ns->sustain)
+             && (ns->osc1->m_midi_note_number == last_midi_num_played))
+            {
+             eg_note_off(ns->eg1);
+             note_played_time = 0;
             }
         }
     }

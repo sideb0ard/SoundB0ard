@@ -13,7 +13,7 @@
 typedef struct nanosynth {
     SOUNDGEN sound_generator;
 
-    int mloop[PPNS];
+    unsigned mloop[PPNS];
     // int melody_loop_num;
     // int melody_loop_cur;
 
