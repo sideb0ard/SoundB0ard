@@ -181,6 +181,9 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         // destination += source*intensity*range
         double modval = src * (*mr->m_mod_intensity) * (*mr->m_mod_range);
 
+        // if (mr->m_source_index == SOURCE_EG1 && mr->m_destination_index == DEST_DCA_EG)
+        //     printf("Source EG1! -- Writing %f -- to DEST DCA!\n", modval);
+
         switch (mr->m_destination_index) {
         case DEST_ALL_OSC_FO:
             self->m_destinations[DEST_OSC1_FO] += modval;

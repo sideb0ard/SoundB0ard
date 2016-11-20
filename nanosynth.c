@@ -46,6 +46,7 @@ nanosynth *new_nanosynth()
 
     ns->m_default_mod_intensity = 1.0;
     ns->m_default_mod_range = 1.0;
+
     ns->m_osc_fo_mod_range = OSC_FO_MOD_RANGE;
     ns->m_filter_mod_range = FILTER_FC_MOD_RANGE;
 
@@ -148,7 +149,7 @@ nanosynth *new_nanosynth()
     ns->osc2->m_mod_source_fo = DEST_OSC2_FO;
     ns->osc2->m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
 
-    ns->f->global_modmatrix = ns->m_modmatrix;
+    ns->f->g_modmatrix = ns->m_modmatrix;
     ns->f->m_mod_source_fc = DEST_FILTER1_FC;
     ns->f->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
 
@@ -159,14 +160,14 @@ nanosynth *new_nanosynth()
     ns->lfo->m_mod_dest_output1 = SOURCE_LFO1;
     ns->lfo->m_mod_dest_output2 = SOURCE_LFO1Q;
 
-    ns->eg1->global_modmatrix = ns->m_modmatrix;
+    ns->eg1->g_modmatrix = ns->m_modmatrix;
     ns->eg1->m_mod_dest_eg_output = SOURCE_EG1;
     ns->eg1->m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
     ns->eg1->m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
     ns->eg1->m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
     ns->eg1->m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
 
-    ns->dca->global_modmatrix = ns->m_modmatrix;
+    ns->dca->g_modmatrix = ns->m_modmatrix;
     ns->dca->m_mod_source_eg = DEST_DCA_EG;
     ns->dca->m_mod_source_amp_db = DEST_NONE;
     ns->dca->m_mod_source_velocity = DEST_DCA_VELOCITY;
@@ -292,7 +293,6 @@ void note_on(nanosynth *self, int midi_num)
     self->osc2->m_osc_fo = midi_freq;
 
     self->lfo->start_oscillator(self->lfo);
-
     start_eg(self->eg1);
 
     if (!self->osc1->m_note_on) {
@@ -304,7 +304,7 @@ void note_on(nanosynth *self, int midi_num)
         self->osc2->update_oscillator(self->osc2);
     }
 
-    //self->m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midi_num;
+    self->m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midi_num;
     // TODO: send velocity self->m_modmatrix->m_sources[SOURCE_VELOCITY] =
     // velocity;
 }
@@ -314,65 +314,58 @@ double nanosynth_gennext(void *self)
     nanosynth *ns = (nanosynth *)self;
 
     // nanosynth_update(ns); // "GUI" controls
+    double out_left = 0.0;
+    double out_right = 0.0;
 
     if (ns->osc1->m_note_on) {
 
+        // layer 0
         // do_modulation_matrix(ns->m_modmatrix, 0);
 
-        // eg_update(ns->eg1);
-        //ns->lfo->update_oscillator(ns->lfo);
+        eg_update(ns->eg1);
+        ns->lfo->update_oscillator(ns->lfo);
 
-        double lfo_out = ns->lfo->do_oscillate(ns->lfo, NULL);
-        double eg_out = eg_generate(ns->eg1, NULL);
+        do_envelope(ns->eg1, NULL);
 
-        // do_modulation_matrix(ns->m_modmatrix, 1);
-        osc_set_fo_mod_exp(ns->osc1, lfo_out * OSC_FO_MOD_RANGE);
-        osc_update(ns->osc1);
+        double yar = 0;
+        yar = ns->lfo->do_oscillate(ns->lfo, NULL);
 
-        osc_set_fo_mod_exp(ns->osc2, lfo_out * OSC_FO_MOD_RANGE);
-        osc_update(ns->osc2);
+        //// layer 1
+        do_modulation_matrix(ns->m_modmatrix, 1);
 
-
-        dca_set_eg_mod(ns->dca, eg_out * ns->m_eg1_dca_intensity); 
         dca_update(ns->dca);
+        ns->f->update(ns->f);
 
-        //ns->f->update(ns->f);
+        ns->osc1->update_oscillator(ns->osc1);
+        ns->osc2->update_oscillator(ns->osc2);
 
-        //ns->osc1->update_oscillator(ns->osc1);
-        //ns->osc2->update_oscillator(ns->osc2);
-
+        //// audio engine block //
         double osc1_val = ns->osc1->do_oscillate(ns->osc1, NULL);
         double osc2_val = ns->osc2->do_oscillate(ns->osc2, NULL);
 
         double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
 
-        double filter_out = osc_out;
-        //double filter_out = ns->f->gennext(ns->f, osc_out);
+        double filter_out = ns->f->gennext(ns->f, osc_out);
 
-        double out_left = 0.0;
-        double out_right = 0.0;
         dca_gennext(ns->dca, filter_out, filter_out, &out_left, &out_right);
 
         if ((get_state(ns->eg1)) == 0) {
             ns->osc1->stop_oscillator(ns->osc1);
             ns->osc2->stop_oscillator(ns->osc2);
             ns->lfo->stop_oscillator(ns->lfo);
-            // stop_eg(ns->eg1);
+            stop_eg(ns->eg1);
         }
 
-        double val = out_left * ns->vol;
-        val = effector(&ns->sound_generator, val);
-        val = envelopor(&ns->sound_generator, val);
+        out_left = effector(&ns->sound_generator, out_left);
+        out_left = envelopor(&ns->sound_generator, out_left);
 
-        //printf("DIFF in VAL %f\n", val - ns->last_val);
-        ns->last_val = val;
-        if ( val >= 1.0)
-            printf("BARF! LOUT!LOUD!\n");
-        return val;
+        // //printf("DIFF in VAL %f\n", val - ns->last_val);
+        // ns->last_val = val;
+        // if ( val >= 1.0)
+        //     printf("BARF! LOUT!LOUD!\n");
     }
-    else {
-        return 0.0;
-    }
+
+    return out_left;
 }
 
 void nanosynth_set_sustain(nanosynth *self, int val)
@@ -405,7 +398,6 @@ void nanosynth_update(nanosynth *self)
     self->lfo->m_lfo_mode = self->m_lfo_mode;
     // osc_update(self->lfo);
 
-    printf("CALLING SET ATTACK TIME...\n");
     set_attack_time_msec(self->eg1, self->m_attack_time_msec);
     set_decay_time_msec(self->eg1, self->m_decay_time_msec);
     set_sustain_level(self->eg1, self->m_sustain_level);

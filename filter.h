@@ -41,7 +41,7 @@ struct filter {
     double m_q;      // current q value
     double m_fc_mod; // frequency cutoff modulation input
 
-    modmatrix *global_modmatrix;
+    modmatrix *g_modmatrix;
     // sources
     unsigned m_mod_source_fc;
     unsigned m_mod_source_fc_control;

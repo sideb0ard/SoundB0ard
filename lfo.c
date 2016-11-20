@@ -54,6 +54,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
         return 0.0;
     }
 
+
     // for QP output
     // advance modulo by 0.25 = 90 degrees
     double quad_modulo = self->m_modulo + 0.25;
@@ -75,6 +76,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
         // use second modulo for quad phase
         angle = quad_modulo * 2.0 * M_PI - M_PI;
         qp_out = parabolic_sine(-angle, true);
+
 
         break;
     }

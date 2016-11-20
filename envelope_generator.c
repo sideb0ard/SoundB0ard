@@ -42,7 +42,7 @@ envelope_generator *new_envelope_generator()
     eg->m_reset_to_zero = false;
     eg->m_legato_mode = false;
 
-    eg->global_modmatrix = NULL;
+    eg->g_modmatrix = NULL;
 
     eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
 
@@ -183,8 +183,8 @@ void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
 
 void eg_update(envelope_generator *self)
 {
-    printf("CALLED EG UPDATE\n");
-    if (!self->global_modmatrix || !self->m_output_eg) {
+    // printf("CALLED EG UPDATE\n");
+    if (!self->g_modmatrix || !self->m_output_eg) {
         return;
     }
 
@@ -192,7 +192,7 @@ void eg_update(envelope_generator *self)
     if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
         self->m_attack_time_scalar == 1.0) {
         double scale =
-            self->global_modmatrix
+            self->g_modmatrix
                 ->m_destinations[self->m_mod_source_eg_attack_scaling];
         if (self->m_attack_time_scalar != 1.0 - scale) {
             self->m_attack_time_scalar = 1.0 - scale;
@@ -205,7 +205,7 @@ void eg_update(envelope_generator *self)
     if (self->m_mod_source_eg_decay_scaling != DEST_NONE &&
         self->m_decay_time_scalar == 1.0) {
         double scale =
-            self->global_modmatrix
+            self->g_modmatrix
                 ->m_destinations[self->m_mod_source_eg_decay_scaling];
         if (self->m_decay_time_scalar != 1.0 - scale) {
             self->m_decay_time_scalar = 1.0 - scale;
@@ -215,7 +215,7 @@ void eg_update(envelope_generator *self)
 
     if (self->m_mod_source_sustain_override != DEST_NONE) {
         double sustain =
-            self->global_modmatrix
+            self->g_modmatrix
                 ->m_destinations[self->m_mod_source_sustain_override];
         if (sustain == 0)
             set_sustain_override(self, false);
@@ -224,9 +224,9 @@ void eg_update(envelope_generator *self)
     }
 }
 
-double eg_generate(envelope_generator *self, double *p_biased_output)
+double do_envelope(envelope_generator *self, double *p_biased_output)
 {
-    //printf("STATE! %s\n", state_strings[self->m_state]);
+    // printf("STATE! %s\n", state_strings[self->m_state]);
     switch (self->m_state) {
     case OFFF: {
         if (self->m_reset_to_zero)
@@ -276,9 +276,9 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
 
         if (self->m_envelope_output <= 0.0 ||
             self->m_release_time_msec <= 0.0) {
-            // printf("Going to OFFF state via RELEASE - output was %f\n",
-            //        self->m_envelope_output);
-            self->m_envelope_output = 0.0;
+            printf("Going to OFFF state via RELEASE - output was %f\n",
+                   self->m_envelope_output);
+            // self->m_envelope_output = 0.0;
             self->m_state = OFFF;
             break;
         }
@@ -301,13 +301,13 @@ double eg_generate(envelope_generator *self, double *p_biased_output)
     }
     }
 
-    if (self->global_modmatrix) {
-        // self->global_modmatrix->m_destinations[SOURCE_EG1] =
+    if (self->g_modmatrix) {
+        // self->g_modmatrix->m_destinations[SOURCE_EG1] =
         // self->m_envelope_output;
-        // self->global_modmatrix->m_destinations[SOURCE_BIASED_EG1] =
+        // self->g_modmatrix->m_destinations[SOURCE_BIASED_EG1] =
         // self->m_envelope_output;
-        self->global_modmatrix->m_sources[SOURCE_EG1] = self->m_envelope_output;
-        self->global_modmatrix->m_sources[SOURCE_BIASED_EG1] =
+        self->g_modmatrix->m_sources[SOURCE_EG1] = self->m_envelope_output;
+        self->g_modmatrix->m_sources[SOURCE_BIASED_EG1] =
             self->m_envelope_output;
     }
 
@@ -327,11 +327,11 @@ void eg_note_off(envelope_generator *self)
     }
 
     if (self->m_envelope_output > 0) {
-        //printf("eg NOTE OFF - RELEASE! %f\n", self->m_envelope_output);
+        printf("eg NOTE OFF - RELEASE! %f\n", self->m_envelope_output);
         self->m_state = RELEASE;
     }
     else {
-        printf("STOPZZZ ZEE POP!\n");
+        printf("STOPZZZ ZEE POP! %f\n", self->m_envelope_output);
         self->m_state = OFFF;
     }
 }

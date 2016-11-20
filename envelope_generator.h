@@ -60,7 +60,7 @@ typedef struct envelope_generator {
 
     state m_state;
 
-    modmatrix *global_modmatrix;
+    modmatrix *g_modmatrix;
     unsigned m_mod_source_eg_attack_scaling;
     unsigned m_mod_source_eg_decay_scaling;
     unsigned m_mod_source_sustain_override;
@@ -92,7 +92,7 @@ void set_sample_rate(envelope_generator *self, double samplerate);
 
 void start_eg(envelope_generator *self);
 void stop_eg(envelope_generator *self);
-double eg_generate(envelope_generator *self, double *p_biased_output);
+double do_envelope(envelope_generator *self, double *p_biased_output);
 
 void eg_update(envelope_generator *self);
 void eg_release(envelope_generator *self);

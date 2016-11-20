@@ -16,7 +16,7 @@ typedef struct dca {
     double m_pan_mod;
     int m_midi_velocity;
 
-    modmatrix *global_modmatrix;
+    modmatrix *g_modmatrix;
 
     unsigned m_mod_source_eg;
     unsigned m_mod_source_amp_db;
