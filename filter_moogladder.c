@@ -73,7 +73,8 @@ void moog_update(filter *f)
     moog->m_LPF4.m_beta = 1.0 / (1.0 + g);
 
     moog->m_gamma = G * G * G * G;
-    moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * G + moog->m_k * G * G);
+    //moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * G + moog->m_k * G * G);
+    moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * moog->m_gamma);
 
     switch (moog->f.m_type) {
     case LPF4:

@@ -165,8 +165,9 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
             continue; // shouldn't happen. but jist in case!
         if (!mr->m_enable)
             continue;
-        if (!check_destination_layer(layer, mr))
+        if (!check_destination_layer(layer, mr)) {
             continue;
+        }
 
         double src = self->m_sources[mr->m_source_index];
 

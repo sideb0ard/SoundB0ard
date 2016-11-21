@@ -84,38 +84,38 @@ nanosynth *new_nanosynth()
     row = create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_FILTER_KEYTRACK,
                             &ns->m_filter_keytrack_intensity,
                             &ns->m_default_mod_range,
-                            TRANSFORM_NOTE_NUMBER_TO_FREQUENCY, true);
+                            TRANSFORM_NOTE_NUMBER_TO_FREQUENCY, false);
     add_matrix_row(ns->m_modmatrix, row);
 
     // VELOCITY -> DCA VEL
     row = create_matrix_row(SOURCE_VELOCITY, DEST_DCA_VELOCITY,
                             &ns->m_default_mod_intensity,
-                            &ns->m_default_mod_range, TRANSFORM_NONE, true);
+                            &ns->m_default_mod_range, TRANSFORM_NONE, false);
     add_matrix_row(ns->m_modmatrix, row);
 
     // PITCHBEND -> PITCHBEND
     row = create_matrix_row(
         SOURCE_PITCHBEND, DEST_ALL_OSC_FO, &ns->m_default_mod_intensity,
-        &ns->m_osc_fo_pitchbend_mod_range, TRANSFORM_NONE, true);
+        &ns->m_osc_fo_pitchbend_mod_range, TRANSFORM_NONE, false);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Vol CC07
     row = create_matrix_row(SOURCE_MIDI_VOLUME_CC07, DEST_DCA_AMP,
                             &ns->m_default_mod_intensity, &ns->m_amp_mod_range,
-                            TRANSFORM_INVERT_MIDI_NORMALIZE, true);
+                            TRANSFORM_INVERT_MIDI_NORMALIZE, false);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Pan CC10
     row = create_matrix_row(
         SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN, &ns->m_default_mod_intensity,
-        &ns->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, true);
+        &ns->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, false);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Sustain Pedal
     row = create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
                             &ns->m_default_mod_intensity,
                             &ns->m_default_mod_range, TRANSFORM_MIDI_SWITCH,
-                            true);
+                            false);
     add_matrix_row(ns->m_modmatrix, row);
 
     // VELOCITY -> EG ATTACK SOURCE_VELOCITY
@@ -163,9 +163,9 @@ nanosynth *new_nanosynth()
     ns->eg1->g_modmatrix = ns->m_modmatrix;
     ns->eg1->m_mod_dest_eg_output = SOURCE_EG1;
     ns->eg1->m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
-    ns->eg1->m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
-    ns->eg1->m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
-    ns->eg1->m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
+    // ns->eg1->m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
+    // ns->eg1->m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
+    // ns->eg1->m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
 
     ns->dca->g_modmatrix = ns->m_modmatrix;
     ns->dca->m_mod_source_eg = DEST_DCA_EG;
@@ -173,11 +173,11 @@ nanosynth *new_nanosynth()
     ns->dca->m_mod_source_velocity = DEST_DCA_VELOCITY;
     ns->dca->m_mod_source_pan = DEST_DCA_PAN;
 
-    ns->vol = 1.0;
+    ns->vol = 0.7;
     ns->cur_octave = 4;
     ns->sustain = 0;
 
-    ns->m_filter_keytrack = true;
+    ns->m_filter_keytrack = false;
     ns->m_filter_keytrack_intensity = 0.5;
 
     ns->sound_generator.gennext = &nanosynth_gennext;
@@ -320,7 +320,7 @@ double nanosynth_gennext(void *self)
     if (ns->osc1->m_note_on) {
 
         // layer 0
-        // do_modulation_matrix(ns->m_modmatrix, 0);
+        do_modulation_matrix(ns->m_modmatrix, 0);
 
         eg_update(ns->eg1);
         ns->lfo->update_oscillator(ns->lfo);
@@ -354,10 +354,12 @@ double nanosynth_gennext(void *self)
             ns->osc2->stop_oscillator(ns->osc2);
             ns->lfo->stop_oscillator(ns->lfo);
             stop_eg(ns->eg1);
+            printf("St-0pping through 0: out_left is %f and eg out is %f\n",
+                    out_left, ns->eg1->m_envelope_output);
         }
 
-        out_left = effector(&ns->sound_generator, out_left);
-        out_left = envelopor(&ns->sound_generator, out_left);
+        // out_left = effector(&ns->sound_generator, out_left);
+        // out_left = envelopor(&ns->sound_generator, out_left);
 
         // //printf("DIFF in VAL %f\n", val - ns->last_val);
         // ns->last_val = val;
