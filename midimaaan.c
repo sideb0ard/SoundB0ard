@@ -3,6 +3,7 @@
 #include <porttime.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 
 #include "defjams.h"
 #include "midi_freq_table.h"
@@ -57,21 +58,32 @@ void *midiman()
 
                 // printf("HAS ACTIVE nanosynth? %d\n", mixr->has_active_ns);
                 if (mixr->has_active_nanosynth) {
+
+                    nanosynth *ns =
+                        (nanosynth *)
+                            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
+
+                    if (ns->recording)
+                    {
+                        int tick = mixr->tick % PPNS;
+                        midi_event *ev = new_midi_event(tick, status, data1, data2);
+                        ns->midi_events_loop[tick] = ev;
+                    }
                     switch (status) {
                     case (144): { // Hex 0x80
-                        midinoteon(data1, data2);
+                        midinoteon(ns, data1, data2);
                         break;
                     }
                     case (128): { // Hex 0x90
-                        midinoteoff(data1, data2);
+                        midinoteoff(ns, data1, data2);
                         break;
                     }
                     case (176): { // Hex 0xB0
-                        midicontrol(data1, data2);
+                        midicontrol(ns, data1, data2);
                         break;
                     }
                     case (224): { // Hex 0xE0
-                        midipitchbend(data1, data2);
+                        midipitchbend(ns, data1, data2);
                         break;
                     }
                     default:
@@ -90,45 +102,53 @@ void *midiman()
     return NULL;
 }
 
-void midinoteon(unsigned int midinote, int velocity)
+void print_midi_event_rec(midi_event *ev)
+{
+    printf("[Midi] %d note: %d\n", ev->tick, ev->data1);
+}
+
+midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
+{
+    midi_event *ev = calloc(1, sizeof(midi_event));
+    if (ev == NULL) {
+        printf("BIG PROBS MATE\n");
+        return NULL;
+    }
+    ev->tick = tick;
+    ev->event_type = event_type;
+    ev->data1 = data1;
+    ev->data2 = data2;
+
+    return ev;
+}
+
+void midinoteon(nanosynth *ns, unsigned int midinote, int velocity)
 {
     (void)velocity;
-    print_midi_event(midinote);
-    nanosynth *ns =
-        (nanosynth *)
-            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     note_on(ns, midinote);
     if (ns->recording) {
         ns->mloop[mixr->tick % PPL] = midinote;
     }
 }
 
-void midinoteoff(unsigned int midinote, int velocity)
+void midinoteoff(nanosynth *ns, unsigned int midinote, int velocity)
 {
     (void)velocity;
-    nanosynth *ns =
-        (nanosynth *)
-            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     if (midinote == ns->osc1->m_midi_note_number) {
         eg_note_off(ns->eg1);
     }
 }
 
-void midipitchbend(int data1, int data2)
+void midipitchbend(nanosynth *ns, int data1, int data2)
 {
     printf("Pitch bend, babee: %d %d\n", data1, data2);
     int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
 
-    nanosynth *ns =
-        (nanosynth *)
-            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     if (actual_pitch_bent_val != 8192) {
         double normalized_pitch_bent_val =
             (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
         ns->m_modmatrix->m_sources[SOURCE_PITCHBEND] =
             normalized_pitch_bent_val;
-        // printf("Actzl: %d and norm %f\n", actual_pitch_bent_val,
-        //       normalized_pitch_bent_val);
         double scaley_val =
             // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
@@ -142,12 +162,9 @@ void midipitchbend(int data1, int data2)
     }
 }
 
-void midicontrol(int data1, int data2)
+void midicontrol(nanosynth *ns, int data1, int data2)
 {
     printf("MIDI Mind Control! %d %d\n", data1, data2);
-    nanosynth *ns =
-        (nanosynth *)
-            mixr->sound_generators[mixr->active_nanosynth_soundgen_num];
     double scaley_val;
     switch (data1) {
     case 1: // K1 - Envelope Attack Time Msec

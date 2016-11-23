@@ -27,6 +27,10 @@ nanosynth *new_nanosynth()
     if (ns == NULL)
         return NULL;
 
+    for (int i = 0; i < PPNS; i++) {
+        ns->midi_events_loop[i] = NULL;
+    }
+
     ns->osc1 = (oscillator *)qb_osc_new();
     ns->osc2 = (oscillator *)qb_osc_new();
     ns->osc2->m_cents = 2.5;
@@ -173,7 +177,7 @@ nanosynth *new_nanosynth()
     ns->dca->m_mod_source_velocity = DEST_DCA_VELOCITY;
     ns->dca->m_mod_source_pan = DEST_DCA_PAN;
 
-    ns->vol = 0.7;
+    ns->dca->m_gain = 0.7;
     ns->cur_octave = 4;
     ns->sustain = 0;
 
@@ -240,13 +244,14 @@ void nanosynth_setvol(void *self, double v)
     if (v < 0.0 || v > 1.0) {
         return;
     }
-    ns->vol = v;
+    ns->dca->m_gain = v;
+    printf("SAW DCA vol - nwo its %f\n", ns->dca->m_gain);
 }
 
 double nanosynth_getvol(void *self)
 {
     nanosynth *ns = (nanosynth *)self;
-    return ns->vol;
+    return ns->dca->m_gain;
 }
 
 void change_octave(void *self, int direction)
@@ -278,7 +283,7 @@ void nanosynth_status(void *self, char *status_string)
     snprintf(status_string, 119,
              ANSI_COLOR_RED "nanosynth! %.2f(freq) sustain: %d "
                             "vol: %.2f" ANSI_COLOR_RESET,
-             ns->osc1->m_fo, ns->sustain, ns->vol);
+             ns->osc1->m_fo, ns->sustain, ns->dca->m_gain);
     nanosynth_print_melodies(ns);
 }
 
@@ -319,7 +324,7 @@ double nanosynth_gennext(void *self)
 
     if (ns->osc1->m_note_on) {
 
-        // layer 0
+        // layer 0 //////////////////////////////
         do_modulation_matrix(ns->m_modmatrix, 0);
 
         eg_update(ns->eg1);
@@ -330,7 +335,7 @@ double nanosynth_gennext(void *self)
         double yar = 0;
         yar = ns->lfo->do_oscillate(ns->lfo, NULL);
 
-        //// layer 1
+        //// layer 1 /////////////////////////////
         do_modulation_matrix(ns->m_modmatrix, 1);
 
         dca_update(ns->dca);
@@ -339,7 +344,7 @@ double nanosynth_gennext(void *self)
         ns->osc1->update_oscillator(ns->osc1);
         ns->osc2->update_oscillator(ns->osc2);
 
-        //// audio engine block //
+        //// audio engine block ///////////////////////////////
         double osc1_val = ns->osc1->do_oscillate(ns->osc1, NULL);
         double osc2_val = ns->osc2->do_oscillate(ns->osc2, NULL);
 
@@ -354,17 +359,10 @@ double nanosynth_gennext(void *self)
             ns->osc2->stop_oscillator(ns->osc2);
             ns->lfo->stop_oscillator(ns->lfo);
             stop_eg(ns->eg1);
-            printf("St-0pping through 0: out_left is %f and eg out is %f\n",
-                    out_left, ns->eg1->m_envelope_output);
         }
 
-        // out_left = effector(&ns->sound_generator, out_left);
-        // out_left = envelopor(&ns->sound_generator, out_left);
-
-        // //printf("DIFF in VAL %f\n", val - ns->last_val);
-        // ns->last_val = val;
-        // if ( val >= 1.0)
-        //     printf("BARF! LOUT!LOUD!\n");
+        out_left = effector(&ns->sound_generator, out_left);
+        out_left = envelopor(&ns->sound_generator, out_left);
     }
 
     return out_left;

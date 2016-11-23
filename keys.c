@@ -133,10 +133,35 @@ void *play_melody_loop(void *p)
         pthread_mutex_unlock(&midi_tick_lock);
 
         int idx = mixr->tick % PPNS;
-        if (ns->mloop[idx] != 0) {
-            note_on(ns, ns->mloop[idx]);
-            last_midi_num_played = ns->mloop[idx];
-            note_played_time = 1;
+        // if (ns->mloop[idx] != 0) {
+        //     note_on(ns, ns->mloop[idx]);
+        //     last_midi_num_played = ns->mloop[idx];
+        //     note_played_time = 1;
+        // }
+
+        if (ns->midi_events_loop[idx] != NULL) {
+          midi_event *ev = ns->midi_events_loop[idx];
+          //print_midi_event_rec(ev);
+          switch(ev->event_type) {
+          case(144): {
+              midinoteon(ns, ev->data1, ev->data2);
+              break;
+          }
+          case (128): { // Hex 0x90
+              midinoteoff(ns, ev->data1, ev->data2);
+              break;
+          }
+          case (176): { // Hex 0xB0
+              midicontrol(ns, ev->data1, ev->data2);
+              break;
+          }
+          case (224): { // Hex 0xE0
+              midipitchbend(ns, ev->data1, ev->data2);
+              break;
+          }
+          }
+          last_midi_num_played = ev->data1;
+          note_played_time = 1;
         }
 
         if (ns->sustain > 0 && note_played_time > 0) {

@@ -278,8 +278,8 @@ double do_envelope(envelope_generator *self, double *p_biased_output)
 
         if (self->m_envelope_output <= 0.0 ||
             self->m_release_time_msec <= 0.0) {
-            printf("Going to OFFF state via RELEASE - output was %f\n",
-                   self->m_envelope_output);
+            // printf("Going to OFFF state via RELEASE - output was %f\n",
+            //        self->m_envelope_output);
             self->m_envelope_output = 0.0;
             self->m_state = OFFF;
             break;
