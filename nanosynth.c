@@ -177,6 +177,7 @@ nanosynth *new_nanosynth()
     ns->dca->m_mod_source_velocity = DEST_DCA_VELOCITY;
     ns->dca->m_mod_source_pan = DEST_DCA_PAN;
 
+    ns->vol = 0.7;
     ns->dca->m_gain = 0.7;
     ns->cur_octave = 4;
     ns->sustain = 0;
@@ -212,7 +213,11 @@ nanosynth *new_nanosynth()
 void nanosynth_reset_melody(nanosynth *ns)
 {
     for (int i = 0; i < PPNS; i++)
-        ns->mloop[i] = 0;
+        if ( ns->midi_events_loop[i] != NULL ) {
+            midi_event *tmp = ns->midi_events_loop[i];
+            ns->midi_events_loop[i] = NULL;
+            free(tmp);
+        }
 }
 
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
@@ -244,14 +249,13 @@ void nanosynth_setvol(void *self, double v)
     if (v < 0.0 || v > 1.0) {
         return;
     }
-    ns->dca->m_gain = v;
-    printf("SAW DCA vol - nwo its %f\n", ns->dca->m_gain);
+    ns->vol = v;
 }
 
 double nanosynth_getvol(void *self)
 {
     nanosynth *ns = (nanosynth *)self;
-    return ns->dca->m_gain;
+    return ns->vol;
 }
 
 void change_octave(void *self, int direction)
@@ -270,8 +274,8 @@ void change_octave(void *self, int direction)
 void nanosynth_print_melodies(nanosynth *self)
 {
     for (int i = 0; i < PPNS; i++) {
-        if (self->mloop[i] != 0) {
-            printf("%d: %d ", i, self->mloop[i]);
+        if (self->midi_events_loop[i] != NULL) {
+            printf("%d: %d ", i, self->midi_events_loop[i]->data1);
         }
     }
     printf("\n");
@@ -283,7 +287,7 @@ void nanosynth_status(void *self, char *status_string)
     snprintf(status_string, 119,
              ANSI_COLOR_RED "nanosynth! %.2f(freq) sustain: %d "
                             "vol: %.2f" ANSI_COLOR_RESET,
-             ns->osc1->m_fo, ns->sustain, ns->dca->m_gain);
+             ns->osc1->m_fo, ns->sustain, ns->vol);
     nanosynth_print_melodies(ns);
 }
 
@@ -363,9 +367,10 @@ double nanosynth_gennext(void *self)
 
         out_left = effector(&ns->sound_generator, out_left);
         out_left = envelopor(&ns->sound_generator, out_left);
+
     }
 
-    return out_left;
+    return out_left * ns->vol;
 }
 
 void nanosynth_set_sustain(nanosynth *self, int val)

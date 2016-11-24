@@ -41,7 +41,7 @@ typedef struct nanosynth {
     bool m_velocity_to_attack_scaling;
     bool m_note_number_to_decay_scaling;
 
-    // float vol;
+    float vol;
 
     modmatrix *m_modmatrix; // routing structure for sound generation
 

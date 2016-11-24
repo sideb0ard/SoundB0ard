@@ -67,8 +67,8 @@ void keys(int soundgen_num)
                 change_octave(ns, UP);
                 break;
             case 114:
-                printf("Switching on REC\n");
-                ns->recording = true;
+                ns->recording = 1 - ns->recording;
+                printf("Toggling REC to %s\n", ns->recording ? "true" : "false");
                 break;
             case 122:
                 printf("Changing WAVE form of synth->osc1\n");
@@ -107,7 +107,10 @@ void keys(int soundgen_num)
                     note_on(ns, midi_num);
                     if (ns->recording) {
                         printf("Recording note!\n");
-                        ns->mloop[mixr->tick % PPNS] = midi_num;
+                        //ns->mloop[mixr->tick % PPNS] = midi_num;
+                        int tick = mixr->tick % PPNS;
+                        midi_event *ev = new_midi_event(tick, 144, midi_num, 0);
+                        ns->midi_events_loop[tick] = ev;
                     }
                 }
                 printf("CCCC %d\n", ch);

@@ -110,14 +110,14 @@ void faderrr(int sg_num, direction d)
     double vol = 0;
 
     if (d == UP) {
-        while (vol < 0.6) {
+        while (vol < 0.7) {
             vol += 0.0001;
             mixr->sound_generators[sg_num]->setvol(
                 mixr->sound_generators[sg_num], vol);
             nanosleep(&ts, NULL);
         }
         mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
-                                               0.6);
+                                               0.7);
     }
     else {
         double vol = mixr->sound_generators[sg_num]->getvol(

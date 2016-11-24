@@ -126,9 +126,9 @@ void midinoteon(nanosynth *ns, unsigned int midinote, int velocity)
 {
     (void)velocity;
     note_on(ns, midinote);
-    if (ns->recording) {
-        ns->mloop[mixr->tick % PPL] = midinote;
-    }
+    // if (ns->recording) {
+    //     ns->mloop[mixr->tick % PPL] = midinote;
+    // }
 }
 
 void midinoteoff(nanosynth *ns, unsigned int midinote, int velocity)
@@ -141,7 +141,7 @@ void midinoteoff(nanosynth *ns, unsigned int midinote, int velocity)
 
 void midipitchbend(nanosynth *ns, int data1, int data2)
 {
-    printf("Pitch bend, babee: %d %d\n", data1, data2);
+    //printf("Pitch bend, babee: %d %d\n", data1, data2);
     int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
 
     if (actual_pitch_bent_val != 8192) {
@@ -152,7 +152,7 @@ void midipitchbend(nanosynth *ns, int data1, int data2)
         double scaley_val =
             // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
-        printf("Cents to bend - %f\n", scaley_val);
+        //printf("Cents to bend - %f\n", scaley_val);
         ns->osc1->m_cents = scaley_val;
         ns->osc2->m_cents = scaley_val + 2.5;
     }
@@ -164,7 +164,7 @@ void midipitchbend(nanosynth *ns, int data1, int data2)
 
 void midicontrol(nanosynth *ns, int data1, int data2)
 {
-    printf("MIDI Mind Control! %d %d\n", data1, data2);
+    //printf("MIDI Mind Control! %d %d\n", data1, data2);
     double scaley_val;
     switch (data1) {
     case 1: // K1 - Envelope Attack Time Msec
