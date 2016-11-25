@@ -1,6 +1,6 @@
 #include <math.h>
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "dca.h"
 #include "defjams.h"
@@ -51,18 +51,21 @@ void dca_set_pan_mod(DCA *self, double mod) { self->m_pan_mod = mod; }
 
 void dca_update(DCA *self)
 {
-    if (self->g_modmatrix)
-    {
+    if (self->g_modmatrix) {
         if (self->m_mod_source_eg != DEST_NONE) {
-            self->m_eg_mod = self->g_modmatrix->m_destinations[self->m_mod_source_eg];
+            self->m_eg_mod =
+                self->g_modmatrix->m_destinations[self->m_mod_source_eg];
         }
         if (self->m_mod_source_amp_db != DEST_NONE)
-            self->m_amp_mod_db = self->g_modmatrix->m_destinations[self->m_mod_source_amp_db];
+            self->m_amp_mod_db =
+                self->g_modmatrix->m_destinations[self->m_mod_source_amp_db];
 
         if (self->m_mod_source_velocity != DEST_NONE)
-            self->m_midi_velocity = self->g_modmatrix->m_destinations[self->m_mod_source_velocity];
+            self->m_midi_velocity =
+                self->g_modmatrix->m_destinations[self->m_mod_source_velocity];
         if (self->m_mod_source_pan != DEST_NONE)
-            self->m_pan_mod = self->g_modmatrix->m_destinations[self->m_mod_source_pan];
+            self->m_pan_mod =
+                self->g_modmatrix->m_destinations[self->m_mod_source_pan];
     }
 
     if (self->m_eg_mod >= 0)
@@ -71,7 +74,6 @@ void dca_update(DCA *self)
         self->m_gain = self->m_eg_mod + 1.0;
 
     self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
-
 }
 
 void dca_gennext(DCA *self, double left_input, double right_input,

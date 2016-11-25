@@ -213,7 +213,7 @@ nanosynth *new_nanosynth()
 void nanosynth_reset_melody(nanosynth *ns)
 {
     for (int i = 0; i < PPNS; i++)
-        if ( ns->midi_events_loop[i] != NULL ) {
+        if (ns->midi_events_loop[i] != NULL) {
             midi_event *tmp = ns->midi_events_loop[i];
             ns->midi_events_loop[i] = NULL;
             free(tmp);
@@ -367,7 +367,6 @@ double nanosynth_gennext(void *self)
 
         out_left = effector(&ns->sound_generator, out_left);
         out_left = envelopor(&ns->sound_generator, out_left);
-
     }
 
     return out_left * ns->vol;

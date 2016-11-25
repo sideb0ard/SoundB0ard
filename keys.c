@@ -68,7 +68,8 @@ void keys(int soundgen_num)
                 break;
             case 114:
                 ns->recording = 1 - ns->recording;
-                printf("Toggling REC to %s\n", ns->recording ? "true" : "false");
+                printf("Toggling REC to %s\n",
+                       ns->recording ? "true" : "false");
                 break;
             case 122:
                 printf("Changing WAVE form of synth->osc1\n");
@@ -107,7 +108,7 @@ void keys(int soundgen_num)
                     note_on(ns, midi_num);
                     if (ns->recording) {
                         printf("Recording note!\n");
-                        //ns->mloop[mixr->tick % PPNS] = midi_num;
+                        // ns->mloop[mixr->tick % PPNS] = midi_num;
                         int tick = mixr->tick % PPNS;
                         midi_event *ev = new_midi_event(tick, 144, midi_num, 0);
                         ns->midi_events_loop[tick] = ev;
@@ -143,37 +144,36 @@ void *play_melody_loop(void *p)
         // }
 
         if (ns->midi_events_loop[idx] != NULL) {
-          midi_event *ev = ns->midi_events_loop[idx];
-          //print_midi_event_rec(ev);
-          switch(ev->event_type) {
-          case(144): {
-              midinoteon(ns, ev->data1, ev->data2);
-              break;
-          }
-          case (128): { // Hex 0x90
-              midinoteoff(ns, ev->data1, ev->data2);
-              break;
-          }
-          case (176): { // Hex 0xB0
-              midicontrol(ns, ev->data1, ev->data2);
-              break;
-          }
-          case (224): { // Hex 0xE0
-              midipitchbend(ns, ev->data1, ev->data2);
-              break;
-          }
-          }
-          last_midi_num_played = ev->data1;
-          note_played_time = 1;
+            midi_event *ev = ns->midi_events_loop[idx];
+            // print_midi_event_rec(ev);
+            switch (ev->event_type) {
+            case (144): {
+                midinoteon(ns, ev->data1, ev->data2);
+                break;
+            }
+            case (128): { // Hex 0x90
+                midinoteoff(ns, ev->data1, ev->data2);
+                break;
+            }
+            case (176): { // Hex 0xB0
+                midicontrol(ns, ev->data1, ev->data2);
+                break;
+            }
+            case (224): { // Hex 0xE0
+                midipitchbend(ns, ev->data1, ev->data2);
+                break;
+            }
+            }
+            last_midi_num_played = ev->data1;
+            note_played_time = 1;
         }
 
         if (ns->sustain > 0 && note_played_time > 0) {
             note_played_time++;
-            if ((note_played_time > ns->sustain)
-             && (ns->osc1->m_midi_note_number == last_midi_num_played))
-            {
-             eg_note_off(ns->eg1);
-             note_played_time = 0;
+            if ((note_played_time > ns->sustain) &&
+                (ns->osc1->m_midi_note_number == last_midi_num_played)) {
+                eg_note_off(ns->eg1);
+                note_played_time = 0;
             }
         }
     }

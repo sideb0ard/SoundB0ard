@@ -38,11 +38,11 @@ void filter_update(filter *f)
     filter_set_q_control(f, f->m_q_control);
     // printf("ORIG:FC: %f\n", f->m_fc);
     // printf("MY FC_CONTROL: %f\n", f->m_fc_control);
-    if (f->g_modmatrix)
-    {
+    if (f->g_modmatrix) {
         f->m_fc_mod = f->g_modmatrix->m_destinations[f->m_mod_source_fc];
         if (f->g_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0)
-            f->m_fc_control = f->g_modmatrix->m_destinations[f->m_mod_source_fc_control];
+            f->m_fc_control =
+                f->g_modmatrix->m_destinations[f->m_mod_source_fc_control];
     }
 
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);

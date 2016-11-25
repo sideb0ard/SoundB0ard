@@ -326,7 +326,8 @@ void interpret(char *line)
                             (nanosynth *)mixr->sound_generators[(int)val1];
                         // convert to midi ticks per millisec * val2
                         // one midi pulse in msec = 1 / (60/bpm) * PPQN / 1000
-                        int sustain_lev = val2 * ( 1 / (60.0 / mixr->bpm) * PPQN / 1000);
+                        int sustain_lev =
+                            val2 * (1 / (60.0 / mixr->bpm) * PPQN / 1000);
                         nanosynth_set_sustain(ns, sustain_lev);
                     }
                 }
