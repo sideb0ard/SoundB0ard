@@ -304,10 +304,6 @@ double do_envelope(envelope_generator *self, double *p_biased_output)
     }
 
     if (self->g_modmatrix) {
-        // self->g_modmatrix->m_destinations[SOURCE_EG1] =
-        // self->m_envelope_output;
-        // self->g_modmatrix->m_destinations[SOURCE_BIASED_EG1] =
-        // self->m_envelope_output;
         self->g_modmatrix->m_sources[SOURCE_EG1] = self->m_envelope_output;
         self->g_modmatrix->m_sources[SOURCE_BIASED_EG1] =
             self->m_envelope_output;

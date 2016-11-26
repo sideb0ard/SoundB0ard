@@ -36,6 +36,9 @@ nanosynth *new_nanosynth()
     ns->osc2->m_cents = 2.5;
 
     ns->lfo = (oscillator *)lfo_new();
+    ns->m_lfo1_dest = OSC;
+    ns->m_lfo_dest_string[0] = "Oscillators";
+    ns->m_lfo_dest_string[1] = "Filters";
 
     ns->eg1 = new_envelope_generator();
 
@@ -67,6 +70,12 @@ nanosynth *new_nanosynth()
                             &ns->m_osc_fo_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
+    // LFO1 -> FILTER1 Fc
+    row = create_matrix_row(SOURCE_LFO1, DEST_ALL_FILTER_FC,
+                            &ns->m_default_mod_intensity,
+                            &ns->m_filter_mod_range, TRANSFORM_NONE, false);
+    add_matrix_row(ns->m_modmatrix, row);
+
     // EG1 -> ALL OSC FO
     row = create_matrix_row(SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
                             &ns->m_eg1_osc_intensity, &ns->m_osc_fo_mod_range,
@@ -88,25 +97,25 @@ nanosynth *new_nanosynth()
     row = create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_FILTER_KEYTRACK,
                             &ns->m_filter_keytrack_intensity,
                             &ns->m_default_mod_range,
-                            TRANSFORM_NOTE_NUMBER_TO_FREQUENCY, false);
+                            TRANSFORM_NOTE_NUMBER_TO_FREQUENCY, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // VELOCITY -> DCA VEL
     row = create_matrix_row(SOURCE_VELOCITY, DEST_DCA_VELOCITY,
                             &ns->m_default_mod_intensity,
-                            &ns->m_default_mod_range, TRANSFORM_NONE, false);
+                            &ns->m_default_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // PITCHBEND -> PITCHBEND
     row = create_matrix_row(
         SOURCE_PITCHBEND, DEST_ALL_OSC_FO, &ns->m_default_mod_intensity,
-        &ns->m_osc_fo_pitchbend_mod_range, TRANSFORM_NONE, false);
+        &ns->m_osc_fo_pitchbend_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Vol CC07
     row = create_matrix_row(SOURCE_MIDI_VOLUME_CC07, DEST_DCA_AMP,
                             &ns->m_default_mod_intensity, &ns->m_amp_mod_range,
-                            TRANSFORM_INVERT_MIDI_NORMALIZE, false);
+                            TRANSFORM_INVERT_MIDI_NORMALIZE, true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // MIDI Pan CC10
@@ -128,21 +137,21 @@ nanosynth *new_nanosynth()
     row = create_matrix_row(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
                             &ns->m_default_mod_intensity,
                             &ns->m_default_mod_range, TRANSFORM_MIDI_NORMALIZE,
-                            false);
+                            true);
     add_matrix_row(ns->m_modmatrix, row);
 
     // NOTE NUMBER -> EG DECAY SCALING
     row = create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_EG_DECAY_SCALING,
                             &ns->m_default_mod_intensity,
                             &ns->m_default_mod_range, TRANSFORM_MIDI_NORMALIZE,
-                            false);
+                            true);
     add_matrix_row(ns->m_modmatrix, row);
 
     ns->m_modmatrix->m_sources[SOURCE_MIDI_VOLUME_CC07] = 127;
     ns->m_modmatrix->m_sources[SOURCE_MIDI_PAN_CC10] = 64;
 
     // end mod matrix setup ///////////////////////////////////
-    //
+
     // mod matrix routings ////////////////////////////////////
 
     ns->osc1->g_modmatrix = ns->m_modmatrix;
@@ -167,9 +176,9 @@ nanosynth *new_nanosynth()
     ns->eg1->g_modmatrix = ns->m_modmatrix;
     ns->eg1->m_mod_dest_eg_output = SOURCE_EG1;
     ns->eg1->m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
-    // ns->eg1->m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
-    // ns->eg1->m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
-    // ns->eg1->m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
+    ns->eg1->m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
+    ns->eg1->m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
+    ns->eg1->m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
 
     ns->dca->g_modmatrix = ns->m_modmatrix;
     ns->dca->m_mod_source_eg = DEST_DCA_EG;
@@ -190,9 +199,6 @@ nanosynth *new_nanosynth()
     ns->sound_generator.setvol = &nanosynth_setvol;
     ns->sound_generator.getvol = &nanosynth_getvol;
     ns->sound_generator.type = NANOSYNTH_TYPE;
-
-    for (int i = 0; i < PPNS; i++)
-        ns->mloop[i] = 0;
 
     // nanosynth_update(ns);
 
@@ -322,7 +328,6 @@ double nanosynth_gennext(void *self)
 {
     nanosynth *ns = (nanosynth *)self;
 
-    // nanosynth_update(ns); // "GUI" controls
     double out_left = 0.0;
     double out_right = 0.0;
 
@@ -330,17 +335,17 @@ double nanosynth_gennext(void *self)
 
         // layer 0 //////////////////////////////
         do_modulation_matrix(ns->m_modmatrix, 0);
+        ///////////////////////////////////////////
 
         eg_update(ns->eg1);
         ns->lfo->update_oscillator(ns->lfo);
 
         do_envelope(ns->eg1, NULL);
-
-        double yar = 0;
-        yar = ns->lfo->do_oscillate(ns->lfo, NULL);
+        ns->lfo->do_oscillate(ns->lfo, NULL);
 
         //// layer 1 /////////////////////////////
         do_modulation_matrix(ns->m_modmatrix, 1);
+        ///////////////////////////////////////////
 
         dca_update(ns->dca);
         ns->f->update(ns->f);
@@ -376,68 +381,4 @@ void nanosynth_set_sustain(nanosynth *self, int val)
 {
     self->sustain = val;
     printf("Set sustain to %d\n", val);
-}
-
-// void nanosynth_add_melody_loop(void *self, melody_loop *mloop)
-// {
-//     nanosynth *ns = (nanosynth *)self;
-//     if (ns->melody_loop_num < 10)
-//         ns->mloops[ns->melody_loop_num++] = mloop;
-// }
-
-void nanosynth_update(nanosynth *self)
-{
-    self->osc1->m_waveform = self->m_osc_waveform;
-    self->osc2->m_waveform = self->m_osc_waveform;
-    // osc_update(self->osc1);
-    // osc_update(self->osc2);
-
-    self->f->m_fc_control = self->m_fc_control;
-    self->f->m_q_control = self->m_q_control;
-    // filter_update(self->f);
-
-    self->lfo->m_waveform = self->m_lfo_waveform;
-    self->lfo->m_amplitude = self->m_lfo_amplitude;
-    self->lfo->m_osc_fo = self->m_lfo_rate;
-    self->lfo->m_lfo_mode = self->m_lfo_mode;
-    // osc_update(self->lfo);
-
-    set_attack_time_msec(self->eg1, self->m_attack_time_msec);
-    set_decay_time_msec(self->eg1, self->m_decay_time_msec);
-    set_sustain_level(self->eg1, self->m_sustain_level);
-    set_release_time_msec(self->eg1, self->m_release_time_msec);
-
-    self->eg1->m_reset_to_zero = self->m_reset_to_zero;
-    self->eg1->m_legato_mode = self->m_legato_mode;
-
-    dca_set_pan_control(self->dca, self->m_pan_control);
-    dca_set_amplitude_db(self->dca, self->m_volume_db);
-    // dca_update(self->dca);
-
-    if (self->m_filter_keytrack) {
-        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
-                          DEST_ALL_FILTER_KEYTRACK, true);
-    }
-    else {
-        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
-                          DEST_ALL_FILTER_KEYTRACK, false);
-    }
-
-    if (self->m_velocity_to_attack_scaling) {
-        enable_matrix_row(self->m_modmatrix, SOURCE_VELOCITY,
-                          DEST_ALL_EG_ATTACK_SCALING, true);
-    }
-    else {
-        enable_matrix_row(self->m_modmatrix, SOURCE_VELOCITY,
-                          DEST_ALL_EG_ATTACK_SCALING, false);
-    }
-
-    if (self->m_note_number_to_decay_scaling) {
-        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
-                          DEST_ALL_EG_DECAY_SCALING, true);
-    }
-    else {
-        enable_matrix_row(self->m_modmatrix, SOURCE_MIDI_NOTE_NUM,
-                          DEST_ALL_EG_DECAY_SCALING, false);
-    }
 }

@@ -6,28 +6,25 @@
 #include "effect.h"
 #include "utils.h"
 
-EFFECT *new_delay(double duration, effect_type e_type)
+EFFECT *new_delay(double duration)
 {
     EFFECT *e;
     e = (EFFECT *)calloc(1, sizeof(EFFECT));
     if (e == NULL)
         return NULL;
 
-    printf("Durrr! %f\n", duration);
+    e->delay = new_stereo_delay();
+    printf("DurrrLAY! %f\n", duration);
 
-    double *buffer;
-    int buf_length = (int)(duration * SAMPLE_RATE);
-    buffer = (double *)calloc(buf_length, sizeof(double));
-    if (buffer == NULL) {
-        perror("Couldn't allocate effect buffer");
-        free(e);
-        return NULL;
-    }
-    e->m_duration = duration;
-    e->m_delay_in_samples = buf_length;
-    e->buffer = buffer;
-    e->buf_length = buf_length;
-    e->type = e_type;
+    delay_prepare_for_play(e->delay);
+    delay_set_delay_time_ms(e->delay, duration);
+    delay_set_feedback_percent(e->delay, 90);
+    delay_set_delay_ratio(e->delay, 0.9);
+    delay_set_wet_mix(e->delay, 0.7);
+    delay_set_mode(e->delay, PINGPONG);
+    delay_update(e->delay);
+
+    e->type = DELAY;
 
     return e;
 }

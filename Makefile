@@ -5,6 +5,7 @@ SRC = audioutils.c \
       bitwize.c \
       cmdloop.c \
       dca.c \
+      delayline.c \
       drumr.c \
       effect.c \
       envelope.c \
@@ -27,6 +28,7 @@ SRC = audioutils.c \
       qblimited_oscillator.c \
       sampler.c \
       sbmsg.c \
+      stereodelay.c \
       sound_generator.c \
       table.c \
       utils.c \

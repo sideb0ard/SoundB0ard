@@ -1,10 +1,11 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
+#include "stereodelay.h"
+
 typedef enum {
     DECIMATOR,
-    DELAY1,
-    DELAY2,
+    DELAY,
     DISTORTION,
     RES,
     REVERB,
@@ -15,6 +16,7 @@ typedef enum {
 } effect_type;
 
 typedef struct {
+    stereodelay *delay;
     double *buffer;
     int buf_read_idx;
     int buf_write_idx;
@@ -35,7 +37,7 @@ typedef struct {
     effect_type type;
 } EFFECT;
 
-EFFECT *new_delay(double duration, effect_type e_type);
+EFFECT *new_delay(double duration);
 EFFECT *new_decimator(void);
 EFFECT *new_distortion(void);
 EFFECT *new_freq_pass(double freq, effect_type pass_type);

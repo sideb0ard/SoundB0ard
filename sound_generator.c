@@ -69,7 +69,7 @@ int add_distortion_soundgen(SOUNDGEN *self)
     return self->effects_num++;
 }
 
-int add_delay_soundgen(SOUNDGEN *self, float duration, effect_type e_type)
+int add_delay_soundgen(SOUNDGEN *self, float duration)
 {
     printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
 
@@ -79,7 +79,7 @@ int add_delay_soundgen(SOUNDGEN *self, float duration, effect_type e_type)
         return -1;
     }
 
-    EFFECT *e = new_delay(duration, e_type);
+    EFFECT *e = new_delay(duration);
     if (e == NULL) {
         perror("Couldn't create effect");
         return -1;
@@ -112,7 +112,13 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type)
 
 float effector(SOUNDGEN *self, float val)
 {
+    double left_in = val;
+    double right_in = val;
+    double left_out = 0.0;
+    double right_out = 0.0;
+    
     double val_copy = val;
+
 
     if (self->effects_on) {
 
@@ -152,20 +158,11 @@ float effector(SOUNDGEN *self, float val)
                     val = 1 / 100 * atan(val * 100);
                 }
                 break;
-            case DELAY1:
-                val = self->effects[i]->m_delay_in_samples == 0
-                          ? val_copy
-                          : read_delay(self->effects[i]);
-                write_delay_and_inc(self->effects[i], val_copy);
-                break;
-            case DELAY2:
-                delay_p = self->effects[i]->buf_p;
-                delay = self->effects[i]->buffer;
-                val += delay[delay_p];
-                delay[delay_p++] = val_copy * 0.5;
-                if (delay_p >= self->effects[i]->buf_length)
-                    delay_p = 0;
-                self->effects[i]->buf_p = delay_p;
+            case DELAY:
+                delay_process_audio(self->effects[i]->delay,
+                                    &left_in, &right_in,
+                                    &left_out, &right_out);
+                val = left_out;
                 break;
             case REVERB:
                 delay_p = self->effects[i]->buf_p;

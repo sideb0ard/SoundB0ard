@@ -299,7 +299,7 @@ void interpret(char *line)
         regmatch_t tpmatch[4];
         regex_t tsigtype_rx;
         regcomp(&tsigtype_rx,
-                "^(vol|freq|delay1|delay2|reverb|res|randd|allpass|"
+                "^(vol|freq|delay|reverb|res|randd|allpass|"
                 "lowpass|highpass|bandpass|nanosynth|sustain|swing) "
                 "([[:digit:].]+) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
@@ -331,45 +331,10 @@ void interpret(char *line)
                         nanosynth_set_sustain(ns, sustain_lev);
                     }
                 }
-                if (strcmp(cmd_type, "delay1") == 0) {
-                    printf("DELAY1 CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
+                if (strcmp(cmd_type, "delay") == 0) {
+                    printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
                            val2);
-                    add_delay_soundgen(mixr->sound_generators[(int)val1], val2,
-                                       DELAY1);
-                }
-                if (strcmp(cmd_type, "delay2") == 0) {
-                    printf("DELAY2 CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
-                           val2);
-                    add_delay_soundgen(mixr->sound_generators[(int)val1], val2,
-                                       DELAY2);
-                }
-                if (strcmp(cmd_type, "res") == 0) {
-                    printf("RESONATOR CALLED FOR! %s %.lf %.lf\n", cmd_type,
-                           val1, val2);
-                    add_delay_soundgen(mixr->sound_generators[(int)val1], val2,
-                                       RES);
-                }
-                if (strcmp(cmd_type, "reverb") == 0) {
-                    printf("REVERB CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
-                           val2);
-                    add_delay_soundgen(mixr->sound_generators[(int)val1], val2,
-                                       REVERB);
-                }
-                if (strcmp(cmd_type, "swing") == 0) {
-                    if (mixr->sound_generators[(int)val1]->type != DRUM_TYPE) {
-                        printf("Beat it, ya chancer\n");
-                    }
-                    else {
-                        printf("SWING CALLED FOR! %s %.lf %.lf\n", cmd_type,
-                               val1, val2);
-                        swingrrr(mixr->sound_generators[(int)val1], val2);
-                    }
-                }
-                if (strcmp(cmd_type, "allpass") == 0) {
-                    printf("ALLPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
-                           val2);
-                    add_delay_soundgen(mixr->sound_generators[(int)val1], val2,
-                                       ALLPASS);
+                    add_delay_soundgen(mixr->sound_generators[(int)val1], val2);
                 }
                 if (strcmp(cmd_type, "lowpass") == 0) {
                     printf("LOWPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
