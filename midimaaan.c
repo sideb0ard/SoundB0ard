@@ -57,10 +57,10 @@ void *midiman()
                 // double timestamp = msg[i].timestamp/1000.;
 
                 // printf("HAS ACTIVE nanosynth? %d\n", mixr->has_active_ns);
-                if (mixr->has_active_nanosynth) {
+                if (mixr->midi_control_destination == NANOSYNTH) {
 
                     nanosynth *ns = (nanosynth *)mixr->sound_generators
-                                        [mixr->active_nanosynth_soundgen_num];
+                                        [mixr->active_midi_soundgen_num];
 
                     if (ns->recording) {
                         int tick = mixr->tick % PPNS;
@@ -87,6 +87,17 @@ void *midiman()
                     }
                     default:
                         printf("SOMETHING ELSE\n");
+                    }
+                }
+                else if (mixr->midi_control_destination == DELAYFX) {
+                    printf("MIDI CONTROLS! DELAY\n");
+                    EFFECT *d = mixr->sound_generators
+                                    [mixr->active_midi_soundgen_num]->effects
+                                    [mixr->active_midi_soundgen_effect_num];
+                    switch(status) {
+                    case (176): { 
+                        midi_delay_control(d, data1, data2);
+                        }
                     }
                 }
                 else {
@@ -194,23 +205,69 @@ void midicontrol(nanosynth *ns, int data1, int data2)
         break;
     case 7: // K7 - Filter Frequency Cut
         scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        // printf("FILTER CUTOFF! %f\n", scaley_val);
-        // printf("FC ! %f\n", ns->f->m_fc);
-        // printf("MM FC CONTROL! %f\n", ns->f->m_fc_control);
         ns->f->m_fc_control = scaley_val;
-        // printf("POST FC ! %f\n", ns->f->m_fc);
-        // printf("MM POST FC CONTROL! %f\n", ns->f->m_fc_control);
         break;
     case 8: // K8 - Filter Q control
         scaley_val = scaleybum(1, 128, 1, 10, data2);
         printf("FILTER Q control! %f\n", scaley_val);
         filter_set_q_control(ns->f, scaley_val);
         break;
-    // case VOLUME_CC07:
-    //     ns->m_modmatrix->m_sources[SOURCE_MIDI_VOLUME_CC07] = (unsigned)
-    //     data1;
     default:
         printf("SOMthing else\n");
     }
-    // nanosynth_update(ns);
+    // nanosynth_update(ns); // TODO either fix this or get rid of it -
+    // currently unnecessary as i update member variables directly rather than have
+    // two representations - one "gui" one on the nanosynth and then on update, set
+    // component values
+}
+
+void midi_delay_control(EFFECT *e, int data1, int data2)
+{
+    if (e->type != DELAY) {
+        printf("OOft, mate, i'm no a delay - cannae help you out\n");
+        return;
+    }
+    stereodelay *d = e->delay;
+
+    double scaley_val;
+    switch (data1) {
+    case 1:
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        printf("OPTION1!\n");
+        break;
+    case 2:
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        printf("OPTION2!\n");
+        break;
+    case 3:
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        printf("OPTION3!\n");
+        break;
+    case 4:
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        printf("OPTION4!\n");
+        break;
+    case 5:
+        scaley_val = scaleybum(0, 128, 0, 2000, data2);
+        printf("DELAY TIME! %f\n", scaley_val);
+        delay_set_delay_time_ms(d, scaley_val);
+        break;
+    case 6:
+        scaley_val = scaleybum(0, 128, -100, 100, data2);
+        printf("DELAY FEEDBACK! %f\n", scaley_val);
+        delay_set_feedback_percent(d, scaley_val);
+        break;
+    case 7:
+        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+        printf("DELAY RATIO! %f\n", scaley_val);
+        delay_set_delay_ratio(d, scaley_val);
+        break;
+    case 8:
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        printf("DELAY MIX! %f\n", scaley_val);
+        delay_set_wet_mix(d, scaley_val);
+        break;
+    default:
+        printf("SOMthing else\n");
+    }
 }

@@ -32,7 +32,7 @@ mixer *new_mixer()
     mixr->tick = 0;
     mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
-    mixr->has_active_nanosynth = 0;
+    mixr->midi_control_destination = NONE;
     if (mixr == NULL) {
         printf("Nae mixer, fucked up!\n");
         return NULL;

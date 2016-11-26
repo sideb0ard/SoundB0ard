@@ -161,8 +161,8 @@ void interpret(char *line)
                     if (mixr->sound_generators[(int)val]->type ==
                         NANOSYNTH_TYPE) {
                         printf("MIDI fer %d\n", (int)val);
-                        mixr->has_active_nanosynth = 1;
-                        mixr->active_nanosynth_soundgen_num = val;
+                        mixr->midi_control_destination = NANOSYNTH;
+                        mixr->active_midi_soundgen_num = val;
                     }
                     else {
                         printf("Can only run keys() on an nanosynth Type, ya "
@@ -299,7 +299,7 @@ void interpret(char *line)
         regmatch_t tpmatch[4];
         regex_t tsigtype_rx;
         regcomp(&tsigtype_rx,
-                "^(vol|freq|delay|reverb|res|randd|allpass|"
+                "^(vol|freq|delay|reverb|res|randd|allpass|midi|"
                 "lowpass|highpass|bandpass|nanosynth|sustain|swing) "
                 "([[:digit:].]+) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
@@ -335,6 +335,23 @@ void interpret(char *line)
                     printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
                            val2);
                     add_delay_soundgen(mixr->sound_generators[(int)val1], val2);
+                }
+                if (strcmp(cmd_type, "midi") == 0) {
+                    printf("MIDI CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
+                           val2);
+                    if (val2 >= mixr->sound_generators[(int)val1]->effects_num) {
+                        printf("Git tae fuck - no enuff effects!\n");
+                        return;
+                    }
+                    if (mixr->sound_generators[(int)val1]->effects[(int)val2]->type != DELAY) {
+                        printf("Git tae fuck - only delay effects for the moment..\n");
+                        return;
+                    }
+                    // else
+                    printf("SUCCESS! GOLDEN MIDI DELAY!\n");
+                    mixr->midi_control_destination = DELAYFX;
+                    mixr->active_midi_soundgen_num = val1;
+                    mixr->active_midi_soundgen_effect_num = val2;
                 }
                 if (strcmp(cmd_type, "lowpass") == 0) {
                     printf("LOWPASS CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,

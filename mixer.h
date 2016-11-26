@@ -24,8 +24,9 @@ typedef struct t_mixer {
     int effects_num;
     int effects_size;
 
-    int has_active_nanosynth; // bool
-    int active_nanosynth_soundgen_num;
+    unsigned midi_control_destination;
+    int active_midi_soundgen_num;
+    int active_midi_soundgen_effect_num;
 
     int bpm;
     int samples_per_midi_tick;
