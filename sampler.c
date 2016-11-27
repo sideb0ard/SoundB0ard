@@ -68,8 +68,9 @@ void sampler_set_incr(void *self)
 {
     SAMPLER *sampler = self;
     printf("BUFSIZE is %d\n", sampler->bufsize);
-    double incr = sampler->bufsize / (SAMPLE_RATE * (60.0 / mixr->bpm * 4) /
-                                      sampler->loop_len * sampler->channels);
+    double incr = (sampler->bufsize /
+                   (SAMPLE_RATE * (60.0 / mixr->bpm) * 4 * sampler->loop_len)) *
+                  sampler->channels;
     printf("INCR is %f\n", incr);
     sampler->incr = incr;
 }

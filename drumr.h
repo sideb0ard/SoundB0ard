@@ -26,6 +26,7 @@ typedef struct t_drumr {
 
     int *buffer;
     int bufsize;
+    int buf_num_channels;
 
     int patterns[10];
     int num_patterns;

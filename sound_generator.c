@@ -158,6 +158,7 @@ float effector(SOUNDGEN *self, float val)
                 }
                 break;
             case DELAY:
+                // delay_update(self->effects[i]->delay);
                 delay_process_audio(self->effects[i]->delay, &left_in,
                                     &right_in, &left_out, &right_out);
                 val = left_out;

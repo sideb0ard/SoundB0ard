@@ -284,8 +284,11 @@ double drum_gennext(void *self)
     for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
         if (drumr->sample_positions[i].playing) {
             val +=
-                drumr->buffer[drumr->sample_positions[i].position++] /
+                // drumr->buffer[drumr->sample_positions[i].position++] /
+                drumr->buffer[drumr->sample_positions[i].position] /
                 2147483648.0; // convert from 16bit in to double between 0 and 1
+            drumr->sample_positions[i].position =
+                drumr->sample_positions[i].position + drumr->channels;
             if ((int)drumr->sample_positions[i].position ==
                 drumr->bufsize) { // end of playback - so reset
                 drumr->sample_positions[i].playing = 0;

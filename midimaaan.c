@@ -256,7 +256,8 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
         delay_set_delay_time_ms(d, scaley_val);
         break;
     case 6:
-        scaley_val = scaleybum(0, 128, -100, 100, data2);
+        // scaley_val = scaleybum(0, 128, -100, 100, data2);
+        scaley_val = scaleybum(0, 128, 20, 100, data2);
         printf("DELAY FEEDBACK! %f\n", scaley_val);
         delay_set_feedback_percent(d, scaley_val);
         break;
