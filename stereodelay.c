@@ -7,7 +7,7 @@ stereodelay *new_stereo_delay()
     d->m_delay_time_ms = 0;
     d->m_feedback_percent = 0;
     d->m_delay_ratio = 0;
-    d->m_wet_mix = 0.5;
+    d->m_wet_mix = 0.0;
 
     return d;
 }

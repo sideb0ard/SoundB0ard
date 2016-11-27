@@ -116,9 +116,8 @@ float effector(SOUNDGEN *self, float val)
     double right_in = val;
     double left_out = 0.0;
     double right_out = 0.0;
-    
-    double val_copy = val;
 
+    double val_copy = val;
 
     if (self->effects_on) {
 
@@ -159,9 +158,8 @@ float effector(SOUNDGEN *self, float val)
                 }
                 break;
             case DELAY:
-                delay_process_audio(self->effects[i]->delay,
-                                    &left_in, &right_in,
-                                    &left_out, &right_out);
+                delay_process_audio(self->effects[i]->delay, &left_in,
+                                    &right_in, &left_out, &right_out);
                 val = left_out;
                 break;
             case REVERB:

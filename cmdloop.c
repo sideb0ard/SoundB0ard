@@ -340,12 +340,19 @@ void interpret(char *line)
                 if (strcmp(cmd_type, "midi") == 0) {
                     printf("MIDI CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
                            val2);
-                    if (val2 >= mixr->sound_generators[(int)val1]->effects_num) {
+                    if (val2 >=
+                        mixr->sound_generators[(int)val1]->effects_num) {
                         printf("Git tae fuck - no enuff effects!\n");
                         return;
                     }
-                    if (mixr->sound_generators[(int)val1]->effects[(int)val2]->type != DELAY) {
-                        printf("Git tae fuck - only delay effects for the moment..\n");
+                    if (mixr->sound_generators[(int)val1]
+                            ->effects[(int)val2]
+                            ->type != DELAY) {
+                        printf("Git tae fuck - only delay effects for the "
+                               "moment..ITS %d\n",
+                               mixr->sound_generators[(int)val1]
+                                   ->effects[(int)val2]
+                                   ->type);
                         return;
                     }
                     // else
@@ -405,7 +412,8 @@ void interpret(char *line)
         regcomp(
             &eurx,
             // TODO - ugh!! clean this shit up..
-            //"^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+) ([\"true\"|\"false\"])$",
+            //"^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+)
+            //([\"true\"|\"false\"])$",
             "^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+) ([.[:alnum:]]+)$",
             REG_EXTENDED | REG_ICASE);
         if (regexec(&eurx, trim_tok, 5, eumatch, 0) == 0) {
@@ -414,22 +422,23 @@ void interpret(char *line)
             char tmp[32];
             int num_beats;
             char bool_start_at_zero[10];
-            sscanf(trim_tok, "%s %s %d %s", cmd_type, tmp, &num_beats, bool_start_at_zero);
+            sscanf(trim_tok, "%s %s %d %s", cmd_type, tmp, &num_beats,
+                   bool_start_at_zero);
             int filename_len = eumatch[2].rm_eo - eumatch[2].rm_so;
             char filename[filename_len + 1];
             strncpy(filename, trim_tok + eumatch[2].rm_so, filename_len);
             filename[filename_len] = '\0';
 
-            if (strncmp(bool_start_at_zero, "true", 5) && strncmp(bool_start_at_zero, "false", 6))
-            {
+            if (strncmp(bool_start_at_zero, "true", 5) &&
+                strncmp(bool_start_at_zero, "false", 6)) {
                 printf("Dingie!\n");
                 return;
             }
-            bool start_at_zero = strcmp(bool_start_at_zero, "true") == 0 ? true : false;
+            bool start_at_zero =
+                strcmp(bool_start_at_zero, "true") == 0 ? true : false;
 
-
-
-            printf("EUCLIDEAN, MO-FO! %s %d %s\n", filename, num_beats, bool_start_at_zero);
+            printf("EUCLIDEAN, MO-FO! %s %d %s\n", filename, num_beats,
+                   bool_start_at_zero);
 
             if (strcmp(cmd_type, "uplay") == 0) {
                 printf("NEW UPLAY DRUM\n");
@@ -441,15 +450,17 @@ void interpret(char *line)
                     (val >= 0 && val < mixr->soundgen_num) ? 1 : 0;
                 if (is_val_a_valid_sig_num &&
                     mixr->sound_generators[val]->type == DRUM_TYPE) {
-                    int euclidean_pattern = create_euclidean_rhythm(num_beats, 16);
+                    int euclidean_pattern =
+                        create_euclidean_rhythm(num_beats, 16);
                     if (start_at_zero)
-                        euclidean_pattern = shift_bits_to_leftmost_position(euclidean_pattern, 16);
-                    add_int_pattern(mixr->sound_generators[val], euclidean_pattern);
+                        euclidean_pattern = shift_bits_to_leftmost_position(
+                            euclidean_pattern, 16);
+                    add_int_pattern(mixr->sound_generators[val],
+                                    euclidean_pattern);
                     printf("Adding UPLAY DRUM\n");
                 }
             }
         }
-
 
         // drum sample play
         regmatch_t fmatch[4];

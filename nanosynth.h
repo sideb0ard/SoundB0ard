@@ -12,7 +12,7 @@
 #include "sound_generator.h"
 
 typedef enum { OSC, FILTER } LFO1_dest;
-typedef enum {NONE, NANOSYNTH, DELAYFX} midi_control_type;
+typedef enum { NONE, NANOSYNTH, DELAYFX } midi_control_type;
 
 typedef struct nanosynth {
     SOUNDGEN sound_generator;

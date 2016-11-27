@@ -59,8 +59,9 @@ void *midiman()
                 // printf("HAS ACTIVE nanosynth? %d\n", mixr->has_active_ns);
                 if (mixr->midi_control_destination == NANOSYNTH) {
 
-                    nanosynth *ns = (nanosynth *)mixr->sound_generators
-                                        [mixr->active_midi_soundgen_num];
+                    nanosynth *ns =
+                        (nanosynth *)mixr
+                            ->sound_generators[mixr->active_midi_soundgen_num];
 
                     if (ns->recording) {
                         int tick = mixr->tick % PPNS;
@@ -91,13 +92,13 @@ void *midiman()
                 }
                 else if (mixr->midi_control_destination == DELAYFX) {
                     printf("MIDI CONTROLS! DELAY\n");
-                    EFFECT *d = mixr->sound_generators
-                                    [mixr->active_midi_soundgen_num]->effects
-                                    [mixr->active_midi_soundgen_effect_num];
-                    switch(status) {
-                    case (176): { 
+                    EFFECT *d =
+                        mixr->sound_generators[mixr->active_midi_soundgen_num]
+                            ->effects[mixr->active_midi_soundgen_effect_num];
+                    switch (status) {
+                    case (176): {
                         midi_delay_control(d, data1, data2);
-                        }
+                    }
                     }
                 }
                 else {
@@ -216,8 +217,10 @@ void midicontrol(nanosynth *ns, int data1, int data2)
         printf("SOMthing else\n");
     }
     // nanosynth_update(ns); // TODO either fix this or get rid of it -
-    // currently unnecessary as i update member variables directly rather than have
-    // two representations - one "gui" one on the nanosynth and then on update, set
+    // currently unnecessary as i update member variables directly rather than
+    // have
+    // two representations - one "gui" one on the nanosynth and then on update,
+    // set
     // component values
 }
 

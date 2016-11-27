@@ -186,7 +186,8 @@ int add_nanosynth(mixer *mixr)
     return add_sound_generator(mixr, m);
 }
 
-int add_drum_euclidean(mixer *mixr, char *filename, int num_beats, bool start_on_first_beat)
+int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
+                       bool start_on_first_beat)
 {
     // preliminary setup
     char cwd[1024];
