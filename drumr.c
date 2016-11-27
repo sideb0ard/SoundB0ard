@@ -38,13 +38,15 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern)
     }
 
     for (int i = 0; i < sp_count; i++) {
-        int pat_num = atoi(spattern[i]);
+        // TODO - make get rid of magic number - loop length
+        int pat_num = 15 - atoi(spattern[i]);
         if (pat_num < DRUM_PATTERN_LEN) {
             printf("PAT_NUM: %d is %d\n", pat_num, (1 << pat_num));
             *final_pattern = (1 << pat_num) | *final_pattern;
             printf("NOW SET %d\n", *final_pattern);
         }
     }
+    printf("FINAL PATTERN %d\n", *final_pattern);
 }
 
 int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
