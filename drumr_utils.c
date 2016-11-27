@@ -92,7 +92,4 @@ void char_binary_version_of_int(int num, char bin_num[17])
             bin_num[15-i] = '0';
     }
     bin_num[16] = '\0';
-
-    printf("[%s] == %d\n", bin_num, num);
-
 }

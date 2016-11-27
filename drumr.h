@@ -47,7 +47,8 @@ DRUM *new_drumr_from_int_pattern(char *filename, int pattern);
 void drum_status(void *self, char *ss);
 void drum_setvol(void *self, double v);
 // void update_pattern(void *self, int newpattern);
-void add_pattern(void *self, char *pattern);
+void add_char_pattern(void *self, char *pattern);
+void add_int_pattern(void *self, int pattern);
 void swingrrr(void *self, int swing_setting);
 
 void int_pattern_to_array(int pattern, int *pat_array);

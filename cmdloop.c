@@ -12,6 +12,7 @@
 #include "audioutils.h"
 #include "cmdloop.h"
 #include "defjams.h"
+#include "drumr_utils.h"
 #include "envelope.h"
 #include "help.h"
 #include "keys.h"
@@ -432,7 +433,6 @@ void interpret(char *line)
 
             if (strcmp(cmd_type, "uplay") == 0) {
                 printf("NEW UPLAY DRUM\n");
-                //add_drum(mixr, filename, pattern);
                 add_drum_euclidean(mixr, filename, num_beats, start_at_zero);
             }
             else if (strcmp(cmd_type, "uaddd") == 0) {
@@ -441,7 +441,10 @@ void interpret(char *line)
                     (val >= 0 && val < mixr->soundgen_num) ? 1 : 0;
                 if (is_val_a_valid_sig_num &&
                     mixr->sound_generators[val]->type == DRUM_TYPE) {
-                    // add_pattern(mixr->sound_generators[val], pattern);
+                    int euclidean_pattern = create_euclidean_rhythm(num_beats, 16);
+                    if (start_at_zero)
+                        euclidean_pattern = shift_bits_to_leftmost_position(euclidean_pattern, 16);
+                    add_int_pattern(mixr->sound_generators[val], euclidean_pattern);
                     printf("Adding UPLAY DRUM\n");
                 }
             }
@@ -490,7 +493,7 @@ void interpret(char *line)
                     (val >= 0 && val < mixr->soundgen_num) ? 1 : 0;
                 if (is_val_a_valid_sig_num &&
                     mixr->sound_generators[val]->type == DRUM_TYPE) {
-                    add_pattern(mixr->sound_generators[val], pattern);
+                    add_char_pattern(mixr->sound_generators[val], pattern);
                 }
             }
         }
