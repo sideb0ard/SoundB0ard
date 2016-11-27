@@ -7,6 +7,7 @@ SRC = audioutils.c \
       dca.c \
       delayline.c \
       drumr.c \
+      drumr_utils.c \
       effect.c \
       envelope.c \
       envelope_generator.c \

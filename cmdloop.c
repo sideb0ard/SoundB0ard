@@ -398,6 +398,56 @@ void interpret(char *line)
             chordie(note);
         }
 
+        // Euclidean drum sample play!
+        regmatch_t eumatch[5];
+        regex_t eurx;
+        regcomp(
+            &eurx,
+            // TODO - ugh!! clean this shit up..
+            //"^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+) ([\"true\"|\"false\"])$",
+            "^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+) ([.[:alnum:]]+)$",
+            REG_EXTENDED | REG_ICASE);
+        if (regexec(&eurx, trim_tok, 5, eumatch, 0) == 0) {
+
+            char cmd_type[10];
+            char tmp[32];
+            int num_beats;
+            char bool_start_at_zero[10];
+            sscanf(trim_tok, "%s %s %d %s", cmd_type, tmp, &num_beats, bool_start_at_zero);
+            int filename_len = eumatch[2].rm_eo - eumatch[2].rm_so;
+            char filename[filename_len + 1];
+            strncpy(filename, trim_tok + eumatch[2].rm_so, filename_len);
+            filename[filename_len] = '\0';
+
+            if (strncmp(bool_start_at_zero, "true", 5) && strncmp(bool_start_at_zero, "false", 6))
+            {
+                printf("Dingie!\n");
+                return;
+            }
+            bool start_at_zero = strcmp(bool_start_at_zero, "true") == 0 ? true : false;
+
+
+
+            printf("EUCLIDEAN, MO-FO! %s %d %s\n", filename, num_beats, bool_start_at_zero);
+
+            if (strcmp(cmd_type, "uplay") == 0) {
+                printf("NEW UPLAY DRUM\n");
+                //add_drum(mixr, filename, pattern);
+                add_drum_euclidean(mixr, filename, num_beats, start_at_zero);
+            }
+            else if (strcmp(cmd_type, "uaddd") == 0) {
+                int val = atoi(filename);
+                int is_val_a_valid_sig_num =
+                    (val >= 0 && val < mixr->soundgen_num) ? 1 : 0;
+                if (is_val_a_valid_sig_num &&
+                    mixr->sound_generators[val]->type == DRUM_TYPE) {
+                    // add_pattern(mixr->sound_generators[val], pattern);
+                    printf("Adding UPLAY DRUM\n");
+                }
+            }
+        }
+
+
         // drum sample play
         regmatch_t fmatch[4];
         regex_t file_rx;
@@ -432,7 +482,7 @@ void interpret(char *line)
             filename[filename_len] = '\0';
 
             if (strcmp(cmd_type, "play") == 0) {
-                add_drum(mixr, filename, pattern);
+                add_drum_char_pattern(mixr, filename, pattern);
             }
             else {
                 int val = atoi(filename);

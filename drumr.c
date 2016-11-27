@@ -7,6 +7,7 @@
 
 #include "defjams.h"
 #include "drumr.h"
+#include "drumr_utils.h"
 #include "mixer.h"
 #include "utils.h"
 
@@ -74,11 +75,23 @@ int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
     return buffer;
 }
 
-DRUM *new_drumr(char *filename, char *pattern)
+DRUM *new_drumr_from_int_pattern(char *filename, int pattern)
+{
+    DRUM *drumr = new_drumr(filename);
+    drumr->patterns[drumr->num_patterns++] = pattern;
+    return drumr;
+}
+
+DRUM *new_drumr_from_char_pattern(char *filename, char *pattern)
+{
+    DRUM *drumr = new_drumr(filename);
+    pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
+    return drumr;
+}
+
+DRUM *new_drumr(char *filename)
 {
     DRUM *drumr = calloc(1, sizeof(DRUM));
-
-    pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
 
     SF_INFO sf_info;
     memset(&sf_info, 0, sizeof(SF_INFO));
@@ -316,16 +329,9 @@ double drum_gennext(void *self)
 void drum_status(void *self, char *status_string)
 {
     DRUM *drumr = self;
-    char spattern[DRUM_PATTERN_LEN + 1] = "";
-    for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
-        if (drumr->patterns[drumr->cur_pattern_num] & (1 << i)) {
-            strncat(&spattern[i], "1", 1);
-        }
-        else {
-            strncat(&spattern[i], "0", 1);
-        }
-    }
-    spattern[DRUM_PATTERN_LEN] = '\0';
+    char spattern[17];
+    char_binary_version_of_int(drumr->patterns[drumr->cur_pattern_num],
+                               spattern);
     snprintf(status_string, 119, ANSI_COLOR_CYAN
              "[%s]\t[%s] vol: %.2lf life_on: %d" ANSI_COLOR_RESET,
              basename(drumr->filename), spattern, drumr->vol,

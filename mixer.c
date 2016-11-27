@@ -10,6 +10,7 @@
 #include "bitwize.h"
 #include "defjams.h"
 #include "drumr.h"
+#include "drumr_utils.h"
 #include "effect.h"
 #include "envelope.h"
 #include "mixer.h"
@@ -185,7 +186,7 @@ int add_nanosynth(mixer *mixr)
     return add_sound_generator(mixr, m);
 }
 
-int add_drum(mixer *mixr, char *filename, char *pattern)
+int add_drum_euclidean(mixer *mixr, char *filename, int num_beats, bool start_on_first_beat)
 {
     // preliminary setup
     char cwd[1024];
@@ -196,7 +197,43 @@ int add_drum(mixer *mixr, char *filename, char *pattern)
     strcat(full_filename, "/wavs/");
     strcat(full_filename, filename);
 
-    DRUM *ndrum = new_drumr(full_filename, pattern);
+    // create euclidean beat
+    int pattern = create_euclidean_rhythm(num_beats, 16);
+    if (start_on_first_beat) {
+        printf("Start on first beat!\n");
+        pattern = shift_bits_to_leftmost_position(pattern, 16);
+    }
+
+    printf("EUCLIDEAN BEAT! %d\n", pattern);
+
+    DRUM *ndrum = new_drumr_from_int_pattern(full_filename, pattern);
+    if (ndrum == NULL) {
+        printf("Barfed on drum creation\n");
+        return -1;
+    }
+    SBMSG *m = new_sbmsg();
+    if (m == NULL) {
+        free(ndrum);
+        printf("MBARF!\n");
+        return -1;
+    }
+
+    m->sound_generator = (SOUNDGEN *)ndrum;
+    return add_sound_generator(mixr, m);
+}
+
+int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
+{
+    // preliminary setup
+    char cwd[1024];
+    getcwd(cwd, 1024);
+    char full_filename[strlen(filename) + strlen(cwd) +
+                       7]; // 7 == '/wavs/' is 6 and 1 for '\0'
+    strcpy(full_filename, cwd);
+    strcat(full_filename, "/wavs/");
+    strcat(full_filename, filename);
+
+    DRUM *ndrum = new_drumr_from_char_pattern(full_filename, pattern);
     if (ndrum == NULL) {
         printf("Barfed on drum creation\n");
         return -1;

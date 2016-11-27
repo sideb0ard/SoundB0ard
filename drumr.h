@@ -27,8 +27,6 @@ typedef struct t_drumr {
     int *buffer;
     int bufsize;
 
-    //  OLD, yeah? int pattern; // bitmask version!
-
     int patterns[10];
     int num_patterns;
     int cur_pattern_num;
@@ -41,7 +39,9 @@ typedef struct t_drumr {
     int game_generation;
 } DRUM;
 
-DRUM *new_drumr(char *filename, char *pattern);
+DRUM *new_drumr(char *filename);
+DRUM *new_drumr_from_char_pattern(char *filename, char *pattern);
+DRUM *new_drumr_from_int_pattern(char *filename, int pattern);
 
 // void drum_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void drum_status(void *self, char *ss);
