@@ -30,7 +30,7 @@ void *timed_sig_start(void *arg)
     SBMSG *msg = arg;
     int sg = -1; // signal generator
 
-    while (mixr->sixteenth_note_tick % 16 != 0)
+    while ((mixr->sixteenth_note_tick + 1) % 16 != 0)
         printf("Waiting %d...\n", mixr->sixteenth_note_tick);
 
     printf("BOOm!\n");

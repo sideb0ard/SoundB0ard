@@ -69,8 +69,9 @@ void sampler_set_incr(void *self)
     SAMPLER *sampler = self;
     printf("BUFSIZE is %d\n", sampler->bufsize);
     printf("CHANNELS is %d\n", sampler->channels);
-    double incr = sampler->bufsize /
-                  (SAMPLE_RATE * (60.0 / mixr->bpm) * 4 * sampler->loop_len);
+    double size_of_one_loop_in_samples = SAMPLE_RATE * (60.0 / mixr->bpm) * 4;
+    printf("SIZE OF ONE LOOP IN SAMPLES %f\n", size_of_one_loop_in_samples);
+    double incr = sampler->bufsize / size_of_one_loop_in_samples * sampler->channels;
     printf("INCR is %f\n", incr);
     sampler->incr = incr;
 }
@@ -82,7 +83,7 @@ double sampler_gennext(void *self)
     // double val = 0;
 
     int base_index = (int)(sampler->position);
-    unsigned long next_index = base_index + 1;
+    unsigned long next_index = base_index + 1; // TODO(+ num_channels)
     double frac, slope, val;
     double bufsize = sampler->bufsize, position = sampler->position;
     int *table = sampler->buffer;
@@ -94,10 +95,13 @@ double sampler_gennext(void *self)
     val += (frac * slope);
     position += sampler->incr;
 
-    while (position >= bufsize)
+    while (position >= bufsize) {
+        printf("Start of sample loop! mxir->16th %d\n", mixr->sixteenth_note_tick);
         position -= bufsize;
-    while (position < 0.0)
+    }
+    while (position < 0.0) {
         position += bufsize;
+    }
 
     sampler->position = position;
     // val =  sampler->buffer[sampler->position] / 2147483648.0 ; // convert

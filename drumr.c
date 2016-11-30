@@ -246,10 +246,15 @@ double drum_gennext(void *self)
                                                       // we can use as index
                                                       // below
 
-    //printf("IDX %d / cur_pattern_pos %d\n", sample_idx, cur_pattern_position);
     if ((drumr->patterns[drumr->cur_pattern_num] & cur_pattern_position) &&
         !drumr->sample_positions[sample_idx].played) {
 
+        if (sample_idx == 0) {
+            printf("Start of loop IDX %d / cur_pattern_pos %d"
+                    " mixr->sixteenth %d\n",
+                    sample_idx, cur_pattern_position,
+                    mixr->sixteenth_note_tick);
+        }
         if (drumr->swing) {
             if (mixr->sixteenth_note_tick % 2) {
                 double swing_offset = PPQN * 2 / 100.0;
