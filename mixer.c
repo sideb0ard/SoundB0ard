@@ -281,16 +281,17 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer *mixr)
 {
-    mixr->cur_sample++; // called once ever SAMPLE_RATE -> the basis of my clock
+    // called once ever SAMPLE_RATE -> cur_sample is the basis of my clock
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
         pthread_mutex_lock(&midi_tick_lock);
-        mixr->tick++; // 1 midi tick (or pulse)
         if (mixr->tick % (PPQN / 4) == 0) {
             mixr->sixteenth_note_tick++; // for drum machine resolution
         }
         pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
+        mixr->tick++; // 1 midi tick (or pulse)
     }
+    mixr->cur_sample++; 
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {

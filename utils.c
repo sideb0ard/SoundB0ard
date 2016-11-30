@@ -30,6 +30,10 @@ void *timed_sig_start(void *arg)
     SBMSG *msg = arg;
     int sg = -1; // signal generator
 
+    while (mixr->sixteenth_note_tick % 16 != 0)
+        printf("Waiting %d...\n", mixr->sixteenth_note_tick);
+
+    printf("BOOm!\n");
     if (strcmp(msg->params, "sloop") == 0) {
         printf("TIMED .... %f\n", msg->looplen);
         sg = add_sampler(mixr, msg->filename, msg->looplen);

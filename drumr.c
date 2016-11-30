@@ -31,6 +31,7 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern)
     char *sp, *sp_last, *spattern[32];
     char *sep = " ";
 
+    printf("CHARPATT %s\n", char_pattern);
     // extract numbers from string into spattern
     for (sp = strtok_r(char_pattern, sep, &sp_last); sp;
          sp = strtok_r(NULL, sep, &sp_last)) {
@@ -111,6 +112,7 @@ DRUM *new_drumr(char *filename)
     drumr->bufsize = bufsize;
     drumr->samplerate = sf_info.samplerate;
     drumr->channels = sf_info.channels;
+    drumr->started = false;
     drumr->vol = 0.7;
 
     drumr->sound_generator.gennext = &drum_gennext;
@@ -118,6 +120,7 @@ DRUM *new_drumr(char *filename)
     drumr->sound_generator.getvol = &drum_getvol;
     drumr->sound_generator.setvol = &drum_setvol;
     drumr->sound_generator.type = DRUM_TYPE;
+
 
     // TODO: do i need to free pattern ?
     return drumr;
@@ -228,12 +231,22 @@ double drum_gennext(void *self)
     DRUM *drumr = self;
     double val = 0;
 
+    if (!drumr->started) {
+        if (mixr->sixteenth_note_tick % DRUM_PATTERN_LEN == 0) {
+            drumr->started = true;
+        }
+        else {
+            return val;
+        }
+    }
+
     int cur_pattern_position =
         1 << (mixr->sixteenth_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
-    int sample_idx = conv_bitz(cur_pattern_position); // convert to an integer
+    int sample_idx = 15 - conv_bitz(cur_pattern_position); // convert to an integer
                                                       // we can use as index
                                                       // below
 
+    //printf("IDX %d / cur_pattern_pos %d\n", sample_idx, cur_pattern_position);
     if ((drumr->patterns[drumr->cur_pattern_num] & cur_pattern_position) &&
         !drumr->sample_positions[sample_idx].played) {
 
