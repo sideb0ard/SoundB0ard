@@ -115,6 +115,8 @@ DRUM *new_drumr(char *filename)
     drumr->started = false;
     drumr->vol = 0.7;
 
+    drumr->tickedyet = false;
+
     drumr->sound_generator.gennext = &drum_gennext;
     drumr->sound_generator.status = &drum_status;
     drumr->sound_generator.getvol = &drum_getvol;
@@ -231,8 +233,12 @@ double drum_gennext(void *self)
     DRUM *drumr = self;
     double val = 0;
 
+    int step_seq_idx = mixr->sixteenth_note_tick % DRUM_PATTERN_LEN;
+
+    // wait till start of loop to keep patterns synched
     if (!drumr->started) {
-        if (mixr->sixteenth_note_tick % DRUM_PATTERN_LEN == 0) {
+        if (step_seq_idx == 0) {
+            printf("Starting LOOP / STEP SEQ [%d]\n", step_seq_idx);
             drumr->started = true;
         }
         else {
@@ -240,21 +246,17 @@ double drum_gennext(void *self)
         }
     }
 
-    int cur_pattern_position =
-        1 << (mixr->sixteenth_note_tick % DRUM_PATTERN_LEN); // bitwise pattern
-    int sample_idx = 15 - conv_bitz(cur_pattern_position); // convert to an integer
-                                                      // we can use as index
-                                                      // below
+    int bit_position = 1 << (15 - step_seq_idx);
 
-    if ((drumr->patterns[drumr->cur_pattern_num] & cur_pattern_position) &&
-        !drumr->sample_positions[sample_idx].played) {
 
-        if (sample_idx == 0) {
-            printf("Start of loop IDX %d / cur_pattern_pos %d"
-                    " mixr->sixteenth %d\n",
-                    sample_idx, cur_pattern_position,
-                    mixr->sixteenth_note_tick);
-        }
+    if ((drumr->patterns[drumr->cur_pattern_num] & bit_position) &&
+        !drumr->sample_positions[step_seq_idx].played) {
+
+
+        if (step_seq_idx == 0)
+            printf("Top of loop [%d] - tick = %d\n",
+                    step_seq_idx, mixr->sixteenth_note_tick);
+
         if (drumr->swing) {
             if (mixr->sixteenth_note_tick % 2) {
                 double swing_offset = PPQN * 2 / 100.0;
@@ -281,25 +283,26 @@ double drum_gennext(void *self)
                     swing_offset = swing_offset * 50 - PPQN;
                 }
                 if (mixr->tick % (PPQN / 4) == (int)swing_offset / 4) {
-                    drumr->sample_positions[sample_idx].playing = 1;
-                    drumr->sample_positions[sample_idx].played = 1;
+                    drumr->sample_positions[step_seq_idx].playing = 1;
+                    drumr->sample_positions[step_seq_idx].played = 1;
                     // printf("SWING SWUNG tick %% PPQN: %d\n", mixr->tick %
                     // PPQN);
                 }
             }
             else {
-                drumr->sample_positions[sample_idx].playing = 1;
-                drumr->sample_positions[sample_idx].played = 1;
+                drumr->sample_positions[step_seq_idx].playing = 1;
+                drumr->sample_positions[step_seq_idx].played = 1;
                 // printf("SWING NORM tick %% PPQN: %d\n", mixr->tick % PPQN);
             }
         }
         else {
-            drumr->sample_positions[sample_idx].playing = 1;
-            drumr->sample_positions[sample_idx].played = 1;
+            drumr->sample_positions[step_seq_idx].playing = 1;
+            drumr->sample_positions[step_seq_idx].played = 1;
         }
     }
 
-    for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
+    //for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
+    for (int i = DRUM_PATTERN_LEN - 1; i >= 0; i--) {
         if (drumr->sample_positions[i].playing) {
             val +=
                 // drumr->buffer[drumr->sample_positions[i].position++] /
@@ -316,7 +319,7 @@ double drum_gennext(void *self)
     }
 
     if (mixr->sixteenth_note_tick != drumr->tick) {
-        int prev_note = sample_idx - 1;
+        int prev_note = step_seq_idx - 1;
         if (prev_note == -1)
             prev_note = 15;
 

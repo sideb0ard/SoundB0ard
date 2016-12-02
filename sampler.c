@@ -96,7 +96,7 @@ double sampler_gennext(void *self)
     position += sampler->incr;
 
     while (position >= bufsize) {
-        printf("Start of sample loop! mxir->16th %d\n", mixr->sixteenth_note_tick);
+        //printf("Start of sample loop! mxir->16th %d\n", mixr->sixteenth_note_tick);
         position -= bufsize;
     }
     while (position < 0.0) {

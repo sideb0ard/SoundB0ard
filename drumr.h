@@ -33,6 +33,7 @@ typedef struct t_drumr {
     int cur_pattern_num;
 
     int tick;
+    bool tickedyet;
     int swing;
     int swing_setting;
 
