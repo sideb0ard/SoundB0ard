@@ -252,17 +252,8 @@ int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
 
 int add_sampler(mixer *mixr, char *filename, double loop_len)
 {
-    // preliminary setup
-    char cwd[1024];
-    getcwd(cwd, 1024);
-    char full_filename[strlen(filename) + strlen(cwd) +
-                       7]; // 7 == '/wavs/' is 6 and 1 for '\0'
-    strcpy(full_filename, cwd);
-    strcat(full_filename, "/wavs/");
-    strcat(full_filename, filename);
-
     printf("ADD SAMPLER - LOOP LEN %f\n", loop_len);
-    SAMPLER *nsampler = new_sampler(full_filename, loop_len);
+    SAMPLER *nsampler = new_sampler(filename, loop_len);
     if (nsampler == NULL) {
         printf("Barfed on sampler creation\n");
         return -1;

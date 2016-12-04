@@ -618,5 +618,30 @@ void interpret(char *line)
                        "that..\n");
             }
         }
+
+        regmatch_t sloop_add[5];
+        regex_t sladd_rx;
+        regcomp(&sladd_rx, "^(sladd) ([[:digit:]]+) ([.[:alnum:]]+) ([[:digit:]]+)$",
+                REG_EXTENDED | REG_ICASE);
+        if (regexec(&sladd_rx, trim_tok, 5, sloop_add, 0) == 0) {
+            printf("SAMPLER ADD SAMPLE!!zzzz\n");
+
+            char cmd_type[10];
+            int  signum = 0;
+            char filename[30];
+            int  loop_len = 0;
+            sscanf(trim_tok, "%s %d %s %d", cmd_type, &signum, filename, &loop_len);
+
+            printf("%s %d %s %d\n", cmd_type, signum, filename, loop_len);
+            int is_val_a_valid_sig_num =
+                (signum >= 0 && signum < mixr->soundgen_num) ? 1 : 0;
+            if (is_val_a_valid_sig_num &&
+                mixr->sound_generators[signum]->type == SAMPLER_TYPE) {
+                printf("BBBBBBOOO YEH!\n");
+
+                sampler_add_sample((SAMPLER*) mixr->sound_generators[signum],
+                                   filename, loop_len);
+            }
+        }
     }
 }
