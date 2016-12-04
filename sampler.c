@@ -79,9 +79,9 @@ void sampler_resample_to_loop_size(SAMPLER *sampler)
     printf("BUFSIZE is %d\n", sampler->orig_file_bufsize);
     printf("CHANNELS is %d\n", sampler->channels);
 
-    double size_of_one_loop_in_samples = mixr->samples_per_midi_tick * PPL;
+    double loop_len_in_samples = mixr->samples_per_midi_tick * PPL * sampler->loop_len;
 
-    double *resampled_file_buffer = (double*) calloc(size_of_one_loop_in_samples,
+    double *resampled_file_buffer = (double*) calloc(loop_len_in_samples,
                                                      sizeof(double));
     if (resampled_file_buffer == NULL)
     {
@@ -93,8 +93,8 @@ void sampler_resample_to_loop_size(SAMPLER *sampler)
     double bufsize = sampler->orig_file_bufsize;
 
     double position = 0;
-    double incr = (double) sampler->orig_file_bufsize / size_of_one_loop_in_samples;
-    for ( int i = 0; i < size_of_one_loop_in_samples; i++)
+    double incr = (double) sampler->orig_file_bufsize / loop_len_in_samples;
+    for ( int i = 0; i < loop_len_in_samples; i++)
     {
         int base_index = (int)position;
         unsigned long next_index = base_index + 1;
@@ -125,16 +125,16 @@ void sampler_resample_to_loop_size(SAMPLER *sampler)
         int old_relative_position = (100 /  sampler->resampled_file_bufsize)  * sampler->position;
 
         sampler->resampled_file_buffer = resampled_file_buffer;
-        sampler->resampled_file_bufsize = size_of_one_loop_in_samples;
+        sampler->resampled_file_bufsize = loop_len_in_samples;
 
-        sampler->position = (size_of_one_loop_in_samples / 100) * old_relative_position;
+        sampler->position = (loop_len_in_samples / 100) * old_relative_position;
         sampler->position = 0;
         sampler->just_been_resampled = true;
         free(oldbuf);
     }
     else {
         sampler->resampled_file_buffer = resampled_file_buffer;
-        sampler->resampled_file_bufsize = size_of_one_loop_in_samples;
+        sampler->resampled_file_bufsize = loop_len_in_samples;
     }
     pthread_mutex_unlock(&sampler->resample_mutex);
 
