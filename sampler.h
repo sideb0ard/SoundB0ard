@@ -1,6 +1,7 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
 
+#include <pthread.h>
 #include "sound_generator.h"
 
 typedef struct t_sampler {
@@ -12,6 +13,8 @@ typedef struct t_sampler {
 
     double   *resampled_file_buffer;
     int       resampled_file_bufsize;
+
+    pthread_mutex_t resample_mutex;
 
     int       position;
 

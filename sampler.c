@@ -18,6 +18,8 @@ SAMPLER *new_sampler(char *filename, double loop_len)
 
     sampler_set_file_name(sampler, filename);
     sampler_import_file_contents(sampler, filename);
+
+    pthread_mutex_init(&sampler->resample_mutex, NULL);
     sampler_resample_to_loop_size(sampler);
 
     sampler->sound_generator.gennext = &sampler_gennext;
@@ -43,7 +45,6 @@ void sampler_set_file_name(SAMPLER *s, char *filename)
 
 void sampler_import_file_contents(SAMPLER *s, char *filename)
 {
-    // soundfile part
     SNDFILE *snd_file;
     SF_INFO sf_info;
 
@@ -77,11 +78,8 @@ void sampler_resample_to_loop_size(SAMPLER *sampler)
     printf("BUFSIZE is %d\n", sampler->orig_file_bufsize);
     printf("CHANNELS is %d\n", sampler->channels);
 
-    //double size_of_one_loop_in_samples = SAMPLE_RATE * (60.0 / mixr->bpm) * 4;
     double size_of_one_loop_in_samples = mixr->samples_per_midi_tick * PPL;
-    //int quotient = sampler->orig_file_bufsize / size_of_one_loop_in_samples;
 
-    //int resized_buf_need = (quotient+1) * size_of_one_loop_in_samples;
     double *resampled_file_buffer = (double*) calloc(size_of_one_loop_in_samples,
                                                      sizeof(double));
     if (resampled_file_buffer == NULL)
@@ -109,7 +107,8 @@ void sampler_resample_to_loop_size(SAMPLER *sampler)
         position += incr;
 
         if (position >= bufsize) {
-            printf("My job here is done\n");
+            printf("POSITION: %f // BUFSIZR: %f My job here is done\n",
+                    position, bufsize);
             break;
         }
 
@@ -117,8 +116,24 @@ void sampler_resample_to_loop_size(SAMPLER *sampler)
         resampled_file_buffer[i] = val / 2147483648.0;
     }
 
-    sampler->resampled_file_buffer = resampled_file_buffer;
-    sampler->resampled_file_bufsize = size_of_one_loop_in_samples;
+    pthread_mutex_lock(&sampler->resample_mutex);
+    bool is_previous_buffer = sampler->resampled_file_buffer != NULL ? true : false;
+    if (is_previous_buffer)
+    {
+        double *oldbuf = sampler->resampled_file_buffer;
+        int old_relative_position = (100 /  sampler->resampled_file_bufsize)  * sampler->position;
+
+        sampler->resampled_file_buffer = resampled_file_buffer;
+        sampler->resampled_file_bufsize = size_of_one_loop_in_samples;
+
+        sampler->position = (size_of_one_loop_in_samples / 100) * old_relative_position;
+        free(oldbuf);
+    }
+    else {
+        sampler->resampled_file_buffer = resampled_file_buffer;
+        sampler->resampled_file_bufsize = size_of_one_loop_in_samples;
+    }
+    pthread_mutex_unlock(&sampler->resample_mutex);
 
 }
 
@@ -134,12 +149,13 @@ double sampler_gennext(void *self)
                 mixr->sixteenth_note_tick,
                 mixr->tick);
     }
+    pthread_mutex_lock(&sampler->resample_mutex);
     double val = sampler->resampled_file_buffer[sampler->position++];
-
     if (sampler->position == sampler->resampled_file_bufsize)
     {
         sampler->position = 0;
     }
+    pthread_mutex_unlock(&sampler->resample_mutex);
 
     if (val > 1 || val < -1)
         printf("BURNIE - SAMPLER OVERLOAD!\n");
