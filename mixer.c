@@ -284,12 +284,13 @@ double gen_next(mixer *mixr)
     // called once ever SAMPLE_RATE -> cur_sample is the basis of my clock
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
         pthread_mutex_lock(&midi_tick_lock);
-        if (mixr->tick % (PPQN / 4) == 0) {
+        mixr->tick++; // 1 midi tick (or pulse)
+        if (mixr->tick % PPS == 0) {
             mixr->sixteenth_note_tick++; // for drum machine resolution
+            //printf("16th++ %d %d %d\n", mixr->sixteenth_note_tick, mixr->tick, mixr->cur_sample);
         }
         pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
-        mixr->tick++; // 1 midi tick (or pulse)
     }
     mixr->cur_sample++; 
 

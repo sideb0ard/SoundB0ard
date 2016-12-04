@@ -13,7 +13,36 @@ SAMPLER *new_sampler(char *filename, double loop_len)
 {
     SAMPLER *sampler = calloc(1, sizeof(SAMPLER));
     sampler->position = 0;
+    sampler->loop_len = loop_len;
+    sampler->vol = 0.0;
 
+    sampler_set_file_name(sampler, filename);
+    sampler_import_file_contents(sampler, filename);
+    sampler_resample_to_loop_size(sampler);
+
+    sampler->sound_generator.gennext = &sampler_gennext;
+    sampler->sound_generator.status = &sampler_status;
+    sampler->sound_generator.getvol = &sampler_getvol;
+    sampler->sound_generator.setvol = &sampler_setvol;
+    sampler->sound_generator.type = SAMPLER_TYPE;
+
+    printf("Filename:: %s\n", sampler->filename);
+    printf("SR: %d\n", sampler->samplerate);
+    printf("Channels: %d\n", sampler->channels);
+    printf("Ticks in a loop: %d\n", sampler->resampled_file_bufsize);
+
+    return sampler;
+}
+
+void sampler_set_file_name(SAMPLER *s, char *filename)
+{
+    int fslen = strlen(filename);
+    s->filename = calloc(1, fslen + 1);
+    strncpy(s->filename, filename, fslen);
+}
+
+void sampler_import_file_contents(SAMPLER *s, char *filename)
+{
     // soundfile part
     SNDFILE *snd_file;
     SF_INFO sf_info;
@@ -22,12 +51,8 @@ SAMPLER *new_sampler(char *filename, double loop_len)
     snd_file = sf_open(filename, SFM_READ, &sf_info);
     if (!snd_file) {
         printf("Err opening %s : %d\n", filename, sf_error(snd_file));
-        return (void *)NULL;
+        return;
     }
-    printf("Filename:: %s\n", filename);
-    printf("SR: %d\n", sf_info.samplerate);
-    printf("Channels: %d\n", sf_info.channels);
-    printf("Frames: %lld\n", sf_info.frames);
 
     int bufsize = sf_info.channels * sf_info.frames;
     printf("Making buffer size of %d\n", bufsize);
@@ -35,45 +60,66 @@ SAMPLER *new_sampler(char *filename, double loop_len)
     int *buffer = calloc(bufsize, sizeof(int));
     if (buffer == NULL) {
         perror("Ooft, memory issues, mate!\n");
-        return (void *)NULL;
+        return;
     }
 
     sf_readf_int(snd_file, buffer, bufsize);
 
-    int fslen = strlen(filename);
-    sampler->filename = calloc(1, fslen + 1);
-    strncpy(sampler->filename, filename, fslen);
+    s->orig_file_buffer = buffer;
+    s->orig_file_bufsize = bufsize;
+    s->samplerate = sf_info.samplerate;
+    s->channels = sf_info.channels;
 
-    sampler->buffer = buffer;
-    sampler->bufsize = bufsize;
-    sampler->samplerate = sf_info.samplerate;
-    sampler->channels = sf_info.channels;
-    printf("LOOP LEN IS %f\n", loop_len);
-    sampler->loop_len = loop_len;
-    printf("SAMPLER LOOP LEN IS %f\n", sampler->loop_len);
-    sampler->vol = 0.0;
-
-    sampler_set_incr(sampler);
-
-    sampler->sound_generator.gennext = &sampler_gennext;
-    sampler->sound_generator.status = &sampler_status;
-    sampler->sound_generator.getvol = &sampler_getvol;
-    sampler->sound_generator.setvol = &sampler_setvol;
-    sampler->sound_generator.type = SAMPLER_TYPE;
-
-    return sampler;
 }
 
-void sampler_set_incr(void *self)
+void sampler_resample_to_loop_size(SAMPLER *sampler)
 {
-    SAMPLER *sampler = self;
-    printf("BUFSIZE is %d\n", sampler->bufsize);
+    printf("BUFSIZE is %d\n", sampler->orig_file_bufsize);
     printf("CHANNELS is %d\n", sampler->channels);
-    double size_of_one_loop_in_samples = SAMPLE_RATE * (60.0 / mixr->bpm) * 4;
-    printf("SIZE OF ONE LOOP IN SAMPLES %f\n", size_of_one_loop_in_samples);
-    double incr = sampler->bufsize / size_of_one_loop_in_samples * sampler->channels;
-    printf("INCR is %f\n", incr);
-    sampler->incr = incr;
+
+    //double size_of_one_loop_in_samples = SAMPLE_RATE * (60.0 / mixr->bpm) * 4;
+    double size_of_one_loop_in_samples = mixr->samples_per_midi_tick * PPL;
+    //int quotient = sampler->orig_file_bufsize / size_of_one_loop_in_samples;
+
+    //int resized_buf_need = (quotient+1) * size_of_one_loop_in_samples;
+    double *resampled_file_buffer = (double*) calloc(size_of_one_loop_in_samples,
+                                                     sizeof(double));
+    if (resampled_file_buffer == NULL)
+    {
+        printf("Memory barf in sampler resample\n");
+        return;
+    }
+
+    int *table = sampler->orig_file_buffer;
+    double bufsize = sampler->orig_file_bufsize;
+
+    double position = 0;
+    double incr = (double) sampler->orig_file_bufsize / size_of_one_loop_in_samples;
+    for ( int i = 0; i < size_of_one_loop_in_samples; i++)
+    {
+        int base_index = (int)position;
+        unsigned long next_index = base_index + 1;
+        double frac, slope, val;
+
+        frac = position - base_index;
+        val = table[base_index];
+        slope = table[next_index] - val;
+
+        val += (frac * slope);
+        position += incr;
+
+        if (position >= bufsize) {
+            printf("My job here is done\n");
+            break;
+        }
+
+        // convert from 16bit int to double between 0 and 1
+        resampled_file_buffer[i] = val / 2147483648.0;
+    }
+
+    sampler->resampled_file_buffer = resampled_file_buffer;
+    sampler->resampled_file_bufsize = size_of_one_loop_in_samples;
+
 }
 
 double sampler_gennext(void *self)
@@ -82,32 +128,18 @@ double sampler_gennext(void *self)
     SAMPLER *sampler = self;
     // double val = 0;
 
-    int base_index = (int)(sampler->position);
-    unsigned long next_index = base_index + 1; // TODO(+ num_channels)
-    double frac, slope, val;
-    double bufsize = sampler->bufsize, position = sampler->position;
-    int *table = sampler->buffer;
-
-    frac = position - base_index;
-    val = table[base_index];
-    slope = table[next_index] - val;
-
-    val += (frac * slope);
-    position += sampler->incr;
-
-    while (position >= bufsize) {
-        //printf("Start of sample loop! mxir->16th %d\n", mixr->sixteenth_note_tick);
-        position -= bufsize;
+    if (sampler->position == 0) {
+        printf("SAMPLER START OF LOOP: %d 16Tick %d Tick %d\n",
+                sampler->position,
+                mixr->sixteenth_note_tick,
+                mixr->tick);
     }
-    while (position < 0.0) {
-        position += bufsize;
+    double val = sampler->resampled_file_buffer[sampler->position++];
+
+    if (sampler->position == sampler->resampled_file_bufsize)
+    {
+        sampler->position = 0;
     }
-
-    sampler->position = position;
-    // val =  sampler->buffer[sampler->position] / 2147483648.0 ; // convert
-    // from 16bit in to double between 0 and 1
-
-    val = val / 2147483648.0;
 
     if (val > 1 || val < -1)
         printf("BURNIE - SAMPLER OVERLOAD!\n");

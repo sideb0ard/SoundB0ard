@@ -254,8 +254,10 @@ double drum_gennext(void *self)
 
 
         if (step_seq_idx == 0)
-            printf("Top of loop [%d] - tick = %d\n",
-                    step_seq_idx, mixr->sixteenth_note_tick);
+            printf("Top of loop [%d] - 16tick = %d, tik = %d\n",
+                    step_seq_idx,
+                    mixr->sixteenth_note_tick,
+                    mixr->tick);
 
         if (drumr->swing) {
             if (mixr->sixteenth_note_tick % 2) {

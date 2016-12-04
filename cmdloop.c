@@ -141,7 +141,7 @@ void interpret(char *line)
                             mixr->sound_generators[i]->envelopes[j]);
                     }
                     if (mixr->sound_generators[i]->type == SAMPLER_TYPE) {
-                        sampler_set_incr(mixr->sound_generators[i]);
+                        sampler_resample_to_loop_size((SAMPLER*)mixr->sound_generators[i]);
                     }
                 }
             }

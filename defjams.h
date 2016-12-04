@@ -13,9 +13,10 @@
 
 #define DEFAULT_ARRAY_SIZE 4
 
-#define PPQN 768       // Pulses Per Quarter Note // one beat
-#define PPL (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
-#define PPNS (PPL * 2) //  2 bars - this is used for recording loop melodies
+#define PPQN 960        // Pulses Per Quarter Note // one beat
+#define PPS  (PPQN / 4) // pulses per SIXTEENTH note, i.e. drum machine hit
+#define PPL  (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
+#define PPNS (PPL * 2)  // Pulses per NanoSynth recording loop, i.e 2 loops/bars
 
 #define DRUM_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
 
