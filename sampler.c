@@ -15,6 +15,7 @@ SAMPLER *new_sampler(char *filename, double loop_len)
     sampler->position = 0;
     sampler->loop_len = loop_len;
     sampler->vol = 0.0;
+    sampler->just_been_resampled = false;
 
     sampler_set_file_name(sampler, filename);
     sampler_import_file_contents(sampler, filename);
@@ -127,6 +128,8 @@ void sampler_resample_to_loop_size(SAMPLER *sampler)
         sampler->resampled_file_bufsize = size_of_one_loop_in_samples;
 
         sampler->position = (size_of_one_loop_in_samples / 100) * old_relative_position;
+        sampler->position = 0;
+        sampler->just_been_resampled = true;
         free(oldbuf);
     }
     else {
@@ -141,16 +144,35 @@ double sampler_gennext(void *self)
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
     SAMPLER *sampler = self;
-    // double val = 0;
+    double val = 0;
 
-    if (sampler->position == 0) {
-        printf("SAMPLER START OF LOOP: %d 16Tick %d Tick %d\n",
-                sampler->position,
-                mixr->sixteenth_note_tick,
-                mixr->tick);
+    // wait till start of loop to keep patterns synched
+    if (!sampler->started) {
+        if (mixr->sixteenth_note_tick % 16 == 0)
+        {
+            printf("Starting SAMPLE LOOP! 16th %d tick: %d\n", mixr->sixteenth_note_tick, mixr->tick);
+            sampler->started = true;
+        }
+        else {
+            return val;
+        }
     }
+
+    // resync after a resample/resize
+    if (sampler->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0)
+    {
+        sampler->position = 0;
+        sampler->just_been_resampled = false;
+    }
+
+    //if (sampler->position == 0) {
+    //    printf("SAMPLER START OF LOOP: %d 16Tick %d Tick %d\n",
+    //            sampler->position,
+    //            mixr->sixteenth_note_tick,
+    //            mixr->tick);
+    //}
     pthread_mutex_lock(&sampler->resample_mutex);
-    double val = sampler->resampled_file_buffer[sampler->position++];
+    val = sampler->resampled_file_buffer[sampler->position++];
     if (sampler->position == sampler->resampled_file_bufsize)
     {
         sampler->position = 0;

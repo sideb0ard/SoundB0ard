@@ -25,15 +25,12 @@ static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
 #define EXTRACT_BITS(the_val, bits_start, bits_len)                            \
     ((the_val >> (bits_start - 1)) & ((1 << bits_len) - 1))
 
+// TODO ( this is superflous - no timing is going on )
 void *timed_sig_start(void *arg)
 {
     SBMSG *msg = arg;
     int sg = -1; // signal generator
 
-    while ((mixr->sixteenth_note_tick) % 16 != 0)
-        printf("Waiting %d...\n", mixr->sixteenth_note_tick);
-
-    printf("BOOm!\n");
     if (strcmp(msg->params, "sloop") == 0) {
         printf("TIMED .... %f\n", msg->looplen);
         sg = add_sampler(mixr, msg->filename, msg->looplen);

@@ -2,6 +2,7 @@
 #define SAMPLER_H
 
 #include <pthread.h>
+#include <stdbool.h>
 #include "sound_generator.h"
 
 typedef struct t_sampler {
@@ -23,6 +24,8 @@ typedef struct t_sampler {
 
     double loop_len;
     double vol;
+    bool started;
+    bool just_been_resampled;
 } SAMPLER;
 
 SAMPLER *new_sampler(char *filename, double loop_len); // loop_len in bars
