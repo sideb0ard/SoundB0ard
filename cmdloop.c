@@ -621,7 +621,7 @@ void interpret(char *line)
 
         regmatch_t sloop_add[5];
         regex_t sladd_rx;
-        regcomp(&sladd_rx, "^(sladd) ([[:digit:]]+) ([.[:alnum:]]+) ([[:digit:]]+)$",
+        regcomp(&sladd_rx, "^(sladdd) ([[:digit:]]+) ([.[:alnum:]]+) ([[:digit:]]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sladd_rx, trim_tok, 5, sloop_add, 0) == 0) {
             printf("SAMPLER ADD SAMPLE!!zzzz\n");

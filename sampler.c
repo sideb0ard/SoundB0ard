@@ -126,6 +126,7 @@ void sampler_resample_to_loop_size(SAMPLER *s)
     {
         sample_resample_to_loop_size(s->samples[i]);
     }
+    s->just_been_resampled = true;
 }
 
 void sample_resample_to_loop_size(file_sample *fs)
@@ -185,7 +186,6 @@ void sample_resample_to_loop_size(file_sample *fs)
         fs->resampled_file_size = loop_len_in_samples;
 
         fs->position = (loop_len_in_samples / 100) * old_relative_position;
-        //fs->just_been_resampled = true;
         free(oldbuf);
     }
     else {
@@ -216,6 +216,7 @@ double sampler_gennext(void *self)
     // resync after a resample/resize
     if (sampler->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0)
     {
+        printf("Resyncing after resample...zzzz\n");
         sampler->samples[sampler->current_sample]->position = 0;
         sampler->just_been_resampled = false;
     }
