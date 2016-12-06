@@ -36,6 +36,7 @@ void loopy(void)
             add_history(line);
             interpret(line);
         }
+        free(line);
     }
 }
 
@@ -642,6 +643,22 @@ void interpret(char *line)
                 sampler_add_sample((SAMPLER*) mixr->sound_generators[signum],
                                    filename, loop_len);
             }
+        }
+        regmatch_t bytebeat_cmd[3];
+        regex_t bytebeat_rx;
+        regcomp(&bytebeat_rx, "^(byte) (.*)$",
+                REG_EXTENDED | REG_ICASE);
+        if (regexec(&bytebeat_rx, trim_tok, 3, bytebeat_cmd, 0) == 0) {
+            printf("BYTESZZZBEAT!\n");
+            int bytebeat_char_len = bytebeat_cmd[2].rm_eo - bytebeat_cmd[2].rm_so;
+            printf("bytebeat_char_len is %d\n", bytebeat_char_len);
+            char bytebeat[bytebeat_char_len + 1];
+            strncpy(bytebeat, trim_tok + bytebeat_cmd[2].rm_so, bytebeat_char_len);
+            bytebeat[bytebeat_char_len] = '\0';
+
+            printf("Byte beat izzz %s\n", bytebeat);
+            add_bytebeat(mixr, bytebeat);
+
         }
     }
 }

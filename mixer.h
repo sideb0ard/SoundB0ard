@@ -52,6 +52,7 @@ mixer *new_mixer(void);
 void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
 int add_bitwize(mixer *mixr, int pattern);
+int add_bytebeat(mixer *mixr, char *pattern);
 int add_osc(mixer *mixr, double freq, wave_type w);
 int add_nanosynth(mixer *mixr);
 int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern);

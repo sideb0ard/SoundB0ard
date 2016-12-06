@@ -8,6 +8,7 @@
 #include <portaudio.h>
 
 #include "bitwize.h"
+#include "bytebeatrrr.h"
 #include "defjams.h"
 #include "drumr.h"
 #include "drumr_utils.h"
@@ -167,6 +168,28 @@ int add_bitwize(mixer *mixr, int pattern)
     printf("Added bitwize gen!\n");
     return add_sound_generator(mixr, m);
 }
+
+int add_bytebeat(mixer *mixr, char *pattern)
+{
+
+    bytebeat *b = new_bytebeat(pattern);
+    if (b == NULL) {
+        printf("BITBARF!\n");
+        return -1;
+    }
+
+    SBMSG *m = new_sbmsg();
+    if (m == NULL) {
+        free(b);
+        printf("MBITBARF!\n");
+        return -1;
+    }
+
+    m->sound_generator = (SOUNDGEN *)b;
+    printf("Added BYTEBEATR!!!\n");
+    return add_sound_generator(mixr, m);
+}
+
 
 int add_nanosynth(mixer *mixr)
 {

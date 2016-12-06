@@ -3,6 +3,13 @@ CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototyp
 
 SRC = audioutils.c \
       bitwize.c \
+      bytebeatrrr.c \
+      bytebeat/interpreter.c \
+      bytebeat/clist.c \
+      bytebeat/dlist.c \
+      bytebeat/list.c \
+      bytebeat/stack.c \
+      bytebeat/queue.c \
       cmdloop.c \
       dca.c \
       delayline.c \
@@ -37,6 +44,8 @@ SRC = audioutils.c \
 
 LIBS = -lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 
+INCS = -Iinclude/ -I/Users/sideboard/NewCodez/SBShell
+
 OBJ = $(SRC:.c=.o)
 
 TARGET = sbsh
@@ -47,7 +56,7 @@ all: $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(LIBS)
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(LIBS) $(INC)
 
 clean:
 	rm -f *.o *~ $(TARGET)
