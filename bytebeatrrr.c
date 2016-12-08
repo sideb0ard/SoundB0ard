@@ -19,8 +19,11 @@ bytebeat *new_bytebeat(char *pattern)
 double bytes_gen_next(void *self)
 {
     bytebeat *b = (bytebeat*) self;
-    printf("Bytes beat! %s\n", b->pattern);
-    return interpreter(b->pattern);
+    //printf("Bytes beat! %s\n", b->pattern);
+    char val = interpreter(b->pattern);
+    double scaled_val = 2.0 / 256 * val;
+    //printf("SCALED! %f\n", scale_val);
+    return scaled_val;
 }
 
 void   bytes_status(void *self, char *ss);

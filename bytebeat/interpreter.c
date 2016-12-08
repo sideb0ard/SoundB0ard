@@ -48,7 +48,7 @@ int associativity(int op); // left or right
 int bin_or_uni(int op);
 int calc(int operator, int first_operand, int val);
 int parse_bytebeat(int t, char *pattern, Stack *stack);
-int parse_rpn(Stack *rpn_stack);
+char parse_rpn(Stack *rpn_stack);
 int precedence(int op);
 bool isnum(char *ch);
 bool isvalid_char(char *ch);
@@ -119,6 +119,9 @@ int precedence(int op)
     case 9:  // DIVIDE
     case 10: // MODULO
         return 6;
+    case 11: // left bracket
+    case 12: // right bracket
+        return 0;
     default:
         return 99;
     }
@@ -163,16 +166,16 @@ int parse_bytebeat(int t, char *pattern, Stack *rpn_stack)
     for (wurd = strtok_r(pattern, sep, &wurdleft); wurd;
          wurd = strtok_r(NULL, sep, &wurdleft)) {
         token *toke = calloc(1, sizeof(token));
-        printf("\nToken is %s\n", wurd);
+        //printf("\nToken is %s\n", wurd);
         int val = atoi(wurd);
         if (val != 0) {
-            printf("NUM! %d\n", val);
+            //printf("NUM! %d\n", val);
             toke->type = NUMBER;
             toke->val = val;
             stack_push(rpn_stack, (void *)(toke));
         }
         else {
-            printf("OP! %s\n", wurd);
+            //printf("OP! %s\n", wurd);
 
             toke->type = OPERATOR;
             if (strcmp(wurd, "<<") == 0)
@@ -218,16 +221,16 @@ int parse_bytebeat(int t, char *pattern, Stack *rpn_stack)
                 continue;
             }
             if (toke->val == RIGHTBRACKET) {
-                printf("RIGHT BRACKET!\n");
+                //printf("RIGHT BRACKET!\n");
                 while (stack_size(operatorz) > 0) {
-                    printf("STACKSIZE %d\n", stack_size(operatorz));
+                    //printf("STACKSIZE %d\n", stack_size(operatorz));
 
                     token *top_o_the_stack = stack_peek(operatorz);
 
-                    printf("Looking at %s\n", ops[top_o_the_stack->val]);
+                    //printf("Looking at %s\n", ops[top_o_the_stack->val]);
 
                     if (top_o_the_stack->val == LEFTBRACKET) {
-                        printf("WOOP - found bracjet!\n");
+                        //printf("WOOP - found bracjet!\n");
                         stack_pop(operatorz, (void **)&top_o_the_stack);
                     }
                     else {
@@ -244,26 +247,26 @@ int parse_bytebeat(int t, char *pattern, Stack *rpn_stack)
                     stack_push(operatorz, (void *)(toke));
                     continue;
                 }
-                printf("STACK SIZE GRETR THAN 0: %d\n", stack_size(operatorz));
+                //printf("STACK SIZE GRETR THAN 0: %d\n", stack_size(operatorz));
                 bool wurk_it = true;
                 while (wurk_it && stack_size(operatorz) > 0) {
                     token *top_o_the_stack = stack_peek(operatorz);
-                    printf(
-                        "PRECEDENCE OF ME %d, precedence of top of stack %d\n",
-                        precedence(toke->val),
-                        precedence(top_o_the_stack->val));
-                    printf("ASSOCIATIVITY OF ME %s, ASSOCIATIVITY of top of "
-                           "stack %s\n",
-                           associativity(toke->val) ? "RIGHT" : "LEFT",
-                           associativity(top_o_the_stack->val) ? "RIGHT"
-                                                               : "LEFT");
+                    // printf(
+                    //     "PRECEDENCE OF ME %d, precedence of top of stack %d\n",
+                    //     precedence(toke->val),
+                    //     precedence(top_o_the_stack->val));
+                    // printf("ASSOCIATIVITY OF ME %s, ASSOCIATIVITY of top of "
+                    //        "stack %s\n",
+                    //        associativity(toke->val) ? "RIGHT" : "LEFT",
+                    //        associativity(top_o_the_stack->val) ? "RIGHT"
+                    //                                            : "LEFT");
                     if (((associativity(toke->val) == LEFT) &&
                          (precedence(toke->val) <=
                           precedence(top_o_the_stack->val))) ||
                         ((associativity(toke->val) == RIGHT) &&
                          (precedence(toke->val) <
                           precedence(top_o_the_stack->val)))) {
-                        printf("POPing to PUSH\n");
+                        //printf("POPing to PUSH\n");
                         if (stack_pop(operatorz, (void **)&top_o_the_stack) ==
                             0) {
                             stack_push(rpn_stack, (void *)top_o_the_stack);
@@ -274,14 +277,14 @@ int parse_bytebeat(int t, char *pattern, Stack *rpn_stack)
                     }
                     else {
                         wurk_it = false;
-                        printf("WURKIT False\n");
+                        //printf("WURKIT False\n");
                     }
                 }
             }
             stack_push(operatorz, (void *)(toke));
         }
-        printf("STACK_SIZE(operatorz): %d\n", stack_size(operatorz));
-        printf("STACK_SIZE(rpn_stack): %d\n", stack_size(rpn_stack));
+        //printf("STACK_SIZE(operatorz): %d\n", stack_size(operatorz));
+        //printf("STACK_SIZE(rpn_stack): %d\n", stack_size(rpn_stack));
     }
 
     token *re_token;
@@ -325,34 +328,33 @@ int calc(int operator, int first_operand, int second_operand)
     }
 }
 
-int parse_rpn(Stack *rpn_stack)
+char parse_rpn(Stack *rpn_stack)
 {
-    printf("\n\n======================================\n");
+    //printf("\n\n======================================\n");
 
     Stack *ans_stack = calloc(1, sizeof(List));
     stack_init(ans_stack, NULL);
 
-    printf("SIZEOF PRSEN STACK %d\n", stack_size(rpn_stack));
+    //printf("SIZEOF PRSEN STACK %d\n", stack_size(rpn_stack));
 
     token *re_token;
     while (stack_pop(rpn_stack, (void **)&re_token) == 0) {
         if (re_token->type == NUMBER) {
-            printf("Num %d\n", re_token->val);
+            //printf("Num %d\n", re_token->val);
             stack_push(ans_stack, (void *)re_token);
         }
         else if (re_token->type == OPERATOR) {
-            printf("Op %s\n", ops[re_token->val]);
+            //printf("Op %s\n", ops[re_token->val]);
             if (bin_or_uni(re_token->val) == UNARY) {
-                printf("UNARY!\n");
+                //printf("UNARY!\n");
                 token *first_operand;
                 stack_pop(ans_stack, (void **)&first_operand);
-                ;
                 int ans = ~first_operand->val;
                 first_operand->val = ans;
                 stack_push(ans_stack, (void *)first_operand);
             }
             else {
-                printf("BINARY!\n");
+                //printf("BINARY!\n");
                 if (stack_size(ans_stack) < 2) {
                     printf("Barf, not enough operands on stack\n");
                     return 1;
@@ -364,12 +366,12 @@ int parse_rpn(Stack *rpn_stack)
                 stack_pop(ans_stack, (void **)&first_operand);
                 ;
 
-                printf("Wurking on %d and %d\n", first_operand->val,
-                       second_operand->val);
+                // printf("Wurking on %d and %d\n", first_operand->val,
+                //        second_operand->val);
                 int ans = calc(re_token->val, first_operand->val,
                                second_operand->val);
 
-                printf("CAlced! %d\n", ans);
+                // printf("CAlced! %d\n", ans);
 
                 token *ans_toke = calloc(1, sizeof(token));
                 ans_toke->type = NUMBER;
@@ -384,7 +386,7 @@ int parse_rpn(Stack *rpn_stack)
             printf("Wowo, nelly!\n");
         }
         re_token = stack_peek(ans_stack);
-        printf("TOTESOFAR: %d\n", re_token->val);
+        // printf("TOTESOFAR: %d\n", re_token->val);
     }
 
     int ret_val = -1;
@@ -394,7 +396,7 @@ int parse_rpn(Stack *rpn_stack)
         stack_pop(ans_stack, (void **)&atoke);
         ret_val = atoke->val;
         free(atoke);
-        printf("Woop, gots an answer: %d\n", ret_val);
+        //printf("Woop, gots an answer: %d\n", ret_val);
     }
     else {
         printf("Nah man, too many items on stack, sumthing is fucked\n");
@@ -406,17 +408,17 @@ int parse_rpn(Stack *rpn_stack)
 
 void reverse_stack(Stack *stack)
 {
-    printf("\n=============\n");
+    // printf("\n=============\n");
     Stack *rev_stack = calloc(1, sizeof(List));
     stack_init(rev_stack, NULL);
 
     token *tokey;
     while (stack_size(stack) > 0) {
         stack_pop(stack, (void **)&tokey);
-        if (tokey->type == NUMBER)
-            printf(":: %d\n", tokey->val);
-        else
-            printf(":: %s\n", ops[tokey->val]);
+        // if (tokey->type == NUMBER)
+        //     printf(":: %d\n", tokey->val);
+        // else
+        //     printf(":: %s\n", ops[tokey->val]);
         stack_push(rev_stack, (void *)tokey);
     }
 
@@ -425,11 +427,11 @@ void reverse_stack(Stack *stack)
     stack_destroy(&tmp_stack);
 }
 
-int interpreter(char *apattern)
+char interpreter(char *apattern)
 {
     int t = mixr->cur_sample;
 
-    printf("T is %d\n", t);
+    //printf("T is %d\n", t);
 
     char pattern[128];
     strncpy(pattern, apattern, 127);
@@ -440,10 +442,10 @@ int interpreter(char *apattern)
     parse_bytebeat(t, pattern, rpn_stack);
     reverse_stack(rpn_stack);
 
-    printf("SIZEOF RETRUNED RVRS STACK %d\n", stack_size(rpn_stack));
+    //printf("SIZEOF RETRUNED RVRS STACK %d\n", stack_size(rpn_stack));
 
-    int ans = parse_rpn(rpn_stack);
-    printf("ANSWER IS %d\n", ans);
+    char ans = parse_rpn(rpn_stack);
+    //printf("ANSWER IS %d\n", ans);
 
     stack_destroy(rpn_stack);
 

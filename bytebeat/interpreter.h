@@ -1,1 +1,1 @@
-int interpreter(char *apattern);
+char interpreter(char *apattern);

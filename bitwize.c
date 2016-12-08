@@ -71,9 +71,11 @@ double bitwize_gennext(void *self)
     char val = bitwize_process(pattern, t);
 
     double scale_val = (2.0 / 256 * val);
-    scale_val = effector(&p_bitwize->sound_generator, scale_val);
-    scale_val = envelopor(&p_bitwize->sound_generator, scale_val);
-    return scale_val * vol;
+    printf("VAL: %d, SCALE_VAL: %f\n", val, scale_val);
+    //scale_val = effector(&p_bitwize->sound_generator, scale_val);
+    //scale_val = envelopor(&p_bitwize->sound_generator, scale_val);
+    //return scale_val * vol;
+    return 0;
 }
 
 void bitwize_status(void *self, char *status_string)
