@@ -11,6 +11,7 @@ bytebeat *new_bytebeat(char *pattern)
     strncpy(b->pattern, pattern, 255);
 
     b->sound_generator.gennext = &bytes_gen_next;
+    b->sound_generator.status = &bytes_status;
 
     return b;
 }
@@ -26,5 +27,9 @@ double bytes_gen_next(void *self)
     return scaled_val;
 }
 
-void   bytes_status(void *self, char *ss);
-
+void bytes_status(void *self, char *status_string)
+{
+    bytebeat *b = (bytebeat*) self;
+    snprintf(status_string, 119, COOL_COLOR_GREEN "[%s]\tvol: %.2lfs"
+                                 ANSI_COLOR_RESET, b->pattern, 0.5);
+}

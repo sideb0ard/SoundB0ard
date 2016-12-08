@@ -223,3 +223,5 @@ melody 1 0:c2 8:a2 16:c2 24:a2
 stop 0, melody 1 0:c2 8:a2 16:c2 24:a2
 
 env 0 4 0, env 0 7 2, delay 0 0.5, delay 0 5, lowpass 0 800
+
+byte ( ( t * ( t >> 8 | t >> 9 ) & 46 & t >> 8 ) ) ^ ( t & t >> 13 | t >> 6 )
