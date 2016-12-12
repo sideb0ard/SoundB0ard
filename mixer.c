@@ -31,6 +31,7 @@ mixer *new_mixer()
     mixr->volume = 0.7;
     mixr->bpm = DEFAULT_BPM;
     mixr->samples_per_midi_tick = (60.0 / DEFAULT_BPM * SAMPLE_RATE) / PPQN;
+    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
     mixr->tick = 0;
     mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
@@ -63,6 +64,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
 {
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
+    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
 }
 
 void delay_toggle(mixer *mixr)

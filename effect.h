@@ -4,6 +4,7 @@
 #include "stereodelay.h"
 
 typedef enum {
+    BEATREPEAT,
     DECIMATOR,
     DELAY,
     DISTORTION,
@@ -37,6 +38,7 @@ typedef struct {
     effect_type type;
 } EFFECT;
 
+EFFECT *new_beatrepeat(int looplen);
 EFFECT *new_delay(double duration);
 EFFECT *new_decimator(void);
 EFFECT *new_distortion(void);

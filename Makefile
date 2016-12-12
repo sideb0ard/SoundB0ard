@@ -2,6 +2,7 @@ CC = clang
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g
 
 SRC = audioutils.c \
+      beatrepeat.c \
       bitwize.c \
       bytebeatrrr.c \
       bytebeat/interpreter.c \

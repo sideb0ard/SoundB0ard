@@ -34,6 +34,9 @@ typedef struct t_mixer {
     int cur_sample; // inverse of SAMPLE RATE
     int tick;       //
 
+    // informational for other sound generators
+    unsigned int loop_len_in_samples;
+
     double volume;
     int keyboard_octave;
 

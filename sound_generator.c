@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "beatrepeat.h"
 #include "defjams.h"
 #include "effect.h"
 #include "sound_generator.h"
@@ -29,6 +30,25 @@ static int resize_effects_array(SOUNDGEN *self)
         }
     }
     return 0;
+}
+
+int add_beatrepeat_soundgen(SOUNDGEN *self, int looplen)
+{
+    printf("RAR! BEATREPEAT all up in this kittycat\n");
+    int res = resize_effects_array(self);
+    if (res == -1) {
+        perror("Couldn't resize effects array");
+        return -1;
+    }
+    EFFECT *e = new_beatrepeat(looplen);
+    if (e == NULL) {
+        perror("Couldn't create DECIMATOR effect");
+        return -1;
+    }
+    self->effects[self->effects_num] = e;
+    self->effects_on = 1;
+    printf("done adding beat repeat effect\n");
+    return self->effects_num++;
 }
 
 int add_decimator_soundgen(SOUNDGEN *self)
@@ -133,7 +153,14 @@ float effector(SOUNDGEN *self, float val)
             float mix = 0.1;
             float atten = 1.0;
 
+            beatrepeat *b;
+
             switch (self->effects[i]->type) {
+            case BEATREPEAT:
+                // printf("INVAL %f\n", val);
+                b = (beatrepeat *) self->effects[i];
+                val = beatrepeat_gennext(b, val);
+                break;
             case DECIMATOR:
                 // printf("INVAL %f\n", val);
                 if (val > 0.0) {

@@ -10,6 +10,7 @@
 #include <readline/readline.h>
 
 #include "audioutils.h"
+#include "beatrepeat.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "drumr_utils.h"
@@ -221,7 +222,7 @@ void interpret(char *line)
 
         regmatch_t sxmatch[3];
         regex_t sx_rx;
-        regcomp(&sx_rx, "^(distort|decimate|life|rec|env) ([[:digit:].]+)$",
+        regcomp(&sx_rx, "^(beatrepeat|distort|decimate|life|rec|env) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sx_rx, trim_tok, 2, sxmatch, 0) == 0) {
             double val = 0;
@@ -233,6 +234,11 @@ void interpret(char *line)
                 if (strncmp(cmd_type, "distort", 10) == 0) {
                     printf("DISTORTTTTTTT!\n");
                     add_distortion_soundgen(mixr->sound_generators[(int)val]);
+                }
+                else if ((strncmp(cmd_type, "beatrepeat", 10) == 0)) {
+                    printf("Toggling BEATREPEAT for %d\n", (int)val);
+                    beatrepeat *b = (beatrepeat *) mixr->sound_generators[(int)val]->effects[0];
+                    b->m_active = 1 - b->m_active;
                 }
                 else if ((strncmp(cmd_type, "rec", 4) == 0)) {
                     if (mixr->sound_generators[(int)val]->type !=
@@ -301,9 +307,9 @@ void interpret(char *line)
         regmatch_t tpmatch[4];
         regex_t tsigtype_rx;
         regcomp(&tsigtype_rx,
-                "^(vol|freq|delay|reverb|res|randd|allpass|midi|"
+                "^(beatrepeat|vol|freq|delay|reverb|res|randd|allpass|midi|"
                 "lowpass|highpass|bandpass|nanosynth|sustain|swing) "
-                "([[:digit:].]+) ([[:digit:].]+)$",
+                "([[:digit:].]+) ([[:alnum:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&tsigtype_rx, trim_tok, 3, tpmatch, 0) == 0) {
             double val1 = 0;
@@ -332,6 +338,11 @@ void interpret(char *line)
                             val2 * (1 / (60.0 / mixr->bpm) * PPQN / 1000);
                         nanosynth_set_sustain(ns, sustain_lev);
                     }
+                }
+                if (strcmp(cmd_type, "beatrepeat") == 0) {
+                    printf("BEAT REPEAT CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
+                           val2);
+                    add_beatrepeat_soundgen(mixr->sound_generators[(int)val1], val2);
                 }
                 if (strcmp(cmd_type, "delay") == 0) {
                     printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,

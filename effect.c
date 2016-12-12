@@ -2,9 +2,29 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "beatrepeat.h"
 #include "defjams.h"
 #include "effect.h"
+#include "mixer.h"
 #include "utils.h"
+
+extern mixer *mixr;
+
+EFFECT *new_beatrepeat(int looplen)
+{
+    beatrepeat *b = calloc(1, sizeof(beatrepeat));
+    if (b == NULL)
+        return NULL;
+
+    printf("NEW BEAT REPEAT! %d loops\n", looplen);
+    b->m_buffer_size = mixr->loop_len_in_samples / 16;
+    b->m_buffer = calloc(b->m_buffer_size, sizeof(double));
+
+    b->effect.type = BEATREPEAT;
+    b->m_active = true;
+
+    return (EFFECT *) b;
+}
 
 EFFECT *new_delay(double duration)
 {
