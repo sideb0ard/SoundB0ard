@@ -1,34 +1,32 @@
 #ifndef SAMPLER_H
 #define SAMPLER_H
 
+#include "sound_generator.h"
 #include <pthread.h>
 #include <stdbool.h>
-#include "sound_generator.h"
 
-typedef struct file_sample
-{
+typedef struct file_sample {
     char *filename;
-    int  *orig_file_bytes;
-    int   orig_file_size;
+    int *orig_file_bytes;
+    int orig_file_size;
 
     double *resampled_file_bytes;
-    int     resampled_file_size;
+    int resampled_file_size;
 
-    int    position;
+    int position;
 
-    int    samplerate;
-    int    channels;
+    int samplerate;
+    int channels;
 
     double loop_len;
 } file_sample;
 
-typedef struct t_sampler
-{
+typedef struct t_sampler {
     SOUNDGEN sound_generator;
 
     file_sample **samples;
-    int           samples_array_size;
-    int           samples_num_entries;
+    int samples_array_size;
+    int samples_num_entries;
 
     int current_sample;
 
@@ -46,8 +44,8 @@ void sampler_resample_to_loop_size(SAMPLER *s);
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double sampler_gennext(void *self);
 
-void   sampler_status(void *self, char *ss);
-void   sampler_setvol(void *self, double v);
+void sampler_status(void *self, char *ss);
+void sampler_setvol(void *self, double v);
 double sampler_getvol(void *self);
 
 void sample_import_file_contents(file_sample *fs, char *filename);

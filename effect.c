@@ -17,13 +17,16 @@ EFFECT *new_beatrepeat(int looplen)
         return NULL;
 
     printf("NEW BEAT REPEAT! %d loops\n", looplen);
-    b->m_buffer_size = mixr->loop_len_in_samples / 16;
+    b->m_buffer_size = mixr->loop_len_in_samples;
     b->m_buffer = calloc(b->m_buffer_size, sizeof(double));
+    b->m_sixteenth_note_size = b->m_buffer_size / 16;
+    b->m_selected_sixteenth = 0;
+    b->m_num_beats_to_repeat = 6;
 
     b->effect.type = BEATREPEAT;
     b->m_active = true;
 
-    return (EFFECT *) b;
+    return (EFFECT *)b;
 }
 
 EFFECT *new_delay(double duration)

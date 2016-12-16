@@ -143,7 +143,8 @@ void interpret(char *line)
                             mixr->sound_generators[i]->envelopes[j]);
                     }
                     if (mixr->sound_generators[i]->type == SAMPLER_TYPE) {
-                        sampler_resample_to_loop_size((SAMPLER*)mixr->sound_generators[i]);
+                        sampler_resample_to_loop_size(
+                            (SAMPLER *)mixr->sound_generators[i]);
                     }
                 }
             }
@@ -222,7 +223,8 @@ void interpret(char *line)
 
         regmatch_t sxmatch[3];
         regex_t sx_rx;
-        regcomp(&sx_rx, "^(beatrepeat|distort|decimate|life|rec|env) ([[:digit:].]+)$",
+        regcomp(&sx_rx,
+                "^(beatrepeat|distort|decimate|life|rec|env) ([[:digit:].]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sx_rx, trim_tok, 2, sxmatch, 0) == 0) {
             double val = 0;
@@ -237,7 +239,9 @@ void interpret(char *line)
                 }
                 else if ((strncmp(cmd_type, "beatrepeat", 10) == 0)) {
                     printf("Toggling BEATREPEAT for %d\n", (int)val);
-                    beatrepeat *b = (beatrepeat *) mixr->sound_generators[(int)val]->effects[0];
+                    beatrepeat *b =
+                        (beatrepeat *)mixr->sound_generators[(int)val]
+                            ->effects[0];
                     b->m_active = 1 - b->m_active;
                 }
                 else if ((strncmp(cmd_type, "rec", 4) == 0)) {
@@ -340,9 +344,10 @@ void interpret(char *line)
                     }
                 }
                 if (strcmp(cmd_type, "beatrepeat") == 0) {
-                    printf("BEAT REPEAT CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
-                           val2);
-                    add_beatrepeat_soundgen(mixr->sound_generators[(int)val1], val2);
+                    printf("BEAT REPEAT CALLED FOR! %s %.lf %.lf\n", cmd_type,
+                           val1, val2);
+                    add_beatrepeat_soundgen(mixr->sound_generators[(int)val1],
+                                            val2);
                 }
                 if (strcmp(cmd_type, "delay") == 0) {
                     printf("DELAY CALLED FOR! %s %.lf %.lf\n", cmd_type, val1,
@@ -421,13 +426,13 @@ void interpret(char *line)
         // Euclidean drum sample play!
         regmatch_t eumatch[5];
         regex_t eurx;
-        regcomp(
-            &eurx,
-            // TODO - ugh!! clean this shit up..
-            //"^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+)
-            //([\"true\"|\"false\"])$",
-            "^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+) ([.[:alnum:]]+)$",
-            REG_EXTENDED | REG_ICASE);
+        regcomp(&eurx,
+                // TODO - ugh!! clean this shit up..
+                //"^(uplay|uaddd) ([.[:alnum:]]+) ([[:digit:]]+)
+                //([\"true\"|\"false\"])$",
+                "^(uplay|uaddd|beatrepeat) ([.[:alnum:]]+) ([[:digit:]]+) "
+                "([.[:alnum:]]+)$",
+                REG_EXTENDED | REG_ICASE);
         if (regexec(&eurx, trim_tok, 5, eumatch, 0) == 0) {
 
             char cmd_type[10];
@@ -441,11 +446,11 @@ void interpret(char *line)
             strncpy(filename, trim_tok + eumatch[2].rm_so, filename_len);
             filename[filename_len] = '\0';
 
-            if (strncmp(bool_start_at_zero, "true", 5) &&
-                strncmp(bool_start_at_zero, "false", 6)) {
-                printf("Dingie!\n");
-                return;
-            }
+            // if (strncmp(bool_start_at_zero, "true", 5) &&
+            //    strncmp(bool_start_at_zero, "false", 6)) {
+            //    printf("Dingie!\n");
+            //    return;
+            //}
             bool start_at_zero =
                 strcmp(bool_start_at_zero, "true") == 0 ? true : false;
 
@@ -470,6 +475,28 @@ void interpret(char *line)
                     add_int_pattern(mixr->sound_generators[val],
                                     euclidean_pattern);
                     printf("Adding UPLAY DRUM\n");
+                }
+            }
+            else if (strcmp(cmd_type, "beatrepeat") == 0) {
+                printf("Beat repeat paramzzz change\n");
+                printf("Sub: %s %d %s\n", tmp, num_beats, bool_start_at_zero);
+                // if (beatrepeat *br, int num_beats)
+                if (mixr->sound_generators[num_beats]->effects[0]->type ==
+                    BEATREPEAT) {
+                    printf("BOOYABEATREPEAT!\n");
+                    beatrepeat *br =
+                        (beatrepeat *)mixr->sound_generators[num_beats]
+                            ->effects[0];
+                    if (strncmp(tmp, "nbeats", 4) == 0) {
+                        printf("NBEATZZZ\n");
+                        beatrepeat_change_num_beats_to_repeat(
+                            br, atoi(bool_start_at_zero));
+                    }
+                    else if (strncmp(tmp, "16th", 4) == 0) {
+                        printf("16thhhyhth\n");
+                        beatrepeat_change_selected_sixteenth(
+                            br, atoi(bool_start_at_zero));
+                    }
                 }
             }
         }
@@ -633,16 +660,18 @@ void interpret(char *line)
 
         regmatch_t sloop_add[5];
         regex_t sladd_rx;
-        regcomp(&sladd_rx, "^(sladdd) ([[:digit:]]+) ([.[:alnum:]]+) ([[:digit:]]+)$",
+        regcomp(&sladd_rx,
+                "^(sladdd) ([[:digit:]]+) ([.[:alnum:]]+) ([[:digit:]]+)$",
                 REG_EXTENDED | REG_ICASE);
         if (regexec(&sladd_rx, trim_tok, 5, sloop_add, 0) == 0) {
             printf("SAMPLER ADD SAMPLE!!zzzz\n");
 
             char cmd_type[10];
-            int  signum = 0;
+            int signum = 0;
             char filename[30];
-            int  loop_len = 0;
-            sscanf(trim_tok, "%s %d %s %d", cmd_type, &signum, filename, &loop_len);
+            int loop_len = 0;
+            sscanf(trim_tok, "%s %d %s %d", cmd_type, &signum, filename,
+                   &loop_len);
 
             printf("%s %d %s %d\n", cmd_type, signum, filename, loop_len);
             int is_val_a_valid_sig_num =
@@ -651,25 +680,25 @@ void interpret(char *line)
                 mixr->sound_generators[signum]->type == SAMPLER_TYPE) {
                 printf("BBBBBBOOO YEH!\n");
 
-                sampler_add_sample((SAMPLER*) mixr->sound_generators[signum],
+                sampler_add_sample((SAMPLER *)mixr->sound_generators[signum],
                                    filename, loop_len);
             }
         }
         regmatch_t bytebeat_cmd[3];
         regex_t bytebeat_rx;
-        regcomp(&bytebeat_rx, "^(byte) (.*)$",
-                REG_EXTENDED | REG_ICASE);
+        regcomp(&bytebeat_rx, "^(byte) (.*)$", REG_EXTENDED | REG_ICASE);
         if (regexec(&bytebeat_rx, trim_tok, 3, bytebeat_cmd, 0) == 0) {
             printf("BYTESZZZBEAT!\n");
-            int bytebeat_char_len = bytebeat_cmd[2].rm_eo - bytebeat_cmd[2].rm_so;
+            int bytebeat_char_len =
+                bytebeat_cmd[2].rm_eo - bytebeat_cmd[2].rm_so;
             printf("bytebeat_char_len is %d\n", bytebeat_char_len);
             char bytebeat[bytebeat_char_len + 1];
-            strncpy(bytebeat, trim_tok + bytebeat_cmd[2].rm_so, bytebeat_char_len);
+            strncpy(bytebeat, trim_tok + bytebeat_cmd[2].rm_so,
+                    bytebeat_char_len);
             bytebeat[bytebeat_char_len] = '\0';
 
             printf("Byte beat izzz %s\n", bytebeat);
             add_bytebeat(mixr, bytebeat);
-
         }
     }
 }

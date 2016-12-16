@@ -157,7 +157,7 @@ float effector(SOUNDGEN *self, float val)
 
             switch (self->effects[i]->type) {
             case BEATREPEAT:
-                b = (beatrepeat *) self->effects[i];
+                b = (beatrepeat *)self->effects[i];
                 val = beatrepeat_gennext(b, val);
                 break;
             case DECIMATOR:

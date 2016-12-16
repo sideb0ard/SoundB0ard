@@ -1,19 +1,17 @@
 #pragma once
 
-#include "sound_generator.h"
 #include "bytebeat/stack.h"
+#include "sound_generator.h"
 
-typedef struct bytebeat
-{
+typedef struct bytebeat {
     SOUNDGEN sound_generator;
     char pattern[256];
     Stack *rpn_stack;
     double vol;
 } bytebeat;
 
-
 bytebeat *new_bytebeat(char *pattern);
 
 double bytes_gen_next(void *self);
-void   bytes_status(void *self, char *ss);
-void   bytes_setvol(void *self, double v);
+void bytes_status(void *self, char *ss);
+void bytes_setvol(void *self, double v);

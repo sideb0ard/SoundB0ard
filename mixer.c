@@ -192,7 +192,6 @@ int add_bytebeat(mixer *mixr, char *pattern)
     return add_sound_generator(mixr, m);
 }
 
-
 int add_nanosynth(mixer *mixr)
 {
     printf("Adding a Nanosynth...\n");
@@ -303,12 +302,13 @@ double gen_next(mixer *mixr)
         mixr->tick++; // 1 midi tick (or pulse)
         if (mixr->tick % PPS == 0) {
             mixr->sixteenth_note_tick++; // for drum machine resolution
-            //printf("16th++ %d %d %d\n", mixr->sixteenth_note_tick, mixr->tick, mixr->cur_sample);
+            // printf("16th++ %d %d %d\n", mixr->sixteenth_note_tick,
+            // mixr->tick, mixr->cur_sample);
         }
         pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
     }
-    mixr->cur_sample++; 
+    mixr->cur_sample++;
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {

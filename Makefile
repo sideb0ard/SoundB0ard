@@ -45,7 +45,7 @@ SRC = audioutils.c \
 
 LIBS = -lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 
-INCS = -Iinclude/ -I/Users/sideboard/NewCodez/SBShell
+INCS = -Iinclude/ -I/Users/sideboard/NewCodez/SBShell -I/Users/sideboard/NewCodez/SBShell/bytebeat
 
 OBJ = $(SRC:.c=.o)
 
@@ -62,3 +62,6 @@ $(TARGET): $(OBJ)
 clean:
 	rm -f *.o *~ $(TARGET)
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
+
+format:
+	clang-format -i *{c,h}

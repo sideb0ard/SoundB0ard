@@ -123,7 +123,6 @@ DRUM *new_drumr(char *filename)
     drumr->sound_generator.setvol = &drum_setvol;
     drumr->sound_generator.type = DRUM_TYPE;
 
-
     // TODO: do i need to free pattern ?
     return drumr;
 }
@@ -248,12 +247,10 @@ double drum_gennext(void *self)
 
     int bit_position = 1 << (15 - step_seq_idx);
 
-
     if ((drumr->patterns[drumr->cur_pattern_num] & bit_position) &&
         !drumr->sample_positions[step_seq_idx].played) {
 
-
-        //if (step_seq_idx == 0)
+        // if (step_seq_idx == 0)
         //    printf("Top of loop [%d] - 16tick = %d, tik = %d\n",
         //            step_seq_idx,
         //            mixr->sixteenth_note_tick,
@@ -303,7 +300,7 @@ double drum_gennext(void *self)
         }
     }
 
-    //for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
+    // for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
     for (int i = DRUM_PATTERN_LEN - 1; i >= 0; i--) {
         if (drumr->sample_positions[i].playing) {
             val +=

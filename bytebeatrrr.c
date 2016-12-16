@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bytebeatrrr.h"
 #include "bytebeat/interpreter.h"
+#include "bytebeatrrr.h"
 #include "mixer.h"
 
 extern mixer *mixr;
@@ -27,24 +27,23 @@ bytebeat *new_bytebeat(char *pattern)
     return b;
 }
 
-
 double bytes_gen_next(void *self)
 {
-    bytebeat *b = (bytebeat*) self;
+    bytebeat *b = (bytebeat *)self;
     // //printf("Bytes beat! %s\n", b->pattern);
     char val = interpreter(b->rpn_stack);
     double scaled_val = 2.0 / 256 * val;
-    //printf("SCALED! %f\n", scale_val);
+    // printf("SCALED! %f\n", scale_val);
     return scaled_val * b->vol;
 }
 
 void bytes_status(void *self, char *status_string)
 {
-    bytebeat *b = (bytebeat*) self;
-    snprintf(status_string, 119, COOL_COLOR_GREEN "[%s]\tvol: %.2lfs"
-                                 ANSI_COLOR_RESET, b->pattern, b->vol);
+    bytebeat *b = (bytebeat *)self;
+    snprintf(status_string, 119,
+             COOL_COLOR_GREEN "[%s]\tvol: %.2lfs" ANSI_COLOR_RESET, b->pattern,
+             b->vol);
 }
-
 
 void bytes_setvol(void *self, double v)
 {
@@ -54,4 +53,3 @@ void bytes_setvol(void *self, double v)
     }
     b->vol = v;
 }
-
