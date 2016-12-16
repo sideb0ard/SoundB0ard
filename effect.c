@@ -69,6 +69,8 @@ EFFECT *new_distortion()
     if (e == NULL)
         return NULL;
 
+    e->type = DISTORTION;
+    printf("Distortion added\n");
     return e;
 }
 

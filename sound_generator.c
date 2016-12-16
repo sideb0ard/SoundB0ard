@@ -157,7 +157,6 @@ float effector(SOUNDGEN *self, float val)
 
             switch (self->effects[i]->type) {
             case BEATREPEAT:
-                // printf("INVAL %f\n", val);
                 b = (beatrepeat *) self->effects[i];
                 val = beatrepeat_gennext(b, val);
                 break;
