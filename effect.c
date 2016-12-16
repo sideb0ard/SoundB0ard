@@ -55,6 +55,7 @@ EFFECT *new_decimator()
     e = (EFFECT *)calloc(1, sizeof(EFFECT));
     if (e == NULL)
         return NULL;
+    e->type = DECIMATOR;
     e->cnt = 0;
     e->bits = 16;
     e->rate = 0.5;
