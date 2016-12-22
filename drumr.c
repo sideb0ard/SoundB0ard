@@ -399,6 +399,12 @@ void add_char_pattern(void *self, char *pattern)
     pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
 }
 
+void change_char_pattern(void *self, char *pattern)
+{
+    DRUM *drumr = self;
+    pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns]);
+}
+
 void add_int_pattern(void *self, int pattern)
 {
     DRUM *drumr = self;

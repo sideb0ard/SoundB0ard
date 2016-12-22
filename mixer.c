@@ -62,9 +62,18 @@ void mixer_ps(mixer *mixr)
 
 void mixer_update_bpm(mixer *mixr, int bpm)
 {
+    printf("Changing bpm to %d\n", bpm);
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
     mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
+    for ( int i = 0; i < mixr->soundgen_num; i++) {
+        for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
+            update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
+        }
+        if (mixr->sound_generators[i]->type == SAMPLER_TYPE) {
+            sampler_resample_to_loop_size((SAMPLER *)mixr->sound_generators[i]);
+        }
+    }
 }
 
 void delay_toggle(mixer *mixr)
@@ -75,9 +84,8 @@ void delay_toggle(mixer *mixr)
 
 void mixer_vol_change(mixer *mixr, float vol)
 {
-    printf("MIXER VOL CHANGE!\n");
+    printf("Changing volume to %f\n", vol);
     if (vol >= 0.0 && vol <= 1.0) {
-        printf("PASSED THA CHALLEND WITH %F!\n", vol);
         mixr->volume = vol;
     }
 }

@@ -4,70 +4,54 @@
 
 void print_help()
 {
-    printf(COOL_COLOR_GREEN "\n");
-    printf(":::: SBSHELL - interactive music making shell :::::::::\n");
-    printf(":::: \n");
-    printf(":::: Status & Global Commands ::::\n");
+    printf(COOL_COLOR_PINK"\n");
+    printf("Haaaaalp!\n");
+    printf("#### SBShell - Interactive, scriptable, algorithmic music shell  ####\n");
+
+    printf("\n"COOL_COLOR_GREEN);
+    printf("[Global Cmds]\n");
     printf(ANSI_COLOR_WHITE);
-    printf("ps                                      - shows you status of "
-           "Mixing desk - BPM, cur tick, and list of channels\n");
-    printf("ls                                      - show you a list of "
-           "playable samples in the 'wav/' directory\n");
-    printf(
-        "delay                                   - switch on global delay\n");
-    printf("exit                                    - ...\n");
-    printf("bpm       <BPM>                         - change BPM\n");
-    printf("vol       <VAL>                         - change volume, a float "
-           "between 0 and 1\n");
-    printf(COOL_COLOR_GREEN);
-    printf(":::: \n");
-    printf(":::: Sound Generator Commands ::::\n");
+    printf("stop -- stop playback\n");
+    printf("start -- re-start playback\n");
+    printf("bpm <bpm> -- change bpm to <bpm>\n");
+    printf("vol <vol> -- change volume to <vol>\n");
+    printf("ps -- show global status and process listing\n");
+    printf("ls -- show file listing of samples, loops, and file projects\n");
+    printf("save <filename> -- save current project settings as <filename>\n");
+    printf("open <filename> -- open <filename> as current project. (Overrides current)\n");
+    printf("record <on/off> -- toggle global record on or off\n");
+    printf("help -- this message, duh\n");
+
+    printf("\n"COOL_COLOR_GREEN);
+    printf("[Sound Generator Cmds]\n");
     printf(ANSI_COLOR_WHITE);
-    printf("sine      <FREQ>                        - create a sine wave of "
-           "FREQ Khz, e.g. `sine 440` for a middle A\n");
-    printf("sawd      <FREQ>                        - create a downward saw "
-           "wave of FREQ Khz, e.g. `sawd 440` for a middle A\n");
-    printf("sawu      <FREQ>                        - create a upward saw wave "
-           "of FREQ Khz, e.g. `sawu 440` for a middle A\n");
-    printf("tri       <FREQ>                        - create a triangle wave "
-           "of FREQ Khz, e.g. `tri 440` for a middle A\n");
-    printf("square    <FREQ>                        - create a square wave of "
-           "FREQ Khz, e.g. `square 440` for a middle A\n");
-    printf("fm        <MODFREQ> <CARFREQ>           - create an Frequency "
-           "Modulator which is two oscillators, the mod and car\n");
-    printf("play      <FILE>    <ticks...>          - play sample on ticks "
-           "(tick are 0-15> e.g. `play kick2.wav 0 4 8 12`\n");
-    printf(COOL_COLOR_GREEN);
-    printf(":::: \n");
-    printf(":::: Loop Generator Commands ::::\n");
+    printf("seq <sample> <pattern> e.g. \"seq kick2.wav 0 4 8 12\"\n");
+    printf("seq <sound_gen_no> add <pattern> e.g. seq 0 add 4 6 10 12\n");
+    printf("seq <sound_gen_no> change <parameter> <val>\n");
+    printf("\n");
+    printf("loop <sample> <bars> e.g. \"loop amen.wav 2\"\n");
+    printf("loop <sound_gen_no> add <sample> <bars>\n");
+    printf("loop <sound_gen_no> change <parameter> <val>\n");
+    printf("\n");
+    printf("play <sample> [16th] -- optional 16th, otherwise plays immediately\n");
+    printf("\n");
+    printf("syn nano\n");
+    printf("syn korg\n");
+    printf("syn poly\n");
+    printf("syn <sound_gen_no> keys\n");
+    printf("syn <sound_gen_no> midi\n");
+    printf("syn <sound_gen_no> change <parameter> <val>\n");
+    printf("\n"COOL_COLOR_GREEN);
+    printf("[FX Cmds]\n");
     printf(ANSI_COLOR_WHITE);
-    printf("loop      <FREQ...> <BARS>              - loop the list of FREQs, "
-           "changing FREQ every num of BARS e.g. `loop 440 220 2`\n");
-    printf("sloop     <FILE>    <BARS>              - loop sample for BARS "
-           "e.g. `sloop organ.wav 2`\n");
-    printf("floop     <MODFREQ> <CARFREQ...> <BARS> - loop FMs, changing "
-           "through list of CARFREQS every num of BARS\n");
-    printf(COOL_COLOR_GREEN);
-    printf(":::: \n");
-    printf(":::: Effects Commands ::::\n");
-    printf(ANSI_COLOR_WHITE);
-    printf("mfm       <sig_num> <mod|car> <FREQ>    - Modify the given FM "
-           "signal_num, change modulator or carrier freq to <FREQ>.\n");
-    printf("solo      <sig_num>                     - Solo the given signal "
-           "number\n");
-    printf("duck      <sig_num>                     - Fade out the given "
-           "signal number for a random time period up to 30 seconds\n");
-    printf("vol       <sig_num> <VAL>               - change volume of given "
-           "signal number, a float between 0 and 1\n");
-    printf("delay     <sig_num> <TIME_VAL>          - add delay to signal "
-           "number, TIME_VAL is a float in seconds.\n");
-    printf("randdrum  <sig_num> <BARS>              - randomizes the drum "
-           "pattern of sig_num sampler every BARS number of bars\n");
-    printf("lowpass   <sig_num> <VAL>               - don't think this quite "
-           "works - supposedly puts a lowpass on sig num, of VAL freq\n");
-    printf("highpass  <sig_num> <VAL>               - don't think this quite "
-           "works - supposedly puts a highpass on sig num, of VAL freq\n");
-    printf("bandpass  <sig_num> <VAL>               - don't think this quite "
-           "works - supposedly puts a bandpass on sig num, of VAL freq\n");
+    printf("delay   <sound_gen_number> [off]\n");
+    printf("distort <sound_gen_number> [off]\n");
+    printf("reverb  <sound_gen_number> [off]\n");
+    printf("crush   <sound_gen_number> [off]\n");
+    printf("repeat  <sound_gen_number> [off]\n");
+    printf("\n");
+    printf("fx <sound_gen_number> change <parameter> <val>\n");
+
     printf(ANSI_COLOR_RESET);
+
 }

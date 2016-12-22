@@ -45,12 +45,14 @@ typedef struct t_drumr {
 DRUM *new_drumr(char *filename);
 DRUM *new_drumr_from_char_pattern(char *filename, char *pattern);
 DRUM *new_drumr_from_int_pattern(char *filename, int pattern);
+DRUM *new_drumr_from_char_array(char *filename, char **pattern, int nsteps);
 
 // void drum_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void drum_status(void *self, char *ss);
 void drum_setvol(void *self, double v);
 // void update_pattern(void *self, int newpattern);
 void add_char_pattern(void *self, char *pattern);
+void change_char_pattern(void *self, char *pattern);
 void add_int_pattern(void *self, int pattern);
 void swingrrr(void *self, int swing_setting);
 

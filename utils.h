@@ -12,6 +12,7 @@ typedef struct freaky {
     double *freaks;
 } freaky;
 
+void get_full_filename(char *basename, char *destination_fullname);
 void thrunner(SBMSG *msg);
 void *timed_sig_start(void *arg);
 void *fadeup_runrrr(void *arg);
