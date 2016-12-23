@@ -38,6 +38,7 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern)
         spattern[sp_count++] = sp;
     }
 
+    *final_pattern = 0;
     for (int i = 0; i < sp_count; i++) {
         // TODO - make get rid of magic number - loop length
         int pat_num = 15 - atoi(spattern[i]);
@@ -402,7 +403,9 @@ void add_char_pattern(void *self, char *pattern)
 void change_char_pattern(void *self, char *pattern)
 {
     DRUM *drumr = self;
-    pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns]);
+    // note to self - not sure how to handle changing when we have multiple
+    // patterns - for the moment i'm just changing the current one
+    pattern_char_to_int(pattern, &drumr->patterns[drumr->cur_pattern_num]);
 }
 
 void add_int_pattern(void *self, int pattern)

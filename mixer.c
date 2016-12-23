@@ -66,7 +66,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
     mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
-    for ( int i = 0; i < mixr->soundgen_num; i++) {
+    for (int i = 0; i < mixr->soundgen_num; i++) {
         for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
             update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
         }
