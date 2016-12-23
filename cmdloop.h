@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 #define SIZE_OF_WURD 21 // 20 char word plus terminator
 #define NUM_WURDS 25

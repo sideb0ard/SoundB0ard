@@ -74,9 +74,9 @@ double sem_gennext(filter *f, double xn)
 
     double lpf = cs->m_alpha * bpf + cs->m_z12;
 
-    double R = 1.0 / (2.0 * f->m_q);
+    // double R = 1.0 / (2.0 * f->m_q);
 
-    double bsf = xn - 2.0 * R * bpf; // hmm, this is unused - mistake?
+    // double bsf = xn - 2.0 * R * bpf; // hmm, this is unused - mistake?
 
     double semBSF = f->m_aux_control * hpf + (1.0 - f->m_aux_control) * lpf;
 

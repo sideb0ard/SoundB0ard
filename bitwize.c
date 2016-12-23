@@ -66,7 +66,6 @@ double bitwize_gennext(void *self)
 {
     BITWIZE *p_bitwize = (BITWIZE *)self;
     int t = p_bitwize->incr++;
-    double vol = p_bitwize->vol;
     int pattern = p_bitwize->pattern;
     char val = bitwize_process(pattern, t);
 
