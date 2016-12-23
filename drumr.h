@@ -54,6 +54,7 @@ void drum_setvol(void *self, double v);
 void add_char_pattern(void *self, char *pattern);
 void change_char_pattern(void *self, char *pattern);
 void add_int_pattern(void *self, int pattern);
+void change_int_pattern(void *self, int pattern);
 void swingrrr(void *self, int swing_setting);
 
 void int_pattern_to_array(int pattern, int *pat_array);

@@ -330,18 +330,12 @@ double drum_gennext(void *self)
             drumr->cur_pattern_num =
                 (drumr->cur_pattern_num + 1) % drumr->num_patterns;
 
-            // printf("MOD16LIFE CHANGE!\n");
-            // printf("GAMEOFLIFE_SETTING %d", drumr->game_of_life_on);
             if (drumr->game_of_life_on) {
-                // printf("LIFE CHANGE!\n");
                 next_life_generation(drumr);
                 if (drumr->game_generation++ > 4) {
                     drumr->patterns[drumr->cur_pattern_num] = seed_pattern();
                     drumr->game_generation = 0;
                 }
-            }
-            else {
-                // printf("NOT ON LIFE\n");
             }
         }
     }
@@ -380,6 +374,8 @@ void drum_setvol(void *self, double v)
 }
 
 void swingrrr(void *self, int swing_setting)
+// swing_setting in range {1..6}, with same convention as
+// Linn drum machines - 50%, 54%, 58%, 62%, 66%, 71%
 {
     DRUM *drumr = self;
     // printf("SWING CALLED FOR %d\n", swing_setting);
@@ -412,6 +408,12 @@ void add_int_pattern(void *self, int pattern)
 {
     DRUM *drumr = self;
     drumr->patterns[drumr->num_patterns++] = pattern;
+}
+
+void change_int_pattern(void *self, int pattern)
+{
+    DRUM *drumr = self;
+    drumr->patterns[drumr->cur_pattern_num] = pattern;
 }
 
 int seed_pattern()

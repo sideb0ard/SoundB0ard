@@ -132,6 +132,29 @@ void interpret(char *line)
                         change_char_pattern(
                             mixr->sound_generators[soundgen_num], pattern);
                     }
+                    else if (strncmp("euclid", wurds[2], 6) == 0) {
+                        int num_beats = atoi(wurds[3]);
+                        int euclidean_pattern = create_euclidean_rhythm(
+                            num_beats, DRUM_PATTERN_LEN);
+                        bool start_at_zero =
+                            strncmp("true", wurds[4], 4) == 0 ? true : false;
+                        if (start_at_zero)
+                            euclidean_pattern = shift_bits_to_leftmost_position(
+                                euclidean_pattern, DRUM_PATTERN_LEN);
+                        // TODO - this could be an add or a change
+                        change_int_pattern(mixr->sound_generators[soundgen_num],
+                                           euclidean_pattern);
+                    }
+                    else if (strncmp("life", wurds[2], 4) == 0) {
+                        printf("Toggling game of life for %d\n", soundgen_num);
+                        DRUM *d = (DRUM *)mixr->sound_generators[soundgen_num];
+                        d->game_of_life_on = 1 - d->game_of_life_on;
+                    }
+                    else if (strncmp("swing", wurds[2], 5) == 0) {
+                        int swing_setting = atoi(wurds[3]);
+                        swingrrr(mixr->sound_generators[soundgen_num],
+                                 swing_setting);
+                    }
 
                     free(pattern);
                 }
