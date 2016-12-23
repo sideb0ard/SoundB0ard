@@ -158,7 +158,12 @@ void interpret(char *line)
                             mixr->sound_generators[soundgen_num], pattern);
                     }
                     else if (strncmp("euclid", wurds[2], 6) == 0) {
+                    // https://en.wikipedia.org/wiki/Euclidean_rhythm
                         int num_beats = atoi(wurds[3]);
+                        if (num_beats <= 0) {
+                            printf("Need a number of beats\n");
+                            return;
+                        }
                         int euclidean_pattern = create_euclidean_rhythm(
                             num_beats, DRUM_PATTERN_LEN);
                         bool start_at_zero =
@@ -243,6 +248,29 @@ void interpret(char *line)
             }
         }
         // FX COMMANDS
+        else if (strncmp("distort", wurds[0], 7) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                add_distortion_soundgen(mixr->sound_generators[soundgen_num]);
+            }
+        }
+        else if (strncmp("decimate", wurds[0], 8) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                add_decimator_soundgen(mixr->sound_generators[soundgen_num]);
+            }
+        }
+        else if (strncmp("env", wurds[0], 3) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                int loop_len = atoi(wurds[2]);
+                int env_type = atoi(wurds[3]);
+                ENVSTREAM *e = new_envelope_stream(loop_len, env_type);
+                if (e != NULL) {
+                    add_envelope_soundgen(mixr->sound_generators[soundgen_num], e);
+                }
+            }
+        }
         else if (strncmp("repeat", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (is_valid_soundgen_num(soundgen_num)) {
@@ -253,9 +281,30 @@ void interpret(char *line)
                 }
             }
         }
+        else if (strncmp("sidechain", wurds[0], 9) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                int input_src = atoi(wurds[2]);
+                int percent_mix = atoi(wurds[3]);
+                printf("SIDEHCINA %d %d %d\n", soundgen_num, input_src, percent_mix);
+                //if (mixr->sound_generators[input_src]->type == DRUM_TYPE) {
+                //    DRUM *d = (DRUM *) mixr->sound_generators[input_src]->type;
+                //    int pat_array[DRUM_PATTERN_LEN];
+                //    int_pattern_to_array(d->patterns[d->cur_pattern_num],
+                //                         pat_array);
+                //    for (int i = 0; i < DRUM_PATTERN_LEN; i++)
+                //    {
+                //        printf("DRUMMMMM %d\n", pat_array[0]);
+                //    }
+                //    //ENVSTREAM *e = new_sidechain_stream(pat_array, percent_mix);
+                //    //printf("GOT STREAM\n");
+                //    //add_envelope_soundgen(mixr->sound_generators[soundgen_num], e);
+                //}
+            }
+        }
 
         else if (strncmp("fx", wurds[0], 2) == 0) {
-            printf("Adding/changing FX ...\n");
+            printf("Changing FX params...\n");
         }
         else {
             print_help();

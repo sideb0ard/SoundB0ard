@@ -85,15 +85,20 @@ void print_help()
     /////////////////////////////////////////////////////////////////////
     printf("\n" COOL_COLOR_GREEN "[FX Cmds]\n");
     printf(ANSI_COLOR_WHITE);
-    printf(ANSI_COLOR_WHITE "delay   <sound_gen_number> [off]\n");
-    printf(ANSI_COLOR_WHITE "distort <sound_gen_number> [off]\n");
-    printf(ANSI_COLOR_WHITE "reverb  <sound_gen_number> [off]\n");
-    printf(ANSI_COLOR_WHITE "crush   <sound_gen_number> [off]\n");
+    printf(ANSI_COLOR_WHITE "decimate  <sound_gen_number>\n");
+    printf(ANSI_COLOR_WHITE "delay     <sound_gen_number>\n");
+    printf(ANSI_COLOR_WHITE "distort   <sound_gen_number>\n");
+    printf(ANSI_COLOR_WHITE "env       <sound_gen_number> <loop_len> <type>\n");
+    printf(ANSI_COLOR_WHITE "reverb    <sound_gen_number>\n");
+    printf(ANSI_COLOR_WHITE "crush     <sound_gen_number>\n");
     printf(ANSI_COLOR_WHITE
-           "repeat  <sound_gen_number> <loop_len>" ANSI_COLOR_CYAN
+           "repeat    <sound_gen_number> <loop_len>" ANSI_COLOR_CYAN
            " -- beatrepeat, default settings\n");
     printf(ANSI_COLOR_WHITE
-           "fx      <sound_gen_number> change <parameter> <val>\n");
+           "sidechain <sound_gen_number> <input_src> <mix>" ANSI_COLOR_CYAN
+           " -- sidechain env, where input_src is a drum pattern\n");
+    printf(ANSI_COLOR_WHITE
+           "fx        <sound_gen_number> change <parameter> <val>\n");
 
     printf(ANSI_COLOR_RESET);
 }

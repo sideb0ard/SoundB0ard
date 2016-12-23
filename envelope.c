@@ -180,6 +180,9 @@ ENVSTREAM *new_envelope_stream(int env_len,
                                int type) // env_len is bars TODO: enum
 {
 
+    if (env_len <= 0)
+        return NULL;
+
     // ENVSTREAM* stream;
     ENVSTREAM *stream = (ENVSTREAM *)calloc(1, sizeof(ENVSTREAM));
     if (stream == NULL)
