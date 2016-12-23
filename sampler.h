@@ -41,6 +41,7 @@ typedef struct t_sampler {
 SAMPLER *new_sampler(char *filename, double loop_len); // loop_len in bars
 void sampler_add_sample(SAMPLER *s, char *filename, int loop_len);
 void sampler_resample_to_loop_size(SAMPLER *s);
+void sampler_change_loop_len(SAMPLER *s, int loop_len);
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double sampler_gennext(void *self);
 

@@ -69,11 +69,6 @@ void interpret(char *line)
                 mixer_update_bpm(mixr, bpm);
         }
 
-        else if (strncmp(wurds[0], "vol", SIZE_OF_WURD) == 0) {
-            double vol = atof(wurds[1]);
-            mixer_vol_change(mixr, vol);
-        }
-
         else if (strncmp(wurds[0], "ps", SIZE_OF_WURD) == 0) {
             mixer_ps(mixr);
         }
@@ -102,7 +97,21 @@ void interpret(char *line)
             printf("Stopping...(NOT IMPLEMENTED)\n");
         }
 
-        //////  SOUND GENERATOR COMMANDS  /////////////////////////
+        else if (strncmp(wurds[0], "vol", SIZE_OF_WURD) == 0) {
+            if (strncmp(wurds[1], "mixer", 5) == 0) {
+                double vol = atof(wurds[2]);
+                mixer_vol_change(mixr, vol);
+            }
+            else {
+                int soundgen_num = atoi(wurds[1]);
+                if (is_valid_soundgen_num(soundgen_num)) {
+                    double vol = atof(wurds[2]);
+                    vol_change(mixr, soundgen_num, vol);
+                }
+            }
+        }
+
+        //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp(wurds[0], "seq", SIZE_OF_WURD) == 0) {
             if (is_valid_file(wurds[1])) {
 
@@ -160,8 +169,29 @@ void interpret(char *line)
                 }
             }
         }
+        // SAMPLE LOOPER COMMANDS
         else if (strncmp(wurds[0], "loop", SIZE_OF_WURD) == 0) {
-            printf("Looping sample...\n");
+            if (is_valid_file(wurds[1])) {
+                int loop_len = atoi(wurds[2]);
+                if (loop_len > 0) {
+                    add_sampler(mixr, wurds[1], loop_len);
+                }
+            }
+            else {
+                int soundgen_num = atoi(wurds[1]);
+                if (is_valid_soundgen_num(soundgen_num) &&
+                    mixr->sound_generators[soundgen_num]->type ==
+                        SAMPLER_TYPE) {
+
+                    if (strncmp("change", wurds[2], 6) == 0) {
+                        if (strncmp("loop_len", wurds[3], 8) == 0) {
+                            SAMPLER *s =
+                                (SAMPLER *)mixr->sound_generators[soundgen_num];
+                            sampler_change_loop_len(s, atoi(wurds[4]));
+                        }
+                    }
+                }
+            }
         }
         else if (strncmp(wurds[0], "play", SIZE_OF_WURD) == 0) {
             printf("Playing onetime sample...\n");

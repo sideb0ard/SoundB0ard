@@ -126,6 +126,17 @@ void sampler_resample_to_loop_size(SAMPLER *s)
     s->just_been_resampled = true;
 }
 
+void sampler_change_loop_len(SAMPLER *s, int loop_len)
+// TODO - not sure about changing loop len for multiple -
+// just gonna change the current one for the moment.
+{
+    if (loop_len > 0) {
+        file_sample *fs = s->samples[s->current_sample];
+        fs->loop_len = loop_len;
+        sample_resample_to_loop_size(fs);
+    }
+}
+
 void sample_resample_to_loop_size(file_sample *fs)
 {
     printf("BUFSIZE is %d\n", fs->orig_file_size);
