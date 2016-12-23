@@ -71,7 +71,7 @@ void print_help()
     printf(ANSI_COLOR_WHITE "syn nano" ANSI_COLOR_CYAN
                             " -- start new Nano Synth\n");
     printf(ANSI_COLOR_WHITE "syn korg" ANSI_COLOR_CYAN
-                            "-- start new Korg Synth\n");
+                            " -- start new Korg Synth\n");
     printf(ANSI_COLOR_WHITE "syn poly" ANSI_COLOR_CYAN
                             " -- start new Poly Synth\n");
     printf(ANSI_COLOR_WHITE "syn <sound_gen_no> keys" ANSI_COLOR_CYAN
@@ -79,6 +79,8 @@ void print_help()
     printf(ANSI_COLOR_WHITE "syn <sound_gen_no> midi" ANSI_COLOR_CYAN
                             " -- control synth via midi controller\n");
     printf(ANSI_COLOR_WHITE "syn <sound_gen_no> change <parameter> <val>\n");
+    printf(ANSI_COLOR_WHITE "syn <sound_gen_no> reset" ANSI_COLOR_CYAN
+                            " -- clear pattern data\n");
 
     /////////////////////////////////////////////////////////////////////
     printf("\n" COOL_COLOR_GREEN "[FX Cmds]\n");
@@ -87,9 +89,11 @@ void print_help()
     printf(ANSI_COLOR_WHITE "distort <sound_gen_number> [off]\n");
     printf(ANSI_COLOR_WHITE "reverb  <sound_gen_number> [off]\n");
     printf(ANSI_COLOR_WHITE "crush   <sound_gen_number> [off]\n");
-    printf(ANSI_COLOR_WHITE "repeat  <sound_gen_number> [off]\n");
-    printf("\n");
-    printf(ANSI_COLOR_WHITE "fx <sound_gen_number> change <parameter> <val>\n");
+    printf(ANSI_COLOR_WHITE
+           "repeat  <sound_gen_number> <loop_len>" ANSI_COLOR_CYAN
+           " -- beatrepeat, default settings\n");
+    printf(ANSI_COLOR_WHITE
+           "fx      <sound_gen_number> change <parameter> <val>\n");
 
     printf(ANSI_COLOR_RESET);
 }

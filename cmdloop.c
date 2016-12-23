@@ -54,51 +54,67 @@ void interpret(char *line)
         int num_wurds = parse_wurds_from_cmd(wurds, cmd);
 
         //////  MIXER COMMANDS  /////////////////////////
-        if (strncmp(wurds[0], "help", SIZE_OF_WURD) == 0) {
+        if (strncmp("help", wurds[0], 4) == 0) {
             print_help();
         }
 
-        else if (strncmp(wurds[0], "quit", SIZE_OF_WURD) == 0 ||
-                 strncmp(wurds[0], "quit", SIZE_OF_WURD) == 0) {
+        else if (strncmp("quit", wurds[0], 4) == 0 ||
+                 strncmp("exit", wurds[0], 4) == 0) {
             exxit();
         }
 
-        else if (strncmp(wurds[0], "bpm", SIZE_OF_WURD) == 0) {
+        else if (strncmp("bpm", wurds[0], 3) == 0) {
             int bpm = atoi(wurds[1]);
             if (bpm > 0)
                 mixer_update_bpm(mixr, bpm);
         }
 
-        else if (strncmp(wurds[0], "ps", SIZE_OF_WURD) == 0) {
+        else if (strncmp("ps", wurds[0], 2) == 0) {
             mixer_ps(mixr);
         }
 
-        else if (strncmp(wurds[0], "ls", SIZE_OF_WURD) == 0) {
+        else if (strncmp("ls", wurds[0], 2) == 0) {
             list_sample_dir();
         }
 
-        else if (strncmp(wurds[0], "record", SIZE_OF_WURD) == 0) {
+        else if (strncmp("record", wurds[0], 6) == 0) {
             printf("Toggling record ..(NOT IMPLEMENTED)\n");
         }
 
         // open / save
-        else if (strncmp(wurds[0], "open", SIZE_OF_WURD) == 0) {
+        else if (strncmp("open", wurds[0], 4) == 0) {
             printf("Opening project ..(NOT IMPLEMENTED)\n");
         }
-        else if (strncmp(wurds[0], "save", SIZE_OF_WURD) == 0) {
+        else if (strncmp("save", wurds[0], 4) == 0) {
             printf("Saving project as ..(NOT IMPLEMENTED)\n");
         }
 
         // start / stop
-        else if (strncmp(wurds[0], "start", SIZE_OF_WURD) == 0) {
+        else if (strncmp("start", wurds[0], 4) == 0) {
             printf("Starting... (NOT IMPLEMENTED)\n");
         }
-        else if (strncmp(wurds[0], "stop", SIZE_OF_WURD) == 0) {
+        else if (strncmp("stop", wurds[0], 4) == 0) {
             printf("Stopping...(NOT IMPLEMENTED)\n");
         }
 
-        else if (strncmp(wurds[0], "vol", SIZE_OF_WURD) == 0) {
-            if (strncmp(wurds[1], "mixer", 5) == 0) {
+        else if (strncmp("down", wurds[0], 4) == 0 ||
+                 strncmp("up", wurds[0], 3) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                SBMSG *msg = new_sbmsg();
+                msg->sound_gen_num = soundgen_num;
+                if (strcmp("up", wurds[0]) == 0) {
+                    strncpy(msg->cmd, "fadeuprrr", 19);
+                }
+                else {
+                    strncpy(msg->cmd, "fadedownrrr", 19);
+                }
+                thrunner(msg);
+            }
+        }
+
+        else if (strncmp("vol", wurds[0], 3) == 0) {
+            if (strncmp("mixer", wurds[1], 5) == 0) {
                 double vol = atof(wurds[2]);
                 mixer_vol_change(mixr, vol);
             }
@@ -112,7 +128,7 @@ void interpret(char *line)
         }
 
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
-        else if (strncmp(wurds[0], "seq", SIZE_OF_WURD) == 0) {
+        else if (strncmp("seq", wurds[0], 3) == 0) {
             if (is_valid_file(wurds[1])) {
 
                 char *pattern = calloc(128, sizeof(char));
@@ -170,7 +186,7 @@ void interpret(char *line)
             }
         }
         // SAMPLE LOOPER COMMANDS
-        else if (strncmp(wurds[0], "loop", SIZE_OF_WURD) == 0) {
+        else if (strncmp("loop", wurds[0], 4) == 0) {
             if (is_valid_file(wurds[1])) {
                 int loop_len = atoi(wurds[2]);
                 if (loop_len > 0) {
@@ -193,13 +209,52 @@ void interpret(char *line)
                 }
             }
         }
-        else if (strncmp(wurds[0], "play", SIZE_OF_WURD) == 0) {
+        // SINGLE SHOT SAMPLE PLAYER COMMANDS
+        else if (strncmp("play", wurds[0], 4) == 0) {
             printf("Playing onetime sample...\n");
         }
-        else if (strncmp(wurds[0], "syn", SIZE_OF_WURD) == 0) {
+        // SYNTHESIZER COMMANDS
+        else if (strncmp("syn", wurds[0], 3) == 0) {
             printf("Synthesizing ...\n");
+            if (strncmp("nano", wurds[1], 4) == 0) {
+                add_nanosynth(mixr);
+            }
+            else {
+                int soundgen_num = atoi(wurds[1]);
+                if (is_valid_soundgen_num(soundgen_num) &&
+                    mixr->sound_generators[soundgen_num]->type ==
+                        NANOSYNTH_TYPE) {
+                    if (strncmp("keys", wurds[2], 4) == 0) {
+                        keys(soundgen_num);
+                    }
+                    else if (strncmp("midi", wurds[2], 4) == 0) {
+                        mixr->midi_control_destination = NANOSYNTH;
+                        mixr->active_midi_soundgen_num = soundgen_num;
+                    }
+                    else if (strncmp("reset", wurds[2], 5) == 0) {
+                        nanosynth *ns =
+                            (nanosynth *)mixr->sound_generators[soundgen_num];
+                        nanosynth_reset_melody(ns);
+                    }
+                    else if (strncmp("change", wurds[2], 6) == 0) {
+                        // change
+                    }
+                }
+            }
         }
-        else if (strncmp(wurds[0], "fx", SIZE_OF_WURD) == 0) {
+        // FX COMMANDS
+        else if (strncmp("repeat", wurds[0], 6) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                int loop_len = atoi(wurds[2]);
+                if (loop_len > 0) {
+                    add_beatrepeat_soundgen(
+                        mixr->sound_generators[soundgen_num], loop_len);
+                }
+            }
+        }
+
+        else if (strncmp("fx", wurds[0], 2) == 0) {
             printf("Adding/changing FX ...\n");
         }
         else {
