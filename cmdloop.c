@@ -305,6 +305,27 @@ void interpret(char *line)
 
         else if (strncmp("fx", wurds[0], 2) == 0) {
             printf("Changing FX params...\n");
+            int soundgen_num = atoi(wurds[1]);
+            int fx_num = atoi(wurds[2]);
+            if (is_valid_fx_num(soundgen_num, fx_num)) {
+                if (strncmp("nbeats", wurds[3], 6) == 0
+                    || strncmp("16th", wurds[3], 4) == 0) {
+                    if (mixr->sound_generators[soundgen_num]->effects[fx_num]->type == BEATREPEAT) {
+                        beatrepeat *b =
+                            (beatrepeat *)mixr->sound_generators[soundgen_num]->effects[fx_num];
+                        if (strncmp("nbeats", wurds[3], 6) == 0) {
+                            int nbeats = atoi(wurds[4]);
+                            beatrepeat_change_num_beats_to_repeat(
+                                    b, nbeats);
+                        }
+                        else {
+                            int s16th = atoi(wurds[4]);
+                            beatrepeat_change_selected_sixteenth(
+                                    b, s16th);
+                        }
+                    }
+                }
+            }
         }
         else {
             print_help();
@@ -350,6 +371,18 @@ bool is_valid_soundgen_num(int soundgen_num)
 {
     if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num) {
         return true;
+    }
+    return false;
+}
+
+bool is_valid_fx_num(int soundgen_num, int fx_num)
+{
+    if (is_valid_soundgen_num(soundgen_num)) {
+        if (mixr->sound_generators[soundgen_num]->effects_num > 0 
+            && fx_num < mixr->sound_generators[soundgen_num]->effects_num)
+        {
+            return true;
+        }
     }
     return false;
 }
