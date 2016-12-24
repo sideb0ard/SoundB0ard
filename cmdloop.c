@@ -10,6 +10,7 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
+#include "algorithm.h"
 #include "audioutils.h"
 #include "beatrepeat.h"
 #include "cmdloop.h"
@@ -51,7 +52,12 @@ void interpret(char *line)
     for (cmd = strtok_r(line, sep, &last_s); cmd;
          cmd = strtok_r(NULL, sep, &last_s)) {
 
-        int num_wurds = parse_wurds_from_cmd(wurds, cmd);
+        char tmp[128];
+        strncpy((char *)tmp, cmd, 127);
+
+        int num_wurds = parse_wurds_from_cmd(wurds, tmp);
+
+        printf("CMD is %s\n", tmp);
 
         //////  MIXER COMMANDS  /////////////////////////
         if (strncmp("help", wurds[0], 4) == 0) {
@@ -158,7 +164,7 @@ void interpret(char *line)
                             mixr->sound_generators[soundgen_num], pattern);
                     }
                     else if (strncmp("euclid", wurds[2], 6) == 0) {
-                    // https://en.wikipedia.org/wiki/Euclidean_rhythm
+                        // https://en.wikipedia.org/wiki/Euclidean_rhythm
                         int num_beats = atoi(wurds[3]);
                         if (num_beats <= 0) {
                             printf("Need a number of beats\n");
@@ -267,7 +273,8 @@ void interpret(char *line)
                 int env_type = atoi(wurds[3]);
                 ENVSTREAM *e = new_envelope_stream(loop_len, env_type);
                 if (e != NULL) {
-                    add_envelope_soundgen(mixr->sound_generators[soundgen_num], e);
+                    add_envelope_soundgen(mixr->sound_generators[soundgen_num],
+                                          e);
                 }
             }
         }
@@ -286,9 +293,11 @@ void interpret(char *line)
             if (is_valid_soundgen_num(soundgen_num)) {
                 int input_src = atoi(wurds[2]);
                 int percent_mix = atoi(wurds[3]);
-                printf("SIDEHCINA %d %d %d\n", soundgen_num, input_src, percent_mix);
-                //if (mixr->sound_generators[input_src]->type == DRUM_TYPE) {
-                //    DRUM *d = (DRUM *) mixr->sound_generators[input_src]->type;
+                printf("SIDEHCINA %d %d %d\n", soundgen_num, input_src,
+                       percent_mix);
+                // if (mixr->sound_generators[input_src]->type == DRUM_TYPE) {
+                //    DRUM *d = (DRUM *)
+                //    mixr->sound_generators[input_src]->type;
                 //    int pat_array[DRUM_PATTERN_LEN];
                 //    int_pattern_to_array(d->patterns[d->cur_pattern_num],
                 //                         pat_array);
@@ -296,9 +305,11 @@ void interpret(char *line)
                 //    {
                 //        printf("DRUMMMMM %d\n", pat_array[0]);
                 //    }
-                //    //ENVSTREAM *e = new_sidechain_stream(pat_array, percent_mix);
+                //    //ENVSTREAM *e = new_sidechain_stream(pat_array,
+                //    percent_mix);
                 //    //printf("GOT STREAM\n");
-                //    //add_envelope_soundgen(mixr->sound_generators[soundgen_num], e);
+                //    //add_envelope_soundgen(mixr->sound_generators[soundgen_num],
+                //    e);
                 //}
             }
         }
@@ -308,24 +319,37 @@ void interpret(char *line)
             int soundgen_num = atoi(wurds[1]);
             int fx_num = atoi(wurds[2]);
             if (is_valid_fx_num(soundgen_num, fx_num)) {
-                if (strncmp("nbeats", wurds[3], 6) == 0
-                    || strncmp("16th", wurds[3], 4) == 0) {
-                    if (mixr->sound_generators[soundgen_num]->effects[fx_num]->type == BEATREPEAT) {
+                if (strncmp("nbeats", wurds[3], 6) == 0 ||
+                    strncmp("16th", wurds[3], 4) == 0) {
+                    if (mixr->sound_generators[soundgen_num]
+                            ->effects[fx_num]
+                            ->type == BEATREPEAT) {
                         beatrepeat *b =
-                            (beatrepeat *)mixr->sound_generators[soundgen_num]->effects[fx_num];
+                            (beatrepeat *)mixr->sound_generators[soundgen_num]
+                                ->effects[fx_num];
                         if (strncmp("nbeats", wurds[3], 6) == 0) {
                             int nbeats = atoi(wurds[4]);
-                            beatrepeat_change_num_beats_to_repeat(
-                                    b, nbeats);
+                            beatrepeat_change_num_beats_to_repeat(b, nbeats);
                         }
                         else {
                             int s16th = atoi(wurds[4]);
-                            beatrepeat_change_selected_sixteenth(
-                                    b, s16th);
+                            beatrepeat_change_selected_sixteenth(b, s16th);
                         }
                     }
                 }
             }
+        }
+
+        else if (strncmp("var", wurds[0], 3) == 0 &&
+                 strncmp("=", wurds[2], 1) == 0) {
+            printf("Oooh! %s = %s\n", wurds[1], wurds[3]);
+            update_environment(wurds[1], atoi(wurds[3]));
+        }
+
+        else if (strncmp("every", wurds[0], 5) == 0 &&
+                 strncmp("loop", wurds[1], 4) == 0) {
+            printf("Starting an algorithm - with %s!\n", cmd);
+            add_algorithm(cmd);
         }
         else {
             print_help();
@@ -378,9 +402,8 @@ bool is_valid_soundgen_num(int soundgen_num)
 bool is_valid_fx_num(int soundgen_num, int fx_num)
 {
     if (is_valid_soundgen_num(soundgen_num)) {
-        if (mixr->sound_generators[soundgen_num]->effects_num > 0 
-            && fx_num < mixr->sound_generators[soundgen_num]->effects_num)
-        {
+        if (mixr->sound_generators[soundgen_num]->effects_num > 0 &&
+            fx_num < mixr->sound_generators[soundgen_num]->effects_num) {
             return true;
         }
     }

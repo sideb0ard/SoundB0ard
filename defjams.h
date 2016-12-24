@@ -48,7 +48,8 @@ typedef enum {
     NANOSYNTH_TYPE,
     SAMPLER_TYPE,
     BITWIZE_TYPE,
-    DRUM_TYPE
+    DRUM_TYPE,
+    ALGORITHM_TYPE,
 } sound_generator_type;
 
 typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;

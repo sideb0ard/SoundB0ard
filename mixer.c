@@ -7,6 +7,7 @@
 
 #include <portaudio.h>
 
+#include "algorithm.h"
 #include "bitwize.h"
 #include "bytebeatrrr.h"
 #include "defjams.h"
@@ -24,14 +25,17 @@ extern ENVSTREAM *ampstream;
 extern pthread_mutex_t midi_tick_lock;
 extern pthread_cond_t midi_tick_cond;
 
+extern mixer *mixr;
+
 mixer *new_mixer()
 {
     mixer *mixr = NULL;
     mixr = calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
-    mixr->bpm = DEFAULT_BPM;
-    mixr->samples_per_midi_tick = (60.0 / DEFAULT_BPM * SAMPLE_RATE) / PPQN;
-    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
+    mixer_update_bpm(mixr, DEFAULT_BPM);
+    // mixr->bpm = DEFAULT_BPM;
+    // mixr->samples_per_midi_tick = (60.0 / DEFAULT_BPM * SAMPLE_RATE) / PPQN;
+    // mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
     mixr->tick = 0;
     mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
@@ -48,13 +52,16 @@ void mixer_ps(mixer *mixr)
     printf(ANSI_COLOR_WHITE
            "::::: Mixing Desk (Volume: %f // BPM: %d // TICK: %d // Qtick: %d) "
            "(Delay On: %d) "
-           ":::::\n" ANSI_COLOR_RESET,
+           ":::::\n",
            mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
            mixr->delay_on);
-    printf(ANSI_COLOR_GREEN "::::: effects: %d :::::\n" ANSI_COLOR_RESET,
-           mixr->effects_num);
+    printf("::::: Environment :::::\n");
+    for (int i = 0; i < mixr->env_var_count; i++) {
+        printf("%s - %d\n", mixr->environment[i].key, mixr->environment[i].val);
+    }
     for (int i = 0; i < mixr->soundgen_num; i++) {
         char ss[240];
+        memset(ss, 0, 240);
         mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
         printf("[%d] - %s\n", i, ss);
     }
@@ -66,6 +73,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
     mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
+    mixr->loop_len_in_ticks = PPL;
     for (int i = 0; i < mixr->soundgen_num; i++) {
         for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
             update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
@@ -176,6 +184,26 @@ int add_bitwize(mixer *mixr, int pattern)
 
     m->sound_generator = (SOUNDGEN *)new_bitw;
     printf("Added bitwize gen!\n");
+    return add_sound_generator(mixr, m);
+}
+
+int add_algorithm(char *line)
+{
+
+    algorithm *a = new_algorithm(line);
+    if (a == NULL) {
+        printf("ALGOBARF!\n");
+        return -1;
+    }
+
+    SBMSG *m = new_sbmsg();
+    if (m == NULL) {
+        free(a);
+        printf("MBITBARF!\n");
+        return -1;
+    }
+
+    m->sound_generator = (SOUNDGEN *)a;
     return add_sound_generator(mixr, m);
 }
 
@@ -327,4 +355,26 @@ double gen_next(mixer *mixr)
     }
 
     return mixr->volume * (output_val / 1.53);
+}
+
+void update_environment(char *key, int val)
+{
+    int env_item_index = 0;
+    bool is_update = false;
+    for (int i = 0; i < mixr->env_var_count; i++) {
+        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0) {
+            printf("Updating existing key\n");
+            is_update = true;
+            env_item_index = i;
+        }
+    }
+    if (is_update) {
+        mixr->environment[env_item_index].val = val;
+    }
+    else {
+        strncpy((char *)&mixr->environment[mixr->env_var_count].key, key,
+                ENVIRONMENT_KEY_SIZE);
+        mixr->environment[mixr->env_var_count].val = val;
+        mixr->env_var_count++;
+    }
 }

@@ -28,25 +28,27 @@ double beatrepeat_gennext(beatrepeat *b, double inval)
     if (b->m_have_recording && b->m_active) {
         size_t relative_sample = mixr->cur_sample % mixr->loop_len_in_samples;
         size_t start_of_beat_repeat =
-            ((b->m_selected_sixteenth + 1) * b->m_sixteenth_note_size)
-            % mixr->loop_len_in_samples;
-        size_t end_of_beat_repeat = (start_of_beat_repeat +
-            (b->m_sixteenth_note_size * b->m_num_beats_to_repeat))
-            % mixr->loop_len_in_samples;
+            ((b->m_selected_sixteenth + 1) * b->m_sixteenth_note_size) %
+            mixr->loop_len_in_samples;
+        size_t end_of_beat_repeat =
+            (start_of_beat_repeat +
+             (b->m_sixteenth_note_size * b->m_num_beats_to_repeat)) %
+            mixr->loop_len_in_samples;
 
-        if ( end_of_beat_repeat < start_of_beat_repeat) {
+        if (end_of_beat_repeat < start_of_beat_repeat) {
             if ((relative_sample > start_of_beat_repeat &&
-                relative_sample < mixr->loop_len_in_samples)
-                || (relative_sample > 0 && relative_sample < end_of_beat_repeat)) {
+                 relative_sample < mixr->loop_len_in_samples) ||
+                (relative_sample > 0 && relative_sample < end_of_beat_repeat)) {
                 return inval +
-                   b->m_buffer[relative_sample % b->m_sixteenth_note_size];
+                       b->m_buffer[relative_sample % b->m_sixteenth_note_size];
             }
         }
         else {
             if (relative_sample > start_of_beat_repeat &&
                 relative_sample < end_of_beat_repeat) {
                 // printf("pos %lu\n", relative_sample % b->m_buffer_size);
-                // return inval + b->m_buffer[relative_sample % b->m_buffer_size];
+                // return inval + b->m_buffer[relative_sample %
+                // b->m_buffer_size];
                 return inval +
                        b->m_buffer[relative_sample % b->m_sixteenth_note_size];
             }
