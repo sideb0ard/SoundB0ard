@@ -209,7 +209,17 @@ void interpret(char *line)
                     mixr->sound_generators[soundgen_num]->type ==
                         SAMPLER_TYPE) {
 
-                    if (strncmp("change", wurds[2], 6) == 0) {
+                    if (strncmp("add", wurds[2], 6) == 0) {
+                        if (is_valid_file(wurds[3])) {
+                            int loop_len = atoi(wurds[4]);
+                            if (loop_len > 0) {
+                                sampler_add_sample((SAMPLER*)mixr->sound_generators[soundgen_num],
+                                                   wurds[3],
+                                                   loop_len);
+                            }
+                        }
+                    }
+                    else if (strncmp("change", wurds[2], 6) == 0) {
                         if (strncmp("loop_len", wurds[3], 8) == 0) {
                             SAMPLER *s =
                                 (SAMPLER *)mixr->sound_generators[soundgen_num];
