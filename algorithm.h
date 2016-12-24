@@ -11,17 +11,17 @@ typedef enum { TICK, S16TH, LOOP } frequency;
 
 typedef struct algorithm {
     SOUNDGEN sound_generator;
-    char cmds[MAX_CMDS][MAX_CMD_LEN];
-    int num_cmds;
-    int cur_cmd;
+    char command[MAX_CMD_LEN];
+    char afterthought[5][MAX_CMD_LEN];
     unsigned int frequency;
     bool has_started;
 } algorithm;
 
 algorithm *new_algorithm(char *line);
 
-void extract_cmds_from_line(algorithm *self, char *line);
+int extract_cmds_from_line(algorithm *self, char *line);
 void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd);
+void algorithm_process_afterthought(algorithm *self);
 
 double algorithm_gen_next(void *self);
 void algorithm_status(void *self, char *ss);

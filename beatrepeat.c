@@ -65,6 +65,5 @@ void beatrepeat_change_num_beats_to_repeat(beatrepeat *br, int num_beats)
 
 void beatrepeat_change_selected_sixteenth(beatrepeat *br, int selected)
 {
-    printf("changing selected 16th..\n");
     br->m_selected_sixteenth = selected;
 }

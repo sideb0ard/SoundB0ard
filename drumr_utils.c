@@ -77,7 +77,6 @@ int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)
     int bitshift_by = num_of_bits_to_align_with - (first_position + 1);
     int ret_num = num << bitshift_by;
     // print_binary_version_of_int(num);
-    printf("BITSHUFING %d by %d = %d\n", num, bitshift_by, ret_num);
     // print_binary_version_of_int(ret_num);
 
     return ret_num;

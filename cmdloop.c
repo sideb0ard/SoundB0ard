@@ -57,8 +57,6 @@ void interpret(char *line)
 
         int num_wurds = parse_wurds_from_cmd(wurds, tmp);
 
-        printf("CMD is %s\n", tmp);
-
         //////  MIXER COMMANDS  /////////////////////////
         if (strncmp("help", wurds[0], 4) == 0) {
             print_help();
@@ -167,7 +165,8 @@ void interpret(char *line)
                         // https://en.wikipedia.org/wiki/Euclidean_rhythm
                         int num_beats = atoi(wurds[3]);
                         if (num_beats <= 0) {
-                            printf("Need a number of beats\n");
+                            // TODO - make debug - printf("Need a number of
+                            // beats\n");
                             return;
                         }
                         int euclidean_pattern = create_euclidean_rhythm(
@@ -315,7 +314,6 @@ void interpret(char *line)
         }
 
         else if (strncmp("fx", wurds[0], 2) == 0) {
-            printf("Changing FX params...\n");
             int soundgen_num = atoi(wurds[1]);
             int fx_num = atoi(wurds[2]);
             if (is_valid_fx_num(soundgen_num, fx_num)) {
@@ -412,7 +410,6 @@ bool is_valid_fx_num(int soundgen_num, int fx_num)
 
 bool is_valid_file(char *filename)
 {
-    printf("Padding up %s\n", filename);
     char cwd[1024];
     getcwd(cwd, 1024);
     char *subdir = "/wavs/";
@@ -420,8 +417,6 @@ bool is_valid_file(char *filename)
     strcpy(full_filename, cwd);
     strcat(full_filename, subdir);
     strcat(full_filename, filename);
-
-    printf("Is valid? %s\n", full_filename);
 
     struct stat buffer;
     return (stat(full_filename, &buffer) == 0);

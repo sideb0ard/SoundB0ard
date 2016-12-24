@@ -81,6 +81,7 @@ void freq_change(mixer *mixr, int sig, float freq);
 void delay_toggle(mixer *mixr);
 
 void update_environment(char *key, int val);
+int get_environment_val(char *key, int *return_val);
 
 double gen_next(mixer *mixr);
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out);

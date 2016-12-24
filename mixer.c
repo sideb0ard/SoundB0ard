@@ -363,7 +363,6 @@ void update_environment(char *key, int val)
     bool is_update = false;
     for (int i = 0; i < mixr->env_var_count; i++) {
         if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0) {
-            printf("Updating existing key\n");
             is_update = true;
             env_item_index = i;
         }
@@ -377,4 +376,15 @@ void update_environment(char *key, int val)
         mixr->environment[mixr->env_var_count].val = val;
         mixr->env_var_count++;
     }
+}
+
+int get_environment_val(char *key, int *return_val)
+{
+    for (int i = 0; i < mixr->env_var_count; i++) {
+        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0) {
+            *return_val = mixr->environment[i].val;
+            return 0;
+        }
+    }
+    return 1;
 }
