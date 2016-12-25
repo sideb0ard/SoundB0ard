@@ -23,6 +23,7 @@ algorithm *new_algorithm(char *line)
     a->sound_generator.gennext = &algorithm_gen_next;
     a->sound_generator.status = &algorithm_status;
     a->sound_generator.setvol = &algorithm_setvol;
+    a->sound_generator.type = ALGORITHM_TYPE;
 
     return a;
 }

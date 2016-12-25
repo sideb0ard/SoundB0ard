@@ -13,6 +13,7 @@
 #include "algorithm.h"
 #include "audioutils.h"
 #include "beatrepeat.h"
+#include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "drumr_utils.h"
@@ -57,6 +58,10 @@ void interpret(char *line)
 
         int num_wurds = parse_wurds_from_cmd(wurds, tmp);
 
+        // Understanding these commands should make more sense when viewed
+        // against the help output, which details each command
+        // (TODO) some kid of doxygen-like scheme to write help output here
+
         //////  MIXER COMMANDS  /////////////////////////
         if (strncmp("help", wurds[0], 4) == 0) {
             print_help();
@@ -79,26 +84,6 @@ void interpret(char *line)
 
         else if (strncmp("ls", wurds[0], 2) == 0) {
             list_sample_dir();
-        }
-
-        else if (strncmp("record", wurds[0], 6) == 0) {
-            printf("Toggling record ..(NOT IMPLEMENTED)\n");
-        }
-
-        // open / save
-        else if (strncmp("open", wurds[0], 4) == 0) {
-            printf("Opening project ..(NOT IMPLEMENTED)\n");
-        }
-        else if (strncmp("save", wurds[0], 4) == 0) {
-            printf("Saving project as ..(NOT IMPLEMENTED)\n");
-        }
-
-        // start / stop
-        else if (strncmp("start", wurds[0], 4) == 0) {
-            printf("Starting... (NOT IMPLEMENTED)\n");
-        }
-        else if (strncmp("stop", wurds[0], 4) == 0) {
-            printf("Stopping...(NOT IMPLEMENTED)\n");
         }
 
         else if (strncmp("down", wurds[0], 4) == 0 ||
@@ -195,6 +180,7 @@ void interpret(char *line)
                 }
             }
         }
+
         // SAMPLE LOOPER COMMANDS
         else if (strncmp("loop", wurds[0], 4) == 0) {
             if (is_valid_file(wurds[1])) {
@@ -213,9 +199,10 @@ void interpret(char *line)
                         if (is_valid_file(wurds[3])) {
                             int loop_len = atoi(wurds[4]);
                             if (loop_len > 0) {
-                                sampler_add_sample((SAMPLER*)mixr->sound_generators[soundgen_num],
-                                                   wurds[3],
-                                                   loop_len);
+                                sampler_add_sample(
+                                    (SAMPLER *)
+                                        mixr->sound_generators[soundgen_num],
+                                    wurds[3], loop_len);
                             }
                         }
                     }
@@ -229,10 +216,12 @@ void interpret(char *line)
                 }
             }
         }
+
         // SINGLE SHOT SAMPLE PLAYER COMMANDS
         else if (strncmp("play", wurds[0], 4) == 0) {
             printf("Playing onetime sample...\n");
         }
+
         // SYNTHESIZER COMMANDS
         else if (strncmp("syn", wurds[0], 3) == 0) {
             printf("Synthesizing ...\n");
@@ -256,8 +245,58 @@ void interpret(char *line)
                             (nanosynth *)mixr->sound_generators[soundgen_num];
                         nanosynth_reset_melody(ns);
                     }
+                    else if (strncmp("sustain", wurds[2], 7) == 0) {
+                        nanosynth *ns =
+                            (nanosynth *)mixr->sound_generators[soundgen_num];
+                        int val = atoi(wurds[3]);
+                        nanosynth_set_sustain(ns,
+                                              val * mixr->midi_ticks_per_ms);
+                    }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         // change
+                    }
+                }
+            }
+        }
+
+        // CHAOS COMMANDS
+        else if (strncmp("chaos", wurds[0], 6) == 0) {
+
+            if (strncmp("monkey", wurds[1], 6) == 0) {
+                add_chaosmonkey();
+            }
+            else {
+                int soundgen_num = atoi(wurds[1]);
+                if (is_valid_soundgen_num(soundgen_num) &&
+                    mixr->sound_generators[soundgen_num]->type ==
+                        CHAOSMONKEY_TYPE) {
+
+                    chaosmonkey *cm =
+                        (chaosmonkey *)mixr->sound_generators[soundgen_num];
+
+                    if (strncmp("wakeup", wurds[2], 7) == 0) {
+                        int freq_wakeup_secs = atoi(wurds[3]);
+                        chaosmonkey_change_wakeup_freq(cm, freq_wakeup_secs);
+                    }
+                    else if (strncmp("chance", wurds[2], 7) == 0) {
+                        int percent_chance = atoi(wurds[3]);
+                        chaosmonkey_change_chance_interrupt(cm, percent_chance);
+                    }
+                    else if (strncmp("suggest", wurds[2], 8) == 0) {
+                        if (strncmp("true", wurds[3], 5) == 0 ||
+                            strncmp("false", wurds[3], 6) == 0) {
+                            bool val =
+                                strcmp("true", wurds[4]) == 0 ? true : false;
+                            chaosmonkey_suggest_mode(cm, val);
+                        }
+                    }
+                    else if (strncmp("action", wurds[2], 7) == 0) {
+                        if (strncmp("true", wurds[3], 5) == 0 ||
+                            strncmp("false", wurds[3], 6) == 0) {
+                            bool val =
+                                strcmp("true", wurds[4]) == 0 ? true : false;
+                            chaosmonkey_action_mode(cm, val);
+                        }
                     }
                 }
             }
@@ -287,6 +326,24 @@ void interpret(char *line)
                 }
             }
         }
+        else if (strncmp("lowpass", wurds[0], 8) == 0 ||
+                 strncmp("highpass", wurds[0], 9) == 0 ||
+                 strncmp("bandpass", wurds[0], 9) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                int val = atoi(wurds[2]);
+                if (strcmp("lowpass", wurds[0]) == 0)
+                    add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
+                                           val, LOWPASS);
+                else if (strcmp("highass", wurds[0]) == 0)
+                    add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
+                                           val, HIGHPASS);
+                else
+                    add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
+                                           val, BANDPASS);
+            }
+        }
+
         else if (strncmp("repeat", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (is_valid_soundgen_num(soundgen_num)) {
@@ -348,6 +405,7 @@ void interpret(char *line)
             }
         }
 
+        // PROGRAMMING CMDS
         else if (strncmp("var", wurds[0], 3) == 0 &&
                  strncmp("=", wurds[2], 1) == 0) {
             printf("Oooh! %s = %s\n", wurds[1], wurds[3]);
@@ -359,6 +417,13 @@ void interpret(char *line)
             printf("Starting an algorithm - with %s!\n", cmd);
             add_algorithm(cmd);
         }
+
+        // UTILS
+        else if (strncmp("chord", wurds[0], 6) == 0) {
+            chordie(wurds[1]);
+        }
+
+        // default HALP!
         else {
             print_help();
         }

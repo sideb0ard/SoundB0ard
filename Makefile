@@ -13,6 +13,7 @@ SRC = \
       bytebeat/list.c \
       bytebeat/stack.c \
       bytebeat/queue.c \
+      chaosmonkey.c \
       cmdloop.c \
       dca.c \
       delayline.c \

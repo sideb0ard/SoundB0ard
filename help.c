@@ -38,8 +38,8 @@ void print_help()
     printf("\n" COOL_COLOR_GREEN "[Sample Looper Cmds]\n");
     printf(ANSI_COLOR_WHITE "loop <sample> <bars>" ANSI_COLOR_CYAN
                             " e.g. \"loop amen.wav 2\"\n");
-    printf(ANSI_COLOR_WHITE "loop <sound_gen_no> add <sample> <bars>\n");
-    printf(ANSI_COLOR_WHITE "loop <sound_gen_no> change <parameter> <val>\n");
+    printf(ANSI_COLOR_WHITE "loop <soundgen_num> add <sample> <bars>\n");
+    printf(ANSI_COLOR_WHITE "loop <soundgen_num> change <parameter> <val>\n");
     printf("\n");
     // printf(ANSI_COLOR_WHITE "play <sample> [16th]" ANSI_COLOR_CYAN
     //                         " -- play one-shot sample. Optional 16th to
@@ -51,19 +51,19 @@ void print_help()
     printf(ANSI_COLOR_WHITE);
     printf(ANSI_COLOR_WHITE "seq <sample> <pattern>" ANSI_COLOR_CYAN
                             " e.g. \"seq kick2.wav 0 4 8 12\"\n");
-    printf(ANSI_COLOR_WHITE "seq <sound_gen_no> add <pattern>" ANSI_COLOR_CYAN
+    printf(ANSI_COLOR_WHITE "seq <soundgen_num> add <pattern>" ANSI_COLOR_CYAN
                             " e.g. seq 0 add 4 6 10 12\n");
-    printf(ANSI_COLOR_WHITE "seq <sound_gen_no> change <pattern>\n");
+    printf(ANSI_COLOR_WHITE "seq <soundgen_num> change <pattern>\n");
     printf(ANSI_COLOR_WHITE
-           "seq <sound_gen_no> euclid <num_hits> [true]" ANSI_COLOR_CYAN
+           "seq <soundgen_num> euclid <num_hits> [true]" ANSI_COLOR_CYAN
            "\n   -- generates "
            "equally spaced number of beats. Optional 'true' shifts\n    them "
            "forward so first hit is on first tick of cycle.\n");
-    printf(ANSI_COLOR_WHITE "seq <sound_gen_no> life" ANSI_COLOR_CYAN
+    printf(ANSI_COLOR_WHITE "seq <soundgen_num> life" ANSI_COLOR_CYAN
                             " - generative changing pattern, based on "
                             "game of life\n");
     printf(ANSI_COLOR_WHITE
-           "seq <sound_gen_no> swing <swing_setting>" ANSI_COLOR_CYAN
+           "seq <soundgen_num> swing <swing_setting>" ANSI_COLOR_CYAN
            "\n    -- toggles swing"
            " on/off. Setting can be between 1..6, which represent\n"
            "    50%%, 54%%, 58%%, 62%%, 66%%, 71%%\n");
@@ -76,13 +76,14 @@ void print_help()
     //                         " -- start new Korg Synth\n");
     // printf(ANSI_COLOR_WHITE "syn poly" ANSI_COLOR_CYAN
     //                         " -- start new Poly Synth\n");
-    printf(ANSI_COLOR_WHITE "syn <sound_gen_no> keys" ANSI_COLOR_CYAN
+    printf(ANSI_COLOR_WHITE "syn <soundgen_num> keys" ANSI_COLOR_CYAN
                             " -- control synth via keyboard\n");
-    printf(ANSI_COLOR_WHITE "syn <sound_gen_no> midi" ANSI_COLOR_CYAN
+    printf(ANSI_COLOR_WHITE "syn <soundgen_num> midi" ANSI_COLOR_CYAN
                             " -- control synth via midi controller\n");
-    printf(ANSI_COLOR_WHITE "syn <sound_gen_no> change <parameter> <val>\n");
-    printf(ANSI_COLOR_WHITE "syn <sound_gen_no> reset" ANSI_COLOR_CYAN
+    printf(ANSI_COLOR_WHITE "syn <soundgen_num> change <parameter> <val>\n");
+    printf(ANSI_COLOR_WHITE "syn <soundgen_num> reset" ANSI_COLOR_CYAN
                             " -- clear pattern data\n");
+    printf(ANSI_COLOR_WHITE "syn <soundgen_num> sustain <val>\n");
 
     /////////////////////////////////////////////////////////////////////
     printf("\n" COOL_COLOR_GREEN "[FX Cmds]\n");
@@ -107,6 +108,22 @@ void print_help()
                             " -- store global variable\n");
     printf(ANSI_COLOR_WHITE "every loop; <cmd1> ; <cmd2>; ..." ANSI_COLOR_CYAN
                             " -- run cmds once every loop\n");
+    /////////////////////////////////////////////////////////////////////
+    printf("\n" COOL_COLOR_GREEN "[Chaos Monkey Cmds]\n");
+    printf(ANSI_COLOR_WHITE "chaos monkey" ANSI_COLOR_CYAN
+                            " -- oh oh, who brought the monkey?\n");
+    printf(ANSI_COLOR_WHITE
+           "chaos <soundgen_num> wakeup <time_seconds>" ANSI_COLOR_CYAN
+           " -- how often the chaos monkey wakes up\n");
+    printf(ANSI_COLOR_WHITE
+           "chaos <soundgen_num> chance <percent>" ANSI_COLOR_CYAN
+           " -- how likely the chaos monkey interrupts\n");
+    printf(ANSI_COLOR_WHITE
+           "chaos <soundgen_num> suggest <true|false>" ANSI_COLOR_CYAN
+           " -- Toggle chaos monkey suggestion mode\n");
+    printf(ANSI_COLOR_WHITE
+           "chaos <soundgen_num> action <true|false>" ANSI_COLOR_CYAN
+           " -- Toggle chaos monkey action mode\n");
 
     printf(ANSI_COLOR_RESET);
 }

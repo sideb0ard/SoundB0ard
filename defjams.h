@@ -50,6 +50,7 @@ typedef enum {
     BITWIZE_TYPE,
     DRUM_TYPE,
     ALGORITHM_TYPE,
+    CHAOSMONKEY_TYPE,
 } sound_generator_type;
 
 typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;

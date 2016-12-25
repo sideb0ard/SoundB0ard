@@ -10,6 +10,7 @@
 #include "algorithm.h"
 #include "bitwize.h"
 #include "bytebeatrrr.h"
+#include "chaosmonkey.h"
 #include "defjams.h"
 #include "drumr.h"
 #include "drumr_utils.h"
@@ -33,9 +34,6 @@ mixer *new_mixer()
     mixr = calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
-    // mixr->bpm = DEFAULT_BPM;
-    // mixr->samples_per_midi_tick = (60.0 / DEFAULT_BPM * SAMPLE_RATE) / PPQN;
-    // mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
     mixr->tick = 0;
     mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
@@ -72,6 +70,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     printf("Changing bpm to %d\n", bpm);
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
+    mixr->midi_ticks_per_ms = PPQN / ((60.0 / bpm) * 1000);
     mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
     mixr->loop_len_in_ticks = PPL;
     for (int i = 0; i < mixr->soundgen_num; i++) {
@@ -204,6 +203,26 @@ int add_algorithm(char *line)
     }
 
     m->sound_generator = (SOUNDGEN *)a;
+    return add_sound_generator(mixr, m);
+}
+
+int add_chaosmonkey()
+{
+
+    chaosmonkey *cm = new_chaosmonkey();
+    if (cm == NULL) {
+        printf("MONKYBARF!\n");
+        return -1;
+    }
+
+    SBMSG *m = new_sbmsg();
+    if (m == NULL) {
+        free(cm);
+        printf("MONKEYMSGBARF!\n");
+        return -1;
+    }
+
+    m->sound_generator = (SOUNDGEN *)cm;
     return add_sound_generator(mixr, m);
 }
 

@@ -378,13 +378,10 @@ void swingrrr(void *self, int swing_setting)
 // Linn drum machines - 50%, 54%, 58%, 62%, 66%, 71%
 {
     DRUM *drumr = self;
-    // printf("SWING CALLED FOR %d\n", swing_setting);
-    if (drumr->swing) {
-        printf("swing OFF\n");
+    if (swing_setting == 0) {
         drumr->swing = 0;
     }
     else {
-        printf("Swing ON to %d\n", swing_setting);
         drumr->swing = 1;
         drumr->swing_setting = swing_setting;
     }

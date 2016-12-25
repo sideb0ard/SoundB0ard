@@ -53,8 +53,7 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool val)
 double chaosmonkey_gen_next(void *self)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
-    if (mixr->cur_sample % (SAMPLE_RATE * cm->frequency_of_wakeup) == 0)
-    {
+    if (mixr->cur_sample % (SAMPLE_RATE * cm->frequency_of_wakeup) == 0) {
         if (cm->chance_of_interruption > (rand() % 100)) {
             printf("I awake!\n");
         }
@@ -65,7 +64,10 @@ double chaosmonkey_gen_next(void *self)
 void chaosmonkey_status(void *self, char *status_string)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
-    snprintf(status_string, 119, "[chaos_monkey] wakeup: %d (sec) %d pct. Suggest: %d, Action: %d", cm->frequency_of_wakeup, cm->chance_of_interruption, cm->make_suggestion, cm->take_action);
+    snprintf(status_string, 119,
+             "[chaos_monkey] wakeup: %d (sec) %d pct. Suggest: %d, Action: %d",
+             cm->frequency_of_wakeup, cm->chance_of_interruption,
+             cm->make_suggestion, cm->take_action);
 }
 
 void chaosmonkey_setvol(void *self, double v)
