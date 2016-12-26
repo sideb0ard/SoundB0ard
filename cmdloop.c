@@ -31,10 +31,18 @@ extern mixer *mixr;
 
 extern wtable *wave_tables[5];
 
+char *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;
+
+void print_prompt()
+{
+    printf("%s", prompt);
+    fflush(stdout);
+}
+
 void loopy(void)
 {
     char *line;
-    while ((line = readline(ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET)) !=
+    while ((line = readline(prompt)) !=
            NULL) {
         if (line[0] != 0) {
             add_history(line);

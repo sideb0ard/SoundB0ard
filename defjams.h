@@ -39,6 +39,7 @@
 #define COOL_COLOR_GREEN "\x1b[38;5;47m"
 #define COOL_COLOR_YELLOW "\x1b[38;5;226m"
 #define COOL_COLOR_PINK "\x1b[38;5;200m"
+#define COOL_COLOR_MAUVE "\x1b[38;5;135m"
 
 typedef enum { OFF, ON } onoff;
 
