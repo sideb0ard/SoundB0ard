@@ -44,6 +44,8 @@ int main()
     pthread_mutex_init(&midi_tick_lock, NULL);
     pthread_cond_init(&midi_tick_cond, NULL);
 
+    srand(time(NULL));
+
     //// run the MIDI event looprrr...
     pthread_t midi_th;
     if (pthread_create(&midi_th, NULL, midiman, NULL)) {

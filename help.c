@@ -88,7 +88,7 @@ void print_help()
     /////////////////////////////////////////////////////////////////////
     printf("\n" COOL_COLOR_GREEN "[FX Cmds]\n");
     printf(ANSI_COLOR_WHITE "decimate  <sound_gen_number>\n");
-    // printf(ANSI_COLOR_WHITE "delay     <sound_gen_number>\n");
+    printf(ANSI_COLOR_WHITE "delay     <sound_gen_number> <delay_ms>\n");
     // printf(ANSI_COLOR_WHITE "distort   <sound_gen_number>\n");
     printf(ANSI_COLOR_WHITE "env       <sound_gen_number> <loop_len> <type>\n");
     // printf(ANSI_COLOR_WHITE "reverb    <sound_gen_number>\n");
@@ -100,7 +100,18 @@ void print_help()
            "sidechain <sound_gen_number> <input_src> <mix>" ANSI_COLOR_CYAN
            " -- sidechain env, where input_src is a drum pattern\n");
     printf(ANSI_COLOR_WHITE
-           "fx        <sound_gen_number> <fx_num> <parameter> <val>\n");
+           "fx        <sound_gen_number> <fx_num> <parameter> <val>\n"
+           "e.g\n"
+           "Delay:\n"
+           "fx        <sound_gen_number> <fx_num> delay <time_ms>\n"
+           "fx        <sound_gen_number> <fx_num> feedback {1..100}\n"
+           "fx        <sound_gen_number> <fx_num> ratio {0..1}\n"
+           "fx        <sound_gen_number> <fx_num> mix {0..1}\n"
+           "fx        <sound_gen_number> <fx_num> mode [NORM|TAP1|TAP2|PINGPONG]\n"
+           "Repeat:\n"
+           "fx        <sound_gen_number> <fx_num> nbeats {1..16}\n"
+           "fx        <sound_gen_number> <fx_num> 16th {1..16}\n"
+           );
 
     /////////////////////////////////////////////////////////////////////
     printf("\n" COOL_COLOR_GREEN "[Programming Cmds]\n");
@@ -125,5 +136,10 @@ void print_help()
            "chaos <soundgen_num> action <true|false>" ANSI_COLOR_CYAN
            " -- Toggle chaos monkey action mode\n");
 
+    /////////////////////////////////////////////////////////////////////
+    printf("\n" COOL_COLOR_GREEN "[Other]\n");
+    printf(ANSI_COLOR_WHITE "strategy" ANSI_COLOR_CYAN
+                            " -- emit a random selection from Brian Eno's"
+                            "Oblique Strategies, 4th Edition\n");
     printf(ANSI_COLOR_RESET);
 }

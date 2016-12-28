@@ -19,6 +19,7 @@ Load it up:
 and typing `help` should give you something like::  
  
 <pre>
+```
 #### SBShell - Interactive, scriptable, algorithmic music shell ####
 
 [Global Cmds]
@@ -73,3 +74,4 @@ chaos <soundgen_num> chance <percent> -- how likely the chaos monkey interrupts
 chaos <soundgen_num> suggest <true|false> -- Toggle chaos monkey suggestion mode
 chaos <soundgen_num> action <true|false> -- Toggle chaos monkey action mode
 </pre>
+```

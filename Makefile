@@ -36,6 +36,7 @@ SRC = \
       mixer.c \
       modmatrix.c \
       nanosynth.c \
+      obliquestrategies.c \
       oscillator.c \
       qblimited_oscillator.c \
       sampler.c \

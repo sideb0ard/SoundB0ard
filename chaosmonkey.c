@@ -7,8 +7,6 @@
 #include "mixer.h"
 #include "utils.h"
 
-#include "obliquestrategies.h"
-
 extern mixer *mixr;
 
 chaosmonkey *new_chaosmonkey()
@@ -57,8 +55,7 @@ double chaosmonkey_gen_next(void *self)
     chaosmonkey *cm = (chaosmonkey *)self;
     if (mixr->cur_sample % (SAMPLE_RATE * cm->frequency_of_wakeup) == 0) {
         if (cm->chance_of_interruption > (rand() % 100)) {
-            int rand_oblique = rand() % 100;
-            printf(COOL_COLOR_MAUVE "%s\n" ANSI_COLOR_RESET, strategies[rand_oblique]);
+            oblique_strategy();
             print_prompt();
         }
     }

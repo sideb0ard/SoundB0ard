@@ -13,7 +13,7 @@ typedef enum {
     ALLPASS,
     LOWPASS,
     HIGHPASS,
-    BANDPASS
+    BANDPASS,
 } effect_type;
 
 typedef struct {
@@ -36,6 +36,7 @@ typedef struct {
     double rate, cnt;
     long m;
     effect_type type;
+
 } EFFECT;
 
 EFFECT *new_beatrepeat(int looplen);

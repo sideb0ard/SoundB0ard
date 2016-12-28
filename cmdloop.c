@@ -310,6 +310,13 @@ void interpret(char *line)
             }
         }
         // FX COMMANDS
+        else if (strncmp("delay", wurds[0], 7) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                int delay_len_ms = atoi(wurds[2]);
+                add_delay_soundgen(mixr->sound_generators[soundgen_num], delay_len_ms);
+            }
+        }
         else if (strncmp("distort", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (is_valid_soundgen_num(soundgen_num)) {
@@ -410,6 +417,64 @@ void interpret(char *line)
                         }
                     }
                 }
+                else if (strncmp("midi", wurds[3], 4) == 0) {
+                    if (mixr->sound_generators[soundgen_num]
+                            ->effects[fx_num]
+                            ->type == DELAY) {
+                        printf("SUCCESS! GOLDEN MIDI DELAY!\n");
+                        mixr->midi_control_destination = DELAYFX;
+                        mixr->active_midi_soundgen_num = soundgen_num;
+                        mixr->active_midi_soundgen_effect_num = fx_num;
+                    }
+                }
+                else if (strncmp("delay", wurds[3], 5) == 0 ||
+                         strncmp("feedback", wurds[3], 8) == 0 ||
+                         strncmp("ratio", wurds[3], 5) == 0 ||
+                         strncmp("mix", wurds[3], 3) == 0 ||
+                         strncmp("mode", wurds[3], 4) == 0) {
+                    if (mixr->sound_generators[soundgen_num]
+                            ->effects[fx_num]
+                            ->type == DELAY) {
+                        stereodelay *d =
+                            (stereodelay *)mixr->sound_generators[soundgen_num]
+                                ->effects[fx_num];
+                        if (strncmp("delay", wurds[3], 5) == 0) {
+                            printf("Changing DELAY TIME\n");
+                            double delay_ms = atof(wurds[4]);
+                            delay_set_delay_time_ms(d, delay_ms);
+                        }
+                        else if (strncmp("feedback", wurds[3], 8) == 0) {
+                            printf("Changing FEEDBACK TIME\n");
+                            int percent = atoi(wurds[4]);
+                            delay_set_feedback_percent(d, percent);
+                        }
+                        else if (strncmp("ratio", wurds[3], 5) == 0) {
+                            printf("Changing RATIO TIME\n");
+                            double ratio = atof(wurds[4]);
+                            delay_set_delay_ratio(d, ratio);
+                        }
+                        else if (strncmp("mix", wurds[3], 3) == 0) {
+                            printf("Changing MIX TIME\n");
+                            double mix = atof(wurds[4]);
+                            delay_set_wet_mix(d, mix);
+                        }
+                        else if (strncmp("mode", wurds[3], 4) == 0) {
+                            printf("MODE!\n");
+                            if (strncmp("NORM", wurds[4], 4) == 0) {
+                                delay_set_mode(d, NORM);
+                            }
+                            else if (strncmp("TAP1", wurds[4], 4) == 0) {
+                                delay_set_mode(d, TAP1);
+                            }
+                            else if (strncmp("TAP2", wurds[4], 4) == 0) {
+                                delay_set_mode(d, TAP2);
+                            }
+                            else if (strncmp("PINGPONG", wurds[4], 8) == 0) {
+                                delay_set_mode(d, PINGPONG);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -429,6 +494,10 @@ void interpret(char *line)
         // UTILS
         else if (strncmp("chord", wurds[0], 6) == 0) {
             chordie(wurds[1]);
+        }
+
+        else if (strncmp("strategy", wurds[0], 8) == 0) {
+            oblique_strategy();
         }
 
         // default HALP!

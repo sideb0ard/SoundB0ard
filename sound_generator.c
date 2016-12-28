@@ -145,6 +145,7 @@ float effector(SOUNDGEN *self, float val)
 
             int delay_p;
             double *delay;
+            beatrepeat *b;
             float val1 = 0;
             float val2 = 0;
             double loop_time = 0.04; // temp trial for reverb
@@ -152,8 +153,6 @@ float effector(SOUNDGEN *self, float val)
             double decay = pow(0.001, loop_time / reverb_time);
             float mix = 0.1;
             float atten = 1.0;
-
-            beatrepeat *b;
 
             switch (self->effects[i]->type) {
             case BEATREPEAT:
@@ -184,7 +183,7 @@ float effector(SOUNDGEN *self, float val)
                 }
                 break;
             case DELAY:
-                // delay_update(self->effects[i]->delay);
+                delay_update(self->effects[i]->delay);
                 delay_process_audio(self->effects[i]->delay, &left_in,
                                     &right_in, &left_out, &right_out);
                 val = left_out;

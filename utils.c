@@ -9,11 +9,13 @@
 #include <time.h>
 #include <unistd.h>
 
+#include "cmdloop.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "utils.h"
 
 extern mixer *mixr;
+extern char *strategies[NUM_STATEGIES];
 
 static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
                                "f#", "g",  "g#", "a",  "a#", "b"};
@@ -187,6 +189,12 @@ void chordie(char *n)
            freqval(strcat(rootnote, "4")), sec_note,
            freqval(strcat(sec_note, "4")), thr_note,
            freqval(strcat(thr_note, "4")));
+}
+
+void oblique_strategy()
+{
+    int rand_oblique = rand() % 100;
+    printf(COOL_COLOR_MAUVE "%s\n" ANSI_COLOR_RESET, strategies[rand_oblique]);
 }
 
 void related_notes(char note[4], double *second_note, double *third_note)
