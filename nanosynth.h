@@ -11,13 +11,19 @@
 #include "oscillator.h"
 #include "sound_generator.h"
 
+#define MAX_NUM_MIDI_LOOPS 16
+
 typedef enum { OSC, FILTER } LFO1_dest;
 typedef enum { NONE, NANOSYNTH, DELAYFX } midi_control_type;
+
+typedef midi_event *midi_events_loop_t[PPNS];
+
 
 typedef struct nanosynth {
     SOUNDGEN sound_generator;
 
-    midi_event *midi_events_loop[PPNS];
+    //midi_event *midi_events_loop[PPNS];
+    midi_events_loop_t midi_events_loop;
 
     oscillator *osc1;
     oscillator *osc2;
