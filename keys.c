@@ -129,7 +129,8 @@ void keys(int soundgen_num)
                         // ns->mloop[mixr->tick % PPNS] = midi_num;
                         int tick = mixr->tick % PPNS;
                         midi_event *ev = new_midi_event(tick, 144, midi_num, 0);
-                        ns->midi_events_loop[tick] = ev;
+                        // ns->midi_events_loop[tick] = ev;
+                        ns->melodies[ns->cur_melody][tick] = ev;
                     }
                 }
                 printf("CCCC %d\n", ch);
@@ -161,8 +162,10 @@ void *play_melody_loop(void *p)
         //     note_played_time = 1;
         // }
 
-        if (ns->midi_events_loop[idx] != NULL) {
-            midi_event *ev = ns->midi_events_loop[idx];
+        // if (ns->midi_events_loop[idx] != NULL) {
+        if (ns->melodies[ns->cur_melody][idx] != NULL) {
+            // midi_event *ev = ns->midi_events_loop[idx];
+            midi_event *ev = ns->melodies[ns->cur_melody][idx];
             // print_midi_event_rec(ev);
             switch (ev->event_type) {
             case (144): {

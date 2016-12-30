@@ -47,7 +47,7 @@ EFFECT *new_delay(double duration)
     delay_set_wet_mix(e->delay, 0.7);
     delay_set_mode(e->delay, PINGPONG);
 
-    //delay_update(e->delay);
+    // delay_update(e->delay);
 
     return e;
 }

@@ -28,7 +28,8 @@ nanosynth *new_nanosynth()
         return NULL;
 
     for (int i = 0; i < PPNS; i++) {
-        ns->midi_events_loop[i] = NULL;
+        // ns->midi_events_loop[i] = NULL;
+        ns->melodies[ns->cur_melody][i] = NULL;
     }
 
     ns->osc1 = (oscillator *)qb_osc_new();
@@ -190,6 +191,7 @@ nanosynth *new_nanosynth()
     ns->dca->m_gain = 0.7;
     ns->cur_octave = 4;
     ns->sustain = 0;
+    ns->num_melodies = 1;
 
     ns->m_filter_keytrack = false;
     ns->m_filter_keytrack_intensity = 0.5;
@@ -216,14 +218,37 @@ nanosynth *new_nanosynth()
     return ns;
 }
 
-void nanosynth_reset_melody(nanosynth *ns)
+void nanosynth_add_melody(nanosynth *ns)
 {
-    for (int i = 0; i < PPNS; i++)
-        if (ns->midi_events_loop[i] != NULL) {
-            midi_event *tmp = ns->midi_events_loop[i];
-            ns->midi_events_loop[i] = NULL;
-            free(tmp);
+    ns->num_melodies++;
+    ns->cur_melody++;
+}
+
+void nanosynth_switch_melody(nanosynth *ns, unsigned int melody_num)
+{
+    if (melody_num < (unsigned)ns->num_melodies) {
+        ns->cur_melody = melody_num;
+    }
+}
+
+void nanosynth_reset_melody_all(nanosynth *ns)
+{
+    for (int i = 0; i < ns->num_melodies; i++) {
+        nanosynth_reset_melody(ns, i);
+    }
+}
+
+void nanosynth_reset_melody(nanosynth *ns, unsigned int melody_num)
+{
+    if (melody_num < (unsigned)ns->num_melodies) {
+        for (int i = 0; i < PPNS; i++) {
+            if (ns->melodies[melody_num][i] != NULL) {
+                midi_event *tmp = ns->melodies[melody_num][i];
+                ns->melodies[melody_num][i] = NULL;
+                free(tmp);
+            }
         }
+    }
 }
 
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
@@ -277,11 +302,13 @@ void change_octave(void *self, int direction)
         ns->cur_octave = octave;
 }
 
-void nanosynth_print_melodies(nanosynth *self)
+void nanosynth_print_melodies(nanosynth *ns)
 {
     for (int i = 0; i < PPNS; i++) {
-        if (self->midi_events_loop[i] != NULL) {
-            printf("%d: %d ", i, self->midi_events_loop[i]->data1);
+        // if (self->midi_events_loop[i] != NULL) {
+        if (ns->melodies[ns->cur_melody][i] != NULL) {
+            // printf("%d: %d ", i, self->midi_events_loop[i]->data1);
+            printf("%d: %d ", i, ns->melodies[ns->cur_melody][i]->data1);
         }
     }
     printf("\n");
@@ -290,10 +317,11 @@ void nanosynth_print_melodies(nanosynth *self)
 void nanosynth_status(void *self, char *status_string)
 {
     nanosynth *ns = (nanosynth *)self;
-    snprintf(status_string, 119,
-             ANSI_COLOR_RED "nanosynth! %.2f(freq) sustain: %d "
-                            "vol: %.2f" ANSI_COLOR_RESET,
-             ns->osc1->m_fo, ns->sustain, ns->vol);
+    snprintf(status_string, 119, ANSI_COLOR_RED
+             "nanosynth! %.2f(freq) sustain: %d "
+             "vol: %.2f num melodies: %d, cur_melody: %d" ANSI_COLOR_RESET,
+             ns->osc1->m_fo, ns->sustain, ns->vol, ns->num_melodies,
+             ns->cur_melody);
     nanosynth_print_melodies(ns);
 }
 

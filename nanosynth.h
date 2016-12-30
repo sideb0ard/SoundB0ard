@@ -18,12 +18,14 @@ typedef enum { NONE, NANOSYNTH, DELAYFX } midi_control_type;
 
 typedef midi_event *midi_events_loop_t[PPNS];
 
-
 typedef struct nanosynth {
     SOUNDGEN sound_generator;
 
-    //midi_event *midi_events_loop[PPNS];
-    midi_events_loop_t midi_events_loop;
+    // midi_event *midi_events_loop[PPNS];
+    // midi_events_loop_t midi_events_loop;
+    midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];
+    int num_melodies;
+    int cur_melody;
 
     oscillator *osc1;
     oscillator *osc2;
@@ -105,7 +107,9 @@ void note_on(nanosynth *self, int midi_num);
 void change_octave(void *self, int direction);
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);
-// void nanosynth_add_melody_loop(void *self, melody_loop *mloop);
-void nanosynth_reset_melody(nanosynth *self);
+void nanosynth_add_melody(nanosynth *self);
+void nanosynth_switch_melody(nanosynth *self, unsigned int melody_num);
+void nanosynth_reset_melody(nanosynth *self, unsigned int melody_num);
+void nanosynth_reset_melody_all(nanosynth *self);
 void nanosynth_add_note(nanosynth *self, int midi_num);
 void nanosynth_print_melodies(nanosynth *self);

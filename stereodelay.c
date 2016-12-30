@@ -1,6 +1,6 @@
 #include "stereodelay.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 stereodelay *new_stereo_delay()
 {
@@ -34,7 +34,7 @@ void delay_set_delay_time_ms(stereodelay *d, double delay_ms)
     printf("Changing DELAY TIME TO %f\n", delay_ms);
     d->m_delay_time_ms = delay_ms;
     printf("NOW IT IS %f\n", d->m_delay_time_ms);
-    //delay_update(d);
+    // delay_update(d);
     printf("Aiight, back!\n");
 }
 void delay_set_feedback_percent(stereodelay *d, double feedback_percent)
@@ -42,14 +42,14 @@ void delay_set_feedback_percent(stereodelay *d, double feedback_percent)
     printf("Changing PERCENT TO %f\n", feedback_percent);
     d->m_feedback_percent = feedback_percent;
     printf("NOW IT IS %f\n", d->m_feedback_percent);
-    //delay_update(d);
+    // delay_update(d);
 }
 void delay_set_delay_ratio(stereodelay *d, double delay_ratio)
 {
     printf("Changing RATIO TO %f\n", delay_ratio);
     d->m_delay_ratio = delay_ratio;
     printf("NOW IT IS %f\n", d->m_delay_ratio);
-    //delay_update(d);
+    // delay_update(d);
 }
 void delay_set_wet_mix(stereodelay *d, double wet_mix)
 {

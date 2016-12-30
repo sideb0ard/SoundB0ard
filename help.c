@@ -99,19 +99,19 @@ void print_help()
     printf(ANSI_COLOR_WHITE
            "sidechain <sound_gen_number> <input_src> <mix>" ANSI_COLOR_CYAN
            " -- sidechain env, where input_src is a drum pattern\n");
-    printf(ANSI_COLOR_WHITE
-           "fx        <sound_gen_number> <fx_num> <parameter> <val>\n"
-           "e.g\n"
-           "Delay:\n"
-           "fx        <sound_gen_number> <fx_num> delay <time_ms>\n"
-           "fx        <sound_gen_number> <fx_num> feedback {1..100}\n"
-           "fx        <sound_gen_number> <fx_num> ratio {0..1}\n"
-           "fx        <sound_gen_number> <fx_num> mix {0..1}\n"
-           "fx        <sound_gen_number> <fx_num> mode [NORM|TAP1|TAP2|PINGPONG]\n"
-           "Repeat:\n"
-           "fx        <sound_gen_number> <fx_num> nbeats {1..16}\n"
-           "fx        <sound_gen_number> <fx_num> 16th {1..16}\n"
-           );
+    printf(
+        ANSI_COLOR_WHITE
+        "fx        <sound_gen_number> <fx_num> <parameter> <val>\n"
+        "e.g\n"
+        "Delay:\n"
+        "fx        <sound_gen_number> <fx_num> delay <time_ms>\n"
+        "fx        <sound_gen_number> <fx_num> feedback {1..100}\n"
+        "fx        <sound_gen_number> <fx_num> ratio {0..1}\n"
+        "fx        <sound_gen_number> <fx_num> mix {0..1}\n"
+        "fx        <sound_gen_number> <fx_num> mode [NORM|TAP1|TAP2|PINGPONG]\n"
+        "Repeat:\n"
+        "fx        <sound_gen_number> <fx_num> nbeats {1..16}\n"
+        "fx        <sound_gen_number> <fx_num> 16th {1..16}\n");
 
     /////////////////////////////////////////////////////////////////////
     printf("\n" COOL_COLOR_GREEN "[Programming Cmds]\n");

@@ -67,7 +67,8 @@ void *midiman()
                         int tick = mixr->tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
-                        ns->midi_events_loop[tick] = ev;
+                        // ns->midi_events_loop[tick] = ev;
+                        ns->melodies[ns->cur_melody][tick] = ev;
                     }
                     switch (status) {
                     case (144): { // Hex 0x80

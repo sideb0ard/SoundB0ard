@@ -42,8 +42,7 @@ void print_prompt()
 void loopy(void)
 {
     char *line;
-    while ((line = readline(prompt)) !=
-           NULL) {
+    while ((line = readline(prompt)) != NULL) {
         if (line[0] != 0) {
             add_history(line);
             interpret(line);
@@ -241,7 +240,19 @@ void interpret(char *line)
                 if (is_valid_soundgen_num(soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type ==
                         NANOSYNTH_TYPE) {
-                    if (strncmp("keys", wurds[2], 4) == 0) {
+                    nanosynth *ns =
+                        (nanosynth *)mixr->sound_generators[soundgen_num];
+                    if (strncmp("add", wurds[2], 4) == 0) {
+                        printf("Adding!\n");
+                        if (strncmp("melody", wurds[3], 6) == 0) {
+                            printf("Melodu!!\n");
+                            nanosynth_add_melody(ns);
+                        }
+                    }
+                    else if (strncmp("change", wurds[2], 6) == 0) {
+                        // change
+                    }
+                    else if (strncmp("keys", wurds[2], 4) == 0) {
                         keys(soundgen_num);
                     }
                     else if (strncmp("midi", wurds[2], 4) == 0) {
@@ -249,19 +260,22 @@ void interpret(char *line)
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("reset", wurds[2], 5) == 0) {
-                        nanosynth *ns =
-                            (nanosynth *)mixr->sound_generators[soundgen_num];
-                        nanosynth_reset_melody(ns);
+                        if (strncmp("all", wurds[3], 3) == 0) {
+                            nanosynth_reset_melody_all(ns);
+                        }
+                        else {
+                            int melody_num = atoi(wurds[3]);
+                            nanosynth_reset_melody(ns, melody_num);
+                        }
                     }
                     else if (strncmp("sustain", wurds[2], 7) == 0) {
-                        nanosynth *ns =
-                            (nanosynth *)mixr->sound_generators[soundgen_num];
                         int val = atoi(wurds[3]);
                         nanosynth_set_sustain(ns,
                                               val * mixr->midi_ticks_per_ms);
                     }
-                    else if (strncmp("change", wurds[2], 6) == 0) {
-                        // change
+                    else if (strncmp("switch", wurds[2], 6) == 0) {
+                        int melody_num = atoi(wurds[3]);
+                        nanosynth_switch_melody(ns, melody_num);
                     }
                 }
             }
@@ -314,7 +328,8 @@ void interpret(char *line)
             int soundgen_num = atoi(wurds[1]);
             if (is_valid_soundgen_num(soundgen_num)) {
                 int delay_len_ms = atoi(wurds[2]);
-                add_delay_soundgen(mixr->sound_generators[soundgen_num], delay_len_ms);
+                add_delay_soundgen(mixr->sound_generators[soundgen_num],
+                                   delay_len_ms);
             }
         }
         else if (strncmp("distort", wurds[0], 7) == 0) {
