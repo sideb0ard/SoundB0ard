@@ -349,13 +349,17 @@ double drum_gennext(void *self)
 void drum_status(void *self, char *status_string)
 {
     DRUM *drumr = self;
+    snprintf(status_string, 119,
+             ANSI_COLOR_CYAN "[SEQUENCER] - \"%s\" Vol: %.2lf life_on: %d",
+             basename(drumr->filename), drumr->vol, drumr->game_of_life_on);
+    char pattern_details[128];
     char spattern[17];
-    char_binary_version_of_int(drumr->patterns[drumr->cur_pattern_num],
-                               spattern);
-    snprintf(status_string, 119, ANSI_COLOR_CYAN
-             "[%s]\t[%s] vol: %.2lf life_on: %d" ANSI_COLOR_RESET,
-             basename(drumr->filename), spattern, drumr->vol,
-             drumr->game_of_life_on);
+    for (int i = 0; i < drumr->num_patterns; i++) {
+        char_binary_version_of_int(drumr->patterns[i], spattern);
+        snprintf(pattern_details, 127, "\n                    [%d] - [%s]", i, spattern);
+        strcat(status_string, pattern_details);
+    }
+    strcat(status_string, ANSI_COLOR_RESET);
 }
 
 double drum_getvol(void *self)

@@ -47,24 +47,27 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(COOL_COLOR_MAUVE
-           "::::: [MIXING dESK] Volume: %.2f // BPM: %d // TICK: %d // Qtick: %d :::::\n"
-           ANSI_COLOR_RESET,
+    printf(COOL_COLOR_MAUVE "::::: [" ANSI_COLOR_WHITE
+                            "MIXING dESK" COOL_COLOR_MAUVE
+                            "] Volume: %.2f // BPM: %d // "
+                            "TICK: %d // Qtick: %d :::::\n" ANSI_COLOR_RESET,
            mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
         for (int i = 0; i < mixr->env_var_count; i++) {
-            printf("%s - %d\n", mixr->environment[i].key, mixr->environment[i].val);
+            printf("%s - %d\n", mixr->environment[i].key,
+                   mixr->environment[i].val);
         }
         printf(ANSI_COLOR_RESET);
     }
+    printf("\n");
 
     for (int i = 0; i < mixr->soundgen_num; i++) {
         char ss[MAX_PS_STRING_SZ];
         memset(ss, 0, MAX_PS_STRING_SZ);
         mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
-        printf("[%2d]  %s\n", i, ss);
+        printf("[%2d]  %s\n\n", i, ss);
     }
 
     printf(ANSI_COLOR_RESET);

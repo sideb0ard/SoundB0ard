@@ -1,6 +1,7 @@
 #pragma once
-#include <stdbool.h>
+#include "nanosynth.h"
 #include "sampler.h"
+#include <stdbool.h>
 
 #define SIZE_OF_WURD 41 // 40 char word plus terminator
 #define NUM_WURDS 25
@@ -16,5 +17,6 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
                                       int start, int end);
 bool is_valid_soundgen_num(int soundgen_num);
 bool is_valid_sample_num(SAMPLER *s, int sample_num);
+bool is_valid_melody_num(nanosynth *ns, int melody_num);
 bool is_valid_fx_num(int soundgen_num, int fx_num);
 bool is_valid_file(char *filename);

@@ -33,7 +33,7 @@ typedef struct t_sampler {
     int cur_sample;
     int cur_sample_iteration;
     bool multi_sample_mode;
-    bool multi_sample_loop_countdown_started;
+    // bool multi_sample_loop_countdown_started;
 
     pthread_mutex_t resample_mutex;
 
@@ -45,6 +45,8 @@ typedef struct t_sampler {
 
 SAMPLER *new_sampler(char *filename, double loop_len); // loop_len in bars
 void sampler_add_sample(SAMPLER *s, char *filename, int loop_len);
+void sampler_set_multi_sample_mode(SAMPLER *s, bool multimode);
+void sampler_switch_sample(SAMPLER *s, int sample_num);
 void sampler_resample_to_loop_size(SAMPLER *s);
 void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len);
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);

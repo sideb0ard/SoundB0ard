@@ -86,9 +86,11 @@ void change_octave(void *self, int direction);
 void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);
 void nanosynth_set_multi_melody_mode(nanosynth *self, bool melody_mode);
+void nanosynth_set_melody_loop_num(nanosynth *self, int melody_num,
+                                   int loop_num);
 void nanosynth_add_melody(nanosynth *self);
 void nanosynth_switch_melody(nanosynth *self, unsigned int melody_num);
 void nanosynth_reset_melody(nanosynth *self, unsigned int melody_num);
 void nanosynth_reset_melody_all(nanosynth *self);
 void nanosynth_add_note(nanosynth *self, int midi_num);
-void nanosynth_print_melodies(nanosynth *self);
+void nanosynth_print_melody(nanosynth *self, int melody_num);

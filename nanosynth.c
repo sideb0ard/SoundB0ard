@@ -300,13 +300,13 @@ void change_octave(void *self, int direction)
         ns->cur_octave--;
 }
 
-void nanosynth_print_melodies(nanosynth *ns)
+void nanosynth_print_melody(nanosynth *ns, int melody_num)
 {
     for (int i = 0; i < PPNS; i++) {
         // if (self->midi_events_loop[i] != NULL) {
-        if (ns->melodies[ns->cur_melody][i] != NULL) {
+        if (ns->melodies[melody_num][i] != NULL) {
             // printf("%d: %d ", i, self->midi_events_loop[i]->data1);
-            printf("%d: %d ", i, ns->melodies[ns->cur_melody][i]->data1);
+            printf("%d: %d ", i, ns->melodies[melody_num][i]->data1);
         }
     }
     printf("\n");
@@ -320,7 +320,7 @@ void nanosynth_status(void *self, char *status_string)
              "vol: %.2f num melodies: %d, cur_melody: %d" ANSI_COLOR_RESET,
              ns->osc1->m_fo, ns->sustain, ns->vol, ns->num_melodies,
              ns->cur_melody);
-    nanosynth_print_melodies(ns);
+    //nanosynth_print_melody(ns, );
 }
 
 void note_on(nanosynth *self, int midi_num)
@@ -406,8 +406,14 @@ double nanosynth_gennext(void *self)
 void nanosynth_set_multi_melody_mode(nanosynth *self, bool melody_mode)
 {
     self->multi_melody_mode = melody_mode;
-    self->multi_melody_loop_countdown_started = true;
+    // self->multi_melody_loop_countdown_started = true;
     self->cur_melody_iteration = self->melody_multiloop_count[self->cur_melody];
+}
+
+void nanosynth_set_melody_loop_num(nanosynth *self, int melody_num,
+                                   int loop_num)
+{
+    self->melody_multiloop_count[melody_num] = loop_num;
 }
 
 void nanosynth_set_sustain(nanosynth *self, int val)

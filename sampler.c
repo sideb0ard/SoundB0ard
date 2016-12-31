@@ -41,7 +41,6 @@ void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
         return;
     }
 
-
     file_sample *fs = calloc(1, sizeof(file_sample));
     sample_set_file_name(fs, filename);
     fs->position = 0;
@@ -206,13 +205,18 @@ double sampler_gennext(void *self)
         sampler->just_been_resampled = false;
     }
 
-    // if (sampler->position == 0) {
-    //    printf("SAMPLER START OF LOOP: %d 16Tick %d Tick %d\n",
-    //            sampler->position,
-    //            mixr->sixteenth_note_tick,
-    //            mixr->tick);
-    //}
-    // pthread_mutex_lock(&sampler->resample_mutex);
+    if (sampler->samples[sampler->cur_sample]->position == 0) {
+
+        if (sampler->multi_sample_mode) {
+            sampler->cur_sample_iteration--;
+            if (sampler->cur_sample_iteration == 0) {
+                sampler->cur_sample =
+                    (sampler->cur_sample + 1) % sampler->num_samples;
+                sampler->cur_sample_iteration =
+                    sampler->sample_num_loops[sampler->cur_sample];
+            }
+        }
+    }
 
     val = sampler->samples[sampler->cur_sample]->resampled_file_bytes
               [sampler->samples[sampler->cur_sample]->position++];
@@ -220,8 +224,8 @@ double sampler_gennext(void *self)
     if (sampler->samples[sampler->cur_sample]->position ==
         sampler->samples[sampler->cur_sample]->resampled_file_size) {
         sampler->samples[sampler->cur_sample]->position = 0;
-        sampler->cur_sample =
-            (sampler->cur_sample + 1) % sampler->num_samples;
+        // sampler->cur_sample =
+        //    (sampler->cur_sample + 1) % sampler->num_samples;
     }
     // pthread_mutex_unlock(&sampler->resample_mutex);
 
@@ -237,19 +241,33 @@ double sampler_gennext(void *self)
 void sampler_status(void *self, char *status_string)
 {
     SAMPLER *sampler = self;
-    snprintf(status_string, MAX_PS_STRING_SZ, COOL_COLOR_GREEN
-             "[LOOPER] Num Samples: %d Current Sample: %d vol: %.2lf",
-             sampler->num_samples, sampler->cur_sample,
-             sampler->vol);
+    snprintf(
+        status_string, MAX_PS_STRING_SZ, COOL_COLOR_GREEN
+        "[LOOPER] Num Samples: %d Current Sample: %d vol: %.2lf Multimode: %s",
+        sampler->num_samples, sampler->cur_sample, sampler->vol,
+        sampler->multi_sample_mode ? "true" : "false");
     int strlen_left = MAX_PS_STRING_SZ - strlen(status_string);
     char looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {
-        snprintf(looper_details, 128, "\n               [%d] %s - loop_len: %d numloops: %d",
-                 i, basename(sampler->samples[i]->filename),
+        snprintf(looper_details, 128,
+                 "\n\t[%d] %s - loop_len: %d numloops: %d", i,
+                 basename(sampler->samples[i]->filename),
                  sampler->samples[i]->loop_len, sampler->sample_num_loops[i]);
         strncat(status_string, looper_details, strlen_left);
     }
     strcat(status_string, ANSI_COLOR_RESET);
+}
+
+void sampler_set_multi_sample_mode(SAMPLER *s, bool multimode)
+{
+    s->multi_sample_mode = multimode;
+    s->cur_sample_iteration = s->sample_num_loops[s->cur_sample];
+}
+
+void sampler_switch_sample(SAMPLER *s, int sample_num)
+{
+    if (sample_num < s->num_samples)
+        s->cur_sample = sample_num;
 }
 
 double sampler_getvol(void *self)

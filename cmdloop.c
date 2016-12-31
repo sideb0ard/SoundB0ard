@@ -202,34 +202,48 @@ void interpret(char *line)
                     mixr->sound_generators[soundgen_num]->type ==
                         SAMPLER_TYPE) {
 
+                    SAMPLER *s =
+                        (SAMPLER *)mixr->sound_generators[soundgen_num];
+
                     if (strncmp("add", wurds[2], 6) == 0) {
                         if (is_valid_file(wurds[3])) {
                             int loop_len = atoi(wurds[4]);
                             if (loop_len > 0) {
-                                sampler_add_sample(
-                                    (SAMPLER *)
-                                        mixr->sound_generators[soundgen_num],
-                                    wurds[3], loop_len);
+                                sampler_add_sample(s, wurds[3], loop_len);
                             }
                         }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        SAMPLER *s =
-                            (SAMPLER *)mixr->sound_generators[soundgen_num];
-                        int sample_num = atoi(wurds[3]);
-                        if (is_valid_sample_num(s, sample_num)) {
-                            if (strncmp("loop_len", wurds[4], 8) == 0) {
-                                int loop_len = atoi(wurds[5]);
-                                sampler_change_loop_len(s, sample_num, loop_len);
+                        if (strncmp("multimode", wurds[3], 10) == 0) {
+                            if (strncmp("true", wurds[4], 4) == 0) {
+                                sampler_set_multi_sample_mode(s, true);
                             }
-                            else if (strncmp("numloops", wurds[4], 8) == 0) {
-                                int num_loops = atoi(wurds[5]);
-                                if (num_loops != 0) {
-                                    s->sample_num_loops[sample_num] =
-                                        num_loops;
+                            else if (strncmp("false", wurds[4], 5) == 0) {
+                                sampler_set_multi_sample_mode(s, false);
+                            }
+                        }
+                        else {
+                            int sample_num = atoi(wurds[3]);
+                            if (is_valid_sample_num(s, sample_num)) {
+                                if (strncmp("loop_len", wurds[4], 8) == 0) {
+                                    int loop_len = atoi(wurds[5]);
+                                    sampler_change_loop_len(s, sample_num,
+                                                            loop_len);
+                                }
+                                else if (strncmp("numloops", wurds[4], 8) ==
+                                         0) {
+                                    int num_loops = atoi(wurds[5]);
+                                    if (num_loops != 0) {
+                                        s->sample_num_loops[sample_num] =
+                                            num_loops;
+                                    }
                                 }
                             }
                         }
+                    }
+                    else if (strncmp("switch", wurds[2], 6) == 0) {
+                        int sample_num = atoi(wurds[3]);
+                        sampler_switch_sample(s, sample_num);
                     }
                 }
             }
@@ -258,7 +272,7 @@ void interpret(char *line)
                         }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (strncmp("melodymode", wurds[3], 10) == 0) {
+                        if (strncmp("multimode", wurds[3], 10) == 0) {
                             if (strncmp("true", wurds[4], 4) == 0) {
                                 nanosynth_set_multi_melody_mode(ns, true);
                             }
@@ -266,13 +280,16 @@ void interpret(char *line)
                                 nanosynth_set_multi_melody_mode(ns, false);
                             }
                         }
-                        else if (strncmp("numloops", wurds[3], 8) == 0) {
-                            int melody_num = atoi(wurds[4]);
-                            int num_loops = atoi(wurds[5]);
-                            if (melody_num < ns->num_melodies &&
-                                num_loops != 0) {
-                                ns->melody_multiloop_count[melody_num] =
-                                    num_loops;
+                        else {
+                            int melody_num = atoi(wurds[3]);
+                            if (is_valid_melody_num(ns, melody_num)) {
+                                if (strncmp("numloops", wurds[3], 8) == 0) {
+                                    int num_loops = atoi(wurds[5]);
+                                    if (num_loops != 0) {
+                                        nanosynth_set_melody_loop_num(
+                                            ns, melody_num, num_loops);
+                                    }
+                                }
                             }
                         }
                         // change
@@ -591,7 +608,15 @@ bool is_valid_soundgen_num(int soundgen_num)
 
 bool is_valid_sample_num(SAMPLER *s, int sample_num)
 {
-    if ( sample_num < s->num_samples) {
+    if (sample_num < s->num_samples) {
+        return true;
+    }
+    return false;
+}
+
+bool is_valid_melody_num(nanosynth *ns, int melody_num)
+{
+    if (melody_num < ns->num_melodies) {
         return true;
     }
     return false;
