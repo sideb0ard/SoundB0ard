@@ -47,22 +47,27 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(ANSI_COLOR_WHITE
-           "::::: Mixing Desk (Volume: %f // BPM: %d // TICK: %d // Qtick: %d) "
-           "(Delay On: %d) "
-           ":::::\n",
-           mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
-           mixr->delay_on);
-    printf("::::: Environment :::::\n");
-    for (int i = 0; i < mixr->env_var_count; i++) {
-        printf("%s - %d\n", mixr->environment[i].key, mixr->environment[i].val);
+    printf(COOL_COLOR_MAUVE
+           "::::: [MIXING dESK] Volume: %.2f // BPM: %d // TICK: %d // Qtick: %d :::::\n"
+           ANSI_COLOR_RESET,
+           mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick);
+
+    if (mixr->env_var_count > 0) {
+        printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
+        for (int i = 0; i < mixr->env_var_count; i++) {
+            printf("%s - %d\n", mixr->environment[i].key, mixr->environment[i].val);
+        }
+        printf(ANSI_COLOR_RESET);
     }
+
     for (int i = 0; i < mixr->soundgen_num; i++) {
-        char ss[240];
-        memset(ss, 0, 240);
+        char ss[MAX_PS_STRING_SZ];
+        memset(ss, 0, MAX_PS_STRING_SZ);
         mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
-        printf("[%d] - %s\n", i, ss);
+        printf("[%2d]  %s\n", i, ss);
     }
+
+    printf(ANSI_COLOR_RESET);
 }
 
 void mixer_update_bpm(mixer *mixr, int bpm)

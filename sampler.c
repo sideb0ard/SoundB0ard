@@ -16,7 +16,6 @@ SAMPLER *new_sampler(char *filename, double loop_len)
     sampler->vol = 0.7;
     sampler->started = false;
     sampler->just_been_resampled = false;
-    // pthread_mutex_init(&sampler->resample_mutex, NULL);
 
     sampler_add_sample(sampler, filename, loop_len);
 
@@ -26,10 +25,9 @@ SAMPLER *new_sampler(char *filename, double loop_len)
     sampler->sound_generator.setvol = &sampler_setvol;
     sampler->sound_generator.type = SAMPLER_TYPE;
 
-    // printf("Filename:: %s\n", sampler->filename);
-    // printf("SR: %d\n", sampler->samplerate);
-    // printf("Channels: %d\n", sampler->channels);
-    // printf("Ticks in a loop: %d\n", sampler->resampled_file_bufsize);
+    for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++) {
+        sampler->sample_num_loops[i] = 1;
+    }
 
     return sampler;
 }
@@ -38,25 +36,11 @@ void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
 {
     printf("SAMPLER!, adding a new SAMPLE!\n");
 
-    file_sample **new_samples = NULL;
-    if (s->samples_array_size <= s->samples_num_entries) {
-        if (s->samples_array_size == 0) {
-            s->samples_array_size = DEFAULT_ARRAY_SIZE;
-        }
-        else {
-            s->samples_array_size *= 2;
-        }
-
-        new_samples =
-            realloc(s->samples, s->samples_array_size * sizeof(file_sample *));
-        if (new_samples == NULL) {
-            printf("Ooh, burney - cannae allocate memory for new SAMPLES");
-            return;
-        }
-        else {
-            s->samples = new_samples;
-        }
+    if (s->num_samples > MAX_SAMPLES_PER_LOOPER) {
+        printf("Already have max num samples\n");
+        return;
     }
+
 
     file_sample *fs = calloc(1, sizeof(file_sample));
     sample_set_file_name(fs, filename);
@@ -68,7 +52,7 @@ void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
     sample_import_file_contents(fs, filename);
     sample_resample_to_loop_size(fs);
 
-    s->samples[s->samples_num_entries++] = fs;
+    s->samples[s->num_samples++] = fs;
     printf("done adding SAMPLE\n");
 }
 
@@ -120,18 +104,16 @@ void sample_import_file_contents(file_sample *fs, char *filename)
 
 void sampler_resample_to_loop_size(SAMPLER *s)
 {
-    for (int i = 0; i < s->samples_num_entries; i++) {
+    for (int i = 0; i < s->num_samples; i++) {
         sample_resample_to_loop_size(s->samples[i]);
     }
     s->just_been_resampled = true;
 }
 
-void sampler_change_loop_len(SAMPLER *s, int loop_len)
-// TODO - not sure about changing loop len for multiple -
-// just gonna change the current one for the moment.
+void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len)
 {
     if (loop_len > 0) {
-        file_sample *fs = s->samples[s->current_sample];
+        file_sample *fs = s->samples[sample_num];
         fs->loop_len = loop_len;
         sample_resample_to_loop_size(fs);
     }
@@ -220,7 +202,7 @@ double sampler_gennext(void *self)
     // resync after a resample/resize
     if (sampler->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
         printf("Resyncing after resample...zzzz\n");
-        sampler->samples[sampler->current_sample]->position = 0;
+        sampler->samples[sampler->cur_sample]->position = 0;
         sampler->just_been_resampled = false;
     }
 
@@ -232,14 +214,14 @@ double sampler_gennext(void *self)
     //}
     // pthread_mutex_lock(&sampler->resample_mutex);
 
-    val = sampler->samples[sampler->current_sample]->resampled_file_bytes
-              [sampler->samples[sampler->current_sample]->position++];
+    val = sampler->samples[sampler->cur_sample]->resampled_file_bytes
+              [sampler->samples[sampler->cur_sample]->position++];
 
-    if (sampler->samples[sampler->current_sample]->position ==
-        sampler->samples[sampler->current_sample]->resampled_file_size) {
-        sampler->samples[sampler->current_sample]->position = 0;
-        sampler->current_sample =
-            (sampler->current_sample + 1) % sampler->samples_num_entries;
+    if (sampler->samples[sampler->cur_sample]->position ==
+        sampler->samples[sampler->cur_sample]->resampled_file_size) {
+        sampler->samples[sampler->cur_sample]->position = 0;
+        sampler->cur_sample =
+            (sampler->cur_sample + 1) % sampler->num_samples;
     }
     // pthread_mutex_unlock(&sampler->resample_mutex);
 
@@ -255,10 +237,19 @@ double sampler_gennext(void *self)
 void sampler_status(void *self, char *status_string)
 {
     SAMPLER *sampler = self;
-    snprintf(status_string, 119,
-             COOL_COLOR_GREEN "[%s]\tvol: %.2lf" ANSI_COLOR_RESET,
-             basename(sampler->samples[sampler->current_sample]->filename),
+    snprintf(status_string, MAX_PS_STRING_SZ, COOL_COLOR_GREEN
+             "[LOOPER] Num Samples: %d Current Sample: %d vol: %.2lf",
+             sampler->num_samples, sampler->cur_sample,
              sampler->vol);
+    int strlen_left = MAX_PS_STRING_SZ - strlen(status_string);
+    char looper_details[strlen_left];
+    for (int i = 0; i < sampler->num_samples; i++) {
+        snprintf(looper_details, 128, "\n               [%d] %s - loop_len: %d numloops: %d",
+                 i, basename(sampler->samples[i]->filename),
+                 sampler->samples[i]->loop_len, sampler->sample_num_loops[i]);
+        strncat(status_string, looper_details, strlen_left);
+    }
+    strcat(status_string, ANSI_COLOR_RESET);
 }
 
 double sampler_getvol(void *self)

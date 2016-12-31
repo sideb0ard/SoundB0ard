@@ -214,10 +214,21 @@ void interpret(char *line)
                         }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (strncmp("loop_len", wurds[3], 8) == 0) {
-                            SAMPLER *s =
-                                (SAMPLER *)mixr->sound_generators[soundgen_num];
-                            sampler_change_loop_len(s, atoi(wurds[4]));
+                        SAMPLER *s =
+                            (SAMPLER *)mixr->sound_generators[soundgen_num];
+                        int sample_num = atoi(wurds[3]);
+                        if (is_valid_sample_num(s, sample_num)) {
+                            if (strncmp("loop_len", wurds[4], 8) == 0) {
+                                int loop_len = atoi(wurds[5]);
+                                sampler_change_loop_len(s, sample_num, loop_len);
+                            }
+                            else if (strncmp("numloops", wurds[4], 8) == 0) {
+                                int num_loops = atoi(wurds[5]);
+                                if (num_loops != 0) {
+                                    s->sample_num_loops[sample_num] =
+                                        num_loops;
+                                }
+                            }
                         }
                     }
                 }
@@ -573,6 +584,14 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
 bool is_valid_soundgen_num(int soundgen_num)
 {
     if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num) {
+        return true;
+    }
+    return false;
+}
+
+bool is_valid_sample_num(SAMPLER *s, int sample_num)
+{
+    if ( sample_num < s->num_samples) {
         return true;
     }
     return false;

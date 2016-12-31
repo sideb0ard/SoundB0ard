@@ -5,6 +5,9 @@
 #include <pthread.h>
 #include <stdbool.h>
 
+// TODO use this more - at the moment just for the int array
+#define MAX_SAMPLES_PER_LOOPER 10
+
 typedef struct file_sample {
     char *filename;
     int *orig_file_bytes;
@@ -18,17 +21,19 @@ typedef struct file_sample {
     int samplerate;
     int channels;
 
-    double loop_len;
+    int loop_len;
 } file_sample;
 
 typedef struct t_sampler {
     SOUNDGEN sound_generator;
 
-    file_sample **samples;
-    int samples_array_size;
-    int samples_num_entries;
-
-    int current_sample;
+    file_sample *samples[MAX_SAMPLES_PER_LOOPER];
+    int sample_num_loops[MAX_SAMPLES_PER_LOOPER];
+    int num_samples;
+    int cur_sample;
+    int cur_sample_iteration;
+    bool multi_sample_mode;
+    bool multi_sample_loop_countdown_started;
 
     pthread_mutex_t resample_mutex;
 
@@ -41,7 +46,7 @@ typedef struct t_sampler {
 SAMPLER *new_sampler(char *filename, double loop_len); // loop_len in bars
 void sampler_add_sample(SAMPLER *s, char *filename, int loop_len);
 void sampler_resample_to_loop_size(SAMPLER *s);
-void sampler_change_loop_len(SAMPLER *s, int loop_len);
+void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len);
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double sampler_gennext(void *self);
 

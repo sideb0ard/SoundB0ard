@@ -10,6 +10,8 @@
 #include "sound_generator.h"
 #include "table.h"
 
+#define MAX_PS_STRING_SZ 512 // arbitrary
+
 #define ENVIRONMENT_ARRAY_SIZE 128
 #define ENVIRONMENT_KEY_SIZE 128
 
