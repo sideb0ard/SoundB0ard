@@ -4,7 +4,10 @@
 
 typedef struct nanosynth nanosynth;
 
-typedef enum { NOTEON, NOTEOFF, PITCHBEND, CONTROL } midi_event_type;
+// unused?
+// typedef enum { NOTEON, NOTEOFF, PITCHBEND, CONTROL } midi_event_type;
+
+typedef enum { OCTAVE_CHANGE } custom_event_type;
 
 typedef struct midi_event {
     unsigned tick;

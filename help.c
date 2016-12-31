@@ -76,14 +76,21 @@ void print_help()
     //                         " -- start new Korg Synth\n");
     // printf(ANSI_COLOR_WHITE "syn poly" ANSI_COLOR_CYAN
     //                         " -- start new Poly Synth\n");
+    printf(ANSI_COLOR_WHITE "syn <soundgen_num> add melody" ANSI_COLOR_CYAN
+                            " -- add new blank melody loop to synth\n");
+    printf(ANSI_COLOR_WHITE
+           "syn <soundgen_num> change <parameter> <val>\n" ANSI_COLOR_CYAN
+           " -- e.g syn 0 change multimode <true|false>\n");
     printf(ANSI_COLOR_WHITE "syn <soundgen_num> keys" ANSI_COLOR_CYAN
                             " -- control synth via keyboard\n");
     printf(ANSI_COLOR_WHITE "syn <soundgen_num> midi" ANSI_COLOR_CYAN
                             " -- control synth via midi controller\n");
-    printf(ANSI_COLOR_WHITE "syn <soundgen_num> change <parameter> <val>\n");
     printf(ANSI_COLOR_WHITE "syn <soundgen_num> reset" ANSI_COLOR_CYAN
                             " -- clear pattern data\n");
     printf(ANSI_COLOR_WHITE "syn <soundgen_num> sustain <val>\n");
+    printf(ANSI_COLOR_WHITE
+           "syn <soundgen_num> switch <melody_num>" ANSI_COLOR_CYAN
+           " -- switch currently playing melody loop to <melody_num>\n");
 
     /////////////////////////////////////////////////////////////////////
     printf("\n" COOL_COLOR_GREEN "[FX Cmds]\n");

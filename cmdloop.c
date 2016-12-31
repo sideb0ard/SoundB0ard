@@ -231,7 +231,6 @@ void interpret(char *line)
 
         // SYNTHESIZER COMMANDS
         else if (strncmp("syn", wurds[0], 3) == 0) {
-            printf("Synthesizing ...\n");
             if (strncmp("nano", wurds[1], 4) == 0) {
                 add_nanosynth(mixr);
             }
@@ -243,13 +242,28 @@ void interpret(char *line)
                     nanosynth *ns =
                         (nanosynth *)mixr->sound_generators[soundgen_num];
                     if (strncmp("add", wurds[2], 4) == 0) {
-                        printf("Adding!\n");
                         if (strncmp("melody", wurds[3], 6) == 0) {
-                            printf("Melodu!!\n");
                             nanosynth_add_melody(ns);
                         }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
+                        if (strncmp("melodymode", wurds[3], 10) == 0) {
+                            if (strncmp("true", wurds[4], 4) == 0) {
+                                nanosynth_set_multi_melody_mode(ns, true);
+                            }
+                            else if (strncmp("false", wurds[4], 5) == 0) {
+                                nanosynth_set_multi_melody_mode(ns, false);
+                            }
+                        }
+                        else if (strncmp("numloops", wurds[3], 8) == 0) {
+                            int melody_num = atoi(wurds[4]);
+                            int num_loops = atoi(wurds[5]);
+                            if (melody_num < ns->num_melodies &&
+                                num_loops != 0) {
+                                ns->melody_multiloop_count[melody_num] =
+                                    num_loops;
+                            }
+                        }
                         // change
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0) {

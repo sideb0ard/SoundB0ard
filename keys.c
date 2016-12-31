@@ -156,17 +156,20 @@ void *play_melody_loop(void *p)
         pthread_mutex_unlock(&midi_tick_lock);
 
         int idx = mixr->tick % PPNS;
-        // if (ns->mloop[idx] != 0) {
-        //     note_on(ns, ns->mloop[idx]);
-        //     last_midi_num_played = ns->mloop[idx];
-        //     note_played_time = 1;
-        // }
 
-        // if (ns->midi_events_loop[idx] != NULL) {
+        if (idx == 0) {
+            if (ns->multi_melody_mode) {
+                ns->cur_melody_iteration--;
+                if (ns->cur_melody_iteration == 0) {
+                    ns->cur_melody = (ns->cur_melody + 1) % ns->num_melodies;
+                    ns->cur_melody_iteration =
+                        ns->melody_multiloop_count[ns->cur_melody];
+                }
+            }
+        }
+
         if (ns->melodies[ns->cur_melody][idx] != NULL) {
-            // midi_event *ev = ns->midi_events_loop[idx];
             midi_event *ev = ns->melodies[ns->cur_melody][idx];
-            // print_midi_event_rec(ev);
             switch (ev->event_type) {
             case (144): {
                 midinoteon(ns, ev->data1, ev->data2);
