@@ -13,6 +13,46 @@
 
 extern mixer *mixr;
 
+DRUM *new_drumr(char *filename)
+{
+    DRUM *drumr = calloc(1, sizeof(DRUM));
+
+    SF_INFO sf_info;
+    memset(&sf_info, 0, sizeof(SF_INFO));
+    int bufsize;
+    int *buffer = load_file_to_buffer(filename, &bufsize, &sf_info);
+
+    int fslen = strlen(filename);
+    drumr->filename = calloc(1, fslen + 1);
+    strncpy(drumr->filename, filename, fslen);
+
+    memset(drumr->matrix1, 0, sizeof drumr->matrix1);
+    memset(drumr->matrix2, 0, sizeof drumr->matrix2);
+
+    drumr->buffer = buffer;
+    drumr->bufsize = bufsize;
+    drumr->samplerate = sf_info.samplerate;
+    drumr->channels = sf_info.channels;
+    drumr->started = false;
+    drumr->vol = 0.7;
+
+    drumr->tickedyet = false;
+    for (int i = 0; i < NUM_DRUM_PATTERNS; i++) {
+        for (int j = 0; j < DRUM_PATTERN_LEN; j++) {
+            drumr->pattern_position_amp[i][j] = DEFAULT_AMP;
+        }
+    }
+
+    drumr->sound_generator.gennext = &drum_gennext;
+    drumr->sound_generator.status = &drum_status;
+    drumr->sound_generator.getvol = &drum_getvol;
+    drumr->sound_generator.setvol = &drum_setvol;
+    drumr->sound_generator.type = DRUM_TYPE;
+
+    // TODO: do i need to free pattern ?
+    return drumr;
+}
+
 void int_pattern_to_array(int pattern, int *pat_array)
 {
     for (int i = 0, p = 1; p < 65535; i++, p *= 2) {
@@ -90,41 +130,6 @@ DRUM *new_drumr_from_char_pattern(char *filename, char *pattern)
 {
     DRUM *drumr = new_drumr(filename);
     pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
-    return drumr;
-}
-
-DRUM *new_drumr(char *filename)
-{
-    DRUM *drumr = calloc(1, sizeof(DRUM));
-
-    SF_INFO sf_info;
-    memset(&sf_info, 0, sizeof(SF_INFO));
-    int bufsize;
-    int *buffer = load_file_to_buffer(filename, &bufsize, &sf_info);
-
-    int fslen = strlen(filename);
-    drumr->filename = calloc(1, fslen + 1);
-    strncpy(drumr->filename, filename, fslen);
-
-    memset(drumr->matrix1, 0, sizeof drumr->matrix1);
-    memset(drumr->matrix2, 0, sizeof drumr->matrix2);
-
-    drumr->buffer = buffer;
-    drumr->bufsize = bufsize;
-    drumr->samplerate = sf_info.samplerate;
-    drumr->channels = sf_info.channels;
-    drumr->started = false;
-    drumr->vol = 0.7;
-
-    drumr->tickedyet = false;
-
-    drumr->sound_generator.gennext = &drum_gennext;
-    drumr->sound_generator.status = &drum_status;
-    drumr->sound_generator.getvol = &drum_getvol;
-    drumr->sound_generator.setvol = &drum_setvol;
-    drumr->sound_generator.type = DRUM_TYPE;
-
-    // TODO: do i need to free pattern ?
     return drumr;
 }
 
@@ -307,7 +312,8 @@ double drum_gennext(void *self)
             val +=
                 // drumr->buffer[drumr->sample_positions[i].position++] /
                 drumr->buffer[drumr->sample_positions[i].position] /
-                2147483648.0; // convert from 16bit in to double between 0 and 1
+                2147483648.0 // convert from 16bit in to double between 0 and 1
+                * drumr->pattern_position_amp[drumr->cur_pattern_num][i];
             drumr->sample_positions[i].position =
                 drumr->sample_positions[i].position + drumr->channels;
             if ((int)drumr->sample_positions[i].position ==
@@ -354,12 +360,27 @@ void drum_status(void *self, char *status_string)
              basename(drumr->filename), drumr->vol, drumr->game_of_life_on);
     char pattern_details[128];
     char spattern[17];
+    char apattern[17];
     for (int i = 0; i < drumr->num_patterns; i++) {
         char_binary_version_of_int(drumr->patterns[i], spattern);
-        snprintf(pattern_details, 127, "\n                    [%d] - [%s]", i, spattern);
+        char_version_of_amp(drumr, i, apattern);
+        snprintf(pattern_details, 127, "\n                    [%d] - [%s][%s]",
+                 i, spattern, apattern);
         strcat(status_string, pattern_details);
     }
     strcat(status_string, ANSI_COLOR_RESET);
+}
+
+// TODO - fix this - being lazy and want it finished NOW!
+void char_version_of_amp(DRUM *d, int pattern_num, char apattern[17])
+{
+    for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
+        if (d->pattern_position_amp[pattern_num][i] == DEFAULT_AMP)
+            apattern[i] = 'n';
+        else
+            apattern[i] = '1';
+    }
+    apattern[16] = '\0';
 }
 
 double drum_getvol(void *self)
@@ -391,30 +412,24 @@ void swingrrr(void *self, int swing_setting)
     }
 }
 
-void add_char_pattern(void *self, char *pattern)
+void add_char_pattern(DRUM *d, char *pattern)
 {
-    DRUM *drumr = self;
-    pattern_char_to_int(pattern, &drumr->patterns[drumr->num_patterns++]);
+    pattern_char_to_int(pattern, &d->patterns[d->num_patterns++]);
 }
 
-void change_char_pattern(void *self, char *pattern)
+void change_char_pattern(DRUM *d, int pattern_num, char *pattern)
 {
-    DRUM *drumr = self;
-    // note to self - not sure how to handle changing when we have multiple
-    // patterns - for the moment i'm just changing the current one
-    pattern_char_to_int(pattern, &drumr->patterns[drumr->cur_pattern_num]);
+    pattern_char_to_int(pattern, &d->patterns[pattern_num]);
 }
 
-void add_int_pattern(void *self, int pattern)
+void add_int_pattern(DRUM *d, int pattern)
 {
-    DRUM *drumr = self;
-    drumr->patterns[drumr->num_patterns++] = pattern;
+    d->patterns[d->num_patterns++] = pattern;
 }
 
-void change_int_pattern(void *self, int pattern)
+void change_int_pattern(DRUM *d, int pattern_num, int pattern)
 {
-    DRUM *drumr = self;
-    drumr->patterns[drumr->cur_pattern_num] = pattern;
+    d->patterns[pattern_num] = pattern;
 }
 
 int seed_pattern()
@@ -428,4 +443,32 @@ int seed_pattern()
         }
     }
     return pattern;
+}
+
+void drum_set_sample_amp(DRUM *d, int pattern_num, int pattern_position,
+                         double v)
+{
+    d->pattern_position_amp[pattern_num][pattern_position] = v;
+}
+
+void drum_set_sample_amp_from_char_pattern(DRUM *d, int pattern_num,
+                                           char *amp_pattern)
+{
+    printf("Ooh, setting amps to %s\n", amp_pattern);
+
+    int sp_count = 0;
+    char *sp, *sp_last, *spattern[32];
+    char *sep = " ";
+
+    printf("CHARPATT %s\n", amp_pattern);
+    // extract numbers from string into spattern
+    for (sp = strtok_r(amp_pattern, sep, &sp_last); sp;
+         sp = strtok_r(NULL, sep, &sp_last)) {
+        spattern[sp_count++] = sp;
+    }
+
+    for (int i = 0; i < sp_count; i++) {
+        printf("[%d] -- %s\n", i, spattern[i]);
+        drum_set_sample_amp(d, pattern_num, atof(spattern[i]), 1);
+    }
 }

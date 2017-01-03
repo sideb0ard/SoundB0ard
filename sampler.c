@@ -249,9 +249,8 @@ void sampler_status(void *self, char *status_string)
     int strlen_left = MAX_PS_STRING_SZ - strlen(status_string);
     char looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {
-        snprintf(looper_details, 128,
-                 "\n\t[%d] %s - loop_len: %d numloops: %d", i,
-                 basename(sampler->samples[i]->filename),
+        snprintf(looper_details, 128, "\n\t[%d] %s - loop_len: %d numloops: %d",
+                 i, basename(sampler->samples[i]->filename),
                  sampler->samples[i]->loop_len, sampler->sample_num_loops[i]);
         strncat(status_string, looper_details, strlen_left);
     }

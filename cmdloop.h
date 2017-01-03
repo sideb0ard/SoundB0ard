@@ -1,4 +1,5 @@
 #pragma once
+#include "drumr.h"
 #include "nanosynth.h"
 #include "sampler.h"
 #include <stdbool.h>
@@ -18,5 +19,6 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
 bool is_valid_soundgen_num(int soundgen_num);
 bool is_valid_sample_num(SAMPLER *s, int sample_num);
 bool is_valid_melody_num(nanosynth *ns, int melody_num);
+bool is_valid_drum_pattern_num(DRUM *d, int pattern_num);
 bool is_valid_fx_num(int soundgen_num, int fx_num);
 bool is_valid_file(char *filename);

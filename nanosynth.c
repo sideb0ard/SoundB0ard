@@ -320,7 +320,7 @@ void nanosynth_status(void *self, char *status_string)
              "vol: %.2f num melodies: %d, cur_melody: %d" ANSI_COLOR_RESET,
              ns->osc1->m_fo, ns->sustain, ns->vol, ns->num_melodies,
              ns->cur_melody);
-    //nanosynth_print_melody(ns, );
+    // nanosynth_print_melody(ns, );
 }
 
 void note_on(nanosynth *self, int midi_num)

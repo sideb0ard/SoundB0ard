@@ -125,40 +125,47 @@ void interpret(char *line)
 
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp("seq", wurds[0], 3) == 0) {
+
+            char *pattern = calloc(128, sizeof(char));
+
             if (is_valid_file(wurds[1])) {
-
-                char *pattern = calloc(128, sizeof(char));
-
                 char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
                 add_drum_char_pattern(mixr, wurds[1], pattern);
-
-                free(pattern);
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type == DRUM_TYPE) {
 
-                    char *pattern = calloc(128, sizeof(char));
-                    char_array_to_seq_string_pattern(pattern, wurds, 3,
-                                                     num_wurds);
+                    DRUM *d = (DRUM *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 3) == 0) {
                         printf("Adding\n");
-                        add_char_pattern(mixr->sound_generators[soundgen_num],
-                                         pattern);
+                        char_array_to_seq_string_pattern(pattern, wurds, 3,
+                                                         num_wurds);
+                        add_char_pattern(d, pattern);
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
+                        char_array_to_seq_string_pattern(pattern, wurds, 5,
+                                                         num_wurds);
                         printf("Changing\n");
-                        change_char_pattern(
-                            mixr->sound_generators[soundgen_num], pattern);
+                        int pattern_num = atoi(wurds[3]);
+                        if (is_valid_drum_pattern_num(d, pattern_num)) {
+                            if (strncmp("pattern", wurds[4], 7) == 0) {
+                                printf("Changing pattern to %s\n", pattern);
+                                change_char_pattern(d, pattern_num, pattern);
+                            }
+                            else if (strncmp("amp", wurds[4], 3) == 0) {
+                                printf("Setting pattern AMP to %s\n", pattern);
+                                drum_set_sample_amp_from_char_pattern(
+                                    d, pattern_num, pattern);
+                            }
+                        }
                     }
                     else if (strncmp("euclid", wurds[2], 6) == 0) {
                         // https://en.wikipedia.org/wiki/Euclidean_rhythm
                         int num_beats = atoi(wurds[3]);
                         if (num_beats <= 0) {
-                            // TODO - make debug - printf("Need a number of
-                            // beats\n");
                             return;
                         }
                         int euclidean_pattern = create_euclidean_rhythm(
@@ -168,13 +175,11 @@ void interpret(char *line)
                         if (start_at_zero)
                             euclidean_pattern = shift_bits_to_leftmost_position(
                                 euclidean_pattern, DRUM_PATTERN_LEN);
-                        // TODO - this could be an add or a change
-                        change_int_pattern(mixr->sound_generators[soundgen_num],
+                        change_int_pattern(d, d->cur_pattern_num,
                                            euclidean_pattern);
                     }
                     else if (strncmp("life", wurds[2], 4) == 0) {
                         printf("Toggling game of life for %d\n", soundgen_num);
-                        DRUM *d = (DRUM *)mixr->sound_generators[soundgen_num];
                         d->game_of_life_on = 1 - d->game_of_life_on;
                     }
                     else if (strncmp("swing", wurds[2], 5) == 0) {
@@ -182,10 +187,9 @@ void interpret(char *line)
                         swingrrr(mixr->sound_generators[soundgen_num],
                                  swing_setting);
                     }
-
-                    free(pattern);
                 }
             }
+            free(pattern);
         }
 
         // SAMPLE LOOPER COMMANDS
@@ -609,6 +613,14 @@ bool is_valid_soundgen_num(int soundgen_num)
 bool is_valid_sample_num(SAMPLER *s, int sample_num)
 {
     if (sample_num < s->num_samples) {
+        return true;
+    }
+    return false;
+}
+
+bool is_valid_drum_pattern_num(DRUM *d, int pattern_num)
+{
+    if (pattern_num < d->num_patterns) {
         return true;
     }
     return false;

@@ -7,6 +7,8 @@
 
 #define GRIDWIDTH (DRUM_PATTERN_LEN / 4)
 #define INTEGER_LENGTH pow(2, DRUM_PATTERN_LEN)
+#define NUM_DRUM_PATTERNS 10
+#define DEFAULT_AMP 0.7
 
 typedef struct t_sample_pos {
     int position;
@@ -28,7 +30,8 @@ typedef struct t_drumr {
     int bufsize;
     int buf_num_channels;
 
-    int patterns[10];
+    int patterns[NUM_DRUM_PATTERNS];
+    double pattern_position_amp[NUM_DRUM_PATTERNS][DRUM_PATTERN_LEN];
     int num_patterns;
     int cur_pattern_num;
 
@@ -50,15 +53,20 @@ DRUM *new_drumr_from_char_array(char *filename, char **pattern, int nsteps);
 // void drum_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void drum_status(void *self, char *ss);
 void drum_setvol(void *self, double v);
+void drum_set_sample_amp(DRUM *self, int pattern_num, int pattern_position,
+                         double v);
+void drum_set_sample_amp_from_char_pattern(DRUM *self, int pattern_num,
+                                           char *amp_pattern);
 // void update_pattern(void *self, int newpattern);
-void add_char_pattern(void *self, char *pattern);
-void change_char_pattern(void *self, char *pattern);
-void add_int_pattern(void *self, int pattern);
-void change_int_pattern(void *self, int pattern);
+void add_char_pattern(DRUM *d, char *pattern);
+void change_char_pattern(DRUM *d, int pattern_num, char *pattern);
+void add_int_pattern(DRUM *d, int pattern);
+void change_int_pattern(DRUM *d, int pattern_num, int pattern);
 void swingrrr(void *self, int swing_setting);
 
 void int_pattern_to_array(int pattern, int *pat_array);
 void pattern_char_to_int(char *chpattern, int *pattern);
+void char_version_of_amp(DRUM *d, int pattern_num, char apattern[49]);
 
 // game of life functionality
 int seed_pattern(void);
