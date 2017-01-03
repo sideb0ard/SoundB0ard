@@ -57,6 +57,7 @@ void drum_set_sample_amp(DRUM *self, int pattern_num, int pattern_position,
                          double v);
 void drum_set_sample_amp_from_char_pattern(DRUM *self, int pattern_num,
                                            char *amp_pattern);
+void drum_set_random_sample_amp(DRUM *d, int pattern_num);
 // void update_pattern(void *self, int newpattern);
 void add_char_pattern(DRUM *d, char *pattern);
 void change_char_pattern(DRUM *d, int pattern_num, char *pattern);

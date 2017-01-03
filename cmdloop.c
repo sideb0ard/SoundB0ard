@@ -145,6 +145,12 @@ void interpret(char *line)
                                                          num_wurds);
                         add_char_pattern(d, pattern);
                     }
+                    else if (strncmp("randamp", wurds[2], 6) == 0) {
+                        int pattern_num = atoi(wurds[3]);
+                        if (is_valid_drum_pattern_num(d, pattern_num)) {
+                            drum_set_random_sample_amp(d, pattern_num);
+                        }
+                    }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         char_array_to_seq_string_pattern(pattern, wurds, 5,
                                                          num_wurds);

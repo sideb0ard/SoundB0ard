@@ -451,6 +451,16 @@ void drum_set_sample_amp(DRUM *d, int pattern_num, int pattern_position,
     d->pattern_position_amp[pattern_num][pattern_position] = v;
 }
 
+void drum_set_random_sample_amp(DRUM *d, int pattern_num)
+{
+    for (int i = 0; i < DRUM_PATTERN_LEN; i++)
+    {
+        double randy = (double)rand()/(double)RAND_MAX;
+        printf("Setting random to %f\n", randy);
+        drum_set_sample_amp(d, pattern_num, i, randy);
+    }
+}
+
 void drum_set_sample_amp_from_char_pattern(DRUM *d, int pattern_num,
                                            char *amp_pattern)
 {
