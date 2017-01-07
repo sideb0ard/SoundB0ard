@@ -49,6 +49,7 @@ void sampler_set_multi_sample_mode(SAMPLER *s, bool multimode);
 void sampler_switch_sample(SAMPLER *s, int sample_num);
 void sampler_resample_to_loop_size(SAMPLER *s);
 void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len);
+void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops);
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double sampler_gennext(void *self);
 

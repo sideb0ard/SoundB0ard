@@ -32,6 +32,64 @@ SAMPLER *new_sampler(char *filename, double loop_len)
     return sampler;
 }
 
+double sampler_gennext(void *self)
+// void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer)
+{
+    SAMPLER *sampler = self;
+    double val = 0;
+
+    // wait till start of loop to keep patterns synched
+    if (!sampler->started) {
+        if (mixr->sixteenth_note_tick % 16 == 0) {
+            printf("Starting SAMPLE LOOP! 16th %d tick: %d\n",
+                   mixr->sixteenth_note_tick, mixr->tick);
+            sampler->started = true;
+        }
+        else {
+            return val;
+        }
+    }
+
+    // resync after a resample/resize
+    if (sampler->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
+        printf("Resyncing after resample...zzzz\n");
+        sampler->samples[sampler->cur_sample]->position = 0;
+        sampler->just_been_resampled = false;
+    }
+
+    if (sampler->samples[sampler->cur_sample]->position == 0) {
+
+        if (sampler->multi_sample_mode) {
+            sampler->cur_sample_iteration--;
+            if (sampler->cur_sample_iteration == 0) {
+                sampler->cur_sample =
+                    (sampler->cur_sample + 1) % sampler->num_samples;
+                sampler->cur_sample_iteration =
+                    sampler->sample_num_loops[sampler->cur_sample];
+            }
+        }
+    }
+
+    val = sampler->samples[sampler->cur_sample]->resampled_file_bytes
+              [sampler->samples[sampler->cur_sample]->position++];
+
+    if (sampler->samples[sampler->cur_sample]->position ==
+        sampler->samples[sampler->cur_sample]->resampled_file_size) {
+        sampler->samples[sampler->cur_sample]->position = 0;
+        // sampler->cur_sample =
+        //    (sampler->cur_sample + 1) % sampler->num_samples;
+    }
+    // pthread_mutex_unlock(&sampler->resample_mutex);
+
+    if (val > 1 || val < -1)
+        printf("BURNIE - SAMPLER OVERLOAD!\n");
+
+    val = effector(&sampler->sound_generator, val);
+    val = envelopor(&sampler->sound_generator, val);
+
+    return val * sampler->vol;
+}
+
 void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
 {
     printf("SAMPLER!, adding a new SAMPLE!\n");
@@ -111,7 +169,7 @@ void sampler_resample_to_loop_size(SAMPLER *s)
 
 void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len)
 {
-    if (loop_len > 0) {
+    if (loop_len > 0 && sample_num < s->num_samples) {
         file_sample *fs = s->samples[sample_num];
         fs->loop_len = loop_len;
         sample_resample_to_loop_size(fs);
@@ -180,64 +238,6 @@ void sample_resample_to_loop_size(file_sample *fs)
     // pthread_mutex_unlock(&sampler->resample_mutex);
 }
 
-double sampler_gennext(void *self)
-// void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer)
-{
-    SAMPLER *sampler = self;
-    double val = 0;
-
-    // wait till start of loop to keep patterns synched
-    if (!sampler->started) {
-        if (mixr->sixteenth_note_tick % 16 == 0) {
-            printf("Starting SAMPLE LOOP! 16th %d tick: %d\n",
-                   mixr->sixteenth_note_tick, mixr->tick);
-            sampler->started = true;
-        }
-        else {
-            return val;
-        }
-    }
-
-    // resync after a resample/resize
-    if (sampler->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
-        printf("Resyncing after resample...zzzz\n");
-        sampler->samples[sampler->cur_sample]->position = 0;
-        sampler->just_been_resampled = false;
-    }
-
-    if (sampler->samples[sampler->cur_sample]->position == 0) {
-
-        if (sampler->multi_sample_mode) {
-            sampler->cur_sample_iteration--;
-            if (sampler->cur_sample_iteration == 0) {
-                sampler->cur_sample =
-                    (sampler->cur_sample + 1) % sampler->num_samples;
-                sampler->cur_sample_iteration =
-                    sampler->sample_num_loops[sampler->cur_sample];
-            }
-        }
-    }
-
-    val = sampler->samples[sampler->cur_sample]->resampled_file_bytes
-              [sampler->samples[sampler->cur_sample]->position++];
-
-    if (sampler->samples[sampler->cur_sample]->position ==
-        sampler->samples[sampler->cur_sample]->resampled_file_size) {
-        sampler->samples[sampler->cur_sample]->position = 0;
-        // sampler->cur_sample =
-        //    (sampler->cur_sample + 1) % sampler->num_samples;
-    }
-    // pthread_mutex_unlock(&sampler->resample_mutex);
-
-    if (val > 1 || val < -1)
-        printf("BURNIE - SAMPLER OVERLOAD!\n");
-
-    val = effector(&sampler->sound_generator, val);
-    val = envelopor(&sampler->sound_generator, val);
-
-    return val * sampler->vol;
-}
-
 void sampler_status(void *self, char *status_string)
 {
     SAMPLER *sampler = self;
@@ -282,4 +282,11 @@ void sampler_setvol(void *self, double v)
         return;
     }
     sampler->vol = v;
+}
+
+void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops)
+{
+    if (sample_num < s->num_samples && num_loops > 0) {
+        s->sample_num_loops[sample_num] = num_loops;
+    }
 }

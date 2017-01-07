@@ -36,7 +36,7 @@ typedef struct {
     double rate, cnt;
     long m;
     effect_type type;
-
+    void (*status)(void *self, char *string);
 } EFFECT;
 
 EFFECT *new_beatrepeat(int looplen);

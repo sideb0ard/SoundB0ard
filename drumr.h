@@ -32,8 +32,11 @@ typedef struct t_drumr {
 
     int patterns[NUM_DRUM_PATTERNS];
     double pattern_position_amp[NUM_DRUM_PATTERNS][DRUM_PATTERN_LEN];
+    int pattern_num_loops[NUM_DRUM_PATTERNS];
     int num_patterns;
-    int cur_pattern_num;
+    int cur_pattern;
+    int cur_pattern_iteration;
+    bool multi_pattern_mode;
 
     int tick;
     bool tickedyet;
@@ -64,6 +67,9 @@ void change_char_pattern(DRUM *d, int pattern_num, char *pattern);
 void add_int_pattern(DRUM *d, int pattern);
 void change_int_pattern(DRUM *d, int pattern_num, int pattern);
 void swingrrr(void *self, int swing_setting);
+
+void drumr_set_multi_pattern_mode(DRUM *d, bool multimode);
+void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops);
 
 void int_pattern_to_array(int pattern, int *pat_array);
 void pattern_char_to_int(char *chpattern, int *pattern);

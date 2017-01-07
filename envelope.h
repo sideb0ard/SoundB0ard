@@ -16,6 +16,7 @@ typedef struct envelope_stream {
     double height;
     int started;
     unsigned long ileft, iright;
+    void (*status)(void *self, char *string);
 } ENVSTREAM;
 
 ENVSTREAM *new_envelope_stream(int env_len, int type); // env_len is bars

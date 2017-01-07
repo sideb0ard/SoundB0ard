@@ -53,8 +53,10 @@ void print_help()
                             " e.g. \"seq kick2.wav 0 4 8 12\"\n");
     printf(ANSI_COLOR_WHITE "seq <soundgen_num> add <pattern>" ANSI_COLOR_CYAN
                             " e.g. seq 0 add 4 6 10 12\n");
-    printf(ANSI_COLOR_WHITE "seq <soundgen_num> change <pattern_num> pattern <pattern>\n");
-    printf(ANSI_COLOR_WHITE "seq <soundgen_num> change <pattern_num> amp <amp_pattern>\n");
+    printf(ANSI_COLOR_WHITE
+           "seq <soundgen_num> change <pattern_num> pattern <pattern>\n");
+    printf(ANSI_COLOR_WHITE
+           "seq <soundgen_num> change <pattern_num> amp <amp_pattern>\n");
     printf(ANSI_COLOR_WHITE "seq <soundgen_num> randamp <pattern_num>\n");
     printf(ANSI_COLOR_WHITE
            "seq <soundgen_num> euclid <num_hits> [true]" ANSI_COLOR_CYAN

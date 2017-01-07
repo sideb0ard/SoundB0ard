@@ -155,16 +155,37 @@ void interpret(char *line)
                         char_array_to_seq_string_pattern(pattern, wurds, 5,
                                                          num_wurds);
                         printf("Changing\n");
-                        int pattern_num = atoi(wurds[3]);
-                        if (is_valid_drum_pattern_num(d, pattern_num)) {
-                            if (strncmp("pattern", wurds[4], 7) == 0) {
-                                printf("Changing pattern to %s\n", pattern);
-                                change_char_pattern(d, pattern_num, pattern);
+
+                        if (strncmp("multimode", wurds[3], 10) == 0) {
+                            if (strncmp("true", wurds[4], 4) == 0) {
+                                drumr_set_multi_pattern_mode(d, true);
                             }
-                            else if (strncmp("amp", wurds[4], 3) == 0) {
-                                printf("Setting pattern AMP to %s\n", pattern);
-                                drum_set_sample_amp_from_char_pattern(
-                                    d, pattern_num, pattern);
+                            else if (strncmp("false", wurds[4], 5) == 0) {
+                                drumr_set_multi_pattern_mode(d, false);
+                            }
+                        }
+                        else {
+                            int pattern_num = atoi(wurds[3]);
+                            if (is_valid_drum_pattern_num(d, pattern_num)) {
+                                if (strncmp("pattern", wurds[4], 7) == 0) {
+                                    printf("Changing pattern to %s\n", pattern);
+                                    change_char_pattern(d, pattern_num,
+                                                        pattern);
+                                }
+                                else if (strncmp("amp", wurds[4], 3) == 0) {
+                                    printf("Setting pattern AMP to %s\n",
+                                           pattern);
+                                    drum_set_sample_amp_from_char_pattern(
+                                        d, pattern_num, pattern);
+                                }
+                                else if (strncmp("numloops", wurds[4], 8) ==
+                                         0) {
+                                    int num_loops = atoi(wurds[5]);
+                                    if (num_loops != 0) {
+                                        drumr_change_num_loops(d, pattern_num,
+                                                               num_loops);
+                                    }
+                                }
                             }
                         }
                     }
@@ -181,7 +202,7 @@ void interpret(char *line)
                         if (start_at_zero)
                             euclidean_pattern = shift_bits_to_leftmost_position(
                                 euclidean_pattern, DRUM_PATTERN_LEN);
-                        change_int_pattern(d, d->cur_pattern_num,
+                        change_int_pattern(d, d->cur_pattern,
                                            euclidean_pattern);
                     }
                     else if (strncmp("life", wurds[2], 4) == 0) {
@@ -244,8 +265,8 @@ void interpret(char *line)
                                          0) {
                                     int num_loops = atoi(wurds[5]);
                                     if (num_loops != 0) {
-                                        s->sample_num_loops[sample_num] =
-                                            num_loops;
+                                        sampler_change_num_loops(s, sample_num,
+                                                                 num_loops);
                                     }
                                 }
                             }
@@ -447,7 +468,7 @@ void interpret(char *line)
                 //    DRUM *d = (DRUM *)
                 //    mixr->sound_generators[input_src]->type;
                 //    int pat_array[DRUM_PATTERN_LEN];
-                //    int_pattern_to_array(d->patterns[d->cur_pattern_num],
+                //    int_pattern_to_array(d->patterns[d->cur_pattern],
                 //                         pat_array);
                 //    for (int i = 0; i < DRUM_PATTERN_LEN; i++)
                 //    {

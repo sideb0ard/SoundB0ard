@@ -67,7 +67,23 @@ void mixer_ps(mixer *mixr)
         char ss[MAX_PS_STRING_SZ];
         memset(ss, 0, MAX_PS_STRING_SZ);
         mixr->sound_generators[i]->status(mixr->sound_generators[i], ss);
-        printf("[%2d]  %s\n\n", i, ss);
+        printf("[%2d]  %s\n", i, ss);
+        if (mixr->sound_generators[i]->effects_num > 0 ||
+            mixr->sound_generators[i]->envelopes_num > 0) {
+            printf("      ");
+            printf(COOL_COLOR_YELLOW);
+            for (int j = 0; j < mixr->sound_generators[i]->effects_num; j++) {
+                printf("[effect]-");
+            }
+            printf(ANSI_COLOR_RESET);
+            printf(COOL_COLOR_GREEN);
+            for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
+                printf("[envelope]-");
+            }
+            printf(ANSI_COLOR_RESET);
+            printf(">[out]");
+        }
+        printf("\n\n");
     }
 
     printf(ANSI_COLOR_RESET);
