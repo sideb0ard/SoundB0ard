@@ -1,3 +1,4 @@
+#include <locale.h>
 #include <pthread.h>
 #include <regex.h>
 #include <stdio.h>
@@ -6,6 +7,7 @@
 #include <sys/stat.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <wchar.h>
 
 #include <readline/history.h>
 #include <readline/readline.h>
@@ -24,6 +26,7 @@
 #include "mixer.h"
 #include "nanosynth.h"
 #include "sampler.h"
+#include "sparkline.h"
 #include "table.h"
 #include "utils.h"
 
@@ -41,6 +44,8 @@ void print_prompt()
 
 void loopy(void)
 {
+    setlocale(LC_ALL, "");
+
     char *line;
     while ((line = readline(prompt)) != NULL) {
         if (line[0] != 0) {
@@ -123,6 +128,12 @@ void interpret(char *line)
             }
         }
 
+        //////  TEMP!
+        else if (strncmp("sparky", wurds[0], 3) == 0) {
+            char *pattern = calloc(128, sizeof(char));
+            char_array_to_string_sequence(pattern, wurds, 1, num_wurds);
+            sparky(pattern);
+        }
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp("seq", wurds[0], 3) == 0) {
 
@@ -610,6 +621,17 @@ int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)
     return num_wurds;
 }
 
+void char_array_to_string_sequence(char *dest_pattern,
+                                   char char_array[NUM_WURDS][SIZE_OF_WURD],
+                                   int start, int end)
+{
+    for (int i = start; i < end; i++) {
+        strcat(dest_pattern, char_array[i]);
+        if (i != (end - 1))
+            strcat(dest_pattern, " ");
+    }
+}
+
 void char_array_to_seq_string_pattern(char *dest_pattern,
                                       char char_array[NUM_WURDS][SIZE_OF_WURD],
                                       int start, int end)
@@ -621,11 +643,7 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
         // no-op
     }
     else {
-        for (int i = start; i < end; i++) {
-            strcat(dest_pattern, char_array[i]);
-            if (i != (end - 1))
-                strcat(dest_pattern, " ");
-        }
+        char_array_to_seq_string_pattern(dest_pattern, char_array, start, end);
     }
 }
 

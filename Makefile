@@ -41,6 +41,7 @@ SRC = \
       qblimited_oscillator.c \
       sampler.c \
       sbmsg.c \
+      sparkline.c \
       stereodelay.c \
       sound_generator.c \
       table.c \

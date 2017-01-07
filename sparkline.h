@@ -1,0 +1,1 @@
+void sparky(char *instr);
