@@ -43,6 +43,19 @@
 #define COOL_COLOR_PINK "\x1b[38;5;200m"
 #define COOL_COLOR_MAUVE "\x1b[38;5;135m"
 
+#define WANSI_COLOR_BLUE L"\x1b[34m"
+#define WANSI_COLOR_CYAN L"\x1b[36m"
+#define WANSI_COLOR_GREEN L"\x1b[32m"
+#define WANSI_COLOR_MAGENTA L"\x1b[35m"
+#define WANSI_COLOR_RED L"\x1b[31m"
+#define WANSI_COLOR_RESET L"\x1b[0m"
+#define WANSI_COLOR_WHITE L"\x1b[37m"
+#define WANSI_COLOR_YELLOW L"\x1b[33m"
+#define WCOOL_COLOR_GREEN L"\x1b[38;5;47m"
+#define WCOOL_COLOR_YELLOW L"\x1b[38;5;226m"
+#define WCOOL_COLOR_PINK L"\x1b[38;5;200m"
+#define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
+
 typedef enum { OFF, ON } onoff;
 
 typedef enum { UP, DOWN } direction;

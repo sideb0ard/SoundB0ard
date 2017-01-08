@@ -643,7 +643,12 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
         // no-op
     }
     else {
-        char_array_to_seq_string_pattern(dest_pattern, char_array, start, end);
+        for (int i = start; i < end; i++) {
+            strcat(dest_pattern, char_array[i]);
+            if (i != (end - 1))
+                strcat(dest_pattern, " ");
+        }
+        //char_array_to_seq_string_pattern(dest_pattern, char_array, start, end);
     }
 }
 
