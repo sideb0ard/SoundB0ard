@@ -2,6 +2,7 @@
 #define SOUNDGEN_H
 
 #include <stdbool.h>
+#include <wchar.h>
 
 #include "defjams.h"
 #include "effect.h"
@@ -10,7 +11,7 @@
 typedef struct t_soundgen {
     // void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);
     double (*gennext)(void *self);
-    void (*status)(void *self, char *string);
+    void (*status)(void *self, wchar_t *wstring);
     void (*setvol)(void *self, double val);
     double (*getvol)(void *self);
     sound_generator_type type;

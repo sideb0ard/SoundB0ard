@@ -191,10 +191,10 @@ void interpret(char *line)
                                 }
                                 else if (strncmp("numloops", wurds[4], 8) ==
                                          0) {
-                                    int num_loops = atoi(wurds[5]);
-                                    if (num_loops != 0) {
+                                    int numloops = atoi(wurds[5]);
+                                    if (numloops != 0) {
                                         drumr_change_num_loops(d, pattern_num,
-                                                               num_loops);
+                                                               numloops);
                                     }
                                 }
                             }
@@ -267,17 +267,17 @@ void interpret(char *line)
                         else {
                             int sample_num = atoi(wurds[3]);
                             if (is_valid_sample_num(s, sample_num)) {
-                                if (strncmp("loop_len", wurds[4], 8) == 0) {
-                                    int loop_len = atoi(wurds[5]);
+                                if (strncmp("looplen", wurds[4], 8) == 0) {
+                                    int looplen = atoi(wurds[5]);
                                     sampler_change_loop_len(s, sample_num,
-                                                            loop_len);
+                                                            looplen);
                                 }
                                 else if (strncmp("numloops", wurds[4], 8) ==
                                          0) {
-                                    int num_loops = atoi(wurds[5]);
-                                    if (num_loops != 0) {
+                                    int numloops = atoi(wurds[5]);
+                                    if (numloops != 0) {
                                         sampler_change_num_loops(s, sample_num,
-                                                                 num_loops);
+                                                                 numloops);
                                     }
                                 }
                             }
@@ -326,10 +326,10 @@ void interpret(char *line)
                             int melody_num = atoi(wurds[3]);
                             if (is_valid_melody_num(ns, melody_num)) {
                                 if (strncmp("numloops", wurds[3], 8) == 0) {
-                                    int num_loops = atoi(wurds[5]);
-                                    if (num_loops != 0) {
+                                    int numloops = atoi(wurds[5]);
+                                    if (numloops != 0) {
                                         nanosynth_set_melody_loop_num(
-                                            ns, melody_num, num_loops);
+                                            ns, melody_num, numloops);
                                     }
                                 }
                             }
@@ -648,7 +648,8 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
             if (i != (end - 1))
                 strcat(dest_pattern, " ");
         }
-        //char_array_to_seq_string_pattern(dest_pattern, char_array, start, end);
+        // char_array_to_seq_string_pattern(dest_pattern, char_array, start,
+        // end);
     }
 }
 

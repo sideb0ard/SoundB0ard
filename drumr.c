@@ -4,6 +4,7 @@
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wchar.h>
 
 #include "defjams.h"
 #include "drumr.h"
@@ -12,6 +13,7 @@
 #include "utils.h"
 
 extern mixer *mixr;
+extern wchar_t *sparkchars;
 
 DRUM *new_drumr(char *filename)
 {
@@ -34,6 +36,8 @@ DRUM *new_drumr(char *filename)
     drumr->samplerate = sf_info.samplerate;
     drumr->channels = sf_info.channels;
     drumr->started = false;
+    drumr->multi_pattern_mode = true;
+    drumr->cur_pattern_iteration = 1;
     drumr->vol = 0.7;
 
     drumr->tickedyet = false;
@@ -67,7 +71,6 @@ double drum_gennext(void *self)
     // wait till start of loop to keep patterns synched
     if (!drumr->started) {
         if (step_seq_idx == 0) {
-            printf("Starting LOOP / STEP SEQ [%d]\n", step_seq_idx);
             drumr->started = true;
         }
         else {
@@ -365,34 +368,36 @@ void next_life_generation(void *d)
 //     drumr->pattern = newpattern;
 // }
 
-void drum_status(void *self, char *status_string)
+void drum_status(void *self, wchar_t *status_string)
 {
     DRUM *drumr = self;
-    snprintf(status_string, 119, ANSI_COLOR_CYAN
-             "[SEQUENCER] - \"%s\" Vol: %.2lf Cur Pattern: %d life_on: %d",
+    swprintf(status_string, 119,
+             WANSI_COLOR_BLUE "[SEQUENCER] \"%s\" Vol: %.2lf Cur: %d "
+                              "life_mode: %d Multi: %s Swing: %d",
              basename(drumr->filename), drumr->vol, drumr->cur_pattern,
-             drumr->game_of_life_on);
-    char pattern_details[128];
+             drumr->game_of_life_on,
+             drumr->multi_pattern_mode ? "true" : "false", drumr->swing);
+    wchar_t pattern_details[128];
     char spattern[17];
-    char apattern[17];
+    wchar_t apattern[17];
     for (int i = 0; i < drumr->num_patterns; i++) {
         char_binary_version_of_int(drumr->patterns[i], spattern);
-        char_version_of_amp(drumr, i, apattern);
-        snprintf(pattern_details, 127, "\n      [%d] - [%s][%s] num_loops: %d",
+        wchar_version_of_amp(drumr, i, apattern);
+        swprintf(pattern_details, 127, L"\n      [%d] - [%s] %ls  numloops: %d",
                  i, spattern, apattern, drumr->pattern_num_loops[i]);
-        strcat(status_string, pattern_details);
+        wcscat(status_string, pattern_details);
     }
-    strcat(status_string, ANSI_COLOR_RESET);
+    wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 // TODO - fix this - being lazy and want it finished NOW!
-void char_version_of_amp(DRUM *d, int pattern_num, char apattern[17])
+void wchar_version_of_amp(DRUM *d, int pattern_num, wchar_t apattern[17])
 {
     for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
-        if (d->pattern_position_amp[pattern_num][i] == DEFAULT_AMP)
-            apattern[i] = 'n';
-        else
-            apattern[i] = '1';
+        double amp = d->pattern_position_amp[pattern_num][i];
+        int idx = (int)floor(scaleybum(0, 1.1, 0, wcslen(sparkchars), amp));
+        apattern[i] = sparkchars[idx];
+        // wprintf(L"\n%ls\n", sparkchars[3]);
     }
     apattern[16] = '\0';
 }

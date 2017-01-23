@@ -41,8 +41,6 @@ double sampler_gennext(void *self)
     // wait till start of loop to keep patterns synched
     if (!sampler->started) {
         if (mixr->sixteenth_note_tick % 16 == 0) {
-            printf("Starting SAMPLE LOOP! 16th %d tick: %d\n",
-                   mixr->sixteenth_note_tick, mixr->tick);
             sampler->started = true;
         }
         else {
@@ -238,23 +236,23 @@ void sample_resample_to_loop_size(file_sample *fs)
     // pthread_mutex_unlock(&sampler->resample_mutex);
 }
 
-void sampler_status(void *self, char *status_string)
+void sampler_status(void *self, wchar_t *status_string)
 {
     SAMPLER *sampler = self;
-    snprintf(
-        status_string, MAX_PS_STRING_SZ, COOL_COLOR_GREEN
-        "[LOOPER] Num Samples: %d Current Sample: %d vol: %.2lf Multimode: %s",
-        sampler->num_samples, sampler->cur_sample, sampler->vol,
-        sampler->multi_sample_mode ? "true" : "false");
-    int strlen_left = MAX_PS_STRING_SZ - strlen(status_string);
-    char looper_details[strlen_left];
+    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
+             "[LOOPER] Vol: %.2lf Multi: %s Current Sample: %d",
+             sampler->vol, sampler->multi_sample_mode ? "true" : "false",
+             sampler->cur_sample);
+    int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
+    wchar_t looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {
-        snprintf(looper_details, 128, "\n\t[%d] %s - loop_len: %d numloops: %d",
-                 i, basename(sampler->samples[i]->filename),
+        swprintf(looper_details, 128,
+                 L"\n      [%d] %s - looplen: %d numloops: %d", i,
+                 basename(sampler->samples[i]->filename),
                  sampler->samples[i]->loop_len, sampler->sample_num_loops[i]);
-        strncat(status_string, looper_details, strlen_left);
+        wcslcat(status_string, looper_details, strlen_left);
     }
-    strcat(status_string, ANSI_COLOR_RESET);
+    wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void sampler_set_multi_sample_mode(SAMPLER *s, bool multimode)

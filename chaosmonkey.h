@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <wchar.h>
 
 #include "sound_generator.h"
 
@@ -20,5 +21,5 @@ void chaosmonkey_suggest_mode(chaosmonkey *cm, bool);
 void chaosmonkey_action_mode(chaosmonkey *cm, bool);
 
 double chaosmonkey_gen_next(void *self);
-void chaosmonkey_status(void *self, char *ss);
+void chaosmonkey_status(void *self, wchar_t *ss);
 void chaosmonkey_setvol(void *self, double v);

@@ -30,6 +30,8 @@
 
 #define NHARMS 7 // number of harmonics
 
+// #define sparkchars L"\u2581\u2582\u2583\u2585\u2586\u2587"
+
 #define ANSI_COLOR_BLUE "\x1b[34m"
 #define ANSI_COLOR_CYAN "\x1b[36m"
 #define ANSI_COLOR_GREEN "\x1b[32m"

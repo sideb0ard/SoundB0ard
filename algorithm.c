@@ -126,14 +126,17 @@ double algorithm_gen_next(void *self)
     return 0;
 }
 
-void algorithm_status(void *self, char *status_string)
+void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
-    strncat(status_string, a->command, strlen(a->command));
-    strncat(status_string, " ", 2);
-    strncat(status_string, a->afterthought[0], strlen(a->afterthought[0]));
-    strncat(status_string, a->afterthought[1], strlen(a->afterthought[1]));
-    strncat(status_string, a->afterthought[2], strlen(a->afterthought[2]));
+    wcslcat(status_string, (wchar_t *)a->command, strlen(a->command));
+    wcslcat(status_string, L" ", 2);
+    wcslcat(status_string, (wchar_t *)a->afterthought[0],
+            strlen(a->afterthought[0]));
+    wcslcat(status_string, (wchar_t *)a->afterthought[1],
+            strlen(a->afterthought[1]));
+    wcslcat(status_string, (wchar_t *)a->afterthought[2],
+            strlen(a->afterthought[2]));
 }
 
 void algorithm_setvol(void *self, double v)

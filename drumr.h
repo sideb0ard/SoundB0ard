@@ -4,6 +4,7 @@
 #include "sound_generator.h"
 #include <sndfile.h>
 #include <stdbool.h>
+#include <wchar.h>
 
 #define GRIDWIDTH (DRUM_PATTERN_LEN / 4)
 #define INTEGER_LENGTH pow(2, DRUM_PATTERN_LEN)
@@ -54,7 +55,7 @@ DRUM *new_drumr_from_int_pattern(char *filename, int pattern);
 DRUM *new_drumr_from_char_array(char *filename, char **pattern, int nsteps);
 
 // void drum_gennext(void* self, double* frame_vals, int framesPerBuffer);
-void drum_status(void *self, char *ss);
+void drum_status(void *self, wchar_t *ss);
 void drum_setvol(void *self, double v);
 void drum_set_sample_amp(DRUM *self, int pattern_num, int pattern_position,
                          double v);
@@ -73,7 +74,7 @@ void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops);
 
 void int_pattern_to_array(int pattern, int *pat_array);
 void pattern_char_to_int(char *chpattern, int *pattern);
-void char_version_of_amp(DRUM *d, int pattern_num, char apattern[49]);
+void wchar_version_of_amp(DRUM *d, int pattern_num, wchar_t apattern[49]);
 
 // game of life functionality
 int seed_pattern(void);

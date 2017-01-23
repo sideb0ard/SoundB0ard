@@ -2,6 +2,7 @@
 #define BITWIZE_H
 
 #include <stdio.h>
+#include <wchar.h>
 
 #include "sound_generator.h"
 
@@ -23,6 +24,6 @@ double bitwize_gennext(void *self);
 void bitwize_setvol(void *self, double v);
 double bitwize_getvol(void *self);
 
-void bitwize_status(void *self, char *status_string);
+void bitwize_status(void *self, wchar_t *status_string);
 
 #endif // BITWIZE_H

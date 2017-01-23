@@ -4,6 +4,7 @@
 #include "sound_generator.h"
 #include <pthread.h>
 #include <stdbool.h>
+#include <wchar.h>
 
 // TODO use this more - at the moment just for the int array
 #define MAX_SAMPLES_PER_LOOPER 10
@@ -53,7 +54,7 @@ void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops);
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double sampler_gennext(void *self);
 
-void sampler_status(void *self, char *ss);
+void sampler_status(void *self, wchar_t *ss);
 void sampler_setvol(void *self, double v);
 double sampler_getvol(void *self);
 

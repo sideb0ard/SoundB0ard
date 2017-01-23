@@ -300,27 +300,38 @@ void change_octave(void *self, int direction)
         ns->cur_octave--;
 }
 
-void nanosynth_print_melody(nanosynth *ns, int melody_num)
+void nanosynth_melody_to_string(nanosynth *ns, int melody_num,
+                                wchar_t melodystr[64])
 {
     for (int i = 0; i < PPNS; i++) {
-        // if (self->midi_events_loop[i] != NULL) {
-        if (ns->melodies[melody_num][i] != NULL) {
-            // printf("%d: %d ", i, self->midi_events_loop[i]->data1);
-            printf("%d: %d ", i, ns->melodies[melody_num][i]->data1);
+        wchar_t scratch[16];
+        if (ns->melodies[melody_num][i] != NULL &&
+            ns->melodies[melody_num][i]->event_type ==
+                144) { // 144 is midi note on
+            wprintf(scratch, "[%d]:%d ", i, ns->melodies[melody_num][i]->data1);
+            wcscat(melodystr, scratch);
         }
     }
     printf("\n");
 }
 
-void nanosynth_status(void *self, char *status_string)
+void nanosynth_status(void *self, wchar_t *status_string)
 {
+    // TODO - a shit load of error checking on boundaries and size
     nanosynth *ns = (nanosynth *)self;
-    snprintf(status_string, 119, ANSI_COLOR_RED
-             "nanosynth! %.2f(freq) sustain: %d "
-             "vol: %.2f num melodies: %d, cur_melody: %d" ANSI_COLOR_RESET,
-             ns->osc1->m_fo, ns->sustain, ns->vol, ns->num_melodies,
-             ns->cur_melody);
-    // nanosynth_print_melody(ns, );
+    swprintf(status_string, 119,
+             WCOOL_COLOR_PINK "[SYNTH] - %.2f(freq) sustain: %d "
+                              "vol: %.2f multimode: %s, cur_melody: %d",
+             ns->osc1->m_fo, ns->sustain, ns->vol,
+             ns->multi_melody_mode ? "true" : "false", ns->cur_melody);
+    for (int i = 0; i < ns->num_melodies; i++) {
+        wchar_t melodystr[64] = {0};
+        wchar_t scratch[64] = {0};
+        nanosynth_melody_to_string(ns, i, melodystr);
+        wprintf(scratch, L"\n      [%d] - %s", i, melodystr);
+        wcscat(status_string, scratch);
+    }
+    wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void note_on(nanosynth *self, int midi_num)

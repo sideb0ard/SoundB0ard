@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <wchar.h>
 
 #include "dca.h"
 #include "envelope_generator.h"
@@ -77,7 +78,7 @@ nanosynth *new_nanosynth(void);
 
 double nanosynth_gennext(void *self);
 // void nanosynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
-void nanosynth_status(void *self, char *status_string);
+void nanosynth_status(void *self, wchar_t *status_string);
 double nanosynth_getvol(void *self);
 void nanosynth_setvol(void *self, double v);
 void note_on(nanosynth *self, int midi_num);
@@ -93,4 +94,5 @@ void nanosynth_switch_melody(nanosynth *self, unsigned int melody_num);
 void nanosynth_reset_melody(nanosynth *self, unsigned int melody_num);
 void nanosynth_reset_melody_all(nanosynth *self);
 void nanosynth_add_note(nanosynth *self, int midi_num);
-void nanosynth_print_melody(nanosynth *self, int melody_num);
+void nanosynth_melody_to_string(nanosynth *self, int melody_num,
+                                wchar_t scratch[64]);

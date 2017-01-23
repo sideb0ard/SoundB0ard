@@ -37,11 +37,11 @@ double bytes_gen_next(void *self)
     return scaled_val * b->vol;
 }
 
-void bytes_status(void *self, char *status_string)
+void bytes_status(void *self, wchar_t *status_string)
 {
     bytebeat *b = (bytebeat *)self;
-    snprintf(status_string, 119,
-             COOL_COLOR_GREEN "[%s]\tvol: %.2lfs" ANSI_COLOR_RESET, b->pattern,
+    swprintf(status_string, 119,
+             WCOOL_COLOR_GREEN "[%s]\tvol: %.2lfs" ANSI_COLOR_RESET, b->pattern,
              b->vol);
 }
 

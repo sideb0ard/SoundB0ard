@@ -62,11 +62,11 @@ double chaosmonkey_gen_next(void *self)
     return 0;
 }
 
-void chaosmonkey_status(void *self, char *status_string)
+void chaosmonkey_status(void *self, wchar_t *status_string)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
-    snprintf(status_string, 119,
-             "[chaos_monkey] wakeup: %d (sec) %d pct. Suggest: %d, Action: %d",
+    swprintf(status_string, 119,
+             L"[chaos_monkey] wakeup: %d (sec) %d pct. Suggest: %d, Action: %d",
              cm->frequency_of_wakeup, cm->chance_of_interruption,
              cm->make_suggestion, cm->take_action);
 }

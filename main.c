@@ -13,6 +13,7 @@
 #include "mixer.h"
 
 mixer *mixr;
+const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
 
 // use broadcast to wake up threads when midi tick changes
 pthread_cond_t midi_tick_cond;

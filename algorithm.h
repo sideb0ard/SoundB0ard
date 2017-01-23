@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <wchar.h>
 
 #include "sound_generator.h"
 
@@ -24,5 +25,5 @@ void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd);
 void algorithm_process_afterthought(algorithm *self);
 
 double algorithm_gen_next(void *self);
-void algorithm_status(void *self, char *ss);
+void algorithm_status(void *self, wchar_t *ss);
 void algorithm_setvol(void *self, double v);
