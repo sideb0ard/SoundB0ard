@@ -68,7 +68,7 @@ void mixer_ps(mixer *mixr)
         wchar_t wss[MAX_PS_STRING_SZ];
         memset(wss, 0, MAX_PS_STRING_SZ);
         mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
-        wprintf(WANSI_COLOR_WHITE"[%2d]"WANSI_COLOR_RESET"  %ls\n", i, wss);
+        wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET "  %ls\n", i, wss);
         if (mixr->sound_generators[i]->effects_num > 0 ||
             mixr->sound_generators[i]->envelopes_num > 0) {
             printf("      ");

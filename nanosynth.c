@@ -19,6 +19,7 @@
 
 extern wtable *wave_tables[5];
 extern mixer *mixr;
+extern const wchar_t *sparkchars;
 
 nanosynth *new_nanosynth()
 {
@@ -301,18 +302,20 @@ void change_octave(void *self, int direction)
 }
 
 void nanosynth_melody_to_string(nanosynth *ns, int melody_num,
-                                wchar_t melodystr[64])
+                                wchar_t melodystr[33])
 {
-    for (int i = 0; i < PPNS; i++) {
-        wchar_t scratch[16];
-        if (ns->melodies[melody_num][i] != NULL &&
-            ns->melodies[melody_num][i]->event_type ==
-                144) { // 144 is midi note on
-            wprintf(scratch, "[%d]:%d ", i, ns->melodies[melody_num][i]->data1);
-            wcscat(melodystr, scratch);
+    int cur_quart = 0;
+    for (int i = 0; i < PPNS; i += PPS) {
+        melodystr[cur_quart] = sparkchars[0];
+        for (int j = i; j < (i + PPS); j++) {
+            if (ns->melodies[melody_num][j] != NULL &&
+                ns->melodies[melody_num][j]->event_type ==
+                    144) { // 144 is midi note on
+                melodystr[cur_quart] = sparkchars[5];
+            }
         }
+        cur_quart++;
     }
-    printf("\n");
 }
 
 void nanosynth_status(void *self, wchar_t *status_string)
@@ -320,15 +323,16 @@ void nanosynth_status(void *self, wchar_t *status_string)
     // TODO - a shit load of error checking on boundaries and size
     nanosynth *ns = (nanosynth *)self;
     swprintf(status_string, 119,
-             WCOOL_COLOR_PINK "[SYNTH] - %.2f(freq) sustain: %d "
-                              "vol: %.2f multimode: %s, cur_melody: %d",
-             ns->osc1->m_fo, ns->sustain, ns->vol,
-             ns->multi_melody_mode ? "true" : "false", ns->cur_melody);
+             WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
+                              "Multi: %s, Cur: %d",
+             ns->vol, ns->sustain, ns->multi_melody_mode ? "true" : "false",
+             ns->cur_melody);
     for (int i = 0; i < ns->num_melodies; i++) {
-        wchar_t melodystr[64] = {0};
-        wchar_t scratch[64] = {0};
+        wchar_t melodystr[33] = {0};
+        wchar_t scratch[128] = {0};
         nanosynth_melody_to_string(ns, i, melodystr);
-        wprintf(scratch, L"\n      [%d] - %s", i, melodystr);
+        swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
+                 ns->melody_multiloop_count[i]);
         wcscat(status_string, scratch);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
