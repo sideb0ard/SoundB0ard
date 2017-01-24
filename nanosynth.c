@@ -324,8 +324,8 @@ void nanosynth_status(void *self, wchar_t *status_string)
     nanosynth *ns = (nanosynth *)self;
     swprintf(status_string, 119,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
-                              "Multi: %s, Cur: %d",
-             ns->vol, ns->sustain, ns->multi_melody_mode ? "true" : "false",
+                              "Multi: %d, Cur: %d",
+             ns->vol, ns->sustain, ns->multi_melody_mode,
              ns->cur_melody);
     for (int i = 0; i < ns->num_melodies; i++) {
         wchar_t melodystr[33] = {0};

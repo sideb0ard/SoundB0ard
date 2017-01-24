@@ -130,13 +130,13 @@ void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
     wcslcat(status_string, (wchar_t *)a->command, strlen(a->command));
-    wcslcat(status_string, L" ", 2);
-    wcslcat(status_string, (wchar_t *)a->afterthought[0],
-            strlen(a->afterthought[0]));
-    wcslcat(status_string, (wchar_t *)a->afterthought[1],
-            strlen(a->afterthought[1]));
-    wcslcat(status_string, (wchar_t *)a->afterthought[2],
-            strlen(a->afterthought[2]));
+    //wcslcat(status_string, L" ", 2);
+    //wcslcat(status_string, (wchar_t *)a->afterthought[0],
+    //        strlen(a->afterthought[0]));
+    //wcslcat(status_string, (wchar_t *)a->afterthought[1],
+    //        strlen(a->afterthought[1]));
+    //wcslcat(status_string, (wchar_t *)a->afterthought[2],
+    //        strlen(a->afterthought[2]));
 }
 
 void algorithm_setvol(void *self, double v)

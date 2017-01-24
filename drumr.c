@@ -373,10 +373,10 @@ void drum_status(void *self, wchar_t *status_string)
     DRUM *drumr = self;
     swprintf(status_string, 119,
              WANSI_COLOR_BLUE "[SEQUENCER] \"%s\" Vol: %.2lf Cur: %d "
-                              "life_mode: %d Multi: %s Swing: %d",
+                              "life_mode: %d Multi: %d Swing: %d",
              basename(drumr->filename), drumr->vol, drumr->cur_pattern,
              drumr->game_of_life_on,
-             drumr->multi_pattern_mode ? "true" : "false", drumr->swing);
+             drumr->multi_pattern_mode, drumr->swing_setting);
     wchar_t pattern_details[128];
     char spattern[17];
     wchar_t apattern[17];
