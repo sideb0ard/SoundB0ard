@@ -129,14 +129,16 @@ double algorithm_gen_next(void *self)
 void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
-    wcslcat(status_string, (wchar_t *)a->command, strlen(a->command));
-    //wcslcat(status_string, L" ", 2);
-    //wcslcat(status_string, (wchar_t *)a->afterthought[0],
-    //        strlen(a->afterthought[0]));
-    //wcslcat(status_string, (wchar_t *)a->afterthought[1],
-    //        strlen(a->afterthought[1]));
-    //wcslcat(status_string, (wchar_t *)a->afterthought[2],
-    //        strlen(a->afterthought[2]));
+    swprintf(status_string, 119,
+            WANSI_COLOR_RED "[ALGO]%s Post: %s %s %s %s %s",
+            a->command,
+            a->afterthought[0],
+            a->afterthought[1],
+            a->afterthought[2],
+            a->afterthought[3],
+            a->afterthought[4]
+            );
+    wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void algorithm_setvol(void *self, double v)
