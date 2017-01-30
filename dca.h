@@ -23,16 +23,16 @@ typedef struct dca {
     unsigned m_mod_source_velocity;
     unsigned m_mod_source_pan;
 
-} DCA;
+} dca;
 
-DCA *new_dca(void);
-void dca_set_midi_velocity(DCA *self, int vel);
-void dca_set_pan_control(DCA *self, double pan);
-void dca_reset(DCA *self);
-void dca_set_amplitude_db(DCA *self, double amp);
-void dca_set_amp_mod_db(DCA *self, double mod);
-void dca_set_eg_mod(DCA *self, double mod);
-void dca_set_pan_mod(DCA *self, double mod);
-void dca_update(DCA *self);
-void dca_gennext(DCA *self, double left_input, double right_input,
+dca *new_dca(void);
+void dca_set_midi_velocity(dca *self, int vel);
+void dca_set_pan_control(dca *self, double pan);
+void dca_reset(dca *self);
+void dca_set_amplitude_db(dca *self, double amp);
+void dca_set_amp_mod_db(dca *self, double mod);
+void dca_set_eg_mod(dca *self, double mod);
+void dca_set_pan_mod(dca *self, double mod);
+void dca_update(dca *self);
+void dca_gennext(dca *self, double left_input, double right_input,
                  double *left_output, double *right_output);

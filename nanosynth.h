@@ -33,16 +33,12 @@ typedef struct nanosynth {
     oscillator *osc1;
     oscillator *osc2;
     oscillator *lfo;
+    envelope_generator *eg1;
+    filter *f;
+    dca *dca;
+
     unsigned m_lfo1_dest;
     char *m_lfo_dest_string[2];
-
-    envelope_generator *eg1;
-
-    // FILTER_CSEM *filter;
-    // FILTER_ONEPOLE *filter;
-    filter *f;
-
-    DCA *dca;
 
     int cur_octave;
     int sustain;
