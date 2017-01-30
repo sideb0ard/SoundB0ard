@@ -1,6 +1,4 @@
 CC = clang
-CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g
-
 SRC = \
       algorithm.c \
       audioutils.c \
@@ -48,11 +46,13 @@ SRC = \
       utils.c \
       wt_oscillator.c \
 
-LIBS = -lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
+LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 
-INCS = -Iinclude/ -I/Users/sideboard/NewCodez/SBShell -I/Users/sideboard/NewCodez/SBShell/bytebeat
+INCDIR=/usr/local/include
+LIBDIR=/usr/local/lib
+CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -I$(INCDIR)
 
-OBJ = $(SRC:.c=.o)
+OBJ=$(SRC:.c=.o)
 
 TARGET = sbsh
 
@@ -62,7 +62,7 @@ all: $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $(TARGET) $(OBJ) $(LIBS) $(INC)
+	$(CC) $(CFLAGS) -L$(LIBDIR) -o $(TARGET) $(OBJ) $(LIBS) $(INCS)
 
 clean:
 	rm -f *.o *~ $(TARGET)
