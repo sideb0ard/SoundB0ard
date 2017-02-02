@@ -72,19 +72,19 @@ void *midiman()
                     }
                     switch (status) {
                     case (144): { // Hex 0x80
-                        midinoteon(ns, data1, data2);
+                        nanosynth_midi_note_on(ns, data1, data2);
                         break;
                     }
                     case (128): { // Hex 0x90
-                        midinoteoff(ns, data1, data2);
+                        nanosynth_midi_note_off(ns, data1, data2, false);
                         break;
                     }
                     case (176): { // Hex 0xB0
-                        midicontrol(ns, data1, data2);
+                        nanosynth_midi_control(ns, data1, data2);
                         break;
                     }
                     case (224): { // Hex 0xE0
-                        midipitchbend(ns, data1, data2);
+                        nanosynth_midi_pitchbend(ns, data1, data2);
                         break;
                     }
                     default:
@@ -132,97 +132,6 @@ midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
     ev->data2 = data2;
 
     return ev;
-}
-
-void midinoteon(nanosynth *ns, unsigned int midinote, int velocity)
-{
-    (void)velocity;
-    note_on(ns, midinote);
-    // if (ns->recording) {
-    //     ns->mloop[mixr->tick % PPL] = midinote;
-    // }
-}
-
-void midinoteoff(nanosynth *ns, unsigned int midinote, int velocity)
-{
-    (void)velocity;
-    if (midinote == ns->osc1->m_midi_note_number) {
-        eg_note_off(ns->eg1);
-    }
-}
-
-void midipitchbend(nanosynth *ns, int data1, int data2)
-{
-    // printf("Pitch bend, babee: %d %d\n", data1, data2);
-    int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
-
-    if (actual_pitch_bent_val != 8192) {
-        double normalized_pitch_bent_val =
-            (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
-        ns->m_modmatrix->m_sources[SOURCE_PITCHBEND] =
-            normalized_pitch_bent_val;
-        double scaley_val =
-            // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
-            scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
-        // printf("Cents to bend - %f\n", scaley_val);
-        ns->osc1->m_cents = scaley_val;
-        ns->osc2->m_cents = scaley_val + 2.5;
-    }
-    else {
-        ns->osc1->m_cents = 0;
-        ns->osc2->m_cents = 2.5;
-    }
-}
-
-void midicontrol(nanosynth *ns, int data1, int data2)
-{
-    // printf("MIDI Mind Control! %d %d\n", data1, data2);
-    double scaley_val;
-    switch (data1) {
-    case 1: // K1 - Envelope Attack Time Msec
-        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        set_attack_time_msec(ns->eg1, scaley_val);
-        break;
-    case 2: // K2 - Envelope Decay Time Msec
-        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        set_decay_time_msec(ns->eg1, scaley_val);
-        break;
-    case 3: // K3 - Envelope Sustain Level
-        scaley_val = scaleybum(1, 128, 0, 1, data2);
-        set_sustain_level(ns->eg1, scaley_val);
-        break;
-    case 4: // K4 - Envelope Release Time Msec
-        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        set_release_time_msec(ns->eg1, scaley_val);
-        break;
-    case 5: // K5 - LFO rate
-        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-        ns->lfo->m_osc_fo = scaley_val;
-        osc_update(ns->lfo);
-        break;
-    case 6: // K6 - LFO amplitude
-        scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-        ns->lfo->m_amplitude = scaley_val;
-        osc_update(ns->lfo);
-        break;
-    case 7: // K7 - Filter Frequency Cut
-        scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        ns->f->m_fc_control = scaley_val;
-        break;
-    case 8: // K8 - Filter Q control
-        scaley_val = scaleybum(1, 128, 1, 10, data2);
-        printf("FILTER Q control! %f\n", scaley_val);
-        filter_set_q_control(ns->f, scaley_val);
-        break;
-    default:
-        printf("SOMthing else\n");
-    }
-    // nanosynth_update(ns); // TODO either fix this or get rid of it -
-    // currently unnecessary as i update member variables directly rather than
-    // have
-    // two representations - one "gui" one on the nanosynth and then on update,
-    // set
-    // component values
 }
 
 void midi_delay_control(EFFECT *e, int data1, int data2)

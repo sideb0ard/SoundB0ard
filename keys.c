@@ -73,15 +73,15 @@ void keys(int soundgen_num)
                 break;
             case 122:
                 printf("Changing WAVE form of synth->osc1\n");
-                nanosynth_change_osc_wave_form(ns, 0);
+                nanosynth_change_osc_wave_form(ns, 0, 0, true);
                 break;
             case 120:
                 printf("Changing WAVE form of synth->osc2\n");
-                nanosynth_change_osc_wave_form(ns, 1);
+                nanosynth_change_osc_wave_form(ns, 0, 1, true);
                 break;
             case 99:
                 printf("Changing WAVE form of synth->lfo\n");
-                nanosynth_change_osc_wave_form(ns, 2);
+                nanosynth_change_osc_wave_form(ns, 0, 2, true);
                 break;
             case 118:
                 ns->m_filter_keytrack = 1 - ns->m_filter_keytrack;
@@ -99,31 +99,32 @@ void keys(int soundgen_num)
                 printf("Key tracking intensity toggle! Val is %f\n",
                        ns->m_filter_keytrack_intensity);
                 break;
-            case 110:
-                printf("Toggling LFO1 destination!\n");
-                ns->m_lfo1_dest = 1 - ns->m_lfo1_dest;
-                printf("LFO1 dest is now %s\n",
-                       ns->m_lfo_dest_string[ns->m_lfo1_dest]);
-                if (ns->m_lfo1_dest == OSC) {
-                    enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-                                      DEST_ALL_OSC_FO, true);
-                    enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-                                      DEST_ALL_FILTER_FC, false);
-                }
-                else {
-                    enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-                                      DEST_ALL_OSC_FO, false);
-                    enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-                                      DEST_ALL_FILTER_FC, true);
-                }
-                break;
+            // case 110:
+            //    printf("Toggling LFO1 destination!\n");
+            //    ns->m_lfo1_dest = 1 - ns->m_lfo1_dest;
+            //    printf("LFO1 dest is now %s\n",
+            //           ns->m_lfo_dest_string[ns->m_lfo1_dest]);
+            //    if (ns->m_lfo1_dest == OSC) {
+            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
+            //                          DEST_ALL_OSC_FO, true);
+            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
+            //                          DEST_ALL_FILTER_FC, false);
+            //    }
+            //    else {
+            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
+            //                          DEST_ALL_OSC_FO, false);
+            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
+            //                          DEST_ALL_FILTER_FC, true);
+            //    }
+            //    break;
 
             default:
                 // play note
                 midi_num = ch_midi_lookup(ch, ns);
                 if (midi_num != -1) {
                     print_midi_event(midi_num);
-                    note_on(ns, midi_num);
+                    nanosynth_midi_note_on(ns, midi_num,
+                                           126); // TODO fill in real velocity
                     if (ns->recording) {
                         printf("Recording note!\n");
                         // ns->mloop[mixr->tick % PPNS] = midi_num;
@@ -172,19 +173,19 @@ void *play_melody_loop(void *p)
             midi_event *ev = ns->melodies[ns->cur_melody][idx];
             switch (ev->event_type) {
             case (144): {
-                midinoteon(ns, ev->data1, ev->data2);
+                nanosynth_midi_note_on(ns, ev->data1, ev->data2);
                 break;
             }
             case (128): { // Hex 0x90
-                midinoteoff(ns, ev->data1, ev->data2);
+                nanosynth_midi_note_off(ns, ev->data1, ev->data2, false);
                 break;
             }
             case (176): { // Hex 0xB0
-                midicontrol(ns, ev->data1, ev->data2);
+                nanosynth_midi_control(ns, ev->data1, ev->data2);
                 break;
             }
             case (224): { // Hex 0xE0
-                midipitchbend(ns, ev->data1, ev->data2);
+                nanosynth_midi_pitchbend(ns, ev->data1, ev->data2);
                 break;
             }
             }
@@ -192,54 +193,15 @@ void *play_melody_loop(void *p)
             note_played_time = 1;
         }
 
-        if (ns->sustain > 0 && note_played_time > 0) {
-            note_played_time++;
-            if ((note_played_time > ns->sustain) &&
-                (ns->osc1->m_midi_note_number == last_midi_num_played)) {
-                eg_note_off(ns->eg1);
-                note_played_time = 0;
-            }
-        }
+        // if (ns->sustain > 0 && note_played_time > 0) {
+        //     note_played_time++;
+        //     if ((note_played_time > ns->sustain) &&
+        //         (ns->osc1->m_midi_note_number == last_midi_num_played)) {
+        //         eg_note_off(ns->eg1);
+        //         note_played_time = 0;
+        //     }
+        // }
     }
 
     return NULL;
 }
-
-// melody_loop *mloop_from_pattern(char *pattern)
-// {
-//     melody_loop *mloop = new_melody_loop();
-//
-//     char *tok, *last_s;
-//     char *sep = " ";
-//     for (tok = strtok_r(pattern, sep, &last_s); tok;
-//          tok = strtok_r(NULL, sep, &last_s)) {
-//         int tick;
-//         int midi_num;
-//         sscanf(tok, "%d:%d", &tick, &midi_num);
-//
-//         if (midi_num != -1) {
-//
-//             melody_event *me = make_melody_event(tick, midi_num);
-//             add_melody_event(mloop, me);
-//         }
-//     }
-//     return mloop;
-// }
-
-// void keys_start_melody_player(int sig_num, char *pattern)
-// {
-//
-//     melody_loop *mloop = mloop_from_pattern(pattern);
-//
-//     printf("KEYS START MELODY!\n");
-//     printf("SIG NUM %d - %s\n", sig_num, pattern);
-//
-//     nanosynth *ns = (nanosynth *)mixr->sound_generators[sig_num];
-//     nanosynth_add_melody_loop(ns, mloop);
-//
-//     pthread_t melody_looprrr;
-//     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ns)) {
-//         fprintf(stderr, "Err running loop\n");
-//     }
-//     pthread_detach(melody_looprrr);
-// }

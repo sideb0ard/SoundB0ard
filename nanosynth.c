@@ -35,37 +35,7 @@ nanosynth *new_nanosynth()
         ns->melody_multiloop_count[i] = 1;
     }
 
-    ns->osc1 = (oscillator *)qb_osc_new();
-    ns->osc2 = (oscillator *)qb_osc_new();
-    ns->osc2->m_cents = 2.5;
-
-    ns->lfo = (oscillator *)lfo_new();
-    ns->m_lfo1_dest = OSC;
-    ns->m_lfo_dest_string[0] = "Oscillators";
-    ns->m_lfo_dest_string[1] = "Filters";
-
-    ns->eg1 = new_envelope_generator();
-
-    // ns->f = (filter *) new_filter_onepole();
-    // ns->f = (filter *) new_filter_sem();
-    // ns->f = (filter *)new_filter_ck35();
-    ns->f = (filter *)new_filter_moog();
-
-    ns->dca = new_dca();
-
     ns->m_modmatrix = new_modmatrix();
-
-    ns->m_default_mod_intensity = 1.0;
-    ns->m_default_mod_range = 1.0;
-
-    ns->m_osc_fo_mod_range = OSC_FO_MOD_RANGE;
-    ns->m_filter_mod_range = FILTER_FC_MOD_RANGE;
-
-    ns->m_osc_fo_pitchbend_mod_range = OSC_PITCHBEND_MOD_RANGE;
-    ns->m_amp_mod_range = AMP_MOD_RANGE;
-
-    ns->m_eg1_dca_intensity = 1.0;
-    ns->m_eg1_osc_intensity = 0.0;
 
     matrixrow *row = NULL;
     // LFO -> ALL OSC FO
@@ -156,42 +126,82 @@ nanosynth *new_nanosynth()
 
     // end mod matrix setup ///////////////////////////////////
 
-    // mod matrix routings ////////////////////////////////////
+    ns->m_default_mod_intensity = 1.0;
+    ns->m_default_mod_range = 1.0;
 
-    ns->osc1->g_modmatrix = ns->m_modmatrix;
-    ns->osc1->m_mod_source_fo = DEST_OSC1_FO;
-    ns->osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
+    ns->m_osc_fo_mod_range = OSC_FO_MOD_RANGE;
+    ns->m_filter_mod_range = FILTER_FC_MOD_RANGE;
 
-    ns->osc2->g_modmatrix = ns->m_modmatrix;
-    ns->osc2->m_mod_source_fo = DEST_OSC2_FO;
-    ns->osc2->m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
+    ns->m_osc_fo_pitchbend_mod_range = OSC_PITCHBEND_MOD_RANGE;
+    ns->m_amp_mod_range = AMP_MOD_RANGE;
 
-    ns->f->g_modmatrix = ns->m_modmatrix;
-    ns->f->m_mod_source_fc = DEST_FILTER1_FC;
-    ns->f->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
+    ns->m_eg1_dca_intensity = 1.0;
+    ns->m_eg1_osc_intensity = 0.0;
 
-    // modulators - they write their outputs into
-    // what will be a Source for something else
+    for (int i = 0; i < MAX_VOICES; i++) {
+        ns->m_voices[i].m_modmatrix = new_modmatrix();
+        set_matrix_core(ns->m_voices[i].m_modmatrix,
+                        get_matrix_core(ns->m_modmatrix));
 
-    ns->lfo->g_modmatrix = ns->m_modmatrix;
-    ns->lfo->m_mod_dest_output1 = SOURCE_LFO1;
-    ns->lfo->m_mod_dest_output2 = SOURCE_LFO1Q;
+        ns->m_voices[i].osc1 = (oscillator *)qb_osc_new();
+        ns->m_voices[i].osc2 = (oscillator *)qb_osc_new();
+        ns->m_voices[i].osc2->m_cents = 2.5;
 
-    ns->eg1->g_modmatrix = ns->m_modmatrix;
-    ns->eg1->m_mod_dest_eg_output = SOURCE_EG1;
-    ns->eg1->m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
-    ns->eg1->m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
-    ns->eg1->m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
-    ns->eg1->m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
+        ns->m_voices[i].lfo = (oscillator *)lfo_new();
+        ns->m_voices[i].m_lfo1_dest = OSC;
+        ns->m_voices[i].m_lfo_dest_string[0] = "Oscillators";
+        ns->m_voices[i].m_lfo_dest_string[1] = "Filters";
 
-    ns->dca->g_modmatrix = ns->m_modmatrix;
-    ns->dca->m_mod_source_eg = DEST_DCA_EG;
-    ns->dca->m_mod_source_amp_db = DEST_NONE;
-    ns->dca->m_mod_source_velocity = DEST_DCA_VELOCITY;
-    ns->dca->m_mod_source_pan = DEST_DCA_PAN;
+        ns->m_voices[i].eg1 = new_envelope_generator();
+
+        // ns->m_voices[i]->f = (filter *) new_filter_onepole();
+        // ns->m_voices[i]->f = (filter *) new_filter_sem();
+        // ns->m_voices[i]->f = (filter *)new_filter_ck35();
+        ns->m_voices[i].f = (filter *)new_filter_moog();
+
+        ns->m_voices[i].dca = new_dca();
+
+        ns->m_voices[i].osc1->g_modmatrix = ns->m_voices[i].m_modmatrix;
+        ns->m_voices[i].osc1->m_mod_source_fo = DEST_OSC1_FO;
+        ns->m_voices[i].osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
+
+        ns->m_voices[i].osc2->g_modmatrix = ns->m_voices[i].m_modmatrix;
+        ns->m_voices[i].osc2->m_mod_source_fo = DEST_OSC2_FO;
+        ns->m_voices[i].osc2->m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
+
+        ns->m_voices[i].f->g_modmatrix = ns->m_voices[i].m_modmatrix;
+        ns->m_voices[i].f->m_mod_source_fc = DEST_FILTER1_FC;
+        ns->m_voices[i].f->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
+
+        // modulators - they write their outputs into
+        // what will be a Source for something else
+
+        ns->m_voices[i].lfo->g_modmatrix = ns->m_voices[i].m_modmatrix;
+        ns->m_voices[i].lfo->m_mod_dest_output1 = SOURCE_LFO1;
+        ns->m_voices[i].lfo->m_mod_dest_output2 = SOURCE_LFO1Q;
+
+        ns->m_voices[i].eg1->g_modmatrix = ns->m_voices[i].m_modmatrix;
+        ns->m_voices[i].eg1->m_mod_dest_eg_output = SOURCE_EG1;
+        ns->m_voices[i].eg1->m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
+        ns->m_voices[i].eg1->m_mod_source_eg_attack_scaling =
+            DEST_EG1_ATTACK_SCALING;
+        ns->m_voices[i].eg1->m_mod_source_eg_decay_scaling =
+            DEST_EG1_DECAY_SCALING;
+        ns->m_voices[i].eg1->m_mod_source_sustain_override =
+            DEST_EG1_SUSTAIN_OVERRIDE;
+
+        ns->m_voices[i].dca->g_modmatrix = ns->m_voices[i].m_modmatrix;
+        ns->m_voices[i].dca->m_mod_source_eg = DEST_DCA_EG;
+        ns->m_voices[i].dca->m_mod_source_amp_db = DEST_NONE;
+        ns->m_voices[i].dca->m_mod_source_velocity = DEST_DCA_VELOCITY;
+        ns->m_voices[i].dca->m_mod_source_pan = DEST_DCA_PAN;
+        ns->m_voices[i].dca->m_gain = 0.7;
+
+        ns->m_pending_midi_note[i] = -1;
+        ns->m_pending_midi_velocity[i] = -1;
+    }
 
     ns->vol = 0.7;
-    ns->dca->m_gain = 0.7;
     ns->cur_octave = 0;
     ns->sustain = 0;
     ns->num_melodies = 1;
@@ -254,25 +264,36 @@ void nanosynth_reset_melody(nanosynth *ns, unsigned int melody_num)
     }
 }
 
-void nanosynth_change_osc_wave_form(nanosynth *self, int oscil)
+void nanosynth_change_osc_wave_form(nanosynth *self, unsigned int voice_no,
+                                    int oscil, bool all_voices)
+{
+    if (all_voices) {
+        for (int i = 0; i < MAX_VOICES; i++)
+            p_nanosynth_change_osc_wave_form(self, i, oscil);
+    }
+    else
+        p_nanosynth_change_osc_wave_form(self, voice_no, oscil);
+}
+
+void p_nanosynth_change_osc_wave_form(nanosynth *self, unsigned int voice_no,
+                                      int oscil)
 {
     unsigned cur_type = 0;
     unsigned next_type = 0;
 
-    if (oscil == 0) {
-        cur_type = self->osc1->m_waveform;
+    switch (oscil) {
+    case 0:
+        cur_type = self->m_voices[voice_no].osc1->m_waveform;
         next_type = (cur_type + 1) % MAX_OSC;
-        self->osc1->m_waveform = next_type;
-    }
-    else if (oscil == 1) {
-        cur_type = self->osc2->m_waveform;
+        self->m_voices[voice_no].osc1->m_waveform = next_type;
+    case 1:
+        cur_type = self->m_voices[voice_no].osc2->m_waveform;
         next_type = (cur_type + 1) % MAX_OSC;
-        self->osc2->m_waveform = next_type;
-    }
-    else if (oscil == 2) {
-        cur_type = self->lfo->m_waveform;
+        self->m_voices[voice_no].osc2->m_waveform = next_type;
+    case 2:
+        cur_type = self->m_voices[voice_no].lfo->m_waveform;
         next_type = (cur_type + 1) % MAX_LFO_OSC;
-        self->lfo->m_waveform = next_type;
+        self->m_voices[voice_no].lfo->m_waveform = next_type;
     }
     printf("now set to %d\n", next_type);
 }
@@ -325,8 +346,7 @@ void nanosynth_status(void *self, wchar_t *status_string)
     swprintf(status_string, 119,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
                               "Multi: %d, Cur: %d",
-             ns->vol, ns->sustain, ns->multi_melody_mode,
-             ns->cur_melody);
+             ns->vol, ns->sustain, ns->multi_melody_mode, ns->cur_melody);
     for (int i = 0; i < ns->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
         wchar_t scratch[128] = {0};
@@ -338,31 +358,43 @@ void nanosynth_status(void *self, wchar_t *status_string)
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-void note_on(nanosynth *self, int midi_num)
+void nanosynth_midi_note_on(nanosynth *self, unsigned int midi_num,
+                            unsigned int velocity)
 {
-    int midi_freq = get_midi_freq(midi_num + (self->cur_octave * 12));
-
-    self->osc1->m_midi_note_number = midi_num;
-    self->osc1->m_osc_fo = midi_freq;
-
-    self->osc2->m_midi_note_number = midi_num;
-    self->osc2->m_osc_fo = midi_freq;
-
-    self->lfo->start_oscillator(self->lfo);
-    start_eg(self->eg1);
-
-    if (!self->osc1->m_note_on) {
-        self->osc1->start_oscillator(self->osc1);
-        self->osc2->start_oscillator(self->osc2);
+    printf("Midi on! %d Velocity! %d\n", midi_num, velocity);
+    if (!self->m_voices[0].osc1->m_note_on) {
+        nanosynth_start_note(self, 0, midi_num, velocity);
+    }
+    else if (!self->m_voices[1].osc1->m_note_on) {
+        nanosynth_start_note(self, 1, midi_num, velocity);
     }
     else {
-        self->osc1->update_oscillator(self->osc1);
-        self->osc2->update_oscillator(self->osc2);
+        unsigned int note0 = self->m_voices[0].osc1->m_midi_note_number;
+        unsigned int note1 = self->m_voices[1].osc1->m_midi_note_number;
+        // if new note is higher than both, steal the lower of the two
+        if (midi_num < note0 && midi_num < note1) {
+            if (note0 < note1)
+                nanosynth_steal_note(self, 0, midi_num, velocity);
+            else
+                nanosynth_steal_note(self, 1, midi_num, velocity);
+        }
     }
+}
 
-    self->m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midi_num;
-    // TODO: send velocity self->m_modmatrix->m_sources[SOURCE_VELOCITY] =
-    // velocity;
+bool nanosynth_midi_note_off(nanosynth *self, unsigned int midi_num,
+                             unsigned int velocity, bool all_notes_off)
+{
+    (void)velocity;
+    if (all_notes_off) {
+        eg_note_off(self->m_voices[0].eg1);
+        eg_note_off(self->m_voices[1].eg1);
+        return true;
+    }
+    if (midi_num == self->m_voices[0].osc1->m_midi_note_number)
+        eg_note_off(self->m_voices[0].eg1);
+    if (midi_num == self->m_voices[1].osc1->m_midi_note_number)
+        eg_note_off(self->m_voices[1].eg1);
+    return true;
 }
 
 double nanosynth_gennext(void *self)
@@ -372,50 +404,104 @@ double nanosynth_gennext(void *self)
     double out_left = 0.0;
     double out_right = 0.0;
 
-    if (ns->osc1->m_note_on) {
+    double accum_out_left = 0.0;
+    double accum_out_right = 0.0;
 
-        // layer 0 //////////////////////////////
-        do_modulation_matrix(ns->m_modmatrix, 0);
-        ///////////////////////////////////////////
+    for (int i = 0; i < MAX_VOICES; i++) {
+        if (accum_out_left != 0.0)
+            printf("TOP OF LOOP! %f\n", accum_out_left);
+        if (out_left != 0.0)
+            printf("TOP OF LOOP OUTLEFT! %f\n", out_left);
+        // clear for loop
+        out_left = 0.0;
+        out_right = 0.0;
 
-        eg_update(ns->eg1);
-        ns->lfo->update_oscillator(ns->lfo);
+        if (ns->m_voices[i].osc1->m_note_on) {
 
-        do_envelope(ns->eg1, NULL);
-        ns->lfo->do_oscillate(ns->lfo, NULL);
+            // layer 0 //////////////////////////////
+            do_modulation_matrix(ns->m_voices[i].m_modmatrix, 0);
+            ///////////////////////////////////////////
 
-        //// layer 1 /////////////////////////////
-        do_modulation_matrix(ns->m_modmatrix, 1);
-        ///////////////////////////////////////////
+            eg_update(ns->m_voices[i].eg1);
+            ns->m_voices[i].lfo->update_oscillator(ns->m_voices[i].lfo);
 
-        dca_update(ns->dca);
-        ns->f->update(ns->f);
+            do_envelope(ns->m_voices[i].eg1, NULL);
+            ns->m_voices[i].lfo->do_oscillate(ns->m_voices[i].lfo, NULL);
 
-        ns->osc1->update_oscillator(ns->osc1);
-        ns->osc2->update_oscillator(ns->osc2);
+            //// layer 1 /////////////////////////////
+            do_modulation_matrix(ns->m_voices[i].m_modmatrix, 1);
+            ///////////////////////////////////////////
 
-        //// audio engine block ///////////////////////////////
-        double osc1_val = ns->osc1->do_oscillate(ns->osc1, NULL);
-        double osc2_val = ns->osc2->do_oscillate(ns->osc2, NULL);
+            dca_update(ns->m_voices[i].dca);
+            ns->m_voices[i].f->update(ns->m_voices[i].f);
 
-        double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
+            ns->m_voices[i].osc1->update_oscillator(ns->m_voices[i].osc1);
+            ns->m_voices[i].osc2->update_oscillator(ns->m_voices[i].osc2);
 
-        double filter_out = ns->f->gennext(ns->f, osc_out);
+            //// audio engine block ///////////////////////////////
+            double osc1_val =
+                ns->m_voices[i].osc1->do_oscillate(ns->m_voices[i].osc1, NULL);
+            double osc2_val =
+                ns->m_voices[i].osc2->do_oscillate(ns->m_voices[i].osc2, NULL);
 
-        dca_gennext(ns->dca, filter_out, filter_out, &out_left, &out_right);
+            double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
+            // printf("OSC_OUT%f\n", osc_out);
+            double filter_out =
+                ns->m_voices[i].f->gennext(ns->m_voices[i].f, osc_out);
+            // if (filter_out != 0.0)
+            //    printf("FILTER_OUT%f\n", osc_out);
+            dca_gennext(ns->m_voices[i].dca, filter_out, filter_out, &out_left,
+                        &out_right);
+            // printf("OUT_LEFT%f\n", out_left);
+            if (out_left != 0.0)
+                printf("AFTER DCA_GENNEXT  %f\n", out_left);
 
-        if ((get_state(ns->eg1)) == 0) {
-            ns->osc1->stop_oscillator(ns->osc1);
-            ns->osc2->stop_oscillator(ns->osc2);
-            ns->lfo->stop_oscillator(ns->lfo);
-            stop_eg(ns->eg1);
+            out_left = effector(&ns->sound_generator, out_left);
+            out_right = effector(&ns->sound_generator, out_right);
+
+            out_left = envelopor(&ns->sound_generator, out_left);
+            out_right = envelopor(&ns->sound_generator, out_right);
+
+            accum_out_left += out_left;
+            accum_out_right += out_right;
+
+            if ((get_state(ns->m_voices[i].eg1)) == 0) {
+                if (ns->m_pending_midi_note[i] >= 0) {
+                    ns->m_voices[i].osc1->m_midi_note_number =
+                        ns->m_pending_midi_note[i];
+                    ns->m_voices[i].osc1->m_osc_fo =
+                        get_midi_freq(ns->m_pending_midi_note[i]);
+
+                    ns->m_voices[i].osc2->m_midi_note_number =
+                        ns->m_pending_midi_note[i];
+                    ns->m_voices[i].osc2->m_osc_fo =
+                        get_midi_freq(ns->m_pending_midi_note[i]);
+
+                    osc_update(ns->m_voices[i].osc1);
+                    osc_update(ns->m_voices[i].osc2);
+
+                    start_eg(ns->m_voices[i].eg1);
+                    ns->m_voices[i]
+                        .m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] =
+                        ns->m_pending_midi_note[i];
+                    ns->m_voices[i].m_modmatrix->m_sources[SOURCE_VELOCITY] =
+                        ns->m_pending_midi_velocity[i];
+
+                    // --- reset
+                    ns->m_pending_midi_note[i] = -1;
+                    ns->m_pending_midi_velocity[i] = -1;
+                }
+                else {
+                    ns->m_voices[i].osc1->stop_oscillator(ns->m_voices[i].osc1);
+                    ns->m_voices[i].osc2->stop_oscillator(ns->m_voices[i].osc2);
+                    ns->m_voices[i].lfo->stop_oscillator(ns->m_voices[i].lfo);
+                    stop_eg(ns->m_voices[i].eg1);
+                }
+            }
         }
-
-        out_left = effector(&ns->sound_generator, out_left);
-        out_left = envelopor(&ns->sound_generator, out_left);
     }
 
-    return out_left * ns->vol;
+    return accum_out_left * ns->vol;
 }
 
 void nanosynth_set_multi_melody_mode(nanosynth *self, bool melody_mode)
@@ -435,4 +521,128 @@ void nanosynth_set_sustain(nanosynth *self, int val)
 {
     self->sustain = val;
     printf("Set sustain to %d\n", val);
+}
+
+void nanosynth_midi_control(nanosynth *ns, unsigned int data1,
+                            unsigned int data2)
+{
+    // printf("MIDI Mind Control! %d %d\n", data1, data2);
+
+    for (int i = 0; i < MAX_VOICES; i++) {
+        double scaley_val;
+        switch (data1) {
+        case 1: // K1 - Envelope Attack Time Msec
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            set_attack_time_msec(ns->m_voices[i].eg1, scaley_val);
+            break;
+        case 2: // K2 - Envelope Decay Time Msec
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            set_decay_time_msec(ns->m_voices[i].eg1, scaley_val);
+            break;
+        case 3: // K3 - Envelope Sustain Level
+            scaley_val = scaleybum(1, 128, 0, 1, data2);
+            set_sustain_level(ns->m_voices[i].eg1, scaley_val);
+            break;
+        case 4: // K4 - Envelope Release Time Msec
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            set_release_time_msec(ns->m_voices[i].eg1, scaley_val);
+            break;
+        case 5: // K5 - LFO rate
+            scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+            ns->m_voices[i].lfo->m_osc_fo = scaley_val;
+            osc_update(ns->m_voices[i].lfo);
+            break;
+        case 6: // K6 - LFO amplitude
+            scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
+            ns->m_voices[i].lfo->m_amplitude = scaley_val;
+            osc_update(ns->m_voices[i].lfo);
+            break;
+        case 7: // K7 - Filter Frequency Cut
+            scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+            ns->m_voices[i].f->m_fc_control = scaley_val;
+            break;
+        case 8: // K8 - Filter Q control
+            scaley_val = scaleybum(1, 128, 1, 10, data2);
+            printf("FILTER Q control! %f\n", scaley_val);
+            filter_set_q_control(ns->m_voices[i].f, scaley_val);
+            break;
+        default:
+            printf("SOMthing else\n");
+        }
+    }
+}
+
+void nanosynth_midi_pitchbend(nanosynth *ns, unsigned int data1,
+                              unsigned int data2)
+{
+    // printf("Pitch bend, babee: %d %d\n", data1, data2);
+    int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
+
+    if (actual_pitch_bent_val != 8192) {
+        double normalized_pitch_bent_val =
+            (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
+        ns->m_modmatrix->m_sources[SOURCE_PITCHBEND] =
+            normalized_pitch_bent_val;
+        double scaley_val =
+            // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
+            scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
+        // printf("Cents to bend - %f\n", scaley_val);
+        for (int i = 0; i < MAX_VOICES; i++) {
+            ns->m_voices[i].osc1->m_cents = scaley_val;
+            ns->m_voices[i].osc2->m_cents = scaley_val + 2.5;
+        }
+    }
+    else {
+        for (int i = 0; i < MAX_VOICES; i++) {
+            ns->m_voices[i].osc1->m_cents = 0;
+            ns->m_voices[i].osc2->m_cents = 2.5;
+        }
+    }
+}
+
+void nanosynth_start_note(nanosynth *ns, int index, unsigned int midinote,
+                          unsigned int velocity)
+{
+    if (index > MAX_VOICES - 1)
+        return;
+
+    // --- set pitches
+    ns->m_voices[index].osc1->m_midi_note_number = midinote;
+    ns->m_voices[index].osc1->m_osc_fo = get_midi_freq(midinote);
+
+    ns->m_voices[index].osc2->m_midi_note_number = midinote;
+    ns->m_voices[index].osc2->m_osc_fo = get_midi_freq(midinote);
+
+    // --- start the modulators FIRST
+    ns->m_voices[index].lfo->start_oscillator(ns->m_voices[index].lfo);
+    start_eg(ns->m_voices[index].eg1);
+
+    // --- not playing, reset and do updateOscillator()
+    ns->m_voices[index].osc1->start_oscillator(ns->m_voices[index].osc1);
+    ns->m_voices[index].osc2->start_oscillator(ns->m_voices[index].osc2);
+
+    // --- set the note number in the mod matrix
+    ns->m_voices[index].m_modmatrix->m_sources[SOURCE_MIDI_NOTE_NUM] = midinote;
+
+    // --- velocity modulation
+    ns->m_voices[index].m_modmatrix->m_sources[SOURCE_VELOCITY] = velocity;
+}
+
+void nanosynth_steal_note(nanosynth *ns, int index,
+                          unsigned int pending_midinote,
+                          unsigned int pending_velocity)
+{
+    if (index > MAX_VOICES - 1)
+        return;
+
+    // --- shutdown the EG with fast linear taper
+    //         - if in Legato mode, EG will ignore this
+    //     - if in RTZ mode, EG will use shutdown linear taper
+    //           otherwise it goes directly to off state for instant
+    //       re-trigger starting at current EG output level
+    eg_shutdown(ns->m_voices[index].eg1);
+
+    // --- save the pending note and velocity
+    ns->m_pending_midi_note[index] = pending_midinote;
+    ns->m_pending_midi_velocity[index] = pending_velocity;
 }

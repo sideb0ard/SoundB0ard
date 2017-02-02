@@ -18,10 +18,11 @@ typedef struct midi_event {
 
 void *midiman(void *);
 
-void midinoteon(nanosynth *ns, unsigned int midinote, int velocity);
-void midinoteoff(nanosynth *ns, unsigned int midinote, int velocity);
-void midipitchbend(nanosynth *ns, int data1, int data2);
-void midicontrol(nanosynth *ns, int data1, int data2);
+// void midinoteon(nanosynth *ns, unsigned int midinote, int velocity);
+// void midinoteoff(nanosynth *ns, unsigned int midinote, int velocity);
+// void midipitchbend(nanosynth *ns, int data1, int data2);
+// void midicontrol(nanosynth *ns, int data1, int data2);
+
 void midi_delay_control(EFFECT *e, int data1, int data2);
 
 midi_event *new_midi_event(int tick, int event_type, int data1, int data2);

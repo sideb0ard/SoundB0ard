@@ -48,10 +48,13 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(COOL_COLOR_MAUVE "::::: [" ANSI_COLOR_WHITE
-                            "MIXING dESK" COOL_COLOR_MAUVE
-                            "] Volume: %.2f // BPM: %d // "
-                            "TICK: %d // Qtick: %d :::::\n" ANSI_COLOR_RESET,
+    printf(COOL_COLOR_MAUVE
+           "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
+           "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
+           " // BPM: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " :::::\n" ANSI_COLOR_RESET,
            mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick);
 
     if (mixr->env_var_count > 0) {

@@ -68,17 +68,22 @@ void dca_update(dca *self)
                 self->g_modmatrix->m_destinations[self->m_mod_source_pan];
     }
 
-    if (self->m_eg_mod >= 0)
+    if (self->m_eg_mod >= 0) {
         self->m_gain = self->m_eg_mod;
+        printf("meg mod%f\n", self->m_eg_mod);
+    }
     else
         self->m_gain = self->m_eg_mod + 1.0;
 
+    printf("1DCA_UPDATE d to n eg mod%f\n", self->m_gain);
     self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
+    printf("2DCA_UPDATE d to n eg mod%f\n", self->m_gain);
 }
 
 void dca_gennext(dca *self, double left_input, double right_input,
                  double *left_output, double *right_output)
 {
+    printf("DCA GENNEXT CALLED WITH %f\n", left_input);
     double pan_total = self->m_pan_control + self->m_pan_mod;
 
     pan_total = fmin(pan_total, 1.0);
@@ -87,8 +92,11 @@ void dca_gennext(dca *self, double left_input, double right_input,
     double pan_right = 0.707;
     calculate_pan_values(pan_total, &pan_left, &pan_right);
 
+    printf("MY AMPS is %f and mi HGain is %f\n", self->m_amplitude_control,
+           self->m_gain);
     *left_output =
         pan_left * self->m_amplitude_control * left_input * self->m_gain;
     *right_output =
         pan_right * self->m_amplitude_control * right_input * self->m_gain;
+    printf("DCA LEFT OUTPUT %f\n", *left_output);
 }

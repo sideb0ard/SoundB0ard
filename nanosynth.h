@@ -13,11 +13,26 @@
 #include "sound_generator.h"
 
 #define MAX_NUM_MIDI_LOOPS 16
+#define MAX_VOICES 2
 
 typedef enum { OSC, FILTER } LFO1_dest;
 typedef enum { NONE, NANOSYNTH, DELAYFX } midi_control_type;
 
 typedef midi_event *midi_events_loop_t[PPNS];
+
+typedef struct nanosynth_voice {
+    oscillator *osc1;
+    oscillator *osc2;
+    oscillator *lfo;
+    envelope_generator *eg1;
+    filter *f;
+    dca *dca;
+
+    modmatrix *m_modmatrix; // routing structure for sound generation
+
+    unsigned m_lfo1_dest;
+    char *m_lfo_dest_string[2];
+} nanosynth_voice;
 
 typedef struct nanosynth {
     SOUNDGEN sound_generator;
@@ -29,16 +44,6 @@ typedef struct nanosynth {
     int cur_melody_iteration;
     bool multi_melody_mode;
     bool multi_melody_loop_countdown_started;
-
-    oscillator *osc1;
-    oscillator *osc2;
-    oscillator *lfo;
-    envelope_generator *eg1;
-    filter *f;
-    dca *dca;
-
-    unsigned m_lfo1_dest;
-    char *m_lfo_dest_string[2];
 
     int cur_octave;
     int sustain;
@@ -53,6 +58,10 @@ typedef struct nanosynth {
     float vol;
 
     modmatrix *m_modmatrix; // routing structure for sound generation
+
+    nanosynth_voice m_voices[MAX_VOICES];
+    int m_pending_midi_note[MAX_VOICES];
+    int m_pending_midi_velocity[MAX_VOICES];
 
     // need these for mod matrix
     double m_default_mod_range; // 1.0
@@ -72,15 +81,33 @@ typedef struct nanosynth {
 
 nanosynth *new_nanosynth(void);
 
+// sound generator interface //////////////
 double nanosynth_gennext(void *self);
 // void nanosynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void nanosynth_status(void *self, wchar_t *status_string);
-double nanosynth_getvol(void *self);
 void nanosynth_setvol(void *self, double v);
-void note_on(nanosynth *self, int midi_num);
-// void note_off(void *self, int midi_num);
+double nanosynth_getvol(void *self);
+////////////////////////////////////
+
+void nanosynth_midi_note_on(nanosynth *self, unsigned int midinote,
+                            unsigned int velocity);
+bool nanosynth_midi_note_off(nanosynth *self, unsigned int midinote,
+                             unsigned int velocity, bool all_notes_off);
+void nanosynth_midi_pitchbend(nanosynth *self, unsigned int data1,
+                              unsigned int data2);
+void nanosynth_midi_control(nanosynth *self, unsigned int data1,
+                            unsigned int data2);
+void nanosynth_start_note(nanosynth *self, int index, unsigned int midinote,
+                          unsigned int velocity);
+void nanosynth_steal_note(nanosynth *self, int index,
+                          unsigned int pending_midinote,
+                          unsigned int pending_velocity);
+
 void change_octave(void *self, int direction);
-void nanosynth_change_osc_wave_form(nanosynth *self, int oscil);
+void nanosynth_change_osc_wave_form(nanosynth *self, unsigned int voice_no,
+                                    int oscil, bool all_voices);
+void p_nanosynth_change_osc_wave_form(nanosynth *self, unsigned int voice_no,
+                                      int oscil);
 void nanosynth_set_sustain(nanosynth *self, int sustain_val);
 void nanosynth_set_multi_melody_mode(nanosynth *self, bool melody_mode);
 void nanosynth_set_melody_loop_num(nanosynth *self, int melody_num,

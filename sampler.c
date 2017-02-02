@@ -241,8 +241,7 @@ void sampler_status(void *self, wchar_t *status_string)
     SAMPLER *sampler = self;
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
              "[LOOPER] Vol: %.2lf Multi: %d Current Sample: %d",
-             sampler->vol, sampler->multi_sample_mode,
-             sampler->cur_sample);
+             sampler->vol, sampler->multi_sample_mode, sampler->cur_sample);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {

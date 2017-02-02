@@ -130,14 +130,9 @@ void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
     swprintf(status_string, 119,
-            WANSI_COLOR_RED "[ALGO]%s Post: %s %s %s %s %s",
-            a->command,
-            a->afterthought[0],
-            a->afterthought[1],
-            a->afterthought[2],
-            a->afterthought[3],
-            a->afterthought[4]
-            );
+             WANSI_COLOR_RED "[ALGO]%s Post: %s %s %s %s %s", a->command,
+             a->afterthought[0], a->afterthought[1], a->afterthought[2],
+             a->afterthought[3], a->afterthought[4]);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
