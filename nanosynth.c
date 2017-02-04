@@ -147,19 +147,13 @@ nanosynth *new_nanosynth()
         ns->m_voices[i].m_modmatrix = new_modmatrix();
         set_matrix_core(ns->m_voices[i].m_modmatrix,
                         get_matrix_core(ns->g_modmatrix));
-#ifdef DEBUG
-        printf("SIZE OF GLOBAL MATRIX: %d\n", get_matrix_size(ns->g_modmatrix));
-        printf("SIZE OF MATRIX: %d\n", get_matrix_size(ns->m_voices[i].m_modmatrix));
-#endif
 
+        // Objects ////////////////////////////////////////////
         ns->m_voices[i].osc1 = (oscillator *)qb_osc_new();
         ns->m_voices[i].osc2 = (oscillator *)qb_osc_new();
         ns->m_voices[i].osc2->m_cents = 2.5;
 
         ns->m_voices[i].lfo = (oscillator *)lfo_new();
-        ns->m_voices[i].m_lfo1_dest = OSC;
-        ns->m_voices[i].m_lfo_dest_string[0] = "Oscillators";
-        ns->m_voices[i].m_lfo_dest_string[1] = "Filters";
 
         ns->m_voices[i].eg1 = new_envelope_generator();
 
@@ -169,7 +163,9 @@ nanosynth *new_nanosynth()
         ns->m_voices[i].f = (filter *)new_filter_moog();
 
         ns->m_voices[i].dca = new_dca();
+        // ENd Objects //////////////////////////////////////////
 
+        // mmmmmMatrix ///////////////////////
         ns->m_voices[i].osc1->g_modmatrix = ns->m_voices[i].m_modmatrix;
         ns->m_voices[i].osc1->m_mod_source_fo = DEST_OSC1_FO;
         ns->m_voices[i].osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
@@ -223,8 +219,6 @@ nanosynth *new_nanosynth()
     ns->sound_generator.setvol = &nanosynth_setvol;
     ns->sound_generator.getvol = &nanosynth_getvol;
     ns->sound_generator.type = NANOSYNTH_TYPE;
-
-    // nanosynth_update(ns);
 
     // start loop player running
     pthread_t melody_looprrr;
@@ -370,7 +364,6 @@ void nanosynth_status(void *self, wchar_t *status_string)
 void nanosynth_midi_note_on(nanosynth *self, unsigned int midi_num,
                             unsigned int velocity)
 {
-    printf("Midi on! %d Velocity! %d\n", midi_num, velocity);
     if (!self->m_voices[0].osc1->m_note_on) {
         nanosynth_start_note(self, 0, midi_num, velocity);
     }
@@ -382,10 +375,20 @@ void nanosynth_midi_note_on(nanosynth *self, unsigned int midi_num,
         unsigned int note1 = self->m_voices[1].osc1->m_midi_note_number;
         // if new note is higher than both, steal the lower of the two
         if (midi_num < note0 && midi_num < note1) {
-            if (note0 < note1)
+            if (note0 < note1) {
                 nanosynth_steal_note(self, 0, midi_num, velocity);
-            else
+            }
+            else {
                 nanosynth_steal_note(self, 1, midi_num, velocity);
+            }
+        }
+        else { // steal higher note
+            if (note0 > note1) {
+                nanosynth_steal_note(self, 0, midi_num, velocity);
+            }
+            else {
+                nanosynth_steal_note(self, 1, midi_num, velocity);
+            }
         }
     }
 }
@@ -471,7 +474,8 @@ double nanosynth_gennext(void *self)
             accum_out_left += out_left;
             accum_out_right += out_right;
 
-            if ((get_state(ns->m_voices[i].eg1)) == 0) {
+            // if note is on but EG is off, note is finished
+            if ((get_state(ns->m_voices[i].eg1)) == 0) { // OFF
                 if (ns->m_pending_midi_note[i] >= 0) {
                     ns->m_voices[i].osc1->m_midi_note_number =
                         ns->m_pending_midi_note[i];

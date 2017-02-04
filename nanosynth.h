@@ -30,8 +30,6 @@ typedef struct nanosynth_voice {
 
     modmatrix *m_modmatrix; // routing structure for sound generation
 
-    unsigned m_lfo1_dest;
-    char *m_lfo_dest_string[2];
 } nanosynth_voice;
 
 typedef struct nanosynth {

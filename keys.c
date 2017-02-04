@@ -99,24 +99,6 @@ void keys(int soundgen_num)
                 printf("Key tracking intensity toggle! Val is %f\n",
                        ns->m_filter_keytrack_intensity);
                 break;
-            // case 110:
-            //    printf("Toggling LFO1 destination!\n");
-            //    ns->m_lfo1_dest = 1 - ns->m_lfo1_dest;
-            //    printf("LFO1 dest is now %s\n",
-            //           ns->m_lfo_dest_string[ns->m_lfo1_dest]);
-            //    if (ns->m_lfo1_dest == OSC) {
-            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-            //                          DEST_ALL_OSC_FO, true);
-            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-            //                          DEST_ALL_FILTER_FC, false);
-            //    }
-            //    else {
-            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-            //                          DEST_ALL_OSC_FO, false);
-            //        enable_matrix_row(ns->m_modmatrix, SOURCE_LFO1,
-            //                          DEST_ALL_FILTER_FC, true);
-            //    }
-            //    break;
 
             default:
                 // play note
@@ -127,10 +109,8 @@ void keys(int soundgen_num)
                                            126); // TODO fill in real velocity
                     if (ns->recording) {
                         printf("Recording note!\n");
-                        // ns->mloop[mixr->tick % PPNS] = midi_num;
                         int tick = mixr->tick % PPNS;
                         midi_event *ev = new_midi_event(tick, 144, midi_num, 0);
-                        // ns->midi_events_loop[tick] = ev;
                         ns->melodies[ns->cur_melody][tick] = ev;
                     }
                 }
