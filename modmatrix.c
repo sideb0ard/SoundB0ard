@@ -74,6 +74,7 @@ void set_matrix_core(modmatrix *self, matrixrow **matrix)
         free(self->m_matrix_core);
     }
     self->m_matrix_core = matrix;
+    self->m_num_rows_in_matrix_core = get_matrix_size(self);
 }
 
 void add_matrix_row(modmatrix *self, matrixrow *row)

@@ -57,7 +57,8 @@ typedef struct nanosynth {
 
     float vol;
 
-    modmatrix *m_modmatrix; // routing structure for sound generation
+    // global modmatrix, core is shared by all voices
+    modmatrix *g_modmatrix; // routing structure for sound generation
 
     nanosynth_voice m_voices[MAX_VOICES];
     int m_pending_midi_note[MAX_VOICES];
