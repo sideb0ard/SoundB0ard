@@ -52,7 +52,7 @@ void dca_set_pan_mod(dca *self, double mod) { self->m_pan_mod = mod; }
 void dca_update(dca *self)
 {
     if (self->g_modmatrix) {
-        //printf("Yup yup, got modmatrix\n");
+        // printf("Yup yup, got modmatrix\n");
         if (self->m_mod_source_eg != DEST_NONE) {
             self->m_eg_mod =
                 self->g_modmatrix->m_destinations[self->m_mod_source_eg];

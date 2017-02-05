@@ -125,7 +125,8 @@ nanosynth *new_nanosynth()
     ns->g_modmatrix->m_sources[SOURCE_MIDI_PAN_CC10] = 64;
 
 #ifdef DEBUG
-    printf("NUM ROWS GLOBAL MOD %d\n", ns->g_modmatrix->m_num_rows_in_matrix_core);
+    printf("NUM ROWS GLOBAL MOD %d\n",
+           ns->g_modmatrix->m_num_rows_in_matrix_core);
 #endif
 
     // end mod matrix setup ///////////////////////////////////
@@ -454,15 +455,15 @@ double nanosynth_gennext(void *self)
                 ns->m_voices[i].osc2->do_oscillate(ns->m_voices[i].osc2, NULL);
 
             double osc_out = 0.5 * osc1_val + 0.5 * osc2_val;
-            //printf("OSC_OUT: %f\n", osc_out);
+            // printf("OSC_OUT: %f\n", osc_out);
             double filter_out =
                 ns->m_voices[i].f->gennext(ns->m_voices[i].f, osc_out);
-            //if (filter_out != 0.0)
+            // if (filter_out != 0.0)
             //   printf("FILTER_OUT%f\n", osc_out);
             dca_gennext(ns->m_voices[i].dca, filter_out, filter_out, &out_left,
                         &out_right);
-            //printf("OUT_LEFT%f\n", out_left);
-            //if (out_left != 0.0)
+            // printf("OUT_LEFT%f\n", out_left);
+            // if (out_left != 0.0)
             //    printf("AFTER DCA_GENNEXT  %f\n", out_left);
 
             out_left = effector(&ns->sound_generator, out_left);
@@ -591,8 +592,6 @@ void nanosynth_midi_pitchbend(nanosynth *ns, unsigned int data1,
     if (actual_pitch_bent_val != 8192) {
         double normalized_pitch_bent_val =
             (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
-        ns->g_modmatrix->m_sources[SOURCE_PITCHBEND] =
-            normalized_pitch_bent_val;
         double scaley_val =
             // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
@@ -600,6 +599,8 @@ void nanosynth_midi_pitchbend(nanosynth *ns, unsigned int data1,
         for (int i = 0; i < MAX_VOICES; i++) {
             ns->m_voices[i].osc1->m_cents = scaley_val;
             ns->m_voices[i].osc2->m_cents = scaley_val + 2.5;
+            ns->m_voices[i].m_modmatrix->m_sources[SOURCE_PITCHBEND] =
+                normalized_pitch_bent_val;
         }
     }
     else {

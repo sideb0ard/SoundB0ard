@@ -103,15 +103,21 @@ void keys(int soundgen_num)
             default:
                 // play note
                 midi_num = ch_midi_lookup(ch, ns);
+                int fake_velocity = 126; // TODO real velocity
                 if (midi_num != -1) {
                     print_midi_event(midi_num);
                     nanosynth_midi_note_on(ns, midi_num,
-                                           126); // TODO fill in real velocity
+                                           fake_velocity);
                     if (ns->recording) {
                         printf("Recording note!\n");
-                        int tick = mixr->tick % PPNS;
-                        midi_event *ev = new_midi_event(tick, 144, midi_num, 0);
-                        ns->melodies[ns->cur_melody][tick] = ev;
+                        int note_on_tick = mixr->tick % PPNS;
+                        midi_event *ev = new_midi_event(note_on_tick, 144, midi_num, fake_velocity);
+                        ns->melodies[ns->cur_melody][note_on_tick] = ev;
+
+                        int note_off_tick = (note_on_tick + PPS*4) % PPNS; // rough guess - PPS is pulses per quart note
+                                                                         // and PPNS is pulses per Nanosynth Loop
+                        midi_event *ev2 = new_midi_event(note_off_tick, 128, midi_num, fake_velocity);
+                        ns->melodies[ns->cur_melody][note_off_tick] = ev2;
                     }
                 }
                 printf("CCCC %d\n", ch);

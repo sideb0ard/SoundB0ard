@@ -185,7 +185,7 @@ void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
 
 void eg_update(envelope_generator *self)
 {
-    //printf("CALLED EG UPDATE\n");
+    // printf("CALLED EG UPDATE\n");
     if (!self->g_modmatrix || !self->m_output_eg) {
         return;
     }
@@ -304,7 +304,8 @@ double do_envelope(envelope_generator *self, double *p_biased_output)
     }
 
     if (self->g_modmatrix) {
-        self->g_modmatrix->m_sources[self->m_mod_dest_eg_output] = self->m_envelope_output;
+        self->g_modmatrix->m_sources[self->m_mod_dest_eg_output] =
+            self->m_envelope_output;
         self->g_modmatrix->m_sources[self->m_mod_dest_eg_biased_output] =
             self->m_envelope_output;
     }
@@ -312,7 +313,7 @@ double do_envelope(envelope_generator *self, double *p_biased_output)
     if (p_biased_output)
         *p_biased_output = self->m_envelope_output - self->m_sustain_level;
 
-    //printf("2EG_ENV_OUTPUT: %f\n", self->m_envelope_output);
+    // printf("2EG_ENV_OUTPUT: %f\n", self->m_envelope_output);
     return self->m_envelope_output;
 }
 

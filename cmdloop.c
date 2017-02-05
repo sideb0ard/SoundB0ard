@@ -325,11 +325,13 @@ void interpret(char *line)
                         else {
                             int melody_num = atoi(wurds[3]);
                             if (is_valid_melody_num(ns, melody_num)) {
-                                if (strncmp("numloops", wurds[3], 8) == 0) {
+                                printf("VALID!\n");
+                                if (strncmp("numloops", wurds[4], 8) == 0) {
                                     int numloops = atoi(wurds[5]);
                                     if (numloops != 0) {
                                         nanosynth_set_melody_loop_num(
                                             ns, melody_num, numloops);
+                                        printf("NUMLOOPS Now %d\n", numloops);
                                     }
                                 }
                             }
