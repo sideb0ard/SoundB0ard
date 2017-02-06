@@ -44,6 +44,7 @@ SRC = \
       sound_generator.c \
       table.c \
       utils.c \
+      voice.c \
       wt_oscillator.c \
 
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile

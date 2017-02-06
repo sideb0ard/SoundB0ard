@@ -74,4 +74,6 @@ typedef enum {
     CHAOSMONKEY_TYPE,
 } sound_generator_type;
 
+typedef enum { MONO, LEGATO } legato_mode;
+
 typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;
