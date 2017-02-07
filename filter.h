@@ -2,6 +2,7 @@
 
 #include "defjams.h"
 #include "modmatrix.h"
+#include "synthfunctions.h"
 
 // 46.88.. = semitones between frequencies (80, 18000.0) / 2
 // taken from Will Pirkle book 'designing software synths..'
@@ -60,3 +61,4 @@ void filter_set_fc_mod(filter *self, double val);
 void filter_set_q_control(filter *self, double val);
 void filter_update(filter *self);
 void filter_reset(filter *self);
+void filter_init_global_parameters(filter *self, global_filter_params *params);

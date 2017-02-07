@@ -28,7 +28,7 @@ typedef struct nanosynth_voice {
     filter *f;
     dca *dca;
 
-    modmatrix *m_modmatrix; // routing structure for sound generation
+    modmatrix *g_modmatrix; // routing structure for sound generation
 
 } nanosynth_voice;
 

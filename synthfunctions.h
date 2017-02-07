@@ -49,13 +49,13 @@ typedef struct {
 typedef struct {
     unsigned int voice_mode;
     double hs_ratio; // hard sync
-    double m_portamento_time_msec;
+    double portamento_time_msec;
 
     double osc_fo_pitchbend_mod_range;
-    double filter_mod_range;
-    double amp_mod_range;
     double osc_fo_mod_range;
     double osc_hard_sync_mod_range;
+    double filter_mod_range;
+    double amp_mod_range;
 
     double filter_keytrack_intensity;
 

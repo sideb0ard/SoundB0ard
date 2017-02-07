@@ -720,3 +720,33 @@ float fasttan(float x)
 }
 
 float fasttanh(float p) { return p / (fabs(2 * p) + 3 / (2 + 2 * p * 2 * p)); }
+
+// no idea! taken from Will Pirkle books
+float fastlog2(float x)
+{
+    union {
+        float f;
+        unsigned int i;
+    } vx = {x};
+    union {
+        unsigned int i;
+        float f;
+    } mx = {(vx.i & 0x007FFFFF) | 0x3f000000};
+    float y = vx.i;
+    y *= 1.1920928955078125e-7f;
+
+    return y - 124.22551499f - 1.498030302f * mx.f -
+           1.72587999f / (0.3520887068f + mx.f);
+}
+
+double semitones_between_frequencies(double start_freq, double end_freq)
+{
+    return fastlog2(end_freq / start_freq) * 12.0;
+}
+
+double mma_midi_to_atten_db(unsigned int midi_val)
+{
+    if (midi_val == 0)
+        return -96.0; // dB floor
+    return 20.0 * log10((127.0 * 127.0) / ((float)midi_val * (float)midi_val));
+}

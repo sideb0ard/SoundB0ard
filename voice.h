@@ -12,7 +12,7 @@
 typedef struct {
 
     // shared by source and dest
-    modmatrix m_modmatrix;
+    modmatrix g_modmatrix;
 
     bool m_note_on;
     unsigned int m_timestamp;
@@ -71,7 +71,7 @@ voice *new_voice(void);
 void voice_init_global_parameters(voice *v, global_synth_params *sp);
 void voice_set_modmatrix_core(voice *v, matrixrow **modmatrix);
 void voice_initialize_modmatrix(voice *v, modmatrix *matrix);
-bool voice_is_active(voice *v);
+bool voice_is_active_voice(voice *v);
 bool voice_can_note_off(voice *v);
 bool voice_is_voice_done(voice *v);
 bool voice_in_legato_mode(voice *v);

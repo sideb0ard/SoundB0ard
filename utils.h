@@ -62,3 +62,9 @@ float lin_terp(float x1, float x2, float y1, float y2, float x);
 void print_midi_event(int midi_num);
 float fasttan(float x);
 float fasttanh(float x);
+float fastlog2(float x);
+float fastpow2(float x);
+float fastexp(float x);
+double semitones_between_frequencies(double start_freq, double end_freq);
+
+double mma_midi_to_atten_db(unsigned int midi_val);

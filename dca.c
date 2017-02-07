@@ -9,6 +9,16 @@
 dca *new_dca()
 {
     dca *d = calloc(1, sizeof(dca));
+    if (!d)
+        return NULL;
+
+    dca_initialize(d);
+
+    return d;
+}
+
+void dca_initialize(dca *d)
+{
     d->m_amplitude_control = 1.0;
     d->m_amp_mod_db = 0.0;
     d->m_gain = 1.0;
@@ -19,15 +29,17 @@ dca *new_dca()
     d->m_midi_velocity = 127;
 
     d->g_modmatrix = NULL;
+
     d->m_mod_source_eg = DEST_NONE;
     d->m_mod_source_amp_db = DEST_NONE;
     d->m_mod_source_velocity = DEST_NONE;
     d->m_mod_source_pan = DEST_NONE;
-
-    return d;
 }
 
-void dca_set_midi_velocity(dca *self, int vel) { self->m_midi_velocity = vel; }
+void dca_set_midi_velocity(dca *self, unsigned int vel)
+{
+    self->m_midi_velocity = vel;
+}
 
 void dca_set_pan_control(dca *self, double pan) { self->m_pan_control = pan; }
 
@@ -51,6 +63,11 @@ void dca_set_pan_mod(dca *self, double mod) { self->m_pan_mod = mod; }
 
 void dca_update(dca *self)
 {
+    if (self->m_global_dca_params) {
+        dca_set_amplitude_db(self, self->m_global_dca_params->amplitude_db);
+        self->m_pan_control = self->m_global_dca_params->pan_control;
+    }
+
     if (self->g_modmatrix) {
         // printf("Yup yup, got modmatrix\n");
         if (self->m_mod_source_eg != DEST_NONE) {
@@ -77,6 +94,7 @@ void dca_update(dca *self)
         self->m_gain = self->m_eg_mod + 1.0;
 
     self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
+    self->m_gain *= mma_midi_to_atten_db(self->m_midi_velocity);
 }
 
 void dca_gennext(dca *self, double left_input, double right_input,
@@ -94,4 +112,11 @@ void dca_gennext(dca *self, double left_input, double right_input,
         pan_left * self->m_amplitude_control * left_input * self->m_gain;
     *right_output =
         pan_right * self->m_amplitude_control * right_input * self->m_gain;
+}
+
+void dca_init_global_parameters(dca *self, global_dca_params *params)
+{
+    self->m_global_dca_params = params;
+    params->amplitude_db = self->m_amplitude_db;
+    params->pan_control = self->m_pan_control;
 }

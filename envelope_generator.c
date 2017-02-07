@@ -38,32 +38,53 @@ envelope_generator *new_envelope_generator()
     eg->m_release_pending = false;
     eg->m_output_eg = false;
     eg->m_eg_mode = ANALOG;
-    set_eg_mode(eg, eg->m_eg_mode);
+    eg_set_eg_mode(eg, eg->m_eg_mode);
     eg->m_reset_to_zero = false;
     eg->m_legato_mode = false;
 
     eg->g_modmatrix = NULL;
 
-    eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
+    // eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
 
     eg->m_mod_dest_eg_output = SOURCE_NONE;
     eg->m_mod_dest_eg_biased_output = SOURCE_NONE;
+
     eg->m_mod_source_eg_attack_scaling = DEST_NONE;
     eg->m_mod_source_eg_decay_scaling = DEST_NONE;
     eg->m_mod_source_sustain_override = DEST_NONE;
 
+    eg->m_global_eg_params = NULL;
+
     return eg;
 }
 
-state get_state(envelope_generator *self) { return self->m_state; }
+state eg_get_state(envelope_generator *self) { return self->m_state; }
 
-void reset(envelope_generator *self)
+bool eg_is_active(envelope_generator *self)
+{
+    if (self->m_state != RELEASE && self->m_state != OFFF &&
+        !self->m_release_pending)
+        return true;
+    return false;
+}
+
+bool eg_can_note_off(envelope_generator *self)
+{
+    if (self->m_state != RELEASE && self->m_state != SHUTDOWN &&
+        !self->m_release_pending)
+        return true;
+    return false;
+}
+
+void eg_reset(envelope_generator *self)
 {
     self->m_attack_time_scalar = 1.0;
     self->m_decay_time_scalar = 1.0;
     self->m_state = OFFF;
     self->m_release_pending = false;
-    set_eg_mode(self, self->m_eg_mode);
+    eg_set_eg_mode(self, self->m_eg_mode);
+
+    eg_calculate_release_time(self);
 
     if (self->m_reset_to_zero) {
         printf("RESET TO ZERO!\n");
@@ -71,7 +92,7 @@ void reset(envelope_generator *self)
     }
 }
 
-void set_eg_mode(envelope_generator *self, eg_mode mode)
+void eg_set_eg_mode(envelope_generator *self, eg_mode mode)
 {
     self->m_eg_mode = mode;
     if (self->m_eg_mode == ANALOG) {
@@ -86,12 +107,12 @@ void set_eg_mode(envelope_generator *self, eg_mode mode)
         self->m_release_tco = self->m_decay_tco;
     }
 
-    calculate_attack_time(self);
-    calculate_decay_time(self);
-    calculate_release_time(self);
+    eg_calculate_attack_time(self);
+    eg_calculate_decay_time(self);
+    eg_calculate_release_time(self);
 }
 
-void calculate_attack_time(envelope_generator *self)
+void eg_calculate_attack_time(envelope_generator *self)
 {
     // printf("CALC ATTK TIME!\n");
     double d_samples =
@@ -103,7 +124,7 @@ void calculate_attack_time(envelope_generator *self)
         (1.0 + self->m_attack_tco) * (1.0 - self->m_attack_coeff);
 }
 
-void calculate_decay_time(envelope_generator *self)
+void eg_calculate_decay_time(envelope_generator *self)
 {
     // printf("CALC DECAY TIME!\n");
     double d_samples =
@@ -115,7 +136,7 @@ void calculate_decay_time(envelope_generator *self)
                            (1.0 - self->m_decay_coeff);
 }
 
-void calculate_release_time(envelope_generator *self)
+void eg_calculate_release_time(envelope_generator *self)
 {
     // printf("CALC RELEASE TIME!\n");
     double d_samples = SAMPLE_RATE * (self->m_release_time_msec / 1000.0);
@@ -125,25 +146,25 @@ void calculate_release_time(envelope_generator *self)
         -self->m_release_tco * (1.0 - self->m_release_coeff);
 }
 
-void set_attack_time_msec(envelope_generator *self, double time)
+void eg_set_attack_time_msec(envelope_generator *self, double time)
 {
     self->m_attack_time_msec = time;
-    calculate_attack_time(self);
+    eg_calculate_attack_time(self);
 }
 
-void set_decay_time_msec(envelope_generator *self, double time)
+void eg_set_decay_time_msec(envelope_generator *self, double time)
 {
     self->m_decay_time_msec = time;
-    calculate_decay_time(self);
+    eg_calculate_decay_time(self);
 }
 
-void set_release_time_msec(envelope_generator *self, double time)
+void eg_set_release_time_msec(envelope_generator *self, double time)
 {
     self->m_release_time_msec = time;
-    calculate_release_time(self);
+    eg_calculate_release_time(self);
 }
 
-void set_sustain_override(envelope_generator *self, bool b)
+void eg_set_sustain_override(envelope_generator *self, bool b)
 {
     self->m_sustain_override = b;
     if (self->m_release_pending && !self->m_sustain_override) {
@@ -152,26 +173,26 @@ void set_sustain_override(envelope_generator *self, bool b)
     }
 }
 
-void set_sustain_level(envelope_generator *self, double level)
+void eg_set_sustain_level(envelope_generator *self, double level)
 {
     self->m_sustain_level = level;
-    calculate_decay_time(self);
+    eg_calculate_decay_time(self);
     if (self->m_state != RELEASE)
-        calculate_release_time(self);
+        eg_calculate_release_time(self);
 }
 
-void start_eg(envelope_generator *self)
+void eg_start_eg(envelope_generator *self)
 {
     if (self->m_legato_mode && self->m_state != OFFF &&
         self->m_state != RELEASE) {
-        printf("Already going, lets RETURN\n");
         return;
     }
 
     // printf("STATE : %s\n", state_strings[self->m_state]);
     // TODO - race condition? YES! this is it - nanosynth finds EG set
     // to zero after this reset and switches off the osc!!!
-    // reset(self);
+    // reset() wos here // WATCH OUT! 2017/02/04
+    eg_reset(self);
     self->m_state = ATTACK;
 }
 
@@ -181,11 +202,49 @@ void eg_release(envelope_generator *self)
         self->m_state = RELEASE;
 }
 
-void stop_eg(envelope_generator *self) { self->m_state = OFFF; }
+void eg_stop_eg(envelope_generator *self) { self->m_state = OFFF; }
+
+void eg_init_global_parameters(envelope_generator *self,
+                               global_eg_params *params)
+{
+    self->m_global_eg_params = params;
+    self->m_global_eg_params->attack_time_msec = self->m_attack_time_msec;
+    self->m_global_eg_params->attack_time_msec = self->m_attack_time_msec;
+    self->m_global_eg_params->decay_time_msec = self->m_decay_time_msec;
+    self->m_global_eg_params->release_time_msec = self->m_release_time_msec;
+    self->m_global_eg_params->sustain_level = self->m_sustain_level;
+    self->m_global_eg_params->shutdown_time_msec = self->m_shutdown_time_msec;
+    self->m_global_eg_params->reset_to_zero = self->m_reset_to_zero;
+    self->m_global_eg_params->legato_mode = self->m_legato_mode;
+}
 
 void eg_update(envelope_generator *self)
 {
-    // printf("CALLED EG UPDATE\n");
+    if (self->m_global_eg_params) {
+        if (self->m_attack_time_msec !=
+            self->m_global_eg_params->attack_time_msec)
+            eg_set_attack_time_msec(self,
+                                    self->m_global_eg_params->attack_time_msec);
+
+        if (self->m_decay_time_msec !=
+            self->m_global_eg_params->decay_time_msec)
+            eg_set_attack_time_msec(self,
+                                    self->m_global_eg_params->attack_time_msec);
+
+        if (self->m_release_time_msec !=
+            self->m_global_eg_params->release_time_msec)
+            eg_set_release_time_msec(
+                self, self->m_global_eg_params->release_time_msec);
+
+        if (self->m_sustain_level != self->m_global_eg_params->sustain_level)
+            eg_set_sustain_level(self, self->m_global_eg_params->sustain_level);
+
+        self->m_shutdown_time_msec =
+            self->m_global_eg_params->shutdown_time_msec;
+        self->m_reset_to_zero = self->m_global_eg_params->reset_to_zero;
+        self->m_legato_mode = self->m_global_eg_params->legato_mode;
+    }
+
     if (!self->g_modmatrix || !self->m_output_eg) {
         return;
     }
@@ -198,7 +257,7 @@ void eg_update(envelope_generator *self)
                 ->m_destinations[self->m_mod_source_eg_attack_scaling];
         if (self->m_attack_time_scalar != 1.0 - scale) {
             self->m_attack_time_scalar = 1.0 - scale;
-            calculate_attack_time(self);
+            eg_calculate_attack_time(self);
         }
     }
 
@@ -211,7 +270,7 @@ void eg_update(envelope_generator *self)
                 ->m_destinations[self->m_mod_source_eg_decay_scaling];
         if (self->m_decay_time_scalar != 1.0 - scale) {
             self->m_decay_time_scalar = 1.0 - scale;
-            calculate_decay_time(self);
+            eg_calculate_decay_time(self);
         }
     }
 
@@ -220,13 +279,13 @@ void eg_update(envelope_generator *self)
             self->g_modmatrix
                 ->m_destinations[self->m_mod_source_sustain_override];
         if (sustain == 0)
-            set_sustain_override(self, false);
+            eg_set_sustain_override(self, false);
         else
-            set_sustain_override(self, true);
+            eg_set_sustain_override(self, true);
     }
 }
 
-double do_envelope(envelope_generator *self, double *p_biased_output)
+double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 {
     // printf("STATE! %s\n", state_strings[self->m_state]);
     switch (self->m_state) {
@@ -307,7 +366,7 @@ double do_envelope(envelope_generator *self, double *p_biased_output)
         self->g_modmatrix->m_sources[self->m_mod_dest_eg_output] =
             self->m_envelope_output;
         self->g_modmatrix->m_sources[self->m_mod_dest_eg_biased_output] =
-            self->m_envelope_output;
+            self->m_envelope_output - self->m_sustain_level;
     }
 
     if (p_biased_output)

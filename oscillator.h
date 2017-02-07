@@ -4,6 +4,7 @@
 
 #include "modmatrix.h"
 #include "sound_generator.h"
+#include "synthfunctions.h"
 
 #define OSC_FO_MOD_RANGE 2          // 2 semitone default
 #define OSC_HARD_SYNC_RATIO_RANGE 4 // 4
@@ -128,3 +129,6 @@ void osc_reset_modulo(oscillator *self, double d);
 void osc_reset(oscillator *self);
 // --- update the frequency, amp mod and PWM
 void osc_update(oscillator *self);
+
+void osc_init_global_parameters(oscillator *self,
+                                global_oscillator_params *params);
