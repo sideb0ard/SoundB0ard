@@ -14,18 +14,18 @@ filter_moog *new_filter_moog()
     filter_setup(&moog->f);
 
     onepole_setup(&moog->m_LPF1);
-    moog->m_LPF1.f.m_type = LPF1;
+    moog->m_LPF1.f.m_filter_type = LPF1;
 
     onepole_setup(&moog->m_LPF2);
-    moog->m_LPF2.f.m_type = LPF1;
+    moog->m_LPF2.f.m_filter_type = LPF1;
 
     onepole_setup(&moog->m_LPF3);
-    moog->m_LPF3.f.m_type = LPF1;
+    moog->m_LPF3.f.m_filter_type = LPF1;
 
     onepole_setup(&moog->m_LPF4);
-    moog->m_LPF4.f.m_type = LPF1;
+    moog->m_LPF4.f.m_filter_type = LPF1;
 
-    moog->f.m_type = LPF4; // default
+    moog->f.m_filter_type = LPF4; // default
 
     moog->m_k = 0.0;
     moog->m_alpha_0 = 0.0;
@@ -76,7 +76,7 @@ void moog_update(filter *f)
     // moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * G + moog->m_k * G * G);
     moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * moog->m_gamma);
 
-    switch (moog->f.m_type) {
+    switch (moog->f.m_filter_type) {
     case LPF4:
         moog->m_a = 0.0;
         moog->m_b = 0.0;
@@ -139,7 +139,7 @@ void moog_reset(filter *f)
 
 double moog_gennext(filter *f, double xn)
 {
-    if (f->m_type == BSF2 || f->m_type == LPF1 || f->m_type == HPF1)
+    if (f->m_filter_type == BSF2 || f->m_filter_type == LPF1 || f->m_filter_type == HPF1)
         return xn;
 
     filter_moog *moog = (filter_moog *)f;

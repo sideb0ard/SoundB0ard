@@ -59,3 +59,15 @@ void filter_reset(filter *f)
 {
     (void)f; // noop
 }
+
+void filter_init_global_parameters(filter *self, global_filter_params *params)
+{
+    self->m_global_filter_params = params;
+    self->m_global_filter_params->aux_control = self->m_aux_control;
+    self->m_global_filter_params->fc_control = self->m_fc_control;
+    self->m_global_filter_params->q_control = self->m_q_control;
+    self->m_global_filter_params->saturation = self->m_saturation;
+    self->m_global_filter_params->filter_type = self->m_filter_type;
+    self->m_global_filter_params->nlp = self->m_nlp;
+}
+

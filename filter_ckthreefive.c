@@ -13,18 +13,18 @@ filter_ck35 *new_filter_ck35()
     filter_setup(&ck35->f);
 
     onepole_setup(&ck35->m_LPF1);
-    ck35->m_LPF1.f.m_type = LPF1;
+    ck35->m_LPF1.f.m_filter_type = LPF1;
 
     onepole_setup(&ck35->m_LPF2);
-    ck35->m_LPF2.f.m_type = LPF2;
+    ck35->m_LPF2.f.m_filter_type = LPF2;
 
     onepole_setup(&ck35->m_HPF1);
-    ck35->m_HPF1.f.m_type = HPF1;
+    ck35->m_HPF1.f.m_filter_type = HPF1;
 
     onepole_setup(&ck35->m_HPF2);
-    ck35->m_HPF2.f.m_type = HPF2;
+    ck35->m_HPF2.f.m_filter_type = HPF2;
 
-    ck35->f.m_type = LPF2; // default
+    ck35->f.m_filter_type = LPF2; // default
 
     ck35->m_k = 0.1;
 
@@ -62,7 +62,7 @@ void ck_update(filter *f)
 
     ck35->m_alpha0 = 1.0 / (1.0 - ck35->m_k * G + ck35->m_k * G * G);
 
-    if (f->m_type == LPF2) {
+    if (f->m_filter_type == LPF2) {
         ck35->m_LPF2.m_beta = (ck35->m_k - ck35->m_k * G) / (1.0 + g);
         ck35->m_LPF1.m_beta = -1.0 / (1.0 + g);
         // printf("UPDATE LPF2 mmmbeta %f\n", self->m_LPF2->m_beta);
@@ -86,13 +86,13 @@ void ck_reset(filter *f)
 
 double ck_gennext(filter *f, double xn)
 {
-    if (f->m_type != LPF2 && f->m_type != HPF2)
+    if (f->m_filter_type != LPF2 && f->m_filter_type != HPF2)
         return xn;
 
     filter_ck35 *ck35 = (filter_ck35 *)f;
 
     double y = 0.0;
-    if (f->m_type == LPF2) {
+    if (f->m_filter_type == LPF2) {
         double y1 = onepole_gennext((filter *)&ck35->m_LPF1, xn);
         // printf("Y1! %f\n", y1);
 

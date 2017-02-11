@@ -40,7 +40,7 @@ void onepole_setup(filter_onepole *op)
     op->f.update = &onepole_update;
     op->f.reset = &onepole_reset;
 
-    op->f.m_type = LPF1;
+    op->f.m_filter_type = LPF1;
 
     op->m_alpha = 1.0;
     op->m_beta = 0.0;
@@ -85,7 +85,7 @@ void onepole_reset(filter *self)
 
 double onepole_gennext(filter *f, double xn)
 {
-    if (f->m_type != LPF1 && f->m_type != HPF1)
+    if (f->m_filter_type != LPF1 && f->m_filter_type != HPF1)
         return xn;
 
     filter_onepole *op = (filter_onepole *)f;
@@ -101,9 +101,9 @@ double onepole_gennext(filter *f, double xn)
 
     double hpf = xn - lpf;
 
-    if (f->m_type == LPF1)
+    if (f->m_filter_type == LPF1)
         return lpf;
-    else if (f->m_type == HPF1)
+    else if (f->m_filter_type == HPF1)
         return hpf;
 
     // should never get here

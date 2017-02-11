@@ -27,7 +27,16 @@ typedef enum {
 
 typedef struct filter filter;
 
-struct filter {
+struct filter
+{
+    modmatrix *g_modmatrix;
+
+    // sources
+    unsigned m_mod_source_fc;
+    unsigned m_mod_source_fc_control;
+
+    global_filter_params *m_global_filter_params;
+
     // GUI controls
     double m_fc_control;  // filter cut-off
     double m_q_control;   // 'qualvity factor' 1-10
@@ -36,16 +45,11 @@ struct filter {
     unsigned m_nlp;      // Non Linear Processing on/off switch
     double m_saturation; // used in NLP
 
-    unsigned m_type;
+    unsigned m_filter_type;
 
     double m_fc;     // current filter cut-off val
     double m_q;      // current q value
     double m_fc_mod; // frequency cutoff modulation input
-
-    modmatrix *g_modmatrix;
-    // sources
-    unsigned m_mod_source_fc;
-    unsigned m_mod_source_fc_control;
 
     void (*set_fc_mod)(filter *self, double d);
     void (*set_q_control)(filter *self, double d);

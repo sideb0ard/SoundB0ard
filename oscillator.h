@@ -24,19 +24,9 @@ typedef struct oscillator oscillator;
 
 struct oscillator {
 
-    // --- render a sample
-    // for LFO:  pAuxOutput = QuadPhaseOutput
-    // Pitched: pAuxOutput = Right channel (return value is left
-    // Channel
-    double (*do_oscillate)(oscillator *self, double *aux_output);
-    //// TODO: implement these per subclass
-    void (*start_oscillator)(oscillator *self);
-    void (*stop_oscillator)(oscillator *self);
-    void (*reset_oscillator)(oscillator *self);
-    void (*update_oscillator)(oscillator *self);
-
     // global modulation matrix
     modmatrix *g_modmatrix;
+
     // sources that we read from
     unsigned m_mod_source_fo;
     unsigned m_mod_source_pulse_width;
@@ -44,6 +34,8 @@ struct oscillator {
     // destinations we write to
     unsigned m_mod_dest_output1;
     unsigned m_mod_dest_output2;
+
+    global_oscillator_params *m_global_oscillator_params;
 
     bool m_note_on;
     // --- user controls or MIDI
@@ -74,14 +66,14 @@ struct oscillator {
     enum { sync, shot, rfree };
     unsigned m_lfo_mode; // to store MODE
 
+    // --- MIDI note that is being played
+    unsigned m_midi_note_number;
+
     // --- for hard sync or other dual-oscillator ideas
     oscillator *m_buddy_oscillator;
 
     // --- flag indicating we are a master oscillator
     bool m_master_osc;
-
-    // --- MIDI note that is being played
-    unsigned m_midi_note_number;
 
     // --- PROTECTED: generally these are either basic calc variables
     //                and modulation stuff
@@ -108,6 +100,18 @@ struct oscillator {
     double m_phase_mod;  /* Phase mod input -1 to +1 (used for DX synth) */
     double m_pw_mod;     /* modulation input for PWM -1 to +1 */
     double m_amp_mod; /* output amplitude modulation for AM 0 to +1 (not dB)*/
+
+    // --- render a sample
+    // for LFO:  pAuxOutput = QuadPhaseOutput
+    // Pitched: pAuxOutput = Right channel (return value is left
+    // Channel
+    double (*do_oscillate)(oscillator *self, double *aux_output);
+    //// TODO: implement these per subclass
+    void (*start_oscillator)(oscillator *self);
+    void (*stop_oscillator)(oscillator *self);
+    void (*reset_oscillator)(oscillator *self);
+    void (*update_oscillator)(oscillator *self);
+
 };
 
 void osc_new_settings(oscillator *self);
@@ -116,14 +120,23 @@ void osc_new_settings(oscillator *self);
 // --- increment the modulo counters
 void osc_inc_modulo(oscillator *self);
 
-void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val);
-
 // --- check and wrap the modulo
 //     returns true if modulo wrapped
 bool osc_check_wrap_modulo(oscillator *self);
 
 // --- reset the modulo (required for master->slave operations)
 void osc_reset_modulo(oscillator *self, double d);
+
+void osc_set_amplitude_mod(oscillator *self, double amp_val);
+
+void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val);
+void osc_set_pitch_bend_mod(oscillator *self, double mod_val);
+
+
+void osc_set_fo_mod_lin(oscillator *self, double fo_mod_val);
+void osc_set_phase_mod(oscillator *self, double mod_val);
+
+void osc_set_pw_mod(oscillator *self, double mod_val);
 
 // --- reset counters, etc...
 void osc_reset(oscillator *self);

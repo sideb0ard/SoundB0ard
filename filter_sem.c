@@ -12,7 +12,7 @@ filter_sem *new_filter_sem()
     filter_setup(&cs->f);
 
     cs->f.m_aux_control = 0.5;
-    cs->f.m_type = LPF2;
+    cs->f.m_filter_type = LPF2;
 
     cs->m_alpha = 1.0;
     cs->m_alpha0 = 1.0;
@@ -59,8 +59,8 @@ void sem_update(filter *f)
 
 double sem_gennext(filter *f, double xn)
 {
-    if (f->m_type != LPF2 && f->m_type != HPF2 && f->m_type != BPF2 &&
-        f->m_type != BSF2)
+    if (f->m_filter_type != LPF2 && f->m_filter_type != HPF2 && f->m_filter_type != BPF2 &&
+        f->m_filter_type != BSF2)
         return xn;
 
     filter_sem *cs = (filter_sem *)f;
@@ -83,13 +83,13 @@ double sem_gennext(filter *f, double xn)
     cs->m_z11 = cs->m_alpha * hpf + bpf;
     cs->m_z12 = cs->m_alpha * bpf + lpf;
 
-    if (f->m_type == LPF2)
+    if (f->m_filter_type == LPF2)
         return lpf;
-    else if (f->m_type == HPF2)
+    else if (f->m_filter_type == HPF2)
         return hpf;
-    else if (f->m_type == BPF2)
+    else if (f->m_filter_type == BPF2)
         return bpf;
-    else if (f->m_type == BSF2)
+    else if (f->m_filter_type == BSF2)
         return semBSF;
 
     // shouldn't get here
