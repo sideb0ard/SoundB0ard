@@ -31,10 +31,10 @@ typedef struct {
     filter *m_filter1;
     filter *m_filter2;
 
-    envelope_generator *m_eg1;
-    envelope_generator *m_eg2;
-    envelope_generator *m_eg3;
-    envelope_generator *m_eg4;
+    envelope_generator m_eg1;
+    envelope_generator m_eg2;
+    envelope_generator m_eg3;
+    envelope_generator m_eg4;
 
     lfo m_lfo1;
     lfo m_lfo2;
@@ -52,6 +52,7 @@ typedef struct {
 
     // pitch-bending for note-steal operation
     double m_osc_pitch;
+    double m_osc_pitch_pending;
 
     double m_portamento_time_msec;
     double m_portamento_start;
@@ -75,6 +76,9 @@ bool voice_is_active_voice(voice *v);
 bool voice_can_note_off(voice *v);
 bool voice_is_voice_done(voice *v);
 bool voice_in_legato_mode(voice *v);
+void voice_prepare_for_play(voice *v);
+void voice_update(voice *v);
+void voice_reset(voice *v);
 void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
                    double frequency, double last_note_frequency);
 void voice_note_off(voice *v, unsigned int midi_note);
