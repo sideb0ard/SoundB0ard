@@ -68,7 +68,7 @@ typedef struct {
     double m_default_mod_range;
 } voice;
 
-void voice_init(voice * v);
+void voice_init(voice *v);
 void voice_init_global_parameters(voice *v, global_synth_params *sp);
 void voice_set_modmatrix_core(voice *v, matrixrow **modmatrix);
 void voice_initialize_modmatrix(voice *v, modmatrix *matrix);

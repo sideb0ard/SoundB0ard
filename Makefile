@@ -31,6 +31,8 @@ SRC = \
       main.c \
       midi_freq_table.c \
       midimaaan.c \
+      minisynth.c \
+      minisynth_voice.c \
       mixer.c \
       modmatrix.c \
       nanosynth.c \

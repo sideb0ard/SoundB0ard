@@ -13,7 +13,7 @@
 #include "sound_generator.h"
 
 #define MAX_NUM_MIDI_LOOPS 16
-#define MAX_VOICES 2
+#define MAX_NANO_VOICES 2
 
 typedef enum { OSC, FILTER } LFO1_dest;
 typedef enum { NONE, NANOSYNTH, DELAYFX } midi_control_type;
@@ -58,9 +58,9 @@ typedef struct nanosynth {
     // global modmatrix, core is shared by all voices
     modmatrix *g_modmatrix; // routing structure for sound generation
 
-    nanosynth_voice m_voices[MAX_VOICES];
-    int m_pending_midi_note[MAX_VOICES];
-    int m_pending_midi_velocity[MAX_VOICES];
+    nanosynth_voice m_voices[MAX_NANO_VOICES];
+    int m_pending_midi_note[MAX_NANO_VOICES];
+    int m_pending_midi_velocity[MAX_NANO_VOICES];
 
     // need these for mod matrix
     double m_default_mod_range; // 1.0

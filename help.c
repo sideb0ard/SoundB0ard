@@ -76,8 +76,8 @@ void print_help()
     printf("\n" COOL_COLOR_GREEN "[Synthesizer Cmds]\n");
     printf(ANSI_COLOR_WHITE "syn nano" ANSI_COLOR_CYAN
                             " -- start new Nano Synth\n");
-    // printf(ANSI_COLOR_WHITE "syn korg" ANSI_COLOR_CYAN
-    //                         " -- start new Korg Synth\n");
+    printf(ANSI_COLOR_WHITE "syn mini" ANSI_COLOR_CYAN
+                            " -- start new MINI Synth\n");
     // printf(ANSI_COLOR_WHITE "syn poly" ANSI_COLOR_CYAN
     //                         " -- start new Poly Synth\n");
     printf(ANSI_COLOR_WHITE "syn <soundgen_num> add melody" ANSI_COLOR_CYAN

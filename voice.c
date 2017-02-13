@@ -4,7 +4,7 @@
 #include "utils.h"
 #include <stdlib.h>
 
-void voice_init(voice * v)
+void voice_init(voice *v)
 {
     v->m_portamento_time_msec = 0.0;
     v->m_note_on = false;
@@ -35,8 +35,8 @@ void voice_init(voice * v)
     envelope_generator_init(&v->m_eg3);
     envelope_generator_init(&v->m_eg4);
 
-    osc_new_settings((oscillator*) &v->m_lfo1);
-    osc_new_settings((oscillator*) &v->m_lfo2);
+    osc_new_settings((oscillator *)&v->m_lfo1);
+    osc_new_settings((oscillator *)&v->m_lfo2);
 
     dca_initialize(&v->m_dca);
 
@@ -75,35 +75,34 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
     add_matrix_row(matrix, row);
 
     // MIDI Sustain Pedal
-    row = create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
-                            &v->m_default_mod_intensity,
-                            &v->m_default_mod_range, TRANSFORM_MIDI_SWITCH,
-                            true);
+    row =
+        create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
+                          &v->m_default_mod_intensity, &v->m_default_mod_range,
+                          TRANSFORM_MIDI_SWITCH, true);
     add_matrix_row(matrix, row);
 
     // NOTE NUMBER -> FILTER Fc CONTROL
-    row = create_matrix_row(SOURCE_MIDI_NOTE_NUM,
-                            DEST_ALL_FILTER_KEYTRACK,
-                            &v->m_global_voice_params->filter_keytrack_intensity,
-                            &v->m_default_mod_range,
-                            TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,
-                            false); /* DISABLED BY DEFAULT */
+    row = create_matrix_row(
+        SOURCE_MIDI_NOTE_NUM, DEST_ALL_FILTER_KEYTRACK,
+        &v->m_global_voice_params->filter_keytrack_intensity,
+        &v->m_default_mod_range, TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,
+        false); /* DISABLED BY DEFAULT */
     add_matrix_row(matrix, row);
 
     // VELOCITY -> EG ATTACK SOURCE_VELOCITY
     // 0 velocity -> scalar = 1, normal attack time
     // 128 velocity -> scalar = 0, fastest (0) attack time:
-    row = create_matrix_row(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
-                            &v->m_default_mod_intensity,
-                            &v->m_default_mod_range, TRANSFORM_MIDI_NORMALIZE,
-                            false);
+    row =
+        create_matrix_row(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
+                          &v->m_default_mod_intensity, &v->m_default_mod_range,
+                          TRANSFORM_MIDI_NORMALIZE, false);
     add_matrix_row(matrix, row);
 
     // NOTE NUMBER -> EG DECAY SCALING
-    row = create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_EG_DECAY_SCALING,
-                            &v->m_default_mod_intensity,
-                            &v->m_default_mod_range, TRANSFORM_MIDI_NORMALIZE,
-                            false);
+    row =
+        create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_EG_DECAY_SCALING,
+                          &v->m_default_mod_intensity, &v->m_default_mod_range,
+                          TRANSFORM_MIDI_NORMALIZE, false);
     add_matrix_row(matrix, row);
 }
 

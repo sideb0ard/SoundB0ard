@@ -16,7 +16,7 @@ filter_moog *new_filter_moog()
     return moog;
 }
 
-void filter_moog_init(filter_moog* moog)
+void filter_moog_init(filter_moog *moog)
 {
     filter_setup(&moog->f);
 
@@ -47,7 +47,6 @@ void filter_moog_init(filter_moog* moog)
     moog->f.gennext = &moog_gennext;
     moog->f.update = &moog_update;
     moog->f.reset = &filter_reset;
-
 }
 
 void moog_set_qcontrol(filter *f, double qcontrol)

@@ -301,6 +301,9 @@ void interpret(char *line)
             if (strncmp("nano", wurds[1], 4) == 0) {
                 add_nanosynth(mixr);
             }
+            else if (strncmp("mini", wurds[1], 4) == 0) {
+                add_minisynth(mixr);
+            }
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&

@@ -17,6 +17,7 @@
 #include "drumr_utils.h"
 #include "effect.h"
 #include "envelope.h"
+#include "minisynth.h"
 #include "mixer.h"
 #include "nanosynth.h"
 #include "sampler.h"
@@ -290,6 +291,24 @@ int add_nanosynth(mixer *mixr)
         return -1;
     }
     m->sound_generator = (SOUNDGEN *)ns;
+    return add_sound_generator(mixr, m);
+}
+
+int add_minisynth(mixer *mixr)
+{
+    printf("Adding a MINISYNTH!!...\n");
+    minisynth *ms = new_minisynth();
+    if (ms == NULL) {
+        printf("Barfed on MINIsynth creation\n");
+        return -1;
+    }
+    SBMSG *m = new_sbmsg();
+    if (m == NULL) {
+        free(ms);
+        printf("MBARF!\n");
+        return -1;
+    }
+    m->sound_generator = (SOUNDGEN *)ms;
     return add_sound_generator(mixr, m);
 }
 

@@ -6,7 +6,7 @@
 
 typedef struct filter_moogladder filter_moog;
 
-struct filter_moogladder {
+typedef struct filter_moogladder {
 
     filter f; // base class
     double m_k;
@@ -23,10 +23,10 @@ struct filter_moogladder {
     filter_onepole m_LPF2;
     filter_onepole m_LPF3;
     filter_onepole m_LPF4;
-};
+} filter_moogladder;
 
 filter_moog *new_filter_moog(void);
-void filter_moog_init(filter_moog* f);
+void filter_moog_init(filter_moog *f);
 
 void moog_set_qcontrol(filter *f, double qcontrol);
 void moog_reset(filter *f);

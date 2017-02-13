@@ -143,7 +143,7 @@ nanosynth *new_nanosynth()
     ns->m_eg1_dca_intensity = 1.0;
     ns->m_eg1_osc_intensity = 0.0;
 
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_NANO_VOICES; i++) {
 
         ns->m_voices[i].g_modmatrix = new_modmatrix();
         set_matrix_core(ns->m_voices[i].g_modmatrix,
@@ -272,7 +272,7 @@ void nanosynth_change_osc_wave_form(nanosynth *self, unsigned int voice_no,
                                     int oscil, bool all_voices)
 {
     if (all_voices) {
-        for (int i = 0; i < MAX_VOICES; i++)
+        for (int i = 0; i < MAX_NANO_VOICES; i++)
             p_nanosynth_change_osc_wave_form(self, i, oscil);
     }
     else
@@ -420,7 +420,7 @@ double nanosynth_gennext(void *self)
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_NANO_VOICES; i++) {
 
         // clear for loop
         out_left = 0.0;
@@ -539,7 +539,7 @@ void nanosynth_midi_control(nanosynth *ns, unsigned int data1,
 {
     // printf("MIDI Mind Control! %d %d\n", data1, data2);
 
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_NANO_VOICES; i++) {
         double scaley_val;
         switch (data1) {
         case 1: // K1 - Envelope Attack Time Msec
@@ -596,7 +596,7 @@ void nanosynth_midi_pitchbend(nanosynth *ns, unsigned int data1,
             // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
         // printf("Cents to bend - %f\n", scaley_val);
-        for (int i = 0; i < MAX_VOICES; i++) {
+        for (int i = 0; i < MAX_NANO_VOICES; i++) {
             ns->m_voices[i].osc1->m_cents = scaley_val;
             ns->m_voices[i].osc2->m_cents = scaley_val + 2.5;
             ns->m_voices[i].g_modmatrix->m_sources[SOURCE_PITCHBEND] =
@@ -604,7 +604,7 @@ void nanosynth_midi_pitchbend(nanosynth *ns, unsigned int data1,
         }
     }
     else {
-        for (int i = 0; i < MAX_VOICES; i++) {
+        for (int i = 0; i < MAX_NANO_VOICES; i++) {
             ns->m_voices[i].osc1->m_cents = 0;
             ns->m_voices[i].osc2->m_cents = 2.5;
         }
@@ -614,7 +614,7 @@ void nanosynth_midi_pitchbend(nanosynth *ns, unsigned int data1,
 void nanosynth_start_note(nanosynth *ns, int index, unsigned int midinote,
                           unsigned int velocity)
 {
-    if (index > MAX_VOICES - 1)
+    if (index > MAX_NANO_VOICES - 1)
         return;
 
     // --- set pitches
@@ -643,7 +643,7 @@ void nanosynth_steal_note(nanosynth *ns, int index,
                           unsigned int pending_midinote,
                           unsigned int pending_velocity)
 {
-    if (index > MAX_VOICES - 1)
+    if (index > MAX_NANO_VOICES - 1)
         return;
 
     // --- shutdown the EG with fast linear taper

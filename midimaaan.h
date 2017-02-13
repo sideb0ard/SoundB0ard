@@ -16,6 +16,8 @@ typedef struct midi_event {
     unsigned data2;
 } midi_event;
 
+typedef midi_event *midi_events_loop_t[PPNS];
+
 void *midiman(void *);
 
 // void midinoteon(nanosynth *ns, unsigned int midinote, int velocity);
