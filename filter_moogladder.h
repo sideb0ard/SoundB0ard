@@ -26,6 +26,7 @@ struct filter_moogladder {
 };
 
 filter_moog *new_filter_moog(void);
+void filter_moog_init(filter_moog* f);
 
 void moog_set_qcontrol(filter *f, double qcontrol);
 void moog_reset(filter *f);

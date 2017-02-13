@@ -59,8 +59,8 @@ void sem_update(filter *f)
 
 double sem_gennext(filter *f, double xn)
 {
-    if (f->m_filter_type != LPF2 && f->m_filter_type != HPF2 && f->m_filter_type != BPF2 &&
-        f->m_filter_type != BSF2)
+    if (f->m_filter_type != LPF2 && f->m_filter_type != HPF2 &&
+        f->m_filter_type != BPF2 && f->m_filter_type != BSF2)
         return xn;
 
     filter_sem *cs = (filter_sem *)f;

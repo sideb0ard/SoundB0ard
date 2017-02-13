@@ -19,6 +19,13 @@ envelope_generator *new_envelope_generator()
         return NULL;
     }
 
+    envelope_generator_init(eg);
+
+    return eg;
+}
+
+void envelope_generator_init(envelope_generator *eg)
+{
     eg->m_attack_time_msec = EG_DEFAULT_STATE_TIME;
     eg->m_decay_time_msec = EG_DEFAULT_STATE_TIME;
     eg->m_release_time_msec = EG_DEFAULT_STATE_TIME;
@@ -54,8 +61,6 @@ envelope_generator *new_envelope_generator()
     eg->m_mod_source_sustain_override = DEST_NONE;
 
     eg->m_global_eg_params = NULL;
-
-    return eg;
 }
 
 state eg_get_state(envelope_generator *self) { return self->m_state; }

@@ -70,4 +70,3 @@ void filter_init_global_parameters(filter *self, global_filter_params *params)
     self->m_global_filter_params->filter_type = self->m_filter_type;
     self->m_global_filter_params->nlp = self->m_nlp;
 }
-

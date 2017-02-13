@@ -111,7 +111,6 @@ struct oscillator {
     void (*stop_oscillator)(oscillator *self);
     void (*reset_oscillator)(oscillator *self);
     void (*update_oscillator)(oscillator *self);
-
 };
 
 void osc_new_settings(oscillator *self);
@@ -131,7 +130,6 @@ void osc_set_amplitude_mod(oscillator *self, double amp_val);
 
 void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val);
 void osc_set_pitch_bend_mod(oscillator *self, double mod_val);
-
 
 void osc_set_fo_mod_lin(oscillator *self, double fo_mod_val);
 void osc_set_phase_mod(oscillator *self, double mod_val);

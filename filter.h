@@ -27,8 +27,7 @@ typedef enum {
 
 typedef struct filter filter;
 
-struct filter
-{
+struct filter {
     modmatrix *g_modmatrix;
 
     // sources

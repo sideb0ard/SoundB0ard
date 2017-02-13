@@ -11,22 +11,6 @@
 
 void osc_new_settings(oscillator *osc)
 {
-    // oscillator *osc;
-    // osc = (oscillator *)calloc(1, sizeof(oscillator));
-    // if (osc == NULL) {
-    //    printf("Nae mem for osc, go figure\n");
-    //    return NULL;
-    //}
-
-    // void (*start_oscillator)();
-    // void (*stop_oscillator)();
-
-    // --- render a sample
-    // for LFO:  pAuxOutput = QuadPhaseOutput
-    // Pitched: pAuxOutput = Right channel (return value is left
-    // Channel
-    // double (*do_oscillate)(void *self, double *aux_output);
-
     osc->m_note_on = false;
     osc->m_midi_note_number = 0;
     osc->m_modulo = 0.0;
@@ -100,7 +84,10 @@ bool osc_check_wrap_modulo(oscillator *self)
 // --- reset the modulo (required for master->slave operations)
 void osc_reset_modulo(oscillator *self, double d) { self->m_modulo = d; }
 
-void osc_set_amplitude_mod(oscillator *self, double amp_val){self->m_amp_mod = amp_val;}
+void osc_set_amplitude_mod(oscillator *self, double amp_val)
+{
+    self->m_amp_mod = amp_val;
+}
 
 void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val)
 {
@@ -158,14 +145,14 @@ void osc_reset(oscillator *self)
 // --- update the frequency, amp mod and PWM
 void osc_update(oscillator *self)
 {
-    if (self->m_global_oscillator_params)
-    {
-        if(self->m_global_oscillator_params->osc_fo >= 0)
+    if (self->m_global_oscillator_params) {
+        if (self->m_global_oscillator_params->osc_fo >= 0)
             self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
 
         self->m_fo_ratio = self->m_global_oscillator_params->fo_ratio;
         self->m_amplitude = self->m_global_oscillator_params->amplitude;
-        self->m_pulse_width_control = self->m_global_oscillator_params->pulse_width_control;
+        self->m_pulse_width_control =
+            self->m_global_oscillator_params->pulse_width_control;
         self->m_octave = self->m_global_oscillator_params->octave;
         self->m_semitones = self->m_global_oscillator_params->semitones;
         self->m_cents = self->m_global_oscillator_params->cents;
@@ -228,9 +215,8 @@ void osc_update(oscillator *self)
 }
 
 void osc_init_global_parameters(oscillator *self,
-        global_oscillator_params *params)
+                                global_oscillator_params *params)
 {
     self->m_global_oscillator_params = params;
     self->m_global_oscillator_params->osc_fo = self->m_osc_fo;
-
 }

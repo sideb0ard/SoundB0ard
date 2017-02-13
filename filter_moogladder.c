@@ -11,6 +11,13 @@
 filter_moog *new_filter_moog()
 {
     filter_moog *moog = (filter_moog *)calloc(1, sizeof(filter_moog));
+    filter_moog_init(moog);
+
+    return moog;
+}
+
+void filter_moog_init(filter_moog* moog)
+{
     filter_setup(&moog->f);
 
     onepole_setup(&moog->m_LPF1);
@@ -41,7 +48,6 @@ filter_moog *new_filter_moog()
     moog->f.update = &moog_update;
     moog->f.reset = &filter_reset;
 
-    return moog;
 }
 
 void moog_set_qcontrol(filter *f, double qcontrol)
@@ -139,7 +145,8 @@ void moog_reset(filter *f)
 
 double moog_gennext(filter *f, double xn)
 {
-    if (f->m_filter_type == BSF2 || f->m_filter_type == LPF1 || f->m_filter_type == HPF1)
+    if (f->m_filter_type == BSF2 || f->m_filter_type == LPF1 ||
+        f->m_filter_type == HPF1)
         return xn;
 
     filter_moog *moog = (filter_moog *)f;

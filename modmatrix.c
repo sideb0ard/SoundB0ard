@@ -27,13 +27,13 @@ int get_matrix_size(modmatrix *self)
     return sz;
 }
 
-void clear_sources(modmatrix *self)
+void matrix_clear_sources(modmatrix *self)
 {
     for (int i = 0; i < MAX_SOURCES; i++)
         self->m_sources[i] = 0.0;
 }
 
-void clear_destinations(modmatrix *self)
+void matrix_clear_destinations(modmatrix *self)
 {
     for (int i = 0; i < MAX_DESTINATIONS; i++)
         self->m_destinations[i] = 0.0;
@@ -156,7 +156,7 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
     if (!self->m_matrix_core)
         return;
 
-    clear_destinations(self);
+    matrix_clear_destinations(self);
 
     for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
 

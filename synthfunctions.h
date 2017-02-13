@@ -11,7 +11,7 @@ typedef struct {
     int octave;                 // octave tweak
     int semitones;              // semitones tweak
     int cents;                  // cents tweak
-    unsigned int waveform;     // to store type
+    unsigned int waveform;      // to store type
     // --- LFOs
     unsigned int lfo_mode; // to store MODE
     // --- CSampleOscillators

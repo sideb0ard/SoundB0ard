@@ -133,8 +133,8 @@ modmatrix *new_modmatrix(void);
 
 int get_matrix_size(modmatrix *self);
 
-void clear_sources(modmatrix *self);
-void clear_destinations(modmatrix *self);
+void matrix_clear_sources(modmatrix *self);
+void matrix_clear_destinations(modmatrix *self);
 
 void create_matrix_core(modmatrix *self);
 void clear_matrix_core(modmatrix *self);

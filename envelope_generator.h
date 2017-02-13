@@ -83,6 +83,8 @@ typedef struct envelope_generator {
 
 envelope_generator *new_envelope_generator(void);
 
+void envelope_generator_init(envelope_generator *eg);
+
 state eg_get_state(envelope_generator *self);
 bool eg_is_active(envelope_generator *self);
 
