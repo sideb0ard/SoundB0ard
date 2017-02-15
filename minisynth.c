@@ -80,8 +80,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
 {
     for (int i = 0; i < MAX_VOICES; i++) {
         if (ms->m_voices[i]) {
-            printf("preparing voice %d for play!\n", i);
-            voice_prepare_for_play(&ms->m_voices[i]->m_voice);
+            minisynth_voice_prepare_for_play(ms->m_voices[i]);
         }
     }
 
@@ -214,14 +213,11 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
 {
     bool steal_note = true;
     for (int i = 0; i < MAX_VOICES; i++) {
-        printf("NOTE on! %d\n", i);
         minisynth_voice *msv = ms->m_voices[i];
         if (!msv)
             return false; // should never happen
         if (!msv->m_voice.m_note_on) {
-            printf("INcy\n");
             minisynth_increment_voice_timestamps(ms);
-            printf("voice note on\n");
             voice_note_on(&msv->m_voice, midinote, velocity,
                           get_midi_freq(midinote), ms->m_last_note_frequency);
 

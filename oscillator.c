@@ -217,7 +217,6 @@ void osc_update(oscillator *self)
 void osc_init_global_parameters(oscillator *self,
                                 global_oscillator_params *params)
 {
-    printf("OSC INITI GLOBAL\n");
     self->m_global_oscillator_params = params;
     self->m_global_oscillator_params->osc_fo = self->m_osc_fo;
     self->m_global_oscillator_params->fo_ratio = self->m_fo_ratio;
