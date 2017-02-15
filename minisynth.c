@@ -1,7 +1,10 @@
 #include <math.h>
 #include <stdlib.h>
 
+#include "midi_freq_table.h"
 #include "minisynth.h"
+
+extern const wchar_t *sparkchars;
 
 minisynth *new_minisynth(void)
 {
@@ -14,24 +17,61 @@ minisynth *new_minisynth(void)
         if (!ms->m_voices[i])
             return NULL; // would be bad
 
-        voice_init_global_parameters(&ms->m_voices[i]->m_voice,
+        minisynth_voice_init_global_parameters(ms->m_voices[i],
                                      &ms->m_global_synth_params);
     }
 
     // use first voice to setup global
     minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
 
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 1; i < MAX_VOICES; i++) {
         voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
                                  get_matrix_core(&ms->g_modmatrix));
     }
 
+    for (int i = 0; i < PPNS; i++) {
+        ms->melodies[ms->cur_melody][i] = NULL;
+    }
+    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++) {
+        ms->melody_multiloop_count[i] = 1;
+    }
+
+    ms->vol = 0.7;
+    ms->cur_octave = 0;
+    ms->sustain = 0;
+    ms->num_melodies = 1;
+
+    ms->sound_generator.gennext = &minisynth_gennext;
+    ms->sound_generator.status = &minisynth_status;
+    ms->sound_generator.setvol = &minisynth_setvol;
+    ms->sound_generator.getvol = &minisynth_getvol;
+    ms->sound_generator.type = SYNTH_TYPE;
+
+    minisynth_prepare_for_play(ms);
     return ms;
 }
 
 // sound generator interface //////////////
 // void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
-void minisynth_status(void *self, wchar_t *status_string);
+void minisynth_status(void *self, wchar_t *status_string)
+{
+    // TODO - a shit load of error checking on boundaries and size
+    minisynth *ms = (minisynth *)self;
+    swprintf(status_string, 119,
+             WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
+                              "Multi: %d, Cur: %d",
+             ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody);
+    for (int i = 0; i < ms->num_melodies; i++) {
+        wchar_t melodystr[33] = {0};
+        wchar_t scratch[128] = {0};
+        minisynth_melody_to_string(ms, i, melodystr);
+        swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
+                 ms->melody_multiloop_count[i]);
+        wcscat(status_string, scratch);
+    }
+    wcscat(status_string, WANSI_COLOR_RESET);
+}
+
 void minisynth_setvol(void *self, double v);
 double minisynth_getvol(void *self);
 ////////////////////////////////////
@@ -40,6 +80,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
 {
     for (int i = 0; i < MAX_VOICES; i++) {
         if (ms->m_voices[i]) {
+            printf("preparing voice %d for play!\n", i);
             voice_prepare_for_play(&ms->m_voices[i]->m_voice);
         }
     }
@@ -168,10 +209,62 @@ void minisynth_update(minisynth *ms)
     // m_DelayFX.update();
 }
 
-void minisynth_midi_note_on(minisynth *self, unsigned int midinote,
-                            unsigned int velocity);
-bool minisynth_midi_note_off(minisynth *self, unsigned int midinote,
-                             unsigned int velocity, bool all_notes_off);
+bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
+                            unsigned int velocity)
+{
+    bool steal_note = true;
+    for (int i = 0; i < MAX_VOICES; i++) {
+        printf("NOTE on! %d\n", i);
+        minisynth_voice *msv = ms->m_voices[i];
+        if (!msv)
+            return false; // should never happen
+        if (!msv->m_voice.m_note_on) {
+            printf("INcy\n");
+            minisynth_increment_voice_timestamps(ms);
+            printf("voice note on\n");
+            voice_note_on(&msv->m_voice, midinote, velocity,
+                          get_midi_freq(midinote), ms->m_last_note_frequency);
+
+            ms->m_last_note_frequency = get_midi_freq(midinote);
+            steal_note = false;
+            break;
+        }
+    }
+
+    if (steal_note) {
+        minisynth_voice *msv = minisynth_get_oldest_voice(ms);
+        if (msv) {
+            minisynth_increment_voice_timestamps(ms);
+            voice_note_on(&msv->m_voice, midinote, velocity,
+                          get_midi_freq(midinote), ms->m_last_note_frequency);
+        }
+        ms->m_last_note_frequency = get_midi_freq(midinote);
+    }
+
+    return true;
+}
+
+bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
+                             unsigned int velocity, bool all_notes_off)
+{
+    (void) velocity;
+
+    if (all_notes_off)
+    {
+        for (int i = 0; i < MAX_VOICES; i++) {
+            if (ms->m_voices[i])
+                voice_note_off(&ms->m_voices[i]->m_voice, midinote);
+        }
+    }
+
+    for (int i = 0; i < MAX_VOICES; i++) {
+        minisynth_voice *msv = minisynth_get_oldest_voice_with_note(ms, midinote);
+        if (msv)
+            voice_note_off(&msv->m_voice, midinote);
+    }
+    return true;
+}
+
 void minisynth_midi_pitchbend(minisynth *self, unsigned int data1,
                               unsigned int data2);
 void minisynth_midi_control(minisynth *self, unsigned int data1,
@@ -182,26 +275,18 @@ void minisynth_steal_note(minisynth *self, int index,
                           unsigned int pending_midinote,
                           unsigned int pending_velocity);
 
-void change_octave(void *self, int direction);
-void minisynth_change_osc_wave_form(minisynth *self, unsigned int voice_no,
-                                    int oscil, bool all_voices);
-void p_minisynth_change_osc_wave_form(minisynth *self, unsigned int voice_no,
-                                      int oscil);
-void minisynth_set_sustain(minisynth *self, int sustain_val);
-void minisynth_set_multi_melody_mode(minisynth *self, bool melody_mode);
+void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)
+{
+    ms->multi_melody_mode = melody_mode;
+    ms->cur_melody_iteration = ms->melody_multiloop_count[ms->cur_melody];
+}
+
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
                                    int loop_num);
-void minisynth_add_melody(minisynth *self);
-void minisynth_switch_melody(minisynth *self, unsigned int melody_num);
-void minisynth_reset_melody(minisynth *self, unsigned int melody_num);
-void minisynth_reset_melody_all(minisynth *self);
-void minisynth_add_note(minisynth *self, int midi_num);
-void minisynth_melody_to_string(minisynth *self, int melody_num,
-                                wchar_t scratch[33]);
 
 double minisynth_gennext(void *self)
 {
-    minisynth *ms = (minisynth*) self;
+    minisynth *ms = (minisynth *)self;
 
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
@@ -211,13 +296,12 @@ double minisynth_gennext(void *self)
     double out_left = 0.0;
     double out_right = 0.0;
 
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
+    for (int i = 0; i < MAX_VOICES; i++) {
         if (ms->m_voices[i])
             minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
 
-        accum_out_left +=  mix * out_left;
-        accum_out_right +=  mix * out_right;
+        accum_out_left += mix * out_left;
+        accum_out_right += mix * out_right;
     }
 
     // TODO delay
@@ -225,3 +309,111 @@ double minisynth_gennext(void *self)
     return accum_out_left;
 }
 
+void minisynth_add_melody(minisynth *ms)
+{
+    ms->num_melodies++;
+    ms->cur_melody++;
+}
+
+void minisynth_switch_melody(minisynth *ms, unsigned int melody_num)
+{
+    if (melody_num < (unsigned)ms->num_melodies) {
+        ms->cur_melody = melody_num;
+    }
+}
+
+void minisynth_reset_melody_all(minisynth *ms)
+{
+    for (int i = 0; i < ms->num_melodies; i++) {
+        minisynth_reset_melody(ms, i);
+    }
+}
+
+void minisynth_reset_melody(minisynth *ms, unsigned int melody_num)
+{
+    if (melody_num < (unsigned)ms->num_melodies) {
+        for (int i = 0; i < PPNS; i++) {
+            if (ms->melodies[melody_num][i] != NULL) {
+                midi_event *tmp = ms->melodies[melody_num][i];
+                ms->melodies[melody_num][i] = NULL;
+                free(tmp);
+            }
+        }
+    }
+}
+
+void minisynth_setvol(void *self, double v)
+{
+    minisynth *ms = (minisynth *)self;
+    if (v < 0.0 || v > 1.0) {
+        return;
+    }
+    ms->vol = v;
+}
+
+double minisynth_getvol(void *self)
+{
+    minisynth *ms = (minisynth *)self;
+    return ms->vol;
+}
+
+void minisynth_melody_to_string(minisynth *ms, int melody_num,
+                                wchar_t melodystr[33])
+{
+    int cur_quart = 0;
+    for (int i = 0; i < PPNS; i += PPS) {
+        melodystr[cur_quart] = sparkchars[0];
+        for (int j = i; j < (i + PPS); j++) {
+            if (ms->melodies[melody_num][j] != NULL &&
+                ms->melodies[melody_num][j]->event_type ==
+                    144) { // 144 is midi note on
+                melodystr[cur_quart] = sparkchars[5];
+            }
+        }
+        cur_quart++;
+    }
+}
+
+void minisynth_increment_voice_timestamps(minisynth *ms)
+{
+    for (int i = 0; i < MAX_VOICES; i++) {
+        if (ms->m_voices[i]) {
+            if (ms->m_voices[i]->m_voice.m_note_on)
+                ms->m_voices[i]->m_voice.m_timestamp++;
+        }
+    }
+}
+
+minisynth_voice *minisynth_get_oldest_voice(minisynth *ms)
+{
+    int timestamp = -1;
+    minisynth_voice *found_voice = NULL;
+    for (int i = 0; i < MAX_VOICES; i++) {
+        if (ms->m_voices[i]) {
+            if (ms->m_voices[i]->m_voice.m_note_on &&
+                (int)ms->m_voices[i]->m_voice.m_timestamp > timestamp) {
+                found_voice = ms->m_voices[i];
+                timestamp = (int)ms->m_voices[i]->m_voice.m_timestamp;
+            }
+        }
+    }
+    return found_voice;
+}
+
+minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
+                                                      unsigned int midi_note)
+{
+    int timestamp = -1;
+    minisynth_voice *found_voice = NULL;
+    for (int i = 0; i < MAX_VOICES; i++) {
+        if (ms->m_voices[i]) {
+            if (voice_can_note_off(&ms->m_voices[i]->m_voice) &&
+                (int)ms->m_voices[i]->m_voice.m_timestamp > timestamp &&
+                ms->m_voices[i]->m_voice.m_midi_note_number == midi_note) {
+                found_voice = ms->m_voices[i];
+                timestamp = (int)ms->m_voices[i]->m_voice.m_timestamp;
+            }
+        }
+    }
+    return found_voice;
+}

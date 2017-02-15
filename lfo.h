@@ -10,6 +10,8 @@ struct lfo {
 
 lfo *lfo_new(void);
 
+void lfo_set_soundgenerator_interface(lfo *l);
+
 double lfo_do_oscillate(oscillator *self, double *quad_phase_output);
 
 void lfo_start_oscillator(oscillator *self);

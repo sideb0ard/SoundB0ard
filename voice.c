@@ -36,7 +36,9 @@ void voice_init(voice *v)
     envelope_generator_init(&v->m_eg4);
 
     osc_new_settings((oscillator *)&v->m_lfo1);
+    lfo_set_soundgenerator_interface(&v->m_lfo1);
     osc_new_settings((oscillator *)&v->m_lfo2);
+    lfo_set_soundgenerator_interface(&v->m_lfo2);
 
     dca_initialize(&v->m_dca);
 
@@ -157,6 +159,7 @@ void voice_prepare_for_play(voice *v)
     if (v->m_osc1) {
         v->m_osc1->g_modmatrix = &v->g_modmatrix;
         v->m_osc1->m_mod_source_fo = DEST_OSC1_FO;
+        printf("JUST SET OSC1 MOD SOURCE FO %d\n", DEST_OSC1_FO);
         v->m_osc1->m_mod_source_pulse_width = DEST_OSC1_PULSEWIDTH;
         v->m_osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
     }
@@ -197,6 +200,7 @@ void voice_prepare_for_play(voice *v)
 
 void voice_init_global_parameters(voice *v, global_synth_params *sp)
 {
+    printf("VOICE! init GLOBAL\n");
     v->m_global_synth_params = sp;
 
     v->m_global_voice_params = &sp->voice_params;
@@ -324,14 +328,17 @@ void voice_reset(voice *v)
 void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
                    double frequency, double last_note_frequency)
 {
+    printf("Voice note on!\n");
     v->m_osc_pitch = frequency;
 
     if (!v->m_note_on && !v->m_note_pending) {
         v->m_midi_note_number = midi_note;
         v->m_midi_velocity = midi_velocity;
+        printf("changing modmatrx mmmm sources\n");
         v->g_modmatrix.m_sources[SOURCE_VELOCITY] = (double)v->m_midi_velocity;
         v->g_modmatrix.m_sources[SOURCE_MIDI_NOTE_NUM] =
             (double)v->m_midi_note_number;
+        printf("changing modmatrx mmmm sources .. .DONE\n");
         if (v->m_portamento_inc > 0.0 && last_note_frequency >= 0) {
             v->m_modulo_portamento = 0.0;
             v->m_portamento_semitones =
@@ -348,6 +355,7 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
                 v->m_osc4->m_osc_fo = v->m_portamento_start;
         }
         else {
+            printf("changing OSCILLATORRRRS pitch\n");
             if (v->m_osc1)
                 v->m_osc1->m_osc_fo = v->m_osc_pitch;
             if (v->m_osc2)
@@ -358,6 +366,7 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
                 v->m_osc4->m_osc_fo = v->m_osc_pitch;
         }
 
+        printf("changing OSCILLATORRRRS midi note number\n");
         if (v->m_osc1)
             v->m_osc1->m_midi_note_number = v->m_midi_note_number;
         if (v->m_osc2)
@@ -367,20 +376,26 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
         if (v->m_osc4)
             v->m_osc4->m_midi_note_number = v->m_midi_note_number;
 
+        printf("Starting OSCILLATORRRRS 1\n");
         if (v->m_osc1)
             v->m_osc1->start_oscillator(v->m_osc1);
+        printf("Starting OSCILLATORRRRS 2\n");
         if (v->m_osc2)
             v->m_osc2->start_oscillator(v->m_osc2);
+        printf("Starting OSCILLATORRRRS 3\n");
         if (v->m_osc3)
             v->m_osc3->start_oscillator(v->m_osc3);
-        if (v->m_osc3)
+        printf("Starting OSCILLATORRRRS 4\n");
+        if (v->m_osc4)
             v->m_osc4->start_oscillator(v->m_osc4);
 
+        printf("Starting EG\n");
         eg_start_eg(&v->m_eg1);
         eg_start_eg(&v->m_eg2);
         eg_start_eg(&v->m_eg3);
         eg_start_eg(&v->m_eg4);
 
+        printf("Starting LFO\n");
         v->m_lfo1.osc.start_oscillator((oscillator *)&v->m_lfo1);
         v->m_lfo2.osc.start_oscillator((oscillator *)&v->m_lfo2);
 

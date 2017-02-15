@@ -66,7 +66,7 @@ typedef enum { OFF, ON } onoff;
 typedef enum { UP, DOWN } direction;
 
 typedef enum {
-    NANOSYNTH_TYPE,
+    SYNTH_TYPE,
     SAMPLER_TYPE,
     BITWIZE_TYPE,
     DRUM_TYPE,

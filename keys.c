@@ -30,7 +30,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    nanosynth *ns = (nanosynth *)mixr->sound_generators[soundgen_num];
+    minisynth *ms = (minisynth *)mixr->sound_generators[soundgen_num];
 
     int ch = 0;
     int quit = 0;
@@ -60,67 +60,67 @@ void keys(int soundgen_num)
                 break;
             case 49:
                 printf("Down an octave...\n");
-                change_octave(ns, DOWN);
+                // change_octave(ns, DOWN);
                 break;
             case 50:
                 printf("Up an octave...\n");
-                change_octave(ns, UP);
+                // change_octave(ns, UP);
                 break;
             case 114:
-                ns->recording = 1 - ns->recording;
+                ms->recording = 1 - ms->recording;
                 printf("Toggling REC to %s\n",
-                       ns->recording ? "true" : "false");
+                       ms->recording ? "true" : "false");
                 break;
             case 122:
                 printf("Changing WAVE form of synth->osc1\n");
-                nanosynth_change_osc_wave_form(ns, 0, 0, true);
+                // minisynth_change_osc_wave_form(ms, 0, 0, true);
                 break;
             case 120:
                 printf("Changing WAVE form of synth->osc2\n");
-                nanosynth_change_osc_wave_form(ns, 0, 1, true);
+                // minisynth_change_osc_wave_form(ms, 0, 1, true);
                 break;
             case 99:
                 printf("Changing WAVE form of synth->lfo\n");
-                nanosynth_change_osc_wave_form(ns, 0, 2, true);
+                // minisynth_change_osc_wave_form(ms, 0, 2, true);
                 break;
             case 118:
-                ns->m_filter_keytrack = 1 - ns->m_filter_keytrack;
+                ms->m_filter_keytrack = 1 - ms->m_filter_keytrack;
                 printf("Key tracking toggle - val is %d!\n",
-                       ns->m_filter_keytrack);
+                       ms->m_filter_keytrack);
                 break;
             case 98:
                 printf("Key tracking intensity toggle!\n");
-                if (ns->m_filter_keytrack_intensity == 0.5)
-                    ns->m_filter_keytrack_intensity = 2.0;
-                else if (ns->m_filter_keytrack_intensity == 2.0)
-                    ns->m_filter_keytrack_intensity = 1.0;
+                if (ms->m_filter_keytrack_intensity == 0.5)
+                    ms->m_filter_keytrack_intensity = 2.0;
+                else if (ms->m_filter_keytrack_intensity == 2.0)
+                    ms->m_filter_keytrack_intensity = 1.0;
                 else
-                    ns->m_filter_keytrack_intensity = 0.5;
+                    ms->m_filter_keytrack_intensity = 0.5;
                 printf("Key tracking intensity toggle! Val is %f\n",
-                       ns->m_filter_keytrack_intensity);
+                       ms->m_filter_keytrack_intensity);
                 break;
 
             default:
                 // play note
-                midi_num = ch_midi_lookup(ch, ns);
+                midi_num = ch_midi_lookup(ch, ms);
                 int fake_velocity = 126; // TODO real velocity
                 if (midi_num != -1) {
                     print_midi_event(midi_num);
-                    nanosynth_midi_note_on(ns, midi_num, fake_velocity);
-                    if (ns->recording) {
+                    minisynth_midi_note_on(ms, midi_num, fake_velocity);
+                    if (ms->recording) {
                         printf("Recording note!\n");
                         int note_on_tick = mixr->tick % PPNS;
                         midi_event *ev = new_midi_event(
                             note_on_tick, 144, midi_num, fake_velocity);
-                        ns->melodies[ns->cur_melody][note_on_tick] = ev;
+                        ms->melodies[ms->cur_melody][note_on_tick] = ev;
 
                         int note_off_tick =
                             (note_on_tick + PPS * 4) %
                             PPNS; // rough guess - PPS is pulses per quart note
-                                  // and PPNS is pulses per Nanosynth Loop
+                                  // and PPNS is pulses per minisynth Loop
                         midi_event *ev2 = new_midi_event(
                             note_off_tick, 128, midi_num, fake_velocity);
-                        ns->melodies[ns->cur_melody][note_off_tick] = ev2;
+                        ms->melodies[ms->cur_melody][note_off_tick] = ev2;
                     }
                 }
                 printf("CCCC %d\n", ch);

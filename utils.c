@@ -266,12 +266,12 @@ int notelookup(char *n)
 // float chfreqlookup(int ch, void *p)
 int ch_midi_lookup(int ch, void *p)
 {
-    nanosynth *ns = (nanosynth *)p;
+    minisynth *ms = (minisynth *)p;
     // int cur_octave = ns->cur_octave * 12;
     int default_octave = 4;
     int cur_octave = default_octave * 12;
-    if (ns->cur_octave != 0) {
-        cur_octave = cur_octave + (ns->cur_octave * 12);
+    if (ms->cur_octave != 0) {
+        cur_octave = cur_octave + (ms->cur_octave * 12);
     }
     int next_octave = cur_octave + 12;
 

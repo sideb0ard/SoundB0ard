@@ -307,8 +307,7 @@ void interpret(char *line)
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type ==
-                        NANOSYNTH_TYPE) {
+                    mixr->sound_generators[soundgen_num]->type == SYNTH_TYPE) {
                     nanosynth *ns =
                         (nanosynth *)mixr->sound_generators[soundgen_num];
                     if (strncmp("add", wurds[2], 4) == 0) {

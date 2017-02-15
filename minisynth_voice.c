@@ -18,10 +18,15 @@ void minisynth_voice_init(minisynth_voice *msv)
     voice_init(&msv->m_voice);
 
     // initialize all my oscillators
-    osc_new_settings((oscillator *)&msv->m_osc1);
-    osc_new_settings((oscillator *)&msv->m_osc2);
-    osc_new_settings((oscillator *)&msv->m_osc3);
-    osc_new_settings((oscillator *)&msv->m_osc4);
+    osc_new_settings(&msv->m_osc1.osc);
+    qb_set_soundgenerator_interface(&msv->m_osc1);
+    printf("OSC1 osc->m_mod_source_fo : %d\n", msv->m_osc1.osc.m_mod_source_fo);
+    osc_new_settings(&msv->m_osc2.osc);
+    qb_set_soundgenerator_interface(&msv->m_osc2);
+    osc_new_settings(&msv->m_osc3.osc);
+    qb_set_soundgenerator_interface(&msv->m_osc3);
+    osc_new_settings(&msv->m_osc4.osc);
+    qb_set_soundgenerator_interface(&msv->m_osc4);
 
     // attach oscillators to my base class
     msv->m_voice.m_osc1 = (oscillator *)&msv->m_osc1;
@@ -126,6 +131,7 @@ void minisynth_voice_init_global_parameters(minisynth_voice *msv,
                                             global_synth_params *sp)
 {
     voice_init_global_parameters(&msv->m_voice, sp);
+
     msv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity = 1.0;
     msv->m_voice.m_global_voice_params->lfo1_filter1_mod_intensity = 1.0;
     msv->m_voice.m_global_voice_params->lfo1_filter2_mod_intensity = 1.0;
@@ -208,49 +214,47 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     if (!voice_gennext(&msv->m_voice, left_output, right_output))
         return false;
 
-    // layer 0 //////////////////////////////
+    //// layer 0 //////////////////////////////
     do_modulation_matrix(&msv->m_voice.g_modmatrix, 0);
 
-    // update layer 1 modulators
+    //// update layer 1 modulators
     eg_update(&msv->m_voice.m_eg1);
-    msv->m_voice.m_lfo1.osc.update_oscillator(
-        (oscillator *)&msv->m_voice.m_lfo1);
+    osc_update((oscillator *)&msv->m_voice.m_lfo1);
 
-    // gen next val layer 1 mods
+    //// gen next val layer 1 mods
     eg_do_envelope(&msv->m_voice.m_eg1, NULL);
-    msv->m_voice.m_lfo1.osc.do_oscillate((oscillator *)&msv->m_voice.m_lfo1,
-                                         NULL);
+    lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1, NULL);
 
-    // layer 1 //////////////////////////////
+    //// layer 1 //////////////////////////////
     do_modulation_matrix(&msv->m_voice.g_modmatrix, 1);
 
     minisynth_voice_update(msv);
     dca_update(&msv->m_voice.m_dca);
     moog_update((filter *)&msv->m_moog_ladder_filter);
 
-    msv->m_voice.m_osc1->update_oscillator((oscillator *)&msv->m_voice.m_osc1);
-    msv->m_voice.m_osc2->update_oscillator((oscillator *)&msv->m_voice.m_osc2);
-    msv->m_voice.m_osc3->update_oscillator((oscillator *)&msv->m_voice.m_osc3);
-    msv->m_voice.m_osc4->update_oscillator((oscillator *)&msv->m_voice.m_osc4);
+    osc_update((oscillator *)&msv->m_voice.m_osc1);
+    //msv->m_voice.m_osc2->update_oscillator((oscillator *)&msv->m_voice.m_osc2);
+    //msv->m_voice.m_osc3->update_oscillator((oscillator *)&msv->m_voice.m_osc3);
+    //msv->m_voice.m_osc4->update_oscillator((oscillator *)&msv->m_voice.m_osc4);
 
-    double osc_mix = 0.333 *
-                         msv->m_voice.m_osc1->do_oscillate(
-                             (oscillator *)&msv->m_voice.m_osc1, NULL) +
-                     0.333 *
-                         msv->m_voice.m_osc2->do_oscillate(
-                             (oscillator *)&msv->m_voice.m_osc2, NULL) +
-                     0.333 *
-                         msv->m_voice.m_osc3->do_oscillate(
-                             (oscillator *)&msv->m_voice.m_osc3, NULL) +
-                     0.333 *
-                         msv->m_voice.m_osc4->do_oscillate(
-                             (oscillator *)&msv->m_voice.m_osc4, NULL);
+    //double osc_mix = 0.333 *
+    //                     msv->m_voice.m_osc1->do_oscillate(
+    //                         (oscillator *)&msv->m_voice.m_osc1, NULL) +
+    //                 0.333 *
+    //                     msv->m_voice.m_osc2->do_oscillate(
+    //                         (oscillator *)&msv->m_voice.m_osc2, NULL) +
+    //                 0.333 *
+    //                     msv->m_voice.m_osc3->do_oscillate(
+    //                         (oscillator *)&msv->m_voice.m_osc3, NULL) +
+    //                 0.333 *
+    //                     msv->m_voice.m_osc4->do_oscillate(
+    //                         (oscillator *)&msv->m_voice.m_osc4, NULL);
 
-    double filter_out =
-        moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
+    //double filter_out =
+    //    moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
 
-    dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
-                right_output);
+    //dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
+    //            right_output);
 
     return true;
 }

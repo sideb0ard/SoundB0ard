@@ -10,6 +10,8 @@ typedef struct qblimited_oscillator {
 
 qb_osc *qb_osc_new(void);
 
+void qb_set_soundgenerator_interface(qb_osc *self);
+
 double qb_do_oscillate(oscillator *self, double *quad_phase_output);
 
 void qb_start_oscillator(oscillator *self);

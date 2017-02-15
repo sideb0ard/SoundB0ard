@@ -111,10 +111,12 @@ minisynth_voice *minisynth_get_oldest_voice(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *synth,
                                                       unsigned int midi_note);
 
-void minisynth_midi_note_on(minisynth *self, unsigned int midinote,
+bool minisynth_midi_note_on(minisynth *self, unsigned int midinote,
                             unsigned int velocity);
 bool minisynth_midi_note_off(minisynth *self, unsigned int midinote,
                              unsigned int velocity, bool all_notes_off);
+void minisynth_midi_mod_wheel(minisynth *self, unsigned int data1,
+                              unsigned int data2);
 void minisynth_midi_pitchbend(minisynth *self, unsigned int data1,
                               unsigned int data2);
 void minisynth_midi_control(minisynth *self, unsigned int data1,
@@ -125,12 +127,6 @@ void minisynth_steal_note(minisynth *self, int index,
                           unsigned int pending_midinote,
                           unsigned int pending_velocity);
 
-void change_octave(void *self, int direction);
-void minisynth_change_osc_wave_form(minisynth *self, unsigned int voice_no,
-                                    int oscil, bool all_voices);
-void p_minisynth_change_osc_wave_form(minisynth *self, unsigned int voice_no,
-                                      int oscil);
-void minisynth_set_sustain(minisynth *self, int sustain_val);
 void minisynth_set_multi_melody_mode(minisynth *self, bool melody_mode);
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
                                    int loop_num);
@@ -138,6 +134,5 @@ void minisynth_add_melody(minisynth *self);
 void minisynth_switch_melody(minisynth *self, unsigned int melody_num);
 void minisynth_reset_melody(minisynth *self, unsigned int melody_num);
 void minisynth_reset_melody_all(minisynth *self);
-void minisynth_add_note(minisynth *self, int midi_num);
 void minisynth_melody_to_string(minisynth *self, int melody_num,
                                 wchar_t scratch[33]);

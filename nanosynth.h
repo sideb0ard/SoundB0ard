@@ -115,6 +115,5 @@ void nanosynth_add_melody(nanosynth *self);
 void nanosynth_switch_melody(nanosynth *self, unsigned int melody_num);
 void nanosynth_reset_melody(nanosynth *self, unsigned int melody_num);
 void nanosynth_reset_melody_all(nanosynth *self);
-void nanosynth_add_note(nanosynth *self, int midi_num);
 void nanosynth_melody_to_string(nanosynth *self, int melody_num,
                                 wchar_t scratch[33]);

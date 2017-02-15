@@ -219,7 +219,7 @@ nanosynth *new_nanosynth()
     ns->sound_generator.status = &nanosynth_status;
     ns->sound_generator.setvol = &nanosynth_setvol;
     ns->sound_generator.getvol = &nanosynth_getvol;
-    ns->sound_generator.type = NANOSYNTH_TYPE;
+    ns->sound_generator.type = SYNTH_TYPE;
 
     // start loop player running
     pthread_t melody_looprrr;

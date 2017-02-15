@@ -5,6 +5,7 @@
 
 #include "drumr.h"
 #include "effect.h"
+#include "minisynth.h"
 #include "nanosynth.h"
 #include "sbmsg.h"
 #include "sound_generator.h"

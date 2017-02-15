@@ -15,7 +15,13 @@ lfo *lfo_new()
     }
 
     osc_new_settings(&l->osc);
+    lfo_set_soundgenerator_interface(l);
 
+    return l;
+}
+
+void lfo_set_soundgenerator_interface(lfo *l)
+{
     l->osc.do_oscillate = &lfo_do_oscillate;
     l->osc.start_oscillator = &lfo_start_oscillator;
     l->osc.stop_oscillator = &lfo_stop_oscillator;
@@ -24,7 +30,6 @@ lfo *lfo_new()
 
     l->osc.m_lfo_mode = sync;
 
-    return l;
 }
 
 double lfo_do_oscillate(oscillator *self, double *quad_phase_output)

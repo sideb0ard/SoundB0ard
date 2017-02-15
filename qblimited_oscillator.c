@@ -15,16 +15,20 @@ qb_osc *qb_osc_new()
     }
 
     osc_new_settings(&qb->osc);
+    qb_set_soundgenerator_interface(qb);
 
+    return qb;
+}
+
+void qb_set_soundgenerator_interface(qb_osc *qb)
+{
     qb->osc.do_oscillate = &qb_do_oscillate;
     qb->osc.start_oscillator = &qb_start_oscillator;
     qb->osc.stop_oscillator = &qb_stop_oscillator;
     qb->osc.reset_oscillator = &qb_reset_oscillator;
     qb->osc.update_oscillator = &osc_update; // from base class
 
-    return qb;
 }
-
 double qb_do_sawtooth(oscillator *self, double modulo, double dInc)
 {
     double dTrivialSaw = 0.0;

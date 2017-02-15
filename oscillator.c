@@ -217,6 +217,16 @@ void osc_update(oscillator *self)
 void osc_init_global_parameters(oscillator *self,
                                 global_oscillator_params *params)
 {
+    printf("OSC INITI GLOBAL\n");
     self->m_global_oscillator_params = params;
     self->m_global_oscillator_params->osc_fo = self->m_osc_fo;
+    self->m_global_oscillator_params->fo_ratio = self->m_fo_ratio;
+    self->m_global_oscillator_params->amplitude = self->m_amplitude;
+    self->m_global_oscillator_params->pulse_width_control = self->m_pulse_width_control;
+    self->m_global_oscillator_params->amplitude = self->m_amplitude;
+    self->m_global_oscillator_params->octave = self->m_octave;
+    self->m_global_oscillator_params->semitones = self->m_semitones;
+    self->m_global_oscillator_params->cents = self->m_cents;
+    self->m_global_oscillator_params->waveform = self->m_waveform;
+    self->m_global_oscillator_params->lfo_mode = self->m_lfo_mode;
 }
