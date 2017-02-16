@@ -51,7 +51,9 @@ void minisynth_voice_init(minisynth_voice *msv)
     eg_set_eg_mode(&msv->m_voice.m_eg1, ANALOG);
     msv->m_voice.m_eg1.m_output_eg = true;
 
+    dca_initialize(&msv->m_voice.m_dca);
     msv->m_voice.m_dca.m_mod_source_eg = DEST_DCA_EG;
+
 }
 
 void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
@@ -229,6 +231,7 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
 
     minisynth_voice_update(msv);
     dca_update(&msv->m_voice.m_dca);
+
     moog_update((filter *) &msv->m_moog_ladder_filter);
 
     osc_update((oscillator *) &msv->m_osc1);

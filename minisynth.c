@@ -47,7 +47,10 @@ minisynth *new_minisynth(void)
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.type = SYNTH_TYPE;
 
-    minisynth_prepare_for_play(ms);
+    printf("MINISYNC voice[0] dca %f\n", ms->m_voices[0]->m_voice.m_dca.m_eg_mod);
+    //minisynth_prepare_for_play(ms);
+    printf("MINISYNC voice[0] dca %f\n", ms->m_voices[0]->m_voice.m_dca.m_eg_mod);
+
     return ms;
 }
 
@@ -85,7 +88,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
     }
 
     // TODO add delay
-    minisynth_update(ms);
+    //minisynth_update(ms);
     ms->m_last_note_frequency = -1.0;
 
     return true;
@@ -280,31 +283,6 @@ void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
                                    int loop_num);
 
-double minisynth_gennext(void *self)
-{
-    minisynth *ms = (minisynth *)self;
-
-    double accum_out_left = 0.0;
-    double accum_out_right = 0.0;
-
-    float mix = 0.25;
-
-    double out_left = 0.0;
-    double out_right = 0.0;
-
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i])
-            minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
-
-        accum_out_left += mix * out_left;
-        accum_out_right += mix * out_right;
-    }
-
-    // TODO delay
-
-    return accum_out_left;
-}
-
 void minisynth_add_melody(minisynth *ms)
 {
     ms->num_melodies++;
@@ -413,3 +391,28 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
     }
     return found_voice;
 }
+
+double minisynth_gennext(void *self)
+{
+    minisynth *ms = (minisynth *)self;
+
+    double accum_out_left = 0.0;
+    double accum_out_right = 0.0;
+
+    float mix = 0.25;
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    for (int i = 0; i < MAX_VOICES; i++) {
+        if (ms->m_voices[i])
+            minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
+        accum_out_left += mix * out_left;
+        accum_out_right += mix * out_right;
+    }
+
+    // TODO delay
+
+    return accum_out_left;
+}
+
