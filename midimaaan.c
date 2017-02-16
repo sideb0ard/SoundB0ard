@@ -9,7 +9,8 @@
 #include "midi_freq_table.h"
 #include "midimaaan.h"
 #include "mixer.h"
-#include "nanosynth.h"
+// #include "nanosynth.h"
+#include "minisynth.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -56,35 +57,35 @@ void *midiman()
                 int data2 = Pm_MessageData2(msg[i].message);
                 // double timestamp = msg[i].timestamp/1000.;
 
-                // printf("HAS ACTIVE nanosynth? %d\n", mixr->has_active_ns);
-                if (mixr->midi_control_destination == NANOSYNTH) {
+                // printf("HAS ACTIVE minisynth? %d\n", mixr->has_active_ns);
+                if (mixr->midi_control_destination == SYNTH) {
 
-                    nanosynth *ns =
-                        (nanosynth *)mixr
+                    minisynth *ms =
+                        (minisynth *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
 
-                    if (ns->recording) {
+                    if (ms->recording) {
                         int tick = mixr->tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
-                        // ns->midi_events_loop[tick] = ev;
-                        ns->melodies[ns->cur_melody][tick] = ev;
+                        // ms->midi_events_loop[tick] = ev;
+                        ms->melodies[ms->cur_melody][tick] = ev;
                     }
                     switch (status) {
                     case (144): { // Hex 0x80
-                        nanosynth_midi_note_on(ns, data1, data2);
+                        minisynth_midi_note_on(ms, data1, data2);
                         break;
                     }
                     case (128): { // Hex 0x90
-                        nanosynth_midi_note_off(ns, data1, data2, false);
+                        minisynth_midi_note_off(ms, data1, data2, false);
                         break;
                     }
                     case (176): { // Hex 0xB0
-                        nanosynth_midi_control(ns, data1, data2);
+                        minisynth_midi_control(ms, data1, data2);
                         break;
                     }
                     case (224): { // Hex 0xE0
-                        nanosynth_midi_pitchbend(ns, data1, data2);
+                        minisynth_midi_pitchbend(ms, data1, data2);
                         break;
                     }
                     default:
@@ -103,7 +104,7 @@ void *midiman()
                     }
                 }
                 else {
-                    printf("Got midi but not connected to nanosynth\n");
+                    printf("Got midi but not connected to synth\n");
                 }
             }
         }

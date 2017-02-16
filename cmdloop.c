@@ -344,7 +344,7 @@ void interpret(char *line)
                         keys(soundgen_num);
                     }
                     else if (strncmp("midi", wurds[2], 4) == 0) {
-                        mixr->midi_control_destination = NANOSYNTH;
+                        mixr->midi_control_destination = SYNTH;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("reset", wurds[2], 5) == 0) {

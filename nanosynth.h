@@ -16,7 +16,6 @@
 #define MAX_NANO_VOICES 2
 
 typedef enum { OSC, FILTER } LFO1_dest;
-typedef enum { NONE, NANOSYNTH, DELAYFX } midi_control_type;
 
 typedef midi_event *midi_events_loop_t[PPNS];
 
