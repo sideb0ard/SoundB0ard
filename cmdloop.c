@@ -24,7 +24,7 @@
 #include "keys.h"
 #include "midimaaan.h"
 #include "mixer.h"
-#include "nanosynth.h"
+#include "minisynth.h"
 #include "sampler.h"
 #include "sparkline.h"
 #include "table.h"
@@ -308,31 +308,31 @@ void interpret(char *line)
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type == SYNTH_TYPE) {
-                    nanosynth *ns =
-                        (nanosynth *)mixr->sound_generators[soundgen_num];
+                    minisynth *ms =
+                        (minisynth *)mixr->sound_generators[soundgen_num];
                     if (strncmp("add", wurds[2], 4) == 0) {
                         if (strncmp("melody", wurds[3], 6) == 0) {
-                            nanosynth_add_melody(ns);
+                            minisynth_add_melody(ms);
                         }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         if (strncmp("multimode", wurds[3], 10) == 0) {
                             if (strncmp("true", wurds[4], 4) == 0) {
-                                nanosynth_set_multi_melody_mode(ns, true);
+                                minisynth_set_multi_melody_mode(ms, true);
                             }
                             else if (strncmp("false", wurds[4], 5) == 0) {
-                                nanosynth_set_multi_melody_mode(ns, false);
+                                minisynth_set_multi_melody_mode(ms, false);
                             }
                         }
                         else {
                             int melody_num = atoi(wurds[3]);
-                            if (is_valid_melody_num(ns, melody_num)) {
+                            if (is_valid_melody_num(ms, melody_num)) {
                                 printf("VALID!\n");
                                 if (strncmp("numloops", wurds[4], 8) == 0) {
                                     int numloops = atoi(wurds[5]);
                                     if (numloops != 0) {
-                                        nanosynth_set_melody_loop_num(
-                                            ns, melody_num, numloops);
+                                        minisynth_set_melody_loop_num(
+                                            ms, melody_num, numloops);
                                         printf("NUMLOOPS Now %d\n", numloops);
                                     }
                                 }
@@ -349,21 +349,16 @@ void interpret(char *line)
                     }
                     else if (strncmp("reset", wurds[2], 5) == 0) {
                         if (strncmp("all", wurds[3], 3) == 0) {
-                            nanosynth_reset_melody_all(ns);
+                            minisynth_reset_melody_all(ms);
                         }
                         else {
                             int melody_num = atoi(wurds[3]);
-                            nanosynth_reset_melody(ns, melody_num);
+                            minisynth_reset_melody(ms, melody_num);
                         }
-                    }
-                    else if (strncmp("sustain", wurds[2], 7) == 0) {
-                        int val = atoi(wurds[3]);
-                        nanosynth_set_sustain(ns,
-                                              val * mixr->midi_ticks_per_ms);
                     }
                     else if (strncmp("switch", wurds[2], 6) == 0) {
                         int melody_num = atoi(wurds[3]);
-                        nanosynth_switch_melody(ns, melody_num);
+                        minisynth_switch_melody(ms, melody_num);
                     }
                 }
             }
@@ -681,9 +676,9 @@ bool is_valid_drum_pattern_num(DRUM *d, int pattern_num)
     return false;
 }
 
-bool is_valid_melody_num(nanosynth *ns, int melody_num)
+bool is_valid_melody_num(minisynth *ms, int melody_num)
 {
-    if (melody_num < ns->num_melodies) {
+    if (melody_num < ms->num_melodies) {
         return true;
     }
     return false;

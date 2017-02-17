@@ -122,6 +122,7 @@ void minisynth_midi_pitchbend(minisynth *self, unsigned int data1,
 void minisynth_midi_control(minisynth *self, unsigned int data1,
                             unsigned int data2);
 
+void minisynth_set_sustain(minisynth *self, int sustain_val);
 void minisynth_set_multi_melody_mode(minisynth *self, bool melody_mode);
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
                                    int loop_num);

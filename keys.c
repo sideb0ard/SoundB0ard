@@ -132,7 +132,7 @@ void keys(int soundgen_num)
 
 void *play_melody_loop(void *p)
 {
-    nanosynth *ns = (nanosynth *)p;
+    minisynth *ns = (minisynth *)p;
 
     int note_played_time = 0;
 
@@ -162,19 +162,20 @@ void *play_melody_loop(void *p)
             midi_event *ev = ns->melodies[ns->cur_melody][idx];
             switch (ev->event_type) {
             case (144): {
-                nanosynth_midi_note_on(ns, ev->data1, ev->data2);
+                minisynth_midi_note_on(ns, ev->data1, ev->data2);
                 break;
             }
             case (128): { // Hex 0x90
-                nanosynth_midi_note_off(ns, ev->data1, ev->data2, false);
+                printf("MELODY LOOP note OFF event\n");
+                minisynth_midi_note_off(ns, ev->data1, ev->data2, false);
                 break;
             }
             case (176): { // Hex 0xB0
-                nanosynth_midi_control(ns, ev->data1, ev->data2);
+                minisynth_midi_control(ns, ev->data1, ev->data2);
                 break;
             }
             case (224): { // Hex 0xE0
-                nanosynth_midi_pitchbend(ns, ev->data1, ev->data2);
+                minisynth_midi_pitchbend(ns, ev->data1, ev->data2);
                 break;
             }
             }

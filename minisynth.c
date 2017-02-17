@@ -1,5 +1,6 @@
 #include <math.h>
 #include <stdlib.h>
+#include <pthread.h>
 
 #include "midi_freq_table.h"
 #include "minisynth.h"
@@ -48,9 +49,14 @@ minisynth *new_minisynth(void)
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.type = SYNTH_TYPE;
 
-    printf("MINISYNC voice[0] dca %f\n", ms->m_voices[0]->m_voice.m_dca.m_eg_mod);
-    //minisynth_prepare_for_play(ms);
-    printf("MINISYNC voice[0] dca %f\n", ms->m_voices[0]->m_voice.m_dca.m_eg_mod);
+     // start loop player running
+    pthread_t melody_looprrr;
+    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
+        fprintf(stderr, "Err running loop\n");
+    }
+    else {
+        pthread_detach(melody_looprrr);
+    }
 
     return ms;
 }
@@ -232,6 +238,7 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
     }
 
     if (steal_note) {
+        printf("STEAL NOTE TRUE!\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(ms);
         if (msv) {
             minisynth_increment_voice_timestamps(ms);
@@ -248,6 +255,7 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
                              unsigned int velocity, bool all_notes_off)
 {
     (void) velocity;
+    printf("MINISYNTH NOTE OFF!\n");
 
     if (all_notes_off)
     {
@@ -259,8 +267,10 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
 
     for (int i = 0; i < MAX_VOICES; i++) {
         minisynth_voice *msv = minisynth_get_oldest_voice_with_note(ms, midinote);
-        if (msv)
+        if (msv) {
+            printf("FOUND a VOICE to turn off\n");
             voice_note_off(&msv->m_voice, midinote);
+        }
     }
     return true;
 }
@@ -369,7 +379,10 @@ void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)
 }
 
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
-                                   int loop_num);
+                                   int loop_num)
+{
+    self->melody_multiloop_count[melody_num] = loop_num;
+}
 
 void minisynth_add_melody(minisynth *ms)
 {
