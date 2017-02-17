@@ -19,7 +19,6 @@
 #include "envelope.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "nanosynth.h"
 #include "sampler.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
@@ -273,24 +272,6 @@ int add_bytebeat(mixer *mixr, char *pattern)
 
     m->sound_generator = (SOUNDGEN *)b;
     printf("Added BYTEBEATR!!!\n");
-    return add_sound_generator(mixr, m);
-}
-
-int add_nanosynth(mixer *mixr)
-{
-    printf("Adding a Nanosynth...\n");
-    nanosynth *ns = new_nanosynth();
-    if (ns == NULL) {
-        printf("Barfed on nanosynth creation\n");
-        return -1;
-    }
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(ns);
-        printf("MBARF!\n");
-        return -1;
-    }
-    m->sound_generator = (SOUNDGEN *)ns;
     return add_sound_generator(mixr, m);
 }
 

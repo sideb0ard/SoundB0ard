@@ -298,10 +298,7 @@ void interpret(char *line)
 
         // SYNTHESIZER COMMANDS
         else if (strncmp("syn", wurds[0], 3) == 0) {
-            if (strncmp("nano", wurds[1], 4) == 0) {
-                add_nanosynth(mixr);
-            }
-            else if (strncmp("mini", wurds[1], 4) == 0) {
+            if (strncmp("mini", wurds[1], 4) == 0) {
                 add_minisynth(mixr);
             }
             else {

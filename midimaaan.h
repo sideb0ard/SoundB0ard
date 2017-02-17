@@ -2,11 +2,6 @@
 
 #include "effect.h"
 
-typedef struct nanosynth nanosynth;
-
-// unused?
-// typedef enum { NOTEON, NOTEOFF, PITCHBEND, CONTROL } midi_event_type;
-
 typedef enum { OCTAVE_CHANGE } custom_event_type;
 
 typedef struct midi_event {
@@ -19,11 +14,6 @@ typedef struct midi_event {
 typedef midi_event *midi_events_loop_t[PPNS];
 
 void *midiman(void *);
-
-// void midinoteon(nanosynth *ns, unsigned int midinote, int velocity);
-// void midinoteoff(nanosynth *ns, unsigned int midinote, int velocity);
-// void midipitchbend(nanosynth *ns, int data1, int data2);
-// void midicontrol(nanosynth *ns, int data1, int data2);
 
 void midi_delay_control(EFFECT *e, int data1, int data2);
 

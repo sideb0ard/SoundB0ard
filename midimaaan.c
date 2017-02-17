@@ -9,7 +9,6 @@
 #include "midi_freq_table.h"
 #include "midimaaan.h"
 #include "mixer.h"
-// #include "nanosynth.h"
 #include "minisynth.h"
 #include "utils.h"
 

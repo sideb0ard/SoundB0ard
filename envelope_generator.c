@@ -194,7 +194,7 @@ void eg_start_eg(envelope_generator *self)
     }
 
     // printf("STATE : %s\n", state_strings[self->m_state]);
-    // TODO - race condition? YES! this is it - nanosynth finds EG set
+    // TODO - race condition? YES! this is it - synth finds EG set
     // to zero after this reset and switches off the osc!!!
     // reset() wos here // WATCH OUT! 2017/02/04
     eg_reset(self);
