@@ -24,12 +24,12 @@ minisynth *new_minisynth(void)
     }
 
     // use first voice to setup global
-    // minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
+    minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
 
-    // for (int i = 1; i < MAX_VOICES; i++) {
-    //    voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
-    //                             get_matrix_core(&ms->g_modmatrix));
-    //}
+    for (int i = 1; i < MAX_VOICES; i++) {
+        voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
+                                 get_matrix_core(&ms->g_modmatrix));
+    }
 
     for (int i = 0; i < PPNS; i++) {
         ms->melodies[ms->cur_melody][i] = NULL;
@@ -49,6 +49,8 @@ minisynth *new_minisynth(void)
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.type = SYNTH_TYPE;
 
+    minisynth_prepare_for_play(ms);
+
     // start loop player running
     pthread_t melody_looprrr;
     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
@@ -62,7 +64,6 @@ minisynth *new_minisynth(void)
 }
 
 // sound generator interface //////////////
-// void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void minisynth_status(void *self, wchar_t *status_string)
 {
     // TODO - a shit load of error checking on boundaries and size
@@ -238,6 +239,7 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
     }
 
     if (steal_note) {
+        printf("STEAL NOTE\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(ms);
         if (msv) {
             minisynth_increment_voice_timestamps(ms);
@@ -499,6 +501,7 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
     return found_voice;
 }
 
+// void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double minisynth_gennext(void *self)
 {
     minisynth *ms = (minisynth *)self;
@@ -520,5 +523,5 @@ double minisynth_gennext(void *self)
 
     // TODO delay
 
-    return accum_out_left;
+    return accum_out_left * ms->vol;
 }

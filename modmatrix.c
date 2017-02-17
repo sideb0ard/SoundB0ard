@@ -173,8 +173,33 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         double src = self->m_sources[mr->m_source_index];
 
         switch (mr->m_source_transform) {
+        case TRANSFORM_UNIPOLAR_TO_BIPOLAR:
+            // src = unipolar_to_bipolar(src);
+            break;
+        case TRANSFORM_BIPOLAR_TO_UNIPOLAR:
+            // src = bipolar_to_unipolar(src);
+            break;
+        case TRANSFORM_MIDI_TO_ATTENUATION:
+            // src = mma_midi_to_atten(src);
+            break;
+        case TRANSFORM_MIDI_TO_PAN:
+            // src = midi_to_pan_value(src);
+            break;
+        case TRANSFORM_MIDI_SWITCH:
+            src = src > 63 ? 1.0 : 0.0;
+            break;
+        case TRANSFORM_MIDI_TO_BIPOLAR:
+            // src = midi_to_bipolar(src);
+            break;
         case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
             src = get_midi_freq(src);
+            break;
+        case TRANSFORM_MIDI_NORMALIZE:
+            src /= 127.0;
+            break;
+        case TRANSFORM_INVERT_MIDI_NORMALIZE:
+            src /= 127.0;
+            src = 1.0 - src;
             break;
         default:
             break;
@@ -183,15 +208,74 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         // destination += source*intensity*range
         double modval = src * (*mr->m_mod_intensity) * (*mr->m_mod_range);
 
-        // if (mr->m_source_index == SOURCE_EG1 && mr->m_destination_index ==
-        // DEST_DCA_EG)
-        //     printf("Source EG1! -- Writing %f -- to DEST DCA!\n", modval);
-
         switch (mr->m_destination_index) {
         case DEST_ALL_OSC_FO:
             self->m_destinations[DEST_OSC1_FO] += modval;
             self->m_destinations[DEST_OSC2_FO] += modval;
+            self->m_destinations[DEST_OSC2_FO] += modval;
+            self->m_destinations[DEST_OSC4_FO] += modval;
             self->m_destinations[DEST_ALL_OSC_FO] += modval;
+        case DEST_ALL_OSC_PULSEWIDTH:
+            self->m_destinations[DEST_OSC1_PULSEWIDTH] += modval;
+            self->m_destinations[DEST_OSC2_PULSEWIDTH] += modval;
+            self->m_destinations[DEST_OSC2_PULSEWIDTH] += modval;
+            self->m_destinations[DEST_OSC4_PULSEWIDTH] += modval;
+            self->m_destinations[DEST_ALL_OSC_PULSEWIDTH] += modval;
+        case DEST_ALL_OSC_FO_RATIO:
+            self->m_destinations[DEST_OSC1_FO_RATIO] += modval;
+            self->m_destinations[DEST_OSC2_FO_RATIO] += modval;
+            self->m_destinations[DEST_OSC2_FO_RATIO] += modval;
+            self->m_destinations[DEST_OSC4_FO_RATIO] += modval;
+            self->m_destinations[DEST_ALL_OSC_FO_RATIO] += modval;
+        case DEST_ALL_OSC_OUTPUT_AMP:
+            self->m_destinations[DEST_OSC1_OUTPUT_AMP] += modval;
+            self->m_destinations[DEST_OSC2_OUTPUT_AMP] += modval;
+            self->m_destinations[DEST_OSC2_OUTPUT_AMP] += modval;
+            self->m_destinations[DEST_OSC4_OUTPUT_AMP] += modval;
+            self->m_destinations[DEST_ALL_OSC_OUTPUT_AMP] += modval;
+        case DEST_ALL_LFO_FO:
+            self->m_destinations[DEST_LFO1_FO] += modval;
+            self->m_destinations[DEST_LFO2_FO] += modval;
+            self->m_destinations[DEST_ALL_LFO_FO] += modval;
+        case DEST_ALL_LFO_OUTPUT_AMP:
+            self->m_destinations[DEST_LFO1_OUTPUT_AMP] += modval;
+            self->m_destinations[DEST_LFO2_OUTPUT_AMP] += modval;
+            self->m_destinations[DEST_ALL_LFO_OUTPUT_AMP] += modval;
+            break;
+        case DEST_ALL_FILTER_FC:
+            self->m_destinations[DEST_FILTER1_FC] += modval;
+            self->m_destinations[DEST_FILTER2_FC] += modval;
+            self->m_destinations[DEST_ALL_FILTER_FC] += modval;
+            break;
+
+        case DEST_ALL_FILTER_KEYTRACK:
+            self->m_destinations[DEST_FILTER1_KEYTRACK] += modval;
+            self->m_destinations[DEST_FILTER2_KEYTRACK] += modval;
+            self->m_destinations[DEST_ALL_FILTER_KEYTRACK] += modval;
+            break;
+
+        case DEST_ALL_EG_ATTACK_SCALING:
+            self->m_destinations[DEST_EG1_ATTACK_SCALING] += modval;
+            self->m_destinations[DEST_EG2_ATTACK_SCALING] += modval;
+            self->m_destinations[DEST_EG3_ATTACK_SCALING] += modval;
+            self->m_destinations[DEST_EG4_ATTACK_SCALING] += modval;
+            self->m_destinations[DEST_ALL_EG_ATTACK_SCALING] += modval;
+            break;
+
+        case DEST_ALL_EG_DECAY_SCALING:
+            self->m_destinations[DEST_EG1_DECAY_SCALING] += modval;
+            self->m_destinations[DEST_EG2_DECAY_SCALING] += modval;
+            self->m_destinations[DEST_EG3_DECAY_SCALING] += modval;
+            self->m_destinations[DEST_EG4_DECAY_SCALING] += modval;
+            self->m_destinations[DEST_ALL_EG_DECAY_SCALING] += modval;
+            break;
+
+        case DEST_ALL_EG_SUSTAIN_OVERRIDE:
+            self->m_destinations[DEST_EG1_SUSTAIN_OVERRIDE] += modval;
+            self->m_destinations[DEST_EG2_SUSTAIN_OVERRIDE] += modval;
+            self->m_destinations[DEST_EG3_SUSTAIN_OVERRIDE] += modval;
+            self->m_destinations[DEST_EG4_SUSTAIN_OVERRIDE] += modval;
+            break;
         default:
             self->m_destinations[mr->m_destination_index] += modval;
         }

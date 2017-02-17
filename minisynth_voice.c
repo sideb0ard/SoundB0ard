@@ -74,12 +74,12 @@ void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
     add_matrix_row(matrix, row);
 
     // EG1 -> FILTER1 FC
-    row = create_matrix_row(
-        SOURCE_BIASED_EG1, DEST_ALL_FILTER_FC,
-        &msv->m_voice.m_global_voice_params->eg1_filter1_mod_intensity,
-        &msv->m_voice.m_global_voice_params->filter_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
+    //row = create_matrix_row(
+    //    SOURCE_BIASED_EG1, DEST_ALL_FILTER_FC,
+    //    &msv->m_voice.m_global_voice_params->eg1_filter1_mod_intensity,
+    //    &msv->m_voice.m_global_voice_params->filter_mod_range, TRANSFORM_NONE,
+    //    true);
+    //add_matrix_row(matrix, row);
 
     // EG1 -> DCA EG
     row = create_matrix_row(
@@ -88,43 +88,43 @@ void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
         &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(matrix, row);
 
-    // EG1 -> ALL OSC1 FC
-    row = create_matrix_row(
-        SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
-        &msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity,
-        &msv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
+    //// EG1 -> ALL OSC1 FC
+    //row = create_matrix_row(
+    //    SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
+    //    &msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity,
+    //    &msv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
+    //    true);
+    //add_matrix_row(matrix, row);
 
     // LFO1 -> FILTER1 FC
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_ALL_FILTER_FC,
-        &msv->m_voice.m_global_voice_params->lfo1_filter1_mod_intensity,
-        &msv->m_voice.m_global_voice_params->filter_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
+    //row = create_matrix_row(
+    //    SOURCE_LFO1, DEST_ALL_FILTER_FC,
+    //    &msv->m_voice.m_global_voice_params->lfo1_filter1_mod_intensity,
+    //    &msv->m_voice.m_global_voice_params->filter_mod_range, TRANSFORM_NONE,
+    //    true);
+    //add_matrix_row(matrix, row);
 
     // LFO1 -> PULSE WIDTH
-    row = create_matrix_row(SOURCE_LFO1, DEST_ALL_OSC_PULSEWIDTH,
-                            &msv->m_voice.m_default_mod_intensity,
-                            &msv->m_voice.m_default_mod_range, TRANSFORM_NONE,
-                            true);
-    add_matrix_row(matrix, row);
+    //row = create_matrix_row(SOURCE_LFO1, DEST_ALL_OSC_PULSEWIDTH,
+    //                        &msv->m_voice.m_default_mod_intensity,
+    //                        &msv->m_voice.m_default_mod_range, TRANSFORM_NONE,
+    //                        true);
+    //add_matrix_row(matrix, row);
 
     // LFO1 (-1 -> +1) -> DCA Amp Mod (0->1)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_DCA_AMP,
-        &msv->m_voice.m_global_voice_params->lfo1_dca_amp_mod_intensity,
-        &msv->m_voice.m_global_voice_params->amp_mod_range,
-        TRANSFORM_BIPOLAR_TO_UNIPOLAR, true);
-    add_matrix_row(matrix, row);
+    //row = create_matrix_row(
+    //    SOURCE_LFO1, DEST_DCA_AMP,
+    //    &msv->m_voice.m_global_voice_params->lfo1_dca_amp_mod_intensity,
+    //    &msv->m_voice.m_global_voice_params->amp_mod_range,
+    //    TRANSFORM_BIPOLAR_TO_UNIPOLAR, true);
+    //add_matrix_row(matrix, row);
 
-    // LFO1 (-1 -> +1) -> DCA Pan Mod (0->1)
-    row = create_matrix_row(
-        SOURCE_LFO1, DEST_DCA_PAN,
-        &msv->m_voice.m_global_voice_params->lfo1_dca_pan_mod_intensity,
-        &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, true);
-    add_matrix_row(matrix, row);
+    //// LFO1 (-1 -> +1) -> DCA Pan Mod (0->1)
+    //row = create_matrix_row(
+    //    SOURCE_LFO1, DEST_DCA_PAN,
+    //    &msv->m_voice.m_global_voice_params->lfo1_dca_pan_mod_intensity,
+    //    &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, true);
+    //add_matrix_row(matrix, row);
 }
 
 void minisynth_voice_init_global_parameters(minisynth_voice *msv,
@@ -211,21 +211,12 @@ void minisynth_voice_reset(minisynth_voice *msv)
 bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
                              double *right_output)
 {
-    if (!voice_gennext(&msv->m_voice, left_output, right_output))
+    if (!voice_gennext(&msv->m_voice, left_output, right_output)) {
         return false;
-
-    // Test Scenario
-    // (void) *right_output;
-    // osc_update((oscillator *)&msv->m_voice.m_lfo1);
-    // double lfo1out = lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1,
-    // NULL);
-    // //*left_output = lfo1out;
-    // osc_set_fo_mod_exp((oscillator*) &msv->m_osc1, lfo1out);
-    // osc_update((oscillator *) &msv->m_osc1);
-    // *left_output = qb_do_oscillate((oscillator*) &msv->m_osc1, NULL);
+    }
 
     //// layer 0 //////////////////////////////
-    // do_modulation_matrix(&msv->m_voice.g_modmatrix, 0);
+    do_modulation_matrix(&msv->m_voice.g_modmatrix, 0);
 
     ////// update layer 1 modulators
     eg_update(&msv->m_voice.m_eg1);
@@ -236,7 +227,7 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1, NULL);
 
     ////// layer 1 //////////////////////////////
-    // do_modulation_matrix(&msv->m_voice.g_modmatrix, 1);
+    do_modulation_matrix(&msv->m_voice.g_modmatrix, 1);
 
     //////minisynth_voice_update(msv);
     dca_update(&msv->m_voice.m_dca);
@@ -258,11 +249,12 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     //                         qb_do_oscillate((oscillator*) &msv->m_osc4,
     //                         NULL);
 
-    double filter_out =
-        moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
+    *left_output = osc_mix;
+    //double filter_out =
+    //    moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
 
-    dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
-                right_output);
+    //dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
+    //            right_output);
 
     return true;
 }
