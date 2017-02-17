@@ -1,6 +1,6 @@
 #include <math.h>
-#include <stdlib.h>
 #include <pthread.h>
+#include <stdlib.h>
 
 #include "midi_freq_table.h"
 #include "minisynth.h"
@@ -20,13 +20,13 @@ minisynth *new_minisynth(void)
             return NULL; // would be bad
 
         minisynth_voice_init_global_parameters(ms->m_voices[i],
-                                     &ms->m_global_synth_params);
+                                               &ms->m_global_synth_params);
     }
 
     // use first voice to setup global
-    //minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
+    // minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
 
-    //for (int i = 1; i < MAX_VOICES; i++) {
+    // for (int i = 1; i < MAX_VOICES; i++) {
     //    voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
     //                             get_matrix_core(&ms->g_modmatrix));
     //}
@@ -49,7 +49,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.type = SYNTH_TYPE;
 
-     // start loop player running
+    // start loop player running
     pthread_t melody_looprrr;
     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
         fprintf(stderr, "Err running loop\n");
@@ -95,7 +95,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
     }
 
     // TODO add delay
-    //minisynth_update(ms);
+    // minisynth_update(ms);
     ms->m_last_note_frequency = -1.0;
 
     return true;
@@ -238,7 +238,6 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
     }
 
     if (steal_note) {
-        printf("STEAL NOTE TRUE!\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(ms);
         if (msv) {
             minisynth_increment_voice_timestamps(ms);
@@ -254,11 +253,9 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
 bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
                              unsigned int velocity, bool all_notes_off)
 {
-    (void) velocity;
-    printf("MINISYNTH NOTE OFF!\n");
+    (void)velocity;
 
-    if (all_notes_off)
-    {
+    if (all_notes_off) {
         for (int i = 0; i < MAX_VOICES; i++) {
             if (ms->m_voices[i])
                 voice_note_off(&ms->m_voices[i]->m_voice, midinote);
@@ -266,9 +263,9 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
     }
 
     for (int i = 0; i < MAX_VOICES; i++) {
-        minisynth_voice *msv = minisynth_get_oldest_voice_with_note(ms, midinote);
+        minisynth_voice *msv =
+            minisynth_get_oldest_voice_with_note(ms, midinote);
         if (msv) {
-            printf("FOUND a VOICE to turn off\n");
             voice_note_off(&msv->m_voice, midinote);
         }
     }
@@ -285,10 +282,14 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         switch (data1) {
         case 1: // K1 - Envelope Attack Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg1, scaley_val);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg2, scaley_val);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg3, scaley_val);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg4, scaley_val);
+            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg1,
+                                    scaley_val);
+            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg2,
+                                    scaley_val);
+            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg3,
+                                    scaley_val);
+            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg4,
+                                    scaley_val);
             break;
         case 2: // K2 - Envelope Decay Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
@@ -306,24 +307,28 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
             break;
         case 4: // K4 - Envelope Release Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg1, scaley_val);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg2, scaley_val);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg3, scaley_val);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg4, scaley_val);
+            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg1,
+                                     scaley_val);
+            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg2,
+                                     scaley_val);
+            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg3,
+                                     scaley_val);
+            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg4,
+                                     scaley_val);
             break;
         case 5: // K5 - LFO rate
             scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
             ms->m_voices[i]->m_voice.m_lfo1.osc.m_osc_fo = scaley_val;
-            osc_update((oscillator*) &ms->m_voices[i]->m_voice.m_lfo1);
+            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo1);
             ms->m_voices[i]->m_voice.m_lfo2.osc.m_osc_fo = scaley_val;
-            osc_update((oscillator*) &ms->m_voices[i]->m_voice.m_lfo2);
+            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo2);
             break;
         case 6: // K6 - LFO amplitude
             scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
             ms->m_voices[i]->m_voice.m_lfo1.osc.m_amplitude = scaley_val;
-            osc_update((oscillator*) &ms->m_voices[i]->m_voice.m_lfo1);
+            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo1);
             ms->m_voices[i]->m_voice.m_lfo2.osc.m_amplitude = scaley_val;
-            osc_update((oscillator*) &ms->m_voices[i]->m_voice.m_lfo2);
+            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo2);
             break;
         case 7: // K7 - Filter Frequency Cut
             scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
@@ -332,7 +337,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         case 8: // K8 - Filter Q control
             scaley_val = scaleybum(1, 128, 1, 10, data2);
             printf("FILTER Q control! %f\n", scaley_val);
-            filter_set_q_control(ms->m_voices[i]->m_voice.m_filter1, scaley_val);
+            filter_set_q_control(ms->m_voices[i]->m_voice.m_filter1,
+                                 scaley_val);
             break;
         default:
             printf("SOMthing else\n");
@@ -516,4 +522,3 @@ double minisynth_gennext(void *self)
 
     return accum_out_left;
 }
-

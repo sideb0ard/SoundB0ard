@@ -8,8 +8,8 @@
 #include "defjams.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
-#include "mixer.h"
 #include "minisynth.h"
+#include "mixer.h"
 #include "utils.h"
 
 extern mixer *mixr;

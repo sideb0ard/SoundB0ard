@@ -145,7 +145,7 @@ void osc_reset(oscillator *self)
 // --- update the frequency, amp mod and PWM
 void osc_update(oscillator *self)
 {
-    //if (self->m_global_oscillator_params) {
+    // if (self->m_global_oscillator_params) {
     //    if (self->m_global_oscillator_params->osc_fo >= 0)
     //        self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
 
@@ -221,7 +221,8 @@ void osc_init_global_parameters(oscillator *self,
     self->m_global_oscillator_params->osc_fo = self->m_osc_fo;
     self->m_global_oscillator_params->fo_ratio = self->m_fo_ratio;
     self->m_global_oscillator_params->amplitude = self->m_amplitude;
-    self->m_global_oscillator_params->pulse_width_control = self->m_pulse_width_control;
+    self->m_global_oscillator_params->pulse_width_control =
+        self->m_pulse_width_control;
     self->m_global_oscillator_params->amplitude = self->m_amplitude;
     self->m_global_oscillator_params->octave = self->m_octave;
     self->m_global_oscillator_params->semitones = self->m_semitones;

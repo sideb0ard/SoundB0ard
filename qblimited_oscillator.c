@@ -27,7 +27,6 @@ void qb_set_soundgenerator_interface(qb_osc *qb)
     qb->osc.stop_oscillator = &qb_stop_oscillator;
     qb->osc.reset_oscillator = &qb_reset_oscillator;
     qb->osc.update_oscillator = &osc_update; // from base class
-
 }
 double qb_do_sawtooth(oscillator *self, double modulo, double dInc)
 {

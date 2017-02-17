@@ -292,7 +292,6 @@ void eg_update(envelope_generator *self)
 
 double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 {
-    // printf("STATE! %s\n", state_strings[self->m_state]);
     switch (self->m_state) {
     case OFFF: {
         if (self->m_reset_to_zero)
@@ -383,18 +382,15 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 
 void eg_note_off(envelope_generator *self)
 {
-    // printf("EG NOTE OFF called\n");
     if (self->m_sustain_override) {
         self->m_release_pending = true;
         return;
     }
 
     if (self->m_envelope_output > 0) {
-        // printf("eg NOTE OFF - RELEASE! %f\n", self->m_envelope_output);
         self->m_state = RELEASE;
     }
     else {
-        // printf("STOPZZZ ZEE POP! %f\n", self->m_envelope_output);
         self->m_state = OFFF;
     }
 }

@@ -29,7 +29,6 @@ void lfo_set_soundgenerator_interface(lfo *l)
     l->osc.update_oscillator = &osc_update; // base clase impl
 
     l->osc.m_lfo_mode = sync;
-
 }
 
 double lfo_do_oscillate(oscillator *self, double *quad_phase_output)

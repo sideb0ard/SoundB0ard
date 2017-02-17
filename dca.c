@@ -90,14 +90,13 @@ void dca_update(dca *self)
     if (self->m_eg_mod >= 0) {
         self->m_gain = self->m_eg_mod;
     }
-    else
-    {
+    else {
         self->m_gain = self->m_eg_mod + 1.0;
     }
 
     self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
-    //self->m_gain *= mma_midi_to_atten_db(self->m_midi_velocity);
-    //printf("MDMAing by MIDI  to %f\n", self->m_gain);
+    // self->m_gain *= mma_midi_to_atten_db(self->m_midi_velocity);
+    // printf("MDMAing by MIDI  to %f\n", self->m_gain);
 }
 
 void dca_gennext(dca *self, double left_input, double right_input,

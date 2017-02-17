@@ -166,7 +166,6 @@ void *play_melody_loop(void *p)
                 break;
             }
             case (128): { // Hex 0x90
-                printf("MELODY LOOP note OFF event\n");
                 minisynth_midi_note_off(ns, ev->data1, ev->data2, false);
                 break;
             }

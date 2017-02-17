@@ -53,7 +53,6 @@ void minisynth_voice_init(minisynth_voice *msv)
 
     dca_initialize(&msv->m_voice.m_dca);
     msv->m_voice.m_dca.m_mod_source_eg = DEST_DCA_EG;
-
 }
 
 void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
@@ -212,55 +211,58 @@ void minisynth_voice_reset(minisynth_voice *msv)
 bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
                              double *right_output)
 {
-    //if (!voice_gennext(&msv->m_voice, left_output, right_output))
-    //    return false;
+    if (!voice_gennext(&msv->m_voice, left_output, right_output))
+        return false;
 
-    (void) *right_output;
-    osc_update((oscillator *)&msv->m_voice.m_lfo1);
-    double lfo1out = lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1, NULL);
-    //*left_output = lfo1out;
-    osc_set_fo_mod_exp((oscillator*) &msv->m_osc1, lfo1out);
-    osc_update((oscillator *) &msv->m_osc1);
-    *left_output = qb_do_oscillate((oscillator*) &msv->m_osc1, NULL);
+    // Test Scenario
+    // (void) *right_output;
+    // osc_update((oscillator *)&msv->m_voice.m_lfo1);
+    // double lfo1out = lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1,
+    // NULL);
+    // //*left_output = lfo1out;
+    // osc_set_fo_mod_exp((oscillator*) &msv->m_osc1, lfo1out);
+    // osc_update((oscillator *) &msv->m_osc1);
+    // *left_output = qb_do_oscillate((oscillator*) &msv->m_osc1, NULL);
 
     //// layer 0 //////////////////////////////
-    //do_modulation_matrix(&msv->m_voice.g_modmatrix, 0);
+    // do_modulation_matrix(&msv->m_voice.g_modmatrix, 0);
 
     ////// update layer 1 modulators
-    //eg_update(&msv->m_voice.m_eg1);
-    //osc_update((oscillator *)&msv->m_voice.m_lfo1);
+    eg_update(&msv->m_voice.m_eg1);
+    osc_update((oscillator *)&msv->m_voice.m_lfo1);
 
     ////// gen next val layer 1 mods
-    //eg_do_envelope(&msv->m_voice.m_eg1, NULL);
-    //lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1, NULL);
+    eg_do_envelope(&msv->m_voice.m_eg1, NULL);
+    lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1, NULL);
 
     ////// layer 1 //////////////////////////////
-    //// do_modulation_matrix(&msv->m_voice.g_modmatrix, 1);
+    // do_modulation_matrix(&msv->m_voice.g_modmatrix, 1);
 
-    ////minisynth_voice_update(msv);
-    //dca_update(&msv->m_voice.m_dca);
+    //////minisynth_voice_update(msv);
+    dca_update(&msv->m_voice.m_dca);
+    moog_update((filter *)&msv->m_moog_ladder_filter);
 
-    //moog_update((filter *) &msv->m_moog_ladder_filter);
+    osc_update((oscillator *)&msv->m_osc1);
+    osc_update((oscillator *)&msv->m_osc2);
+    osc_update((oscillator *)&msv->m_osc3);
+    osc_update((oscillator *)&msv->m_osc4);
 
-    //osc_update((oscillator *) &msv->m_osc1);
-    //osc_update((oscillator *) &msv->m_osc2);
-    //osc_update((oscillator *) &msv->m_osc3);
-    //osc_update((oscillator *) &msv->m_osc4);
+    double osc_mix = 0.333 * qb_do_oscillate((oscillator *)&msv->m_osc1, NULL) +
+                     0.333 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL);
+    //                         qb_do_oscillate((oscillator*) &msv->m_osc2, NULL)
+    //                         +
+    //                     0.333 *
+    //                         qb_do_oscillate((oscillator*) &msv->m_osc3, NULL)
+    //                         +
+    //                     0.333 *
+    //                         qb_do_oscillate((oscillator*) &msv->m_osc4,
+    //                         NULL);
 
-    //double osc_mix = 0.333 *
-    //                     qb_do_oscillate((oscillator*) &msv->m_osc1, NULL) +
-    //                 0.333 *
-    //                     qb_do_oscillate((oscillator*) &msv->m_osc2, NULL) +
-    //                 0.333 *
-    //                     qb_do_oscillate((oscillator*) &msv->m_osc3, NULL) +
-    //                 0.333 *
-    //                     qb_do_oscillate((oscillator*) &msv->m_osc4, NULL);
+    double filter_out =
+        moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
 
-    // double filter_out =
-    //     moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
-
-    // dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
-    //             right_output);
+    dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
+                right_output);
 
     return true;
 }
