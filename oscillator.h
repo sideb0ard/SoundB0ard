@@ -92,7 +92,7 @@ struct oscillator {
     double m_dpw_square_modulator; // square toggle
     double m_dpw_z1;               // memory register for differentiator
 
-    // --- mondulation inputs
+    // --- modulation inputs
     double m_fo_mod;         /* modulation input -1 to +1 */
     double m_pitch_bend_mod; /* modulation input -1 to +1 */
     double m_fo_mod_lin; /* FM modulation input -1 to +1 (not actually used in

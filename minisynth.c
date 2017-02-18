@@ -23,13 +23,13 @@ minisynth *new_minisynth(void)
                                                &ms->m_global_synth_params);
     }
 
-    // use first voice to setup global
-    minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
+    // // use first voice to setup global
+    // minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
 
-    for (int i = 1; i < MAX_VOICES; i++) {
-        voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
-                                 get_matrix_core(&ms->g_modmatrix));
-    }
+    // for (int i = 1; i < MAX_VOICES; i++) {
+    //     voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
+    //                              get_matrix_core(&ms->g_modmatrix));
+    // }
 
     for (int i = 0; i < PPNS; i++) {
         ms->melodies[ms->cur_melody][i] = NULL;
@@ -63,28 +63,6 @@ minisynth *new_minisynth(void)
     return ms;
 }
 
-// sound generator interface //////////////
-void minisynth_status(void *self, wchar_t *status_string)
-{
-    // TODO - a shit load of error checking on boundaries and size
-    minisynth *ms = (minisynth *)self;
-    swprintf(status_string, 119,
-             WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
-                              "Multi: %d, Cur: %d",
-             ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody);
-    for (int i = 0; i < ms->num_melodies; i++) {
-        wchar_t melodystr[33] = {0};
-        wchar_t scratch[128] = {0};
-        minisynth_melody_to_string(ms, i, melodystr);
-        swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
-                 ms->melody_multiloop_count[i]);
-        wcscat(status_string, scratch);
-    }
-    wcscat(status_string, WANSI_COLOR_RESET);
-}
-
-void minisynth_setvol(void *self, double v);
-double minisynth_getvol(void *self);
 ////////////////////////////////////
 
 bool minisynth_prepare_for_play(minisynth *ms)
@@ -425,21 +403,6 @@ void minisynth_reset_melody(minisynth *ms, unsigned int melody_num)
     }
 }
 
-void minisynth_setvol(void *self, double v)
-{
-    minisynth *ms = (minisynth *)self;
-    if (v < 0.0 || v > 1.0) {
-        return;
-    }
-    ms->vol = v;
-}
-
-double minisynth_getvol(void *self)
-{
-    minisynth *ms = (minisynth *)self;
-    return ms->vol;
-}
-
 void minisynth_melody_to_string(minisynth *ms, int melody_num,
                                 wchar_t melodystr[33])
 {
@@ -499,6 +462,42 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
         }
     }
     return found_voice;
+}
+
+// sound generator interface //////////////
+void minisynth_status(void *self, wchar_t *status_string)
+{
+    // TODO - a shit load of error checking on boundaries and size
+    minisynth *ms = (minisynth *)self;
+    swprintf(status_string, 119,
+             WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
+                              "Multi: %d, Cur: %d",
+             ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody);
+    for (int i = 0; i < ms->num_melodies; i++) {
+        wchar_t melodystr[33] = {0};
+        wchar_t scratch[128] = {0};
+        minisynth_melody_to_string(ms, i, melodystr);
+        swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
+                 ms->melody_multiloop_count[i]);
+        wcscat(status_string, scratch);
+    }
+    wcscat(status_string, WANSI_COLOR_RESET);
+}
+
+
+void minisynth_setvol(void *self, double v)
+{
+    minisynth *ms = (minisynth *)self;
+    if (v < 0.0 || v > 1.0) {
+        return;
+    }
+    ms->vol = v;
+}
+
+double minisynth_getvol(void *self)
+{
+    minisynth *ms = (minisynth *)self;
+    return ms->vol;
 }
 
 // void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
