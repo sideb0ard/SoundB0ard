@@ -54,9 +54,7 @@ void *midiman()
                 int status = Pm_MessageStatus(msg[i].message);
                 int data1 = Pm_MessageData1(msg[i].message);
                 int data2 = Pm_MessageData2(msg[i].message);
-                // double timestamp = msg[i].timestamp/1000.;
 
-                // printf("HAS ACTIVE minisynth? %d\n", mixr->has_active_ns);
                 if (mixr->midi_control_destination == SYNTH) {
 
                     minisynth *ms =
@@ -67,29 +65,14 @@ void *midiman()
                         int tick = mixr->tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
-                        // ms->midi_events_loop[tick] = ev;
                         ms->melodies[ms->cur_melody][tick] = ev;
                     }
-                    switch (status) {
-                    case (144): { // Hex 0x80
-                        minisynth_midi_note_on(ms, data1, data2);
-                        break;
-                    }
-                    case (128): { // Hex 0x90
-                        minisynth_midi_note_off(ms, data1, data2, false);
-                        break;
-                    }
-                    case (176): { // Hex 0xB0
-                        minisynth_midi_control(ms, data1, data2);
-                        break;
-                    }
-                    case (224): { // Hex 0xE0
-                        minisynth_midi_pitchbend(ms, data1, data2);
-                        break;
-                    }
-                    default:
-                        printf("SOMETHING ELSE\n");
-                    }
+
+                    midi_event ev;
+                    ev.event_type = status;
+                    ev.data1 = data1;
+                    ev.data2 = data2;
+                    midi_parse_midi_event(ms, &ev);
                 }
                 else if (mixr->midi_control_destination == DELAYFX) {
                     printf("MIDI CONTROLS! DELAY\n");
@@ -183,5 +166,29 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
         break;
     default:
         printf("SOMthing else\n");
+    }
+}
+
+void midi_parse_midi_event(minisynth *ms, midi_event *ev)
+{
+    switch (ev->event_type) {
+    case (144): { // Hex 0x80
+        minisynth_midi_note_on(ms, ev->data1, ev->data2);
+        break;
+    }
+    case (128): { // Hex 0x90
+        minisynth_midi_note_off(ms, ev->data1, ev->data2, false);
+        break;
+    }
+    case (176): { // Hex 0xB0
+        minisynth_midi_control(ms, ev->data1, ev->data2);
+        break;
+    }
+    case (224): { // Hex 0xE0
+        minisynth_midi_pitchbend(ms, ev->data1, ev->data2);
+        break;
+    }
+    default:
+        printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
     }
 }

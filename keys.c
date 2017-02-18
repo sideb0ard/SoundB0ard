@@ -10,6 +10,7 @@
 
 #include "defjams.h"
 #include "keys.h"
+#include "midimaaan.h"
 #include "mixer.h"
 #include "utils.h"
 
@@ -105,8 +106,10 @@ void keys(int soundgen_num)
                 midi_num = ch_midi_lookup(ch, ms);
                 int fake_velocity = 126; // TODO real velocity
                 if (midi_num != -1) {
+
                     print_midi_event(midi_num);
                     minisynth_midi_note_on(ms, midi_num, fake_velocity);
+
                     if (ms->recording) {
                         printf("Recording note!\n");
                         int note_on_tick = mixr->tick % PPNS;
@@ -132,13 +135,9 @@ void keys(int soundgen_num)
 
 void *play_melody_loop(void *p)
 {
-    minisynth *ns = (minisynth *)p;
-
-    int note_played_time = 0;
+    minisynth *ms = (minisynth *)p;
 
     printf("PLAY melody starting..\n");
-
-    unsigned last_midi_num_played = 0;
 
     while (1) {
         pthread_mutex_lock(&midi_tick_lock);
@@ -148,48 +147,21 @@ void *play_melody_loop(void *p)
         int idx = mixr->tick % PPNS;
 
         if (idx == 0) {
-            if (ns->multi_melody_mode) {
-                ns->cur_melody_iteration--;
-                if (ns->cur_melody_iteration == 0) {
-                    ns->cur_melody = (ns->cur_melody + 1) % ns->num_melodies;
-                    ns->cur_melody_iteration =
-                        ns->melody_multiloop_count[ns->cur_melody];
+            if (ms->multi_melody_mode) {
+                ms->cur_melody_iteration--;
+                if (ms->cur_melody_iteration == 0) {
+                    ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
+                    ms->cur_melody_iteration =
+                        ms->melody_multiloop_count[ms->cur_melody];
                 }
             }
         }
 
-        if (ns->melodies[ns->cur_melody][idx] != NULL) {
-            midi_event *ev = ns->melodies[ns->cur_melody][idx];
-            switch (ev->event_type) {
-            case (144): {
-                minisynth_midi_note_on(ns, ev->data1, ev->data2);
-                break;
-            }
-            case (128): { // Hex 0x90
-                minisynth_midi_note_off(ns, ev->data1, ev->data2, false);
-                break;
-            }
-            case (176): { // Hex 0xB0
-                minisynth_midi_control(ns, ev->data1, ev->data2);
-                break;
-            }
-            case (224): { // Hex 0xE0
-                minisynth_midi_pitchbend(ns, ev->data1, ev->data2);
-                break;
-            }
-            }
-            last_midi_num_played = ev->data1;
-            note_played_time = 1;
+        if (ms->melodies[ms->cur_melody][idx] != NULL) {
+            midi_event *ev = ms->melodies[ms->cur_melody][idx];
+            midi_parse_midi_event(ms, ev);
         }
 
-        // if (ns->sustain > 0 && note_played_time > 0) {
-        //     note_played_time++;
-        //     if ((note_played_time > ns->sustain) &&
-        //         (ns->osc1->m_midi_note_number == last_midi_num_played)) {
-        //         eg_note_off(ns->eg1);
-        //         note_played_time = 0;
-        //     }
-        // }
     }
 
     return NULL;

@@ -223,13 +223,13 @@ void voice_init_global_parameters(voice *v, global_synth_params *sp)
                                    &v->m_global_synth_params->osc1_params);
     if (v->m_osc2)
         osc_init_global_parameters(v->m_osc2,
-                                   &v->m_global_synth_params->osc1_params);
+                                   &v->m_global_synth_params->osc2_params);
     if (v->m_osc3)
         osc_init_global_parameters(v->m_osc3,
-                                   &v->m_global_synth_params->osc1_params);
+                                   &v->m_global_synth_params->osc3_params);
     if (v->m_osc4)
         osc_init_global_parameters(v->m_osc4,
-                                   &v->m_global_synth_params->osc1_params);
+                                   &v->m_global_synth_params->osc4_params);
 
     if (v->m_filter1)
         filter_init_global_parameters(

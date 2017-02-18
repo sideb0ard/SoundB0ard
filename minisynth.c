@@ -74,7 +74,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
     }
 
     // TODO add delay
-    // minisynth_update(ms);
+    minisynth_update(ms);
     ms->m_last_note_frequency = -1.0;
 
     return true;

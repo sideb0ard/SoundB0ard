@@ -2,6 +2,8 @@
 
 #include "effect.h"
 
+typedef struct minisynth minisynth;
+
 typedef enum { OCTAVE_CHANGE } custom_event_type;
 
 typedef struct midi_event {
@@ -19,3 +21,5 @@ void midi_delay_control(EFFECT *e, int data1, int data2);
 
 midi_event *new_midi_event(int tick, int event_type, int data1, int data2);
 void print_midi_event_rec(midi_event *ev);
+
+void midi_parse_midi_event(minisynth *ms, midi_event *ev);
