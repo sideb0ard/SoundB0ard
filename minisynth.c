@@ -23,13 +23,13 @@ minisynth *new_minisynth(void)
                                                &ms->m_global_synth_params);
     }
 
-    // // use first voice to setup global
-    // minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
+    // use first voice to setup global
+    minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
 
-    // for (int i = 1; i < MAX_VOICES; i++) {
-    //     voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
-    //                              get_matrix_core(&ms->g_modmatrix));
-    // }
+    for (int i = 1; i < MAX_VOICES; i++) {
+        voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
+                                 get_matrix_core(&ms->g_modmatrix));
+    }
 
     for (int i = 0; i < PPNS; i++) {
         ms->melodies[ms->cur_melody][i] = NULL;

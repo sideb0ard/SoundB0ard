@@ -56,56 +56,56 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
                             &v->m_default_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(matrix, row);
 
-    //// PITCHBEND -> OSC
-    //row = create_matrix_row(
-    //    SOURCE_PITCHBEND, DEST_ALL_OSC_FO, &v->m_default_mod_intensity,
-    //    &v->m_global_voice_params->osc_fo_pitchbend_mod_range, TRANSFORM_NONE,
-    //    true);
-    //add_matrix_row(matrix, row);
+    // PITCHBEND -> OSC
+    row = create_matrix_row(
+        SOURCE_PITCHBEND, DEST_ALL_OSC_FO, &v->m_default_mod_intensity,
+        &v->m_global_voice_params->osc_fo_pitchbend_mod_range, TRANSFORM_NONE,
+        true);
+    add_matrix_row(matrix, row);
 
-    //// MIDI Volume CC07
-    //row = create_matrix_row(SOURCE_MIDI_VOLUME_CC07, DEST_DCA_AMP,
-    //                        &v->m_default_mod_intensity,
-    //                        &v->m_global_voice_params->amp_mod_range,
-    //                        TRANSFORM_INVERT_MIDI_NORMALIZE, true);
-    //add_matrix_row(matrix, row);
+    // MIDI Volume CC07
+    row = create_matrix_row(SOURCE_MIDI_VOLUME_CC07, DEST_DCA_AMP,
+                            &v->m_default_mod_intensity,
+                            &v->m_global_voice_params->amp_mod_range,
+                            TRANSFORM_INVERT_MIDI_NORMALIZE, true);
+    add_matrix_row(matrix, row);
 
-    //// MIDI Pan CC10
-    //row = create_matrix_row(
-    //    SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN, &v->m_default_mod_intensity,
-    //    &v->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, false);
-    //add_matrix_row(matrix, row);
+    // MIDI Pan CC10
+    row = create_matrix_row(
+        SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN, &v->m_default_mod_intensity,
+        &v->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, false);
+    add_matrix_row(matrix, row);
 
-    //// MIDI Sustain Pedal
-    //row =
-    //    create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
-    //                      &v->m_default_mod_intensity, &v->m_default_mod_range,
-    //                      TRANSFORM_MIDI_SWITCH, true);
-    //add_matrix_row(matrix, row);
+    // MIDI Sustain Pedal
+    row =
+        create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
+                          &v->m_default_mod_intensity, &v->m_default_mod_range,
+                          TRANSFORM_MIDI_SWITCH, true);
+    add_matrix_row(matrix, row);
 
-    //// NOTE NUMBER -> FILTER Fc CONTROL
-    //row = create_matrix_row(
-    //    SOURCE_MIDI_NOTE_NUM, DEST_ALL_FILTER_KEYTRACK,
-    //    &v->m_global_voice_params->filter_keytrack_intensity,
-    //    &v->m_default_mod_range, TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,
-    //    false); /* DISABLED BY DEFAULT */
-    //add_matrix_row(matrix, row);
+    // NOTE NUMBER -> FILTER Fc CONTROL
+    row = create_matrix_row(
+        SOURCE_MIDI_NOTE_NUM, DEST_ALL_FILTER_KEYTRACK,
+        &v->m_global_voice_params->filter_keytrack_intensity,
+        &v->m_default_mod_range, TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,
+        false); /* DISABLED BY DEFAULT */
+    add_matrix_row(matrix, row);
 
-    //// VELOCITY -> EG ATTACK SOURCE_VELOCITY
-    //// 0 velocity -> scalar = 1, normal attack time
-    //// 128 velocity -> scalar = 0, fastest (0) attack time:
-    //row =
-    //    create_matrix_row(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
-    //                      &v->m_default_mod_intensity, &v->m_default_mod_range,
-    //                      TRANSFORM_MIDI_NORMALIZE, false);
-    //add_matrix_row(matrix, row);
+    // VELOCITY -> EG ATTACK SOURCE_VELOCITY
+    // 0 velocity -> scalar = 1, normal attack time
+    // 128 velocity -> scalar = 0, fastest (0) attack time:
+    row =
+        create_matrix_row(SOURCE_VELOCITY, DEST_ALL_EG_ATTACK_SCALING,
+                          &v->m_default_mod_intensity, &v->m_default_mod_range,
+                          TRANSFORM_MIDI_NORMALIZE, false);
+    add_matrix_row(matrix, row);
 
-    //// NOTE NUMBER -> EG DECAY SCALING
-    //row =
-    //    create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_EG_DECAY_SCALING,
-    //                      &v->m_default_mod_intensity, &v->m_default_mod_range,
-    //                      TRANSFORM_MIDI_NORMALIZE, false);
-    //add_matrix_row(matrix, row);
+    // NOTE NUMBER -> EG DECAY SCALING
+    row =
+        create_matrix_row(SOURCE_MIDI_NOTE_NUM, DEST_ALL_EG_DECAY_SCALING,
+                          &v->m_default_mod_intensity, &v->m_default_mod_range,
+                          TRANSFORM_MIDI_NORMALIZE, false);
+    add_matrix_row(matrix, row);
 }
 
 void voice_prepare_for_play(voice *v)
