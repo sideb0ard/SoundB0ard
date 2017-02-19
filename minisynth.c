@@ -14,6 +14,8 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
+    ms->m_eg1_dca_intensity = 1.0;
+
     for (int i = 0; i < MAX_VOICES; i++) {
         ms->m_voices[i] = new_minisynth_voice();
         if (!ms->m_voices[i])
