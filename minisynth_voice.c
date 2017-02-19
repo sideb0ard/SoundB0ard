@@ -211,6 +211,12 @@ void minisynth_voice_reset(minisynth_voice *msv)
 bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
                              double *right_output)
 {
+    //if (msv->m_voice.g_modmatrix.m_matrix_core) {
+    //    printf("VOICE GOTS A MATRIX CORE\n");
+    //} else {
+    //    printf("VOICE NAE GOTS A MATRIX CORE\n");
+    //}
+
     if (!voice_gennext(&msv->m_voice, left_output, right_output)) {
         return false;
     }
@@ -248,13 +254,13 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     //    qb_do_oscillate((oscillator*) &msv->m_osc4,
     //    NULL);
 
-    *left_output = osc_mix;
-    // double filter_out =
-    //    moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
+    //*left_output = osc_mix;
+    double filter_out =
+       moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
 
     //*left_output = filter_out;
-    // dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
-    //            right_output);
+    dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
+               right_output);
 
     return true;
 }

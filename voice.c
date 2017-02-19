@@ -73,7 +73,7 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
     // MIDI Pan CC10
     row = create_matrix_row(
         SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN, &v->m_default_mod_intensity,
-        &v->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, false);
+        &v->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, true);
     add_matrix_row(matrix, row);
 
     // MIDI Sustain Pedal

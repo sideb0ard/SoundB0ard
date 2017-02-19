@@ -7,9 +7,9 @@
 // 46.88.. = semitones between frequencies (80, 18000.0) / 2
 // taken from Will Pirkle book 'designing software synths..'
 #define FILTER_FC_MOD_RANGE 46.881879936465680
-#define FILTER_FC_MIN 80        // 80Hz
+#define FILTER_FC_MIN 180        // 80Hz
 #define FILTER_FC_MAX 18000     // 18 kHz
-#define FILTER_FC_DEFAULT 10000 // 10kHz
+#define FILTER_FC_DEFAULT 12000 // 10kHz
 #define FILTER_Q_DEFAULT 0.707  // butterworth?
 #define FILTER_TYPE_DEFAULT LPF1
 

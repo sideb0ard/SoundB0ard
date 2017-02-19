@@ -26,11 +26,10 @@ minisynth *new_minisynth(void)
     // use first voice to setup global
     minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
 
-    for (int i = 1; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++) {
         voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
                                  get_matrix_core(&ms->g_modmatrix));
     }
-
     for (int i = 0; i < PPNS; i++) {
         ms->melodies[ms->cur_melody][i] = NULL;
     }
@@ -50,6 +49,16 @@ minisynth *new_minisynth(void)
     ms->sound_generator.type = SYNTH_TYPE;
 
     minisynth_prepare_for_play(ms);
+
+    printf("\n\nPREPARED\n");
+    for (int i = 1; i < MAX_VOICES; i++) {
+        // if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core) {
+        //     printf("[%d] GOTS A MATRIX CORE\n", i);
+        // } else {
+        //     printf("[%d] NAE GOTS A MATRIX CORE\n", i);
+        // }
+    }
+
 
     // start loop player running
     pthread_t melody_looprrr;
@@ -471,6 +480,15 @@ void minisynth_status(void *self, wchar_t *status_string)
         wcscat(status_string, scratch);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
+
+    for (int i = 1; i < MAX_VOICES; i++) {
+        if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core) {
+            printf("[%d] GOTS A MATRIX CORE\n", i);
+        } else {
+            printf("[%d] NAE GOTS A MATRIX CORE\n", i);
+        }
+    }
+
 }
 
 void minisynth_setvol(void *self, double v)
@@ -502,8 +520,13 @@ double minisynth_gennext(void *self)
     double out_right = 0.0;
 
     for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i])
+        if (ms->m_voices[i]) {
+            //if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core)
+            //    printf("[%d] MINISYNTH GENNEXT - matrxi CORE!\n", i);
+            //else
+            //    printf("[%d] NAE MINISYNTH GENNEXT - matrxi CORE!\n", i);
             minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
+        }
         accum_out_left += mix * out_left;
         accum_out_right += mix * out_right;
     }
