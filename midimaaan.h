@@ -11,6 +11,7 @@ typedef struct midi_event {
     unsigned event_type;
     unsigned data1;
     unsigned data2;
+    bool delete_after_use;
 } midi_event;
 
 typedef midi_event *midi_events_loop_t[PPNS];

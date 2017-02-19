@@ -246,6 +246,7 @@ void eg_update(envelope_generator *self)
 
         self->m_shutdown_time_msec =
             self->m_global_eg_params->shutdown_time_msec;
+
         self->m_reset_to_zero = self->m_global_eg_params->reset_to_zero;
         self->m_legato_mode = self->m_global_eg_params->legato_mode;
     }

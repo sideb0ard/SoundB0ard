@@ -177,7 +177,7 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
         break;
     }
     case (128): { // Hex 0x90
-        minisynth_midi_note_off(ms, ev->data1, ev->data2, false);
+        minisynth_midi_note_off(ms, ev->data1, ev->data2, true);
         break;
     }
     case (176): { // Hex 0xB0
@@ -190,5 +190,9 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
     }
     default:
         printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
+    }
+    if (ev->delete_after_use) {
+        free(ev);
+        ms->melodies[ms->cur_melody][ev->tick] = NULL;
     }
 }

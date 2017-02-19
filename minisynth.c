@@ -262,63 +262,52 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         switch (data1) {
         case 1: // K1 - Envelope Attack Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg1,
-                                    scaley_val);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg2,
-                                    scaley_val);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg3,
-                                    scaley_val);
-            eg_set_attack_time_msec(&ms->m_voices[i]->m_voice.m_eg4,
-                                    scaley_val);
+            ms->m_global_synth_params.eg1_params.attack_time_msec = scaley_val;
+            ms->m_global_synth_params.eg2_params.attack_time_msec = scaley_val;
+            ms->m_global_synth_params.eg3_params.attack_time_msec = scaley_val;
+            ms->m_global_synth_params.eg4_params.attack_time_msec = scaley_val;
             break;
         case 2: // K2 - Envelope Decay Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            eg_set_decay_time_msec(&ms->m_voices[i]->m_voice.m_eg1, scaley_val);
-            eg_set_decay_time_msec(&ms->m_voices[i]->m_voice.m_eg2, scaley_val);
-            eg_set_decay_time_msec(&ms->m_voices[i]->m_voice.m_eg3, scaley_val);
-            eg_set_decay_time_msec(&ms->m_voices[i]->m_voice.m_eg4, scaley_val);
+            ms->m_global_synth_params.eg1_params.decay_time_msec = scaley_val;
+            ms->m_global_synth_params.eg2_params.decay_time_msec = scaley_val;
+            ms->m_global_synth_params.eg3_params.decay_time_msec = scaley_val;
+            ms->m_global_synth_params.eg4_params.decay_time_msec = scaley_val;
             break;
         case 3: // K3 - Envelope Sustain Level
             scaley_val = scaleybum(1, 128, 0, 1, data2);
-            eg_set_sustain_level(&ms->m_voices[i]->m_voice.m_eg1, scaley_val);
-            eg_set_sustain_level(&ms->m_voices[i]->m_voice.m_eg2, scaley_val);
-            eg_set_sustain_level(&ms->m_voices[i]->m_voice.m_eg3, scaley_val);
-            eg_set_sustain_level(&ms->m_voices[i]->m_voice.m_eg4, scaley_val);
+            ms->m_global_synth_params.eg1_params.sustain_level = scaley_val;
+            ms->m_global_synth_params.eg2_params.sustain_level = scaley_val;
+            ms->m_global_synth_params.eg3_params.sustain_level = scaley_val;
+            ms->m_global_synth_params.eg4_params.sustain_level = scaley_val;
             break;
         case 4: // K4 - Envelope Release Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg1,
-                                     scaley_val);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg2,
-                                     scaley_val);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg3,
-                                     scaley_val);
-            eg_set_release_time_msec(&ms->m_voices[i]->m_voice.m_eg4,
-                                     scaley_val);
+            ms->m_global_synth_params.eg1_params.release_time_msec = scaley_val;
+            ms->m_global_synth_params.eg2_params.release_time_msec = scaley_val;
+            ms->m_global_synth_params.eg3_params.release_time_msec = scaley_val;
+            ms->m_global_synth_params.eg4_params.release_time_msec = scaley_val;
             break;
         case 5: // K5 - LFO rate
             scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-            ms->m_voices[i]->m_voice.m_lfo1.osc.m_osc_fo = scaley_val;
-            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo1);
-            ms->m_voices[i]->m_voice.m_lfo2.osc.m_osc_fo = scaley_val;
-            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo2);
+            ms->m_global_synth_params.lfo1_params.osc_fo = scaley_val;
+            ms->m_global_synth_params.lfo2_params.osc_fo = scaley_val;
             break;
         case 6: // K6 - LFO amplitude
             scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-            ms->m_voices[i]->m_voice.m_lfo1.osc.m_amplitude = scaley_val;
-            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo1);
-            ms->m_voices[i]->m_voice.m_lfo2.osc.m_amplitude = scaley_val;
-            osc_update((oscillator *)&ms->m_voices[i]->m_voice.m_lfo2);
+            ms->m_global_synth_params.lfo1_params.amplitude = scaley_val;
+            ms->m_global_synth_params.lfo2_params.amplitude = scaley_val;
             break;
         case 7: // K7 - Filter Frequency Cut
             scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-            ms->m_voices[i]->m_voice.m_filter1->m_fc_control = scaley_val;
+            ms->m_global_synth_params.filter1_params.fc_control = scaley_val;
+            ms->m_global_synth_params.filter2_params.fc_control = scaley_val;
             break;
         case 8: // K8 - Filter Q control
             scaley_val = scaleybum(1, 128, 1, 10, data2);
             printf("FILTER Q control! %f\n", scaley_val);
-            filter_set_q_control(ms->m_voices[i]->m_voice.m_filter1,
-                                 scaley_val);
+            ms->m_global_synth_params.filter1_params.q_control = scaley_val;
+            ms->m_global_synth_params.filter2_params.q_control = scaley_val;
             break;
         default:
             printf("SOMthing else\n");
@@ -483,7 +472,6 @@ void minisynth_status(void *self, wchar_t *status_string)
     }
     wcscat(status_string, WANSI_COLOR_RESET);
 }
-
 
 void minisynth_setvol(void *self, double v)
 {
