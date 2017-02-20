@@ -69,19 +69,19 @@ struct oscillator {
     // --- MIDI note that is being played
     unsigned m_midi_note_number;
 
-    // --- for hard sync or other dual-oscillator ideas
-    oscillator *m_buddy_oscillator;
-
-    // --- flag indicating we are a master oscillator
-    bool m_master_osc;
+    // TODO - unused these next two?
+    //// --- for hard sync or other dual-oscillator ideas
+    // oscillator *m_buddy_oscillator;
+    //// --- flag indicating we are a master oscillator
+    // bool m_master_osc;
 
     // --- PROTECTED: generally these are either basic calc variables
     //                and modulation stuff
     // --- calculation variables
     // double m_sample_rate; // fs
-    double m_fo;               // current (actual) frequency of oscillator
-    double m_pulse_width;      // pulse width in % for calculation
-    bool m_square_edge_rising; // hysteresis for square edge
+    double m_fo;          // current (actual) frequency of oscillator
+    double m_pulse_width; // pulse width in % for calculation
+    // bool m_square_edge_rising; // hysteresis for square edge
 
     // --- for noise and random sample/hold
     unsigned m_pn_register; // for PN Noise sequence

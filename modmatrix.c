@@ -246,7 +246,7 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
             self->m_destinations[DEST_ALL_LFO_OUTPUT_AMP] += modval;
             break;
         case DEST_ALL_FILTER_FC:
-            //printf("Writing to DEST_FILTER1_FC! %f\n", modval);
+            // printf("Writing to DEST_FILTER1_FC! %f\n", modval);
             self->m_destinations[DEST_FILTER1_FC] += modval;
             self->m_destinations[DEST_FILTER2_FC] += modval;
             self->m_destinations[DEST_ALL_FILTER_FC] += modval;

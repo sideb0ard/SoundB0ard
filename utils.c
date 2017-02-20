@@ -437,14 +437,24 @@ double pitch_shift_multiplier(double pitch_shift_semitones)
 
 void calculate_pan_values(double pan_total, double *pan_left, double *pan_right)
 {
+    printf("CALC PAN VALS! PI: %f, pan_tota: %f\n", M_PI, pan_total);
+    printf("PI / 4.0 : %f\n", M_PI / 4.0);
+    printf("PI / 4.0 * pan_total : %f\n", (M_PI / 4.0) * (pan_total + 1.0));
+    printf("COS! : %f\n", cos((M_PI / 4.0) * (pan_total + 1.0)));
     *pan_left = cos((M_PI / 4.0) * (pan_total + 1.0));
     *pan_right = sin((M_PI / 4.0) * (pan_total + 1.0));
+    printf("PANLEFT[1] %f\n", *pan_left);
+    printf("PANRIGHT[1] %f\n", *pan_right);
 
     *pan_left = fmax(*pan_left, (double)0.0);
     *pan_left = fmin(*pan_left, (double)1.0);
+    printf("PANLEFT[2] %f\n", *pan_left);
+    printf("PANRIGHT[2] %f\n", *pan_right);
 
     *pan_right = fmax(*pan_right, (double)0.0);
     *pan_right = fmin(*pan_right, (double)1.0);
+    printf("PANLEFT[3] %f\n", *pan_left);
+    printf("PANRIGHT[3] %f\n", *pan_right);
 }
 
 // From K&R C - cut n pasted from

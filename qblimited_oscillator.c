@@ -246,18 +246,16 @@ double qb_do_oscillate(oscillator *self, double *aux_output)
     if (self->m_waveform == TRI)
         osc_inc_modulo(self);
 
-    // if (self->g_modmatrix)
-    // {
-    //     self->g_modmatrix->m_sources[self->m_mod_dest_output1] =
-    //         out * self->m_amplitude * self->m_amp_mod;
-    //     self->g_modmatrix->m_sources[self->m_mod_dest_output2] =
-    //         out * self->m_amplitude * self->m_amp_mod;
-    // }
+    if (self->g_modmatrix) {
+        self->g_modmatrix->m_sources[self->m_mod_dest_output1] =
+            out * self->m_amplitude * self->m_amp_mod;
+        self->g_modmatrix->m_sources[self->m_mod_dest_output2] =
+            out * self->m_amplitude * self->m_amp_mod;
+    }
 
     // --- self->m_amp_mod is set in update()
     if (aux_output)
         *aux_output = out * self->m_amplitude * self->m_amp_mod;
-    ;
 
     // --- self->m_amp_mod is set in update()
     return out * self->m_amplitude * self->m_amp_mod;

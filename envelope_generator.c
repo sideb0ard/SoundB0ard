@@ -51,7 +51,7 @@ void envelope_generator_init(envelope_generator *eg)
 
     eg->g_modmatrix = NULL;
 
-    //eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
+    // eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
 
     eg->m_mod_dest_eg_output = SOURCE_NONE;
     eg->m_mod_dest_eg_biased_output = SOURCE_NONE;

@@ -390,6 +390,34 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
         v->m_timestamp = 0;
         return;
     }
+    if (v->m_note_pending && v->m_midi_note_number_pending == midi_note)
+        return;
+
+    v->m_midi_note_number_pending = midi_note;
+    v->m_midi_velocity_pending = midi_velocity;
+    v->m_osc_pitch_pending = frequency;
+
+    v->m_note_pending = true;
+
+    if (v->m_portamento_inc > 0.0 && last_note_frequency > 0) {
+        if (v->m_modulo_portamento > 0.0) {
+            double portamento_pitch_mult = pitch_shift_multiplier(
+                v->m_modulo_portamento * v->m_portamento_semitones);
+            v->m_portamento_start =
+                v->m_portamento_start * portamento_pitch_mult;
+        }
+        else {
+            v->m_portamento_start = last_note_frequency;
+        }
+        v->m_modulo_portamento = 0.0;
+        v->m_portamento_semitones =
+            semitones_between_frequencies(v->m_portamento_start, frequency);
+    }
+
+    eg_shutdown(&v->m_eg1);
+    eg_shutdown(&v->m_eg2);
+    eg_shutdown(&v->m_eg3);
+    eg_shutdown(&v->m_eg4);
 }
 
 void voice_note_off(voice *v, unsigned int midi_note)

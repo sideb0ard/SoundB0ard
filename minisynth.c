@@ -61,7 +61,6 @@ minisynth *new_minisynth(void)
         // }
     }
 
-
     // start loop player running
     pthread_t melody_looprrr;
     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
@@ -486,11 +485,11 @@ void minisynth_status(void *self, wchar_t *status_string)
     for (int i = 1; i < MAX_VOICES; i++) {
         if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core) {
             printf("[%d] GOTS A MATRIX CORE\n", i);
-        } else {
+        }
+        else {
             printf("[%d] NAE GOTS A MATRIX CORE\n", i);
         }
     }
-
 }
 
 void minisynth_setvol(void *self, double v)
@@ -523,9 +522,9 @@ double minisynth_gennext(void *self)
 
     for (int i = 0; i < MAX_VOICES; i++) {
         if (ms->m_voices[i]) {
-            //if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core)
+            // if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core)
             //    printf("[%d] MINISYNTH GENNEXT - matrxi CORE!\n", i);
-            //else
+            // else
             //    printf("[%d] NAE MINISYNTH GENNEXT - matrxi CORE!\n", i);
             minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
         }

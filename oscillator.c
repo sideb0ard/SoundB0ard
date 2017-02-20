@@ -53,11 +53,11 @@ void osc_new_settings(oscillator *osc)
     osc->m_mod_dest_output1 = SOURCE_NONE;
     osc->m_mod_dest_output2 = SOURCE_NONE;
 
-    osc->m_square_edge_rising = false;
+    // osc->m_square_edge_rising = false;
 
-    // --- for hard sync
-    osc->m_buddy_oscillator = NULL;
-    osc->m_master_osc = false;
+    // // --- for hard sync
+    // osc->m_buddy_oscillator = NULL;
+    // osc->m_master_osc = false;
 
     osc->m_global_oscillator_params = NULL;
 }
@@ -131,7 +131,7 @@ void osc_reset(oscillator *self)
     self->m_rsh_value = 0.0;
 
     // square state variable
-    self->m_square_edge_rising = false;
+    // self->m_square_edge_rising = false;
 
     // modulation variables
     self->m_amp_mod = 1.0; // note default to 1 to avoid silent osc
@@ -223,7 +223,6 @@ void osc_init_global_parameters(oscillator *self,
     self->m_global_oscillator_params->amplitude = self->m_amplitude;
     self->m_global_oscillator_params->pulse_width_control =
         self->m_pulse_width_control;
-    self->m_global_oscillator_params->amplitude = self->m_amplitude;
     self->m_global_oscillator_params->octave = self->m_octave;
     self->m_global_oscillator_params->semitones = self->m_semitones;
     self->m_global_oscillator_params->cents = self->m_cents;

@@ -101,18 +101,25 @@ void dca_update(dca *self)
 void dca_gennext(dca *self, double left_input, double right_input,
                  double *left_output, double *right_output)
 {
-    double pan_total = self->m_pan_control + self->m_pan_mod;
+    (void)right_input;
+    (void)*right_output;
+    // TODO (i'm bypassing pan implementation, the calculate_pan_values
+    // doesn't seem to be working
 
-    pan_total = fmin(pan_total, 1.0);
-    pan_total = fmax(pan_total, -1.0);
-    double pan_left = 0.707;
-    double pan_right = 0.707;
-    calculate_pan_values(pan_total, &pan_left, &pan_right);
+    // double pan_total = self->m_pan_control + self->m_pan_mod;
 
-    *left_output =
-        pan_left * self->m_amplitude_control * left_input * self->m_gain;
-    *right_output =
-        pan_right * self->m_amplitude_control * right_input * self->m_gain;
+    // pan_total = fmin(pan_total, 1.0);
+    // pan_total = fmax(pan_total, -1.0);
+    // double pan_left = 0.707;
+    // double pan_right = 0.707;
+    // calculate_pan_values(pan_total, &pan_left, &pan_right);
+
+    //*left_output =
+    //    pan_left * self->m_amplitude_control * left_input * self->m_gain;
+    //*right_output =
+    //    pan_right * self->m_amplitude_control * right_input * self->m_gain;
+
+    *left_output = self->m_amplitude_control * left_input * self->m_gain;
 }
 
 void dca_init_global_parameters(dca *self, global_dca_params *params)
