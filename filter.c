@@ -17,7 +17,7 @@ void filter_setup(filter *f)
     f->m_nlp = OFF;
     f->m_saturation = 1.0;
 
-    f->g_modmatrix = NULL;
+    f->m_v_modmatrix = NULL;
     f->m_mod_source_fc = DEST_NONE;
     f->m_mod_source_fc_control = DEST_NONE;
 }
@@ -35,6 +35,10 @@ void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
 
 void filter_update(filter *f)
 {
+    // printf("1ORIG:FC: %f\n", f->m_fc);
+    // printf("2MY FC_CONTROL: %f\n", f->m_fc_control);
+    // printf("GLOBAL FC_CONTROL IS %f\n",
+    // f->m_global_filter_params->fc_control);
     if (f->m_global_filter_params) {
         f->m_aux_control = f->m_global_filter_params->aux_control;
         f->m_fc_control = f->m_global_filter_params->fc_control;
@@ -44,13 +48,15 @@ void filter_update(filter *f)
         f->m_nlp = f->m_global_filter_params->nlp;
     }
 
-    // printf("ORIG:FC: %f\n", f->m_fc);
-    // printf("MY FC_CONTROL: %f\n", f->m_fc_control);
-    if (f->g_modmatrix) {
-        f->m_fc_mod = f->g_modmatrix->m_destinations[f->m_mod_source_fc];
-        if (f->g_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0)
+    // printf("2RIG:FC: %f\n", f->m_fc);
+    // printf("2Y FC_CONTROL: %f\n", f->m_fc_control);
+    // exit(0);
+
+    if (f->m_v_modmatrix) {
+        f->m_fc_mod = f->m_v_modmatrix->m_destinations[f->m_mod_source_fc];
+        if (f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0)
             f->m_fc_control =
-                f->g_modmatrix->m_destinations[f->m_mod_source_fc_control];
+                f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control];
     }
 
     filter_set_q_control(f, f->m_q_control);

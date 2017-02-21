@@ -12,7 +12,7 @@
 typedef struct {
 
     // shared by source and dest
-    modmatrix g_modmatrix;
+    modmatrix m_v_modmatrix;
 
     bool m_note_on;
     unsigned int m_timestamp;

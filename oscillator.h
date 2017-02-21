@@ -24,8 +24,8 @@ typedef struct oscillator oscillator;
 
 struct oscillator {
 
-    // global modulation matrix
-    modmatrix *g_modmatrix;
+    // modulation matrix, owned by voice we are part of
+    modmatrix *m_v_modmatrix;
 
     // sources that we read from
     unsigned m_mod_source_fo;

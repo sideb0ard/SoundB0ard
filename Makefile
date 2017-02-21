@@ -61,6 +61,8 @@ TARGET = sbsh
 .PHONE: depend clean
 
 all: $(TARGET)
+	@ctags *{h,c}
+	$(format)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 $(TARGET): $(OBJ)

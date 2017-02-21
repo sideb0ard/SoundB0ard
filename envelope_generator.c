@@ -49,7 +49,7 @@ void envelope_generator_init(envelope_generator *eg)
     eg->m_reset_to_zero = false;
     eg->m_legato_mode = false;
 
-    eg->g_modmatrix = NULL;
+    eg->m_v_modmatrix = NULL;
 
     // eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
 
@@ -251,7 +251,7 @@ void eg_update(envelope_generator *self)
         self->m_legato_mode = self->m_global_eg_params->legato_mode;
     }
 
-    if (!self->g_modmatrix || !self->m_output_eg) {
+    if (!self->m_v_modmatrix || !self->m_output_eg) {
         return;
     }
 
@@ -259,7 +259,7 @@ void eg_update(envelope_generator *self)
     if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
         self->m_attack_time_scalar == 1.0) {
         double scale =
-            self->g_modmatrix
+            self->m_v_modmatrix
                 ->m_destinations[self->m_mod_source_eg_attack_scaling];
         if (self->m_attack_time_scalar != 1.0 - scale) {
             self->m_attack_time_scalar = 1.0 - scale;
@@ -272,7 +272,7 @@ void eg_update(envelope_generator *self)
     if (self->m_mod_source_eg_decay_scaling != DEST_NONE &&
         self->m_decay_time_scalar == 1.0) {
         double scale =
-            self->g_modmatrix
+            self->m_v_modmatrix
                 ->m_destinations[self->m_mod_source_eg_decay_scaling];
         if (self->m_decay_time_scalar != 1.0 - scale) {
             self->m_decay_time_scalar = 1.0 - scale;
@@ -282,7 +282,7 @@ void eg_update(envelope_generator *self)
 
     if (self->m_mod_source_sustain_override != DEST_NONE) {
         double sustain =
-            self->g_modmatrix
+            self->m_v_modmatrix
                 ->m_destinations[self->m_mod_source_sustain_override];
         if (sustain == 0)
             eg_set_sustain_override(self, false);
@@ -367,10 +367,10 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
     }
     }
 
-    if (self->g_modmatrix) {
-        self->g_modmatrix->m_sources[self->m_mod_dest_eg_output] =
+    if (self->m_v_modmatrix) {
+        self->m_v_modmatrix->m_sources[self->m_mod_dest_eg_output] =
             self->m_envelope_output;
-        self->g_modmatrix->m_sources[self->m_mod_dest_eg_biased_output] =
+        self->m_v_modmatrix->m_sources[self->m_mod_dest_eg_biased_output] =
             self->m_envelope_output - self->m_sustain_level;
     }
 

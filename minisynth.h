@@ -42,7 +42,7 @@ typedef struct minisynth {
     minisynth_voice *m_voices[MAX_VOICES];
 
     // global modmatrix, core is shared by all voices
-    modmatrix g_modmatrix; // routing structure for sound generation
+    modmatrix m_ms_modmatrix; // routing structure for sound generation
     global_synth_params m_global_synth_params;
 
     double m_last_note_frequency;

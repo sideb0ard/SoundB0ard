@@ -110,88 +110,88 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
 
 void voice_prepare_for_play(voice *v)
 {
-    matrix_clear_sources(&v->g_modmatrix);
-    v->g_modmatrix.m_sources[SOURCE_MIDI_VOLUME_CC07] = 127;
-    v->g_modmatrix.m_sources[SOURCE_MIDI_PAN_CC10] = 64;
+    matrix_clear_sources(&v->m_v_modmatrix);
+    v->m_v_modmatrix.m_sources[SOURCE_MIDI_VOLUME_CC07] = 127;
+    v->m_v_modmatrix.m_sources[SOURCE_MIDI_PAN_CC10] = 64;
 
-    v->m_lfo1.osc.g_modmatrix = &v->g_modmatrix;
+    v->m_lfo1.osc.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_lfo1.osc.m_mod_dest_output1 = SOURCE_LFO1;
     v->m_lfo1.osc.m_mod_dest_output2 = SOURCE_LFO1Q;
 
-    v->m_lfo2.osc.g_modmatrix = &v->g_modmatrix;
+    v->m_lfo2.osc.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_lfo2.osc.m_mod_dest_output1 = SOURCE_LFO2;
     v->m_lfo2.osc.m_mod_dest_output2 = SOURCE_LFO2Q;
 
-    v->m_eg1.g_modmatrix = &v->g_modmatrix;
+    v->m_eg1.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg1.m_mod_dest_eg_output = SOURCE_EG1;
     v->m_eg1.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
     v->m_eg1.m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
     v->m_eg1.m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
     v->m_eg1.m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
 
-    v->m_eg2.g_modmatrix = &v->g_modmatrix;
+    v->m_eg2.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg2.m_mod_dest_eg_output = SOURCE_EG2;
     v->m_eg2.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG2;
     v->m_eg2.m_mod_source_eg_attack_scaling = DEST_EG2_ATTACK_SCALING;
     v->m_eg2.m_mod_source_eg_decay_scaling = DEST_EG2_DECAY_SCALING;
     v->m_eg2.m_mod_source_sustain_override = DEST_EG2_SUSTAIN_OVERRIDE;
 
-    v->m_eg3.g_modmatrix = &v->g_modmatrix;
+    v->m_eg3.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg3.m_mod_dest_eg_output = SOURCE_EG3;
     v->m_eg3.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG3;
     v->m_eg3.m_mod_source_eg_attack_scaling = DEST_EG3_ATTACK_SCALING;
     v->m_eg3.m_mod_source_eg_decay_scaling = DEST_EG3_DECAY_SCALING;
     v->m_eg3.m_mod_source_sustain_override = DEST_EG3_SUSTAIN_OVERRIDE;
 
-    v->m_eg4.g_modmatrix = &v->g_modmatrix;
+    v->m_eg4.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg4.m_mod_dest_eg_output = SOURCE_EG4;
     v->m_eg4.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG4;
     v->m_eg4.m_mod_source_eg_attack_scaling = DEST_EG4_ATTACK_SCALING;
     v->m_eg4.m_mod_source_eg_decay_scaling = DEST_EG4_DECAY_SCALING;
     v->m_eg4.m_mod_source_sustain_override = DEST_EG4_SUSTAIN_OVERRIDE;
 
-    v->m_dca.g_modmatrix = &v->g_modmatrix;
+    v->m_dca.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_dca.m_mod_source_eg = DEST_DCA_EG;
     v->m_dca.m_mod_source_amp_db = DEST_DCA_AMP;
     v->m_dca.m_mod_source_velocity = DEST_DCA_VELOCITY;
     v->m_dca.m_mod_source_pan = DEST_DCA_PAN;
 
     if (v->m_osc1) {
-        v->m_osc1->g_modmatrix = &v->g_modmatrix;
+        v->m_osc1->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc1->m_mod_source_fo = DEST_OSC1_FO;
         v->m_osc1->m_mod_source_pulse_width = DEST_OSC1_PULSEWIDTH;
         v->m_osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
     }
 
     if (v->m_osc2) {
-        v->m_osc2->g_modmatrix = &v->g_modmatrix;
+        v->m_osc2->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc2->m_mod_source_fo = DEST_OSC2_FO;
         v->m_osc2->m_mod_source_pulse_width = DEST_OSC2_PULSEWIDTH;
         v->m_osc2->m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
     }
 
     if (v->m_osc3) {
-        v->m_osc3->g_modmatrix = &v->g_modmatrix;
+        v->m_osc3->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc3->m_mod_source_fo = DEST_OSC3_FO;
         v->m_osc3->m_mod_source_pulse_width = DEST_OSC3_PULSEWIDTH;
         v->m_osc3->m_mod_source_amp = DEST_OSC3_OUTPUT_AMP;
     }
 
     if (v->m_osc4) {
-        v->m_osc4->g_modmatrix = &v->g_modmatrix;
+        v->m_osc4->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc4->m_mod_source_fo = DEST_OSC4_FO;
         v->m_osc4->m_mod_source_pulse_width = DEST_OSC4_PULSEWIDTH;
         v->m_osc4->m_mod_source_amp = DEST_OSC4_OUTPUT_AMP;
     }
 
     if (v->m_filter1) {
-        v->m_filter1->g_modmatrix = &v->g_modmatrix;
+        v->m_filter1->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_filter1->m_mod_source_fc = DEST_FILTER1_FC;
         v->m_filter1->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
     }
 
     if (v->m_filter2) {
-        v->m_filter2->g_modmatrix = &v->g_modmatrix;
+        v->m_filter2->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_filter2->m_mod_source_fc = DEST_FILTER2_FC;
         v->m_filter2->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
     }
@@ -253,7 +253,7 @@ void voice_init_global_parameters(voice *v, global_synth_params *sp)
 }
 void voice_set_modmatrix_core(voice *v, matrixrow **modmatrix)
 {
-    set_matrix_core(&v->g_modmatrix, modmatrix);
+    set_matrix_core(&v->m_v_modmatrix, modmatrix);
 }
 
 bool voice_is_active_voice(voice *v)
@@ -331,8 +331,9 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
     if (!v->m_note_on && !v->m_note_pending) {
         v->m_midi_note_number = midi_note;
         v->m_midi_velocity = midi_velocity;
-        v->g_modmatrix.m_sources[SOURCE_VELOCITY] = (double)v->m_midi_velocity;
-        v->g_modmatrix.m_sources[SOURCE_MIDI_NOTE_NUM] =
+        v->m_v_modmatrix.m_sources[SOURCE_VELOCITY] =
+            (double)v->m_midi_velocity;
+        v->m_v_modmatrix.m_sources[SOURCE_MIDI_NOTE_NUM] =
             (double)v->m_midi_note_number;
         if (v->m_portamento_inc > 0.0 && last_note_frequency >= 0) {
             v->m_modulo_portamento = 0.0;
@@ -485,11 +486,11 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
             v->m_osc_pitch = v->m_osc_pitch_pending;
             v->m_timestamp = 0;
 
-            v->g_modmatrix.m_sources[SOURCE_MIDI_NOTE_NUM] =
+            v->m_v_modmatrix.m_sources[SOURCE_MIDI_NOTE_NUM] =
                 (double)v->m_midi_note_number;
 
             if (!voice_in_legato_mode(v))
-                v->g_modmatrix.m_sources[SOURCE_VELOCITY] =
+                v->m_v_modmatrix.m_sources[SOURCE_VELOCITY] =
                     (double)v->m_midi_velocity;
 
             double pitch = v->m_portamento_inc > 0.0 ? v->m_portamento_start

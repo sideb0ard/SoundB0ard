@@ -8,7 +8,7 @@
 
 typedef struct dca {
 
-    modmatrix *g_modmatrix;
+    modmatrix *m_v_modmatrix;
 
     unsigned m_mod_source_eg;
     unsigned m_mod_source_amp_db;

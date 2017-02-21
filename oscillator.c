@@ -44,7 +44,7 @@ void osc_new_settings(oscillator *osc)
     osc->m_waveform = SINE;
 
     // --- default modulation matrix inits
-    osc->g_modmatrix = NULL;
+    osc->m_v_modmatrix = NULL;
 
     // --- everything is disconnected unless you use mod matrix
     osc->m_mod_source_fo = DEST_NONE;
@@ -167,18 +167,18 @@ void osc_update(oscillator *self)
     // --- Modulation Matrix
     //
     // --- get from matrix Sources
-    if (self->g_modmatrix) {
+    if (self->m_v_modmatrix) {
         // --- zero is norm for these
         self->m_fo_mod =
-            self->g_modmatrix->m_destinations[self->m_mod_source_fo];
+            self->m_v_modmatrix->m_destinations[self->m_mod_source_fo];
 
         self->m_pw_mod =
-            self->g_modmatrix->m_destinations[self->m_mod_source_pulse_width];
+            self->m_v_modmatrix->m_destinations[self->m_mod_source_pulse_width];
 
         // --- amp mod is 0->1
         // --- invert for oscillator output mod
         self->m_amp_mod =
-            self->g_modmatrix->m_destinations[self->m_mod_source_amp];
+            self->m_v_modmatrix->m_destinations[self->m_mod_source_amp];
         self->m_amp_mod = 1.0 - self->m_amp_mod;
     }
 

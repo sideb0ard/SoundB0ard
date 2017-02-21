@@ -61,10 +61,10 @@ double wt_do_oscillate(oscillator *self, double *aux_output)
     // --- get output
     double out_sample = wt_do_wave_table(wt, &wt->m_read_index, wt->m_wt_inc);
 
-    if (self->g_modmatrix) {
-        self->g_modmatrix->m_sources[self->m_mod_dest_output1] =
+    if (self->m_v_modmatrix) {
+        self->m_v_modmatrix->m_sources[self->m_mod_dest_output1] =
             out_sample * self->m_amplitude * self->m_amp_mod;
-        self->g_modmatrix->m_sources[self->m_mod_dest_output2] =
+        self->m_v_modmatrix->m_sources[self->m_mod_dest_output2] =
             out_sample * self->m_amplitude * self->m_amp_mod;
     }
 

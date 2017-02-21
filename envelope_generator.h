@@ -25,7 +25,7 @@ typedef enum {
 
 typedef struct envelope_generator {
 
-    modmatrix *g_modmatrix;
+    modmatrix *m_v_modmatrix;
 
     unsigned m_mod_source_eg_attack_scaling;
     unsigned m_mod_source_eg_decay_scaling;

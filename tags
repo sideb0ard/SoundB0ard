@@ -1,0 +1,1307 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.8	//
+ALGORITHM_TYPE	defjams.h	/^    ALGORITHM_TYPE,$/;"	e	enum:__anon4
+ALLPASS	effect.h	/^    ALLPASS,$/;"	e	enum:__anon8
+AMP_MOD_RANGE	dca.h	/^#define AMP_MOD_RANGE /;"	d
+ANALOG	envelope_generator.h	/^typedef enum { ANALOG, DIGITAL } eg_mode;$/;"	e	enum:__anon10
+ANSI_COLOR_BLUE	defjams.h	/^#define ANSI_COLOR_BLUE /;"	d
+ANSI_COLOR_CYAN	defjams.h	/^#define ANSI_COLOR_CYAN /;"	d
+ANSI_COLOR_GREEN	defjams.h	/^#define ANSI_COLOR_GREEN /;"	d
+ANSI_COLOR_MAGENTA	defjams.h	/^#define ANSI_COLOR_MAGENTA /;"	d
+ANSI_COLOR_RED	defjams.h	/^#define ANSI_COLOR_RED /;"	d
+ANSI_COLOR_RESET	defjams.h	/^#define ANSI_COLOR_RESET /;"	d
+ANSI_COLOR_WHITE	defjams.h	/^#define ANSI_COLOR_WHITE /;"	d
+ANSI_COLOR_YELLOW	defjams.h	/^#define ANSI_COLOR_YELLOW /;"	d
+ARC4RANDOMMAX	utils.c	/^#define ARC4RANDOMMAX /;"	d	file:
+ATTACK	envelope_generator.h	/^    ATTACK,$/;"	e	enum:__anon11
+B	utils.c	/^const double B = 4.0 \/ (float)M_PI;$/;"	v
+BANDPASS	effect.h	/^    BANDPASS,$/;"	e	enum:__anon8
+BEATREPEAT	effect.h	/^    BEATREPEAT,$/;"	e	enum:__anon8
+BEATREPEAT_H_	beatrepeat.h	/^#define BEATREPEAT_H_$/;"	d
+BITWIZE	bitwize.h	/^} BITWIZE;$/;"	t	typeref:struct:t_bitwize
+BITWIZE_H	bitwize.h	/^#define BITWIZE_H$/;"	d
+BITWIZE_TYPE	defjams.h	/^    BITWIZE_TYPE,$/;"	e	enum:__anon4
+BPF2	filter.h	/^    BPF2,$/;"	e	enum:__anon12
+BPF4	filter.h	/^    BPF4$/;"	e	enum:__anon12
+BSF2	filter.h	/^    BSF2,$/;"	e	enum:__anon12
+C	utils.c	/^const double C = -4.0 \/ ((float)M_PI * (float)M_PI);$/;"	v
+CHAOSMONKEY_TYPE	defjams.h	/^    CHAOSMONKEY_TYPE,$/;"	e	enum:__anon4
+CONCAVE_LIMIT	utils.c	/^#define CONCAVE_LIMIT /;"	d	file:
+CONVEX_LIMIT	utils.c	/^#define CONVEX_LIMIT /;"	d	file:
+COOL_COLOR_GREEN	defjams.h	/^#define COOL_COLOR_GREEN /;"	d
+COOL_COLOR_MAUVE	defjams.h	/^#define COOL_COLOR_MAUVE /;"	d
+COOL_COLOR_PINK	defjams.h	/^#define COOL_COLOR_PINK /;"	d
+COOL_COLOR_YELLOW	defjams.h	/^#define COOL_COLOR_YELLOW /;"	d
+DECAY	envelope_generator.h	/^    DECAY,$/;"	e	enum:__anon11
+DECIMATOR	effect.h	/^    DECIMATOR,$/;"	e	enum:__anon8
+DEFAULT_AMP	drumr.h	/^#define DEFAULT_AMP /;"	d
+DEFAULT_ARRAY_SIZE	defjams.h	/^#define DEFAULT_ARRAY_SIZE /;"	d
+DEFAULT_BPM	defjams.h	/^#define DEFAULT_BPM /;"	d
+DEFAULT_ENV_LENGTH	defjams.h	/^#define DEFAULT_ENV_LENGTH /;"	d
+DEFAULT_LFO_RATE	oscillator.h	/^#define DEFAULT_LFO_RATE /;"	d
+DELAY	effect.h	/^    DELAY,$/;"	e	enum:__anon8
+DELAYFX	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon7
+DEST_ALL_EG_ATTACK_SCALING	modmatrix.h	/^    DEST_ALL_EG_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_ALL_EG_DECAY_SCALING	modmatrix.h	/^    DEST_ALL_EG_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_ALL_EG_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_ALL_EG_SUSTAIN_OVERRIDE, \/\/ <- keep this last$/;"	e	enum:__anon18
+DEST_ALL_FILTER_FC	modmatrix.h	/^    DEST_ALL_FILTER_FC,$/;"	e	enum:__anon18
+DEST_ALL_FILTER_KEYTRACK	modmatrix.h	/^    DEST_ALL_FILTER_KEYTRACK, \/\/ the control value, overriding the GUI$/;"	e	enum:__anon18
+DEST_ALL_FILTER_Q	modmatrix.h	/^    DEST_ALL_FILTER_Q,$/;"	e	enum:__anon18
+DEST_ALL_LFO_FO	modmatrix.h	/^    DEST_ALL_LFO_FO,$/;"	e	enum:__anon18
+DEST_ALL_LFO_OUTPUT_AMP	modmatrix.h	/^    DEST_ALL_LFO_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_ALL_OSC_FO	modmatrix.h	/^    DEST_ALL_OSC_FO,$/;"	e	enum:__anon18
+DEST_ALL_OSC_FO_RATIO	modmatrix.h	/^    DEST_ALL_OSC_FO_RATIO,$/;"	e	enum:__anon18
+DEST_ALL_OSC_OUTPUT_AMP	modmatrix.h	/^    DEST_ALL_OSC_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_ALL_OSC_PULSEWIDTH	modmatrix.h	/^    DEST_ALL_OSC_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_DCA_AMP	modmatrix.h	/^    DEST_DCA_AMP,$/;"	e	enum:__anon18
+DEST_DCA_EG	modmatrix.h	/^    DEST_DCA_EG,$/;"	e	enum:__anon18
+DEST_DCA_PAN	modmatrix.h	/^    DEST_DCA_PAN,$/;"	e	enum:__anon18
+DEST_DCA_VELOCITY	modmatrix.h	/^    DEST_DCA_VELOCITY,$/;"	e	enum:__anon18
+DEST_EG1_ATTACK_SCALING	modmatrix.h	/^    DEST_EG1_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG1_DECAY_SCALING	modmatrix.h	/^    DEST_EG1_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG1_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG1_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_EG2_ATTACK_SCALING	modmatrix.h	/^    DEST_EG2_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG2_DECAY_SCALING	modmatrix.h	/^    DEST_EG2_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG2_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG2_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_EG3_ATTACK_SCALING	modmatrix.h	/^    DEST_EG3_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG3_DECAY_SCALING	modmatrix.h	/^    DEST_EG3_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG3_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG3_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_EG4_ATTACK_SCALING	modmatrix.h	/^    DEST_EG4_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG4_DECAY_SCALING	modmatrix.h	/^    DEST_EG4_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG4_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG4_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_FILTER1_FC	modmatrix.h	/^    DEST_FILTER1_FC,$/;"	e	enum:__anon18
+DEST_FILTER1_KEYTRACK	modmatrix.h	/^    DEST_FILTER1_KEYTRACK,$/;"	e	enum:__anon18
+DEST_FILTER1_Q	modmatrix.h	/^    DEST_FILTER1_Q,$/;"	e	enum:__anon18
+DEST_FILTER2_FC	modmatrix.h	/^    DEST_FILTER2_FC,$/;"	e	enum:__anon18
+DEST_FILTER2_KEYTRACK	modmatrix.h	/^    DEST_FILTER2_KEYTRACK,$/;"	e	enum:__anon18
+DEST_FILTER2_Q	modmatrix.h	/^    DEST_FILTER2_Q,$/;"	e	enum:__anon18
+DEST_HARD_SYNC_RATIO	modmatrix.h	/^    DEST_HARD_SYNC_RATIO,$/;"	e	enum:__anon18
+DEST_LFO1_FO	modmatrix.h	/^    DEST_LFO1_FO,$/;"	e	enum:__anon18
+DEST_LFO1_OUTPUT_AMP	modmatrix.h	/^    DEST_LFO1_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_LFO2_FO	modmatrix.h	/^    DEST_LFO2_FO,$/;"	e	enum:__anon18
+DEST_LFO2_OUTPUT_AMP	modmatrix.h	/^    DEST_LFO2_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_NONE	modmatrix.h	/^    DEST_NONE,$/;"	e	enum:__anon18
+DEST_OSC1_FO	modmatrix.h	/^    DEST_OSC1_FO,$/;"	e	enum:__anon18
+DEST_OSC1_FO_RATIO	modmatrix.h	/^    DEST_OSC1_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC1_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC1_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC1_PULSEWIDTH	modmatrix.h	/^    DEST_OSC1_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_OSC2_FO	modmatrix.h	/^    DEST_OSC2_FO,$/;"	e	enum:__anon18
+DEST_OSC2_FO_RATIO	modmatrix.h	/^    DEST_OSC2_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC2_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC2_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC2_PULSEWIDTH	modmatrix.h	/^    DEST_OSC2_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_OSC3_FO	modmatrix.h	/^    DEST_OSC3_FO,$/;"	e	enum:__anon18
+DEST_OSC3_FO_RATIO	modmatrix.h	/^    DEST_OSC3_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC3_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC3_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC3_PULSEWIDTH	modmatrix.h	/^    DEST_OSC3_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_OSC4_FO	modmatrix.h	/^    DEST_OSC4_FO,$/;"	e	enum:__anon18
+DEST_OSC4_FO_RATIO	modmatrix.h	/^    DEST_OSC4_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC4_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC4_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC4_PULSEWIDTH	modmatrix.h	/^    DEST_OSC4_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_VS_AC_AXIS	modmatrix.h	/^    DEST_VS_AC_AXIS,$/;"	e	enum:__anon18
+DEST_VS_BD_AXIS	modmatrix.h	/^    DEST_VS_BD_AXIS,$/;"	e	enum:__anon18
+DIGITAL	envelope_generator.h	/^typedef enum { ANALOG, DIGITAL } eg_mode;$/;"	e	enum:__anon10
+DISTORTION	effect.h	/^    DISTORTION,$/;"	e	enum:__anon8
+DOWN	defjams.h	/^typedef enum { UP, DOWN } direction;$/;"	e	enum:__anon3
+DRUM	drumr.h	/^} DRUM;$/;"	t	typeref:struct:t_drumr
+DRUM_H	drumr.h	/^#define DRUM_H$/;"	d
+DRUM_PATTERN_LEN	defjams.h	/^#define DRUM_PATTERN_LEN /;"	d
+DRUM_TYPE	defjams.h	/^    DRUM_TYPE,$/;"	e	enum:__anon4
+EFFECT	effect.h	/^} EFFECT;$/;"	t	typeref:struct:__anon9
+EFFECT_H	effect.h	/^#define EFFECT_H$/;"	d
+EG1_DEFAULT_OSC_INTENSITY	envelope_generator.h	/^#define EG1_DEFAULT_OSC_INTENSITY /;"	d
+EG_DEFAULT_STATE_TIME	envelope_generator.h	/^#define EG_DEFAULT_STATE_TIME /;"	d
+EG_MAXTIME_MS	envelope_generator.h	/^#define EG_MAXTIME_MS /;"	d
+EG_MAX_OSC_INTENSITY	envelope_generator.h	/^#define EG_MAX_OSC_INTENSITY /;"	d
+EG_MINTIME_MS	envelope_generator.h	/^#define EG_MINTIME_MS /;"	d
+EG_MIN_OSC_INTENSITY	envelope_generator.h	/^#define EG_MIN_OSC_INTENSITY /;"	d
+ENVELOPE	envelope.h	/^} ENVELOPE;$/;"	t	typeref:struct:envelope
+ENVELOPE_H	envelope.h	/^#define ENVELOPE_H$/;"	d
+ENVIRONMENT_ARRAY_SIZE	mixer.h	/^#define ENVIRONMENT_ARRAY_SIZE /;"	d
+ENVIRONMENT_KEY_SIZE	mixer.h	/^#define ENVIRONMENT_KEY_SIZE /;"	d
+ENVSTREAM	envelope.h	/^} ENVSTREAM;$/;"	t	typeref:struct:envelope_stream
+EXTRACT_BITS	utils.c	/^#define EXTRACT_BITS(/;"	d	file:
+FILTER_FC_DEFAULT	filter.h	/^#define FILTER_FC_DEFAULT /;"	d
+FILTER_FC_MAX	filter.h	/^#define FILTER_FC_MAX /;"	d
+FILTER_FC_MIN	filter.h	/^#define FILTER_FC_MIN /;"	d
+FILTER_FC_MOD_RANGE	filter.h	/^#define FILTER_FC_MOD_RANGE /;"	d
+FILTER_Q_DEFAULT	filter.h	/^#define FILTER_Q_DEFAULT /;"	d
+FILTER_TYPE_DEFAULT	filter.h	/^#define FILTER_TYPE_DEFAULT /;"	d
+FRAMES_PER_BUFFER	defjams.h	/^#define FRAMES_PER_BUFFER /;"	d
+FREQRAD	defjams.h	/^#define FREQRAD /;"	d
+GRIDWIDTH	drumr.h	/^#define GRIDWIDTH /;"	d
+HIGHPASS	effect.h	/^    HIGHPASS,$/;"	e	enum:__anon8
+HPF1	filter.h	/^    HPF1,$/;"	e	enum:__anon12
+HPF2	filter.h	/^    HPF2,$/;"	e	enum:__anon12
+HPF4	filter.h	/^    HPF4,$/;"	e	enum:__anon12
+INTEGER_LENGTH	drumr.h	/^#define INTEGER_LENGTH /;"	d
+KEYS_H_	keys.h	/^#define KEYS_H_$/;"	d
+LEGATO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
+LOOP	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
+LOWPASS	effect.h	/^    LOWPASS,$/;"	e	enum:__anon8
+LPF1	filter.h	/^    LPF1,$/;"	e	enum:__anon12
+LPF2	filter.h	/^    LPF2,$/;"	e	enum:__anon12
+LPF4	filter.h	/^    LPF4,$/;"	e	enum:__anon12
+MAXCHARS	sparkline.c	/^#define MAXCHARS /;"	d	file:
+MAX_CMDS	algorithm.h	/^#define MAX_CMDS /;"	d
+MAX_CMD_LEN	algorithm.h	/^#define MAX_CMD_LEN /;"	d
+MAX_DESTINATIONS	modmatrix.h	/^    MAX_DESTINATIONS$/;"	e	enum:__anon18
+MAX_LFO_OSC	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+MAX_LFO_RATE	oscillator.h	/^#define MAX_LFO_RATE /;"	d
+MAX_NUM_MIDI_LOOPS	minisynth.h	/^#define MAX_NUM_MIDI_LOOPS /;"	d
+MAX_OSC	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+MAX_PS_STRING_SZ	mixer.h	/^#define MAX_PS_STRING_SZ /;"	d
+MAX_SAMPLES_PER_LOOPER	sampler.h	/^#define MAX_SAMPLES_PER_LOOPER /;"	d
+MAX_SOURCES	modmatrix.h	/^    MAX_SOURCES$/;"	e	enum:__anon17
+MAX_TRANSFORMS	modmatrix.h	/^    MAX_TRANSFORMS \/* not needed? *\/$/;"	e	enum:__anon19
+MAX_VOICES	minisynth.h	/^#define MAX_VOICES /;"	d
+MIN_LFO_RATE	oscillator.h	/^#define MIN_LFO_RATE /;"	d
+MIXER_H	mixer.h	/^#define MIXER_H$/;"	d
+MONO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
+M_PI	defjams.h	/^#define M_PI /;"	d
+NHARMS	defjams.h	/^#define NHARMS /;"	d
+NOISE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+NONE	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon7
+NORM	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG } delay_mode;$/;"	e	enum:__anon25
+NUM_DRUM_PATTERNS	drumr.h	/^#define NUM_DRUM_PATTERNS /;"	d
+NUM_STATEGIES	defjams.h	/^#define NUM_STATEGIES /;"	d
+NUM_TABLES	wt_oscillator.h	/^#define NUM_TABLES /;"	d
+NUM_WURDS	cmdloop.h	/^#define NUM_WURDS /;"	d
+OCTAVE_CHANGE	midimaaan.h	/^typedef enum { OCTAVE_CHANGE } custom_event_type;$/;"	e	enum:__anon13
+OFF	defjams.h	/^typedef enum { OFF, ON } onoff;$/;"	e	enum:__anon2
+OFFF	envelope_generator.h	/^    OFFF, \/\/ name clash in defjams$/;"	e	enum:__anon11
+ON	defjams.h	/^typedef enum { OFF, ON } onoff;$/;"	e	enum:__anon2
+OSC_FO_DEFAULT	oscillator.h	/^#define OSC_FO_DEFAULT /;"	d
+OSC_FO_MAX	oscillator.h	/^#define OSC_FO_MAX /;"	d
+OSC_FO_MIN	oscillator.h	/^#define OSC_FO_MIN /;"	d
+OSC_FO_MOD_RANGE	oscillator.h	/^#define OSC_FO_MOD_RANGE /;"	d
+OSC_HARD_SYNC_RATIO_RANGE	oscillator.h	/^#define OSC_HARD_SYNC_RATIO_RANGE /;"	d
+OSC_PITCHBEND_MOD_RANGE	oscillator.h	/^#define OSC_PITCHBEND_MOD_RANGE /;"	d
+OSC_PULSEWIDTH_DEFAULT	oscillator.h	/^#define OSC_PULSEWIDTH_DEFAULT /;"	d
+OSC_PULSEWIDTH_MAX	oscillator.h	/^#define OSC_PULSEWIDTH_MAX /;"	d
+OSC_PULSEWIDTH_MIN	oscillator.h	/^#define OSC_PULSEWIDTH_MIN /;"	d
+P	utils.c	/^const double P = 0.225;$/;"	v
+PINGPONG	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG } delay_mode;$/;"	e	enum:__anon25
+PNOISE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+PPL	defjams.h	/^#define PPL /;"	d
+PPNS	defjams.h	/^#define PPNS /;"	d
+PPQN	defjams.h	/^#define PPQN /;"	d
+PPS	defjams.h	/^#define PPS /;"	d
+RELEASE	envelope_generator.h	/^    RELEASE,$/;"	e	enum:__anon11
+RES	effect.h	/^    RES,$/;"	e	enum:__anon8
+REVERB	effect.h	/^    REVERB,$/;"	e	enum:__anon8
+S16TH	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
+SAMPLER	sampler.h	/^} SAMPLER;$/;"	t	typeref:struct:t_sampler
+SAMPLER_H	sampler.h	/^#define SAMPLER_H$/;"	d
+SAMPLER_TYPE	defjams.h	/^    SAMPLER_TYPE,$/;"	e	enum:__anon4
+SAMPLE_RATE	defjams.h	/^#define SAMPLE_RATE /;"	d
+SAW1	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+SAW2	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+SAW3	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+SAW_D	defjams.h	/^typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;$/;"	e	enum:__anon6
+SAW_U	defjams.h	/^typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;$/;"	e	enum:__anon6
+SBMSG	sbmsg.h	/^} SBMSG;$/;"	t	typeref:struct:sbmsg
+SBMSG_H	sbmsg.h	/^#define SBMSG_H$/;"	d
+SBSHELL_SYNTH_FUNCTION_H_	synthfunctions.h	/^#define SBSHELL_SYNTH_FUNCTION_H_$/;"	d
+SBSHELL_VOICE_H_	voice.h	/^#define SBSHELL_VOICE_H_$/;"	d
+SHUTDOWN	envelope_generator.h	/^    SHUTDOWN$/;"	e	enum:__anon11
+SINE	defjams.h	/^typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;$/;"	e	enum:__anon6
+SINE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+SIZE_OF_WURD	cmdloop.h	/^#define SIZE_OF_WURD /;"	d
+SOUNDGEN	sound_generator.h	/^} SOUNDGEN;$/;"	t	typeref:struct:t_soundgen
+SOUNDGEN_H	sound_generator.h	/^#define SOUNDGEN_H$/;"	d
+SOURCE_BIASED_EG1	modmatrix.h	/^    SOURCE_BIASED_EG1,$/;"	e	enum:__anon17
+SOURCE_BIASED_EG2	modmatrix.h	/^    SOURCE_BIASED_EG2,$/;"	e	enum:__anon17
+SOURCE_BIASED_EG3	modmatrix.h	/^    SOURCE_BIASED_EG3,$/;"	e	enum:__anon17
+SOURCE_BIASED_EG4	modmatrix.h	/^    SOURCE_BIASED_EG4,$/;"	e	enum:__anon17
+SOURCE_EG1	modmatrix.h	/^    SOURCE_EG1,$/;"	e	enum:__anon17
+SOURCE_EG2	modmatrix.h	/^    SOURCE_EG2,$/;"	e	enum:__anon17
+SOURCE_EG3	modmatrix.h	/^    SOURCE_EG3,$/;"	e	enum:__anon17
+SOURCE_EG4	modmatrix.h	/^    SOURCE_EG4,$/;"	e	enum:__anon17
+SOURCE_LFO1	modmatrix.h	/^    SOURCE_LFO1,$/;"	e	enum:__anon17
+SOURCE_LFO1Q	modmatrix.h	/^    SOURCE_LFO1Q,$/;"	e	enum:__anon17
+SOURCE_LFO2	modmatrix.h	/^    SOURCE_LFO2,$/;"	e	enum:__anon17
+SOURCE_LFO2Q	modmatrix.h	/^    SOURCE_LFO2Q,$/;"	e	enum:__anon17
+SOURCE_MIDI_EXPRESSION_CC11	modmatrix.h	/^    SOURCE_MIDI_EXPRESSION_CC11,$/;"	e	enum:__anon17
+SOURCE_MIDI_JS_X	modmatrix.h	/^    SOURCE_MIDI_JS_X,$/;"	e	enum:__anon17
+SOURCE_MIDI_JS_Y	modmatrix.h	/^    SOURCE_MIDI_JS_Y,$/;"	e	enum:__anon17
+SOURCE_MIDI_NOTE_NUM	modmatrix.h	/^    SOURCE_MIDI_NOTE_NUM,$/;"	e	enum:__anon17
+SOURCE_MIDI_PAN_CC10	modmatrix.h	/^    SOURCE_MIDI_PAN_CC10,$/;"	e	enum:__anon17
+SOURCE_MIDI_VOLUME_CC07	modmatrix.h	/^    SOURCE_MIDI_VOLUME_CC07,$/;"	e	enum:__anon17
+SOURCE_MODWHEEL	modmatrix.h	/^    SOURCE_MODWHEEL,$/;"	e	enum:__anon17
+SOURCE_NONE	modmatrix.h	/^    SOURCE_NONE,$/;"	e	enum:__anon17
+SOURCE_PITCHBEND	modmatrix.h	/^    SOURCE_PITCHBEND,$/;"	e	enum:__anon17
+SOURCE_SUSTAIN_PEDAL	modmatrix.h	/^    SOURCE_SUSTAIN_PEDAL,$/;"	e	enum:__anon17
+SOURCE_VELOCITY	modmatrix.h	/^    SOURCE_VELOCITY,$/;"	e	enum:__anon17
+SQUARE	defjams.h	/^typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;$/;"	e	enum:__anon6
+SQUARE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+SUSTAIN	envelope_generator.h	/^    SUSTAIN,$/;"	e	enum:__anon11
+SYNTH	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon7
+SYNTH_NUM_LOOPS	defjams.h	/^#define SYNTH_NUM_LOOPS /;"	d
+SYNTH_TYPE	defjams.h	/^    SYNTH_TYPE,$/;"	e	enum:__anon4
+Saw2Sqr	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
+Saw3	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
+Sqr3	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
+TABLEN	defjams.h	/^#define TABLEN /;"	d
+TABRAD	defjams.h	/^#define TABRAD /;"	d
+TAP1	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG } delay_mode;$/;"	e	enum:__anon25
+TAP2	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG } delay_mode;$/;"	e	enum:__anon25
+TICK	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
+TRANSFORM_BIPOLAR_TO_UNIPOLAR	modmatrix.h	/^    TRANSFORM_BIPOLAR_TO_UNIPOLAR,$/;"	e	enum:__anon19
+TRANSFORM_INVERT_MIDI_NORMALIZE	modmatrix.h	/^    TRANSFORM_INVERT_MIDI_NORMALIZE,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_NORMALIZE	modmatrix.h	/^    TRANSFORM_MIDI_NORMALIZE,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_SWITCH	modmatrix.h	/^    TRANSFORM_MIDI_SWITCH,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_TO_ATTENUATION	modmatrix.h	/^    TRANSFORM_MIDI_TO_ATTENUATION,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_TO_BIPOLAR	modmatrix.h	/^    TRANSFORM_MIDI_TO_BIPOLAR,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_TO_PAN	modmatrix.h	/^    TRANSFORM_MIDI_TO_PAN,$/;"	e	enum:__anon19
+TRANSFORM_NONE	modmatrix.h	/^    TRANSFORM_NONE,$/;"	e	enum:__anon19
+TRANSFORM_NOTE_NUMBER_TO_FREQUENCY	modmatrix.h	/^    TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,$/;"	e	enum:__anon19
+TRANSFORM_UNIPOLAR_TO_BIPOLAR	modmatrix.h	/^    TRANSFORM_UNIPOLAR_TO_BIPOLAR,$/;"	e	enum:__anon19
+TRI	defjams.h	/^typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;$/;"	e	enum:__anon6
+TRI	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon22
+TWO_PI	defjams.h	/^#define TWO_PI /;"	d
+Tri2Saw	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
+Tri2Sqr	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
+UP	defjams.h	/^typedef enum { UP, DOWN } direction;$/;"	e	enum:__anon3
+WANSI_COLOR_BLUE	defjams.h	/^#define WANSI_COLOR_BLUE /;"	d
+WANSI_COLOR_CYAN	defjams.h	/^#define WANSI_COLOR_CYAN /;"	d
+WANSI_COLOR_GREEN	defjams.h	/^#define WANSI_COLOR_GREEN /;"	d
+WANSI_COLOR_MAGENTA	defjams.h	/^#define WANSI_COLOR_MAGENTA /;"	d
+WANSI_COLOR_RED	defjams.h	/^#define WANSI_COLOR_RED /;"	d
+WANSI_COLOR_RESET	defjams.h	/^#define WANSI_COLOR_RESET /;"	d
+WANSI_COLOR_WHITE	defjams.h	/^#define WANSI_COLOR_WHITE /;"	d
+WANSI_COLOR_YELLOW	defjams.h	/^#define WANSI_COLOR_YELLOW /;"	d
+WCOOL_COLOR_GREEN	defjams.h	/^#define WCOOL_COLOR_GREEN /;"	d
+WCOOL_COLOR_MAUVE	defjams.h	/^#define WCOOL_COLOR_MAUVE /;"	d
+WCOOL_COLOR_PINK	defjams.h	/^#define WCOOL_COLOR_PINK /;"	d
+WCOOL_COLOR_YELLOW	defjams.h	/^#define WCOOL_COLOR_YELLOW /;"	d
+WT_LENGTH	wt_oscillator.h	/^#define WT_LENGTH /;"	d
+__HELP__H	help.h	/^#define __HELP__H$/;"	d
+_env_reset	envelope.c	/^static void _env_reset(ENVSTREAM *stream)$/;"	f	file:
+_env_updatepoints	envelope.c	/^static void _env_updatepoints(ENVSTREAM *stream)$/;"	f	file:
+_lookupTables_	lookuptables.h	/^#define _lookupTables_$/;"	d
+_new_wtable	table.c	/^static wtable *_new_wtable(void)$/;"	f	file:
+active_midi_soundgen_effect_num	mixer.h	/^    int active_midi_soundgen_effect_num;$/;"	m	struct:t_mixer
+active_midi_soundgen_num	mixer.h	/^    int active_midi_soundgen_num;$/;"	m	struct:t_mixer
+add_algorithm	mixer.c	/^int add_algorithm(char *line)$/;"	f
+add_beatrepeat_soundgen	sound_generator.c	/^int add_beatrepeat_soundgen(SOUNDGEN *self, int looplen)$/;"	f
+add_bitwize	mixer.c	/^int add_bitwize(mixer *mixr, int pattern)$/;"	f
+add_bytebeat	mixer.c	/^int add_bytebeat(mixer *mixr, char *pattern)$/;"	f
+add_chaosmonkey	mixer.c	/^int add_chaosmonkey()$/;"	f
+add_char_pattern	drumr.c	/^void add_char_pattern(DRUM *d, char *pattern)$/;"	f
+add_decimator_soundgen	sound_generator.c	/^int add_decimator_soundgen(SOUNDGEN *self)$/;"	f
+add_delay_soundgen	sound_generator.c	/^int add_delay_soundgen(SOUNDGEN *self, float duration)$/;"	f
+add_distortion_soundgen	sound_generator.c	/^int add_distortion_soundgen(SOUNDGEN *self)$/;"	f
+add_drum_char_pattern	mixer.c	/^int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)$/;"	f
+add_drum_euclidean	mixer.c	/^int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,$/;"	f
+add_effect	mixer.c	/^int add_effect(mixer *mixr)$/;"	f
+add_envelope_soundgen	sound_generator.c	/^int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)$/;"	f
+add_freq_pass_soundgen	sound_generator.c	/^int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type)$/;"	f
+add_int_pattern	drumr.c	/^void add_int_pattern(DRUM *d, int pattern)$/;"	f
+add_matrix_row	modmatrix.c	/^void add_matrix_row(modmatrix *self, matrixrow *row)$/;"	f
+add_minisynth	mixer.c	/^int add_minisynth(mixer *mixr)$/;"	f
+add_sampler	mixer.c	/^int add_sampler(mixer *mixr, char *filename, double loop_len)$/;"	f
+add_sound_generator	mixer.c	/^int add_sound_generator(mixer *mixr, SBMSG *sbm)$/;"	f
+afterthought	algorithm.h	/^    char afterthought[5][MAX_CMD_LEN];$/;"	m	struct:algorithm
+algorithm	algorithm.h	/^typedef struct algorithm {$/;"	s
+algorithm	algorithm.h	/^} algorithm;$/;"	t	typeref:struct:algorithm
+algorithm_gen_next	algorithm.c	/^double algorithm_gen_next(void *self)$/;"	f
+algorithm_process_afterthought	algorithm.c	/^void algorithm_process_afterthought(algorithm *self)$/;"	f
+algorithm_replace_vars_in_cmd	algorithm.c	/^void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd)$/;"	f
+algorithm_setvol	algorithm.c	/^void algorithm_setvol(void *self, double v)$/;"	f
+algorithm_status	algorithm.c	/^void algorithm_status(void *self, wchar_t *status_string)$/;"	f
+amp_mod_range	synthfunctions.h	/^    double amp_mod_range;$/;"	m	struct:__anon30
+amplitude	synthfunctions.h	/^    double amplitude;           \/\/ 0->1 from GUI$/;"	m	struct:__anon26
+amplitude_a	synthfunctions.h	/^    double amplitude_a;$/;"	m	struct:__anon30
+amplitude_b	synthfunctions.h	/^    double amplitude_b;$/;"	m	struct:__anon30
+amplitude_c	synthfunctions.h	/^    double amplitude_c;$/;"	m	struct:__anon30
+amplitude_d	synthfunctions.h	/^    double amplitude_d;$/;"	m	struct:__anon30
+amplitude_db	synthfunctions.h	/^    double amplitude_db; \/\/ the user's control setting in dB$/;"	m	struct:__anon29
+attack_time_msec	synthfunctions.h	/^    double attack_time_msec;  \/\/ att: is a time duration$/;"	m	struct:__anon28
+aux_control	synthfunctions.h	/^    double aux_control;$/;"	m	struct:__anon27
+beatrepeat	beatrepeat.h	/^typedef struct beatrepeat {$/;"	s
+beatrepeat	beatrepeat.h	/^} beatrepeat;$/;"	t	typeref:struct:beatrepeat
+beatrepeat_change_num_beats_to_repeat	beatrepeat.c	/^void beatrepeat_change_num_beats_to_repeat(beatrepeat *br, int num_beats)$/;"	f
+beatrepeat_change_selected_sixteenth	beatrepeat.c	/^void beatrepeat_change_selected_sixteenth(beatrepeat *br, int selected)$/;"	f
+beatrepeat_gennext	beatrepeat.c	/^double beatrepeat_gennext(beatrepeat *b, double inval)$/;"	f
+bits	effect.h	/^    int bits;$/;"	m	struct:__anon9
+bitwize_gennext	bitwize.c	/^double bitwize_gennext(void *self)$/;"	f
+bitwize_getvol	bitwize.c	/^double bitwize_getvol(void *self)$/;"	f
+bitwize_process	bitwize.c	/^char bitwize_process(int pattern, int t)$/;"	f
+bitwize_setvol	bitwize.c	/^void bitwize_setvol(void *self, double v)$/;"	f
+bitwize_status	bitwize.c	/^void bitwize_status(void *self, wchar_t *status_string)$/;"	f
+bpm	mixer.h	/^    int bpm;$/;"	m	struct:t_mixer
+buf_length	effect.h	/^    int buf_length;$/;"	m	struct:__anon9
+buf_num_channels	drumr.h	/^    int buf_num_channels;$/;"	m	struct:t_drumr
+buf_p	effect.h	/^    int buf_p;$/;"	m	struct:__anon9
+buf_read_idx	effect.h	/^    int buf_read_idx;$/;"	m	struct:__anon9
+buf_write_idx	effect.h	/^    int buf_write_idx;$/;"	m	struct:__anon9
+buffer	drumr.h	/^    int *buffer;$/;"	m	struct:t_drumr
+buffer	effect.h	/^    double *buffer;$/;"	m	struct:__anon9
+bufsize	drumr.h	/^    int bufsize;$/;"	m	struct:t_drumr
+build_euclidean_pattern_int	drumr_utils.c	/^void build_euclidean_pattern_int(int level, int *bitmap_int,$/;"	f
+bytebeat	bytebeatrrr.h	/^typedef struct bytebeat {$/;"	s
+bytebeat	bytebeatrrr.h	/^} bytebeat;$/;"	t	typeref:struct:bytebeat
+bytes_gen_next	bytebeatrrr.c	/^double bytes_gen_next(void *self)$/;"	f
+bytes_setvol	bytebeatrrr.c	/^void bytes_setvol(void *self, double v)$/;"	f
+bytes_status	bytebeatrrr.c	/^void bytes_status(void *self, wchar_t *status_string)$/;"	f
+calculate_pan_values	utils.c	/^void calculate_pan_values(double pan_total, double *pan_left, double *pan_right)$/;"	f
+car_osc	sbmsg.h	/^    char car_osc[10];$/;"	m	struct:sbmsg
+carfreq	sbmsg.h	/^    int carfreq;$/;"	m	struct:sbmsg
+cents	synthfunctions.h	/^    int cents;                  \/\/ cents tweak$/;"	m	struct:__anon26
+ch_midi_lookup	utils.c	/^int ch_midi_lookup(int ch, void *p)$/;"	f
+chance_of_interruption	chaosmonkey.h	/^    int chance_of_interruption; \/\/ percent likelihood$/;"	m	struct:chaosmonkey
+change_char_pattern	drumr.c	/^void change_char_pattern(DRUM *d, int pattern_num, char *pattern)$/;"	f
+change_int_pattern	drumr.c	/^void change_int_pattern(DRUM *d, int pattern_num, int pattern)$/;"	f
+channels	drumr.h	/^    int channels;$/;"	m	struct:t_drumr
+channels	sampler.h	/^    int channels;$/;"	m	struct:file_sample
+chaosmonkey	chaosmonkey.h	/^typedef struct chaosmonkey {$/;"	s
+chaosmonkey	chaosmonkey.h	/^} chaosmonkey;$/;"	t	typeref:struct:chaosmonkey
+chaosmonkey_action_mode	chaosmonkey.c	/^void chaosmonkey_action_mode(chaosmonkey *cm, bool val)$/;"	f
+chaosmonkey_change_chance_interrupt	chaosmonkey.c	/^void chaosmonkey_change_chance_interrupt(chaosmonkey *cm, int percent)$/;"	f
+chaosmonkey_change_wakeup_freq	chaosmonkey.c	/^void chaosmonkey_change_wakeup_freq(chaosmonkey *cm, int num_seconds)$/;"	f
+chaosmonkey_gen_next	chaosmonkey.c	/^double chaosmonkey_gen_next(void *self)$/;"	f
+chaosmonkey_setvol	chaosmonkey.c	/^void chaosmonkey_setvol(void *self, double v)$/;"	f
+chaosmonkey_status	chaosmonkey.c	/^void chaosmonkey_status(void *self, wchar_t *status_string)$/;"	f
+chaosmonkey_suggest_mode	chaosmonkey.c	/^void chaosmonkey_suggest_mode(chaosmonkey *cm, bool val)$/;"	f
+char_array_to_seq_string_pattern	cmdloop.c	/^void char_array_to_seq_string_pattern(char *dest_pattern,$/;"	f
+char_array_to_string_sequence	cmdloop.c	/^void char_array_to_string_sequence(char *dest_pattern,$/;"	f
+char_binary_version_of_int	drumr_utils.c	/^void char_binary_version_of_int(int num, char bin_num[17])$/;"	f
+check_destination_layer	modmatrix.c	/^bool check_destination_layer(unsigned layer, matrixrow *row)$/;"	f
+check_wrap_index	utils.c	/^void check_wrap_index(double *index)$/;"	f
+chordie	utils.c	/^void chordie(char *n)$/;"	f
+ck_gennext	filter_ckthreefive.c	/^double ck_gennext(filter *f, double xn)$/;"	f
+ck_reset	filter_ckthreefive.c	/^void ck_reset(filter *f)$/;"	f
+ck_set_qcontrol	filter_ckthreefive.c	/^void ck_set_qcontrol(filter *f, double qcontrol)$/;"	f
+ck_update	filter_ckthreefive.c	/^void ck_update(filter *f)$/;"	f
+clear_matrix_core	modmatrix.c	/^void clear_matrix_core(modmatrix *self)$/;"	f
+cmd	sbmsg.h	/^    char cmd[20];$/;"	m	struct:sbmsg
+cnt	effect.h	/^    double rate, cnt;$/;"	m	struct:__anon9
+coef	effect.h	/^    double coef;$/;"	m	struct:__anon9
+command	algorithm.h	/^    char command[MAX_CMD_LEN];$/;"	m	struct:algorithm
+concave_inverted_transform	utils.c	/^double concave_inverted_transform(double value)$/;"	f
+concave_transform	utils.c	/^double concave_transform(double value)$/;"	f
+conv_bitz	utils.c	/^int conv_bitz(int num)$/;"	f
+convex_inverted_transform	utils.c	/^double convex_inverted_transform(double value)$/;"	f
+convex_transform	utils.c	/^double convex_transform(double value)$/;"	f
+costh	effect.h	/^    double costh;$/;"	m	struct:__anon9
+create_euclidean_rhythm	drumr_utils.c	/^int create_euclidean_rhythm(int num_beats, int len_pattern)$/;"	f
+create_matrix_core	modmatrix.c	/^void create_matrix_core(modmatrix *self)$/;"	f
+create_matrix_row	modmatrix.c	/^matrixrow *create_matrix_row(unsigned src, unsigned dest, double *intensity,$/;"	f
+cur_melody	minisynth.h	/^    int cur_melody;$/;"	m	struct:minisynth
+cur_melody_iteration	minisynth.h	/^    int cur_melody_iteration;$/;"	m	struct:minisynth
+cur_octave	minisynth.h	/^    int cur_octave;$/;"	m	struct:minisynth
+cur_pattern	drumr.h	/^    int cur_pattern;$/;"	m	struct:t_drumr
+cur_pattern_iteration	drumr.h	/^    int cur_pattern_iteration;$/;"	m	struct:t_drumr
+cur_sample	mixer.h	/^    int cur_sample; \/\/ inverse of SAMPLE RATE$/;"	m	struct:t_mixer
+cur_sample	sampler.h	/^    int cur_sample;$/;"	m	struct:t_sampler
+cur_sample_iteration	sampler.h	/^    int cur_sample_iteration;$/;"	m	struct:t_sampler
+curpos	envelope.h	/^    double curpos;$/;"	m	struct:envelope_stream
+custom_event_type	midimaaan.h	/^typedef enum { OCTAVE_CHANGE } custom_event_type;$/;"	t	typeref:enum:__anon13
+dBLEPTable	lookuptables.h	/^const double dBLEPTable[4096] = {$/;"	v
+dBLEPTable_8_BLK	lookuptables.h	/^const double dBLEPTable_8_BLK[4096] = {$/;"	v
+dBLEPTable_8_BLKHAR	lookuptables.h	/^const double dBLEPTable_8_BLKHAR[4096] = {$/;"	v
+dBLEPTable_8_HAMM	lookuptables.h	/^const double dBLEPTable_8_HAMM[4096] = {$/;"	v
+dBLEPTable_8_HANN	lookuptables.h	/^const double dBLEPTable_8_HANN[4096] = {$/;"	v
+dBLEPTable_8_RECT	lookuptables.h	/^const double dBLEPTable_8_RECT[4096] = {$/;"	v
+dBLEPTable_8_TRI	lookuptables.h	/^const double dBLEPTable_8_TRI[4096] = {$/;"	v
+dBLEPTable_8_WELCH	lookuptables.h	/^const double dBLEPTable_8_WELCH[4096] = {$/;"	v
+data1	midimaaan.h	/^    unsigned data1;$/;"	m	struct:midi_event
+data2	midimaaan.h	/^    unsigned data2;$/;"	m	struct:midi_event
+dca	dca.h	/^typedef struct dca {$/;"	s
+dca	dca.h	/^} dca;$/;"	t	typeref:struct:dca
+dca_gennext	dca.c	/^void dca_gennext(dca *self, double left_input, double right_input,$/;"	f
+dca_init_global_parameters	dca.c	/^void dca_init_global_parameters(dca *self, global_dca_params *params)$/;"	f
+dca_initialize	dca.c	/^void dca_initialize(dca *d)$/;"	f
+dca_params	synthfunctions.h	/^    global_dca_params dca_params;$/;"	m	struct:__anon31
+dca_reset	dca.c	/^void dca_reset(dca *self)$/;"	f
+dca_set_amp_mod_db	dca.c	/^void dca_set_amp_mod_db(dca *self, double mod) { self->m_amp_mod_db = mod; }$/;"	f
+dca_set_amplitude_db	dca.c	/^void dca_set_amplitude_db(dca *self, double amp)$/;"	f
+dca_set_eg_mod	dca.c	/^void dca_set_eg_mod(dca *self, double mod) { self->m_eg_mod = mod; }$/;"	f
+dca_set_midi_velocity	dca.c	/^void dca_set_midi_velocity(dca *self, unsigned int vel)$/;"	f
+dca_set_pan_control	dca.c	/^void dca_set_pan_control(dca *self, double pan) { self->m_pan_control = pan; }$/;"	f
+dca_set_pan_mod	dca.c	/^void dca_set_pan_mod(dca *self, double mod) { self->m_pan_mod = mod; }$/;"	f
+dca_update	dca.c	/^void dca_update(dca *self)$/;"	f
+decay_time_msec	synthfunctions.h	/^    double decay_time_msec;   \/\/ dcy: is a time to decay 1->0$/;"	m	struct:__anon28
+delay	effect.h	/^    stereodelay *delay;$/;"	m	struct:__anon9
+delay	mixer.h	/^    float delay[(int)SAMPLE_RATE \/ 8];$/;"	m	struct:__anon16
+delay_mode	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG } delay_mode;$/;"	t	typeref:enum:__anon25
+delay_on	mixer.h	/^    int delay_on;$/;"	m	struct:t_mixer
+delay_p	mixer.h	/^    int delay_p;$/;"	m	struct:__anon16
+delay_prepare_for_play	stereodelay.c	/^void delay_prepare_for_play(stereodelay *d)$/;"	f
+delay_process_audio	stereodelay.c	/^bool delay_process_audio(stereodelay *d, double *input_left,$/;"	f
+delay_reset	stereodelay.c	/^void delay_reset(stereodelay *d)$/;"	f
+delay_set_delay_ratio	stereodelay.c	/^void delay_set_delay_ratio(stereodelay *d, double delay_ratio)$/;"	f
+delay_set_delay_time_ms	stereodelay.c	/^void delay_set_delay_time_ms(stereodelay *d, double delay_ms)$/;"	f
+delay_set_feedback_percent	stereodelay.c	/^void delay_set_feedback_percent(stereodelay *d, double feedback_percent)$/;"	f
+delay_set_mode	stereodelay.c	/^void delay_set_mode(stereodelay *d, unsigned mode) { d->m_mode = mode; }$/;"	f
+delay_set_wet_mix	stereodelay.c	/^void delay_set_wet_mix(stereodelay *d, double wet_mix)$/;"	f
+delay_toggle	mixer.c	/^void delay_toggle(mixer *mixr)$/;"	f
+delay_update	stereodelay.c	/^void delay_update(stereodelay *d)$/;"	f
+delayline	delayline.h	/^typedef struct delayline {$/;"	s
+delayline	delayline.h	/^} delayline;$/;"	t	typeref:struct:delayline
+delayline_cook_variables	delayline.c	/^void delayline_cook_variables(delayline *dl)$/;"	f
+delayline_init	delayline.c	/^void delayline_init(delayline *dl, int delay_length)$/;"	f
+delayline_process_audio	delayline.c	/^bool delayline_process_audio(delayline *dl, double *input, double *output)$/;"	f
+delayline_read_delay	delayline.c	/^double delayline_read_delay(delayline *dl)$/;"	f
+delayline_read_delay_at	delayline.c	/^double delayline_read_delay_at(delayline *dl, double ms)$/;"	f
+delayline_reset	delayline.c	/^void delayline_reset(delayline *dl)$/;"	f
+delayline_set_delay_ms	delayline.c	/^void delayline_set_delay_ms(delayline *dl, double delay_ms)$/;"	f
+delayline_write_delay_and_inc	delayline.c	/^void delayline_write_delay_and_inc(delayline *dl, double delay_input)$/;"	f
+delete_after_use	midimaaan.h	/^    bool delete_after_use;$/;"	m	struct:midi_event
+delete_matrix_core	modmatrix.c	/^void delete_matrix_core(modmatrix *self)$/;"	f
+direction	defjams.h	/^typedef enum { UP, DOWN } direction;$/;"	t	typeref:enum:__anon3
+do_blep_n	utils.c	/^double do_blep_n(const double *blep_table, double table_len, double modulo,$/;"	f
+do_modulation_matrix	modmatrix.c	/^void do_modulation_matrix(modmatrix *self, unsigned layer)$/;"	f
+do_oscillate	oscillator.h	/^    double (*do_oscillate)(oscillator *self, double *aux_output);$/;"	m	struct:oscillator
+do_pn_sequence	utils.c	/^double do_pn_sequence(unsigned *pn_register)$/;"	f
+do_white_noise	utils.c	/^double do_white_noise()$/;"	f
+drum_gennext	drumr.c	/^double drum_gennext(void *self)$/;"	f
+drum_getvol	drumr.c	/^double drum_getvol(void *self)$/;"	f
+drum_set_random_sample_amp	drumr.c	/^void drum_set_random_sample_amp(DRUM *d, int pattern_num)$/;"	f
+drum_set_sample_amp	drumr.c	/^void drum_set_sample_amp(DRUM *d, int pattern_num, int pattern_position,$/;"	f
+drum_set_sample_amp_from_char_pattern	drumr.c	/^void drum_set_sample_amp_from_char_pattern(DRUM *d, int pattern_num,$/;"	f
+drum_setvol	drumr.c	/^void drum_setvol(void *self, double v)$/;"	f
+drum_status	drumr.c	/^void drum_status(void *self, wchar_t *status_string)$/;"	f
+drumr_change_num_loops	drumr.c	/^void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops)$/;"	f
+drumr_set_multi_pattern_mode	drumr.c	/^void drumr_set_multi_pattern_mode(DRUM *d, bool multimode)$/;"	f
+dsaw	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+duck_runrrr	utils.c	/^void *duck_runrrr(void *arg)$/;"	f
+effect	beatrepeat.h	/^    EFFECT effect;$/;"	m	struct:beatrepeat
+effect_type	effect.h	/^} effect_type;$/;"	t	typeref:enum:__anon8
+effector	sound_generator.c	/^float effector(SOUNDGEN *self, float val)$/;"	f
+effects	mixer.h	/^    EFFECT **effects;$/;"	m	struct:t_mixer
+effects	sound_generator.h	/^    EFFECT **effects;$/;"	m	struct:t_soundgen
+effects_num	mixer.h	/^    int effects_num;$/;"	m	struct:t_mixer
+effects_num	sound_generator.h	/^    int effects_num;  \/\/ num of effects$/;"	m	struct:t_soundgen
+effects_on	sound_generator.h	/^    int effects_on; \/\/ bool$/;"	m	struct:t_soundgen
+effects_size	mixer.h	/^    int effects_size;$/;"	m	struct:t_mixer
+effects_size	sound_generator.h	/^    int effects_size; \/\/ size of array$/;"	m	struct:t_soundgen
+eg1_dca_amp_mod_intensity	synthfunctions.h	/^    double eg1_dca_amp_mod_intensity;$/;"	m	struct:__anon30
+eg1_filter1_mod_intensity	synthfunctions.h	/^    double eg1_filter1_mod_intensity;$/;"	m	struct:__anon30
+eg1_filter2_mod_intensity	synthfunctions.h	/^    double eg1_filter2_mod_intensity;$/;"	m	struct:__anon30
+eg1_osc_mod_intensity	synthfunctions.h	/^    double eg1_osc_mod_intensity;$/;"	m	struct:__anon30
+eg1_params	synthfunctions.h	/^    global_eg_params eg1_params;$/;"	m	struct:__anon31
+eg2_dca_amp_mod_intensity	synthfunctions.h	/^    double eg2_dca_amp_mod_intensity;$/;"	m	struct:__anon30
+eg2_filter1_mod_intensity	synthfunctions.h	/^    double eg2_filter1_mod_intensity;$/;"	m	struct:__anon30
+eg2_filter2_mod_intensity	synthfunctions.h	/^    double eg2_filter2_mod_intensity;$/;"	m	struct:__anon30
+eg2_osc_mod_intensity	synthfunctions.h	/^    double eg2_osc_mod_intensity;$/;"	m	struct:__anon30
+eg2_params	synthfunctions.h	/^    global_eg_params eg2_params;$/;"	m	struct:__anon31
+eg3_dca_amp_mod_intensity	synthfunctions.h	/^    double eg3_dca_amp_mod_intensity;$/;"	m	struct:__anon30
+eg3_filter1_mod_intensity	synthfunctions.h	/^    double eg3_filter1_mod_intensity;$/;"	m	struct:__anon30
+eg3_filter2_mod_intensity	synthfunctions.h	/^    double eg3_filter2_mod_intensity;$/;"	m	struct:__anon30
+eg3_osc_mod_intensity	synthfunctions.h	/^    double eg3_osc_mod_intensity;$/;"	m	struct:__anon30
+eg3_params	synthfunctions.h	/^    global_eg_params eg3_params;$/;"	m	struct:__anon31
+eg4_dca_amp_mod_intensity	synthfunctions.h	/^    double eg4_dca_amp_mod_intensity;$/;"	m	struct:__anon30
+eg4_filter1_mod_intensity	synthfunctions.h	/^    double eg4_filter1_mod_intensity;$/;"	m	struct:__anon30
+eg4_filter2_mod_intensity	synthfunctions.h	/^    double eg4_filter2_mod_intensity;$/;"	m	struct:__anon30
+eg4_osc_mod_intensity	synthfunctions.h	/^    double eg4_osc_mod_intensity;$/;"	m	struct:__anon30
+eg4_params	synthfunctions.h	/^    global_eg_params eg4_params;$/;"	m	struct:__anon31
+eg_calculate_attack_time	envelope_generator.c	/^void eg_calculate_attack_time(envelope_generator *self)$/;"	f
+eg_calculate_decay_time	envelope_generator.c	/^void eg_calculate_decay_time(envelope_generator *self)$/;"	f
+eg_calculate_release_time	envelope_generator.c	/^void eg_calculate_release_time(envelope_generator *self)$/;"	f
+eg_can_note_off	envelope_generator.c	/^bool eg_can_note_off(envelope_generator *self)$/;"	f
+eg_do_envelope	envelope_generator.c	/^double eg_do_envelope(envelope_generator *self, double *p_biased_output)$/;"	f
+eg_get_state	envelope_generator.c	/^state eg_get_state(envelope_generator *self) { return self->m_state; }$/;"	f
+eg_init_global_parameters	envelope_generator.c	/^void eg_init_global_parameters(envelope_generator *self,$/;"	f
+eg_is_active	envelope_generator.c	/^bool eg_is_active(envelope_generator *self)$/;"	f
+eg_mode	envelope_generator.h	/^typedef enum { ANALOG, DIGITAL } eg_mode;$/;"	t	typeref:enum:__anon10
+eg_note_off	envelope_generator.c	/^void eg_note_off(envelope_generator *self)$/;"	f
+eg_release	envelope_generator.c	/^void eg_release(envelope_generator *self)$/;"	f
+eg_reset	envelope_generator.c	/^void eg_reset(envelope_generator *self)$/;"	f
+eg_set_attack_time_msec	envelope_generator.c	/^void eg_set_attack_time_msec(envelope_generator *self, double time)$/;"	f
+eg_set_decay_time_msec	envelope_generator.c	/^void eg_set_decay_time_msec(envelope_generator *self, double time)$/;"	f
+eg_set_eg_mode	envelope_generator.c	/^void eg_set_eg_mode(envelope_generator *self, eg_mode mode)$/;"	f
+eg_set_release_time_msec	envelope_generator.c	/^void eg_set_release_time_msec(envelope_generator *self, double time)$/;"	f
+eg_set_sustain_level	envelope_generator.c	/^void eg_set_sustain_level(envelope_generator *self, double level)$/;"	f
+eg_set_sustain_override	envelope_generator.c	/^void eg_set_sustain_override(envelope_generator *self, bool b)$/;"	f
+eg_shutdown	envelope_generator.c	/^void eg_shutdown(envelope_generator *self)$/;"	f
+eg_start_eg	envelope_generator.c	/^void eg_start_eg(envelope_generator *self)$/;"	f
+eg_stop_eg	envelope_generator.c	/^void eg_stop_eg(envelope_generator *self) { self->m_state = OFFF; }$/;"	f
+eg_update	envelope_generator.c	/^void eg_update(envelope_generator *self)$/;"	f
+enable_matrix_row	modmatrix.c	/^bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,$/;"	f
+env_var	mixer.h	/^} env_var;$/;"	t	typeref:struct:environment_variable
+env_var_count	mixer.h	/^    int env_var_count;$/;"	m	struct:t_mixer
+envelope	envelope.h	/^typedef struct envelope {$/;"	s
+envelope_generator	envelope_generator.h	/^typedef struct envelope_generator {$/;"	s
+envelope_generator	envelope_generator.h	/^} envelope_generator;$/;"	t	typeref:struct:envelope_generator
+envelope_generator_init	envelope_generator.c	/^void envelope_generator_init(envelope_generator *eg)$/;"	f
+envelope_stream	envelope.h	/^typedef struct envelope_stream {$/;"	s
+envelope_stream_tick	envelope.c	/^double envelope_stream_tick(ENVSTREAM *stream)$/;"	f
+envelopes	sound_generator.h	/^    ENVSTREAM **envelopes;$/;"	m	struct:t_soundgen
+envelopes_enabled	sound_generator.h	/^    int envelopes_enabled; \/\/ bool$/;"	m	struct:t_soundgen
+envelopes_num	sound_generator.h	/^    int envelopes_num;  \/\/ num of effects$/;"	m	struct:t_soundgen
+envelopes_size	sound_generator.h	/^    int envelopes_size; \/\/ size of array$/;"	m	struct:t_soundgen
+envelopor	sound_generator.c	/^float envelopor(SOUNDGEN *self, float val)$/;"	f
+environment	mixer.h	/^    env_var environment[ENVIRONMENT_ARRAY_SIZE];$/;"	m	struct:t_mixer
+environment_variable	mixer.h	/^typedef struct environment_variable {$/;"	s
+event_type	midimaaan.h	/^    unsigned event_type;$/;"	m	struct:midi_event
+expo	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+extract_cmds_from_line	algorithm.c	/^int extract_cmds_from_line(algorithm *self, char *line)$/;"	f
+exxit	cmdloop.c	/^int exxit()$/;"	f
+f	filter_ckthreefive.h	/^    filter f; \/\/ base class$/;"	m	struct:filter_ckthreefive
+f	filter_moogladder.h	/^    filter f; \/\/ base class$/;"	m	struct:filter_moogladder
+f	filter_onepole.h	/^    filter f; \/\/ base class$/;"	m	struct:filter_onepole
+f	filter_sem.h	/^    filter f; \/\/ base class$/;"	m	struct:filter_sem
+fadedown_runrrr	utils.c	/^void *fadedown_runrrr(void *arg)$/;"	f
+faderrr	utils.c	/^void faderrr(int sg_num, direction d)$/;"	f
+fadeup_runrrr	utils.c	/^void *fadeup_runrrr(void *arg)$/;"	f
+fastlog2	utils.c	/^float fastlog2(float x)$/;"	f
+fasttan	utils.c	/^float fasttan(float x)$/;"	f
+fasttanh	utils.c	/^float fasttanh(float p) { return p \/ (fabs(2 * p) + 3 \/ (2 + 2 * p * 2 * p)); }$/;"	f
+fc_control	synthfunctions.h	/^    double fc_control;$/;"	m	struct:__anon27
+file_sample	sampler.h	/^typedef struct file_sample {$/;"	s
+file_sample	sampler.h	/^} file_sample;$/;"	t	typeref:struct:file_sample
+filename	drumr.h	/^    char *filename;$/;"	m	struct:t_drumr
+filename	sampler.h	/^    char *filename;$/;"	m	struct:file_sample
+filename	sbmsg.h	/^    char filename[100];$/;"	m	struct:sbmsg
+filter	filter.h	/^struct filter {$/;"	s
+filter	filter.h	/^typedef struct filter filter;$/;"	t	typeref:struct:filter
+filter1_params	synthfunctions.h	/^    global_filter_params filter1_params;$/;"	m	struct:__anon31
+filter2_params	synthfunctions.h	/^    global_filter_params filter2_params;$/;"	m	struct:__anon31
+filter_ck35	filter_ckthreefive.h	/^typedef struct filter_ckthreefive filter_ck35;$/;"	t	typeref:struct:filter_ckthreefive
+filter_ckthreefive	filter_ckthreefive.h	/^struct filter_ckthreefive {$/;"	s
+filter_init_global_parameters	filter.c	/^void filter_init_global_parameters(filter *self, global_filter_params *params)$/;"	f
+filter_keytrack_intensity	synthfunctions.h	/^    double filter_keytrack_intensity;$/;"	m	struct:__anon30
+filter_mod_range	synthfunctions.h	/^    double filter_mod_range;$/;"	m	struct:__anon30
+filter_moog	filter_moogladder.h	/^typedef struct filter_moogladder filter_moog;$/;"	t	typeref:struct:filter_moogladder
+filter_moog_init	filter_moogladder.c	/^void filter_moog_init(filter_moog *moog)$/;"	f
+filter_moogladder	filter_moogladder.h	/^typedef struct filter_moogladder {$/;"	s
+filter_moogladder	filter_moogladder.h	/^} filter_moogladder;$/;"	t	typeref:struct:filter_moogladder
+filter_onepole	filter_onepole.h	/^typedef struct filter_onepole {$/;"	s
+filter_onepole	filter_onepole.h	/^} filter_onepole;$/;"	t	typeref:struct:filter_onepole
+filter_reset	filter.c	/^void filter_reset(filter *f)$/;"	f
+filter_sem	filter_sem.h	/^struct filter_sem {$/;"	s
+filter_sem	filter_sem.h	/^typedef struct filter_sem filter_sem;$/;"	t	typeref:struct:filter_sem
+filter_set_fc_mod	filter.c	/^void filter_set_fc_mod(filter *f, double val) { f->m_fc_mod = val; }$/;"	f
+filter_set_q_control	filter.c	/^void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }$/;"	f
+filter_setup	filter.c	/^void filter_setup(filter *f)$/;"	f
+filter_type	filter.h	/^} filter_type;$/;"	t	typeref:enum:__anon12
+filter_type	synthfunctions.h	/^    unsigned int filter_type;$/;"	m	struct:__anon27
+filter_update	filter.c	/^void filter_update(filter *f)$/;"	f
+fo_ratio	synthfunctions.h	/^    double fo_ratio;$/;"	m	struct:__anon26
+freaks	utils.h	/^    double *freaks;$/;"	m	struct:freaky
+freaky	utils.h	/^typedef struct freaky {$/;"	s
+freaky	utils.h	/^} freaky;$/;"	t	typeref:struct:freaky
+free_stream	envelope.c	/^void free_stream(ENVSTREAM *stream)$/;"	f
+freq	sbmsg.h	/^    int freq;$/;"	m	struct:sbmsg
+frequency	algorithm.h	/^    unsigned int frequency;$/;"	m	struct:algorithm
+frequency	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	t	typeref:enum:__anon1
+frequency_of_wakeup	chaosmonkey.h	/^    int frequency_of_wakeup;    \/\/ seconds$/;"	m	struct:chaosmonkey
+freqval	utils.c	/^float freqval(char *n)$/;"	f
+game_generation	drumr.h	/^    int game_generation;$/;"	m	struct:t_drumr
+game_of_life_on	drumr.h	/^    bool game_of_life_on;$/;"	m	struct:t_drumr
+gen_next	mixer.c	/^double gen_next(mixer *mixr)$/;"	f
+gennext	filter.h	/^    double (*gennext)(filter *self, double xn); \/\/ do_filter$/;"	m	struct:filter
+gennext	sound_generator.h	/^    double (*gennext)(void *self);$/;"	m	struct:t_soundgen
+get_environment_val	mixer.c	/^int get_environment_val(char *key, int *return_val)$/;"	f
+get_matrix_core	modmatrix.c	/^matrixrow **get_matrix_core(modmatrix *self) { return self->m_matrix_core; }$/;"	f
+get_matrix_size	modmatrix.c	/^int get_matrix_size(modmatrix *self)$/;"	f
+get_midi_freq	midi_freq_table.c	/^float get_midi_freq(int midinum) { return midi_freq_table[midinum]; }$/;"	f
+getvol	sound_generator.h	/^    double (*getvol)(void *self);$/;"	m	struct:t_soundgen
+global_dca_params	synthfunctions.h	/^} global_dca_params;$/;"	t	typeref:struct:__anon29
+global_eg_params	synthfunctions.h	/^} global_eg_params;$/;"	t	typeref:struct:__anon28
+global_filter_params	synthfunctions.h	/^} global_filter_params;$/;"	t	typeref:struct:__anon27
+global_oscillator_params	synthfunctions.h	/^} global_oscillator_params;$/;"	t	typeref:struct:__anon26
+global_synth_params	synthfunctions.h	/^} global_synth_params;$/;"	t	typeref:struct:__anon31
+global_voice_params	synthfunctions.h	/^} global_voice_params;$/;"	t	typeref:struct:__anon30
+has_started	algorithm.h	/^    bool has_started;$/;"	m	struct:algorithm
+height	envelope.h	/^    double height;$/;"	m	struct:envelope_stream
+hs_ratio	synthfunctions.h	/^    double hs_ratio; \/\/ hard sync$/;"	m	struct:__anon30
+ileft	envelope.h	/^    unsigned long ileft, iright;$/;"	m	struct:envelope_stream
+incr	bitwize.h	/^    double incr;$/;"	m	struct:t_bitwize
+incr	envelope.h	/^    double incr;$/;"	m	struct:envelope_stream
+int_pattern_to_array	drumr.c	/^void int_pattern_to_array(int pattern, int *pat_array)$/;"	f
+int_to_matrix	drumr.c	/^void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])$/;"	f
+interpret	cmdloop.c	/^void interpret(char *line)$/;"	f
+iright	envelope.h	/^    unsigned long ileft, iright;$/;"	m	struct:envelope_stream
+is_valid_drum_pattern_num	cmdloop.c	/^bool is_valid_drum_pattern_num(DRUM *d, int pattern_num)$/;"	f
+is_valid_file	cmdloop.c	/^bool is_valid_file(char *filename)$/;"	f
+is_valid_fx_num	cmdloop.c	/^bool is_valid_fx_num(int soundgen_num, int fx_num)$/;"	f
+is_valid_melody_num	cmdloop.c	/^bool is_valid_melody_num(minisynth *ms, int melody_num)$/;"	f
+is_valid_osc	utils.c	/^int is_valid_osc(char *string)$/;"	f
+is_valid_sample_num	cmdloop.c	/^bool is_valid_sample_num(SAMPLER *s, int sample_num)$/;"	f
+is_valid_soundgen_num	cmdloop.c	/^bool is_valid_soundgen_num(int soundgen_num)$/;"	f
+itoa	utils.c	/^void itoa(int n, char s[])$/;"	f
+just_been_resampled	sampler.h	/^    bool just_been_resampled;$/;"	m	struct:t_sampler
+key	mixer.h	/^    char key[ENVIRONMENT_KEY_SIZE];$/;"	m	struct:environment_variable
+keyboard_octave	mixer.h	/^    int keyboard_octave;$/;"	m	struct:t_mixer
+keys	keys.c	/^void keys(int soundgen_num)$/;"	f
+left_phase	mixer.h	/^    float left_phase;$/;"	m	struct:__anon16
+leftpoint	envelope.h	/^    ENVELOPE leftpoint, rightpoint;$/;"	m	struct:envelope_stream
+legato_mode	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	t	typeref:enum:__anon5
+legato_mode	synthfunctions.h	/^    bool legato_mode;$/;"	m	struct:__anon28
+length	table.h	/^    unsigned long length;$/;"	m	struct:wtable
+lfo	lfo.h	/^struct lfo {$/;"	s
+lfo	lfo.h	/^typedef struct lfo lfo;$/;"	t	typeref:struct:lfo
+lfo1_dca_amp_mod_intensity	synthfunctions.h	/^    double lfo1_dca_amp_mod_intensity;$/;"	m	struct:__anon30
+lfo1_dca_pan_mod_intensity	synthfunctions.h	/^    double lfo1_dca_pan_mod_intensity;$/;"	m	struct:__anon30
+lfo1_filter1_mod_intensity	synthfunctions.h	/^    double lfo1_filter1_mod_intensity;$/;"	m	struct:__anon30
+lfo1_filter2_mod_intensity	synthfunctions.h	/^    double lfo1_filter2_mod_intensity;$/;"	m	struct:__anon30
+lfo1_hs_mod_intensity	synthfunctions.h	/^    double lfo1_hs_mod_intensity;$/;"	m	struct:__anon30
+lfo1_osc_mod_intensity	synthfunctions.h	/^    double lfo1_osc_mod_intensity;$/;"	m	struct:__anon30
+lfo1_params	synthfunctions.h	/^    global_oscillator_params lfo1_params;$/;"	m	struct:__anon31
+lfo2_dca_amp_mod_intensity	synthfunctions.h	/^    double lfo2_dca_amp_mod_intensity;$/;"	m	struct:__anon30
+lfo2_dca_pan_mod_intensity	synthfunctions.h	/^    double lfo2_dca_pan_mod_intensity;$/;"	m	struct:__anon30
+lfo2_filter1_mod_intensity	synthfunctions.h	/^    double lfo2_filter1_mod_intensity;$/;"	m	struct:__anon30
+lfo2_filter2_mod_intensity	synthfunctions.h	/^    double lfo2_filter2_mod_intensity;$/;"	m	struct:__anon30
+lfo2_hs_mod_intensity	synthfunctions.h	/^    double lfo2_hs_mod_intensity;$/;"	m	struct:__anon30
+lfo2_osc_mod_intensity	synthfunctions.h	/^    double lfo2_osc_mod_intensity;$/;"	m	struct:__anon30
+lfo2_params	synthfunctions.h	/^    global_oscillator_params lfo2_params;$/;"	m	struct:__anon31
+lfo_do_oscillate	lfo.c	/^double lfo_do_oscillate(oscillator *self, double *quad_phase_output)$/;"	f
+lfo_mode	synthfunctions.h	/^    unsigned int lfo_mode; \/\/ to store MODE$/;"	m	struct:__anon26
+lfo_new	lfo.c	/^lfo *lfo_new()$/;"	f
+lfo_reset_oscillator	lfo.c	/^void lfo_reset_oscillator(oscillator *self) { osc_reset(self); }$/;"	f
+lfo_set_soundgenerator_interface	lfo.c	/^void lfo_set_soundgenerator_interface(lfo *l)$/;"	f
+lfo_start_oscillator	lfo.c	/^void lfo_start_oscillator(oscillator *self)$/;"	f
+lfo_stop_oscillator	lfo.c	/^void lfo_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
+lin_terp	utils.c	/^float lin_terp(float x1, float x2, float y1, float y2, float x)$/;"	f
+list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
+load_file_to_buffer	drumr.c	/^int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)$/;"	f
+loop_Mode	synthfunctions.h	/^    unsigned int loop_Mode;$/;"	m	struct:__anon26
+loop_len	sampler.h	/^    int loop_len;$/;"	m	struct:file_sample
+loop_len_in_samples	mixer.h	/^    unsigned int loop_len_in_samples;$/;"	m	struct:t_mixer
+loop_len_in_ticks	mixer.h	/^    unsigned int loop_len_in_ticks;$/;"	m	struct:t_mixer
+looplen	sbmsg.h	/^    double looplen;$/;"	m	struct:sbmsg
+loopy	cmdloop.c	/^void loopy(void)$/;"	f
+m	effect.h	/^    long m;$/;"	m	struct:__anon9
+m_HPF1	filter_ckthreefive.h	/^    filter_onepole m_HPF1;$/;"	m	struct:filter_ckthreefive
+m_HPF2	filter_ckthreefive.h	/^    filter_onepole m_HPF2;$/;"	m	struct:filter_ckthreefive
+m_LPF1	filter_ckthreefive.h	/^    filter_onepole m_LPF1;$/;"	m	struct:filter_ckthreefive
+m_LPF1	filter_moogladder.h	/^    filter_onepole m_LPF1;$/;"	m	struct:filter_moogladder
+m_LPF2	filter_ckthreefive.h	/^    filter_onepole m_LPF2;$/;"	m	struct:filter_ckthreefive
+m_LPF2	filter_moogladder.h	/^    filter_onepole m_LPF2;$/;"	m	struct:filter_moogladder
+m_LPF3	filter_moogladder.h	/^    filter_onepole m_LPF3;$/;"	m	struct:filter_moogladder
+m_LPF4	filter_moogladder.h	/^    filter_onepole m_LPF4;$/;"	m	struct:filter_moogladder
+m_a	filter_moogladder.h	/^    double m_a;$/;"	m	struct:filter_moogladder
+m_a0	filter_onepole.h	/^    double m_a0;$/;"	m	struct:filter_onepole
+m_active	beatrepeat.h	/^    bool m_active;$/;"	m	struct:beatrepeat
+m_alpha	filter_onepole.h	/^    double m_alpha;$/;"	m	struct:filter_onepole
+m_alpha	filter_sem.h	/^    double m_alpha;$/;"	m	struct:filter_sem
+m_alpha0	filter_ckthreefive.h	/^    double m_alpha0;$/;"	m	struct:filter_ckthreefive
+m_alpha0	filter_sem.h	/^    double m_alpha0;$/;"	m	struct:filter_sem
+m_alpha_0	filter_moogladder.h	/^    double m_alpha_0;$/;"	m	struct:filter_moogladder
+m_amp_mod	oscillator.h	/^    double m_amp_mod; \/* output amplitude modulation for AM 0 to +1 (not dB)*\/$/;"	m	struct:oscillator
+m_amp_mod_db	dca.h	/^    double m_amp_mod_db;$/;"	m	struct:dca
+m_amplitude	oscillator.h	/^    double m_amplitude; \/\/ 0->1 from GUI$/;"	m	struct:oscillator
+m_amplitude_control	dca.h	/^    double m_amplitude_control;$/;"	m	struct:dca
+m_amplitude_db	dca.h	/^    double m_amplitude_db; \/\/ gui?$/;"	m	struct:dca
+m_attack_coeff	envelope_generator.h	/^    double m_attack_coeff;$/;"	m	struct:envelope_generator
+m_attack_offset	envelope_generator.h	/^    double m_attack_offset;$/;"	m	struct:envelope_generator
+m_attack_tco	envelope_generator.h	/^    double m_attack_tco;$/;"	m	struct:envelope_generator
+m_attack_time_msec	envelope_generator.h	/^    double m_attack_time_msec;$/;"	m	struct:envelope_generator
+m_attack_time_msec	minisynth.h	/^    double m_attack_time_msec;$/;"	m	struct:minisynth
+m_attack_time_scalar	envelope_generator.h	/^    double m_attack_time_scalar; \/\/ for velocity -> attack time mod$/;"	m	struct:envelope_generator
+m_aux_control	filter.h	/^    double m_aux_control; \/\/ a spare control, used in SEM and ladder filters$/;"	m	struct:filter
+m_b	filter_moogladder.h	/^    double m_b;$/;"	m	struct:filter_moogladder
+m_beta	filter_onepole.h	/^    double m_beta;$/;"	m	struct:filter_onepole
+m_buffer	beatrepeat.h	/^    double *m_buffer;$/;"	m	struct:beatrepeat
+m_buffer	delayline.h	/^    double *m_buffer;$/;"	m	struct:delayline
+m_buffer_position	beatrepeat.h	/^    size_t m_buffer_position;$/;"	m	struct:beatrepeat
+m_buffer_size	beatrepeat.h	/^    size_t m_buffer_size;$/;"	m	struct:beatrepeat
+m_buffer_size	delayline.h	/^    int m_buffer_size;$/;"	m	struct:delayline
+m_c	filter_moogladder.h	/^    double m_c;$/;"	m	struct:filter_moogladder
+m_cents	oscillator.h	/^    double m_cents;     \/\/ cents tweak$/;"	m	struct:oscillator
+m_current_table	wt_oscillator.h	/^    double *m_current_table;$/;"	m	struct:wt_oscillator
+m_current_table_index	wt_oscillator.h	/^    int m_current_table_index; \/\/ 0 - 9$/;"	m	struct:wt_oscillator
+m_d	filter_moogladder.h	/^    double m_d;$/;"	m	struct:filter_moogladder
+m_dca	voice.h	/^    dca m_dca;$/;"	m	struct:__anon32
+m_decay_coeff	envelope_generator.h	/^    double m_decay_coeff;$/;"	m	struct:envelope_generator
+m_decay_offset	envelope_generator.h	/^    double m_decay_offset;$/;"	m	struct:envelope_generator
+m_decay_release_time_msec	minisynth.h	/^    double m_decay_release_time_msec;$/;"	m	struct:minisynth
+m_decay_tco	envelope_generator.h	/^    double m_decay_tco;$/;"	m	struct:envelope_generator
+m_decay_time_msec	envelope_generator.h	/^    double m_decay_time_msec;$/;"	m	struct:envelope_generator
+m_decay_time_scalar	envelope_generator.h	/^    double m_decay_time_scalar;  \/\/ for note# -> decay time mod$/;"	m	struct:envelope_generator
+m_default_mod_intensity	voice.h	/^    double m_default_mod_intensity;$/;"	m	struct:__anon32
+m_default_mod_range	voice.h	/^    double m_default_mod_range;$/;"	m	struct:__anon32
+m_delay_in_samples	delayline.h	/^    double m_delay_in_samples;$/;"	m	struct:delayline
+m_delay_in_samples	effect.h	/^    int m_delay_in_samples;$/;"	m	struct:__anon9
+m_delay_ms	delayline.h	/^    double m_delay_ms;$/;"	m	struct:delayline
+m_delay_ms	effect.h	/^    double m_delay_ms;$/;"	m	struct:__anon9
+m_delay_ratio	minisynth.h	/^    double m_delay_ratio;$/;"	m	struct:minisynth
+m_delay_ratio	stereodelay.h	/^    double m_delay_ratio;$/;"	m	struct:stereodelay
+m_delay_time_ms	stereodelay.h	/^    double m_delay_time_ms;$/;"	m	struct:stereodelay
+m_delay_time_msec	minisynth.h	/^    double m_delay_time_msec;$/;"	m	struct:minisynth
+m_delaymode	minisynth.h	/^    unsigned int m_delaymode;$/;"	m	struct:minisynth
+m_delta	filter_onepole.h	/^    double m_delta;$/;"	m	struct:filter_onepole
+m_destination_index	modmatrix.h	/^    unsigned m_destination_index;$/;"	m	struct:__anon20
+m_destinations	modmatrix.h	/^    double m_destinations[MAX_DESTINATIONS];$/;"	m	struct:__anon21
+m_detune_cents	minisynth.h	/^    double m_detune_cents;$/;"	m	struct:minisynth
+m_dpw_square_modulator	oscillator.h	/^    double m_dpw_square_modulator; \/\/ square toggle$/;"	m	struct:oscillator
+m_dpw_z1	oscillator.h	/^    double m_dpw_z1;               \/\/ memory register for differentiator$/;"	m	struct:oscillator
+m_duration	effect.h	/^    double m_duration;$/;"	m	struct:__anon9
+m_e	filter_moogladder.h	/^    double m_e;$/;"	m	struct:filter_moogladder
+m_eg1	voice.h	/^    envelope_generator m_eg1;$/;"	m	struct:__anon32
+m_eg1_dca_intensity	minisynth.h	/^    double m_eg1_dca_intensity;$/;"	m	struct:minisynth
+m_eg1_filter_intensity	minisynth.h	/^    double m_eg1_filter_intensity;$/;"	m	struct:minisynth
+m_eg1_osc_intensity	minisynth.h	/^    double m_eg1_osc_intensity;$/;"	m	struct:minisynth
+m_eg2	voice.h	/^    envelope_generator m_eg2;$/;"	m	struct:__anon32
+m_eg3	voice.h	/^    envelope_generator m_eg3;$/;"	m	struct:__anon32
+m_eg4	voice.h	/^    envelope_generator m_eg4;$/;"	m	struct:__anon32
+m_eg_mod	dca.h	/^    double m_eg_mod;$/;"	m	struct:dca
+m_eg_mode	envelope_generator.h	/^    unsigned m_eg_mode; \/\/ enum above, analog or digital$/;"	m	struct:envelope_generator
+m_enable	modmatrix.h	/^    bool m_enable;$/;"	m	struct:__anon20
+m_envelope_output	envelope_generator.h	/^    double m_envelope_output;$/;"	m	struct:envelope_generator
+m_epsilon	filter_onepole.h	/^    double m_epsilon;$/;"	m	struct:filter_onepole
+m_fc	filter.h	/^    double m_fc;     \/\/ current filter cut-off val$/;"	m	struct:filter
+m_fc_control	filter.h	/^    double m_fc_control;  \/\/ filter cut-off$/;"	m	struct:filter
+m_fc_control	minisynth.h	/^    double m_fc_control;$/;"	m	struct:minisynth
+m_fc_mod	filter.h	/^    double m_fc_mod; \/\/ frequency cutoff modulation input$/;"	m	struct:filter
+m_feedback	filter_onepole.h	/^    double m_feedback;$/;"	m	struct:filter_onepole
+m_feedback_pct	minisynth.h	/^    double m_feedback_pct;$/;"	m	struct:minisynth
+m_feedback_percent	stereodelay.h	/^    double m_feedback_percent;$/;"	m	struct:stereodelay
+m_filter1	voice.h	/^    filter *m_filter1;$/;"	m	struct:__anon32
+m_filter2	voice.h	/^    filter *m_filter2;$/;"	m	struct:__anon32
+m_filter_keytrack	minisynth.h	/^    unsigned int m_filter_keytrack;$/;"	m	struct:minisynth
+m_filter_keytrack_intensity	minisynth.h	/^    double m_filter_keytrack_intensity;$/;"	m	struct:minisynth
+m_filter_type	filter.h	/^    unsigned m_filter_type;$/;"	m	struct:filter
+m_filter_type	filter_ckthreefive.h	/^    filter_type m_filter_type;$/;"	m	struct:filter_ckthreefive
+m_fo	oscillator.h	/^    double m_fo;          \/\/ current (actual) frequency of oscillator$/;"	m	struct:oscillator
+m_fo_mod	oscillator.h	/^    double m_fo_mod;         \/* modulation input -1 to +1 *\/$/;"	m	struct:oscillator
+m_fo_mod_lin	oscillator.h	/^    double m_fo_mod_lin; \/* FM modulation input -1 to +1 (not actually used in$/;"	m	struct:oscillator
+m_fo_ratio	oscillator.h	/^    double m_fo_ratio;  \/\/ FM Synth Modulator OR Hard Sync ratio$/;"	m	struct:oscillator
+m_gain	dca.h	/^    double m_gain;$/;"	m	struct:dca
+m_gamma	filter_moogladder.h	/^    double m_gamma;$/;"	m	struct:filter_moogladder
+m_gamma	filter_onepole.h	/^    double m_gamma;$/;"	m	struct:filter_onepole
+m_gate	beatrepeat.h	/^    unsigned int m_gate;$/;"	m	struct:beatrepeat
+m_global_dca_params	dca.h	/^    global_dca_params *m_global_dca_params;$/;"	m	struct:dca
+m_global_eg_params	envelope_generator.h	/^    global_eg_params *m_global_eg_params;$/;"	m	struct:envelope_generator
+m_global_filter_params	filter.h	/^    global_filter_params *m_global_filter_params;$/;"	m	struct:filter
+m_global_oscillator_params	oscillator.h	/^    global_oscillator_params *m_global_oscillator_params;$/;"	m	struct:oscillator
+m_global_synth_params	minisynth.h	/^    global_synth_params m_global_synth_params;$/;"	m	struct:minisynth
+m_global_synth_params	voice.h	/^    global_synth_params *m_global_synth_params;$/;"	m	struct:__anon32
+m_global_voice_params	voice.h	/^    global_voice_params *m_global_voice_params;$/;"	m	struct:__anon32
+m_grid	beatrepeat.h	/^    unsigned int m_grid;$/;"	m	struct:beatrepeat
+m_have_recording	beatrepeat.h	/^    bool m_have_recording;$/;"	m	struct:beatrepeat
+m_hs_ratio	voice.h	/^    double m_hs_ratio; \/\/ hard sync$/;"	m	struct:__anon32
+m_inc	oscillator.h	/^    double m_inc;    \/\/ phase inc = fo\/fs$/;"	m	struct:oscillator
+m_inc_shutdown	envelope_generator.h	/^    double m_inc_shutdown;$/;"	m	struct:envelope_generator
+m_interval	beatrepeat.h	/^    unsigned int m_interval;$/;"	m	struct:beatrepeat
+m_k	filter_ckthreefive.h	/^    double m_k;$/;"	m	struct:filter_ckthreefive
+m_k	filter_moogladder.h	/^    double m_k;$/;"	m	struct:filter_moogladder
+m_last_note_frequency	minisynth.h	/^    double m_last_note_frequency;$/;"	m	struct:minisynth
+m_left_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	struct:stereodelay
+m_legato_mode	envelope_generator.h	/^    bool m_legato_mode;$/;"	m	struct:envelope_generator
+m_legato_mode	minisynth.h	/^    unsigned int m_legato_mode;$/;"	m	struct:minisynth
+m_legato_mode	voice.h	/^    unsigned int m_legato_mode;$/;"	m	struct:__anon32
+m_lfo1	voice.h	/^    lfo m_lfo1;$/;"	m	struct:__anon32
+m_lfo1_amp_intensity	minisynth.h	/^    double m_lfo1_amp_intensity;$/;"	m	struct:minisynth
+m_lfo1_amplitude	minisynth.h	/^    double m_lfo1_amplitude;$/;"	m	struct:minisynth
+m_lfo1_filter_fc_intensity	minisynth.h	/^    double m_lfo1_filter_fc_intensity;$/;"	m	struct:minisynth
+m_lfo1_osc_pitch_intensity	minisynth.h	/^    double m_lfo1_osc_pitch_intensity;$/;"	m	struct:minisynth
+m_lfo1_pan_intensity	minisynth.h	/^    double m_lfo1_pan_intensity;$/;"	m	struct:minisynth
+m_lfo1_rate	minisynth.h	/^    double m_lfo1_rate;$/;"	m	struct:minisynth
+m_lfo1_waveform	minisynth.h	/^    unsigned int m_lfo1_waveform;$/;"	m	struct:minisynth
+m_lfo2	voice.h	/^    lfo m_lfo2;$/;"	m	struct:__anon32
+m_lfo_mode	oscillator.h	/^    unsigned m_lfo_mode; \/\/ to store MODE$/;"	m	struct:oscillator
+m_matrix_core	modmatrix.h	/^    matrixrow **m_matrix_core;$/;"	m	struct:__anon21
+m_midi_note_number	oscillator.h	/^    unsigned m_midi_note_number;$/;"	m	struct:oscillator
+m_midi_note_number	voice.h	/^    unsigned int m_midi_note_number;$/;"	m	struct:__anon32
+m_midi_note_number_pending	voice.h	/^    unsigned int m_midi_note_number_pending;$/;"	m	struct:__anon32
+m_midi_rx_channel	minisynth.h	/^    unsigned int m_midi_rx_channel;$/;"	m	struct:minisynth
+m_midi_velocity	dca.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:dca
+m_midi_velocity	voice.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:__anon32
+m_midi_velocity_pending	voice.h	/^    unsigned int m_midi_velocity_pending;$/;"	m	struct:__anon32
+m_mod_dest_eg_biased_output	envelope_generator.h	/^    unsigned m_mod_dest_eg_biased_output;$/;"	m	struct:envelope_generator
+m_mod_dest_eg_output	envelope_generator.h	/^    unsigned m_mod_dest_eg_output;$/;"	m	struct:envelope_generator
+m_mod_dest_output1	oscillator.h	/^    unsigned m_mod_dest_output1;$/;"	m	struct:oscillator
+m_mod_dest_output2	oscillator.h	/^    unsigned m_mod_dest_output2;$/;"	m	struct:oscillator
+m_mod_intensity	modmatrix.h	/^    double *m_mod_intensity;$/;"	m	struct:__anon20
+m_mod_range	modmatrix.h	/^    double *m_mod_range;$/;"	m	struct:__anon20
+m_mod_source_amp	oscillator.h	/^    unsigned m_mod_source_amp;$/;"	m	struct:oscillator
+m_mod_source_amp_db	dca.h	/^    unsigned m_mod_source_amp_db;$/;"	m	struct:dca
+m_mod_source_eg	dca.h	/^    unsigned m_mod_source_eg;$/;"	m	struct:dca
+m_mod_source_eg_attack_scaling	envelope_generator.h	/^    unsigned m_mod_source_eg_attack_scaling;$/;"	m	struct:envelope_generator
+m_mod_source_eg_decay_scaling	envelope_generator.h	/^    unsigned m_mod_source_eg_decay_scaling;$/;"	m	struct:envelope_generator
+m_mod_source_fc	filter.h	/^    unsigned m_mod_source_fc;$/;"	m	struct:filter
+m_mod_source_fc_control	filter.h	/^    unsigned m_mod_source_fc_control;$/;"	m	struct:filter
+m_mod_source_fo	oscillator.h	/^    unsigned m_mod_source_fo;$/;"	m	struct:oscillator
+m_mod_source_pan	dca.h	/^    unsigned m_mod_source_pan;$/;"	m	struct:dca
+m_mod_source_pulse_width	oscillator.h	/^    unsigned m_mod_source_pulse_width;$/;"	m	struct:oscillator
+m_mod_source_sustain_override	envelope_generator.h	/^    unsigned m_mod_source_sustain_override;$/;"	m	struct:envelope_generator
+m_mod_source_velocity	dca.h	/^    unsigned m_mod_source_velocity;$/;"	m	struct:dca
+m_mode	stereodelay.h	/^    unsigned m_mode;$/;"	m	struct:stereodelay
+m_modulo	oscillator.h	/^    double m_modulo; \/\/ modulo counter 0->1$/;"	m	struct:oscillator
+m_modulo_portamento	voice.h	/^    double m_modulo_portamento;$/;"	m	struct:__anon32
+m_moog_ladder_filter	minisynth_voice.h	/^    filter_moogladder m_moog_ladder_filter;$/;"	m	struct:__anon15
+m_ms_modmatrix	minisynth.h	/^    modmatrix m_ms_modmatrix; \/\/ routing structure for sound generation$/;"	m	struct:minisynth
+m_nlp	filter.h	/^    unsigned m_nlp;      \/\/ Non Linear Processing on\/off switch$/;"	m	struct:filter
+m_noise_osc_db	minisynth.h	/^    double m_noise_osc_db;$/;"	m	struct:minisynth
+m_note_number_to_decay_scaling	minisynth.h	/^    unsigned int m_note_number_to_decay_scaling;$/;"	m	struct:minisynth
+m_note_on	oscillator.h	/^    bool m_note_on;$/;"	m	struct:oscillator
+m_note_on	voice.h	/^    bool m_note_on;$/;"	m	struct:__anon32
+m_note_pending	voice.h	/^    bool m_note_pending;$/;"	m	struct:__anon32
+m_num_beats_to_repeat	beatrepeat.h	/^    size_t m_num_beats_to_repeat;$/;"	m	struct:beatrepeat
+m_num_rows_in_matrix_core	modmatrix.h	/^    int m_num_rows_in_matrix_core;$/;"	m	struct:__anon21
+m_octave	minisynth.h	/^    int m_octave;$/;"	m	struct:minisynth
+m_octave	oscillator.h	/^    double m_octave;    \/\/ octave tweak$/;"	m	struct:oscillator
+m_offset	beatrepeat.h	/^    unsigned int m_offset;$/;"	m	struct:beatrepeat
+m_osc1	minisynth_voice.h	/^    qblimited_oscillator m_osc1;$/;"	m	struct:__anon15
+m_osc1	voice.h	/^    oscillator *m_osc1;$/;"	m	struct:__anon32
+m_osc2	minisynth_voice.h	/^    qblimited_oscillator m_osc2;$/;"	m	struct:__anon15
+m_osc2	voice.h	/^    oscillator *m_osc2;$/;"	m	struct:__anon32
+m_osc3	minisynth_voice.h	/^    qblimited_oscillator m_osc3;$/;"	m	struct:__anon15
+m_osc3	voice.h	/^    oscillator *m_osc3;$/;"	m	struct:__anon32
+m_osc4	minisynth_voice.h	/^    qblimited_oscillator m_osc4;$/;"	m	struct:__anon15
+m_osc4	voice.h	/^    oscillator *m_osc4;$/;"	m	struct:__anon32
+m_osc_fo	oscillator.h	/^    double m_osc_fo;    \/\/ oscillator frequency from MIDI note number$/;"	m	struct:oscillator
+m_osc_pitch	voice.h	/^    double m_osc_pitch;$/;"	m	struct:__anon32
+m_osc_pitch_pending	voice.h	/^    double m_osc_pitch_pending;$/;"	m	struct:__anon32
+m_output_eg	envelope_generator.h	/^    bool m_output_eg; \/\/ i.e. this instance is going direct to output, rather$/;"	m	struct:envelope_generator
+m_pan_control	dca.h	/^    double m_pan_control;$/;"	m	struct:dca
+m_pan_mod	dca.h	/^    double m_pan_mod;$/;"	m	struct:dca
+m_phase_mod	oscillator.h	/^    double m_phase_mod;  \/* Phase mod input -1 to +1 (used for DX synth) *\/$/;"	m	struct:oscillator
+m_pitch_bend_mod	oscillator.h	/^    double m_pitch_bend_mod; \/* modulation input -1 to +1 *\/$/;"	m	struct:oscillator
+m_pitchbend_range	minisynth.h	/^    int m_pitchbend_range;$/;"	m	struct:minisynth
+m_pn_register	oscillator.h	/^    unsigned m_pn_register; \/\/ for PN Noise sequence$/;"	m	struct:oscillator
+m_portamento_inc	voice.h	/^    double m_portamento_inc;$/;"	m	struct:__anon32
+m_portamento_semitones	voice.h	/^    double m_portamento_semitones;$/;"	m	struct:__anon32
+m_portamento_start	voice.h	/^    double m_portamento_start;$/;"	m	struct:__anon32
+m_portamento_time_msec	minisynth.h	/^    double m_portamento_time_msec;$/;"	m	struct:minisynth
+m_portamento_time_msec	voice.h	/^    double m_portamento_time_msec;$/;"	m	struct:__anon32
+m_pulse_width	oscillator.h	/^    double m_pulse_width; \/\/ pulse width in % for calculation$/;"	m	struct:oscillator
+m_pulse_width_control	oscillator.h	/^    double m_pulse_width_control;$/;"	m	struct:oscillator
+m_pulse_width_pct	minisynth.h	/^    double m_pulse_width_pct;$/;"	m	struct:minisynth
+m_pw_mod	oscillator.h	/^    double m_pw_mod;     \/* modulation input for PWM -1 to +1 *\/$/;"	m	struct:oscillator
+m_q	filter.h	/^    double m_q;      \/\/ current q value$/;"	m	struct:filter
+m_q_control	filter.h	/^    double m_q_control;   \/\/ 'qualvity factor' 1-10$/;"	m	struct:filter
+m_q_control	minisynth.h	/^    double m_q_control;$/;"	m	struct:minisynth
+m_read_index	delayline.h	/^    int m_read_index;$/;"	m	struct:delayline
+m_read_index	wt_oscillator.h	/^    double m_read_index;$/;"	m	struct:wt_oscillator
+m_recording	beatrepeat.h	/^    bool m_recording;$/;"	m	struct:beatrepeat
+m_release_coeff	envelope_generator.h	/^    double m_release_coeff;$/;"	m	struct:envelope_generator
+m_release_offset	envelope_generator.h	/^    double m_release_offset;$/;"	m	struct:envelope_generator
+m_release_pending	envelope_generator.h	/^    bool m_release_pending;$/;"	m	struct:envelope_generator
+m_release_tco	envelope_generator.h	/^    double m_release_tco;$/;"	m	struct:envelope_generator
+m_release_time_msec	envelope_generator.h	/^    double m_release_time_msec;$/;"	m	struct:envelope_generator
+m_reset_to_zero	envelope_generator.h	/^    bool m_reset_to_zero;$/;"	m	struct:envelope_generator
+m_reset_to_zero	minisynth.h	/^    unsigned int m_reset_to_zero;$/;"	m	struct:minisynth
+m_rho	filter_sem.h	/^    double m_rho;$/;"	m	struct:filter_sem
+m_right_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	struct:stereodelay
+m_rsh_counter	oscillator.h	/^    int m_rsh_counter;      \/\/ random sample\/hold counter$/;"	m	struct:oscillator
+m_rsh_value	oscillator.h	/^    double m_rsh_value;     \/\/ currnet rsh output$/;"	m	struct:oscillator
+m_saturation	filter.h	/^    double m_saturation; \/\/ used in NLP$/;"	m	struct:filter
+m_saw_tables	wt_oscillator.h	/^    double *m_saw_tables[NUM_TABLES];$/;"	m	struct:wt_oscillator
+m_selected_sixteenth	beatrepeat.h	/^    size_t m_selected_sixteenth;$/;"	m	struct:beatrepeat
+m_semitones	oscillator.h	/^    double m_semitones; \/\/ semitones tweak$/;"	m	struct:oscillator
+m_shutdown_time_msec	envelope_generator.h	/^    double m_shutdown_time_msec;$/;"	m	struct:envelope_generator
+m_sine_table	wt_oscillator.h	/^    double m_sine_table[WT_LENGTH];$/;"	m	struct:wt_oscillator
+m_sixteenth_note_size	beatrepeat.h	/^    size_t m_sixteenth_note_size;$/;"	m	struct:beatrepeat
+m_source_index	modmatrix.h	/^    unsigned m_source_index;$/;"	m	struct:__anon20
+m_source_transform	modmatrix.h	/^    unsigned m_source_transform;$/;"	m	struct:__anon20
+m_sources	modmatrix.h	/^    double m_sources[MAX_SOURCES];$/;"	m	struct:__anon21
+m_square_corr_factor	wt_oscillator.h	/^    double m_square_corr_factor[NUM_TABLES];$/;"	m	struct:wt_oscillator
+m_state	envelope_generator.h	/^    state m_state;$/;"	m	struct:envelope_generator
+m_sub_osc_db	minisynth.h	/^    double m_sub_osc_db;$/;"	m	struct:minisynth
+m_sustain_level	envelope_generator.h	/^    double m_sustain_level;$/;"	m	struct:envelope_generator
+m_sustain_level	minisynth.h	/^    double m_sustain_level;$/;"	m	struct:minisynth
+m_sustain_override	envelope_generator.h	/^    bool m_sustain_override;$/;"	m	struct:envelope_generator
+m_tap2_left_delay_time_ms	stereodelay.h	/^    double m_tap2_left_delay_time_ms;$/;"	m	struct:stereodelay
+m_tap2_right_delay_time_ms	stereodelay.h	/^    double m_tap2_right_delay_time_ms;$/;"	m	struct:stereodelay
+m_timestamp	voice.h	/^    unsigned int m_timestamp;$/;"	m	struct:__anon32
+m_triangle_tables	wt_oscillator.h	/^    double *m_triangle_tables[NUM_TABLES];$/;"	m	struct:wt_oscillator
+m_v_modmatrix	dca.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:dca
+m_v_modmatrix	envelope_generator.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:envelope_generator
+m_v_modmatrix	filter.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:filter
+m_v_modmatrix	oscillator.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:oscillator
+m_v_modmatrix	voice.h	/^    modmatrix m_v_modmatrix;$/;"	m	struct:__anon32
+m_velocity_to_attack_scaling	minisynth.h	/^    unsigned int m_velocity_to_attack_scaling;$/;"	m	struct:minisynth
+m_voice	minisynth_voice.h	/^    voice m_voice;$/;"	m	struct:__anon15
+m_voice_mode	minisynth.h	/^    unsigned int m_voice_mode;$/;"	m	struct:minisynth
+m_voice_mode	voice.h	/^    unsigned int m_voice_mode;$/;"	m	struct:__anon32
+m_voices	minisynth.h	/^    minisynth_voice *m_voices[MAX_VOICES];$/;"	m	struct:minisynth
+m_volume_db	minisynth.h	/^    double m_volume_db;$/;"	m	struct:minisynth
+m_waveform	oscillator.h	/^    unsigned m_waveform; \/\/ to store type$/;"	m	struct:oscillator
+m_wet_mix	minisynth.h	/^    double m_wet_mix;$/;"	m	struct:minisynth
+m_wet_mix	stereodelay.h	/^    double m_wet_mix;$/;"	m	struct:stereodelay
+m_write_index	delayline.h	/^    int m_write_index;$/;"	m	struct:delayline
+m_wt_inc	wt_oscillator.h	/^    double m_wt_inc;$/;"	m	struct:wt_oscillator
+m_z1	filter_onepole.h	/^    double m_z1;$/;"	m	struct:filter_onepole
+m_z11	filter_sem.h	/^    double m_z11;$/;"	m	struct:filter_sem
+m_z12	filter_sem.h	/^    double m_z12;$/;"	m	struct:filter_sem
+main	main.c	/^int main()$/;"	f
+make_suggestion	chaosmonkey.h	/^    bool make_suggestion;$/;"	m	struct:chaosmonkey
+matrix1	drumr.h	/^    int matrix1[GRIDWIDTH][GRIDWIDTH];$/;"	m	struct:t_drumr
+matrix2	drumr.h	/^    int matrix2[GRIDWIDTH][GRIDWIDTH];$/;"	m	struct:t_drumr
+matrix_clear_destinations	modmatrix.c	/^void matrix_clear_destinations(modmatrix *self)$/;"	f
+matrix_clear_sources	modmatrix.c	/^void matrix_clear_sources(modmatrix *self)$/;"	f
+matrix_destinations	modmatrix.h	/^} matrix_destinations;$/;"	t	typeref:enum:__anon18
+matrix_row_exists	modmatrix.c	/^bool matrix_row_exists(modmatrix *self, unsigned sourceidx, unsigned destidx)$/;"	f
+matrix_sources	modmatrix.h	/^} matrix_sources;$/;"	t	typeref:enum:__anon17
+matrix_to_int	drumr.c	/^int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])$/;"	f
+matrix_transformations	modmatrix.h	/^} matrix_transformations;$/;"	t	typeref:enum:__anon19
+matrixrow	modmatrix.h	/^} matrixrow;$/;"	t	typeref:struct:__anon20
+maxpoint	envelope.c	/^ENVELOPE maxpoint(const ENVELOPE *points, long npoints)$/;"	f
+melodies	minisynth.h	/^    midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];$/;"	m	struct:minisynth
+melody_multiloop_count	minisynth.h	/^    int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];$/;"	m	struct:minisynth
+midiFreqTable	lookuptables.h	/^const float midiFreqTable[128] = {$/;"	v
+midi_control_destination	mixer.h	/^    unsigned midi_control_destination;$/;"	m	struct:t_mixer
+midi_control_type	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	t	typeref:enum:__anon7
+midi_delay_control	midimaaan.c	/^void midi_delay_control(EFFECT *e, int data1, int data2)$/;"	f
+midi_event	midimaaan.h	/^typedef struct midi_event {$/;"	s
+midi_event	midimaaan.h	/^} midi_event;$/;"	t	typeref:struct:midi_event
+midi_events_loop_t	midimaaan.h	/^typedef midi_event *midi_events_loop_t[PPNS];$/;"	t
+midi_freq_table	midi_freq_table.c	/^const float midi_freq_table[128] = {$/;"	v
+midi_parse_midi_event	midimaaan.c	/^void midi_parse_midi_event(minisynth *ms, midi_event *ev)$/;"	f
+midi_tick_cond	main.c	/^pthread_cond_t midi_tick_cond;$/;"	v
+midi_tick_lock	main.c	/^pthread_mutex_t midi_tick_lock;$/;"	v
+midi_ticks_per_ms	mixer.h	/^    int midi_ticks_per_ms;$/;"	m	struct:t_mixer
+midiman	midimaaan.c	/^void *midiman()$/;"	f
+minisynth	midimaaan.h	/^typedef struct minisynth minisynth;$/;"	t	typeref:struct:minisynth
+minisynth	minisynth.h	/^typedef struct minisynth {$/;"	s
+minisynth	minisynth.h	/^} minisynth;$/;"	t	typeref:struct:minisynth
+minisynth_add_melody	minisynth.c	/^void minisynth_add_melody(minisynth *ms)$/;"	f
+minisynth_gennext	minisynth.c	/^double minisynth_gennext(void *self)$/;"	f
+minisynth_get_oldest_voice	minisynth.c	/^minisynth_voice *minisynth_get_oldest_voice(minisynth *ms)$/;"	f
+minisynth_get_oldest_voice_with_note	minisynth.c	/^minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,$/;"	f
+minisynth_getvol	minisynth.c	/^double minisynth_getvol(void *self)$/;"	f
+minisynth_increment_voice_timestamps	minisynth.c	/^void minisynth_increment_voice_timestamps(minisynth *ms)$/;"	f
+minisynth_melody_to_string	minisynth.c	/^void minisynth_melody_to_string(minisynth *ms, int melody_num,$/;"	f
+minisynth_midi_control	minisynth.c	/^void minisynth_midi_control(minisynth *ms, unsigned int data1,$/;"	f
+minisynth_midi_note_off	minisynth.c	/^bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,$/;"	f
+minisynth_midi_note_on	minisynth.c	/^bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,$/;"	f
+minisynth_midi_pitchbend	minisynth.c	/^void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,$/;"	f
+minisynth_prepare_for_play	minisynth.c	/^bool minisynth_prepare_for_play(minisynth *ms)$/;"	f
+minisynth_reset_melody	minisynth.c	/^void minisynth_reset_melody(minisynth *ms, unsigned int melody_num)$/;"	f
+minisynth_reset_melody_all	minisynth.c	/^void minisynth_reset_melody_all(minisynth *ms)$/;"	f
+minisynth_set_melody_loop_num	minisynth.c	/^void minisynth_set_melody_loop_num(minisynth *self, int melody_num,$/;"	f
+minisynth_set_multi_melody_mode	minisynth.c	/^void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)$/;"	f
+minisynth_setvol	minisynth.c	/^void minisynth_setvol(void *self, double v)$/;"	f
+minisynth_status	minisynth.c	/^void minisynth_status(void *self, wchar_t *status_string)$/;"	f
+minisynth_switch_melody	minisynth.c	/^void minisynth_switch_melody(minisynth *ms, unsigned int melody_num)$/;"	f
+minisynth_update	minisynth.c	/^void minisynth_update(minisynth *ms)$/;"	f
+minisynth_voice	minisynth_voice.h	/^} minisynth_voice;$/;"	t	typeref:struct:__anon15
+minisynth_voice_choice	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	t	typeref:enum:__anon14
+minisynth_voice_gennext	minisynth_voice.c	/^bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,$/;"	f
+minisynth_voice_init	minisynth_voice.c	/^void minisynth_voice_init(minisynth_voice *msv)$/;"	f
+minisynth_voice_init_global_parameters	minisynth_voice.c	/^void minisynth_voice_init_global_parameters(minisynth_voice *msv,$/;"	f
+minisynth_voice_initialize_modmatrix	minisynth_voice.c	/^void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,$/;"	f
+minisynth_voice_prepare_for_play	minisynth_voice.c	/^void minisynth_voice_prepare_for_play(minisynth_voice *msv)$/;"	f
+minisynth_voice_reset	minisynth_voice.c	/^void minisynth_voice_reset(minisynth_voice *msv)$/;"	f
+minisynth_voice_update	minisynth_voice.c	/^void minisynth_voice_update(minisynth_voice *msv)$/;"	f
+mixer	mixer.h	/^} mixer;$/;"	t	typeref:struct:t_mixer
+mixer_ps	mixer.c	/^void mixer_ps(mixer *mixr)$/;"	f
+mixer_update_bpm	mixer.c	/^void mixer_update_bpm(mixer *mixr, int bpm)$/;"	f
+mixer_vol_change	mixer.c	/^void mixer_vol_change(mixer *mixr, float vol)$/;"	f
+mixr	main.c	/^mixer *mixr;$/;"	v
+mixr	mixer.h	/^    mixer *mixr;$/;"	m	struct:__anon16
+mma_midi_to_atten_db	utils.c	/^double mma_midi_to_atten_db(unsigned int midi_val)$/;"	f
+mod_osc	sbmsg.h	/^    char mod_osc[10];$/;"	m	struct:sbmsg
+modfreq	sbmsg.h	/^    int modfreq;$/;"	m	struct:sbmsg
+modmatrix	modmatrix.h	/^} modmatrix;$/;"	t	typeref:struct:__anon21
+moog_gennext	filter_moogladder.c	/^double moog_gennext(filter *f, double xn)$/;"	f
+moog_reset	filter_moogladder.c	/^void moog_reset(filter *f)$/;"	f
+moog_set_qcontrol	filter_moogladder.c	/^void moog_set_qcontrol(filter *f, double qcontrol)$/;"	f
+moog_update	filter_moogladder.c	/^void moog_update(filter *f)$/;"	f
+multi_melody_loop_countdown_started	minisynth.h	/^    bool multi_melody_loop_countdown_started;$/;"	m	struct:minisynth
+multi_melody_mode	minisynth.h	/^    bool multi_melody_mode;$/;"	m	struct:minisynth
+multi_pattern_mode	drumr.h	/^    bool multi_pattern_mode;$/;"	m	struct:t_drumr
+multi_sample_mode	sampler.h	/^    bool multi_sample_mode;$/;"	m	struct:t_sampler
+new_algorithm	algorithm.c	/^algorithm *new_algorithm(char *line)$/;"	f
+new_beatrepeat	effect.c	/^EFFECT *new_beatrepeat(int looplen)$/;"	f
+new_bitwize	bitwize.c	/^BITWIZE *new_bitwize(int pattern)$/;"	f
+new_bytebeat	bytebeatrrr.c	/^bytebeat *new_bytebeat(char *pattern)$/;"	f
+new_chaosmonkey	chaosmonkey.c	/^chaosmonkey *new_chaosmonkey()$/;"	f
+new_dca	dca.c	/^dca *new_dca()$/;"	f
+new_decimator	effect.c	/^EFFECT *new_decimator()$/;"	f
+new_delay	effect.c	/^EFFECT *new_delay(double duration)$/;"	f
+new_distortion	effect.c	/^EFFECT *new_distortion()$/;"	f
+new_drumr	drumr.c	/^DRUM *new_drumr(char *filename)$/;"	f
+new_drumr_from_char_pattern	drumr.c	/^DRUM *new_drumr_from_char_pattern(char *filename, char *pattern)$/;"	f
+new_drumr_from_int_pattern	drumr.c	/^DRUM *new_drumr_from_int_pattern(char *filename, int pattern)$/;"	f
+new_envelope_generator	envelope_generator.c	/^envelope_generator *new_envelope_generator()$/;"	f
+new_envelope_stream	envelope.c	/^ENVSTREAM *new_envelope_stream(int env_len,$/;"	f
+new_fadein_points	envelope.c	/^ENVELOPE *new_fadein_points()$/;"	f
+new_fadeout_points	envelope.c	/^ENVELOPE *new_fadeout_points()$/;"	f
+new_filter_ck35	filter_ckthreefive.c	/^filter_ck35 *new_filter_ck35()$/;"	f
+new_filter_moog	filter_moogladder.c	/^filter_moog *new_filter_moog()$/;"	f
+new_filter_onepole	filter_onepole.c	/^filter_onepole *new_filter_onepole()$/;"	f
+new_filter_sem	filter_sem.c	/^filter_sem *new_filter_sem()$/;"	f
+new_freq_pass	effect.c	/^EFFECT *new_freq_pass(double freq, effect_type pass_type)$/;"	f
+new_freqs_from_string	utils.c	/^freaky *new_freqs_from_string(char *string)$/;"	f
+new_midi_event	midimaaan.c	/^midi_event *new_midi_event(int tick, int event_type, int data1, int data2)$/;"	f
+new_minisynth	minisynth.c	/^minisynth *new_minisynth(void)$/;"	f
+new_minisynth_voice	minisynth_voice.c	/^minisynth_voice *new_minisynth_voice(void)$/;"	f
+new_mixer	mixer.c	/^mixer *new_mixer()$/;"	f
+new_modmatrix	modmatrix.c	/^modmatrix *new_modmatrix(void)$/;"	f
+new_sampler	sampler.c	/^SAMPLER *new_sampler(char *filename, double loop_len)$/;"	f
+new_saw_table	table.c	/^wtable *new_saw_table(int up)$/;"	f
+new_sbmsg	sbmsg.c	/^SBMSG *new_sbmsg()$/;"	f
+new_sidechain_stream	envelope.c	/^ENVSTREAM *new_sidechain_stream(int *pattern, int percent)$/;"	f
+new_sine_table	table.c	/^wtable *new_sine_table()$/;"	f
+new_square_table	table.c	/^wtable *new_square_table()$/;"	f
+new_stereo_delay	stereodelay.c	/^stereodelay *new_stereo_delay()$/;"	f
+new_tri_table	table.c	/^wtable *new_tri_table()$/;"	f
+new_wavey_points	envelope.c	/^ENVELOPE *new_wavey_points()$/;"	f
+newpoints	envelope.c	/^ENVELOPE *newpoints()$/;"	f
+next_life_generation	drumr.c	/^void next_life_generation(void *d)$/;"	f
+nlp	synthfunctions.h	/^    unsigned int nlp;$/;"	m	struct:__anon27
+norm_wtable	table.c	/^static void norm_wtable(wtable *t)$/;"	f	file:
+notelookup	utils.c	/^int notelookup(char *n)$/;"	f
+npoints	envelope.h	/^    unsigned long npoints;$/;"	m	struct:envelope_stream
+num_freaks	utils.h	/^    int num_freaks;$/;"	m	struct:freaky
+num_melodies	minisynth.h	/^    int num_melodies;$/;"	m	struct:minisynth
+num_patterns	drumr.h	/^    int num_patterns;$/;"	m	struct:t_drumr
+num_samples	sampler.h	/^    int num_samples;$/;"	m	struct:t_sampler
+oblique_strategy	utils.c	/^void oblique_strategy()$/;"	f
+octave	synthfunctions.h	/^    int octave;                 \/\/ octave tweak$/;"	m	struct:__anon26
+onepole_gennext	filter_onepole.c	/^double onepole_gennext(filter *f, double xn)$/;"	f
+onepole_get_feedback_output	filter_onepole.c	/^double onepole_get_feedback_output(filter_onepole *f)$/;"	f
+onepole_reset	filter_onepole.c	/^void onepole_reset(filter *self)$/;"	f
+onepole_set_feedback	filter_onepole.c	/^void onepole_set_feedback(filter_onepole *op, double fb)$/;"	f
+onepole_setup	filter_onepole.c	/^void onepole_setup(filter_onepole *op)$/;"	f
+onepole_update	filter_onepole.c	/^void onepole_update(filter *f)$/;"	f
+onoff	defjams.h	/^typedef enum { OFF, ON } onoff;$/;"	t	typeref:enum:__anon2
+op1_feedback	synthfunctions.h	/^    double op1_feedback;$/;"	m	struct:__anon30
+op2_feedback	synthfunctions.h	/^    double op2_feedback;$/;"	m	struct:__anon30
+op3_feedback	synthfunctions.h	/^    double op3_feedback;$/;"	m	struct:__anon30
+op4_feedback	synthfunctions.h	/^    double op4_feedback;$/;"	m	struct:__anon30
+orbit_x_amp	synthfunctions.h	/^    double orbit_x_amp;$/;"	m	struct:__anon30
+orbit_y_amp	synthfunctions.h	/^    double orbit_y_amp;$/;"	m	struct:__anon30
+orig_file_bytes	sampler.h	/^    int *orig_file_bytes;$/;"	m	struct:file_sample
+orig_file_size	sampler.h	/^    int orig_file_size;$/;"	m	struct:file_sample
+osc	lfo.h	/^    oscillator osc;$/;"	m	struct:lfo
+osc	qblimited_oscillator.h	/^    oscillator osc;$/;"	m	struct:qblimited_oscillator
+osc	wt_oscillator.h	/^    oscillator osc;$/;"	m	struct:wt_oscillator
+osc1_params	synthfunctions.h	/^    global_oscillator_params osc1_params;$/;"	m	struct:__anon31
+osc2_params	synthfunctions.h	/^    global_oscillator_params osc2_params;$/;"	m	struct:__anon31
+osc3_params	synthfunctions.h	/^    global_oscillator_params osc3_params;$/;"	m	struct:__anon31
+osc4_params	synthfunctions.h	/^    global_oscillator_params osc4_params;$/;"	m	struct:__anon31
+osc_check_wrap_modulo	oscillator.c	/^bool osc_check_wrap_modulo(oscillator *self)$/;"	f
+osc_fo	synthfunctions.h	/^    double osc_fo;$/;"	m	struct:__anon26
+osc_fo_mod_range	synthfunctions.h	/^    double osc_fo_mod_range;$/;"	m	struct:__anon30
+osc_fo_pitchbend_mod_range	synthfunctions.h	/^    double osc_fo_pitchbend_mod_range;$/;"	m	struct:__anon30
+osc_hard_sync_mod_range	synthfunctions.h	/^    double osc_hard_sync_mod_range;$/;"	m	struct:__anon30
+osc_inc_modulo	oscillator.c	/^void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }$/;"	f
+osc_init_global_parameters	oscillator.c	/^void osc_init_global_parameters(oscillator *self,$/;"	f
+osc_new_settings	oscillator.c	/^void osc_new_settings(oscillator *osc)$/;"	f
+osc_reset	oscillator.c	/^void osc_reset(oscillator *self)$/;"	f
+osc_reset_modulo	oscillator.c	/^void osc_reset_modulo(oscillator *self, double d) { self->m_modulo = d; }$/;"	f
+osc_set_amplitude_mod	oscillator.c	/^void osc_set_amplitude_mod(oscillator *self, double amp_val)$/;"	f
+osc_set_fo_mod_exp	oscillator.c	/^void osc_set_fo_mod_exp(oscillator *self, double fo_mod_val)$/;"	f
+osc_set_fo_mod_lin	oscillator.c	/^void osc_set_fo_mod_lin(oscillator *self, double fo_mod_val)$/;"	f
+osc_set_phase_mod	oscillator.c	/^void osc_set_phase_mod(oscillator *self, double mod_val)$/;"	f
+osc_set_pitch_bend_mod	oscillator.c	/^void osc_set_pitch_bend_mod(oscillator *self, double mod_val)$/;"	f
+osc_set_pw_mod	oscillator.c	/^void osc_set_pw_mod(oscillator *self, double mod_val)$/;"	f
+osc_update	oscillator.c	/^void osc_update(oscillator *self)$/;"	f
+oscillator	oscillator.h	/^struct oscillator {$/;"	s
+oscillator	oscillator.h	/^typedef struct oscillator oscillator;$/;"	t	typeref:struct:oscillator
+paCallback	main.c	/^static int paCallback(const void *inputBuffer, void *outputBuffer,$/;"	f	file:
+paData	mixer.h	/^} paData;$/;"	t	typeref:struct:__anon16
+pa_setup	audioutils.c	/^void pa_setup(void)$/;"	f
+pa_teardown	audioutils.c	/^void pa_teardown(void)$/;"	f
+pan_control	synthfunctions.h	/^    double pan_control;$/;"	m	struct:__anon29
+parabolic_sine	utils.c	/^double parabolic_sine(double x, bool high_precision)$/;"	f
+params	sbmsg.h	/^    char params[20];$/;"	m	struct:sbmsg
+parse_wurds_from_cmd	cmdloop.c	/^int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)$/;"	f
+pattern	bitwize.h	/^    int pattern;$/;"	m	struct:t_bitwize
+pattern	bytebeatrrr.h	/^    char pattern[256];$/;"	m	struct:bytebeat
+pattern_char_to_int	drumr.c	/^void pattern_char_to_int(char *char_pattern, int *final_pattern)$/;"	f
+pattern_num_loops	drumr.h	/^    int pattern_num_loops[NUM_DRUM_PATTERNS];$/;"	m	struct:t_drumr
+pattern_position_amp	drumr.h	/^    double pattern_position_amp[NUM_DRUM_PATTERNS][DRUM_PATTERN_LEN];$/;"	m	struct:t_drumr
+patterns	drumr.h	/^    int patterns[NUM_DRUM_PATTERNS];$/;"	m	struct:t_drumr
+pitch_shift_multiplier	utils.c	/^double pitch_shift_multiplier(double pitch_shift_semitones)$/;"	f
+play_melody_loop	keys.c	/^void *play_melody_loop(void *p)$/;"	f
+played	drumr.h	/^    int played;$/;"	m	struct:t_sample_pos
+playing	drumr.h	/^    int playing;$/;"	m	struct:t_sample_pos
+points	envelope.h	/^    ENVELOPE *points;$/;"	m	struct:envelope_stream
+portamento_time_msec	synthfunctions.h	/^    double portamento_time_msec;$/;"	m	struct:__anon30
+position	drumr.h	/^    int position;$/;"	m	struct:t_sample_pos
+position	sampler.h	/^    int position;$/;"	m	struct:file_sample
+print_help	help.c	/^void print_help()$/;"	f
+print_midi_event	utils.c	/^void print_midi_event(int midi_num)$/;"	f
+print_midi_event_rec	midimaaan.c	/^void print_midi_event_rec(midi_event *ev)$/;"	f
+print_prompt	cmdloop.c	/^void print_prompt()$/;"	f
+printbp	envelope.c	/^void printbp(ENVELOPE *bp)$/;"	f
+prompt	cmdloop.c	/^char *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;$/;"	v
+ps_envelope_stream	envelope.c	/^void ps_envelope_stream(ENVSTREAM *stream)$/;"	f
+pulse_width_control	synthfunctions.h	/^    double pulse_width_control; \/\/ from GUI$/;"	m	struct:__anon26
+q_control	synthfunctions.h	/^    double q_control;$/;"	m	struct:__anon27
+qb_do_oscillate	qblimited_oscillator.c	/^double qb_do_oscillate(oscillator *self, double *aux_output)$/;"	f
+qb_do_sawtooth	qblimited_oscillator.c	/^double qb_do_sawtooth(oscillator *self, double modulo, double dInc)$/;"	f
+qb_do_square	qblimited_oscillator.c	/^double qb_do_square(oscillator *self, double modulo, double dInc)$/;"	f
+qb_do_triangle	qblimited_oscillator.c	/^double qb_do_triangle(double modulo, double inc, double fo,$/;"	f
+qb_osc	qblimited_oscillator.h	/^typedef struct qblimited_oscillator qb_osc;$/;"	t	typeref:struct:qblimited_oscillator
+qb_osc_new	qblimited_oscillator.c	/^qb_osc *qb_osc_new()$/;"	f
+qb_reset_oscillator	qblimited_oscillator.c	/^void qb_reset_oscillator(oscillator *self)$/;"	f
+qb_set_soundgenerator_interface	qblimited_oscillator.c	/^void qb_set_soundgenerator_interface(qb_osc *qb)$/;"	f
+qb_start_oscillator	qblimited_oscillator.c	/^void qb_start_oscillator(oscillator *self)$/;"	f
+qb_stop_oscillator	qblimited_oscillator.c	/^void qb_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
+qblimited_oscillator	qblimited_oscillator.h	/^typedef struct qblimited_oscillator {$/;"	s
+qblimited_oscillator	qblimited_oscillator.h	/^} qblimited_oscillator;$/;"	t	typeref:struct:qblimited_oscillator
+qrsh	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+rate	effect.h	/^    double rate, cnt;$/;"	m	struct:__anon9
+read_delay	effect.c	/^double read_delay(EFFECT *self)$/;"	f
+recording	minisynth.h	/^    bool recording;$/;"	m	struct:minisynth
+related_notes	utils.c	/^void related_notes(char note[4], double *second_note, double *third_note)$/;"	f
+release_time_msec	synthfunctions.h	/^    double release_time_msec; \/\/ rel: is a time to decay 1->0$/;"	m	struct:__anon28
+resample_mutex	sampler.h	/^    pthread_mutex_t resample_mutex;$/;"	m	struct:t_sampler
+resampled_file_bytes	sampler.h	/^    double *resampled_file_bytes;$/;"	m	struct:file_sample
+resampled_file_size	sampler.h	/^    int resampled_file_size;$/;"	m	struct:file_sample
+reset	filter.h	/^    void (*reset)(filter *self);$/;"	m	struct:filter
+reset_oscillator	oscillator.h	/^    void (*reset_oscillator)(oscillator *self);$/;"	m	struct:oscillator
+reset_to_zero	synthfunctions.h	/^    bool reset_to_zero;$/;"	m	struct:__anon28
+resize_effects_array	sound_generator.c	/^static int resize_effects_array(SOUNDGEN *self)$/;"	f	file:
+rev_lookup	utils.c	/^static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",$/;"	v	file:
+reverse	utils.c	/^void reverse(char s[])$/;"	f
+rfree	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon24
+right_phase	mixer.h	/^    float right_phase;$/;"	m	struct:__anon16
+rightpoint	envelope.h	/^    ENVELOPE leftpoint, rightpoint;$/;"	m	struct:envelope_stream
+rpn_stack	bytebeatrrr.h	/^    Stack *rpn_stack;$/;"	m	struct:bytebeat
+rr	effect.h	/^    double rr;$/;"	m	struct:__anon9
+rsh	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+rsq	effect.h	/^    double rsq;$/;"	m	struct:__anon9
+sample_import_file_contents	sampler.c	/^void sample_import_file_contents(file_sample *fs, char *filename)$/;"	f
+sample_num_loops	sampler.h	/^    int sample_num_loops[MAX_SAMPLES_PER_LOOPER];$/;"	m	struct:t_sampler
+sample_pos	drumr.h	/^} sample_pos;$/;"	t	typeref:struct:t_sample_pos
+sample_positions	drumr.h	/^    sample_pos sample_positions[DRUM_PATTERN_LEN];$/;"	m	struct:t_drumr
+sample_resample_to_loop_size	sampler.c	/^void sample_resample_to_loop_size(file_sample *fs)$/;"	f
+sample_set_file_name	sampler.c	/^void sample_set_file_name(file_sample *fs, char *filename)$/;"	f
+sampler_add_sample	sampler.c	/^void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)$/;"	f
+sampler_change_loop_len	sampler.c	/^void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len)$/;"	f
+sampler_change_num_loops	sampler.c	/^void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops)$/;"	f
+sampler_gennext	sampler.c	/^double sampler_gennext(void *self)$/;"	f
+sampler_getvol	sampler.c	/^double sampler_getvol(void *self)$/;"	f
+sampler_resample_to_loop_size	sampler.c	/^void sampler_resample_to_loop_size(SAMPLER *s)$/;"	f
+sampler_set_multi_sample_mode	sampler.c	/^void sampler_set_multi_sample_mode(SAMPLER *s, bool multimode)$/;"	f
+sampler_setvol	sampler.c	/^void sampler_setvol(void *self, double v)$/;"	f
+sampler_status	sampler.c	/^void sampler_status(void *self, wchar_t *status_string)$/;"	f
+sampler_switch_sample	sampler.c	/^void sampler_switch_sample(SAMPLER *s, int sample_num)$/;"	f
+samplerate	drumr.h	/^    int samplerate;$/;"	m	struct:t_drumr
+samplerate	sampler.h	/^    int samplerate;$/;"	m	struct:file_sample
+samples	sampler.h	/^    file_sample *samples[MAX_SAMPLES_PER_LOOPER];$/;"	m	struct:t_sampler
+samples_per_midi_tick	mixer.h	/^    int samples_per_midi_tick;$/;"	m	struct:t_mixer
+saturation	synthfunctions.h	/^    double saturation;$/;"	m	struct:__anon27
+sbmsg	sbmsg.h	/^typedef struct sbmsg {$/;"	s
+scal	effect.h	/^    double scal;$/;"	m	struct:__anon9
+scaleybum	utils.c	/^double scaleybum(double cur_min, double cur_max, double new_min, double new_max,$/;"	f
+seed_pattern	drumr.c	/^int seed_pattern()$/;"	f
+sem_gennext	filter_sem.c	/^double sem_gennext(filter *f, double xn)$/;"	f
+sem_reset	filter_sem.c	/^void sem_reset(filter *f)$/;"	f
+sem_set_qcontrol	filter_sem.c	/^void sem_set_qcontrol(filter *f, double qcontrol)$/;"	f
+sem_update	filter_sem.c	/^void sem_update(filter *f)$/;"	f
+semitones	synthfunctions.h	/^    int semitones;              \/\/ semitones tweak$/;"	m	struct:__anon26
+semitones_between_frequencies	utils.c	/^double semitones_between_frequencies(double start_freq, double end_freq)$/;"	f
+set_fc_mod	filter.h	/^    void (*set_fc_mod)(filter *self, double d);$/;"	m	struct:filter
+set_matrix_core	modmatrix.c	/^void set_matrix_core(modmatrix *self, matrixrow **matrix)$/;"	f
+set_q_control	filter.h	/^    void (*set_q_control)(filter *self, double d);$/;"	m	struct:filter
+setvol	sound_generator.h	/^    void (*setvol)(void *self, double val);$/;"	m	struct:t_soundgen
+shift_bits_to_leftmost_position	drumr_utils.c	/^int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)$/;"	f
+shot	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon24
+shutdown_time_msec	synthfunctions.h	/^    double shutdown_time_msec; \/\/ shutdown is a time$/;"	m	struct:__anon28
+sine	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+sixteenth_note_tick	mixer.h	/^    int sixteenth_note_tick;$/;"	m	struct:t_mixer
+sound_gen_num	sbmsg.h	/^    int sound_gen_num;$/;"	m	struct:sbmsg
+sound_generator	algorithm.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:algorithm
+sound_generator	bitwize.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:t_bitwize
+sound_generator	bytebeatrrr.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:bytebeat
+sound_generator	chaosmonkey.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:chaosmonkey
+sound_generator	drumr.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:t_drumr
+sound_generator	minisynth.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:minisynth
+sound_generator	sampler.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:t_sampler
+sound_generator	sbmsg.h	/^    SOUNDGEN *sound_generator;$/;"	m	struct:sbmsg
+sound_generator_type	defjams.h	/^} sound_generator_type;$/;"	t	typeref:enum:__anon4
+sound_generators	mixer.h	/^    SOUNDGEN **sound_generators;$/;"	m	struct:t_mixer
+soundgen_num	mixer.h	/^    int soundgen_num;  \/\/ actual number of SGs$/;"	m	struct:t_mixer
+soundgen_size	mixer.h	/^    int soundgen_size; \/\/ number of memory slots reserved for SGszz$/;"	m	struct:t_mixer
+sparkchars	main.c	/^const wchar_t *sparkchars = L"\\u2581\\u2582\\u2583\\u2585\\u2586\\u2587";$/;"	v
+sparky	sparkline.c	/^void sparky(char *instr)$/;"	f
+square	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+start_oscillator	oscillator.h	/^    void (*start_oscillator)(oscillator *self);$/;"	m	struct:oscillator
+started	drumr.h	/^    bool started;$/;"	m	struct:t_drumr
+started	envelope.h	/^    int started;$/;"	m	struct:envelope_stream
+started	sampler.h	/^    bool started;$/;"	m	struct:t_sampler
+state	envelope_generator.h	/^} state;$/;"	t	typeref:enum:__anon11
+state_strings	envelope_generator.c	/^char *state_strings[] = {"OFFF",    "ATTACK",  "DECAY",$/;"	v
+status	effect.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:__anon9
+status	envelope.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:envelope_stream
+status	sound_generator.h	/^    void (*status)(void *self, wchar_t *wstring);$/;"	m	struct:t_soundgen
+stereodelay	stereodelay.h	/^typedef struct stereodelay {$/;"	s
+stereodelay	stereodelay.h	/^} stereodelay;$/;"	t	typeref:struct:stereodelay
+stop_oscillator	oscillator.h	/^    void (*stop_oscillator)(oscillator *self);$/;"	m	struct:oscillator
+strategies	obliquestrategies.c	/^char *strategies[NUM_STATEGIES] = {$/;"	v
+strim	utils.c	/^void strim(const char *input, char *result)$/;"	f
+sustain	minisynth.h	/^    int sustain;$/;"	m	struct:minisynth
+sustain_level	synthfunctions.h	/^    double sustain_level;$/;"	m	struct:__anon28
+swing	drumr.h	/^    int swing;$/;"	m	struct:t_drumr
+swing_setting	drumr.h	/^    int swing_setting;$/;"	m	struct:t_drumr
+swingrrr	drumr.c	/^void swingrrr(void *self, int swing_setting)$/;"	f
+sync	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon24
+t_bitwize	bitwize.h	/^typedef struct t_bitwize {$/;"	s
+t_drumr	drumr.h	/^typedef struct t_drumr {$/;"	s
+t_mixer	mixer.h	/^typedef struct t_mixer {$/;"	s
+t_sample_pos	drumr.h	/^typedef struct t_sample_pos {$/;"	s
+t_sampler	sampler.h	/^typedef struct t_sampler {$/;"	s
+t_soundgen	sound_generator.h	/^typedef struct t_soundgen {$/;"	s
+table	table.h	/^    double *table;$/;"	m	struct:wtable
+take_action	chaosmonkey.h	/^    bool take_action;$/;"	m	struct:chaosmonkey
+thrunner	utils.c	/^void thrunner(SBMSG *msg)$/;"	f
+tick	drumr.h	/^    int tick;$/;"	m	struct:t_drumr
+tick	midimaaan.h	/^    unsigned tick;$/;"	m	struct:midi_event
+tick	mixer.h	/^    int tick;       \/\/$/;"	m	struct:t_mixer
+tickedyet	drumr.h	/^    bool tickedyet;$/;"	m	struct:t_drumr
+time	envelope.h	/^    double time;$/;"	m	struct:envelope
+timed_sig_start	utils.c	/^void *timed_sig_start(void *arg)$/;"	f
+tri	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+type	effect.h	/^    effect_type type;$/;"	m	struct:__anon9
+type	sound_generator.h	/^    sound_generator_type type;$/;"	m	struct:t_soundgen
+unipolar_to_bipolar	utils.c	/^double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }$/;"	f
+update	filter.h	/^    void (*update)(filter *self);$/;"	m	struct:filter
+update_envelope_stream_bpm	envelope.c	/^void update_envelope_stream_bpm(ENVSTREAM *stream)$/;"	f
+update_environment	mixer.c	/^void update_environment(char *key, int val)$/;"	f
+update_oscillator	oscillator.h	/^    void (*update_oscillator)(oscillator *self);$/;"	m	struct:oscillator
+usaw	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon23
+val	mixer.h	/^    int val;$/;"	m	struct:environment_variable
+value	envelope.h	/^    double value;$/;"	m	struct:envelope
+vector_path_mode	synthfunctions.h	/^    unsigned int vector_path_mode;$/;"	m	struct:__anon30
+voice	voice.h	/^} voice;$/;"	t	typeref:struct:__anon32
+voice_can_note_off	voice.c	/^bool voice_can_note_off(voice *v)$/;"	f
+voice_gennext	voice.c	/^bool voice_gennext(voice *v, double *left_output, double *right_output)$/;"	f
+voice_in_legato_mode	voice.c	/^bool voice_in_legato_mode(voice *v) { return v->m_eg1.m_legato_mode; }$/;"	f
+voice_init	voice.c	/^void voice_init(voice *v)$/;"	f
+voice_init_global_parameters	voice.c	/^void voice_init_global_parameters(voice *v, global_synth_params *sp)$/;"	f
+voice_initialize_modmatrix	voice.c	/^void voice_initialize_modmatrix(voice *v, modmatrix *matrix)$/;"	f
+voice_is_active_voice	voice.c	/^bool voice_is_active_voice(voice *v)$/;"	f
+voice_is_voice_done	voice.c	/^bool voice_is_voice_done(voice *v)$/;"	f
+voice_mode	synthfunctions.h	/^    unsigned int voice_mode;$/;"	m	struct:__anon30
+voice_note_off	voice.c	/^void voice_note_off(voice *v, unsigned int midi_note)$/;"	f
+voice_note_on	voice.c	/^void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,$/;"	f
+voice_params	synthfunctions.h	/^    global_voice_params voice_params;$/;"	m	struct:__anon31
+voice_prepare_for_play	voice.c	/^void voice_prepare_for_play(voice *v)$/;"	f
+voice_reset	voice.c	/^void voice_reset(voice *v)$/;"	f
+voice_set_modmatrix_core	voice.c	/^void voice_set_modmatrix_core(voice *v, matrixrow **modmatrix)$/;"	f
+voice_update	voice.c	/^void voice_update(voice *v)$/;"	f
+vol	bitwize.h	/^    double vol;$/;"	m	struct:t_bitwize
+vol	bytebeatrrr.h	/^    double vol;$/;"	m	struct:bytebeat
+vol	drumr.h	/^    double vol;$/;"	m	struct:t_drumr
+vol	minisynth.h	/^    float vol;$/;"	m	struct:minisynth
+vol	sampler.h	/^    double vol;$/;"	m	struct:t_sampler
+vol_change	mixer.c	/^void vol_change(mixer *mixr, int sg, float vol)$/;"	f
+volume	mixer.h	/^    double volume;$/;"	m	struct:t_mixer
+wave_type	defjams.h	/^typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;$/;"	t	typeref:enum:__anon6
+waveform	synthfunctions.h	/^    unsigned int waveform;      \/\/ to store type$/;"	m	struct:__anon26
+wchar_version_of_amp	drumr.c	/^void wchar_version_of_amp(DRUM *d, int pattern_num, wchar_t apattern[17])$/;"	f
+width	envelope.h	/^    double width;$/;"	m	struct:envelope_stream
+write_delay_and_inc	effect.c	/^void write_delay_and_inc(EFFECT *self, double val)$/;"	f
+wt_check_wrap_index	wt_oscillator.c	/^void wt_check_wrap_index(double *index)$/;"	f
+wt_create_wave_tables	wt_oscillator.c	/^void wt_create_wave_tables(wt_osc *self)$/;"	f
+wt_destroy_wave_tables	wt_oscillator.c	/^void wt_destroy_wave_tables(wt_osc *self)$/;"	f
+wt_do_oscillate	wt_oscillator.c	/^double wt_do_oscillate(oscillator *self, double *aux_output)$/;"	f
+wt_do_square_wave	wt_oscillator.c	/^double wt_do_square_wave(wt_osc *self)$/;"	f
+wt_do_wave_table	wt_oscillator.c	/^double wt_do_wave_table(wt_osc *self, double *read_index, double wt_inc)$/;"	f
+wt_get_table_index	wt_oscillator.c	/^int wt_get_table_index(wt_osc *self)$/;"	f
+wt_osc	wt_oscillator.h	/^typedef struct wt_oscillator wt_osc;$/;"	t	typeref:struct:wt_oscillator
+wt_osc_new	wt_oscillator.c	/^wt_osc *wt_osc_new()$/;"	f
+wt_oscillator	wt_oscillator.h	/^struct wt_oscillator {$/;"	s
+wt_reset_oscillator	wt_oscillator.c	/^void wt_reset_oscillator(oscillator *self)$/;"	f
+wt_select_table	wt_oscillator.c	/^void wt_select_table(wt_osc *self)$/;"	f
+wt_start_oscillator	wt_oscillator.c	/^void wt_start_oscillator(oscillator *self)$/;"	f
+wt_stop_oscillator	wt_oscillator.c	/^void wt_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
+wt_update_oscillator	wt_oscillator.c	/^void wt_update_oscillator(oscillator *self)$/;"	f
+wtable	table.h	/^typedef struct wtable {$/;"	s
+wtable	table.h	/^} wtable;$/;"	t	typeref:struct:wtable
+wtable_free	table.c	/^void wtable_free(wtable **gtable)$/;"	f
+wtable_info	table.c	/^void wtable_info(wtable *t)$/;"	f

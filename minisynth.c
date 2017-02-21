@@ -14,6 +14,8 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
+    minisynth_prepare_for_play(ms);
+
     ms->m_eg1_dca_intensity = 1.0;
 
     for (int i = 0; i < MAX_VOICES; i++) {
@@ -26,11 +28,11 @@ minisynth *new_minisynth(void)
     }
 
     // use first voice to setup global
-    minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->g_modmatrix);
+    minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->m_ms_modmatrix);
 
     for (int i = 0; i < MAX_VOICES; i++) {
         voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
-                                 get_matrix_core(&ms->g_modmatrix));
+                                 get_matrix_core(&ms->m_ms_modmatrix));
     }
     for (int i = 0; i < PPNS; i++) {
         ms->melodies[ms->cur_melody][i] = NULL;
@@ -49,17 +51,6 @@ minisynth *new_minisynth(void)
     ms->sound_generator.setvol = &minisynth_setvol;
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.type = SYNTH_TYPE;
-
-    minisynth_prepare_for_play(ms);
-
-    printf("\n\nPREPARED\n");
-    for (int i = 1; i < MAX_VOICES; i++) {
-        // if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core) {
-        //     printf("[%d] GOTS A MATRIX CORE\n", i);
-        // } else {
-        //     printf("[%d] NAE GOTS A MATRIX CORE\n", i);
-        // }
-    }
 
     // start loop player running
     pthread_t melody_looprrr;
@@ -177,24 +168,24 @@ void minisynth_update(minisynth *ms)
 
     // --- enable/disable mod matrix stuff
     if (ms->m_velocity_to_attack_scaling == 1)
-        enable_matrix_row(&ms->g_modmatrix, SOURCE_VELOCITY,
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_VELOCITY,
                           DEST_ALL_EG_ATTACK_SCALING, true); // enable
     else
-        enable_matrix_row(&ms->g_modmatrix, SOURCE_VELOCITY,
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_VELOCITY,
                           DEST_ALL_EG_ATTACK_SCALING, false);
 
     if (ms->m_note_number_to_decay_scaling == 1)
-        enable_matrix_row(&ms->g_modmatrix, SOURCE_MIDI_NOTE_NUM,
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_EG_DECAY_SCALING, true); // enable
     else
-        enable_matrix_row(&ms->g_modmatrix, SOURCE_MIDI_NOTE_NUM,
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_EG_DECAY_SCALING, false);
 
     if (ms->m_filter_keytrack == 1)
-        enable_matrix_row(&ms->g_modmatrix, SOURCE_MIDI_NOTE_NUM,
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_FILTER_KEYTRACK, true); // enable
     else
-        enable_matrix_row(&ms->g_modmatrix, SOURCE_MIDI_NOTE_NUM,
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_FILTER_KEYTRACK, false);
 
     // TODO! delay
@@ -343,7 +334,7 @@ void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,
             ms->m_voices[i]->m_voice.m_osc2->m_cents = scaley_val + 2.5;
             ms->m_voices[i]->m_voice.m_osc3->m_cents = scaley_val;
             ms->m_voices[i]->m_voice.m_osc4->m_cents = scaley_val + 2.5;
-            ms->m_voices[i]->m_voice.g_modmatrix.m_sources[SOURCE_PITCHBEND] =
+            ms->m_voices[i]->m_voice.m_v_modmatrix.m_sources[SOURCE_PITCHBEND] =
                 normalized_pitch_bent_val;
         }
     }
@@ -481,15 +472,6 @@ void minisynth_status(void *self, wchar_t *status_string)
         wcscat(status_string, scratch);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
-
-    for (int i = 1; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core) {
-            printf("[%d] GOTS A MATRIX CORE\n", i);
-        }
-        else {
-            printf("[%d] NAE GOTS A MATRIX CORE\n", i);
-        }
-    }
 }
 
 void minisynth_setvol(void *self, double v)

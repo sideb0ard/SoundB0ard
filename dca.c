@@ -28,7 +28,7 @@ void dca_initialize(dca *d)
     d->m_pan_mod = 0.0;
     d->m_midi_velocity = 127;
 
-    d->g_modmatrix = NULL;
+    d->m_v_modmatrix = NULL;
 
     d->m_mod_source_eg = DEST_NONE;
     d->m_mod_source_amp_db = DEST_NONE;
@@ -68,23 +68,24 @@ void dca_update(dca *self)
         self->m_pan_control = self->m_global_dca_params->pan_control;
     }
 
-    if (self->g_modmatrix) {
+    if (self->m_v_modmatrix) {
         // printf("Yup yup, got modmatrix\n");
         if (self->m_mod_source_eg != DEST_NONE) {
             self->m_eg_mod =
-                self->g_modmatrix->m_destinations[self->m_mod_source_eg];
+                self->m_v_modmatrix->m_destinations[self->m_mod_source_eg];
         }
         if (self->m_mod_source_amp_db != DEST_NONE)
             self->m_amp_mod_db =
-                self->g_modmatrix->m_destinations[self->m_mod_source_amp_db];
+                self->m_v_modmatrix->m_destinations[self->m_mod_source_amp_db];
 
         if (self->m_mod_source_velocity != DEST_NONE)
             self->m_midi_velocity =
-                self->g_modmatrix->m_destinations[self->m_mod_source_velocity];
+                self->m_v_modmatrix
+                    ->m_destinations[self->m_mod_source_velocity];
 
         if (self->m_mod_source_pan != DEST_NONE)
             self->m_pan_mod =
-                self->g_modmatrix->m_destinations[self->m_mod_source_pan];
+                self->m_v_modmatrix->m_destinations[self->m_mod_source_pan];
     }
 
     if (self->m_eg_mod >= 0) {

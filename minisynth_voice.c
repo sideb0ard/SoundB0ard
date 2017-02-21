@@ -211,7 +211,7 @@ void minisynth_voice_reset(minisynth_voice *msv)
 bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
                              double *right_output)
 {
-    // if (msv->m_voice.g_modmatrix.m_matrix_core) {
+    // if (msv->m_voice.m_v_modmatrix.m_matrix_core) {
     //    printf("VOICE GOTS A MATRIX CORE\n");
     //} else {
     //    printf("VOICE NAE GOTS A MATRIX CORE\n");
@@ -222,7 +222,7 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     }
 
     //// layer 0 //////////////////////////////
-    do_modulation_matrix(&msv->m_voice.g_modmatrix, 0);
+    do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 0);
 
     ////// update layer 1 modulators
     eg_update(&msv->m_voice.m_eg1);
@@ -233,7 +233,7 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     lfo_do_oscillate((oscillator *)&msv->m_voice.m_lfo1, NULL);
 
     ////// layer 1 //////////////////////////////
-    do_modulation_matrix(&msv->m_voice.g_modmatrix, 1);
+    do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 1);
 
     //////minisynth_voice_update(msv);
     dca_update(&msv->m_voice.m_dca);
