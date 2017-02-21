@@ -8,6 +8,9 @@
 
 extern const wchar_t *sparkchars;
 
+// defined in minisynth_voice.h
+char *s_mode_names[] = {"SAW3", "SQR3", "SAW2SQR", "TRI2SAW", "TRI2SQR"};
+
 minisynth *new_minisynth(void)
 {
     minisynth *ms = calloc(1, sizeof(minisynth));
@@ -61,6 +64,9 @@ minisynth *new_minisynth(void)
         pthread_detach(melody_looprrr);
     }
 
+    minisynth_update(ms);
+    printf("NEW! SUSTAIN LEVEL is %f\n",
+            ms->m_voices[0]->m_voice.m_eg1.m_sustain_level);
     return ms;
 }
 
@@ -155,7 +161,6 @@ void minisynth_update(minisynth *ms)
         ms->m_attack_time_msec;
     ms->m_global_synth_params.eg1_params.decay_time_msec =
         ms->m_decay_release_time_msec;
-
     ms->m_global_synth_params.eg1_params.sustain_level = ms->m_sustain_level;
     ms->m_global_synth_params.eg1_params.release_time_msec =
         ms->m_decay_release_time_msec;
@@ -263,31 +268,19 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         switch (data1) {
         case 1: // K1 - Envelope Attack Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            ms->m_global_synth_params.eg1_params.attack_time_msec = scaley_val;
-            ms->m_global_synth_params.eg2_params.attack_time_msec = scaley_val;
-            ms->m_global_synth_params.eg3_params.attack_time_msec = scaley_val;
-            ms->m_global_synth_params.eg4_params.attack_time_msec = scaley_val;
+            ms->m_attack_time_msec = scaley_val;
             break;
         case 2: // K2 - Envelope Decay Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            ms->m_global_synth_params.eg1_params.decay_time_msec = scaley_val;
-            ms->m_global_synth_params.eg2_params.decay_time_msec = scaley_val;
-            ms->m_global_synth_params.eg3_params.decay_time_msec = scaley_val;
-            ms->m_global_synth_params.eg4_params.decay_time_msec = scaley_val;
+            ms->m_decay_release_time_msec = scaley_val;
             break;
         case 3: // K3 - Envelope Sustain Level
             scaley_val = scaleybum(1, 128, 0, 1, data2);
-            ms->m_global_synth_params.eg1_params.sustain_level = scaley_val;
-            ms->m_global_synth_params.eg2_params.sustain_level = scaley_val;
-            ms->m_global_synth_params.eg3_params.sustain_level = scaley_val;
-            ms->m_global_synth_params.eg4_params.sustain_level = scaley_val;
+            ms->m_sustain_level = scaley_val;
             break;
         case 4: // K4 - Envelope Release Time Msec
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            ms->m_global_synth_params.eg1_params.release_time_msec = scaley_val;
-            ms->m_global_synth_params.eg2_params.release_time_msec = scaley_val;
-            ms->m_global_synth_params.eg3_params.release_time_msec = scaley_val;
-            ms->m_global_synth_params.eg4_params.release_time_msec = scaley_val;
+            ms->m_decay_release_time_msec = scaley_val;
             break;
         case 5: // K5 - LFO rate
             scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
@@ -301,19 +294,18 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
             break;
         case 7: // K7 - Filter Frequency Cut
             scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-            ms->m_global_synth_params.filter1_params.fc_control = scaley_val;
-            ms->m_global_synth_params.filter2_params.fc_control = scaley_val;
+            ms->m_fc_control = scaley_val;
             break;
         case 8: // K8 - Filter Q control
             scaley_val = scaleybum(1, 128, 1, 10, data2);
             printf("FILTER Q control! %f\n", scaley_val);
-            ms->m_global_synth_params.filter1_params.q_control = scaley_val;
-            ms->m_global_synth_params.filter2_params.q_control = scaley_val;
+            ms->m_q_control = scaley_val;
             break;
         default:
             printf("SOMthing else\n");
         }
     }
+    minisynth_update(ms);
 }
 
 void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,
@@ -346,6 +338,7 @@ void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,
             ms->m_voices[i]->m_voice.m_osc4->m_cents = 2.5;
         }
     }
+    minisynth_update(ms);
 }
 
 void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)
@@ -461,8 +454,12 @@ void minisynth_status(void *self, wchar_t *status_string)
     minisynth *ms = (minisynth *)self;
     swprintf(status_string, 119,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
-                              "Multi: %d, Cur: %d",
-             ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody);
+                              "Multimode: %d, Cur: %d"
+             "\n      MODE: %s A:%.2f D:%.2f S:%.2f R:%.2f",
+             ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody,
+             s_mode_names[ms->m_voice_mode],
+             ms->m_attack_time_msec, ms->m_decay_release_time_msec,
+             ms->m_sustain_level, ms->m_decay_release_time_msec);
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
         wchar_t scratch[128] = {0};

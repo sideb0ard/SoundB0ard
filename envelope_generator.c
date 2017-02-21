@@ -5,8 +5,8 @@
 
 #include "defjams.h"
 #include "envelope_generator.h"
-
 // this ordering should match the enum defined in envelope_header.h
+//
 char *state_strings[] = {"OFFF",    "ATTACK",  "DECAY",
                          "SUSTAIN", "RELEASE", "SHUTDOWN"};
 
@@ -14,10 +14,9 @@ envelope_generator *new_envelope_generator()
 {
     envelope_generator *eg =
         (envelope_generator *)calloc(1, sizeof(envelope_generator));
-    if (eg == NULL) {
-        printf("Oof\n");
+
+    if (eg == NULL)
         return NULL;
-    }
 
     envelope_generator_init(eg);
 
@@ -51,8 +50,6 @@ void envelope_generator_init(envelope_generator *eg)
 
     eg->m_v_modmatrix = NULL;
 
-    // eg->m_eg1_osc_intensity = EG1_DEFAULT_OSC_INTENSITY;
-
     eg->m_mod_dest_eg_output = SOURCE_NONE;
     eg->m_mod_dest_eg_biased_output = SOURCE_NONE;
 
@@ -76,7 +73,7 @@ bool eg_is_active(envelope_generator *self)
 bool eg_can_note_off(envelope_generator *self)
 {
     if (self->m_state != RELEASE && self->m_state != SHUTDOWN &&
-        !self->m_release_pending)
+        self->m_state != OFFF && !self->m_release_pending)
         return true;
     return false;
 }
@@ -131,7 +128,6 @@ void eg_calculate_attack_time(envelope_generator *self)
 
 void eg_calculate_decay_time(envelope_generator *self)
 {
-    // printf("CALC DECAY TIME!\n");
     double d_samples =
         SAMPLE_RATE *
         ((self->m_decay_time_scalar * self->m_decay_time_msec) / 1000.0);
@@ -169,13 +165,9 @@ void eg_set_release_time_msec(envelope_generator *self, double time)
     eg_calculate_release_time(self);
 }
 
-void eg_set_sustain_override(envelope_generator *self, bool b)
+void eg_set_shutdown_time_msec(envelope_generator *self, double time)
 {
-    self->m_sustain_override = b;
-    if (self->m_release_pending && !self->m_sustain_override) {
-        self->m_release_pending = false;
-        eg_note_off(self);
-    }
+    self->m_shutdown_time_msec = time;
 }
 
 void eg_set_sustain_level(envelope_generator *self, double level)
@@ -184,6 +176,15 @@ void eg_set_sustain_level(envelope_generator *self, double level)
     eg_calculate_decay_time(self);
     if (self->m_state != RELEASE)
         eg_calculate_release_time(self);
+}
+
+void eg_set_sustain_override(envelope_generator *self, bool b)
+{
+    self->m_sustain_override = b;
+    if (self->m_release_pending && !self->m_sustain_override) {
+        self->m_release_pending = false;
+        eg_note_off(self);
+    }
 }
 
 void eg_start_eg(envelope_generator *self)
@@ -233,8 +234,8 @@ void eg_update(envelope_generator *self)
 
         if (self->m_decay_time_msec !=
             self->m_global_eg_params->decay_time_msec)
-            eg_set_attack_time_msec(self,
-                                    self->m_global_eg_params->attack_time_msec);
+            eg_set_decay_time_msec(self,
+                                   self->m_global_eg_params->attack_time_msec);
 
         if (self->m_release_time_msec !=
             self->m_global_eg_params->release_time_msec)
@@ -251,7 +252,7 @@ void eg_update(envelope_generator *self)
         self->m_legato_mode = self->m_global_eg_params->legato_mode;
     }
 
-    if (!self->m_v_modmatrix || !self->m_output_eg) {
+    if (!self->m_v_modmatrix) {
         return;
     }
 
@@ -303,12 +304,10 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
         self->m_envelope_output =
             self->m_attack_offset +
             self->m_envelope_output * self->m_attack_coeff;
-        /// printf("ATTACK! %f\n", self->m_envelope_output);
         if (self->m_envelope_output >= 1.0 ||
             self->m_attack_time_scalar * self->m_attack_time_msec <= 0.0) {
             self->m_envelope_output = 1.0;
             self->m_state = DECAY;
-            // printf("Going to DECAY state\n");
             break;
         }
         break;
@@ -320,13 +319,13 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
             self->m_decay_time_scalar * self->m_decay_time_msec <= 0.0) {
             self->m_envelope_output = self->m_sustain_level;
             self->m_state = SUSTAIN;
-            // printf("Going to SUSTAIN state\n");
             break;
         }
         break;
     }
     case SUSTAIN: {
         self->m_envelope_output = self->m_sustain_level;
+        //printf("SSSSSSSSsUTAINstate %f\n", self->m_envelope_output);
         break;
     }
     case RELEASE: {

@@ -235,7 +235,7 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     ////// layer 1 //////////////////////////////
     do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 1);
 
-    //////minisynth_voice_update(msv);
+    minisynth_voice_update(msv);
     dca_update(&msv->m_voice.m_dca);
     moog_update((filter *)&msv->m_moog_ladder_filter);
 
@@ -249,10 +249,10 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
         0.333 * // qb_do_oscillate((oscillator *)&msv->m_osc2, NULL);
             qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
         0.333 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL);
-    //    +
-    // 0.333 *
-    //    qb_do_oscillate((oscillator*) &msv->m_osc4,
-    //    NULL);
+    //   +
+    //0.333 *
+    //   qb_do_oscillate((oscillator*) &msv->m_osc4,
+    //   NULL);
 
     //*left_output = osc_mix;
     double filter_out =

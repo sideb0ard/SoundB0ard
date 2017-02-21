@@ -75,29 +75,24 @@ void keys(int soundgen_num)
             case 122:
                 printf("SAW3 mode\n");
                 ms->m_voice_mode = 0;
-                minisynth_update(ms);
-
                 // printf("Changing WAVE form of synth->osc1\n");
                 // minisynth_change_osc_wave_form(ms, 0, 0, true);
                 break;
             case 120:
                 printf("SQR3 mode\n");
                 ms->m_voice_mode = 1;
-                minisynth_update(ms);
                 // printf("Changing WAVE form of synth->osc2\n");
                 // minisynth_change_osc_wave_form(ms, 0, 1, true);
                 break;
             case 99:
                 printf("SAW2SQR mode\n");
                 ms->m_voice_mode = 2;
-                minisynth_update(ms);
                 // printf("Changing WAVE form of synth->lfo\n");
                 // minisynth_change_osc_wave_form(ms, 0, 2, true);
                 break;
             case 118:
                 printf("TRI2SAW mode\n");
                 ms->m_voice_mode = 3;
-                minisynth_update(ms);
                 // ms->m_filter_keytrack = 1 - ms->m_filter_keytrack;
                 // printf("Key tracking toggle - val is %d!\n",
                 //       ms->m_filter_keytrack);
@@ -105,7 +100,6 @@ void keys(int soundgen_num)
             case 98:
                 printf("TRI2SQR mode\n");
                 ms->m_voice_mode = 4;
-                minisynth_update(ms);
                 // printf("Key tracking intensity toggle!\n");
                 // if (ms->m_filter_keytrack_intensity == 0.5)
                 //    ms->m_filter_keytrack_intensity = 2.0;
@@ -155,6 +149,7 @@ void keys(int soundgen_num)
                 }
                 printf("CCCC %d\n", ch);
             }
+            minisynth_update(ms);
         }
     }
     tcsetattr(0, TCSANOW, &old_info);

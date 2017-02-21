@@ -62,7 +62,6 @@ TARGET = sbsh
 
 all: $(TARGET)
 	@ctags *{h,c}
-	@clang-format -i *{h,c}
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 $(TARGET): $(OBJ)

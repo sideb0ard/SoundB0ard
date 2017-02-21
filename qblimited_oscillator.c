@@ -6,6 +6,8 @@
 #include "qblimited_oscillator.h"
 #include "utils.h"
 
+char *s_waveform_names[] = {"SINE", "SAW1", "SAW2", "SAW3", "TRI", "SQUARE", "NOISE", "PNOISE", "MAX_OSC" };
+
 qb_osc *qb_osc_new()
 {
     qb_osc *qb = (qb_osc *)calloc(1, sizeof(qb_osc));
