@@ -66,7 +66,7 @@ minisynth *new_minisynth(void)
 
     minisynth_update(ms);
     printf("NEW! SUSTAIN LEVEL is %f\n",
-            ms->m_voices[0]->m_voice.m_eg1.m_sustain_level);
+           ms->m_voices[0]->m_voice.m_eg1.m_sustain_level);
     return ms;
 }
 
@@ -455,11 +455,11 @@ void minisynth_status(void *self, wchar_t *status_string)
     swprintf(status_string, 119,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
                               "Multimode: %d, Cur: %d"
-             "\n      MODE: %s A:%.2f D:%.2f S:%.2f R:%.2f",
+                              "\n      MODE: %s A:%.2f D:%.2f S:%.2f R:%.2f",
              ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody,
-             s_mode_names[ms->m_voice_mode],
-             ms->m_attack_time_msec, ms->m_decay_release_time_msec,
-             ms->m_sustain_level, ms->m_decay_release_time_msec);
+             s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec,
+             ms->m_decay_release_time_msec, ms->m_sustain_level,
+             ms->m_decay_release_time_msec);
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
         wchar_t scratch[128] = {0};

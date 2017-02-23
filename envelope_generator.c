@@ -215,7 +215,6 @@ void eg_init_global_parameters(envelope_generator *self,
 {
     self->m_global_eg_params = params;
     self->m_global_eg_params->attack_time_msec = self->m_attack_time_msec;
-    self->m_global_eg_params->attack_time_msec = self->m_attack_time_msec;
     self->m_global_eg_params->decay_time_msec = self->m_decay_time_msec;
     self->m_global_eg_params->release_time_msec = self->m_release_time_msec;
     self->m_global_eg_params->sustain_level = self->m_sustain_level;
@@ -247,7 +246,6 @@ void eg_update(envelope_generator *self)
 
         self->m_shutdown_time_msec =
             self->m_global_eg_params->shutdown_time_msec;
-
         self->m_reset_to_zero = self->m_global_eg_params->reset_to_zero;
         self->m_legato_mode = self->m_global_eg_params->legato_mode;
     }
@@ -325,7 +323,7 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
     }
     case SUSTAIN: {
         self->m_envelope_output = self->m_sustain_level;
-        //printf("SSSSSSSSsUTAINstate %f\n", self->m_envelope_output);
+        // printf("SSSSSSSSsUTAINstate %f\n", self->m_envelope_output);
         break;
     }
     case RELEASE: {
@@ -345,6 +343,7 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
             //        self->m_envelope_output);
             self->m_envelope_output = 0.0;
             self->m_state = OFFF;
+            // printf("RELEASE SAYS OFFF!\n");
             break;
         }
         break;
@@ -355,10 +354,12 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
             if (self->m_envelope_output <= 0) {
                 self->m_envelope_output = 0.0;
                 self->m_state = OFFF;
+                // printf("SHUTDOWN SAYS OFFF!\n");
                 break;
             }
         }
         else {
+            // printf("SHUTDOWN SAYS OFFF!\n");
             self->m_state = OFFF;
             // printf("Going to OFFF state\n");
         }
@@ -391,6 +392,7 @@ void eg_note_off(envelope_generator *self)
         self->m_state = RELEASE;
     }
     else {
+        // printf("EG_NOTE_OFF SAYS OFF! Vol: %f\n", self->m_envelope_output);
         self->m_state = OFFF;
     }
 }
