@@ -4,8 +4,10 @@
 
 #include "midi_freq_table.h"
 #include "minisynth.h"
+#include "mixer.h"
 #include "utils.h"
 
+extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
 // defined in minisynth_voice.h
@@ -284,13 +286,11 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
             break;
         case 5: // K5 - LFO rate
             scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-            ms->m_global_synth_params.lfo1_params.osc_fo = scaley_val;
-            ms->m_global_synth_params.lfo2_params.osc_fo = scaley_val;
+            ms->m_lfo1_rate = scaley_val;
             break;
         case 6: // K6 - LFO amplitude
             scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-            ms->m_global_synth_params.lfo1_params.amplitude = scaley_val;
-            ms->m_global_synth_params.lfo2_params.amplitude = scaley_val;
+            ms->m_lfo1_amplitude = scaley_val;
             break;
         case 7: // K7 - Filter Frequency Cut
             scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
@@ -452,6 +452,14 @@ void minisynth_status(void *self, wchar_t *status_string)
 {
     // TODO - a shit load of error checking on boundaries and size
     minisynth *ms = (minisynth *)self;
+    if (mixr->debug_mode)
+    {
+        for (int i=0; i < PPNS; i++)
+        {
+            if (ms->melodies[ms->cur_melody][i] != NULL)
+                print_midi_event_rec(ms->melodies[ms->cur_melody][i]);
+        }
+    }
     swprintf(status_string, 119,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
                               "Multimode: %d, Cur: %d"
@@ -490,6 +498,7 @@ double minisynth_getvol(void *self)
 double minisynth_gennext(void *self)
 {
     minisynth *ms = (minisynth *)self;
+    minisynth_update(ms);
 
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
@@ -501,10 +510,6 @@ double minisynth_gennext(void *self)
 
     for (int i = 0; i < MAX_VOICES; i++) {
         if (ms->m_voices[i]) {
-            // if (ms->m_voices[i]->m_voice.g_modmatrix.m_matrix_core)
-            //    printf("[%d] MINISYNTH GENNEXT - matrxi CORE!\n", i);
-            // else
-            //    printf("[%d] NAE MINISYNTH GENNEXT - matrxi CORE!\n", i);
             minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
         }
         accum_out_left += mix * out_left;

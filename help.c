@@ -14,15 +14,17 @@ void print_help()
     // playback\n");
     printf(ANSI_COLOR_WHITE "bpm <bpm>" ANSI_COLOR_CYAN
                             " -- change bpm to <bpm>\n");
+    printf(ANSI_COLOR_WHITE "debug [on|off]" ANSI_COLOR_CYAN
+                            " -- enable/disable debug output\n");
+    printf(ANSI_COLOR_WHITE
+           "ls" ANSI_COLOR_CYAN
+           " -- show file listing of samples, loops, and file projects\n");
+    printf(ANSI_COLOR_WHITE "ps" ANSI_COLOR_CYAN
+                            " -- show global status and process listing\n");
     printf(ANSI_COLOR_WHITE "vol <soundgen_num> <vol>" ANSI_COLOR_CYAN
                             " -- change volume of Soundgenerator to <vol>\n");
     printf(ANSI_COLOR_WHITE "vol mixer <vol>" ANSI_COLOR_CYAN
                             " -- change mixer volume to <vol>\n");
-    printf(ANSI_COLOR_WHITE "ps" ANSI_COLOR_CYAN
-                            " -- show global status and process listing\n");
-    printf(ANSI_COLOR_WHITE
-           "ls" ANSI_COLOR_CYAN
-           " -- show file listing of samples, loops, and file projects\n");
     // printf(ANSI_COLOR_WHITE
     //        "save <filename>" ANSI_COLOR_CYAN
     //        " -- save current project settings as <filename>\n");

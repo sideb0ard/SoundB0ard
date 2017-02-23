@@ -420,6 +420,7 @@ dca_set_midi_velocity	dca.c	/^void dca_set_midi_velocity(dca *self, unsigned int
 dca_set_pan_control	dca.c	/^void dca_set_pan_control(dca *self, double pan) { self->m_pan_control = pan; }$/;"	f
 dca_set_pan_mod	dca.c	/^void dca_set_pan_mod(dca *self, double mod) { self->m_pan_mod = mod; }$/;"	f
 dca_update	dca.c	/^void dca_update(dca *self)$/;"	f
+debug_mode	mixer.h	/^    bool debug_mode;$/;"	m	struct:t_mixer
 decay_time_msec	synthfunctions.h	/^    double decay_time_msec;   \/\/ dcy: is a time to decay 1->0$/;"	m	struct:__anon27
 delay	effect.h	/^    stereodelay *delay;$/;"	m	struct:__anon8
 delay	mixer.h	/^    float delay[(int)SAMPLE_RATE \/ 8];$/;"	m	struct:__anon15
@@ -1151,7 +1152,7 @@ rr	effect.h	/^    double rr;$/;"	m	struct:__anon8
 rsh	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon22
 rsq	effect.h	/^    double rsq;$/;"	m	struct:__anon8
 s_mode_names	minisynth.c	/^char *s_mode_names[] = {"SAW3", "SQR3", "SAW2SQR", "TRI2SAW", "TRI2SQR"};$/;"	v
-s_waveform_names	qblimited_oscillator.c	/^char *s_waveform_names[] = {"SINE", "SAW1", "SAW2", "SAW3", "TRI", "SQUARE", "NOISE", "PNOISE", "MAX_OSC" };$/;"	v
+s_waveform_names	qblimited_oscillator.c	/^char *s_waveform_names[] = {"SINE",   "SAW1",  "SAW2",   "SAW3",   "TRI",$/;"	v
 sample_import_file_contents	sampler.c	/^void sample_import_file_contents(file_sample *fs, char *filename)$/;"	f
 sample_num_loops	sampler.h	/^    int sample_num_loops[MAX_SAMPLES_PER_LOOPER];$/;"	m	struct:t_sampler
 sample_pos	drumr.h	/^} sample_pos;$/;"	t	typeref:struct:t_sample_pos

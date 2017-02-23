@@ -90,6 +90,19 @@ void interpret(char *line)
                 mixer_update_bpm(mixr, bpm);
         }
 
+        else if (strncmp("debug", wurds[0], 5) == 0) {
+            if (strncmp("on", wurds[1], 2) == 0 ||
+                strncmp("true", wurds[1], 4) == 0) {
+                printf("Enabling debug mode\n");
+                mixr->debug_mode = true;
+            }
+            else if (strncmp("off", wurds[1], 2) == 0 ||
+                     strncmp("false", wurds[1], 5) == 0) {
+                printf("Disabling debug mode\n");
+                mixr->debug_mode = false;
+            }
+        }
+
         else if (strncmp("ps", wurds[0], 2) == 0) {
             mixer_ps(mixr);
         }

@@ -30,6 +30,7 @@ typedef struct t_mixer {
     int env_var_count;
 
     int delay_on;
+    bool debug_mode;
 
     EFFECT **effects;
     int effects_num;

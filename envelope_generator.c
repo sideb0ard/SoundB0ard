@@ -227,9 +227,12 @@ void eg_update(envelope_generator *self)
 {
     if (self->m_global_eg_params) {
         if (self->m_attack_time_msec !=
-            self->m_global_eg_params->attack_time_msec)
+            self->m_global_eg_params->attack_time_msec) {
             eg_set_attack_time_msec(self,
                                     self->m_global_eg_params->attack_time_msec);
+            printf("Attack time changed - now it's %f\n",
+                   self->m_attack_time_msec);
+        }
 
         if (self->m_decay_time_msec !=
             self->m_global_eg_params->decay_time_msec)
@@ -254,17 +257,17 @@ void eg_update(envelope_generator *self)
         return;
     }
 
-    // --- with mod matrix, when value is 0 there is NO modulation, so here
-    if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
-        self->m_attack_time_scalar == 1.0) {
-        double scale =
-            self->m_v_modmatrix
-                ->m_destinations[self->m_mod_source_eg_attack_scaling];
-        if (self->m_attack_time_scalar != 1.0 - scale) {
-            self->m_attack_time_scalar = 1.0 - scale;
-            eg_calculate_attack_time(self);
-        }
-    }
+    //// --- with mod matrix, when value is 0 there is NO modulation, so here
+    // if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
+    //    self->m_attack_time_scalar == 1.0) {
+    //    double scale =
+    //        self->m_v_modmatrix
+    //            ->m_destinations[self->m_mod_source_eg_attack_scaling];
+    //    if (self->m_attack_time_scalar != 1.0 - scale) {
+    //        self->m_attack_time_scalar = 1.0 - scale;
+    //        eg_calculate_attack_time(self);
+    //    }
+    //}
 
     // --- for vel->attack and note#->decay scaling modulation
     //     NOTE: make sure this is only called ONCE during a new note event!
