@@ -65,9 +65,9 @@ void *midiman()
                         int tick = mixr->tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
-                        print_midi_event_rec(ev);
                         // TODO - maybe something better than just add a tick?
-                        // perhaps 16 x ? or be able to add additional events to a midiEvent
+                        // perhaps 16 x ? or be able to add additional events to
+                        // a midiEvent
                         while (ms->melodies[ms->cur_melody][tick] != NULL)
                             tick++;
                         ms->melodies[ms->cur_melody][tick] = ev;
@@ -77,7 +77,6 @@ void *midiman()
                     ev.event_type = status;
                     ev.data1 = data1;
                     ev.data2 = data2;
-                    print_midi_event_rec(&ev);
                     midi_parse_midi_event(ms, &ev);
                 }
                 else if (mixr->midi_control_destination == DELAYFX) {

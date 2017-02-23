@@ -215,8 +215,10 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
         return false;
     }
 
+    minisynth_voice_update(msv);
+
     //// layer 0 //////////////////////////////
-    do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 0);
+    // do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 0);
 
     ////// update layer 1 modulators
     eg_update(&msv->m_voice.m_eg1);
@@ -229,7 +231,6 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     ////// layer 1 //////////////////////////////
     do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 1);
 
-    minisynth_voice_update(msv);
     dca_update(&msv->m_voice.m_dca);
     moog_update((filter *)&msv->m_moog_ladder_filter);
 

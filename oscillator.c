@@ -146,8 +146,9 @@ void osc_reset(oscillator *self)
 void osc_update(oscillator *self)
 {
     if (self->m_global_oscillator_params) {
-        if (self->m_global_oscillator_params->osc_fo >= 0)
+        if (self->m_global_oscillator_params->osc_fo >= 0) {
             self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
+        }
 
         self->m_fo_ratio = self->m_global_oscillator_params->fo_ratio;
         self->m_amplitude = self->m_global_oscillator_params->amplitude;

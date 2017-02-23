@@ -263,7 +263,7 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
 void minisynth_midi_control(minisynth *ms, unsigned int data1,
                             unsigned int data2)
 {
-    // printf("MIDI Mind Control! %d %d\n", data1, data2);
+    printf("MIDI Mind Control! %d %d\n", data1, data2);
 
     for (int i = 0; i < MAX_VOICES; i++) {
         double scaley_val;
@@ -452,10 +452,8 @@ void minisynth_status(void *self, wchar_t *status_string)
 {
     // TODO - a shit load of error checking on boundaries and size
     minisynth *ms = (minisynth *)self;
-    if (mixr->debug_mode)
-    {
-        for (int i=0; i < PPNS; i++)
-        {
+    if (mixr->debug_mode) {
+        for (int i = 0; i < PPNS; i++) {
             if (ms->melodies[ms->cur_melody][i] != NULL)
                 print_midi_event_rec(ms->melodies[ms->cur_melody][i]);
         }
@@ -463,11 +461,11 @@ void minisynth_status(void *self, wchar_t *status_string)
     swprintf(status_string, 119,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
                               "Multimode: %d, Cur: %d"
-                              "\n      MODE: %s A:%.2f D:%.2f S:%.2f R:%.2f",
-             ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody,
+                              "\n      MODE: %s A:%.2f D/R:%.2f S:%.2f",
+             "\n      LFO1 amp: %f :%.2f D/R:%.2f S:%.2f", ms->vol, ms->sustain,
+             ms->multi_melody_mode, ms->cur_melody,
              s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec,
-             ms->m_decay_release_time_msec, ms->m_sustain_level,
-             ms->m_decay_release_time_msec);
+             ms->m_decay_release_time_msec, ms->m_sustain_level);
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
         wchar_t scratch[128] = {0};
@@ -498,7 +496,7 @@ double minisynth_getvol(void *self)
 double minisynth_gennext(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    minisynth_update(ms);
+    // minisynth_update(ms);
 
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;

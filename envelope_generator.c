@@ -109,6 +109,7 @@ void eg_set_eg_mode(envelope_generator *self, eg_mode mode)
         self->m_release_tco = self->m_decay_tco;
     }
 
+    // printf("SETEGMODE!\n");
     eg_calculate_attack_time(self);
     eg_calculate_decay_time(self);
     eg_calculate_release_time(self);
@@ -124,6 +125,8 @@ void eg_calculate_attack_time(envelope_generator *self)
         exp(-log((1.0 + self->m_attack_tco) / self->m_attack_tco) / d_samples);
     self->m_attack_offset =
         (1.0 + self->m_attack_tco) * (1.0 - self->m_attack_coeff);
+    // printf("COEFF: %f OFFSET: %f\n", self->m_attack_coeff,
+    // self->m_attack_offset);
 }
 
 void eg_calculate_decay_time(envelope_generator *self)
@@ -150,6 +153,7 @@ void eg_calculate_release_time(envelope_generator *self)
 void eg_set_attack_time_msec(envelope_generator *self, double time)
 {
     self->m_attack_time_msec = time;
+    printf("SETATTACKTIME!\n");
     eg_calculate_attack_time(self);
 }
 
@@ -194,10 +198,7 @@ void eg_start_eg(envelope_generator *self)
         return;
     }
 
-    // printf("STATE : %s\n", state_strings[self->m_state]);
-    // TODO - race condition? YES! this is it - synth finds EG set
-    // to zero after this reset and switches off the osc!!!
-    // reset() wos here // WATCH OUT! 2017/02/04
+    // NOTE: has caused issues -
     eg_reset(self);
     self->m_state = ATTACK;
 }
@@ -257,17 +258,18 @@ void eg_update(envelope_generator *self)
         return;
     }
 
-    //// --- with mod matrix, when value is 0 there is NO modulation, so here
-    // if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
-    //    self->m_attack_time_scalar == 1.0) {
-    //    double scale =
-    //        self->m_v_modmatrix
-    //            ->m_destinations[self->m_mod_source_eg_attack_scaling];
-    //    if (self->m_attack_time_scalar != 1.0 - scale) {
-    //        self->m_attack_time_scalar = 1.0 - scale;
-    //        eg_calculate_attack_time(self);
-    //    }
-    //}
+    // --- with mod matrix, when value is 0 there is NO modulation, so here
+    if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
+        self->m_attack_time_scalar == 1.0) {
+        double scale =
+            self->m_v_modmatrix
+                ->m_destinations[self->m_mod_source_eg_attack_scaling];
+        if (self->m_attack_time_scalar != 1.0 - scale) {
+            self->m_attack_time_scalar = 1.0 - scale;
+            printf("EGUPDATE!\n");
+            eg_calculate_attack_time(self);
+        }
+    }
 
     // --- for vel->attack and note#->decay scaling modulation
     //     NOTE: make sure this is only called ONCE during a new note event!
