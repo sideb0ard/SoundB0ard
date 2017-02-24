@@ -69,7 +69,7 @@ void *midiman()
                         // perhaps 16 x ? or be able to add additional events to
                         // a midiEvent
                         while (ms->melodies[ms->cur_melody][tick] != NULL)
-                            tick++;
+                            tick += 1 % PPNS;
                         ms->melodies[ms->cur_melody][tick] = ev;
                     }
 
