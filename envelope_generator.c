@@ -153,7 +153,6 @@ void eg_calculate_release_time(envelope_generator *self)
 void eg_set_attack_time_msec(envelope_generator *self, double time)
 {
     self->m_attack_time_msec = time;
-    printf("SETATTACKTIME!\n");
     eg_calculate_attack_time(self);
 }
 
