@@ -68,8 +68,10 @@ void *midiman()
                         // TODO - maybe something better than just add a tick?
                         // perhaps 16 x ? or be able to add additional events to
                         // a midiEvent
-                        while (ms->melodies[ms->cur_melody][tick] != NULL)
-                            tick += 1 % PPNS;
+                        while (ms->melodies[ms->cur_melody][tick] != NULL) {
+                            tick++;
+                            if (tick >= PPNS) tick = 0;
+                        }
                         ms->melodies[ms->cur_melody][tick] = ev;
                     }
 
