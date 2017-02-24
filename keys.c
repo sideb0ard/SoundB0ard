@@ -168,6 +168,7 @@ void *play_melody_loop(void *p)
 
         int idx = mixr->tick % PPNS;
 
+        // top of the loop, check if we need to progress to next loop
         if (idx == 0) {
             if (ms->multi_melody_mode) {
                 ms->cur_melody_iteration--;

@@ -50,6 +50,7 @@ minisynth *new_minisynth(void)
     ms->cur_octave = 0;
     ms->sustain = 0;
     ms->num_melodies = 1;
+    ms->m_voice_mode = 0;
 
     ms->sound_generator.gennext = &minisynth_gennext;
     ms->sound_generator.status = &minisynth_status;
@@ -461,10 +462,10 @@ void minisynth_status(void *self, wchar_t *status_string)
     swprintf(status_string, 119,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
                               "Multimode: %d, Cur: %d"
-                              "\n      MODE: %s A:%.2f D/R:%.2f S:%.2f",
+                              "\n      MODE: %d A:%.2f D/R:%.2f S:%.2f",
              "\n      LFO1 amp: %f :%.2f D/R:%.2f S:%.2f", ms->vol, ms->sustain,
              ms->multi_melody_mode, ms->cur_melody,
-             s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec,
+             ms->m_voice_mode, ms->m_attack_time_msec,
              ms->m_decay_release_time_msec, ms->m_sustain_level);
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
