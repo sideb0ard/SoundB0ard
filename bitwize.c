@@ -80,7 +80,7 @@ double bitwize_gennext(void *self)
 void bitwize_status(void *self, wchar_t *status_string)
 {
     BITWIZE *p_bitwize = self;
-    swprintf(status_string, 119,
+    swprintf(status_string, MAX_PS_STRING_SZ,
              WANSI_COLOR_MAGENTA "BWIZE vol: %f pattern: %d" ANSI_COLOR_RESET,
              p_bitwize->vol, p_bitwize->pattern);
 }

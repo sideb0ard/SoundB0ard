@@ -129,7 +129,7 @@ double algorithm_gen_next(void *self)
 void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
-    swprintf(status_string, 119,
+    swprintf(status_string, MAX_PS_STRING_SZ,
              WANSI_COLOR_RED "[ALGO]%s Post: %s %s %s %s %s", a->command,
              a->afterthought[0], a->afterthought[1], a->afterthought[2],
              a->afterthought[3], a->afterthought[4]);

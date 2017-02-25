@@ -70,7 +70,7 @@ void *midiman()
                         // a midiEvent
                         while (ms->melodies[ms->cur_melody][tick] != NULL) {
                             tick++;
-                            if (tick >= PPNS) tick = 0;
+                            if (tick == PPNS) tick = 0;
                         }
                         ms->melodies[ms->cur_melody][tick] = ev;
                     }

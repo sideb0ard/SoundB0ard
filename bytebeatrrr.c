@@ -40,7 +40,7 @@ double bytes_gen_next(void *self)
 void bytes_status(void *self, wchar_t *status_string)
 {
     bytebeat *b = (bytebeat *)self;
-    swprintf(status_string, 119,
+    swprintf(status_string, MAX_PS_STRING_SZ,
              WCOOL_COLOR_GREEN "[%s]\tvol: %.2lfs" ANSI_COLOR_RESET, b->pattern,
              b->vol);
 }

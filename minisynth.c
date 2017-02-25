@@ -11,7 +11,7 @@ extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
 // defined in minisynth_voice.h
-char *s_mode_names[] = {"SAW3", "SQR3", "SAW2SQR", "TRI2SAW", "TRI2SQR"};
+const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW", L"TRI2SQR"};
 
 minisynth *new_minisynth(void)
 {
@@ -451,22 +451,25 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
 // sound generator interface //////////////
 void minisynth_status(void *self, wchar_t *status_string)
 {
-    // TODO - a shit load of error checking on boundaries and size
     minisynth *ms = (minisynth *)self;
+
     if (mixr->debug_mode) {
         for (int i = 0; i < PPNS; i++) {
             if (ms->melodies[ms->cur_melody][i] != NULL)
                 print_midi_event_rec(ms->melodies[ms->cur_melody][i]);
         }
     }
-    swprintf(status_string, 119,
+
+    // TODO - a shit load of error checking on boundaries and size
+    swprintf(status_string, MAX_PS_STRING_SZ,
              WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
                               "Multimode: %d, Cur: %d"
-                              "\n      MODE: %d A:%.2f D/R:%.2f S:%.2f",
-             "\n      LFO1 amp: %f :%.2f D/R:%.2f S:%.2f", ms->vol, ms->sustain,
+                              "\n      MODE: %ls A:%.2f D/R:%.2f S:%.2f"
+             "\n      LFO1 amp: %2.f rate:%.2f", ms->vol, ms->sustain,
              ms->multi_melody_mode, ms->cur_melody,
-             ms->m_voice_mode, ms->m_attack_time_msec,
-             ms->m_decay_release_time_msec, ms->m_sustain_level);
+             s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec,
+             ms->m_decay_release_time_msec, ms->m_sustain_level,
+             ms->m_lfo1_amplitude, ms->m_lfo1_rate);
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
         wchar_t scratch[128] = {0};
