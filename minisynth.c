@@ -519,6 +519,8 @@ double minisynth_gennext(void *self)
     }
 
     // TODO delay
+    accum_out_left = effector(&ms->sound_generator, accum_out_left);
+    accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
 
     return accum_out_left * ms->vol;
 }
