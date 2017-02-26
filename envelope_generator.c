@@ -230,8 +230,6 @@ void eg_update(envelope_generator *self)
             self->m_global_eg_params->attack_time_msec) {
             eg_set_attack_time_msec(self,
                                     self->m_global_eg_params->attack_time_msec);
-            printf("Attack time changed - now it's %f\n",
-                   self->m_attack_time_msec);
         }
 
         if (self->m_decay_time_msec !=

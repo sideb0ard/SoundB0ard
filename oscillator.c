@@ -143,11 +143,14 @@ void osc_reset(oscillator *self)
 }
 
 // --- update the frequency, amp mod and PWM
-void osc_update(oscillator *self)
+void osc_update(oscillator *self, char *name)
 {
+    (void) name;
     if (self->m_global_oscillator_params) {
+        //printf("I'm %s\n", name);
         if (self->m_global_oscillator_params->osc_fo >= 0) {
             self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
+            //printf("Gots Global Params OSc_FO >= 0!\n");
         }
 
         self->m_fo_ratio = self->m_global_oscillator_params->fo_ratio;
@@ -169,6 +172,7 @@ void osc_update(oscillator *self)
     //
     // --- get from matrix Sources
     if (self->m_v_modmatrix) {
+        //printf("GOTS a V_MODMATRIX\n");
         // --- zero is norm for these
         self->m_fo_mod =
             self->m_v_modmatrix->m_destinations[self->m_mod_source_fo];

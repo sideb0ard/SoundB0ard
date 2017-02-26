@@ -1083,7 +1083,7 @@ osc_set_fo_mod_lin	oscillator.c	/^void osc_set_fo_mod_lin(oscillator *self, doub
 osc_set_phase_mod	oscillator.c	/^void osc_set_phase_mod(oscillator *self, double mod_val)$/;"	f
 osc_set_pitch_bend_mod	oscillator.c	/^void osc_set_pitch_bend_mod(oscillator *self, double mod_val)$/;"	f
 osc_set_pw_mod	oscillator.c	/^void osc_set_pw_mod(oscillator *self, double mod_val)$/;"	f
-osc_update	oscillator.c	/^void osc_update(oscillator *self)$/;"	f
+osc_update	oscillator.c	/^void osc_update(oscillator *self, char *name)$/;"	f
 oscillator	oscillator.h	/^struct oscillator {$/;"	s
 oscillator	oscillator.h	/^typedef struct oscillator oscillator;$/;"	t	typeref:struct:oscillator
 paCallback	main.c	/^static int paCallback(const void *inputBuffer, void *outputBuffer,$/;"	f	file:
@@ -1251,7 +1251,7 @@ unipolar_to_bipolar	utils.c	/^double unipolar_to_bipolar(double value) { return 
 update	filter.h	/^    void (*update)(filter *self);$/;"	m	struct:filter
 update_envelope_stream_bpm	envelope.c	/^void update_envelope_stream_bpm(ENVSTREAM *stream)$/;"	f
 update_environment	mixer.c	/^void update_environment(char *key, int val)$/;"	f
-update_oscillator	oscillator.h	/^    void (*update_oscillator)(oscillator *self);$/;"	m	struct:oscillator
+update_oscillator	oscillator.h	/^    void (*update_oscillator)(oscillator *self, char *name);$/;"	m	struct:oscillator
 usaw	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon22
 val	mixer.h	/^    int val;$/;"	m	struct:environment_variable
 value	envelope.h	/^    double value;$/;"	m	struct:envelope
@@ -1298,7 +1298,7 @@ wt_reset_oscillator	wt_oscillator.c	/^void wt_reset_oscillator(oscillator *self)
 wt_select_table	wt_oscillator.c	/^void wt_select_table(wt_osc *self)$/;"	f
 wt_start_oscillator	wt_oscillator.c	/^void wt_start_oscillator(oscillator *self)$/;"	f
 wt_stop_oscillator	wt_oscillator.c	/^void wt_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
-wt_update_oscillator	wt_oscillator.c	/^void wt_update_oscillator(oscillator *self)$/;"	f
+wt_update_oscillator	wt_oscillator.c	/^void wt_update_oscillator(oscillator *self, char *name)$/;"	f
 wtable	table.h	/^typedef struct wtable {$/;"	s
 wtable	table.h	/^} wtable;$/;"	t	typeref:struct:wtable
 wtable_free	table.c	/^void wtable_free(wtable **gtable)$/;"	f

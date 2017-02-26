@@ -33,7 +33,7 @@ void wt_start_oscillator(oscillator *self);
 void wt_stop_oscillator(oscillator *self);
 void wt_reset_oscillator(oscillator *self);
 
-void wt_update_oscillator(oscillator *self);
+void wt_update_oscillator(oscillator *self, char *name);
 // find the table with the proper number of harmonics for our pitch
 int wt_get_table_index(wt_osc *self);
 void wt_select_table(wt_osc *self);
