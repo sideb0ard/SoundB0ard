@@ -560,3 +560,16 @@ midi_event **minisynth_get_midi_loop(minisynth *self)
 {
     return self->melodies[self->cur_melody];
 }
+
+void minisynth_add_event(minisynth *ms, midi_event *ev)
+{
+    int tick = ev->tick;
+    while (ms->melodies[ms->cur_melody][tick] != NULL) {
+        tick++;
+        if (tick == PPNS)
+            tick = 0;
+    }
+    if (mixr->debug_mode)
+        printf("Adding Event: Tick: %d Type: %s Midi: %d\n", ev->tick, ev->event_type == 144 ? "NOTEON" : "NOTEOFF", ev->data1);
+    ms->melodies[ms->cur_melody][tick] = ev;
+}

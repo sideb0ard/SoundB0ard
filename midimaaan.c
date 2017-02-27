@@ -68,12 +68,7 @@ void *midiman()
                         // TODO - maybe something better than just add a tick?
                         // perhaps 16 x ? or be able to add additional events to
                         // a midiEvent
-                        while (ms->melodies[ms->cur_melody][tick] != NULL) {
-                            tick++;
-                            if (tick == PPNS)
-                                tick = 0;
-                        }
-                        ms->melodies[ms->cur_melody][tick] = ev;
+                        minisynth_add_event(ms, ev);
                     }
 
                     midi_event ev;

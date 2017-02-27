@@ -98,24 +98,51 @@ void chaosmonkey_throw_chaos()
         for (int i = 0; i < mixr->soundgen_num; i++) {
             if (mixr->sound_generators[i]->type == SYNTH_TYPE) {
                 int num_notes = 0;
-                int freq[10] = {0};
+                int midi_num[10] = {0};
                 int tick[10] = {0};
 
                 minisynth *ms = (minisynth *)mixr->sound_generators[i];
-                printf("Found a synth!\n");
                 midi_event **melody = minisynth_get_midi_loop(ms);
                 for (int j = 0; j < PPNS && num_notes < 10; j++) {
                     if (melody[j] != NULL) {
                         if (melody[j]->event_type == 144) {
-                            freq[num_notes] = melody[j]->data1;
+                            midi_num[num_notes] = melody[j]->data1;
                             tick[num_notes] = melody[j]->tick;
                             num_notes++;
                         }
-                        printf("Found an event!\n");
                     }
                 }
-                printf("SYNTH has %d ON EVENTS\n", num_notes);
-                printf("I WILL CREATE %d\n", rand() % num_notes);
+                int num_new_notes = rand() % 4;
+                for (int k = 0; k < num_new_notes; k++)
+                {
+                    int newnum = (rand() % 2) > 0 ? 4 : 3;
+                    int randy = rand() % 3;
+                    switch(randy) {
+                    case 0:
+                        break; // same octave
+                    case 1:
+                        newnum += 12; // up an octave
+                    case 2:
+                        newnum -= 12;
+                    }
+
+                    int new_midi_num = (midi_num[k]+newnum)%128;
+
+                    int note_on_tick = (tick[k] + PPNS/2) % PPNS;
+                    int note_off_tick = note_on_tick + (PPS * 4);
+                    if (note_off_tick >= PPNS) note_off_tick = PPNS - 1;
+
+                    midi_event *ev = new_midi_event(note_on_tick, 144, // noteon
+                                                    new_midi_num, 127);
+                    ev->delete_after_use = true;
+
+                    midi_event *ev2 = new_midi_event(note_off_tick, 128, //noteoff
+                                                    new_midi_num, 127);
+                    ev2->delete_after_use = true;
+
+                    minisynth_add_event(ms, ev);
+                    minisynth_add_event(ms, ev2);
+                }
             }
         }
     }

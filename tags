@@ -965,6 +965,7 @@ midiman	midimaaan.c	/^void *midiman()$/;"	f
 minisynth	midimaaan.h	/^typedef struct minisynth minisynth;$/;"	t	typeref:struct:minisynth
 minisynth	minisynth.h	/^typedef struct minisynth {$/;"	s
 minisynth	minisynth.h	/^} minisynth;$/;"	t	typeref:struct:minisynth
+minisynth_add_event	minisynth.c	/^void minisynth_add_event(minisynth *ms, midi_event *ev)$/;"	f
 minisynth_add_melody	minisynth.c	/^void minisynth_add_melody(minisynth *ms)$/;"	f
 minisynth_gennext	minisynth.c	/^double minisynth_gennext(void *self)$/;"	f
 minisynth_get_midi_loop	minisynth.c	/^midi_event **minisynth_get_midi_loop(minisynth *self)$/;"	f

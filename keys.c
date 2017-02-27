@@ -120,7 +120,6 @@ void keys(int soundgen_num)
                     print_midi_event(midi_num);
                     minisynth_midi_note_on(ms, midi_num, fake_velocity);
 
-                    // TODO: refactor this out - this adds a temp note_off
                     int note_off_tick =
                         ((mixr->tick % PPNS) + PPS * 4) %
                         PPNS; // rough guess - PPS is pulses per quart note
@@ -128,7 +127,8 @@ void keys(int soundgen_num)
                     midi_event *ev = new_midi_event(note_off_tick, 128,
                                                     midi_num, fake_velocity);
                     ev->delete_after_use = true; // _THIS_ is the magic
-                    ms->melodies[ms->cur_melody][note_off_tick] = ev;
+                    //ms->melodies[ms->cur_melody][note_off_tick] = ev;
+                    minisynth_add_event(ms, ev);
                     ////////////////////////
 
                     if (ms->recording) {
@@ -136,6 +136,7 @@ void keys(int soundgen_num)
                         int note_on_tick = mixr->tick % PPNS;
                         midi_event *ev = new_midi_event(
                             note_on_tick, 144, midi_num, fake_velocity);
+
                         ms->melodies[ms->cur_melody][note_on_tick] = ev;
 
                         int note_off_tick =
@@ -144,7 +145,8 @@ void keys(int soundgen_num)
                                   // and PPNS is pulses per minisynth Loop
                         midi_event *ev2 = new_midi_event(
                             note_off_tick, 128, midi_num, fake_velocity);
-                        ms->melodies[ms->cur_melody][note_off_tick] = ev2;
+                        minisynth_add_event(ms, ev2);
+                        //ms->melodies[ms->cur_melody][note_off_tick] = ev2;
                     }
                 }
                 printf("CCCC %d\n", ch);
