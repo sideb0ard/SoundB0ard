@@ -39,8 +39,6 @@ double parabolic_sine(double x, bool highprecision);
 double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
                  double cur_val);
 
-void oblique_strategy(void);
-
 void itoa(int n, char s[]);
 void reverse(char s[]);
 

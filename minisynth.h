@@ -147,3 +147,4 @@ void minisynth_reset_melody(minisynth *self, unsigned int melody_num);
 void minisynth_reset_melody_all(minisynth *self);
 void minisynth_melody_to_string(minisynth *self, int melody_num,
                                 wchar_t scratch[33]);
+midi_event **minisynth_get_midi_loop(minisynth *self);

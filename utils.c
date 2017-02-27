@@ -191,12 +191,6 @@ void chordie(char *n)
            freqval(strcat(thr_note, "4")));
 }
 
-void oblique_strategy()
-{
-    int rand_oblique = rand() % 100;
-    printf(COOL_COLOR_MAUVE "%s\n" ANSI_COLOR_RESET, strategies[rand_oblique]);
-}
-
 void related_notes(char note[4], double *second_note, double *third_note)
 {
     char root_note;

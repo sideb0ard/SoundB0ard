@@ -25,6 +25,7 @@
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
+#include "obliquestrategies.h"
 #include "sampler.h"
 #include "sparkline.h"
 #include "table.h"

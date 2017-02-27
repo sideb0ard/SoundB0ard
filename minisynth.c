@@ -555,3 +555,8 @@ double minisynth_gennext(void *self)
 
     return accum_out_left * ms->vol;
 }
+
+midi_event **minisynth_get_midi_loop(minisynth *self)
+{
+    return self->melodies[self->cur_melody];
+}

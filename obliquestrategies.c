@@ -1,4 +1,8 @@
+#include <stdio.h>
+#include <stdlib.h>
+
 #include "defjams.h"
+#include "obliquestrategies.h"
 
 char *strategies[NUM_STATEGIES] = {
     "Abandon desire",
@@ -101,3 +105,10 @@ char *strategies[NUM_STATEGIES] = {
     "Work at a different speed",
     "Would anyone want it?",
     "Your mistake was a hidden intention"};
+
+void oblique_strategy()
+{
+    int rand_oblique = rand() % 100;
+    printf(COOL_COLOR_MAUVE "Brian Eno says \"%s\"\n" ANSI_COLOR_RESET,
+           strategies[rand_oblique]);
+}
