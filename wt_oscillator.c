@@ -92,7 +92,7 @@ void wt_reset_oscillator(oscillator *self)
 
 void wt_update_oscillator(oscillator *self, char *name)
 {
-    osc_update(self, "WT");
+    osc_update(self, name);
     wt_osc *wt = (wt_osc *)self;
     wt->m_wt_inc = WT_LENGTH * self->m_inc;
     wt_select_table(wt);

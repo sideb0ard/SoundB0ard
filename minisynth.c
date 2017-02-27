@@ -11,7 +11,8 @@ extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
 // defined in minisynth_voice.h
-const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW", L"TRI2SQR"};
+const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
+                                 L"TRI2SQR"};
 
 minisynth *new_minisynth(void)
 {
@@ -19,6 +20,52 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
+    ms->vol = 0.7;
+    ms->cur_octave = 0;
+    ms->sustain = 0;
+    ms->num_melodies = 1;
+
+    ms->sound_generator.gennext = &minisynth_gennext;
+    ms->sound_generator.status = &minisynth_status;
+    ms->sound_generator.setvol = &minisynth_setvol;
+    ms->sound_generator.getvol = &minisynth_getvol;
+    ms->sound_generator.type = SYNTH_TYPE;
+
+    ms->m_voice_mode = 0;
+    ms->m_detune_cents = 0.0;
+    ms->m_lfo1_amplitude = 1.0;
+    ms->m_lfo1_rate = DEFAULT_LFO_RATE;
+    ms->m_fc_control = FILTER_FC_DEFAULT;
+    ms->m_q_control = FILTER_Q_DEFAULT;
+    ms->m_attack_time_msec = EG_DEFAULT_STATE_TIME;
+    ms->m_delay_time_msec = EG_DEFAULT_STATE_TIME;
+    ms->m_decay_release_time_msec = EG_DEFAULT_STATE_TIME;
+    ms->m_pulse_width_pct = OSC_PULSEWIDTH_DEFAULT;
+    ms->m_feedback_pct = 0;
+    ms->m_delay_ratio = 0;
+    ms->m_wet_mix = 0.0;
+    ms->m_octave = 0;
+    ms->m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
+    ms->m_lfo1_osc_pitch_intensity = 0.0;
+    ms->m_sub_osc_db = -96.000000;
+    ms->m_eg1_osc_intensity = 0.0;
+    ms->m_eg1_filter_intensity = 0.0;
+    ms->m_lfo1_filter_fc_intensity = 0.0;
+    ms->m_sustain_level = 0.510000;
+    ms->m_noise_osc_db = -96.000000;
+    ms->m_lfo1_amp_intensity = 0.0;
+    ms->m_lfo1_pan_intensity = 0.0;
+    ms->m_eg1_dca_intensity = 1.0;
+    ms->m_lfo1_waveform = 0;
+    ms->m_volume_db = 1.0;
+    ms->m_legato_mode = DEFAULT_LEGATO_MODE;
+    ms->m_pitchbend_range = 1;
+    ms->m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
+    ms->m_filter_keytrack = DEFAULT_FILTER_KEYTRACK;
+    ms->m_filter_keytrack_intensity = DEFAULT_FILTER_KEYTRACK_INTENSITY;
+    ms->m_velocity_to_attack_scaling = 0;
+    ms->m_note_number_to_decay_scaling = 0;
+    ms->m_delaymode = 0;
     ms->m_eg1_dca_intensity = 1.0;
 
     for (int i = 0; i < MAX_VOICES; i++) {
@@ -47,18 +94,6 @@ minisynth *new_minisynth(void)
         ms->melody_multiloop_count[i] = 1;
     }
 
-    ms->vol = 0.7;
-    ms->cur_octave = 0;
-    ms->sustain = 0;
-    ms->num_melodies = 1;
-    ms->m_voice_mode = 0;
-
-    ms->sound_generator.gennext = &minisynth_gennext;
-    ms->sound_generator.status = &minisynth_status;
-    ms->sound_generator.setvol = &minisynth_setvol;
-    ms->sound_generator.getvol = &minisynth_getvol;
-    ms->sound_generator.type = SYNTH_TYPE;
-
     // start loop player running
     pthread_t melody_looprrr;
     if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
@@ -69,8 +104,7 @@ minisynth *new_minisynth(void)
     }
 
     minisynth_update(ms);
-    printf("NEW! SUSTAIN LEVEL is %f\n",
-           ms->m_voices[0]->m_voice.m_eg1.m_sustain_level);
+
     return ms;
 }
 
@@ -78,13 +112,9 @@ minisynth *new_minisynth(void)
 
 bool minisynth_prepare_for_play(minisynth *ms)
 {
-    printf("MINISYNTH PREPAE!\n");
     for (int i = 0; i < MAX_VOICES; i++) {
         if (ms->m_voices[i]) {
-            printf("PREPA - got voice!\n");
             minisynth_voice_prepare_for_play(ms->m_voices[i]);
-        } else {
-            printf("Nae voice\n");
         }
     }
 
@@ -283,9 +313,9 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         scaley_val = scaleybum(1, 128, 0, 1, data2);
         ms->m_sustain_level = scaley_val;
         break;
-    case 4: // K4 - Envelope Release Time Msec
-        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        ms->m_decay_release_time_msec = scaley_val;
+    case 4: // K4 - Synth Volume
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        ms->m_volume_db = scaley_val;
         break;
     case 5: // K6 - LFO amplitude
         scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
@@ -461,15 +491,16 @@ void minisynth_status(void *self, wchar_t *status_string)
     }
 
     // TODO - a shit load of error checking on boundaries and size
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             WCOOL_COLOR_PINK "[SYNTH] - Vol: %.2f Sustain: %d "
-                              "Multimode: %d, Cur: %d"
-                              "\n      MODE: %ls A:%.2f D/R:%.2f S:%.2f"
-             "\n      LFO1 amp: %.2f rate:%.2f", ms->vol, ms->sustain,
-             ms->multi_melody_mode, ms->cur_melody,
+    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
+             "[SYNTH] - Vol: %.2f Sustain: %d "
+             "Multimode: %d, Cur: %d"
+             "\n      MODE: %ls A:%.2f D/R:%.2f S:%.2f Amp: %2.f"
+             "\n      LFO1 amp: %.2f rate:%.2f Filter FC: %.2f Filter Q: %2.f",
+             ms->vol, ms->sustain, ms->multi_melody_mode, ms->cur_melody,
              s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec,
              ms->m_decay_release_time_msec, ms->m_sustain_level,
-             ms->m_lfo1_amplitude, ms->m_lfo1_rate);
+             ms->m_volume_db, ms->m_lfo1_amplitude, ms->m_lfo1_rate,
+             ms->m_fc_control, ms->m_q_control);
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
         wchar_t scratch[128] = {0};

@@ -68,17 +68,17 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     }
 
     // decode and calculate
-    //printf("WAVEFORM %d\n", self->m_waveform);
+    // printf("WAVEFORM %d\n", self->m_waveform);
     switch (self->m_waveform) {
     case sine: {
-        //printf("SINE?\n");
+        // printf("SINE?\n");
         // calculate angle
         double angle = self->m_modulo * 2.0 * M_PI - M_PI;
-        //printf("ANGLEE! %f\n", angle);
+        // printf("ANGLEE! %f\n", angle);
 
         // call the parabolicSine approximator
         out = parabolic_sine(-angle, true);
-        //printf("OUT! %f\n", out);
+        // printf("OUT! %f\n", out);
 
         // use second modulo for quad phase
         angle = quad_modulo * 2.0 * M_PI - M_PI;
@@ -190,7 +190,9 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     //// class
     if (self->m_v_modmatrix) {
         // write our outputs into their destinations
-        //printf("LFO WRITING TO m_mod_dest_output1 OUT:%f m_AMP: %f m_AMP_MOD: %f FINALVAL: %f\n", out, self->m_amplitude, self->m_amp_mod, out * self->m_amplitude * self->m_amp_mod);
+        // printf("LFO WRITING TO m_mod_dest_output1 OUT:%f m_AMP: %f m_AMP_MOD:
+        // %f FINALVAL: %f\n", out, self->m_amplitude, self->m_amp_mod, out *
+        // self->m_amplitude * self->m_amp_mod);
         self->m_v_modmatrix->m_sources[self->m_mod_dest_output1] =
             out * self->m_amplitude * self->m_amp_mod;
 

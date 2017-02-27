@@ -109,7 +109,6 @@ void eg_set_eg_mode(envelope_generator *self, eg_mode mode)
         self->m_release_tco = self->m_decay_tco;
     }
 
-    // printf("SETEGMODE!\n");
     eg_calculate_attack_time(self);
     eg_calculate_decay_time(self);
     eg_calculate_release_time(self);
@@ -117,7 +116,6 @@ void eg_set_eg_mode(envelope_generator *self, eg_mode mode)
 
 void eg_calculate_attack_time(envelope_generator *self)
 {
-    // printf("CALC ATTK TIME!\n");
     double d_samples =
         SAMPLE_RATE *
         ((self->m_attack_time_scalar * self->m_attack_time_msec) / 1000.0);
@@ -125,8 +123,6 @@ void eg_calculate_attack_time(envelope_generator *self)
         exp(-log((1.0 + self->m_attack_tco) / self->m_attack_tco) / d_samples);
     self->m_attack_offset =
         (1.0 + self->m_attack_tco) * (1.0 - self->m_attack_coeff);
-    // printf("COEFF: %f OFFSET: %f\n", self->m_attack_coeff,
-    // self->m_attack_offset);
 }
 
 void eg_calculate_decay_time(envelope_generator *self)
@@ -263,7 +259,6 @@ void eg_update(envelope_generator *self)
                 ->m_destinations[self->m_mod_source_eg_attack_scaling];
         if (self->m_attack_time_scalar != 1.0 - scale) {
             self->m_attack_time_scalar = 1.0 - scale;
-            printf("EGUPDATE!\n");
             eg_calculate_attack_time(self);
         }
     }
@@ -325,7 +320,6 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
     }
     case SUSTAIN: {
         self->m_envelope_output = self->m_sustain_level;
-        // printf("SSSSSSSSsUTAINstate %f\n", self->m_envelope_output);
         break;
     }
     case RELEASE: {
@@ -341,11 +335,8 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 
         if (self->m_envelope_output <= 0.0 ||
             self->m_release_time_msec <= 0.0) {
-            // printf("Going to OFFF state via RELEASE - output was %f\n",
-            //        self->m_envelope_output);
             self->m_envelope_output = 0.0;
             self->m_state = OFFF;
-            // printf("RELEASE SAYS OFFF!\n");
             break;
         }
         break;
@@ -356,14 +347,11 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
             if (self->m_envelope_output <= 0) {
                 self->m_envelope_output = 0.0;
                 self->m_state = OFFF;
-                // printf("SHUTDOWN SAYS OFFF!\n");
                 break;
             }
         }
         else {
-            // printf("SHUTDOWN SAYS OFFF!\n");
             self->m_state = OFFF;
-            // printf("Going to OFFF state\n");
         }
         break;
     }
@@ -379,7 +367,6 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
     if (p_biased_output)
         *p_biased_output = self->m_envelope_output - self->m_sustain_level;
 
-    // printf("2EG_ENV_OUTPUT: %f\n", self->m_envelope_output);
     return self->m_envelope_output;
 }
 
@@ -394,7 +381,6 @@ void eg_note_off(envelope_generator *self)
         self->m_state = RELEASE;
     }
     else {
-        // printf("EG_NOTE_OFF SAYS OFF! Vol: %f\n", self->m_envelope_output);
         self->m_state = OFFF;
     }
 }

@@ -239,24 +239,18 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     osc_update((oscillator *)&msv->m_osc3, "OSC3");
     osc_update((oscillator *)&msv->m_osc4, "OSC4");
 
-    double osc_mix =
-        0.333 * qb_do_oscillate((oscillator *)&msv->m_osc1, NULL) +
-        0.333 * // qb_do_oscillate((oscillator *)&msv->m_osc2, NULL);
-            qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
-        0.333 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL);
-    //printf("OSC_MIX: %f\n", osc_mix);
-    //   +
-    // 0.333 *
-    //   qb_do_oscillate((oscillator*) &msv->m_osc4,
-    //   NULL);
+    double osc_mix = 0.333 * qb_do_oscillate((oscillator *)&msv->m_osc1, NULL) +
+                     0.333 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
+                     0.333 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL) +
+                     0.333 * qb_do_oscillate((oscillator *)&msv->m_osc4, NULL);
 
-    *left_output = osc_mix;
-    // double filter_out =
-    //    moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
+    double filter_out =
+        moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
 
-    //double filter_out = osc_mix; // TODO REMOVE = not real
-    //dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
-    //            right_output);
+    //*left_output = filter_out;
+    // double filter_out = osc_mix; // TODO REMOVE = not real
+    dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
+                right_output);
 
     return true;
 }

@@ -41,8 +41,21 @@ DECIMATOR	effect.h	/^    DECIMATOR,$/;"	e	enum:__anon7
 DEFAULT_AMP	drumr.h	/^#define DEFAULT_AMP /;"	d
 DEFAULT_ARRAY_SIZE	defjams.h	/^#define DEFAULT_ARRAY_SIZE /;"	d
 DEFAULT_BPM	defjams.h	/^#define DEFAULT_BPM /;"	d
+DEFAULT_DETUNE_CENTS	minisynth.h	/^#define DEFAULT_DETUNE_CENTS /;"	d
 DEFAULT_ENV_LENGTH	defjams.h	/^#define DEFAULT_ENV_LENGTH /;"	d
+DEFAULT_FILTER_KEYTRACK	minisynth.h	/^#define DEFAULT_FILTER_KEYTRACK /;"	d
+DEFAULT_FILTER_KEYTRACK_INTENSITY	minisynth.h	/^#define DEFAULT_FILTER_KEYTRACK_INTENSITY /;"	d
+DEFAULT_LEGATO_MODE	minisynth.h	/^#define DEFAULT_LEGATO_MODE /;"	d
 DEFAULT_LFO_RATE	oscillator.h	/^#define DEFAULT_LFO_RATE /;"	d
+DEFAULT_MIDI_EXPRESSION	minisynth.h	/^#define DEFAULT_MIDI_EXPRESSION /;"	d
+DEFAULT_MIDI_MODWHEEL	minisynth.h	/^#define DEFAULT_MIDI_MODWHEEL /;"	d
+DEFAULT_MIDI_PAN	minisynth.h	/^#define DEFAULT_MIDI_PAN /;"	d
+DEFAULT_MIDI_PITCHBEND	minisynth.h	/^#define DEFAULT_MIDI_PITCHBEND /;"	d
+DEFAULT_MIDI_VOLUME	minisynth.h	/^#define DEFAULT_MIDI_VOLUME /;"	d
+DEFAULT_NOTE_TO_DECAY	minisynth.h	/^#define DEFAULT_NOTE_TO_DECAY /;"	d
+DEFAULT_PORTAMENTO_TIME_MSEC	minisynth.h	/^#define DEFAULT_PORTAMENTO_TIME_MSEC /;"	d
+DEFAULT_RESET_TO_ZERO	minisynth.h	/^#define DEFAULT_RESET_TO_ZERO /;"	d
+DEFAULT_VELOCITY_TO_ATTACK	minisynth.h	/^#define DEFAULT_VELOCITY_TO_ATTACK /;"	d
 DELAY	effect.h	/^    DELAY,$/;"	e	enum:__anon7
 DELAYFX	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon6
 DEST_ALL_EG_ATTACK_SCALING	modmatrix.h	/^    DEST_ALL_EG_ATTACK_SCALING,$/;"	e	enum:__anon17

@@ -243,7 +243,6 @@ void voice_init_global_parameters(voice *v, global_synth_params *sp)
     eg_init_global_parameters(&v->m_eg3, &v->m_global_synth_params->eg3_params);
     eg_init_global_parameters(&v->m_eg4, &v->m_global_synth_params->eg4_params);
 
-    printf("Setting LFO1 params!\n");
     osc_init_global_parameters((oscillator *)&v->m_lfo1,
                                &v->m_global_synth_params->lfo1_params);
     osc_init_global_parameters((oscillator *)&v->m_lfo2,
