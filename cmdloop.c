@@ -322,6 +322,7 @@ void interpret(char *line)
                     mixr->sound_generators[soundgen_num]->type == SYNTH_TYPE) {
                     minisynth *ms =
                         (minisynth *)mixr->sound_generators[soundgen_num];
+
                     if (strncmp("add", wurds[2], 4) == 0) {
                         if (strncmp("melody", wurds[3], 6) == 0) {
                             minisynth_add_melody(ms);
@@ -351,6 +352,23 @@ void interpret(char *line)
                             }
                         }
                         // change
+                    }
+                    else if (strncmp("copy", wurds[2], 4) == 0) {
+                        int sg2 = atoi(wurds[3]);
+                        if (is_valid_soundgen_num(sg2) &&
+                            mixr->sound_generators[sg2]->type == SYNTH_TYPE) {
+                            minisynth *ms2 =
+                                (minisynth *)mixr->sound_generators[sg2];
+                            printf("Copying SYNTH patterns!\n");
+                            int pattern_nomnom = atoi(wurds[4]);
+                            if (pattern_nomnom <= ms2->num_melodies)
+                            {
+                                printf("And we got patterns to copy~!\n");
+                            }
+                        }
+                        // if wurds[3] is valid soundnum and wurds[4] <= wurds[3]->num_patterns
+                        // wurds[1]->add_pattern
+                        // wurds[1]->pattern = wurds[3]->get_pattern(wurds[4])
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0) {
                         keys(soundgen_num);

@@ -967,6 +967,8 @@ minisynth	minisynth.h	/^typedef struct minisynth {$/;"	s
 minisynth	minisynth.h	/^} minisynth;$/;"	t	typeref:struct:minisynth
 minisynth_add_event	minisynth.c	/^void minisynth_add_event(minisynth *ms, midi_event *ev)$/;"	f
 minisynth_add_melody	minisynth.c	/^void minisynth_add_melody(minisynth *ms)$/;"	f
+minisynth_add_midi_loop	minisynth.c	/^void minisynth_add_midi_loop(minisynth *self, midi_event** events, int melody_num)$/;"	f
+minisynth_copy_midi_loop	minisynth.c	/^midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)$/;"	f
 minisynth_gennext	minisynth.c	/^double minisynth_gennext(void *self)$/;"	f
 minisynth_get_midi_loop	minisynth.c	/^midi_event **minisynth_get_midi_loop(minisynth *self)$/;"	f
 minisynth_get_oldest_voice	minisynth.c	/^minisynth_voice *minisynth_get_oldest_voice(minisynth *ms)$/;"	f
