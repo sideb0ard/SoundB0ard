@@ -101,13 +101,14 @@ void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
     sample_set_file_name(fs, filename);
     fs->position = 0;
     fs->loop_len = loop_len;
-    sample_import_file_contents(fs, filename);
-    sample_resample_to_loop_size(fs);
 
-    sample_import_file_contents(fs, filename);
-    sample_resample_to_loop_size(fs);
+    if (strncmp(filename, "none", 4) != 0) {
+        sample_import_file_contents(fs, filename);
+    }
 
+    sample_resample_to_loop_size(fs);
     s->samples[s->num_samples++] = fs;
+
     printf("done adding SAMPLE\n");
 }
 
@@ -189,50 +190,50 @@ void sample_resample_to_loop_size(file_sample *fs)
         return;
     }
 
-    int *table = fs->orig_file_bytes;
-    double bufsize = fs->orig_file_size;
+    if (strncmp(fs->filename, "none", 4) != 0) {
 
-    double position = 0;
-    double incr = (double)fs->orig_file_size / loop_len_in_samples;
-    for (int i = 0; i < loop_len_in_samples; i++) {
-        int base_index = (int)position;
-        unsigned long next_index = base_index + 1;
-        double frac, slope, val;
+        int *table = fs->orig_file_bytes;
+        double bufsize = fs->orig_file_size;
 
-        frac = position - base_index;
-        val = table[base_index];
-        slope = table[next_index] - val;
+        double position = 0;
+        double incr = (double)fs->orig_file_size / loop_len_in_samples;
+        for (int i = 0; i < loop_len_in_samples; i++) {
+            int base_index = (int)position;
+            unsigned long next_index = base_index + 1;
+            double frac, slope, val;
 
-        val += (frac * slope);
-        position += incr;
+            frac = position - base_index;
+            val = table[base_index];
+            slope = table[next_index] - val;
 
-        if (position >= bufsize) {
-            printf("POSITION: %f // BUFSIZR: %f My job here is done\n",
-                   position, bufsize);
-            break;
+            val += (frac * slope);
+            position += incr;
+
+            if (position >= bufsize) {
+                printf("POSITION: %f // BUFSIZR: %f My job here is done\n",
+                       position, bufsize);
+                break;
+            }
+
+            // convert from 16bit int to double between 0 and 1
+            resampled_file_bytes[i] = val / 2147483648.0;
         }
 
-        // convert from 16bit int to double between 0 and 1
-        resampled_file_bytes[i] = val / 2147483648.0;
+        // pthread_mutex_lock(&sampler->resample_mutex);
+        bool is_previous_buffer =
+            fs->resampled_file_bytes != NULL ? true : false;
+        if (is_previous_buffer) {
+            double *oldbuf = fs->resampled_file_bytes;
+            int old_relative_position =
+                (100 / fs->resampled_file_size) * fs->position;
+
+            fs->position = (loop_len_in_samples / 100) * old_relative_position;
+            free(oldbuf);
+        }
     }
 
-    // pthread_mutex_lock(&sampler->resample_mutex);
-    bool is_previous_buffer = fs->resampled_file_bytes != NULL ? true : false;
-    if (is_previous_buffer) {
-        double *oldbuf = fs->resampled_file_bytes;
-        int old_relative_position =
-            (100 / fs->resampled_file_size) * fs->position;
-
-        fs->resampled_file_bytes = resampled_file_bytes;
-        fs->resampled_file_size = loop_len_in_samples;
-
-        fs->position = (loop_len_in_samples / 100) * old_relative_position;
-        free(oldbuf);
-    }
-    else {
-        fs->resampled_file_bytes = resampled_file_bytes;
-        fs->resampled_file_size = loop_len_in_samples;
-    }
+    fs->resampled_file_bytes = resampled_file_bytes;
+    fs->resampled_file_size = loop_len_in_samples;
     // pthread_mutex_unlock(&sampler->resample_mutex);
 }
 

@@ -113,11 +113,10 @@ void chaosmonkey_throw_chaos()
                     }
                 }
                 int num_new_notes = rand() % 4;
-                for (int k = 0; k < num_new_notes; k++)
-                {
+                for (int k = 0; k < num_new_notes; k++) {
                     int newnum = (rand() % 2) > 0 ? 4 : 3;
                     int randy = rand() % 3;
-                    switch(randy) {
+                    switch (randy) {
                     case 0:
                         break; // same octave
                     case 1:
@@ -126,18 +125,20 @@ void chaosmonkey_throw_chaos()
                         newnum -= 12;
                     }
 
-                    int new_midi_num = (midi_num[k]+newnum)%128;
+                    int new_midi_num = (midi_num[k] + newnum) % 128;
 
-                    int note_on_tick = (tick[k] + PPNS/2) % PPNS;
+                    int note_on_tick = (tick[k] + PPNS / 2) % PPNS;
                     int note_off_tick = note_on_tick + (PPS * 4);
-                    if (note_off_tick >= PPNS) note_off_tick = PPNS - 1;
+                    if (note_off_tick >= PPNS)
+                        note_off_tick = PPNS - 1;
 
                     midi_event *ev = new_midi_event(note_on_tick, 144, // noteon
                                                     new_midi_num, 127);
                     ev->delete_after_use = true;
 
-                    midi_event *ev2 = new_midi_event(note_off_tick, 128, //noteoff
-                                                    new_midi_num, 127);
+                    midi_event *ev2 =
+                        new_midi_event(note_off_tick, 128, // noteoff
+                                       new_midi_num, 127);
                     ev2->delete_after_use = true;
 
                     minisynth_add_event(ms, ev);

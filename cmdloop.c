@@ -246,7 +246,7 @@ void interpret(char *line)
 
         // SAMPLE LOOPER COMMANDS
         else if (strncmp("loop", wurds[0], 4) == 0) {
-            if (is_valid_file(wurds[1])) {
+            if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {
                 int loop_len = atoi(wurds[2]);
                 if (loop_len > 0) {
                     add_sampler(mixr, wurds[1], loop_len);
@@ -262,7 +262,8 @@ void interpret(char *line)
                         (SAMPLER *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 6) == 0) {
-                        if (is_valid_file(wurds[3])) {
+                        if (is_valid_file(wurds[3]) ||
+                            strncmp(wurds[3], "none", 4) == 0) {
                             int loop_len = atoi(wurds[4]);
                             if (loop_len > 0) {
                                 sampler_add_sample(s, wurds[3], loop_len);

@@ -195,7 +195,8 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
         printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
     }
     if (ev->delete_after_use) {
-        printf("DELETing TEMP TICK!\n");
+        if (mixr->debug_mode)
+            printf("DELETing TEMP TICK!\n");
         free(ev);
         ms->melodies[ms->cur_melody][ev->tick] = NULL;
     }

@@ -127,7 +127,7 @@ void keys(int soundgen_num)
                     midi_event *ev = new_midi_event(note_off_tick, 128,
                                                     midi_num, fake_velocity);
                     ev->delete_after_use = true; // _THIS_ is the magic
-                    //ms->melodies[ms->cur_melody][note_off_tick] = ev;
+                    // ms->melodies[ms->cur_melody][note_off_tick] = ev;
                     minisynth_add_event(ms, ev);
                     ////////////////////////
 
@@ -146,7 +146,7 @@ void keys(int soundgen_num)
                         midi_event *ev2 = new_midi_event(
                             note_off_tick, 128, midi_num, fake_velocity);
                         minisynth_add_event(ms, ev2);
-                        //ms->melodies[ms->cur_melody][note_off_tick] = ev2;
+                        // ms->melodies[ms->cur_melody][note_off_tick] = ev2;
                     }
                 }
                 printf("CCCC %d\n", ch);

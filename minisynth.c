@@ -570,6 +570,7 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
             tick = 0;
     }
     if (mixr->debug_mode)
-        printf("Adding Event: Tick: %d Type: %s Midi: %d\n", ev->tick, ev->event_type == 144 ? "NOTEON" : "NOTEOFF", ev->data1);
+        printf("Adding Event: Tick: %d Type: %s Midi: %d\n", ev->tick,
+               ev->event_type == 144 ? "NOTEON" : "NOTEOFF", ev->data1);
     ms->melodies[ms->cur_melody][tick] = ev;
 }
