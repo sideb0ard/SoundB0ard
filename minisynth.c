@@ -600,6 +600,8 @@ midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
 
 void minisynth_add_midi_loop(minisynth *self, midi_event** events, int melody_num)
 {
+    (void) events;
+
     if (melody_num >= self->num_melodies)
     {
         printf("Dingjie!\n");

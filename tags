@@ -479,7 +479,7 @@ drum_set_sample_amp_from_char_pattern	drumr.c	/^void drum_set_sample_amp_from_ch
 drum_setvol	drumr.c	/^void drum_setvol(void *self, double v)$/;"	f
 drum_status	drumr.c	/^void drum_status(void *self, wchar_t *status_string)$/;"	f
 drumr_change_num_loops	drumr.c	/^void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops)$/;"	f
-drumr_set_multi_pattern_mode	drumr.c	/^void drumr_set_multi_pattern_mode(DRUM *d, bool multimode)$/;"	f
+drumr_set_multi_pattern_mode	drumr.c	/^void drumr_set_multi_pattern_mode(DRUM *d, bool multi)$/;"	f
 dsaw	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon22
 duck_runrrr	utils.c	/^void *duck_runrrr(void *arg)$/;"	f
 effect	beatrepeat.h	/^    EFFECT effect;$/;"	m	struct:beatrepeat
@@ -1182,13 +1182,16 @@ sample_set_file_name	sampler.c	/^void sample_set_file_name(file_sample *fs, char
 sampler_add_sample	sampler.c	/^void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)$/;"	f
 sampler_change_loop_len	sampler.c	/^void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len)$/;"	f
 sampler_change_num_loops	sampler.c	/^void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops)$/;"	f
+sampler_create_sample	sampler.c	/^file_sample *sampler_create_sample(char *filename, int loop_len)$/;"	f
 sampler_gennext	sampler.c	/^double sampler_gennext(void *self)$/;"	f
 sampler_getvol	sampler.c	/^double sampler_getvol(void *self)$/;"	f
 sampler_resample_to_loop_size	sampler.c	/^void sampler_resample_to_loop_size(SAMPLER *s)$/;"	f
-sampler_set_multi_sample_mode	sampler.c	/^void sampler_set_multi_sample_mode(SAMPLER *s, bool multimode)$/;"	f
+sampler_scramble	sampler.c	/^void sampler_scramble(SAMPLER *s)$/;"	f
+sampler_set_multi_sample_mode	sampler.c	/^void sampler_set_multi_sample_mode(SAMPLER *s, bool multi)$/;"	f
 sampler_setvol	sampler.c	/^void sampler_setvol(void *self, double v)$/;"	f
 sampler_status	sampler.c	/^void sampler_status(void *self, wchar_t *status_string)$/;"	f
 sampler_switch_sample	sampler.c	/^void sampler_switch_sample(SAMPLER *s, int sample_num)$/;"	f
+sampler_toggle_scramble_mode	sampler.c	/^void sampler_toggle_scramble_mode(SAMPLER *s)$/;"	f
 samplerate	drumr.h	/^    int samplerate;$/;"	m	struct:t_drumr
 samplerate	sampler.h	/^    int samplerate;$/;"	m	struct:file_sample
 samples	sampler.h	/^    file_sample *samples[MAX_SAMPLES_PER_LOOPER];$/;"	m	struct:t_sampler
@@ -1197,6 +1200,9 @@ saturation	synthfunctions.h	/^    double saturation;$/;"	m	struct:__anon26
 sbmsg	sbmsg.h	/^typedef struct sbmsg {$/;"	s
 scal	effect.h	/^    double scal;$/;"	m	struct:__anon8
 scaleybum	utils.c	/^double scaleybum(double cur_min, double cur_max, double new_min, double new_max,$/;"	f
+scramble_counter	sampler.h	/^	int scramble_counter;$/;"	m	struct:t_sampler
+scramblrrr	sampler.h	/^    file_sample *scramblrrr; \/\/ for storing scrambled effect version of loop$/;"	m	struct:t_sampler
+scramblrrr_mode	sampler.h	/^    bool scramblrrr_mode;$/;"	m	struct:t_sampler
 seed_pattern	drumr.c	/^int seed_pattern()$/;"	f
 sem_gennext	filter_sem.c	/^double sem_gennext(filter *f, double xn)$/;"	f
 sem_reset	filter_sem.c	/^void sem_reset(filter *f)$/;"	f

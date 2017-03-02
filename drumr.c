@@ -505,9 +505,9 @@ void drum_set_sample_amp_from_char_pattern(DRUM *d, int pattern_num,
     }
 }
 
-void drumr_set_multi_pattern_mode(DRUM *d, bool multimode)
+void drumr_set_multi_pattern_mode(DRUM *d, bool multi)
 {
-    d->multi_pattern_mode = multimode;
+    d->multi_pattern_mode = multi;
     d->cur_pattern_iteration = d->pattern_num_loops[d->cur_pattern];
 }
 

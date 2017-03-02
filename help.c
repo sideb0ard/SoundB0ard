@@ -86,7 +86,7 @@ void print_help()
                             " -- add new blank melody loop to synth\n");
     printf(ANSI_COLOR_WHITE
            "syn <soundgen_num> change <parameter> <val>\n" ANSI_COLOR_CYAN
-           " -- e.g syn 0 change multimode <true|false>\n");
+           " -- e.g syn 0 change multi <true|false>\n");
     printf(ANSI_COLOR_WHITE "syn <soundgen_num> keys" ANSI_COLOR_CYAN
                             " -- control synth via keyboard\n");
     printf(ANSI_COLOR_WHITE "syn <soundgen_num> midi" ANSI_COLOR_CYAN

@@ -181,13 +181,15 @@ void interpret(char *line)
                                                          num_wurds);
                         printf("Changing\n");
 
-                        if (strncmp("multimode", wurds[3], 10) == 0) {
+                        if (strncmp("multi", wurds[3], 5) == 0) {
                             if (strncmp("true", wurds[4], 4) == 0) {
                                 drumr_set_multi_pattern_mode(d, true);
                             }
                             else if (strncmp("false", wurds[4], 5) == 0) {
                                 drumr_set_multi_pattern_mode(d, false);
                             }
+                            printf("Sequencer multi mode : %s\n", d->multi_pattern_mode ? "true" : "false");
+
                         }
                         else {
                             int pattern_num = atoi(wurds[3]);
@@ -270,14 +272,19 @@ void interpret(char *line)
                             }
                         }
                     }
+                    else if (strncmp("scramble", wurds[2], 8) == 0) {
+                        printf("Switching on scramble mode!\n");
+                        sampler_toggle_scramble_mode(s);
+                    }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (strncmp("multimode", wurds[3], 10) == 0) {
+                        if (strncmp("multi", wurds[3], 5) == 0) {
                             if (strncmp("true", wurds[4], 4) == 0) {
                                 sampler_set_multi_sample_mode(s, true);
                             }
                             else if (strncmp("false", wurds[4], 5) == 0) {
                                 sampler_set_multi_sample_mode(s, false);
                             }
+                            printf("Sampler multi mode : %s\n", s->multi_sample_mode ? "true" : "false");
                         }
                         else {
                             int sample_num = atoi(wurds[3]);
@@ -329,13 +336,14 @@ void interpret(char *line)
                         }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (strncmp("multimode", wurds[3], 10) == 0) {
+                        if (strncmp("multi", wurds[3], 5) == 0) {
                             if (strncmp("true", wurds[4], 4) == 0) {
                                 minisynth_set_multi_melody_mode(ms, true);
                             }
                             else if (strncmp("false", wurds[4], 5) == 0) {
                                 minisynth_set_multi_melody_mode(ms, false);
                             }
+                            printf("Synth multi mode : %s\n", ms->multi_melody_mode ? "true" : "false");
                         }
                         else {
                             int melody_num = atoi(wurds[3]);

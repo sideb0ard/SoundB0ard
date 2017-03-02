@@ -70,7 +70,7 @@ void add_int_pattern(DRUM *d, int pattern);
 void change_int_pattern(DRUM *d, int pattern_num, int pattern);
 void swingrrr(void *self, int swing_setting);
 
-void drumr_set_multi_pattern_mode(DRUM *d, bool multimode);
+void drumr_set_multi_pattern_mode(DRUM *d, bool multi);
 void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops);
 
 void int_pattern_to_array(int pattern, int *pat_array);

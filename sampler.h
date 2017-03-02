@@ -30,6 +30,7 @@ typedef struct t_sampler {
 
     file_sample *samples[MAX_SAMPLES_PER_LOOPER];
     int sample_num_loops[MAX_SAMPLES_PER_LOOPER];
+    file_sample *scramblrrr; // for storing scrambled effect version of loop
     int num_samples;
     int cur_sample;
     int cur_sample_iteration;
@@ -41,12 +42,17 @@ typedef struct t_sampler {
     double vol;
     bool started;
     bool just_been_resampled;
+    bool scramblrrr_mode;
+	int scramble_counter;
 
 } SAMPLER;
 
 SAMPLER *new_sampler(char *filename, double loop_len); // loop_len in bars
 void sampler_add_sample(SAMPLER *s, char *filename, int loop_len);
-void sampler_set_multi_sample_mode(SAMPLER *s, bool multimode);
+file_sample *sampler_create_sample(char *filename, int loop_len);
+void sampler_toggle_scramble_mode(SAMPLER *s);
+void sampler_scramble(SAMPLER *s);
+void sampler_set_multi_sample_mode(SAMPLER *s, bool multi);
 void sampler_switch_sample(SAMPLER *s, int sample_num);
 void sampler_resample_to_loop_size(SAMPLER *s);
 void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len);
