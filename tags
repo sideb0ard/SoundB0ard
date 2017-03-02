@@ -331,6 +331,7 @@ amplitude_d	synthfunctions.h	/^    double amplitude_d;$/;"	m	struct:__anon29
 amplitude_db	synthfunctions.h	/^    double amplitude_db; \/\/ the user's control setting in dB$/;"	m	struct:__anon28
 attack_time_msec	synthfunctions.h	/^    double attack_time_msec;  \/\/ att: is a time duration$/;"	m	struct:__anon27
 aux_control	synthfunctions.h	/^    double aux_control;$/;"	m	struct:__anon26
+backup_pattern_while_game_of_life_on	drumr.h	/^    int backup_pattern_while_game_of_life_on; \/\/ store current pattern so game of life can use slot$/;"	m	struct:t_drumr
 beatrepeat	beatrepeat.h	/^typedef struct beatrepeat {$/;"	s
 beatrepeat	beatrepeat.h	/^} beatrepeat;$/;"	t	typeref:struct:beatrepeat
 beatrepeat_change_num_beats_to_repeat	beatrepeat.c	/^void beatrepeat_change_num_beats_to_repeat(beatrepeat *br, int num_beats)$/;"	f
@@ -1203,6 +1204,7 @@ sem_set_qcontrol	filter_sem.c	/^void sem_set_qcontrol(filter *f, double qcontrol
 sem_update	filter_sem.c	/^void sem_update(filter *f)$/;"	f
 semitones	synthfunctions.h	/^    int semitones;              \/\/ semitones tweak$/;"	m	struct:__anon25
 semitones_between_frequencies	utils.c	/^double semitones_between_frequencies(double start_freq, double end_freq)$/;"	f
+seq_toggle_game_of_life	drumr.c	/^void seq_toggle_game_of_life(DRUM *d, bool on)$/;"	f
 set_fc_mod	filter.h	/^    void (*set_fc_mod)(filter *self, double d);$/;"	m	struct:filter
 set_matrix_core	modmatrix.c	/^void set_matrix_core(modmatrix *self, matrixrow **matrix)$/;"	f
 set_q_control	filter.h	/^    void (*set_q_control)(filter *self, double d);$/;"	m	struct:filter

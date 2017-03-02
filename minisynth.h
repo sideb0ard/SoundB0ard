@@ -15,7 +15,7 @@
 #include "minisynth_voice.h"
 
 #define MAX_NUM_MIDI_LOOPS 16
-#define MAX_VOICES 16
+#define MAX_VOICES 4
 
 #define DEFAULT_DETUNE_CENTS 0.0
 

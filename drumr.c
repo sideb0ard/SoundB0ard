@@ -517,3 +517,19 @@ void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops)
         d->pattern_num_loops[pattern_num] = num_loops;
     }
 }
+
+void seq_toggle_game_of_life(DRUM *d, bool on)
+{
+    if (on) {
+        d->backup_pattern_while_game_of_life_on = d->patterns[0];
+        d->multi_pattern_mode = false;
+        d->cur_pattern = 0;
+        d->game_of_life_on = true;
+    }
+    else {
+        d->patterns[0] = d->backup_pattern_while_game_of_life_on;
+        d->multi_pattern_mode = true;
+        d->game_of_life_on = false;
+    }
+}
+

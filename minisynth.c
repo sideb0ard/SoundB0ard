@@ -261,7 +261,8 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
     }
 
     if (steal_note) {
-        printf("STEAL NOTE\n");
+        if (mixr->debug_mode)
+            printf("STEAL NOTE\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(ms);
         if (msv) {
             minisynth_increment_voice_timestamps(ms);

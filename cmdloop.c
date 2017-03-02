@@ -232,7 +232,7 @@ void interpret(char *line)
                     }
                     else if (strncmp("life", wurds[2], 4) == 0) {
                         printf("Toggling game of life for %d\n", soundgen_num);
-                        d->game_of_life_on = 1 - d->game_of_life_on;
+                        seq_toggle_game_of_life(d, 1 - d->game_of_life_on);
                     }
                     else if (strncmp("swing", wurds[2], 5) == 0) {
                         int swing_setting = atoi(wurds[3]);
