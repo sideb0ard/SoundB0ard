@@ -326,9 +326,9 @@ void sampler_scramble(SAMPLER *s)
 	int len = s->samples[s->cur_sample]->resampled_file_size;
 	int len16th = len / 16;
 
-	int cur16th = 1;
-	int cur_marker = 0;
-	int next_marker = cur16th * len16th;
+	int cur16th = 0;
+	int cur_marker = 0; // between cur and next is measured in samples
+	int next_marker = 0;
 
 	for (int i = 0; i < len; i++)
 	{
@@ -341,7 +341,7 @@ void sampler_scramble(SAMPLER *s)
 			s->scramblrrr->resampled_file_bytes[i] = s->samples[s->cur_sample]->resampled_file_bytes[i];
 		}
 		else {
-			s->scramblrrr->resampled_file_bytes[(i + s->scramble_counter*len16th) % len] = s->samples[s->cur_sample]->resampled_file_bytes[i];
+			s->scramblrrr->resampled_file_bytes[i] = s->samples[s->cur_sample]->resampled_file_bytes[ (i + s->scramble_counter*len16th) % len];
 		}
 	}
 	s->scramble_counter = (s->scramble_counter + 1) % 16;
