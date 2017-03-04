@@ -50,8 +50,9 @@ double sampler_gennext(void *self)
         }
     }
 
-    if (sampler->scramblrrr_mode && (mixr->cur_sample % sampler->scramblrrr->resampled_file_size == 0))
-    {
+    if (sampler->scramblrrr_mode &&
+        (mixr->cur_sample % (sampler->scramblrrr->resampled_file_size * 4) ==
+         0)) {
         sampler_scramble(sampler);
     }
 
@@ -76,23 +77,26 @@ double sampler_gennext(void *self)
     }
 
     if (sampler->scramblrrr_mode) {
-        val = sampler->scramblrrr->resampled_file_bytes
-                  [sampler->scramblrrr->position++];
-		//printf("Val! %f // Position! %d\n", val, sampler->scramblrrr->position);
-
-        if (sampler->scramblrrr->position ==
-            sampler->scramblrrr->resampled_file_size) {
-            sampler->scramblrrr->position = 0;
-        }
+        val = sampler->scramblrrr
+                  ->resampled_file_bytes[sampler->scramblrrr->position++];
+        // printf("Val! %f // Position! %d\n", val,
+        // sampler->scramblrrr->position);
+        sampler->samples[sampler->cur_sample]
+            ->position++; // keep increasing normal sample
     }
     else {
         val = sampler->samples[sampler->cur_sample]->resampled_file_bytes
                   [sampler->samples[sampler->cur_sample]->position++];
+    }
 
-        if (sampler->samples[sampler->cur_sample]->position ==
-            sampler->samples[sampler->cur_sample]->resampled_file_size) {
-            sampler->samples[sampler->cur_sample]->position = 0;
-        }
+    if (sampler->scramblrrr->position ==
+        sampler->scramblrrr->resampled_file_size) {
+        sampler->scramblrrr->position = 0;
+    }
+
+    if (sampler->samples[sampler->cur_sample]->position ==
+        sampler->samples[sampler->cur_sample]->resampled_file_size) {
+        sampler->samples[sampler->cur_sample]->position = 0;
     }
 
     if (val > 1 || val < -1)
@@ -116,7 +120,6 @@ void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
     file_sample *fs = sampler_create_sample(filename, loop_len);
     s->samples[s->num_samples++] = fs;
     printf("done adding SAMPLE\n");
-
 }
 
 file_sample *sampler_create_sample(char *filename, int loop_len)
@@ -185,6 +188,7 @@ void sampler_resample_to_loop_size(SAMPLER *s)
     for (int i = 0; i < s->num_samples; i++) {
         sample_resample_to_loop_size(s->samples[i]);
     }
+    sample_resample_to_loop_size(s->scramblrrr);
     s->just_been_resampled = true;
 }
 
@@ -202,8 +206,7 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("BUFSIZE is %d\n", fs->orig_file_size);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples =
-        mixr->samples_per_midi_tick * PPL * fs->loop_len;
+    int loop_len_in_samples = mixr->samples_per_midi_tick * PPL * fs->loop_len;
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
@@ -262,10 +265,11 @@ void sample_resample_to_loop_size(file_sample *fs)
 void sampler_status(void *self, wchar_t *status_string)
 {
     SAMPLER *sampler = self;
-    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
-             "[LOOPER] Vol: %.2lf Multi: %d Current Sample: %d ScramblrrrMode: %s",
-             sampler->vol, sampler->multi_sample_mode, sampler->cur_sample, 
-             sampler->scramblrrr_mode ? "true" : "false");
+    swprintf(
+        status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
+        "[LOOPER] Vol: %.2lf Multi: %d Current Sample: %d ScramblrrrMode: %s",
+        sampler->vol, sampler->multi_sample_mode, sampler->cur_sample,
+        sampler->scramblrrr_mode ? "true" : "false");
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {
@@ -315,34 +319,34 @@ void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops)
 void sampler_toggle_scramble_mode(SAMPLER *s)
 {
     s->scramblrrr_mode = 1 - s->scramblrrr_mode;
-	if (s->scramblrrr_mode == false)
-    	s->scramble_counter = 1;
-    printf("Changed sampler scramblrrr mode to %s\n", s->scramblrrr_mode ? "true" : "false");
+    s->scramble_counter = 0;
+    if (s->scramblrrr_mode == true) {
+        int len = s->samples[s->cur_sample]->resampled_file_size;
+        for (int i = 0; i < len; i++)
+            s->scramblrrr->resampled_file_bytes[i] =
+                s->samples[s->cur_sample]->resampled_file_bytes[i];
+        s->scramblrrr->position = s->samples[s->cur_sample]->position;
+    }
+    printf("Changed sampler scramblrrr mode to %s\n",
+           s->scramblrrr_mode ? "true" : "false");
 }
-
 
 void sampler_scramble(SAMPLER *s)
 {
-	int len = s->samples[s->cur_sample]->resampled_file_size;
-	int len16th = len / 16;
+    int len = s->samples[s->cur_sample]->resampled_file_size;
+    int len16th = len / 16;
 
-	int cur16th = 0;
-	int cur_marker = 0; // between cur and next is measured in samples
-	int next_marker = 0;
+    for (int i = 0; i < len; i++) {
+        if (i % len16th == 0)
+            s->scramble_counter++;
 
-	for (int i = 0; i < len; i++)
-	{
-		if (i == next_marker) {
-			cur_marker = next_marker;
-			cur16th++;
-			next_marker = cur16th * len16th;
-		}
-		if (cur16th % 2) {
-			s->scramblrrr->resampled_file_bytes[i] = s->samples[s->cur_sample]->resampled_file_bytes[i];
-		}
-		else {
-			s->scramblrrr->resampled_file_bytes[i] = s->samples[s->cur_sample]->resampled_file_bytes[ (i + s->scramble_counter*len16th) % len];
-		}
-	}
-	s->scramble_counter = (s->scramble_counter + 1) % 16;
+        if (s->scramble_counter % 2 != 0) {
+            s->scramblrrr->resampled_file_bytes[i] =
+                s->samples[s->cur_sample]->resampled_file_bytes[i];
+        }
+        else {
+            s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] =
+                s->samples[s->cur_sample]->resampled_file_bytes[i];
+        }
+    }
 }

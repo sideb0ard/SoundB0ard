@@ -176,42 +176,37 @@ void interpret(char *line)
                             drum_set_random_sample_amp(d, pattern_num);
                         }
                     }
+                    else if (strncmp("multi", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            drumr_set_multi_pattern_mode(d, true);
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            drumr_set_multi_pattern_mode(d, false);
+                        }
+                        printf("Sequencer multi mode : %s\n",
+                               d->multi_pattern_mode ? "true" : "false");
+                    }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         char_array_to_seq_string_pattern(pattern, wurds, 5,
                                                          num_wurds);
                         printf("Changing\n");
 
-                        if (strncmp("multi", wurds[3], 5) == 0) {
-                            if (strncmp("true", wurds[4], 4) == 0) {
-                                drumr_set_multi_pattern_mode(d, true);
+                        int pattern_num = atoi(wurds[3]);
+                        if (is_valid_drum_pattern_num(d, pattern_num)) {
+                            if (strncmp("pattern", wurds[4], 7) == 0) {
+                                printf("Changing pattern to %s\n", pattern);
+                                change_char_pattern(d, pattern_num, pattern);
                             }
-                            else if (strncmp("false", wurds[4], 5) == 0) {
-                                drumr_set_multi_pattern_mode(d, false);
+                            else if (strncmp("amp", wurds[4], 3) == 0) {
+                                printf("Setting pattern AMP to %s\n", pattern);
+                                drum_set_sample_amp_from_char_pattern(
+                                    d, pattern_num, pattern);
                             }
-                            printf("Sequencer multi mode : %s\n", d->multi_pattern_mode ? "true" : "false");
-
-                        }
-                        else {
-                            int pattern_num = atoi(wurds[3]);
-                            if (is_valid_drum_pattern_num(d, pattern_num)) {
-                                if (strncmp("pattern", wurds[4], 7) == 0) {
-                                    printf("Changing pattern to %s\n", pattern);
-                                    change_char_pattern(d, pattern_num,
-                                                        pattern);
-                                }
-                                else if (strncmp("amp", wurds[4], 3) == 0) {
-                                    printf("Setting pattern AMP to %s\n",
-                                           pattern);
-                                    drum_set_sample_amp_from_char_pattern(
-                                        d, pattern_num, pattern);
-                                }
-                                else if (strncmp("numloops", wurds[4], 8) ==
-                                         0) {
-                                    int numloops = atoi(wurds[5]);
-                                    if (numloops != 0) {
-                                        drumr_change_num_loops(d, pattern_num,
-                                                               numloops);
-                                    }
+                            else if (strncmp("numloops", wurds[4], 8) == 0) {
+                                int numloops = atoi(wurds[5]);
+                                if (numloops != 0) {
+                                    drumr_change_num_loops(d, pattern_num,
+                                                           numloops);
                                 }
                             }
                         }
@@ -276,31 +271,28 @@ void interpret(char *line)
                         printf("Switching on scramble mode!\n");
                         sampler_toggle_scramble_mode(s);
                     }
-                    else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (strncmp("multi", wurds[3], 5) == 0) {
-                            if (strncmp("true", wurds[4], 4) == 0) {
-                                sampler_set_multi_sample_mode(s, true);
-                            }
-                            else if (strncmp("false", wurds[4], 5) == 0) {
-                                sampler_set_multi_sample_mode(s, false);
-                            }
-                            printf("Sampler multi mode : %s\n", s->multi_sample_mode ? "true" : "false");
+                    else if (strncmp("multi", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            sampler_set_multi_sample_mode(s, true);
                         }
-                        else {
-                            int sample_num = atoi(wurds[3]);
-                            if (is_valid_sample_num(s, sample_num)) {
-                                if (strncmp("looplen", wurds[4], 8) == 0) {
-                                    int looplen = atoi(wurds[5]);
-                                    sampler_change_loop_len(s, sample_num,
-                                                            looplen);
-                                }
-                                else if (strncmp("numloops", wurds[4], 8) ==
-                                         0) {
-                                    int numloops = atoi(wurds[5]);
-                                    if (numloops != 0) {
-                                        sampler_change_num_loops(s, sample_num,
-                                                                 numloops);
-                                    }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            sampler_set_multi_sample_mode(s, false);
+                        }
+                        printf("Sampler multi mode : %s\n",
+                               s->multi_sample_mode ? "true" : "false");
+                    }
+                    else if (strncmp("change", wurds[2], 6) == 0) {
+                        int sample_num = atoi(wurds[3]);
+                        if (is_valid_sample_num(s, sample_num)) {
+                            if (strncmp("looplen", wurds[4], 8) == 0) {
+                                int looplen = atoi(wurds[5]);
+                                sampler_change_loop_len(s, sample_num, looplen);
+                            }
+                            else if (strncmp("numloops", wurds[4], 8) == 0) {
+                                int numloops = atoi(wurds[5]);
+                                if (numloops != 0) {
+                                    sampler_change_num_loops(s, sample_num,
+                                                             numloops);
                                 }
                             }
                         }
@@ -335,31 +327,30 @@ void interpret(char *line)
                             minisynth_add_melody(ms);
                         }
                     }
-                    else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (strncmp("multi", wurds[3], 5) == 0) {
-                            if (strncmp("true", wurds[4], 4) == 0) {
-                                minisynth_set_multi_melody_mode(ms, true);
-                            }
-                            else if (strncmp("false", wurds[4], 5) == 0) {
-                                minisynth_set_multi_melody_mode(ms, false);
-                            }
-                            printf("Synth multi mode : %s\n", ms->multi_melody_mode ? "true" : "false");
+                    // TODO HERE!
+                    if (strncmp("multi", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            minisynth_set_multi_melody_mode(ms, true);
                         }
-                        else {
-                            int melody_num = atoi(wurds[3]);
-                            if (is_valid_melody_num(ms, melody_num)) {
-                                printf("VALID!\n");
-                                if (strncmp("numloops", wurds[4], 8) == 0) {
-                                    int numloops = atoi(wurds[5]);
-                                    if (numloops != 0) {
-                                        minisynth_set_melody_loop_num(
-                                            ms, melody_num, numloops);
-                                        printf("NUMLOOPS Now %d\n", numloops);
-                                    }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            minisynth_set_multi_melody_mode(ms, false);
+                        }
+                        printf("Synth multi mode : %s\n",
+                               ms->multi_melody_mode ? "true" : "false");
+                    }
+                    else if (strncmp("change", wurds[2], 6) == 0) {
+                        int melody_num = atoi(wurds[3]);
+                        if (is_valid_melody_num(ms, melody_num)) {
+                            printf("VALID!\n");
+                            if (strncmp("numloops", wurds[4], 8) == 0) {
+                                int numloops = atoi(wurds[5]);
+                                if (numloops != 0) {
+                                    minisynth_set_melody_loop_num(
+                                        ms, melody_num, numloops);
+                                    printf("NUMLOOPS Now %d\n", numloops);
                                 }
                             }
                         }
-                        // change
                     }
                     else if (strncmp("copy", wurds[2], 4) == 0) {
                         int sg2 = atoi(wurds[3]);
@@ -369,12 +360,12 @@ void interpret(char *line)
                                 (minisynth *)mixr->sound_generators[sg2];
                             printf("Copying SYNTH patterns!\n");
                             int pattern_nomnom = atoi(wurds[4]);
-                            if (pattern_nomnom <= ms2->num_melodies)
-                            {
+                            if (pattern_nomnom <= ms2->num_melodies) {
                                 printf("And we got patterns to copy~!\n");
                             }
                         }
-                        // if wurds[3] is valid soundnum and wurds[4] <= wurds[3]->num_patterns
+                        // if wurds[3] is valid soundnum and wurds[4] <=
+                        // wurds[3]->num_patterns
                         // wurds[1]->add_pattern
                         // wurds[1]->pattern = wurds[3]->get_pattern(wurds[4])
                     }

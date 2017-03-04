@@ -578,32 +578,29 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
 
 midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
 {
-    if (melody_num >= self->num_melodies)
-    {
+    if (melody_num >= self->num_melodies) {
         printf("Dingjie!\n");
         return NULL;
     }
     // midi_event_loop defined in midimaaan.h
-    midi_event **new_midi_events_loop = calloc(PPNS, sizeof(midi_event*));
-    for (int i = 0; i < PPNS; i++)
-    {
-        if (self->melodies[melody_num][i] != NULL)
-        {
+    midi_event **new_midi_events_loop = calloc(PPNS, sizeof(midi_event *));
+    for (int i = 0; i < PPNS; i++) {
+        if (self->melodies[melody_num][i] != NULL) {
             midi_event *ev = self->melodies[melody_num][i];
-            new_midi_events_loop[i] = new_midi_event(ev->tick, ev->event_type, ev->data1, ev->data2);
+            new_midi_events_loop[i] =
+                new_midi_event(ev->tick, ev->event_type, ev->data1, ev->data2);
         }
     }
 
     return new_midi_events_loop;
 }
 
-
-void minisynth_add_midi_loop(minisynth *self, midi_event** events, int melody_num)
+void minisynth_add_midi_loop(minisynth *self, midi_event **events,
+                             int melody_num)
 {
-    (void) events;
+    (void)events;
 
-    if (melody_num >= self->num_melodies)
-    {
+    if (melody_num >= self->num_melodies) {
         printf("Dingjie!\n");
         return;
     }

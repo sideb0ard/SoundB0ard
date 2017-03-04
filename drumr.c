@@ -532,4 +532,3 @@ void seq_toggle_game_of_life(DRUM *d, bool on)
         d->game_of_life_on = false;
     }
 }
-

@@ -34,7 +34,8 @@ typedef struct t_drumr {
     int patterns[NUM_DRUM_PATTERNS];
     double pattern_position_amp[NUM_DRUM_PATTERNS][DRUM_PATTERN_LEN];
     int pattern_num_loops[NUM_DRUM_PATTERNS];
-    int backup_pattern_while_game_of_life_on; // store current pattern so game of life can use slot
+    int backup_pattern_while_game_of_life_on; // store current pattern so game
+                                              // of life can use slot
     int num_patterns;
     int cur_pattern;
     int cur_pattern_iteration;

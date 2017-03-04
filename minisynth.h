@@ -150,4 +150,5 @@ void minisynth_melody_to_string(minisynth *self, int melody_num,
 midi_event **minisynth_get_midi_loop(minisynth *self);
 void minisynth_add_event(minisynth *self, midi_event *ev);
 midi_event **minisynth_copy_midi_loop(minisynth *self, int pattern_num);
-void minisynth_add_midi_loop(minisynth *self, midi_event** events, int pattern_num);
+void minisynth_add_midi_loop(minisynth *self, midi_event **events,
+                             int pattern_num);

@@ -43,7 +43,7 @@ typedef struct t_sampler {
     bool started;
     bool just_been_resampled;
     bool scramblrrr_mode;
-	int scramble_counter;
+    int scramble_counter;
 
 } SAMPLER;
 
