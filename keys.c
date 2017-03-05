@@ -178,6 +178,8 @@ void *play_melody_loop(void *p)
                     ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
                     ms->cur_melody_iteration =
                         ms->melody_multiloop_count[ms->cur_melody];
+                    // TODO - this doesn't seem to have intended effect
+                    //minisynth_reset_voices(ms);
                 }
             }
         }

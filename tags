@@ -984,6 +984,7 @@ minisynth_midi_pitchbend	minisynth.c	/^void minisynth_midi_pitchbend(minisynth *
 minisynth_prepare_for_play	minisynth.c	/^bool minisynth_prepare_for_play(minisynth *ms)$/;"	f
 minisynth_reset_melody	minisynth.c	/^void minisynth_reset_melody(minisynth *ms, unsigned int melody_num)$/;"	f
 minisynth_reset_melody_all	minisynth.c	/^void minisynth_reset_melody_all(minisynth *ms)$/;"	f
+minisynth_reset_voices	minisynth.c	/^void minisynth_reset_voices(minisynth *ms)$/;"	f
 minisynth_set_melody_loop_num	minisynth.c	/^void minisynth_set_melody_loop_num(minisynth *self, int melody_num,$/;"	f
 minisynth_set_multi_melody_mode	minisynth.c	/^void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)$/;"	f
 minisynth_setvol	minisynth.c	/^void minisynth_setvol(void *self, double v)$/;"	f

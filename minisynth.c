@@ -405,6 +405,13 @@ void minisynth_reset_melody_all(minisynth *ms)
     }
 }
 
+void minisynth_reset_voices(minisynth *ms)
+{
+    for (int i = 0; i < MAX_VOICES; i++) {
+        minisynth_voice_reset(ms->m_voices[i]);
+    }
+}
+
 void minisynth_reset_melody(minisynth *ms, unsigned int melody_num)
 {
     if (melody_num < (unsigned)ms->num_melodies) {
