@@ -336,17 +336,51 @@ void sampler_scramble(SAMPLER *s)
     int len = s->samples[s->cur_sample]->resampled_file_size;
     int len16th = len / 16;
 
-    for (int i = 0; i < len; i++) {
-        if (i % len16th == 0)
-            s->scramble_counter++;
+    // take a copy of the first 16th that we can randomly inject below.
+    double first16th[len16th];
+    // lets grab a reverse copy too!
+    double rev16th[len16th];
+    //
+    for (int i = 0; i < len16th; i++) {
+        first16th[i] = s->samples[s->cur_sample]->resampled_file_bytes[i];
+        rev16th[(len16th-1)-i] = s->samples[s->cur_sample]->resampled_file_bytes[i];
+    }
 
-        if (s->scramble_counter % 2 != 0) {
+    bool yolo = false;
+    bool reverse = false;
+
+    for (int i = 0; i < len; i++) {
+        if (i % len16th == 0) {
+            s->scramble_counter++;
+            if (yolo || reverse) {
+                yolo = false;
+                reverse = false;
+            }
+            else {
+                int dicey = rand()%100;
+                if (dicey >= 80 && dicey < 90)
+                    yolo = true;
+                else if (dicey >= 95)
+                    reverse = true;
+            }
+        }
+
+
+        if (yolo) {
             s->scramblrrr->resampled_file_bytes[i] =
-                s->samples[s->cur_sample]->resampled_file_bytes[i];
+                first16th[i%len16th];
+        }
+        else if (reverse) {
+            s->scramblrrr->resampled_file_bytes[i] =
+                rev16th[i%len16th];
         }
         else {
-            s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] =
-                s->samples[s->cur_sample]->resampled_file_bytes[i];
+            if (s->scramble_counter % 2 != 0)
+                s->scramblrrr->resampled_file_bytes[i] =
+                    s->samples[s->cur_sample]->resampled_file_bytes[i];
+            else
+                s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] =
+                    s->samples[s->cur_sample]->resampled_file_bytes[i];
         }
     }
 }
