@@ -343,7 +343,8 @@ void sampler_scramble(SAMPLER *s)
     //
     for (int i = 0; i < len16th; i++) {
         first16th[i] = s->samples[s->cur_sample]->resampled_file_bytes[i];
-        rev16th[(len16th-1)-i] = s->samples[s->cur_sample]->resampled_file_bytes[i];
+        rev16th[(len16th - 1) - i] =
+            s->samples[s->cur_sample]->resampled_file_bytes[i];
     }
 
     bool yolo = false;
@@ -357,7 +358,7 @@ void sampler_scramble(SAMPLER *s)
                 reverse = false;
             }
             else {
-                int dicey = rand()%100;
+                int dicey = rand() % 100;
                 if (dicey >= 80 && dicey < 90)
                     yolo = true;
                 else if (dicey >= 95)
@@ -365,14 +366,11 @@ void sampler_scramble(SAMPLER *s)
             }
         }
 
-
         if (yolo) {
-            s->scramblrrr->resampled_file_bytes[i] =
-                first16th[i%len16th];
+            s->scramblrrr->resampled_file_bytes[i] = first16th[i % len16th];
         }
         else if (reverse) {
-            s->scramblrrr->resampled_file_bytes[i] =
-                rev16th[i%len16th];
+            s->scramblrrr->resampled_file_bytes[i] = rev16th[i % len16th];
         }
         else {
             if (s->scramble_counter % 2 != 0)

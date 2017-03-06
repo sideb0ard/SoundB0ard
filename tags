@@ -730,6 +730,7 @@ m_decay_time_msec	envelope_generator.h	/^    double m_decay_time_msec;$/;"	m	str
 m_decay_time_scalar	envelope_generator.h	/^    double m_decay_time_scalar;  \/\/ for note# -> decay time mod$/;"	m	struct:envelope_generator
 m_default_mod_intensity	voice.h	/^    double m_default_mod_intensity;$/;"	m	struct:__anon31
 m_default_mod_range	voice.h	/^    double m_default_mod_range;$/;"	m	struct:__anon31
+m_delay_fx	minisynth.h	/^    stereodelay m_delay_fx;$/;"	m	struct:minisynth
 m_delay_in_samples	delayline.h	/^    double m_delay_in_samples;$/;"	m	struct:delayline
 m_delay_in_samples	effect.h	/^    int m_delay_in_samples;$/;"	m	struct:__anon8
 m_delay_ms	delayline.h	/^    double m_delay_ms;$/;"	m	struct:delayline

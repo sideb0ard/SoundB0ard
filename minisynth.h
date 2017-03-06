@@ -11,6 +11,7 @@
 #include "modmatrix.h"
 #include "oscillator.h"
 #include "sound_generator.h"
+#include "stereodelay.h"
 
 #include "minisynth_voice.h"
 
@@ -65,7 +66,7 @@ typedef struct minisynth {
     unsigned int m_midi_rx_channel;
 
     // new delay! fx! TODO
-    // stereodelay fx m_delay_fx;
+    stereodelay m_delay_fx;
 
     unsigned int m_voice_mode;
     double m_detune_cents;

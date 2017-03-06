@@ -266,12 +266,6 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
         }
     }
 
-    // ENVSTREAM *e = new_envelope_stream(env_len, type);
-    // if (e == NULL) {
-    //     perror("Couldn't create envelope");
-    //     return -1;
-    // }
-    //
     self->envelopes[self->envelopes_num] = e;
     self->envelopes_enabled = 1;
     printf("done adding envelope\n");
