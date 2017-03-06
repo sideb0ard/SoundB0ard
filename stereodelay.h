@@ -5,7 +5,7 @@
 #include "defjams.h"
 #include "delayline.h"
 
-typedef enum { NORM, TAP1, TAP2, PINGPONG } delay_mode;
+typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;
 
 typedef struct stereodelay {
     delayline m_left_delay, m_right_delay;

@@ -18,7 +18,19 @@
 #define MAX_NUM_MIDI_LOOPS 16
 #define MAX_VOICES 4
 
+#define MIN_DETUNE_CENTS -50.0
+#define MAX_DETUNE_CENTS 50.0
 #define DEFAULT_DETUNE_CENTS 0.0
+
+#define MIN_PULSE_WIDTH_PCT 1.0
+#define MAX_PULSE_WIDTH_PCT 99.0
+#define DEFAULT_PULSE_WIDTH_PCT 50.0
+#define MIN_NOISE_OSC_AMP_DB -96.0
+#define MAX_NOISE_OSC_AMP_DB 0.0
+#define DEFAULT_NOISE_OSC_AMP_DB -96.0
+#define MIN_SUB_OSC_AMP_DB -96.0
+#define MAX_SUB_OSC_AMP_DB 0.0
+#define DEFAULT_SUB_OSC_AMP_DB -96.0
 
 #define DEFAULT_LEGATO_MODE 0
 #define DEFAULT_RESET_TO_ZERO 0
@@ -68,41 +80,51 @@ typedef struct minisynth {
     // new delay! fx! TODO
     stereodelay m_delay_fx;
 
-    unsigned int m_voice_mode;
-    double m_detune_cents;
-    double m_fc_control;
-    double m_lfo1_rate;
+    unsigned int m_voice_mode; // controlled by keys
+    // midi mode one, top row
     double m_attack_time_msec;
-    double m_pulse_width_pct;
+    double m_decay_release_time_msec;
+    double m_sustain_level;
+    double m_volume_db;
+    // midi mode one, bottom row
+    double m_lfo1_amplitude;
+    double m_lfo1_rate;
+    double m_fc_control;
+    double m_q_control;
+
+    // midi mode two, top row
     double m_delay_time_msec;
     double m_feedback_pct;
     double m_delay_ratio;
     double m_wet_mix;
-    int m_octave;
-    double m_portamento_time_msec;
-    double m_q_control;
-    double m_lfo1_osc_pitch_intensity;
-    double m_decay_release_time_msec;
-    double m_lfo1_amplitude;
+    unsigned int m_delay_mode; // via keyboard 'n' key (TODO!)
+    // midi mode two, bottom row
+    double m_detune_cents;
+    double m_pulse_width_pct;
     double m_sub_osc_db;
-    double m_eg1_osc_intensity;
-    double m_eg1_filter_intensity;
-    double m_lfo1_filter_fc_intensity;
-    double m_sustain_level;
     double m_noise_osc_db;
-    double m_lfo1_amp_intensity;
-    double m_lfo1_pan_intensity;
-    unsigned int m_lfo1_waveform;
-    double m_eg1_dca_intensity;
-    double m_volume_db;
-    unsigned int m_legato_mode;
+
+    int m_octave;
     int m_pitchbend_range;
+    unsigned int m_lfo1_waveform;
+    unsigned int m_legato_mode;
     unsigned int m_reset_to_zero;
     unsigned int m_filter_keytrack;
-    double m_filter_keytrack_intensity;
     unsigned int m_velocity_to_attack_scaling;
     unsigned int m_note_number_to_decay_scaling;
-    unsigned int m_delaymode;
+
+    double m_eg1_dca_intensity;
+    double m_eg1_filter_intensity;
+    double m_eg1_osc_intensity;
+
+    double m_filter_keytrack_intensity;
+
+    double m_lfo1_amp_intensity;
+    double m_lfo1_filter_fc_intensity;
+    double m_lfo1_osc_pitch_intensity;
+    double m_lfo1_pan_intensity;
+
+    double m_portamento_time_msec;
 
 } minisynth;
 
@@ -154,3 +176,4 @@ void minisynth_add_event(minisynth *self, midi_event *ev);
 midi_event **minisynth_copy_midi_loop(minisynth *self, int pattern_num);
 void minisynth_add_midi_loop(minisynth *self, midi_event **events,
                              int pattern_num);
+void minisynth_toggle_delay_mode(minisynth *ms);

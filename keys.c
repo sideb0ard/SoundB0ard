@@ -75,42 +75,31 @@ void keys(int soundgen_num)
             case 122:
                 printf("SAW3 mode\n");
                 ms->m_voice_mode = 0;
-                // printf("Changing WAVE form of synth->osc1\n");
-                // minisynth_change_osc_wave_form(ms, 0, 0, true);
                 break;
             case 120:
                 printf("SQR3 mode\n");
                 ms->m_voice_mode = 1;
-                // printf("Changing WAVE form of synth->osc2\n");
-                // minisynth_change_osc_wave_form(ms, 0, 1, true);
                 break;
             case 99:
                 printf("SAW2SQR mode\n");
                 ms->m_voice_mode = 2;
-                // printf("Changing WAVE form of synth->lfo\n");
-                // minisynth_change_osc_wave_form(ms, 0, 2, true);
                 break;
             case 118:
                 printf("TRI2SAW mode\n");
                 ms->m_voice_mode = 3;
-                // ms->m_filter_keytrack = 1 - ms->m_filter_keytrack;
-                // printf("Key tracking toggle - val is %d!\n",
-                //       ms->m_filter_keytrack);
                 break;
             case 98:
                 printf("TRI2SQR mode\n");
                 ms->m_voice_mode = 4;
-                // printf("Key tracking intensity toggle!\n");
-                // if (ms->m_filter_keytrack_intensity == 0.5)
-                //    ms->m_filter_keytrack_intensity = 2.0;
-                // else if (ms->m_filter_keytrack_intensity == 2.0)
-                //    ms->m_filter_keytrack_intensity = 1.0;
-                // else
-                //    ms->m_filter_keytrack_intensity = 0.5;
-                // printf("Key tracking intensity toggle! Val is %f\n",
-                //       ms->m_filter_keytrack_intensity);
                 break;
-
+            case 110:
+                minisynth_toggle_delay_mode(ms);
+                printf("Switching DELAY mode -- %d\n", ms->m_delay_mode);
+                break;
+            case 109:
+                mixer_toggle_midi_mode(mixr);
+                printf("Switching MIDI mode -- %d\n", mixr->m_midi_controller_mode);
+                break;
             default:
                 // play note
                 midi_num = ch_midi_lookup(ch, ms);

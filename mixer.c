@@ -38,6 +38,7 @@ mixer *new_mixer()
     mixr->tick = 0;
     mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
+    mixr->m_midi_controller_mode = 0;
     mixr->midi_control_destination = NONE;
     if (mixr == NULL) {
         printf("Nae mixer, fucked up!\n");
@@ -111,6 +112,11 @@ void mixer_update_bpm(mixer *mixr, int bpm)
             sampler_resample_to_loop_size((SAMPLER *)mixr->sound_generators[i]);
         }
     }
+}
+
+void mixer_toggle_midi_mode(mixer *mixr)
+{
+    mixr->m_midi_controller_mode = ++(mixr->m_midi_controller_mode) %  MAX_NUM_MIDI_MODES;
 }
 
 void delay_toggle(mixer *mixr)
