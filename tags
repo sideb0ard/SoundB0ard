@@ -327,6 +327,7 @@ add_freq_pass_soundgen	sound_generator.c	/^int add_freq_pass_soundgen(SOUNDGEN *
 add_int_pattern	drumr.c	/^void add_int_pattern(DRUM *d, int pattern)$/;"	f
 add_matrix_row	modmatrix.c	/^void add_matrix_row(modmatrix *self, matrixrow *row)$/;"	f
 add_minisynth	mixer.c	/^int add_minisynth(mixer *mixr)$/;"	f
+add_reverb_soundgen	sound_generator.c	/^int add_reverb_soundgen(SOUNDGEN *self, float reverbtime)$/;"	f
 add_sampler	mixer.c	/^int add_sampler(mixer *mixr, char *filename, double loop_len)$/;"	f
 add_sound_generator	mixer.c	/^int add_sound_generator(mixer *mixr, SBMSG *sbm)$/;"	f
 afterthought	algorithm.h	/^    char afterthought[5][MAX_CMD_LEN];$/;"	m	struct:algorithm
@@ -733,6 +734,7 @@ m_buffer_size	beatrepeat.h	/^    size_t m_buffer_size;$/;"	m	struct:beatrepeat
 m_buffer_size	delayline.h	/^    int m_buffer_size;$/;"	m	struct:delayline
 m_c	filter_moogladder.h	/^    double m_c;$/;"	m	struct:filter_moogladder
 m_cents	oscillator.h	/^    double m_cents;     \/\/ cents tweak$/;"	m	struct:oscillator
+m_chorus_offset	modular_delay.h	/^    double m_chorus_offset;$/;"	m	struct:mod_delay
 m_current_table	wt_oscillator.h	/^    double *m_current_table;$/;"	m	struct:wt_oscillator
 m_current_table_index	wt_oscillator.h	/^    int m_current_table_index; \/\/ 0 - 9$/;"	m	struct:wt_oscillator
 m_d	filter_moogladder.h	/^    double m_d;$/;"	m	struct:filter_moogladder
@@ -745,6 +747,7 @@ m_decay_time_msec	envelope_generator.h	/^    double m_decay_time_msec;$/;"	m	str
 m_decay_time_scalar	envelope_generator.h	/^    double m_decay_time_scalar;  \/\/ for note# -> decay time mod$/;"	m	struct:envelope_generator
 m_default_mod_intensity	voice.h	/^    double m_default_mod_intensity;$/;"	m	struct:__anon32
 m_default_mod_range	voice.h	/^    double m_default_mod_range;$/;"	m	struct:__anon32
+m_delay	modular_delay.h	/^    stereodelay *m_delay;$/;"	m	struct:mod_delay
 m_delay_fx	minisynth.h	/^    stereodelay m_delay_fx;$/;"	m	struct:minisynth
 m_delay_in_samples	delayline.h	/^    double m_delay_in_samples;$/;"	m	struct:delayline
 m_delay_in_samples	effect.h	/^    int m_delay_in_samples;$/;"	m	struct:__anon8
@@ -816,6 +819,7 @@ m_left_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	st
 m_legato_mode	envelope_generator.h	/^    bool m_legato_mode;$/;"	m	struct:envelope_generator
 m_legato_mode	minisynth.h	/^    unsigned int m_legato_mode;$/;"	m	struct:minisynth
 m_legato_mode	voice.h	/^    unsigned int m_legato_mode;$/;"	m	struct:__anon32
+m_lfo	modular_delay.h	/^    lfo         *m_lfo;$/;"	m	struct:mod_delay
 m_lfo1	voice.h	/^    lfo m_lfo1;$/;"	m	struct:__anon32
 m_lfo1_amp_intensity	minisynth.h	/^    double m_lfo1_amp_intensity;$/;"	m	struct:minisynth
 m_lfo1_amplitude	minisynth.h	/^    double m_lfo1_amplitude;$/;"	m	struct:minisynth
@@ -827,6 +831,7 @@ m_lfo1_waveform	minisynth.h	/^    unsigned int m_lfo1_waveform;$/;"	m	struct:min
 m_lfo2	voice.h	/^    lfo m_lfo2;$/;"	m	struct:__anon32
 m_lfo_mode	oscillator.h	/^    unsigned m_lfo_mode; \/\/ to store MODE$/;"	m	struct:oscillator
 m_matrix_core	modmatrix.h	/^    matrixrow **m_matrix_core;$/;"	m	struct:__anon21
+m_max_delay_msec	modular_delay.h	/^    double m_max_delay_msec;$/;"	m	struct:mod_delay
 m_midi_controller_mode	mixer.h	/^    unsigned int m_midi_controller_mode; \/\/ to switch control knob routing$/;"	m	struct:t_mixer
 m_midi_note_number	oscillator.h	/^    unsigned m_midi_note_number;$/;"	m	struct:oscillator
 m_midi_note_number	voice.h	/^    unsigned int m_midi_note_number;$/;"	m	struct:__anon32
@@ -835,6 +840,7 @@ m_midi_rx_channel	minisynth.h	/^    unsigned int m_midi_rx_channel;$/;"	m	struct
 m_midi_velocity	dca.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:dca
 m_midi_velocity	voice.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:__anon32
 m_midi_velocity_pending	voice.h	/^    unsigned int m_midi_velocity_pending;$/;"	m	struct:__anon32
+m_min_delay_msec	modular_delay.h	/^    double m_min_delay_msec;$/;"	m	struct:mod_delay
 m_mod_dest_eg_biased_output	envelope_generator.h	/^    unsigned m_mod_dest_eg_biased_output;$/;"	m	struct:envelope_generator
 m_mod_dest_eg_output	envelope_generator.h	/^    unsigned m_mod_dest_eg_output;$/;"	m	struct:envelope_generator
 m_mod_dest_output1	oscillator.h	/^    unsigned m_mod_dest_output1;$/;"	m	struct:oscillator
@@ -1027,6 +1033,8 @@ mixer_vol_change	mixer.c	/^void mixer_vol_change(mixer *mixr, float vol)$/;"	f
 mixr	main.c	/^mixer *mixr;$/;"	v
 mixr	mixer.h	/^    mixer *mixr;$/;"	m	struct:__anon16
 mma_midi_to_atten_db	utils.c	/^double mma_midi_to_atten_db(unsigned int midi_val)$/;"	f
+mod_delay	modular_delay.h	/^typedef struct mod_delay$/;"	s
+mod_delay	modular_delay.h	/^} mod_delay;$/;"	t	typeref:struct:mod_delay
 mod_osc	sbmsg.h	/^    char mod_osc[10];$/;"	m	struct:sbmsg
 modfreq	sbmsg.h	/^    int modfreq;$/;"	m	struct:sbmsg
 modmatrix	modmatrix.h	/^} modmatrix;$/;"	t	typeref:struct:__anon21
@@ -1064,7 +1072,9 @@ new_midi_event	midimaaan.c	/^midi_event *new_midi_event(int tick, int event_type
 new_minisynth	minisynth.c	/^minisynth *new_minisynth(void)$/;"	f
 new_minisynth_voice	minisynth_voice.c	/^minisynth_voice *new_minisynth_voice(void)$/;"	f
 new_mixer	mixer.c	/^mixer *new_mixer()$/;"	f
+new_mod_delay	modular_delay.c	/^mod_delay *new_mod_delay()$/;"	f
 new_modmatrix	modmatrix.c	/^modmatrix *new_modmatrix(void)$/;"	f
+new_reverb	effect.c	/^EFFECT *new_reverb(double reverbtime)$/;"	f
 new_sampler	sampler.c	/^SAMPLER *new_sampler(char *filename, double loop_len)$/;"	f
 new_saw_table	table.c	/^wtable *new_saw_table(int up)$/;"	f
 new_sbmsg	sbmsg.c	/^SBMSG *new_sbmsg()$/;"	f

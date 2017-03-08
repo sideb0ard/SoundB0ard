@@ -47,7 +47,33 @@ EFFECT *new_delay(double duration)
     delay_set_wet_mix(e->delay, 0.7);
     delay_set_mode(e->delay, PINGPONG);
 
-    // delay_update(e->delay);
+    delay_update(e->delay);
+
+    return e;
+}
+
+EFFECT *new_reverb(double reverbtime)
+{
+    EFFECT *e;
+    e = (EFFECT *)calloc(1, sizeof(EFFECT));
+    if (e == NULL)
+        return NULL;
+
+    e->type = REVERB;
+    printf("REVERB! %f\n", reverbtime);
+
+    double *buffer;
+    int buf_length = (int)(reverbtime * SAMPLE_RATE);
+    buffer = (double *)calloc(buf_length, sizeof(double));
+    if (buffer == NULL) {
+        perror("Couldn't allocate effect buffer");
+        free(e);
+        return NULL;
+    }
+    e->m_duration = reverbtime;
+    e->m_delay_in_samples = buf_length;
+    e->buffer = buffer;
+    e->buf_length = buf_length;
 
     return e;
 }

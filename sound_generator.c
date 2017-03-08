@@ -110,6 +110,27 @@ int add_delay_soundgen(SOUNDGEN *self, float duration)
     return self->effects_num++;
 }
 
+int add_reverb_soundgen(SOUNDGEN *self, float reverbtime)
+{
+    printf("Booya, adding a new REVERB to SOUNDGEN: %f!\n", reverbtime);
+
+    int res = resize_effects_array(self);
+    if (res == -1) {
+        perror("Couldn't resize effects array");
+        return -1;
+    }
+
+    EFFECT *e = new_reverb(reverbtime);
+    if (e == NULL) {
+        perror("Couldn't create effect");
+        return -1;
+    }
+    self->effects[self->effects_num] = e;
+    self->effects_on = 1;
+    printf("done adding effect\n");
+    return self->effects_num++;
+}
+
 int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type)
 {
     printf("Booya, adding a new *PASS to SOUNDGEN: %f!\n", freq);

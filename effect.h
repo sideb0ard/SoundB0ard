@@ -41,6 +41,7 @@ typedef struct {
 
 EFFECT *new_beatrepeat(int looplen);
 EFFECT *new_delay(double duration);
+EFFECT *new_reverb(double reverbtime);
 EFFECT *new_decimator(void);
 EFFECT *new_distortion(void);
 EFFECT *new_freq_pass(double freq, effect_type pass_type);
