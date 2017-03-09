@@ -855,7 +855,7 @@ m_lfo1_rate	minisynth.h	/^    double m_lfo1_rate;$/;"	m	struct:minisynth
 m_lfo1_waveform	minisynth.h	/^    unsigned int m_lfo1_waveform;$/;"	m	struct:minisynth
 m_lfo2	voice.h	/^    lfo m_lfo2;$/;"	m	struct:__anon33
 m_lfo_mode	oscillator.h	/^    unsigned m_lfo_mode; \/\/ to store MODE$/;"	m	struct:oscillator
-m_lfo_type	modular_delay.h	/^    unsigned int m_lfo_type; \/\/ TRI \/ SIN$/;"	m	struct:mod_delay
+m_lfo_type	modular_delay.h	/^    unsigned int m_lfo_type; \/\/ TRI \/ SINE$/;"	m	struct:mod_delay
 m_matrix_core	modmatrix.h	/^    matrixrow **m_matrix_core;$/;"	m	struct:__anon21
 m_max_delay_msec	modular_delay.h	/^    double m_max_delay_msec;$/;"	m	struct:mod_delay
 m_midi_controller_mode	mixer.h	/^    unsigned int m_midi_controller_mode; \/\/ to switch control knob routing$/;"	m	struct:t_mixer

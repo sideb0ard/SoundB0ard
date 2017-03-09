@@ -122,53 +122,101 @@ midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
 
 void midi_delay_control(EFFECT *e, int data1, int data2)
 {
-    if (e->type != DELAY) {
+    if (e->type != DELAY && e->type != MODDELAY) {
         printf("OOft, mate, i'm no a delay - cannae help you out\n");
         return;
     }
-    stereodelay *d = e->delay;
 
     double scaley_val;
-    switch (data1) {
-    case 1:
-        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        printf("OPTION1!\n");
-        break;
-    case 2:
-        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        printf("OPTION2!\n");
-        break;
-    case 3:
-        scaley_val = scaleybum(1, 128, 0, 1, data2);
-        printf("OPTION3!\n");
-        break;
-    case 4:
-        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        printf("OPTION4!\n");
-        break;
-    case 5:
-        scaley_val = scaleybum(0, 128, 0, 2000, data2);
-        printf("DELAY TIME! %f\n", scaley_val);
-        delay_set_delay_time_ms(d, scaley_val);
-        break;
-    case 6:
-        // scaley_val = scaleybum(0, 128, -100, 100, data2);
-        scaley_val = scaleybum(0, 128, 20, 100, data2);
-        printf("DELAY FEEDBACK! %f\n", scaley_val);
-        delay_set_feedback_percent(d, scaley_val);
-        break;
-    case 7:
-        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
-        printf("DELAY RATIO! %f\n", scaley_val);
-        delay_set_delay_ratio(d, scaley_val);
-        break;
-    case 8:
-        scaley_val = scaleybum(1, 128, 0, 1, data2);
-        printf("DELAY MIX! %f\n", scaley_val);
-        delay_set_wet_mix(d, scaley_val);
-        break;
-    default:
-        printf("SOMthing else\n");
+    if (e->type == DELAY)
+    {
+        stereodelay *d = e->delay;
+        switch (data1) {
+        case 1:
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            printf("OPTION1!\n");
+            break;
+        case 2:
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            printf("OPTION2!\n");
+            break;
+        case 3:
+            scaley_val = scaleybum(1, 128, 0, 1, data2);
+            printf("OPTION3!\n");
+            break;
+        case 4:
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            printf("OPTION4!\n");
+            break;
+        case 5:
+            scaley_val = scaleybum(0, 128, 0, 2000, data2);
+            printf("DELAY TIME! %f\n", scaley_val);
+            delay_set_delay_time_ms(d, scaley_val);
+            break;
+        case 6:
+            // scaley_val = scaleybum(0, 128, -100, 100, data2);
+            scaley_val = scaleybum(0, 128, 20, 100, data2);
+            printf("DELAY FEEDBACK! %f\n", scaley_val);
+            delay_set_feedback_percent(d, scaley_val);
+            break;
+        case 7:
+            scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+            printf("DELAY RATIO! %f\n", scaley_val);
+            delay_set_delay_ratio(d, scaley_val);
+            break;
+        case 8:
+            scaley_val = scaleybum(1, 128, 0, 1, data2);
+            printf("DELAY MIX! %f\n", scaley_val);
+            delay_set_wet_mix(d, scaley_val);
+            break;
+        default:
+            printf("SOMthing else\n");
+        }
+    }
+    else if (e->type == MODDELAY)
+    {
+        mod_delay *d = e->moddelay;
+        switch (data1) {
+        case 1:
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            printf("OPTION1!\n");
+            break;
+        case 2:
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            printf("OPTION2!\n");
+            break;
+        case 3:
+            scaley_val = scaleybum(1, 128, 0, 1, data2);
+            printf("OPTION3!\n");
+            break;
+        case 4:
+            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            printf("OPTION4!\n");
+            break;
+        case 5:
+            scaley_val = scaleybum(0, 128, 0, 100, data2);
+            printf("MOD DELAY DDEPTH ! %f\n", scaley_val);
+            d->m_depth = scaley_val;
+            break;
+        case 6:
+            // scaley_val = scaleybum(0, 128, -100, 100, data2);
+            scaley_val = scaleybum(0, 128, 0.02, 5.0, data2);
+            printf("MOD DELAY RATE ! %f\n", scaley_val);
+            d->m_rate = scaley_val;
+            break;
+        case 7:
+            scaley_val = scaleybum(1, 128, -100, 100, data2);
+            printf("MOD DELAY FEEDBACK PCT! %f\n", scaley_val);
+            d->m_feedback_percent = scaley_val;
+            break;
+        case 8:
+            scaley_val = scaleybum(1, 128, 0, 30, data2);
+            printf("MODDELAY CHORUS OFFSET! %f\n", scaley_val);
+            d->m_chorus_offset = scaley_val;
+            break;
+        default:
+            printf("SOMthing else\n");
+        }
     }
 }
 

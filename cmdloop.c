@@ -558,10 +558,29 @@ void interpret(char *line)
                         }
                     }
                 }
+                if (strncmp("modtype", wurds[3], 7) == 0 ||
+                    strncmp("lfotype", wurds[3], 7) == 0) {
+                    if (mixr->sound_generators[soundgen_num]
+                            ->effects[fx_num]
+                            ->type == MODDELAY) {
+                        mod_delay *d =
+                            (mod_delay *)mixr->sound_generators[soundgen_num]
+                                ->effects[fx_num];
+                        if (strncmp("modtype", wurds[3], 7) == 0) {
+                            if (strncmp("flanger", wurds[4], 7) == 0) d->m_mod_type = FLANGER;
+                            if (strncmp("vibrato", wurds[4], 7) == 0) d->m_mod_type = VIBRATO;
+                            if (strncmp("chorus", wurds[4], 6) == 0) d->m_mod_type = CHORUS;
+                        } else if (strncmp("lfotype", wurds[3], 7) == 0) {
+                            if (strncmp("tri", wurds[4], 3) == 0) d->m_lfo_type = TRI;
+                            if (strncmp("sin", wurds[4], 3) == 0) d->m_lfo_type = SINE;
+                        }
+                    }
+                }
                 else if (strncmp("midi", wurds[3], 4) == 0) {
                     if (mixr->sound_generators[soundgen_num]
                             ->effects[fx_num]
-                            ->type == DELAY) {
+                            ->type == DELAY 
+                        || mixr->sound_generators[soundgen_num]->effects[fx_num]->type == MODDELAY) {
                         printf("SUCCESS! GOLDEN MIDI DELAY!\n");
                         mixr->midi_control_destination = DELAYFX;
                         mixr->active_midi_soundgen_num = soundgen_num;

@@ -18,7 +18,7 @@ typedef struct mod_delay {
     double m_chorus_offset;
 
     unsigned int m_mod_type; // FLANGER, VIBRATO, CHORUS
-    unsigned int m_lfo_type; // TRI / SIN
+    unsigned int m_lfo_type; // TRI / SINE
 
 } mod_delay;
 
