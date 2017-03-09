@@ -6,6 +6,7 @@
 #include "defjams.h"
 #include "effect.h"
 #include "mixer.h"
+#include "modular_delay.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -48,6 +49,21 @@ EFFECT *new_delay(double duration)
     delay_set_mode(e->delay, PINGPONG);
 
     delay_update(e->delay);
+
+    return e;
+}
+
+EFFECT *effect_new_mod_delay()
+{
+    EFFECT *e;
+    e = (EFFECT *)calloc(1, sizeof(EFFECT));
+    if (e == NULL)
+        return NULL;
+
+    e->moddelay = new_mod_delay();
+    mod_delay_prepare_for_play(e->moddelay);
+    e->type = MODDELAY;
+    printf("MOD DurrrLAY!\n");
 
     return e;
 }

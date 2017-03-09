@@ -116,7 +116,8 @@ void mixer_update_bpm(mixer *mixr, int bpm)
 
 void mixer_toggle_midi_mode(mixer *mixr)
 {
-    mixr->m_midi_controller_mode = ++(mixr->m_midi_controller_mode) %  MAX_NUM_MIDI_MODES;
+    mixr->m_midi_controller_mode =
+        ++(mixr->m_midi_controller_mode) % MAX_NUM_MIDI_MODES;
 }
 
 void delay_toggle(mixer *mixr)

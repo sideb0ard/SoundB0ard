@@ -3,7 +3,6 @@
 #include <stdbool.h>
 
 #include "modmatrix.h"
-#include "sound_generator.h"
 #include "synthfunctions.h"
 
 #define OSC_FO_MOD_RANGE 2          // 2 semitone default

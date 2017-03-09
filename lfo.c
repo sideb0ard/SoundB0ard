@@ -200,9 +200,6 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
         self->m_v_modmatrix->m_sources[self->m_mod_dest_output2] =
             qp_out * self->m_amplitude * self->m_amp_mod;
     }
-    else {
-        printf("WHOA!\n");
-    }
 
     if (quad_phase_output)
         *quad_phase_output = qp_out * self->m_amplitude * self->m_amp_mod;

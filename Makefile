@@ -14,6 +14,7 @@ SRC = \
       chaosmonkey.c \
       cmdloop.c \
       dca.c \
+	  ddlmodule.c \
       delayline.c \
       drumr.c \
       drumr_utils.c \
@@ -35,6 +36,7 @@ SRC = \
       minisynth_voice.c \
       mixer.c \
       modmatrix.c \
+	  modular_delay.c \
       obliquestrategies.c \
       oscillator.c \
       qblimited_oscillator.c \

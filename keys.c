@@ -98,7 +98,8 @@ void keys(int soundgen_num)
                 break;
             case 109:
                 mixer_toggle_midi_mode(mixr);
-                printf("Switching MIDI mode -- %d\n", mixr->m_midi_controller_mode);
+                printf("Switching MIDI mode -- %d\n",
+                       mixr->m_midi_controller_mode);
                 break;
             default:
                 // play note

@@ -12,9 +12,7 @@ mod_delay *new_mod_delay()
     if (!md->m_lfo)
         return NULL;
 
-    md->m_delay = new_stereo_delay();
-    if (!md->m_delay)
-        return NULL;
+    ddl_initialize(&md->m_delay);
 
     md->m_min_delay_msec = 0.0;
     md->m_max_delay_msec = 0.0;
@@ -24,8 +22,8 @@ mod_delay *new_mod_delay()
     md->m_rate = 0.18;
     md->m_feedback_percent = 0;
     md->m_chorus_offset = 0;
-    md->m_mod_type = FLANGER;
-    md->m_lfo_type = TRI;
+    md->m_mod_type = CHORUS; // FLANGER, VIBRATO, CHORUS
+    md->m_lfo_type = SINE;   // SINE or TRI
 
     return md;
 }
@@ -40,51 +38,50 @@ void mod_delay_update_lfo(mod_delay *md)
 void mod_delay_update_delay(mod_delay *md)
 {
     if (md->m_mod_type != VIBRATO)
-        md->m_delay->m_feedback_percent = md->m_feedback_percent;
-    delay_update(md->m_delay);
+        md->m_delay.m_feedback_pct = md->m_feedback_percent;
+    ddl_cook_variables(&md->m_delay);
 }
 
 void mod_delay_cook_mod_type(mod_delay *md)
 {
-    switch(md->m_mod_type) {
-        case VIBRATO:
-        {
-            md->m_min_delay_msec = 0;
-            md->m_max_delay_msec = 7;
-            md->m_delay->m_wet_mix = 100.0;
-            md->m_delay->m_feedback_percent = 0.0;
-            break;
-        }
-        case CHORUS:
-        {
-            md->m_min_delay_msec = 5;
-            md->m_max_delay_msec = 30;
-            md->m_delay->m_wet_mix = 50.0;
-            md->m_delay->m_feedback_percent = md->m_feedback_percent;
-            break;
-        }
-        case FLANGER:
-        default:
-        {
-            md->m_min_delay_msec = 0;
-            md->m_max_delay_msec = 7;
-            md->m_delay->m_wet_mix = 50.0;
-            md->m_delay->m_feedback_percent = md->m_feedback_percent;
-            break;
-        }
+    switch (md->m_mod_type) {
+    case VIBRATO: {
+        md->m_min_delay_msec = 0;
+        md->m_max_delay_msec = 7;
+        md->m_delay.m_wet_level_pct = 100.0;
+        md->m_delay.m_feedback_pct = 0.0;
+        break;
+    }
+    case CHORUS: {
+        md->m_min_delay_msec = 5;
+        md->m_max_delay_msec = 30;
+        md->m_delay.m_wet_level_pct = 50.0;
+        md->m_delay.m_feedback_pct = md->m_feedback_percent;
+        break;
+    }
+    case FLANGER:
+    default: {
+        md->m_min_delay_msec = 0;
+        md->m_max_delay_msec = 7;
+        md->m_delay.m_wet_level_pct = 50.0;
+        md->m_delay.m_feedback_pct = md->m_feedback_percent;
+        break;
+    }
     }
 }
 
 double mod_delay_calculate_delay_offset(mod_delay *md, double lfo_sample)
 {
-    if (md->m_mod_type == FLANGER || md->m_mod_type == VIBRATO)
-    {
-        return (md->m_depth / 100.0)*(lfo_sample*(md->m_max_delay_msec - md->m_min_delay_msec)) + md->m_min_delay_msec;
+    if (md->m_mod_type == FLANGER || md->m_mod_type == VIBRATO) {
+        return (md->m_depth / 100.0) * (lfo_sample * (md->m_max_delay_msec -
+                                                      md->m_min_delay_msec)) +
+               md->m_min_delay_msec;
     }
-    else if (md->m_mod_type == CHORUS)
-    {
+    else if (md->m_mod_type == CHORUS) {
         double start = md->m_min_delay_msec + md->m_chorus_offset;
-        return (md->m_depth / 100.0)*(lfo_sample*(md->m_max_delay_msec - md->m_min_delay_msec)) + start;
+        return (md->m_depth / 100.0) * (lfo_sample * (md->m_max_delay_msec -
+                                                      md->m_min_delay_msec)) +
+               start;
     }
 
     return 0.0; // shouldn't happen
@@ -92,13 +89,12 @@ double mod_delay_calculate_delay_offset(mod_delay *md, double lfo_sample)
 
 bool mod_delay_prepare_for_play(mod_delay *md)
 {
-    lfo_start_oscillator((oscillator*)md->m_lfo);
-    delay_prepare_for_play(md->m_delay);
+    lfo_start_oscillator((oscillator *)md->m_lfo);
+    ddl_prepare_for_play(&md->m_delay);
 
     mod_delay_update(md);
 
     return true;
-
 }
 
 bool mod_delay_update(mod_delay *md)
@@ -110,20 +106,22 @@ bool mod_delay_update(mod_delay *md)
 }
 
 bool mod_delay_process_audio(mod_delay *md, double *input_left,
-                       double *input_right, double *output_left,
-                       double *output_right)
+                             double *input_right, double *output_left,
+                             double *output_right)
 {
+    (void) input_right;
+    (void) output_right;
+
     double yn = 0;
     double yqn = 0;
-    yn = lfo_do_oscillate((oscillator*)md->m_lfo, &yqn);
+    yn = lfo_do_oscillate((oscillator *)md->m_lfo, &yqn);
     double delay = 0.0;
     // QUAD
     delay = mod_delay_calculate_delay_offset(md, yn);
-    delay_set_delay_time_ms(md->m_delay, delay);
+    md->m_delay.m_delay_ms = delay;
     mod_delay_update_delay(md);
 
-    delay_process_audio(md->m_delay, input_left, input_right, output_left, output_right);
+    ddl_process_audio_frame(&md->m_delay, input_left, output_left, 1, 1);
 
     return true;
 }
-

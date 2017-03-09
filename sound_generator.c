@@ -5,6 +5,7 @@
 #include "beatrepeat.h"
 #include "defjams.h"
 #include "effect.h"
+#include "modular_delay.h"
 #include "sound_generator.h"
 
 static int resize_effects_array(SOUNDGEN *self)
@@ -100,6 +101,27 @@ int add_delay_soundgen(SOUNDGEN *self, float duration)
     }
 
     EFFECT *e = new_delay(duration);
+    if (e == NULL) {
+        perror("Couldn't create effect");
+        return -1;
+    }
+    self->effects[self->effects_num] = e;
+    self->effects_on = 1;
+    printf("done adding effect\n");
+    return self->effects_num++;
+}
+
+int add_moddelay_soundgen(SOUNDGEN *self)
+{
+    printf("Booya, adding a new MODDELAY to SOUNDGEN!\n");
+
+    int res = resize_effects_array(self);
+    if (res == -1) {
+        perror("Couldn't resize effects array");
+        return -1;
+    }
+
+    EFFECT *e = effect_new_mod_delay();
     if (e == NULL) {
         perror("Couldn't create effect");
         return -1;
@@ -207,6 +229,12 @@ float effector(SOUNDGEN *self, float val)
                 delay_update(self->effects[i]->delay);
                 delay_process_audio(self->effects[i]->delay, &left_in,
                                     &right_in, &left_out, &right_out);
+                val = left_out;
+                break;
+            case MODDELAY:
+                mod_delay_update(self->effects[i]->moddelay);
+                mod_delay_process_audio(self->effects[i]->moddelay, &left_in,
+                                        &right_in, &left_out, &right_out);
                 val = left_out;
                 break;
             case REVERB:

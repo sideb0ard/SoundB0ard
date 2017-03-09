@@ -1,12 +1,14 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
+#include "modular_delay.h"
 #include "stereodelay.h"
 
 typedef enum {
     BEATREPEAT,
     DECIMATOR,
     DELAY,
+    MODDELAY,
     DISTORTION,
     RES,
     REVERB,
@@ -18,6 +20,7 @@ typedef enum {
 
 typedef struct {
     stereodelay *delay;
+    mod_delay *moddelay;
     double *buffer;
     int buf_read_idx;
     int buf_write_idx;
@@ -41,6 +44,7 @@ typedef struct {
 
 EFFECT *new_beatrepeat(int looplen);
 EFFECT *new_delay(double duration);
+EFFECT *effect_new_mod_delay(void);
 EFFECT *new_reverb(double reverbtime);
 EFFECT *new_decimator(void);
 EFFECT *new_distortion(void);
