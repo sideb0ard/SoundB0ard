@@ -1,8 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "defjams.h"
 #include "ddlmodule.h"
+#include "defjams.h"
 #include "utils.h"
 
 void ddl_initialize(ddlmodule *d)
@@ -39,18 +39,25 @@ void ddl_cook_variables(ddlmodule *d)
 {
     d->m_feedback = d->m_feedback_pct / 100.0;
     d->m_wet_level = d->m_wet_level_pct / 100.0;
-    d->m_delay_in_samples = d->m_delay_ms*((double)SAMPLE_RATE/1000.0);
+    d->m_delay_in_samples = d->m_delay_ms * (SAMPLE_RATE / 1000.0);
 
+    int precookidx = d->m_read_index;
     d->m_read_index = d->m_write_index - (int)d->m_delay_in_samples;
 
     if (d->m_read_index < 0)
         d->m_read_index += d->m_buffer_size;
+
+    if (d->m_read_index >= d->m_buffer_size)
+        printf("WHOA NELLIE! Before: %d After: %d Buffer Size: %d DelayMs: %f  "
+               "Delay In Samples: %f\n",
+               precookidx, d->m_read_index, d->m_buffer_size, d->m_delay_ms,
+               d->m_delay_in_samples);
 }
 
 void ddl_reset_delay(ddlmodule *d)
 {
     if (d->m_buffer)
-        memset(d->m_buffer, 0, d->m_buffer_size*sizeof(double));
+        memset(d->m_buffer, 0, d->m_buffer_size * sizeof(double));
     d->m_write_index = 0;
     d->m_read_index = 0;
 }
@@ -77,17 +84,18 @@ bool ddl_process_audio_frame(ddlmodule *d, double *input_buffer,
 {
     double xn = input_buffer[0];
     double yn = d->m_buffer[d->m_read_index];
-    if (d->m_read_index == d->m_write_index && d->m_delay_in_samples < 1.0)
-    {
+    if (d->m_read_index == d->m_write_index && d->m_delay_in_samples < 1.0) {
         yn = xn;
     }
 
     int read_index_1 = d->m_read_index - 1;
     if (read_index_1 < 0)
-        read_index_1 = d->m_buffer_size -1;
+        read_index_1 = d->m_buffer_size - 1;
 
     double yn_1 = d->m_buffer[read_index_1];
+
     double frac_delay = d->m_delay_in_samples - (int)d->m_delay_in_samples;
+
     double interp = lin_terp(0, 1, yn, yn_1, frac_delay);
 
     if (d->m_delay_in_samples == 0)
@@ -109,15 +117,15 @@ bool ddl_process_audio_frame(ddlmodule *d, double *input_buffer,
         d->m_write_index = 0;
 
     d->m_read_index++;
-    if(d->m_read_index >= d->m_buffer_size)
+    if (d->m_read_index >= d->m_buffer_size) {
         d->m_read_index = 0;
+    }
 
-    if(num_input_channels == 1 && num_output_channels == 2)
+    if (num_input_channels == 1 && num_output_channels == 2)
         output_buffer[1] = output_buffer[0]; // copying mono
 
     if (num_input_channels == 2 && num_output_channels == 2)
         output_buffer[1] = output_buffer[0]; // copying mono
 
     return true;
-
 }

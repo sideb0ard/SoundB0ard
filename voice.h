@@ -83,5 +83,6 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
                    double frequency, double last_note_frequency);
 void voice_note_off(voice *v, unsigned int midi_note);
 bool voice_gennext(voice *v, double *left_output, double *right_output);
+void voice_set_sustain_override(voice *v, bool b);
 
 #endif // SBSHELL_VOICE_H_

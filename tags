@@ -964,6 +964,7 @@ m_sub_osc_db	minisynth.h	/^    double m_sub_osc_db;$/;"	m	struct:minisynth
 m_sustain_level	envelope_generator.h	/^    double m_sustain_level;$/;"	m	struct:envelope_generator
 m_sustain_level	minisynth.h	/^    double m_sustain_level;$/;"	m	struct:minisynth
 m_sustain_override	envelope_generator.h	/^    bool m_sustain_override;$/;"	m	struct:envelope_generator
+m_sustain_override	minisynth.h	/^    bool m_sustain_override;$/;"	m	struct:minisynth
 m_tap2_left_delay_time_ms	stereodelay.h	/^    double m_tap2_left_delay_time_ms;$/;"	m	struct:stereodelay
 m_tap2_right_delay_time_ms	stereodelay.h	/^    double m_tap2_right_delay_time_ms;$/;"	m	struct:stereodelay
 m_timestamp	voice.h	/^    unsigned int m_timestamp;$/;"	m	struct:__anon33
@@ -1044,6 +1045,7 @@ minisynth_reset_melody_all	minisynth.c	/^void minisynth_reset_melody_all(minisyn
 minisynth_reset_voices	minisynth.c	/^void minisynth_reset_voices(minisynth *ms)$/;"	f
 minisynth_set_melody_loop_num	minisynth.c	/^void minisynth_set_melody_loop_num(minisynth *self, int melody_num,$/;"	f
 minisynth_set_multi_melody_mode	minisynth.c	/^void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)$/;"	f
+minisynth_set_sustain_override	minisynth.c	/^void minisynth_set_sustain_override(minisynth *ms, bool b)$/;"	f
 minisynth_setvol	minisynth.c	/^void minisynth_setvol(void *self, double v)$/;"	f
 minisynth_status	minisynth.c	/^void minisynth_status(void *self, wchar_t *status_string)$/;"	f
 minisynth_switch_melody	minisynth.c	/^void minisynth_switch_melody(minisynth *ms, unsigned int melody_num)$/;"	f
@@ -1372,6 +1374,7 @@ voice_params	synthfunctions.h	/^    global_voice_params voice_params;$/;"	m	stru
 voice_prepare_for_play	voice.c	/^void voice_prepare_for_play(voice *v)$/;"	f
 voice_reset	voice.c	/^void voice_reset(voice *v)$/;"	f
 voice_set_modmatrix_core	voice.c	/^void voice_set_modmatrix_core(voice *v, matrixrow **modmatrix)$/;"	f
+voice_set_sustain_override	voice.c	/^void voice_set_sustain_override(voice *v, bool b)$/;"	f
 voice_update	voice.c	/^void voice_update(voice *v)$/;"	f
 vol	bitwize.h	/^    double vol;$/;"	m	struct:t_bitwize
 vol	bytebeatrrr.h	/^    double vol;$/;"	m	struct:bytebeat

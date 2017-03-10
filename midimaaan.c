@@ -128,8 +128,7 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
     }
 
     double scaley_val;
-    if (e->type == DELAY)
-    {
+    if (e->type == DELAY) {
         stereodelay *d = e->delay;
         switch (data1) {
         case 1:
@@ -173,8 +172,7 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
             printf("SOMthing else\n");
         }
     }
-    else if (e->type == MODDELAY)
-    {
+    else if (e->type == MODDELAY) {
         mod_delay *d = e->moddelay;
         switch (data1) {
         case 1:

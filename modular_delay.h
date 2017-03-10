@@ -1,7 +1,7 @@
 #pragma once
 
-#include "lfo.h"
 #include "ddlmodule.h"
+#include "lfo.h"
 
 typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;
 

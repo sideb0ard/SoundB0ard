@@ -76,12 +76,13 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
         &v->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, true);
     add_matrix_row(matrix, row);
 
-    // MIDI Sustain Pedal
-    row =
-        create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
-                          &v->m_default_mod_intensity, &v->m_default_mod_range,
-                          TRANSFORM_MIDI_SWITCH, true);
-    add_matrix_row(matrix, row);
+    // // MIDI Sustain Pedal
+    // row =
+    //     create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
+    //                       &v->m_default_mod_intensity,
+    //                       &v->m_default_mod_range,
+    //                       TRANSFORM_MIDI_SWITCH, true);
+    // add_matrix_row(matrix, row);
 
     // NOTE NUMBER -> FILTER Fc CONTROL
     row = create_matrix_row(
@@ -127,28 +128,28 @@ void voice_prepare_for_play(voice *v)
     v->m_eg1.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
     v->m_eg1.m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
     v->m_eg1.m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
-    v->m_eg1.m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
+    // v->m_eg1.m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
 
     v->m_eg2.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg2.m_mod_dest_eg_output = SOURCE_EG2;
     v->m_eg2.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG2;
     v->m_eg2.m_mod_source_eg_attack_scaling = DEST_EG2_ATTACK_SCALING;
     v->m_eg2.m_mod_source_eg_decay_scaling = DEST_EG2_DECAY_SCALING;
-    v->m_eg2.m_mod_source_sustain_override = DEST_EG2_SUSTAIN_OVERRIDE;
+    // v->m_eg2.m_mod_source_sustain_override = DEST_EG2_SUSTAIN_OVERRIDE;
 
     v->m_eg3.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg3.m_mod_dest_eg_output = SOURCE_EG3;
     v->m_eg3.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG3;
     v->m_eg3.m_mod_source_eg_attack_scaling = DEST_EG3_ATTACK_SCALING;
     v->m_eg3.m_mod_source_eg_decay_scaling = DEST_EG3_DECAY_SCALING;
-    v->m_eg3.m_mod_source_sustain_override = DEST_EG3_SUSTAIN_OVERRIDE;
+    // v->m_eg3.m_mod_source_sustain_override = DEST_EG3_SUSTAIN_OVERRIDE;
 
     v->m_eg4.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg4.m_mod_dest_eg_output = SOURCE_EG4;
     v->m_eg4.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG4;
     v->m_eg4.m_mod_source_eg_attack_scaling = DEST_EG4_ATTACK_SCALING;
     v->m_eg4.m_mod_source_eg_decay_scaling = DEST_EG4_DECAY_SCALING;
-    v->m_eg4.m_mod_source_sustain_override = DEST_EG4_SUSTAIN_OVERRIDE;
+    // v->m_eg4.m_mod_source_sustain_override = DEST_EG4_SUSTAIN_OVERRIDE;
 
     v->m_dca.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_dca.m_mod_source_eg = DEST_DCA_EG;
@@ -570,4 +571,12 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
         }
     }
     return true;
+}
+
+void voice_set_sustain_override(voice *v, bool b)
+{
+    eg_set_sustain_override(&v->m_eg1, b);
+    eg_set_sustain_override(&v->m_eg2, b);
+    eg_set_sustain_override(&v->m_eg3, b);
+    eg_set_sustain_override(&v->m_eg4, b);
 }

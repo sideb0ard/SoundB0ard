@@ -1,6 +1,8 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "modular_delay.h"
+#include "utils.h"
 
 mod_delay *new_mod_delay()
 {
@@ -89,10 +91,10 @@ double mod_delay_calculate_delay_offset(mod_delay *md, double lfo_sample)
 
 bool mod_delay_prepare_for_play(mod_delay *md)
 {
-    lfo_start_oscillator((oscillator *)md->m_lfo);
     ddl_prepare_for_play(&md->m_delay);
 
     mod_delay_update(md);
+    lfo_start_oscillator((oscillator *)md->m_lfo);
 
     return true;
 }
@@ -109,17 +111,19 @@ bool mod_delay_process_audio(mod_delay *md, double *input_left,
                              double *input_right, double *output_left,
                              double *output_right)
 {
-    (void) input_right;
-    (void) output_right;
+    (void)input_right;
+    (void)output_right;
 
     double yn = 0;
     double yqn = 0;
     yn = lfo_do_oscillate((oscillator *)md->m_lfo, &yqn);
+    yn = scaleybum(-1.0, 1.0, 0, 1.0, yn);
+
     double delay = 0.0;
     // QUAD
     delay = mod_delay_calculate_delay_offset(md, yn);
     md->m_delay.m_delay_ms = delay;
-    mod_delay_update_delay(md);
+    ddl_cook_variables(&md->m_delay);
 
     ddl_process_audio_frame(&md->m_delay, input_left, output_left, 1, 1);
 

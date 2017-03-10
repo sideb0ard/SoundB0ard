@@ -327,7 +327,6 @@ void interpret(char *line)
                             minisynth_add_melody(ms);
                         }
                     }
-                    // TODO HERE!
                     if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
                             minisynth_set_multi_melody_mode(ms, true);
@@ -337,6 +336,32 @@ void interpret(char *line)
                         }
                         printf("Synth multi mode : %s\n",
                                ms->multi_melody_mode ? "true" : "false");
+                    }
+                    if (strncmp("sustain", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            minisynth_set_sustain_override(ms, true);
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            minisynth_set_sustain_override(ms, false);
+                        }
+                        printf("Synth Sustain Override : %s\n",
+                               ms->m_sustain_override ? "true" : "false");
+                        for (int i = 0; i < MAX_VOICES; i++) {
+                            if (ms->m_voices[i]) {
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg1.m_sustain_override);
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg2.m_sustain_override);
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg3.m_sustain_override);
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg4.m_sustain_override);
+                            }
+                        }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         int melody_num = atoi(wurds[3]);
@@ -567,20 +592,28 @@ void interpret(char *line)
                             (mod_delay *)mixr->sound_generators[soundgen_num]
                                 ->effects[fx_num];
                         if (strncmp("modtype", wurds[3], 7) == 0) {
-                            if (strncmp("flanger", wurds[4], 7) == 0) d->m_mod_type = FLANGER;
-                            if (strncmp("vibrato", wurds[4], 7) == 0) d->m_mod_type = VIBRATO;
-                            if (strncmp("chorus", wurds[4], 6) == 0) d->m_mod_type = CHORUS;
-                        } else if (strncmp("lfotype", wurds[3], 7) == 0) {
-                            if (strncmp("tri", wurds[4], 3) == 0) d->m_lfo_type = TRI;
-                            if (strncmp("sin", wurds[4], 3) == 0) d->m_lfo_type = SINE;
+                            if (strncmp("flanger", wurds[4], 7) == 0)
+                                d->m_mod_type = FLANGER;
+                            if (strncmp("vibrato", wurds[4], 7) == 0)
+                                d->m_mod_type = VIBRATO;
+                            if (strncmp("chorus", wurds[4], 6) == 0)
+                                d->m_mod_type = CHORUS;
+                        }
+                        else if (strncmp("lfotype", wurds[3], 7) == 0) {
+                            if (strncmp("tri", wurds[4], 3) == 0)
+                                d->m_lfo_type = TRI;
+                            if (strncmp("sin", wurds[4], 3) == 0)
+                                d->m_lfo_type = SINE;
                         }
                     }
                 }
                 else if (strncmp("midi", wurds[3], 4) == 0) {
                     if (mixr->sound_generators[soundgen_num]
-                            ->effects[fx_num]
-                            ->type == DELAY 
-                        || mixr->sound_generators[soundgen_num]->effects[fx_num]->type == MODDELAY) {
+                                ->effects[fx_num]
+                                ->type == DELAY ||
+                        mixr->sound_generators[soundgen_num]
+                                ->effects[fx_num]
+                                ->type == MODDELAY) {
                         printf("SUCCESS! GOLDEN MIDI DELAY!\n");
                         mixr->midi_control_destination = DELAYFX;
                         mixr->active_midi_soundgen_num = soundgen_num;

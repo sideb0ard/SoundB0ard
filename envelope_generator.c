@@ -277,6 +277,7 @@ void eg_update(envelope_generator *self)
     }
 
     if (self->m_mod_source_sustain_override != DEST_NONE) {
+        printf("SUSTAIN OVERRIDE IS NOT DEST NONE!??\n");
         double sustain =
             self->m_v_modmatrix
                 ->m_destinations[self->m_mod_source_sustain_override];

@@ -67,6 +67,7 @@ minisynth *new_minisynth(void)
     ms->m_note_number_to_decay_scaling = 0;
     ms->m_delay_mode = 0;
     ms->m_eg1_dca_intensity = 1.0;
+    ms->m_sustain_override = false;
 
     for (int i = 0; i < MAX_VOICES; i++) {
         ms->m_voices[i] = new_minisynth_voice();
@@ -674,4 +675,15 @@ void minisynth_add_midi_loop(minisynth *self, midi_event **events,
 void minisynth_toggle_delay_mode(minisynth *ms)
 {
     ms->m_delay_mode = ++(ms->m_delay_mode) % MAX_NUM_DELAY_MODE;
+}
+
+void minisynth_set_sustain_override(minisynth *ms, bool b)
+{
+    ms->m_sustain_override = b;
+
+    for (int i = 0; i < MAX_VOICES; i++) {
+        if (ms->m_voices[i]) {
+            voice_set_sustain_override(&ms->m_voices[i]->m_voice, b);
+        }
+    }
 }
