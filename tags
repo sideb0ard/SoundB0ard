@@ -1044,6 +1044,7 @@ midi_event	midimaaan.h	/^typedef struct midi_event {$/;"	s
 midi_event	midimaaan.h	/^} midi_event;$/;"	t	typeref:struct:midi_event
 midi_events_loop_t	midimaaan.h	/^typedef midi_event *midi_events_loop_t[PPNS];$/;"	t
 midi_freq_table	midi_freq_table.c	/^const float midi_freq_table[128] = {$/;"	v
+midi_melody_quantize	midimaaan.c	/^void midi_melody_quantize(midi_event **melody)$/;"	f
 midi_mode	mixer.h	/^} midi_mode; \/\/ to switch control knob routing$/;"	t	typeref:enum:__anon15
 midi_parse_midi_event	midimaaan.c	/^void midi_parse_midi_event(minisynth *ms, midi_event *ev)$/;"	f
 midi_tick_cond	main.c	/^pthread_cond_t midi_tick_cond;$/;"	v

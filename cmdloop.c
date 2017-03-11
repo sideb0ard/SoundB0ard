@@ -401,6 +401,14 @@ void interpret(char *line)
                         mixr->midi_control_destination = SYNTH;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
+                    else if (strncmp("quantize", wurds[2], 8) == 0) {
+                        int melody_num = atoi(wurds[3]);
+                        if (is_valid_melody_num(ms, melody_num)) {
+                            printf("QuantiZe!\n");
+                            midi_event **melody = ms->melodies[ms->cur_melody];
+                            midi_melody_quantize(melody);
+                        }
+                    }
                     else if (strncmp("reset", wurds[2], 5) == 0) {
                         if (strncmp("all", wurds[3], 3) == 0) {
                             minisynth_reset_melody_all(ms);
@@ -581,7 +589,7 @@ void interpret(char *line)
                         }
                     }
                 }
-                if (strncmp("modtype", wurds[3], 7) == 0 ||
+                else if (strncmp("modtype", wurds[3], 7) == 0 ||
                     strncmp("lfotype", wurds[3], 7) == 0) {
                     if (mixr->sound_generators[soundgen_num]
                             ->effects[fx_num]
@@ -620,6 +628,17 @@ void interpret(char *line)
                             DELAYFX; // TODO rename to FX
                         mixr->active_midi_soundgen_num = soundgen_num;
                         mixr->active_midi_soundgen_effect_num = fx_num;
+                    }
+                }
+                else if (strncmp("wetmix", wurds[3], 6) == 0) {
+                    if (mixr->sound_generators[soundgen_num]
+                                ->effects[fx_num]
+                                ->type == REVERB) {
+                        reverb *r = (reverb *) mixr->sound_generators[soundgen_num]->effects[fx_num];
+                        int wetmix = atoi(wurds[4]);
+                        if (0 <= wetmix && wetmix <= 100)
+                            r->m_wet_pct = wetmix;
+                        printf("REVERB WETMIX! %f\n", r->m_wet_pct);
                     }
                 }
                 else if (strncmp("delay", wurds[3], 5) == 0 ||
