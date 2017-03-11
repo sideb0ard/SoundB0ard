@@ -96,8 +96,8 @@ void stereo_delay_update(stereodelay *d)
 }
 
 bool stereo_delay_process_audio(stereodelay *d, double *input_left,
-                         double *input_right, double *output_left,
-                         double *output_right)
+                                double *input_right, double *output_left,
+                                double *output_right)
 {
     double left_delay_out = delayline_read_delay(&d->m_left_delay);
     double right_delay_out = delayline_read_delay(&d->m_right_delay);

@@ -2,8 +2,8 @@
 #define EFFECT_H
 
 #include "modular_delay.h"
-#include "stereodelay.h"
 #include "reverb.h"
+#include "stereodelay.h"
 
 typedef enum {
     BEATREPEAT,

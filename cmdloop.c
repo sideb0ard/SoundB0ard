@@ -611,9 +611,13 @@ void interpret(char *line)
                                 ->type == DELAY ||
                         mixr->sound_generators[soundgen_num]
                                 ->effects[fx_num]
-                                ->type == MODDELAY) {
+                                ->type == MODDELAY ||
+                        mixr->sound_generators[soundgen_num]
+                                ->effects[fx_num]
+                                ->type == REVERB) {
                         printf("SUCCESS! GOLDEN MIDI DELAY!\n");
-                        mixr->midi_control_destination = DELAYFX;
+                        mixr->midi_control_destination =
+                            DELAYFX; // TODO rename to FX
                         mixr->active_midi_soundgen_num = soundgen_num;
                         mixr->active_midi_soundgen_effect_num = fx_num;
                     }

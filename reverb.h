@@ -6,15 +6,14 @@
 #include "afx/lpfcombfilter.h"
 #include "afx/onepolelpf.h"
 
-typedef struct reverb
-{
+typedef struct reverb {
     // pre-delay block
     delay m_pre_delay;
 
     // input diffusion
     one_pole_lpf m_input_lpf;
-    delay_apf    m_input_apf_1;
-    delay_apf    m_input_apf_2;
+    delay_apf m_input_apf_1;
+    delay_apf m_input_apf_2;
 
     // parrallel comb bank 1
     comb_filter m_parallel_cf_1;
@@ -37,17 +36,16 @@ typedef struct reverb
     delay_apf m_output_apf_4;
     // cooking with gas
 
-
     // "gui"
-    double m_pre_delay_msec;
-    double m_pre_delay_atten_db;
-    double m_input_lpf_g;
-    double m_apf_1_delay_msec;
-    double m_apf_1_g;
-    double m_apf_2_delay_msec;
+    double m_pre_delay_msec;     // midi k1
+    double m_pre_delay_atten_db; // k2
+    double m_rt60;               // reverb time, k3
+    double m_wet_pct;            // mix, k4
+    double m_input_lpf_g;        // k5
+    double m_apf_1_delay_msec;   // k6
+    double m_apf_1_g;            // k7
+    double m_apf_2_delay_msec;   // k8
     double m_apf_2_g;
-    double m_rt60;
-    double m_wet_pct;
     double m_comb_1_delay_msec;
     double m_comb_2_delay_msec;
     double m_comb_3_delay_msec;
@@ -68,4 +66,6 @@ reverb *new_reverb(void);
 void reverb_init_reverb(reverb *r);
 void reverb_cook_variables(reverb *r);
 
-bool reverb_process_audio(reverb *r, double *in, double *out, unsigned int num_channels_in, unsigned int num_channels_out);
+bool reverb_process_audio(reverb *r, double *in, double *out,
+                          unsigned int num_channels_in,
+                          unsigned int num_channels_out);

@@ -7,7 +7,7 @@ reverb *new_reverb(void)
 {
     reverb *r = calloc(1, sizeof(reverb));
 
-	r->m_pre_delay_msec = 40;
+    r->m_pre_delay_msec = 40;
     r->m_pre_delay_atten_db = 0;
     r->m_input_lpf_g = 0.45;
 
@@ -38,8 +38,6 @@ reverb *new_reverb(void)
 
     reverb_init_reverb(r);
 
-
-
     return r;
 }
 
@@ -47,20 +45,20 @@ void reverb_init_reverb(reverb *r)
 {
     delay_init(&r->m_pre_delay, 2.0 * SAMPLE_RATE);
 
-    delay_apf_init(&r->m_input_apf_1, 0.1*SAMPLE_RATE);
-    delay_apf_init(&r->m_input_apf_2, 0.1*SAMPLE_RATE);
+    delay_apf_init(&r->m_input_apf_1, 0.1 * SAMPLE_RATE);
+    delay_apf_init(&r->m_input_apf_2, 0.1 * SAMPLE_RATE);
 
-    comb_filter_init(&r->m_parallel_cf_1, 0.1*SAMPLE_RATE);
-    comb_filter_init(&r->m_parallel_cf_2, 0.1*SAMPLE_RATE);
-    lpf_comb_filter_init(&r->m_parallel_cf_3, 0.1*SAMPLE_RATE);
-    lpf_comb_filter_init(&r->m_parallel_cf_4, 0.1*SAMPLE_RATE);
-    comb_filter_init(&r->m_parallel_cf_5, 0.1*SAMPLE_RATE);
-    comb_filter_init(&r->m_parallel_cf_6, 0.1*SAMPLE_RATE);
-    lpf_comb_filter_init(&r->m_parallel_cf_7, 0.1*SAMPLE_RATE);
-    lpf_comb_filter_init(&r->m_parallel_cf_8, 0.1*SAMPLE_RATE);
+    comb_filter_init(&r->m_parallel_cf_1, 0.1 * SAMPLE_RATE);
+    comb_filter_init(&r->m_parallel_cf_2, 0.1 * SAMPLE_RATE);
+    lpf_comb_filter_init(&r->m_parallel_cf_3, 0.1 * SAMPLE_RATE);
+    lpf_comb_filter_init(&r->m_parallel_cf_4, 0.1 * SAMPLE_RATE);
+    comb_filter_init(&r->m_parallel_cf_5, 0.1 * SAMPLE_RATE);
+    comb_filter_init(&r->m_parallel_cf_6, 0.1 * SAMPLE_RATE);
+    lpf_comb_filter_init(&r->m_parallel_cf_7, 0.1 * SAMPLE_RATE);
+    lpf_comb_filter_init(&r->m_parallel_cf_8, 0.1 * SAMPLE_RATE);
 
-    delay_apf_init(&r->m_output_apf_3, 0.1*SAMPLE_RATE);
-    delay_apf_init(&r->m_output_apf_4, 0.1*SAMPLE_RATE);
+    delay_apf_init(&r->m_output_apf_3, 0.1 * SAMPLE_RATE);
+    delay_apf_init(&r->m_output_apf_4, 0.1 * SAMPLE_RATE);
 
     one_pole_lpf_init(&r->m_input_lpf);
     one_pole_lpf_init(&r->m_damping_lpf_1);
@@ -135,11 +133,12 @@ void reverb_cook_variables(reverb *r)
     lpf_comb_filter_set_comb_g(&r->m_parallel_cf_8, r->m_lpf2_g2);
 }
 
-bool reverb_process_audio(reverb *r, double *in, double *out, unsigned int num_input_channels, unsigned int num_output_channels)
+bool reverb_process_audio(reverb *r, double *in, double *out,
+                          unsigned int num_input_channels,
+                          unsigned int num_output_channels)
 {
     double input_sample = in[0];
-    if (num_input_channels == 2)
-    {
+    if (num_input_channels == 2) {
         input_sample += in[1];
         input_sample *= 0.5;
     }
@@ -176,14 +175,18 @@ bool reverb_process_audio(reverb *r, double *in, double *out, unsigned int num_i
     lpf_comb_filter_process_audio(&r->m_parallel_cf_7, &input_lpf, &pc_7_out);
     lpf_comb_filter_process_audio(&r->m_parallel_cf_8, &input_lpf, &pc_8_out);
 
-    c_1_out = 0.25 * pc_1_out - 0.25*pc_2_out + 0.25*pc_3_out - 0.25*pc_4_out;
-    c_2_out = 0.25 * pc_5_out - 0.25*pc_6_out + 0.25*pc_7_out - 0.25*pc_8_out;
+    c_1_out =
+        0.25 * pc_1_out - 0.25 * pc_2_out + 0.25 * pc_3_out - 0.25 * pc_4_out;
+    c_2_out =
+        0.25 * pc_5_out - 0.25 * pc_6_out + 0.25 * pc_7_out - 0.25 * pc_8_out;
 
     double damping_lpf_1_out = 0;
-    one_pole_lpf_process_audio(&r->m_damping_lpf_1, &c_1_out, &damping_lpf_1_out);
+    one_pole_lpf_process_audio(&r->m_damping_lpf_1, &c_1_out,
+                               &damping_lpf_1_out);
 
     double damping_lpf_2_out = 0;
-    one_pole_lpf_process_audio(&r->m_damping_lpf_2, &c_2_out, &damping_lpf_2_out);
+    one_pole_lpf_process_audio(&r->m_damping_lpf_2, &c_2_out,
+                               &damping_lpf_2_out);
 
     double apf_3_out = 0;
     delay_apf_process_audio(&r->m_output_apf_3, &damping_lpf_1_out, &apf_3_out);
@@ -191,16 +194,13 @@ bool reverb_process_audio(reverb *r, double *in, double *out, unsigned int num_i
     double apf_4_out = 0;
     delay_apf_process_audio(&r->m_output_apf_4, &damping_lpf_2_out, &apf_4_out);
 
-    out[0] = ((100.0 - r->m_wet_pct)/100.0)*input_sample + 
-        (r->m_wet_pct/100.0)*(apf_3_out);
+    out[0] = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
+             (r->m_wet_pct / 100.0) * (apf_3_out);
 
-    if (num_output_channels == 2)
-    {
-        out[1] = ((100.0 - r->m_wet_pct)/100.0)*input_sample + 
-            (r->m_wet_pct/100.0)*(apf_4_out);
+    if (num_output_channels == 2) {
+        out[1] = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
+                 (r->m_wet_pct / 100.0) * (apf_4_out);
     }
 
     return true;
-
 }
-

@@ -122,8 +122,8 @@ midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
 
 void midi_delay_control(EFFECT *e, int data1, int data2)
 {
-    if (e->type != DELAY && e->type != MODDELAY) {
-        printf("OOft, mate, i'm no a delay - cannae help you out\n");
+    if (e->type != DELAY && e->type != MODDELAY && e->type != REVERB) {
+        printf("OOft, mate, i'm no an accepted FX - cannae help you out\n");
         return;
     }
 
@@ -215,6 +215,55 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
         default:
             printf("SOMthing else\n");
         }
+    }
+    else if (e->type == REVERB) {
+        reverb *r = e->r;
+        switch (data1) {
+        case 1:
+            scaley_val = scaleybum(1, 128, 0, 100, data2);
+            printf("Reverb Pre Delay Ms!\n");
+            r->m_pre_delay_msec = scaley_val;
+            break;
+        case 2:
+            scaley_val = scaleybum(1, 128, -96, 0, data2);
+            printf("Reverb Pre Delay Atten DB!\n");
+            r->m_pre_delay_atten_db = scaley_val;
+            break;
+        case 3:
+            scaley_val = scaleybum(1, 128, 0, 5000, data2);
+            printf("Reverb Time!\n");
+            r->m_rt60 = scaley_val;
+            break;
+        case 4:
+            scaley_val = scaleybum(1, 128, 0, 100, data2);
+            printf("Reverb Wet Mix!\n");
+            r->m_wet_pct = scaley_val;
+            break;
+        case 5:
+            scaley_val = scaleybum(0, 128, 0, 1, data2);
+            printf("Reverb Bandwidth - Input Diffusion! %f\n", scaley_val);
+            r->m_input_lpf_g = scaley_val;
+            break;
+        case 6:
+            scaley_val = scaleybum(0, 128, 0, 100, data2);
+            printf("Reverb Input Diffusion Delay ms! %f\n", scaley_val);
+            r->m_apf_1_delay_msec = scaley_val;
+            break;
+        case 7:
+            scaley_val = scaleybum(1, 128, -1, 1, data2);
+            printf("Reverb Input Diffusion APF 1 co-efficient ! %f\n",
+                   scaley_val);
+            r->m_apf_1_g = scaley_val;
+            break;
+        case 8:
+            scaley_val = scaleybum(1, 128, 0, 100, data2);
+            printf("Reverb Input APF 2 delay msec ! %f\n", scaley_val);
+            r->m_apf_2_delay_msec = scaley_val;
+            break;
+        default:
+            printf("SOMthing else\n");
+        }
+        reverb_cook_variables(r);
     }
 }
 

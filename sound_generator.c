@@ -173,10 +173,10 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type)
     return self->effects_num++;
 }
 
-float effector(SOUNDGEN *self, float val)
+float effector(SOUNDGEN *self, double val)
 {
-    double left_in = val;
-    double right_in = val;
+    // double left_in = val;
+    // double right_in = val;
     double left_out = 0.0;
     double right_out = 0.0;
 
@@ -198,7 +198,6 @@ float effector(SOUNDGEN *self, float val)
                 val = beatrepeat_gennext(b, val);
                 break;
             case DECIMATOR:
-                // printf("INVAL %f\n", val);
                 if (val > 0.0) {
                     self->effects[i]->cnt += self->effects[i]->rate;
                     val *= 2;
@@ -207,14 +206,9 @@ float effector(SOUNDGEN *self, float val)
                         val = (long)(val * self->effects[i]->m) /
                               (double)self->effects[i]->m;
                     }
-                    // printf("OUTVAL %f\n", val);
                 }
                 break;
             case DISTORTION:
-                // if ( val > 0.0 ) {
-                //    val *= 2;
-                //    val = (val / (1.0 + 0.28 * (val * val)));
-                //}
                 if (val > 0.0) {
                     val *= 2;
                     val = 1 / 100 * atan(val * 100);
@@ -222,19 +216,19 @@ float effector(SOUNDGEN *self, float val)
                 break;
             case DELAY:
                 stereo_delay_update(self->effects[i]->delay);
-                stereo_delay_process_audio(self->effects[i]->delay, &left_in,
-                                    &right_in, &left_out, &right_out);
+                stereo_delay_process_audio(self->effects[i]->delay, &val, &val,
+                                           &left_out, &right_out);
                 val = left_out;
                 break;
             case MODDELAY:
                 mod_delay_update(self->effects[i]->moddelay);
-                mod_delay_process_audio(self->effects[i]->moddelay, &left_in,
-                                        &right_in, &left_out, &right_out);
+                mod_delay_process_audio(self->effects[i]->moddelay, &val, &val,
+                                        &left_out, &right_out);
                 val = left_out;
                 break;
             case REVERB:
-                reverb_process_audio(self->effects[i]->r, &left_in,
-                                     &left_out, 1, 1);
+                reverb_process_audio(self->effects[i]->r, &val, &left_out, 1,
+                                     1);
                 val = left_out;
                 break;
             case RES:
