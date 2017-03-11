@@ -13,44 +13,44 @@ stereodelay *new_stereo_delay()
     return d;
 }
 
-void delay_reset(stereodelay *d)
+void stereo_delay_reset(stereodelay *d)
 {
     delayline_reset(&d->m_left_delay);
     delayline_reset(&d->m_right_delay);
 }
 
-void delay_prepare_for_play(stereodelay *d)
+void stereo_delay_prepare_for_play(stereodelay *d)
 {
     // delay line memory allocated here
     delayline_init(&d->m_left_delay, 2.0 * SAMPLE_RATE);
     delayline_init(&d->m_right_delay, 2.0 * SAMPLE_RATE);
-    delay_reset(d);
+    stereo_delay_reset(d);
 }
 
-void delay_set_mode(stereodelay *d, unsigned mode) { d->m_mode = mode; }
+void stereo_delay_set_mode(stereodelay *d, unsigned mode) { d->m_mode = mode; }
 
-void delay_set_delay_time_ms(stereodelay *d, double delay_ms)
+void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms)
 {
     d->m_delay_time_ms = delay_ms;
-    delay_update(d);
+    stereo_delay_update(d);
 }
-void delay_set_feedback_percent(stereodelay *d, double feedback_percent)
+void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)
 {
     d->m_feedback_percent = feedback_percent;
-    delay_update(d);
+    stereo_delay_update(d);
 }
-void delay_set_delay_ratio(stereodelay *d, double delay_ratio)
+void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)
 {
     d->m_delay_ratio = delay_ratio;
-    delay_update(d);
+    stereo_delay_update(d);
 }
-void delay_set_wet_mix(stereodelay *d, double wet_mix)
+void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix)
 {
     d->m_wet_mix = wet_mix;
-    delay_update(d);
+    stereo_delay_update(d);
 }
 
-void delay_update(stereodelay *d)
+void stereo_delay_update(stereodelay *d)
 {
     if (d->m_mode == TAP1 || d->m_mode == TAP2) {
         if (d->m_delay_ratio < 0) {
@@ -95,7 +95,7 @@ void delay_update(stereodelay *d)
     }
 }
 
-bool delay_process_audio(stereodelay *d, double *input_left,
+bool stereo_delay_process_audio(stereodelay *d, double *input_left,
                          double *input_right, double *output_left,
                          double *output_right)
 {

@@ -1,5 +1,10 @@
 CC = clang
 SRC = \
+	  afx/combfilter.c \
+ 	  afx/delay.c \
+	  afx/delayapf.c  \
+	  afx/lpfcombfilter.c \
+	  afx/onepolelpf.c \
       algorithm.c \
       audioutils.c \
       beatrepeat.c \
@@ -40,6 +45,7 @@ SRC = \
       obliquestrategies.c \
       oscillator.c \
       qblimited_oscillator.c \
+	  reverb.c \
       sampler.c \
       sbmsg.c \
       sparkline.c \

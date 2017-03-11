@@ -142,7 +142,7 @@ int add_reverb_soundgen(SOUNDGEN *self, float reverbtime)
         return -1;
     }
 
-    EFFECT *e = new_reverb(reverbtime);
+    EFFECT *e = new_reverb_effect(reverbtime);
     if (e == NULL) {
         perror("Couldn't create effect");
         return -1;
@@ -226,8 +226,8 @@ float effector(SOUNDGEN *self, float val)
                 }
                 break;
             case DELAY:
-                delay_update(self->effects[i]->delay);
-                delay_process_audio(self->effects[i]->delay, &left_in,
+                stereo_delay_update(self->effects[i]->delay);
+                stereo_delay_process_audio(self->effects[i]->delay, &left_in,
                                     &right_in, &left_out, &right_out);
                 val = left_out;
                 break;

@@ -20,15 +20,15 @@ typedef struct stereodelay {
 
 stereodelay *new_stereo_delay(void);
 
-void delay_set_mode(stereodelay *d, unsigned mode);
-void delay_set_delay_time_ms(stereodelay *d, double delay_ms);
-void delay_set_feedback_percent(stereodelay *d, double feedback_percent);
-void delay_set_delay_ratio(stereodelay *d, double delay_ratio);
-void delay_set_wet_mix(stereodelay *d, double wet_mix);
+void stereo_delay_set_mode(stereodelay *d, unsigned mode);
+void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms);
+void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent);
+void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio);
+void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix);
 
-void delay_prepare_for_play(stereodelay *d);
-void delay_reset(stereodelay *d);
-void delay_update(stereodelay *d);
-bool delay_process_audio(stereodelay *d, double *input_left,
+void stereo_delay_prepare_for_play(stereodelay *d);
+void stereo_delay_reset(stereodelay *d);
+void stereo_delay_update(stereodelay *d);
+bool stereo_delay_process_audio(stereodelay *d, double *input_left,
                          double *input_right, double *output_left,
                          double *output_right);

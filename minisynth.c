@@ -119,7 +119,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
         }
     }
 
-    delay_prepare_for_play(&ms->m_delay_fx);
+    stereo_delay_prepare_for_play(&ms->m_delay_fx);
 
     minisynth_update(ms);
     ms->m_last_note_frequency = -1.0;
@@ -234,12 +234,12 @@ void minisynth_update(minisynth *ms)
                           DEST_ALL_FILTER_KEYTRACK, false);
 
     // // --- update master FX delay
-    delay_set_delay_time_ms(&ms->m_delay_fx, ms->m_delay_time_msec);
-    delay_set_feedback_percent(&ms->m_delay_fx, ms->m_feedback_pct);
-    delay_set_delay_ratio(&ms->m_delay_fx, ms->m_delay_ratio);
-    delay_set_wet_mix(&ms->m_delay_fx, ms->m_wet_mix);
-    delay_set_mode(&ms->m_delay_fx, ms->m_delay_mode);
-    delay_update(&ms->m_delay_fx);
+    stereo_delay_set_delay_time_ms(&ms->m_delay_fx, ms->m_delay_time_msec);
+    stereo_delay_set_feedback_percent(&ms->m_delay_fx, ms->m_feedback_pct);
+    stereo_delay_set_delay_ratio(&ms->m_delay_fx, ms->m_delay_ratio);
+    stereo_delay_set_wet_mix(&ms->m_delay_fx, ms->m_wet_mix);
+    stereo_delay_set_mode(&ms->m_delay_fx, ms->m_delay_mode);
+    stereo_delay_update(&ms->m_delay_fx);
 }
 
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
@@ -614,7 +614,7 @@ double minisynth_gennext(void *self)
     }
 
     // TODO delay
-    delay_process_audio(&ms->m_delay_fx, &accum_out_left, &accum_out_left,
+    stereo_delay_process_audio(&ms->m_delay_fx, &accum_out_left, &accum_out_left,
                         &accum_out_left, &accum_out_right);
 
     accum_out_left = effector(&ms->sound_generator, accum_out_left);

@@ -634,36 +634,36 @@ void interpret(char *line)
                         if (strncmp("delay", wurds[3], 5) == 0) {
                             printf("Changing DELAY TIME\n");
                             double delay_ms = atof(wurds[4]);
-                            delay_set_delay_time_ms(d, delay_ms);
+                            stereo_delay_set_delay_time_ms(d, delay_ms);
                         }
                         else if (strncmp("feedback", wurds[3], 8) == 0) {
                             printf("Changing FEEDBACK TIME\n");
                             int percent = atoi(wurds[4]);
-                            delay_set_feedback_percent(d, percent);
+                            stereo_delay_set_feedback_percent(d, percent);
                         }
                         else if (strncmp("ratio", wurds[3], 5) == 0) {
                             printf("Changing RATIO TIME\n");
                             double ratio = atof(wurds[4]);
-                            delay_set_delay_ratio(d, ratio);
+                            stereo_delay_set_delay_ratio(d, ratio);
                         }
                         else if (strncmp("mix", wurds[3], 3) == 0) {
                             printf("Changing MIX TIME\n");
                             double mix = atof(wurds[4]);
-                            delay_set_wet_mix(d, mix);
+                            stereo_delay_set_wet_mix(d, mix);
                         }
                         else if (strncmp("mode", wurds[3], 4) == 0) {
                             printf("MODE!\n");
                             if (strncmp("NORM", wurds[4], 4) == 0) {
-                                delay_set_mode(d, NORM);
+                                stereo_delay_set_mode(d, NORM);
                             }
                             else if (strncmp("TAP1", wurds[4], 4) == 0) {
-                                delay_set_mode(d, TAP1);
+                                stereo_delay_set_mode(d, TAP1);
                             }
                             else if (strncmp("TAP2", wurds[4], 4) == 0) {
-                                delay_set_mode(d, TAP2);
+                                stereo_delay_set_mode(d, TAP2);
                             }
                             else if (strncmp("PINGPONG", wurds[4], 8) == 0) {
-                                delay_set_mode(d, PINGPONG);
+                                stereo_delay_set_mode(d, PINGPONG);
                             }
                         }
                     }

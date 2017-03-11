@@ -41,14 +41,14 @@ EFFECT *new_delay(double duration)
     e->type = DELAY;
     printf("DurrrLAY! %f\n", duration);
 
-    delay_prepare_for_play(e->delay);
-    delay_set_delay_time_ms(e->delay, duration);
-    delay_set_feedback_percent(e->delay, 90);
-    delay_set_delay_ratio(e->delay, 0.9);
-    delay_set_wet_mix(e->delay, 0.7);
-    delay_set_mode(e->delay, PINGPONG);
+    stereo_delay_prepare_for_play(e->delay);
+    stereo_delay_set_delay_time_ms(e->delay, duration);
+    stereo_delay_set_feedback_percent(e->delay, 90);
+    stereo_delay_set_delay_ratio(e->delay, 0.9);
+    stereo_delay_set_wet_mix(e->delay, 0.7);
+    stereo_delay_set_mode(e->delay, PINGPONG);
 
-    delay_update(e->delay);
+    stereo_delay_update(e->delay);
 
     return e;
 }
@@ -68,7 +68,7 @@ EFFECT *effect_new_mod_delay()
     return e;
 }
 
-EFFECT *new_reverb(double reverbtime)
+EFFECT *new_reverb_effect(double reverbtime)
 {
     EFFECT *e;
     e = (EFFECT *)calloc(1, sizeof(EFFECT));

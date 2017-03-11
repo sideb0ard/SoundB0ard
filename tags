@@ -474,16 +474,7 @@ delay	mixer.h	/^    float delay[(int)SAMPLE_RATE \/ 8];$/;"	m	struct:__anon16
 delay_mode	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	t	typeref:enum:__anon26
 delay_on	mixer.h	/^    int delay_on;$/;"	m	struct:t_mixer
 delay_p	mixer.h	/^    int delay_p;$/;"	m	struct:__anon16
-delay_prepare_for_play	stereodelay.c	/^void delay_prepare_for_play(stereodelay *d)$/;"	f
-delay_process_audio	stereodelay.c	/^bool delay_process_audio(stereodelay *d, double *input_left,$/;"	f
-delay_reset	stereodelay.c	/^void delay_reset(stereodelay *d)$/;"	f
-delay_set_delay_ratio	stereodelay.c	/^void delay_set_delay_ratio(stereodelay *d, double delay_ratio)$/;"	f
-delay_set_delay_time_ms	stereodelay.c	/^void delay_set_delay_time_ms(stereodelay *d, double delay_ms)$/;"	f
-delay_set_feedback_percent	stereodelay.c	/^void delay_set_feedback_percent(stereodelay *d, double feedback_percent)$/;"	f
-delay_set_mode	stereodelay.c	/^void delay_set_mode(stereodelay *d, unsigned mode) { d->m_mode = mode; }$/;"	f
-delay_set_wet_mix	stereodelay.c	/^void delay_set_wet_mix(stereodelay *d, double wet_mix)$/;"	f
 delay_toggle	mixer.c	/^void delay_toggle(mixer *mixr)$/;"	f
-delay_update	stereodelay.c	/^void delay_update(stereodelay *d)$/;"	f
 delayline	delayline.h	/^typedef struct delayline {$/;"	s
 delayline	delayline.h	/^} delayline;$/;"	t	typeref:struct:delayline
 delayline_cook_variables	delayline.c	/^void delayline_cook_variables(delayline *dl)$/;"	f
@@ -734,6 +725,14 @@ m_amp_mod_db	dca.h	/^    double m_amp_mod_db;$/;"	m	struct:dca
 m_amplitude	oscillator.h	/^    double m_amplitude; \/\/ 0->1 from GUI$/;"	m	struct:oscillator
 m_amplitude_control	dca.h	/^    double m_amplitude_control;$/;"	m	struct:dca
 m_amplitude_db	dca.h	/^    double m_amplitude_db; \/\/ gui?$/;"	m	struct:dca
+m_apf_1_delay_msec	reverb.h	/^    double m_apf_1_delay_msec;$/;"	m	struct:reverb
+m_apf_1_g	reverb.h	/^    double m_apf_1_g;$/;"	m	struct:reverb
+m_apf_2_delay_msec	reverb.h	/^    double m_apf_2_delay_msec;$/;"	m	struct:reverb
+m_apf_2_g	reverb.h	/^    double m_apf_2_g;$/;"	m	struct:reverb
+m_apf_3_delay_msec	reverb.h	/^    double m_apf_3_delay_msec;$/;"	m	struct:reverb
+m_apf_3_g	reverb.h	/^    double m_apf_3_g;$/;"	m	struct:reverb
+m_apf_4_delay_msec	reverb.h	/^    double m_apf_4_delay_msec;$/;"	m	struct:reverb
+m_apf_4_g	reverb.h	/^    double m_apf_4_g;$/;"	m	struct:reverb
 m_attack_coeff	envelope_generator.h	/^    double m_attack_coeff;$/;"	m	struct:envelope_generator
 m_attack_offset	envelope_generator.h	/^    double m_attack_offset;$/;"	m	struct:envelope_generator
 m_attack_tco	envelope_generator.h	/^    double m_attack_tco;$/;"	m	struct:envelope_generator
@@ -753,9 +752,19 @@ m_buffer_size	delayline.h	/^    int m_buffer_size;$/;"	m	struct:delayline
 m_c	filter_moogladder.h	/^    double m_c;$/;"	m	struct:filter_moogladder
 m_cents	oscillator.h	/^    double m_cents;     \/\/ cents tweak$/;"	m	struct:oscillator
 m_chorus_offset	modular_delay.h	/^    double m_chorus_offset;$/;"	m	struct:mod_delay
+m_comb_1_delay_msec	reverb.h	/^    double m_comb_1_delay_msec;$/;"	m	struct:reverb
+m_comb_2_delay_msec	reverb.h	/^    double m_comb_2_delay_msec;$/;"	m	struct:reverb
+m_comb_3_delay_msec	reverb.h	/^    double m_comb_3_delay_msec;$/;"	m	struct:reverb
+m_comb_4_delay_msec	reverb.h	/^    double m_comb_4_delay_msec;$/;"	m	struct:reverb
+m_comb_5_delay_msec	reverb.h	/^    double m_comb_5_delay_msec;$/;"	m	struct:reverb
+m_comb_6_delay_msec	reverb.h	/^    double m_comb_6_delay_msec;$/;"	m	struct:reverb
+m_comb_7_delay_msec	reverb.h	/^    double m_comb_7_delay_msec;$/;"	m	struct:reverb
+m_comb_8_delay_msec	reverb.h	/^    double m_comb_8_delay_msec;$/;"	m	struct:reverb
 m_current_table	wt_oscillator.h	/^    double *m_current_table;$/;"	m	struct:wt_oscillator
 m_current_table_index	wt_oscillator.h	/^    int m_current_table_index; \/\/ 0 - 9$/;"	m	struct:wt_oscillator
 m_d	filter_moogladder.h	/^    double m_d;$/;"	m	struct:filter_moogladder
+m_damping_lpf_1	reverb.h	/^    one_pole_lpf m_damping_lpf_1;$/;"	m	struct:reverb
+m_damping_lpf_2	reverb.h	/^    one_pole_lpf m_damping_lpf_2;$/;"	m	struct:reverb
 m_dca	voice.h	/^    dca m_dca;$/;"	m	struct:__anon33
 m_decay_coeff	envelope_generator.h	/^    double m_decay_coeff;$/;"	m	struct:envelope_generator
 m_decay_offset	envelope_generator.h	/^    double m_decay_offset;$/;"	m	struct:envelope_generator
@@ -836,6 +845,10 @@ m_have_recording	beatrepeat.h	/^    bool m_have_recording;$/;"	m	struct:beatrepe
 m_hs_ratio	voice.h	/^    double m_hs_ratio; \/\/ hard sync$/;"	m	struct:__anon33
 m_inc	oscillator.h	/^    double m_inc;    \/\/ phase inc = fo\/fs$/;"	m	struct:oscillator
 m_inc_shutdown	envelope_generator.h	/^    double m_inc_shutdown;$/;"	m	struct:envelope_generator
+m_input_apf_1	reverb.h	/^    delay_apf    m_input_apf_1;$/;"	m	struct:reverb
+m_input_apf_2	reverb.h	/^    delay_apf    m_input_apf_2;$/;"	m	struct:reverb
+m_input_lpf	reverb.h	/^    one_pole_lpf m_input_lpf;$/;"	m	struct:reverb
+m_input_lpf_g	reverb.h	/^    double m_input_lpf_g;$/;"	m	struct:reverb
 m_interval	beatrepeat.h	/^    unsigned int m_interval;$/;"	m	struct:beatrepeat
 m_k	filter_ckthreefive.h	/^    double m_k;$/;"	m	struct:filter_ckthreefive
 m_k	filter_moogladder.h	/^    double m_k;$/;"	m	struct:filter_moogladder
@@ -856,6 +869,7 @@ m_lfo1_waveform	minisynth.h	/^    unsigned int m_lfo1_waveform;$/;"	m	struct:min
 m_lfo2	voice.h	/^    lfo m_lfo2;$/;"	m	struct:__anon33
 m_lfo_mode	oscillator.h	/^    unsigned m_lfo_mode; \/\/ to store MODE$/;"	m	struct:oscillator
 m_lfo_type	modular_delay.h	/^    unsigned int m_lfo_type; \/\/ TRI \/ SINE$/;"	m	struct:mod_delay
+m_lpf2_g2	reverb.h	/^    double m_lpf2_g2;$/;"	m	struct:reverb
 m_matrix_core	modmatrix.h	/^    matrixrow **m_matrix_core;$/;"	m	struct:__anon21
 m_max_delay_msec	modular_delay.h	/^    double m_max_delay_msec;$/;"	m	struct:mod_delay
 m_midi_controller_mode	mixer.h	/^    unsigned int m_midi_controller_mode; \/\/ to switch control knob routing$/;"	m	struct:t_mixer
@@ -913,9 +927,19 @@ m_osc4	voice.h	/^    oscillator *m_osc4;$/;"	m	struct:__anon33
 m_osc_fo	oscillator.h	/^    double m_osc_fo;    \/\/ oscillator frequency from MIDI note number$/;"	m	struct:oscillator
 m_osc_pitch	voice.h	/^    double m_osc_pitch;$/;"	m	struct:__anon33
 m_osc_pitch_pending	voice.h	/^    double m_osc_pitch_pending;$/;"	m	struct:__anon33
+m_output_apf_3	reverb.h	/^    delay_apf m_output_apf_3;$/;"	m	struct:reverb
+m_output_apf_4	reverb.h	/^    delay_apf m_output_apf_4;$/;"	m	struct:reverb
 m_output_eg	envelope_generator.h	/^    bool m_output_eg; \/\/ i.e. this instance is going direct to output, rather$/;"	m	struct:envelope_generator
 m_pan_control	dca.h	/^    double m_pan_control;$/;"	m	struct:dca
 m_pan_mod	dca.h	/^    double m_pan_mod;$/;"	m	struct:dca
+m_parallel_cf_1	reverb.h	/^    comb_filter m_parallel_cf_1;$/;"	m	struct:reverb
+m_parallel_cf_2	reverb.h	/^    comb_filter m_parallel_cf_2;$/;"	m	struct:reverb
+m_parallel_cf_3	reverb.h	/^    lpf_comb_filter m_parallel_cf_3;$/;"	m	struct:reverb
+m_parallel_cf_4	reverb.h	/^    lpf_comb_filter m_parallel_cf_4;$/;"	m	struct:reverb
+m_parallel_cf_5	reverb.h	/^    comb_filter m_parallel_cf_5;$/;"	m	struct:reverb
+m_parallel_cf_6	reverb.h	/^    comb_filter m_parallel_cf_6;$/;"	m	struct:reverb
+m_parallel_cf_7	reverb.h	/^    lpf_comb_filter m_parallel_cf_7;$/;"	m	struct:reverb
+m_parallel_cf_8	reverb.h	/^    lpf_comb_filter m_parallel_cf_8;$/;"	m	struct:reverb
 m_phase_mod	oscillator.h	/^    double m_phase_mod;  \/* Phase mod input -1 to +1 (used for DX synth) *\/$/;"	m	struct:oscillator
 m_pitch_bend_mod	oscillator.h	/^    double m_pitch_bend_mod; \/* modulation input -1 to +1 *\/$/;"	m	struct:oscillator
 m_pitchbend_range	minisynth.h	/^    int m_pitchbend_range;$/;"	m	struct:minisynth
@@ -925,6 +949,9 @@ m_portamento_semitones	voice.h	/^    double m_portamento_semitones;$/;"	m	struct
 m_portamento_start	voice.h	/^    double m_portamento_start;$/;"	m	struct:__anon33
 m_portamento_time_msec	minisynth.h	/^    double m_portamento_time_msec;$/;"	m	struct:minisynth
 m_portamento_time_msec	voice.h	/^    double m_portamento_time_msec;$/;"	m	struct:__anon33
+m_pre_delay	reverb.h	/^    delay m_pre_delay;$/;"	m	struct:reverb
+m_pre_delay_atten_db	reverb.h	/^    double m_pre_delay_atten_db;$/;"	m	struct:reverb
+m_pre_delay_msec	reverb.h	/^    double m_pre_delay_msec;$/;"	m	struct:reverb
 m_pulse_width	oscillator.h	/^    double m_pulse_width; \/\/ pulse width in % for calculation$/;"	m	struct:oscillator
 m_pulse_width_control	oscillator.h	/^    double m_pulse_width_control;$/;"	m	struct:oscillator
 m_pulse_width_pct	minisynth.h	/^    double m_pulse_width_pct;$/;"	m	struct:minisynth
@@ -948,6 +975,7 @@ m_rho	filter_sem.h	/^    double m_rho;$/;"	m	struct:filter_sem
 m_right_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	struct:stereodelay
 m_rsh_counter	oscillator.h	/^    int m_rsh_counter;      \/\/ random sample\/hold counter$/;"	m	struct:oscillator
 m_rsh_value	oscillator.h	/^    double m_rsh_value;     \/\/ currnet rsh output$/;"	m	struct:oscillator
+m_rt60	reverb.h	/^    double m_rt60;$/;"	m	struct:reverb
 m_saturation	filter.h	/^    double m_saturation; \/\/ used in NLP$/;"	m	struct:filter
 m_saw_tables	wt_oscillator.h	/^    double *m_saw_tables[NUM_TABLES];$/;"	m	struct:wt_oscillator
 m_selected_sixteenth	beatrepeat.h	/^    size_t m_selected_sixteenth;$/;"	m	struct:beatrepeat
@@ -986,6 +1014,7 @@ m_wet_level	ddlmodule.h	/^    double m_wet_level;$/;"	m	struct:ddlmodule
 m_wet_level_pct	ddlmodule.h	/^    double m_wet_level_pct;$/;"	m	struct:ddlmodule
 m_wet_mix	minisynth.h	/^    double m_wet_mix;$/;"	m	struct:minisynth
 m_wet_mix	stereodelay.h	/^    double m_wet_mix;$/;"	m	struct:stereodelay
+m_wet_pct	reverb.h	/^    double m_wet_pct;$/;"	m	struct:reverb
 m_write_index	ddlmodule.h	/^    int m_write_index;$/;"	m	struct:ddlmodule
 m_write_index	delayline.h	/^    int m_write_index;$/;"	m	struct:delayline
 m_wt_inc	wt_oscillator.h	/^    double m_wt_inc;$/;"	m	struct:wt_oscillator
@@ -1118,7 +1147,8 @@ new_minisynth_voice	minisynth_voice.c	/^minisynth_voice *new_minisynth_voice(voi
 new_mixer	mixer.c	/^mixer *new_mixer()$/;"	f
 new_mod_delay	modular_delay.c	/^mod_delay *new_mod_delay()$/;"	f
 new_modmatrix	modmatrix.c	/^modmatrix *new_modmatrix(void)$/;"	f
-new_reverb	effect.c	/^EFFECT *new_reverb(double reverbtime)$/;"	f
+new_reverb	reverb.c	/^reverb *new_reverb(void)$/;"	f
+new_reverb_effect	effect.c	/^EFFECT *new_reverb_effect(double reverbtime)$/;"	f
 new_sampler	sampler.c	/^SAMPLER *new_sampler(char *filename, double loop_len)$/;"	f
 new_saw_table	table.c	/^wtable *new_saw_table(int up)$/;"	f
 new_sbmsg	sbmsg.c	/^SBMSG *new_sbmsg()$/;"	f
@@ -1238,6 +1268,11 @@ reset_oscillator	oscillator.h	/^    void (*reset_oscillator)(oscillator *self);$
 reset_to_zero	synthfunctions.h	/^    bool reset_to_zero;$/;"	m	struct:__anon29
 resize_effects_array	sound_generator.c	/^static int resize_effects_array(SOUNDGEN *self)$/;"	f	file:
 rev_lookup	utils.c	/^static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",$/;"	v	file:
+reverb	reverb.h	/^typedef struct reverb$/;"	s
+reverb	reverb.h	/^} reverb;$/;"	t	typeref:struct:reverb
+reverb_cook_variables	reverb.c	/^void reverb_cook_variables(reverb *r)$/;"	f
+reverb_init_reverb	reverb.c	/^void reverb_init_reverb(reverb *r)$/;"	f
+reverb_process_audio_frame	reverb.c	/^bool reverb_process_audio_frame(reverb *r, double *in, double *out, unsigned int num_input_channels, unsigned int num_output_channels)$/;"	f
 reverse	utils.c	/^void reverse(char s[])$/;"	f
 rfree	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon25
 right_phase	mixer.h	/^    float right_phase;$/;"	m	struct:__anon16
@@ -1320,6 +1355,15 @@ state_strings	envelope_generator.c	/^char *state_strings[] = {"OFFF",    "ATTACK
 status	effect.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:__anon8
 status	envelope.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:envelope_stream
 status	sound_generator.h	/^    void (*status)(void *self, wchar_t *wstring);$/;"	m	struct:t_soundgen
+stereo_delay_prepare_for_play	stereodelay.c	/^void stereo_delay_prepare_for_play(stereodelay *d)$/;"	f
+stereo_delay_process_audio	stereodelay.c	/^bool stereo_delay_process_audio(stereodelay *d, double *input_left,$/;"	f
+stereo_delay_reset	stereodelay.c	/^void stereo_delay_reset(stereodelay *d)$/;"	f
+stereo_delay_set_delay_ratio	stereodelay.c	/^void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)$/;"	f
+stereo_delay_set_delay_time_ms	stereodelay.c	/^void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms)$/;"	f
+stereo_delay_set_feedback_percent	stereodelay.c	/^void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)$/;"	f
+stereo_delay_set_mode	stereodelay.c	/^void stereo_delay_set_mode(stereodelay *d, unsigned mode) { d->m_mode = mode; }$/;"	f
+stereo_delay_set_wet_mix	stereodelay.c	/^void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix)$/;"	f
+stereo_delay_update	stereodelay.c	/^void stereo_delay_update(stereodelay *d)$/;"	f
 stereodelay	stereodelay.h	/^typedef struct stereodelay {$/;"	s
 stereodelay	stereodelay.h	/^} stereodelay;$/;"	t	typeref:struct:stereodelay
 stop_oscillator	oscillator.h	/^    void (*stop_oscillator)(oscillator *self);$/;"	m	struct:oscillator
