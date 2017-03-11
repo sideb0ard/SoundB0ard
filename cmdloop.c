@@ -634,11 +634,12 @@ void interpret(char *line)
                     if (mixr->sound_generators[soundgen_num]
                                 ->effects[fx_num]
                                 ->type == REVERB) {
-                        reverb *r = (reverb *) mixr->sound_generators[soundgen_num]->effects[fx_num];
+                        reverb *r = (reverb *) mixr->sound_generators[soundgen_num]->effects[fx_num]->r;
                         int wetmix = atoi(wurds[4]);
                         if (0 <= wetmix && wetmix <= 100)
                             r->m_wet_pct = wetmix;
                         printf("REVERB WETMIX! %f\n", r->m_wet_pct);
+                        reverb_cook_variables(r);
                     }
                 }
                 else if (strncmp("delay", wurds[3], 5) == 0 ||
