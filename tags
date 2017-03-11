@@ -332,7 +332,7 @@ add_int_pattern	drumr.c	/^void add_int_pattern(DRUM *d, int pattern)$/;"	f
 add_matrix_row	modmatrix.c	/^void add_matrix_row(modmatrix *self, matrixrow *row)$/;"	f
 add_minisynth	mixer.c	/^int add_minisynth(mixer *mixr)$/;"	f
 add_moddelay_soundgen	sound_generator.c	/^int add_moddelay_soundgen(SOUNDGEN *self)$/;"	f
-add_reverb_soundgen	sound_generator.c	/^int add_reverb_soundgen(SOUNDGEN *self, float reverbtime)$/;"	f
+add_reverb_soundgen	sound_generator.c	/^int add_reverb_soundgen(SOUNDGEN *self)$/;"	f
 add_sampler	mixer.c	/^int add_sampler(mixer *mixr, char *filename, double loop_len)$/;"	f
 add_sound_generator	mixer.c	/^int add_sound_generator(mixer *mixr, SBMSG *sbm)$/;"	f
 afterthought	algorithm.h	/^    char afterthought[5][MAX_CMD_LEN];$/;"	m	struct:algorithm
@@ -1148,7 +1148,7 @@ new_mixer	mixer.c	/^mixer *new_mixer()$/;"	f
 new_mod_delay	modular_delay.c	/^mod_delay *new_mod_delay()$/;"	f
 new_modmatrix	modmatrix.c	/^modmatrix *new_modmatrix(void)$/;"	f
 new_reverb	reverb.c	/^reverb *new_reverb(void)$/;"	f
-new_reverb_effect	effect.c	/^EFFECT *new_reverb_effect(double reverbtime)$/;"	f
+new_reverb_effect	effect.c	/^EFFECT *new_reverb_effect()$/;"	f
 new_sampler	sampler.c	/^SAMPLER *new_sampler(char *filename, double loop_len)$/;"	f
 new_saw_table	table.c	/^wtable *new_saw_table(int up)$/;"	f
 new_sbmsg	sbmsg.c	/^SBMSG *new_sbmsg()$/;"	f
@@ -1255,6 +1255,7 @@ qb_stop_oscillator	qblimited_oscillator.c	/^void qb_stop_oscillator(oscillator *
 qblimited_oscillator	qblimited_oscillator.h	/^typedef struct qblimited_oscillator {$/;"	s
 qblimited_oscillator	qblimited_oscillator.h	/^} qblimited_oscillator;$/;"	t	typeref:struct:qblimited_oscillator
 qrsh	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon24
+r	effect.h	/^    reverb *r;$/;"	m	struct:__anon8
 rate	effect.h	/^    double rate, cnt;$/;"	m	struct:__anon8
 read_delay	effect.c	/^double read_delay(EFFECT *self)$/;"	f
 recording	minisynth.h	/^    bool recording;$/;"	m	struct:minisynth
@@ -1272,7 +1273,7 @@ reverb	reverb.h	/^typedef struct reverb$/;"	s
 reverb	reverb.h	/^} reverb;$/;"	t	typeref:struct:reverb
 reverb_cook_variables	reverb.c	/^void reverb_cook_variables(reverb *r)$/;"	f
 reverb_init_reverb	reverb.c	/^void reverb_init_reverb(reverb *r)$/;"	f
-reverb_process_audio_frame	reverb.c	/^bool reverb_process_audio_frame(reverb *r, double *in, double *out, unsigned int num_input_channels, unsigned int num_output_channels)$/;"	f
+reverb_process_audio	reverb.c	/^bool reverb_process_audio(reverb *r, double *in, double *out, unsigned int num_input_channels, unsigned int num_output_channels)$/;"	f
 reverse	utils.c	/^void reverse(char s[])$/;"	f
 rfree	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon25
 right_phase	mixer.h	/^    float right_phase;$/;"	m	struct:__anon16

@@ -68,4 +68,4 @@ reverb *new_reverb(void);
 void reverb_init_reverb(reverb *r);
 void reverb_cook_variables(reverb *r);
 
-bool reverb_process_audio_frame(reverb *r, double *in, double *out, unsigned int num_channels_in, unsigned int num_channels_out);
+bool reverb_process_audio(reverb *r, double *in, double *out, unsigned int num_channels_in, unsigned int num_channels_out);

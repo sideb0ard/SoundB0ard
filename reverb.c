@@ -135,7 +135,7 @@ void reverb_cook_variables(reverb *r)
     lpf_comb_filter_set_comb_g(&r->m_parallel_cf_8, r->m_lpf2_g2);
 }
 
-bool reverb_process_audio_frame(reverb *r, double *in, double *out, unsigned int num_input_channels, unsigned int num_output_channels)
+bool reverb_process_audio(reverb *r, double *in, double *out, unsigned int num_input_channels, unsigned int num_output_channels)
 {
     double input_sample = in[0];
     if (num_input_channels == 2)

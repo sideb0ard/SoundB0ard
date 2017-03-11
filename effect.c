@@ -68,7 +68,7 @@ EFFECT *effect_new_mod_delay()
     return e;
 }
 
-EFFECT *new_reverb_effect(double reverbtime)
+EFFECT *new_reverb_effect()
 {
     EFFECT *e;
     e = (EFFECT *)calloc(1, sizeof(EFFECT));
@@ -76,20 +76,9 @@ EFFECT *new_reverb_effect(double reverbtime)
         return NULL;
 
     e->type = REVERB;
-    printf("REVERB! %f\n", reverbtime);
 
-    double *buffer;
-    int buf_length = (int)(reverbtime * SAMPLE_RATE);
-    buffer = (double *)calloc(buf_length, sizeof(double));
-    if (buffer == NULL) {
-        perror("Couldn't allocate effect buffer");
-        free(e);
-        return NULL;
-    }
-    e->m_duration = reverbtime;
-    e->m_delay_in_samples = buf_length;
-    e->buffer = buffer;
-    e->buf_length = buf_length;
+    e->r = new_reverb();
+    printf("REVERB!\n");
 
     return e;
 }

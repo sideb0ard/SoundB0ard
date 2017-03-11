@@ -478,9 +478,7 @@ void interpret(char *line)
         else if (strncmp("reverb", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (is_valid_soundgen_num(soundgen_num)) {
-                int reverbtime = atoi(wurds[2]);
-                add_reverb_soundgen(mixr->sound_generators[soundgen_num],
-                                    reverbtime);
+                add_reverb_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
         else if (strncmp("distort", wurds[0], 7) == 0) {

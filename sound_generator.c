@@ -132,9 +132,9 @@ int add_moddelay_soundgen(SOUNDGEN *self)
     return self->effects_num++;
 }
 
-int add_reverb_soundgen(SOUNDGEN *self, float reverbtime)
+int add_reverb_soundgen(SOUNDGEN *self)
 {
-    printf("Booya, adding a new REVERB to SOUNDGEN: %f!\n", reverbtime);
+    printf("Booya, adding a new REVERB to SOUNDGEN!\n");
 
     int res = resize_effects_array(self);
     if (res == -1) {
@@ -142,7 +142,7 @@ int add_reverb_soundgen(SOUNDGEN *self, float reverbtime)
         return -1;
     }
 
-    EFFECT *e = new_reverb_effect(reverbtime);
+    EFFECT *e = new_reverb_effect();
     if (e == NULL) {
         perror("Couldn't create effect");
         return -1;
@@ -191,11 +191,6 @@ float effector(SOUNDGEN *self, float val)
             beatrepeat *b;
             float val1 = 0;
             float val2 = 0;
-            double loop_time = 0.04; // temp trial for reverb
-            double reverb_time = 1.5;
-            double decay = pow(0.001, loop_time / reverb_time);
-            float mix = 0.1;
-            float atten = 1.0;
 
             switch (self->effects[i]->type) {
             case BEATREPEAT:
@@ -238,14 +233,9 @@ float effector(SOUNDGEN *self, float val)
                 val = left_out;
                 break;
             case REVERB:
-                delay_p = self->effects[i]->buf_p;
-                delay = self->effects[i]->buffer;
-                val = delay[delay_p] * decay;
-                delay[delay_p++] = (val_copy * atten) + val;
-                val = (val_copy * (1 - mix)) + (val * mix);
-                if (delay_p >= self->effects[i]->buf_length)
-                    delay_p = 0;
-                self->effects[i]->buf_p = delay_p;
+                reverb_process_audio(self->effects[i]->r, &left_in,
+                                     &left_out, 1, 1);
+                val = left_out;
                 break;
             case RES:
                 delay_p = self->effects[i]->buf_p;
