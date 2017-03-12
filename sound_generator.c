@@ -175,8 +175,6 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type)
 
 float effector(SOUNDGEN *self, double val)
 {
-    // double left_in = val;
-    // double right_in = val;
     double left_out = 0.0;
     double right_out = 0.0;
 

@@ -146,12 +146,6 @@ void interpret(char *line)
             }
         }
 
-        //////  TEMP!
-        else if (strncmp("sparky", wurds[0], 3) == 0) {
-            char *pattern = calloc(128, sizeof(char));
-            char_array_to_string_sequence(pattern, wurds, 1, num_wurds);
-            sparky(pattern);
-        }
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp("seq", wurds[0], 3) == 0) {
 
@@ -279,6 +273,13 @@ void interpret(char *line)
                 }
             }
             free(pattern);
+        }
+
+        // BITSHIFT MACHINEZ
+        else if (strncmp("bitshift", wurds[0], 8) == 0) {
+            int bitpattern = atoi(wurds[1]);
+            printf("BUTTSHIFTZ! %d\n", bitpattern);
+            add_bitwize(mixr, bitpattern);
         }
 
         // SAMPLE LOOPER COMMANDS

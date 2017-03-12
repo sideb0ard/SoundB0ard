@@ -4,6 +4,7 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "sound_generator.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
@@ -18,9 +19,9 @@ BITWIZE *new_bitwize(int pattern)
     p_bitwize->pattern = pattern;
     printf("NEW BITWIZET!\n");
 
+    p_bitwize->m_lfo = lfo_new();
     p_bitwize->sound_generator.gennext = &bitwize_gennext;
     p_bitwize->sound_generator.status = &bitwize_status;
-    // TODO
     p_bitwize->sound_generator.getvol = &bitwize_getvol;
     p_bitwize->sound_generator.setvol = &bitwize_setvol;
     p_bitwize->sound_generator.type = BITWIZE_TYPE;
@@ -64,17 +65,37 @@ char bitwize_process(int pattern, int t)
 
 double bitwize_gennext(void *self)
 {
-    BITWIZE *p_bitwize = (BITWIZE *)self;
-    int t = p_bitwize->incr++;
-    int pattern = p_bitwize->pattern;
-    char val = bitwize_process(pattern, t);
+    BITWIZE *b = (BITWIZE *)self;
 
+    int t = b->incr++;
+    int pattern = b->pattern;
+    char val = bitwize_process(pattern, t);
     double scale_val = (2.0 / 256 * val);
-    printf("VAL: %d, SCALE_VAL: %f\n", val, scale_val);
-    // scale_val = effector(&p_bitwize->sound_generator, scale_val);
-    // scale_val = envelopor(&p_bitwize->sound_generator, scale_val);
-    // return scale_val * vol;
-    return 0;
+    double scaled = scaleybum(-128, 127, -1.0, 0.9, val);
+
+    double yn = 0;
+    double yqn = 0;
+    yn = lfo_do_oscillate((oscillator *)b->m_lfo, &yqn);
+
+    int tick = mixr->cur_sample % 9600000000;
+    //int tick = mixr->sixteenth_note_tick;
+
+    if (b->tick != tick)
+    {
+        b->tick = tick;
+        b->current_val = scale_val;
+    }
+
+    //printf("VAL: %d, SCALE_VAL: %f SCALED: %f CURRENT: %f \n", val, scale_val, scaled, b->current_val);
+
+    double return_val = b->current_val;
+
+    return_val = effector(&b->sound_generator, return_val);
+    return_val = envelopor(&b->sound_generator, return_val);
+
+    ////printf("VAL:%f\n", return_val);
+    //return return_val * 0.4 * yn;
+    return return_val * 0.4 ;
 }
 
 void bitwize_status(void *self, wchar_t *status_string)

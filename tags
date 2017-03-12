@@ -436,6 +436,7 @@ cur_sample	mixer.h	/^    int cur_sample; \/\/ inverse of SAMPLE RATE$/;"	m	struc
 cur_sample	sampler.h	/^    int cur_sample;$/;"	m	struct:t_sampler
 cur_sample_iteration	sampler.h	/^    int cur_sample_iteration;$/;"	m	struct:t_sampler
 curpos	envelope.h	/^    double curpos;$/;"	m	struct:envelope_stream
+current_val	bitwize.h	/^    double current_val;$/;"	m	struct:t_bitwize
 custom_event_type	midimaaan.h	/^typedef enum { OCTAVE_CHANGE } custom_event_type;$/;"	t	typeref:enum:__anon13
 dBLEPTable	lookuptables.h	/^const double dBLEPTable[4096] = {$/;"	v
 dBLEPTable_8_BLK	lookuptables.h	/^const double dBLEPTable_8_BLK[4096] = {$/;"	v
@@ -861,6 +862,7 @@ m_left_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	st
 m_legato_mode	envelope_generator.h	/^    bool m_legato_mode;$/;"	m	struct:envelope_generator
 m_legato_mode	minisynth.h	/^    unsigned int m_legato_mode;$/;"	m	struct:minisynth
 m_legato_mode	voice.h	/^    unsigned int m_legato_mode;$/;"	m	struct:__anon34
+m_lfo	bitwize.h	/^    lfo *m_lfo;$/;"	m	struct:t_bitwize
 m_lfo	modular_delay.h	/^    lfo *m_lfo;$/;"	m	struct:mod_delay
 m_lfo1	voice.h	/^    lfo m_lfo1;$/;"	m	struct:__anon34
 m_lfo1_amp_intensity	minisynth.h	/^    double m_lfo1_amp_intensity;$/;"	m	struct:minisynth
@@ -1400,6 +1402,7 @@ t_soundgen	sound_generator.h	/^typedef struct t_soundgen {$/;"	s
 table	table.h	/^    double *table;$/;"	m	struct:wtable
 take_action	chaosmonkey.h	/^    bool take_action;$/;"	m	struct:chaosmonkey
 thrunner	utils.c	/^void thrunner(SBMSG *msg)$/;"	f
+tick	bitwize.h	/^    int tick;$/;"	m	struct:t_bitwize
 tick	drumr.h	/^    int tick;$/;"	m	struct:t_drumr
 tick	midimaaan.h	/^    unsigned tick;$/;"	m	struct:midi_event
 tick	mixer.h	/^    int tick;       \/\/$/;"	m	struct:t_mixer

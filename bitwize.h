@@ -10,10 +10,14 @@ typedef struct t_bitwize {
 
     SOUNDGEN sound_generator;
 
+    lfo *m_lfo;
+
     double incr;
     double vol;
 
     int pattern;
+    int tick;
+    double current_val;
 
 } BITWIZE;
 
