@@ -14,6 +14,7 @@ typedef struct t_soundgen {
     void (*status)(void *self, wchar_t *wstring);
     void (*setvol)(void *self, double val);
     double (*getvol)(void *self);
+
     sound_generator_type type;
 
     int effects_size; // size of array

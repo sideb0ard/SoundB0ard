@@ -23,6 +23,7 @@ algorithm *new_algorithm(char *line)
     a->sound_generator.gennext = &algorithm_gen_next;
     a->sound_generator.status = &algorithm_status;
     a->sound_generator.setvol = &algorithm_setvol;
+    a->sound_generator.getvol = &algorithm_getvol;
     a->sound_generator.type = ALGORITHM_TYPE;
 
     return a;
@@ -141,4 +142,10 @@ void algorithm_setvol(void *self, double v)
     (void)self;
     (void)v;
     // no-op
+}
+
+double algorithm_getvol(void *self)
+{
+    (void)self;
+    return 0.0;
 }

@@ -16,6 +16,7 @@ typedef struct algorithm {
     char afterthought[5][MAX_CMD_LEN];
     unsigned int frequency;
     bool has_started;
+    bool active;
 } algorithm;
 
 algorithm *new_algorithm(char *line);
@@ -27,3 +28,4 @@ void algorithm_process_afterthought(algorithm *self);
 double algorithm_gen_next(void *self);
 void algorithm_status(void *self, wchar_t *ss);
 void algorithm_setvol(void *self, double v);
+double algorithm_getvol(void *self);

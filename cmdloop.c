@@ -108,6 +108,10 @@ void interpret(char *line)
             mixer_ps(mixr);
         }
 
+        else if (strncmp("quiet", wurds[0], 5) == 0) {
+            for (int i = 0; i < mixr->soundgen_num; i++)
+                mixr->sound_generators[i]->setvol(mixr->sound_generators[i],0.0);
+        }
         else if (strncmp("ls", wurds[0], 2) == 0) {
             list_sample_dir();
         }

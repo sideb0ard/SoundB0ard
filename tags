@@ -312,6 +312,7 @@ _env_reset	envelope.c	/^static void _env_reset(ENVSTREAM *stream)$/;"	f	file:
 _env_updatepoints	envelope.c	/^static void _env_updatepoints(ENVSTREAM *stream)$/;"	f	file:
 _lookupTables_	lookuptables.h	/^#define _lookupTables_$/;"	d
 _new_wtable	table.c	/^static wtable *_new_wtable(void)$/;"	f	file:
+active	algorithm.h	/^    bool active;$/;"	m	struct:algorithm
 active_midi_soundgen_effect_num	mixer.h	/^    int active_midi_soundgen_effect_num;$/;"	m	struct:t_mixer
 active_midi_soundgen_num	mixer.h	/^    int active_midi_soundgen_num;$/;"	m	struct:t_mixer
 add_algorithm	mixer.c	/^int add_algorithm(char *line)$/;"	f
@@ -339,6 +340,7 @@ afterthought	algorithm.h	/^    char afterthought[5][MAX_CMD_LEN];$/;"	m	struct:a
 algorithm	algorithm.h	/^typedef struct algorithm {$/;"	s
 algorithm	algorithm.h	/^} algorithm;$/;"	t	typeref:struct:algorithm
 algorithm_gen_next	algorithm.c	/^double algorithm_gen_next(void *self)$/;"	f
+algorithm_getvol	algorithm.c	/^double algorithm_getvol(void *self)$/;"	f
 algorithm_process_afterthought	algorithm.c	/^void algorithm_process_afterthought(algorithm *self)$/;"	f
 algorithm_replace_vars_in_cmd	algorithm.c	/^void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd)$/;"	f
 algorithm_setvol	algorithm.c	/^void algorithm_setvol(void *self, double v)$/;"	f

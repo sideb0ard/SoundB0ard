@@ -3,10 +3,6 @@
 #include "sbmsg.h"
 #include <stdbool.h>
 
-// void startrrr(int sig_num);
-// void timed_sig_start(const char *sigtype, int freq, int freq2);
-// void *algo_run(void *);
-
 typedef struct freaky {
     int num_freaks;
     double *freaks;
