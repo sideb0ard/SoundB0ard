@@ -17,6 +17,8 @@ typedef struct t_sample_pos {
     int played;
 } sample_pos;
 
+typedef enum {MARKOVHAUS, MARKOVBOOMBAP} markovmodez;
+
 typedef struct t_drumr {
     SOUNDGEN sound_generator;
     sample_pos sample_positions[DRUM_PATTERN_LEN];
@@ -34,8 +36,8 @@ typedef struct t_drumr {
     int patterns[NUM_DRUM_PATTERNS];
     double pattern_position_amp[NUM_DRUM_PATTERNS][DRUM_PATTERN_LEN];
     int pattern_num_loops[NUM_DRUM_PATTERNS];
-    int backup_pattern_while_game_of_life_on; // store current pattern so game
-                                              // of life can use slot
+    int backup_pattern_while_getting_crazy; // store current pattern so
+                                            // algorithms can use slot
     int num_patterns;
     int cur_pattern;
     int cur_pattern_iteration;
@@ -46,9 +48,16 @@ typedef struct t_drumr {
     int swing;
     int swing_setting;
 
-    bool started;
+    bool started; // to sync at top of loop
+
     bool game_of_life_on;
-    int game_generation;
+    int  game_generation;
+
+    bool markov_on;
+    unsigned int markov_mode; // MARKOVHAUS or MARKOVBOOMBAP
+    int  markov_generation;
+
+    int max_generation; // used for game of life or markov chain
 } DRUM;
 
 DRUM *new_drumr(char *filename);
@@ -82,13 +91,18 @@ void wchar_version_of_amp(DRUM *d, int pattern_num, wchar_t apattern[49]);
 int seed_pattern(void);
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH]);
 int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH]);
-void next_life_generation(void *d);
+void next_life_generation(DRUM *d);
+void next_markov_generation(DRUM *d);
 
 int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info);
 
 double drum_gennext(void *self);
 double drum_getvol(void *self);
 
-void seq_toggle_game_of_life(DRUM *d, bool on);
+void seq_set_game_of_life(DRUM *d, bool on);
+void seq_set_markov(DRUM *d, bool on);
+void seq_set_markov_mode(DRUM *d, unsigned int mode);
+void seq_set_backup_mode(DRUM *d, bool on);
+void seq_set_max_generations(DRUM *d, int max);
 
 #endif // DRUM_H

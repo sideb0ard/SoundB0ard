@@ -191,26 +191,40 @@ void interpret(char *line)
                                d->multi_pattern_mode ? "true" : "false");
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        char_array_to_seq_string_pattern(pattern, wurds, 5,
-                                                         num_wurds);
-                        printf("Changing\n");
+                        if (strncmp("markov", wurds[3], 6) == 0) {
+                            printf("MARKOV!\n");
+                            if (strncmp("haus", wurds[4], 4) == 0) {
+                                printf("HAUS!\n");
+                                seq_set_markov_mode(d, MARKOVHAUS);
+                            }
+                            else if (strncmp("boombap", wurds[4], 7) == 0) {
+                                printf("BOOMBAP!\n");
+                                seq_set_markov_mode(d, MARKOVBOOMBAP);
+                            }
+                        }
+                        else {
+                            // TODO -- this looks fragile - only used in two of the below situs
+                            char_array_to_seq_string_pattern(pattern, wurds, 5,
+                                                             num_wurds);
+                            printf("Changing\n");
 
-                        int pattern_num = atoi(wurds[3]);
-                        if (is_valid_drum_pattern_num(d, pattern_num)) {
-                            if (strncmp("pattern", wurds[4], 7) == 0) {
-                                printf("Changing pattern to %s\n", pattern);
-                                change_char_pattern(d, pattern_num, pattern);
-                            }
-                            else if (strncmp("amp", wurds[4], 3) == 0) {
-                                printf("Setting pattern AMP to %s\n", pattern);
-                                drum_set_sample_amp_from_char_pattern(
-                                    d, pattern_num, pattern);
-                            }
-                            else if (strncmp("numloops", wurds[4], 8) == 0) {
-                                int numloops = atoi(wurds[5]);
-                                if (numloops != 0) {
-                                    drumr_change_num_loops(d, pattern_num,
-                                                           numloops);
+                            int pattern_num = atoi(wurds[3]);
+                            if (is_valid_drum_pattern_num(d, pattern_num)) {
+                                if (strncmp("pattern", wurds[4], 7) == 0) {
+                                    printf("Changing pattern to %s\n", pattern);
+                                    change_char_pattern(d, pattern_num, pattern);
+                                }
+                                else if (strncmp("amp", wurds[4], 3) == 0) {
+                                    printf("Setting pattern AMP to %s\n", pattern);
+                                    drum_set_sample_amp_from_char_pattern(
+                                        d, pattern_num, pattern);
+                                }
+                                else if (strncmp("numloops", wurds[4], 8) == 0) {
+                                    int numloops = atoi(wurds[5]);
+                                    if (numloops != 0) {
+                                        drumr_change_num_loops(d, pattern_num,
+                                                               numloops);
+                                    }
                                 }
                             }
                         }
@@ -232,8 +246,30 @@ void interpret(char *line)
                                            euclidean_pattern);
                     }
                     else if (strncmp("life", wurds[2], 4) == 0) {
-                        printf("Toggling game of life for %d\n", soundgen_num);
-                        seq_toggle_game_of_life(d, 1 - d->game_of_life_on);
+                        int num_gens = atoi(wurds[3]);
+                        if (num_gens > 0) {
+                            if (mixr->debug_mode)
+                                printf("Enabling game of life for %d generations\n", num_gens);
+                            seq_set_game_of_life(d, 1);
+                            seq_set_max_generations(d, num_gens);
+                        }
+                        else {
+                            printf("Toggling game of life for %d\n", soundgen_num);
+                            seq_set_game_of_life(d, 1 - d->game_of_life_on);
+                        }
+                    }
+                    else if (strncmp("markov", wurds[2], 4) == 0) {
+                        int num_gens = atoi(wurds[3]);
+                        if (num_gens > 0) {
+                            if (mixr->debug_mode)
+                                printf("Enabling Markov mode for %d generations\n", num_gens);
+                            seq_set_markov(d, 1);
+                            seq_set_max_generations(d, num_gens);
+                        }
+                        else {
+                            printf("Toggling Markov for %d\n", soundgen_num);
+                            seq_set_markov(d, 1 - d->markov_on);
+                        }
                     }
                     else if (strncmp("swing", wurds[2], 5) == 0) {
                         int swing_setting = atoi(wurds[3]);
@@ -642,7 +678,8 @@ void interpret(char *line)
                         int wetmix = atoi(wurds[4]);
                         if (0 <= wetmix && wetmix <= 100)
                             r->m_wet_pct = wetmix;
-                        printf("REVERB WETMIX! %f\n", r->m_wet_pct);
+                        if (mixr->debug_mode)
+                            printf("REVERB WETMIX! %f\n", r->m_wet_pct);
                         reverb_cook_variables(r);
                     }
                 }
@@ -658,27 +695,32 @@ void interpret(char *line)
                             (stereodelay *)mixr->sound_generators[soundgen_num]
                                 ->effects[fx_num];
                         if (strncmp("delay", wurds[3], 5) == 0) {
-                            printf("Changing DELAY TIME\n");
+                            if (mixr->debug_mode)
+                                printf("Changing DELAY TIME\n");
                             double delay_ms = atof(wurds[4]);
                             stereo_delay_set_delay_time_ms(d, delay_ms);
                         }
                         else if (strncmp("feedback", wurds[3], 8) == 0) {
-                            printf("Changing FEEDBACK TIME\n");
+                            if (mixr->debug_mode)
+                                printf("Changing FEEDBACK TIME\n");
                             int percent = atoi(wurds[4]);
                             stereo_delay_set_feedback_percent(d, percent);
                         }
                         else if (strncmp("ratio", wurds[3], 5) == 0) {
-                            printf("Changing RATIO TIME\n");
+                            if (mixr->debug_mode)
+                                printf("Changing RATIO TIME\n");
                             double ratio = atof(wurds[4]);
                             stereo_delay_set_delay_ratio(d, ratio);
                         }
                         else if (strncmp("mix", wurds[3], 3) == 0) {
-                            printf("Changing MIX TIME\n");
+                            if (mixr->debug_mode)
+                                printf("Changing MIX TIME\n");
                             double mix = atof(wurds[4]);
                             stereo_delay_set_wet_mix(d, mix);
                         }
                         else if (strncmp("mode", wurds[3], 4) == 0) {
-                            printf("MODE!\n");
+                            if (mixr->debug_mode)
+                                printf("MODE!\n");
                             if (strncmp("NORM", wurds[4], 4) == 0) {
                                 stereo_delay_set_mode(d, NORM);
                             }

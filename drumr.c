@@ -111,8 +111,8 @@ double drum_gennext(void *self)
                 if (mixr->tick % (PPQN / 4) == (int)swing_offset / 4) {
                     drumr->sample_positions[step_seq_idx].playing = 1;
                     drumr->sample_positions[step_seq_idx].played = 1;
-                    // printf("SWING SWUNG tick %% PPQN: %d\n", mixr->tick %
-                    // PPQN);
+                    if (mixr->debug_mode)
+                        printf("SWING SWUNG tick %% PPQN: %d\n", mixr->tick % PPQN);
                 }
             }
             else {
@@ -155,10 +155,12 @@ double drum_gennext(void *self)
 
         if (drumr->tick % 16 == 0) {
 
-            // printf("Top of loop [%d] - 16tick = %d, tik = %d\n",
-            //         step_seq_idx,
-            //         mixr->sixteenth_note_tick,
-            //         mixr->tick);
+            if (mixr->debug_mode) {
+            printf("Top of loop [%d] - 16tick = %d, tik = %d\n",
+                    step_seq_idx,
+                    mixr->sixteenth_note_tick,
+                    mixr->tick);
+            }
 
             if (drumr->multi_pattern_mode) {
                 drumr->cur_pattern_iteration--;
@@ -178,6 +180,26 @@ double drum_gennext(void *self)
                 if (drumr->game_generation++ > 4) {
                     drumr->patterns[drumr->cur_pattern] = seed_pattern();
                     drumr->game_generation = 0;
+                }
+                if (drumr->max_generation != 0 &&
+                        drumr->game_generation >= drumr->max_generation)
+                {
+                    if(mixr->debug_mode)
+                        printf("passed max generation of life - stopping\n");
+                    drumr->game_generation = 0;
+                    seq_set_game_of_life(drumr, 0);
+                }
+            }
+            else if (drumr->markov_on) {
+                next_markov_generation(drumr);
+                drumr->markov_generation++;
+                if (drumr->max_generation != 0 &&
+                        drumr->markov_generation >= drumr->max_generation)
+                {
+                    if(mixr->debug_mode)
+                        printf("passed max generation of markov - stopping\n");
+                    drumr->game_generation = 0;
+                    seq_set_markov(drumr, 0);
                 }
             }
         }
@@ -306,10 +328,9 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
 }
 
 // game of life algo
-void next_life_generation(void *d)
+void next_life_generation(DRUM *self)
 {
     // printf("NEXT LIFE GEN!\n");
-    DRUM *self = d;
     memset(self->matrix1, 0, sizeof self->matrix1);
     memset(self->matrix2, 0, sizeof self->matrix2);
     int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
@@ -362,6 +383,134 @@ void next_life_generation(void *d)
     self->patterns[self->cur_pattern] = new_pattern;
 }
 
+void next_markov_generation(DRUM *d)
+{
+    int new_pattern = 0;
+
+    for (int i = 32768; i > 0; i = i >> 1) {
+
+        int randy = rand() % 100;
+        if (mixr->debug_mode)
+           printf("Iiii %d Randy! %d\n", i, randy);
+
+        if (d->markov_mode == MARKOVHAUS)
+        {
+            if (mixr->debug_mode)
+                printf("HAUS MUSIC ALL NIGHT LONG!\n");
+
+            switch(i){
+            case 32768:
+                randy < 95 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 16384:
+                randy < 5 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 8192:
+                randy < 5 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 4096:
+                randy < 5 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 2048:
+                randy < 95 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 1024:
+                randy < 5 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 512:
+                randy < 5 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 256:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 128:
+                randy < 95 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 64:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 32:
+                randy < 5 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 16:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 8:
+                randy < 95 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 4:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 2:
+                randy < 9 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 1:
+                randy < 11 ? new_pattern = new_pattern | i : 0;
+                break;
+            }
+        }
+        else if (d->markov_mode == MARKOVBOOMBAP)
+        {
+            if (mixr->debug_mode)
+                printf("88 y'all!!\n");
+            switch(i){
+            case 32768:
+                randy < 95 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 16384:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 8192:
+                randy < 5 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 4096:
+                randy < 85 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 2048:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 1024:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 512:
+                randy < 15 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 256:
+                randy < 2 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 128:
+                randy < 95 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 64:
+                randy < 12 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 32:
+                randy < 12 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 16:
+                randy < 22 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 8:
+                randy < 15 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 4:
+                randy < 12 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 2:
+                randy < 9 ? new_pattern = new_pattern | i : 0;
+                break;
+            case 1:
+                randy < 41 ? new_pattern = new_pattern | i : 0;
+                break;
+            }
+        }
+    }
+
+    if (mixr->debug_mode)
+        printf("New pattern! %d\n", new_pattern);
+    d->patterns[d->cur_pattern] = new_pattern;
+}
+
 // void update_pattern(void *self, int newpattern)
 // {
 //     DRUM *drumr = self;
@@ -372,11 +521,11 @@ void drum_status(void *self, wchar_t *status_string)
 {
     DRUM *drumr = self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_BLUE "[SEQUENCER] \"%s\" Vol: %.2lf Cur: %d "
-                              "life_mode: %d Multi: %d Swing: %d",
+             WANSI_COLOR_BLUE "[SEQUENCER] \"%s\" Vol: %.2lf Cur: %d life_mode: %d "
+                              "markov_on: %d markov_mode: %s Multi: %d Swing: %d Max Gen: %d",
              basename(drumr->filename), drumr->vol, drumr->cur_pattern,
-             drumr->game_of_life_on, drumr->multi_pattern_mode,
-             drumr->swing_setting);
+             drumr->game_of_life_on, drumr->markov_on, drumr->markov_mode ? "boombap" : "haus",  drumr->multi_pattern_mode,
+             drumr->swing_setting, drumr->max_generation);
     wchar_t pattern_details[128];
     char spattern[17];
     wchar_t apattern[17];
@@ -518,17 +667,51 @@ void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops)
     }
 }
 
-void seq_toggle_game_of_life(DRUM *d, bool on)
+void seq_set_game_of_life(DRUM *d, bool b)
 {
-    if (on) {
-        d->backup_pattern_while_game_of_life_on = d->patterns[0];
-        d->multi_pattern_mode = false;
-        d->cur_pattern = 0;
+    d->game_generation = 0;
+    if (b) {
         d->game_of_life_on = true;
+        seq_set_backup_mode(d, b);
     }
     else {
-        d->patterns[0] = d->backup_pattern_while_game_of_life_on;
-        d->multi_pattern_mode = true;
         d->game_of_life_on = false;
+        seq_set_backup_mode(d, b);
     }
+}
+
+void seq_set_markov(DRUM *d, bool b)
+{
+    d->markov_generation = 0;
+    if (b) {
+        d->markov_on = true;
+        seq_set_backup_mode(d, b);
+    }
+    else {
+        d->markov_on = false;
+        seq_set_backup_mode(d, b);
+    }
+}
+
+void seq_set_backup_mode(DRUM *d, bool on)
+{
+    if (on) {
+        d->backup_pattern_while_getting_crazy = d->patterns[0];
+        d->multi_pattern_mode = false;
+        d->cur_pattern = 0;
+    }
+    else {
+        d->patterns[0] = d->backup_pattern_while_getting_crazy;
+        d->multi_pattern_mode = true;
+    }
+}
+
+void seq_set_max_generations(DRUM *d, int max)
+{
+    d->max_generation = max;
+}
+
+void seq_set_markov_mode(DRUM *d, unsigned int mode)
+{
+    d->markov_mode = mode;
 }
