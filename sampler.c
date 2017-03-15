@@ -347,7 +347,7 @@ void sampler_scramble(SAMPLER *s)
 
     double *scrambled = s->scramblrrr->resampled_file_bytes;
     int len = s->scramblrrr->resampled_file_size;
-    int len16th = len / 16;
+    int len16th = len / s->scramblrrr->loop_len / 16;
 
     // take a copy of the first 16th that we can randomly inject below.
     double first16th[len16th];
