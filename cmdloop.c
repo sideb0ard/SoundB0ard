@@ -349,7 +349,7 @@ void interpret(char *line)
                             }
                             else {
                                 printf("Toggling sTUTTER..\n");
-                                int new_mode = 1 - s->scramblrrr_mode;
+                                int new_mode = 1 - s->stutter_mode;
                                 sampler_set_stutter_mode(s, new_mode);
                             }
                         }
