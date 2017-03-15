@@ -50,6 +50,22 @@ double sampler_gennext(void *self)
         }
     }
 
+    if (sampler->stutter_mode &&
+        (mixr->cur_sample % (sampler->scramblrrr->resampled_file_size / 16) ==
+         0)) {
+        if (mixr->debug_mode)
+            printf("Stutututututter! Current: %d\n",
+                   sampler->stutter_current_16th);
+        if (rand() % 100 > 60) {
+            if (mixr->debug_mode)
+                printf("Advancing stutter 16th..\n");
+            sampler->stutter_current_16th++;
+            if (sampler->stutter_current_16th == 16) {
+                sampler->stutter_current_16th = 0;
+            }
+        }
+    }
+
     if (sampler->scramblrrr_mode &&
         (mixr->cur_sample % (sampler->scramblrrr->resampled_file_size * 4) ==
          0)) {
@@ -77,11 +93,18 @@ double sampler_gennext(void *self)
         }
     }
 
-    if (sampler->scramblrrr_mode) {
+    if (sampler->stutter_mode) {
+        int len16th = sampler->scramblrrr->resampled_file_size / 16;
+        int stutidx =
+            (sampler->samples[sampler->cur_sample]->position % len16th) +
+            sampler->stutter_current_16th * len16th;
+        val = sampler->samples[sampler->cur_sample]
+                  ->resampled_file_bytes[stutidx];
+        sampler->samples[sampler->cur_sample]->position++;
+    }
+    else if (sampler->scramblrrr_mode) {
         val = sampler->scramblrrr
                   ->resampled_file_bytes[sampler->scramblrrr->position++];
-        // printf("Val! %f // Position! %d\n", val,
-        // sampler->scramblrrr->position);
         sampler->samples[sampler->cur_sample]
             ->position++; // keep increasing normal sample
     }
@@ -270,11 +293,12 @@ void sample_resample_to_loop_size(file_sample *fs)
 void sampler_status(void *self, wchar_t *status_string)
 {
     SAMPLER *sampler = self;
-    swprintf(
-        status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
-        "[LOOPER] Vol: %.2lf Multi: %d Current Sample: %d ScramblrrrMode: %s MaxGen: %d",
-        sampler->vol, sampler->multi_sample_mode, sampler->cur_sample,
-        sampler->scramblrrr_mode ? "true" : "false", sampler->max_scramble_generation);
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             WCOOL_COLOR_GREEN "[LOOPER] Vol: %.2lf Multi: %d Current Sample: "
+                               "%d ScramblrrrMode: %s MaxGen: %d",
+             sampler->vol, sampler->multi_sample_mode, sampler->cur_sample,
+             sampler->scramblrrr_mode ? "true" : "false",
+             sampler->max_generation);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {
@@ -338,8 +362,10 @@ void sampler_set_scramble_mode(SAMPLER *s, bool b)
 
 void sampler_set_max_scramble_generation(SAMPLER *s, int max)
 {
-    s->max_scramble_generation = max;
+    s->max_generation = max;
 }
+
+void sampler_set_stutter_mode(SAMPLER *s, bool b) { s->stutter_mode = b; }
 
 void sampler_scramble(SAMPLER *s)
 {
@@ -361,9 +387,9 @@ void sampler_scramble(SAMPLER *s)
     for (int i = 0; i < len16th; i++) {
         first16th[i] = scrambled[i];
         rev16th[(len16th - 1) - i] = scrambled[i];
-        third16th[i] = scrambled[i+len16th*3];
-        fourth16th[i] = scrambled[i+len16th*4];
-        seventh16th[i] = scrambled[i+len16th*7];
+        third16th[i] = scrambled[i + len16th * 3];
+        fourth16th[i] = scrambled[i + len16th * 4];
+        seventh16th[i] = scrambled[i + len16th * 7];
     }
 
     bool yolo = false;
@@ -387,7 +413,6 @@ void sampler_scramble(SAMPLER *s)
                     reverse = true;
             }
             dice2 = rand() % 100;
-
         }
 
         if (yolo) {
@@ -400,41 +425,48 @@ void sampler_scramble(SAMPLER *s)
             if (s->scramble_counter % 2 != 0)
                 s->scramblrrr->resampled_file_bytes[i] =
                     s->samples[s->cur_sample]->resampled_file_bytes[i];
-            else
-            {
+            else {
                 if (dice2 < 7)
-                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = third16th[i%len16th];
+                    s->scramblrrr
+                        ->resampled_file_bytes[(i + len16th * 2) % len] =
+                        third16th[i % len16th];
                 else if (dice2 >= 8 && dice2 < 15)
-                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = fourth16th[i%len16th];
+                    s->scramblrrr
+                        ->resampled_file_bytes[(i + len16th * 2) % len] =
+                        fourth16th[i % len16th];
                 else if (dice2 >= 16 && dice2 < 22)
-                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = seventh16th[i%len16th];
+                    s->scramblrrr
+                        ->resampled_file_bytes[(i + len16th * 2) % len] =
+                        seventh16th[i % len16th];
                 // TODO -- maybe later
-                //else if (dice2 >= 22 && dice2 < 87 && s->scramble_counter % 3 == 0) {
+                // else if (dice2 >= 22 && dice2 < 87 && s->scramble_counter % 3
+                // == 0) {
                 //    printf("CRAZY SHIT!\n");
                 //    copyfirsthalf = true;
                 //    break;
                 //}
                 else
-                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] =
+                    s->scramblrrr
+                        ->resampled_file_bytes[(i + len16th * 2) % len] =
                         s->samples[s->cur_sample]->resampled_file_bytes[i];
             }
         }
     }
-    if (copyfirsthalf)
-    {
+    if (copyfirsthalf) {
         int halflen = len / 2;
         for (int i = 0; i < halflen; i++)
-           s->scramblrrr->resampled_file_bytes[i+halflen] = s->samples[s->cur_sample]->resampled_file_bytes[i]; 
+            s->scramblrrr->resampled_file_bytes[i + halflen] =
+                s->samples[s->cur_sample]->resampled_file_bytes[i];
     }
 
     if (mixr->debug_mode)
-        printf("Looper: Max Gen: %d // Current Gen: %d\n", s->max_scramble_generation, s->scramble_generation);
+        printf("Looper: Max Gen: %d // Current Gen: %d\n", s->max_generation,
+               s->scramble_generation);
 
-    if (s->max_scramble_generation > 0 && s->scramble_generation >= s->max_scramble_generation)
-    {
+    if (s->max_generation > 0 && s->scramble_generation >= s->max_generation) {
         printf("Max GEn! We outta here... peace\n");
         s->scramble_generation = 0;
-        s->max_scramble_generation = 0;
+        s->max_generation = 0;
         s->scramblrrr_mode = false;
     }
 }

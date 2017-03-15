@@ -17,7 +17,7 @@ typedef struct t_sample_pos {
     int played;
 } sample_pos;
 
-typedef enum {MARKOVHAUS, MARKOVBOOMBAP} markovmodez;
+typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;
 
 typedef struct t_drumr {
     SOUNDGEN sound_generator;
@@ -51,11 +51,11 @@ typedef struct t_drumr {
     bool started; // to sync at top of loop
 
     bool game_of_life_on;
-    int  game_generation;
+    int game_generation;
 
     bool markov_on;
     unsigned int markov_mode; // MARKOVHAUS or MARKOVBOOMBAP
-    int  markov_generation;
+    int markov_generation;
 
     int max_generation; // used for game of life or markov chain
 } DRUM;

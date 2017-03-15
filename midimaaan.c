@@ -300,10 +300,9 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
 void midi_melody_quantize(midi_event **melody)
 {
     printf("Quantizzzzzzing\n");
-    for (int i = 0; i < PPNS; i++)
-    {
+    for (int i = 0; i < PPNS; i++) {
         if (melody[i]) {
-            int tick =  melody[i]->tick;
+            int tick = melody[i]->tick;
             int amendedtick = 0;
             printf("TICK NOM: %d\n", melody[i]->tick);
             int tickdiv16 = tick / 16;
@@ -314,8 +313,9 @@ void midi_melody_quantize(midi_event **melody)
             else
                 amendedtick = upper16th;
 
-            // TODO - do i need a mutex or protection here - melody[tick] is being read from other thread
-            melody[i]->tick = amendedtick; 
+            // TODO - do i need a mutex or protection here - melody[tick] is
+            // being read from other thread
+            melody[i]->tick = amendedtick;
             printf("Amended TICK: %d\n", amendedtick);
         }
     }

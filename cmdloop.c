@@ -110,7 +110,8 @@ void interpret(char *line)
 
         else if (strncmp("quiet", wurds[0], 5) == 0) {
             for (int i = 0; i < mixr->soundgen_num; i++)
-                mixr->sound_generators[i]->setvol(mixr->sound_generators[i],0.0);
+                mixr->sound_generators[i]->setvol(mixr->sound_generators[i],
+                                                  0.0);
         }
         else if (strncmp("ls", wurds[0], 2) == 0) {
             list_sample_dir();
@@ -197,7 +198,8 @@ void interpret(char *line)
                             }
                         }
                         else {
-                            // TODO -- this looks fragile - only used in two of the below situs
+                            // TODO -- this looks fragile - only used in two of
+                            // the below situs
                             char_array_to_seq_string_pattern(pattern, wurds, 5,
                                                              num_wurds);
                             printf("Changing\n");
@@ -206,14 +208,17 @@ void interpret(char *line)
                             if (is_valid_drum_pattern_num(d, pattern_num)) {
                                 if (strncmp("pattern", wurds[4], 7) == 0) {
                                     printf("Changing pattern to %s\n", pattern);
-                                    change_char_pattern(d, pattern_num, pattern);
+                                    change_char_pattern(d, pattern_num,
+                                                        pattern);
                                 }
                                 else if (strncmp("amp", wurds[4], 3) == 0) {
-                                    printf("Setting pattern AMP to %s\n", pattern);
+                                    printf("Setting pattern AMP to %s\n",
+                                           pattern);
                                     drum_set_sample_amp_from_char_pattern(
                                         d, pattern_num, pattern);
                                 }
-                                else if (strncmp("numloops", wurds[4], 8) == 0) {
+                                else if (strncmp("numloops", wurds[4], 8) ==
+                                         0) {
                                     int numloops = atoi(wurds[5]);
                                     if (numloops != 0) {
                                         drumr_change_num_loops(d, pattern_num,
@@ -243,12 +248,15 @@ void interpret(char *line)
                         int num_gens = atoi(wurds[3]);
                         if (num_gens > 0) {
                             if (mixr->debug_mode)
-                                printf("Enabling game of life for %d generations\n", num_gens);
+                                printf("Enabling game of life for %d "
+                                       "generations\n",
+                                       num_gens);
                             seq_set_game_of_life(d, 1);
                             seq_set_max_generations(d, num_gens);
                         }
                         else {
-                            printf("Toggling game of life for %d\n", soundgen_num);
+                            printf("Toggling game of life for %d\n",
+                                   soundgen_num);
                             seq_set_game_of_life(d, 1 - d->game_of_life_on);
                         }
                     }
@@ -256,7 +264,9 @@ void interpret(char *line)
                         int num_gens = atoi(wurds[3]);
                         if (num_gens > 0) {
                             if (mixr->debug_mode)
-                                printf("Enabling Markov mode for %d generations\n", num_gens);
+                                printf(
+                                    "Enabling Markov mode for %d generations\n",
+                                    num_gens);
                             seq_set_markov(d, 1);
                             seq_set_max_generations(d, num_gens);
                         }
@@ -315,8 +325,7 @@ void interpret(char *line)
                             sampler_set_scramble_mode(s, false);
                         else {
                             int max_gen = atoi(wurds[3]);
-                            if (max_gen > 0)
-                            {
+                            if (max_gen > 0) {
                                 sampler_set_max_scramble_generation(s, max_gen);
                                 sampler_set_scramble_mode(s, true);
                             }
@@ -324,6 +333,24 @@ void interpret(char *line)
                                 printf("Toggling scramble..\n");
                                 int new_mode = 1 - s->scramblrrr_mode;
                                 sampler_set_scramble_mode(s, new_mode);
+                            }
+                        }
+                    }
+                    else if (strncmp("stutter", wurds[2], 7) == 0) {
+                        if (strncmp(wurds[3], "true", 4) == 0)
+                            sampler_set_stutter_mode(s, true);
+                        else if (strncmp(wurds[3], "false", 5) == 0)
+                            sampler_set_stutter_mode(s, false);
+                        else {
+                            int max_gen = atoi(wurds[3]);
+                            if (max_gen > 0) {
+                                sampler_set_stutter_mode(s, true);
+                                // TODO set max gen
+                            }
+                            else {
+                                printf("Toggling sTUTTER..\n");
+                                int new_mode = 1 - s->scramblrrr_mode;
+                                sampler_set_stutter_mode(s, new_mode);
                             }
                         }
                     }
@@ -646,7 +673,7 @@ void interpret(char *line)
                     }
                 }
                 else if (strncmp("modtype", wurds[3], 7) == 0 ||
-                    strncmp("lfotype", wurds[3], 7) == 0) {
+                         strncmp("lfotype", wurds[3], 7) == 0) {
                     if (mixr->sound_generators[soundgen_num]
                             ->effects[fx_num]
                             ->type == MODDELAY) {
@@ -688,9 +715,12 @@ void interpret(char *line)
                 }
                 else if (strncmp("wetmix", wurds[3], 6) == 0) {
                     if (mixr->sound_generators[soundgen_num]
+                            ->effects[fx_num]
+                            ->type == REVERB) {
+                        reverb *r =
+                            (reverb *)mixr->sound_generators[soundgen_num]
                                 ->effects[fx_num]
-                                ->type == REVERB) {
-                        reverb *r = (reverb *) mixr->sound_generators[soundgen_num]->effects[fx_num]->r;
+                                ->r;
                         int wetmix = atoi(wurds[4]);
                         if (0 <= wetmix && wetmix <= 100)
                             r->m_wet_pct = wetmix;

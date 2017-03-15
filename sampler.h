@@ -42,10 +42,16 @@ typedef struct t_sampler {
     double vol;
     bool started;
     bool just_been_resampled;
+
     bool scramblrrr_mode;
     int scramble_counter;
     int scramble_generation;
-    int max_scramble_generation;
+
+    bool stutter_mode;
+    int stutter_current_16th;
+    int stutter_generation;
+
+    int max_generation;
 
 } SAMPLER;
 
@@ -56,6 +62,8 @@ file_sample *sampler_create_sample(char *filename, int loop_len);
 void sampler_scramble(SAMPLER *s);
 void sampler_set_scramble_mode(SAMPLER *s, bool b);
 void sampler_set_max_scramble_generation(SAMPLER *s, int max);
+
+void sampler_set_stutter_mode(SAMPLER *s, bool b);
 
 void sampler_set_multi_sample_mode(SAMPLER *s, bool multi);
 void sampler_switch_sample(SAMPLER *s, int sample_num);

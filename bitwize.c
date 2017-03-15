@@ -78,15 +78,15 @@ double bitwize_gennext(void *self)
     yn = lfo_do_oscillate((oscillator *)b->m_lfo, &yqn);
 
     int tick = mixr->cur_sample % 9600000000;
-    //int tick = mixr->sixteenth_note_tick;
+    // int tick = mixr->sixteenth_note_tick;
 
-    if (b->tick != tick)
-    {
+    if (b->tick != tick) {
         b->tick = tick;
         b->current_val = scale_val;
     }
 
-    //printf("VAL: %d, SCALE_VAL: %f SCALED: %f CURRENT: %f \n", val, scale_val, scaled, b->current_val);
+    // printf("VAL: %d, SCALE_VAL: %f SCALED: %f CURRENT: %f \n", val,
+    // scale_val, scaled, b->current_val);
 
     double return_val = b->current_val;
 
@@ -94,8 +94,8 @@ double bitwize_gennext(void *self)
     return_val = envelopor(&b->sound_generator, return_val);
 
     ////printf("VAL:%f\n", return_val);
-    //return return_val * 0.4 * yn;
-    return return_val * 0.4 ;
+    // return return_val * 0.4 * yn;
+    return return_val * 0.4;
 }
 
 void bitwize_status(void *self, wchar_t *status_string)

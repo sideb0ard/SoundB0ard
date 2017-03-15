@@ -163,8 +163,8 @@ LOWPASS	effect.h	/^    LOWPASS,$/;"	e	enum:__anon8
 LPF1	filter.h	/^    LPF1,$/;"	e	enum:__anon12
 LPF2	filter.h	/^    LPF2,$/;"	e	enum:__anon12
 LPF4	filter.h	/^    LPF4,$/;"	e	enum:__anon12
-MARKOVBOOMBAP	drumr.h	/^typedef enum {MARKOVHAUS, MARKOVBOOMBAP} markovmodez;$/;"	e	enum:__anon7
-MARKOVHAUS	drumr.h	/^typedef enum {MARKOVHAUS, MARKOVBOOMBAP} markovmodez;$/;"	e	enum:__anon7
+MARKOVBOOMBAP	drumr.h	/^typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;$/;"	e	enum:__anon7
+MARKOVHAUS	drumr.h	/^typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;$/;"	e	enum:__anon7
 MAXCHARS	sparkline.c	/^#define MAXCHARS /;"	d	file:
 MAX_CMDS	algorithm.h	/^#define MAX_CMDS /;"	d
 MAX_CMD_LEN	algorithm.h	/^#define MAX_CMD_LEN /;"	d
@@ -633,7 +633,7 @@ frequency	algorithm.h	/^    unsigned int frequency;$/;"	m	struct:algorithm
 frequency	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	t	typeref:enum:__anon1
 frequency_of_wakeup	chaosmonkey.h	/^    int frequency_of_wakeup;    \/\/ seconds$/;"	m	struct:chaosmonkey
 freqval	utils.c	/^float freqval(char *n)$/;"	f
-game_generation	drumr.h	/^    int  game_generation;$/;"	m	struct:t_drumr
+game_generation	drumr.h	/^    int game_generation;$/;"	m	struct:t_drumr
 game_of_life_on	drumr.h	/^    bool game_of_life_on;$/;"	m	struct:t_drumr
 gen_next	mixer.c	/^double gen_next(mixer *mixr)$/;"	f
 gennext	filter.h	/^    double (*gennext)(filter *self, double xn); \/\/ do_filter$/;"	m	struct:filter
@@ -1029,10 +1029,10 @@ m_z11	filter_sem.h	/^    double m_z11;$/;"	m	struct:filter_sem
 m_z12	filter_sem.h	/^    double m_z12;$/;"	m	struct:filter_sem
 main	main.c	/^int main()$/;"	f
 make_suggestion	chaosmonkey.h	/^    bool make_suggestion;$/;"	m	struct:chaosmonkey
-markov_generation	drumr.h	/^    int  markov_generation;$/;"	m	struct:t_drumr
+markov_generation	drumr.h	/^    int markov_generation;$/;"	m	struct:t_drumr
 markov_mode	drumr.h	/^    unsigned int markov_mode; \/\/ MARKOVHAUS or MARKOVBOOMBAP$/;"	m	struct:t_drumr
 markov_on	drumr.h	/^    bool markov_on;$/;"	m	struct:t_drumr
-markovmodez	drumr.h	/^typedef enum {MARKOVHAUS, MARKOVBOOMBAP} markovmodez;$/;"	t	typeref:enum:__anon7
+markovmodez	drumr.h	/^typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;$/;"	t	typeref:enum:__anon7
 matrix1	drumr.h	/^    int matrix1[GRIDWIDTH][GRIDWIDTH];$/;"	m	struct:t_drumr
 matrix2	drumr.h	/^    int matrix2[GRIDWIDTH][GRIDWIDTH];$/;"	m	struct:t_drumr
 matrix_clear_destinations	modmatrix.c	/^void matrix_clear_destinations(modmatrix *self)$/;"	f
@@ -1044,7 +1044,7 @@ matrix_to_int	drumr.c	/^int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])$/;"	
 matrix_transformations	modmatrix.h	/^} matrix_transformations;$/;"	t	typeref:enum:__anon20
 matrixrow	modmatrix.h	/^} matrixrow;$/;"	t	typeref:struct:__anon21
 max_generation	drumr.h	/^    int max_generation; \/\/ used for game of life or markov chain$/;"	m	struct:t_drumr
-max_scramble_generation	sampler.h	/^    int max_scramble_generation;$/;"	m	struct:t_sampler
+max_generation	sampler.h	/^    int max_generation;$/;"	m	struct:t_sampler
 maxpoint	envelope.c	/^ENVELOPE maxpoint(const ENVELOPE *points, long npoints)$/;"	f
 melodies	minisynth.h	/^    midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];$/;"	m	struct:minisynth
 melody_multiloop_count	minisynth.h	/^    int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];$/;"	m	struct:minisynth
@@ -1315,6 +1315,7 @@ sampler_scramble	sampler.c	/^void sampler_scramble(SAMPLER *s)$/;"	f
 sampler_set_max_scramble_generation	sampler.c	/^void sampler_set_max_scramble_generation(SAMPLER *s, int max)$/;"	f
 sampler_set_multi_sample_mode	sampler.c	/^void sampler_set_multi_sample_mode(SAMPLER *s, bool multi)$/;"	f
 sampler_set_scramble_mode	sampler.c	/^void sampler_set_scramble_mode(SAMPLER *s, bool b)$/;"	f
+sampler_set_stutter_mode	sampler.c	/^void sampler_set_stutter_mode(SAMPLER *s, bool b)$/;"	f
 sampler_setvol	sampler.c	/^void sampler_setvol(void *self, double v)$/;"	f
 sampler_status	sampler.c	/^void sampler_status(void *self, wchar_t *status_string)$/;"	f
 sampler_switch_sample	sampler.c	/^void sampler_switch_sample(SAMPLER *s, int sample_num)$/;"	f
@@ -1340,8 +1341,8 @@ semitones_between_frequencies	utils.c	/^double semitones_between_frequencies(dou
 seq_set_backup_mode	drumr.c	/^void seq_set_backup_mode(DRUM *d, bool on)$/;"	f
 seq_set_game_of_life	drumr.c	/^void seq_set_game_of_life(DRUM *d, bool b)$/;"	f
 seq_set_markov	drumr.c	/^void seq_set_markov(DRUM *d, bool b)$/;"	f
-seq_set_markov_mode	drumr.c	/^void seq_set_markov_mode(DRUM *d, unsigned int mode)$/;"	f
-seq_set_max_generations	drumr.c	/^void seq_set_max_generations(DRUM *d, int max)$/;"	f
+seq_set_markov_mode	drumr.c	/^void seq_set_markov_mode(DRUM *d, unsigned int mode) { d->markov_mode = mode; }$/;"	f
+seq_set_max_generations	drumr.c	/^void seq_set_max_generations(DRUM *d, int max) { d->max_generation = max; }$/;"	f
 set_fc_mod	filter.h	/^    void (*set_fc_mod)(filter *self, double d);$/;"	m	struct:filter
 set_matrix_core	modmatrix.c	/^void set_matrix_core(modmatrix *self, matrixrow **matrix)$/;"	f
 set_q_control	filter.h	/^    void (*set_q_control)(filter *self, double d);$/;"	m	struct:filter
@@ -1390,6 +1391,9 @@ stereodelay	stereodelay.h	/^} stereodelay;$/;"	t	typeref:struct:stereodelay
 stop_oscillator	oscillator.h	/^    void (*stop_oscillator)(oscillator *self);$/;"	m	struct:oscillator
 strategies	obliquestrategies.c	/^char *strategies[NUM_STATEGIES] = {$/;"	v
 strim	utils.c	/^void strim(const char *input, char *result)$/;"	f
+stutter_current_16th	sampler.h	/^    int stutter_current_16th;$/;"	m	struct:t_sampler
+stutter_generation	sampler.h	/^    int stutter_generation;$/;"	m	struct:t_sampler
+stutter_mode	sampler.h	/^    bool stutter_mode;$/;"	m	struct:t_sampler
 sustain	minisynth.h	/^    int sustain;$/;"	m	struct:minisynth
 sustain_level	synthfunctions.h	/^    double sustain_level;$/;"	m	struct:__anon30
 swing	drumr.h	/^    int swing;$/;"	m	struct:t_drumr
