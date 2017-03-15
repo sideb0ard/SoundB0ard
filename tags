@@ -1044,6 +1044,7 @@ matrix_to_int	drumr.c	/^int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])$/;"	
 matrix_transformations	modmatrix.h	/^} matrix_transformations;$/;"	t	typeref:enum:__anon20
 matrixrow	modmatrix.h	/^} matrixrow;$/;"	t	typeref:struct:__anon21
 max_generation	drumr.h	/^    int max_generation; \/\/ used for game of life or markov chain$/;"	m	struct:t_drumr
+max_scramble_generation	sampler.h	/^    int max_scramble_generation;$/;"	m	struct:t_sampler
 maxpoint	envelope.c	/^ENVELOPE maxpoint(const ENVELOPE *points, long npoints)$/;"	f
 melodies	minisynth.h	/^    midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];$/;"	m	struct:minisynth
 melody_multiloop_count	minisynth.h	/^    int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];$/;"	m	struct:minisynth
@@ -1311,11 +1312,12 @@ sampler_gennext	sampler.c	/^double sampler_gennext(void *self)$/;"	f
 sampler_getvol	sampler.c	/^double sampler_getvol(void *self)$/;"	f
 sampler_resample_to_loop_size	sampler.c	/^void sampler_resample_to_loop_size(SAMPLER *s)$/;"	f
 sampler_scramble	sampler.c	/^void sampler_scramble(SAMPLER *s)$/;"	f
+sampler_set_max_scramble_generation	sampler.c	/^void sampler_set_max_scramble_generation(SAMPLER *s, int max)$/;"	f
 sampler_set_multi_sample_mode	sampler.c	/^void sampler_set_multi_sample_mode(SAMPLER *s, bool multi)$/;"	f
+sampler_set_scramble_mode	sampler.c	/^void sampler_set_scramble_mode(SAMPLER *s, bool b)$/;"	f
 sampler_setvol	sampler.c	/^void sampler_setvol(void *self, double v)$/;"	f
 sampler_status	sampler.c	/^void sampler_status(void *self, wchar_t *status_string)$/;"	f
 sampler_switch_sample	sampler.c	/^void sampler_switch_sample(SAMPLER *s, int sample_num)$/;"	f
-sampler_toggle_scramble_mode	sampler.c	/^void sampler_toggle_scramble_mode(SAMPLER *s)$/;"	f
 samplerate	drumr.h	/^    int samplerate;$/;"	m	struct:t_drumr
 samplerate	sampler.h	/^    int samplerate;$/;"	m	struct:file_sample
 samples	sampler.h	/^    file_sample *samples[MAX_SAMPLES_PER_LOOPER];$/;"	m	struct:t_sampler
@@ -1325,6 +1327,7 @@ sbmsg	sbmsg.h	/^typedef struct sbmsg {$/;"	s
 scal	effect.h	/^    double scal;$/;"	m	struct:__anon9
 scaleybum	utils.c	/^double scaleybum(double cur_min, double cur_max, double new_min, double new_max,$/;"	f
 scramble_counter	sampler.h	/^    int scramble_counter;$/;"	m	struct:t_sampler
+scramble_generation	sampler.h	/^    int scramble_generation;$/;"	m	struct:t_sampler
 scramblrrr	sampler.h	/^    file_sample *scramblrrr; \/\/ for storing scrambled effect version of loop$/;"	m	struct:t_sampler
 scramblrrr_mode	sampler.h	/^    bool scramblrrr_mode;$/;"	m	struct:t_sampler
 seed_pattern	drumr.c	/^int seed_pattern()$/;"	f

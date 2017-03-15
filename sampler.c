@@ -60,6 +60,7 @@ double sampler_gennext(void *self)
     if (sampler->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
         printf("Resyncing after resample...zzzz\n");
         sampler->samples[sampler->cur_sample]->position = 0;
+        sampler->scramblrrr->position = 0;
         sampler->just_been_resampled = false;
     }
 
@@ -196,8 +197,12 @@ void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len)
 {
     if (loop_len > 0 && sample_num < s->num_samples) {
         file_sample *fs = s->samples[sample_num];
+
         fs->loop_len = loop_len;
         sample_resample_to_loop_size(fs);
+
+        s->scramblrrr->loop_len = loop_len;
+        sample_resample_to_loop_size(s->scramblrrr);
     }
 }
 
@@ -267,9 +272,9 @@ void sampler_status(void *self, wchar_t *status_string)
     SAMPLER *sampler = self;
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
-        "[LOOPER] Vol: %.2lf Multi: %d Current Sample: %d ScramblrrrMode: %s",
+        "[LOOPER] Vol: %.2lf Multi: %d Current Sample: %d ScramblrrrMode: %s MaxGen: %d",
         sampler->vol, sampler->multi_sample_mode, sampler->cur_sample,
-        sampler->scramblrrr_mode ? "true" : "false");
+        sampler->scramblrrr_mode ? "true" : "false", sampler->max_scramble_generation);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {
@@ -316,9 +321,9 @@ void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops)
     }
 }
 
-void sampler_toggle_scramble_mode(SAMPLER *s)
+void sampler_set_scramble_mode(SAMPLER *s, bool b)
 {
-    s->scramblrrr_mode = 1 - s->scramblrrr_mode;
+    s->scramblrrr_mode = b;
     s->scramble_counter = 0;
     if (s->scramblrrr_mode == true) {
         int len = s->samples[s->cur_sample]->resampled_file_size;
@@ -331,26 +336,42 @@ void sampler_toggle_scramble_mode(SAMPLER *s)
            s->scramblrrr_mode ? "true" : "false");
 }
 
+void sampler_set_max_scramble_generation(SAMPLER *s, int max)
+{
+    s->max_scramble_generation = max;
+}
+
 void sampler_scramble(SAMPLER *s)
 {
-    int len = s->samples[s->cur_sample]->resampled_file_size;
+    s->scramble_generation++;
+
+    double *scrambled = s->scramblrrr->resampled_file_bytes;
+    int len = s->scramblrrr->resampled_file_size;
     int len16th = len / 16;
 
     // take a copy of the first 16th that we can randomly inject below.
     double first16th[len16th];
     // lets grab a reverse copy too!
     double rev16th[len16th];
-    //
+    // let's go all in!
+    double third16th[len16th];
+    double fourth16th[len16th];
+    double seventh16th[len16th];
+
     for (int i = 0; i < len16th; i++) {
-        first16th[i] = s->samples[s->cur_sample]->resampled_file_bytes[i];
-        rev16th[(len16th - 1) - i] =
-            s->samples[s->cur_sample]->resampled_file_bytes[i];
+        first16th[i] = scrambled[i];
+        rev16th[(len16th - 1) - i] = scrambled[i];
+        third16th[i] = scrambled[i+len16th*3];
+        fourth16th[i] = scrambled[i+len16th*4];
+        seventh16th[i] = scrambled[i+len16th*7];
     }
 
     bool yolo = false;
     bool reverse = false;
+    int dice1, dice2;
 
     for (int i = 0; i < len; i++) {
+
         if (i % len16th == 0) {
             s->scramble_counter++;
             if (yolo || reverse) {
@@ -358,12 +379,14 @@ void sampler_scramble(SAMPLER *s)
                 reverse = false;
             }
             else {
-                int dicey = rand() % 100;
-                if (dicey >= 80 && dicey < 90)
+                dice1 = rand() % 100;
+                if (dice1 >= 85 && dice1 < 95)
                     yolo = true;
-                else if (dicey >= 95)
+                else if (dice1 >= 95)
                     reverse = true;
             }
+            dice2 = rand() % 100;
+
         }
 
         if (yolo) {
@@ -377,8 +400,27 @@ void sampler_scramble(SAMPLER *s)
                 s->scramblrrr->resampled_file_bytes[i] =
                     s->samples[s->cur_sample]->resampled_file_bytes[i];
             else
-                s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] =
-                    s->samples[s->cur_sample]->resampled_file_bytes[i];
+            {
+                if (dice2 < 7)
+                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = third16th[i%len16th];
+                else if (dice2 >= 8 && dice2 < 15)
+                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = fourth16th[i%len16th];
+                else if (dice2 >= 16 && dice2 < 22)
+                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = seventh16th[i%len16th];
+                else
+                    s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] =
+                        s->samples[s->cur_sample]->resampled_file_bytes[i];
+            }
         }
+    }
+    if (mixr->debug_mode)
+        printf("Looper: Max Gen: %d // Current Gen: %d\n", s->max_scramble_generation, s->scramble_generation);
+
+    if (s->max_scramble_generation > 0 && s->scramble_generation >= s->max_scramble_generation)
+    {
+        printf("Max GEn! We outta here... peace\n");
+        s->scramble_generation = 0;
+        s->max_scramble_generation = 0;
+        s->scramblrrr_mode = false;
     }
 }

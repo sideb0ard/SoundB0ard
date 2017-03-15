@@ -309,8 +309,23 @@ void interpret(char *line)
                         }
                     }
                     else if (strncmp("scramble", wurds[2], 8) == 0) {
-                        printf("Switching on scramble mode!\n");
-                        sampler_toggle_scramble_mode(s);
+                        if (strncmp(wurds[3], "true", 4) == 0)
+                            sampler_set_scramble_mode(s, true);
+                        else if (strncmp(wurds[3], "false", 5) == 0)
+                            sampler_set_scramble_mode(s, false);
+                        else {
+                            int max_gen = atoi(wurds[3]);
+                            if (max_gen > 0)
+                            {
+                                sampler_set_max_scramble_generation(s, max_gen);
+                                sampler_set_scramble_mode(s, true);
+                            }
+                            else {
+                                printf("Toggling scramble..\n");
+                                int new_mode = 1 - s->scramblrrr_mode;
+                                sampler_set_scramble_mode(s, new_mode);
+                            }
+                        }
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
