@@ -61,7 +61,7 @@ file_sample *sampler_create_sample(char *filename, int loop_len);
 
 void sampler_scramble(SAMPLER *s);
 void sampler_set_scramble_mode(SAMPLER *s, bool b);
-void sampler_set_max_scramble_generation(SAMPLER *s, int max);
+void sampler_set_max_generation(SAMPLER *s, int max);
 
 void sampler_set_stutter_mode(SAMPLER *s, bool b);
 

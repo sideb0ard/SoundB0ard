@@ -6,7 +6,7 @@ stereodelay *new_stereo_delay()
 {
     stereodelay *d = calloc(1, sizeof(stereodelay));
     d->m_delay_time_ms = 0;
-    d->m_feedback_percent = 50;
+    d->m_feedback_percent = 0;
     d->m_delay_ratio = 0;
     d->m_wet_mix = 0.0;
 

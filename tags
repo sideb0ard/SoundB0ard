@@ -1312,10 +1312,10 @@ sampler_gennext	sampler.c	/^double sampler_gennext(void *self)$/;"	f
 sampler_getvol	sampler.c	/^double sampler_getvol(void *self)$/;"	f
 sampler_resample_to_loop_size	sampler.c	/^void sampler_resample_to_loop_size(SAMPLER *s)$/;"	f
 sampler_scramble	sampler.c	/^void sampler_scramble(SAMPLER *s)$/;"	f
-sampler_set_max_scramble_generation	sampler.c	/^void sampler_set_max_scramble_generation(SAMPLER *s, int max)$/;"	f
+sampler_set_max_generation	sampler.c	/^void sampler_set_max_generation(SAMPLER *s, int max)$/;"	f
 sampler_set_multi_sample_mode	sampler.c	/^void sampler_set_multi_sample_mode(SAMPLER *s, bool multi)$/;"	f
 sampler_set_scramble_mode	sampler.c	/^void sampler_set_scramble_mode(SAMPLER *s, bool b)$/;"	f
-sampler_set_stutter_mode	sampler.c	/^void sampler_set_stutter_mode(SAMPLER *s, bool b) { s->stutter_mode = b; }$/;"	f
+sampler_set_stutter_mode	sampler.c	/^void sampler_set_stutter_mode(SAMPLER *s, bool b)$/;"	f
 sampler_setvol	sampler.c	/^void sampler_setvol(void *self, double v)$/;"	f
 sampler_status	sampler.c	/^void sampler_status(void *self, wchar_t *status_string)$/;"	f
 sampler_switch_sample	sampler.c	/^void sampler_switch_sample(SAMPLER *s, int sample_num)$/;"	f

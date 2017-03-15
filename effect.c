@@ -43,8 +43,8 @@ EFFECT *new_delay(double duration)
 
     stereo_delay_prepare_for_play(e->delay);
     stereo_delay_set_delay_time_ms(e->delay, duration);
-    stereo_delay_set_feedback_percent(e->delay, 90);
-    stereo_delay_set_delay_ratio(e->delay, 0.9);
+    stereo_delay_set_feedback_percent(e->delay, 2);
+    stereo_delay_set_delay_ratio(e->delay, 0.2);
     stereo_delay_set_wet_mix(e->delay, 0.7);
     stereo_delay_set_mode(e->delay, PINGPONG);
 

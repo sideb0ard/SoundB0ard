@@ -326,7 +326,7 @@ void interpret(char *line)
                         else {
                             int max_gen = atoi(wurds[3]);
                             if (max_gen > 0) {
-                                sampler_set_max_scramble_generation(s, max_gen);
+                                sampler_set_max_generation(s, max_gen);
                                 sampler_set_scramble_mode(s, true);
                             }
                             else {
@@ -344,8 +344,8 @@ void interpret(char *line)
                         else {
                             int max_gen = atoi(wurds[3]);
                             if (max_gen > 0) {
+                                sampler_set_max_generation(s, max_gen);
                                 sampler_set_stutter_mode(s, true);
-                                // TODO set max gen
                             }
                             else {
                                 printf("Toggling sTUTTER..\n");

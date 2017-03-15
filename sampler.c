@@ -62,6 +62,14 @@ double sampler_gennext(void *self)
             sampler->stutter_current_16th++;
             if (sampler->stutter_current_16th == 16) {
                 sampler->stutter_current_16th = 0;
+                sampler->stutter_generation++;
+                if (sampler->max_generation != 0 &&
+                    sampler->stutter_generation == sampler->max_generation) {
+                    printf("Max stutter reached - resettinggggzz..\n");
+                    sampler->stutter_generation = 0;
+                    sampler->max_generation = 0;
+                    sampler->stutter_mode = false;
+                }
             }
         }
     }
@@ -293,12 +301,15 @@ void sample_resample_to_loop_size(file_sample *fs)
 void sampler_status(void *self, wchar_t *status_string)
 {
     SAMPLER *sampler = self;
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             WCOOL_COLOR_GREEN "[LOOPER] Vol: %.2lf Multi: %d Current Sample: "
-                               "%d ScramblrrrMode: %s MaxGen: %d",
-             sampler->vol, sampler->multi_sample_mode, sampler->cur_sample,
-             sampler->scramblrrr_mode ? "true" : "false",
-             sampler->max_generation);
+    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
+             "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
+             "ScramblrrrMode: %s ScrambleGen: %d StutterMode: %s "
+             "Stutter Gen: %d MaxGen: %d",
+             sampler->vol, sampler->multi_sample_mode ? "true" : "false",
+             sampler->cur_sample, sampler->scramblrrr_mode ? "true" : "false",
+             sampler->scramble_generation,
+             sampler->stutter_mode ? "true" : "false",
+             sampler->stutter_generation, sampler->max_generation);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < sampler->num_samples; i++) {
@@ -349,6 +360,7 @@ void sampler_set_scramble_mode(SAMPLER *s, bool b)
 {
     s->scramblrrr_mode = b;
     s->scramble_counter = 0;
+    s->scramble_generation = 0;
     if (s->scramblrrr_mode == true) {
         int len = s->samples[s->cur_sample]->resampled_file_size;
         for (int i = 0; i < len; i++)
@@ -360,12 +372,16 @@ void sampler_set_scramble_mode(SAMPLER *s, bool b)
            s->scramblrrr_mode ? "true" : "false");
 }
 
-void sampler_set_max_scramble_generation(SAMPLER *s, int max)
+void sampler_set_max_generation(SAMPLER *s, int max)
 {
     s->max_generation = max;
 }
 
-void sampler_set_stutter_mode(SAMPLER *s, bool b) { s->stutter_mode = b; }
+void sampler_set_stutter_mode(SAMPLER *s, bool b)
+{
+    s->stutter_generation = 0;
+    s->stutter_mode = b;
+}
 
 void sampler_scramble(SAMPLER *s)
 {
