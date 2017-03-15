@@ -368,6 +368,7 @@ void sampler_scramble(SAMPLER *s)
 
     bool yolo = false;
     bool reverse = false;
+    bool copyfirsthalf = false;
     int dice1, dice2;
 
     for (int i = 0; i < len; i++) {
@@ -407,12 +408,25 @@ void sampler_scramble(SAMPLER *s)
                     s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = fourth16th[i%len16th];
                 else if (dice2 >= 16 && dice2 < 22)
                     s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] = seventh16th[i%len16th];
+                // TODO -- maybe later
+                //else if (dice2 >= 22 && dice2 < 87 && s->scramble_counter % 3 == 0) {
+                //    printf("CRAZY SHIT!\n");
+                //    copyfirsthalf = true;
+                //    break;
+                //}
                 else
                     s->scramblrrr->resampled_file_bytes[(i + len16th * 2) % len] =
                         s->samples[s->cur_sample]->resampled_file_bytes[i];
             }
         }
     }
+    if (copyfirsthalf)
+    {
+        int halflen = len / 2;
+        for (int i = 0; i < halflen; i++)
+           s->scramblrrr->resampled_file_bytes[i+halflen] = s->samples[s->cur_sample]->resampled_file_bytes[i]; 
+    }
+
     if (mixr->debug_mode)
         printf("Looper: Max Gen: %d // Current Gen: %d\n", s->max_scramble_generation, s->scramble_generation);
 
