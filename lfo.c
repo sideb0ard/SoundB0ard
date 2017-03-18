@@ -28,7 +28,7 @@ void lfo_set_soundgenerator_interface(lfo *l)
     l->osc.reset_oscillator = &lfo_reset_oscillator;
     l->osc.update_oscillator = &osc_update; // base clase impl
 
-    l->osc.m_lfo_mode = sync;
+    l->osc.m_lfo_mode = LFOSYNC;
 }
 
 double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
@@ -48,7 +48,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     bool wrap = osc_check_wrap_modulo(self);
 
     // one shot LFO?
-    if (self->m_lfo_mode == shot && wrap) {
+    if (self->m_lfo_mode == LFOSHOT && wrap) {
         self->m_note_on = false;
 
         if (quad_phase_output) {
@@ -90,7 +90,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     case usaw:
     case dsaw: {
         // --- one shot is unipolar for saw
-        if (self->m_lfo_mode != shot) {
+        if (self->m_lfo_mode != LFOSHOT) {
             // unipolar to bipolar
             out = unipolar_to_bipolar(self->m_modulo);
             qp_out = unipolar_to_bipolar(quad_modulo);
@@ -123,7 +123,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
         else // out = +1 -> 0
             out = 1.0 - 2.0 * (self->m_modulo - 0.5);
 
-        if (self->m_lfo_mode != shot)
+        if (self->m_lfo_mode != LFOSHOT)
             // unipolar to bipolar
             out = unipolar_to_bipolar(out);
 
@@ -211,7 +211,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
 
 void lfo_start_oscillator(oscillator *self)
 {
-    if (self->m_lfo_mode == sync || self->m_lfo_mode == shot)
+    if (self->m_lfo_mode == LFOSYNC || self->m_lfo_mode == LFOSHOT)
         osc_reset(self);
 
     self->m_note_on = true;

@@ -7,7 +7,7 @@
 ALGORITHM_TYPE	defjams.h	/^    ALGORITHM_TYPE,$/;"	e	enum:__anon4
 ALLPASS	effect.h	/^    ALLPASS,$/;"	e	enum:__anon8
 AMP_MOD_RANGE	dca.h	/^#define AMP_MOD_RANGE /;"	d
-ANALOG	envelope_generator.h	/^typedef enum { ANALOG, DIGITAL } eg_mode;$/;"	e	enum:__anon10
+ANALOG	envelope_generator.h	/^enum { ANALOG, DIGITAL };$/;"	e	enum:__anon10
 ANSI_COLOR_BLUE	defjams.h	/^#define ANSI_COLOR_BLUE /;"	d
 ANSI_COLOR_CYAN	defjams.h	/^#define ANSI_COLOR_CYAN /;"	d
 ANSI_COLOR_GREEN	defjams.h	/^#define ANSI_COLOR_GREEN /;"	d
@@ -120,7 +120,7 @@ DEST_OSC4_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC4_OUTPUT_AMP,$/;"	e	enum:__anon19
 DEST_OSC4_PULSEWIDTH	modmatrix.h	/^    DEST_OSC4_PULSEWIDTH,$/;"	e	enum:__anon19
 DEST_VS_AC_AXIS	modmatrix.h	/^    DEST_VS_AC_AXIS,$/;"	e	enum:__anon19
 DEST_VS_BD_AXIS	modmatrix.h	/^    DEST_VS_BD_AXIS,$/;"	e	enum:__anon19
-DIGITAL	envelope_generator.h	/^typedef enum { ANALOG, DIGITAL } eg_mode;$/;"	e	enum:__anon10
+DIGITAL	envelope_generator.h	/^enum { ANALOG, DIGITAL };$/;"	e	enum:__anon10
 DISTORTION	effect.h	/^    DISTORTION,$/;"	e	enum:__anon8
 DOWN	defjams.h	/^typedef enum { UP, DOWN } direction;$/;"	e	enum:__anon3
 DRUM	drumr.h	/^} DRUM;$/;"	t	typeref:struct:t_drumr
@@ -158,6 +158,9 @@ HPF4	filter.h	/^    HPF4,$/;"	e	enum:__anon12
 INTEGER_LENGTH	drumr.h	/^#define INTEGER_LENGTH /;"	d
 KEYS_H_	keys.h	/^#define KEYS_H_$/;"	d
 LEGATO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
+LFORFREE	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
+LFOSHOT	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
+LFOSYNC	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
 LOOP	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
 LOWPASS	effect.h	/^    LOWPASS,$/;"	e	enum:__anon8
 LPF1	filter.h	/^    LPF1,$/;"	e	enum:__anon12
@@ -170,13 +173,13 @@ MAX_CMDS	algorithm.h	/^#define MAX_CMDS /;"	d
 MAX_CMD_LEN	algorithm.h	/^#define MAX_CMD_LEN /;"	d
 MAX_DESTINATIONS	modmatrix.h	/^    MAX_DESTINATIONS$/;"	e	enum:__anon19
 MAX_DETUNE_CENTS	minisynth.h	/^#define MAX_DETUNE_CENTS /;"	d
-MAX_LFO_OSC	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+MAX_LFO_OSC	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 MAX_LFO_RATE	oscillator.h	/^#define MAX_LFO_RATE /;"	d
 MAX_NOISE_OSC_AMP_DB	minisynth.h	/^#define MAX_NOISE_OSC_AMP_DB /;"	d
 MAX_NUM_DELAY_MODE	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
 MAX_NUM_MIDI_LOOPS	minisynth.h	/^#define MAX_NUM_MIDI_LOOPS /;"	d
 MAX_NUM_MIDI_MODES	mixer.h	/^    MAX_NUM_MIDI_MODES,$/;"	e	enum:__anon16
-MAX_OSC	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
+MAX_OSC	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
 MAX_PS_STRING_SZ	mixer.h	/^#define MAX_PS_STRING_SZ /;"	d
 MAX_PULSE_WIDTH_PCT	minisynth.h	/^#define MAX_PULSE_WIDTH_PCT /;"	d
 MAX_SAMPLES_PER_LOOPER	sampler.h	/^#define MAX_SAMPLES_PER_LOOPER /;"	d
@@ -196,7 +199,7 @@ MODDELAY	effect.h	/^    MODDELAY,$/;"	e	enum:__anon8
 MONO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
 M_PI	defjams.h	/^#define M_PI /;"	d
 NHARMS	defjams.h	/^#define NHARMS /;"	d
-NOISE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
+NOISE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
 NONE	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon6
 NORM	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
 NUM_DRUM_PATTERNS	drumr.h	/^#define NUM_DRUM_PATTERNS /;"	d
@@ -219,7 +222,7 @@ OSC_PULSEWIDTH_MAX	oscillator.h	/^#define OSC_PULSEWIDTH_MAX /;"	d
 OSC_PULSEWIDTH_MIN	oscillator.h	/^#define OSC_PULSEWIDTH_MIN /;"	d
 P	utils.c	/^const double P = 0.225;$/;"	v
 PINGPONG	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
-PNOISE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
+PNOISE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
 PPL	defjams.h	/^#define PPL /;"	d
 PPNS	defjams.h	/^#define PPNS /;"	d
 PPQN	defjams.h	/^#define PPQN /;"	d
@@ -232,15 +235,15 @@ SAMPLER	sampler.h	/^} SAMPLER;$/;"	t	typeref:struct:t_sampler
 SAMPLER_H	sampler.h	/^#define SAMPLER_H$/;"	d
 SAMPLER_TYPE	defjams.h	/^    SAMPLER_TYPE,$/;"	e	enum:__anon4
 SAMPLE_RATE	defjams.h	/^#define SAMPLE_RATE /;"	d
-SAW1	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
-SAW2	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
-SAW3	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
+SAW1	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+SAW2	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+SAW3	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
 SBMSG	sbmsg.h	/^} SBMSG;$/;"	t	typeref:struct:sbmsg
 SBMSG_H	sbmsg.h	/^#define SBMSG_H$/;"	d
 SBSHELL_SYNTH_FUNCTION_H_	synthfunctions.h	/^#define SBSHELL_SYNTH_FUNCTION_H_$/;"	d
 SBSHELL_VOICE_H_	voice.h	/^#define SBSHELL_VOICE_H_$/;"	d
 SHUTDOWN	envelope_generator.h	/^    SHUTDOWN$/;"	e	enum:__anon11
-SINE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
+SINE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
 SIZE_OF_WURD	cmdloop.h	/^#define SIZE_OF_WURD /;"	d
 SOUNDGEN	sound_generator.h	/^} SOUNDGEN;$/;"	t	typeref:struct:t_soundgen
 SOUNDGEN_H	sound_generator.h	/^#define SOUNDGEN_H$/;"	d
@@ -267,7 +270,7 @@ SOURCE_NONE	modmatrix.h	/^    SOURCE_NONE,$/;"	e	enum:__anon18
 SOURCE_PITCHBEND	modmatrix.h	/^    SOURCE_PITCHBEND,$/;"	e	enum:__anon18
 SOURCE_SUSTAIN_PEDAL	modmatrix.h	/^    SOURCE_SUSTAIN_PEDAL,$/;"	e	enum:__anon18
 SOURCE_VELOCITY	modmatrix.h	/^    SOURCE_VELOCITY,$/;"	e	enum:__anon18
-SQUARE	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
+SQUARE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
 SUSTAIN	envelope_generator.h	/^    SUSTAIN,$/;"	e	enum:__anon11
 SYNTH	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon6
 SYNTH_NUM_LOOPS	defjams.h	/^#define SYNTH_NUM_LOOPS /;"	d
@@ -290,7 +293,7 @@ TRANSFORM_MIDI_TO_PAN	modmatrix.h	/^    TRANSFORM_MIDI_TO_PAN,$/;"	e	enum:__anon
 TRANSFORM_NONE	modmatrix.h	/^    TRANSFORM_NONE,$/;"	e	enum:__anon20
 TRANSFORM_NOTE_NUMBER_TO_FREQUENCY	modmatrix.h	/^    TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,$/;"	e	enum:__anon20
 TRANSFORM_UNIPOLAR_TO_BIPOLAR	modmatrix.h	/^    TRANSFORM_UNIPOLAR_TO_BIPOLAR,$/;"	e	enum:__anon20
-TRI	oscillator.h	/^    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:oscillator::__anon24
+TRI	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
 TWO_PI	defjams.h	/^#define TWO_PI /;"	d
 Tri2Saw	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
 Tri2Sqr	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
@@ -368,7 +371,7 @@ bitwize_getvol	bitwize.c	/^double bitwize_getvol(void *self)$/;"	f
 bitwize_process	bitwize.c	/^char bitwize_process(int pattern, int t)$/;"	f
 bitwize_setvol	bitwize.c	/^void bitwize_setvol(void *self, double v)$/;"	f
 bitwize_status	bitwize.c	/^void bitwize_status(void *self, wchar_t *status_string)$/;"	f
-bpm	mixer.h	/^    int bpm;$/;"	m	struct:t_mixer
+bpm	mixer.h	/^    double bpm;$/;"	m	struct:t_mixer
 buf_length	effect.h	/^    int buf_length;$/;"	m	struct:__anon9
 buf_num_channels	drumr.h	/^    int buf_num_channels;$/;"	m	struct:t_drumr
 buf_p	effect.h	/^    int buf_p;$/;"	m	struct:__anon9
@@ -507,7 +510,7 @@ drum_setvol	drumr.c	/^void drum_setvol(void *self, double v)$/;"	f
 drum_status	drumr.c	/^void drum_status(void *self, wchar_t *status_string)$/;"	f
 drumr_change_num_loops	drumr.c	/^void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops)$/;"	f
 drumr_set_multi_pattern_mode	drumr.c	/^void drumr_set_multi_pattern_mode(DRUM *d, bool multi)$/;"	f
-dsaw	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+dsaw	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 duck_runrrr	utils.c	/^void *duck_runrrr(void *arg)$/;"	f
 effect	beatrepeat.h	/^    EFFECT effect;$/;"	m	struct:beatrepeat
 effect_new_mod_delay	effect.c	/^EFFECT *effect_new_mod_delay()$/;"	f
@@ -545,16 +548,15 @@ eg_calculate_decay_time	envelope_generator.c	/^void eg_calculate_decay_time(enve
 eg_calculate_release_time	envelope_generator.c	/^void eg_calculate_release_time(envelope_generator *self)$/;"	f
 eg_can_note_off	envelope_generator.c	/^bool eg_can_note_off(envelope_generator *self)$/;"	f
 eg_do_envelope	envelope_generator.c	/^double eg_do_envelope(envelope_generator *self, double *p_biased_output)$/;"	f
-eg_get_state	envelope_generator.c	/^state eg_get_state(envelope_generator *self) { return self->m_state; }$/;"	f
+eg_get_state	envelope_generator.c	/^unsigned int eg_get_state(envelope_generator *self) { return self->m_state; }$/;"	f
 eg_init_global_parameters	envelope_generator.c	/^void eg_init_global_parameters(envelope_generator *self,$/;"	f
 eg_is_active	envelope_generator.c	/^bool eg_is_active(envelope_generator *self)$/;"	f
-eg_mode	envelope_generator.h	/^typedef enum { ANALOG, DIGITAL } eg_mode;$/;"	t	typeref:enum:__anon10
 eg_note_off	envelope_generator.c	/^void eg_note_off(envelope_generator *self)$/;"	f
 eg_release	envelope_generator.c	/^void eg_release(envelope_generator *self)$/;"	f
 eg_reset	envelope_generator.c	/^void eg_reset(envelope_generator *self)$/;"	f
 eg_set_attack_time_msec	envelope_generator.c	/^void eg_set_attack_time_msec(envelope_generator *self, double time)$/;"	f
 eg_set_decay_time_msec	envelope_generator.c	/^void eg_set_decay_time_msec(envelope_generator *self, double time)$/;"	f
-eg_set_eg_mode	envelope_generator.c	/^void eg_set_eg_mode(envelope_generator *self, eg_mode mode)$/;"	f
+eg_set_eg_mode	envelope_generator.c	/^void eg_set_eg_mode(envelope_generator *self, unsigned int mode)$/;"	f
 eg_set_release_time_msec	envelope_generator.c	/^void eg_set_release_time_msec(envelope_generator *self, double time)$/;"	f
 eg_set_shutdown_time_msec	envelope_generator.c	/^void eg_set_shutdown_time_msec(envelope_generator *self, double time)$/;"	f
 eg_set_sustain_level	envelope_generator.c	/^void eg_set_sustain_level(envelope_generator *self, double level)$/;"	f
@@ -580,7 +582,7 @@ envelopor	sound_generator.c	/^float envelopor(SOUNDGEN *self, float val)$/;"	f
 environment	mixer.h	/^    env_var environment[ENVIRONMENT_ARRAY_SIZE];$/;"	m	struct:t_mixer
 environment_variable	mixer.h	/^typedef struct environment_variable {$/;"	s
 event_type	midimaaan.h	/^    unsigned event_type;$/;"	m	struct:midi_event
-expo	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+expo	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 extract_cmds_from_line	algorithm.c	/^int extract_cmds_from_line(algorithm *self, char *line)$/;"	f
 exxit	cmdloop.c	/^int exxit()$/;"	f
 f	filter_ckthreefive.h	/^    filter f; \/\/ base class$/;"	m	struct:filter_ckthreefive
@@ -993,7 +995,7 @@ m_source_index	modmatrix.h	/^    unsigned m_source_index;$/;"	m	struct:__anon21
 m_source_transform	modmatrix.h	/^    unsigned m_source_transform;$/;"	m	struct:__anon21
 m_sources	modmatrix.h	/^    double m_sources[MAX_SOURCES];$/;"	m	struct:__anon22
 m_square_corr_factor	wt_oscillator.h	/^    double m_square_corr_factor[NUM_TABLES];$/;"	m	struct:wt_oscillator
-m_state	envelope_generator.h	/^    state m_state;$/;"	m	struct:envelope_generator
+m_state	envelope_generator.h	/^    unsigned int m_state;$/;"	m	struct:envelope_generator
 m_sub_osc_db	minisynth.h	/^    double m_sub_osc_db;$/;"	m	struct:minisynth
 m_sustain_level	envelope_generator.h	/^    double m_sustain_level;$/;"	m	struct:envelope_generator
 m_sustain_level	minisynth.h	/^    double m_sustain_level;$/;"	m	struct:minisynth
@@ -1252,7 +1254,7 @@ print_midi_event	utils.c	/^void print_midi_event(int midi_num)$/;"	f
 print_midi_event_rec	midimaaan.c	/^void print_midi_event_rec(midi_event *ev)$/;"	f
 print_prompt	cmdloop.c	/^void print_prompt()$/;"	f
 printbp	envelope.c	/^void printbp(ENVELOPE *bp)$/;"	f
-prompt	cmdloop.c	/^char *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;$/;"	v
+prompt	cmdloop.c	/^char const *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;$/;"	v
 ps_envelope_stream	envelope.c	/^void ps_envelope_stream(ENVSTREAM *stream)$/;"	f
 pulse_width_control	synthfunctions.h	/^    double pulse_width_control; \/\/ from GUI$/;"	m	struct:__anon28
 q_control	synthfunctions.h	/^    double q_control;$/;"	m	struct:__anon29
@@ -1268,7 +1270,7 @@ qb_start_oscillator	qblimited_oscillator.c	/^void qb_start_oscillator(oscillator
 qb_stop_oscillator	qblimited_oscillator.c	/^void qb_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
 qblimited_oscillator	qblimited_oscillator.h	/^typedef struct qblimited_oscillator {$/;"	s
 qblimited_oscillator	qblimited_oscillator.h	/^} qblimited_oscillator;$/;"	t	typeref:struct:qblimited_oscillator
-qrsh	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+qrsh	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 r	effect.h	/^    reverb *r;$/;"	m	struct:__anon9
 rate	effect.h	/^    double rate, cnt;$/;"	m	struct:__anon9
 read_delay	effect.c	/^double read_delay(EFFECT *self)$/;"	f
@@ -1289,12 +1291,11 @@ reverb_cook_variables	reverb.c	/^void reverb_cook_variables(reverb *r)$/;"	f
 reverb_init_reverb	reverb.c	/^void reverb_init_reverb(reverb *r)$/;"	f
 reverb_process_audio	reverb.c	/^bool reverb_process_audio(reverb *r, double *in, double *out,$/;"	f
 reverse	utils.c	/^void reverse(char s[])$/;"	f
-rfree	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon26
 right_phase	mixer.h	/^    float right_phase;$/;"	m	struct:__anon17
 rightpoint	envelope.h	/^    ENVELOPE leftpoint, rightpoint;$/;"	m	struct:envelope_stream
 rpn_stack	bytebeatrrr.h	/^    Stack *rpn_stack;$/;"	m	struct:bytebeat
 rr	effect.h	/^    double rr;$/;"	m	struct:__anon9
-rsh	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+rsh	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 rsq	effect.h	/^    double rsq;$/;"	m	struct:__anon9
 s_mode_names	minisynth.c	/^const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",$/;"	v
 s_waveform_names	qblimited_oscillator.c	/^char *s_waveform_names[] = {"SINE",   "SAW1",  "SAW2",   "SAW3",   "TRI",$/;"	v
@@ -1348,9 +1349,8 @@ set_matrix_core	modmatrix.c	/^void set_matrix_core(modmatrix *self, matrixrow **
 set_q_control	filter.h	/^    void (*set_q_control)(filter *self, double d);$/;"	m	struct:filter
 setvol	sound_generator.h	/^    void (*setvol)(void *self, double val);$/;"	m	struct:t_soundgen
 shift_bits_to_leftmost_position	drumr_utils.c	/^int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)$/;"	f
-shot	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon26
 shutdown_time_msec	synthfunctions.h	/^    double shutdown_time_msec; \/\/ shutdown is a time$/;"	m	struct:__anon30
-sine	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+sine	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 sixteenth_note_tick	mixer.h	/^    int sixteenth_note_tick;$/;"	m	struct:t_mixer
 sound_gen_num	sbmsg.h	/^    int sound_gen_num;$/;"	m	struct:sbmsg
 sound_generator	algorithm.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:algorithm
@@ -1367,12 +1367,11 @@ soundgen_num	mixer.h	/^    int soundgen_num;  \/\/ actual number of SGs$/;"	m	st
 soundgen_size	mixer.h	/^    int soundgen_size; \/\/ number of memory slots reserved for SGszz$/;"	m	struct:t_mixer
 sparkchars	main.c	/^const wchar_t *sparkchars = L"\\u2581\\u2582\\u2583\\u2585\\u2586\\u2587";$/;"	v
 sparky	sparkline.c	/^void sparky(char *instr)$/;"	f
-square	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+square	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 start_oscillator	oscillator.h	/^    void (*start_oscillator)(oscillator *self);$/;"	m	struct:oscillator
 started	drumr.h	/^    bool started; \/\/ to sync at top of loop$/;"	m	struct:t_drumr
 started	envelope.h	/^    int started;$/;"	m	struct:envelope_stream
 started	sampler.h	/^    bool started;$/;"	m	struct:t_sampler
-state	envelope_generator.h	/^} state;$/;"	t	typeref:enum:__anon11
 state_strings	envelope_generator.c	/^char *state_strings[] = {"OFFF",    "ATTACK",  "DECAY",$/;"	v
 status	effect.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:__anon9
 status	envelope.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:envelope_stream
@@ -1399,7 +1398,6 @@ sustain_level	synthfunctions.h	/^    double sustain_level;$/;"	m	struct:__anon30
 swing	drumr.h	/^    int swing;$/;"	m	struct:t_drumr
 swing_setting	drumr.h	/^    int swing_setting;$/;"	m	struct:t_drumr
 swingrrr	drumr.c	/^void swingrrr(void *self, int swing_setting)$/;"	f
-sync	oscillator.h	/^    enum { sync, shot, rfree };$/;"	e	enum:oscillator::__anon26
 t_bitwize	bitwize.h	/^typedef struct t_bitwize {$/;"	s
 t_drumr	drumr.h	/^typedef struct t_drumr {$/;"	s
 t_mixer	mixer.h	/^typedef struct t_mixer {$/;"	s
@@ -1416,7 +1414,7 @@ tick	mixer.h	/^    int tick;       \/\/$/;"	m	struct:t_mixer
 tickedyet	drumr.h	/^    bool tickedyet;$/;"	m	struct:t_drumr
 time	envelope.h	/^    double time;$/;"	m	struct:envelope
 timed_sig_start	utils.c	/^void *timed_sig_start(void *arg)$/;"	f
-tri	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+tri	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 type	effect.h	/^    effect_type type;$/;"	m	struct:__anon9
 type	sound_generator.h	/^    sound_generator_type type;$/;"	m	struct:t_soundgen
 unipolar_to_bipolar	utils.c	/^double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }$/;"	f
@@ -1424,7 +1422,7 @@ update	filter.h	/^    void (*update)(filter *self);$/;"	m	struct:filter
 update_envelope_stream_bpm	envelope.c	/^void update_envelope_stream_bpm(ENVSTREAM *stream)$/;"	f
 update_environment	mixer.c	/^void update_environment(char *key, int val)$/;"	f
 update_oscillator	oscillator.h	/^    void (*update_oscillator)(oscillator *self, char *name);$/;"	m	struct:oscillator
-usaw	oscillator.h	/^    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:oscillator::__anon25
+usaw	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 val	mixer.h	/^    int val;$/;"	m	struct:environment_variable
 value	envelope.h	/^    double value;$/;"	m	struct:envelope
 vector_path_mode	synthfunctions.h	/^    unsigned int vector_path_mode;$/;"	m	struct:__anon32

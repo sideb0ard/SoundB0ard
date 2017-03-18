@@ -12,7 +12,7 @@ extern mixer *mixr;
 
 SAMPLER *new_sampler(char *filename, double loop_len)
 {
-    SAMPLER *sampler = calloc(1, sizeof(SAMPLER));
+    SAMPLER *sampler = (SAMPLER *)calloc(1, sizeof(SAMPLER));
     sampler->vol = 0.7;
     sampler->started = false;
     sampler->just_been_resampled = false;
@@ -37,7 +37,7 @@ SAMPLER *new_sampler(char *filename, double loop_len)
 double sampler_gennext(void *self)
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
-    SAMPLER *sampler = self;
+    SAMPLER *sampler = (SAMPLER *)self;
     double val = 0;
 
     // wait till start of loop to keep patterns synched
@@ -156,7 +156,7 @@ void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
 
 file_sample *sampler_create_sample(char *filename, int loop_len)
 {
-    file_sample *fs = calloc(1, sizeof(file_sample));
+    file_sample *fs = (file_sample *)calloc(1, sizeof(file_sample));
     sample_set_file_name(fs, filename);
     fs->position = 0;
     fs->loop_len = loop_len;
@@ -172,7 +172,7 @@ file_sample *sampler_create_sample(char *filename, int loop_len)
 void sample_set_file_name(file_sample *fs, char *filename)
 {
     int fslen = strlen(filename);
-    fs->filename = calloc(1, fslen + 1);
+    fs->filename = (char *)calloc(1, fslen + 1);
     strncpy(fs->filename, filename, fslen);
 }
 
@@ -201,7 +201,7 @@ void sample_import_file_contents(file_sample *fs, char *filename)
     int bufsize = sf_info.channels * sf_info.frames;
     printf("Making buffer size of %d\n", bufsize);
 
-    int *buffer = calloc(bufsize, sizeof(int));
+    int *buffer = (int *)calloc(bufsize, sizeof(int));
     if (buffer == NULL) {
         perror("Ooft, memory issues, mate!\n");
         return;
@@ -300,7 +300,7 @@ void sample_resample_to_loop_size(file_sample *fs)
 
 void sampler_status(void *self, wchar_t *status_string)
 {
-    SAMPLER *sampler = self;
+    SAMPLER *sampler = (SAMPLER *)self;
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
              "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
              "ScramblrrrMode: %s ScrambleGen: %d StutterMode: %s "
@@ -336,13 +336,13 @@ void sampler_switch_sample(SAMPLER *s, int sample_num)
 
 double sampler_getvol(void *self)
 {
-    SAMPLER *sampler = self;
+    SAMPLER *sampler = (SAMPLER *)self;
     return sampler->vol;
 }
 
 void sampler_setvol(void *self, double v)
 {
-    SAMPLER *sampler = self;
+    SAMPLER *sampler = (SAMPLER *)self;
     if (v < 0.0 || v > 1.0) {
         return;
     }

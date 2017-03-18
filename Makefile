@@ -1,3 +1,4 @@
+# CC = clang++
 CC = clang
 SRC = \
 	afx/combfilter.c \

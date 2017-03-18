@@ -71,7 +71,7 @@ double bitwize_gennext(void *self)
     int pattern = b->pattern;
     char val = bitwize_process(pattern, t);
     double scale_val = (2.0 / 256 * val);
-    double scaled = scaleybum(-128, 127, -1.0, 0.9, val);
+    // double scaled = scaleybum(-128, 127, -1.0, 0.9, val);
 
     double yn = 0;
     double yqn = 0;
@@ -100,7 +100,7 @@ double bitwize_gennext(void *self)
 
 void bitwize_status(void *self, wchar_t *status_string)
 {
-    BITWIZE *p_bitwize = self;
+    BITWIZE *p_bitwize = (BITWIZE *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              WANSI_COLOR_MAGENTA "BWIZE vol: %f pattern: %d" ANSI_COLOR_RESET,
              p_bitwize->vol, p_bitwize->pattern);

@@ -17,7 +17,7 @@ extern wchar_t *sparkchars;
 
 DRUM *new_drumr(char *filename)
 {
-    DRUM *drumr = calloc(1, sizeof(DRUM));
+    DRUM *drumr = (DRUM *)calloc(1, sizeof(DRUM));
 
     SF_INFO sf_info;
     memset(&sf_info, 0, sizeof(SF_INFO));
@@ -25,7 +25,7 @@ DRUM *new_drumr(char *filename)
     int *buffer = load_file_to_buffer(filename, &bufsize, &sf_info);
 
     int fslen = strlen(filename);
-    drumr->filename = calloc(1, fslen + 1);
+    drumr->filename = (char *)calloc(1, fslen + 1);
     strncpy(drumr->filename, filename, fslen);
 
     memset(drumr->matrix1, 0, sizeof drumr->matrix1);
@@ -63,7 +63,7 @@ DRUM *new_drumr(char *filename)
 double drum_gennext(void *self)
 // void drum_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
-    DRUM *drumr = self;
+    DRUM *drumr = (DRUM *)self;
     double val = 0;
 
     int step_seq_idx = mixr->sixteenth_note_tick % DRUM_PATTERN_LEN;
@@ -224,7 +224,7 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern)
 {
     int sp_count = 0;
     char *sp, *sp_last, *spattern[32];
-    char *sep = " ";
+    char const *sep = " ";
 
     printf("CHARPATT %s\n", char_pattern);
     // extract numbers from string into spattern
@@ -264,7 +264,7 @@ int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
     *bufsize = sf_info->channels * sf_info->frames;
     printf("Making buffer size of %d\n", *bufsize);
 
-    int *buffer = calloc(*bufsize, sizeof(int));
+    int *buffer = (int *)calloc(*bufsize, sizeof(int));
     if (buffer == NULL) {
         printf("Ooft, memory issues, mate!\n");
         return NULL;
@@ -514,7 +514,7 @@ void next_markov_generation(DRUM *d)
 
 void drum_status(void *self, wchar_t *status_string)
 {
-    DRUM *drumr = self;
+    DRUM *drumr = (DRUM *)self;
     swprintf(status_string, MAX_PS_STRING_SZ, WANSI_COLOR_BLUE
              "[SEQUENCER] \"%s\" Vol: %.2lf Cur: %d life_mode: %d "
              "markov_on: %d markov_mode: %s Multi: %d Swing: %d Max Gen: %d",
@@ -549,13 +549,13 @@ void wchar_version_of_amp(DRUM *d, int pattern_num, wchar_t apattern[17])
 
 double drum_getvol(void *self)
 {
-    DRUM *drumr = self;
+    DRUM *drumr = (DRUM *)self;
     return drumr->vol;
 }
 
 void drum_setvol(void *self, double v)
 {
-    DRUM *drumr = self;
+    DRUM *drumr = (DRUM *)self;
     if (v < 0.0 || v > 1.0) {
         return;
     }
@@ -566,7 +566,7 @@ void swingrrr(void *self, int swing_setting)
 // swing_setting in range {1..6}, with same convention as
 // Linn drum machines - 50%, 54%, 58%, 62%, 66%, 71%
 {
-    DRUM *drumr = self;
+    DRUM *drumr = (DRUM *)self;
     if (swing_setting == 0) {
         drumr->swing = 0;
     }
@@ -635,7 +635,7 @@ void drum_set_sample_amp_from_char_pattern(DRUM *d, int pattern_num,
 
     int sp_count = 0;
     char *sp, *sp_last, *spattern[32];
-    char *sep = " ";
+    char const *sep = " ";
 
     printf("CHARPATT %s\n", amp_pattern);
     // extract numbers from string into spattern

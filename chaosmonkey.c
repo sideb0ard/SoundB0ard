@@ -12,7 +12,7 @@ extern mixer *mixr;
 
 chaosmonkey *new_chaosmonkey()
 {
-    chaosmonkey *cm = calloc(1, sizeof(chaosmonkey));
+    chaosmonkey *cm = (chaosmonkey *)calloc(1, sizeof(chaosmonkey));
 
     printf("New chaosmonkey!\n");
 

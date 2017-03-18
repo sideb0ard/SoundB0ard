@@ -26,7 +26,7 @@ bool ddl_prepare_for_play(ddlmodule *d)
     if (d->m_buffer)
         free(d->m_buffer);
 
-    d->m_buffer = calloc(d->m_buffer_size, sizeof(double));
+    d->m_buffer = (double *)calloc(d->m_buffer_size, sizeof(double));
     ddl_reset_delay(d);
     ddl_cook_variables(d);
 

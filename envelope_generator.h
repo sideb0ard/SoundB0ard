@@ -12,16 +12,16 @@
 #define EG_MIN_OSC_INTENSITY 0
 #define EG_MAX_OSC_INTENSITY 0 // TODO - check this
 
-typedef enum { ANALOG, DIGITAL } eg_mode;
+enum { ANALOG, DIGITAL };
 
-typedef enum {
+enum {
     OFFF, // name clash in defjams
     ATTACK,
     DECAY,
     SUSTAIN,
     RELEASE,
     SHUTDOWN
-} state;
+};
 
 typedef struct envelope_generator {
 
@@ -77,7 +77,7 @@ typedef struct envelope_generator {
     double m_inc_shutdown;
 
     // enum above
-    state m_state;
+    unsigned int m_state;
 
 } envelope_generator;
 
@@ -85,14 +85,14 @@ envelope_generator *new_envelope_generator(void);
 
 void envelope_generator_init(envelope_generator *eg);
 
-state eg_get_state(envelope_generator *self);
+unsigned int eg_get_state(envelope_generator *self);
 bool eg_is_active(envelope_generator *self);
 
 bool eg_can_note_off(envelope_generator *self);
 
 void eg_reset(envelope_generator *self);
 
-void eg_set_eg_mode(envelope_generator *self, eg_mode mode);
+void eg_set_eg_mode(envelope_generator *self, unsigned int mode);
 
 void eg_calculate_attack_time(envelope_generator *self);
 void eg_calculate_decay_time(envelope_generator *self);

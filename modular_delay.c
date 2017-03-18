@@ -6,7 +6,7 @@
 
 mod_delay *new_mod_delay()
 {
-    mod_delay *md = calloc(1, sizeof(mod_delay));
+    mod_delay *md = (mod_delay *)calloc(1, sizeof(mod_delay));
     if (!md) // barf
         return NULL;
 

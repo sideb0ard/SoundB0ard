@@ -3,6 +3,6 @@
 
 SBMSG *new_sbmsg()
 {
-    SBMSG *m = calloc(1, sizeof(SBMSG));
+    SBMSG *m = (SBMSG *)calloc(1, sizeof(SBMSG));
     return m;
 }

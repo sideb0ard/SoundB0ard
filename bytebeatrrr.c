@@ -10,7 +10,7 @@ extern mixer *mixr;
 
 bytebeat *new_bytebeat(char *pattern)
 {
-    bytebeat *b = calloc(1, sizeof(bytebeat));
+    bytebeat *b = (bytebeat *)calloc(1, sizeof(bytebeat));
     strncpy(b->pattern, pattern, 255);
 
     b->rpn_stack = new_rpn_stack(pattern);

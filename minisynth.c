@@ -16,7 +16,7 @@ const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
 
 minisynth *new_minisynth(void)
 {
-    minisynth *ms = calloc(1, sizeof(minisynth));
+    minisynth *ms = (minisynth *)calloc(1, sizeof(minisynth));
     if (ms == NULL)
         return NULL; // barf
 
@@ -650,7 +650,8 @@ midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
         return NULL;
     }
     // midi_event_loop defined in midimaaan.h
-    midi_event **new_midi_events_loop = calloc(PPNS, sizeof(midi_event *));
+    midi_event **new_midi_events_loop =
+        (midi_event **)calloc(PPNS, sizeof(midi_event *));
     for (int i = 0; i < PPNS; i++) {
         if (self->melodies[melody_num][i] != NULL) {
             midi_event *ev = self->melodies[melody_num][i];

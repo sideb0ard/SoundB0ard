@@ -5,7 +5,7 @@
 
 reverb *new_reverb(void)
 {
-    reverb *r = calloc(1, sizeof(reverb));
+    reverb *r = (reverb *)calloc(1, sizeof(reverb));
 
     r->m_pre_delay_msec = 40;
     r->m_pre_delay_atten_db = 0;

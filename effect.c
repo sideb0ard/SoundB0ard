@@ -13,13 +13,13 @@ extern mixer *mixr;
 
 EFFECT *new_beatrepeat(int looplen)
 {
-    beatrepeat *b = calloc(1, sizeof(beatrepeat));
+    beatrepeat *b = (beatrepeat *)calloc(1, sizeof(beatrepeat));
     if (b == NULL)
         return NULL;
 
     printf("NEW BEAT REPEAT! %d loops\n", looplen);
     b->m_buffer_size = mixr->loop_len_in_samples;
-    b->m_buffer = calloc(b->m_buffer_size, sizeof(double));
+    b->m_buffer = (double *)calloc(b->m_buffer_size, sizeof(double));
     b->m_sixteenth_note_size = b->m_buffer_size / 16;
     b->m_selected_sixteenth = 0;
     b->m_num_beats_to_repeat = 6;

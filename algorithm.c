@@ -11,7 +11,7 @@ extern mixer *mixr;
 
 algorithm *new_algorithm(char *line)
 {
-    algorithm *a = calloc(1, sizeof(algorithm));
+    algorithm *a = (algorithm *)calloc(1, sizeof(algorithm));
 
     printf("New algorithm!\n");
     if (extract_cmds_from_line(a, line)) {
@@ -35,7 +35,7 @@ int extract_cmds_from_line(algorithm *self, char *line)
     int num_cmds = 0;
 
     char *cmd, *last_s;
-    char *sep = ";";
+    char const *sep = ";";
     for (cmd = strtok_r(line, sep, &last_s); cmd;
          cmd = strtok_r(NULL, sep, &last_s)) {
 
@@ -70,7 +70,7 @@ int extract_cmds_from_line(algorithm *self, char *line)
 void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd)
 {
     char *toke, *last_toke;
-    char *sep = " ";
+    char const *sep = " ";
     for (toke = strtok_r(stored_cmd, sep, &last_toke); toke;
          toke = strtok_r(NULL, sep, &last_toke)) {
 

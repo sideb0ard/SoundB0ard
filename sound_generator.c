@@ -20,8 +20,8 @@ static int resize_effects_array(SOUNDGEN *self)
             self->effects_size *= 2;
         }
 
-        new_effects =
-            realloc(self->effects, self->effects_size * sizeof(EFFECT *));
+        new_effects = (EFFECT **)realloc(self->effects,
+                                         self->effects_size * sizeof(EFFECT *));
         if (new_effects == NULL) {
             printf("Ooh, burney - cannae allocate memory for new effects");
             return -1;
@@ -286,8 +286,8 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
             self->envelopes_size *= 2;
         }
 
-        new_envelopes = realloc(self->envelopes,
-                                self->envelopes_size * sizeof(ENVSTREAM *));
+        new_envelopes = (ENVSTREAM **)realloc(
+            self->envelopes, self->envelopes_size * sizeof(ENVSTREAM *));
         if (new_envelopes == NULL) {
             printf("Ooh, burney - cannae allocate memory for new envelopes");
             return -1;

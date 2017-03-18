@@ -107,7 +107,7 @@ void print_midi_event_rec(midi_event *ev)
 
 midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
 {
-    midi_event *ev = calloc(1, sizeof(midi_event));
+    midi_event *ev = (midi_event *)calloc(1, sizeof(midi_event));
     if (ev == NULL) {
         printf("BIG PROBS MATE\n");
         return NULL;

@@ -19,6 +19,13 @@
 #define MAX_LFO_RATE 10.0
 #define DEFAULT_LFO_RATE 0.5
 
+// --- for PITCHED Oscillators
+enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };
+// --- for LFOs
+enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };
+// --- for LFOs - MODE
+enum { LFOSYNC, LFOSHOT, LFORFREE };
+
 typedef struct oscillator oscillator;
 
 struct oscillator {
@@ -54,15 +61,8 @@ struct oscillator {
     // ---  pulse width in % (sqr only) from GUI
     double m_pulse_width_control;
 
-    // --- for PITCHED Oscillators
-    enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };
     unsigned m_waveform; // to store type
 
-    // --- for LFOs
-    enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };
-
-    // --- for LFOs - MODE
-    enum { sync, shot, rfree };
     unsigned m_lfo_mode; // to store MODE
 
     // --- MIDI note that is being played

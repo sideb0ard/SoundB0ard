@@ -3,7 +3,8 @@
 
 minisynth_voice *new_minisynth_voice(void)
 {
-    minisynth_voice *msv = calloc(1, sizeof(minisynth_voice));
+    minisynth_voice *msv =
+        (minisynth_voice *)calloc(1, sizeof(minisynth_voice));
     if (msv == NULL)
         return NULL;
     minisynth_voice_init(msv);

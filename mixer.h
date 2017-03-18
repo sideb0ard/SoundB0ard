@@ -48,7 +48,7 @@ typedef struct t_mixer {
     int active_midi_soundgen_num;
     int active_midi_soundgen_effect_num;
 
-    int bpm;
+    double bpm;
 
     int samples_per_midi_tick;
     int midi_ticks_per_ms;

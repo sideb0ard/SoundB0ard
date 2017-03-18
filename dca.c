@@ -8,7 +8,7 @@
 
 dca *new_dca()
 {
-    dca *d = calloc(1, sizeof(dca));
+    dca *d = (dca *)calloc(1, sizeof(dca));
     if (!d)
         return NULL;
 

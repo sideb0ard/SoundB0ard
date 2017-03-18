@@ -166,7 +166,7 @@ void osc_update(oscillator *self, char *name)
 
     // --- ignore LFO mode for noise sources
     if (self->m_waveform == rsh || self->m_waveform == qrsh)
-        self->m_lfo_mode = rfree;
+        self->m_lfo_mode = LFORFREE;
 
     // --- Modulation Matrix
     //

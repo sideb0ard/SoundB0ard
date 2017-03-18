@@ -60,7 +60,7 @@ void envelope_generator_init(envelope_generator *eg)
     eg->m_global_eg_params = NULL;
 }
 
-state eg_get_state(envelope_generator *self) { return self->m_state; }
+unsigned int eg_get_state(envelope_generator *self) { return self->m_state; }
 
 bool eg_is_active(envelope_generator *self)
 {
@@ -94,7 +94,7 @@ void eg_reset(envelope_generator *self)
     }
 }
 
-void eg_set_eg_mode(envelope_generator *self, eg_mode mode)
+void eg_set_eg_mode(envelope_generator *self, unsigned int mode)
 {
     self->m_eg_mode = mode;
     if (self->m_eg_mode == ANALOG) {

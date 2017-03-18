@@ -151,9 +151,9 @@ void wt_create_wave_tables(wt_osc *self)
     // SAW, TRIANGLE: need 10 tables
     double seed_freq = 27.5; // Note A0, bottom of piano
     for (int j = 0; j < NUM_TABLES; j++) {
-        double *saw_table = calloc(WT_LENGTH, sizeof(double));
+        double *saw_table = (double *)calloc(WT_LENGTH, sizeof(double));
 
-        double *tri_table = calloc(WT_LENGTH, sizeof(double));
+        double *tri_table = (double *)calloc(WT_LENGTH, sizeof(double));
 
         int nHarms = (int)((SAMPLE_RATE / 2.0 / seed_freq) - 1.0);
         int nHalfHarms = (int)((float)nHarms / 2.0);

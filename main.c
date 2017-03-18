@@ -60,7 +60,7 @@ int main()
 
     PaStream *stream;
     PaError err;
-    paData *data = calloc(1, sizeof(paData));
+    paData *data = (paData *)calloc(1, sizeof(paData));
     mixr = new_mixer();
     data->mixr = mixr;
 

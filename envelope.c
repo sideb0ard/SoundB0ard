@@ -28,7 +28,7 @@ void update_envelope_stream_bpm(ENVSTREAM *stream)
     // 100 is for percent - time of envelope is measured as percent of loop len
     stream->incr =
         100.0 / (60.0 / (mixr->bpm) * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
-    printf("called me - BPM IS NOW %d\n", mixr->bpm);
+    printf("called me - BPM IS NOW %f\n", mixr->bpm);
 }
 
 ENVELOPE maxpoint(const ENVELOPE *points, long npoints)

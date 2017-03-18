@@ -26,6 +26,7 @@
 #include "minisynth.h"
 #include "mixer.h"
 #include "obliquestrategies.h"
+#include "oscillator.h"
 #include "sampler.h"
 #include "sparkline.h"
 #include "table.h"
@@ -35,7 +36,7 @@ extern mixer *mixr;
 
 extern wtable *wave_tables[5];
 
-char *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;
+char const *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;
 
 void print_prompt()
 {
@@ -62,7 +63,7 @@ void interpret(char *line)
     char wurds[NUM_WURDS][SIZE_OF_WURD];
 
     char *cmd, *last_s;
-    char *sep = ",";
+    char const *sep = ",";
     for (cmd = strtok_r(line, sep, &last_s); cmd;
          cmd = strtok_r(NULL, sep, &last_s)) {
 
@@ -150,7 +151,7 @@ void interpret(char *line)
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp("seq", wurds[0], 3) == 0) {
 
-            char *pattern = calloc(128, sizeof(char));
+            char *pattern = (char *)calloc(128, sizeof(char));
 
             if (is_valid_file(wurds[1])) {
                 char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
@@ -818,7 +819,7 @@ int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)
 {
     memset(wurds, 0, NUM_WURDS * SIZE_OF_WURD);
     int num_wurds = 0;
-    char *sep = " ";
+    char const *sep = " ";
     char *tok, *last_s;
     for (tok = strtok_r(line, sep, &last_s); tok;
          tok = strtok_r(NULL, sep, &last_s)) {

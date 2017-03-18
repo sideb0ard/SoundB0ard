@@ -30,7 +30,7 @@ static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
 // TODO ( this is superflous - no timing is going on )
 void *timed_sig_start(void *arg)
 {
-    SBMSG *msg = arg;
+    SBMSG *msg = (SBMSG *)arg;
     int sg = -1; // signal generator
 
     if (strcmp(msg->params, "sloop") == 0) {
@@ -49,14 +49,14 @@ void *timed_sig_start(void *arg)
 
 void *fadeup_runrrr(void *arg)
 {
-    SBMSG *msg = arg;
+    SBMSG *msg = (SBMSG *)arg;
     faderrr(msg->sound_gen_num, UP);
 
     return NULL;
 }
 void *fadedown_runrrr(void *arg)
 {
-    SBMSG *msg = arg;
+    SBMSG *msg = (SBMSG *)arg;
     faderrr(msg->sound_gen_num, DOWN);
 
     return NULL;
@@ -64,7 +64,7 @@ void *fadedown_runrrr(void *arg)
 
 void *duck_runrrr(void *arg)
 {
-    SBMSG *msg = arg;
+    SBMSG *msg = (SBMSG *)arg;
     printf("Duckin' %d\n", msg->sound_gen_num);
     faderrr(msg->sound_gen_num, DOWN);
     sleep(rand() % 15);
@@ -147,9 +147,9 @@ freaky *new_freqs_from_string(char *string)
         fargv[freq_count++] = ap;
     }
 
-    freaky *f = calloc(1, sizeof(freaky));
+    freaky *f = (freaky *)calloc(1, sizeof(freaky));
     f->num_freaks = freq_count;
-    f->freaks = calloc(freq_count, sizeof(int));
+    f->freaks = (double *)calloc(freq_count, sizeof(int));
 
     for (int i = 0; i < freq_count; i++) {
         f->freaks[i] = atof(fargv[i]);

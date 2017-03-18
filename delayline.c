@@ -13,7 +13,7 @@ void delayline_init(delayline *dl, int delay_length)
     if (dl->m_buffer)
         free(dl->m_buffer);
 
-    dl->m_buffer = calloc(dl->m_buffer_size, sizeof(double));
+    dl->m_buffer = (double *)calloc(dl->m_buffer_size, sizeof(double));
 }
 
 void delayline_reset(delayline *dl)

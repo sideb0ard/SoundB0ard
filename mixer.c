@@ -31,8 +31,7 @@ extern mixer *mixr;
 
 mixer *new_mixer()
 {
-    mixer *mixr = NULL;
-    mixr = calloc(1, sizeof(mixer));
+    mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
     mixr->tick = 0;
@@ -52,7 +51,7 @@ void mixer_ps(mixer *mixr)
     printf(COOL_COLOR_MAUVE
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
            "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-           " // BPM: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
@@ -156,8 +155,8 @@ int add_effect(mixer *mixr)
             mixr->effects_size *= 2;
         }
 
-        new_effects =
-            realloc(mixr->effects, mixr->effects_size * sizeof(EFFECT *));
+        new_effects = (EFFECT **)realloc(mixr->effects,
+                                         mixr->effects_size * sizeof(EFFECT *));
         if (new_effects == NULL) {
             printf("Ooh, burney - cannae allocate memory for new sounds");
             return -1;
@@ -188,8 +187,8 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm)
             mixr->soundgen_size *= 2;
         }
 
-        new_soundgens = realloc(mixr->sound_generators,
-                                mixr->soundgen_size * sizeof(SOUNDGEN *));
+        new_soundgens = (SOUNDGEN **)realloc(
+            mixr->sound_generators, mixr->soundgen_size * sizeof(SOUNDGEN *));
         if (new_soundgens == NULL) {
             printf("Ooh, burney - cannae allocate memory for new sounds");
             return -1;
