@@ -23,6 +23,8 @@
 #include "sbmsg.h"
 #include "sound_generator.h"
 
+#include "ableton_link_wrapper.h"
+
 extern ENVSTREAM *ampstream;
 extern pthread_mutex_t midi_tick_lock;
 extern pthread_cond_t midi_tick_cond;
@@ -43,6 +45,7 @@ mixer *new_mixer()
         printf("Nae mixer, fucked up!\n");
         return NULL;
     }
+    new_ableton_link();
     return mixr;
 }
 

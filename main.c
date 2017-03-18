@@ -19,6 +19,12 @@ const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
 pthread_cond_t midi_tick_cond;
 pthread_mutex_t midi_tick_lock;
 
+typedef struct state
+{
+    bool running;
+
+} state;
+
 static int paCallback(const void *inputBuffer, void *outputBuffer,
                       unsigned long framesPerBuffer,
                       const PaStreamCallbackTimeInfo *timeInfo,

@@ -1297,6 +1297,7 @@ rpn_stack	bytebeatrrr.h	/^    Stack *rpn_stack;$/;"	m	struct:bytebeat
 rr	effect.h	/^    double rr;$/;"	m	struct:__anon9
 rsh	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
 rsq	effect.h	/^    double rsq;$/;"	m	struct:__anon9
+running	main.c	/^    bool running;$/;"	m	struct:state	file:
 s_mode_names	minisynth.c	/^const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",$/;"	v
 s_waveform_names	qblimited_oscillator.c	/^char *s_waveform_names[] = {"SINE",   "SAW1",  "SAW2",   "SAW3",   "TRI",$/;"	v
 sample_import_file_contents	sampler.c	/^void sample_import_file_contents(file_sample *fs, char *filename)$/;"	f
@@ -1372,6 +1373,8 @@ start_oscillator	oscillator.h	/^    void (*start_oscillator)(oscillator *self);$
 started	drumr.h	/^    bool started; \/\/ to sync at top of loop$/;"	m	struct:t_drumr
 started	envelope.h	/^    int started;$/;"	m	struct:envelope_stream
 started	sampler.h	/^    bool started;$/;"	m	struct:t_sampler
+state	main.c	/^typedef struct state$/;"	s	file:
+state	main.c	/^} state;$/;"	t	typeref:struct:state	file:
 state_strings	envelope_generator.c	/^char *state_strings[] = {"OFFF",    "ATTACK",  "DECAY",$/;"	v
 status	effect.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:__anon9
 status	envelope.h	/^    void (*status)(void *self, char *string);$/;"	m	struct:envelope_stream

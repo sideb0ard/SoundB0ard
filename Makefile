@@ -61,6 +61,7 @@ LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 INCDIR=/usr/local/include
 LIBDIR=/usr/local/lib
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -I$(INCDIR)
+CPPFLAGS = -std=c++11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -I$(INCDIR)
 
 %.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)
@@ -74,7 +75,7 @@ all: $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -L$(LIBDIR) -o $@ $^ $(LIBS) $(INCS)
+	$(CC) $(CPPFLAGS) -L$(LIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)
 
 clean:
 	rm -f *.o *~ $(TARGET)
