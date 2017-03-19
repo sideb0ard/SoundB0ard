@@ -10,6 +10,8 @@
 #include "sound_generator.h"
 #include "table.h"
 
+#include "ableton_link_wrapper.h"
+
 #define MAX_PS_STRING_SZ 512 // arbitrary
 
 #define ENVIRONMENT_ARRAY_SIZE 128
@@ -62,6 +64,8 @@ typedef struct t_mixer {
 
     double volume;
     int keyboard_octave; // TODO <- need this?
+
+    AbletonLink *m_ableton_link;
 
 } mixer;
 

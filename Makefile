@@ -59,9 +59,11 @@ OBJ = \
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 
 INCDIR=/usr/local/include
+ABLETONINC=/Users/sideboard/NewCodez/link/include
+ABLETONASIOINC=/Users/sideboard/NewCodez/link/modules/asio-standalone/asio/include
 LIBDIR=/usr/local/lib
 CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -I$(INCDIR)
-CPPFLAGS = -std=c++11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -I$(INCDIR)
+CPPFLAGS = -std=c++11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -I$(INCDIR) -I$(ABLETONINC) -I$(ABLETONASIOINC)
 
 %.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)
