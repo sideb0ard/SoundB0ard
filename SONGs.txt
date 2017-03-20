@@ -1,0 +1,30 @@
+dangwe.aiff // bpm 80
+
+thinkloop1bar5.aiff
+reverb
+
+soulsoulstrings2bar.aiff looplen2
+
+soulsoulstrings2bar.aiff 2 scramble
+
+heyasnare.aiff 12
+
+mawkick2 0
+
+
+mainchampagne.aiff 12
+
+djharmain.aiff // scramble
+djsharmain.aiff // sramble
+op
+
+loop thinkloop1bar4.aiff  // decimate 
+thinkloop1bar3.aiff 
+
+plantcellE1bar2.wav looplen 2 // reverb
+
+seq huff.aiff 4 
+
+brandyxmen2bar2.wav
+brandyxmen2bar1.wav
+// scramble

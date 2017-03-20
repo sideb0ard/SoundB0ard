@@ -89,7 +89,8 @@ void interpret(char *line)
         else if (strncmp("bpm", wurds[0], 3) == 0) {
             int bpm = atoi(wurds[1]);
             if (bpm > 0)
-                mixer_update_bpm(mixr, bpm);
+                link_set_bpm(mixr->m_ableton_link, bpm);
+            // mixer_update_bpm(mixr, bpm);
         }
 
         else if (strncmp("debug", wurds[0], 5) == 0) {

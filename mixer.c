@@ -44,23 +44,30 @@ mixer *new_mixer()
         return NULL;
     }
 
-    mixr->m_ableton_link = new_ableton_link();
+    mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
 
     return mixr;
 }
 
 void mixer_ps(mixer *mixr)
 {
+    LinkData data = link_get_timing_data(mixr->m_ableton_link);
     printf(COOL_COLOR_MAUVE
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
            "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
-           " :::::\n" ANSI_COLOR_RESET,
+           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE "\n"
+           "                    Quantum: " ANSI_COLOR_WHITE
+           "%.2f" COOL_COLOR_MAUVE " Tempo: " ANSI_COLOR_WHITE
+           "%.2f" COOL_COLOR_MAUVE " Beat: " ANSI_COLOR_WHITE
+           "%.2f" COOL_COLOR_MAUVE " Phase: " ANSI_COLOR_WHITE
+           "%.2f" COOL_COLOR_MAUVE " NumPeers: " ANSI_COLOR_WHITE
+           "%d" COOL_COLOR_MAUVE " :::::\n" ANSI_COLOR_RESET,
            mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
-           mixr->debug_mode ? "true" : "false");
+           mixr->debug_mode ? "true" : "false", data.quantum, data.tempo,
+           data.beat, data.phase, data.num_peers);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
@@ -391,6 +398,9 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
 double gen_next(mixer *mixr)
 {
     // called once ever SAMPLE_RATE -> cur_sample is the basis of my clock
+
+    link_update_from_main_callback(mixr->m_ableton_link);
+
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
         pthread_mutex_lock(&midi_tick_lock);
         mixr->tick++; // 1 midi tick (or pulse)

@@ -35,8 +35,8 @@ void *midiman()
     else {
         printf(
             "No MIDI inputs detected. If you think there should be, run 'midi' "
-            "to try and reinitialize. (NOT YET IMPLEMENTED\n"); // TODO
-                                                                // implement
+            "to try and reinitialize. (NOT YET IMPLEMENTED)\n"); // TODO
+                                                                 // implement
         return NULL;
     }
 
