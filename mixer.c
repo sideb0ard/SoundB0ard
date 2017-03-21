@@ -379,22 +379,21 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
 
 void mixer_start_playing(mixer *mixr)
 {
+    link_reset_beat_time(mixr->m_ableton_link);
     mixr->m_is_playing = true;
 }
 
 void mixer_stop_playing(mixer *mixr)
 {
     mixr->m_is_playing = false;
-    link_reset_beat_time(mixr->m_ableton_link);
 }
 
+// called once ever SAMPLE_RATE. This is the main audio callback
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer *mixr, uint64_t host_time)
 {
-    // called once ever SAMPLE_RATE -> cur_sample is the basis of my clock
 
-    link_update_from_main_callback(mixr->m_ableton_link, host_time);
-
+    // TODO - this needs to change if num frames > 1
     if (link_get_sample_time(mixr->m_ableton_link) %
             link_get_samples_per_midi_tick(mixr->m_ableton_link) ==
         0) {
@@ -402,15 +401,29 @@ double gen_next(mixer *mixr, uint64_t host_time)
         mixr->tick++; // 1 midi tick (or pulse)
         if (mixr->tick % PPS == 0) {
             mixr->sixteenth_note_tick++; // for drum machine resolution
-            // printf("16th++ %d %d %d\n", mixr->sixteenth_note_tick,
-            // mixr->tick, mixr->cur_sample);
         }
         pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
     }
 
+    if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time))
+        printf("Start Of Sixteenth!\n");
+
+
     double output_val = 0.0;
-    if (mixr->m_is_playing && mixr->soundgen_num > 0) {
+    if (!mixr->m_is_playing) 
+    {
+        return output_val;
+    }
+
+    //link_callback_timing_data data = link_get_callback_timing_data(mixr->m_ableton_link);
+    double beat_quantum = link_get_beat_current_quantum(mixr->m_ableton_link, host_time);
+    if (beat_quantum < 4.) {
+        // count in, wait for sync
+        return output_val;
+    }
+
+    if (mixr->soundgen_num > 0) {
         for (int i = 0; i < mixr->soundgen_num; i++) {
             output_val +=
                 mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);

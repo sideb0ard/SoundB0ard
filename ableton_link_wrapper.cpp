@@ -27,6 +27,8 @@ struct AbletonLink {
     double m_loop_len_in_samples;
     double m_loop_len_in_ticks;
 
+    std::chrono::microseconds m_last_sample_time;
+
     std::chrono::microseconds m_output_latency;
 
     ableton::link::HostTimeFilter<ableton::platforms::stl::Clock>
@@ -90,6 +92,15 @@ LinkData link_get_timing_data(AbletonLink *l)
     return data;
 }
 
+link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, double quantum)
+{
+    link_callback_timing_data data;
+    data.this_quantum = l->m_quantum;
+    data.beat_at_time = 0;
+    data.phase_this_sample = 0;
+    data.phase_last_sample = 0;
+}
+
 double link_get_bpm(AbletonLink *l)
 {
     auto timeline = l->m_link.captureAppTimeline();
@@ -109,6 +120,7 @@ void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)
     auto timeline = l->m_link.captureAudioTimeline();
 
     if (l->m_reset_beat_time) {
+        std::cout << "Resetting beat time" << std::endl;
         timeline.requestBeatAtTime(0, host_time, l->m_quantum);
         l->m_reset_beat_time = false;
     }
@@ -121,18 +133,45 @@ void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)
     l->m_link.commitAudioTimeline(timeline);
 
     l->m_sample_time++;
+
 }
 
 void link_set_bpm(AbletonLink *l, double bpm)
 {
-    // TODO - do i need locks here?
     l->m_requested_tempo = bpm;
-    // auto timeline = l->link.captureAppTimeline();
 }
 
 void link_reset_beat_time(AbletonLink *l)
 {
     l->m_reset_beat_time = true;
+}
+
+double link_get_beat_current_quantum(AbletonLink *l, uint64_t i_host_time)
+{
+    const auto host_time = std::chrono::microseconds(i_host_time);
+    auto timeline = l->m_link.captureAudioTimeline();
+    return timeline.beatAtTime(host_time, l->m_quantum);
+}
+
+bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time)
+{
+    auto timeline = l->m_link.captureAudioTimeline();
+    const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
+
+    const auto this_sample_time = std::chrono::microseconds(host_time);
+    const auto lastSampleHostTime = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
+    //std::cout << "Sample times " << this_sample_time.count() << " " << lastSampleHostTime.count()
+    //    << timeline.phaseAtTime(this_sample_time, 1) << " " << timeline.phaseAtTime(lastSampleHostTime, 1)
+    //    << std::endl;
+
+    bool is_new_sixteenth = false;
+    if (timeline.phaseAtTime(this_sample_time, 1) < timeline.phaseAtTime(lastSampleHostTime, 1)) {
+        printf("THIS IS IT\n");
+        is_new_sixteenth = true;
+    }
+
+    l->m_last_sample_time = this_sample_time;
+    return is_new_sixteenth;
 }
 
 int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }
