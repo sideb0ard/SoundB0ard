@@ -33,6 +33,13 @@ ENVELOPE *new_wavey_points(void);
 void printbp(ENVELOPE *bp);
 
 void ps_envelope_stream(ENVSTREAM *stream);
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
 void update_envelope_stream_bpm(ENVSTREAM *stream);
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

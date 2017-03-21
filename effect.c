@@ -18,7 +18,7 @@ EFFECT *new_beatrepeat(int looplen)
         return NULL;
 
     printf("NEW BEAT REPEAT! %d loops\n", looplen);
-    b->m_buffer_size = mixr->loop_len_in_samples;
+    b->m_buffer_size = link_get_loop_len_in_samples(mixr->m_ableton_link);
     b->m_buffer = (double *)calloc(b->m_buffer_size, sizeof(double));
     b->m_sixteenth_note_size = b->m_buffer_size / 16;
     b->m_selected_sixteenth = 0;

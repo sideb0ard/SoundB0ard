@@ -53,7 +53,9 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool val)
 double chaosmonkey_gen_next(void *self)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
-    if (mixr->cur_sample % (SAMPLE_RATE * cm->frequency_of_wakeup) == 0) {
+    if (link_get_sample_time(mixr->m_ableton_link) %
+            (SAMPLE_RATE * cm->frequency_of_wakeup) ==
+        0) {
         if (cm->chance_of_interruption > (rand() % 100)) {
             if (cm->make_suggestion && cm->take_action) {
                 if ((rand() % 100) > 50) // do one or other

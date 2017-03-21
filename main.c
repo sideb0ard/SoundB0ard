@@ -1,3 +1,4 @@
+#include <inttypes.h>
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -30,12 +31,16 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
     (void)timeInfo;
     (void)statusFlags;
 
+    uint64_t host_time = link_get_host_time(data->mixr->m_ableton_link);
+    // printf("PA Callback - host time: %" PRIu64 "\n", host_time);
+
     for (unsigned long i = 0; i < framesPerBuffer; i++) {
         float val = 0;
-        val = gen_next(data->mixr);
+        val = gen_next(data->mixr, host_time);
         *out++ = val;
         *out++ = val;
     }
+
     return 0;
 }
 

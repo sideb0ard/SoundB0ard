@@ -32,19 +32,19 @@ extern mixer *mixr;
 mixer *new_mixer()
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
-    mixr->volume = 0.7;
-    mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->tick = 0;
-    mixr->cur_sample = 0;
-    mixr->keyboard_octave = 3;
-    mixr->m_midi_controller_mode = 0;
-    mixr->midi_control_destination = NONE;
     if (mixr == NULL) {
         printf("Nae mixer, fucked up!\n");
         return NULL;
     }
 
+    // mixr->bpm = DEFAULT_BPM;
     mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
+    mixr->volume = 0.7;
+    mixr->tick = 0;
+    // mixr->cur_sample = 0;
+    mixr->keyboard_octave = 3;
+    mixr->m_midi_controller_mode = 0;
+    mixr->midi_control_destination = NONE;
 
     return mixr;
 }
@@ -55,7 +55,6 @@ void mixer_ps(mixer *mixr)
     printf(COOL_COLOR_MAUVE
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
            "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-           " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE "\n"
@@ -65,7 +64,7 @@ void mixer_ps(mixer *mixr)
            "%.2f" COOL_COLOR_MAUVE " Phase: " ANSI_COLOR_WHITE
            "%.2f" COOL_COLOR_MAUVE " NumPeers: " ANSI_COLOR_WHITE
            "%d" COOL_COLOR_MAUVE " :::::\n" ANSI_COLOR_RESET,
-           mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
+           mixr->volume, mixr->tick, mixr->sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false", data.quantum, data.tempo,
            data.beat, data.phase, data.num_peers);
 
@@ -103,24 +102,6 @@ void mixer_ps(mixer *mixr)
     }
 
     printf(ANSI_COLOR_RESET);
-}
-
-void mixer_update_bpm(mixer *mixr, int bpm)
-{
-    printf("Changing bpm to %d\n", bpm);
-    mixr->bpm = bpm;
-    mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
-    mixr->midi_ticks_per_ms = PPQN / ((60.0 / bpm) * 1000);
-    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
-    mixr->loop_len_in_ticks = PPL;
-    for (int i = 0; i < mixr->soundgen_num; i++) {
-        for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
-            update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
-        }
-        if (mixr->sound_generators[i]->type == SAMPLER_TYPE) {
-            sampler_resample_to_loop_size((SAMPLER *)mixr->sound_generators[i]);
-        }
-    }
 }
 
 void mixer_toggle_midi_mode(mixer *mixr)
@@ -395,13 +376,15 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
 }
 
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
-double gen_next(mixer *mixr)
+double gen_next(mixer *mixr, uint64_t host_time)
 {
     // called once ever SAMPLE_RATE -> cur_sample is the basis of my clock
 
-    link_update_from_main_callback(mixr->m_ableton_link);
+    link_update_from_main_callback(mixr->m_ableton_link, host_time);
 
-    if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
+    if (link_get_sample_time(mixr->m_ableton_link) %
+            link_get_samples_per_midi_tick(mixr->m_ableton_link) ==
+        0) {
         pthread_mutex_lock(&midi_tick_lock);
         mixr->tick++; // 1 midi tick (or pulse)
         if (mixr->tick % PPS == 0) {
@@ -412,7 +395,6 @@ double gen_next(mixer *mixr)
         pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
     }
-    mixr->cur_sample++;
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {
@@ -422,7 +404,10 @@ double gen_next(mixer *mixr)
         }
     }
 
-    return mixr->volume * (output_val / 1.53);
+    double val = mixr->volume * (output_val / 1.53);
+    // printf("Returning VAL %f\n", val);
+    // return mixr->volume * (output_val / 1.53);
+    return val;
 }
 
 void update_environment(char *key, int val)

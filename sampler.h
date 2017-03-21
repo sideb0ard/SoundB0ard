@@ -67,7 +67,6 @@ void sampler_set_stutter_mode(SAMPLER *s, bool b);
 
 void sampler_set_multi_sample_mode(SAMPLER *s, bool multi);
 void sampler_switch_sample(SAMPLER *s, int sample_num);
-void sampler_resample_to_loop_size(SAMPLER *s);
 void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len);
 void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops);
 // void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer);
@@ -80,5 +79,13 @@ double sampler_getvol(void *self);
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);
 void sample_resample_to_loop_size(file_sample *fs);
+
+#if defined(__cplusplus)
+extern "C" {
+#endif
+void sampler_resample_to_loop_size(SAMPLER *s);
+#if defined(__cplusplus)
+}
+#endif
 
 #endif // SAMPLER_H

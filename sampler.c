@@ -39,6 +39,7 @@ double sampler_gennext(void *self)
 {
     SAMPLER *sampler = (SAMPLER *)self;
     double val = 0;
+    int sample_time = link_get_sample_time(mixr->m_ableton_link);
 
     // wait till start of loop to keep patterns synched
     if (!sampler->started) {
@@ -51,8 +52,7 @@ double sampler_gennext(void *self)
     }
 
     if (sampler->stutter_mode &&
-        (mixr->cur_sample % (sampler->scramblrrr->resampled_file_size / 16) ==
-         0)) {
+        (sample_time % (sampler->scramblrrr->resampled_file_size / 16) == 0)) {
         if (mixr->debug_mode)
             printf("Stutututututter! Current: %d\n",
                    sampler->stutter_current_16th);
@@ -75,8 +75,7 @@ double sampler_gennext(void *self)
     }
 
     if (sampler->scramblrrr_mode &&
-        (mixr->cur_sample % (sampler->scramblrrr->resampled_file_size * 4) ==
-         0)) {
+        (sample_time % (sampler->scramblrrr->resampled_file_size * 4) == 0)) {
         sampler_scramble(sampler);
     }
 
@@ -242,7 +241,9 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("BUFSIZE is %d\n", fs->orig_file_size);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples = mixr->samples_per_midi_tick * PPL * fs->loop_len;
+    int loop_len_in_samples =
+        link_get_samples_per_midi_tick(mixr->m_ableton_link) * PPL *
+        fs->loop_len;
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));

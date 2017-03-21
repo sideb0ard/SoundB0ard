@@ -26,9 +26,9 @@ static void _env_reset(ENVSTREAM *stream)
 void update_envelope_stream_bpm(ENVSTREAM *stream)
 {
     // 100 is for percent - time of envelope is measured as percent of loop len
-    stream->incr =
-        100.0 / (60.0 / (mixr->bpm) * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
-    printf("called me - BPM IS NOW %f\n", mixr->bpm);
+    double bpm = link_get_bpm(mixr->m_ableton_link);
+    stream->incr = 100.0 / (60.0 / bpm * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
+    printf("called me - BPM IS NOW %f\n", bpm);
 }
 
 ENVELOPE maxpoint(const ENVELOPE *points, long npoints)
@@ -139,7 +139,8 @@ ENVSTREAM *new_sidechain_stream(int *pattern, int percent)
     points[17].value = 0.1;
 
     stream->points = points;
-    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * 4);
+    stream->incr =
+        100.0 / (60.0 / link_get_bpm(mixr->m_ableton_link) * SAMPLE_RATE * 4);
 
     _env_reset(stream);
 
@@ -212,7 +213,8 @@ ENVSTREAM *new_envelope_stream(int env_len,
 
     // unsigned long npoints = 4;
     stream->points = points;
-    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * env_len * 4);
+    stream->incr = 100.0 / (60.0 / link_get_bpm(mixr->m_ableton_link) *
+                            SAMPLE_RATE * env_len * 4);
 
     _env_reset(stream);
 

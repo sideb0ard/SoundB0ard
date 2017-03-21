@@ -77,7 +77,7 @@ double bitwize_gennext(void *self)
     double yqn = 0;
     yn = lfo_do_oscillate((oscillator *)b->m_lfo, &yqn);
 
-    int tick = mixr->cur_sample % 9600000000;
+    int tick = link_get_sample_time(mixr->m_ableton_link) % 9600000000;
     // int tick = mixr->sixteenth_note_tick;
 
     if (b->tick != tick) {

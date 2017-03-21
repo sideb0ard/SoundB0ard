@@ -50,17 +50,17 @@ typedef struct t_mixer {
     int active_midi_soundgen_num;
     int active_midi_soundgen_effect_num;
 
-    double bpm;
+    // double bpm;
 
-    int samples_per_midi_tick;
-    int midi_ticks_per_ms;
+    //  int samples_per_midi_tick;
+    //  int midi_ticks_per_ms;
     int sixteenth_note_tick;
-    int cur_sample; // inverse of SAMPLE RATE
-    int tick;       //
+    // int cur_sample; // inverse of SAMPLE RATE
+    int tick; //
 
     // informational for other sound generators
-    unsigned int loop_len_in_samples;
-    unsigned int loop_len_in_ticks;
+    //  unsigned int loop_len_in_samples;
+    //  unsigned int loop_len_in_ticks;
 
     double volume;
     int keyboard_octave; // TODO <- need this?
@@ -102,7 +102,7 @@ void mixer_toggle_midi_mode(mixer *mixr);
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
 
-double gen_next(mixer *mixr);
+double gen_next(mixer *mixr, uint64_t host_time);
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out);
 
 #endif // MIXER_H

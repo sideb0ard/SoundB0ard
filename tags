@@ -18,6 +18,8 @@ ANSI_COLOR_WHITE	defjams.h	/^#define ANSI_COLOR_WHITE /;"	d
 ANSI_COLOR_YELLOW	defjams.h	/^#define ANSI_COLOR_YELLOW /;"	d
 ARC4RANDOMMAX	utils.c	/^#define ARC4RANDOMMAX /;"	d	file:
 ATTACK	envelope_generator.h	/^    ATTACK,$/;"	e	enum:__anon11
+AbletonLink	ableton_link_wrapper.cpp	/^    AbletonLink(double bpm)$/;"	f	struct:AbletonLink
+AbletonLink	ableton_link_wrapper.cpp	/^struct AbletonLink {$/;"	s	file:
 AbletonLink	ableton_link_wrapper.h	/^typedef struct AbletonLink AbletonLink;$/;"	t	typeref:struct:AbletonLink
 B	utils.c	/^const double B = 4.0 \/ (float)M_PI;$/;"	v
 BANDPASS	effect.h	/^    BANDPASS,$/;"	e	enum:__anon8
@@ -162,6 +164,7 @@ LEGATO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
 LFORFREE	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
 LFOSHOT	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
 LFOSYNC	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
+LINK_PLATFORM_MACOSX	ableton_link_wrapper.cpp	/^#define LINK_PLATFORM_MACOSX /;"	d	file:
 LOOP	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
 LOWPASS	effect.h	/^    LOWPASS,$/;"	e	enum:__anon8
 LPF1	filter.h	/^    LPF1,$/;"	e	enum:__anon12
@@ -375,7 +378,6 @@ bitwize_getvol	bitwize.c	/^double bitwize_getvol(void *self)$/;"	f
 bitwize_process	bitwize.c	/^char bitwize_process(int pattern, int t)$/;"	f
 bitwize_setvol	bitwize.c	/^void bitwize_setvol(void *self, double v)$/;"	f
 bitwize_status	bitwize.c	/^void bitwize_status(void *self, wchar_t *status_string)$/;"	f
-bpm	mixer.h	/^    double bpm;$/;"	m	struct:t_mixer
 buf_length	effect.h	/^    int buf_length;$/;"	m	struct:__anon9
 buf_num_channels	drumr.h	/^    int buf_num_channels;$/;"	m	struct:t_drumr
 buf_p	effect.h	/^    int buf_p;$/;"	m	struct:__anon9
@@ -439,7 +441,6 @@ cur_melody_iteration	minisynth.h	/^    int cur_melody_iteration;$/;"	m	struct:mi
 cur_octave	minisynth.h	/^    int cur_octave;$/;"	m	struct:minisynth
 cur_pattern	drumr.h	/^    int cur_pattern;$/;"	m	struct:t_drumr
 cur_pattern_iteration	drumr.h	/^    int cur_pattern_iteration;$/;"	m	struct:t_drumr
-cur_sample	mixer.h	/^    int cur_sample; \/\/ inverse of SAMPLE RATE$/;"	m	struct:t_mixer
 cur_sample	sampler.h	/^    int cur_sample;$/;"	m	struct:t_sampler
 cur_sample_iteration	sampler.h	/^    int cur_sample_iteration;$/;"	m	struct:t_sampler
 curpos	envelope.h	/^    double curpos;$/;"	m	struct:envelope_stream
@@ -641,7 +642,7 @@ frequency_of_wakeup	chaosmonkey.h	/^    int frequency_of_wakeup;    \/\/ seconds
 freqval	utils.c	/^float freqval(char *n)$/;"	f
 game_generation	drumr.h	/^    int game_generation;$/;"	m	struct:t_drumr
 game_of_life_on	drumr.h	/^    bool game_of_life_on;$/;"	m	struct:t_drumr
-gen_next	mixer.c	/^double gen_next(mixer *mixr)$/;"	f
+gen_next	mixer.c	/^double gen_next(mixer *mixr, uint64_t host_time)$/;"	f
 gennext	filter.h	/^    double (*gennext)(filter *self, double xn); \/\/ do_filter$/;"	m	struct:filter
 gennext	sound_generator.h	/^    double (*gennext)(void *self);$/;"	m	struct:t_soundgen
 get_environment_val	mixer.c	/^int get_environment_val(char *key, int *return_val)$/;"	f
@@ -706,12 +707,18 @@ lfo_set_soundgenerator_interface	lfo.c	/^void lfo_set_soundgenerator_interface(l
 lfo_start_oscillator	lfo.c	/^void lfo_start_oscillator(oscillator *self)$/;"	f
 lfo_stop_oscillator	lfo.c	/^void lfo_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
 lin_terp	utils.c	/^float lin_terp(float x1, float x2, float y1, float y2, float x)$/;"	f
+link_get_bpm	ableton_link_wrapper.cpp	/^double link_get_bpm(AbletonLink *l)$/;"	f
+link_get_host_time	ableton_link_wrapper.cpp	/^uint64_t link_get_host_time(AbletonLink *l)$/;"	f
+link_get_loop_len_in_samples	ableton_link_wrapper.cpp	/^int link_get_loop_len_in_samples(AbletonLink *l)$/;"	f
+link_get_sample_time	ableton_link_wrapper.cpp	/^int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }$/;"	f
+link_get_samples_per_midi_tick	ableton_link_wrapper.cpp	/^int link_get_samples_per_midi_tick(AbletonLink *l)$/;"	f
+link_get_timing_data	ableton_link_wrapper.cpp	/^LinkData link_get_timing_data(AbletonLink *l)$/;"	f
+link_set_bpm	ableton_link_wrapper.cpp	/^void link_set_bpm(AbletonLink *l, double bpm)$/;"	f
+link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)$/;"	f
 list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
 load_file_to_buffer	drumr.c	/^int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)$/;"	f
 loop_Mode	synthfunctions.h	/^    unsigned int loop_Mode;$/;"	m	struct:__anon28
 loop_len	sampler.h	/^    int loop_len;$/;"	m	struct:file_sample
-loop_len_in_samples	mixer.h	/^    unsigned int loop_len_in_samples;$/;"	m	struct:t_mixer
-loop_len_in_ticks	mixer.h	/^    unsigned int loop_len_in_ticks;$/;"	m	struct:t_mixer
 looplen	sbmsg.h	/^    double looplen;$/;"	m	struct:sbmsg
 loopy	cmdloop.c	/^void loopy(void)$/;"	f
 m	effect.h	/^    long m;$/;"	m	struct:__anon9
@@ -854,6 +861,7 @@ m_global_synth_params	voice.h	/^    global_synth_params *m_global_synth_params;$
 m_global_voice_params	voice.h	/^    global_voice_params *m_global_voice_params;$/;"	m	struct:__anon34
 m_grid	beatrepeat.h	/^    unsigned int m_grid;$/;"	m	struct:beatrepeat
 m_have_recording	beatrepeat.h	/^    bool m_have_recording;$/;"	m	struct:beatrepeat
+m_host_time_filter	ableton_link_wrapper.cpp	/^        m_host_time_filter;$/;"	m	struct:AbletonLink	file:
 m_hs_ratio	voice.h	/^    double m_hs_ratio; \/\/ hard sync$/;"	m	struct:__anon34
 m_inc	oscillator.h	/^    double m_inc;    \/\/ phase inc = fo\/fs$/;"	m	struct:oscillator
 m_inc_shutdown	envelope_generator.h	/^    double m_inc_shutdown;$/;"	m	struct:envelope_generator
@@ -862,6 +870,7 @@ m_input_apf_2	reverb.h	/^    delay_apf m_input_apf_2;$/;"	m	struct:reverb
 m_input_lpf	reverb.h	/^    one_pole_lpf m_input_lpf;$/;"	m	struct:reverb
 m_input_lpf_g	reverb.h	/^    double m_input_lpf_g;        \/\/ k5$/;"	m	struct:reverb
 m_interval	beatrepeat.h	/^    unsigned int m_interval;$/;"	m	struct:beatrepeat
+m_is_playing	ableton_link_wrapper.cpp	/^    bool m_is_playing;$/;"	m	struct:AbletonLink	file:
 m_k	filter_ckthreefive.h	/^    double m_k;$/;"	m	struct:filter_ckthreefive
 m_k	filter_moogladder.h	/^    double m_k;$/;"	m	struct:filter_moogladder
 m_last_note_frequency	minisynth.h	/^    double m_last_note_frequency;$/;"	m	struct:minisynth
@@ -882,6 +891,9 @@ m_lfo1_waveform	minisynth.h	/^    unsigned int m_lfo1_waveform;$/;"	m	struct:min
 m_lfo2	voice.h	/^    lfo m_lfo2;$/;"	m	struct:__anon34
 m_lfo_mode	oscillator.h	/^    unsigned m_lfo_mode; \/\/ to store MODE$/;"	m	struct:oscillator
 m_lfo_type	modular_delay.h	/^    unsigned int m_lfo_type; \/\/ TRI \/ SINE$/;"	m	struct:mod_delay
+m_link	ableton_link_wrapper.cpp	/^    ableton::Link m_link;$/;"	m	struct:AbletonLink	file:
+m_loop_len_in_samples	ableton_link_wrapper.cpp	/^    double m_loop_len_in_samples;$/;"	m	struct:AbletonLink	file:
+m_loop_len_in_ticks	ableton_link_wrapper.cpp	/^    double m_loop_len_in_ticks;$/;"	m	struct:AbletonLink	file:
 m_lpf2_g2	reverb.h	/^    double m_lpf2_g2;$/;"	m	struct:reverb
 m_matrix_core	modmatrix.h	/^    matrixrow **m_matrix_core;$/;"	m	struct:__anon22
 m_max_delay_msec	modular_delay.h	/^    double m_max_delay_msec;$/;"	m	struct:mod_delay
@@ -890,6 +902,7 @@ m_midi_note_number	oscillator.h	/^    unsigned m_midi_note_number;$/;"	m	struct:
 m_midi_note_number	voice.h	/^    unsigned int m_midi_note_number;$/;"	m	struct:__anon34
 m_midi_note_number_pending	voice.h	/^    unsigned int m_midi_note_number_pending;$/;"	m	struct:__anon34
 m_midi_rx_channel	minisynth.h	/^    unsigned int m_midi_rx_channel;$/;"	m	struct:minisynth
+m_midi_ticks_per_ms	ableton_link_wrapper.cpp	/^    double m_midi_ticks_per_ms;$/;"	m	struct:AbletonLink	file:
 m_midi_velocity	dca.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:dca
 m_midi_velocity	voice.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:__anon34
 m_midi_velocity_pending	voice.h	/^    unsigned int m_midi_velocity_pending;$/;"	m	struct:__anon34
@@ -943,6 +956,7 @@ m_osc_pitch_pending	voice.h	/^    double m_osc_pitch_pending;$/;"	m	struct:__ano
 m_output_apf_3	reverb.h	/^    delay_apf m_output_apf_3;$/;"	m	struct:reverb
 m_output_apf_4	reverb.h	/^    delay_apf m_output_apf_4;$/;"	m	struct:reverb
 m_output_eg	envelope_generator.h	/^    bool m_output_eg; \/\/ i.e. this instance is going direct to output, rather$/;"	m	struct:envelope_generator
+m_output_latency	ableton_link_wrapper.cpp	/^    std::chrono::microseconds m_output_latency;$/;"	m	struct:AbletonLink	file:
 m_pan_control	dca.h	/^    double m_pan_control;$/;"	m	struct:dca
 m_pan_mod	dca.h	/^    double m_pan_mod;$/;"	m	struct:dca
 m_parallel_cf_1	reverb.h	/^    comb_filter m_parallel_cf_1;$/;"	m	struct:reverb
@@ -972,6 +986,7 @@ m_pw_mod	oscillator.h	/^    double m_pw_mod;     \/* modulation input for PWM -1
 m_q	filter.h	/^    double m_q;      \/\/ current q value$/;"	m	struct:filter
 m_q_control	filter.h	/^    double m_q_control;   \/\/ 'qualvity factor' 1-10$/;"	m	struct:filter
 m_q_control	minisynth.h	/^    double m_q_control;$/;"	m	struct:minisynth
+m_quantum	ableton_link_wrapper.cpp	/^    double m_quantum;$/;"	m	struct:AbletonLink	file:
 m_rate	modular_delay.h	/^    double m_rate;$/;"	m	struct:mod_delay
 m_read_index	ddlmodule.h	/^    int m_read_index;$/;"	m	struct:ddlmodule
 m_read_index	delayline.h	/^    int m_read_index;$/;"	m	struct:delayline
@@ -982,6 +997,8 @@ m_release_offset	envelope_generator.h	/^    double m_release_offset;$/;"	m	struc
 m_release_pending	envelope_generator.h	/^    bool m_release_pending;$/;"	m	struct:envelope_generator
 m_release_tco	envelope_generator.h	/^    double m_release_tco;$/;"	m	struct:envelope_generator
 m_release_time_msec	envelope_generator.h	/^    double m_release_time_msec;$/;"	m	struct:envelope_generator
+m_requested_tempo	ableton_link_wrapper.cpp	/^    double m_requested_tempo;$/;"	m	struct:AbletonLink	file:
+m_reset_beat_time	ableton_link_wrapper.cpp	/^    bool m_reset_beat_time;$/;"	m	struct:AbletonLink	file:
 m_reset_to_zero	envelope_generator.h	/^    bool m_reset_to_zero;$/;"	m	struct:envelope_generator
 m_reset_to_zero	minisynth.h	/^    unsigned int m_reset_to_zero;$/;"	m	struct:minisynth
 m_rho	filter_sem.h	/^    double m_rho;$/;"	m	struct:filter_sem
@@ -989,6 +1006,9 @@ m_right_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	s
 m_rsh_counter	oscillator.h	/^    int m_rsh_counter;      \/\/ random sample\/hold counter$/;"	m	struct:oscillator
 m_rsh_value	oscillator.h	/^    double m_rsh_value;     \/\/ currnet rsh output$/;"	m	struct:oscillator
 m_rt60	reverb.h	/^    double m_rt60;               \/\/ reverb time, k3$/;"	m	struct:reverb
+m_running	ableton_link_wrapper.cpp	/^    std::atomic<bool> m_running;$/;"	m	struct:AbletonLink	file:
+m_sample_time	ableton_link_wrapper.cpp	/^    int m_sample_time;$/;"	m	struct:AbletonLink	file:
+m_samples_per_midi_tick	ableton_link_wrapper.cpp	/^    double m_samples_per_midi_tick;$/;"	m	struct:AbletonLink	file:
 m_saturation	filter.h	/^    double m_saturation; \/\/ used in NLP$/;"	m	struct:filter
 m_saw_tables	wt_oscillator.h	/^    double *m_saw_tables[NUM_TABLES];$/;"	m	struct:wt_oscillator
 m_selected_sixteenth	beatrepeat.h	/^    size_t m_selected_sixteenth;$/;"	m	struct:beatrepeat
@@ -1068,7 +1088,6 @@ midi_mode	mixer.h	/^} midi_mode; \/\/ to switch control knob routing$/;"	t	typer
 midi_parse_midi_event	midimaaan.c	/^void midi_parse_midi_event(minisynth *ms, midi_event *ev)$/;"	f
 midi_tick_cond	main.c	/^pthread_cond_t midi_tick_cond;$/;"	v
 midi_tick_lock	main.c	/^pthread_mutex_t midi_tick_lock;$/;"	v
-midi_ticks_per_ms	mixer.h	/^    int midi_ticks_per_ms;$/;"	m	struct:t_mixer
 midiman	midimaaan.c	/^void *midiman()$/;"	f
 minisynth	midimaaan.h	/^typedef struct minisynth minisynth;$/;"	t	typeref:struct:minisynth
 minisynth	minisynth.h	/^typedef struct minisynth {$/;"	s
@@ -1112,7 +1131,6 @@ minisynth_voice_update	minisynth_voice.c	/^void minisynth_voice_update(minisynth
 mixer	mixer.h	/^} mixer;$/;"	t	typeref:struct:t_mixer
 mixer_ps	mixer.c	/^void mixer_ps(mixer *mixr)$/;"	f
 mixer_toggle_midi_mode	mixer.c	/^void mixer_toggle_midi_mode(mixer *mixr)$/;"	f
-mixer_update_bpm	mixer.c	/^void mixer_update_bpm(mixer *mixr, int bpm)$/;"	f
 mixer_vol_change	mixer.c	/^void mixer_vol_change(mixer *mixr, float vol)$/;"	f
 mixr	main.c	/^mixer *mixr;$/;"	v
 mixr	mixer.h	/^    mixer *mixr;$/;"	m	struct:__anon17
@@ -1139,6 +1157,7 @@ multi_melody_loop_countdown_started	minisynth.h	/^    bool multi_melody_loop_cou
 multi_melody_mode	minisynth.h	/^    bool multi_melody_mode;$/;"	m	struct:minisynth
 multi_pattern_mode	drumr.h	/^    bool multi_pattern_mode;$/;"	m	struct:t_drumr
 multi_sample_mode	sampler.h	/^    bool multi_sample_mode;$/;"	m	struct:t_sampler
+new_ableton_link	ableton_link_wrapper.cpp	/^AbletonLink *new_ableton_link(double bpm)$/;"	f
 new_algorithm	algorithm.c	/^algorithm *new_algorithm(char *line)$/;"	f
 new_beatrepeat	effect.c	/^EFFECT *new_beatrepeat(int looplen)$/;"	f
 new_bitwize	bitwize.c	/^BITWIZE *new_bitwize(int pattern)$/;"	f
@@ -1331,7 +1350,6 @@ sampler_switch_sample	sampler.c	/^void sampler_switch_sample(SAMPLER *s, int sam
 samplerate	drumr.h	/^    int samplerate;$/;"	m	struct:t_drumr
 samplerate	sampler.h	/^    int samplerate;$/;"	m	struct:file_sample
 samples	sampler.h	/^    file_sample *samples[MAX_SAMPLES_PER_LOOPER];$/;"	m	struct:t_sampler
-samples_per_midi_tick	mixer.h	/^    int samples_per_midi_tick;$/;"	m	struct:t_mixer
 saturation	synthfunctions.h	/^    double saturation;$/;"	m	struct:__anon29
 sbmsg	sbmsg.h	/^typedef struct sbmsg {$/;"	s
 scal	effect.h	/^    double scal;$/;"	m	struct:__anon9
@@ -1428,6 +1446,7 @@ type	effect.h	/^    effect_type type;$/;"	m	struct:__anon9
 type	sound_generator.h	/^    sound_generator_type type;$/;"	m	struct:t_soundgen
 unipolar_to_bipolar	utils.c	/^double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }$/;"	f
 update	filter.h	/^    void (*update)(filter *self);$/;"	m	struct:filter
+update_bpm	ableton_link_wrapper.cpp	/^void update_bpm(double bpm)$/;"	f
 update_envelope_stream_bpm	envelope.c	/^void update_envelope_stream_bpm(ENVSTREAM *stream)$/;"	f
 update_environment	mixer.c	/^void update_environment(char *key, int val)$/;"	f
 update_oscillator	oscillator.h	/^    void (*update_oscillator)(oscillator *self, char *name);$/;"	m	struct:oscillator
