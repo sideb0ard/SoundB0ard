@@ -55,6 +55,7 @@ void mixer_ps(mixer *mixr)
     printf(COOL_COLOR_MAUVE
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
            "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
+           " Playing: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE "\n"
@@ -64,7 +65,8 @@ void mixer_ps(mixer *mixr)
            "%.2f" COOL_COLOR_MAUVE " Phase: " ANSI_COLOR_WHITE
            "%.2f" COOL_COLOR_MAUVE " NumPeers: " ANSI_COLOR_WHITE
            "%d" COOL_COLOR_MAUVE " :::::\n" ANSI_COLOR_RESET,
-           mixr->volume, mixr->tick, mixr->sixteenth_note_tick,
+           mixr->volume, mixr->m_is_playing ? "true" : "false",
+           mixr->tick, mixr->sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false", data.quantum, data.tempo,
            data.beat, data.phase, data.num_peers);
 
@@ -375,6 +377,17 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
     return add_sound_generator(mixr, m);
 }
 
+void mixer_start_playing(mixer *mixr)
+{
+    mixr->m_is_playing = true;
+}
+
+void mixer_stop_playing(mixer *mixr)
+{
+    mixr->m_is_playing = false;
+    link_reset_beat_time(mixr->m_ableton_link);
+}
+
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
 double gen_next(mixer *mixr, uint64_t host_time)
 {
@@ -397,7 +410,7 @@ double gen_next(mixer *mixr, uint64_t host_time)
     }
 
     double output_val = 0.0;
-    if (mixr->soundgen_num > 0) {
+    if (mixr->m_is_playing && mixr->soundgen_num > 0) {
         for (int i = 0; i < mixr->soundgen_num; i++) {
             output_val +=
                 mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
@@ -441,3 +454,4 @@ int get_environment_val(char *key, int *return_val)
     }
     return 1;
 }
+

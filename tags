@@ -713,6 +713,7 @@ link_get_loop_len_in_samples	ableton_link_wrapper.cpp	/^int link_get_loop_len_in
 link_get_sample_time	ableton_link_wrapper.cpp	/^int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }$/;"	f
 link_get_samples_per_midi_tick	ableton_link_wrapper.cpp	/^int link_get_samples_per_midi_tick(AbletonLink *l)$/;"	f
 link_get_timing_data	ableton_link_wrapper.cpp	/^LinkData link_get_timing_data(AbletonLink *l)$/;"	f
+link_reset_beat_time	ableton_link_wrapper.cpp	/^void link_reset_beat_time(AbletonLink *l)$/;"	f
 link_set_bpm	ableton_link_wrapper.cpp	/^void link_set_bpm(AbletonLink *l, double bpm)$/;"	f
 link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)$/;"	f
 list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
@@ -871,6 +872,7 @@ m_input_lpf	reverb.h	/^    one_pole_lpf m_input_lpf;$/;"	m	struct:reverb
 m_input_lpf_g	reverb.h	/^    double m_input_lpf_g;        \/\/ k5$/;"	m	struct:reverb
 m_interval	beatrepeat.h	/^    unsigned int m_interval;$/;"	m	struct:beatrepeat
 m_is_playing	ableton_link_wrapper.cpp	/^    bool m_is_playing;$/;"	m	struct:AbletonLink	file:
+m_is_playing	mixer.h	/^    bool m_is_playing;$/;"	m	struct:t_mixer
 m_k	filter_ckthreefive.h	/^    double m_k;$/;"	m	struct:filter_ckthreefive
 m_k	filter_moogladder.h	/^    double m_k;$/;"	m	struct:filter_moogladder
 m_last_note_frequency	minisynth.h	/^    double m_last_note_frequency;$/;"	m	struct:minisynth
@@ -1130,6 +1132,8 @@ minisynth_voice_reset	minisynth_voice.c	/^void minisynth_voice_reset(minisynth_v
 minisynth_voice_update	minisynth_voice.c	/^void minisynth_voice_update(minisynth_voice *msv)$/;"	f
 mixer	mixer.h	/^} mixer;$/;"	t	typeref:struct:t_mixer
 mixer_ps	mixer.c	/^void mixer_ps(mixer *mixr)$/;"	f
+mixer_start_playing	mixer.c	/^void mixer_start_playing(mixer *mixr)$/;"	f
+mixer_stop_playing	mixer.c	/^void mixer_stop_playing(mixer *mixr)$/;"	f
 mixer_toggle_midi_mode	mixer.c	/^void mixer_toggle_midi_mode(mixer *mixr)$/;"	f
 mixer_vol_change	mixer.c	/^void mixer_vol_change(mixer *mixr, float vol)$/;"	f
 mixr	main.c	/^mixer *mixr;$/;"	v
@@ -1437,7 +1441,7 @@ thrunner	utils.c	/^void thrunner(SBMSG *msg)$/;"	f
 tick	bitwize.h	/^    int tick;$/;"	m	struct:t_bitwize
 tick	drumr.h	/^    int tick;$/;"	m	struct:t_drumr
 tick	midimaaan.h	/^    unsigned tick;$/;"	m	struct:midi_event
-tick	mixer.h	/^    int tick;       \/\/$/;"	m	struct:t_mixer
+tick	mixer.h	/^    int tick; \/\/$/;"	m	struct:t_mixer
 tickedyet	drumr.h	/^    bool tickedyet;$/;"	m	struct:t_drumr
 time	envelope.h	/^    double time;$/;"	m	struct:envelope
 timed_sig_start	utils.c	/^void *timed_sig_start(void *arg)$/;"	f

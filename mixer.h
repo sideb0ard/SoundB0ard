@@ -40,6 +40,8 @@ typedef struct t_mixer {
     int delay_on;
     bool debug_mode;
 
+    bool m_is_playing;
+
     EFFECT **effects;
     int effects_num;
     int effects_size;
@@ -98,6 +100,8 @@ void freq_change(mixer *mixr, int sig, float freq);
 void delay_toggle(mixer *mixr);
 
 void mixer_toggle_midi_mode(mixer *mixr);
+void mixer_start_playing(mixer *mixr);
+void mixer_stop_playing(mixer *mixr);
 
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);

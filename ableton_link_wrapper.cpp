@@ -129,6 +129,12 @@ void link_set_bpm(AbletonLink *l, double bpm)
     l->m_requested_tempo = bpm;
     // auto timeline = l->link.captureAppTimeline();
 }
+
+void link_reset_beat_time(AbletonLink *l)
+{
+    l->m_reset_beat_time = true;
+}
+
 int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }
 
 int link_get_samples_per_midi_tick(AbletonLink *l)

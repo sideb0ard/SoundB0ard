@@ -81,6 +81,14 @@ void interpret(char *line)
             print_help();
         }
 
+        else if (strncmp("start", wurds[0], 4) == 0) {
+            mixer_start_playing(mixr);
+        }
+
+        else if (strncmp("stop", wurds[0], 4) == 0) {
+            mixer_stop_playing(mixr);
+        }
+
         else if (strncmp("quit", wurds[0], 4) == 0 ||
                  strncmp("exit", wurds[0], 4) == 0) {
             exxit();
