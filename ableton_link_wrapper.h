@@ -26,7 +26,7 @@ AbletonLink *new_ableton_link(double bpm);
 LinkData link_get_timing_data(AbletonLink *l);
 link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, double quantum);
 double link_get_beat_current_quantum(AbletonLink *l, uint64_t host_time);
-bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time);
+bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_number);
 void link_update_from_main_callback(AbletonLink *l, uint64_t host_time);
 
 void update_bpm(double bpm);
@@ -40,6 +40,8 @@ int link_get_loop_len_in_samples(AbletonLink *l);
 
 double link_get_bpm(AbletonLink *l);
 uint64_t link_get_host_time(AbletonLink *l);
+
+void temp_use_link_metronome(AbletonLink *l, void *outputBuffer, int framesPerBuffer);
 
 #ifdef __cplusplus
 } // end extern "C"

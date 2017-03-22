@@ -48,8 +48,6 @@ typedef struct t_drumr {
     int swing;
     int swing_setting;
 
-    bool started; // to sync at top of loop
-
     bool game_of_life_on;
     int game_generation;
 

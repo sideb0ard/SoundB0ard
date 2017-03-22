@@ -31,14 +31,14 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
     (void)timeInfo;
     (void)statusFlags;
 
+    // Ableton Link stuff //////////////////////////////////////////////
     uint64_t host_time = link_get_host_time(data->mixr->m_ableton_link);
-    // printf("PA Callback - host time: %" PRIu64 "\n", host_time);
-
     link_update_from_main_callback(mixr->m_ableton_link, host_time);
+    /////////////////////////////////////////////////////////////////////
 
     for (unsigned long i = 0; i < framesPerBuffer; i++) {
         float val = 0;
-        val = gen_next(data->mixr, host_time);
+        val = gen_next(data->mixr, host_time, i);
         *out++ = val;
         *out++ = val;
     }

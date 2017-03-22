@@ -57,6 +57,7 @@ typedef struct t_mixer {
     //  int samples_per_midi_tick;
     //  int midi_ticks_per_ms;
     int sixteenth_note_tick;
+    bool start_of_sixteenth;
     // int cur_sample; // inverse of SAMPLE RATE
     int tick; //
 
@@ -73,10 +74,6 @@ typedef struct t_mixer {
 
 typedef struct {
     mixer *mixr;
-    float delay[(int)SAMPLE_RATE / 8];
-    int delay_p;
-    float left_phase;
-    float right_phase;
 } paData;
 
 mixer *new_mixer(void);
@@ -106,7 +103,7 @@ void mixer_stop_playing(mixer *mixr);
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
 
-double gen_next(mixer *mixr, uint64_t host_time);
+double gen_next(mixer *mixr, uint64_t host_time, int sample_number);
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out);
 
 #endif // MIXER_H

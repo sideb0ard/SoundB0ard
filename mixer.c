@@ -112,12 +112,6 @@ void mixer_toggle_midi_mode(mixer *mixr)
         ++(mixr->m_midi_controller_mode) % MAX_NUM_MIDI_MODES;
 }
 
-void delay_toggle(mixer *mixr)
-{
-    mixr->delay_on = abs(1 - mixr->delay_on);
-    printf("MIXER VOL DELAY: %d!\n", mixr->delay_on);
-}
-
 void mixer_vol_change(mixer *mixr, float vol)
 {
     printf("Changing volume to %f\n", vol);
@@ -390,24 +384,34 @@ void mixer_stop_playing(mixer *mixr)
 
 // called once ever SAMPLE_RATE. This is the main audio callback
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
-double gen_next(mixer *mixr, uint64_t host_time)
+double gen_next(mixer *mixr, uint64_t host_time, int sample_number)
 {
 
-    // TODO - this needs to change if num frames > 1
-    if (link_get_sample_time(mixr->m_ableton_link) %
-            link_get_samples_per_midi_tick(mixr->m_ableton_link) ==
-        0) {
-        pthread_mutex_lock(&midi_tick_lock);
-        mixr->tick++; // 1 midi tick (or pulse)
-        if (mixr->tick % PPS == 0) {
-            mixr->sixteenth_note_tick++; // for drum machine resolution
-        }
-        pthread_cond_broadcast(&midi_tick_cond);
-        pthread_mutex_unlock(&midi_tick_lock);
-    }
+    // // TODO - this needs to change if num frames > 1
+    // if (link_get_sample_time(mixr->m_ableton_link) %
+    //         link_get_samples_per_midi_tick(mixr->m_ableton_link) ==
+    //     0) {
+    //     pthread_mutex_lock(&midi_tick_lock);
+    //     mixr->tick++; // 1 midi tick (or pulse)
+    //     if (mixr->tick % PPS == 0) {
+    //         mixr->sixteenth_note_tick++; // for drum machine resolution
+    //     }
+    //     pthread_cond_broadcast(&midi_tick_cond);
+    //     pthread_mutex_unlock(&midi_tick_lock);
+    // }
 
-    if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time))
-        printf("Start Of Sixteenth!\n");
+    if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time, sample_number)) {
+        //pthread_mutex_lock(&midi_tick_lock);
+        //mixr->tick++; // 1 midi tick (or pulse)
+        //if (mixr->tick % PPS == 0) {
+        mixr->sixteenth_note_tick++; // for drum machine resolution
+        mixr->start_of_sixteenth = true;
+        //}
+        //pthread_cond_broadcast(&midi_tick_cond);
+        //pthread_mutex_unlock(&midi_tick_lock);
+    } else {
+        mixr->start_of_sixteenth = false;
+    }
 
 
     double output_val = 0.0;

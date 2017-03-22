@@ -27,9 +27,8 @@ struct AbletonLink {
     double m_loop_len_in_samples;
     double m_loop_len_in_ticks;
 
-    std::chrono::microseconds m_last_sample_time;
-
     std::chrono::microseconds m_output_latency;
+    std::chrono::microseconds mTimeAtLastClick;
 
     ableton::link::HostTimeFilter<ableton::platforms::stl::Clock>
         m_host_time_filter;
@@ -153,24 +152,20 @@ double link_get_beat_current_quantum(AbletonLink *l, uint64_t i_host_time)
     return timeline.beatAtTime(host_time, l->m_quantum);
 }
 
-bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time)
+bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_number)
 {
     auto timeline = l->m_link.captureAudioTimeline();
     const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
 
-    const auto this_sample_time = std::chrono::microseconds(host_time);
+    const auto this_sample_time = std::chrono::microseconds(host_time) + std::chrono::microseconds(llround(sample_number * microsPerSample));
     const auto lastSampleHostTime = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
-    //std::cout << "Sample times " << this_sample_time.count() << " " << lastSampleHostTime.count()
-    //    << timeline.phaseAtTime(this_sample_time, 1) << " " << timeline.phaseAtTime(lastSampleHostTime, 1)
-    //    << std::endl;
 
     bool is_new_sixteenth = false;
-    if (timeline.phaseAtTime(this_sample_time, 1) < timeline.phaseAtTime(lastSampleHostTime, 1)) {
-        printf("THIS IS IT\n");
+    if (timeline.phaseAtTime(this_sample_time, 0.25) < timeline.phaseAtTime(lastSampleHostTime, 0.25)) {
         is_new_sixteenth = true;
+        //printf("SAMPLEPHASETIMEDIFF %f %f == %f\n", timeline.phaseAtTime(this_sample_time, 0.25), timeline.phaseAtTime(lastSampleHostTime, 0.25), timeline.phaseAtTime(lastSampleHostTime, 0.25) - timeline.phaseAtTime(this_sample_time, 0.25));
     }
 
-    l->m_last_sample_time = this_sample_time;
     return is_new_sixteenth;
 }
 
@@ -194,6 +189,69 @@ uint64_t link_get_host_time(AbletonLink *l)
     uint64_t itime = host_time.count();
 
     return itime;
+}
+
+void temp_use_link_metronome(AbletonLink *l, void *outputBuffer, int numSamples)
+{
+    auto timeline = l->m_link.captureAudioTimeline();
+    const auto beginHostTime =
+        l->m_host_time_filter.sampleTimeToHostTime(l->m_sample_time);
+	using namespace std::chrono;
+
+    auto mBuffer = (float*) outputBuffer;
+
+	auto quantum = 4;
+
+  // Metronome frequencies
+  static const double highTone = 1567.98;
+  static const double lowTone = 1108.73;
+  // 100ms click duration
+  static const auto clickDuration = duration<double>{0.1};
+
+  // The number of microseconds that elapse between samples
+  const auto microsPerSample = 1e6 / SAMPLE_RATE;
+
+  for (std::size_t i = 0; i < numSamples; ++i)
+  {
+    double amplitude = 0.;
+    // Compute the host time for this sample and the last.
+    const auto hostTime = beginHostTime + microseconds(llround(i * microsPerSample));
+    const auto lastSampleHostTime = hostTime - microseconds(llround(microsPerSample));
+
+    // Only make sound for positive beat magnitudes. Negative beat
+    // magnitudes are count-in beats.
+    if (timeline.beatAtTime(hostTime, quantum) >= 0.)
+    {
+      // If the phase wraps around between the last sample and the
+      // current one with respect to a 1 beat quantum, then a click
+      // should occur.
+      if (timeline.phaseAtTime(hostTime, 1) < timeline.phaseAtTime(lastSampleHostTime, 1))
+      {
+        //std::cout << "NEW BEAT!" << std::endl;
+        l->mTimeAtLastClick = hostTime;
+      }
+
+      const auto secondsAfterClick =
+        duration_cast<duration<double>>(hostTime - l->mTimeAtLastClick);
+
+      // If we're within the click duration of the last beat, render
+      // the click tone into this sample
+      if (secondsAfterClick < clickDuration)
+      {
+ 		// If the phase of the last beat with respect to the current
+ 		       // quantum was zero, then it was at a quantum boundary and we
+ 		       // want to use the high tone. For other beats within the
+ 		       // quantum, use the low tone.
+ 		       const auto freq =
+ 		         floor(timeline.phaseAtTime(hostTime, quantum)) == 0 ? highTone : lowTone;
+
+ 		       // Simple cosine synth
+ 		       amplitude = cos(2 * M_PI * secondsAfterClick.count() * freq)
+ 		                   * (1 - sin(5 * M_PI * secondsAfterClick.count()));
+ 	  }
+    }
+    mBuffer[i] = amplitude;
+    }
 }
 
 } // extern "C"
