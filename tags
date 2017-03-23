@@ -640,7 +640,6 @@ frequency_of_wakeup	chaosmonkey.h	/^    int frequency_of_wakeup;    \/\/ seconds
 freqval	utils.c	/^float freqval(char *n)$/;"	f
 game_generation	drumr.h	/^    int game_generation;$/;"	m	struct:t_drumr
 game_of_life_on	drumr.h	/^    bool game_of_life_on;$/;"	m	struct:t_drumr
-gen_next	mixer.c	/^double gen_next(mixer *mixr, uint64_t host_time, int sample_number)$/;"	f
 gennext	filter.h	/^    double (*gennext)(filter *self, double xn); \/\/ do_filter$/;"	m	struct:filter
 gennext	sound_generator.h	/^    double (*gennext)(void *self);$/;"	m	struct:t_soundgen
 get_environment_val	mixer.c	/^int get_environment_val(char *key, int *return_val)$/;"	f
@@ -714,10 +713,11 @@ link_get_loop_len_in_samples	ableton_link_wrapper.cpp	/^int link_get_loop_len_in
 link_get_sample_time	ableton_link_wrapper.cpp	/^int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }$/;"	f
 link_get_samples_per_midi_tick	ableton_link_wrapper.cpp	/^int link_get_samples_per_midi_tick(AbletonLink *l)$/;"	f
 link_get_timing_data	ableton_link_wrapper.cpp	/^LinkData link_get_timing_data(AbletonLink *l)$/;"	f
+link_is_start_of_quarter	ableton_link_wrapper.cpp	/^bool link_is_start_of_quarter(AbletonLink *l, uint64_t host_time, int sample_number)$/;"	f
 link_is_start_of_sixteenth	ableton_link_wrapper.cpp	/^bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_number)$/;"	f
 link_reset_beat_time	ableton_link_wrapper.cpp	/^void link_reset_beat_time(AbletonLink *l)$/;"	f
 link_set_bpm	ableton_link_wrapper.cpp	/^void link_set_bpm(AbletonLink *l, double bpm)$/;"	f
-link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)$/;"	f
+link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time, int num_frames)$/;"	f
 list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
 load_file_to_buffer	drumr.c	/^int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)$/;"	f
 loop_Mode	synthfunctions.h	/^    unsigned int loop_Mode;$/;"	m	struct:__anon28
@@ -1134,6 +1134,7 @@ minisynth_voice_prepare_for_play	minisynth_voice.c	/^void minisynth_voice_prepar
 minisynth_voice_reset	minisynth_voice.c	/^void minisynth_voice_reset(minisynth_voice *msv)$/;"	f
 minisynth_voice_update	minisynth_voice.c	/^void minisynth_voice_update(minisynth_voice *msv)$/;"	f
 mixer	mixer.h	/^} mixer;$/;"	t	typeref:struct:t_mixer
+mixer_gennext	mixer.c	/^double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number)$/;"	f
 mixer_ps	mixer.c	/^void mixer_ps(mixer *mixr)$/;"	f
 mixer_start_playing	mixer.c	/^void mixer_start_playing(mixer *mixr)$/;"	f
 mixer_stop_playing	mixer.c	/^void mixer_stop_playing(mixer *mixr)$/;"	f

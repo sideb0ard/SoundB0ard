@@ -106,8 +106,10 @@ double link_get_bpm(AbletonLink *l)
     return timeline.tempo();
 }
 
-void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)
+void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time, int num_frames)
 {
+
+    l->m_sample_time += num_frames;
 
     // const auto buffer_begin_at_output = host_time + l->m_output_latency;
     // std::cout << "HOSTTIME: " << host_time << std::endl;
@@ -119,7 +121,6 @@ void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)
     auto timeline = l->m_link.captureAudioTimeline();
 
     if (l->m_reset_beat_time) {
-        std::cout << "Resetting beat time" << std::endl;
         timeline.requestBeatAtTime(0, host_time, l->m_quantum);
         l->m_reset_beat_time = false;
     }
@@ -131,7 +132,6 @@ void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)
 
     l->m_link.commitAudioTimeline(timeline);
 
-    l->m_sample_time++;
 
 }
 
@@ -167,6 +167,22 @@ bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_n
     }
 
     return is_new_sixteenth;
+}
+
+bool link_is_start_of_quarter(AbletonLink *l, uint64_t host_time, int sample_number)
+{
+    auto timeline = l->m_link.captureAudioTimeline();
+    const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
+
+    const auto this_sample_time = std::chrono::microseconds(host_time) + std::chrono::microseconds(llround(sample_number * microsPerSample));
+    const auto lastSampleHostTime = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
+
+    bool is_new_quarter = false;
+    if (timeline.phaseAtTime(this_sample_time, 1) < timeline.phaseAtTime(lastSampleHostTime, 1)) {
+        is_new_quarter = true;
+    }
+
+    return is_new_quarter;
 }
 
 int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }

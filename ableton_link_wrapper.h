@@ -27,7 +27,8 @@ LinkData link_get_timing_data(AbletonLink *l);
 link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, double quantum);
 double link_get_beat_current_quantum(AbletonLink *l, uint64_t host_time);
 bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_number);
-void link_update_from_main_callback(AbletonLink *l, uint64_t host_time);
+bool link_is_start_of_quarter(AbletonLink *l, uint64_t host_time, int sample_number);
+void link_update_from_main_callback(AbletonLink *l, uint64_t host_time, int num_frames);
 
 void update_bpm(double bpm);
 

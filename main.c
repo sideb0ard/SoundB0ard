@@ -33,12 +33,12 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
 
     // Ableton Link stuff //////////////////////////////////////////////
     uint64_t host_time = link_get_host_time(data->mixr->m_ableton_link);
-    link_update_from_main_callback(mixr->m_ableton_link, host_time);
+    link_update_from_main_callback(mixr->m_ableton_link, host_time, framesPerBuffer);
     /////////////////////////////////////////////////////////////////////
 
     for (unsigned long i = 0; i < framesPerBuffer; i++) {
         float val = 0;
-        val = gen_next(data->mixr, host_time, i);
+        val = mixer_gennext(data->mixr, host_time, i);
         *out++ = val;
         *out++ = val;
     }

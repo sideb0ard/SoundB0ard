@@ -65,13 +65,37 @@ double drum_gennext(void *self)
     DRUM *drumr = (DRUM *)self;
     double val = 0;
 
+    int step_seq_idx = mixr->sixteenth_note_tick % DRUM_PATTERN_LEN;
+    int bit_position = 1 << (15 - step_seq_idx);
 
-    return val;
-    //int step_seq_idx = mixr->sixteenth_note_tick % DRUM_PATTERN_LEN;
+    if (drumr->patterns[drumr->cur_pattern] & bit_position)
+    {
+        if (mixr->start_of_sixteenth) { // assuming this is only true for one sample per sixteenth
+            printf("BAM!\n");
+            drumr->sample_positions[step_seq_idx].playing = true;
+            drumr->sample_positions[step_seq_idx].position = 0;
+        }
+    }
+
+    for (int i = 0; i < DRUM_PATTERN_LEN; i++) {
+    //for (int i = DRUM_PATTERN_LEN - 1; i >= 0; i--) {
+        if (drumr->sample_positions[i].playing) {
+            val += drumr->buffer[drumr->sample_positions[i].position] /
+                2147483648.0 // convert from 16bit in to double between 0 and 1
+                * drumr->pattern_position_amp[drumr->cur_pattern][i];
+            drumr->sample_positions[i].position += drumr->channels;
+            if (drumr->sample_positions[i].position ==
+                drumr->bufsize) { // end of playback - so reset
+                drumr->sample_positions[i].playing = 0;
+                drumr->sample_positions[i].position = 0;
+            }
+        }
+    }
+
+    return val * drumr->vol;;
     ////printf("STEP SEQ IDX %d and BIT POSITION %d\n", step_seq_idx, 15 - step_seq_idx);
     ////printf("STEP SEQ IDX %d and BIT 16POSITION %d\n", step_seq_idx, DRUM_PATTERN_LEN - step_seq_idx);
 
-    //int bit_position = 1 << (15 - step_seq_idx);
     ////int bit_position = 1 << (DRUM_PATTERN_LEN - step_seq_idx);
 
     //if ((drumr->patterns[drumr->cur_pattern] & bit_position) &&

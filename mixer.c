@@ -384,7 +384,7 @@ void mixer_stop_playing(mixer *mixr)
 
 // called once ever SAMPLE_RATE. This is the main audio callback
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
-double gen_next(mixer *mixr, uint64_t host_time, int sample_number)
+double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number)
 {
 
     // // TODO - this needs to change if num frames > 1
@@ -400,18 +400,17 @@ double gen_next(mixer *mixr, uint64_t host_time, int sample_number)
     //     pthread_mutex_unlock(&midi_tick_lock);
     // }
 
-    if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time, sample_number)) {
-        //pthread_mutex_lock(&midi_tick_lock);
-        //mixr->tick++; // 1 midi tick (or pulse)
-        //if (mixr->tick % PPS == 0) {
-        mixr->sixteenth_note_tick++; // for drum machine resolution
-        mixr->start_of_sixteenth = true;
-        //}
-        //pthread_cond_broadcast(&midi_tick_cond);
-        //pthread_mutex_unlock(&midi_tick_lock);
-    } else {
-        mixr->start_of_sixteenth = false;
-    }
+    //if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time, sample_number)) {
+    //    //pthread_mutex_lock(&midi_tick_lock);
+    //    //mixr->tick++; // 1 midi tick (or pulse)
+    //    //if (mixr->tick % PPS == 0) {
+    //    mixr->sixteenth_note_tick++; // for drum machine resolution
+    //    //}
+    //    //pthread_cond_broadcast(&midi_tick_cond);
+    //    //pthread_mutex_unlock(&midi_tick_lock);
+    //} else {
+    //    mixr->start_of_sixteenth = false;
+    //}
 
 
     double output_val = 0.0;
@@ -422,9 +421,18 @@ double gen_next(mixer *mixr, uint64_t host_time, int sample_number)
 
     //link_callback_timing_data data = link_get_callback_timing_data(mixr->m_ableton_link);
     double beat_quantum = link_get_beat_current_quantum(mixr->m_ableton_link, host_time);
-    if (beat_quantum < 4.) {
+    if (beat_quantum < 0.) {
         // count in, wait for sync
+        printf("Counting in... %f\n", beat_quantum);
         return output_val;
+    }
+
+    if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time, sample_number)) {
+        //printf("BEAT!\n");
+        mixr->start_of_sixteenth = true;
+    }
+    else {
+        mixr->start_of_sixteenth = false;
     }
 
     if (mixr->soundgen_num > 0) {
