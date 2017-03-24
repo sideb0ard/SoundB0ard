@@ -71,7 +71,6 @@ double drum_gennext(void *self)
     if (drumr->patterns[drumr->cur_pattern] & bit_position)
     {
         if (mixr->start_of_sixteenth) { // assuming this is only true for one sample per sixteenth
-            printf("BAM!\n");
             drumr->sample_positions[step_seq_idx].playing = true;
             drumr->sample_positions[step_seq_idx].position = 0;
         }

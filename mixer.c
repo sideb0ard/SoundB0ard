@@ -387,7 +387,7 @@ void mixer_stop_playing(mixer *mixr)
 
 // called once ever SAMPLE_RATE. This is the main audio callback
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out)
-double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number)
+double mixer_gennext(mixer *mixr, int sample_number)
 {
 
     // // TODO - this needs to change if num frames > 1
@@ -422,43 +422,39 @@ double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number)
         return output_val;
     }
 
-    //link_callback_timing_data data = link_get_callback_timing_data(mixr->m_ableton_link);
-    double beat_phase = ceil(link_get_beat_current_position(mixr->m_ableton_link, host_time, sample_number));
-    double quantum = link_get_current_quantum(mixr->m_ableton_link);
-    if (beat_phase <= 0.) {
-        // count in, wait for sync
-        printf("Counting in... %f\n", beat_phase);
-        return output_val;
-    }
+    double beat_at_time = link_get_beat_at_time(mixr->m_ableton_link, sample_number);
+    if (beat_at_time >= 0.) {
+        if (link_is_start_of_sixteenth(mixr->m_ableton_link, sample_number)) {
 
-    if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time, sample_number)) {
-        //printf("BEAT! %f\n", beat_phase);
-        if (beat_phase == mixr->phase_count) {
-            mixr->phase_counter++;
+            //// temp troublesh00ter
+            ////printf("BEAT! %f %f\n", beat_at_time, mixr->phase_count);
+            //if (beat_at_time == mixr->phase_count) {
+            //    mixr->phase_counter++;
+            //}
+            //else {
+            //    if ((int)mixr->phase_counter != 4)
+            //        printf("Saw %d counts of beat %d\n", mixr->phase_counter, (int)mixr->phase_count);
+            //    mixr->phase_count = beat_at_time;
+            //    mixr->phase_counter = 1;
+            //}
+
+            mixr->start_of_sixteenth = true;
+            mixr->sixteenth_note_tick++; // for drum machine resolution
         }
         else {
-            if ((int)mixr->phase_counter != 4)
-                printf("Saw %d counts of beat %d\n", mixr->phase_counter, (int)mixr->phase_count);
-            mixr->phase_count = beat_phase;
-            mixr->phase_counter = 1;
+            mixr->start_of_sixteenth = false;
         }
 
-        mixr->start_of_sixteenth = true;
-        mixr->sixteenth_note_tick++; // for drum machine resolution
-    }
-    else {
-        mixr->start_of_sixteenth = false;
-    }
-
-    if (mixr->soundgen_num > 0) {
-        for (int i = 0; i < mixr->soundgen_num; i++) {
-            output_val +=
-                mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
+        if (mixr->soundgen_num > 0) {
+            for (int i = 0; i < mixr->soundgen_num; i++) {
+                output_val +=
+                    mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
+            }
         }
-    }
 
-    double val = mixr->volume * (output_val / 1.53);
-    return val;
+        double val = mixr->volume * (output_val / 1.53);
+        return val;
+    }
 
     return output_val;
 }

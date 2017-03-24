@@ -76,10 +76,6 @@ typedef struct t_mixer {
 
 } mixer;
 
-typedef struct {
-    mixer *mixr;
-} paData;
-
 mixer *new_mixer(void);
 
 void mixer_ps(mixer *mixr);
@@ -107,7 +103,7 @@ void mixer_stop_playing(mixer *mixr);
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
 
-double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number);
+double mixer_gennext(mixer *mixr, int sample_number);
 // void gen_next(mixer* mixr, int framesPerBuffer, float* out);
 
 #endif // MIXER_H

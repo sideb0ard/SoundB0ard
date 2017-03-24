@@ -25,23 +25,21 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
                       const PaStreamCallbackTimeInfo *timeInfo,
                       PaStreamCallbackFlags statusFlags, void *userData)
 {
-    paData *data = (paData *)userData;
+    mixer *mixr = (mixer *)userData;
     float *out = (float *)outputBuffer;
     (void)inputBuffer;
     (void)timeInfo;
     (void)statusFlags;
 
     // Ableton Link stuff //////////////////////////////////////////////
-    uint64_t host_time = link_get_host_time(data->mixr->m_ableton_link);
-    link_update_from_main_callback(mixr->m_ableton_link, host_time);
+    link_update_from_main_callback(mixr->m_ableton_link);
     /////////////////////////////////////////////////////////////////////
 
     for (unsigned long i = 0; i < framesPerBuffer; i++) {
         float val = 0;
-        val = mixer_gennext(data->mixr, host_time, i);
+        val = mixer_gennext(mixr, i);
         *out++ = val;
         *out++ = val;
-        link_update_sample_time(mixr->m_ableton_link, 1);
     }
 
 
@@ -69,16 +67,14 @@ int main()
 
     PaStream *stream;
     PaError err;
-    paData *data = (paData *)calloc(1, sizeof(paData));
     mixr = new_mixer();
-    data->mixr = mixr;
 
     err = Pa_OpenDefaultStream(&stream,
                                0,         // no input channels
                                2,         // stereo output
                                paFloat32, // 32bit fp output
                                SAMPLE_RATE, paFramesPerBufferUnspecified,
-                               paCallback, data);
+                               paCallback, mixr);
 
     if (err != paNoError) {
         printf("Errrrr! couldn't open Portaudio default stream: %s\n",

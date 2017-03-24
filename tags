@@ -33,7 +33,7 @@ BPF4	filter.h	/^    BPF4$/;"	e	enum:__anon12
 BSF2	filter.h	/^    BSF2,$/;"	e	enum:__anon12
 C	utils.c	/^const double C = -4.0 \/ ((float)M_PI * (float)M_PI);$/;"	v
 CHAOSMONKEY_TYPE	defjams.h	/^    CHAOSMONKEY_TYPE,$/;"	e	enum:__anon4
-CHORUS	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	e	enum:__anon23
+CHORUS	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	e	enum:__anon22
 CONCAVE_LIMIT	utils.c	/^#define CONCAVE_LIMIT /;"	d	file:
 CONVEX_LIMIT	utils.c	/^#define CONVEX_LIMIT /;"	d	file:
 COOL_COLOR_GREEN	defjams.h	/^#define COOL_COLOR_GREEN /;"	d
@@ -65,64 +65,64 @@ DEFAULT_SUB_OSC_AMP_DB	minisynth.h	/^#define DEFAULT_SUB_OSC_AMP_DB /;"	d
 DEFAULT_VELOCITY_TO_ATTACK	minisynth.h	/^#define DEFAULT_VELOCITY_TO_ATTACK /;"	d
 DELAY	effect.h	/^    DELAY,$/;"	e	enum:__anon8
 DELAYFX	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon6
-DEST_ALL_EG_ATTACK_SCALING	modmatrix.h	/^    DEST_ALL_EG_ATTACK_SCALING,$/;"	e	enum:__anon19
-DEST_ALL_EG_DECAY_SCALING	modmatrix.h	/^    DEST_ALL_EG_DECAY_SCALING,$/;"	e	enum:__anon19
-DEST_ALL_EG_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_ALL_EG_SUSTAIN_OVERRIDE, \/\/ <- keep this last$/;"	e	enum:__anon19
-DEST_ALL_FILTER_FC	modmatrix.h	/^    DEST_ALL_FILTER_FC,$/;"	e	enum:__anon19
-DEST_ALL_FILTER_KEYTRACK	modmatrix.h	/^    DEST_ALL_FILTER_KEYTRACK, \/\/ the control value, overriding the GUI$/;"	e	enum:__anon19
-DEST_ALL_FILTER_Q	modmatrix.h	/^    DEST_ALL_FILTER_Q,$/;"	e	enum:__anon19
-DEST_ALL_LFO_FO	modmatrix.h	/^    DEST_ALL_LFO_FO,$/;"	e	enum:__anon19
-DEST_ALL_LFO_OUTPUT_AMP	modmatrix.h	/^    DEST_ALL_LFO_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_ALL_OSC_FO	modmatrix.h	/^    DEST_ALL_OSC_FO,$/;"	e	enum:__anon19
-DEST_ALL_OSC_FO_RATIO	modmatrix.h	/^    DEST_ALL_OSC_FO_RATIO,$/;"	e	enum:__anon19
-DEST_ALL_OSC_OUTPUT_AMP	modmatrix.h	/^    DEST_ALL_OSC_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_ALL_OSC_PULSEWIDTH	modmatrix.h	/^    DEST_ALL_OSC_PULSEWIDTH,$/;"	e	enum:__anon19
-DEST_DCA_AMP	modmatrix.h	/^    DEST_DCA_AMP,$/;"	e	enum:__anon19
-DEST_DCA_EG	modmatrix.h	/^    DEST_DCA_EG,$/;"	e	enum:__anon19
-DEST_DCA_PAN	modmatrix.h	/^    DEST_DCA_PAN,$/;"	e	enum:__anon19
-DEST_DCA_VELOCITY	modmatrix.h	/^    DEST_DCA_VELOCITY,$/;"	e	enum:__anon19
-DEST_EG1_ATTACK_SCALING	modmatrix.h	/^    DEST_EG1_ATTACK_SCALING,$/;"	e	enum:__anon19
-DEST_EG1_DECAY_SCALING	modmatrix.h	/^    DEST_EG1_DECAY_SCALING,$/;"	e	enum:__anon19
-DEST_EG1_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG1_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon19
-DEST_EG2_ATTACK_SCALING	modmatrix.h	/^    DEST_EG2_ATTACK_SCALING,$/;"	e	enum:__anon19
-DEST_EG2_DECAY_SCALING	modmatrix.h	/^    DEST_EG2_DECAY_SCALING,$/;"	e	enum:__anon19
-DEST_EG2_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG2_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon19
-DEST_EG3_ATTACK_SCALING	modmatrix.h	/^    DEST_EG3_ATTACK_SCALING,$/;"	e	enum:__anon19
-DEST_EG3_DECAY_SCALING	modmatrix.h	/^    DEST_EG3_DECAY_SCALING,$/;"	e	enum:__anon19
-DEST_EG3_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG3_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon19
-DEST_EG4_ATTACK_SCALING	modmatrix.h	/^    DEST_EG4_ATTACK_SCALING,$/;"	e	enum:__anon19
-DEST_EG4_DECAY_SCALING	modmatrix.h	/^    DEST_EG4_DECAY_SCALING,$/;"	e	enum:__anon19
-DEST_EG4_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG4_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon19
-DEST_FILTER1_FC	modmatrix.h	/^    DEST_FILTER1_FC,$/;"	e	enum:__anon19
-DEST_FILTER1_KEYTRACK	modmatrix.h	/^    DEST_FILTER1_KEYTRACK,$/;"	e	enum:__anon19
-DEST_FILTER1_Q	modmatrix.h	/^    DEST_FILTER1_Q,$/;"	e	enum:__anon19
-DEST_FILTER2_FC	modmatrix.h	/^    DEST_FILTER2_FC,$/;"	e	enum:__anon19
-DEST_FILTER2_KEYTRACK	modmatrix.h	/^    DEST_FILTER2_KEYTRACK,$/;"	e	enum:__anon19
-DEST_FILTER2_Q	modmatrix.h	/^    DEST_FILTER2_Q,$/;"	e	enum:__anon19
-DEST_HARD_SYNC_RATIO	modmatrix.h	/^    DEST_HARD_SYNC_RATIO,$/;"	e	enum:__anon19
-DEST_LFO1_FO	modmatrix.h	/^    DEST_LFO1_FO,$/;"	e	enum:__anon19
-DEST_LFO1_OUTPUT_AMP	modmatrix.h	/^    DEST_LFO1_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_LFO2_FO	modmatrix.h	/^    DEST_LFO2_FO,$/;"	e	enum:__anon19
-DEST_LFO2_OUTPUT_AMP	modmatrix.h	/^    DEST_LFO2_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_NONE	modmatrix.h	/^    DEST_NONE,$/;"	e	enum:__anon19
-DEST_OSC1_FO	modmatrix.h	/^    DEST_OSC1_FO,$/;"	e	enum:__anon19
-DEST_OSC1_FO_RATIO	modmatrix.h	/^    DEST_OSC1_FO_RATIO,$/;"	e	enum:__anon19
-DEST_OSC1_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC1_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_OSC1_PULSEWIDTH	modmatrix.h	/^    DEST_OSC1_PULSEWIDTH,$/;"	e	enum:__anon19
-DEST_OSC2_FO	modmatrix.h	/^    DEST_OSC2_FO,$/;"	e	enum:__anon19
-DEST_OSC2_FO_RATIO	modmatrix.h	/^    DEST_OSC2_FO_RATIO,$/;"	e	enum:__anon19
-DEST_OSC2_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC2_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_OSC2_PULSEWIDTH	modmatrix.h	/^    DEST_OSC2_PULSEWIDTH,$/;"	e	enum:__anon19
-DEST_OSC3_FO	modmatrix.h	/^    DEST_OSC3_FO,$/;"	e	enum:__anon19
-DEST_OSC3_FO_RATIO	modmatrix.h	/^    DEST_OSC3_FO_RATIO,$/;"	e	enum:__anon19
-DEST_OSC3_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC3_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_OSC3_PULSEWIDTH	modmatrix.h	/^    DEST_OSC3_PULSEWIDTH,$/;"	e	enum:__anon19
-DEST_OSC4_FO	modmatrix.h	/^    DEST_OSC4_FO,$/;"	e	enum:__anon19
-DEST_OSC4_FO_RATIO	modmatrix.h	/^    DEST_OSC4_FO_RATIO,$/;"	e	enum:__anon19
-DEST_OSC4_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC4_OUTPUT_AMP,$/;"	e	enum:__anon19
-DEST_OSC4_PULSEWIDTH	modmatrix.h	/^    DEST_OSC4_PULSEWIDTH,$/;"	e	enum:__anon19
-DEST_VS_AC_AXIS	modmatrix.h	/^    DEST_VS_AC_AXIS,$/;"	e	enum:__anon19
-DEST_VS_BD_AXIS	modmatrix.h	/^    DEST_VS_BD_AXIS,$/;"	e	enum:__anon19
+DEST_ALL_EG_ATTACK_SCALING	modmatrix.h	/^    DEST_ALL_EG_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_ALL_EG_DECAY_SCALING	modmatrix.h	/^    DEST_ALL_EG_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_ALL_EG_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_ALL_EG_SUSTAIN_OVERRIDE, \/\/ <- keep this last$/;"	e	enum:__anon18
+DEST_ALL_FILTER_FC	modmatrix.h	/^    DEST_ALL_FILTER_FC,$/;"	e	enum:__anon18
+DEST_ALL_FILTER_KEYTRACK	modmatrix.h	/^    DEST_ALL_FILTER_KEYTRACK, \/\/ the control value, overriding the GUI$/;"	e	enum:__anon18
+DEST_ALL_FILTER_Q	modmatrix.h	/^    DEST_ALL_FILTER_Q,$/;"	e	enum:__anon18
+DEST_ALL_LFO_FO	modmatrix.h	/^    DEST_ALL_LFO_FO,$/;"	e	enum:__anon18
+DEST_ALL_LFO_OUTPUT_AMP	modmatrix.h	/^    DEST_ALL_LFO_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_ALL_OSC_FO	modmatrix.h	/^    DEST_ALL_OSC_FO,$/;"	e	enum:__anon18
+DEST_ALL_OSC_FO_RATIO	modmatrix.h	/^    DEST_ALL_OSC_FO_RATIO,$/;"	e	enum:__anon18
+DEST_ALL_OSC_OUTPUT_AMP	modmatrix.h	/^    DEST_ALL_OSC_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_ALL_OSC_PULSEWIDTH	modmatrix.h	/^    DEST_ALL_OSC_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_DCA_AMP	modmatrix.h	/^    DEST_DCA_AMP,$/;"	e	enum:__anon18
+DEST_DCA_EG	modmatrix.h	/^    DEST_DCA_EG,$/;"	e	enum:__anon18
+DEST_DCA_PAN	modmatrix.h	/^    DEST_DCA_PAN,$/;"	e	enum:__anon18
+DEST_DCA_VELOCITY	modmatrix.h	/^    DEST_DCA_VELOCITY,$/;"	e	enum:__anon18
+DEST_EG1_ATTACK_SCALING	modmatrix.h	/^    DEST_EG1_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG1_DECAY_SCALING	modmatrix.h	/^    DEST_EG1_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG1_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG1_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_EG2_ATTACK_SCALING	modmatrix.h	/^    DEST_EG2_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG2_DECAY_SCALING	modmatrix.h	/^    DEST_EG2_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG2_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG2_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_EG3_ATTACK_SCALING	modmatrix.h	/^    DEST_EG3_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG3_DECAY_SCALING	modmatrix.h	/^    DEST_EG3_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG3_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG3_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_EG4_ATTACK_SCALING	modmatrix.h	/^    DEST_EG4_ATTACK_SCALING,$/;"	e	enum:__anon18
+DEST_EG4_DECAY_SCALING	modmatrix.h	/^    DEST_EG4_DECAY_SCALING,$/;"	e	enum:__anon18
+DEST_EG4_SUSTAIN_OVERRIDE	modmatrix.h	/^    DEST_EG4_SUSTAIN_OVERRIDE,$/;"	e	enum:__anon18
+DEST_FILTER1_FC	modmatrix.h	/^    DEST_FILTER1_FC,$/;"	e	enum:__anon18
+DEST_FILTER1_KEYTRACK	modmatrix.h	/^    DEST_FILTER1_KEYTRACK,$/;"	e	enum:__anon18
+DEST_FILTER1_Q	modmatrix.h	/^    DEST_FILTER1_Q,$/;"	e	enum:__anon18
+DEST_FILTER2_FC	modmatrix.h	/^    DEST_FILTER2_FC,$/;"	e	enum:__anon18
+DEST_FILTER2_KEYTRACK	modmatrix.h	/^    DEST_FILTER2_KEYTRACK,$/;"	e	enum:__anon18
+DEST_FILTER2_Q	modmatrix.h	/^    DEST_FILTER2_Q,$/;"	e	enum:__anon18
+DEST_HARD_SYNC_RATIO	modmatrix.h	/^    DEST_HARD_SYNC_RATIO,$/;"	e	enum:__anon18
+DEST_LFO1_FO	modmatrix.h	/^    DEST_LFO1_FO,$/;"	e	enum:__anon18
+DEST_LFO1_OUTPUT_AMP	modmatrix.h	/^    DEST_LFO1_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_LFO2_FO	modmatrix.h	/^    DEST_LFO2_FO,$/;"	e	enum:__anon18
+DEST_LFO2_OUTPUT_AMP	modmatrix.h	/^    DEST_LFO2_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_NONE	modmatrix.h	/^    DEST_NONE,$/;"	e	enum:__anon18
+DEST_OSC1_FO	modmatrix.h	/^    DEST_OSC1_FO,$/;"	e	enum:__anon18
+DEST_OSC1_FO_RATIO	modmatrix.h	/^    DEST_OSC1_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC1_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC1_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC1_PULSEWIDTH	modmatrix.h	/^    DEST_OSC1_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_OSC2_FO	modmatrix.h	/^    DEST_OSC2_FO,$/;"	e	enum:__anon18
+DEST_OSC2_FO_RATIO	modmatrix.h	/^    DEST_OSC2_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC2_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC2_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC2_PULSEWIDTH	modmatrix.h	/^    DEST_OSC2_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_OSC3_FO	modmatrix.h	/^    DEST_OSC3_FO,$/;"	e	enum:__anon18
+DEST_OSC3_FO_RATIO	modmatrix.h	/^    DEST_OSC3_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC3_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC3_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC3_PULSEWIDTH	modmatrix.h	/^    DEST_OSC3_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_OSC4_FO	modmatrix.h	/^    DEST_OSC4_FO,$/;"	e	enum:__anon18
+DEST_OSC4_FO_RATIO	modmatrix.h	/^    DEST_OSC4_FO_RATIO,$/;"	e	enum:__anon18
+DEST_OSC4_OUTPUT_AMP	modmatrix.h	/^    DEST_OSC4_OUTPUT_AMP,$/;"	e	enum:__anon18
+DEST_OSC4_PULSEWIDTH	modmatrix.h	/^    DEST_OSC4_PULSEWIDTH,$/;"	e	enum:__anon18
+DEST_VS_AC_AXIS	modmatrix.h	/^    DEST_VS_AC_AXIS,$/;"	e	enum:__anon18
+DEST_VS_BD_AXIS	modmatrix.h	/^    DEST_VS_BD_AXIS,$/;"	e	enum:__anon18
 DIGITAL	envelope_generator.h	/^enum { ANALOG, DIGITAL };$/;"	e	enum:__anon10
 DISTORTION	effect.h	/^    DISTORTION,$/;"	e	enum:__anon8
 DOWN	defjams.h	/^typedef enum { UP, DOWN } direction;$/;"	e	enum:__anon3
@@ -150,7 +150,7 @@ FILTER_FC_MIN	filter.h	/^#define FILTER_FC_MIN /;"	d
 FILTER_FC_MOD_RANGE	filter.h	/^#define FILTER_FC_MOD_RANGE /;"	d
 FILTER_Q_DEFAULT	filter.h	/^#define FILTER_Q_DEFAULT /;"	d
 FILTER_TYPE_DEFAULT	filter.h	/^#define FILTER_TYPE_DEFAULT /;"	d
-FLANGER	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	e	enum:__anon23
+FLANGER	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	e	enum:__anon22
 FRAMES_PER_BUFFER	defjams.h	/^#define FRAMES_PER_BUFFER /;"	d
 FREQRAD	defjams.h	/^#define FREQRAD /;"	d
 GRIDWIDTH	drumr.h	/^#define GRIDWIDTH /;"	d
@@ -161,9 +161,9 @@ HPF4	filter.h	/^    HPF4,$/;"	e	enum:__anon12
 INTEGER_LENGTH	drumr.h	/^#define INTEGER_LENGTH /;"	d
 KEYS_H_	keys.h	/^#define KEYS_H_$/;"	d
 LEGATO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
-LFORFREE	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
-LFOSHOT	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
-LFOSYNC	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon26
+LFORFREE	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
+LFOSHOT	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
+LFOSYNC	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
 LINK_PLATFORM_MACOSX	ableton_link_wrapper.cpp	/^#define LINK_PLATFORM_MACOSX /;"	d	file:
 LOOP	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
 LOWPASS	effect.h	/^    LOWPASS,$/;"	e	enum:__anon8
@@ -177,21 +177,21 @@ MARKOVHAUS	drumr.h	/^typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;$/;"
 MAXCHARS	sparkline.c	/^#define MAXCHARS /;"	d	file:
 MAX_CMDS	algorithm.h	/^#define MAX_CMDS /;"	d
 MAX_CMD_LEN	algorithm.h	/^#define MAX_CMD_LEN /;"	d
-MAX_DESTINATIONS	modmatrix.h	/^    MAX_DESTINATIONS$/;"	e	enum:__anon19
+MAX_DESTINATIONS	modmatrix.h	/^    MAX_DESTINATIONS$/;"	e	enum:__anon18
 MAX_DETUNE_CENTS	minisynth.h	/^#define MAX_DETUNE_CENTS /;"	d
-MAX_LFO_OSC	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+MAX_LFO_OSC	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 MAX_LFO_RATE	oscillator.h	/^#define MAX_LFO_RATE /;"	d
 MAX_NOISE_OSC_AMP_DB	minisynth.h	/^#define MAX_NOISE_OSC_AMP_DB /;"	d
-MAX_NUM_DELAY_MODE	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
+MAX_NUM_DELAY_MODE	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon26
 MAX_NUM_MIDI_LOOPS	minisynth.h	/^#define MAX_NUM_MIDI_LOOPS /;"	d
 MAX_NUM_MIDI_MODES	mixer.h	/^    MAX_NUM_MIDI_MODES,$/;"	e	enum:__anon16
-MAX_OSC	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+MAX_OSC	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 MAX_PS_STRING_SZ	mixer.h	/^#define MAX_PS_STRING_SZ /;"	d
 MAX_PULSE_WIDTH_PCT	minisynth.h	/^#define MAX_PULSE_WIDTH_PCT /;"	d
 MAX_SAMPLES_PER_LOOPER	sampler.h	/^#define MAX_SAMPLES_PER_LOOPER /;"	d
-MAX_SOURCES	modmatrix.h	/^    MAX_SOURCES$/;"	e	enum:__anon18
+MAX_SOURCES	modmatrix.h	/^    MAX_SOURCES$/;"	e	enum:__anon17
 MAX_SUB_OSC_AMP_DB	minisynth.h	/^#define MAX_SUB_OSC_AMP_DB /;"	d
-MAX_TRANSFORMS	modmatrix.h	/^    MAX_TRANSFORMS \/* not needed? *\/$/;"	e	enum:__anon20
+MAX_TRANSFORMS	modmatrix.h	/^    MAX_TRANSFORMS \/* not needed? *\/$/;"	e	enum:__anon19
 MAX_VOICES	minisynth.h	/^#define MAX_VOICES /;"	d
 MIDI_MODE_ONE	mixer.h	/^    MIDI_MODE_ONE,$/;"	e	enum:__anon16
 MIDI_MODE_TWO	mixer.h	/^    MIDI_MODE_TWO,$/;"	e	enum:__anon16
@@ -205,9 +205,9 @@ MODDELAY	effect.h	/^    MODDELAY,$/;"	e	enum:__anon8
 MONO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
 M_PI	defjams.h	/^#define M_PI /;"	d
 NHARMS	defjams.h	/^#define NHARMS /;"	d
-NOISE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+NOISE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 NONE	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon6
-NORM	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
+NORM	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon26
 NUM_DRUM_PATTERNS	drumr.h	/^#define NUM_DRUM_PATTERNS /;"	d
 NUM_STATEGIES	defjams.h	/^#define NUM_STATEGIES /;"	d
 NUM_TABLES	wt_oscillator.h	/^#define NUM_TABLES /;"	d
@@ -227,8 +227,8 @@ OSC_PULSEWIDTH_DEFAULT	oscillator.h	/^#define OSC_PULSEWIDTH_DEFAULT /;"	d
 OSC_PULSEWIDTH_MAX	oscillator.h	/^#define OSC_PULSEWIDTH_MAX /;"	d
 OSC_PULSEWIDTH_MIN	oscillator.h	/^#define OSC_PULSEWIDTH_MIN /;"	d
 P	utils.c	/^const double P = 0.225;$/;"	v
-PINGPONG	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
-PNOISE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+PINGPONG	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon26
+PNOISE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 PPL	defjams.h	/^#define PPL /;"	d
 PPNS	defjams.h	/^#define PPNS /;"	d
 PPQN	defjams.h	/^#define PPQN /;"	d
@@ -241,42 +241,42 @@ SAMPLER	sampler.h	/^} SAMPLER;$/;"	t	typeref:struct:t_sampler
 SAMPLER_H	sampler.h	/^#define SAMPLER_H$/;"	d
 SAMPLER_TYPE	defjams.h	/^    SAMPLER_TYPE,$/;"	e	enum:__anon4
 SAMPLE_RATE	defjams.h	/^#define SAMPLE_RATE /;"	d
-SAW1	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
-SAW2	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
-SAW3	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+SAW1	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
+SAW2	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
+SAW3	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 SBMSG	sbmsg.h	/^} SBMSG;$/;"	t	typeref:struct:sbmsg
 SBMSG_H	sbmsg.h	/^#define SBMSG_H$/;"	d
 SBSHELL_SYNTH_FUNCTION_H_	synthfunctions.h	/^#define SBSHELL_SYNTH_FUNCTION_H_$/;"	d
 SBSHELL_VOICE_H_	voice.h	/^#define SBSHELL_VOICE_H_$/;"	d
 SHUTDOWN	envelope_generator.h	/^    SHUTDOWN$/;"	e	enum:__anon11
-SINE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+SINE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 SIZE_OF_WURD	cmdloop.h	/^#define SIZE_OF_WURD /;"	d
 SOUNDGEN	sound_generator.h	/^} SOUNDGEN;$/;"	t	typeref:struct:t_soundgen
 SOUNDGEN_H	sound_generator.h	/^#define SOUNDGEN_H$/;"	d
-SOURCE_BIASED_EG1	modmatrix.h	/^    SOURCE_BIASED_EG1,$/;"	e	enum:__anon18
-SOURCE_BIASED_EG2	modmatrix.h	/^    SOURCE_BIASED_EG2,$/;"	e	enum:__anon18
-SOURCE_BIASED_EG3	modmatrix.h	/^    SOURCE_BIASED_EG3,$/;"	e	enum:__anon18
-SOURCE_BIASED_EG4	modmatrix.h	/^    SOURCE_BIASED_EG4,$/;"	e	enum:__anon18
-SOURCE_EG1	modmatrix.h	/^    SOURCE_EG1,$/;"	e	enum:__anon18
-SOURCE_EG2	modmatrix.h	/^    SOURCE_EG2,$/;"	e	enum:__anon18
-SOURCE_EG3	modmatrix.h	/^    SOURCE_EG3,$/;"	e	enum:__anon18
-SOURCE_EG4	modmatrix.h	/^    SOURCE_EG4,$/;"	e	enum:__anon18
-SOURCE_LFO1	modmatrix.h	/^    SOURCE_LFO1,$/;"	e	enum:__anon18
-SOURCE_LFO1Q	modmatrix.h	/^    SOURCE_LFO1Q,$/;"	e	enum:__anon18
-SOURCE_LFO2	modmatrix.h	/^    SOURCE_LFO2,$/;"	e	enum:__anon18
-SOURCE_LFO2Q	modmatrix.h	/^    SOURCE_LFO2Q,$/;"	e	enum:__anon18
-SOURCE_MIDI_EXPRESSION_CC11	modmatrix.h	/^    SOURCE_MIDI_EXPRESSION_CC11,$/;"	e	enum:__anon18
-SOURCE_MIDI_JS_X	modmatrix.h	/^    SOURCE_MIDI_JS_X,$/;"	e	enum:__anon18
-SOURCE_MIDI_JS_Y	modmatrix.h	/^    SOURCE_MIDI_JS_Y,$/;"	e	enum:__anon18
-SOURCE_MIDI_NOTE_NUM	modmatrix.h	/^    SOURCE_MIDI_NOTE_NUM,$/;"	e	enum:__anon18
-SOURCE_MIDI_PAN_CC10	modmatrix.h	/^    SOURCE_MIDI_PAN_CC10,$/;"	e	enum:__anon18
-SOURCE_MIDI_VOLUME_CC07	modmatrix.h	/^    SOURCE_MIDI_VOLUME_CC07,$/;"	e	enum:__anon18
-SOURCE_MODWHEEL	modmatrix.h	/^    SOURCE_MODWHEEL,$/;"	e	enum:__anon18
-SOURCE_NONE	modmatrix.h	/^    SOURCE_NONE,$/;"	e	enum:__anon18
-SOURCE_PITCHBEND	modmatrix.h	/^    SOURCE_PITCHBEND,$/;"	e	enum:__anon18
-SOURCE_SUSTAIN_PEDAL	modmatrix.h	/^    SOURCE_SUSTAIN_PEDAL,$/;"	e	enum:__anon18
-SOURCE_VELOCITY	modmatrix.h	/^    SOURCE_VELOCITY,$/;"	e	enum:__anon18
-SQUARE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+SOURCE_BIASED_EG1	modmatrix.h	/^    SOURCE_BIASED_EG1,$/;"	e	enum:__anon17
+SOURCE_BIASED_EG2	modmatrix.h	/^    SOURCE_BIASED_EG2,$/;"	e	enum:__anon17
+SOURCE_BIASED_EG3	modmatrix.h	/^    SOURCE_BIASED_EG3,$/;"	e	enum:__anon17
+SOURCE_BIASED_EG4	modmatrix.h	/^    SOURCE_BIASED_EG4,$/;"	e	enum:__anon17
+SOURCE_EG1	modmatrix.h	/^    SOURCE_EG1,$/;"	e	enum:__anon17
+SOURCE_EG2	modmatrix.h	/^    SOURCE_EG2,$/;"	e	enum:__anon17
+SOURCE_EG3	modmatrix.h	/^    SOURCE_EG3,$/;"	e	enum:__anon17
+SOURCE_EG4	modmatrix.h	/^    SOURCE_EG4,$/;"	e	enum:__anon17
+SOURCE_LFO1	modmatrix.h	/^    SOURCE_LFO1,$/;"	e	enum:__anon17
+SOURCE_LFO1Q	modmatrix.h	/^    SOURCE_LFO1Q,$/;"	e	enum:__anon17
+SOURCE_LFO2	modmatrix.h	/^    SOURCE_LFO2,$/;"	e	enum:__anon17
+SOURCE_LFO2Q	modmatrix.h	/^    SOURCE_LFO2Q,$/;"	e	enum:__anon17
+SOURCE_MIDI_EXPRESSION_CC11	modmatrix.h	/^    SOURCE_MIDI_EXPRESSION_CC11,$/;"	e	enum:__anon17
+SOURCE_MIDI_JS_X	modmatrix.h	/^    SOURCE_MIDI_JS_X,$/;"	e	enum:__anon17
+SOURCE_MIDI_JS_Y	modmatrix.h	/^    SOURCE_MIDI_JS_Y,$/;"	e	enum:__anon17
+SOURCE_MIDI_NOTE_NUM	modmatrix.h	/^    SOURCE_MIDI_NOTE_NUM,$/;"	e	enum:__anon17
+SOURCE_MIDI_PAN_CC10	modmatrix.h	/^    SOURCE_MIDI_PAN_CC10,$/;"	e	enum:__anon17
+SOURCE_MIDI_VOLUME_CC07	modmatrix.h	/^    SOURCE_MIDI_VOLUME_CC07,$/;"	e	enum:__anon17
+SOURCE_MODWHEEL	modmatrix.h	/^    SOURCE_MODWHEEL,$/;"	e	enum:__anon17
+SOURCE_NONE	modmatrix.h	/^    SOURCE_NONE,$/;"	e	enum:__anon17
+SOURCE_PITCHBEND	modmatrix.h	/^    SOURCE_PITCHBEND,$/;"	e	enum:__anon17
+SOURCE_SUSTAIN_PEDAL	modmatrix.h	/^    SOURCE_SUSTAIN_PEDAL,$/;"	e	enum:__anon17
+SOURCE_VELOCITY	modmatrix.h	/^    SOURCE_VELOCITY,$/;"	e	enum:__anon17
+SQUARE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 SUSTAIN	envelope_generator.h	/^    SUSTAIN,$/;"	e	enum:__anon11
 SYNTH	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;$/;"	e	enum:__anon6
 SYNTH_NUM_LOOPS	defjams.h	/^#define SYNTH_NUM_LOOPS /;"	d
@@ -286,25 +286,25 @@ Saw3	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } 
 Sqr3	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
 TABLEN	defjams.h	/^#define TABLEN /;"	d
 TABRAD	defjams.h	/^#define TABRAD /;"	d
-TAP1	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
-TAP2	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon27
+TAP1	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon26
+TAP2	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	e	enum:__anon26
 TICK	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
-TRANSFORM_BIPOLAR_TO_UNIPOLAR	modmatrix.h	/^    TRANSFORM_BIPOLAR_TO_UNIPOLAR,$/;"	e	enum:__anon20
-TRANSFORM_INVERT_MIDI_NORMALIZE	modmatrix.h	/^    TRANSFORM_INVERT_MIDI_NORMALIZE,$/;"	e	enum:__anon20
-TRANSFORM_MIDI_NORMALIZE	modmatrix.h	/^    TRANSFORM_MIDI_NORMALIZE,$/;"	e	enum:__anon20
-TRANSFORM_MIDI_SWITCH	modmatrix.h	/^    TRANSFORM_MIDI_SWITCH,$/;"	e	enum:__anon20
-TRANSFORM_MIDI_TO_ATTENUATION	modmatrix.h	/^    TRANSFORM_MIDI_TO_ATTENUATION,$/;"	e	enum:__anon20
-TRANSFORM_MIDI_TO_BIPOLAR	modmatrix.h	/^    TRANSFORM_MIDI_TO_BIPOLAR,$/;"	e	enum:__anon20
-TRANSFORM_MIDI_TO_PAN	modmatrix.h	/^    TRANSFORM_MIDI_TO_PAN,$/;"	e	enum:__anon20
-TRANSFORM_NONE	modmatrix.h	/^    TRANSFORM_NONE,$/;"	e	enum:__anon20
-TRANSFORM_NOTE_NUMBER_TO_FREQUENCY	modmatrix.h	/^    TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,$/;"	e	enum:__anon20
-TRANSFORM_UNIPOLAR_TO_BIPOLAR	modmatrix.h	/^    TRANSFORM_UNIPOLAR_TO_BIPOLAR,$/;"	e	enum:__anon20
-TRI	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon24
+TRANSFORM_BIPOLAR_TO_UNIPOLAR	modmatrix.h	/^    TRANSFORM_BIPOLAR_TO_UNIPOLAR,$/;"	e	enum:__anon19
+TRANSFORM_INVERT_MIDI_NORMALIZE	modmatrix.h	/^    TRANSFORM_INVERT_MIDI_NORMALIZE,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_NORMALIZE	modmatrix.h	/^    TRANSFORM_MIDI_NORMALIZE,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_SWITCH	modmatrix.h	/^    TRANSFORM_MIDI_SWITCH,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_TO_ATTENUATION	modmatrix.h	/^    TRANSFORM_MIDI_TO_ATTENUATION,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_TO_BIPOLAR	modmatrix.h	/^    TRANSFORM_MIDI_TO_BIPOLAR,$/;"	e	enum:__anon19
+TRANSFORM_MIDI_TO_PAN	modmatrix.h	/^    TRANSFORM_MIDI_TO_PAN,$/;"	e	enum:__anon19
+TRANSFORM_NONE	modmatrix.h	/^    TRANSFORM_NONE,$/;"	e	enum:__anon19
+TRANSFORM_NOTE_NUMBER_TO_FREQUENCY	modmatrix.h	/^    TRANSFORM_NOTE_NUMBER_TO_FREQUENCY,$/;"	e	enum:__anon19
+TRANSFORM_UNIPOLAR_TO_BIPOLAR	modmatrix.h	/^    TRANSFORM_UNIPOLAR_TO_BIPOLAR,$/;"	e	enum:__anon19
+TRI	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 TWO_PI	defjams.h	/^#define TWO_PI /;"	d
 Tri2Saw	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
 Tri2Sqr	minisynth_voice.h	/^typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;$/;"	e	enum:__anon14
 UP	defjams.h	/^typedef enum { UP, DOWN } direction;$/;"	e	enum:__anon3
-VIBRATO	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	e	enum:__anon23
+VIBRATO	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	e	enum:__anon22
 WANSI_COLOR_BLUE	defjams.h	/^#define WANSI_COLOR_BLUE /;"	d
 WANSI_COLOR_CYAN	defjams.h	/^#define WANSI_COLOR_CYAN /;"	d
 WANSI_COLOR_GREEN	defjams.h	/^#define WANSI_COLOR_GREEN /;"	d
@@ -356,15 +356,15 @@ algorithm_process_afterthought	algorithm.c	/^void algorithm_process_afterthought
 algorithm_replace_vars_in_cmd	algorithm.c	/^void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd)$/;"	f
 algorithm_setvol	algorithm.c	/^void algorithm_setvol(void *self, double v)$/;"	f
 algorithm_status	algorithm.c	/^void algorithm_status(void *self, wchar_t *status_string)$/;"	f
-amp_mod_range	synthfunctions.h	/^    double amp_mod_range;$/;"	m	struct:__anon32
-amplitude	synthfunctions.h	/^    double amplitude;           \/\/ 0->1 from GUI$/;"	m	struct:__anon28
-amplitude_a	synthfunctions.h	/^    double amplitude_a;$/;"	m	struct:__anon32
-amplitude_b	synthfunctions.h	/^    double amplitude_b;$/;"	m	struct:__anon32
-amplitude_c	synthfunctions.h	/^    double amplitude_c;$/;"	m	struct:__anon32
-amplitude_d	synthfunctions.h	/^    double amplitude_d;$/;"	m	struct:__anon32
-amplitude_db	synthfunctions.h	/^    double amplitude_db; \/\/ the user's control setting in dB$/;"	m	struct:__anon31
-attack_time_msec	synthfunctions.h	/^    double attack_time_msec;  \/\/ att: is a time duration$/;"	m	struct:__anon30
-aux_control	synthfunctions.h	/^    double aux_control;$/;"	m	struct:__anon29
+amp_mod_range	synthfunctions.h	/^    double amp_mod_range;$/;"	m	struct:__anon31
+amplitude	synthfunctions.h	/^    double amplitude;           \/\/ 0->1 from GUI$/;"	m	struct:__anon27
+amplitude_a	synthfunctions.h	/^    double amplitude_a;$/;"	m	struct:__anon31
+amplitude_b	synthfunctions.h	/^    double amplitude_b;$/;"	m	struct:__anon31
+amplitude_c	synthfunctions.h	/^    double amplitude_c;$/;"	m	struct:__anon31
+amplitude_d	synthfunctions.h	/^    double amplitude_d;$/;"	m	struct:__anon31
+amplitude_db	synthfunctions.h	/^    double amplitude_db; \/\/ the user's control setting in dB$/;"	m	struct:__anon30
+attack_time_msec	synthfunctions.h	/^    double attack_time_msec;  \/\/ att: is a time duration$/;"	m	struct:__anon29
+aux_control	synthfunctions.h	/^    double aux_control;$/;"	m	struct:__anon28
 backup_pattern_while_getting_crazy	drumr.h	/^    int backup_pattern_while_getting_crazy; \/\/ store current pattern so$/;"	m	struct:t_drumr
 beat	ableton_link_wrapper.h	/^    double beat;$/;"	m	struct:LinkData
 beat_at_time	ableton_link_wrapper.h	/^    double beat_at_time;$/;"	m	struct:link_callback_timing_data
@@ -396,7 +396,7 @@ bytes_status	bytebeatrrr.c	/^void bytes_status(void *self, wchar_t *status_strin
 calculate_pan_values	utils.c	/^void calculate_pan_values(double pan_total, double *pan_left, double *pan_right)$/;"	f
 car_osc	sbmsg.h	/^    char car_osc[10];$/;"	m	struct:sbmsg
 carfreq	sbmsg.h	/^    int carfreq;$/;"	m	struct:sbmsg
-cents	synthfunctions.h	/^    int cents;                  \/\/ cents tweak$/;"	m	struct:__anon28
+cents	synthfunctions.h	/^    int cents;                  \/\/ cents tweak$/;"	m	struct:__anon27
 ch_midi_lookup	utils.c	/^int ch_midi_lookup(int ch, void *p)$/;"	f
 chance_of_interruption	chaosmonkey.h	/^    int chance_of_interruption; \/\/ percent likelihood$/;"	m	struct:chaosmonkey
 change_char_pattern	drumr.c	/^void change_char_pattern(DRUM *d, int pattern_num, char *pattern)$/;"	f
@@ -462,7 +462,7 @@ dca	dca.h	/^} dca;$/;"	t	typeref:struct:dca
 dca_gennext	dca.c	/^void dca_gennext(dca *self, double left_input, double right_input,$/;"	f
 dca_init_global_parameters	dca.c	/^void dca_init_global_parameters(dca *self, global_dca_params *params)$/;"	f
 dca_initialize	dca.c	/^void dca_initialize(dca *d)$/;"	f
-dca_params	synthfunctions.h	/^    global_dca_params dca_params;$/;"	m	struct:__anon33
+dca_params	synthfunctions.h	/^    global_dca_params dca_params;$/;"	m	struct:__anon32
 dca_reset	dca.c	/^void dca_reset(dca *self)$/;"	f
 dca_set_amp_mod_db	dca.c	/^void dca_set_amp_mod_db(dca *self, double mod) { self->m_amp_mod_db = mod; }$/;"	f
 dca_set_amplitude_db	dca.c	/^void dca_set_amplitude_db(dca *self, double amp)$/;"	f
@@ -482,9 +482,9 @@ ddl_set_uses_external_feedback	ddlmodule.c	/^void ddl_set_uses_external_feedback
 ddlmodule	ddlmodule.h	/^typedef struct ddlmodule {$/;"	s
 ddlmodule	ddlmodule.h	/^} ddlmodule;$/;"	t	typeref:struct:ddlmodule
 debug_mode	mixer.h	/^    bool debug_mode;$/;"	m	struct:t_mixer
-decay_time_msec	synthfunctions.h	/^    double decay_time_msec;   \/\/ dcy: is a time to decay 1->0$/;"	m	struct:__anon30
+decay_time_msec	synthfunctions.h	/^    double decay_time_msec;   \/\/ dcy: is a time to decay 1->0$/;"	m	struct:__anon29
 delay	effect.h	/^    stereodelay *delay;$/;"	m	struct:__anon9
-delay_mode	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	t	typeref:enum:__anon27
+delay_mode	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;$/;"	t	typeref:enum:__anon26
 delay_on	mixer.h	/^    int delay_on;$/;"	m	struct:t_mixer
 delayline	delayline.h	/^typedef struct delayline {$/;"	s
 delayline	delayline.h	/^} delayline;$/;"	t	typeref:struct:delayline
@@ -513,7 +513,7 @@ drum_setvol	drumr.c	/^void drum_setvol(void *self, double v)$/;"	f
 drum_status	drumr.c	/^void drum_status(void *self, wchar_t *status_string)$/;"	f
 drumr_change_num_loops	drumr.c	/^void drumr_change_num_loops(DRUM *d, int pattern_num, int num_loops)$/;"	f
 drumr_set_multi_pattern_mode	drumr.c	/^void drumr_set_multi_pattern_mode(DRUM *d, bool multi)$/;"	f
-dsaw	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+dsaw	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 duck_runrrr	utils.c	/^void *duck_runrrr(void *arg)$/;"	f
 effect	beatrepeat.h	/^    EFFECT effect;$/;"	m	struct:beatrepeat
 effect_new_mod_delay	effect.c	/^EFFECT *effect_new_mod_delay()$/;"	f
@@ -526,26 +526,26 @@ effects_num	sound_generator.h	/^    int effects_num;  \/\/ num of effects$/;"	m	
 effects_on	sound_generator.h	/^    int effects_on; \/\/ bool$/;"	m	struct:t_soundgen
 effects_size	mixer.h	/^    int effects_size;$/;"	m	struct:t_mixer
 effects_size	sound_generator.h	/^    int effects_size; \/\/ size of array$/;"	m	struct:t_soundgen
-eg1_dca_amp_mod_intensity	synthfunctions.h	/^    double eg1_dca_amp_mod_intensity;$/;"	m	struct:__anon32
-eg1_filter1_mod_intensity	synthfunctions.h	/^    double eg1_filter1_mod_intensity;$/;"	m	struct:__anon32
-eg1_filter2_mod_intensity	synthfunctions.h	/^    double eg1_filter2_mod_intensity;$/;"	m	struct:__anon32
-eg1_osc_mod_intensity	synthfunctions.h	/^    double eg1_osc_mod_intensity;$/;"	m	struct:__anon32
-eg1_params	synthfunctions.h	/^    global_eg_params eg1_params;$/;"	m	struct:__anon33
-eg2_dca_amp_mod_intensity	synthfunctions.h	/^    double eg2_dca_amp_mod_intensity;$/;"	m	struct:__anon32
-eg2_filter1_mod_intensity	synthfunctions.h	/^    double eg2_filter1_mod_intensity;$/;"	m	struct:__anon32
-eg2_filter2_mod_intensity	synthfunctions.h	/^    double eg2_filter2_mod_intensity;$/;"	m	struct:__anon32
-eg2_osc_mod_intensity	synthfunctions.h	/^    double eg2_osc_mod_intensity;$/;"	m	struct:__anon32
-eg2_params	synthfunctions.h	/^    global_eg_params eg2_params;$/;"	m	struct:__anon33
-eg3_dca_amp_mod_intensity	synthfunctions.h	/^    double eg3_dca_amp_mod_intensity;$/;"	m	struct:__anon32
-eg3_filter1_mod_intensity	synthfunctions.h	/^    double eg3_filter1_mod_intensity;$/;"	m	struct:__anon32
-eg3_filter2_mod_intensity	synthfunctions.h	/^    double eg3_filter2_mod_intensity;$/;"	m	struct:__anon32
-eg3_osc_mod_intensity	synthfunctions.h	/^    double eg3_osc_mod_intensity;$/;"	m	struct:__anon32
-eg3_params	synthfunctions.h	/^    global_eg_params eg3_params;$/;"	m	struct:__anon33
-eg4_dca_amp_mod_intensity	synthfunctions.h	/^    double eg4_dca_amp_mod_intensity;$/;"	m	struct:__anon32
-eg4_filter1_mod_intensity	synthfunctions.h	/^    double eg4_filter1_mod_intensity;$/;"	m	struct:__anon32
-eg4_filter2_mod_intensity	synthfunctions.h	/^    double eg4_filter2_mod_intensity;$/;"	m	struct:__anon32
-eg4_osc_mod_intensity	synthfunctions.h	/^    double eg4_osc_mod_intensity;$/;"	m	struct:__anon32
-eg4_params	synthfunctions.h	/^    global_eg_params eg4_params;$/;"	m	struct:__anon33
+eg1_dca_amp_mod_intensity	synthfunctions.h	/^    double eg1_dca_amp_mod_intensity;$/;"	m	struct:__anon31
+eg1_filter1_mod_intensity	synthfunctions.h	/^    double eg1_filter1_mod_intensity;$/;"	m	struct:__anon31
+eg1_filter2_mod_intensity	synthfunctions.h	/^    double eg1_filter2_mod_intensity;$/;"	m	struct:__anon31
+eg1_osc_mod_intensity	synthfunctions.h	/^    double eg1_osc_mod_intensity;$/;"	m	struct:__anon31
+eg1_params	synthfunctions.h	/^    global_eg_params eg1_params;$/;"	m	struct:__anon32
+eg2_dca_amp_mod_intensity	synthfunctions.h	/^    double eg2_dca_amp_mod_intensity;$/;"	m	struct:__anon31
+eg2_filter1_mod_intensity	synthfunctions.h	/^    double eg2_filter1_mod_intensity;$/;"	m	struct:__anon31
+eg2_filter2_mod_intensity	synthfunctions.h	/^    double eg2_filter2_mod_intensity;$/;"	m	struct:__anon31
+eg2_osc_mod_intensity	synthfunctions.h	/^    double eg2_osc_mod_intensity;$/;"	m	struct:__anon31
+eg2_params	synthfunctions.h	/^    global_eg_params eg2_params;$/;"	m	struct:__anon32
+eg3_dca_amp_mod_intensity	synthfunctions.h	/^    double eg3_dca_amp_mod_intensity;$/;"	m	struct:__anon31
+eg3_filter1_mod_intensity	synthfunctions.h	/^    double eg3_filter1_mod_intensity;$/;"	m	struct:__anon31
+eg3_filter2_mod_intensity	synthfunctions.h	/^    double eg3_filter2_mod_intensity;$/;"	m	struct:__anon31
+eg3_osc_mod_intensity	synthfunctions.h	/^    double eg3_osc_mod_intensity;$/;"	m	struct:__anon31
+eg3_params	synthfunctions.h	/^    global_eg_params eg3_params;$/;"	m	struct:__anon32
+eg4_dca_amp_mod_intensity	synthfunctions.h	/^    double eg4_dca_amp_mod_intensity;$/;"	m	struct:__anon31
+eg4_filter1_mod_intensity	synthfunctions.h	/^    double eg4_filter1_mod_intensity;$/;"	m	struct:__anon31
+eg4_filter2_mod_intensity	synthfunctions.h	/^    double eg4_filter2_mod_intensity;$/;"	m	struct:__anon31
+eg4_osc_mod_intensity	synthfunctions.h	/^    double eg4_osc_mod_intensity;$/;"	m	struct:__anon31
+eg4_params	synthfunctions.h	/^    global_eg_params eg4_params;$/;"	m	struct:__anon32
 eg_calculate_attack_time	envelope_generator.c	/^void eg_calculate_attack_time(envelope_generator *self)$/;"	f
 eg_calculate_decay_time	envelope_generator.c	/^void eg_calculate_decay_time(envelope_generator *self)$/;"	f
 eg_calculate_release_time	envelope_generator.c	/^void eg_calculate_release_time(envelope_generator *self)$/;"	f
@@ -585,7 +585,7 @@ envelopor	sound_generator.c	/^float envelopor(SOUNDGEN *self, float val)$/;"	f
 environment	mixer.h	/^    env_var environment[ENVIRONMENT_ARRAY_SIZE];$/;"	m	struct:t_mixer
 environment_variable	mixer.h	/^typedef struct environment_variable {$/;"	s
 event_type	midimaaan.h	/^    unsigned event_type;$/;"	m	struct:midi_event
-expo	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+expo	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 extract_cmds_from_line	algorithm.c	/^int extract_cmds_from_line(algorithm *self, char *line)$/;"	f
 exxit	cmdloop.c	/^int exxit()$/;"	f
 f	filter_ckthreefive.h	/^    filter f; \/\/ base class$/;"	m	struct:filter_ckthreefive
@@ -598,7 +598,7 @@ fadeup_runrrr	utils.c	/^void *fadeup_runrrr(void *arg)$/;"	f
 fastlog2	utils.c	/^float fastlog2(float x)$/;"	f
 fasttan	utils.c	/^float fasttan(float x)$/;"	f
 fasttanh	utils.c	/^float fasttanh(float p) { return p \/ (fabs(2 * p) + 3 \/ (2 + 2 * p * 2 * p)); }$/;"	f
-fc_control	synthfunctions.h	/^    double fc_control;$/;"	m	struct:__anon29
+fc_control	synthfunctions.h	/^    double fc_control;$/;"	m	struct:__anon28
 file_sample	sampler.h	/^typedef struct file_sample {$/;"	s
 file_sample	sampler.h	/^} file_sample;$/;"	t	typeref:struct:file_sample
 filename	drumr.h	/^    char *filename;$/;"	m	struct:t_drumr
@@ -606,13 +606,13 @@ filename	sampler.h	/^    char *filename;$/;"	m	struct:file_sample
 filename	sbmsg.h	/^    char filename[100];$/;"	m	struct:sbmsg
 filter	filter.h	/^struct filter {$/;"	s
 filter	filter.h	/^typedef struct filter filter;$/;"	t	typeref:struct:filter
-filter1_params	synthfunctions.h	/^    global_filter_params filter1_params;$/;"	m	struct:__anon33
-filter2_params	synthfunctions.h	/^    global_filter_params filter2_params;$/;"	m	struct:__anon33
+filter1_params	synthfunctions.h	/^    global_filter_params filter1_params;$/;"	m	struct:__anon32
+filter2_params	synthfunctions.h	/^    global_filter_params filter2_params;$/;"	m	struct:__anon32
 filter_ck35	filter_ckthreefive.h	/^typedef struct filter_ckthreefive filter_ck35;$/;"	t	typeref:struct:filter_ckthreefive
 filter_ckthreefive	filter_ckthreefive.h	/^struct filter_ckthreefive {$/;"	s
 filter_init_global_parameters	filter.c	/^void filter_init_global_parameters(filter *self, global_filter_params *params)$/;"	f
-filter_keytrack_intensity	synthfunctions.h	/^    double filter_keytrack_intensity;$/;"	m	struct:__anon32
-filter_mod_range	synthfunctions.h	/^    double filter_mod_range;$/;"	m	struct:__anon32
+filter_keytrack_intensity	synthfunctions.h	/^    double filter_keytrack_intensity;$/;"	m	struct:__anon31
+filter_mod_range	synthfunctions.h	/^    double filter_mod_range;$/;"	m	struct:__anon31
 filter_moog	filter_moogladder.h	/^typedef struct filter_moogladder filter_moog;$/;"	t	typeref:struct:filter_moogladder
 filter_moog_init	filter_moogladder.c	/^void filter_moog_init(filter_moog *moog)$/;"	f
 filter_moogladder	filter_moogladder.h	/^typedef struct filter_moogladder {$/;"	s
@@ -626,9 +626,9 @@ filter_set_fc_mod	filter.c	/^void filter_set_fc_mod(filter *f, double val) { f->
 filter_set_q_control	filter.c	/^void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }$/;"	f
 filter_setup	filter.c	/^void filter_setup(filter *f)$/;"	f
 filter_type	filter.h	/^} filter_type;$/;"	t	typeref:enum:__anon12
-filter_type	synthfunctions.h	/^    unsigned int filter_type;$/;"	m	struct:__anon29
+filter_type	synthfunctions.h	/^    unsigned int filter_type;$/;"	m	struct:__anon28
 filter_update	filter.c	/^void filter_update(filter *f)$/;"	f
-fo_ratio	synthfunctions.h	/^    double fo_ratio;$/;"	m	struct:__anon28
+fo_ratio	synthfunctions.h	/^    double fo_ratio;$/;"	m	struct:__anon27
 freaks	utils.h	/^    double *freaks;$/;"	m	struct:freaky
 freaky	utils.h	/^typedef struct freaky {$/;"	s
 freaky	utils.h	/^} freaky;$/;"	t	typeref:struct:freaky
@@ -647,15 +647,15 @@ get_matrix_core	modmatrix.c	/^matrixrow **get_matrix_core(modmatrix *self) { ret
 get_matrix_size	modmatrix.c	/^int get_matrix_size(modmatrix *self)$/;"	f
 get_midi_freq	midi_freq_table.c	/^float get_midi_freq(int midinum) { return midi_freq_table[midinum]; }$/;"	f
 getvol	sound_generator.h	/^    double (*getvol)(void *self);$/;"	m	struct:t_soundgen
-global_dca_params	synthfunctions.h	/^} global_dca_params;$/;"	t	typeref:struct:__anon31
-global_eg_params	synthfunctions.h	/^} global_eg_params;$/;"	t	typeref:struct:__anon30
-global_filter_params	synthfunctions.h	/^} global_filter_params;$/;"	t	typeref:struct:__anon29
-global_oscillator_params	synthfunctions.h	/^} global_oscillator_params;$/;"	t	typeref:struct:__anon28
-global_synth_params	synthfunctions.h	/^} global_synth_params;$/;"	t	typeref:struct:__anon33
-global_voice_params	synthfunctions.h	/^} global_voice_params;$/;"	t	typeref:struct:__anon32
+global_dca_params	synthfunctions.h	/^} global_dca_params;$/;"	t	typeref:struct:__anon30
+global_eg_params	synthfunctions.h	/^} global_eg_params;$/;"	t	typeref:struct:__anon29
+global_filter_params	synthfunctions.h	/^} global_filter_params;$/;"	t	typeref:struct:__anon28
+global_oscillator_params	synthfunctions.h	/^} global_oscillator_params;$/;"	t	typeref:struct:__anon27
+global_synth_params	synthfunctions.h	/^} global_synth_params;$/;"	t	typeref:struct:__anon32
+global_voice_params	synthfunctions.h	/^} global_voice_params;$/;"	t	typeref:struct:__anon31
 has_started	algorithm.h	/^    bool has_started;$/;"	m	struct:algorithm
 height	envelope.h	/^    double height;$/;"	m	struct:envelope_stream
-hs_ratio	synthfunctions.h	/^    double hs_ratio; \/\/ hard sync$/;"	m	struct:__anon32
+hs_ratio	synthfunctions.h	/^    double hs_ratio; \/\/ hard sync$/;"	m	struct:__anon31
 ileft	envelope.h	/^    unsigned long ileft, iright;$/;"	m	struct:envelope_stream
 incr	bitwize.h	/^    double incr;$/;"	m	struct:t_bitwize
 incr	envelope.h	/^    double incr;$/;"	m	struct:envelope_stream
@@ -677,26 +677,26 @@ keyboard_octave	mixer.h	/^    int keyboard_octave; \/\/ TODO <- need this?$/;"	m
 keys	keys.c	/^void keys(int soundgen_num)$/;"	f
 leftpoint	envelope.h	/^    ENVELOPE leftpoint, rightpoint;$/;"	m	struct:envelope_stream
 legato_mode	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	t	typeref:enum:__anon5
-legato_mode	synthfunctions.h	/^    bool legato_mode;$/;"	m	struct:__anon30
+legato_mode	synthfunctions.h	/^    bool legato_mode;$/;"	m	struct:__anon29
 length	table.h	/^    unsigned long length;$/;"	m	struct:wtable
 lfo	lfo.h	/^struct lfo {$/;"	s
 lfo	lfo.h	/^typedef struct lfo lfo;$/;"	t	typeref:struct:lfo
-lfo1_dca_amp_mod_intensity	synthfunctions.h	/^    double lfo1_dca_amp_mod_intensity;$/;"	m	struct:__anon32
-lfo1_dca_pan_mod_intensity	synthfunctions.h	/^    double lfo1_dca_pan_mod_intensity;$/;"	m	struct:__anon32
-lfo1_filter1_mod_intensity	synthfunctions.h	/^    double lfo1_filter1_mod_intensity;$/;"	m	struct:__anon32
-lfo1_filter2_mod_intensity	synthfunctions.h	/^    double lfo1_filter2_mod_intensity;$/;"	m	struct:__anon32
-lfo1_hs_mod_intensity	synthfunctions.h	/^    double lfo1_hs_mod_intensity;$/;"	m	struct:__anon32
-lfo1_osc_mod_intensity	synthfunctions.h	/^    double lfo1_osc_mod_intensity;$/;"	m	struct:__anon32
-lfo1_params	synthfunctions.h	/^    global_oscillator_params lfo1_params;$/;"	m	struct:__anon33
-lfo2_dca_amp_mod_intensity	synthfunctions.h	/^    double lfo2_dca_amp_mod_intensity;$/;"	m	struct:__anon32
-lfo2_dca_pan_mod_intensity	synthfunctions.h	/^    double lfo2_dca_pan_mod_intensity;$/;"	m	struct:__anon32
-lfo2_filter1_mod_intensity	synthfunctions.h	/^    double lfo2_filter1_mod_intensity;$/;"	m	struct:__anon32
-lfo2_filter2_mod_intensity	synthfunctions.h	/^    double lfo2_filter2_mod_intensity;$/;"	m	struct:__anon32
-lfo2_hs_mod_intensity	synthfunctions.h	/^    double lfo2_hs_mod_intensity;$/;"	m	struct:__anon32
-lfo2_osc_mod_intensity	synthfunctions.h	/^    double lfo2_osc_mod_intensity;$/;"	m	struct:__anon32
-lfo2_params	synthfunctions.h	/^    global_oscillator_params lfo2_params;$/;"	m	struct:__anon33
+lfo1_dca_amp_mod_intensity	synthfunctions.h	/^    double lfo1_dca_amp_mod_intensity;$/;"	m	struct:__anon31
+lfo1_dca_pan_mod_intensity	synthfunctions.h	/^    double lfo1_dca_pan_mod_intensity;$/;"	m	struct:__anon31
+lfo1_filter1_mod_intensity	synthfunctions.h	/^    double lfo1_filter1_mod_intensity;$/;"	m	struct:__anon31
+lfo1_filter2_mod_intensity	synthfunctions.h	/^    double lfo1_filter2_mod_intensity;$/;"	m	struct:__anon31
+lfo1_hs_mod_intensity	synthfunctions.h	/^    double lfo1_hs_mod_intensity;$/;"	m	struct:__anon31
+lfo1_osc_mod_intensity	synthfunctions.h	/^    double lfo1_osc_mod_intensity;$/;"	m	struct:__anon31
+lfo1_params	synthfunctions.h	/^    global_oscillator_params lfo1_params;$/;"	m	struct:__anon32
+lfo2_dca_amp_mod_intensity	synthfunctions.h	/^    double lfo2_dca_amp_mod_intensity;$/;"	m	struct:__anon31
+lfo2_dca_pan_mod_intensity	synthfunctions.h	/^    double lfo2_dca_pan_mod_intensity;$/;"	m	struct:__anon31
+lfo2_filter1_mod_intensity	synthfunctions.h	/^    double lfo2_filter1_mod_intensity;$/;"	m	struct:__anon31
+lfo2_filter2_mod_intensity	synthfunctions.h	/^    double lfo2_filter2_mod_intensity;$/;"	m	struct:__anon31
+lfo2_hs_mod_intensity	synthfunctions.h	/^    double lfo2_hs_mod_intensity;$/;"	m	struct:__anon31
+lfo2_osc_mod_intensity	synthfunctions.h	/^    double lfo2_osc_mod_intensity;$/;"	m	struct:__anon31
+lfo2_params	synthfunctions.h	/^    global_oscillator_params lfo2_params;$/;"	m	struct:__anon32
 lfo_do_oscillate	lfo.c	/^double lfo_do_oscillate(oscillator *self, double *quad_phase_output)$/;"	f
-lfo_mode	synthfunctions.h	/^    unsigned int lfo_mode; \/\/ to store MODE$/;"	m	struct:__anon28
+lfo_mode	synthfunctions.h	/^    unsigned int lfo_mode; \/\/ to store MODE$/;"	m	struct:__anon27
 lfo_new	lfo.c	/^lfo *lfo_new()$/;"	f
 lfo_reset_oscillator	lfo.c	/^void lfo_reset_oscillator(oscillator *self) { osc_reset(self); }$/;"	f
 lfo_set_soundgenerator_interface	lfo.c	/^void lfo_set_soundgenerator_interface(lfo *l)$/;"	f
@@ -705,7 +705,7 @@ lfo_stop_oscillator	lfo.c	/^void lfo_stop_oscillator(oscillator *self) { self->m
 lin_terp	utils.c	/^float lin_terp(float x1, float x2, float y1, float y2, float x)$/;"	f
 link_callback_timing_data	ableton_link_wrapper.h	/^typedef struct link_callback_timing_data {$/;"	s
 link_callback_timing_data	ableton_link_wrapper.h	/^} link_callback_timing_data;$/;"	t	typeref:struct:link_callback_timing_data
-link_get_beat_current_position	ableton_link_wrapper.cpp	/^double link_get_beat_current_position(AbletonLink *l, uint64_t i_host_time, int sample_number)$/;"	f
+link_get_beat_at_time	ableton_link_wrapper.cpp	/^double link_get_beat_at_time(AbletonLink *l, int sample_number)$/;"	f
 link_get_bpm	ableton_link_wrapper.cpp	/^double link_get_bpm(AbletonLink *l)$/;"	f
 link_get_callback_timing_data	ableton_link_wrapper.cpp	/^link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, double quantum)$/;"	f
 link_get_current_quantum	ableton_link_wrapper.cpp	/^double link_get_current_quantum(AbletonLink *l)$/;"	f
@@ -714,20 +714,18 @@ link_get_loop_len_in_samples	ableton_link_wrapper.cpp	/^int link_get_loop_len_in
 link_get_sample_time	ableton_link_wrapper.cpp	/^int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }$/;"	f
 link_get_samples_per_midi_tick	ableton_link_wrapper.cpp	/^int link_get_samples_per_midi_tick(AbletonLink *l)$/;"	f
 link_get_timing_data	ableton_link_wrapper.cpp	/^LinkData link_get_timing_data(AbletonLink *l)$/;"	f
-link_is_start_of_quarter	ableton_link_wrapper.cpp	/^bool link_is_start_of_quarter(AbletonLink *l, uint64_t host_time, int sample_number)$/;"	f
-link_is_start_of_sixteenth	ableton_link_wrapper.cpp	/^bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_number)$/;"	f
+link_is_start_of_sixteenth	ableton_link_wrapper.cpp	/^bool link_is_start_of_sixteenth(AbletonLink *l, int sample_number)$/;"	f
 link_reset_beat_time	ableton_link_wrapper.cpp	/^void link_reset_beat_time(AbletonLink *l)$/;"	f
 link_set_bpm	ableton_link_wrapper.cpp	/^void link_set_bpm(AbletonLink *l, double bpm)$/;"	f
-link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)$/;"	f
+link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l)$/;"	f
 link_update_sample_time	ableton_link_wrapper.cpp	/^void link_update_sample_time(AbletonLink *l, int num_frames)$/;"	f
 list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
 load_file_to_buffer	drumr.c	/^int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)$/;"	f
-loop_Mode	synthfunctions.h	/^    unsigned int loop_Mode;$/;"	m	struct:__anon28
+loop_Mode	synthfunctions.h	/^    unsigned int loop_Mode;$/;"	m	struct:__anon27
 loop_len	sampler.h	/^    int loop_len;$/;"	m	struct:file_sample
 looplen	sbmsg.h	/^    double looplen;$/;"	m	struct:sbmsg
 loopy	cmdloop.c	/^void loopy(void)$/;"	f
 m	effect.h	/^    long m;$/;"	m	struct:__anon9
-mTimeAtLastClick	ableton_link_wrapper.cpp	/^    std::chrono::microseconds mTimeAtLastClick;$/;"	m	struct:AbletonLink	file:
 m_HPF1	filter_ckthreefive.h	/^    filter_onepole m_HPF1;$/;"	m	struct:filter_ckthreefive
 m_HPF2	filter_ckthreefive.h	/^    filter_onepole m_HPF2;$/;"	m	struct:filter_ckthreefive
 m_LPF1	filter_ckthreefive.h	/^    filter_onepole m_LPF1;$/;"	m	struct:filter_ckthreefive
@@ -790,15 +788,15 @@ m_current_table_index	wt_oscillator.h	/^    int m_current_table_index; \/\/ 0 - 
 m_d	filter_moogladder.h	/^    double m_d;$/;"	m	struct:filter_moogladder
 m_damping_lpf_1	reverb.h	/^    one_pole_lpf m_damping_lpf_1;$/;"	m	struct:reverb
 m_damping_lpf_2	reverb.h	/^    one_pole_lpf m_damping_lpf_2;$/;"	m	struct:reverb
-m_dca	voice.h	/^    dca m_dca;$/;"	m	struct:__anon34
+m_dca	voice.h	/^    dca m_dca;$/;"	m	struct:__anon33
 m_decay_coeff	envelope_generator.h	/^    double m_decay_coeff;$/;"	m	struct:envelope_generator
 m_decay_offset	envelope_generator.h	/^    double m_decay_offset;$/;"	m	struct:envelope_generator
 m_decay_release_time_msec	minisynth.h	/^    double m_decay_release_time_msec;$/;"	m	struct:minisynth
 m_decay_tco	envelope_generator.h	/^    double m_decay_tco;$/;"	m	struct:envelope_generator
 m_decay_time_msec	envelope_generator.h	/^    double m_decay_time_msec;$/;"	m	struct:envelope_generator
 m_decay_time_scalar	envelope_generator.h	/^    double m_decay_time_scalar;  \/\/ for note# -> decay time mod$/;"	m	struct:envelope_generator
-m_default_mod_intensity	voice.h	/^    double m_default_mod_intensity;$/;"	m	struct:__anon34
-m_default_mod_range	voice.h	/^    double m_default_mod_range;$/;"	m	struct:__anon34
+m_default_mod_intensity	voice.h	/^    double m_default_mod_intensity;$/;"	m	struct:__anon33
+m_default_mod_range	voice.h	/^    double m_default_mod_range;$/;"	m	struct:__anon33
 m_delay	modular_delay.h	/^    ddlmodule m_delay;$/;"	m	struct:mod_delay
 m_delay_fx	minisynth.h	/^    stereodelay m_delay_fx;$/;"	m	struct:minisynth
 m_delay_in_samples	ddlmodule.h	/^    double m_delay_in_samples;$/;"	m	struct:ddlmodule
@@ -814,23 +812,23 @@ m_delay_time_ms	stereodelay.h	/^    double m_delay_time_ms;$/;"	m	struct:stereod
 m_delay_time_msec	minisynth.h	/^    double m_delay_time_msec;$/;"	m	struct:minisynth
 m_delta	filter_onepole.h	/^    double m_delta;$/;"	m	struct:filter_onepole
 m_depth	modular_delay.h	/^    double m_depth;$/;"	m	struct:mod_delay
-m_destination_index	modmatrix.h	/^    unsigned m_destination_index;$/;"	m	struct:__anon21
-m_destinations	modmatrix.h	/^    double m_destinations[MAX_DESTINATIONS];$/;"	m	struct:__anon22
+m_destination_index	modmatrix.h	/^    unsigned m_destination_index;$/;"	m	struct:__anon20
+m_destinations	modmatrix.h	/^    double m_destinations[MAX_DESTINATIONS];$/;"	m	struct:__anon21
 m_detune_cents	minisynth.h	/^    double m_detune_cents;$/;"	m	struct:minisynth
 m_dpw_square_modulator	oscillator.h	/^    double m_dpw_square_modulator; \/\/ square toggle$/;"	m	struct:oscillator
 m_dpw_z1	oscillator.h	/^    double m_dpw_z1;               \/\/ memory register for differentiator$/;"	m	struct:oscillator
 m_duration	effect.h	/^    double m_duration;$/;"	m	struct:__anon9
 m_e	filter_moogladder.h	/^    double m_e;$/;"	m	struct:filter_moogladder
-m_eg1	voice.h	/^    envelope_generator m_eg1;$/;"	m	struct:__anon34
+m_eg1	voice.h	/^    envelope_generator m_eg1;$/;"	m	struct:__anon33
 m_eg1_dca_intensity	minisynth.h	/^    double m_eg1_dca_intensity;$/;"	m	struct:minisynth
 m_eg1_filter_intensity	minisynth.h	/^    double m_eg1_filter_intensity;$/;"	m	struct:minisynth
 m_eg1_osc_intensity	minisynth.h	/^    double m_eg1_osc_intensity;$/;"	m	struct:minisynth
-m_eg2	voice.h	/^    envelope_generator m_eg2;$/;"	m	struct:__anon34
-m_eg3	voice.h	/^    envelope_generator m_eg3;$/;"	m	struct:__anon34
-m_eg4	voice.h	/^    envelope_generator m_eg4;$/;"	m	struct:__anon34
+m_eg2	voice.h	/^    envelope_generator m_eg2;$/;"	m	struct:__anon33
+m_eg3	voice.h	/^    envelope_generator m_eg3;$/;"	m	struct:__anon33
+m_eg4	voice.h	/^    envelope_generator m_eg4;$/;"	m	struct:__anon33
 m_eg_mod	dca.h	/^    double m_eg_mod;$/;"	m	struct:dca
 m_eg_mode	envelope_generator.h	/^    unsigned m_eg_mode; \/\/ enum above, analog or digital$/;"	m	struct:envelope_generator
-m_enable	modmatrix.h	/^    bool m_enable;$/;"	m	struct:__anon21
+m_enable	modmatrix.h	/^    bool m_enable;$/;"	m	struct:__anon20
 m_envelope_output	envelope_generator.h	/^    double m_envelope_output;$/;"	m	struct:envelope_generator
 m_epsilon	filter_onepole.h	/^    double m_epsilon;$/;"	m	struct:filter_onepole
 m_fc	filter.h	/^    double m_fc;     \/\/ current filter cut-off val$/;"	m	struct:filter
@@ -844,8 +842,8 @@ m_feedback_pct	ddlmodule.h	/^    double m_feedback_pct;$/;"	m	struct:ddlmodule
 m_feedback_pct	minisynth.h	/^    double m_feedback_pct;$/;"	m	struct:minisynth
 m_feedback_percent	modular_delay.h	/^    double m_feedback_percent;$/;"	m	struct:mod_delay
 m_feedback_percent	stereodelay.h	/^    double m_feedback_percent;$/;"	m	struct:stereodelay
-m_filter1	voice.h	/^    filter *m_filter1;$/;"	m	struct:__anon34
-m_filter2	voice.h	/^    filter *m_filter2;$/;"	m	struct:__anon34
+m_filter1	voice.h	/^    filter *m_filter1;$/;"	m	struct:__anon33
+m_filter2	voice.h	/^    filter *m_filter2;$/;"	m	struct:__anon33
 m_filter_keytrack	minisynth.h	/^    unsigned int m_filter_keytrack;$/;"	m	struct:minisynth
 m_filter_keytrack_intensity	minisynth.h	/^    double m_filter_keytrack_intensity;$/;"	m	struct:minisynth
 m_filter_type	filter.h	/^    unsigned m_filter_type;$/;"	m	struct:filter
@@ -863,12 +861,13 @@ m_global_eg_params	envelope_generator.h	/^    global_eg_params *m_global_eg_para
 m_global_filter_params	filter.h	/^    global_filter_params *m_global_filter_params;$/;"	m	struct:filter
 m_global_oscillator_params	oscillator.h	/^    global_oscillator_params *m_global_oscillator_params;$/;"	m	struct:oscillator
 m_global_synth_params	minisynth.h	/^    global_synth_params m_global_synth_params;$/;"	m	struct:minisynth
-m_global_synth_params	voice.h	/^    global_synth_params *m_global_synth_params;$/;"	m	struct:__anon34
-m_global_voice_params	voice.h	/^    global_voice_params *m_global_voice_params;$/;"	m	struct:__anon34
+m_global_synth_params	voice.h	/^    global_synth_params *m_global_synth_params;$/;"	m	struct:__anon33
+m_global_voice_params	voice.h	/^    global_voice_params *m_global_voice_params;$/;"	m	struct:__anon33
 m_grid	beatrepeat.h	/^    unsigned int m_grid;$/;"	m	struct:beatrepeat
 m_have_recording	beatrepeat.h	/^    bool m_have_recording;$/;"	m	struct:beatrepeat
 m_host_time_filter	ableton_link_wrapper.cpp	/^        m_host_time_filter;$/;"	m	struct:AbletonLink	file:
-m_hs_ratio	voice.h	/^    double m_hs_ratio; \/\/ hard sync$/;"	m	struct:__anon34
+m_hosttime	ableton_link_wrapper.cpp	/^    std::chrono::microseconds m_hosttime;$/;"	m	struct:AbletonLink	file:
+m_hs_ratio	voice.h	/^    double m_hs_ratio; \/\/ hard sync$/;"	m	struct:__anon33
 m_inc	oscillator.h	/^    double m_inc;    \/\/ phase inc = fo\/fs$/;"	m	struct:oscillator
 m_inc_shutdown	envelope_generator.h	/^    double m_inc_shutdown;$/;"	m	struct:envelope_generator
 m_input_apf_1	reverb.h	/^    delay_apf m_input_apf_1;$/;"	m	struct:reverb
@@ -884,10 +883,10 @@ m_last_note_frequency	minisynth.h	/^    double m_last_note_frequency;$/;"	m	stru
 m_left_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	struct:stereodelay
 m_legato_mode	envelope_generator.h	/^    bool m_legato_mode;$/;"	m	struct:envelope_generator
 m_legato_mode	minisynth.h	/^    unsigned int m_legato_mode;$/;"	m	struct:minisynth
-m_legato_mode	voice.h	/^    unsigned int m_legato_mode;$/;"	m	struct:__anon34
+m_legato_mode	voice.h	/^    unsigned int m_legato_mode;$/;"	m	struct:__anon33
 m_lfo	bitwize.h	/^    lfo *m_lfo;$/;"	m	struct:t_bitwize
 m_lfo	modular_delay.h	/^    lfo *m_lfo;$/;"	m	struct:mod_delay
-m_lfo1	voice.h	/^    lfo m_lfo1;$/;"	m	struct:__anon34
+m_lfo1	voice.h	/^    lfo m_lfo1;$/;"	m	struct:__anon33
 m_lfo1_amp_intensity	minisynth.h	/^    double m_lfo1_amp_intensity;$/;"	m	struct:minisynth
 m_lfo1_amplitude	minisynth.h	/^    double m_lfo1_amplitude;$/;"	m	struct:minisynth
 m_lfo1_filter_fc_intensity	minisynth.h	/^    double m_lfo1_filter_fc_intensity;$/;"	m	struct:minisynth
@@ -895,31 +894,31 @@ m_lfo1_osc_pitch_intensity	minisynth.h	/^    double m_lfo1_osc_pitch_intensity;$
 m_lfo1_pan_intensity	minisynth.h	/^    double m_lfo1_pan_intensity;$/;"	m	struct:minisynth
 m_lfo1_rate	minisynth.h	/^    double m_lfo1_rate;$/;"	m	struct:minisynth
 m_lfo1_waveform	minisynth.h	/^    unsigned int m_lfo1_waveform;$/;"	m	struct:minisynth
-m_lfo2	voice.h	/^    lfo m_lfo2;$/;"	m	struct:__anon34
+m_lfo2	voice.h	/^    lfo m_lfo2;$/;"	m	struct:__anon33
 m_lfo_mode	oscillator.h	/^    unsigned m_lfo_mode; \/\/ to store MODE$/;"	m	struct:oscillator
 m_lfo_type	modular_delay.h	/^    unsigned int m_lfo_type; \/\/ TRI \/ SINE$/;"	m	struct:mod_delay
 m_link	ableton_link_wrapper.cpp	/^    ableton::Link m_link;$/;"	m	struct:AbletonLink	file:
 m_loop_len_in_samples	ableton_link_wrapper.cpp	/^    double m_loop_len_in_samples;$/;"	m	struct:AbletonLink	file:
 m_loop_len_in_ticks	ableton_link_wrapper.cpp	/^    double m_loop_len_in_ticks;$/;"	m	struct:AbletonLink	file:
 m_lpf2_g2	reverb.h	/^    double m_lpf2_g2;$/;"	m	struct:reverb
-m_matrix_core	modmatrix.h	/^    matrixrow **m_matrix_core;$/;"	m	struct:__anon22
+m_matrix_core	modmatrix.h	/^    matrixrow **m_matrix_core;$/;"	m	struct:__anon21
 m_max_delay_msec	modular_delay.h	/^    double m_max_delay_msec;$/;"	m	struct:mod_delay
 m_midi_controller_mode	mixer.h	/^    unsigned int m_midi_controller_mode; \/\/ to switch control knob routing$/;"	m	struct:t_mixer
 m_midi_note_number	oscillator.h	/^    unsigned m_midi_note_number;$/;"	m	struct:oscillator
-m_midi_note_number	voice.h	/^    unsigned int m_midi_note_number;$/;"	m	struct:__anon34
-m_midi_note_number_pending	voice.h	/^    unsigned int m_midi_note_number_pending;$/;"	m	struct:__anon34
+m_midi_note_number	voice.h	/^    unsigned int m_midi_note_number;$/;"	m	struct:__anon33
+m_midi_note_number_pending	voice.h	/^    unsigned int m_midi_note_number_pending;$/;"	m	struct:__anon33
 m_midi_rx_channel	minisynth.h	/^    unsigned int m_midi_rx_channel;$/;"	m	struct:minisynth
 m_midi_ticks_per_ms	ableton_link_wrapper.cpp	/^    double m_midi_ticks_per_ms;$/;"	m	struct:AbletonLink	file:
 m_midi_velocity	dca.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:dca
-m_midi_velocity	voice.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:__anon34
-m_midi_velocity_pending	voice.h	/^    unsigned int m_midi_velocity_pending;$/;"	m	struct:__anon34
+m_midi_velocity	voice.h	/^    unsigned int m_midi_velocity;$/;"	m	struct:__anon33
+m_midi_velocity_pending	voice.h	/^    unsigned int m_midi_velocity_pending;$/;"	m	struct:__anon33
 m_min_delay_msec	modular_delay.h	/^    double m_min_delay_msec;$/;"	m	struct:mod_delay
 m_mod_dest_eg_biased_output	envelope_generator.h	/^    unsigned m_mod_dest_eg_biased_output;$/;"	m	struct:envelope_generator
 m_mod_dest_eg_output	envelope_generator.h	/^    unsigned m_mod_dest_eg_output;$/;"	m	struct:envelope_generator
 m_mod_dest_output1	oscillator.h	/^    unsigned m_mod_dest_output1;$/;"	m	struct:oscillator
 m_mod_dest_output2	oscillator.h	/^    unsigned m_mod_dest_output2;$/;"	m	struct:oscillator
-m_mod_intensity	modmatrix.h	/^    double *m_mod_intensity;$/;"	m	struct:__anon21
-m_mod_range	modmatrix.h	/^    double *m_mod_range;$/;"	m	struct:__anon21
+m_mod_intensity	modmatrix.h	/^    double *m_mod_intensity;$/;"	m	struct:__anon20
+m_mod_range	modmatrix.h	/^    double *m_mod_range;$/;"	m	struct:__anon20
 m_mod_source_amp	oscillator.h	/^    unsigned m_mod_source_amp;$/;"	m	struct:oscillator
 m_mod_source_amp_db	dca.h	/^    unsigned m_mod_source_amp_db;$/;"	m	struct:dca
 m_mod_source_eg	dca.h	/^    unsigned m_mod_source_eg;$/;"	m	struct:dca
@@ -935,31 +934,31 @@ m_mod_source_velocity	dca.h	/^    unsigned m_mod_source_velocity;$/;"	m	struct:d
 m_mod_type	modular_delay.h	/^    unsigned int m_mod_type; \/\/ FLANGER, VIBRATO, CHORUS$/;"	m	struct:mod_delay
 m_mode	stereodelay.h	/^    unsigned m_mode;$/;"	m	struct:stereodelay
 m_modulo	oscillator.h	/^    double m_modulo; \/\/ modulo counter 0->1$/;"	m	struct:oscillator
-m_modulo_portamento	voice.h	/^    double m_modulo_portamento;$/;"	m	struct:__anon34
+m_modulo_portamento	voice.h	/^    double m_modulo_portamento;$/;"	m	struct:__anon33
 m_moog_ladder_filter	minisynth_voice.h	/^    filter_moogladder m_moog_ladder_filter;$/;"	m	struct:__anon15
 m_ms_modmatrix	minisynth.h	/^    modmatrix m_ms_modmatrix; \/\/ routing structure for sound generation$/;"	m	struct:minisynth
 m_nlp	filter.h	/^    unsigned m_nlp;      \/\/ Non Linear Processing on\/off switch$/;"	m	struct:filter
 m_noise_osc_db	minisynth.h	/^    double m_noise_osc_db;$/;"	m	struct:minisynth
 m_note_number_to_decay_scaling	minisynth.h	/^    unsigned int m_note_number_to_decay_scaling;$/;"	m	struct:minisynth
 m_note_on	oscillator.h	/^    bool m_note_on;$/;"	m	struct:oscillator
-m_note_on	voice.h	/^    bool m_note_on;$/;"	m	struct:__anon34
-m_note_pending	voice.h	/^    bool m_note_pending;$/;"	m	struct:__anon34
+m_note_on	voice.h	/^    bool m_note_on;$/;"	m	struct:__anon33
+m_note_pending	voice.h	/^    bool m_note_pending;$/;"	m	struct:__anon33
 m_num_beats_to_repeat	beatrepeat.h	/^    size_t m_num_beats_to_repeat;$/;"	m	struct:beatrepeat
-m_num_rows_in_matrix_core	modmatrix.h	/^    int m_num_rows_in_matrix_core;$/;"	m	struct:__anon22
+m_num_rows_in_matrix_core	modmatrix.h	/^    int m_num_rows_in_matrix_core;$/;"	m	struct:__anon21
 m_octave	minisynth.h	/^    int m_octave;$/;"	m	struct:minisynth
 m_octave	oscillator.h	/^    double m_octave;    \/\/ octave tweak$/;"	m	struct:oscillator
 m_offset	beatrepeat.h	/^    unsigned int m_offset;$/;"	m	struct:beatrepeat
 m_osc1	minisynth_voice.h	/^    qblimited_oscillator m_osc1;$/;"	m	struct:__anon15
-m_osc1	voice.h	/^    oscillator *m_osc1;$/;"	m	struct:__anon34
+m_osc1	voice.h	/^    oscillator *m_osc1;$/;"	m	struct:__anon33
 m_osc2	minisynth_voice.h	/^    qblimited_oscillator m_osc2;$/;"	m	struct:__anon15
-m_osc2	voice.h	/^    oscillator *m_osc2;$/;"	m	struct:__anon34
+m_osc2	voice.h	/^    oscillator *m_osc2;$/;"	m	struct:__anon33
 m_osc3	minisynth_voice.h	/^    qblimited_oscillator m_osc3;$/;"	m	struct:__anon15
-m_osc3	voice.h	/^    oscillator *m_osc3;$/;"	m	struct:__anon34
+m_osc3	voice.h	/^    oscillator *m_osc3;$/;"	m	struct:__anon33
 m_osc4	minisynth_voice.h	/^    qblimited_oscillator m_osc4;$/;"	m	struct:__anon15
-m_osc4	voice.h	/^    oscillator *m_osc4;$/;"	m	struct:__anon34
+m_osc4	voice.h	/^    oscillator *m_osc4;$/;"	m	struct:__anon33
 m_osc_fo	oscillator.h	/^    double m_osc_fo;    \/\/ oscillator frequency from MIDI note number$/;"	m	struct:oscillator
-m_osc_pitch	voice.h	/^    double m_osc_pitch;$/;"	m	struct:__anon34
-m_osc_pitch_pending	voice.h	/^    double m_osc_pitch_pending;$/;"	m	struct:__anon34
+m_osc_pitch	voice.h	/^    double m_osc_pitch;$/;"	m	struct:__anon33
+m_osc_pitch_pending	voice.h	/^    double m_osc_pitch_pending;$/;"	m	struct:__anon33
 m_output_apf_3	reverb.h	/^    delay_apf m_output_apf_3;$/;"	m	struct:reverb
 m_output_apf_4	reverb.h	/^    delay_apf m_output_apf_4;$/;"	m	struct:reverb
 m_output_eg	envelope_generator.h	/^    bool m_output_eg; \/\/ i.e. this instance is going direct to output, rather$/;"	m	struct:envelope_generator
@@ -978,11 +977,11 @@ m_phase_mod	oscillator.h	/^    double m_phase_mod;  \/* Phase mod input -1 to +1
 m_pitch_bend_mod	oscillator.h	/^    double m_pitch_bend_mod; \/* modulation input -1 to +1 *\/$/;"	m	struct:oscillator
 m_pitchbend_range	minisynth.h	/^    int m_pitchbend_range;$/;"	m	struct:minisynth
 m_pn_register	oscillator.h	/^    unsigned m_pn_register; \/\/ for PN Noise sequence$/;"	m	struct:oscillator
-m_portamento_inc	voice.h	/^    double m_portamento_inc;$/;"	m	struct:__anon34
-m_portamento_semitones	voice.h	/^    double m_portamento_semitones;$/;"	m	struct:__anon34
-m_portamento_start	voice.h	/^    double m_portamento_start;$/;"	m	struct:__anon34
+m_portamento_inc	voice.h	/^    double m_portamento_inc;$/;"	m	struct:__anon33
+m_portamento_semitones	voice.h	/^    double m_portamento_semitones;$/;"	m	struct:__anon33
+m_portamento_start	voice.h	/^    double m_portamento_start;$/;"	m	struct:__anon33
 m_portamento_time_msec	minisynth.h	/^    double m_portamento_time_msec;$/;"	m	struct:minisynth
-m_portamento_time_msec	voice.h	/^    double m_portamento_time_msec;$/;"	m	struct:__anon34
+m_portamento_time_msec	voice.h	/^    double m_portamento_time_msec;$/;"	m	struct:__anon33
 m_pre_delay	reverb.h	/^    delay m_pre_delay;$/;"	m	struct:reverb
 m_pre_delay_atten_db	reverb.h	/^    double m_pre_delay_atten_db; \/\/ k2$/;"	m	struct:reverb
 m_pre_delay_msec	reverb.h	/^    double m_pre_delay_msec;     \/\/ midi k1$/;"	m	struct:reverb
@@ -1014,6 +1013,7 @@ m_rsh_counter	oscillator.h	/^    int m_rsh_counter;      \/\/ random sample\/hol
 m_rsh_value	oscillator.h	/^    double m_rsh_value;     \/\/ currnet rsh output$/;"	m	struct:oscillator
 m_rt60	reverb.h	/^    double m_rt60;               \/\/ reverb time, k3$/;"	m	struct:reverb
 m_running	ableton_link_wrapper.cpp	/^    std::atomic<bool> m_running;$/;"	m	struct:AbletonLink	file:
+m_sample_at_last_sixteenth	ableton_link_wrapper.cpp	/^    int m_sample_at_last_sixteenth;$/;"	m	struct:AbletonLink	file:
 m_sample_time	ableton_link_wrapper.cpp	/^    int m_sample_time;$/;"	m	struct:AbletonLink	file:
 m_samples_per_midi_tick	ableton_link_wrapper.cpp	/^    double m_samples_per_midi_tick;$/;"	m	struct:AbletonLink	file:
 m_saturation	filter.h	/^    double m_saturation; \/\/ used in NLP$/;"	m	struct:filter
@@ -1023,9 +1023,9 @@ m_semitones	oscillator.h	/^    double m_semitones; \/\/ semitones tweak$/;"	m	st
 m_shutdown_time_msec	envelope_generator.h	/^    double m_shutdown_time_msec;$/;"	m	struct:envelope_generator
 m_sine_table	wt_oscillator.h	/^    double m_sine_table[WT_LENGTH];$/;"	m	struct:wt_oscillator
 m_sixteenth_note_size	beatrepeat.h	/^    size_t m_sixteenth_note_size;$/;"	m	struct:beatrepeat
-m_source_index	modmatrix.h	/^    unsigned m_source_index;$/;"	m	struct:__anon21
-m_source_transform	modmatrix.h	/^    unsigned m_source_transform;$/;"	m	struct:__anon21
-m_sources	modmatrix.h	/^    double m_sources[MAX_SOURCES];$/;"	m	struct:__anon22
+m_source_index	modmatrix.h	/^    unsigned m_source_index;$/;"	m	struct:__anon20
+m_source_transform	modmatrix.h	/^    unsigned m_source_transform;$/;"	m	struct:__anon20
+m_sources	modmatrix.h	/^    double m_sources[MAX_SOURCES];$/;"	m	struct:__anon21
 m_square_corr_factor	wt_oscillator.h	/^    double m_square_corr_factor[NUM_TABLES];$/;"	m	struct:wt_oscillator
 m_state	envelope_generator.h	/^    unsigned int m_state;$/;"	m	struct:envelope_generator
 m_sub_osc_db	minisynth.h	/^    double m_sub_osc_db;$/;"	m	struct:minisynth
@@ -1036,18 +1036,18 @@ m_sustain_override	minisynth.h	/^    bool m_sustain_override;$/;"	m	struct:minis
 m_tap2_left_delay_time_ms	stereodelay.h	/^    double m_tap2_left_delay_time_ms;$/;"	m	struct:stereodelay
 m_tap2_right_delay_time_ms	stereodelay.h	/^    double m_tap2_right_delay_time_ms;$/;"	m	struct:stereodelay
 m_timeline	ableton_link_wrapper.cpp	/^    ableton::Link::Timeline m_timeline; \/\/ should be updated in every callback$/;"	m	struct:AbletonLink	file:
-m_timestamp	voice.h	/^    unsigned int m_timestamp;$/;"	m	struct:__anon34
+m_timestamp	voice.h	/^    unsigned int m_timestamp;$/;"	m	struct:__anon33
 m_triangle_tables	wt_oscillator.h	/^    double *m_triangle_tables[NUM_TABLES];$/;"	m	struct:wt_oscillator
 m_use_external_feedback	ddlmodule.h	/^    bool m_use_external_feedback;$/;"	m	struct:ddlmodule
 m_v_modmatrix	dca.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:dca
 m_v_modmatrix	envelope_generator.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:envelope_generator
 m_v_modmatrix	filter.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:filter
 m_v_modmatrix	oscillator.h	/^    modmatrix *m_v_modmatrix;$/;"	m	struct:oscillator
-m_v_modmatrix	voice.h	/^    modmatrix m_v_modmatrix;$/;"	m	struct:__anon34
+m_v_modmatrix	voice.h	/^    modmatrix m_v_modmatrix;$/;"	m	struct:__anon33
 m_velocity_to_attack_scaling	minisynth.h	/^    unsigned int m_velocity_to_attack_scaling;$/;"	m	struct:minisynth
 m_voice	minisynth_voice.h	/^    voice m_voice;$/;"	m	struct:__anon15
 m_voice_mode	minisynth.h	/^    unsigned int m_voice_mode; \/\/ controlled by keys$/;"	m	struct:minisynth
-m_voice_mode	voice.h	/^    unsigned int m_voice_mode;$/;"	m	struct:__anon34
+m_voice_mode	voice.h	/^    unsigned int m_voice_mode;$/;"	m	struct:__anon33
 m_voices	minisynth.h	/^    minisynth_voice *m_voices[MAX_VOICES];$/;"	m	struct:minisynth
 m_volume_db	minisynth.h	/^    double m_volume_db;$/;"	m	struct:minisynth
 m_waveform	oscillator.h	/^    unsigned m_waveform; \/\/ to store type$/;"	m	struct:oscillator
@@ -1072,12 +1072,12 @@ matrix1	drumr.h	/^    int matrix1[GRIDWIDTH][GRIDWIDTH];$/;"	m	struct:t_drumr
 matrix2	drumr.h	/^    int matrix2[GRIDWIDTH][GRIDWIDTH];$/;"	m	struct:t_drumr
 matrix_clear_destinations	modmatrix.c	/^void matrix_clear_destinations(modmatrix *self)$/;"	f
 matrix_clear_sources	modmatrix.c	/^void matrix_clear_sources(modmatrix *self)$/;"	f
-matrix_destinations	modmatrix.h	/^} matrix_destinations;$/;"	t	typeref:enum:__anon19
+matrix_destinations	modmatrix.h	/^} matrix_destinations;$/;"	t	typeref:enum:__anon18
 matrix_row_exists	modmatrix.c	/^bool matrix_row_exists(modmatrix *self, unsigned sourceidx, unsigned destidx)$/;"	f
-matrix_sources	modmatrix.h	/^} matrix_sources;$/;"	t	typeref:enum:__anon18
+matrix_sources	modmatrix.h	/^} matrix_sources;$/;"	t	typeref:enum:__anon17
 matrix_to_int	drumr.c	/^int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])$/;"	f
-matrix_transformations	modmatrix.h	/^} matrix_transformations;$/;"	t	typeref:enum:__anon20
-matrixrow	modmatrix.h	/^} matrixrow;$/;"	t	typeref:struct:__anon21
+matrix_transformations	modmatrix.h	/^} matrix_transformations;$/;"	t	typeref:enum:__anon19
+matrixrow	modmatrix.h	/^} matrixrow;$/;"	t	typeref:struct:__anon20
 max_generation	drumr.h	/^    int max_generation; \/\/ used for game of life or markov chain$/;"	m	struct:t_drumr
 max_generation	sampler.h	/^    int max_generation;$/;"	m	struct:t_sampler
 maxpoint	envelope.c	/^ENVELOPE maxpoint(const ENVELOPE *points, long npoints)$/;"	f
@@ -1137,14 +1137,13 @@ minisynth_voice_prepare_for_play	minisynth_voice.c	/^void minisynth_voice_prepar
 minisynth_voice_reset	minisynth_voice.c	/^void minisynth_voice_reset(minisynth_voice *msv)$/;"	f
 minisynth_voice_update	minisynth_voice.c	/^void minisynth_voice_update(minisynth_voice *msv)$/;"	f
 mixer	mixer.h	/^} mixer;$/;"	t	typeref:struct:t_mixer
-mixer_gennext	mixer.c	/^double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number)$/;"	f
+mixer_gennext	mixer.c	/^double mixer_gennext(mixer *mixr, int sample_number)$/;"	f
 mixer_ps	mixer.c	/^void mixer_ps(mixer *mixr)$/;"	f
 mixer_start_playing	mixer.c	/^void mixer_start_playing(mixer *mixr)$/;"	f
 mixer_stop_playing	mixer.c	/^void mixer_stop_playing(mixer *mixr)$/;"	f
 mixer_toggle_midi_mode	mixer.c	/^void mixer_toggle_midi_mode(mixer *mixr)$/;"	f
 mixer_vol_change	mixer.c	/^void mixer_vol_change(mixer *mixr, float vol)$/;"	f
 mixr	main.c	/^mixer *mixr;$/;"	v
-mixr	mixer.h	/^    mixer *mixr;$/;"	m	struct:__anon17
 mma_midi_to_atten_db	utils.c	/^double mma_midi_to_atten_db(unsigned int midi_val)$/;"	f
 mod_delay	modular_delay.h	/^typedef struct mod_delay {$/;"	s
 mod_delay	modular_delay.h	/^} mod_delay;$/;"	t	typeref:struct:mod_delay
@@ -1158,8 +1157,8 @@ mod_delay_update_lfo	modular_delay.c	/^void mod_delay_update_lfo(mod_delay *md)$
 mod_osc	sbmsg.h	/^    char mod_osc[10];$/;"	m	struct:sbmsg
 moddelay	effect.h	/^    mod_delay *moddelay;$/;"	m	struct:__anon9
 modfreq	sbmsg.h	/^    int modfreq;$/;"	m	struct:sbmsg
-modmatrix	modmatrix.h	/^} modmatrix;$/;"	t	typeref:struct:__anon22
-modular_type	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	t	typeref:enum:__anon23
+modmatrix	modmatrix.h	/^} modmatrix;$/;"	t	typeref:struct:__anon21
+modular_type	modular_delay.h	/^typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;$/;"	t	typeref:enum:__anon22
 moog_gennext	filter_moogladder.c	/^double moog_gennext(filter *f, double xn)$/;"	f
 moog_reset	filter_moogladder.c	/^void moog_reset(filter *f)$/;"	f
 moog_set_qcontrol	filter_moogladder.c	/^void moog_set_qcontrol(filter *f, double qcontrol)$/;"	f
@@ -1211,7 +1210,7 @@ new_wavey_points	envelope.c	/^ENVELOPE *new_wavey_points()$/;"	f
 newpoints	envelope.c	/^ENVELOPE *newpoints()$/;"	f
 next_life_generation	drumr.c	/^void next_life_generation(DRUM *self)$/;"	f
 next_markov_generation	drumr.c	/^void next_markov_generation(DRUM *d)$/;"	f
-nlp	synthfunctions.h	/^    unsigned int nlp;$/;"	m	struct:__anon29
+nlp	synthfunctions.h	/^    unsigned int nlp;$/;"	m	struct:__anon28
 norm_wtable	table.c	/^static void norm_wtable(wtable *t)$/;"	f	file:
 notelookup	utils.c	/^int notelookup(char *n)$/;"	f
 npoints	envelope.h	/^    unsigned long npoints;$/;"	m	struct:envelope_stream
@@ -1221,7 +1220,7 @@ num_patterns	drumr.h	/^    int num_patterns;$/;"	m	struct:t_drumr
 num_peers	ableton_link_wrapper.h	/^    int num_peers;$/;"	m	struct:LinkData
 num_samples	sampler.h	/^    int num_samples;$/;"	m	struct:t_sampler
 oblique_strategy	obliquestrategies.c	/^void oblique_strategy()$/;"	f
-octave	synthfunctions.h	/^    int octave;                 \/\/ octave tweak$/;"	m	struct:__anon28
+octave	synthfunctions.h	/^    int octave;                 \/\/ octave tweak$/;"	m	struct:__anon27
 onepole_gennext	filter_onepole.c	/^double onepole_gennext(filter *f, double xn)$/;"	f
 onepole_get_feedback_output	filter_onepole.c	/^double onepole_get_feedback_output(filter_onepole *f)$/;"	f
 onepole_reset	filter_onepole.c	/^void onepole_reset(filter *self)$/;"	f
@@ -1229,26 +1228,26 @@ onepole_set_feedback	filter_onepole.c	/^void onepole_set_feedback(filter_onepole
 onepole_setup	filter_onepole.c	/^void onepole_setup(filter_onepole *op)$/;"	f
 onepole_update	filter_onepole.c	/^void onepole_update(filter *f)$/;"	f
 onoff	defjams.h	/^typedef enum { OFF, ON } onoff;$/;"	t	typeref:enum:__anon2
-op1_feedback	synthfunctions.h	/^    double op1_feedback;$/;"	m	struct:__anon32
-op2_feedback	synthfunctions.h	/^    double op2_feedback;$/;"	m	struct:__anon32
-op3_feedback	synthfunctions.h	/^    double op3_feedback;$/;"	m	struct:__anon32
-op4_feedback	synthfunctions.h	/^    double op4_feedback;$/;"	m	struct:__anon32
-orbit_x_amp	synthfunctions.h	/^    double orbit_x_amp;$/;"	m	struct:__anon32
-orbit_y_amp	synthfunctions.h	/^    double orbit_y_amp;$/;"	m	struct:__anon32
+op1_feedback	synthfunctions.h	/^    double op1_feedback;$/;"	m	struct:__anon31
+op2_feedback	synthfunctions.h	/^    double op2_feedback;$/;"	m	struct:__anon31
+op3_feedback	synthfunctions.h	/^    double op3_feedback;$/;"	m	struct:__anon31
+op4_feedback	synthfunctions.h	/^    double op4_feedback;$/;"	m	struct:__anon31
+orbit_x_amp	synthfunctions.h	/^    double orbit_x_amp;$/;"	m	struct:__anon31
+orbit_y_amp	synthfunctions.h	/^    double orbit_y_amp;$/;"	m	struct:__anon31
 orig_file_bytes	sampler.h	/^    int *orig_file_bytes;$/;"	m	struct:file_sample
 orig_file_size	sampler.h	/^    int orig_file_size;$/;"	m	struct:file_sample
 osc	lfo.h	/^    oscillator osc;$/;"	m	struct:lfo
 osc	qblimited_oscillator.h	/^    oscillator osc;$/;"	m	struct:qblimited_oscillator
 osc	wt_oscillator.h	/^    oscillator osc;$/;"	m	struct:wt_oscillator
-osc1_params	synthfunctions.h	/^    global_oscillator_params osc1_params;$/;"	m	struct:__anon33
-osc2_params	synthfunctions.h	/^    global_oscillator_params osc2_params;$/;"	m	struct:__anon33
-osc3_params	synthfunctions.h	/^    global_oscillator_params osc3_params;$/;"	m	struct:__anon33
-osc4_params	synthfunctions.h	/^    global_oscillator_params osc4_params;$/;"	m	struct:__anon33
+osc1_params	synthfunctions.h	/^    global_oscillator_params osc1_params;$/;"	m	struct:__anon32
+osc2_params	synthfunctions.h	/^    global_oscillator_params osc2_params;$/;"	m	struct:__anon32
+osc3_params	synthfunctions.h	/^    global_oscillator_params osc3_params;$/;"	m	struct:__anon32
+osc4_params	synthfunctions.h	/^    global_oscillator_params osc4_params;$/;"	m	struct:__anon32
 osc_check_wrap_modulo	oscillator.c	/^bool osc_check_wrap_modulo(oscillator *self)$/;"	f
-osc_fo	synthfunctions.h	/^    double osc_fo;$/;"	m	struct:__anon28
-osc_fo_mod_range	synthfunctions.h	/^    double osc_fo_mod_range;$/;"	m	struct:__anon32
-osc_fo_pitchbend_mod_range	synthfunctions.h	/^    double osc_fo_pitchbend_mod_range;$/;"	m	struct:__anon32
-osc_hard_sync_mod_range	synthfunctions.h	/^    double osc_hard_sync_mod_range;$/;"	m	struct:__anon32
+osc_fo	synthfunctions.h	/^    double osc_fo;$/;"	m	struct:__anon27
+osc_fo_mod_range	synthfunctions.h	/^    double osc_fo_mod_range;$/;"	m	struct:__anon31
+osc_fo_pitchbend_mod_range	synthfunctions.h	/^    double osc_fo_pitchbend_mod_range;$/;"	m	struct:__anon31
+osc_hard_sync_mod_range	synthfunctions.h	/^    double osc_hard_sync_mod_range;$/;"	m	struct:__anon31
 osc_inc_modulo	oscillator.c	/^void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }$/;"	f
 osc_init_global_parameters	oscillator.c	/^void osc_init_global_parameters(oscillator *self,$/;"	f
 osc_new_settings	oscillator.c	/^void osc_new_settings(oscillator *osc)$/;"	f
@@ -1264,10 +1263,9 @@ osc_update	oscillator.c	/^void osc_update(oscillator *self, char *name)$/;"	f
 oscillator	oscillator.h	/^struct oscillator {$/;"	s
 oscillator	oscillator.h	/^typedef struct oscillator oscillator;$/;"	t	typeref:struct:oscillator
 paCallback	main.c	/^static int paCallback(const void *inputBuffer, void *outputBuffer,$/;"	f	file:
-paData	mixer.h	/^} paData;$/;"	t	typeref:struct:__anon17
 pa_setup	audioutils.c	/^void pa_setup(void)$/;"	f
 pa_teardown	audioutils.c	/^void pa_teardown(void)$/;"	f
-pan_control	synthfunctions.h	/^    double pan_control;$/;"	m	struct:__anon31
+pan_control	synthfunctions.h	/^    double pan_control;$/;"	m	struct:__anon30
 parabolic_sine	utils.c	/^double parabolic_sine(double x, bool high_precision)$/;"	f
 params	sbmsg.h	/^    char params[20];$/;"	m	struct:sbmsg
 parse_wurds_from_cmd	cmdloop.c	/^int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)$/;"	f
@@ -1287,7 +1285,7 @@ play_melody_loop	keys.c	/^void *play_melody_loop(void *p)$/;"	f
 played	drumr.h	/^    int played;$/;"	m	struct:t_sample_pos
 playing	drumr.h	/^    int playing;$/;"	m	struct:t_sample_pos
 points	envelope.h	/^    ENVELOPE *points;$/;"	m	struct:envelope_stream
-portamento_time_msec	synthfunctions.h	/^    double portamento_time_msec;$/;"	m	struct:__anon32
+portamento_time_msec	synthfunctions.h	/^    double portamento_time_msec;$/;"	m	struct:__anon31
 position	drumr.h	/^    int position;$/;"	m	struct:t_sample_pos
 position	sampler.h	/^    int position;$/;"	m	struct:file_sample
 print_help	help.c	/^void print_help()$/;"	f
@@ -1297,8 +1295,8 @@ print_prompt	cmdloop.c	/^void print_prompt()$/;"	f
 printbp	envelope.c	/^void printbp(ENVELOPE *bp)$/;"	f
 prompt	cmdloop.c	/^char const *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;$/;"	v
 ps_envelope_stream	envelope.c	/^void ps_envelope_stream(ENVSTREAM *stream)$/;"	f
-pulse_width_control	synthfunctions.h	/^    double pulse_width_control; \/\/ from GUI$/;"	m	struct:__anon28
-q_control	synthfunctions.h	/^    double q_control;$/;"	m	struct:__anon29
+pulse_width_control	synthfunctions.h	/^    double pulse_width_control; \/\/ from GUI$/;"	m	struct:__anon27
+q_control	synthfunctions.h	/^    double q_control;$/;"	m	struct:__anon28
 qb_do_oscillate	qblimited_oscillator.c	/^double qb_do_oscillate(oscillator *self, double *aux_output)$/;"	f
 qb_do_sawtooth	qblimited_oscillator.c	/^double qb_do_sawtooth(oscillator *self, double modulo, double dInc)$/;"	f
 qb_do_square	qblimited_oscillator.c	/^double qb_do_square(oscillator *self, double modulo, double dInc)$/;"	f
@@ -1311,20 +1309,20 @@ qb_start_oscillator	qblimited_oscillator.c	/^void qb_start_oscillator(oscillator
 qb_stop_oscillator	qblimited_oscillator.c	/^void qb_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
 qblimited_oscillator	qblimited_oscillator.h	/^typedef struct qblimited_oscillator {$/;"	s
 qblimited_oscillator	qblimited_oscillator.h	/^} qblimited_oscillator;$/;"	t	typeref:struct:qblimited_oscillator
-qrsh	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+qrsh	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 quantum	ableton_link_wrapper.h	/^    double quantum;$/;"	m	struct:LinkData
 r	effect.h	/^    reverb *r;$/;"	m	struct:__anon9
 rate	effect.h	/^    double rate, cnt;$/;"	m	struct:__anon9
 read_delay	effect.c	/^double read_delay(EFFECT *self)$/;"	f
 recording	minisynth.h	/^    bool recording;$/;"	m	struct:minisynth
 related_notes	utils.c	/^void related_notes(char note[4], double *second_note, double *third_note)$/;"	f
-release_time_msec	synthfunctions.h	/^    double release_time_msec; \/\/ rel: is a time to decay 1->0$/;"	m	struct:__anon30
+release_time_msec	synthfunctions.h	/^    double release_time_msec; \/\/ rel: is a time to decay 1->0$/;"	m	struct:__anon29
 resample_mutex	sampler.h	/^    pthread_mutex_t resample_mutex;$/;"	m	struct:t_sampler
 resampled_file_bytes	sampler.h	/^    double *resampled_file_bytes;$/;"	m	struct:file_sample
 resampled_file_size	sampler.h	/^    int resampled_file_size;$/;"	m	struct:file_sample
 reset	filter.h	/^    void (*reset)(filter *self);$/;"	m	struct:filter
 reset_oscillator	oscillator.h	/^    void (*reset_oscillator)(oscillator *self);$/;"	m	struct:oscillator
-reset_to_zero	synthfunctions.h	/^    bool reset_to_zero;$/;"	m	struct:__anon30
+reset_to_zero	synthfunctions.h	/^    bool reset_to_zero;$/;"	m	struct:__anon29
 resize_effects_array	sound_generator.c	/^static int resize_effects_array(SOUNDGEN *self)$/;"	f	file:
 rev_lookup	utils.c	/^static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",$/;"	v	file:
 reverb	reverb.h	/^typedef struct reverb {$/;"	s
@@ -1336,7 +1334,7 @@ reverse	utils.c	/^void reverse(char s[])$/;"	f
 rightpoint	envelope.h	/^    ENVELOPE leftpoint, rightpoint;$/;"	m	struct:envelope_stream
 rpn_stack	bytebeatrrr.h	/^    Stack *rpn_stack;$/;"	m	struct:bytebeat
 rr	effect.h	/^    double rr;$/;"	m	struct:__anon9
-rsh	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+rsh	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 rsq	effect.h	/^    double rsq;$/;"	m	struct:__anon9
 s_mode_names	minisynth.c	/^const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",$/;"	v
 s_waveform_names	qblimited_oscillator.c	/^char *s_waveform_names[] = {"SINE",   "SAW1",  "SAW2",   "SAW3",   "TRI",$/;"	v
@@ -1364,7 +1362,7 @@ sampler_switch_sample	sampler.c	/^void sampler_switch_sample(SAMPLER *s, int sam
 samplerate	drumr.h	/^    int samplerate;$/;"	m	struct:t_drumr
 samplerate	sampler.h	/^    int samplerate;$/;"	m	struct:file_sample
 samples	sampler.h	/^    file_sample *samples[MAX_SAMPLES_PER_LOOPER];$/;"	m	struct:t_sampler
-saturation	synthfunctions.h	/^    double saturation;$/;"	m	struct:__anon29
+saturation	synthfunctions.h	/^    double saturation;$/;"	m	struct:__anon28
 sbmsg	sbmsg.h	/^typedef struct sbmsg {$/;"	s
 scal	effect.h	/^    double scal;$/;"	m	struct:__anon9
 scaleybum	utils.c	/^double scaleybum(double cur_min, double cur_max, double new_min, double new_max,$/;"	f
@@ -1377,7 +1375,7 @@ sem_gennext	filter_sem.c	/^double sem_gennext(filter *f, double xn)$/;"	f
 sem_reset	filter_sem.c	/^void sem_reset(filter *f)$/;"	f
 sem_set_qcontrol	filter_sem.c	/^void sem_set_qcontrol(filter *f, double qcontrol)$/;"	f
 sem_update	filter_sem.c	/^void sem_update(filter *f)$/;"	f
-semitones	synthfunctions.h	/^    int semitones;              \/\/ semitones tweak$/;"	m	struct:__anon28
+semitones	synthfunctions.h	/^    int semitones;              \/\/ semitones tweak$/;"	m	struct:__anon27
 semitones_between_frequencies	utils.c	/^double semitones_between_frequencies(double start_freq, double end_freq)$/;"	f
 seq_set_backup_mode	drumr.c	/^void seq_set_backup_mode(DRUM *d, bool on)$/;"	f
 seq_set_game_of_life	drumr.c	/^void seq_set_game_of_life(DRUM *d, bool b)$/;"	f
@@ -1389,8 +1387,8 @@ set_matrix_core	modmatrix.c	/^void set_matrix_core(modmatrix *self, matrixrow **
 set_q_control	filter.h	/^    void (*set_q_control)(filter *self, double d);$/;"	m	struct:filter
 setvol	sound_generator.h	/^    void (*setvol)(void *self, double val);$/;"	m	struct:t_soundgen
 shift_bits_to_leftmost_position	drumr_utils.c	/^int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)$/;"	f
-shutdown_time_msec	synthfunctions.h	/^    double shutdown_time_msec; \/\/ shutdown is a time$/;"	m	struct:__anon30
-sine	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+shutdown_time_msec	synthfunctions.h	/^    double shutdown_time_msec; \/\/ shutdown is a time$/;"	m	struct:__anon29
+sine	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 sixteenth_note_tick	mixer.h	/^    int sixteenth_note_tick;$/;"	m	struct:t_mixer
 sound_gen_num	sbmsg.h	/^    int sound_gen_num;$/;"	m	struct:sbmsg
 sound_generator	algorithm.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:algorithm
@@ -1407,7 +1405,7 @@ soundgen_num	mixer.h	/^    int soundgen_num;  \/\/ actual number of SGs$/;"	m	st
 soundgen_size	mixer.h	/^    int soundgen_size; \/\/ number of memory slots reserved for SGszz$/;"	m	struct:t_mixer
 sparkchars	main.c	/^const wchar_t *sparkchars = L"\\u2581\\u2582\\u2583\\u2585\\u2586\\u2587";$/;"	v
 sparky	sparkline.c	/^void sparky(char *instr)$/;"	f
-square	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+square	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 start_of_sixteenth	mixer.h	/^    bool start_of_sixteenth;$/;"	m	struct:t_mixer
 start_oscillator	oscillator.h	/^    void (*start_oscillator)(oscillator *self);$/;"	m	struct:oscillator
 started	envelope.h	/^    int started;$/;"	m	struct:envelope_stream
@@ -1434,7 +1432,7 @@ stutter_current_16th	sampler.h	/^    int stutter_current_16th;$/;"	m	struct:t_sa
 stutter_generation	sampler.h	/^    int stutter_generation;$/;"	m	struct:t_sampler
 stutter_mode	sampler.h	/^    bool stutter_mode;$/;"	m	struct:t_sampler
 sustain	minisynth.h	/^    int sustain;$/;"	m	struct:minisynth
-sustain_level	synthfunctions.h	/^    double sustain_level;$/;"	m	struct:__anon30
+sustain_level	synthfunctions.h	/^    double sustain_level;$/;"	m	struct:__anon29
 swing	drumr.h	/^    int swing;$/;"	m	struct:t_drumr
 swing_setting	drumr.h	/^    int swing_setting;$/;"	m	struct:t_drumr
 swingrrr	drumr.c	/^void swingrrr(void *self, int swing_setting)$/;"	f
@@ -1456,7 +1454,7 @@ tick	mixer.h	/^    int tick; \/\/$/;"	m	struct:t_mixer
 tickedyet	drumr.h	/^    bool tickedyet;$/;"	m	struct:t_drumr
 time	envelope.h	/^    double time;$/;"	m	struct:envelope
 timed_sig_start	utils.c	/^void *timed_sig_start(void *arg)$/;"	f
-tri	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+tri	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 type	effect.h	/^    effect_type type;$/;"	m	struct:__anon9
 type	sound_generator.h	/^    sound_generator_type type;$/;"	m	struct:t_soundgen
 unipolar_to_bipolar	utils.c	/^double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }$/;"	f
@@ -1465,11 +1463,11 @@ update_bpm	ableton_link_wrapper.cpp	/^void update_bpm(double bpm)$/;"	f
 update_envelope_stream_bpm	envelope.c	/^void update_envelope_stream_bpm(ENVSTREAM *stream)$/;"	f
 update_environment	mixer.c	/^void update_environment(char *key, int val)$/;"	f
 update_oscillator	oscillator.h	/^    void (*update_oscillator)(oscillator *self, char *name);$/;"	m	struct:oscillator
-usaw	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon25
+usaw	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 val	mixer.h	/^    int val;$/;"	m	struct:environment_variable
 value	envelope.h	/^    double value;$/;"	m	struct:envelope
-vector_path_mode	synthfunctions.h	/^    unsigned int vector_path_mode;$/;"	m	struct:__anon32
-voice	voice.h	/^} voice;$/;"	t	typeref:struct:__anon34
+vector_path_mode	synthfunctions.h	/^    unsigned int vector_path_mode;$/;"	m	struct:__anon31
+voice	voice.h	/^} voice;$/;"	t	typeref:struct:__anon33
 voice_can_note_off	voice.c	/^bool voice_can_note_off(voice *v)$/;"	f
 voice_gennext	voice.c	/^bool voice_gennext(voice *v, double *left_output, double *right_output)$/;"	f
 voice_in_legato_mode	voice.c	/^bool voice_in_legato_mode(voice *v) { return v->m_eg1.m_legato_mode; }$/;"	f
@@ -1478,10 +1476,10 @@ voice_init_global_parameters	voice.c	/^void voice_init_global_parameters(voice *
 voice_initialize_modmatrix	voice.c	/^void voice_initialize_modmatrix(voice *v, modmatrix *matrix)$/;"	f
 voice_is_active_voice	voice.c	/^bool voice_is_active_voice(voice *v)$/;"	f
 voice_is_voice_done	voice.c	/^bool voice_is_voice_done(voice *v)$/;"	f
-voice_mode	synthfunctions.h	/^    unsigned int voice_mode;$/;"	m	struct:__anon32
+voice_mode	synthfunctions.h	/^    unsigned int voice_mode;$/;"	m	struct:__anon31
 voice_note_off	voice.c	/^void voice_note_off(voice *v, unsigned int midi_note)$/;"	f
 voice_note_on	voice.c	/^void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,$/;"	f
-voice_params	synthfunctions.h	/^    global_voice_params voice_params;$/;"	m	struct:__anon33
+voice_params	synthfunctions.h	/^    global_voice_params voice_params;$/;"	m	struct:__anon32
 voice_prepare_for_play	voice.c	/^void voice_prepare_for_play(voice *v)$/;"	f
 voice_reset	voice.c	/^void voice_reset(voice *v)$/;"	f
 voice_set_modmatrix_core	voice.c	/^void voice_set_modmatrix_core(voice *v, matrixrow **modmatrix)$/;"	f
@@ -1494,7 +1492,7 @@ vol	minisynth.h	/^    float vol;$/;"	m	struct:minisynth
 vol	sampler.h	/^    double vol;$/;"	m	struct:t_sampler
 vol_change	mixer.c	/^void vol_change(mixer *mixr, int sg, float vol)$/;"	f
 volume	mixer.h	/^    double volume;$/;"	m	struct:t_mixer
-waveform	synthfunctions.h	/^    unsigned int waveform;      \/\/ to store type$/;"	m	struct:__anon28
+waveform	synthfunctions.h	/^    unsigned int waveform;      \/\/ to store type$/;"	m	struct:__anon27
 wchar_version_of_amp	drumr.c	/^void wchar_version_of_amp(DRUM *d, int pattern_num, wchar_t apattern[17])$/;"	f
 width	envelope.h	/^    double width;$/;"	m	struct:envelope_stream
 write_delay_and_inc	effect.c	/^void write_delay_and_inc(EFFECT *self, double val)$/;"	f
