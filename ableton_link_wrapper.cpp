@@ -168,11 +168,6 @@ double link_get_bpm(AbletonLink *l)
     return timeline.tempo();
 }
 
-void link_update_sample_time(AbletonLink *l, int num_frames)
-{
-    l->m_sample_time += num_frames;
-}
-
 void link_set_bpm(AbletonLink *l, double bpm)
 {
     l->m_requested_tempo = bpm;
@@ -195,7 +190,7 @@ double link_get_beat_at_time(AbletonLink *l, int sample_number)
     return l->m_timeline.beatAtTime(host_time, l->m_quantum);
 }
 
-bool link_is_start_of_sixteenth(AbletonLink *l, int sample_number)
+bool link_is_start_of_sixteenth(AbletonLink *l, int sample_number, int *sx_tick)
 {
     const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
 
@@ -208,6 +203,9 @@ bool link_is_start_of_sixteenth(AbletonLink *l, int sample_number)
         {
             //std::cout << "NEW BEAT! " << l->m_timeline.beatAtTime(l->m_hosttime, l->m_quantum) << l->m_sample_time << " Diff: " << l->m_sample_time - l->m_sample_at_last_sixteenth << std::endl;
             is_new_sixteenth = true;
+            const auto beat = l->m_timeline.beatAtTime(this_sample_time, l->m_quantum);
+            //std::cout << "this is BEAT: " << beat << std::endl;
+            *sx_tick = (int) (beat * 4);
         }
         //else
         //{

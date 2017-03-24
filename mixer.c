@@ -41,7 +41,7 @@ mixer *new_mixer()
     mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
     mixr->volume = 0.7;
     mixr->tick = 0;
-    mixr->sixteenth_note_tick = -1; // minus, so that on first beat it becomes zero and % works correctlt
+    mixr->sixteenth_note_tick = 0; // minus, so that on first beat it becomes zero and % works correctlt
     // mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
     mixr->m_midi_controller_mode = 0;
@@ -424,7 +424,8 @@ double mixer_gennext(mixer *mixr, int sample_number)
 
     double beat_at_time = link_get_beat_at_time(mixr->m_ableton_link, sample_number);
     if (beat_at_time >= 0.) {
-        if (link_is_start_of_sixteenth(mixr->m_ableton_link, sample_number)) {
+        int sx_tick;
+        if (link_is_start_of_sixteenth(mixr->m_ableton_link, sample_number, &sx_tick)) {
 
             //// temp troublesh00ter
             ////printf("BEAT! %f %f\n", beat_at_time, mixr->phase_count);
@@ -439,7 +440,7 @@ double mixer_gennext(mixer *mixr, int sample_number)
             //}
 
             mixr->start_of_sixteenth = true;
-            mixr->sixteenth_note_tick++; // for drum machine resolution
+            mixr->sixteenth_note_tick = sx_tick; // for drum machine resolution
         }
         else {
             mixr->start_of_sixteenth = false;

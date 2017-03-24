@@ -30,7 +30,7 @@ link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, double q
 
 void update_bpm(double bpm);
 
-bool link_is_start_of_sixteenth(AbletonLink *l, int sample_num);
+bool link_is_start_of_sixteenth(AbletonLink *l, int sample_num, int *sx_tick);
 
 int link_get_sample_time(AbletonLink *l);
 int link_get_samples_per_midi_tick(AbletonLink *l);

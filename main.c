@@ -31,7 +31,7 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
     (void)timeInfo;
     (void)statusFlags;
 
-    // Ableton Link stuff //////////////////////////////////////////////
+    // Ableton Sync stuff //////////////////////////////////////////////
     link_update_from_main_callback(mixr->m_ableton_link);
     /////////////////////////////////////////////////////////////////////
 
