@@ -41,10 +41,13 @@ mixer *new_mixer()
     mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
     mixr->volume = 0.7;
     mixr->tick = 0;
+    mixr->sixteenth_note_tick = -1; // minus, so that on first beat it becomes zero and % works correctlt
     // mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
     mixr->m_midi_controller_mode = 0;
     mixr->midi_control_destination = NONE;
+
+    mixr->phase_counter = 1;
 
     return mixr;
 }
@@ -420,16 +423,28 @@ double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number)
     }
 
     //link_callback_timing_data data = link_get_callback_timing_data(mixr->m_ableton_link);
-    double beat_quantum = link_get_beat_current_quantum(mixr->m_ableton_link, host_time);
-    if (beat_quantum < 0.) {
+    double beat_phase = ceil(link_get_beat_current_position(mixr->m_ableton_link, host_time, sample_number));
+    double quantum = link_get_current_quantum(mixr->m_ableton_link);
+    if (beat_phase <= 0.) {
         // count in, wait for sync
-        printf("Counting in... %f\n", beat_quantum);
+        printf("Counting in... %f\n", beat_phase);
         return output_val;
     }
 
     if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time, sample_number)) {
-        //printf("BEAT!\n");
+        //printf("BEAT! %f\n", beat_phase);
+        if (beat_phase == mixr->phase_count) {
+            mixr->phase_counter++;
+        }
+        else {
+            if ((int)mixr->phase_counter != 4)
+                printf("Saw %d counts of beat %d\n", mixr->phase_counter, (int)mixr->phase_count);
+            mixr->phase_count = beat_phase;
+            mixr->phase_counter = 1;
+        }
+
         mixr->start_of_sixteenth = true;
+        mixr->sixteenth_note_tick++; // for drum machine resolution
     }
     else {
         mixr->start_of_sixteenth = false;
@@ -443,9 +458,9 @@ double mixer_gennext(mixer *mixr, uint64_t host_time, int sample_number)
     }
 
     double val = mixr->volume * (output_val / 1.53);
-    // printf("Returning VAL %f\n", val);
-    // return mixr->volume * (output_val / 1.53);
     return val;
+
+    return output_val;
 }
 
 void update_environment(char *key, int val)

@@ -13,8 +13,11 @@
 
 extern mixer *mixr;
 
-struct AbletonLink {
+struct AbletonLink
+{
     ableton::Link m_link;
+    ableton::Link::Timeline m_timeline; // should be updated in every callback
+
     std::atomic<bool> m_running;
 
     double m_requested_tempo;
@@ -33,8 +36,9 @@ struct AbletonLink {
     ableton::link::HostTimeFilter<ableton::platforms::stl::Clock>
         m_host_time_filter;
 
+
     AbletonLink(double bpm)
-        : m_link(bpm), m_running(true), m_requested_tempo{bpm}, m_quantum{4.},
+        : m_link(bpm), m_timeline{m_link.captureAudioTimeline()}, m_running(true), m_requested_tempo{bpm}, m_quantum{4.},
           m_reset_beat_time{false}, m_is_playing{false}, m_sample_time{0},
           m_samples_per_midi_tick{(60.0 / bpm * SAMPLE_RATE) / PPQN},
           m_midi_ticks_per_ms{PPQN / ((60.0 / bpm) * 1000)},
@@ -76,6 +80,26 @@ AbletonLink *new_ableton_link(double bpm)
     return new AbletonLink(bpm);
 }
 
+
+void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)
+{
+    const auto host_time = std::chrono::microseconds(i_host_time);
+
+    l->m_timeline = l->m_link.captureAudioTimeline();
+
+    if (l->m_reset_beat_time) {
+        l->m_timeline.requestBeatAtTime(0, host_time, l->m_quantum);
+        l->m_reset_beat_time = false;
+    }
+
+    if (l->m_requested_tempo > 0) {
+        l->m_timeline.setTempo(l->m_requested_tempo, host_time);
+        l->m_requested_tempo = 0;
+    }
+
+    l->m_link.commitAudioTimeline(l->m_timeline);
+}
+
 LinkData link_get_timing_data(AbletonLink *l)
 {
     auto timeline = l->m_link.captureAppTimeline();
@@ -106,33 +130,9 @@ double link_get_bpm(AbletonLink *l)
     return timeline.tempo();
 }
 
-void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time, int num_frames)
+void link_update_sample_time(AbletonLink *l, int num_frames)
 {
-
     l->m_sample_time += num_frames;
-
-    // const auto buffer_begin_at_output = host_time + l->m_output_latency;
-    // std::cout << "HOSTTIME: " << host_time << std::endl;
-
-    const auto host_time = std::chrono::microseconds(i_host_time);
-    // std::cout << "HOSTTIME: " << i_host_time << " and as chrono " <<
-    // host_time.count() << std::endl;
-
-    auto timeline = l->m_link.captureAudioTimeline();
-
-    if (l->m_reset_beat_time) {
-        timeline.requestBeatAtTime(0, host_time, l->m_quantum);
-        l->m_reset_beat_time = false;
-    }
-
-    if (l->m_requested_tempo > 0) {
-        timeline.setTempo(l->m_requested_tempo, host_time);
-        l->m_requested_tempo = 0;
-    }
-
-    l->m_link.commitAudioTimeline(timeline);
-
-
 }
 
 void link_set_bpm(AbletonLink *l, double bpm)
@@ -145,25 +145,28 @@ void link_reset_beat_time(AbletonLink *l)
     l->m_reset_beat_time = true;
 }
 
-double link_get_beat_current_quantum(AbletonLink *l, uint64_t i_host_time)
+double link_get_current_quantum(AbletonLink *l)
 {
-    const auto host_time = std::chrono::microseconds(i_host_time);
-    auto timeline = l->m_link.captureAudioTimeline();
-    return timeline.beatAtTime(host_time, l->m_quantum);
+    return l->m_quantum;
+}
+
+double link_get_beat_current_position(AbletonLink *l, uint64_t i_host_time, int sample_number)
+{
+    const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
+    const auto host_time = std::chrono::microseconds(i_host_time) + std::chrono::microseconds(llround(sample_number * microsPerSample));
+    return l->m_timeline.beatAtTime(host_time, l->m_quantum);
 }
 
 bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_number)
 {
-    auto timeline = l->m_link.captureAudioTimeline();
     const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
 
     const auto this_sample_time = std::chrono::microseconds(host_time) + std::chrono::microseconds(llround(sample_number * microsPerSample));
     const auto lastSampleHostTime = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
 
     bool is_new_sixteenth = false;
-    if (timeline.phaseAtTime(this_sample_time, 0.25) < timeline.phaseAtTime(lastSampleHostTime, 0.25)) {
+    if (l->m_timeline.phaseAtTime(this_sample_time, 0.25) < l->m_timeline.phaseAtTime(lastSampleHostTime, 0.25)) {
         is_new_sixteenth = true;
-        //printf("SAMPLEPHASETIMEDIFF %f %f == %f\n", timeline.phaseAtTime(this_sample_time, 0.25), timeline.phaseAtTime(lastSampleHostTime, 0.25), timeline.phaseAtTime(lastSampleHostTime, 0.25) - timeline.phaseAtTime(this_sample_time, 0.25));
     }
 
     return is_new_sixteenth;
@@ -171,14 +174,13 @@ bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_n
 
 bool link_is_start_of_quarter(AbletonLink *l, uint64_t host_time, int sample_number)
 {
-    auto timeline = l->m_link.captureAudioTimeline();
     const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
 
     const auto this_sample_time = std::chrono::microseconds(host_time) + std::chrono::microseconds(llround(sample_number * microsPerSample));
     const auto lastSampleHostTime = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
 
     bool is_new_quarter = false;
-    if (timeline.phaseAtTime(this_sample_time, 1) < timeline.phaseAtTime(lastSampleHostTime, 1)) {
+    if (l->m_timeline.phaseAtTime(this_sample_time, 1) < l->m_timeline.phaseAtTime(lastSampleHostTime, 1)) {
         is_new_quarter = true;
     }
 
@@ -205,69 +207,6 @@ uint64_t link_get_host_time(AbletonLink *l)
     uint64_t itime = host_time.count();
 
     return itime;
-}
-
-void temp_use_link_metronome(AbletonLink *l, void *outputBuffer, int numSamples)
-{
-    auto timeline = l->m_link.captureAudioTimeline();
-    const auto beginHostTime =
-        l->m_host_time_filter.sampleTimeToHostTime(l->m_sample_time);
-	using namespace std::chrono;
-
-    auto mBuffer = (float*) outputBuffer;
-
-	auto quantum = 4;
-
-  // Metronome frequencies
-  static const double highTone = 1567.98;
-  static const double lowTone = 1108.73;
-  // 100ms click duration
-  static const auto clickDuration = duration<double>{0.1};
-
-  // The number of microseconds that elapse between samples
-  const auto microsPerSample = 1e6 / SAMPLE_RATE;
-
-  for (std::size_t i = 0; i < numSamples; ++i)
-  {
-    double amplitude = 0.;
-    // Compute the host time for this sample and the last.
-    const auto hostTime = beginHostTime + microseconds(llround(i * microsPerSample));
-    const auto lastSampleHostTime = hostTime - microseconds(llround(microsPerSample));
-
-    // Only make sound for positive beat magnitudes. Negative beat
-    // magnitudes are count-in beats.
-    if (timeline.beatAtTime(hostTime, quantum) >= 0.)
-    {
-      // If the phase wraps around between the last sample and the
-      // current one with respect to a 1 beat quantum, then a click
-      // should occur.
-      if (timeline.phaseAtTime(hostTime, 1) < timeline.phaseAtTime(lastSampleHostTime, 1))
-      {
-        //std::cout << "NEW BEAT!" << std::endl;
-        l->mTimeAtLastClick = hostTime;
-      }
-
-      const auto secondsAfterClick =
-        duration_cast<duration<double>>(hostTime - l->mTimeAtLastClick);
-
-      // If we're within the click duration of the last beat, render
-      // the click tone into this sample
-      if (secondsAfterClick < clickDuration)
-      {
- 		// If the phase of the last beat with respect to the current
- 		       // quantum was zero, then it was at a quantum boundary and we
- 		       // want to use the high tone. For other beats within the
- 		       // quantum, use the low tone.
- 		       const auto freq =
- 		         floor(timeline.phaseAtTime(hostTime, quantum)) == 0 ? highTone : lowTone;
-
- 		       // Simple cosine synth
- 		       amplitude = cos(2 * M_PI * secondsAfterClick.count() * freq)
- 		                   * (1 - sin(5 * M_PI * secondsAfterClick.count()));
- 	  }
-    }
-    mBuffer[i] = amplitude;
-    }
 }
 
 } // extern "C"

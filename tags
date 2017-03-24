@@ -19,7 +19,7 @@ ANSI_COLOR_YELLOW	defjams.h	/^#define ANSI_COLOR_YELLOW /;"	d
 ARC4RANDOMMAX	utils.c	/^#define ARC4RANDOMMAX /;"	d	file:
 ATTACK	envelope_generator.h	/^    ATTACK,$/;"	e	enum:__anon11
 AbletonLink	ableton_link_wrapper.cpp	/^    AbletonLink(double bpm)$/;"	f	struct:AbletonLink
-AbletonLink	ableton_link_wrapper.cpp	/^struct AbletonLink {$/;"	s	file:
+AbletonLink	ableton_link_wrapper.cpp	/^struct AbletonLink$/;"	s	file:
 AbletonLink	ableton_link_wrapper.h	/^typedef struct AbletonLink AbletonLink;$/;"	t	typeref:struct:AbletonLink
 B	utils.c	/^const double B = 4.0 \/ (float)M_PI;$/;"	v
 BANDPASS	effect.h	/^    BANDPASS,$/;"	e	enum:__anon8
@@ -705,9 +705,10 @@ lfo_stop_oscillator	lfo.c	/^void lfo_stop_oscillator(oscillator *self) { self->m
 lin_terp	utils.c	/^float lin_terp(float x1, float x2, float y1, float y2, float x)$/;"	f
 link_callback_timing_data	ableton_link_wrapper.h	/^typedef struct link_callback_timing_data {$/;"	s
 link_callback_timing_data	ableton_link_wrapper.h	/^} link_callback_timing_data;$/;"	t	typeref:struct:link_callback_timing_data
-link_get_beat_current_quantum	ableton_link_wrapper.cpp	/^double link_get_beat_current_quantum(AbletonLink *l, uint64_t i_host_time)$/;"	f
+link_get_beat_current_position	ableton_link_wrapper.cpp	/^double link_get_beat_current_position(AbletonLink *l, uint64_t i_host_time, int sample_number)$/;"	f
 link_get_bpm	ableton_link_wrapper.cpp	/^double link_get_bpm(AbletonLink *l)$/;"	f
 link_get_callback_timing_data	ableton_link_wrapper.cpp	/^link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, double quantum)$/;"	f
+link_get_current_quantum	ableton_link_wrapper.cpp	/^double link_get_current_quantum(AbletonLink *l)$/;"	f
 link_get_host_time	ableton_link_wrapper.cpp	/^uint64_t link_get_host_time(AbletonLink *l)$/;"	f
 link_get_loop_len_in_samples	ableton_link_wrapper.cpp	/^int link_get_loop_len_in_samples(AbletonLink *l)$/;"	f
 link_get_sample_time	ableton_link_wrapper.cpp	/^int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }$/;"	f
@@ -717,7 +718,8 @@ link_is_start_of_quarter	ableton_link_wrapper.cpp	/^bool link_is_start_of_quarte
 link_is_start_of_sixteenth	ableton_link_wrapper.cpp	/^bool link_is_start_of_sixteenth(AbletonLink *l, uint64_t host_time, int sample_number)$/;"	f
 link_reset_beat_time	ableton_link_wrapper.cpp	/^void link_reset_beat_time(AbletonLink *l)$/;"	f
 link_set_bpm	ableton_link_wrapper.cpp	/^void link_set_bpm(AbletonLink *l, double bpm)$/;"	f
-link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time, int num_frames)$/;"	f
+link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, uint64_t i_host_time)$/;"	f
+link_update_sample_time	ableton_link_wrapper.cpp	/^void link_update_sample_time(AbletonLink *l, int num_frames)$/;"	f
 list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
 load_file_to_buffer	drumr.c	/^int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)$/;"	f
 loop_Mode	synthfunctions.h	/^    unsigned int loop_Mode;$/;"	m	struct:__anon28
@@ -1033,6 +1035,7 @@ m_sustain_override	envelope_generator.h	/^    bool m_sustain_override;$/;"	m	str
 m_sustain_override	minisynth.h	/^    bool m_sustain_override;$/;"	m	struct:minisynth
 m_tap2_left_delay_time_ms	stereodelay.h	/^    double m_tap2_left_delay_time_ms;$/;"	m	struct:stereodelay
 m_tap2_right_delay_time_ms	stereodelay.h	/^    double m_tap2_right_delay_time_ms;$/;"	m	struct:stereodelay
+m_timeline	ableton_link_wrapper.cpp	/^    ableton::Link::Timeline m_timeline; \/\/ should be updated in every callback$/;"	m	struct:AbletonLink	file:
 m_timestamp	voice.h	/^    unsigned int m_timestamp;$/;"	m	struct:__anon34
 m_triangle_tables	wt_oscillator.h	/^    double *m_triangle_tables[NUM_TABLES];$/;"	m	struct:wt_oscillator
 m_use_external_feedback	ddlmodule.h	/^    bool m_use_external_feedback;$/;"	m	struct:ddlmodule
@@ -1275,6 +1278,8 @@ pattern_num_loops	drumr.h	/^    int pattern_num_loops[NUM_DRUM_PATTERNS];$/;"	m	
 pattern_position_amp	drumr.h	/^    double pattern_position_amp[NUM_DRUM_PATTERNS][DRUM_PATTERN_LEN];$/;"	m	struct:t_drumr
 patterns	drumr.h	/^    int patterns[NUM_DRUM_PATTERNS];$/;"	m	struct:t_drumr
 phase	ableton_link_wrapper.h	/^    double phase;$/;"	m	struct:LinkData
+phase_count	mixer.h	/^    double phase_count;$/;"	m	struct:t_mixer
+phase_counter	mixer.h	/^    int phase_counter;$/;"	m	struct:t_mixer
 phase_last_sample	ableton_link_wrapper.h	/^    double phase_last_sample;$/;"	m	struct:link_callback_timing_data
 phase_this_sample	ableton_link_wrapper.h	/^    double phase_this_sample;$/;"	m	struct:link_callback_timing_data
 pitch_shift_multiplier	utils.c	/^double pitch_shift_multiplier(double pitch_shift_semitones)$/;"	f
@@ -1441,7 +1446,6 @@ t_sampler	sampler.h	/^typedef struct t_sampler {$/;"	s
 t_soundgen	sound_generator.h	/^typedef struct t_soundgen {$/;"	s
 table	table.h	/^    double *table;$/;"	m	struct:wtable
 take_action	chaosmonkey.h	/^    bool take_action;$/;"	m	struct:chaosmonkey
-temp_use_link_metronome	ableton_link_wrapper.cpp	/^void temp_use_link_metronome(AbletonLink *l, void *outputBuffer, int numSamples)$/;"	f
 tempo	ableton_link_wrapper.h	/^    double tempo;$/;"	m	struct:LinkData
 this_quantum	ableton_link_wrapper.h	/^    double this_quantum;$/;"	m	struct:link_callback_timing_data
 thrunner	utils.c	/^void thrunner(SBMSG *msg)$/;"	f
