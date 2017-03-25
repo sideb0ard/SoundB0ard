@@ -400,21 +400,26 @@ double mixer_gennext(mixer *mixr, int sample_number)
     {
         link_callback_timing_data timing_data = link_get_callback_timing_data(mixr->m_ableton_link, sample_number);
 
-        // UPDATE ALL TIMINGS
+        mixr->is_start_of_loop = false;
+        mixr->is_start_of_quarter = false;
+        mixr->is_start_of_sixteenth = false;
+
+        // UPDATE ALL TIMINGS ////////////////////////////////////////////////////////
         if (timing_data.is_start_of_loop) {
-            //printf("TOP OF THA LOOP!\n");
+            mixr->is_start_of_loop = true;
+            int loop_len_in_samples =
+                     link_get_samples_per_midi_tick(mixr->m_ableton_link) * PPL;
+            int loop_len_2 = link_get_loop_len_in_samples(mixr->m_ableton_link);
+            printf("START OF LOOP - SAMPLE NUM IS %d // num samples per loop: %d %d\n", link_get_sample_time(mixr->m_ableton_link), loop_len_in_samples, loop_len_2);
         }
 
         if (timing_data.is_start_of_quarter) {
-            //printf("DA BEAT\n");
+            mixr->is_start_of_quarter = true;
         }
 
         if (timing_data.is_start_of_sixteenth) {
             mixr->is_start_of_sixteenth = true;
             mixr->sixteenth_note_tick = timing_data.sx_tick; // for drum machine resolution
-        }
-        else {
-            mixr->is_start_of_sixteenth = false;
         }
 
         if (timing_data.is_midi_tick) {
@@ -423,7 +428,7 @@ double mixer_gennext(mixer *mixr, int sample_number)
             pthread_mutex_unlock(&midi_tick_lock);
             pthread_cond_broadcast(&midi_tick_cond);
         }
-        // END UPDATE ALL TIMINGS
+        // END UPDATE ALL TIMINGS //////////////////////////////////////////////////////////
 
         // CALL THA COPS
         if (mixr->soundgen_num > 0) {

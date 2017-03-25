@@ -43,11 +43,19 @@ double sampler_gennext(void *self)
 
     // wait till start of loop to keep patterns synched
     if (!sampler->started) {
-        if (mixr->sixteenth_note_tick % 16 == 0) {
+        if (mixr->is_start_of_loop) {
             sampler->started = true;
         }
         else {
             return val;
+        }
+    }
+
+    if (mixr->is_start_of_loop) {
+        printf("SAMPLER POSITION %d LEN: %d\n", sampler->samples[sampler->cur_sample]->position, sampler->samples[sampler->cur_sample]->resampled_file_size);
+        if (sampler->samples[sampler->cur_sample]->position > 0 && sampler->samples[sampler->cur_sample]->position < 10) {
+            printf("FIXING SAMPLER POSITION %d\n", sampler->samples[sampler->cur_sample]->position);
+            sampler->samples[sampler->cur_sample]->position = 0;
         }
     }
 
@@ -88,6 +96,7 @@ double sampler_gennext(void *self)
     }
 
     if (sampler->samples[sampler->cur_sample]->position == 0) {
+    //if (mixr->is_start_of_loop) {
 
         if (sampler->multi_sample_mode) {
             sampler->cur_sample_iteration--;
@@ -241,8 +250,7 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("BUFSIZE is %d\n", fs->orig_file_size);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples =
-        link_get_samples_per_midi_tick(mixr->m_ableton_link) * PPL *
+    int loop_len_in_samples = link_get_loop_len_in_samples(mixr->m_ableton_link) *
         fs->loop_len;
 
     double *resampled_file_bytes =

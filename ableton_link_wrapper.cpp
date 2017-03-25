@@ -50,9 +50,9 @@ struct AbletonLink
           m_sample_at_last_quarter{0},
           m_sample_at_last_midi_tick{0},
           m_sample_at_last_sixteenth{0},
-          m_samples_per_midi_tick{(60.0 / bpm * SAMPLE_RATE) / PPQN},
           m_midi_ticks_per_ms{PPQN / ((60.0 / bpm) * 1000)},
-          m_loop_len_in_samples{m_samples_per_midi_tick * PPL},
+          m_samples_per_midi_tick{(60.0 / bpm * SAMPLE_RATE) / PPQN},
+          m_loop_len_in_samples{(60.0 / bpm * SAMPLE_RATE) * m_quantum},
           m_loop_len_in_ticks{PPL}
     {
         m_link.setTempoCallback(update_bpm);
@@ -188,7 +188,7 @@ link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, int samp
 
     //// Loop
     if (l->m_timeline.phaseAtTime(this_sample_time, l->m_quantum) < l->m_timeline.phaseAtTime(last_sample_time, l->m_quantum)) {
-        if ((l->m_sample_time - l->m_sample_at_last_loop) > 100) // fudge to ensure we don't double count
+        if ((l->m_sample_time - l->m_sample_at_last_loop) > 1000) // fudge to ensure we don't double count
         {
             data.is_start_of_loop = true;
         }
@@ -197,7 +197,7 @@ link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, int samp
 
     // quarter
     if (l->m_timeline.phaseAtTime(this_sample_time, 1) < l->m_timeline.phaseAtTime(last_sample_time, 1)) {
-        if ((l->m_sample_time - l->m_sample_at_last_quarter) > 100) // fudge to ensure we don't double count
+        if ((l->m_sample_time - l->m_sample_at_last_quarter) > 250) // fudge to ensure we don't double count
         {
             data.is_start_of_quarter = true;
         }

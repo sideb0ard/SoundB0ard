@@ -110,16 +110,18 @@ void keys(int soundgen_num)
                     print_midi_event(midi_num);
                     minisynth_midi_note_on(ms, midi_num, fake_velocity);
 
-                    int note_off_tick =
-                        ((mixr->midi_tick % PPNS) + PPS * 4) %
-                        PPNS; // rough guess - PPS is pulses per quart note
-                              // and PPNS is pulses per minisynth Loop
-                    midi_event *ev = new_midi_event(note_off_tick, 128,
-                                                    midi_num, fake_velocity);
-                    ev->delete_after_use = true; // _THIS_ is the magic
-                    // ms->melodies[ms->cur_melody][note_off_tick] = ev;
-                    minisynth_add_event(ms, ev);
-                    ////////////////////////
+                    if (mixr->midi_tick != 0) { // this happens if we haven't started yet
+                        int note_off_tick =
+                            ((mixr->midi_tick % PPNS) + PPS * 4) %
+                            PPNS; // rough guess - PPS is pulses per quart note
+                                  // and PPNS is pulses per minisynth Loop
+                        midi_event *ev = new_midi_event(note_off_tick, 128,
+                                                        midi_num, fake_velocity);
+                        ev->delete_after_use = true; // _THIS_ is the magic
+                        // ms->melodies[ms->cur_melody][note_off_tick] = ev;
+                        minisynth_add_event(ms, ev);
+                        ////////////////////////
+                    }
 
                     if (ms->recording) {
                         printf("Recording note!\n");
