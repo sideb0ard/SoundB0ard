@@ -4,7 +4,7 @@
 
 #include "audioutils.h"
 
-void pa_setup(void)
+double pa_setup(void)
 {
     // PA start me up!
     PaError err;
@@ -14,6 +14,13 @@ void pa_setup(void)
                Pa_GetErrorText(err));
         exit(-1);
     }
+    PaStreamParameters params;
+    params.device = Pa_GetDefaultOutputDevice();
+    if (params.device == paNoDevice)
+        printf("BARF!\n");
+    double suggested_latency = Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
+    printf("SUGGESTED LATENCY: %f\n", suggested_latency);
+    return suggested_latency;
 }
 
 void pa_teardown(void)

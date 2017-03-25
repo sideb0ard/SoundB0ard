@@ -32,16 +32,24 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
     (void)statusFlags;
 
     // Ableton Sync stuff //////////////////////////////////////////////
-    link_update_from_main_callback(mixr->m_ableton_link);
+    link_update_from_main_callback(mixr->m_ableton_link, framesPerBuffer);
     /////////////////////////////////////////////////////////////////////
 
-    for (unsigned long i = 0; i < framesPerBuffer; i++) {
-        float val = 0;
-        val = mixer_gennext(mixr, i);
-        *out++ = val;
-        *out++ = val;
+    if (!mixr->m_is_playing) 
+    {
+        for (unsigned long i = 0; i < framesPerBuffer; i++) {
+            *out++ = 0.;
+            *out++ = 0.;
+        }
     }
-
+    else {
+        for (unsigned long i = 0; i < framesPerBuffer; i++) {
+            float val = 0;
+            val = mixer_gennext(mixr, i);
+            *out++ = val;
+            *out++ = val;
+        }
+    }
 
     return 0;
 }
@@ -63,11 +71,11 @@ int main()
     pthread_detach(midi_th);
 
     // PortAudio start me up!
-    pa_setup();
+    double output_latency = pa_setup();
+    mixr = new_mixer(output_latency);
 
     PaStream *stream;
     PaError err;
-    mixr = new_mixer();
 
     err = Pa_OpenDefaultStream(&stream,
                                0,         // no input channels

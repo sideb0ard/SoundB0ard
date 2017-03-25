@@ -53,7 +53,9 @@ double sampler_gennext(void *self)
 
     if (mixr->is_start_of_loop) {
         printf("SAMPLER POSITION %d LEN: %d\n", sampler->samples[sampler->cur_sample]->position, sampler->samples[sampler->cur_sample]->resampled_file_size);
-        if (sampler->samples[sampler->cur_sample]->position > 0 && sampler->samples[sampler->cur_sample]->position < 10) {
+        if ((sampler->samples[sampler->cur_sample]->position > 0 && sampler->samples[sampler->cur_sample]->position < 10)
+           || (sampler->samples[sampler->cur_sample]->position < sampler->samples[sampler->cur_sample]->resampled_file_size 
+               && sampler->samples[sampler->cur_sample]->position > sampler->samples[sampler->cur_sample]->resampled_file_size - 10)) {
             printf("FIXING SAMPLER POSITION %d\n", sampler->samples[sampler->cur_sample]->position);
             sampler->samples[sampler->cur_sample]->position = 0;
         }

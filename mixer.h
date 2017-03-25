@@ -65,15 +65,11 @@ typedef struct t_mixer {
     double volume;
     int keyboard_octave; // TODO <- need this?
 
-    // temp troubleshooting counters for ableton sync
-    double phase_count;
-    int phase_counter;
-
     AbletonLink *m_ableton_link;
 
 } mixer;
 
-mixer *new_mixer(void);
+mixer *new_mixer(double output_latency);
 
 void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);

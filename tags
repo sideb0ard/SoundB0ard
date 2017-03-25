@@ -193,6 +193,7 @@ MAX_SOURCES	modmatrix.h	/^    MAX_SOURCES$/;"	e	enum:__anon17
 MAX_SUB_OSC_AMP_DB	minisynth.h	/^#define MAX_SUB_OSC_AMP_DB /;"	d
 MAX_TRANSFORMS	modmatrix.h	/^    MAX_TRANSFORMS \/* not needed? *\/$/;"	e	enum:__anon19
 MAX_VOICES	minisynth.h	/^#define MAX_VOICES /;"	d
+MICROS_PER_SAMPLE	ableton_link_wrapper.cpp	/^const auto MICROS_PER_SAMPLE = 1e6 \/ (double) SAMPLE_RATE;$/;"	v
 MIDI_MODE_ONE	mixer.h	/^    MIDI_MODE_ONE,$/;"	e	enum:__anon16
 MIDI_MODE_TWO	mixer.h	/^    MIDI_MODE_TWO,$/;"	e	enum:__anon16
 MIN_DETUNE_CENTS	minisynth.h	/^#define MIN_DETUNE_CENTS /;"	d
@@ -714,12 +715,16 @@ link_get_beat_at_time	ableton_link_wrapper.cpp	/^double link_get_beat_at_time(Ab
 link_get_bpm	ableton_link_wrapper.cpp	/^double link_get_bpm(AbletonLink *l)$/;"	f
 link_get_callback_timing_data	ableton_link_wrapper.cpp	/^link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, int sample_number)$/;"	f
 link_get_loop_len_in_samples	ableton_link_wrapper.cpp	/^int link_get_loop_len_in_samples(AbletonLink *l)$/;"	f
+link_get_old_sample_time	ableton_link_wrapper.cpp	/^int link_get_old_sample_time(AbletonLink *l)$/;"	f
 link_get_sample_time	ableton_link_wrapper.cpp	/^int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }$/;"	f
 link_get_samples_per_midi_tick	ableton_link_wrapper.cpp	/^int link_get_samples_per_midi_tick(AbletonLink *l)$/;"	f
 link_get_timing_data_for_display	ableton_link_wrapper.cpp	/^LinkData link_get_timing_data_for_display(AbletonLink *l)$/;"	f
+link_inc_sample_time	ableton_link_wrapper.cpp	/^void link_inc_sample_time(AbletonLink *l) { l->m_sample_time++; }$/;"	f
 link_reset_beat_time	ableton_link_wrapper.cpp	/^void link_reset_beat_time(AbletonLink *l)$/;"	f
 link_set_bpm	ableton_link_wrapper.cpp	/^void link_set_bpm(AbletonLink *l, double bpm)$/;"	f
-link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l)$/;"	f
+link_set_latency	ableton_link_wrapper.cpp	/^void link_set_latency(AbletonLink *l, double latency)$/;"	f
+link_set_old_sample_time	ableton_link_wrapper.cpp	/^void link_set_old_sample_time(AbletonLink *l)$/;"	f
+link_update_from_main_callback	ableton_link_wrapper.cpp	/^void link_update_from_main_callback(AbletonLink *l, int num_frames)$/;"	f
 list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
 load_file_to_buffer	drumr.c	/^int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)$/;"	f
 loop_Mode	synthfunctions.h	/^    unsigned int loop_Mode;$/;"	m	struct:__anon27
@@ -866,6 +871,7 @@ m_global_synth_params	voice.h	/^    global_synth_params *m_global_synth_params;$
 m_global_voice_params	voice.h	/^    global_voice_params *m_global_voice_params;$/;"	m	struct:__anon33
 m_grid	beatrepeat.h	/^    unsigned int m_grid;$/;"	m	struct:beatrepeat
 m_have_recording	beatrepeat.h	/^    bool m_have_recording;$/;"	m	struct:beatrepeat
+m_have_started	ableton_link_wrapper.cpp	/^    bool m_have_started;$/;"	m	struct:AbletonLink	file:
 m_host_time_filter	ableton_link_wrapper.cpp	/^        m_host_time_filter;$/;"	m	struct:AbletonLink	file:
 m_hosttime	ableton_link_wrapper.cpp	/^    std::chrono::microseconds m_hosttime; \/\/ also updated every callback$/;"	m	struct:AbletonLink	file:
 m_hs_ratio	voice.h	/^    double m_hs_ratio; \/\/ hard sync$/;"	m	struct:__anon33
@@ -1017,6 +1023,7 @@ m_sample_at_last_midi_tick	ableton_link_wrapper.cpp	/^    int m_sample_at_last_m
 m_sample_at_last_quarter	ableton_link_wrapper.cpp	/^    int m_sample_at_last_quarter;$/;"	m	struct:AbletonLink	file:
 m_sample_at_last_sixteenth	ableton_link_wrapper.cpp	/^    int m_sample_at_last_sixteenth;$/;"	m	struct:AbletonLink	file:
 m_sample_time	ableton_link_wrapper.cpp	/^    int m_sample_time;$/;"	m	struct:AbletonLink	file:
+m_sample_time_last	ableton_link_wrapper.cpp	/^    int m_sample_time_last; \/\/ TEMP$/;"	m	struct:AbletonLink	file:
 m_samples_per_midi_tick	ableton_link_wrapper.cpp	/^    double m_samples_per_midi_tick;$/;"	m	struct:AbletonLink	file:
 m_saturation	filter.h	/^    double m_saturation; \/\/ used in NLP$/;"	m	struct:filter
 m_saw_tables	wt_oscillator.h	/^    double *m_saw_tables[NUM_TABLES];$/;"	m	struct:wt_oscillator
@@ -1196,7 +1203,7 @@ new_freqs_from_string	utils.c	/^freaky *new_freqs_from_string(char *string)$/;"	
 new_midi_event	midimaaan.c	/^midi_event *new_midi_event(int tick, int event_type, int data1, int data2)$/;"	f
 new_minisynth	minisynth.c	/^minisynth *new_minisynth(void)$/;"	f
 new_minisynth_voice	minisynth_voice.c	/^minisynth_voice *new_minisynth_voice(void)$/;"	f
-new_mixer	mixer.c	/^mixer *new_mixer()$/;"	f
+new_mixer	mixer.c	/^mixer *new_mixer(double latency)$/;"	f
 new_mod_delay	modular_delay.c	/^mod_delay *new_mod_delay()$/;"	f
 new_modmatrix	modmatrix.c	/^modmatrix *new_modmatrix(void)$/;"	f
 new_reverb	reverb.c	/^reverb *new_reverb(void)$/;"	f
@@ -1266,7 +1273,7 @@ osc_update	oscillator.c	/^void osc_update(oscillator *self, char *name)$/;"	f
 oscillator	oscillator.h	/^struct oscillator {$/;"	s
 oscillator	oscillator.h	/^typedef struct oscillator oscillator;$/;"	t	typeref:struct:oscillator
 paCallback	main.c	/^static int paCallback(const void *inputBuffer, void *outputBuffer,$/;"	f	file:
-pa_setup	audioutils.c	/^void pa_setup(void)$/;"	f
+pa_setup	audioutils.c	/^double pa_setup(void)$/;"	f
 pa_teardown	audioutils.c	/^void pa_teardown(void)$/;"	f
 pan_control	synthfunctions.h	/^    double pan_control;$/;"	m	struct:__anon30
 parabolic_sine	utils.c	/^double parabolic_sine(double x, bool high_precision)$/;"	f
@@ -1279,8 +1286,6 @@ pattern_num_loops	drumr.h	/^    int pattern_num_loops[NUM_DRUM_PATTERNS];$/;"	m	
 pattern_position_amp	drumr.h	/^    double pattern_position_amp[NUM_DRUM_PATTERNS][DRUM_PATTERN_LEN];$/;"	m	struct:t_drumr
 patterns	drumr.h	/^    int patterns[NUM_DRUM_PATTERNS];$/;"	m	struct:t_drumr
 phase	ableton_link_wrapper.h	/^    double phase;$/;"	m	struct:LinkData
-phase_count	mixer.h	/^    double phase_count;$/;"	m	struct:t_mixer
-phase_counter	mixer.h	/^    int phase_counter;$/;"	m	struct:t_mixer
 pitch_shift_multiplier	utils.c	/^double pitch_shift_multiplier(double pitch_shift_semitones)$/;"	f
 play_melody_loop	keys.c	/^void *play_melody_loop(void *p)$/;"	f
 played	drumr.h	/^    int played;$/;"	m	struct:t_sample_pos

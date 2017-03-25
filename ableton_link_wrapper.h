@@ -23,7 +23,9 @@ typedef struct link_callback_timing_data {
 } link_callback_timing_data;
 
 AbletonLink *new_ableton_link(double bpm);
-void link_update_from_main_callback(AbletonLink *l);
+void link_update_from_main_callback(AbletonLink *l, int num_frames);
+
+void link_set_latency(AbletonLink *l, double latency);
 
 LinkData link_get_timing_data_for_display(AbletonLink *l);
 link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, int sample_num);
@@ -37,8 +39,13 @@ double link_get_bpm(AbletonLink *l);
 double link_get_beat_at_time(AbletonLink *l, int sample_number);
 double link_get_current_quantum(AbletonLink *l);
 
+//temp
+void link_set_old_sample_time(AbletonLink *l);
+int link_get_old_sample_time(AbletonLink *l);
+
 void link_set_bpm(AbletonLink *l, double bpm);
 void link_reset_beat_time(AbletonLink *l);
+void link_inc_sample_time(AbletonLink *l);
 
 #ifdef __cplusplus
 } // end extern "C"

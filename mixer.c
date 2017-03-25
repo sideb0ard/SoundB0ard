@@ -29,7 +29,7 @@ extern pthread_cond_t midi_tick_cond;
 
 extern mixer *mixr;
 
-mixer *new_mixer()
+mixer *new_mixer(double latency)
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
     if (mixr == NULL) {
@@ -37,17 +37,14 @@ mixer *new_mixer()
         return NULL;
     }
 
-    // mixr->bpm = DEFAULT_BPM;
     mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
+    link_set_latency(mixr->m_ableton_link, latency);
     mixr->volume = 0.7;
     mixr->midi_tick = 0;
-    mixr->sixteenth_note_tick = 0; // minus, so that on first beat it becomes zero and % works correctlt
-    // mixr->cur_sample = 0;
+    mixr->sixteenth_note_tick = 0;
     mixr->keyboard_octave = 3;
     mixr->m_midi_controller_mode = 0;
     mixr->midi_control_destination = NONE;
-
-    mixr->phase_counter = 1;
 
     return mixr;
 }
@@ -390,10 +387,10 @@ double mixer_gennext(mixer *mixr, int sample_number)
 {
 
     double output_val = 0.0;
-    if (!mixr->m_is_playing) 
-    {
-        return output_val;
-    }
+    // if (link_get_sample_time(mixr->m_ableton_link) == 0 && sample_number == 0)
+    // {
+    //     printf("START ME UP!\n");
+    // }
 
     double beat_at_time = link_get_beat_at_time(mixr->m_ableton_link, sample_number);
     if (beat_at_time >= 0.)
@@ -407,10 +404,12 @@ double mixer_gennext(mixer *mixr, int sample_number)
         // UPDATE ALL TIMINGS ////////////////////////////////////////////////////////
         if (timing_data.is_start_of_loop) {
             mixr->is_start_of_loop = true;
-            int loop_len_in_samples =
-                     link_get_samples_per_midi_tick(mixr->m_ableton_link) * PPL;
-            int loop_len_2 = link_get_loop_len_in_samples(mixr->m_ableton_link);
-            printf("START OF LOOP - SAMPLE NUM IS %d // num samples per loop: %d %d\n", link_get_sample_time(mixr->m_ableton_link), loop_len_in_samples, loop_len_2);
+            int loop_len_in_samples = link_get_loop_len_in_samples(mixr->m_ableton_link);
+            int sample_num = link_get_sample_time(mixr->m_ableton_link);
+            int last_sample_num = link_get_old_sample_time(mixr->m_ableton_link);
+            double bpm = link_get_bpm(mixr->m_ableton_link);
+            printf("START OF LOOP(%f) - SAMPLE NUM IS %d // OLD: %d diff(%d) num samples per loop: %d\n", bpm, sample_num, last_sample_num, sample_num - last_sample_num, loop_len_in_samples);
+            link_set_old_sample_time(mixr->m_ableton_link);
         }
 
         if (timing_data.is_start_of_quarter) {
