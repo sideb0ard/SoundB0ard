@@ -37,7 +37,6 @@ typedef struct t_mixer {
     env_var environment[ENVIRONMENT_ARRAY_SIZE];
     int env_var_count;
 
-    int delay_on;
     bool debug_mode;
 
     bool m_is_playing;
@@ -52,14 +51,12 @@ typedef struct t_mixer {
     int active_midi_soundgen_num;
     int active_midi_soundgen_effect_num;
 
-    // double bpm;
-
-    //  int samples_per_midi_tick;
-    //  int midi_ticks_per_ms;
+    int midi_tick;
     int sixteenth_note_tick;
-    bool start_of_sixteenth;
-    // int cur_sample; // inverse of SAMPLE RATE
-    int tick; //
+
+    bool is_start_of_loop;
+    bool is_start_of_quarter;
+    bool is_start_of_sixteenth;
 
     // informational for other sound generators
     //  unsigned int loop_len_in_samples;

@@ -62,7 +62,7 @@ void *midiman()
                             ->sound_generators[mixr->active_midi_soundgen_num];
 
                     if (ms->recording) {
-                        int tick = mixr->tick % PPNS;
+                        int tick = mixr->midi_tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
                         // TODO - maybe something better than just add a tick?

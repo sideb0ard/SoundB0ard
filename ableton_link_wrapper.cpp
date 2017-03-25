@@ -20,16 +20,16 @@ struct AbletonLink
     ableton::link::HostTimeFilter<ableton::platforms::stl::Clock>
         m_host_time_filter;
 
-    std::chrono::microseconds m_hosttime;
+    std::chrono::microseconds m_hosttime; // also updated every callback
 
-    std::atomic<bool> m_running;
-
-    double m_requested_tempo;
     double m_quantum;
+    double m_requested_tempo;
     bool m_reset_beat_time;
-    bool m_is_playing;
 
     int m_sample_time;
+    int m_sample_at_last_loop;
+    int m_sample_at_last_quarter;
+    int m_sample_at_last_midi_tick;
     int m_sample_at_last_sixteenth;
 
     double m_samples_per_midi_tick;
@@ -37,17 +37,23 @@ struct AbletonLink
     double m_loop_len_in_samples;
     double m_loop_len_in_ticks;
 
-
     std::chrono::microseconds m_output_latency;
 
     AbletonLink(double bpm)
-        : m_link(bpm), m_timeline{m_link.captureAudioTimeline()}, m_running(true), m_requested_tempo{bpm}, m_quantum{4.},
-          m_reset_beat_time{false}, m_is_playing{false}, m_sample_time{0}, m_sample_at_last_sixteenth{0},
+        : m_link{bpm},
+          m_timeline{m_link.captureAudioTimeline()},
+          m_quantum{4.},
+          m_requested_tempo{bpm},
+          m_reset_beat_time{false},
+          m_sample_time{0},
+          m_sample_at_last_loop{0},
+          m_sample_at_last_quarter{0},
+          m_sample_at_last_midi_tick{0},
+          m_sample_at_last_sixteenth{0},
           m_samples_per_midi_tick{(60.0 / bpm * SAMPLE_RATE) / PPQN},
           m_midi_ticks_per_ms{PPQN / ((60.0 / bpm) * 1000)},
           m_loop_len_in_samples{m_samples_per_midi_tick * PPL},
           m_loop_len_in_ticks{PPL}
-
     {
         m_link.setTempoCallback(update_bpm);
         m_link.enable(true);
@@ -57,13 +63,19 @@ struct AbletonLink
 void update_bpm(double bpm)
 {
     printf("Changing bpm to %.2f\n", bpm);
-    // mixr->bpm = bpm;
+    
+    mixr->m_ableton_link->m_requested_tempo = bpm;
+
     mixr->m_ableton_link->m_samples_per_midi_tick =
         (60.0 / bpm * SAMPLE_RATE) / PPQN;
+
     mixr->m_ableton_link->m_midi_ticks_per_ms = PPQN / ((60.0 / bpm) * 1000);
+
     mixr->m_ableton_link->m_loop_len_in_samples =
         mixr->m_ableton_link->m_samples_per_midi_tick * PPL;
+
     mixr->m_ableton_link->m_loop_len_in_ticks = PPL;
+
     for (int i = 0; i < mixr->soundgen_num; i++) {
         for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
             update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
@@ -88,7 +100,7 @@ void link_update_from_main_callback(AbletonLink *l)
 {
     const auto host_time = l->m_host_time_filter.sampleTimeToHostTime(l->m_sample_time);
 
-    l->m_hosttime = host_time;
+    l->m_hosttime = host_time; // save it for use in other functions during the audio callback
 
     l->m_timeline = l->m_link.captureAudioTimeline();
 
@@ -103,42 +115,9 @@ void link_update_from_main_callback(AbletonLink *l)
     }
 
     l->m_link.commitAudioTimeline(l->m_timeline);
-
-    //const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
-
-    //for (int i = 0; i < num_frames; i++)
-    //{
-
-    //    const auto this_sample_time = host_time + std::chrono::microseconds(llround(i * microsPerSample));
-    //    const auto lastSampleHostTime = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
-
-    //    int beat_at_time = (int) l->m_timeline.beatAtTime(this_sample_time, l->m_quantum);
-    //    if (l->m_timeline.beatAtTime(this_sample_time, l->m_quantum) >= 0.)
-    //    {
-    //        if (l->m_timeline.phaseAtTime(this_sample_time, 1) < l->m_timeline.phaseAtTime(lastSampleHostTime, 1))
-    //        {
-    //            std::cout << "THISSAMPLE " << l->m_sample_time << " LAST " << l->m_sample_at_last_sixteenth << std::endl;
-    //            //if ((l->sample_at_last_sixteenth + 10) >= l->m_sample_time)
-    //            if ((l->m_sample_time - l->m_sample_at_last_sixteenth) > 10)
-    //            {
-    //                std::cout << "NEW BEAT! " << beat_at_time << " " << l->m_sample_time << " " << l->m_sample_time - l->m_sample_at_last_sixteenth << std::endl;
-    //            }
-    //            else
-    //            {
-    //                std::cout << "Nearly a new Beat! diff " << l->m_sample_time - l->m_sample_at_last_sixteenth << std::endl;
-    //            }
-    //            l->m_sample_at_last_sixteenth = l->m_sample_time;
-    //            //l->cur_beat_seen++;
-    //            //num_times_cur_beat_seen
-    //        }
-    //    }
-
-    //    l->m_sample_time++;
-    //}
-
 }
 
-LinkData link_get_timing_data(AbletonLink *l)
+LinkData link_get_timing_data_for_display(AbletonLink *l)
 {
     auto timeline = l->m_link.captureAppTimeline();
     const auto time = l->m_link.clock().micros();
@@ -153,21 +132,6 @@ LinkData link_get_timing_data(AbletonLink *l)
     return data;
 }
 
-link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, double quantum)
-{
-    link_callback_timing_data data;
-    data.this_quantum = l->m_quantum;
-    data.beat_at_time = 0;
-    data.phase_this_sample = 0;
-    data.phase_last_sample = 0;
-}
-
-double link_get_bpm(AbletonLink *l)
-{
-    auto timeline = l->m_link.captureAppTimeline();
-    return timeline.tempo();
-}
-
 void link_set_bpm(AbletonLink *l, double bpm)
 {
     l->m_requested_tempo = bpm;
@@ -178,10 +142,16 @@ void link_reset_beat_time(AbletonLink *l)
     l->m_reset_beat_time = true;
 }
 
-double link_get_current_quantum(AbletonLink *l)
+double link_get_bpm(AbletonLink *l)
 {
-    return l->m_quantum;
+    auto timeline = l->m_link.captureAppTimeline();
+    return timeline.tempo();
 }
+
+//double link_get_current_quantum(AbletonLink *l)
+//{
+//    return l->m_quantum;
+//}
 
 double link_get_beat_at_time(AbletonLink *l, int sample_number)
 {
@@ -190,32 +160,64 @@ double link_get_beat_at_time(AbletonLink *l, int sample_number)
     return l->m_timeline.beatAtTime(host_time, l->m_quantum);
 }
 
-bool link_is_start_of_sixteenth(AbletonLink *l, int sample_number, int *sx_tick)
+// called every sample
+link_callback_timing_data link_get_callback_timing_data(AbletonLink *l, int sample_number)
 {
+    link_callback_timing_data data;
+    data.is_midi_tick = false;
+    data.is_start_of_loop = false;
+    data.is_start_of_quarter = false;
+    data.is_start_of_sixteenth = false;
+    data.sx_tick = 0;
+
     const auto microsPerSample = 1e6 / (double) SAMPLE_RATE;
 
     const auto this_sample_time = l->m_hosttime + std::chrono::microseconds(llround(sample_number * microsPerSample));
-    const auto lastSampleHostTime = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
+    const auto last_sample_time = this_sample_time - std::chrono::microseconds(llround(microsPerSample));
 
-    bool is_new_sixteenth = false;
-    if (l->m_timeline.phaseAtTime(this_sample_time, 0.25) < l->m_timeline.phaseAtTime(lastSampleHostTime, 0.25)) {
-        if ((l->m_sample_time - l->m_sample_at_last_sixteenth) > 1000) // fudge to ensure we don't double count
+    //// MIDI tick inc
+    double phase_time_in_midi_ticks = 1.0 / PPQN; // pulses per quarter note
+    if (l->m_timeline.phaseAtTime(this_sample_time, phase_time_in_midi_ticks) < l->m_timeline.phaseAtTime(last_sample_time, phase_time_in_midi_ticks)) {
+        //printf("%f(%d) %f(%d)\n", l->m_timeline.phaseAtTime(this_sample_time, phase_time_in_midi_ticks), l->m_sample_time, l->m_timeline.phaseAtTime(last_sample_time, phase_time_in_midi_ticks), l->m_sample_at_last_midi_tick);
+        if ((l->m_sample_time - l->m_sample_at_last_midi_tick) > 10) // fudge to ensure we don't double count
         {
-            //std::cout << "NEW BEAT! " << l->m_timeline.beatAtTime(l->m_hosttime, l->m_quantum) << l->m_sample_time << " Diff: " << l->m_sample_time - l->m_sample_at_last_sixteenth << std::endl;
-            is_new_sixteenth = true;
-            const auto beat = l->m_timeline.beatAtTime(this_sample_time, l->m_quantum);
-            //std::cout << "this is BEAT: " << beat << std::endl;
-            *sx_tick = (int) (beat * 4);
+            data.is_midi_tick = true;
         }
-        //else
-        //{
-        //    std::cout << "Nearly a new Beat! Diff " << l->m_sample_time - l->m_sample_at_last_sixteenth << std::endl;
-        //}
+        l->m_sample_at_last_midi_tick = l->m_sample_time;
+    }
+
+    //// Loop
+    if (l->m_timeline.phaseAtTime(this_sample_time, l->m_quantum) < l->m_timeline.phaseAtTime(last_sample_time, l->m_quantum)) {
+        if ((l->m_sample_time - l->m_sample_at_last_loop) > 100) // fudge to ensure we don't double count
+        {
+            data.is_start_of_loop = true;
+        }
+        l->m_sample_at_last_loop = l->m_sample_time;
+    }
+
+    // quarter
+    if (l->m_timeline.phaseAtTime(this_sample_time, 1) < l->m_timeline.phaseAtTime(last_sample_time, 1)) {
+        if ((l->m_sample_time - l->m_sample_at_last_quarter) > 100) // fudge to ensure we don't double count
+        {
+            data.is_start_of_quarter = true;
+        }
+        l->m_sample_at_last_quarter = l->m_sample_time;
+    }
+
+    // per sixteenth
+    if (l->m_timeline.phaseAtTime(this_sample_time, 0.25) < l->m_timeline.phaseAtTime(last_sample_time, 0.25)) {
+        if ((l->m_sample_time - l->m_sample_at_last_sixteenth) > 100) // fudge to ensure we don't double count
+        {
+            const auto beat = l->m_timeline.beatAtTime(this_sample_time, l->m_quantum);
+            data.sx_tick = (int) (beat * 4); // gets used for drum sequencer
+            data.is_start_of_sixteenth = true;
+        }
         l->m_sample_at_last_sixteenth = l->m_sample_time;
     }
 
     l->m_sample_time++;
-    return is_new_sixteenth;
+
+    return data;
 }
 
 
@@ -229,16 +231,6 @@ int link_get_samples_per_midi_tick(AbletonLink *l)
 int link_get_loop_len_in_samples(AbletonLink *l)
 {
     return l->m_loop_len_in_samples;
-}
-
-uint64_t link_get_host_time(AbletonLink *l)
-{
-    const auto host_time =
-        l->m_host_time_filter.sampleTimeToHostTime(l->m_sample_time);
-
-    uint64_t itime = host_time.count();
-
-    return itime;
 }
 
 } // extern "C"

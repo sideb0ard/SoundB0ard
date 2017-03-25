@@ -111,7 +111,7 @@ void keys(int soundgen_num)
                     minisynth_midi_note_on(ms, midi_num, fake_velocity);
 
                     int note_off_tick =
-                        ((mixr->tick % PPNS) + PPS * 4) %
+                        ((mixr->midi_tick % PPNS) + PPS * 4) %
                         PPNS; // rough guess - PPS is pulses per quart note
                               // and PPNS is pulses per minisynth Loop
                     midi_event *ev = new_midi_event(note_off_tick, 128,
@@ -123,7 +123,7 @@ void keys(int soundgen_num)
 
                     if (ms->recording) {
                         printf("Recording note!\n");
-                        int note_on_tick = mixr->tick % PPNS;
+                        int note_on_tick = mixr->midi_tick % PPNS;
                         midi_event *ev = new_midi_event(
                             note_on_tick, 144, midi_num, fake_velocity);
 
@@ -158,7 +158,7 @@ void *play_melody_loop(void *p)
         pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
         pthread_mutex_unlock(&midi_tick_lock);
 
-        int idx = mixr->tick % PPNS;
+        int idx = mixr->midi_tick % PPNS;
 
         // top of the loop, check if we need to progress to next loop
         if (idx == 0) {

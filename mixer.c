@@ -40,7 +40,7 @@ mixer *new_mixer()
     // mixr->bpm = DEFAULT_BPM;
     mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
     mixr->volume = 0.7;
-    mixr->tick = 0;
+    mixr->midi_tick = 0;
     mixr->sixteenth_note_tick = 0; // minus, so that on first beat it becomes zero and % works correctlt
     // mixr->cur_sample = 0;
     mixr->keyboard_octave = 3;
@@ -54,12 +54,12 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    LinkData data = link_get_timing_data(mixr->m_ableton_link);
+    LinkData data = link_get_timing_data_for_display(mixr->m_ableton_link);
     printf(COOL_COLOR_MAUVE
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
            "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " Playing: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
-           " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " // MIDITICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE "\n"
            "                    Quantum: " ANSI_COLOR_WHITE
@@ -69,7 +69,7 @@ void mixer_ps(mixer *mixr)
            "%.2f" COOL_COLOR_MAUVE " NumPeers: " ANSI_COLOR_WHITE
            "%d" COOL_COLOR_MAUVE " :::::\n" ANSI_COLOR_RESET,
            mixr->volume, mixr->m_is_playing ? "true" : "false",
-           mixr->tick, mixr->sixteenth_note_tick,
+           mixr->midi_tick, mixr->sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false", data.quantum, data.tempo,
            data.beat, data.phase, data.num_peers);
 
@@ -385,36 +385,9 @@ void mixer_stop_playing(mixer *mixr)
     mixr->m_is_playing = false;
 }
 
-// called once ever SAMPLE_RATE. This is the main audio callback
-// void gen_next(mixer* mixr, int framesPerBuffer, float* out)
+// called once every SAMPLE_RATE. This is the main audio callback
 double mixer_gennext(mixer *mixr, int sample_number)
 {
-
-    // // TODO - this needs to change if num frames > 1
-    // if (link_get_sample_time(mixr->m_ableton_link) %
-    //         link_get_samples_per_midi_tick(mixr->m_ableton_link) ==
-    //     0) {
-    //     pthread_mutex_lock(&midi_tick_lock);
-    //     mixr->tick++; // 1 midi tick (or pulse)
-    //     if (mixr->tick % PPS == 0) {
-    //         mixr->sixteenth_note_tick++; // for drum machine resolution
-    //     }
-    //     pthread_cond_broadcast(&midi_tick_cond);
-    //     pthread_mutex_unlock(&midi_tick_lock);
-    // }
-
-    //if (link_is_start_of_sixteenth(mixr->m_ableton_link, host_time, sample_number)) {
-    //    //pthread_mutex_lock(&midi_tick_lock);
-    //    //mixr->tick++; // 1 midi tick (or pulse)
-    //    //if (mixr->tick % PPS == 0) {
-    //    mixr->sixteenth_note_tick++; // for drum machine resolution
-    //    //}
-    //    //pthread_cond_broadcast(&midi_tick_cond);
-    //    //pthread_mutex_unlock(&midi_tick_lock);
-    //} else {
-    //    mixr->start_of_sixteenth = false;
-    //}
-
 
     double output_val = 0.0;
     if (!mixr->m_is_playing) 
@@ -423,29 +396,36 @@ double mixer_gennext(mixer *mixr, int sample_number)
     }
 
     double beat_at_time = link_get_beat_at_time(mixr->m_ableton_link, sample_number);
-    if (beat_at_time >= 0.) {
-        int sx_tick;
-        if (link_is_start_of_sixteenth(mixr->m_ableton_link, sample_number, &sx_tick)) {
+    if (beat_at_time >= 0.)
+    {
+        link_callback_timing_data timing_data = link_get_callback_timing_data(mixr->m_ableton_link, sample_number);
 
-            //// temp troublesh00ter
-            ////printf("BEAT! %f %f\n", beat_at_time, mixr->phase_count);
-            //if (beat_at_time == mixr->phase_count) {
-            //    mixr->phase_counter++;
-            //}
-            //else {
-            //    if ((int)mixr->phase_counter != 4)
-            //        printf("Saw %d counts of beat %d\n", mixr->phase_counter, (int)mixr->phase_count);
-            //    mixr->phase_count = beat_at_time;
-            //    mixr->phase_counter = 1;
-            //}
+        // UPDATE ALL TIMINGS
+        if (timing_data.is_start_of_loop) {
+            //printf("TOP OF THA LOOP!\n");
+        }
 
-            mixr->start_of_sixteenth = true;
-            mixr->sixteenth_note_tick = sx_tick; // for drum machine resolution
+        if (timing_data.is_start_of_quarter) {
+            //printf("DA BEAT\n");
+        }
+
+        if (timing_data.is_start_of_sixteenth) {
+            mixr->is_start_of_sixteenth = true;
+            mixr->sixteenth_note_tick = timing_data.sx_tick; // for drum machine resolution
         }
         else {
-            mixr->start_of_sixteenth = false;
+            mixr->is_start_of_sixteenth = false;
         }
 
+        if (timing_data.is_midi_tick) {
+            pthread_mutex_lock(&midi_tick_lock);
+            mixr->midi_tick++; // 1 midi tick (or pulse)
+            pthread_mutex_unlock(&midi_tick_lock);
+            pthread_cond_broadcast(&midi_tick_cond);
+        }
+        // END UPDATE ALL TIMINGS
+
+        // CALL THA COPS
         if (mixr->soundgen_num > 0) {
             for (int i = 0; i < mixr->soundgen_num; i++) {
                 output_val +=
