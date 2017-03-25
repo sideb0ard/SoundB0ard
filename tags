@@ -1394,7 +1394,6 @@ strim	utils.c	/^void strim(const char *input, char *result)$/;"	f
 stutter_current_16th	sampler.h	/^    int stutter_current_16th;$/;"	m	struct:t_sampler
 stutter_generation	sampler.h	/^    int stutter_generation;$/;"	m	struct:t_sampler
 stutter_mode	sampler.h	/^    bool stutter_mode;$/;"	m	struct:t_sampler
-sustain	minisynth.h	/^    int sustain;$/;"	m	struct:minisynth
 sustain_level	synthfunctions.h	/^    double sustain_level;$/;"	m	struct:__anon30
 swing	drumr.h	/^    int swing;$/;"	m	struct:t_drumr
 swing_setting	drumr.h	/^    int swing_setting;$/;"	m	struct:t_drumr

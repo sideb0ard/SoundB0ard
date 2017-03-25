@@ -22,7 +22,7 @@ minisynth *new_minisynth(void)
 
     ms->vol = 0.7;
     ms->cur_octave = 0;
-    ms->sustain = 0;
+    //ms->sustain = 0;
     ms->num_melodies = 1;
 
     ms->sound_generator.gennext = &minisynth_gennext;
@@ -549,7 +549,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     // TODO - a shit load of error checking on boundaries and size
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
-        "[SYNTH] - Vol: %.2f Multi: %s, CurMelody:%d DelayMode: %d Mode: %ls"
+        "[SYNTH] - Vol: %.2f MultiMode: %s, CurMelody: %d SustainOverride: %s DelayMode: %d Mode: %ls"
         "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
         "Filter FC: %.2f Filter Q: %2.f"
         "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
@@ -557,8 +557,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f",
         ms->vol, ms->multi_melody_mode ? "true" : "false", ms->cur_melody,
-        ms->m_delay_mode, s_mode_names[ms->m_voice_mode],
-        ms->m_attack_time_msec, ms->m_decay_release_time_msec,
+        ms->m_sustain_override ? "true" : "false", ms->m_delay_mode,
+        s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec, ms->m_decay_release_time_msec,
         ms->m_sustain_level, ms->m_volume_db, ms->m_lfo1_amplitude,
         ms->m_lfo1_rate, ms->m_fc_control, ms->m_q_control,
         ms->m_delay_time_msec, ms->m_feedback_pct, ms->m_delay_ratio,

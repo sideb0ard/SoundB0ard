@@ -575,6 +575,7 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
 
 void voice_set_sustain_override(voice *v, bool b)
 {
+    printf("VOICE SET SUSTAIN OVERRIDE CALLED\n");
     eg_set_sustain_override(&v->m_eg1, b);
     eg_set_sustain_override(&v->m_eg2, b);
     eg_set_sustain_override(&v->m_eg3, b);

@@ -179,6 +179,7 @@ void eg_set_sustain_level(envelope_generator *self, double level)
 
 void eg_set_sustain_override(envelope_generator *self, bool b)
 {
+    printf("Set sustain override called with %s\n", b ? "true" : "FAlse");
     self->m_sustain_override = b;
     if (self->m_release_pending && !self->m_sustain_override) {
         self->m_release_pending = false;
@@ -373,11 +374,14 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 
 void eg_note_off(envelope_generator *self)
 {
+    printf("EG NOTE OFF - !\n");
     if (self->m_sustain_override) {
+        printf("OVERRODE - PENDING!\n");
         self->m_release_pending = true;
         return;
     }
 
+    printf("SLIPPED PAST !\n");
     if (self->m_envelope_output > 0) {
         self->m_state = RELEASE;
     }
@@ -388,6 +392,7 @@ void eg_note_off(envelope_generator *self)
 
 void eg_shutdown(envelope_generator *self)
 {
+    printf("VOICE SHUTDOWN!\n");
     if (self->m_legato_mode)
         return;
     self->m_inc_shutdown = -(1000.0 * self->m_envelope_output) /
