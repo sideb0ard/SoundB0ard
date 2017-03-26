@@ -65,14 +65,6 @@ typedef struct t_mixer {
 
 } mixer;
 
-typedef struct {
-    mixer *mixr;
-    float delay[(int)SAMPLE_RATE / 8];
-    int delay_p;
-    float left_phase;
-    float right_phase;
-} paData;
-
 mixer *new_mixer(void);
 
 void mixer_ps(mixer *mixr);
@@ -98,7 +90,6 @@ void mixer_toggle_midi_mode(mixer *mixr);
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
 
-double gen_next(mixer *mixr);
-// void gen_next(mixer* mixr, int framesPerBuffer, float* out);
+double mixer_gennext(mixer *mixr);
 
 #endif // MIXER_H

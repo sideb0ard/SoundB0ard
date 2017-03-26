@@ -384,8 +384,7 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
     return add_sound_generator(mixr, m);
 }
 
-// void gen_next(mixer* mixr, int framesPerBuffer, float* out)
-double gen_next(mixer *mixr)
+double mixer_gennext(mixer *mixr)
 {
     // called once ever SAMPLE_RATE -> cur_sample is the basis of my clock
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
