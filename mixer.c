@@ -21,6 +21,7 @@
 #include "mixer.h"
 #include "sampler.h"
 #include "sbmsg.h"
+#include "standalonelfo.h"
 #include "sound_generator.h"
 
 extern ENVSTREAM *ampstream;
@@ -217,43 +218,25 @@ int add_bitwize(mixer *mixr, int pattern)
 int mixer_add_lfo(mixer *mixr)
 {
     printf("Adding an LFO, mo!\n");
-    lfo *l = lfo_new();
-    return 0;
+    standalonelfo *l = lfo_new_standalone();
+    return add_sound_generator(mixr, (SOUNDGEN*) l);
 }
 
 int add_algorithm(char *line)
 {
-
     algorithm *a = new_algorithm(line);
-    if (a == NULL) {
-        printf("ALGOBARF!\n");
-        return -1;
-    }
-
     return add_sound_generator(mixr, (SOUNDGEN*) a);
 }
 
 int add_chaosmonkey()
 {
-
     chaosmonkey *cm = new_chaosmonkey();
-    if (cm == NULL) {
-        printf("MONKYBARF!\n");
-        return -1;
-    }
-
     return add_sound_generator(mixr, (SOUNDGEN*) cm);
 }
 
 int add_bytebeat(mixer *mixr, char *pattern)
 {
-
     bytebeat *b = new_bytebeat(pattern);
-    if (b == NULL) {
-        printf("BITBARF!\n");
-        return -1;
-    }
-
     return add_sound_generator(mixr, (SOUNDGEN*)b);
 }
 
@@ -261,10 +244,6 @@ int add_minisynth(mixer *mixr)
 {
     printf("Adding a MINISYNTH!!...\n");
     minisynth *ms = new_minisynth();
-    if (ms == NULL) {
-        printf("Barfed on MINIsynth creation\n");
-        return -1;
-    }
     return add_sound_generator(mixr, (SOUNDGEN*) ms);
 }
 

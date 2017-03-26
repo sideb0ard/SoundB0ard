@@ -161,6 +161,7 @@ LEGATO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
 LFORFREE	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
 LFOSHOT	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
 LFOSYNC	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
+LFO_TYPE	defjams.h	/^    LFO_TYPE,$/;"	e	enum:__anon4
 LOOP	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
 LOWPASS	effect.h	/^    LOWPASS,$/;"	e	enum:__anon8
 LPF1	filter.h	/^    LPF1,$/;"	e	enum:__anon12
@@ -674,8 +675,8 @@ leftpoint	envelope.h	/^    ENVELOPE leftpoint, rightpoint;$/;"	m	struct:envelope
 legato_mode	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	t	typeref:enum:__anon5
 legato_mode	synthfunctions.h	/^    bool legato_mode;$/;"	m	struct:__anon29
 length	table.h	/^    unsigned long length;$/;"	m	struct:wtable
-lfo	lfo.h	/^struct lfo {$/;"	s
-lfo	lfo.h	/^typedef struct lfo lfo;$/;"	t	typeref:struct:lfo
+lfo	lfo.h	/^typedef struct lfo {$/;"	s
+lfo	lfo.h	/^} lfo;$/;"	t	typeref:struct:lfo
 lfo1_dca_amp_mod_intensity	synthfunctions.h	/^    double lfo1_dca_amp_mod_intensity;$/;"	m	struct:__anon31
 lfo1_dca_pan_mod_intensity	synthfunctions.h	/^    double lfo1_dca_pan_mod_intensity;$/;"	m	struct:__anon31
 lfo1_filter1_mod_intensity	synthfunctions.h	/^    double lfo1_filter1_mod_intensity;$/;"	m	struct:__anon31
@@ -691,11 +692,16 @@ lfo2_hs_mod_intensity	synthfunctions.h	/^    double lfo2_hs_mod_intensity;$/;"	m
 lfo2_osc_mod_intensity	synthfunctions.h	/^    double lfo2_osc_mod_intensity;$/;"	m	struct:__anon31
 lfo2_params	synthfunctions.h	/^    global_oscillator_params lfo2_params;$/;"	m	struct:__anon32
 lfo_do_oscillate	lfo.c	/^double lfo_do_oscillate(oscillator *self, double *quad_phase_output)$/;"	f
+lfo_do_standalone	standalonelfo.c	/^double lfo_do_standalone(void *sg)$/;"	f
+lfo_getvol	standalonelfo.c	/^double lfo_getvol(void *self) { return 0.; }$/;"	f
 lfo_mode	synthfunctions.h	/^    unsigned int lfo_mode; \/\/ to store MODE$/;"	m	struct:__anon27
 lfo_new	lfo.c	/^lfo *lfo_new()$/;"	f
+lfo_new_standalone	standalonelfo.c	/^standalonelfo *lfo_new_standalone()$/;"	f
 lfo_reset_oscillator	lfo.c	/^void lfo_reset_oscillator(oscillator *self) { osc_reset(self); }$/;"	f
 lfo_set_soundgenerator_interface	lfo.c	/^void lfo_set_soundgenerator_interface(lfo *l)$/;"	f
+lfo_setvol	standalonelfo.c	/^void lfo_setvol(void *self, double v) {}$/;"	f
 lfo_start_oscillator	lfo.c	/^void lfo_start_oscillator(oscillator *self)$/;"	f
+lfo_status	standalonelfo.c	/^void lfo_status(void *self, wchar_t *ss) {}$/;"	f
 lfo_stop_oscillator	lfo.c	/^void lfo_stop_oscillator(oscillator *self) { self->m_note_on = false; }$/;"	f
 lin_terp	utils.c	/^float lin_terp(float x1, float x2, float y1, float y2, float x)$/;"	f
 list_sample_dir	utils.c	/^void list_sample_dir()$/;"	f
@@ -1200,6 +1206,7 @@ orig_file_bytes	sampler.h	/^    int *orig_file_bytes;$/;"	m	struct:file_sample
 orig_file_size	sampler.h	/^    int orig_file_size;$/;"	m	struct:file_sample
 osc	lfo.h	/^    oscillator osc;$/;"	m	struct:lfo
 osc	qblimited_oscillator.h	/^    oscillator osc;$/;"	m	struct:qblimited_oscillator
+osc	standalonelfo.h	/^    oscillator osc;$/;"	m	struct:standalonelfo
 osc	wt_oscillator.h	/^    oscillator osc;$/;"	m	struct:wt_oscillator
 osc1_params	synthfunctions.h	/^    global_oscillator_params osc1_params;$/;"	m	struct:__anon32
 osc2_params	synthfunctions.h	/^    global_oscillator_params osc2_params;$/;"	m	struct:__anon32
@@ -1343,6 +1350,7 @@ set_fc_mod	filter.h	/^    void (*set_fc_mod)(filter *self, double d);$/;"	m	stru
 set_matrix_core	modmatrix.c	/^void set_matrix_core(modmatrix *self, matrixrow **matrix)$/;"	f
 set_q_control	filter.h	/^    void (*set_q_control)(filter *self, double d);$/;"	m	struct:filter
 setvol	sound_generator.h	/^    void (*setvol)(void *self, double val);$/;"	m	struct:t_soundgen
+sg	standalonelfo.h	/^    SOUNDGEN sg;$/;"	m	struct:standalonelfo
 shift_bits_to_leftmost_position	drumr_utils.c	/^int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)$/;"	f
 shutdown_time_msec	synthfunctions.h	/^    double shutdown_time_msec; \/\/ shutdown is a time$/;"	m	struct:__anon29
 sine	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
@@ -1362,6 +1370,8 @@ soundgen_size	mixer.h	/^    int soundgen_size; \/\/ number of memory slots reser
 sparkchars	main.c	/^const wchar_t *sparkchars = L"\\u2581\\u2582\\u2583\\u2585\\u2586\\u2587";$/;"	v
 sparky	sparkline.c	/^void sparky(char *instr)$/;"	f
 square	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
+standalonelfo	standalonelfo.h	/^typedef struct standalonelfo {$/;"	s
+standalonelfo	standalonelfo.h	/^} standalonelfo;$/;"	t	typeref:struct:standalonelfo
 start_oscillator	oscillator.h	/^    void (*start_oscillator)(oscillator *self);$/;"	m	struct:oscillator
 started	drumr.h	/^    bool started; \/\/ to sync at top of loop$/;"	m	struct:t_drumr
 started	envelope.h	/^    int started;$/;"	m	struct:envelope_stream

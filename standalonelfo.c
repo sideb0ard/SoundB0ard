@@ -2,47 +2,30 @@
 #include <stdlib.h>
 
 #include "defjams.h"
-#include "lfo.h"
-#include "oscillator.h"
+#include "standalonelfo.h"
 #include "utils.h"
 
-lfo *lfo_new()
+standalonelfo *lfo_new_standalone()
 {
-    lfo *l = (lfo *)calloc(1, sizeof(lfo));
-    if (l == NULL) {
-        printf("Nae mems for LFO, mate. Sort it oot\n");
-        return NULL;
-    }
-
+    standalonelfo *l = (standalonelfo *)calloc(1, sizeof(standalonelfo));
     osc_new_settings(&l->osc);
-    lfo_set_soundgenerator_interface(l);
+    l->osc.m_note_on = true;
 
-    l->osc.m_fo = DEFAULT_LFO_RATE;
+    l->sg.gennext = &lfo_do_standalone;
+    l->sg.status = &lfo_status;
+    l->sg.getvol = &lfo_getvol;
+    l->sg.setvol = &lfo_setvol;
+    l->sg.type = LFO_TYPE;
 
     return l;
 }
 
-void lfo_set_soundgenerator_interface(lfo *l)
+double lfo_do_standalone(void *sg)
 {
-    l->osc.do_oscillate = &lfo_do_oscillate;
-    l->osc.do_oscillate = &lfo_do_oscillate;
-    l->osc.start_oscillator = &lfo_start_oscillator;
-    l->osc.stop_oscillator = &lfo_stop_oscillator;
-    l->osc.reset_oscillator = &lfo_reset_oscillator;
-    l->osc.update_oscillator = &osc_update; // base clase impl
+    standalonelfo *l = (standalonelfo*) sg;
+    oscillator *self = &l->osc;
 
-    l->osc.m_lfo_mode = LFOSYNC;
-}
-
-double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
-{
-    if (!self->m_note_on) {
-        if (quad_phase_output) {
-            *quad_phase_output = 0.0;
-        }
-        return 0.0;
-    }
-
+    printf("LFOoooooooooooo Mod: %f Inc: %f\n", self->m_modulo, self->m_inc);
     // output
     double out = 0.0;
     double qp_out = 0.0;
@@ -53,11 +36,6 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     // one shot LFO?
     if (self->m_lfo_mode == LFOSHOT && wrap) {
         self->m_note_on = false;
-
-        if (quad_phase_output) {
-            *quad_phase_output = 0.0;
-        }
-
         return 0.0;
     }
 
@@ -74,14 +52,14 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     // printf("WAVEFORM %d\n", self->m_waveform);
     switch (self->m_waveform) {
     case sine: {
-        // printf("SINE?\n");
+        printf("SINE?\n");
         // calculate angle
         double angle = self->m_modulo * 2.0 * M_PI - M_PI;
-        // printf("ANGLEE! %f\n", angle);
+        printf("ANGLEE! %f\n", angle);
 
         // call the parabolicSine approximator
         out = parabolic_sine(-angle, true);
-        // printf("OUT! %f\n", out);
+        printf("OUT! %f\n", out);
 
         // use second modulo for quad phase
         angle = quad_modulo * 2.0 * M_PI - M_PI;
@@ -189,37 +167,29 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
     // ok to inc modulo now
     osc_inc_modulo(self);
 
+    ////// self->m_amplitude & self->m_amp_mod is calculated in update() on base
+    ////// class
+    //if (self->m_v_modmatrix) {
+    //    // write our outputs into their destinations
+    //    // printf("LFO WRITING TO m_mod_dest_output1 OUT:%f m_AMP: %f m_AMP_MOD:
+    //    // %f FINALVAL: %f\n", out, self->m_amplitude, self->m_amp_mod, out *
+    //    // self->m_amplitude * self->m_amp_mod);
+    //    self->m_v_modmatrix->m_sources[self->m_mod_dest_output1] =
+    //        out * self->m_amplitude * self->m_amp_mod;
+
+    //    // add quad phase/stereo output
+    //    self->m_v_modmatrix->m_sources[self->m_mod_dest_output2] =
+    //        qp_out * self->m_amplitude * self->m_amp_mod;
+    //}
+
+
     //// self->m_amplitude & self->m_amp_mod is calculated in update() on base
     //// class
-    if (self->m_v_modmatrix) {
-        // write our outputs into their destinations
-        // printf("LFO WRITING TO m_mod_dest_output1 OUT:%f m_AMP: %f m_AMP_MOD:
-        // %f FINALVAL: %f\n", out, self->m_amplitude, self->m_amp_mod, out *
-        // self->m_amplitude * self->m_amp_mod);
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_output1] =
-            out * self->m_amplitude * self->m_amp_mod;
-
-        // add quad phase/stereo output
-        self->m_v_modmatrix->m_sources[self->m_mod_dest_output2] =
-            qp_out * self->m_amplitude * self->m_amp_mod;
-    }
-
-    if (quad_phase_output)
-        *quad_phase_output = qp_out * self->m_amplitude * self->m_amp_mod;
-
-    // self->m_amplitude & self->m_amp_mod is calculated in update() on base
-    // class
+    printf("Returningzz val: %f amp: %f amp_mod: %f\n", out, self->m_amplitude, self->m_amp_mod); 
     return out * self->m_amplitude * self->m_amp_mod;
+
 }
 
-void lfo_start_oscillator(oscillator *self)
-{
-    if (self->m_lfo_mode == LFOSYNC || self->m_lfo_mode == LFOSHOT)
-        osc_reset(self);
-
-    self->m_note_on = true;
-}
-
-void lfo_stop_oscillator(oscillator *self) { self->m_note_on = false; }
-
-void lfo_reset_oscillator(oscillator *self) { osc_reset(self); }
+void lfo_status(void *self, wchar_t *ss) {}
+double lfo_getvol(void *self) { return 0.; }
+void lfo_setvol(void *self, double v) {}

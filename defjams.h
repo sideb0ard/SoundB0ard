@@ -72,6 +72,7 @@ typedef enum {
     DRUM_TYPE,
     ALGORITHM_TYPE,
     CHAOSMONKEY_TYPE,
+    LFO_TYPE,
 } sound_generator_type;
 
 typedef enum { MONO, LEGATO } legato_mode;

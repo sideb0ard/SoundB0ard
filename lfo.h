@@ -2,11 +2,9 @@
 
 #include "oscillator.h"
 
-typedef struct lfo lfo;
-
-struct lfo {
+typedef struct lfo {
     oscillator osc;
-};
+} lfo;
 
 lfo *lfo_new(void);
 
@@ -17,3 +15,4 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output);
 void lfo_start_oscillator(oscillator *self);
 void lfo_stop_oscillator(oscillator *self);
 void lfo_reset_oscillator(oscillator *self);
+

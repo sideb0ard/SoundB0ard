@@ -49,6 +49,7 @@ OBJ = \
 	sampler.o \
 	sbmsg.o \
 	sparkline.o \
+	standalonelfo.o \
 	stereodelay.o \
 	sound_generator.o \
 	table.o \
