@@ -92,6 +92,10 @@ void interpret(char *line)
                 mixer_update_bpm(mixr, bpm);
         }
 
+        else if (strncmp("lfo", wurds[0], 3) == 0) {
+            mixer_add_lfo(mixr);
+        }
+
         else if (strncmp("debug", wurds[0], 5) == 0) {
             if (strncmp("on", wurds[1], 2) == 0 ||
                 strncmp("true", wurds[1], 4) == 0) {

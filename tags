@@ -340,7 +340,7 @@ add_minisynth	mixer.c	/^int add_minisynth(mixer *mixr)$/;"	f
 add_moddelay_soundgen	sound_generator.c	/^int add_moddelay_soundgen(SOUNDGEN *self)$/;"	f
 add_reverb_soundgen	sound_generator.c	/^int add_reverb_soundgen(SOUNDGEN *self)$/;"	f
 add_sampler	mixer.c	/^int add_sampler(mixer *mixr, char *filename, double loop_len)$/;"	f
-add_sound_generator	mixer.c	/^int add_sound_generator(mixer *mixr, SBMSG *sbm)$/;"	f
+add_sound_generator	mixer.c	/^int add_sound_generator(mixer *mixr, SOUNDGEN *sg)$/;"	f
 afterthought	algorithm.h	/^    char afterthought[5][MAX_CMD_LEN];$/;"	m	struct:algorithm
 algorithm	algorithm.h	/^typedef struct algorithm {$/;"	s
 algorithm	algorithm.h	/^} algorithm;$/;"	t	typeref:struct:algorithm
@@ -1101,6 +1101,7 @@ minisynth_voice_prepare_for_play	minisynth_voice.c	/^void minisynth_voice_prepar
 minisynth_voice_reset	minisynth_voice.c	/^void minisynth_voice_reset(minisynth_voice *msv)$/;"	f
 minisynth_voice_update	minisynth_voice.c	/^void minisynth_voice_update(minisynth_voice *msv)$/;"	f
 mixer	mixer.h	/^} mixer;$/;"	t	typeref:struct:t_mixer
+mixer_add_lfo	mixer.c	/^int mixer_add_lfo(mixer *mixr)$/;"	f
 mixer_gennext	mixer.c	/^double mixer_gennext(mixer *mixr)$/;"	f
 mixer_ps	mixer.c	/^void mixer_ps(mixer *mixr)$/;"	f
 mixer_toggle_midi_mode	mixer.c	/^void mixer_toggle_midi_mode(mixer *mixr)$/;"	f
@@ -1354,7 +1355,6 @@ sound_generator	chaosmonkey.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:chaos
 sound_generator	drumr.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:t_drumr
 sound_generator	minisynth.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:minisynth
 sound_generator	sampler.h	/^    SOUNDGEN sound_generator;$/;"	m	struct:t_sampler
-sound_generator	sbmsg.h	/^    SOUNDGEN *sound_generator;$/;"	m	struct:sbmsg
 sound_generator_type	defjams.h	/^} sound_generator_type;$/;"	t	typeref:enum:__anon4
 sound_generators	mixer.h	/^    SOUNDGEN **sound_generators;$/;"	m	struct:t_mixer
 soundgen_num	mixer.h	/^    int soundgen_num;  \/\/ actual number of SGs$/;"	m	struct:t_mixer

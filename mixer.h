@@ -72,13 +72,14 @@ void mixer_update_bpm(mixer *mixr, int bpm);
 int add_algorithm(char *line);
 int add_bitwize(mixer *mixr, int pattern);
 int add_bytebeat(mixer *mixr, char *pattern);
+int mixer_add_lfo(mixer *mixr);
 int add_chaosmonkey(void);
 int add_minisynth(mixer *mixr);
 int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern);
 int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
                        bool start_on_first_beat);
 int add_sampler(mixer *mixr, char *filename, double loop_len);
-int add_sound_generator(mixer *mixr, SBMSG *sbm);
+int add_sound_generator(mixer *mixr, SOUNDGEN *sg);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);

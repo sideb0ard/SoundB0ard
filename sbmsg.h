@@ -17,7 +17,6 @@ typedef struct sbmsg {
     char car_osc[10];
     int carfreq;
     int sound_gen_num;
-    SOUNDGEN *sound_generator;
 } SBMSG;
 
 SBMSG *new_sbmsg(void);

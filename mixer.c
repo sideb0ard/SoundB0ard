@@ -176,7 +176,7 @@ int add_effect(mixer *mixr)
     return mixr->effects_num++;
 }
 
-int add_sound_generator(mixer *mixr, SBMSG *sbm)
+int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
 {
     SOUNDGEN **new_soundgens = NULL;
     if (mixr->soundgen_size <= mixr->soundgen_num) {
@@ -197,7 +197,7 @@ int add_sound_generator(mixer *mixr, SBMSG *sbm)
             mixr->sound_generators = new_soundgens;
         }
     }
-    mixr->sound_generators[mixr->soundgen_num] = sbm->sound_generator;
+    mixr->sound_generators[mixr->soundgen_num] = sg;
     return mixr->soundgen_num++;
 }
 
@@ -210,16 +210,15 @@ int add_bitwize(mixer *mixr, int pattern)
         return -1;
     }
 
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(new_bitw);
-        printf("MBITBARF!\n");
-        return -1;
-    }
-
-    m->sound_generator = (SOUNDGEN *)new_bitw;
     printf("Added bitwize gen!\n");
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*) new_bitw);
+}
+
+int mixer_add_lfo(mixer *mixr)
+{
+    printf("Adding an LFO, mo!\n");
+    lfo *l = lfo_new();
+    return 0;
 }
 
 int add_algorithm(char *line)
@@ -231,15 +230,7 @@ int add_algorithm(char *line)
         return -1;
     }
 
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(a);
-        printf("MBITBARF!\n");
-        return -1;
-    }
-
-    m->sound_generator = (SOUNDGEN *)a;
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*) a);
 }
 
 int add_chaosmonkey()
@@ -251,15 +242,7 @@ int add_chaosmonkey()
         return -1;
     }
 
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(cm);
-        printf("MONKEYMSGBARF!\n");
-        return -1;
-    }
-
-    m->sound_generator = (SOUNDGEN *)cm;
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*) cm);
 }
 
 int add_bytebeat(mixer *mixr, char *pattern)
@@ -271,16 +254,7 @@ int add_bytebeat(mixer *mixr, char *pattern)
         return -1;
     }
 
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(b);
-        printf("MBITBARF!\n");
-        return -1;
-    }
-
-    m->sound_generator = (SOUNDGEN *)b;
-    printf("Added BYTEBEATR!!!\n");
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*)b);
 }
 
 int add_minisynth(mixer *mixr)
@@ -291,14 +265,7 @@ int add_minisynth(mixer *mixr)
         printf("Barfed on MINIsynth creation\n");
         return -1;
     }
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(ms);
-        printf("MBARF!\n");
-        return -1;
-    }
-    m->sound_generator = (SOUNDGEN *)ms;
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*) ms);
 }
 
 int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
@@ -327,15 +294,8 @@ int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
         printf("Barfed on drum creation\n");
         return -1;
     }
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(ndrum);
-        printf("MBARF!\n");
-        return -1;
-    }
 
-    m->sound_generator = (SOUNDGEN *)ndrum;
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*)ndrum);
 }
 
 int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
@@ -354,15 +314,7 @@ int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
         printf("Barfed on drum creation\n");
         return -1;
     }
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(ndrum);
-        printf("MBARF!\n");
-        return -1;
-    }
-
-    m->sound_generator = (SOUNDGEN *)ndrum;
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*) ndrum);
 }
 
 int add_sampler(mixer *mixr, char *filename, double loop_len)
@@ -373,15 +325,7 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
         printf("Barfed on sampler creation\n");
         return -1;
     }
-    SBMSG *m = new_sbmsg();
-    if (m == NULL) {
-        free(nsampler);
-        printf("SAMPLMBARF!\n");
-        return -1;
-    }
-
-    m->sound_generator = (SOUNDGEN *)nsampler;
-    return add_sound_generator(mixr, m);
+    return add_sound_generator(mixr, (SOUNDGEN*) nsampler);
 }
 
 double mixer_gennext(mixer *mixr)
