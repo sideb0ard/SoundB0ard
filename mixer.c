@@ -21,7 +21,7 @@
 #include "mixer.h"
 #include "sampler.h"
 #include "sbmsg.h"
-#include "standalonelfo.h"
+#include "spork.h"
 #include "sound_generator.h"
 
 extern ENVSTREAM *ampstream;
@@ -215,11 +215,11 @@ int add_bitwize(mixer *mixr, int pattern)
     return add_sound_generator(mixr, (SOUNDGEN*) new_bitw);
 }
 
-int mixer_add_lfo(mixer *mixr)
+int mixer_add_spork(mixer *mixr)
 {
-    printf("Adding an LFO, mo!\n");
-    standalonelfo *l = lfo_new_standalone();
-    return add_sound_generator(mixr, (SOUNDGEN*) l);
+    printf("Adding an SPORK, mo!\n");
+    spork *s = new_spork();
+    return add_sound_generator(mixr, (SOUNDGEN*) s);
 }
 
 int add_algorithm(char *line)

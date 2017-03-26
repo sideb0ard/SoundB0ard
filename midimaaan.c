@@ -10,6 +10,7 @@
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
+#include "spork.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -87,6 +88,11 @@ void *midiman()
                         midi_delay_control(d, data1, data2);
                     }
                     }
+                }
+                else if (mixr->midi_control_destination == MIDISPORK) {
+                    printf("MIDI CONTROLS! SPORK\n");
+                    spork *s =
+                        (spork *) mixr->sound_generators[mixr->active_midi_soundgen_num];
                 }
                 else {
                     printf("Got midi but not connected to synth\n");

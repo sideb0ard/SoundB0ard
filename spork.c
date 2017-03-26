@@ -2,30 +2,31 @@
 #include <stdlib.h>
 
 #include "defjams.h"
-#include "standalonelfo.h"
+#include "spork.h"
 #include "utils.h"
 
-standalonelfo *lfo_new_standalone()
+spork *new_spork()
 {
-    standalonelfo *l = (standalonelfo *)calloc(1, sizeof(standalonelfo));
-    osc_new_settings(&l->osc);
-    l->osc.m_note_on = true;
+    spork *s = (spork *)calloc(1, sizeof(spork));
+    osc_new_settings(&s->osc);
+    s->osc.m_note_on = true;
 
-    l->sg.gennext = &lfo_do_standalone;
-    l->sg.status = &lfo_status;
-    l->sg.getvol = &lfo_getvol;
-    l->sg.setvol = &lfo_setvol;
-    l->sg.type = LFO_TYPE;
+    s->sg.gennext = &spork_gennext;
+    s->sg.status = &spork_status;
+    s->sg.getvol = &spork_getvol;
+    s->sg.setvol = &spork_setvol;
+    s->sg.type = LFO_TYPE;
 
-    return l;
+    return s;
 }
 
-double lfo_do_standalone(void *sg)
+double spork_gennext(void *sg)
 {
-    standalonelfo *l = (standalonelfo*) sg;
+    spork *l = (spork*) sg;
     oscillator *self = &l->osc;
 
-    printf("LFOoooooooooooo Mod: %f Inc: %f\n", self->m_modulo, self->m_inc);
+    osc_update(self, "SpoooooooOOOrk");
+
     // output
     double out = 0.0;
     double qp_out = 0.0;
@@ -52,14 +53,11 @@ double lfo_do_standalone(void *sg)
     // printf("WAVEFORM %d\n", self->m_waveform);
     switch (self->m_waveform) {
     case sine: {
-        printf("SINE?\n");
         // calculate angle
         double angle = self->m_modulo * 2.0 * M_PI - M_PI;
-        printf("ANGLEE! %f\n", angle);
 
         // call the parabolicSine approximator
         out = parabolic_sine(-angle, true);
-        printf("OUT! %f\n", out);
 
         // use second modulo for quad phase
         angle = quad_modulo * 2.0 * M_PI - M_PI;
@@ -185,11 +183,10 @@ double lfo_do_standalone(void *sg)
 
     //// self->m_amplitude & self->m_amp_mod is calculated in update() on base
     //// class
-    printf("Returningzz val: %f amp: %f amp_mod: %f\n", out, self->m_amplitude, self->m_amp_mod); 
     return out * self->m_amplitude * self->m_amp_mod;
 
 }
 
-void lfo_status(void *self, wchar_t *ss) {}
-double lfo_getvol(void *self) { return 0.; }
-void lfo_setvol(void *self, double v) {}
+void spork_status(void *self, wchar_t *ss) {}
+double spork_getvol(void *self) { return 0.; }
+void spork_setvol(void *self, double v) {}

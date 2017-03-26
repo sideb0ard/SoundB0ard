@@ -92,8 +92,10 @@ void interpret(char *line)
                 mixer_update_bpm(mixr, bpm);
         }
 
-        else if (strncmp("lfo", wurds[0], 3) == 0) {
-            mixer_add_lfo(mixr);
+        else if (strncmp("spork", wurds[0], 3) == 0) {
+            int soundgen_num = mixer_add_spork(mixr);
+            mixr->midi_control_destination = MIDISPORK;
+            mixr->active_midi_soundgen_num = soundgen_num;
         }
 
         else if (strncmp("debug", wurds[0], 5) == 0) {

@@ -79,4 +79,4 @@ typedef enum { MONO, LEGATO } legato_mode;
 
 // typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;
 
-typedef enum { NONE, SYNTH, DELAYFX } midi_control_type;
+typedef enum { NONE, SYNTH, DELAYFX, MIDISPORK } midi_control_type;

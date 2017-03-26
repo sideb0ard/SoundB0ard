@@ -72,7 +72,7 @@ void mixer_update_bpm(mixer *mixr, int bpm);
 int add_algorithm(char *line);
 int add_bitwize(mixer *mixr, int pattern);
 int add_bytebeat(mixer *mixr, char *pattern);
-int mixer_add_lfo(mixer *mixr);
+int mixer_add_spork(mixer *mixr);
 int add_chaosmonkey(void);
 int add_minisynth(mixer *mixr);
 int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern);
