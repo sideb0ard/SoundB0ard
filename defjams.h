@@ -15,6 +15,11 @@
 
 #define DEFAULT_ARRAY_SIZE 4
 
+#define MAX_PS_STRING_SZ 512 // arbitrary
+
+#define ENVIRONMENT_ARRAY_SIZE 128
+#define ENVIRONMENT_KEY_SIZE 128
+
 #define SYNTH_NUM_LOOPS 2
 #define PPQN 960       // Pulses Per Quarter Note // one beat
 #define PPS (PPQN / 4) // pulses per SIXTEENTH note, i.e. drum machine hit

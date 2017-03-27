@@ -137,8 +137,8 @@ EG_MINTIME_MS	envelope_generator.h	/^#define EG_MINTIME_MS /;"	d
 EG_MIN_OSC_INTENSITY	envelope_generator.h	/^#define EG_MIN_OSC_INTENSITY /;"	d
 ENVELOPE	envelope.h	/^} ENVELOPE;$/;"	t	typeref:struct:envelope
 ENVELOPE_H	envelope.h	/^#define ENVELOPE_H$/;"	d
-ENVIRONMENT_ARRAY_SIZE	mixer.h	/^#define ENVIRONMENT_ARRAY_SIZE /;"	d
-ENVIRONMENT_KEY_SIZE	mixer.h	/^#define ENVIRONMENT_KEY_SIZE /;"	d
+ENVIRONMENT_ARRAY_SIZE	defjams.h	/^#define ENVIRONMENT_ARRAY_SIZE /;"	d
+ENVIRONMENT_KEY_SIZE	defjams.h	/^#define ENVIRONMENT_KEY_SIZE /;"	d
 ENVSTREAM	envelope.h	/^} ENVSTREAM;$/;"	t	typeref:struct:envelope_stream
 EXTRACT_BITS	utils.c	/^#define EXTRACT_BITS(/;"	d	file:
 FILTER_FC_DEFAULT	filter.h	/^#define FILTER_FC_DEFAULT /;"	d
@@ -181,7 +181,7 @@ MAX_NUM_DELAY_MODE	stereodelay.h	/^typedef enum { NORM, TAP1, TAP2, PINGPONG, MA
 MAX_NUM_MIDI_LOOPS	minisynth.h	/^#define MAX_NUM_MIDI_LOOPS /;"	d
 MAX_NUM_MIDI_MODES	mixer.h	/^    MAX_NUM_MIDI_MODES,$/;"	e	enum:__anon16
 MAX_OSC	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
-MAX_PS_STRING_SZ	mixer.h	/^#define MAX_PS_STRING_SZ /;"	d
+MAX_PS_STRING_SZ	defjams.h	/^#define MAX_PS_STRING_SZ /;"	d
 MAX_PULSE_WIDTH_PCT	minisynth.h	/^#define MAX_PULSE_WIDTH_PCT /;"	d
 MAX_SAMPLES_PER_LOOPER	sampler.h	/^#define MAX_SAMPLES_PER_LOOPER /;"	d
 MAX_SOURCES	modmatrix.h	/^    MAX_SOURCES$/;"	e	enum:__anon17
@@ -824,6 +824,7 @@ m_feedback_pct	ddlmodule.h	/^    double m_feedback_pct;$/;"	m	struct:ddlmodule
 m_feedback_pct	minisynth.h	/^    double m_feedback_pct;$/;"	m	struct:minisynth
 m_feedback_percent	modular_delay.h	/^    double m_feedback_percent;$/;"	m	struct:mod_delay
 m_feedback_percent	stereodelay.h	/^    double m_feedback_percent;$/;"	m	struct:stereodelay
+m_filter	spork.h	/^    filter_moogladder m_filter;$/;"	m	struct:spork
 m_filter1	voice.h	/^    filter *m_filter1;$/;"	m	struct:__anon33
 m_filter2	voice.h	/^    filter *m_filter2;$/;"	m	struct:__anon33
 m_filter_keytrack	minisynth.h	/^    unsigned int m_filter_keytrack;$/;"	m	struct:minisynth
@@ -864,6 +865,7 @@ m_legato_mode	minisynth.h	/^    unsigned int m_legato_mode;$/;"	m	struct:minisyn
 m_legato_mode	voice.h	/^    unsigned int m_legato_mode;$/;"	m	struct:__anon33
 m_lfo	bitwize.h	/^    lfo *m_lfo;$/;"	m	struct:t_bitwize
 m_lfo	modular_delay.h	/^    lfo *m_lfo;$/;"	m	struct:mod_delay
+m_lfo	spork.h	/^    lfo m_lfo;$/;"	m	struct:spork
 m_lfo1	voice.h	/^    lfo m_lfo1;$/;"	m	struct:__anon33
 m_lfo1_amp_intensity	minisynth.h	/^    double m_lfo1_amp_intensity;$/;"	m	struct:minisynth
 m_lfo1_amplitude	minisynth.h	/^    double m_lfo1_amplitude;$/;"	m	struct:minisynth
@@ -923,6 +925,7 @@ m_octave	minisynth.h	/^    int m_octave;$/;"	m	struct:minisynth
 m_octave	oscillator.h	/^    double m_octave;    \/\/ octave tweak$/;"	m	struct:oscillator
 m_offset	beatrepeat.h	/^    unsigned int m_offset;$/;"	m	struct:beatrepeat
 m_osc1	minisynth_voice.h	/^    qblimited_oscillator m_osc1;$/;"	m	struct:__anon15
+m_osc1	spork.h	/^    qblimited_oscillator m_osc1;$/;"	m	struct:spork
 m_osc1	voice.h	/^    oscillator *m_osc1;$/;"	m	struct:__anon33
 m_osc2	minisynth_voice.h	/^    qblimited_oscillator m_osc2;$/;"	m	struct:__anon15
 m_osc2	voice.h	/^    oscillator *m_osc2;$/;"	m	struct:__anon33
@@ -1014,6 +1017,7 @@ m_voice	minisynth_voice.h	/^    voice m_voice;$/;"	m	struct:__anon15
 m_voice_mode	minisynth.h	/^    unsigned int m_voice_mode; \/\/ controlled by keys$/;"	m	struct:minisynth
 m_voice_mode	voice.h	/^    unsigned int m_voice_mode;$/;"	m	struct:__anon33
 m_voices	minisynth.h	/^    minisynth_voice *m_voices[MAX_VOICES];$/;"	m	struct:minisynth
+m_volume	spork.h	/^    double m_volume;$/;"	m	struct:spork
 m_volume_db	minisynth.h	/^    double m_volume_db;$/;"	m	struct:minisynth
 m_waveform	oscillator.h	/^    unsigned m_waveform; \/\/ to store type$/;"	m	struct:oscillator
 m_wet_level	ddlmodule.h	/^    double m_wet_level;$/;"	m	struct:ddlmodule
@@ -1203,7 +1207,6 @@ orig_file_bytes	sampler.h	/^    int *orig_file_bytes;$/;"	m	struct:file_sample
 orig_file_size	sampler.h	/^    int orig_file_size;$/;"	m	struct:file_sample
 osc	lfo.h	/^    oscillator osc;$/;"	m	struct:lfo
 osc	qblimited_oscillator.h	/^    oscillator osc;$/;"	m	struct:qblimited_oscillator
-osc	spork.h	/^    oscillator osc;$/;"	m	struct:spork
 osc	wt_oscillator.h	/^    oscillator osc;$/;"	m	struct:wt_oscillator
 osc1_params	synthfunctions.h	/^    global_oscillator_params osc1_params;$/;"	m	struct:__anon32
 osc2_params	synthfunctions.h	/^    global_oscillator_params osc2_params;$/;"	m	struct:__anon32
@@ -1369,9 +1372,9 @@ sparky	sparkline.c	/^void sparky(char *instr)$/;"	f
 spork	spork.h	/^typedef struct spork {$/;"	s
 spork	spork.h	/^} spork;$/;"	t	typeref:struct:spork
 spork_gennext	spork.c	/^double spork_gennext(void *sg)$/;"	f
-spork_getvol	spork.c	/^double spork_getvol(void *self) { return 0.; }$/;"	f
-spork_setvol	spork.c	/^void spork_setvol(void *self, double v) {}$/;"	f
-spork_status	spork.c	/^void spork_status(void *self, wchar_t *ss) {}$/;"	f
+spork_getvol	spork.c	/^double spork_getvol(void *self)$/;"	f
+spork_setvol	spork.c	/^void spork_setvol(void *self, double v)$/;"	f
+spork_status	spork.c	/^void spork_status(void *self, wchar_t *ss)$/;"	f
 square	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24
 start_oscillator	oscillator.h	/^    void (*start_oscillator)(oscillator *self);$/;"	m	struct:oscillator
 started	drumr.h	/^    bool started; \/\/ to sync at top of loop$/;"	m	struct:t_drumr
