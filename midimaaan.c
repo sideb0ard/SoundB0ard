@@ -149,11 +149,11 @@ void spork_parse_midi(spork *s, int data1, int data2)
         printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude );
         break;
     case 4:
-        scaley_val = scaleybum(1, 128, 10, 900, data2);
+        scaley_val = scaleybum(1, 128, 10, 220, data2);
         printf("OSC FREQ!!\n");
         s->m_osc1.osc.m_osc_fo = scaley_val;
-        s->m_osc2.osc.m_osc_fo = scaley_val;
-        s->m_osc3.osc.m_osc_fo = scaley_val;
+        s->m_osc2.osc.m_osc_fo = scaley_val * 2;
+        s->m_osc3.osc.m_osc_fo = scaley_val / 3;
         break;
     case 5:
         scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
@@ -161,17 +161,19 @@ void spork_parse_midi(spork *s, int data1, int data2)
         s->m_filter.f.m_fc_control = scaley_val;
         break;
     case 6:
-        // scaley_val = scaleybum(0, 128, -100, 100, data2);
-        scaley_val = scaleybum(0, 128, 20, 100, data2);
-        printf("DELAY FEEDBACK! %f\n", scaley_val);
+        scaley_val = scaleybum(1, 128, 0, 100, data2);
+        printf("Reverb Pre Delay Ms!\n");
+        s->m_reverb->m_pre_delay_msec = scaley_val;
         break;
     case 7:
-        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
-        printf("DELAY RATIO! %f\n", scaley_val);
+        scaley_val = scaleybum(1, 128, 0, 5000, data2);
+        printf("Reverb Time!\n");
+        s->m_reverb->m_rt60 = scaley_val;
         break;
     case 8:
-        scaley_val = scaleybum(1, 128, 0, 1, data2);
-        printf("DELAY MIX! %f\n", scaley_val);
+        scaley_val = scaleybum(1, 128, 0, 100, data2);
+        printf("Reverb Wet Mix!\n");
+        s->m_reverb->m_wet_pct = scaley_val;
         break;
     default:
         printf("SOMthing else\n");

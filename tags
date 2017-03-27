@@ -982,6 +982,7 @@ m_release_tco	envelope_generator.h	/^    double m_release_tco;$/;"	m	struct:enve
 m_release_time_msec	envelope_generator.h	/^    double m_release_time_msec;$/;"	m	struct:envelope_generator
 m_reset_to_zero	envelope_generator.h	/^    bool m_reset_to_zero;$/;"	m	struct:envelope_generator
 m_reset_to_zero	minisynth.h	/^    unsigned int m_reset_to_zero;$/;"	m	struct:minisynth
+m_reverb	spork.h	/^    reverb *m_reverb;$/;"	m	struct:spork
 m_rho	filter_sem.h	/^    double m_rho;$/;"	m	struct:filter_sem
 m_right_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	struct:stereodelay
 m_rsh_counter	oscillator.h	/^    int m_rsh_counter;      \/\/ random sample\/hold counter$/;"	m	struct:oscillator

@@ -13,6 +13,8 @@ typedef struct spork {
     qblimited_oscillator m_osc3;
     filter_moogladder m_filter;
 
+    reverb *m_reverb;
+
     double m_volume;
 } spork;
 

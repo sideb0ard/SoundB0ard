@@ -41,6 +41,8 @@ spork *new_spork()
     s->sg.setvol = &spork_setvol;
     s->sg.type = SPORK_TYPE;
 
+    s->m_reverb = new_reverb();
+
     s->m_volume = 0.0;
 
     return s;
@@ -70,8 +72,12 @@ double spork_gennext(void *sg)
     moog_update((filter *)&s->m_filter);
     double filter_out = moog_gennext((filter *)&s->m_filter, osc_out);
 
-    return filter_out * s->m_volume;
+    double return_val = 0.;
+    reverb_process_audio(s->m_reverb, &filter_out, &return_val, 1, 1);
 
+    return_val = effector(&s->sg, return_val);
+    return_val = envelopor(&s->sg, return_val);
+    return return_val * s->m_volume;
 }
 
 void spork_status(void *self, wchar_t *ss)
