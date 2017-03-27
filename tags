@@ -161,7 +161,6 @@ LEGATO	defjams.h	/^typedef enum { MONO, LEGATO } legato_mode;$/;"	e	enum:__anon5
 LFORFREE	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
 LFOSHOT	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
 LFOSYNC	oscillator.h	/^enum { LFOSYNC, LFOSHOT, LFORFREE };$/;"	e	enum:__anon25
-LFO_TYPE	defjams.h	/^    LFO_TYPE,$/;"	e	enum:__anon4
 LOOP	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	e	enum:__anon1
 LOWPASS	effect.h	/^    LOWPASS,$/;"	e	enum:__anon8
 LPF1	filter.h	/^    LPF1,$/;"	e	enum:__anon12
@@ -272,6 +271,7 @@ SOURCE_NONE	modmatrix.h	/^    SOURCE_NONE,$/;"	e	enum:__anon17
 SOURCE_PITCHBEND	modmatrix.h	/^    SOURCE_PITCHBEND,$/;"	e	enum:__anon17
 SOURCE_SUSTAIN_PEDAL	modmatrix.h	/^    SOURCE_SUSTAIN_PEDAL,$/;"	e	enum:__anon17
 SOURCE_VELOCITY	modmatrix.h	/^    SOURCE_VELOCITY,$/;"	e	enum:__anon17
+SPORK_TYPE	defjams.h	/^    SPORK_TYPE,$/;"	e	enum:__anon4
 SQUARE	oscillator.h	/^enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };$/;"	e	enum:__anon23
 SUSTAIN	envelope_generator.h	/^    SUSTAIN,$/;"	e	enum:__anon11
 SYNTH	defjams.h	/^typedef enum { NONE, SYNTH, DELAYFX, MIDISPORK } midi_control_type;$/;"	e	enum:__anon6
@@ -928,8 +928,10 @@ m_osc1	minisynth_voice.h	/^    qblimited_oscillator m_osc1;$/;"	m	struct:__anon1
 m_osc1	spork.h	/^    qblimited_oscillator m_osc1;$/;"	m	struct:spork
 m_osc1	voice.h	/^    oscillator *m_osc1;$/;"	m	struct:__anon33
 m_osc2	minisynth_voice.h	/^    qblimited_oscillator m_osc2;$/;"	m	struct:__anon15
+m_osc2	spork.h	/^    qblimited_oscillator m_osc2;$/;"	m	struct:spork
 m_osc2	voice.h	/^    oscillator *m_osc2;$/;"	m	struct:__anon33
 m_osc3	minisynth_voice.h	/^    qblimited_oscillator m_osc3;$/;"	m	struct:__anon15
+m_osc3	spork.h	/^    qblimited_oscillator m_osc3;$/;"	m	struct:spork
 m_osc3	voice.h	/^    oscillator *m_osc3;$/;"	m	struct:__anon33
 m_osc4	minisynth_voice.h	/^    qblimited_oscillator m_osc4;$/;"	m	struct:__anon15
 m_osc4	voice.h	/^    oscillator *m_osc4;$/;"	m	struct:__anon33
@@ -1369,10 +1371,12 @@ soundgen_num	mixer.h	/^    int soundgen_num;  \/\/ actual number of SGs$/;"	m	st
 soundgen_size	mixer.h	/^    int soundgen_size; \/\/ number of memory slots reserved for SGszz$/;"	m	struct:t_mixer
 sparkchars	main.c	/^const wchar_t *sparkchars = L"\\u2581\\u2582\\u2583\\u2585\\u2586\\u2587";$/;"	v
 sparky	sparkline.c	/^void sparky(char *instr)$/;"	f
+spork	midimaaan.h	/^typedef struct spork spork;$/;"	t	typeref:struct:spork
 spork	spork.h	/^typedef struct spork {$/;"	s
 spork	spork.h	/^} spork;$/;"	t	typeref:struct:spork
 spork_gennext	spork.c	/^double spork_gennext(void *sg)$/;"	f
 spork_getvol	spork.c	/^double spork_getvol(void *self)$/;"	f
+spork_parse_midi	midimaaan.c	/^void spork_parse_midi(spork *s, int data1, int data2)$/;"	f
 spork_setvol	spork.c	/^void spork_setvol(void *self, double v)$/;"	f
 spork_status	spork.c	/^void spork_status(void *self, wchar_t *ss)$/;"	f
 square	oscillator.h	/^enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };$/;"	e	enum:__anon24

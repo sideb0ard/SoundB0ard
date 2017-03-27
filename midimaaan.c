@@ -93,6 +93,7 @@ void *midiman()
                     printf("MIDI CONTROLS! SPORK\n");
                     spork *s =
                         (spork *) mixr->sound_generators[mixr->active_midi_soundgen_num];
+                    spork_parse_midi(s, data1, data2);
                 }
                 else {
                     printf("Got midi but not connected to synth\n");
@@ -124,6 +125,57 @@ midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
     ev->data2 = data2;
 
     return ev;
+}
+
+void spork_parse_midi(spork *s, int data1, int data2)
+{
+    printf("SPORKMIDIiii!\n");
+    double scaley_val = 0.0;
+    switch(data1) {
+    case 1:
+        scaley_val = scaleybum(1, 128, 0.0, 1.0, data2);
+        printf("VOLUME!\n");
+        s->m_volume = scaley_val;
+        break;
+    case 2:
+        scaley_val = scaleybum(1, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+        s->m_lfo.osc.m_osc_fo = scaley_val;
+        printf("LFO RATE! %f\n", s->m_lfo.osc.m_osc_fo);
+
+        break;
+    case 3:
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        s->m_lfo.osc.m_amplitude = scaley_val;
+        printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude );
+        break;
+    case 4:
+        scaley_val = scaleybum(1, 128, 10, 900, data2);
+        printf("OSC FREQ!!\n");
+        s->m_osc1.osc.m_osc_fo = scaley_val;
+        s->m_osc2.osc.m_osc_fo = scaley_val;
+        s->m_osc3.osc.m_osc_fo = scaley_val;
+        break;
+    case 5:
+        scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        printf("FILTER FC! %f\n", scaley_val);
+        s->m_filter.f.m_fc_control = scaley_val;
+        break;
+    case 6:
+        // scaley_val = scaleybum(0, 128, -100, 100, data2);
+        scaley_val = scaleybum(0, 128, 20, 100, data2);
+        printf("DELAY FEEDBACK! %f\n", scaley_val);
+        break;
+    case 7:
+        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+        printf("DELAY RATIO! %f\n", scaley_val);
+        break;
+    case 8:
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        printf("DELAY MIX! %f\n", scaley_val);
+        break;
+    default:
+        printf("SOMthing else\n");
+    }
 }
 
 void midi_delay_control(EFFECT *e, int data1, int data2)

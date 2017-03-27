@@ -3,6 +3,7 @@
 #include "effect.h"
 
 typedef struct minisynth minisynth;
+typedef struct spork spork;
 
 typedef enum { OCTAVE_CHANGE } custom_event_type;
 
@@ -26,3 +27,5 @@ void print_midi_event_rec(midi_event *ev);
 void midi_parse_midi_event(minisynth *ms, midi_event *ev);
 
 void midi_melody_quantize(midi_event **melody);
+
+void spork_parse_midi(spork *s, int data1, int data2);
