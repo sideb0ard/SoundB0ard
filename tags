@@ -620,7 +620,6 @@ filter_reset	filter.c	/^void filter_reset(filter *f)$/;"	f
 filter_sem	filter_sem.h	/^struct filter_sem {$/;"	s
 filter_sem	filter_sem.h	/^typedef struct filter_sem filter_sem;$/;"	t	typeref:struct:filter_sem
 filter_set_fc_mod	filter.c	/^void filter_set_fc_mod(filter *f, double val) { f->m_fc_mod = val; }$/;"	f
-filter_set_q_control	filter.c	/^void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }$/;"	f
 filter_setup	filter.c	/^void filter_setup(filter *f)$/;"	f
 filter_type	filter.h	/^} filter_type;$/;"	t	typeref:enum:__anon12
 filter_type	synthfunctions.h	/^    unsigned int filter_type;$/;"	m	struct:__anon28

@@ -10,7 +10,7 @@
 #define FILTER_FC_MIN 180       // 80Hz
 #define FILTER_FC_MAX 18000     // 18 kHz
 #define FILTER_FC_DEFAULT 12000 // 10kHz
-#define FILTER_Q_DEFAULT 0.707  // butterworth?
+#define FILTER_Q_DEFAULT 0.707  // butterworth (noidea!)
 #define FILTER_TYPE_DEFAULT LPF1
 
 typedef enum {

@@ -35,7 +35,7 @@ void filter_moog_init(filter_moog *moog)
     moog->f.m_filter_type = LPF4; // default
 
     moog->m_k = 0.0;
-    moog->m_alpha_0 = 0.0;
+    moog->m_alpha_0 = 1.0;
     moog->m_a = 0.0;
     moog->m_b = 0.0;
     moog->m_c = 0.0;
@@ -53,12 +53,14 @@ void moog_set_qcontrol(filter *f, double qcontrol)
 {
     filter_moog *self = (filter_moog *)f;
     self->m_k = (4.0) * (qcontrol - 1.0) / (10.0 - 1.0);
+    //printf("M_K: %f\n", self->m_k);
 }
 
 void moog_update(filter *f)
 {
     filter_update(f); // update base class
     filter_moog *moog = (filter_moog *)f;
+    moog->m_k = (4.0) * (f->m_q_control - 1.0)/(10.0 - 1.0);
 
     double wd = 2.0 * M_PI * f->m_fc;
     double T = 1.0 / SAMPLE_RATE;
@@ -124,7 +126,7 @@ void moog_update(filter *f)
         moog->m_d = 0.0;
         moog->m_e = 0.0;
         break;
-    default:
+    default: // LPF4
         moog->m_a = 0.0;
         moog->m_b = 0.0;
         moog->m_c = 0.0;
@@ -162,10 +164,13 @@ double moog_gennext(filter *f, double xn)
     }
 
     double LP1 = onepole_gennext((filter *)&moog->m_LPF1, u);
-    double LP2 = onepole_gennext((filter *)&moog->m_LPF2, u);
-    double LP3 = onepole_gennext((filter *)&moog->m_LPF3, u);
-    double LP4 = onepole_gennext((filter *)&moog->m_LPF4, u);
+    double LP2 = onepole_gennext((filter *)&moog->m_LPF2, LP1);
+    double LP3 = onepole_gennext((filter *)&moog->m_LPF3, LP2);
+    double LP4 = onepole_gennext((filter *)&moog->m_LPF4, LP3);
 
-    return moog->m_a * u + moog->m_b * LP1 + moog->m_c * LP2 + moog->m_d * LP3 +
-           moog->m_e * LP4;
+    return moog->m_a * u
+         + moog->m_b * LP1
+         + moog->m_c * LP2
+         + moog->m_d * LP3
+         + moog->m_e * LP4;
 }

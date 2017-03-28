@@ -403,7 +403,9 @@ void interpret(char *line)
         // SYNTHESIZER COMMANDS
         else if (strncmp("syn", wurds[0], 3) == 0) {
             if (strncmp("mini", wurds[1], 4) == 0) {
-                add_minisynth(mixr);
+                int sgnum = add_minisynth(mixr);
+                mixr->midi_control_destination = SYNTH;
+                mixr->active_midi_soundgen_num = sgnum;
             }
             else {
                 int soundgen_num = atoi(wurds[1]);

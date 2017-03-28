@@ -1,5 +1,6 @@
 #include "minisynth_voice.h"
 #include <stdlib.h>
+#include <stdio.h>
 
 minisynth_voice *new_minisynth_voice(void)
 {
@@ -248,8 +249,6 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     double filter_out =
         moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
 
-    //*left_output = filter_out;
-    // double filter_out = osc_mix; // TODO REMOVE = not real
     dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
                 right_output);
 

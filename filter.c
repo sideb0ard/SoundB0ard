@@ -18,8 +18,11 @@ void filter_setup(filter *f)
     f->m_saturation = 1.0;
 
     f->m_v_modmatrix = NULL;
+
     f->m_mod_source_fc = DEST_NONE;
     f->m_mod_source_fc_control = DEST_NONE;
+
+    //f->m_global_filter_params = NULL;
 }
 
 // void filter_set_fc_control(filter *f, double val)
@@ -31,7 +34,7 @@ void filter_setup(filter *f)
 
 void filter_set_fc_mod(filter *f, double val) { f->m_fc_mod = val; }
 
-void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
+//void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
 
 void filter_update(filter *f)
 {
@@ -49,7 +52,7 @@ void filter_update(filter *f)
     }
 
     // printf("2RIG:FC: %f\n", f->m_fc);
-    // printf("2Y FC_CONTROL: %f\n", f->m_fc_control);
+    //printf("Q!!! : %f\n", f->m_q_control);
     // exit(0);
 
     if (f->m_v_modmatrix) {
@@ -59,7 +62,7 @@ void filter_update(filter *f)
                 f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control];
     }
 
-    filter_set_q_control(f, f->m_q_control);
+    //f->set_q_control(f, f->m_q_control);
 
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);
     // printf("OOFT, M_FC %f\n", f->m_fc);
@@ -68,8 +71,9 @@ void filter_update(filter *f)
         f->m_fc = FILTER_FC_MAX;
     if (f->m_fc < FILTER_FC_MIN)
         f->m_fc = FILTER_FC_MIN;
-    // printf("NOW:FC: %f\n", f->m_fc);
-    // printf("NOW MY FC_CONTROL: %f\n", f->m_fc_control);
+    //printf("NOW:_Q_: %f\n", f->m_q_control);
+    //printf("NOW:FC: %f\n", f->m_fc);
+    //printf("NOW MY FC_CONTROL: %f\n", f->m_fc_control);
 }
 
 void filter_reset(filter *f)
