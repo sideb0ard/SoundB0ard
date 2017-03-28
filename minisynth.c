@@ -314,19 +314,24 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         printf("Voice! Mode Toggle - %ls\n", s_mode_names[ms->m_voice_mode]);
         break;
     case 11: 
-        printf("Legato! Mode\n");
+        ms->m_legato_mode = 1 - ms->m_legato_mode;
+        printf("Legato! Mode %d\n", ms->m_legato_mode);
         break;
     case 12: 
+        ms->m_reset_to_zero = 1 - ms->m_reset_to_zero;
         printf("Reset To Zero! Mode\n");
         break;
     case 13: 
+        ms->m_filter_keytrack = 1 - ms->m_filter_keytrack;
         printf("Filter Keytrack! Mode\n");
         break;
     case 14: 
-        printf("Velocity To Attack! Mode\n");
+        ms->m_velocity_to_attack_scaling = 1 - ms->m_velocity_to_attack_scaling;
+        printf("Velocity To Attack! Mode %d\n", ms->m_velocity_to_attack_scaling);
         break;
     case 15: 
-        printf("Note To Decay Scaling! Mode\n");
+        ms->m_note_number_to_decay_scaling = 1 - ms->m_note_number_to_decay_scaling;
+        printf("Note To Decay Scaling! Mode %d\n", ms->m_note_number_to_decay_scaling);
         break;
     case 16: 
         printf("Toggle! MIDI Mode\n");
