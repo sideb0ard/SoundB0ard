@@ -77,7 +77,6 @@ typedef struct minisynth {
 
     unsigned int m_midi_rx_channel;
 
-    // new delay! fx! TODO
     stereodelay m_delay_fx;
 
     unsigned int m_voice_mode; // controlled by keys
@@ -104,8 +103,20 @@ typedef struct minisynth {
     double m_sub_osc_db;
     double m_noise_osc_db;
 
+    // midi mode three, top row
+    double m_eg1_dca_intensity;
+    double m_eg1_filter_intensity;
+    double m_eg1_osc_intensity;
+    double m_filter_keytrack_intensity;
+    // midi mode three, bottom row
+    double m_lfo1_amp_intensity;
+    double m_lfo1_filter_fc_intensity;
+    double m_lfo1_osc_pitch_intensity;
+    double m_lfo1_pan_intensity;
+
     int m_octave;
     int m_pitchbend_range;
+
     unsigned int m_lfo1_waveform;
     unsigned int m_legato_mode;
     unsigned int m_reset_to_zero;
@@ -113,16 +124,6 @@ typedef struct minisynth {
     unsigned int m_velocity_to_attack_scaling;
     unsigned int m_note_number_to_decay_scaling;
 
-    double m_eg1_dca_intensity;
-    double m_eg1_filter_intensity;
-    double m_eg1_osc_intensity;
-
-    double m_filter_keytrack_intensity;
-
-    double m_lfo1_amp_intensity;
-    double m_lfo1_filter_fc_intensity;
-    double m_lfo1_osc_pitch_intensity;
-    double m_lfo1_pan_intensity;
 
     double m_portamento_time_msec;
     bool m_sustain_override;

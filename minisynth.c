@@ -302,88 +302,139 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
                             unsigned int data2)
 {
     double scaley_val;
-    switch (mixr->m_midi_controller_mode) {
-    case MIDI_MODE_ONE:
-        switch (data1) {
-        case 1: // K1 - Envelope Attack Time Msec
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            ms->m_attack_time_msec = scaley_val;
-            break;
-        case 2: // K2 - Envelope Decay Time Msec
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-            ms->m_decay_release_time_msec = scaley_val;
-            break;
-        case 3: // K3 - Envelope Sustain Level
-            scaley_val = scaleybum(1, 128, 0, 1, data2);
-            ms->m_sustain_level = scaley_val;
-            break;
-        case 4: // K4 - Synth Volume
-            scaley_val = scaleybum(1, 128, 0, 1, data2);
-            ms->m_volume_db = scaley_val;
-            break;
-        case 5: // K6 - LFO amplitude
-            scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-            ms->m_lfo1_amplitude = scaley_val;
-            break;
-        case 6: // K5 - LFO rate
-            scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-            ms->m_lfo1_rate = scaley_val;
-            break;
-        case 7: // K7 - Filter Frequency Cut
-            scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-            ms->m_fc_control = scaley_val;
-            break;
-        case 8: // K8 - Filter Q control
-            scaley_val = scaleybum(1, 128, 1, 10, data2);
-            ms->m_q_control = scaley_val;
-            break;
-        default:
-            printf("SOMthing else\n");
-        }
+    //switch (mixr->m_midi_controller_mode) {
+    //case MIDI_MODE_ONE:
+    switch (data1) {
+    case 9: 
+        ms->m_lfo1_waveform = (++ms->m_lfo1_waveform)% MAX_LFO_OSC;
+        printf("LFO! Mode Toggle: %d MaxLFO: %d\n", ms->m_lfo1_waveform, MAX_LFO_OSC);
         break;
-    case MIDI_MODE_TWO:
-        switch (data1) {
-        case 1:
-            scaley_val = scaleybum(1, 128, 0, 1000, data2);
-            ms->m_delay_time_msec = scaley_val;
-            break;
-        case 2:
-            scaley_val = scaleybum(1, 128, 0, 100, data2);
-            ms->m_feedback_pct = scaley_val;
-            break;
-        case 3:
-            scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
-            ms->m_delay_ratio = scaley_val;
-            break;
-        case 4:
-            scaley_val = scaleybum(1, 128, 0.0, 0.9, data2);
-            ms->m_wet_mix = scaley_val;
-            break;
-        case 5:
-            scaley_val =
-                scaleybum(0, 128, MIN_DETUNE_CENTS, MAX_DETUNE_CENTS, data2);
-            ms->m_detune_cents = scaley_val;
-            break;
-        case 6:
-            scaley_val = scaleybum(0, 128, MIN_PULSE_WIDTH_PCT,
-                                   MAX_PULSE_WIDTH_PCT, data2);
-            ms->m_pulse_width_pct = scaley_val;
-            break;
-        case 7:
-            scaley_val = scaleybum(1, 128, MIN_SUB_OSC_AMP_DB,
-                                   MAX_SUB_OSC_AMP_DB, data2);
-            ms->m_sub_osc_db = scaley_val;
-            break;
-        case 8:
-            scaley_val = scaleybum(1, 128, MIN_NOISE_OSC_AMP_DB,
-                                   MAX_NOISE_OSC_AMP_DB, data2);
-            ms->m_noise_osc_db = scaley_val;
-            break;
-        default:
-            printf("SOMthing else\n");
-        }
+    case 10: 
+        ms->m_voice_mode = ( ++ms->m_voice_mode)% 5;
+        printf("Voice! Mode Toggle - %ls\n", s_mode_names[ms->m_voice_mode]);
         break;
+    case 11: 
+        printf("Legato! Mode\n");
+        break;
+    case 12: 
+        printf("Reset To Zero! Mode\n");
+        break;
+    case 13: 
+        printf("Filter Keytrack! Mode\n");
+        break;
+    case 14: 
+        printf("Velocity To Attack! Mode\n");
+        break;
+    case 15: 
+        printf("Note To Decay Scaling! Mode\n");
+        break;
+    case 16: 
+        printf("Toggle! MIDI Mode\n");
+        break;
+    /// BANK B on MPK Mini MKII
+    case 17: 
+        printf("Delay Mode! Mode\n");
+        break;
+    case 18: 
+        printf("Sustain Override! Mode\n");
+        break;
+    case 19: 
+        printf("19! \n");
+        break;
+    case 20: 
+        printf("20! Mode\n");
+        break;
+    case 21: 
+        printf("21! MIDI Mode\n");
+        break;
+    case 22: 
+        printf("22! MIDI Mode\n");
+        break;
+    case 23: 
+        printf("23! MIDI Mode\n");
+        break;
+    case 24: 
+        printf("24! MIDI Mode\n");
+        break;
+    case 1: // K1 - Envelope Attack Time Msec
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        ms->m_attack_time_msec = scaley_val;
+        break;
+    case 2: // K2 - Envelope Decay Time Msec
+        scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+        ms->m_decay_release_time_msec = scaley_val;
+        break;
+    case 3: // K3 - Envelope Sustain Level
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        ms->m_sustain_level = scaley_val;
+        break;
+    case 4: // K4 - Synth Volume
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        ms->m_volume_db = scaley_val;
+        break;
+    case 5: // K6 - LFO amplitude
+        scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
+        ms->m_lfo1_amplitude = scaley_val;
+        break;
+    case 6: // K5 - LFO rate
+        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+        ms->m_lfo1_rate = scaley_val;
+        break;
+    case 7: // K7 - Filter Frequency Cut
+        scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        ms->m_fc_control = scaley_val;
+        break;
+    case 8: // K8 - Filter Q control
+        scaley_val = scaleybum(1, 128, 1, 10, data2);
+        ms->m_q_control = scaley_val;
+        break;
+    default:
+        printf("DATANUM: %d\n", data1);
     }
+        //break;
+    //case MIDI_MODE_TWO:
+    //    switch (data1) {
+    //    case 1:
+    //        scaley_val = scaleybum(1, 128, 0, 1000, data2);
+    //        ms->m_delay_time_msec = scaley_val;
+    //        break;
+    //    case 2:
+    //        scaley_val = scaleybum(1, 128, 0, 100, data2);
+    //        ms->m_feedback_pct = scaley_val;
+    //        break;
+    //    case 3:
+    //        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+    //        ms->m_delay_ratio = scaley_val;
+    //        break;
+    //    case 4:
+    //        scaley_val = scaleybum(1, 128, 0.0, 0.9, data2);
+    //        ms->m_wet_mix = scaley_val;
+    //        break;
+    //    case 5:
+    //        scaley_val =
+    //            scaleybum(0, 128, MIN_DETUNE_CENTS, MAX_DETUNE_CENTS, data2);
+    //        ms->m_detune_cents = scaley_val;
+    //        break;
+    //    case 6:
+    //        scaley_val = scaleybum(0, 128, MIN_PULSE_WIDTH_PCT,
+    //                               MAX_PULSE_WIDTH_PCT, data2);
+    //        ms->m_pulse_width_pct = scaley_val;
+    //        break;
+    //    case 7:
+    //        scaley_val = scaleybum(1, 128, MIN_SUB_OSC_AMP_DB,
+    //                               MAX_SUB_OSC_AMP_DB, data2);
+    //        ms->m_sub_osc_db = scaley_val;
+    //        break;
+    //    case 8:
+    //        scaley_val = scaleybum(1, 128, MIN_NOISE_OSC_AMP_DB,
+    //                               MAX_NOISE_OSC_AMP_DB, data2);
+    //        ms->m_noise_osc_db = scaley_val;
+    //        break;
+    //    default:
+    //        printf("SOMthing else\n");
+    //    }
+    //    break;
+    //}
 
     minisynth_update(ms);
 }
