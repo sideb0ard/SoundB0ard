@@ -56,12 +56,15 @@ sequencer *new_seq(char *filename)
     seq->sound_generator.setvol = &seq_setvol;
     seq->sound_generator.type = SEQUENCER_TYPE;
 
-    // TODO: do i need to free pattern ?
+    stereo_delay_prepare_for_play(&seq->m_delay_fx);
+    filter_moog_init(&seq->m_filter);
+    seq->m_fc_control = 10000;
+    moog_update((filter*) &seq->m_filter);
+
     return seq;
 }
 
 double seq_gennext(void *self)
-// void seq_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
     sequencer *seq = (sequencer *)self;
     double val = 0;
@@ -128,7 +131,6 @@ double seq_gennext(void *self)
         }
     }
 
-    // for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
     for (int i = SEQUENCER_PATTERN_LEN - 1; i >= 0; i--) {
         if (seq->sample_positions[i].playing) {
             val +=
@@ -205,7 +207,22 @@ double seq_gennext(void *self)
     val = effector(&seq->sound_generator, val);
     val = envelopor(&seq->sound_generator, val);
 
-    return val * seq->vol;
+    // update delay and filter
+    seq->m_filter.f.m_fc_control = seq->m_fc_control;
+    moog_set_qcontrol((filter*) &seq->m_filter, seq->m_q_control);
+    moog_update((filter*) &seq->m_filter);
+    val = moog_gennext((filter*) &seq->m_filter, val);
+
+    stereo_delay_set_mode(&seq->m_delay_fx, seq->m_delay_mode);
+    stereo_delay_set_delay_time_ms(&seq->m_delay_fx, seq->m_delay_time_msec);
+    stereo_delay_set_feedback_percent(&seq->m_delay_fx, seq->m_feedback_pct);
+    stereo_delay_set_delay_ratio(&seq->m_delay_fx, seq->m_delay_ratio);
+    stereo_delay_set_wet_mix(&seq->m_delay_fx, seq->m_wet_mix);
+    stereo_delay_update(&seq->m_delay_fx);
+    double out = 0.0;
+    stereo_delay_process_audio(&seq->m_delay_fx, &val, &val, &out, &out);
+
+    return out * seq->vol;
 }
 
 void int_pattern_to_array(int pattern, int *pat_array)
@@ -705,3 +722,58 @@ void seq_set_backup_mode(sequencer *d, bool on)
 void seq_set_max_generations(sequencer *d, int max) { d->max_generation = max; }
 
 void seq_set_markov_mode(sequencer *d, unsigned int mode) { d->markov_mode = mode; }
+
+void seq_parse_midi(sequencer *s, unsigned int data1, unsigned int data2)
+{
+    printf("YA BEEZER, MIDI DRUM SEQUENCER!\n");
+
+    double scaley_val = 0.;
+    switch (data1) {
+    case 1:
+        scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        printf("Filter FREQ Control! %f\n", scaley_val);
+        s->m_fc_control = scaley_val;
+        break;
+    case 2:
+        scaley_val = scaleybum(1, 128, 1, 10, data2);
+        printf("Filter Q Control! %f\n", scaley_val);
+        s->m_q_control = scaley_val;
+        break;
+    case 3:
+        scaley_val = scaleybum(1, 128, 1, 6, data2);
+        printf("SWIIIiiing!! %f\n", scaley_val);
+        s->swing_setting = scaley_val;
+        break;
+    case 4:
+        scaley_val = scaleybum(1, 128, 0., 1., data2);
+        printf("Volume! %f\n", scaley_val);
+        s->vol = scaley_val;
+        break;
+    case 5:
+        scaley_val = scaleybum(0, 128, 0, 2000, data2);
+        printf("Delay Feedback Msec %f!\n", scaley_val);
+        s->m_delay_time_msec = scaley_val;
+        break;
+    case 6:
+        scaley_val = scaleybum(0, 128, 20, 100, data2);
+        printf("Delay Feedback Pct! %f\n", scaley_val);
+        s->m_feedback_pct = scaley_val;
+        break;
+    case 7:
+        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+        printf("Delay Ratio! %f\n", scaley_val);
+        s->m_delay_ratio = scaley_val;
+        break;
+    case 8:
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        printf("DELAY Wet mix %f!\n", scaley_val);
+        s->m_wet_mix = scaley_val;
+        break;
+    case 9: // PAD 5
+        printf("Toggle Delay Mode!\n");
+        s->m_delay_mode = (++s->m_delay_mode) % MAX_NUM_DELAY_MODE; 
+        break;
+    default:
+        break;
+    }
+}

@@ -1,7 +1,9 @@
 #ifndef SEQUENCER_H
 #define SEQUENCER_H
 
+#include "filter_moogladder.h"
 #include "sound_generator.h"
+#include "stereodelay.h"
 #include <sndfile.h>
 #include <stdbool.h>
 #include <wchar.h>
@@ -27,7 +29,6 @@ typedef struct sequencer {
     char *filename;
     int samplerate;
     int channels;
-    double vol;
 
     int *buffer;
     int bufsize;
@@ -46,7 +47,6 @@ typedef struct sequencer {
     int tick;
     bool tickedyet;
     int swing;
-    int swing_setting;
 
     bool started; // to sync at top of loop
 
@@ -58,6 +58,21 @@ typedef struct sequencer {
     int markov_generation;
 
     int max_generation; // used for game of life or markov chain
+
+    stereodelay m_delay_fx;
+    // midi - top row
+    double m_fc_control;
+    double m_q_control;
+    int swing_setting;
+    double vol;
+    filter_moogladder m_filter;
+    // midi - bottom row, mode 1
+    double m_delay_time_msec;
+    double m_feedback_pct;
+    double m_delay_ratio;
+    double m_wet_mix;
+    unsigned int m_delay_mode; // pad5 button
+
 } sequencer;
 
 sequencer *new_seq(char *filename);
@@ -102,5 +117,7 @@ void seq_set_markov(sequencer *d, bool on);
 void seq_set_markov_mode(sequencer *d, unsigned int mode);
 void seq_set_backup_mode(sequencer *d, bool on);
 void seq_set_max_generations(sequencer *d, int max);
+
+void seq_parse_midi(sequencer *d, unsigned int data1, unsigned int data2);
 
 #endif // SEQUENCER_H

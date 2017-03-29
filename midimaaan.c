@@ -86,6 +86,13 @@ void *midiman()
                     }
                     }
                 }
+                else if (mixr->midi_control_destination == MIDISEQUENCER) {
+                    printf("SEQUENCER MIDI CONTROL!\n");
+                    sequencer *s = 
+                        (sequencer *) mixr
+                        ->sound_generators[mixr->active_midi_soundgen_num];
+                    seq_parse_midi(s, data1, data2);
+                }
                 else if (mixr->midi_control_destination == MIDISPORK) {
                     printf("MIDI CONTROLS! SPORK\n");
                     spork *s =

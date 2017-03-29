@@ -160,7 +160,9 @@ void interpret(char *line)
 
             if (is_valid_file(wurds[1])) {
                 char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
-                add_seq_char_pattern(mixr, wurds[1], pattern);
+                int sgnum = add_seq_char_pattern(mixr, wurds[1], pattern);
+                mixr->midi_control_destination = MIDISEQUENCER;
+                mixr->active_midi_soundgen_num = sgnum;
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
@@ -180,6 +182,12 @@ void interpret(char *line)
                         if (is_valid_seq_pattern_num(d, pattern_num)) {
                             seq_set_random_sample_amp(d, pattern_num);
                         }
+                    }
+                    else if (strncmp("midi", wurds[2], 4) == 0)
+                    {
+                        printf("MIDI goes to Da Winner .. Sequencer %d\n", soundgen_num);
+                        mixr->midi_control_destination = MIDISEQUENCER;
+                        mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {

@@ -673,7 +673,6 @@ double minisynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    // TODO delay
     stereo_delay_process_audio(&ms->m_delay_fx, &accum_out_left,
                                &accum_out_left, &accum_out_left,
                                &accum_out_right);
