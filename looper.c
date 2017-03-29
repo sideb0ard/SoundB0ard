@@ -6,155 +6,155 @@
 
 #include "defjams.h"
 #include "mixer.h"
-#include "sampler.h"
+#include "looper.h"
 
 extern mixer *mixr;
 
-SAMPLER *new_sampler(char *filename, double loop_len)
+looper *new_looper(char *filename, double loop_len)
 {
-    SAMPLER *sampler = (SAMPLER *)calloc(1, sizeof(SAMPLER));
-    sampler->vol = 0.7;
-    sampler->started = false;
-    sampler->just_been_resampled = false;
+    looper *l = (looper *)calloc(1, sizeof(looper));
+    l->vol = 0.7;
+    l->started = false;
+    l->just_been_resampled = false;
 
-    sampler_add_sample(sampler, filename, loop_len);
+    looper_add_sample(l, filename, loop_len);
 
-    sampler->scramblrrr = sampler_create_sample("none", loop_len);
+    l->scramblrrr = looper_create_sample("none", loop_len);
 
-    sampler->sound_generator.gennext = &sampler_gennext;
-    sampler->sound_generator.status = &sampler_status;
-    sampler->sound_generator.getvol = &sampler_getvol;
-    sampler->sound_generator.setvol = &sampler_setvol;
-    sampler->sound_generator.type = SAMPLER_TYPE;
+    l->sound_generator.gennext = &looper_gennext;
+    l->sound_generator.status = &looper_status;
+    l->sound_generator.getvol = &looper_getvol;
+    l->sound_generator.setvol = &looper_setvol;
+    l->sound_generator.type = LOOPER_TYPE;
 
     for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++) {
-        sampler->sample_num_loops[i] = 1;
+        l->sample_num_loops[i] = 1;
     }
 
-    return sampler;
+    return l;
 }
 
-double sampler_gennext(void *self)
-// void sampler_gennext(void* self, double* frame_vals, int framesPerBuffer)
+double looper_gennext(void *self)
+// void looper_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
-    SAMPLER *sampler = (SAMPLER *)self;
+    looper *l = (looper *)self;
     double val = 0;
 
     // wait till start of loop to keep patterns synched
-    if (!sampler->started) {
+    if (!l->started) {
         if (mixr->sixteenth_note_tick % 16 == 0) {
-            sampler->started = true;
+            l->started = true;
         }
         else {
             return val;
         }
     }
 
-    if (sampler->stutter_mode &&
-        (mixr->cur_sample % (sampler->scramblrrr->resampled_file_size / 16) ==
+    if (l->stutter_mode &&
+        (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) ==
          0)) {
         if (mixr->debug_mode)
             printf("Stutututututter! Current: %d\n",
-                   sampler->stutter_current_16th);
+                   l->stutter_current_16th);
         if (rand() % 100 > 60) {
             if (mixr->debug_mode)
                 printf("Advancing stutter 16th..\n");
-            sampler->stutter_current_16th++;
-            if (sampler->stutter_current_16th == 16) {
-                sampler->stutter_current_16th = 0;
-                sampler->stutter_generation++;
-                if (sampler->max_generation != 0 &&
-                    sampler->stutter_generation == sampler->max_generation) {
+            l->stutter_current_16th++;
+            if (l->stutter_current_16th == 16) {
+                l->stutter_current_16th = 0;
+                l->stutter_generation++;
+                if (l->max_generation != 0 &&
+                    l->stutter_generation == l->max_generation) {
                     printf("Max stutter reached - resettinggggzz..\n");
-                    sampler->stutter_generation = 0;
-                    sampler->max_generation = 0;
-                    sampler->stutter_mode = false;
+                    l->stutter_generation = 0;
+                    l->max_generation = 0;
+                    l->stutter_mode = false;
                 }
             }
         }
     }
 
-    if (sampler->scramblrrr_mode &&
-        (mixr->cur_sample % (sampler->scramblrrr->resampled_file_size * 4) ==
+    if (l->scramblrrr_mode &&
+        (mixr->cur_sample % (l->scramblrrr->resampled_file_size * 4) ==
          0)) {
-        sampler_scramble(sampler);
+        looper_scramble(l);
     }
 
     // resync after a resample/resize
-    if (sampler->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
+    if (l->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
         printf("Resyncing after resample...zzzz\n");
-        sampler->samples[sampler->cur_sample]->position = 0;
-        sampler->scramblrrr->position = 0;
-        sampler->just_been_resampled = false;
+        l->samples[l->cur_sample]->position = 0;
+        l->scramblrrr->position = 0;
+        l->just_been_resampled = false;
     }
 
-    if (sampler->samples[sampler->cur_sample]->position == 0) {
+    if (l->samples[l->cur_sample]->position == 0) {
 
-        if (sampler->multi_sample_mode) {
-            sampler->cur_sample_iteration--;
-            if (sampler->cur_sample_iteration == 0) {
-                sampler->cur_sample =
-                    (sampler->cur_sample + 1) % sampler->num_samples;
-                sampler->cur_sample_iteration =
-                    sampler->sample_num_loops[sampler->cur_sample];
+        if (l->multi_sample_mode) {
+            l->cur_sample_iteration--;
+            if (l->cur_sample_iteration == 0) {
+                l->cur_sample =
+                    (l->cur_sample + 1) % l->num_samples;
+                l->cur_sample_iteration =
+                    l->sample_num_loops[l->cur_sample];
             }
         }
     }
 
-    if (sampler->stutter_mode) {
-        int len16th = sampler->scramblrrr->resampled_file_size / 16;
+    if (l->stutter_mode) {
+        int len16th = l->scramblrrr->resampled_file_size / 16;
         int stutidx =
-            (sampler->samples[sampler->cur_sample]->position % len16th) +
-            sampler->stutter_current_16th * len16th;
-        val = sampler->samples[sampler->cur_sample]
+            (l->samples[l->cur_sample]->position % len16th) +
+            l->stutter_current_16th * len16th;
+        val = l->samples[l->cur_sample]
                   ->resampled_file_bytes[stutidx];
-        sampler->samples[sampler->cur_sample]->position++;
+        l->samples[l->cur_sample]->position++;
     }
-    else if (sampler->scramblrrr_mode) {
-        val = sampler->scramblrrr
-                  ->resampled_file_bytes[sampler->scramblrrr->position++];
-        sampler->samples[sampler->cur_sample]
+    else if (l->scramblrrr_mode) {
+        val = l->scramblrrr
+                  ->resampled_file_bytes[l->scramblrrr->position++];
+        l->samples[l->cur_sample]
             ->position++; // keep increasing normal sample
     }
     else {
-        val = sampler->samples[sampler->cur_sample]->resampled_file_bytes
-                  [sampler->samples[sampler->cur_sample]->position++];
+        val = l->samples[l->cur_sample]->resampled_file_bytes
+                  [l->samples[l->cur_sample]->position++];
     }
 
-    if (sampler->scramblrrr->position ==
-        sampler->scramblrrr->resampled_file_size) {
-        sampler->scramblrrr->position = 0;
+    if (l->scramblrrr->position ==
+        l->scramblrrr->resampled_file_size) {
+        l->scramblrrr->position = 0;
     }
 
-    if (sampler->samples[sampler->cur_sample]->position ==
-        sampler->samples[sampler->cur_sample]->resampled_file_size) {
-        sampler->samples[sampler->cur_sample]->position = 0;
+    if (l->samples[l->cur_sample]->position ==
+        l->samples[l->cur_sample]->resampled_file_size) {
+        l->samples[l->cur_sample]->position = 0;
     }
 
     if (val > 1 || val < -1)
-        printf("BURNIE - SAMPLER OVERLOAD!\n");
+        printf("BURNIE - looper OVERLOAD!\n");
 
-    val = effector(&sampler->sound_generator, val);
-    val = envelopor(&sampler->sound_generator, val);
+    val = effector(&l->sound_generator, val);
+    val = envelopor(&l->sound_generator, val);
 
-    return val * sampler->vol;
+    return val * l->vol;
 }
 
-void sampler_add_sample(SAMPLER *s, char *filename, int loop_len)
+void looper_add_sample(looper *s, char *filename, int loop_len)
 {
-    printf("SAMPLER!, adding a new SAMPLE!\n");
+    printf("looper!, adding a new SAMPLE!\n");
 
     if (s->num_samples > MAX_SAMPLES_PER_LOOPER) {
         printf("Already have max num samples\n");
         return;
     }
 
-    file_sample *fs = sampler_create_sample(filename, loop_len);
+    file_sample *fs = looper_create_sample(filename, loop_len);
     s->samples[s->num_samples++] = fs;
     printf("done adding SAMPLE\n");
 }
 
-file_sample *sampler_create_sample(char *filename, int loop_len)
+file_sample *looper_create_sample(char *filename, int loop_len)
 {
     file_sample *fs = (file_sample *)calloc(1, sizeof(file_sample));
     sample_set_file_name(fs, filename);
@@ -215,25 +215,25 @@ void sample_import_file_contents(file_sample *fs, char *filename)
     fs->channels = sf_info.channels;
 }
 
-void sampler_resample_to_loop_size(SAMPLER *s)
+void looper_resample_to_loop_size(looper *l)
 {
-    for (int i = 0; i < s->num_samples; i++) {
-        sample_resample_to_loop_size(s->samples[i]);
+    for (int i = 0; i < l->num_samples; i++) {
+        sample_resample_to_loop_size(l->samples[i]);
     }
-    sample_resample_to_loop_size(s->scramblrrr);
-    s->just_been_resampled = true;
+    sample_resample_to_loop_size(l->scramblrrr);
+    l->just_been_resampled = true;
 }
 
-void sampler_change_loop_len(SAMPLER *s, int sample_num, int loop_len)
+void looper_change_loop_len(looper *l, int sample_num, int loop_len)
 {
-    if (loop_len > 0 && sample_num < s->num_samples) {
-        file_sample *fs = s->samples[sample_num];
+    if (loop_len > 0 && sample_num < l->num_samples) {
+        file_sample *fs = l->samples[sample_num];
 
         fs->loop_len = loop_len;
         sample_resample_to_loop_size(fs);
 
-        s->scramblrrr->loop_len = loop_len;
-        sample_resample_to_loop_size(s->scramblrrr);
+        l->scramblrrr->loop_len = loop_len;
+        sample_resample_to_loop_size(l->scramblrrr);
     }
 }
 
@@ -247,7 +247,7 @@ void sample_resample_to_loop_size(file_sample *fs)
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
     if (resampled_file_bytes == NULL) {
-        printf("Memory barf in sampler resample\n");
+        printf("Memory barf in looper resample\n");
         return;
     }
 
@@ -280,7 +280,7 @@ void sample_resample_to_loop_size(file_sample *fs)
             resampled_file_bytes[i] = val / 2147483648.0;
         }
 
-        // pthread_mutex_lock(&sampler->resample_mutex);
+        // pthread_mutex_lock(&looper->resample_mutex);
         bool is_previous_buffer =
             fs->resampled_file_bytes != NULL ? true : false;
         if (is_previous_buffer) {
@@ -295,68 +295,68 @@ void sample_resample_to_loop_size(file_sample *fs)
 
     fs->resampled_file_bytes = resampled_file_bytes;
     fs->resampled_file_size = loop_len_in_samples;
-    // pthread_mutex_unlock(&sampler->resample_mutex);
+    // pthread_mutex_unlock(&looper->resample_mutex);
 }
 
-void sampler_status(void *self, wchar_t *status_string)
+void looper_status(void *self, wchar_t *status_string)
 {
-    SAMPLER *sampler = (SAMPLER *)self;
+    looper *l = (looper *)self;
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
              "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
              "ScramblrrrMode: %s ScrambleGen: %d StutterMode: %s "
              "Stutter Gen: %d MaxGen: %d",
-             sampler->vol, sampler->multi_sample_mode ? "true" : "false",
-             sampler->cur_sample, sampler->scramblrrr_mode ? "true" : "false",
-             sampler->scramble_generation,
-             sampler->stutter_mode ? "true" : "false",
-             sampler->stutter_generation, sampler->max_generation);
+             l->vol, l->multi_sample_mode ? "true" : "false",
+             l->cur_sample, l->scramblrrr_mode ? "true" : "false",
+             l->scramble_generation,
+             l->stutter_mode ? "true" : "false",
+             l->stutter_generation, l->max_generation);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
-    for (int i = 0; i < sampler->num_samples; i++) {
+    for (int i = 0; i < l->num_samples; i++) {
         swprintf(looper_details, 128,
                  L"\n      [%d] %s - looplen: %d numloops: %d", i,
-                 basename(sampler->samples[i]->filename),
-                 sampler->samples[i]->loop_len, sampler->sample_num_loops[i]);
+                 basename(l->samples[i]->filename),
+                 l->samples[i]->loop_len, l->sample_num_loops[i]);
         wcslcat(status_string, looper_details, strlen_left);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-void sampler_set_multi_sample_mode(SAMPLER *s, bool multi)
+void looper_set_multi_sample_mode(looper *s, bool multi)
 {
     s->multi_sample_mode = multi;
     s->cur_sample_iteration = s->sample_num_loops[s->cur_sample];
 }
 
-void sampler_switch_sample(SAMPLER *s, int sample_num)
+void looper_switch_sample(looper *s, int sample_num)
 {
     if (sample_num < s->num_samples)
         s->cur_sample = sample_num;
 }
 
-double sampler_getvol(void *self)
+double looper_getvol(void *self)
 {
-    SAMPLER *sampler = (SAMPLER *)self;
-    return sampler->vol;
+    looper *l = (looper *)self;
+    return l->vol;
 }
 
-void sampler_setvol(void *self, double v)
+void looper_setvol(void *self, double v)
 {
-    SAMPLER *sampler = (SAMPLER *)self;
+    looper *l = (looper *)self;
     if (v < 0.0 || v > 1.0) {
         return;
     }
-    sampler->vol = v;
+    l->vol = v;
 }
 
-void sampler_change_num_loops(SAMPLER *s, int sample_num, int num_loops)
+void looper_change_num_loops(looper *s, int sample_num, int num_loops)
 {
     if (sample_num < s->num_samples && num_loops > 0) {
         s->sample_num_loops[sample_num] = num_loops;
     }
 }
 
-void sampler_set_scramble_mode(SAMPLER *s, bool b)
+void looper_set_scramble_mode(looper *s, bool b)
 {
     s->scramblrrr_mode = b;
     s->scramble_counter = 0;
@@ -368,22 +368,22 @@ void sampler_set_scramble_mode(SAMPLER *s, bool b)
                 s->samples[s->cur_sample]->resampled_file_bytes[i];
         s->scramblrrr->position = s->samples[s->cur_sample]->position;
     }
-    printf("Changed sampler scramblrrr mode to %s\n",
+    printf("Changed looper scramblrrr mode to %s\n",
            s->scramblrrr_mode ? "true" : "false");
 }
 
-void sampler_set_max_generation(SAMPLER *s, int max)
+void looper_set_max_generation(looper *s, int max)
 {
     s->max_generation = max;
 }
 
-void sampler_set_stutter_mode(SAMPLER *s, bool b)
+void looper_set_stutter_mode(looper *s, bool b)
 {
     s->stutter_generation = 0;
     s->stutter_mode = b;
 }
 
-void sampler_scramble(SAMPLER *s)
+void looper_scramble(looper *s)
 {
     s->scramble_generation++;
 

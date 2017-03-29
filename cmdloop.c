@@ -27,7 +27,6 @@
 #include "mixer.h"
 #include "obliquestrategies.h"
 #include "oscillator.h"
-#include "sampler.h"
 #include "sparkline.h"
 #include "table.h"
 #include "utils.h"
@@ -304,69 +303,69 @@ void interpret(char *line)
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {
                 int loop_len = atoi(wurds[2]);
                 if (loop_len > 0) {
-                    add_sampler(mixr, wurds[1], loop_len);
+                    add_looper(mixr, wurds[1], loop_len);
                 }
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type ==
-                        SAMPLER_TYPE) {
+                        LOOPER_TYPE) {
 
-                    SAMPLER *s =
-                        (SAMPLER *)mixr->sound_generators[soundgen_num];
+                    looper *s =
+                        (looper *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 6) == 0) {
                         if (is_valid_file(wurds[3]) ||
                             strncmp(wurds[3], "none", 4) == 0) {
                             int loop_len = atoi(wurds[4]);
                             if (loop_len > 0) {
-                                sampler_add_sample(s, wurds[3], loop_len);
+                                looper_add_sample(s, wurds[3], loop_len);
                             }
                         }
                     }
                     else if (strncmp("scramble", wurds[2], 8) == 0) {
                         if (strncmp(wurds[3], "true", 4) == 0)
-                            sampler_set_scramble_mode(s, true);
+                            looper_set_scramble_mode(s, true);
                         else if (strncmp(wurds[3], "false", 5) == 0)
-                            sampler_set_scramble_mode(s, false);
+                            looper_set_scramble_mode(s, false);
                         else {
                             int max_gen = atoi(wurds[3]);
                             if (max_gen > 0) {
-                                sampler_set_max_generation(s, max_gen);
-                                sampler_set_scramble_mode(s, true);
+                                looper_set_max_generation(s, max_gen);
+                                looper_set_scramble_mode(s, true);
                             }
                             else {
                                 printf("Toggling scramble..\n");
                                 int new_mode = 1 - s->scramblrrr_mode;
-                                sampler_set_scramble_mode(s, new_mode);
+                                looper_set_scramble_mode(s, new_mode);
                             }
                         }
                     }
                     else if (strncmp("stutter", wurds[2], 7) == 0) {
                         if (strncmp(wurds[3], "true", 4) == 0)
-                            sampler_set_stutter_mode(s, true);
+                            looper_set_stutter_mode(s, true);
                         else if (strncmp(wurds[3], "false", 5) == 0)
-                            sampler_set_stutter_mode(s, false);
+                            looper_set_stutter_mode(s, false);
                         else {
                             int max_gen = atoi(wurds[3]);
                             if (max_gen > 0) {
-                                sampler_set_max_generation(s, max_gen);
-                                sampler_set_stutter_mode(s, true);
+                                looper_set_max_generation(s, max_gen);
+                                looper_set_stutter_mode(s, true);
                             }
                             else {
                                 printf("Toggling sTUTTER..\n");
                                 int new_mode = 1 - s->stutter_mode;
-                                sampler_set_stutter_mode(s, new_mode);
+                                looper_set_stutter_mode(s, new_mode);
                             }
                         }
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
-                            sampler_set_multi_sample_mode(s, true);
+                            looper_set_multi_sample_mode(s, true);
                         }
                         else if (strncmp("false", wurds[3], 5) == 0) {
-                            sampler_set_multi_sample_mode(s, false);
+                            looper_set_multi_sample_mode(s, false);
                         }
                         printf("Sampler multi mode : %s\n",
                                s->multi_sample_mode ? "true" : "false");
@@ -376,12 +375,12 @@ void interpret(char *line)
                         if (is_valid_sample_num(s, sample_num)) {
                             if (strncmp("looplen", wurds[4], 8) == 0) {
                                 int looplen = atoi(wurds[5]);
-                                sampler_change_loop_len(s, sample_num, looplen);
+                                looper_change_loop_len(s, sample_num, looplen);
                             }
                             else if (strncmp("numloops", wurds[4], 8) == 0) {
                                 int numloops = atoi(wurds[5]);
                                 if (numloops != 0) {
-                                    sampler_change_num_loops(s, sample_num,
+                                    looper_change_num_loops(s, sample_num,
                                                              numloops);
                                 }
                             }
@@ -389,7 +388,7 @@ void interpret(char *line)
                     }
                     else if (strncmp("switch", wurds[2], 6) == 0) {
                         int sample_num = atoi(wurds[3]);
-                        sampler_switch_sample(s, sample_num);
+                        looper_switch_sample(s, sample_num);
                     }
                 }
             }
@@ -878,7 +877,7 @@ bool is_valid_soundgen_num(int soundgen_num)
     return false;
 }
 
-bool is_valid_sample_num(SAMPLER *s, int sample_num)
+bool is_valid_sample_num(looper *s, int sample_num)
 {
     if (sample_num < s->num_samples) {
         return true;

@@ -70,7 +70,7 @@ typedef enum { UP, DOWN } direction;
 
 typedef enum {
     SYNTH_TYPE,
-    SAMPLER_TYPE,
+    LOOPER_TYPE,
     BITWIZE_TYPE,
     DRUM_TYPE,
     ALGORITHM_TYPE,
@@ -79,4 +79,4 @@ typedef enum {
 } sound_generator_type;
 
 typedef enum { MONO, LEGATO } legato_mode;
-typedef enum { NONE, SYNTH, DELAYFX, MIDISPORK, MIDISEQUENCER, MIDISAMPLER } midi_control_type;
+typedef enum { NONE, SYNTH, DELAYFX, MIDISPORK, MIDISEQUENCER, MIDILOOPER } midi_control_type;

@@ -19,7 +19,7 @@
 #include "envelope.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "sampler.h"
+#include "looper.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
 #include "spork.h"
@@ -108,8 +108,8 @@ void mixer_update_bpm(mixer *mixr, int bpm)
         for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
             update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
         }
-        if (mixr->sound_generators[i]->type == SAMPLER_TYPE) {
-            sampler_resample_to_loop_size((SAMPLER *)mixr->sound_generators[i]);
+        if (mixr->sound_generators[i]->type == LOOPER_TYPE) {
+            looper_resample_to_loop_size((looper *)mixr->sound_generators[i]);
         }
     }
 }
@@ -302,15 +302,15 @@ int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
     return add_sound_generator(mixr, (SOUNDGEN *)ndrum);
 }
 
-int add_sampler(mixer *mixr, char *filename, double loop_len)
+int add_looper(mixer *mixr, char *filename, double loop_len)
 {
-    printf("ADD SAMPLER - LOOP LEN %f\n", loop_len);
-    SAMPLER *nsampler = new_sampler(filename, loop_len);
-    if (nsampler == NULL) {
-        printf("Barfed on sampler creation\n");
+    printf("ADD looper - LOOP LEN %f\n", loop_len);
+    looper *l = new_looper(filename, loop_len);
+    if (l == NULL) {
+        printf("Barfed on looper creation\n");
         return -1;
     }
-    return add_sound_generator(mixr, (SOUNDGEN *)nsampler);
+    return add_sound_generator(mixr, (SOUNDGEN *)l);
 }
 
 double mixer_gennext(mixer *mixr)

@@ -46,7 +46,7 @@ OBJ = \
 	oscillator.o \
 	qblimited_oscillator.o \
 	reverb.o \
-	sampler.o \
+	looper.o \
 	sbmsg.o \
 	sparkline.o \
 	spork.o \

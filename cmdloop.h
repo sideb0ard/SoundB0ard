@@ -1,7 +1,7 @@
 #pragma once
 #include "drumr.h"
 #include "minisynth.h"
-#include "sampler.h"
+#include "looper.h"
 #include <stdbool.h>
 
 #define SIZE_OF_WURD 41 // 40 char word plus terminator
@@ -20,7 +20,7 @@ void char_array_to_string_sequence(char *dest_pattern,
                                    char char_array[NUM_WURDS][SIZE_OF_WURD],
                                    int start, int end);
 bool is_valid_soundgen_num(int soundgen_num);
-bool is_valid_sample_num(SAMPLER *s, int sample_num);
+bool is_valid_sample_num(looper *s, int sample_num);
 bool is_valid_melody_num(minisynth *ns, int melody_num);
 bool is_valid_drum_pattern_num(DRUM *d, int pattern_num);
 bool is_valid_fx_num(int soundgen_num, int fx_num);
