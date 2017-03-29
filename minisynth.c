@@ -50,7 +50,8 @@ minisynth *new_minisynth(void)
     ms->m_eg1_osc_intensity = 0.0;
     ms->m_eg1_filter_intensity = 0.0;
     ms->m_lfo1_filter_fc_intensity = 0.0;
-    ms->m_sustain_level = 0.510000;
+    // ms->m_sustain_level = 0.510000;
+    ms->m_sustain_level = 0.9;
     ms->m_noise_osc_db = -96.000000;
     ms->m_lfo1_amp_intensity = 0.0;
     ms->m_lfo1_pan_intensity = 0.0;
@@ -680,7 +681,7 @@ double minisynth_gennext(void *self)
     accum_out_left = effector(&ms->sound_generator, accum_out_left);
     accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
 
-    return accum_out_left * ms->vol;
+    return accum_out_left * ms->m_volume_db;
 }
 
 midi_event **minisynth_get_midi_loop(minisynth *self)

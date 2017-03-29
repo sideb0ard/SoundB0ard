@@ -861,7 +861,7 @@ m_input_lpf_g	reverb.h	/^    double m_input_lpf_g;        \/\/ k5$/;"	m	struct:r
 m_interval	beatrepeat.h	/^    unsigned int m_interval;$/;"	m	struct:beatrepeat
 m_k	filter_ckthreefive.h	/^    double m_k;$/;"	m	struct:filter_ckthreefive
 m_k	filter_moogladder.h	/^    double m_k;$/;"	m	struct:filter_moogladder
-m_key_controller_mode	mixer.h	/^    unsigned int m_key_controller_mode; \/\/ to switch key control routing$/;"	m	struct:t_mixer
+m_key_controller_mode	mixer.h	/^    unsigned int m_key_controller_mode;  \/\/ to switch key control routing$/;"	m	struct:t_mixer
 m_last_note_frequency	minisynth.h	/^    double m_last_note_frequency;$/;"	m	struct:minisynth
 m_left_delay	stereodelay.h	/^    delayline m_left_delay, m_right_delay;$/;"	m	struct:stereodelay
 m_legato_mode	envelope_generator.h	/^    bool m_legato_mode;$/;"	m	struct:envelope_generator
