@@ -69,6 +69,19 @@
 typedef enum { UP, DOWN } direction;
 
 typedef enum {
+    MIDI_KNOB_MODE_ONE,
+    MIDI_KNOB_MODE_TWO,
+    MIDI_KNOB_MODE_THREE,
+    MAX_NUM_KNOB_MODES,
+} midi_mode; // to switch control knob routing
+
+typedef enum {
+    KEY_MODE_ONE,
+    KEY_MODE_TWO,
+    MAX_NUM_KEY_MODES,
+} key_mode; // to switch key control routing
+
+typedef enum {
     SYNTH_TYPE,
     LOOPER_TYPE,
     BITWIZE_TYPE,

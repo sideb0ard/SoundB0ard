@@ -61,8 +61,9 @@ typedef struct minisynth {
     int sustain;
 
     bool recording;
+    unsigned int m_midi_knob_mode; // midi routings, 1..3
 
-    float vol;
+    //float vol;
 
     // end SOUNDGEN stuff
 

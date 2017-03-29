@@ -15,18 +15,6 @@ typedef struct environment_variable {
     int val;
 } env_var;
 
-typedef enum {
-    MIDI_MODE_ONE,
-    MIDI_MODE_TWO,
-    MAX_NUM_MIDI_MODES,
-} midi_mode; // to switch control knob routing
-
-typedef enum {
-    KEY_MODE_ONE,
-    KEY_MODE_TWO,
-    MAX_NUM_KEY_MODES,
-} key_mode; // to switch key control routing
-
 typedef struct t_mixer {
 
     SOUNDGEN **sound_generators;

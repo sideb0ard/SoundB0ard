@@ -114,10 +114,11 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     }
 }
 
+// TODO - this has moved to minisynth
 void mixer_toggle_midi_mode(mixer *mixr)
 {
     mixr->m_midi_controller_mode =
-        ++(mixr->m_midi_controller_mode) % MAX_NUM_MIDI_MODES;
+        ++(mixr->m_midi_controller_mode) % MAX_NUM_KNOB_MODES;
 }
 
 void mixer_toggle_key_mode(mixer *mixr)
