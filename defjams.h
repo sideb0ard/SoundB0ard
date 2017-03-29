@@ -66,8 +66,6 @@
 #define WCOOL_COLOR_PINK L"\x1b[38;5;200m"
 #define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
 
-typedef enum { OFF, ON } onoff;
-
 typedef enum { UP, DOWN } direction;
 
 typedef enum {
@@ -81,7 +79,4 @@ typedef enum {
 } sound_generator_type;
 
 typedef enum { MONO, LEGATO } legato_mode;
-
-// typedef enum { SINE, TRI, SQUARE, SAW_U, SAW_D } wave_type;
-
-typedef enum { NONE, SYNTH, DELAYFX, MIDISPORK } midi_control_type;
+typedef enum { NONE, SYNTH, DELAYFX, MIDISPORK, MIDISEQUENCER, MIDISAMPLER } midi_control_type;

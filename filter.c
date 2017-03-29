@@ -14,7 +14,7 @@ void filter_setup(filter *f)
 
     f->m_fc_mod = 0.0;
     f->m_aux_control = 0.0;
-    f->m_nlp = OFF;
+    f->m_nlp = 0;
     f->m_saturation = 1.0;
 
     f->m_v_modmatrix = NULL;

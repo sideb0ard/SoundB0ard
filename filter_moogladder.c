@@ -159,7 +159,7 @@ double moog_gennext(filter *f, double xn)
     xn *= 1.0 + f->m_aux_control * moog->m_k;
 
     double u = (xn - moog->m_k * sigma) * moog->m_alpha_0;
-    if (f->m_nlp == ON) {
+    if (f->m_nlp) {
         u = fasttanh(f->m_saturation * u);
     }
 

@@ -103,7 +103,7 @@ double ck_gennext(filter *f, double xn)
         double u = ck35->m_alpha0 * (y1 + S35);
         // printf("U! %f\n", u);
 
-        if (f->m_nlp == ON)
+        if (f->m_nlp)
             u = tanh(f->m_saturation * u);
 
         y = ck35->m_k * onepole_gennext((filter *)&ck35->m_LPF2, u);
@@ -120,7 +120,7 @@ double ck_gennext(filter *f, double xn)
         double u = ck35->m_alpha0 * y1 + S35;
         y = ck35->m_k * u;
 
-        if (f->m_nlp == ON)
+        if (f->m_nlp)
             y = tanh(f->m_saturation * y);
 
         onepole_gennext((filter *)&ck35->m_LPF1,

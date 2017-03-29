@@ -69,7 +69,7 @@ double sem_gennext(filter *f, double xn)
 
     double bpf = cs->m_alpha * hpf + cs->m_z11;
 
-    if (f->m_nlp == ON)
+    if (f->m_nlp)
         bpf = tanh(f->m_saturation * bpf);
 
     double lpf = cs->m_alpha * bpf + cs->m_z12;
