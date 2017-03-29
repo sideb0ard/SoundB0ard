@@ -1,6 +1,6 @@
 #include "minisynth_voice.h"
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 minisynth_voice *new_minisynth_voice(void)
 {

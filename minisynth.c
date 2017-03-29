@@ -301,63 +301,67 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
                             unsigned int data2)
 {
     double scaley_val;
-    //switch (mixr->m_midi_controller_mode) {
-    //case MIDI_MODE_ONE:
+    // switch (mixr->m_midi_controller_mode) {
+    // case MIDI_MODE_ONE:
     switch (data1) {
-    case 9: 
-        ms->m_lfo1_waveform = (++ms->m_lfo1_waveform)% MAX_LFO_OSC;
-        printf("LFO! Mode Toggle: %d MaxLFO: %d\n", ms->m_lfo1_waveform, MAX_LFO_OSC);
+    case 9:
+        ms->m_lfo1_waveform = (++ms->m_lfo1_waveform) % MAX_LFO_OSC;
+        printf("LFO! Mode Toggle: %d MaxLFO: %d\n", ms->m_lfo1_waveform,
+               MAX_LFO_OSC);
         break;
-    case 10: 
-        ms->m_voice_mode = ( ++ms->m_voice_mode)% 5;
+    case 10:
+        ms->m_voice_mode = (++ms->m_voice_mode) % 5;
         printf("Voice! Mode Toggle - %ls\n", s_mode_names[ms->m_voice_mode]);
         break;
-    case 11: 
+    case 11:
         ms->m_legato_mode = 1 - ms->m_legato_mode;
         printf("Legato! Mode %d\n", ms->m_legato_mode);
         break;
-    case 12: 
+    case 12:
         ms->m_reset_to_zero = 1 - ms->m_reset_to_zero;
         printf("Reset To Zero! Mode\n");
         break;
-    case 13: 
+    case 13:
         ms->m_filter_keytrack = 1 - ms->m_filter_keytrack;
         printf("Filter Keytrack! Mode\n");
         break;
-    case 14: 
+    case 14:
         ms->m_velocity_to_attack_scaling = 1 - ms->m_velocity_to_attack_scaling;
-        printf("Velocity To Attack! Mode %d\n", ms->m_velocity_to_attack_scaling);
+        printf("Velocity To Attack! Mode %d\n",
+               ms->m_velocity_to_attack_scaling);
         break;
-    case 15: 
-        ms->m_note_number_to_decay_scaling = 1 - ms->m_note_number_to_decay_scaling;
-        printf("Note To Decay Scaling! Mode %d\n", ms->m_note_number_to_decay_scaling);
+    case 15:
+        ms->m_note_number_to_decay_scaling =
+            1 - ms->m_note_number_to_decay_scaling;
+        printf("Note To Decay Scaling! Mode %d\n",
+               ms->m_note_number_to_decay_scaling);
         break;
-    case 16: 
+    case 16:
         printf("Toggle! MIDI Mode\n");
         break;
     /// BANK B on MPK Mini MKII
-    case 17: 
+    case 17:
         printf("Delay Mode! Mode\n");
         break;
-    case 18: 
+    case 18:
         printf("Sustain Override! Mode\n");
         break;
-    case 19: 
+    case 19:
         printf("19! \n");
         break;
-    case 20: 
+    case 20:
         printf("20! Mode\n");
         break;
-    case 21: 
+    case 21:
         printf("21! MIDI Mode\n");
         break;
-    case 22: 
+    case 22:
         printf("22! MIDI Mode\n");
         break;
-    case 23: 
+    case 23:
         printf("23! MIDI Mode\n");
         break;
-    case 24: 
+    case 24:
         printf("24! MIDI Mode\n");
         break;
     case 1: // K1 - Envelope Attack Time Msec
@@ -395,8 +399,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
     default:
         printf("DATANUM: %d\n", data1);
     }
-        //break;
-    //case MIDI_MODE_TWO:
+    // break;
+    // case MIDI_MODE_TWO:
     //    switch (data1) {
     //    case 1:
     //        scaley_val = scaleybum(1, 128, 0, 1000, data2);
@@ -688,12 +692,14 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
 {
     int tick = ev->tick;
     while (ms->melodies[ms->cur_melody][tick] != NULL) {
+        printf("GOtsz a tick already - bump!\n");
         tick++;
-        if (tick == PPNS)
+        if (tick == PPNS) // wrap around
             tick = 0;
     }
+    ev->tick = tick;
     if (mixr->debug_mode)
-        printf("Adding Event: Tick: %d Type: %s Midi: %d\n", ev->tick,
+        printf("Adding Event: Tick: %d Type: %s Midi: %d\n", tick,
                ev->event_type == 144 ? "NOTEON" : "NOTEOFF", ev->data1);
     ms->melodies[ms->cur_melody][tick] = ev;
 }

@@ -12,7 +12,7 @@ spork *new_spork()
     // LFO
     osc_new_settings((oscillator *)&s->m_lfo);
     lfo_set_soundgenerator_interface(&s->m_lfo);
-    
+
     // THREE OSC
     osc_new_settings(&s->m_osc1.osc);
     qb_set_soundgenerator_interface(&s->m_osc1);
@@ -29,11 +29,10 @@ spork *new_spork()
 
     filter_moog_init(&s->m_filter);
 
-
-    lfo_start_oscillator((oscillator*)&s->m_lfo);
-    qb_start_oscillator((oscillator*)&s->m_osc1);
-    qb_start_oscillator((oscillator*)&s->m_osc2);
-    qb_start_oscillator((oscillator*)&s->m_osc3);
+    lfo_start_oscillator((oscillator *)&s->m_lfo);
+    qb_start_oscillator((oscillator *)&s->m_osc1);
+    qb_start_oscillator((oscillator *)&s->m_osc2);
+    qb_start_oscillator((oscillator *)&s->m_osc3);
 
     s->sg.gennext = &spork_gennext;
     s->sg.status = &spork_status;
@@ -50,7 +49,7 @@ spork *new_spork()
 
 double spork_gennext(void *sg)
 {
-    spork *s = (spork*) sg;
+    spork *s = (spork *)sg;
 
     // LFOOOOOO
     osc_update(&s->m_lfo.osc, "SpoooooooOOOrkFO");
@@ -64,9 +63,9 @@ double spork_gennext(void *sg)
     osc_update((oscillator *)&s->m_osc2, "OSC2");
     s->m_osc3.osc.m_fo_mod = lfo_out;
     osc_update((oscillator *)&s->m_osc3, "OSC3");
-    double osc_out =  0.3 * qb_do_oscillate((oscillator *)&s->m_osc1, NULL)
-                    + 0.3 * qb_do_oscillate((oscillator *)&s->m_osc2, NULL)
-                    + 0.3 * qb_do_oscillate((oscillator *)&s->m_osc3, NULL);
+    double osc_out = 0.3 * qb_do_oscillate((oscillator *)&s->m_osc1, NULL) +
+                     0.3 * qb_do_oscillate((oscillator *)&s->m_osc2, NULL) +
+                     0.3 * qb_do_oscillate((oscillator *)&s->m_osc3, NULL);
 
     // FILTERRZZZ
     moog_update((filter *)&s->m_filter);
@@ -82,22 +81,20 @@ double spork_gennext(void *sg)
 
 void spork_status(void *self, wchar_t *ss)
 {
-    spork *s = (spork*) self;
-    swprintf(ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
-             "[SPORK] Vol: %.2lf\n", s->m_volume);
+    spork *s = (spork *)self;
+    swprintf(ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN "[SPORK] Vol: %.2lf\n",
+             s->m_volume);
     wcscat(ss, WANSI_COLOR_RESET);
 }
 
-
 double spork_getvol(void *self)
 {
-    spork *s = (spork*) self;
+    spork *s = (spork *)self;
     return s->m_volume;
 }
 
 void spork_setvol(void *self, double v)
 {
-    spork *s = (spork*) self;
+    spork *s = (spork *)self;
     s->m_volume = v;
 }
-

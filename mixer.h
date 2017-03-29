@@ -45,7 +45,7 @@ typedef struct t_mixer {
 
     unsigned int midi_control_destination;
     unsigned int m_midi_controller_mode; // to switch control knob routing
-    unsigned int m_key_controller_mode; // to switch key control routing
+    unsigned int m_key_controller_mode;  // to switch key control routing
 
     int active_midi_soundgen_num;
     int active_midi_soundgen_effect_num;

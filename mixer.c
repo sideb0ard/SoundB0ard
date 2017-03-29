@@ -21,8 +21,8 @@
 #include "mixer.h"
 #include "sampler.h"
 #include "sbmsg.h"
-#include "spork.h"
 #include "sound_generator.h"
+#include "spork.h"
 
 extern ENVSTREAM *ampstream;
 extern pthread_mutex_t midi_tick_lock;
@@ -218,39 +218,39 @@ int add_bitwize(mixer *mixr, int pattern)
     }
 
     printf("Added bitwize gen!\n");
-    return add_sound_generator(mixr, (SOUNDGEN*) new_bitw);
+    return add_sound_generator(mixr, (SOUNDGEN *)new_bitw);
 }
 
 int mixer_add_spork(mixer *mixr)
 {
     printf("Adding an SPORK, mo!\n");
     spork *s = new_spork();
-    return add_sound_generator(mixr, (SOUNDGEN*) s);
+    return add_sound_generator(mixr, (SOUNDGEN *)s);
 }
 
 int add_algorithm(char *line)
 {
     algorithm *a = new_algorithm(line);
-    return add_sound_generator(mixr, (SOUNDGEN*) a);
+    return add_sound_generator(mixr, (SOUNDGEN *)a);
 }
 
 int add_chaosmonkey()
 {
     chaosmonkey *cm = new_chaosmonkey();
-    return add_sound_generator(mixr, (SOUNDGEN*) cm);
+    return add_sound_generator(mixr, (SOUNDGEN *)cm);
 }
 
 int add_bytebeat(mixer *mixr, char *pattern)
 {
     bytebeat *b = new_bytebeat(pattern);
-    return add_sound_generator(mixr, (SOUNDGEN*)b);
+    return add_sound_generator(mixr, (SOUNDGEN *)b);
 }
 
 int add_minisynth(mixer *mixr)
 {
     printf("Adding a MINISYNTH!!...\n");
     minisynth *ms = new_minisynth();
-    return add_sound_generator(mixr, (SOUNDGEN*) ms);
+    return add_sound_generator(mixr, (SOUNDGEN *)ms);
 }
 
 int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
@@ -280,7 +280,7 @@ int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
         return -1;
     }
 
-    return add_sound_generator(mixr, (SOUNDGEN*)ndrum);
+    return add_sound_generator(mixr, (SOUNDGEN *)ndrum);
 }
 
 int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
@@ -299,7 +299,7 @@ int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
         printf("Barfed on drum creation\n");
         return -1;
     }
-    return add_sound_generator(mixr, (SOUNDGEN*) ndrum);
+    return add_sound_generator(mixr, (SOUNDGEN *)ndrum);
 }
 
 int add_sampler(mixer *mixr, char *filename, double loop_len)
@@ -310,7 +310,7 @@ int add_sampler(mixer *mixr, char *filename, double loop_len)
         printf("Barfed on sampler creation\n");
         return -1;
     }
-    return add_sound_generator(mixr, (SOUNDGEN*) nsampler);
+    return add_sound_generator(mixr, (SOUNDGEN *)nsampler);
 }
 
 double mixer_gennext(mixer *mixr)

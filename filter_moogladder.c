@@ -53,14 +53,14 @@ void moog_set_qcontrol(filter *f, double qcontrol)
 {
     filter_moog *self = (filter_moog *)f;
     self->m_k = (4.0) * (qcontrol - 1.0) / (10.0 - 1.0);
-    //printf("M_K: %f\n", self->m_k);
+    // printf("M_K: %f\n", self->m_k);
 }
 
 void moog_update(filter *f)
 {
     filter_update(f); // update base class
     filter_moog *moog = (filter_moog *)f;
-    moog->m_k = (4.0) * (f->m_q_control - 1.0)/(10.0 - 1.0);
+    moog->m_k = (4.0) * (f->m_q_control - 1.0) / (10.0 - 1.0);
 
     double wd = 2.0 * M_PI * f->m_fc;
     double T = 1.0 / SAMPLE_RATE;
@@ -168,9 +168,6 @@ double moog_gennext(filter *f, double xn)
     double LP3 = onepole_gennext((filter *)&moog->m_LPF3, LP2);
     double LP4 = onepole_gennext((filter *)&moog->m_LPF4, LP3);
 
-    return moog->m_a * u
-         + moog->m_b * LP1
-         + moog->m_c * LP2
-         + moog->m_d * LP3
-         + moog->m_e * LP4;
+    return moog->m_a * u + moog->m_b * LP1 + moog->m_c * LP2 + moog->m_d * LP3 +
+           moog->m_e * LP4;
 }

@@ -66,9 +66,6 @@ void *midiman()
                         int tick = mixr->tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
-                        // TODO - maybe something better than just add a tick?
-                        // perhaps 16 x ? or be able to add additional events to
-                        // a midiEvent
                         minisynth_add_event(ms, ev);
                     }
 
@@ -92,7 +89,8 @@ void *midiman()
                 else if (mixr->midi_control_destination == MIDISPORK) {
                     printf("MIDI CONTROLS! SPORK\n");
                     spork *s =
-                        (spork *) mixr->sound_generators[mixr->active_midi_soundgen_num];
+                        (spork *)mixr
+                            ->sound_generators[mixr->active_midi_soundgen_num];
                     spork_parse_midi(s, data1, data2);
                 }
                 else {
@@ -131,7 +129,7 @@ void spork_parse_midi(spork *s, int data1, int data2)
 {
     printf("SPORKMIDIiii!\n");
     double scaley_val = 0.0;
-    switch(data1) {
+    switch (data1) {
     case 1:
         scaley_val = scaleybum(1, 128, 0.0, 1.0, data2);
         printf("VOLUME!\n");
@@ -146,7 +144,7 @@ void spork_parse_midi(spork *s, int data1, int data2)
     case 3:
         scaley_val = scaleybum(1, 128, 0, 1, data2);
         s->m_lfo.osc.m_amplitude = scaley_val;
-        printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude );
+        printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude);
         break;
     case 4:
         scaley_val = scaleybum(1, 128, 10, 220, data2);
@@ -349,11 +347,12 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
     default:
         printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
     }
+
     if (ev->delete_after_use) {
-        if (mixr->debug_mode)
-            printf("DELETing TEMP TICK!\n");
-        free(ev);
         ms->melodies[ms->cur_melody][ev->tick] = NULL;
+        if (mixr->debug_mode)
+            printf("DELETing TEMP TICK! %d data2: %d\n", ev->tick, ev->data2);
+        free(ev);
     }
 }
 

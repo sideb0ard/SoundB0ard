@@ -93,8 +93,9 @@ void keys(int soundgen_num)
                 ms->m_voice_mode = 4;
                 break;
             case 110:
-                ms->m_lfo1_waveform = (++ms->m_lfo1_waveform)% MAX_LFO_OSC;
-                printf("LFO! Mode Toggle: %d MaxLFO: %d\n", ms->m_lfo1_waveform, MAX_LFO_OSC);
+                ms->m_lfo1_waveform = (++ms->m_lfo1_waveform) % MAX_LFO_OSC;
+                printf("LFO! Mode Toggle: %d MaxLFO: %d\n", ms->m_lfo1_waveform,
+                       MAX_LFO_OSC);
                 break;
             case 109:
                 mixer_toggle_key_mode(mixr);

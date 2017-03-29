@@ -631,6 +631,7 @@ freaks	utils.h	/^    double *freaks;$/;"	m	struct:freaky
 freaky	utils.h	/^typedef struct freaky {$/;"	s
 freaky	utils.h	/^} freaky;$/;"	t	typeref:struct:freaky
 free_stream	envelope.c	/^void free_stream(ENVSTREAM *stream)$/;"	f
+freq	effect.h	/^    double freq;$/;"	m	struct:__anon9
 freq	sbmsg.h	/^    int freq;$/;"	m	struct:sbmsg
 frequency	algorithm.h	/^    unsigned int frequency;$/;"	m	struct:algorithm
 frequency	algorithm.h	/^typedef enum { TICK, S16TH, LOOP } frequency;$/;"	t	typeref:enum:__anon1

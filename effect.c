@@ -116,6 +116,8 @@ EFFECT *new_freq_pass(double freq, effect_type pass_type)
     if (e == NULL)
         return NULL;
 
+    e->freq = freq;
+
     double *buffer;
     int buf_length = 2;
     buffer = (double *)calloc(buf_length, sizeof(double));

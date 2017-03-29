@@ -36,6 +36,7 @@ typedef struct {
     double rr;
     double rsq;
     double scal;
+    double freq;
     // for decimator
     int bits;
     double rate, cnt;

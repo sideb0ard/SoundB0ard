@@ -123,7 +123,6 @@ typedef struct minisynth {
     unsigned int m_velocity_to_attack_scaling;
     unsigned int m_note_number_to_decay_scaling;
 
-
     double m_portamento_time_msec;
     bool m_sustain_override;
 
