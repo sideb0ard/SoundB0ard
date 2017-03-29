@@ -58,7 +58,6 @@ typedef struct minisynth {
     bool multi_melody_mode;
     bool multi_melody_loop_countdown_started;
 
-    int cur_octave;
     int sustain;
 
     bool recording;

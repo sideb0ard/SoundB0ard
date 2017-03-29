@@ -61,11 +61,11 @@ void keys(int soundgen_num)
                 break;
             case 49:
                 printf("Down an octave...\n");
-                // change_octave(ns, DOWN);
+                ms->m_octave--;
                 break;
             case 50:
                 printf("Up an octave...\n");
-                // change_octave(ns, UP);
+                ms->m_octave++;
                 break;
             case 114:
                 ms->recording = 1 - ms->recording;
@@ -93,13 +93,13 @@ void keys(int soundgen_num)
                 ms->m_voice_mode = 4;
                 break;
             case 110:
-                minisynth_toggle_delay_mode(ms);
-                printf("Switching DELAY mode -- %d\n", ms->m_delay_mode);
+                ms->m_lfo1_waveform = (++ms->m_lfo1_waveform)% MAX_LFO_OSC;
+                printf("LFO! Mode Toggle: %d MaxLFO: %d\n", ms->m_lfo1_waveform, MAX_LFO_OSC);
                 break;
             case 109:
-                mixer_toggle_midi_mode(mixr);
-                printf("Switching MIDI mode -- %d\n",
-                       mixr->m_midi_controller_mode);
+                mixer_toggle_key_mode(mixr);
+                printf("Switching KEY mode -- %d\n",
+                       mixr->m_key_controller_mode);
                 break;
             default:
                 // play note

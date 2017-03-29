@@ -120,6 +120,12 @@ void mixer_toggle_midi_mode(mixer *mixr)
         ++(mixr->m_midi_controller_mode) % MAX_NUM_MIDI_MODES;
 }
 
+void mixer_toggle_key_mode(mixer *mixr)
+{
+    mixr->m_key_controller_mode =
+        ++(mixr->m_key_controller_mode) % MAX_NUM_KEY_MODES;
+}
+
 void delay_toggle(mixer *mixr)
 {
     mixr->delay_on = abs(1 - mixr->delay_on);

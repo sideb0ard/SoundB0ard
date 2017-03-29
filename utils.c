@@ -264,8 +264,8 @@ int ch_midi_lookup(int ch, void *p)
     // int cur_octave = ns->cur_octave * 12;
     int default_octave = 4;
     int cur_octave = default_octave * 12;
-    if (ms->cur_octave != 0) {
-        cur_octave = cur_octave + (ms->cur_octave * 12);
+    if (ms->m_octave != 0) {
+        cur_octave = cur_octave + (ms->m_octave * 12);
     }
     int next_octave = cur_octave + 12;
 

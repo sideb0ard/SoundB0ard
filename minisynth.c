@@ -21,7 +21,6 @@ minisynth *new_minisynth(void)
         return NULL; // barf
 
     ms->vol = 0.7;
-    ms->cur_octave = 0;
     ms->sustain = 0;
     ms->num_melodies = 1;
 

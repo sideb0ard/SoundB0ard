@@ -21,6 +21,12 @@ typedef enum {
     MAX_NUM_MIDI_MODES,
 } midi_mode; // to switch control knob routing
 
+typedef enum {
+    KEY_MODE_ONE,
+    KEY_MODE_TWO,
+    MAX_NUM_KEY_MODES,
+} key_mode; // to switch key control routing
+
 typedef struct t_mixer {
 
     SOUNDGEN **sound_generators;
@@ -39,6 +45,7 @@ typedef struct t_mixer {
 
     unsigned int midi_control_destination;
     unsigned int m_midi_controller_mode; // to switch control knob routing
+    unsigned int m_key_controller_mode; // to switch key control routing
 
     int active_midi_soundgen_num;
     int active_midi_soundgen_effect_num;
@@ -82,6 +89,7 @@ void freq_change(mixer *mixr, int sig, float freq);
 void delay_toggle(mixer *mixr);
 
 void mixer_toggle_midi_mode(mixer *mixr);
+void mixer_toggle_key_mode(mixer *mixr);
 
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
