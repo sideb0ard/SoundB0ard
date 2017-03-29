@@ -22,13 +22,13 @@
 
 #define SYNTH_NUM_LOOPS 2
 #define PPQN 960       // Pulses Per Quarter Note // one beat
-#define PPS (PPQN / 4) // pulses per SIXTEENTH note, i.e. drum machine hit
+#define PPS (PPQN / 4) // pulses per SIXTEENTH note, i.e. seq machine hit
 #define PPL (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
 #define PPNS                                                                   \
     (PPL *                                                                     \
      SYNTH_NUM_LOOPS) // Pulses per NanoSynth recording loop, i.e 2 loops/bars
 
-#define DRUM_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
+#define SEQUENCER_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
 
 #define TWO_PI (2.0 * M_PI)
 #define FREQRAD (TWO_PI / SAMPLE_RATE)
@@ -72,7 +72,7 @@ typedef enum {
     SYNTH_TYPE,
     LOOPER_TYPE,
     BITWIZE_TYPE,
-    DRUM_TYPE,
+    SEQUENCER_TYPE,
     ALGORITHM_TYPE,
     CHAOSMONKEY_TYPE,
     SPORK_TYPE,

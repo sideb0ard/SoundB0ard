@@ -111,7 +111,7 @@ void print_help()
            " -- beatrepeat, default settings\n");
     printf(ANSI_COLOR_WHITE
            "sidechain <sound_gen_number> <input_src> <mix>" ANSI_COLOR_CYAN
-           " -- sidechain env, where input_src is a drum pattern\n");
+           " -- sidechain env, where input_src is a seq pattern\n");
     printf(
         ANSI_COLOR_WHITE
         "fx        <sound_gen_number> <fx_num> <parameter> <val>\n"

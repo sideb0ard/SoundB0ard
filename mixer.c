@@ -13,8 +13,8 @@
 #include "bytebeatrrr.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
-#include "drumr.h"
-#include "drumr_utils.h"
+#include "sequencer.h"
+#include "sequencer_utils.h"
 #include "effect.h"
 #include "envelope.h"
 #include "minisynth.h"
@@ -253,7 +253,7 @@ int add_minisynth(mixer *mixr)
     return add_sound_generator(mixr, (SOUNDGEN *)ms);
 }
 
-int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
+int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                        bool start_on_first_beat)
 {
     // preliminary setup
@@ -274,16 +274,16 @@ int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
 
     printf("EUCLIDEAN BEAT! %d\n", pattern);
 
-    DRUM *ndrum = new_drumr_from_int_pattern(full_filename, pattern);
-    if (ndrum == NULL) {
-        printf("Barfed on drum creation\n");
+    sequencer *nseq = new_seq_from_int_pattern(full_filename, pattern);
+    if (nseq == NULL) {
+        printf("Barfed on seq creation\n");
         return -1;
     }
 
-    return add_sound_generator(mixr, (SOUNDGEN *)ndrum);
+    return add_sound_generator(mixr, (SOUNDGEN *)nseq);
 }
 
-int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
+int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern)
 {
     // preliminary setup
     char cwd[1024];
@@ -294,12 +294,12 @@ int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern)
     strcat(full_filename, "/wavs/");
     strcat(full_filename, filename);
 
-    DRUM *ndrum = new_drumr_from_char_pattern(full_filename, pattern);
-    if (ndrum == NULL) {
-        printf("Barfed on drum creation\n");
+    sequencer *nseq = new_seq_from_char_pattern(full_filename, pattern);
+    if (nseq == NULL) {
+        printf("Barfed on seq creation\n");
         return -1;
     }
-    return add_sound_generator(mixr, (SOUNDGEN *)ndrum);
+    return add_sound_generator(mixr, (SOUNDGEN *)nseq);
 }
 
 int add_looper(mixer *mixr, char *filename, double loop_len)
@@ -320,7 +320,7 @@ double mixer_gennext(mixer *mixr)
         pthread_mutex_lock(&midi_tick_lock);
         mixr->tick++; // 1 midi tick (or pulse)
         if (mixr->tick % PPS == 0) {
-            mixr->sixteenth_note_tick++; // for drum machine resolution
+            mixr->sixteenth_note_tick++; // for seq machine resolution
             // printf("16th++ %d %d %d\n", mixr->sixteenth_note_tick,
             // mixr->tick, mixr->cur_sample);
         }

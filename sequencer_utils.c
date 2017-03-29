@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-#include "drumr_utils.h"
+#include "sequencer_utils.h"
 
 void build_euclidean_pattern_int(int level, int *bitmap_int,
                                  int *bitmap_position, int *count,

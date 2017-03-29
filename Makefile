@@ -21,8 +21,8 @@ OBJ = \
 	dca.o \
 	ddlmodule.o \
 	delayline.o \
-	drumr.o \
-	drumr_utils.o \
+	sequencer.o \
+	sequencer_utils.o \
 	effect.o \
 	envelope.o \
 	envelope_generator.o \

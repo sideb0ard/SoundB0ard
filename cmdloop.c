@@ -18,7 +18,7 @@
 #include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
-#include "drumr_utils.h"
+#include "sequencer_utils.h"
 #include "envelope.h"
 #include "help.h"
 #include "keys.h"
@@ -160,14 +160,14 @@ void interpret(char *line)
 
             if (is_valid_file(wurds[1])) {
                 char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
-                add_drum_char_pattern(mixr, wurds[1], pattern);
+                add_seq_char_pattern(mixr, wurds[1], pattern);
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type == DRUM_TYPE) {
+                    mixr->sound_generators[soundgen_num]->type == SEQUENCER_TYPE) {
 
-                    DRUM *d = (DRUM *)mixr->sound_generators[soundgen_num];
+                    sequencer *d = (sequencer *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 3) == 0) {
                         printf("Adding\n");
@@ -177,16 +177,16 @@ void interpret(char *line)
                     }
                     else if (strncmp("randamp", wurds[2], 6) == 0) {
                         int pattern_num = atoi(wurds[3]);
-                        if (is_valid_drum_pattern_num(d, pattern_num)) {
-                            drum_set_random_sample_amp(d, pattern_num);
+                        if (is_valid_seq_pattern_num(d, pattern_num)) {
+                            seq_set_random_sample_amp(d, pattern_num);
                         }
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
-                            drumr_set_multi_pattern_mode(d, true);
+                            seq_set_multi_pattern_mode(d, true);
                         }
                         else if (strncmp("false", wurds[3], 5) == 0) {
-                            drumr_set_multi_pattern_mode(d, false);
+                            seq_set_multi_pattern_mode(d, false);
                         }
                         printf("Sequencer multi mode : %s\n",
                                d->multi_pattern_mode ? "true" : "false");
@@ -211,7 +211,7 @@ void interpret(char *line)
                             printf("Changing\n");
 
                             int pattern_num = atoi(wurds[3]);
-                            if (is_valid_drum_pattern_num(d, pattern_num)) {
+                            if (is_valid_seq_pattern_num(d, pattern_num)) {
                                 if (strncmp("pattern", wurds[4], 7) == 0) {
                                     printf("Changing pattern to %s\n", pattern);
                                     change_char_pattern(d, pattern_num,
@@ -220,14 +220,14 @@ void interpret(char *line)
                                 else if (strncmp("amp", wurds[4], 3) == 0) {
                                     printf("Setting pattern AMP to %s\n",
                                            pattern);
-                                    drum_set_sample_amp_from_char_pattern(
+                                    seq_set_sample_amp_from_char_pattern(
                                         d, pattern_num, pattern);
                                 }
                                 else if (strncmp("numloops", wurds[4], 8) ==
                                          0) {
                                     int numloops = atoi(wurds[5]);
                                     if (numloops != 0) {
-                                        drumr_change_num_loops(d, pattern_num,
+                                        seq_change_num_loops(d, pattern_num,
                                                                numloops);
                                     }
                                 }
@@ -241,12 +241,12 @@ void interpret(char *line)
                             return;
                         }
                         int euclidean_pattern = create_euclidean_rhythm(
-                            num_beats, DRUM_PATTERN_LEN);
+                            num_beats, SEQUENCER_PATTERN_LEN);
                         bool start_at_zero =
                             strncmp("true", wurds[4], 4) == 0 ? true : false;
                         if (start_at_zero)
                             euclidean_pattern = shift_bits_to_leftmost_position(
-                                euclidean_pattern, DRUM_PATTERN_LEN);
+                                euclidean_pattern, SEQUENCER_PATTERN_LEN);
                         change_int_pattern(d, d->cur_pattern,
                                            euclidean_pattern);
                     }
@@ -639,15 +639,15 @@ void interpret(char *line)
                 int percent_mix = atoi(wurds[3]);
                 printf("SIDEHCINA %d %d %d\n", soundgen_num, input_src,
                        percent_mix);
-                // if (mixr->sound_generators[input_src]->type == DRUM_TYPE) {
-                //    DRUM *d = (DRUM *)
+                // if (mixr->sound_generators[input_src]->type == SEQUENCER_TYPE) {
+                //    sequencer *d = (sequencer *)
                 //    mixr->sound_generators[input_src]->type;
-                //    int pat_array[DRUM_PATTERN_LEN];
+                //    int pat_array[SEQUENCER_PATTERN_LEN];
                 //    int_pattern_to_array(d->patterns[d->cur_pattern],
                 //                         pat_array);
-                //    for (int i = 0; i < DRUM_PATTERN_LEN; i++)
+                //    for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++)
                 //    {
-                //        printf("DRUMMMMM %d\n", pat_array[0]);
+                //        printf("sequencerMMMM %d\n", pat_array[0]);
                 //    }
                 //    //ENVSTREAM *e = new_sidechain_stream(pat_array,
                 //    percent_mix);
@@ -885,7 +885,7 @@ bool is_valid_sample_num(looper *s, int sample_num)
     return false;
 }
 
-bool is_valid_drum_pattern_num(DRUM *d, int pattern_num)
+bool is_valid_seq_pattern_num(sequencer *d, int pattern_num)
 {
     if (pattern_num < d->num_patterns) {
         return true;

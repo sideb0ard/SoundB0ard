@@ -3,7 +3,7 @@
 
 #include <portaudio.h>
 
-#include "drumr.h"
+#include "sequencer.h"
 #include "effect.h"
 #include "minisynth.h"
 #include "sbmsg.h"
@@ -77,8 +77,8 @@ int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr);
 int add_chaosmonkey(void);
 int add_minisynth(mixer *mixr);
-int add_drum_char_pattern(mixer *mixr, char *filename, char *pattern);
-int add_drum_euclidean(mixer *mixr, char *filename, int num_beats,
+int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
+int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                        bool start_on_first_beat);
 int add_looper(mixer *mixr, char *filename, double loop_len);
 int add_sound_generator(mixer *mixr, SOUNDGEN *sg);
