@@ -88,11 +88,11 @@ minisynth *new_minisynth(void)
         voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
                                  get_matrix_core(&ms->m_ms_modmatrix));
     }
-    for (int i = 0; i < PPNS; i++) {
-        ms->melodies[ms->cur_melody][i] = NULL;
-    }
     for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++) {
         ms->melody_multiloop_count[i] = 1;
+        for (int j = 0; j < PPNS; j++) {
+            ms->melodies[i][j] = NULL;
+        }
     }
 
     // start loop player running
@@ -578,6 +578,12 @@ void minisynth_add_melody(minisynth *ms)
     ms->cur_melody++;
 }
 
+void minisynth_dupe_melody(minisynth *ms)
+{
+    midi_event **melody = minisynth_copy_midi_loop(ms, ms->cur_melody);
+    minisynth_add_midi_loop(ms, melody, ms->cur_melody + 1);
+}
+
 void minisynth_switch_melody(minisynth *ms, unsigned int melody_num)
 {
     if (melody_num < (unsigned)ms->num_melodies) {
@@ -803,15 +809,21 @@ midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
     return new_midi_events_loop;
 }
 
-void minisynth_add_midi_loop(minisynth *self, midi_event **events,
+void minisynth_add_midi_loop(minisynth *ms, midi_event **events,
                              int melody_num)
 {
-    (void)events;
-
-    if (melody_num >= self->num_melodies) {
+    if (melody_num >= MAX_NUM_MIDI_LOOPS) {
         printf("Dingjie!\n");
         return;
     }
+    for ( int i = 0; i < PPNS; i++) {
+        if (events[i] != NULL)
+            ms->melodies[melody_num][i] = events[i];
+    }
+    ms->num_melodies++;
+    ms->cur_melody++;
+    free(events); // get rid of container
+    printf("Added new Melody\n");
 }
 
 void minisynth_toggle_delay_mode(minisynth *ms)

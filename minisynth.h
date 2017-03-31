@@ -166,6 +166,7 @@ void minisynth_set_multi_melody_mode(minisynth *self, bool melody_mode);
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
                                    int loop_num);
 void minisynth_add_melody(minisynth *self);
+void minisynth_dupe_melody(minisynth *self);
 void minisynth_switch_melody(minisynth *self, unsigned int melody_num);
 void minisynth_reset_melody(minisynth *self, unsigned int melody_num);
 void minisynth_reset_melody_all(minisynth *self);

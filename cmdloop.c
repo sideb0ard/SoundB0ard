@@ -421,10 +421,12 @@ void interpret(char *line)
                     minisynth *ms =
                         (minisynth *)mixr->sound_generators[soundgen_num];
 
-                    if (strncmp("add", wurds[2], 4) == 0) {
-                        if (strncmp("melody", wurds[3], 6) == 0) {
-                            minisynth_add_melody(ms);
-                        }
+                    if (strncmp("add", wurds[2], 3) == 0) {
+                        minisynth_add_melody(ms);
+                    }
+                    if (strncmp("dupe", wurds[2], 4) == 0) {
+                        printf("Duping current Synth melody..\n");
+                        minisynth_dupe_melody(ms);
                     }
                     if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
