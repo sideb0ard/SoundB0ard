@@ -723,6 +723,7 @@ void seq_set_max_generations(sequencer *d, int max) { d->max_generation = max; }
 
 void seq_set_markov_mode(sequencer *d, unsigned int mode) { d->markov_mode = mode; }
 
+// TODO make this part of SOUND GENERATOR
 void seq_parse_midi(sequencer *s, unsigned int data1, unsigned int data2)
 {
     printf("YA BEEZER, MIDI DRUM SEQUENCER!\n");

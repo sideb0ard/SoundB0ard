@@ -7,6 +7,7 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "looper.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
@@ -30,6 +31,11 @@ looper *new_looper(char *filename, double loop_len)
     for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++) {
         l->sample_num_loops[i] = 1;
     }
+
+    stereo_delay_prepare_for_play(&l->m_delay_fx);
+    filter_moog_init(&l->m_filter);
+    l->m_fc_control = 10000;
+    moog_update((filter*) &l->m_filter);
 
     return l;
 }
@@ -137,7 +143,22 @@ double looper_gennext(void *self)
     val = effector(&l->sound_generator, val);
     val = envelopor(&l->sound_generator, val);
 
-    return val * l->vol;
+     // update delay and filter
+    l->m_filter.f.m_fc_control = l->m_fc_control;
+    moog_set_qcontrol((filter*) &l->m_filter, l->m_q_control);
+    moog_update((filter*) &l->m_filter);
+    val = moog_gennext((filter*) &l->m_filter, val);
+
+    stereo_delay_set_mode(&l->m_delay_fx, l->m_delay_mode);
+    stereo_delay_set_delay_time_ms(&l->m_delay_fx, l->m_delay_time_msec);
+    stereo_delay_set_feedback_percent(&l->m_delay_fx, l->m_feedback_pct);
+    stereo_delay_set_delay_ratio(&l->m_delay_fx, l->m_delay_ratio);
+    stereo_delay_set_wet_mix(&l->m_delay_fx, l->m_wet_mix);
+    stereo_delay_update(&l->m_delay_fx);
+    double out = 0.0;
+    stereo_delay_process_audio(&l->m_delay_fx, &val, &val, &out, &out);
+
+    return out * l->vol;
 }
 
 void looper_add_sample(looper *s, char *filename, int loop_len)
@@ -484,5 +505,61 @@ void looper_scramble(looper *s)
         s->scramble_generation = 0;
         s->max_generation = 0;
         s->scramblrrr_mode = false;
+    }
+}
+
+// TODO - move this to SOUND GENERATOR
+void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2)
+{
+    printf("YA BEEZER, MIDI DRUM SEQUENCER!\n");
+
+    double scaley_val = 0.;
+    switch (data1) {
+    case 1:
+        scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        printf("Filter FREQ Control! %f\n", scaley_val);
+        s->m_fc_control = scaley_val;
+        break;
+    case 2:
+        scaley_val = scaleybum(1, 128, 1, 10, data2);
+        printf("Filter Q Control! %f\n", scaley_val);
+        s->m_q_control = scaley_val;
+        break;
+    case 3:
+        scaley_val = scaleybum(1, 128, 1, 6, data2);
+        printf("SWIIIiiing!! %f\n", scaley_val);
+        s->swing_setting = scaley_val;
+        break;
+    case 4:
+        scaley_val = scaleybum(1, 128, 0., 1., data2);
+        printf("Volume! %f\n", scaley_val);
+        s->vol = scaley_val;
+        break;
+    case 5:
+        scaley_val = scaleybum(0, 128, 0, 2000, data2);
+        printf("Delay Feedback Msec %f!\n", scaley_val);
+        s->m_delay_time_msec = scaley_val;
+        break;
+    case 6:
+        scaley_val = scaleybum(0, 128, 20, 100, data2);
+        printf("Delay Feedback Pct! %f\n", scaley_val);
+        s->m_feedback_pct = scaley_val;
+        break;
+    case 7:
+        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+        printf("Delay Ratio! %f\n", scaley_val);
+        s->m_delay_ratio = scaley_val;
+        break;
+    case 8:
+        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        printf("DELAY Wet mix %f!\n", scaley_val);
+        s->m_wet_mix = scaley_val;
+        break;
+    case 9: // PAD 5
+        printf("Toggle Delay Mode!\n");
+        s->m_delay_mode = (++s->m_delay_mode) % MAX_NUM_DELAY_MODE; 
+        break;
+    default:
+        break;
     }
 }

@@ -39,7 +39,6 @@ typedef struct t_looper {
 
     pthread_mutex_t resample_mutex;
 
-    double vol;
     bool started;
     bool just_been_resampled;
 
@@ -52,6 +51,20 @@ typedef struct t_looper {
     int stutter_generation;
 
     int max_generation;
+
+	stereodelay m_delay_fx;
+    // midi - top row
+    double m_fc_control;
+    double m_q_control;
+    int swing_setting;
+    double vol;
+    filter_moogladder m_filter;
+    // midi - bottom row, mode 1
+    double m_delay_time_msec;
+    double m_feedback_pct;
+    double m_delay_ratio;
+    double m_wet_mix;
+    unsigned int m_delay_mode; // pad5 button
 
 } looper;
 
@@ -80,5 +93,7 @@ double looper_getvol(void *self);
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);
 void sample_resample_to_loop_size(file_sample *fs);
+
+void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2);
 
 #endif // LOOPER_H

@@ -311,7 +311,9 @@ void interpret(char *line)
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {
                 int loop_len = atoi(wurds[2]);
                 if (loop_len > 0) {
-                    add_looper(mixr, wurds[1], loop_len);
+                    int soundgen_num = add_looper(mixr, wurds[1], loop_len);
+                    mixr->midi_control_destination = MIDILOOPER;
+                    mixr->active_midi_soundgen_num = soundgen_num;
                 }
             }
             else {
@@ -331,6 +333,36 @@ void interpret(char *line)
                                 looper_add_sample(s, wurds[3], loop_len);
                             }
                         }
+                    }
+                    else if (strncmp("change", wurds[2], 6) == 0) {
+                        int sample_num = atoi(wurds[3]);
+                        if (is_valid_sample_num(s, sample_num)) {
+                            if (strncmp("looplen", wurds[4], 8) == 0) {
+                                int looplen = atoi(wurds[5]);
+                                looper_change_loop_len(s, sample_num, looplen);
+                            }
+                            else if (strncmp("numloops", wurds[4], 8) == 0) {
+                                int numloops = atoi(wurds[5]);
+                                if (numloops != 0) {
+                                    looper_change_num_loops(s, sample_num,
+                                                             numloops);
+                                }
+                            }
+                        }
+                    }
+                    else if (strncmp("midi", wurds[2], 4) == 0) {
+                        mixr->midi_control_destination = MIDILOOPER;
+                        mixr->active_midi_soundgen_num = soundgen_num;
+                    }
+                    else if (strncmp("multi", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            looper_set_multi_sample_mode(s, true);
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            looper_set_multi_sample_mode(s, false);
+                        }
+                        printf("Sampler multi mode : %s\n",
+                               s->multi_sample_mode ? "true" : "false");
                     }
                     else if (strncmp("scramble", wurds[2], 8) == 0) {
                         if (strncmp(wurds[3], "true", 4) == 0)
@@ -365,32 +397,6 @@ void interpret(char *line)
                                 printf("Toggling sTUTTER..\n");
                                 int new_mode = 1 - s->stutter_mode;
                                 looper_set_stutter_mode(s, new_mode);
-                            }
-                        }
-                    }
-                    else if (strncmp("multi", wurds[2], 5) == 0) {
-                        if (strncmp("true", wurds[3], 4) == 0) {
-                            looper_set_multi_sample_mode(s, true);
-                        }
-                        else if (strncmp("false", wurds[3], 5) == 0) {
-                            looper_set_multi_sample_mode(s, false);
-                        }
-                        printf("Sampler multi mode : %s\n",
-                               s->multi_sample_mode ? "true" : "false");
-                    }
-                    else if (strncmp("change", wurds[2], 6) == 0) {
-                        int sample_num = atoi(wurds[3]);
-                        if (is_valid_sample_num(s, sample_num)) {
-                            if (strncmp("looplen", wurds[4], 8) == 0) {
-                                int looplen = atoi(wurds[5]);
-                                looper_change_loop_len(s, sample_num, looplen);
-                            }
-                            else if (strncmp("numloops", wurds[4], 8) == 0) {
-                                int numloops = atoi(wurds[5]);
-                                if (numloops != 0) {
-                                    looper_change_num_loops(s, sample_num,
-                                                             numloops);
-                                }
                             }
                         }
                     }
