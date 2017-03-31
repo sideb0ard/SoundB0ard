@@ -422,7 +422,51 @@ void interpret(char *line)
                         (minisynth *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 3) == 0) {
-                        minisynth_add_melody(ms);
+                        if (strncmp("melody", wurds[3], 6) == 0) {
+                            minisynth_add_melody(ms);
+                        }
+                        else {
+                            int melody = atoi(wurds[3]);
+                            if (is_valid_melody_num(ms, melody)) {
+                                printf("MELODY ADD EVENT!\n");
+                            }
+                            int tick = atoi(wurds[4]);
+                            if (tick >= PPNS) {
+                                printf("tick %d out of range\n", tick);
+                                return;
+                            }
+                            int notenum = atoi(wurds[5]);
+                            int onoff = -1;
+                            if (strncmp("on", wurds[6], 2) == 0) {
+                                onoff = 144;
+                            }
+                            else if (strncmp("off", wurds[6], 3) == 0) {
+                                onoff = 128;
+                            }
+
+                            if (onoff != -1) {
+                                midi_event *ev = new_midi_event(tick, onoff,
+                                                        notenum, 128);
+                                minisynth_add_event(ms, ev);
+                            } else {
+                                printf("Needs to be 'on' or 'off'\n");
+                            }
+                        }
+                    }
+                    if (strncmp("delete", wurds[2], 3) == 0) {
+                        if (strncmp("melody", wurds[3], 6) == 0) {
+                            // minisynth_delete_melody(ms); // TODO implement
+                            printf("Imagine i deleted your melody..\n");
+                        }
+                        else {
+                            int melody = atoi(wurds[3]);
+                            if (is_valid_melody_num(ms, melody)) {
+                                printf("MELODY DELETE EVENT!\n");
+                            }
+                            int tick = atoi(wurds[4]);
+                            if (tick < PPNS)
+                                minisynth_delete_event(ms, melody, tick);
+                        }
                     }
                     if (strncmp("dupe", wurds[2], 4) == 0) {
                         printf("Duping current Synth melody..\n");
@@ -437,6 +481,13 @@ void interpret(char *line)
                         }
                         printf("Synth multi mode : %s\n",
                                ms->multi_melody_mode ? "true" : "false");
+                    }
+                    if (strncmp("nudge", wurds[2], 5) == 0) {
+                        int sixteenth = atoi(wurds[3]);
+                        if (sixteenth < 16) {
+                            printf("Nudging Melody along %d sixteenthzzzz!\n", sixteenth);
+                            minisynth_nudge_melody(ms, ms->cur_melody, sixteenth);
+                        }
                     }
                     if (strncmp("sustain", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
@@ -901,14 +952,6 @@ bool is_valid_sample_num(looper *s, int sample_num)
 bool is_valid_seq_pattern_num(sequencer *d, int pattern_num)
 {
     if (pattern_num < d->num_patterns) {
-        return true;
-    }
-    return false;
-}
-
-bool is_valid_melody_num(minisynth *ms, int melody_num)
-{
-    if (melody_num < ms->num_melodies) {
         return true;
     }
     return false;

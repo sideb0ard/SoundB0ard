@@ -789,6 +789,23 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
     ms->melodies[ms->cur_melody][tick] = ev;
 }
 
+void minisynth_delete_event(minisynth *ms, int pat_num, int tick)
+{
+    if (is_valid_melody_num(ms, pat_num)) {
+        if (ms->melodies[ms->cur_melody][tick] != NULL) {
+            midi_event *ev = ms->melodies[ms->cur_melody][tick];
+            ms->melodies[ms->cur_melody][tick] = NULL;
+            free(ev);
+            printf("Deleted midi event at tick %d\n", tick);
+        }
+        else {
+            printf("Not a valid midi event at tick: %d\n", tick);
+        }
+    } else {
+        printf("Not a valid pattern num: %d \n", pat_num);
+    }
+}
+
 midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
 {
     if (melody_num >= self->num_melodies) {
@@ -834,13 +851,15 @@ void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
         return;
     }
     for ( int i = 0; i < PPNS; i++) {
-        if (ms->melodies[melody_num][i] != NULL)
+        if (ms->melodies[melody_num][i] != NULL) {
             free(ms->melodies[melody_num][i]);
+            ms->melodies[melody_num][i] = NULL;
+        }
         if (events[i] != NULL)
             ms->melodies[melody_num][i] = events[i];
     }
     free(events); // get rid of container
-    printf("Added new Melody\n");
+    printf("Replaced Melody %d\n", melody_num);
 }
 
 void minisynth_toggle_delay_mode(minisynth *ms)
@@ -857,4 +876,37 @@ void minisynth_set_sustain_override(minisynth *ms, bool b)
             voice_set_sustain_override(&ms->m_voices[i]->m_voice, b);
         }
     }
+}
+
+void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth)
+{
+    if (sixteenth >= 16) {
+        printf("Nah, mate, nudge needs to be less than 16\n");
+        return;
+    }
+    int sixteenth_of_loop = PPNS / 16.0;
+    midi_event **orig_loop = minisynth_copy_midi_loop(ms, melody_num);
+
+    midi_event **new_midi_events_loop =
+        (midi_event **)calloc(PPNS, sizeof(midi_event *));
+
+    for (int i = 0; i < PPNS; i++) {
+        if (orig_loop[i] != NULL) {
+            midi_event *ev = orig_loop[i];
+            int new_tick = (ev->tick + (sixteenth*sixteenth_of_loop)) % PPNS;
+            printf("Old tick: %d with new: %d\n", ev->tick, new_tick);
+            new_midi_events_loop[new_tick] = new_midi_event(new_tick, ev->event_type, ev->data1, ev->data2);
+        }
+    }
+    free(orig_loop);
+    minisynth_replace_midi_loop(ms, new_midi_events_loop, melody_num);
+
+}
+
+bool is_valid_melody_num(minisynth *ms, int melody_num)
+{
+    if (melody_num < ms->num_melodies) {
+        return true;
+    }
+    return false;
 }

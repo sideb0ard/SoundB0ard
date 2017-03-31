@@ -175,6 +175,7 @@ void minisynth_melody_to_string(minisynth *self, int melody_num,
                                 wchar_t scratch[33]);
 midi_event **minisynth_get_midi_loop(minisynth *self);
 void minisynth_add_event(minisynth *self, midi_event *ev);
+void minisynth_delete_event(minisynth *ms, int pat_num, int tick);
 midi_event **minisynth_copy_midi_loop(minisynth *self, int pattern_num);
 void minisynth_add_midi_loop(minisynth *self, midi_event **events,
                              int pattern_num);
@@ -182,3 +183,6 @@ void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
                              int melody_num);
 void minisynth_toggle_delay_mode(minisynth *ms);
 void minisynth_set_sustain_override(minisynth *ms, bool b);
+
+void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
+bool is_valid_melody_num(minisynth *ns, int melody_num);
