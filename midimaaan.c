@@ -386,3 +386,36 @@ void midi_melody_quantize(midi_event **melody)
         }
     }
 }
+
+void midi_melody_print(midi_event **melody)
+{
+    printf("Melody Details\n");
+    for (int i = 0; i < PPNS; i++) {
+        if (melody[i]) {
+            int tick   = melody[i]->tick;
+            int data1  = melody[i]->data1;
+            int data2  = melody[i]->data2;
+            int typeint   = melody[i]->event_type;
+            char type[20] = {0};
+            switch(typeint){
+            case(144):
+                strcpy(type, "note_on");
+                break;
+            case(128):
+                strcpy(type, "note_off");
+                break;
+            case(176):
+                strcpy(type, "midi_control");
+                break;
+            case(224):
+                strcpy(type, "pitch_bend");
+                break;
+            default:
+                strcpy(type, "no_idea");
+                break;
+            }
+            int delete = melody[i]->delete_after_use;
+            printf("[Tick: %d] - note: %d velocity: %d type: %s delete_after_use: %s\n", tick, data1, data2, type, delete ? "true" : "false");
+        }
+    }
+}

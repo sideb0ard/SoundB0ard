@@ -26,6 +26,7 @@ void print_midi_event_rec(midi_event *ev);
 
 void midi_parse_midi_event(minisynth *ms, midi_event *ev);
 
+void midi_melody_print(midi_event **melody);
 void midi_melody_quantize(midi_event **melody);
 
 void spork_parse_midi(spork *s, int data1, int data2);

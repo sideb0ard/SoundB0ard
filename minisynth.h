@@ -178,5 +178,7 @@ void minisynth_add_event(minisynth *self, midi_event *ev);
 midi_event **minisynth_copy_midi_loop(minisynth *self, int pattern_num);
 void minisynth_add_midi_loop(minisynth *self, midi_event **events,
                              int pattern_num);
+void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
+                             int melody_num);
 void minisynth_toggle_delay_mode(minisynth *ms);
 void minisynth_set_sustain_override(minisynth *ms, bool b);

@@ -484,16 +484,11 @@ void interpret(char *line)
                             mixr->sound_generators[sg2]->type == SYNTH_TYPE) {
                             minisynth *ms2 =
                                 (minisynth *)mixr->sound_generators[sg2];
-                            printf("Copying SYNTH patterns!\n");
-                            int pattern_nomnom = atoi(wurds[4]);
-                            if (pattern_nomnom <= ms2->num_melodies) {
-                                printf("And we got patterns to copy~!\n");
-                            }
+                            printf("Copying SYNTH pattern from %d to %d!\n", soundgen_num, sg2);
+                            midi_event **melody = minisynth_copy_midi_loop(ms, ms->cur_melody);
+                            minisynth_replace_midi_loop(ms2, melody, ms2->cur_melody);
+
                         }
-                        // if wurds[3] is valid soundnum and wurds[4] <=
-                        // wurds[3]->num_patterns
-                        // wurds[1]->add_pattern
-                        // wurds[1]->pattern = wurds[3]->get_pattern(wurds[4])
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0) {
                         keys(soundgen_num);
@@ -501,6 +496,14 @@ void interpret(char *line)
                     else if (strncmp("midi", wurds[2], 4) == 0) {
                         mixr->midi_control_destination = SYNTH;
                         mixr->active_midi_soundgen_num = soundgen_num;
+                    }
+                    else if (strncmp("print", wurds[2], 5) == 0) {
+                        int melody_num = atoi(wurds[3]);
+                        if (is_valid_melody_num(ms, melody_num)) {
+                            printf("Melody Detail:!\n");
+                            midi_event **melody = ms->melodies[ms->cur_melody];
+                            midi_melody_print(melody);
+                        }
                     }
                     else if (strncmp("quantize", wurds[2], 8) == 0) {
                         int melody_num = atoi(wurds[3]);

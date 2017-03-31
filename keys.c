@@ -115,30 +115,25 @@ void keys(int soundgen_num)
                         ((mixr->tick % PPNS) + PPS * 4) %
                         PPNS; // rough guess - PPS is pulses per quart note
                               // and PPNS is pulses per minisynth Loop
-                    midi_event *ev = new_midi_event(note_off_tick, 128,
+
+                    midi_event *off_event = new_midi_event(note_off_tick, 128,
                                                     midi_num, fake_velocity);
-                    ev->delete_after_use = true; // _THIS_ is the magic
-                    // ms->melodies[ms->cur_melody][note_off_tick] = ev;
-                    minisynth_add_event(ms, ev);
                     ////////////////////////
 
                     if (ms->recording) {
                         printf("Recording note!\n");
                         int note_on_tick = mixr->tick % PPNS;
-                        midi_event *ev = new_midi_event(
+                        midi_event *on_event = new_midi_event(
                             note_on_tick, 144, midi_num, fake_velocity);
 
-                        ms->melodies[ms->cur_melody][note_on_tick] = ev;
-
-                        int note_off_tick =
-                            (note_on_tick + PPS * 4) %
-                            PPNS; // rough guess - PPS is pulses per quart note
-                                  // and PPNS is pulses per minisynth Loop
-                        midi_event *ev2 = new_midi_event(
-                            note_off_tick, 128, midi_num, fake_velocity);
-                        minisynth_add_event(ms, ev2);
-                        // ms->melodies[ms->cur_melody][note_off_tick] = ev2;
+                        minisynth_add_event(ms, on_event);
+                        minisynth_add_event(ms, off_event);
                     }
+                    else {
+                        off_event->delete_after_use = true; // _THIS_ is the magic
+                        minisynth_add_event(ms, off_event);
+                    }
+
                 }
                 printf("CCCC %d\n", ch);
             }

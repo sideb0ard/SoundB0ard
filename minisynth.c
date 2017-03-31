@@ -777,7 +777,7 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
 {
     int tick = ev->tick;
     while (ms->melodies[ms->cur_melody][tick] != NULL) {
-        printf("GOtsz a tick already - bump!\n");
+        printf("Gotsz a tick already - bump!\n");
         tick++;
         if (tick == PPNS) // wrap around
             tick = 0;
@@ -822,6 +822,23 @@ void minisynth_add_midi_loop(minisynth *ms, midi_event **events,
     }
     ms->num_melodies++;
     ms->cur_melody++;
+    free(events); // get rid of container
+    printf("Added new Melody\n");
+}
+
+void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
+                             int melody_num)
+{
+    if (melody_num >= MAX_NUM_MIDI_LOOPS) {
+        printf("Dingjie!\n");
+        return;
+    }
+    for ( int i = 0; i < PPNS; i++) {
+        if (ms->melodies[melody_num][i] != NULL)
+            free(ms->melodies[melody_num][i]);
+        if (events[i] != NULL)
+            ms->melodies[melody_num][i] = events[i];
+    }
     free(events); // get rid of container
     printf("Added new Melody\n");
 }
