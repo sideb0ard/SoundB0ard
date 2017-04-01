@@ -910,3 +910,35 @@ bool is_valid_melody_num(minisynth *ms, int melody_num)
     }
     return false;
 }
+
+// TODO - better function name - this is programatic calls
+void minisynth_handle_midi_note(minisynth *ms, int note, int velocity)
+{
+	if (mixr->debug_mode)
+		print_midi_event(note);
+
+    minisynth_midi_note_on(ms, note, velocity);
+
+    int note_off_tick =
+        ((mixr->tick % PPNS) + PPS * 4) %
+        PPNS; // rough guess - PPS is pulses per quart note
+              // and PPNS is pulses per minisynth Loop
+
+    midi_event *off_event = new_midi_event(note_off_tick, 128,
+                                    note, velocity);
+    ////////////////////////
+
+    if (ms->recording) {
+        printf("Recording note!\n");
+        int note_on_tick = mixr->tick % PPNS;
+        midi_event *on_event = new_midi_event(
+            note_on_tick, 144, note, velocity);
+
+        minisynth_add_event(ms, on_event);
+        minisynth_add_event(ms, off_event);
+    }
+    else {
+        off_event->delete_after_use = true; // _THIS_ is the magic
+        minisynth_add_event(ms, off_event);
+    }
+}

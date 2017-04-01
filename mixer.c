@@ -40,6 +40,7 @@ mixer *new_mixer()
     mixr->keyboard_octave = 3;
     mixr->m_midi_controller_mode = 0;
     mixr->midi_control_destination = NONE;
+    mixr->start_of_loop = false;
     if (mixr == NULL) {
         printf("Nae mixer, fucked up!\n");
         return NULL;
@@ -327,7 +328,17 @@ double mixer_gennext(mixer *mixr)
         }
         pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
+
+        if (mixr->tick % PPL == 0) {
+            mixr->start_of_loop = true;
+        } else {
+            mixr->start_of_loop = false;
+        }
+
+    } else {
+        mixr->start_of_loop = false;
     }
+
     mixr->cur_sample++;
 
     double output_val = 0.0;

@@ -107,33 +107,7 @@ void keys(int soundgen_num)
                 midi_num = ch_midi_lookup(ch, ms);
                 int fake_velocity = 126; // TODO real velocity
                 if (midi_num != -1) {
-
-                    print_midi_event(midi_num);
-                    minisynth_midi_note_on(ms, midi_num, fake_velocity);
-
-                    int note_off_tick =
-                        ((mixr->tick % PPNS) + PPS * 4) %
-                        PPNS; // rough guess - PPS is pulses per quart note
-                              // and PPNS is pulses per minisynth Loop
-
-                    midi_event *off_event = new_midi_event(note_off_tick, 128,
-                                                    midi_num, fake_velocity);
-                    ////////////////////////
-
-                    if (ms->recording) {
-                        printf("Recording note!\n");
-                        int note_on_tick = mixr->tick % PPNS;
-                        midi_event *on_event = new_midi_event(
-                            note_on_tick, 144, midi_num, fake_velocity);
-
-                        minisynth_add_event(ms, on_event);
-                        minisynth_add_event(ms, off_event);
-                    }
-                    else {
-                        off_event->delete_after_use = true; // _THIS_ is the magic
-                        minisynth_add_event(ms, off_event);
-                    }
-
+                    minisynth_handle_midi_note(ms, midi_num, fake_velocity);
                 }
                 printf("CCCC %d\n", ch);
             }

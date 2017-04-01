@@ -11,6 +11,8 @@ typedef struct chaosmonkey {
     int chance_of_interruption; // percent likelihood
     bool make_suggestion;
     bool take_action;
+    int last_midi_tick;
+    int last_sixteenth;
 } chaosmonkey;
 
 chaosmonkey *new_chaosmonkey(void);
@@ -20,7 +22,7 @@ void chaosmonkey_change_chance_interrupt(chaosmonkey *cm, int percent);
 void chaosmonkey_suggest_mode(chaosmonkey *cm, bool);
 void chaosmonkey_action_mode(chaosmonkey *cm, bool);
 
-void chaosmonkey_throw_chaos(void);
+void chaosmonkey_throw_chaos(int note);
 
 double chaosmonkey_gen_next(void *self);
 void chaosmonkey_status(void *self, wchar_t *ss);

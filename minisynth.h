@@ -186,3 +186,5 @@ void minisynth_set_sustain_override(minisynth *ms, bool b);
 
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
 bool is_valid_melody_num(minisynth *ns, int melody_num);
+
+void minisynth_handle_midi_note(minisynth *ms, int note, int velocity);
