@@ -312,6 +312,7 @@ void interpret(char *line)
                 int loop_len = atoi(wurds[2]);
                 if (loop_len > 0) {
                     int soundgen_num = add_looper(mixr, wurds[1], loop_len);
+                    printf("SOUNDGEN %d\n", soundgen_num);
                     mixr->midi_control_destination = MIDILOOPER;
                     mixr->active_midi_soundgen_num = soundgen_num;
                 }

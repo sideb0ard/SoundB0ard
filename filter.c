@@ -55,6 +55,7 @@ void filter_update(filter *f)
     // printf("Q!!! : %f\n", f->m_q_control);
     // exit(0);
 
+    // TODO - INVESTIGATE LFO -> FILTER LACK OF WOBBLE
     if (f->m_v_modmatrix) {
         f->m_fc_mod = f->m_v_modmatrix->m_destinations[f->m_mod_source_fc];
         if (f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0)

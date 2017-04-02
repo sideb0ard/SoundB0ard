@@ -56,37 +56,44 @@ double chaosmonkey_gen_next(void *self)
     chaosmonkey *cm = (chaosmonkey *)self;
     if (mixr->start_of_loop) {
         // DO SOMETHING
+        printf("TICK: %d PPQN: %d\n", mixr->tick, PPQN);
+        int randy1 = rand() % 4; 
+        for (int i = 0; i < randy1; i++)
+        {
+            int t = mixr->cur_sample;
+		    int bzzt = 0;
+		    int randy = rand() % 5;
+		    switch(randy) {
+		    case 0:
+                bzzt = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
+            case 1:
+                bzzt = (t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6);
+            case 2:
+                bzzt = (t * (t >> 5 | t >> 8)) >> (t >> 16);
+            case 3:
+                bzzt = (t * (t >> 3 | t >> 4)) >> (t >> 7);
+            case 4:
+                 bzzt = (t * (t >> 13 | t >> 4)) >> (t >> 3);
+            }
+
+            int nom = scaleybum(INT_MIN, INT_MAX, 30, 100, bzzt);
+
+            if (mixr->debug_mode)
+                printf("BZZZT %d Midi Num: %d\n", bzzt, nom);
+
+            chaosmonkey_throw_chaos(nom);
+        }
     }
     if (cm->last_midi_tick != mixr->tick)
     {
         //printf("MIDI Tick!\n");
         cm->last_midi_tick = mixr->tick;
     }
-    if (cm->last_sixteenth != mixr->sixteenth_note_tick 
-        && (rand() % 100) > 88)
+    if (cm->last_sixteenth != mixr->sixteenth_note_tick)
     {
         //printf("16th Tick!\n");
         cm->last_sixteenth = mixr->sixteenth_note_tick;
 
-        int t = mixr->cur_sample;
-		int bzzt = 0;
-		int randy = rand() % 5;
-		switch(randy) {
-		case 0:
-            bzzt = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
-        case 1:
-            bzzt = (t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6);
-        case 2:
-            bzzt = (t * (t >> 5 | t >> 8)) >> (t >> 16);
-        case 3:
-            bzzt = (t * (t >> 3 | t >> 4)) >> (t >> 7);
-        case 4:
-             bzzt = (t * (t >> 13 | t >> 4)) >> (t >> 3);
-        }
-
-        int nom = scaleybum(INT_MIN, INT_MAX, 30, 100, bzzt);
-        printf("BZZZT %d Midi Num: %d\n", bzzt, nom);
-        chaosmonkey_throw_chaos(nom);
 		
     }
 
@@ -139,7 +146,22 @@ void chaosmonkey_throw_chaos(int note)
                 //int tick[10] = {0};
 
                 minisynth *ms = (minisynth *)mixr->sound_generators[i];
-                minisynth_handle_midi_note(ms, note, 126);
+                //minisynth_handle_midi_note(ms, note, 126);
+
+                int rand_timing = rand() % 16;
+                int note_on_tick = (mixr->tick % PPNS) + rand_timing * PPQN;
+                int note_off_tick = note_on_tick + 3 * PPQN;
+                midi_event *on_event = new_midi_event(
+                    note_on_tick, 144, note, 126);
+                on_event->delete_after_use = true;
+                midi_event *off_event = new_midi_event(
+                    note_off_tick, 128, note, 126);
+                off_event->delete_after_use = true;
+
+                minisynth_add_event(ms, on_event);
+                minisynth_add_event(ms, off_event);
+
+                return;
                 //midi_event **melody = minisynth_get_midi_loop(ms);
                 //for (int j = 0; j < PPNS && num_notes < 10; j++) {
                 //    if (melody[j] != NULL) {

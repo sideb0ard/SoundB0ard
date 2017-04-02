@@ -9,6 +9,7 @@
 #include "midi_freq_table.h"
 #include "midimaaan.h"
 #include "minisynth.h"
+#include "looper.h"
 #include "mixer.h"
 #include "spork.h"
 #include "utils.h"
@@ -85,6 +86,13 @@ void *midiman()
                         midi_delay_control(d, data1, data2);
                     }
                     }
+                }
+                else if (mixr->midi_control_destination == MIDILOOPER) {
+                    printf("LOOPER MIDI CONTROL!\n");
+                    looper *l = 
+                        (looper *) mixr
+                        ->sound_generators[mixr->active_midi_soundgen_num];
+                    looper_parse_midi(l, data1, data2);
                 }
                 else if (mixr->midi_control_destination == MIDISEQUENCER) {
                     printf("SEQUENCER MIDI CONTROL!\n");
