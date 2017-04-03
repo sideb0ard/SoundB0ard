@@ -367,24 +367,28 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 1: // K1 - Envelope Attack Time Msec
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            printf("Envelope attack!\n");
+            if(mixr->debug_mode)
+                printf("Envelope attack!\n");
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             ms->m_attack_time_msec = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
             scaley_val = scaleybum(1, 128, 0, 1000, data2);
             ms->m_delay_time_msec = scaley_val;
-            printf("DELAY MS: %f\n", ms->m_delay_time_msec);
+            if(mixr->debug_mode)
+                printf("DELAY MS: %f\n", ms->m_delay_time_msec);
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-            printf("EG1->DCA intensity!\n");
+            if(mixr->debug_mode)
+                printf("EG1->DCA intensity!\n");
             scaley_val = scaleybum(1, 128, 0, 10, data2);
             ms->m_eg1_dca_intensity = scaley_val;
         }
         break;
     case 2: // K2 - Envelope Decay Time Msec
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            printf("Envelope decay!\n");
+            if(mixr->debug_mode)
+                printf("Envelope decay!\n");
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             ms->m_decay_release_time_msec = scaley_val;
         }
@@ -399,7 +403,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 3: // K3 - Envelope Sustain Level
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            printf("Env Sustain level\n");
+            if(mixr->debug_mode)
+                printf("Env Sustain level\n");
             scaley_val = scaleybum(1, 128, 0, 1, data2);
             ms->m_sustain_level = scaley_val;
         }
@@ -429,7 +434,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 5: // K6 - LFO amplitude
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            printf("LFO Amplitude\n");
+            if(mixr->debug_mode)
+                printf("LFO Amplitude\n");
             scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
             ms->m_lfo1_amplitude = scaley_val;
         }
@@ -444,7 +450,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 6: // K5 - LFO rate
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            printf("LFO Rate\n");
+            if(mixr->debug_mode)
+                printf("LFO Rate\n");
             scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
             ms->m_lfo1_rate = scaley_val;
         }
@@ -459,7 +466,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 7: // K7 - Filter Frequency Cut
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            printf("Filter Frequency!\n");
+            if(mixr->debug_mode)
+                printf("Filter Frequency!\n");
             scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
             ms->m_fc_control = scaley_val;
         }
@@ -474,7 +482,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 8: // K8 - Filter Q control
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            printf("Filter Q!\n");
+            if(mixr->debug_mode)
+                printf("Filter Q!\n");
             scaley_val = scaleybum(1, 128, 1, 10, data2);
             ms->m_q_control = scaley_val;
         }

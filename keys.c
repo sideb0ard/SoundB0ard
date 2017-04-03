@@ -121,6 +121,7 @@ void *play_melody_loop(void *p)
 {
     minisynth *ms = (minisynth *)p;
 
+    pthread_setname_np("Melody looper");
     printf("PLAY melody starting..\n");
 
     while (1) {

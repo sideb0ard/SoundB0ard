@@ -19,6 +19,8 @@ extern mixer *mixr;
 void *midiman()
 {
     printf("MIDI maaaaan!\n");
+    pthread_setname_np("Midimaaaan");
+
     Pm_Initialize();
 
     int cnt;
