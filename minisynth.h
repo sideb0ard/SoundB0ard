@@ -184,6 +184,9 @@ void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
 void minisynth_toggle_delay_mode(minisynth *ms);
 void minisynth_set_sustain_override(minisynth *ms, bool b);
 
+void minisynth_rand_settings(minisynth *ms);
+void minisynth_print_settings(minisynth *ms);
+
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
 bool is_valid_melody_num(minisynth *ns, int melody_num);
 

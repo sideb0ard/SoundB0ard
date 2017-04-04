@@ -11,6 +11,7 @@
 #include "defjams.h"
 #include "keys.h"
 #include "midimaaan.h"
+#include "minisynth.h"
 #include "mixer.h"
 #include "utils.h"
 
@@ -91,6 +92,10 @@ void keys(int soundgen_num)
             case 98:
                 printf("TRI2SQR mode\n");
                 ms->m_voice_mode = 4;
+                break;
+            case 91:
+                printf("RANDOM MONDY mode!\n");
+                minisynth_rand_settings(ms);
                 break;
             case 110:
                 ms->m_lfo1_waveform = (++ms->m_lfo1_waveform) % MAX_LFO_OSC;

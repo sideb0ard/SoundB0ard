@@ -496,6 +496,9 @@ void interpret(char *line)
                             minisynth_nudge_melody(ms, ms->cur_melody, sixteenth);
                         }
                     }
+                    if (strncmp("rand", wurds[2], 4) == 0) {
+                        minisynth_rand_settings(ms);
+                    }
                     if (strncmp("sustain", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
                             minisynth_set_sustain_override(ms, true);

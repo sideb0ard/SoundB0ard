@@ -26,7 +26,7 @@ void *midiman()
     int cnt;
     const PmDeviceInfo *info;
 
-    int dev;
+    int dev = 0;
 
     if ((cnt = Pm_CountDevices())) {
         for (int i = 0; i < cnt; i++) {
@@ -76,6 +76,7 @@ void *midiman()
                     ev.event_type = status;
                     ev.data1 = data1;
                     ev.data2 = data2;
+                    ev.delete_after_use = false;
                     midi_parse_midi_event(ms, &ev);
                 }
                 else if (mixr->midi_control_destination == DELAYFX) {
@@ -138,6 +139,7 @@ midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
     ev->event_type = event_type;
     ev->data1 = data1;
     ev->data2 = data2;
+    ev->delete_after_use = false;
 
     return ev;
 }

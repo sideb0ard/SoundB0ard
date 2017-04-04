@@ -3,11 +3,6 @@
 #include "sbmsg.h"
 #include <stdbool.h>
 
-typedef struct freaky {
-    int num_freaks;
-    double *freaks;
-} freaky;
-
 void get_full_filename(char *basename, char *destination_fullname);
 void thrunner(SBMSG *msg);
 void *timed_sig_start(void *arg);
@@ -15,7 +10,6 @@ void *fadeup_runrrr(void *arg);
 void *fadedown_runrrr(void *arg);
 void *duck_runrrr(void *arg);
 void faderrr(int sig_num, direction d);
-freaky *new_freqs_from_string(char *string);
 float freqval(char *n);
 int notelookup(char *n);
 int ch_midi_lookup(int ch, void *fm);

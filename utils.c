@@ -136,27 +136,6 @@ void faderrr(int sg_num, direction d)
     }
 }
 
-freaky *new_freqs_from_string(char *string)
-{
-    char *ap, *ap_last, *fargv[8];
-    int freq_count = 0;
-    char *sep = " ";
-
-    for (ap = strtok_r(string, sep, &ap_last); ap;
-         ap = strtok_r(NULL, sep, &ap_last)) {
-        fargv[freq_count++] = ap;
-    }
-
-    freaky *f = (freaky *)calloc(1, sizeof(freaky));
-    f->num_freaks = freq_count;
-    f->freaks = (double *)calloc(freq_count, sizeof(int));
-
-    for (int i = 0; i < freq_count; i++) {
-        f->freaks[i] = atof(fargv[i]);
-    }
-    return f;
-}
-
 void list_sample_dir()
 {
     DIR *dp;

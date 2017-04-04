@@ -11,8 +11,10 @@ mod_delay *new_mod_delay()
         return NULL;
 
     md->m_lfo = lfo_new();
-    if (!md->m_lfo)
+    if (!md->m_lfo) {
+        free (md);
         return NULL;
+    }
 
     ddl_initialize(&md->m_delay);
 

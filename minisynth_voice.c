@@ -200,6 +200,7 @@ void minisynth_voice_update(minisynth_voice *msv)
         msv->m_osc1.osc.reset_oscillator((oscillator *)&msv->m_osc1);
         msv->m_osc2.osc.reset_oscillator((oscillator *)&msv->m_osc2);
         msv->m_osc3.osc.reset_oscillator((oscillator *)&msv->m_osc3);
+        msv->m_osc4.osc.reset_oscillator((oscillator *)&msv->m_osc4);
     }
 }
 

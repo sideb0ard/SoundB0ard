@@ -887,7 +887,8 @@ bool is_valid_melody_num(minisynth *ms, int melody_num)
     return false;
 }
 
-// TODO - better function name - this is programatic calls
+// TODO - better function name - this is programatic calls, which 
+// basically adds a matching delete after use event i.e. == a note off
 void minisynth_handle_midi_note(minisynth *ms, int note, int velocity)
 {
 	if (mixr->debug_mode)
@@ -917,4 +918,90 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity)
         off_event->delete_after_use = true; // _THIS_ is the magic
         minisynth_add_event(ms, off_event);
     }
+}
+
+void minisynth_rand_settings(minisynth *ms)
+{
+    printf("Randomizing SYNTH!\n");
+    ms->m_voice_mode = rand() % 4;
+    ms->m_detune_cents = ((float)rand())/RAND_MAX;
+    ms->m_lfo1_amplitude = ((float)rand())/RAND_MAX;
+    ms->m_lfo1_rate = ((float)rand())/RAND_MAX * (MAX_LFO_RATE - MIN_LFO_RATE) + MIN_LFO_RATE;
+    ms->m_fc_control = ((float)rand())/RAND_MAX * (FILTER_FC_MAX - FILTER_FC_MIN) + FILTER_FC_MIN;
+    ms->m_q_control = ((float)rand())/RAND_MAX;
+    ms->m_attack_time_msec = ((float)rand())/RAND_MAX * EG_MAXTIME_MS;
+    ms->m_delay_time_msec = ((float)rand())/RAND_MAX * EG_MAXTIME_MS;
+    ms->m_decay_release_time_msec = ((float)rand())/RAND_MAX * EG_MAXTIME_MS;
+    ms->m_pulse_width_pct = (((float)rand()/(float)(RAND_MAX)) * 96) + 2;
+    //ms->m_feedback_pct = ((float)rand()/(float)(RAND_MAX));
+    //ms->m_delay_ratio = ((float)rand())/RAND_MAX;
+    //ms->m_wet_mix = ((float)rand()/(float)(RAND_MAX));
+    //ms->m_octave = rand() % 4 - 2;
+    //ms->m_portamento_time_msec = ((float)rand()/(float)(RAND_MAX)) * 10;
+    //ms->m_lfo1_osc_pitch_intensity = ((float)rand()/(float)(RAND_MAX));
+    //ms->m_sub_osc_db = -96.000000;
+    //ms->m_eg1_osc_intensity = 0.0;
+    //ms->m_eg1_filter_intensity = 0.0;
+    //ms->m_lfo1_filter_fc_intensity = 0.0;
+    //// ms->m_sustain_level = 0.510000;
+    //ms->m_sustain_level = 0.9;
+    //ms->m_noise_osc_db = -96.000000;
+    //ms->m_lfo1_amp_intensity = 0.0;
+    //ms->m_lfo1_pan_intensity = 0.0;
+    //ms->m_eg1_dca_intensity = 1.0;
+    //ms->m_lfo1_waveform = 0;
+    //ms->m_volume_db = 1.0;
+    //ms->m_legato_mode = DEFAULT_LEGATO_MODE;
+    //ms->m_pitchbend_range = 1;
+    //ms->m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
+    //ms->m_filter_keytrack = DEFAULT_FILTER_KEYTRACK;
+    //ms->m_filter_keytrack_intensity = DEFAULT_FILTER_KEYTRACK_INTENSITY;
+    //ms->m_velocity_to_attack_scaling = 0;
+    //ms->m_note_number_to_decay_scaling = 0;
+    //ms->m_delay_mode = 0;
+    //ms->m_eg1_dca_intensity = 1.0;
+    //ms->m_sustain_override = false;
+    //
+    minisynth_print_settings(ms);
+}
+
+void minisynth_print_settings(minisynth *ms)
+{
+    printf("Voice mode %d\n", ms->m_voice_mode);
+    printf("Detune Cents: %f\n", ms->m_detune_cents);
+    printf("LFO AMp: %f\n", ms->m_lfo1_amplitude);
+    printf("LFO Rate %f\n", ms->m_lfo1_rate);
+    printf("Filter Control %f\n", ms->m_fc_control);
+    printf("Filter Q Control: %f\n", ms->m_q_control);
+    printf("EG Attack time: %f\n", ms->m_attack_time_msec);
+    printf("EG Delay Time: %f\n", ms->m_delay_time_msec);
+    printf("EG Decay Time: %f\n", ms->m_decay_release_time_msec);
+    printf("Pulse Width Pct: %f\n", ms->m_pulse_width_pct);
+    printf("Delay Feedback Pct %f\n", ms->m_feedback_pct);
+    printf("Delay Ratio: %f\n", ms->m_delay_ratio);
+    printf("Delay Wet Mix: %f\n", ms->m_wet_mix);
+    printf("Octave: %d\n", ms->m_octave);
+    printf("Portamento Time %f\n", ms->m_portamento_time_msec);
+    printf("LFO1 Osc Pitch Intensity: %f\n", ms->m_lfo1_osc_pitch_intensity);
+    printf("Sub OSC Db: %f\n", ms->m_sub_osc_db);
+    printf("EG1 OSc Intensity: %f\n", ms->m_eg1_osc_intensity);
+    printf("EG1 Filter Intensity %f\n", ms->m_eg1_filter_intensity);
+    printf("LFO1 Filter FC Intensity: %f\n", ms->m_lfo1_filter_fc_intensity);
+    printf("Sustain Level: %f\n", ms->m_sustain_level);
+    printf("Noise OSC Db: %f\n", ms->m_noise_osc_db);
+    printf("LFO1 Amp Intensity: %f\n", ms->m_lfo1_amp_intensity);
+    printf("LFO1 Pan Intensity: %f\n", ms->m_lfo1_pan_intensity);
+    printf("EG1 DCA Intensity: %f\n", ms->m_eg1_dca_intensity);
+    printf("LFO Waveform: %d\n", ms->m_lfo1_waveform);
+    printf("Volume: %f\n", ms->m_volume_db);
+    printf("LEGATO MODE: %d\n", ms->m_legato_mode);
+    printf("Pitchbend Range: %d\n", ms->m_pitchbend_range);
+    printf("Reset To Zero: %d\n", ms->m_reset_to_zero);
+    printf("Filter Keytrack: %d\n", ms->m_filter_keytrack);
+    printf("Filter Keytrack Intensity: %f\n", ms->m_filter_keytrack_intensity);
+    printf("Velocity to Attack Scaling: %d\n", ms->m_velocity_to_attack_scaling);
+    printf("Note Number To Decay Scaling: %d\n", ms->m_note_number_to_decay_scaling);
+    printf("Delay Mode: %d\n", ms->m_delay_mode);
+    printf("EG1 DCA Intensity: %f\n", ms->m_eg1_dca_intensity);
+    printf("Sustain Override: %d\n", ms->m_sustain_override);
 }
