@@ -921,6 +921,9 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity)
 void minisynth_rand_settings(minisynth *ms)
 {
     printf("Randomizing SYNTH!\n");
+    int rand_ = 0;
+    double scaley_val;
+
     ms->m_voice_mode = rand() % 4;
     ms->m_detune_cents = ((float)rand()) / RAND_MAX;
     ms->m_lfo1_amplitude = ((float)rand()) / RAND_MAX;
@@ -932,38 +935,42 @@ void minisynth_rand_settings(minisynth *ms)
         FILTER_FC_MIN;
     ms->m_q_control = ((float)rand()) / RAND_MAX;
     ms->m_attack_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
-    ms->m_delay_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
     ms->m_decay_release_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
     ms->m_pulse_width_pct = (((float)rand() / (float)(RAND_MAX)) * 96) + 2;
-    // ms->m_feedback_pct = ((float)rand()/(float)(RAND_MAX));
-    // ms->m_delay_ratio = ((float)rand())/RAND_MAX;
-    // ms->m_wet_mix = ((float)rand()/(float)(RAND_MAX));
-    // ms->m_octave = rand() % 4 - 2;
-    // ms->m_portamento_time_msec = ((float)rand()/(float)(RAND_MAX)) * 10;
-    // ms->m_lfo1_osc_pitch_intensity = ((float)rand()/(float)(RAND_MAX));
-    // ms->m_sub_osc_db = -96.000000;
-    // ms->m_eg1_osc_intensity = 0.0;
-    // ms->m_eg1_filter_intensity = 0.0;
-    // ms->m_lfo1_filter_fc_intensity = 0.0;
-    //// ms->m_sustain_level = 0.510000;
+
+    rand_ = (rand() % 127) + 1; 
+    scaley_val = scaleybum(1, 128, -0.9, 0.9, rand_);
+    ms->m_delay_ratio = scaley_val;
+    ms->m_delay_time_msec = ((float)rand()) / RAND_MAX * 2000;
+    ms->m_feedback_pct = (float) (rand() % 200) - 100;
+    ms->m_wet_mix = ((float)rand()/(float)(RAND_MAX)) * 100;
+
+    ms->m_octave = rand() % 4 - 2;
+
+    ms->m_portamento_time_msec = ((float)rand()/(float)(RAND_MAX)) * 10;
+    ms->m_lfo1_osc_pitch_intensity = (((float)rand()/(float)(RAND_MAX)) * 2) - 1;
+    ms->m_sub_osc_db = -1.0 * (rand() % 96);
+    ms->m_eg1_osc_intensity = (rand() % 2) + 1;
+    ms->m_eg1_filter_intensity = (rand() % 2) + 1;
+    ms->m_lfo1_filter_fc_intensity = (rand() % 2) + 1; 
     // ms->m_sustain_level = 0.9;
-    // ms->m_noise_osc_db = -96.000000;
-    // ms->m_lfo1_amp_intensity = 0.0;
-    // ms->m_lfo1_pan_intensity = 0.0;
-    // ms->m_eg1_dca_intensity = 1.0;
-    // ms->m_lfo1_waveform = 0;
+    ms->m_noise_osc_db = -1.0 * (rand() % 96);
+    ms->m_lfo1_amp_intensity = ((float)rand()/(float)(RAND_MAX));
+    ms->m_lfo1_pan_intensity = ((float)rand()/(float)(RAND_MAX));
+    ms->m_eg1_dca_intensity = ((float)rand()/(float)(RAND_MAX));
+    ms->m_lfo1_waveform = rand() % MAX_LFO_OSC;
     // ms->m_volume_db = 1.0;
-    // ms->m_legato_mode = DEFAULT_LEGATO_MODE;
-    // ms->m_pitchbend_range = 1;
-    // ms->m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
-    // ms->m_filter_keytrack = DEFAULT_FILTER_KEYTRACK;
-    // ms->m_filter_keytrack_intensity = DEFAULT_FILTER_KEYTRACK_INTENSITY;
-    // ms->m_velocity_to_attack_scaling = 0;
-    // ms->m_note_number_to_decay_scaling = 0;
-    // ms->m_delay_mode = 0;
-    // ms->m_eg1_dca_intensity = 1.0;
-    // ms->m_sustain_override = false;
-    //
+    ms->m_legato_mode = rand() % 2;
+    ms->m_pitchbend_range = rand() % 12;
+    ms->m_reset_to_zero = rand() % 2;
+    ms->m_filter_keytrack = rand() % 2;
+    ms->m_filter_keytrack_intensity = (((float)rand()/(float)(RAND_MAX)) * 10) + 0.51;
+    ms->m_velocity_to_attack_scaling = rand() % 2;
+    ms->m_note_number_to_decay_scaling = rand() % 2;
+    ms->m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
+    ms->m_eg1_dca_intensity = (rand() % 2) + 1;
+    ms->m_sustain_override = rand() % 2;
+
     minisynth_print_settings(ms);
 }
 

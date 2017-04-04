@@ -89,7 +89,6 @@ void eg_reset(envelope_generator *self)
     eg_calculate_release_time(self);
 
     if (self->m_reset_to_zero) {
-        printf("RESET TO ZERO!\n");
         self->m_envelope_output = 0.0;
     }
 }
