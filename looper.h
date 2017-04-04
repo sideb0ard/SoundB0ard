@@ -1,6 +1,7 @@
 #ifndef LOOPER_H
 #define LOOPER_H
 
+#include "filter_moogladder.h"
 #include "sound_generator.h"
 #include <pthread.h>
 #include <stdbool.h>
