@@ -13,14 +13,14 @@
 #include "bytebeatrrr.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
-#include "sequencer.h"
-#include "sequencer_utils.h"
 #include "effect.h"
 #include "envelope.h"
+#include "looper.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "looper.h"
 #include "sbmsg.h"
+#include "sequencer.h"
+#include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "spork.h"
 
@@ -256,7 +256,7 @@ int add_minisynth(mixer *mixr)
 }
 
 int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
-                       bool start_on_first_beat)
+                      bool start_on_first_beat)
 {
     // preliminary setup
     char cwd[1024];
@@ -331,11 +331,12 @@ double mixer_gennext(mixer *mixr)
 
         if (mixr->tick % PPL == 0) {
             mixr->start_of_loop = true;
-        } else {
+        }
+        else {
             mixr->start_of_loop = false;
         }
-
-    } else {
+    }
+    else {
         mixr->start_of_loop = false;
     }
 

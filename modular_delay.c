@@ -12,7 +12,7 @@ mod_delay *new_mod_delay()
 
     md->m_lfo = lfo_new();
     if (!md->m_lfo) {
-        free (md);
+        free(md);
         return NULL;
     }
 

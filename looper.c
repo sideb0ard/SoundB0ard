@@ -5,8 +5,8 @@
 #include <unistd.h>
 
 #include "defjams.h"
-#include "mixer.h"
 #include "looper.h"
+#include "mixer.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -35,7 +35,7 @@ looper *new_looper(char *filename, double loop_len)
     stereo_delay_prepare_for_play(&l->m_delay_fx);
     filter_moog_init(&l->m_filter);
     l->m_fc_control = 10000;
-    moog_update((filter*) &l->m_filter);
+    moog_update((filter *)&l->m_filter);
 
     return l;
 }
@@ -57,11 +57,9 @@ double looper_gennext(void *self)
     }
 
     if (l->stutter_mode &&
-        (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) ==
-         0)) {
+        (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0)) {
         if (mixr->debug_mode)
-            printf("Stutututututter! Current: %d\n",
-                   l->stutter_current_16th);
+            printf("Stutututututter! Current: %d\n", l->stutter_current_16th);
         if (rand() % 100 > 60) {
             if (mixr->debug_mode)
                 printf("Advancing stutter 16th..\n");
@@ -81,8 +79,7 @@ double looper_gennext(void *self)
     }
 
     if (l->scramblrrr_mode &&
-        (mixr->cur_sample % (l->scramblrrr->resampled_file_size * 4) ==
-         0)) {
+        (mixr->cur_sample % (l->scramblrrr->resampled_file_size * 4) == 0)) {
         looper_scramble(l);
     }
 
@@ -99,36 +96,29 @@ double looper_gennext(void *self)
         if (l->multi_sample_mode) {
             l->cur_sample_iteration--;
             if (l->cur_sample_iteration == 0) {
-                l->cur_sample =
-                    (l->cur_sample + 1) % l->num_samples;
-                l->cur_sample_iteration =
-                    l->sample_num_loops[l->cur_sample];
+                l->cur_sample = (l->cur_sample + 1) % l->num_samples;
+                l->cur_sample_iteration = l->sample_num_loops[l->cur_sample];
             }
         }
     }
 
     if (l->stutter_mode) {
         int len16th = l->scramblrrr->resampled_file_size / 16;
-        int stutidx =
-            (l->samples[l->cur_sample]->position % len16th) +
-            l->stutter_current_16th * len16th;
-        val = l->samples[l->cur_sample]
-                  ->resampled_file_bytes[stutidx];
+        int stutidx = (l->samples[l->cur_sample]->position % len16th) +
+                      l->stutter_current_16th * len16th;
+        val = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
         l->samples[l->cur_sample]->position++;
     }
     else if (l->scramblrrr_mode) {
-        val = l->scramblrrr
-                  ->resampled_file_bytes[l->scramblrrr->position++];
-        l->samples[l->cur_sample]
-            ->position++; // keep increasing normal sample
+        val = l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
+        l->samples[l->cur_sample]->position++; // keep increasing normal sample
     }
     else {
-        val = l->samples[l->cur_sample]->resampled_file_bytes
-                  [l->samples[l->cur_sample]->position++];
+        val = l->samples[l->cur_sample]
+                  ->resampled_file_bytes[l->samples[l->cur_sample]->position++];
     }
 
-    if (l->scramblrrr->position ==
-        l->scramblrrr->resampled_file_size) {
+    if (l->scramblrrr->position == l->scramblrrr->resampled_file_size) {
         l->scramblrrr->position = 0;
     }
 
@@ -143,11 +133,11 @@ double looper_gennext(void *self)
     val = effector(&l->sound_generator, val);
     val = envelopor(&l->sound_generator, val);
 
-     // update delay and filter
+    // update delay and filter
     l->m_filter.f.m_fc_control = l->m_fc_control;
-    moog_set_qcontrol((filter*) &l->m_filter, l->m_q_control);
-    moog_update((filter*) &l->m_filter);
-    val = moog_gennext((filter*) &l->m_filter, val);
+    moog_set_qcontrol((filter *)&l->m_filter, l->m_q_control);
+    moog_update((filter *)&l->m_filter);
+    val = moog_gennext((filter *)&l->m_filter, val);
 
     stereo_delay_set_mode(&l->m_delay_fx, l->m_delay_mode);
     stereo_delay_set_delay_time_ms(&l->m_delay_fx, l->m_delay_time_msec);
@@ -326,18 +316,17 @@ void looper_status(void *self, wchar_t *status_string)
              "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
              "ScramblrrrMode: %s ScrambleGen: %d StutterMode: %s "
              "Stutter Gen: %d MaxGen: %d",
-             l->vol, l->multi_sample_mode ? "true" : "false",
-             l->cur_sample, l->scramblrrr_mode ? "true" : "false",
-             l->scramble_generation,
-             l->stutter_mode ? "true" : "false",
-             l->stutter_generation, l->max_generation);
+             l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
+             l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
+             l->stutter_mode ? "true" : "false", l->stutter_generation,
+             l->max_generation);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < l->num_samples; i++) {
         swprintf(looper_details, 128,
                  L"\n      [%d] %s - looplen: %d numloops: %d", i,
-                 basename(l->samples[i]->filename),
-                 l->samples[i]->loop_len, l->sample_num_loops[i]);
+                 basename(l->samples[i]->filename), l->samples[i]->loop_len,
+                 l->sample_num_loops[i]);
         wcslcat(status_string, looper_details, strlen_left);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
@@ -393,10 +382,7 @@ void looper_set_scramble_mode(looper *s, bool b)
            s->scramblrrr_mode ? "true" : "false");
 }
 
-void looper_set_max_generation(looper *s, int max)
-{
-    s->max_generation = max;
-}
+void looper_set_max_generation(looper *s, int max) { s->max_generation = max; }
 
 void looper_set_stutter_mode(looper *s, bool b)
 {
@@ -557,7 +543,7 @@ void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2)
         break;
     case 9: // PAD 5
         printf("Toggle Delay Mode!\n");
-        s->m_delay_mode = (++s->m_delay_mode) % MAX_NUM_DELAY_MODE; 
+        s->m_delay_mode = (++s->m_delay_mode) % MAX_NUM_DELAY_MODE;
         break;
     default:
         break;

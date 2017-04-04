@@ -63,7 +63,7 @@ typedef struct minisynth {
     bool recording;
     unsigned int m_midi_knob_mode; // midi routings, 1..3
 
-    //float vol;
+    // float vol;
 
     // end SOUNDGEN stuff
 
@@ -180,7 +180,7 @@ midi_event **minisynth_copy_midi_loop(minisynth *self, int pattern_num);
 void minisynth_add_midi_loop(minisynth *self, midi_event **events,
                              int pattern_num);
 void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
-                             int melody_num);
+                                 int melody_num);
 void minisynth_toggle_delay_mode(minisynth *ms);
 void minisynth_set_sustain_override(minisynth *ms, bool b);
 

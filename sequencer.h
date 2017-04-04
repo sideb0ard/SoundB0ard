@@ -83,9 +83,9 @@ sequencer *new_seq_from_char_array(char *filename, char **pattern, int nsteps);
 void seq_status(void *self, wchar_t *ss);
 void seq_setvol(void *self, double v);
 void seq_set_sample_amp(sequencer *self, int pattern_num, int pattern_position,
-                         double v);
+                        double v);
 void seq_set_sample_amp_from_char_pattern(sequencer *self, int pattern_num,
-                                           char *amp_pattern);
+                                          char *amp_pattern);
 void seq_set_random_sample_amp(sequencer *d, int pattern_num);
 void add_char_pattern(sequencer *d, char *pattern);
 void change_char_pattern(sequencer *d, int pattern_num, char *pattern);

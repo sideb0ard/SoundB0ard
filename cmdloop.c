@@ -18,7 +18,6 @@
 #include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
-#include "sequencer_utils.h"
 #include "envelope.h"
 #include "help.h"
 #include "keys.h"
@@ -27,6 +26,7 @@
 #include "mixer.h"
 #include "obliquestrategies.h"
 #include "oscillator.h"
+#include "sequencer_utils.h"
 #include "sparkline.h"
 #include "table.h"
 #include "utils.h"
@@ -167,9 +167,11 @@ void interpret(char *line)
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type == SEQUENCER_TYPE) {
+                    mixr->sound_generators[soundgen_num]->type ==
+                        SEQUENCER_TYPE) {
 
-                    sequencer *d = (sequencer *)mixr->sound_generators[soundgen_num];
+                    sequencer *d =
+                        (sequencer *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 3) == 0) {
                         printf("Adding\n");
@@ -183,9 +185,9 @@ void interpret(char *line)
                             seq_set_random_sample_amp(d, pattern_num);
                         }
                     }
-                    else if (strncmp("midi", wurds[2], 4) == 0)
-                    {
-                        printf("MIDI goes to Da Winner .. Sequencer %d\n", soundgen_num);
+                    else if (strncmp("midi", wurds[2], 4) == 0) {
+                        printf("MIDI goes to Da Winner .. Sequencer %d\n",
+                               soundgen_num);
                         mixr->midi_control_destination = MIDISEQUENCER;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
@@ -236,7 +238,7 @@ void interpret(char *line)
                                     int numloops = atoi(wurds[5]);
                                     if (numloops != 0) {
                                         seq_change_num_loops(d, pattern_num,
-                                                               numloops);
+                                                             numloops);
                                     }
                                 }
                             }
@@ -320,11 +322,9 @@ void interpret(char *line)
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type ==
-                        LOOPER_TYPE) {
+                    mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE) {
 
-                    looper *s =
-                        (looper *)mixr->sound_generators[soundgen_num];
+                    looper *s = (looper *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 6) == 0) {
                         if (is_valid_file(wurds[3]) ||
@@ -346,7 +346,7 @@ void interpret(char *line)
                                 int numloops = atoi(wurds[5]);
                                 if (numloops != 0) {
                                     looper_change_num_loops(s, sample_num,
-                                                             numloops);
+                                                            numloops);
                                 }
                             }
                         }
@@ -452,10 +452,11 @@ void interpret(char *line)
                             }
 
                             if (onoff != -1) {
-                                midi_event *ev = new_midi_event(tick, onoff,
-                                                        notenum, 128);
+                                midi_event *ev =
+                                    new_midi_event(tick, onoff, notenum, 128);
                                 minisynth_add_event(ms, ev);
-                            } else {
+                            }
+                            else {
                                 printf("Needs to be 'on' or 'off'\n");
                             }
                         }
@@ -492,8 +493,10 @@ void interpret(char *line)
                     if (strncmp("nudge", wurds[2], 5) == 0) {
                         int sixteenth = atoi(wurds[3]);
                         if (sixteenth < 16) {
-                            printf("Nudging Melody along %d sixteenthzzzz!\n", sixteenth);
-                            minisynth_nudge_melody(ms, ms->cur_melody, sixteenth);
+                            printf("Nudging Melody along %d sixteenthzzzz!\n",
+                                   sixteenth);
+                            minisynth_nudge_melody(ms, ms->cur_melody,
+                                                   sixteenth);
                         }
                     }
                     if (strncmp("rand", wurds[2], 4) == 0) {
@@ -545,10 +548,12 @@ void interpret(char *line)
                             mixr->sound_generators[sg2]->type == SYNTH_TYPE) {
                             minisynth *ms2 =
                                 (minisynth *)mixr->sound_generators[sg2];
-                            printf("Copying SYNTH pattern from %d to %d!\n", soundgen_num, sg2);
-                            midi_event **melody = minisynth_copy_midi_loop(ms, ms->cur_melody);
-                            minisynth_replace_midi_loop(ms2, melody, ms2->cur_melody);
-
+                            printf("Copying SYNTH pattern from %d to %d!\n",
+                                   soundgen_num, sg2);
+                            midi_event **melody =
+                                minisynth_copy_midi_loop(ms, ms->cur_melody);
+                            minisynth_replace_midi_loop(ms2, melody,
+                                                        ms2->cur_melody);
                         }
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0) {
@@ -713,7 +718,8 @@ void interpret(char *line)
                 int percent_mix = atoi(wurds[3]);
                 printf("SIDEHCINA %d %d %d\n", soundgen_num, input_src,
                        percent_mix);
-                // if (mixr->sound_generators[input_src]->type == SEQUENCER_TYPE) {
+                // if (mixr->sound_generators[input_src]->type ==
+                // SEQUENCER_TYPE) {
                 //    sequencer *d = (sequencer *)
                 //    mixr->sound_generators[input_src]->type;
                 //    int pat_array[SEQUENCER_PATTERN_LEN];

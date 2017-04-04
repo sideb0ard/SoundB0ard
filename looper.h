@@ -52,7 +52,7 @@ typedef struct t_looper {
 
     int max_generation;
 
-	stereodelay m_delay_fx;
+    stereodelay m_delay_fx;
     // midi - top row
     double m_fc_control;
     double m_q_control;

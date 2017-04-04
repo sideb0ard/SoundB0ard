@@ -3,10 +3,10 @@
 
 #include <portaudio.h>
 
-#include "sequencer.h"
 #include "effect.h"
 #include "minisynth.h"
 #include "sbmsg.h"
+#include "sequencer.h"
 #include "sound_generator.h"
 #include "table.h"
 
@@ -68,7 +68,7 @@ int add_chaosmonkey(void);
 int add_minisynth(mixer *mixr);
 int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
 int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
-                       bool start_on_first_beat);
+                      bool start_on_first_beat);
 int add_looper(mixer *mixr, char *filename, double loop_len);
 int add_sound_generator(mixer *mixr, SOUNDGEN *sg);
 int add_effect(mixer *mixr);

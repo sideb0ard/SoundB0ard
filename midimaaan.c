@@ -6,10 +6,10 @@
 #include <string.h>
 
 #include "defjams.h"
+#include "looper.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
 #include "minisynth.h"
-#include "looper.h"
 #include "mixer.h"
 #include "spork.h"
 #include "utils.h"
@@ -92,16 +92,16 @@ void *midiman()
                 }
                 else if (mixr->midi_control_destination == MIDILOOPER) {
                     printf("LOOPER MIDI CONTROL!\n");
-                    looper *l = 
-                        (looper *) mixr
-                        ->sound_generators[mixr->active_midi_soundgen_num];
+                    looper *l =
+                        (looper *)mixr
+                            ->sound_generators[mixr->active_midi_soundgen_num];
                     looper_parse_midi(l, data1, data2);
                 }
                 else if (mixr->midi_control_destination == MIDISEQUENCER) {
                     printf("SEQUENCER MIDI CONTROL!\n");
-                    sequencer *s = 
-                        (sequencer *) mixr
-                        ->sound_generators[mixr->active_midi_soundgen_num];
+                    sequencer *s =
+                        (sequencer *)mixr
+                            ->sound_generators[mixr->active_midi_soundgen_num];
                     seq_parse_midi(s, data1, data2);
                 }
                 else if (mixr->midi_control_destination == MIDISPORK) {
@@ -404,22 +404,22 @@ void midi_melody_print(midi_event **melody)
     printf("Melody Details\n");
     for (int i = 0; i < PPNS; i++) {
         if (melody[i]) {
-            int tick   = melody[i]->tick;
-            int data1  = melody[i]->data1;
-            int data2  = melody[i]->data2;
-            int typeint   = melody[i]->event_type;
+            int tick = melody[i]->tick;
+            int data1 = melody[i]->data1;
+            int data2 = melody[i]->data2;
+            int typeint = melody[i]->event_type;
             char type[20] = {0};
-            switch(typeint){
-            case(144):
+            switch (typeint) {
+            case (144):
                 strcpy(type, "note_on");
                 break;
-            case(128):
+            case (128):
                 strcpy(type, "note_off");
                 break;
-            case(176):
+            case (176):
                 strcpy(type, "midi_control");
                 break;
-            case(224):
+            case (224):
                 strcpy(type, "pitch_bend");
                 break;
             default:
@@ -427,7 +427,9 @@ void midi_melody_print(midi_event **melody)
                 break;
             }
             int delete = melody[i]->delete_after_use;
-            printf("[Tick: %d] - note: %d velocity: %d type: %s delete_after_use: %s\n", tick, data1, data2, type, delete ? "true" : "false");
+            printf("[Tick: %d] - note: %d velocity: %d type: %s "
+                   "delete_after_use: %s\n",
+                   tick, data1, data2, type, delete ? "true" : "false");
         }
     }
 }

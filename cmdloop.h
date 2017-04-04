@@ -1,7 +1,7 @@
 #pragma once
-#include "sequencer.h"
-#include "minisynth.h"
 #include "looper.h"
+#include "minisynth.h"
+#include "sequencer.h"
 #include <stdbool.h>
 
 #define SIZE_OF_WURD 41 // 40 char word plus terminator

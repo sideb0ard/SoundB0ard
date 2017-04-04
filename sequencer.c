@@ -7,9 +7,9 @@
 #include <wchar.h>
 
 #include "defjams.h"
+#include "mixer.h"
 #include "sequencer.h"
 #include "sequencer_utils.h"
-#include "mixer.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -59,7 +59,7 @@ sequencer *new_seq(char *filename)
     stereo_delay_prepare_for_play(&seq->m_delay_fx);
     filter_moog_init(&seq->m_filter);
     seq->m_fc_control = 10000;
-    moog_update((filter*) &seq->m_filter);
+    moog_update((filter *)&seq->m_filter);
 
     return seq;
 }
@@ -209,9 +209,9 @@ double seq_gennext(void *self)
 
     // update delay and filter
     seq->m_filter.f.m_fc_control = seq->m_fc_control;
-    moog_set_qcontrol((filter*) &seq->m_filter, seq->m_q_control);
-    moog_update((filter*) &seq->m_filter);
-    val = moog_gennext((filter*) &seq->m_filter, val);
+    moog_set_qcontrol((filter *)&seq->m_filter, seq->m_q_control);
+    moog_update((filter *)&seq->m_filter);
+    val = moog_gennext((filter *)&seq->m_filter, val);
 
     stereo_delay_set_mode(&seq->m_delay_fx, seq->m_delay_mode);
     stereo_delay_set_delay_time_ms(&seq->m_delay_fx, seq->m_delay_time_msec);
@@ -631,7 +631,7 @@ int seed_pattern()
 }
 
 void seq_set_sample_amp(sequencer *d, int pattern_num, int pattern_position,
-                         double v)
+                        double v)
 {
     d->pattern_position_amp[pattern_num][pattern_position] = v;
 }
@@ -646,7 +646,7 @@ void seq_set_random_sample_amp(sequencer *d, int pattern_num)
 }
 
 void seq_set_sample_amp_from_char_pattern(sequencer *d, int pattern_num,
-                                           char *amp_pattern)
+                                          char *amp_pattern)
 {
     printf("Ooh, setting amps to %s\n", amp_pattern);
 
@@ -721,7 +721,10 @@ void seq_set_backup_mode(sequencer *d, bool on)
 
 void seq_set_max_generations(sequencer *d, int max) { d->max_generation = max; }
 
-void seq_set_markov_mode(sequencer *d, unsigned int mode) { d->markov_mode = mode; }
+void seq_set_markov_mode(sequencer *d, unsigned int mode)
+{
+    d->markov_mode = mode;
+}
 
 // TODO make this part of SOUND GENERATOR
 void seq_parse_midi(sequencer *s, unsigned int data1, unsigned int data2)
@@ -772,7 +775,7 @@ void seq_parse_midi(sequencer *s, unsigned int data1, unsigned int data2)
         break;
     case 9: // PAD 5
         printf("Toggle Delay Mode!\n");
-        s->m_delay_mode = (++s->m_delay_mode) % MAX_NUM_DELAY_MODE; 
+        s->m_delay_mode = (++s->m_delay_mode) % MAX_NUM_DELAY_MODE;
         break;
     default:
         break;

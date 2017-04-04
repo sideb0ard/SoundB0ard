@@ -92,4 +92,11 @@ typedef enum {
 } sound_generator_type;
 
 typedef enum { MONO, LEGATO } legato_mode;
-typedef enum { NONE, SYNTH, DELAYFX, MIDISPORK, MIDISEQUENCER, MIDILOOPER } midi_control_type;
+typedef enum {
+    NONE,
+    SYNTH,
+    DELAYFX,
+    MIDISPORK,
+    MIDISEQUENCER,
+    MIDILOOPER
+} midi_control_type;

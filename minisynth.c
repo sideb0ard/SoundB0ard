@@ -20,7 +20,7 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
-    //ms->vol = 0.7;
+    // ms->vol = 0.7;
     ms->sustain = 0;
     ms->num_melodies = 1;
 
@@ -367,7 +367,7 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 1: // K1 - Envelope Attack Time Msec
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("Envelope attack!\n");
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             ms->m_attack_time_msec = scaley_val;
@@ -375,11 +375,11 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
             scaley_val = scaleybum(1, 128, 0, 1000, data2);
             ms->m_delay_time_msec = scaley_val;
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("DELAY MS: %f\n", ms->m_delay_time_msec);
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("EG1->DCA intensity!\n");
             scaley_val = scaleybum(1, 128, 0, 10, data2);
             ms->m_eg1_dca_intensity = scaley_val;
@@ -387,23 +387,23 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         break;
     case 2: // K2 - Envelope Decay Time Msec
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("Envelope decay!\n");
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             ms->m_decay_release_time_msec = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
             scaley_val = scaleybum(1, 128, 0, 10, data2);
-            //ms->X = scaley_val;
+            // ms->X = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-            //scaley_val = scaleybum(1, 128, X, X, data2);
-            //ms->X = scaley_val;
+            // scaley_val = scaleybum(1, 128, X, X, data2);
+            // ms->X = scaley_val;
         }
         break;
     case 3: // K3 - Envelope Sustain Level
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("Env Sustain level\n");
             scaley_val = scaleybum(1, 128, 0, 1, data2);
             ms->m_sustain_level = scaley_val;
@@ -424,76 +424,76 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
             ms->m_volume_db = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         break;
     case 5: // K6 - LFO amplitude
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("LFO Amplitude\n");
             scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
             ms->m_lfo1_amplitude = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         break;
     case 6: // K5 - LFO rate
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("LFO Rate\n");
             scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
             ms->m_lfo1_rate = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         break;
     case 7: // K7 - Filter Frequency Cut
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("Filter Frequency!\n");
             scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
             ms->m_fc_control = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         break;
     case 8: // K8 - Filter Q control
         if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
-            if(mixr->debug_mode)
+            if (mixr->debug_mode)
                 printf("Filter Q!\n");
             scaley_val = scaleybum(1, 128, 1, 10, data2);
             ms->m_q_control = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
-        //    scaley_val = scaleybum(1, 128, X, X, data2);
-        //    ms->X = scaley_val;
+            //    scaley_val = scaleybum(1, 128, X, X, data2);
+            //    ms->X = scaley_val;
         }
         break;
     default:
@@ -677,8 +677,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         "%2.f"
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f",
-        ms->m_volume_db, ms->multi_melody_mode ? "true" : "false", ms->cur_melody,
-        ms->m_delay_mode, s_mode_names[ms->m_voice_mode],
+        ms->m_volume_db, ms->multi_melody_mode ? "true" : "false",
+        ms->cur_melody, ms->m_delay_mode, s_mode_names[ms->m_voice_mode],
         ms->m_attack_time_msec, ms->m_decay_release_time_msec,
         ms->m_sustain_level, ms->m_volume_db, ms->m_lfo1_amplitude,
         ms->m_lfo1_rate, ms->m_fc_control, ms->m_q_control,
@@ -777,7 +777,8 @@ void minisynth_delete_event(minisynth *ms, int pat_num, int tick)
         else {
             printf("Not a valid midi event at tick: %d\n", tick);
         }
-    } else {
+    }
+    else {
         printf("Not a valid pattern num: %d \n", pat_num);
     }
 }
@@ -802,14 +803,13 @@ midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
     return new_midi_events_loop;
 }
 
-void minisynth_add_midi_loop(minisynth *ms, midi_event **events,
-                             int melody_num)
+void minisynth_add_midi_loop(minisynth *ms, midi_event **events, int melody_num)
 {
     if (melody_num >= MAX_NUM_MIDI_LOOPS) {
         printf("Dingjie!\n");
         return;
     }
-    for ( int i = 0; i < PPNS; i++) {
+    for (int i = 0; i < PPNS; i++) {
         if (events[i] != NULL)
             ms->melodies[melody_num][i] = events[i];
     }
@@ -820,13 +820,13 @@ void minisynth_add_midi_loop(minisynth *ms, midi_event **events,
 }
 
 void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
-                             int melody_num)
+                                 int melody_num)
 {
     if (melody_num >= MAX_NUM_MIDI_LOOPS) {
         printf("Dingjie!\n");
         return;
     }
-    for ( int i = 0; i < PPNS; i++) {
+    for (int i = 0; i < PPNS; i++) {
         if (ms->melodies[melody_num][i] != NULL) {
             free(ms->melodies[melody_num][i]);
             ms->melodies[melody_num][i] = NULL;
@@ -869,14 +869,14 @@ void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth)
     for (int i = 0; i < PPNS; i++) {
         if (orig_loop[i] != NULL) {
             midi_event *ev = orig_loop[i];
-            int new_tick = (ev->tick + (sixteenth*sixteenth_of_loop)) % PPNS;
+            int new_tick = (ev->tick + (sixteenth * sixteenth_of_loop)) % PPNS;
             printf("Old tick: %d with new: %d\n", ev->tick, new_tick);
-            new_midi_events_loop[new_tick] = new_midi_event(new_tick, ev->event_type, ev->data1, ev->data2);
+            new_midi_events_loop[new_tick] =
+                new_midi_event(new_tick, ev->event_type, ev->data1, ev->data2);
         }
     }
     free(orig_loop);
     minisynth_replace_midi_loop(ms, new_midi_events_loop, melody_num);
-
 }
 
 bool is_valid_melody_num(minisynth *ms, int melody_num)
@@ -887,29 +887,27 @@ bool is_valid_melody_num(minisynth *ms, int melody_num)
     return false;
 }
 
-// TODO - better function name - this is programatic calls, which 
+// TODO - better function name - this is programatic calls, which
 // basically adds a matching delete after use event i.e. == a note off
 void minisynth_handle_midi_note(minisynth *ms, int note, int velocity)
 {
-	if (mixr->debug_mode)
-		print_midi_event(note);
+    if (mixr->debug_mode)
+        print_midi_event(note);
 
     minisynth_midi_note_on(ms, note, velocity);
 
-    int note_off_tick =
-        ((mixr->tick % PPNS) + PPS * 4) %
-        PPNS; // rough guess - PPS is pulses per quart note
-              // and PPNS is pulses per minisynth Loop
+    int note_off_tick = ((mixr->tick % PPNS) + PPS * 4) %
+                        PPNS; // rough guess - PPS is pulses per quart note
+                              // and PPNS is pulses per minisynth Loop
 
-    midi_event *off_event = new_midi_event(note_off_tick, 128,
-                                    note, velocity);
+    midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
 
     if (ms->recording) {
         printf("Recording note!\n");
         int note_on_tick = mixr->tick % PPNS;
-        midi_event *on_event = new_midi_event(
-            note_on_tick, 144, note, velocity);
+        midi_event *on_event =
+            new_midi_event(note_on_tick, 144, note, velocity);
 
         minisynth_add_event(ms, on_event);
         minisynth_add_event(ms, off_event);
@@ -924,43 +922,47 @@ void minisynth_rand_settings(minisynth *ms)
 {
     printf("Randomizing SYNTH!\n");
     ms->m_voice_mode = rand() % 4;
-    ms->m_detune_cents = ((float)rand())/RAND_MAX;
-    ms->m_lfo1_amplitude = ((float)rand())/RAND_MAX;
-    ms->m_lfo1_rate = ((float)rand())/RAND_MAX * (MAX_LFO_RATE - MIN_LFO_RATE) + MIN_LFO_RATE;
-    ms->m_fc_control = ((float)rand())/RAND_MAX * (FILTER_FC_MAX - FILTER_FC_MIN) + FILTER_FC_MIN;
-    ms->m_q_control = ((float)rand())/RAND_MAX;
-    ms->m_attack_time_msec = ((float)rand())/RAND_MAX * EG_MAXTIME_MS;
-    ms->m_delay_time_msec = ((float)rand())/RAND_MAX * EG_MAXTIME_MS;
-    ms->m_decay_release_time_msec = ((float)rand())/RAND_MAX * EG_MAXTIME_MS;
-    ms->m_pulse_width_pct = (((float)rand()/(float)(RAND_MAX)) * 96) + 2;
-    //ms->m_feedback_pct = ((float)rand()/(float)(RAND_MAX));
-    //ms->m_delay_ratio = ((float)rand())/RAND_MAX;
-    //ms->m_wet_mix = ((float)rand()/(float)(RAND_MAX));
-    //ms->m_octave = rand() % 4 - 2;
-    //ms->m_portamento_time_msec = ((float)rand()/(float)(RAND_MAX)) * 10;
-    //ms->m_lfo1_osc_pitch_intensity = ((float)rand()/(float)(RAND_MAX));
-    //ms->m_sub_osc_db = -96.000000;
-    //ms->m_eg1_osc_intensity = 0.0;
-    //ms->m_eg1_filter_intensity = 0.0;
-    //ms->m_lfo1_filter_fc_intensity = 0.0;
+    ms->m_detune_cents = ((float)rand()) / RAND_MAX;
+    ms->m_lfo1_amplitude = ((float)rand()) / RAND_MAX;
+    ms->m_lfo1_rate =
+        ((float)rand()) / RAND_MAX * (MAX_LFO_RATE - MIN_LFO_RATE) +
+        MIN_LFO_RATE;
+    ms->m_fc_control =
+        ((float)rand()) / RAND_MAX * (FILTER_FC_MAX - FILTER_FC_MIN) +
+        FILTER_FC_MIN;
+    ms->m_q_control = ((float)rand()) / RAND_MAX;
+    ms->m_attack_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
+    ms->m_delay_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
+    ms->m_decay_release_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
+    ms->m_pulse_width_pct = (((float)rand() / (float)(RAND_MAX)) * 96) + 2;
+    // ms->m_feedback_pct = ((float)rand()/(float)(RAND_MAX));
+    // ms->m_delay_ratio = ((float)rand())/RAND_MAX;
+    // ms->m_wet_mix = ((float)rand()/(float)(RAND_MAX));
+    // ms->m_octave = rand() % 4 - 2;
+    // ms->m_portamento_time_msec = ((float)rand()/(float)(RAND_MAX)) * 10;
+    // ms->m_lfo1_osc_pitch_intensity = ((float)rand()/(float)(RAND_MAX));
+    // ms->m_sub_osc_db = -96.000000;
+    // ms->m_eg1_osc_intensity = 0.0;
+    // ms->m_eg1_filter_intensity = 0.0;
+    // ms->m_lfo1_filter_fc_intensity = 0.0;
     //// ms->m_sustain_level = 0.510000;
-    //ms->m_sustain_level = 0.9;
-    //ms->m_noise_osc_db = -96.000000;
-    //ms->m_lfo1_amp_intensity = 0.0;
-    //ms->m_lfo1_pan_intensity = 0.0;
-    //ms->m_eg1_dca_intensity = 1.0;
-    //ms->m_lfo1_waveform = 0;
-    //ms->m_volume_db = 1.0;
-    //ms->m_legato_mode = DEFAULT_LEGATO_MODE;
-    //ms->m_pitchbend_range = 1;
-    //ms->m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
-    //ms->m_filter_keytrack = DEFAULT_FILTER_KEYTRACK;
-    //ms->m_filter_keytrack_intensity = DEFAULT_FILTER_KEYTRACK_INTENSITY;
-    //ms->m_velocity_to_attack_scaling = 0;
-    //ms->m_note_number_to_decay_scaling = 0;
-    //ms->m_delay_mode = 0;
-    //ms->m_eg1_dca_intensity = 1.0;
-    //ms->m_sustain_override = false;
+    // ms->m_sustain_level = 0.9;
+    // ms->m_noise_osc_db = -96.000000;
+    // ms->m_lfo1_amp_intensity = 0.0;
+    // ms->m_lfo1_pan_intensity = 0.0;
+    // ms->m_eg1_dca_intensity = 1.0;
+    // ms->m_lfo1_waveform = 0;
+    // ms->m_volume_db = 1.0;
+    // ms->m_legato_mode = DEFAULT_LEGATO_MODE;
+    // ms->m_pitchbend_range = 1;
+    // ms->m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
+    // ms->m_filter_keytrack = DEFAULT_FILTER_KEYTRACK;
+    // ms->m_filter_keytrack_intensity = DEFAULT_FILTER_KEYTRACK_INTENSITY;
+    // ms->m_velocity_to_attack_scaling = 0;
+    // ms->m_note_number_to_decay_scaling = 0;
+    // ms->m_delay_mode = 0;
+    // ms->m_eg1_dca_intensity = 1.0;
+    // ms->m_sustain_override = false;
     //
     minisynth_print_settings(ms);
 }
@@ -999,8 +1001,10 @@ void minisynth_print_settings(minisynth *ms)
     printf("Reset To Zero: %d\n", ms->m_reset_to_zero);
     printf("Filter Keytrack: %d\n", ms->m_filter_keytrack);
     printf("Filter Keytrack Intensity: %f\n", ms->m_filter_keytrack_intensity);
-    printf("Velocity to Attack Scaling: %d\n", ms->m_velocity_to_attack_scaling);
-    printf("Note Number To Decay Scaling: %d\n", ms->m_note_number_to_decay_scaling);
+    printf("Velocity to Attack Scaling: %d\n",
+           ms->m_velocity_to_attack_scaling);
+    printf("Note Number To Decay Scaling: %d\n",
+           ms->m_note_number_to_decay_scaling);
     printf("Delay Mode: %d\n", ms->m_delay_mode);
     printf("EG1 DCA Intensity: %f\n", ms->m_eg1_dca_intensity);
     printf("Sustain Override: %d\n", ms->m_sustain_override);
