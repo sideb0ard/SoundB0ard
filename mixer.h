@@ -51,8 +51,12 @@ typedef struct t_mixer {
     unsigned int loop_len_in_samples;
     unsigned int loop_len_in_ticks;
 
+    bool is_sixteenth;
+    bool is_eighth;
+    bool is_quarter;
+
     double volume;
-    int keyboard_octave; // TODO <- need this?
+    // int keyboard_octave; // TODO <- need this?
 
 } mixer;
 

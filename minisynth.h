@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include "arpeggiator.h"
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"
@@ -44,6 +45,8 @@
 #define DEFAULT_MIDI_PAN 64
 #define DEFAULT_MIDI_EXPRESSION 0
 #define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
+
+static const char PRESET_FILENAME[] = "synthpresets.dat";
 
 typedef struct minisynth {
     SOUNDGEN sound_generator;
@@ -127,6 +130,8 @@ typedef struct minisynth {
     double m_portamento_time_msec;
     bool m_sustain_override;
 
+    arpeggiator m_arp;
+
 } minisynth;
 
 minisynth *new_minisynth(void);
@@ -186,8 +191,10 @@ void minisynth_set_sustain_override(minisynth *ms, bool b);
 
 void minisynth_rand_settings(minisynth *ms);
 void minisynth_print_settings(minisynth *ms);
+bool minisynth_save_settings(minisynth *ms, char *preset_name);
 
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
 bool is_valid_melody_num(minisynth *ns, int melody_num);
 
 void minisynth_handle_midi_note(minisynth *ms, int note, int velocity);
+void minisynth_set_arpeggiate(minisynth *ms, bool b);

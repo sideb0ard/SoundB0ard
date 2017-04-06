@@ -502,6 +502,11 @@ void interpret(char *line)
                     if (strncmp("rand", wurds[2], 4) == 0) {
                         minisynth_rand_settings(ms);
                     }
+                    if (strncmp("save", wurds[2], 4) == 0) {
+                        char preset_name[20];
+                        strncpy(preset_name, wurds[3], 19);
+                        minisynth_save_settings(ms, preset_name);
+                    }
                     if (strncmp("sustain", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
                             minisynth_set_sustain_override(ms, true);

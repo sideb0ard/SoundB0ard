@@ -33,18 +33,25 @@ extern mixer *mixr;
 mixer *new_mixer()
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
-    mixr->volume = 0.7;
-    mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->tick = 0;
-    mixr->cur_sample = 0;
-    mixr->keyboard_octave = 3;
-    mixr->m_midi_controller_mode = 0;
-    mixr->midi_control_destination = NONE;
-    mixr->start_of_loop = false;
     if (mixr == NULL) {
         printf("Nae mixer, fucked up!\n");
         return NULL;
     }
+
+    mixr->volume = 0.7;
+    mixer_update_bpm(mixr, DEFAULT_BPM);
+    mixr->tick = 0;
+    mixr->cur_sample = 0;
+    // mixr->keyboard_octave = 3;
+    mixr->m_midi_controller_mode =
+        KEY_MODE_ONE; // dunno whether this should be on mixer or synth
+    mixr->midi_control_destination = NONE;
+
+    mixr->start_of_loop = true;
+    mixr->is_sixteenth = true;
+    mixr->is_eighth = true;
+    mixr->is_quarter = true;
+
     return mixr;
 }
 
@@ -338,6 +345,26 @@ double mixer_gennext(mixer *mixr)
     }
     else {
         mixr->start_of_loop = false;
+    }
+
+    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0) {
+        mixr->is_sixteenth = true;
+        printf("SIXTEENTH! %d\n", mixr->cur_sample);
+        if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 2) == 0) {
+            mixr->is_eighth = true;
+            printf("EIGHTH!\n");
+            if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 4) == 0) {
+                mixr->is_quarter = true;
+                printf("QUART!\n");
+            } else {
+                mixr->is_quarter = false;
+            }
+        } else {
+            mixr->is_eighth = false;
+        }
+    }
+    else {
+        mixr->is_sixteenth = false;
     }
 
     mixr->cur_sample++;

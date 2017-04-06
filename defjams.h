@@ -66,7 +66,7 @@
 #define WCOOL_COLOR_PINK L"\x1b[38;5;200m"
 #define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
 
-typedef enum { UP, DOWN } direction;
+typedef enum { UP, DOWN, UPDOWN, RANDOM } direction;
 
 typedef enum {
     MIDI_KNOB_MODE_ONE,

@@ -6,6 +6,7 @@ OBJ = \
 	afx/lpfcombfilter.o \
 	afx/onepolelpf.o \
 	algorithm.o \
+	arpeggiator.o \
 	audioutils.o \
 	beatrepeat.o \
 	bitwize.o \
