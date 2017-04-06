@@ -130,6 +130,7 @@ typedef struct minisynth {
     double m_portamento_time_msec;
     bool m_sustain_override;
 
+    int m_last_midi_note;
     arpeggiator m_arp;
 
 } minisynth;
@@ -196,5 +197,5 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name);
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
 bool is_valid_melody_num(minisynth *ns, int melody_num);
 
-void minisynth_handle_midi_note(minisynth *ms, int note, int velocity);
+void minisynth_handle_midi_note(minisynth *ms, int note, int velocity, bool update_last_midi);
 void minisynth_set_arpeggiate(minisynth *ms, bool b);

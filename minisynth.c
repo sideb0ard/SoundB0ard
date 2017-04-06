@@ -69,6 +69,7 @@ minisynth *new_minisynth(void)
     ms->m_delay_mode = 0;
     ms->m_eg1_dca_intensity = 1.0;
     ms->m_sustain_override = false;
+    ms->m_last_midi_note = 0;
 
     for (int i = 0; i < MAX_VOICES; i++) {
         ms->m_voices[i] = new_minisynth_voice();
@@ -274,6 +275,7 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
         }
         ms->m_last_note_frequency = get_midi_freq(midinote);
     }
+
 
     return true;
 }
@@ -894,13 +896,17 @@ bool is_valid_melody_num(minisynth *ms, int melody_num)
 
 // TODO - better function name - this is programatic calls, which
 // basically adds a matching delete after use event i.e. == a note off
-void minisynth_handle_midi_note(minisynth *ms, int note, int velocity)
+void minisynth_handle_midi_note(minisynth *ms, int note, int velocity, bool update_last_midi)
 {
     if (mixr->debug_mode)
         print_midi_event(note);
 
+    if (update_last_midi) {
+        ms->m_last_midi_note = note;
+    }
     minisynth_midi_note_on(ms, note, velocity);
 
+    // TODO - store a sustain time on minisynth to use here
     int note_off_tick = ((mixr->tick % PPNS) + PPS * 4) %
                         PPNS; // rough guess - PPS is pulses per quart note
                               // and PPNS is pulses per minisynth Loop
@@ -943,35 +949,35 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_decay_release_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
     ms->m_pulse_width_pct = (((float)rand() / (float)(RAND_MAX)) * 96) + 2;
 
-    rand_ = (rand() % 127) + 1;
-    scaley_val = scaleybum(1, 128, -0.9, 0.9, rand_);
-    ms->m_delay_ratio = scaley_val;
-    ms->m_delay_time_msec = ((float)rand()) / RAND_MAX * 2000;
-    ms->m_feedback_pct = (float)(rand() % 200) - 100;
-    ms->m_wet_mix = ((float)rand() / (float)(RAND_MAX)) * 100;
+    //rand_ = (rand() % 127) + 1;
+    //scaley_val = scaleybum(1, 128, -0.9, 0.9, rand_);
+    //ms->m_delay_ratio = scaley_val;
+    //ms->m_delay_time_msec = ((float)rand()) / RAND_MAX * 2000;
+    //ms->m_feedback_pct = (float)(rand() % 200) - 100;
+    //ms->m_wet_mix = ((float)rand() / (float)(RAND_MAX)) * 100;
 
-    ms->m_octave = rand() % 4 - 2;
+    //ms->m_octave = rand() % 4 - 2;
 
-    ms->m_portamento_time_msec = ((float)rand() / (float)(RAND_MAX)) * 10;
-    ms->m_lfo1_osc_pitch_intensity =
-        (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    ms->m_sub_osc_db = -1.0 * (rand() % 96);
-    ms->m_eg1_osc_intensity = (rand() % 2) + 1;
-    ms->m_eg1_filter_intensity = (rand() % 2) + 1;
-    ms->m_lfo1_filter_fc_intensity = (rand() % 2) + 1;
-    // ms->m_sustain_level = 0.9;
+    //ms->m_portamento_time_msec = ((float)rand() / (float)(RAND_MAX)) * 10;
+    //ms->m_lfo1_osc_pitch_intensity =
+    //    (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
+    //ms->m_sub_osc_db = -1.0 * (rand() % 96);
+    //ms->m_eg1_osc_intensity = (rand() % 2) + 1;
+    //ms->m_eg1_filter_intensity = (rand() % 2) + 1;
+    //ms->m_lfo1_filter_fc_intensity = (rand() % 2) + 1;
+    //// ms->m_sustain_level = 0.9;
     ms->m_noise_osc_db = -1.0 * (rand() % 96);
     ms->m_lfo1_amp_intensity = ((float)rand() / (float)(RAND_MAX));
     ms->m_lfo1_pan_intensity = ((float)rand() / (float)(RAND_MAX));
     ms->m_eg1_dca_intensity = ((float)rand() / (float)(RAND_MAX));
     ms->m_lfo1_waveform = rand() % MAX_LFO_OSC;
-    // ms->m_volume_db = 1.0;
-    ms->m_legato_mode = rand() % 2;
-    ms->m_pitchbend_range = rand() % 12;
+    //// ms->m_volume_db = 1.0;
+    //ms->m_legato_mode = rand() % 2;
+    //ms->m_pitchbend_range = rand() % 12;
     ms->m_reset_to_zero = rand() % 2;
-    ms->m_filter_keytrack = rand() % 2;
-    ms->m_filter_keytrack_intensity =
-        (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
+    //ms->m_filter_keytrack = rand() % 2;
+    //ms->m_filter_keytrack_intensity =
+    //    (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
     ms->m_velocity_to_attack_scaling = rand() % 2;
     ms->m_note_number_to_decay_scaling = rand() % 2;
     ms->m_delay_mode = rand() % MAX_NUM_DELAY_MODE;

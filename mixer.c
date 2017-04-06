@@ -349,13 +349,10 @@ double mixer_gennext(mixer *mixr)
 
     if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0) {
         mixr->is_sixteenth = true;
-        printf("SIXTEENTH! %d\n", mixr->cur_sample);
         if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 2) == 0) {
             mixr->is_eighth = true;
-            printf("EIGHTH!\n");
             if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 4) == 0) {
                 mixr->is_quarter = true;
-                printf("QUART!\n");
             } else {
                 mixr->is_quarter = false;
             }

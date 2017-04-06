@@ -53,7 +53,7 @@ void keys(int soundgen_num)
 
         if (fdz[0].revents & POLLIN) {
             ch = getchar();
-            printf("C %d\n", ch);
+            //printf("C %d\n", ch);
             int midi_num;
             switch (ch) {
             case 27:
@@ -112,9 +112,9 @@ void keys(int soundgen_num)
                 midi_num = ch_midi_lookup(ch, ms);
                 int fake_velocity = 126; // TODO real velocity
                 if (midi_num != -1) {
-                    minisynth_handle_midi_note(ms, midi_num, fake_velocity);
+                    minisynth_handle_midi_note(ms, midi_num, fake_velocity, true);
                 }
-                printf("CCCC %d\n", ch);
+                //printf("CCCC %d\n", ch);
             }
             minisynth_update(ms);
         }

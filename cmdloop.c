@@ -461,6 +461,9 @@ void interpret(char *line)
                             }
                         }
                     }
+                    if (strncmp("arp", wurds[2], 3) == 0) {
+                        minisynth_set_arpeggiate(ms, 1 - ms->m_arp.active);
+                    }
                     if (strncmp("delete", wurds[2], 3) == 0) {
                         if (strncmp("melody", wurds[3], 6) == 0) {
                             // minisynth_delete_melody(ms); // TODO implement
