@@ -52,7 +52,7 @@ typedef struct t_mixer {
     unsigned int loop_len_in_ticks;
 
     bool is_sixteenth;
-    bool is_eighth;
+    //bool is_eighth;
     bool is_quarter;
 
     double volume;

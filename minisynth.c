@@ -766,9 +766,9 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
             tick = 0;
     }
     ev->tick = tick;
-    if (mixr->debug_mode)
-        printf("Adding Event: Tick: %d Type: %s Midi: %d\n", tick,
-               ev->event_type == 144 ? "NOTEON" : "NOTEOFF", ev->data1);
+    // if (mixr->debug_mode)
+    //     printf("Adding Event: Tick: %d Type: %s Midi: %d\n", tick,
+    //            ev->event_type == 144 ? "NOTEON" : "NOTEOFF", ev->data1);
     ms->melodies[ms->cur_melody][tick] = ev;
 }
 
@@ -906,10 +906,7 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity, bool upda
     }
     minisynth_midi_note_on(ms, note, velocity);
 
-    // TODO - store a sustain time on minisynth to use here
-    int note_off_tick = ((mixr->tick % PPNS) + PPS * 4) %
-                        PPNS; // rough guess - PPS is pulses per quart note
-                              // and PPNS is pulses per minisynth Loop
+    int note_off_tick = (mixr->tick + (PPS * 4 - 7)) % PPNS;
 
     midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////

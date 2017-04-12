@@ -24,20 +24,28 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
 
 
     if (mixr->is_sixteenth) {
-        switch(arp->cur_step) {
-        case(ROOT):
+        if (arp->single_note_repeat) {
             note = ms->m_last_midi_note;
-            break;
-        case(THIRD):
-            note =  ms->m_last_midi_note + 4;
-            break;
-        case(FIFTH):
-            note =  ms->m_last_midi_note + 7;
-            break;
         }
-        arp->cur_step = (arp->cur_step + 1) % MAX_STEPS;
+        else {
+            switch(arp->cur_step) {
+            case(ROOT):
+                note = ms->m_last_midi_note;
+                break;
+            case(THIRD):
+                note =  ms->m_last_midi_note + 4;
+                break;
+            case(FIFTH):
+                note =  ms->m_last_midi_note + 7;
+                break;
+            }
+            arp->cur_step = (arp->cur_step + 1) % MAX_STEPS;
+        }
+
         if (note > 8) {
             minisynth_handle_midi_note(ms, note, velocity, false);
+        } else {
+            printf("PASS!\n");
         }
     }
 }

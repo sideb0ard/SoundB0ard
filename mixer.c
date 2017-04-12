@@ -40,16 +40,16 @@ mixer *new_mixer()
 
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->tick = 0;
+    mixr->tick = -1; // this gets incremented in a cond_variable, if i make it -1, that means it will be 0 for all clients on first wakeup
     mixr->cur_sample = 0;
-    // mixr->keyboard_octave = 3;
     mixr->m_midi_controller_mode =
         KEY_MODE_ONE; // dunno whether this should be on mixer or synth
     mixr->midi_control_destination = NONE;
 
+    // the lifetime of this boolean is a single sample
     mixr->start_of_loop = true;
     mixr->is_sixteenth = true;
-    mixr->is_eighth = true;
+    //mixr->is_eighth = true;
     mixr->is_quarter = true;
 
     return mixr;
@@ -324,47 +324,39 @@ int add_looper(mixer *mixr, char *filename, double loop_len)
 
 double mixer_gennext(mixer *mixr)
 {
-    // called once ever SAMPLE_RATE -> cur_sample is the basis of my clock
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
         pthread_mutex_lock(&midi_tick_lock);
         mixr->tick++; // 1 midi tick (or pulse)
-        if (mixr->tick % PPS == 0) {
-            mixr->sixteenth_note_tick++; // for seq machine resolution
-            // printf("16th++ %d %d %d\n", mixr->sixteenth_note_tick,
-            // mixr->tick, mixr->cur_sample);
-        }
-        pthread_cond_broadcast(&midi_tick_cond);
         pthread_mutex_unlock(&midi_tick_lock);
+        pthread_cond_broadcast(&midi_tick_cond);
+    }
 
-        if (mixr->tick % PPL == 0) {
-            mixr->start_of_loop = true;
-        }
-        else {
-            mixr->start_of_loop = false;
-        }
+    if ((mixr->tick * mixr->samples_per_midi_tick) % PPL == 0) {
+        mixr->start_of_loop = true;
     }
     else {
         mixr->start_of_loop = false;
     }
 
-    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPS * mixr->samples_per_midi_tick) == 0) {
         mixr->is_sixteenth = true;
-        if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 2) == 0) {
-            mixr->is_eighth = true;
-            if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 4) == 0) {
-                mixr->is_quarter = true;
-            } else {
-                mixr->is_quarter = false;
-            }
-        } else {
-            mixr->is_eighth = false;
-        }
+        mixr->sixteenth_note_tick++; // for seq machine resolution
+
+
+        //if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 2) == 0) {
+        //    mixr->is_eighth = true;
+        //    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 4) == 0) {
+        //        mixr->is_quarter = true;
+        //    } else {
+        //        mixr->is_quarter = false;
+        //    }
+        //} else {
+        //    mixr->is_eighth = false;
+        //}
     }
     else {
         mixr->is_sixteenth = false;
     }
-
-    mixr->cur_sample++;
 
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {
@@ -373,6 +365,8 @@ double mixer_gennext(mixer *mixr)
                 mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
         }
     }
+
+    mixr->cur_sample++;
 
     return mixr->volume * (output_val / 1.53);
 }
