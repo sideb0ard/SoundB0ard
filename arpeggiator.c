@@ -10,7 +10,7 @@ void arpeggiator_init(arpeggiator *arp)
 {
     arp->active = false;
     arp->latch = true;
-    arp->single_note_repeat = true;
+    arp->single_note_repeat = false;
     arp->octave_range = 2;
     arp->mode = UP;
     arp->rate = SIXTEEN;
@@ -22,30 +22,27 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
     int note = 0;
     int velocity = 126;
 
-
     if (mixr->is_sixteenth) {
         if (arp->single_note_repeat) {
             note = ms->m_last_midi_note;
         }
         else {
-            switch(arp->cur_step) {
-            case(ROOT):
+            switch (arp->cur_step) {
+            case (ROOT):
                 note = ms->m_last_midi_note;
                 break;
-            case(THIRD):
-                note =  ms->m_last_midi_note + 4;
+            case (THIRD):
+                note = ms->m_last_midi_note + 4;
                 break;
-            case(FIFTH):
-                note =  ms->m_last_midi_note + 7;
+            case (FIFTH):
+                note = ms->m_last_midi_note + 7;
                 break;
             }
             arp->cur_step = (arp->cur_step + 1) % MAX_STEPS;
         }
 
-        if (note > 8) {
+        if (note) {
             minisynth_handle_midi_note(ms, note, velocity, false);
-        } else {
-            printf("PASS!\n");
         }
     }
 }

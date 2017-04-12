@@ -15,10 +15,6 @@
 mixer *mixr;
 const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
 
-// use broadcast to wake up threads when midi tick changes
-pthread_cond_t midi_tick_cond;
-pthread_mutex_t midi_tick_lock;
-
 static int paCallback(const void *inputBuffer, void *outputBuffer,
                       unsigned long framesPerBuffer,
                       const PaStreamCallbackTimeInfo *timeInfo,
@@ -41,9 +37,6 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
 
 int main()
 {
-
-    pthread_mutex_init(&midi_tick_lock, NULL);
-    pthread_cond_init(&midi_tick_cond, NULL);
 
     srand(time(NULL));
 

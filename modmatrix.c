@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "midi_freq_table.h"
 #include "modmatrix.h"
@@ -35,8 +36,9 @@ void matrix_clear_sources(modmatrix *self)
 
 void matrix_clear_destinations(modmatrix *self)
 {
-    for (int i = 0; i < MAX_DESTINATIONS; i++)
-        self->m_destinations[i] = 0.0;
+    memset(self->m_destinations, 0, sizeof(double) * MAX_DESTINATIONS);
+    // for (int i = 0; i < MAX_DESTINATIONS; i++)
+    //    self->m_destinations[i] = 0.0;
 }
 
 void create_matrix_core(modmatrix *self)

@@ -17,7 +17,7 @@
 #include "minisynth_voice.h"
 
 #define MAX_NUM_MIDI_LOOPS 16
-#define MAX_VOICES 4
+#define MAX_VOICES 8
 
 #define MIN_DETUNE_CENTS -50.0
 #define MAX_DETUNE_CENTS 50.0
@@ -197,5 +197,7 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name);
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
 bool is_valid_melody_num(minisynth *ns, int melody_num);
 
-void minisynth_handle_midi_note(minisynth *ms, int note, int velocity, bool update_last_midi);
+void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
+                                bool update_last_midi);
 void minisynth_set_arpeggiate(minisynth *ms, bool b);
+void minisynth_play_melody(minisynth *ms);

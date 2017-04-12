@@ -98,13 +98,13 @@ minisynth *new_minisynth(void)
     }
 
     // start loop player running
-    pthread_t melody_looprrr;
-    if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
-        fprintf(stderr, "Err running loop\n");
-    }
-    else {
-        pthread_detach(melody_looprrr);
-    }
+    // pthread_t melody_looprrr;
+    // if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
+    //    fprintf(stderr, "Err running loop\n");
+    //}
+    // else {
+    //    pthread_detach(melody_looprrr);
+    //}
 
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);
@@ -275,7 +275,6 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
         }
         ms->m_last_note_frequency = get_midi_freq(midinote);
     }
-
 
     return true;
 }
@@ -722,6 +721,10 @@ double minisynth_gennext(void *self)
     minisynth *ms = (minisynth *)self;
     // minisynth_update(ms);
 
+    if (mixr->is_midi_tick) {
+        minisynth_play_melody(ms);
+    }
+
     if (ms->m_arp.active) {
         arpeggiate(ms, &ms->m_arp);
     }
@@ -896,7 +899,8 @@ bool is_valid_melody_num(minisynth *ms, int melody_num)
 
 // TODO - better function name - this is programatic calls, which
 // basically adds a matching delete after use event i.e. == a note off
-void minisynth_handle_midi_note(minisynth *ms, int note, int velocity, bool update_last_midi)
+void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
+                                bool update_last_midi)
 {
     if (mixr->debug_mode)
         print_midi_event(note);
@@ -946,22 +950,22 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_decay_release_time_msec = ((float)rand()) / RAND_MAX * EG_MAXTIME_MS;
     ms->m_pulse_width_pct = (((float)rand() / (float)(RAND_MAX)) * 96) + 2;
 
-    //rand_ = (rand() % 127) + 1;
-    //scaley_val = scaleybum(1, 128, -0.9, 0.9, rand_);
-    //ms->m_delay_ratio = scaley_val;
-    //ms->m_delay_time_msec = ((float)rand()) / RAND_MAX * 2000;
-    //ms->m_feedback_pct = (float)(rand() % 200) - 100;
-    //ms->m_wet_mix = ((float)rand() / (float)(RAND_MAX)) * 100;
+    // rand_ = (rand() % 127) + 1;
+    // scaley_val = scaleybum(1, 128, -0.9, 0.9, rand_);
+    // ms->m_delay_ratio = scaley_val;
+    // ms->m_delay_time_msec = ((float)rand()) / RAND_MAX * 2000;
+    // ms->m_feedback_pct = (float)(rand() % 200) - 100;
+    // ms->m_wet_mix = ((float)rand() / (float)(RAND_MAX)) * 100;
 
-    //ms->m_octave = rand() % 4 - 2;
+    // ms->m_octave = rand() % 4 - 2;
 
-    //ms->m_portamento_time_msec = ((float)rand() / (float)(RAND_MAX)) * 10;
-    //ms->m_lfo1_osc_pitch_intensity =
+    // ms->m_portamento_time_msec = ((float)rand() / (float)(RAND_MAX)) * 10;
+    // ms->m_lfo1_osc_pitch_intensity =
     //    (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    //ms->m_sub_osc_db = -1.0 * (rand() % 96);
-    //ms->m_eg1_osc_intensity = (rand() % 2) + 1;
-    //ms->m_eg1_filter_intensity = (rand() % 2) + 1;
-    //ms->m_lfo1_filter_fc_intensity = (rand() % 2) + 1;
+    // ms->m_sub_osc_db = -1.0 * (rand() % 96);
+    // ms->m_eg1_osc_intensity = (rand() % 2) + 1;
+    // ms->m_eg1_filter_intensity = (rand() % 2) + 1;
+    // ms->m_lfo1_filter_fc_intensity = (rand() % 2) + 1;
     //// ms->m_sustain_level = 0.9;
     ms->m_noise_osc_db = -1.0 * (rand() % 96);
     ms->m_lfo1_amp_intensity = ((float)rand() / (float)(RAND_MAX));
@@ -969,11 +973,11 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_eg1_dca_intensity = ((float)rand() / (float)(RAND_MAX));
     ms->m_lfo1_waveform = rand() % MAX_LFO_OSC;
     //// ms->m_volume_db = 1.0;
-    //ms->m_legato_mode = rand() % 2;
-    //ms->m_pitchbend_range = rand() % 12;
+    // ms->m_legato_mode = rand() % 2;
+    // ms->m_pitchbend_range = rand() % 12;
     ms->m_reset_to_zero = rand() % 2;
-    //ms->m_filter_keytrack = rand() % 2;
-    //ms->m_filter_keytrack_intensity =
+    // ms->m_filter_keytrack = rand() % 2;
+    // ms->m_filter_keytrack_intensity =
     //    (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
     ms->m_velocity_to_attack_scaling = rand() % 2;
     ms->m_note_number_to_decay_scaling = rand() % 2;
@@ -1097,3 +1101,26 @@ void minisynth_print_settings(minisynth *ms)
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
+
+void minisynth_play_melody(minisynth *ms)
+{
+
+    int idx = mixr->tick % PPNS;
+
+    // top of the loop, check if we need to progress to next loop
+    if (idx == 0) {
+        if (ms->multi_melody_mode) {
+            ms->cur_melody_iteration--;
+            if (ms->cur_melody_iteration == 0) {
+                ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
+                ms->cur_melody_iteration =
+                    ms->melody_multiloop_count[ms->cur_melody];
+            }
+        }
+    }
+
+    if (ms->melodies[ms->cur_melody][idx] != NULL) {
+        midi_event *ev = ms->melodies[ms->cur_melody][idx];
+        midi_parse_midi_event(ms, ev);
+    }
+}

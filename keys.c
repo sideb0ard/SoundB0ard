@@ -16,8 +16,6 @@
 #include "utils.h"
 
 extern mixer *mixr;
-extern pthread_cond_t midi_tick_cond;
-extern pthread_mutex_t midi_tick_lock;
 
 void keys(int soundgen_num)
 {
@@ -53,7 +51,7 @@ void keys(int soundgen_num)
 
         if (fdz[0].revents & POLLIN) {
             ch = getchar();
-            //printf("C %d\n", ch);
+            // printf("C %d\n", ch);
             int midi_num;
             switch (ch) {
             case 27:
@@ -112,47 +110,13 @@ void keys(int soundgen_num)
                 midi_num = ch_midi_lookup(ch, ms);
                 int fake_velocity = 126; // TODO real velocity
                 if (midi_num != -1) {
-                    minisynth_handle_midi_note(ms, midi_num, fake_velocity, true);
+                    minisynth_handle_midi_note(ms, midi_num, fake_velocity,
+                                               true);
                 }
-                //printf("CCCC %d\n", ch);
+                // printf("CCCC %d\n", ch);
             }
             minisynth_update(ms);
         }
     }
     tcsetattr(0, TCSANOW, &old_info);
-}
-
-void *play_melody_loop(void *p)
-{
-    minisynth *ms = (minisynth *)p;
-
-    pthread_setname_np("Melody looper");
-    printf("PLAY melody starting..\n");
-
-    while (1) {
-        pthread_mutex_lock(&midi_tick_lock);
-        pthread_cond_wait(&midi_tick_cond, &midi_tick_lock);
-        pthread_mutex_unlock(&midi_tick_lock);
-
-        int idx = mixr->tick % PPNS;
-
-        // top of the loop, check if we need to progress to next loop
-        if (idx == 0) {
-            if (ms->multi_melody_mode) {
-                ms->cur_melody_iteration--;
-                if (ms->cur_melody_iteration == 0) {
-                    ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
-                    ms->cur_melody_iteration =
-                        ms->melody_multiloop_count[ms->cur_melody];
-                }
-            }
-        }
-
-        if (ms->melodies[ms->cur_melody][idx] != NULL) {
-            midi_event *ev = ms->melodies[ms->cur_melody][idx];
-            midi_parse_midi_event(ms, ev);
-        }
-    }
-
-    return NULL;
 }

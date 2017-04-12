@@ -25,8 +25,6 @@
 #include "spork.h"
 
 extern ENVSTREAM *ampstream;
-extern pthread_mutex_t midi_tick_lock;
-extern pthread_cond_t midi_tick_cond;
 
 extern mixer *mixr;
 
@@ -40,16 +38,16 @@ mixer *new_mixer()
 
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->tick = -1; // this gets incremented in a cond_variable, if i make it -1, that means it will be 0 for all clients on first wakeup
+    mixr->tick = -1;
     mixr->cur_sample = 0;
     mixr->m_midi_controller_mode =
         KEY_MODE_ONE; // dunno whether this should be on mixer or synth
     mixr->midi_control_destination = NONE;
 
-    // the lifetime of this boolean is a single sample
+    // the lifetime of these booleans is a single sample
+    mixr->is_midi_tick = true;
     mixr->start_of_loop = true;
     mixr->is_sixteenth = true;
-    //mixr->is_eighth = true;
     mixr->is_quarter = true;
 
     return mixr;
@@ -325,10 +323,11 @@ int add_looper(mixer *mixr, char *filename, double loop_len)
 double mixer_gennext(mixer *mixr)
 {
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
-        pthread_mutex_lock(&midi_tick_lock);
         mixr->tick++; // 1 midi tick (or pulse)
-        pthread_mutex_unlock(&midi_tick_lock);
-        pthread_cond_broadcast(&midi_tick_cond);
+        mixr->is_midi_tick = true;
+    }
+    else {
+        mixr->is_midi_tick = false;
     }
 
     if ((mixr->tick * mixr->samples_per_midi_tick) % PPL == 0) {
@@ -341,18 +340,6 @@ double mixer_gennext(mixer *mixr)
     if (mixr->cur_sample % (PPS * mixr->samples_per_midi_tick) == 0) {
         mixr->is_sixteenth = true;
         mixr->sixteenth_note_tick++; // for seq machine resolution
-
-
-        //if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 2) == 0) {
-        //    mixr->is_eighth = true;
-        //    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick * 4) == 0) {
-        //        mixr->is_quarter = true;
-        //    } else {
-        //        mixr->is_quarter = false;
-        //    }
-        //} else {
-        //    mixr->is_eighth = false;
-        //}
     }
     else {
         mixr->is_sixteenth = false;
