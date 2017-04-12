@@ -15,6 +15,13 @@ wt_osc *wt_osc_new()
     }
 
     osc_new_settings(&wt->osc);
+    wt_prepare(wt);
+
+    return wt;
+}
+
+void wt_prepare(wt_osc *wt)
+{
     wt->osc.do_oscillate = &wt_do_oscillate;
     wt->osc.start_oscillator = &wt_start_oscillator;
     wt->osc.stop_oscillator = &wt_stop_oscillator;
@@ -34,8 +41,6 @@ wt_osc *wt_osc_new()
     wt->m_current_table = &wt->m_sine_table[0];
 
     wt_create_wave_tables(wt);
-
-    return wt;
 }
 
 // typical overrides

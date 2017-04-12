@@ -27,6 +27,8 @@ struct wt_oscillator {
 
 wt_osc *wt_osc_new(void);
 
+void wt_prepare(wt_osc *osc);
+
 // typical overrides
 double wt_do_oscillate(oscillator *self, double *aux_output);
 void wt_start_oscillator(oscillator *self);
