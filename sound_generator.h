@@ -34,6 +34,7 @@ int add_distortion_soundgen(SOUNDGEN *self);
 int add_decimator_soundgen(SOUNDGEN *self);
 int add_delay_soundgen(SOUNDGEN *self, float duration);
 int add_moddelay_soundgen(SOUNDGEN *self);
+int add_modfilter_soundgen(SOUNDGEN *self);
 int add_reverb_soundgen(SOUNDGEN *self);
 int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type);
 float effector(SOUNDGEN *self, double val);

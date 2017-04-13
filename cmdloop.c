@@ -661,6 +661,12 @@ void interpret(char *line)
                 add_moddelay_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
+        else if (strncmp("modfilter", wurds[0], 9) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (is_valid_soundgen_num(soundgen_num)) {
+                add_modfilter_soundgen(mixr->sound_generators[soundgen_num]);
+            }
+        }
         else if (strncmp("reverb", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (is_valid_soundgen_num(soundgen_num)) {

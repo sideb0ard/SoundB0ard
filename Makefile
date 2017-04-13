@@ -3,6 +3,7 @@ OBJ = \
 	afx/combfilter.o \
 	afx/delay.o \
 	afx/delayapf.o  \
+	afx/biquad_lpf.o \
 	afx/lpfcombfilter.o \
 	afx/onepolelpf.o \
 	algorithm.o \
@@ -42,6 +43,7 @@ OBJ = \
 	minisynth_voice.o \
 	mixer.o \
 	modmatrix.o \
+	modfilter.o \
 	modular_delay.o \
 	obliquestrategies.o \
 	oscillator.o \

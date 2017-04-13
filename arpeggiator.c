@@ -41,7 +41,7 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
             arp->cur_step = (arp->cur_step + 1) % MAX_STEPS;
         }
 
-        if (note) {
+        if (note > 8) {
             minisynth_handle_midi_note(ms, note, velocity, false);
         }
     }

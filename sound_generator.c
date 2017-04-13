@@ -132,6 +132,28 @@ int add_moddelay_soundgen(SOUNDGEN *self)
     return self->effects_num++;
 }
 
+int add_modfilter_soundgen(SOUNDGEN *self)
+{
+    printf("Booya, adding a new MODFILTERRRRR to SOUNDGEN!\n");
+
+    int res = resize_effects_array(self);
+    if (res == -1) {
+        perror("Couldn't resize effects array");
+        return -1;
+    }
+
+    EFFECT *e = effect_new_mod_filter();
+    if (e == NULL) {
+        perror("Couldn't create effect");
+        return -1;
+    }
+    self->effects[self->effects_num] = e;
+    self->effects_on = 1;
+    printf("done adding effect\n");
+    return self->effects_num++;
+}
+
+
 int add_reverb_soundgen(SOUNDGEN *self)
 {
     printf("Booya, adding a new REVERB to SOUNDGEN!\n");
@@ -222,6 +244,10 @@ float effector(SOUNDGEN *self, double val)
                 mod_delay_update(self->effects[i]->moddelay);
                 mod_delay_process_audio(self->effects[i]->moddelay, &val, &val,
                                         &left_out, &right_out);
+                val = left_out;
+                break;
+            case MODFILTER:
+                modfilter_process_audio(self->effects[i]->modfilter, &val, &left_out);
                 val = left_out;
                 break;
             case REVERB:

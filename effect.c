@@ -68,6 +68,20 @@ EFFECT *effect_new_mod_delay()
     return e;
 }
 
+EFFECT *effect_new_mod_filter()
+{
+    EFFECT *e;
+    e = (EFFECT *)calloc(1, sizeof(EFFECT));
+    if (e == NULL)
+        return NULL;
+
+    e->modfilter = new_modfilter();
+    e->type = MODFILTER;
+    printf("MOD FILTER!\n");
+
+    return e;
+}
+
 EFFECT *new_reverb_effect()
 {
     EFFECT *e;
