@@ -483,6 +483,10 @@ void interpret(char *line)
                         printf("Duping current Synth melody..\n");
                         minisynth_dupe_melody(ms);
                     }
+                    if (strncmp("import", wurds[2], 6) == 0) {
+                        printf("Importing file\n");
+                        minisynth_import_midi_from_file(ms, wurds[3]);
+                    }
                     if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
                             minisynth_set_multi_melody_mode(ms, true);

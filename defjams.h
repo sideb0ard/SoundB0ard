@@ -20,7 +20,7 @@
 #define ENVIRONMENT_ARRAY_SIZE 128
 #define ENVIRONMENT_KEY_SIZE 128
 
-#define SYNTH_NUM_LOOPS 2
+#define SYNTH_NUM_LOOPS 8
 #define PPQN 960       // Pulses Per Quarter Note // one beat
 #define PPS (PPQN / 4) // pulses per SIXTEENTH note, i.e. seq machine hit
 #define PPL (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats

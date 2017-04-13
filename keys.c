@@ -108,7 +108,7 @@ void keys(int soundgen_num)
             default:
                 // play note
                 midi_num = ch_midi_lookup(ch, ms);
-                int fake_velocity = 126; // TODO real velocity
+                int fake_velocity = 100; // TODO real velocity
                 if (midi_num != -1) {
                     minisynth_handle_midi_note(ms, midi_num, fake_velocity,
                                                true);

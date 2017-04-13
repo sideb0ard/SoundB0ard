@@ -20,7 +20,7 @@ void arpeggiator_init(arpeggiator *arp)
 void arpeggiate(minisynth *ms, arpeggiator *arp)
 {
     int note = 0;
-    int velocity = 126;
+    int velocity = 100;
 
     if (mixr->is_sixteenth) {
         if (arp->single_note_repeat) {

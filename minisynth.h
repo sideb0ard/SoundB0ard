@@ -203,3 +203,5 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
                                 bool update_last_midi);
 void minisynth_set_arpeggiate(minisynth *ms, bool b);
 void minisynth_play_melody(minisynth *ms);
+
+void minisynth_import_midi_from_file(minisynth *ms, char *filename);

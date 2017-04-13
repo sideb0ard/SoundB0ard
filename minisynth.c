@@ -691,14 +691,14 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_wet_mix, ms->m_detune_cents, ms->m_pulse_width_pct,
         ms->m_sub_osc_db, ms->m_noise_osc_db);
 
-    for (int i = 0; i < ms->num_melodies; i++) {
-        wchar_t melodystr[33] = {0};
-        wchar_t scratch[128] = {0};
-        minisynth_melody_to_string(ms, i, melodystr);
-        swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
-                 ms->melody_multiloop_count[i]);
-        wcscat(status_string, scratch);
-    }
+    //for (int i = 0; i < ms->num_melodies; i++) {
+    //    wchar_t melodystr[33] = {0};
+    //    wchar_t scratch[128] = {0};
+    //    minisynth_melody_to_string(ms, i, melodystr);
+    //    swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
+    //             ms->melody_multiloop_count[i]);
+    //    wcscat(status_string, scratch);
+    //}
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
@@ -767,15 +767,13 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
 {
     int tick = ev->tick;
     while (ms->melodies[ms->cur_melody][tick] != NULL) {
-        printf("Gotsz a tick already - bump!\n");
+        if (mixr->debug_mode)
+            printf("Gotsz a tick already - bump!\n");
         tick++;
         if (tick == PPNS) // wrap around
             tick = 0;
     }
     ev->tick = tick;
-    // if (mixr->debug_mode)
-    //     printf("Adding Event: Tick: %d Type: %s Midi: %d\n", tick,
-    //            ev->event_type == 144 ? "NOTEON" : "NOTEOFF", ev->data1);
     ms->melodies[ms->cur_melody][tick] = ev;
 }
 
@@ -1127,4 +1125,53 @@ void minisynth_play_melody(minisynth *ms)
         midi_event *ev = ms->melodies[ms->cur_melody][idx];
         midi_parse_midi_event(ms, ev);
     }
+}
+
+void minisynth_import_midi_from_file(minisynth *ms, char *filename)
+{
+    printf("Importing MIDI from %s\n", filename);
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Couldn't open yer file!\n");
+        return;
+    }
+
+    char *item, *last_s;
+    char const *sep = "::";
+	char line[256];
+    while (fgets(line, sizeof(line), fp)) {
+        printf("%s", line); 
+        int count = 0;
+        int tick = 0;
+        int status = 0;
+        int midi_note = 0;
+        int midi_vel = 0; 
+        for (item = strtok_r(line, sep, &last_s); item;
+             item = strtok_r(NULL, sep, &last_s)) {
+            switch(count){
+            case 0:
+                tick = atoi(item);
+                break;
+            case 1:
+                status = atoi(item);
+                break;
+            case 2:
+                midi_note = atoi(item);
+                break;
+            case 3:
+                midi_vel = atoi(item);
+                break;
+            }
+            count++;
+            printf("ITEM! %s\n", item);
+        }
+        if (count == 4) {
+            printf("GOtzz %d %d %d %d %d\n", count, tick, status, midi_note, midi_vel);
+            midi_event *ev =
+                new_midi_event(tick, status, midi_note, midi_vel);
+            minisynth_add_event(ms, ev);
+        }
+    }
+
+    fclose(fp);
 }
