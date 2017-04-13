@@ -13,6 +13,7 @@
 #include "oscillator.h"
 #include "sound_generator.h"
 #include "stereodelay.h"
+#include "afx/limiter.h"
 
 #include "minisynth_voice.h"
 
@@ -132,6 +133,7 @@ typedef struct minisynth {
 
     int m_last_midi_note;
     arpeggiator m_arp;
+    limiter m_limiter;
 
 } minisynth;
 

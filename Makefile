@@ -1,9 +1,11 @@
 CC = clang++
 OBJ = \
+	afx/biquad_lpf.o \
 	afx/combfilter.o \
 	afx/delay.o \
 	afx/delayapf.o  \
-	afx/biquad_lpf.o \
+	afx/envelope_follower.o \
+	afx/limiter.o \
 	afx/lpfcombfilter.o \
 	afx/onepolelpf.o \
 	algorithm.o \

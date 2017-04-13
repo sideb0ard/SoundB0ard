@@ -109,6 +109,8 @@ minisynth *new_minisynth(void)
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);
 
+    limiter_init(&ms->m_limiter, 10.0, 500.); // attack time, decay
+
     return ms;
 }
 
@@ -751,7 +753,9 @@ double minisynth_gennext(void *self)
     accum_out_left = effector(&ms->sound_generator, accum_out_left);
     accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
 
-    return accum_out_left * ms->m_volume_db;
+    accum_out_left *= ms->m_volume_db;
+
+    return limiter_process(&ms->m_limiter, &accum_out_left);
 }
 
 midi_event **minisynth_get_midi_loop(minisynth *self)

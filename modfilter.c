@@ -14,8 +14,8 @@ modfilter *new_modfilter()
 
 void modfilter_init(modfilter *mf)
 {
-    biquad_init(&mf->m_left_lpf);
-    biquad_init(&mf->m_right_lpf);
+    biquad_init(&mf->m_left_lpf, 1200. / SAMPLE_RATE, 8.0, 0.0);
+    //biquad_init(&mf->m_right_lpf);
 
     osc_new_settings((oscillator *)&mf->m_fc_lfo);
     lfo_set_soundgenerator_interface(&mf->m_fc_lfo);
@@ -119,10 +119,10 @@ bool modfilter_process_audio(modfilter *mf, double *in, double *out)
 
     //biquad_update(&mf->m_left_lpf);
     *out = biquad_process(&mf->m_left_lpf, *in);
+    printf("IN: %f OUT: %f\n", *in, *out);
 
     // TODO if stereo, use m_right_lp too
 
-    //printf("IN: %f OUT: %f\n", *in, *out);
 
     return true;
 

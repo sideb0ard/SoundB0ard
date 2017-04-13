@@ -3,7 +3,7 @@
 #include "biquad_lpf.h"
 // cribbed from http://www.earlevel.com/main/2012/11/26/biquad-c-source-code/
 
-void biquad_init(biquad *b)
+void biquad_init(biquad *b, double fc, double q, double peakgain)
 {
     b->type = bq_type_lowpass;
     b->a0 = 1.0;
@@ -11,11 +11,15 @@ void biquad_init(biquad *b)
     b->a2 = 0.0;
     b->b1 = 0.0;
     b->b1 = 0.0;
-    b->q  = 0.707;
-    b->fc = 0.50;
-    b->peakgain = 0.0;
+    b->q  = q;
+    b->fc = fc;
+    b->peakgain = peakgain;
     b->z1 = 0.0;
     b->z2 = 0.0;
+    // b->x1 = 0.0;
+    // b->x2 = 0.0;
+
+    biquad_update(b);
 }
 
 void  biquad_update(biquad *b)

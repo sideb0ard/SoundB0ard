@@ -14,10 +14,11 @@ typedef struct biquad
 {
 	unsigned int type;
 	double a0, a1, a2, b1, b2;
-	double fc, q, peakgain;
 	double z1, z2;
+	//double x1, x2;
+	double fc, q, peakgain;
 } biquad;
 
-void  biquad_init(biquad *b);
+void biquad_init(biquad *b, double fc, double q, double peakgain);
 double biquad_process(biquad *b, double in);
 void  biquad_update(biquad *b);
