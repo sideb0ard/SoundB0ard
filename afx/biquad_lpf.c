@@ -120,7 +120,9 @@ void  biquad_update(biquad *b)
 
 double biquad_process(biquad *b, double in)
 {
+    //printf("IN! %f\n a0: %f z1: %f", in, b->a0, b->z1);
     double out = in * b->a0 + b->z1;
+    //printf("OUT! %f\n", out);
     b->z1 = in * b->a1 + b->z2 - b->b1 * out;
     b->z2 = in * b->a2 - b->b2 * out;
     return out;

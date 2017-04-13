@@ -90,6 +90,7 @@ void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq, dou
     mf->m_right_lpf.a2 = alpha;
     mf->m_right_lpf.b1 = -2.0*gamma; // if b's are negative in the difference equation
     mf->m_right_lpf.b2 = 2.0*beta;
+
 }
 
 bool modfilter_process_audio(modfilter *mf, double *in, double *out)
@@ -100,22 +101,28 @@ bool modfilter_process_audio(modfilter *mf, double *in, double *out)
     osc_update((oscillator *)&mf->m_fc_lfo, "LFO1FC");
     yn = lfo_do_oscillate((oscillator *)&mf->m_fc_lfo, &yqn);
     double fc = modfilter_calculate_cutoff_freq(mf, yn);
-    double fcq = modfilter_calculate_cutoff_freq(mf, yqn);
+    //printf("LFO FC: %f FC: %f\n", yn, fc);
+    //double fcq = modfilter_calculate_cutoff_freq(mf, yqn);
 
     osc_update((oscillator *)&mf->m_q_lfo, "LFO1Q");
     yn = lfo_do_oscillate((oscillator *)&mf->m_q_lfo, &yqn);
     double q = modfilter_calculate_q(mf, yn);
-    double qq = modfilter_calculate_q(mf, yqn);
+    //printf("LFO Q: %f Q: %f\n", yn, q);
+    //double qq = modfilter_calculate_q(mf, yqn);
 
     modfilter_calculate_left_lpf_coeffs(mf, fc, q);
 
-    if (mf->m_lfo_phase == 0)
-        modfilter_calculate_right_lpf_coeffs(mf, fc, q);
-    else
-        modfilter_calculate_right_lpf_coeffs(mf, fcq, qq);
+    //if (mf->m_lfo_phase == 0)
+    //    modfilter_calculate_right_lpf_coeffs(mf, fc, q);
+    //else
+    //    modfilter_calculate_right_lpf_coeffs(mf, fcq, qq);
 
-    biquad_update(&mf->m_left_lpf);
+    //biquad_update(&mf->m_left_lpf);
     *out = biquad_process(&mf->m_left_lpf, *in);
+
+    // TODO if stereo, use m_right_lp too
+
+    //printf("IN: %f OUT: %f\n", *in, *out);
 
     return true;
 
