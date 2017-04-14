@@ -691,14 +691,14 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_wet_mix, ms->m_detune_cents, ms->m_pulse_width_pct,
         ms->m_sub_osc_db, ms->m_noise_osc_db);
 
-    //for (int i = 0; i < ms->num_melodies; i++) {
-    //    wchar_t melodystr[33] = {0};
-    //    wchar_t scratch[128] = {0};
-    //    minisynth_melody_to_string(ms, i, melodystr);
-    //    swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
-    //             ms->melody_multiloop_count[i]);
-    //    wcscat(status_string, scratch);
-    //}
+    for (int i = 0; i < ms->num_melodies; i++) {
+        wchar_t melodystr[33] = {0};
+        wchar_t scratch[128] = {0};
+        minisynth_melody_to_string(ms, i, melodystr);
+        swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i, melodystr,
+                 ms->melody_multiloop_count[i]);
+        wcscat(status_string, scratch);
+    }
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
@@ -1151,6 +1151,11 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
             switch(count){
             case 0:
                 tick = atoi(item);
+                if (tick >= PPNS) {
+                    printf("TICK OVER!: %d\n", tick);
+                    minisynth_add_melody(ms);
+                    // tick = tick % PPNS;
+                }
                 break;
             case 1:
                 status = atoi(item);
@@ -1173,5 +1178,6 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
         }
     }
 
+    minisynth_set_multi_melody_mode(ms, true);
     fclose(fp);
 }
