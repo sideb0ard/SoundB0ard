@@ -658,9 +658,12 @@ void minisynth_status(void *self, wchar_t *status_string)
     minisynth *ms = (minisynth *)self;
 
     if (mixr->debug_mode) {
-        for (int i = 0; i < PPNS; i++) {
-            if (ms->melodies[ms->cur_melody][i] != NULL)
-                print_midi_event_rec(ms->melodies[ms->cur_melody][i]);
+        for (int i = 0; i < ms->num_melodies; i++) {
+            printf("Melody %d\n", i);
+            for (int j = 0; j < PPNS; j++) {
+                if (ms->melodies[i][j] != NULL)
+                    print_midi_event_rec(ms->melodies[i][j]);
+            }
         }
     }
 
