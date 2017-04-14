@@ -15,7 +15,7 @@
 
 #define DEFAULT_ARRAY_SIZE 4
 
-#define MAX_PS_STRING_SZ 2048 // arbitrary
+#define MAX_PS_STRING_SZ 204800 // arbitrary
 
 #define ENVIRONMENT_ARRAY_SIZE 128
 #define ENVIRONMENT_KEY_SIZE 128

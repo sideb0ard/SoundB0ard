@@ -4,6 +4,7 @@
 #include <wchar.h>
 
 #include "sound_generator.h"
+#include "minisynth.h"
 
 typedef struct chaosmonkey {
     SOUNDGEN sound_generator;
@@ -22,7 +23,7 @@ void chaosmonkey_change_chance_interrupt(chaosmonkey *cm, int percent);
 void chaosmonkey_suggest_mode(chaosmonkey *cm, bool);
 void chaosmonkey_action_mode(chaosmonkey *cm, bool);
 
-void chaosmonkey_throw_chaos(int note);
+void chaosmonkey_add_note_at_random_time(minisynth *ms, int note);
 
 double chaosmonkey_gen_next(void *self);
 void chaosmonkey_status(void *self, wchar_t *ss);

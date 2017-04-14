@@ -330,7 +330,7 @@ double mixer_gennext(mixer *mixr)
         mixr->is_midi_tick = false;
     }
 
-    if ((mixr->tick * mixr->samples_per_midi_tick) % PPL == 0) {
+    if (mixr->cur_sample % (PPL * mixr->samples_per_midi_tick) == 0) {
         mixr->start_of_loop = true;
     }
     else {

@@ -97,14 +97,6 @@ minisynth *new_minisynth(void)
         }
     }
 
-    // start loop player running
-    // pthread_t melody_looprrr;
-    // if (pthread_create(&melody_looprrr, NULL, play_melody_loop, ms)) {
-    //    fprintf(stderr, "Err running loop\n");
-    //}
-    // else {
-    //    pthread_detach(melody_looprrr);
-    //}
 
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);

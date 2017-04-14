@@ -348,6 +348,7 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
 {
     switch (ev->event_type) {
     case (144): { // Hex 0x80
+        ms->m_last_midi_note = ev->data1;
         minisynth_midi_note_on(ms, ev->data1, ev->data2);
         break;
     }
