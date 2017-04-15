@@ -12,6 +12,7 @@
 #include "minisynth.h"
 #include "mixer.h"
 #include "spork.h"
+#include "sample_sequencer.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
 
@@ -99,11 +100,11 @@ void *midiman()
                     looper_parse_midi(l, data1, data2);
                 }
                 else if (mixr->midi_control_destination == MIDISEQUENCER) {
-                    printf("SEQUENCER MIDI CONTROL!\n");
-                    sequencer *s =
-                        (sequencer *)mixr
+                    printf("SAMPLE SEQUENCER MIDI CONTROL!\n");
+                    sample_sequencer *s =
+                        (sample_sequencer *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
-                    seq_parse_midi(s, data1, data2);
+                    sample_seq_parse_midi(s, data1, data2);
                 }
                 else if (mixr->midi_control_destination == MIDISPORK) {
                     printf("MIDI CONTROLS! SPORK\n");

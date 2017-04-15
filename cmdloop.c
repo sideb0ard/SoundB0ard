@@ -26,6 +26,7 @@
 #include "mixer.h"
 #include "obliquestrategies.h"
 #include "oscillator.h"
+#include "sample_sequencer.h"
 #include "sequencer_utils.h"
 #include "sparkline.h"
 #include "table.h"
@@ -190,133 +191,27 @@ void interpret(char *line)
                     mixr->sound_generators[soundgen_num]->type ==
                         SEQUENCER_TYPE) {
 
-                    sequencer *d =
-                        (sequencer *)mixr->sound_generators[soundgen_num];
-
-                    if (strncmp("add", wurds[2], 3) == 0) {
-                        printf("Adding\n");
-                        char_array_to_seq_string_pattern(pattern, wurds, 3,
-                                                         num_wurds);
-                        add_char_pattern(d, pattern);
-                    }
-                    else if (strncmp("randamp", wurds[2], 6) == 0) {
-                        int pattern_num = atoi(wurds[3]);
-                        if (is_valid_seq_pattern_num(d, pattern_num)) {
-                            seq_set_random_sample_amp(d, pattern_num);
-                        }
-                    }
-                    else if (strncmp("midi", wurds[2], 4) == 0) {
+                    if (strncmp("midi", wurds[2], 4) == 0) {
                         printf("MIDI goes to Da Winner .. Sequencer %d\n",
                                soundgen_num);
                         mixr->midi_control_destination = MIDISEQUENCER;
                         mixr->active_midi_soundgen_num = soundgen_num;
-                    }
-                    else if (strncmp("multi", wurds[2], 5) == 0) {
-                        if (strncmp("true", wurds[3], 4) == 0) {
-                            seq_set_multi_pattern_mode(d, true);
-                        }
-                        else if (strncmp("false", wurds[3], 5) == 0) {
-                            seq_set_multi_pattern_mode(d, false);
-                        }
-                        printf("Sequencer multi mode : %s\n",
-                               d->multi_pattern_mode ? "true" : "false");
-                    }
-                    else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (strncmp("markov", wurds[3], 6) == 0) {
-                            printf("MARKOV!\n");
-                            if (strncmp("haus", wurds[4], 4) == 0) {
-                                printf("HAUS!\n");
-                                seq_set_markov_mode(d, MARKOVHAUS);
-                            }
-                            else if (strncmp("boombap", wurds[4], 7) == 0) {
-                                printf("BOOMBAP!\n");
-                                seq_set_markov_mode(d, MARKOVBOOMBAP);
-                            }
-                        }
-                        else {
-                            // TODO -- this looks fragile - only used in two of
-                            // the below situs
-                            char_array_to_seq_string_pattern(pattern, wurds, 5,
-                                                             num_wurds);
-                            printf("Changing\n");
-
-                            int pattern_num = atoi(wurds[3]);
-                            if (is_valid_seq_pattern_num(d, pattern_num)) {
-                                if (strncmp("pattern", wurds[4], 7) == 0) {
-                                    printf("Changing pattern to %s\n", pattern);
-                                    change_char_pattern(d, pattern_num,
-                                                        pattern);
-                                }
-                                else if (strncmp("amp", wurds[4], 3) == 0) {
-                                    printf("Setting pattern AMP to %s\n",
-                                           pattern);
-                                    seq_set_sample_amp_from_char_pattern(
-                                        d, pattern_num, pattern);
-                                }
-                                else if (strncmp("numloops", wurds[4], 8) ==
-                                         0) {
-                                    int numloops = atoi(wurds[5]);
-                                    if (numloops != 0) {
-                                        seq_change_num_loops(d, pattern_num,
-                                                             numloops);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else if (strncmp("euclid", wurds[2], 6) == 0) {
-                        // https://en.wikipedia.org/wiki/Euclidean_rhythm
-                        int num_beats = atoi(wurds[3]);
-                        if (num_beats <= 0) {
-                            return;
-                        }
-                        int euclidean_pattern = create_euclidean_rhythm(
-                            num_beats, SEQUENCER_PATTERN_LEN);
-                        bool start_at_zero =
-                            strncmp("true", wurds[4], 4) == 0 ? true : false;
-                        if (start_at_zero)
-                            euclidean_pattern = shift_bits_to_leftmost_position(
-                                euclidean_pattern, SEQUENCER_PATTERN_LEN);
-                        change_int_pattern(d, d->cur_pattern,
-                                           euclidean_pattern);
-                    }
-                    else if (strncmp("life", wurds[2], 4) == 0) {
-                        int num_gens = atoi(wurds[3]);
-                        if (num_gens > 0) {
-                            if (mixr->debug_mode)
-                                printf("Enabling game of life for %d "
-                                       "generations\n",
-                                       num_gens);
-                            seq_set_game_of_life(d, 1);
-                            seq_set_max_generations(d, num_gens);
-                        }
-                        else {
-                            printf("Toggling game of life for %d\n",
-                                   soundgen_num);
-                            seq_set_game_of_life(d, 1 - d->game_of_life_on);
-                        }
-                    }
-                    else if (strncmp("markov", wurds[2], 4) == 0) {
-                        int num_gens = atoi(wurds[3]);
-                        if (num_gens > 0) {
-                            if (mixr->debug_mode)
-                                printf(
-                                    "Enabling Markov mode for %d generations\n",
-                                    num_gens);
-                            seq_set_markov(d, 1);
-                            seq_set_max_generations(d, num_gens);
-                        }
-                        else {
-                            printf("Toggling Markov for %d\n", soundgen_num);
-                            seq_set_markov(d, 1 - d->markov_on);
-                        }
                     }
                     else if (strncmp("swing", wurds[2], 5) == 0) {
                         int swing_setting = atoi(wurds[3]);
                         swingrrr(mixr->sound_generators[soundgen_num],
                                  swing_setting);
                     }
+                    else
+                    {
+                        sample_sequencer *s =
+                            (sample_sequencer *)mixr->sound_generators[soundgen_num];
+                        sequencer *seq = &s->m_seq;
+
+                        parse_sequencer_command(seq, wurds, num_wurds, pattern);
+                    }
                 }
+
             }
             free(pattern);
         }
@@ -1045,3 +940,115 @@ int exxit()
     pa_teardown();
     exit(0);
 }
+
+void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD], int num_wurds, char *pattern)
+{
+    if (strncmp("add", wurds[2], 3) == 0) {
+        printf("Adding\n");
+        char_array_to_seq_string_pattern(pattern, wurds, 3,
+                                         num_wurds);
+        add_char_pattern(seq, pattern);
+    }
+    else if (strncmp("randamp", wurds[2], 6) == 0) {
+        int pattern_num = atoi(wurds[3]);
+        if (is_valid_seq_pattern_num(seq, pattern_num)) {
+            seq_set_random_sample_amp(seq, pattern_num);
+        }
+    }
+    else if (strncmp("multi", wurds[2], 5) == 0) {
+        if (strncmp("true", wurds[3], 4) == 0) {
+            seq_set_multi_pattern_mode(seq, true);
+        }
+        else if (strncmp("false", wurds[3], 5) == 0) {
+            seq_set_multi_pattern_mode(seq, false);
+        }
+        printf("Sequencer multi mode : %s\n",
+               seq->multi_pattern_mode ? "true" : "false");
+    }
+    else if (strncmp("change", wurds[2], 6) == 0) {
+        if (strncmp("markov", wurds[3], 6) == 0) {
+            printf("MARKOV!\n");
+            if (strncmp("haus", wurds[4], 4) == 0) {
+                printf("HAUS!\n");
+                seq_set_markov_mode(seq, MARKOVHAUS);
+            }
+            else if (strncmp("boombap", wurds[4], 7) == 0) {
+                printf("BOOMBAP!\n");
+                seq_set_markov_mode(seq, MARKOVBOOMBAP);
+            }
+        }
+        else {
+            char_array_to_seq_string_pattern(pattern, wurds, 5,
+                                             num_wurds);
+            printf("Changing\n");
+
+            int pattern_num = atoi(wurds[3]);
+            if (is_valid_seq_pattern_num(seq, pattern_num)) {
+                if (strncmp("pattern", wurds[4], 7) == 0) {
+                    printf("Changing pattern to %s\n", pattern);
+                    change_char_pattern(seq, pattern_num,
+                                        pattern);
+                }
+                else if (strncmp("amp", wurds[4], 3) == 0) {
+                    printf("Setting pattern AMP to %s\n",
+                           pattern);
+                    seq_set_sample_amp_from_char_pattern(
+                        seq, pattern_num, pattern);
+                }
+                else if (strncmp("numloops", wurds[4], 8) ==
+                         0) {
+                    int numloops = atoi(wurds[5]);
+                    if (numloops != 0) {
+                        seq_change_num_loops(seq, pattern_num,
+                                             numloops);
+                    }
+                }
+            }
+        }
+    }
+    else if (strncmp("euclid", wurds[2], 6) == 0) {
+        // https://en.wikipedia.org/wiki/Euclidean_rhythm
+        int num_beats = atoi(wurds[3]);
+        if (num_beats <= 0) {
+            return;
+        }
+        int euclidean_pattern = create_euclidean_rhythm(
+            num_beats, SEQUENCER_PATTERN_LEN);
+        bool start_at_zero =
+            strncmp("true", wurds[4], 4) == 0 ? true : false;
+        if (start_at_zero)
+            euclidean_pattern = shift_bits_to_leftmost_position(
+                euclidean_pattern, SEQUENCER_PATTERN_LEN);
+        change_int_pattern(seq, seq->cur_pattern,
+                           euclidean_pattern);
+    }
+    else if (strncmp("life", wurds[2], 4) == 0) {
+        int num_gens = atoi(wurds[3]);
+        if (num_gens > 0) {
+            if (mixr->debug_mode)
+                printf("Enabling game of life for %d "
+                       "generations\n",
+                       num_gens);
+            seq_set_game_of_life(seq, 1);
+            seq_set_max_generations(seq, num_gens);
+        }
+        else {
+            seq_set_game_of_life(seq, 1 - seq->game_of_life_on);
+        }
+    }
+    else if (strncmp("markov", wurds[2], 4) == 0) {
+        int num_gens = atoi(wurds[3]);
+        if (num_gens > 0) {
+            if (mixr->debug_mode)
+                printf(
+                    "Enabling Markov mode for %d generations\n",
+                    num_gens);
+            seq_set_markov(seq, 1);
+            seq_set_max_generations(seq, num_gens);
+        }
+        else {
+            seq_set_markov(seq, 1 - seq->markov_on);
+        }
+    }
+}
+
