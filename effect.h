@@ -1,8 +1,8 @@
 #ifndef EFFECT_H
 #define EFFECT_H
 
-#include "modular_delay.h"
 #include "modfilter.h"
+#include "modular_delay.h"
 #include "reverb.h"
 #include "stereodelay.h"
 

@@ -97,7 +97,6 @@ minisynth *new_minisynth(void)
         }
     }
 
-
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);
 
@@ -1133,17 +1132,17 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
 
     char *item, *last_s;
     char const *sep = "::";
-	char line[256];
+    char line[256];
     while (fgets(line, sizeof(line), fp)) {
-        printf("%s", line); 
+        printf("%s", line);
         int count = 0;
         int tick = 0;
         int status = 0;
         int midi_note = 0;
-        int midi_vel = 0; 
+        int midi_vel = 0;
         for (item = strtok_r(line, sep, &last_s); item;
              item = strtok_r(NULL, sep, &last_s)) {
-            switch(count){
+            switch (count) {
             case 0:
                 tick = atoi(item);
                 if (tick >= PPNS) {
@@ -1166,9 +1165,9 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
             printf("ITEM! %s\n", item);
         }
         if (count == 4) {
-            printf("GOtzz %d %d %d %d %d\n", count, tick, status, midi_note, midi_vel);
-            midi_event *ev =
-                new_midi_event(tick, status, midi_note, midi_vel);
+            printf("GOtzz %d %d %d %d %d\n", count, tick, status, midi_note,
+                   midi_vel);
+            midi_event *ev = new_midi_event(tick, status, midi_note, midi_vel);
             minisynth_add_event(ms, ev);
         }
     }

@@ -3,8 +3,10 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "sound_generator.h"
 #include "minisynth.h"
+#include "sound_generator.h"
+
+enum { CHAOS_ONE, CHAOS_TWO };
 
 typedef struct chaosmonkey {
     SOUNDGEN sound_generator;
@@ -14,9 +16,12 @@ typedef struct chaosmonkey {
     bool take_action;
     int last_midi_tick;
     int last_sixteenth;
+    int soundgen;
+    unsigned soundgen_type;
+    unsigned chaos_mode;
 } chaosmonkey;
 
-chaosmonkey *new_chaosmonkey(void);
+chaosmonkey *new_chaosmonkey(int soundgen);
 
 void chaosmonkey_change_wakeup_freq(chaosmonkey *cm, int num_seconds);
 void chaosmonkey_change_chance_interrupt(chaosmonkey *cm, int percent);

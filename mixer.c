@@ -241,9 +241,9 @@ int add_algorithm(char *line)
     return add_sound_generator(mixr, (SOUNDGEN *)a);
 }
 
-int add_chaosmonkey()
+int add_chaosmonkey(int soundgen)
 {
-    chaosmonkey *cm = new_chaosmonkey();
+    chaosmonkey *cm = new_chaosmonkey(soundgen);
     return add_sound_generator(mixr, (SOUNDGEN *)cm);
 }
 

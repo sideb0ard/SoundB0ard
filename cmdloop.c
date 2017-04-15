@@ -153,6 +153,15 @@ void interpret(char *line)
             }
         }
 
+        else if (strncmp("synthdrum", wurds[0], 9) == 0) {
+            if (strncmp("kick", wurds[1], 4) == 0) {
+                printf("Synthy KICK!\n");
+            }
+            else if (strncmp("snare", wurds[1], 5) == 0) {
+                printf("Synthy SNARE!\n");
+            }
+        }
+
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp("seq", wurds[0], 3) == 0) {
 
@@ -612,7 +621,10 @@ void interpret(char *line)
         else if (strncmp("chaos", wurds[0], 6) == 0) {
 
             if (strncmp("monkey", wurds[1], 6) == 0) {
-                add_chaosmonkey();
+                int soundgen_num = atoi(wurds[2]);
+                if (is_valid_soundgen_num(soundgen_num)) {
+                    add_chaosmonkey(soundgen_num);
+                }
             }
             else {
                 int soundgen_num = atoi(wurds[1]);

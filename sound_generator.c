@@ -153,7 +153,6 @@ int add_modfilter_soundgen(SOUNDGEN *self)
     return self->effects_num++;
 }
 
-
 int add_reverb_soundgen(SOUNDGEN *self)
 {
     printf("Booya, adding a new REVERB to SOUNDGEN!\n");
@@ -247,7 +246,8 @@ float effector(SOUNDGEN *self, double val)
                 val = left_out;
                 break;
             case MODFILTER:
-                modfilter_process_audio(self->effects[i]->modfilter, &val, &left_out);
+                modfilter_process_audio(self->effects[i]->modfilter, &val,
+                                        &left_out);
                 val = left_out;
                 break;
             case REVERB:

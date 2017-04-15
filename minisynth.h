@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include "afx/limiter.h"
 #include "arpeggiator.h"
 #include "dca.h"
 #include "envelope_generator.h"
@@ -13,7 +14,6 @@
 #include "oscillator.h"
 #include "sound_generator.h"
 #include "stereodelay.h"
-#include "afx/limiter.h"
 
 #include "minisynth_voice.h"
 

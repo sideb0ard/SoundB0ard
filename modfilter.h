@@ -1,10 +1,9 @@
 #pragma once
 
-#include "lfo.h"
 #include "afx/biquad_lpf.h"
+#include "lfo.h"
 
-typedef struct modfilter
-{
+typedef struct modfilter {
     biquad m_left_lpf;
     biquad m_right_lpf;
 
@@ -29,6 +28,8 @@ modfilter *new_modfilter(void);
 void modfilter_init(modfilter *mf);
 double modfilter_calculate_cutoff_freq(modfilter *mf, double lfo_sample);
 double modfilter_calculate_q(modfilter *mf, double lfo_sample);
-void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq, double q);
-void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq, double q);
+void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
+                                         double q);
+void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
+                                          double q);
 bool modfilter_process_audio(modfilter *mf, double *in, double *out);

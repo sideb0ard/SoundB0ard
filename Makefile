@@ -57,6 +57,7 @@ OBJ = \
 	spork.o \
 	stereodelay.o \
 	sound_generator.o \
+	synthdrum_sequencer.o \
 	table.o \
 	utils.o \
 	voice.o \
