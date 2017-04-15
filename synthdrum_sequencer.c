@@ -3,6 +3,7 @@
 #include "sequencer_utils.h"
 #include "utils.h"
 #include <stdlib.h>
+#include <string.h>
 
 extern mixer *mixr;
 
@@ -13,6 +14,8 @@ synthdrum_sequencer *new_synthdrum_seq(int drumtype)
 {
     printf("New Drum Synth!\n");
     synthdrum_sequencer *sds = calloc(1, sizeof(synthdrum_sequencer));
+    seq_init(&sds->m_seq);
+
     sds->drumtype = drumtype;
     sds->vol = 0.7;
     sds->started = false;
@@ -51,14 +54,13 @@ void sds_status(void *self, wchar_t *ss)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     swprintf(ss, MAX_PS_STRING_SZ,
-             WANSI_COLOR_GREEN "[SYNTHDRUM] Type: %s Vol: %.2lf Ptn: %d\n",
-             sds->drumtype == KICK ? "drum" : "snare", sds->vol, sds->pattern);
+             WANSI_COLOR_GREEN "[SYNTHDRUM] Type: %s Vol: %.2lf",
+             sds->drumtype == KICK ? "drum" : "snare", sds->vol);
 
-    wchar_t pattern_details[128];
-    char spattern[17];
-    char_binary_version_of_int(sds->pattern, spattern);
-    swprintf(pattern_details, 127, L"\n      [%s]", spattern);
-    wcscat(ss, pattern_details);
+    wchar_t seq_status_string[MAX_PS_STRING_SZ];
+    memset(seq_status_string, 0, MAX_PS_STRING_SZ);
+    seq_status(&sds->m_seq, seq_status_string);
+    wcscat(ss, seq_status_string);
     wcscat(ss, WANSI_COLOR_RESET);
 }
 
@@ -84,9 +86,10 @@ double sds_gennext(void *self)
     }
 
     int bit_position = 1 << (15 - step_seq_idx);
-    if ((sds->pattern & bit_position) && mixr->is_sixteenth) {
+    if ((sds->m_seq.patterns[sds->m_seq.cur_pattern] & bit_position) && mixr->is_sixteenth) {
         sds_trigger(sds);
     }
+    seq_tick(&sds->m_seq);
 
     if (sds->osc1_sustain_counter >= sds->osc1_sustain_len_in_samples)
         sds->m_eg1.m_state = RELEASE;

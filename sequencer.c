@@ -24,15 +24,28 @@ void seq_init(sequencer *seq)
     memset(seq->matrix1, 0, sizeof seq->matrix1);
     memset(seq->matrix2, 0, sizeof seq->matrix2);
 
+    seq->num_patterns = 0;
+    seq->cur_pattern = 0;
     seq->multi_pattern_mode = true;
     seq->cur_pattern_iteration = 1;
+    seq->backup_pattern_while_getting_crazy = 0;
 
     for (int i = 0; i < NUM_SEQUENCER_PATTERNS; i++) {
+        seq->patterns[i] = 0;
         seq->pattern_num_loops[i] = 1;
         for (int j = 0; j < SEQUENCER_PATTERN_LEN; j++) {
             seq->pattern_position_amp[i][j] = DEFAULT_AMP;
         }
     }
+
+    seq->game_of_life_on = false;
+    seq->game_generation = 0;
+    seq->markov_on = false;
+    seq->markov_mode = MARKOVBOOMBAP;
+    seq->markov_generation = 0;
+
+    seq->max_generation = 0;
+
 }
 
 bool seq_tick(sequencer *seq)

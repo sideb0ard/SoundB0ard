@@ -5,6 +5,7 @@
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
 #include "sound_generator.h"
+#include "sequencer.h"
 
 typedef struct pattern_hit_metadata {
     bool played;
@@ -13,6 +14,7 @@ typedef struct pattern_hit_metadata {
 
 typedef struct synthdrum_sequencer {
     SOUNDGEN sg;
+    sequencer m_seq;
 
     qblimited_oscillator m_osc1;
     double osc1_sustain_len_in_samples;
@@ -30,7 +32,6 @@ typedef struct synthdrum_sequencer {
     unsigned drumtype; // KICK or SNARE
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
-    int pattern;
     bool started;
 
 } synthdrum_sequencer;
