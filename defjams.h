@@ -88,9 +88,11 @@ typedef enum {
     LOOPER_TYPE,
     BITWIZE_TYPE,
     SEQUENCER_TYPE,
+    SYNTHDRUM_TYPE,
     ALGORITHM_TYPE,
     CHAOSMONKEY_TYPE,
     SPORK_TYPE,
+    NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 
 typedef enum { MONO, LEGATO } legato_mode;
@@ -100,5 +102,6 @@ typedef enum {
     DELAYFX,
     MIDISPORK,
     MIDISEQUENCER,
+    MIDISYNTHDRUM,
     MIDILOOPER
 } midi_control_type;

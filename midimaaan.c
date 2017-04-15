@@ -12,6 +12,7 @@
 #include "minisynth.h"
 #include "mixer.h"
 #include "spork.h"
+#include "synthdrum_sequencer.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -110,6 +111,13 @@ void *midiman()
                         (spork *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
                     spork_parse_midi(s, data1, data2);
+                }
+                else if (mixr->midi_control_destination == MIDISYNTHDRUM) {
+                    printf("MIDI CONTROLS! SYNTHDRUM\n");
+                    synthdrum_sequencer *sds =
+                        (synthdrum_sequencer *)mixr
+                            ->sound_generators[mixr->active_midi_soundgen_num];
+                    sds_parse_midi(sds, data1, data2);
                 }
                 else {
                     printf("Got midi but not connected to synth\n");

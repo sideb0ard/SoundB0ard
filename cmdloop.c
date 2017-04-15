@@ -157,17 +157,20 @@ void interpret(char *line)
             char *pattern = (char *)calloc(128, sizeof(char));
             char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
             printf("Patterrnnzz! %s\n", pattern);
-            int int_pattern= 0;
+            int int_pattern = 0;
             pattern_char_to_int(pattern, &int_pattern);
             printf("Patterrnnzz! %s %d\n", pattern, int_pattern);
+            int soundgen_num = 0;
             if (strncmp("kick", wurds[1], 4) == 0) {
                 printf("Synthy KICK!\n");
-                mixer_add_synthdrum(mixr, KICK, int_pattern);
+                soundgen_num = mixer_add_synthdrum(mixr, KICK, int_pattern);
             }
             else if (strncmp("snare", wurds[1], 5) == 0) {
                 printf("Synthy SNARE!\n");
-                mixer_add_synthdrum(mixr, SNARE, int_pattern);
+                soundgen_num = mixer_add_synthdrum(mixr, SNARE, int_pattern);
             }
+            mixr->midi_control_destination = MIDISYNTHDRUM;
+            mixr->active_midi_soundgen_num = soundgen_num;
         }
 
         //////  STEP SEQUENCER COMMANDS  /////////////////////////

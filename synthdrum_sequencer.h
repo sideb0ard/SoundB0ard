@@ -7,8 +7,8 @@
 #include "sound_generator.h"
 
 typedef struct pattern_hit_metadata {
-	bool played;
-	bool playing;
+    bool played;
+    bool playing;
 } pattern_hit_metadata;
 
 typedef struct synthdrum_sequencer {
@@ -28,8 +28,8 @@ typedef struct synthdrum_sequencer {
 
     double vol;
     unsigned drumtype; // KICK or SNARE
-	pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
-	
+    pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
+
     int pattern;
     bool started;
 
@@ -43,3 +43,4 @@ double sds_gennext(void *self);
 double sds_getvol(void *self);
 void sds_trigger(synthdrum_sequencer *sds);
 void sds_stop(synthdrum_sequencer *sds);
+void sds_parse_midi(synthdrum_sequencer *s, int data1, int data2);
