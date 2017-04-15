@@ -23,6 +23,7 @@
 #include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "spork.h"
+#include "synthdrum_sequencer.h"
 
 extern ENVSTREAM *ampstream;
 
@@ -233,6 +234,14 @@ int mixer_add_spork(mixer *mixr)
     printf("Adding an SPORK, mo!\n");
     spork *s = new_spork();
     return add_sound_generator(mixr, (SOUNDGEN *)s);
+}
+
+int mixer_add_synthdrum(mixer *mixr, int drumtype, int pattern)
+{
+    printf("Adding an SYNTHYDRUM, yo!\n");
+    synthdrum_sequencer *sds = new_synthdrum_seq(drumtype);
+    sds->pattern = pattern;
+    return add_sound_generator(mixr, (SOUNDGEN *)sds);
 }
 
 int add_algorithm(char *line)

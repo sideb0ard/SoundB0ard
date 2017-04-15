@@ -68,6 +68,8 @@
 
 typedef enum { UP, DOWN, UPDOWN, RANDOM } direction;
 
+enum { KICK, SNARE };
+
 typedef enum {
     MIDI_KNOB_MODE_ONE,
     MIDI_KNOB_MODE_TWO,
