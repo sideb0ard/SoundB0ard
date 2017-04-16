@@ -27,6 +27,7 @@
 #include "obliquestrategies.h"
 #include "oscillator.h"
 #include "sample_sequencer.h"
+#include "synthdrum_sequencer.h"
 #include "sequencer_utils.h"
 #include "sparkline.h"
 #include "table.h"
@@ -165,13 +166,33 @@ void interpret(char *line)
             if (strncmp("kick", wurds[1], 4) == 0) {
                 printf("Synthy KICK!\n");
                 soundgen_num = mixer_add_synthdrum(mixr, KICK, int_pattern);
+                mixr->midi_control_destination = MIDISYNTHDRUM;
+                mixr->active_midi_soundgen_num = soundgen_num;
             }
             else if (strncmp("snare", wurds[1], 5) == 0) {
                 printf("Synthy SNARE!\n");
                 soundgen_num = mixer_add_synthdrum(mixr, SNARE, int_pattern);
+                mixr->midi_control_destination = MIDISYNTHDRUM;
+                mixr->active_midi_soundgen_num = soundgen_num;
             }
-            mixr->midi_control_destination = MIDISYNTHDRUM;
-            mixr->active_midi_soundgen_num = soundgen_num;
+            else
+            {
+                int soundgen_num = atoi(wurds[1]);
+                if (is_valid_soundgen_num(soundgen_num) &&
+                    mixr->sound_generators[soundgen_num]->type ==
+                        SYNTHDRUM_TYPE) {
+                    if (strncmp("midi", wurds[2], 4) == 0) {
+                        printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer %d\n",
+                               soundgen_num);
+                        mixr->midi_control_destination = MIDISYNTHDRUM;
+                        mixr->active_midi_soundgen_num = soundgen_num;
+                    }
+                        synthdrum_sequencer *s =
+                            (synthdrum_sequencer *)mixr->sound_generators[soundgen_num];
+                        sequencer *seq = &s->m_seq;
+                        parse_sequencer_command(seq, wurds, num_wurds, pattern);
+                    }
+            }
         }
 
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
@@ -207,7 +228,6 @@ void interpret(char *line)
                         sample_sequencer *s =
                             (sample_sequencer *)mixr->sound_generators[soundgen_num];
                         sequencer *seq = &s->m_seq;
-
                         parse_sequencer_command(seq, wurds, num_wurds, pattern);
                     }
                 }
