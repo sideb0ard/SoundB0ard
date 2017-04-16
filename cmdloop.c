@@ -187,11 +187,14 @@ void interpret(char *line)
                         mixr->midi_control_destination = MIDISYNTHDRUM;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
+                    else {
                         synthdrum_sequencer *s =
                             (synthdrum_sequencer *)mixr->sound_generators[soundgen_num];
                         sequencer *seq = &s->m_seq;
+                        printf("SYNTHDRUM SEQ!\n");
                         parse_sequencer_command(seq, wurds, num_wurds, pattern);
                     }
+                }
             }
         }
 

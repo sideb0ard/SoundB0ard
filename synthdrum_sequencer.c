@@ -46,6 +46,7 @@ synthdrum_sequencer *new_synthdrum_seq(int drumtype)
     sds->sg.status = &sds_status;
     sds->sg.getvol = &sds_getvol;
     sds->sg.setvol = &sds_setvol;
+    sds->sg.type = SYNTHDRUM_TYPE;
 
     return sds;
 }

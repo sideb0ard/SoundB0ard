@@ -114,7 +114,6 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern)
     char *sp, *sp_last, *spattern[32];
     char const *sep = " ";
 
-    printf("CHARPATT %s\n", char_pattern);
     // extract numbers from string into spattern
     for (sp = strtok_r(char_pattern, sep, &sp_last); sp;
          sp = strtok_r(NULL, sep, &sp_last)) {
@@ -126,12 +125,16 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern)
         // TODO - make get rid of magic number - loop length
         int pat_num = 15 - atoi(spattern[i]);
         if (pat_num < SEQUENCER_PATTERN_LEN) {
-            printf("PAT_NUM: %d is %d\n", pat_num, (1 << pat_num));
             *final_pattern = (1 << pat_num) | *final_pattern;
-            printf("NOW SET %d\n", *final_pattern);
+            if (mixr->debug_mode) {
+                printf("CHARPATT %s\n", char_pattern);
+                printf("PAT_NUM: %d is %d\n", pat_num, (1 << pat_num));
+                printf("NOW SET %d\n", *final_pattern);
+            }
         }
     }
-    printf("FINAL PATTERN %d\n", *final_pattern);
+    if (mixr->debug_mode)
+        printf("FINAL PATTERN %d\n", *final_pattern);
 }
 
 
