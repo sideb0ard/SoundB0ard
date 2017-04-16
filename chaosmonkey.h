@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include "lfo.h"
 #include "minisynth.h"
 #include "sound_generator.h"
 
@@ -19,6 +20,7 @@ typedef struct chaosmonkey {
     int soundgen;
     unsigned soundgen_type;
     unsigned chaos_mode;
+    lfo m_lfo;
 } chaosmonkey;
 
 chaosmonkey *new_chaosmonkey(int soundgen);

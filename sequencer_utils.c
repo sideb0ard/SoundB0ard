@@ -1,6 +1,9 @@
 #include <stdio.h>
 
+#include "mixer.h"
 #include "sequencer_utils.h"
+
+extern mixer *mixr;
 
 void build_euclidean_pattern_int(int level, int *bitmap_int,
                                  int *bitmap_position, int *count,
@@ -91,4 +94,26 @@ void char_binary_version_of_int(int num, char bin_num[17])
             bin_num[15 - i] = '0';
     }
     bin_num[16] = '\0';
+}
+
+unsigned int gimme_a_bitwise_int(int pattern, int t)
+{
+    unsigned int result;
+    switch (pattern) {
+    case 0:
+        result = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
+    case 1:
+        result = (t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6);
+    case 2:
+        result = (t * (t >> 5 | t >> 8)) >> (t >> 16);
+    case 3:
+        result = (t * (t >> 3 | t >> 4)) >> (t >> 7);
+    case 4:
+        result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
+    default:
+        result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
+    }
+    if (mixr->debug_mode)
+        printf("T: %d Result: %d\n", t, result);
+    return result;
 }

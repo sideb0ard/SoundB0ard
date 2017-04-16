@@ -529,7 +529,6 @@ void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,
             ms->m_voices[i]->m_voice.m_osc4->m_cents = 2.5;
         }
     }
-    minisynth_update(ms);
 }
 
 void minisynth_set_multi_melody_mode(minisynth *ms, bool melody_mode)
@@ -715,7 +714,7 @@ double minisynth_getvol(void *self)
 double minisynth_gennext(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    // minisynth_update(ms);
+    minisynth_update(ms);
 
     if (mixr->is_midi_tick) {
         minisynth_play_melody(ms);
@@ -1174,4 +1173,11 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
 
     minisynth_set_multi_melody_mode(ms, true);
     fclose(fp);
+}
+
+void minisynth_set_filter_mod(minisynth *ms, double mod)
+{
+    for (int i = 0; i < MAX_VOICES; i++) {
+        minisynth_voice_set_filter_mod(ms->m_voices[i], mod);
+    }
 }

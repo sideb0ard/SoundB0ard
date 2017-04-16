@@ -255,3 +255,8 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
 
     return true;
 }
+
+void minisynth_voice_set_filter_mod(minisynth_voice *ms, double mod)
+{
+    filter_set_fc_mod(&ms->m_moog_ladder_filter.f, mod);
+}

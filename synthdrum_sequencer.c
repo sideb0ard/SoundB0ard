@@ -19,7 +19,8 @@ synthdrum_sequencer *new_synthdrum_seq(int drumtype)
     sds->drumtype = drumtype;
     sds->vol = 0.7;
     sds->started = false;
-    sds->midi_controller_mode = 0; // TODO enum or sumthing - for the moment just two modes
+    sds->midi_controller_mode =
+        0; // TODO enum or sumthing - for the moment just two modes
     for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
         sds->metadata[i].played = 0.0;
         sds->metadata[i].playing = 0.0;
@@ -44,7 +45,7 @@ synthdrum_sequencer *new_synthdrum_seq(int drumtype)
     osc_new_settings(&sds->m_osc2.osc);
     qb_set_soundgenerator_interface(&sds->m_osc2);
     sds->m_osc2.osc.m_waveform = SINE;
-    sds->m_osc2.osc.m_osc_fo = 47;
+    sds->m_osc2.osc.m_osc_fo = 200;
     sds->osc2_sustain_len_in_samples =
         SAMPLE_RATE / 1000. * (OSC2_SUSTAIN_MS + sds->m_eg2.m_attack_time_msec +
                                sds->m_eg2.m_decay_time_msec);
@@ -56,8 +57,8 @@ synthdrum_sequencer *new_synthdrum_seq(int drumtype)
     sds->m_osc3.osc.m_waveform = SINE;
     sds->m_osc3.osc.m_osc_fo = 147;
     sds->osc3_sustain_len_in_samples =
-        SAMPLE_RATE / 1000. * (OSC2_SUSTAIN_MS + sds->m_eg2.m_attack_time_msec +
-                               sds->m_eg2.m_decay_time_msec);
+        SAMPLE_RATE / 1000. *
+        (sds->m_eg2.m_attack_time_msec + sds->m_eg2.m_decay_time_msec);
     sds->osc3_sustain_counter = 0;
     sds->osc3_amp = 0.2;
 
@@ -134,7 +135,6 @@ double sds_gennext(void *self)
     osc_update(&sds->m_osc1.osc, "NOISEOSC");
     osc_update(&sds->m_osc2.osc, "SINEOSC");
 
-
     double osc1 = qb_do_oscillate(&sds->m_osc1.osc, NULL);
     double osc2 = qb_do_oscillate(&sds->m_osc2.osc, NULL);
 
@@ -142,15 +142,17 @@ double sds_gennext(void *self)
         if (osc1 > 0.0 || osc2 > 0.0)
             printf("oSC1: %f OSC2: %f\n", osc1, osc2);
 
-    val = eg2 * (eg1*osc1*sds->osc1_amp + osc2*sds->osc2_amp);
+    // val = eg2 * (eg1*osc1*sds->osc1_amp + osc2*sds->osc2_amp);
+    val = eg2 * osc2 * sds->osc2_amp;
 
-    moog_update((filter *)&sds->m_filter);
-    double filter_out =
-        moog_gennext((filter *)&sds->m_filter, val);
-    if (mixr->debug_mode)
-        printf("FILTEROUOOT %f\n", filter_out);
+    // moog_update((filter *)&sds->m_filter);
+    // double filter_out =
+    //    moog_gennext((filter *)&sds->m_filter, val);
+    // if (mixr->debug_mode)
+    //    printf("FILTEROUOOT %f\n", filter_out);
 
-    return filter_out * sds->vol;
+    // return filter_out * sds->vol;
+    return val * sds->vol;
 }
 
 double sds_getvol(void *self)
@@ -238,7 +240,8 @@ void sds_parse_midi(synthdrum_sequencer *sds, int data1, int data2)
             scaley_val = scaleybum(1, 128, 0.0, 1.0, data2);
             printf("VOLUME!\n");
             sds->vol = scaley_val;
-        } else {
+        }
+        else {
             scaley_val = scaleybum(1, 128, 0.0, 1.0, data2);
             printf("OSC1 AMP!\n");
             sds->osc1_amp = scaley_val;
@@ -260,8 +263,9 @@ void sds_parse_midi(synthdrum_sequencer *sds, int data1, int data2)
         if (sds->midi_controller_mode == 0) {
             scaley_val = scaleybum(1, 128, 5, 500, data2);
             sds->osc1_sustain_len_in_samples =
-                SAMPLE_RATE / 1000. * (scaley_val + +sds->m_eg1.m_attack_time_msec +
-                                       sds->m_eg1.m_decay_time_msec);
+                SAMPLE_RATE / 1000. *
+                (scaley_val + +sds->m_eg1.m_attack_time_msec +
+                 sds->m_eg1.m_decay_time_msec);
             ;
             printf("OSC1 SUSTAIN!! %f\n", scaley_val);
         }
@@ -274,7 +278,8 @@ void sds_parse_midi(synthdrum_sequencer *sds, int data1, int data2)
             sds->m_eg1.m_decay_time_msec = scaley_val;
             sds->m_eg1.m_release_time_msec = scaley_val;
             printf("ENV1 DECAY/RELEASE!! %f\n", sds->m_eg1.m_release_time_msec);
-        } else {
+        }
+        else {
         }
         break;
     case 5:
@@ -282,7 +287,8 @@ void sds_parse_midi(synthdrum_sequencer *sds, int data1, int data2)
             scaley_val = scaleybum(0, 128, OSC_FO_MIN, 300, data2);
             printf("OSC2 freQ! %f\n", scaley_val);
             sds->m_osc2.osc.m_osc_fo = scaley_val;
-        } else {
+        }
+        else {
         }
         break;
     case 6:
@@ -290,17 +296,20 @@ void sds_parse_midi(synthdrum_sequencer *sds, int data1, int data2)
             scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             sds->m_eg2.m_attack_time_msec = scaley_val;
             printf("ENV2 ATTACK! %f\n", sds->m_eg2.m_attack_time_msec);
-        } else {
+        }
+        else {
         }
         break;
     case 7:
         if (sds->midi_controller_mode == 0) {
             scaley_val = scaleybum(1, 128, 5, 500, data2);
             sds->osc2_sustain_len_in_samples =
-                SAMPLE_RATE / 1000. * (scaley_val + +sds->m_eg2.m_attack_time_msec +
-                                       sds->m_eg2.m_decay_time_msec);
+                SAMPLE_RATE / 1000. *
+                (scaley_val + +sds->m_eg2.m_attack_time_msec +
+                 sds->m_eg2.m_decay_time_msec);
             printf("OSC2 SUSTAIN!! %f\n", scaley_val);
-        } else {
+        }
+        else {
             printf("FILTER Qviiity !\n");
             scaley_val = scaleybum(1, 128, 1, 10, data2);
             sds->m_filter.f.m_q = scaley_val;
@@ -312,7 +321,8 @@ void sds_parse_midi(synthdrum_sequencer *sds, int data1, int data2)
             sds->m_eg2.m_decay_time_msec = scaley_val;
             sds->m_eg2.m_release_time_msec = scaley_val;
             printf("ENV2 DECAY/RELEASE!! %f\n", sds->m_eg2.m_release_time_msec);
-        } else {
+        }
+        else {
             printf("FILTER FREQ CUTOFF!\n");
             scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
             sds->m_filter.f.m_fc = scaley_val;

@@ -33,7 +33,11 @@ typedef struct sequencer {
     unsigned int markov_mode; // MARKOVHAUS or MARKOVBOOMBAP
     int markov_generation;
 
-    int max_generation; // used for game of life or markov chain
+    bool bitwise_on;
+    unsigned int bitwise_mode;
+    int bitwise_generation;
+
+    int max_generation; // used for game of life, markov chain and bitwise
 
 } sequencer;
 
@@ -65,5 +69,7 @@ void next_markov_generation(sequencer *s);
 void seq_set_game_of_life(sequencer *s, bool on);
 void seq_set_markov(sequencer *s, bool on);
 void seq_set_markov_mode(sequencer *s, unsigned int mode);
+void seq_set_bitwise(sequencer *s, bool on);
+void seq_set_bitwise_mode(sequencer *s, unsigned int mode);
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);

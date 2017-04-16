@@ -400,6 +400,7 @@ void interpret(char *line)
                         }
                     }
                     if (strncmp("arp", wurds[2], 3) == 0) {
+                        ms->recording = false;
                         minisynth_set_arpeggiate(ms, 1 - ms->m_arp.active);
                     }
                     if (strncmp("delete", wurds[2], 3) == 0) {
@@ -1000,6 +1001,11 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                 seq_set_markov_mode(seq, MARKOVBOOMBAP);
             }
         }
+        if (strncmp("bitwise", wurds[3], 6) == 0) {
+            printf("BITWISE CHANGE!!\n");
+            int bitwise_mode = atoi(wurds[4]);
+            seq_set_bitwise_mode(seq, bitwise_mode);
+        }
         else {
             char_array_to_seq_string_pattern(pattern, wurds, 5, num_wurds);
             printf("Changing\n");
@@ -1062,6 +1068,18 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         }
         else {
             seq_set_markov(seq, 1 - seq->markov_on);
+        }
+    }
+    else if (strncmp("bitwise", wurds[2], 4) == 0) {
+        int num_gens = atoi(wurds[3]);
+        if (num_gens > 0) {
+            if (mixr->debug_mode)
+                printf("Enabling Bitwise mode for %d generations\n", num_gens);
+            seq_set_bitwise(seq, 1);
+            seq_set_max_generations(seq, num_gens);
+        }
+        else {
+            seq_set_bitwise(seq, 1 - seq->bitwise_on);
         }
     }
 }

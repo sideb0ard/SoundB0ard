@@ -31,3 +31,4 @@ void minisynth_voice_reset(minisynth_voice *ms);
 
 bool minisynth_voice_gennext(minisynth_voice *ms, double *left_output,
                              double *right_output);
+void minisynth_voice_set_filter_mod(minisynth_voice *ms, double mod);

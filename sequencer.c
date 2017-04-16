@@ -43,6 +43,9 @@ void seq_init(sequencer *seq)
     seq->markov_on = false;
     seq->markov_mode = MARKOVBOOMBAP;
     seq->markov_generation = 0;
+    seq->bitwise_on = false;
+    seq->bitwise_mode = 0;
+    seq->bitwise_generation = 0;
 
     seq->max_generation = 0;
 }
@@ -86,6 +89,19 @@ bool seq_tick(sequencer *seq)
                         printf("passed max generation of markov - stopping\n");
                     seq->game_generation = 0;
                     seq_set_markov(seq, 0);
+                }
+            }
+            else if (seq->bitwise_on) {
+                int new_pattern =
+                    gimme_a_bitwise_int(seq->bitwise_mode, mixr->cur_sample);
+                seq->patterns[seq->cur_pattern] = new_pattern;
+                seq->bitwise_generation++;
+                if (seq->max_generation != 0 &&
+                    seq->bitwise_generation >= seq->max_generation) {
+                    if (mixr->debug_mode)
+                        printf("passed max generation of bitwise - stopping\n");
+                    seq->bitwise_generation = 0;
+                    seq_set_bitwise(seq, 0);
                 }
             }
         }
@@ -502,6 +518,19 @@ void seq_set_markov(sequencer *s, bool b)
     }
 }
 
+void seq_set_bitwise(sequencer *s, bool b)
+{
+    s->bitwise_generation = 0;
+    if (b) {
+        s->bitwise_on = true;
+        seq_set_backup_mode(s, b);
+    }
+    else {
+        s->bitwise_on = false;
+        seq_set_backup_mode(s, b);
+    }
+}
+
 void seq_set_backup_mode(sequencer *s, bool on)
 {
     if (on) {
@@ -520,4 +549,9 @@ void seq_set_max_generations(sequencer *s, int max) { s->max_generation = max; }
 void seq_set_markov_mode(sequencer *s, unsigned int mode)
 {
     s->markov_mode = mode;
+}
+
+void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
+{
+    s->bitwise_mode = mode;
 }
