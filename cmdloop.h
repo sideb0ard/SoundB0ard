@@ -13,7 +13,8 @@ void interpret(char *line);
 
 int exxit(void);
 int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line);
-void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD], int num_wurds, char *pattern);
+void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
+                             int num_wurds, char *pattern);
 void char_array_to_seq_string_pattern(char *dest_pattern,
                                       char char_array[NUM_WURDS][SIZE_OF_WURD],
                                       int start, int end);

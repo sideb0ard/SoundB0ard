@@ -11,8 +11,8 @@
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "spork.h"
 #include "sample_sequencer.h"
+#include "spork.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
 

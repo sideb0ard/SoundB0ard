@@ -18,8 +18,8 @@
 #include "looper.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "sbmsg.h"
 #include "sample_sequencer.h"
+#include "sbmsg.h"
 #include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "spork.h"
@@ -290,7 +290,8 @@ int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
 
     printf("EUCLIDEAN BEAT! %d\n", pattern);
 
-    sample_sequencer *nseq = new_sample_seq_from_int_pattern(full_filename, pattern);
+    sample_sequencer *nseq =
+        new_sample_seq_from_int_pattern(full_filename, pattern);
     if (nseq == NULL) {
         printf("Barfed on seq creation\n");
         return -1;
@@ -310,7 +311,8 @@ int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern)
     strcat(full_filename, "/wavs/");
     strcat(full_filename, filename);
 
-    sample_sequencer *nseq = new_sample_seq_from_char_pattern(full_filename, pattern);
+    sample_sequencer *nseq =
+        new_sample_seq_from_char_pattern(full_filename, pattern);
     if (nseq == NULL) {
         printf("Barfed on seq creation\n");
         return -1;

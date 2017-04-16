@@ -4,8 +4,8 @@
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
-#include "sound_generator.h"
 #include "sequencer.h"
+#include "sound_generator.h"
 
 typedef struct pattern_hit_metadata {
     bool played;
@@ -19,17 +19,28 @@ typedef struct synthdrum_sequencer {
     qblimited_oscillator m_osc1;
     double osc1_sustain_len_in_samples;
     int osc1_sustain_counter;
+    double osc1_amp;
 
     qblimited_oscillator m_osc2;
     double osc2_sustain_len_in_samples;
     int osc2_sustain_counter;
+    double osc2_amp;
+
+    qblimited_oscillator m_osc3;
+    double osc3_sustain_len_in_samples;
+    int osc3_sustain_counter;
+    double osc3_amp;
 
     envelope_generator m_eg1;
     envelope_generator m_eg2;
+
     filter_moogladder m_filter;
 
     double vol;
+
+    unsigned int midi_controller_mode;
     unsigned drumtype; // KICK or SNARE
+
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
     bool started;

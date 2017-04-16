@@ -45,21 +45,19 @@ void seq_init(sequencer *seq)
     seq->markov_generation = 0;
 
     seq->max_generation = 0;
-
 }
 
 bool seq_tick(sequencer *seq)
 {
-    if (mixr->sixteenth_note_tick != seq->tick)
-    {
+    if (mixr->sixteenth_note_tick != seq->tick) {
         seq->tick = mixr->sixteenth_note_tick;
 
-        if (seq->tick % 16 == 0)
-        {
+        if (seq->tick % 16 == 0) {
             if (seq->multi_pattern_mode) {
                 seq->cur_pattern_iteration--;
                 if (seq->cur_pattern_iteration == 0) {
-                    seq->cur_pattern = (seq->cur_pattern + 1) % seq->num_patterns;
+                    seq->cur_pattern =
+                        (seq->cur_pattern + 1) % seq->num_patterns;
                     seq->cur_pattern_iteration =
                         seq->pattern_num_loops[seq->cur_pattern];
                 }
@@ -136,7 +134,6 @@ void pattern_char_to_int(char *char_pattern, int *final_pattern)
     if (mixr->debug_mode)
         printf("FINAL PATTERN %d\n", *final_pattern);
 }
-
 
 // game of life algo helpers
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])

@@ -18,7 +18,8 @@ extern wchar_t *sparkchars;
 
 sample_sequencer *new_sample_seq(char *filename)
 {
-    sample_sequencer *seq = (sample_sequencer *)calloc(1, sizeof(sample_sequencer));
+    sample_sequencer *seq =
+        (sample_sequencer *)calloc(1, sizeof(sample_sequencer));
     seq_init(&seq->m_seq);
 
     SF_INFO sf_info;
@@ -198,18 +199,20 @@ sample_sequencer *new_sample_seq_from_int_pattern(char *filename, int pattern)
     return seq;
 }
 
-sample_sequencer *new_sample_seq_from_char_pattern(char *filename, char *pattern)
+sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
+                                                   char *pattern)
 {
     sample_sequencer *seq = new_sample_seq(filename);
-    pattern_char_to_int(pattern, &seq->m_seq.patterns[seq->m_seq.num_patterns++]);
+    pattern_char_to_int(pattern,
+                        &seq->m_seq.patterns[seq->m_seq.num_patterns++]);
     return seq;
 }
 
 void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    swprintf(status_string, MAX_PS_STRING_SZ, WANSI_COLOR_BLUE
-             "[SAMPLE SEQ] \"%s\" Vol: %.2lf",
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf",
              basename(seq->filename), seq->vol);
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -248,7 +251,8 @@ void swingrrr(void *self, int swing_setting)
 }
 
 // TODO make this part of SOUND GENERATOR
-void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1, unsigned int data2)
+void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
+                           unsigned int data2)
 {
     printf("YA BEEZER, MIDI DRUM SEQUENCER!\n");
 

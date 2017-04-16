@@ -27,9 +27,9 @@
 #include "obliquestrategies.h"
 #include "oscillator.h"
 #include "sample_sequencer.h"
-#include "synthdrum_sequencer.h"
 #include "sequencer_utils.h"
 #include "sparkline.h"
+#include "synthdrum_sequencer.h"
 #include "table.h"
 #include "utils.h"
 
@@ -175,21 +175,22 @@ void interpret(char *line)
                 mixr->midi_control_destination = MIDISYNTHDRUM;
                 mixr->active_midi_soundgen_num = soundgen_num;
             }
-            else
-            {
+            else {
                 int soundgen_num = atoi(wurds[1]);
                 if (is_valid_soundgen_num(soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type ==
                         SYNTHDRUM_TYPE) {
                     if (strncmp("midi", wurds[2], 4) == 0) {
-                        printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer %d\n",
+                        printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer "
+                               "%d\n",
                                soundgen_num);
                         mixr->midi_control_destination = MIDISYNTHDRUM;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else {
                         synthdrum_sequencer *s =
-                            (synthdrum_sequencer *)mixr->sound_generators[soundgen_num];
+                            (synthdrum_sequencer *)
+                                mixr->sound_generators[soundgen_num];
                         sequencer *seq = &s->m_seq;
                         printf("SYNTHDRUM SEQ!\n");
                         parse_sequencer_command(seq, wurds, num_wurds, pattern);
@@ -226,15 +227,14 @@ void interpret(char *line)
                         swingrrr(mixr->sound_generators[soundgen_num],
                                  swing_setting);
                     }
-                    else
-                    {
+                    else {
                         sample_sequencer *s =
-                            (sample_sequencer *)mixr->sound_generators[soundgen_num];
+                            (sample_sequencer *)
+                                mixr->sound_generators[soundgen_num];
                         sequencer *seq = &s->m_seq;
                         parse_sequencer_command(seq, wurds, num_wurds, pattern);
                     }
                 }
-
             }
             free(pattern);
         }
@@ -964,12 +964,12 @@ int exxit()
     exit(0);
 }
 
-void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD], int num_wurds, char *pattern)
+void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
+                             int num_wurds, char *pattern)
 {
     if (strncmp("add", wurds[2], 3) == 0) {
         printf("Adding\n");
-        char_array_to_seq_string_pattern(pattern, wurds, 3,
-                                         num_wurds);
+        char_array_to_seq_string_pattern(pattern, wurds, 3, num_wurds);
         add_char_pattern(seq, pattern);
     }
     else if (strncmp("randamp", wurds[2], 6) == 0) {
@@ -1001,29 +1001,24 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD], int num
             }
         }
         else {
-            char_array_to_seq_string_pattern(pattern, wurds, 5,
-                                             num_wurds);
+            char_array_to_seq_string_pattern(pattern, wurds, 5, num_wurds);
             printf("Changing\n");
 
             int pattern_num = atoi(wurds[3]);
             if (is_valid_seq_pattern_num(seq, pattern_num)) {
                 if (strncmp("pattern", wurds[4], 7) == 0) {
                     printf("Changing pattern to %s\n", pattern);
-                    change_char_pattern(seq, pattern_num,
-                                        pattern);
+                    change_char_pattern(seq, pattern_num, pattern);
                 }
                 else if (strncmp("amp", wurds[4], 3) == 0) {
-                    printf("Setting pattern AMP to %s\n",
-                           pattern);
-                    seq_set_sample_amp_from_char_pattern(
-                        seq, pattern_num, pattern);
+                    printf("Setting pattern AMP to %s\n", pattern);
+                    seq_set_sample_amp_from_char_pattern(seq, pattern_num,
+                                                         pattern);
                 }
-                else if (strncmp("numloops", wurds[4], 8) ==
-                         0) {
+                else if (strncmp("numloops", wurds[4], 8) == 0) {
                     int numloops = atoi(wurds[5]);
                     if (numloops != 0) {
-                        seq_change_num_loops(seq, pattern_num,
-                                             numloops);
+                        seq_change_num_loops(seq, pattern_num, numloops);
                     }
                 }
             }
@@ -1035,15 +1030,13 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD], int num
         if (num_beats <= 0) {
             return;
         }
-        int euclidean_pattern = create_euclidean_rhythm(
-            num_beats, SEQUENCER_PATTERN_LEN);
-        bool start_at_zero =
-            strncmp("true", wurds[4], 4) == 0 ? true : false;
+        int euclidean_pattern =
+            create_euclidean_rhythm(num_beats, SEQUENCER_PATTERN_LEN);
+        bool start_at_zero = strncmp("true", wurds[4], 4) == 0 ? true : false;
         if (start_at_zero)
             euclidean_pattern = shift_bits_to_leftmost_position(
                 euclidean_pattern, SEQUENCER_PATTERN_LEN);
-        change_int_pattern(seq, seq->cur_pattern,
-                           euclidean_pattern);
+        change_int_pattern(seq, seq->cur_pattern, euclidean_pattern);
     }
     else if (strncmp("life", wurds[2], 4) == 0) {
         int num_gens = atoi(wurds[3]);
@@ -1063,9 +1056,7 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD], int num
         int num_gens = atoi(wurds[3]);
         if (num_gens > 0) {
             if (mixr->debug_mode)
-                printf(
-                    "Enabling Markov mode for %d generations\n",
-                    num_gens);
+                printf("Enabling Markov mode for %d generations\n", num_gens);
             seq_set_markov(seq, 1);
             seq_set_max_generations(seq, num_gens);
         }
@@ -1074,4 +1065,3 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD], int num
         }
     }
 }
-
