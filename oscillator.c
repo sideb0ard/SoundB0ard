@@ -150,7 +150,7 @@ void osc_update(oscillator *self, char *name)
         // printf("I'm %s\n", name);
         if (self->m_global_oscillator_params->osc_fo >= 0) {
             self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
-            // printf("Gots Global Params OSc_FO >= 0!\n");
+            printf("Gots Global Params OSc_FO >= 0!\n");
         }
 
         self->m_fo_ratio = self->m_global_oscillator_params->fo_ratio;

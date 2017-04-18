@@ -32,7 +32,7 @@ void envelope_generator_init(envelope_generator *eg)
     eg->m_attack_time_scalar = 1.0;
     eg->m_decay_time_scalar = 1.0;
 
-    eg->m_sustain_level = 1.0;
+    eg->m_sustain_level = 0.7;
     eg->m_envelope_output = 0.0;
 
     eg->m_inc_shutdown = 0.0;
@@ -289,6 +289,7 @@ void eg_update(envelope_generator *self)
 
 double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 {
+    //printf("STATe: %s\n" , state_strings[self->m_state]);
     switch (self->m_state) {
     case OFFF: {
         if (self->m_reset_to_zero)

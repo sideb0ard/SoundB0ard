@@ -1048,11 +1048,12 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         int num_gens = atoi(wurds[3]);
         if (num_gens > 0) {
             if (mixr->debug_mode)
-                printf("Enabling game of life for %d "
-                       "generations\n",
+                printf("Enabling game of life every %d "
+                       "loops\n",
                        num_gens);
             seq_set_game_of_life(seq, 1);
-            seq_set_max_generations(seq, num_gens);
+            seq->life_every_n_loops = num_gens;
+            //seq_set_max_generations(seq, num_gens);
         }
         else {
             seq_set_game_of_life(seq, 1 - seq->game_of_life_on);

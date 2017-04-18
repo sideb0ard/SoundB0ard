@@ -502,42 +502,42 @@ void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2)
     double scaley_val = 0.;
     switch (data1) {
     case 1:
-        scaley_val = scaleybum(1, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+        scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, data2);
         printf("Filter FREQ Control! %f\n", scaley_val);
         s->m_fc_control = scaley_val;
         break;
     case 2:
-        scaley_val = scaleybum(1, 128, 1, 10, data2);
+        scaley_val = scaleybum(0, 127, 1, 10, data2);
         printf("Filter Q Control! %f\n", scaley_val);
         s->m_q_control = scaley_val;
         break;
     case 3:
-        scaley_val = scaleybum(1, 128, 1, 6, data2);
+        scaley_val = scaleybum(0, 127, 1, 6, data2);
         printf("SWIIIiiing!! %f\n", scaley_val);
         s->swing_setting = scaley_val;
         break;
     case 4:
-        scaley_val = scaleybum(1, 128, 0., 1., data2);
+        scaley_val = scaleybum(0, 127, 0., 1., data2);
         printf("Volume! %f\n", scaley_val);
         s->vol = scaley_val;
         break;
     case 5:
-        scaley_val = scaleybum(0, 128, 0, 2000, data2);
+        scaley_val = scaleybum(0, 127, 0, 2000, data2);
         printf("Delay Feedback Msec %f!\n", scaley_val);
         s->m_delay_time_msec = scaley_val;
         break;
     case 6:
-        scaley_val = scaleybum(0, 128, 20, 100, data2);
+        scaley_val = scaleybum(0, 127, 20, 100, data2);
         printf("Delay Feedback Pct! %f\n", scaley_val);
         s->m_feedback_pct = scaley_val;
         break;
     case 7:
-        scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+        scaley_val = scaleybum(0, 127, -0.9, 0.9, data2);
         printf("Delay Ratio! %f\n", scaley_val);
         s->m_delay_ratio = scaley_val;
         break;
     case 8:
-        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        scaley_val = scaleybum(0, 127, 0, 1, data2);
         printf("DELAY Wet mix %f!\n", scaley_val);
         s->m_wet_mix = scaley_val;
         break;

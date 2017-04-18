@@ -28,14 +28,17 @@ typedef struct sequencer {
 
     bool game_of_life_on;
     int game_generation;
+    int life_every_n_loops;
 
     bool markov_on;
     unsigned int markov_mode; // MARKOVHAUS or MARKOVBOOMBAP
     int markov_generation;
+    int markov_every_n_loops;
 
     bool bitwise_on;
     unsigned int bitwise_mode;
     int bitwise_generation;
+    int bitwise_every_n_loops;
 
     int max_generation; // used for game of life, markov chain and bitwise
 

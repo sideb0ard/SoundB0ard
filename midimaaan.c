@@ -61,6 +61,9 @@ void *midiman()
                 int data1 = Pm_MessageData1(msg[i].message);
                 int data2 = Pm_MessageData2(msg[i].message);
 
+                if (mixr->debug_mode)
+                    printf("[MIDI message] status:%d data1:%d data2:%d\n", status, data1, data2);
+
                 if (mixr->midi_control_destination == SYNTH) {
 
                     minisynth *ms =
@@ -159,23 +162,23 @@ void spork_parse_midi(spork *s, int data1, int data2)
     double scaley_val = 0.0;
     switch (data1) {
     case 1:
-        scaley_val = scaleybum(1, 128, 0.0, 1.0, data2);
+        scaley_val = scaleybum(0, 127, 0.0, 1.0, data2);
         printf("VOLUME!\n");
         s->m_volume = scaley_val;
         break;
     case 2:
-        scaley_val = scaleybum(1, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+        scaley_val = scaleybum(0, 127, MIN_LFO_RATE, MAX_LFO_RATE, data2);
         s->m_lfo.osc.m_osc_fo = scaley_val;
         printf("LFO RATE! %f\n", s->m_lfo.osc.m_osc_fo);
 
         break;
     case 3:
-        scaley_val = scaleybum(1, 128, 0, 1, data2);
+        scaley_val = scaleybum(0, 127, 0, 1, data2);
         s->m_lfo.osc.m_amplitude = scaley_val;
         printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude);
         break;
     case 4:
-        scaley_val = scaleybum(1, 128, 10, 220, data2);
+        scaley_val = scaleybum(0, 127, 10, 220, data2);
         printf("OSC FREQ!!\n");
         s->m_osc1.osc.m_osc_fo = scaley_val;
         s->m_osc2.osc.m_osc_fo = scaley_val * 2;
@@ -187,17 +190,17 @@ void spork_parse_midi(spork *s, int data1, int data2)
         s->m_filter.f.m_fc_control = scaley_val;
         break;
     case 6:
-        scaley_val = scaleybum(1, 128, 0, 100, data2);
+        scaley_val = scaleybum(0, 127, 0, 100, data2);
         printf("Reverb Pre Delay Ms!\n");
         s->m_reverb->m_pre_delay_msec = scaley_val;
         break;
     case 7:
-        scaley_val = scaleybum(1, 128, 0, 5000, data2);
+        scaley_val = scaleybum(0, 127, 0, 5000, data2);
         printf("Reverb Time!\n");
         s->m_reverb->m_rt60 = scaley_val;
         break;
     case 8:
-        scaley_val = scaleybum(1, 128, 0, 100, data2);
+        scaley_val = scaleybum(0, 127, 0, 100, data2);
         printf("Reverb Wet Mix!\n");
         s->m_reverb->m_wet_pct = scaley_val;
         break;
@@ -218,39 +221,39 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
         stereodelay *d = e->delay;
         switch (data1) {
         case 1:
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             printf("OPTION1!\n");
             break;
         case 2:
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             printf("OPTION2!\n");
             break;
         case 3:
-            scaley_val = scaleybum(1, 128, 0, 1, data2);
+            scaley_val = scaleybum(0, 127, 0, 1, data2);
             printf("OPTION3!\n");
             break;
         case 4:
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             printf("OPTION4!\n");
             break;
         case 5:
-            scaley_val = scaleybum(1, 128, 0, 2000, data2);
+            scaley_val = scaleybum(0, 127, 0, 2000, data2);
             printf("DELAY TIME! %f\n", scaley_val);
             stereo_delay_set_delay_time_ms(d, scaley_val);
             break;
         case 6:
             // scaley_val = scaleybum(0, 128, -100, 100, data2);
-            scaley_val = scaleybum(1, 128, 20, 100, data2);
+            scaley_val = scaleybum(0, 127, 20, 100, data2);
             printf("DELAY FEEDBACK! %f\n", scaley_val);
             stereo_delay_set_feedback_percent(d, scaley_val);
             break;
         case 7:
-            scaley_val = scaleybum(1, 128, -0.9, 0.9, data2);
+            scaley_val = scaleybum(0, 127, -0.9, 0.9, data2);
             printf("DELAY RATIO! %f\n", scaley_val);
             stereo_delay_set_delay_ratio(d, scaley_val);
             break;
         case 8:
-            scaley_val = scaleybum(1, 128, 0, 1, data2);
+            scaley_val = scaleybum(0, 127, 0, 1, data2);
             printf("DELAY MIX! %f\n", scaley_val);
             stereo_delay_set_wet_mix(d, scaley_val);
             break;
@@ -262,19 +265,19 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
         mod_delay *d = e->moddelay;
         switch (data1) {
         case 1:
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             printf("OPTION1!\n");
             break;
         case 2:
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             printf("OPTION2!\n");
             break;
         case 3:
-            scaley_val = scaleybum(1, 128, 0, 1, data2);
+            scaley_val = scaleybum(0, 127, 0, 1, data2);
             printf("OPTION3!\n");
             break;
         case 4:
-            scaley_val = scaleybum(1, 128, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             printf("OPTION4!\n");
             break;
         case 5:
@@ -289,12 +292,12 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
             d->m_rate = scaley_val;
             break;
         case 7:
-            scaley_val = scaleybum(1, 128, -100, 100, data2);
+            scaley_val = scaleybum(0, 127, -100, 100, data2);
             printf("MOD DELAY FEEDBACK PCT! %f\n", scaley_val);
             d->m_feedback_percent = scaley_val;
             break;
         case 8:
-            scaley_val = scaleybum(1, 128, 0, 30, data2);
+            scaley_val = scaleybum(0, 127, 0, 30, data2);
             printf("MODDELAY CHORUS OFFSET! %f\n", scaley_val);
             d->m_chorus_offset = scaley_val;
             break;
@@ -306,22 +309,22 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
         reverb *r = e->r;
         switch (data1) {
         case 1:
-            scaley_val = scaleybum(1, 128, 0, 100, data2);
+            scaley_val = scaleybum(0, 127, 0, 100, data2);
             printf("Reverb Pre Delay Ms!\n");
             r->m_pre_delay_msec = scaley_val;
             break;
         case 2:
-            scaley_val = scaleybum(1, 128, -96, 0, data2);
+            scaley_val = scaleybum(0, 127, -96, 0, data2);
             printf("Reverb Pre Delay Atten DB!\n");
             r->m_pre_delay_atten_db = scaley_val;
             break;
         case 3:
-            scaley_val = scaleybum(1, 128, 0, 5000, data2);
+            scaley_val = scaleybum(0, 127, 0, 5000, data2);
             printf("Reverb Time!\n");
             r->m_rt60 = scaley_val;
             break;
         case 4:
-            scaley_val = scaleybum(1, 128, 0, 100, data2);
+            scaley_val = scaleybum(0, 127, 0, 100, data2);
             printf("Reverb Wet Mix!\n");
             r->m_wet_pct = scaley_val;
             break;
@@ -336,13 +339,13 @@ void midi_delay_control(EFFECT *e, int data1, int data2)
             r->m_apf_1_delay_msec = scaley_val;
             break;
         case 7:
-            scaley_val = scaleybum(1, 128, -1, 1, data2);
+            scaley_val = scaleybum(0, 127, -1, 1, data2);
             printf("Reverb Input Diffusion APF 1 co-efficient ! %f\n",
                    scaley_val);
             r->m_apf_1_g = scaley_val;
             break;
         case 8:
-            scaley_val = scaleybum(1, 128, 0, 100, data2);
+            scaley_val = scaleybum(0, 127, 0, 100, data2);
             printf("Reverb Input APF 2 delay msec ! %f\n", scaley_val);
             r->m_apf_2_delay_msec = scaley_val;
             break;

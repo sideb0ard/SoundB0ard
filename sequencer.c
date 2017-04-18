@@ -40,12 +40,15 @@ void seq_init(sequencer *seq)
 
     seq->game_of_life_on = false;
     seq->game_generation = 0;
+    seq->life_every_n_loops = 0;
     seq->markov_on = false;
     seq->markov_mode = MARKOVBOOMBAP;
     seq->markov_generation = 0;
+    seq->markov_every_n_loops = 0;
     seq->bitwise_on = false;
     seq->bitwise_mode = 0;
     seq->bitwise_generation = 0;
+    seq->bitwise_every_n_loops = 0;
 
     seq->max_generation = 0;
 }
@@ -67,18 +70,25 @@ bool seq_tick(sequencer *seq)
             }
 
             if (seq->game_of_life_on) {
-                next_life_generation(seq);
-                if (seq->game_generation++ > 4) {
-                    seq->patterns[seq->cur_pattern] = seed_pattern();
-                    seq->game_generation = 0;
+                if (seq->game_generation % seq->life_every_n_loops == 0) {
+                    seq_set_backup_mode(seq, true);
+                    next_life_generation(seq);
                 }
-                if (seq->max_generation != 0 &&
-                    seq->game_generation >= seq->max_generation) {
-                    if (mixr->debug_mode)
-                        printf("passed max generation of life - stopping\n");
-                    seq->game_generation = 0;
-                    seq_set_game_of_life(seq, 0);
+                else
+                {
+                    seq_set_backup_mode(seq, false);
                 }
+                    //if (seq->game_generation++ > 4) {
+                    //    seq->patterns[seq->cur_pattern] = seed_pattern();
+                    //    seq->game_generation = 0;
+                    //}
+                    //if (seq->max_generation != 0 &&
+                    //    seq->game_generation >= seq->max_generation) {
+                    //    if (mixr->debug_mode)
+                    //        printf("passed max generation of life - stopping\n");
+                    //    seq->game_generation = 0;
+                    //    seq_set_game_of_life(seq, 0);
+                    //}
             }
             else if (seq->markov_on) {
                 next_markov_generation(seq);
