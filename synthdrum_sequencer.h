@@ -15,6 +15,7 @@ typedef struct pattern_hit_metadata {
 typedef struct synthdrum_sequencer {
     SOUNDGEN sg;
     sequencer m_seq;
+    double m_pitch;
 
     qblimited_oscillator m_osc1;
     double osc1_sustain_len_in_samples;

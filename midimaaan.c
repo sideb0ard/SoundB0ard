@@ -62,7 +62,8 @@ void *midiman()
                 int data2 = Pm_MessageData2(msg[i].message);
 
                 if (mixr->debug_mode)
-                    printf("[MIDI message] status:%d data1:%d data2:%d\n", status, data1, data2);
+                    printf("[MIDI message] status:%d data1:%d data2:%d\n",
+                           status, data1, data2);
 
                 if (mixr->midi_control_destination == SYNTH) {
 

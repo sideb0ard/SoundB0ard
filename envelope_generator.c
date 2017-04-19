@@ -43,8 +43,7 @@ void envelope_generator_init(envelope_generator *eg)
     eg->m_sustain_override = false;
     eg->m_release_pending = false;
     eg->m_output_eg = false;
-    eg->m_eg_mode = ANALOG;
-    eg_set_eg_mode(eg, eg->m_eg_mode);
+    eg_set_eg_mode(eg, ANALOG);
     eg->m_reset_to_zero = false;
     eg->m_legato_mode = false;
 
@@ -193,7 +192,7 @@ void eg_start_eg(envelope_generator *self)
     }
 
     // NOTE: has caused issues -
-    eg_reset(self);
+    // eg_reset(self);
     self->m_state = ATTACK;
 }
 
@@ -209,6 +208,7 @@ void eg_init_global_parameters(envelope_generator *self,
                                global_eg_params *params)
 {
     self->m_global_eg_params = params;
+
     self->m_global_eg_params->attack_time_msec = self->m_attack_time_msec;
     self->m_global_eg_params->decay_time_msec = self->m_decay_time_msec;
     self->m_global_eg_params->release_time_msec = self->m_release_time_msec;
@@ -289,7 +289,6 @@ void eg_update(envelope_generator *self)
 
 double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 {
-    //printf("STATe: %s\n" , state_strings[self->m_state]);
     switch (self->m_state) {
     case OFFF: {
         if (self->m_reset_to_zero)
@@ -325,13 +324,18 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
     }
     case RELEASE: {
         if (self->m_sustain_override) {
+            // printf("SUSTAIN OVERRIDE!\n");
             self->m_envelope_output = self->m_sustain_level;
             break;
         }
         else {
+            // printf("ELSE: ENV OUTPUT %f\n", self->m_envelope_output);
             self->m_envelope_output =
                 self->m_release_offset +
                 self->m_envelope_output * self->m_release_coeff;
+            // printf("else: ENV OUTPUT NOW %f offset %f release coeff %f\n",
+            // self->m_envelope_output, self->m_release_offset,
+            // self->m_release_coeff);
         }
 
         if (self->m_envelope_output <= 0.0 ||

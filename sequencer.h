@@ -27,7 +27,7 @@ typedef struct sequencer {
     bool multi_pattern_mode;
 
     bool game_of_life_on;
-    int game_generation;
+    int life_generation;
     int life_every_n_loops;
 
     bool markov_on;

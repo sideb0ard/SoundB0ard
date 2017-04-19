@@ -1045,42 +1045,78 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         change_int_pattern(seq, seq->cur_pattern, euclidean_pattern);
     }
     else if (strncmp("life", wurds[2], 4) == 0) {
-        int num_gens = atoi(wurds[3]);
-        if (num_gens > 0) {
-            if (mixr->debug_mode)
-                printf("Enabling game of life every %d "
-                       "loops\n",
-                       num_gens);
-            seq_set_game_of_life(seq, 1);
-            seq->life_every_n_loops = num_gens;
-            //seq_set_max_generations(seq, num_gens);
+        if (strncmp("every", wurds[3], 5) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_game_of_life(seq, true);
+                seq->life_every_n_loops = num_gens;
+            }
+            else {
+                printf("Need a number for every 'n'\n");
+            }
+        }
+        else if (strncmp("for", wurds[3], 3) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_game_of_life(seq, true);
+                seq_set_max_generations(seq, num_gens);
+            }
+            else {
+                printf("Need a number for 'for'\n");
+            }
         }
         else {
             seq_set_game_of_life(seq, 1 - seq->game_of_life_on);
         }
     }
     else if (strncmp("markov", wurds[2], 4) == 0) {
-        int num_gens = atoi(wurds[3]);
-        if (num_gens > 0) {
-            if (mixr->debug_mode)
-                printf("Enabling Markov mode for %d generations\n", num_gens);
-            seq_set_markov(seq, 1);
-            seq_set_max_generations(seq, num_gens);
+        if (strncmp("every", wurds[3], 5) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_markov(seq, true);
+                seq->markov_every_n_loops = num_gens;
+            }
+            else {
+                printf("Need a number for every 'n'\n");
+            }
+        }
+        else if (strncmp("for", wurds[3], 3) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_markov(seq, true);
+                seq_set_max_generations(seq, num_gens);
+            }
+            else {
+                printf("Need a number for 'for'\n");
+            }
         }
         else {
-            seq_set_markov(seq, 1 - seq->markov_on);
+            seq_set_markov(seq, 1 - seq->game_of_life_on);
         }
     }
     else if (strncmp("bitwise", wurds[2], 4) == 0) {
-        int num_gens = atoi(wurds[3]);
-        if (num_gens > 0) {
-            if (mixr->debug_mode)
-                printf("Enabling Bitwise mode for %d generations\n", num_gens);
-            seq_set_bitwise(seq, 1);
-            seq_set_max_generations(seq, num_gens);
+        if (strncmp("every", wurds[3], 5) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_bitwise(seq, true);
+                seq->bitwise_every_n_loops = num_gens;
+            }
+            else {
+                printf("Need a number for every 'n'\n");
+            }
+        }
+        else if (strncmp("for", wurds[3], 3) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_bitwise(seq, true);
+                seq_set_max_generations(seq, num_gens);
+            }
+            else {
+                printf("Need a number for 'for'\n");
+            }
         }
         else {
-            seq_set_bitwise(seq, 1 - seq->bitwise_on);
+            seq_set_bitwise(seq, 1 - seq->game_of_life_on);
         }
     }
 }

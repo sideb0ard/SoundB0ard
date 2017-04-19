@@ -39,7 +39,7 @@ void seq_init(sequencer *seq)
     }
 
     seq->game_of_life_on = false;
-    seq->game_generation = 0;
+    seq->life_generation = 0;
     seq->life_every_n_loops = 0;
     seq->markov_on = false;
     seq->markov_mode = MARKOVBOOMBAP;
@@ -59,6 +59,7 @@ bool seq_tick(sequencer *seq)
         seq->tick = mixr->sixteenth_note_tick;
 
         if (seq->tick % 16 == 0) {
+
             if (seq->multi_pattern_mode) {
                 seq->cur_pattern_iteration--;
                 if (seq->cur_pattern_iteration == 0) {
@@ -70,49 +71,62 @@ bool seq_tick(sequencer *seq)
             }
 
             if (seq->game_of_life_on) {
-                if (seq->game_generation % seq->life_every_n_loops == 0) {
-                    seq_set_backup_mode(seq, true);
-                    next_life_generation(seq);
+                if (seq->life_every_n_loops > 0) {
+                    if (seq->life_generation % seq->life_every_n_loops == 0) {
+                        seq_set_backup_mode(seq, true);
+                        next_life_generation(seq);
+                    }
+                    else {
+                        seq_set_backup_mode(seq, false);
+                    }
                 }
-                else
-                {
-                    seq_set_backup_mode(seq, false);
+                else if (seq->max_generation > 0) {
+                    if (seq->life_generation >= seq->max_generation) {
+                        seq->life_generation = 0;
+                        seq_set_game_of_life(seq, false);
+                    }
                 }
-                    //if (seq->game_generation++ > 4) {
-                    //    seq->patterns[seq->cur_pattern] = seed_pattern();
-                    //    seq->game_generation = 0;
-                    //}
-                    //if (seq->max_generation != 0 &&
-                    //    seq->game_generation >= seq->max_generation) {
-                    //    if (mixr->debug_mode)
-                    //        printf("passed max generation of life - stopping\n");
-                    //    seq->game_generation = 0;
-                    //    seq_set_game_of_life(seq, 0);
-                    //}
+                seq->life_generation++;
             }
             else if (seq->markov_on) {
-                next_markov_generation(seq);
-                seq->markov_generation++;
-                if (seq->max_generation != 0 &&
-                    seq->markov_generation >= seq->max_generation) {
-                    if (mixr->debug_mode)
-                        printf("passed max generation of markov - stopping\n");
-                    seq->game_generation = 0;
-                    seq_set_markov(seq, 0);
+                if (seq->markov_every_n_loops > 0) {
+                    if (seq->markov_generation % seq->markov_every_n_loops ==
+                        0) {
+                        seq_set_backup_mode(seq, true);
+                        next_markov_generation(seq);
+                    }
+                    else {
+                        seq_set_backup_mode(seq, false);
+                    }
                 }
+                else if (seq->max_generation > 0) {
+                    if (seq->markov_generation >= seq->max_generation) {
+                        seq->markov_generation = 0;
+                        seq_set_markov(seq, false);
+                    }
+                }
+                seq->markov_generation++;
             }
             else if (seq->bitwise_on) {
-                int new_pattern =
-                    gimme_a_bitwise_int(seq->bitwise_mode, mixr->cur_sample);
-                seq->patterns[seq->cur_pattern] = new_pattern;
-                seq->bitwise_generation++;
-                if (seq->max_generation != 0 &&
-                    seq->bitwise_generation >= seq->max_generation) {
-                    if (mixr->debug_mode)
-                        printf("passed max generation of bitwise - stopping\n");
-                    seq->bitwise_generation = 0;
-                    seq_set_bitwise(seq, 0);
+                if (seq->bitwise_every_n_loops > 0) {
+                    if (seq->bitwise_generation % seq->bitwise_every_n_loops ==
+                        0) {
+                        seq_set_backup_mode(seq, true);
+                        int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
+                                                              mixr->cur_sample);
+                        seq->patterns[seq->cur_pattern] = new_pattern;
+                    }
+                    else {
+                        seq_set_backup_mode(seq, false);
+                    }
                 }
+                else if (seq->max_generation > 0) {
+                    if (seq->bitwise_generation >= seq->max_generation) {
+                        seq->bitwise_generation = 0;
+                        seq_set_bitwise(seq, false);
+                    }
+                }
+                seq->bitwise_generation++;
             }
         }
         return true;
@@ -200,7 +214,7 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
 // game of life algo
 void next_life_generation(sequencer *self)
 {
-    // printf("NEXT LIFE GEN!\n");
+    printf("NEXT LIFE GEN!\n");
     memset(self->matrix1, 0, sizeof self->matrix1);
     memset(self->matrix2, 0, sizeof self->matrix2);
     int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
@@ -387,12 +401,15 @@ void next_markov_generation(sequencer *d)
 
 void seq_status(sequencer *seq, wchar_t *status_string)
 {
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             L"\n      CurStep: %d life_mode: %d "
-             "markov_on: %d markov_mode: %s Multi: %d Max Gen: %d",
-             seq->cur_pattern, seq->game_of_life_on, seq->markov_on,
-             seq->markov_mode ? "boombap" : "haus", seq->multi_pattern_mode,
-             seq->max_generation);
+    swprintf(
+        status_string, MAX_PS_STRING_SZ,
+        L"\n      CurStep: %d life_mode: %d Every_n: %d "
+        "markov_on: %d markov_mode: %s Markov_Every_n: %d Multi: %d Max Gen: %d"
+        L"\n      Bitwise: %d Bitwise_every_n: %d",
+        seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
+        seq->markov_on, seq->markov_mode ? "boombap" : "haus",
+        seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
+        seq->bitwise_on, seq->bitwise_every_n_loops);
     wchar_t pattern_details[128];
     char spattern[17];
     wchar_t apattern[17];
@@ -504,7 +521,7 @@ void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops)
 
 void seq_set_game_of_life(sequencer *s, bool b)
 {
-    s->game_generation = 0;
+    s->life_generation = 0;
     if (b) {
         s->game_of_life_on = true;
         seq_set_backup_mode(s, b);
