@@ -122,7 +122,7 @@ void *midiman()
                     synthdrum_sequencer *sds =
                         (synthdrum_sequencer *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
-                    sds_parse_midi(sds, data1, data2);
+                    sds_parse_midi(sds, status, data1, data2);
                 }
                 else {
                     printf("Got midi but not connected to synth\n");

@@ -192,7 +192,7 @@ void eg_start_eg(envelope_generator *self)
     }
 
     // NOTE: has caused issues -
-    // eg_reset(self);
+    eg_reset(self);
     self->m_state = ATTACK;
 }
 

@@ -56,4 +56,4 @@ double sds_gennext(void *self);
 double sds_getvol(void *self);
 void sds_trigger(synthdrum_sequencer *sds);
 void sds_stop(synthdrum_sequencer *sds);
-void sds_parse_midi(synthdrum_sequencer *s, int data1, int data2);
+void sds_parse_midi(synthdrum_sequencer *s, int status, int data1, int data2);
