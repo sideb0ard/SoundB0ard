@@ -10,7 +10,7 @@ void arpeggiator_init(arpeggiator *arp)
 {
     arp->active = false;
     arp->latch = true;
-    arp->single_note_repeat = false;
+    arp->single_note_repeat = true;
     arp->octave_range = 2;
     arp->mode = UP;
     arp->rate = SIXTEEN;

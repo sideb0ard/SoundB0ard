@@ -54,7 +54,7 @@ typedef struct synthdrum_sequencer {
 
 } synthdrum_sequencer;
 
-synthdrum_sequencer *new_synthdrum_seq(int drumtype);
+synthdrum_sequencer *new_synthdrum_seq(void);
 
 void sds_status(void *self, wchar_t *ss);
 void sds_setvol(void *self, double v);
@@ -65,4 +65,4 @@ void sds_stop(synthdrum_sequencer *sds);
 void sds_parse_midi(synthdrum_sequencer *s, int status, int data1, int data2);
 bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name);
 bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name);
-bool synthdrum_list_patches(synthdrum_sequencer *sds);
+bool synthdrum_list_patches(void);

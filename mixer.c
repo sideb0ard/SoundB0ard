@@ -63,9 +63,10 @@ void mixer_ps(mixer *mixr)
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
-           " :::::\n" ANSI_COLOR_RESET,
+           " :::::\n"
+           "::::: PPQN: %d PPS: %d PPL: %d PPNS: %d "  ANSI_COLOR_RESET,
            mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
-           mixr->debug_mode ? "true" : "false");
+           mixr->debug_mode ? "true" : "false", PPQN, PPS, PPL, PPNS);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
@@ -236,10 +237,10 @@ int mixer_add_spork(mixer *mixr)
     return add_sound_generator(mixr, (SOUNDGEN *)s);
 }
 
-int mixer_add_synthdrum(mixer *mixr, int drumtype, int pattern)
+int mixer_add_synthdrum(mixer *mixr, int pattern)
 {
     printf("Adding an SYNTHYDRUM, yo!\n");
-    synthdrum_sequencer *sds = new_synthdrum_seq(drumtype);
+    synthdrum_sequencer *sds = new_synthdrum_seq();
     sds->m_seq.patterns[sds->m_seq.num_patterns++] = pattern;
     return add_sound_generator(mixr, (SOUNDGEN *)sds);
 }

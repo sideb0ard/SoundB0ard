@@ -12,14 +12,13 @@ const int OSC1_SUSTAIN_MS = 10;
 const int OSC2_SUSTAIN_MS = 0;
 const double DEFAULT_PITCH = 97;
 
-synthdrum_sequencer *new_synthdrum_seq(int drumtype)
+synthdrum_sequencer *new_synthdrum_seq()
 {
     printf("New Drum Synth!\n");
     synthdrum_sequencer *sds = calloc(1, sizeof(synthdrum_sequencer));
     seq_init(&sds->m_seq);
     sds->m_pitch = DEFAULT_PITCH;
 
-    sds->drumtype = drumtype;
     sds->vol = 1;
     sds->started = false;
     sds->midi_controller_mode =
@@ -73,10 +72,10 @@ void sds_status(void *self, wchar_t *ss)
     swprintf(
         ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
         "[SYNTHDRUM] Type: %s Vol: %.2f Envelope STATE: %d SustainOverride: %d"
-        "\n      Osc1 Fo: %.0f Pitch Env A:%.2f D:%.2f S:%.2f R:%.2f "
+        "\n      Osc1 Waveform: %d Fo: %.0f Pitch Env A:%.2f D:%.2f S:%.2f R:%.2f "
         "Distortion_Threshold: %.2f\n",
         sds->drumtype == KICK ? "drum" : "snare", sds->vol, sds->m_eg1.m_state,
-        sds->m_eg1.m_sustain_override, sds->m_osc1.osc.m_osc_fo,
+        sds->m_eg1.m_sustain_override, sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo,
         sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
         sds->osc1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
         sds->m_eg1.m_release_time_msec, sds->m_distortion_threshold);
@@ -289,7 +288,8 @@ void sds_parse_midi(synthdrum_sequencer *sds, int status, int data1, int data2)
             if (sds->midi_controller_mode == 0) {
                 scaley_val = scaleybum(0, 127, 1, 100, data2);
                 eg_set_decay_time_msec(&sds->m_eg1, scaley_val);
-                printf("DECAY!! %f\n", scaley_val);
+                eg_set_release_time_msec(&sds->m_eg1, scaley_val);
+                printf("DECAY/RELEASE!! %f\n", scaley_val);
             }
             else {
                 scaley_val =
@@ -307,9 +307,9 @@ void sds_parse_midi(synthdrum_sequencer *sds, int status, int data1, int data2)
             break;
         case 5:
             if (sds->midi_controller_mode == 0) {
-                scaley_val = scaleybum(0, 128, 30, 120, data2);
-                printf("OSC1 freQ! %f\n", scaley_val);
-                sds->m_osc1.osc.m_osc_fo = scaley_val;
+                scaley_val = floor(scaleybum(0, 127, 0, 8, data2));
+                printf("OSC TYPE! %f\n", scaley_val);
+                sds->m_osc1.osc.m_waveform = scaley_val;
             }
             else {
             }
@@ -470,7 +470,7 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
     return true;
 }
 
-bool synthdrum_list_patches(synthdrum_sequencer *sds)
+bool synthdrum_list_patches()
 {
     FILE *fp = fopen(DRUMSYNTH_SAVED_SETUPS_FILENAME, "r");
     if (fp == NULL) {

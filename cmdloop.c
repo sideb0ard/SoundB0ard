@@ -162,18 +162,14 @@ void interpret(char *line)
             int int_pattern = 0;
             pattern_char_to_int(pattern, &int_pattern);
             printf("Patterrnnzz! %s %d\n", pattern, int_pattern);
-            int soundgen_num = 0;
-            if (strncmp("kick", wurds[1], 4) == 0) {
-                printf("Synthy KICK!\n");
-                soundgen_num = mixer_add_synthdrum(mixr, KICK, int_pattern);
+            if (strncmp("new", wurds[1], 4) == 0) {
+                int soundgen_num = mixer_add_synthdrum(mixr, int_pattern);
                 mixr->midi_control_destination = MIDISYNTHDRUM;
                 mixr->active_midi_soundgen_num = soundgen_num;
             }
-            else if (strncmp("snare", wurds[1], 5) == 0) {
-                printf("Synthy SNARE!\n");
-                soundgen_num = mixer_add_synthdrum(mixr, SNARE, int_pattern);
-                mixr->midi_control_destination = MIDISYNTHDRUM;
-                mixr->active_midi_soundgen_num = soundgen_num;
+            if (strncmp("list", wurds[1], 4) == 0) {
+                printf("Listing SYNTHDRUM patches.. \n");
+                synthdrum_list_patches();
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
@@ -195,10 +191,6 @@ void interpret(char *line)
                         if (strncmp("open", wurds[2], 4) == 0) {
                             printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
                             synthdrum_open_patch(s, wurds[3]); 
-                        }
-                        if (strncmp("list", wurds[2], 4) == 0) {
-                            printf("Listing SYNTHDRUM patches.. \n");
-                            synthdrum_list_patches(s);
                         }
                         if (strncmp("save", wurds[2], 4) == 0) {
                             printf("Saving SYNTHDRUM pattern as %s\n", wurds[2]);

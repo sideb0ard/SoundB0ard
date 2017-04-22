@@ -69,7 +69,7 @@ int add_algorithm(char *line);
 int add_bitwize(mixer *mixr, int pattern);
 int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr);
-int mixer_add_synthdrum(mixer *mixr, int drumtype, int pattern);
+int mixer_add_synthdrum(mixer *mixr, int pattern);
 int add_chaosmonkey(int soundgen);
 int add_minisynth(mixer *mixr);
 int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
