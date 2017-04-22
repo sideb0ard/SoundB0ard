@@ -86,6 +86,9 @@ bool seq_tick(sequencer *seq)
                         seq_set_game_of_life(seq, false);
                     }
                 }
+                else {
+                    next_life_generation(seq);
+                }
                 seq->life_generation++;
             }
             else if (seq->markov_on) {
@@ -104,6 +107,9 @@ bool seq_tick(sequencer *seq)
                         seq->markov_generation = 0;
                         seq_set_markov(seq, false);
                     }
+                }
+                else {
+                        next_markov_generation(seq);
                 }
                 seq->markov_generation++;
             }
@@ -125,6 +131,11 @@ bool seq_tick(sequencer *seq)
                         seq->bitwise_generation = 0;
                         seq_set_bitwise(seq, false);
                     }
+                }
+                else {
+                   int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
+                                                         mixr->cur_sample);
+                   seq->patterns[seq->cur_pattern] = new_pattern;
                 }
                 seq->bitwise_generation++;
             }
@@ -214,7 +225,6 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
 // game of life algo
 void next_life_generation(sequencer *self)
 {
-    printf("NEXT LIFE GEN!\n");
     memset(self->matrix1, 0, sizeof self->matrix1);
     memset(self->matrix2, 0, sizeof self->matrix2);
     int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);

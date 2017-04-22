@@ -56,6 +56,18 @@ double looper_gennext(void *self)
         }
     }
 
+    if (mixr->sixteenth_note_tick % 16 == 0 && l->resample_pending)
+    {
+        looper_resample_to_loop_size(l);
+    }
+
+    if (mixr->sixteenth_note_tick % 16 == 0 && l->change_loopsize_pending)
+    {
+        printf("PENDING LOOPSIZE FOUND! %d loops for loop num: %d\n", l->pending_loop_size,  l->pending_loop_num);
+        looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
+        l->change_loopsize_pending = false;
+    }
+
     if (l->stutter_mode &&
         (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0)) {
         if (mixr->debug_mode)
@@ -237,6 +249,7 @@ void looper_resample_to_loop_size(looper *l)
 
 void looper_change_loop_len(looper *l, int sample_num, int loop_len)
 {
+    printf("LOOP CHANGE CALLED! sampleNUm: %d and looplen: %d\n", sample_num, loop_len);
     if (loop_len > 0 && sample_num < l->num_samples) {
         file_sample *fs = l->samples[sample_num];
 
@@ -461,13 +474,11 @@ void looper_scramble(looper *s)
                     s->scramblrrr
                         ->resampled_file_bytes[(i + len16th * 2) % len] =
                         seventh16th[i % len16th];
-                // TODO -- maybe later
-                // else if (dice2 >= 22 && dice2 < 87 && s->scramble_counter % 3
-                // == 0) {
-                //    printf("CRAZY SHIT!\n");
-                //    copyfirsthalf = true;
-                //    break;
-                //}
+                 else if (dice2 >= 42 && dice2 < 87 && s->scramble_counter % 3
+                 == 0) {
+                    copyfirsthalf = true;
+                    break;
+                }
                 else
                     s->scramblrrr
                         ->resampled_file_bytes[(i + len16th * 2) % len] =
@@ -480,6 +491,7 @@ void looper_scramble(looper *s)
         for (int i = 0; i < halflen; i++)
             s->scramblrrr->resampled_file_bytes[i + halflen] =
                 s->samples[s->cur_sample]->resampled_file_bytes[i];
+        copyfirsthalf = false;
     }
 
     if (mixr->debug_mode)
@@ -488,9 +500,7 @@ void looper_scramble(looper *s)
 
     if (s->max_generation > 0 && s->scramble_generation >= s->max_generation) {
         printf("Max GEn! We outta here... peace\n");
-        s->scramble_generation = 0;
-        s->max_generation = 0;
-        s->scramblrrr_mode = false;
+        looper_set_scramble_mode(s, false);
     }
 }
 

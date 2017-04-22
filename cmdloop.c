@@ -192,8 +192,22 @@ void interpret(char *line)
                             (synthdrum_sequencer *)
                                 mixr->sound_generators[soundgen_num];
                         sequencer *seq = &s->m_seq;
-                        printf("SYNTHDRUM SEQ!\n");
-                        parse_sequencer_command(seq, wurds, num_wurds, pattern);
+                        if (strncmp("open", wurds[2], 4) == 0) {
+                            printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
+                            synthdrum_open_patch(s, wurds[3]); 
+                        }
+                        if (strncmp("list", wurds[2], 4) == 0) {
+                            printf("Listing SYNTHDRUM patches.. \n");
+                            synthdrum_list_patches(s);
+                        }
+                        if (strncmp("save", wurds[2], 4) == 0) {
+                            printf("Saving SYNTHDRUM pattern as %s\n", wurds[2]);
+                            synthdrum_save_patch(s, wurds[3]); 
+                        }
+                        else {
+                            printf("SYNTHDRUM SEQ!\n");
+                            parse_sequencer_command(seq, wurds, num_wurds, pattern);
+                        }
                     }
                 }
             }
@@ -278,7 +292,11 @@ void interpret(char *line)
                         if (is_valid_sample_num(s, sample_num)) {
                             if (strncmp("looplen", wurds[4], 8) == 0) {
                                 int looplen = atoi(wurds[5]);
-                                looper_change_loop_len(s, sample_num, looplen);
+                                //looper_change_loop_len(s, sample_num, looplen);
+                                s->pending_loop_num = sample_num;
+                                s->pending_loop_size = looplen;
+                                s->change_loopsize_pending = true;
+                                printf("CHANGEING PENDING ..\n");
                             }
                             else if (strncmp("numloops", wurds[4], 8) == 0) {
                                 int numloops = atoi(wurds[5]);

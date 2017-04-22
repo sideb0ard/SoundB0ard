@@ -7,6 +7,9 @@
 #include "sequencer.h"
 #include "sound_generator.h"
 
+
+static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] = "settings/synthdrumpatches.dat";
+
 typedef struct pattern_hit_metadata {
     bool played;
     bool playing;
@@ -16,11 +19,16 @@ typedef struct synthdrum_sequencer {
     SOUNDGEN sg;
     sequencer m_seq;
     double m_pitch;
+    char m_patch_name[512];
+    double vol;
+    unsigned drumtype; // KICK or SNARE
+    unsigned int midi_controller_mode;
 
     qblimited_oscillator m_osc1;
     double osc1_sustain_len_in_samples;
     int osc1_sustain_counter;
     double osc1_amp;
+    double eg1_osc1_intensity;
 
     qblimited_oscillator m_osc2;
     double osc2_sustain_len_in_samples;
@@ -37,10 +45,8 @@ typedef struct synthdrum_sequencer {
 
     filter_moogladder m_filter;
 
-    double vol;
+    double m_distortion_threshold;
 
-    unsigned int midi_controller_mode;
-    unsigned drumtype; // KICK or SNARE
 
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
@@ -57,3 +63,6 @@ double sds_getvol(void *self);
 void sds_trigger(synthdrum_sequencer *sds);
 void sds_stop(synthdrum_sequencer *sds);
 void sds_parse_midi(synthdrum_sequencer *s, int status, int data1, int data2);
+bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name);
+bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name);
+bool synthdrum_list_patches(synthdrum_sequencer *sds);

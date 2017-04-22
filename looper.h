@@ -67,6 +67,11 @@ typedef struct t_looper {
     double m_wet_mix;
     unsigned int m_delay_mode; // pad5 button
 
+    bool resample_pending;
+    bool change_loopsize_pending;
+    int pending_loop_size;
+    int pending_loop_num;
+
 } looper;
 
 looper *new_looper(char *filename, double loop_len); // loop_len in bars

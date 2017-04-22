@@ -32,7 +32,7 @@ void envelope_generator_init(envelope_generator *eg)
     eg->m_attack_time_scalar = 1.0;
     eg->m_decay_time_scalar = 1.0;
 
-    eg->m_sustain_level = 0.7;
+    eg->m_sustain_level = 1;
     eg->m_envelope_output = 0.0;
 
     eg->m_inc_shutdown = 0.0;
@@ -96,9 +96,8 @@ void eg_set_eg_mode(envelope_generator *self, unsigned int mode)
 {
     self->m_eg_mode = mode;
     if (self->m_eg_mode == ANALOG) {
-        self->m_attack_tco = exp(-0.5); // fast attack
-        // self->m_attack_tco = exp(-5.0);
-        self->m_decay_tco = exp(-5.0);
+        self->m_attack_tco = exp(-1.5); // fast attack
+        self->m_decay_tco = exp(-4.95);
         self->m_release_tco = self->m_decay_tco;
     }
     else {

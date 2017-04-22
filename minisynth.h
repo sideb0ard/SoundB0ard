@@ -47,7 +47,7 @@
 #define DEFAULT_MIDI_EXPRESSION 0
 #define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
 
-static const char PRESET_FILENAME[] = "synthpresets.dat";
+static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 
 typedef struct minisynth {
     SOUNDGEN sound_generator;
