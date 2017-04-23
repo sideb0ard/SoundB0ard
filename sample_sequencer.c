@@ -1,6 +1,5 @@
 #include <libgen.h>
 #include <math.h>
-#include <pthread.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -305,4 +304,12 @@ void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
     default:
         break;
     }
+}
+
+void sample_seq_del(sample_sequencer *s)
+{
+    printf("Deleting SAMPLESEQUENCER SELF\n");
+    printf("Deleting sample buffer\n");
+    printf("Deleting char buffer for filename\n");
+    printf("bye!\n");
 }

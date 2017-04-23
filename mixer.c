@@ -1,5 +1,4 @@
 #include <math.h>
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -62,9 +61,8 @@ void mixer_ps(mixer *mixr)
            " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
-           " :::::\n"
-           "::::: PPQN: %d PPS: %d PPL: %d PPNS: %d "  ANSI_COLOR_RESET,
+           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
+           "::::: PPQN: %d PPS: %d PPL: %d PPNS: %d " ANSI_COLOR_RESET,
            mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false", PPQN, PPS, PPL, PPNS);
 
@@ -79,26 +77,31 @@ void mixer_ps(mixer *mixr)
     printf("\n");
 
     for (int i = 0; i < mixr->soundgen_num; i++) {
-        wchar_t wss[MAX_PS_STRING_SZ];
-        memset(wss, 0, MAX_PS_STRING_SZ);
-        mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
-        wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET "  %ls\n", i, wss);
-        if (mixr->sound_generators[i]->effects_num > 0 ||
-            mixr->sound_generators[i]->envelopes_num > 0) {
-            printf("      ");
-            printf(COOL_COLOR_YELLOW);
-            for (int j = 0; j < mixr->sound_generators[i]->effects_num; j++) {
-                printf("[effect]-");
+        if (mixr->sound_generators[i] != NULL) {
+            wchar_t wss[MAX_PS_STRING_SZ];
+            memset(wss, 0, MAX_PS_STRING_SZ);
+            mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
+            wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET "  %ls\n", i,
+                    wss);
+            if (mixr->sound_generators[i]->effects_num > 0 ||
+                mixr->sound_generators[i]->envelopes_num > 0) {
+                printf("      ");
+                printf(COOL_COLOR_YELLOW);
+                for (int j = 0; j < mixr->sound_generators[i]->effects_num;
+                     j++) {
+                    printf("[effect]-");
+                }
+                printf(ANSI_COLOR_RESET);
+                printf(COOL_COLOR_GREEN);
+                for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
+                     j++) {
+                    printf("[envelope]-");
+                }
+                printf(ANSI_COLOR_RESET);
+                printf(">[out]");
             }
-            printf(ANSI_COLOR_RESET);
-            printf(COOL_COLOR_GREEN);
-            for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
-                printf("[envelope]-");
-            }
-            printf(ANSI_COLOR_RESET);
-            printf(">[out]");
+            printf("\n\n");
         }
-        printf("\n\n");
     }
 
     printf(ANSI_COLOR_RESET);
@@ -113,11 +116,15 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
     mixr->loop_len_in_ticks = PPL;
     for (int i = 0; i < mixr->soundgen_num; i++) {
-        for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
-            update_envelope_stream_bpm(mixr->sound_generators[i]->envelopes[j]);
-        }
-        if (mixr->sound_generators[i]->type == LOOPER_TYPE) {
-            looper_resample_to_loop_size((looper *)mixr->sound_generators[i]);
+        if (mixr->sound_generators[i] != NULL) {
+            for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
+                update_envelope_stream_bpm(
+                    mixr->sound_generators[i]->envelopes[j]);
+            }
+            if (mixr->sound_generators[i]->type == LOOPER_TYPE) {
+                looper_resample_to_loop_size(
+                    (looper *)mixr->sound_generators[i]);
+            }
         }
     }
 }
@@ -152,7 +159,7 @@ void mixer_vol_change(mixer *mixr, float vol)
 void vol_change(mixer *mixr, int sg, float vol)
 {
     printf("SG: %d // soungen_num : %d\n", sg, mixr->soundgen_num);
-    if (sg > (mixr->soundgen_num - 1)) {
+    if (!mixer_is_valid_soundgen_num(mixr, sg)) {
         printf("Nah mate, returning\n");
         return;
     }
@@ -195,6 +202,7 @@ int add_effect(mixer *mixr)
 int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
 {
     SOUNDGEN **new_soundgens = NULL;
+    // TODO -- reuse any NULLs
     if (mixr->soundgen_size <= mixr->soundgen_num) {
         if (mixr->soundgen_size == 0) {
             mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
@@ -360,8 +368,10 @@ double mixer_gennext(mixer *mixr)
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {
         for (int i = 0; i < mixr->soundgen_num; i++) {
-            output_val +=
-                mixr->sound_generators[i]->gennext(mixr->sound_generators[i]);
+            if (mixr->sound_generators[i] != NULL) {
+                output_val += mixr->sound_generators[i]->gennext(
+                    mixr->sound_generators[i]);
+            }
         }
     }
 
@@ -400,4 +410,54 @@ int get_environment_val(char *key, int *return_val)
         }
     }
     return 1;
+}
+
+bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
+{
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+        printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
+        SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+        switch (sg->type) {
+        case (SYNTH_TYPE):
+            printf("DELASYNTH!\n");
+            break;
+        case (LOOPER_TYPE):
+            printf("DELALOOPER!\n");
+            break;
+        case (BITWIZE_TYPE):
+            printf("DELABIT!\n");
+            break;
+        case (SEQUENCER_TYPE):
+            printf("DELASEQ!\n");
+            sample_sequencer *s = (sample_sequencer *)sg;
+            mixr->sound_generators[soundgen_num] = NULL;
+            sample_seq_del(s);
+            break;
+        case (SYNTHDRUM_TYPE):
+            printf("DELASYNTHDRUM!\n");
+            break;
+        case (ALGORITHM_TYPE):
+            printf("DELALGO!\n");
+            break;
+        case (CHAOSMONKEY_TYPE):
+            printf("DELAMONKEY!\n");
+            break;
+        case (SPORK_TYPE):
+            printf("DELASPORKT!\n");
+            break;
+        case (NUM_SOUNDGEN_TYPE):
+            // should never happen
+            break;
+        }
+    }
+    return true;
+}
+
+bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
+{
+    if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num &&
+        mixr->sound_generators[soundgen_num] != NULL) {
+        return true;
+    }
+    return false;
 }

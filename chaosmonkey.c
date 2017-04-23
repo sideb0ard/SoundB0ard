@@ -14,7 +14,7 @@ extern mixer *mixr;
 
 chaosmonkey *new_chaosmonkey(int soundgen)
 {
-    if (!is_valid_soundgen_num(soundgen)) {
+    if (!mixer_is_valid_soundgen_num(mixr, soundgen)) {
         return NULL;
     }
     chaosmonkey *cm = (chaosmonkey *)calloc(1, sizeof(chaosmonkey));

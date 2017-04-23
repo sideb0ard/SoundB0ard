@@ -21,7 +21,7 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
 void char_array_to_string_sequence(char *dest_pattern,
                                    char char_array[NUM_WURDS][SIZE_OF_WURD],
                                    int start, int end);
-bool is_valid_soundgen_num(int soundgen_num);
+// bool is_valid_soundgen_num(int soundgen_num);
 bool is_valid_sample_num(looper *s, int sample_num);
 bool is_valid_seq_pattern_num(sequencer *d, int pattern_num);
 bool is_valid_fx_num(int soundgen_num, int fx_num);

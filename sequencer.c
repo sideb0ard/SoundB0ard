@@ -1,6 +1,5 @@
 #include <libgen.h>
 #include <math.h>
-#include <pthread.h>
 #include <sndfile.h>
 #include <stdlib.h>
 #include <string.h>
@@ -109,7 +108,7 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                        next_markov_generation(seq);
+                    next_markov_generation(seq);
                 }
                 seq->markov_generation++;
             }
@@ -133,9 +132,9 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                   int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
-                                                         mixr->cur_sample);
-                   seq->patterns[seq->cur_pattern] = new_pattern;
+                    int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
+                                                          mixr->cur_sample);
+                    seq->patterns[seq->cur_pattern] = new_pattern;
                 }
                 seq->bitwise_generation++;
             }

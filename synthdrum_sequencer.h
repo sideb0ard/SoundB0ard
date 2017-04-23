@@ -7,8 +7,8 @@
 #include "sequencer.h"
 #include "sound_generator.h"
 
-
-static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] = "settings/synthdrumpatches.dat";
+static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
+    "settings/synthdrumpatches.dat";
 
 typedef struct pattern_hit_metadata {
     bool played;
@@ -46,7 +46,6 @@ typedef struct synthdrum_sequencer {
     filter_moogladder m_filter;
 
     double m_distortion_threshold;
-
 
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 

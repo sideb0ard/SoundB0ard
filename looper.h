@@ -3,7 +3,6 @@
 
 #include "filter_moogladder.h"
 #include "sound_generator.h"
-#include <pthread.h>
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -37,8 +36,6 @@ typedef struct t_looper {
     int cur_sample_iteration;
     bool multi_sample_mode;
     // bool multi_sample_loop_countdown_started;
-
-    pthread_mutex_t resample_mutex;
 
     bool started;
     bool just_been_resampled;

@@ -72,11 +72,13 @@ void sds_status(void *self, wchar_t *ss)
     swprintf(
         ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
         "[SYNTHDRUM] Type: %s Vol: %.2f Envelope STATE: %d SustainOverride: %d"
-        "\n      Osc1 Waveform: %d Fo: %.0f Pitch Env A:%.2f D:%.2f S:%.2f R:%.2f "
+        "\n      Osc1 Waveform: %d Fo: %.0f Pitch Env A:%.2f D:%.2f S:%.2f "
+        "R:%.2f "
         "Distortion_Threshold: %.2f\n",
         sds->drumtype == KICK ? "drum" : "snare", sds->vol, sds->m_eg1.m_state,
-        sds->m_eg1.m_sustain_override, sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo,
-        sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
+        sds->m_eg1.m_sustain_override, sds->m_osc1.osc.m_waveform,
+        sds->m_osc1.osc.m_osc_fo, sds->m_eg1.m_attack_time_msec,
+        sds->m_eg1.m_decay_time_msec,
         sds->osc1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
         sds->m_eg1.m_release_time_msec, sds->m_distortion_threshold);
 
@@ -148,7 +150,7 @@ double sds_gennext(void *self)
     osc_update(&sds->m_osc2.osc, "NOISEOSC");
     double osc2 = qb_do_oscillate(&sds->m_osc2.osc, NULL);
 
-    val = (eg1 * osc1) * 2;//+ (eg2 * osc2 * sds->osc2_amp);
+    val = (eg1 * osc1) * 2; //+ (eg2 * osc2 * sds->osc2_amp);
 
     return val * sds->vol;
     // moog_update((filter *)&sds->m_filter);
@@ -361,45 +363,38 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
            DRUMSYNTH_SAVED_SETUPS_FILENAME);
     FILE *filetosave = fopen(DRUMSYNTH_SAVED_SETUPS_FILENAME, "a");
 
-    fprintf(filetosave, "%s"    // m_patch_name
-                       " %f"    // vol
-                       " %d"    // drumtype
-                       " %f"    // osc1_amp
-                       " %f"    // m_osc1.osc.m_osc_fo
-                       " %d"    // m_osc1.osc.m_waveform
-                       " %f"    // osc1_sustain_len_in_samples
-                       " %f"    // eg1_osc1_intensity
-                       " %f"    // osc2_amp
-                       " %f"    // m_osc2.osc.m_osc_fo
-                       " %d"    // m_osc2.osc.m_waveform
-                       " %f"    // osc2_sustain_len_in_samples
-                       " %f"    // osc3_amp
-                       " %f"    // m_osc3.osc.m_osc_fo
-                       " %d"    // m_osc3.osc.m_waveform
-                       " %f"    // osc3_sustain_len_in_samples
-                       " %f"    // m_eg1.m_attack_time_msec
-                       " %f"    // m_eg1.m_decay_time_msec
-                       " %f"    // m_eg1.m_release_time_msec
-                       " %f"    // m_eg2.m_attack_time_msec
-                       " %f"    // m_eg2.m_decay_time_msec
-                       " %f\n", // m_eg2.m_release_time_msec
-            sds->m_patch_name, sds->vol, sds->drumtype,
-            sds->osc1_amp,
-            sds->m_osc1.osc.m_osc_fo,
-            sds->m_osc1.osc.m_waveform, 
-            sds->osc1_sustain_len_in_samples,
-            sds->eg1_osc1_intensity,
-            sds->osc2_amp,
-            sds->m_osc2.osc.m_osc_fo,
-            sds->m_osc2.osc.m_waveform, 
-            sds->osc2_sustain_len_in_samples,
-            sds->osc3_amp,
-            sds->m_osc3.osc.m_osc_fo,
-            sds->m_osc3.osc.m_waveform, 
-            sds->osc3_sustain_len_in_samples,
-            sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
-            sds->m_eg1.m_release_time_msec, sds->m_eg2.m_attack_time_msec,
-            sds->m_eg2.m_decay_time_msec, sds->m_eg2.m_release_time_msec);
+    fprintf(filetosave, "%s"     // m_patch_name
+                        " %f"    // vol
+                        " %d"    // drumtype
+                        " %f"    // osc1_amp
+                        " %f"    // m_osc1.osc.m_osc_fo
+                        " %d"    // m_osc1.osc.m_waveform
+                        " %f"    // osc1_sustain_len_in_samples
+                        " %f"    // eg1_osc1_intensity
+                        " %f"    // osc2_amp
+                        " %f"    // m_osc2.osc.m_osc_fo
+                        " %d"    // m_osc2.osc.m_waveform
+                        " %f"    // osc2_sustain_len_in_samples
+                        " %f"    // osc3_amp
+                        " %f"    // m_osc3.osc.m_osc_fo
+                        " %d"    // m_osc3.osc.m_waveform
+                        " %f"    // osc3_sustain_len_in_samples
+                        " %f"    // m_eg1.m_attack_time_msec
+                        " %f"    // m_eg1.m_decay_time_msec
+                        " %f"    // m_eg1.m_release_time_msec
+                        " %f"    // m_eg2.m_attack_time_msec
+                        " %f"    // m_eg2.m_decay_time_msec
+                        " %f\n", // m_eg2.m_release_time_msec
+            sds->m_patch_name, sds->vol, sds->drumtype, sds->osc1_amp,
+            sds->m_osc1.osc.m_osc_fo, sds->m_osc1.osc.m_waveform,
+            sds->osc1_sustain_len_in_samples, sds->eg1_osc1_intensity,
+            sds->osc2_amp, sds->m_osc2.osc.m_osc_fo, sds->m_osc2.osc.m_waveform,
+            sds->osc2_sustain_len_in_samples, sds->osc3_amp,
+            sds->m_osc3.osc.m_osc_fo, sds->m_osc3.osc.m_waveform,
+            sds->osc3_sustain_len_in_samples, sds->m_eg1.m_attack_time_msec,
+            sds->m_eg1.m_decay_time_msec, sds->m_eg1.m_release_time_msec,
+            sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
+            sds->m_eg2.m_release_time_msec);
 
     fclose(filetosave);
     return true;
@@ -420,50 +415,41 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
         if (strncmp(patch_name, name, 255) == 0) {
             printf("MATCH PATCH NAME %s\n", patch_name);
             printf("BEFORE OSC_FO %f\n", sds->m_osc1.osc.m_osc_fo);
-            int num = 
-            sscanf(line, "%s"    // m_patch_name
-                         "  %lf"    // vol
-                         "  %d"    // drumtype
-                         "  %lf"    // osc1_amp
-                         "  %lf"    // m_osc1.osc.m_osc_fo
-                         "  %d"    // m_osc1.osc.m_waveform
-                         "  %lf"    // osc1_sustain_len_in_samples
-                         "  %lf"    // eg1_osc1_intensity
-                         "  %lf"    // osc2_amp
-                         "  %lf"    // m_osc2.osc.m_osc_fo
-                         "  %d"    // m_osc2.osc.m_waveform
-                         "  %lf"    // osc2_sustain_len_in_samples
-                         "  %lf"    // osc3_amp
-                         "  %lf"    // m_osc3.osc.m_osc_fo
-                         "  %d"    // m_osc3.osc.m_waveform
-                         "  %lf"    // osc3_sustain_len_in_samples
-                         "  %lf"    // m_eg1.m_attack_time_msec
-                         "  %lf"    // m_eg1.m_decay_time_msec
-                         "  %lf"    // m_eg1.m_release_time_msec
-                         "  %lf"    // m_eg2.m_attack_time_msec
-                         "  %lf"    // m_eg2.m_decay_time_msec
-                         "  %lf\n", // m_eg2.m_release_time_msec
-                    sds->m_patch_name, &sds->vol, &sds->drumtype,
-                    &sds->osc1_amp,
-                    &sds->m_osc1.osc.m_osc_fo,
-                    &sds->m_osc1.osc.m_waveform, 
-                    &sds->osc1_sustain_len_in_samples,
-                    &sds->eg1_osc1_intensity,
-                    &sds->osc2_amp,
-                    &sds->m_osc2.osc.m_osc_fo,
-                    &sds->m_osc2.osc.m_waveform, 
-                    &sds->osc2_sustain_len_in_samples,
-                    &sds->osc3_amp,
-                    &sds->m_osc3.osc.m_osc_fo,
-                    &sds->m_osc3.osc.m_waveform, 
-                    &sds->osc3_sustain_len_in_samples,
-                    &sds->m_eg1.m_attack_time_msec,
-                    &sds->m_eg1.m_decay_time_msec,
-                    &sds->m_eg1.m_release_time_msec,
-                    &sds->m_eg2.m_attack_time_msec,
-                    &sds->m_eg2.m_decay_time_msec,
-                    &sds->m_eg2.m_release_time_msec);
-            printf("AFTER OSC_FO %f - scanned %d\n", sds->m_osc1.osc.m_osc_fo, num);
+            int num = sscanf(
+                line, "%s"       // m_patch_name
+                      "  %lf"    // vol
+                      "  %d"     // drumtype
+                      "  %lf"    // osc1_amp
+                      "  %lf"    // m_osc1.osc.m_osc_fo
+                      "  %d"     // m_osc1.osc.m_waveform
+                      "  %lf"    // osc1_sustain_len_in_samples
+                      "  %lf"    // eg1_osc1_intensity
+                      "  %lf"    // osc2_amp
+                      "  %lf"    // m_osc2.osc.m_osc_fo
+                      "  %d"     // m_osc2.osc.m_waveform
+                      "  %lf"    // osc2_sustain_len_in_samples
+                      "  %lf"    // osc3_amp
+                      "  %lf"    // m_osc3.osc.m_osc_fo
+                      "  %d"     // m_osc3.osc.m_waveform
+                      "  %lf"    // osc3_sustain_len_in_samples
+                      "  %lf"    // m_eg1.m_attack_time_msec
+                      "  %lf"    // m_eg1.m_decay_time_msec
+                      "  %lf"    // m_eg1.m_release_time_msec
+                      "  %lf"    // m_eg2.m_attack_time_msec
+                      "  %lf"    // m_eg2.m_decay_time_msec
+                      "  %lf\n", // m_eg2.m_release_time_msec
+                sds->m_patch_name, &sds->vol, &sds->drumtype, &sds->osc1_amp,
+                &sds->m_osc1.osc.m_osc_fo, &sds->m_osc1.osc.m_waveform,
+                &sds->osc1_sustain_len_in_samples, &sds->eg1_osc1_intensity,
+                &sds->osc2_amp, &sds->m_osc2.osc.m_osc_fo,
+                &sds->m_osc2.osc.m_waveform, &sds->osc2_sustain_len_in_samples,
+                &sds->osc3_amp, &sds->m_osc3.osc.m_osc_fo,
+                &sds->m_osc3.osc.m_waveform, &sds->osc3_sustain_len_in_samples,
+                &sds->m_eg1.m_attack_time_msec, &sds->m_eg1.m_decay_time_msec,
+                &sds->m_eg1.m_release_time_msec, &sds->m_eg2.m_attack_time_msec,
+                &sds->m_eg2.m_decay_time_msec, &sds->m_eg2.m_release_time_msec);
+            printf("AFTER OSC_FO %f - scanned %d\n", sds->m_osc1.osc.m_osc_fo,
+                   num);
         }
     }
     fclose(fp);

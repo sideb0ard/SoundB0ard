@@ -65,6 +65,7 @@ mixer *new_mixer(void);
 
 void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
+bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 int add_algorithm(char *line);
 int add_bitwize(mixer *mixr, int pattern);
 int add_bytebeat(mixer *mixr, char *pattern);
@@ -85,6 +86,7 @@ void delay_toggle(mixer *mixr);
 
 void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);
+bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
 
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);

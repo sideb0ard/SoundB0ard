@@ -56,14 +56,13 @@ double looper_gennext(void *self)
         }
     }
 
-    if (mixr->sixteenth_note_tick % 16 == 0 && l->resample_pending)
-    {
+    if (mixr->sixteenth_note_tick % 16 == 0 && l->resample_pending) {
         looper_resample_to_loop_size(l);
     }
 
-    if (mixr->sixteenth_note_tick % 16 == 0 && l->change_loopsize_pending)
-    {
-        printf("PENDING LOOPSIZE FOUND! %d loops for loop num: %d\n", l->pending_loop_size,  l->pending_loop_num);
+    if (mixr->sixteenth_note_tick % 16 == 0 && l->change_loopsize_pending) {
+        printf("PENDING LOOPSIZE FOUND! %d loops for loop num: %d\n",
+               l->pending_loop_size, l->pending_loop_num);
         looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
         l->change_loopsize_pending = false;
     }
@@ -249,7 +248,8 @@ void looper_resample_to_loop_size(looper *l)
 
 void looper_change_loop_len(looper *l, int sample_num, int loop_len)
 {
-    printf("LOOP CHANGE CALLED! sampleNUm: %d and looplen: %d\n", sample_num, loop_len);
+    printf("LOOP CHANGE CALLED! sampleNUm: %d and looplen: %d\n", sample_num,
+           loop_len);
     if (loop_len > 0 && sample_num < l->num_samples) {
         file_sample *fs = l->samples[sample_num];
 
@@ -304,7 +304,6 @@ void sample_resample_to_loop_size(file_sample *fs)
             resampled_file_bytes[i] = val / 2147483648.0;
         }
 
-        // pthread_mutex_lock(&looper->resample_mutex);
         bool is_previous_buffer =
             fs->resampled_file_bytes != NULL ? true : false;
         if (is_previous_buffer) {
@@ -319,7 +318,6 @@ void sample_resample_to_loop_size(file_sample *fs)
 
     fs->resampled_file_bytes = resampled_file_bytes;
     fs->resampled_file_size = loop_len_in_samples;
-    // pthread_mutex_unlock(&looper->resample_mutex);
 }
 
 void looper_status(void *self, wchar_t *status_string)
@@ -474,8 +472,8 @@ void looper_scramble(looper *s)
                     s->scramblrrr
                         ->resampled_file_bytes[(i + len16th * 2) % len] =
                         seventh16th[i % len16th];
-                 else if (dice2 >= 42 && dice2 < 87 && s->scramble_counter % 3
-                 == 0) {
+                else if (dice2 >= 42 && dice2 < 87 &&
+                         s->scramble_counter % 3 == 0) {
                     copyfirsthalf = true;
                     break;
                 }

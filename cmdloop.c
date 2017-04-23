@@ -1,5 +1,4 @@
 #include <locale.h>
-#include <pthread.h>
 #include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -125,10 +124,17 @@ void interpret(char *line)
             list_sample_dir();
         }
 
+        else if (strncmp("del", wurds[0], 3) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                printf("Deleting SOUND GEN %d\n", soundgen_num);
+                mixer_del_soundgen(mixr, soundgen_num);
+            }
+        }
         else if (strncmp("down", wurds[0], 4) == 0 ||
                  strncmp("up", wurds[0], 3) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 SBMSG *msg = new_sbmsg();
                 msg->sound_gen_num = soundgen_num;
                 if (strcmp("up", wurds[0]) == 0) {
@@ -148,7 +154,7 @@ void interpret(char *line)
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
-                if (is_valid_soundgen_num(soundgen_num)) {
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                     double vol = atof(wurds[2]);
                     vol_change(mixr, soundgen_num, vol);
                 }
@@ -173,7 +179,7 @@ void interpret(char *line)
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
-                if (is_valid_soundgen_num(soundgen_num) &&
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type ==
                         SYNTHDRUM_TYPE) {
                     if (strncmp("midi", wurds[2], 4) == 0) {
@@ -190,15 +196,17 @@ void interpret(char *line)
                         sequencer *seq = &s->m_seq;
                         if (strncmp("open", wurds[2], 4) == 0) {
                             printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
-                            synthdrum_open_patch(s, wurds[3]); 
+                            synthdrum_open_patch(s, wurds[3]);
                         }
                         if (strncmp("save", wurds[2], 4) == 0) {
-                            printf("Saving SYNTHDRUM pattern as %s\n", wurds[2]);
-                            synthdrum_save_patch(s, wurds[3]); 
+                            printf("Saving SYNTHDRUM pattern as %s\n",
+                                   wurds[2]);
+                            synthdrum_save_patch(s, wurds[3]);
                         }
                         else {
                             printf("SYNTHDRUM SEQ!\n");
-                            parse_sequencer_command(seq, wurds, num_wurds, pattern);
+                            parse_sequencer_command(seq, wurds, num_wurds,
+                                                    pattern);
                         }
                     }
                 }
@@ -218,7 +226,7 @@ void interpret(char *line)
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
-                if (is_valid_soundgen_num(soundgen_num) &&
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type ==
                         SEQUENCER_TYPE) {
 
@@ -265,7 +273,7 @@ void interpret(char *line)
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
-                if (is_valid_soundgen_num(soundgen_num) &&
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE) {
 
                     looper *s = (looper *)mixr->sound_generators[soundgen_num];
@@ -284,7 +292,8 @@ void interpret(char *line)
                         if (is_valid_sample_num(s, sample_num)) {
                             if (strncmp("looplen", wurds[4], 8) == 0) {
                                 int looplen = atoi(wurds[5]);
-                                //looper_change_loop_len(s, sample_num, looplen);
+                                // looper_change_loop_len(s, sample_num,
+                                // looplen);
                                 s->pending_loop_num = sample_num;
                                 s->pending_loop_size = looplen;
                                 s->change_loopsize_pending = true;
@@ -371,7 +380,7 @@ void interpret(char *line)
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
-                if (is_valid_soundgen_num(soundgen_num) &&
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type == SYNTH_TYPE) {
                     minisynth *ms =
                         (minisynth *)mixr->sound_generators[soundgen_num];
@@ -505,7 +514,7 @@ void interpret(char *line)
                     }
                     else if (strncmp("copy", wurds[2], 4) == 0) {
                         int sg2 = atoi(wurds[3]);
-                        if (is_valid_soundgen_num(sg2) &&
+                        if (mixer_is_valid_soundgen_num(mixr, sg2) &&
                             mixr->sound_generators[sg2]->type == SYNTH_TYPE) {
                             minisynth *ms2 =
                                 (minisynth *)mixr->sound_generators[sg2];
@@ -562,13 +571,13 @@ void interpret(char *line)
 
             if (strncmp("monkey", wurds[1], 6) == 0) {
                 int soundgen_num = atoi(wurds[2]);
-                if (is_valid_soundgen_num(soundgen_num)) {
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                     add_chaosmonkey(soundgen_num);
                 }
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
-                if (is_valid_soundgen_num(soundgen_num) &&
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type ==
                         CHAOSMONKEY_TYPE) {
 
@@ -605,7 +614,7 @@ void interpret(char *line)
         // FX COMMANDS
         else if (strncmp("delay", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 int delay_len_ms = atoi(wurds[2]);
                 add_delay_soundgen(mixr->sound_generators[soundgen_num],
                                    delay_len_ms);
@@ -613,37 +622,37 @@ void interpret(char *line)
         }
         else if (strncmp("moddelay", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 add_moddelay_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
         else if (strncmp("modfilter", wurds[0], 9) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 add_modfilter_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
         else if (strncmp("reverb", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 add_reverb_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
         else if (strncmp("distort", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 add_distortion_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
         else if (strncmp("decimate", wurds[0], 8) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 add_decimator_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
         else if (strncmp("env", wurds[0], 3) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 int loop_len = atoi(wurds[2]);
                 int env_type = atoi(wurds[3]);
                 ENVSTREAM *e = new_envelope_stream(loop_len, env_type);
@@ -657,7 +666,7 @@ void interpret(char *line)
                  strncmp("highpass", wurds[0], 9) == 0 ||
                  strncmp("bandpass", wurds[0], 9) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 int val = atoi(wurds[2]);
                 if (strcmp("lowpass", wurds[0]) == 0)
                     add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
@@ -673,7 +682,7 @@ void interpret(char *line)
 
         else if (strncmp("repeat", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 int loop_len = atoi(wurds[2]);
                 if (loop_len > 0) {
                     add_beatrepeat_soundgen(
@@ -683,7 +692,7 @@ void interpret(char *line)
         }
         else if (strncmp("sidechain", wurds[0], 9) == 0) {
             int soundgen_num = atoi(wurds[1]);
-            if (is_valid_soundgen_num(soundgen_num)) {
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 int input_src = atoi(wurds[2]);
                 int percent_mix = atoi(wurds[3]);
                 printf("SIDEHCINA %d %d %d\n", soundgen_num, input_src,
@@ -919,14 +928,6 @@ void char_array_to_seq_string_pattern(char *dest_pattern,
     }
 }
 
-bool is_valid_soundgen_num(int soundgen_num)
-{
-    if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num) {
-        return true;
-    }
-    return false;
-}
-
 bool is_valid_sample_num(looper *s, int sample_num)
 {
     if (sample_num < s->num_samples) {
@@ -945,7 +946,7 @@ bool is_valid_seq_pattern_num(sequencer *d, int pattern_num)
 
 bool is_valid_fx_num(int soundgen_num, int fx_num)
 {
-    if (is_valid_soundgen_num(soundgen_num)) {
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
         if (mixr->sound_generators[soundgen_num]->effects_num > 0 &&
             fx_num < mixr->sound_generators[soundgen_num]->effects_num) {
             return true;
