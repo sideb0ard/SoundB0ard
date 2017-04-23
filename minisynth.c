@@ -1180,3 +1180,21 @@ void minisynth_set_filter_mod(minisynth *ms, double mod)
         minisynth_voice_set_filter_mod(ms->m_voices[i], mod);
     }
 }
+
+void minisynth_del_self(minisynth *ms)
+{
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        minisynth_voice_free_self(ms->m_voices[i]);
+    }
+    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
+    {
+        for (int j = 0; j < PPNS; j++)
+        {
+            if (ms->melodies[i][j] != NULL)
+                midi_event_free(ms->melodies[i][j]);
+        }
+    }
+    printf("Deleting MINISYNTH self\n");
+    free(ms);
+}

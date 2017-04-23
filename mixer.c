@@ -421,6 +421,8 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
         switch (sg->type) {
         case (SYNTH_TYPE):
             printf("DELASYNTH!\n");
+            minisynth *ms = (minisynth*) sg;
+            minisynth_del_self(ms);
             break;
         case (LOOPER_TYPE):
             printf("DELALOOPER!\n");
@@ -437,6 +439,8 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
             break;
         case (SYNTHDRUM_TYPE):
             printf("DELASYNTHDRUM!\n");
+            synthdrum_sequencer *sds = (synthdrum_sequencer*) sg;
+            synthdrum_del_self(sds);
             break;
         case (ALGORITHM_TYPE):
             printf("DELALGO!\n");

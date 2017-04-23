@@ -54,6 +54,7 @@ typedef struct synthdrum_sequencer {
 } synthdrum_sequencer;
 
 synthdrum_sequencer *new_synthdrum_seq(void);
+void synthdrum_del_self(synthdrum_sequencer *sds);
 
 void sds_status(void *self, wchar_t *ss);
 void sds_setvol(void *self, double v);

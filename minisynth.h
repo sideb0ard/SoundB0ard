@@ -206,3 +206,4 @@ void minisynth_play_melody(minisynth *ms);
 
 void minisynth_import_midi_from_file(minisynth *ms, char *filename);
 void minisynth_set_filter_mod(minisynth *ms, double mod);
+void minisynth_del_self(minisynth *ms);

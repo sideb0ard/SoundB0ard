@@ -20,6 +20,7 @@ typedef struct {
 
 minisynth_voice *new_minisynth_voice(void);
 void minisynth_voice_init(minisynth_voice *ms);
+void minisynth_voice_free_self(minisynth_voice *msv);
 
 void minisynth_voice_init_global_parameters(minisynth_voice *ms,
                                             global_synth_params *sp);

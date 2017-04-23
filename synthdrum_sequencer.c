@@ -472,3 +472,8 @@ bool synthdrum_list_patches()
     fclose(fp);
     return true;
 }
+
+void synthdrum_del_self(synthdrum_sequencer *sds)
+{
+    printf("Deleting Synthdrum self\n");
+}
