@@ -185,9 +185,9 @@ file_sample *looper_create_sample(char *filename, int loop_len)
 
     if (strncmp(filename, "none", 4) != 0) {
         sample_import_file_contents(fs, filename);
+        sample_resample_to_loop_size(fs);
     }
 
-    sample_resample_to_loop_size(fs);
     return fs;
 }
 
@@ -230,6 +230,7 @@ void sample_import_file_contents(file_sample *fs, char *filename)
     }
 
     sf_readf_int(snd_file, buffer, bufsize);
+    sf_close(snd_file);
 
     fs->orig_file_bytes = buffer;
     fs->orig_file_size = bufsize;
@@ -263,6 +264,10 @@ void looper_change_loop_len(looper *l, int sample_num, int loop_len)
 
 void sample_resample_to_loop_size(file_sample *fs)
 {
+    if (strncmp(fs->filename, "none", 4) == 0) {
+        return;
+    }
+
     printf("BUFSIZE is %d\n", fs->orig_file_size);
     printf("CHANNELS is %d\n", fs->channels);
 
@@ -275,45 +280,42 @@ void sample_resample_to_loop_size(file_sample *fs)
         return;
     }
 
-    if (strncmp(fs->filename, "none", 4) != 0) {
+    int *table = fs->orig_file_bytes;
+    double bufsize = fs->orig_file_size;
 
-        int *table = fs->orig_file_bytes;
-        double bufsize = fs->orig_file_size;
+    double position = 0;
+    double incr = (double)fs->orig_file_size / loop_len_in_samples;
+    for (int i = 0; i < loop_len_in_samples; i++) {
+        int base_index = (int)position;
+        unsigned long next_index = base_index + 1;
+        double frac, slope, val;
 
-        double position = 0;
-        double incr = (double)fs->orig_file_size / loop_len_in_samples;
-        for (int i = 0; i < loop_len_in_samples; i++) {
-            int base_index = (int)position;
-            unsigned long next_index = base_index + 1;
-            double frac, slope, val;
+        frac = position - base_index;
+        val = table[base_index];
+        slope = table[next_index] - val;
 
-            frac = position - base_index;
-            val = table[base_index];
-            slope = table[next_index] - val;
+        val += (frac * slope);
+        position += incr;
 
-            val += (frac * slope);
-            position += incr;
-
-            if (position >= bufsize) {
-                printf("POSITION: %f // BUFSIZR: %f My job here is done\n",
-                       position, bufsize);
-                break;
-            }
-
-            // convert from 16bit int to double between 0 and 1
-            resampled_file_bytes[i] = val / 2147483648.0;
+        if (position >= bufsize) {
+            printf("POSITION: %f // BUFSIZR: %f My job here is done\n",
+                   position, bufsize);
+            break;
         }
 
-        bool is_previous_buffer =
-            fs->resampled_file_bytes != NULL ? true : false;
-        if (is_previous_buffer) {
-            double *oldbuf = fs->resampled_file_bytes;
-            int old_relative_position =
-                (100 / fs->resampled_file_size) * fs->position;
+        // convert from 16bit int to double between 0 and 1
+        resampled_file_bytes[i] = val / 2147483648.0;
+    }
 
-            fs->position = (loop_len_in_samples / 100) * old_relative_position;
-            free(oldbuf);
-        }
+    bool is_previous_buffer =
+        fs->resampled_file_bytes != NULL ? true : false;
+    if (is_previous_buffer) {
+        double *oldbuf = fs->resampled_file_bytes;
+        int old_relative_position =
+            (100 / fs->resampled_file_size) * fs->position;
+
+        fs->position = (loop_len_in_samples / 100) * old_relative_position;
+        free(oldbuf);
     }
 
     fs->resampled_file_bytes = resampled_file_bytes;
@@ -556,4 +558,27 @@ void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2)
     default:
         break;
     }
+}
+
+void looper_del_self(looper *s)
+{
+    for (int i = 0; i < s->num_samples; i++)
+    {
+        printf("Dleeeting samples\n");
+        file_sample_free(s->samples[i]);
+    }
+    free(s);
+}
+
+void file_sample_free(file_sample *fs)
+{
+    if (strncmp(fs->filename, "none", 4) != 0) {
+        printf("Dleeeting original file bytes\n");
+        free(fs->orig_file_bytes);
+        printf("Dleeeting resampeld file bytes\n");
+        free(fs->resampled_file_bytes);
+    }
+    printf("Dleeeting filename \n");
+    free(fs->filename);
+    free(fs);
 }

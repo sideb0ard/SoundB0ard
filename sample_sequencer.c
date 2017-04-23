@@ -188,6 +188,7 @@ int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
     }
 
     sf_readf_int(snd_file, buffer, *bufsize);
+    sf_close(snd_file);
     return buffer;
 }
 
@@ -308,8 +309,10 @@ void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
 
 void sample_seq_del(sample_sequencer *s)
 {
-    printf("Deleting SAMPLESEQUENCER SELF\n");
     printf("Deleting sample buffer\n");
+    free(s->buffer);
     printf("Deleting char buffer for filename\n");
-    printf("bye!\n");
+    free(s->filename);
+    printf("Deleting SAMPLESEQUENCER SELF- bye!\n");
+    free(s);
 }

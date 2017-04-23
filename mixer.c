@@ -417,12 +417,15 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
         SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+        mixr->sound_generators[soundgen_num] = NULL;
         switch (sg->type) {
         case (SYNTH_TYPE):
             printf("DELASYNTH!\n");
             break;
         case (LOOPER_TYPE):
             printf("DELALOOPER!\n");
+            looper *l = (looper*) sg;
+            looper_del_self(l);
             break;
         case (BITWIZE_TYPE):
             printf("DELABIT!\n");
@@ -430,7 +433,6 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
         case (SEQUENCER_TYPE):
             printf("DELASEQ!\n");
             sample_sequencer *s = (sample_sequencer *)sg;
-            mixr->sound_generators[soundgen_num] = NULL;
             sample_seq_del(s);
             break;
         case (SYNTHDRUM_TYPE):
