@@ -465,10 +465,6 @@ void interpret(char *line)
                                 minisynth_delete_event(ms, melody, tick);
                         }
                     }
-                    else if (strncmp("dupe", wurds[2], 4) == 0) {
-                        printf("Duping current Synth melody..\n");
-                        minisynth_dupe_melody(ms);
-                    }
                     else if (strncmp("import", wurds[2], 6) == 0) {
                         printf("Importing file\n");
                         minisynth_import_midi_from_file(ms, wurds[3]);

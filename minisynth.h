@@ -55,6 +55,7 @@ typedef struct minisynth {
     int tick; // current 16th note tick from mixer
     midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];
     int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];
+    midi_events_loop_t backup_melody_while_getting_crazy;
 
     int num_melodies;
     int cur_melody;
@@ -181,16 +182,17 @@ void minisynth_set_multi_melody_mode(minisynth *self, bool melody_mode);
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
                                    int loop_num);
 void minisynth_add_melody(minisynth *self);
-void minisynth_dupe_melody(minisynth *self);
+void minisynth_dupe_melody(midi_event **from, midi_event **to);
 void minisynth_switch_melody(minisynth *self, unsigned int melody_num);
 void minisynth_reset_melody(minisynth *self, unsigned int melody_num);
 void minisynth_reset_melody_all(minisynth *self);
 void minisynth_reset_voices(minisynth *self);
 void minisynth_melody_to_string(minisynth *self, int melody_num,
                                 wchar_t scratch[33]);
-midi_event **minisynth_get_midi_loop(minisynth *self);
 void minisynth_add_event(minisynth *self, midi_event *ev);
 void minisynth_delete_event(minisynth *ms, int pat_num, int tick);
+
+midi_event **minisynth_get_midi_loop(minisynth *self);
 midi_event **minisynth_copy_midi_loop(minisynth *self, int pattern_num);
 void minisynth_add_midi_loop(minisynth *self, midi_event **events,
                              int pattern_num);
@@ -215,3 +217,5 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename);
 void minisynth_set_filter_mod(minisynth *ms, double mod);
 void minisynth_del_self(minisynth *ms);
 void minisynth_set_morph_mode(minisynth *ms, bool b);
+void minisynth_set_backup_mode(minisynth *ms, bool b);
+void minisynth_morph(minisynth *ms);

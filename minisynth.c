@@ -552,10 +552,18 @@ void minisynth_add_melody(minisynth *ms)
     ms->cur_melody++;
 }
 
-void minisynth_dupe_melody(minisynth *ms)
+void minisynth_dupe_melody(midi_event **from, midi_event **to)
 {
-    midi_event **melody = minisynth_copy_midi_loop(ms, ms->cur_melody);
-    minisynth_add_midi_loop(ms, melody, ms->cur_melody + 1);
+    for (int i = 0; i < PPNS; i++) {
+        if (to[i] != NULL) {
+            midi_event_free(to[i]);
+        }
+        if (from[i] != NULL) {
+            midi_event *ev = from[i];
+            to[i] =
+                new_midi_event(ev->tick, ev->event_type, ev->data1, ev->data2);
+        }
+    }
 }
 
 void minisynth_switch_melody(minisynth *ms, unsigned int melody_num)
@@ -728,24 +736,25 @@ double minisynth_gennext(void *self)
                 if (ms->morph_every_n_loops > 0) {
                     if (ms->morph_generation % ms->morph_every_n_loops == 0) {
                         printf("GEN NEW PATTERN!\n");
-                        // back up pattern?
-                        // gen new pattern
+                        minisynth_set_backup_mode(ms, true);
+                        minisynth_morph(ms);
                     }
                     else {
                         printf("REVERT OLD NEW PATTERN!\n");
-                        // revert pattern
+                        minisynth_set_backup_mode(ms, false);
                     }
                 }
                 else if (ms->max_generation > 0) {
                     if (ms->morph_generation >= ms->max_generation) {
                         ms->morph_generation = 0;
                         minisynth_set_morph_mode(ms, false);
+                        minisynth_set_backup_mode(ms, false);
                         printf("MAX GENS! OLD PATTERN!\n");
                     }
                 }
                 else {
                     printf("GEN NEW PATTERN!\n");
-                    // gen new pattern
+                    minisynth_morph(ms);
                 }
                 ms->morph_generation++;
             }
@@ -1168,6 +1177,7 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
 
     char *item, *last_s;
     char const *sep = "::";
+    minisynth_morph(ms);
     char line[256];
     while (fgets(line, sizeof(line), fp)) {
         printf("%s", line);
@@ -1240,6 +1250,27 @@ void minisynth_del_self(minisynth *ms)
 void minisynth_set_morph_mode(minisynth *ms, bool b)
 {
     ms->morph_mode = b;
-    //minisynth_midi_note_on(ms, 60, 128);
-    //ms->m_sustain_override = true;
+    minisynth_set_backup_mode(ms, b);
+}
+
+void minisynth_set_backup_mode(minisynth *ms, bool b)
+{
+    if (b) {
+        minisynth_dupe_melody(ms->melodies[0], ms->backup_melody_while_getting_crazy);
+        ms->multi_melody_mode = false;
+        ms->cur_melody = 0;
+    }
+    else {
+        minisynth_dupe_melody(ms->backup_melody_while_getting_crazy, ms->melodies[0]);
+        ms->multi_melody_mode = true;
+    }
+}
+
+void minisynth_morph(minisynth *ms)
+{
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (ms->melodies[0][i] != NULL)
+            midi_event_free(ms->melodies[0][i]);
+    }
 }

@@ -608,14 +608,8 @@ void seq_set_game_of_life(sequencer *s, bool b)
 void seq_set_markov(sequencer *s, bool b)
 {
     s->markov_generation = 0;
-    if (b) {
-        s->markov_on = true;
-        seq_set_backup_mode(s, b);
-    }
-    else {
-        s->markov_on = false;
-        seq_set_backup_mode(s, b);
-    }
+    s->markov_on = b;
+    seq_set_backup_mode(s, b);
 }
 
 void seq_set_bitwise(sequencer *s, bool b)
