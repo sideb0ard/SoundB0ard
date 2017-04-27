@@ -557,6 +557,7 @@ void minisynth_dupe_melody(midi_event **from, midi_event **to)
     for (int i = 0; i < PPNS; i++) {
         if (to[i] != NULL) {
             midi_event_free(to[i]);
+            to[i] = NULL;
         }
         if (from[i] != NULL) {
             midi_event *ev = from[i];
@@ -680,7 +681,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
         "[SYNTH] - Vol: %.2f Multi: %s, Morph: %s, Morph EveryN: %d Morph Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
-        "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
+        "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f SustainOverride: %s "
         "Filter FC: %.2f Filter Q: %2.f"
         "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
         "%2.f"
@@ -691,7 +692,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->cur_melody, ms->m_delay_mode, s_mode_names[ms->m_voice_mode],
         ms->m_attack_time_msec, ms->m_decay_release_time_msec,
         ms->m_sustain_level, ms->m_volume_db, ms->m_lfo1_amplitude,
-        ms->m_lfo1_rate, ms->m_fc_control, ms->m_q_control,
+        ms->m_lfo1_rate, ms->m_sustain_override ? "true" : "false", ms->m_fc_control, ms->m_q_control,
         ms->m_delay_time_msec, ms->m_feedback_pct, ms->m_delay_ratio,
         ms->m_wet_mix, ms->m_detune_cents, ms->m_pulse_width_pct,
         ms->m_sub_osc_db, ms->m_noise_osc_db);
@@ -727,10 +728,31 @@ double minisynth_gennext(void *self)
 {
 
     minisynth *ms = (minisynth *)self;
+
+    if (mixr->is_midi_tick) {
+        int idx = mixr->tick % PPNS;
+        // top of the MS loop, which is two bars, check if we need to progress to next loop
+        if (idx == 0) {
+            if (ms->multi_melody_mode) {
+                ms->cur_melody_iteration--;
+                if (ms->cur_melody_iteration == 0) {
+                    minisynth_stop(ms);
+                    ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
+                    ms->cur_melody_iteration =
+                        ms->melody_multiloop_count[ms->cur_melody];
+                }
+            }
+        }
+
+        if (ms->melodies[ms->cur_melody][idx] != NULL) {
+            midi_event *ev = ms->melodies[ms->cur_melody][idx];
+            midi_parse_midi_event(ms, ev);
+        }
+    }
+
     if (mixr->sixteenth_note_tick != ms->tick) {
         ms->tick = mixr->sixteenth_note_tick;
         if (ms->tick % 16 == 0) {
-            printf("TOP OF THE LOOP!\n");
             if (ms->morph_mode) {
                 printf("WOO, MORPH MODE!!\n");
                 if (ms->morph_every_n_loops > 0) {
@@ -761,10 +783,6 @@ double minisynth_gennext(void *self)
         }
     }
     minisynth_update(ms);
-
-    if (mixr->is_midi_tick) {
-        minisynth_play_melody(ms);
-    }
 
     if (ms->m_arp.active) {
         arpeggiate(ms, &ms->m_arp);
@@ -1143,29 +1161,6 @@ void minisynth_print_settings(minisynth *ms)
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
 
-void minisynth_play_melody(minisynth *ms)
-{
-
-    int idx = mixr->tick % PPNS;
-
-    // top of the loop, check if we need to progress to next loop
-    if (idx == 0) {
-        if (ms->multi_melody_mode) {
-            ms->cur_melody_iteration--;
-            if (ms->cur_melody_iteration == 0) {
-                ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
-                ms->cur_melody_iteration =
-                    ms->melody_multiloop_count[ms->cur_melody];
-            }
-        }
-    }
-
-    if (ms->melodies[ms->cur_melody][idx] != NULL) {
-        midi_event *ev = ms->melodies[ms->cur_melody][idx];
-        midi_parse_midi_event(ms, ev);
-    }
-}
-
 void minisynth_import_midi_from_file(minisynth *ms, char *filename)
 {
     printf("Importing MIDI from %s\n", filename);
@@ -1239,8 +1234,10 @@ void minisynth_del_self(minisynth *ms)
     {
         for (int j = 0; j < PPNS; j++)
         {
-            if (ms->melodies[i][j] != NULL)
+            if (ms->melodies[i][j] != NULL) {
                 midi_event_free(ms->melodies[i][j]);
+                ms->melodies[i][j] = NULL;
+            }
         }
     }
     printf("Deleting MINISYNTH self\n");
@@ -1268,9 +1265,19 @@ void minisynth_set_backup_mode(minisynth *ms, bool b)
 
 void minisynth_morph(minisynth *ms)
 {
+    minisynth_stop(ms);
     for (int i = 0; i < PPNS; i++)
     {
-        if (ms->melodies[0][i] != NULL)
+        if (ms->melodies[0][i] != NULL) {
             midi_event_free(ms->melodies[0][i]);
+            ms->melodies[0][i] = NULL;
+        }
+    }
+}
+
+void minisynth_stop(minisynth *ms)
+{
+    for (int i = 0; i < MAX_VOICES; i++) {
+        voice_reset(&ms->m_voices[i]->m_voice);
     }
 }

@@ -159,6 +159,8 @@ double minisynth_getvol(void *self);
 bool minisynth_prepare_for_play(minisynth *synth);
 void minisynth_user_interface_change(minisynth *synth);
 
+void minisynth_stop(minisynth *ms);
+
 void minisynth_update(minisynth *synth);
 
 void minisynth_increment_voice_timestamps(minisynth *synth);
@@ -211,7 +213,6 @@ bool is_valid_melody_num(minisynth *ns, int melody_num);
 void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
                                 bool update_last_midi);
 void minisynth_set_arpeggiate(minisynth *ms, bool b);
-void minisynth_play_melody(minisynth *ms);
 
 void minisynth_import_midi_from_file(minisynth *ms, char *filename);
 void minisynth_set_filter_mod(minisynth *ms, double mod);
