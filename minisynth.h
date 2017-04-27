@@ -52,6 +52,7 @@ static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 typedef struct minisynth {
     SOUNDGEN sound_generator;
 
+    int tick; // current 16th note tick from mixer
     midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];
     int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];
 
@@ -131,7 +132,11 @@ typedef struct minisynth {
     double m_portamento_time_msec;
     bool m_sustain_override;
 
-    bool m_morph_mode; // magical
+    bool morph_mode; // magical
+    int morph_every_n_loops;
+    int morph_generation;
+
+    int max_generation;
 
     int m_last_midi_note;
     arpeggiator m_arp;

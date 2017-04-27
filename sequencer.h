@@ -39,6 +39,10 @@ typedef struct sequencer {
     int euclidean_generation;
     int euclidean_every_n_loops;
 
+    bool randamp_on;
+    int randamp_generation;
+    int randamp_every_n_loops;
+
     bool bitwise_on;
     unsigned int bitwise_mode;
     int bitwise_generation;
@@ -78,9 +82,13 @@ void next_euclidean_generation(sequencer *s);
 
 void seq_set_euclidean(sequencer *s, bool b);
 void seq_set_game_of_life(sequencer *s, bool on);
+void seq_set_randamp(sequencer *s, bool on);
+
 void seq_set_markov(sequencer *s, bool on);
 void seq_set_markov_mode(sequencer *s, unsigned int mode);
+
 void seq_set_bitwise(sequencer *s, bool on);
 void seq_set_bitwise_mode(sequencer *s, unsigned int mode);
+
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);

@@ -69,7 +69,10 @@ minisynth *new_minisynth(void)
     ms->m_eg1_dca_intensity = 1.0;
     ms->m_sustain_override = false;
     ms->m_last_midi_note = 0;
-    ms->m_morph_mode = false;
+    ms->morph_mode = false;
+    ms->morph_every_n_loops = 0;
+    ms->morph_generation = 0;
+    ms->max_generation = 0;
 
     for (int i = 0; i < MAX_VOICES; i++) {
         ms->m_voices[i] = new_minisynth_voice();
@@ -668,7 +671,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     // TODO - a shit load of error checking on boundaries and size
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
-        "[SYNTH] - Vol: %.2f Multi: %s, Morph: %s, CurMelody:%d DelayMode: %d Mode: %ls"
+        "[SYNTH] - Vol: %.2f Multi: %s, Morph: %s, Morph EveryN: %d Morph Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
         "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
         "Filter FC: %.2f Filter Q: %2.f"
         "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
@@ -676,7 +679,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f",
         ms->m_volume_db, ms->multi_melody_mode ? "true" : "false",
-        ms->m_morph_mode ? "true" : "false",
+        ms->morph_mode ? "true" : "false", ms->morph_every_n_loops, ms->morph_generation,
         ms->cur_melody, ms->m_delay_mode, s_mode_names[ms->m_voice_mode],
         ms->m_attack_time_msec, ms->m_decay_release_time_msec,
         ms->m_sustain_level, ms->m_volume_db, ms->m_lfo1_amplitude,
@@ -714,9 +717,39 @@ double minisynth_getvol(void *self)
 // void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double minisynth_gennext(void *self)
 {
+
     minisynth *ms = (minisynth *)self;
-    if (ms->m_morph_mode) {
-        ms->m_fc_control = fmod(ms->m_fc_control + 1, 20000) + 5000;
+    if (mixr->sixteenth_note_tick != ms->tick) {
+        ms->tick = mixr->sixteenth_note_tick;
+        if (ms->tick % 16 == 0) {
+            printf("TOP OF THE LOOP!\n");
+            if (ms->morph_mode) {
+                printf("WOO, MORPH MODE!!\n");
+                if (ms->morph_every_n_loops > 0) {
+                    if (ms->morph_generation % ms->morph_every_n_loops == 0) {
+                        printf("GEN NEW PATTERN!\n");
+                        // back up pattern?
+                        // gen new pattern
+                    }
+                    else {
+                        printf("REVERT OLD NEW PATTERN!\n");
+                        // revert pattern
+                    }
+                }
+                else if (ms->max_generation > 0) {
+                    if (ms->morph_generation >= ms->max_generation) {
+                        ms->morph_generation = 0;
+                        minisynth_set_morph_mode(ms, false);
+                        printf("MAX GENS! OLD PATTERN!\n");
+                    }
+                }
+                else {
+                    printf("GEN NEW PATTERN!\n");
+                    // gen new pattern
+                }
+                ms->morph_generation++;
+            }
+        }
     }
     minisynth_update(ms);
 
@@ -1206,7 +1239,7 @@ void minisynth_del_self(minisynth *ms)
 
 void minisynth_set_morph_mode(minisynth *ms, bool b)
 {
-    ms->m_morph_mode = b;
-    minisynth_midi_note_on(ms, 60, 128);
-    ms->m_sustain_override = true;
+    ms->morph_mode = b;
+    //minisynth_midi_note_on(ms, 60, 128);
+    //ms->m_sustain_override = true;
 }

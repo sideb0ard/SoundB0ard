@@ -481,17 +481,32 @@ void interpret(char *line)
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("morph", wurds[2], 5) == 0) {
-                        if (strncmp("true", wurds[3], 4) == 0) {
-                            minisynth_set_morph_mode(ms, true);
+                        if (strncmp("every", wurds[3], 5) == 0) {
+                            int num_gens = atoi(wurds[4]);
+                            if (num_gens > 0) {
+                                minisynth_set_morph_mode(ms, true);
+                                ms->morph_every_n_loops = num_gens;
+                            }
+                            else {
+                                printf("Need a number for every 'n'\n");
+                            }
                         }
-                        else if (strncmp("false", wurds[3], 5) == 0) {
-                            minisynth_set_morph_mode(ms, false);
+                        else if (strncmp("for", wurds[3], 3) == 0) {
+                            int num_gens = atoi(wurds[4]);
+                            if (num_gens > 0) {
+                                minisynth_set_morph_mode(ms, true);
+                                ms->max_generation = num_gens;
+                            }
+                            else {
+                                printf("Need a number for 'for'\n");
+                            }
                         }
-                        else { /// just toggle
-                            minisynth_set_morph_mode(ms, 1 - ms->m_morph_mode);
+                        else { // just toggle
+                            minisynth_set_morph_mode(ms, 1 - ms->morph_mode);
                         }
+
                         printf("Synth morph mode : %s\n",
-                               ms->m_morph_mode ? "true" : "false");
+                               ms->morph_mode ? "true" : "false");
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {
@@ -998,10 +1013,12 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         add_char_pattern(seq, pattern);
     }
     else if (strncmp("randamp", wurds[2], 6) == 0) {
-        int pattern_num = atoi(wurds[3]);
-        if (is_valid_seq_pattern_num(seq, pattern_num)) {
-            seq_set_random_sample_amp(seq, pattern_num);
-        }
+        seq_set_randamp(seq, 1 - seq->randamp_on);
+        printf("Toggling randamp to %s \n", seq->randamp_on ? "true" : "false");
+        //int pattern_num = atoi(wurds[3]);
+        //if (is_valid_seq_pattern_num(seq, pattern_num)) {
+        //    seq_set_random_sample_amp(seq, pattern_num);
+        //}
     }
     else if (strncmp("multi", wurds[2], 5) == 0) {
         if (strncmp("true", wurds[3], 4) == 0) {

@@ -40,13 +40,20 @@ void seq_init(sequencer *seq)
     seq->game_of_life_on = false;
     seq->life_generation = 0;
     seq->life_every_n_loops = 0;
+
     seq->euclidean_on = false;
     seq->euclidean_generation = 0;
     seq->euclidean_every_n_loops = 0;
+
+    seq->randamp_on = false;
+    seq->randamp_generation = 0;
+    seq->randamp_every_n_loops = 0;
+
     seq->markov_on = false;
     seq->markov_mode = MARKOVBOOMBAP;
     seq->markov_generation = 0;
     seq->markov_every_n_loops = 0;
+
     seq->bitwise_on = false;
     seq->bitwise_mode = 0;
     seq->bitwise_generation = 0;
@@ -162,6 +169,18 @@ bool seq_tick(sequencer *seq)
                     seq->patterns[seq->cur_pattern] = new_pattern;
                 }
                 seq->bitwise_generation++;
+            }
+            if (seq->randamp_on) {
+                if (seq->randamp_every_n_loops > 0) {
+                    if (seq->randamp_generation % seq->randamp_every_n_loops ==
+                        0) {
+                        seq_set_random_sample_amp(seq, seq->cur_pattern);
+                    }
+                }
+                else {
+                    seq_set_random_sample_amp(seq, seq->cur_pattern);
+                }
+                seq->randamp_generation++;
             }
         }
         return true;
@@ -310,6 +329,10 @@ void next_markov_generation(sequencer *d)
 {
     int new_pattern = 0;
 
+    if (rand() % 10 > 8) {
+        d->patterns[d->cur_pattern] = new_pattern;
+        return;
+    }
     for (int i = 32768; i > 0; i = i >> 1) {
 
         int randy = rand() % 100;
@@ -518,7 +541,6 @@ void seq_set_random_sample_amp(sequencer *s, int pattern_num)
 {
     for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
         double randy = (double)rand() / (double)RAND_MAX;
-        printf("Setting random to %f\n", randy);
         seq_set_sample_amp(s, pattern_num, i, randy);
     }
 }
@@ -632,4 +654,9 @@ void seq_set_markov_mode(sequencer *s, unsigned int mode)
 void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
 {
     s->bitwise_mode = mode;
+}
+
+void seq_set_randamp(sequencer *s, bool b)
+{
+    s->randamp_on = b;
 }

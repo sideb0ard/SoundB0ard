@@ -213,8 +213,8 @@ void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf",
-             basename(seq->filename), seq->vol);
+             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf Swing: %d", 
+             basename(seq->filename), seq->vol, seq->swing_setting);
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);
