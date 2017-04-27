@@ -418,85 +418,9 @@ void interpret(char *line)
                             }
                         }
                     }
-                    if (strncmp("arp", wurds[2], 3) == 0) {
+                    else if (strncmp("arp", wurds[2], 3) == 0) {
                         ms->recording = false;
                         minisynth_set_arpeggiate(ms, 1 - ms->m_arp.active);
-                    }
-                    if (strncmp("delete", wurds[2], 3) == 0) {
-                        if (strncmp("melody", wurds[3], 6) == 0) {
-                            // minisynth_delete_melody(ms); // TODO implement
-                            printf("Imagine i deleted your melody..\n");
-                        }
-                        else {
-                            int melody = atoi(wurds[3]);
-                            if (is_valid_melody_num(ms, melody)) {
-                                printf("MELODY DELETE EVENT!\n");
-                            }
-                            int tick = atoi(wurds[4]);
-                            if (tick < PPNS)
-                                minisynth_delete_event(ms, melody, tick);
-                        }
-                    }
-                    if (strncmp("dupe", wurds[2], 4) == 0) {
-                        printf("Duping current Synth melody..\n");
-                        minisynth_dupe_melody(ms);
-                    }
-                    if (strncmp("import", wurds[2], 6) == 0) {
-                        printf("Importing file\n");
-                        minisynth_import_midi_from_file(ms, wurds[3]);
-                    }
-                    if (strncmp("multi", wurds[2], 5) == 0) {
-                        if (strncmp("true", wurds[3], 4) == 0) {
-                            minisynth_set_multi_melody_mode(ms, true);
-                        }
-                        else if (strncmp("false", wurds[3], 5) == 0) {
-                            minisynth_set_multi_melody_mode(ms, false);
-                        }
-                        printf("Synth multi mode : %s\n",
-                               ms->multi_melody_mode ? "true" : "false");
-                    }
-                    if (strncmp("nudge", wurds[2], 5) == 0) {
-                        int sixteenth = atoi(wurds[3]);
-                        if (sixteenth < 16) {
-                            printf("Nudging Melody along %d sixteenthzzzz!\n",
-                                   sixteenth);
-                            minisynth_nudge_melody(ms, ms->cur_melody,
-                                                   sixteenth);
-                        }
-                    }
-                    if (strncmp("rand", wurds[2], 4) == 0) {
-                        minisynth_rand_settings(ms);
-                    }
-                    if (strncmp("save", wurds[2], 4) == 0) {
-                        char preset_name[20];
-                        strncpy(preset_name, wurds[3], 19);
-                        minisynth_save_settings(ms, preset_name);
-                    }
-                    if (strncmp("sustain", wurds[2], 5) == 0) {
-                        if (strncmp("true", wurds[3], 4) == 0) {
-                            minisynth_set_sustain_override(ms, true);
-                        }
-                        else if (strncmp("false", wurds[3], 5) == 0) {
-                            minisynth_set_sustain_override(ms, false);
-                        }
-                        printf("Synth Sustain Override : %s\n",
-                               ms->m_sustain_override ? "true" : "false");
-                        for (int i = 0; i < MAX_VOICES; i++) {
-                            if (ms->m_voices[i]) {
-                                printf("EG sustain: %d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg1.m_sustain_override);
-                                printf("EG sustain: %d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg2.m_sustain_override);
-                                printf("EG sustain: %d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg3.m_sustain_override);
-                                printf("EG sustain: %d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg4.m_sustain_override);
-                            }
-                        }
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         int melody_num = atoi(wurds[3]);
@@ -526,12 +450,67 @@ void interpret(char *line)
                                                         ms2->cur_melody);
                         }
                     }
+                    else if (strncmp("delete", wurds[2], 3) == 0) {
+                        if (strncmp("melody", wurds[3], 6) == 0) {
+                            // minisynth_delete_melody(ms); // TODO implement
+                            printf("Imagine i deleted your melody..\n");
+                        }
+                        else {
+                            int melody = atoi(wurds[3]);
+                            if (is_valid_melody_num(ms, melody)) {
+                                printf("MELODY DELETE EVENT!\n");
+                            }
+                            int tick = atoi(wurds[4]);
+                            if (tick < PPNS)
+                                minisynth_delete_event(ms, melody, tick);
+                        }
+                    }
+                    else if (strncmp("dupe", wurds[2], 4) == 0) {
+                        printf("Duping current Synth melody..\n");
+                        minisynth_dupe_melody(ms);
+                    }
+                    else if (strncmp("import", wurds[2], 6) == 0) {
+                        printf("Importing file\n");
+                        minisynth_import_midi_from_file(ms, wurds[3]);
+                    }
                     else if (strncmp("keys", wurds[2], 4) == 0) {
                         keys(soundgen_num);
                     }
                     else if (strncmp("midi", wurds[2], 4) == 0) {
                         mixr->midi_control_destination = SYNTH;
                         mixr->active_midi_soundgen_num = soundgen_num;
+                    }
+                    else if (strncmp("morph", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            minisynth_set_morph_mode(ms, true);
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            minisynth_set_morph_mode(ms, false);
+                        }
+                        else { /// just toggle
+                            minisynth_set_morph_mode(ms, 1 - ms->m_morph_mode);
+                        }
+                        printf("Synth morph mode : %s\n",
+                               ms->m_morph_mode ? "true" : "false");
+                    }
+                    else if (strncmp("multi", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            minisynth_set_multi_melody_mode(ms, true);
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            minisynth_set_multi_melody_mode(ms, false);
+                        }
+                        printf("Synth multi mode : %s\n",
+                               ms->multi_melody_mode ? "true" : "false");
+                    }
+                    else if (strncmp("nudge", wurds[2], 5) == 0) {
+                        int sixteenth = atoi(wurds[3]);
+                        if (sixteenth < 16) {
+                            printf("Nudging Melody along %d sixteenthzzzz!\n",
+                                   sixteenth);
+                            minisynth_nudge_melody(ms, ms->cur_melody,
+                                                   sixteenth);
+                        }
                     }
                     else if (strncmp("print", wurds[2], 5) == 0) {
                         int melody_num = atoi(wurds[3]);
@@ -549,6 +528,9 @@ void interpret(char *line)
                             midi_melody_quantize(melody);
                         }
                     }
+                    else if (strncmp("rand", wurds[2], 4) == 0) {
+                        minisynth_rand_settings(ms);
+                    }
                     else if (strncmp("reset", wurds[2], 5) == 0) {
                         if (strncmp("all", wurds[3], 3) == 0) {
                             minisynth_reset_melody_all(ms);
@@ -558,9 +540,40 @@ void interpret(char *line)
                             minisynth_reset_melody(ms, melody_num);
                         }
                     }
+                    else if (strncmp("save", wurds[2], 4) == 0) {
+                        char preset_name[20];
+                        strncpy(preset_name, wurds[3], 19);
+                        minisynth_save_settings(ms, preset_name);
+                    }
                     else if (strncmp("switch", wurds[2], 6) == 0) {
                         int melody_num = atoi(wurds[3]);
                         minisynth_switch_melody(ms, melody_num);
+                    }
+                    else if (strncmp("sustain", wurds[2], 5) == 0) {
+                        if (strncmp("true", wurds[3], 4) == 0) {
+                            minisynth_set_sustain_override(ms, true);
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0) {
+                            minisynth_set_sustain_override(ms, false);
+                        }
+                        printf("Synth Sustain Override : %s\n",
+                               ms->m_sustain_override ? "true" : "false");
+                        for (int i = 0; i < MAX_VOICES; i++) {
+                            if (ms->m_voices[i]) {
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg1.m_sustain_override);
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg2.m_sustain_override);
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg3.m_sustain_override);
+                                printf("EG sustain: %d\n",
+                                       ms->m_voices[i]
+                                           ->m_voice.m_eg4.m_sustain_override);
+                            }
+                        }
                     }
                 }
             }
@@ -1041,20 +1054,21 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             }
         }
     }
-    else if (strncmp("euclid", wurds[2], 6) == 0) {
-        // https://en.wikipedia.org/wiki/Euclidean_rhythm
-        int num_beats = atoi(wurds[3]);
-        if (num_beats <= 0) {
-            return;
-        }
-        int euclidean_pattern =
-            create_euclidean_rhythm(num_beats, SEQUENCER_PATTERN_LEN);
-        bool start_at_zero = strncmp("true", wurds[4], 4) == 0 ? true : false;
-        if (start_at_zero)
-            euclidean_pattern = shift_bits_to_leftmost_position(
-                euclidean_pattern, SEQUENCER_PATTERN_LEN);
-        change_int_pattern(seq, seq->cur_pattern, euclidean_pattern);
-    }
+    //else if (strncmp("euclid", wurds[2], 6) == 0) {
+    //    printf("EUCLID!\n");
+    //    // https://en.wikipedia.org/wiki/Euclidean_rhythm
+    //    int num_beats = atoi(wurds[3]);
+    //    if (num_beats <= 0) {
+    //        return;
+    //    }
+    //    int euclidean_pattern =
+    //        create_euclidean_rhythm(num_beats, SEQUENCER_PATTERN_LEN);
+    //    bool start_at_zero = strncmp("true", wurds[4], 4) == 0 ? true : false;
+    //    if (start_at_zero)
+    //        euclidean_pattern = shift_bits_to_leftmost_position(
+    //            euclidean_pattern, SEQUENCER_PATTERN_LEN);
+    //    change_int_pattern(seq, seq->cur_pattern, euclidean_pattern);
+    //}
     else if (strncmp("life", wurds[2], 4) == 0) {
         if (strncmp("every", wurds[3], 5) == 0) {
             int num_gens = atoi(wurds[4]);
@@ -1128,6 +1142,32 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         }
         else {
             seq_set_bitwise(seq, 1 - seq->game_of_life_on);
+        }
+    }
+    else if (strncmp("euclid", wurds[2], 6) == 0) {
+        printf("Euclidean, yo!\n");
+        if (strncmp("every", wurds[3], 5) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_euclidean(seq, true);
+                seq->euclidean_every_n_loops = num_gens;
+            }
+            else {
+                printf("Need a number for every 'n'\n");
+            }
+        }
+        else if (strncmp("for", wurds[3], 3) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_euclidean(seq, true);
+                seq_set_max_generations(seq, num_gens);
+            }
+            else {
+                printf("Need a number for 'for'\n");
+            }
+        }
+        else {
+            seq_set_euclidean(seq, 1 - seq->game_of_life_on);
         }
     }
 }

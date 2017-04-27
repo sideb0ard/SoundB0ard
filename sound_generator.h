@@ -14,6 +14,7 @@ typedef struct t_soundgen {
     void (*status)(void *self, wchar_t *wstring);
     void (*setvol)(void *self, double val);
     double (*getvol)(void *self);
+    int (*get_num_tracks)(void *self);
 
     sound_generator_type type;
 

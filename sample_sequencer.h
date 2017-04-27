@@ -56,6 +56,8 @@ sample_sequencer *new_sample_seq_from_int_pattern(char *filename, int pattern);
 sample_sequencer *new_sample_seq_from_char_array(char *filename, char **pattern,
                                                  int nsteps);
 
+int sample_seq_get_num_tracks(void *s);
+
 void sample_seq_del(sample_sequencer *s);
 void sample_seq_status(void *self, wchar_t *ss);
 void sample_seq_setvol(void *self, double v);

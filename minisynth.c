@@ -69,6 +69,7 @@ minisynth *new_minisynth(void)
     ms->m_eg1_dca_intensity = 1.0;
     ms->m_sustain_override = false;
     ms->m_last_midi_note = 0;
+    ms->m_morph_mode = false;
 
     for (int i = 0; i < MAX_VOICES; i++) {
         ms->m_voices[i] = new_minisynth_voice();
@@ -667,7 +668,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     // TODO - a shit load of error checking on boundaries and size
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
-        "[SYNTH] - Vol: %.2f Multi: %s, CurMelody:%d DelayMode: %d Mode: %ls"
+        "[SYNTH] - Vol: %.2f Multi: %s, Morph: %s, CurMelody:%d DelayMode: %d Mode: %ls"
         "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
         "Filter FC: %.2f Filter Q: %2.f"
         "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
@@ -675,6 +676,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f",
         ms->m_volume_db, ms->multi_melody_mode ? "true" : "false",
+        ms->m_morph_mode ? "true" : "false",
         ms->cur_melody, ms->m_delay_mode, s_mode_names[ms->m_voice_mode],
         ms->m_attack_time_msec, ms->m_decay_release_time_msec,
         ms->m_sustain_level, ms->m_volume_db, ms->m_lfo1_amplitude,
@@ -713,6 +715,9 @@ double minisynth_getvol(void *self)
 double minisynth_gennext(void *self)
 {
     minisynth *ms = (minisynth *)self;
+    if (ms->m_morph_mode) {
+        ms->m_fc_control = fmod(ms->m_fc_control + 1, 20000) + 5000;
+    }
     minisynth_update(ms);
 
     if (mixr->is_midi_tick) {
@@ -1197,4 +1202,11 @@ void minisynth_del_self(minisynth *ms)
     }
     printf("Deleting MINISYNTH self\n");
     free(ms);
+}
+
+void minisynth_set_morph_mode(minisynth *ms, bool b)
+{
+    ms->m_morph_mode = b;
+    minisynth_midi_note_on(ms, 60, 128);
+    ms->m_sustain_override = true;
 }

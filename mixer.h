@@ -10,10 +10,24 @@
 #include "sound_generator.h"
 #include "table.h"
 
+#define MAX_SCENES 10
+#define MAX_TRACKS_PER_SCENE 10
+
 typedef struct environment_variable {
     char key[ENVIRONMENT_KEY_SIZE];
     int val;
 } env_var;
+
+typedef struct soundgen_track {
+    unsigned int soundgen_num;
+    unsigned int soundgen_track_num;
+} soundgen_track;
+
+typedef struct scene {
+    unsigned int num_bars_to_play;
+    unsigned int num_tracks;
+    soundgen_track soundgen_tracks[MAX_TRACKS_PER_SCENE];
+} scene;
 
 typedef struct t_mixer {
 
@@ -31,6 +45,11 @@ typedef struct t_mixer {
     EFFECT **effects;
     int effects_num;
     int effects_size;
+
+    scene scenes[MAX_SCENES];
+    int num_scenes; // actual amount of scenes
+    int current_scene;
+    bool scene_mode;
 
     unsigned int midi_control_destination;
     unsigned int m_midi_controller_mode; // to switch control knob routing
@@ -92,5 +111,9 @@ void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
 
 double mixer_gennext(mixer *mixr);
+
+bool mixer_add_scene(mixer *mixr, int num_bars);
+bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num, int soundgen_num, int soundgen_track);
+bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
 
 #endif // MIXER_H

@@ -96,10 +96,11 @@ void char_binary_version_of_int(int num, char bin_num[17])
     bin_num[16] = '\0';
 }
 
-unsigned int gimme_a_bitwise_int(int pattern, int t)
+unsigned int gimme_a_bitwise_int(int bit_pattern_enum, int t)
 {
-    unsigned int result;
-    switch (pattern) {
+    //unsigned int result;
+    char result;
+    switch (bit_pattern_enum) {
     case 0:
         result = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
     case 1:

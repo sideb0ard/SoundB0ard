@@ -35,6 +35,10 @@ typedef struct sequencer {
     int markov_generation;
     int markov_every_n_loops;
 
+    bool euclidean_on;
+    int euclidean_generation;
+    int euclidean_every_n_loops;
+
     bool bitwise_on;
     unsigned int bitwise_mode;
     int bitwise_generation;
@@ -70,7 +74,9 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH]);
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH]);
 void next_life_generation(sequencer *s);
 void next_markov_generation(sequencer *s);
+void next_euclidean_generation(sequencer *s);
 
+void seq_set_euclidean(sequencer *s, bool b);
 void seq_set_game_of_life(sequencer *s, bool on);
 void seq_set_markov(sequencer *s, bool on);
 void seq_set_markov_mode(sequencer *s, unsigned int mode);

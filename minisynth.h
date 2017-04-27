@@ -131,6 +131,8 @@ typedef struct minisynth {
     double m_portamento_time_msec;
     bool m_sustain_override;
 
+    bool m_morph_mode; // magical
+
     int m_last_midi_note;
     arpeggiator m_arp;
     limiter m_limiter;
@@ -207,3 +209,4 @@ void minisynth_play_melody(minisynth *ms);
 void minisynth_import_midi_from_file(minisynth *ms, char *filename);
 void minisynth_set_filter_mod(minisynth *ms, double mod);
 void minisynth_del_self(minisynth *ms);
+void minisynth_set_morph_mode(minisynth *ms, bool b);

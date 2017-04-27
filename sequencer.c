@@ -40,6 +40,9 @@ void seq_init(sequencer *seq)
     seq->game_of_life_on = false;
     seq->life_generation = 0;
     seq->life_every_n_loops = 0;
+    seq->euclidean_on = false;
+    seq->euclidean_generation = 0;
+    seq->euclidean_every_n_loops = 0;
     seq->markov_on = false;
     seq->markov_mode = MARKOVBOOMBAP;
     seq->markov_generation = 0;
@@ -89,6 +92,28 @@ bool seq_tick(sequencer *seq)
                     next_life_generation(seq);
                 }
                 seq->life_generation++;
+            }
+            else if (seq->euclidean_on) {
+                if (seq->euclidean_every_n_loops > 0) {
+                    if (seq->euclidean_generation % seq->euclidean_every_n_loops ==
+                        0) {
+                        seq_set_backup_mode(seq, true);
+                        next_euclidean_generation(seq);
+                    }
+                    else {
+                        seq_set_backup_mode(seq, false);
+                    }
+                }
+                else if (seq->max_generation > 0) {
+                    if (seq->euclidean_generation >= seq->max_generation) {
+                        seq->euclidean_generation = 0;
+                        seq_set_euclidean(seq, false);
+                    }
+                }
+                else {
+                    next_euclidean_generation(seq);
+                }
+                seq->euclidean_generation++;
             }
             else if (seq->markov_on) {
                 if (seq->markov_every_n_loops > 0) {
@@ -219,6 +244,11 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
     }
 
     return return_pattern;
+}
+void next_euclidean_generation(sequencer *s)
+{
+    int rand_steps = (rand() % 9) + 1;
+    s->patterns[s->cur_pattern] = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
 }
 
 // game of life algo
@@ -414,11 +444,11 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         L"\n      CurStep: %d life_mode: %d Every_n: %d "
         "markov_on: %d markov_mode: %s Markov_Every_n: %d Multi: %d Max Gen: %d"
-        L"\n      Bitwise: %d Bitwise_every_n: %d",
+        L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
         seq->markov_on, seq->markov_mode ? "boombap" : "haus",
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
-        seq->bitwise_on, seq->bitwise_every_n_loops);
+        seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on, seq->euclidean_every_n_loops);
     wchar_t pattern_details[128];
     char spattern[17];
     wchar_t apattern[17];
@@ -528,6 +558,18 @@ void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops)
     }
 }
 
+void seq_set_euclidean(sequencer *s, bool b)
+{
+    s->euclidean_generation = 0;
+    if (b) {
+        s->euclidean_on = true;
+        seq_set_backup_mode(s, b);
+    }
+    else {
+        s->euclidean_on = false;
+        seq_set_backup_mode(s, b);
+    }
+}
 void seq_set_game_of_life(sequencer *s, bool b)
 {
     s->life_generation = 0;
