@@ -66,9 +66,9 @@ void mixer_ps(mixer *mixr)
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
-           "::::: PPQN: %d PPS: %d PPL: %d PPNS: %d " ANSI_COLOR_RESET,
+           "::::: PPQN: %d PPSIXTEENTH: %d PPBAR: %d PPNS: %d " ANSI_COLOR_RESET,
            mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
-           mixr->debug_mode ? "true" : "false", PPQN, PPS, PPL, PPNS);
+           mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
@@ -129,8 +129,8 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
     mixr->midi_ticks_per_ms = PPQN / ((60.0 / bpm) * 1000);
-    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPL;
-    mixr->loop_len_in_ticks = PPL;
+    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPBAR;
+    mixr->loop_len_in_ticks = PPBAR;
     for (int i = 0; i < mixr->soundgen_num; i++) {
         if (mixr->sound_generators[i] != NULL) {
             for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
@@ -366,14 +366,14 @@ double mixer_gennext(mixer *mixr)
         mixr->is_midi_tick = false;
     }
 
-    if (mixr->cur_sample % (PPL * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
         mixr->start_of_loop = true;
     }
     else {
         mixr->start_of_loop = false;
     }
 
-    if (mixr->cur_sample % (PPS * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
         mixr->is_sixteenth = true;
         mixr->sixteenth_note_tick++; // for seq machine resolution
     }

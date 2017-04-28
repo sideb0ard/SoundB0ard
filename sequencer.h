@@ -11,7 +11,7 @@ typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;
 
 typedef struct sequencer {
 
-    int tick;
+    int tick; // sixteenth
 
     int matrix1[GRIDWIDTH][GRIDWIDTH];
     int matrix2[GRIDWIDTH][GRIDWIDTH];

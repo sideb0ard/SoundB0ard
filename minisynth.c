@@ -605,9 +605,9 @@ void minisynth_melody_to_string(minisynth *ms, int melody_num,
                                 wchar_t melodystr[33])
 {
     int cur_quart = 0;
-    for (int i = 0; i < PPNS; i += PPS) {
+    for (int i = 0; i < PPNS; i += PPSIXTEENTH) {
         melodystr[cur_quart] = sparkchars[0];
-        for (int j = i; j < (i + PPS); j++) {
+        for (int j = i; j < (i + PPSIXTEENTH); j++) {
             if (ms->melodies[melody_num][j] != NULL &&
                 ms->melodies[melody_num][j]->event_type ==
                     144) { // 144 is midi note on
@@ -752,7 +752,7 @@ double minisynth_gennext(void *self)
 
     if (mixr->sixteenth_note_tick != ms->tick) {
         ms->tick = mixr->sixteenth_note_tick;
-        if (ms->tick % 16 == 0) {
+        if (ms->tick % 32 == 0) {
             if (ms->morph_mode) {
                 if (ms->morph_every_n_loops > 0) {
                     if (ms->morph_generation % ms->morph_every_n_loops == 0) {
@@ -964,7 +964,7 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
     }
     minisynth_midi_note_on(ms, note, velocity);
 
-    int note_off_tick = (mixr->tick + (PPS * 4 - 7)) % PPNS;
+    int note_off_tick = (mixr->tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
 
     midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
@@ -1296,10 +1296,10 @@ void minisynth_morph(minisynth *ms)
         int note = midi_notes[rand() % 10];
         int amp = rand() % 128;
         int note_on_tick = rand() % PPNS;
-        note_on_tick /= PPS;
-        note_on_tick *= PPS;
+        note_on_tick /= PPSIXTEENTH;
+        note_on_tick *= PPSIXTEENTH;
     
-        int note_off_tick = (note_on_tick + (PPS * 4 - 7)) % PPNS;
+        int note_off_tick = (note_on_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
 
         midi_event *on_event  = new_midi_event(note_on_tick, 144, note, amp);
         midi_event *off_event = new_midi_event(note_off_tick, 128, note, amp);

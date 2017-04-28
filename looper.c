@@ -267,7 +267,7 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("BUFSIZE is %d\n", fs->orig_file_size);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples = mixr->samples_per_midi_tick * PPL * fs->loop_len;
+    int loop_len_in_samples = mixr->samples_per_midi_tick * PPBAR * fs->loop_len;
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
