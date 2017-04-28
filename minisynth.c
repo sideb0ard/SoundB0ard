@@ -754,15 +754,12 @@ double minisynth_gennext(void *self)
         ms->tick = mixr->sixteenth_note_tick;
         if (ms->tick % 16 == 0) {
             if (ms->morph_mode) {
-                printf("WOO, MORPH MODE!!\n");
                 if (ms->morph_every_n_loops > 0) {
                     if (ms->morph_generation % ms->morph_every_n_loops == 0) {
-                        printf("GEN NEW PATTERN!\n");
                         minisynth_set_backup_mode(ms, true);
                         minisynth_morph(ms);
                     }
                     else {
-                        printf("REVERT OLD NEW PATTERN!\n");
                         minisynth_set_backup_mode(ms, false);
                     }
                 }
@@ -771,11 +768,9 @@ double minisynth_gennext(void *self)
                         ms->morph_generation = 0;
                         minisynth_set_morph_mode(ms, false);
                         minisynth_set_backup_mode(ms, false);
-                        printf("MAX GENS! OLD PATTERN!\n");
                     }
                 }
                 else {
-                    printf("GEN NEW PATTERN!\n");
                     minisynth_morph(ms);
                 }
                 ms->morph_generation++;
@@ -1273,6 +1268,46 @@ void minisynth_morph(minisynth *ms)
             ms->melodies[0][i] = NULL;
         }
     }
+    static const int NUM_MIDI_NOTES = 10;
+    int midi_notes[10] = {0};
+    int notes_returned = minisynth_get_notes_from_melody((midi_event**)&ms->backup_melody_while_getting_crazy, midi_notes);
+    int i, j = 0;
+    if (notes_returned > 1) {
+        if (notes_returned < NUM_MIDI_NOTES)
+        {
+            int space_to_improv = NUM_MIDI_NOTES - notes_returned;
+            int idx = NUM_MIDI_NOTES - space_to_improv;
+            for (i = 0; i < space_to_improv; i++)
+            {
+                for (j = 0; j < notes_returned && idx < NUM_MIDI_NOTES; j++)
+                {
+                    int third = midi_notes[j] + 4;
+                    int fifth = midi_notes[j] + 7;
+                    midi_notes[idx++] = third;
+                    if (idx < NUM_MIDI_NOTES) midi_notes[idx++] = fifth;
+                    if (rand() % 100 > 90 && idx < NUM_MIDI_NOTES) midi_notes[idx++] = third - 12; 
+                    if (rand() % 100 > 95 && idx < NUM_MIDI_NOTES) midi_notes[idx++] = third + 12; 
+                }
+            }
+        }
+    }
+    int randy = rand() % 6;
+    for (i = 0; i < randy; i++) {
+        int note = midi_notes[rand() % 10];
+        int amp = rand() % 128;
+        int note_on_tick = rand() % PPNS;
+        note_on_tick /= PPS;
+        note_on_tick *= PPS;
+    
+        int note_off_tick = (note_on_tick + (PPS * 4 - 7)) % PPNS;
+
+        midi_event *on_event  = new_midi_event(note_on_tick, 144, note, amp);
+        midi_event *off_event = new_midi_event(note_off_tick, 128, note, amp);
+        on_event->delete_after_use  = true;
+        off_event->delete_after_use = true;
+        minisynth_add_event(ms, on_event);
+        minisynth_add_event(ms, off_event);
+    }
 }
 
 void minisynth_stop(minisynth *ms)
@@ -1280,4 +1315,23 @@ void minisynth_stop(minisynth *ms)
     for (int i = 0; i < MAX_VOICES; i++) {
         voice_reset(&ms->m_voices[i]->m_voice);
     }
+}
+
+int minisynth_get_notes_from_melody(midi_event **melody, int return_midi_notes[10])
+{
+    int idx = 0;
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (melody[i] != NULL) {
+            midi_event *e = melody[i];
+            if (e->event_type == 144) { // note on
+                if (!is_int_member_in_array(e->data1, return_midi_notes, 10)) {
+                    return_midi_notes[idx++] = e->data1;
+                    if (idx == 10) return idx; 
+                }
+            }
+        }
+    }
+    return idx;
+
 }

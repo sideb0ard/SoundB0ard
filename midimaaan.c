@@ -402,9 +402,9 @@ void midi_melody_quantize(midi_event **melody)
             int tick = melody[i]->tick;
             int amendedtick = 0;
             printf("TICK NOM: %d\n", melody[i]->tick);
-            int tickdiv16 = tick / 16;
-            int lower16th = tickdiv16 * 16;
-            int upper16th = lower16th + 16;
+            int tickdiv16 = tick / PPS;
+            int lower16th = tickdiv16 * PPS;
+            int upper16th = lower16th + PPS;
             if ((tick - lower16th) < (upper16th - tick))
                 amendedtick = lower16th;
             else
