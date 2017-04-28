@@ -1308,6 +1308,9 @@ void minisynth_morph(minisynth *ms)
         minisynth_add_event(ms, on_event);
         minisynth_add_event(ms, off_event);
     }
+    if (rand() % 100 > 90) ms->m_sustain_override = 1 - ms->m_sustain_override;
+    if (rand() % 100 > 90) ms->m_arp.active = 1 - ms->m_arp.active;
+    if (rand() % 100 > 95) minisynth_rand_settings(ms);
 }
 
 void minisynth_stop(minisynth *ms)
