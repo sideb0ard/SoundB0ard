@@ -730,7 +730,7 @@ double minisynth_gennext(void *self)
     minisynth *ms = (minisynth *)self;
 
     if (mixr->is_midi_tick) {
-        int idx = mixr->tick % PPNS;
+        int idx = mixr->midi_tick % PPNS;
         // top of the MS loop, which is two bars, check if we need to progress to next loop
         if (idx == 0) {
             if (ms->multi_melody_mode) {
@@ -964,14 +964,14 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
     }
     minisynth_midi_note_on(ms, note, velocity);
 
-    int note_off_tick = (mixr->tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
+    int note_off_tick = (mixr->midi_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
 
     midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
 
     if (ms->recording) {
         printf("Recording note!\n");
-        int note_on_tick = mixr->tick % PPNS;
+        int note_on_tick = mixr->midi_tick % PPNS;
         midi_event *on_event =
             new_midi_event(note_on_tick, 144, note, velocity);
 

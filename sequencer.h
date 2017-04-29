@@ -3,23 +3,27 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#define GRIDWIDTH (SEQUENCER_PATTERN_LEN / 4)
-#define INTEGER_LENGTH pow(2, SEQUENCER_PATTERN_LEN)
+#define GRIDWIDTH (PPBAR / 4)
+#define INTEGER_LENGTH pow(2, PPBAR)
+
 #define NUM_SEQUENCER_PATTERNS 10
 
 typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;
 
+typedef int pattern[PPBAR];
+
 typedef struct sequencer {
 
-    int tick; // sixteenth
+    int sixteenth_tick;
+    int midi_tick;
 
     int matrix1[GRIDWIDTH][GRIDWIDTH];
     int matrix2[GRIDWIDTH][GRIDWIDTH];
 
-    int patterns[NUM_SEQUENCER_PATTERNS];
-    double pattern_position_amp[NUM_SEQUENCER_PATTERNS][SEQUENCER_PATTERN_LEN];
+    pattern patterns[NUM_SEQUENCER_PATTERNS];
+    double pattern_position_amp[NUM_SEQUENCER_PATTERNS][PPBAR];
     int pattern_num_loops[NUM_SEQUENCER_PATTERNS];
-    int backup_pattern_while_getting_crazy; // store current pattern so
+    pattern backup_pattern_while_getting_crazy; // store current pattern so
                                             // algorithms can use slot
     int num_patterns;
     int cur_pattern;
@@ -70,7 +74,7 @@ void seq_set_multi_pattern_mode(sequencer *s, bool multi);
 void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops);
 
 void int_pattern_to_array(int pattern, int *pat_array);
-void pattern_char_to_int(char *chpattern, int *pattern);
+void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR]);
 void wchar_version_of_amp(sequencer *s, int pattern_num, wchar_t apattern[49]);
 
 int seed_pattern(void);

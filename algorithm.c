@@ -110,7 +110,7 @@ double algorithm_gen_next(void *self)
     algorithm *a = (algorithm *)self;
     switch (a->frequency) {
     case LOOP:
-        if (!a->has_started && (mixr->tick % mixr->loop_len_in_ticks == 0)) {
+        if (!a->has_started && (mixr->midi_tick % mixr->loop_len_in_ticks == 0)) {
             a->has_started = true;
             char now_cmd[MAX_CMD_LEN] = {0};
             char stored_cmd[MAX_CMD_LEN] = {0};
@@ -119,7 +119,7 @@ double algorithm_gen_next(void *self)
             interpret(now_cmd);
             algorithm_process_afterthought(a);
         }
-        else if (mixr->tick % mixr->loop_len_in_ticks != 0) {
+        else if (mixr->midi_tick % mixr->loop_len_in_ticks != 0) {
             a->has_started = false;
         }
         break;

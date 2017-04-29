@@ -19,7 +19,9 @@ const double DEFAULT_AMP = 0.7;
 void seq_init(sequencer *seq)
 {
 
-    seq->tick = 0;
+    seq->sixteenth_tick = 0;
+    seq->midi_tick = 0;
+
     memset(seq->matrix1, 0, sizeof seq->matrix1);
     memset(seq->matrix2, 0, sizeof seq->matrix2);
 
@@ -27,13 +29,13 @@ void seq_init(sequencer *seq)
     seq->cur_pattern = 0;
     seq->multi_pattern_mode = true;
     seq->cur_pattern_iteration = 1;
-    seq->backup_pattern_while_getting_crazy = 0;
 
     for (int i = 0; i < NUM_SEQUENCER_PATTERNS; i++) {
-        seq->patterns[i] = 0;
         seq->pattern_num_loops[i] = 1;
-        for (int j = 0; j < SEQUENCER_PATTERN_LEN; j++) {
+        for (int j = 0; j < PPBAR; j++) {
             seq->pattern_position_amp[i][j] = DEFAULT_AMP;
+            seq->patterns[i][j] = 0;
+            seq->backup_pattern_while_getting_crazy[j] = 0;
         }
     }
 
@@ -64,10 +66,10 @@ void seq_init(sequencer *seq)
 
 bool seq_tick(sequencer *seq)
 {
-    if (mixr->sixteenth_note_tick != seq->tick) {
-        seq->tick = mixr->sixteenth_note_tick;
+    if (mixr->sixteenth_note_tick != seq->sixteenth_tick) {
+        seq->sixteenth_tick = mixr->sixteenth_note_tick;
 
-        if (seq->tick % 16 == 0) {
+        if (seq->sixteenth_tick % 16 == 0) {
 
             if (seq->multi_pattern_mode) {
                 seq->cur_pattern_iteration--;
@@ -83,7 +85,7 @@ bool seq_tick(sequencer *seq)
                 if (seq->life_every_n_loops > 0) {
                     if (seq->life_generation % seq->life_every_n_loops == 0) {
                         seq_set_backup_mode(seq, true);
-                        next_life_generation(seq);
+                        //next_life_generation(seq);
                     }
                     else {
                         seq_set_backup_mode(seq, false);
@@ -96,7 +98,7 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                    next_life_generation(seq);
+                    //next_life_generation(seq);
                 }
                 seq->life_generation++;
             }
@@ -105,7 +107,7 @@ bool seq_tick(sequencer *seq)
                     if (seq->euclidean_generation % seq->euclidean_every_n_loops ==
                         0) {
                         seq_set_backup_mode(seq, true);
-                        next_euclidean_generation(seq);
+                        //next_euclidean_generation(seq);
                     }
                     else {
                         seq_set_backup_mode(seq, false);
@@ -118,7 +120,7 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                    next_euclidean_generation(seq);
+                    //next_euclidean_generation(seq);
                 }
                 seq->euclidean_generation++;
             }
@@ -144,32 +146,32 @@ bool seq_tick(sequencer *seq)
                 }
                 seq->markov_generation++;
             }
-            else if (seq->bitwise_on) {
-                if (seq->bitwise_every_n_loops > 0) {
-                    if (seq->bitwise_generation % seq->bitwise_every_n_loops ==
-                        0) {
-                        seq_set_backup_mode(seq, true);
-                        int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
-                                                              mixr->cur_sample);
-                        seq->patterns[seq->cur_pattern] = new_pattern;
-                    }
-                    else {
-                        seq_set_backup_mode(seq, false);
-                    }
-                }
-                else if (seq->max_generation > 0) {
-                    if (seq->bitwise_generation >= seq->max_generation) {
-                        seq->bitwise_generation = 0;
-                        seq_set_bitwise(seq, false);
-                    }
-                }
-                else {
-                    int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
-                                                          mixr->cur_sample);
-                    seq->patterns[seq->cur_pattern] = new_pattern;
-                }
-                seq->bitwise_generation++;
-            }
+            //else if (seq->bitwise_on) {
+            //    if (seq->bitwise_every_n_loops > 0) {
+            //        if (seq->bitwise_generation % seq->bitwise_every_n_loops ==
+            //            0) {
+            //            seq_set_backup_mode(seq, true);
+            //            int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
+            //                                                  mixr->cur_sample);
+            //            seq->patterns[seq->cur_pattern] = new_pattern;
+            //        }
+            //        else {
+            //            seq_set_backup_mode(seq, false);
+            //        }
+            //    }
+            //    else if (seq->max_generation > 0) {
+            //        if (seq->bitwise_generation >= seq->max_generation) {
+            //            seq->bitwise_generation = 0;
+            //            seq_set_bitwise(seq, false);
+            //        }
+            //    }
+            //    else {
+            //        int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
+            //                                              mixr->cur_sample);
+            //        seq->patterns[seq->cur_pattern] = new_pattern;
+            //    }
+            //    seq->bitwise_generation++;
+            //}
             if (seq->randamp_on) {
                 if (seq->randamp_every_n_loops > 0) {
                     if (seq->randamp_generation % seq->randamp_every_n_loops ==
@@ -200,34 +202,23 @@ void int_pattern_to_array(int pattern, int *pat_array)
     }
 }
 
-void pattern_char_to_int(char *char_pattern, int *final_pattern)
+void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
 {
     int sp_count = 0;
-    char *sp, *sp_last, *spattern[32];
+    char *sp, *sp_last;
+    int pattern[16];
     char const *sep = " ";
 
     // extract numbers from string into spattern
     for (sp = strtok_r(char_pattern, sep, &sp_last); sp;
          sp = strtok_r(NULL, sep, &sp_last)) {
-        spattern[sp_count++] = sp;
+        pattern[sp_count++] = atoi(sp);
     }
-
-    *final_pattern = 0;
     for (int i = 0; i < sp_count; i++) {
-        // TODO - make get rid of magic number - loop length
-        int pat_num = 15 - atoi(spattern[i]);
-        if (pat_num < SEQUENCER_PATTERN_LEN) {
-            *final_pattern = (1 << pat_num) | *final_pattern;
-            if (mixr->debug_mode) {
-                printf("CHARPATT %s\n", char_pattern);
-                printf("PAT_NUM: %d is %d\n", pat_num, (1 << pat_num));
-                printf("NOW SET %d\n", *final_pattern);
-            }
-        }
+        final_pattern[pattern[i]*PPSIXTEENTH] = 1;
     }
-    if (mixr->debug_mode)
-        printf("FINAL PATTERN %d\n", *final_pattern);
 }
+
 
 // game of life algo helpers
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])
@@ -264,77 +255,77 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
 
     return return_pattern;
 }
-void next_euclidean_generation(sequencer *s)
-{
-    int rand_steps = (rand() % 9) + 1;
-    s->patterns[s->cur_pattern] = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
-}
+
+// void next_euclidean_generation(sequencer *s)
+// {
+//     int rand_steps = (rand() % 9) + 1;
+//     s->patterns[s->cur_pattern] = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
+// }
 
 // game of life algo
-void next_life_generation(sequencer *self)
-{
-    memset(self->matrix1, 0, sizeof self->matrix1);
-    memset(self->matrix2, 0, sizeof self->matrix2);
-    int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
-
-    for (int y = 0; y < GRIDWIDTH; y++) {
-        for (int x = 0; x < GRIDWIDTH; x++) {
-
-            int neighbors = 0;
-
-            // printf("My co-ords y:%d x:%d\n", y, x);
-            for (int rel_y = y - 1; rel_y <= y + 1; rel_y++) {
-                for (int rel_x = x - 1; rel_x <= x + 1; rel_x++) {
-                    int n_y = rel_y;
-                    int n_x = rel_x;
-                    if (n_y < 0)
-                        n_y += GRIDWIDTH;
-                    if (n_y == GRIDWIDTH)
-                        n_y -= GRIDWIDTH;
-                    if (n_x < 0)
-                        n_x += GRIDWIDTH;
-                    if (n_x == GRIDWIDTH)
-                        n_x -= GRIDWIDTH;
-                    if (!(n_x == x && n_y == y)) {
-                        // printf("My neighbs y:%d x:%d val - %d\n", n_y, n_x);
-                        if (self->matrix1[n_y][n_x] == 1)
-                            neighbors += 1;
-                    }
-                }
-            }
-            // printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
-
-            // the RULES
-            if (self->matrix1[y][x] == 0 && neighbors == 3)
-                self->matrix2[y][x] = 1;
-
-            if (self->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
-                self->matrix2[y][x] = 1;
-
-            if (self->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
-                self->matrix2[y][x] = 0;
-        }
-    }
-    // matrix_print(4, matrix2);
-
-    // int return_pattern = matrix_to_int(self->matrix2);
-    int new_pattern = matrix_to_int(self->matrix2);
-    // printf("NEW PATTERN! %d\n", new_pattern);
-    if (new_pattern == 0)
-        new_pattern = seed_pattern();
-    self->patterns[self->cur_pattern] = new_pattern;
-}
+// void next_life_generation(sequencer *self)
+// {
+//     memset(self->matrix1, 0, sizeof self->matrix1);
+//     memset(self->matrix2, 0, sizeof self->matrix2);
+//     //int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
+// 
+//     for (int y = 0; y < GRIDWIDTH; y++) {
+//         for (int x = 0; x < GRIDWIDTH; x++) {
+// 
+//             int neighbors = 0;
+// 
+//             // printf("My co-ords y:%d x:%d\n", y, x);
+//             for (int rel_y = y - 1; rel_y <= y + 1; rel_y++) {
+//                 for (int rel_x = x - 1; rel_x <= x + 1; rel_x++) {
+//                     int n_y = rel_y;
+//                     int n_x = rel_x;
+//                     if (n_y < 0)
+//                         n_y += GRIDWIDTH;
+//                     if (n_y == GRIDWIDTH)
+//                         n_y -= GRIDWIDTH;
+//                     if (n_x < 0)
+//                         n_x += GRIDWIDTH;
+//                     if (n_x == GRIDWIDTH)
+//                         n_x -= GRIDWIDTH;
+//                     if (!(n_x == x && n_y == y)) {
+//                         // printf("My neighbs y:%d x:%d val - %d\n", n_y, n_x);
+//                         if (self->matrix1[n_y][n_x] == 1)
+//                             neighbors += 1;
+//                     }
+//                 }
+//             }
+//             // printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
+// 
+//             // the RULES
+//             if (self->matrix1[y][x] == 0 && neighbors == 3)
+//                 self->matrix2[y][x] = 1;
+// 
+//             if (self->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
+//                 self->matrix2[y][x] = 1;
+// 
+//             if (self->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
+//                 self->matrix2[y][x] = 0;
+//         }
+//     }
+//     // matrix_print(4, matrix2);
+// 
+//     // int return_pattern = matrix_to_int(self->matrix2);
+//     int new_pattern = matrix_to_int(self->matrix2);
+//     // printf("NEW PATTERN! %d\n", new_pattern);
+//     if (new_pattern == 0)
+//         new_pattern = seed_pattern();
+//     self->patterns[self->cur_pattern] = new_pattern;
+// }
 
 void next_markov_generation(sequencer *d)
 {
-    int new_pattern = 0;
-
     if (rand() % 10 > 8) {
-        d->patterns[d->cur_pattern] = new_pattern;
+        memset(d->patterns[d->cur_pattern], 0, PPBAR*sizeof(int));
         return;
     }
-    for (int i = 32768; i > 0; i = i >> 1) {
 
+    for (int i = 0; i < 16; i++)
+    {
         int randy = rand() % 100;
         if (mixr->debug_mode)
             printf("Iiii %d Randy! %d\n", i, randy);
@@ -344,53 +335,53 @@ void next_markov_generation(sequencer *d)
                 printf("HAUS MUSIC ALL NIGHT LONG!\n");
 
             switch (i) {
-            case 32768:
-                randy < 95 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 16384:
-                randy < 5 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 8192:
-                randy < 5 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 4096:
-                randy < 5 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 2048:
-                randy < 95 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 1024:
-                randy < 5 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 512:
-                randy < 5 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 256:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 128:
-                randy < 95 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 64:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 32:
-                randy < 5 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 16:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 8:
-                randy < 95 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 4:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 2:
-                randy < 9 ? new_pattern = new_pattern | i : 0;
+            case 0:
+                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
                 break;
             case 1:
-                randy < 11 ? new_pattern = new_pattern | i : 0;
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 2:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 3:
+                if (randy < 3) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 4:
+                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 5:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 6:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 7:
+                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 8:
+                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 9:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 10:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 11:
+                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 12:
+                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 13:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 14:
+                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 15:
+                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
                 break;
             }
         }
@@ -398,61 +389,57 @@ void next_markov_generation(sequencer *d)
             if (mixr->debug_mode)
                 printf("88 y'all!!\n");
             switch (i) {
-            case 32768:
-                randy < 95 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 16384:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 8192:
-                randy < 5 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 4096:
-                randy < 85 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 2048:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 1024:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 512:
-                randy < 15 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 256:
-                randy < 2 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 128:
-                randy < 95 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 64:
-                randy < 12 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 32:
-                randy < 12 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 16:
-                randy < 22 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 8:
-                randy < 15 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 4:
-                randy < 12 ? new_pattern = new_pattern | i : 0;
-                break;
-            case 2:
-                randy < 9 ? new_pattern = new_pattern | i : 0;
+            case 0:
+                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
                 break;
             case 1:
-                randy < 41 ? new_pattern = new_pattern | i : 0;
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 2:
+                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 3:
+                if (randy < 35) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 4:
+                if (randy < 15) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 5:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 6:
+                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 7:
+                if (randy < 12) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 8:
+                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 9:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 10:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 11:
+                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 12:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 13:
+                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 14:
+                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                break;
+            case 15:
+                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
                 break;
             }
         }
     }
-
-    if (mixr->debug_mode)
-        printf("New pattern! %d\n", new_pattern);
-    d->patterns[d->cur_pattern] = new_pattern;
 }
 
 // void update_pattern(void *self, int newpattern)
@@ -476,7 +463,7 @@ void seq_status(sequencer *seq, wchar_t *status_string)
     char spattern[17];
     wchar_t apattern[17];
     for (int i = 0; i < seq->num_patterns; i++) {
-        char_binary_version_of_int(seq->patterns[i], spattern);
+        //char_binary_version_of_pattern(seq->patterns[i], spattern);
         wchar_version_of_amp(seq, i, apattern);
         swprintf(pattern_details, 127, L"\n      [%d] - [%s] %ls  numloops: %d",
                  i, spattern, apattern, seq->pattern_num_loops[i]);
@@ -499,25 +486,25 @@ void wchar_version_of_amp(sequencer *d, int pattern_num, wchar_t apattern[17])
 
 void add_char_pattern(sequencer *s, char *pattern)
 {
-    pattern_char_to_int(pattern, &s->patterns[s->num_patterns++]);
+    pattern_char_to_pattern(pattern, s->patterns[s->num_patterns++]);
     s->cur_pattern++;
 }
 
-void add_int_pattern(sequencer *s, int pattern)
-{
-    s->patterns[s->num_patterns++] = pattern;
-    s->cur_pattern++;
-}
+//void add_int_pattern(sequencer *s, int pattern)
+//{
+//    s->patterns[s->num_patterns++] = pattern;
+//    s->cur_pattern++;
+//}
 
 void change_char_pattern(sequencer *s, int pattern_num, char *pattern)
 {
-    pattern_char_to_int(pattern, &s->patterns[pattern_num]);
+    pattern_char_to_pattern(pattern, s->patterns[pattern_num]);
 }
 
-void change_int_pattern(sequencer *s, int pattern_num, int pattern)
-{
-    s->patterns[pattern_num] = pattern;
-}
+// void change_int_pattern(sequencer *s, int pattern_num, int pattern)
+// {
+//     s->patterns[pattern_num] = pattern;
+// }
 
 int seed_pattern()
 {
@@ -628,12 +615,12 @@ void seq_set_bitwise(sequencer *s, bool b)
 void seq_set_backup_mode(sequencer *s, bool on)
 {
     if (on) {
-        s->backup_pattern_while_getting_crazy = s->patterns[0];
+        memcpy(s->backup_pattern_while_getting_crazy, s->patterns[0], PPBAR*sizeof(int));
         s->multi_pattern_mode = false;
         s->cur_pattern = 0;
     }
     else {
-        s->patterns[0] = s->backup_pattern_while_getting_crazy;
+        memcpy(s->patterns[0], s->backup_pattern_while_getting_crazy, PPBAR*sizeof(int));
         s->multi_pattern_mode = true;
     }
 }

@@ -142,7 +142,7 @@ void chaosmonkey_setvol(void *self, double v)
 void chaosmonkey_add_note_at_random_time(minisynth *ms, int note)
 {
     int rand_timing = rand() % 16;
-    int note_on_tick = (mixr->tick + rand_timing * PPQN) % PPNS;
+    int note_on_tick = (mixr->midi_tick + rand_timing * PPQN) % PPNS;
     int note_off_tick = (note_on_tick + 3 * PPQN + 7) % PPNS;
     midi_event *on_event = new_midi_event(note_on_tick, 144, note, 126);
     on_event->delete_after_use = true;

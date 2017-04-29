@@ -20,7 +20,7 @@ typedef struct t_sample_pos {
 typedef struct sample_sequencer {
     SOUNDGEN sound_generator;
     sequencer m_seq;
-    sample_pos sample_positions[SEQUENCER_PATTERN_LEN];
+    sample_pos sample_positions[PPBAR];
     char *filename;
     int samplerate;
     int channels;

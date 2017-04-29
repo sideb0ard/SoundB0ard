@@ -102,19 +102,18 @@ double sds_gennext(void *self)
     double val = 0.0;
 
     // POSITIONAL
-    int step_seq_idx = mixr->sixteenth_note_tick % SEQUENCER_PATTERN_LEN;
+    int idx = mixr->midi_tick % PPBAR;
 
     if (!sds->started) {
-        if (step_seq_idx == 0)
+        if (idx == 0)
             sds->started = true;
         else
             return val;
     }
 
-    int bit_position = 1 << (15 - step_seq_idx);
-    if ((sds->m_seq.patterns[sds->m_seq.cur_pattern] & bit_position) &&
-        mixr->is_sixteenth) {
-        sds_trigger(sds);
+    if (mixr->is_midi_tick) {
+        if (sds->m_seq.patterns[sds->m_seq.cur_pattern])
+            sds_trigger(sds);
     }
     seq_tick(&sds->m_seq);
 

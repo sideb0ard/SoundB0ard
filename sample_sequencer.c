@@ -57,11 +57,11 @@ double sample_seq_gennext(void *self)
     sample_sequencer *seq = (sample_sequencer *)self;
     double val = 0;
 
-    int step_seq_idx = mixr->sixteenth_note_tick % SEQUENCER_PATTERN_LEN;
+    int idx = mixr->midi_tick % PPBAR;
 
     // wait till start of loop to keep patterns synched
     if (!seq->started) {
-        if (step_seq_idx == 0) {
+        if (idx == 0) {
             seq->started = true;
         }
         else {
@@ -69,59 +69,14 @@ double sample_seq_gennext(void *self)
         }
     }
 
-    int bit_position = 1 << (15 - step_seq_idx);
-
-    if ((seq->m_seq.patterns[seq->m_seq.cur_pattern] & bit_position) &&
-        !seq->sample_positions[step_seq_idx].played) {
-        if (seq->swing) {
-            if (mixr->sixteenth_note_tick % 2) {
-                double swing_offset = PPQN * 2 / 100.0;
-                switch (seq->swing_setting) {
-                case 1:
-                    swing_offset = swing_offset * 50 - PPQN;
-                    break;
-                case 2:
-                    swing_offset = swing_offset * 54 - PPQN;
-                    break;
-                case 3:
-                    swing_offset = swing_offset * 58 - PPQN;
-                    break;
-                case 4:
-                    swing_offset = swing_offset * 62 - PPQN;
-                    break;
-                case 5:
-                    swing_offset = swing_offset * 66 - PPQN;
-                    break;
-                case 6:
-                    swing_offset = swing_offset * 71 - PPQN;
-                    break;
-                default:
-                    swing_offset = swing_offset * 50 - PPQN;
-                }
-                if (mixr->tick % (PPQN / 4) == (int)swing_offset / 4) {
-                    seq->sample_positions[step_seq_idx].playing = 1;
-                    seq->sample_positions[step_seq_idx].played = 1;
-                    if (mixr->debug_mode)
-                        printf("SWING SWUNG tick %% PPQN: %d\n",
-                               mixr->tick % PPQN);
-                }
-            }
-            else {
-                seq->sample_positions[step_seq_idx].playing = 1;
-                seq->sample_positions[step_seq_idx].played = 1;
-                // printf("SWING NORM tick %% PPQN: %d\n", mixr->tick % PPQN);
-            }
-        }
-        else {
-            seq->sample_positions[step_seq_idx].playing = 1;
-            seq->sample_positions[step_seq_idx].played = 1;
-        }
+    if (mixr->is_midi_tick
+        && seq->m_seq.patterns[seq->m_seq.cur_pattern][idx]) {
+            seq->sample_positions[idx].playing = 1;
     }
 
-    for (int i = SEQUENCER_PATTERN_LEN - 1; i >= 0; i--) {
+    for (int i = 0; i < PPBAR; i++) {
         if (seq->sample_positions[i].playing) {
             val +=
-                // seq->buffer[seq->sample_positions[i].position++] /
                 seq->buffer[seq->sample_positions[i].position] /
                 2147483648.0 // convert from 16bit in to double between 0 and 1
                 * seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern][i];
@@ -135,13 +90,7 @@ double sample_seq_gennext(void *self)
         }
     }
 
-    if (seq_tick(&seq->m_seq)) {
-        int prev_note = step_seq_idx - 1;
-        if (prev_note == -1)
-            prev_note = 15;
-
-        seq->sample_positions[prev_note].played = 0;
-    }
+    seq_tick(&seq->m_seq);
 
     val = effector(&seq->sound_generator, val);
     val = envelopor(&seq->sound_generator, val);
@@ -193,19 +142,19 @@ int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
     return buffer;
 }
 
-sample_sequencer *new_sample_seq_from_int_pattern(char *filename, int pattern)
-{
-    sample_sequencer *seq = new_sample_seq(filename);
-    seq->m_seq.patterns[seq->m_seq.num_patterns++] = pattern;
-    return seq;
-}
+// sample_sequencer *new_sample_seq_from_int_pattern(char *filename, int pattern)
+// {
+//     sample_sequencer *seq = new_sample_seq(filename);
+//     seq->m_seq.patterns[seq->m_seq.num_patterns++] = pattern;
+//     return seq;
+// }
 
 sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
                                                    char *pattern)
 {
     sample_sequencer *seq = new_sample_seq(filename);
-    pattern_char_to_int(pattern,
-                        &seq->m_seq.patterns[seq->m_seq.num_patterns++]);
+    pattern_char_to_pattern(pattern,
+                        seq->m_seq.patterns[seq->m_seq.num_patterns++]);
     return seq;
 }
 

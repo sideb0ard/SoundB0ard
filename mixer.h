@@ -64,7 +64,7 @@ typedef struct t_mixer {
     int midi_ticks_per_ms;
     int sixteenth_note_tick;
     int cur_sample; // inverse of SAMPLE RATE
-    int tick;       //
+    int midi_tick;
 
     // informational for other sound generators
     unsigned int loop_len_in_samples;

@@ -38,7 +38,7 @@ mixer *new_mixer()
 
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->tick = -1;
+    mixr->midi_tick = -1;
     mixr->cur_sample = 0;
     mixr->m_midi_controller_mode =
         KEY_MODE_ONE; // dunno whether this should be on mixer or synth
@@ -67,7 +67,7 @@ void mixer_ps(mixer *mixr)
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
            "::::: PPQN: %d PPSIXTEENTH: %d PPBAR: %d PPNS: %d " ANSI_COLOR_RESET,
-           mixr->volume, mixr->bpm, mixr->tick, mixr->sixteenth_note_tick,
+           mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0) {
@@ -265,7 +265,7 @@ int mixer_add_synthdrum(mixer *mixr, int pattern)
 {
     printf("Adding an SYNTHYDRUM, yo!\n");
     synthdrum_sequencer *sds = new_synthdrum_seq();
-    sds->m_seq.patterns[sds->m_seq.num_patterns++] = pattern;
+    //sds->m_seq.patterns[sds->m_seq.num_patterns++] = pattern;
     return add_sound_generator(mixr, (SOUNDGEN *)sds);
 }
 
@@ -294,36 +294,36 @@ int add_minisynth(mixer *mixr)
     return add_sound_generator(mixr, (SOUNDGEN *)ms);
 }
 
-int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
-                      bool start_on_first_beat)
-{
-    // preliminary setup
-    char cwd[1024];
-    getcwd(cwd, 1024);
-    char full_filename[strlen(filename) + strlen(cwd) +
-                       7]; // 7 == '/wavs/' is 6 and 1 for '\0'
-    strcpy(full_filename, cwd);
-    strcat(full_filename, "/wavs/");
-    strcat(full_filename, filename);
-
-    // create euclidean beat
-    int pattern = create_euclidean_rhythm(num_beats, 16);
-    if (start_on_first_beat) {
-        printf("Start on first beat!\n");
-        pattern = shift_bits_to_leftmost_position(pattern, 16);
-    }
-
-    printf("EUCLIDEAN BEAT! %d\n", pattern);
-
-    sample_sequencer *nseq =
-        new_sample_seq_from_int_pattern(full_filename, pattern);
-    if (nseq == NULL) {
-        printf("Barfed on seq creation\n");
-        return -1;
-    }
-
-    return add_sound_generator(mixr, (SOUNDGEN *)nseq);
-}
+// int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
+//                       bool start_on_first_beat)
+// {
+//     // preliminary setup
+//     char cwd[1024];
+//     getcwd(cwd, 1024);
+//     char full_filename[strlen(filename) + strlen(cwd) +
+//                        7]; // 7 == '/wavs/' is 6 and 1 for '\0'
+//     strcpy(full_filename, cwd);
+//     strcat(full_filename, "/wavs/");
+//     strcat(full_filename, filename);
+// 
+//     // create euclidean beat
+//     int pattern = create_euclidean_rhythm(num_beats, 16);
+//     if (start_on_first_beat) {
+//         printf("Start on first beat!\n");
+//         pattern = shift_bits_to_leftmost_position(pattern, 16);
+//     }
+// 
+//     printf("EUCLIDEAN BEAT! %d\n", pattern);
+// 
+//     sample_sequencer *nseq =
+//         new_sample_seq_from_int_pattern(full_filename, pattern);
+//     if (nseq == NULL) {
+//         printf("Barfed on seq creation\n");
+//         return -1;
+//     }
+// 
+//     return add_sound_generator(mixr, (SOUNDGEN *)nseq);
+// }
 
 int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern)
 {
@@ -359,7 +359,7 @@ int add_looper(mixer *mixr, char *filename, double loop_len)
 double mixer_gennext(mixer *mixr)
 {
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
-        mixr->tick++; // 1 midi tick (or pulse)
+        mixr->midi_tick++; // 1 midi tick (or pulse)
         mixr->is_midi_tick = true;
     }
     else {
@@ -373,7 +373,7 @@ double mixer_gennext(mixer *mixr)
         mixr->start_of_loop = false;
     }
 
-    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0) {
         mixr->is_sixteenth = true;
         mixr->sixteenth_note_tick++; // for seq machine resolution
     }

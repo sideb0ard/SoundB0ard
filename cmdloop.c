@@ -124,7 +124,7 @@ void interpret(char *line)
             list_sample_dir();
         }
 
-        else if (strncmp("del", wurds[0], 3) == 0) {
+        else if (strncmp("rm", wurds[0], 3) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 printf("Deleting SOUND GEN %d\n", soundgen_num);
@@ -161,57 +161,57 @@ void interpret(char *line)
             }
         }
 
-        else if (strncmp("synthdrum", wurds[0], 9) == 0) {
-            char *pattern = (char *)calloc(128, sizeof(char));
-            char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
-            printf("Patterrnnzz! %s\n", pattern);
-            int int_pattern = 0;
-            pattern_char_to_int(pattern, &int_pattern);
-            printf("Patterrnnzz! %s %d\n", pattern, int_pattern);
-            if (strncmp("new", wurds[1], 4) == 0) {
-                int soundgen_num = mixer_add_synthdrum(mixr, int_pattern);
-                mixr->midi_control_destination = MIDISYNTHDRUM;
-                mixr->active_midi_soundgen_num = soundgen_num;
-            }
-            if (strncmp("list", wurds[1], 4) == 0) {
-                printf("Listing SYNTHDRUM patches.. \n");
-                synthdrum_list_patches();
-            }
-            else {
-                int soundgen_num = atoi(wurds[1]);
-                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type ==
-                        SYNTHDRUM_TYPE) {
-                    if (strncmp("midi", wurds[2], 4) == 0) {
-                        printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer "
-                               "%d\n",
-                               soundgen_num);
-                        mixr->midi_control_destination = MIDISYNTHDRUM;
-                        mixr->active_midi_soundgen_num = soundgen_num;
-                    }
-                    else {
-                        synthdrum_sequencer *s =
-                            (synthdrum_sequencer *)
-                                mixr->sound_generators[soundgen_num];
-                        sequencer *seq = &s->m_seq;
-                        if (strncmp("open", wurds[2], 4) == 0) {
-                            printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
-                            synthdrum_open_patch(s, wurds[3]);
-                        }
-                        if (strncmp("save", wurds[2], 4) == 0) {
-                            printf("Saving SYNTHDRUM pattern as %s\n",
-                                   wurds[2]);
-                            synthdrum_save_patch(s, wurds[3]);
-                        }
-                        else {
-                            printf("SYNTHDRUM SEQ!\n");
-                            parse_sequencer_command(seq, wurds, num_wurds,
-                                                    pattern);
-                        }
-                    }
-                }
-            }
-        }
+        //else if (strncmp("synthdrum", wurds[0], 9) == 0) {
+        //    char *pattern = (char *)calloc(128, sizeof(char));
+        //    char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
+        //    printf("Patterrnnzz! %s\n", pattern);
+        //    int int_pattern = 0;
+        //    pattern_char_to_int(pattern, &int_pattern);
+        //    printf("Patterrnnzz! %s %d\n", pattern, int_pattern);
+        //    if (strncmp("new", wurds[1], 4) == 0) {
+        //        int soundgen_num = mixer_add_synthdrum(mixr, int_pattern);
+        //        mixr->midi_control_destination = MIDISYNTHDRUM;
+        //        mixr->active_midi_soundgen_num = soundgen_num;
+        //    }
+        //    if (strncmp("list", wurds[1], 4) == 0) {
+        //        printf("Listing SYNTHDRUM patches.. \n");
+        //        synthdrum_list_patches();
+        //    }
+        //    else {
+        //        int soundgen_num = atoi(wurds[1]);
+        //        if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+        //            mixr->sound_generators[soundgen_num]->type ==
+        //                SYNTHDRUM_TYPE) {
+        //            if (strncmp("midi", wurds[2], 4) == 0) {
+        //                printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer "
+        //                       "%d\n",
+        //                       soundgen_num);
+        //                mixr->midi_control_destination = MIDISYNTHDRUM;
+        //                mixr->active_midi_soundgen_num = soundgen_num;
+        //            }
+        //            else {
+        //                synthdrum_sequencer *s =
+        //                    (synthdrum_sequencer *)
+        //                        mixr->sound_generators[soundgen_num];
+        //                sequencer *seq = &s->m_seq;
+        //                if (strncmp("open", wurds[2], 4) == 0) {
+        //                    printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
+        //                    synthdrum_open_patch(s, wurds[3]);
+        //                }
+        //                if (strncmp("save", wurds[2], 4) == 0) {
+        //                    printf("Saving SYNTHDRUM pattern as %s\n",
+        //                           wurds[2]);
+        //                    synthdrum_save_patch(s, wurds[3]);
+        //                }
+        //                else {
+        //                    printf("SYNTHDRUM SEQ!\n");
+        //                    parse_sequencer_command(seq, wurds, num_wurds,
+        //                                            pattern);
+        //                }
+        //            }
+        //        }
+        //    }
+        //}
 
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp("seq", wurds[0], 3) == 0) {
@@ -1011,10 +1011,6 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
     else if (strncmp("randamp", wurds[2], 6) == 0) {
         seq_set_randamp(seq, 1 - seq->randamp_on);
         printf("Toggling randamp to %s \n", seq->randamp_on ? "true" : "false");
-        //int pattern_num = atoi(wurds[3]);
-        //if (is_valid_seq_pattern_num(seq, pattern_num)) {
-        //    seq_set_random_sample_amp(seq, pattern_num);
-        //}
     }
     else if (strncmp("multi", wurds[2], 5) == 0) {
         if (strncmp("true", wurds[3], 4) == 0) {
