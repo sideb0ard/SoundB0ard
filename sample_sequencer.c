@@ -21,6 +21,11 @@ sample_sequencer *new_sample_seq(char *filename)
         (sample_sequencer *)calloc(1, sizeof(sample_sequencer));
     seq_init(&seq->m_seq);
 
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+    {
+        seq->samples_now_playing[i] = -1;
+    }
+
     SF_INFO sf_info;
     memset(&sf_info, 0, sizeof(SF_INFO));
     int bufsize;
@@ -71,21 +76,25 @@ double sample_seq_gennext(void *self)
 
     if (mixr->is_midi_tick
         && seq->m_seq.patterns[seq->m_seq.cur_pattern][idx]) {
-            seq->sample_positions[idx].playing = 1;
+            int seq_position = get_a_sample_seq_position(seq);
+            if (seq_position != -1) {
+                seq->samples_now_playing[seq_position] = idx;
+            }
     }
 
-    for (int i = 0; i < PPBAR; i++) {
-        if (seq->sample_positions[i].playing) {
-            val +=
-                seq->buffer[seq->sample_positions[i].position] /
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+    {
+        if (seq->samples_now_playing[i] != -1) {
+            int cur_sample_midi_tick = seq->samples_now_playing[i];
+            val += seq->buffer[seq->sample_positions[cur_sample_midi_tick].position] /
                 2147483648.0 // convert from 16bit in to double between 0 and 1
-                * seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern][i];
-            seq->sample_positions[i].position =
-                seq->sample_positions[i].position + seq->channels;
-            if ((int)seq->sample_positions[i].position ==
+                * seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern][cur_sample_midi_tick];
+            seq->sample_positions[cur_sample_midi_tick].position =
+                seq->sample_positions[cur_sample_midi_tick].position + seq->channels;
+            if ((int)seq->sample_positions[cur_sample_midi_tick].position >=
                 seq->bufsize) { // end of playback - so reset
-                seq->sample_positions[i].playing = 0;
-                seq->sample_positions[i].position = 0;
+                seq->samples_now_playing[i] = -1;
+                seq->sample_positions[cur_sample_midi_tick].position = 0;
             }
         }
     }
@@ -271,4 +280,15 @@ int sample_seq_get_num_tracks(void *self)
 {
     sample_sequencer *s = (sample_sequencer*) self;
     return s->m_seq.num_patterns;
+}
+
+int get_a_sample_seq_position(sample_sequencer *ss)
+{
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+    {
+        if (ss->samples_now_playing[i] == -1) {
+            return i;
+        }
+    }
+    return -1;
 }
