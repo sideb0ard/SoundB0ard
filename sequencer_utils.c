@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 
 #include "mixer.h"
 #include "sequencer_utils.h"
@@ -41,7 +42,7 @@ int create_euclidean_rhythm(int num_beats, int len_pattern)
     // array tells us how many level l −1 strings make up a level l string.
     int count[len_pattern];
 
-    for (int i = 0; i < len_pattern; i++) { // is this necessary?
+    for (int i = 0; i < len_pattern; i++) {
         remainderrr[i] = 0;
         count[i] = 0;
     }
@@ -64,8 +65,28 @@ int create_euclidean_rhythm(int num_beats, int len_pattern)
 
     build_euclidean_pattern_int(level, &bitmap_int, &bitmap_position, count,
                                 remainderrr);
-
     return bitmap_int;
+}
+
+void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array, int len_pattern_array, unsigned gridsize)
+{
+    for (int i = 15; i >= 0; i--) {
+        if (bitpattern & 1 << i) {
+            int bitposition = 0;
+            switch(gridsize) {
+                case(TWENTYFOURTH):
+                bitposition = (15-i) * PPTWENTYFOURTH;
+                break;
+                case(SIXTEENTH):
+                default:
+                bitposition = (15-i) * PPSIXTEENTH;
+                break;
+            }
+            if (bitposition < len_pattern_array) {
+                pattern_array[bitposition] = 1;
+            }
+        }
+    }
 }
 
 int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)
@@ -117,4 +138,15 @@ unsigned int gimme_a_bitwise_int(int bit_pattern_enum, int t)
     if (mixr->debug_mode)
         printf("T: %d Result: %d\n", t, result);
     return result;
+}
+
+void print_pattern(int *pattern_array, int len_pattern_array)
+{
+    printf("PP\n\n");
+    for (int i = 0; i < len_pattern_array; i++) {
+        if (pattern_array[i]) {
+            printf("PATTERN ON: %d\n", i);
+            printf("PATTERN SIZTEENTH: %d\n", i / PPSIXTEENTH);
+        }
+    }
 }

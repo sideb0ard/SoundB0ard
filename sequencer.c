@@ -98,7 +98,7 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                    //next_life_generation(seq);
+                    next_life_generation(seq);
                 }
                 seq->life_generation++;
             }
@@ -107,7 +107,7 @@ bool seq_tick(sequencer *seq)
                     if (seq->euclidean_generation % seq->euclidean_every_n_loops ==
                         0) {
                         seq_set_backup_mode(seq, true);
-                        //next_euclidean_generation(seq);
+                        next_euclidean_generation(seq);
                     }
                     else {
                         seq_set_backup_mode(seq, false);
@@ -120,7 +120,7 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                    //next_euclidean_generation(seq);
+                    next_euclidean_generation(seq);
                 }
                 seq->euclidean_generation++;
             }
@@ -256,66 +256,69 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
     return return_pattern;
 }
 
-// void next_euclidean_generation(sequencer *s)
-// {
-//     int rand_steps = (rand() % 9) + 1;
-//     s->patterns[s->cur_pattern] = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
-// }
+void next_euclidean_generation(sequencer *s)
+{
+    int rand_steps = (rand() % 9) + 1;
+    int bitpattern = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
+    // char charpattern[17] = {0};
+    // char_binary_version_of_int(bitpattern, charpattern);
+    // printf("CHRAZ %s\n", charpattern);
+    convert_bitshift_pattern_to_pattern(bitpattern, (int*) &s->patterns[s->cur_pattern], PPBAR, SIXTEENTH);
+}
 
 // game of life algo
-// void next_life_generation(sequencer *self)
-// {
-//     memset(self->matrix1, 0, sizeof self->matrix1);
-//     memset(self->matrix2, 0, sizeof self->matrix2);
-//     //int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
-// 
-//     for (int y = 0; y < GRIDWIDTH; y++) {
-//         for (int x = 0; x < GRIDWIDTH; x++) {
-// 
-//             int neighbors = 0;
-// 
-//             // printf("My co-ords y:%d x:%d\n", y, x);
-//             for (int rel_y = y - 1; rel_y <= y + 1; rel_y++) {
-//                 for (int rel_x = x - 1; rel_x <= x + 1; rel_x++) {
-//                     int n_y = rel_y;
-//                     int n_x = rel_x;
-//                     if (n_y < 0)
-//                         n_y += GRIDWIDTH;
-//                     if (n_y == GRIDWIDTH)
-//                         n_y -= GRIDWIDTH;
-//                     if (n_x < 0)
-//                         n_x += GRIDWIDTH;
-//                     if (n_x == GRIDWIDTH)
-//                         n_x -= GRIDWIDTH;
-//                     if (!(n_x == x && n_y == y)) {
-//                         // printf("My neighbs y:%d x:%d val - %d\n", n_y, n_x);
-//                         if (self->matrix1[n_y][n_x] == 1)
-//                             neighbors += 1;
-//                     }
-//                 }
-//             }
-//             // printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
-// 
-//             // the RULES
-//             if (self->matrix1[y][x] == 0 && neighbors == 3)
-//                 self->matrix2[y][x] = 1;
-// 
-//             if (self->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
-//                 self->matrix2[y][x] = 1;
-// 
-//             if (self->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
-//                 self->matrix2[y][x] = 0;
-//         }
-//     }
-//     // matrix_print(4, matrix2);
-// 
-//     // int return_pattern = matrix_to_int(self->matrix2);
-//     int new_pattern = matrix_to_int(self->matrix2);
-//     // printf("NEW PATTERN! %d\n", new_pattern);
-//     if (new_pattern == 0)
-//         new_pattern = seed_pattern();
-//     self->patterns[self->cur_pattern] = new_pattern;
-// }
+void next_life_generation(sequencer *self)
+{
+    memset(self->matrix1, 0, sizeof self->matrix1);
+    memset(self->matrix2, 0, sizeof self->matrix2);
+    //int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
+
+    for (int y = 0; y < GRIDWIDTH; y++) {
+        for (int x = 0; x < GRIDWIDTH; x++) {
+
+            int neighbors = 0;
+
+            printf("My co-ords y:%d x:%d\n", y, x);
+            for (int rel_y = y - 1; rel_y <= y + 1; rel_y++) {
+                for (int rel_x = x - 1; rel_x <= x + 1; rel_x++) {
+                    int n_y = rel_y;
+                    int n_x = rel_x;
+                    if (n_y < 0)
+                        n_y += GRIDWIDTH;
+                    if (n_y == GRIDWIDTH)
+                        n_y -= GRIDWIDTH;
+                    if (n_x < 0)
+                        n_x += GRIDWIDTH;
+                    if (n_x == GRIDWIDTH)
+                        n_x -= GRIDWIDTH;
+                    if (!(n_x == x && n_y == y)) {
+                        // printf("My neighbs y:%d x:%d val - %d\n", n_y, n_x);
+                        if (self->matrix1[n_y][n_x] == 1)
+                            neighbors += 1;
+                    }
+                }
+            }
+            printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
+
+            // the RULES
+            if (self->matrix1[y][x] == 0 && neighbors == 3)
+                self->matrix2[y][x] = 1;
+
+            if (self->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
+                self->matrix2[y][x] = 1;
+
+            if (self->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
+                self->matrix2[y][x] = 0;
+        }
+    }
+
+    // int return_pattern = matrix_to_int(self->matrix2);
+    //int new_pattern = matrix_to_int(self->matrix2);
+    //// printf("NEW PATTERN! %d\n", new_pattern);
+    //if (new_pattern == 0)
+    //    new_pattern = seed_pattern();
+    //self->patterns[self->cur_pattern] = new_pattern;
+}
 
 void next_markov_generation(sequencer *d)
 {
@@ -572,11 +575,11 @@ void seq_set_euclidean(sequencer *s, bool b)
     s->euclidean_generation = 0;
     if (b) {
         s->euclidean_on = true;
-        seq_set_backup_mode(s, b);
+        //seq_set_backup_mode(s, b);
     }
     else {
         s->euclidean_on = false;
-        seq_set_backup_mode(s, b);
+        //seq_set_backup_mode(s, b);
     }
 }
 void seq_set_game_of_life(sequencer *s, bool b)
@@ -615,12 +618,20 @@ void seq_set_bitwise(sequencer *s, bool b)
 void seq_set_backup_mode(sequencer *s, bool on)
 {
     if (on) {
-        memcpy(s->backup_pattern_while_getting_crazy, s->patterns[0], PPBAR*sizeof(int));
+        // printf("EUCLID ON!\n");
+        // print_pattern(s->backup_pattern_while_getting_crazy, PPBAR);
+        memset(s->backup_pattern_while_getting_crazy, 0, PPBAR*sizeof(int));
+        memcpy(s->backup_pattern_while_getting_crazy, &s->patterns[0], PPBAR*sizeof(int));
+        memset(&s->patterns[0], 0, PPBAR*sizeof(int));
         s->multi_pattern_mode = false;
         s->cur_pattern = 0;
+        // print_pattern(s->backup_pattern_while_getting_crazy, PPBAR);
+        // printf("\n");
     }
     else {
-        memcpy(s->patterns[0], s->backup_pattern_while_getting_crazy, PPBAR*sizeof(int));
+        //printf("EUCLID OFF!\n");
+        memset(&s->patterns[0], 0, PPBAR*sizeof(int));
+        memcpy(&s->patterns[0], s->backup_pattern_while_getting_crazy, PPBAR*sizeof(int));
         s->multi_pattern_mode = true;
     }
 }

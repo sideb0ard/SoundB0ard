@@ -22,8 +22,9 @@
 
 #define SYNTH_NUM_BARS 2
 #define PPQN 960       // Pulses Per Quarter Note // one beat
-#define PPSIXTEENTH (PPQN / 4) // pulses per SIXTEENTH note, i.e. seq machine hit
-#define PPTHIRTYTWO (PPQN / 4) // pulses per SIXTEENTH note, i.e. seq machine hit
+#define PPSIXTEENTH (PPQN / 4)
+#define PPTWENTYFOURTH (PPQN / 6)
+#define PPTHIRTYSECOND (PPQN / 8)
 #define PPBAR (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
 #define PPNS                                                                   \
     (PPBAR *                                                                     \
@@ -106,3 +107,5 @@ typedef enum {
     MIDISYNTHDRUM,
     MIDILOOPER
 } midi_control_type;
+
+enum { SIXTEENTH, TWENTYFOURTH } sequencer_grid_step;
