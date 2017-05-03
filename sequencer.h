@@ -10,7 +10,7 @@
 
 typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;
 
-typedef int pattern[PPBAR];
+typedef int seq_pattern[PPBAR];
 
 typedef struct sequencer {
 
@@ -20,10 +20,10 @@ typedef struct sequencer {
     int matrix1[GRIDWIDTH][GRIDWIDTH];
     int matrix2[GRIDWIDTH][GRIDWIDTH];
 
-    pattern patterns[NUM_SEQUENCER_PATTERNS];
+    seq_pattern patterns[NUM_SEQUENCER_PATTERNS];
     double pattern_position_amp[NUM_SEQUENCER_PATTERNS][PPBAR];
     int pattern_num_loops[NUM_SEQUENCER_PATTERNS];
-    pattern backup_pattern_while_getting_crazy; // store current pattern so
+    seq_pattern backup_pattern_while_getting_crazy; // store current pattern so
                                             // algorithms can use slot
     int num_patterns;
     int cur_pattern;

@@ -86,7 +86,6 @@ void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 int add_algorithm(char *line);
-int add_bitwize(mixer *mixr, int pattern);
 int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr);
 int mixer_add_synthdrum(mixer *mixr, int pattern);

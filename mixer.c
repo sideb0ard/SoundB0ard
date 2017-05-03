@@ -8,8 +8,6 @@
 #include <portaudio.h>
 
 #include "algorithm.h"
-#include "bitwize.h"
-#include "bytebeatrrr.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
 #include "effect.h"
@@ -241,19 +239,6 @@ int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
     return mixr->soundgen_num++;
 }
 
-int add_bitwize(mixer *mixr, int pattern)
-{
-
-    BITWIZE *new_bitw = new_bitwize(pattern);
-    if (new_bitw == NULL) {
-        printf("BITBARF!\n");
-        return -1;
-    }
-
-    printf("Added bitwize gen!\n");
-    return add_sound_generator(mixr, (SOUNDGEN *)new_bitw);
-}
-
 int mixer_add_spork(mixer *mixr)
 {
     printf("Adding an SPORK, mo!\n");
@@ -281,49 +266,12 @@ int add_chaosmonkey(int soundgen)
     return add_sound_generator(mixr, (SOUNDGEN *)cm);
 }
 
-int add_bytebeat(mixer *mixr, char *pattern)
-{
-    bytebeat *b = new_bytebeat(pattern);
-    return add_sound_generator(mixr, (SOUNDGEN *)b);
-}
-
 int add_minisynth(mixer *mixr)
 {
     printf("Adding a MINISYNTH!!...\n");
     minisynth *ms = new_minisynth();
     return add_sound_generator(mixr, (SOUNDGEN *)ms);
 }
-
-// int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
-//                       bool start_on_first_beat)
-// {
-//     // preliminary setup
-//     char cwd[1024];
-//     getcwd(cwd, 1024);
-//     char full_filename[strlen(filename) + strlen(cwd) +
-//                        7]; // 7 == '/wavs/' is 6 and 1 for '\0'
-//     strcpy(full_filename, cwd);
-//     strcat(full_filename, "/wavs/");
-//     strcat(full_filename, filename);
-// 
-//     // create euclidean beat
-//     int pattern = create_euclidean_rhythm(num_beats, 16);
-//     if (start_on_first_beat) {
-//         printf("Start on first beat!\n");
-//         pattern = shift_bits_to_leftmost_position(pattern, 16);
-//     }
-// 
-//     printf("EUCLIDEAN BEAT! %d\n", pattern);
-// 
-//     sample_sequencer *nseq =
-//         new_sample_seq_from_int_pattern(full_filename, pattern);
-//     if (nseq == NULL) {
-//         printf("Barfed on seq creation\n");
-//         return -1;
-//     }
-// 
-//     return add_sound_generator(mixr, (SOUNDGEN *)nseq);
-// }
 
 int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern)
 {

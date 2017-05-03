@@ -37,10 +37,6 @@ void *timed_sig_start(void *arg)
         printf("TIMED .... %f\n", msg->looplen);
         sg = add_looper(mixr, msg->filename, msg->looplen);
     }
-    else if (strcmp(msg->params, "bitwize") == 0) {
-        sg = add_bitwize(mixr, msg->freq);
-    }
-
     // faderrr(sg, UP);
 
     // free(msg);

@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include "mixer.h"
+#include "utils.h"
 #include "sequencer_utils.h"
 
 extern mixer *mixr;
@@ -116,6 +117,20 @@ void char_binary_version_of_int(int num, char bin_num[17])
     }
     bin_num[16] = '\0';
 }
+
+void char_binary_version_of_pattern(seq_pattern p, char bin_num[17])
+{
+    for (int i = 0; i < 16; i++) {
+        if (is_int_member_in_array(1, &p[i*PPSIXTEENTH], PPSIXTEENTH))
+            bin_num[i] = '1';
+        else
+            bin_num[i] = '0';
+    }
+    bin_num[16] = '\0';
+}
+
+bool seq_pattern_sixteenth_has_hit();
+
 
 unsigned int gimme_a_bitwise_int(int bit_pattern_enum, int t)
 {

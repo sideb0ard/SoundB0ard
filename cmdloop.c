@@ -253,13 +253,6 @@ void interpret(char *line)
             free(pattern);
         }
 
-        // BITSHIFT MACHINEZ
-        else if (strncmp("bitshift", wurds[0], 8) == 0) {
-            int bitpattern = atoi(wurds[1]);
-            printf("BUTTSHIFTZ! %d\n", bitpattern);
-            add_bitwize(mixr, bitpattern);
-        }
-
         // SAMPLE LOOPER COMMANDS
         else if (strncmp("loop", wurds[0], 4) == 0) {
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {

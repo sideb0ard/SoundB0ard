@@ -209,7 +209,7 @@ void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
     int pattern[16];
     char const *sep = " ";
 
-    // extract numbers from string into spattern
+    // extract numbers from string into pattern
     for (sp = strtok_r(char_pattern, sep, &sp_last); sp;
          sp = strtok_r(NULL, sep, &sp_last)) {
         pattern[sp_count++] = atoi(sp);
@@ -260,9 +260,8 @@ void next_euclidean_generation(sequencer *s)
 {
     int rand_steps = (rand() % 9) + 1;
     int bitpattern = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
-    // char charpattern[17] = {0};
-    // char_binary_version_of_int(bitpattern, charpattern);
-    // printf("CHRAZ %s\n", charpattern);
+    if (rand() % 2 == 1)
+        bitpattern = shift_bits_to_leftmost_position(bitpattern, SEQUENCER_PATTERN_LEN);
     convert_bitshift_pattern_to_pattern(bitpattern, (int*) &s->patterns[s->cur_pattern], PPBAR, SIXTEENTH);
 }
 
@@ -466,7 +465,7 @@ void seq_status(sequencer *seq, wchar_t *status_string)
     char spattern[17];
     wchar_t apattern[17];
     for (int i = 0; i < seq->num_patterns; i++) {
-        //char_binary_version_of_pattern(seq->patterns[i], spattern);
+        char_binary_version_of_pattern(seq->patterns[i], spattern);
         wchar_version_of_amp(seq, i, apattern);
         swprintf(pattern_details, 127, L"\n      [%d] - [%s] %ls  numloops: %d",
                  i, spattern, apattern, seq->pattern_num_loops[i]);

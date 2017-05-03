@@ -12,14 +12,6 @@ OBJ = \
 	arpeggiator.o \
 	audioutils.o \
 	beatrepeat.o \
-	bitwize.o \
-	bytebeatrrr.o \
-	bytebeat/interpreter.o \
-	bytebeat/clist.o \
-	bytebeat/dlist.o \
-	bytebeat/list.o \
-	bytebeat/stack.o \
-	bytebeat/queue.o \
 	chaosmonkey.o \
 	cmdloop.o \
 	dca.o \
