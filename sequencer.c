@@ -85,7 +85,7 @@ bool seq_tick(sequencer *seq)
                 if (seq->life_every_n_loops > 0) {
                     if (seq->life_generation % seq->life_every_n_loops == 0) {
                         seq_set_backup_mode(seq, true);
-                        //next_life_generation(seq);
+                        // next_life_generation(seq);
                     }
                     else {
                         seq_set_backup_mode(seq, false);
@@ -104,7 +104,8 @@ bool seq_tick(sequencer *seq)
             }
             else if (seq->euclidean_on) {
                 if (seq->euclidean_every_n_loops > 0) {
-                    if (seq->euclidean_generation % seq->euclidean_every_n_loops ==
+                    if (seq->euclidean_generation %
+                            seq->euclidean_every_n_loops ==
                         0) {
                         seq_set_backup_mode(seq, true);
                         next_euclidean_generation(seq);
@@ -146,12 +147,14 @@ bool seq_tick(sequencer *seq)
                 }
                 seq->markov_generation++;
             }
-            //else if (seq->bitwise_on) {
+            // else if (seq->bitwise_on) {
             //    if (seq->bitwise_every_n_loops > 0) {
-            //        if (seq->bitwise_generation % seq->bitwise_every_n_loops ==
+            //        if (seq->bitwise_generation % seq->bitwise_every_n_loops
+            //        ==
             //            0) {
             //            seq_set_backup_mode(seq, true);
-            //            int new_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
+            //            int new_pattern =
+            //            gimme_a_bitwise_int(seq->bitwise_mode,
             //                                                  mixr->cur_sample);
             //            seq->patterns[seq->cur_pattern] = new_pattern;
             //        }
@@ -215,10 +218,9 @@ void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
         pattern[sp_count++] = atoi(sp);
     }
     for (int i = 0; i < sp_count; i++) {
-        final_pattern[pattern[i]*PPSIXTEENTH] = 1;
+        final_pattern[pattern[i] * PPSIXTEENTH] = 1;
     }
 }
-
 
 // game of life algo helpers
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])
@@ -258,11 +260,14 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
 
 void next_euclidean_generation(sequencer *s)
 {
+    memset(&s->patterns[0], 0, PPBAR * sizeof(int));
     int rand_steps = (rand() % 9) + 1;
     int bitpattern = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
     if (rand() % 2 == 1)
-        bitpattern = shift_bits_to_leftmost_position(bitpattern, SEQUENCER_PATTERN_LEN);
-    convert_bitshift_pattern_to_pattern(bitpattern, (int*) &s->patterns[s->cur_pattern], PPBAR, SIXTEENTH);
+        bitpattern =
+            shift_bits_to_leftmost_position(bitpattern, SEQUENCER_PATTERN_LEN);
+    convert_bitshift_pattern_to_pattern(
+        bitpattern, (int *)&s->patterns[s->cur_pattern], PPBAR, SIXTEENTH);
 }
 
 // game of life algo
@@ -270,7 +275,7 @@ void next_life_generation(sequencer *self)
 {
     memset(self->matrix1, 0, sizeof self->matrix1);
     memset(self->matrix2, 0, sizeof self->matrix2);
-    //int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
+    // int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
 
     for (int y = 0; y < GRIDWIDTH; y++) {
         for (int x = 0; x < GRIDWIDTH; x++) {
@@ -312,132 +317,164 @@ void next_life_generation(sequencer *self)
     }
 
     // int return_pattern = matrix_to_int(self->matrix2);
-    //int new_pattern = matrix_to_int(self->matrix2);
+    // int new_pattern = matrix_to_int(self->matrix2);
     //// printf("NEW PATTERN! %d\n", new_pattern);
-    //if (new_pattern == 0)
+    // if (new_pattern == 0)
     //    new_pattern = seed_pattern();
-    //self->patterns[self->cur_pattern] = new_pattern;
+    // self->patterns[self->cur_pattern] = new_pattern;
 }
 
-void next_markov_generation(sequencer *d)
+void next_markov_generation(sequencer *s)
 {
+    memset(&s->patterns[0], 0, PPBAR * sizeof(int));
     if (rand() % 10 > 8) {
-        memset(d->patterns[d->cur_pattern], 0, PPBAR*sizeof(int));
+        memset(s->patterns[s->cur_pattern], 0, PPBAR * sizeof(int));
         return;
     }
 
-    for (int i = 0; i < 16; i++)
-    {
+    for (int i = 0; i < 16; i++) {
         int randy = rand() % 100;
         if (mixr->debug_mode)
             printf("Iiii %d Randy! %d\n", i, randy);
 
-        if (d->markov_mode == MARKOVHAUS) {
+        if (s->markov_mode == MARKOVHAUS) {
             if (mixr->debug_mode)
                 printf("HAUS MUSIC ALL NIGHT LONG!\n");
 
             switch (i) {
             case 0:
-                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 95)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 1:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 2:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 3:
-                if (randy < 3) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 3)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 4:
-                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 95)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 5:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 6:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 7:
-                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 2)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 8:
-                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 95)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 9:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 10:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 11:
-                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 2)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 12:
-                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 95)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 13:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 14:
-                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 25)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 15:
-                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 2)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             }
         }
-        else if (d->markov_mode == MARKOVBOOMBAP) {
+        else if (s->markov_mode == MARKOVBOOMBAP) {
             if (mixr->debug_mode)
                 printf("88 y'all!!\n");
             switch (i) {
             case 0:
-                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 95)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 1:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 2:
-                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 25)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 3:
-                if (randy < 35) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 35)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 4:
-                if (randy < 15) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 15)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 5:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 6:
-                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 25)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 7:
-                if (randy < 12) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 12)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 8:
-                if (randy < 95) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 95)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 9:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 10:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 11:
-                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 25)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 12:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 13:
-                if (randy < 5) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 5)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 14:
-                if (randy < 25) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 25)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             case 15:
-                if (randy < 2) d->patterns[d->cur_pattern][i*PPSIXTEENTH] = 1;
+                if (randy < 2)
+                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
                 break;
             }
         }
@@ -460,7 +497,8 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
         seq->markov_on, seq->markov_mode ? "boombap" : "haus",
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
-        seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on, seq->euclidean_every_n_loops);
+        seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on,
+        seq->euclidean_every_n_loops);
     wchar_t pattern_details[128];
     char spattern[17];
     wchar_t apattern[17];
@@ -492,7 +530,7 @@ void add_char_pattern(sequencer *s, char *pattern)
     s->cur_pattern++;
 }
 
-//void add_int_pattern(sequencer *s, int pattern)
+// void add_int_pattern(sequencer *s, int pattern)
 //{
 //    s->patterns[s->num_patterns++] = pattern;
 //    s->cur_pattern++;
@@ -572,15 +610,9 @@ void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops)
 void seq_set_euclidean(sequencer *s, bool b)
 {
     s->euclidean_generation = 0;
-    if (b) {
-        s->euclidean_on = true;
-        //seq_set_backup_mode(s, b);
-    }
-    else {
-        s->euclidean_on = false;
-        //seq_set_backup_mode(s, b);
-    }
+    s->euclidean_on = b;
 }
+
 void seq_set_game_of_life(sequencer *s, bool b)
 {
     s->life_generation = 0;
@@ -604,33 +636,24 @@ void seq_set_markov(sequencer *s, bool b)
 void seq_set_bitwise(sequencer *s, bool b)
 {
     s->bitwise_generation = 0;
-    if (b) {
-        s->bitwise_on = true;
-        seq_set_backup_mode(s, b);
-    }
-    else {
-        s->bitwise_on = false;
-        seq_set_backup_mode(s, b);
-    }
+    s->bitwise_on = b;
+    seq_set_backup_mode(s, b);
 }
 
 void seq_set_backup_mode(sequencer *s, bool on)
 {
     if (on) {
-        // printf("EUCLID ON!\n");
-        // print_pattern(s->backup_pattern_while_getting_crazy, PPBAR);
-        memset(s->backup_pattern_while_getting_crazy, 0, PPBAR*sizeof(int));
-        memcpy(s->backup_pattern_while_getting_crazy, &s->patterns[0], PPBAR*sizeof(int));
-        memset(&s->patterns[0], 0, PPBAR*sizeof(int));
+        memset(s->backup_pattern_while_getting_crazy, 0, PPBAR * sizeof(int));
+        memcpy(s->backup_pattern_while_getting_crazy, &s->patterns[0],
+               PPBAR * sizeof(int));
+        //memset(&s->patterns[0], 0, PPBAR * sizeof(int));
         s->multi_pattern_mode = false;
         s->cur_pattern = 0;
-        // print_pattern(s->backup_pattern_while_getting_crazy, PPBAR);
-        // printf("\n");
     }
     else {
-        //printf("EUCLID OFF!\n");
-        memset(&s->patterns[0], 0, PPBAR*sizeof(int));
-        memcpy(&s->patterns[0], s->backup_pattern_while_getting_crazy, PPBAR*sizeof(int));
+        memset(&s->patterns[0], 0, PPBAR * sizeof(int));
+        memcpy(&s->patterns[0], s->backup_pattern_while_getting_crazy,
+               PPBAR * sizeof(int));
         s->multi_pattern_mode = true;
     }
 }
@@ -647,7 +670,4 @@ void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
     s->bitwise_mode = mode;
 }
 
-void seq_set_randamp(sequencer *s, bool b)
-{
-    s->randamp_on = b;
-}
+void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }

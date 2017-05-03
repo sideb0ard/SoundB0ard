@@ -220,4 +220,5 @@ void minisynth_del_self(minisynth *ms);
 void minisynth_set_morph_mode(minisynth *ms, bool b);
 void minisynth_set_backup_mode(minisynth *ms, bool b);
 void minisynth_morph(minisynth *ms);
-int minisynth_get_notes_from_melody(midi_event **melody, int return_midi_notes[10]);
+int minisynth_get_notes_from_melody(midi_event **melody,
+                                    int return_midi_notes[10]);

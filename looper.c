@@ -267,7 +267,8 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("BUFSIZE is %d\n", fs->orig_file_size);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples = mixr->samples_per_midi_tick * PPBAR * fs->loop_len;
+    int loop_len_in_samples =
+        mixr->samples_per_midi_tick * PPBAR * fs->loop_len;
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
@@ -276,8 +277,7 @@ void sample_resample_to_loop_size(file_sample *fs)
         return;
     }
 
-    if (strncmp("none", fs->filename, 4) != 0)
-    {
+    if (strncmp("none", fs->filename, 4) != 0) {
         int *table = fs->orig_file_bytes;
         double bufsize = fs->orig_file_size;
 
@@ -561,8 +561,7 @@ void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2)
 
 void looper_del_self(looper *s)
 {
-    for (int i = 0; i < s->num_samples; i++)
-    {
+    for (int i = 0; i < s->num_samples; i++) {
         printf("Dleeeting samples\n");
         file_sample_free(s->samples[i]);
     }

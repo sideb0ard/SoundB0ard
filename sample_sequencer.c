@@ -21,8 +21,7 @@ sample_sequencer *new_sample_seq(char *filename)
         (sample_sequencer *)calloc(1, sizeof(sample_sequencer));
     seq_init(&seq->m_seq);
 
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
-    {
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
         seq->samples_now_playing[i] = -1;
     }
 
@@ -74,23 +73,27 @@ double sample_seq_gennext(void *self)
         }
     }
 
-    if (mixr->is_midi_tick
-        && seq->m_seq.patterns[seq->m_seq.cur_pattern][idx]) {
-            int seq_position = get_a_sample_seq_position(seq);
-            if (seq_position != -1) {
-                seq->samples_now_playing[seq_position] = idx;
-            }
+    if (mixr->is_midi_tick &&
+        seq->m_seq.patterns[seq->m_seq.cur_pattern][idx]) {
+        int seq_position = get_a_sample_seq_position(seq);
+        if (seq_position != -1) {
+            seq->samples_now_playing[seq_position] = idx;
+        }
     }
 
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
-    {
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
         if (seq->samples_now_playing[i] != -1) {
             int cur_sample_midi_tick = seq->samples_now_playing[i];
-            val += seq->buffer[seq->sample_positions[cur_sample_midi_tick].position] /
+            val +=
+                seq->buffer[seq->sample_positions[cur_sample_midi_tick]
+                                .position] /
                 2147483648.0 // convert from 16bit in to double between 0 and 1
-                * seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern][cur_sample_midi_tick];
+                *
+                seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
+                                               [cur_sample_midi_tick];
             seq->sample_positions[cur_sample_midi_tick].position =
-                seq->sample_positions[cur_sample_midi_tick].position + seq->channels;
+                seq->sample_positions[cur_sample_midi_tick].position +
+                seq->channels;
             if ((int)seq->sample_positions[cur_sample_midi_tick].position >=
                 seq->bufsize) { // end of playback - so reset
                 seq->samples_now_playing[i] = -1;
@@ -151,7 +154,8 @@ int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
     return buffer;
 }
 
-// sample_sequencer *new_sample_seq_from_int_pattern(char *filename, int pattern)
+// sample_sequencer *new_sample_seq_from_int_pattern(char *filename, int
+// pattern)
 // {
 //     sample_sequencer *seq = new_sample_seq(filename);
 //     seq->m_seq.patterns[seq->m_seq.num_patterns++] = pattern;
@@ -163,7 +167,7 @@ sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
 {
     sample_sequencer *seq = new_sample_seq(filename);
     pattern_char_to_pattern(pattern,
-                        seq->m_seq.patterns[seq->m_seq.num_patterns++]);
+                            seq->m_seq.patterns[seq->m_seq.num_patterns++]);
     return seq;
 }
 
@@ -171,7 +175,7 @@ void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf Swing: %d", 
+             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf Swing: %d",
              basename(seq->filename), seq->vol, seq->swing_setting);
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -278,14 +282,13 @@ void sample_seq_del(sample_sequencer *s)
 
 int sample_seq_get_num_tracks(void *self)
 {
-    sample_sequencer *s = (sample_sequencer*) self;
+    sample_sequencer *s = (sample_sequencer *)self;
     return s->m_seq.num_patterns;
 }
 
 int get_a_sample_seq_position(sample_sequencer *ss)
 {
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
-    {
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
         if (ss->samples_now_playing[i] == -1) {
             return i;
         }

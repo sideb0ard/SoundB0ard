@@ -161,7 +161,7 @@ void interpret(char *line)
             }
         }
 
-        //else if (strncmp("synthdrum", wurds[0], 9) == 0) {
+        // else if (strncmp("synthdrum", wurds[0], 9) == 0) {
         //    char *pattern = (char *)calloc(128, sizeof(char));
         //    char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
         //    printf("Patterrnnzz! %s\n", pattern);
@@ -183,8 +183,7 @@ void interpret(char *line)
         //            mixr->sound_generators[soundgen_num]->type ==
         //                SYNTHDRUM_TYPE) {
         //            if (strncmp("midi", wurds[2], 4) == 0) {
-        //                printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer "
-        //                       "%d\n",
+        //                printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer %d\n",
         //                       soundgen_num);
         //                mixr->midi_control_destination = MIDISYNTHDRUM;
         //                mixr->active_midi_soundgen_num = soundgen_num;
@@ -1056,7 +1055,7 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             }
         }
     }
-    //else if (strncmp("euclid", wurds[2], 6) == 0) {
+    // else if (strncmp("euclid", wurds[2], 6) == 0) {
     //    printf("EUCLID!\n");
     //    // https://en.wikipedia.org/wiki/Euclidean_rhythm
     //    int num_beats = atoi(wurds[3]);
@@ -1118,7 +1117,7 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             }
         }
         else {
-            seq_set_markov(seq, 1 - seq->game_of_life_on);
+            seq_set_markov(seq, 1 - seq->markov_on);
         }
     }
     else if (strncmp("bitwise", wurds[2], 4) == 0) {

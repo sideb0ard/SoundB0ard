@@ -731,11 +731,12 @@ double mma_midi_to_atten_db(unsigned int midi_val)
     return 20.0 * log10((127.0 * 127.0) / ((float)midi_val * (float)midi_val));
 }
 
-bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in, int size_of_array)
+bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
+                            int size_of_array)
 {
-    for (int i = 0; i < size_of_array; i++)
-    {
-        if (array_to_look_in[i] == member_to_look_for) return true;
+    for (int i = 0; i < size_of_array; i++) {
+        if (array_to_look_in[i] == member_to_look_for)
+            return true;
     }
     return false;
 }

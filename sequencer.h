@@ -24,7 +24,7 @@ typedef struct sequencer {
     double pattern_position_amp[NUM_SEQUENCER_PATTERNS][PPBAR];
     int pattern_num_loops[NUM_SEQUENCER_PATTERNS];
     seq_pattern backup_pattern_while_getting_crazy; // store current pattern so
-                                            // algorithms can use slot
+                                                    // algorithms can use slot
     int num_patterns;
     int cur_pattern;
     int cur_pattern_iteration;

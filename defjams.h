@@ -21,13 +21,13 @@
 #define ENVIRONMENT_KEY_SIZE 128
 
 #define SYNTH_NUM_BARS 2
-#define PPQN 960       // Pulses Per Quarter Note // one beat
+#define PPQN 960 // Pulses Per Quarter Note // one beat
 #define PPSIXTEENTH (PPQN / 4)
 #define PPTWENTYFOURTH (PPQN / 6)
 #define PPTHIRTYSECOND (PPQN / 8)
 #define PPBAR (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
 #define PPNS                                                                   \
-    (PPBAR *                                                                     \
+    (PPBAR *                                                                   \
      SYNTH_NUM_BARS) // Pulses per NanoSynth recording loop, i.e 2 loops/bars
 
 #define SEQUENCER_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar

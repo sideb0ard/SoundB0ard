@@ -57,16 +57,17 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(COOL_COLOR_MAUVE
-           "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
-           "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-           " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-           " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-           " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
-           "::::: PPQN: %d PPSIXTEENTH: %d PPBAR: %d PPNS: %d " ANSI_COLOR_RESET,
-           mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
-           mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPBAR, PPNS);
+    printf(
+        COOL_COLOR_MAUVE
+        "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
+        "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
+        " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
+        " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+        " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+        " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
+        "::::: PPQN: %d PPSIXTEENTH: %d PPBAR: %d PPNS: %d " ANSI_COLOR_RESET,
+        mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
+        mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
@@ -79,14 +80,17 @@ void mixer_ps(mixer *mixr)
     printf("\n");
 
     if (mixr->num_scenes > 0) {
-        printf("::::: [scene mode: %s] .....] - \n", mixr->scene_mode ? "true" : "false");
+        printf("::::: [scene mode: %s] .....] - \n",
+               mixr->scene_mode ? "true" : "false");
         for (int i = 0; i < mixr->num_scenes; i++) {
-            printf("::::: [%d] - %d bars - ", i, mixr->scenes[i].num_bars_to_play);
+            printf("::::: [%d] - %d bars - ", i,
+                   mixr->scenes[i].num_bars_to_play);
             for (int j = 0; j < mixr->scenes[i].num_tracks; j++) {
-                printf("(%d,%d)", mixr->scenes[i].soundgen_tracks[j].soundgen_num,
-                                  mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
+                printf("(%d,%d)",
+                       mixr->scenes[i].soundgen_tracks[j].soundgen_num,
+                       mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
             }
-           printf("\n"); 
+            printf("\n");
         }
     }
 
@@ -250,7 +254,7 @@ int mixer_add_synthdrum(mixer *mixr, int pattern)
 {
     printf("Adding an SYNTHYDRUM, yo!\n");
     synthdrum_sequencer *sds = new_synthdrum_seq();
-    //sds->m_seq.patterns[sds->m_seq.num_patterns++] = pattern;
+    // sds->m_seq.patterns[sds->m_seq.num_patterns++] = pattern;
     return add_sound_generator(mixr, (SOUNDGEN *)sds);
 }
 
@@ -385,12 +389,12 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
         switch (sg->type) {
         case (SYNTH_TYPE):
             printf("DELASYNTH!\n");
-            minisynth *ms = (minisynth*) sg;
+            minisynth *ms = (minisynth *)sg;
             minisynth_del_self(ms);
             break;
         case (LOOPER_TYPE):
             printf("DELALOOPER!\n");
-            looper *l = (looper*) sg;
+            looper *l = (looper *)sg;
             looper_del_self(l);
             break;
         case (BITWIZE_TYPE):
@@ -403,7 +407,7 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
             break;
         case (SYNTHDRUM_TYPE):
             printf("DELASYNTHDRUM!\n");
-            synthdrum_sequencer *sds = (synthdrum_sequencer*) sg;
+            synthdrum_sequencer *sds = (synthdrum_sequencer *)sg;
             synthdrum_del_self(sds);
             break;
         case (ALGORITHM_TYPE):
@@ -439,10 +443,12 @@ bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
     return false;
 }
 
-bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num, int track_num)
+bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
+                                       int track_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num)
-        && track_num < mixr->sound_generators[soundgen_num]->get_num_tracks(mixr->sound_generators[soundgen_num]))
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+        track_num < mixr->sound_generators[soundgen_num]->get_num_tracks(
+                        mixr->sound_generators[soundgen_num]))
         return true;
 
     return false;
@@ -450,8 +456,7 @@ bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num, int track_
 
 bool mixer_add_scene(mixer *mixr, int num_bars)
 {
-    if (mixr->num_scenes >= MAX_SCENES)
-    {
+    if (mixr->num_scenes >= MAX_SCENES) {
         printf("Dingie mate\n");
         return false;
     }
@@ -463,13 +468,15 @@ bool mixer_add_scene(mixer *mixr, int num_bars)
     return true;
 }
 
-bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num, int soundgen_num, int soundgen_track)
+bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
+                                       int soundgen_num, int soundgen_track)
 {
     if (!mixer_is_valid_scene_num(mixr, scene_num)) {
         printf("%d is not a valid scene number\n", scene_num);
         return false;
     }
-    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num, soundgen_track)) {
+    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num,
+                                           soundgen_track)) {
         printf("%d is not a valid soundgen number\n", soundgen_num);
         return false;
     }

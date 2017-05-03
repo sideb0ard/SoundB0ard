@@ -261,7 +261,4 @@ void minisynth_voice_set_filter_mod(minisynth_voice *ms, double mod)
     filter_set_fc_mod(&ms->m_moog_ladder_filter.f, mod);
 }
 
-void minisynth_voice_free_self(minisynth_voice *ms)
-{
-    free(ms);
-}
+void minisynth_voice_free_self(minisynth_voice *ms) { free(ms); }

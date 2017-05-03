@@ -680,22 +680,25 @@ void minisynth_status(void *self, wchar_t *status_string)
     // TODO - a shit load of error checking on boundaries and size
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
-        "[SYNTH] - Vol: %.2f Multi: %s, Morph: %s, Morph EveryN: %d Morph Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
-        "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f SustainOverride: %s "
+        "[SYNTH] - Vol: %.2f Multi: %s, Morph: %s, Morph EveryN: %d Morph "
+        "Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
+        "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
+        "SustainOverride: %s "
         "Filter FC: %.2f Filter Q: %2.f"
         "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
         "%2.f"
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f",
         ms->m_volume_db, ms->multi_melody_mode ? "true" : "false",
-        ms->morph_mode ? "true" : "false", ms->morph_every_n_loops, ms->morph_generation,
-        ms->cur_melody, ms->m_delay_mode, s_mode_names[ms->m_voice_mode],
-        ms->m_attack_time_msec, ms->m_decay_release_time_msec,
-        ms->m_sustain_level, ms->m_volume_db, ms->m_lfo1_amplitude,
-        ms->m_lfo1_rate, ms->m_sustain_override ? "true" : "false", ms->m_fc_control, ms->m_q_control,
-        ms->m_delay_time_msec, ms->m_feedback_pct, ms->m_delay_ratio,
-        ms->m_wet_mix, ms->m_detune_cents, ms->m_pulse_width_pct,
-        ms->m_sub_osc_db, ms->m_noise_osc_db);
+        ms->morph_mode ? "true" : "false", ms->morph_every_n_loops,
+        ms->morph_generation, ms->cur_melody, ms->m_delay_mode,
+        s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec,
+        ms->m_decay_release_time_msec, ms->m_sustain_level, ms->m_volume_db,
+        ms->m_lfo1_amplitude, ms->m_lfo1_rate,
+        ms->m_sustain_override ? "true" : "false", ms->m_fc_control,
+        ms->m_q_control, ms->m_delay_time_msec, ms->m_feedback_pct,
+        ms->m_delay_ratio, ms->m_wet_mix, ms->m_detune_cents,
+        ms->m_pulse_width_pct, ms->m_sub_osc_db, ms->m_noise_osc_db);
 
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
@@ -731,7 +734,8 @@ double minisynth_gennext(void *self)
 
     if (mixr->is_midi_tick) {
         int idx = mixr->midi_tick % PPNS;
-        // top of the MS loop, which is two bars, check if we need to progress to next loop
+        // top of the MS loop, which is two bars, check if we need to progress
+        // to next loop
         if (idx == 0) {
             if (ms->multi_melody_mode) {
                 ms->cur_melody_iteration--;
@@ -1221,14 +1225,11 @@ void minisynth_set_filter_mod(minisynth *ms, double mod)
 
 void minisynth_del_self(minisynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
+    for (int i = 0; i < MAX_VOICES; i++) {
         minisynth_voice_free_self(ms->m_voices[i]);
     }
-    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
-    {
-        for (int j = 0; j < PPNS; j++)
-        {
+    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++) {
+        for (int j = 0; j < PPNS; j++) {
             if (ms->melodies[i][j] != NULL) {
                 midi_event_free(ms->melodies[i][j]);
                 ms->melodies[i][j] = NULL;
@@ -1248,12 +1249,14 @@ void minisynth_set_morph_mode(minisynth *ms, bool b)
 void minisynth_set_backup_mode(minisynth *ms, bool b)
 {
     if (b) {
-        minisynth_dupe_melody(ms->melodies[0], ms->backup_melody_while_getting_crazy);
+        minisynth_dupe_melody(ms->melodies[0],
+                              ms->backup_melody_while_getting_crazy);
         ms->multi_melody_mode = false;
         ms->cur_melody = 0;
     }
     else {
-        minisynth_dupe_melody(ms->backup_melody_while_getting_crazy, ms->melodies[0]);
+        minisynth_dupe_melody(ms->backup_melody_while_getting_crazy,
+                              ms->melodies[0]);
         ms->multi_melody_mode = true;
     }
 }
@@ -1261,8 +1264,7 @@ void minisynth_set_backup_mode(minisynth *ms, bool b)
 void minisynth_morph(minisynth *ms)
 {
     minisynth_stop(ms);
-    for (int i = 0; i < PPNS; i++)
-    {
+    for (int i = 0; i < PPNS; i++) {
         if (ms->melodies[0][i] != NULL) {
             midi_event_free(ms->melodies[0][i]);
             ms->melodies[0][i] = NULL;
@@ -1270,23 +1272,24 @@ void minisynth_morph(minisynth *ms)
     }
     static const int NUM_MIDI_NOTES = 10;
     int midi_notes[10] = {0};
-    int notes_returned = minisynth_get_notes_from_melody((midi_event**)&ms->backup_melody_while_getting_crazy, midi_notes);
+    int notes_returned = minisynth_get_notes_from_melody(
+        (midi_event **)&ms->backup_melody_while_getting_crazy, midi_notes);
     int i, j = 0;
     if (notes_returned > 1) {
-        if (notes_returned < NUM_MIDI_NOTES)
-        {
+        if (notes_returned < NUM_MIDI_NOTES) {
             int space_to_improv = NUM_MIDI_NOTES - notes_returned;
             int idx = NUM_MIDI_NOTES - space_to_improv;
-            for (i = 0; i < space_to_improv; i++)
-            {
-                for (j = 0; j < notes_returned && idx < NUM_MIDI_NOTES; j++)
-                {
+            for (i = 0; i < space_to_improv; i++) {
+                for (j = 0; j < notes_returned && idx < NUM_MIDI_NOTES; j++) {
                     int third = midi_notes[j] + 4;
                     int fifth = midi_notes[j] + 7;
                     midi_notes[idx++] = third;
-                    if (idx < NUM_MIDI_NOTES) midi_notes[idx++] = fifth;
-                    if (rand() % 100 > 90 && idx < NUM_MIDI_NOTES) midi_notes[idx++] = third - 12; 
-                    if (rand() % 100 > 95 && idx < NUM_MIDI_NOTES) midi_notes[idx++] = third + 12; 
+                    if (idx < NUM_MIDI_NOTES)
+                        midi_notes[idx++] = fifth;
+                    if (rand() % 100 > 90 && idx < NUM_MIDI_NOTES)
+                        midi_notes[idx++] = third - 12;
+                    if (rand() % 100 > 95 && idx < NUM_MIDI_NOTES)
+                        midi_notes[idx++] = third + 12;
                 }
             }
         }
@@ -1298,19 +1301,22 @@ void minisynth_morph(minisynth *ms)
         int note_on_tick = rand() % PPNS;
         note_on_tick /= PPSIXTEENTH;
         note_on_tick *= PPSIXTEENTH;
-    
+
         int note_off_tick = (note_on_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
 
-        midi_event *on_event  = new_midi_event(note_on_tick, 144, note, amp);
+        midi_event *on_event = new_midi_event(note_on_tick, 144, note, amp);
         midi_event *off_event = new_midi_event(note_off_tick, 128, note, amp);
-        on_event->delete_after_use  = true;
+        on_event->delete_after_use = true;
         off_event->delete_after_use = true;
         minisynth_add_event(ms, on_event);
         minisynth_add_event(ms, off_event);
     }
-    if (rand() % 100 > 90) ms->m_sustain_override = 1 - ms->m_sustain_override;
-    if (rand() % 100 > 90) ms->m_arp.active = 1 - ms->m_arp.active;
-    if (rand() % 100 > 95) minisynth_rand_settings(ms);
+    if (rand() % 100 > 90)
+        ms->m_sustain_override = 1 - ms->m_sustain_override;
+    if (rand() % 100 > 90)
+        ms->m_arp.active = 1 - ms->m_arp.active;
+    if (rand() % 100 > 95)
+        minisynth_rand_settings(ms);
 }
 
 void minisynth_stop(minisynth *ms)
@@ -1320,21 +1326,21 @@ void minisynth_stop(minisynth *ms)
     }
 }
 
-int minisynth_get_notes_from_melody(midi_event **melody, int return_midi_notes[10])
+int minisynth_get_notes_from_melody(midi_event **melody,
+                                    int return_midi_notes[10])
 {
     int idx = 0;
-    for (int i = 0; i < PPNS; i++)
-    {
+    for (int i = 0; i < PPNS; i++) {
         if (melody[i] != NULL) {
             midi_event *e = melody[i];
             if (e->event_type == 144) { // note on
                 if (!is_int_member_in_array(e->data1, return_midi_notes, 10)) {
                     return_midi_notes[idx++] = e->data1;
-                    if (idx == 10) return idx; 
+                    if (idx == 10)
+                        return idx;
                 }
             }
         }
     }
     return idx;
-
 }

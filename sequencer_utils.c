@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include "mixer.h"
-#include "utils.h"
 #include "sequencer_utils.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
@@ -69,18 +69,20 @@ int create_euclidean_rhythm(int num_beats, int len_pattern)
     return bitmap_int;
 }
 
-void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array, int len_pattern_array, unsigned gridsize)
+void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array,
+                                         int len_pattern_array,
+                                         unsigned gridsize)
 {
     for (int i = 15; i >= 0; i--) {
         if (bitpattern & 1 << i) {
             int bitposition = 0;
-            switch(gridsize) {
-                case(TWENTYFOURTH):
-                bitposition = (15-i) * PPTWENTYFOURTH;
+            switch (gridsize) {
+            case (TWENTYFOURTH):
+                bitposition = (15 - i) * PPTWENTYFOURTH;
                 break;
-                case(SIXTEENTH):
-                default:
-                bitposition = (15-i) * PPSIXTEENTH;
+            case (SIXTEENTH):
+            default:
+                bitposition = (15 - i) * PPSIXTEENTH;
                 break;
             }
             if (bitposition < len_pattern_array) {
@@ -121,7 +123,7 @@ void char_binary_version_of_int(int num, char bin_num[17])
 void char_binary_version_of_pattern(seq_pattern p, char bin_num[17])
 {
     for (int i = 0; i < 16; i++) {
-        if (is_int_member_in_array(1, &p[i*PPSIXTEENTH], PPSIXTEENTH))
+        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
             bin_num[i] = '1';
         else
             bin_num[i] = '0';
@@ -131,10 +133,9 @@ void char_binary_version_of_pattern(seq_pattern p, char bin_num[17])
 
 bool seq_pattern_sixteenth_has_hit();
 
-
 unsigned int gimme_a_bitwise_int(int bit_pattern_enum, int t)
 {
-    //unsigned int result;
+    // unsigned int result;
     char result;
     switch (bit_pattern_enum) {
     case 0:

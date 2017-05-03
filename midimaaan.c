@@ -157,10 +157,7 @@ midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
     return ev;
 }
 
-void midi_event_free(midi_event *ev)
-{
-    free(ev);
-}
+void midi_event_free(midi_event *ev) { free(ev); }
 
 void spork_parse_midi(spork *s, int data1, int data2)
 {
