@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#define GRIDWIDTH (PPBAR / 4)
+#define GRIDWIDTH (SEQUENCER_PATTERN_LEN / 4)
 #define INTEGER_LENGTH pow(2, PPBAR)
 
 #define NUM_SEQUENCER_PATTERNS 10

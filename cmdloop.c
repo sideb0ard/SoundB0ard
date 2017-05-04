@@ -284,8 +284,6 @@ void interpret(char *line)
                         if (is_valid_sample_num(s, sample_num)) {
                             if (strncmp("looplen", wurds[4], 8) == 0) {
                                 int looplen = atoi(wurds[5]);
-                                // looper_change_loop_len(s, sample_num,
-                                // looplen);
                                 s->pending_loop_num = sample_num;
                                 s->pending_loop_size = looplen;
                                 s->change_loopsize_pending = true;
@@ -987,7 +985,7 @@ bool is_valid_file(char *filename)
 
 int exxit()
 {
-    printf(COOL_COLOR_GREEN "\nBeat it, ya val jerk...\n" ANSI_COLOR_RESET);
+    printf(COOL_COLOR_GREEN "\nBeat it, ya val jerk...\n" ANSI_COLOR_RESET); // Thrashin' reference
     pa_teardown();
     exit(0);
 }
@@ -1055,21 +1053,6 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             }
         }
     }
-    // else if (strncmp("euclid", wurds[2], 6) == 0) {
-    //    printf("EUCLID!\n");
-    //    // https://en.wikipedia.org/wiki/Euclidean_rhythm
-    //    int num_beats = atoi(wurds[3]);
-    //    if (num_beats <= 0) {
-    //        return;
-    //    }
-    //    int euclidean_pattern =
-    //        create_euclidean_rhythm(num_beats, SEQUENCER_PATTERN_LEN);
-    //    bool start_at_zero = strncmp("true", wurds[4], 4) == 0 ? true : false;
-    //    if (start_at_zero)
-    //        euclidean_pattern = shift_bits_to_leftmost_position(
-    //            euclidean_pattern, SEQUENCER_PATTERN_LEN);
-    //    change_int_pattern(seq, seq->cur_pattern, euclidean_pattern);
-    //}
     else if (strncmp("life", wurds[2], 4) == 0) {
         if (strncmp("every", wurds[3], 5) == 0) {
             int num_gens = atoi(wurds[4]);

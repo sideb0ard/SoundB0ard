@@ -85,7 +85,7 @@ bool seq_tick(sequencer *seq)
                 if (seq->life_every_n_loops > 0) {
                     if (seq->life_generation % seq->life_every_n_loops == 0) {
                         seq_set_backup_mode(seq, true);
-                        // next_life_generation(seq);
+                        next_life_generation(seq);
                     }
                     else {
                         seq_set_backup_mode(seq, false);
@@ -98,6 +98,7 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
+                    printf("Next LIFE!\n");
                     next_life_generation(seq);
                 }
                 seq->life_generation++;
@@ -271,11 +272,13 @@ void next_euclidean_generation(sequencer *s)
 }
 
 // game of life algo
-void next_life_generation(sequencer *self)
+void next_life_generation(sequencer *s)
 {
-    memset(self->matrix1, 0, sizeof self->matrix1);
-    memset(self->matrix2, 0, sizeof self->matrix2);
-    // int_to_matrix(self->patterns[self->cur_pattern], self->matrix1);
+    memset(s->matrix1, 0, sizeof s->matrix1);
+    memset(s->matrix2, 0, sizeof s->matrix2);
+    int cur_pattern_as_int = pattern_as_int_representation(s->patterns[s->cur_pattern]);
+    printf("CUR PATTERN AS INT %d\n", cur_pattern_as_int);
+    int_to_matrix(cur_pattern_as_int, s->matrix1);
 
     for (int y = 0; y < GRIDWIDTH; y++) {
         for (int x = 0; x < GRIDWIDTH; x++) {
@@ -297,7 +300,7 @@ void next_life_generation(sequencer *self)
                         n_x -= GRIDWIDTH;
                     if (!(n_x == x && n_y == y)) {
                         // printf("My neighbs y:%d x:%d val - %d\n", n_y, n_x);
-                        if (self->matrix1[n_y][n_x] == 1)
+                        if (s->matrix1[n_y][n_x] == 1)
                             neighbors += 1;
                     }
                 }
@@ -305,23 +308,25 @@ void next_life_generation(sequencer *self)
             printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
 
             // the RULES
-            if (self->matrix1[y][x] == 0 && neighbors == 3)
-                self->matrix2[y][x] = 1;
+            if (s->matrix1[y][x] == 0 && neighbors == 3)
+                s->matrix2[y][x] = 1;
 
-            if (self->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
-                self->matrix2[y][x] = 1;
+            if (s->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
+                s->matrix2[y][x] = 1;
 
-            if (self->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
-                self->matrix2[y][x] = 0;
+            if (s->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
+                s->matrix2[y][x] = 0;
         }
     }
 
-    // int return_pattern = matrix_to_int(self->matrix2);
-    // int new_pattern = matrix_to_int(self->matrix2);
-    //// printf("NEW PATTERN! %d\n", new_pattern);
-    // if (new_pattern == 0)
-    //    new_pattern = seed_pattern();
-    // self->patterns[self->cur_pattern] = new_pattern;
+    int return_pattern = matrix_to_int(s->matrix2);
+    int new_pattern = matrix_to_int(s->matrix2);
+    printf("NEW PATTERN! %d\n", new_pattern);
+    if (new_pattern == 0)
+       new_pattern = seed_pattern();
+
+    memset(&s->patterns[0], 0, PPBAR * sizeof(int));
+    convert_bitshift_pattern_to_pattern(new_pattern, s->patterns[0], PPBAR, SIXTEENTH);
 }
 
 void next_markov_generation(sequencer *s)
@@ -616,14 +621,8 @@ void seq_set_euclidean(sequencer *s, bool b)
 void seq_set_game_of_life(sequencer *s, bool b)
 {
     s->life_generation = 0;
-    if (b) {
-        s->game_of_life_on = true;
-        seq_set_backup_mode(s, b);
-    }
-    else {
-        s->game_of_life_on = false;
-        seq_set_backup_mode(s, b);
-    }
+    s->game_of_life_on = b;
+    seq_set_backup_mode(s, b);
 }
 
 void seq_set_markov(sequencer *s, bool b)

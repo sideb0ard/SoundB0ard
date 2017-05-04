@@ -166,3 +166,14 @@ void print_pattern(int *pattern_array, int len_pattern_array)
         }
     }
 }
+
+int pattern_as_int_representation(seq_pattern p)
+{
+    int pattern_as_int = 0;
+    for (int i = 0; i < 16; i++) {
+        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+            pattern_as_int = pattern_as_int | (2^(15-i));
+    }
+    printf("PATTERN AS INT: %d\n", pattern_as_int);
+    return pattern_as_int;
+}
