@@ -226,6 +226,7 @@ void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
 // game of life algo helpers
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])
 {
+    printf("INT TO MATRIX!\n");
     int row = 0;
     for (int i = 0, p = 1; i < INTEGER_LENGTH; i++, p *= 2) {
 
@@ -238,6 +239,7 @@ void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])
             matrix[row][col] = 1;
         }
     }
+    printf("INT TO MATRIX done!\n");
 }
 
 int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
@@ -281,7 +283,9 @@ void next_life_generation(sequencer *s)
     int_to_matrix(cur_pattern_as_int, s->matrix1);
 
     for (int y = 0; y < GRIDWIDTH; y++) {
+        printf("Y!\n");
         for (int x = 0; x < GRIDWIDTH; x++) {
+            printf("x!\n");
 
             int neighbors = 0;
 
@@ -319,7 +323,6 @@ void next_life_generation(sequencer *s)
         }
     }
 
-    int return_pattern = matrix_to_int(s->matrix2);
     int new_pattern = matrix_to_int(s->matrix2);
     printf("NEW PATTERN! %d\n", new_pattern);
     if (new_pattern == 0)
