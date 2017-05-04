@@ -4,7 +4,7 @@
 #include <wchar.h>
 
 #define GRIDWIDTH (SEQUENCER_PATTERN_LEN / 4)
-#define INTEGER_LENGTH pow(2, PPBAR)
+#define INTEGER_LENGTH pow(2, SEQUENCER_PATTERN_LEN)
 
 #define NUM_SEQUENCER_PATTERNS 10
 

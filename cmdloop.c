@@ -183,7 +183,8 @@ void interpret(char *line)
         //            mixr->sound_generators[soundgen_num]->type ==
         //                SYNTHDRUM_TYPE) {
         //            if (strncmp("midi", wurds[2], 4) == 0) {
-        //                printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer %d\n",
+        //                printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer
+        //                %d\n",
         //                       soundgen_num);
         //                mixr->midi_control_destination = MIDISYNTHDRUM;
         //                mixr->active_midi_soundgen_num = soundgen_num;
@@ -985,7 +986,9 @@ bool is_valid_file(char *filename)
 
 int exxit()
 {
-    printf(COOL_COLOR_GREEN "\nBeat it, ya val jerk...\n" ANSI_COLOR_RESET); // Thrashin' reference
+    printf(
+        COOL_COLOR_GREEN
+        "\nBeat it, ya val jerk...\n" ANSI_COLOR_RESET); // Thrashin' reference
     pa_teardown();
     exit(0);
 }

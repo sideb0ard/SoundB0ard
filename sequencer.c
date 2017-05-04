@@ -218,6 +218,7 @@ void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
          sp = strtok_r(NULL, sep, &sp_last)) {
         pattern[sp_count++] = atoi(sp);
     }
+    memset(final_pattern, 0, PPBAR * sizeof(int));
     for (int i = 0; i < sp_count; i++) {
         final_pattern[pattern[i] * PPSIXTEENTH] = 1;
     }
@@ -226,7 +227,6 @@ void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
 // game of life algo helpers
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])
 {
-    printf("INT TO MATRIX!\n");
     int row = 0;
     for (int i = 0, p = 1; i < INTEGER_LENGTH; i++, p *= 2) {
 
@@ -239,7 +239,6 @@ void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH])
             matrix[row][col] = 1;
         }
     }
-    printf("INT TO MATRIX done!\n");
 }
 
 int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
@@ -278,18 +277,16 @@ void next_life_generation(sequencer *s)
 {
     memset(s->matrix1, 0, sizeof s->matrix1);
     memset(s->matrix2, 0, sizeof s->matrix2);
-    int cur_pattern_as_int = pattern_as_int_representation(s->patterns[s->cur_pattern]);
-    printf("CUR PATTERN AS INT %d\n", cur_pattern_as_int);
+    int cur_pattern_as_int =
+        pattern_as_int_representation((int *)&s->patterns[s->cur_pattern]);
+    // printf("CUR PATTERN AS INT %d\n", cur_pattern_as_int);
     int_to_matrix(cur_pattern_as_int, s->matrix1);
 
     for (int y = 0; y < GRIDWIDTH; y++) {
-        printf("Y!\n");
         for (int x = 0; x < GRIDWIDTH; x++) {
-            printf("x!\n");
-
             int neighbors = 0;
 
-            printf("My co-ords y:%d x:%d\n", y, x);
+            // printf("My co-ords y:%d x:%d\n", y, x);
             for (int rel_y = y - 1; rel_y <= y + 1; rel_y++) {
                 for (int rel_x = x - 1; rel_x <= x + 1; rel_x++) {
                     int n_y = rel_y;
@@ -309,7 +306,7 @@ void next_life_generation(sequencer *s)
                     }
                 }
             }
-            printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
+            // printf("[%d][%d] - I gots %d neighbors\n", y, x, neighbors);
 
             // the RULES
             if (s->matrix1[y][x] == 0 && neighbors == 3)
@@ -324,12 +321,13 @@ void next_life_generation(sequencer *s)
     }
 
     int new_pattern = matrix_to_int(s->matrix2);
-    printf("NEW PATTERN! %d\n", new_pattern);
+    // printf("NEW PATTERN! %d\n", new_pattern);
     if (new_pattern == 0)
-       new_pattern = seed_pattern();
+        new_pattern = seed_pattern();
 
     memset(&s->patterns[0], 0, PPBAR * sizeof(int));
-    convert_bitshift_pattern_to_pattern(new_pattern, s->patterns[0], PPBAR, SIXTEENTH);
+    convert_bitshift_pattern_to_pattern(new_pattern, s->patterns[0], PPBAR,
+                                        SIXTEENTH);
 }
 
 void next_markov_generation(sequencer *s)
@@ -648,7 +646,7 @@ void seq_set_backup_mode(sequencer *s, bool on)
         memset(s->backup_pattern_while_getting_crazy, 0, PPBAR * sizeof(int));
         memcpy(s->backup_pattern_while_getting_crazy, &s->patterns[0],
                PPBAR * sizeof(int));
-        //memset(&s->patterns[0], 0, PPBAR * sizeof(int));
+        // memset(&s->patterns[0], 0, PPBAR * sizeof(int));
         s->multi_pattern_mode = false;
         s->cur_pattern = 0;
     }

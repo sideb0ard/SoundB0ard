@@ -6,6 +6,7 @@
 #include "utils.h"
 
 extern mixer *mixr;
+extern const wchar_t *sparkchars;
 
 void build_euclidean_pattern_int(int level, int *bitmap_int,
                                  int *bitmap_position, int *count,
@@ -120,6 +121,17 @@ void char_binary_version_of_int(int num, char bin_num[17])
     bin_num[16] = '\0';
 }
 
+void wchar_binary_version_of_pattern(seq_pattern p, wchar_t bin_num[17])
+{
+    for (int i = 0; i < 16; i++) {
+        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+            bin_num[i] = sparkchars[5];
+        else
+            bin_num[i] = sparkchars[0];
+    }
+    bin_num[16] = '\0';
+}
+
 void char_binary_version_of_pattern(seq_pattern p, char bin_num[17])
 {
     for (int i = 0; i < 16; i++) {
@@ -171,9 +183,10 @@ int pattern_as_int_representation(seq_pattern p)
 {
     int pattern_as_int = 0;
     for (int i = 0; i < 16; i++) {
-        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
-            pattern_as_int = pattern_as_int | (2^(15-i));
+        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH)) {
+            int cur_bit = pow(2, 15 - i);
+            pattern_as_int = pattern_as_int | cur_bit;
+        }
     }
-    printf("PATTERN AS INT: %d\n", pattern_as_int);
     return pattern_as_int;
 }
