@@ -277,25 +277,25 @@ int add_minisynth(mixer *mixr)
     return add_sound_generator(mixr, (SOUNDGEN *)ms);
 }
 
-int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern)
-{
-    // preliminary setup
-    char cwd[1024];
-    getcwd(cwd, 1024);
-    char full_filename[strlen(filename) + strlen(cwd) +
-                       7]; // 7 == '/wavs/' is 6 and 1 for '\0'
-    strcpy(full_filename, cwd);
-    strcat(full_filename, "/wavs/");
-    strcat(full_filename, filename);
-
-    sample_sequencer *nseq =
-        new_sample_seq_from_char_pattern(full_filename, pattern);
-    if (nseq == NULL) {
-        printf("Barfed on seq creation\n");
-        return -1;
-    }
-    return add_sound_generator(mixr, (SOUNDGEN *)nseq);
-}
+// int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern)
+// {
+//     // preliminary setup
+//     char cwd[1024];
+//     getcwd(cwd, 1024);
+//     char full_filename[strlen(filename) + strlen(cwd) +
+//                        7]; // 7 == '/wavs/' is 6 and 1 for '\0'
+//     strcpy(full_filename, cwd);
+//     strcat(full_filename, "/wavs/");
+//     strcat(full_filename, filename);
+// 
+//     sample_sequencer *nseq =
+//         new_sample_seq_from_char_pattern(full_filename, pattern);
+//     if (nseq == NULL) {
+//         printf("Barfed on seq creation\n");
+//         return -1;
+//     }
+//     return add_sound_generator(mixr, (SOUNDGEN *)nseq);
+// }
 
 int add_looper(mixer *mixr, char *filename, double loop_len)
 {

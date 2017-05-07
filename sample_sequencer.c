@@ -2,6 +2,7 @@
 #include <math.h>
 #include <sndfile.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <string.h>
 #include <wchar.h>
 
@@ -25,10 +26,18 @@ sample_sequencer *new_sample_seq(char *filename)
         seq->samples_now_playing[i] = -1;
     }
 
+	char cwd[1024];
+	getcwd(cwd, 1024);
+	char full_filename[strlen(filename) + strlen(cwd) +
+	                   7]; // 7 == '/wavs/' is 6 and 1 for '\0'
+	strcpy(full_filename, cwd);
+	strcat(full_filename, "/wavs/");
+	strcat(full_filename, filename);
+
     SF_INFO sf_info;
     memset(&sf_info, 0, sizeof(SF_INFO));
     int bufsize;
-    int *buffer = load_file_to_buffer(filename, &bufsize, &sf_info);
+    int *buffer = load_file_to_buffer(full_filename, &bufsize, &sf_info);
 
     int fslen = strlen(filename);
     seq->filename = (char *)calloc(1, fslen + 1);

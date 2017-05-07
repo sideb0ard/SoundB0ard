@@ -579,7 +579,7 @@ void seq_set_sample_amp(sequencer *s, int pattern_num, int pattern_position,
 
 void seq_set_random_sample_amp(sequencer *s, int pattern_num)
 {
-    for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
+    for (int i = 0; i < s->pattern_len; i++) {
         double randy = (double)rand() / (double)RAND_MAX;
         seq_set_sample_amp(s, pattern_num, i, randy);
     }
