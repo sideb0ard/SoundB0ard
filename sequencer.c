@@ -693,8 +693,17 @@ void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p, wchar_t *b
 
 void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p, char *bin_num)
 {
+    int incs = 0;
+    switch(s->pattern_len) {
+    case(24):
+        incs = PPTWENTYFOURTH;
+        break;
+    case(16):
+        incs = PPSIXTEENTH;
+        break;
+    }
     for (int i = 0; i < s->pattern_len; i++) {
-        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+        if (is_int_member_in_array(1, &p[i * incs], incs))
             bin_num[i] = '1';
         else
             bin_num[i] = '0';
