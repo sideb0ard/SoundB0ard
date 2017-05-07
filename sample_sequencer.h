@@ -41,7 +41,6 @@ typedef struct sample_sequencer {
     // midi - top row
     double m_fc_control;
     double m_q_control;
-    int swing_setting;
     double vol;
     filter_moogladder m_filter;
     // midi - bottom row, mode 1
@@ -68,8 +67,6 @@ void sample_seq_status(void *self, wchar_t *ss);
 void sample_seq_setvol(void *self, double v);
 double sample_seq_gennext(void *self);
 double sample_seq_getvol(void *self);
-
-void swingrrr(void *self, int swing_setting);
 
 int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info);
 void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,

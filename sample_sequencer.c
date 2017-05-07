@@ -184,8 +184,8 @@ void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf Swing: %d",
-             basename(seq->filename), seq->vol, seq->swing_setting);
+             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf ",
+             basename(seq->filename), seq->vol );
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);
@@ -206,20 +206,6 @@ void sample_seq_setvol(void *self, double v)
         return;
     }
     seq->vol = v;
-}
-
-void swingrrr(void *self, int swing_setting)
-// swing_setting in range {1..6}, with same convention as
-// Linn seq machines - 50%, 54%, 58%, 62%, 66%, 71%
-{
-    sample_sequencer *seq = (sample_sequencer *)self;
-    if (swing_setting == 0) {
-        seq->swing = 0;
-    }
-    else {
-        seq->swing = 1;
-        seq->swing_setting = swing_setting;
-    }
 }
 
 // TODO make this part of SOUND GENERATOR
@@ -243,7 +229,7 @@ void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
     case 3:
         scaley_val = scaleybum(0, 127, 1, 6, data2);
         printf("SWIIIiiing!! %f\n", scaley_val);
-        s->swing_setting = scaley_val;
+        //s->swing_setting = scaley_val;
         break;
     case 4:
         scaley_val = scaleybum(0, 127, 0., 1., data2);

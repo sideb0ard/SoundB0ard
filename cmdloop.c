@@ -239,11 +239,6 @@ void interpret(char *line)
                         mixr->midi_control_destination = MIDISEQUENCER;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
-                    else if (strncmp("swing", wurds[2], 5) == 0) {
-                        int swing_setting = atoi(wurds[3]);
-                        swingrrr(mixr->sound_generators[soundgen_num],
-                                 swing_setting);
-                    }
                     else {
                         sample_sequencer *s =
                             (sample_sequencer *)
@@ -930,14 +925,6 @@ bool is_valid_sample_num(looper *s, int sample_num)
     return false;
 }
 
-bool is_valid_seq_pattern_num(sequencer *d, int pattern_num)
-{
-    if (pattern_num < d->num_patterns) {
-        return true;
-    }
-    return false;
-}
-
 bool is_valid_fx_num(int soundgen_num, int fx_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
@@ -989,9 +976,30 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         printf("Change gridsteps to %d\n", gridsteps);
         seq_set_gridsteps(seq, gridsteps);
     }
+    else if (strncmp("mv", wurds[2], 2) == 0) {
+        int pattern_num = atoi(wurds[3]);
+        if (seq_is_valid_pattern_num(seq, pattern_num)) {
+            int hitfrom = atoi(wurds[4]);
+            int hitto = atoi(wurds[5]);
+            seq_mv_hit(seq, pattern_num, hitfrom, hitto);
+        }
+    }
+    else if (strncmp("print", wurds[2], 5) == 0) {
+        int pattern_num = atoi(wurds[3]);
+        if (seq_is_valid_pattern_num(seq, pattern_num)) {
+            printf("Printing pattern for %d\n", pattern_num);
+            seq_print_pattern(seq, pattern_num);
+        }
+    }
     else if (strncmp("randamp", wurds[2], 6) == 0) {
         seq_set_randamp(seq, 1 - seq->randamp_on);
         printf("Toggling randamp to %s \n", seq->randamp_on ? "true" : "false");
+    }
+    else if (strncmp("swing", wurds[2], 5) == 0) {
+        int pattern_num = atoi(wurds[3]);
+        if (seq_is_valid_pattern_num(seq, pattern_num)) {
+            printf("changing swing for %d\n", pattern_num);
+        }
     }
     else if (strncmp("multi", wurds[2], 5) == 0) {
         if (strncmp("true", wurds[3], 4) == 0) {
@@ -1021,16 +1029,15 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             seq_set_bitwise_mode(seq, bitwise_mode);
         }
         else {
-            char_array_to_seq_string_pattern(seq, pattern, wurds, 5, num_wurds);
-            printf("Changing\n");
-
             int pattern_num = atoi(wurds[3]);
-            if (is_valid_seq_pattern_num(seq, pattern_num)) {
+            if (seq_is_valid_pattern_num(seq, pattern_num)) {
                 if (strncmp("pattern", wurds[4], 7) == 0) {
+                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5, num_wurds);
                     printf("Changing pattern to %s\n", pattern);
                     change_char_pattern(seq, pattern_num, pattern);
                 }
                 else if (strncmp("amp", wurds[4], 3) == 0) {
+                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5, num_wurds);
                     printf("Setting pattern AMP to %s\n", pattern);
                     seq_set_sample_amp_from_char_pattern(seq, pattern_num,
                                                          pattern);

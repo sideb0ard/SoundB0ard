@@ -725,3 +725,36 @@ void seq_set_gridsteps(sequencer *s, unsigned int gridsteps)
         break;
     }
 }
+
+void seq_print_pattern(sequencer *s, unsigned int pattern_num)
+{
+    if (seq_is_valid_pattern_num(s, pattern_num)) {
+        printf("Pattern %d\n", pattern_num);
+        for (int i = 0; i < PPBAR; i++) {
+            if (s->patterns[pattern_num][i] == 1) {
+                printf("[%d] on\n", i);
+            }
+        }
+    }
+}
+
+bool seq_is_valid_pattern_num(sequencer *d, int pattern_num)
+{
+    if (pattern_num >= 0 && pattern_num < d->num_patterns) {
+        return true;
+    }
+    return false;
+}
+
+void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
+{
+    if (seq_is_valid_pattern_num(s, pattern_num)) {
+        if (s->patterns[pattern_num][stepfrom] == 1 && stepto < PPBAR) {
+            s->patterns[pattern_num][stepfrom] = 0;
+            s->patterns[pattern_num][stepto] = 1;
+        } else {
+            printf("Sumthing wrong - either stepfrom(%d) is not a hit or stepto(%d) not less than PPBAR(%d)\n", stepfrom, stepto, PPBAR); 
+        }
+    }
+}
+

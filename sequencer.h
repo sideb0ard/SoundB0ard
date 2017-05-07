@@ -103,3 +103,6 @@ void seq_set_max_generations(sequencer *s, int max);
 void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p, wchar_t *bin_num);
 void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p, char *bin_num);
 void seq_set_gridsteps(sequencer *s, unsigned int gridsteps);
+void seq_print_pattern(sequencer *s, unsigned int pattern_num);
+bool seq_is_valid_pattern_num(sequencer *s, int pattern_num);
+void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto);
