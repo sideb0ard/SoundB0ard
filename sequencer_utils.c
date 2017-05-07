@@ -74,16 +74,22 @@ void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array,
                                          int len_pattern_array,
                                          unsigned gridsize)
 {
-    for (int i = 15; i >= 0; i--) {
+    int steps = 0;
+    if (gridsize == TWENTYFOURTH)
+        steps = 23;
+    else if (gridsize == SIXTEENTH)
+        steps = 15;
+
+    for (int i = steps; i >= 0; i--) {
         if (bitpattern & 1 << i) {
             int bitposition = 0;
             switch (gridsize) {
             case (TWENTYFOURTH):
-                bitposition = (15 - i) * PPTWENTYFOURTH;
+                bitposition = (steps - i) * PPTWENTYFOURTH;
                 break;
             case (SIXTEENTH):
             default:
-                bitposition = (15 - i) * PPSIXTEENTH;
+                bitposition = (steps - i) * PPSIXTEENTH;
                 break;
             }
             if (bitposition < len_pattern_array) {
@@ -117,28 +123,6 @@ void char_binary_version_of_int(int num, char bin_num[17])
             bin_num[15 - i] = '1';
         else
             bin_num[15 - i] = '0';
-    }
-    bin_num[16] = '\0';
-}
-
-void wchar_binary_version_of_pattern(seq_pattern p, wchar_t bin_num[17])
-{
-    for (int i = 0; i < 16; i++) {
-        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
-            bin_num[i] = sparkchars[5];
-        else
-            bin_num[i] = sparkchars[0];
-    }
-    bin_num[16] = '\0';
-}
-
-void char_binary_version_of_pattern(seq_pattern p, char bin_num[17])
-{
-    for (int i = 0; i < 16; i++) {
-        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
-            bin_num[i] = '1';
-        else
-            bin_num[i] = '0';
     }
     bin_num[16] = '\0';
 }

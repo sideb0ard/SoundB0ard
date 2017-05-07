@@ -8,7 +8,8 @@
 
 #define NUM_SEQUENCER_PATTERNS 10
 
-typedef enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;
+enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;
+enum { SIXTEENTH, TWENTYFOURTH } sequencer_grid_step;
 
 typedef int seq_pattern[PPBAR];
 
@@ -16,6 +17,9 @@ typedef struct sequencer {
 
     int sixteenth_tick;
     int midi_tick;
+
+    unsigned int gridsteps;
+    int pattern_len; // 24th or 16th
 
     int matrix1[GRIDWIDTH][GRIDWIDTH];
     int matrix2[GRIDWIDTH][GRIDWIDTH];
@@ -73,8 +77,7 @@ void change_int_pattern(sequencer *s, int pattern_num, int pattern);
 void seq_set_multi_pattern_mode(sequencer *s, bool multi);
 void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops);
 
-void int_pattern_to_array(int pattern, int *pat_array);
-void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR]);
+void pattern_char_to_pattern(sequencer *s, char *char_pattern, int final_pattern[PPBAR]);
 void wchar_version_of_amp(sequencer *s, int pattern_num, wchar_t apattern[49]);
 
 int seed_pattern(void);
@@ -96,3 +99,7 @@ void seq_set_bitwise_mode(sequencer *s, unsigned int mode);
 
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);
+
+void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p, wchar_t *bin_num);
+void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p, char *bin_num);
+void seq_set_gridsteps(sequencer *s, unsigned int gridsteps);

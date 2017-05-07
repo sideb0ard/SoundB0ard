@@ -705,32 +705,6 @@ void interpret(char *line)
                 }
             }
         }
-        else if (strncmp("sidechain", wurds[0], 9) == 0) {
-            int soundgen_num = atoi(wurds[1]);
-            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
-                int input_src = atoi(wurds[2]);
-                int percent_mix = atoi(wurds[3]);
-                printf("SIDEHCINA %d %d %d\n", soundgen_num, input_src,
-                       percent_mix);
-                // if (mixr->sound_generators[input_src]->type ==
-                // SEQUENCER_TYPE) {
-                //    sequencer *d = (sequencer *)
-                //    mixr->sound_generators[input_src]->type;
-                //    int pat_array[SEQUENCER_PATTERN_LEN];
-                //    int_pattern_to_array(d->patterns[d->cur_pattern],
-                //                         pat_array);
-                //    for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++)
-                //    {
-                //        printf("sequencerMMMM %d\n", pat_array[0]);
-                //    }
-                //    //ENVSTREAM *e = new_sidechain_stream(pat_array,
-                //    percent_mix);
-                //    //printf("GOT STREAM\n");
-                //    //add_envelope_soundgen(mixr->sound_generators[soundgen_num],
-                //    e);
-                //}
-            }
-        }
 
         else if (strncmp("fx", wurds[0], 2) == 0) {
             int soundgen_num = atoi(wurds[1]);
@@ -1000,6 +974,15 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         printf("Adding\n");
         char_array_to_seq_string_pattern(pattern, wurds, 3, num_wurds);
         add_char_pattern(seq, pattern);
+    }
+    else if (strncmp("grid", wurds[2], 4) == 0) {
+        int gridsteps = atoi(wurds[3]);
+        if ( gridsteps != 16 && gridsteps != 24) {
+            printf("Gridsteps must be either 16 or 24 (not %d)\n", gridsteps);
+            return;
+        }
+        printf("Change gridsteps to %d\n", gridsteps);
+        seq_set_gridsteps(seq, gridsteps);
     }
     else if (strncmp("randamp", wurds[2], 6) == 0) {
         seq_set_randamp(seq, 1 - seq->randamp_on);

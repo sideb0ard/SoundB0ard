@@ -166,7 +166,7 @@ sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
                                                    char *pattern)
 {
     sample_sequencer *seq = new_sample_seq(filename);
-    pattern_char_to_pattern(pattern,
+    pattern_char_to_pattern(&seq->m_seq, pattern,
                             seq->m_seq.patterns[seq->m_seq.num_patterns++]);
     return seq;
 }

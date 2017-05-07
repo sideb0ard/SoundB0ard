@@ -19,7 +19,7 @@ const double DEFAULT_AMP = 0.7;
 void seq_init(sequencer *seq)
 {
 
-    seq->sixteenth_tick = 0;
+    seq->sixteenth_tick = 0; // TODO - this is less relevant, now that i also have 24th
     seq->midi_tick = 0;
 
     memset(seq->matrix1, 0, sizeof seq->matrix1);
@@ -29,6 +29,8 @@ void seq_init(sequencer *seq)
     seq->cur_pattern = 0;
     seq->multi_pattern_mode = true;
     seq->cur_pattern_iteration = 1;
+    seq->gridsteps = SIXTEENTH;
+    seq->pattern_len = 16;
 
     for (int i = 0; i < NUM_SEQUENCER_PATTERNS; i++) {
         seq->pattern_num_loops[i] = 1;
@@ -66,6 +68,8 @@ void seq_init(sequencer *seq)
 
 bool seq_tick(sequencer *seq)
 {
+    // TODO - maybe rename this - the main reason is to know
+    // when we're at the start of a loop
     if (mixr->sixteenth_note_tick != seq->sixteenth_tick) {
         seq->sixteenth_tick = mixr->sixteenth_note_tick;
 
@@ -194,24 +198,14 @@ bool seq_tick(sequencer *seq)
     return false;
 }
 
-void int_pattern_to_array(int pattern, int *pat_array)
-{
-    for (int i = 0, p = 1; p < 65535; i++, p *= 2) {
-        if (pattern & p) {
-            pat_array[i] = 1;
-        }
-        else {
-            pat_array[i] = 0;
-        }
-    }
-}
-
-void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
+void pattern_char_to_pattern(sequencer *s, char *char_pattern, int final_pattern[PPBAR])
 {
     int sp_count = 0;
     char *sp, *sp_last;
-    int pattern[16];
+    int pattern[s->pattern_len];
     char const *sep = " ";
+
+    printf("GOtz char_pattern %s\n", char_pattern);
 
     // extract numbers from string into pattern
     for (sp = strtok_r(char_pattern, sep, &sp_last); sp;
@@ -219,8 +213,21 @@ void pattern_char_to_pattern(char *char_pattern, int final_pattern[PPBAR])
         pattern[sp_count++] = atoi(sp);
     }
     memset(final_pattern, 0, PPBAR * sizeof(int));
+    int mult = 0;
+    switch(s->gridsteps) {
+    case(SIXTEENTH):
+        mult = PPSIXTEENTH;
+        printf("Case 16! multis %d\n", mult);
+        break;
+    case(TWENTYFOURTH):
+        mult = PPTWENTYFOURTH;
+        printf("Case 24! multis %d\n", mult);
+        break;
+    }
+
     for (int i = 0; i < sp_count; i++) {
-        final_pattern[pattern[i] * PPSIXTEENTH] = 1;
+        printf("Adding hit to midi step %d\n", pattern[i] * mult);
+        final_pattern[pattern[i] * mult] = 1;
     }
 }
 
@@ -264,12 +271,12 @@ void next_euclidean_generation(sequencer *s)
 {
     memset(&s->patterns[0], 0, PPBAR * sizeof(int));
     int rand_steps = (rand() % 9) + 1;
-    int bitpattern = create_euclidean_rhythm(rand_steps, SEQUENCER_PATTERN_LEN);
+    int bitpattern = create_euclidean_rhythm(rand_steps, s->pattern_len);
     if (rand() % 2 == 1)
         bitpattern =
-            shift_bits_to_leftmost_position(bitpattern, SEQUENCER_PATTERN_LEN);
+            shift_bits_to_leftmost_position(bitpattern, s->pattern_len);
     convert_bitshift_pattern_to_pattern(
-        bitpattern, (int *)&s->patterns[s->cur_pattern], PPBAR, SIXTEENTH);
+        bitpattern, (int *)&s->patterns[s->cur_pattern], PPBAR, s->gridsteps);
 }
 
 // game of life algo
@@ -338,7 +345,7 @@ void next_markov_generation(sequencer *s)
         return;
     }
 
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < s->pattern_len; i++) {
         int randy = rand() % 100;
         if (mixr->debug_mode)
             printf("Iiii %d Randy! %d\n", i, randy);
@@ -497,19 +504,19 @@ void seq_status(sequencer *seq, wchar_t *status_string)
 {
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"\n      CurStep: %d life_mode: %d Every_n: %d "
+        L"\n      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d"
         "markov_on: %d markov_mode: %s Markov_Every_n: %d Multi: %d Max Gen: %d"
         L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
-        seq->markov_on, seq->markov_mode ? "boombap" : "haus",
+        seq->pattern_len, seq->markov_on, seq->markov_mode ? "boombap" : "haus",
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
         seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on,
         seq->euclidean_every_n_loops);
     wchar_t pattern_details[128];
-    char spattern[17];
-    wchar_t apattern[17];
+    char spattern[seq->pattern_len + 1];
+    wchar_t apattern[seq->pattern_len + 1];
     for (int i = 0; i < seq->num_patterns; i++) {
-        char_binary_version_of_pattern(seq->patterns[i], spattern);
+        seq_char_binary_version_of_pattern(seq, seq->patterns[i], spattern);
         wchar_version_of_amp(seq, i, apattern);
         swprintf(pattern_details, 127, L"\n      [%d] - [%s] %ls  numloops: %d",
                  i, spattern, apattern, seq->pattern_num_loops[i]);
@@ -519,20 +526,20 @@ void seq_status(sequencer *seq, wchar_t *status_string)
 }
 
 // TODO - fix this - being lazy and want it finished NOW!
-void wchar_version_of_amp(sequencer *d, int pattern_num, wchar_t apattern[17])
+void wchar_version_of_amp(sequencer *s, int pattern_num, wchar_t *apattern)
 {
-    for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
-        double amp = d->pattern_position_amp[pattern_num][i];
+    for (int i = 0; i < s->pattern_len; i++) {
+        double amp = s->pattern_position_amp[pattern_num][i];
         int idx = (int)floor(scaleybum(0, 1.1, 0, wcslen(sparkchars), amp));
         apattern[i] = sparkchars[idx];
         // wprintf(L"\n%ls\n", sparkchars[3]);
     }
-    apattern[16] = '\0';
+    apattern[s->pattern_len] = '\0';
 }
 
 void add_char_pattern(sequencer *s, char *pattern)
 {
-    pattern_char_to_pattern(pattern, s->patterns[s->num_patterns++]);
+    pattern_char_to_pattern(s, pattern, s->patterns[s->num_patterns++]);
     s->cur_pattern++;
 }
 
@@ -544,7 +551,7 @@ void add_char_pattern(sequencer *s, char *pattern)
 
 void change_char_pattern(sequencer *s, int pattern_num, char *pattern)
 {
-    pattern_char_to_pattern(pattern, s->patterns[pattern_num]);
+    pattern_char_to_pattern(s, pattern, s->patterns[pattern_num]);
 }
 
 // void change_int_pattern(sequencer *s, int pattern_num, int pattern)
@@ -671,3 +678,41 @@ void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
 }
 
 void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }
+
+
+void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p, wchar_t *bin_num)
+{
+    for (int i = 0; i < s->pattern_len; i++) {
+        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+            bin_num[i] = sparkchars[5];
+        else
+            bin_num[i] = sparkchars[0];
+    }
+    bin_num[s->pattern_len] = '\0';
+}
+
+void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p, char *bin_num)
+{
+    for (int i = 0; i < s->pattern_len; i++) {
+        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+            bin_num[i] = '1';
+        else
+            bin_num[i] = '0';
+    }
+    bin_num[s->pattern_len] = '\0';
+}
+
+void seq_set_gridsteps(sequencer *s, unsigned int gridsteps)
+{
+    printf("SEQ! changing gridsteps to %d\n", gridsteps);
+    switch(gridsteps) {
+    case(16):
+        s->gridsteps = SIXTEENTH;
+        s->pattern_len = gridsteps;
+        break;
+    case(24):
+        s->gridsteps = TWENTYFOURTH;
+        s->pattern_len = gridsteps;
+        break;
+    }
+}
