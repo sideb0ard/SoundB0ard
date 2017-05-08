@@ -19,7 +19,8 @@ const double DEFAULT_AMP = 0.7;
 void seq_init(sequencer *seq)
 {
 
-    seq->sixteenth_tick = 0; // TODO - this is less relevant, now that i also have 24th
+    seq->sixteenth_tick =
+        0; // TODO - this is less relevant, now that i also have 24th
     seq->midi_tick = 0;
 
     memset(seq->matrix1, 0, sizeof seq->matrix1);
@@ -198,7 +199,8 @@ bool seq_tick(sequencer *seq)
     return false;
 }
 
-void pattern_char_to_pattern(sequencer *s, char *char_pattern, int final_pattern[PPBAR])
+void pattern_char_to_pattern(sequencer *s, char *char_pattern,
+                             int final_pattern[PPBAR])
 {
     int sp_count = 0;
     char *sp, *sp_last;
@@ -214,12 +216,12 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern, int final_pattern
     }
     memset(final_pattern, 0, PPBAR * sizeof(int));
     int mult = 0;
-    switch(s->gridsteps) {
-    case(SIXTEENTH):
+    switch (s->gridsteps) {
+    case (SIXTEENTH):
         mult = PPSIXTEENTH;
         printf("Case 16! multis %d\n", mult);
         break;
-    case(TWENTYFOURTH):
+    case (TWENTYFOURTH):
         mult = PPTWENTYFOURTH;
         printf("Case 24! multis %d\n", mult);
         break;
@@ -679,8 +681,8 @@ void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
 
 void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }
 
-
-void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p, wchar_t *bin_num)
+void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
+                                         wchar_t *bin_num)
 {
     for (int i = 0; i < s->pattern_len; i++) {
         if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
@@ -691,14 +693,15 @@ void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p, wchar_t *b
     bin_num[s->pattern_len] = '\0';
 }
 
-void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p, char *bin_num)
+void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p,
+                                        char *bin_num)
 {
     int incs = 0;
-    switch(s->pattern_len) {
-    case(24):
+    switch (s->pattern_len) {
+    case (24):
         incs = PPTWENTYFOURTH;
         break;
-    case(16):
+    case (16):
         incs = PPSIXTEENTH;
         break;
     }
@@ -714,12 +717,12 @@ void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p, char *bin_n
 void seq_set_gridsteps(sequencer *s, unsigned int gridsteps)
 {
     printf("SEQ! changing gridsteps to %d\n", gridsteps);
-    switch(gridsteps) {
-    case(16):
+    switch (gridsteps) {
+    case (16):
         s->gridsteps = SIXTEENTH;
         s->pattern_len = gridsteps;
         break;
-    case(24):
+    case (24):
         s->gridsteps = TWENTYFOURTH;
         s->pattern_len = gridsteps;
         break;
@@ -752,9 +755,25 @@ void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
         if (s->patterns[pattern_num][stepfrom] == 1 && stepto < PPBAR) {
             s->patterns[pattern_num][stepfrom] = 0;
             s->patterns[pattern_num][stepto] = 1;
-        } else {
-            printf("Sumthing wrong - either stepfrom(%d) is not a hit or stepto(%d) not less than PPBAR(%d)\n", stepfrom, stepto, PPBAR); 
+        }
+        else {
+            printf("Sumthing wrong - either stepfrom(%d) is not a hit or "
+                   "stepto(%d) not less than PPBAR(%d)\n",
+                   stepfrom, stepto, PPBAR);
         }
     }
 }
 
+void seq_add_hit(sequencer *s, int pattern_num, int step)
+{
+    if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR) {
+        s->patterns[pattern_num][step] = 1;
+    }
+}
+
+void seq_rm_hit(sequencer *s, int pattern_num, int step)
+{
+    if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR) {
+        s->patterns[pattern_num][step] = 0;
+    }
+}

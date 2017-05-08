@@ -77,7 +77,8 @@ void change_int_pattern(sequencer *s, int pattern_num, int pattern);
 void seq_set_multi_pattern_mode(sequencer *s, bool multi);
 void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops);
 
-void pattern_char_to_pattern(sequencer *s, char *char_pattern, int final_pattern[PPBAR]);
+void pattern_char_to_pattern(sequencer *s, char *char_pattern,
+                             int final_pattern[PPBAR]);
 void wchar_version_of_amp(sequencer *s, int pattern_num, wchar_t apattern[49]);
 
 int seed_pattern(void);
@@ -100,9 +101,13 @@ void seq_set_bitwise_mode(sequencer *s, unsigned int mode);
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);
 
-void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p, wchar_t *bin_num);
-void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p, char *bin_num);
+void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
+                                         wchar_t *bin_num);
+void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p,
+                                        char *bin_num);
 void seq_set_gridsteps(sequencer *s, unsigned int gridsteps);
 void seq_print_pattern(sequencer *s, unsigned int pattern_num);
 bool seq_is_valid_pattern_num(sequencer *s, int pattern_num);
 void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto);
+void seq_add_hit(sequencer *s, int pattern_num, int step);
+void seq_rm_hit(sequencer *s, int pattern_num, int step);

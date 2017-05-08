@@ -287,7 +287,7 @@ int add_minisynth(mixer *mixr)
 //     strcpy(full_filename, cwd);
 //     strcat(full_filename, "/wavs/");
 //     strcat(full_filename, filename);
-// 
+//
 //     sample_sequencer *nseq =
 //         new_sample_seq_from_char_pattern(full_filename, pattern);
 //     if (nseq == NULL) {

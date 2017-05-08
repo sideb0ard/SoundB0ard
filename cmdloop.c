@@ -220,10 +220,15 @@ void interpret(char *line)
 
             if (is_valid_file(wurds[1])) {
                 sample_sequencer *s = new_sample_seq(wurds[1]);
-                char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 2, num_wurds);
-                int sgnum = add_sound_generator(mixr, (SOUNDGEN *) s); //  add_seq_char_pattern(mixr, wurds[1], pattern);
-                pattern_char_to_pattern(&s->m_seq, pattern,
-                                        s->m_seq.patterns[s->m_seq.num_patterns++]);
+                char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 2,
+                                                 num_wurds);
+                int sgnum = add_sound_generator(
+                    mixr,
+                    (SOUNDGEN *)
+                        s); //  add_seq_char_pattern(mixr, wurds[1], pattern);
+                pattern_char_to_pattern(
+                    &s->m_seq, pattern,
+                    s->m_seq.patterns[s->m_seq.num_patterns++]);
                 mixr->midi_control_destination = MIDISEQUENCER;
                 mixr->active_midi_soundgen_num = sgnum;
             }
@@ -901,8 +906,12 @@ void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,
     if (strncmp("all", char_array[start], 3) == 0) {
         if (seq->pattern_len == 16) {
             strncat(dest_pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 127);
-        } else if (seq->pattern_len == 24) {
-            strncat(dest_pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23", 151);
+        }
+        else if (seq->pattern_len == 24) {
+            strncat(
+                dest_pattern,
+                "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23",
+                151);
         }
     }
     else if (strncmp("none", char_array[start], 4) == 0) {
@@ -969,20 +978,12 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
     }
     else if (strncmp("grid", wurds[2], 4) == 0) {
         int gridsteps = atoi(wurds[3]);
-        if ( gridsteps != 16 && gridsteps != 24) {
+        if (gridsteps != 16 && gridsteps != 24) {
             printf("Gridsteps must be either 16 or 24 (not %d)\n", gridsteps);
             return;
         }
         printf("Change gridsteps to %d\n", gridsteps);
         seq_set_gridsteps(seq, gridsteps);
-    }
-    else if (strncmp("mv", wurds[2], 2) == 0) {
-        int pattern_num = atoi(wurds[3]);
-        if (seq_is_valid_pattern_num(seq, pattern_num)) {
-            int hitfrom = atoi(wurds[4]);
-            int hitto = atoi(wurds[5]);
-            seq_mv_hit(seq, pattern_num, hitfrom, hitto);
-        }
     }
     else if (strncmp("print", wurds[2], 5) == 0) {
         int pattern_num = atoi(wurds[3]);
@@ -1031,22 +1032,37 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         else {
             int pattern_num = atoi(wurds[3]);
             if (seq_is_valid_pattern_num(seq, pattern_num)) {
-                if (strncmp("pattern", wurds[4], 7) == 0) {
-                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5, num_wurds);
-                    printf("Changing pattern to %s\n", pattern);
-                    change_char_pattern(seq, pattern_num, pattern);
+                if (strncmp("add", wurds[4], 3) == 0) {
+                    int hit = atoi(wurds[5]);
+                    seq_add_hit(seq, pattern_num, hit);
                 }
                 else if (strncmp("amp", wurds[4], 3) == 0) {
-                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5, num_wurds);
+                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5,
+                                                     num_wurds);
                     printf("Setting pattern AMP to %s\n", pattern);
                     seq_set_sample_amp_from_char_pattern(seq, pattern_num,
                                                          pattern);
+                }
+                else if (strncmp("mv", wurds[4], 2) == 0) {
+                    int hitfrom = atoi(wurds[5]);
+                    int hitto = atoi(wurds[6]);
+                    seq_mv_hit(seq, pattern_num, hitfrom, hitto);
                 }
                 else if (strncmp("numloops", wurds[4], 8) == 0) {
                     int numloops = atoi(wurds[5]);
                     if (numloops != 0) {
                         seq_change_num_loops(seq, pattern_num, numloops);
                     }
+                }
+                else if (strncmp("pattern", wurds[4], 7) == 0) {
+                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5,
+                                                     num_wurds);
+                    printf("Changing pattern to %s\n", pattern);
+                    change_char_pattern(seq, pattern_num, pattern);
+                }
+                else if (strncmp("rm", wurds[4], 2) == 0) {
+                    int hit = atoi(wurds[5]);
+                    seq_rm_hit(seq, pattern_num, hit);
                 }
             }
         }

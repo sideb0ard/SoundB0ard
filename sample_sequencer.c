@@ -2,8 +2,8 @@
 #include <math.h>
 #include <sndfile.h>
 #include <stdlib.h>
-#include <unistd.h>
 #include <string.h>
+#include <unistd.h>
 #include <wchar.h>
 
 #include "defjams.h"
@@ -26,13 +26,13 @@ sample_sequencer *new_sample_seq(char *filename)
         seq->samples_now_playing[i] = -1;
     }
 
-	char cwd[1024];
-	getcwd(cwd, 1024);
-	char full_filename[strlen(filename) + strlen(cwd) +
-	                   7]; // 7 == '/wavs/' is 6 and 1 for '\0'
-	strcpy(full_filename, cwd);
-	strcat(full_filename, "/wavs/");
-	strcat(full_filename, filename);
+    char cwd[1024];
+    getcwd(cwd, 1024);
+    char full_filename[strlen(filename) + strlen(cwd) +
+                       7]; // 7 == '/wavs/' is 6 and 1 for '\0'
+    strcpy(full_filename, cwd);
+    strcat(full_filename, "/wavs/");
+    strcat(full_filename, filename);
 
     SF_INFO sf_info;
     memset(&sf_info, 0, sizeof(SF_INFO));
@@ -185,7 +185,7 @@ void sample_seq_status(void *self, wchar_t *status_string)
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf ",
-             basename(seq->filename), seq->vol );
+             basename(seq->filename), seq->vol);
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);
@@ -229,7 +229,7 @@ void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
     case 3:
         scaley_val = scaleybum(0, 127, 1, 6, data2);
         printf("SWIIIiiing!! %f\n", scaley_val);
-        //s->swing_setting = scaley_val;
+        // s->swing_setting = scaley_val;
         break;
     case 4:
         scaley_val = scaleybum(0, 127, 0., 1., data2);
