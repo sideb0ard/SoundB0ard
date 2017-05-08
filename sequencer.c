@@ -520,8 +520,8 @@ void seq_status(sequencer *seq, wchar_t *status_string)
     for (int i = 0; i < seq->num_patterns; i++) {
         seq_char_binary_version_of_pattern(seq, seq->patterns[i], spattern);
         wchar_version_of_amp(seq, i, apattern);
-        swprintf(pattern_details, 127, L"\n      [%d] - [%s] %ls  numloops: %d",
-                 i, spattern, apattern, seq->pattern_num_loops[i]);
+        swprintf(pattern_details, 127, L"\n      [%d] - [%s] %ls  numloops: %d Swing: %d",
+                 i, spattern, apattern, seq->pattern_num_loops[i], seq->pattern_num_swing_setting[i]);
         wcscat(status_string, pattern_details);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
@@ -766,6 +766,7 @@ void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 
 void seq_add_hit(sequencer *s, int pattern_num, int step)
 {
+    printf("Add'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR) {
         s->patterns[pattern_num][step] = 1;
     }
@@ -773,7 +774,17 @@ void seq_add_hit(sequencer *s, int pattern_num, int step)
 
 void seq_rm_hit(sequencer *s, int pattern_num, int step)
 {
+    printf("Rm'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR) {
         s->patterns[pattern_num][step] = 0;
     }
 }
+
+void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
+{
+    if (seq_is_valid_pattern_num(s, pattern_num)) {
+        printf("Setting pattern %d swing setting to %d\n", pattern_num, swing_setting);
+        s->pattern_num_swing_setting[pattern_num] = swing_setting;
+    }
+}
+

@@ -996,12 +996,6 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         seq_set_randamp(seq, 1 - seq->randamp_on);
         printf("Toggling randamp to %s \n", seq->randamp_on ? "true" : "false");
     }
-    else if (strncmp("swing", wurds[2], 5) == 0) {
-        int pattern_num = atoi(wurds[3]);
-        if (seq_is_valid_pattern_num(seq, pattern_num)) {
-            printf("changing swing for %d\n", pattern_num);
-        }
-    }
     else if (strncmp("multi", wurds[2], 5) == 0) {
         if (strncmp("true", wurds[3], 4) == 0) {
             seq_set_multi_pattern_mode(seq, true);
@@ -1034,6 +1028,7 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             if (seq_is_valid_pattern_num(seq, pattern_num)) {
                 if (strncmp("add", wurds[4], 3) == 0) {
                     int hit = atoi(wurds[5]);
+                    printf("Adding a hit to %d\n", hit);
                     seq_add_hit(seq, pattern_num, hit);
                 }
                 else if (strncmp("amp", wurds[4], 3) == 0) {
@@ -1062,7 +1057,13 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                 }
                 else if (strncmp("rm", wurds[4], 2) == 0) {
                     int hit = atoi(wurds[5]);
+                    printf("Rm'ing hit to %d\n", hit);
                     seq_rm_hit(seq, pattern_num, hit);
+                }
+                else if (strncmp("swing", wurds[4], 5) == 0) {
+                    int swing_setting = atoi(wurds[5]);
+                    printf("changing swing to %d for pattern num %d\n", swing_setting, pattern_num);
+                    seq_swing_pattern(seq, pattern_num, swing_setting);
                 }
             }
         }

@@ -27,6 +27,7 @@ typedef struct sequencer {
     seq_pattern patterns[NUM_SEQUENCER_PATTERNS];
     double pattern_position_amp[NUM_SEQUENCER_PATTERNS][PPBAR];
     int pattern_num_loops[NUM_SEQUENCER_PATTERNS];
+    int pattern_num_swing_setting[NUM_SEQUENCER_PATTERNS];
     seq_pattern backup_pattern_while_getting_crazy; // store current pattern so
                                                     // algorithms can use slot
     int num_patterns;
@@ -111,3 +112,4 @@ bool seq_is_valid_pattern_num(sequencer *s, int pattern_num);
 void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto);
 void seq_add_hit(sequencer *s, int pattern_num, int step);
 void seq_rm_hit(sequencer *s, int pattern_num, int step);
+void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting);
