@@ -903,7 +903,16 @@ void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,
                                       char char_array[NUM_WURDS][SIZE_OF_WURD],
                                       int start, int end)
 {
-    if (strncmp("all", char_array[start], 3) == 0) {
+    if (strncmp("all24", char_array[start], 5) == 0) {
+        if (seq->pattern_len == 16) {
+            seq_set_gridsteps(seq, 24);
+        }
+        strncat(
+            dest_pattern,
+            "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23",
+            151);
+    }
+    else if (strncmp("all", char_array[start], 3) == 0) {
         if (seq->pattern_len == 16) {
             strncat(dest_pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 127);
         }
@@ -1031,6 +1040,11 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                     printf("Adding a hit to %d\n", hit);
                     seq_add_hit(seq, pattern_num, hit);
                 }
+                else if (strncmp("madd", wurds[4], 3) == 0) { // midi pulses
+                    int hit = atoi(wurds[5]);
+                    printf("Adding a hit to %d\n", hit);
+                    seq_add_micro_hit(seq, pattern_num, hit);
+                }
                 else if (strncmp("amp", wurds[4], 3) == 0) {
                     char_array_to_seq_string_pattern(seq, pattern, wurds, 5,
                                                      num_wurds);
@@ -1038,10 +1052,15 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                     seq_set_sample_amp_from_char_pattern(seq, pattern_num,
                                                          pattern);
                 }
-                else if (strncmp("mv", wurds[4], 2) == 0) {
+                else if (strncmp("mv", wurds[4], 2) == 0) { // deals in 16th or 24th
                     int hitfrom = atoi(wurds[5]);
                     int hitto = atoi(wurds[6]);
                     seq_mv_hit(seq, pattern_num, hitfrom, hitto);
+                }
+                else if (strncmp("mmv", wurds[4], 2) == 0) { // deals in midi pulses
+                    int hitfrom = atoi(wurds[5]);
+                    int hitto = atoi(wurds[6]);
+                    seq_mv_micro_hit(seq, pattern_num, hitfrom, hitto);
                 }
                 else if (strncmp("numloops", wurds[4], 8) == 0) {
                     int numloops = atoi(wurds[5]);
@@ -1059,6 +1078,11 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                     int hit = atoi(wurds[5]);
                     printf("Rm'ing hit to %d\n", hit);
                     seq_rm_hit(seq, pattern_num, hit);
+                }
+                else if (strncmp("mrm", wurds[4], 2) == 0) {
+                    int hit = atoi(wurds[5]);
+                    printf("Rm'ing hit to %d\n", hit);
+                    seq_rm_micro_hit(seq, pattern_num, hit);
                 }
                 else if (strncmp("swing", wurds[4], 5) == 0) {
                     int swing_setting = atoi(wurds[5]);

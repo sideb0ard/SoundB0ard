@@ -65,9 +65,9 @@ void mixer_ps(mixer *mixr)
         " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
         " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
         " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
-        "::::: PPQN: %d PPSIXTEENTH: %d PPBAR: %d PPNS: %d " ANSI_COLOR_RESET,
+        "::::: PPQN: %d PPSIXTEENTH: %d PPTWENTYFOURTH: %d PPBAR: %d PPNS: %d " ANSI_COLOR_RESET,
         mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
-        mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPBAR, PPNS);
+        mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");

@@ -109,7 +109,10 @@ void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p,
 void seq_set_gridsteps(sequencer *s, unsigned int gridsteps);
 void seq_print_pattern(sequencer *s, unsigned int pattern_num);
 bool seq_is_valid_pattern_num(sequencer *s, int pattern_num);
-void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto);
-void seq_add_hit(sequencer *s, int pattern_num, int step);
-void seq_rm_hit(sequencer *s, int pattern_num, int step);
+void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto); // these three deal with hits in 16ths
+void seq_add_hit(sequencer *s, int pattern_num, int step); // above
+void seq_rm_hit(sequencer *s, int pattern_num, int step); // above
+void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom, int stepto); // these deal with hits in midi pulses
+void seq_add_micro_hit(sequencer *s, int pattern_num, int step);
+void seq_rm_micro_hit(sequencer *s, int pattern_num, int step);
 void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting);

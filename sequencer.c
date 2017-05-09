@@ -219,11 +219,9 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern,
     switch (s->gridsteps) {
     case (SIXTEENTH):
         mult = PPSIXTEENTH;
-        printf("Case 16! multis %d\n", mult);
         break;
     case (TWENTYFOURTH):
         mult = PPTWENTYFOURTH;
-        printf("Case 24! multis %d\n", mult);
         break;
     }
 
@@ -751,6 +749,49 @@ bool seq_is_valid_pattern_num(sequencer *d, int pattern_num)
 
 void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 {
+    int multi = 0;
+    if (s->pattern_len == 16) {
+        multi = PPSIXTEENTH;
+    } else if (s->pattern_len == 24) {
+        multi = PPTWENTYFOURTH;
+    }
+
+    int mstepfrom = stepfrom * multi;
+    int mstepto = stepto * multi;
+
+    seq_mv_micro_hit(s, pattern_num, mstepfrom, mstepto);
+
+}
+
+void seq_add_hit(sequencer *s, int pattern_num, int step)
+{
+    int multi = 0;
+    if (s->pattern_len == 16) {
+        multi = PPSIXTEENTH;
+    } else if (s->pattern_len == 24) {
+        multi = PPTWENTYFOURTH;
+    }
+
+    int mstep = step * multi;
+    seq_add_micro_hit(s, pattern_num, mstep);
+
+}
+
+void seq_rm_hit(sequencer *s, int pattern_num, int step)
+{
+    int multi = 0;
+    if (s->pattern_len == 16) {
+        multi = PPSIXTEENTH;
+    } else if (s->pattern_len == 24) {
+        multi = PPTWENTYFOURTH;
+    }
+
+    int mstep = step * multi;
+    seq_rm_micro_hit(s, pattern_num, mstep);
+}
+
+void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
+{
     if (seq_is_valid_pattern_num(s, pattern_num)) {
         if (s->patterns[pattern_num][stepfrom] == 1 && stepto < PPBAR) {
             s->patterns[pattern_num][stepfrom] = 0;
@@ -764,7 +805,7 @@ void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
     }
 }
 
-void seq_add_hit(sequencer *s, int pattern_num, int step)
+void seq_add_micro_hit(sequencer *s, int pattern_num, int step)
 {
     printf("Add'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR) {
@@ -772,7 +813,7 @@ void seq_add_hit(sequencer *s, int pattern_num, int step)
     }
 }
 
-void seq_rm_hit(sequencer *s, int pattern_num, int step)
+void seq_rm_micro_hit(sequencer *s, int pattern_num, int step)
 {
     printf("Rm'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR) {
@@ -783,8 +824,49 @@ void seq_rm_hit(sequencer *s, int pattern_num, int step)
 void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
 {
     if (seq_is_valid_pattern_num(s, pattern_num)) {
+
+        int old_swing_setting = s->pattern_num_swing_setting[pattern_num];
+        if (old_swing_setting == swing_setting) return;
+
         printf("Setting pattern %d swing setting to %d\n", pattern_num, swing_setting);
         s->pattern_num_swing_setting[pattern_num] = swing_setting;
+
+        int hitz_to_swing[64] = {0}; // arbitrary - shouldn't have more than 64 hits
+        int hitz_to_swing_idx = 0;
+
+        int multi = 0;
+        switch (s->gridsteps) {
+        case (SIXTEENTH):
+            multi = PPSIXTEENTH;
+            break;
+        case (TWENTYFOURTH):
+            multi = PPTWENTYFOURTH;
+            break;
+        }
+
+        int idx = multi; // miss out first sixteenth
+        while (idx < PPBAR) {
+            int next_idx = idx + multi;
+            printf("IDX %d // next idx %d\n", idx, next_idx);
+            for ( ; idx < next_idx; idx++) {
+                if ( s->patterns[s->cur_pattern][idx] == 1 ) {
+                    printf("Found a hit at %d\n", idx);
+                    hitz_to_swing[hitz_to_swing_idx++] = idx;
+                }
+            }
+            idx += multi;
+        }
+
+        int diff = (swing_setting - old_swing_setting) * 4; // swing moves in incs of 4%
+        int num_ppz = multi * 2; // i.e. percent between two increments
+        int pulses_to_move = num_ppz / 100.0 * diff;
+        printf("Pulses to move is %d\n", pulses_to_move);
+
+        for (int i = 0; i < 64; i++) {
+            if (hitz_to_swing[i] == 0) break;
+            int hit = hitz_to_swing[i];
+            printf("Going to swing hit %d\n", hit);
+            seq_mv_micro_hit(s, pattern_num, hit, hit + pulses_to_move);
+        }
     }
 }
-
