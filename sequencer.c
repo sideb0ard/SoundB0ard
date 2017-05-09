@@ -103,7 +103,6 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                    printf("Next LIFE!\n");
                     next_life_generation(seq);
                 }
                 seq->life_generation++;
