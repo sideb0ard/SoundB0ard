@@ -57,17 +57,18 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(
-        COOL_COLOR_MAUVE
-        "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
-        "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-        " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-        " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-        " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-        " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
-        "::::: PPQN: %d PPSIXTEENTH: %d PPTWENTYFOURTH: %d PPBAR: %d PPNS: %d " ANSI_COLOR_RESET,
-        mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
-        mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS);
+    printf(COOL_COLOR_MAUVE
+           "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
+           "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
+           " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
+           " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
+           "::::: PPQN: %d PPSIXTEENTH: %d PPTWENTYFOURTH: %d PPBAR: %d PPNS: "
+           "%d " ANSI_COLOR_RESET,
+           mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
+           mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH,
+           PPTWENTYFOURTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
@@ -333,6 +334,22 @@ double mixer_gennext(mixer *mixr)
         mixr->is_sixteenth = false;
     }
 
+    if (mixr->scene_mode && mixr->start_of_loop) {
+        // printf("Top of the bar\n");
+        if (mixr->current_scene_bar_count++ >=
+            mixr->scenes[mixr->current_scene].num_bars_to_play) {
+            mixr->current_scene = (mixr->current_scene + 1) % mixr->num_scenes;
+            mixr->current_scene_bar_count = 0;
+            printf("SCENE MODE CHANGE %d!\n", mixr->current_scene);
+        }
+        scene *s = &mixr->scenes[mixr->current_scene];
+        for (int j = 0; j < s->num_tracks; j++) {
+            printf("Scene: %d -- Enabling SG: %d Track: %d\n",
+                   mixr->current_scene, s->soundgen_tracks[j].soundgen_num,
+                   s->soundgen_tracks[j].soundgen_track_num);
+        }
+    }
+
     double output_val = 0.0;
     if (mixr->soundgen_num > 0) {
         for (int i = 0; i < mixr->soundgen_num; i++) {
@@ -460,9 +477,9 @@ bool mixer_add_scene(mixer *mixr, int num_bars)
         printf("Dingie mate\n");
         return false;
     }
+    printf("NUM BARSZZ! %d\n", num_bars);
 
-    mixr->num_scenes++;
-    mixr->scenes[mixr->current_scene++].num_bars_to_play = num_bars;
+    mixr->scenes[mixr->num_scenes++].num_bars_to_play = num_bars;
     // not setting scene mode true -- do that separately
 
     return true;
@@ -481,7 +498,7 @@ bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
         return false;
     }
 
-    if (mixr->scenes[scene_num].num_tracks < MAX_TRACKS_PER_SCENE) {
+    if (mixr->scenes[scene_num].num_tracks >= MAX_TRACKS_PER_SCENE) {
         printf("Too many tracks for this scene\n");
         return false;
     }
@@ -490,5 +507,32 @@ bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
     s->soundgen_tracks[s->num_tracks].soundgen_num = soundgen_num;
     s->soundgen_tracks[s->num_tracks].soundgen_track_num = soundgen_track;
 
+    s->num_tracks++;
+
     return true;
+}
+
+bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
+                                        int soundgen_num, int soundgen_track)
+{
+    if (!mixer_is_valid_scene_num(mixr, scene_num)) {
+        printf("%d is not a valid scene number\n", scene_num);
+        return false;
+    }
+    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num,
+                                           soundgen_track)) {
+        printf("%d is not a valid soundgen number\n", soundgen_num);
+        return false;
+    }
+
+    scene *s = &mixr->scenes[scene_num];
+    for (int i = 0; i < s->num_tracks; i++) {
+        if (s->soundgen_tracks[i].soundgen_num == soundgen_num &&
+            s->soundgen_tracks[i].soundgen_track_num == soundgen_track) {
+            s->soundgen_tracks[i].soundgen_num = -1;
+            return true;
+        }
+    }
+
+    return false;
 }

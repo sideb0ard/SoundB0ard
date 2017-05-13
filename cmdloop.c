@@ -161,6 +161,50 @@ void interpret(char *line)
             }
         }
 
+        else if (strncmp("scene", wurds[0], 5) == 0) {
+            if (strncmp("new", wurds[1], 4) == 0) {
+                int num_bars = atoi(wurds[2]);
+                if (num_bars == 0)
+                    num_bars = 4; // default
+                mixer_add_scene(mixr, num_bars);
+                printf("New scene with %d bars!\n", num_bars);
+            }
+            else if (strncmp("mode", wurds[1], 4) == 0) {
+                if (strncmp("on", wurds[2], 2) == 0)
+                    mixr->scene_mode = true;
+                else if (strncmp("off", wurds[2], 3) == 0)
+                    mixr->scene_mode = false;
+                else
+                    mixr->scene_mode = 1 - mixr->scene_mode;
+                printf("Mode scene! %s\n", mixr->scene_mode ? "true" : "false");
+            }
+            else {
+                int scene_num = atoi(wurds[1]);
+                if (mixer_is_valid_scene_num(mixr, scene_num)) {
+                    printf("Changing scene %d\n", scene_num);
+                    if (strncmp("add", wurds[2], 3) == 0) {
+                        int sg_num = atoi(wurds[3]);
+                        int sg_track_num = atoi(wurds[4]);
+                        if (mixer_is_valid_soundgen_track_num(mixr, sg_num,
+                                                              sg_track_num)) {
+                            printf("Adding sg %d %d\n", sg_num, sg_track_num);
+                            mixer_add_soundgen_track_to_scene(
+                                mixr, scene_num, sg_num, sg_track_num);
+                        }
+                    }
+                    if (strncmp("rm", wurds[2], 2) == 0) {
+                        int sg_num = atoi(wurds[3]);
+                        int sg_track_num = atoi(wurds[4]);
+                        if (mixer_is_valid_soundgen_track_num(mixr, sg_num,
+                                                              sg_track_num)) {
+                            printf("Removing sg %d %d\n", sg_num, sg_track_num);
+                            mixer_rm_soundgen_track_from_scene(
+                                mixr, scene_num, sg_num, sg_track_num);
+                        }
+                    }
+                }
+            }
+        }
         // else if (strncmp("synthdrum", wurds[0], 9) == 0) {
         //    char *pattern = (char *)calloc(128, sizeof(char));
         //    char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
@@ -907,10 +951,9 @@ void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,
         if (seq->pattern_len == 16) {
             seq_set_gridsteps(seq, 24);
         }
-        strncat(
-            dest_pattern,
-            "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23",
-            151);
+        strncat(dest_pattern,
+                "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23",
+                151);
     }
     else if (strncmp("all", char_array[start], 3) == 0) {
         if (seq->pattern_len == 16) {
@@ -1052,12 +1095,14 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                     seq_set_sample_amp_from_char_pattern(seq, pattern_num,
                                                          pattern);
                 }
-                else if (strncmp("mv", wurds[4], 2) == 0) { // deals in 16th or 24th
+                else if (strncmp("mv", wurds[4], 2) ==
+                         0) { // deals in 16th or 24th
                     int hitfrom = atoi(wurds[5]);
                     int hitto = atoi(wurds[6]);
                     seq_mv_hit(seq, pattern_num, hitfrom, hitto);
                 }
-                else if (strncmp("mmv", wurds[4], 2) == 0) { // deals in midi pulses
+                else if (strncmp("mmv", wurds[4], 2) ==
+                         0) { // deals in midi pulses
                     int hitfrom = atoi(wurds[5]);
                     int hitto = atoi(wurds[6]);
                     seq_mv_micro_hit(seq, pattern_num, hitfrom, hitto);
@@ -1086,7 +1131,8 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                 }
                 else if (strncmp("swing", wurds[4], 5) == 0) {
                     int swing_setting = atoi(wurds[5]);
-                    printf("changing swing to %d for pattern num %d\n", swing_setting, pattern_num);
+                    printf("changing swing to %d for pattern num %d\n",
+                           swing_setting, pattern_num);
                     seq_swing_pattern(seq, pattern_num, swing_setting);
                 }
             }

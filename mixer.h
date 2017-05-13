@@ -49,6 +49,7 @@ typedef struct t_mixer {
     scene scenes[MAX_SCENES];
     int num_scenes; // actual amount of scenes
     int current_scene;
+    int current_scene_bar_count;
     bool scene_mode;
 
     unsigned int midi_control_destination;
@@ -116,6 +117,8 @@ bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
 bool mixer_add_scene(mixer *mixr, int num_bars);
 bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
                                        int soundgen_num, int soundgen_track);
+bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
+                                        int soundgen_num, int soundgen_track);
 bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
 
 #endif // MIXER_H
