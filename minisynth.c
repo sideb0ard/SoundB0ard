@@ -30,6 +30,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.start = &minisynth_sg_start;
     ms->sound_generator.stop = &minisynth_sg_stop;
+    ms->sound_generator.get_num_tracks = &minisynth_get_num_tracks;
     ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.type = SYNTH_TYPE;
 
@@ -1366,6 +1367,12 @@ void minisynth_sg_stop(void *self)
     minisynth *ms = (minisynth *)self;
     ms->active = false;
     minisynth_stop(ms);
+}
+
+int minisynth_get_num_tracks(void *self)
+{
+    minisynth *ms = (minisynth *) self;
+    return ms->num_melodies;
 }
 
 void minisynth_make_active_track(void *self, int pattern_num)

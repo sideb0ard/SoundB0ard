@@ -185,6 +185,7 @@ void interpret(char *line)
                     if (strncmp("add", wurds[2], 3) == 0) {
                         int sg_num = atoi(wurds[3]);
                         int sg_track_num = atoi(wurds[4]);
+                        printf("Gots nums %d %d\n", sg_num, sg_track_num);
                         if (mixer_is_valid_soundgen_track_num(mixr, sg_num,
                                                               sg_track_num)) {
                             printf("Adding sg %d %d\n", sg_num, sg_track_num);

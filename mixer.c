@@ -489,6 +489,7 @@ bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num)
 {
+    printf("Inside is valid soundgen..\n");
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
         track_num < mixr->sound_generators[soundgen_num]->get_num_tracks(
                         mixr->sound_generators[soundgen_num]))
@@ -535,6 +536,7 @@ bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
 
     s->num_tracks++;
 
+    printf("ALL good here\n");
     return true;
 }
 

@@ -228,4 +228,5 @@ int minisynth_get_notes_from_melody(midi_event **melody,
 void minisynth_sg_start(void *self);
 void minisynth_sg_stop(void *self);
 
+int minisynth_get_num_tracks(void *self);
 void minisynth_make_active_track(void *self, int pattern_num);

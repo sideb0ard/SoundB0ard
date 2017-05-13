@@ -95,6 +95,8 @@ void looper_setvol(void *self, double v);
 double looper_getvol(void *self);
 void looper_start(void *self);
 void looper_stop(void *self);
+void looper_make_active_track(void *self, int track_num);
+int looper_get_num_tracks(void *self);
 
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);
@@ -103,6 +105,5 @@ void sample_resample_to_loop_size(file_sample *fs);
 void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2);
 void file_sample_free(file_sample *fs);
 void looper_del_self(looper *s);
-void looper_make_active_track(void *self, int track_num);
 
 #endif // LOOPER_H

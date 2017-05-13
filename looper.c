@@ -29,6 +29,8 @@ looper *new_looper(char *filename, double loop_len)
     l->sound_generator.setvol = &looper_setvol;
     l->sound_generator.start = &looper_start;
     l->sound_generator.stop = &looper_stop;
+    l->sound_generator.get_num_tracks = &looper_get_num_tracks;
+    l->sound_generator.make_active_track = &looper_make_active_track;
     l->sound_generator.type = LOOPER_TYPE;
 
     for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++) {
@@ -609,4 +611,10 @@ void looper_make_active_track(void *self, int track_num)
 {
     looper *l = (looper *)self;
     l->cur_sample = track_num;
+}
+
+int looper_get_num_tracks(void *self)
+{
+    looper *l = (looper*) self;
+    return l->num_samples;
 }
