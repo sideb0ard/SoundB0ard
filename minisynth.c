@@ -28,6 +28,9 @@ minisynth *new_minisynth(void)
     ms->sound_generator.status = &minisynth_status;
     ms->sound_generator.setvol = &minisynth_setvol;
     ms->sound_generator.getvol = &minisynth_getvol;
+    ms->sound_generator.start = &minisynth_sg_start;
+    ms->sound_generator.stop = &minisynth_sg_stop;
+    ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.type = SYNTH_TYPE;
 
     ms->m_voice_mode = 0;
@@ -105,6 +108,7 @@ minisynth *new_minisynth(void)
 
     limiter_init(&ms->m_limiter, 10.0, 500.); // attack time, decay
 
+    ms->active = true;
     return ms;
 }
 
@@ -680,7 +684,8 @@ void minisynth_status(void *self, wchar_t *status_string)
     // TODO - a shit load of error checking on boundaries and size
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
-        "[SYNTH] - Vol: %.2f Multi: %s, Morph: %s, Morph EveryN: %d Morph "
+        "[SYNTH] - Vol: %.2f Active: %s Multi: %s, Morph: %s, Morph EveryN: %d "
+        "Morph "
         "Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
         "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
         "SustainOverride: %s "
@@ -689,7 +694,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         "%2.f"
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f",
-        ms->m_volume_db, ms->multi_melody_mode ? "true" : "false",
+        ms->m_volume_db, ms->active ? "true" : "false",
+        ms->multi_melody_mode ? "true" : "false",
         ms->morph_mode ? "true" : "false", ms->morph_every_n_loops,
         ms->morph_generation, ms->cur_melody, ms->m_delay_mode,
         s_mode_names[ms->m_voice_mode], ms->m_attack_time_msec,
@@ -731,6 +737,9 @@ double minisynth_gennext(void *self)
 {
 
     minisynth *ms = (minisynth *)self;
+
+    if (!ms->active)
+        return 0.0;
 
     if (mixr->is_midi_tick) {
         int idx = mixr->midi_tick % PPNS;
@@ -1343,4 +1352,25 @@ int minisynth_get_notes_from_melody(midi_event **melody,
         }
     }
     return idx;
+}
+
+void minisynth_sg_start(void *self)
+{
+    minisynth *ms = (minisynth *)self;
+    ms->active = true;
+    minisynth_stop(ms);
+}
+
+void minisynth_sg_stop(void *self)
+{
+    minisynth *ms = (minisynth *)self;
+    ms->active = false;
+    minisynth_stop(ms);
+}
+
+void minisynth_make_active_track(void *self, int pattern_num)
+{
+    minisynth *ms = (minisynth *)self;
+    ms->cur_melody =
+        pattern_num; // TODO - standardize - PATTERN? TRACK? MELODY?!?!
 }

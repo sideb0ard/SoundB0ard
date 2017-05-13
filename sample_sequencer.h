@@ -35,6 +35,7 @@ typedef struct sample_sequencer {
 
     int swing;
 
+    bool active;
     bool started; // to sync at top of loop
 
     stereodelay m_delay_fx;
@@ -61,13 +62,18 @@ sample_sequencer *new_sample_seq_from_char_array(char *filename, char **pattern,
 
 int get_a_sample_seq_position(sample_sequencer *ss);
 int sample_seq_get_num_tracks(void *s);
+void sample_seq_make_active_track(void *s, int track_num);
 
 void sample_seq_del(sample_sequencer *s);
 void sample_seq_status(void *self, wchar_t *ss);
 void sample_seq_setvol(void *self, double v);
+void sample_start(void *self);
+void sample_stop(void *self);
 double sample_seq_gennext(void *self);
 double sample_seq_getvol(void *self);
 
 int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info);
 void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
                            unsigned int data2);
+
+void sample_sequencer_reset_samples(sample_sequencer *seq);

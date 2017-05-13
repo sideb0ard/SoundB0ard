@@ -336,18 +336,44 @@ double mixer_gennext(mixer *mixr)
 
     if (mixr->scene_mode && mixr->start_of_loop) {
         // printf("Top of the bar\n");
-        if (mixr->current_scene_bar_count++ >=
+
+        if (mixr->current_scene_bar_count >=
             mixr->scenes[mixr->current_scene].num_bars_to_play) {
             mixr->current_scene = (mixr->current_scene + 1) % mixr->num_scenes;
             mixr->current_scene_bar_count = 0;
-            printf("SCENE MODE CHANGE %d!\n", mixr->current_scene);
+
+            // printf("SCENE MODE CHANGE %d!\n", mixr->current_scene);
+            scene *s = &mixr->scenes[mixr->current_scene];
+            for (int i = 0; i < mixr->soundgen_num; i++) {
+                if (!mixer_is_soundgen_in_scene(i, s)) {
+                    // printf("Scene[%d] - Stopping SG %d\n",
+                    // mixr->current_scene, i);
+                    mixr->sound_generators[i]->stop(mixr->sound_generators[i]);
+                }
+                // sample_sequencer *seq = (sample_sequencer*)
+                // mixr->sound_generators[i];
+                // printf("SG %d is active? %s\n", i, seq->active ? "true" :
+                // "false");
+            }
+
+            for (int i = 0; i < s->num_tracks; i++) {
+                int soundgen_num = s->soundgen_tracks[i].soundgen_num;
+                int soundgen_track_num =
+                    s->soundgen_tracks[i].soundgen_track_num;
+                // printf("Scene: %d -- Enabling SG: %d Track: %d\n",
+                //        mixr->current_scene, soundgen_num,
+                //        soundgen_track_num);
+                mixr->sound_generators[soundgen_num]->start(
+                    mixr->sound_generators[soundgen_num]);
+                mixr->sound_generators[soundgen_num]->make_active_track(
+                    mixr->sound_generators[soundgen_num], soundgen_track_num);
+                // sample_sequencer *seq = (sample_sequencer*)
+                // mixr->sound_generators[i];
+                // printf("SG %d is active? %s\n", i, seq->active ? "true" :
+                // "false");
+            }
         }
-        scene *s = &mixr->scenes[mixr->current_scene];
-        for (int j = 0; j < s->num_tracks; j++) {
-            printf("Scene: %d -- Enabling SG: %d Track: %d\n",
-                   mixr->current_scene, s->soundgen_tracks[j].soundgen_num,
-                   s->soundgen_tracks[j].soundgen_track_num);
-        }
+        mixr->current_scene_bar_count++;
     }
 
     double output_val = 0.0;
@@ -534,5 +560,13 @@ bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
         }
     }
 
+    return false;
+}
+bool mixer_is_soundgen_in_scene(int soundgen_num, scene *s)
+{
+    for (int i = 0; i < s->num_tracks; i++) {
+        if (soundgen_num == s->soundgen_tracks[i].soundgen_num)
+            return true;
+    }
     return false;
 }

@@ -15,6 +15,7 @@ looper *new_looper(char *filename, double loop_len)
 {
     looper *l = (looper *)calloc(1, sizeof(looper));
     l->vol = 0.7;
+    l->active = true;
     l->started = false;
     l->just_been_resampled = false;
 
@@ -26,6 +27,8 @@ looper *new_looper(char *filename, double loop_len)
     l->sound_generator.status = &looper_status;
     l->sound_generator.getvol = &looper_getvol;
     l->sound_generator.setvol = &looper_setvol;
+    l->sound_generator.start = &looper_start;
+    l->sound_generator.stop = &looper_stop;
     l->sound_generator.type = LOOPER_TYPE;
 
     for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++) {
@@ -45,6 +48,9 @@ double looper_gennext(void *self)
 {
     looper *l = (looper *)self;
     double val = 0;
+
+    if (!l->active)
+        return val;
 
     // wait till start of loop to keep patterns synched
     if (!l->started) {
@@ -327,11 +333,11 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
              "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
              "ScramblrrrMode: %s ScrambleGen: %d StutterMode: %s "
-             "Stutter Gen: %d MaxGen: %d",
+             "Stutter Gen: %d MaxGen: %d Active: %s",
              l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
              l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
              l->stutter_mode ? "true" : "false", l->stutter_generation,
-             l->max_generation);
+             l->max_generation, l->active ? " true" : "false");
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < l->num_samples; i++) {
@@ -342,6 +348,24 @@ void looper_status(void *self, wchar_t *status_string)
         wcslcat(status_string, looper_details, strlen_left);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
+}
+
+void looper_start(void *self)
+{
+    looper *l = (looper *)self;
+    l->active = true;
+    l->started = false;
+    l->samples[l->cur_sample]->position = 0;
+    l->scramblrrr->position = 0;
+}
+
+void looper_stop(void *self)
+{
+    looper *l = (looper *)self;
+    l->active = false;
+    l->started = false;
+    l->samples[l->cur_sample]->position = 0;
+    l->scramblrrr->position = 0;
 }
 
 void looper_set_multi_sample_mode(looper *s, bool multi)
@@ -579,4 +603,10 @@ void file_sample_free(file_sample *fs)
     printf("Dleeeting filename \n");
     free(fs->filename);
     free(fs);
+}
+
+void looper_make_active_track(void *self, int track_num)
+{
+    looper *l = (looper *)self;
+    l->cur_sample = track_num;
 }

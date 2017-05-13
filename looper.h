@@ -37,6 +37,7 @@ typedef struct t_looper {
     bool multi_sample_mode;
     // bool multi_sample_loop_countdown_started;
 
+    bool active;
     bool started;
     bool just_been_resampled;
 
@@ -92,6 +93,8 @@ double looper_gennext(void *self);
 void looper_status(void *self, wchar_t *ss);
 void looper_setvol(void *self, double v);
 double looper_getvol(void *self);
+void looper_start(void *self);
+void looper_stop(void *self);
 
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);
@@ -100,5 +103,6 @@ void sample_resample_to_loop_size(file_sample *fs);
 void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2);
 void file_sample_free(file_sample *fs);
 void looper_del_self(looper *s);
+void looper_make_active_track(void *self, int track_num);
 
 #endif // LOOPER_H

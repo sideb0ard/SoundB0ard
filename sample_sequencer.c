@@ -22,9 +22,7 @@ sample_sequencer *new_sample_seq(char *filename)
         (sample_sequencer *)calloc(1, sizeof(sample_sequencer));
     seq_init(&seq->m_seq);
 
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
-        seq->samples_now_playing[i] = -1;
-    }
+    sample_sequencer_reset_samples(seq);
 
     char cwd[1024];
     getcwd(cwd, 1024);
@@ -47,14 +45,20 @@ sample_sequencer *new_sample_seq(char *filename)
     seq->bufsize = bufsize;
     seq->samplerate = sf_info.samplerate;
     seq->channels = sf_info.channels;
+
+    seq->active = true;
     seq->started = false;
+
     seq->vol = 0.7;
 
     seq->sound_generator.gennext = &sample_seq_gennext;
     seq->sound_generator.status = &sample_seq_status;
     seq->sound_generator.getvol = &sample_seq_getvol;
     seq->sound_generator.setvol = &sample_seq_setvol;
+    seq->sound_generator.start = &sample_start;
+    seq->sound_generator.stop = &sample_stop;
     seq->sound_generator.get_num_tracks = &sample_seq_get_num_tracks;
+    seq->sound_generator.make_active_track = &sample_seq_make_active_track;
     seq->sound_generator.type = SEQUENCER_TYPE;
 
     stereo_delay_prepare_for_play(&seq->m_delay_fx);
@@ -65,10 +69,20 @@ sample_sequencer *new_sample_seq(char *filename)
     return seq;
 }
 
+void sample_sequencer_reset_samples(sample_sequencer *seq)
+{
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
+        seq->samples_now_playing[i] = -1;
+    }
+}
+
 double sample_seq_gennext(void *self)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     double val = 0;
+
+    if (!seq->active)
+        return val;
 
     int idx = mixr->midi_tick % PPBAR;
 
@@ -184,8 +198,8 @@ void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf ",
-             basename(seq->filename), seq->vol);
+             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf Active: %s",
+             basename(seq->filename), seq->vol, seq->active ? "true" : "false");
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);
@@ -281,6 +295,12 @@ int sample_seq_get_num_tracks(void *self)
     return s->m_seq.num_patterns;
 }
 
+void sample_seq_make_active_track(void *self, int track_num)
+{
+    sample_sequencer *s = (sample_sequencer *)self;
+    s->m_seq.cur_pattern = track_num;
+}
+
 int get_a_sample_seq_position(sample_sequencer *ss)
 {
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
@@ -289,4 +309,18 @@ int get_a_sample_seq_position(sample_sequencer *ss)
         }
     }
     return -1;
+}
+
+void sample_start(void *self)
+{
+    sample_sequencer *s = (sample_sequencer *)self;
+    s->active = true;
+    sample_sequencer_reset_samples(s);
+}
+
+void sample_stop(void *self)
+{
+    sample_sequencer *s = (sample_sequencer *)self;
+    s->active = false;
+    sample_sequencer_reset_samples(s);
 }

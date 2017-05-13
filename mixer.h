@@ -19,13 +19,13 @@ typedef struct environment_variable {
 } env_var;
 
 typedef struct soundgen_track {
-    unsigned int soundgen_num;
-    unsigned int soundgen_track_num;
+    int soundgen_num;
+    int soundgen_track_num;
 } soundgen_track;
 
 typedef struct scene {
-    unsigned int num_bars_to_play;
-    unsigned int num_tracks;
+    int num_bars_to_play;
+    int num_tracks;
     soundgen_track soundgen_tracks[MAX_TRACKS_PER_SCENE];
 } scene;
 
@@ -120,5 +120,6 @@ bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
 bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
                                         int soundgen_num, int soundgen_track);
 bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
+bool mixer_is_soundgen_in_scene(int soundgen_num, scene *scene_num);
 
 #endif // MIXER_H

@@ -64,6 +64,8 @@ typedef struct minisynth {
     bool multi_melody_mode;
     bool multi_melody_loop_countdown_started;
 
+    bool active;
+
     int sustain;
 
     bool recording;
@@ -222,3 +224,8 @@ void minisynth_set_backup_mode(minisynth *ms, bool b);
 void minisynth_morph(minisynth *ms);
 int minisynth_get_notes_from_melody(midi_event **melody,
                                     int return_midi_notes[10]);
+
+void minisynth_sg_start(void *self);
+void minisynth_sg_stop(void *self);
+
+void minisynth_make_active_track(void *self, int pattern_num);
