@@ -170,10 +170,14 @@ void interpret(char *line)
                 printf("New scene with %d bars!\n", num_bars);
             }
             else if (strncmp("mode", wurds[1], 4) == 0) {
-                if (strncmp("on", wurds[2], 2) == 0)
+                if (strncmp("on", wurds[2], 2) == 0) {
                     mixr->scene_mode = true;
-                else if (strncmp("off", wurds[2], 3) == 0)
+                    mixr->scene_start_pending = true;
+                }
+                else if (strncmp("off", wurds[2], 3) == 0) {
                     mixr->scene_mode = false;
+                    mixr->scene_start_pending = false;
+                }
                 else
                     mixr->scene_mode = 1 - mixr->scene_mode;
                 printf("Mode scene! %s\n", mixr->scene_mode ? "true" : "false");

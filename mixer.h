@@ -50,7 +50,6 @@ typedef struct t_mixer {
     int num_scenes; // actual amount of scenes
     int current_scene;
     int current_scene_bar_count;
-    bool scene_mode;
 
     unsigned int midi_control_destination;
     unsigned int m_midi_controller_mode; // to switch control knob routing
@@ -75,6 +74,9 @@ typedef struct t_mixer {
     bool is_midi_tick;
     // bool is_eighth;
     bool is_quarter;
+
+    bool scene_mode;
+    bool scene_start_pending;
 
     double volume;
     // int keyboard_octave; // TODO <- need this?
