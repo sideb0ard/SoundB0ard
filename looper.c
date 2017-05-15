@@ -356,9 +356,9 @@ void looper_start(void *self)
 {
     looper *l = (looper *)self;
     l->active = true;
-    l->started = false;
-    l->samples[l->cur_sample]->position = 0;
-    l->scramblrrr->position = 0;
+    //l->started = false;
+    //l->samples[l->cur_sample]->position = 0;
+    //l->scramblrrr->position = 0;
 }
 
 void looper_stop(void *self)

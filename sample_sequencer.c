@@ -320,7 +320,6 @@ void sample_start(void *self)
 
 void sample_stop(void *self)
 {
-    printf("Stopp me!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     s->active = false;
     sample_sequencer_reset_samples(s);
