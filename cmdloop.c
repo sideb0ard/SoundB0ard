@@ -454,7 +454,7 @@ void interpret(char *line)
                             if (onoff != -1) {
                                 midi_event *ev =
                                     new_midi_event(tick, onoff, notenum, 128);
-                                minisynth_add_event(ms, ev);
+                                minisynth_add_event(ms, ms->cur_melody, ev);
                             }
                             else {
                                 printf("Needs to be 'on' or 'off'\n");
@@ -468,7 +468,6 @@ void interpret(char *line)
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         int melody_num = atoi(wurds[3]);
                         if (is_valid_melody_num(ms, melody_num)) {
-                            printf("VALID!\n");
                             if (strncmp("numloops", wurds[4], 8) == 0) {
                                 int numloops = atoi(wurds[5]);
                                 if (numloops != 0) {
@@ -476,6 +475,28 @@ void interpret(char *line)
                                         ms, melody_num, numloops);
                                     printf("NUMLOOPS Now %d\n", numloops);
                                 }
+                            }
+                            else if (strncmp("add", wurds[4], 3) == 0) {
+                                int tick = atoi(wurds[5]);
+                                int midi_note = atoi(wurds[6]);
+                                printf("Adding note\n");
+                                minisynth_add_note(ms, melody_num, tick, midi_note);
+                            }
+                            else if (strncmp("rm", wurds[4], 2) == 0) {
+                                int tick = atoi(wurds[5]);
+                                printf("Rm'ing note\n");
+                                minisynth_rm_note(ms, melody_num, tick);
+                            }
+                            else if (strncmp("madd", wurds[4], 4) == 0) {
+                                int tick = atoi(wurds[5]);
+                                int midi_note = atoi(wurds[6]);
+                                printf("Adding note\n");
+                                minisynth_add_micro_note(ms, melody_num, tick, midi_note);
+                            }
+                            else if (strncmp("mrm", wurds[4], 3) == 0) {
+                                int tick = atoi(wurds[5]);
+                                printf("Rm'ing note\n");
+                                minisynth_rm_micro_note(ms, melody_num, tick);
                             }
                         }
                     }
@@ -505,7 +526,7 @@ void interpret(char *line)
                             }
                             int tick = atoi(wurds[4]);
                             if (tick < PPNS)
-                                minisynth_delete_event(ms, melody, tick);
+                                minisynth_rm_micro_note(ms, melody, tick);
                         }
                     }
                     else if (strncmp("import", wurds[2], 6) == 0) {
@@ -568,11 +589,12 @@ void interpret(char *line)
                     }
                     else if (strncmp("print", wurds[2], 5) == 0) {
                         int melody_num = atoi(wurds[3]);
-                        if (is_valid_melody_num(ms, melody_num)) {
-                            printf("Melody Detail:!\n");
-                            midi_event **melody = ms->melodies[ms->cur_melody];
-                            midi_melody_print(melody);
-                        }
+                        //if (is_valid_melody_num(ms, melody_num)) {
+                        //    printf("Melody Detail:!\n");
+                        //    midi_event **melody = ms->melodies[ms->cur_melody];
+                        //    midi_melody_print(melody);
+                        //}
+                        minisynth_print_pattern(ms, melody_num);
                     }
                     else if (strncmp("quantize", wurds[2], 8) == 0) {
                         int melody_num = atoi(wurds[3]);

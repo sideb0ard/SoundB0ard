@@ -674,11 +674,7 @@ void minisynth_status(void *self, wchar_t *status_string)
 
     if (mixr->debug_mode) {
         for (int i = 0; i < ms->num_melodies; i++) {
-            printf("Melody %d\n", i);
-            for (int j = 0; j < PPNS; j++) {
-                if (ms->melodies[i][j] != NULL)
-                    print_midi_event_rec(ms->melodies[i][j]);
-            }
+            minisynth_print_pattern(ms, i);
         }
     }
 
@@ -829,10 +825,10 @@ midi_event **minisynth_get_midi_loop(minisynth *self)
     return self->melodies[self->cur_melody];
 }
 
-void minisynth_add_event(minisynth *ms, midi_event *ev)
+void minisynth_add_event(minisynth *ms, int melody_num, midi_event *ev)
 {
     int tick = ev->tick;
-    while (ms->melodies[ms->cur_melody][tick] != NULL) {
+    while (ms->melodies[melody_num][tick] != NULL) {
         if (mixr->debug_mode)
             printf("Gotsz a tick already - bump!\n");
         tick++;
@@ -840,25 +836,7 @@ void minisynth_add_event(minisynth *ms, midi_event *ev)
             tick = 0;
     }
     ev->tick = tick;
-    ms->melodies[ms->cur_melody][tick] = ev;
-}
-
-void minisynth_delete_event(minisynth *ms, int pat_num, int tick)
-{
-    if (is_valid_melody_num(ms, pat_num)) {
-        if (ms->melodies[ms->cur_melody][tick] != NULL) {
-            midi_event *ev = ms->melodies[ms->cur_melody][tick];
-            ms->melodies[ms->cur_melody][tick] = NULL;
-            free(ev);
-            printf("Deleted midi event at tick %d\n", tick);
-        }
-        else {
-            printf("Not a valid midi event at tick: %d\n", tick);
-        }
-    }
-    else {
-        printf("Not a valid pattern num: %d \n", pat_num);
-    }
+    ms->melodies[melody_num][tick] = ev;
 }
 
 midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
@@ -989,12 +967,12 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
         midi_event *on_event =
             new_midi_event(note_on_tick, 144, note, velocity);
 
-        minisynth_add_event(ms, on_event);
-        minisynth_add_event(ms, off_event);
+        minisynth_add_event(ms, ms->cur_melody,  on_event);
+        minisynth_add_event(ms, ms->cur_melody, off_event);
     }
     else {
         off_event->delete_after_use = true; // _THIS_ is the magic
-        minisynth_add_event(ms, off_event);
+        minisynth_add_event(ms, ms->cur_melody, off_event);
     }
 }
 
@@ -1218,7 +1196,7 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
             printf("GOtzz %d %d %d %d %d\n", count, tick, status, midi_note,
                    midi_vel);
             midi_event *ev = new_midi_event(tick, status, midi_note, midi_vel);
-            minisynth_add_event(ms, ev);
+            minisynth_add_event(ms, ms->cur_melody, ev);
         }
     }
 
@@ -1318,8 +1296,8 @@ void minisynth_morph(minisynth *ms)
         midi_event *off_event = new_midi_event(note_off_tick, 128, note, amp);
         on_event->delete_after_use = true;
         off_event->delete_after_use = true;
-        minisynth_add_event(ms, on_event);
-        minisynth_add_event(ms, off_event);
+        minisynth_add_event(ms, ms->cur_melody, on_event);
+        minisynth_add_event(ms, ms->cur_melody, off_event);
     }
     if (rand() % 100 > 90)
         ms->m_sustain_override = 1 - ms->m_sustain_override;
@@ -1381,3 +1359,60 @@ void minisynth_make_active_track(void *self, int pattern_num)
     ms->cur_melody =
         pattern_num; // TODO - standardize - PATTERN? TRACK? MELODY?!?!
 }
+
+void minisynth_print_pattern(minisynth *ms, int pattern_num)
+{
+    if (is_valid_melody_num(ms, pattern_num)) {
+        midi_event **melody = ms->melodies[pattern_num];
+        midi_melody_print(melody);
+    }
+}
+
+
+void minisynth_add_note(minisynth *ms, int pattern_num, int step, int midi_note)
+{
+    int mstep = step * PPQN;
+    minisynth_add_micro_note(ms, pattern_num, mstep, midi_note);
+}
+
+void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep, int midi_note)
+{
+    if (is_valid_melody_num(ms, pattern_num)
+        && mstep < PPNS)
+    {
+        printf("New Notes!! %d - %d\n", mstep, midi_note);
+        midi_event *on =
+             new_midi_event(mstep, 144, midi_note, 128);
+        int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
+        midi_event *off =
+             new_midi_event(note_off_tick, 128, midi_note, 128);
+
+        minisynth_add_event(ms, pattern_num, on);
+        minisynth_add_event(ms, pattern_num, off);
+    }
+}
+
+void minisynth_rm_note(minisynth *ms, int pattern_num, int step)
+{
+    int mstep = step * PPQN;
+    minisynth_rm_micro_note(ms, pattern_num, mstep);
+}
+
+void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
+{
+    if (is_valid_melody_num(ms, pat_num)) {
+        if (ms->melodies[ms->cur_melody][tick] != NULL) {
+            midi_event *ev = ms->melodies[ms->cur_melody][tick];
+            ms->melodies[ms->cur_melody][tick] = NULL;
+            free(ev);
+            printf("Deleted midi event at tick %d\n", tick);
+        }
+        else {
+            printf("Not a valid midi event at tick: %d\n", tick);
+        }
+    }
+    else {
+        printf("Not a valid pattern num: %d \n", pat_num);
+    }
+}
+

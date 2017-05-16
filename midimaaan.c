@@ -75,7 +75,7 @@ void *midiman()
                         int tick = mixr->midi_tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
-                        minisynth_add_event(ms, ev);
+                        minisynth_add_event(ms, ms->cur_melody, ev);
                     }
 
                     midi_event ev;
@@ -417,7 +417,6 @@ void midi_melody_quantize(midi_event **melody)
 
 void midi_melody_print(midi_event **melody)
 {
-    printf("Melody Details\n");
     for (int i = 0; i < PPNS; i++) {
         if (melody[i]) {
             int tick = melody[i]->tick;
@@ -443,7 +442,7 @@ void midi_melody_print(midi_event **melody)
                 break;
             }
             int delete = melody[i]->delete_after_use;
-            printf("[Tick: %d] - note: %d velocity: %d type: %s "
+            printf("[Tick: %5d] - note: %4d velocity: %4d type: %s "
                    "delete_after_use: %s\n",
                    tick, data1, data2, type, delete ? "true" : "false");
         }
