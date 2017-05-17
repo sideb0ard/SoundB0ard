@@ -675,9 +675,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     minisynth *ms = (minisynth *)self;
 
     if (mixr->debug_mode) {
-        for (int i = 0; i < ms->num_melodies; i++) {
-            minisynth_print_pattern(ms, i);
-        }
+        minisynth_print(ms);
     }
 
     // TODO - a shit load of error checking on boundaries and size
@@ -1362,12 +1360,15 @@ void minisynth_make_active_track(void *self, int pattern_num)
         pattern_num; // TODO - standardize - PATTERN? TRACK? MELODY?!?!
 }
 
-void minisynth_print_pattern(minisynth *ms, int pattern_num)
+void minisynth_print(minisynth *ms)
 {
-    if (is_valid_melody_num(ms, pattern_num)) {
-        midi_event **melody = ms->melodies[pattern_num];
+    for (int i = 0; i < ms->num_melodies; i++)
+    {
+        printf("Pattern Num %d\n", i);
+        midi_event **melody = ms->melodies[i];
         midi_melody_print(melody);
     }
+    minisynth_print_settings(ms);
 }
 
 

@@ -432,34 +432,6 @@ void interpret(char *line)
                         if (strncmp("melody", wurds[3], 6) == 0) {
                             minisynth_add_melody(ms);
                         }
-                        // else {
-                        //     int melody = atoi(wurds[3]);
-                        //     if (is_valid_melody_num(ms, melody)) {
-                        //         printf("MELODY ADD EVENT!\n");
-                        //     }
-                        //     int tick = atoi(wurds[4]);
-                        //     if (tick >= PPNS) {
-                        //         printf("tick %d out of range\n", tick);
-                        //         return;
-                        //     }
-                        //     int notenum = atoi(wurds[5]);
-                        //     int onoff = -1;
-                        //     if (strncmp("on", wurds[6], 2) == 0) {
-                        //         onoff = 144;
-                        //     }
-                        //     else if (strncmp("off", wurds[6], 3) == 0) {
-                        //         onoff = 128;
-                        //     }
-
-                        //     if (onoff != -1) {
-                        //         midi_event *ev =
-                        //             new_midi_event(tick, onoff, notenum, 128);
-                        //         minisynth_add_event(ms, ms->cur_melody, ev);
-                        //     }
-                        //     else {
-                        //         printf("Needs to be 'on' or 'off'\n");
-                        //     }
-                        // }
                     }
                     else if (strncmp("arp", wurds[2], 3) == 0) {
                         ms->recording = false;
@@ -600,13 +572,7 @@ void interpret(char *line)
                         }
                     }
                     else if (strncmp("print", wurds[2], 5) == 0) {
-                        int melody_num = atoi(wurds[3]);
-                        //if (is_valid_melody_num(ms, melody_num)) {
-                        //    printf("Melody Detail:!\n");
-                        //    midi_event **melody = ms->melodies[ms->cur_melody];
-                        //    midi_melody_print(melody);
-                        //}
-                        minisynth_print_pattern(ms, melody_num);
+                        minisynth_print(ms);
                     }
                     else if (strncmp("quantize", wurds[2], 8) == 0) {
                         int melody_num = atoi(wurds[3]);
