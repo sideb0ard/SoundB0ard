@@ -432,34 +432,34 @@ void interpret(char *line)
                         if (strncmp("melody", wurds[3], 6) == 0) {
                             minisynth_add_melody(ms);
                         }
-                        else {
-                            int melody = atoi(wurds[3]);
-                            if (is_valid_melody_num(ms, melody)) {
-                                printf("MELODY ADD EVENT!\n");
-                            }
-                            int tick = atoi(wurds[4]);
-                            if (tick >= PPNS) {
-                                printf("tick %d out of range\n", tick);
-                                return;
-                            }
-                            int notenum = atoi(wurds[5]);
-                            int onoff = -1;
-                            if (strncmp("on", wurds[6], 2) == 0) {
-                                onoff = 144;
-                            }
-                            else if (strncmp("off", wurds[6], 3) == 0) {
-                                onoff = 128;
-                            }
+                        // else {
+                        //     int melody = atoi(wurds[3]);
+                        //     if (is_valid_melody_num(ms, melody)) {
+                        //         printf("MELODY ADD EVENT!\n");
+                        //     }
+                        //     int tick = atoi(wurds[4]);
+                        //     if (tick >= PPNS) {
+                        //         printf("tick %d out of range\n", tick);
+                        //         return;
+                        //     }
+                        //     int notenum = atoi(wurds[5]);
+                        //     int onoff = -1;
+                        //     if (strncmp("on", wurds[6], 2) == 0) {
+                        //         onoff = 144;
+                        //     }
+                        //     else if (strncmp("off", wurds[6], 3) == 0) {
+                        //         onoff = 128;
+                        //     }
 
-                            if (onoff != -1) {
-                                midi_event *ev =
-                                    new_midi_event(tick, onoff, notenum, 128);
-                                minisynth_add_event(ms, ms->cur_melody, ev);
-                            }
-                            else {
-                                printf("Needs to be 'on' or 'off'\n");
-                            }
-                        }
+                        //     if (onoff != -1) {
+                        //         midi_event *ev =
+                        //             new_midi_event(tick, onoff, notenum, 128);
+                        //         minisynth_add_event(ms, ms->cur_melody, ev);
+                        //     }
+                        //     else {
+                        //         printf("Needs to be 'on' or 'off'\n");
+                        //     }
+                        // }
                     }
                     else if (strncmp("arp", wurds[2], 3) == 0) {
                         ms->recording = false;
@@ -482,6 +482,12 @@ void interpret(char *line)
                                 printf("Adding note\n");
                                 minisynth_add_note(ms, melody_num, tick, midi_note);
                             }
+                            else if (strncmp("mv", wurds[4], 2) == 0) {
+                                int fromtick = atoi(wurds[5]);
+                                int totick = atoi(wurds[6]);
+                                printf("MV'ing note\n");
+                                minisynth_mv_note(ms, melody_num, fromtick, totick);
+                            }
                             else if (strncmp("rm", wurds[4], 2) == 0) {
                                 int tick = atoi(wurds[5]);
                                 printf("Rm'ing note\n");
@@ -490,8 +496,14 @@ void interpret(char *line)
                             else if (strncmp("madd", wurds[4], 4) == 0) {
                                 int tick = atoi(wurds[5]);
                                 int midi_note = atoi(wurds[6]);
-                                printf("Adding note\n");
+                                printf("MAdding note\n");
                                 minisynth_add_micro_note(ms, melody_num, tick, midi_note);
+                            }
+                            else if (strncmp("mmv", wurds[4], 2) == 0) {
+                                int fromtick = atoi(wurds[5]);
+                                int totick = atoi(wurds[6]);
+                                printf("MMV'ing note\n");
+                                minisynth_mv_micro_note(ms, melody_num, fromtick, totick);
                             }
                             else if (strncmp("mrm", wurds[4], 3) == 0) {
                                 int tick = atoi(wurds[5]);

@@ -78,6 +78,8 @@ minisynth *new_minisynth(void)
     ms->morph_generation = 0;
     ms->max_generation = 0;
 
+    ms->multi_melody_mode = true;
+
     for (int i = 0; i < MAX_VOICES; i++) {
         ms->m_voices[i] = new_minisynth_voice();
         if (!ms->m_voices[i])
@@ -1371,7 +1373,7 @@ void minisynth_print_pattern(minisynth *ms, int pattern_num)
 
 void minisynth_add_note(minisynth *ms, int pattern_num, int step, int midi_note)
 {
-    int mstep = step * PPQN;
+    int mstep = step * PPSIXTEENTH;
     minisynth_add_micro_note(ms, pattern_num, mstep, midi_note);
 }
 
@@ -1389,19 +1391,21 @@ void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep, int mid
 
         minisynth_add_event(ms, pattern_num, on);
         minisynth_add_event(ms, pattern_num, off);
+    } else {
+        printf("Adding MICRO note - not valid melody-num(%d) || step no good(%d)\n", pattern_num, mstep);  
     }
 }
 
 void minisynth_rm_note(minisynth *ms, int pattern_num, int step)
 {
-    int mstep = step * PPQN;
+    int mstep = step * PPSIXTEENTH;
     minisynth_rm_micro_note(ms, pattern_num, mstep);
 }
 
 void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
 {
     if (is_valid_melody_num(ms, pat_num)) {
-        if (ms->melodies[ms->cur_melody][tick] != NULL) {
+        if (ms->melodies[pat_num][tick] != NULL) {
             midi_event *ev = ms->melodies[ms->cur_melody][tick];
             ms->melodies[ms->cur_melody][tick] = NULL;
             free(ev);
@@ -1416,3 +1420,23 @@ void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
     }
 }
 
+void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep, int tostep)
+{
+    int mfromstep = fromstep * PPSIXTEENTH;
+    int mtostep = tostep * PPSIXTEENTH;
+    minisynth_mv_micro_note(ms, pattern_num, mfromstep, mtostep);
+}
+
+void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep, int tostep)
+{
+    if (is_valid_melody_num(ms, pattern_num)) {
+        if (ms->melodies[pattern_num][fromstep] != NULL
+            && ms->melodies[pattern_num][tostep] != NULL) {
+            ms->melodies[pattern_num][tostep] = ms->melodies[pattern_num][fromstep];
+            ms->melodies[pattern_num][fromstep] = NULL;
+        }
+        else {
+            printf("Woof, cannae move micro note - either fromstep(%d) or tostep(%d) is not NULL\n", fromstep, tostep);
+        }
+    }
+}

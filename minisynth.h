@@ -234,5 +234,7 @@ void minisynth_make_active_track(void *self, int pattern_num);
 void minisynth_print_pattern(minisynth *ms, int pattern_num);
 void minisynth_add_note(minisynth *ms, int pattern_num, int step, int midi_note);
 void minisynth_rm_note(minisynth *ms, int pattern_num, int step);
+void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep, int tostep);
 void minisynth_add_micro_note(minisynth *ms, int pattern_num, int step, int midi_note);
 void minisynth_rm_micro_note(minisynth *ms, int pattern_num, int step);
+void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep, int tostep);
