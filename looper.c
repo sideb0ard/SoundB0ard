@@ -56,7 +56,8 @@ double looper_gennext(void *self)
 
     // wait till start of loop to keep patterns synched
     if (!l->started) {
-        if (mixr->sixteenth_note_tick % 16 == 0) {
+        if (mixr->start_of_loop) {
+            printf("Starting now! 16th tick is %d\n", mixr->sixteenth_note_tick % 16);
             l->started = true;
         }
         else {
@@ -64,11 +65,11 @@ double looper_gennext(void *self)
         }
     }
 
-    if (mixr->sixteenth_note_tick % 16 == 0 && l->resample_pending) {
+    if (mixr->start_of_loop && l->resample_pending) {
         looper_resample_to_loop_size(l);
     }
 
-    if (mixr->sixteenth_note_tick % 16 == 0 && l->change_loopsize_pending) {
+    if (mixr->start_of_loop && l->change_loopsize_pending) {
         printf("PENDING LOOPSIZE FOUND! %d loops for loop num: %d\n",
                l->pending_loop_size, l->pending_loop_num);
         looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
@@ -335,11 +336,13 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
              "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
              "ScramblrrrMode: %s ScrambleGen: %d StutterMode: %s "
-             "Stutter Gen: %d MaxGen: %d Active: %s",
+             "Stutter Gen: %d MaxGen: %d Active: %s"
+             "Position: %d Sample Length: %d",
              l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
              l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
              l->stutter_mode ? "true" : "false", l->stutter_generation,
-             l->max_generation, l->active ? " true" : "false");
+             l->max_generation, l->active ? " true" : "false",
+             l->samples[l->cur_sample]->position, l->samples[l->cur_sample]->resampled_file_size);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < l->num_samples; i++) {

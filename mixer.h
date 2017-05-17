@@ -40,7 +40,6 @@ typedef struct t_mixer {
 
     int delay_on;
     bool debug_mode;
-    bool start_of_loop; // true for one sample during loop time
 
     EFFECT **effects;
     int effects_num;
@@ -70,6 +69,7 @@ typedef struct t_mixer {
     unsigned int loop_len_in_samples;
     unsigned int loop_len_in_ticks;
 
+    bool start_of_loop; // true for one sample during loop time
     bool is_sixteenth;
     bool is_midi_tick;
     // bool is_eighth;
