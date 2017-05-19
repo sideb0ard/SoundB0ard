@@ -553,10 +553,10 @@ void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
     self->melody_multiloop_count[melody_num] = loop_num;
 }
 
-void minisynth_add_melody(minisynth *ms)
+int minisynth_add_melody(minisynth *ms)
 {
-    ms->num_melodies++;
     ms->cur_melody++;
+    return ms->num_melodies++; // this will return melody_num of new one
 }
 
 void minisynth_dupe_melody(midi_event **from, midi_event **to)

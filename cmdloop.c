@@ -484,18 +484,26 @@ void interpret(char *line)
                             }
                         }
                     }
-                    else if (strncmp("copy", wurds[2], 4) == 0) {
-                        int sg2 = atoi(wurds[3]);
+                    else if (strncmp("cp", wurds[2], 2) == 0) {
+                        int pattern_num = atoi(wurds[3]);
+                        int sg2 = atoi(wurds[4]);
+                        int pattern_num2 = atoi(wurds[5]);
                         if (mixer_is_valid_soundgen_num(mixr, sg2) &&
                             mixr->sound_generators[sg2]->type == SYNTH_TYPE) {
                             minisynth *ms2 =
                                 (minisynth *)mixr->sound_generators[sg2];
-                            printf("Copying SYNTH pattern from %d to %d!\n",
-                                   soundgen_num, sg2);
-                            midi_event **melody =
-                                minisynth_copy_midi_loop(ms, ms->cur_melody);
-                            minisynth_replace_midi_loop(ms2, melody,
-                                                        ms2->cur_melody);
+                            if (is_valid_melody_num(ms, pattern_num)
+                                && is_valid_melody_num(ms2, pattern_num2)) {
+
+                                printf("Copying SYNTH pattern from %d:%d to %d:%d!\n",
+                                       soundgen_num, pattern_num, sg2, pattern_num2);
+
+                                midi_event **melody =
+                                    minisynth_copy_midi_loop(ms, pattern_num);
+
+                                minisynth_replace_midi_loop(ms2, melody,
+                                                            pattern_num2);
+                            }
                         }
                     }
                     else if (strncmp("delete", wurds[2], 3) == 0) {
@@ -512,6 +520,11 @@ void interpret(char *line)
                             if (tick < PPNS)
                                 minisynth_rm_micro_note(ms, melody, tick);
                         }
+                    }
+                    else if (strncmp("dupe", wurds[2], 4) == 0) {
+                        int pattern_num = atoi(wurds[3]);
+                        int new_pattern_num = minisynth_add_melody(ms);
+                        minisynth_dupe_melody(ms->melodies[pattern_num], ms->melodies[new_pattern_num]);
                     }
                     else if (strncmp("import", wurds[2], 6) == 0) {
                         printf("Importing file\n");
