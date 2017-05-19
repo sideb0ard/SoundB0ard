@@ -36,11 +36,12 @@ mixer *new_mixer()
 
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->midi_tick = -1;
     mixr->cur_sample = 0;
     mixr->m_midi_controller_mode =
         KEY_MODE_ONE; // dunno whether this should be on mixer or synth
     mixr->midi_control_destination = NONE;
+    mixr->sixteenth_note_tick = -1;
+    mixr->midi_tick = -1;
 
     // the lifetime of these booleans is a single sample
     mixr->is_midi_tick = true;
@@ -329,8 +330,8 @@ double mixer_gennext(mixer *mixr)
     }
 
     if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0) {
-        mixr->is_sixteenth = true;
         mixr->sixteenth_note_tick++; // for seq machine resolution
+        mixr->is_sixteenth = true;
     }
     else {
         mixr->is_sixteenth = false;
