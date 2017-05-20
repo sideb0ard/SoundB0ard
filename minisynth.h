@@ -181,7 +181,6 @@ void minisynth_midi_pitchbend(minisynth *self, unsigned int data1,
 void minisynth_midi_control(minisynth *self, unsigned int data1,
                             unsigned int data2);
 
-void minisynth_set_sustain(minisynth *self, int sustain_val);
 void minisynth_set_multi_melody_mode(minisynth *self, bool melody_mode);
 void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
                                    int loop_num);
@@ -203,7 +202,6 @@ void minisynth_add_midi_loop(minisynth *self, midi_event **events,
 void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
                                  int melody_num);
 void minisynth_toggle_delay_mode(minisynth *ms);
-void minisynth_set_sustain_override(minisynth *ms, bool b);
 
 void minisynth_rand_settings(minisynth *ms);
 void minisynth_print_settings(minisynth *ms);
@@ -238,3 +236,40 @@ void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep, int tostep)
 void minisynth_add_micro_note(minisynth *ms, int pattern_num, int step, int midi_note);
 void minisynth_rm_micro_note(minisynth *ms, int pattern_num, int step);
 void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep, int tostep);
+
+void minisynth_set_attack_time_ms(minisynth *ms, double val);
+void minisynth_set_decay_time_ms(minisynth *ms, double val);
+void minisynth_set_delay_feedback_pct(minisynth *ms, double val);
+void minisynth_set_delay_ratio(minisynth *ms, double val);
+void minisynth_set_delay_mode(minisynth *ms, unsigned int val);
+void minisynth_set_delay_time_ms(minisynth *ms, double val);
+void minisynth_set_delay_wetmix(minisynth *ms, double val);
+void minisynth_set_detune(minisynth *ms, double val);
+void minisynth_set_eg1_dca_int(minisynth *ms, double val);
+void minisynth_set_eg1_filter_int(minisynth *ms, int val);
+void minisynth_set_eg1_osc_int(minisynth *ms, double val);
+void minisynth_set_filter_fc(minisynth *ms, double val);
+void minisynth_set_filter_fq(minisynth *ms, double val);
+void minisynth_set_keytrack_int(minisynth *ms, double val);
+void minisynth_set_keytrack(minisynth *ms, unsigned int val);
+void minisynth_set_legato_mode(minisynth *ms, unsigned int val);
+void minisynth_set_lfo1_amp_int(minisynth *ms, double val);
+void minisynth_set_lfo1_amp(minisynth *ms, double val);
+void minisynth_set_lfo1_filter_fc_int(minisynth *ms, double val);
+void minisynth_set_lfo1_rate(minisynth *ms, double val);
+void minisynth_set_lfo1_pan_int(minisynth *ms, double val);
+void minisynth_set_lfo1_pitch(minisynth *ms, double val);
+void minisynth_set_lfo1_wave(minisynth *ms, unsigned int val);
+void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
+void minisynth_set_noise_osc_db(minisynth *ms, double val);
+void minisynth_set_octave(minisynth *ms, int val);
+void minisynth_set_pitchbend_range(minisynth *ms, int val);
+void minisynth_set_portamento_time_ms(minisynth *ms, double val);
+void minisynth_set_pulsewidth_pct(minisynth *ms, double val);
+void minisynth_set_sub_osc_db(minisynth *ms, double val);
+void minisynth_set_sustain(minisynth *ms, double val);
+void minisynth_set_sustain_override(minisynth *ms, bool b);
+void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
+void minisynth_set_voice_mode(minisynth *ms, double val);
+void minisynth_set_vol(minisynth *ms, double val);
+void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);

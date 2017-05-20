@@ -899,17 +899,6 @@ void minisynth_toggle_delay_mode(minisynth *ms)
     ms->m_delay_mode = ++(ms->m_delay_mode) % MAX_NUM_DELAY_MODE;
 }
 
-void minisynth_set_sustain_override(minisynth *ms, bool b)
-{
-    ms->m_sustain_override = b;
-
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]) {
-            voice_set_sustain_override(&ms->m_voices[i]->m_voice, b);
-        }
-    }
-}
-
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth)
 {
     if (sixteenth >= 16) {
@@ -1109,7 +1098,7 @@ void minisynth_print_settings(minisynth *ms)
     printf("Decay Time ms (decayms): %f\n", ms->m_decay_release_time_msec);
     printf("Delay Feedback Pct (delayfb)%f\n", ms->m_feedback_pct);
     printf("Delay Ratio (delayr): %f\n", ms->m_delay_ratio);
-    printf("Delay Mode (delaymode): %d\n", ms->m_delay_mode);
+    printf("Delay Mode (delaymode): %d\n", ms->m_delay_mode); // unsigned int
     printf("Delay Time ms (delayms): %f\n", ms->m_delay_time_msec);
     printf("Delay Wet Mix (delaymx): %f\n", ms->m_wet_mix);
     printf("Detune Cents (detune): %f\n", ms->m_detune_cents);
@@ -1119,30 +1108,30 @@ void minisynth_print_settings(minisynth *ms)
     printf("Filter Cutoff (fc): %f\n", ms->m_fc_control);
     printf("Filter Q Control (fq): %f\n", ms->m_q_control);
     printf("Filter Keytrack Intensity (ktint): %f\n", ms->m_filter_keytrack_intensity);
-    printf("Filter Keytrack (kt): %d\n", ms->m_filter_keytrack);
-    printf("LEGATO MODE (legato): %d\n", ms->m_legato_mode);
+    printf("Filter Keytrack (kt): %d\n", ms->m_filter_keytrack); // unsigned
+    printf("LEGATO MODE (legato): %d\n", ms->m_legato_mode); // unsigned
     printf("LFO1 Amp Intensity (lfo1ampint): %f\n", ms->m_lfo1_amp_intensity);
     printf("LFO AMp (lfo1amp): %f\n", ms->m_lfo1_amplitude);
     printf("LFO1 Filter FC Intensity (lfo1filterint): %f\n", ms->m_lfo1_filter_fc_intensity);
     printf("LFO Rate (lfo1rate): %f\n", ms->m_lfo1_rate);
     printf("LFO1 Pan Intensity (lfo1panint): %f\n", ms->m_lfo1_pan_intensity);
     printf("LFO1 Osc Pitch Intensity (lfo1pitch): %f\n", ms->m_lfo1_osc_pitch_intensity);
-    printf("LFO Waveform (lfowave): %d\n", ms->m_lfo1_waveform);
-    printf("Note Number To Decay Scaling (ndscale): %d\n",
+    printf("LFO Waveform (lfowave): %d\n", ms->m_lfo1_waveform); // unsigned
+    printf("Note Number To Decay Scaling (ndscale): %d\n",  // unsigned
            ms->m_note_number_to_decay_scaling);
     printf("Noise OSC Db (noisedb): %f\n", ms->m_noise_osc_db);
-    printf("Octave (oct): %d\n", ms->m_octave);
-    printf("Pitchbend Range (pitchrange): %d\n", ms->m_pitchbend_range);
+    printf("Octave (oct): %d\n", ms->m_octave); // int
+    printf("Pitchbend Range (pitchrange): %d\n", ms->m_pitchbend_range); // int
     printf("Portamento Time ms (porta): %f\n", ms->m_portamento_time_msec);
     printf("Pulse Width Pct (pw): %f\n", ms->m_pulse_width_pct);
     printf("Sub OSC Db (subosc): %f\n", ms->m_sub_osc_db);
     printf("Sustain Level (sustainlvl): %f\n", ms->m_sustain_level);
-    printf("Sustain Override (sustain): %d\n", ms->m_sustain_override);
+    printf("Sustain Override (sustain): %d\n", ms->m_sustain_override); // bool
     printf("Velocity to Attack Scaling (vascale): %d\n",
-           ms->m_velocity_to_attack_scaling);
-    printf("Voice mode (voice): %d\n", ms->m_voice_mode);
+           ms->m_velocity_to_attack_scaling); // unsigned
+    printf("Voice mode (voice): %d\n", ms->m_voice_mode); // unsigned
     printf("Volume (vol): %f\n", ms->m_volume_db);
-    printf("Reset To Zero (zero): %d\n", ms->m_reset_to_zero);
+    printf("Reset To Zero (zero): %d\n", ms->m_reset_to_zero); // unsigned
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
@@ -1440,3 +1429,51 @@ void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep, int t
         }
     }
 }
+
+void minisynth_set_attack_time_ms(minisynth *ms, double val);
+void minisynth_set_decay_time_ms(minisynth *ms, double val);
+void minisynth_set_delay_feedback_pct(minisynth *ms, double val);
+void minisynth_set_delay_ratio(minisynth *ms, double val);
+void minisynth_set_delay_mode(minisynth *ms, unsigned int val);
+void minisynth_set_delay_time_ms(minisynth *ms, double val);
+void minisynth_set_delay_wetmix(minisynth *ms, double val);
+void minisynth_set_detune(minisynth *ms, double val);
+void minisynth_set_eg1_dca_int(minisynth *ms, double val);
+void minisynth_set_eg1_filter_int(minisynth *ms, int val);
+void minisynth_set_eg1_osc_int(minisynth *ms, double val);
+void minisynth_set_filter_fc(minisynth *ms, double val);
+void minisynth_set_filter_fq(minisynth *ms, double val);
+void minisynth_set_keytrack_int(minisynth *ms, double val);
+void minisynth_set_keytrack(minisynth *ms, unsigned int val);
+void minisynth_set_legato_mode(minisynth *ms, unsigned int val);
+void minisynth_set_lfo1_amp_int(minisynth *ms, double val);
+void minisynth_set_lfo1_amp(minisynth *ms, double val);
+void minisynth_set_lfo1_filter_fc_int(minisynth *ms, double val);
+void minisynth_set_lfo1_rate(minisynth *ms, double val);
+void minisynth_set_lfo1_pan_int(minisynth *ms, double val);
+void minisynth_set_lfo1_pitch(minisynth *ms, double val);
+void minisynth_set_lfo1_wave(minisynth *ms, unsigned int val);
+void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
+void minisynth_set_noise_osc_db(minisynth *ms, double val);
+void minisynth_set_octave(minisynth *ms, int val);
+void minisynth_set_pitchbend_range(minisynth *ms, int val);
+void minisynth_set_portamento_time_ms(minisynth *ms, double val);
+void minisynth_set_pulsewidth_pct(minisynth *ms, double val);
+void minisynth_set_sub_osc_db(minisynth *ms, double val);
+void minisynth_set_sustain(minisynth *ms, double val);
+
+void minisynth_set_sustain_override(minisynth *ms, bool b)
+{
+    ms->m_sustain_override = b;
+
+    for (int i = 0; i < MAX_VOICES; i++) {
+        if (ms->m_voices[i]) {
+            voice_set_sustain_override(&ms->m_voices[i]->m_voice, b);
+        }
+    }
+}
+
+void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
+void minisynth_set_voice_mode(minisynth *ms, double val);
+void minisynth_set_vol(minisynth *ms, double val);
+void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
