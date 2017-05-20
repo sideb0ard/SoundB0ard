@@ -315,7 +315,7 @@ void sample_start(void *self)
 {
     sample_sequencer *s = (sample_sequencer *)self;
     s->active = true;
-    //sample_sequencer_reset_samples(s);
+    // sample_sequencer_reset_samples(s);
 }
 
 void sample_stop(void *self)

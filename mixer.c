@@ -338,15 +338,15 @@ double mixer_gennext(mixer *mixr)
     }
 
     if (mixr->scene_mode && mixr->start_of_loop) {
-        //printf("Top of the bar\n");
+        // printf("Top of the bar\n");
 
         if (mixr->current_scene_bar_count >=
-            mixr->scenes[mixr->current_scene].num_bars_to_play
-            || mixr->scene_start_pending) {
+                mixr->scenes[mixr->current_scene].num_bars_to_play ||
+            mixr->scene_start_pending) {
             mixr->current_scene = (mixr->current_scene + 1) % mixr->num_scenes;
             mixr->current_scene_bar_count = 0;
 
-            //printf("SCENE MODE CHANGE %d!\n", mixr->current_scene);
+            // printf("SCENE MODE CHANGE %d!\n", mixr->current_scene);
             scene *s = &mixr->scenes[mixr->current_scene];
             for (int i = 0; i < mixr->soundgen_num; i++) {
                 if (!mixer_is_soundgen_in_scene(i, s)) {

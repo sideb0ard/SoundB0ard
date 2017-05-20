@@ -57,7 +57,8 @@ double looper_gennext(void *self)
     // wait till start of loop to keep patterns synched
     if (!l->started) {
         if (mixr->start_of_loop) {
-            printf("Starting now! 16th tick is %d\n", mixr->sixteenth_note_tick % 16);
+            printf("Starting now! 16th tick is %d\n",
+                   mixr->sixteenth_note_tick % 16);
             l->started = true;
         }
         else {
@@ -342,7 +343,8 @@ void looper_status(void *self, wchar_t *status_string)
              l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
              l->stutter_mode ? "true" : "false", l->stutter_generation,
              l->max_generation, l->active ? " true" : "false",
-             l->samples[l->cur_sample]->position, l->samples[l->cur_sample]->resampled_file_size);
+             l->samples[l->cur_sample]->position,
+             l->samples[l->cur_sample]->resampled_file_size);
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < l->num_samples; i++) {
@@ -359,9 +361,9 @@ void looper_start(void *self)
 {
     looper *l = (looper *)self;
     l->active = true;
-    //l->started = false;
-    //l->samples[l->cur_sample]->position = 0;
-    //l->scramblrrr->position = 0;
+    // l->started = false;
+    // l->samples[l->cur_sample]->position = 0;
+    // l->scramblrrr->position = 0;
 }
 
 void looper_stop(void *self)
@@ -618,6 +620,6 @@ void looper_make_active_track(void *self, int track_num)
 
 int looper_get_num_tracks(void *self)
 {
-    looper *l = (looper*) self;
+    looper *l = (looper *)self;
     return l->num_samples;
 }

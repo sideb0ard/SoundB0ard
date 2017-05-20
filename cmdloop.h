@@ -15,8 +15,7 @@ int exxit(void);
 int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line);
 void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                              int num_wurds, char *pattern);
-bool parse_minisynth_settings_change(minisynth *ms,
-                                     char wurds[][SIZE_OF_WURD],
+bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
                                      int num_wurds);
 void char_array_to_seq_string_pattern(sequencer *s, char *dest_pattern,
                                       char char_array[NUM_WURDS][SIZE_OF_WURD],

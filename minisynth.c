@@ -956,7 +956,7 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
         midi_event *on_event =
             new_midi_event(note_on_tick, 144, note, velocity);
 
-        minisynth_add_event(ms, ms->cur_melody,  on_event);
+        minisynth_add_event(ms, ms->cur_melody, on_event);
         minisynth_add_event(ms, ms->cur_melody, off_event);
     }
     else {
@@ -1103,24 +1103,28 @@ void minisynth_print_settings(minisynth *ms)
     printf("Delay Wet Mix (delaymx): %f\n", ms->m_wet_mix);
     printf("Detune Cents (detune): %f\n", ms->m_detune_cents);
     printf("EG1 DCA Intensity (eg1dcaint): %f\n", ms->m_eg1_dca_intensity);
-    printf("EG1 Filter Intensity (eg1filterint)%f\n", ms->m_eg1_filter_intensity);
+    printf("EG1 Filter Intensity (eg1filterint)%f\n",
+           ms->m_eg1_filter_intensity);
     printf("EG1 OSc Intensity (eg1oscint): %f\n", ms->m_eg1_osc_intensity);
     printf("Filter Cutoff (fc): %f\n", ms->m_fc_control);
     printf("Filter Q Control (fq): %f\n", ms->m_q_control);
-    printf("Filter Keytrack Intensity (ktint): %f\n", ms->m_filter_keytrack_intensity);
+    printf("Filter Keytrack Intensity (ktint): %f\n",
+           ms->m_filter_keytrack_intensity);
     printf("Filter Keytrack (kt): %d\n", ms->m_filter_keytrack); // unsigned
-    printf("LEGATO MODE (legato): %d\n", ms->m_legato_mode); // unsigned
+    printf("LEGATO MODE (legato): %d\n", ms->m_legato_mode);     // unsigned
     printf("LFO1 Amp Intensity (lfo1ampint): %f\n", ms->m_lfo1_amp_intensity);
     printf("LFO AMp (lfo1amp): %f\n", ms->m_lfo1_amplitude);
-    printf("LFO1 Filter FC Intensity (lfo1filterint): %f\n", ms->m_lfo1_filter_fc_intensity);
+    printf("LFO1 Filter FC Intensity (lfo1filterint): %f\n",
+           ms->m_lfo1_filter_fc_intensity);
     printf("LFO Rate (lfo1rate): %f\n", ms->m_lfo1_rate);
     printf("LFO1 Pan Intensity (lfo1panint): %f\n", ms->m_lfo1_pan_intensity);
-    printf("LFO1 Osc Pitch Intensity (lfo1pitch): %f\n", ms->m_lfo1_osc_pitch_intensity);
+    printf("LFO1 Osc Pitch Intensity (lfo1pitch): %f\n",
+           ms->m_lfo1_osc_pitch_intensity);
     printf("LFO Waveform (lfowave): %d\n", ms->m_lfo1_waveform); // unsigned
-    printf("Note Number To Decay Scaling (ndscale): %d\n",  // unsigned
+    printf("Note Number To Decay Scaling (ndscale): %d\n",       // unsigned
            ms->m_note_number_to_decay_scaling);
     printf("Noise OSC Db (noisedb): %f\n", ms->m_noise_osc_db);
-    printf("Octave (oct): %d\n", ms->m_octave); // int
+    printf("Octave (oct): %d\n", ms->m_octave);                          // int
     printf("Pitchbend Range (pitchrange): %d\n", ms->m_pitchbend_range); // int
     printf("Portamento Time ms (porta): %f\n", ms->m_portamento_time_msec);
     printf("Pulse Width Pct (pw): %f\n", ms->m_pulse_width_pct);
@@ -1128,7 +1132,7 @@ void minisynth_print_settings(minisynth *ms)
     printf("Sustain Level (sustainlvl): %f\n", ms->m_sustain_level);
     printf("Sustain Override (sustain): %d\n", ms->m_sustain_override); // bool
     printf("Velocity to Attack Scaling (vascale): %d\n",
-           ms->m_velocity_to_attack_scaling); // unsigned
+           ms->m_velocity_to_attack_scaling);             // unsigned
     printf("Voice mode (voice): %d\n", ms->m_voice_mode); // unsigned
     printf("Volume (vol): %f\n", ms->m_volume_db);
     printf("Reset To Zero (zero): %d\n", ms->m_reset_to_zero); // unsigned
@@ -1337,7 +1341,7 @@ void minisynth_sg_stop(void *self)
 
 int minisynth_get_num_tracks(void *self)
 {
-    minisynth *ms = (minisynth *) self;
+    minisynth *ms = (minisynth *)self;
     return ms->num_melodies;
 }
 
@@ -1350,8 +1354,7 @@ void minisynth_make_active_track(void *self, int pattern_num)
 
 void minisynth_print(minisynth *ms)
 {
-    for (int i = 0; i < ms->num_melodies; i++)
-    {
+    for (int i = 0; i < ms->num_melodies; i++) {
         printf("Pattern Num %d\n", i);
         midi_event **melody = ms->melodies[i];
         midi_melody_print(melody);
@@ -1359,29 +1362,28 @@ void minisynth_print(minisynth *ms)
     minisynth_print_settings(ms);
 }
 
-
 void minisynth_add_note(minisynth *ms, int pattern_num, int step, int midi_note)
 {
     int mstep = step * PPSIXTEENTH;
     minisynth_add_micro_note(ms, pattern_num, mstep, midi_note);
 }
 
-void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep, int midi_note)
+void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep,
+                              int midi_note)
 {
-    if (is_valid_melody_num(ms, pattern_num)
-        && mstep < PPNS)
-    {
+    if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS) {
         printf("New Notes!! %d - %d\n", mstep, midi_note);
-        midi_event *on =
-             new_midi_event(mstep, 144, midi_note, 128);
+        midi_event *on = new_midi_event(mstep, 144, midi_note, 128);
         int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
-        midi_event *off =
-             new_midi_event(note_off_tick, 128, midi_note, 128);
+        midi_event *off = new_midi_event(note_off_tick, 128, midi_note, 128);
 
         minisynth_add_event(ms, pattern_num, on);
         minisynth_add_event(ms, pattern_num, off);
-    } else {
-        printf("Adding MICRO note - not valid melody-num(%d) || step no good(%d)\n", pattern_num, mstep);  
+    }
+    else {
+        printf("Adding MICRO note - not valid melody-num(%d) || step no "
+               "good(%d)\n",
+               pattern_num, mstep);
     }
 }
 
@@ -1416,16 +1418,20 @@ void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep, int tostep)
     minisynth_mv_micro_note(ms, pattern_num, mfromstep, mtostep);
 }
 
-void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep, int tostep)
+void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
+                             int tostep)
 {
     if (is_valid_melody_num(ms, pattern_num)) {
-        if (ms->melodies[pattern_num][fromstep] != NULL
-            && ms->melodies[pattern_num][tostep] != NULL) {
-            ms->melodies[pattern_num][tostep] = ms->melodies[pattern_num][fromstep];
+        if (ms->melodies[pattern_num][fromstep] != NULL &&
+            ms->melodies[pattern_num][tostep] != NULL) {
+            ms->melodies[pattern_num][tostep] =
+                ms->melodies[pattern_num][fromstep];
             ms->melodies[pattern_num][fromstep] = NULL;
         }
         else {
-            printf("Woof, cannae move micro note - either fromstep(%d) or tostep(%d) is not NULL\n", fromstep, tostep);
+            printf("Woof, cannae move micro note - either fromstep(%d) or "
+                   "tostep(%d) is not NULL\n",
+                   fromstep, tostep);
         }
     }
 }

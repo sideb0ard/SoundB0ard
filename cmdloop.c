@@ -438,8 +438,10 @@ void interpret(char *line)
                         minisynth_set_arpeggiate(ms, 1 - ms->m_arp.active);
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (parse_minisynth_settings_change(ms, wurds, num_wurds))
-                        { continue; }
+                        if (parse_minisynth_settings_change(ms, wurds,
+                                                            num_wurds)) {
+                            continue;
+                        }
                         int melody_num = atoi(wurds[3]);
                         if (is_valid_melody_num(ms, melody_num)) {
                             if (strncmp("numloops", wurds[4], 8) == 0) {
@@ -454,13 +456,15 @@ void interpret(char *line)
                                 int tick = atoi(wurds[5]);
                                 int midi_note = atoi(wurds[6]);
                                 printf("Adding note\n");
-                                minisynth_add_note(ms, melody_num, tick, midi_note);
+                                minisynth_add_note(ms, melody_num, tick,
+                                                   midi_note);
                             }
                             else if (strncmp("mv", wurds[4], 2) == 0) {
                                 int fromtick = atoi(wurds[5]);
                                 int totick = atoi(wurds[6]);
                                 printf("MV'ing note\n");
-                                minisynth_mv_note(ms, melody_num, fromtick, totick);
+                                minisynth_mv_note(ms, melody_num, fromtick,
+                                                  totick);
                             }
                             else if (strncmp("rm", wurds[4], 2) == 0) {
                                 int tick = atoi(wurds[5]);
@@ -471,13 +475,15 @@ void interpret(char *line)
                                 int tick = atoi(wurds[5]);
                                 int midi_note = atoi(wurds[6]);
                                 printf("MAdding note\n");
-                                minisynth_add_micro_note(ms, melody_num, tick, midi_note);
+                                minisynth_add_micro_note(ms, melody_num, tick,
+                                                         midi_note);
                             }
                             else if (strncmp("mmv", wurds[4], 2) == 0) {
                                 int fromtick = atoi(wurds[5]);
                                 int totick = atoi(wurds[6]);
                                 printf("MMV'ing note\n");
-                                minisynth_mv_micro_note(ms, melody_num, fromtick, totick);
+                                minisynth_mv_micro_note(ms, melody_num,
+                                                        fromtick, totick);
                             }
                             else if (strncmp("mrm", wurds[4], 3) == 0) {
                                 int tick = atoi(wurds[5]);
@@ -494,11 +500,13 @@ void interpret(char *line)
                             mixr->sound_generators[sg2]->type == SYNTH_TYPE) {
                             minisynth *ms2 =
                                 (minisynth *)mixr->sound_generators[sg2];
-                            if (is_valid_melody_num(ms, pattern_num)
-                                && is_valid_melody_num(ms2, pattern_num2)) {
+                            if (is_valid_melody_num(ms, pattern_num) &&
+                                is_valid_melody_num(ms2, pattern_num2)) {
 
-                                printf("Copying SYNTH pattern from %d:%d to %d:%d!\n",
-                                       soundgen_num, pattern_num, sg2, pattern_num2);
+                                printf("Copying SYNTH pattern from %d:%d to "
+                                       "%d:%d!\n",
+                                       soundgen_num, pattern_num, sg2,
+                                       pattern_num2);
 
                                 midi_event **melody =
                                     minisynth_copy_midi_loop(ms, pattern_num);
@@ -526,7 +534,8 @@ void interpret(char *line)
                     else if (strncmp("dupe", wurds[2], 4) == 0) {
                         int pattern_num = atoi(wurds[3]);
                         int new_pattern_num = minisynth_add_melody(ms);
-                        minisynth_dupe_melody(ms->melodies[pattern_num], ms->melodies[new_pattern_num]);
+                        minisynth_dupe_melody(ms->melodies[pattern_num],
+                                              ms->melodies[new_pattern_num]);
                     }
                     else if (strncmp("import", wurds[2], 6) == 0) {
                         printf("Importing file\n");
@@ -1261,7 +1270,8 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
     }
 }
 
-bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD], int num_wurds)
+bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
+                                     int num_wurds)
 {
     if (strncmp("attackms", wurds[3], 8) == 0) {
         printf("Minisynth change Attack Time Ms!\n");

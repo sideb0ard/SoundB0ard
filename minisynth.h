@@ -230,12 +230,16 @@ int minisynth_get_num_tracks(void *self);
 void minisynth_make_active_track(void *self, int pattern_num);
 
 void minisynth_print(minisynth *ms);
-void minisynth_add_note(minisynth *ms, int pattern_num, int step, int midi_note);
+void minisynth_add_note(minisynth *ms, int pattern_num, int step,
+                        int midi_note);
 void minisynth_rm_note(minisynth *ms, int pattern_num, int step);
-void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep, int tostep);
-void minisynth_add_micro_note(minisynth *ms, int pattern_num, int step, int midi_note);
+void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep,
+                       int tostep);
+void minisynth_add_micro_note(minisynth *ms, int pattern_num, int step,
+                              int midi_note);
 void minisynth_rm_micro_note(minisynth *ms, int pattern_num, int step);
-void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep, int tostep);
+void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
+                             int tostep);
 
 void minisynth_set_attack_time_ms(minisynth *ms, double val);
 void minisynth_set_decay_time_ms(minisynth *ms, double val);
