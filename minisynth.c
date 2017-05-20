@@ -1105,45 +1105,44 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
 
 void minisynth_print_settings(minisynth *ms)
 {
-    printf("Voice mode %d\n", ms->m_voice_mode);
-    printf("Detune Cents: %f\n", ms->m_detune_cents);
-    printf("LFO AMp: %f\n", ms->m_lfo1_amplitude);
-    printf("LFO Rate %f\n", ms->m_lfo1_rate);
-    printf("Filter Control %f\n", ms->m_fc_control);
-    printf("Filter Q Control: %f\n", ms->m_q_control);
-    printf("EG Attack time: %f\n", ms->m_attack_time_msec);
-    printf("EG Delay Time: %f\n", ms->m_delay_time_msec);
-    printf("EG Decay Time: %f\n", ms->m_decay_release_time_msec);
-    printf("Pulse Width Pct: %f\n", ms->m_pulse_width_pct);
-    printf("Delay Feedback Pct %f\n", ms->m_feedback_pct);
-    printf("Delay Ratio: %f\n", ms->m_delay_ratio);
-    printf("Delay Wet Mix: %f\n", ms->m_wet_mix);
-    printf("Octave: %d\n", ms->m_octave);
-    printf("Portamento Time %f\n", ms->m_portamento_time_msec);
-    printf("LFO1 Osc Pitch Intensity: %f\n", ms->m_lfo1_osc_pitch_intensity);
-    printf("Sub OSC Db: %f\n", ms->m_sub_osc_db);
-    printf("EG1 OSc Intensity: %f\n", ms->m_eg1_osc_intensity);
-    printf("EG1 Filter Intensity %f\n", ms->m_eg1_filter_intensity);
-    printf("LFO1 Filter FC Intensity: %f\n", ms->m_lfo1_filter_fc_intensity);
-    printf("Sustain Level: %f\n", ms->m_sustain_level);
-    printf("Noise OSC Db: %f\n", ms->m_noise_osc_db);
-    printf("LFO1 Amp Intensity: %f\n", ms->m_lfo1_amp_intensity);
-    printf("LFO1 Pan Intensity: %f\n", ms->m_lfo1_pan_intensity);
-    printf("EG1 DCA Intensity: %f\n", ms->m_eg1_dca_intensity);
-    printf("LFO Waveform: %d\n", ms->m_lfo1_waveform);
-    printf("Volume: %f\n", ms->m_volume_db);
-    printf("LEGATO MODE: %d\n", ms->m_legato_mode);
-    printf("Pitchbend Range: %d\n", ms->m_pitchbend_range);
-    printf("Reset To Zero: %d\n", ms->m_reset_to_zero);
-    printf("Filter Keytrack: %d\n", ms->m_filter_keytrack);
-    printf("Filter Keytrack Intensity: %f\n", ms->m_filter_keytrack_intensity);
-    printf("Velocity to Attack Scaling: %d\n",
-           ms->m_velocity_to_attack_scaling);
-    printf("Note Number To Decay Scaling: %d\n",
+    printf("Attack time ms (attackms): %f\n", ms->m_attack_time_msec);
+    printf("Decay Time ms (decayms): %f\n", ms->m_decay_release_time_msec);
+    printf("Delay Feedback Pct (delayfb)%f\n", ms->m_feedback_pct);
+    printf("Delay Ratio (delayr): %f\n", ms->m_delay_ratio);
+    printf("Delay Mode (delaymode): %d\n", ms->m_delay_mode);
+    printf("Delay Time ms (delayms): %f\n", ms->m_delay_time_msec);
+    printf("Delay Wet Mix (delaymx): %f\n", ms->m_wet_mix);
+    printf("Detune Cents (detune): %f\n", ms->m_detune_cents);
+    printf("EG1 DCA Intensity (eg1dcaint): %f\n", ms->m_eg1_dca_intensity);
+    printf("EG1 Filter Intensity (eg1filterint)%f\n", ms->m_eg1_filter_intensity);
+    printf("EG1 OSc Intensity (eg1oscint): %f\n", ms->m_eg1_osc_intensity);
+    printf("Filter Cutoff (fc): %f\n", ms->m_fc_control);
+    printf("Filter Q Control (fq): %f\n", ms->m_q_control);
+    printf("Filter Keytrack Intensity (ktint): %f\n", ms->m_filter_keytrack_intensity);
+    printf("Filter Keytrack (kt): %d\n", ms->m_filter_keytrack);
+    printf("LEGATO MODE (legato): %d\n", ms->m_legato_mode);
+    printf("LFO1 Amp Intensity (lfo1ampint): %f\n", ms->m_lfo1_amp_intensity);
+    printf("LFO AMp (lfo1amp): %f\n", ms->m_lfo1_amplitude);
+    printf("LFO1 Filter FC Intensity (lfo1filterint): %f\n", ms->m_lfo1_filter_fc_intensity);
+    printf("LFO Rate (lfo1rate): %f\n", ms->m_lfo1_rate);
+    printf("LFO1 Pan Intensity (lfo1panint): %f\n", ms->m_lfo1_pan_intensity);
+    printf("LFO1 Osc Pitch Intensity (lfo1pitch): %f\n", ms->m_lfo1_osc_pitch_intensity);
+    printf("LFO Waveform (lfowave): %d\n", ms->m_lfo1_waveform);
+    printf("Note Number To Decay Scaling (ndscale): %d\n",
            ms->m_note_number_to_decay_scaling);
-    printf("Delay Mode: %d\n", ms->m_delay_mode);
-    printf("EG1 DCA Intensity: %f\n", ms->m_eg1_dca_intensity);
-    printf("Sustain Override: %d\n", ms->m_sustain_override);
+    printf("Noise OSC Db (noisedb): %f\n", ms->m_noise_osc_db);
+    printf("Octave (oct): %d\n", ms->m_octave);
+    printf("Pitchbend Range (pitchrange): %d\n", ms->m_pitchbend_range);
+    printf("Portamento Time ms (porta): %f\n", ms->m_portamento_time_msec);
+    printf("Pulse Width Pct (pw): %f\n", ms->m_pulse_width_pct);
+    printf("Sub OSC Db (subosc): %f\n", ms->m_sub_osc_db);
+    printf("Sustain Level (sustainlvl): %f\n", ms->m_sustain_level);
+    printf("Sustain Override (sustain): %d\n", ms->m_sustain_override);
+    printf("Velocity to Attack Scaling (vascale): %d\n",
+           ms->m_velocity_to_attack_scaling);
+    printf("Voice mode (voice): %d\n", ms->m_voice_mode);
+    printf("Volume (vol): %f\n", ms->m_volume_db);
+    printf("Reset To Zero (zero): %d\n", ms->m_reset_to_zero);
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }

@@ -438,6 +438,8 @@ void interpret(char *line)
                         minisynth_set_arpeggiate(ms, 1 - ms->m_arp.active);
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
+                        if (parse_minisynth_settings_change(ms, wurds, num_wurds))
+                        { continue; }
                         int melody_num = atoi(wurds[3]);
                         if (is_valid_melody_num(ms, melody_num)) {
                             if (strncmp("numloops", wurds[4], 8) == 0) {
@@ -1257,4 +1259,153 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             seq_set_euclidean(seq, 1 - seq->game_of_life_on);
         }
     }
+}
+
+bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD], int num_wurds)
+{
+    if (strncmp("attackms", wurds[3], 8) == 0) {
+        printf("Minisynth change Attack Time Ms!\n");
+        return true;
+    }
+    else if (strncmp("decayms", wurds[3], 7) == 0) {
+        printf("Minisynth change Decay/Relase Time MS!\n");
+        return true;
+    }
+    else if (strncmp("delayfb", wurds[3], 7) == 0) {
+        printf("Minisynth change Delay Feedback!\n");
+        return true;
+    }
+    else if (strncmp("delayr", wurds[3], 6) == 0) {
+        printf("Minisynth change Delay Ratio!\n");
+        return true;
+    }
+    else if (strncmp("delaymode", wurds[3], 9) == 0) {
+        printf("Minisynth change DELAY MODE!\n");
+        return true;
+    }
+    else if (strncmp("delayms", wurds[3], 7) == 0) {
+        printf("Minisynth change Delay Time Ms!\n");
+        return true;
+    }
+    else if (strncmp("delaymx", wurds[3], 7) == 0) {
+        printf("Minisynth change Delay Wet Mix!\n");
+        return true;
+    }
+    else if (strncmp("detune", wurds[3], 6) == 0) {
+        printf("Minisynth change DETUNE!\n");
+        return true;
+    }
+    else if (strncmp("eg1dcaint", wurds[3], 9) == 0) {
+        printf("Minisynth change EG1 DCA Int!\n");
+        return true;
+    }
+    else if (strncmp("eg1filterint", wurds[3], 12) == 0) {
+        printf("Minisynth change EG1 Filter Int!\n");
+        return true;
+    }
+    else if (strncmp("eg1oscint", wurds[3], 9) == 0) {
+        printf("Minisynth change EG1 Osc Int!\n");
+        return true;
+    }
+    else if (strncmp("fc", wurds[3], 2) == 0) {
+        printf("Minisynth change Filter Cutoff!\n");
+        return true;
+    }
+    else if (strncmp("fq", wurds[3], 2) == 0) {
+        printf("Minisynth change Filter Qualivity!\n");
+        return true;
+    }
+    else if (strncmp("ktint", wurds[3], 5) == 0) {
+        printf("Minisynth change Filter Keytrack Intensity!\n");
+        return true;
+    }
+    else if (strncmp("kt", wurds[3], 2) == 0) {
+        printf("Minisynth change Filter Keytrack!\n");
+        return true;
+    }
+    else if (strncmp("legato", wurds[3], 6) == 0) {
+        printf("Minisynth change LEGATO!\n");
+        return true;
+    }
+    else if (strncmp("lfo1ampint", wurds[3], 10) == 0) {
+        printf("Minisynth change LFO1 Amp Int!\n");
+        return true;
+    }
+    else if (strncmp("lfo1amp", wurds[3], 7) == 0) {
+        printf("Minisynth change LFO1 AMP!\n");
+        return true;
+    }
+    else if (strncmp("lfo1filterint", wurds[3], 13) == 0) {
+        printf("Minisynth change LFO1 Filter Int!\n");
+        return true;
+    }
+    else if (strncmp("lfo1rate", wurds[3], 8) == 0) {
+        printf("Minisynth change LFO1 rate!\n");
+        return true;
+    }
+    else if (strncmp("lfo1panint", wurds[3], 10) == 0) {
+        printf("Minisynth change LFO1 Pan Int!\n");
+        return true;
+    }
+    else if (strncmp("lfo1pitch", wurds[3], 9) == 0) {
+        printf("Minisynth change LFO1 Pitch!\n");
+        return true;
+    }
+    else if (strncmp("lfowave", wurds[3], 7) == 0) {
+        printf("Minisynth change LFO1 Wave!\n");
+        return true;
+    }
+    else if (strncmp("ndscale", wurds[3], 7) == 0) {
+        printf("Minisynth change Note Number to Decay Scaling!\n");
+        return true;
+    }
+    else if (strncmp("noisedb", wurds[3], 7) == 0) {
+        printf("Minisynth change Noise Osc DB!\n");
+        return true;
+    }
+    else if (strncmp("oct", wurds[3], 3) == 0) {
+        printf("Minisynth change OCTAVE!\n");
+        return true;
+    }
+    else if (strncmp("pitchrange", wurds[3], 10) == 0) {
+        printf("Minisynth change Pitchbend RANGE!\n");
+        return true;
+    }
+    else if (strncmp("porta", wurds[3], 5) == 0) {
+        printf("Minisynth change PORTAMENTO Time!\n");
+        return true;
+    }
+    else if (strncmp("pw", wurds[3], 2) == 0) {
+        printf("Minisynth change PULSEWIDTH Pct!\n");
+        return true;
+    }
+    else if (strncmp("subosc", wurds[3], 6) == 0) {
+        printf("Minisynth change SubOSC DB!\n");
+        return true;
+    }
+    else if (strncmp("sustainlvl", wurds[3], 10) == 0) {
+        printf("Minisynth change Sustain Level!\n");
+        return true;
+    }
+    else if (strncmp("sustain", wurds[3], 7) == 0) {
+        printf("Minisynth change SUSTAIN!\n");
+        return true;
+    }
+    else if (strncmp("vascale", wurds[3], 7) == 0) {
+        printf("Minisynth change Velocity to Attack Scaling!\n");
+        return true;
+    }
+    else if (strncmp("voice", wurds[3], 5) == 0) {
+        printf("Minisynth change VOICE!\n");
+        return true;
+    }
+    else if (strncmp("vol", wurds[3], 3) == 0) {
+        printf("Minisynth change VOLUME!\n");
+        return true;
+    }
+    else if (strncmp("zero", wurds[3], 4) == 0) {
+        printf("Minisynth change REST-To-ZERO!\n");
+        return true;
+    }
+    return false;
 }
