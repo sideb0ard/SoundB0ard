@@ -493,6 +493,7 @@ void interpret(char *line)
                                 }
                             }
                             else if (strncmp("melody", wurds[4], 6) == 0) {
+                                minisynth_reset_melody(ms, melody_num);
                                 char_melody_to_midi_melody(ms, melody_num,
                                                            wurds, 5, num_wurds);
                             }
@@ -512,8 +513,9 @@ void interpret(char *line)
                     }
                     else if (strncmp("cp", wurds[2], 2) == 0) {
                         int pattern_num = atoi(wurds[3]);
-                        int sg2 = atoi(wurds[4]);
-                        int pattern_num2 = atoi(wurds[5]);
+                        int sg2 = 0;
+                        int pattern_num2 = 0;
+                        sscanf(wurds[4], "%d:%d", &sg2, &pattern_num2);
                         if (mixer_is_valid_soundgen_num(mixr, sg2) &&
                             mixr->sound_generators[sg2]->type == SYNTH_TYPE) {
                             minisynth *ms2 =
