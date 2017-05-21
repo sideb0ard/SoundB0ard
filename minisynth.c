@@ -79,6 +79,7 @@ minisynth *new_minisynth(void)
     ms->max_generation = 0;
 
     ms->multi_melody_mode = true;
+    ms->cur_melody_iteration = 1;
 
     for (int i = 0; i < MAX_VOICES; i++) {
         ms->m_voices[i] = new_minisynth_voice();
@@ -555,8 +556,9 @@ void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
 
 int minisynth_add_melody(minisynth *ms)
 {
+    minisynth_stop(ms);
     ms->cur_melody++;
-    return ms->num_melodies++; // this will return melody_num of new one
+    return ms->num_melodies++;
 }
 
 void minisynth_dupe_melody(midi_event **from, midi_event **to)

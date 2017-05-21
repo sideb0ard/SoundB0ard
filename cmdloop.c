@@ -420,6 +420,10 @@ void interpret(char *line)
                 int sgnum = add_minisynth(mixr);
                 mixr->midi_control_destination = SYNTH;
                 mixr->active_midi_soundgen_num = sgnum;
+                if (num_wurds > 2) {
+                    minisynth *ms = (minisynth *)mixr->sound_generators[sgnum];
+                    char_melody_to_midi_melody(ms, 0, wurds, 2, num_wurds);
+                }
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
@@ -430,7 +434,11 @@ void interpret(char *line)
 
                     if (strncmp("add", wurds[2], 3) == 0) {
                         if (strncmp("melody", wurds[3], 6) == 0) {
-                            minisynth_add_melody(ms);
+                            int new_melody_num = minisynth_add_melody(ms);
+                            if (num_wurds > 4) {
+                                char_melody_to_midi_melody(ms, new_melody_num,
+                                                           wurds, 4, num_wurds);
+                            }
                         }
                     }
                     else if (strncmp("arp", wurds[2], 3) == 0) {
@@ -453,11 +461,14 @@ void interpret(char *line)
                                 }
                             }
                             else if (strncmp("add", wurds[4], 3) == 0) {
-                                int tick = atoi(wurds[5]);
-                                int midi_note = atoi(wurds[6]);
-                                printf("Adding note\n");
-                                minisynth_add_note(ms, melody_num, tick,
-                                                   midi_note);
+                                int tick = 0;
+                                int midi_note = 0;
+                                sscanf(wurds[5], "%d:%d", &tick, &midi_note);
+                                if (midi_note != 0) {
+                                    printf("Adding note\n");
+                                    minisynth_add_note(ms, melody_num, tick,
+                                                       midi_note);
+                                }
                             }
                             else if (strncmp("mv", wurds[4], 2) == 0) {
                                 int fromtick = atoi(wurds[5]);
@@ -472,11 +483,14 @@ void interpret(char *line)
                                 minisynth_rm_note(ms, melody_num, tick);
                             }
                             else if (strncmp("madd", wurds[4], 4) == 0) {
-                                int tick = atoi(wurds[5]);
-                                int midi_note = atoi(wurds[6]);
-                                printf("MAdding note\n");
-                                minisynth_add_micro_note(ms, melody_num, tick,
-                                                         midi_note);
+                                int tick = 0;
+                                int midi_note = 0;
+                                sscanf(wurds[5], "%d:%d", &tick, &midi_note);
+                                if (midi_note != 0) {
+                                    printf("MAdding note\n");
+                                    minisynth_add_micro_note(ms, melody_num,
+                                                             tick, midi_note);
+                                }
                             }
                             else if (strncmp("melody", wurds[4], 6) == 0) {
                                 char_melody_to_midi_melody(ms, melody_num,
