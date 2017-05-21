@@ -4,7 +4,14 @@
 #include "qblimited_oscillator.h"
 #include "voice.h"
 
-typedef enum { Saw3, Sqr3, Saw2Sqr, Tri2Saw, Tri2Sqr } minisynth_voice_choice;
+typedef enum {
+    Saw3,
+    Sqr3,
+    Saw2Sqr,
+    Tri2Saw,
+    Tri2Sqr,
+    MAX_VOICE_CHOICE
+} minisynth_voice_choice;
 
 typedef struct {
     voice m_voice;

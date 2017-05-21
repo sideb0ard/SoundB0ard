@@ -274,6 +274,6 @@ void minisynth_set_sub_osc_db(minisynth *ms, double val);
 void minisynth_set_sustain(minisynth *ms, double val);
 void minisynth_set_sustain_override(minisynth *ms, bool b);
 void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
-void minisynth_set_voice_mode(minisynth *ms, double val);
+void minisynth_set_voice_mode(minisynth *ms, unsigned int val);
 void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);

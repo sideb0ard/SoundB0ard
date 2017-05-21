@@ -1094,48 +1094,61 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
 
 void minisynth_print_settings(minisynth *ms)
 {
-    printf("Attack time ms (attackms): %f\n", ms->m_attack_time_msec);
-    printf("Decay Time ms (decayms): %f\n", ms->m_decay_release_time_msec);
-    printf("Delay Feedback Pct (delayfb)%f\n", ms->m_feedback_pct);
-    printf("Delay Ratio (delayr): %f\n", ms->m_delay_ratio);
-    printf("Delay Mode (delaymode): %d\n", ms->m_delay_mode); // unsigned int
-    printf("Delay Time ms (delayms): %f\n", ms->m_delay_time_msec);
+    printf("Attack time ms (attackms): %f [%d-%d]\n", ms->m_attack_time_msec,
+           EG_MINTIME_MS, EG_MAXTIME_MS);
+    printf("Decay Time ms (decayms): %f [%d-%d]\n",
+           ms->m_decay_release_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
+    printf("Delay Feedback Pct (delayfb): %f [0-100]\n", ms->m_feedback_pct);
+    printf("Delay Ratio (delayr): %f\n [-1 - 1]", ms->m_delay_ratio);
+    printf("Delay Mode (delaymode): %d [0-]\n",
+           ms->m_delay_mode); // unsigned int
+    printf("Delay Time ms (delayms): %f [%d-%d]\n", ms->m_delay_time_msec,
+           EG_MINTIME_MS, EG_MAXTIME_MS);
     printf("Delay Wet Mix (delaymx): %f\n", ms->m_wet_mix);
-    printf("Detune Cents (detune): %f\n", ms->m_detune_cents);
-    printf("EG1 DCA Intensity (eg1dcaint): %f\n", ms->m_eg1_dca_intensity);
-    printf("EG1 Filter Intensity (eg1filterint)%f\n",
+    printf("Detune Cents (detune): %f [-100-100]\n", ms->m_detune_cents);
+    printf("EG1 DCA Intensity (eg1dcaint): %f [-1 - 1]\n",
+           ms->m_eg1_dca_intensity);
+    printf("EG1 Filter Intensity (eg1filterint): %f [-1 - 1]\n",
            ms->m_eg1_filter_intensity);
-    printf("EG1 OSc Intensity (eg1oscint): %f\n", ms->m_eg1_osc_intensity);
-    printf("Filter Cutoff (fc): %f\n", ms->m_fc_control);
-    printf("Filter Q Control (fq): %f\n", ms->m_q_control);
-    printf("Filter Keytrack Intensity (ktint): %f\n",
+    printf("EG1 OSc Intensity (eg1oscint): %f [-1 - 1]\n",
+           ms->m_eg1_osc_intensity);
+    printf("Filter Cutoff (fc): %f [80-18000]\n", ms->m_fc_control);
+    printf("Filter Q Control (fq): [1-10]%f\n", ms->m_q_control);
+    printf("Filter Keytrack Intensity (ktint): %f [0.5-10]\n",
            ms->m_filter_keytrack_intensity);
-    printf("Filter Keytrack (kt): %d\n", ms->m_filter_keytrack); // unsigned
-    printf("LEGATO MODE (legato): %d\n", ms->m_legato_mode);     // unsigned
-    printf("LFO1 Amp Intensity (lfo1ampint): %f\n", ms->m_lfo1_amp_intensity);
-    printf("LFO AMp (lfo1amp): %f\n", ms->m_lfo1_amplitude);
-    printf("LFO1 Filter FC Intensity (lfo1filterint): %f\n",
+    printf("Filter Keytrack (kt): %d [0-1]\n",
+           ms->m_filter_keytrack);                                 // unsigned
+    printf("LEGATO MODE (legato): %d [0-1]\n", ms->m_legato_mode); // unsigned
+    printf("LFO1 Amp Intensity (lfo1ampint): %f [0-1]\n",
+           ms->m_lfo1_amp_intensity);
+    printf("LFO AMp (lfo1amp): %f [0-1]\n", ms->m_lfo1_amplitude);
+    printf("LFO1 Filter FC Intensity (lfo1filterint): %f [-1-1]\n",
            ms->m_lfo1_filter_fc_intensity);
-    printf("LFO Rate (lfo1rate): %f\n", ms->m_lfo1_rate);
-    printf("LFO1 Pan Intensity (lfo1panint): %f\n", ms->m_lfo1_pan_intensity);
-    printf("LFO1 Osc Pitch Intensity (lfo1pitch): %f\n",
+    printf("LFO Rate (lfo1rate): %f [0.02-20]\n", ms->m_lfo1_rate);
+    printf("LFO1 Pan Intensity (lfo1panint): %f [0-1]\n",
+           ms->m_lfo1_pan_intensity);
+    printf("LFO1 Osc Pitch Intensity (lfo1pitch): %f [-1-1]\n",
            ms->m_lfo1_osc_pitch_intensity);
-    printf("LFO Waveform (lfowave): %d\n", ms->m_lfo1_waveform); // unsigned
-    printf("Note Number To Decay Scaling (ndscale): %d\n",       // unsigned
+    printf("LFO Waveform (lfowave): %d [0-7]\n",
+           ms->m_lfo1_waveform);                                 // unsigned
+    printf("Note Number To Decay Scaling (ndscale): %d [0-1]\n", // unsigned
            ms->m_note_number_to_decay_scaling);
-    printf("Noise OSC Db (noisedb): %f\n", ms->m_noise_osc_db);
-    printf("Octave (oct): %d\n", ms->m_octave);                          // int
-    printf("Pitchbend Range (pitchrange): %d\n", ms->m_pitchbend_range); // int
-    printf("Portamento Time ms (porta): %f\n", ms->m_portamento_time_msec);
-    printf("Pulse Width Pct (pw): %f\n", ms->m_pulse_width_pct);
-    printf("Sub OSC Db (subosc): %f\n", ms->m_sub_osc_db);
-    printf("Sustain Level (sustainlvl): %f\n", ms->m_sustain_level);
-    printf("Sustain Override (sustain): %d\n", ms->m_sustain_override); // bool
-    printf("Velocity to Attack Scaling (vascale): %d\n",
-           ms->m_velocity_to_attack_scaling);             // unsigned
-    printf("Voice mode (voice): %d\n", ms->m_voice_mode); // unsigned
-    printf("Volume (vol): %f\n", ms->m_volume_db);
-    printf("Reset To Zero (zero): %d\n", ms->m_reset_to_zero); // unsigned
+    printf("Noise OSC Db (noisedb): %f [-96-0]\n", ms->m_noise_osc_db);
+    printf("Octave (oct): %d [-4-4]\n", ms->m_octave); // int
+    printf("Pitchbend Range (pitchrange): %d [0-12]\n",
+           ms->m_pitchbend_range); // int
+    printf("Portamento Time ms (porta): %f [0-5000]\n",
+           ms->m_portamento_time_msec);
+    printf("Pulse Width Pct (pw): %f [1-99]\n", ms->m_pulse_width_pct);
+    printf("Sub OSC Db (subosc): %f [-96-0]\n", ms->m_sub_osc_db);
+    printf("Sustain Level (sustainlvl): %f [0-1]\n", ms->m_sustain_level);
+    printf("Sustain Override (sustain): %d [0,1]\n",
+           ms->m_sustain_override); // bool
+    printf("Velocity to Attack Scaling (vascale): %d [0,1]\n",
+           ms->m_velocity_to_attack_scaling);                   // unsigned
+    printf("Voice mode (voice): %d [0-5]\n", ms->m_voice_mode); // unsigned
+    printf("Volume (vol): %f [0-1]\n", ms->m_volume_db);
+    printf("Reset To Zero (zero): %d [0,1]\n", ms->m_reset_to_zero); // unsigned
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
@@ -1436,37 +1449,255 @@ void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
     }
 }
 
-void minisynth_set_attack_time_ms(minisynth *ms, double val);
-void minisynth_set_decay_time_ms(minisynth *ms, double val);
-void minisynth_set_delay_feedback_pct(minisynth *ms, double val);
-void minisynth_set_delay_ratio(minisynth *ms, double val);
-void minisynth_set_delay_mode(minisynth *ms, unsigned int val);
-void minisynth_set_delay_time_ms(minisynth *ms, double val);
-void minisynth_set_delay_wetmix(minisynth *ms, double val);
-void minisynth_set_detune(minisynth *ms, double val);
-void minisynth_set_eg1_dca_int(minisynth *ms, double val);
-void minisynth_set_eg1_filter_int(minisynth *ms, int val);
-void minisynth_set_eg1_osc_int(minisynth *ms, double val);
-void minisynth_set_filter_fc(minisynth *ms, double val);
-void minisynth_set_filter_fq(minisynth *ms, double val);
-void minisynth_set_keytrack_int(minisynth *ms, double val);
-void minisynth_set_keytrack(minisynth *ms, unsigned int val);
-void minisynth_set_legato_mode(minisynth *ms, unsigned int val);
-void minisynth_set_lfo1_amp_int(minisynth *ms, double val);
-void minisynth_set_lfo1_amp(minisynth *ms, double val);
-void minisynth_set_lfo1_filter_fc_int(minisynth *ms, double val);
-void minisynth_set_lfo1_rate(minisynth *ms, double val);
-void minisynth_set_lfo1_pan_int(minisynth *ms, double val);
-void minisynth_set_lfo1_pitch(minisynth *ms, double val);
-void minisynth_set_lfo1_wave(minisynth *ms, unsigned int val);
-void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
-void minisynth_set_noise_osc_db(minisynth *ms, double val);
-void minisynth_set_octave(minisynth *ms, int val);
-void minisynth_set_pitchbend_range(minisynth *ms, int val);
-void minisynth_set_portamento_time_ms(minisynth *ms, double val);
-void minisynth_set_pulsewidth_pct(minisynth *ms, double val);
-void minisynth_set_sub_osc_db(minisynth *ms, double val);
-void minisynth_set_sustain(minisynth *ms, double val);
+void minisynth_set_attack_time_ms(minisynth *ms, double val)
+{
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
+        ms->m_attack_time_msec = val;
+    else
+        printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+}
+
+void minisynth_set_decay_time_ms(minisynth *ms, double val)
+{
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
+        ms->m_decay_release_time_msec = val;
+    else
+        printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+}
+
+void minisynth_set_delay_feedback_pct(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 100)
+        ms->m_feedback_pct = val;
+    else
+        printf("val must be between 0 and 100\n");
+}
+
+void minisynth_set_delay_ratio(minisynth *ms, double val)
+{
+    if (val >= -0.9 && val <= 0.9)
+        ms->m_feedback_pct = val;
+    else
+        printf("val must be between -0.9 and 0.9\n");
+}
+
+void minisynth_set_delay_mode(minisynth *ms, unsigned int val)
+{
+    if (val < MAX_NUM_DELAY_MODE)
+        ms->m_delay_mode = val;
+    else
+        printf("val must be between 0 and %d\n", MAX_NUM_DELAY_MODE);
+}
+
+void minisynth_set_delay_time_ms(minisynth *ms, double val)
+{
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
+        ms->m_delay_time_msec = val;
+    else
+        printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+}
+
+void minisynth_set_delay_wetmix(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 1)
+        ms->m_wet_mix = val;
+    else
+        printf("val must be between 0 and 1\n");
+}
+
+void minisynth_set_detune(minisynth *ms, double val)
+{
+    if (val >= -100 && val <= 100)
+        ms->m_detune_cents = val;
+    else
+        printf("val must be between -100 and 100\n");
+}
+
+void minisynth_set_eg1_dca_int(minisynth *ms, double val)
+{
+    if (val >= -1 && val <= 1)
+        ms->m_eg1_dca_intensity = val;
+    else
+        printf("val must be between -1 and 1\n");
+}
+
+void minisynth_set_eg1_filter_int(minisynth *ms, int val)
+{
+    if (val >= -1 && val <= 1)
+        ms->m_eg1_filter_intensity = val;
+    else
+        printf("val must be between -1 and 1\n");
+}
+
+void minisynth_set_eg1_osc_int(minisynth *ms, double val)
+{
+    if (val >= -1 && val <= 1)
+        ms->m_eg1_osc_intensity = val;
+    else
+        printf("val must be between -1 and 1\n");
+}
+
+void minisynth_set_filter_fc(minisynth *ms, double val)
+{
+    if (val >= 80 && val <= 18000)
+        ms->m_fc_control = val;
+    else
+        printf("val must be between 80 and 18000\n");
+}
+
+void minisynth_set_filter_fq(minisynth *ms, double val)
+{
+    if (val >= 1 && val <= 10)
+        ms->m_q_control = val;
+    else
+        printf("val must be between 1 and 10\n");
+}
+
+void minisynth_set_keytrack_int(minisynth *ms, double val)
+{
+    if (val >= 0.5 && val <= 10)
+        ms->m_filter_keytrack_intensity = val;
+    else
+        printf("val must be between 0.5 and 10\n");
+}
+
+void minisynth_set_keytrack(minisynth *ms, unsigned int val)
+{
+    if (val != 0 && val != 1) {
+        printf("Val must be zero or one\n");
+        return;
+    }
+    ms->m_filter_keytrack = val;
+}
+
+void minisynth_set_legato_mode(minisynth *ms, unsigned int val)
+{
+    if (val != 0 && val != 1) {
+        printf("Val must be zero or one\n");
+        return;
+    }
+    ms->m_legato_mode = val;
+}
+
+void minisynth_set_lfo1_amp_int(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 1)
+        ms->m_lfo1_amp_intensity = val;
+    else
+        printf("val must be between 0 and 1\n");
+}
+void minisynth_set_lfo1_amp(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 1)
+        ms->m_lfo1_amplitude = val;
+    else
+        printf("val must be between 0 and 1\n");
+}
+
+void minisynth_set_lfo1_filter_fc_int(minisynth *ms, double val)
+{
+    if (val >= -1 && val <= 1)
+        ms->m_lfo1_filter_fc_intensity = val;
+    else
+        printf("val must be between -1 and 1\n");
+}
+
+void minisynth_set_lfo1_rate(minisynth *ms, double val)
+{
+    if (val >= 0.02 && val <= 20)
+        ms->m_lfo1_rate = val;
+    else
+        printf("val must be between 0.02 and 20\n");
+}
+
+void minisynth_set_lfo1_pan_int(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 1)
+        ms->m_lfo1_pan_intensity = val;
+    else
+        printf("val must be between 0 and 1\n");
+}
+
+void minisynth_set_lfo1_pitch(minisynth *ms, double val)
+{
+    if (val >= -1 && val <= 1)
+        ms->m_lfo1_osc_pitch_intensity = val;
+    else
+        printf("val must be between -1 and 1\n");
+}
+
+void minisynth_set_lfo1_wave(minisynth *ms, unsigned int val)
+{
+    if (val < MAX_LFO_OSC)
+        ms->m_lfo1_waveform = val;
+    else
+        printf("val must be between 0 and %d\n", MAX_LFO_OSC);
+}
+
+void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val)
+{
+    if (val != 0 && val != 1) {
+        printf("Val must be zero or one\n");
+        return;
+    }
+    ms->m_note_number_to_decay_scaling = val;
+}
+
+void minisynth_set_noise_osc_db(minisynth *ms, double val)
+{
+    if (val >= -96 && val <= 0)
+        ms->m_noise_osc_db = val;
+    else
+        printf("val must be between -96 and 0\n");
+}
+
+void minisynth_set_octave(minisynth *ms, int val)
+{
+    if (val >= -4 && val <= 4)
+        ms->m_octave = val;
+    else
+        printf("val must be between -4 and 4\n");
+}
+
+void minisynth_set_pitchbend_range(minisynth *ms, int val)
+{
+    if (val >= 0 && val <= 12)
+        ms->m_pitchbend_range = val;
+    else
+        printf("val must be between 0 and 12\n");
+}
+
+void minisynth_set_portamento_time_ms(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 5000)
+        ms->m_portamento_time_msec = val;
+    else
+        printf("val must be between 0 and 5000\n");
+}
+
+void minisynth_set_pulsewidth_pct(minisynth *ms, double val)
+{
+    if (val >= 1 && val <= 99)
+        ms->m_pulse_width_pct = val;
+    else
+        printf("val must be between 1 and 99\n");
+}
+
+void minisynth_set_sub_osc_db(minisynth *ms, double val)
+{
+    if (val >= -96 && val <= 0)
+        ms->m_sub_osc_db = val;
+    else
+        printf("val must be between -96 and 0\n");
+}
+
+void minisynth_set_sustain(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 1)
+        ms->m_sub_osc_db = val;
+    else
+        printf("val must be between 0 and 1\n");
+}
 
 void minisynth_set_sustain_override(minisynth *ms, bool b)
 {
@@ -1479,7 +1710,36 @@ void minisynth_set_sustain_override(minisynth *ms, bool b)
     }
 }
 
-void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
-void minisynth_set_voice_mode(minisynth *ms, double val);
-void minisynth_set_vol(minisynth *ms, double val);
-void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
+void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val)
+{
+    if (val != 0 && val != 1) {
+        printf("Val must be zero or one\n");
+        return;
+    }
+    ms->m_velocity_to_attack_scaling = val;
+}
+
+void minisynth_set_voice_mode(minisynth *ms, unsigned int val)
+{
+    if (val < MAX_VOICE_CHOICE)
+        ms->m_voice_mode = val;
+    else
+        printf("val must be between 0 and %d\n", MAX_VOICE_CHOICE);
+}
+
+void minisynth_set_vol(minisynth *ms, double val)
+{
+    if (val >= 0 && val <= 1)
+        ms->m_volume_db = val;
+    else
+        printf("val must be between 0 and 1\n");
+}
+
+void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
+{
+    if (val != 0 && val != 1) {
+        printf("Val must be zero or one\n");
+        return;
+    }
+    ms->m_reset_to_zero = val;
+}
