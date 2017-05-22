@@ -49,44 +49,7 @@
 
 static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 
-typedef struct minisynth {
-    SOUNDGEN sound_generator;
-
-    int tick; // current 16th note tick from mixer
-    midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];
-    int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];
-    midi_events_loop_t backup_melody_while_getting_crazy;
-
-    int num_melodies;
-    int cur_melody;
-    int cur_melody_iteration;
-
-    bool multi_melody_mode;
-    bool multi_melody_loop_countdown_started;
-
-    bool active;
-
-    int sustain;
-
-    bool recording;
-    unsigned int m_midi_knob_mode; // midi routings, 1..3
-
-    // float vol;
-
-    // end SOUNDGEN stuff
-
-    minisynth_voice *m_voices[MAX_VOICES];
-
-    // global modmatrix, core is shared by all voices
-    modmatrix m_ms_modmatrix; // routing structure for sound generation
-    global_synth_params m_global_synth_params;
-
-    double m_last_note_frequency;
-
-    unsigned int m_midi_rx_channel;
-
-    stereodelay m_delay_fx;
-
+typedef struct synthsettings {
     unsigned int m_voice_mode; // controlled by keys
     // midi mode one, top row
     double m_attack_time_msec;
@@ -134,6 +97,48 @@ typedef struct minisynth {
 
     double m_portamento_time_msec;
     bool m_sustain_override;
+} synthsettings;
+
+typedef struct minisynth {
+    SOUNDGEN sound_generator;
+
+    int tick; // current 16th note tick from mixer
+    midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];
+    int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];
+    midi_events_loop_t backup_melody_while_getting_crazy;
+
+    int num_melodies;
+    int cur_melody;
+    int cur_melody_iteration;
+
+    bool multi_melody_mode;
+    bool multi_melody_loop_countdown_started;
+
+    bool active;
+
+    int sustain;
+
+    bool recording;
+    unsigned int m_midi_knob_mode; // midi routings, 1..3
+
+    // float vol;
+
+    // end SOUNDGEN stuff
+
+    minisynth_voice *m_voices[MAX_VOICES];
+
+    // global modmatrix, core is shared by all voices
+    modmatrix m_ms_modmatrix; // routing structure for sound generation
+    global_synth_params m_global_synth_params;
+
+    double m_last_note_frequency;
+
+    unsigned int m_midi_rx_channel;
+
+    stereodelay m_delay_fx;
+
+    synthsettings m_settings;
+
 
     bool morph_mode; // magical
     int morph_every_n_loops;

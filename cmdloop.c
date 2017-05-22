@@ -655,7 +655,8 @@ void interpret(char *line)
                             minisynth_set_sustain_override(ms, false);
                         }
                         printf("Synth Sustain Override : %s\n",
-                               ms->m_sustain_override ? "true" : "false");
+                               ms->m_settings.m_sustain_override ? "true"
+                                                                 : "false");
                         for (int i = 0; i < MAX_VOICES; i++) {
                             if (ms->m_voices[i]) {
                                 printf("EG sustain: %d\n",

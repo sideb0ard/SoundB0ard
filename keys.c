@@ -59,11 +59,11 @@ void keys(int soundgen_num)
                 break;
             case 49:
                 printf("Down an octave...\n");
-                ms->m_octave--;
+                ms->m_settings.m_octave--;
                 break;
             case 50:
                 printf("Up an octave...\n");
-                ms->m_octave++;
+                ms->m_settings.m_octave++;
                 break;
             case 114:
                 ms->recording = 1 - ms->recording;
@@ -72,32 +72,33 @@ void keys(int soundgen_num)
                 break;
             case 122:
                 printf("SAW3 mode\n");
-                ms->m_voice_mode = 0;
+                ms->m_settings.m_voice_mode = 0;
                 break;
             case 120:
                 printf("SQR3 mode\n");
-                ms->m_voice_mode = 1;
+                ms->m_settings.m_voice_mode = 1;
                 break;
             case 99:
                 printf("SAW2SQR mode\n");
-                ms->m_voice_mode = 2;
+                ms->m_settings.m_voice_mode = 2;
                 break;
             case 118:
                 printf("TRI2SAW mode\n");
-                ms->m_voice_mode = 3;
+                ms->m_settings.m_voice_mode = 3;
                 break;
             case 98:
                 printf("TRI2SQR mode\n");
-                ms->m_voice_mode = 4;
+                ms->m_settings.m_voice_mode = 4;
                 break;
             case 91:
                 printf("RANDOM MONDY mode!\n");
                 minisynth_rand_settings(ms);
                 break;
             case 110:
-                ms->m_lfo1_waveform = (++ms->m_lfo1_waveform) % MAX_LFO_OSC;
-                printf("LFO! Mode Toggle: %d MaxLFO: %d\n", ms->m_lfo1_waveform,
-                       MAX_LFO_OSC);
+                ms->m_settings.m_lfo1_waveform =
+                    (++ms->m_settings.m_lfo1_waveform) % MAX_LFO_OSC;
+                printf("LFO! Mode Toggle: %d MaxLFO: %d\n",
+                       ms->m_settings.m_lfo1_waveform, MAX_LFO_OSC);
                 break;
             case 109:
                 mixer_toggle_key_mode(mixr);
