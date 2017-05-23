@@ -1291,73 +1291,78 @@ void minisynth_set_backup_mode(minisynth *ms, bool b)
     if (b) {
         minisynth_dupe_melody(ms->melodies[0],
                               ms->backup_melody_while_getting_crazy);
+        ms->m_settings_backup_while_getting_crazy = ms->m_settings;
         ms->multi_melody_mode = false;
         ms->cur_melody = 0;
     }
     else {
         minisynth_dupe_melody(ms->backup_melody_while_getting_crazy,
                               ms->melodies[0]);
+        ms->m_settings = ms->m_settings_backup_while_getting_crazy;
         ms->multi_melody_mode = true;
     }
 }
 
 void minisynth_morph(minisynth *ms)
 {
-    minisynth_stop(ms);
-    for (int i = 0; i < PPNS; i++) {
-        if (ms->melodies[0][i] != NULL) {
-            midi_event_free(ms->melodies[0][i]);
-            ms->melodies[0][i] = NULL;
-        }
-    }
-    static const int NUM_MIDI_NOTES = 10;
-    int midi_notes[10] = {0};
-    int notes_returned = minisynth_get_notes_from_melody(
-        (midi_event **)&ms->backup_melody_while_getting_crazy, midi_notes);
-    int i, j = 0;
-    if (notes_returned > 1) {
-        if (notes_returned < NUM_MIDI_NOTES) {
-            int space_to_improv = NUM_MIDI_NOTES - notes_returned;
-            int idx = NUM_MIDI_NOTES - space_to_improv;
-            for (i = 0; i < space_to_improv; i++) {
-                for (j = 0; j < notes_returned && idx < NUM_MIDI_NOTES; j++) {
-                    int third = midi_notes[j] + 4;
-                    int fifth = midi_notes[j] + 7;
-                    midi_notes[idx++] = third;
-                    if (idx < NUM_MIDI_NOTES)
-                        midi_notes[idx++] = fifth;
-                    if (rand() % 100 > 90 && idx < NUM_MIDI_NOTES)
-                        midi_notes[idx++] = third - 12;
-                    if (rand() % 100 > 95 && idx < NUM_MIDI_NOTES)
-                        midi_notes[idx++] = third + 12;
-                }
-            }
-        }
-    }
-    int randy = rand() % 6;
-    for (i = 0; i < randy; i++) {
-        int note = midi_notes[rand() % 10];
-        int amp = rand() % 128;
-        int note_on_tick = rand() % PPNS;
-        note_on_tick /= PPSIXTEENTH;
-        note_on_tick *= PPSIXTEENTH;
+    printf("MIGHTY MORPH!\n");
+    minisynth_set_octave(ms, ms->m_settings.m_octave - 1);
+    //minisynth_stop(ms);
+    //minisynth_reset_melody(ms, 0);
+    //for (int i = 0; i < PPNS; i++) {
+    //    if (ms->melodies[0][i] != NULL) {
+    //        midi_event_free(ms->melodies[0][i]);
+    //        ms->melodies[0][i] = NULL;
+    //    }
+    //}
+    //static const int NUM_MIDI_NOTES = 10;
+    //int midi_notes[10] = {0};
+    //int notes_returned = minisynth_get_notes_from_melody(
+    //    (midi_event **)&ms->backup_melody_while_getting_crazy, midi_notes);
+    //int i, j = 0;
+    //if (notes_returned > 1) {
+    //    if (notes_returned < NUM_MIDI_NOTES) {
+    //        int space_to_improv = NUM_MIDI_NOTES - notes_returned;
+    //        int idx = NUM_MIDI_NOTES - space_to_improv;
+    //        for (i = 0; i < space_to_improv; i++) {
+    //            for (j = 0; j < notes_returned && idx < NUM_MIDI_NOTES; j++) {
+    //                int third = midi_notes[j] + 4;
+    //                int fifth = midi_notes[j] + 7;
+    //                midi_notes[idx++] = third;
+    //                if (idx < NUM_MIDI_NOTES)
+    //                    midi_notes[idx++] = fifth;
+    //                if (rand() % 100 > 90 && idx < NUM_MIDI_NOTES)
+    //                    midi_notes[idx++] = third - 12;
+    //                if (rand() % 100 > 95 && idx < NUM_MIDI_NOTES)
+    //                    midi_notes[idx++] = third + 12;
+    //            }
+    //        }
+    //    }
+    //}
+    //int randy = rand() % 6;
+    //for (i = 0; i < randy; i++) {
+    //    int note = midi_notes[rand() % 10];
+    //    int amp = rand() % 128;
+    //    int note_on_tick = rand() % PPNS;
+    //    note_on_tick /= PPSIXTEENTH;
+    //    note_on_tick *= PPSIXTEENTH;
 
-        int note_off_tick = (note_on_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
+    //    int note_off_tick = (note_on_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
 
-        midi_event *on_event = new_midi_event(note_on_tick, 144, note, amp);
-        midi_event *off_event = new_midi_event(note_off_tick, 128, note, amp);
-        on_event->delete_after_use = true;
-        off_event->delete_after_use = true;
-        minisynth_add_event(ms, ms->cur_melody, on_event);
-        minisynth_add_event(ms, ms->cur_melody, off_event);
-    }
-    if (rand() % 100 > 90)
-        ms->m_settings.m_sustain_override =
-            1 - ms->m_settings.m_sustain_override;
-    if (rand() % 100 > 90)
-        ms->m_arp.active = 1 - ms->m_arp.active;
-    if (rand() % 100 > 95)
-        minisynth_rand_settings(ms);
+    //    midi_event *on_event = new_midi_event(note_on_tick, 144, note, amp);
+    //    midi_event *off_event = new_midi_event(note_off_tick, 128, note, amp);
+    //    on_event->delete_after_use = true;
+    //    off_event->delete_after_use = true;
+    //    minisynth_add_event(ms, ms->cur_melody, on_event);
+    //    minisynth_add_event(ms, ms->cur_melody, off_event);
+    //}
+    //if (rand() % 100 > 90)
+    //    ms->m_settings.m_sustain_override =
+    //        1 - ms->m_settings.m_sustain_override;
+    //if (rand() % 100 > 90)
+    //    ms->m_arp.active = 1 - ms->m_arp.active;
+    //if (rand() % 100 > 95)
+    //    minisynth_rand_settings(ms);
 }
 
 void minisynth_stop(minisynth *ms)

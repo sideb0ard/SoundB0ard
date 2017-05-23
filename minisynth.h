@@ -138,6 +138,7 @@ typedef struct minisynth {
     stereodelay m_delay_fx;
 
     synthsettings m_settings;
+    synthsettings m_settings_backup_while_getting_crazy;
 
 
     bool morph_mode; // magical

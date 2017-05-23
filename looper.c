@@ -460,10 +460,16 @@ void looper_scramble(looper *s)
 
     bool yolo = false;
     bool reverse = false;
-    bool copyfirsthalf = false;
+    bool copy_first_half = false;
+    bool silence_last_quarter = false;
     int dice1, dice2;
 
-    for (int i = 0; i < len; i++) {
+    int outer_randy = rand() % 100;
+    silence_last_quarter = outer_randy > 90 && outer_randy <= 95 ? true : false;
+    copy_first_half = outer_randy > 95 ? true : false;
+
+    for (int i = 0; i < len; i++)
+    {
 
         if (i % len16th == 0) {
             s->scramble_counter++;
@@ -473,9 +479,9 @@ void looper_scramble(looper *s)
             }
             else {
                 dice1 = rand() % 100;
-                if (dice1 >= 85 && dice1 < 95)
+                if (dice1 >= 85 && dice1 < 90)
                     yolo = true;
-                else if (dice1 >= 95)
+                else if (dice1 >= 90 && dice1 < 97)
                     reverse = true;
             }
             dice2 = rand() % 100;
@@ -504,11 +510,6 @@ void looper_scramble(looper *s)
                     s->scramblrrr
                         ->resampled_file_bytes[(i + len16th * 2) % len] =
                         seventh16th[i % len16th];
-                else if (dice2 >= 42 && dice2 < 87 &&
-                         s->scramble_counter % 3 == 0) {
-                    copyfirsthalf = true;
-                    break;
-                }
                 else
                     s->scramblrrr
                         ->resampled_file_bytes[(i + len16th * 2) % len] =
@@ -516,12 +517,18 @@ void looper_scramble(looper *s)
             }
         }
     }
-    if (copyfirsthalf) {
+
+    if (copy_first_half) {
         int halflen = len / 2;
         for (int i = 0; i < halflen; i++)
             s->scramblrrr->resampled_file_bytes[i + halflen] =
                 s->samples[s->cur_sample]->resampled_file_bytes[i];
-        copyfirsthalf = false;
+    }
+
+    if (silence_last_quarter) {
+        int quartlen = len / 4;
+        for (int i = quartlen * 3; i < len; i++)
+            s->scramblrrr->resampled_file_bytes[i] = 0;
     }
 
     if (mixr->debug_mode)
