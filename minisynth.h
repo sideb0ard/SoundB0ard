@@ -97,6 +97,7 @@ typedef struct synthsettings {
 
     double m_portamento_time_msec;
     bool m_sustain_override;
+    double m_sustain_time_ms;
 } synthsettings;
 
 typedef struct minisynth {
@@ -139,7 +140,6 @@ typedef struct minisynth {
 
     synthsettings m_settings;
     synthsettings m_settings_backup_while_getting_crazy;
-
 
     bool morph_mode; // magical
     int morph_every_n_loops;
@@ -278,6 +278,7 @@ void minisynth_set_portamento_time_ms(minisynth *ms, double val);
 void minisynth_set_pulsewidth_pct(minisynth *ms, double val);
 void minisynth_set_sub_osc_db(minisynth *ms, double val);
 void minisynth_set_sustain(minisynth *ms, double val);
+void minisynth_set_sustain_time(minisynth *ms, double val);
 void minisynth_set_sustain_override(minisynth *ms, bool b);
 void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_voice_mode(minisynth *ms, unsigned int val);

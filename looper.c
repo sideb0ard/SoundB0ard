@@ -468,8 +468,7 @@ void looper_scramble(looper *s)
     silence_last_quarter = outer_randy > 90 && outer_randy <= 95 ? true : false;
     copy_first_half = outer_randy > 95 ? true : false;
 
-    for (int i = 0; i < len; i++)
-    {
+    for (int i = 0; i < len; i++) {
 
         if (i % len16th == 0) {
             s->scramble_counter++;

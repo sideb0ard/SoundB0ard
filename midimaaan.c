@@ -20,7 +20,6 @@ extern mixer *mixr;
 
 void *midiman()
 {
-    printf("MIDI maaaaan!\n");
     pthread_setname_np("Midimaaaan");
 
     Pm_Initialize();
@@ -39,12 +38,9 @@ void *midiman()
         }
     }
     else {
-        printf(
-            "No MIDI inputs detected. If you think there should be, run 'midi' "
-            "to try and reinitialize. (NOT YET IMPLEMENTED\n"); // TODO
-                                                                // implement
         return NULL;
     }
+    printf("MIDI maaaaan!\n");
 
     PortMidiStream *mstream;
     PmEvent msg[32];

@@ -134,7 +134,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     printf("Changing bpm to %d\n", bpm);
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
-    mixr->midi_ticks_per_ms = PPQN / ((60.0 / bpm) * 1000);
+    mixr->midi_ticks_per_ms = PPQN * bpm / 60000;
     mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPBAR;
     mixr->loop_len_in_ticks = PPBAR;
     for (int i = 0; i < mixr->soundgen_num; i++) {

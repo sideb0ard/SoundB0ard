@@ -73,6 +73,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_delay_mode = 0;
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_sustain_override = false;
+    ms->m_settings.m_sustain_time_ms = 100;
 
     ms->m_last_midi_note = 0;
     ms->morph_mode = false;
@@ -702,11 +703,10 @@ void minisynth_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
         "[SYNTH] - Vol: %.2f Active: %s Multi: %s, Morph: %s, Morph EveryN: %d "
-        "Morph "
-        "Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
+        "Morph Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
         "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
-        "SustainOverride: %s "
-        "Filter FC: %.2f Filter Q: %2.f"
+        "SustainOverride: %s Sustain Time(ms): %.2f Filter FC: %.2f Filter Q: "
+        "%2.f"
         "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
         "%2.f"
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
@@ -721,11 +721,12 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_sustain_level, ms->m_settings.m_volume_db,
         ms->m_settings.m_lfo1_amplitude, ms->m_settings.m_lfo1_rate,
         ms->m_settings.m_sustain_override ? "true" : "false",
-        ms->m_settings.m_fc_control, ms->m_settings.m_q_control,
-        ms->m_settings.m_delay_time_msec, ms->m_settings.m_feedback_pct,
-        ms->m_settings.m_delay_ratio, ms->m_settings.m_wet_mix,
-        ms->m_settings.m_detune_cents, ms->m_settings.m_pulse_width_pct,
-        ms->m_settings.m_sub_osc_db, ms->m_settings.m_noise_osc_db);
+        ms->m_settings.m_sustain_time_ms, ms->m_settings.m_fc_control,
+        ms->m_settings.m_q_control, ms->m_settings.m_delay_time_msec,
+        ms->m_settings.m_feedback_pct, ms->m_settings.m_delay_ratio,
+        ms->m_settings.m_wet_mix, ms->m_settings.m_detune_cents,
+        ms->m_settings.m_pulse_width_pct, ms->m_settings.m_sub_osc_db,
+        ms->m_settings.m_noise_osc_db);
 
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
@@ -1048,6 +1049,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
     ms->m_settings.m_eg1_dca_intensity = (rand() % 2) + 1;
     ms->m_settings.m_sustain_override = rand() % 2;
+    ms->m_settings.m_sustain_time_ms = rand() % 1000;
 
     minisynth_print_settings(ms);
 }
@@ -1101,6 +1103,7 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
                    "::%d"    // ms->m_settings.m_note_number_to_decay_scaling);
                    "::%d"    // ms->m_settings.m_delay_mode);
                    "::%f"    // ms->m_settings.m_eg1_dca_intensity);
+                   "::%f"    // ms->m_settings.m_sustain_time_ms);
                    "::%d\n", // ms->m_settings.m_sustain_override);
         preset_name, ms->m_settings.m_voice_mode, ms->m_settings.m_detune_cents,
         ms->m_settings.m_lfo1_amplitude, ms->m_settings.m_lfo1_rate,
@@ -1124,7 +1127,7 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
         ms->m_settings.m_velocity_to_attack_scaling,
         ms->m_settings.m_note_number_to_decay_scaling,
         ms->m_settings.m_delay_mode, ms->m_settings.m_eg1_dca_intensity,
-        ms->m_settings.m_sustain_override);
+        ms->m_settings.m_sustain_time_ms, ms->m_settings.m_sustain_override);
 
     fclose(presetzzz);
     return true;
@@ -1187,6 +1190,8 @@ void minisynth_print_settings(minisynth *ms)
     printf("Sub OSC Db (subosc): %f [-96-0]\n", ms->m_settings.m_sub_osc_db);
     printf("Sustain Level (sustainlvl): %f [0-1]\n",
            ms->m_settings.m_sustain_level);
+    printf("Sustain Time ms  (sustainms): %f [10-2000]\n",
+           ms->m_settings.m_sustain_time_ms);
     printf("Sustain Override (sustain): %d [0,1]\n",
            ms->m_settings.m_sustain_override); // bool
     printf("Velocity to Attack Scaling (vascale): %d [0,1]\n",
@@ -1307,20 +1312,20 @@ void minisynth_morph(minisynth *ms)
 {
     printf("MIGHTY MORPH!\n");
     minisynth_set_octave(ms, ms->m_settings.m_octave - 1);
-    //minisynth_stop(ms);
-    //minisynth_reset_melody(ms, 0);
-    //for (int i = 0; i < PPNS; i++) {
+    // minisynth_stop(ms);
+    // minisynth_reset_melody(ms, 0);
+    // for (int i = 0; i < PPNS; i++) {
     //    if (ms->melodies[0][i] != NULL) {
     //        midi_event_free(ms->melodies[0][i]);
     //        ms->melodies[0][i] = NULL;
     //    }
     //}
-    //static const int NUM_MIDI_NOTES = 10;
-    //int midi_notes[10] = {0};
-    //int notes_returned = minisynth_get_notes_from_melody(
+    // static const int NUM_MIDI_NOTES = 10;
+    // int midi_notes[10] = {0};
+    // int notes_returned = minisynth_get_notes_from_melody(
     //    (midi_event **)&ms->backup_melody_while_getting_crazy, midi_notes);
-    //int i, j = 0;
-    //if (notes_returned > 1) {
+    // int i, j = 0;
+    // if (notes_returned > 1) {
     //    if (notes_returned < NUM_MIDI_NOTES) {
     //        int space_to_improv = NUM_MIDI_NOTES - notes_returned;
     //        int idx = NUM_MIDI_NOTES - space_to_improv;
@@ -1339,8 +1344,8 @@ void minisynth_morph(minisynth *ms)
     //        }
     //    }
     //}
-    //int randy = rand() % 6;
-    //for (i = 0; i < randy; i++) {
+    // int randy = rand() % 6;
+    // for (i = 0; i < randy; i++) {
     //    int note = midi_notes[rand() % 10];
     //    int amp = rand() % 128;
     //    int note_on_tick = rand() % PPNS;
@@ -1356,12 +1361,12 @@ void minisynth_morph(minisynth *ms)
     //    minisynth_add_event(ms, ms->cur_melody, on_event);
     //    minisynth_add_event(ms, ms->cur_melody, off_event);
     //}
-    //if (rand() % 100 > 90)
+    // if (rand() % 100 > 90)
     //    ms->m_settings.m_sustain_override =
     //        1 - ms->m_settings.m_sustain_override;
-    //if (rand() % 100 > 90)
+    // if (rand() % 100 > 90)
     //    ms->m_arp.active = 1 - ms->m_arp.active;
-    //if (rand() % 100 > 95)
+    // if (rand() % 100 > 95)
     //    minisynth_rand_settings(ms);
 }
 
@@ -1440,7 +1445,10 @@ void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep,
     if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS) {
         printf("New Notes!! %d - %d\n", mstep, midi_note);
         midi_event *on = new_midi_event(mstep, 144, midi_note, 128);
-        int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
+        // int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
+        int note_off_tick = (mstep + (int)(mixr->midi_ticks_per_ms *
+                                           ms->m_settings.m_sustain_time_ms)) %
+                            PPNS;
         midi_event *off = new_midi_event(note_off_tick, 128, midi_note, 128);
 
         minisynth_add_event(ms, pattern_num, on);
@@ -1795,4 +1803,12 @@ void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
         return;
     }
     ms->m_settings.m_reset_to_zero = val;
+}
+
+void minisynth_set_sustain_time(minisynth *ms, double val)
+{
+    if (val >= 10 && val <= 2000)
+        ms->m_settings.m_sustain_time_ms = val;
+    else
+        printf("val must be between 10 and 2000\n");
 }
