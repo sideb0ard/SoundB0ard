@@ -52,6 +52,7 @@ void keys(int soundgen_num)
             ch = getchar();
             // printf("C %d\n", ch);
             int midi_num;
+            char textnote[4] = {0};
             switch (ch) {
             case 27:
             case 113:
@@ -107,8 +108,9 @@ void keys(int soundgen_num)
                 break;
             default:
                 // play note
-                midi_num = ch_midi_lookup(ch, ms);
-                printf("MIDI: %d\n", midi_num);
+                midi_num =
+                    ch_midi_lookup(ch, ms->m_settings.m_octave, textnote);
+                printf("MIDI: %s [%d]\n", textnote, midi_num);
                 int fake_velocity = 100; // TODO real velocity
                 if (midi_num != -1) {
                     minisynth_handle_midi_note(ms, midi_num, fake_velocity,

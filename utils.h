@@ -12,7 +12,7 @@ void *duck_runrrr(void *arg);
 void faderrr(int sig_num, direction d);
 float freqval(char *n);
 int notelookup(char *n);
-int ch_midi_lookup(int ch, void *fm);
+int ch_midi_lookup(int ch, int octave, char *keytext);
 void list_sample_dir(void);
 void strim(const char *input, char *result);
 void chordie(char *n);

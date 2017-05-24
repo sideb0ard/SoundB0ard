@@ -233,64 +233,73 @@ int notelookup(char *n)
 }
 
 // float chfreqlookup(int ch, void *p)
-int ch_midi_lookup(int ch, void *p)
+int ch_midi_lookup(int ch, int octave, char *keytext)
 {
-    minisynth *ms = (minisynth *)p;
-    // int cur_octave = ns->cur_octave * 12;
-    int default_octave = 4;
-    int cur_octave = default_octave * 12;
-    if (ms->m_settings.m_octave != 0) {
-        cur_octave = cur_octave + (ms->m_settings.m_octave * 12);
-    }
-    int next_octave = cur_octave + 12;
+    int cur_octave_midi_num = octave * 12;
+    int next_octave = cur_octave_midi_num + 12;
 
     int midi_num = -1;
 
     switch (ch) {
     case 97:
-        midi_num = 0 + cur_octave;
+        midi_num = 0 + cur_octave_midi_num; // C
+        strncpy(keytext, "C", 1);
         break;
     case 119:
-        midi_num = 1 + cur_octave;
+        midi_num = 1 + cur_octave_midi_num; // C#
+        strncpy(keytext, "C#", 2);
         break;
     case 115:
-        midi_num = 2 + cur_octave;
+        midi_num = 2 + cur_octave_midi_num; // D
+        strncpy(keytext, "D", 1);
         break;
     case 101:
-        midi_num = 3 + cur_octave;
+        midi_num = 3 + cur_octave_midi_num; // D#
+        strncpy(keytext, "D#", 2);
         break;
     case 100:
-        midi_num = 4 + cur_octave;
+        midi_num = 4 + cur_octave_midi_num; // E
+        strncpy(keytext, "E", 1);
         break;
     case 102:
-        midi_num = 5 + cur_octave;
+        midi_num = 5 + cur_octave_midi_num; // F
+        strncpy(keytext, "F", 1);
         break;
     case 116:
-        midi_num = 6 + cur_octave;
+        midi_num = 6 + cur_octave_midi_num; // F#
+        strncpy(keytext, "F#", 2);
         break;
     case 103:
-        midi_num = 7 + cur_octave;
+        midi_num = 7 + cur_octave_midi_num; // G
+        strncpy(keytext, "G", 1);
         break;
     case 121:
-        midi_num = 8 + cur_octave;
+        midi_num = 8 + cur_octave_midi_num; // G#
+        strncpy(keytext, "G#", 2);
         break;
     case 104:
-        midi_num = 9 + cur_octave;
+        midi_num = 9 + cur_octave_midi_num; // A
+        strncpy(keytext, "A", 1);
         break;
     case 117:
-        midi_num = 10 + cur_octave;
+        midi_num = 10 + cur_octave_midi_num; // A#
+        strncpy(keytext, "A#", 2);
         break;
     case 106:
-        midi_num = 11 + cur_octave;
+        midi_num = 11 + cur_octave_midi_num; // B
+        strncpy(keytext, "B", 1);
         break;
     case 107:
-        midi_num = 0 + next_octave;
+        midi_num = 0 + next_octave; // C
+        strncpy(keytext, "C", 1);
         break;
     case 111:
-        midi_num = 1 + next_octave;
+        midi_num = 1 + next_octave; // C#
+        strncpy(keytext, "C#", 2);
         break;
     case 108:
-        midi_num = 2 + next_octave;
+        midi_num = 2 + next_octave; // D
+        strncpy(keytext, "D", 1);
         break;
         // default:
         //    midi_num = -1;

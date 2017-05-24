@@ -47,7 +47,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_feedback_pct = 0;
     ms->m_settings.m_delay_ratio = 0;
     ms->m_settings.m_wet_mix = 0.0;
-    ms->m_settings.m_octave = 0;
+    ms->m_settings.m_octave = 3;
     ms->m_settings.m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
     ms->m_settings.m_lfo1_osc_pitch_intensity = 0.0;
     ms->m_settings.m_sub_osc_db = -96.000000;
@@ -73,7 +73,8 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_delay_mode = 0;
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_sustain_override = false;
-    ms->m_settings.m_sustain_time_ms = 100;
+    ms->m_settings.m_sustain_time_ms = 400;
+    ms->m_settings.m_sustain_time_sixteenth = 1;
 
     ms->m_last_midi_note = 0;
     ms->morph_mode = false;
@@ -1104,6 +1105,7 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
                    "::%d"    // ms->m_settings.m_delay_mode);
                    "::%f"    // ms->m_settings.m_eg1_dca_intensity);
                    "::%f"    // ms->m_settings.m_sustain_time_ms);
+                   "::%f"    // ms->m_settings.m_sustain_time_sixteenth);
                    "::%d\n", // ms->m_settings.m_sustain_override);
         preset_name, ms->m_settings.m_voice_mode, ms->m_settings.m_detune_cents,
         ms->m_settings.m_lfo1_amplitude, ms->m_settings.m_lfo1_rate,
@@ -1127,7 +1129,9 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
         ms->m_settings.m_velocity_to_attack_scaling,
         ms->m_settings.m_note_number_to_decay_scaling,
         ms->m_settings.m_delay_mode, ms->m_settings.m_eg1_dca_intensity,
-        ms->m_settings.m_sustain_time_ms, ms->m_settings.m_sustain_override);
+        ms->m_settings.m_sustain_time_ms,
+        ms->m_settings.m_sustain_time_sixteenth,
+        ms->m_settings.m_sustain_override);
 
     fclose(presetzzz);
     return true;
@@ -1192,6 +1196,8 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_sustain_level);
     printf("Sustain Time ms  (sustainms): %f [10-2000]\n",
            ms->m_settings.m_sustain_time_ms);
+    printf("Sustain Time Ticks  (sustain16th): %f [1-16]\n",
+           ms->m_settings.m_sustain_time_sixteenth);
     printf("Sustain Override (sustain): %d [0,1]\n",
            ms->m_settings.m_sustain_override); // bool
     printf("Velocity to Attack Scaling (vascale): %d [0,1]\n",
@@ -1446,9 +1452,10 @@ void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep,
         printf("New Notes!! %d - %d\n", mstep, midi_note);
         midi_event *on = new_midi_event(mstep, 144, midi_note, 128);
         // int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
-        int note_off_tick = (mstep + (int)(mixr->midi_ticks_per_ms *
-                                           ms->m_settings.m_sustain_time_ms)) %
-                            PPNS;
+        int note_off_tick =
+            (mstep +
+             (int)(PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth)) %
+            PPNS;
         midi_event *off = new_midi_event(note_off_tick, 128, midi_note, 128);
 
         minisynth_add_event(ms, pattern_num, on);
@@ -1805,7 +1812,15 @@ void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
     ms->m_settings.m_reset_to_zero = val;
 }
 
-void minisynth_set_sustain_time(minisynth *ms, double val)
+void minisynth_set_sustain_time_sixteenth(minisynth *ms, double val)
+{
+    if (val >= 1 && val <= 16)
+        ms->m_settings.m_sustain_time_sixteenth = val;
+    else
+        printf("val must be between 1 and 16\n");
+}
+
+void minisynth_set_sustain_time_ms(minisynth *ms, double val)
 {
     if (val >= 10 && val <= 2000)
         ms->m_settings.m_sustain_time_ms = val;

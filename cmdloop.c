@@ -1483,7 +1483,13 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
     else if (strncmp("sustainms", wurds[3], 9) == 0) {
         printf("Minisynth change Sustain Time ms!\n");
         double val = atof(wurds[4]);
-        minisynth_set_sustain_time(ms, val);
+        minisynth_set_sustain_time_ms(ms, val);
+        return true;
+    }
+    else if (strncmp("sustain16th", wurds[3], 11) == 0) {
+        printf("Minisynth change Sustain Time 16th!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_sustain_time_sixteenth(ms, val);
         return true;
     }
     else if (strncmp("sustain", wurds[3], 7) == 0) {
