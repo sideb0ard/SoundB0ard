@@ -14,6 +14,10 @@ extern const wchar_t *sparkchars;
 const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
                                  L"TRI2SQR"};
 
+// defined in oscillator.h
+const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE" 
+                                     "EXPO", "RSH", "QRSH"};
+
 minisynth *new_minisynth(void)
 {
     minisynth *ms = (minisynth *)calloc(1, sizeof(minisynth));
@@ -998,7 +1002,7 @@ void minisynth_rand_settings(minisynth *ms)
     int rand_ = 0;
     double scaley_val;
 
-    ms->m_settings.m_voice_mode = rand() % 4;
+    ms->m_settings.m_voice_mode = rand() % 5;
     ms->m_settings.m_detune_cents = ((float)rand()) / RAND_MAX;
     ms->m_settings.m_lfo1_amplitude = ((float)rand()) / RAND_MAX;
     ms->m_settings.m_lfo1_rate =
@@ -1051,6 +1055,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_eg1_dca_intensity = (rand() % 2) + 1;
     ms->m_settings.m_sustain_override = rand() % 2;
     ms->m_settings.m_sustain_time_ms = rand() % 1000;
+    ms->m_settings.m_sustain_time_sixteenth = rand() % 5;
 
     minisynth_print_settings(ms);
 }
@@ -1139,35 +1144,44 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
 
 void minisynth_print_settings(minisynth *ms)
 {
+    printf(COOL_COLOR_PINK);
     printf("Attack time ms (attackms): %f [%d-%d]\n",
            ms->m_settings.m_attack_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
-    printf("Decay Time ms (decayms): %f [%d-%d]\n",
+    printf("Decay / Release Time ms (decayms): %f [%d-%d]\n",
            ms->m_settings.m_decay_release_time_msec, EG_MINTIME_MS,
            EG_MAXTIME_MS);
+    printf("Sustain Level (sustainlvl): %f [0-1]\n",
+           ms->m_settings.m_sustain_level);
+    printf("Sustain Time ms  (sustainms): %f [10-2000]\n",
+           ms->m_settings.m_sustain_time_ms);
+    printf("Sustain Time Ticks  (sustain16th): %f [1-16]\n",
+           ms->m_settings.m_sustain_time_sixteenth);
+    printf("Sustain Override (sustain): %d [0,1]\n",
+           ms->m_settings.m_sustain_override); // bool
+    printf(COOL_COLOR_GREEN);
     printf("Delay Feedback Pct (delayfb): %f [0-100]\n",
            ms->m_settings.m_feedback_pct);
-    printf("Delay Ratio (delayr): %f\n [-1 - 1]", ms->m_settings.m_delay_ratio);
+    printf("Delay Ratio (delayr): %f [-1-1]\n", ms->m_settings.m_delay_ratio);
     printf("Delay Mode (delaymode): %d [0-]\n",
            ms->m_settings.m_delay_mode); // unsigned int
     printf("Delay Time ms (delayms): %f [%d-%d]\n",
            ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
     printf("Delay Wet Mix (delaymx): %f\n", ms->m_settings.m_wet_mix);
-    printf("Detune Cents (detune): %f [-100-100]\n",
-           ms->m_settings.m_detune_cents);
+    printf(ANSI_COLOR_YELLOW);
     printf("EG1 DCA Intensity (eg1dcaint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_dca_intensity);
     printf("EG1 Filter Intensity (eg1filterint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_filter_intensity);
     printf("EG1 OSc Intensity (eg1oscint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_osc_intensity);
+    printf(ANSI_COLOR_WHITE);
     printf("Filter Cutoff (fc): %f [80-18000]\n", ms->m_settings.m_fc_control);
     printf("Filter Q Control (fq): [1-10]%f\n", ms->m_settings.m_q_control);
     printf("Filter Keytrack Intensity (ktint): %f [0.5-10]\n",
            ms->m_settings.m_filter_keytrack_intensity);
     printf("Filter Keytrack (kt): %d [0-1]\n",
            ms->m_settings.m_filter_keytrack); // unsigned
-    printf("LEGATO MODE (legato): %d [0-1]\n",
-           ms->m_settings.m_legato_mode); // unsigned
+    printf(ANSI_COLOR_MAGENTA);
     printf("LFO1 Amp Intensity (lfo1ampint): %f [0-1]\n",
            ms->m_settings.m_lfo1_amp_intensity);
     printf("LFO AMp (lfo1amp): %f [0-1]\n", ms->m_settings.m_lfo1_amplitude);
@@ -1178,8 +1192,18 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_lfo1_pan_intensity);
     printf("LFO1 Osc Pitch Intensity (lfo1pitch): %f [-1-1]\n",
            ms->m_settings.m_lfo1_osc_pitch_intensity);
-    printf("LFO Waveform (lfowave): %d [0-7]\n",
-           ms->m_settings.m_lfo1_waveform);                      // unsigned
+    printf("LFO Waveform (lfowave): %s - %d [0-8]\n",
+           s_lfo_mode_names[ms->m_settings.m_lfo1_waveform],
+           ms->m_settings.m_lfo1_waveform); // unsigned
+    printf(ANSI_COLOR_WHITE);
+    printf("Voice mode (voice): %ls - %d [0-5]\n",
+           s_mode_names[ms->m_settings.m_voice_mode],
+           ms->m_settings.m_voice_mode); // unsigned
+    printf(COOL_COLOR_MAUVE);
+    printf("Detune Cents (detune): %f [-100-100]\n",
+           ms->m_settings.m_detune_cents);
+    printf("LEGATO MODE (legato): %d [0-1]\n",
+           ms->m_settings.m_legato_mode); // unsigned
     printf("Note Number To Decay Scaling (ndscale): %d [0-1]\n", // unsigned
            ms->m_settings.m_note_number_to_decay_scaling);
     printf("Noise OSC Db (noisedb): %f [-96-0]\n",
@@ -1192,21 +1216,12 @@ void minisynth_print_settings(minisynth *ms)
     printf("Pulse Width Pct (pw): %f [1-99]\n",
            ms->m_settings.m_pulse_width_pct);
     printf("Sub OSC Db (subosc): %f [-96-0]\n", ms->m_settings.m_sub_osc_db);
-    printf("Sustain Level (sustainlvl): %f [0-1]\n",
-           ms->m_settings.m_sustain_level);
-    printf("Sustain Time ms  (sustainms): %f [10-2000]\n",
-           ms->m_settings.m_sustain_time_ms);
-    printf("Sustain Time Ticks  (sustain16th): %f [1-16]\n",
-           ms->m_settings.m_sustain_time_sixteenth);
-    printf("Sustain Override (sustain): %d [0,1]\n",
-           ms->m_settings.m_sustain_override); // bool
     printf("Velocity to Attack Scaling (vascale): %d [0,1]\n",
            ms->m_settings.m_velocity_to_attack_scaling); // unsigned
-    printf("Voice mode (voice): %d [0-5]\n",
-           ms->m_settings.m_voice_mode); // unsigned
     printf("Volume (vol): %f [0-1]\n", ms->m_settings.m_volume_db);
     printf("Reset To Zero (zero): %d [0,1]\n",
            ms->m_settings.m_reset_to_zero); // unsigned
+    printf(ANSI_COLOR_RESET);
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
@@ -1316,7 +1331,9 @@ void minisynth_set_backup_mode(minisynth *ms, bool b)
 
 void minisynth_morph(minisynth *ms)
 {
-    printf("MIGHTY MORPH!\n");
+    if (mixr->debug_mode)
+        printf("MIGHTY MORPH!\n");
+
     minisynth_set_octave(ms, ms->m_settings.m_octave - 1);
     // minisynth_stop(ms);
     // minisynth_reset_melody(ms, 0);
@@ -1476,7 +1493,8 @@ void minisynth_rm_note(minisynth *ms, int pattern_num, int step)
 
 void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
 {
-    if (is_valid_melody_num(ms, pat_num)) {
+    if (is_valid_melody_num(ms, pat_num)
+        && tick < PPNS) {
         if (ms->melodies[pat_num][tick] != NULL) {
             midi_event *ev = ms->melodies[ms->cur_melody][tick];
             ms->melodies[ms->cur_melody][tick] = NULL;
@@ -1484,7 +1502,8 @@ void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
             printf("Deleted midi event at tick %d\n", tick);
         }
         else {
-            printf("Not a valid midi event at tick: %d\n", tick);
+            if (mixr->debug_mode)
+                printf("Not a valid midi event at tick: %d\n", tick);
         }
     }
     else {
@@ -1503,16 +1522,17 @@ void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
                              int tostep)
 {
     if (is_valid_melody_num(ms, pattern_num)) {
-        if (ms->melodies[pattern_num][fromstep] != NULL &&
-            ms->melodies[pattern_num][tostep] != NULL) {
+        if (ms->melodies[pattern_num][fromstep] != NULL)
+        {
+            minisynth_rm_micro_note(ms, pattern_num, tostep);
             ms->melodies[pattern_num][tostep] =
                 ms->melodies[pattern_num][fromstep];
             ms->melodies[pattern_num][fromstep] = NULL;
         }
         else {
-            printf("Woof, cannae move micro note - either fromstep(%d) or "
-                   "tostep(%d) is not NULL\n",
-                   fromstep, tostep);
+            printf("Woof, cannae move micro note - either fromstep(%d) is NULL or "
+                   "tostep(%d) is not less than %d\n",
+                   fromstep, tostep, PPNS);
         }
     }
 }

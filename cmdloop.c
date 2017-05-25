@@ -166,8 +166,8 @@ void interpret(char *line)
                 int num_bars = atoi(wurds[2]);
                 if (num_bars == 0)
                     num_bars = 4; // default
-                mixer_add_scene(mixr, num_bars);
-                printf("New scene with %d bars!\n", num_bars);
+                int new_scene_num = mixer_add_scene(mixr, num_bars);
+                printf("New scene %d with %d bars!\n", new_scene_num, num_bars);
             }
             else if (strncmp("mode", wurds[1], 4) == 0) {
                 if (strncmp("on", wurds[2], 2) == 0) {
@@ -197,9 +197,25 @@ void interpret(char *line)
                                 mixr, scene_num, sg_num, sg_track_num);
                         }
                     }
+                    if (strncmp("cp", wurds[2], 2) == 0) {
+                        int scene_num2 = atoi(wurds[3]);
+                        if (mixer_is_valid_scene_num(mixr, scene_num2)) {
+                            printf("Copying scene %d to %d\n", scene_num, scene_num2);
+                            mixer_cp_scene(mixr, scene_num, scene_num2);
+                        } else {
+                            printf("Not copying scene %d -- %d is not a valid destination\n", scene_num, scene_num2);
+                        }
+                    }
+                    else if (strncmp("dupe", wurds[2], 4) == 0) {
+                        printf("Duplicating scene %d\n", scene_num);
+                        int default_num_bars = 4;
+                        int new_scene_num = mixer_add_scene(mixr, default_num_bars);
+                        mixer_cp_scene(mixr, scene_num, new_scene_num);
+                    }
                     else if (strncmp("rm", wurds[2], 2) == 0) {
-                        int sg_num = atoi(wurds[3]);
-                        int sg_track_num = atoi(wurds[4]);
+                        int sg_num = 0;
+                        int sg_track_num = 0;
+                        sscanf(wurds[3], "%d:%d", &sg_num, &sg_track_num);
                         if (mixer_is_valid_soundgen_track_num(mixr, sg_num,
                                                               sg_track_num)) {
                             printf("Removing sg %d %d\n", sg_num, sg_track_num);

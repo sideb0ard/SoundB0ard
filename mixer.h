@@ -117,12 +117,13 @@ double mixer_gennext(mixer *mixr);
 
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num);
-bool mixer_add_scene(mixer *mixr, int num_bars);
+int mixer_add_scene(mixer *mixr, int num_bars);
 bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
                                        int soundgen_num, int soundgen_track);
 bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
                                         int soundgen_num, int soundgen_track);
 bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
 bool mixer_is_soundgen_in_scene(int soundgen_num, scene *scene_num);
+bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
 #endif // MIXER_H

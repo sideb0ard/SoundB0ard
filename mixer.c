@@ -90,9 +90,11 @@ void mixer_ps(mixer *mixr)
             printf("::::: [%d] - %d bars - ", i,
                    mixr->scenes[i].num_bars_to_play);
             for (int j = 0; j < mixr->scenes[i].num_tracks; j++) {
-                printf("(%d,%d)",
-                       mixr->scenes[i].soundgen_tracks[j].soundgen_num,
-                       mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
+                if (mixr->scenes[i].soundgen_tracks[j].soundgen_num != -1) {
+                    printf("(%d,%d)",
+                           mixr->scenes[i].soundgen_tracks[j].soundgen_num,
+                           mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
+                }
             }
             printf("\n");
         }
@@ -383,6 +385,9 @@ void mixer_play_scene(mixer *mixr, int scene_num)
     
     for (int i = 0; i < s->num_tracks; i++) {
         int soundgen_num = s->soundgen_tracks[i].soundgen_num;
+        if (soundgen_num == -1) {
+            continue;
+        }
         int soundgen_track_num =
             s->soundgen_tracks[i].soundgen_track_num;
         mixr->sound_generators[soundgen_num]->start(
@@ -499,7 +504,7 @@ bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
     return false;
 }
 
-bool mixer_add_scene(mixer *mixr, int num_bars)
+int mixer_add_scene(mixer *mixr, int num_bars)
 {
     if (mixr->num_scenes >= MAX_SCENES) {
         printf("Dingie mate\n");
@@ -507,10 +512,9 @@ bool mixer_add_scene(mixer *mixr, int num_bars)
     }
     printf("NUM BARSZZ! %d\n", num_bars);
 
-    mixr->scenes[mixr->num_scenes++].num_bars_to_play = num_bars;
-    // not setting scene mode true -- do that separately
+    mixr->scenes[mixr->num_scenes].num_bars_to_play = num_bars;
 
-    return true;
+    return mixr->num_scenes++;
 }
 
 bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
@@ -573,3 +577,20 @@ bool mixer_is_soundgen_in_scene(int soundgen_num, scene *s)
     }
     return false;
 }
+
+bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
+{
+    if (!mixer_is_valid_scene_num(mixr, scene_num_from)) {
+        printf("%d is not a valid scene number\n", scene_num_from);
+        return false;
+    }
+    if (!mixer_is_valid_scene_num(mixr, scene_num_to)) {
+        printf("%d is not a valid scene number\n", scene_num_from);
+        return false;
+    }
+
+    mixr->scenes[scene_num_to] = mixr->scenes[scene_num_from];
+
+    return true;
+}
+
