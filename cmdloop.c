@@ -197,7 +197,7 @@ void interpret(char *line)
                                 mixr, scene_num, sg_num, sg_track_num);
                         }
                     }
-                    if (strncmp("rm", wurds[2], 2) == 0) {
+                    else if (strncmp("rm", wurds[2], 2) == 0) {
                         int sg_num = atoi(wurds[3]);
                         int sg_track_num = atoi(wurds[4]);
                         if (mixer_is_valid_soundgen_track_num(mixr, sg_num,
@@ -206,6 +206,11 @@ void interpret(char *line)
                             mixer_rm_soundgen_track_from_scene(
                                 mixr, scene_num, sg_num, sg_track_num);
                         }
+                    }
+                    else {
+                        printf("Queueing scene %d\n", scene_num);
+                        mixr->scene_start_pending = true;
+                        mixr->current_scene = scene_num;
                     }
                 }
             }
