@@ -15,8 +15,9 @@ const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
                                  L"TRI2SQR"};
 
 // defined in oscillator.h
-const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE" 
-                                     "EXPO", "RSH", "QRSH"};
+const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE"
+                                                                 "EXPO",
+                                  "RSH", "QRSH"};
 
 minisynth *new_minisynth(void)
 {
@@ -38,6 +39,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.type = SYNTH_TYPE;
 
+    strncpy(ms->m_settings.m_settings_name, "DEFAULT", 7);
     ms->m_settings.m_voice_mode = 0;
     ms->m_settings.m_detune_cents = 0.0;
     ms->m_settings.m_lfo1_amplitude = 1.0;
@@ -707,7 +709,8 @@ void minisynth_status(void *self, wchar_t *status_string)
     // TODO - a shit load of error checking on boundaries and size
     swprintf(
         status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
-        "[SYNTH] - Vol: %.2f Active: %s Multi: %s, Morph: %s, Morph EveryN: %d "
+        "[SYNTH '%s'] - Vol: %.2f Active: %s Multi: %s, Morph: %s, Morph "
+        "EveryN: %d "
         "Morph Generation: %d CurMelody:%d DelayMode: %d Mode: %ls"
         "\n      A:%.2f D/R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f rate:%.2f "
         "SustainOverride: %s Sustain Time(ms): %.2f Filter FC: %.2f Filter Q: "
@@ -716,8 +719,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         "%2.f"
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f",
-        ms->m_settings.m_volume_db, ms->active ? "true" : "false",
-        ms->multi_melody_mode ? "true" : "false",
+        ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
+        ms->active ? "true" : "false", ms->multi_melody_mode ? "true" : "false",
         ms->morph_mode ? "true" : "false", ms->morph_every_n_loops,
         ms->morph_generation, ms->cur_melody, ms->m_settings.m_delay_mode,
         s_mode_names[ms->m_settings.m_voice_mode],
@@ -1028,10 +1031,10 @@ void minisynth_rand_settings(minisynth *ms)
 
     // ms->m_settings.m_octave = rand() % 4 - 2;
 
-    ms->m_settings.m_portamento_time_msec = ((float)rand() /
-    (float)(RAND_MAX)) * 10;
+    ms->m_settings.m_portamento_time_msec =
+        ((float)rand() / (float)(RAND_MAX)) * 10;
     ms->m_settings.m_lfo1_osc_pitch_intensity =
-       (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
+        (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
     ms->m_settings.m_sub_osc_db = -1.0 * (rand() % 96);
     ms->m_settings.m_eg1_osc_intensity = (rand() % 2) + 1;
     ms->m_settings.m_eg1_filter_intensity = (rand() % 2) + 1;
@@ -1048,7 +1051,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_reset_to_zero = rand() % 2;
     ms->m_settings.m_filter_keytrack = rand() % 2;
     ms->m_settings.m_filter_keytrack_intensity =
-       (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
+        (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
     ms->m_settings.m_velocity_to_attack_scaling = rand() % 2;
     ms->m_settings.m_note_number_to_decay_scaling = rand() % 2;
     ms->m_settings.m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
@@ -1142,6 +1145,141 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
     return true;
 }
 
+bool minisynth_list_presets()
+{
+    FILE *presetzzz = fopen(PRESET_FILENAME, "r");
+
+    char line[256];
+
+    while (fgets(line, sizeof(line), presetzzz)) {
+        printf("%s", line);
+    }
+
+    fclose(presetzzz);
+
+    return true;
+}
+
+bool minisynth_check_if_preset_exists(char *preset_to_find)
+{
+    FILE *presetzzz = fopen(PRESET_FILENAME, "r");
+
+    char line[2048];
+    char const *sep = "::";
+    char *preset_name, *last_s;
+
+    while (fgets(line, sizeof(line), presetzzz)) {
+        preset_name = strtok_r(line, sep, &last_s);
+        if (strncmp(preset_to_find, preset_name, 255) == 0)
+            return true;
+    }
+
+    fclose(presetzzz);
+    return false;
+}
+bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
+{
+    if (strlen(preset_to_load) == 0) {
+        printf("Play tha game, pal, need a name to LOAD yer synth settings "
+               "with\n");
+        return false;
+    }
+
+    char line[2048];
+    char chompyline[2048];
+    FILE *presetzzz = fopen(PRESET_FILENAME, "r");
+    char const *sep = "::";
+    char *preset_name, *last_s;
+
+    while (fgets(line, sizeof(line), presetzzz)) {
+        strcpy(chompyline, line);
+        preset_name = strtok_r(line, sep, &last_s);
+        if (strncmp(preset_to_load, preset_name, 255) == 0) {
+            printf("Found yer PRESET!\n");
+            int matches = sscanf(
+                chompyline, "::%[^:]"  // m_settings_name
+                      "::%d"  // m_voice_mode
+                      "::%lf" // ms->m_settings.m_detune_cents
+                      "::%lf" // ms->m_settings.m_lfo1_amplitude);
+                      "::%lf" // ms->m_settings.m_lfo1_rate);
+                      "::%lf" // ms->m_settings.m_fc_control);
+                      "::%lf" // ms->m_settings.m_q_control);
+                      "::%lf" // ms->m_settings.m_attack_time_msec);
+                      "::%lf" // ms->m_settings.m_delay_time_msec);
+                      "::%lf" // ms->m_settings.m_decay_release_time_msec);
+                      "::%lf" // ms->m_settings.m_pulse_width_pct);
+                      "::%lf" // ms->m_settings.m_feedback_pct);
+                      "::%lf" // ms->m_settings.m_delay_ratio);
+                      "::%lf" // ms->m_settings.m_wet_mix);
+                      "::%d"  // ms->m_settings.m_octave);
+                      "::%lf" // ms->m_settings.m_portamento_time_msec);
+                      "::%lf" // ms->m_settings.m_lfo1_osc_pitch_intensity);
+                      "::%lf" // ms->m_settings.m_sub_osc_db);
+                      "::%lf" // ms->m_settings.m_eg1_osc_intensity);
+                      "::%lf" // ms->m_settings.m_eg1_filter_intensity);
+                      "::%lf" // ms->m_settings.m_lfo1_filter_fc_intensity);
+                      "::%lf" // ms->m_settings.m_sustain_level);
+                      "::%lf" // ms->m_settings.m_noise_osc_db);
+                      "::%lf" // ms->m_settings.m_lfo1_amp_intensity);
+                      "::%lf" // ms->m_settings.m_lfo1_pan_intensity);
+                      "::%lf" // ms->m_settings.m_eg1_dca_intensity);
+                      "::%d"  // ms->m_settings.m_lfo1_waveform);
+                      "::%lf" // ms->m_settings.m_volume_db);
+                      "::%d"  // ms->m_settings.m_legato_mode);
+                      "::%d"  // ms->m_settings.m_pitchbend_range);
+                      "::%d"  // ms->m_settings.m_reset_to_zero);
+                      "::%d"  // ms->m_settings.m_filter_keytrack);
+                      "::%lf" // ms->m_settings.m_filter_keytrack_intensity);
+                      "::%d"  // ms->m_settings.m_velocity_to_attack_scaling);
+                      "::%d"  // ms->m_settings.m_note_number_to_decay_scaling);
+                      "::%d"  // ms->m_settings.m_delay_mode);
+                      "::%lf" // ms->m_settings.m_eg1_dca_intensity);
+                      "::%lf" // ms->m_settings.m_sustain_time_ms);
+                      "::%lf" // ms->m_settings.m_sustain_time_sixteenth);
+                      "::%d\n", // ms->m_settings.m_sustain_override);
+                ms->m_settings.m_settings_name, &ms->m_settings.m_voice_mode,
+                &ms->m_settings.m_detune_cents,
+                &ms->m_settings.m_lfo1_amplitude, &ms->m_settings.m_lfo1_rate,
+                &ms->m_settings.m_fc_control, &ms->m_settings.m_q_control,
+                &ms->m_settings.m_attack_time_msec,
+                &ms->m_settings.m_delay_time_msec,
+                &ms->m_settings.m_decay_release_time_msec,
+                &ms->m_settings.m_pulse_width_pct,
+                &ms->m_settings.m_feedback_pct, &ms->m_settings.m_delay_ratio,
+                &ms->m_settings.m_wet_mix, &ms->m_settings.m_octave,
+                &ms->m_settings.m_portamento_time_msec,
+                &ms->m_settings.m_lfo1_osc_pitch_intensity,
+                &ms->m_settings.m_sub_osc_db,
+                &ms->m_settings.m_eg1_osc_intensity,
+                &ms->m_settings.m_eg1_filter_intensity,
+                &ms->m_settings.m_lfo1_filter_fc_intensity,
+                &ms->m_settings.m_sustain_level, &ms->m_settings.m_noise_osc_db,
+                &ms->m_settings.m_lfo1_amp_intensity,
+                &ms->m_settings.m_lfo1_pan_intensity,
+                &ms->m_settings.m_eg1_dca_intensity,
+                &ms->m_settings.m_lfo1_waveform, &ms->m_settings.m_volume_db,
+                &ms->m_settings.m_legato_mode,
+                &ms->m_settings.m_pitchbend_range,
+                &ms->m_settings.m_reset_to_zero,
+                &ms->m_settings.m_filter_keytrack,
+                &ms->m_settings.m_filter_keytrack_intensity,
+                &ms->m_settings.m_velocity_to_attack_scaling,
+                &ms->m_settings.m_note_number_to_decay_scaling,
+                &ms->m_settings.m_delay_mode,
+                &ms->m_settings.m_eg1_dca_intensity,
+                &ms->m_settings.m_sustain_time_ms,
+                &ms->m_settings.m_sustain_time_sixteenth,
+                &ms->m_settings.m_sustain_override);
+
+            printf("Matched %d fields\n", matches);
+            minisynth_update(ms);
+        }
+    }
+
+    fclose(presetzzz);
+    return true;
+}
+
 void minisynth_print_settings(minisynth *ms)
 {
     printf(COOL_COLOR_PINK);
@@ -1154,7 +1292,7 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_sustain_level);
     printf("Sustain Time ms  (sustainms): %f [10-2000]\n",
            ms->m_settings.m_sustain_time_ms);
-    printf("Sustain Time Ticks  (sustain16th): %f [1-16]\n",
+    printf("Sustain Time Sixteenths  (sustain16th): %f [1-16]\n",
            ms->m_settings.m_sustain_time_sixteenth);
     printf("Sustain Override (sustain): %d [0,1]\n",
            ms->m_settings.m_sustain_override); // bool
@@ -1203,7 +1341,7 @@ void minisynth_print_settings(minisynth *ms)
     printf("Detune Cents (detune): %f [-100-100]\n",
            ms->m_settings.m_detune_cents);
     printf("LEGATO MODE (legato): %d [0-1]\n",
-           ms->m_settings.m_legato_mode); // unsigned
+           ms->m_settings.m_legato_mode);                        // unsigned
     printf("Note Number To Decay Scaling (ndscale): %d [0-1]\n", // unsigned
            ms->m_settings.m_note_number_to_decay_scaling);
     printf("Noise OSC Db (noisedb): %f [-96-0]\n",
@@ -1493,8 +1631,7 @@ void minisynth_rm_note(minisynth *ms, int pattern_num, int step)
 
 void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
 {
-    if (is_valid_melody_num(ms, pat_num)
-        && tick < PPNS) {
+    if (is_valid_melody_num(ms, pat_num) && tick < PPNS) {
         if (ms->melodies[pat_num][tick] != NULL) {
             midi_event *ev = ms->melodies[ms->cur_melody][tick];
             ms->melodies[ms->cur_melody][tick] = NULL;
@@ -1522,17 +1659,17 @@ void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
                              int tostep)
 {
     if (is_valid_melody_num(ms, pattern_num)) {
-        if (ms->melodies[pattern_num][fromstep] != NULL)
-        {
+        if (ms->melodies[pattern_num][fromstep] != NULL) {
             minisynth_rm_micro_note(ms, pattern_num, tostep);
             ms->melodies[pattern_num][tostep] =
                 ms->melodies[pattern_num][fromstep];
             ms->melodies[pattern_num][fromstep] = NULL;
         }
         else {
-            printf("Woof, cannae move micro note - either fromstep(%d) is NULL or "
-                   "tostep(%d) is not less than %d\n",
-                   fromstep, tostep, PPNS);
+            printf(
+                "Woof, cannae move micro note - either fromstep(%d) is NULL or "
+                "tostep(%d) is not less than %d\n",
+                fromstep, tostep, PPNS);
         }
     }
 }

@@ -50,53 +50,43 @@
 static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 
 typedef struct synthsettings {
+    char m_settings_name[256];
     unsigned int m_voice_mode; // controlled by keys
-    // midi mode one, top row
     double m_attack_time_msec;
     double m_decay_release_time_msec;
     double m_sustain_level;
     double m_volume_db;
-    // midi mode one, bottom row
     double m_lfo1_amplitude;
     double m_lfo1_rate;
     double m_fc_control;
     double m_q_control;
-
-    // midi mode two, top row
     double m_delay_time_msec;
     double m_feedback_pct;
     double m_delay_ratio;
     double m_wet_mix;
     unsigned int m_delay_mode; // via keyboard 'n' key (TODO!)
-    // midi mode two, bottom row
     double m_detune_cents;
     double m_pulse_width_pct;
     double m_sub_osc_db;
     double m_noise_osc_db;
-
-    // midi mode three, top row
     double m_eg1_dca_intensity;
     double m_eg1_filter_intensity;
     double m_eg1_osc_intensity;
     double m_filter_keytrack_intensity;
-    // midi mode three, bottom row
     double m_lfo1_amp_intensity;
     double m_lfo1_filter_fc_intensity;
     double m_lfo1_osc_pitch_intensity;
     double m_lfo1_pan_intensity;
-
     int m_octave;
     int m_pitchbend_range;
-
     unsigned int m_lfo1_waveform;
     unsigned int m_legato_mode;
     unsigned int m_reset_to_zero;
     unsigned int m_filter_keytrack;
     unsigned int m_velocity_to_attack_scaling;
     unsigned int m_note_number_to_decay_scaling;
-
     double m_portamento_time_msec;
-    bool m_sustain_override;
+    unsigned int m_sustain_override;
     double m_sustain_time_ms;
     double m_sustain_time_sixteenth;
 } synthsettings;
@@ -213,6 +203,9 @@ void minisynth_toggle_delay_mode(minisynth *ms);
 void minisynth_rand_settings(minisynth *ms);
 void minisynth_print_settings(minisynth *ms);
 bool minisynth_save_settings(minisynth *ms, char *preset_name);
+bool minisynth_load_settings(minisynth *ms, char *preset_name);
+bool minisynth_list_presets(void);
+bool minisynth_check_if_preset_exists(char *preset_to_find);
 
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
 bool is_valid_melody_num(minisynth *ns, int melody_num);

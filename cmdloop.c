@@ -200,16 +200,21 @@ void interpret(char *line)
                     if (strncmp("cp", wurds[2], 2) == 0) {
                         int scene_num2 = atoi(wurds[3]);
                         if (mixer_is_valid_scene_num(mixr, scene_num2)) {
-                            printf("Copying scene %d to %d\n", scene_num, scene_num2);
+                            printf("Copying scene %d to %d\n", scene_num,
+                                   scene_num2);
                             mixer_cp_scene(mixr, scene_num, scene_num2);
-                        } else {
-                            printf("Not copying scene %d -- %d is not a valid destination\n", scene_num, scene_num2);
+                        }
+                        else {
+                            printf("Not copying scene %d -- %d is not a valid "
+                                   "destination\n",
+                                   scene_num, scene_num2);
                         }
                     }
                     else if (strncmp("dupe", wurds[2], 4) == 0) {
                         printf("Duplicating scene %d\n", scene_num);
                         int default_num_bars = 4;
-                        int new_scene_num = mixer_add_scene(mixr, default_num_bars);
+                        int new_scene_num =
+                            mixer_add_scene(mixr, default_num_bars);
                         mixer_cp_scene(mixr, scene_num, new_scene_num);
                     }
                     else if (strncmp("rm", wurds[2], 2) == 0) {
@@ -446,6 +451,9 @@ void interpret(char *line)
                     char_melody_to_midi_melody(ms, 0, wurds, 2, num_wurds);
                 }
             }
+            if (strncmp("list", wurds[1], 4) == 0) {
+                minisynth_list_presets();
+            }
             else {
                 int soundgen_num = atoi(wurds[1]);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
@@ -584,6 +592,11 @@ void interpret(char *line)
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0) {
                         keys(soundgen_num);
+                    }
+                    else if (strncmp("load", wurds[2], 4) == 0) {
+                        char preset_name[20];
+                        strncpy(preset_name, wurds[3], 19);
+                        minisynth_load_settings(ms, preset_name);
                     }
                     else if (strncmp("midi", wurds[2], 4) == 0) {
                         mixr->midi_control_destination = SYNTH;

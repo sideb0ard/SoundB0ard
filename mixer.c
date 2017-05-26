@@ -91,9 +91,10 @@ void mixer_ps(mixer *mixr)
                    mixr->scenes[i].num_bars_to_play);
             for (int j = 0; j < mixr->scenes[i].num_tracks; j++) {
                 if (mixr->scenes[i].soundgen_tracks[j].soundgen_num != -1) {
-                    printf("(%d,%d)",
-                           mixr->scenes[i].soundgen_tracks[j].soundgen_num,
-                           mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
+                    printf(
+                        "(%d,%d)",
+                        mixr->scenes[i].soundgen_tracks[j].soundgen_num,
+                        mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
                 }
             }
             printf("\n");
@@ -339,7 +340,7 @@ double mixer_gennext(mixer *mixr)
         mixr->is_sixteenth = false;
     }
 
-    //if (mixr->scene_mode && mixr->start_of_loop) {
+    // if (mixr->scene_mode && mixr->start_of_loop) {
     if (mixr->start_of_loop) {
         // printf("Top of the bar\n");
 
@@ -348,15 +349,16 @@ double mixer_gennext(mixer *mixr)
             mixr->scene_start_pending = false;
         }
 
-        //if (mixr->current_scene_bar_count >=
+        // if (mixr->current_scene_bar_count >=
         //        mixr->scenes[mixr->current_scene].num_bars_to_play ||
         //    mixr->scene_start_pending) {
-        //    mixr->current_scene = (mixr->current_scene + 1) % mixr->num_scenes;
+        //    mixr->current_scene = (mixr->current_scene + 1) %
+        //    mixr->num_scenes;
         //    mixr->current_scene_bar_count = 0;
 
         //    // printf("SCENE MODE CHANGE %d!\n", mixr->current_scene);
         //}
-        //mixr->current_scene_bar_count++;
+        // mixr->current_scene_bar_count++;
     }
 
     double output_val = 0.0;
@@ -382,14 +384,13 @@ void mixer_play_scene(mixer *mixr, int scene_num)
             mixr->sound_generators[i]->stop(mixr->sound_generators[i]);
         }
     }
-    
+
     for (int i = 0; i < s->num_tracks; i++) {
         int soundgen_num = s->soundgen_tracks[i].soundgen_num;
         if (soundgen_num == -1) {
             continue;
         }
-        int soundgen_track_num =
-            s->soundgen_tracks[i].soundgen_track_num;
+        int soundgen_track_num = s->soundgen_tracks[i].soundgen_track_num;
         mixr->sound_generators[soundgen_num]->start(
             mixr->sound_generators[soundgen_num]);
         mixr->sound_generators[soundgen_num]->make_active_track(
@@ -593,4 +594,3 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
 
     return true;
 }
-
