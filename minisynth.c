@@ -67,7 +67,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_lfo1_pan_intensity = 0.0;
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_lfo1_waveform = 0;
-    ms->m_settings.m_volume_db = 0.7;
+    ms->m_settings.m_volume_db = 0.4;
     ms->m_settings.m_legato_mode = DEFAULT_LEGATO_MODE;
     ms->m_settings.m_pitchbend_range = 1;
     ms->m_settings.m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
@@ -779,7 +779,8 @@ double minisynth_gennext(void *self)
             if (ms->multi_melody_mode) {
                 ms->cur_melody_iteration--;
                 if (ms->cur_melody_iteration == 0) {
-                    minisynth_stop(ms);
+                    if (!ms->m_settings.m_sustain_override)
+                        minisynth_stop(ms);
                     ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
                     ms->cur_melody_iteration =
                         ms->melody_multiloop_count[ms->cur_melody];
