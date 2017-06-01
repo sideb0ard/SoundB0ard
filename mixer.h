@@ -10,8 +10,8 @@
 #include "sound_generator.h"
 #include "table.h"
 
-#define MAX_SCENES 10
-#define MAX_TRACKS_PER_SCENE 10
+#define MAX_SCENES 100
+#define MAX_TRACKS_PER_SCENE 100
 
 typedef struct environment_variable {
     char key[ENVIRONMENT_KEY_SIZE];

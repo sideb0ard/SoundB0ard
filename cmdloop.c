@@ -197,7 +197,7 @@ void interpret(char *line)
                                 mixr, scene_num, sg_num, sg_track_num);
                         }
                     }
-                    if (strncmp("cp", wurds[2], 2) == 0) {
+                    else if (strncmp("cp", wurds[2], 2) == 0) {
                         int scene_num2 = atoi(wurds[3]);
                         if (mixer_is_valid_scene_num(mixr, scene_num2)) {
                             printf("Copying scene %d to %d\n", scene_num,
@@ -410,24 +410,40 @@ void interpret(char *line)
                         }
                     }
                     else if (strncmp("stutter", wurds[2], 7) == 0) {
-                        if (strncmp(wurds[3], "true", 4) == 0)
-                            looper_set_stutter_mode(s, true);
-                        else if (strncmp(wurds[3], "false", 5) == 0)
-                            looper_set_stutter_mode(s, false);
-                        else {
+                        if (strncmp(wurds[3], "every", 4) == 0) {
+                            int num_gens = atoi(wurds[4]);
+                            if (num_gens > 0) {
+                                printf("Stuttering every %d n loops!\n",
+                                       num_gens);
+                                looper_set_stutter_mode(s, true);
+                                s->stutter_every_n_loops = num_gens;
+                            }
+                            else {
+                                printf("Need a number for every 'n'\n");
+                            }
+                        }
+                        else if (strncmp(wurds[3], "for", 3) == 0) {
                             int max_gen = atoi(wurds[3]);
                             if (max_gen > 0) {
                                 looper_set_max_generation(s, max_gen);
                                 looper_set_stutter_mode(s, true);
                             }
                             else {
-                                printf("Toggling sTUTTER..\n");
-                                int new_mode = 1 - s->stutter_mode;
-                                looper_set_stutter_mode(s, new_mode);
+                                printf("Need a number of loops for 'for'\n");
                             }
                         }
+                        else if (strncmp(wurds[3], "true", 4) == 0)
+                            looper_set_stutter_mode(s, true);
+                        else if (strncmp(wurds[3], "false", 5) == 0)
+                            looper_set_stutter_mode(s, false);
+                        else {
+                            int new_mode = 1 - s->stutter_mode;
+                            printf("Toggling sTUTTER to %s..\n",
+                                   new_mode ? "true" : "false");
+                            looper_set_stutter_mode(s, new_mode);
+                        }
                     }
-                    else if (strncmp("switch", wurds[2], 6) == 0) {
+                    else if (strncmp("switch", wurds[3], 6) == 0) {
                         int sample_num = atoi(wurds[3]);
                         looper_switch_sample(s, sample_num);
                     }

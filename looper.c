@@ -77,23 +77,37 @@ double looper_gennext(void *self)
         l->change_loopsize_pending = false;
     }
 
-    if (l->stutter_mode &&
-        (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0)) {
-        if (mixr->debug_mode)
-            printf("Stutututututter! Current: %d\n", l->stutter_current_16th);
-        if (rand() % 100 > 60) {
+    if (mixr->start_of_loop) {
+        if (l->stutter_mode) {
+            if (l->stutter_every_n_loops > 0) {
+                if (l->stutter_generation % l->stutter_every_n_loops == 0) {
+                    l->stutter_active = true;
+                }
+                else {
+                    l->stutter_active = false;
+                }
+            }
+            else if (l->max_generation > 0) {
+                if (l->stutter_generation >= l->max_generation) {
+                    looper_set_stutter_mode(l, false);
+                }
+            }
+            l->stutter_generation++;
+        }
+    }
+
+    if (l->stutter_active) {
+        if (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0) {
             if (mixr->debug_mode)
-                printf("Advancing stutter 16th..\n");
-            l->stutter_current_16th++;
-            if (l->stutter_current_16th == 16) {
-                l->stutter_current_16th = 0;
-                l->stutter_generation++;
-                if (l->max_generation != 0 &&
-                    l->stutter_generation == l->max_generation) {
-                    printf("Max stutter reached - resettinggggzz..\n");
-                    l->stutter_generation = 0;
-                    l->max_generation = 0;
-                    l->stutter_mode = false;
+                printf("Stutututututter! Current: %d\n",
+                       l->stutter_current_16th);
+
+            if (rand() % 100 > 60) {
+                if (mixr->debug_mode)
+                    printf("Advancing stutter 16th..\n");
+                l->stutter_current_16th++;
+                if (l->stutter_current_16th == 16) {
+                    l->stutter_current_16th = 0;
                 }
             }
         }
@@ -123,7 +137,7 @@ double looper_gennext(void *self)
         }
     }
 
-    if (l->stutter_mode) {
+    if (l->stutter_active) {
         int len16th = l->scramblrrr->resampled_file_size / 16;
         int stutidx = (l->samples[l->cur_sample]->position % len16th) +
                       l->stutter_current_16th * len16th;
@@ -431,6 +445,7 @@ void looper_set_stutter_mode(looper *s, bool b)
 {
     s->stutter_generation = 0;
     s->stutter_mode = b;
+    s->stutter_active = b;
 }
 
 void looper_scramble(looper *s)

@@ -66,12 +66,13 @@ void mixer_ps(mixer *mixr)
            " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
+           " // Scene: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
            "::::: PPQN: %d PPSIXTEENTH: %d PPTWENTYFOURTH: %d PPBAR: %d PPNS: "
            "%d " ANSI_COLOR_RESET,
            mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
-           mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH,
-           PPTWENTYFOURTH, PPBAR, PPNS);
+           mixr->current_scene, mixr->debug_mode ? "true" : "false", PPQN,
+           PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
@@ -84,7 +85,7 @@ void mixer_ps(mixer *mixr)
     printf("\n");
 
     if (mixr->num_scenes > 0) {
-        printf("::::: [scene mode: %s] .....] - \n",
+        printf(ANSI_COLOR_WHITE "::::: [scene mode: %s] .....] - \n",
                mixr->scene_mode ? "true" : "false");
         for (int i = 0; i < mixr->num_scenes; i++) {
             printf("::::: [%d] - %d bars - ", i,
@@ -97,7 +98,7 @@ void mixer_ps(mixer *mixr)
                         mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
                 }
             }
-            printf("\n");
+            printf(ANSI_COLOR_RESET "\n");
         }
     }
 
@@ -325,19 +326,24 @@ double mixer_gennext(mixer *mixr)
         mixr->is_midi_tick = false;
     }
 
-    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
-        mixr->start_of_loop = true;
-    }
-    else {
-        mixr->start_of_loop = false;
-    }
-
     if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0) {
         mixr->sixteenth_note_tick++; // for seq machine resolution
         mixr->is_sixteenth = true;
     }
     else {
         mixr->is_sixteenth = false;
+    }
+
+    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
+        mixr->start_of_loop = true;
+        if (mixr->debug_mode) {
+            printf("START OF LOOP - sample: %d, midi_tick: %d sixteenth: %d\n",
+                   mixr->cur_sample, mixr->midi_tick,
+                   mixr->sixteenth_note_tick);
+        }
+    }
+    else {
+        mixr->start_of_loop = false;
     }
 
     // if (mixr->scene_mode && mixr->start_of_loop) {
@@ -504,7 +510,7 @@ bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num)
 {
-    printf("Inside is valid soundgen..\n");
+    printf("Inside is valid soundgen track num..\n");
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
         track_num < mixr->sound_generators[soundgen_num]->get_num_tracks(
                         mixr->sound_generators[soundgen_num]))

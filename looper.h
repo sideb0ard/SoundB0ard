@@ -46,6 +46,9 @@ typedef struct t_looper {
     int scramble_generation;
 
     bool stutter_mode;
+    bool stutter_active;
+    int stutter_every_n_loops;
+    int stutter_every_n_loops_generation;
     int stutter_current_16th;
     int stutter_generation;
 
