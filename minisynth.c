@@ -1021,7 +1021,8 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_pulse_width_pct = rand() % 100;
     rand_ = (rand() % 127) + 1;
     scaley_val = scaleybum(0, 127, -0.9, 0.9, rand_);
-    ms->m_settings.m_delay_ratio = (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
+    ms->m_settings.m_delay_ratio =
+        (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
     ms->m_settings.m_delay_time_msec = rand() % 300;
     ms->m_settings.m_feedback_pct = rand() % 30;
     ms->m_settings.m_wet_mix = rand() % 60;
@@ -1030,7 +1031,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_octave = rand() % 5 + 1;
 
     ms->m_settings.m_portamento_time_msec = rand() % 400;
-    ms->m_settings.m_lfo1_osc_pitch_intensity = 
+    ms->m_settings.m_lfo1_osc_pitch_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
     ms->m_settings.m_sub_osc_db = -1.0 * (rand() % 96);
     ms->m_settings.m_eg1_osc_intensity =
@@ -1053,7 +1054,8 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_velocity_to_attack_scaling = rand() % 2;
     ms->m_settings.m_note_number_to_decay_scaling = rand() % 2;
     ms->m_settings.m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
-    ms->m_settings.m_eg1_dca_intensity = (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
+    ms->m_settings.m_eg1_dca_intensity =
+        (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
     ms->m_settings.m_sustain_override = rand() % 2;
     ms->m_settings.m_sustain_time_ms = rand() % 1000;
     ms->m_settings.m_sustain_time_sixteenth = rand() % 5;
@@ -1195,46 +1197,47 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
         if (strncmp(preset_to_load, preset_name, 255) == 0) {
             printf("Found yer PRESET!\n");
             int matches = sscanf(
-                chompyline, "::%[^:]"  // m_settings_name
-                      "::%d"  // m_voice_mode
-                      "::%lf" // ms->m_settings.m_detune_cents
-                      "::%lf" // ms->m_settings.m_lfo1_amplitude);
-                      "::%lf" // ms->m_settings.m_lfo1_rate);
-                      "::%lf" // ms->m_settings.m_fc_control);
-                      "::%lf" // ms->m_settings.m_q_control);
-                      "::%lf" // ms->m_settings.m_attack_time_msec);
-                      "::%lf" // ms->m_settings.m_delay_time_msec);
-                      "::%lf" // ms->m_settings.m_decay_release_time_msec);
-                      "::%lf" // ms->m_settings.m_pulse_width_pct);
-                      "::%lf" // ms->m_settings.m_feedback_pct);
-                      "::%lf" // ms->m_settings.m_delay_ratio);
-                      "::%lf" // ms->m_settings.m_wet_mix);
-                      "::%d"  // ms->m_settings.m_octave);
-                      "::%lf" // ms->m_settings.m_portamento_time_msec);
-                      "::%lf" // ms->m_settings.m_lfo1_osc_pitch_intensity);
-                      "::%lf" // ms->m_settings.m_sub_osc_db);
-                      "::%lf" // ms->m_settings.m_eg1_osc_intensity);
-                      "::%lf" // ms->m_settings.m_eg1_filter_intensity);
-                      "::%lf" // ms->m_settings.m_lfo1_filter_fc_intensity);
-                      "::%lf" // ms->m_settings.m_sustain_level);
-                      "::%lf" // ms->m_settings.m_noise_osc_db);
-                      "::%lf" // ms->m_settings.m_lfo1_amp_intensity);
-                      "::%lf" // ms->m_settings.m_lfo1_pan_intensity);
-                      "::%lf" // ms->m_settings.m_eg1_dca_intensity);
-                      "::%d"  // ms->m_settings.m_lfo1_waveform);
-                      "::%lf" // ms->m_settings.m_volume_db);
-                      "::%d"  // ms->m_settings.m_legato_mode);
-                      "::%d"  // ms->m_settings.m_pitchbend_range);
-                      "::%d"  // ms->m_settings.m_reset_to_zero);
-                      "::%d"  // ms->m_settings.m_filter_keytrack);
-                      "::%lf" // ms->m_settings.m_filter_keytrack_intensity);
-                      "::%d"  // ms->m_settings.m_velocity_to_attack_scaling);
-                      "::%d"  // ms->m_settings.m_note_number_to_decay_scaling);
-                      "::%d"  // ms->m_settings.m_delay_mode);
-                      "::%lf" // ms->m_settings.m_eg1_dca_intensity);
-                      "::%lf" // ms->m_settings.m_sustain_time_ms);
-                      "::%lf" // ms->m_settings.m_sustain_time_sixteenth);
-                      "::%d\n", // ms->m_settings.m_sustain_override);
+                chompyline,
+                "::%[^:]" // m_settings_name
+                "::%d"    // m_voice_mode
+                "::%lf"   // ms->m_settings.m_detune_cents
+                "::%lf"   // ms->m_settings.m_lfo1_amplitude);
+                "::%lf"   // ms->m_settings.m_lfo1_rate);
+                "::%lf"   // ms->m_settings.m_fc_control);
+                "::%lf"   // ms->m_settings.m_q_control);
+                "::%lf"   // ms->m_settings.m_attack_time_msec);
+                "::%lf"   // ms->m_settings.m_delay_time_msec);
+                "::%lf"   // ms->m_settings.m_decay_release_time_msec);
+                "::%lf"   // ms->m_settings.m_pulse_width_pct);
+                "::%lf"   // ms->m_settings.m_feedback_pct);
+                "::%lf"   // ms->m_settings.m_delay_ratio);
+                "::%lf"   // ms->m_settings.m_wet_mix);
+                "::%d"    // ms->m_settings.m_octave);
+                "::%lf"   // ms->m_settings.m_portamento_time_msec);
+                "::%lf"   // ms->m_settings.m_lfo1_osc_pitch_intensity);
+                "::%lf"   // ms->m_settings.m_sub_osc_db);
+                "::%lf"   // ms->m_settings.m_eg1_osc_intensity);
+                "::%lf"   // ms->m_settings.m_eg1_filter_intensity);
+                "::%lf"   // ms->m_settings.m_lfo1_filter_fc_intensity);
+                "::%lf"   // ms->m_settings.m_sustain_level);
+                "::%lf"   // ms->m_settings.m_noise_osc_db);
+                "::%lf"   // ms->m_settings.m_lfo1_amp_intensity);
+                "::%lf"   // ms->m_settings.m_lfo1_pan_intensity);
+                "::%lf"   // ms->m_settings.m_eg1_dca_intensity);
+                "::%d"    // ms->m_settings.m_lfo1_waveform);
+                "::%lf"   // ms->m_settings.m_volume_db);
+                "::%d"    // ms->m_settings.m_legato_mode);
+                "::%d"    // ms->m_settings.m_pitchbend_range);
+                "::%d"    // ms->m_settings.m_reset_to_zero);
+                "::%d"    // ms->m_settings.m_filter_keytrack);
+                "::%lf"   // ms->m_settings.m_filter_keytrack_intensity);
+                "::%d"    // ms->m_settings.m_velocity_to_attack_scaling);
+                "::%d"    // ms->m_settings.m_note_number_to_decay_scaling);
+                "::%d"    // ms->m_settings.m_delay_mode);
+                "::%lf"   // ms->m_settings.m_eg1_dca_intensity);
+                "::%lf"   // ms->m_settings.m_sustain_time_ms);
+                "::%lf"   // ms->m_settings.m_sustain_time_sixteenth);
+                "::%d\n", // ms->m_settings.m_sustain_override);
                 ms->m_settings.m_settings_name, &ms->m_settings.m_voice_mode,
                 &ms->m_settings.m_detune_cents,
                 &ms->m_settings.m_lfo1_amplitude, &ms->m_settings.m_lfo1_rate,
