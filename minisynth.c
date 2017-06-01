@@ -1025,7 +1025,8 @@ void minisynth_rand_settings(minisynth *ms)
         (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
     ms->m_settings.m_delay_time_msec = rand() % 300;
     ms->m_settings.m_feedback_pct = rand() % 30;
-    ms->m_settings.m_wet_mix = rand() % 60;
+    // ms->m_settings.m_wet_mix = rand() % 60;
+    minisynth_set_delay_wetmix(ms, ((float)rand() / (float)(RAND_MAX)));
 
     ms->m_settings.m_sustain_level = ((float)rand()) / RAND_MAX;
     ms->m_settings.m_octave = rand() % 5 + 1;
@@ -1305,7 +1306,7 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_delay_mode); // unsigned int
     printf("Delay Time ms (delayms): %f [%d-%d]\n",
            ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
-    printf("Delay Wet Mix (delaymx): %f\n", ms->m_settings.m_wet_mix);
+    printf("Delay Wet Mix (delaymx): %f [0-1]\n", ms->m_settings.m_wet_mix);
     printf(ANSI_COLOR_YELLOW);
     printf("EG1 DCA Intensity (eg1dcaint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_dca_intensity);
@@ -1702,7 +1703,7 @@ void minisynth_set_delay_feedback_pct(minisynth *ms, double val)
 void minisynth_set_delay_ratio(minisynth *ms, double val)
 {
     if (val >= -0.9 && val <= 0.9)
-        ms->m_settings.m_feedback_pct = val;
+        ms->m_settings.m_delay_ratio = val;
     else
         printf("val must be between -0.9 and 0.9\n");
 }
@@ -1920,7 +1921,8 @@ void minisynth_set_sub_osc_db(minisynth *ms, double val)
 void minisynth_set_sustain(minisynth *ms, double val)
 {
     if (val >= 0 && val <= 1)
-        ms->m_settings.m_sub_osc_db = val;
+        //ms->m_settings.m_sub_osc_db = val;
+        ms->m_settings.m_sustain_level = val;
     else
         printf("val must be between 0 and 1\n");
 }

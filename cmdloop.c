@@ -467,7 +467,7 @@ void interpret(char *line)
                     char_melody_to_midi_melody(ms, 0, wurds, 2, num_wurds);
                 }
             }
-            if (strncmp("list", wurds[1], 4) == 0) {
+            if (strncmp("ls", wurds[1], 2) == 0) {
                 minisynth_list_presets();
             }
             else {
@@ -1525,8 +1525,8 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
         return true;
     }
     else if (strncmp("sustainlvl", wurds[3], 10) == 0) {
-        printf("Minisynth change Sustain Level!\n");
         double val = atof(wurds[4]);
+        printf("Minisynth change Sustain Level! %.2f\n", val);
         minisynth_set_sustain(ms, val);
         return true;
     }
