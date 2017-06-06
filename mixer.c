@@ -95,8 +95,8 @@ void mixer_ps(mixer *mixr)
                         mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
                 }
             }
-            printf(ANSI_COLOR_RESET "\n");
         }
+        printf(ANSI_COLOR_RESET "\n");
     }
 
     for (int i = 0; i < mixr->soundgen_num; i++) {
@@ -112,7 +112,7 @@ void mixer_ps(mixer *mixr)
                 printf(COOL_COLOR_YELLOW);
                 for (int j = 0; j < mixr->sound_generators[i]->effects_num;
                      j++) {
-                    printf("[effect]-");
+                    printf("[fx %d:%d] %s\n", i, j, "mefex");
                 }
                 printf(ANSI_COLOR_RESET);
                 printf(COOL_COLOR_GREEN);
