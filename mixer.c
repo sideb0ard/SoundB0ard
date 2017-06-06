@@ -36,12 +36,9 @@ mixer *new_mixer()
 
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->cur_sample = 0;
     mixr->m_midi_controller_mode =
         KEY_MODE_ONE; // dunno whether this should be on mixer or synth
     mixr->midi_control_destination = NONE;
-    mixr->sixteenth_note_tick = -1;
-    mixr->midi_tick = -1;
 
     // the lifetime of these booleans is a single sample
     mixr->is_midi_tick = true;
@@ -141,6 +138,10 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->midi_ticks_per_ms = PPQN * bpm / 60000;
     mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPBAR;
     mixr->loop_len_in_ticks = PPBAR;
+    mixr->sixteenth_note_tick = -1;
+    mixr->midi_tick = -1;
+    mixr->cur_sample = 0;
+
     for (int i = 0; i < mixr->soundgen_num; i++) {
         if (mixr->sound_generators[i] != NULL) {
             for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
@@ -336,6 +337,10 @@ double mixer_gennext(mixer *mixr)
 
     if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
         mixr->start_of_loop = true;
+        if (mixr->start_of_loop && (mixr->sixteenth_note_tick%16 != 0))
+            printf("BUG! START OF LOOP - sample: %d, midi_tick: %d sixteenth: %d\n",
+                   mixr->cur_sample, mixr->midi_tick,
+                   mixr->sixteenth_note_tick);
         if (mixr->debug_mode) {
             printf("START OF LOOP - sample: %d, midi_tick: %d sixteenth: %d\n",
                    mixr->cur_sample, mixr->midi_tick,

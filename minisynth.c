@@ -16,8 +16,7 @@ const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
 
 // defined in oscillator.h
 const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE"
-                                                                 "EXPO",
-                                  "RSH", "QRSH"};
+                                  "EXPO", "RSH", "QRSH"};
 
 minisynth *new_minisynth(void)
 {
@@ -67,7 +66,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_lfo1_pan_intensity = 0.0;
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_lfo1_waveform = 0;
-    ms->m_settings.m_volume_db = 0.4;
+    ms->m_settings.m_volume_db = 0.7;
     ms->m_settings.m_legato_mode = DEFAULT_LEGATO_MODE;
     ms->m_settings.m_pitchbend_range = 1;
     ms->m_settings.m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
@@ -80,7 +79,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_sustain_override = false;
     ms->m_settings.m_sustain_time_ms = 400;
-    ms->m_settings.m_sustain_time_sixteenth = 1;
+    ms->m_settings.m_sustain_time_sixteenth = 4;
 
     ms->m_last_midi_note = 0;
     ms->morph_mode = false;
@@ -100,7 +99,7 @@ minisynth *new_minisynth(void)
                                                &ms->m_global_synth_params);
     }
 
-    // clears out momatric sources and resets all oscs, lfos, eg's etc.
+    // clears out modmatrix sources and resets all oscs, lfos, eg's etc.
     minisynth_prepare_for_play(ms);
 
     // use first voice to setup global

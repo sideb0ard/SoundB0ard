@@ -90,7 +90,7 @@ void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
         &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(matrix, row);
 
-    // EG1 -> ALL OSC1 FC
+    // EG1 -> ALL OSC
     row = create_matrix_row(
         SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
         &msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity,
