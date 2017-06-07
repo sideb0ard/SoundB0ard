@@ -112,6 +112,7 @@ void mixer_ps(mixer *mixr)
                 printf(COOL_COLOR_YELLOW);
                 for (int j = 0; j < mixr->sound_generators[i]->effects_num;
                      j++) {
+                    fx *f = mixr->sound_generators[i]->effects[j];
                     printf("[fx %d:%d] %s\n", i, j, "mefex");
                 }
                 printf(ANSI_COLOR_RESET);
@@ -156,23 +157,17 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     }
 }
 
-// TODO - this has moved to minisynth
-void mixer_toggle_midi_mode(mixer *mixr)
-{
-    mixr->m_midi_controller_mode =
-        ++(mixr->m_midi_controller_mode) % MAX_NUM_KNOB_MODES;
-}
+//// TODO - this has moved to minisynth
+//void mixer_toggle_midi_mode(mixer *mixr)
+//{
+//    mixr->m_midi_controller_mode =
+//        ++(mixr->m_midi_controller_mode) % MAX_NUM_KNOB_MODES;
+//}
 
 void mixer_toggle_key_mode(mixer *mixr)
 {
     mixr->m_key_controller_mode =
         ++(mixr->m_key_controller_mode) % MAX_NUM_KEY_MODES;
-}
-
-void delay_toggle(mixer *mixr)
-{
-    mixr->delay_on = abs(1 - mixr->delay_on);
-    printf("MIXER VOL DELAY: %d!\n", mixr->delay_on);
 }
 
 void mixer_vol_change(mixer *mixr, float vol)
@@ -193,44 +188,12 @@ void vol_change(mixer *mixr, int sg, float vol)
     mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
 }
 
-int add_effect(mixer *mixr)
-{
-    printf("Booya, adding a new effect!\n");
-    EFFECT **new_effects = NULL;
-    if (mixr->effects_size <= mixr->effects_num) {
-        if (mixr->effects_size == 0) {
-            mixr->effects_size = DEFAULT_ARRAY_SIZE;
-        }
-        else {
-            mixr->effects_size *= 2;
-        }
-
-        new_effects = (EFFECT **)realloc(mixr->effects,
-                                         mixr->effects_size * sizeof(EFFECT *));
-        if (new_effects == NULL) {
-            printf("Ooh, burney - cannae allocate memory for new sounds");
-            return -1;
-        }
-        else {
-            mixr->effects = new_effects;
-        }
-    }
-
-    EFFECT *e = new_delay(200);
-    if (e == NULL) {
-        perror("Couldn't create effect");
-        return -1;
-    }
-    mixr->effects[mixr->effects_num] = e;
-    printf("done adding effect\n");
-    return mixr->effects_num++;
-}
-
 int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
 {
     SOUNDGEN **new_soundgens = NULL;
-    // TODO -- reuse any NULLs
-    if (mixr->soundgen_size <= mixr->soundgen_num) {
+
+    if (mixr->soundgen_size <= mixr->soundgen_num)
+    {
         if (mixr->soundgen_size == 0) {
             mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
         }
@@ -285,26 +248,6 @@ int add_minisynth(mixer *mixr)
     minisynth *ms = new_minisynth();
     return add_sound_generator(mixr, (SOUNDGEN *)ms);
 }
-
-// int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern)
-// {
-//     // preliminary setup
-//     char cwd[1024];
-//     getcwd(cwd, 1024);
-//     char full_filename[strlen(filename) + strlen(cwd) +
-//                        7]; // 7 == '/wavs/' is 6 and 1 for '\0'
-//     strcpy(full_filename, cwd);
-//     strcat(full_filename, "/wavs/");
-//     strcat(full_filename, filename);
-//
-//     sample_sequencer *nseq =
-//         new_sample_seq_from_char_pattern(full_filename, pattern);
-//     if (nseq == NULL) {
-//         printf("Barfed on seq creation\n");
-//         return -1;
-//     }
-//     return add_sound_generator(mixr, (SOUNDGEN *)nseq);
-// }
 
 int add_looper(mixer *mixr, char *filename, double loop_len)
 {

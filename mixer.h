@@ -38,12 +38,7 @@ typedef struct t_mixer {
     env_var environment[ENVIRONMENT_ARRAY_SIZE];
     int env_var_count;
 
-    int delay_on;
     bool debug_mode;
-
-    EFFECT **effects;
-    int effects_num;
-    int effects_size;
 
     scene scenes[MAX_SCENES];
     int num_scenes; // actual amount of scenes
@@ -72,15 +67,12 @@ typedef struct t_mixer {
     bool start_of_loop; // true for one sample during loop time
     bool is_sixteenth;
     bool is_midi_tick;
-    // bool is_eighth;
     bool is_quarter;
 
     bool scene_mode;
     bool scene_start_pending;
 
     double volume;
-    // int keyboard_octave; // TODO <- need this?
-
 } mixer;
 
 mixer *new_mixer(void);
@@ -88,13 +80,14 @@ mixer *new_mixer(void);
 void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
+
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr);
 int mixer_add_synthdrum(mixer *mixr, int pattern);
 int add_chaosmonkey(int soundgen);
 int add_minisynth(mixer *mixr);
-int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
+// int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
 int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                       bool start_on_first_beat);
 int add_looper(mixer *mixr, char *filename, double loop_len);
@@ -103,7 +96,6 @@ int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
 void freq_change(mixer *mixr, int sig, float freq);
-void delay_toggle(mixer *mixr);
 
 void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);

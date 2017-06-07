@@ -19,49 +19,28 @@ typedef enum {
     LOWPASS,
     HIGHPASS,
     BANDPASS,
-} effect_type;
+} fx_type;
 
 typedef struct {
-    stereodelay *delay;
-    mod_delay *moddelay;
-    modfilter *modfilter;
-    reverb *r;
-    double *buffer;
-    int buf_read_idx;
-    int buf_write_idx;
-    double m_duration;
-    double m_delay_ms;
-    int m_delay_in_samples;
-    int buf_p;
-    int buf_length;
-    double costh;
-    double coef;
-    double rr;
-    double rsq;
-    double scal;
-    double freq;
-    // for decimator
-    int bits;
-    double rate, cnt;
-    long m;
-    effect_type type;
+    fx_type type;
     void (*status)(void *self, char *string);
-} EFFECT;
+    double (*process)(void *self, double input);
+} fx;
 
-EFFECT *new_beatrepeat(int looplen);
-EFFECT *new_delay(double duration);
-EFFECT *effect_new_mod_delay(void);
-EFFECT *effect_new_mod_filter(void);
-EFFECT *new_reverb_effect(void);
-EFFECT *new_decimator(void);
-EFFECT *new_distortion(void);
-EFFECT *new_freq_pass(double freq, effect_type pass_type);
+fx *new_beatrepeat(int looplen);
+fx *new_delay(double duration);
+fx *effect_new_mod_delay(void);
+fx *effect_new_mod_filter(void);
+fx *new_reverb_effect(void);
+fx *new_decimator(void);
+fx *new_distortion(void);
+fx *new_freq_pass(double freq, fx_type pass_type);
 
-void cook_variables(EFFECT *self);
-void set_delay_ms(EFFECT *self, double msec);
-double read_delay(EFFECT *self);
-double read_delay_at(EFFECT *self, double msec);
-void write_delay_and_inc(EFFECT *self, double val);
+void cook_variables(fx *self);
+void set_delay_ms(fx *self, double msec);
+double read_delay(fx *self);
+double read_delay_at(fx *self, double msec);
+void write_delay_and_inc(fx *self, double val);
 void delay_audio(double *input, double *output);
 
 #endif

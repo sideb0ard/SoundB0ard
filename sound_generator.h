@@ -23,7 +23,7 @@ typedef struct t_soundgen {
 
     int effects_size; // size of array
     int effects_num;  // num of effects
-    EFFECT **effects;
+    fx **effects;
     int effects_on; // bool
 
     int envelopes_size; // size of array
@@ -40,7 +40,7 @@ int add_delay_soundgen(SOUNDGEN *self, float duration);
 int add_moddelay_soundgen(SOUNDGEN *self);
 int add_modfilter_soundgen(SOUNDGEN *self);
 int add_reverb_soundgen(SOUNDGEN *self);
-int add_freq_pass_soundgen(SOUNDGEN *self, float freq, effect_type pass_type);
+int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type);
 float effector(SOUNDGEN *self, double val);
 
 int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e);

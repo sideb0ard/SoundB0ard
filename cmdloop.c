@@ -857,134 +857,135 @@ void interpret(char *line)
             int soundgen_num = atoi(wurds[1]);
             int fx_num = atoi(wurds[2]);
             if (is_valid_fx_num(soundgen_num, fx_num)) {
-                if (strncmp("nbeats", wurds[3], 6) == 0 ||
-                    strncmp("16th", wurds[3], 4) == 0) {
-                    if (mixr->sound_generators[soundgen_num]
-                            ->effects[fx_num]
-                            ->type == BEATREPEAT) {
-                        beatrepeat *b =
-                            (beatrepeat *)mixr->sound_generators[soundgen_num]
-                                ->effects[fx_num];
-                        if (strncmp("nbeats", wurds[3], 6) == 0) {
-                            int nbeats = atoi(wurds[4]);
-                            beatrepeat_change_num_beats_to_repeat(b, nbeats);
-                        }
-                        else {
-                            int s16th = atoi(wurds[4]);
-                            beatrepeat_change_selected_sixteenth(b, s16th);
-                        }
-                    }
-                }
-                else if (strncmp("modtype", wurds[3], 7) == 0 ||
-                         strncmp("lfotype", wurds[3], 7) == 0) {
-                    if (mixr->sound_generators[soundgen_num]
-                            ->effects[fx_num]
-                            ->type == MODDELAY) {
-                        mod_delay *d =
-                            (mod_delay *)mixr->sound_generators[soundgen_num]
-                                ->effects[fx_num];
-                        if (strncmp("modtype", wurds[3], 7) == 0) {
-                            if (strncmp("flanger", wurds[4], 7) == 0)
-                                d->m_mod_type = FLANGER;
-                            if (strncmp("vibrato", wurds[4], 7) == 0)
-                                d->m_mod_type = VIBRATO;
-                            if (strncmp("chorus", wurds[4], 6) == 0)
-                                d->m_mod_type = CHORUS;
-                        }
-                        else if (strncmp("lfotype", wurds[3], 7) == 0) {
-                            if (strncmp("tri", wurds[4], 3) == 0)
-                                d->m_lfo_type = TRI;
-                            if (strncmp("sin", wurds[4], 3) == 0)
-                                d->m_lfo_type = SINE;
-                        }
-                    }
-                }
-                else if (strncmp("midi", wurds[3], 4) == 0) {
-                    if (mixr->sound_generators[soundgen_num]
-                                ->effects[fx_num]
-                                ->type == DELAY ||
-                        mixr->sound_generators[soundgen_num]
-                                ->effects[fx_num]
-                                ->type == MODDELAY ||
-                        mixr->sound_generators[soundgen_num]
-                                ->effects[fx_num]
-                                ->type == REVERB) {
-                        printf("SUCCESS! GOLDEN MIDI DELAY!\n");
-                        mixr->midi_control_destination =
-                            DELAYFX; // TODO rename to FX
-                        mixr->active_midi_soundgen_num = soundgen_num;
-                        mixr->active_midi_soundgen_effect_num = fx_num;
-                    }
-                }
-                else if (strncmp("wetmix", wurds[3], 6) == 0) {
-                    if (mixr->sound_generators[soundgen_num]
-                            ->effects[fx_num]
-                            ->type == REVERB) {
-                        reverb *r =
-                            (reverb *)mixr->sound_generators[soundgen_num]
-                                ->effects[fx_num]
-                                ->r;
-                        int wetmix = atoi(wurds[4]);
-                        if (0 <= wetmix && wetmix <= 100)
-                            r->m_wet_pct = wetmix;
-                        if (mixr->debug_mode)
-                            printf("REVERB WETMIX! %f\n", r->m_wet_pct);
-                        reverb_cook_variables(r);
-                    }
-                }
-                else if (strncmp("delay", wurds[3], 5) == 0 ||
-                         strncmp("feedback", wurds[3], 8) == 0 ||
-                         strncmp("ratio", wurds[3], 5) == 0 ||
-                         strncmp("mix", wurds[3], 3) == 0 ||
-                         strncmp("mode", wurds[3], 4) == 0) {
-                    if (mixr->sound_generators[soundgen_num]
-                            ->effects[fx_num]
-                            ->type == DELAY) {
-                        stereodelay *d =
-                            (stereodelay *)mixr->sound_generators[soundgen_num]
-                                ->effects[fx_num];
-                        if (strncmp("delay", wurds[3], 5) == 0) {
-                            if (mixr->debug_mode)
-                                printf("Changing DELAY TIME\n");
-                            double delay_ms = atof(wurds[4]);
-                            stereo_delay_set_delay_time_ms(d, delay_ms);
-                        }
-                        else if (strncmp("feedback", wurds[3], 8) == 0) {
-                            if (mixr->debug_mode)
-                                printf("Changing FEEDBACK TIME\n");
-                            int percent = atoi(wurds[4]);
-                            stereo_delay_set_feedback_percent(d, percent);
-                        }
-                        else if (strncmp("ratio", wurds[3], 5) == 0) {
-                            if (mixr->debug_mode)
-                                printf("Changing RATIO TIME\n");
-                            double ratio = atof(wurds[4]);
-                            stereo_delay_set_delay_ratio(d, ratio);
-                        }
-                        else if (strncmp("mix", wurds[3], 3) == 0) {
-                            if (mixr->debug_mode)
-                                printf("Changing MIX TIME\n");
-                            double mix = atof(wurds[4]);
-                            stereo_delay_set_wet_mix(d, mix);
-                        }
-                        else if (strncmp("mode", wurds[3], 4) == 0) {
-                            if (mixr->debug_mode)
-                                printf("MODE!\n");
-                            if (strncmp("NORM", wurds[4], 4) == 0) {
-                                stereo_delay_set_mode(d, NORM);
-                            }
-                            else if (strncmp("TAP1", wurds[4], 4) == 0) {
-                                stereo_delay_set_mode(d, TAP1);
-                            }
-                            else if (strncmp("TAP2", wurds[4], 4) == 0) {
-                                stereo_delay_set_mode(d, TAP2);
-                            }
-                            else if (strncmp("PINGPONG", wurds[4], 8) == 0) {
-                                stereo_delay_set_mode(d, PINGPONG);
-                            }
-                        }
-                    }
-                }
+                printf("FXXxxxxx\n");
+                // if (strncmp("nbeats", wurds[3], 6) == 0 ||
+                //     strncmp("16th", wurds[3], 4) == 0) {
+                //     if (mixr->sound_generators[soundgen_num]
+                //             ->effects[fx_num]
+                //             ->type == BEATREPEAT) {
+                //         beatrepeat *b =
+                //             (beatrepeat *)mixr->sound_generators[soundgen_num]
+                //                 ->effects[fx_num];
+                //         if (strncmp("nbeats", wurds[3], 6) == 0) {
+                //             int nbeats = atoi(wurds[4]);
+                //             beatrepeat_change_num_beats_to_repeat(b, nbeats);
+                //         }
+                //         else {
+                //             int s16th = atoi(wurds[4]);
+                //             beatrepeat_change_selected_sixteenth(b, s16th);
+                //         }
+                //     }
+                // }
+                // else if (strncmp("modtype", wurds[3], 7) == 0 ||
+                //          strncmp("lfotype", wurds[3], 7) == 0) {
+                //     if (mixr->sound_generators[soundgen_num]
+                //             ->effects[fx_num]
+                //             ->type == MODDELAY) {
+                //         mod_delay *d =
+                //             (mod_delay *)mixr->sound_generators[soundgen_num]
+                //                 ->effects[fx_num];
+                //         if (strncmp("modtype", wurds[3], 7) == 0) {
+                //             if (strncmp("flanger", wurds[4], 7) == 0)
+                //                 d->m_mod_type = FLANGER;
+                //             if (strncmp("vibrato", wurds[4], 7) == 0)
+                //                 d->m_mod_type = VIBRATO;
+                //             if (strncmp("chorus", wurds[4], 6) == 0)
+                //                 d->m_mod_type = CHORUS;
+                //         }
+                //         else if (strncmp("lfotype", wurds[3], 7) == 0) {
+                //             if (strncmp("tri", wurds[4], 3) == 0)
+                //                 d->m_lfo_type = TRI;
+                //             if (strncmp("sin", wurds[4], 3) == 0)
+                //                 d->m_lfo_type = SINE;
+                //         }
+                //     }
+                // }
+                // else if (strncmp("midi", wurds[3], 4) == 0) {
+                //     if (mixr->sound_generators[soundgen_num]
+                //                 ->effects[fx_num]
+                //                 ->type == DELAY ||
+                //         mixr->sound_generators[soundgen_num]
+                //                 ->effects[fx_num]
+                //                 ->type == MODDELAY ||
+                //         mixr->sound_generators[soundgen_num]
+                //                 ->effects[fx_num]
+                //                 ->type == REVERB) {
+                //         printf("SUCCESS! GOLDEN MIDI DELAY!\n");
+                //         mixr->midi_control_destination =
+                //             DELAYFX; // TODO rename to FX
+                //         mixr->active_midi_soundgen_num = soundgen_num;
+                //         mixr->active_midi_soundgen_effect_num = fx_num;
+                //     }
+                // }
+                // else if (strncmp("wetmix", wurds[3], 6) == 0) {
+                //     if (mixr->sound_generators[soundgen_num]
+                //             ->effects[fx_num]
+                //             ->type == REVERB) {
+                //         reverb *r =
+                //             (reverb *)mixr->sound_generators[soundgen_num]
+                //                 ->effects[fx_num]
+                //                 ->r;
+                //         int wetmix = atoi(wurds[4]);
+                //         if (0 <= wetmix && wetmix <= 100)
+                //             r->m_wet_pct = wetmix;
+                //         if (mixr->debug_mode)
+                //             printf("REVERB WETMIX! %f\n", r->m_wet_pct);
+                //         reverb_cook_variables(r);
+                //     }
+                // }
+                // else if (strncmp("delay", wurds[3], 5) == 0 ||
+                //          strncmp("feedback", wurds[3], 8) == 0 ||
+                //          strncmp("ratio", wurds[3], 5) == 0 ||
+                //          strncmp("mix", wurds[3], 3) == 0 ||
+                //          strncmp("mode", wurds[3], 4) == 0) {
+                //     if (mixr->sound_generators[soundgen_num]
+                //             ->effects[fx_num]
+                //             ->type == DELAY) {
+                //         stereodelay *d =
+                //             (stereodelay *)mixr->sound_generators[soundgen_num]
+                //                 ->effects[fx_num];
+                //         if (strncmp("delay", wurds[3], 5) == 0) {
+                //             if (mixr->debug_mode)
+                //                 printf("Changing DELAY TIME\n");
+                //             double delay_ms = atof(wurds[4]);
+                //             stereo_delay_set_delay_time_ms(d, delay_ms);
+                //         }
+                //         else if (strncmp("feedback", wurds[3], 8) == 0) {
+                //             if (mixr->debug_mode)
+                //                 printf("Changing FEEDBACK TIME\n");
+                //             int percent = atoi(wurds[4]);
+                //             stereo_delay_set_feedback_percent(d, percent);
+                //         }
+                //         else if (strncmp("ratio", wurds[3], 5) == 0) {
+                //             if (mixr->debug_mode)
+                //                 printf("Changing RATIO TIME\n");
+                //             double ratio = atof(wurds[4]);
+                //             stereo_delay_set_delay_ratio(d, ratio);
+                //         }
+                //         else if (strncmp("mix", wurds[3], 3) == 0) {
+                //             if (mixr->debug_mode)
+                //                 printf("Changing MIX TIME\n");
+                //             double mix = atof(wurds[4]);
+                //             stereo_delay_set_wet_mix(d, mix);
+                //         }
+                //         else if (strncmp("mode", wurds[3], 4) == 0) {
+                //             if (mixr->debug_mode)
+                //                 printf("MODE!\n");
+                //             if (strncmp("NORM", wurds[4], 4) == 0) {
+                //                 stereo_delay_set_mode(d, NORM);
+                //             }
+                //             else if (strncmp("TAP1", wurds[4], 4) == 0) {
+                //                 stereo_delay_set_mode(d, TAP1);
+                //             }
+                //             else if (strncmp("TAP2", wurds[4], 4) == 0) {
+                //                 stereo_delay_set_mode(d, TAP2);
+                //             }
+                //             else if (strncmp("PINGPONG", wurds[4], 8) == 0) {
+                //                 stereo_delay_set_mode(d, PINGPONG);
+                //             }
+                //         }
+                //     }
+                // }
             }
         }
 

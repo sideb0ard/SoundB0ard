@@ -6,7 +6,7 @@
 #include "effect.h"
 
 typedef struct beatrepeat {
-    EFFECT effect;
+    fx effect;
     double *m_buffer;
     size_t m_buffer_size;
     size_t m_buffer_position;

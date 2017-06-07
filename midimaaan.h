@@ -20,7 +20,7 @@ typedef midi_event *midi_events_loop_t[PPNS];
 
 void *midiman(void *);
 
-void midi_delay_control(EFFECT *e, int data1, int data2);
+void midi_delay_control(fx *e, int data1, int data2);
 
 midi_event *new_midi_event(int tick, int event_type, int data1, int data2);
 void midi_event_free(midi_event *ms);
