@@ -3,7 +3,7 @@
 
 #include <portaudio.h>
 
-#include "effect.h"
+#include "fx.h"
 #include "minisynth.h"
 #include "sbmsg.h"
 #include "sequencer.h"

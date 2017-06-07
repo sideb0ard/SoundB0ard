@@ -3,6 +3,7 @@
 
 #include "filter_moogladder.h"
 #include "sound_generator.h"
+#include "stereodelay.h"
 #include <stdbool.h>
 #include <wchar.h>
 

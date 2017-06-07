@@ -4,12 +4,29 @@
 
 #include "beatrepeat.h"
 #include "defjams.h"
-#include "effect.h"
+#include "fx.h"
 #include "mixer.h"
 #include "modular_delay.h"
 #include "utils.h"
 
 extern mixer *mixr;
+
+fx *effect_new_delay(double duration)
+{
+
+    stereodelay *sd = new_stereo_delay();
+    printf("DurrrLAY! %f\n", duration);
+
+    stereo_delay_prepare_for_play(sd);
+    stereo_delay_set_delay_time_ms(sd, duration);
+    stereo_delay_set_feedback_percent(sd, 2);
+    stereo_delay_set_delay_ratio(sd, 0.2);
+    stereo_delay_set_wet_mix(sd, 0.7);
+    stereo_delay_set_mode(sd, PINGPONG);
+    stereo_delay_update(sd);
+
+    return (fx*) sd;
+}
 
 // fx *new_beatrepeat(int looplen)
 // {
@@ -30,28 +47,6 @@ extern mixer *mixr;
 //     return (fx *)b;
 // }
 // 
-// fx *new_delay(double duration)
-// {
-//     fx *e;
-//     e = (fx *)calloc(1, sizeof(fx));
-//     if (e == NULL)
-//         return NULL;
-// 
-//     e->delay = new_stereo_delay();
-//     e->type = DELAY;
-//     printf("DurrrLAY! %f\n", duration);
-// 
-//     stereo_delay_prepare_for_play(e->delay);
-//     stereo_delay_set_delay_time_ms(e->delay, duration);
-//     stereo_delay_set_feedback_percent(e->delay, 2);
-//     stereo_delay_set_delay_ratio(e->delay, 0.2);
-//     stereo_delay_set_wet_mix(e->delay, 0.7);
-//     stereo_delay_set_mode(e->delay, PINGPONG);
-// 
-//     stereo_delay_update(e->delay);
-// 
-//     return e;
-// }
 // 
 // fx *effect_new_mod_delay()
 // {

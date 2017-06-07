@@ -1,7 +1,8 @@
 #pragma once
 
-#include "effect.h"
+#include "fx.h"
 #include "pthread.h"
+#include <stdbool.h>
 
 typedef struct minisynth minisynth;
 typedef struct spork spork;

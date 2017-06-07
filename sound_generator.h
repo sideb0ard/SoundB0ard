@@ -5,7 +5,7 @@
 #include <wchar.h>
 
 #include "defjams.h"
-#include "effect.h"
+#include "fx.h"
 #include "envelope.h"
 
 typedef struct t_soundgen {

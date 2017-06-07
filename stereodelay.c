@@ -1,14 +1,20 @@
 #include "stereodelay.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include <wchar.h>
 
 stereodelay *new_stereo_delay()
 {
     stereodelay *d = (stereodelay *)calloc(1, sizeof(stereodelay));
+
     d->m_delay_time_ms = 0;
     d->m_feedback_percent = 0;
     d->m_delay_ratio = 0;
     d->m_wet_mix = 0.0;
+
+    d->m_fx.type = DELAY;
+    d->m_fx.status = &stereo_delay_status;
+    d->m_fx.process = &stereo_delay_process_wrapper;
 
     return d;
 }
@@ -152,4 +158,21 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
                     d->m_wet_mix * (right_out + right_tap2_out);
 
     return true;
+}
+
+void stereo_delay_status(void *self, char *status_string)
+{
+    stereodelay *sd = (stereodelay*) self;
+    snprintf(status_string, MAX_PS_STRING_SZ,
+            "delayms:%.2f fb:%.2f ratio:%.2f wetmx:%.2f mode:%d tap2left:%.2f tap2right:%.2f",
+            sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio, sd->m_wet_mix,
+            sd->m_mode, sd->m_tap2_left_delay_time_ms, sd->m_tap2_right_delay_time_ms);
+}
+
+double stereo_delay_process_wrapper(void *self, double input)
+{
+    stereodelay *sd = (stereodelay*) self;
+    double output = 0.;
+    stereo_delay_process_audio(sd, &input, &input, &output, &output);
+    return output;
 }

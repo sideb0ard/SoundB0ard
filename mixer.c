@@ -10,7 +10,7 @@
 #include "algorithm.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
-#include "effect.h"
+#include "fx.h"
 #include "envelope.h"
 #include "looper.h"
 #include "minisynth.h"
@@ -113,16 +113,18 @@ void mixer_ps(mixer *mixr)
                 for (int j = 0; j < mixr->sound_generators[i]->effects_num;
                      j++) {
                     fx *f = mixr->sound_generators[i]->effects[j];
-                    printf("[fx %d:%d] %s\n", i, j, "mefex");
+                    char fx_status[512];
+                    f->status(f, fx_status);
+                    printf("\n      [fx %d:%d %s]", i, j, fx_status);
                 }
                 printf(ANSI_COLOR_RESET);
-                printf(COOL_COLOR_GREEN);
-                for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
-                     j++) {
-                    printf("[envelope]-");
-                }
-                printf(ANSI_COLOR_RESET);
-                printf(">[out]");
+                //printf(COOL_COLOR_GREEN);
+                //for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
+                //     j++) {
+                //    printf("[envelope]-");
+                //}
+                //printf(ANSI_COLOR_RESET);
+                //printf("->[out]");
             }
             printf("\n\n");
         }
@@ -155,19 +157,6 @@ void mixer_update_bpm(mixer *mixr, int bpm)
             }
         }
     }
-}
-
-//// TODO - this has moved to minisynth
-//void mixer_toggle_midi_mode(mixer *mixr)
-//{
-//    mixr->m_midi_controller_mode =
-//        ++(mixr->m_midi_controller_mode) % MAX_NUM_KNOB_MODES;
-//}
-
-void mixer_toggle_key_mode(mixer *mixr)
-{
-    mixr->m_key_controller_mode =
-        ++(mixr->m_key_controller_mode) % MAX_NUM_KEY_MODES;
 }
 
 void mixer_vol_change(mixer *mixr, float vol)

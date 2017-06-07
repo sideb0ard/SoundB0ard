@@ -4,11 +4,11 @@
 
 #include "beatrepeat.h"
 #include "defjams.h"
-#include "effect.h"
+#include "fx.h"
 #include "modular_delay.h"
 #include "sound_generator.h"
 
-static int resize_effects_array(SOUNDGEN *self)
+static void resize_effects_array(SOUNDGEN *self)
 {
 
     fx **new_effects = NULL;
@@ -24,24 +24,31 @@ static int resize_effects_array(SOUNDGEN *self)
                                          self->effects_size * sizeof(fx *));
         if (new_effects == NULL) {
             printf("Ooh, burney - cannae allocate memory for new effects");
-            return -1;
+            exit(1);
         }
         else {
             self->effects = new_effects;
         }
     }
-    return 0;
+}
+
+int add_delay_soundgen(SOUNDGEN *self, float duration)
+{
+    printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
+    resize_effects_array(self);
+    fx *d = effect_new_delay(duration);
+    self->effects[self->effects_num] = d;
+    self->effects_on = 1;
+    printf("done adding effect\n");
+    return self->effects_num++;
 }
 
 int add_beatrepeat_soundgen(SOUNDGEN *self, int looplen)
 {
     printf("RAR! BEATREPEAT all up in this kittycat\n");
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
+    resize_effects_array(self);
     (void) looplen;
+
     //fx *e = new_beatrepeat(looplen);
     //if (e == NULL) {
     //    perror("Couldn't create DECIMATOR effect");
@@ -57,11 +64,7 @@ int add_beatrepeat_soundgen(SOUNDGEN *self, int looplen)
 int add_decimator_soundgen(SOUNDGEN *self)
 {
     printf("RAR! DECIMATOR all up in this kittycat\n");
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
+    resize_effects_array(self);
     //fx *e = new_decimator();
     //if (e == NULL) {
     //    perror("Couldn't create DECIMATOR effect");
@@ -77,11 +80,7 @@ int add_decimator_soundgen(SOUNDGEN *self)
 int add_distortion_soundgen(SOUNDGEN *self)
 {
     printf("BOOYA! Distortion all up in this kittycat\n");
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
+    resize_effects_array(self);
     //fx *e = new_distortion();
     //if (e == NULL) {
     //    perror("Couldn't create DISTORTion effect");
@@ -94,37 +93,11 @@ int add_distortion_soundgen(SOUNDGEN *self)
     return self->effects_num;
 }
 
-int add_delay_soundgen(SOUNDGEN *self, float duration)
-{
-    printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
-
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
-
-    //fx *e = new_delay(duration);
-    //if (e == NULL) {
-    //    perror("Couldn't create effect");
-    //    return -1;
-    //}
-    //self->effects[self->effects_num] = e;
-    //self->effects_on = 1;
-    //printf("done adding effect\n");
-    //return self->effects_num++;
-    return self->effects_num;
-}
-
 int add_moddelay_soundgen(SOUNDGEN *self)
 {
     printf("Booya, adding a new MODDELAY to SOUNDGEN!\n");
+    resize_effects_array(self);
 
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
 
     //fx *e = effect_new_mod_delay();
     //if (e == NULL) {
@@ -141,12 +114,7 @@ int add_moddelay_soundgen(SOUNDGEN *self)
 int add_modfilter_soundgen(SOUNDGEN *self)
 {
     printf("Booya, adding a new MODFILTERRRRR to SOUNDGEN!\n");
-
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
+    resize_effects_array(self);
 
     // fx *e = effect_new_mod_filter();
     // if (e == NULL) {
@@ -163,12 +131,7 @@ int add_modfilter_soundgen(SOUNDGEN *self)
 int add_reverb_soundgen(SOUNDGEN *self)
 {
     printf("Booya, adding a new REVERB to SOUNDGEN!\n");
-
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
+    resize_effects_array(self);
 
     //fx *e = new_reverb_effect();
     //if (e == NULL) {
@@ -185,11 +148,7 @@ int add_reverb_soundgen(SOUNDGEN *self)
 int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
 {
     printf("Booya, adding a new *PASS to SOUNDGEN: %f!\n", freq);
-    int res = resize_effects_array(self);
-    if (res == -1) {
-        perror("Couldn't resize effects array");
-        return -1;
-    }
+    resize_effects_array(self);
     (void) pass_type;
 
     //fx *e = new_freq_pass(freq, pass_type);
@@ -206,19 +165,21 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
 
 float effector(SOUNDGEN *self, double val)
 {
-    // double left_out = 0.0;
-    // double right_out = 0.0;
-
-    // double val_copy = val;
-
     if (self->effects_on) {
-
+        double accumulator = 0.;
         for (int i = 0; i < self->effects_num; i++) {
 
             fx *f = self->effects[i];
-            char fxstatus[512];
-            f->status((void*)f, fxstatus);
-            printf("YAR %s\n", fxstatus);
+            val =  f->process(f, val);
+            accumulator += val;
+        }
+        return accumulator;
+    }
+    return val;
+
+            //char fxstatus[512];
+            //f->status((void*)f, fxstatus);
+            //printf("YAR %s\n", fxstatus);
             // int delay_p;
             // double *delay;
             // beatrepeat *b;
@@ -308,9 +269,6 @@ float effector(SOUNDGEN *self, double val)
             //     self->effects[i]->buffer[0] = val;
             //     break;
             // }
-        }
-    }
-    return val;
 }
 
 //////////////////////////////////////////////////////

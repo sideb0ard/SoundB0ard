@@ -4,10 +4,12 @@
 
 #include "defjams.h"
 #include "delayline.h"
+#include "fx.h"
 
 typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;
 
 typedef struct stereodelay {
+    fx m_fx; // API
     delayline m_left_delay, m_right_delay;
     double m_delay_time_ms;
     double m_feedback_percent;
@@ -19,6 +21,9 @@ typedef struct stereodelay {
 } stereodelay;
 
 stereodelay *new_stereo_delay(void);
+
+void stereo_delay_status(void *self, char *string);
+double stereo_delay_process_wrapper(void *self, double input);
 
 void stereo_delay_set_mode(stereodelay *d, unsigned mode);
 void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms);

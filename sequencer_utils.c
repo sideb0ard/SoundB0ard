@@ -4,6 +4,7 @@
 #include "mixer.h"
 #include "sequencer_utils.h"
 #include "utils.h"
+#include <math.h>
 
 extern mixer *mixr;
 extern const wchar_t *sparkchars;

@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-#include "effect.h"
+#include "fx.h"
 
 typedef struct beatrepeat {
     fx effect;

@@ -20,7 +20,7 @@ OBJ = \
 	sample_sequencer.o \
 	sequencer.o \
 	sequencer_utils.o \
-	effect.o \
+	fx.o \
 	envelope.o \
 	envelope_generator.o \
 	filter.o \
