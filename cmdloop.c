@@ -858,6 +858,25 @@ void interpret(char *line)
             int fx_num = atoi(wurds[2]);
             if (is_valid_fx_num(soundgen_num, fx_num)) {
                 printf("FXXxxxxx\n");
+                fx *f = mixr->sound_generators[soundgen_num]->effects[fx_num];
+                if (f->type == DELAY){
+                    printf("Changing Dulay!\n"); 
+                    stereodelay *sd = (stereodelay*) f;
+                    double val = atof(wurds[4]);
+                    // keep these strings in sync with status() output
+                    if (strncmp("delayms", wurds[3], 7) == 0)
+                        stereo_delay_set_delay_time_ms(sd, val);
+                    else if (strncmp("fb", wurds[3], 2) == 0)
+                        stereo_delay_set_feedback_percent(sd, val);
+                    else if (strncmp("ratio", wurds[3], 5) == 0)
+                        stereo_delay_set_delay_ratio(sd, val);
+                    else if (strncmp("wetmx", wurds[3], 5) == 0)
+                        stereo_delay_set_wet_mix(sd, val);
+                    else if (strncmp("mode", wurds[3], 4) == 0)
+                        stereo_delay_set_mode(sd, val);
+                    else
+                        printf("<bleurgh!>\n");
+                }
                 // if (strncmp("nbeats", wurds[3], 6) == 0 ||
                 //     strncmp("16th", wurds[3], 4) == 0) {
                 //     if (mixr->sound_generators[soundgen_num]

@@ -11,10 +11,10 @@ typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;
 typedef struct stereodelay {
     fx m_fx; // API
     delayline m_left_delay, m_right_delay;
-    double m_delay_time_ms;
-    double m_feedback_percent;
+    double m_delay_time_ms; // 0 - 2000
+    double m_feedback_percent; // -100 - 100
     double m_delay_ratio;
-    double m_wet_mix;
+    double m_wet_mix;  // 0 - 100
     unsigned m_mode;
     double m_tap2_left_delay_time_ms;
     double m_tap2_right_delay_time_ms;

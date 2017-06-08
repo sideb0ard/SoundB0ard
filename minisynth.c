@@ -1701,10 +1701,10 @@ void minisynth_set_delay_feedback_pct(minisynth *ms, double val)
 
 void minisynth_set_delay_ratio(minisynth *ms, double val)
 {
-    if (val >= -0.9 && val <= 0.9)
+    if (val >= -1 && val <= 1)
         ms->m_settings.m_delay_ratio = val;
     else
-        printf("val must be between -0.9 and 0.9\n");
+        printf("val must be between -1 and 1\n");
 }
 
 void minisynth_set_delay_mode(minisynth *ms, unsigned int val)

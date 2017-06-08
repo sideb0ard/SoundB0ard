@@ -33,27 +33,52 @@ void stereo_delay_prepare_for_play(stereodelay *d)
     stereo_delay_reset(d);
 }
 
-void stereo_delay_set_mode(stereodelay *d, unsigned mode) { d->m_mode = mode; }
+void stereo_delay_set_mode(stereodelay *d, unsigned mode)
+{
+    if (mode < MAX_NUM_DELAY_MODE)
+        d->m_mode = mode;
+    else
+        printf("Delay mode must be between 0 and %d\n", MAX_NUM_DELAY_MODE);
+}
 
 void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms)
 {
-    d->m_delay_time_ms = delay_ms;
-    stereo_delay_update(d);
+    if (delay_ms >= 0 && delay_ms <= 2000) {
+        d->m_delay_time_ms = delay_ms;
+        stereo_delay_update(d);
+    }
+    else
+        printf("Delay time ms must be between 0 and 2000\n");
 }
+
 void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)
 {
-    d->m_feedback_percent = feedback_percent;
-    stereo_delay_update(d);
+    if (feedback_percent >= -100 && feedback_percent <= 100) {
+        d->m_feedback_percent = feedback_percent;
+        stereo_delay_update(d);
+    }
+    else
+        printf("Feedback %% must be between -100 and 100\n"); 
 }
+
 void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)
 {
-    d->m_delay_ratio = delay_ratio;
-    stereo_delay_update(d);
+    if (delay_ratio >= -1 && delay_ratio < 1) {
+        d->m_delay_ratio = delay_ratio;
+        stereo_delay_update(d);
+    }
+    else
+        printf("Delay ratio must be between -1 and 1\n");
 }
+
 void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix)
 {
-    d->m_wet_mix = wet_mix;
-    stereo_delay_update(d);
+    if (wet_mix >= 0 && wet_mix <= 100) {
+        d->m_wet_mix = wet_mix;
+        stereo_delay_update(d);
+    }
+    else
+        printf("Wetmix must be between 0 and 100\n");
 }
 
 void stereo_delay_update(stereodelay *d)
