@@ -39,9 +39,12 @@ int extract_cmds_from_line(algorithm *self, char *line)
     for (cmd = strtok_r(line, sep, &last_s); cmd;
          cmd = strtok_r(NULL, sep, &last_s)) {
 
-        if (strncmp("every loop", cmd, 11) == 0 && num_cmds == 0) {
+        printf("Cmd: %s\n", cmd);
+
+        if (strncmp("every loop", cmd, 10) == 0 && num_cmds == 0) {
             self->frequency = LOOP;
             num_cmds++;
+            printf("Every LOOP numcmds: %d\n", num_cmds);
         }
         else if (num_cmds == 1) {
             strncpy(self->command, cmd, MAX_CMD_LEN);

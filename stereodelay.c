@@ -58,7 +58,7 @@ void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)
         stereo_delay_update(d);
     }
     else
-        printf("Feedback %% must be between -100 and 100\n"); 
+        printf("Feedback %% must be between -100 and 100\n");
 }
 
 void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)
@@ -187,16 +187,18 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
 
 void stereo_delay_status(void *self, char *status_string)
 {
-    stereodelay *sd = (stereodelay*) self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
-            "delayms:%.2f fb:%.2f ratio:%.2f wetmx:%.2f mode:%d tap2left:%.2f tap2right:%.2f",
-            sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio, sd->m_wet_mix,
-            sd->m_mode, sd->m_tap2_left_delay_time_ms, sd->m_tap2_right_delay_time_ms);
+    stereodelay *sd = (stereodelay *)self;
+    snprintf(status_string, MAX_PS_STRING_SZ, "delayms:%.2f fb:%.2f ratio:%.2f "
+                                              "wetmx:%.2f mode:%d "
+                                              "tap2left:%.2f tap2right:%.2f",
+             sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio,
+             sd->m_wet_mix, sd->m_mode, sd->m_tap2_left_delay_time_ms,
+             sd->m_tap2_right_delay_time_ms);
 }
 
 double stereo_delay_process_wrapper(void *self, double input)
 {
-    stereodelay *sd = (stereodelay*) self;
+    stereodelay *sd = (stereodelay *)self;
     double output = 0.;
     stereo_delay_process_audio(sd, &input, &input, &output, &output);
     return output;

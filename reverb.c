@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <stdlib.h>
 
 #include "defjams.h"
@@ -37,6 +38,10 @@ reverb *new_reverb(void)
     r->m_wet_pct = 50;
 
     reverb_init_reverb(r);
+
+    r->m_fx.type = REVERB;
+    r->m_fx.status = &reverb_status;
+    r->m_fx.process = &reverb_process_wrapper;
 
     return r;
 }
@@ -203,4 +208,142 @@ bool reverb_process_audio(reverb *r, double *in, double *out,
     }
 
     return true;
+}
+
+void reverb_status(void *self, char *status_string)
+{
+    reverb *r = (reverb *)self;
+    snprintf(status_string, MAX_PS_STRING_SZ,
+             "predelayms:%.2f predelayattDb:%.2f inputLPFg:%.2f lpf2g2:%2.f  "
+             "reverbtime:%.2f wetmx:%2.f APF1delayms:%.2f APF1g:%.2f "
+             "APF2delayms:%.2f APF2g:%.2f APF3delayms:%.2f APF3g:%.2f "
+             "APF4delayms:%.2f APF4g:%.2f comb1delayms:%.2f comb2delayms:%.2f "
+             "comb3delayms:%.2f comb4delayms:%.2f comb5delayms:%.2f "
+             "comb6delayms:%.2f comb7delayms:%.2f comb8delayms:%.2f",
+             r->m_pre_delay_msec, r->m_pre_delay_atten_db, r->m_input_lpf_g,
+             r->m_lpf2_g2, r->m_rt60, r->m_wet_pct, r->m_apf_1_delay_msec,
+             r->m_apf_1_g, r->m_apf_2_delay_msec, r->m_apf_2_g,
+             r->m_apf_3_delay_msec, r->m_apf_3_g, r->m_apf_4_delay_msec,
+             r->m_apf_4_g, r->m_comb_1_delay_msec, r->m_comb_2_delay_msec,
+             r->m_comb_3_delay_msec, r->m_comb_4_delay_msec,
+             r->m_comb_5_delay_msec, r->m_comb_6_delay_msec,
+             r->m_comb_7_delay_msec, r->m_comb_8_delay_msec);
+}
+
+double reverb_process_wrapper(void *self, double input)
+{
+    reverb *r = (reverb *)self;
+    double output = 0;
+    reverb_process_audio(r, &input, &output, 1, 1);
+    return output;
+}
+
+void reverb_set_pre_delay_msec(reverb *r, double val)
+{
+    if (val >= 0 && val <= 100)
+        r->m_pre_delay_msec = val;
+    else
+        printf("Val must be between 0 and 100\n");
+}
+
+void reverb_set_pre_delay_atten_db(reverb *r, double val)
+{
+    if (val >= -96 && val <= 0)
+        r->m_pre_delay_atten_db = val;
+    else
+        printf("Val must be between -96 and 0\n");
+}
+
+void reverb_set_rt60(reverb *r, double val)
+{
+    if (val >= 0 && val <= 5000)
+        r->m_rt60 = val;
+    else
+        printf("Val must be between 0 and 5000\n");
+}
+
+void reverb_set_wet_pct(reverb *r, double val)
+{
+    if (val >= 0 && val <= 100)
+        r->m_wet_pct = val;
+    else
+        printf("Val must be between 0 and 100\n");
+}
+
+void reverb_set_input_lpf_g(reverb *r, double val)
+{
+    if (val >= 0 && val <= 1)
+        r->m_input_lpf_g = val;
+    else
+        printf("Val must be between 0 and 1\n");
+}
+
+void reverb_set_lpf2_g2(reverb *r, double val)
+{
+    if (val >= 0 && val <= 1)
+        r->m_lpf2_g2 = val;
+    else
+        printf("Val must be between 0 and 1\n");
+}
+
+void reverb_set_apf_delay_msec(reverb *r, int apf_num, double val)
+{
+    if (val >= 0 && val <= 100 && apf_num > 0 && apf_num < 5) {
+        switch(apf_num){
+        case(1):
+        r->m_apf_1_delay_msec = val;
+        case(2):
+        r->m_apf_2_delay_msec = val;
+        case(3):
+        r->m_apf_3_delay_msec = val;
+        case(4):
+        r->m_apf_4_delay_msec = val;
+        }
+    }
+    else 
+        printf("Val must be between 0 and 100, apf 1-4\n");
+}
+
+void reverb_set_apf_g(reverb *r, int apf_num, double val)
+{
+    if (val >= -1 && val <= 1 && apf_num > 0 && apf_num < 5) {
+        switch(apf_num){
+        case(1):
+        r->m_apf_1_g = val;
+        case(2):
+        r->m_apf_2_g = val;
+        case(3):
+        r->m_apf_3_g = val;
+        case(4):
+        r->m_apf_4_g = val;
+        }
+    }
+    else 
+        printf("Val must be between -1 and 1, apf 1-4\n");
+}
+
+void reverb_set_comb_delay_msec(reverb *r, int comb_num, double val)
+{
+    if (val >= 0 && val <= 100 && comb_num > 0 && comb_num < 9) {
+        switch(comb_num){
+        case(1):
+        r->m_comb_1_delay_msec = val;
+        case(2):
+        r->m_comb_2_delay_msec = val;
+        case(3):
+        r->m_comb_3_delay_msec = val;
+        case(4):
+        r->m_comb_4_delay_msec = val;
+        case(5):
+        r->m_comb_5_delay_msec = val;
+        case(6):
+        r->m_comb_6_delay_msec = val;
+        case(7):
+        r->m_comb_7_delay_msec = val;
+        case(8):
+        r->m_comb_8_delay_msec = val;
+        }
+    }
+    else
+        printf("Val must be between 0 and 100, Combs 1-8\n");
 }

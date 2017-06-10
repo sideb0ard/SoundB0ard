@@ -79,8 +79,7 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
     // // MIDI Sustain Pedal
     row =
         create_matrix_row(SOURCE_SUSTAIN_PEDAL, DEST_ALL_EG_SUSTAIN_OVERRIDE,
-                          &v->m_default_mod_intensity,
-                          &v->m_default_mod_range,
+                          &v->m_default_mod_intensity, &v->m_default_mod_range,
                           TRANSFORM_MIDI_SWITCH, true);
     add_matrix_row(matrix, row);
 

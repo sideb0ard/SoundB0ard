@@ -5,8 +5,8 @@
 #include <wchar.h>
 
 #include "defjams.h"
-#include "fx.h"
 #include "envelope.h"
+#include "fx.h"
 
 typedef struct t_soundgen {
     // void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);

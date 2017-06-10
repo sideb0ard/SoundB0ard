@@ -216,15 +216,17 @@ void midi_delay_control(fx *e, int data1, int data2)
     }
 
     double scaley_val;
-    //if (e->type == DELAY) {
+    // if (e->type == DELAY) {
     //    stereodelay *d = e->delay;
     //    switch (data1) {
     //    case 1:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
+    //        data2);
     //        printf("OPTION1!\n");
     //        break;
     //    case 2:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
+    //        data2);
     //        printf("OPTION2!\n");
     //        break;
     //    case 3:
@@ -232,7 +234,8 @@ void midi_delay_control(fx *e, int data1, int data2)
     //        printf("OPTION3!\n");
     //        break;
     //    case 4:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
+    //        data2);
     //        printf("OPTION4!\n");
     //        break;
     //    case 5:
@@ -260,15 +263,17 @@ void midi_delay_control(fx *e, int data1, int data2)
     //        printf("SOMthing else\n");
     //    }
     //}
-    //else if (e->type == MODDELAY) {
+    // else if (e->type == MODDELAY) {
     //    mod_delay *d = e->moddelay;
     //    switch (data1) {
     //    case 1:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
+    //        data2);
     //        printf("OPTION1!\n");
     //        break;
     //    case 2:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
+    //        data2);
     //        printf("OPTION2!\n");
     //        break;
     //    case 3:
@@ -276,7 +281,8 @@ void midi_delay_control(fx *e, int data1, int data2)
     //        printf("OPTION3!\n");
     //        break;
     //    case 4:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
+    //        data2);
     //        printf("OPTION4!\n");
     //        break;
     //    case 5:
@@ -304,7 +310,7 @@ void midi_delay_control(fx *e, int data1, int data2)
     //        printf("SOMthing else\n");
     //    }
     //}
-    //else if (e->type == REVERB) {
+    // else if (e->type == REVERB) {
     //    reverb *r = e->r;
     //    switch (data1) {
     //    case 1:

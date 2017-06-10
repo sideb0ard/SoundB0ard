@@ -49,8 +49,7 @@ void filter_update(filter *f)
         f->m_nlp = f->m_global_filter_params->nlp;
     }
 
-
-    //printf("After GLOBAL filter - fc_control is %f\n", f->m_fc_control);
+    // printf("After GLOBAL filter - fc_control is %f\n", f->m_fc_control);
     // printf("2RIG:FC: %f\n", f->m_fc);
     // printf("Q!!! : %f\n", f->m_q_control);
     // exit(0);
@@ -62,7 +61,7 @@ void filter_update(filter *f)
             f->m_fc_control =
                 f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control];
     }
-    //printf("After MOD MATRXI filter - fc_control is %f\n", f->m_fc_control);
+    // printf("After MOD MATRXI filter - fc_control is %f\n", f->m_fc_control);
 
     // f->set_q_control(f, f->m_q_control);
 

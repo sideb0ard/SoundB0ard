@@ -5,8 +5,11 @@
 #include "afx/delayapf.h"
 #include "afx/lpfcombfilter.h"
 #include "afx/onepolelpf.h"
+#include "fx.h"
 
 typedef struct reverb {
+    fx m_fx; // API
+
     // pre-delay block
     delay m_pre_delay;
 
@@ -36,29 +39,33 @@ typedef struct reverb {
     delay_apf m_output_apf_4;
     // cooking with gas
 
-    // "gui"
-    double m_pre_delay_msec;     // midi k1
-    double m_pre_delay_atten_db; // k2
-    double m_rt60;               // reverb time, k3
-    double m_wet_pct;            // mix, k4
-    double m_input_lpf_g;        // k5
-    double m_apf_1_delay_msec;   // k6
-    double m_apf_1_g;            // k7
-    double m_apf_2_delay_msec;   // k8
+    // GUI ///////////////////////////
+    double m_pre_delay_msec;
+    double m_pre_delay_atten_db;
+    // reverb output
+    double m_rt60;
+    double m_wet_pct;
+    // input diffusion
+    double m_input_lpf_g;
+    double m_lpf2_g2;
+    // APF -- all pass filter
+    double m_apf_1_delay_msec;
+    double m_apf_1_g;
+    double m_apf_2_delay_msec;
     double m_apf_2_g;
+    double m_apf_3_delay_msec;
+    double m_apf_3_g;
+    double m_apf_4_delay_msec;
+    double m_apf_4_g;
+    // COMBover
     double m_comb_1_delay_msec;
     double m_comb_2_delay_msec;
     double m_comb_3_delay_msec;
     double m_comb_4_delay_msec;
-    double m_lpf2_g2;
-    double m_apf_3_delay_msec;
-    double m_apf_3_g;
     double m_comb_5_delay_msec;
     double m_comb_6_delay_msec;
     double m_comb_7_delay_msec;
     double m_comb_8_delay_msec;
-    double m_apf_4_delay_msec;
-    double m_apf_4_g;
 
 } reverb;
 
@@ -69,3 +76,16 @@ void reverb_cook_variables(reverb *r);
 bool reverb_process_audio(reverb *r, double *in, double *out,
                           unsigned int num_channels_in,
                           unsigned int num_channels_out);
+
+void reverb_status(void *self, char *string);
+double reverb_process_wrapper(void *self, double input);
+
+void reverb_set_pre_delay_msec(reverb *r, double val);
+void reverb_set_pre_delay_atten_db(reverb *r, double val);
+void reverb_set_rt60(reverb *r, double val);
+void reverb_set_wet_pct(reverb *r, double val);
+void reverb_set_input_lpf_g(reverb *r, double val);
+void reverb_set_lpf2_g2(reverb *r, double val);
+void reverb_set_apf_delay_msec(reverb *r, int apf_num, double val);
+void reverb_set_apf_g(reverb *r, int apf_num, double val);
+void reverb_set_comb_delay_msec(reverb *r, int comb_num, double val);

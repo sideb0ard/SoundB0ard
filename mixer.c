@@ -10,8 +10,8 @@
 #include "algorithm.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
-#include "fx.h"
 #include "envelope.h"
+#include "fx.h"
 #include "looper.h"
 #include "minisynth.h"
 #include "mixer.h"
@@ -95,6 +95,7 @@ void mixer_ps(mixer *mixr)
                         mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
                 }
             }
+            printf("\n");
         }
         printf(ANSI_COLOR_RESET "\n");
     }
@@ -118,13 +119,13 @@ void mixer_ps(mixer *mixr)
                     printf("\n      [fx %d:%d %s]", i, j, fx_status);
                 }
                 printf(ANSI_COLOR_RESET);
-                //printf(COOL_COLOR_GREEN);
-                //for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
+                // printf(COOL_COLOR_GREEN);
+                // for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
                 //     j++) {
                 //    printf("[envelope]-");
                 //}
-                //printf(ANSI_COLOR_RESET);
-                //printf("->[out]");
+                // printf(ANSI_COLOR_RESET);
+                // printf("->[out]");
             }
             printf("\n\n");
         }
@@ -181,8 +182,7 @@ int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
 {
     SOUNDGEN **new_soundgens = NULL;
 
-    if (mixr->soundgen_size <= mixr->soundgen_num)
-    {
+    if (mixr->soundgen_size <= mixr->soundgen_num) {
         if (mixr->soundgen_size == 0) {
             mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
         }
@@ -269,8 +269,9 @@ double mixer_gennext(mixer *mixr)
 
     if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
         mixr->start_of_loop = true;
-        if (mixr->start_of_loop && (mixr->sixteenth_note_tick%16 != 0))
-            printf("BUG! START OF LOOP - sample: %d, midi_tick: %d sixteenth: %d\n",
+        if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0))
+            printf("BUG! START OF LOOP - sample: %d, midi_tick: %d sixteenth: "
+                   "%d\n",
                    mixr->cur_sample, mixr->midi_tick,
                    mixr->sixteenth_note_tick);
         if (mixr->debug_mode) {

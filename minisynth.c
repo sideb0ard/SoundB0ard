@@ -16,7 +16,8 @@ const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
 
 // defined in oscillator.h
 const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE"
-                                  "EXPO", "RSH", "QRSH"};
+                                                                 "EXPO",
+                                  "RSH", "QRSH"};
 
 minisynth *new_minisynth(void)
 {
@@ -1920,7 +1921,7 @@ void minisynth_set_sub_osc_db(minisynth *ms, double val)
 void minisynth_set_sustain(minisynth *ms, double val)
 {
     if (val >= 0 && val <= 1)
-        //ms->m_settings.m_sub_osc_db = val;
+        // ms->m_settings.m_sub_osc_db = val;
         ms->m_settings.m_sustain_level = val;
     else
         printf("val must be between 0 and 1\n");

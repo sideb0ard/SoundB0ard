@@ -25,6 +25,7 @@
 #include "mixer.h"
 #include "obliquestrategies.h"
 #include "oscillator.h"
+#include "reverb.h"
 #include "sample_sequencer.h"
 #include "sequencer_utils.h"
 #include "sparkline.h"
@@ -857,11 +858,10 @@ void interpret(char *line)
             int soundgen_num = atoi(wurds[1]);
             int fx_num = atoi(wurds[2]);
             if (is_valid_fx_num(soundgen_num, fx_num)) {
-                printf("FXXxxxxx\n");
                 fx *f = mixr->sound_generators[soundgen_num]->effects[fx_num];
-                if (f->type == DELAY){
-                    printf("Changing Dulay!\n"); 
-                    stereodelay *sd = (stereodelay*) f;
+                if (f->type == DELAY) {
+                    //printf("Changing Dulay!\n");
+                    stereodelay *sd = (stereodelay *)f;
                     double val = atof(wurds[4]);
                     // keep these strings in sync with status() output
                     if (strncmp("delayms", wurds[3], 7) == 0)
@@ -877,13 +877,64 @@ void interpret(char *line)
                     else
                         printf("<bleurgh!>\n");
                 }
+                else if (f->type == REVERB) {
+                    //printf("Re-re-re----verb!\n");
+                    reverb *r = (reverb*) f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("predelayms", wurds[3], 10) == 0)
+                        reverb_set_pre_delay_msec(r, val);
+                    else if (strncmp("predelayattDb", wurds[3], 13) == 0)
+                        reverb_set_pre_delay_atten_db(r, val);
+                    else if (strncmp("inputLPFg", wurds[3], 9) == 0)
+                        reverb_set_input_lpf_g(r, val);
+                    else if (strncmp("lpf2g2", wurds[3], 6) == 0)
+                        reverb_set_lpf2_g2(r, val);
+                    else if (strncmp("reverbtime", wurds[3], 10) == 0)
+                        reverb_set_rt60(r, val);
+                    else if (strncmp("wetmx", wurds[3], 5) == 0)
+                        reverb_set_wet_pct(r, val);
+                    else if (strncmp("APF1delayms", wurds[3], 11) == 0)
+                        reverb_set_apf_delay_msec(r, 1, val);
+                    else if (strncmp("APF1g", wurds[3], 5) == 0)
+                        reverb_set_apf_g(r, 1, val);
+                    else if (strncmp("APF2delayms", wurds[3], 11) == 0)
+                        reverb_set_apf_delay_msec(r, 2, val);
+                    else if (strncmp("APF2g", wurds[3], 5) == 0)
+                        reverb_set_apf_g(r, 2, val);
+                    else if (strncmp("APF3delayms", wurds[3], 11) == 0)
+                        reverb_set_apf_delay_msec(r, 3, val);
+                    else if (strncmp("APF3g", wurds[3], 5) == 0)
+                        reverb_set_apf_g(r, 3, val);
+                    else if (strncmp("APF4delayms", wurds[3], 11) == 0)
+                        reverb_set_apf_delay_msec(r, 4, val);
+                    else if (strncmp("APF4g", wurds[3], 5) == 0)
+                        reverb_set_apf_g(r, 4, val);
+                    else if (strncmp("comb1delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 1, val);
+                    else if (strncmp("comb2delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 2, val);
+                    else if (strncmp("comb3delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 3, val);
+                    else if (strncmp("comb4delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 4, val);
+                    else if (strncmp("comb5delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 5, val);
+                    else if (strncmp("comb6delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 6, val);
+                    else if (strncmp("comb7delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 7, val);
+                    else if (strncmp("comb8delayms", wurds[3], 12) == 0)
+                        reverb_set_comb_delay_msec(r, 8, val);
+                }
+
                 // if (strncmp("nbeats", wurds[3], 6) == 0 ||
                 //     strncmp("16th", wurds[3], 4) == 0) {
                 //     if (mixr->sound_generators[soundgen_num]
                 //             ->effects[fx_num]
                 //             ->type == BEATREPEAT) {
                 //         beatrepeat *b =
-                //             (beatrepeat *)mixr->sound_generators[soundgen_num]
+                //             (beatrepeat
+                //             *)mixr->sound_generators[soundgen_num]
                 //                 ->effects[fx_num];
                 //         if (strncmp("nbeats", wurds[3], 6) == 0) {
                 //             int nbeats = atoi(wurds[4]);
@@ -961,7 +1012,8 @@ void interpret(char *line)
                 //             ->effects[fx_num]
                 //             ->type == DELAY) {
                 //         stereodelay *d =
-                //             (stereodelay *)mixr->sound_generators[soundgen_num]
+                //             (stereodelay
+                //             *)mixr->sound_generators[soundgen_num]
                 //                 ->effects[fx_num];
                 //         if (strncmp("delay", wurds[3], 5) == 0) {
                 //             if (mixr->debug_mode)

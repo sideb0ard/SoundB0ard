@@ -3,8 +3,8 @@
 #include "filter_moogladder.h"
 #include "lfo.h"
 #include "qblimited_oscillator.h"
-#include "sound_generator.h"
 #include "reverb.h"
+#include "sound_generator.h"
 
 typedef struct spork {
     SOUNDGEN sg;

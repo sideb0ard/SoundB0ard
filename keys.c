@@ -102,10 +102,10 @@ void keys(int soundgen_num)
                        ms->m_settings.m_lfo1_waveform, MAX_LFO_OSC);
                 break;
             case 109:
-                //mixer_toggle_key_mode(mixr);
-                //printf("Switching KEY mode -- %d\n",
-                //       mixr->m_key_controller_mode);
-                //break;
+            // mixer_toggle_key_mode(mixr);
+            // printf("Switching KEY mode -- %d\n",
+            //       mixr->m_key_controller_mode);
+            // break;
             default:
                 // play note
                 midi_num =
