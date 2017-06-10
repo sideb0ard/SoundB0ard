@@ -289,59 +289,59 @@ void reverb_set_lpf2_g2(reverb *r, double val)
 void reverb_set_apf_delay_msec(reverb *r, int apf_num, double val)
 {
     if (val >= 0 && val <= 100 && apf_num > 0 && apf_num < 5) {
-        switch(apf_num){
-        case(1):
-        r->m_apf_1_delay_msec = val;
-        case(2):
-        r->m_apf_2_delay_msec = val;
-        case(3):
-        r->m_apf_3_delay_msec = val;
-        case(4):
-        r->m_apf_4_delay_msec = val;
+        switch (apf_num) {
+        case (1):
+            r->m_apf_1_delay_msec = val;
+        case (2):
+            r->m_apf_2_delay_msec = val;
+        case (3):
+            r->m_apf_3_delay_msec = val;
+        case (4):
+            r->m_apf_4_delay_msec = val;
         }
     }
-    else 
+    else
         printf("Val must be between 0 and 100, apf 1-4\n");
 }
 
 void reverb_set_apf_g(reverb *r, int apf_num, double val)
 {
     if (val >= -1 && val <= 1 && apf_num > 0 && apf_num < 5) {
-        switch(apf_num){
-        case(1):
-        r->m_apf_1_g = val;
-        case(2):
-        r->m_apf_2_g = val;
-        case(3):
-        r->m_apf_3_g = val;
-        case(4):
-        r->m_apf_4_g = val;
+        switch (apf_num) {
+        case (1):
+            r->m_apf_1_g = val;
+        case (2):
+            r->m_apf_2_g = val;
+        case (3):
+            r->m_apf_3_g = val;
+        case (4):
+            r->m_apf_4_g = val;
         }
     }
-    else 
+    else
         printf("Val must be between -1 and 1, apf 1-4\n");
 }
 
 void reverb_set_comb_delay_msec(reverb *r, int comb_num, double val)
 {
     if (val >= 0 && val <= 100 && comb_num > 0 && comb_num < 9) {
-        switch(comb_num){
-        case(1):
-        r->m_comb_1_delay_msec = val;
-        case(2):
-        r->m_comb_2_delay_msec = val;
-        case(3):
-        r->m_comb_3_delay_msec = val;
-        case(4):
-        r->m_comb_4_delay_msec = val;
-        case(5):
-        r->m_comb_5_delay_msec = val;
-        case(6):
-        r->m_comb_6_delay_msec = val;
-        case(7):
-        r->m_comb_7_delay_msec = val;
-        case(8):
-        r->m_comb_8_delay_msec = val;
+        switch (comb_num) {
+        case (1):
+            r->m_comb_1_delay_msec = val;
+        case (2):
+            r->m_comb_2_delay_msec = val;
+        case (3):
+            r->m_comb_3_delay_msec = val;
+        case (4):
+            r->m_comb_4_delay_msec = val;
+        case (5):
+            r->m_comb_5_delay_msec = val;
+        case (6):
+            r->m_comb_6_delay_msec = val;
+        case (7):
+            r->m_comb_7_delay_msec = val;
+        case (8):
+            r->m_comb_8_delay_msec = val;
         }
     }
     else

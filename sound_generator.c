@@ -37,7 +37,6 @@ static int soundgen_add_fx(SOUNDGEN *self, fx *f)
 
     printf("done adding effect\n");
     return self->effects_num++;
-
 }
 
 int add_delay_soundgen(SOUNDGEN *self, float duration)
@@ -52,33 +51,21 @@ int add_delay_soundgen(SOUNDGEN *self, float duration)
     stereo_delay_set_mode(sd, PINGPONG);
     stereo_delay_update(sd);
 
-    return soundgen_add_fx(self, (fx*) sd);
+    return soundgen_add_fx(self, (fx *)sd);
 }
 
 int add_reverb_soundgen(SOUNDGEN *self)
 {
     printf("Booya, adding a new REVERB to SOUNDGEN!\n");
     reverb *r = new_reverb();
-    return soundgen_add_fx(self, (fx*) r);
-
+    return soundgen_add_fx(self, (fx *)r);
 }
 
-
-int add_beatrepeat_soundgen(SOUNDGEN *self, int looplen)
+int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth)
 {
     printf("RAR! BEATREPEAT all up in this kittycat\n");
-    (void)looplen;
-
-    // fx *e = new_beatrepeat(looplen);
-    // if (e == NULL) {
-    //    perror("Couldn't create DECIMATOR effect");
-    //    return -1;
-    //}
-    // self->effects[self->effects_num] = e;
-    // self->effects_on = 1;
-    // printf("done adding beat repeat effect\n");
-    // return self->effects_num++;
-    return self->effects_num;
+    beatrepeat *b = new_beatrepeat(nbeats, sixteenth);
+    return soundgen_add_fx(self, (fx*)b);
 }
 
 int add_decimator_soundgen(SOUNDGEN *self)

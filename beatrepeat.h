@@ -6,7 +6,7 @@
 #include "fx.h"
 
 typedef struct beatrepeat {
-    fx effect;
+    fx m_fx;
     double *m_buffer;
     size_t m_buffer_size;
     size_t m_buffer_position;
@@ -22,9 +22,11 @@ typedef struct beatrepeat {
     bool m_active;
 } beatrepeat;
 
+beatrepeat *new_beatrepeat(int nbeats, int sixteenth);
 void beatrepeat_change_num_beats_to_repeat(beatrepeat *br, int num_beats);
 void beatrepeat_change_selected_sixteenth(beatrepeat *br, int selected);
 
-double beatrepeat_gennext(beatrepeat *br, double input);
+void beatrepeat_status(void *self, char *status_string);
+double beatrepeat_gennext(void *self, double input);
 
 #endif // BEATREPEAT_H_

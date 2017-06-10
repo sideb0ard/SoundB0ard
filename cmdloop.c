@@ -846,11 +846,10 @@ void interpret(char *line)
         else if (strncmp("repeat", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
-                int loop_len = atoi(wurds[2]);
-                if (loop_len > 0) {
-                    add_beatrepeat_soundgen(
-                        mixr->sound_generators[soundgen_num], loop_len);
-                }
+                int nbeats = atoi(wurds[2]);
+                int sixteenth = atoi(wurds[3]);
+                add_beatrepeat_soundgen(
+                    mixr->sound_generators[soundgen_num], nbeats, sixteenth);
             }
         }
 
@@ -860,7 +859,7 @@ void interpret(char *line)
             if (is_valid_fx_num(soundgen_num, fx_num)) {
                 fx *f = mixr->sound_generators[soundgen_num]->effects[fx_num];
                 if (f->type == DELAY) {
-                    //printf("Changing Dulay!\n");
+                    // printf("Changing Dulay!\n");
                     stereodelay *sd = (stereodelay *)f;
                     double val = atof(wurds[4]);
                     // keep these strings in sync with status() output
@@ -878,8 +877,8 @@ void interpret(char *line)
                         printf("<bleurgh!>\n");
                 }
                 else if (f->type == REVERB) {
-                    //printf("Re-re-re----verb!\n");
-                    reverb *r = (reverb*) f;
+                    // printf("Re-re-re----verb!\n");
+                    reverb *r = (reverb *)f;
                     double val = atof(wurds[4]);
                     if (strncmp("predelayms", wurds[3], 10) == 0)
                         reverb_set_pre_delay_msec(r, val);
@@ -926,26 +925,15 @@ void interpret(char *line)
                     else if (strncmp("comb8delayms", wurds[3], 12) == 0)
                         reverb_set_comb_delay_msec(r, 8, val);
                 }
+                else if (f->type == BEATREPEAT) {
+                    beatrepeat *br = (beatrepeat *)f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("numbeats", wurds[3], 8) == 0)
+                        beatrepeat_change_num_beats_to_repeat(br, val);
+                    else if (strncmp("sixteenth", wurds[3], 9) == 0)
+                        beatrepeat_change_selected_sixteenth(br, val);
+                }
 
-                // if (strncmp("nbeats", wurds[3], 6) == 0 ||
-                //     strncmp("16th", wurds[3], 4) == 0) {
-                //     if (mixr->sound_generators[soundgen_num]
-                //             ->effects[fx_num]
-                //             ->type == BEATREPEAT) {
-                //         beatrepeat *b =
-                //             (beatrepeat
-                //             *)mixr->sound_generators[soundgen_num]
-                //                 ->effects[fx_num];
-                //         if (strncmp("nbeats", wurds[3], 6) == 0) {
-                //             int nbeats = atoi(wurds[4]);
-                //             beatrepeat_change_num_beats_to_repeat(b, nbeats);
-                //         }
-                //         else {
-                //             int s16th = atoi(wurds[4]);
-                //             beatrepeat_change_selected_sixteenth(b, s16th);
-                //         }
-                //     }
-                // }
                 // else if (strncmp("modtype", wurds[3], 7) == 0 ||
                 //          strncmp("lfotype", wurds[3], 7) == 0) {
                 //     if (mixr->sound_generators[soundgen_num]

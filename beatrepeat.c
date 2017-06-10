@@ -5,8 +5,40 @@
 
 extern mixer *mixr;
 
-double beatrepeat_gennext(beatrepeat *b, double inval)
+beatrepeat *new_beatrepeat(int nbeats, int sixteenth)
 {
+    printf("NEW BEAT REPEAT! nbeats: %d sixteenth:%d\n", nbeats, sixteenth);
+    beatrepeat *b = (beatrepeat*)calloc(1, sizeof(beatrepeat));
+
+    b->m_fx.type = BEATREPEAT;
+    b->m_fx.status = &beatrepeat_status;
+    b->m_fx.process = &beatrepeat_gennext;
+
+    // TODO - this doesn't handle a change of BPM
+    b->m_buffer_size = mixr->loop_len_in_samples;
+    b->m_buffer = (double *)calloc(b->m_buffer_size, sizeof(double));
+    b->m_sixteenth_note_size = b->m_buffer_size / 16;
+    b->m_num_beats_to_repeat = nbeats;
+    b->m_selected_sixteenth = sixteenth;
+
+    b->m_active = true;
+
+    return b;
+}
+
+void beatrepeat_status(void *self, char *status_string)
+{
+    beatrepeat *b = (beatrepeat*) self;
+    snprintf(status_string, MAX_PS_STRING_SZ,
+            "numbeats:%zu sixteenth:%zu",
+            b->m_num_beats_to_repeat,
+            b->m_selected_sixteenth);
+}
+
+double beatrepeat_gennext(void *self, double inval)
+{
+    beatrepeat *b = (beatrepeat*) self;
+
     // if ( mixr->sixteenth_note_tick % 16 == b->m_selected_sixteenth
     if (mixr->sixteenth_note_tick % 16 == 0 && !b->m_recording &&
         !b->m_have_recording) {
