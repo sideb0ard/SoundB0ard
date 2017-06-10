@@ -29,6 +29,12 @@ mod_delay *new_mod_delay()
     md->m_mod_type = CHORUS; // FLANGER, VIBRATO, CHORUS
     md->m_lfo_type = SINE;   // SINE or TRI
 
+    md->m_fx.type = MODDELAY;
+    md->m_fx.status = &mod_delay_status;
+    md->m_fx.process = &mod_delay_process_wrapper;
+
+    mod_delay_prepare_for_play(md);
+
     return md;
 }
 
@@ -130,4 +136,70 @@ bool mod_delay_process_audio(mod_delay *md, double *input_left,
     ddl_process_audio_frame(&md->m_delay, input_left, output_left, 1, 1);
 
     return true;
+}
+
+void mod_delay_status(void *self, char *status_string)
+{
+    mod_delay *md = (mod_delay *)self;
+    snprintf(status_string, MAX_PS_STRING_SZ, "depth:%.2f rate:%.2f "
+                                              "feedback:%.2f chorusoffset:%.2f "
+                                              "modType:%d LFOtype:%d",
+             md->m_depth, md->m_rate, md->m_feedback_percent,
+             md->m_chorus_offset, md->m_mod_type, md->m_lfo_type);
+}
+
+double mod_delay_process_wrapper(void *self, double input)
+{
+    mod_delay *md = (mod_delay *)self;
+    double out = 0.;
+    mod_delay_process_audio(md, &input, &input, &out, &out);
+    return out;
+}
+
+void mod_delay_set_depth(mod_delay *md, double val)
+{
+    if (val >= 0 && val <= 100)
+        md->m_depth = val;
+    else
+        printf("Val has to be between 0 and 100\n");
+}
+
+void mod_delay_set_rate(mod_delay *md, double val)
+{
+    if (val >= 0.02 && val <= 5)
+        md->m_rate = val;
+    else
+        printf("Val has to be between 0.02 and 5\n");
+}
+
+void mod_delay_set_feedback_percent(mod_delay *md, double val)
+{
+    if (val >= -100 && val <= 100)
+        md->m_feedback_percent = val;
+    else
+        printf("Val has to be between -100 and 100\n");
+}
+
+void mod_delay_set_chorus_offset(mod_delay *md, double val)
+{
+    if (val >= 0 && val <= 30)
+        md->m_chorus_offset = val;
+    else
+        printf("Val has to be between 0 and 30\n");
+}
+
+void mod_delay_set_mod_type(mod_delay *md, unsigned int val)
+{
+    if (val < MAX_MOD_TYPE)
+        md->m_mod_type = val;
+    else
+        printf("Val has to be between 0 and %d\n", MAX_MOD_TYPE - 1);
+}
+
+void mod_delay_set_lfo_type(mod_delay *md, unsigned int val)
+{
+    if (val < 2)
+        md->m_lfo_type = val;
+    else
+        printf("Val has to be 0 or 1\n");
 }

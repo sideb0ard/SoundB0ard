@@ -8,7 +8,7 @@ extern mixer *mixr;
 beatrepeat *new_beatrepeat(int nbeats, int sixteenth)
 {
     printf("NEW BEAT REPEAT! nbeats: %d sixteenth:%d\n", nbeats, sixteenth);
-    beatrepeat *b = (beatrepeat*)calloc(1, sizeof(beatrepeat));
+    beatrepeat *b = (beatrepeat *)calloc(1, sizeof(beatrepeat));
 
     b->m_fx.type = BEATREPEAT;
     b->m_fx.status = &beatrepeat_status;
@@ -28,16 +28,14 @@ beatrepeat *new_beatrepeat(int nbeats, int sixteenth)
 
 void beatrepeat_status(void *self, char *status_string)
 {
-    beatrepeat *b = (beatrepeat*) self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
-            "numbeats:%zu sixteenth:%zu",
-            b->m_num_beats_to_repeat,
-            b->m_selected_sixteenth);
+    beatrepeat *b = (beatrepeat *)self;
+    snprintf(status_string, MAX_PS_STRING_SZ, "numbeats:%zu sixteenth:%zu",
+             b->m_num_beats_to_repeat, b->m_selected_sixteenth);
 }
 
 double beatrepeat_gennext(void *self, double inval)
 {
-    beatrepeat *b = (beatrepeat*) self;
+    beatrepeat *b = (beatrepeat *)self;
 
     // if ( mixr->sixteenth_note_tick % 16 == b->m_selected_sixteenth
     if (mixr->sixteenth_note_tick % 16 == 0 && !b->m_recording &&

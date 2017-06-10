@@ -2,10 +2,12 @@
 
 #include "ddlmodule.h"
 #include "lfo.h"
+#include "fx.h"
 
-typedef enum { FLANGER, VIBRATO, CHORUS } modular_type;
+typedef enum { FLANGER, VIBRATO, CHORUS, MAX_MOD_TYPE } modular_type;
 
 typedef struct mod_delay {
+    fx m_fx;
     lfo *m_lfo;
     ddlmodule m_delay;
 
@@ -33,3 +35,13 @@ bool mod_delay_update(mod_delay *md);
 bool mod_delay_process_audio(mod_delay *md, double *input_left,
                              double *input_right, double *output_left,
                              double *output_right);
+
+double mod_delay_process_wrapper(void *self, double input);
+void mod_delay_status(void *self, char *status_string);
+
+void mod_delay_set_depth(mod_delay *md, double val);
+void mod_delay_set_rate(mod_delay *md, double val);
+void mod_delay_set_feedback_percent(mod_delay *md, double val);
+void mod_delay_set_chorus_offset(mod_delay *md, double val);
+void mod_delay_set_mod_type(mod_delay *md, unsigned int val);
+void mod_delay_set_lfo_type(mod_delay *md, unsigned int val);

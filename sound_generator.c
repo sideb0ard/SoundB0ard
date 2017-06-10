@@ -65,7 +65,14 @@ int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth)
 {
     printf("RAR! BEATREPEAT all up in this kittycat\n");
     beatrepeat *b = new_beatrepeat(nbeats, sixteenth);
-    return soundgen_add_fx(self, (fx*)b);
+    return soundgen_add_fx(self, (fx *)b);
+}
+
+int add_moddelay_soundgen(SOUNDGEN *self)
+{
+    printf("Booya, adding a new MODDELAY to SOUNDGEN!\n");
+    mod_delay *md = new_mod_delay();
+    return soundgen_add_fx(self, (fx *)md);
 }
 
 int add_decimator_soundgen(SOUNDGEN *self)
@@ -94,22 +101,6 @@ int add_distortion_soundgen(SOUNDGEN *self)
     // self->effects[self->effects_num] = e;
     // self->effects_on = 1;
     // printf("done adding effect\n");
-    // return self->effects_num++;
-    return self->effects_num;
-}
-
-int add_moddelay_soundgen(SOUNDGEN *self)
-{
-    printf("Booya, adding a new MODDELAY to SOUNDGEN!\n");
-
-    // fx *e = effect_new_mod_delay();
-    // if (e == NULL) {
-    //    perror("Couldn't create effect");
-    //    return -1;
-    //}
-    // self->effects[self->effects_num] = e;
-    // self->effects_on = 1;
-    printf("done adding effect\n");
     // return self->effects_num++;
     return self->effects_num;
 }

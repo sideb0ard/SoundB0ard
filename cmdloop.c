@@ -22,6 +22,7 @@
 #include "keys.h"
 #include "midimaaan.h"
 #include "minisynth.h"
+#include "modular_delay.h"
 #include "mixer.h"
 #include "obliquestrategies.h"
 #include "oscillator.h"
@@ -848,8 +849,8 @@ void interpret(char *line)
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 int nbeats = atoi(wurds[2]);
                 int sixteenth = atoi(wurds[3]);
-                add_beatrepeat_soundgen(
-                    mixr->sound_generators[soundgen_num], nbeats, sixteenth);
+                add_beatrepeat_soundgen(mixr->sound_generators[soundgen_num],
+                                        nbeats, sixteenth);
             }
         }
 
@@ -932,6 +933,28 @@ void interpret(char *line)
                         beatrepeat_change_num_beats_to_repeat(br, val);
                     else if (strncmp("sixteenth", wurds[3], 9) == 0)
                         beatrepeat_change_selected_sixteenth(br, val);
+                }
+                else if (f->type == MODDELAY) {
+                    mod_delay *md = (mod_delay *)f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("depth", wurds[3], 5) == 0) {
+                        mod_delay_set_depth(md, val);
+                    }
+                    else if (strncmp("rate", wurds[3], 4) == 0) {
+                        mod_delay_set_rate(md, val);
+                    }
+                    else if (strncmp("feedback", wurds[3], 8) == 0) {
+                        mod_delay_set_feedback_percent(md, val);
+                    }
+                    else if (strncmp("chorusoffset", wurds[3], 12) == 0) {
+                        mod_delay_set_chorus_offset(md, val);
+                    }
+                    else if (strncmp("modType", wurds[3], 7) == 0) {
+                        mod_delay_set_mod_type(md, (unsigned int) val);
+                    }
+                    else if (strncmp("LFOtype", wurds[3], 7) == 0) {
+                        mod_delay_set_lfo_type(md, (unsigned int) val);
+                    }
                 }
 
                 // else if (strncmp("modtype", wurds[3], 7) == 0 ||
