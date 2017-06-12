@@ -6,6 +6,7 @@
 #include "defjams.h"
 #include "fx.h"
 #include "modular_delay.h"
+#include "modfilter.h"
 #include "reverb.h"
 #include "sound_generator.h"
 #include "stereodelay.h"
@@ -75,6 +76,13 @@ int add_moddelay_soundgen(SOUNDGEN *self)
     return soundgen_add_fx(self, (fx *)md);
 }
 
+int add_modfilter_soundgen(SOUNDGEN *self)
+{
+    printf("Booya, adding a new MODFILTERRRRR to SOUNDGEN!\n");
+    modfilter *mf = new_modfilter();
+    return soundgen_add_fx(self, (fx *)mf);
+}
+
 int add_decimator_soundgen(SOUNDGEN *self)
 {
     printf("RAR! DECIMATOR all up in this kittycat\n");
@@ -98,22 +106,6 @@ int add_distortion_soundgen(SOUNDGEN *self)
     //    perror("Couldn't create DISTORTion effect");
     //    return -1;
     //}
-    // self->effects[self->effects_num] = e;
-    // self->effects_on = 1;
-    // printf("done adding effect\n");
-    // return self->effects_num++;
-    return self->effects_num;
-}
-
-int add_modfilter_soundgen(SOUNDGEN *self)
-{
-    printf("Booya, adding a new MODFILTERRRRR to SOUNDGEN!\n");
-
-    // fx *e = effect_new_mod_filter();
-    // if (e == NULL) {
-    //     perror("Couldn't create effect");
-    //     return -1;
-    // }
     // self->effects[self->effects_num] = e;
     // self->effects_on = 1;
     // printf("done adding effect\n");
@@ -152,20 +144,6 @@ float effector(SOUNDGEN *self, double val)
     }
     return val;
 
-    // char fxstatus[512];
-    // f->status((void*)f, fxstatus);
-    // printf("YAR %s\n", fxstatus);
-    // int delay_p;
-    // double *delay;
-    // beatrepeat *b;
-    // float val1 = 0;
-    // float val2 = 0;
-
-    // switch (self->effects[i]->type) {
-    // case BEATREPEAT:
-    //     b = (beatrepeat *)self->effects[i];
-    //     val = beatrepeat_gennext(b, val);
-    //     break;
     // case DECIMATOR:
     //     if (val > 0.0) {
     //         self->effects[i]->cnt += self->effects[i]->rate;
@@ -183,26 +161,9 @@ float effector(SOUNDGEN *self, double val)
     //         val = 1 / 100 * atan(val * 100);
     //     }
     //     break;
-    // case DELAY:
-    //     stereo_delay_update(self->effects[i]->delay);
-    //     stereo_delay_process_audio(self->effects[i]->delay, &val, &val,
-    //                                &left_out, &right_out);
-    //     val = left_out;
-    //     break;
-    // case MODDELAY:
-    //     mod_delay_update(self->effects[i]->moddelay);
-    //     mod_delay_process_audio(self->effects[i]->moddelay, &val, &val,
-    //                             &left_out, &right_out);
-    //     val = left_out;
-    //     break;
     // case MODFILTER:
     //     modfilter_process_audio(self->effects[i]->modfilter, &val,
     //                             &left_out);
-    //     val = left_out;
-    //     break;
-    // case REVERB:
-    //     reverb_process_audio(self->effects[i]->r, &val, &left_out, 1,
-    //                          1);
     //     val = left_out;
     //     break;
     // case RES:

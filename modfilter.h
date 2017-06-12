@@ -1,9 +1,11 @@
 #pragma once
 
-#include "afx/biquad_lpf.h"
+#include "afx/biquad.h"
 #include "lfo.h"
+#include "fx.h"
 
 typedef struct modfilter {
+    fx m_fx; // API
     biquad m_left_lpf;
     biquad m_right_lpf;
 
@@ -17,15 +19,16 @@ typedef struct modfilter {
 
     double m_mod_depth_fc;
     double m_mod_rate_fc;
-    unsigned int m_lfo_waveform;
     double m_mod_depth_q;
     double m_mod_rate_q;
+    unsigned int m_lfo_waveform;
     unsigned int m_lfo_phase;
 
 } modfilter;
 
 modfilter *new_modfilter(void);
 void modfilter_init(modfilter *mf);
+void modfilter_update(modfilter *mf);
 double modfilter_calculate_cutoff_freq(modfilter *mf, double lfo_sample);
 double modfilter_calculate_q(modfilter *mf, double lfo_sample);
 void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
@@ -33,3 +36,13 @@ void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
 void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
                                           double q);
 bool modfilter_process_audio(modfilter *mf, double *in, double *out);
+
+double modfilter_process_wrapper(void *self, double input);
+void modfilter_status(void *self, char *status_string);
+
+void modfilter_set_mod_depth_fc(modfilter *mf, double val);
+void modfilter_set_mod_rate_fc(modfilter *mf, double val);
+void modfilter_set_mod_depth_q(modfilter *mf, double val);
+void modfilter_set_mod_rate_q(modfilter *mf, double val);
+void modfilter_set_lfo_waveform(modfilter *mf, unsigned int val);
+void modfilter_set_lfo_phase(modfilter *mf, unsigned int val);

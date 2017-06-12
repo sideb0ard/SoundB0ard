@@ -1,6 +1,6 @@
 CC = clang++
 OBJ = \
-	afx/biquad_lpf.o \
+	afx/biquad.o \
 	afx/combfilter.o \
 	afx/delay.o \
 	afx/delayapf.o  \

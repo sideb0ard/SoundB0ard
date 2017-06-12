@@ -9,6 +9,7 @@ typedef enum {
     MODFILTER,
     DISTORTION,
     RES,
+    RESONANTLPF,
     REVERB,
     ALLPASS,
     LOWPASS,

@@ -119,13 +119,12 @@ void mixer_ps(mixer *mixr)
                     printf("\n      [fx %d:%d %s]", i, j, fx_status);
                 }
                 printf(ANSI_COLOR_RESET);
-                // printf(COOL_COLOR_GREEN);
-                // for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
-                //     j++) {
-                //    printf("[envelope]-");
-                //}
-                // printf(ANSI_COLOR_RESET);
-                // printf("->[out]");
+                 printf(COOL_COLOR_GREEN);
+                 for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
+                     j++) {
+                    printf("[envelope]\n");
+                }
+                 printf(ANSI_COLOR_RESET);
             }
             printf("\n\n");
         }
