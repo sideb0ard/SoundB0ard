@@ -143,9 +143,8 @@ void osc_reset(oscillator *self)
 }
 
 // --- update the frequency, amp mod and PWM
-void osc_update(oscillator *self, char *name)
+void osc_update(oscillator *self)
 {
-    (void)name;
     if (self->m_global_oscillator_params) {
         // printf("I'm %s\n", name);
         if (self->m_global_oscillator_params->osc_fo >= 0) {

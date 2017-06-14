@@ -203,10 +203,10 @@ int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
     return mixr->soundgen_num++;
 }
 
-int mixer_add_spork(mixer *mixr)
+int mixer_add_spork(mixer *mixr, double freq)
 {
     printf("Adding an SPORK, mo!\n");
-    spork *s = new_spork();
+    spork *s = new_spork(freq);
     return add_sound_generator(mixr, (SOUNDGEN *)s);
 }
 

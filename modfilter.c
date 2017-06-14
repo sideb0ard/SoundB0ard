@@ -125,13 +125,13 @@ bool modfilter_process_audio(modfilter *mf, double *in, double *out)
     double yn = 0.0;
     double yqn = 0; // quad phase
 
-    osc_update((oscillator *)&mf->m_fc_lfo, "LFO1FC");
+    osc_update((oscillator *)&mf->m_fc_lfo);
     yn = lfo_do_oscillate((oscillator *)&mf->m_fc_lfo, &yqn);
     double fc = modfilter_calculate_cutoff_freq(mf, yn);
     double fcq = modfilter_calculate_cutoff_freq(mf, yqn);
     // printf("LFO FC: %f FC: %f\n", yn, fc);
 
-    osc_update((oscillator *)&mf->m_q_lfo, "LFO1Q");
+    osc_update((oscillator *)&mf->m_q_lfo);
     yn = lfo_do_oscillate((oscillator *)&mf->m_q_lfo, &yqn);
     double q = modfilter_calculate_q(mf, yn);
     double qq = modfilter_calculate_q(mf, yqn);

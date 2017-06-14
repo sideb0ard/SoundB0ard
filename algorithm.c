@@ -153,3 +153,12 @@ double algorithm_getvol(void *self)
     (void)self;
     return 0.0;
 }
+
+void algorithm_start(void *self)
+{
+    (void)self;
+}
+void algorithm_stop(void *self)
+{
+    (void)self;
+}

@@ -158,54 +158,54 @@ void midi_event_free(midi_event *ev) { free(ev); }
 void spork_parse_midi(spork *s, int data1, int data2)
 {
     printf("SPORKMIDIiii!\n");
-    double scaley_val = 0.0;
-    switch (data1) {
-    case 1:
-        scaley_val = scaleybum(0, 127, 0.0, 1.0, data2);
-        printf("VOLUME!\n");
-        s->m_volume = scaley_val;
-        break;
-    case 2:
-        scaley_val = scaleybum(0, 127, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-        s->m_lfo.osc.m_osc_fo = scaley_val;
-        printf("LFO RATE! %f\n", s->m_lfo.osc.m_osc_fo);
+    //double scaley_val = 0.0;
+    //switch (data1) {
+    //case 1:
+    //    scaley_val = scaleybum(0, 127, 0.0, 1.0, data2);
+    //    printf("VOLUME!\n");
+    //    s->m_volume = scaley_val;
+    //    break;
+    //case 2:
+    //    scaley_val = scaleybum(0, 127, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+    //    s->m_lfo.osc.m_osc_fo = scaley_val;
+    //    printf("LFO RATE! %f\n", s->m_lfo.osc.m_osc_fo);
 
-        break;
-    case 3:
-        scaley_val = scaleybum(0, 127, 0, 1, data2);
-        s->m_lfo.osc.m_amplitude = scaley_val;
-        printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude);
-        break;
-    case 4:
-        scaley_val = scaleybum(0, 127, 10, 220, data2);
-        printf("OSC FREQ!!\n");
-        s->m_osc1.osc.m_osc_fo = scaley_val;
-        s->m_osc2.osc.m_osc_fo = scaley_val * 2;
-        s->m_osc3.osc.m_osc_fo = scaley_val / 3;
-        break;
-    case 5:
-        scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        printf("FILTER FC! %f\n", scaley_val);
-        s->m_filter.f.m_fc_control = scaley_val;
-        break;
-    case 6:
-        scaley_val = scaleybum(0, 127, 0, 100, data2);
-        printf("Reverb Pre Delay Ms!\n");
-        s->m_reverb->m_pre_delay_msec = scaley_val;
-        break;
-    case 7:
-        scaley_val = scaleybum(0, 127, 0, 5000, data2);
-        printf("Reverb Time!\n");
-        s->m_reverb->m_rt60 = scaley_val;
-        break;
-    case 8:
-        scaley_val = scaleybum(0, 127, 0, 100, data2);
-        printf("Reverb Wet Mix!\n");
-        s->m_reverb->m_wet_pct = scaley_val;
-        break;
-    default:
-        printf("SOMthing else\n");
-    }
+    //    break;
+    //case 3:
+    //    scaley_val = scaleybum(0, 127, 0, 1, data2);
+    //    s->m_lfo.osc.m_amplitude = scaley_val;
+    //    printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude);
+    //    break;
+    //case 4:
+    //    scaley_val = scaleybum(0, 127, 10, 220, data2);
+    //    printf("OSC FREQ!!\n");
+    //    s->m_osc1.osc.m_osc_fo = scaley_val;
+    //    s->m_osc2.osc.m_osc_fo = scaley_val * 2;
+    //    s->m_osc3.osc.m_osc_fo = scaley_val / 3;
+    //    break;
+    //case 5:
+    //    scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+    //    printf("FILTER FC! %f\n", scaley_val);
+    //    s->m_filter.f.m_fc_control = scaley_val;
+    //    break;
+    //case 6:
+    //    scaley_val = scaleybum(0, 127, 0, 100, data2);
+    //    printf("Reverb Pre Delay Ms!\n");
+    //    s->m_reverb->m_pre_delay_msec = scaley_val;
+    //    break;
+    //case 7:
+    //    scaley_val = scaleybum(0, 127, 0, 5000, data2);
+    //    printf("Reverb Time!\n");
+    //    s->m_reverb->m_rt60 = scaley_val;
+    //    break;
+    //case 8:
+    //    scaley_val = scaleybum(0, 127, 0, 100, data2);
+    //    printf("Reverb Wet Mix!\n");
+    //    s->m_reverb->m_wet_pct = scaley_val;
+    //    break;
+    //default:
+    //    printf("SOMthing else\n");
+    //}
 }
 
 void midi_delay_control(fx *e, int data1, int data2)

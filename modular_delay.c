@@ -42,7 +42,7 @@ void mod_delay_update_lfo(mod_delay *md)
 {
     md->m_lfo->osc.m_osc_fo = md->m_rate;
     md->m_lfo->osc.m_waveform = md->m_lfo_type;
-    osc_update(&md->m_lfo->osc, "modular_delay");
+    osc_update(&md->m_lfo->osc);
 }
 
 void mod_delay_update_delay(mod_delay *md)

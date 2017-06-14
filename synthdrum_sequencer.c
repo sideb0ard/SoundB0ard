@@ -4,6 +4,7 @@
 #include "utils.h"
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 extern mixer *mixr;
 extern char *state_strings;
@@ -141,12 +142,12 @@ double sds_gennext(void *self)
         sds->eg1_osc1_intensity * OSC_FO_MOD_RANGE * eg1_biased;
     sds->m_osc1.osc.m_fo_mod = eg1_osc_mod;
 
-    osc_update(&sds->m_osc1.osc, "SINEOSC");
+    osc_update(&sds->m_osc1.osc);
     double osc1 = qb_do_oscillate(&sds->m_osc1.osc, NULL);
 
     // noise for initial hit
     double eg2 = eg_do_envelope(&sds->m_eg2, NULL);
-    osc_update(&sds->m_osc2.osc, "NOISEOSC");
+    osc_update(&sds->m_osc2.osc);
     double osc2 = qb_do_oscillate(&sds->m_osc2.osc, NULL);
 
     val = (eg1 * osc1) * 2; //+ (eg2 * osc2 * sds->osc2_amp);

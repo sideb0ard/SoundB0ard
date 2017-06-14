@@ -31,6 +31,7 @@
 #include "sample_sequencer.h"
 #include "sequencer_utils.h"
 #include "sparkline.h"
+#include "spork.h"
 #include "synthdrum_sequencer.h"
 #include "table.h"
 #include "utils.h"
@@ -95,10 +96,16 @@ void interpret(char *line)
                 mixer_update_bpm(mixr, bpm);
         }
 
-        else if (strncmp("spork", wurds[0], 3) == 0) {
-            int soundgen_num = mixer_add_spork(mixr);
-            mixr->midi_control_destination = MIDISPORK;
-            mixr->active_midi_soundgen_num = soundgen_num;
+        else if (strncmp("new", wurds[0], 3) == 0) {
+            if (strncmp("spork", wurds[1], 5) == 0) {
+                printf("Sp0rky!\n");
+                double freq = atof(wurds[2]);
+                if (freq > 0.) {
+                    mixer_add_spork(mixr, freq);
+                } else {
+                    mixer_add_spork(mixr, 440);
+                }
+            }
         }
 
         else if (strncmp("debug", wurds[0], 5) == 0) {
@@ -132,6 +139,22 @@ void interpret(char *line)
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 printf("Deleting SOUND GEN %d\n", soundgen_num);
                 mixer_del_soundgen(mixr, soundgen_num);
+            }
+        }
+        else if (strncmp("start", wurds[0], 5) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                printf("Starting SOUND GEN %d\n", soundgen_num);
+                SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+                sg->start(sg);
+            }
+        }
+        else if (strncmp("stop", wurds[0], 5) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                printf("Stopping SOUND GEN %d\n", soundgen_num);
+                SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+                sg->stop(sg);
             }
         }
         else if (strncmp("down", wurds[0], 4) == 0 ||
@@ -334,6 +357,23 @@ void interpret(char *line)
             free(pattern);
         }
 
+        else if (strncmp("spork", wurds[0], 5) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+                mixr->sound_generators[soundgen_num]->type == SPORK_TYPE) {
+                spork *s = (spork*) mixr->sound_generators[soundgen_num];
+                printf("Your Spork is my command!\n");
+                double val = atof(wurds[3]);
+                if (strncmp("freq", wurds[2], 4) == 0)
+                    spork_set_freq(s, val);
+                else if (strncmp("waveform", wurds[2], 8) == 0)
+                    spork_set_waveform(s, val);
+                else if (strncmp("mode", wurds[2], 4) == 0)
+                    spork_set_mode(s, val);
+                else if (strncmp("polarity", wurds[2], 4) == 0)
+                    spork_set_mode(s, val);
+            }
+        }
         // SAMPLE LOOPER COMMANDS
         else if (strncmp("loop", wurds[0], 4) == 0) {
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {

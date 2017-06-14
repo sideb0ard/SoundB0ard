@@ -225,7 +225,7 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
 
     ////// update layer 1 modulators
     eg_update(&msv->m_voice.m_eg1);
-    osc_update((oscillator *)&msv->m_voice.m_lfo1, "LFO1");
+    osc_update((oscillator *)&msv->m_voice.m_lfo1);
 
     ////// gen next val layer 1 mods
     eg_do_envelope(&msv->m_voice.m_eg1, NULL);
@@ -237,10 +237,10 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     dca_update(&msv->m_voice.m_dca);
     moog_update((filter *)&msv->m_moog_ladder_filter);
 
-    osc_update((oscillator *)&msv->m_osc1, "OSC1");
-    osc_update((oscillator *)&msv->m_osc2, "OSC2");
-    osc_update((oscillator *)&msv->m_osc3, "OSC3");
-    osc_update((oscillator *)&msv->m_osc4, "OSC4");
+    osc_update((oscillator *)&msv->m_osc1);
+    osc_update((oscillator *)&msv->m_osc2);
+    osc_update((oscillator *)&msv->m_osc3);
+    osc_update((oscillator *)&msv->m_osc4);
 
     double osc_mix = 0.333 * qb_do_oscillate((oscillator *)&msv->m_osc1, NULL) +
                      0.333 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +

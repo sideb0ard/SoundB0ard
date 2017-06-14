@@ -109,7 +109,7 @@ struct oscillator {
     void (*start_oscillator)(oscillator *self);
     void (*stop_oscillator)(oscillator *self);
     void (*reset_oscillator)(oscillator *self);
-    void (*update_oscillator)(oscillator *self, char *name);
+    void (*update_oscillator)(oscillator *self);
 };
 
 void osc_new_settings(oscillator *self);
@@ -138,7 +138,7 @@ void osc_set_pw_mod(oscillator *self, double mod_val);
 // --- reset counters, etc...
 void osc_reset(oscillator *self);
 // --- update the frequency, amp mod and PWM
-void osc_update(oscillator *self, char *name);
+void osc_update(oscillator *self);
 
 void osc_init_global_parameters(oscillator *self,
                                 global_oscillator_params *params);

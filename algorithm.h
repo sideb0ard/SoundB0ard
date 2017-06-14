@@ -29,3 +29,5 @@ double algorithm_gen_next(void *self);
 void algorithm_status(void *self, wchar_t *ss);
 void algorithm_setvol(void *self, double v);
 double algorithm_getvol(void *self);
+void algorithm_start(void *self);
+void algorithm_stop(void *self);

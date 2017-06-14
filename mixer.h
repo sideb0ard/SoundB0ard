@@ -83,7 +83,7 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);
-int mixer_add_spork(mixer *mixr);
+int mixer_add_spork(mixer *mixr, double freq);
 int mixer_add_synthdrum(mixer *mixr, int pattern);
 int add_chaosmonkey(int soundgen);
 int add_minisynth(mixer *mixr);
