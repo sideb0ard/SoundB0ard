@@ -10,13 +10,13 @@
 typedef struct spork {
     SOUNDGEN sg;
     wt_oscillator m_osc;
-    //lfo m_lfo;
-    //qblimited_oscillator m_osc1;
-    //qblimited_oscillator m_osc2;
-    //qblimited_oscillator m_osc3;
-    //filter_moogladder m_filter;
+    // lfo m_lfo;
+    // qblimited_oscillator m_osc1;
+    // qblimited_oscillator m_osc2;
+    // qblimited_oscillator m_osc3;
+    // filter_moogladder m_filter;
 
-    //reverb *m_reverb;
+    // reverb *m_reverb;
 
     // "gui"
     double freq;

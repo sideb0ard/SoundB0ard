@@ -1,8 +1,8 @@
 #pragma once
 
 #include "afx/biquad.h"
-#include "lfo.h"
 #include "fx.h"
+#include "lfo.h"
 
 typedef struct modfilter {
     fx m_fx; // API

@@ -18,7 +18,7 @@ typedef struct wt_oscillator {
 
     double freq;
     unsigned int waveform; // 0: sine, saw, tri, square
-    unsigned int mode; // 0: normal, bandlimited
+    unsigned int mode;     // 0: normal, bandlimited
     unsigned int polarity; // bipolar, unipolar
 
     double m_sine_array[WT_LENGTH];

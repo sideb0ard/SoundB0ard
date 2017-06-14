@@ -44,10 +44,6 @@ void modfilter_init(modfilter *mf)
 
     lfo_set_soundgenerator_interface(&mf->m_q_lfo);
     lfo_start_oscillator((oscillator *)&mf->m_q_lfo);
-
-
-
-
 }
 
 void modfilter_update(modfilter *mf)
@@ -56,7 +52,6 @@ void modfilter_update(modfilter *mf)
     mf->m_q_lfo.osc.m_osc_fo = mf->m_mod_rate_q;
     mf->m_fc_lfo.osc.m_waveform = mf->m_lfo_waveform;
     mf->m_q_lfo.osc.m_waveform = mf->m_lfo_waveform;
-
 }
 double modfilter_calculate_cutoff_freq(modfilter *mf, double lfo_sample)
 {
@@ -140,9 +135,9 @@ bool modfilter_process_audio(modfilter *mf, double *in, double *out)
     modfilter_calculate_left_lpf_coeffs(mf, fc, q);
 
     if (mf->m_lfo_phase == 0)
-       modfilter_calculate_right_lpf_coeffs(mf, fc, q);
+        modfilter_calculate_right_lpf_coeffs(mf, fc, q);
     else
-       modfilter_calculate_right_lpf_coeffs(mf, fcq, qq);
+        modfilter_calculate_right_lpf_coeffs(mf, fcq, qq);
 
     *out = biquad_process(&mf->m_left_lpf, *in);
 
@@ -153,16 +148,19 @@ bool modfilter_process_audio(modfilter *mf, double *in, double *out)
 
 double modfilter_process_wrapper(void *self, double input)
 {
-    modfilter *mf = (modfilter*) self;
+    modfilter *mf = (modfilter *)self;
     double output = 0;
     modfilter_process_audio(mf, &input, &output);
     return output;
-
 }
 void modfilter_status(void *self, char *status_string)
 {
-    modfilter *mf = (modfilter*) self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f LFO:%d LFOphase:%d", mf->m_mod_depth_fc, mf->m_mod_rate_fc, mf->m_mod_depth_q, mf->m_mod_rate_q, mf->m_lfo_waveform, mf->m_lfo_phase);
+    modfilter *mf = (modfilter *)self;
+    snprintf(
+        status_string, MAX_PS_STRING_SZ,
+        "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f LFO:%d LFOphase:%d",
+        mf->m_mod_depth_fc, mf->m_mod_rate_fc, mf->m_mod_depth_q,
+        mf->m_mod_rate_q, mf->m_lfo_waveform, mf->m_lfo_phase);
 }
 
 void modfilter_set_mod_depth_fc(modfilter *mf, double val)

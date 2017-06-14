@@ -22,9 +22,9 @@
 #include "keys.h"
 #include "midimaaan.h"
 #include "minisynth.h"
-#include "modular_delay.h"
-#include "modfilter.h"
 #include "mixer.h"
+#include "modfilter.h"
+#include "modular_delay.h"
 #include "obliquestrategies.h"
 #include "oscillator.h"
 #include "reverb.h"
@@ -102,7 +102,8 @@ void interpret(char *line)
                 double freq = atof(wurds[2]);
                 if (freq > 0.) {
                     mixer_add_spork(mixr, freq);
-                } else {
+                }
+                else {
                     mixer_add_spork(mixr, 440);
                 }
             }
@@ -361,7 +362,7 @@ void interpret(char *line)
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
                 mixr->sound_generators[soundgen_num]->type == SPORK_TYPE) {
-                spork *s = (spork*) mixr->sound_generators[soundgen_num];
+                spork *s = (spork *)mixr->sound_generators[soundgen_num];
                 printf("Your Spork is my command!\n");
                 double val = atof(wurds[3]);
                 if (strncmp("freq", wurds[2], 4) == 0)
@@ -991,10 +992,10 @@ void interpret(char *line)
                         mod_delay_set_chorus_offset(md, val);
                     }
                     else if (strncmp("modType", wurds[3], 7) == 0) {
-                        mod_delay_set_mod_type(md, (unsigned int) val);
+                        mod_delay_set_mod_type(md, (unsigned int)val);
                     }
                     else if (strncmp("LFOtype", wurds[3], 7) == 0) {
-                        mod_delay_set_lfo_type(md, (unsigned int) val);
+                        mod_delay_set_lfo_type(md, (unsigned int)val);
                     }
                 }
                 else if (f->type == MODFILTER) {
@@ -1019,7 +1020,6 @@ void interpret(char *line)
                         modfilter_set_lfo_phase(mf, val);
                     }
                 }
-
             }
         }
 

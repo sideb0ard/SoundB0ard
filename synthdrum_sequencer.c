@@ -2,9 +2,9 @@
 #include "mixer.h"
 #include "sequencer_utils.h"
 #include "utils.h"
+#include <math.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h>
 
 extern mixer *mixr;
 extern char *state_strings;
