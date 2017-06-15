@@ -22,9 +22,11 @@ typedef struct wt_oscillator {
     unsigned int polarity; // bipolar, unipolar
 
     double m_sine_array[WT_LENGTH];
+
     double m_saw_array[WT_LENGTH];
     double m_triangle_array[WT_LENGTH];
     double m_square_array[WT_LENGTH];
+
     double m_saw_array_bl5[WT_LENGTH]; // band limited to 5 partials
     double m_triangle_array_bl5[WT_LENGTH];
     double m_square_array_bl5[WT_LENGTH];
@@ -35,7 +37,6 @@ wt_osc *wt_osc_new(void);
 
 void wt_init(wt_osc *wt);
 
-// typical overrides
 double wt_do_oscillate(wt_osc *wt);
 void wt_start(wt_osc *wt);
 void wt_stop(wt_osc *wt);

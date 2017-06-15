@@ -37,7 +37,6 @@ void wt_reset(wt_osc *wt)
     wt_update(wt);
 }
 
-// typical overrides
 double wt_do_oscillate(wt_osc *wt)
 {
     if (!wt->noteon) {
@@ -45,7 +44,7 @@ double wt_do_oscillate(wt_osc *wt)
     }
     int read_index = (int)wt->m_read_index;
     double frac = read_index - wt->m_read_index;
-    int read_index_next = read_index + 1 > WT_LENGTH ? 0 : read_index + 1;
+    int read_index_next = read_index + 1 > (WT_LENGTH-1) ? 0 : read_index + 1;
 
     double outval = 0.0;
 
@@ -55,16 +54,28 @@ double wt_do_oscillate(wt_osc *wt)
                           wt->m_sine_array[read_index_next], frac);
         break;
     case (1): // saw
-        outval = lin_terp(0, 1, wt->m_saw_array[read_index],
-                          wt->m_saw_array[read_index_next], frac);
+        if (wt->mode == 0) // normal
+            outval = lin_terp(0, 1, wt->m_saw_array[read_index],
+                              wt->m_saw_array[read_index_next], frac);
+        else
+            outval = lin_terp(0, 1, wt->m_saw_array_bl5[read_index],
+                              wt->m_saw_array_bl5[read_index_next], frac);
         break;
     case (2): // tri
-        outval = lin_terp(0, 1, wt->m_triangle_array[read_index],
-                          wt->m_triangle_array[read_index_next], frac);
+        if (wt->mode == 0) // normal
+            outval = lin_terp(0, 1, wt->m_triangle_array[read_index],
+                              wt->m_triangle_array[read_index_next], frac);
+        else
+            outval = lin_terp(0, 1, wt->m_triangle_array_bl5[read_index],
+                              wt->m_triangle_array_bl5[read_index_next], frac);
         break;
     case (3): // square
-        outval = lin_terp(0, 1, wt->m_square_array[read_index],
-                          wt->m_square_array[read_index_next], frac);
+        if (wt->mode == 0) // normal
+            outval = lin_terp(0, 1, wt->m_square_array[read_index],
+                              wt->m_square_array[read_index_next], frac);
+        else
+            outval = lin_terp(0, 1, wt->m_square_array_bl5[read_index],
+                              wt->m_square_array_bl5[read_index_next], frac);
         break;
     default:
         outval = lin_terp(0, 1, wt->m_sine_array[read_index],
@@ -105,10 +116,13 @@ void wt_create_wave_tables(wt_osc *wt)
     double ms2 = 1.0 / 512.;
     double bs2 = -1.0;
 
+    double max_tri = 0.;
+    double max_saw = 0.;
+    double max_sqr = 0.;
+
     for (int i = 0; i < WT_LENGTH; i++) {
         wt->m_sine_array[i] = sin(((double)i / WT_LENGTH) * (2 * M_PI));
         wt->m_saw_array[i] = i < 512 ? ms1 * i + bs1 : ms2 * (i - 511) + bs2;
-        wt->m_square_array[i] = i < 512 ? 1.0 : -1.0;
 
         if (i < 256)
             wt->m_triangle_array[i] = mt1 * i + bt1;
@@ -116,6 +130,51 @@ void wt_create_wave_tables(wt_osc *wt)
             wt->m_triangle_array[i] = mtf2 * (i - 256) + btf2;
         else
             wt->m_triangle_array[i] = mt2 * (i - 768) + bt2;
+
+        wt->m_square_array[i] = i < 512 ? 1.0 : -1.0;
+
+        wt->m_saw_array_bl5[i] = 0.;
+        wt->m_square_array_bl5[i] = 0.;
+        wt->m_triangle_array_bl5[i] = 0.;
+
+        for (int g = 1; g <= 6; g++) {
+            double n = (double)g;
+            wt->m_saw_array_bl5[i] += pow((float)-1.0,(float)(g+1))*
+                                         (1.0/n)*sin(2.0*M_PI*i*n/WT_LENGTH);
+        }
+
+        for (int g = 0; g <= 3; g++) {
+            double n = (double)g;
+            wt->m_triangle_array_bl5[i] += pow((float)-1.0,(float)n) *
+                                              (1.0/pow((float)(2*n+1),
+                                              (float)2.0))*
+                                              sin(2.0*M_PI*(2.0*n+1)*i/(float)WT_LENGTH);
+        }
+
+        for (int g = 1; g <= 5; g+=2) {
+            double n = (double)g;
+            wt->m_square_array_bl5[i] += (1.0/n)*sin(2.0*M_PI*i*n/(float)WT_LENGTH);
+        }
+
+        if (i==0)
+        {
+            max_saw = wt->m_saw_array_bl5[i];
+            max_tri = wt->m_triangle_array_bl5[i];
+            max_sqr = wt->m_square_array_bl5[i];
+        }
+        else
+        {
+            if (wt->m_saw_array_bl5[i] > max_saw) max_saw = wt->m_saw_array_bl5[i];
+            if (wt->m_triangle_array_bl5[i] > max_tri) max_tri = wt->m_triangle_array_bl5[i];
+            if (wt->m_square_array_bl5[i] > max_sqr) max_sqr = wt->m_square_array_bl5[i];
+        }
+    }
+    for (int i = 0; i < WT_LENGTH; i++)
+    {
+        wt->m_saw_array_bl5[i] /= max_saw;
+        wt->m_triangle_array_bl5[i] /= max_tri;
+        wt->m_square_array_bl5[i] /= max_sqr;
+        printf("SQ: %f\n", wt->m_square_array[i]);
     }
 }
 
