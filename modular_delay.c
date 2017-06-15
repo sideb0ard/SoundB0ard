@@ -4,6 +4,8 @@
 #include "modular_delay.h"
 #include "utils.h"
 
+static char *mod_type_as_string[] = {"FLANGER", "VIBRATO", "CHORUS"};
+
 mod_delay *new_mod_delay()
 {
     mod_delay *md = (mod_delay *)calloc(1, sizeof(mod_delay));
@@ -141,10 +143,11 @@ void mod_delay_status(void *self, char *status_string)
 {
     mod_delay *md = (mod_delay *)self;
     snprintf(status_string, MAX_PS_STRING_SZ, "depth:%.2f rate:%.2f "
-                                              "feedback:%.2f chorusoffset:%.2f "
-                                              "modType:%d LFOtype:%d",
+                                              "fb:%.2f offset:%.2f "
+                                              "type:%s lfo:%s",
              md->m_mod_depth_pct, md->m_mod_freq, md->m_feedback_percent,
-             md->m_chorus_offset, md->m_mod_type, md->m_lfo_type);
+             md->m_chorus_offset, mod_type_as_string[md->m_mod_type],
+             md->m_lfo_type ? "SIN" : "TRI");
 }
 
 double mod_delay_process_wrapper(void *self, double input)

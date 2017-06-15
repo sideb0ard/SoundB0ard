@@ -985,16 +985,16 @@ void interpret(char *line)
                     else if (strncmp("rate", wurds[3], 4) == 0) {
                         mod_delay_set_rate(md, val);
                     }
-                    else if (strncmp("feedback", wurds[3], 8) == 0) {
+                    else if (strncmp("fb", wurds[3], 8) == 0) {
                         mod_delay_set_feedback_percent(md, val);
                     }
-                    else if (strncmp("chorusoffset", wurds[3], 12) == 0) {
+                    else if (strncmp("offset", wurds[3], 12) == 0) {
                         mod_delay_set_chorus_offset(md, val);
                     }
-                    else if (strncmp("modType", wurds[3], 7) == 0) {
+                    else if (strncmp("type", wurds[3], 7) == 0) {
                         mod_delay_set_mod_type(md, (unsigned int)val);
                     }
-                    else if (strncmp("LFOtype", wurds[3], 7) == 0) {
+                    else if (strncmp("lfo", wurds[3], 7) == 0) {
                         mod_delay_set_lfo_type(md, (unsigned int)val);
                     }
                 }
