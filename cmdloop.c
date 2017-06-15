@@ -372,7 +372,7 @@ void interpret(char *line)
                 else if (strncmp("mode", wurds[2], 4) == 0)
                     spork_set_mode(s, val);
                 else if (strncmp("polarity", wurds[2], 4) == 0)
-                    spork_set_mode(s, val);
+                    spork_set_polarity(s, val);
             }
         }
         // SAMPLE LOOPER COMMANDS

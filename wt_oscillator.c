@@ -14,22 +14,25 @@ wt_osc *wt_osc_new()
         return NULL;
     }
 
-    wt_init(wt);
+    wt_initialize(wt);
 
     return wt;
 }
 
-void wt_init(wt_osc *wt)
+void wt_initialize(wt_osc *wt)
 {
     wt_create_wave_tables(wt);
     wt_reset(wt);
+    wt_update(wt);
 }
 
 void wt_reset(wt_osc *wt)
 {
     wt->m_read_index = 0;
+    wt->m_quad_phase_read_index = WT_LENGTH / 4;
     wt->m_inc = 0;
     wt->noteon = false;
+    wt->m_invert = false;
     wt->freq = 440;
     wt->waveform = 0;
     wt->mode = 0;
@@ -37,53 +40,104 @@ void wt_reset(wt_osc *wt)
     wt_update(wt);
 }
 
-double wt_do_oscillate(wt_osc *wt)
+double wt_do_oscillate(wt_osc *wt, double *quad_outval)
 {
     if (!wt->noteon) {
         return 0.0;
+        *quad_outval = 0.0;
     }
     int read_index = (int)wt->m_read_index;
+    int quad_read_index = (int)wt->m_quad_phase_read_index;
     double frac = read_index - wt->m_read_index;
-    int read_index_next = read_index + 1 > (WT_LENGTH-1) ? 0 : read_index + 1;
+    int read_index_next = read_index + 1 > (WT_LENGTH - 1) ? 0 : read_index + 1;
+    int quad_read_index_next =
+        quad_read_index + 1 > (WT_LENGTH - 1) ? 0 : quad_read_index + 1;
 
     double outval = 0.0;
+    *quad_outval = 0.0;
 
     switch (wt->waveform) {
     case (0): // sine
         outval = lin_terp(0, 1, wt->m_sine_array[read_index],
                           wt->m_sine_array[read_index_next], frac);
+        *quad_outval = lin_terp(0, 1, wt->m_sine_array[quad_read_index],
+                                wt->m_sine_array[quad_read_index_next], frac);
         break;
-    case (1): // saw
+    case (1):              // saw
         if (wt->mode == 0) // normal
+        {
             outval = lin_terp(0, 1, wt->m_saw_array[read_index],
                               wt->m_saw_array[read_index_next], frac);
-        else
+            *quad_outval =
+                lin_terp(0, 1, wt->m_saw_array[quad_read_index],
+                         wt->m_saw_array[quad_read_index_next], frac);
+        }
+        else {
             outval = lin_terp(0, 1, wt->m_saw_array_bl5[read_index],
                               wt->m_saw_array_bl5[read_index_next], frac);
+            *quad_outval =
+                lin_terp(0, 1, wt->m_saw_array_bl5[quad_read_index],
+                         wt->m_saw_array_bl5[quad_read_index_next], frac);
+        }
         break;
-    case (2): // tri
+    case (2):              // tri
         if (wt->mode == 0) // normal
+        {
             outval = lin_terp(0, 1, wt->m_triangle_array[read_index],
                               wt->m_triangle_array[read_index_next], frac);
-        else
+            *quad_outval =
+                lin_terp(0, 1, wt->m_triangle_array[quad_read_index],
+                         wt->m_triangle_array[quad_read_index_next], frac);
+        }
+        else {
             outval = lin_terp(0, 1, wt->m_triangle_array_bl5[read_index],
                               wt->m_triangle_array_bl5[read_index_next], frac);
+            *quad_outval =
+                lin_terp(0, 1, wt->m_triangle_array_bl5[quad_read_index],
+                         wt->m_triangle_array_bl5[quad_read_index_next], frac);
+        }
         break;
-    case (3): // square
+    case (3):              // square
         if (wt->mode == 0) // normal
+        {
             outval = lin_terp(0, 1, wt->m_square_array[read_index],
                               wt->m_square_array[read_index_next], frac);
-        else
+            *quad_outval =
+                lin_terp(0, 1, wt->m_square_array[quad_read_index],
+                         wt->m_square_array[quad_read_index_next], frac);
+        }
+        else {
             outval = lin_terp(0, 1, wt->m_square_array_bl5[read_index],
                               wt->m_square_array_bl5[read_index_next], frac);
+            *quad_outval =
+                lin_terp(0, 1, wt->m_square_array_bl5[quad_read_index],
+                         wt->m_square_array_bl5[quad_read_index_next], frac);
+        }
         break;
     default:
         outval = lin_terp(0, 1, wt->m_sine_array[read_index],
                           wt->m_sine_array[read_index_next], frac);
+        *quad_outval = lin_terp(0, 1, wt->m_sine_array[quad_read_index],
+                                wt->m_sine_array[quad_read_index_next], frac);
+    }
+
+    if (wt->m_invert) {
+        outval *= -1.0;
+        *quad_outval *= -1.0;
+    }
+
+    if (wt->polarity == 1) { // bipolar
+        outval /= 2.0;
+        outval += 0.5;
+
+        *quad_outval /= 2.0;
+        *quad_outval += 0.5;
     }
 
     wt->m_read_index += wt->m_inc;
+    wt->m_quad_phase_read_index += wt->m_inc;
     wt_check_wrap_index(&wt->m_read_index);
+    wt_check_wrap_index(&wt->m_quad_phase_read_index);
 
     return outval;
 }
@@ -139,42 +193,43 @@ void wt_create_wave_tables(wt_osc *wt)
 
         for (int g = 1; g <= 6; g++) {
             double n = (double)g;
-            wt->m_saw_array_bl5[i] += pow((float)-1.0,(float)(g+1))*
-                                         (1.0/n)*sin(2.0*M_PI*i*n/WT_LENGTH);
+            wt->m_saw_array_bl5[i] += pow((float)-1.0, (float)(g + 1)) *
+                                      (1.0 / n) *
+                                      sin(2.0 * M_PI * i * n / WT_LENGTH);
         }
 
         for (int g = 0; g <= 3; g++) {
             double n = (double)g;
-            wt->m_triangle_array_bl5[i] += pow((float)-1.0,(float)n) *
-                                              (1.0/pow((float)(2*n+1),
-                                              (float)2.0))*
-                                              sin(2.0*M_PI*(2.0*n+1)*i/(float)WT_LENGTH);
+            wt->m_triangle_array_bl5[i] +=
+                pow((float)-1.0, (float)n) *
+                (1.0 / pow((float)(2 * n + 1), (float)2.0)) *
+                sin(2.0 * M_PI * (2.0 * n + 1) * i / (float)WT_LENGTH);
         }
 
-        for (int g = 1; g <= 5; g+=2) {
+        for (int g = 1; g <= 5; g += 2) {
             double n = (double)g;
-            wt->m_square_array_bl5[i] += (1.0/n)*sin(2.0*M_PI*i*n/(float)WT_LENGTH);
+            wt->m_square_array_bl5[i] +=
+                (1.0 / n) * sin(2.0 * M_PI * i * n / (float)WT_LENGTH);
         }
 
-        if (i==0)
-        {
+        if (i == 0) {
             max_saw = wt->m_saw_array_bl5[i];
             max_tri = wt->m_triangle_array_bl5[i];
             max_sqr = wt->m_square_array_bl5[i];
         }
-        else
-        {
-            if (wt->m_saw_array_bl5[i] > max_saw) max_saw = wt->m_saw_array_bl5[i];
-            if (wt->m_triangle_array_bl5[i] > max_tri) max_tri = wt->m_triangle_array_bl5[i];
-            if (wt->m_square_array_bl5[i] > max_sqr) max_sqr = wt->m_square_array_bl5[i];
+        else {
+            if (wt->m_saw_array_bl5[i] > max_saw)
+                max_saw = wt->m_saw_array_bl5[i];
+            if (wt->m_triangle_array_bl5[i] > max_tri)
+                max_tri = wt->m_triangle_array_bl5[i];
+            if (wt->m_square_array_bl5[i] > max_sqr)
+                max_sqr = wt->m_square_array_bl5[i];
         }
     }
-    for (int i = 0; i < WT_LENGTH; i++)
-    {
+    for (int i = 0; i < WT_LENGTH; i++) {
         wt->m_saw_array_bl5[i] /= max_saw;
         wt->m_triangle_array_bl5[i] /= max_tri;
         wt->m_square_array_bl5[i] /= max_sqr;
-        printf("SQ: %f\n", wt->m_square_array[i]);
     }
 }
 

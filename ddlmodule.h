@@ -20,7 +20,6 @@ typedef struct ddlmodule {
 } ddlmodule;
 
 void ddl_initialize(ddlmodule *d);
-bool ddl_prepare_for_play(ddlmodule *d);
 bool ddl_process_audio_frame(ddlmodule *d, double *input_buffer,
                              double *output_buffer,
                              unsigned int num_input_channels,

@@ -18,10 +18,7 @@ void ddl_initialize(ddlmodule *d)
     d->m_buffer_size = 0;
 
     ddl_cook_variables(d);
-}
 
-bool ddl_prepare_for_play(ddlmodule *d)
-{
     d->m_buffer_size = 2 * SAMPLE_RATE;
     if (d->m_buffer)
         free(d->m_buffer);
@@ -31,8 +28,6 @@ bool ddl_prepare_for_play(ddlmodule *d)
     ddl_cook_variables(d);
 
     printf("Cooked, mon!\n");
-
-    return true;
 }
 
 void ddl_cook_variables(ddlmodule *d)

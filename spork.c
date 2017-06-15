@@ -14,7 +14,7 @@ spork *new_spork(double freq)
 {
     spork *s = (spork *)calloc(1, sizeof(spork));
 
-    wt_init(&s->m_osc);
+    wt_initialize(&s->m_osc);
 
     s->sg.gennext = &spork_gennext;
     s->sg.status = &spork_status;
@@ -44,7 +44,8 @@ double spork_gennext(void *sg)
     if (!s->active)
         return return_val;
 
-    return_val = wt_do_oscillate(&s->m_osc);
+    double quad_return_val = 0.;
+    return_val = wt_do_oscillate(&s->m_osc, &quad_return_val);
     return_val = effector(&s->sg, return_val);
     return_val = envelopor(&s->sg, return_val);
     return return_val * s->m_volume;

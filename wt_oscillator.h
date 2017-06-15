@@ -35,9 +35,9 @@ typedef struct wt_oscillator {
 
 wt_osc *wt_osc_new(void);
 
-void wt_init(wt_osc *wt);
+void wt_initialize(wt_osc *wt);
 
-double wt_do_oscillate(wt_osc *wt);
+double wt_do_oscillate(wt_osc *wt, double *quad_output);
 void wt_start(wt_osc *wt);
 void wt_stop(wt_osc *wt);
 void wt_reset(wt_osc *wt);
