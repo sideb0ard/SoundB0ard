@@ -130,17 +130,19 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
     return self->effects_num;
 }
 
-float effector(SOUNDGEN *self, double val)
+double effector(SOUNDGEN *self, double val)
 {
     if (self->effects_on) {
-        double accumulator = 0.;
+        //double accumulator = 0.;
         for (int i = 0; i < self->effects_num; i++) {
 
             fx *f = self->effects[i];
-            val = f->process(f, val);
-            accumulator += val;
+            if (f->enabled) {
+                val = f->process(f, val);
+            }
+            //accumulator += val;
         }
-        return accumulator;
+        //return accumulator;
     }
     return val;
 
@@ -239,7 +241,7 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
     return self->envelopes_num++;
 }
 
-float envelopor(SOUNDGEN *self, float val)
+double envelopor(SOUNDGEN *self, double val)
 {
 
     if (self->envelopes_num > 0 && self->envelopes_enabled) {

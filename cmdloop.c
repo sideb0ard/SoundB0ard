@@ -899,9 +899,15 @@ void interpret(char *line)
         else if (strncmp("fx", wurds[0], 2) == 0) {
             int soundgen_num = atoi(wurds[1]);
             int fx_num = atoi(wurds[2]);
-            if (is_valid_fx_num(soundgen_num, fx_num)) {
+            if (is_valid_fx_num(soundgen_num, fx_num))
+            {
                 fx *f = mixr->sound_generators[soundgen_num]->effects[fx_num];
-                if (f->type == DELAY) {
+
+                if (strncmp("on", wurds[3], 2) == 0)
+                    f->enabled = true;
+                else if (strncmp("off", wurds[3], 3) == 0)
+                    f->enabled = false;
+                else if (f->type == DELAY) {
                     // printf("Changing Dulay!\n");
                     stereodelay *sd = (stereodelay *)f;
                     double val = atof(wurds[4]);
@@ -1013,11 +1019,11 @@ void interpret(char *line)
                     else if (strncmp("rateq", wurds[3], 5) == 0) {
                         modfilter_set_mod_rate_q(mf, val);
                     }
-                    else if (strncmp("LFOphase", wurds[3], 8) == 0) {
-                        modfilter_set_lfo_waveform(mf, val);
-                    }
-                    else if (strncmp("LFO", wurds[3], 3) == 0) {
+                    else if (strncmp("phase", wurds[3], 8) == 0) {
                         modfilter_set_lfo_phase(mf, val);
+                    }
+                    else if (strncmp("lfo", wurds[3], 3) == 0) {
+                        modfilter_set_lfo_waveform(mf, val);
                     }
                 }
             }

@@ -2,15 +2,15 @@
 
 #include "afx/biquad.h"
 #include "fx.h"
-#include "lfo.h"
+#include "wt_oscillator.h"
 
 typedef struct modfilter {
     fx m_fx; // API
     biquad m_left_lpf;
     biquad m_right_lpf;
 
-    lfo m_fc_lfo;
-    lfo m_q_lfo;
+    wt_oscillator m_fc_lfo;
+    wt_oscillator m_q_lfo;
 
     double m_min_cutoff_freq;
     double m_max_cutoff_freq;

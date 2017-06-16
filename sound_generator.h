@@ -41,9 +41,9 @@ int add_moddelay_soundgen(SOUNDGEN *self);
 int add_modfilter_soundgen(SOUNDGEN *self);
 int add_reverb_soundgen(SOUNDGEN *self);
 int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type);
-float effector(SOUNDGEN *self, double val);
+double effector(SOUNDGEN *self, double val);
 
 int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e);
-float envelopor(SOUNDGEN *self, float val);
+double envelopor(SOUNDGEN *self, double val);
 
 #endif // SOUNDGEN_H

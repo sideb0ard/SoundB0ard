@@ -13,6 +13,7 @@ stereodelay *new_stereo_delay()
     d->m_wet_mix = 0.0;
 
     d->m_fx.type = DELAY;
+    d->m_fx.enabled = true;
     d->m_fx.status = &stereo_delay_status;
     d->m_fx.process = &stereo_delay_process_wrapper;
 

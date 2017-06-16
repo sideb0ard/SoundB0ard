@@ -11,6 +11,7 @@ beatrepeat *new_beatrepeat(int nbeats, int sixteenth)
     beatrepeat *b = (beatrepeat *)calloc(1, sizeof(beatrepeat));
 
     b->m_fx.type = BEATREPEAT;
+    b->m_fx.enabled = true;
     b->m_fx.status = &beatrepeat_status;
     b->m_fx.process = &beatrepeat_gennext;
 

@@ -17,6 +17,7 @@ mod_delay *new_mod_delay()
 
     // fx API
     md->m_fx.type = MODDELAY;
+    md->m_fx.enabled = true;
     md->m_fx.status = &mod_delay_status;
     md->m_fx.process = &mod_delay_process_wrapper;
 

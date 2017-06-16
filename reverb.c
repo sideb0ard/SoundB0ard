@@ -40,6 +40,7 @@ reverb *new_reverb(void)
     reverb_init_reverb(r);
 
     r->m_fx.type = REVERB;
+    r->m_fx.enabled = true;
     r->m_fx.status = &reverb_status;
     r->m_fx.process = &reverb_process_wrapper;
 
