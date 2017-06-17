@@ -53,6 +53,7 @@ float fasttanh(float x);
 float fastlog2(float x);
 float fastpow2(float x);
 float fastexp(float x);
+double lagrpol(double *x, double *y, int n, double xbar);
 double semitones_between_frequencies(double start_freq, double end_freq);
 
 double mma_midi_to_atten_db(unsigned int midi_val);

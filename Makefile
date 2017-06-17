@@ -15,6 +15,7 @@ OBJ = \
 	dca.o \
 	ddlmodule.o \
 	delayline.o \
+	dynamics_processor.o \
 	sample_sequencer.o \
 	sequencer.o \
 	sequencer_utils.o \

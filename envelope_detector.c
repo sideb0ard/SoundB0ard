@@ -35,7 +35,8 @@ void envelope_detector_setreleasetime(envelope_detector *ed, double release_ms)
     if (ed->m_analogtc)
         ed->m_releasetime = exp(ANALOG_TC / (release_ms * SAMPLE_RATE * 0.001));
     else
-        ed->m_releasetime = exp(DIGITAL_TC / (release_ms * SAMPLE_RATE * 0.001));
+        ed->m_releasetime =
+            exp(DIGITAL_TC / (release_ms * SAMPLE_RATE * 0.001));
 }
 
 void envelope_detector_settcmodeanalog(envelope_detector *ed, bool analogtc)
@@ -47,7 +48,7 @@ void envelope_detector_settcmodeanalog(envelope_detector *ed, bool analogtc)
 
 double envelope_detector_detect(envelope_detector *ed, double input)
 {
-    switch(ed->m_detectmode) {
+    switch (ed->m_detectmode) {
     case 0:
         input = fabs(input);
     case 1:
@@ -63,14 +64,15 @@ double envelope_detector_detect(envelope_detector *ed, double input)
     else
         ed->m_envelope = ed->m_releasetime * (ed->m_envelope - input) + input;
 
-    if (ed->m_envelope > 0.0 && ed->m_envelope < FLT_MIN_PLUS) ed->m_envelope = 0.;
-    if (ed->m_envelope < 0.0 && ed->m_envelope > FLT_MIN_MINUS) ed->m_envelope = 0.;
+    if (ed->m_envelope > 0.0 && ed->m_envelope < FLT_MIN_PLUS)
+        ed->m_envelope = 0.;
+    if (ed->m_envelope < 0.0 && ed->m_envelope > FLT_MIN_MINUS)
+        ed->m_envelope = 0.;
 
     ed->m_envelope = min(ed->m_envelope, 1.0);
     ed->m_envelope = max(ed->m_envelope, 0.0);
 
-    if (ed->m_logdetector) 
-    {
+    if (ed->m_logdetector) {
         if (ed->m_envelope <= 0)
             return -96.0;
         return 20 * log10(ed->m_envelope);

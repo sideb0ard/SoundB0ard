@@ -4,6 +4,7 @@
 
 #include "beatrepeat.h"
 #include "defjams.h"
+#include "dynamics_processor.h"
 #include "envelope_follower.h"
 #include "fx.h"
 #include "modfilter.h"
@@ -63,12 +64,18 @@ int add_reverb_soundgen(SOUNDGEN *self)
     return soundgen_add_fx(self, (fx *)r);
 }
 
+int add_compressor_soundgen(SOUNDGEN *self)
+{
+    printf("COMPresssssion!\n");
+    dynamics_processor *dp = new_dynamics_processor();
+    return soundgen_add_fx(self, (fx *)dp);
+}
+
 int add_follower_soundgen(SOUNDGEN *self)
 {
     printf("RAWK! ENvelope Followerrr!\n");
     envelope_follower *ef = new_envelope_follower();
-    return soundgen_add_fx(self, (fx*)ef);
-
+    return soundgen_add_fx(self, (fx *)ef);
 }
 int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth)
 {

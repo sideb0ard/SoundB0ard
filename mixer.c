@@ -110,10 +110,13 @@ void mixer_ps(mixer *mixr)
             if (mixr->sound_generators[i]->effects_num > 0 ||
                 mixr->sound_generators[i]->envelopes_num > 0) {
                 printf("      ");
-                printf(COOL_COLOR_YELLOW);
                 for (int j = 0; j < mixr->sound_generators[i]->effects_num;
                      j++) {
                     fx *f = mixr->sound_generators[i]->effects[j];
+                    if (f->enabled)
+                        printf(COOL_COLOR_YELLOW);
+                    else
+                        printf(ANSI_COLOR_RESET);
                     char fx_status[512];
                     f->status(f, fx_status);
                     printf("\n      [fx %d:%d %s]", i, j, fx_status);

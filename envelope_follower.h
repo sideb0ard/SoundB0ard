@@ -1,8 +1,8 @@
 #pragma once
 
 #include "afx/biquad.h"
-#include "fx.h"
 #include "envelope_detector.h"
+#include "fx.h"
 
 typedef struct envelope_follower {
     fx m_fx; // API
@@ -21,7 +21,7 @@ typedef struct envelope_follower {
     double m_release_ms;
     double m_q;
     unsigned int m_time_constant; // analog or digital
-    unsigned int m_direction; // up down
+    unsigned int m_direction;     // up down
 
 } envelope_follower;
 

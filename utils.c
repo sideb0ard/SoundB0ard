@@ -749,3 +749,37 @@ bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
     }
     return false;
 }
+
+/*  //// FROM will pirkle book - http://www.willpirkle.com/
+    Function:   lagrpol() implements n-order Lagrange Interpolation
+
+    Inputs:     double* x   Pointer to an array containing the x-coordinates of
+   the input values
+                double* y   Pointer to an array containing the y-coordinates of
+   the input values
+                int n       The order of the interpolator, this is also the
+   length of the x,y input arrays
+                double xbar The x-coorinates whose y-value we want to
+   interpolate
+
+    Returns     The interpolated value y at xbar. xbar ideally is between the
+   middle two values in the input array,
+                but can be anywhere within the limits, which is needed for
+   interpolating the first few or last few samples
+                in a table with a fixed size.
+*/
+inline double lagrpol(double *x, double *y, int n, double xbar)
+{
+    int i, j;
+    double fx = 0.0;
+    double l = 1.0;
+    for (i = 0; i < n; i++) {
+        l = 1.0;
+        for (j = 0; j < n; j++) {
+            if (j != i)
+                l *= (xbar - x[j]) / (x[i] - x[j]);
+        }
+        fx += l * y[i];
+    }
+    return (fx);
+}

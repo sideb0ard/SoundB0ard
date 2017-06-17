@@ -17,6 +17,7 @@
 #include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
+#include "dynamics_processor.h"
 #include "envelope.h"
 #include "envelope_follower.h"
 #include "help.h"
@@ -819,6 +820,12 @@ void interpret(char *line)
             }
         }
         // FX COMMANDS
+        else if (strncmp("compressor", wurds[0], 10) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                add_compressor_soundgen(mixr->sound_generators[soundgen_num]);
+            }
+        }
         else if (strncmp("delay", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
@@ -931,6 +938,32 @@ void interpret(char *line)
                     else
                         printf("<bleurgh!>\n");
                 }
+                else if (f->type == COMPRESSOR) {
+                    dynamics_processor *dp = (dynamics_processor *)f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("inputgain", wurds[3], 9) == 0)
+                        dynamics_processor_set_inputgain_db(dp, val);
+                    else if (strncmp("threshold", wurds[3], 9) == 0)
+                        dynamics_processor_set_threshold(dp, val);
+                    else if (strncmp("attackms", wurds[3], 8) == 0)
+                        dynamics_processor_set_attack_ms(dp, val);
+                    else if (strncmp("releasems", wurds[3], 9) == 0)
+                        dynamics_processor_set_release_ms(dp, val);
+                    else if (strncmp("ratio", wurds[3], 5) == 0)
+                        dynamics_processor_set_ratio(dp, val);
+                    else if (strncmp("outputgain", wurds[3], 10) == 0)
+                        dynamics_processor_set_outputgain_db(dp, val);
+                    else if (strncmp("kneewidth", wurds[3], 9) == 0)
+                        dynamics_processor_set_knee_width(dp, val);
+                    else if (strncmp("lookahead", wurds[3], 9) == 0)
+                        dynamics_processor_set_lookahead_delay_ms(dp, val);
+                    else if (strncmp("stereolink", wurds[3], 9) == 0)
+                        dynamics_processor_set_stereo_link(dp, val);
+                    else if (strncmp("type", wurds[3], 4) == 0)
+                        dynamics_processor_set_processor_type(dp, val);
+                    else if (strncmp("mode", wurds[3], 4) == 0)
+                        dynamics_processor_set_time_constant(dp, val);
+                }
                 else if (f->type == REVERB) {
                     // printf("Re-re-re----verb!\n");
                     reverb *r = (reverb *)f;
@@ -989,7 +1022,7 @@ void interpret(char *line)
                         beatrepeat_change_selected_sixteenth(br, val);
                 }
                 else if (f->type == ENVELOPEFOLLOWER) {
-                    envelope_follower *ef = (envelope_follower*) f;
+                    envelope_follower *ef = (envelope_follower *)f;
                     double val = atof(wurds[4]);
                     if (strncmp("pregain", wurds[3], 4) == 0)
                         envelope_follower_set_pregain_db(ef, val);

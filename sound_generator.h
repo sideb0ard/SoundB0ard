@@ -34,6 +34,7 @@ typedef struct t_soundgen {
 } SOUNDGEN;
 
 int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth);
+int add_compressor_soundgen(SOUNDGEN *self);
 int add_distortion_soundgen(SOUNDGEN *self);
 int add_decimator_soundgen(SOUNDGEN *self);
 int add_delay_soundgen(SOUNDGEN *self, float duration);
