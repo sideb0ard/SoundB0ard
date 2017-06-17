@@ -13,7 +13,7 @@ typedef struct quad_flanger {
     double m_mod_depth_pct;
     double m_mod_freq;
     double m_feedback_percent;
-    unsigned int m_lfo_type;  // TRI / SINE
+    unsigned int m_lfo_type; // TRI / SINE
 
 } quad_flanger;
 
@@ -23,8 +23,8 @@ bool quad_flanger_prepare_for_play(quad_flanger *qf);
 bool quad_flanger_update_mod_delays(quad_flanger *qf);
 bool quad_flanger_update(quad_flanger *qf);
 bool quad_flanger_process_audio(quad_flanger *qf, double *input_left,
-                             double *input_right, double *output_left,
-                             double *output_right);
+                                double *input_right, double *output_left,
+                                double *output_right);
 
 double quad_flanger_process_wrapper(void *self, double input);
 void quad_flanger_status(void *self, char *status_string);

@@ -16,8 +16,8 @@ quad_flanger *new_quad_flanger()
     qf->m_fx.process = &quad_flanger_process_wrapper;
 
     // "gui"
-    qf->m_mod_depth_pct = 50;   // percent
-    qf->m_mod_freq = 0.18;      // range: 0.02 - 5
+    qf->m_mod_depth_pct = 50;    // percent
+    qf->m_mod_freq = 0.18;       // range: 0.02 - 5
     qf->m_feedback_percent = 50; //  range: -100 - 100
     qf->m_lfo_type = 0; // TRI or SINE // these don't match other OSC enums
 
@@ -28,7 +28,6 @@ quad_flanger *new_quad_flanger()
     return qf;
 }
 
-
 bool quad_flanger_update(quad_flanger *qf)
 {
     quad_flanger_update_mod_delays(qf);
@@ -37,13 +36,13 @@ bool quad_flanger_update(quad_flanger *qf)
 
 bool quad_flanger_update_mod_delays(quad_flanger *qf)
 {
-    qf->m_moddelay_left.m_lfo_phase = 0; // norm
+    qf->m_moddelay_left.m_lfo_phase = 0;  // norm
     qf->m_moddelay_right.m_lfo_phase = 1; // quad
 }
 
 bool quad_flanger_process_audio(quad_flanger *qf, double *input_left,
-                             double *input_right, double *output_left,
-                             double *output_right)
+                                double *input_right, double *output_left,
+                                double *output_right)
 {
     // TODO once i have stereo enabled, actually use the right moddelay
     mod_delay_process_audio(&qf->m_moddelay_left, input_left, input_right,

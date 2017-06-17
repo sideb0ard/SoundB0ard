@@ -3,7 +3,6 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "afx/limiter.h"
 #include "arpeggiator.h"
 #include "dca.h"
 #include "envelope_generator.h"
@@ -140,7 +139,6 @@ typedef struct minisynth {
 
     int m_last_midi_note;
     arpeggiator m_arp;
-    limiter m_limiter;
 
 } minisynth;
 

@@ -3,78 +3,71 @@
 #include <stdlib.h>
 
 #include "defjams.h"
-#include "modfilter.h"
+#include "envelope_follower.h"
 
-modfilter *new_modfilter()
+envelope_follower *new_envelope_follower()
 {
-    modfilter *mf = calloc(1, sizeof(modfilter));
-    modfilter_init(mf);
+    envelope_follower *ef = calloc(1, sizeof(envelope_follower));
+    envelope_follower_init(ef);
 
-    mf->m_fx.type = MODFILTER;
-    mf->m_fx.enabled = true;
-    mf->m_fx.status = &modfilter_status;
-    mf->m_fx.process = &modfilter_process_wrapper;
+    ef->m_fx.type = ENVELOPEFOLLOWER;
+    ef->m_fx.enabled = true;
+    ef->m_fx.status = &envelope_follower_status;
+    ef->m_fx.process = &envelope_follower_process_wrapper;
 
-    return mf;
+    envelope_follower_init(ef);
+
+    return ef;
 }
 
-void modfilter_init(modfilter *mf)
+void envelope_follower_init(envelope_follower *ef)
 {
-    biquad_flush_delays(&mf->m_left_lpf);
-    biquad_flush_delays(&mf->m_right_lpf);
+    ef->m_min_cutoff_freq = 100.;
+    ef->m_max_cutoff_freq = 5000.;
 
-    wt_initialize(&mf->m_fc_lfo);
-    wt_initialize(&mf->m_q_lfo);
+    ef->m_pregain_db = 12; // range 0-20
+    ef->m_threshold = 0.2; // range 0-1
+    ef->m_attack_ms = 25; // 10-100
+    ef->m_release_ms = 50; // 20 - 250
+    ef->m_q = 5; // 0.5 - 20
+    ef->m_time_constant = 1; // digital
+    ef->m_direction = 0; // up
 
-    mf->m_min_cutoff_freq = 100.;
-    mf->m_max_cutoff_freq = 5000.;
-    mf->m_min_q = 0.577;
-    mf->m_max_q = 10;
+    biquad_flush_delays(&ef->m_left_lpf);
+    biquad_flush_delays(&ef->m_right_lpf);
 
-    mf->m_lfo_waveform = sine;
-    mf->m_mod_depth_fc = 50.;
-    mf->m_mod_rate_fc = 2.5;
-    mf->m_mod_depth_q = 50.;
-    mf->m_mod_rate_q = 2.5;
-    mf->m_lfo_phase = 0;
+    if (ef->m_time_constant == 1) // digital
+    {
+        envelope_detector_init(&ef->m_left_detector, ef->m_attack_ms, ef->m_release_ms, false, DETECT_MODE_RMS, false);
+        envelope_detector_init(&ef->m_right_detector, ef->m_attack_ms, ef->m_release_ms, false, DETECT_MODE_RMS, false);
+    } else {
+        envelope_detector_init(&ef->m_left_detector, ef->m_attack_ms, ef->m_release_ms, true, DETECT_MODE_RMS, true);
+        envelope_detector_init(&ef->m_right_detector, ef->m_attack_ms, ef->m_release_ms, true, DETECT_MODE_RMS, true);
+    }
 
-    mf->m_fc_lfo.polarity = 1; // unipolar
-    mf->m_fc_lfo.mode = 0; // normal, not band limited
-
-    mf->m_q_lfo.polarity = 1; // unipolar
-    mf->m_q_lfo.mode = 0; // normal, not band limited
-
-    modfilter_update(mf);
-
-    wt_start(&mf->m_fc_lfo);
-    wt_start(&mf->m_q_lfo);
 }
 
-void modfilter_update(modfilter *mf)
+void envelope_follower_update(envelope_follower *ef)
 {
-    mf->m_fc_lfo.freq = mf->m_mod_rate_fc;
-    mf->m_q_lfo.freq = mf->m_mod_rate_q;
-    mf->m_fc_lfo.waveform = mf->m_lfo_waveform;
-    mf->m_q_lfo.waveform = mf->m_lfo_waveform;
-    wt_update(&mf->m_fc_lfo);
-    wt_update(&mf->m_q_lfo);
+    envelope_detector_setattacktime(&ef->m_left_detector, ef->m_attack_ms);
+    envelope_detector_setattacktime(&ef->m_right_detector, ef->m_attack_ms);
+    envelope_detector_setreleasetime(&ef->m_left_detector, ef->m_release_ms);
+    envelope_detector_setreleasetime(&ef->m_right_detector, ef->m_release_ms);
+
+
 }
 
-double modfilter_calculate_cutoff_freq(modfilter *mf, double lfo_sample)
+double envelope_follower_calculate_cutoff_freq(envelope_follower *ef, double env_sample)
 {
-    return (mf->m_mod_depth_fc / 100.0) *
-               (lfo_sample * (mf->m_max_cutoff_freq - mf->m_min_cutoff_freq)) +
-           mf->m_min_cutoff_freq;
+    if (ef->m_direction == 0) // up
+        return env_sample * (ef->m_max_cutoff_freq - ef->m_min_cutoff_freq) + ef->m_min_cutoff_freq;
+    else
+        return ef->m_max_cutoff_freq - env_sample * (ef->m_max_cutoff_freq - ef->m_min_cutoff_freq);
+
+    return ef->m_min_cutoff_freq; // should never get here
 }
 
-double modfilter_calculate_q(modfilter *mf, double lfo_sample)
-{
-    return (mf->m_mod_depth_q / 100.0) *
-               (lfo_sample * (mf->m_max_q - mf->m_min_q)) +
-           mf->m_min_q;
-}
-
-void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
+void envelope_follower_calculate_left_lpf_coeffs(envelope_follower *ef, double cutoff_freq,
                                          double q)
 {
     double theta_c = 2.0 * M_PI * cutoff_freq / (double)SAMPLE_RATE;
@@ -90,15 +83,15 @@ void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
     double alpha = (0.5 + beta - gamma) / 2.0;
 
     // left channel
-    mf->m_left_lpf.m_a0 = alpha;
-    mf->m_left_lpf.m_a1 = 2.0 * alpha;
-    mf->m_left_lpf.m_a2 = alpha;
-    mf->m_left_lpf.m_b1 =
+    ef->m_left_lpf.m_a0 = alpha;
+    ef->m_left_lpf.m_a1 = 2.0 * alpha;
+    ef->m_left_lpf.m_a2 = alpha;
+    ef->m_left_lpf.m_b1 =
         -2.0 * gamma; // if b's are negative in the difference equation
-    mf->m_left_lpf.m_b2 = 2.0 * beta;
+    ef->m_left_lpf.m_b2 = 2.0 * beta;
 }
 
-void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
+void envelope_follower_calculate_right_lpf_coeffs(envelope_follower *ef, double cutoff_freq,
                                           double q)
 {
     double theta_c = 2.0 * M_PI * cutoff_freq / (double)SAMPLE_RATE;
@@ -114,116 +107,114 @@ void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
     double alpha = (0.5 + beta - gamma) / 2.0;
 
     // left channel
-    mf->m_right_lpf.m_a0 = alpha;
-    mf->m_right_lpf.m_a1 = 2.0 * alpha;
-    mf->m_right_lpf.m_a2 = alpha;
-    mf->m_right_lpf.m_b1 =
+    ef->m_right_lpf.m_a0 = alpha;
+    ef->m_right_lpf.m_a1 = 2.0 * alpha;
+    ef->m_right_lpf.m_a2 = alpha;
+    ef->m_right_lpf.m_b1 =
         -2.0 * gamma; // if b's are negative in the difference equation
-    mf->m_right_lpf.m_b2 = 2.0 * beta;
+    ef->m_right_lpf.m_b2 = 2.0 * beta;
 }
 
-bool modfilter_process_audio(modfilter *mf, double *in, double *out)
+bool envelope_follower_process_audio(envelope_follower *ef, double *in, double *out)
 {
-    double yn = 0.0;
-    double yqn = 0; // quad phase
+    double gain = pow(10, ef->m_pregain_db / 20.);
+    double detect_left = envelope_detector_detect(&ef->m_left_detector, gain * (*in));
+    double mod_freq_left = ef->m_min_cutoff_freq;
 
-    yn = wt_do_oscillate(&mf->m_fc_lfo, &yqn);
-    double fc = modfilter_calculate_cutoff_freq(mf, yn);
-    double fcq = modfilter_calculate_cutoff_freq(mf, yqn);
-    // printf("LFO FC: %f FC: %f\n", yn, fc);
+    if (detect_left >= ef->m_threshold)
+        mod_freq_left = envelope_follower_calculate_cutoff_freq(ef, detect_left);
 
-    yn = wt_do_oscillate(&mf->m_q_lfo, &yqn);
-    double q = modfilter_calculate_q(mf, yn);
-    double qq = modfilter_calculate_q(mf, yqn);
-    // printf("LFO Q: %f Q: %f\n", yn, q);
+    envelope_follower_calculate_left_lpf_coeffs(ef, mod_freq_left, ef->m_q);
+    *out = biquad_process(&ef->m_left_lpf, *in);
 
-    modfilter_calculate_left_lpf_coeffs(mf, fc, q);
-
-    if (mf->m_lfo_phase == 0)
-        modfilter_calculate_right_lpf_coeffs(mf, fc, q);
-    else
-        modfilter_calculate_right_lpf_coeffs(mf, fcq, qq);
-
-    *out = biquad_process(&mf->m_left_lpf, *in);
-
-    // TODO if stereo, use m_right_lp too
+    // TODO right channel stuff
 
     return true;
 }
 
-double modfilter_process_wrapper(void *self, double input)
+double envelope_follower_process_wrapper(void *self, double input)
 {
-    modfilter *mf = (modfilter *)self;
+    envelope_follower *ef = (envelope_follower *)self;
     double output = 0;
-    modfilter_process_audio(mf, &input, &output);
+    envelope_follower_process_audio(ef, &input, &output);
     return output;
 }
-void modfilter_status(void *self, char *status_string)
+void envelope_follower_status(void *self, char *status_string)
 {
-    modfilter *mf = (modfilter *)self;
-    snprintf(
-        status_string, MAX_PS_STRING_SZ,
-        "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f lfo:%d phase:%d",
-        mf->m_mod_depth_fc, mf->m_mod_rate_fc, mf->m_mod_depth_q,
-        mf->m_mod_rate_q, mf->m_lfo_waveform, mf->m_lfo_phase);
+    envelope_follower *ef = (envelope_follower *)self;
+    snprintf(status_string, MAX_PS_STRING_SZ,
+             "pregain:%.2f threshold:%.2f attackms:%.2f releasems:%.2f q:%.2f mode:%s(%d) dir:%s(%d)",
+             ef->m_pregain_db, ef->m_threshold, ef->m_attack_ms, ef->m_release_ms, ef->m_q, ef->m_time_constant ? "DIGITAL" : "ANALOG", ef->m_time_constant, ef->m_direction ? "DOWN" : "UP", ef->m_direction);
 }
 
-void modfilter_set_mod_depth_fc(modfilter *mf, double val)
+void envelope_follower_set_pregain_db(envelope_follower *ef, double val)
 {
-    if (val >= 0 && val <= 100)
-        mf->m_mod_depth_fc = val;
+    if (val >= 0 && val <= 20)
+        ef->m_pregain_db = val;
     else
-        printf("Val has to be between 0 and 100\n");
-
-    modfilter_update(mf);
+        printf("Val has to be between 0 and 20\n");
 }
 
-void modfilter_set_mod_rate_fc(modfilter *mf, double val)
+void envelope_follower_set_threshold(envelope_follower *ef, double val)
 {
-    if (val >= 0.2 && val <= 10)
-        mf->m_mod_rate_fc = val;
+    if (val >= 0 && val <= 1)
+        ef->m_threshold = val;
     else
-        printf("Val has to be between 0.2 and 10\n");
-
-    modfilter_update(mf);
+        printf("Val has to be between 0 and 1\n");
 }
 
-void modfilter_set_mod_depth_q(modfilter *mf, double val)
+void envelope_follower_set_attack_ms(envelope_follower *ef, double val)
 {
-    if (val >= 0 && val <= 100)
-        mf->m_mod_depth_q = val;
+    if (val >= 10 && val <= 100) {
+        ef->m_attack_ms = val;
+        envelope_detector_setattacktime(&ef->m_left_detector, val);
+        envelope_detector_setattacktime(&ef->m_right_detector, val);
+    }
     else
-        printf("Val has to be between 0 and 100\n");
+        printf("Val has to be between 10 and 100\n");
 
-    modfilter_update(mf);
 }
 
-void modfilter_set_mod_rate_q(modfilter *mf, double val)
+void envelope_follower_set_release_ms(envelope_follower *ef, double val)
 {
-    if (val >= 0.2 && val <= 10)
-        mf->m_mod_rate_q = val;
+    if (val >= 20 && val <= 250) {
+        ef->m_release_ms = val;
+        envelope_detector_setreleasetime(&ef->m_left_detector, val);
+        envelope_detector_setreleasetime(&ef->m_right_detector, val);
+    }
     else
-        printf("Val has to be between 0.2 and 10\n");
-
-    modfilter_update(mf);
+        printf("Val has to be between 20 and 250\n");
 }
 
-void modfilter_set_lfo_waveform(modfilter *mf, unsigned int val)
+void envelope_follower_set_q(envelope_follower *ef, double val)
 {
-    if (val < 4)
-        mf->m_lfo_waveform = val;
+    if (val >= 0.5 && val <= 20)
+        ef->m_q = val;
     else
-        printf("Val has to be between 0 and 3\n");
-
-    modfilter_update(mf);
+        printf("Val has to be between 0.5 and 20\n");
 }
 
-void modfilter_set_lfo_phase(modfilter *mf, unsigned int val)
+void envelope_follower_set_time_constant(envelope_follower *ef,
+                                         unsigned int val)
+{
+    if (val < 2) {
+        ef->m_time_constant = val;
+        if (val == 0) { // analog
+            envelope_detector_settcmodeanalog(&ef->m_left_detector, true);
+            envelope_detector_settcmodeanalog(&ef->m_right_detector, true);
+        } else {
+            envelope_detector_settcmodeanalog(&ef->m_left_detector, false);
+            envelope_detector_settcmodeanalog(&ef->m_right_detector, false);
+        }
+    }
+    else
+        printf("Val has to be 0 or 1\n");
+}
+
+void envelope_follower_set_direction(envelope_follower *ef, unsigned int val)
 {
     if (val < 2)
-        mf->m_lfo_phase = val;
+        ef->m_direction = val;
     else
-        printf("Val has to be between 0 or 1\n");
-
-    modfilter_update(mf);
+        printf("Val has to be 0 or 1\n");
 }

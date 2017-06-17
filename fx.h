@@ -17,7 +17,8 @@ typedef enum {
     LOWPASS,
     HIGHPASS,
     BANDPASS,
-    QUADFLANGER
+    QUADFLANGER,
+    ENVELOPEFOLLOWER
 } fx_type;
 
 typedef struct fx {

@@ -4,8 +4,6 @@ OBJ = \
 	afx/combfilter.o \
 	afx/delay.o \
 	afx/delayapf.o  \
-	afx/envelope_follower.o \
-	afx/limiter.o \
 	afx/lpfcombfilter.o \
 	afx/onepolelpf.o \
 	algorithm.o \
@@ -22,6 +20,8 @@ OBJ = \
 	sequencer_utils.o \
 	envelope.o \
 	envelope_generator.o \
+	envelope_follower.o \
+	envelope_detector.o \
 	filter.o \
 	filter_ckthreefive.o \
 	filter_moogladder.o \

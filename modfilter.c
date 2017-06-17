@@ -39,10 +39,10 @@ void modfilter_init(modfilter *mf)
     mf->m_lfo_phase = 0;
 
     mf->m_fc_lfo.polarity = 1; // unipolar
-    mf->m_fc_lfo.mode = 0; // normal, not band limited
+    mf->m_fc_lfo.mode = 0;     // normal, not band limited
 
     mf->m_q_lfo.polarity = 1; // unipolar
-    mf->m_q_lfo.mode = 0; // normal, not band limited
+    mf->m_q_lfo.mode = 0;     // normal, not band limited
 
     modfilter_update(mf);
 
@@ -161,11 +161,10 @@ double modfilter_process_wrapper(void *self, double input)
 void modfilter_status(void *self, char *status_string)
 {
     modfilter *mf = (modfilter *)self;
-    snprintf(
-        status_string, MAX_PS_STRING_SZ,
-        "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f lfo:%d phase:%d",
-        mf->m_mod_depth_fc, mf->m_mod_rate_fc, mf->m_mod_depth_q,
-        mf->m_mod_rate_q, mf->m_lfo_waveform, mf->m_lfo_phase);
+    snprintf(status_string, MAX_PS_STRING_SZ,
+             "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f lfo:%d phase:%d",
+             mf->m_mod_depth_fc, mf->m_mod_rate_fc, mf->m_mod_depth_q,
+             mf->m_mod_rate_q, mf->m_lfo_waveform, mf->m_lfo_phase);
 }
 
 void modfilter_set_mod_depth_fc(modfilter *mf, double val)

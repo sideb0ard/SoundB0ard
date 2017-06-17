@@ -18,6 +18,7 @@
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
+#include "envelope_follower.h"
 #include "help.h"
 #include "keys.h"
 #include "midimaaan.h"
@@ -826,6 +827,12 @@ void interpret(char *line)
                                    delay_len_ms);
             }
         }
+        else if (strncmp("follower", wurds[0], 8) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                add_follower_soundgen(mixr->sound_generators[soundgen_num]);
+            }
+        }
         else if (strncmp("moddelay", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
@@ -899,8 +906,7 @@ void interpret(char *line)
         else if (strncmp("fx", wurds[0], 2) == 0) {
             int soundgen_num = atoi(wurds[1]);
             int fx_num = atoi(wurds[2]);
-            if (is_valid_fx_num(soundgen_num, fx_num))
-            {
+            if (is_valid_fx_num(soundgen_num, fx_num)) {
                 fx *f = mixr->sound_generators[soundgen_num]->effects[fx_num];
 
                 if (strncmp("on", wurds[3], 2) == 0)
@@ -982,6 +988,25 @@ void interpret(char *line)
                     else if (strncmp("sixteenth", wurds[3], 9) == 0)
                         beatrepeat_change_selected_sixteenth(br, val);
                 }
+                else if (f->type == ENVELOPEFOLLOWER) {
+                    envelope_follower *ef = (envelope_follower*) f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("pregain", wurds[3], 4) == 0)
+                        envelope_follower_set_pregain_db(ef, val);
+                    else if (strncmp("threshold", wurds[3], 9) == 0)
+                        envelope_follower_set_threshold(ef, val);
+                    else if (strncmp("attackms", wurds[3], 8) == 0)
+                        envelope_follower_set_attack_ms(ef, val);
+                    else if (strncmp("releasems", wurds[3], 9) == 0)
+                        envelope_follower_set_release_ms(ef, val);
+                    else if (strncmp("q", wurds[3], 1) == 0)
+                        envelope_follower_set_q(ef, val);
+                    else if (strncmp("mode", wurds[3], 4) == 0)
+                        envelope_follower_set_time_constant(ef, val);
+                    else if (strncmp("dir", wurds[3], 4) == 0)
+                        envelope_follower_set_direction(ef, val);
+                }
+
                 else if (f->type == MODDELAY) {
                     mod_delay *md = (mod_delay *)f;
                     double val = atof(wurds[4]);

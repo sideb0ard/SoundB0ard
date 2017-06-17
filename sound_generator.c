@@ -4,6 +4,7 @@
 
 #include "beatrepeat.h"
 #include "defjams.h"
+#include "envelope_follower.h"
 #include "fx.h"
 #include "modfilter.h"
 #include "modular_delay.h"
@@ -62,6 +63,13 @@ int add_reverb_soundgen(SOUNDGEN *self)
     return soundgen_add_fx(self, (fx *)r);
 }
 
+int add_follower_soundgen(SOUNDGEN *self)
+{
+    printf("RAWK! ENvelope Followerrr!\n");
+    envelope_follower *ef = new_envelope_follower();
+    return soundgen_add_fx(self, (fx*)ef);
+
+}
 int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth)
 {
     printf("RAR! BEATREPEAT all up in this kittycat\n");
@@ -133,16 +141,16 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
 double effector(SOUNDGEN *self, double val)
 {
     if (self->effects_on) {
-        //double accumulator = 0.;
+        // double accumulator = 0.;
         for (int i = 0; i < self->effects_num; i++) {
 
             fx *f = self->effects[i];
             if (f->enabled) {
                 val = f->process(f, val);
             }
-            //accumulator += val;
+            // accumulator += val;
         }
-        //return accumulator;
+        // return accumulator;
     }
     return val;
 
