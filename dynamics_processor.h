@@ -36,13 +36,12 @@ enum { COMP, LIMIT, EXPAND, GATE };
 dynamics_processor *new_dynamics_processor(void);
 void dynamics_processor_init(dynamics_processor *dp);
 
-double dynamics_processor_calc_compression_gain(dynamics_processor *dp,
-                                                double detector_val,
+double dynamics_processor_calc_compression_gain(double detector_val,
                                                 double threshold, double rratio,
                                                 double kneewidth, bool limit);
 
 double dynamics_processor_calc_downward_expander_gain(
-    dynamics_processor *dp, double detector_val, double threshold,
+    double detector_val, double threshold,
     double rratio, double kneewidth, bool gate);
 
 void dynamics_processor_status(void *self, char *status_string);
