@@ -3,19 +3,23 @@
 #include <stdlib.h>
 #include <wchar.h>
 
-stereodelay *new_stereo_delay()
+stereodelay *new_stereo_delay(double duration)
 {
     stereodelay *d = (stereodelay *)calloc(1, sizeof(stereodelay));
 
-    d->m_delay_time_ms = 0;
-    d->m_feedback_percent = 0;
-    d->m_delay_ratio = 0;
-    d->m_wet_mix = 0.0;
+    d->m_delay_time_ms = duration;
+    d->m_feedback_percent = 2;
+    d->m_delay_ratio = 0.2;
+    d->m_wet_mix = 0.7;
+    d->m_mode = PINGPONG;
 
     d->m_fx.type = DELAY;
     d->m_fx.enabled = true;
     d->m_fx.status = &stereo_delay_status;
     d->m_fx.process = &stereo_delay_process_wrapper;
+
+    stereo_delay_prepare_for_play(d);
+    stereo_delay_update(d);
 
     return d;
 }

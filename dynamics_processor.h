@@ -40,9 +40,11 @@ double dynamics_processor_calc_compression_gain(double detector_val,
                                                 double threshold, double rratio,
                                                 double kneewidth, bool limit);
 
-double dynamics_processor_calc_downward_expander_gain(
-    double detector_val, double threshold,
-    double rratio, double kneewidth, bool gate);
+double dynamics_processor_calc_downward_expander_gain(double detector_val,
+                                                      double threshold,
+                                                      double rratio,
+                                                      double kneewidth,
+                                                      bool gate);
 
 void dynamics_processor_status(void *self, char *status_string);
 double dynamics_processor_process(void *self, double input);

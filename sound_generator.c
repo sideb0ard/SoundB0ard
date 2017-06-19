@@ -12,6 +12,7 @@
 #include "reverb.h"
 #include "sound_generator.h"
 #include "stereodelay.h"
+#include "waveshaper.h"
 
 static int soundgen_add_fx(SOUNDGEN *self, fx *f)
 {
@@ -45,15 +46,7 @@ static int soundgen_add_fx(SOUNDGEN *self, fx *f)
 int add_delay_soundgen(SOUNDGEN *self, float duration)
 {
     printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
-    stereodelay *sd = new_stereo_delay();
-    stereo_delay_prepare_for_play(sd);
-    stereo_delay_set_delay_time_ms(sd, duration);
-    stereo_delay_set_feedback_percent(sd, 2);
-    stereo_delay_set_delay_ratio(sd, 0.2);
-    stereo_delay_set_wet_mix(sd, 0.7);
-    stereo_delay_set_mode(sd, PINGPONG);
-    stereo_delay_update(sd);
-
+    stereodelay *sd = new_stereo_delay(duration);
     return soundgen_add_fx(self, (fx *)sd);
 }
 
@@ -62,6 +55,13 @@ int add_reverb_soundgen(SOUNDGEN *self)
     printf("Booya, adding a new REVERB to SOUNDGEN!\n");
     reverb *r = new_reverb();
     return soundgen_add_fx(self, (fx *)r);
+}
+
+int add_waveshape_soundgen(SOUNDGEN *self)
+{
+    printf("WAVshape\n");
+    waveshaper *ws = new_waveshaper();
+    return soundgen_add_fx(self, (fx *)ws);
 }
 
 int add_compressor_soundgen(SOUNDGEN *self)
@@ -147,18 +147,13 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
 
 double effector(SOUNDGEN *self, double val)
 {
-    if (self->effects_on) {
-        // double accumulator = 0.;
-        for (int i = 0; i < self->effects_num; i++) {
-
-            fx *f = self->effects[i];
-            if (f->enabled) {
-                val = f->process(f, val);
-            }
-            // accumulator += val;
+    for (int i = 0; i < self->effects_num; i++) {
+        fx *f = self->effects[i];
+        if (f->enabled) {
+            val = f->process(f, val);
         }
-        // return accumulator;
     }
+
     return val;
 
     // case DECIMATOR:
@@ -177,11 +172,6 @@ double effector(SOUNDGEN *self, double val)
     //         val *= 2;
     //         val = 1 / 100 * atan(val * 100);
     //     }
-    //     break;
-    // case MODFILTER:
-    //     modfilter_process_audio(self->effects[i]->modfilter, &val,
-    //                             &left_out);
-    //     val = left_out;
     //     break;
     // case RES:
     //     delay_p = self->effects[i]->buf_p;

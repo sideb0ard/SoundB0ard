@@ -55,6 +55,7 @@ OBJ = \
 	utils.o \
 	voice.o \
 	wt_oscillator.o \
+	waveshaper.o
 
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
 

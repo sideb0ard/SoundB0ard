@@ -37,6 +37,7 @@
 #include "synthdrum_sequencer.h"
 #include "table.h"
 #include "utils.h"
+#include "waveshaper.h"
 
 extern mixer *mixr;
 
@@ -858,6 +859,12 @@ void interpret(char *line)
                 add_reverb_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
+        else if (strncmp("waveshape", wurds[0], 6) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                add_waveshape_soundgen(mixr->sound_generators[soundgen_num]);
+            }
+        }
         else if (strncmp("distort", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
@@ -1012,6 +1019,18 @@ void interpret(char *line)
                         reverb_set_comb_delay_msec(r, 7, val);
                     else if (strncmp("comb8delayms", wurds[3], 12) == 0)
                         reverb_set_comb_delay_msec(r, 8, val);
+                }
+                else if (f->type == WAVESHAPER) {
+                    waveshaper *ws = (waveshaper *)f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("k_pos", wurds[3], 5) == 0)
+                        waveshaper_set_arc_tan_k_pos(ws, val);
+                    else if (strncmp("k_neg", wurds[3], 5) == 0)
+                        waveshaper_set_arc_tan_k_neg(ws, val);
+                    else if (strncmp("stages", wurds[3], 5) == 0)
+                        waveshaper_set_stages(ws, val);
+                    else if (strncmp("invert", wurds[3], 5) == 0)
+                        waveshaper_set_invert_stages(ws, val);
                 }
                 else if (f->type == BEATREPEAT) {
                     beatrepeat *br = (beatrepeat *)f;

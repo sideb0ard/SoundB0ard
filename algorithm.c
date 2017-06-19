@@ -24,6 +24,8 @@ algorithm *new_algorithm(char *line)
     a->sound_generator.status = &algorithm_status;
     a->sound_generator.setvol = &algorithm_setvol;
     a->sound_generator.getvol = &algorithm_getvol;
+    a->sound_generator.start = &algorithm_start;
+    a->sound_generator.stop = &algorithm_stop;
     a->sound_generator.type = ALGORITHM_TYPE;
 
     return a;

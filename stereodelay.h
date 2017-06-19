@@ -20,7 +20,7 @@ typedef struct stereodelay {
     double m_tap2_right_delay_time_ms;
 } stereodelay;
 
-stereodelay *new_stereo_delay(void);
+stereodelay *new_stereo_delay(double duration);
 
 void stereo_delay_status(void *self, char *string);
 double stereo_delay_process_wrapper(void *self, double input);

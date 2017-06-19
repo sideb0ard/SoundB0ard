@@ -73,15 +73,17 @@ double dynamics_processor_calc_compression_gain(double detector_val,
     return pow(10.0, yg / 20.0);
 }
 
-double dynamics_processor_calc_downward_expander_gain(double detector_val, double threshold,
-    double rratio, double kneewidth, bool gate)
+double dynamics_processor_calc_downward_expander_gain(double detector_val,
+                                                      double threshold,
+                                                      double rratio,
+                                                      double kneewidth,
+                                                      bool gate)
 {
-    double es = 1.0/rratio - 1;
+    double es = 1.0 / rratio - 1;
     if (gate)
         es = -1;
-    if(kneewidth > 0 && detector_val > (threshold - kneewidth/2.0) &&
-            detector_val < threshold + kneewidth/2.0)
-    {
+    if (kneewidth > 0 && detector_val > (threshold - kneewidth / 2.0) &&
+        detector_val < threshold + kneewidth / 2.0) {
         double x[2];
         double y[2];
         x[0] = threshold - kneewidth / 2.0;
@@ -94,7 +96,7 @@ double dynamics_processor_calc_downward_expander_gain(double detector_val, doubl
     }
     double yg = es * (threshold - detector_val);
     yg = min(0, yg);
-    return pow(10.0, yg/20.0);
+    return pow(10.0, yg / 20.0);
 }
 
 void dynamics_processor_set_inputgain_db(dynamics_processor *dp, double val)
@@ -225,7 +227,7 @@ double dynamics_processor_process(void *self, double input)
     double returnval = 0;
 
     dynamics_processor *dp = (dynamics_processor *)self;
-    //double inputgain = pow(10.0, dp->m_inputgain_db / 20.0);
+    // double inputgain = pow(10.0, dp->m_inputgain_db / 20.0);
     double outputgain = pow(10.0, dp->m_outputgain_db / 20.0);
 
     // used in stereo output
@@ -243,10 +245,10 @@ double dynamics_processor_process(void *self, double input)
 
     if (dp->m_stereo_link == 0) // on
     {
-        link_detector = 0.5 * (pow(10.0, left_detector/20.0) + pow(10.0, right_detector/20.0));
-        link_detector = 20.0*log10(link_detector);
+        link_detector = 0.5 * (pow(10.0, left_detector / 20.0) +
+                               pow(10.0, right_detector / 20.0));
+        link_detector = 20.0 * log10(link_detector);
     }
-
 
     if (dp->m_processor_type == COMP)
         gn = dynamics_processor_calc_compression_gain(
@@ -269,7 +271,7 @@ double dynamics_processor_process(void *self, double input)
     delay_process_audio(&dp->m_left_delay, &input, &lookahead_out);
 
     returnval = gn * lookahead_out * outputgain;
-    //returnval = gn * input * outputgain;
-    //returnval = gn * input * inputgain;
+    // returnval = gn * input * outputgain;
+    // returnval = gn * input * inputgain;
     return returnval;
 }

@@ -5,6 +5,7 @@
 
 typedef enum {
     BEATREPEAT,
+    COMPRESSOR,
     DECIMATOR,
     DELAY,
     MODDELAY,
@@ -19,7 +20,7 @@ typedef enum {
     BANDPASS,
     QUADFLANGER,
     ENVELOPEFOLLOWER,
-    COMPRESSOR
+    WAVESHAPER
 } fx_type;
 
 typedef struct fx {
