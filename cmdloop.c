@@ -13,6 +13,7 @@
 
 #include "algorithm.h"
 #include "audioutils.h"
+#include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "chaosmonkey.h"
 #include "cmdloop.h"
@@ -835,6 +836,15 @@ void interpret(char *line)
                                    delay_len_ms);
             }
         }
+        else if (strncmp("filter", wurds[0], 6) == 0) {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                int type = atoi(wurds[2]);
+                double freq = atof(wurds[3]);
+                add_basicfilter_soundgen(mixr->sound_generators[soundgen_num],
+                                         type, freq);
+            }
+        }
         else if (strncmp("follower", wurds[0], 8) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
@@ -1031,6 +1041,14 @@ void interpret(char *line)
                         waveshaper_set_stages(ws, val);
                     else if (strncmp("invert", wurds[3], 5) == 0)
                         waveshaper_set_invert_stages(ws, val);
+                }
+                else if (f->type == BASICFILTER) {
+                    filterpass *fp = (filterpass *)f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("freq", wurds[3], 4) == 0)
+                        filterpass_set_freq(fp, val);
+                    else if (strncmp("type", wurds[3], 4) == 0)
+                        filterpass_set_type(fp, val);
                 }
                 else if (f->type == BEATREPEAT) {
                     beatrepeat *br = (beatrepeat *)f;

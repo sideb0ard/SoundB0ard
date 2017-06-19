@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "defjams.h"
 #include "dynamics_processor.h"
@@ -62,6 +63,19 @@ int add_waveshape_soundgen(SOUNDGEN *self)
     printf("WAVshape\n");
     waveshaper *ws = new_waveshaper();
     return soundgen_add_fx(self, (fx *)ws);
+}
+
+int add_basicfilter_soundgen(SOUNDGEN *self, unsigned int type, double freq)
+{
+    printf("Fffuuuuhfilter!\n");
+    if (freq >= 20 && freq <= 20480 && type < 4) {
+        filterpass *fp = new_filterpass(freq, type);
+        return soundgen_add_fx(self, (fx *)fp);
+    }
+    else
+        printf("Check yer params, mate\n");
+
+    return -1;
 }
 
 int add_compressor_soundgen(SOUNDGEN *self)

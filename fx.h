@@ -4,6 +4,7 @@
 #include <stdbool.h>
 
 typedef enum {
+    BASICFILTER,
     BEATREPEAT,
     COMPRESSOR,
     DECIMATOR,
@@ -11,13 +12,13 @@ typedef enum {
     MODDELAY,
     MODFILTER,
     DISTORTION,
-    RES,
+    // RES,
     RESONANTLPF,
     REVERB,
-    ALLPASS,
-    LOWPASS,
-    HIGHPASS,
-    BANDPASS,
+    // ALLPASS,
+    // LOWPASS,
+    // HIGHPASS,
+    // BANDPASS,
     QUADFLANGER,
     ENVELOPEFOLLOWER,
     WAVESHAPER

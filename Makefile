@@ -9,6 +9,7 @@ OBJ = \
 	algorithm.o \
 	arpeggiator.o \
 	audioutils.o \
+	basicfilterpass.o \
 	beatrepeat.o \
 	chaosmonkey.o \
 	cmdloop.o \
