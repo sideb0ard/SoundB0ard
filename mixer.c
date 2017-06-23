@@ -43,7 +43,9 @@ mixer *new_mixer()
     // the lifetime of these booleans is a single sample
     mixr->is_midi_tick = true;
     mixr->start_of_loop = true;
+    mixr->is_thirtysecond = true;
     mixr->is_sixteenth = true;
+    mixr->is_eighth = true;
     mixr->is_quarter = true;
 
     mixr->scene_mode = false;
@@ -261,12 +263,33 @@ double mixer_gennext(mixer *mixr)
         mixr->is_midi_tick = false;
     }
 
+    if (mixr->cur_sample % ((PPSIXTEENTH/2) * mixr->samples_per_midi_tick) == 0) { // thirty second
+        mixr->is_thirtysecond = true;
+    }
+    else {
+        mixr->is_thirtysecond = false;
+    }
+
     if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0) {
         mixr->sixteenth_note_tick++; // for seq machine resolution
         mixr->is_sixteenth = true;
     }
     else {
         mixr->is_sixteenth = false;
+    }
+
+    if (mixr->cur_sample % (PPSIXTEENTH*2 * mixr->samples_per_midi_tick) == 0) {
+        mixr->is_eighth = true;
+    }
+    else {
+        mixr->is_eighth = false;
+    }
+
+    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0) {
+        mixr->is_quarter = true;
+    }
+    else {
+        mixr->is_quarter = false;
     }
 
     if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {

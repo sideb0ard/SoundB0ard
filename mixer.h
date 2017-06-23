@@ -65,9 +65,11 @@ typedef struct t_mixer {
     unsigned int loop_len_in_ticks;
 
     bool start_of_loop; // true for one sample during loop time
+    bool is_thirtysecond;
     bool is_sixteenth;
-    bool is_midi_tick;
+    bool is_eighth;
     bool is_quarter;
+    bool is_midi_tick;
 
     bool scene_mode;
     bool scene_start_pending;

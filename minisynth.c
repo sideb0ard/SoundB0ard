@@ -20,7 +20,7 @@ const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE"
 
 const char *arp_mode_to_string[] = {"UP", "DOWN", "UPDOWN", "RANDOM"};
 const char *arp_cur_step_to_string[] = {"ROOT", "THIRD", "FIFTH"};
-const char *arp_rate_to_string[] = {"SIXTEEN", "EIGHT", "FOUR"};
+const char *arp_rate_to_string[] = {"THIRTYSECOND", "SIXTEENTH", "EIGHTH", "QUARTER"};
 
 minisynth *new_minisynth(void)
 {
@@ -56,7 +56,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_feedback_pct = 0;
     ms->m_settings.m_delay_ratio = 0;
     ms->m_settings.m_wet_mix = 0.0;
-    ms->m_settings.m_octave = 3;
+    ms->m_settings.m_octave = 2;
     ms->m_settings.m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
     ms->m_settings.m_lfo1_osc_pitch_intensity = 0.0;
     ms->m_settings.m_sub_osc_db = -96.000000;
@@ -981,7 +981,7 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
     }
     minisynth_midi_note_on(ms, note, velocity);
 
-    int note_off_tick = (mixr->midi_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
+    int note_off_tick = (mixr->midi_tick + (PPSIXTEENTH * (int)ms->m_settings.m_sustain_time_sixteenth - 7)) % PPNS;
 
     midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
