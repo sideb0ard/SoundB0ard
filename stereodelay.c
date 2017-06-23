@@ -68,7 +68,7 @@ void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)
 
 void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)
 {
-    if (delay_ratio >= -1 && delay_ratio < 1) {
+    if (delay_ratio >= -1 && delay_ratio <= 1) {
         d->m_delay_ratio = delay_ratio;
         stereo_delay_update(d);
     }

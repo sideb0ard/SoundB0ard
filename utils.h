@@ -9,7 +9,7 @@ void *timed_sig_start(void *arg);
 void *fadeup_runrrr(void *arg);
 void *fadedown_runrrr(void *arg);
 void *duck_runrrr(void *arg);
-void faderrr(int sig_num, direction d);
+void faderrr(int sig_num, unsigned int d);
 float freqval(char *n);
 int notelookup(char *n);
 int ch_midi_lookup(int ch, int octave, char *keytext);

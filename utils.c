@@ -100,7 +100,7 @@ void thrunner(SBMSG *msg)
     }
 }
 
-void faderrr(int sg_num, direction d)
+void faderrr(int sg_num, unsigned int d)
 {
 
     struct timespec ts;

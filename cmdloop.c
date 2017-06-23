@@ -1708,6 +1708,55 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
         minisynth_set_reset_to_zero(ms, val);
         return true;
     }
+    else if (strncmp("arplatch", wurds[3], 8) == 0) {
+        printf("Minisynth change ARP Latch!\n");
+        int val = atoi(wurds[4]);
+        if (val == 0 || val == 1)
+            minisynth_set_arpeggiate_latch(ms, val);
+        else
+            printf("Gimme a 0 or 1\n");
+        return true;
+    }
+    else if (strncmp("arprepeat", wurds[3], 9) == 0) {
+        printf("Minisynth change ARP Repeat!\n");
+        int val = atoi(wurds[4]);
+        if (val == 0 || val == 1)
+            minisynth_set_arpeggiate_single_note_repeat(ms, val);
+        else
+            printf("Gimme a 0 or 1\n");
+        return true;
+    }
+    else if (strncmp("arpoctrange", wurds[3], 11) == 0) {
+        printf("Minisynth change ARP Oct Range!\n");
+        int val = atoi(wurds[4]);
+        minisynth_set_arpeggiate_octave_range(ms, val);
+        return true;
+    }
+    else if (strncmp("arpmode", wurds[3], 7) == 0) {
+        printf("Minisynth change ARP Mode!\n");
+        int val = atoi(wurds[4]);
+        minisynth_set_arpeggiate_mode(ms, val);
+        return true;
+    }
+    else if (strncmp("arprate", wurds[3], 7) == 0) {
+        printf("Minisynth change ARP Rate!\n");
+        int val = atoi(wurds[4]);
+        minisynth_set_arpeggiate_rate(ms, val);
+        return true;
+    }
+    else if (strncmp("arpcurstep", wurds[3], 11) == 0) {
+        printf("you don't change Minisynth curstep - it increments by itself!\n");
+        return true;
+    }
+    else if (strncmp("arp", wurds[3], 3) == 0) {
+        printf("Minisynth change ARP!\n");
+        int val = atoi(wurds[4]);
+        if (val == 0 || val == 1)
+            minisynth_set_arpeggiate(ms, val);
+        else
+            printf("Gimme a 1 or 0\n");
+        return true;
+    }
     return false;
 }
 

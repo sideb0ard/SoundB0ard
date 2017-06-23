@@ -16,8 +16,11 @@ const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
 
 // defined in oscillator.h
 const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE"
-                                                                 "EXPO",
-                                  "RSH", "QRSH"};
+                                  "EXPO", "RSH", "QRSH"};
+
+const char *arp_mode_to_string[] = {"UP", "DOWN", "UPDOWN", "RANDOM"};
+const char *arp_cur_step_to_string[] = {"ROOT", "THIRD", "FIFTH"};
+const char *arp_rate_to_string[] = {"SIXTEEN", "EIGHT", "FOUR"};
 
 minisynth *new_minisynth(void)
 {
@@ -777,8 +780,8 @@ double minisynth_gennext(void *self)
             if (ms->multi_melody_mode) {
                 ms->cur_melody_iteration--;
                 if (ms->cur_melody_iteration == 0) {
-                    if (!ms->m_settings.m_sustain_override)
-                        minisynth_stop(ms);
+                    // if (!ms->m_settings.m_sustain_override)
+                    //     minisynth_stop(ms);
                     ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
                     ms->cur_melody_iteration =
                         ms->melody_multiloop_count[ms->cur_melody];
@@ -1014,8 +1017,8 @@ void minisynth_rand_settings(minisynth *ms)
         ((float)rand()) / RAND_MAX * (FILTER_FC_MAX - FILTER_FC_MIN) +
         FILTER_FC_MIN;
     ms->m_settings.m_q_control = rand() % 10;
-    ms->m_settings.m_attack_time_msec = rand() % 400;
-    ms->m_settings.m_decay_release_time_msec = rand() % 400;
+    ms->m_settings.m_attack_time_msec = (rand() % 400) + 50;
+    ms->m_settings.m_decay_release_time_msec = (rand() % 400) + 50;
     ms->m_settings.m_pulse_width_pct = rand() % 100;
     rand_ = (rand() % 127) + 1;
     // scaley_val = scaleybum(0, 127, -0.9, 0.9, rand_);
@@ -1302,10 +1305,10 @@ void minisynth_print_settings(minisynth *ms)
     printf("Delay Feedback Pct (delayfb): %f [0-100]\n",
            ms->m_settings.m_feedback_pct);
     printf("Delay Ratio (delayr): %f [-1-1]\n", ms->m_settings.m_delay_ratio);
-    printf("Delay Mode (delaymode): %d [0-]\n",
-           ms->m_settings.m_delay_mode); // unsigned int
+    printf("Delay Mode (delaymode): %d [0-%d]\n",
+           ms->m_settings.m_delay_mode, MAX_NUM_DELAY_MODE - 1); // unsigned int
     printf("Delay Time ms (delayms): %f [%d-%d]\n",
-           ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
+           ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, 2000);
     printf("Delay Wet Mix (delaymx): %f [0-1]\n", ms->m_settings.m_wet_mix);
     printf(ANSI_COLOR_YELLOW);
     printf("EG1 DCA Intensity (eg1dcaint): %f [-1 - 1]\n",
@@ -1361,10 +1364,46 @@ void minisynth_print_settings(minisynth *ms)
     printf("Volume (vol): %f [0-1]\n", ms->m_settings.m_volume_db);
     printf("Reset To Zero (zero): %d [0,1]\n",
            ms->m_settings.m_reset_to_zero); // unsigned
+    printf(COOL_COLOR_YELLOW);
+    printf("Arp Active (arp): %s [0,1]\n", ms->m_arp.active ? "true" : "false");
+    printf("Arp Latch (arplatch): %s [0,1]\n", ms->m_arp.latch ? "true" : "false");
+    printf("Arp Single Note Repeat (arprepeat): %s [0,1]\n", ms->m_arp.single_note_repeat ? "true" : "false");
+    printf("Arp Octave Range (arpoctrange): %d [1,7]\n", ms->m_arp.octave_range);
+    printf("Arp Mode (arpmode): %s [0,3]\n", arp_mode_to_string[ms->m_arp.mode]);
+    printf("Arp Rate (arprate): %s [0,2]\n", arp_rate_to_string[ms->m_arp.rate]);
+    printf("Arp Cur Step (arpcurstep): %s\n", arp_cur_step_to_string[ms->m_arp.cur_step]);
     printf(ANSI_COLOR_RESET);
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
+
+void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)
+{ 
+    ms->m_arp.latch = b;
+}
+
+void minisynth_set_arpeggiate_single_note_repeat(minisynth *ms, bool b)
+{
+    ms->m_arp.single_note_repeat = b;
+}
+void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val)
+{
+    ms->m_arp.octave_range = val;
+}
+void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode)
+{
+    if (mode < MAX_ARP_MODE)
+        ms->m_arp.mode = mode;
+    else
+        printf("Val must be < %d\n", MAX_ARP_MODE);
+}
+void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode)
+{
+    if (mode < MAX_ARP_RATE)
+        ms->m_arp.rate = mode;
+    else
+        printf("Val must be < %d\n", MAX_ARP_RATE);
+}
 
 void minisynth_import_midi_from_file(minisynth *ms, char *filename)
 {
@@ -1718,10 +1757,10 @@ void minisynth_set_delay_mode(minisynth *ms, unsigned int val)
 
 void minisynth_set_delay_time_ms(minisynth *ms, double val)
 {
-    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
+    if (val >= 0 && val <= 2000)
         ms->m_settings.m_delay_time_msec = val;
     else
-        printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+        printf("val must be between 0 and 2000\n");
 }
 
 void minisynth_set_delay_wetmix(minisynth *ms, double val)

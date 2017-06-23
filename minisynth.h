@@ -211,6 +211,11 @@ bool is_valid_melody_num(minisynth *ns, int melody_num);
 void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
                                 bool update_last_midi);
 void minisynth_set_arpeggiate(minisynth *ms, bool b);
+void minisynth_set_arpeggiate_latch(minisynth *ms, bool b);
+void minisynth_set_arpeggiate_single_note_repeat(minisynth *ms, bool b);
+void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val);
+void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode);
+void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode);
 
 void minisynth_import_midi_from_file(minisynth *ms, char *filename);
 void minisynth_set_filter_mod(minisynth *ms, double mod);

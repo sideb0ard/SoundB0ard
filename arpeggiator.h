@@ -4,8 +4,9 @@
 
 typedef struct minisynth minisynth;
 
-enum arp_rate { SIXTEEN, EIGHTH, FOUR } arp_rate;
-enum arp_step { ROOT, THIRD, FIFTH, MAX_STEPS };
+enum { UP, DOWN, UPDOWN, RANDOM, MAX_ARP_MODE} mode;
+enum { SIXTEEN, EIGHT, FOUR, MAX_ARP_RATE } arp_rate;
+enum { ROOT, THIRD, FIFTH, MAX_ARP_STEPS } arp_step;
 
 typedef struct arpeggiator {
     bool active;

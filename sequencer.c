@@ -794,6 +794,7 @@ void seq_rm_hit(sequencer *s, int pattern_num, int step)
 
 void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 {
+    printf("SEQ mv micro\n");
     if (seq_is_valid_pattern_num(s, pattern_num)) {
         if (s->patterns[pattern_num][stepfrom] == 1 && stepto < PPBAR) {
             s->patterns[pattern_num][stepfrom] = 0;
