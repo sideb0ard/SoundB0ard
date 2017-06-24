@@ -11,7 +11,8 @@ void arpeggiator_init(arpeggiator *arp)
     arp->active = false;
     arp->latch = true;
     arp->single_note_repeat = false;
-    arp->octave_range = 2;
+    arp->cur_octave = 0;
+    arp->octave_range = 1;
     arp->mode = UP;
     arp->rate = ASIXTEENTH;
     arp->cur_step = ROOT;
@@ -42,10 +43,15 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
                 note = ms->m_last_midi_note + 7;
                 break;
             }
-            arp->cur_step = (arp->cur_step + 1) % MAX_ARP_STEPS;
         }
-        if (note > 8) {
-            minisynth_handle_midi_note(ms, note, velocity, false);
-        }
+
+        if (note > 8)
+            minisynth_handle_midi_note(ms, note+(12*arp->cur_octave), velocity, false);
+
+        if (arp->cur_step == FIFTH)
+            arp->cur_octave = (arp->cur_octave + 1) % arp->octave_range;
+
+        arp->cur_step = (arp->cur_step + 1) % MAX_ARP_STEPS;
+
     }
 }

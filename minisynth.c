@@ -1368,7 +1368,7 @@ void minisynth_print_settings(minisynth *ms)
     printf("Arp Active (arp): %s [0,1]\n", ms->m_arp.active ? "true" : "false");
     printf("Arp Latch (arplatch): %s [0,1]\n", ms->m_arp.latch ? "true" : "false");
     printf("Arp Single Note Repeat (arprepeat): %s [0,1]\n", ms->m_arp.single_note_repeat ? "true" : "false");
-    printf("Arp Octave Range (arpoctrange): %d [1,7]\n", ms->m_arp.octave_range);
+    printf("Arp Octave Range (arpoctrange): %d [1,4]\n", ms->m_arp.octave_range);
     printf("Arp Mode (arpmode): %s [0,3]\n", arp_mode_to_string[ms->m_arp.mode]);
     printf("Arp Rate (arprate): %s [0,2]\n", arp_rate_to_string[ms->m_arp.rate]);
     printf("Arp Cur Step (arpcurstep): %s\n", arp_cur_step_to_string[ms->m_arp.cur_step]);
@@ -1388,7 +1388,10 @@ void minisynth_set_arpeggiate_single_note_repeat(minisynth *ms, bool b)
 }
 void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val)
 {
-    ms->m_arp.octave_range = val;
+    if (val >= 1 && val <= 4)
+        ms->m_arp.octave_range = val;
+    else
+        printf("Val must be between 1 and 4\n");
 }
 void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode)
 {

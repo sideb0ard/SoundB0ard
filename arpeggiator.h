@@ -12,6 +12,7 @@ typedef struct arpeggiator {
     bool active;
     bool latch;
     bool single_note_repeat;
+    int cur_octave;
     int octave_range;
     unsigned int mode;
     unsigned int rate;
