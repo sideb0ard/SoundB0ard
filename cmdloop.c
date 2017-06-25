@@ -1745,7 +1745,8 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
         return true;
     }
     else if (strncmp("arpcurstep", wurds[3], 11) == 0) {
-        printf("you don't change Minisynth curstep - it increments by itself!\n");
+        printf(
+            "you don't change Minisynth curstep - it increments by itself!\n");
         return true;
     }
     else if (strncmp("arp", wurds[3], 3) == 0) {

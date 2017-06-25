@@ -1,6 +1,7 @@
 #include "arpeggiator.h"
 #include "minisynth.h"
 #include "mixer.h"
+#include <stdlib.h>
 
 extern mixer *mixr;
 
@@ -14,6 +15,7 @@ void arpeggiator_init(arpeggiator *arp)
     arp->cur_octave = 0;
     arp->octave_range = 1;
     arp->mode = UP;
+    arp->direction = UP;
     arp->rate = ASIXTEENTH;
     arp->cur_step = ROOT;
 }
@@ -23,11 +25,10 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
     int note = 0;
     int velocity = 100;
 
-    if ((mixr->is_thirtysecond && arp->rate==ATHIRTYSECOND)
-       || (mixr->is_sixteenth && arp->rate==ASIXTEENTH)
-       || (mixr->is_eighth && arp->rate==AEIGHTH)
-       || (mixr->is_quarter && arp->rate==AQUARTER))
-    {
+    if ((mixr->is_thirtysecond && arp->rate == ATHIRTYSECOND) ||
+        (mixr->is_sixteenth && arp->rate == ASIXTEENTH) ||
+        (mixr->is_eighth && arp->rate == AEIGHTH) ||
+        (mixr->is_quarter && arp->rate == AQUARTER)) {
         if (arp->single_note_repeat) {
             note = ms->m_last_midi_note;
         }
@@ -46,12 +47,54 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
         }
 
         if (note > 8)
-            minisynth_handle_midi_note(ms, note+(12*arp->cur_octave), velocity, false);
+            minisynth_handle_midi_note(ms, note + (12 * arp->cur_octave),
+                                       velocity, false);
 
-        if (arp->cur_step == FIFTH)
-            arp->cur_octave = (arp->cur_octave + 1) % arp->octave_range;
+        switch (arp->mode) {
+        case (UP):
+            if (arp->cur_step == FIFTH)
+                arp->cur_octave = (arp->cur_octave + 1) % arp->octave_range;
 
-        arp->cur_step = (arp->cur_step + 1) % MAX_ARP_STEPS;
-
+            arp->cur_step = (arp->cur_step + 1) % MAX_ARP_STEPS;
+            break;
+        case (DOWN):
+            if (arp->cur_step == ROOT) {
+                arp->cur_octave--;
+                if (arp->cur_octave < 0)
+                    arp->cur_octave = arp->octave_range - 1;
+                arp->cur_step = MAX_ARP_STEPS - 1;
+            }
+            else
+                arp->cur_step--;
+            break;
+        case (UPDOWN):
+            if (arp->direction == UP) {
+                if (arp->cur_step == FIFTH) {
+                    if (arp->cur_octave == arp->octave_range - 1)
+                        arp->direction = DOWN;
+                    else
+                        arp->cur_octave =
+                            (arp->cur_octave + 1) % arp->octave_range;
+                }
+                arp->cur_step = (arp->cur_step + 1) % MAX_ARP_STEPS;
+            }
+            else {
+                if (arp->cur_step == ROOT) {
+                    arp->cur_octave--;
+                    if (arp->cur_octave < 0) {
+                        arp->cur_octave = 0;
+                        arp->direction = UP;
+                    }
+                    arp->cur_step = MAX_ARP_STEPS - 1;
+                }
+                else
+                    arp->cur_step--;
+            }
+            break;
+        case (RANDOM):
+            arp->cur_octave = rand() % arp->octave_range;
+            arp->cur_step = rand() % MAX_ARP_STEPS;
+            break;
+        }
     }
 }

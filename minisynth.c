@@ -16,11 +16,13 @@ const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
 
 // defined in oscillator.h
 const char *s_lfo_mode_names[] = {"SINE", "USAW", "DSAW", "TRI", "SQUARE"
-                                  "EXPO", "RSH", "QRSH"};
+                                                                 "EXPO",
+                                  "RSH", "QRSH"};
 
 const char *arp_mode_to_string[] = {"UP", "DOWN", "UPDOWN", "RANDOM"};
 const char *arp_cur_step_to_string[] = {"ROOT", "THIRD", "FIFTH"};
-const char *arp_rate_to_string[] = {"THIRTYSECOND", "SIXTEENTH", "EIGHTH", "QUARTER"};
+const char *arp_rate_to_string[] = {"THIRTYSECOND", "SIXTEENTH", "EIGHTH",
+                                    "QUARTER"};
 
 minisynth *new_minisynth(void)
 {
@@ -981,7 +983,10 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
     }
     minisynth_midi_note_on(ms, note, velocity);
 
-    int note_off_tick = (mixr->midi_tick + (PPSIXTEENTH * (int)ms->m_settings.m_sustain_time_sixteenth - 7)) % PPNS;
+    int note_off_tick =
+        (mixr->midi_tick +
+         (PPSIXTEENTH * (int)ms->m_settings.m_sustain_time_sixteenth - 7)) %
+        PPNS;
 
     midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
@@ -1305,8 +1310,8 @@ void minisynth_print_settings(minisynth *ms)
     printf("Delay Feedback Pct (delayfb): %f [0-100]\n",
            ms->m_settings.m_feedback_pct);
     printf("Delay Ratio (delayr): %f [-1-1]\n", ms->m_settings.m_delay_ratio);
-    printf("Delay Mode (delaymode): %d [0-%d]\n",
-           ms->m_settings.m_delay_mode, MAX_NUM_DELAY_MODE - 1); // unsigned int
+    printf("Delay Mode (delaymode): %d [0-%d]\n", ms->m_settings.m_delay_mode,
+           MAX_NUM_DELAY_MODE - 1); // unsigned int
     printf("Delay Time ms (delayms): %f [%d-%d]\n",
            ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, 2000);
     printf("Delay Wet Mix (delaymx): %f [0-1]\n", ms->m_settings.m_wet_mix);
@@ -1366,19 +1371,25 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_reset_to_zero); // unsigned
     printf(COOL_COLOR_YELLOW);
     printf("Arp Active (arp): %s [0,1]\n", ms->m_arp.active ? "true" : "false");
-    printf("Arp Latch (arplatch): %s [0,1]\n", ms->m_arp.latch ? "true" : "false");
-    printf("Arp Single Note Repeat (arprepeat): %s [0,1]\n", ms->m_arp.single_note_repeat ? "true" : "false");
-    printf("Arp Octave Range (arpoctrange): %d [1,4]\n", ms->m_arp.octave_range);
-    printf("Arp Mode (arpmode): %s [0,3]\n", arp_mode_to_string[ms->m_arp.mode]);
-    printf("Arp Rate (arprate): %s [0,2]\n", arp_rate_to_string[ms->m_arp.rate]);
-    printf("Arp Cur Step (arpcurstep): %s\n", arp_cur_step_to_string[ms->m_arp.cur_step]);
+    printf("Arp Latch (arplatch): %s [0,1]\n",
+           ms->m_arp.latch ? "true" : "false");
+    printf("Arp Single Note Repeat (arprepeat): %s [0,1]\n",
+           ms->m_arp.single_note_repeat ? "true" : "false");
+    printf("Arp Octave Range (arpoctrange): %d [1,4]\n",
+           ms->m_arp.octave_range);
+    printf("Arp Mode (arpmode): %s [0,3]\n",
+           arp_mode_to_string[ms->m_arp.mode]);
+    printf("Arp Rate (arprate): %s [0,2]\n",
+           arp_rate_to_string[ms->m_arp.rate]);
+    printf("Arp Cur Step (arpcurstep): %s\n",
+           arp_cur_step_to_string[ms->m_arp.cur_step]);
     printf(ANSI_COLOR_RESET);
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
 
 void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)
-{ 
+{
     ms->m_arp.latch = b;
 }
 

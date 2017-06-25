@@ -263,7 +263,8 @@ double mixer_gennext(mixer *mixr)
         mixr->is_midi_tick = false;
     }
 
-    if (mixr->cur_sample % ((PPSIXTEENTH/2) * mixr->samples_per_midi_tick) == 0) { // thirty second
+    if (mixr->cur_sample % ((PPSIXTEENTH / 2) * mixr->samples_per_midi_tick) ==
+        0) { // thirty second
         mixr->is_thirtysecond = true;
     }
     else {
@@ -278,7 +279,8 @@ double mixer_gennext(mixer *mixr)
         mixr->is_sixteenth = false;
     }
 
-    if (mixr->cur_sample % (PPSIXTEENTH*2 * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) ==
+        0) {
         mixr->is_eighth = true;
     }
     else {
@@ -294,11 +296,14 @@ double mixer_gennext(mixer *mixr)
 
     if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
         mixr->start_of_loop = true;
-        if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0))
+        if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0)) {
             printf("BUG! START OF LOOP - sample: %d, midi_tick: %d sixteenth: "
                    "%d\n",
                    mixr->cur_sample, mixr->midi_tick,
                    mixr->sixteenth_note_tick);
+            mixr->sixteenth_note_tick = 0;
+            mixr->midi_tick = 0;
+        }
         if (mixr->debug_mode) {
             printf("START OF LOOP - sample: %d, midi_tick: %d sixteenth: %d\n",
                    mixr->cur_sample, mixr->midi_tick,
