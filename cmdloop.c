@@ -101,13 +101,6 @@ void interpret(char *line)
                 mixer_update_bpm(mixr, bpm);
         }
 
-        else if (strncmp("generate", wurds[0], 8) == 0) {
-            int soundgen_num = atoi(wurds[1]);
-            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
-                int melody_num = atoi(wurds[2]);
-                mixer_generate_melody(mixr, soundgen_num, melody_num);
-            }
-        }
         else if (strncmp("keys", wurds[0], 4) == 0) {
             for (int i = 0; i < NUM_KEYS; i++) {
                 char *key = key_names[i];
@@ -559,6 +552,10 @@ void interpret(char *line)
                     else if (strncmp("arp", wurds[2], 3) == 0) {
                         ms->recording = false;
                         minisynth_set_arpeggiate(ms, 1 - ms->m_arp.active);
+                    }
+                    else if (strncmp("generate", wurds[2], 8) == 0) {
+                        int melody_num = atoi(wurds[3]);
+                        minisynth_generate_melody(ms, melody_num);
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         if (parse_minisynth_settings_change(ms, wurds,

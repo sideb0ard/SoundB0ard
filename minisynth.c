@@ -5,10 +5,14 @@
 #include "midi_freq_table.h"
 #include "minisynth.h"
 #include "mixer.h"
+#include "sequencer_utils.h"
 #include "utils.h"
 
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
+extern const char *key_names[NUM_KEYS];
+extern const int key_midi_mapping[NUM_KEYS];
+extern const compat_key_list compat_keys[NUM_KEYS];
 
 // defined in minisynth_voice.h
 const wchar_t *s_mode_names[] = {L"SAW3", L"SQR3", L"SAW2SQR", L"TRI2SAW",
@@ -273,6 +277,62 @@ void minisynth_update(minisynth *ms)
     stereo_delay_set_wet_mix(&ms->m_delay_fx, ms->m_settings.m_wet_mix);
     stereo_delay_set_mode(&ms->m_delay_fx, ms->m_settings.m_delay_mode);
     stereo_delay_update(&ms->m_delay_fx);
+}
+
+void minisynth_generate_melody(minisynth *ms, int melody_num)
+{
+    if (!is_valid_melody_num(ms, melody_num)) {
+        printf("Not a valid melody number\n");
+        return;
+    }
+    minisynth_reset_melody(ms, melody_num);
+
+    int rand_num_notes = (rand() % 5) + 2;
+    int generated_melody_note_num[NUM_COMPAT_NOTES];
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+        generated_melody_note_num[i] = -99;
+    int generated_melody_note_num_idx = 0;
+    while (generated_melody_note_num_idx < rand_num_notes) {
+        int randy = rand() % (NUM_COMPAT_NOTES);
+        if (!is_int_member_in_array(randy, generated_melody_note_num,
+                                    NUM_COMPAT_NOTES)) {
+            generated_melody_note_num[generated_melody_note_num_idx++] = randy;
+        }
+    }
+
+    // printf("They are: ");
+    // for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+    //    if (generated_melody_note_num[i] != -99)
+    //        printf("%d ", generated_melody_note_num[i]);
+    // printf("\n");
+
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++) {
+        if (generated_melody_note_num[i] != -99) {
+            int idx = generated_melody_note_num[i];
+            printf("Compat: %s\n", key_names[compat_keys[0][idx]]);
+            // printf("Compat: %d\n", key_midi_mapping[compat_keys[0][idx]]);
+
+            int rand_steps = (rand() % 9) + 1;
+            int bitpattern = create_euclidean_rhythm(rand_steps, 32);
+            if (rand() % 2 == 1)
+                bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
+
+            printf("Pattern is %d\n", bitpattern);
+            char cbitpattern[33];
+            for (int i = 31; i >= 0; i--) {
+                if (bitpattern & 1 << i) {
+                    cbitpattern[31 - i] = '1';
+                    minisynth_add_note(
+                        ms, melody_num, 31 - i,
+                        key_midi_mapping[compat_keys[mixr->key][idx]]); // THIS!
+                }
+                else
+                    cbitpattern[31 - i] = '0';
+            }
+            cbitpattern[32] = '\0';
+            printf("Pattern is %d - %s\n", bitpattern, cbitpattern);
+        }
+    }
 }
 
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,

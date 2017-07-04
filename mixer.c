@@ -27,31 +27,9 @@ extern ENVSTREAM *ampstream;
 
 extern mixer *mixr;
 
-const char *key_names[] = {
-    "C_MAJOR",      "G_MAJOR",      "D_MAJOR",       "A_MAJOR",
-    "E_MAJOR",      "B_MAJOR",      "F_SHARP_MAJOR", "D_FLAT_MAJOR",
-    "A_FLAT_MAJOR", "E_FLAT_MAJOR", "B_FLAT_MAJOR",  "F_MAJOR",
-};
-
-const int key_midi_mapping[] = {24, 31, 26, 33, 28, 35, 30, 25, 32, 27, 34, 29};
-
-// typedef unsigned int compat_key_list[6];
-const compat_key_list compat_keys[] = {
-    {C_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, F_MAJOR, G_MAJOR, A_FLAT_MAJOR},
-    {G_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, C_MAJOR, D_MAJOR, E_FLAT_MAJOR},
-    {D_MAJOR, E_FLAT_MAJOR, F_SHARP_MAJOR, G_MAJOR, A_MAJOR, B_FLAT_MAJOR},
-    {A_MAJOR, B_FLAT_MAJOR, D_FLAT_MAJOR, D_MAJOR, E_MAJOR, F_SHARP_MAJOR},
-    {E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, A_MAJOR, B_MAJOR, D_FLAT_MAJOR},
-    {B_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR},
-    {F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, B_MAJOR, D_FLAT_MAJOR,
-     E_FLAT_MAJOR},
-    {D_FLAT_MAJOR, E_FLAT_MAJOR, E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR,
-     B_FLAT_MAJOR},
-    {A_FLAT_MAJOR, B_FLAT_MAJOR, B_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, E_MAJOR},
-    {E_FLAT_MAJOR, E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, B_MAJOR},
-    {B_FLAT_MAJOR, B_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, F_MAJOR, F_SHARP_MAJOR},
-    {F_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, C_MAJOR,
-     D_FLAT_MAJOR}};
+extern const char *key_names[NUM_KEYS];
+extern const int key_midi_mapping[NUM_KEYS];
+extern const compat_key_list compat_keys[NUM_KEYS];
 
 mixer *new_mixer()
 {
@@ -167,68 +145,6 @@ void mixer_ps(mixer *mixr)
     }
 
     printf(ANSI_COLOR_RESET);
-}
-
-void mixer_generate_melody(mixer *mixr, int synthnum, int melody_num)
-{
-    if (!mixer_is_valid_soundgen_num(mixr, synthnum) ||
-        mixr->sound_generators[synthnum]->type != SYNTH_TYPE) {
-        printf("Not a minisynth - can't apply a melody\n");
-        return;
-    }
-    minisynth *ms = (minisynth *)mixr->sound_generators[synthnum];
-    if (!is_valid_melody_num(ms, melody_num)) {
-        printf("Not a valid melody number\n");
-        return;
-    }
-    minisynth_reset_melody(ms, melody_num);
-
-    int rand_num_notes = (rand() % 5) + 2;
-    int generated_melody_note_num[NUM_COMPAT_NOTES];
-    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
-        generated_melody_note_num[i] = -99;
-    int generated_melody_note_num_idx = 0;
-    while (generated_melody_note_num_idx < rand_num_notes) {
-        int randy = rand() % (NUM_COMPAT_NOTES);
-        if (!is_int_member_in_array(randy, generated_melody_note_num,
-                                    NUM_COMPAT_NOTES)) {
-            generated_melody_note_num[generated_melody_note_num_idx++] = randy;
-        }
-    }
-
-    // printf("They are: ");
-    // for (int i = 0; i < NUM_COMPAT_NOTES; i++)
-    //    if (generated_melody_note_num[i] != -99)
-    //        printf("%d ", generated_melody_note_num[i]);
-    // printf("\n");
-
-    for (int i = 0; i < NUM_COMPAT_NOTES; i++) {
-        if (generated_melody_note_num[i] != -99) {
-            int idx = generated_melody_note_num[i];
-            printf("Compat: %s\n", key_names[compat_keys[0][idx]]);
-            // printf("Compat: %d\n", key_midi_mapping[compat_keys[0][idx]]);
-
-            int rand_steps = (rand() % 9) + 1;
-            int bitpattern = create_euclidean_rhythm(rand_steps, 32);
-            if (rand() % 2 == 1)
-                bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-
-            printf("Pattern is %d\n", bitpattern);
-            char cbitpattern[33];
-            for (int i = 31; i >= 0; i--) {
-                if (bitpattern & 1 << i) {
-                    cbitpattern[31 - i] = '1';
-                    minisynth_add_note(
-                        ms, melody_num, 31 - i,
-                        key_midi_mapping[compat_keys[mixr->key][idx]]); // THIS!
-                }
-                else
-                    cbitpattern[31 - i] = '0';
-            }
-            cbitpattern[32] = '\0';
-            printf("Pattern is %d - %s\n", bitpattern, cbitpattern);
-        }
-    }
 }
 
 const compat_key_list *mixer_get_compat_notes(mixer *mixr)

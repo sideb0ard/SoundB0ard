@@ -159,6 +159,8 @@ void minisynth_stop(minisynth *ms);
 
 void minisynth_update(minisynth *synth);
 
+void minisynth_generate_melody(minisynth *ms, int melody_num);
+
 void minisynth_increment_voice_timestamps(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *synth,
