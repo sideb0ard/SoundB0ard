@@ -46,8 +46,7 @@ int create_euclidean_rhythm(int num_beats, int len_pattern)
     int count[len_pattern];
 
     for (int i = 0; i < len_pattern; i++) {
-        remainderrr[i] = 0;
-        count[i] = 0;
+        remainderrr[i] = count[i] = 0;
     }
 
     // this is the real work, like magick

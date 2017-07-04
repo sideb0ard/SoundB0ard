@@ -822,8 +822,14 @@ double minisynth_gennext(void *self)
                 }
                 ms->morph_generation++;
             }
+            if (minisynth_get_num_notes(ms) == 0) {
+                minisynth_stop(ms);
+                minisynth_reset_melody(ms, 0);
+            }
         }
     }
+
+
     minisynth_update(ms);
 
     if (ms->m_arp.active) {
@@ -996,6 +1002,7 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
         int note_on_tick = mixr->midi_tick % PPNS;
         midi_event *on_event =
             new_midi_event(note_on_tick, 144, note, velocity);
+        on_event->tick_off = note_off_tick;
 
         minisynth_add_event(ms, ms->cur_melody, on_event);
         minisynth_add_event(ms, ms->cur_melody, off_event);
@@ -1524,24 +1531,41 @@ void minisynth_set_backup_mode(minisynth *ms, bool b)
 
 void minisynth_morph(minisynth *ms)
 {
-    if (mixr->debug_mode)
-        printf("MIGHTY MORPH!\n");
-
-    minisynth_set_octave(ms, ms->m_settings.m_octave - 1);
-    // minisynth_stop(ms);
-    // minisynth_reset_melody(ms, 0);
-    // for (int i = 0; i < PPNS; i++) {
-    //    if (ms->melodies[0][i] != NULL) {
-    //        midi_event_free(ms->melodies[0][i]);
-    //        ms->melodies[0][i] = NULL;
-    //    }
-    //}
-    // static const int NUM_MIDI_NOTES = 10;
-    // int midi_notes[10] = {0};
-    // int notes_returned = minisynth_get_notes_from_melody(
+    for (int i = 0; i < PPNS; i++)
+    {
+        midi_event *e = ms->melodies[0][i];
+        int rand_num = rand() % 3;
+        int rand_num2 = rand() % 3;
+        if (e != NULL && e->event_type == 144)
+        {
+            printf("KEY! %d - %d %d %d\n", i, e->event_type, e->data1, e->data2);
+            int randy = rand() % 3;
+            int i = 0;
+            switch(randy) {
+            case 0:
+                printf("Removing note\n");
+                minisynth_rm_micro_note(ms, 0, i);
+                break;
+            case 1:
+                printf("Duping note\n");
+                for (i = 0; i < rand_num; i++)
+                    minisynth_add_micro_note(ms, 0, rand_num2 *PPQN * i, e->data1);
+                break;
+            case 2:
+                printf("choosing a complimentary key\n");
+                break;
+            }
+        }
+    }
+    //minisynth_stop(ms);
+    //minisynth_reset_melody(ms, 0);
+    //const int NUM_MIDI_NOTES = 10;
+    //int midi_notes[10] = {0};
+    //int notes_returned = minisynth_get_notes_from_melody(
     //    (midi_event **)&ms->backup_melody_while_getting_crazy, midi_notes);
-    // int i, j = 0;
-    // if (notes_returned > 1) {
+    //printf("GOt %d notes\n", notes_returned);
+    //int i, j = 0;
+    //if (notes_returned > 1) {
     //    if (notes_returned < NUM_MIDI_NOTES) {
     //        int space_to_improv = NUM_MIDI_NOTES - notes_returned;
     //        int idx = NUM_MIDI_NOTES - space_to_improv;
@@ -1560,8 +1584,8 @@ void minisynth_morph(minisynth *ms)
     //        }
     //    }
     //}
-    // int randy = rand() % 6;
-    // for (i = 0; i < randy; i++) {
+    //int randy = rand() % 6;
+    //for (i = 0; i < randy; i++) {
     //    int note = midi_notes[rand() % 10];
     //    int amp = rand() % 128;
     //    int note_on_tick = rand() % PPNS;
@@ -1592,6 +1616,22 @@ void minisynth_stop(minisynth *ms)
         voice_reset(&ms->m_voices[i]->m_voice);
     }
 }
+
+int minisynth_get_num_notes(minisynth *ms)
+{
+    int notecount = 0;
+    for (int i = 0 ; i < ms->num_melodies; i++)
+    {
+        for ( int j = 0; j < PPNS; j++) {
+            midi_event *e = ms->melodies[i][j];
+            if ( e != NULL && e->event_type == 144)
+                notecount++;
+        }
+    }
+    return notecount;
+}
+        
+
 
 int minisynth_get_notes_from_melody(midi_event **melody,
                                     int return_midi_notes[10])
@@ -1664,9 +1704,10 @@ void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep,
         // int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
         int note_off_tick =
             (mstep +
-             (int)(PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth)) %
+             (int)(PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth)-7) %
             PPNS;
         midi_event *off = new_midi_event(note_off_tick, 128, midi_note, 128);
+        on->tick_off = note_off_tick;
 
         minisynth_add_event(ms, pattern_num, on);
         minisynth_add_event(ms, pattern_num, off);
@@ -1689,9 +1730,13 @@ void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
     if (is_valid_melody_num(ms, pat_num) && tick < PPNS) {
         if (ms->melodies[pat_num][tick] != NULL) {
             midi_event *ev = ms->melodies[ms->cur_melody][tick];
+            minisynth_midi_note_off(ms, ev->data1, ev->data2, false);
             ms->melodies[ms->cur_melody][tick] = NULL;
+            int tick_off = ev->tick_off;
             free(ev);
             printf("Deleted midi event at tick %d\n", tick);
+            if (tick_off)
+                minisynth_rm_micro_note(ms, pat_num, tick_off);
         }
         else {
             if (mixr->debug_mode)

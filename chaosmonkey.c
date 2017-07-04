@@ -73,11 +73,11 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool val)
 double chaosmonkey_gen_next(void *self)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
-    osc_update(&cm->m_lfo.osc);
-    double unused_quad = 0.0;
-    double lfo_out = lfo_do_oscillate(&cm->m_lfo.osc, &unused_quad);
-    minisynth *ms = (minisynth *)mixr->sound_generators[cm->soundgen];
-    minisynth_set_filter_mod(ms, lfo_out);
+    // osc_update(&cm->m_lfo.osc);
+    // double unused_quad = 0.0;
+    // double lfo_out = lfo_do_oscillate(&cm->m_lfo.osc, &unused_quad);
+    // minisynth *ms = (minisynth *)mixr->sound_generators[cm->soundgen];
+    // minisynth_set_filter_mod(ms, lfo_out);
     // switch (cm->chaos_mode) {
     // case (0):
     //     printf("CHAOS MODE ZERO\n");
@@ -87,7 +87,8 @@ double chaosmonkey_gen_next(void *self)
     //     break;
     // }
 
-    // if (mixr->is_sixteenth) { // && ((rand() % 100 > 90))) {
+    if (mixr->is_sixteenth) {
+    }
     //    if (mixr->soundgen_num > 1) // chaos monkey is counted as one
     //    {
     //        for (int i = 0; i < mixr->soundgen_num; i++) {

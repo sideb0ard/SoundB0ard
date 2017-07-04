@@ -22,6 +22,7 @@ typedef struct file_sample {
 
     int samplerate;
     int channels;
+    int frames;
 
     int loop_len;
 } file_sample;

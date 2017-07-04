@@ -230,6 +230,7 @@ void minisynth_sg_start(void *self);
 void minisynth_sg_stop(void *self);
 
 int minisynth_get_num_tracks(void *self);
+int minisynth_get_num_notes(minisynth *ms);
 void minisynth_make_active_track(void *self, int pattern_num);
 
 void minisynth_print(minisynth *ms);

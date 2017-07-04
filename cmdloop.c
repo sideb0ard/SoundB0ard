@@ -383,12 +383,12 @@ void interpret(char *line)
         else if (strncmp("loop", wurds[0], 4) == 0) {
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {
                 int loop_len = atoi(wurds[2]);
-                if (loop_len > 0) {
-                    int soundgen_num = add_looper(mixr, wurds[1], loop_len);
-                    printf("SOUNDGEN %d\n", soundgen_num);
-                    mixr->midi_control_destination = MIDILOOPER;
-                    mixr->active_midi_soundgen_num = soundgen_num;
-                }
+                // if (loop_len > 0) {
+                int soundgen_num = add_looper(mixr, wurds[1], loop_len);
+                printf("SOUNDGEN %d\n", soundgen_num);
+                mixr->midi_control_destination = MIDILOOPER;
+                mixr->active_midi_soundgen_num = soundgen_num;
+                //}
             }
             else {
                 int soundgen_num = atoi(wurds[1]);
@@ -908,7 +908,7 @@ void interpret(char *line)
                 if (strcmp("lowpass", wurds[0]) == 0)
                     add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
                                            val, LOWPASS);
-                else if (strcmp("highass", wurds[0]) == 0)
+                else if (strcmp("highpass", wurds[0]) == 0)
                     add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
                                            val, HIGHPASS);
                 else
@@ -1273,6 +1273,10 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         printf("Change gridsteps to %d\n", gridsteps);
         seq_set_gridsteps(seq, gridsteps);
     }
+    else if (strncmp("sloppy", wurds[2], 6) == 0) {
+        int sloppyjoe = atoi(wurds[3]);
+        seq_set_sloppiness(seq, sloppyjoe);
+    }
     else if (strncmp("print", wurds[2], 5) == 0) {
         int pattern_num = atoi(wurds[3]);
         if (seq_is_valid_pattern_num(seq, pattern_num)) {
@@ -1304,6 +1308,10 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             else if (strncmp("boombap", wurds[4], 7) == 0) {
                 printf("BOOMBAP!\n");
                 seq_set_markov_mode(seq, MARKOVBOOMBAP);
+            }
+            else if (strncmp("snare", wurds[4], 7) == 0) {
+                printf("MARKOVSNARE!\n");
+                seq_set_markov_mode(seq, MARKOVSNARE);
             }
         }
         if (strncmp("bitwise", wurds[3], 6) == 0) {

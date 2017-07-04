@@ -8,7 +8,7 @@
 
 #define NUM_SEQUENCER_PATTERNS 10
 
-enum { MARKOVHAUS, MARKOVBOOMBAP } markovmodez;
+enum { MARKOVHAUS, MARKOVBOOMBAP, MARKOVSNARE } markovmodez;
 enum { SIXTEENTH, TWENTYFOURTH } sequencer_grid_step;
 
 typedef int seq_pattern[PPBAR];
@@ -58,6 +58,8 @@ typedef struct sequencer {
     int bitwise_every_n_loops;
 
     int max_generation; // used for game of life, markov chain and bitwise
+
+    int sloppiness; // 0 - 10
 
 } sequencer;
 
@@ -118,3 +120,6 @@ void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom,
 void seq_add_micro_hit(sequencer *s, int pattern_num, int step);
 void seq_rm_micro_hit(sequencer *s, int pattern_num, int step);
 void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting);
+
+void seq_set_sloppiness(sequencer *s, int sloppy_setting);
+int sloppy_weight(sequencer *s);

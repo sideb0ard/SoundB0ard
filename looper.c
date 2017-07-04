@@ -260,6 +260,7 @@ void sample_import_file_contents(file_sample *fs, char *filename)
     fs->orig_file_size = bufsize;
     fs->samplerate = sf_info.samplerate;
     fs->channels = sf_info.channels;
+    fs->frames = sf_info.frames;
 }
 
 void looper_resample_to_loop_size(looper *l)
@@ -289,10 +290,15 @@ void looper_change_loop_len(looper *l, int sample_num, int loop_len)
 void sample_resample_to_loop_size(file_sample *fs)
 {
     printf("BUFSIZE is %d\n", fs->orig_file_size);
+    printf("FRAMES is %d\n", fs->frames);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples =
-        mixr->samples_per_midi_tick * PPBAR * fs->loop_len;
+    int loop_len_in_samples = 0;
+    if (fs->loop_len != 0)
+        loop_len_in_samples =
+            mixr->samples_per_midi_tick * PPBAR * fs->loop_len;
+    else
+        loop_len_in_samples = fs->frames;
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
@@ -454,7 +460,11 @@ void looper_scramble(looper *s)
 
     double *scrambled = s->scramblrrr->resampled_file_bytes;
     int len = s->scramblrrr->resampled_file_size;
-    int len16th = len / s->scramblrrr->loop_len / 16;
+    int len16th;
+    // if (s->scramblrrr->loop_len != 0)
+    //    len16th = len / s->scramblrrr->loop_len / 16;
+    // else
+    len16th = mixr->loop_len_in_samples / 16;
 
     // take a copy of the first 16th that we can randomly inject below.
     double first16th[len16th];

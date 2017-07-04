@@ -64,13 +64,12 @@ void seq_init(sequencer *seq)
     seq->bitwise_generation = 0;
     seq->bitwise_every_n_loops = 0;
 
+    seq->sloppiness = 0;
     seq->max_generation = 0;
 }
 
 bool seq_tick(sequencer *seq)
 {
-    // TODO - maybe rename this - the main reason is to know
-    // when we're at the start of a loop
     if (mixr->sixteenth_note_tick != seq->sixteenth_tick) {
         seq->sixteenth_tick = mixr->sixteenth_note_tick;
 
@@ -336,6 +335,13 @@ void next_life_generation(sequencer *s)
                                         SIXTEENTH);
 }
 
+int sloppy_weight(sequencer *s)
+{
+    if (!s->sloppiness)
+        return 0;
+    return rand() % (s->sloppiness * 10);
+}
+
 void next_markov_generation(sequencer *s)
 {
     memset(&s->patterns[0], 0, PPBAR * sizeof(int));
@@ -349,6 +355,8 @@ void next_markov_generation(sequencer *s)
         if (mixr->debug_mode)
             printf("Iiii %d Randy! %d\n", i, randy);
 
+        int position = i * PPSIXTEENTH;
+
         if (s->markov_mode == MARKOVHAUS) {
             if (mixr->debug_mode)
                 printf("HAUS MUSIC ALL NIGHT LONG!\n");
@@ -356,67 +364,67 @@ void next_markov_generation(sequencer *s)
             switch (i) {
             case 0:
                 if (randy < 95)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 1:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 2:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 3:
                 if (randy < 3)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 4:
                 if (randy < 95)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 5:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 6:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 7:
                 if (randy < 2)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 8:
                 if (randy < 95)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 9:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 10:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 11:
                 if (randy < 2)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 12:
                 if (randy < 95)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 13:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 14:
                 if (randy < 25)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 15:
                 if (randy < 2)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             }
         }
@@ -426,67 +434,197 @@ void next_markov_generation(sequencer *s)
             switch (i) {
             case 0:
                 if (randy < 95)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 1:
-                if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 5) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
                 break;
             case 2:
-                if (randy < 25)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 25) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
                 break;
             case 3:
-                if (randy < 35)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 35) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
                 break;
             case 4:
-                if (randy < 15)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 15) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
                 break;
             case 5:
-                if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 5) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
                 break;
             case 6:
-                if (randy < 25)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 25) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
                 break;
             case 7:
-                if (randy < 12)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 12) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
                 break;
             case 8:
-                if (randy < 95)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 95) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            case 9:
+                if (randy < 5) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            case 10:
+                if (randy < 5) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            case 11:
+                if (randy < 25) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            case 12:
+                if (randy < 5) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            case 13:
+                if (randy < 5) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            case 14:
+                if (randy < 25) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            case 15:
+                if (randy < 2) {
+                    if (rand() % 2) // positive
+                        s->patterns[s->cur_pattern]
+                                   [position + sloppy_weight(s)] = 1;
+                    else
+                        s->patterns[s->cur_pattern]
+                                   [position - sloppy_weight(s)] = 1;
+                }
+                break;
+            }
+        }
+        else if (s->markov_mode == MARKOVSNARE) {
+            switch (i) {
+            case 2:
+                if (randy < 4)
+                    s->patterns[s->cur_pattern][position] = 1;
+                break;
+            case 3:
+                if (randy < 3)
+                    s->patterns[s->cur_pattern][position] = 1;
+                break;
+            case 4:
+                if (randy < 90)
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 9:
                 if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 10:
-                if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
-                break;
-            case 11:
-                if (randy < 25)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 7)
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 12:
-                if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 90)
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 13:
-                if (randy < 5)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 10)
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 14:
-                if (randy < 25)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 10)
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             case 15:
-                if (randy < 2)
-                    s->patterns[s->cur_pattern][i * PPSIXTEENTH] = 1;
+                if (randy < 10)
+                    s->patterns[s->cur_pattern][position] = 1;
                 break;
             }
         }
@@ -503,14 +641,15 @@ void seq_status(sequencer *seq, wchar_t *status_string)
 {
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"\n      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d"
+        L"\n      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d "
         "markov_on: %d markov_mode: %s Markov_Every_n: %d Multi: %d Max Gen: %d"
-        L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d",
+        L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d"
+        "sloppy: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
         seq->pattern_len, seq->markov_on, seq->markov_mode ? "boombap" : "haus",
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
         seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on,
-        seq->euclidean_every_n_loops);
+        seq->euclidean_every_n_loops, seq->sloppiness);
     wchar_t pattern_details[128];
     char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];
@@ -877,4 +1016,9 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
             seq_mv_micro_hit(s, pattern_num, hit, hit + pulses_to_move);
         }
     }
+}
+
+void seq_set_sloppiness(sequencer *s, int sloppy_setting)
+{
+    s->sloppiness = sloppy_setting;
 }
