@@ -1551,21 +1551,22 @@ void minisynth_morph(minisynth *ms)
         int num_notes = minisynth_get_num_notes(ms);
 
         if (e != NULL && e->event_type == 144) {
-            printf("KEY! %d - %d %d %d\n", i, e->event_type, e->data1,
-                   e->data2);
+            //printf("KEY! %d - %d %d %d\n", i, e->event_type, e->data1,
+            //       e->data2);
 
             int randy = rand() % 3;
             int j = 0;
+            int new_note_num = 0;
             switch (randy) {
             case 0:
                 if (num_notes > 3) {
-                    printf("Removing note\n");
+                    //printf("Removing note\n");
                     minisynth_rm_micro_note(ms, 0, i);
                 }
                 break;
             case 1:
                 if (num_notes < 15) {
-                    printf("Duping note\n");
+                    //printf("Duping note\n");
                     for (j = 1; j < rand_num; j++) {
                         int next_note = (i + rand_num2 * PPSIXTEENTH * j) % PPNS;
                         minisynth_add_micro_note(ms, 0, next_note, e->data1);
@@ -1573,8 +1574,6 @@ void minisynth_morph(minisynth *ms)
                 }
                 break;
             case 2:
-                printf("choosing a complimentary key\n");
-                int new_note_num;
                 if (rand_num3)
                     new_note_num = e->data1 + 7;
                 else
@@ -1587,7 +1586,8 @@ void minisynth_morph(minisynth *ms)
             }
         }
     }
-    minisynth_print_melodies(ms);
+    //minisynth_print_melodies(ms);
+    minisynth_update(ms);
 }
 
 void minisynth_stop(minisynth *ms)
@@ -1681,7 +1681,7 @@ void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep,
                               int midi_note)
 {
     if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS) {
-        printf("New Notes!! %d - %d\n", mstep, midi_note);
+        //printf("New Notes!! %d - %d\n", mstep, midi_note);
         midi_event *on = new_midi_event(mstep, 144, midi_note, 128);
         // int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
         int note_off_tick =
@@ -1716,7 +1716,7 @@ void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
             ms->melodies[ms->cur_melody][tick] = NULL;
             int tick_off = ev->tick_off;
             free(ev);
-            printf("Deleted midi event at tick %d\n", tick);
+            //printf("Deleted midi event at tick %d\n", tick);
             if (tick_off)
                 minisynth_rm_micro_note(ms, pat_num, tick_off);
         }
