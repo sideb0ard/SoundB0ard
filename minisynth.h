@@ -187,7 +187,7 @@ void minisynth_reset_melody_all(minisynth *self);
 void minisynth_reset_voices(minisynth *self);
 void minisynth_melody_to_string(minisynth *self, int melody_num,
                                 wchar_t scratch[33]);
-void minisynth_add_event(minisynth *self, int pattern_num, midi_event *ev);
+int minisynth_add_event(minisynth *self, int pattern_num, midi_event *ev);
 void minisynth_delete_event(minisynth *ms, int pat_num, int tick);
 
 midi_event **minisynth_get_midi_loop(minisynth *self);
@@ -199,6 +199,7 @@ void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
 void minisynth_toggle_delay_mode(minisynth *ms);
 
 void minisynth_rand_settings(minisynth *ms);
+void minisynth_print_melodies(minisynth *ms);
 void minisynth_print_settings(minisynth *ms);
 bool minisynth_save_settings(minisynth *ms, char *preset_name);
 bool minisynth_load_settings(minisynth *ms, char *preset_name);

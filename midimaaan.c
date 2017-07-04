@@ -445,8 +445,8 @@ void midi_melody_print(midi_event **melody)
             }
             int delete = melody[i]->delete_after_use;
             printf("[Tick: %5d] - note: %4d velocity: %4d type: %s "
-                   "delete_after_use: %s\n",
-                   tick, data1, data2, type, delete ? "true" : "false");
+                   "tick_off: %d delete_after_use: %s\n",
+                   tick, data1, data2, type, melody[i]->tick_off, delete ? "true" : "false");
         }
     }
 }
