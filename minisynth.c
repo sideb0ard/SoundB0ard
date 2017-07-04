@@ -637,6 +637,7 @@ void minisynth_reset_melody(minisynth *ms, unsigned int melody_num)
             }
         }
     }
+    minisynth_stop(ms);
 }
 
 void minisynth_melody_to_string(minisynth *ms, int melody_num,
@@ -778,6 +779,7 @@ double minisynth_gennext(void *self)
         ms->tick = mixr->sixteenth_note_tick;
         if (ms->tick % 32 == 0) {
             if (ms->morph_mode) {
+                minisynth_stop(ms);
                 if (ms->morph_every_n_loops > 0) {
                     if (ms->morph_generation % ms->morph_every_n_loops == 0) {
                         minisynth_set_backup_mode(ms, true);
@@ -799,10 +801,6 @@ double minisynth_gennext(void *self)
                 }
                 ms->morph_generation++;
             }
-            // if (minisynth_get_num_notes(ms) == 0) {
-            //    minisynth_stop(ms);
-            //    minisynth_reset_melody(ms, 0);
-            //}
         }
     }
 
@@ -811,11 +809,11 @@ double minisynth_gennext(void *self)
         // top of the MS loop, which is two bars, check if we need to progress
         // to next loop
         if (idx == 0) {
-            if (ms->multi_melody_mode) {
+            if (ms->multi_melody_mode && ms->num_melodies > 1) {
                 ms->cur_melody_iteration--;
                 if (ms->cur_melody_iteration == 0) {
                     // if (!ms->m_settings.m_sustain_override)
-                    //     minisynth_stop(ms);
+                    minisynth_stop(ms);
                     ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
                     ms->cur_melody_iteration =
                         ms->melody_multiloop_count[ms->cur_melody];

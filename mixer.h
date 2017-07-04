@@ -88,7 +88,7 @@ void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 const compat_key_list *mixer_get_compat_notes(mixer *mixr);
-void mixer_generate_melody(mixer *mixr);
+void mixer_generate_melody(mixer *mixr, int synthnum, int pattern_num);
 
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);

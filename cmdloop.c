@@ -41,6 +41,7 @@
 #include "waveshaper.h"
 
 extern mixer *mixr;
+extern char *key_names[NUM_KEYS];
 
 extern wtable *wave_tables[5];
 
@@ -101,7 +102,25 @@ void interpret(char *line)
         }
 
         else if (strncmp("generate", wurds[0], 8) == 0) {
-            mixer_generate_melody(mixr);
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                int melody_num = atoi(wurds[2]);
+                mixer_generate_melody(mixr, soundgen_num, melody_num);
+            }
+        }
+        else if (strncmp("keys", wurds[0], 4) == 0) {
+            for (int i = 0; i < NUM_KEYS; i++) {
+                char *key = key_names[i];
+                printf("%d [%s] ", i, key);
+            }
+            printf("\n");
+        }
+        else if (strncmp("key", wurds[0], 3) == 0) {
+            int key = atoi(wurds[1]);
+            if (key >= 0 && key < NUM_KEYS) {
+                printf("Changing KEY!\n");
+                mixr->key = key;
+            }
         }
         else if (strncmp("new", wurds[0], 3) == 0) {
             if (strncmp("spork", wurds[1], 5) == 0) {
