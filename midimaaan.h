@@ -15,7 +15,8 @@ typedef struct midi_event {
     unsigned data1;
     unsigned data2;
     bool delete_after_use;
-    unsigned tick_off; // if this is a key on event, keep track of corresponding key off
+    unsigned tick_off; // if this is a key on event, keep track of corresponding
+                       // key off
 } midi_event;
 
 typedef midi_event *midi_events_loop_t[PPNS];
