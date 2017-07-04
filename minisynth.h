@@ -154,7 +154,6 @@ double minisynth_getvol(void *self);
 
 // Will Pirkle model
 bool minisynth_prepare_for_play(minisynth *synth);
-void minisynth_user_interface_change(minisynth *synth);
 
 void minisynth_stop(minisynth *ms);
 

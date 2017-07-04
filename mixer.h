@@ -29,6 +29,8 @@ typedef struct scene {
     soundgen_track soundgen_tracks[MAX_TRACKS_PER_SCENE];
 } scene;
 
+typedef unsigned int compat_key_list[6];
+
 typedef struct t_mixer {
 
     SOUNDGEN **sound_generators;
@@ -75,6 +77,9 @@ typedef struct t_mixer {
     bool scene_start_pending;
 
     double volume;
+
+    unsigned int key;
+
 } mixer;
 
 mixer *new_mixer(void);
@@ -82,6 +87,8 @@ mixer *new_mixer(void);
 void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
+const compat_key_list *mixer_get_compat_notes(mixer *mixr);
+void mixer_generate_melody(mixer *mixr);
 
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);

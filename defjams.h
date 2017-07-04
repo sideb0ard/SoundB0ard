@@ -40,6 +40,8 @@
 
 #define NHARMS 7 // number of harmonics
 
+#define NUM_COMPAT_NOTES 6
+
 // #define sparkchars L"\u2581\u2582\u2583\u2585\u2586\u2587"
 
 #define ANSI_COLOR_BLUE "\x1b[34m"
@@ -94,6 +96,22 @@ typedef enum {
     SPORK_TYPE,
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;
+
+typedef enum {
+    C_MAJOR,       // midi 24
+    G_MAJOR,       //  31
+    D_MAJOR,       // 26
+    A_MAJOR,       // 33
+    E_MAJOR,       // 28
+    B_MAJOR,       // 35
+    F_SHARP_MAJOR, // 30
+    D_FLAT_MAJOR,  // 25
+    A_FLAT_MAJOR,  // 32
+    E_FLAT_MAJOR,  // 27
+    B_FLAT_MAJOR,  // 34
+    F_MAJOR,       // 29
+    NUM_KEYS
+} key_type;
 
 typedef enum { MONO, LEGATO } legato_mode;
 typedef enum {

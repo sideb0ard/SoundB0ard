@@ -21,10 +21,37 @@
 #include "sound_generator.h"
 #include "spork.h"
 #include "synthdrum_sequencer.h"
+#include "utils.h"
 
 extern ENVSTREAM *ampstream;
 
 extern mixer *mixr;
+
+const char *key_names[] = {
+    "C_MAJOR",      "G_MAJOR",      "D_MAJOR",       "A_MAJOR",
+    "E_MAJOR",      "B_MAJOR",      "F_SHARP_MAJOR", "D_FLAT_MAJOR",
+    "A_FLAT_MAJOR", "E_FLAT_MAJOR", "B_FLAT_MAJOR",  "F_MAJOR",
+};
+
+const int key_midi_mapping[] = {24, 31, 26, 33, 28, 35, 30, 25, 32, 27, 34, 29};
+
+// typedef unsigned int compat_key_list[6];
+const compat_key_list compat_keys[] = {
+    {C_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, F_MAJOR, G_MAJOR, A_FLAT_MAJOR},
+    {G_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, C_MAJOR, D_MAJOR, E_FLAT_MAJOR},
+    {D_MAJOR, E_FLAT_MAJOR, F_SHARP_MAJOR, G_MAJOR, A_MAJOR, B_FLAT_MAJOR},
+    {A_MAJOR, B_FLAT_MAJOR, D_FLAT_MAJOR, D_MAJOR, E_MAJOR, F_SHARP_MAJOR},
+    {E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, A_MAJOR, B_MAJOR, D_FLAT_MAJOR},
+    {B_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR},
+    {F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, B_MAJOR, D_FLAT_MAJOR,
+     E_FLAT_MAJOR},
+    // TODO(finish)!
+    // {D_FLAT_MAJOR, E_FLAT_MAJOR, E_FLAT_MAJOR,
+    // {A_FLAT_MAJOR,
+    // {E_FLAT_MAJOR,
+    // {B_FLAT_MAJOR,
+    // {F_MAJOR,
+};
 
 mixer *new_mixer()
 {
@@ -54,6 +81,8 @@ mixer *new_mixer()
     mixr->num_scenes = 1;
     mixr->current_scene = -1;
 
+    mixr->key = C_MAJOR;
+
     return mixr;
 }
 
@@ -62,6 +91,7 @@ void mixer_ps(mixer *mixr)
     printf(COOL_COLOR_MAUVE
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
            "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
+           "] Key: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
            " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
            " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
            " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
@@ -69,9 +99,10 @@ void mixer_ps(mixer *mixr)
            " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
            "::::: PPQN: %d PPSIXTEENTH: %d PPTWENTYFOURTH: %d PPBAR: %d PPNS: "
            "%d " ANSI_COLOR_RESET,
-           mixr->volume, mixr->bpm, mixr->midi_tick, mixr->sixteenth_note_tick,
-           mixr->current_scene, mixr->debug_mode ? "true" : "false", PPQN,
-           PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS);
+           mixr->volume, key_names[mixr->key], mixr->bpm, mixr->midi_tick,
+           mixr->sixteenth_note_tick, mixr->current_scene,
+           mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH,
+           PPTWENTYFOURTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0) {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
@@ -136,6 +167,41 @@ void mixer_ps(mixer *mixr)
     }
 
     printf(ANSI_COLOR_RESET);
+}
+
+void mixer_generate_melody(mixer *mixr)
+{
+    int rand_num_notes = (rand() % 5) + 2;
+    int generated_melody_note_num[NUM_COMPAT_NOTES];
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+        generated_melody_note_num[i] = -99;
+    int generated_melody_note_num_idx = 0;
+    while (generated_melody_note_num_idx < rand_num_notes) {
+        int randy = rand() % (NUM_COMPAT_NOTES);
+        if (!is_int_member_in_array(randy, generated_melody_note_num,
+                                    NUM_COMPAT_NOTES)) {
+            generated_melody_note_num[generated_melody_note_num_idx++] = randy;
+        }
+    }
+
+    printf("They are: ");
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+        if (generated_melody_note_num[i] != -99)
+            printf("%d ", generated_melody_note_num[i]);
+    printf("\n");
+
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++) {
+        if (generated_melody_note_num[i] != -99) {
+            int idx = generated_melody_note_num[i];
+            printf("Compat: %s\n", key_names[compat_keys[0][idx]]);
+            printf("Compat: %d\n", key_midi_mapping[compat_keys[0][idx]]);
+        }
+    }
+}
+
+const compat_key_list *mixer_get_compat_notes(mixer *mixr)
+{
+    return &compat_keys[mixr->key];
 }
 
 void mixer_update_bpm(mixer *mixr, int bpm)

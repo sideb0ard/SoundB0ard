@@ -100,6 +100,9 @@ void interpret(char *line)
                 mixer_update_bpm(mixr, bpm);
         }
 
+        else if (strncmp("generate", wurds[0], 8) == 0) {
+            mixer_generate_melody(mixr);
+        }
         else if (strncmp("new", wurds[0], 3) == 0) {
             if (strncmp("spork", wurds[1], 5) == 0) {
                 printf("Sp0rky!\n");
