@@ -473,10 +473,12 @@ void next_markov_generation(sequencer *s)
                 if (randy < 15) {
                     if (randyTripleOrDouble > 90 && randyTripleOrDouble < 95) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)] = 1;
+                        s->patterns[s->cur_pattern]
+                                   [position + (PPSIXTEENTH / 2)] = 1;
                     }
                     else if (randyTripleOrDouble > 95) {
-                        s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)*2] = 1;
+                        s->patterns[s->cur_pattern]
+                                   [position + (PPSIXTEENTH / 4) * 3] = 1;
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -520,10 +522,12 @@ void next_markov_generation(sequencer *s)
                 if (randy < 95) {
                     if (randyTripleOrDouble > 80 && randyTripleOrDouble < 95) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)] = 1;
+                        s->patterns[s->cur_pattern]
+                                   [position + (PPSIXTEENTH / 2)] = 1;
                     }
                     else if (randyTripleOrDouble > 95) {
-                        s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)*2] = 1;
+                        s->patterns[s->cur_pattern]
+                                   [position + (PPSIXTEENTH / 4) * 3] = 1;
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -567,10 +571,12 @@ void next_markov_generation(sequencer *s)
                 if (randy < 5) {
                     if (randyTripleOrDouble > 90 && randyTripleOrDouble < 95) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)] = 1;
+                        s->patterns[s->cur_pattern]
+                                   [position + (PPSIXTEENTH / 3)] = 1;
                     }
                     else if (randyTripleOrDouble > 95) {
-                        s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)*2] = 1;
+                        s->patterns[s->cur_pattern]
+                                   [position + (PPSIXTEENTH / 3) * 2] = 1;
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -594,7 +600,8 @@ void next_markov_generation(sequencer *s)
                 if (randy < 25) {
                     if (randyTripleOrDouble > 90 && randyTripleOrDouble < 95) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)] = 1;
+                        s->patterns[s->cur_pattern]
+                                   [position + (PPSIXTEENTH / 2)] = 1;
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -641,10 +648,12 @@ void next_markov_generation(sequencer *s)
             case 12:
                 if (randyTripleOrDouble > 90 && randyTripleOrDouble < 95) {
                     s->patterns[s->cur_pattern][position] = 1;
-                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)] = 1;
+                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH / 2)] =
+                        1;
                 }
                 else if (randyTripleOrDouble > 95) {
-                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)*2] = 1;
+                    s->patterns[s->cur_pattern]
+                               [position + (PPSIXTEENTH / 4) * 3] = 1;
                 }
                 else if (randy < 90)
                     s->patterns[s->cur_pattern][position] = 1;
@@ -652,10 +661,12 @@ void next_markov_generation(sequencer *s)
             case 13:
                 if (randyTripleOrDouble > 90 && randyTripleOrDouble < 95) {
                     s->patterns[s->cur_pattern][position] = 1;
-                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)] = 1;
+                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH / 2)] =
+                        1;
                 }
                 else if (randyTripleOrDouble > 95) {
-                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH/3)*2] = 1;
+                    s->patterns[s->cur_pattern]
+                               [position + (PPSIXTEENTH / 4) * 3] = 1;
                 }
                 else if (randy < 10)
                     s->patterns[s->cur_pattern][position] = 1;

@@ -390,8 +390,13 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
 
         v->m_note_on = true;
         v->m_timestamp = 0;
-        return;
+
+        return; // ESCAPE HATCH, ALL DONE
     }
+
+    // if we get here, we need to steal a note
+    //
+    // this checks if we're already stealing this note - then no-op, just rturn
     if (v->m_note_pending && v->m_midi_note_number_pending == midi_note)
         return;
 

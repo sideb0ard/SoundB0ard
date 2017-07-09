@@ -1,7 +1,10 @@
 #include <stdlib.h>
 
 #include "dynamics_processor.h"
+#include "mixer.h"
 #include "utils.h"
+
+extern mixer *mixr;
 
 const char *dynamics_processor_type_to_char[] = {"COMP", "LIMIT", "EXPAND",
                                                  "GATE"};
@@ -23,6 +26,7 @@ dynamics_processor *new_dynamics_processor(void)
     dp->m_knee_width = 0;        // 0 - 20
     dp->m_processor_type = COMP; // 0-3 COMP, LIMIT, EXPAND GATE
     dp->m_time_constant = 0;     // digital, analog
+    dp->m_external_source = -99; //
 
     dynamics_processor_init(dp);
 
@@ -68,7 +72,7 @@ double dynamics_processor_calc_compression_gain(double detector_val,
         y[1] = cs;
         cs = lagrpol(&x[0], &y[0], 2, detector_val);
     }
-    double yg = cs * (threshold = detector_val);
+    double yg = cs * (threshold - detector_val);
     yg = min(0, yg);
     return pow(10.0, yg / 20.0);
 }
@@ -212,14 +216,16 @@ void dynamics_processor_status(void *self, char *status_string)
     snprintf(status_string, MAX_PS_STRING_SZ,
              "inputgain:%.2f threshold:%.2f attackms:%.2f releasems:%.2f "
              "ratio:%.2f outputgain:%.2f kneewidth:%.2f lookahead:%.2f "
-             "sterolink:%s(%d) type:%s(%d) mode:%s(%d)",
+             "sterolink:%s(%d)"
+             "\n      [type:%s(%d) mode:%s(%d) extsource:%s(%d)",
              dp->m_inputgain_db, dp->m_threshold, dp->m_attack_ms,
              dp->m_release_ms, dp->m_ratio, dp->m_outputgain_db,
              dp->m_knee_width, dp->m_lookahead_delay_ms,
              dp->m_stereo_link ? "ON" : "OFF", dp->m_stereo_link,
              dynamics_processor_type_to_char[dp->m_processor_type],
              dp->m_processor_type, dp->m_time_constant ? "DIGITAL" : "ANALOG",
-             dp->m_time_constant);
+             dp->m_time_constant, dp->m_external_source < 0 ? "off" : "on",
+             dp->m_external_source);
 }
 
 double dynamics_processor_process(void *self, double input)
@@ -234,8 +240,12 @@ double dynamics_processor_process(void *self, double input)
     // double xn_l = inputgain * input;
     // double xn_r = 0.;
 
+    double left_detector_input = input;
+    if (dp->m_external_source >= 0)
+        left_detector_input = mixr->soundgen_cur_val[dp->m_external_source];
+
     double left_detector =
-        envelope_detector_detect(&dp->m_left_detector, input);
+        envelope_detector_detect(&dp->m_left_detector, left_detector_input);
     double right_detector = left_detector;
 
     // TODO - something useful with stero
@@ -243,17 +253,21 @@ double dynamics_processor_process(void *self, double input)
     double link_detector = left_detector;
     double gn = 1.;
 
-    if (dp->m_stereo_link == 0) // on
-    {
+    if (dp->m_stereo_link == 1) {
         link_detector = 0.5 * (pow(10.0, left_detector / 20.0) +
                                pow(10.0, right_detector / 20.0));
         link_detector = 20.0 * log10(link_detector);
     }
 
-    if (dp->m_processor_type == COMP)
+    if (dp->m_processor_type == COMP) {
+        double tmpgn = gn;
         gn = dynamics_processor_calc_compression_gain(
             link_detector, dp->m_threshold, dp->m_ratio, dp->m_knee_width,
             false);
+        // if (gn == tmpgn) {
+        //    printf("NOTHING HAPPENED!\n");
+        //}
+    }
     else if (dp->m_processor_type == LIMIT)
         gn = dynamics_processor_calc_compression_gain(
             link_detector, dp->m_threshold, dp->m_ratio, dp->m_knee_width,
@@ -274,4 +288,15 @@ double dynamics_processor_process(void *self, double input)
     // returnval = gn * input * outputgain;
     // returnval = gn * input * inputgain;
     return returnval;
+}
+
+void dynamics_processor_set_external_source(dynamics_processor *dp,
+                                            unsigned int val)
+{
+    if (val < 99) {
+        if (mixer_is_valid_soundgen_num(mixr, val))
+            dp->m_external_source = val;
+    }
+    else
+        dp->m_external_source = -99; // TODO less shitty mechanism!
 }

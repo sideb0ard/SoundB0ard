@@ -999,6 +999,8 @@ void interpret(char *line)
                         dynamics_processor_set_processor_type(dp, val);
                     else if (strncmp("mode", wurds[3], 4) == 0)
                         dynamics_processor_set_time_constant(dp, val);
+                    else if (strncmp("exsource", wurds[3], 9) == 0)
+                        dynamics_processor_set_external_source(dp, val);
                 }
                 else if (f->type == REVERB) {
                     // printf("Re-re-re----verb!\n");

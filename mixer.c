@@ -353,8 +353,9 @@ double mixer_gennext(mixer *mixr)
     if (mixr->soundgen_num > 0) {
         for (int i = 0; i < mixr->soundgen_num; i++) {
             if (mixr->sound_generators[i] != NULL) {
-                output_val += mixr->sound_generators[i]->gennext(
+                mixr->soundgen_cur_val[i] = mixr->sound_generators[i]->gennext(
                     mixr->sound_generators[i]);
+                output_val += mixr->soundgen_cur_val[i];
             }
         }
     }

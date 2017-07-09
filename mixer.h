@@ -12,6 +12,7 @@
 
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
+#define MAX_NUM_SOUNDGEN 100
 
 typedef struct environment_variable {
     char key[ENVIRONMENT_KEY_SIZE];
@@ -36,6 +37,11 @@ typedef struct t_mixer {
     SOUNDGEN **sound_generators;
     int soundgen_num;  // actual number of SGs
     int soundgen_size; // number of memory slots reserved for SGszz
+
+    double soundgen_cur_val[MAX_NUM_SOUNDGEN]; // cache for current val,
+                                               // currently used for sidechain
+                                               // compressor TODO there are no
+                                               // checks for this num
 
     env_var environment[ENVIRONMENT_ARRAY_SIZE];
     int env_var_count;

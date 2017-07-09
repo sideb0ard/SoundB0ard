@@ -839,7 +839,6 @@ double minisynth_gennext(void *self)
         ms->tick = mixr->sixteenth_note_tick;
         if (ms->tick % 32 == 0) {
             if (ms->morph_mode) {
-                minisynth_stop(ms);
                 if (ms->morph_every_n_loops > 0) {
                     if (ms->morph_generation % ms->morph_every_n_loops == 0) {
                         minisynth_set_backup_mode(ms, true);
@@ -872,9 +871,21 @@ double minisynth_gennext(void *self)
             if (ms->multi_melody_mode && ms->num_melodies > 1) {
                 ms->cur_melody_iteration--;
                 if (ms->cur_melody_iteration == 0) {
-                    // if (!ms->m_settings.m_sustain_override)
-                    minisynth_stop(ms);
-                    ms->cur_melody = (ms->cur_melody + 1) % ms->num_melodies;
+                    int next_melody = (ms->cur_melody + 1) % ms->num_melodies;
+                    for (int i = 0; i < PPNS; i++) {
+                        if (ms->melodies[ms->cur_melody][i] != NULL) {
+                            midi_event *ev = ms->melodies[ms->cur_melody][i];
+                            // COPY all note off events
+                            if (ev->event_type == 128) {
+                                midi_event *tmp =
+                                    new_midi_event(ev->tick, ev->event_type,
+                                                   ev->data1, ev->data2);
+                                tmp->delete_after_use = true;
+                                minisynth_add_event(ms, next_melody, tmp);
+                            }
+                        }
+                    }
+                    ms->cur_melody = next_melody;
                     ms->cur_melody_iteration =
                         ms->melody_multiloop_count[ms->cur_melody];
                 }
@@ -938,6 +949,19 @@ int minisynth_add_event(minisynth *ms, int melody_num, midi_event *ev)
     ev->tick = tick;
     ms->melodies[melody_num][tick] = ev;
     return tick;
+}
+
+void minisynth_clear_melody_ready_for_new_one(minisynth *ms, int melody_num)
+{
+    for (int i = 0; i < PPNS; i++) {
+        if (ms->melodies[melody_num][i] != NULL) {
+            midi_event *ev = ms->melodies[melody_num][i];
+            if (ev->event_type == 144) {
+                free(ms->melodies[melody_num][i]);
+                ms->melodies[melody_num][i] = NULL;
+            }
+        }
+    }
 }
 
 midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)

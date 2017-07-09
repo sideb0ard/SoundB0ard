@@ -28,6 +28,8 @@ typedef struct dynamics_processor {
     unsigned int m_stereo_link;    // on, off
     unsigned int m_processor_type; // comp, limit, expand, gate
     unsigned int m_time_constant;  // digital, analog
+    int m_external_source; // a soundgenerator id that will correspond to mixer
+                           // input cache
 
 } dynamics_processor;
 
@@ -64,3 +66,5 @@ void dynamics_processor_set_processor_type(dynamics_processor *dp,
                                            unsigned int val);
 void dynamics_processor_set_time_constant(dynamics_processor *dp,
                                           unsigned int val);
+void dynamics_processor_set_external_source(dynamics_processor *dp,
+                                            unsigned int val);
