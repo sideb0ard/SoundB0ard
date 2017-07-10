@@ -1453,6 +1453,31 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             seq_set_markov(seq, 1 - seq->markov_on);
         }
     }
+    else if (strncmp("shuffle", wurds[2], 7) == 0) {
+        if (strncmp("every", wurds[3], 5) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_shuffle(seq, true);
+                seq->shuffle_every_n_loops = num_gens;
+            }
+            else {
+                printf("Need a number for every 'n'\n");
+            }
+        }
+        else if (strncmp("for", wurds[3], 3) == 0) {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0) {
+                seq_set_shuffle(seq, true);
+                seq_set_max_generations(seq, num_gens);
+            }
+            else {
+                printf("Need a number for 'for'\n");
+            }
+        }
+        else {
+            seq_set_shuffle(seq, 1 - seq->shuffle_on);
+        }
+    }
     else if (strncmp("bitwise", wurds[2], 4) == 0) {
         if (strncmp("every", wurds[3], 5) == 0) {
             int num_gens = atoi(wurds[4]);

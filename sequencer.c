@@ -54,6 +54,10 @@ void seq_init(sequencer *seq)
     seq->randamp_generation = 0;
     seq->randamp_every_n_loops = 0;
 
+    seq->shuffle_on = false;
+    seq->shuffle_generation = 0;
+    seq->shuffle_every_n_loops = 0;
+
     seq->markov_on = false;
     seq->markov_mode = MARKOVBOOMBAP;
     seq->markov_generation = 0;
@@ -72,6 +76,32 @@ bool seq_tick(sequencer *seq)
 {
     if (mixr->sixteenth_note_tick != seq->sixteenth_tick) {
         seq->sixteenth_tick = mixr->sixteenth_note_tick;
+
+        if (seq->sixteenth_tick % 4 == 0)
+        {
+            if (seq->shuffle_on) {
+                if (seq->shuffle_every_n_loops > 0) {
+                    if (seq->shuffle_generation % seq->shuffle_every_n_loops ==
+                        0) {
+                        seq_set_backup_mode(seq, true);
+                        next_shuffle_generation(seq);
+                    }
+                    else {
+                        seq_set_backup_mode(seq, false);
+                    }
+                }
+                else if (seq->max_generation > 0) {
+                    if (seq->shuffle_generation >= seq->max_generation) {
+                        seq->shuffle_generation = 0;
+                        seq_set_shuffle(seq, false);
+                    }
+                }
+                else {
+                    next_shuffle_generation(seq);
+                }
+                seq->shuffle_generation++;
+            }
+        }
 
         if (seq->sixteenth_tick % 16 == 0) {
 
@@ -342,6 +372,29 @@ int sloppy_weight(sequencer *s)
     return rand() % (s->sloppiness * 10);
 }
 
+void next_shuffle_generation(sequencer *s)
+{
+    int positions_to_shuffle[100] = {0};
+    int positions_to_shuffle_idx = 0;
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (s->patterns[s->cur_pattern][i])
+        {
+            positions_to_shuffle[positions_to_shuffle_idx++] = i;
+            s->patterns[s->cur_pattern][i] = 0;
+        }
+    }
+
+    if (positions_to_shuffle_idx > 0)
+    {
+        for (int i = 0; i < positions_to_shuffle_idx; ++i)
+        {
+            int newposition = (positions_to_shuffle[i]+PPSIXTEENTH*3) % PPBAR;
+            s->patterns[s->cur_pattern][newposition] = 1;
+        }
+    }
+}
+
 void next_markov_generation(sequencer *s)
 {
     memset(&s->patterns[0], 0, PPBAR * sizeof(int));
@@ -351,7 +404,8 @@ void next_markov_generation(sequencer *s)
         return;
     }
 
-    for (int i = 0; i < s->pattern_len; i++) {
+    for (int i = 0; i < s->pattern_len; i++)
+    {
         int randy = rand() % 100;
         int randyTripleOrDouble = rand() % 100;
 
@@ -700,12 +754,12 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         L"\n      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d "
         "markov_on: %d markov_mode: %s Markov_Every_n: %d Multi: %d Max Gen: %d"
         L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d"
-        "sloppy: %d",
+        "sloppy: %d shuffle_on: %d shuffle_every_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
         seq->pattern_len, seq->markov_on, seq->markov_mode ? "boombap" : "haus",
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
         seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on,
-        seq->euclidean_every_n_loops, seq->sloppiness);
+        seq->euclidean_every_n_loops, seq->sloppiness, seq->shuffle_on, seq->shuffle_every_n_loops);
     wchar_t pattern_details[128];
     char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];
@@ -874,6 +928,8 @@ void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
 }
 
 void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }
+
+void seq_set_shuffle(sequencer *s, bool b) { s->shuffle_on = b; }
 
 void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
                                          wchar_t *bin_num)
