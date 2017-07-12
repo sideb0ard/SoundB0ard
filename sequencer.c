@@ -77,8 +77,7 @@ bool seq_tick(sequencer *seq)
     if (mixr->sixteenth_note_tick != seq->sixteenth_tick) {
         seq->sixteenth_tick = mixr->sixteenth_note_tick;
 
-        if (seq->sixteenth_tick % 4 == 0)
-        {
+        if (seq->sixteenth_tick % 4 == 0) {
             if (seq->shuffle_on) {
                 if (seq->shuffle_every_n_loops > 0) {
                     if (seq->shuffle_generation % seq->shuffle_every_n_loops ==
@@ -376,20 +375,17 @@ void next_shuffle_generation(sequencer *s)
 {
     int positions_to_shuffle[100] = {0};
     int positions_to_shuffle_idx = 0;
-    for (int i = 0; i < PPBAR; i++)
-    {
-        if (s->patterns[s->cur_pattern][i])
-        {
+    for (int i = 0; i < PPBAR; i++) {
+        if (s->patterns[s->cur_pattern][i]) {
             positions_to_shuffle[positions_to_shuffle_idx++] = i;
             s->patterns[s->cur_pattern][i] = 0;
         }
     }
 
-    if (positions_to_shuffle_idx > 0)
-    {
-        for (int i = 0; i < positions_to_shuffle_idx; ++i)
-        {
-            int newposition = (positions_to_shuffle[i]+PPSIXTEENTH*3) % PPBAR;
+    if (positions_to_shuffle_idx > 0) {
+        for (int i = 0; i < positions_to_shuffle_idx; ++i) {
+            int newposition =
+                (positions_to_shuffle[i] + PPSIXTEENTH * 3) % PPBAR;
             s->patterns[s->cur_pattern][newposition] = 1;
         }
     }
@@ -404,8 +400,7 @@ void next_markov_generation(sequencer *s)
         return;
     }
 
-    for (int i = 0; i < s->pattern_len; i++)
-    {
+    for (int i = 0; i < s->pattern_len; i++) {
         int randy = rand() % 100;
         int randyTripleOrDouble = rand() % 100;
 
@@ -525,8 +520,7 @@ void next_markov_generation(sequencer *s)
                 break;
             case 4:
                 if (randy < 15) {
-                    if (randyTripleOrDouble > 90)
-                    {
+                    if (randyTripleOrDouble > 90) {
                         s->patterns[s->cur_pattern][position] = 1;
                         s->patterns[s->cur_pattern]
                                    [position + (PPSIXTEENTH / 3)] = 1;
@@ -575,13 +569,11 @@ void next_markov_generation(sequencer *s)
                 break;
             case 8:
                 if (randy < 95) {
-                    if (randyTripleOrDouble > 80)
-                    {
+                    if (randyTripleOrDouble > 80) {
                         s->patterns[s->cur_pattern][position] = 1;
                         s->patterns[s->cur_pattern]
                                    [position + (PPSIXTEENTH / 3)] = 1;
-                        if (randyTripleOrDouble > 95)
-                        {
+                        if (randyTripleOrDouble > 95) {
                             s->patterns[s->cur_pattern]
                                        [position + (PPSIXTEENTH / 6) * 4] = 1;
                         }
@@ -759,7 +751,8 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         seq->pattern_len, seq->markov_on, seq->markov_mode ? "boombap" : "haus",
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
         seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on,
-        seq->euclidean_every_n_loops, seq->sloppiness, seq->shuffle_on, seq->shuffle_every_n_loops);
+        seq->euclidean_every_n_loops, seq->sloppiness, seq->shuffle_on,
+        seq->shuffle_every_n_loops);
     wchar_t pattern_details[128];
     char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];

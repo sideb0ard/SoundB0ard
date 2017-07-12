@@ -1383,44 +1383,28 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
 
 void minisynth_print_settings(minisynth *ms)
 {
-    printf(COOL_COLOR_PINK);
-    printf("Attack time ms (attackms): %f [%d-%d]\n",
+    printf(COOL_COLOR_PINK); // EG
+    printf("EG1 Attack time ms (attackms): %f [%d-%d]\n",
            ms->m_settings.m_attack_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
-    printf("Decay / Release Time ms (decayms): %f [%d-%d]\n",
+    printf("EG1 Decay / Release Time ms (decayms): %f [%d-%d]\n",
            ms->m_settings.m_decay_release_time_msec, EG_MINTIME_MS,
            EG_MAXTIME_MS);
-    printf("Sustain Level (sustainlvl): %f [0-1]\n",
+    printf("EG1 Sustain Level (sustainlvl): %f [0-1]\n",
            ms->m_settings.m_sustain_level);
-    printf("Sustain Time ms  (sustainms): %f [10-2000]\n",
+    printf("EG1 Sustain Time ms  (sustainms): %f [10-2000]\n",
            ms->m_settings.m_sustain_time_ms);
-    printf("Sustain Time Sixteenths  (sustain16th): %f [1-16]\n",
+    printf("EG1 Sustain Time Sixteenths  (sustain16th): %f [1-16]\n",
            ms->m_settings.m_sustain_time_sixteenth);
-    printf("Sustain Override (sustain): %d [0,1]\n",
+    printf("EG1 Sustain Override (sustain): %d [0,1]\n",
            ms->m_settings.m_sustain_override); // bool
-    printf(COOL_COLOR_GREEN);
-    printf("Delay Feedback Pct (delayfb): %f [0-100]\n",
-           ms->m_settings.m_feedback_pct);
-    printf("Delay Ratio (delayr): %f [-1-1]\n", ms->m_settings.m_delay_ratio);
-    printf("Delay Mode (delaymode): %d [0-%d]\n", ms->m_settings.m_delay_mode,
-           MAX_NUM_DELAY_MODE - 1); // unsigned int
-    printf("Delay Time ms (delayms): %f [%d-%d]\n",
-           ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, 2000);
-    printf("Delay Wet Mix (delaymx): %f [0-1]\n", ms->m_settings.m_wet_mix);
-    printf(ANSI_COLOR_YELLOW);
     printf("EG1 DCA Intensity (eg1dcaint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_dca_intensity);
     printf("EG1 Filter Intensity (eg1filterint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_filter_intensity);
     printf("EG1 OSc Intensity (eg1oscint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_osc_intensity);
-    printf(ANSI_COLOR_WHITE);
-    printf("Filter Cutoff (fc): %f [80-18000]\n", ms->m_settings.m_fc_control);
-    printf("Filter Q Control (fq): [1-10]%f\n", ms->m_settings.m_q_control);
-    printf("Filter Keytrack Intensity (ktint): %f [0.5-10]\n",
-           ms->m_settings.m_filter_keytrack_intensity);
-    printf("Filter Keytrack (kt): %d [0-1]\n",
-           ms->m_settings.m_filter_keytrack); // unsigned
-    printf(ANSI_COLOR_MAGENTA);
+
+    printf(COOL_COLOR_GREEN); // LFO
     printf("LFO1 Amp Intensity (lfo1ampint): %f [0-1]\n",
            ms->m_settings.m_lfo1_amp_intensity);
     printf("LFO AMp (lfo1amp): %f [0-1]\n", ms->m_settings.m_lfo1_amplitude);
@@ -1434,11 +1418,20 @@ void minisynth_print_settings(minisynth *ms)
     printf("LFO Waveform (lfowave): %s - %d [0-8]\n",
            s_lfo_mode_names[ms->m_settings.m_lfo1_waveform],
            ms->m_settings.m_lfo1_waveform); // unsigned
-    printf(ANSI_COLOR_WHITE);
+
+    printf(ANSI_COLOR_MAGENTA); // FILTER
+    printf("Filter Cutoff (fc): %f [80-18000]\n", ms->m_settings.m_fc_control);
+    printf("Filter Q Control (fq): [1-10]%f\n", ms->m_settings.m_q_control);
+    printf("Filter Keytrack Intensity (ktint): %f [0.5-10]\n",
+           ms->m_settings.m_filter_keytrack_intensity);
+    // TODO - where's type? // whats NLP?
+
+    printf(COOL_COLOR_YELLOW); // CONTROL PANEL
     printf("Voice mode (voice): %ls - %d [0-5]\n",
            s_mode_names[ms->m_settings.m_voice_mode],
            ms->m_settings.m_voice_mode); // unsigned
-    printf(COOL_COLOR_MAUVE);
+    printf("Filter Keytrack (kt): %d [0-1]\n",
+           ms->m_settings.m_filter_keytrack); // unsigned
     printf("Detune Cents (detune): %f [-100-100]\n",
            ms->m_settings.m_detune_cents);
     printf("LEGATO MODE (legato): %d [0-1]\n",
@@ -1460,7 +1453,8 @@ void minisynth_print_settings(minisynth *ms)
     printf("Volume (vol): %f [0-1]\n", ms->m_settings.m_volume_db);
     printf("Reset To Zero (zero): %d [0,1]\n",
            ms->m_settings.m_reset_to_zero); // unsigned
-    printf(COOL_COLOR_YELLOW);
+
+    printf(COOL_COLOR_MAUVE); // ARPEGGIATORRRR
     printf("Arp Active (arp): %s [0,1]\n", ms->m_arp.active ? "true" : "false");
     printf("Arp Latch (arplatch): %s [0,1]\n",
            ms->m_arp.latch ? "true" : "false");
@@ -1474,6 +1468,17 @@ void minisynth_print_settings(minisynth *ms)
            arp_rate_to_string[ms->m_arp.rate]);
     printf("Arp Cur Step (arpcurstep): %s\n",
            arp_cur_step_to_string[ms->m_arp.cur_step]);
+
+    printf(ANSI_COLOR_WHITE); // DELAY
+    printf("Delay Feedback Pct (delayfb): %f [0-100]\n",
+           ms->m_settings.m_feedback_pct);
+    printf("Delay Ratio (delayr): %f [-1-1]\n", ms->m_settings.m_delay_ratio);
+    printf("Delay Mode (delaymode): %d [0-%d]\n", ms->m_settings.m_delay_mode,
+           MAX_NUM_DELAY_MODE - 1); // unsigned int
+    printf("Delay Time ms (delayms): %f [%d-%d]\n",
+           ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, 2000);
+    printf("Delay Wet Mix (delaymx): %f [0-1]\n", ms->m_settings.m_wet_mix);
+
     printf(ANSI_COLOR_RESET);
 }
 

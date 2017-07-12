@@ -94,6 +94,26 @@ double looper_gennext(void *self)
             }
             l->stutter_generation++;
         }
+
+        if (l->scramblrrr_mode) {
+            if (l->scramble_every_n_loops > 0) {
+                if (l->scramble_generation % l->scramble_every_n_loops == 0)
+                    l->scramblrrr_active = true;
+                else
+                    l->scramblrrr_active = false;
+            }
+            else if (l->max_generation > 0) {
+                if (l->scramble_generation >= l->max_generation) {
+                    looper_set_scramble_mode(l, false);
+                }
+            }
+
+            if (l->scramblrrr_active) {
+                looper_scramble(l);
+            }
+
+            l->scramble_generation++;
+        }
     }
 
     if (l->stutter_active) {
@@ -111,11 +131,6 @@ double looper_gennext(void *self)
                 }
             }
         }
-    }
-
-    if (l->scramblrrr_mode &&
-        (mixr->cur_sample % (l->scramblrrr->resampled_file_size * 4) == 0)) {
-        looper_scramble(l);
     }
 
     // resync after a resample/resize
@@ -144,7 +159,7 @@ double looper_gennext(void *self)
         val = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
         l->samples[l->cur_sample]->position++;
     }
-    else if (l->scramblrrr_mode) {
+    else if (l->scramblrrr_active) {
         val = l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
         l->samples[l->cur_sample]->position++; // keep increasing normal sample
     }
@@ -356,15 +371,16 @@ void looper_status(void *self, wchar_t *status_string)
     looper *l = (looper *)self;
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
              "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
-             "ScramblrrrMode: %s ScrambleGen: %d StutterMode: %s "
-             "Stutter Gen: %d MaxGen: %d Active: %s"
-             "Position: %d Sample Length: %d",
+             "ScramblrrrMode: %s ScrambleGen: %d ScrambleEveryN: %d "
+             "StutterMode: %s Stutter Gen: %d StutterEveryN: %d MaxGen: %d "
+             " Active: %s Position: %d Sample Length: %d",
              l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
              l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
-             l->stutter_mode ? "true" : "false", l->stutter_generation,
-             l->max_generation, l->active ? " true" : "false",
-             l->samples[l->cur_sample]->position,
+             l->scramble_every_n_loops, l->stutter_mode ? "true" : "false",
+             l->stutter_generation, l->stutter_every_n_loops, l->max_generation,
+             l->active ? " true" : "false", l->samples[l->cur_sample]->position,
              l->samples[l->cur_sample]->resampled_file_size);
+
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < l->num_samples; i++) {
@@ -431,6 +447,7 @@ void looper_change_num_loops(looper *s, int sample_num, int num_loops)
 
 void looper_set_scramble_mode(looper *s, bool b)
 {
+    s->scramblrrr_active = b;
     s->scramblrrr_mode = b;
     s->scramble_counter = 0;
     s->scramble_generation = 0;
@@ -456,8 +473,6 @@ void looper_set_stutter_mode(looper *s, bool b)
 
 void looper_scramble(looper *s)
 {
-    s->scramble_generation++;
-
     double *scrambled = s->scramblrrr->resampled_file_bytes;
     int len = s->scramblrrr->resampled_file_size;
     int len16th;
@@ -483,76 +498,90 @@ void looper_scramble(looper *s)
         seventh16th[i] = scrambled[i + len16th * 7];
     }
 
-    bool yolo = false;
-    bool reverse = false;
-    bool copy_first_half = false;
-    bool silence_last_quarter = false;
-    int dice1, dice2;
+    s->scramble_counter = 0;
+    if (s->scramble_every_n_loops >
+        0) { // this is more punchy and extreme as it happens only once every n
+        for (int i = 0; i < len; i++) {
+            if (i % len16th == 0) {
+                s->scramble_counter++;
+            }
+            scrambled[i] = first16th[i % len16th];
+        }
+    }
+    else if (mixr->cur_sample % (s->scramblrrr->resampled_file_size * 4) ==
+             0) { // this is the evolver
+        bool yolo = false;
+        bool reverse = false;
+        bool copy_first_half = false;
+        bool silence_last_quarter = false;
+        int dice1, dice2;
 
-    int outer_randy = rand() % 100;
-    silence_last_quarter = outer_randy > 90 && outer_randy <= 95 ? true : false;
-    copy_first_half = outer_randy > 95 ? true : false;
+        int outer_randy = rand() % 100;
+        silence_last_quarter =
+            outer_randy > 90 && outer_randy <= 95 ? true : false;
+        copy_first_half = outer_randy > 95 ? true : false;
 
-    for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++) {
 
-        if (i % len16th == 0) {
-            s->scramble_counter++;
-            if (yolo || reverse) {
-                yolo = false;
-                reverse = false;
+            if (i % len16th == 0) {
+                s->scramble_counter++;
+                if (yolo || reverse) {
+                    yolo = false;
+                    reverse = false;
+                }
+                else {
+                    dice1 = rand() % 100;
+                    if (dice1 >= 85 && dice1 < 90)
+                        yolo = true;
+                    else if (dice1 >= 90 && dice1 < 97)
+                        reverse = true;
+                }
+                dice2 = rand() % 100;
+            }
+
+            if (yolo) {
+                s->scramblrrr->resampled_file_bytes[i] = first16th[i % len16th];
+            }
+            else if (reverse) {
+                s->scramblrrr->resampled_file_bytes[i] = rev16th[i % len16th];
             }
             else {
-                dice1 = rand() % 100;
-                if (dice1 >= 85 && dice1 < 90)
-                    yolo = true;
-                else if (dice1 >= 90 && dice1 < 97)
-                    reverse = true;
-            }
-            dice2 = rand() % 100;
-        }
-
-        if (yolo) {
-            s->scramblrrr->resampled_file_bytes[i] = first16th[i % len16th];
-        }
-        else if (reverse) {
-            s->scramblrrr->resampled_file_bytes[i] = rev16th[i % len16th];
-        }
-        else {
-            if (s->scramble_counter % 2 != 0)
-                s->scramblrrr->resampled_file_bytes[i] =
-                    s->samples[s->cur_sample]->resampled_file_bytes[i];
-            else {
-                if (dice2 < 7)
-                    s->scramblrrr
-                        ->resampled_file_bytes[(i + len16th * 2) % len] =
-                        third16th[i % len16th];
-                else if (dice2 >= 8 && dice2 < 15)
-                    s->scramblrrr
-                        ->resampled_file_bytes[(i + len16th * 2) % len] =
-                        fourth16th[i % len16th];
-                else if (dice2 >= 16 && dice2 < 22)
-                    s->scramblrrr
-                        ->resampled_file_bytes[(i + len16th * 2) % len] =
-                        seventh16th[i % len16th];
-                else
-                    s->scramblrrr
-                        ->resampled_file_bytes[(i + len16th * 2) % len] =
+                if (s->scramble_counter % 2 != 0)
+                    s->scramblrrr->resampled_file_bytes[i] =
                         s->samples[s->cur_sample]->resampled_file_bytes[i];
+                else {
+                    if (dice2 < 7)
+                        s->scramblrrr
+                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                            third16th[i % len16th];
+                    else if (dice2 >= 8 && dice2 < 15)
+                        s->scramblrrr
+                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                            fourth16th[i % len16th];
+                    else if (dice2 >= 16 && dice2 < 22)
+                        s->scramblrrr
+                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                            seventh16th[i % len16th];
+                    else
+                        s->scramblrrr
+                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                            s->samples[s->cur_sample]->resampled_file_bytes[i];
+                }
             }
         }
-    }
 
-    if (copy_first_half) {
-        int halflen = len / 2;
-        for (int i = 0; i < halflen; i++)
-            s->scramblrrr->resampled_file_bytes[i + halflen] =
-                s->samples[s->cur_sample]->resampled_file_bytes[i];
-    }
+        if (copy_first_half) {
+            int halflen = len / 2;
+            for (int i = 0; i < halflen; i++)
+                s->scramblrrr->resampled_file_bytes[i + halflen] =
+                    s->samples[s->cur_sample]->resampled_file_bytes[i];
+        }
 
-    if (silence_last_quarter) {
-        int quartlen = len / 4;
-        for (int i = quartlen * 3; i < len; i++)
-            s->scramblrrr->resampled_file_bytes[i] = 0;
+        if (silence_last_quarter) {
+            int quartlen = len / 4;
+            for (int i = quartlen * 3; i < len; i++)
+                s->scramblrrr->resampled_file_bytes[i] = 0;
+        }
     }
 
     if (mixr->debug_mode)

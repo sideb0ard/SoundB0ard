@@ -455,10 +455,18 @@ void interpret(char *line)
                                s->multi_sample_mode ? "true" : "false");
                     }
                     else if (strncmp("scramble", wurds[2], 8) == 0) {
-                        if (strncmp(wurds[3], "true", 4) == 0)
-                            looper_set_scramble_mode(s, true);
-                        else if (strncmp(wurds[3], "false", 5) == 0)
-                            looper_set_scramble_mode(s, false);
+                        if (strncmp(wurds[3], "every", 5) == 0) {
+                            int num_gens = atoi(wurds[4]);
+                            if (num_gens > 0) {
+                                printf("Scrambling every %d n loops!\n",
+                                       num_gens);
+                                looper_set_scramble_mode(s, true);
+                                s->scramble_every_n_loops = num_gens;
+                            }
+                            else {
+                                printf("Need a number for every 'n'\n");
+                            }
+                        }
                         else {
                             int max_gen = atoi(wurds[3]);
                             if (max_gen > 0) {

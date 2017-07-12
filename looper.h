@@ -44,7 +44,10 @@ typedef struct t_looper {
     bool just_been_resampled;
 
     bool scramblrrr_mode;
+    bool scramblrrr_active;
     int scramble_counter;
+    int scramble_every_n_loops;
+    int scramble_every_n_loops_generation;
     int scramble_generation;
 
     bool stutter_mode;
