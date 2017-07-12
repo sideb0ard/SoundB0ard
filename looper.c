@@ -499,27 +499,42 @@ void looper_scramble(looper *s)
     }
 
     s->scramble_counter = 0;
-    if (s->scramble_every_n_loops >
-        0) { // this is more punchy and extreme as it happens only once every n
-        for (int i = 0; i < len; i++) {
-            if (i % len16th == 0) {
-                s->scramble_counter++;
-            }
-            scrambled[i] = first16th[i % len16th];
-        }
-    }
-    else if (mixr->cur_sample % (s->scramblrrr->resampled_file_size * 4) ==
-             0) { // this is the evolver
-        bool yolo = false;
-        bool reverse = false;
-        bool copy_first_half = false;
-        bool silence_last_quarter = false;
-        int dice1, dice2;
+    bool should_run = false;
+    bool yolo = false;
+    bool reverse = false;
+    bool copy_first_half = false;
+    bool silence_last_quarter = false;
+    int dice1, dice2;
+    int PCT_CHANCE_YOLO = 0;
+    int PCT_CHANCE_REV = 0;
+    int PCT_CHANCE_COPY_FIRST_HALF = 0;
+    int PCT_CHANCE_SILENCE_LAST_QUARTER = 0;
+    int PCT_CHANCE_16TH = 0;
 
-        int outer_randy = rand() % 100;
-        silence_last_quarter =
-            outer_randy > 90 && outer_randy <= 95 ? true : false;
-        copy_first_half = outer_randy > 95 ? true : false;
+    if (s->scramble_every_n_loops > 0)
+    { // this is more punchy and extreme as it happens only once every n
+        should_run = true;
+        PCT_CHANCE_YOLO = 45;
+        PCT_CHANCE_REV = 25;
+        PCT_CHANCE_COPY_FIRST_HALF = 22;
+        PCT_CHANCE_SILENCE_LAST_QUARTER = 1;
+        PCT_CHANCE_16TH = 7;
+    }
+    else if (mixr->cur_sample % (s->scramblrrr->resampled_file_size * 4) == 0)
+    { // this is the evolver
+        should_run = true;
+        PCT_CHANCE_YOLO = 25;
+        PCT_CHANCE_REV = 25;
+        PCT_CHANCE_COPY_FIRST_HALF = 10;
+        PCT_CHANCE_SILENCE_LAST_QUARTER = 5;
+        PCT_CHANCE_16TH = 7;
+    }
+
+    if (should_run)
+    {
+        bool we_third16th = false;
+        bool we_fourth16th = false;
+        bool we_seventh16th = false;
 
         for (int i = 0; i < len; i++) {
 
@@ -530,57 +545,65 @@ void looper_scramble(looper *s)
                     reverse = false;
                 }
                 else {
-                    dice1 = rand() % 100;
-                    if (dice1 >= 85 && dice1 < 90)
+                    if (rand() % 100 < PCT_CHANCE_YOLO)
                         yolo = true;
-                    else if (dice1 >= 90 && dice1 < 97)
+                    else if (rand() % 100 < PCT_CHANCE_REV)
                         reverse = true;
                 }
-                dice2 = rand() % 100;
+
+                we_third16th = false;
+                we_fourth16th = false;
+                we_seventh16th = false;
+                if (rand() % 100 < PCT_CHANCE_16TH)
+                    we_third16th = true;
+                else if (rand() % 100 < PCT_CHANCE_16TH)
+                    we_fourth16th = true;
+                else if (rand() % 100 < PCT_CHANCE_16TH)
+                    we_seventh16th = true;
             }
 
             if (yolo) {
-                s->scramblrrr->resampled_file_bytes[i] = first16th[i % len16th];
+               scrambled[i] = first16th[i % len16th];
             }
             else if (reverse) {
-                s->scramblrrr->resampled_file_bytes[i] = rev16th[i % len16th];
+                scrambled[i] = rev16th[i % len16th];
             }
             else {
-                if (s->scramble_counter % 2 != 0)
-                    s->scramblrrr->resampled_file_bytes[i] =
+                if (s->scramble_counter % 2 == 0)
+                    //s->scramblrrr->resampled_file_bytes[i] =
+                    scrambled[i] =
                         s->samples[s->cur_sample]->resampled_file_bytes[i];
                 else {
-                    if (dice2 < 7)
-                        s->scramblrrr
-                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                    if (we_third16th)
+                        scrambled[(i + len16th * 2) % len] =
                             third16th[i % len16th];
-                    else if (dice2 >= 8 && dice2 < 15)
-                        s->scramblrrr
-                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                    else if (we_fourth16th)
+                        scrambled[(i + len16th * 2) % len] =
                             fourth16th[i % len16th];
-                    else if (dice2 >= 16 && dice2 < 22)
-                        s->scramblrrr
-                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                    else if (we_seventh16th)
+                        scrambled[(i + len16th * 2) % len] =
                             seventh16th[i % len16th];
                     else
-                        s->scramblrrr
-                            ->resampled_file_bytes[(i + len16th * 2) % len] =
+                        scrambled[(i + len16th * 2) % len] =
                             s->samples[s->cur_sample]->resampled_file_bytes[i];
                 }
             }
         }
 
+        copy_first_half = rand() % 100 < PCT_CHANCE_COPY_FIRST_HALF ? true : false; 
+        silence_last_quarter = rand() % 100 < PCT_CHANCE_YOLO ? true : false; 
+
         if (copy_first_half) {
             int halflen = len / 2;
             for (int i = 0; i < halflen; i++)
-                s->scramblrrr->resampled_file_bytes[i + halflen] =
+                scrambled[i + halflen] =
                     s->samples[s->cur_sample]->resampled_file_bytes[i];
         }
 
         if (silence_last_quarter) {
             int quartlen = len / 4;
             for (int i = quartlen * 3; i < len; i++)
-                s->scramblrrr->resampled_file_bytes[i] = 0;
+                scrambled[i] = 0;
         }
     }
 
