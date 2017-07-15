@@ -68,3 +68,4 @@ void dynamics_processor_set_time_constant(dynamics_processor *dp,
                                           unsigned int val);
 void dynamics_processor_set_external_source(dynamics_processor *dp,
                                             unsigned int val);
+void dynamics_processor_set_default_sidechain_params(dynamics_processor *dp);
