@@ -18,5 +18,6 @@ void delayline_set_delay_ms(delayline *dl, double delay_ms);
 void delayline_cook_variables(delayline *dl);
 double delayline_read_delay(delayline *dl);
 double delayline_read_delay_at(delayline *dl, double ms);
+double delayline_read_delay_at_idx(delayline *dl, int idx);
 void delayline_write_delay_and_inc(delayline *dl, double delay_input);
 bool delayline_process_audio(delayline *dl, double *input, double *output);

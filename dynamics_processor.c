@@ -308,4 +308,3 @@ void dynamics_processor_set_default_sidechain_params(dynamics_processor *dp)
     dynamics_processor_set_release_ms(dp, 55);
     dynamics_processor_set_ratio(dp, 5);
 }
-

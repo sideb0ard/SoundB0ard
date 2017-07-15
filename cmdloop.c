@@ -879,8 +879,8 @@ void interpret(char *line)
                 add_follower_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
-        else if (strncmp("granulator", wurds[0], 8) == 0
-                 || strncmp("gran", wurds[0], 4) == 0) {
+        else if (strncmp("granulator", wurds[0], 8) == 0 ||
+                 strncmp("gran", wurds[0], 4) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
                 add_granulator_soundgen(mixr->sound_generators[soundgen_num]);
@@ -1017,20 +1017,21 @@ void interpret(char *line)
                         dynamics_processor_set_time_constant(dp, val);
                     else if (strncmp("extsource", wurds[3], 9) == 0)
                         dynamics_processor_set_external_source(dp, val);
-                    else if (strncmp("def", wurds[3], 3) == 0 
-                            || strncmp("default", wurds[3], 7) == 0)
+                    else if (strncmp("def", wurds[3], 3) == 0 ||
+                             strncmp("default", wurds[3], 7) == 0)
                         dynamics_processor_set_default_sidechain_params(dp);
                 }
                 else if (f->type == GRANULATOR) {
-                    granulator *g = (granulator *)g;
-                    printf("JOBBIE\n");
-                    printf("GANZZZZ %d\n", g->num_grains);
-                    printf("GANZZZZ %d\n", g->grain_duration_ms);
+                    granulator *g = (granulator *)f;
                     double val = atof(wurds[4]);
-                    //if (strncmp("numgrains", wurds[3], 9) == 0)
-                    //    granulator_change_num_grains(g, val);
-                    //else if (strncmp("grainlen", wurds[3], 8) == 0)
-                    //    granulator_change_grain_len(g, val);
+                    if (strncmp("numgrains", wurds[3], 9) == 0)
+                        granulator_set_num_grains(g, val);
+                    else if (strncmp("grainlen", wurds[3], 8) == 0)
+                        granulator_set_grain_len(g, val);
+                    else if (strncmp("fudge", wurds[3], 5) == 0)
+                        granulator_set_fudge_factor(g, val);
+                    else if (strncmp("wetmx", wurds[3], 5) == 0)
+                        granulator_set_wet_mix(g, val);
                 }
                 else if (f->type == REVERB) {
                     reverb *r = (reverb *)f;

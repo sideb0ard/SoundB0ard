@@ -109,47 +109,6 @@ ENVELOPE *new_fadeout_points()
     return points;
 }
 
-ENVSTREAM *new_sidechain_stream(int *pattern, int percent)
-{
-    ENVSTREAM *stream = (ENVSTREAM *)calloc(1, sizeof(ENVSTREAM));
-    if (stream == NULL)
-        return NULL;
-
-    ENVELOPE *points = NULL;
-    points = (ENVELOPE *)calloc(18, sizeof(ENVELOPE));
-    if (points == NULL)
-        return NULL;
-
-    points[0].time = 0.0;
-    points[0].value = 0.1;
-
-    double t = 5.5;
-    for (int i = 1; i < 17; i++, t += 5.55) {
-        points[i].time = t;
-        if (pattern[i - 1]) {
-            // points[i].value = 0.0;
-            points[i].value = 1 / 100.0 * (100.0 - percent);
-        }
-        else {
-            points[i].value = 1.0;
-        }
-    }
-
-    points[17].time = 99.0;
-    points[17].value = 0.1;
-
-    stream->points = points;
-    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * 4);
-
-    _env_reset(stream);
-
-    stream->npoints = 18;
-
-    for (int i = 0; i < 18; i++)
-        printf("Time: %f Val: %f\n", points[i].time, points[i].value);
-    return stream;
-}
-
 ENVELOPE *new_wavey_points()
 {
 

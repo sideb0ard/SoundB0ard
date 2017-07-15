@@ -71,6 +71,24 @@ double delayline_read_delay_at(delayline *dl, double ms)
     return lin_terp(0, 1, yn, yn_minus_one, frac_delay);
 }
 
+double delayline_read_delay_at_idx(delayline *dl, int read_index)
+{
+    if (read_index >= dl->m_buffer_size) {
+        // wrap around
+        read_index = read_index % dl->m_buffer_size;
+    }
+
+    double yn = dl->m_buffer[read_index];
+
+    int read_index_minus_one = read_index - 1;
+    if (read_index_minus_one < 0)
+        read_index_minus_one = dl->m_buffer_size - 1;
+
+    double yn_minus_one = dl->m_buffer[read_index_minus_one];
+    double frac_delay = dl->m_delay_in_samples - (int)dl->m_delay_in_samples;
+    return lin_terp(0, 1, yn, yn_minus_one, frac_delay);
+}
+
 void delayline_write_delay_and_inc(delayline *dl, double delay_input)
 {
     dl->m_buffer[dl->m_write_index] = delay_input;

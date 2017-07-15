@@ -511,8 +511,8 @@ void looper_scramble(looper *s)
     int PCT_CHANCE_SILENCE_LAST_QUARTER = 0;
     int PCT_CHANCE_16TH = 0;
 
-    if (s->scramble_every_n_loops > 0)
-    { // this is more punchy and extreme as it happens only once every n
+    if (s->scramble_every_n_loops >
+        0) { // this is more punchy and extreme as it happens only once every n
         should_run = true;
         PCT_CHANCE_YOLO = 45;
         PCT_CHANCE_REV = 25;
@@ -520,8 +520,8 @@ void looper_scramble(looper *s)
         PCT_CHANCE_SILENCE_LAST_QUARTER = 1;
         PCT_CHANCE_16TH = 7;
     }
-    else if (mixr->cur_sample % (s->scramblrrr->resampled_file_size * 4) == 0)
-    { // this is the evolver
+    else if (mixr->cur_sample % (s->scramblrrr->resampled_file_size * 4) ==
+             0) { // this is the evolver
         should_run = true;
         PCT_CHANCE_YOLO = 25;
         PCT_CHANCE_REV = 25;
@@ -530,8 +530,7 @@ void looper_scramble(looper *s)
         PCT_CHANCE_16TH = 7;
     }
 
-    if (should_run)
-    {
+    if (should_run) {
         bool we_third16th = false;
         bool we_fourth16th = false;
         bool we_seventh16th = false;
@@ -563,14 +562,14 @@ void looper_scramble(looper *s)
             }
 
             if (yolo) {
-               scrambled[i] = first16th[i % len16th];
+                scrambled[i] = first16th[i % len16th];
             }
             else if (reverse) {
                 scrambled[i] = rev16th[i % len16th];
             }
             else {
                 if (s->scramble_counter % 2 == 0)
-                    //s->scramblrrr->resampled_file_bytes[i] =
+                    // s->scramblrrr->resampled_file_bytes[i] =
                     scrambled[i] =
                         s->samples[s->cur_sample]->resampled_file_bytes[i];
                 else {
@@ -590,8 +589,9 @@ void looper_scramble(looper *s)
             }
         }
 
-        copy_first_half = rand() % 100 < PCT_CHANCE_COPY_FIRST_HALF ? true : false; 
-        silence_last_quarter = rand() % 100 < PCT_CHANCE_YOLO ? true : false; 
+        copy_first_half =
+            rand() % 100 < PCT_CHANCE_COPY_FIRST_HALF ? true : false;
+        silence_last_quarter = rand() % 100 < PCT_CHANCE_YOLO ? true : false;
 
         if (copy_first_half) {
             int halflen = len / 2;

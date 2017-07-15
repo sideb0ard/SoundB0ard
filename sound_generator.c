@@ -178,63 +178,6 @@ double effector(SOUNDGEN *self, double val)
     }
 
     return val;
-
-    // case DECIMATOR:
-    //     if (val > 0.0) {
-    //         self->effects[i]->cnt += self->effects[i]->rate;
-    //         val *= 2;
-    //         if (self->effects[i]->cnt >= 1) {
-    //             self->effects[i]->cnt -= 1;
-    //             val = (long)(val * self->effects[i]->m) /
-    //                   (double)self->effects[i]->m;
-    //         }
-    //     }
-    //     break;
-    // case DISTORTION:
-    //     if (val > 0.0) {
-    //         val *= 2;
-    //         val = 1 / 100 * atan(val * 100);
-    //     }
-    //     break;
-    // case RES:
-    //     delay_p = self->effects[i]->buf_p;
-    //     delay = self->effects[i]->buffer;
-    //     val = delay[delay_p];
-    //     delay[delay_p++] = (val_copy + val) * 0.5;
-    //     if (delay_p >= self->effects[i]->buf_length)
-    //         delay_p = 0;
-    //     self->effects[i]->buf_p = delay_p;
-    //     break;
-    // case ALLPASS:
-    //     delay_p = self->effects[i]->buf_p;
-    //     delay = self->effects[i]->buffer;
-    //     val1 = delay[delay_p];
-    //     val2 = val - (val1 * 0.5);
-    //     delay[delay_p++] = val2;
-    //     val = val1 + (val2 * 0.2);
-    //     if (delay_p >= self->effects[i]->buf_length)
-    //         delay_p = 0;
-    //     self->effects[i]->buf_p = delay_p;
-    //     break;
-    // case LOWPASS:
-    //     val = (val * (1 + self->effects[i]->coef) -
-    //            self->effects[i]->buffer[0] * self->effects[i]->coef);
-    //     self->effects[i]->buffer[0] = val;
-    //     break;
-    // case HIGHPASS:
-    //     val = (val * (1 - self->effects[i]->coef) -
-    //            self->effects[i]->buffer[0] * self->effects[i]->coef);
-    //     self->effects[i]->buffer[0] = val;
-    //     break;
-    // case BANDPASS:
-    //     val = (val * self->effects[i]->scal +
-    //            self->effects[i]->rr * self->effects[i]->costh *
-    //                self->effects[i]->buffer[0] -
-    //            self->effects[i]->rsq * self->effects[i]->buffer[1]);
-    //     self->effects[i]->buffer[1] = self->effects[i]->buffer[0];
-    //     self->effects[i]->buffer[0] = val;
-    //     break;
-    // }
 }
 
 //////////////////////////////////////////////////////
