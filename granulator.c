@@ -11,7 +11,7 @@ granulator *new_granulator(int initial_num_grains, int initial_grain_len_ms)
     granulator *g = (granulator *)calloc(1, sizeof(granulator));
     g->num_grains_per_sec = initial_num_grains;
     g->grain_duration_ms = initial_grain_len_ms;
-    g->wet_mix = 0.7;
+    g->wet_mix = 1;
 
     delayline_init(&g->m_delay, 2.0 * SAMPLE_RATE);
     delayline_reset(&g->m_delay);
@@ -44,13 +44,17 @@ double granulator_process_audio(void *self, double input)
         grain_activate(&g->m_grains[cur_grain]);
     }
 
+    // if (mixr->start_of_loop)
+    //    granulator_refresh_cloud(g);
+
     g->cloud_read_idx++;
-    if (g->cloud_read_idx == g->cloud_read_end)
+    if (g->cloud_read_idx == g->cloud_read_len)
         g->cloud_read_idx = 0;
 
     double output = 0.;
     int samplesize_between_grains =
-        g->cloud_read_end / g->num_grains_per_looplen;
+        g->cloud_read_len / g->num_grains_per_looplen;
+
     for (int i = 0; i < g->num_grains_per_looplen; i++) {
         int grain_idx = grain_generate_idx(&g->m_grains[i]);
         if (grain_idx != -1) {
@@ -74,8 +78,8 @@ double granulator_process_audio(void *self, double input)
 void granulator_refresh_cloud(granulator *g)
 {
     g->cloud_read_idx = 0;
-    g->cloud_read_end = mixr->loop_len_in_samples * 2;
-    if (g->cloud_read_end > MAXCLOUD_LEN_SEC * SAMPLE_RATE) {
+    g->cloud_read_len = mixr->loop_len_in_samples;
+    if (g->cloud_read_len > MAXCLOUD_LEN_SEC * SAMPLE_RATE) {
         printf(
             "Whoa nellie! my math must be terrible - this disnae work out!\n");
         printf("Increase size of MAXCLOUD_LEN_SEC\n");
@@ -83,13 +87,13 @@ void granulator_refresh_cloud(granulator *g)
     }
 
     double beat_time_in_secs = 60.0 / mixr->bpm;
-    double seconds_in_cloud_loop = 8 * beat_time_in_secs;
+    double seconds_in_cloud_loop = 4 * beat_time_in_secs;
 
     int num_grains_in_cloud_loop =
         seconds_in_cloud_loop * g->num_grains_per_sec;
-    g->num_grains_per_looplen = num_grains_in_cloud_loop;
-    //printf("BeattimeSecs: %f secs/cloudloop: %f num_grains_in_cloud_loop: %d\n",
-    //       beat_time_in_secs, seconds_in_cloud_loop, num_grains_in_cloud_loop);
+    g->num_grains_per_looplen = seconds_in_cloud_loop * g->num_grains_per_sec;
+    printf("BeattimeSecs: %f secs/cloudloop: %f num_grains_in_cloud_loop: %d\n",
+           beat_time_in_secs, seconds_in_cloud_loop, num_grains_in_cloud_loop);
 
     for (int i = 0; i < num_grains_in_cloud_loop; i++) {
         int grain_dur = g->grain_duration_ms;
@@ -103,17 +107,19 @@ void granulator_refresh_cloud(granulator *g)
         }
         grain_initialize(&g->m_grains[i], grain_dur);
     }
-    int spacing = g->cloud_read_end / num_grains_in_cloud_loop;
-    printf("Spacing is %d (read-end: %d) / num_grains\n", spacing,
-           g->cloud_read_end);
-    int current_grain = 0;
-    for (int i = 0; i < g->cloud_read_end; i++)
+
+    // reset all
+    for (int i = 0; i < g->cloud_read_len; i++)
         g->cloud_of_grains[i] = -99;
 
-    for (int i = 0; i < g->cloud_read_end; ) {
+    int spacing = g->cloud_read_len / num_grains_in_cloud_loop;
+    int current_grain = 0;
+    for (int i = 0; i < g->cloud_read_len; ) {
+        printf("activating\n");
         g->cloud_of_grains[i] = current_grain++;
-        int fudgey = spacing + (rand() % 20) * 44.1 ; // 20 msec in samples
-        i += fudgey;
+        //int fudgey = spacing + (rand() % 20) * 44.1 ; // 20 msec in samples
+        //i += fudgey;
+        i+=spacing;
     }
 }
 
