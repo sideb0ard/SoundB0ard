@@ -33,7 +33,8 @@ typedef struct granulator {
     int cloud_read_end;
 
     int grain_duration_ms;
-    int num_grains;
+    int num_grains_per_sec;     //
+    int num_grains_per_looplen; //
 
     int fudge_factor;
 
