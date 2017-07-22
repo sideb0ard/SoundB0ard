@@ -27,13 +27,18 @@ typedef struct granulator {
     delayline m_delay;
 
     grain m_grains[MAXGRAINS]; // actual grains
-    int cloud_of_grains[MAXCLOUD_LEN_SEC * SAMPLE_RATE]; // position of grains
-    int cloud_read_idx;
-    int cloud_read_len;
+    //int cloud_of_grains[MAXCLOUD_LEN_SEC * SAMPLE_RATE]; // position of grains
+    //int cloud_read_idx;
+    //int cloud_read_len;
 
     int grain_duration_ms;
-    int num_grains_per_sec;
-    int num_grains_per_looplen;
+    int num_grains;
+    //int num_grains_per_looplen;
+
+    bool locked;
+    bool buffer_is_full;
+    int read_pos;
+    bool apply_envelope;
 
     int fudge_factor;
 
@@ -50,3 +55,6 @@ void granulator_set_num_grains(granulator *g, int num_grains);
 void granulator_set_grain_len(granulator *g, int grain_len);
 void granulator_set_fudge_factor(granulator *g, int fudge);
 void granulator_set_wet_mix(granulator *g, double mix);
+void granulator_set_read_pos(granulator *g, int percent);
+void granulator_set_locked(granulator *g, bool b);
+void granulator_set_apply_env(granulator *g, bool b);

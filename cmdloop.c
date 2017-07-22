@@ -1032,6 +1032,12 @@ void interpret(char *line)
                         granulator_set_fudge_factor(g, val);
                     else if (strncmp("wetmx", wurds[3], 5) == 0)
                         granulator_set_wet_mix(g, val);
+                    else if (strncmp("locked", wurds[3], 5) == 0)
+                        granulator_set_locked(g, val);
+                    else if (strncmp("read_pos", wurds[3], 8) == 0)
+                        granulator_set_read_pos(g, val);
+                    else if (strncmp("env", wurds[3], 3) == 0)
+                        granulator_set_apply_env(g, val);
                 }
                 else if (f->type == REVERB) {
                     reverb *r = (reverb *)f;
