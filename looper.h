@@ -7,25 +7,38 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-// TODO use this more - at the moment just for the int array
 #define MAX_SAMPLES_PER_LOOPER 10
+#define MAX_SOUND_GRAINS 1000
 
 typedef struct file_sample {
     char *filename;
     int *orig_file_bytes;
     int orig_file_size;
-
     double *resampled_file_bytes;
     int resampled_file_size;
-
     int position;
-
     int samplerate;
     int channels;
     int frames;
-
     int loop_len;
 } file_sample;
+
+#define MAX_GRAIN_STREAM_LEN_SEC 10
+
+typedef struct sound_grain {
+    int grain_duration_ms;
+    int grain_len_samples;
+    int audiobuffer_num;
+    int audiobuffer_idx;
+    bool active;
+} sound_grain;
+
+enum {
+    GRAIN_SEQUENTIAL,
+    GRAIN_RANDOM,
+    GRAIN_REVERSED,
+    GRAIN_NUM_SELECTION_MODES
+};
 
 typedef struct t_looper {
     SOUNDGEN sound_generator;
@@ -33,6 +46,7 @@ typedef struct t_looper {
     file_sample *samples[MAX_SAMPLES_PER_LOOPER];
     int sample_num_loops[MAX_SAMPLES_PER_LOOPER];
     file_sample *scramblrrr; // for storing scrambled effect version of loop
+    int loop_len;
     int num_samples;
     int cur_sample;
     int cur_sample_iteration;
@@ -42,6 +56,14 @@ typedef struct t_looper {
     bool active;
     bool started;
     bool just_been_resampled;
+
+    bool granulate_mode;
+    int grain_duration;
+    int grains_per_sec;
+    unsigned int grain_selection;
+    sound_grain m_grains[MAX_SOUND_GRAINS];
+    int grain_stream[MAX_GRAIN_STREAM_LEN_SEC * SAMPLE_RATE];
+    int grain_stream_read_idx;
 
     bool scramblrrr_mode;
     bool scramblrrr_active;
@@ -59,19 +81,7 @@ typedef struct t_looper {
 
     int max_generation;
 
-    stereodelay m_delay_fx;
-    // midi - top row
-    double m_fc_control;
-    double m_q_control;
-    int swing_setting;
     double vol;
-    filter_moogladder m_filter;
-    // midi - bottom row, mode 1
-    double m_delay_time_msec;
-    double m_feedback_pct;
-    double m_delay_ratio;
-    double m_wet_mix;
-    unsigned int m_delay_mode; // pad5 button
 
     bool resample_pending;
     bool change_loopsize_pending;
@@ -106,11 +116,16 @@ void looper_stop(void *self);
 void looper_make_active_track(void *self, int track_num);
 int looper_get_num_tracks(void *self);
 
+void looper_refresh_grain_stream(looper *l);
+void looper_set_granulate(looper *l, bool b);
+void looper_set_grain_duration(looper *l, int dur);
+void looper_set_grains_per_sec(looper *l, int gps);
+void looper_set_grain_selection_mode(looper *l, unsigned int mode);
+
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);
 void sample_resample_to_loop_size(file_sample *fs);
 
-void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2);
 void file_sample_free(file_sample *fs);
 void looper_del_self(looper *s);
 

@@ -18,6 +18,11 @@ looper *new_looper(char *filename, double loop_len)
     l->active = true;
     l->started = false;
     l->just_been_resampled = false;
+    l->loop_len = loop_len;
+    l->granulate_mode = false;
+    l->grain_duration = 50;
+    l->grains_per_sec = 30;
+    l->grain_selection = 0;
 
     looper_add_sample(l, filename, loop_len);
 
@@ -36,11 +41,6 @@ looper *new_looper(char *filename, double loop_len)
     for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++) {
         l->sample_num_loops[i] = 1;
     }
-
-    stereo_delay_prepare_for_play(&l->m_delay_fx);
-    filter_moog_init(&l->m_filter);
-    l->m_fc_control = 10000;
-    moog_update((filter *)&l->m_filter);
 
     return l;
 }
@@ -66,112 +66,121 @@ double looper_gennext(void *self)
         }
     }
 
-    if (mixr->start_of_loop && l->resample_pending) {
-        looper_resample_to_loop_size(l);
-    }
-
-    if (mixr->start_of_loop && l->change_loopsize_pending) {
-        printf("PENDING LOOPSIZE FOUND! %d loops for loop num: %d\n",
-               l->pending_loop_size, l->pending_loop_num);
-        looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
-        l->change_loopsize_pending = false;
-    }
-
-    if (mixr->start_of_loop) {
-        if (l->stutter_mode) {
-            if (l->stutter_every_n_loops > 0) {
-                if (l->stutter_generation % l->stutter_every_n_loops == 0) {
-                    l->stutter_active = true;
-                }
-                else {
-                    l->stutter_active = false;
-                }
-            }
-            else if (l->max_generation > 0) {
-                if (l->stutter_generation >= l->max_generation) {
-                    looper_set_stutter_mode(l, false);
-                }
-            }
-            l->stutter_generation++;
-        }
-
-        if (l->scramblrrr_mode) {
-            if (l->scramble_every_n_loops > 0) {
-                if (l->scramble_generation % l->scramble_every_n_loops == 0)
-                    l->scramblrrr_active = true;
-                else
-                    l->scramblrrr_active = false;
-            }
-            else if (l->max_generation > 0) {
-                if (l->scramble_generation >= l->max_generation) {
-                    looper_set_scramble_mode(l, false);
-                }
-            }
-
-            if (l->scramblrrr_active) {
-                looper_scramble(l);
-            }
-
-            l->scramble_generation++;
-        }
-    }
-
-    if (l->stutter_active) {
-        if (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0) {
-            if (mixr->debug_mode)
-                printf("Stutututututter! Current: %d\n",
-                       l->stutter_current_16th);
-
-            if (rand() % 100 > 60) {
-                if (mixr->debug_mode)
-                    printf("Advancing stutter 16th..\n");
-                l->stutter_current_16th++;
-                if (l->stutter_current_16th == 16) {
-                    l->stutter_current_16th = 0;
-                }
-            }
-        }
-    }
-
-    // resync after a resample/resize
-    if (l->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
-        printf("Resyncing after resample...zzzz\n");
-        l->samples[l->cur_sample]->position = 0;
-        l->scramblrrr->position = 0;
-        l->just_been_resampled = false;
-    }
-
-    if (l->samples[l->cur_sample]->position == 0) {
-
-        if (l->multi_sample_mode) {
-            l->cur_sample_iteration--;
-            if (l->cur_sample_iteration == 0) {
-                l->cur_sample = (l->cur_sample + 1) % l->num_samples;
-                l->cur_sample_iteration = l->sample_num_loops[l->cur_sample];
-            }
-        }
-    }
-
-    if (l->stutter_active) {
-        int len16th = l->scramblrrr->resampled_file_size / 16;
-        int stutidx = (l->samples[l->cur_sample]->position % len16th) +
-                      l->stutter_current_16th * len16th;
-        val = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
-        l->samples[l->cur_sample]->position++;
-    }
-    else if (l->scramblrrr_active) {
-        val = l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
-        l->samples[l->cur_sample]->position++; // keep increasing normal sample
+    if (l->granulate_mode) {
+        // printf("GRANYL!\n");
     }
     else {
-        val = l->samples[l->cur_sample]
-                  ->resampled_file_bytes[l->samples[l->cur_sample]->position++];
+        if (mixr->start_of_loop && l->resample_pending) {
+            looper_resample_to_loop_size(l);
+        }
+
+        if (mixr->start_of_loop && l->change_loopsize_pending) {
+            printf("PENDING LOOPSIZE FOUND! %d loops for loop num: %d\n",
+                   l->pending_loop_size, l->pending_loop_num);
+            looper_change_loop_len(l, l->pending_loop_num,
+                                   l->pending_loop_size);
+            l->change_loopsize_pending = false;
+        }
+
+        if (mixr->start_of_loop) {
+            if (l->stutter_mode) {
+                if (l->stutter_every_n_loops > 0) {
+                    if (l->stutter_generation % l->stutter_every_n_loops == 0) {
+                        l->stutter_active = true;
+                    }
+                    else {
+                        l->stutter_active = false;
+                    }
+                }
+                else if (l->max_generation > 0) {
+                    if (l->stutter_generation >= l->max_generation) {
+                        looper_set_stutter_mode(l, false);
+                    }
+                }
+                l->stutter_generation++;
+            }
+
+            if (l->scramblrrr_mode) {
+                if (l->scramble_every_n_loops > 0) {
+                    if (l->scramble_generation % l->scramble_every_n_loops == 0)
+                        l->scramblrrr_active = true;
+                    else
+                        l->scramblrrr_active = false;
+                }
+                else if (l->max_generation > 0) {
+                    if (l->scramble_generation >= l->max_generation) {
+                        looper_set_scramble_mode(l, false);
+                    }
+                }
+
+                if (l->scramblrrr_active) {
+                    looper_scramble(l);
+                }
+
+                l->scramble_generation++;
+            }
+        }
+
+        if (l->stutter_active) {
+            if (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) ==
+                0) {
+                if (mixr->debug_mode)
+                    printf("Stutututututter! Current: %d\n",
+                           l->stutter_current_16th);
+
+                if (rand() % 100 > 60) {
+                    if (mixr->debug_mode)
+                        printf("Advancing stutter 16th..\n");
+                    l->stutter_current_16th++;
+                    if (l->stutter_current_16th == 16) {
+                        l->stutter_current_16th = 0;
+                    }
+                }
+            }
+        }
+
+        // resync after a resample/resize
+        if (l->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
+            printf("Resyncing after resample...zzzz\n");
+            l->samples[l->cur_sample]->position = 0;
+            l->scramblrrr->position = 0;
+            l->just_been_resampled = false;
+        }
+
+        if (l->samples[l->cur_sample]->position == 0) {
+
+            if (l->multi_sample_mode) {
+                l->cur_sample_iteration--;
+                if (l->cur_sample_iteration == 0) {
+                    l->cur_sample = (l->cur_sample + 1) % l->num_samples;
+                    l->cur_sample_iteration =
+                        l->sample_num_loops[l->cur_sample];
+                }
+            }
+        }
+
+        if (l->stutter_active) {
+            int len16th = l->scramblrrr->resampled_file_size / 16;
+            int stutidx = (l->samples[l->cur_sample]->position % len16th) +
+                          l->stutter_current_16th * len16th;
+            val = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
+        }
+        else if (l->scramblrrr_active) {
+            val =
+                l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
+        }
+        else {
+            val =
+                l->samples[l->cur_sample]
+                    ->resampled_file_bytes[l->samples[l->cur_sample]->position];
+        }
+
+        if (l->scramblrrr->position == l->scramblrrr->resampled_file_size) {
+            l->scramblrrr->position = 0;
+        }
     }
 
-    if (l->scramblrrr->position == l->scramblrrr->resampled_file_size) {
-        l->scramblrrr->position = 0;
-    }
-
+    l->samples[l->cur_sample]->position++;
     if (l->samples[l->cur_sample]->position ==
         l->samples[l->cur_sample]->resampled_file_size) {
         l->samples[l->cur_sample]->position = 0;
@@ -183,22 +192,7 @@ double looper_gennext(void *self)
     val = effector(&l->sound_generator, val);
     val = envelopor(&l->sound_generator, val);
 
-    // update delay and filter
-    l->m_filter.f.m_fc_control = l->m_fc_control;
-    moog_set_qcontrol((filter *)&l->m_filter, l->m_q_control);
-    moog_update((filter *)&l->m_filter);
-    val = moog_gennext((filter *)&l->m_filter, val);
-
-    stereo_delay_set_mode(&l->m_delay_fx, l->m_delay_mode);
-    stereo_delay_set_delay_time_ms(&l->m_delay_fx, l->m_delay_time_msec);
-    stereo_delay_set_feedback_percent(&l->m_delay_fx, l->m_feedback_pct);
-    stereo_delay_set_delay_ratio(&l->m_delay_fx, l->m_delay_ratio);
-    stereo_delay_set_wet_mix(&l->m_delay_fx, l->m_wet_mix);
-    stereo_delay_update(&l->m_delay_fx);
-    double out = 0.0;
-    stereo_delay_process_audio(&l->m_delay_fx, &val, &val, &out, &out);
-
-    return out * l->vol;
+    return val * l->vol;
 }
 
 void looper_add_sample(looper *s, char *filename, int loop_len)
@@ -308,12 +302,9 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("FRAMES is %d\n", fs->frames);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples = 0;
+    int loop_len_in_samples = fs->frames;
     if (fs->loop_len != 0)
-        loop_len_in_samples =
-            mixr->samples_per_midi_tick * PPBAR * fs->loop_len;
-    else
-        loop_len_in_samples = fs->frames;
+        loop_len_in_samples = mixr->loop_len_in_samples * fs->loop_len;
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
@@ -370,11 +361,14 @@ void looper_status(void *self, wchar_t *status_string)
 {
     looper *l = (looper *)self;
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
-             "[LOOPER] Vol: %.2lf MultiMode: %s Current Sample: %d "
-             "ScramblrrrMode: %s ScrambleGen: %d ScrambleEveryN: %d "
-             "StutterMode: %s Stutter Gen: %d StutterEveryN: %d MaxGen: %d "
-             " Active: %s Position: %d Sample Length: %d",
+             "[LOOPER] Vol:%.2lf MultiMode:%s Current Sample:%d Granulate:%s"
+             " grain_duration:%d grains_per_sec:%d grain_selection:%d\n"
+             "      ScramblrrrMode:%s ScrambleGen:%d ScrambleEveryN:%d "
+             "StutterMode:%s StutterGen:%d StutterEveryN:%d\n"
+             "      MaxGen:%d  Active:%s Position:%d SampleLength:%d",
              l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
+             l->granulate_mode ? "true" : "false", l->grain_duration,
+             l->grains_per_sec, l->grain_selection,
              l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
              l->scramble_every_n_loops, l->stutter_mode ? "true" : "false",
              l->stutter_generation, l->stutter_every_n_loops, l->max_generation,
@@ -385,8 +379,9 @@ void looper_status(void *self, wchar_t *status_string)
     wchar_t looper_details[strlen_left];
     for (int i = 0; i < l->num_samples; i++) {
         swprintf(looper_details, 128,
-                 L"\n      [%d] %s - looplen: %d numloops: %d", i,
-                 basename(l->samples[i]->filename), l->samples[i]->loop_len,
+                 L"\n      [" WANSI_COLOR_WHITE "%d" WCOOL_COLOR_GREEN "]"
+                 " %s - looplen: %d numloops: %d",
+                 i, basename(l->samples[i]->filename), l->samples[i]->loop_len,
                  l->sample_num_loops[i]);
         wcslcat(status_string, looper_details, strlen_left);
     }
@@ -617,62 +612,6 @@ void looper_scramble(looper *s)
     }
 }
 
-// TODO - move this to SOUND GENERATOR
-void looper_parse_midi(looper *s, unsigned int data1, unsigned int data2)
-{
-    printf("YA BEEZER, MIDI DRUM SEQUENCER!\n");
-
-    double scaley_val = 0.;
-    switch (data1) {
-    case 1:
-        scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        printf("Filter FREQ Control! %f\n", scaley_val);
-        s->m_fc_control = scaley_val;
-        break;
-    case 2:
-        scaley_val = scaleybum(0, 127, 1, 10, data2);
-        printf("Filter Q Control! %f\n", scaley_val);
-        s->m_q_control = scaley_val;
-        break;
-    case 3:
-        scaley_val = scaleybum(0, 127, 1, 6, data2);
-        printf("SWIIIiiing!! %f\n", scaley_val);
-        s->swing_setting = scaley_val;
-        break;
-    case 4:
-        scaley_val = scaleybum(0, 127, 0., 1., data2);
-        printf("Volume! %f\n", scaley_val);
-        s->vol = scaley_val;
-        break;
-    case 5:
-        scaley_val = scaleybum(0, 127, 0, 2000, data2);
-        printf("Delay Feedback Msec %f!\n", scaley_val);
-        s->m_delay_time_msec = scaley_val;
-        break;
-    case 6:
-        scaley_val = scaleybum(0, 127, 20, 100, data2);
-        printf("Delay Feedback Pct! %f\n", scaley_val);
-        s->m_feedback_pct = scaley_val;
-        break;
-    case 7:
-        scaley_val = scaleybum(0, 127, -0.9, 0.9, data2);
-        printf("Delay Ratio! %f\n", scaley_val);
-        s->m_delay_ratio = scaley_val;
-        break;
-    case 8:
-        scaley_val = scaleybum(0, 127, 0, 1, data2);
-        printf("DELAY Wet mix %f!\n", scaley_val);
-        s->m_wet_mix = scaley_val;
-        break;
-    case 9: // PAD 5
-        printf("Toggle Delay Mode!\n");
-        s->m_delay_mode = (++s->m_delay_mode) % MAX_NUM_DELAY_MODE;
-        break;
-    default:
-        break;
-    }
-}
-
 void looper_del_self(looper *s)
 {
     for (int i = 0; i < s->num_samples; i++) {
@@ -705,4 +644,48 @@ int looper_get_num_tracks(void *self)
 {
     looper *l = (looper *)self;
     return l->num_samples;
+}
+
+void looper_refresh_grain_stream(looper *l)
+{
+    double beat_time_in_secs = 60.0 / mixr->bpm;
+    double seconds_in_cloud_loop = 4 * beat_time_in_secs * l->loop_len;
+    int num_grains_per_looplen = seconds_in_cloud_loop * l->grains_per_sec;
+    int spacing =
+        mixr->loop_len_in_samples * l->loop_len / num_grains_per_looplen;
+
+    // for (int i = 0; i < l->num_grains; i++)
+    //{
+    //}
+}
+
+void looper_set_granulate(looper *l, bool b)
+{
+    if (b != 0 && b != 1) {
+        printf("Must be true or false, yo!\n");
+        return;
+    }
+    l->granulate_mode = b;
+    looper_refresh_grain_stream(l);
+}
+void looper_set_grain_duration(looper *l, int dur)
+{
+    // if (dur < MAX_GRAIN_DURATION) {
+    l->grain_duration = dur;
+    looper_refresh_grain_stream(l);
+    //} else
+    //    printf("Sorry, grain duration must be under %d\n",
+    //    MAX_GRAIN_DURATION);
+}
+
+void looper_set_grains_per_sec(looper *l, int gps)
+{
+    l->grains_per_sec = gps;
+    looper_refresh_grain_stream(l);
+}
+
+void looper_set_grain_selection_mode(looper *l, unsigned int mode)
+{
+    l->grain_selection = mode;
+    looper_refresh_grain_stream(l);
 }

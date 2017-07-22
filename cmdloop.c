@@ -441,6 +441,23 @@ void interpret(char *line)
                             }
                         }
                     }
+                    else if (strncmp("granulate", wurds[2], 8) == 0) {
+                        int on_or_off = atoi(wurds[3]);
+                        printf("ONOROFF: %d\n", on_or_off);
+                        looper_set_granulate(s, on_or_off);
+                    }
+                    else if (strncmp("grain_duration", wurds[2], 14) == 0) {
+                        int dur = atoi(wurds[3]);
+                        looper_set_grain_duration(s, dur);
+                    }
+                    else if (strncmp("grains_per_sec", wurds[2], 14) == 0) {
+                        int gps = atoi(wurds[3]);
+                        looper_set_grains_per_sec(s, gps);
+                    }
+                    else if (strncmp("grain_selection", wurds[2], 16) == 0) {
+                        int mode = atoi(wurds[3]);
+                        looper_set_grain_selection_mode(s, mode);
+                    }
                     else if (strncmp("midi", wurds[2], 4) == 0) {
                         mixr->midi_control_destination = MIDILOOPER;
                         mixr->active_midi_soundgen_num = soundgen_num;
