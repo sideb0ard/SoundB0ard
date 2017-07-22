@@ -26,10 +26,12 @@ typedef struct file_sample {
 #define MAX_GRAIN_STREAM_LEN_SEC 10
 
 typedef struct sound_grain {
-    int grain_duration_ms;
     int grain_len_samples;
     int audiobuffer_num;
-    int audiobuffer_idx;
+    int audiobuffer_start_idx;
+    int audiobuffer_cur_pos;
+    int release_time_pct; // percent of grain_len_samples
+    int attack_time_pct; // percent of grain_len_samples
     bool active;
 } sound_grain;
 
@@ -58,12 +60,16 @@ typedef struct t_looper {
     bool just_been_resampled;
 
     bool granulate_mode;
-    int grain_duration;
+    int grain_duration_ms;
     int grains_per_sec;
+    int num_grains_per_looplen;
     unsigned int grain_selection;
     sound_grain m_grains[MAX_SOUND_GRAINS];
+    int m_cur_grain;
     int grain_stream[MAX_GRAIN_STREAM_LEN_SEC * SAMPLE_RATE];
-    int grain_stream_read_idx;
+    int grain_stream_len_samples;
+    int grain_attack_time_pct;
+    int grain_release_time_pct;
 
     bool scramblrrr_mode;
     bool scramblrrr_active;
@@ -120,7 +126,15 @@ void looper_refresh_grain_stream(looper *l);
 void looper_set_granulate(looper *l, bool b);
 void looper_set_grain_duration(looper *l, int dur);
 void looper_set_grains_per_sec(looper *l, int gps);
+void looper_set_grain_attack_size_pct(looper *l, int att);
+void looper_set_grain_release_size_pct(looper *l, int rel);
 void looper_set_grain_selection_mode(looper *l, unsigned int mode);
+
+void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct, int release_pct);
+void sound_grain_activate(sound_grain *g, bool b);
+int sound_grain_generate_idx(sound_grain *g);
+double sound_grain_env(sound_grain *g);
+void sound_grain_reset(sound_grain *g);
 
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);

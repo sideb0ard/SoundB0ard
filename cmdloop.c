@@ -446,7 +446,7 @@ void interpret(char *line)
                         printf("ONOROFF: %d\n", on_or_off);
                         looper_set_granulate(s, on_or_off);
                     }
-                    else if (strncmp("grain_duration", wurds[2], 14) == 0) {
+                    else if (strncmp("grain_duration_ms", wurds[2], 14) == 0) {
                         int dur = atoi(wurds[3]);
                         looper_set_grain_duration(s, dur);
                     }
