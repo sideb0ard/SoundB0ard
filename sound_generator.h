@@ -39,7 +39,6 @@ int add_compressor_soundgen(SOUNDGEN *self);
 int add_distortion_soundgen(SOUNDGEN *self);
 int add_decimator_soundgen(SOUNDGEN *self);
 int add_delay_soundgen(SOUNDGEN *self, float duration);
-int add_granulator_soundgen(SOUNDGEN *self);
 int add_moddelay_soundgen(SOUNDGEN *self);
 int add_modfilter_soundgen(SOUNDGEN *self);
 int add_follower_soundgen(SOUNDGEN *self);

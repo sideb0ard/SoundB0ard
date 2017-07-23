@@ -8,7 +8,6 @@
 #include "dynamics_processor.h"
 #include "envelope_follower.h"
 #include "fx.h"
-#include "granulator.h"
 #include "modfilter.h"
 #include "modular_delay.h"
 #include "reverb.h"
@@ -91,13 +90,6 @@ int add_follower_soundgen(SOUNDGEN *self)
     printf("RAWK! ENvelope Followerrr!\n");
     envelope_follower *ef = new_envelope_follower();
     return soundgen_add_fx(self, (fx *)ef);
-}
-
-int add_granulator_soundgen(SOUNDGEN *self)
-{
-    printf("RAWK! GRANNY!!\n");
-    granulator *g = new_granulator(2, 50); // 2 grains x 50ms
-    return soundgen_add_fx(self, (fx *)g);
 }
 
 int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth)

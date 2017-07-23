@@ -8,7 +8,6 @@
 #include <wchar.h>
 
 #define MAX_SAMPLES_PER_LOOPER 10
-#define MAX_SOUND_GRAINS 1000
 
 typedef struct file_sample {
     char *filename;
@@ -23,26 +22,7 @@ typedef struct file_sample {
     int loop_len;
 } file_sample;
 
-#define MAX_GRAIN_STREAM_LEN_SEC 10
-
-typedef struct sound_grain {
-    int grain_len_samples;
-    int audiobuffer_num;
-    int audiobuffer_start_idx;
-    int audiobuffer_cur_pos;
-    int release_time_pct; // percent of grain_len_samples
-    int attack_time_pct; // percent of grain_len_samples
-    bool active;
-} sound_grain;
-
-enum {
-    GRAIN_SEQUENTIAL,
-    GRAIN_RANDOM,
-    GRAIN_REVERSED,
-    GRAIN_NUM_SELECTION_MODES
-};
-
-typedef struct t_looper {
+typedef struct looper {
     SOUNDGEN sound_generator;
 
     file_sample *samples[MAX_SAMPLES_PER_LOOPER];
@@ -58,20 +38,6 @@ typedef struct t_looper {
     bool active;
     bool started;
     bool just_been_resampled;
-
-    bool granulate_mode;
-    int  granular_file_position;
-    int  granular_spray;
-    int grain_duration_ms;
-    int grains_per_sec;
-    int num_grains_per_looplen;
-    unsigned int grain_selection;
-    sound_grain m_grains[MAX_SOUND_GRAINS];
-    int m_cur_grain;
-    int grain_stream[MAX_GRAIN_STREAM_LEN_SEC * SAMPLE_RATE];
-    int grain_stream_len_samples;
-    int grain_attack_time_pct;
-    int grain_release_time_pct;
 
     bool scramblrrr_mode;
     bool scramblrrr_active;
@@ -95,7 +61,6 @@ typedef struct t_looper {
     bool change_loopsize_pending;
     int pending_loop_size;
     int pending_loop_num;
-
 } looper;
 
 looper *new_looper(char *filename, double loop_len); // loop_len in bars
@@ -123,22 +88,6 @@ void looper_start(void *self);
 void looper_stop(void *self);
 void looper_make_active_track(void *self, int track_num);
 int looper_get_num_tracks(void *self);
-
-void looper_refresh_grain_stream(looper *l);
-void looper_set_granulate(looper *l, bool b);
-void looper_set_grain_duration(looper *l, int dur);
-void looper_set_grains_per_sec(looper *l, int gps);
-void looper_set_grain_attack_size_pct(looper *l, int att);
-void looper_set_grain_release_size_pct(looper *l, int rel);
-void looper_set_grain_selection_mode(looper *l, unsigned int mode);
-void looper_set_granular_file_position(looper *l, int position);
-void looper_set_granular_spray(looper *l, int spray_ms);
-
-void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct, int release_pct);
-void sound_grain_activate(sound_grain *g, bool b);
-int sound_grain_generate_idx(sound_grain *g);
-double sound_grain_env(sound_grain *g);
-void sound_grain_reset(sound_grain *g);
 
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);

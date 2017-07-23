@@ -21,7 +21,6 @@
 #include "dynamics_processor.h"
 #include "envelope.h"
 #include "envelope_follower.h"
-#include "granulator.h"
 #include "help.h"
 #include "keys.h"
 #include "midimaaan.h"
@@ -441,31 +440,32 @@ void interpret(char *line)
                             }
                         }
                     }
-                    else if (strncmp("granulate", wurds[2], 8) == 0) {
-                        int on_or_off = atoi(wurds[3]);
-                        printf("ONOROFF: %d\n", on_or_off);
-                        looper_set_granulate(s, on_or_off);
-                    }
-                    else if (strncmp("grain_duration_ms", wurds[2], 14) == 0) {
-                        int dur = atoi(wurds[3]);
-                        looper_set_grain_duration(s, dur);
-                    }
-                    else if (strncmp("grains_per_sec", wurds[2], 14) == 0) {
-                        int gps = atoi(wurds[3]);
-                        looper_set_grains_per_sec(s, gps);
-                    }
-                    else if (strncmp("grain_selection", wurds[2], 16) == 0) {
-                        int mode = atoi(wurds[3]);
-                        looper_set_grain_selection_mode(s, mode);
-                    }
-                    else if (strncmp("grain_file_pos", wurds[2], 14) == 0) {
-                        int pos = atoi(wurds[3]);
-                        looper_set_granular_file_position(s, pos);
-                    }
-                    else if (strncmp("grain_spray_ms", wurds[2], 14) == 0) {
-                        int spray = atoi(wurds[3]);
-                        looper_set_granular_spray(s, spray);
-                    }
+                    // else if (strncmp("granulate", wurds[2], 8) == 0) {
+                    //    int on_or_off = atoi(wurds[3]);
+                    //    printf("ONOROFF: %d\n", on_or_off);
+                    //    looper_set_granulate(s, on_or_off);
+                    //}
+                    // else if (strncmp("grain_duration_ms", wurds[2], 14) == 0)
+                    // {
+                    //    int dur = atoi(wurds[3]);
+                    //    looper_set_grain_duration(s, dur);
+                    //}
+                    // else if (strncmp("grains_per_sec", wurds[2], 14) == 0) {
+                    //    int gps = atoi(wurds[3]);
+                    //    looper_set_grains_per_sec(s, gps);
+                    //}
+                    // else if (strncmp("grain_selection", wurds[2], 16) == 0) {
+                    //    int mode = atoi(wurds[3]);
+                    //    looper_set_grain_selection_mode(s, mode);
+                    //}
+                    // else if (strncmp("grain_file_pos", wurds[2], 14) == 0) {
+                    //    int pos = atoi(wurds[3]);
+                    //    looper_set_granular_file_position(s, pos);
+                    //}
+                    // else if (strncmp("grain_spray_ms", wurds[2], 14) == 0) {
+                    //    int spray = atoi(wurds[3]);
+                    //    looper_set_granular_spray(s, spray);
+                    //}
                     else if (strncmp("midi", wurds[2], 4) == 0) {
                         mixr->midi_control_destination = MIDILOOPER;
                         mixr->active_midi_soundgen_num = soundgen_num;
@@ -904,13 +904,13 @@ void interpret(char *line)
                 add_follower_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
-        else if (strncmp("granulator", wurds[0], 8) == 0 ||
-                 strncmp("gran", wurds[0], 4) == 0) {
-            int soundgen_num = atoi(wurds[1]);
-            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
-                add_granulator_soundgen(mixr->sound_generators[soundgen_num]);
-            }
-        }
+        // else if (strncmp("granulator", wurds[0], 8) == 0 ||
+        //         strncmp("gran", wurds[0], 4) == 0) {
+        //    int soundgen_num = atoi(wurds[1]);
+        //    if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+        //        add_granulator_soundgen(mixr->sound_generators[soundgen_num]);
+        //    }
+        //}
         else if (strncmp("moddelay", wurds[0], 7) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
@@ -1046,24 +1046,24 @@ void interpret(char *line)
                              strncmp("default", wurds[3], 7) == 0)
                         dynamics_processor_set_default_sidechain_params(dp);
                 }
-                else if (f->type == GRANULATOR) {
-                    granulator *g = (granulator *)f;
-                    double val = atof(wurds[4]);
-                    if (strncmp("numgrains", wurds[3], 9) == 0)
-                        granulator_set_num_grains(g, val);
-                    else if (strncmp("grainlen", wurds[3], 8) == 0)
-                        granulator_set_grain_len(g, val);
-                    else if (strncmp("fudge", wurds[3], 5) == 0)
-                        granulator_set_fudge_factor(g, val);
-                    else if (strncmp("wetmx", wurds[3], 5) == 0)
-                        granulator_set_wet_mix(g, val);
-                    else if (strncmp("locked", wurds[3], 5) == 0)
-                        granulator_set_locked(g, val);
-                    else if (strncmp("read_pos", wurds[3], 8) == 0)
-                        granulator_set_read_pos(g, val);
-                    else if (strncmp("env", wurds[3], 3) == 0)
-                        granulator_set_apply_env(g, val);
-                }
+                // else if (f->type == GRANULATOR) {
+                //    granulator *g = (granulator *)f;
+                //    double val = atof(wurds[4]);
+                //    if (strncmp("numgrains", wurds[3], 9) == 0)
+                //        granulator_set_num_grains(g, val);
+                //    else if (strncmp("grainlen", wurds[3], 8) == 0)
+                //        granulator_set_grain_len(g, val);
+                //    else if (strncmp("fudge", wurds[3], 5) == 0)
+                //        granulator_set_fudge_factor(g, val);
+                //    else if (strncmp("wetmx", wurds[3], 5) == 0)
+                //        granulator_set_wet_mix(g, val);
+                //    else if (strncmp("locked", wurds[3], 5) == 0)
+                //        granulator_set_locked(g, val);
+                //    else if (strncmp("read_pos", wurds[3], 8) == 0)
+                //        granulator_set_read_pos(g, val);
+                //    else if (strncmp("env", wurds[3], 3) == 0)
+                //        granulator_set_apply_env(g, val);
+                //}
                 else if (f->type == REVERB) {
                     reverb *r = (reverb *)f;
                     double val = atof(wurds[4]);
