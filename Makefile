@@ -29,6 +29,7 @@ OBJ = \
 	filter_moogladder.o \
 	filter_onepole.o \
 	filter_sem.o \
+	granulator.o \
 	help.o \
 	keys.o \
 	lfo.o \

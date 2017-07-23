@@ -61,6 +61,8 @@ void granulator_setvol(void *self, double v);
 double granulator_getvol(void *self);
 void granulator_start(void *self);
 void granulator_stop(void *self);
+int granulator_get_num_tracks(void *self);
+void granulator_make_active_track(void *self, int tracknum);
 
 void granulator_refresh_grain_stream(granulator *g);
 void granulator_set_granulate(granulator *g, bool b);

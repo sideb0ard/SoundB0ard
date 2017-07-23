@@ -56,6 +56,7 @@
 #define COOL_COLOR_YELLOW "\x1b[38;5;226m"
 #define COOL_COLOR_PINK "\x1b[38;5;200m"
 #define COOL_COLOR_MAUVE "\x1b[38;5;135m"
+#define COOL_COLOR_ORANGE "\x1b[38;5;202m"
 
 #define WANSI_COLOR_BLUE L"\x1b[34m"
 #define WANSI_COLOR_CYAN L"\x1b[36m"
@@ -69,6 +70,7 @@
 #define WCOOL_COLOR_YELLOW L"\x1b[38;5;226m"
 #define WCOOL_COLOR_PINK L"\x1b[38;5;200m"
 #define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
+#define WCOOL_COLOR_ORANGE L"\x1b[38;5;202m"
 
 enum { KICK, SNARE };
 
@@ -89,6 +91,7 @@ typedef enum {
     SYNTH_TYPE,
     LOOPER_TYPE,
     BITWIZE_TYPE,
+    GRANULATOR_TYPE,
     SEQUENCER_TYPE,
     SYNTHDRUM_TYPE,
     ALGORITHM_TYPE,

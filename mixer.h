@@ -105,6 +105,7 @@ int add_minisynth(mixer *mixr);
 int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                       bool start_on_first_beat);
 int add_looper(mixer *mixr, char *filename, double loop_len);
+int add_granulator(mixer *mixr, char *filename);
 int add_sound_generator(mixer *mixr, SOUNDGEN *sg);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);

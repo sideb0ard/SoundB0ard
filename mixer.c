@@ -12,6 +12,7 @@
 #include "defjams.h"
 #include "envelope.h"
 #include "fx.h"
+#include "granulator.h"
 #include "looper.h"
 #include "minisynth.h"
 #include "mixer.h"
@@ -267,6 +268,14 @@ int add_looper(mixer *mixr, char *filename, double loop_len)
     return add_sound_generator(mixr, (SOUNDGEN *)l);
 }
 
+int add_granulator(mixer *mixr, char *filename)
+{
+    printf("ADDING A GRANNY!\n");
+    granulator *g = new_granulator(filename);
+    printf("GOT A GRAANY\n");
+    return add_sound_generator(mixr, (SOUNDGEN *)g);
+}
+
 double mixer_gennext(mixer *mixr)
 {
     if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
@@ -443,6 +452,11 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
             printf("DELALOOPER!\n");
             looper *l = (looper *)sg;
             looper_del_self(l);
+            break;
+        case (GRANULATOR_TYPE):
+            printf("DELETINGA GRANNY!\n");
+            granulator *g = (granulator *)sg;
+            granulator_del_self(g);
             break;
         case (BITWIZE_TYPE):
             printf("DELABIT!\n");

@@ -21,6 +21,7 @@
 #include "dynamics_processor.h"
 #include "envelope.h"
 #include "envelope_follower.h"
+#include "granulator.h"
 #include "help.h"
 #include "keys.h"
 #include "midimaaan.h"
@@ -394,6 +395,41 @@ void interpret(char *line)
                     spork_set_polarity(s, val);
             }
         }
+        // GRANULATOR COMMANDS
+        else if (strncmp("granulator", wurds[0], 8) == 0 ||
+                 strncmp("gran", wurds[0], 4) == 0) {
+            if (is_valid_file(wurds[1])) {
+                // if (loop_len > 0) {
+                int soundgen_num = add_granulator(mixr, wurds[1]);
+                printf("SOUNDGEN %d\n", soundgen_num);
+            }
+            else {
+                int soundgen_num = atoi(wurds[1]);
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+                    mixr->sound_generators[soundgen_num]->type ==
+                        GRANULATOR_TYPE) {
+                    granulator *g =
+                        (granulator *)mixr->sound_generators[soundgen_num];
+                    if (strncmp("grain_duration_ms", wurds[2], 14) == 0) {
+                        int dur = atoi(wurds[3]);
+                        granulator_set_grain_duration(g, dur);
+                    }
+                    else if (strncmp("grains_per_sec", wurds[2], 14) == 0) {
+                        int gps = atoi(wurds[3]);
+                        granulator_set_grains_per_sec(g, gps);
+                    }
+                    else if (strncmp("grain_file_pos", wurds[2], 14) == 0) {
+                        int pos = atoi(wurds[3]);
+                        granulator_set_granular_file_position(g, pos);
+                    }
+                    else if (strncmp("grain_spray_ms", wurds[2], 14) == 0) {
+                        int spray = atoi(wurds[3]);
+                        granulator_set_granular_spray(g, spray);
+                    }
+                }
+            }
+        }
+
         // SAMPLE LOOPER COMMANDS
         else if (strncmp("loop", wurds[0], 4) == 0) {
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {
@@ -440,32 +476,6 @@ void interpret(char *line)
                             }
                         }
                     }
-                    // else if (strncmp("granulate", wurds[2], 8) == 0) {
-                    //    int on_or_off = atoi(wurds[3]);
-                    //    printf("ONOROFF: %d\n", on_or_off);
-                    //    looper_set_granulate(s, on_or_off);
-                    //}
-                    // else if (strncmp("grain_duration_ms", wurds[2], 14) == 0)
-                    // {
-                    //    int dur = atoi(wurds[3]);
-                    //    looper_set_grain_duration(s, dur);
-                    //}
-                    // else if (strncmp("grains_per_sec", wurds[2], 14) == 0) {
-                    //    int gps = atoi(wurds[3]);
-                    //    looper_set_grains_per_sec(s, gps);
-                    //}
-                    // else if (strncmp("grain_selection", wurds[2], 16) == 0) {
-                    //    int mode = atoi(wurds[3]);
-                    //    looper_set_grain_selection_mode(s, mode);
-                    //}
-                    // else if (strncmp("grain_file_pos", wurds[2], 14) == 0) {
-                    //    int pos = atoi(wurds[3]);
-                    //    looper_set_granular_file_position(s, pos);
-                    //}
-                    // else if (strncmp("grain_spray_ms", wurds[2], 14) == 0) {
-                    //    int spray = atoi(wurds[3]);
-                    //    looper_set_granular_spray(s, spray);
-                    //}
                     else if (strncmp("midi", wurds[2], 4) == 0) {
                         mixr->midi_control_destination = MIDILOOPER;
                         mixr->active_midi_soundgen_num = soundgen_num;

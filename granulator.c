@@ -17,7 +17,7 @@ granulator *new_granulator(char *filename)
     g->vol = 0.7;
     g->active = true;
     g->started = false;
-    g->granulate_mode = false;
+
     g->granular_file_position = 0;
     g->granular_spray = 441; // 10ms * SR/1000;
     g->grain_duration_ms = 50;
@@ -36,7 +36,7 @@ granulator *new_granulator(char *filename)
     g->sound_generator.make_active_track = &granulator_make_active_track;
     g->sound_generator.type = GRANULATOR_TYPE;
 
-    granulator_refresh_grain_stream(l);
+    granulator_refresh_grain_stream(g);
 
     return g;
 }
@@ -50,146 +50,104 @@ double granulator_gennext(void *self)
     if (!g->active)
         return val;
 
-    int cur_loop_position = g->samples[l->cur_sample]->position;
-    int cur_grain = g->grain_stream[cur_loop_position];
-    if (cur_grain != -99) {
-        // sound_grain_activate(&l->m_grains[cur_grain], true);
-        l->m_cur_grain = cur_grain;
-        sound_grain_reset(&l->m_grains[l->m_cur_grain]);
-    }
+    // int cur_loop_position = g->samples[l->cur_sample]->position;
+    // int cur_grain = g->grain_stream[cur_loop_position];
+    // if (cur_grain != -99) {
+    //    // sound_grain_activate(&l->m_grains[cur_grain], true);
+    //    l->m_cur_grain = cur_grain;
+    //    sound_grain_reset(&l->m_grains[l->m_cur_grain]);
+    //}
 
-    int grain_idx = sound_grain_generate_idx(&l->m_grains[l->m_cur_grain]);
-    int modified_idx =
-        grain_idx % l->samples[l->cur_sample]->resampled_file_size;
-    val = l->samples[l->cur_sample]->resampled_file_bytes[modified_idx];
+    // int grain_idx = sound_grain_generate_idx(&l->m_grains[l->m_cur_grain]);
+    // int modified_idx =
+    //    grain_idx % l->samples[l->cur_sample]->resampled_file_size;
+    // val = l->samples[l->cur_sample]->resampled_file_bytes[modified_idx];
 
-    val = effector(&l->sound_generator, val);
-    val = envelopor(&l->sound_generator, val);
+    val = effector(&g->sound_generator, val);
+    val = envelopor(&g->sound_generator, val);
 
-    return val * l->vol;
+    return val * g->vol;
 }
 
 void granulator_status(void *self, wchar_t *status_string)
 {
-    granulator *l = (granulator *)self;
-    swprintf(
-        status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
-        "[granulator] Vol:%.2lf MultiMode:%s CurSample:%d Len:%d Granulate:%s"
-        " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
-        "      ScramblrrrMode:%s ScrambleGen:%d ScrambleEveryN:%d "
-        "StutterMode:%s StutterGen:%d StutterEveryN:%d\n"
-        "      MaxGen:%d  Active:%s Position:%d SampleLength:%d",
-        l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
-        l->samples[l->cur_sample]->resampled_file_size,
-        l->granulate_mode ? "true" : "false", l->grain_duration_ms,
-        l->grains_per_sec, l->granular_spray,
-        l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
-        l->scramble_every_n_loops, l->stutter_mode ? "true" : "false",
-        l->stutter_generation, l->stutter_every_n_loops, l->max_generation,
-        l->active ? " true" : "false", l->samples[l->cur_sample]->position,
-        l->samples[l->cur_sample]->resampled_file_size);
+    granulator *g = (granulator *)self;
+    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_ORANGE
+             "[GRANULATOR] Vol:%.2lf File:%s Len:%d"
+             " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n",
+             g->vol, "testfile", 256, g->grain_duration_ms, g->grains_per_sec,
+             g->granular_spray);
 
-    int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
-    wchar_t granulator_details[strlen_left];
-    for (int i = 0; i < l->num_samples; i++) {
-        swprintf(granulator_details, 128,
-                 L"\n      [" WANSI_COLOR_WHITE "%d" WCOOL_COLOR_GREEN "]"
-                 " %s - looplen: %d numloops: %d",
-                 i, basename(l->samples[i]->filename), l->samples[i]->loop_len,
-                 l->sample_num_loops[i]);
-        wcslcat(status_string, granulator_details, strlen_left);
-    }
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void granulator_start(void *self)
 {
-    granulator *l = (granulator *)self;
-    l->active = true;
-    // l->started = false;
-    // l->samples[l->cur_sample]->position = 0;
-    // l->scramblrrr->position = 0;
+    granulator *g = (granulator *)self;
+    g->active = true;
 }
 
 void granulator_stop(void *self)
 {
-    granulator *l = (granulator *)self;
-    l->active = false;
-    l->started = false;
-    l->samples[l->cur_sample]->position = 0;
-    l->scramblrrr->position = 0;
+    granulator *g = (granulator *)self;
+    g->active = false;
+    g->started = false;
 }
 
 double granulator_getvol(void *self)
 {
-    granulator *l = (granulator *)self;
-    return l->vol;
+    granulator *g = (granulator *)self;
+    return g->vol;
 }
 
 void granulator_setvol(void *self, double v)
 {
-    granulator *l = (granulator *)self;
+    granulator *g = (granulator *)self;
     if (v < 0.0 || v > 1.0) {
         return;
     }
-    l->vol = v;
+    g->vol = v;
 }
 
-void granulator_del_self(granulator *s)
+void granulator_del_self(granulator *g)
 {
-    for (int i = 0; i < s->num_samples; i++) {
-        printf("Dleeeting samples\n");
-        file_sample_free(s->samples[i]);
-    }
-    free(s);
+    // TODO delete file
+    free(g);
 }
 
 void granulator_make_active_track(void *self, int track_num)
 {
-    granulator *l = (granulator *)self;
-    l->cur_sample = track_num;
+    // NOOP
 }
 
-int granulator_get_num_tracks(void *self)
-{
-    granulator *l = (granulator *)self;
-    return l->num_samples;
-}
+int granulator_get_num_tracks(void *self) { return 1; }
 
-void granulator_refresh_grain_stream(granulator *l)
+void granulator_refresh_grain_stream(granulator *g)
 {
-    double beat_time_in_secs = 60.0 / mixr->bpm;
-    double seconds_in_cloud_loop = 4 * beat_time_in_secs * l->loop_len;
-    l->num_grains_per_looplen = seconds_in_cloud_loop * l->grains_per_sec;
-    int grain_duration_samples = l->grain_duration_ms * 44.1;
-    int spacing =
-        mixr->loop_len_in_samples * l->loop_len / l->num_grains_per_looplen;
-
-    // TODO - don't think grain_stream_len_samples needs to be a member variable
-    l->grain_stream_len_samples = mixr->loop_len_in_samples * l->loop_len;
-    printf("LOOPLEN:%d NUMGRAINS:%d LENOFGRAINMS:%d, LENOFGRAIN_SAMPLE:%d, "
-           "SPACING:%d\n",
-           l->grain_stream_len_samples, l->num_grains_per_looplen,
-           l->grain_duration_ms, grain_duration_samples, spacing);
+    int looplen_in_seconds = mixr->loop_len_in_samples / (double)SAMPLE_RATE;
+    g->num_grains_per_looplen = looplen_in_seconds * g->grains_per_sec;
+    int grain_duration_samples = g->grain_duration_ms * 44.1;
+    int spacing = mixr->loop_len_in_samples / g->num_grains_per_looplen;
 
     // create all the necessary grains with appropriate starting idx
-    int grain_idx = l->granular_file_position;
-    if (l->granular_spray > 0)
-        grain_idx += rand() % l->granular_spray;
-    int attack_time_pct = l->grain_attack_time_pct;
-    int release_time_pct = l->grain_release_time_pct;
-    for (int i = 0; i < l->num_grains_per_looplen; i++) {
-        sound_grain_init(&l->m_grains[i], grain_duration_samples, grain_idx,
+    int grain_idx = g->granular_file_position;
+    if (g->granular_spray > 0)
+        grain_idx += rand() % g->granular_spray;
+    int attack_time_pct = g->grain_attack_time_pct;
+    int release_time_pct = g->grain_release_time_pct;
+    for (int i = 0; i < g->num_grains_per_looplen; i++) {
+        sound_grain_init(&g->m_grains[i], grain_duration_samples, grain_idx,
                          attack_time_pct, release_time_pct);
     }
 
     // reset, then populate the grain_stream positions with the
     // assocciated grain number
-    for (int i = 0; i < l->grain_stream_len_samples; i++)
-        l->grain_stream[i] = -99;
+    for (int i = 0; i < mixr->loop_len_in_samples; i++)
+        g->grain_stream[i] = -99;
     int current_grain = 0;
-    for (int i = 0; i < l->grain_stream_len_samples;) {
-        l->grain_stream[i] = current_grain++;
+    for (int i = 0; i < mixr->loop_len_in_samples;) {
+        // printf("adding to grain stream\n");
+        g->grain_stream[i] = current_grain++;
         i += spacing;
     }
 }
@@ -241,13 +199,13 @@ void granulator_set_grain_release_size_pct(granulator *l, int release_pct)
 
 void granulator_set_granular_file_position(granulator *l, int pos)
 {
-    int current_sample_file_size =
-        l->samples[l->cur_sample]->resampled_file_size;
-    if (pos < current_sample_file_size)
-        l->granular_file_position = pos;
-    else
-        printf("Position must be less than file length:%d\n",
-               current_sample_file_size);
+    // int current_sample_file_size =
+    //    l->samples[l->cur_sample]->resampled_file_size;
+    // if (pos < current_sample_file_size)
+    //    l->granular_file_position = pos;
+    // else
+    //    printf("Position must be less than file length:%d\n",
+    //           current_sample_file_size);
     granulator_refresh_grain_stream(l);
 }
 
