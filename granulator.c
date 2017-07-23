@@ -24,6 +24,7 @@ granulator *new_granulator(char *filename)
     g->grains_per_sec = 30; // density
     g->grain_attack_time_pct = 2;
     g->grain_release_time_pct = 2;
+    g->quasi_grain_fudge = 220; // samples
 
     g->sound_generator.gennext = &granulator_gennext;
     g->sound_generator.status = &granulator_status;
@@ -60,7 +61,9 @@ double granulator_gennext(void *self)
         int attack_time_pct = g->grain_attack_time_pct;
         int release_time_pct = g->grain_release_time_pct;
         int duration = g->grain_duration_ms * 44.1;
-        int fudge = rand() % 220;
+        int fudge = 0;
+        if (g->quasi_grain_fudge != 0)
+            fudge = rand() % g->quasi_grain_fudge;
         duration += fudge;
         sound_grain_init(&g->m_grain, duration, grain_idx,
                          attack_time_pct, release_time_pct);
@@ -80,11 +83,10 @@ void granulator_status(void *self, wchar_t *status_string)
 {
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_ORANGE
-             "[GRANULATOR] Vol:%.2lf File:%s Len:%d"
-             " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d grain_file_pos:%d\n",
-             g->vol, g->filename, g->filecontents_len, g->grain_duration_ms, g->grains_per_sec,
-             g->granular_spray, g->grain_file_position);
-
+             "[GRANULATOR] vol:%.2lf file:%s len:%d quasi_grain_fudge:%d"
+             " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d grain_file_pos:%d",
+             g->vol, g->filename, g->filecontents_len, g->quasi_grain_fudge,
+             g->grain_duration_ms, g->grains_per_sec, g->granular_spray, g->grain_file_position);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
@@ -158,6 +160,9 @@ void granulator_import_file(granulator *g, char *filename)
         sf_close(snd_file);
         return;
     }
+    if (g->filecontents) // already have old contents
+        free(g->filecontents);
+
     g->filecontents = filecontents;
     sf_readf_double(snd_file, g->filecontents, g->filecontents_len);
     sf_close(snd_file);
@@ -223,6 +228,11 @@ void granulator_set_granular_spray(granulator *g, int spray_ms)
 {
     int spray_samples = spray_ms * 44.1;
     g->granular_spray = spray_samples;
+}
+
+void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor)
+{
+    g->quasi_grain_fudge = fudgefactor;
 }
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,

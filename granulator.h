@@ -42,6 +42,7 @@ typedef struct granulator {
     sound_grain m_next_grain;
 
     int granular_spray;
+    int quasi_grain_fudge;
     int grain_file_position;
     int grain_duration_ms;
     int grains_per_sec;
@@ -76,6 +77,7 @@ void granulator_set_grain_attack_size_pct(granulator *g, int att);
 void granulator_set_grain_release_size_pct(granulator *g, int rel);
 void granulator_set_grain_file_position(granulator *g, int position);
 void granulator_set_granular_spray(granulator *g, int spray_ms);
+void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct);

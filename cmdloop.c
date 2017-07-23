@@ -426,6 +426,15 @@ void interpret(char *line)
                         int spray = atoi(wurds[3]);
                         granulator_set_granular_spray(g, spray);
                     }
+                    else if (strncmp("quasi_grain_fudge", wurds[2], 17) == 0) {
+                        int fudge = atoi(wurds[3]);
+                        granulator_set_quasi_grain_fudge(g, fudge);
+                    }
+                    else if (strncmp("file", wurds[2], 4) == 0) {
+                        if (is_valid_file(wurds[3])) {
+                            granulator_import_file(g, wurds[3]);
+                        }
+                    }
                 }
             }
         }
