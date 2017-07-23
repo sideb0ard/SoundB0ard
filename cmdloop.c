@@ -458,6 +458,14 @@ void interpret(char *line)
                         int mode = atoi(wurds[3]);
                         looper_set_grain_selection_mode(s, mode);
                     }
+                    else if (strncmp("grain_file_pos", wurds[2], 14) == 0) {
+                        int pos = atoi(wurds[3]);
+                        looper_set_granular_file_position(s, pos);
+                    }
+                    else if (strncmp("grain_spray_ms", wurds[2], 14) == 0) {
+                        int spray = atoi(wurds[3]);
+                        looper_set_granular_spray(s, spray);
+                    }
                     else if (strncmp("midi", wurds[2], 4) == 0) {
                         mixr->midi_control_destination = MIDILOOPER;
                         mixr->active_midi_soundgen_num = soundgen_num;

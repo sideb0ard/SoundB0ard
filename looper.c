@@ -20,6 +20,8 @@ looper *new_looper(char *filename, double loop_len)
     l->just_been_resampled = false;
     l->loop_len = loop_len;
     l->granulate_mode = false;
+    l->granular_file_position = 0;
+    l->granular_spray = 441; // 10ms * SR/1000;
     l->grain_duration_ms = 50;
     l->grains_per_sec = 30; // density
     l->grain_attack_time_pct = 2;
@@ -73,7 +75,8 @@ double looper_gennext(void *self)
 
     if (l->granulate_mode)
     {
-        int cur_grain = l->grain_stream[l->samples[l->cur_sample]->position];
+        int cur_loop_position = l->samples[l->cur_sample]->position;
+        int cur_grain = l->grain_stream[cur_loop_position];
         if (cur_grain != -99) {
             //sound_grain_activate(&l->m_grains[cur_grain], true);
             l->m_cur_grain = cur_grain;
@@ -83,16 +86,6 @@ double looper_gennext(void *self)
         int grain_idx = sound_grain_generate_idx(&l->m_grains[l->m_cur_grain]);
         int modified_idx = grain_idx % l->samples[l->cur_sample]->resampled_file_size;
         val = l->samples[l->cur_sample]->resampled_file_bytes[modified_idx];
-
-        //for (int i = 0; i < l->num_grains_per_looplen; i++)
-        //{
-        //    int grain_idx = sound_grain_generate_idx(&l->m_grains[i]);
-        //    if (grain_idx != -1) {
-        //        int modified_idx = grain_idx % l->samples[l->cur_sample]->resampled_file_size;
-        //        val += l->samples[l->cur_sample]->resampled_file_bytes[modified_idx] *
-        //                sound_grain_env(&l->m_grains[i]);
-        //    }
-        //}
     }
     else {
         if (mixr->start_of_loop && l->resample_pending) {
@@ -386,14 +379,15 @@ void looper_status(void *self, wchar_t *status_string)
 {
     looper *l = (looper *)self;
     swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
-             "[LOOPER] Vol:%.2lf MultiMode:%s Current Sample:%d Granulate:%s"
-             " grain_duration_ms:%d grains_per_sec:%d grain_selection:%d grains_per_loop:%d\n"
+             "[LOOPER] Vol:%.2lf MultiMode:%s CurSample:%d Len:%d Granulate:%s"
+             " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
              "      ScramblrrrMode:%s ScrambleGen:%d ScrambleEveryN:%d "
              "StutterMode:%s StutterGen:%d StutterEveryN:%d\n"
              "      MaxGen:%d  Active:%s Position:%d SampleLength:%d",
              l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
+             l->samples[l->cur_sample]->resampled_file_size,
              l->granulate_mode ? "true" : "false", l->grain_duration_ms,
-             l->grains_per_sec, l->grain_selection, l->num_grains_per_looplen,
+             l->grains_per_sec, l->granular_spray ,
              l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
              l->scramble_every_n_loops, l->stutter_mode ? "true" : "false",
              l->stutter_generation, l->stutter_every_n_loops, l->max_generation,
@@ -690,14 +684,15 @@ void looper_refresh_grain_stream(looper *l)
             spacing);
 
     // create all the necessary grains with appropriate starting idx
-    int grain_idx = 0;
+    int grain_idx = l->granular_file_position;
+    if (l->granular_spray > 0)
+        grain_idx += rand() % l->granular_spray;
     int attack_time_pct = l->grain_attack_time_pct;
     int release_time_pct = l->grain_release_time_pct;
     for (int i = 0; i < l->num_grains_per_looplen; i++)
     {
         sound_grain_init(&l->m_grains[i], grain_duration_samples, grain_idx,
                          attack_time_pct, release_time_pct);
-        grain_idx += spacing;
     }
 
     // reset, then populate the grain_stream positions with the 
@@ -757,6 +752,22 @@ void looper_set_grain_release_size_pct(looper *l, int release_pct)
     looper_refresh_grain_stream(l);
 }
 
+void looper_set_granular_file_position(looper *l, int pos)
+{
+    int current_sample_file_size = l->samples[l->cur_sample]->resampled_file_size; 
+    if (pos < current_sample_file_size)
+        l->granular_file_position = pos;
+    else
+        printf("Position must be less than file length:%d\n", current_sample_file_size);
+    looper_refresh_grain_stream(l);
+}
+
+void looper_set_granular_spray(looper *l, int spray_ms)
+{
+    int spray_samples = spray_ms * 44.1;
+    l->granular_spray = spray_samples;
+}
+
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct, int release_pct)
 {
     g->grain_len_samples = dur;
@@ -804,3 +815,4 @@ double sound_grain_env(sound_grain *g)
 
     return env_amp;
 }
+

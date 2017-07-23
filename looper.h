@@ -60,6 +60,8 @@ typedef struct t_looper {
     bool just_been_resampled;
 
     bool granulate_mode;
+    int  granular_file_position;
+    int  granular_spray;
     int grain_duration_ms;
     int grains_per_sec;
     int num_grains_per_looplen;
@@ -129,6 +131,8 @@ void looper_set_grains_per_sec(looper *l, int gps);
 void looper_set_grain_attack_size_pct(looper *l, int att);
 void looper_set_grain_release_size_pct(looper *l, int rel);
 void looper_set_grain_selection_mode(looper *l, unsigned int mode);
+void looper_set_granular_file_position(looper *l, int position);
+void looper_set_granular_spray(looper *l, int spray_ms);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct, int release_pct);
 void sound_grain_activate(sound_grain *g, bool b);
