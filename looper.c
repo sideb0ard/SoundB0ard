@@ -245,6 +245,7 @@ void sample_import_file_contents(file_sample *fs, char *filename)
     int *buffer = (int *)calloc(bufsize, sizeof(int));
     if (buffer == NULL) {
         perror("Ooft, memory issues, mate!\n");
+        sf_close(snd_file);
         return;
     }
 
