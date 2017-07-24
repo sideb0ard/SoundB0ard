@@ -101,6 +101,10 @@ void granulator_set_selection_mode(granulator *g, unsigned int mode);
 int granulator_get_available_grain_num(granulator *g);
 int granulator_deactivate_other_grains(granulator *g);
 
+void granulator_set_lfo_amp(granulator *g, double amp);
+void granulator_set_lfo_voice(granulator *g, unsigned int voice);
+void granulator_set_lfo_rate(granulator *g, double rate);
+
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);
 int sound_grain_generate_idx(sound_grain *g);

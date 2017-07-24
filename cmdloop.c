@@ -452,6 +452,19 @@ void interpret(char *line)
                         printf("MODE is %d\n", mode);
                         granulator_set_sequencer_mode(g, mode);
                     }
+                    else if (strncmp("lfo_type", wurds[2], 8) == 0) {
+                        int type = atoi(wurds[3]);
+                        printf("LFO TYPE is %d\n", mode);
+                        granulator_set_lfo_voice(g, type);
+                    }
+                    else if (strncmp("lfo_amp", wurds[2], 7) == 0) {
+                        double amp = atof(wurds[3]);
+                        granulator_set_lfo_amp(g, amp);
+                    }
+                    else if (strncmp("lfo_rate", wurds[2], 8) == 0) {
+                        double rate = atoi(wurds[3]);
+                        granulator_set_lfo_rate(g, rate);
+                    }
                     else {
                         printf("ELSEY SEQUENCE!\n");
                         char *pattern = (char *)calloc(151, sizeof(char));

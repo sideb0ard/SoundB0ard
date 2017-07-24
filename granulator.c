@@ -51,6 +51,8 @@ granulator *new_granulator(char *filename)
     envelope_generator_init(&g->m_eg1);
     osc_new_settings((oscillator *)&g->m_lfo1);
     lfo_set_soundgenerator_interface(&g->m_lfo1);
+    g->m_lfo1.osc.m_osc_fo = 0.5; //default LFO
+    lfo_start_oscillator((oscillator *)&g->m_lfo1);
 
     return g;
 }
@@ -79,6 +81,10 @@ double granulator_gennext(void *self)
 
     double eg = eg_do_envelope(&g->m_eg1, NULL);
     double lfo_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
+    double scaley_val = scaleybum(-1,1,1,100,lfo_out);
+    g->grain_duration_ms = scaley_val;
+
+    //printf("LFO out:%f : %f\n", lfo_out, scaley_val);
 
     int cur_loop_position = mixr->cur_sample % mixr->loop_len_in_samples;
     bool new_grain = g->grain_stream[cur_loop_position];
@@ -197,6 +203,63 @@ void granulator_make_active_track(void *self, int track_num)
 }
 
 int granulator_get_num_tracks(void *self) { return 1; }
+
+//////////////////////////// grain stuff //////////////////////////
+// granulator functions contuine below
+
+void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
+                      int release_pct, int pitch)
+{
+    g->grain_len_samples = dur;
+    g->audiobuffer_start_idx = starting_idx;
+    g->audiobuffer_cur_pos = starting_idx;
+    g->audiobuffer_pitch = pitch;
+    g->attack_time_pct = attack_pct;
+    g->release_time_pct = release_pct;
+    g->active = true;
+    g->deactivation_pending = false;
+}
+
+int sound_grain_generate_idx(sound_grain *g)
+{
+    if (!g->active)
+        return -99;
+
+    double my_idx = g->audiobuffer_cur_pos;
+
+    g->audiobuffer_cur_pos += g->audiobuffer_pitch;
+    int end_buffer = g->audiobuffer_start_idx + g->grain_len_samples;
+    if (g->audiobuffer_cur_pos >= end_buffer) {
+        g->audiobuffer_cur_pos -= g->grain_len_samples;
+        if (g->deactivation_pending)
+            g->active = false;
+    }
+    else if (g->audiobuffer_cur_pos < 0) {
+        g->audiobuffer_cur_pos = end_buffer - g->audiobuffer_cur_pos;
+        if (g->deactivation_pending)
+            g->active = false;
+    }
+    return my_idx;
+}
+
+void sound_grain_reset(sound_grain *g)
+{
+    g->audiobuffer_cur_pos = g->audiobuffer_start_idx;
+}
+
+double sound_grain_env(sound_grain *g)
+{
+    double env_amp = 1.;
+    double percent_pos = 100. / g->grain_len_samples *
+                         (g->audiobuffer_cur_pos - g->audiobuffer_start_idx);
+    if (percent_pos < g->attack_time_pct)
+        env_amp *= percent_pos / g->attack_time_pct;
+    else if (percent_pos > (100 - g->release_time_pct))
+        env_amp *= (100 - percent_pos) / g->release_time_pct;
+    return env_amp;
+}
+
+//////////////////////////// end of grain stuff //////////////////////////
 
 void granulator_import_file(granulator *g, char *filename)
 {
@@ -368,56 +431,26 @@ int granulator_deactivate_other_grains(granulator *g)
     return num_deactivated;
 }
 
-//////////////////////////// grain stuff //////////////////////////
-
-void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
-                      int release_pct, int pitch)
+void granulator_set_lfo_amp(granulator *g, double amp)
 {
-    g->grain_len_samples = dur;
-    g->audiobuffer_start_idx = starting_idx;
-    g->audiobuffer_cur_pos = starting_idx;
-    g->audiobuffer_pitch = pitch;
-    g->attack_time_pct = attack_pct;
-    g->release_time_pct = release_pct;
-    g->active = true;
-    g->deactivation_pending = false;
+    if (amp >= 0.0 && amp <= 1.0)
+        g->m_lfo1.osc.m_amplitude = amp;
+    else
+        printf("Amp should be between 0 and 1\n");
 }
 
-int sound_grain_generate_idx(sound_grain *g)
+void granulator_set_lfo_voice(granulator *g, unsigned int voice)
 {
-    if (!g->active)
-        return -99;
-
-    double my_idx = g->audiobuffer_cur_pos;
-
-    g->audiobuffer_cur_pos += g->audiobuffer_pitch;
-    int end_buffer = g->audiobuffer_start_idx + g->grain_len_samples;
-    if (g->audiobuffer_cur_pos >= end_buffer) {
-        g->audiobuffer_cur_pos -= g->grain_len_samples;
-        if (g->deactivation_pending)
-            g->active = false;
-    }
-    else if (g->audiobuffer_cur_pos < 0) {
-        g->audiobuffer_cur_pos = end_buffer - g->audiobuffer_cur_pos;
-        if (g->deactivation_pending)
-            g->active = false;
-    }
-    return my_idx;
+    if (voice < MAX_LFO_OSC)
+        g->m_lfo1.osc.m_waveform = voice;
+    else
+        printf("Voice ENUM should be < %d\n", MAX_LFO_OSC);
 }
 
-void sound_grain_reset(sound_grain *g)
+void granulator_set_lfo_rate(granulator *g, double rate)
 {
-    g->audiobuffer_cur_pos = g->audiobuffer_start_idx;
-}
-
-double sound_grain_env(sound_grain *g)
-{
-    double env_amp = 1.;
-    double percent_pos = 100. / g->grain_len_samples *
-                         (g->audiobuffer_cur_pos - g->audiobuffer_start_idx);
-    if (percent_pos < g->attack_time_pct)
-        env_amp *= percent_pos / g->attack_time_pct;
-    else if (percent_pos > (100 - g->release_time_pct))
-        env_amp *= (100 - percent_pos) / g->release_time_pct;
-    return env_amp;
+    if (rate >= MIN_LFO_RATE && rate <= MAX_LFO_RATE)
+        g->m_lfo1.osc.m_osc_fo = rate;
+    else
+        printf("LFO rate should be between %f and %f\n", MIN_LFO_RATE, MAX_LFO_RATE);
 }

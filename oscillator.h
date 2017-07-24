@@ -16,7 +16,7 @@
 #define OSC_PULSEWIDTH_DEFAULT 50   // 50%
 
 #define MIN_LFO_RATE 0.02
-#define MAX_LFO_RATE 10.0
+#define MAX_LFO_RATE 20.0
 #define DEFAULT_LFO_RATE 0.5
 
 // --- for PITCHED Oscillators
