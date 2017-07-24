@@ -1,9 +1,10 @@
 #ifndef GRANULATOR_H
 #define GRANULATOR_H
 
-#include "filter_moogladder.h"
+#include "envelope_generator.h"
+#include "lfo.h"
+#include "sequencer.h"
 #include "sound_generator.h"
-#include "stereodelay.h"
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -15,6 +16,7 @@ typedef struct sound_grain {
     int audiobuffer_num;
     int audiobuffer_start_idx;
     int audiobuffer_cur_pos;
+    int audiobuffer_pitch;
     int release_time_pct; // percent of grain_len_samples
     int attack_time_pct;  // percent of grain_len_samples
     bool active;
@@ -59,6 +61,13 @@ typedef struct granulator {
     int grain_attack_time_pct;
     int grain_release_time_pct;
 
+    sequencer m_seq;
+    bool sequencer_mode;
+    int sequencer_gate;
+
+    envelope_generator m_eg1;
+    lfo m_lfo1;
+
     double vol;
 } granulator;
 
@@ -79,6 +88,7 @@ void granulator_import_file(granulator *g, char *filename);
 
 void granulator_refresh_grain_stream(granulator *g);
 void granulator_set_scan_mode(granulator *g, bool b);
+void granulator_set_sequencer_mode(granulator *g, bool b);
 void granulator_set_scan_speed(granulator *g, int speed);
 void granulator_set_grain_duration(granulator *g, int dur);
 void granulator_set_grains_per_sec(granulator *g, int gps);
@@ -92,7 +102,7 @@ int granulator_get_available_grain_num(granulator *g);
 int granulator_deactivate_other_grains(granulator *g);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
-                      int release_pct);
+                      int release_pct, int pitch);
 int sound_grain_generate_idx(sound_grain *g);
 double sound_grain_env(sound_grain *g);
 

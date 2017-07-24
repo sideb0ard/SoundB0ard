@@ -447,6 +447,18 @@ void interpret(char *line)
                         int mode = atoi(wurds[3]);
                         granulator_set_selection_mode(g, mode);
                     }
+                    else if (strncmp("sequencer_mode", wurds[2], 13) == 0) {
+                        int mode = atoi(wurds[3]);
+                        printf("MODE is %d\n", mode);
+                        granulator_set_sequencer_mode(g, mode);
+                    }
+                    else {
+                        printf("ELSEY SEQUENCE!\n");
+                        char *pattern = (char *)calloc(151, sizeof(char));
+                        sequencer *seq = &g->m_seq;
+                        parse_sequencer_command(seq, wurds, num_wurds, pattern);
+                        free(pattern);
+                    }
                 }
             }
         }

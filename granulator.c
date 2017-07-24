@@ -10,6 +10,7 @@
 #include "utils.h"
 
 extern mixer *mixr;
+extern char *s_lfo_mode_names;
 
 granulator *new_granulator(char *filename)
 {
@@ -28,6 +29,7 @@ granulator *new_granulator(char *filename)
     g->selection_mode = GRAIN_SELECTION_STATIC;
 
     g->scan_through_file = false;
+    g->sequencer_mode = false;
     g->scan_speed = 1;
 
     g->sound_generator.gennext = &granulator_gennext;
@@ -43,6 +45,13 @@ granulator *new_granulator(char *filename)
     granulator_import_file(g, filename);
     granulator_refresh_grain_stream(g);
 
+    seq_init(&g->m_seq);
+    granulator_set_sequencer_mode(g, false);
+
+    envelope_generator_init(&g->m_eg1);
+    osc_new_settings((oscillator *)&g->m_lfo1);
+    lfo_set_soundgenerator_interface(&g->m_lfo1);
+
     return g;
 }
 
@@ -56,7 +65,7 @@ double granulator_gennext(void *self)
         return val;
 
     if (g->scan_through_file) {
-        g->grain_file_position += g->scan_speed;
+        g->grain_file_position++;
         if (g->grain_file_position >= g->filecontents_len)
             g->grain_file_position =
                 g->grain_file_position % g->filecontents_len;
@@ -65,14 +74,16 @@ double granulator_gennext(void *self)
                 g->filecontents_len - g->grain_file_position;
     }
 
+    eg_update(&g->m_eg1);
+    osc_update((oscillator *)&g->m_lfo1);
+
+    double eg = eg_do_envelope(&g->m_eg1, NULL);
+    double lfo_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
+
     int cur_loop_position = mixr->cur_sample % mixr->loop_len_in_samples;
     bool new_grain = g->grain_stream[cur_loop_position];
     if (new_grain) {
         g->cur_grain_num = granulator_get_available_grain_num(g);
-        if (g->cur_grain_num == -99) {
-            printf("PANIC!\n");
-            exit(0);
-        }
 
         int duration = g->grain_duration_ms * 44.1;
         int fudge = 0;
@@ -90,7 +101,7 @@ double granulator_gennext(void *self)
         int attack_time_pct = g->grain_attack_time_pct;
         int release_time_pct = g->grain_release_time_pct;
         sound_grain_init(&g->m_grains[g->cur_grain_num], duration, grain_idx,
-                         attack_time_pct, release_time_pct);
+                         attack_time_pct, release_time_pct, g->scan_speed);
         g->num_active_grains++;
         int num_deactivated = granulator_deactivate_other_grains(g);
         g->num_active_grains -= num_deactivated;
@@ -105,10 +116,22 @@ double granulator_gennext(void *self)
         }
     }
 
+    if (g->sequencer_mode && g->m_seq.num_patterns > 0) {
+        int idx = mixr->midi_tick % PPBAR;
+        if (mixr->is_midi_tick &&
+            g->m_seq.patterns[g->m_seq.cur_pattern][idx]) {
+            g->sequencer_gate = 1;
+        }
+        else if (mixr->is_sixteenth)
+            g->sequencer_gate = 0;
+
+        seq_tick(&g->m_seq);
+    }
+
     val = effector(&g->sound_generator, val);
     val = envelopor(&g->sound_generator, val);
 
-    return val * g->vol;
+    return val * g->vol * g->sequencer_gate;
 }
 
 void granulator_status(void *self, wchar_t *status_string)
@@ -118,11 +141,19 @@ void granulator_status(void *self, wchar_t *status_string)
              "[GRANULATOR] vol:%.2lf file:%s len:%d quasi_grain_fudge:%d"
              " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
              "      grain_file_pos:%d scan:%s scan_speed:%d selection_mode:%d "
-             "active_grains:%d",
+             "active_grains:%d highest_grain_num:%d sequencer_mode:%s\n"
+             "      lfo_type:%s lfo_amp:%f lfo_rate:%f",
              g->vol, g->filename, g->filecontents_len, g->quasi_grain_fudge,
              g->grain_duration_ms, g->grains_per_sec, g->granular_spray,
              g->grain_file_position, g->scan_through_file ? "true" : "false",
-             g->scan_speed, g->selection_mode, g->num_active_grains);
+             g->scan_speed, g->selection_mode, g->num_active_grains,
+             g->highest_grain_num, g->sequencer_mode ? "true" : "false",
+             // s_lfo_mode_names[g->m_lfo1.osc.m_waveform],
+             "jobboe", g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo);
+    wchar_t seq_status_string[MAX_PS_STRING_SZ];
+    memset(seq_status_string, 0, MAX_PS_STRING_SZ);
+    seq_status(&g->m_seq, seq_status_string);
+    wcscat(status_string, seq_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
@@ -295,6 +326,19 @@ void granulator_set_selection_mode(granulator *g, unsigned int mode)
     g->selection_mode = mode;
 }
 
+void granulator_set_sequencer_mode(granulator *g, bool b)
+{
+    if (b != 0 && b != 1) {
+        printf("not BOOLEY BOOLEY!\n");
+        return;
+    }
+    if (b)
+        g->sequencer_gate = 0;
+    else
+        g->sequencer_gate = 1;
+    g->sequencer_mode = b;
+}
+
 int granulator_get_available_grain_num(granulator *g)
 {
     int idx = 0;
@@ -307,7 +351,7 @@ int granulator_get_available_grain_num(granulator *g)
         idx++;
     }
     printf("WOW - NO GRAINS TO BE FOUND IN %d attempts\n", idx++);
-    return -99;
+    return 0;
 }
 
 int granulator_deactivate_other_grains(granulator *g)
@@ -327,11 +371,12 @@ int granulator_deactivate_other_grains(granulator *g)
 //////////////////////////// grain stuff //////////////////////////
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
-                      int release_pct)
+                      int release_pct, int pitch)
 {
     g->grain_len_samples = dur;
     g->audiobuffer_start_idx = starting_idx;
     g->audiobuffer_cur_pos = starting_idx;
+    g->audiobuffer_pitch = pitch;
     g->attack_time_pct = attack_pct;
     g->release_time_pct = release_pct;
     g->active = true;
@@ -345,10 +390,15 @@ int sound_grain_generate_idx(sound_grain *g)
 
     double my_idx = g->audiobuffer_cur_pos;
 
-    g->audiobuffer_cur_pos++;
-    if (g->audiobuffer_cur_pos >=
-        g->audiobuffer_start_idx + g->grain_len_samples) {
-        g->audiobuffer_cur_pos = g->audiobuffer_start_idx;
+    g->audiobuffer_cur_pos += g->audiobuffer_pitch;
+    int end_buffer = g->audiobuffer_start_idx + g->grain_len_samples;
+    if (g->audiobuffer_cur_pos >= end_buffer) {
+        g->audiobuffer_cur_pos -= g->grain_len_samples;
+        if (g->deactivation_pending)
+            g->active = false;
+    }
+    else if (g->audiobuffer_cur_pos < 0) {
+        g->audiobuffer_cur_pos = end_buffer - g->audiobuffer_cur_pos;
         if (g->deactivation_pending)
             g->active = false;
     }
