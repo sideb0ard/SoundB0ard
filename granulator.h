@@ -7,8 +7,8 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#define MAX_SOUND_GRAINS 1000
-#define MAX_GRAIN_STREAM_LEN_SEC 10
+#define MAX_CONCURRENT_GRAINS 1000
+#define MAX_GRAIN_STREAM_LEN_SEC 10 // assuming a loop is never more than 10sec
 
 typedef struct sound_grain {
     int grain_len_samples;
@@ -17,13 +17,13 @@ typedef struct sound_grain {
     int audiobuffer_cur_pos;
     int release_time_pct; // percent of grain_len_samples
     int attack_time_pct;  // percent of grain_len_samples
-    bool initialized;
+    bool active;
+    bool deactivation_pending;
 } sound_grain;
 
 enum {
-    GRAIN_SEQUENTIAL,
-    GRAIN_RANDOM,
-    GRAIN_REVERSED,
+    GRAIN_SELECTION_STATIC,
+    GRAIN_SELECTION_RANDOM,
     GRAIN_NUM_SELECTION_MODES
 };
 
@@ -37,8 +37,11 @@ typedef struct granulator {
     double *filecontents;
     int filecontents_len;
     int current_file_read_position;
-    
-    sound_grain m_grain;
+
+    int num_active_grains;
+    int highest_grain_num;
+    int cur_grain_num;
+    sound_grain m_grains[MAX_CONCURRENT_GRAINS];
     sound_grain m_next_grain;
 
     int granular_spray;
@@ -47,6 +50,10 @@ typedef struct granulator {
     int grain_duration_ms;
     int grains_per_sec;
     int num_grains_per_looplen;
+    unsigned int selection_mode;
+
+    bool scan_through_file;
+    int scan_speed;
 
     int grain_stream[MAX_GRAIN_STREAM_LEN_SEC * SAMPLE_RATE];
     int grain_attack_time_pct;
@@ -71,6 +78,8 @@ void granulator_make_active_track(void *self, int tracknum);
 void granulator_import_file(granulator *g, char *filename);
 
 void granulator_refresh_grain_stream(granulator *g);
+void granulator_set_scan_mode(granulator *g, bool b);
+void granulator_set_scan_speed(granulator *g, int speed);
 void granulator_set_grain_duration(granulator *g, int dur);
 void granulator_set_grains_per_sec(granulator *g, int gps);
 void granulator_set_grain_attack_size_pct(granulator *g, int att);
@@ -78,6 +87,9 @@ void granulator_set_grain_release_size_pct(granulator *g, int rel);
 void granulator_set_grain_file_position(granulator *g, int position);
 void granulator_set_granular_spray(granulator *g, int spray_ms);
 void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor);
+void granulator_set_selection_mode(granulator *g, unsigned int mode);
+int granulator_get_available_grain_num(granulator *g);
+int granulator_deactivate_other_grains(granulator *g);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct);
