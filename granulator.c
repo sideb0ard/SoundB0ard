@@ -20,12 +20,12 @@ granulator *new_granulator(char *filename)
     g->started = false;
 
     g->grain_file_position = 0;
-    g->granular_spray = 0; // 10ms * SR/1000;
+    g->granular_spray = 441; // 10 ms * 44.1
     g->grain_duration_ms = 50;
-    g->grains_per_sec = 30; // density
-    g->grain_attack_time_pct = 2;
-    g->grain_release_time_pct = 2;
-    g->quasi_grain_fudge = 0; // samples
+    g->grains_per_sec = 30;
+    g->grain_attack_time_pct = 20;
+    g->grain_release_time_pct = 20;
+    g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
 
     g->scan_through_file = false;
@@ -140,10 +140,8 @@ double granulator_gennext(void *self)
         g->cur_grain_num = granulator_get_available_grain_num(g);
 
         int duration = g->grain_duration_ms * 44.1;
-        int fudge = 0;
         if (g->quasi_grain_fudge != 0)
-            fudge = rand() % g->quasi_grain_fudge;
-        duration += fudge;
+            duration += rand() % g->quasi_grain_fudge;
 
         int grain_idx = g->grain_file_position;
         if (g->selection_mode == GRAIN_SELECTION_RANDOM)
@@ -311,7 +309,7 @@ int sound_grain_generate_idx(sound_grain *g)
     // else if (g->audiobuffer_cur_pos == g->grain_len_samples / 2) {
     //    g->doppelganger_started = true;
     //}
-    else if (g->audiobuffer_cur_pos < 0) {
+    else if (g->audiobuffer_cur_pos < g->audiobuffer_start_idx) {
         g->audiobuffer_cur_pos = end_buffer - g->audiobuffer_cur_pos;
         if (g->deactivation_pending)
             g->active = false;
