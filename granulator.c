@@ -404,6 +404,10 @@ int granulator_calculate_grain_spacing(granulator *g)
 {
     int looplen_in_seconds = mixr->loop_len_in_samples / (double)SAMPLE_RATE;
     g->num_grains_per_looplen = looplen_in_seconds * g->grains_per_sec;
+    if (g->num_grains_per_looplen == 0)
+    {
+        g->num_grains_per_looplen = 2; // whoops! dn't wanna div by 0 below
+    }
     int grain_duration_samples =
         g->grain_duration_ms * (double)SAMPLE_RATE / 1000.;
     int spacing = mixr->loop_len_in_samples / g->num_grains_per_looplen;
