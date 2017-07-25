@@ -60,6 +60,7 @@ typedef struct granulator {
     int scan_speed;
 
     int grain_stream[MAX_GRAIN_STREAM_LEN_SEC * SAMPLE_RATE];
+    int last_grain_launched_sample_time;
     int grain_attack_time_pct;
     int grain_release_time_pct;
 
@@ -71,12 +72,18 @@ typedef struct granulator {
 
     bool graindur_lfo_on;
     lfo m_lfo1; // grain dur
+    double m_lfo1_min;
+    double m_lfo1_max;
 
     bool grainps_lfo_on;
     lfo m_lfo2; // grains per sec
+    double m_lfo2_min;
+    double m_lfo2_max;
 
     bool grainscanfile_lfo_on;
     lfo m_lfo3; // file read position
+    double m_lfo3_min;
+    double m_lfo3_max;
 
     double vol;
 } granulator;
@@ -96,7 +103,7 @@ void granulator_make_active_track(void *self, int tracknum);
 
 void granulator_import_file(granulator *g, char *filename);
 
-void granulator_refresh_grain_stream(granulator *g);
+int granulator_calculate_grain_spacing(granulator *g);
 void granulator_set_scan_mode(granulator *g, bool b);
 void granulator_set_sequencer_mode(granulator *g, bool b);
 void granulator_set_scan_speed(granulator *g, int speed);
@@ -114,6 +121,8 @@ int granulator_deactivate_other_grains(granulator *g);
 void granulator_set_lfo_amp(granulator *g, int lfonum, double amp);
 void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice);
 void granulator_set_lfo_rate(granulator *g, int lfonum, double rate);
+void granulator_set_lfo_min(granulator *g, int lfonum, double minval);
+void granulator_set_lfo_max(granulator *g, int lfonum, double maxval);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);

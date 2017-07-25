@@ -465,6 +465,14 @@ void interpret(char *line)
                         double rate = atof(wurds[3]);
                         granulator_set_lfo_rate(g, 1, rate);
                     }
+                    else if (strncmp("lfo1_min", wurds[2], 8) == 0) {
+                        double min = atof(wurds[3]);
+                        granulator_set_lfo_min(g, 1, min);
+                    }
+                    else if (strncmp("lfo1_max", wurds[2], 8) == 0) {
+                        double max = atof(wurds[3]);
+                        granulator_set_lfo_max(g, 1, max);
+                    }
                     else if (strncmp("lfo2_type", wurds[2], 8) == 0) {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", mode);
@@ -478,6 +486,14 @@ void interpret(char *line)
                         double rate = atof(wurds[3]);
                         granulator_set_lfo_rate(g, 2, rate);
                     }
+                    else if (strncmp("lfo2_min", wurds[2], 8) == 0) {
+                        double min = atof(wurds[3]);
+                        granulator_set_lfo_min(g, 2, min);
+                    }
+                    else if (strncmp("lfo2_max", wurds[2], 8) == 0) {
+                        double max = atof(wurds[3]);
+                        granulator_set_lfo_max(g, 2, max);
+                    }
                     else if (strncmp("lfo3_type", wurds[2], 8) == 0) {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", mode);
@@ -490,6 +506,14 @@ void interpret(char *line)
                     else if (strncmp("lfo3_rate", wurds[2], 8) == 0) {
                         double rate = atof(wurds[3]);
                         granulator_set_lfo_rate(g, 3, rate);
+                    }
+                    else if (strncmp("lfo3_min", wurds[2], 8) == 0) {
+                        double min = atof(wurds[3]);
+                        granulator_set_lfo_min(g, 3, min);
+                    }
+                    else if (strncmp("lfo3_max", wurds[2], 8) == 0) {
+                        double max = atof(wurds[3]);
+                        granulator_set_lfo_max(g, 3, max);
                     }
                     else if (strncmp("graindur_lfo_on", wurds[2], 14) == 0) {
                         int b = atoi(wurds[3]);

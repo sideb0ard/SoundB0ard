@@ -43,7 +43,7 @@ granulator *new_granulator(char *filename)
     g->sound_generator.type = GRANULATOR_TYPE;
 
     granulator_import_file(g, filename);
-    granulator_refresh_grain_stream(g);
+    // granulator_refresh_grain_stream(g);
 
     seq_init(&g->m_seq);
     granulator_set_sequencer_mode(g, false);
@@ -51,6 +51,8 @@ granulator *new_granulator(char *filename)
     envelope_generator_init(&g->m_eg1);
 
     g->graindur_lfo_on = false;
+    g->m_lfo1_min = 20;
+    g->m_lfo1_max = 100;
     osc_new_settings((oscillator *)&g->m_lfo1);
     lfo_set_soundgenerator_interface(&g->m_lfo1);
     g->m_lfo1.osc.m_osc_fo = 0.01; // default LFO
@@ -58,6 +60,8 @@ granulator *new_granulator(char *filename)
     lfo_start_oscillator((oscillator *)&g->m_lfo1);
 
     g->grainps_lfo_on = false;
+    g->m_lfo2_min = 1;
+    g->m_lfo2_max = 100;
     osc_new_settings((oscillator *)&g->m_lfo2);
     lfo_set_soundgenerator_interface(&g->m_lfo2);
     g->m_lfo2.osc.m_osc_fo = 0.01; // default LFO
@@ -65,6 +69,8 @@ granulator *new_granulator(char *filename)
     lfo_start_oscillator((oscillator *)&g->m_lfo2);
 
     g->grainscanfile_lfo_on = false;
+    g->m_lfo3_min = 0;
+    g->m_lfo3_max = g->filecontents_len;
     osc_new_settings((oscillator *)&g->m_lfo3);
     lfo_set_soundgenerator_interface(&g->m_lfo3);
     g->m_lfo3.osc.m_osc_fo = 0.01; // default LFO
@@ -102,25 +108,30 @@ double granulator_gennext(void *self)
 
     if (g->graindur_lfo_on) {
         double lfo1_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
-        double scaley_val = scaleybum(-1, 1, 20, 100, lfo1_out);
+        double scaley_val =
+            scaleybum(-1, 1, g->m_lfo1_min, g->m_lfo1_max, lfo1_out);
         g->grain_duration_ms = scaley_val;
     }
 
     if (g->grainps_lfo_on) {
         double lfo2_out = lfo_do_oscillate((oscillator *)&g->m_lfo2, NULL);
-        double scaley_val = scaleybum(-1, 1, 22, 70, lfo2_out);
+        double scaley_val =
+            scaleybum(-1, 1, g->m_lfo2_min, g->m_lfo2_max, lfo2_out);
         g->grains_per_sec = scaley_val;
     }
 
     if (g->grainscanfile_lfo_on) {
         double lfo3_out = lfo_do_oscillate((oscillator *)&g->m_lfo3, NULL);
-        double scaley_val = scaleybum(-1, 1, 0, g->filecontents_len, lfo3_out);
+        double scaley_val =
+            scaleybum(-1, 1, g->m_lfo3_min, g->m_lfo3_max, lfo3_out);
         g->grain_file_position = scaley_val;
     }
 
-    int cur_loop_position = mixr->cur_sample % mixr->loop_len_in_samples;
-    bool new_grain = g->grain_stream[cur_loop_position];
-    if (new_grain) {
+    int spacing = granulator_calculate_grain_spacing(g);
+    if (mixr->cur_sample >
+        g->last_grain_launched_sample_time + spacing) // new grain time
+    {
+        g->last_grain_launched_sample_time = mixr->cur_sample;
         g->cur_grain_num = granulator_get_available_grain_num(g);
 
         int duration = g->grain_duration_ms * 44.1;
@@ -183,28 +194,31 @@ double granulator_gennext(void *self)
 void granulator_status(void *self, wchar_t *status_string)
 {
     granulator *g = (granulator *)self;
-    swprintf(
-        status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_ORANGE
-        "[GRANULATOR] vol:%.2lf file:%s len:%d quasi_grain_fudge:%d"
-        " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
-        "      grain_file_pos:%d scan:%s scan_speed:%d selection_mode:%d "
-        "active_grains:%d highest_grain_num:%d sequencer_mode:%s\n"
-        "      graindur_lfo_on     :%s lfo1_type:%d lfo1_amp:%f lfo1_rate:%f \n"
-        "      grainps_lfo_on      :%s lfo2_type:%d lfo2_amp:%f lfo2_rate:%f \n"
-        "      grainscanfile_lfo_on:%s lfo3_type:%d lfo3_amp:%f lfo3_rate:%f "
-        "\n",
-        g->vol, g->filename, g->filecontents_len, g->quasi_grain_fudge,
-        g->grain_duration_ms, g->grains_per_sec, g->granular_spray,
-        g->grain_file_position, g->scan_through_file ? "true" : "false",
-        g->scan_speed, g->selection_mode, g->num_active_grains,
-        g->highest_grain_num, g->sequencer_mode ? "true" : "false",
-        // s_lfo_mode_names[g->m_lfo1.osc.m_waveform],
-        g->graindur_lfo_on ? "true" : "false", g->m_lfo1.osc.m_waveform,
-        g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo,
-        g->grainps_lfo_on ? "true" : "false", g->m_lfo2.osc.m_waveform,
-        g->m_lfo2.osc.m_amplitude, g->m_lfo2.osc.m_osc_fo,
-        g->grainscanfile_lfo_on ? "true" : "false", g->m_lfo3.osc.m_waveform,
-        g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo);
+    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_ORANGE
+             "[GRANULATOR] vol:%.2lf file:%s len:%d quasi_grain_fudge:%d"
+             " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
+             "      grain_file_pos:%d scan:%s scan_speed:%d selection_mode:%d "
+             "active_grains:%d highest_grain_num:%d sequencer_mode:%s\n"
+             "      graindur_lfo_on :%s lfo1_type:%d lfo1_amp:%f lfo1_rate:%f"
+             " lfo1_min:%f lfo1_max:%f \n"
+             "      grainps_lfo_on  :%s lfo2_type:%d lfo2_amp:%f lfo2_rate:%f"
+             " lfo2_min:%f lfo2_max:%f \n"
+             "      grainscan_lfo_on:%s lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
+             " lfo3_min:%f lfo3_max:%f ",
+             g->vol, g->filename, g->filecontents_len, g->quasi_grain_fudge,
+             g->grain_duration_ms, g->grains_per_sec, g->granular_spray,
+             g->grain_file_position, g->scan_through_file ? "true" : "false",
+             g->scan_speed, g->selection_mode, g->num_active_grains,
+             g->highest_grain_num, g->sequencer_mode ? "true" : "false",
+             // s_lfo_mode_names[g->m_lfo1.osc.m_waveform],
+             g->graindur_lfo_on ? "true" : "false", g->m_lfo1.osc.m_waveform,
+             g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
+             g->m_lfo1_max, g->grainps_lfo_on ? "true" : "false",
+             g->m_lfo2.osc.m_waveform, g->m_lfo2.osc.m_amplitude,
+             g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min, g->m_lfo2_max,
+             g->grainscanfile_lfo_on ? "true" : "false",
+             g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
+             g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -377,27 +391,21 @@ void granulator_import_file(granulator *g, char *filename)
     sf_close(snd_file);
 }
 
-void granulator_refresh_grain_stream(granulator *g)
+int granulator_calculate_grain_spacing(granulator *g)
 {
     int looplen_in_seconds = mixr->loop_len_in_samples / (double)SAMPLE_RATE;
     g->num_grains_per_looplen = looplen_in_seconds * g->grains_per_sec;
     int grain_duration_samples =
         g->grain_duration_ms * (double)SAMPLE_RATE / 1000.;
     int spacing = mixr->loop_len_in_samples / g->num_grains_per_looplen;
-
-    memset(g->grain_stream, 0, sizeof(int) * mixr->loop_len_in_samples);
-    for (int i = 0; i < mixr->loop_len_in_samples;) {
-        g->grain_stream[i] = 1;
-        int fudge = rand() % 441;
-        i += spacing + fudge;
-    }
+    return spacing;
 }
 
 void granulator_set_grain_duration(granulator *g, int dur)
 {
     // if (dur < MAX_GRAIN_DURATION) {
     g->grain_duration_ms = dur;
-    granulator_refresh_grain_stream(g);
+    // granulator_refresh_grain_stream(g);
     //} else
     //    printf("Sorry, grain duration must be under %d\n",
     //    MAX_GRAIN_DURATION);
@@ -406,21 +414,21 @@ void granulator_set_grain_duration(granulator *g, int dur)
 void granulator_set_grains_per_sec(granulator *g, int gps)
 {
     g->grains_per_sec = gps;
-    granulator_refresh_grain_stream(g);
+    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_grain_attack_size_pct(granulator *g, int attack_pct)
 {
     if (attack_pct < 50)
         g->grain_attack_time_pct = attack_pct;
-    granulator_refresh_grain_stream(g);
+    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_grain_release_size_pct(granulator *g, int release_pct)
 {
     if (release_pct < 50)
         g->grain_release_time_pct = release_pct;
-    granulator_refresh_grain_stream(g);
+    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_grain_file_position(granulator *g, int pos)
@@ -430,7 +438,7 @@ void granulator_set_grain_file_position(granulator *g, int pos)
         return;
     }
     g->grain_file_position = (double)pos / 100. * g->filecontents_len;
-    granulator_refresh_grain_stream(g);
+    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_granular_spray(granulator *g, int spray_ms)
@@ -565,4 +573,39 @@ void granulator_set_lfo_rate(granulator *g, int lfonum, double rate)
     }
     else
         printf("LFO rate should be between %f and %f\n", 0., MAX_LFO_RATE);
+}
+
+void granulator_set_lfo_min(granulator *g, int lfonum, double minval)
+{
+    if (minval < 0)
+        return;
+    switch (lfonum) {
+    case (1):
+        g->m_lfo1_min = minval;
+        break;
+    case (2):
+        g->m_lfo2_min = minval;
+        break;
+    case (3):
+        g->m_lfo3_min = minval;
+        break;
+    }
+}
+
+void granulator_set_lfo_max(granulator *g, int lfonum, double maxval)
+{
+    switch (lfonum) {
+    case (1):
+        if (maxval > g->m_lfo1_min)
+            g->m_lfo1_max = maxval;
+        break;
+    case (2):
+        if (maxval > g->m_lfo2_min)
+            g->m_lfo2_max = maxval;
+        break;
+    case (3):
+        if (maxval > g->m_lfo3_min)
+            g->m_lfo3_max = maxval;
+        break;
+    }
 }
