@@ -59,7 +59,6 @@ typedef struct granulator {
     bool scan_through_file;
     int scan_speed;
 
-    int grain_stream[MAX_GRAIN_STREAM_LEN_SEC * SAMPLE_RATE];
     int last_grain_launched_sample_time;
     int grain_attack_time_pct;
     int grain_release_time_pct;

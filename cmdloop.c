@@ -523,8 +523,7 @@ void interpret(char *line)
                         int b = atoi(wurds[3]);
                         g->grainps_lfo_on = b;
                     }
-                    else if (strncmp("grainscanfile_lfo_on", wurds[2], 19) ==
-                             0) {
+                    else if (strncmp("grainscan_lfo_on", wurds[2], 16) == 0) {
                         int b = atoi(wurds[3]);
                         g->grainscanfile_lfo_on = b;
                     }

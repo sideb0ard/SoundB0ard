@@ -43,7 +43,6 @@ granulator *new_granulator(char *filename)
     g->sound_generator.type = GRANULATOR_TYPE;
 
     granulator_import_file(g, filename);
-    // granulator_refresh_grain_stream(g);
 
     seq_init(&g->m_seq);
     granulator_set_sequencer_mode(g, false);
@@ -125,6 +124,12 @@ double granulator_gennext(void *self)
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo3_min, g->m_lfo3_max, lfo3_out);
         g->grain_file_position = scaley_val;
+        if (g->grain_file_position >= g->filecontents_len)
+            g->grain_file_position =
+                g->grain_file_position % g->filecontents_len;
+        else if (g->grain_file_position < 0)
+            g->grain_file_position =
+                g->filecontents_len - g->grain_file_position;
     }
 
     int spacing = granulator_calculate_grain_spacing(g);
@@ -159,6 +164,8 @@ double granulator_gennext(void *self)
     for (int i = 0; i < g->highest_grain_num; i++) {
         int grain_idx = sound_grain_generate_idx(&g->m_grains[i]);
         if (grain_idx != -99) {
+            if (grain_idx < 0)
+                printf("VLIMEY!\n");
             int modified_idx = grain_idx % g->filecontents_len;
             val += g->filecontents[modified_idx] *
                    sound_grain_env(&g->m_grains[i],
@@ -301,22 +308,24 @@ int sound_grain_generate_idx(sound_grain *g)
         if (g->deactivation_pending)
             g->active = false;
     }
-    else if (g->audiobuffer_cur_pos == g->grain_len_samples / 2) {
-        g->doppelganger_started = true;
-    }
+    // else if (g->audiobuffer_cur_pos == g->grain_len_samples / 2) {
+    //    g->doppelganger_started = true;
+    //}
     else if (g->audiobuffer_cur_pos < 0) {
         g->audiobuffer_cur_pos = end_buffer - g->audiobuffer_cur_pos;
         if (g->deactivation_pending)
             g->active = false;
     }
 
-    if (g->doppelganger_started) {
-        g->doppelganger_idx += g->audiobuffer_pitch;
-        if (g->doppelganger_idx >= end_buffer)
-            g->doppelganger_idx -= g->grain_len_samples;
-        else if (g->doppelganger_idx < 0)
-            g->doppelganger_idx += g->grain_len_samples;
-    }
+    // if (g->doppelganger_started) {
+    //    g->doppelganger_idx += g->audiobuffer_pitch;
+    //    if (g->doppelganger_idx >= end_buffer)
+    //        g->doppelganger_idx -= g->grain_len_samples;
+    //    else if (g->doppelganger_idx < 0)
+    //        g->doppelganger_idx += g->grain_len_samples;
+    //}
+    if (my_idx < 0)
+        printf("VLIMEY! %f\n", my_idx);
     return my_idx;
 }
 
@@ -405,7 +414,6 @@ void granulator_set_grain_duration(granulator *g, int dur)
 {
     // if (dur < MAX_GRAIN_DURATION) {
     g->grain_duration_ms = dur;
-    // granulator_refresh_grain_stream(g);
     //} else
     //    printf("Sorry, grain duration must be under %d\n",
     //    MAX_GRAIN_DURATION);
@@ -414,21 +422,18 @@ void granulator_set_grain_duration(granulator *g, int dur)
 void granulator_set_grains_per_sec(granulator *g, int gps)
 {
     g->grains_per_sec = gps;
-    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_grain_attack_size_pct(granulator *g, int attack_pct)
 {
     if (attack_pct < 50)
         g->grain_attack_time_pct = attack_pct;
-    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_grain_release_size_pct(granulator *g, int release_pct)
 {
     if (release_pct < 50)
         g->grain_release_time_pct = release_pct;
-    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_grain_file_position(granulator *g, int pos)
@@ -438,7 +443,6 @@ void granulator_set_grain_file_position(granulator *g, int pos)
         return;
     }
     g->grain_file_position = (double)pos / 100. * g->filecontents_len;
-    // granulator_refresh_grain_stream(g);
 }
 
 void granulator_set_granular_spray(granulator *g, int spray_ms)
