@@ -21,6 +21,8 @@ typedef struct sound_grain {
     int attack_time_pct;  // percent of grain_len_samples
     bool active;
     bool deactivation_pending;
+    bool doppelganger_started;
+    int doppelganger_idx;
 } sound_grain;
 
 enum {
@@ -66,7 +68,15 @@ typedef struct granulator {
     int sequencer_gate;
 
     envelope_generator m_eg1;
-    lfo m_lfo1;
+
+    bool graindur_lfo_on;
+    lfo m_lfo1; // grain dur
+
+    bool grainps_lfo_on;
+    lfo m_lfo2; // grains per sec
+
+    bool grainscanfile_lfo_on;
+    lfo m_lfo3; // file read position
 
     double vol;
 } granulator;
@@ -101,14 +111,15 @@ void granulator_set_selection_mode(granulator *g, unsigned int mode);
 int granulator_get_available_grain_num(granulator *g);
 int granulator_deactivate_other_grains(granulator *g);
 
-void granulator_set_lfo_amp(granulator *g, double amp);
-void granulator_set_lfo_voice(granulator *g, unsigned int voice);
-void granulator_set_lfo_rate(granulator *g, double rate);
+void granulator_set_lfo_amp(granulator *g, int lfonum, double amp);
+void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice);
+void granulator_set_lfo_rate(granulator *g, int lfonum, double rate);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);
 int sound_grain_generate_idx(sound_grain *g);
-double sound_grain_env(sound_grain *g);
+int sound_grain_gen_doppelganger_idx(sound_grain *g);
+double sound_grain_env(sound_grain *g, int idx_num);
 
 void granulator_del_self(granulator *g);
 

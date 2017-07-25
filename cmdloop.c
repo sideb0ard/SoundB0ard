@@ -452,18 +452,57 @@ void interpret(char *line)
                         printf("MODE is %d\n", mode);
                         granulator_set_sequencer_mode(g, mode);
                     }
-                    else if (strncmp("lfo_type", wurds[2], 8) == 0) {
+                    else if (strncmp("lfo1_type", wurds[2], 8) == 0) {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", mode);
-                        granulator_set_lfo_voice(g, type);
+                        granulator_set_lfo_voice(g, 1, type);
                     }
-                    else if (strncmp("lfo_amp", wurds[2], 7) == 0) {
+                    else if (strncmp("lfo1_amp", wurds[2], 7) == 0) {
                         double amp = atof(wurds[3]);
-                        granulator_set_lfo_amp(g, amp);
+                        granulator_set_lfo_amp(g, 1, amp);
                     }
-                    else if (strncmp("lfo_rate", wurds[2], 8) == 0) {
-                        double rate = atoi(wurds[3]);
-                        granulator_set_lfo_rate(g, rate);
+                    else if (strncmp("lfo1_rate", wurds[2], 8) == 0) {
+                        double rate = atof(wurds[3]);
+                        granulator_set_lfo_rate(g, 1, rate);
+                    }
+                    else if (strncmp("lfo2_type", wurds[2], 8) == 0) {
+                        int type = atoi(wurds[3]);
+                        printf("LFO TYPE is %d\n", mode);
+                        granulator_set_lfo_voice(g, 2, type);
+                    }
+                    else if (strncmp("lfo2_amp", wurds[2], 7) == 0) {
+                        double amp = atof(wurds[3]);
+                        granulator_set_lfo_amp(g, 2, amp);
+                    }
+                    else if (strncmp("lfo2_rate", wurds[2], 8) == 0) {
+                        double rate = atof(wurds[3]);
+                        granulator_set_lfo_rate(g, 2, rate);
+                    }
+                    else if (strncmp("lfo3_type", wurds[2], 8) == 0) {
+                        int type = atoi(wurds[3]);
+                        printf("LFO TYPE is %d\n", mode);
+                        granulator_set_lfo_voice(g, 3, type);
+                    }
+                    else if (strncmp("lfo3_amp", wurds[2], 7) == 0) {
+                        double amp = atof(wurds[3]);
+                        granulator_set_lfo_amp(g, 3, amp);
+                    }
+                    else if (strncmp("lfo3_rate", wurds[2], 8) == 0) {
+                        double rate = atof(wurds[3]);
+                        granulator_set_lfo_rate(g, 3, rate);
+                    }
+                    else if (strncmp("graindur_lfo_on", wurds[2], 14) == 0) {
+                        int b = atoi(wurds[3]);
+                        g->graindur_lfo_on = b;
+                    }
+                    else if (strncmp("grainps_lfo_on", wurds[2], 13) == 0) {
+                        int b = atoi(wurds[3]);
+                        g->grainps_lfo_on = b;
+                    }
+                    else if (strncmp("grainscanfile_lfo_on", wurds[2], 19) ==
+                             0) {
+                        int b = atoi(wurds[3]);
+                        g->grainscanfile_lfo_on = b;
                     }
                     else {
                         printf("ELSEY SEQUENCE!\n");
