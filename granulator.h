@@ -53,11 +53,10 @@ typedef struct granulator {
     int grain_file_position;
     int grain_duration_ms;
     int grains_per_sec;
+    int grain_pitch;
     int num_grains_per_looplen;
     unsigned int selection_mode;
 
-    bool scan_through_file;
-    int scan_speed;
 
     int last_grain_launched_sample_time;
     int grain_attack_time_pct;
@@ -103,9 +102,8 @@ void granulator_make_active_track(void *self, int tracknum);
 void granulator_import_file(granulator *g, char *filename);
 
 int granulator_calculate_grain_spacing(granulator *g);
-void granulator_set_scan_mode(granulator *g, bool b);
 void granulator_set_sequencer_mode(granulator *g, bool b);
-void granulator_set_scan_speed(granulator *g, int speed);
+void granulator_set_grain_pitch(granulator *g, int pitch);
 void granulator_set_grain_duration(granulator *g, int dur);
 void granulator_set_grains_per_sec(granulator *g, int gps);
 void granulator_set_grain_attack_size_pct(granulator *g, int att);

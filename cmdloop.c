@@ -435,13 +435,9 @@ void interpret(char *line)
                             granulator_import_file(g, wurds[3]);
                         }
                     }
-                    else if (strncmp("scan_speed", wurds[2], 10) == 0) {
-                        int speed = atoi(wurds[3]);
-                        granulator_set_scan_speed(g, speed);
-                    }
-                    else if (strncmp("scan", wurds[2], 4) == 0) {
-                        int scan = atoi(wurds[3]);
-                        granulator_set_scan_mode(g, scan);
+                    else if (strncmp("grain_pitch", wurds[2], 10) == 0) {
+                        int pitch = atoi(wurds[3]);
+                        granulator_set_grain_pitch(g, pitch);
                     }
                     else if (strncmp("selection_mode", wurds[2], 14) == 0) {
                         int mode = atoi(wurds[3]);
