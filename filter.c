@@ -73,7 +73,7 @@ void filter_update(filter *f)
     // f->set_q_control(f, f->m_q_control);
 
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);
-    // printf("OOFT, M_FC %f\n", f->m_fc);
+    //printf("OOFT, M_FC %f\n", f->m_fc);
 
     if (f->m_fc > FILTER_FC_MAX)
         f->m_fc = FILTER_FC_MAX;
