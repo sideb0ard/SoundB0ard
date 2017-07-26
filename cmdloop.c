@@ -18,6 +18,7 @@
 #include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
+#include "distortion.h"
 #include "dynamics_processor.h"
 #include "envelope.h"
 #include "envelope_follower.h"
@@ -523,6 +524,18 @@ void interpret(char *line)
                         int b = atoi(wurds[3]);
                         g->grainscanfile_lfo_on = b;
                     }
+                    else if (strncmp("eg_amp_attack_ms", wurds[2], 16) == 0) {
+                        int attack = atoi(wurds[3]);
+                        eg_set_attack_time_msec(&g->m_eg1, attack);
+                    }
+                    else if (strncmp("eg_amp_release_ms", wurds[2], 17) == 0) {
+                        int release = atoi(wurds[3]);
+                        eg_set_release_time_msec(&g->m_eg1, release);
+                    }
+                    else if (strncmp("eg_state", wurds[2], 8) == 0) {
+                        int state = atoi(wurds[3]);
+                        // eg_set_state(&g->m_eg1, state);
+                    }
                     else {
                         printf("ELSEY SEQUENCE!\n");
                         char *pattern = (char *)calloc(151, sizeof(char));
@@ -1006,10 +1019,7 @@ void interpret(char *line)
         else if (strncmp("filter", wurds[0], 6) == 0) {
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
-                int type = atoi(wurds[2]);
-                double freq = atof(wurds[3]);
-                add_basicfilter_soundgen(mixr->sound_generators[soundgen_num],
-                                         type, freq);
+                add_basicfilter_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
         else if (strncmp("follower", wurds[0], 8) == 0) {
@@ -1242,9 +1252,11 @@ void interpret(char *line)
                     filterpass *fp = (filterpass *)f;
                     double val = atof(wurds[4]);
                     if (strncmp("freq", wurds[3], 4) == 0)
-                        filterpass_set_freq(fp, val);
+                        filter_set_fc_control(&fp->m_filter.f, val);
+                    if (strncmp("q", wurds[3], 4) == 0)
+                        moog_set_qcontrol(&fp->m_filter.f, val);
                     else if (strncmp("type", wurds[3], 4) == 0)
-                        filterpass_set_type(fp, val);
+                        filter_set_type(&fp->m_filter.f, val);
                 }
                 else if (f->type == BEATREPEAT) {
                     beatrepeat *br = (beatrepeat *)f;
@@ -1253,6 +1265,12 @@ void interpret(char *line)
                         beatrepeat_change_num_beats_to_repeat(br, val);
                     else if (strncmp("sixteenth", wurds[3], 9) == 0)
                         beatrepeat_change_selected_sixteenth(br, val);
+                }
+                else if (f->type == DISTORTION) {
+                    distortion *d = (distortion *)f;
+                    double val = atof(wurds[4]);
+                    if (strncmp("threshold", wurds[3], 9) == 0)
+                        distortion_set_threshold(d, val);
                 }
                 else if (f->type == ENVELOPEFOLLOWER) {
                     envelope_follower *ef = (envelope_follower *)f;

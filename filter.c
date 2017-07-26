@@ -25,14 +25,21 @@ void filter_setup(filter *f)
     // f->m_global_filter_params = NULL;
 }
 
-// void filter_set_fc_control(filter *f, double val)
-//{
-//    if (val > FILTER_FC_MIN && val < FILTER_FC_MAX) {
-//        f->m_fc_control = val;
-//    }
-//}
+void filter_set_fc_control(filter *f, double val)
+{
+    if (val > FILTER_FC_MIN && val < FILTER_FC_MAX) {
+        f->m_fc_control = val;
+    }
+}
 
 void filter_set_fc_mod(filter *f, double val) { f->m_fc_mod = val; }
+void filter_set_type(filter *f, unsigned int type)
+{
+    if (type < NUM_FILTER_TYPES)
+        f->m_filter_type = type;
+    else
+        printf("Type must be between 0 and %d\n", NUM_FILTER_TYPES - 1);
+}
 
 // void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
 

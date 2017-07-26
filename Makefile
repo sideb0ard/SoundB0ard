@@ -15,6 +15,7 @@ OBJ = \
 	cmdloop.o \
 	dca.o \
 	ddlmodule.o \
+	distortion.o \
 	delayline.o \
 	dynamics_processor.o \
 	sample_sequencer.o \

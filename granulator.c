@@ -16,7 +16,7 @@ granulator *new_granulator(char *filename)
 {
     granulator *g = (granulator *)calloc(1, sizeof(granulator));
     g->vol = 0.7;
-    g->active = true;
+    // g->active = true;
     g->started = false;
 
     g->grain_file_position = 0;
@@ -46,7 +46,9 @@ granulator *new_granulator(char *filename)
     seq_init(&g->m_seq);
     granulator_set_sequencer_mode(g, false);
 
-    envelope_generator_init(&g->m_eg1);
+    envelope_generator_init(&g->m_eg1); // start/stop env
+    g->m_eg1.m_attack_time_msec = 50;
+    g->m_eg1.m_release_time_msec = 75;
 
     g->graindur_lfo_on = false;
     g->m_lfo1_min = 20;
@@ -75,6 +77,8 @@ granulator *new_granulator(char *filename)
     g->m_lfo3.osc.m_amplitude = 1.;
     lfo_start_oscillator((oscillator *)&g->m_lfo3);
 
+    granulator_start(g);
+
     return g;
 }
 
@@ -84,15 +88,26 @@ double granulator_gennext(void *self)
     granulator *g = (granulator *)self;
     double val = 0;
 
+    if (g->sequencer_mode && g->m_seq.num_patterns > 0) {
+        int idx = mixr->midi_tick % PPBAR;
+        if (mixr->is_midi_tick &&
+            g->m_seq.patterns[g->m_seq.cur_pattern][idx]) {
+            granulator_start(g);
+        }
+        else if (mixr->is_sixteenth)
+            granulator_stop(g);
+        seq_tick(&g->m_seq);
+    }
+
     if (!g->active)
         return val;
 
-    eg_update(&g->m_eg1);
+    if (g->m_eg1.m_state == OFFF)
+        g->active = false;
+
     osc_update((oscillator *)&g->m_lfo1);
     osc_update((oscillator *)&g->m_lfo2);
     osc_update((oscillator *)&g->m_lfo3);
-
-    double eg = eg_do_envelope(&g->m_eg1, NULL);
 
     if (g->graindur_lfo_on) {
         double lfo1_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
@@ -167,22 +182,13 @@ double granulator_gennext(void *self)
         }
     }
 
-    if (g->sequencer_mode && g->m_seq.num_patterns > 0) {
-        int idx = mixr->midi_tick % PPBAR;
-        if (mixr->is_midi_tick &&
-            g->m_seq.patterns[g->m_seq.cur_pattern][idx]) {
-            g->sequencer_gate = 1;
-        }
-        else if (mixr->is_sixteenth)
-            g->sequencer_gate = 0;
-
-        seq_tick(&g->m_seq);
-    }
-
     val = effector(&g->sound_generator, val);
     val = envelopor(&g->sound_generator, val);
 
-    return val * g->vol * g->sequencer_gate;
+    eg_update(&g->m_eg1);
+    double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
+
+    return val * g->vol * eg_amp;
 }
 
 void granulator_status(void *self, wchar_t *status_string)
@@ -198,12 +204,13 @@ void granulator_status(void *self, wchar_t *status_string)
              "      grainps_lfo_on  :%s lfo2_type:%d lfo2_amp:%f lfo2_rate:%f"
              " lfo2_min:%f lfo2_max:%f \n"
              "      grainscan_lfo_on:%s lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
-             " lfo3_min:%f lfo3_max:%f ",
+             " lfo3_min:%f lfo3_max:%f \n"
+             "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
              g->vol, g->filename, g->filecontents_len, g->quasi_grain_fudge,
              g->grain_duration_ms, g->grains_per_sec, g->granular_spray,
-             g->grain_file_position,
-             g->grain_pitch, g->selection_mode, g->num_active_grains,
-             g->highest_grain_num, g->sequencer_mode ? "true" : "false",
+             g->grain_file_position, g->grain_pitch, g->selection_mode,
+             g->num_active_grains, g->highest_grain_num,
+             g->sequencer_mode ? "true" : "false",
              // s_lfo_mode_names[g->m_lfo1.osc.m_waveform],
              g->graindur_lfo_on ? "true" : "false", g->m_lfo1.osc.m_waveform,
              g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
@@ -212,7 +219,9 @@ void granulator_status(void *self, wchar_t *status_string)
              g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min, g->m_lfo2_max,
              g->grainscanfile_lfo_on ? "true" : "false",
              g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
-             g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max);
+             g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max,
+             g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
+             g->m_eg1.m_state);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -224,14 +233,16 @@ void granulator_status(void *self, wchar_t *status_string)
 void granulator_start(void *self)
 {
     granulator *g = (granulator *)self;
+    eg_start_eg(&g->m_eg1);
     g->active = true;
 }
 
 void granulator_stop(void *self)
 {
     granulator *g = (granulator *)self;
-    g->active = false;
+    // g->active = false;
     g->started = false;
+    eg_release(&g->m_eg1);
 }
 
 double granulator_getvol(void *self)
@@ -301,7 +312,8 @@ int sound_grain_generate_idx(sound_grain *g)
             g->active = false;
     }
 
-    if (g->doppelganger_started) { // started by grain_envelope, when we enter release
+    if (g->doppelganger_started) { // started by grain_envelope, when we enter
+                                   // release
         g->doppelganger_idx += g->audiobuffer_pitch;
         if (g->doppelganger_idx >= end_buffer)
             g->doppelganger_idx -= g->grain_len_samples;
@@ -387,8 +399,7 @@ int granulator_calculate_grain_spacing(granulator *g)
 {
     int looplen_in_seconds = mixr->loop_len_in_samples / (double)SAMPLE_RATE;
     g->num_grains_per_looplen = looplen_in_seconds * g->grains_per_sec;
-    if (g->num_grains_per_looplen == 0)
-    {
+    if (g->num_grains_per_looplen == 0) {
         g->num_grains_per_looplen = 2; // whoops! dn't wanna div by 0 below
     }
     int grain_duration_samples =

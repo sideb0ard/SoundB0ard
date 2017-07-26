@@ -57,7 +57,6 @@ typedef struct granulator {
     int num_grains_per_looplen;
     unsigned int selection_mode;
 
-
     int last_grain_launched_sample_time;
     int grain_attack_time_pct;
     int grain_release_time_pct;
@@ -66,7 +65,8 @@ typedef struct granulator {
     bool sequencer_mode;
     int sequencer_gate;
 
-    envelope_generator m_eg1;
+    envelope_generator m_eg1; // start/stop amp
+    envelope_generator m_eg2; // unused so far
 
     bool graindur_lfo_on;
     lfo m_lfo1; // grain dur

@@ -22,7 +22,8 @@ typedef enum {
     BSF2,
     LPF4,
     HPF4,
-    BPF4
+    BPF4,
+    NUM_FILTER_TYPES
 } filter_type;
 
 typedef struct filter filter;
@@ -60,8 +61,10 @@ struct filter {
 
 void filter_setup(filter *self);
 
+void filter_set_fc_control(filter *f, double val);
 void filter_set_fc_mod(filter *self, double val);
 void filter_set_q_control(filter *self, double val);
+void filter_set_type(filter *self, unsigned int type);
 void filter_update(filter *self);
 void filter_reset(filter *self);
 void filter_init_global_parameters(filter *self, global_filter_params *params);

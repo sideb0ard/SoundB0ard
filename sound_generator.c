@@ -5,6 +5,7 @@
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "defjams.h"
+#include "distortion.h"
 #include "dynamics_processor.h"
 #include "envelope_follower.h"
 #include "fx.h"
@@ -65,17 +66,11 @@ int add_waveshape_soundgen(SOUNDGEN *self)
     return soundgen_add_fx(self, (fx *)ws);
 }
 
-int add_basicfilter_soundgen(SOUNDGEN *self, unsigned int type, double freq)
+int add_basicfilter_soundgen(SOUNDGEN *self)
 {
     printf("Fffuuuuhfilter!\n");
-    if (freq >= 20 && freq <= 20480 && type < 4) {
-        filterpass *fp = new_filterpass(freq, type);
-        return soundgen_add_fx(self, (fx *)fp);
-    }
-    else
-        printf("Check yer params, mate\n");
-
-    return -1;
+    filterpass *fp = new_filterpass();
+    return soundgen_add_fx(self, (fx *)fp);
 }
 
 int add_compressor_soundgen(SOUNDGEN *self)
@@ -131,16 +126,8 @@ int add_decimator_soundgen(SOUNDGEN *self)
 int add_distortion_soundgen(SOUNDGEN *self)
 {
     printf("BOOYA! Distortion all up in this kittycat\n");
-    // fx *e = new_distortion();
-    // if (e == NULL) {
-    //    perror("Couldn't create DISTORTion effect");
-    //    return -1;
-    //}
-    // self->effects[self->effects_num] = e;
-    // self->effects_on = 1;
-    // printf("done adding effect\n");
-    // return self->effects_num++;
-    return self->effects_num;
+    distortion *d = new_distortion();
+    return soundgen_add_fx(self, (fx *)d);
 }
 
 int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
