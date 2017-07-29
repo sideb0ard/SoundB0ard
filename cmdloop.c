@@ -405,8 +405,8 @@ void interpret(char *line)
         // GRANULATOR COMMANDS
         else if (strncmp("granulator", wurds[0], 8) == 0 ||
                  strncmp("gran", wurds[0], 4) == 0) {
-            if (is_valid_file(wurds[1])) {
-                // if (loop_len > 0) {
+            if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0) {
+                printf("VALID!\n");
                 int soundgen_num = add_granulator(mixr, wurds[1]);
                 printf("SOUNDGEN %d\n", soundgen_num);
             }
@@ -427,7 +427,7 @@ void interpret(char *line)
                     }
                     else if (strncmp("grain_file_pos", wurds[2], 14) == 0) {
                         int pos = atoi(wurds[3]);
-                        granulator_set_grain_file_position(g, pos);
+                        granulator_set_grain_buffer_position(g, pos);
                     }
                     else if (strncmp("grain_spray_ms", wurds[2], 14) == 0) {
                         int spray = atoi(wurds[3]);
@@ -436,6 +436,13 @@ void interpret(char *line)
                     else if (strncmp("quasi_grain_fudge", wurds[2], 17) == 0) {
                         int fudge = atoi(wurds[3]);
                         granulator_set_quasi_grain_fudge(g, fudge);
+                    }
+                    else if (strncmp("extsource", wurds[2], 9) == 0) {
+                        int sg = atoi(wurds[3]);
+                        if (mixer_is_valid_soundgen_num(mixr, sg)) {
+                            printf("GRAN is following %d\n", sg);
+                            granulator_set_external_source(g, sg);
+                        }
                     }
                     else if (strncmp("file", wurds[2], 4) == 0) {
                         if (is_valid_file(wurds[3])) {
@@ -468,6 +475,10 @@ void interpret(char *line)
                         double rate = atof(wurds[3]);
                         granulator_set_lfo_rate(g, 1, rate);
                     }
+                    else if (strncmp("lfo1_sync", wurds[2], 8) == 0) {
+                        double loops = atof(wurds[3]);
+                        granulator_set_lfo_sync(g, 1, loops);
+                    }
                     else if (strncmp("lfo1_min", wurds[2], 8) == 0) {
                         double min = atof(wurds[3]);
                         granulator_set_lfo_min(g, 1, min);
@@ -489,6 +500,10 @@ void interpret(char *line)
                         double rate = atof(wurds[3]);
                         granulator_set_lfo_rate(g, 2, rate);
                     }
+                    else if (strncmp("lfo2_sync", wurds[2], 8) == 0) {
+                        double loops = atof(wurds[3]);
+                        granulator_set_lfo_sync(g, 2, loops);
+                    }
                     else if (strncmp("lfo2_min", wurds[2], 8) == 0) {
                         double min = atof(wurds[3]);
                         granulator_set_lfo_min(g, 2, min);
@@ -509,6 +524,10 @@ void interpret(char *line)
                     else if (strncmp("lfo3_rate", wurds[2], 8) == 0) {
                         double rate = atof(wurds[3]);
                         granulator_set_lfo_rate(g, 3, rate);
+                    }
+                    else if (strncmp("lfo3_sync", wurds[2], 8) == 0) {
+                        double loops = atof(wurds[3]);
+                        granulator_set_lfo_sync(g, 3, loops);
                     }
                     else if (strncmp("lfo3_min", wurds[2], 8) == 0) {
                         double min = atof(wurds[3]);
@@ -722,7 +741,10 @@ void interpret(char *line)
                     }
                     else if (strncmp("generate", wurds[2], 8) == 0) {
                         int melody_num = atoi(wurds[3]);
-                        minisynth_generate_melody(ms, melody_num);
+                        int max_notes = atoi(wurds[4]);
+                        int max_steps = atoi(wurds[5]);
+                        minisynth_generate_melody(ms, melody_num, max_notes,
+                                                  max_steps);
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         if (parse_minisynth_settings_change(ms, wurds,
@@ -1455,6 +1477,10 @@ bool is_valid_fx_num(int soundgen_num, int fx_num)
 
 bool is_valid_file(char *filename)
 {
+    if (strlen(filename) == 0) {
+        printf("That ain't no valid file where i come from..\n");
+        return false;
+    }
     char cwd[1024];
     getcwd(cwd, 1024);
     char *subdir = "/wavs/";

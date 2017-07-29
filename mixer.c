@@ -161,7 +161,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->bpm = bpm;
     mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
     mixr->midi_ticks_per_ms = PPQN * bpm / 60000;
-    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPBAR;
+    mixr->loop_len_in_samples = 60.0 / bpm * SAMPLE_RATE * 4;
     mixr->loop_len_in_ticks = PPBAR;
     mixr->sixteenth_note_tick = -1;
     mixr->midi_tick = -1;

@@ -277,7 +277,8 @@ void minisynth_update(minisynth *ms)
     stereo_delay_update(&ms->m_delay_fx);
 }
 
-void minisynth_generate_melody(minisynth *ms, int melody_num)
+void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
+                               int max_steps)
 {
     if (!is_valid_melody_num(ms, melody_num)) {
         printf("Not a valid melody number\n");
@@ -285,7 +286,15 @@ void minisynth_generate_melody(minisynth *ms, int melody_num)
     }
     minisynth_reset_melody(ms, melody_num);
 
-    int rand_num_notes = (rand() % 5) + 2;
+    if (max_notes == 0)
+        max_notes = 5;
+    if (max_steps == 0)
+        max_steps = 9;
+
+    printf("MAX NOTES %d MAX STEPS: %d\n", max_notes, max_steps);
+    int rand_num_notes = (rand() % max_notes);
+    if (rand_num_notes == 0)
+        rand_num_notes = 1;
     int generated_melody_note_num[NUM_COMPAT_NOTES];
     for (int i = 0; i < NUM_COMPAT_NOTES; i++)
         generated_melody_note_num[i] = -99;
@@ -310,7 +319,7 @@ void minisynth_generate_melody(minisynth *ms, int melody_num)
             printf("Compat: %s\n", key_names[compat_keys[0][idx]]);
             // printf("Compat: %d\n", key_midi_mapping[compat_keys[0][idx]]);
 
-            int rand_steps = (rand() % 9) + 1;
+            int rand_steps = (rand() % max_steps) + 1;
             int bitpattern = create_euclidean_rhythm(rand_steps, 32);
             if (rand() % 2 == 1)
                 bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);

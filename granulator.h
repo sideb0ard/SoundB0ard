@@ -36,11 +36,13 @@ typedef struct granulator {
 
     bool active;
     bool started;
+    bool have_active_buffer;
 
     char filename[512];
-    double *filecontents;
-    int filecontents_len;
-    int current_file_read_position;
+    double *audio_buffer;
+    int audio_buffer_len;
+    int audio_buffer_write_idx;
+    int external_source_sg; // exclusive - external or file
 
     int num_active_grains;
     int highest_grain_num;
@@ -50,7 +52,7 @@ typedef struct granulator {
 
     int granular_spray;
     int quasi_grain_fudge;
-    int grain_file_position;
+    int grain_buffer_position;
     int grain_duration_ms;
     int grains_per_sec;
     int grain_pitch;
@@ -100,6 +102,7 @@ int granulator_get_num_tracks(void *self);
 void granulator_make_active_track(void *self, int tracknum);
 
 void granulator_import_file(granulator *g, char *filename);
+void granulator_set_external_source(granulator *g, int sound_gen_num);
 
 int granulator_calculate_grain_spacing(granulator *g);
 void granulator_set_sequencer_mode(granulator *g, bool b);
@@ -108,7 +111,7 @@ void granulator_set_grain_duration(granulator *g, int dur);
 void granulator_set_grains_per_sec(granulator *g, int gps);
 void granulator_set_grain_attack_size_pct(granulator *g, int att);
 void granulator_set_grain_release_size_pct(granulator *g, int rel);
-void granulator_set_grain_file_position(granulator *g, int position);
+void granulator_set_grain_buffer_position(granulator *g, int position);
 void granulator_set_granular_spray(granulator *g, int spray_ms);
 void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor);
 void granulator_set_selection_mode(granulator *g, unsigned int mode);
@@ -120,6 +123,7 @@ void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice);
 void granulator_set_lfo_rate(granulator *g, int lfonum, double rate);
 void granulator_set_lfo_min(granulator *g, int lfonum, double minval);
 void granulator_set_lfo_max(granulator *g, int lfonum, double maxval);
+void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);
