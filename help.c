@@ -4,6 +4,7 @@
 
 void print_help()
 {
+    return;
     printf("\n" COOL_COLOR_PINK "#### SBShell - Interactive, scriptable, "
            "algorithmic music shell ####\n");
 

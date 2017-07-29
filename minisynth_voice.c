@@ -134,16 +134,16 @@ void minisynth_voice_init_global_parameters(minisynth_voice *msv,
 {
     voice_init_global_parameters(&msv->m_voice, sp);
 
-    msv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity = 1.0;
-    msv->m_voice.m_global_voice_params->lfo1_filter1_mod_intensity = 1.0;
-    msv->m_voice.m_global_voice_params->lfo1_filter2_mod_intensity = 1.0;
-    msv->m_voice.m_global_voice_params->lfo1_dca_pan_mod_intensity = 1.0;
-    msv->m_voice.m_global_voice_params->lfo1_dca_amp_mod_intensity = 1.0;
+    msv->m_voice.m_global_voice_params->lfo1_osc_mod_intensity = 0.0;
+    msv->m_voice.m_global_voice_params->lfo1_filter1_mod_intensity = 0.0;
+    msv->m_voice.m_global_voice_params->lfo1_filter2_mod_intensity = 0.0;
+    msv->m_voice.m_global_voice_params->lfo1_dca_pan_mod_intensity = 0.0;
+    msv->m_voice.m_global_voice_params->lfo1_dca_amp_mod_intensity = 0.0;
 
-    msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity = 1.0;
-    msv->m_voice.m_global_voice_params->eg1_filter1_mod_intensity = 1.0;
-    msv->m_voice.m_global_voice_params->eg1_filter2_mod_intensity = 1.0;
-    msv->m_voice.m_global_voice_params->eg1_dca_amp_mod_intensity = 1.0;
+    msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity = 0.0;
+    msv->m_voice.m_global_voice_params->eg1_filter1_mod_intensity = 0.0;
+    msv->m_voice.m_global_voice_params->eg1_filter2_mod_intensity = 0.0;
+    msv->m_voice.m_global_voice_params->eg1_dca_amp_mod_intensity = 0.0;
 }
 
 void minisynth_voice_prepare_for_play(minisynth_voice *msv)

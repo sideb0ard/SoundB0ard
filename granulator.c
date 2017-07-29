@@ -47,8 +47,8 @@ granulator *new_granulator(char *filename)
     granulator_set_sequencer_mode(g, false);
 
     envelope_generator_init(&g->m_eg1); // start/stop env
-    g->m_eg1.m_attack_time_msec = 50;
-    g->m_eg1.m_release_time_msec = 75;
+    g->m_eg1.m_attack_time_msec = 500;
+    g->m_eg1.m_release_time_msec = 750;
 
     g->graindur_lfo_on = false;
     g->m_lfo1_min = 20;

@@ -368,7 +368,7 @@ int sloppy_weight(sequencer *s)
 {
     if (!s->sloppiness)
         return 0;
-    return rand() % (s->sloppiness * 10);
+    return rand() % (s->sloppiness * 20);
 }
 
 void next_shuffle_generation(sequencer *s)
@@ -522,12 +522,13 @@ void next_markov_generation(sequencer *s)
                 if (randy < 15) {
                     if (randyTripleOrDouble > 90) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern]
-                                   [position + (PPSIXTEENTH / 3)] = 1;
+                        s->patterns[s->cur_pattern][position + PPTWENTYFOURTH] =
+                            1;
                         if (randyTripleOrDouble > 95) {
                             s->patterns[s->cur_pattern]
-                                       [position + (PPSIXTEENTH / 6) * 4] = 1;
+                                       [position + (PPTWENTYFOURTH * 2)] = 1;
                         }
+                        i += 4; // skip next few beats
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -538,7 +539,7 @@ void next_markov_generation(sequencer *s)
                 }
                 break;
             case 5:
-                if (randy < 5) {
+                if (randy < 3) {
                     if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
                                    [position + sloppy_weight(s)] = 1;
@@ -548,7 +549,7 @@ void next_markov_generation(sequencer *s)
                 }
                 break;
             case 6:
-                if (randy < 25) {
+                if (randy < 15) {
                     if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
                                    [position + sloppy_weight(s)] = 1;
@@ -571,12 +572,13 @@ void next_markov_generation(sequencer *s)
                 if (randy < 95) {
                     if (randyTripleOrDouble > 80) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern]
-                                   [position + (PPSIXTEENTH / 3)] = 1;
+                        s->patterns[s->cur_pattern][position + PPTWENTYFOURTH] =
+                            1;
                         if (randyTripleOrDouble > 95) {
                             s->patterns[s->cur_pattern]
-                                       [position + (PPSIXTEENTH / 6) * 4] = 1;
+                                       [position + (PPTWENTYFOURTH * 2)] = 1;
                         }
+                        i += 4; // skip next few beats
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -587,7 +589,7 @@ void next_markov_generation(sequencer *s)
                 }
                 break;
             case 9:
-                if (randy < 5) {
+                if (randy < 3) {
                     if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
                                    [position + sloppy_weight(s)] = 1;
@@ -620,12 +622,13 @@ void next_markov_generation(sequencer *s)
                 if (randy < 5) {
                     if (randyTripleOrDouble > 90) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern]
-                                   [position + (PPSIXTEENTH / 3)] = 1;
+                        s->patterns[s->cur_pattern][position + PPTWENTYFOURTH] =
+                            1;
                         if (randyTripleOrDouble > 95) {
                             s->patterns[s->cur_pattern]
-                                       [position + (PPSIXTEENTH / 3) * 4] = 1;
+                                       [position + (PPTWENTYFOURTH * 2)] = 1;
                         }
+                        i += 4; // skip next few beats
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -646,11 +649,12 @@ void next_markov_generation(sequencer *s)
                 }
                 break;
             case 14:
-                if (randy < 25) {
+                if (randy < 5) {
                     if (randyTripleOrDouble > 90) {
                         s->patterns[s->cur_pattern][position] = 1;
-                        s->patterns[s->cur_pattern]
-                                   [position + (PPSIXTEENTH / 3)] = 1;
+                        s->patterns[s->cur_pattern][position + PPTWENTYFOURTH] =
+                            1;
+                        i += 4; // skip next few beats
                     }
                     else if (rand() % 2) // positive
                         s->patterns[s->cur_pattern]
@@ -697,12 +701,12 @@ void next_markov_generation(sequencer *s)
             case 12:
                 if (randyTripleOrDouble > 90) {
                     s->patterns[s->cur_pattern][position] = 1;
-                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH / 3)] =
-                        1;
+                    s->patterns[s->cur_pattern][position + PPTWENTYFOURTH] = 1;
                     if (randyTripleOrDouble > 95) {
                         s->patterns[s->cur_pattern]
-                                   [position + (PPSIXTEENTH / 6) * 4] = 1;
+                                   [position + (PPTWENTYFOURTH * 2)] = 1;
                     }
+                    i += 4; // skip next few beats
                 }
                 else if (randy < 90)
                     s->patterns[s->cur_pattern][position] = 1;
@@ -710,12 +714,12 @@ void next_markov_generation(sequencer *s)
             case 13:
                 if (randyTripleOrDouble > 90) {
                     s->patterns[s->cur_pattern][position] = 1;
-                    s->patterns[s->cur_pattern][position + (PPSIXTEENTH / 3)] =
-                        1;
+                    s->patterns[s->cur_pattern][position + PPTWENTYFOURTH] = 1;
                     if (randyTripleOrDouble > 95) {
                         s->patterns[s->cur_pattern]
-                                   [position + (PPSIXTEENTH / 6) * 4] = 1;
+                                   [position + (PPTWENTYFOURTH * 2)] = 1;
                     }
+                    i += 4; // skip next few beats
                 }
                 else if (randy < 10)
                     s->patterns[s->cur_pattern][position] = 1;

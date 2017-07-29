@@ -130,6 +130,12 @@ void interpret(char *line)
             }
         }
 
+        else if (strncmp("preview", wurds[0], 7) == 0) {
+            if (is_valid_file(wurds[1])) {
+                mixer_preview_track(mixr, wurds[1]);
+            }
+        }
+
         else if (strncmp("debug", wurds[0], 5) == 0) {
             if (strncmp("on", wurds[1], 2) == 0 ||
                 strncmp("true", wurds[1], 4) == 0) {

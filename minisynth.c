@@ -60,7 +60,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_feedback_pct = 0;
     ms->m_settings.m_delay_ratio = 0;
     ms->m_settings.m_wet_mix = 0.0;
-    ms->m_settings.m_octave = 2;
+    ms->m_settings.m_octave = 1;
     ms->m_settings.m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
     ms->m_settings.m_lfo1_osc_pitch_intensity = 0.0;
     ms->m_settings.m_sub_osc_db = -96.000000;
@@ -643,8 +643,8 @@ void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
 
 int minisynth_add_melody(minisynth *ms)
 {
-    //minisynth_stop(ms);
-    //ms->cur_melody++;
+    // minisynth_stop(ms);
+    // ms->cur_melody++;
     return ms->num_melodies++;
 }
 
@@ -791,7 +791,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_sustain_level, ms->m_settings.m_volume_db,
         ms->m_settings.m_lfo1_amplitude, ms->m_settings.m_lfo1_rate,
         ms->m_settings.m_sustain_override ? "true" : "false",
-        ms->m_settings.m_sustain_time_ms, ms->m_voices[0]->m_moog_ladder_filter.f.m_fc,
+        ms->m_settings.m_sustain_time_ms,
+        ms->m_voices[0]->m_moog_ladder_filter.f.m_fc,
         ms->m_settings.m_q_control, ms->m_settings.m_delay_time_msec,
         ms->m_settings.m_feedback_pct, ms->m_settings.m_delay_ratio,
         ms->m_settings.m_wet_mix, ms->m_settings.m_detune_cents,
@@ -837,8 +838,7 @@ double minisynth_gennext(void *self)
     if (!ms->active)
         return 0.0;
 
-    if (mixr->sixteenth_note_tick != ms->tick)
-    {
+    if (mixr->sixteenth_note_tick != ms->tick) {
         ms->tick = mixr->sixteenth_note_tick;
         if (ms->tick % 32 == 0) {
             if (ms->morph_mode) {
@@ -866,22 +866,20 @@ double minisynth_gennext(void *self)
         }
     }
 
-    if (mixr->is_midi_tick)
-    {
+    if (mixr->is_midi_tick) {
         int idx = mixr->midi_tick % PPNS;
         // top of the MS loop, which is two bars, check if we need to progress
         // to next loop
-        if (idx == 0)
-        {
-            if (ms->multi_melody_mode && ms->num_melodies > 1)
-            {
+        if (idx == 0) {
+            if (ms->multi_melody_mode && ms->num_melodies > 1) {
                 ms->cur_melody_iteration--;
                 if (ms->cur_melody_iteration == 0) {
                     int next_melody = (ms->cur_melody + 1) % ms->num_melodies;
                     if (!ms->m_settings.m_sustain_override) {
                         for (int i = 0; i < PPNS; i++) {
                             if (ms->melodies[ms->cur_melody][i] != NULL) {
-                                midi_event *ev = ms->melodies[ms->cur_melody][i];
+                                midi_event *ev =
+                                    ms->melodies[ms->cur_melody][i];
                                 // COPY all note off events
                                 if (ev->event_type == 128) {
                                     midi_event *tmp =

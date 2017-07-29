@@ -67,15 +67,15 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(COOL_COLOR_MAUVE
-           "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_MAUVE
-           "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-           "] Key: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE
-           " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_MAUVE
-           " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-           " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-           " // Scene: " ANSI_COLOR_WHITE "%d" COOL_COLOR_MAUVE
-           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_MAUVE " :::::\n"
+    printf(COOL_COLOR_GREEN
+           "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_GREEN
+           "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+           "] Key: " ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN
+           " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+           " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
+           " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
+           " // Scene: " ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
+           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
            "::::: PPQN: %d PPSIXTEENTH: %d PPTWENTYFOURTH: %d PPBAR: %d PPNS: "
            "%d " ANSI_COLOR_RESET,
            mixr->volume, key_names[mixr->key], mixr->bpm, mixr->midi_tick,
@@ -94,7 +94,9 @@ void mixer_ps(mixer *mixr)
     printf("\n");
 
     if (mixr->num_scenes > 0) {
-        printf(ANSI_COLOR_WHITE "::::: [scene mode: %s] .....] - \n",
+        printf(COOL_COLOR_GREEN "::::: [" ANSI_COLOR_WHITE
+                                "scene mode: %s" COOL_COLOR_GREEN
+                                "] .....] - \n",
                mixr->scene_mode ? "true" : "false");
         for (int i = 0; i < mixr->num_scenes; i++) {
             printf("::::: [%d] - %d bars - ", i,
@@ -604,4 +606,9 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
     mixr->scenes[scene_num_to] = mixr->scenes[scene_num_from];
 
     return true;
+}
+
+void mixer_preview_track(mixer *mixr, char *filename)
+{
+    // TODO
 }

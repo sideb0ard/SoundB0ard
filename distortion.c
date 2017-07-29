@@ -14,7 +14,7 @@ distortion *new_distortion(void)
     d->m_fx.process = &distortion_process;
     d->m_fx.status = &distortion_status;
 
-    d->m_threshold = 1.0;
+    d->m_threshold = 0.707;
     return d;
 }
 
