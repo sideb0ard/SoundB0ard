@@ -107,14 +107,8 @@ typedef struct minisynth {
 
     bool active;
 
-    int sustain;
-
     bool recording;
     unsigned int m_midi_knob_mode; // midi routings, 1..3
-
-    // float vol;
-
-    // end SOUNDGEN stuff
 
     minisynth_voice *m_voices[MAX_VOICES];
 

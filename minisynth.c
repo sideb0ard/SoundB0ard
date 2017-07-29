@@ -34,8 +34,6 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
-    // ms->vol = 0.7;
-    ms->sustain = 0;
     ms->num_melodies = 1;
 
     ms->sound_generator.gennext = &minisynth_gennext;
@@ -645,8 +643,8 @@ void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
 
 int minisynth_add_melody(minisynth *ms)
 {
-    minisynth_stop(ms);
-    ms->cur_melody++;
+    //minisynth_stop(ms);
+    //ms->cur_melody++;
     return ms->num_melodies++;
 }
 
@@ -782,7 +780,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
         "%2.f"
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
-        "NoiseOsc Db: %2.f",
+        "NoiseOsc Db: %2.f EG1sus:%d Eg2sus:%d Eg3sus:%d Eg4sus:%d",
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
         ms->active ? "true" : "false", ms->multi_melody_mode ? "true" : "false",
         ms->morph_mode ? "true" : "false", ms->morph_every_n_loops,
@@ -798,7 +796,11 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_feedback_pct, ms->m_settings.m_delay_ratio,
         ms->m_settings.m_wet_mix, ms->m_settings.m_detune_cents,
         ms->m_settings.m_pulse_width_pct, ms->m_settings.m_sub_osc_db,
-        ms->m_settings.m_noise_osc_db);
+        ms->m_settings.m_noise_osc_db,
+        ms->m_voices[0]->m_voice.m_eg1.m_sustain_override,
+        ms->m_voices[0]->m_voice.m_eg2.m_sustain_override,
+        ms->m_voices[0]->m_voice.m_eg3.m_sustain_override,
+        ms->m_voices[0]->m_voice.m_eg4.m_sustain_override);
 
     for (int i = 0; i < ms->num_melodies; i++) {
         wchar_t melodystr[33] = {0};
@@ -835,7 +837,8 @@ double minisynth_gennext(void *self)
     if (!ms->active)
         return 0.0;
 
-    if (mixr->sixteenth_note_tick != ms->tick) {
+    if (mixr->sixteenth_note_tick != ms->tick)
+    {
         ms->tick = mixr->sixteenth_note_tick;
         if (ms->tick % 32 == 0) {
             if (ms->morph_mode) {
@@ -863,25 +866,30 @@ double minisynth_gennext(void *self)
         }
     }
 
-    if (mixr->is_midi_tick) {
+    if (mixr->is_midi_tick)
+    {
         int idx = mixr->midi_tick % PPNS;
         // top of the MS loop, which is two bars, check if we need to progress
         // to next loop
-        if (idx == 0) {
-            if (ms->multi_melody_mode && ms->num_melodies > 1) {
+        if (idx == 0)
+        {
+            if (ms->multi_melody_mode && ms->num_melodies > 1)
+            {
                 ms->cur_melody_iteration--;
                 if (ms->cur_melody_iteration == 0) {
                     int next_melody = (ms->cur_melody + 1) % ms->num_melodies;
-                    for (int i = 0; i < PPNS; i++) {
-                        if (ms->melodies[ms->cur_melody][i] != NULL) {
-                            midi_event *ev = ms->melodies[ms->cur_melody][i];
-                            // COPY all note off events
-                            if (ev->event_type == 128) {
-                                midi_event *tmp =
-                                    new_midi_event(ev->tick, ev->event_type,
-                                                   ev->data1, ev->data2);
-                                tmp->delete_after_use = true;
-                                minisynth_add_event(ms, next_melody, tmp);
+                    if (!ms->m_settings.m_sustain_override) {
+                        for (int i = 0; i < PPNS; i++) {
+                            if (ms->melodies[ms->cur_melody][i] != NULL) {
+                                midi_event *ev = ms->melodies[ms->cur_melody][i];
+                                // COPY all note off events
+                                if (ev->event_type == 128) {
+                                    midi_event *tmp =
+                                        new_midi_event(ev->tick, ev->event_type,
+                                                       ev->data1, ev->data2);
+                                    tmp->delete_after_use = true;
+                                    minisynth_add_event(ms, next_melody, tmp);
+                                }
                             }
                         }
                     }
