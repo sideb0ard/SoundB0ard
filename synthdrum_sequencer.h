@@ -51,6 +51,7 @@ typedef struct synthdrum_sequencer {
 
     bool mod_pitch;
 
+    bool active;
     bool started;
 
 } synthdrum_sequencer;
@@ -62,6 +63,12 @@ void sds_status(void *self, wchar_t *ss);
 void sds_setvol(void *self, double v);
 double sds_gennext(void *self);
 double sds_getvol(void *self);
+
+void sds_start(void *self);
+void sds_stop(void *self);
+int sds_get_num_tracks(void *self);
+void sds_make_active_track(void *self, int tracknum);
+
 void sds_trigger(synthdrum_sequencer *sds);
 void sds_parse_midi(synthdrum_sequencer *s, int status, int data1, int data2);
 bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name);

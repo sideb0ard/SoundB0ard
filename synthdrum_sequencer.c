@@ -75,7 +75,13 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->sg.status = &sds_status;
     sds->sg.getvol = &sds_getvol;
     sds->sg.setvol = &sds_setvol;
+    sds->sg.start = &sds_start;
+    sds->sg.stop = &sds_stop;
+    sds->sg.get_num_tracks = &sds_get_num_tracks;
+    sds->sg.make_active_track = &sds_make_active_track;
     sds->sg.type = SYNTHDRUM_TYPE;
+
+    sds->active = true;
 
     return sds;
 }
@@ -683,7 +689,7 @@ void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val)
 void synthdrum_set_eg2_osc_intensity(synthdrum_sequencer *sds, double val)
 {
     if (val >= 0 && val <= 1)
-        sds->eg2_osc2_intensity = 1;
+        sds->eg2_osc2_intensity = val;
     else
         printf("Val has to be between 0 and 1\n");
 }
@@ -707,4 +713,27 @@ void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val)
     }
     else
         printf("Val must be between 0 and 1\n");
+}
+
+void sds_start(void *self)
+{
+    synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    sds->active = true;
+}
+
+void sds_stop(void *self)
+{
+    synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    sds->active = true;
+}
+int sds_get_num_tracks(void *self)
+{
+    synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    return sds->m_seq.num_patterns;
+}
+
+void sds_make_active_track(void *self, int track_num)
+{
+    synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    sds->m_seq.cur_pattern = track_num;
 }

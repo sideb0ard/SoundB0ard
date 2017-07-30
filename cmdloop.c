@@ -307,7 +307,8 @@ void interpret(char *line)
                     &sds->m_seq, pattern,
                     sds->m_seq.patterns[sds->m_seq.num_patterns++]);
             }
-            if (strncmp("list", wurds[1], 4) == 0) {
+            if (strncmp("list", wurds[1], 4) == 0 ||
+                strncmp("ls", wurds[1], 2) == 0) {
                 printf("Listing SYNTHDRUM patches.. \n");
                 synthdrum_list_patches();
             }
@@ -401,25 +402,20 @@ void interpret(char *line)
                         int val = atof(wurds[3]);
                         synthdrum_set_mod_pitch(sds, val);
                     }
+                    else if (strncmp("save", wurds[2], 4) == 0 ||
+                             strncmp("export", wurds[2], 6) == 0) {
+                        printf("Saving SYNTHDRUM patch..\n");
+                        synthdrum_save_patch(sds, wurds[3]);
+                    }
+                    else if (strncmp("open", wurds[2], 4) == 0 ||
+                             strncmp("import", wurds[2], 7) == 0) {
+                        printf("Opening SYNTHDRUM patches.. \n");
+                        synthdrum_open_patch(sds, wurds[3]);
+                    }
                     else {
-                        synthdrum_sequencer *s =
-                            (synthdrum_sequencer *)
-                                mixr->sound_generators[soundgen_num];
-                        sequencer *seq = &s->m_seq;
-                        if (strncmp("open", wurds[2], 4) == 0) {
-                            printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
-                            synthdrum_open_patch(s, wurds[3]);
-                        }
-                        if (strncmp("save", wurds[2], 4) == 0) {
-                            printf("Saving SYNTHDRUM pattern as %s\n",
-                                   wurds[2]);
-                            synthdrum_save_patch(s, wurds[3]);
-                        }
-                        else {
-                            printf("SYNTHDRUM SEQ!\n");
-                            parse_sequencer_command(seq, wurds, num_wurds,
-                                                    pattern);
-                        }
+                        printf("SYNTHDRUM SEQ!\n");
+                        parse_sequencer_command(&sds->m_seq, wurds, num_wurds,
+                                                pattern);
                     }
                 }
             }

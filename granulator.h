@@ -92,7 +92,6 @@ granulator *new_granulator(char *filename);
 
 // void granulator_gennext(void* self, double* frame_vals, int framesPerBuffer);
 double granulator_gennext(void *self);
-
 void granulator_status(void *self, wchar_t *ss);
 void granulator_setvol(void *self, double v);
 double granulator_getvol(void *self);
