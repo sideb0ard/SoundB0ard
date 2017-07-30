@@ -534,8 +534,6 @@ bool synthdrum_list_patches()
         printf("Dingie!\n");
         return false;
     }
-    char *item, *last_item;
-    char const *sep = "::";
     char line[256];
     while (fgets(line, sizeof(line), fp)) {
         printf("%s", line);
@@ -547,4 +545,5 @@ bool synthdrum_list_patches()
 void synthdrum_del_self(synthdrum_sequencer *sds)
 {
     printf("Deleting Synthdrum self\n");
+    free(sds);
 }

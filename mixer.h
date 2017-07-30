@@ -98,7 +98,6 @@ void mixer_generate_melody(mixer *mixr, int synthnum, int pattern_num);
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr, double freq);
-int mixer_add_synthdrum(mixer *mixr, int pattern);
 int add_chaosmonkey(int soundgen);
 int add_minisynth(mixer *mixr);
 // int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);

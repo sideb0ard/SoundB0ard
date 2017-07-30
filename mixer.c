@@ -150,11 +150,6 @@ void mixer_ps(mixer *mixr)
     printf(ANSI_COLOR_RESET);
 }
 
-const compat_key_list *mixer_get_compat_notes(mixer *mixr)
-{
-    return &compat_keys[mixr->key];
-}
-
 void mixer_update_bpm(mixer *mixr, int bpm)
 {
     printf("Changing bpm to %d\n", bpm);
@@ -230,13 +225,6 @@ int mixer_add_spork(mixer *mixr, double freq)
     printf("Adding an SPORK, mo!\n");
     spork *s = new_spork(freq);
     return add_sound_generator(mixr, (SOUNDGEN *)s);
-}
-
-int mixer_add_synthdrum(mixer *mixr, int pattern)
-{
-    printf("Adding an SYNTHYDRUM, yo!\n");
-    synthdrum_sequencer *sds = new_synthdrum_seq();
-    return add_sound_generator(mixr, (SOUNDGEN *)sds);
 }
 
 int add_algorithm(char *line)
@@ -609,5 +597,7 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
 
 void mixer_preview_track(mixer *mixr, char *filename)
 {
+    (void)mixr;
+    (void)filename;
     // TODO
 }

@@ -285,9 +285,15 @@ void granulator_del_self(granulator *g)
 void granulator_make_active_track(void *self, int track_num)
 {
     // NOOP
+    (void)self;
+    (void)track_num;
 }
 
-int granulator_get_num_tracks(void *self) { return 1; }
+int granulator_get_num_tracks(void *self)
+{
+    (void)self;
+    return 1;
+}
 
 //////////////////////////// grain stuff //////////////////////////
 // granulator functions contuine below
@@ -346,11 +352,6 @@ int sound_grain_gen_doppelganger_idx(sound_grain *g)
         return -99;
     else
         return g->doppelganger_idx;
-}
-
-void sound_grain_reset(sound_grain *g)
-{
-    g->audiobuffer_cur_pos = g->audiobuffer_start_idx;
 }
 
 double sound_grain_env(sound_grain *g, int idx_num)
@@ -437,8 +438,6 @@ int granulator_calculate_grain_spacing(granulator *g)
     if (g->num_grains_per_looplen == 0) {
         g->num_grains_per_looplen = 2; // whoops! dn't wanna div by 0 below
     }
-    int grain_duration_samples =
-        g->grain_duration_ms * (double)SAMPLE_RATE / 1000.;
     int spacing = mixr->loop_len_in_samples / g->num_grains_per_looplen;
     return spacing;
 }

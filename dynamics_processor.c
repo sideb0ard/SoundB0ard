@@ -260,13 +260,9 @@ double dynamics_processor_process(void *self, double input)
     }
 
     if (dp->m_processor_type == COMP) {
-        double tmpgn = gn;
         gn = dynamics_processor_calc_compression_gain(
             link_detector, dp->m_threshold, dp->m_ratio, dp->m_knee_width,
             false);
-        // if (gn == tmpgn) {
-        //    printf("NOTHING HAPPENED!\n");
-        //}
     }
     else if (dp->m_processor_type == LIMIT)
         gn = dynamics_processor_calc_compression_gain(
@@ -285,8 +281,6 @@ double dynamics_processor_process(void *self, double input)
     delay_process_audio(&dp->m_left_delay, &input, &lookahead_out);
 
     returnval = gn * lookahead_out * outputgain;
-    // returnval = gn * input * outputgain;
-    // returnval = gn * input * inputgain;
     return returnval;
 }
 

@@ -1115,8 +1115,6 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
 void minisynth_rand_settings(minisynth *ms)
 {
     printf("Randomizing SYNTH!\n");
-    int rand_ = 0;
-    double scaley_val;
 
     ms->m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
     ms->m_settings.m_detune_cents = (rand() % 200) - 100;
@@ -1131,7 +1129,6 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_attack_time_msec = (rand() % 400) + 50;
     ms->m_settings.m_decay_release_time_msec = (rand() % 400) + 50;
     ms->m_settings.m_pulse_width_pct = rand() % 100;
-    rand_ = (rand() % 127) + 1;
     // scaley_val = scaleybum(0, 127, -0.9, 0.9, rand_);
     ms->m_settings.m_delay_ratio =
         (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;

@@ -150,6 +150,9 @@ void midi_event_free(midi_event *ev) { free(ev); }
 
 void spork_parse_midi(spork *s, int data1, int data2)
 {
+    (void)s;
+    (void)data1;
+    (void)data2;
     printf("SPORKMIDIiii!\n");
     // double scaley_val = 0.0;
     // switch (data1) {
@@ -207,8 +210,10 @@ void midi_delay_control(fx *e, int data1, int data2)
         printf("OOft, mate, i'm no an accepted FX - cannae help you out\n");
         return;
     }
+    (void)data1;
+    (void)data2;
 
-    double scaley_val;
+    // double scaley_val;
     // if (e->type == DELAY) {
     //    stereodelay *d = e->delay;
     //    switch (data1) {

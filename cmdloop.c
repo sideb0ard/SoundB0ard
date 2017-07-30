@@ -796,8 +796,7 @@ void interpret(char *line)
                                                   max_steps);
                     }
                     else if (strncmp("change", wurds[2], 6) == 0) {
-                        if (parse_minisynth_settings_change(ms, wurds,
-                                                            num_wurds)) {
+                        if (parse_minisynth_settings_change(ms, wurds)) {
                             continue;
                         }
                         int melody_num = atoi(wurds[3]);
@@ -1794,8 +1793,7 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
     }
 }
 
-bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
-                                     int num_wurds)
+bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
 {
     if (strncmp("attackms", wurds[3], 8) == 0) {
         printf("Minisynth change Attack Time Ms!\n");

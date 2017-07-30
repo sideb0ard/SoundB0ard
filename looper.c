@@ -484,7 +484,6 @@ void looper_scramble(looper *s)
     bool reverse = false;
     bool copy_first_half = false;
     bool silence_last_quarter = false;
-    int dice1, dice2;
     int PCT_CHANCE_YOLO = 0;
     int PCT_CHANCE_REV = 0;
     int PCT_CHANCE_COPY_FIRST_HALF = 0;
