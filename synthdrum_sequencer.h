@@ -49,6 +49,8 @@ typedef struct synthdrum_sequencer {
 
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
+    bool mod_pitch;
+
     bool started;
 
 } synthdrum_sequencer;
@@ -65,3 +67,14 @@ void sds_parse_midi(synthdrum_sequencer *s, int status, int data1, int data2);
 bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name);
 bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name);
 bool synthdrum_list_patches(void);
+void synthdrum_set_osc_wav(synthdrum_sequencer *sds, int osc_num,
+                           unsigned int wave);
+void synthdrum_set_osc_fo(synthdrum_sequencer *sds, int osc_num, double freq);
+void synthdrum_set_eg_attack(synthdrum_sequencer *sds, int eg_num, double val);
+void synthdrum_set_eg_decay(synthdrum_sequencer *sds, int eg_num, double val);
+void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
+                                 double val);
+void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val);
+void synthdrum_set_eg2_osc_intensity(synthdrum_sequencer *sds, double val);
+void synthdrum_set_mod_pitch(synthdrum_sequencer *sds, bool b);
+void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val);

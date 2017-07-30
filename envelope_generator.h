@@ -5,12 +5,9 @@
 #include "modmatrix.h"
 #include "synthfunctions.h"
 
-#define EG_MINTIME_MS 50 // these two used for attacjtime, decay and release
+#define EG_MINTIME_MS 1 // these two used for attacjtime, decay and release
 #define EG_MAXTIME_MS 5000
 #define EG_DEFAULT_STATE_TIME 100
-#define EG1_DEFAULT_OSC_INTENSITY 0
-#define EG_MIN_OSC_INTENSITY 0
-#define EG_MAX_OSC_INTENSITY 0 // TODO - check this
 
 enum { ANALOG, DIGITAL };
 

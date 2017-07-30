@@ -316,56 +316,90 @@ void interpret(char *line)
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
                     mixr->sound_generators[soundgen_num]->type ==
                         SYNTHDRUM_TYPE) {
+
+                    synthdrum_sequencer *sds =
+                        (synthdrum_sequencer *)
+                            mixr->sound_generators[soundgen_num];
+
                     if (strncmp("osc1_wav", wurds[2], 8) == 0) {
-                        printf("placeholder\n");
+                        int val = atoi(wurds[3]);
+                        synthdrum_set_osc_wav(sds, 1, val);
                     }
                     else if (strncmp("osc1_fo", wurds[2], 7) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_osc_fo(sds, 1, val);
+                    }
+                    else if (strncmp("osc1_amp", wurds[2], 7) == 0) {
+                        double val = atof(wurds[3]);
+                        synthdrum_set_osc_amp(sds, 1, val);
                     }
                     else if (strncmp("eg1_attack", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_attack(sds, 1, val);
                     }
                     else if (strncmp("eg1_decay", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_decay(sds, 1, val);
                     }
                     else if (strncmp("eg1_sustain_ms", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_sustain_ms(sds, 1, val);
                     }
                     else if (strncmp("eg1_release", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_release(sds, 1, val);
                     }
                     else if (strncmp("osc2_wav", wurds[2], 8) == 0) {
-                        printf("placeholder\n");
+                        int val = atoi(wurds[3]);
+                        synthdrum_set_osc_wav(sds, 2, val);
                     }
                     else if (strncmp("osc2_fo", wurds[2], 7) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_osc_fo(sds, 2, val);
+                    }
+                    else if (strncmp("osc2_amp", wurds[2], 7) == 0) {
+                        double val = atof(wurds[3]);
+                        synthdrum_set_osc_amp(sds, 2, val);
                     }
                     else if (strncmp("eg2_attack", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_attack(sds, 2, val);
                     }
                     else if (strncmp("eg2_decay", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_decay(sds, 2, val);
                     }
                     else if (strncmp("eg2_sustain_ms", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_sustain_ms(sds, 2, val);
                     }
                     else if (strncmp("eg2_release", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_release(sds, 2, val);
                     }
                     else if (strncmp("eg2_osc2_int", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg2_osc_intensity(sds, val);
                     }
                     else if (strncmp("eg3_attack", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_attack(sds, 3, val);
                     }
                     else if (strncmp("eg3_decay", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_decay(sds, 3, val);
                     }
                     else if (strncmp("eg3_sustain_ms", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_sustain_ms(sds, 3, val);
                     }
                     else if (strncmp("eg3_release", wurds[2], 10) == 0) {
-                        printf("placeholder\n");
+                        double val = atof(wurds[3]);
+                        synthdrum_set_eg_release(sds, 3, val);
+                    }
+                    else if (strncmp("mod_pitch", wurds[2], 10) == 0) {
+                        int val = atof(wurds[3]);
+                        synthdrum_set_mod_pitch(sds, val);
                     }
                     else {
                         synthdrum_sequencer *s =

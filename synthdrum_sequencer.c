@@ -32,24 +32,24 @@ synthdrum_sequencer *new_synthdrum_seq()
 
     // pitch envelope
     envelope_generator_init(&sds->m_eg1);
-    sds->m_eg1.m_attack_time_msec = 2;
-    sds->m_eg1.m_decay_time_msec = 0;
-    sds->m_eg1.m_release_time_msec = 5;
+    eg_set_attack_time_msec(&sds->m_eg1, 1);
+    eg_set_decay_time_msec(&sds->m_eg1, 0);
+    eg_set_release_time_msec(&sds->m_eg1, 1);
     sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG1_SUSTAIN_MS;
     sds->eg1_sustain_counter = 0;
 
     envelope_generator_init(&sds->m_eg2);
-    sds->m_eg2.m_attack_time_msec = 2;
-    sds->m_eg2.m_decay_time_msec = 50;
-    sds->m_eg2.m_release_time_msec = 2;
+    eg_set_attack_time_msec(&sds->m_eg2, 2);
+    eg_set_decay_time_msec(&sds->m_eg2, 50);
+    eg_set_release_time_msec(&sds->m_eg1, 2);
     sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG2_SUSTAIN_MS;
     sds->eg2_sustain_counter = 0;
     sds->eg2_osc2_intensity = 1;
 
     envelope_generator_init(&sds->m_eg3);
-    sds->m_eg3.m_attack_time_msec = 2;
-    sds->m_eg3.m_decay_time_msec = 50;
-    sds->m_eg3.m_release_time_msec = 2;
+    eg_set_attack_time_msec(&sds->m_eg3, 2);
+    eg_set_decay_time_msec(&sds->m_eg3, 50);
+    eg_set_release_time_msec(&sds->m_eg3, 20);
     sds->eg3_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG3_SUSTAIN_MS;
     sds->eg3_sustain_counter = 0;
 
@@ -57,15 +57,19 @@ synthdrum_sequencer *new_synthdrum_seq()
     qb_set_soundgenerator_interface(&sds->m_osc1);
     sds->m_osc1.osc.m_waveform = NOISE;
     sds->m_osc1.osc.m_osc_fo = DEFAULT_PITCH;
-    sds->osc1_amp = 1;
+    sds->osc1_amp = 0.307;
+    osc_update(&sds->m_osc1.osc);
 
     osc_new_settings(&sds->m_osc2.osc);
     qb_set_soundgenerator_interface(&sds->m_osc2);
     sds->m_osc2.osc.m_waveform = SINE;
     sds->m_osc2.osc.m_osc_fo = 58;
     sds->osc2_amp = 1.0;
+    osc_update(&sds->m_osc2.osc);
 
     // filter_moog_init(&sds->m_filter);
+    //
+    sds->mod_pitch = true;
 
     sds->sg.gennext = &sds_gennext;
     sds->sg.status = &sds_status;
@@ -79,30 +83,37 @@ synthdrum_sequencer *new_synthdrum_seq()
 void sds_status(void *self, wchar_t *ss)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
-    swprintf(
-        ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
-        "[SYNTHDRUM] Type: %s Vol: %.2f AmpEnv STATE: %d PitchEnv STATE: %d "
-        "\n      Osc1 osc1_wav:%d osc1_fo:%.0f eg1_attack:%.2f eg1_decay:%.2f "
-        "eg1_sustain_ms:%.2f eg1_release:%.2f "
-        "\n      Osc2 osc2_wav:%d osc2_fo:%.0f eg2_attack:%.2f eg2_decay:%.2f "
-        "eg2_sustain_ms:%.2f eg2_release:%.2f eg2_osc2_int:%.2f"
-        "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_ms:%.2f "
-        "eg3_release:%.2f",
-        sds->drumtype == KICK ? "drum" : "snare", sds->vol, sds->m_eg1.m_state,
-        sds->m_eg2.m_state, sds->m_osc1.osc.m_waveform,
-        sds->m_osc1.osc.m_osc_fo, sds->m_eg1.m_attack_time_msec,
-        sds->m_eg1.m_decay_time_msec,
-        sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg1.m_release_time_msec,
+    swprintf(ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
+             "[SYNTHDRUM] Type: %s Vol: %.2f ModPitch:%s AmpEnv STATE: %d "
+             "PitchEnv STATE: %d "
+             "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f "
+             "eg1_attack:%.2f eg1_decay:%.2f "
+             "eg1_sustain_ms:%.2f eg1_release:%.2f "
+             "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f "
+             "eg2_attack:%.2f eg2_decay:%.2f "
+             "eg2_sustain_ms:%.2f eg2_release:%.2f eg2_osc2_int:%.2f"
+             "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_ms:%.2f "
+             "eg3_release:%.2f",
+             sds->drumtype == KICK ? "drum" : "snare", sds->vol,
+             sds->mod_pitch ? "true" : "false", sds->m_eg1.m_state,
+             sds->m_eg2.m_state,
 
-        sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo,
-        sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
-        sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+             sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo,
+             sds->osc1_amp,
 
-        sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
-        sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg3.m_release_time_msec);
+             sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
+             sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+             sds->m_eg1.m_release_time_msec,
+
+             sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
+
+             sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
+             sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+             sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+
+             sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
+             sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+             sds->m_eg3.m_release_time_msec);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -165,18 +176,23 @@ double sds_gennext(void *self)
 
     double eg1_out = eg_do_envelope(&sds->m_eg1, NULL);
     osc_update(&sds->m_osc1.osc);
-    double osc1_out = qb_do_oscillate(&sds->m_osc1.osc, NULL) * eg1_out;
+    double osc1_out =
+        qb_do_oscillate(&sds->m_osc1.osc, NULL) * eg1_out * sds->osc1_amp;
 
-    double eg2_out = eg_do_envelope(&sds->m_eg2, NULL);
-    double eg2_osc_mod = sds->eg2_osc2_intensity * OSC_FO_MOD_RANGE * eg2_out;
-    sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
+    if (sds->mod_pitch) {
+        double eg2_biased_out = 0;
+        eg_do_envelope(&sds->m_eg2, &eg2_biased_out);
+        double eg2_osc_mod =
+            sds->eg2_osc2_intensity * OSC_FO_MOD_RANGE * eg2_biased_out;
+        sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
+    }
     osc_update(&sds->m_osc2.osc);
-    double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL);
+    double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;
 
     val = osc1_out + osc2_out;
 
     return val * sds->vol * eg_do_envelope(&sds->m_eg3, NULL);
-    ;
+
     // moog_update((filter *)&sds->m_filter);
     // double filter_out =
     //  moog_gennext((filter *)&sds->m_filter, val);
@@ -546,4 +562,149 @@ void synthdrum_del_self(synthdrum_sequencer *sds)
 {
     printf("Deleting Synthdrum self\n");
     free(sds);
+}
+
+void synthdrum_set_osc_wav(synthdrum_sequencer *sds, int osc_num,
+                           unsigned int wave)
+{
+    if (!(wave < MAX_OSC)) {
+        printf("WAV has to be between 0 and %d\n", MAX_OSC - 1);
+        return;
+    }
+    switch (osc_num) {
+    case (1):
+        sds->m_osc1.osc.m_waveform = wave;
+        break;
+    case (2):
+        sds->m_osc2.osc.m_waveform = wave;
+        break;
+    }
+}
+void synthdrum_set_osc_fo(synthdrum_sequencer *sds, int osc_num, double freq)
+{
+    if (freq >= OSC_FO_MIN && freq <= OSC_FO_MAX) {
+        switch (osc_num) {
+        case (1):
+            sds->m_osc1.osc.m_osc_fo = freq;
+            break;
+        case (2):
+            sds->m_osc2.osc.m_osc_fo = freq;
+            break;
+        }
+    }
+    else {
+        printf("FREQ has to be between %d and %d\n", OSC_FO_MIN,
+               OSC_FO_MAX - 1);
+        return;
+    }
+}
+
+void synthdrum_set_eg_attack(synthdrum_sequencer *sds, int eg_num, double val)
+{
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS) {
+        switch (eg_num) {
+        case (1):
+            eg_set_attack_time_msec(&sds->m_eg1, val);
+            break;
+        case (2):
+            eg_set_attack_time_msec(&sds->m_eg2, val);
+            break;
+        case (3):
+            eg_set_attack_time_msec(&sds->m_eg3, val);
+            break;
+        }
+    }
+    else
+        printf("Val has to be between %d and %d\n", EG_MINTIME_MS,
+               EG_MAXTIME_MS);
+}
+void synthdrum_set_eg_decay(synthdrum_sequencer *sds, int eg_num, double val)
+{
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS) {
+        switch (eg_num) {
+        case (1):
+            eg_set_decay_time_msec(&sds->m_eg1, val);
+            break;
+        case (2):
+            eg_set_decay_time_msec(&sds->m_eg2, val);
+            break;
+        case (3):
+            eg_set_decay_time_msec(&sds->m_eg3, val);
+            break;
+        }
+    }
+    else
+        printf("Val has to be between %d and %d\n", EG_MINTIME_MS,
+               EG_MAXTIME_MS);
+}
+
+void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
+                                 double val)
+{
+    if (val >= 0 && val <= 5000) {
+        int samples_val = SAMPLE_RATE / 1000. * val;
+        switch (eg_num) {
+        case (1):
+            sds->eg2_sustain_len_in_samples = samples_val;
+            break;
+        case (2):
+            sds->eg2_sustain_len_in_samples = samples_val;
+            break;
+        case (3):
+            sds->eg3_sustain_len_in_samples = samples_val;
+            break;
+        }
+    }
+    else
+        printf("Val has to be between %d and %d\n", EG_MINTIME_MS,
+               EG_MAXTIME_MS);
+}
+
+void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val)
+{
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS) {
+        switch (eg_num) {
+        case (1):
+            eg_set_release_time_msec(&sds->m_eg1, val);
+            break;
+        case (2):
+            eg_set_release_time_msec(&sds->m_eg2, val);
+            break;
+        case (3):
+            eg_set_release_time_msec(&sds->m_eg3, val);
+            break;
+        }
+    }
+    else
+        printf("Val has to be between %d and %d\n", EG_MINTIME_MS,
+               EG_MAXTIME_MS);
+}
+
+void synthdrum_set_eg2_osc_intensity(synthdrum_sequencer *sds, double val)
+{
+    if (val >= 0 && val <= 1)
+        sds->eg2_osc2_intensity = 1;
+    else
+        printf("Val has to be between 0 and 1\n");
+}
+
+void synthdrum_set_mod_pitch(synthdrum_sequencer *sds, bool b)
+{
+    sds->mod_pitch = b;
+}
+
+void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val)
+{
+    if (val >= 0 && val <= 1.0) {
+        switch (osc_num) {
+        case (1):
+            sds->osc1_amp = val;
+            break;
+        case (2):
+            sds->osc2_amp = val;
+            break;
+        }
+    }
+    else
+        printf("Val must be between 0 and 1\n");
 }
