@@ -73,6 +73,7 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool val)
 double chaosmonkey_gen_next(void *self)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
+    (void)cm;
     // osc_update(&cm->m_lfo.osc);
     // double unused_quad = 0.0;
     // double lfo_out = lfo_do_oscillate(&cm->m_lfo.osc, &unused_quad);

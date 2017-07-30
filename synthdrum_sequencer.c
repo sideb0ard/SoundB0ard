@@ -9,8 +9,9 @@
 extern mixer *mixr;
 extern char *state_strings;
 
-const int OSC1_SUSTAIN_MS = 10;
-const int OSC2_SUSTAIN_MS = 0;
+const int EG1_SUSTAIN_MS = 0;
+const int EG2_SUSTAIN_MS = 0;
+const int EG3_SUSTAIN_MS = 0;
 const double DEFAULT_PITCH = 97;
 
 synthdrum_sequencer *new_synthdrum_seq()
@@ -31,32 +32,40 @@ synthdrum_sequencer *new_synthdrum_seq()
 
     // pitch envelope
     envelope_generator_init(&sds->m_eg1);
-    sds->m_eg1.m_attack_time_msec = 10;
+    sds->m_eg1.m_attack_time_msec = 2;
     sds->m_eg1.m_decay_time_msec = 0;
-    sds->m_eg1.m_release_time_msec = 175;
+    sds->m_eg1.m_release_time_msec = 5;
+    sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG1_SUSTAIN_MS;
+    sds->eg1_sustain_counter = 0;
 
     envelope_generator_init(&sds->m_eg2);
     sds->m_eg2.m_attack_time_msec = 2;
-    sds->m_eg2.m_decay_time_msec = 2;
+    sds->m_eg2.m_decay_time_msec = 50;
     sds->m_eg2.m_release_time_msec = 2;
+    sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG2_SUSTAIN_MS;
+    sds->eg2_sustain_counter = 0;
+    sds->eg2_osc2_intensity = 1;
+
+    envelope_generator_init(&sds->m_eg3);
+    sds->m_eg3.m_attack_time_msec = 2;
+    sds->m_eg3.m_decay_time_msec = 50;
+    sds->m_eg3.m_release_time_msec = 2;
+    sds->eg3_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG3_SUSTAIN_MS;
+    sds->eg3_sustain_counter = 0;
 
     osc_new_settings(&sds->m_osc1.osc);
     qb_set_soundgenerator_interface(&sds->m_osc1);
-    sds->m_osc1.osc.m_waveform = SINE;
+    sds->m_osc1.osc.m_waveform = NOISE;
     sds->m_osc1.osc.m_osc_fo = DEFAULT_PITCH;
-    sds->osc1_sustain_len_in_samples = SAMPLE_RATE / 1000. * OSC1_SUSTAIN_MS;
-    sds->osc1_sustain_counter = 0;
     sds->osc1_amp = 1;
-    sds->eg1_osc1_intensity = 1;
 
     osc_new_settings(&sds->m_osc2.osc);
     qb_set_soundgenerator_interface(&sds->m_osc2);
-    sds->m_osc2.osc.m_waveform = NOISE;
-    sds->osc2_sustain_len_in_samples = SAMPLE_RATE / 1000. * OSC2_SUSTAIN_MS;
-    sds->osc2_sustain_counter = 0;
-    sds->osc2_amp = 0.0;
+    sds->m_osc2.osc.m_waveform = SINE;
+    sds->m_osc2.osc.m_osc_fo = 58;
+    sds->osc2_amp = 1.0;
 
-    filter_moog_init(&sds->m_filter);
+    // filter_moog_init(&sds->m_filter);
 
     sds->sg.gennext = &sds_gennext;
     sds->sg.status = &sds_status;
@@ -72,16 +81,28 @@ void sds_status(void *self, wchar_t *ss)
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     swprintf(
         ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
-        "[SYNTHDRUM] Type: %s Vol: %.2f Envelope STATE: %d SustainOverride: %d"
-        "\n      Osc1 Waveform: %d Fo: %.0f Pitch Env A:%.2f D:%.2f S:%.2f "
-        "R:%.2f "
-        "Distortion_Threshold: %.2f\n",
+        "[SYNTHDRUM] Type: %s Vol: %.2f AmpEnv STATE: %d PitchEnv STATE: %d "
+        "\n      Osc1 osc1_wav:%d osc1_fo:%.0f eg1_attack:%.2f eg1_decay:%.2f "
+        "eg1_sustain_ms:%.2f eg1_release:%.2f "
+        "\n      Osc2 osc2_wav:%d osc2_fo:%.0f eg2_attack:%.2f eg2_decay:%.2f "
+        "eg2_sustain_ms:%.2f eg2_release:%.2f eg2_osc2_int:%.2f"
+        "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_ms:%.2f "
+        "eg3_release:%.2f",
         sds->drumtype == KICK ? "drum" : "snare", sds->vol, sds->m_eg1.m_state,
-        sds->m_eg1.m_sustain_override, sds->m_osc1.osc.m_waveform,
+        sds->m_eg2.m_state, sds->m_osc1.osc.m_waveform,
         sds->m_osc1.osc.m_osc_fo, sds->m_eg1.m_attack_time_msec,
         sds->m_eg1.m_decay_time_msec,
-        sds->osc1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg1.m_release_time_msec, sds->m_distortion_threshold);
+        sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+        sds->m_eg1.m_release_time_msec,
+
+        sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo,
+        sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
+        sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+        sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+
+        sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
+        sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+        sds->m_eg3.m_release_time_msec);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -113,7 +134,7 @@ double sds_gennext(void *self)
     }
 
     if (mixr->is_midi_tick) {
-        if (sds->m_seq.patterns[sds->m_seq.cur_pattern])
+        if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
             sds_trigger(sds);
     }
     seq_tick(&sds->m_seq);
@@ -121,38 +142,41 @@ double sds_gennext(void *self)
     // END POSITIONAL /////////////////////////////////////////
 
     if (sds->m_eg1.m_state == SUSTAIN) {
-        sds->osc1_sustain_counter++;
-        if (sds->osc1_sustain_counter >= sds->osc1_sustain_len_in_samples) {
-            sds->osc1_sustain_counter = 0;
+        sds->eg1_sustain_counter++;
+        if (sds->eg1_sustain_counter >= sds->eg1_sustain_len_in_samples) {
+            sds->eg1_sustain_counter = 0;
             sds->m_eg1.m_state = RELEASE;
         }
     }
     if (sds->m_eg2.m_state == SUSTAIN) {
-        sds->osc2_sustain_counter++;
-        if (sds->osc2_sustain_counter >= sds->osc2_sustain_len_in_samples) {
-            sds->osc2_sustain_counter = 0;
+        sds->eg2_sustain_counter++;
+        if (sds->eg2_sustain_counter >= sds->eg2_sustain_len_in_samples) {
+            sds->eg2_sustain_counter = 0;
             sds->m_eg2.m_state = RELEASE;
         }
     }
+    if (sds->m_eg3.m_state == SUSTAIN) {
+        sds->eg3_sustain_counter++;
+        if (sds->eg3_sustain_counter >= sds->eg3_sustain_len_in_samples) {
+            sds->eg3_sustain_counter = 0;
+            sds->m_eg3.m_state = RELEASE;
+        }
+    }
 
-    double eg1_biased = 0.;
-    double eg1 = eg_do_envelope(&sds->m_eg1, &eg1_biased);
-
-    double eg1_osc_mod =
-        sds->eg1_osc1_intensity * OSC_FO_MOD_RANGE * eg1_biased;
-    sds->m_osc1.osc.m_fo_mod = eg1_osc_mod;
-
+    double eg1_out = eg_do_envelope(&sds->m_eg1, NULL);
     osc_update(&sds->m_osc1.osc);
-    double osc1 = qb_do_oscillate(&sds->m_osc1.osc, NULL);
+    double osc1_out = qb_do_oscillate(&sds->m_osc1.osc, NULL) * eg1_out;
 
-    // noise for initial hit
-    double eg2 = eg_do_envelope(&sds->m_eg2, NULL);
+    double eg2_out = eg_do_envelope(&sds->m_eg2, NULL);
+    double eg2_osc_mod = sds->eg2_osc2_intensity * OSC_FO_MOD_RANGE * eg2_out;
+    sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
     osc_update(&sds->m_osc2.osc);
-    double osc2 = qb_do_oscillate(&sds->m_osc2.osc, NULL);
+    double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL);
 
-    val = (eg1 * osc1) * 2; //+ (eg2 * osc2 * sds->osc2_amp);
+    val = osc1_out + osc2_out;
 
-    return val * sds->vol;
+    return val * sds->vol * eg_do_envelope(&sds->m_eg3, NULL);
+    ;
     // moog_update((filter *)&sds->m_filter);
     // double filter_out =
     //  moog_gennext((filter *)&sds->m_filter, val);
@@ -171,18 +195,15 @@ void sds_trigger(synthdrum_sequencer *sds)
     osc_reset(&sds->m_osc1.osc);
     sds->m_osc1.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg1);
-    sds->osc1_sustain_counter = 0;
+    sds->eg1_sustain_counter = 0;
 
     osc_reset(&sds->m_osc2.osc);
     sds->m_osc2.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg2);
-    sds->osc2_sustain_counter = 0;
-}
+    sds->eg2_sustain_counter = 0;
 
-void sds_stop(synthdrum_sequencer *sds)
-{
-    sds->m_osc1.osc.m_note_on = false;
-    sds->m_osc2.osc.m_note_on = false;
+    eg_start_eg(&sds->m_eg3);
+    sds->eg3_sustain_counter = 0;
 }
 
 void sds_parse_midi(synthdrum_sequencer *sds, int status, int data1, int data2)
@@ -282,7 +303,7 @@ void sds_parse_midi(synthdrum_sequencer *sds, int status, int data1, int data2)
             }
             else {
                 scaley_val = scaleybum(0, 127, 0, 500, data2);
-                sds->osc1_sustain_len_in_samples =
+                sds->eg1_sustain_len_in_samples =
                     SAMPLE_RATE / 1000. * scaley_val;
             }
             break;
@@ -369,32 +390,37 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
                         " %f"    // osc1_amp
                         " %f"    // m_osc1.osc.m_osc_fo
                         " %d"    // m_osc1.osc.m_waveform
-                        " %f"    // osc1_sustain_len_in_samples
-                        " %f"    // eg1_osc1_intensity
                         " %f"    // osc2_amp
                         " %f"    // m_osc2.osc.m_osc_fo
                         " %d"    // m_osc2.osc.m_waveform
-                        " %f"    // osc2_sustain_len_in_samples
-                        " %f"    // osc3_amp
-                        " %f"    // m_osc3.osc.m_osc_fo
-                        " %d"    // m_osc3.osc.m_waveform
-                        " %f"    // osc3_sustain_len_in_samples
                         " %f"    // m_eg1.m_attack_time_msec
                         " %f"    // m_eg1.m_decay_time_msec
                         " %f"    // m_eg1.m_release_time_msec
+                        " %f"    // eg1_sustain_len_in_samples
                         " %f"    // m_eg2.m_attack_time_msec
                         " %f"    // m_eg2.m_decay_time_msec
-                        " %f\n", // m_eg2.m_release_time_msec
+                        " %f"    // m_eg2.m_release_time_msec
+                        " %f"    // eg2_osc2_intensity
+                        " %f"    // eg2_sustain_len_in_samples
+                        " %f"    // m_eg3.m_attack_time_msec
+                        " %f"    // m_eg3.m_decay_time_msec
+                        " %f"    // m_eg3.m_release_time_msec
+                        " %f\n", // eg3_sustain_len_in_samples
             sds->m_patch_name, sds->vol, sds->drumtype, sds->osc1_amp,
-            sds->m_osc1.osc.m_osc_fo, sds->m_osc1.osc.m_waveform,
-            sds->osc1_sustain_len_in_samples, sds->eg1_osc1_intensity,
-            sds->osc2_amp, sds->m_osc2.osc.m_osc_fo, sds->m_osc2.osc.m_waveform,
-            sds->osc2_sustain_len_in_samples, sds->osc3_amp,
-            sds->m_osc3.osc.m_osc_fo, sds->m_osc3.osc.m_waveform,
-            sds->osc3_sustain_len_in_samples, sds->m_eg1.m_attack_time_msec,
-            sds->m_eg1.m_decay_time_msec, sds->m_eg1.m_release_time_msec,
+            sds->m_osc1.osc.m_osc_fo, sds->m_osc1.osc.m_waveform, sds->osc2_amp,
+            sds->m_osc2.osc.m_osc_fo, sds->m_osc2.osc.m_waveform,
+
+            sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
+            sds->m_eg1.m_release_time_msec, sds->eg1_sustain_len_in_samples,
+
             sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
-            sds->m_eg2.m_release_time_msec);
+            sds->m_eg2.m_release_time_msec, sds->eg2_sustain_len_in_samples,
+            sds->eg2_osc2_intensity,
+
+            sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
+            sds->m_eg3.m_release_time_msec, sds->eg3_sustain_len_in_samples
+
+            );
 
     fclose(filetosave);
     return true;
@@ -416,38 +442,83 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
             printf("MATCH PATCH NAME %s\n", patch_name);
             printf("BEFORE OSC_FO %f\n", sds->m_osc1.osc.m_osc_fo);
             int num = sscanf(
-                line, "%s"       // m_patch_name
-                      "  %lf"    // vol
-                      "  %d"     // drumtype
-                      "  %lf"    // osc1_amp
-                      "  %lf"    // m_osc1.osc.m_osc_fo
-                      "  %d"     // m_osc1.osc.m_waveform
-                      "  %lf"    // osc1_sustain_len_in_samples
-                      "  %lf"    // eg1_osc1_intensity
-                      "  %lf"    // osc2_amp
-                      "  %lf"    // m_osc2.osc.m_osc_fo
-                      "  %d"     // m_osc2.osc.m_waveform
-                      "  %lf"    // osc2_sustain_len_in_samples
-                      "  %lf"    // osc3_amp
-                      "  %lf"    // m_osc3.osc.m_osc_fo
-                      "  %d"     // m_osc3.osc.m_waveform
-                      "  %lf"    // osc3_sustain_len_in_samples
-                      "  %lf"    // m_eg1.m_attack_time_msec
-                      "  %lf"    // m_eg1.m_decay_time_msec
-                      "  %lf"    // m_eg1.m_release_time_msec
-                      "  %lf"    // m_eg2.m_attack_time_msec
-                      "  %lf"    // m_eg2.m_decay_time_msec
-                      "  %lf\n", // m_eg2.m_release_time_msec
+                line, "%s"      // m_patch_name
+                      " %lf"    // vol
+                      " %d"     // drumtype
+                      " %lf"    // osc1_amp
+                      " %lf"    // m_osc1.osc.m_osc_fo
+                      " %d"     // m_osc1.osc.m_waveform
+                      " %lf"    // osc2_amp
+                      " %lf"    // m_osc2.osc.m_osc_fo
+                      " %d"     // m_osc2.osc.m_waveform
+                      " %lf"    // m_eg1.m_attack_time_msec
+                      " %lf"    // m_eg1.m_decay_time_msec
+                      " %lf"    // m_eg1.m_release_time_msec
+                      " %lf"    // eg1_sustain_len_in_samples
+                      " %lf"    // m_eg2.m_attack_time_msec
+                      " %lf"    // m_eg2.m_decay_time_msec
+                      " %lf"    // m_eg2.m_release_time_msec
+                      " %lf"    // eg2_osc2_intensity
+                      " %lf"    // eg2_sustain_len_in_samples
+                      " %lf"    // m_eg3.m_attack_time_msec
+                      " %lf"    // m_eg3.m_decay_time_msec
+                      " %lf"    // m_eg3.m_release_time_msec
+                      " %lf\n", // eg3_sustain_len_in_samples
                 sds->m_patch_name, &sds->vol, &sds->drumtype, &sds->osc1_amp,
                 &sds->m_osc1.osc.m_osc_fo, &sds->m_osc1.osc.m_waveform,
-                &sds->osc1_sustain_len_in_samples, &sds->eg1_osc1_intensity,
                 &sds->osc2_amp, &sds->m_osc2.osc.m_osc_fo,
-                &sds->m_osc2.osc.m_waveform, &sds->osc2_sustain_len_in_samples,
-                &sds->osc3_amp, &sds->m_osc3.osc.m_osc_fo,
-                &sds->m_osc3.osc.m_waveform, &sds->osc3_sustain_len_in_samples,
+                &sds->m_osc2.osc.m_waveform,
+
                 &sds->m_eg1.m_attack_time_msec, &sds->m_eg1.m_decay_time_msec,
-                &sds->m_eg1.m_release_time_msec, &sds->m_eg2.m_attack_time_msec,
-                &sds->m_eg2.m_decay_time_msec, &sds->m_eg2.m_release_time_msec);
+                &sds->m_eg1.m_release_time_msec,
+                &sds->eg1_sustain_len_in_samples,
+
+                &sds->m_eg2.m_attack_time_msec, &sds->m_eg2.m_decay_time_msec,
+                &sds->m_eg2.m_release_time_msec,
+                &sds->eg2_sustain_len_in_samples, &sds->eg2_osc2_intensity,
+
+                &sds->m_eg3.m_attack_time_msec, &sds->m_eg3.m_decay_time_msec,
+                &sds->m_eg3.m_release_time_msec,
+                &sds->eg3_sustain_len_in_samples
+
+                );
+
+            //          "  %lf"    // vol
+            //          "  %d"     // drumtype
+            //          "  %lf"    // osc1_amp
+            //          "  %lf"    // m_osc1.osc.m_osc_fo
+            //          "  %d"     // m_osc1.osc.m_waveform
+            //          "  %lf"    // osc1_sustain_len_in_samples
+            //          "  %lf"    // eg2_osc2_intensity
+            //          "  %lf"    // osc2_amp
+            //          "  %lf"    // m_osc2.osc.m_osc_fo
+            //          "  %d"     // m_osc2.osc.m_waveform
+            //          "  %lf"    // osc2_sustain_len_in_samples
+            //          "  %lf"    // m_eg1.m_attack_time_msec
+            //          "  %lf"    // m_eg1.m_decay_time_msec
+            //          "  %lf"    // m_eg1.m_release_time_msec
+            //          "  %lf"    // m_eg2.m_attack_time_msec
+            //          "  %lf"    // m_eg2.m_decay_time_msec
+            //          "  %lf"    // m_eg2.m_release_time_msec
+            //          "  %lf"    // m_eg3.m_attack_time_msec
+            //          "  %lf"    // m_eg3.m_decay_time_msec
+            //          "  %lf\n", // m_eg3.m_release_time_msec
+            //    sds->m_patch_name, &sds->vol, &sds->drumtype, &sds->osc1_amp,
+            //    &sds->m_osc1.osc.m_osc_fo, &sds->m_osc1.osc.m_waveform,
+            //    &sds->osc1_sustain_len_in_samples, &sds->eg2_osc2_intensity,
+            //    &sds->osc2_amp, &sds->m_osc2.osc.m_osc_fo,
+            //    &sds->m_osc2.osc.m_waveform,
+            //    &sds->osc2_sustain_len_in_samples,
+            //    &sds->m_eg1.m_attack_time_msec,
+            //    &sds->m_eg1.m_decay_time_msec,
+            //    &sds->m_eg1.m_release_time_msec,
+            //    &sds->m_eg2.m_attack_time_msec,
+            //    &sds->m_eg2.m_decay_time_msec,
+            //    &sds->m_eg2.m_release_time_msec,
+            //    &sds->m_eg3.m_attack_time_msec,
+            //    &sds->m_eg3.m_decay_time_msec,
+            //    &sds->m_eg3.m_release_time_msec
+            //    );
             printf("AFTER OSC_FO %f - scanned %d\n", sds->m_osc1.osc.m_osc_fo,
                    num);
         }

@@ -236,7 +236,6 @@ int mixer_add_synthdrum(mixer *mixr, int pattern)
 {
     printf("Adding an SYNTHYDRUM, yo!\n");
     synthdrum_sequencer *sds = new_synthdrum_seq();
-    // sds->m_seq.patterns[sds->m_seq.num_patterns++] = pattern;
     return add_sound_generator(mixr, (SOUNDGEN *)sds);
 }
 

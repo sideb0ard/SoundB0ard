@@ -290,57 +290,106 @@ void interpret(char *line)
                 }
             }
         }
-        // else if (strncmp("synthdrum", wurds[0], 9) == 0) {
-        //    char *pattern = (char *)calloc(128, sizeof(char));
-        //    char_array_to_seq_string_pattern(pattern, wurds, 2, num_wurds);
-        //    printf("Patterrnnzz! %s\n", pattern);
-        //    int int_pattern = 0;
-        //    pattern_char_to_int(pattern, &int_pattern);
-        //    printf("Patterrnnzz! %s %d\n", pattern, int_pattern);
-        //    if (strncmp("new", wurds[1], 4) == 0) {
-        //        int soundgen_num = mixer_add_synthdrum(mixr, int_pattern);
-        //        mixr->midi_control_destination = MIDISYNTHDRUM;
-        //        mixr->active_midi_soundgen_num = soundgen_num;
-        //    }
-        //    if (strncmp("list", wurds[1], 4) == 0) {
-        //        printf("Listing SYNTHDRUM patches.. \n");
-        //        synthdrum_list_patches();
-        //    }
-        //    else {
-        //        int soundgen_num = atoi(wurds[1]);
-        //        if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-        //            mixr->sound_generators[soundgen_num]->type ==
-        //                SYNTHDRUM_TYPE) {
-        //            if (strncmp("midi", wurds[2], 4) == 0) {
-        //                printf("MIDI goes to Da Winner .. SYNTHDRUM Sequencer
-        //                %d\n",
-        //                       soundgen_num);
-        //                mixr->midi_control_destination = MIDISYNTHDRUM;
-        //                mixr->active_midi_soundgen_num = soundgen_num;
-        //            }
-        //            else {
-        //                synthdrum_sequencer *s =
-        //                    (synthdrum_sequencer *)
-        //                        mixr->sound_generators[soundgen_num];
-        //                sequencer *seq = &s->m_seq;
-        //                if (strncmp("open", wurds[2], 4) == 0) {
-        //                    printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
-        //                    synthdrum_open_patch(s, wurds[3]);
-        //                }
-        //                if (strncmp("save", wurds[2], 4) == 0) {
-        //                    printf("Saving SYNTHDRUM pattern as %s\n",
-        //                           wurds[2]);
-        //                    synthdrum_save_patch(s, wurds[3]);
-        //                }
-        //                else {
-        //                    printf("SYNTHDRUM SEQ!\n");
-        //                    parse_sequencer_command(seq, wurds, num_wurds,
-        //                                            pattern);
-        //                }
-        //            }
-        //        }
-        //    }
-        //}
+
+        else if (strncmp("synthdrum", wurds[0], 9) == 0 ||
+                 strncmp("sd", wurds[0], 2) == 0) {
+            char pattern[151] = {0};
+            if (strncmp("new", wurds[1], 4) == 0) {
+                synthdrum_sequencer *sds = new_synthdrum_seq();
+                char_array_to_seq_string_pattern(&sds->m_seq, pattern, wurds, 2,
+                                                 num_wurds);
+                int sgnum = add_sound_generator(
+                    mixr,
+                    (SOUNDGEN *)
+                        sds); //  add_seq_char_pattern(mixr, wurds[1], pattern);
+                printf("New Sound Generator (SD): %d\n", sgnum);
+                pattern_char_to_pattern(
+                    &sds->m_seq, pattern,
+                    sds->m_seq.patterns[sds->m_seq.num_patterns++]);
+            }
+            if (strncmp("list", wurds[1], 4) == 0) {
+                printf("Listing SYNTHDRUM patches.. \n");
+                synthdrum_list_patches();
+            }
+            else {
+                int soundgen_num = atoi(wurds[1]);
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+                    mixr->sound_generators[soundgen_num]->type ==
+                        SYNTHDRUM_TYPE) {
+                    if (strncmp("osc1_wav", wurds[2], 8) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("osc1_fo", wurds[2], 7) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg1_attack", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg1_decay", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg1_sustain_ms", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg1_release", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("osc2_wav", wurds[2], 8) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("osc2_fo", wurds[2], 7) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg2_attack", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg2_decay", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg2_sustain_ms", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg2_release", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg2_osc2_int", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg3_attack", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg3_decay", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg3_sustain_ms", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else if (strncmp("eg3_release", wurds[2], 10) == 0) {
+                        printf("placeholder\n");
+                    }
+                    else {
+                        synthdrum_sequencer *s =
+                            (synthdrum_sequencer *)
+                                mixr->sound_generators[soundgen_num];
+                        sequencer *seq = &s->m_seq;
+                        if (strncmp("open", wurds[2], 4) == 0) {
+                            printf("Opening SYNTHDRUM patch %s\n", wurds[2]);
+                            synthdrum_open_patch(s, wurds[3]);
+                        }
+                        if (strncmp("save", wurds[2], 4) == 0) {
+                            printf("Saving SYNTHDRUM pattern as %s\n",
+                                   wurds[2]);
+                            synthdrum_save_patch(s, wurds[3]);
+                        }
+                        else {
+                            printf("SYNTHDRUM SEQ!\n");
+                            parse_sequencer_command(seq, wurds, num_wurds,
+                                                    pattern);
+                        }
+                    }
+                }
+            }
+        }
 
         //////  STEP SEQUENCER COMMANDS  /////////////////////////
         else if (strncmp("seq", wurds[0], 3) == 0) {
@@ -557,10 +606,10 @@ void interpret(char *line)
                         int release = atoi(wurds[3]);
                         eg_set_release_time_msec(&g->m_eg1, release);
                     }
-                    else if (strncmp("eg_state", wurds[2], 8) == 0) {
-                        int state = atoi(wurds[3]);
-                        // eg_set_state(&g->m_eg1, state);
-                    }
+                    // else if (strncmp("eg_state", wurds[2], 8) == 0) {
+                    //    //int state = atoi(wurds[3]);
+                    //    // eg_set_state(&g->m_eg1, state);
+                    //}
                     else {
                         printf("ELSEY SEQUENCE!\n");
                         char *pattern = (char *)calloc(151, sizeof(char));
@@ -1408,17 +1457,6 @@ int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)
             break;
     }
     return num_wurds;
-}
-
-void char_array_to_string_sequence(sequencer *seq, char *dest_pattern,
-                                   char char_array[NUM_WURDS][SIZE_OF_WURD],
-                                   int start, int end)
-{
-    for (int i = start; i < end; i++) {
-        strcat(dest_pattern, char_array[i]);
-        if (i != (end - 1))
-            strcat(dest_pattern, " ");
-    }
 }
 
 void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,

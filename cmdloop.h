@@ -20,9 +20,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD],
 void char_array_to_seq_string_pattern(sequencer *s, char *dest_pattern,
                                       char char_array[NUM_WURDS][SIZE_OF_WURD],
                                       int start, int end);
-void char_array_to_string_sequence(sequencer *s, char *dest_pattern,
-                                   char char_array[NUM_WURDS][SIZE_OF_WURD],
-                                   int start, int end);
 void char_melody_to_midi_melody(minisynth *ms, int dest_melody,
                                 char char_array[NUM_WURDS][SIZE_OF_WURD],
                                 int start, int end);
