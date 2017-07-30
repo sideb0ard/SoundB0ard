@@ -143,6 +143,9 @@ double sds_gennext(void *self)
     // POSITIONAL
     int idx = mixr->midi_tick % PPBAR;
 
+    if (!sds->active)
+        return val;
+
     if (!sds->started) {
         if (idx == 0)
             sds->started = true;
@@ -724,7 +727,7 @@ void sds_start(void *self)
 void sds_stop(void *self)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
-    sds->active = true;
+    sds->active = false;
 }
 int sds_get_num_tracks(void *self)
 {
