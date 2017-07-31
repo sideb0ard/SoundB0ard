@@ -129,6 +129,10 @@ typedef struct minisynth {
     int morph_every_n_loops;
     int morph_generation;
 
+    bool generate_mode; // magical
+    int generate_every_n_loops;
+    int generate_generation;
+
     int max_generation;
 
     int m_last_midi_note;
@@ -218,6 +222,8 @@ void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode);
 void minisynth_import_midi_from_file(minisynth *ms, char *filename);
 void minisynth_set_filter_mod(minisynth *ms, double mod);
 void minisynth_del_self(minisynth *ms);
+
+void minisynth_set_generate_mode(minisynth *ms, bool b);
 void minisynth_set_morph_mode(minisynth *ms, bool b);
 void minisynth_set_backup_mode(minisynth *ms, bool b);
 void minisynth_morph(minisynth *ms);

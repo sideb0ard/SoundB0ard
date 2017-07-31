@@ -77,7 +77,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     filter_set_type((filter *)&sds->m_filter, sds->m_filter_type);
     filter_set_fc_control((filter *)&sds->m_filter, sds->m_filter_fc);
     moog_set_qcontrol((filter *)&sds->m_filter, sds->m_filter_q);
-    sds->m_distortion.m_threshold = 0.707;
+    sds->m_distortion_threshold = 0.707;
 
     sds->sg.gennext = &sds_gennext;
     sds->sg.status = &sds_status;
@@ -211,7 +211,7 @@ double sds_gennext(void *self)
     osc_update(&sds->m_osc2.osc);
     double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;
 
-    // sds->m_distortion.m_threshold = sds->m_distortion_threshold;
+    sds->m_distortion.m_threshold = sds->m_distortion_threshold;
     double distorted_osc2_out =
         distortion_process(&sds->m_distortion, osc2_out);
 
@@ -585,13 +585,16 @@ void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val)
 
 void synthdrum_set_filter_freq(synthdrum_sequencer *sds, double val)
 {
+    sds->m_filter_fc = val;
     filter_set_fc_control((filter *)&sds->m_filter, val);
 }
 void synthdrum_set_filter_q(synthdrum_sequencer *sds, double val)
 {
+    sds->m_filter_q = val;
     moog_set_qcontrol((filter *)&sds->m_filter, val);
 }
 void synthdrum_set_filter_type(synthdrum_sequencer *sds, unsigned int val)
 {
+    sds->m_filter_type = val;
     filter_set_type((filter *)&sds->m_filter, val);
 }

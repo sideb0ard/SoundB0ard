@@ -418,7 +418,7 @@ void interpret(char *line)
                         int val = atof(wurds[3]);
                         synthdrum_set_filter_type(sds, val);
                     }
-                    else if (strncmp("freq", wurds[2], 2) == 0) {
+                    else if (strncmp("freq", wurds[2], 4) == 0) {
                         printf("Freq!\n");
                         double val = atof(wurds[3]);
                         synthdrum_set_filter_freq(sds, val);
@@ -984,11 +984,11 @@ void interpret(char *line)
                         mixr->midi_control_destination = SYNTH;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
-                    else if (strncmp("morph", wurds[2], 5) == 0) {
+                    else if (strncmp("genmode", wurds[2], 8) == 0) {
                         if (strncmp("every", wurds[3], 5) == 0) {
                             int num_gens = atoi(wurds[4]);
                             if (num_gens > 0) {
-                                minisynth_set_morph_mode(ms, true);
+                                minisynth_set_generate_mode(ms, true);
                                 ms->morph_every_n_loops = num_gens;
                             }
                             else {
@@ -998,7 +998,7 @@ void interpret(char *line)
                         else if (strncmp("for", wurds[3], 3) == 0) {
                             int num_gens = atoi(wurds[4]);
                             if (num_gens > 0) {
-                                minisynth_set_morph_mode(ms, true);
+                                minisynth_set_generate_mode(ms, true);
                                 ms->max_generation = num_gens;
                             }
                             else {
@@ -1006,11 +1006,11 @@ void interpret(char *line)
                             }
                         }
                         else { // just toggle
-                            minisynth_set_morph_mode(ms, 1 - ms->morph_mode);
+                            minisynth_set_generate_mode(ms, 1 - ms->generate_mode);
                         }
 
-                        printf("Synth morph mode : %s\n",
-                               ms->morph_mode ? "true" : "false");
+                        printf("Synth GENERATE mode : %s\n",
+                               ms->generate_mode ? "true" : "false");
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0) {
                         if (strncmp("true", wurds[3], 4) == 0) {

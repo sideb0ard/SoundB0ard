@@ -291,7 +291,7 @@ void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
     if (max_steps == 0)
         max_steps = 9;
 
-    printf("MAX NOTES %d MAX STEPS: %d\n", max_notes, max_steps);
+    //printf("MAX NOTES %d MAX STEPS: %d\n", max_notes, max_steps);
     int rand_num_notes = (rand() % max_notes);
     if (rand_num_notes == 0)
         rand_num_notes = 1;
@@ -316,7 +316,7 @@ void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
     for (int i = 0; i < NUM_COMPAT_NOTES; i++) {
         if (generated_melody_note_num[i] != -99) {
             int idx = generated_melody_note_num[i];
-            printf("Compat: %s\n", key_names[compat_keys[0][idx]]);
+            //printf("Compat: %s\n", key_names[compat_keys[0][idx]]);
             // printf("Compat: %d\n", key_midi_mapping[compat_keys[0][idx]]);
 
             int rand_steps = (rand() % max_steps) + 1;
@@ -324,7 +324,7 @@ void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
             if (rand() % 2 == 1)
                 bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
 
-            printf("Pattern is %d\n", bitpattern);
+            //printf("Pattern is %d\n", bitpattern);
             char cbitpattern[33];
             for (int i = 31; i >= 0; i--) {
                 if (bitpattern & 1 << i) {
@@ -337,7 +337,7 @@ void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
                     cbitpattern[31 - i] = '0';
             }
             cbitpattern[32] = '\0';
-            printf("Pattern is %d - %s\n", bitpattern, cbitpattern);
+            //printf("Pattern is %d - %s\n", bitpattern, cbitpattern);
         }
     }
 }
@@ -849,12 +849,13 @@ double minisynth_gennext(void *self)
 
     if (mixr->sixteenth_note_tick != ms->tick) {
         ms->tick = mixr->sixteenth_note_tick;
-        if (ms->tick % 32 == 0) {
-            if (ms->morph_mode) {
-                if (ms->morph_every_n_loops > 0) {
-                    if (ms->morph_generation % ms->morph_every_n_loops == 0) {
+        //if (mixr->start_of_loop) {
+        if (ms->tick % 64 == 0) {
+            if (ms->generate_mode) {
+                if (ms->generate_every_n_loops > 0) {
+                    if (ms->generate_generation % ms->generate_every_n_loops == 0) {
                         minisynth_set_backup_mode(ms, true);
-                        minisynth_morph(ms);
+                        minisynth_generate_melody(ms, 0, 0, 0);
                     }
                     else {
                         minisynth_set_backup_mode(ms, false);
@@ -863,14 +864,14 @@ double minisynth_gennext(void *self)
                 else if (ms->max_generation > 0) {
                     if (ms->morph_generation >= ms->max_generation) {
                         ms->morph_generation = 0;
-                        minisynth_set_morph_mode(ms, false);
+                        minisynth_set_generate_mode(ms, false);
                         minisynth_set_backup_mode(ms, false);
                     }
                 }
                 else {
-                    minisynth_morph(ms);
+                    minisynth_generate_melody(ms, 0, 0, 0);
                 }
-                ms->morph_generation++;
+                ms->generate_generation++;
             }
         }
     }
@@ -1610,6 +1611,12 @@ void minisynth_del_self(minisynth *ms)
 void minisynth_set_morph_mode(minisynth *ms, bool b)
 {
     ms->morph_mode = b;
+    minisynth_set_backup_mode(ms, b);
+}
+
+void minisynth_set_generate_mode(minisynth *ms, bool b)
+{
+    ms->generate_mode = b;
     minisynth_set_backup_mode(ms, b);
 }
 
