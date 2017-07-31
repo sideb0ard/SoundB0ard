@@ -52,8 +52,8 @@ synthdrum_sequencer *new_synthdrum_seq()
     // osc2 pitch envelope
     envelope_generator_init(&sds->m_eg2);
     eg_set_attack_time_msec(&sds->m_eg2, 1);
-    eg_set_decay_time_msec(&sds->m_eg2, 460);
-    eg_set_release_time_msec(&sds->m_eg1, 2);
+    eg_set_decay_time_msec(&sds->m_eg2, 60);
+    eg_set_release_time_msec(&sds->m_eg1, 100);
     eg_set_sustain_level(&sds->m_eg2, 0.1);
     sds->eg2_sustain_ms = 0;
     sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg2_sustain_ms;
@@ -63,7 +63,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     // output amp envelope
     envelope_generator_init(&sds->m_eg3);
     eg_set_attack_time_msec(&sds->m_eg3, 1);
-    eg_set_decay_time_msec(&sds->m_eg3, 460);
+    eg_set_decay_time_msec(&sds->m_eg3, 250);
     eg_set_release_time_msec(&sds->m_eg3, 100);
     eg_set_sustain_level(&sds->m_eg3, 0.1);
     sds->eg3_sustain_ms = 0;
