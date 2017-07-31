@@ -7,10 +7,10 @@
 
 void filter_setup(filter *f)
 {
-    f->m_q_control = 1.0; // Q is 1 to 10
     f->m_fc = FILTER_FC_DEFAULT;
     f->m_q = FILTER_Q_DEFAULT;
     f->m_fc_control = FILTER_FC_DEFAULT;
+    f->m_q_control = 1.0; // Q is 1 to 10
 
     f->m_fc_mod = 0.0;
     f->m_aux_control = 0.0;

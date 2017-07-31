@@ -9,60 +9,25 @@
 extern mixer *mixr;
 extern char *state_strings;
 
-const int EG1_SUSTAIN_MS = 0;
-const int EG2_SUSTAIN_MS = 0;
-const int EG3_SUSTAIN_MS = 0;
-const double DEFAULT_PITCH = 97;
-
 synthdrum_sequencer *new_synthdrum_seq()
 {
     printf("New Drum Synth!\n");
     synthdrum_sequencer *sds = calloc(1, sizeof(synthdrum_sequencer));
     seq_init(&sds->m_seq);
-    sds->m_pitch = DEFAULT_PITCH;
 
     sds->vol = 1;
     sds->started = false;
-    sds->midi_controller_mode =
-        0; // TODO enum or sumthing - for the moment just two modes
     for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
         sds->metadata[i].played = 0.0;
         sds->metadata[i].playing = 0.0;
     }
 
-    // osc1 noise amp env
-    envelope_generator_init(&sds->m_eg1);
-    eg_set_attack_time_msec(&sds->m_eg1, 1);
-    eg_set_decay_time_msec(&sds->m_eg1, 0);
-    eg_set_release_time_msec(&sds->m_eg1, 1);
-    eg_set_sustain_level(&sds->m_eg1, 0.1);
-    sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG1_SUSTAIN_MS;
-    sds->eg1_sustain_counter = 0;
-
-    // osc2 pitch envelope
-    envelope_generator_init(&sds->m_eg2);
-    eg_set_attack_time_msec(&sds->m_eg2, 1);
-    eg_set_decay_time_msec(&sds->m_eg2, 50);
-    eg_set_release_time_msec(&sds->m_eg1, 2);
-    eg_set_sustain_level(&sds->m_eg2, 0.1);
-    sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG2_SUSTAIN_MS;
-    sds->eg2_sustain_counter = 0;
-    sds->eg2_osc2_intensity = 1;
-
-    // output amp envelope
-    envelope_generator_init(&sds->m_eg3);
-    eg_set_attack_time_msec(&sds->m_eg3, 1);
-    eg_set_decay_time_msec(&sds->m_eg3, 460);
-    eg_set_release_time_msec(&sds->m_eg3, 100);
-    eg_set_sustain_level(&sds->m_eg3, 0.1);
-    sds->eg3_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG3_SUSTAIN_MS;
-    sds->eg3_sustain_counter = 0;
+    strncpy(sds->m_patch_name, "Default", 7);
 
     // OSC1 transient noise
     osc_new_settings(&sds->m_osc1.osc);
     qb_set_soundgenerator_interface(&sds->m_osc1);
     sds->m_osc1.osc.m_waveform = NOISE;
-    sds->m_osc1.osc.m_osc_fo = DEFAULT_PITCH;
     sds->osc1_amp = 0.307;
     osc_update(&sds->m_osc1.osc);
 
@@ -74,11 +39,45 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->osc2_amp = 1.0;
     osc_update(&sds->m_osc2.osc);
 
-    filter_moog_init(&sds->m_filter);
-    filter_set_fc_control((filter *)&sds->m_filter, 180);
-    sds->m_distortion.m_threshold = 0.707;
+    // osc1 noise amp env
+    envelope_generator_init(&sds->m_eg1);
+    eg_set_attack_time_msec(&sds->m_eg1, 1);
+    eg_set_decay_time_msec(&sds->m_eg1, 0);
+    eg_set_release_time_msec(&sds->m_eg1, 1);
+    eg_set_sustain_level(&sds->m_eg1, 0.1);
+    sds->eg1_sustain_ms = 0;
+    sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg1_sustain_ms;
+    sds->eg1_sustain_counter = 0;
 
-    sds->mod_pitch = true;
+    // osc2 pitch envelope
+    envelope_generator_init(&sds->m_eg2);
+    eg_set_attack_time_msec(&sds->m_eg2, 1);
+    eg_set_decay_time_msec(&sds->m_eg2, 460);
+    eg_set_release_time_msec(&sds->m_eg1, 2);
+    eg_set_sustain_level(&sds->m_eg2, 0.1);
+    sds->eg2_sustain_ms = 0;
+    sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg2_sustain_ms;
+    sds->eg2_sustain_counter = 0;
+    sds->eg2_osc2_intensity = 1;
+
+    // output amp envelope
+    envelope_generator_init(&sds->m_eg3);
+    eg_set_attack_time_msec(&sds->m_eg3, 1);
+    eg_set_decay_time_msec(&sds->m_eg3, 460);
+    eg_set_release_time_msec(&sds->m_eg3, 100);
+    eg_set_sustain_level(&sds->m_eg3, 0.1);
+    sds->eg3_sustain_ms = 0;
+    sds->eg3_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg3_sustain_ms;
+    sds->eg3_sustain_counter = 0;
+
+    filter_moog_init(&sds->m_filter);
+    sds->m_filter_type = LPF4;
+    sds->m_filter_fc = 180;
+    sds->m_filter_q = 0.707;
+    filter_set_type((filter *)&sds->m_filter, sds->m_filter_type);
+    filter_set_fc_control((filter *)&sds->m_filter, sds->m_filter_fc);
+    moog_set_qcontrol((filter *)&sds->m_filter, sds->m_filter_q);
+    sds->m_distortion.m_threshold = 0.707;
 
     sds->sg.gennext = &sds_gennext;
     sds->sg.status = &sds_status;
@@ -100,31 +99,28 @@ void sds_status(void *self, wchar_t *ss)
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     swprintf(
         ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
-        "[SYNTHDRUM] Type: %s Vol: %.2f mod_pitch:%s AmpEnv STATE: %d "
-        "PitchEnv STATE: %d "
-        "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f"
+        "[SYNTHDRUM] Name: %s Vol: %.2f "
+        "distortion_threshold:%.2f " WANSI_COLOR_GREEN_TOO
+        "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f" WANSI_COLOR_GREEN
         "\n      eg1_attack:%.2f eg1_decay:%.2f eg1_sustain_level:%.2f "
-        "eg1_sustain_ms:%.2f eg1_release:%.2f "
-        "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f"
+        "eg1_sustain_ms:%.2f eg1_release:%.2f " WANSI_COLOR_GREEN_TOO
+        "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f" WANSI_COLOR_GREEN
         "\n      eg2_attack:%.2f eg2_decay:%.2f eg2_sustain_level:%.2f "
-        "eg2_sustain_ms:%.2f eg2_release:%.2f eg2_osc2_int:%.2f"
+        "eg2_sustain_ms:%.2f eg2_release:%.2f "
+        "eg2_osc2_int:%.2f" WANSI_COLOR_GREEN_TOO
         "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_level:%.2f "
-        "eg3_sustain_ms:%.2f eg3_release:%.2f"
-        "\n      filter_type:%d freq:%2.f q:%2.f distortion_threshold:%.2f",
+        "eg3_sustain_ms:%.2f eg3_release:%.2f" WANSI_COLOR_GREEN
+        "\n      filter_type:%d freq:%2.f q:%2.f" WANSI_COLOR_GREEN_TOO,
 
-        sds->drumtype == KICK ? "drum" : "snare", sds->vol,
-        sds->mod_pitch ? "true" : "false", sds->m_eg1.m_state,
-        sds->m_eg2.m_state,
+        sds->m_patch_name, sds->vol, sds->m_distortion_threshold,
 
         sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo, sds->osc1_amp,
-
         sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
         sds->m_eg1.m_sustain_level,
         sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
         sds->m_eg1.m_release_time_msec,
 
         sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
-
         sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
         sds->m_eg2.m_sustain_level,
         sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
@@ -133,9 +129,8 @@ void sds_status(void *self, wchar_t *ss)
         sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
         sds->m_eg3.m_sustain_level,
         sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg3.m_release_time_msec, sds->m_filter.f.m_filter_type,
-        sds->m_filter.f.m_fc_control, sds->m_filter.f.m_q_control,
-        sds->m_distortion.m_threshold);
+        sds->m_eg3.m_release_time_msec, sds->m_filter_type, sds->m_filter_fc,
+        sds->m_filter_q);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -159,8 +154,9 @@ double sds_gennext(void *self)
     // POSITIONAL
     int idx = mixr->midi_tick % PPBAR;
 
-    if (!sds->active)
+    if (!sds->active) {
         return val;
+    }
 
     if (!sds->started) {
         if (idx == 0)
@@ -215,9 +211,13 @@ double sds_gennext(void *self)
     osc_update(&sds->m_osc2.osc);
     double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;
 
+    // sds->m_distortion.m_threshold = sds->m_distortion_threshold;
     double distorted_osc2_out =
         distortion_process(&sds->m_distortion, osc2_out);
 
+    // sds->m_filter.f.m_filter_type = sds->m_filter_type;
+    // sds->m_filter.f.m_fc_control = sds->m_filter_fc;
+    // sds->m_filter.f.m_q_control = sds->m_filter_q;
     moog_update((filter *)&sds->m_filter);
     double filtered_osc2_out =
         moog_gennext((filter *)&sds->m_filter, distorted_osc2_out);
@@ -252,172 +252,6 @@ void sds_trigger(synthdrum_sequencer *sds)
     sds->eg3_sustain_counter = 0;
 }
 
-void sds_parse_midi(synthdrum_sequencer *sds, int status, int data1, int data2)
-{
-    // switch (ev->event_type) {
-    // case (144): { // Hex 0x80
-    //    ms->m_last_midi_note = ev->data1;
-    //    minisynth_midi_note_on(ms, ev->data1, ev->data2);
-    //    break;
-    if (status == 144) // note on
-    {
-        printf("PITCH!\n");
-        sds->m_pitch = data1;
-        sds->m_osc1.osc.m_osc_fo = data1;
-    }
-    else if (status == 176) // control
-    {
-        printf("SYNTHDRUMMIDI!\n");
-        double scaley_val = 0.0;
-        switch (data1) {
-        case 9:
-            printf("9\n");
-            break;
-        case 10:
-            printf("10\n");
-            break;
-        case 11:
-            printf("11\n");
-            break;
-        case 12:
-            printf("12\n");
-            break;
-        case 13:
-            printf("13\n");
-            break;
-        case 14:
-            printf("14\n");
-            break;
-        case 15:
-            printf("15\n");
-            break;
-        case 16:
-            printf("Toggle! MIDI Knob Modee!\n");
-            sds->midi_controller_mode = 1 - sds->midi_controller_mode;
-            break;
-        /// BANK B on MPK Mini MKII
-        case 17:
-            printf("Delay Mode! Mode\n");
-            break;
-        case 18:
-            printf("Sustain Override! Mode\n");
-            break;
-        case 19:
-            printf("19! \n");
-            break;
-        case 20:
-            printf("20! Mode\n");
-            break;
-        case 21:
-            printf("21! MIDI Mode\n");
-            break;
-        case 22:
-            printf("22! MIDI Mode\n");
-            break;
-        case 23:
-            printf("23! MIDI Mode\n");
-            break;
-        case 24:
-            printf("24! MIDI Mode\n");
-            break;
-        case 1:
-            if (sds->midi_controller_mode == 0) {
-                scaley_val = scaleybum(0, 128, 48, 107, data2);
-                printf("TUNE! %f\n", scaley_val);
-                sds->m_osc1.osc.m_osc_fo = scaley_val;
-            }
-            else {
-                scaley_val = scaleybum(0, 127, 2, 20, data2);
-                eg_set_attack_time_msec(&sds->m_eg1, scaley_val);
-                printf("ENV1 ATTACK! %f\n", sds->m_eg1.m_attack_time_msec);
-            }
-            break;
-        case 2:
-            if (sds->midi_controller_mode == 0) {
-                scaley_val = scaleybum(0, 127, 0, 1, data2);
-                sds->vol = scaley_val;
-                printf("LEVEL!! %f\n", scaley_val);
-            }
-            else {
-            }
-            break;
-        case 3:
-            if (sds->midi_controller_mode == 0) {
-                scaley_val = scaleybum(0, 127, 1, 50, data2);
-                eg_set_attack_time_msec(&sds->m_eg1, scaley_val);
-                printf("ATTACK!! %f\n", scaley_val);
-            }
-            else {
-                scaley_val = scaleybum(0, 127, 0, 500, data2);
-                sds->eg1_sustain_len_in_samples =
-                    SAMPLE_RATE / 1000. * scaley_val;
-            }
-            break;
-        case 4:
-            if (sds->midi_controller_mode == 0) {
-                scaley_val = scaleybum(0, 127, 1, 100, data2);
-                eg_set_decay_time_msec(&sds->m_eg1, scaley_val);
-                eg_set_release_time_msec(&sds->m_eg1, scaley_val);
-                printf("DECAY/RELEASE!! %f\n", scaley_val);
-            }
-            else {
-                scaley_val =
-                    scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-                eg_set_release_time_msec(&sds->m_eg1, scaley_val);
-                printf("ENV1 RELEASE!! %f\n", sds->m_eg1.m_release_time_msec);
-                // scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX,
-                // data2);
-                // sds->m_filter.f.m_fc = scaley_val;
-                // printf("FILTER FREQ CUTOFF %f!\n", m_filter.f.m_fc);
-                // printf("FILTER Qviiity !\n");
-                // scaley_val = scaleybum(0, 127, 1, 10, data2);
-                // sds->m_filter.f.m_q = scaley_val;
-            }
-            break;
-        case 5:
-            if (sds->midi_controller_mode == 0) {
-                scaley_val = floor(scaleybum(0, 127, 0, 8, data2));
-                printf("OSC TYPE! %f\n", scaley_val);
-                sds->m_osc1.osc.m_waveform = scaley_val;
-            }
-            else {
-            }
-            break;
-        case 6:
-            if (sds->midi_controller_mode == 0) {
-                scaley_val = scaleybum(0, 127, 0, 1, data2);
-                sds->osc2_amp = scaley_val;
-                printf("OSC2 AMp!! %f\n", scaley_val);
-            }
-            else {
-            }
-            break;
-        case 7:
-            if (sds->midi_controller_mode == 0) {
-                scaley_val = scaleybum(0, 127, 0, 220, data2);
-                sds->m_eg2.m_decay_time_msec = scaley_val;
-                sds->m_eg2.m_release_time_msec = scaley_val;
-                printf("ENV2 DECAY/RELEASE!! %f\n",
-                       sds->m_eg2.m_release_time_msec);
-            }
-            else {
-            }
-            break;
-        case 8:
-            if (sds->midi_controller_mode == 0) {
-                printf("DISTORTION!!\n");
-                scaley_val = scaleybum(0, 127, 100, 0.01, data2);
-                sds->m_distortion.m_threshold = scaley_val;
-            }
-            else {
-            }
-            break;
-        default:
-            printf("SOMthing else\n");
-        }
-    }
-}
-
 bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
 {
     if (strlen(name) == 0) {
@@ -432,39 +266,50 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
 
     fprintf(filetosave, "%s"     // m_patch_name
                         " %f"    // vol
-                        " %d"    // drumtype
-                        " %f"    // osc1_amp
-                        " %f"    // m_osc1.osc.m_osc_fo
+                        " %f"    // distortion_threshold
                         " %d"    // m_osc1.osc.m_waveform
-                        " %f"    // osc2_amp
-                        " %f"    // m_osc2.osc.m_osc_fo
+                        " %f"    // m_osc1.osc.m_osc_fo
+                        " %f"    // osc1_amp
                         " %d"    // m_osc2.osc.m_waveform
+                        " %f"    // m_osc2.osc.m_osc_fo
+                        " %f"    // osc2_amp
                         " %f"    // m_eg1.m_attack_time_msec
                         " %f"    // m_eg1.m_decay_time_msec
-                        " %f"    // m_eg1.m_release_time_msec
+                        " %f"    // m_eg1.m_sustain_level
                         " %f"    // eg1_sustain_len_in_samples
+                        " %f"    // m_eg1.m_release_time_msec
                         " %f"    // m_eg2.m_attack_time_msec
                         " %f"    // m_eg2.m_decay_time_msec
+                        " %f"    // m_eg2.m_sustain_level
+                        " %f"    // eg2_sustain_len_in_samples
                         " %f"    // m_eg2.m_release_time_msec
                         " %f"    // eg2_osc2_intensity
-                        " %f"    // eg2_sustain_len_in_samples
                         " %f"    // m_eg3.m_attack_time_msec
                         " %f"    // m_eg3.m_decay_time_msec
+                        " %f"    // m_eg2.m_sustain_level
+                        " %f"    // eg3_sustain_len_in_samples
                         " %f"    // m_eg3.m_release_time_msec
-                        " %f\n", // eg3_sustain_len_in_samples
-            sds->m_patch_name, sds->vol, sds->drumtype, sds->osc1_amp,
-            sds->m_osc1.osc.m_osc_fo, sds->m_osc1.osc.m_waveform, sds->osc2_amp,
-            sds->m_osc2.osc.m_osc_fo, sds->m_osc2.osc.m_waveform,
+                        " %d"    // filter type
+                        " %f"    // filter fc_control
+                        " %f\n", // filter q_control
+            sds->m_patch_name, sds->vol, sds->m_distortion.m_threshold,
+
+            sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo, sds->osc1_amp,
+            sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_osc_fo, sds->osc2_amp,
 
             sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
-            sds->m_eg1.m_release_time_msec, sds->eg1_sustain_len_in_samples,
+            sds->m_eg1.m_sustain_level, sds->eg1_sustain_len_in_samples,
+            sds->m_eg1.m_release_time_msec,
 
             sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
-            sds->m_eg2.m_release_time_msec, sds->eg2_sustain_len_in_samples,
-            sds->eg2_osc2_intensity,
+            sds->m_eg2.m_sustain_level, sds->eg2_sustain_len_in_samples,
+            sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
 
             sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
-            sds->m_eg3.m_release_time_msec, sds->eg3_sustain_len_in_samples
+            sds->m_eg3.m_sustain_level, sds->eg3_sustain_len_in_samples,
+            sds->m_eg3.m_release_time_msec,
+
+            sds->m_filter_type, sds->m_filter_fc, sds->m_filter_q
 
             );
 
@@ -490,81 +335,52 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
             int num = sscanf(
                 line, "%s"      // m_patch_name
                       " %lf"    // vol
-                      " %d"     // drumtype
-                      " %lf"    // osc1_amp
-                      " %lf"    // m_osc1.osc.m_osc_fo
+                      " %lf"    // distortion_threshold
                       " %d"     // m_osc1.osc.m_waveform
-                      " %lf"    // osc2_amp
-                      " %lf"    // m_osc2.osc.m_osc_fo
+                      " %lf"    // m_osc1.osc.m_osc_fo
+                      " %lf"    // osc1_amp
                       " %d"     // m_osc2.osc.m_waveform
+                      " %lf"    // m_osc2.osc.m_osc_fo
+                      " %lf"    // osc2_amp
                       " %lf"    // m_eg1.m_attack_time_msec
                       " %lf"    // m_eg1.m_decay_time_msec
-                      " %lf"    // m_eg1.m_release_time_msec
+                      " %lf"    // m_eg1.m_sustain_level
                       " %lf"    // eg1_sustain_len_in_samples
+                      " %lf"    // m_eg1.m_release_time_msec
                       " %lf"    // m_eg2.m_attack_time_msec
                       " %lf"    // m_eg2.m_decay_time_msec
+                      " %lf"    // m_eg2.m_sustain_level
+                      " %lf"    // eg2_sustain_len_in_samples
                       " %lf"    // m_eg2.m_release_time_msec
                       " %lf"    // eg2_osc2_intensity
-                      " %lf"    // eg2_sustain_len_in_samples
                       " %lf"    // m_eg3.m_attack_time_msec
                       " %lf"    // m_eg3.m_decay_time_msec
+                      " %lf"    // m_eg2.m_sustain_level
+                      " %lf"    // eg3_sustain_len_in_samples
                       " %lf"    // m_eg3.m_release_time_msec
-                      " %lf\n", // eg3_sustain_len_in_samples
-                sds->m_patch_name, &sds->vol, &sds->drumtype, &sds->osc1_amp,
-                &sds->m_osc1.osc.m_osc_fo, &sds->m_osc1.osc.m_waveform,
-                &sds->osc2_amp, &sds->m_osc2.osc.m_osc_fo,
-                &sds->m_osc2.osc.m_waveform,
+                      " %d"     // filter type
+                      " %lf"    // filter fc_control
+                      " %lf\n", // filter q_control
+                sds->m_patch_name, &sds->vol, &sds->m_distortion.m_threshold,
+
+                &sds->m_osc1.osc.m_waveform, &sds->m_osc1.osc.m_osc_fo,
+                &sds->osc1_amp, &sds->m_osc2.osc.m_waveform,
+                &sds->m_osc2.osc.m_osc_fo, &sds->osc2_amp,
 
                 &sds->m_eg1.m_attack_time_msec, &sds->m_eg1.m_decay_time_msec,
+                &sds->m_eg1.m_sustain_level, &sds->eg1_sustain_len_in_samples,
                 &sds->m_eg1.m_release_time_msec,
-                &sds->eg1_sustain_len_in_samples,
 
                 &sds->m_eg2.m_attack_time_msec, &sds->m_eg2.m_decay_time_msec,
-                &sds->m_eg2.m_release_time_msec,
-                &sds->eg2_sustain_len_in_samples, &sds->eg2_osc2_intensity,
+                &sds->m_eg2.m_sustain_level, &sds->eg2_sustain_len_in_samples,
+                &sds->m_eg2.m_release_time_msec, &sds->eg2_osc2_intensity,
 
                 &sds->m_eg3.m_attack_time_msec, &sds->m_eg3.m_decay_time_msec,
+                &sds->m_eg3.m_sustain_level, &sds->eg3_sustain_len_in_samples,
                 &sds->m_eg3.m_release_time_msec,
-                &sds->eg3_sustain_len_in_samples
 
-                );
+                &sds->m_filter_type, &sds->m_filter_fc, &sds->m_filter_q);
 
-            //          "  %lf"    // vol
-            //          "  %d"     // drumtype
-            //          "  %lf"    // osc1_amp
-            //          "  %lf"    // m_osc1.osc.m_osc_fo
-            //          "  %d"     // m_osc1.osc.m_waveform
-            //          "  %lf"    // osc1_sustain_len_in_samples
-            //          "  %lf"    // eg2_osc2_intensity
-            //          "  %lf"    // osc2_amp
-            //          "  %lf"    // m_osc2.osc.m_osc_fo
-            //          "  %d"     // m_osc2.osc.m_waveform
-            //          "  %lf"    // osc2_sustain_len_in_samples
-            //          "  %lf"    // m_eg1.m_attack_time_msec
-            //          "  %lf"    // m_eg1.m_decay_time_msec
-            //          "  %lf"    // m_eg1.m_release_time_msec
-            //          "  %lf"    // m_eg2.m_attack_time_msec
-            //          "  %lf"    // m_eg2.m_decay_time_msec
-            //          "  %lf"    // m_eg2.m_release_time_msec
-            //          "  %lf"    // m_eg3.m_attack_time_msec
-            //          "  %lf"    // m_eg3.m_decay_time_msec
-            //          "  %lf\n", // m_eg3.m_release_time_msec
-            //    sds->m_patch_name, &sds->vol, &sds->drumtype, &sds->osc1_amp,
-            //    &sds->m_osc1.osc.m_osc_fo, &sds->m_osc1.osc.m_waveform,
-            //    &sds->osc1_sustain_len_in_samples, &sds->eg2_osc2_intensity,
-            //    &sds->osc2_amp, &sds->m_osc2.osc.m_osc_fo,
-            //    &sds->m_osc2.osc.m_waveform,
-            //    &sds->osc2_sustain_len_in_samples,
-            //    &sds->m_eg1.m_attack_time_msec,
-            //    &sds->m_eg1.m_decay_time_msec,
-            //    &sds->m_eg1.m_release_time_msec,
-            //    &sds->m_eg2.m_attack_time_msec,
-            //    &sds->m_eg2.m_decay_time_msec,
-            //    &sds->m_eg2.m_release_time_msec,
-            //    &sds->m_eg3.m_attack_time_msec,
-            //    &sds->m_eg3.m_decay_time_msec,
-            //    &sds->m_eg3.m_release_time_msec
-            //    );
             printf("AFTER OSC_FO %f - scanned %d\n", sds->m_osc1.osc.m_osc_fo,
                    num);
         }
@@ -718,11 +534,6 @@ void synthdrum_set_eg2_osc_intensity(synthdrum_sequencer *sds, double val)
         printf("Val has to be between 0 and 1\n");
 }
 
-void synthdrum_set_mod_pitch(synthdrum_sequencer *sds, bool b)
-{
-    sds->mod_pitch = b;
-}
-
 void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val)
 {
     if (val >= 0 && val <= 1.0) {
@@ -767,7 +578,20 @@ void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val)
 {
     printf("setting distortion to %f\n", val);
     if (val >= 0 && val <= 1)
-        sds->m_distortion.m_threshold = val;
+        sds->m_distortion_threshold = val;
     else
         printf("Val must be between 0 and 1\n");
+}
+
+void synthdrum_set_filter_freq(synthdrum_sequencer *sds, double val)
+{
+    filter_set_fc_control((filter *)&sds->m_filter, val);
+}
+void synthdrum_set_filter_q(synthdrum_sequencer *sds, double val)
+{
+    moog_set_qcontrol((filter *)&sds->m_filter, val);
+}
+void synthdrum_set_filter_type(synthdrum_sequencer *sds, unsigned int val)
+{
+    filter_set_type((filter *)&sds->m_filter, val);
 }

@@ -413,35 +413,26 @@ void interpret(char *line)
                         double val = atof(wurds[3]);
                         synthdrum_set_eg_release(sds, 3, val);
                     }
-                    else if (strncmp("mod_pitch", wurds[2], 10) == 0) {
-                        int val = atof(wurds[3]);
-                        synthdrum_set_mod_pitch(sds, val);
-                    }
                     else if (strncmp("filter_type", wurds[2], 11) == 0) {
                         printf("filter tyyyype!\n");
                         int val = atof(wurds[3]);
-                        filter_set_type((filter *)&sds->m_filter, val);
+                        synthdrum_set_filter_type(sds, val);
                     }
                     else if (strncmp("freq", wurds[2], 2) == 0) {
                         printf("Freq!\n");
                         double val = atof(wurds[3]);
-                        filter_set_fc_control((filter *)&sds->m_filter, val);
+                        synthdrum_set_filter_freq(sds, val);
                     }
                     else if (strncmp("q", wurds[2], 1) == 0) {
                         printf("Q!\n");
                         double val = atof(wurds[3]);
-                        moog_set_qcontrol((filter *)&sds->m_filter, val);
+                        synthdrum_set_filter_q(sds, val);
                     }
                     else if (strncmp("distortion_threshold", wurds[2], 20) ==
                              0) {
                         printf("DIZZTORION!\n");
                         double val = atof(wurds[3]);
                         synthdrum_set_distortion_threshold(sds, val);
-                    }
-                    else if (strncmp("disable_amp_env", wurds[2], 7) == 0) {
-                        printf("toggling amp env!\n");
-                        int val = atof(wurds[3]);
-                        sds->disable_amp_env = val;
                     }
                     else if (strncmp("save", wurds[2], 4) == 0 ||
                              strncmp("export", wurds[2], 6) == 0) {

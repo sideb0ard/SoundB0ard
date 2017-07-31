@@ -46,6 +46,7 @@ void filter_moog_init(filter_moog *moog)
     moog->f.set_q_control = &moog_set_qcontrol;
     moog->f.gennext = &moog_gennext;
     moog->f.update = &moog_update;
+    moog->f.m_q_control = 1.0; // Q is 1 to 10
     moog->f.reset = &filter_reset;
 }
 
