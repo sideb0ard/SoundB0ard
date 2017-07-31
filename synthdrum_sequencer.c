@@ -30,29 +30,35 @@ synthdrum_sequencer *new_synthdrum_seq()
         sds->metadata[i].playing = 0.0;
     }
 
-    // pitch envelope
+    // osc1 noise amp env
     envelope_generator_init(&sds->m_eg1);
     eg_set_attack_time_msec(&sds->m_eg1, 1);
     eg_set_decay_time_msec(&sds->m_eg1, 0);
     eg_set_release_time_msec(&sds->m_eg1, 1);
+    eg_set_sustain_level(&sds->m_eg1, 0.1);
     sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG1_SUSTAIN_MS;
     sds->eg1_sustain_counter = 0;
 
+    // osc2 pitch envelope
     envelope_generator_init(&sds->m_eg2);
-    eg_set_attack_time_msec(&sds->m_eg2, 2);
+    eg_set_attack_time_msec(&sds->m_eg2, 1);
     eg_set_decay_time_msec(&sds->m_eg2, 50);
     eg_set_release_time_msec(&sds->m_eg1, 2);
+    eg_set_sustain_level(&sds->m_eg2, 0.1);
     sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG2_SUSTAIN_MS;
     sds->eg2_sustain_counter = 0;
     sds->eg2_osc2_intensity = 1;
 
+    // output amp envelope
     envelope_generator_init(&sds->m_eg3);
-    eg_set_attack_time_msec(&sds->m_eg3, 2);
-    eg_set_decay_time_msec(&sds->m_eg3, 50);
-    eg_set_release_time_msec(&sds->m_eg3, 20);
+    eg_set_attack_time_msec(&sds->m_eg3, 1);
+    eg_set_decay_time_msec(&sds->m_eg3, 460);
+    eg_set_release_time_msec(&sds->m_eg3, 100);
+    eg_set_sustain_level(&sds->m_eg3, 0.1);
     sds->eg3_sustain_len_in_samples = SAMPLE_RATE / 1000. * EG3_SUSTAIN_MS;
     sds->eg3_sustain_counter = 0;
 
+    // OSC1 transient noise
     osc_new_settings(&sds->m_osc1.osc);
     qb_set_soundgenerator_interface(&sds->m_osc1);
     sds->m_osc1.osc.m_waveform = NOISE;
@@ -60,15 +66,18 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->osc1_amp = 0.307;
     osc_update(&sds->m_osc1.osc);
 
+    // OSC body
     osc_new_settings(&sds->m_osc2.osc);
     qb_set_soundgenerator_interface(&sds->m_osc2);
     sds->m_osc2.osc.m_waveform = SINE;
-    sds->m_osc2.osc.m_osc_fo = 58;
+    sds->m_osc2.osc.m_osc_fo = 110;
     sds->osc2_amp = 1.0;
     osc_update(&sds->m_osc2.osc);
 
-    // filter_moog_init(&sds->m_filter);
-    //
+    filter_moog_init(&sds->m_filter);
+    filter_set_fc_control((filter *)&sds->m_filter, 180);
+    sds->m_distortion.m_threshold = 0.707;
+
     sds->mod_pitch = true;
 
     sds->sg.gennext = &sds_gennext;
@@ -81,7 +90,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->sg.make_active_track = &sds_make_active_track;
     sds->sg.type = SYNTHDRUM_TYPE;
 
-    sds->active = true;
+    sds_start(sds);
 
     return sds;
 }
@@ -89,37 +98,44 @@ synthdrum_sequencer *new_synthdrum_seq()
 void sds_status(void *self, wchar_t *ss)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
-    swprintf(ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
-             "[SYNTHDRUM] Type: %s Vol: %.2f ModPitch:%s AmpEnv STATE: %d "
-             "PitchEnv STATE: %d "
-             "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f "
-             "eg1_attack:%.2f eg1_decay:%.2f "
-             "eg1_sustain_ms:%.2f eg1_release:%.2f "
-             "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f "
-             "eg2_attack:%.2f eg2_decay:%.2f "
-             "eg2_sustain_ms:%.2f eg2_release:%.2f eg2_osc2_int:%.2f"
-             "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_ms:%.2f "
-             "eg3_release:%.2f",
-             sds->drumtype == KICK ? "drum" : "snare", sds->vol,
-             sds->mod_pitch ? "true" : "false", sds->m_eg1.m_state,
-             sds->m_eg2.m_state,
+    swprintf(
+        ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
+        "[SYNTHDRUM] Type: %s Vol: %.2f mod_pitch:%s AmpEnv STATE: %d "
+        "PitchEnv STATE: %d "
+        "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f"
+        "\n      eg1_attack:%.2f eg1_decay:%.2f eg1_sustain_level:%.2f "
+        "eg1_sustain_ms:%.2f eg1_release:%.2f "
+        "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f"
+        "\n      eg2_attack:%.2f eg2_decay:%.2f eg2_sustain_level:%.2f "
+        "eg2_sustain_ms:%.2f eg2_release:%.2f eg2_osc2_int:%.2f"
+        "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_level:%.2f "
+        "eg3_sustain_ms:%.2f eg3_release:%.2f"
+        "\n      filter_type:%d freq:%2.f q:%2.f distortion_threshold:%.2f",
 
-             sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo,
-             sds->osc1_amp,
+        sds->drumtype == KICK ? "drum" : "snare", sds->vol,
+        sds->mod_pitch ? "true" : "false", sds->m_eg1.m_state,
+        sds->m_eg2.m_state,
 
-             sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
-             sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-             sds->m_eg1.m_release_time_msec,
+        sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo, sds->osc1_amp,
 
-             sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
+        sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
+        sds->m_eg1.m_sustain_level,
+        sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+        sds->m_eg1.m_release_time_msec,
 
-             sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
-             sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-             sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+        sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
 
-             sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
-             sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-             sds->m_eg3.m_release_time_msec);
+        sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
+        sds->m_eg2.m_sustain_level,
+        sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+        sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+
+        sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
+        sds->m_eg3.m_sustain_level,
+        sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+        sds->m_eg3.m_release_time_msec, sds->m_filter.f.m_filter_type,
+        sds->m_filter.f.m_fc_control, sds->m_filter.f.m_q_control,
+        sds->m_distortion.m_threshold);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -183,30 +199,34 @@ double sds_gennext(void *self)
         }
     }
 
+    // noise env for initial snap
     double eg1_out = eg_do_envelope(&sds->m_eg1, NULL);
     osc_update(&sds->m_osc1.osc);
     double osc1_out =
         qb_do_oscillate(&sds->m_osc1.osc, NULL) * eg1_out * sds->osc1_amp;
 
-    if (sds->mod_pitch) {
-        double eg2_biased_out = 0;
-        eg_do_envelope(&sds->m_eg2, &eg2_biased_out);
-        double eg2_osc_mod =
-            sds->eg2_osc2_intensity * OSC_FO_MOD_RANGE * eg2_biased_out;
-        sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
-    }
+    // eg2 env -> pitch of OSC2
+    double eg2_biased_out = 0;
+    eg_do_envelope(&sds->m_eg2, &eg2_biased_out);
+    double eg2_osc_mod =
+        sds->eg2_osc2_intensity * 3 /*semitones*/ * eg2_biased_out;
+    sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
+
     osc_update(&sds->m_osc2.osc);
     double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;
 
-    val = osc1_out + osc2_out;
+    double distorted_osc2_out =
+        distortion_process(&sds->m_distortion, osc2_out);
 
-    return val * sds->vol * eg_do_envelope(&sds->m_eg3, NULL);
+    moog_update((filter *)&sds->m_filter);
+    double filtered_osc2_out =
+        moog_gennext((filter *)&sds->m_filter, distorted_osc2_out);
 
-    // moog_update((filter *)&sds->m_filter);
-    // double filter_out =
-    //  moog_gennext((filter *)&sds->m_filter, val);
+    // overall amp env
+    double amp_out_env = eg_do_envelope(&sds->m_eg3, NULL);
 
-    // return filter_out * sds->vol;
+    return (osc1_out * sds->osc1_amp + filtered_osc2_out * sds->osc2_amp) *
+           amp_out_env * sds->vol;
 }
 
 double sds_getvol(void *self)
@@ -217,6 +237,7 @@ double sds_getvol(void *self)
 
 void sds_trigger(synthdrum_sequencer *sds)
 {
+    // printf("trigger!\n");
     osc_reset(&sds->m_osc1.osc);
     sds->m_osc1.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg1);
@@ -386,7 +407,7 @@ void sds_parse_midi(synthdrum_sequencer *sds, int status, int data1, int data2)
             if (sds->midi_controller_mode == 0) {
                 printf("DISTORTION!!\n");
                 scaley_val = scaleybum(0, 127, 100, 0.01, data2);
-                sds->m_distortion_threshold = scaley_val;
+                sds->m_distortion.m_threshold = scaley_val;
             }
             else {
             }
@@ -729,6 +750,7 @@ void sds_stop(void *self)
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     sds->active = false;
 }
+
 int sds_get_num_tracks(void *self)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
@@ -739,4 +761,13 @@ void sds_make_active_track(void *self, int track_num)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     sds->m_seq.cur_pattern = track_num;
+}
+
+void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val)
+{
+    printf("setting distortion to %f\n", val);
+    if (val >= 0 && val <= 1)
+        sds->m_distortion.m_threshold = val;
+    else
+        printf("Val must be between 0 and 1\n");
 }

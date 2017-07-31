@@ -61,23 +61,11 @@ struct oscillator {
     // ---  pulse width in % (sqr only) from GUI
     double m_pulse_width_control;
 
-    unsigned m_waveform; // to store type
+    unsigned m_waveform;
+    unsigned m_lfo_mode;
 
-    unsigned m_lfo_mode; // to store MODE
-
-    // --- MIDI note that is being played
     unsigned m_midi_note_number;
 
-    // TODO - unused these next two?
-    //// --- for hard sync or other dual-oscillator ideas
-    // oscillator *m_buddy_oscillator;
-    //// --- flag indicating we are a master oscillator
-    // bool m_master_osc;
-
-    // --- PROTECTED: generally these are either basic calc variables
-    //                and modulation stuff
-    // --- calculation variables
-    // double m_sample_rate; // fs
     double m_fo;          // current (actual) frequency of oscillator
     double m_pulse_width; // pulse width in % for calculation
     // bool m_square_edge_rising; // hysteresis for square edge
@@ -100,12 +88,7 @@ struct oscillator {
     double m_pw_mod;     /* modulation input for PWM -1 to +1 */
     double m_amp_mod; /* output amplitude modulation for AM 0 to +1 (not dB)*/
 
-    // --- render a sample
-    // for LFO:  pAuxOutput = QuadPhaseOutput
-    // Pitched: pAuxOutput = Right channel (return value is left
-    // Channel
     double (*do_oscillate)(oscillator *self, double *aux_output);
-    //// TODO: implement these per subclass
     void (*start_oscillator)(oscillator *self);
     void (*stop_oscillator)(oscillator *self);
     void (*reset_oscillator)(oscillator *self);
@@ -114,15 +97,9 @@ struct oscillator {
 
 void osc_new_settings(oscillator *self);
 
-// --- modulo functions for master/slave operation
-// --- increment the modulo counters
 void osc_inc_modulo(oscillator *self);
-
-// --- check and wrap the modulo
-//     returns true if modulo wrapped
 bool osc_check_wrap_modulo(oscillator *self);
 
-// --- reset the modulo (required for master->slave operations)
 void osc_reset_modulo(oscillator *self, double d);
 
 void osc_set_amplitude_mod(oscillator *self, double amp_val);
@@ -135,9 +112,7 @@ void osc_set_phase_mod(oscillator *self, double mod_val);
 
 void osc_set_pw_mod(oscillator *self, double mod_val);
 
-// --- reset counters, etc...
 void osc_reset(oscillator *self);
-// --- update the frequency, amp mod and PWM
 void osc_update(oscillator *self);
 
 void osc_init_global_parameters(oscillator *self,

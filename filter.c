@@ -27,8 +27,11 @@ void filter_setup(filter *f)
 
 void filter_set_fc_control(filter *f, double val)
 {
-    if (val > FILTER_FC_MIN && val < FILTER_FC_MAX) {
+    if (val >= FILTER_FC_MIN && val <= FILTER_FC_MAX) {
         f->m_fc_control = val;
+    }
+    else {
+        printf("FC must be between %d and %d\n", FILTER_FC_MIN, FILTER_FC_MAX);
     }
 }
 

@@ -74,16 +74,19 @@ typedef struct granulator {
     lfo m_lfo1; // grain dur
     double m_lfo1_min;
     double m_lfo1_max;
+    bool lfo1_sync;
 
     bool grainps_lfo_on;
     lfo m_lfo2; // grains per sec
     double m_lfo2_min;
     double m_lfo2_max;
+    bool lfo2_sync;
 
     bool grainscanfile_lfo_on;
     lfo m_lfo3; // file read position
     double m_lfo3_min;
     double m_lfo3_max;
+    bool lfo3_sync;
 
     double vol;
 } granulator;

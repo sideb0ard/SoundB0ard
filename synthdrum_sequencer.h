@@ -1,6 +1,7 @@
 #pragma once
 
 #include "defjams.h"
+#include "distortion.h"
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
@@ -44,8 +45,7 @@ typedef struct synthdrum_sequencer {
     int eg3_sustain_counter;
 
     filter_moogladder m_filter;
-
-    double m_distortion_threshold;
+    distortion m_distortion;
 
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
@@ -53,6 +53,7 @@ typedef struct synthdrum_sequencer {
 
     bool active;
     bool started;
+    bool disable_amp_env;
 
 } synthdrum_sequencer;
 
@@ -85,3 +86,4 @@ void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val);
 void synthdrum_set_eg2_osc_intensity(synthdrum_sequencer *sds, double val);
 void synthdrum_set_mod_pitch(synthdrum_sequencer *sds, bool b);
 void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val);
+void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val);

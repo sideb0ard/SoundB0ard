@@ -53,21 +53,11 @@ void osc_new_settings(oscillator *osc)
     osc->m_mod_dest_output1 = SOURCE_NONE;
     osc->m_mod_dest_output2 = SOURCE_NONE;
 
-    // osc->m_square_edge_rising = false;
-
-    // // --- for hard sync
-    // osc->m_buddy_oscillator = NULL;
-    // osc->m_master_osc = false;
-
     osc->m_global_oscillator_params = NULL;
 }
 
-// --- modulo functions for master/slave operation
-// --- increment the modulo counters
 void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }
 
-// --- check and wrap the modulo
-//     returns true if modulo wrapped
 bool osc_check_wrap_modulo(oscillator *self)
 {
     if (self->m_inc > 0 && self->m_modulo >= 1.0) {
@@ -81,7 +71,6 @@ bool osc_check_wrap_modulo(oscillator *self)
     return false;
 }
 
-// --- reset the modulo (required for master->slave operations)
 void osc_reset_modulo(oscillator *self, double d) { self->m_modulo = d; }
 
 void osc_set_amplitude_mod(oscillator *self, double amp_val)
@@ -115,25 +104,14 @@ void osc_set_pw_mod(oscillator *self, double mod_val)
 
 void osc_reset(oscillator *self)
 {
-    // --- Pitched modulos, wavetables start at 0.0
     self->m_modulo = 0.0;
-
-    // --- needed fror triangle algorithm, DPW
     self->m_dpw_square_modulator = -1.0;
-
-    // --- flush DPW registers
     self->m_dpw_z1 = 0.0;
 
-    // --- for random stuff
-    srand(time(NULL));
     self->m_pn_register = rand();
     self->m_rsh_counter = -1; // flag for reset condition
     self->m_rsh_value = 0.0;
 
-    // square state variable
-    // self->m_square_edge_rising = false;
-
-    // modulation variables
     self->m_amp_mod = 1.0; // note default to 1 to avoid silent osc
     self->m_pw_mod = 0.0;
     self->m_pitch_bend_mod = 0.0;
@@ -142,14 +120,11 @@ void osc_reset(oscillator *self)
     self->m_phase_mod = 0.0;
 }
 
-// --- update the frequency, amp mod and PWM
 void osc_update(oscillator *self)
 {
     if (self->m_global_oscillator_params) {
-        // printf("I'm %s\n", name);
-        if (self->m_global_oscillator_params->osc_fo >= 0) {
+        if (self->m_global_oscillator_params->osc_fo >= 0)
             self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
-        }
 
         self->m_fo_ratio = self->m_global_oscillator_params->fo_ratio;
         self->m_amplitude = self->m_global_oscillator_params->amplitude;
@@ -166,11 +141,8 @@ void osc_update(oscillator *self)
     if (self->m_waveform == rsh || self->m_waveform == qrsh)
         self->m_lfo_mode = LFORFREE;
 
-    // --- Modulation Matrix
-    //
     // --- get from matrix Sources
     if (self->m_v_modmatrix) {
-        // printf("GOTS a V_MODMATRIX\n");
         // --- zero is norm for these
         self->m_fo_mod =
             self->m_v_modmatrix->m_destinations[self->m_mod_source_fo];
@@ -201,10 +173,7 @@ void osc_update(oscillator *self)
     if (self->m_fo < -OSC_FO_MAX)
         self->m_fo = -OSC_FO_MAX;
 
-    // --- calculate increment (a.k.a. phase a.k.a. phaseIncrement, etc...)
     self->m_inc = self->m_fo / SAMPLE_RATE;
-
-    // --- Pulse Width Modulation --- //
 
     // --- limits are 2% and 98%
     self->m_pulse_width = self->m_pulse_width_control +

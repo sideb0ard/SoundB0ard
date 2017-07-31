@@ -60,6 +60,7 @@ granulator *new_granulator(char *filename)
     lfo_set_soundgenerator_interface(&g->m_lfo1);
     g->m_lfo1.osc.m_osc_fo = 0.01; // default LFO
     g->m_lfo1.osc.m_amplitude = 1.;
+    g->lfo1_sync = false;
     lfo_start_oscillator((oscillator *)&g->m_lfo1);
 
     g->grainps_lfo_on = false;
@@ -69,6 +70,7 @@ granulator *new_granulator(char *filename)
     lfo_set_soundgenerator_interface(&g->m_lfo2);
     g->m_lfo2.osc.m_osc_fo = 0.01; // default LFO
     g->m_lfo2.osc.m_amplitude = 1.;
+    g->lfo2_sync = false;
     lfo_start_oscillator((oscillator *)&g->m_lfo2);
 
     g->grainscanfile_lfo_on = false;
@@ -78,6 +80,7 @@ granulator *new_granulator(char *filename)
     lfo_set_soundgenerator_interface(&g->m_lfo3);
     g->m_lfo3.osc.m_osc_fo = 0.01; // default LFO
     g->m_lfo3.osc.m_amplitude = 1.;
+    g->lfo3_sync = false;
     lfo_start_oscillator((oscillator *)&g->m_lfo3);
 
     granulator_start(g);
@@ -125,6 +128,8 @@ double granulator_gennext(void *self)
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo1_min, g->m_lfo1_max, lfo1_out);
         g->grain_duration_ms = scaley_val;
+        // if (mixr->start_of_loop && g->lfo1_sync)
+        //    g->grain_duration_ms = g->m_lfo1_min;
     }
 
     if (g->grainps_lfo_on) {
@@ -132,6 +137,8 @@ double granulator_gennext(void *self)
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo2_min, g->m_lfo2_max, lfo2_out);
         g->grains_per_sec = scaley_val;
+        // if (mixr->start_of_loop && g->lfo2_sync)
+        //    g->grains_per_sec = g->m_lfo2_min;
     }
 
     if (g->grainscanfile_lfo_on) {
@@ -145,6 +152,9 @@ double granulator_gennext(void *self)
         else if (g->grain_buffer_position < 0)
             g->grain_buffer_position =
                 g->audio_buffer_len - g->grain_buffer_position;
+
+        // if (mixr->start_of_loop && g->lfo3_sync)
+        //    g->grain_buffer_position = g->m_lfo3_min;
     }
 
     if (g->have_active_buffer) // file buffer or external in
@@ -589,12 +599,15 @@ void granulator_set_lfo_rate(granulator *g, int lfonum, double rate)
         switch (lfonum) {
         case (1):
             g->m_lfo1.osc.m_osc_fo = rate;
+            g->lfo1_sync = false;
             break;
         case (2):
             g->m_lfo2.osc.m_osc_fo = rate;
+            g->lfo2_sync = false;
             break;
         case (3):
             g->m_lfo3.osc.m_osc_fo = rate;
+            g->lfo3_sync = false;
             break;
         }
     }
@@ -639,18 +652,22 @@ void granulator_set_lfo_max(granulator *g, int lfonum, double maxval)
 
 void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops)
 {
-    double osc_fo =
-        (double)SAMPLE_RATE / (mixr->loop_len_in_samples * numloops);
+
+    int looplen_in_samples = 60 / mixr->bpm * SAMPLE_RATE;
+    double osc_fo = (double)SAMPLE_RATE / (looplen_in_samples * numloops);
     printf("Setting LFO %d sync to %f\n", lfonum, osc_fo);
     switch (lfonum) {
     case (1):
         g->m_lfo1.osc.m_osc_fo = osc_fo;
+        g->lfo1_sync = true;
         break;
     case (2):
         g->m_lfo2.osc.m_osc_fo = osc_fo;
+        g->lfo2_sync = true;
         break;
     case (3):
         g->m_lfo3.osc.m_osc_fo = osc_fo;
+        g->lfo3_sync = true;
         break;
     }
 }
