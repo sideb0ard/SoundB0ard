@@ -364,11 +364,22 @@ void next_life_generation(sequencer *s)
                                         SIXTEENTH);
 }
 
-int sloppy_weight(sequencer *s)
+int sloppy_weight(sequencer *s, int position)
 {
     if (!s->sloppiness)
-        return 0;
-    return rand() % (s->sloppiness * 20);
+        return position;
+
+    int sloopy = position; // yeah, yeah, sloppy, i know - but sloopy sounds cool.
+
+    if (rand() % 2) // positive
+        sloopy += rand() % s->sloppiness;
+    else
+        sloopy -= rand() % s->sloppiness;
+
+    if (sloopy < PPBAR)
+        return sloopy;
+    else
+        return position;
 }
 
 void next_shuffle_generation(sequencer *s)
@@ -490,32 +501,20 @@ void next_markov_generation(sequencer *s)
                 break;
             case 1:
                 if (randy < 5) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 2:
                 if (randy < 25) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 3:
                 if (randy < 35) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 4:
@@ -530,42 +529,28 @@ void next_markov_generation(sequencer *s)
                         }
                         i += 4; // skip next few beats
                     }
-                    else if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    else {
+                        int sloppy_position = sloppy_weight(s, position);
+                        s->patterns[s->cur_pattern][sloppy_position] = 1;
+                    }
                 }
                 break;
             case 5:
                 if (randy < 3) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 6:
                 if (randy < 15) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 7:
                 if (randy < 12) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 8:
@@ -580,42 +565,29 @@ void next_markov_generation(sequencer *s)
                         }
                         i += 4; // skip next few beats
                     }
-                    else if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
                     else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    {
+                        int sloppy_position = sloppy_weight(s, position);
+                        s->patterns[s->cur_pattern][sloppy_position] = 1;
+                    }
                 }
                 break;
             case 9:
                 if (randy < 3) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 10:
                 if (randy < 5) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 11:
                 if (randy < 25) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 12:
@@ -630,22 +602,17 @@ void next_markov_generation(sequencer *s)
                         }
                         i += 4; // skip next few beats
                     }
-                    else if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
                     else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    {
+                        int sloppy_position = sloppy_weight(s, position);
+                        s->patterns[s->cur_pattern][sloppy_position] = 1;
+                    }
                 }
                 break;
             case 13:
                 if (randy < 5) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             case 14:
@@ -656,22 +623,17 @@ void next_markov_generation(sequencer *s)
                             1;
                         i += 4; // skip next few beats
                     }
-                    else if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
                     else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    {
+                        int sloppy_position = sloppy_weight(s, position);
+                        s->patterns[s->cur_pattern][sloppy_position] = 1;
+                    }
                 }
                 break;
             case 15:
                 if (randy < 2) {
-                    if (rand() % 2) // positive
-                        s->patterns[s->cur_pattern]
-                                   [position + sloppy_weight(s)] = 1;
-                    else
-                        s->patterns[s->cur_pattern]
-                                   [position - sloppy_weight(s)] = 1;
+                    int sloppy_position = sloppy_weight(s, position);
+                    s->patterns[s->cur_pattern][sloppy_position] = 1;
                 }
                 break;
             }

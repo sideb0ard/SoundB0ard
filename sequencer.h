@@ -128,4 +128,4 @@ void seq_rm_micro_hit(sequencer *s, int pattern_num, int step);
 void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting);
 
 void seq_set_sloppiness(sequencer *s, int sloppy_setting);
-int sloppy_weight(sequencer *s);
+int sloppy_weight(sequencer *s, int position);
