@@ -191,6 +191,11 @@ void minisynth_voice_update(minisynth_voice *msv)
             msv->m_voice.m_global_synth_params->osc2_params.waveform = SQUARE;
             msv->m_voice.m_global_synth_params->osc3_params.waveform = TRI;
             break;
+        case Sin2Sqr:
+            msv->m_voice.m_global_synth_params->osc1_params.waveform = SINE;
+            msv->m_voice.m_global_synth_params->osc2_params.waveform = SINE;
+            msv->m_voice.m_global_synth_params->osc3_params.waveform = TRI;
+            break;
         default:
             msv->m_voice.m_global_synth_params->osc1_params.waveform = SAW1;
             msv->m_voice.m_global_synth_params->osc2_params.waveform = SAW1;

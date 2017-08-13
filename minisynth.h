@@ -17,7 +17,7 @@
 #include "minisynth_voice.h"
 
 #define MAX_NUM_MIDI_LOOPS 64
-#define MAX_VOICES 2
+#define MAX_VOICES 4
 
 #define MIN_DETUNE_CENTS -50.0
 #define MAX_DETUNE_CENTS 50.0
@@ -52,7 +52,8 @@ typedef struct synthsettings {
     char m_settings_name[256];
     unsigned int m_voice_mode; // controlled by keys
     double m_attack_time_msec;
-    double m_decay_release_time_msec;
+    double m_decay_time_msec;
+    double m_release_time_msec;
     double m_sustain_level;
     double m_volume_db;
     double m_lfo1_amplitude;
@@ -82,6 +83,9 @@ typedef struct synthsettings {
     unsigned int m_legato_mode;
     unsigned int m_reset_to_zero;
     unsigned int m_filter_keytrack;
+    unsigned int m_filter_type;
+    double m_filter_saturation;
+    unsigned int m_nlp;
     unsigned int m_velocity_to_attack_scaling;
     unsigned int m_note_number_to_decay_scaling;
     double m_portamento_time_msec;
@@ -251,6 +255,7 @@ void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
 
 void minisynth_set_attack_time_ms(minisynth *ms, double val);
 void minisynth_set_decay_time_ms(minisynth *ms, double val);
+void minisynth_set_release_time_ms(minisynth *ms, double val);
 void minisynth_set_delay_feedback_pct(minisynth *ms, double val);
 void minisynth_set_delay_ratio(minisynth *ms, double val);
 void minisynth_set_delay_mode(minisynth *ms, unsigned int val);
@@ -258,10 +263,13 @@ void minisynth_set_delay_time_ms(minisynth *ms, double val);
 void minisynth_set_delay_wetmix(minisynth *ms, double val);
 void minisynth_set_detune(minisynth *ms, double val);
 void minisynth_set_eg1_dca_int(minisynth *ms, double val);
-void minisynth_set_eg1_filter_int(minisynth *ms, int val);
+void minisynth_set_eg1_filter_int(minisynth *ms, double val);
 void minisynth_set_eg1_osc_int(minisynth *ms, double val);
 void minisynth_set_filter_fc(minisynth *ms, double val);
 void minisynth_set_filter_fq(minisynth *ms, double val);
+void minisynth_set_filter_type(minisynth *ms, unsigned int val);
+void minisynth_set_filter_saturation(minisynth *ms, double val);
+void minisynth_set_filter_nlp(minisynth *ms, unsigned int val);
 void minisynth_set_keytrack_int(minisynth *ms, double val);
 void minisynth_set_keytrack(minisynth *ms, unsigned int val);
 void minisynth_set_legato_mode(minisynth *ms, unsigned int val);

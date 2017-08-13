@@ -22,7 +22,7 @@ void filter_setup(filter *f)
     f->m_mod_source_fc = DEST_NONE;
     f->m_mod_source_fc_control = DEST_NONE;
 
-    // f->m_global_filter_params = NULL;
+    f->m_global_filter_params = NULL;
 }
 
 void filter_set_fc_control(filter *f, double val)
@@ -48,8 +48,6 @@ void filter_set_type(filter *f, unsigned int type)
 
 void filter_update(filter *f)
 {
-    // printf("1ORIG:FC: %f\n", f->m_fc);
-    // printf("2MY FC_CONTROL: %f\n", f->m_fc_control);
     if (f->m_global_filter_params) {
         f->m_aux_control = f->m_global_filter_params->aux_control;
         f->m_fc_control = f->m_global_filter_params->fc_control;
@@ -59,32 +57,19 @@ void filter_update(filter *f)
         f->m_nlp = f->m_global_filter_params->nlp;
     }
 
-    // printf("After GLOBAL filter - fc_control is %f\n", f->m_fc_control);
-    // printf("2RIG:FC: %f\n", f->m_fc);
-    // printf("Q!!! : %f\n", f->m_q_control);
-    // exit(0);
-
-    // TODO - INVESTIGATE LFO -> FILTER LACK OF WOBBLE
     if (f->m_v_modmatrix) {
         f->m_fc_mod = f->m_v_modmatrix->m_destinations[f->m_mod_source_fc];
         if (f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0)
             f->m_fc_control =
                 f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control];
     }
-    // printf("After MOD MATRXI filter - fc_control is %f\n", f->m_fc_control);
-
-    // f->set_q_control(f, f->m_q_control);
 
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);
-    // printf("OOFT, M_FC %f\n", f->m_fc);
 
     if (f->m_fc > FILTER_FC_MAX)
         f->m_fc = FILTER_FC_MAX;
     if (f->m_fc < FILTER_FC_MIN)
         f->m_fc = FILTER_FC_MIN;
-    // printf("NOW:_Q_: %f\n", f->m_q_control);
-    // printf("NOW:FC: %f\n", f->m_fc);
-    // printf("NOW MY FC_CONTROL: %f\n", f->m_fc_control);
 }
 
 void filter_reset(filter *f)

@@ -369,7 +369,8 @@ int sloppy_weight(sequencer *s, int position)
     if (!s->sloppiness)
         return position;
 
-    int sloopy = position; // yeah, yeah, sloppy, i know - but sloopy sounds cool.
+    int sloopy =
+        position; // yeah, yeah, sloppy, i know - but sloopy sounds cool.
 
     if (rand() % 2) // positive
         sloopy += rand() % s->sloppiness;
@@ -565,8 +566,7 @@ void next_markov_generation(sequencer *s)
                         }
                         i += 4; // skip next few beats
                     }
-                    else
-                    {
+                    else {
                         int sloppy_position = sloppy_weight(s, position);
                         s->patterns[s->cur_pattern][sloppy_position] = 1;
                     }
@@ -602,8 +602,7 @@ void next_markov_generation(sequencer *s)
                         }
                         i += 4; // skip next few beats
                     }
-                    else
-                    {
+                    else {
                         int sloppy_position = sloppy_weight(s, position);
                         s->patterns[s->cur_pattern][sloppy_position] = 1;
                     }
@@ -623,8 +622,7 @@ void next_markov_generation(sequencer *s)
                             1;
                         i += 4; // skip next few beats
                     }
-                    else
-                    {
+                    else {
                         int sloppy_position = sloppy_weight(s, position);
                         s->patterns[s->cur_pattern][sloppy_position] = 1;
                     }

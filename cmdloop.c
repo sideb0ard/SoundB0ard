@@ -1006,7 +1006,8 @@ void interpret(char *line)
                             }
                         }
                         else { // just toggle
-                            minisynth_set_generate_mode(ms, 1 - ms->generate_mode);
+                            minisynth_set_generate_mode(ms,
+                                                        1 - ms->generate_mode);
                         }
 
                         printf("Synth GENERATE mode : %s\n",
@@ -1864,9 +1865,15 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         return true;
     }
     else if (strncmp("decayms", wurds[3], 7) == 0) {
-        printf("Minisynth change Decay/Relase Time MS!\n");
+        printf("Minisynth change Decay Time MS!\n");
         double val = atof(wurds[4]);
         minisynth_set_decay_time_ms(ms, val);
+        return true;
+    }
+    else if (strncmp("releasems", wurds[3], 7) == 0) {
+        printf("Minisynth change Release Time MS!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_release_time_ms(ms, val);
         return true;
     }
     else if (strncmp("delayfb", wurds[3], 7) == 0) {
@@ -1933,6 +1940,24 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         printf("Minisynth change Filter Qualivity!\n");
         double val = atof(wurds[4]);
         minisynth_set_filter_fq(ms, val);
+        return true;
+    }
+    else if (strncmp("type", wurds[3], 4) == 0) {
+        printf("Minisynth change Filter TYPE!\n");
+        int val = atoi(wurds[4]);
+        minisynth_set_filter_type(ms, val);
+        return true;
+    }
+    else if (strncmp("saturation", wurds[3], 10) == 0) {
+        printf("Minisynth change Filter SATURATION!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_filter_saturation(ms, val);
+        return true;
+    }
+    else if (strncmp("nlp", wurds[3], 3) == 0) {
+        printf("Minisynth change Filter NLP!\n");
+        unsigned val = atoi(wurds[4]);
+        minisynth_set_filter_nlp(ms, val);
         return true;
     }
     else if (strncmp("ktint", wurds[3], 5) == 0) {

@@ -10,6 +10,7 @@ typedef enum {
     Saw2Sqr,
     Tri2Saw,
     Tri2Sqr,
+    Sin2Sqr,
     MAX_VOICE_CHOICE
 } minisynth_voice_choice;
 
