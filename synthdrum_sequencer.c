@@ -15,7 +15,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     synthdrum_sequencer *sds = calloc(1, sizeof(synthdrum_sequencer));
     seq_init(&sds->m_seq);
 
-    sds->vol = 1;
+    sds->vol = 0.6;
     sds->started = false;
     for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
         sds->metadata[i].played = 0.0;
@@ -35,7 +35,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     osc_new_settings(&sds->m_osc2.osc);
     qb_set_soundgenerator_interface(&sds->m_osc2);
     sds->m_osc2.osc.m_waveform = SINE;
-    sds->m_osc2.osc.m_osc_fo = 110;
+    sds->m_osc2.osc.m_osc_fo = 94;
     sds->osc2_amp = 1.0;
     osc_update(&sds->m_osc2.osc);
 

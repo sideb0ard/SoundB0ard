@@ -2170,10 +2170,70 @@ void char_melody_to_midi_melody(minisynth *ms, int dest_melody,
     for (int i = start; i < end; i++) {
         int tick = 0;
         int midi_note = 0;
-        sscanf(char_array[i], "%d:%d", &tick, &midi_note);
-        if (midi_note != 0) {
-            printf("Adding %d:%d\n", tick, midi_note);
-            minisynth_add_note(ms, dest_melody, tick, midi_note);
+        char char_note[3] = {0};
+        bool chord_found = false;
+        chord_midi_notes chnotes = {0, 0, 0};
+        sscanf(char_array[i], "%d:%s", &tick, char_note);
+        if (strncasecmp(char_note, "c", 1) == 0) {
+            chnotes = get_midi_notes_from_char_chord("C_MAJOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "dm", 2) == 0) {
+            chnotes = get_midi_notes_from_char_chord("D_MINOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "d", 1) == 0) {
+            chnotes = get_midi_notes_from_char_chord("D_MAJOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "em", 2) == 0) {
+            chnotes = get_midi_notes_from_char_chord("E_MINOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "e", 1) == 0) {
+            chnotes = get_midi_notes_from_char_chord("E_MAJOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "f", 1) == 0) {
+            chnotes = get_midi_notes_from_char_chord("F_MAJOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "gm", 2) == 0) {
+            chnotes = get_midi_notes_from_char_chord("G_MINOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "g", 1) == 0) {
+            chnotes = get_midi_notes_from_char_chord("G_MAJOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "am", 2) == 0) {
+            chnotes = get_midi_notes_from_char_chord("A_MINOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "a", 1) == 0) {
+            chnotes = get_midi_notes_from_char_chord("A_MAJOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "bm", 2) == 0) {
+            chnotes = get_midi_notes_from_char_chord("B_MINOR");
+            chord_found = true;
+        }
+        else if (strncasecmp(char_note, "b", 1) == 0) {
+            chnotes = get_midi_notes_from_char_chord("B_MAJOR");
+            chord_found = true;
+        }
+        else {
+            sscanf(char_array[i], "%d:%d", &tick, &midi_note);
+            if (midi_note != 0) {
+                printf("Adding %d:%d\n", tick, midi_note);
+                minisynth_add_note(ms, dest_melody, tick, midi_note);
+            }
+        }
+
+        if (chord_found) {
+            minisynth_add_note(ms, dest_melody, tick, chnotes.root);
+            minisynth_add_note(ms, dest_melody, tick, chnotes.third);
+            minisynth_add_note(ms, dest_melody, tick, chnotes.fifth);
         }
     }
 }
