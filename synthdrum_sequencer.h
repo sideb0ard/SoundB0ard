@@ -28,17 +28,20 @@ typedef struct synthdrum_sequencer {
     qblimited_oscillator m_osc2;
     double osc2_amp;
 
+    // osc1 amp
     envelope_generator m_eg1;
     double eg1_sustain_len_in_samples;
     int eg1_sustain_ms;
     int eg1_sustain_counter;
 
+    // osc2 pitch
     envelope_generator m_eg2;
     double eg2_osc2_intensity;
     double eg2_sustain_len_in_samples;
     int eg2_sustain_ms;
     int eg2_sustain_counter;
 
+    // output amp
     envelope_generator m_eg3;
     double eg3_sustain_len_in_samples;
     int eg3_sustain_ms;
@@ -54,6 +57,7 @@ typedef struct synthdrum_sequencer {
 
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
+    int mod_semitones_range;
     bool active;
     bool started;
 
@@ -90,3 +94,4 @@ void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val);
 void synthdrum_set_filter_freq(synthdrum_sequencer *sds, double val);
 void synthdrum_set_filter_q(synthdrum_sequencer *sds, double val);
 void synthdrum_set_filter_type(synthdrum_sequencer *sds, unsigned int val);
+void synthdrum_set_mod_semitones_range(synthdrum_sequencer *sds, int val);

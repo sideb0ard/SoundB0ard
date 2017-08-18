@@ -88,7 +88,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->sg.get_num_tracks = &sds_get_num_tracks;
     sds->sg.make_active_track = &sds_make_active_track;
     sds->sg.type = SYNTHDRUM_TYPE;
-
+    sds->mod_semitones_range = 4;
     sds_start(sds);
 
     return sds;
@@ -104,7 +104,8 @@ void sds_status(void *self, wchar_t *ss)
         "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f" WANSI_COLOR_GREEN
         "\n      eg1_attack:%.2f eg1_decay:%.2f eg1_sustain_level:%.2f "
         "eg1_sustain_ms:%.2f eg1_release:%.2f " WANSI_COLOR_GREEN_TOO
-        "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f" WANSI_COLOR_GREEN
+        "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f mod_pitch_semitones:%d"
+        WANSI_COLOR_GREEN
         "\n      eg2_attack:%.2f eg2_decay:%.2f eg2_sustain_level:%.2f "
         "eg2_sustain_ms:%.2f eg2_release:%.2f "
         "eg2_osc2_int:%.2f" WANSI_COLOR_GREEN_TOO
@@ -121,6 +122,7 @@ void sds_status(void *self, wchar_t *ss)
         sds->m_eg1.m_release_time_msec,
 
         sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
+        sds->mod_semitones_range,
         sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
         sds->m_eg2.m_sustain_level,
         sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
@@ -205,14 +207,14 @@ double sds_gennext(void *self)
     double eg2_biased_out = 0;
     eg_do_envelope(&sds->m_eg2, &eg2_biased_out);
     double eg2_osc_mod =
-        sds->eg2_osc2_intensity * 3 /*semitones*/ * eg2_biased_out;
+        sds->eg2_osc2_intensity * sds->mod_semitones_range * eg2_biased_out;
     sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
 
     osc_update(&sds->m_osc2.osc);
     double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;
 
     sds->m_distortion.m_threshold = sds->m_distortion_threshold;
-    double distorted_osc2_out =
+    double distorted_out =
         distortion_process(&sds->m_distortion, osc2_out);
 
     // sds->m_filter.f.m_filter_type = sds->m_filter_type;
@@ -220,13 +222,17 @@ double sds_gennext(void *self)
     // sds->m_filter.f.m_q_control = sds->m_filter_q;
     moog_update((filter *)&sds->m_filter);
     double filtered_osc2_out =
-        moog_gennext((filter *)&sds->m_filter, distorted_osc2_out);
+        moog_gennext((filter *)&sds->m_filter, distorted_out);
 
     // overall amp env
     double amp_out_env = eg_do_envelope(&sds->m_eg3, NULL);
 
-    return (osc1_out * sds->osc1_amp + filtered_osc2_out * sds->osc2_amp) *
+    double almost_out = (osc1_out * sds->osc1_amp + filtered_osc2_out * sds->osc2_amp) *
            amp_out_env * sds->vol;
+
+    almost_out = effector(&sds->sg, almost_out);
+    almost_out = envelopor(&sds->sg, almost_out);
+    return almost_out;
 }
 
 double sds_getvol(void *self)
@@ -247,6 +253,7 @@ void sds_trigger(synthdrum_sequencer *sds)
     sds->m_osc2.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg2);
     sds->eg2_sustain_counter = 0;
+
 
     eg_start_eg(&sds->m_eg3);
     sds->eg3_sustain_counter = 0;
@@ -491,7 +498,7 @@ void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
         int samples_val = SAMPLE_RATE / 1000. * val;
         switch (eg_num) {
         case (1):
-            sds->eg2_sustain_len_in_samples = samples_val;
+            sds->eg1_sustain_len_in_samples = samples_val;
             break;
         case (2):
             sds->eg2_sustain_len_in_samples = samples_val;
@@ -597,4 +604,8 @@ void synthdrum_set_filter_type(synthdrum_sequencer *sds, unsigned int val)
 {
     sds->m_filter_type = val;
     filter_set_type((filter *)&sds->m_filter, val);
+}
+void synthdrum_set_mod_semitones_range(synthdrum_sequencer *sds, int val)
+{
+    sds->mod_semitones_range = val;
 }

@@ -367,6 +367,14 @@ void interpret(char *line)
                         double val = atof(wurds[3]);
                         synthdrum_set_osc_amp(sds, 2, val);
                     }
+                    else if (strncmp("osc3_wav", wurds[2], 8) == 0) {
+                        int val = atoi(wurds[3]);
+                        synthdrum_set_osc_wav(sds, 3, val);
+                    }
+                    else if (strncmp("osc3_fo", wurds[2], 7) == 0) {
+                        double val = atof(wurds[3]);
+                        synthdrum_set_osc_fo(sds, 3, val);
+                    }
                     else if (strncmp("eg2_attack", wurds[2], 10) == 0) {
                         double val = atof(wurds[3]);
                         synthdrum_set_eg_attack(sds, 2, val);
@@ -434,13 +442,20 @@ void interpret(char *line)
                         double val = atof(wurds[3]);
                         synthdrum_set_distortion_threshold(sds, val);
                     }
+                    else if (strncmp("mod_pitch_semitones", wurds[2], 19) ==
+                             0) {
+                        printf("modPITCH!!\n");
+                        int val = atoi(wurds[3]);
+                        synthdrum_set_mod_semitones_range(sds, val);
+                    }
                     else if (strncmp("save", wurds[2], 4) == 0 ||
                              strncmp("export", wurds[2], 6) == 0) {
                         printf("Saving SYNTHDRUM patch..\n");
                         synthdrum_save_patch(sds, wurds[3]);
                     }
                     else if (strncmp("open", wurds[2], 4) == 0 ||
-                             strncmp("import", wurds[2], 7) == 0) {
+                             strncmp("import", wurds[2], 6) == 0 ||
+                             strncmp("load", wurds[2], 4) == 0) {
                         printf("Opening SYNTHDRUM patches.. \n");
                         synthdrum_open_patch(sds, wurds[3]);
                     }
@@ -1060,7 +1075,8 @@ void interpret(char *line)
                         strncpy(preset_name, wurds[3], 19);
                         minisynth_save_settings(ms, preset_name);
                     }
-                    else if (strncmp("switch", wurds[2], 6) == 0) {
+                    else if (strncmp("switch", wurds[2], 6) == 0 ||
+                            strncmp("CurMelody", wurds[2], 9) == 0) {
                         int melody_num = atoi(wurds[3]);
                         minisynth_switch_melody(ms, melody_num);
                     }
@@ -1668,6 +1684,12 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         else {
             int pattern_num = atoi(wurds[3]);
             if (seq_is_valid_pattern_num(seq, pattern_num)) {
+                if (strncmp("amp", wurds[4], 3) == 0) {
+                    int hit = atoi(wurds[5]);
+                    double amp = atof(wurds[6]);
+                    printf("Changing amp of %d:%d to %f\n", pattern_num, hit, amp);
+                    seq_set_sample_amp(seq, pattern_num, hit, amp);
+                }
                 if (strncmp("add", wurds[4], 3) == 0) {
                     int hit = atoi(wurds[5]);
                     printf("Adding a hit to %d\n", hit);
