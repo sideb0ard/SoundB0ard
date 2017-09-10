@@ -500,6 +500,7 @@ void interpret(char *line)
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("load", wurds[2], 4) == 0 ||
+                             strncmp("open", wurds[2], 4) == 0 ||
                              strncmp("import", wurds[2], 6) == 0) {
                         if (is_valid_file(wurds[3])) {
                             printf("Changing Loaded FILE!\n");
@@ -863,7 +864,8 @@ void interpret(char *line)
                         (minisynth *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("add", wurds[2], 3) == 0) {
-                        if (strncmp("melody", wurds[3], 6) == 0) {
+                        if (strncmp("melody", wurds[3], 6) == 0 ||
+                            strncmp("pattern", wurds[3], 7) == 0) {
                             int new_melody_num = minisynth_add_melody(ms);
                             if (num_wurds > 4) {
                                 char_melody_to_midi_melody(ms, new_melody_num,
@@ -928,7 +930,8 @@ void interpret(char *line)
                                                              tick, midi_note);
                                 }
                             }
-                            else if (strncmp("melody", wurds[4], 6) == 0) {
+                            else if (strncmp("melody", wurds[4], 6) == 0 ||
+                                     strncmp("pattern", wurds[4], 7) == 0) {
                                 minisynth_reset_melody(ms, melody_num);
                                 char_melody_to_midi_melody(ms, melody_num,
                                                            wurds, 5, num_wurds);
