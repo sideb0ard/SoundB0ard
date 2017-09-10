@@ -16,6 +16,8 @@ extern wchar_t *sparkchars;
 
 const double DEFAULT_AMP = 0.7;
 
+const char *s_markov_mode[] = {"boombap", "haus", "snare"};
+
 void seq_init(sequencer *seq)
 {
 
@@ -712,7 +714,7 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d"
         "sloppy: %d shuffle_on: %d shuffle_every_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
-        seq->pattern_len, seq->markov_on, seq->markov_mode ? "boombap" : "haus",
+        seq->pattern_len, seq->markov_on, s_markov_mode[seq->markov_mode],
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
         seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on,
         seq->euclidean_every_n_loops, seq->sloppiness, seq->shuffle_on,

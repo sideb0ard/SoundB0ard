@@ -159,7 +159,7 @@ void interpret(char *line)
                                                   0.0);
         }
         else if (strncmp("ls", wurds[0], 2) == 0) {
-            list_sample_dir();
+            list_sample_dir(wurds[1]);
         }
 
         else if (strncmp("rm", wurds[0], 3) == 0) {
@@ -241,9 +241,9 @@ void interpret(char *line)
                 if (mixer_is_valid_scene_num(mixr, scene_num)) {
                     printf("Changing scene %d\n", scene_num);
                     if (strncmp("add", wurds[2], 3) == 0) {
-                        int sg_num = atoi(wurds[3]);
-                        int sg_track_num = atoi(wurds[4]);
-                        printf("Gots nums %d %d\n", sg_num, sg_track_num);
+                        int sg_num = 0;
+                        int sg_track_num = 0;
+                        sscanf(wurds[3], "%d:%d", &sg_num, &sg_track_num);
                         if (mixer_is_valid_soundgen_track_num(mixr, sg_num,
                                                               sg_track_num)) {
                             printf("Adding sg %d %d\n", sg_num, sg_track_num);

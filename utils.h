@@ -13,7 +13,7 @@ void faderrr(int sig_num, unsigned int d);
 float freqval(char *n);
 int notelookup(char *n);
 int ch_midi_lookup(int ch, int octave, char *keytext);
-void list_sample_dir(void);
+void list_sample_dir(char *dirname);
 void strim(const char *input, char *result);
 void chordie(char *n);
 int conv_bitz(int num);

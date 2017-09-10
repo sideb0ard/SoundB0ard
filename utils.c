@@ -132,14 +132,34 @@ void faderrr(int sg_num, unsigned int d)
     }
 }
 
-void list_sample_dir()
+void list_sample_dir(char *dir)
 {
+    char dirname[512] = "./wavs/";
+
+    if (0 != strcmp(dir, ""))
+        strcat(dirname, dir);
+
     DIR *dp;
     struct dirent *ep;
-    dp = opendir("./wavs");
+    dp = opendir(dirname);
     if (dp != NULL) {
         while ((ep = readdir(dp)))
-            puts(ep->d_name);
+        {
+            char filename[512] = "";
+            if (ep->d_type == DT_DIR)
+            {
+                //strcat(filename, "\x1b[34m");
+                strcat(filename, ANSI_COLOR_BLUE);
+                strcat(filename, ep->d_name);
+                strcat(filename, "/");
+            }
+            else
+                strcat(filename, ep->d_name);
+
+            if (strncmp(ep->d_name, ".", 1) != 0)
+                puts(filename);
+
+        }
         (void)closedir(dp);
     }
     else {
