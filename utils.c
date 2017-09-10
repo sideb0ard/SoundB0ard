@@ -3,12 +3,12 @@
 #include <math.h>
 #include <pthread.h>
 #include <regex.h>
+#include <sndfile.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <sndfile.h>
 
 #include "cmdloop.h"
 #include "defjams.h"
@@ -75,7 +75,7 @@ audio_buffer_details import_file_contents(double **buffer, char *filename)
     SNDFILE *snd_file;
     SF_INFO sf_info;
 
-    audio_buffer_details deetz = {0, 0, 0};
+    audio_buffer_details deetz = {"", 0, 0, 0};
 
     char cwd[1024];
     getcwd(cwd, 1024);
@@ -84,8 +84,6 @@ audio_buffer_details import_file_contents(double **buffer, char *filename)
     strcpy(full_filename, cwd);
     strcat(full_filename, "/wavs/");
     strcat(full_filename, filename);
-
-    printf("Importing %s as %s\n", filename, full_filename);
 
     sf_info.format = 0;
     snd_file = sf_open(full_filename, SFM_READ, &sf_info);
@@ -96,26 +94,21 @@ audio_buffer_details import_file_contents(double **buffer, char *filename)
 
     int audio_buffer_len = sf_info.channels * sf_info.frames;
 
-    printf("Calloc'ing a buffer of %d\n", audio_buffer_len);
-    double *audio_buffer =
-        (double *)calloc(audio_buffer_len, sizeof(double));
+    double *audio_buffer = (double *)calloc(audio_buffer_len, sizeof(double));
     if (audio_buffer == NULL) {
         perror("deid!\n");
         sf_close(snd_file);
         return deetz;
     }
-    printf("Buffer was %p\n", *buffer);
     if (*buffer) // already have old contents
         free(*buffer);
-    printf("Buffer is now NULL %p\n", buffer);
 
     *buffer = audio_buffer;
-    printf("Buffer is finally %p (audio_buffer %p)\n", *buffer, audio_buffer);
 
     sf_readf_double(snd_file, *buffer, audio_buffer_len);
-    printf("Buffer is FINALLY finally %p \n", *buffer);
     sf_close(snd_file);
 
+    strcat(deetz.filename, filename);
     deetz.buffer_length = audio_buffer_len;
     deetz.sample_rate = sf_info.samplerate;
     deetz.num_channels = sf_info.channels;
@@ -197,22 +190,22 @@ void list_sample_dir(char *dir)
     struct dirent *ep;
     dp = opendir(dirname);
     if (dp != NULL) {
-        while ((ep = readdir(dp)))
-        {
+        while ((ep = readdir(dp))) {
             char filename[512] = "";
-            if (ep->d_type == DT_DIR)
-            {
-                //strcat(filename, "\x1b[34m");
+            if (ep->d_type == DT_DIR) {
+                // strcat(filename, "\x1b[34m");
                 strcat(filename, ANSI_COLOR_BLUE);
                 strcat(filename, ep->d_name);
                 strcat(filename, "/");
             }
-            else
+            else {
+                strcat(filename, dir);
+                strcat(filename, "/");
                 strcat(filename, ep->d_name);
+            }
 
             if (strncmp(ep->d_name, ".", 1) != 0)
                 puts(filename);
-
         }
         (void)closedir(dp);
     }

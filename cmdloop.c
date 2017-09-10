@@ -499,6 +499,16 @@ void interpret(char *line)
                         mixr->midi_control_destination = MIDISEQUENCER;
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
+                    else if (strncmp("load", wurds[2], 4) == 0 ||
+                             strncmp("import", wurds[2], 6) == 0) {
+                        if (is_valid_file(wurds[3])) {
+                            printf("Changing Loaded FILE!\n");
+                            sample_sequencer *s =
+                                (sample_sequencer *)
+                                    mixr->sound_generators[soundgen_num];
+                            sample_seq_import_file(s, wurds[3]);
+                        }
+                    }
                     else {
                         sample_sequencer *s =
                             (sample_sequencer *)
@@ -1076,7 +1086,7 @@ void interpret(char *line)
                         minisynth_save_settings(ms, preset_name);
                     }
                     else if (strncmp("switch", wurds[2], 6) == 0 ||
-                            strncmp("CurMelody", wurds[2], 9) == 0) {
+                             strncmp("CurMelody", wurds[2], 9) == 0) {
                         int melody_num = atoi(wurds[3]);
                         minisynth_switch_melody(ms, melody_num);
                     }
@@ -1688,7 +1698,8 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                 if (strncmp("amp", wurds[4], 3) == 0) {
                     int hit = atoi(wurds[5]);
                     double amp = atof(wurds[6]);
-                    printf("Changing amp of %d:%d to %f\n", pattern_num, hit, amp);
+                    printf("Changing amp of %d:%d to %f\n", pattern_num, hit,
+                           amp);
                     seq_set_sample_amp(seq, pattern_num, hit, amp);
                 }
                 if (strncmp("add", wurds[4], 3) == 0) {

@@ -25,13 +25,13 @@ typedef struct sample_sequencer {
     int samples_now_playing[MAX_CONCURRENT_SAMPLES]; // contains midi tick of
                                                      // current samples
     // rathern than walking array -1 means not playing
-    char *filename;
+    char filename[1024];
     int samplerate;
     int channels;
 
     double *buffer;
     int bufsize;
-    //int buf_num_channels;
+    // int buf_num_channels;
 
     int swing;
 

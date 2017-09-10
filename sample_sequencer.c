@@ -22,13 +22,6 @@ sample_sequencer *new_sample_seq(char *filename)
         (sample_sequencer *)calloc(1, sizeof(sample_sequencer));
     seq_init(&seq->m_seq);
 
-    sample_sequencer_reset_samples(seq);
-
-    int fslen = strlen(filename);
-    seq->filename = (char *)calloc(1, fslen + 1);
-    strncpy(seq->filename, filename, fslen);
-    printf("SEQ filename %s\n", seq->filename);
-
     sample_seq_import_file(seq, filename);
 
     seq->active = true;
@@ -57,15 +50,22 @@ sample_sequencer *new_sample_seq(char *filename)
 void sample_seq_import_file(sample_sequencer *seq, char *filename)
 {
     audio_buffer_details deetz = import_file_contents(&seq->buffer, filename);
+    strcpy(seq->filename, deetz.filename);
     seq->bufsize = deetz.buffer_length;
     seq->samplerate = deetz.sample_rate;
     seq->channels = deetz.num_channels;
+    sample_sequencer_reset_samples(seq);
 }
 
 void sample_sequencer_reset_samples(sample_sequencer *seq)
 {
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
         seq->samples_now_playing[i] = -1;
+    }
+    for (int i = 0; i < PPBAR; i++) {
+        seq->sample_positions[i].position = 0;
+        seq->sample_positions[i].playing = 0;
+        seq->sample_positions[i].played = 0;
     }
 }
 
@@ -100,12 +100,10 @@ double sample_seq_gennext(void *self)
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
         if (seq->samples_now_playing[i] != -1) {
             int cur_sample_midi_tick = seq->samples_now_playing[i];
-            val +=
-                seq->buffer[seq->sample_positions[cur_sample_midi_tick]
-                                .position]
-                *
-                seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
-                                               [cur_sample_midi_tick];
+            val += seq->buffer[seq->sample_positions[cur_sample_midi_tick]
+                                   .position] *
+                   seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
+                                                  [cur_sample_midi_tick];
             seq->sample_positions[cur_sample_midi_tick].position =
                 seq->sample_positions[cur_sample_midi_tick].position +
                 seq->channels;
@@ -154,7 +152,7 @@ void sample_seq_status(void *self, wchar_t *status_string)
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf Active: %s",
-             basename(seq->filename), seq->vol, seq->active ? "true" : "false");
+             seq->filename, seq->vol, seq->active ? "true" : "false");
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);

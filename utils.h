@@ -1,12 +1,12 @@
 #pragma once
 
+#include "audioutils.h"
 #include "sbmsg.h"
 #include <stdbool.h>
-#include "audioutils.h"
 
 void get_full_filename(char *basename, char *destination_fullname);
 
-audio_buffer_details import_file_contents(double **buffer, char* filename);
+audio_buffer_details import_file_contents(double **buffer, char *filename);
 void thrunner(SBMSG *msg);
 void *timed_sig_start(void *arg);
 void *fadeup_runrrr(void *arg);

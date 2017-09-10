@@ -387,7 +387,8 @@ double sound_grain_env(sound_grain *g, int idx_num)
 void granulator_import_file(granulator *g, char *filename)
 {
     strncpy(g->filename, filename, 512);
-    audio_buffer_details deetz =  import_file_contents(&g->audio_buffer, filename);
+    audio_buffer_details deetz =
+        import_file_contents(&g->audio_buffer, filename);
     g->audio_buffer_len = deetz.buffer_length;
     g->external_source_sg = -1;
     g->have_active_buffer = true;
