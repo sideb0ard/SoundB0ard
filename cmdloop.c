@@ -1675,17 +1675,17 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                seq->multi_pattern_mode ? "true" : "false");
     }
     // else if (strncmp("change", wurds[2], 6) == 0) {
-    else if (strncmp("markov_mode", wurds[3], 11) == 0) {
+    else if (strncmp("markov_mode", wurds[2], 11) == 0) {
         printf("MARKOV!\n");
-        if (strncmp("haus", wurds[4], 4) == 0) {
+        if (strncmp("haus", wurds[3], 4) == 0) {
             printf("HAUS!\n");
             seq_set_markov_mode(seq, MARKOVHAUS);
         }
-        else if (strncmp("boombap", wurds[4], 7) == 0) {
+        else if (strncmp("boombap", wurds[3], 7) == 0) {
             printf("BOOMBAP!\n");
             seq_set_markov_mode(seq, MARKOVBOOMBAP);
         }
-        else if (strncmp("snare", wurds[4], 7) == 0) {
+        else if (strncmp("snare", wurds[3], 7) == 0) {
             printf("MARKOVSNARE!\n");
             seq_set_markov_mode(seq, MARKOVSNARE);
         }

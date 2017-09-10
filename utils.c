@@ -183,7 +183,11 @@ void list_sample_dir(char *dir)
 {
     char dirname[512] = "./wavs/";
 
+    bool have_subdir = false;
     if (0 != strcmp(dir, ""))
+        have_subdir = true;
+
+    if (have_subdir)
         strcat(dirname, dir);
 
     DIR *dp;
@@ -199,8 +203,12 @@ void list_sample_dir(char *dir)
                 strcat(filename, "/");
             }
             else {
-                strcat(filename, dir);
-                strcat(filename, "/");
+                strcat(filename, ANSI_COLOR_BLUE);
+                if (have_subdir) {
+                    strcat(filename, dir);
+                    strcat(filename, "/");
+                }
+                strcat(filename, ANSI_COLOR_RESET);
                 strcat(filename, ep->d_name);
             }
 
