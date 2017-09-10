@@ -366,7 +366,7 @@ void looper_status(void *self, wchar_t *status_string)
         swprintf(looper_details, 128,
                  L"\n      [" WANSI_COLOR_WHITE "%d" WCOOL_COLOR_GREEN "]"
                  " %s - looplen: %d numloops: %d",
-                 i, basename(l->samples[i]->filename), l->samples[i]->loop_len,
+                 i, l->samples[i]->filename, l->samples[i]->loop_len,
                  l->sample_num_loops[i]);
         wcslcat(status_string, looper_details, strlen_left);
     }

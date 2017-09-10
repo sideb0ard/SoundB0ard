@@ -236,8 +236,6 @@ void sample_seq_del(sample_sequencer *s)
 {
     printf("Deleting sample buffer\n");
     free(s->buffer);
-    printf("Deleting char buffer for filename\n");
-    free(s->filename);
     printf("Deleting SAMPLESEQUENCER SELF- bye!\n");
     free(s);
 }
