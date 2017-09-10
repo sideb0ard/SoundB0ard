@@ -1674,95 +1674,20 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         printf("Sequencer multi mode : %s\n",
                seq->multi_pattern_mode ? "true" : "false");
     }
-    else if (strncmp("change", wurds[2], 6) == 0) {
-        if (strncmp("markov", wurds[3], 6) == 0) {
-            printf("MARKOV!\n");
-            if (strncmp("haus", wurds[4], 4) == 0) {
-                printf("HAUS!\n");
-                seq_set_markov_mode(seq, MARKOVHAUS);
-            }
-            else if (strncmp("boombap", wurds[4], 7) == 0) {
-                printf("BOOMBAP!\n");
-                seq_set_markov_mode(seq, MARKOVBOOMBAP);
-            }
-            else if (strncmp("snare", wurds[4], 7) == 0) {
-                printf("MARKOVSNARE!\n");
-                seq_set_markov_mode(seq, MARKOVSNARE);
-            }
+    // else if (strncmp("change", wurds[2], 6) == 0) {
+    else if (strncmp("markov_mode", wurds[3], 11) == 0) {
+        printf("MARKOV!\n");
+        if (strncmp("haus", wurds[4], 4) == 0) {
+            printf("HAUS!\n");
+            seq_set_markov_mode(seq, MARKOVHAUS);
         }
-        if (strncmp("bitwise", wurds[3], 6) == 0) {
-            printf("BITWISE CHANGE!!\n");
-            int bitwise_mode = atoi(wurds[4]);
-            seq_set_bitwise_mode(seq, bitwise_mode);
+        else if (strncmp("boombap", wurds[4], 7) == 0) {
+            printf("BOOMBAP!\n");
+            seq_set_markov_mode(seq, MARKOVBOOMBAP);
         }
-        else {
-            int pattern_num = atoi(wurds[3]);
-            if (seq_is_valid_pattern_num(seq, pattern_num)) {
-                if (strncmp("amp", wurds[4], 3) == 0) {
-                    int hit = atoi(wurds[5]);
-                    double amp = atof(wurds[6]);
-                    printf("Changing amp of %d:%d to %f\n", pattern_num, hit,
-                           amp);
-                    seq_set_sample_amp(seq, pattern_num, hit, amp);
-                }
-                if (strncmp("add", wurds[4], 3) == 0) {
-                    int hit = atoi(wurds[5]);
-                    printf("Adding a hit to %d\n", hit);
-                    seq_add_hit(seq, pattern_num, hit);
-                }
-                else if (strncmp("madd", wurds[4], 3) == 0) { // midi pulses
-                    int hit = atoi(wurds[5]);
-                    printf("Adding a hit to %d\n", hit);
-                    seq_add_micro_hit(seq, pattern_num, hit);
-                }
-                else if (strncmp("amp", wurds[4], 3) == 0) {
-                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5,
-                                                     num_wurds);
-                    printf("Setting pattern AMP to %s\n", pattern);
-                    seq_set_sample_amp_from_char_pattern(seq, pattern_num,
-                                                         pattern);
-                }
-                else if (strncmp("mv", wurds[4], 2) ==
-                         0) { // deals in 16th or 24th
-                    int hitfrom = atoi(wurds[5]);
-                    int hitto = atoi(wurds[6]);
-                    seq_mv_hit(seq, pattern_num, hitfrom, hitto);
-                }
-                else if (strncmp("mmv", wurds[4], 2) ==
-                         0) { // deals in midi pulses
-                    int hitfrom = atoi(wurds[5]);
-                    int hitto = atoi(wurds[6]);
-                    seq_mv_micro_hit(seq, pattern_num, hitfrom, hitto);
-                }
-                else if (strncmp("numloops", wurds[4], 8) == 0) {
-                    int numloops = atoi(wurds[5]);
-                    if (numloops != 0) {
-                        seq_change_num_loops(seq, pattern_num, numloops);
-                    }
-                }
-                else if (strncmp("pattern", wurds[4], 7) == 0) {
-                    char_array_to_seq_string_pattern(seq, pattern, wurds, 5,
-                                                     num_wurds);
-                    printf("Changing pattern to %s\n", pattern);
-                    change_char_pattern(seq, pattern_num, pattern);
-                }
-                else if (strncmp("rm", wurds[4], 2) == 0) {
-                    int hit = atoi(wurds[5]);
-                    printf("Rm'ing hit to %d\n", hit);
-                    seq_rm_hit(seq, pattern_num, hit);
-                }
-                else if (strncmp("mrm", wurds[4], 2) == 0) {
-                    int hit = atoi(wurds[5]);
-                    printf("Rm'ing hit to %d\n", hit);
-                    seq_rm_micro_hit(seq, pattern_num, hit);
-                }
-                else if (strncmp("swing", wurds[4], 5) == 0) {
-                    int swing_setting = atoi(wurds[5]);
-                    printf("changing swing to %d for pattern num %d\n",
-                           swing_setting, pattern_num);
-                    seq_swing_pattern(seq, pattern_num, swing_setting);
-                }
-            }
+        else if (strncmp("snare", wurds[4], 7) == 0) {
+            printf("MARKOVSNARE!\n");
+            seq_set_markov_mode(seq, MARKOVSNARE);
         }
     }
     else if (strncmp("life", wurds[2], 4) == 0) {
@@ -1889,6 +1814,71 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         }
         else {
             seq_set_euclidean(seq, 1 - seq->game_of_life_on);
+        }
+    }
+    else {
+        int pattern_num = atoi(wurds[3]);
+        if (seq_is_valid_pattern_num(seq, pattern_num)) {
+            if (strncmp("amp", wurds[4], 3) == 0) {
+                int hit = atoi(wurds[5]);
+                double amp = atof(wurds[6]);
+                printf("Changing amp of %d:%d to %f\n", pattern_num, hit, amp);
+                seq_set_sample_amp(seq, pattern_num, hit, amp);
+            }
+            if (strncmp("add", wurds[4], 3) == 0) {
+                int hit = atoi(wurds[5]);
+                printf("Adding a hit to %d\n", hit);
+                seq_add_hit(seq, pattern_num, hit);
+            }
+            else if (strncmp("madd", wurds[4], 3) == 0) { // midi pulses
+                int hit = atoi(wurds[5]);
+                printf("Adding a hit to %d\n", hit);
+                seq_add_micro_hit(seq, pattern_num, hit);
+            }
+            else if (strncmp("amp", wurds[4], 3) == 0) {
+                char_array_to_seq_string_pattern(seq, pattern, wurds, 5,
+                                                 num_wurds);
+                printf("Setting pattern AMP to %s\n", pattern);
+                seq_set_sample_amp_from_char_pattern(seq, pattern_num, pattern);
+            }
+            else if (strncmp("mv", wurds[4], 2) == 0) { // deals in 16th or 24th
+                int hitfrom = atoi(wurds[5]);
+                int hitto = atoi(wurds[6]);
+                seq_mv_hit(seq, pattern_num, hitfrom, hitto);
+            }
+            else if (strncmp("mmv", wurds[4], 2) == 0) { // deals in midi pulses
+                int hitfrom = atoi(wurds[5]);
+                int hitto = atoi(wurds[6]);
+                seq_mv_micro_hit(seq, pattern_num, hitfrom, hitto);
+            }
+            else if (strncmp("numloops", wurds[4], 8) == 0) {
+                int numloops = atoi(wurds[5]);
+                if (numloops != 0) {
+                    seq_change_num_loops(seq, pattern_num, numloops);
+                }
+            }
+            else if (strncmp("pattern", wurds[4], 7) == 0) {
+                char_array_to_seq_string_pattern(seq, pattern, wurds, 5,
+                                                 num_wurds);
+                printf("Changing pattern to %s\n", pattern);
+                change_char_pattern(seq, pattern_num, pattern);
+            }
+            else if (strncmp("rm", wurds[4], 2) == 0) {
+                int hit = atoi(wurds[5]);
+                printf("Rm'ing hit to %d\n", hit);
+                seq_rm_hit(seq, pattern_num, hit);
+            }
+            else if (strncmp("mrm", wurds[4], 2) == 0) {
+                int hit = atoi(wurds[5]);
+                printf("Rm'ing hit to %d\n", hit);
+                seq_rm_micro_hit(seq, pattern_num, hit);
+            }
+            else if (strncmp("swing", wurds[4], 5) == 0) {
+                int swing_setting = atoi(wurds[5]);
+                printf("changing swing to %d for pattern num %d\n",
+                       swing_setting, pattern_num);
+                seq_swing_pattern(seq, pattern_num, swing_setting);
+            }
         }
     }
 }
