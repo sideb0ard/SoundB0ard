@@ -29,9 +29,9 @@ typedef struct sample_sequencer {
     int samplerate;
     int channels;
 
-    int *buffer;
+    double *buffer;
     int bufsize;
-    int buf_num_channels;
+    //int buf_num_channels;
 
     int swing;
 
@@ -72,7 +72,7 @@ void sample_stop(void *self);
 double sample_seq_gennext(void *self);
 double sample_seq_getvol(void *self);
 
-int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info);
+void sample_seq_import_file(sample_sequencer *s, char *filename);
 void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
                            unsigned int data2);
 

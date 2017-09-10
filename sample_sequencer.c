@@ -24,27 +24,12 @@ sample_sequencer *new_sample_seq(char *filename)
 
     sample_sequencer_reset_samples(seq);
 
-    char cwd[1024];
-    getcwd(cwd, 1024);
-    char full_filename[strlen(filename) + strlen(cwd) +
-                       7]; // 7 == '/wavs/' is 6 and 1 for '\0'
-    strcpy(full_filename, cwd);
-    strcat(full_filename, "/wavs/");
-    strcat(full_filename, filename);
-
-    SF_INFO sf_info;
-    memset(&sf_info, 0, sizeof(SF_INFO));
-    int bufsize;
-    int *buffer = load_file_to_buffer(full_filename, &bufsize, &sf_info);
-
     int fslen = strlen(filename);
     seq->filename = (char *)calloc(1, fslen + 1);
     strncpy(seq->filename, filename, fslen);
+    printf("SEQ filename %s\n", seq->filename);
 
-    seq->buffer = buffer;
-    seq->bufsize = bufsize;
-    seq->samplerate = sf_info.samplerate;
-    seq->channels = sf_info.channels;
+    sample_seq_import_file(seq, filename);
 
     seq->active = true;
     seq->started = false;
@@ -67,6 +52,14 @@ sample_sequencer *new_sample_seq(char *filename)
     moog_update((filter *)&seq->m_filter);
 
     return seq;
+}
+
+void sample_seq_import_file(sample_sequencer *seq, char *filename)
+{
+    audio_buffer_details deetz = import_file_contents(&seq->buffer, filename);
+    seq->bufsize = deetz.buffer_length;
+    seq->samplerate = deetz.sample_rate;
+    seq->channels = deetz.num_channels;
 }
 
 void sample_sequencer_reset_samples(sample_sequencer *seq)
@@ -109,8 +102,7 @@ double sample_seq_gennext(void *self)
             int cur_sample_midi_tick = seq->samples_now_playing[i];
             val +=
                 seq->buffer[seq->sample_positions[cur_sample_midi_tick]
-                                .position] /
-                2147483648.0 // convert from 16bit in to double between 0 and 1
+                                .position]
                 *
                 seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
                                                [cur_sample_midi_tick];
@@ -147,43 +139,6 @@ double sample_seq_gennext(void *self)
 
     return out * seq->vol;
 }
-
-int *load_file_to_buffer(char *filename, int *bufsize, SF_INFO *sf_info)
-{
-    SNDFILE *snd_file;
-
-    sf_info->format = 0;
-    snd_file = sf_open(filename, SFM_READ, sf_info);
-    if (!snd_file) {
-        printf("Err opening %s : %d\n", filename, sf_error(snd_file));
-        return NULL;
-    }
-    printf("Filename:: %s\n", filename);
-    printf("SR: %d\n", sf_info->samplerate);
-    printf("Channels: %d\n", sf_info->channels);
-    printf("Frames: %lld\n", sf_info->frames);
-
-    *bufsize = sf_info->channels * sf_info->frames;
-    printf("Making buffer size of %d\n", *bufsize);
-
-    int *buffer = (int *)calloc(*bufsize, sizeof(int));
-    if (buffer == NULL) {
-        printf("Ooft, memory issues, mate!\n");
-        return NULL;
-    }
-
-    sf_readf_int(snd_file, buffer, *bufsize);
-    sf_close(snd_file);
-    return buffer;
-}
-
-// sample_sequencer *new_sample_seq_from_int_pattern(char *filename, int
-// pattern)
-// {
-//     sample_sequencer *seq = new_sample_seq(filename);
-//     seq->m_seq.patterns[seq->m_seq.num_patterns++] = pattern;
-//     return seq;
-// }
 
 sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
                                                    char *pattern)

@@ -1593,6 +1593,7 @@ bool is_valid_fx_num(int soundgen_num, int fx_num)
 
 bool is_valid_file(char *filename)
 {
+    printf("IS valid? %s\n", filename);
     if (strlen(filename) == 0) {
         printf("That ain't no valid file where i come from..\n");
         return false;
