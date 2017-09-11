@@ -9,7 +9,7 @@
 #include "oscillator.h"
 #include "synthfunctions.h"
 
-typedef struct {
+typedef struct voice {
 
     // shared by source and dest
     modmatrix m_v_modmatrix;

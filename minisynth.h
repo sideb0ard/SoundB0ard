@@ -50,21 +50,40 @@ static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 
 typedef struct synthsettings {
     char m_settings_name[256];
-    unsigned int m_voice_mode; // controlled by keys
+
+    unsigned int m_voice_mode;
+
+    unsigned int m_lfo1_waveform;
+    double m_lfo1_rate;
+    double m_lfo1_amplitude;
+    double m_lfo1_amp_intensity;
+    double m_lfo1_filter_fc_intensity;
+    double m_lfo1_osc_pitch_intensity;
+    double m_lfo1_pan_intensity;
+
+    unsigned int m_lfo2_waveform;
+    double m_lfo2_rate;
+    double m_lfo2_amplitude;
+    double m_lfo2_amp_intensity;
+    double m_lfo2_filter_fc_intensity;
+    double m_lfo2_osc_pitch_intensity;
+    double m_lfo2_pan_intensity;
+
     double m_attack_time_msec;
     double m_decay_time_msec;
     double m_release_time_msec;
     double m_sustain_level;
+
     double m_volume_db;
-    double m_lfo1_amplitude;
-    double m_lfo1_rate;
     double m_fc_control;
     double m_q_control;
+
     double m_delay_time_msec;
-    double m_feedback_pct;
+    double m_delay_feedback_pct;
     double m_delay_ratio;
-    double m_wet_mix;
-    unsigned int m_delay_mode; // via keyboard 'n' key (TODO!)
+    double m_delay_wet_mix;
+    unsigned int m_delay_mode;
+
     double m_detune_cents;
     double m_pulse_width_pct;
     double m_sub_osc_db;
@@ -73,13 +92,9 @@ typedef struct synthsettings {
     double m_eg1_filter_intensity;
     double m_eg1_osc_intensity;
     double m_filter_keytrack_intensity;
-    double m_lfo1_amp_intensity;
-    double m_lfo1_filter_fc_intensity;
-    double m_lfo1_osc_pitch_intensity;
-    double m_lfo1_pan_intensity;
+
     int m_octave;
     int m_pitchbend_range;
-    unsigned int m_lfo1_waveform;
     unsigned int m_legato_mode;
     unsigned int m_reset_to_zero;
     unsigned int m_filter_keytrack;
@@ -273,13 +288,15 @@ void minisynth_set_filter_nlp(minisynth *ms, unsigned int val);
 void minisynth_set_keytrack_int(minisynth *ms, double val);
 void minisynth_set_keytrack(minisynth *ms, unsigned int val);
 void minisynth_set_legato_mode(minisynth *ms, unsigned int val);
-void minisynth_set_lfo1_amp_int(minisynth *ms, double val);
-void minisynth_set_lfo1_amp(minisynth *ms, double val);
-void minisynth_set_lfo1_filter_fc_int(minisynth *ms, double val);
-void minisynth_set_lfo1_rate(minisynth *ms, double val);
-void minisynth_set_lfo1_pan_int(minisynth *ms, double val);
-void minisynth_set_lfo1_pitch(minisynth *ms, double val);
-void minisynth_set_lfo1_wave(minisynth *ms, unsigned int val);
+// LFO
+void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_amp(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_pitch(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val);
+
 void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_noise_osc_db(minisynth *ms, double val);
 void minisynth_set_octave(minisynth *ms, int val);

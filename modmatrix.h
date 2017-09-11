@@ -27,7 +27,6 @@ typedef enum {
     SOURCE_MIDI_JS_X,
     SOURCE_MIDI_JS_Y,
     MAX_SOURCES
-
 } matrix_sources;
 
 typedef enum {
@@ -150,6 +149,8 @@ bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
 
 bool check_destination_layer(unsigned layer, matrixrow *row);
 void do_modulation_matrix(modmatrix *self, unsigned layer);
+
+void print_modulation_matrix(modmatrix *self);
 
 matrixrow *create_matrix_row(unsigned src, unsigned dest, double *intensity,
                              double *range, unsigned transformation,

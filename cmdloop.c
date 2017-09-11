@@ -1969,7 +1969,7 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_filter_fq(ms, val);
         return true;
     }
-    else if (strncmp("type", wurds[3], 4) == 0) {
+    else if (strncmp("filtertype", wurds[3], 4) == 0) {
         printf("Minisynth change Filter TYPE!\n");
         int val = atoi(wurds[4]);
         minisynth_set_filter_type(ms, val);
@@ -2005,46 +2005,88 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_legato_mode(ms, val);
         return true;
     }
+    else if (strncmp("lfo1wave", wurds[3], 7) == 0) {
+        printf("Minisynth change LFO1 Wave!\n");
+        int val = atoi(wurds[4]);
+        minisynth_set_lfo_wave(ms, 1, val);
+        return true;
+    }
     else if (strncmp("lfo1ampint", wurds[3], 10) == 0) {
         printf("Minisynth change LFO1 Amp Int!\n");
         double val = atof(wurds[4]);
-        minisynth_set_lfo1_amp_int(ms, val);
+        minisynth_set_lfo_amp_int(ms, 1, val);
         return true;
     }
     else if (strncmp("lfo1amp", wurds[3], 7) == 0) {
         printf("Minisynth change LFO1 AMP!\n");
         double val = atof(wurds[4]);
-        minisynth_set_lfo1_amp(ms, val);
+        minisynth_set_lfo_amp(ms, 1, val);
         return true;
     }
     else if (strncmp("lfo1filterint", wurds[3], 13) == 0) {
         printf("Minisynth change LFO1 Filter FC Int!\n");
         double val = atof(wurds[4]);
-        minisynth_set_lfo1_filter_fc_int(ms, val);
+        minisynth_set_lfo_filter_fc_int(ms, 1, val);
         return true;
     }
     else if (strncmp("lfo1rate", wurds[3], 8) == 0) {
         printf("Minisynth change LFO1 rate!\n");
         double val = atof(wurds[4]);
-        minisynth_set_lfo1_rate(ms, val);
+        minisynth_set_lfo_rate(ms, 1, val);
         return true;
     }
     else if (strncmp("lfo1panint", wurds[3], 10) == 0) {
         printf("Minisynth change LFO1 Pan Int!\n");
         double val = atof(wurds[4]);
-        minisynth_set_lfo1_pan_int(ms, val);
+        minisynth_set_lfo_pan_int(ms, 1, val);
         return true;
     }
     else if (strncmp("lfo1pitch", wurds[3], 9) == 0) {
         printf("Minisynth change LFO1 Pitch!\n");
         double val = atof(wurds[4]);
-        minisynth_set_lfo1_pitch(ms, val);
+        minisynth_set_lfo_pitch(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfowave", wurds[3], 7) == 0) {
-        printf("Minisynth change LFO1 Wave!\n");
+    else if (strncmp("lfo2wave", wurds[3], 7) == 0) {
+        printf("Minisynth change LFO2 Wave!\n");
         int val = atoi(wurds[4]);
-        minisynth_set_lfo1_wave(ms, val);
+        minisynth_set_lfo_wave(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2ampint", wurds[3], 10) == 0) {
+        printf("Minisynth change LFO2 Amp Int!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_lfo_amp_int(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2amp", wurds[3], 7) == 0) {
+        printf("Minisynth change LFO2 AMP!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_lfo_amp(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2filterint", wurds[3], 13) == 0) {
+        printf("Minisynth change LFO2 Filter FC Int!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_lfo_filter_fc_int(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2rate", wurds[3], 8) == 0) {
+        printf("Minisynth change LFO2 rate!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_lfo_rate(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2panint", wurds[3], 10) == 0) {
+        printf("Minisynth change LFO2 Pan Int!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_lfo_pan_int(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2pitch", wurds[3], 9) == 0) {
+        printf("Minisynth change LFO2 Pitch!\n");
+        double val = atof(wurds[4]);
+        minisynth_set_lfo_pitch(ms, 2, val);
         return true;
     }
     else if (strncmp("ndscale", wurds[3], 7) == 0) {
