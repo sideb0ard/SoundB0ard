@@ -13,6 +13,8 @@ extern const wchar_t *sparkchars;
 extern const char *key_names[NUM_KEYS];
 extern const int key_midi_mapping[NUM_KEYS];
 extern const compat_key_list compat_keys[NUM_KEYS];
+extern const char *s_source_enum_to_name[];
+extern const char *s_dest_enum_to_name[];
 
 // defined in minisynth_voice.h
 const wchar_t *s_mode_names[] = {L"SAW3",    L"SQR3",    L"SAW2SQR",
@@ -1476,6 +1478,9 @@ void minisynth_print_settings(minisynth *ms)
         "lfo1wave: %s - %d [0-7] (sine,usaw,dsaw,tri,square,expo,rsh,qrsh)\n",
         s_lfo_mode_names[ms->m_settings.m_lfo1_waveform],
         ms->m_settings.m_lfo1_waveform); // unsigned
+    printf("lfo1dest: %s - %d [0-3]\n",
+           s_dest_enum_to_name[ms->m_settings.m_lfo1_dest],
+           ms->m_settings.m_lfo1_dest);
     printf("lfo1rate: %.2f [0.02-20]", ms->m_settings.m_lfo1_rate);
     printf(" lfo1ampint: %.2f [0-1]", ms->m_settings.m_lfo1_amp_intensity);
     printf(" lfo1amp: %.2f [0-1]\n", ms->m_settings.m_lfo1_amplitude);
@@ -1490,6 +1495,9 @@ void minisynth_print_settings(minisynth *ms)
         "lfo2wave: %s - %d [0-7] (sine,usaw,dsaw,tri,square,expo,rsh,qrsh)\n",
         s_lfo_mode_names[ms->m_settings.m_lfo2_waveform],
         ms->m_settings.m_lfo2_waveform); // unsigned
+    printf("lfo1dest: %s - %d [0-3]\n",
+           s_dest_enum_to_name[ms->m_settings.m_lfo2_dest],
+           ms->m_settings.m_lfo2_dest);
     printf("lfo2rate: %.2f [0.02-20]", ms->m_settings.m_lfo2_rate);
     printf(" lfo2ampint: %.2f [0-1]", ms->m_settings.m_lfo2_amp_intensity);
     printf(" lfo2amp: %.2f [0-1]\n", ms->m_settings.m_lfo2_amplitude);
@@ -2075,10 +2083,10 @@ void minisynth_set_filter_fc(minisynth *ms, double val)
 
 void minisynth_set_filter_fq(minisynth *ms, double val)
 {
-    if (val >= 1 && val <= 10)
+    if (val >= 0.5 && val <= 10)
         ms->m_settings.m_q_control = val;
     else
-        printf("val must be between 1 and 10\n");
+        printf("val must be between 0.5 and 10\n");
 }
 
 void minisynth_set_filter_type(minisynth *ms, unsigned int val)

@@ -143,7 +143,7 @@ bool seq_tick(sequencer *seq)
                             seq->euclidean_every_n_loops ==
                         0) {
                         seq_set_backup_mode(seq, true);
-                        next_euclidean_generation(seq);
+                        next_euclidean_generation(seq, 0);
                     }
                     else {
                         seq_set_backup_mode(seq, false);
@@ -156,7 +156,7 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else {
-                    next_euclidean_generation(seq);
+                    next_euclidean_generation(seq, 0);
                 }
                 seq->euclidean_generation++;
             }
@@ -296,16 +296,16 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
     return return_pattern;
 }
 
-void next_euclidean_generation(sequencer *s)
+void next_euclidean_generation(sequencer *s, int pattern_num)
 {
-    memset(&s->patterns[0], 0, PPBAR * sizeof(int));
+    memset(&s->patterns[pattern_num], 0, PPBAR * sizeof(int));
     int rand_steps = (rand() % 9) + 1;
     int bitpattern = create_euclidean_rhythm(rand_steps, s->pattern_len);
     if (rand() % 2 == 1)
         bitpattern =
             shift_bits_to_leftmost_position(bitpattern, s->pattern_len);
     convert_bitshift_pattern_to_pattern(
-        bitpattern, (int *)&s->patterns[s->cur_pattern], PPBAR, s->gridsteps);
+        bitpattern, (int *)&s->patterns[pattern_num], PPBAR, s->gridsteps);
 }
 
 // game of life algo

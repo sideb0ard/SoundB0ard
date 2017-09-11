@@ -59,9 +59,10 @@ void filter_update(filter *f)
 
     if (f->m_v_modmatrix) {
         f->m_fc_mod = f->m_v_modmatrix->m_destinations[f->m_mod_source_fc];
-        if (f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0)
+        if (f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0) {
             f->m_fc_control =
                 f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control];
+        }
     }
 
     f->m_fc = f->m_fc_control * pitch_shift_multiplier(f->m_fc_mod);

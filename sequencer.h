@@ -92,7 +92,7 @@ int seed_pattern(void);
 int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH]);
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH]);
 
-void next_euclidean_generation(sequencer *s);
+void next_euclidean_generation(sequencer *s, int pattern_num);
 void next_life_generation(sequencer *s);
 void next_markov_generation(sequencer *s);
 void next_shuffle_generation(sequencer *s);

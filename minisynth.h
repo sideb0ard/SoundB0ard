@@ -54,6 +54,7 @@ typedef struct synthsettings {
     unsigned int m_voice_mode;
 
     unsigned int m_lfo1_waveform;
+    unsigned int m_lfo1_dest;
     double m_lfo1_rate;
     double m_lfo1_amplitude;
     double m_lfo1_amp_intensity;
@@ -62,6 +63,7 @@ typedef struct synthsettings {
     double m_lfo1_pan_intensity;
 
     unsigned int m_lfo2_waveform;
+    unsigned int m_lfo2_dest;
     double m_lfo2_rate;
     double m_lfo2_amplitude;
     double m_lfo2_amp_intensity;

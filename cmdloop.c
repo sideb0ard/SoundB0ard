@@ -884,6 +884,17 @@ void interpret(char *line)
                         minisynth_generate_melody(ms, melody_num, max_notes,
                                                   max_steps);
                     }
+                    else if (strncmp("rand", wurds[2], 4) == 0) {
+                        minisynth_rand_settings(ms);
+                    }
+                    else if (strncmp("genrand", wurds[2], 4) == 0) {
+                        minisynth_rand_settings(ms);
+                        int melody_num = atoi(wurds[3]);
+                        int max_notes = atoi(wurds[4]);
+                        int max_steps = atoi(wurds[5]);
+                        minisynth_generate_melody(ms, melody_num, max_notes,
+                                                  max_steps);
+                    }
                     else if (strncmp("change", wurds[2], 6) == 0) {
                         if (parse_minisynth_settings_change(ms, wurds)) {
                             continue;
@@ -1789,6 +1800,10 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         else {
             seq_set_bitwise(seq, 1 - seq->game_of_life_on);
         }
+    }
+    else if (strncmp("generate", wurds[2], 8) == 0) {
+        int pattern_num = atoi(wurds[3]);
+        next_euclidean_generation(seq, pattern_num);
     }
     else if (strncmp("euclid", wurds[2], 6) == 0) {
         printf("Euclidean, yo!\n");
