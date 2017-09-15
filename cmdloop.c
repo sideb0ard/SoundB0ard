@@ -178,11 +178,22 @@ void interpret(char *line)
             }
         }
         else if (strncmp("stop", wurds[0], 5) == 0) {
-            int soundgen_num = atoi(wurds[1]);
-            if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
-                printf("Stopping SOUND GEN %d\n", soundgen_num);
-                SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
-                sg->stop(sg);
+            if (strncmp(wurds[1], "all", 3) == 0)
+            {
+                for (int i = 0; i < mixr->soundgen_num; i++)
+                {
+                    SOUNDGEN *sg = mixr->sound_generators[i];
+                    if (sg != NULL)
+                        sg->stop(sg);
+                }
+            }
+            else {
+                int soundgen_num = atoi(wurds[1]);
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+                    printf("Stopping SOUND GEN %d\n", soundgen_num);
+                    SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+                    sg->stop(sg);
+                }
             }
         }
         else if (strncmp("down", wurds[0], 4) == 0 ||
@@ -581,7 +592,9 @@ void interpret(char *line)
                             granulator_set_external_source(g, sg);
                         }
                     }
-                    else if (strncmp("file", wurds[2], 4) == 0) {
+                    else if (strncmp("file", wurds[2], 4) == 0
+                            || strncmp("open", wurds[2], 4) == 0
+                            || strncmp("import", wurds[2], 6) == 0) {
                         if (is_valid_file(wurds[3])) {
                             granulator_import_file(g, wurds[3]);
                         }
@@ -1692,7 +1705,9 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             printf("HAUS!\n");
             seq_set_markov_mode(seq, MARKOVHAUS);
         }
-        else if (strncmp("boombap", wurds[3], 7) == 0) {
+        else if (strncmp("boombap", wurds[3], 7) == 0
+                || strncmp("hiphop", wurds[3], 6) == 0
+                || strncmp("beats", wurds[3], 5) == 0) {
             printf("BOOMBAP!\n");
             seq_set_markov_mode(seq, MARKOVBOOMBAP);
         }

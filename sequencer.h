@@ -8,7 +8,7 @@
 
 #define NUM_SEQUENCER_PATTERNS 10
 
-enum { MARKOVHAUS, MARKOVBOOMBAP, MARKOVSNARE } markovmodez;
+enum { MARKOVBOOMBAP, MARKOVHAUS, MARKOVSNARE } markovmodez;
 enum { SIXTEENTH, TWENTYFOURTH } sequencer_grid_step;
 
 typedef int seq_pattern[PPBAR];

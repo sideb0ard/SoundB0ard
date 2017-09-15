@@ -1595,7 +1595,7 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_delay_wet_mix);
 
     printf(ANSI_COLOR_RESET);
-    print_modulation_matrix(&ms->m_ms_modmatrix);
+    //print_modulation_matrix(&ms->m_ms_modmatrix);
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }

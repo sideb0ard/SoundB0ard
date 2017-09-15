@@ -710,11 +710,11 @@ void seq_status(sequencer *seq, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         L"\n      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d "
-        "markov: %d markov_mode: %s Markov_Every_n: %d Multi: %d Max Gen: %d"
+        "markov: %d markov_mode: %s(%d) Markov_Every_n: %d Multi: %d Max Gen: %d"
         L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d"
         "sloppy: %d shuffle_on: %d shuffle_every_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
-        seq->pattern_len, seq->markov_on, s_markov_mode[seq->markov_mode],
+        seq->pattern_len, seq->markov_on, s_markov_mode[seq->markov_mode], seq->markov_mode,
         seq->markov_every_n_loops, seq->multi_pattern_mode, seq->max_generation,
         seq->bitwise_on, seq->bitwise_every_n_loops, seq->euclidean_on,
         seq->euclidean_every_n_loops, seq->sloppiness, seq->shuffle_on,
