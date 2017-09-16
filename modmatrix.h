@@ -112,7 +112,8 @@ typedef enum {
     MAX_TRANSFORMS /* not needed? */
 } matrix_transformations;
 
-typedef struct {
+typedef struct
+{
     unsigned m_source_index;
     unsigned m_destination_index;
     double *m_mod_intensity;
@@ -121,7 +122,8 @@ typedef struct {
     bool m_enable;
 } matrixrow;
 
-typedef struct {
+typedef struct
+{
     matrixrow **m_matrix_core;
     int m_num_rows_in_matrix_core;
     double m_sources[MAX_SOURCES];

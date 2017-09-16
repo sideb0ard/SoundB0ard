@@ -3,7 +3,8 @@
 
 #include "sound_generator.h"
 
-typedef struct sbmsg {
+typedef struct sbmsg
+{
     // this is a generic data structure to pass arguments
     // at some point, i'll sure this will be too messy and
     // need separated into message types.

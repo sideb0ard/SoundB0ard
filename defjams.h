@@ -78,7 +78,11 @@
 #define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
 #define WCOOL_COLOR_ORANGE L"\x1b[38;5;202m"
 
-enum { KICK, SNARE };
+enum
+{
+    KICK,
+    SNARE
+};
 
 typedef enum {
     MIDI_KNOB_MODE_ONE,

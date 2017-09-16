@@ -7,7 +7,8 @@
 #include "afx/onepolelpf.h"
 #include "fx.h"
 
-typedef struct reverb {
+typedef struct reverb
+{
     fx m_fx; // API
 
     // pre-delay block

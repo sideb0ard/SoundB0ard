@@ -6,9 +6,16 @@
 #include "filter_moogladder.h"
 #include "fx.h"
 
-enum { LOWPASS, HIGHPASS, ALLPASS, BANDPASS };
+enum
+{
+    LOWPASS,
+    HIGHPASS,
+    ALLPASS,
+    BANDPASS
+};
 
-typedef struct filterpass {
+typedef struct filterpass
+{
     fx m_fx; // API
     filter_moogladder m_filter;
 } filterpass;

@@ -8,7 +8,8 @@
 #include "envelope.h"
 #include "fx.h"
 
-typedef struct t_soundgen {
+typedef struct t_soundgen
+{
     // void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);
     double (*gennext)(void *self);
     void (*status)(void *self, wchar_t *wstring);

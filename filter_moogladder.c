@@ -85,7 +85,8 @@ void moog_update(filter *f)
     // moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * G + moog->m_k * G * G);
     moog->m_alpha_0 = 1.0 / (1.0 + moog->m_k * moog->m_gamma);
 
-    switch (moog->f.m_filter_type) {
+    switch (moog->f.m_filter_type)
+    {
     case LPF4:
         moog->m_a = 0.0;
         moog->m_b = 0.0;
@@ -161,7 +162,8 @@ double moog_gennext(filter *f, double xn)
     xn *= 1.0 + f->m_aux_control * moog->m_k;
 
     double u = (xn - moog->m_k * sigma) * moog->m_alpha_0;
-    if (f->m_nlp) {
+    if (f->m_nlp)
+    {
         u = fasttanh(f->m_saturation * u);
     }
 

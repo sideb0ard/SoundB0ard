@@ -11,12 +11,14 @@
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/synthdrumpatches.dat";
 
-typedef struct pattern_hit_metadata {
+typedef struct pattern_hit_metadata
+{
     bool played;
     bool playing;
 } pattern_hit_metadata;
 
-typedef struct synthdrum_sequencer {
+typedef struct synthdrum_sequencer
+{
     SOUNDGEN sg;
     sequencer m_seq;
     char m_patch_name[512];

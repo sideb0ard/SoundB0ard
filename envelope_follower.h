@@ -4,7 +4,8 @@
 #include "envelope_detector.h"
 #include "fx.h"
 
-typedef struct envelope_follower {
+typedef struct envelope_follower
+{
     fx m_fx; // API
     biquad m_left_lpf;
     biquad m_right_lpf;

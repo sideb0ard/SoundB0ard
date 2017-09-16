@@ -8,12 +8,22 @@
 
 #define NUM_SEQUENCER_PATTERNS 10
 
-enum { MARKOVBOOMBAP, MARKOVHAUS, MARKOVSNARE } markovmodez;
-enum { SIXTEENTH, TWENTYFOURTH } sequencer_grid_step;
+enum
+{
+    MARKOVBOOMBAP,
+    MARKOVHAUS,
+    MARKOVSNARE
+} markovmodez;
+enum
+{
+    SIXTEENTH,
+    TWENTYFOURTH
+} sequencer_grid_step;
 
 typedef int seq_pattern[PPBAR];
 
-typedef struct sequencer {
+typedef struct sequencer
+{
 
     int sixteenth_tick;
     int midi_tick;

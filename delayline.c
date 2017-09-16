@@ -73,7 +73,8 @@ double delayline_read_delay_at(delayline *dl, double ms)
 
 double delayline_read_delay_at_idx(delayline *dl, int read_index)
 {
-    if (read_index >= dl->m_buffer_size) {
+    if (read_index >= dl->m_buffer_size)
+    {
         // wrap around
         read_index = read_index % dl->m_buffer_size;
     }

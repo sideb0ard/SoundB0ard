@@ -20,7 +20,8 @@ typedef enum {
     WAVESHAPER
 } fx_type;
 
-typedef struct fx {
+typedef struct fx
+{
     fx_type type;
     bool enabled;
     void (*status)(void *self, char *string);

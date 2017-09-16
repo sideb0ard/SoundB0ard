@@ -6,7 +6,8 @@
 
 typedef enum { FLANGER, VIBRATO, CHORUS, MAX_MOD_TYPE } modular_type;
 
-typedef struct mod_delay {
+typedef struct mod_delay
+{
     fx m_fx;
     wt_oscillator m_lfo;
     ddlmodule m_ddl;

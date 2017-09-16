@@ -71,7 +71,8 @@ double waveshaper_process_audio(void *self, double input)
     waveshaper *ws = (waveshaper *)self;
     double xn = input;
 
-    for (unsigned int i = 0; i < ws->m_stages; i++) {
+    for (unsigned int i = 0; i < ws->m_stages; i++)
+    {
         if (xn >= 0)
             xn = (1.0 / atan(ws->m_arc_tan_k_pos)) *
                  atan(ws->m_arc_tan_k_pos * xn);

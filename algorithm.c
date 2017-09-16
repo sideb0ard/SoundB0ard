@@ -14,7 +14,8 @@ algorithm *new_algorithm(char *line)
     algorithm *a = (algorithm *)calloc(1, sizeof(algorithm));
 
     printf("New algorithm!\n");
-    if (extract_cmds_from_line(a, line)) {
+    if (extract_cmds_from_line(a, line))
+    {
         printf("Couldn't part commands from line\n");
         free(a);
         return NULL;
@@ -39,33 +40,38 @@ int extract_cmds_from_line(algorithm *self, char *line)
     char *cmd, *last_s;
     char const *sep = ";";
     for (cmd = strtok_r(line, sep, &last_s); cmd;
-         cmd = strtok_r(NULL, sep, &last_s)) {
+         cmd = strtok_r(NULL, sep, &last_s))
+    {
 
         printf("Cmd: %s\n", cmd);
 
-        if (strncmp("every loop", cmd, 10) == 0 && num_cmds == 0) {
+        if (strncmp("every loop", cmd, 10) == 0 && num_cmds == 0)
+        {
             self->frequency = LOOP;
             num_cmds++;
             printf("Every LOOP numcmds: %d\n", num_cmds);
         }
-        else if (num_cmds == 1) {
+        else if (num_cmds == 1)
+        {
             strncpy(self->command, cmd, MAX_CMD_LEN);
             printf("CMD %s\n", cmd);
             num_cmds++;
         }
-        else if (num_cmds == 2) {
+        else if (num_cmds == 2)
+        {
             int num_scanned =
                 sscanf(cmd, "%s %s %s %s %s", self->afterthought[0],
                        self->afterthought[1], self->afterthought[2],
                        self->afterthought[3], self->afterthought[4]);
             printf("AFTERTHOUGHT %s (scanned %d)\n", cmd, num_scanned);
-            if (num_scanned == 5 &&
-                strncmp("%", self->afterthought[3], 2) == 0) {
+            if (num_scanned == 5 && strncmp("%", self->afterthought[3], 2) == 0)
+            {
                 num_cmds++;
             }
         }
     }
-    if (num_cmds != 3) {
+    if (num_cmds != 3)
+    {
         printf("DONK! Doesn't have 3 commands\n");
         return 1;
     }
@@ -77,11 +83,14 @@ void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd)
     char *toke, *last_toke;
     char const *sep = " ";
     for (toke = strtok_r(stored_cmd, sep, &last_toke); toke;
-         toke = strtok_r(NULL, sep, &last_toke)) {
+         toke = strtok_r(NULL, sep, &last_toke))
+    {
 
-        for (int i = 0; i < mixr->env_var_count; i++) {
+        for (int i = 0; i < mixr->env_var_count; i++)
+        {
             if (strncmp(mixr->environment[i].key, toke, ENVIRONMENT_KEY_SIZE) ==
-                0) {
+                0)
+            {
                 itoa(mixr->environment[i].val, toke);
             }
         }
@@ -93,17 +102,20 @@ void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd)
 void algorithm_process_afterthought(algorithm *self)
 {
     int orig_val = 0;
-    if (get_environment_val(self->afterthought[0], &orig_val)) {
+    if (get_environment_val(self->afterthought[0], &orig_val))
+    {
         printf("key not found\n");
         return;
     }
 
-    if (strncmp(self->afterthought[1], "+=", 2) == 0) {
+    if (strncmp(self->afterthought[1], "+=", 2) == 0)
+    {
         update_environment(self->afterthought[0],
                            (orig_val += atoi(self->afterthought[2])) %
                                atoi(self->afterthought[4]));
     }
-    if (strncmp(self->afterthought[1], "*=", 2) == 0) {
+    if (strncmp(self->afterthought[1], "*=", 2) == 0)
+    {
         update_environment(self->afterthought[0],
                            (orig_val *= atoi(self->afterthought[2])) %
                                atoi(self->afterthought[4]));
@@ -113,10 +125,11 @@ void algorithm_process_afterthought(algorithm *self)
 double algorithm_gen_next(void *self)
 {
     algorithm *a = (algorithm *)self;
-    switch (a->frequency) {
+    switch (a->frequency)
+    {
     case LOOP:
-        if (!a->has_started &&
-            (mixr->midi_tick % mixr->loop_len_in_ticks == 0)) {
+        if (!a->has_started && (mixr->midi_tick % mixr->loop_len_in_ticks == 0))
+        {
             a->has_started = true;
             char now_cmd[MAX_CMD_LEN] = {0};
             char stored_cmd[MAX_CMD_LEN] = {0};
@@ -125,7 +138,8 @@ double algorithm_gen_next(void *self)
             interpret(now_cmd);
             algorithm_process_afterthought(a);
         }
-        else if (mixr->midi_tick % mixr->loop_len_in_ticks != 0) {
+        else if (mixr->midi_tick % mixr->loop_len_in_ticks != 0)
+        {
             a->has_started = false;
         }
         break;

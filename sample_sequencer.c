@@ -59,10 +59,12 @@ void sample_seq_import_file(sample_sequencer *seq, char *filename)
 
 void sample_sequencer_reset_samples(sample_sequencer *seq)
 {
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+    {
         seq->samples_now_playing[i] = -1;
     }
-    for (int i = 0; i < PPBAR; i++) {
+    for (int i = 0; i < PPBAR; i++)
+    {
         seq->sample_positions[i].position = 0;
         seq->sample_positions[i].playing = 0;
         seq->sample_positions[i].played = 0;
@@ -80,25 +82,31 @@ double sample_seq_gennext(void *self)
     int idx = mixr->midi_tick % PPBAR;
 
     // wait till start of loop to keep patterns synched
-    if (!seq->started) {
-        if (idx == 0) {
+    if (!seq->started)
+    {
+        if (idx == 0)
+        {
             seq->started = true;
         }
-        else {
+        else
+        {
             return val;
         }
     }
 
-    if (mixr->is_midi_tick &&
-        seq->m_seq.patterns[seq->m_seq.cur_pattern][idx]) {
+    if (mixr->is_midi_tick && seq->m_seq.patterns[seq->m_seq.cur_pattern][idx])
+    {
         int seq_position = get_a_sample_seq_position(seq);
-        if (seq_position != -1) {
+        if (seq_position != -1)
+        {
             seq->samples_now_playing[seq_position] = idx;
         }
     }
 
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
-        if (seq->samples_now_playing[i] != -1) {
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+    {
+        if (seq->samples_now_playing[i] != -1)
+        {
             int cur_sample_midi_tick = seq->samples_now_playing[i];
             val += seq->buffer[seq->sample_positions[cur_sample_midi_tick]
                                    .position] *
@@ -108,7 +116,8 @@ double sample_seq_gennext(void *self)
                 seq->sample_positions[cur_sample_midi_tick].position +
                 seq->channels;
             if ((int)seq->sample_positions[cur_sample_midi_tick].position >=
-                seq->bufsize) { // end of playback - so reset
+                seq->bufsize)
+            { // end of playback - so reset
                 seq->samples_now_playing[i] = -1;
                 seq->sample_positions[cur_sample_midi_tick].position = 0;
             }
@@ -169,7 +178,8 @@ double sample_seq_getvol(void *self)
 void sample_seq_setvol(void *self, double v)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    if (v < 0.0 || v > 1.0) {
+    if (v < 0.0 || v > 1.0)
+    {
         return;
     }
     seq->vol = v;
@@ -182,7 +192,8 @@ void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
     printf("YA BEEZER, MIDI DRUM SEQUENCER!\n");
 
     double scaley_val = 0.;
-    switch (data1) {
+    switch (data1)
+    {
     case 1:
         scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, data2);
         printf("Filter FREQ Control! %f\n", scaley_val);
@@ -254,8 +265,10 @@ void sample_seq_make_active_track(void *self, int track_num)
 
 int get_a_sample_seq_position(sample_sequencer *ss)
 {
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++) {
-        if (ss->samples_now_playing[i] == -1) {
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+    {
+        if (ss->samples_now_playing[i] == -1)
+        {
             return i;
         }
     }

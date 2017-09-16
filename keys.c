@@ -40,20 +40,24 @@ void keys(int soundgen_num)
     fdz[0].fd = STDIN_FILENO;
     fdz[0].events = POLLIN;
 
-    while (!quit) {
+    while (!quit)
+    {
 
         pollret = poll(fdz, 1, 0);
-        if (pollret == -1) {
+        if (pollret == -1)
+        {
             perror("poll");
             return;
         }
 
-        if (fdz[0].revents & POLLIN) {
+        if (fdz[0].revents & POLLIN)
+        {
             ch = getchar();
             // printf("C %d\n", ch);
             int midi_num;
             char textnote[4] = {0};
-            switch (ch) {
+            switch (ch)
+            {
             case 27:
             case 113:
                 quit = 1;
@@ -112,7 +116,8 @@ void keys(int soundgen_num)
                     ch_midi_lookup(ch, ms->m_settings.m_octave, textnote);
                 printf("MIDI: %s [%d]\n", textnote, midi_num);
                 int fake_velocity = 100; // TODO real velocity
-                if (midi_num != -1) {
+                if (midi_num != -1)
+                {
                     minisynth_handle_midi_note(ms, midi_num, fake_velocity,
                                                true);
                 }

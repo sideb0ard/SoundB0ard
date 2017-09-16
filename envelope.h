@@ -1,12 +1,14 @@
 #ifndef ENVELOPE_H
 #define ENVELOPE_H
 
-typedef struct envelope {
+typedef struct envelope
+{
     double time;
     double value;
 } ENVELOPE;
 
-typedef struct envelope_stream {
+typedef struct envelope_stream
+{
     ENVELOPE *points;
     ENVELOPE leftpoint, rightpoint;
     unsigned long npoints;

@@ -29,15 +29,19 @@ void *midiman()
 
     int dev = 0;
 
-    if ((cnt = Pm_CountDevices())) {
-        for (int i = 0; i < cnt; i++) {
+    if ((cnt = Pm_CountDevices()))
+    {
+        for (int i = 0; i < cnt; i++)
+        {
             info = Pm_GetDeviceInfo(i);
-            if (info->input && (strncmp(info->name, "MPKmini2", 8) == 0)) {
+            if (info->input && (strncmp(info->name, "MPKmini2", 8) == 0))
+            {
                 dev = i;
             }
         }
     }
-    else {
+    else
+    {
         return NULL;
     }
     printf("MIDI maaaaan!\n");
@@ -49,25 +53,31 @@ void *midiman()
     retval = Pm_OpenInput(&mstream, dev, NULL, 512L, NULL, NULL);
     if (retval != pmNoError)
         printf("Err opening input for MPKmini2: %s\n", Pm_GetErrorText(retval));
-    while (1) {
-        if (Pm_Poll(mstream)) {
+    while (1)
+    {
+        if (Pm_Poll(mstream))
+        {
             cnt = Pm_Read(mstream, msg, 32);
-            for (int i = 0; i < cnt; i++) {
+            for (int i = 0; i < cnt; i++)
+            {
                 int status = Pm_MessageStatus(msg[i].message);
                 int data1 = Pm_MessageData1(msg[i].message);
                 int data2 = Pm_MessageData2(msg[i].message);
 
                 if (mixr->debug_mode)
-                    printf("[MIDI message] status:%d data1:%d data2:%d\n",
+                    printf("[MIDI message] status:%d data1:%d "
+                           "data2:%d\n",
                            status, data1, data2);
 
-                if (mixr->midi_control_destination == SYNTH) {
+                if (mixr->midi_control_destination == SYNTH)
+                {
 
                     minisynth *ms =
                         (minisynth *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
 
-                    if (ms->recording) {
+                    if (ms->recording)
+                    {
                         int tick = mixr->midi_tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
@@ -81,33 +91,40 @@ void *midiman()
                     ev.delete_after_use = false;
                     midi_parse_midi_event(ms, &ev);
                 }
-                else if (mixr->midi_control_destination == DELAYFX) {
+                else if (mixr->midi_control_destination == DELAYFX)
+                {
                     printf("MIDI CONTROLS! DELAY\n");
                     fx *d =
                         mixr->sound_generators[mixr->active_midi_soundgen_num]
                             ->effects[mixr->active_midi_soundgen_effect_num];
-                    switch (status) {
-                    case (176): {
+                    switch (status)
+                    {
+                    case (176):
+                    {
                         midi_delay_control(d, data1, data2);
                     }
                     }
                 }
-                else if (mixr->midi_control_destination == MIDISEQUENCER) {
+                else if (mixr->midi_control_destination == MIDISEQUENCER)
+                {
                     printf("SAMPLE SEQUENCER MIDI CONTROL!\n");
                     sample_sequencer *s =
                         (sample_sequencer *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
                     sample_seq_parse_midi(s, data1, data2);
                 }
-                else if (mixr->midi_control_destination == MIDISPORK) {
+                else if (mixr->midi_control_destination == MIDISPORK)
+                {
                     printf("MIDI CONTROLS! SPORK\n");
                     spork *s =
                         (spork *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
                     spork_parse_midi(s, data1, data2);
                 }
-                else {
-                    printf("Got midi but not connected to synth\n");
+                else
+                {
+                    printf("Got midi but not connected to "
+                           "synth\n");
                 }
             }
         }
@@ -126,7 +143,8 @@ void print_midi_event_rec(midi_event *ev)
 midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
 {
     midi_event *ev = (midi_event *)calloc(1, sizeof(midi_event));
-    if (ev == NULL) {
+    if (ev == NULL)
+    {
         printf("BIG PROBS MATE\n");
         return NULL;
     }
@@ -199,7 +217,8 @@ void spork_parse_midi(spork *s, int data1, int data2)
 
 void midi_delay_control(fx *e, int data1, int data2)
 {
-    if (e->type != DELAY && e->type != MODDELAY && e->type != REVERB) {
+    if (e->type != DELAY && e->type != MODDELAY && e->type != REVERB)
+    {
         printf("OOft, mate, i'm no an accepted FX - cannae help you out\n");
         return;
     }
@@ -354,21 +373,26 @@ void midi_delay_control(fx *e, int data1, int data2)
 
 void midi_parse_midi_event(minisynth *ms, midi_event *ev)
 {
-    switch (ev->event_type) {
-    case (144): { // Hex 0x80
+    switch (ev->event_type)
+    {
+    case (144):
+    { // Hex 0x80
         ms->m_last_midi_note = ev->data1;
         minisynth_midi_note_on(ms, ev->data1, ev->data2);
         break;
     }
-    case (128): { // Hex 0x90
+    case (128):
+    { // Hex 0x90
         minisynth_midi_note_off(ms, ev->data1, ev->data2, true);
         break;
     }
-    case (176): { // Hex 0xB0
+    case (176):
+    { // Hex 0xB0
         minisynth_midi_control(ms, ev->data1, ev->data2);
         break;
     }
-    case (224): { // Hex 0xE0
+    case (224):
+    { // Hex 0xE0
         minisynth_midi_pitchbend(ms, ev->data1, ev->data2);
         break;
     }
@@ -376,7 +400,8 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
         printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
     }
 
-    if (ev->delete_after_use) {
+    if (ev->delete_after_use)
+    {
         ms->melodies[ms->cur_melody][ev->tick] = NULL;
         if (mixr->debug_mode)
             printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
@@ -387,8 +412,10 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
 void midi_melody_quantize(midi_event **melody)
 {
     printf("Quantizzzzzzing\n");
-    for (int i = 0; i < PPNS; i++) {
-        if (melody[i]) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (melody[i])
+        {
             int tick = melody[i]->tick;
             int amendedtick = 0;
             printf("TICK NOM: %d\n", melody[i]->tick);
@@ -400,7 +427,8 @@ void midi_melody_quantize(midi_event **melody)
             else
                 amendedtick = upper16th;
 
-            // TODO - do i need a mutex or protection here - melody[tick] is
+            // TODO - do i need a mutex or protection here -
+            // melody[tick] is
             // being read from other thread
             melody[i]->tick = amendedtick;
             printf("Amended TICK: %d\n", amendedtick);
@@ -410,14 +438,17 @@ void midi_melody_quantize(midi_event **melody)
 
 void midi_melody_print(midi_event **melody)
 {
-    for (int i = 0; i < PPNS; i++) {
-        if (melody[i]) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (melody[i])
+        {
             int tick = melody[i]->tick;
             int data1 = melody[i]->data1;
             int data2 = melody[i]->data2;
             int typeint = melody[i]->event_type;
             char type[20] = {0};
-            switch (typeint) {
+            switch (typeint)
+            {
             case (144):
                 strcpy(type, "note_on");
                 break;

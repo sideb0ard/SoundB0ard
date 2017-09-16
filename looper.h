@@ -9,7 +9,8 @@
 
 #define MAX_SAMPLES_PER_LOOPER 10
 
-typedef struct file_sample {
+typedef struct file_sample
+{
     char *filename;
     int *orig_file_bytes;
     int orig_file_size;
@@ -22,7 +23,8 @@ typedef struct file_sample {
     int loop_len;
 } file_sample;
 
-typedef struct looper {
+typedef struct looper
+{
     SOUNDGEN sound_generator;
 
     file_sample *samples[MAX_SAMPLES_PER_LOOPER];

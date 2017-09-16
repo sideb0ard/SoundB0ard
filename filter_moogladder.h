@@ -6,7 +6,8 @@
 
 typedef struct filter_moogladder filter_moog;
 
-typedef struct filter_moogladder {
+typedef struct filter_moogladder
+{
 
     filter f; // base class
     double m_k;

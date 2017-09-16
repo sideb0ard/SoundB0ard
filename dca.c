@@ -63,14 +63,17 @@ void dca_set_pan_mod(dca *self, double mod) { self->m_pan_mod = mod; }
 
 void dca_update(dca *self)
 {
-    if (self->m_global_dca_params) {
+    if (self->m_global_dca_params)
+    {
         dca_set_amplitude_db(self, self->m_global_dca_params->amplitude_db);
         self->m_pan_control = self->m_global_dca_params->pan_control;
     }
 
-    if (self->m_v_modmatrix) {
+    if (self->m_v_modmatrix)
+    {
         // printf("Yup yup, got modmatrix\n");
-        if (self->m_mod_source_eg != DEST_NONE) {
+        if (self->m_mod_source_eg != DEST_NONE)
+        {
             self->m_eg_mod =
                 self->m_v_modmatrix->m_destinations[self->m_mod_source_eg];
         }
@@ -88,10 +91,12 @@ void dca_update(dca *self)
                 self->m_v_modmatrix->m_destinations[self->m_mod_source_pan];
     }
 
-    if (self->m_eg_mod >= 0) {
+    if (self->m_eg_mod >= 0)
+    {
         self->m_gain = self->m_eg_mod;
     }
-    else {
+    else
+    {
         self->m_gain = self->m_eg_mod + 1.0;
     }
 

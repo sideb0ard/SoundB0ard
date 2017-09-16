@@ -1,7 +1,8 @@
 #pragma once
 #include <stdbool.h>
 
-typedef struct ddlmodule {
+typedef struct ddlmodule
+{
     double m_delay_in_samples;
     double m_feedback;
     double m_wet_level;

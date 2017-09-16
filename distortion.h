@@ -2,7 +2,8 @@
 
 #include "fx.h"
 
-typedef struct distortion {
+typedef struct distortion
+{
     fx m_fx; // API
 
     double m_threshold;

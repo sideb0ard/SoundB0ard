@@ -2,7 +2,8 @@
 #define SBSHELL_SYNTH_FUNCTION_H_
 
 // OSCILLATOR ///////////////////////////
-typedef struct {
+typedef struct
+{
     // --- common
     double osc_fo;
     double fo_ratio;
@@ -19,7 +20,8 @@ typedef struct {
 } global_oscillator_params;
 
 // FILTER ///////////////////////////////////
-typedef struct {
+typedef struct
+{
     double fc_control;
     double q_control;
     double aux_control;
@@ -29,7 +31,8 @@ typedef struct {
 } global_filter_params;
 
 // ENVELOPE GENERATOR //////////////////////
-typedef struct {
+typedef struct
+{
     double attack_time_msec;  // att: is a time duration
     double decay_time_msec;   // dcy: is a time to decay 1->0
     double release_time_msec; // rel: is a time to decay 1->0
@@ -40,13 +43,15 @@ typedef struct {
 } global_eg_params;
 
 // DCA GENERATOR //////////////////////
-typedef struct {
+typedef struct
+{
     double amplitude_db; // the user's control setting in dB
     double pan_control;
 } global_dca_params;
 
 // VOICE PARAMS
-typedef struct {
+typedef struct
+{
     unsigned int voice_mode;
     double hs_ratio; // hard sync
     double portamento_time_msec;
@@ -111,7 +116,8 @@ typedef struct {
 } global_voice_params;
 
 // SYNTH  /////////////////////////////
-typedef struct {
+typedef struct
+{
     global_voice_params voice_params;
     global_oscillator_params osc1_params;
     global_oscillator_params osc2_params;

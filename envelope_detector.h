@@ -17,10 +17,22 @@
 #define min(a, b) (((a) < (b)) ? (a) : (b))
 #endif
 
-enum { PEAK, MS, RMS };
-enum { DETECT_MODE_PEAK, DETECT_MODE_MS, DETECT_MODE_RMS, DETECT_MODE_NONE };
+enum
+{
+    PEAK,
+    MS,
+    RMS
+};
+enum
+{
+    DETECT_MODE_PEAK,
+    DETECT_MODE_MS,
+    DETECT_MODE_RMS,
+    DETECT_MODE_NONE
+};
 
-typedef struct envelope_detector {
+typedef struct envelope_detector
+{
     int m_sample;
     double m_envelope;
 

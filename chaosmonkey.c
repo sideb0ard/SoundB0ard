@@ -14,7 +14,8 @@ extern mixer *mixr;
 
 chaosmonkey *new_chaosmonkey(int soundgen)
 {
-    if (!mixer_is_valid_soundgen_num(mixr, soundgen)) {
+    if (!mixer_is_valid_soundgen_num(mixr, soundgen))
+    {
         return NULL;
     }
     chaosmonkey *cm = (chaosmonkey *)calloc(1, sizeof(chaosmonkey));
@@ -88,7 +89,8 @@ double chaosmonkey_gen_next(void *self)
     //     break;
     // }
 
-    if (mixr->is_sixteenth) {
+    if (mixr->is_sixteenth)
+    {
     }
     //    if (mixr->soundgen_num > 1) // chaos monkey is counted as one
     //    {

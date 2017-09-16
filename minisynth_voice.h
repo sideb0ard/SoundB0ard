@@ -14,7 +14,8 @@ typedef enum {
     MAX_VOICE_CHOICE
 } minisynth_voice_choice;
 
-typedef struct {
+typedef struct
+{
     voice m_voice;
 
     qblimited_oscillator m_osc1;

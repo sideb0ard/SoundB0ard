@@ -12,7 +12,8 @@ static wtable *_new_wtable(void)
     if (t == NULL)
         return NULL;
     t->table = (double *)calloc(1, (TABLEN + 1) * sizeof(double));
-    if (t->table == NULL) {
+    if (t->table == NULL)
+    {
         free(t);
         return NULL;
     }
@@ -25,7 +26,8 @@ static void norm_wtable(wtable *t)
     unsigned long i;
     double val, maxamp = 0.0;
 
-    for (i = 0; i < t->length; i++) {
+    for (i = 0; i < t->length; i++)
+    {
         val = fabs(t->table[i]);
         if (maxamp < val)
             maxamp = val;
@@ -69,9 +71,11 @@ wtable *new_tri_table()
         return NULL;
 
     step = TWO_PI / TABLEN;
-    for (i = 0; i < NHARMS; i++) {
+    for (i = 0; i < NHARMS; i++)
+    {
         amp = 1.0 / (harmonic * harmonic);
-        for (j = 0; j < TABLEN; j++) {
+        for (j = 0; j < TABLEN; j++)
+        {
             t->table[j] += amp * cos(step * harmonic * j);
         }
         harmonic += 2;
@@ -92,9 +96,11 @@ wtable *new_square_table()
 
     step = TWO_PI / TABLEN;
 
-    for (i = 0; i < NHARMS; i++) {
+    for (i = 0; i < NHARMS; i++)
+    {
         amp = 1.0 / harmonic;
-        for (j = 0; j < TABLEN; j++) {
+        for (j = 0; j < TABLEN; j++)
+        {
             t->table[j] += amp * sin(step * harmonic * j);
         }
         harmonic += 2;
@@ -118,7 +124,8 @@ wtable *new_saw_table(int up)
     if (up)
         amp = -1;
 
-    for (i = 0; i < NHARMS; i++) {
+    for (i = 0; i < NHARMS; i++)
+    {
         val = amp / harmonic;
         for (j = 0; j < t->length; j++)
             t->table[j] += val * sin(step * harmonic * j);
@@ -138,7 +145,8 @@ void wtable_info(wtable *t)
 
 void wtable_free(wtable **gtable)
 {
-    if (gtable && *gtable && (*gtable)->table) {
+    if (gtable && *gtable && (*gtable)->table)
+    {
         free((*gtable)->table);
         free(*gtable);
         *gtable = NULL;

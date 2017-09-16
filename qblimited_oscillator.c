@@ -12,7 +12,8 @@ char *s_waveform_names[] = {"SINE",   "SAW1",  "SAW2",   "SAW3",   "TRI",
 qb_osc *qb_osc_new()
 {
     qb_osc *qb = (qb_osc *)calloc(1, sizeof(qb_osc));
-    if (qb == NULL) {
+    if (qb == NULL)
+    {
         printf("Dinghie, mate\n");
         return NULL;
     }
@@ -47,7 +48,8 @@ double qb_do_sawtooth(oscillator *self, double modulo, double dInc)
     }
 
     // --- NOTE: Fs/8 = Nyquist/4
-    if (self->m_fo <= SAMPLE_RATE / 8.0) {
+    if (self->m_fo <= SAMPLE_RATE / 8.0)
+    {
         out = dTrivialSaw + do_blep_n(&dBLEPTable_8_BLKHAR[0], /* BLEP table */
                                       4096,       /* BLEP table length */
                                       modulo,     /* current phase value */
@@ -190,8 +192,10 @@ double qb_do_oscillate(oscillator *self, double *aux_output)
     double calc_modulo = self->m_modulo + self->m_phase_mod;
     check_wrap_index(&calc_modulo);
 
-    switch (self->m_waveform) {
-    case SINE: {
+    switch (self->m_waveform)
+    {
+    case SINE:
+    {
         // calculate angle
         double angle = calc_modulo * 2.0 * (double)M_PI - (double)M_PI;
 
@@ -203,20 +207,23 @@ double qb_do_oscillate(oscillator *self, double *aux_output)
 
     case SAW1:
     case SAW2:
-    case SAW3: {
+    case SAW3:
+    {
         // do first waveform
         out = qb_do_sawtooth(self, calc_modulo, self->m_inc);
 
         break;
     }
 
-    case SQUARE: {
+    case SQUARE:
+    {
         out = qb_do_square(self, calc_modulo, self->m_inc);
 
         break;
     }
 
-    case TRI: {
+    case TRI:
+    {
         // do first waveform
         if (bWrap)
             self->m_dpw_square_modulator *= -1.0;
@@ -227,14 +234,16 @@ double qb_do_oscillate(oscillator *self, double *aux_output)
         break;
     }
 
-    case NOISE: {
+    case NOISE:
+    {
         // use helper function
         out = do_white_noise();
 
         break;
     }
 
-    case PNOISE: {
+    case PNOISE:
+    {
         // use helper function
         out = do_pn_sequence(&self->m_pn_register);
 
@@ -249,7 +258,8 @@ double qb_do_oscillate(oscillator *self, double *aux_output)
     if (self->m_waveform == TRI)
         osc_inc_modulo(self);
 
-    if (self->m_v_modmatrix) {
+    if (self->m_v_modmatrix)
+    {
         self->m_v_modmatrix->m_sources[self->m_mod_dest_output1] =
             out * self->m_amplitude * self->m_amp_mod;
         self->m_v_modmatrix->m_sources[self->m_mod_dest_output2] =
@@ -269,7 +279,8 @@ void qb_reset_oscillator(oscillator *self)
     osc_reset(self);
     // --- saw/tri starts at 0.5
     if (self->m_waveform == SAW1 || self->m_waveform == SAW2 ||
-        self->m_waveform == SAW3 || self->m_waveform == TRI) {
+        self->m_waveform == SAW3 || self->m_waveform == TRI)
+    {
         self->m_modulo = 0.5;
     }
 }

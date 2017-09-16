@@ -12,13 +12,15 @@
 #define DEFAULT_AMP 0.7
 #define MAX_CONCURRENT_SAMPLES 10 // arbitrary
 
-typedef struct t_sample_pos {
+typedef struct t_sample_pos
+{
     int position;
     int playing;
     int played;
 } sample_pos;
 
-typedef struct sample_sequencer {
+typedef struct sample_sequencer
+{
     SOUNDGEN sound_generator;
     sequencer m_seq;
     sample_pos sample_positions[PPBAR];
@@ -38,18 +40,18 @@ typedef struct sample_sequencer {
     bool active;
     bool started; // to sync at top of loop
 
-    stereodelay m_delay_fx;
-    // midi - top row
+    double vol;
+
+    filter_moogladder m_filter;
     double m_fc_control;
     double m_q_control;
-    double vol;
-    filter_moogladder m_filter;
-    // midi - bottom row, mode 1
+    stereodelay m_delay_fx;
+
     double m_delay_time_msec;
     double m_feedback_pct;
     double m_delay_ratio;
     double m_wet_mix;
-    unsigned int m_delay_mode; // pad5 button
+    unsigned int m_delay_mode;
 
 } sample_sequencer;
 

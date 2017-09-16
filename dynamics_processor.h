@@ -8,7 +8,8 @@
 #include "envelope_detector.h"
 #include "fx.h"
 
-typedef struct dynamics_processor {
+typedef struct dynamics_processor
+{
     fx m_fx; // API
 
     envelope_detector m_left_detector;
@@ -33,7 +34,13 @@ typedef struct dynamics_processor {
 
 } dynamics_processor;
 
-enum { COMP, LIMIT, EXPAND, GATE };
+enum
+{
+    COMP,
+    LIMIT,
+    EXPAND,
+    GATE
+};
 
 dynamics_processor *new_dynamics_processor(void);
 void dynamics_processor_init(dynamics_processor *dp);

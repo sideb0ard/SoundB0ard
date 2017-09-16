@@ -144,7 +144,8 @@ bool reverb_process_audio(reverb *r, double *in, double *out,
                           unsigned int num_output_channels)
 {
     double input_sample = in[0];
-    if (num_input_channels == 2) {
+    if (num_input_channels == 2)
+    {
         input_sample += in[1];
         input_sample *= 0.5;
     }
@@ -203,7 +204,8 @@ bool reverb_process_audio(reverb *r, double *in, double *out,
     out[0] = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
              (r->m_wet_pct / 100.0) * (apf_3_out);
 
-    if (num_output_channels == 2) {
+    if (num_output_channels == 2)
+    {
         out[1] = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
                  (r->m_wet_pct / 100.0) * (apf_4_out);
     }
@@ -289,8 +291,10 @@ void reverb_set_lpf2_g2(reverb *r, double val)
 
 void reverb_set_apf_delay_msec(reverb *r, int apf_num, double val)
 {
-    if (val >= 0 && val <= 100 && apf_num > 0 && apf_num < 5) {
-        switch (apf_num) {
+    if (val >= 0 && val <= 100 && apf_num > 0 && apf_num < 5)
+    {
+        switch (apf_num)
+        {
         case (1):
             r->m_apf_1_delay_msec = val;
         case (2):
@@ -307,8 +311,10 @@ void reverb_set_apf_delay_msec(reverb *r, int apf_num, double val)
 
 void reverb_set_apf_g(reverb *r, int apf_num, double val)
 {
-    if (val >= -1 && val <= 1 && apf_num > 0 && apf_num < 5) {
-        switch (apf_num) {
+    if (val >= -1 && val <= 1 && apf_num > 0 && apf_num < 5)
+    {
+        switch (apf_num)
+        {
         case (1):
             r->m_apf_1_g = val;
         case (2):
@@ -325,8 +331,10 @@ void reverb_set_apf_g(reverb *r, int apf_num, double val)
 
 void reverb_set_comb_delay_msec(reverb *r, int comb_num, double val)
 {
-    if (val >= 0 && val <= 100 && comb_num > 0 && comb_num < 9) {
-        switch (comb_num) {
+    if (val >= 0 && val <= 100 && comb_num > 0 && comb_num < 9)
+    {
+        switch (comb_num)
+        {
         case (1):
             r->m_comb_1_delay_msec = val;
         case (2):

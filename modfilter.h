@@ -4,7 +4,8 @@
 #include "fx.h"
 #include "wt_oscillator.h"
 
-typedef struct modfilter {
+typedef struct modfilter
+{
     fx m_fx; // API
     biquad m_left_lpf;
     biquad m_right_lpf;

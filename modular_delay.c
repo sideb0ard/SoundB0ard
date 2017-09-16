@@ -54,15 +54,18 @@ bool mod_delay_update(mod_delay *md)
 
 void mod_delay_cook_mod_type(mod_delay *md)
 {
-    switch (md->m_mod_type) {
-    case VIBRATO: {
+    switch (md->m_mod_type)
+    {
+    case VIBRATO:
+    {
         md->m_min_delay_msec = 0;
         md->m_max_delay_msec = 7;
         md->m_ddl.m_wet_level_pct = 100.0;
         md->m_ddl.m_feedback_pct = 0.0;
         break;
     }
-    case CHORUS: {
+    case CHORUS:
+    {
         md->m_min_delay_msec = 5;
         md->m_max_delay_msec = 30;
         md->m_ddl.m_wet_level_pct = 50.0;
@@ -70,7 +73,8 @@ void mod_delay_cook_mod_type(mod_delay *md)
         break;
     }
     case FLANGER:
-    default: {
+    default:
+    {
         md->m_min_delay_msec = 0;
         md->m_max_delay_msec = 7;
         md->m_ddl.m_wet_level_pct = 50.0;
@@ -97,13 +101,15 @@ void mod_delay_update_ddl(mod_delay *md)
 
 double mod_delay_calculate_delay_offset(mod_delay *md, double lfo_sample)
 {
-    if (md->m_mod_type == FLANGER || md->m_mod_type == VIBRATO) {
+    if (md->m_mod_type == FLANGER || md->m_mod_type == VIBRATO)
+    {
         return (md->m_mod_depth_pct / 100.0) *
                    (lfo_sample *
                     (md->m_max_delay_msec - md->m_min_delay_msec)) +
                md->m_min_delay_msec;
     }
-    else if (md->m_mod_type == CHORUS) {
+    else if (md->m_mod_type == CHORUS)
+    {
         double start = md->m_min_delay_msec + md->m_chorus_offset;
         return (md->m_mod_depth_pct / 100.0) *
                    (lfo_sample *

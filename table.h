@@ -1,6 +1,7 @@
 #pragma once
 
-typedef struct wtable {
+typedef struct wtable
+{
     double *table;
     unsigned long length;
 } wtable;

@@ -34,7 +34,8 @@ void *timed_sig_start(void *arg)
     SBMSG *msg = (SBMSG *)arg;
     int sg = -1; // signal generator
 
-    if (strcmp(msg->params, "sloop") == 0) {
+    if (strcmp(msg->params, "sloop") == 0)
+    {
         printf("TIMED .... %f\n", msg->looplen);
         sg = add_looper(mixr, msg->filename, msg->looplen);
     }
@@ -87,7 +88,8 @@ audio_buffer_details import_file_contents(double **buffer, char *filename)
 
     sf_info.format = 0;
     snd_file = sf_open(full_filename, SFM_READ, &sf_info);
-    if (!snd_file) {
+    if (!snd_file)
+    {
         printf("Barfed opening %s : %d", full_filename, sf_error(snd_file));
         return deetz;
     }
@@ -95,7 +97,8 @@ audio_buffer_details import_file_contents(double **buffer, char *filename)
     int audio_buffer_len = sf_info.channels * sf_info.frames;
 
     double *audio_buffer = (double *)calloc(audio_buffer_len, sizeof(double));
-    if (audio_buffer == NULL) {
+    if (audio_buffer == NULL)
+    {
         perror("deid!\n");
         sf_close(snd_file);
         return deetz;
@@ -121,26 +124,34 @@ void thrunner(SBMSG *msg)
     // need to ensure and free(msg) in all subtasks from here
     printf("Got CMD: %s\n", msg->cmd);
     pthread_t pthrrrd;
-    if (strcmp(msg->cmd, "timed_sig_start") == 0) {
-        if (pthread_create(&pthrrrd, NULL, timed_sig_start, msg)) {
+    if (strcmp(msg->cmd, "timed_sig_start") == 0)
+    {
+        if (pthread_create(&pthrrrd, NULL, timed_sig_start, msg))
+        {
             fprintf(stderr, "Err, running phrrread..\n");
             return;
         }
     }
-    else if (strcmp(msg->cmd, "fadeuprrr") == 0) {
-        if (pthread_create(&pthrrrd, NULL, fadeup_runrrr, msg)) {
+    else if (strcmp(msg->cmd, "fadeuprrr") == 0)
+    {
+        if (pthread_create(&pthrrrd, NULL, fadeup_runrrr, msg))
+        {
             fprintf(stderr, "Err, running phrrread..\n");
             return;
         }
     }
-    else if (strcmp(msg->cmd, "fadedownrrr") == 0) {
-        if (pthread_create(&pthrrrd, NULL, fadedown_runrrr, msg)) {
+    else if (strcmp(msg->cmd, "fadedownrrr") == 0)
+    {
+        if (pthread_create(&pthrrrd, NULL, fadedown_runrrr, msg))
+        {
             fprintf(stderr, "Err, running phrrread..\n");
             return;
         }
     }
-    else if (strcmp(msg->cmd, "duckrrr") == 0) {
-        if (pthread_create(&pthrrrd, NULL, duck_runrrr, msg)) {
+    else if (strcmp(msg->cmd, "duckrrr") == 0)
+    {
+        if (pthread_create(&pthrrrd, NULL, duck_runrrr, msg))
+        {
             fprintf(stderr, "Err, running phrrread..\n");
             return;
         }
@@ -155,8 +166,10 @@ void faderrr(int sg_num, unsigned int d)
     ts.tv_nsec = 500000;
     double vol = 0;
 
-    if (d == UP) {
-        while (vol < 0.7) {
+    if (d == UP)
+    {
+        while (vol < 0.7)
+        {
             vol += 0.0001;
             mixr->sound_generators[sg_num]->setvol(
                 mixr->sound_generators[sg_num], vol);
@@ -165,10 +178,12 @@ void faderrr(int sg_num, unsigned int d)
         mixr->sound_generators[sg_num]->setvol(mixr->sound_generators[sg_num],
                                                0.7);
     }
-    else {
+    else
+    {
         double vol = mixr->sound_generators[sg_num]->getvol(
             mixr->sound_generators[sg_num]);
-        while (vol > 0.0) {
+        while (vol > 0.0)
+        {
             vol -= 0.0001;
             mixr->sound_generators[sg_num]->setvol(
                 mixr->sound_generators[sg_num], vol);
@@ -193,18 +208,23 @@ void list_sample_dir(char *dir)
     DIR *dp;
     struct dirent *ep;
     dp = opendir(dirname);
-    if (dp != NULL) {
-        while ((ep = readdir(dp))) {
+    if (dp != NULL)
+    {
+        while ((ep = readdir(dp)))
+        {
             char filename[512] = "";
-            if (ep->d_type == DT_DIR) {
+            if (ep->d_type == DT_DIR)
+            {
                 // strcat(filename, "\x1b[34m");
                 strcat(filename, ANSI_COLOR_BLUE);
                 strcat(filename, ep->d_name);
                 strcat(filename, "/");
             }
-            else {
+            else
+            {
                 strcat(filename, ANSI_COLOR_BLUE);
-                if (have_subdir) {
+                if (have_subdir)
+                {
                     strcat(filename, dir);
                     strcat(filename, "/");
                 }
@@ -217,7 +237,8 @@ void list_sample_dir(char *dir)
         }
         (void)closedir(dp);
     }
-    else {
+    else
+    {
         perror("Couldn't open wavs dir\n");
     }
 }
@@ -315,7 +336,8 @@ int ch_midi_lookup(int ch, int octave, char *keytext)
 
     int midi_num = -1;
 
-    switch (ch) {
+    switch (ch)
+    {
     case 97:
         midi_num = 0 + cur_octave_midi_num; // C
         strncpy(keytext, "C", 1);
@@ -393,7 +415,8 @@ float freqval(char *n)
     regex_t single_letter_rx;
     regcomp(&single_letter_rx, "^([[:alpha:]#]{1,2})([[:digit:]])$",
             REG_EXTENDED | REG_ICASE);
-    if (regexec(&single_letter_rx, n, 3, nmatch, 0) == 0) {
+    if (regexec(&single_letter_rx, n, 3, nmatch, 0) == 0)
+    {
 
         int note_str_len = nmatch[1].rm_eo - nmatch[1].rm_so;
         char note[note_str_len + 1];
@@ -404,7 +427,8 @@ float freqval(char *n)
         strncpy(str_octave, n + note_str_len, 1);
         str_octave[1] = '\0';
 
-        // purpose of this is working out how many semitones the given note is
+        // purpose of this is working out how many semitones the given note
+        // is
         // from A4
         int n_num = (12 * atoi(str_octave)) + notelookup(note);
         // fixed note, which we compare against is A4 - '4' is the fourth
@@ -414,7 +438,8 @@ float freqval(char *n)
         float freqval = a4 * (pow(twelfth_root_of_two, diff));
         return freqval;
     }
-    else {
+    else
+    {
         return -1.0;
     }
 }
@@ -423,20 +448,25 @@ void strim(const char *input, char *result)
 {
     int flag = 0;
 
-    while (*input) {
-        if (!isspace((unsigned char)*input) && flag == 0) {
+    while (*input)
+    {
+        if (!isspace((unsigned char)*input) && flag == 0)
+        {
             *result++ = *input;
             flag = 1;
         }
         input++;
-        if (flag == 1) {
+        if (flag == 1)
+        {
             *result++ = *input;
         }
     }
 
-    while (1) {
+    while (1)
+    {
         result--;
-        if (!isspace((unsigned char)*input) && flag == 0) {
+        if (!isspace((unsigned char)*input) && flag == 0)
+        {
             break;
         }
         flag = 0;
@@ -446,8 +476,10 @@ void strim(const char *input, char *result)
 
 int conv_bitz(int num)
 {
-    for (int i = 0; i < 16; i++) {
-        if ((num & (1 << i)) == num) {
+    for (int i = 0; i < 16; i++)
+    {
+        if ((num & (1 << i)) == num)
+        {
             // printf("%d is %d\n", num, i);
             return i;
         }
@@ -457,22 +489,28 @@ int conv_bitz(int num)
 
 int is_valid_osc(char *string)
 {
-    if (strncmp(string, "square", 9) == 0) {
+    if (strncmp(string, "square", 9) == 0)
+    {
         return 1;
     }
-    else if (strncmp(string, "saw_d", 9) == 0) {
+    else if (strncmp(string, "saw_d", 9) == 0)
+    {
         return 1;
     }
-    else if (strncmp(string, "saw_u", 9) == 0) {
+    else if (strncmp(string, "saw_u", 9) == 0)
+    {
         return 1;
     }
-    else if (strncmp(string, "tri", 9) == 0) {
+    else if (strncmp(string, "tri", 9) == 0)
+    {
         return 1;
     }
-    else if (strncmp(string, "sine", 9) == 0) {
+    else if (strncmp(string, "sine", 9) == 0)
+    {
         return 1;
     }
-    else {
+    else
+    {
         return 0;
     }
 }
@@ -520,7 +558,8 @@ void itoa(int n, char s[])
     if ((sign = n) < 0) /* record sign */
         n = -n;         /* make n positive */
     i = 0;
-    do {                       /* generate digits in reverse order */
+    do
+    {                          /* generate digits in reverse order */
         s[i++] = n % 10 + '0'; /* get next digit */
     } while ((n /= 10) > 0);   /* delete it */
     if (sign < 0)
@@ -535,7 +574,8 @@ void reverse(char s[])
     int i, j;
     char c;
 
-    for (i = 0, j = strlen(s) - 1; i < j; i++, j--) {
+    for (i = 0, j = strlen(s) - 1; i < j; i++, j--)
+    {
         c = s[i];
         s[i] = s[j];
         s[j] = c;
@@ -694,8 +734,10 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
 
     // LEFT side of edge
     // -1 < t < 0
-    for (int i = 1; i <= (int)points_per_side; i++) {
-        if (modulo > 1.0 - (double)i * inc) {
+    for (int i = 1; i <= (int)points_per_side; i++)
+    {
+        if (modulo > 1.0 - (double)i * inc)
+        {
             // --- calculate distance
             t = (modulo - 1.0) / (points_per_side * inc);
 
@@ -703,10 +745,12 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
             float fIndex = (1.0 + t) * dTableCenter;
 
             // --- truncation
-            if (interpolate) {
+            if (interpolate)
+            {
                 blep = blep_table[(int)fIndex];
             }
-            else {
+            else
+            {
                 float fIndex = (1.0 + t) * dTableCenter;
                 float frac = fIndex - (int)fIndex;
                 blep = lin_terp(0, 1, blep_table[(int)fIndex],
@@ -723,8 +767,10 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
 
     // RIGHT side of discontinuity
     // 0 <= t < 1
-    for (int i = 1; i <= (int)points_per_side; i++) {
-        if (modulo < (double)i * inc) {
+    for (int i = 1; i <= (int)points_per_side; i++)
+    {
+        if (modulo < (double)i * inc)
+        {
             // calculate distance
             t = modulo / (points_per_side * inc);
 
@@ -732,10 +778,12 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
             float fIndex = t * dTableCenter + (dTableCenter + 1.0);
 
             // truncation
-            if (interpolate) {
+            if (interpolate)
+            {
                 blep = blep_table[(int)fIndex];
             }
-            else {
+            else
+            {
                 float frac = fIndex - (int)fIndex;
                 if ((int)fIndex + 1 >= table_len)
                     blep = lin_terp(0, 1, blep_table[(int)fIndex],
@@ -818,7 +866,8 @@ double mma_midi_to_atten_db(unsigned int midi_val)
 bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
                             int size_of_array)
 {
-    for (int i = 0; i < size_of_array; i++) {
+    for (int i = 0; i < size_of_array; i++)
+    {
         if (array_to_look_in[i] == member_to_look_for)
             return true;
     }
@@ -848,9 +897,11 @@ inline double lagrpol(double *x, double *y, int n, double xbar)
     int i, j;
     double fx = 0.0;
     double l = 1.0;
-    for (i = 0; i < n; i++) {
+    for (i = 0; i < n; i++)
+    {
         l = 1.0;
-        for (j = 0; j < n; j++) {
+        for (j = 0; j < n; j++)
+        {
             if (j != i)
                 l *= (xbar - x[j]) / (x[i] - x[j]);
         }

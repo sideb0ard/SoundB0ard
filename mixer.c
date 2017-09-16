@@ -35,7 +35,8 @@ extern const compat_key_list compat_keys[NUM_KEYS];
 mixer *new_mixer()
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
-    if (mixr == NULL) {
+    if (mixr == NULL)
+    {
         printf("Nae mixer, fucked up!\n");
         return NULL;
     }
@@ -83,9 +84,11 @@ void mixer_ps(mixer *mixr)
            mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH,
            PPTWENTYFOURTH, PPBAR, PPNS);
 
-    if (mixr->env_var_count > 0) {
+    if (mixr->env_var_count > 0)
+    {
         printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
-        for (int i = 0; i < mixr->env_var_count; i++) {
+        for (int i = 0; i < mixr->env_var_count; i++)
+        {
             printf("%s - %d\n", mixr->environment[i].key,
                    mixr->environment[i].val);
         }
@@ -93,16 +96,20 @@ void mixer_ps(mixer *mixr)
     }
     printf("\n");
 
-    if (mixr->num_scenes > 0) {
+    if (mixr->num_scenes > 0)
+    {
         printf(COOL_COLOR_GREEN "::::: [" ANSI_COLOR_WHITE
                                 "scene mode: %s" COOL_COLOR_GREEN
                                 "] .....] - \n",
                mixr->scene_mode ? "true" : "false");
-        for (int i = 0; i < mixr->num_scenes; i++) {
+        for (int i = 0; i < mixr->num_scenes; i++)
+        {
             printf("::::: [%d] - %d bars - ", i,
                    mixr->scenes[i].num_bars_to_play);
-            for (int j = 0; j < mixr->scenes[i].num_tracks; j++) {
-                if (mixr->scenes[i].soundgen_tracks[j].soundgen_num != -1) {
+            for (int j = 0; j < mixr->scenes[i].num_tracks; j++)
+            {
+                if (mixr->scenes[i].soundgen_tracks[j].soundgen_num != -1)
+                {
                     printf(
                         "(%d,%d)",
                         mixr->scenes[i].soundgen_tracks[j].soundgen_num,
@@ -114,18 +121,21 @@ void mixer_ps(mixer *mixr)
         printf(ANSI_COLOR_RESET "\n");
     }
 
-    for (int i = 0; i < mixr->soundgen_num; i++) {
-        if (mixr->sound_generators[i] != NULL) {
+    for (int i = 0; i < mixr->soundgen_num; i++)
+    {
+        if (mixr->sound_generators[i] != NULL)
+        {
             wchar_t wss[MAX_PS_STRING_SZ];
             memset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
             wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET "  %ls\n", i,
                     wss);
             if (mixr->sound_generators[i]->effects_num > 0 ||
-                mixr->sound_generators[i]->envelopes_num > 0) {
+                mixr->sound_generators[i]->envelopes_num > 0)
+            {
                 printf("      ");
-                for (int j = 0; j < mixr->sound_generators[i]->effects_num;
-                     j++) {
+                for (int j = 0; j < mixr->sound_generators[i]->effects_num; j++)
+                {
                     fx *f = mixr->sound_generators[i]->effects[j];
                     if (f->enabled)
                         printf(COOL_COLOR_YELLOW);
@@ -138,7 +148,8 @@ void mixer_ps(mixer *mixr)
                 printf(ANSI_COLOR_RESET);
                 printf(COOL_COLOR_GREEN);
                 for (int j = 0; j < mixr->sound_generators[i]->envelopes_num;
-                     j++) {
+                     j++)
+                {
                     printf("[envelope]\n");
                 }
                 printf(ANSI_COLOR_RESET);
@@ -163,13 +174,17 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->midi_tick = -1;
     mixr->cur_sample = 0;
 
-    for (int i = 0; i < mixr->soundgen_num; i++) {
-        if (mixr->sound_generators[i] != NULL) {
-            for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++) {
+    for (int i = 0; i < mixr->soundgen_num; i++)
+    {
+        if (mixr->sound_generators[i] != NULL)
+        {
+            for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++)
+            {
                 update_envelope_stream_bpm(
                     mixr->sound_generators[i]->envelopes[j]);
             }
-            if (mixr->sound_generators[i]->type == LOOPER_TYPE) {
+            if (mixr->sound_generators[i]->type == LOOPER_TYPE)
+            {
                 looper_resample_to_loop_size(
                     (looper *)mixr->sound_generators[i]);
             }
@@ -180,7 +195,8 @@ void mixer_update_bpm(mixer *mixr, int bpm)
 void mixer_vol_change(mixer *mixr, float vol)
 {
     printf("Changing volume to %f\n", vol);
-    if (vol >= 0.0 && vol <= 1.0) {
+    if (vol >= 0.0 && vol <= 1.0)
+    {
         mixr->volume = vol;
     }
 }
@@ -188,7 +204,8 @@ void mixer_vol_change(mixer *mixr, float vol)
 void vol_change(mixer *mixr, int sg, float vol)
 {
     printf("SG: %d // soungen_num : %d\n", sg, mixr->soundgen_num);
-    if (!mixer_is_valid_soundgen_num(mixr, sg)) {
+    if (!mixer_is_valid_soundgen_num(mixr, sg))
+    {
         printf("Nah mate, returning\n");
         return;
     }
@@ -199,21 +216,26 @@ int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
 {
     SOUNDGEN **new_soundgens = NULL;
 
-    if (mixr->soundgen_size <= mixr->soundgen_num) {
-        if (mixr->soundgen_size == 0) {
+    if (mixr->soundgen_size <= mixr->soundgen_num)
+    {
+        if (mixr->soundgen_size == 0)
+        {
             mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
         }
-        else {
+        else
+        {
             mixr->soundgen_size *= 2;
         }
 
         new_soundgens = (SOUNDGEN **)realloc(
             mixr->sound_generators, mixr->soundgen_size * sizeof(SOUNDGEN *));
-        if (new_soundgens == NULL) {
+        if (new_soundgens == NULL)
+        {
             printf("Ooh, burney - cannae allocate memory for new sounds");
             return -1;
         }
-        else {
+        else
+        {
             mixr->sound_generators = new_soundgens;
         }
     }
@@ -251,7 +273,8 @@ int add_looper(mixer *mixr, char *filename, double loop_len)
 {
     printf("ADD looper - LOOP LEN %f\n", loop_len);
     looper *l = new_looper(filename, loop_len);
-    if (l == NULL) {
+    if (l == NULL)
+    {
         printf("Barfed on looper creation\n");
         return -1;
     }
@@ -268,70 +291,87 @@ int add_granulator(mixer *mixr, char *filename)
 
 double mixer_gennext(mixer *mixr)
 {
-    if (mixr->cur_sample % mixr->samples_per_midi_tick == 0) {
+    if (mixr->cur_sample % mixr->samples_per_midi_tick == 0)
+    {
         mixr->midi_tick++; // 1 midi tick (or pulse)
         mixr->is_midi_tick = true;
     }
-    else {
+    else
+    {
         mixr->is_midi_tick = false;
     }
 
     if (mixr->cur_sample % ((PPSIXTEENTH / 2) * mixr->samples_per_midi_tick) ==
-        0) { // thirty second
+        0)
+    { // thirty second
         mixr->is_thirtysecond = true;
     }
-    else {
+    else
+    {
         mixr->is_thirtysecond = false;
     }
 
-    if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0)
+    {
         mixr->sixteenth_note_tick++; // for seq machine resolution
         mixr->is_sixteenth = true;
     }
-    else {
+    else
+    {
         mixr->is_sixteenth = false;
     }
 
-    if (mixr->cur_sample % (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) ==
-        0) {
+    if (mixr->cur_sample % (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) == 0)
+    {
         mixr->is_eighth = true;
     }
-    else {
+    else
+    {
         mixr->is_eighth = false;
     }
 
-    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0)
+    {
         mixr->is_quarter = true;
     }
-    else {
+    else
+    {
         mixr->is_quarter = false;
     }
 
-    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0) {
+    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0)
+    {
         mixr->start_of_loop = true;
-        if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0)) {
-            printf("BUG! START OF LOOP - sample: %d, midi_tick: %d sixteenth: "
+        if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0))
+        {
+            printf("BUG! START OF LOOP - sample: %d, midi_tick: %d "
+                   "sixteenth: "
                    "%d\n",
                    mixr->cur_sample, mixr->midi_tick,
                    mixr->sixteenth_note_tick);
             mixr->sixteenth_note_tick = 0;
             mixr->midi_tick = 0;
         }
-        if (mixr->debug_mode) {
-            printf("START OF LOOP - sample: %d, midi_tick: %d sixteenth: %d\n",
+        if (mixr->debug_mode)
+        {
+            printf("START OF LOOP - sample: %d, midi_tick: %d "
+                   "sixteenth: %d\n",
                    mixr->cur_sample, mixr->midi_tick,
                    mixr->sixteenth_note_tick);
         }
     }
-    else {
+    else
+    {
         mixr->start_of_loop = false;
     }
 
     // if (mixr->scene_mode && mixr->start_of_loop) {
-    if (mixr->start_of_loop) {
+    if (mixr->start_of_loop)
+    {
         // printf("Top of the bar\n");
 
-        if (mixr->scene_start_pending) {
+        if (mixr->scene_start_pending)
+        {
             mixer_play_scene(mixr, mixr->current_scene);
             mixr->scene_start_pending = false;
         }
@@ -349,9 +389,12 @@ double mixer_gennext(mixer *mixr)
     }
 
     double output_val = 0.0;
-    if (mixr->soundgen_num > 0) {
-        for (int i = 0; i < mixr->soundgen_num; i++) {
-            if (mixr->sound_generators[i] != NULL) {
+    if (mixr->soundgen_num > 0)
+    {
+        for (int i = 0; i < mixr->soundgen_num; i++)
+        {
+            if (mixr->sound_generators[i] != NULL)
+            {
                 mixr->soundgen_cur_val[i] = mixr->sound_generators[i]->gennext(
                     mixr->sound_generators[i]);
                 output_val += mixr->soundgen_cur_val[i];
@@ -367,28 +410,34 @@ double mixer_gennext(mixer *mixr)
 void mixer_play_scene(mixer *mixr, int scene_num)
 {
     scene *s = &mixr->scenes[scene_num];
-    for (int i = 0; i < mixr->soundgen_num; i++) {
+    for (int i = 0; i < mixr->soundgen_num; i++)
+    {
         if (!mixer_is_soundgen_in_scene(i, s) &&
-            mixer_is_valid_soundgen_num(mixr, i)) {
+            mixer_is_valid_soundgen_num(mixr, i))
+        {
             mixr->sound_generators[i]->stop(mixr->sound_generators[i]);
         }
     }
 
-    for (int i = 0; i < s->num_tracks; i++) {
+    for (int i = 0; i < s->num_tracks; i++)
+    {
         int soundgen_num = s->soundgen_tracks[i].soundgen_num;
-        if (soundgen_num == -1) {
+        if (soundgen_num == -1)
+        {
             continue;
         }
         int soundgen_track_num = s->soundgen_tracks[i].soundgen_track_num;
-        if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+        if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+        {
             mixr->sound_generators[soundgen_num]->start(
                 mixr->sound_generators[soundgen_num]);
             mixr->sound_generators[soundgen_num]->make_active_track(
                 mixr->sound_generators[soundgen_num], soundgen_track_num);
         }
-        else {
-            printf(
-                "Oh, a deleted soundgen, better remove that from the scene\n");
+        else
+        {
+            printf("Oh, a deleted soundgen, better remove that from "
+                   "the scene\n");
             s->soundgen_tracks[i].soundgen_num = -1;
         }
     }
@@ -398,16 +447,20 @@ void update_environment(char *key, int val)
 {
     int env_item_index = 0;
     bool is_update = false;
-    for (int i = 0; i < mixr->env_var_count; i++) {
-        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0) {
+    for (int i = 0; i < mixr->env_var_count; i++)
+    {
+        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0)
+        {
             is_update = true;
             env_item_index = i;
         }
     }
-    if (is_update) {
+    if (is_update)
+    {
         mixr->environment[env_item_index].val = val;
     }
-    else {
+    else
+    {
         strncpy((char *)&mixr->environment[mixr->env_var_count].key, key,
                 ENVIRONMENT_KEY_SIZE);
         mixr->environment[mixr->env_var_count].val = val;
@@ -417,8 +470,10 @@ void update_environment(char *key, int val)
 
 int get_environment_val(char *key, int *return_val)
 {
-    for (int i = 0; i < mixr->env_var_count; i++) {
-        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0) {
+    for (int i = 0; i < mixr->env_var_count; i++)
+    {
+        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0)
+        {
             *return_val = mixr->environment[i].val;
             return 0;
         }
@@ -428,11 +483,13 @@ int get_environment_val(char *key, int *return_val)
 
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+    {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
         SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
         mixr->sound_generators[soundgen_num] = NULL;
-        switch (sg->type) {
+        switch (sg->type)
+        {
         case (SYNTH_TYPE):
             printf("DELASYNTH!\n");
             minisynth *ms = (minisynth *)sg;
@@ -481,7 +538,8 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
 {
     if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num &&
-        mixr->sound_generators[soundgen_num] != NULL) {
+        mixr->sound_generators[soundgen_num] != NULL)
+    {
         return true;
     }
     return false;
@@ -508,7 +566,8 @@ bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
 
 int mixer_add_scene(mixer *mixr, int num_bars)
 {
-    if (mixr->num_scenes >= MAX_SCENES) {
+    if (mixr->num_scenes >= MAX_SCENES)
+    {
         printf("Dingie mate\n");
         return false;
     }
@@ -522,17 +581,19 @@ int mixer_add_scene(mixer *mixr, int num_bars)
 bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
                                        int soundgen_num, int soundgen_track)
 {
-    if (!mixer_is_valid_scene_num(mixr, scene_num)) {
+    if (!mixer_is_valid_scene_num(mixr, scene_num))
+    {
         printf("%d is not a valid scene number\n", scene_num);
         return false;
     }
-    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num,
-                                           soundgen_track)) {
+    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num, soundgen_track))
+    {
         printf("%d is not a valid soundgen number\n", soundgen_num);
         return false;
     }
 
-    if (mixr->scenes[scene_num].num_tracks >= MAX_TRACKS_PER_SCENE) {
+    if (mixr->scenes[scene_num].num_tracks >= MAX_TRACKS_PER_SCENE)
+    {
         printf("Too many tracks for this scene\n");
         return false;
     }
@@ -550,20 +611,23 @@ bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
 bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
                                         int soundgen_num, int soundgen_track)
 {
-    if (!mixer_is_valid_scene_num(mixr, scene_num)) {
+    if (!mixer_is_valid_scene_num(mixr, scene_num))
+    {
         printf("%d is not a valid scene number\n", scene_num);
         return false;
     }
-    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num,
-                                           soundgen_track)) {
+    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num, soundgen_track))
+    {
         printf("%d is not a valid soundgen number\n", soundgen_num);
         return false;
     }
 
     scene *s = &mixr->scenes[scene_num];
-    for (int i = 0; i < s->num_tracks; i++) {
+    for (int i = 0; i < s->num_tracks; i++)
+    {
         if (s->soundgen_tracks[i].soundgen_num == soundgen_num &&
-            s->soundgen_tracks[i].soundgen_track_num == soundgen_track) {
+            s->soundgen_tracks[i].soundgen_track_num == soundgen_track)
+        {
             s->soundgen_tracks[i].soundgen_num = -1;
             return true;
         }
@@ -573,7 +637,8 @@ bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
 }
 bool mixer_is_soundgen_in_scene(int soundgen_num, scene *s)
 {
-    for (int i = 0; i < s->num_tracks; i++) {
+    for (int i = 0; i < s->num_tracks; i++)
+    {
         if (soundgen_num == s->soundgen_tracks[i].soundgen_num)
             return true;
     }
@@ -582,11 +647,13 @@ bool mixer_is_soundgen_in_scene(int soundgen_num, scene *s)
 
 bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
 {
-    if (!mixer_is_valid_scene_num(mixr, scene_num_from)) {
+    if (!mixer_is_valid_scene_num(mixr, scene_num_from))
+    {
         printf("%d is not a valid scene number\n", scene_num_from);
         return false;
     }
-    if (!mixer_is_valid_scene_num(mixr, scene_num_to)) {
+    if (!mixer_is_valid_scene_num(mixr, scene_num_to))
+    {
         printf("%d is not a valid scene number\n", scene_num_from);
         return false;
     }

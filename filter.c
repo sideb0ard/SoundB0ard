@@ -27,10 +27,12 @@ void filter_setup(filter *f)
 
 void filter_set_fc_control(filter *f, double val)
 {
-    if (val >= FILTER_FC_MIN && val <= FILTER_FC_MAX) {
+    if (val >= FILTER_FC_MIN && val <= FILTER_FC_MAX)
+    {
         f->m_fc_control = val;
     }
-    else {
+    else
+    {
         printf("FC must be between %d and %d\n", FILTER_FC_MIN, FILTER_FC_MAX);
     }
 }
@@ -48,7 +50,8 @@ void filter_set_type(filter *f, unsigned int type)
 
 void filter_update(filter *f)
 {
-    if (f->m_global_filter_params) {
+    if (f->m_global_filter_params)
+    {
         f->m_aux_control = f->m_global_filter_params->aux_control;
         f->m_fc_control = f->m_global_filter_params->fc_control;
         f->m_q_control = f->m_global_filter_params->q_control;
@@ -57,9 +60,11 @@ void filter_update(filter *f)
         f->m_nlp = f->m_global_filter_params->nlp;
     }
 
-    if (f->m_v_modmatrix) {
+    if (f->m_v_modmatrix)
+    {
         f->m_fc_mod = f->m_v_modmatrix->m_destinations[f->m_mod_source_fc];
-        if (f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0) {
+        if (f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control] > 0)
+        {
             f->m_fc_control =
                 f->m_v_modmatrix->m_destinations[f->m_mod_source_fc_control];
         }

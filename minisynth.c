@@ -118,7 +118,8 @@ minisynth *new_minisynth(void)
     ms->multi_melody_mode = true;
     ms->cur_melody_iteration = 1;
 
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         ms->m_voices[i] = new_minisynth_voice();
         if (!ms->m_voices[i])
             return NULL; // would be bad
@@ -133,13 +134,16 @@ minisynth *new_minisynth(void)
     // use first voice to setup global
     minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->m_ms_modmatrix);
 
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
                                  get_matrix_core(&ms->m_ms_modmatrix));
     }
-    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++) {
+    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
+    {
         ms->melody_multiloop_count[i] = 1;
-        for (int j = 0; j < PPNS; j++) {
+        for (int j = 0; j < PPNS; j++)
+        {
             ms->melodies[i][j] = NULL;
         }
     }
@@ -155,8 +159,10 @@ minisynth *new_minisynth(void)
 
 bool minisynth_prepare_for_play(minisynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (ms->m_voices[i])
+        {
             minisynth_voice_prepare_for_play(ms->m_voices[i]);
         }
     }
@@ -305,7 +311,8 @@ void minisynth_update(minisynth *ms)
 void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
                                int max_steps)
 {
-    if (!is_valid_melody_num(ms, melody_num)) {
+    if (!is_valid_melody_num(ms, melody_num))
+    {
         printf("Not a valid melody number\n");
         return;
     }
@@ -324,10 +331,12 @@ void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
     for (int i = 0; i < NUM_COMPAT_NOTES; i++)
         generated_melody_note_num[i] = -99;
     int generated_melody_note_num_idx = 0;
-    while (generated_melody_note_num_idx < rand_num_notes) {
+    while (generated_melody_note_num_idx < rand_num_notes)
+    {
         int randy = rand() % (NUM_COMPAT_NOTES);
         if (!is_int_member_in_array(randy, generated_melody_note_num,
-                                    NUM_COMPAT_NOTES)) {
+                                    NUM_COMPAT_NOTES))
+        {
             generated_melody_note_num[generated_melody_note_num_idx++] = randy;
         }
     }
@@ -338,11 +347,14 @@ void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
     //        printf("%d ", generated_melody_note_num[i]);
     // printf("\n");
 
-    for (int i = 0; i < NUM_COMPAT_NOTES; i++) {
-        if (generated_melody_note_num[i] != -99) {
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+    {
+        if (generated_melody_note_num[i] != -99)
+        {
             int idx = generated_melody_note_num[i];
             // printf("Compat: %s\n", key_names[compat_keys[0][idx]]);
-            // printf("Compat: %d\n", key_midi_mapping[compat_keys[0][idx]]);
+            // printf("Compat: %d\n",
+            // key_midi_mapping[compat_keys[0][idx]]);
 
             int rand_steps = (rand() % max_steps) + 1;
             int bitpattern = create_euclidean_rhythm(rand_steps, 32);
@@ -351,8 +363,10 @@ void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
 
             // printf("Pattern is %d\n", bitpattern);
             char cbitpattern[33];
-            for (int i = 31; i >= 0; i--) {
-                if (bitpattern & 1 << i) {
+            for (int i = 31; i >= 0; i--)
+            {
+                if (bitpattern & 1 << i)
+                {
                     cbitpattern[31 - i] = '1';
                     minisynth_add_note(
                         ms, melody_num, 31 - i,
@@ -371,11 +385,13 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
                             unsigned int velocity)
 {
     bool steal_note = true;
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         minisynth_voice *msv = ms->m_voices[i];
         if (!msv)
             return false; // should never happen
-        if (!msv->m_voice.m_note_on) {
+        if (!msv->m_voice.m_note_on)
+        {
             minisynth_increment_voice_timestamps(ms);
             voice_note_on(&msv->m_voice, midinote, velocity,
                           get_midi_freq(midinote), ms->m_last_note_frequency);
@@ -386,11 +402,13 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
         }
     }
 
-    if (steal_note) {
+    if (steal_note)
+    {
         if (mixr->debug_mode)
             printf("STEAL NOTE\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(ms);
-        if (msv) {
+        if (msv)
+        {
             minisynth_increment_voice_timestamps(ms);
             voice_note_on(&msv->m_voice, midinote, velocity,
                           get_midi_freq(midinote), ms->m_last_note_frequency);
@@ -406,17 +424,21 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
 {
     (void)velocity;
 
-    if (all_notes_off) {
-        for (int i = 0; i < MAX_VOICES; i++) {
+    if (all_notes_off)
+    {
+        for (int i = 0; i < MAX_VOICES; i++)
+        {
             if (ms->m_voices[i])
                 voice_note_off(&ms->m_voices[i]->m_voice, midinote);
         }
     }
 
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         minisynth_voice *msv =
             minisynth_get_oldest_voice_with_note(ms, midinote);
-        if (msv) {
+        if (msv)
+        {
             voice_note_off(&msv->m_voice, midinote);
         }
     }
@@ -429,7 +451,8 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
     double scaley_val;
     // switch (mixr->m_midi_controller_mode) {
     // case MIDI_KNOB_MODE_ONE:
-    switch (data1) {
+    switch (data1)
+    {
     case 9:
         ms->m_settings.m_lfo1_waveform =
             (++ms->m_settings.m_lfo1_waveform) % MAX_LFO_OSC;
@@ -494,19 +517,22 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         printf("24! MIDI Mode\n");
         break;
     case 1: // K1 - Envelope Attack Time Msec
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             if (mixr->debug_mode)
                 printf("Envelope attack!\n");
             scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             ms->m_settings.m_attack_time_msec = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             scaley_val = scaleybum(0, 127, 0, 1000, data2);
             ms->m_settings.m_delay_time_msec = scaley_val;
             if (mixr->debug_mode)
                 printf("DELAY MS: %f\n", ms->m_settings.m_delay_time_msec);
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             if (mixr->debug_mode)
                 printf("EG1->DCA intensity!\n");
             scaley_val = scaleybum(0, 127, 0, 10, data2);
@@ -514,112 +540,133 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
         }
         break;
     case 2: // K2 - Envelope Decay Time Msec
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             if (mixr->debug_mode)
                 printf("Envelope decay!\n");
             scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
             ms->m_settings.m_decay_time_msec = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             scaley_val = scaleybum(0, 127, 0, 10, data2);
             // ms->X = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             // scaley_val = scaleybum(0, 127, X, X, data2);
             // ms->X = scaley_val;
         }
         break;
     case 3: // K3 - Envelope Sustain Level
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             if (mixr->debug_mode)
                 printf("Env Sustain level\n");
             scaley_val = scaleybum(0, 127, 0, 1, data2);
             ms->m_settings.m_sustain_level = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             // scaley_val = scaleybum(0, 127, X, X, data2);
             // ms->X = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             // scaley_val = scaleybum(0, 127, X, X, data2);
             // ms->X = scaley_val;
         }
         break;
     case 4: // K4 - Synth Volume
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             printf("Synth volume\n");
             scaley_val = scaleybum(0, 127, 0, 1, data2);
             ms->m_settings.m_volume_db = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
         break;
     case 5: // K6 - LFO amplitude
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             if (mixr->debug_mode)
                 printf("LFO Amplitude\n");
             scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
             ms->m_settings.m_lfo1_amplitude = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
         break;
     case 6: // K5 - LFO rate
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             if (mixr->debug_mode)
                 printf("LFO Rate\n");
             scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
             ms->m_settings.m_lfo1_rate = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
         break;
     case 7: // K7 - Filter Frequency Cut
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             if (mixr->debug_mode)
                 printf("Filter Frequency!\n");
             scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, data2);
             ms->m_settings.m_fc_control = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
         break;
     case 8: // K8 - Filter Q control
-        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE) {
+        if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_ONE)
+        {
             if (mixr->debug_mode)
                 printf("Filter Q!\n");
             scaley_val = scaleybum(0, 127, 1, 10, data2);
             ms->m_settings.m_q_control = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_TWO)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
-        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE) {
+        else if (ms->m_midi_knob_mode == MIDI_KNOB_MODE_THREE)
+        {
             //    scaley_val = scaleybum(0, 127, X, X, data2);
             //    ms->X = scaley_val;
         }
@@ -637,14 +684,16 @@ void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,
     // printf("Pitch bend, babee: %d %d\n", data1, data2);
     int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
 
-    if (actual_pitch_bent_val != 8192) {
+    if (actual_pitch_bent_val != 8192)
+    {
         double normalized_pitch_bent_val =
             (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
         double scaley_val =
             // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
         // printf("Cents to bend - %f\n", scaley_val);
-        for (int i = 0; i < MAX_VOICES; i++) {
+        for (int i = 0; i < MAX_VOICES; i++)
+        {
             ms->m_voices[i]->m_voice.m_osc1->m_cents = scaley_val;
             ms->m_voices[i]->m_voice.m_osc2->m_cents = scaley_val + 2.5;
             ms->m_voices[i]->m_voice.m_osc3->m_cents = scaley_val;
@@ -653,8 +702,10 @@ void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,
                 normalized_pitch_bent_val;
         }
     }
-    else {
-        for (int i = 0; i < MAX_VOICES; i++) {
+    else
+    {
+        for (int i = 0; i < MAX_VOICES; i++)
+        {
             ms->m_voices[i]->m_voice.m_osc1->m_cents = 0;
             ms->m_voices[i]->m_voice.m_osc2->m_cents = 2.5;
             ms->m_voices[i]->m_voice.m_osc3->m_cents = 0;
@@ -684,12 +735,15 @@ int minisynth_add_melody(minisynth *ms)
 
 void minisynth_dupe_melody(midi_event **from, midi_event **to)
 {
-    for (int i = 0; i < PPNS; i++) {
-        if (to[i] != NULL) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (to[i] != NULL)
+        {
             midi_event_free(to[i]);
             to[i] = NULL;
         }
-        if (from[i] != NULL) {
+        if (from[i] != NULL)
+        {
             midi_event *ev = from[i];
             to[i] =
                 new_midi_event(ev->tick, ev->event_type, ev->data1, ev->data2);
@@ -699,30 +753,36 @@ void minisynth_dupe_melody(midi_event **from, midi_event **to)
 
 void minisynth_switch_melody(minisynth *ms, unsigned int melody_num)
 {
-    if (melody_num < (unsigned)ms->num_melodies) {
+    if (melody_num < (unsigned)ms->num_melodies)
+    {
         ms->cur_melody = melody_num;
     }
 }
 
 void minisynth_reset_melody_all(minisynth *ms)
 {
-    for (int i = 0; i < ms->num_melodies; i++) {
+    for (int i = 0; i < ms->num_melodies; i++)
+    {
         minisynth_reset_melody(ms, i);
     }
 }
 
 void minisynth_reset_voices(minisynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         minisynth_voice_reset(ms->m_voices[i]);
     }
 }
 
 void minisynth_reset_melody(minisynth *ms, unsigned int melody_num)
 {
-    if (melody_num < (unsigned)ms->num_melodies) {
-        for (int i = 0; i < PPNS; i++) {
-            if (ms->melodies[melody_num][i] != NULL) {
+    if (melody_num < (unsigned)ms->num_melodies)
+    {
+        for (int i = 0; i < PPNS; i++)
+        {
+            if (ms->melodies[melody_num][i] != NULL)
+            {
                 midi_event *tmp = ms->melodies[melody_num][i];
                 ms->melodies[melody_num][i] = NULL;
                 free(tmp);
@@ -736,12 +796,14 @@ void minisynth_melody_to_string(minisynth *ms, int melody_num,
                                 wchar_t melodystr[33])
 {
     int cur_quart = 0;
-    for (int i = 0; i < PPNS; i += PPSIXTEENTH) {
+    for (int i = 0; i < PPNS; i += PPSIXTEENTH)
+    {
         melodystr[cur_quart] = sparkchars[0];
-        for (int j = i; j < (i + PPSIXTEENTH); j++) {
+        for (int j = i; j < (i + PPSIXTEENTH); j++)
+        {
             if (ms->melodies[melody_num][j] != NULL &&
-                ms->melodies[melody_num][j]->event_type ==
-                    144) { // 144 is midi note on
+                ms->melodies[melody_num][j]->event_type == 144)
+            { // 144 is midi note on
                 melodystr[cur_quart] = sparkchars[5];
             }
         }
@@ -751,8 +813,10 @@ void minisynth_melody_to_string(minisynth *ms, int melody_num,
 
 void minisynth_increment_voice_timestamps(minisynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (ms->m_voices[i])
+        {
             if (ms->m_voices[i]->m_voice.m_note_on)
                 ms->m_voices[i]->m_voice.m_timestamp++;
         }
@@ -763,10 +827,13 @@ minisynth_voice *minisynth_get_oldest_voice(minisynth *ms)
 {
     int timestamp = -1;
     minisynth_voice *found_voice = NULL;
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (ms->m_voices[i])
+        {
             if (ms->m_voices[i]->m_voice.m_note_on &&
-                (int)ms->m_voices[i]->m_voice.m_timestamp > timestamp) {
+                (int)ms->m_voices[i]->m_voice.m_timestamp > timestamp)
+            {
                 found_voice = ms->m_voices[i];
                 timestamp = (int)ms->m_voices[i]->m_voice.m_timestamp;
             }
@@ -780,11 +847,14 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
 {
     int timestamp = -1;
     minisynth_voice *found_voice = NULL;
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (ms->m_voices[i])
+        {
             if (voice_can_note_off(&ms->m_voices[i]->m_voice) &&
                 (int)ms->m_voices[i]->m_voice.m_timestamp > timestamp &&
-                ms->m_voices[i]->m_voice.m_midi_note_number == midi_note) {
+                ms->m_voices[i]->m_voice.m_midi_note_number == midi_note)
+            {
                 found_voice = ms->m_voices[i];
                 timestamp = (int)ms->m_voices[i]->m_voice.m_timestamp;
             }
@@ -798,7 +868,8 @@ void minisynth_status(void *self, wchar_t *status_string)
 {
     minisynth *ms = (minisynth *)self;
 
-    if (mixr->debug_mode) {
+    if (mixr->debug_mode)
+    {
         minisynth_print(ms);
     }
 
@@ -837,7 +908,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_voices[0]->m_voice.m_eg3.m_sustain_override,
         ms->m_voices[0]->m_voice.m_eg4.m_sustain_override);
 
-    for (int i = 0; i < ms->num_melodies; i++) {
+    for (int i = 0; i < ms->num_melodies; i++)
+    {
         wchar_t melodystr[33] = {0};
         wchar_t scratch[128] = {0};
         minisynth_melody_to_string(ms, i, melodystr);
@@ -851,7 +923,8 @@ void minisynth_status(void *self, wchar_t *status_string)
 void minisynth_setvol(void *self, double v)
 {
     minisynth *ms = (minisynth *)self;
-    if (v < 0.0 || v > 1.0) {
+    if (v < 0.0 || v > 1.0)
+    {
         return;
     }
     ms->m_settings.m_volume_db = v;
@@ -872,29 +945,38 @@ double minisynth_gennext(void *self)
     if (!ms->active)
         return 0.0;
 
-    if (mixr->sixteenth_note_tick != ms->tick) {
+    if (mixr->sixteenth_note_tick != ms->tick)
+    {
         ms->tick = mixr->sixteenth_note_tick;
         // if (mixr->start_of_loop) {
-        if (ms->tick % 64 == 0) {
-            if (ms->generate_mode) {
-                if (ms->generate_every_n_loops > 0) {
+        if (ms->tick % 64 == 0)
+        {
+            if (ms->generate_mode)
+            {
+                if (ms->generate_every_n_loops > 0)
+                {
                     if (ms->generate_generation % ms->generate_every_n_loops ==
-                        0) {
+                        0)
+                    {
                         minisynth_set_backup_mode(ms, true);
                         minisynth_generate_melody(ms, 0, 0, 0);
                     }
-                    else {
+                    else
+                    {
                         minisynth_set_backup_mode(ms, false);
                     }
                 }
-                else if (ms->max_generation > 0) {
-                    if (ms->morph_generation >= ms->max_generation) {
+                else if (ms->max_generation > 0)
+                {
+                    if (ms->morph_generation >= ms->max_generation)
+                    {
                         ms->morph_generation = 0;
                         minisynth_set_generate_mode(ms, false);
                         minisynth_set_backup_mode(ms, false);
                     }
                 }
-                else {
+                else
+                {
                     minisynth_generate_melody(ms, 0, 0, 0);
                 }
                 ms->generate_generation++;
@@ -902,22 +984,32 @@ double minisynth_gennext(void *self)
         }
     }
 
-    if (mixr->is_midi_tick) {
+    if (mixr->is_midi_tick)
+    {
         int idx = mixr->midi_tick % PPNS;
-        // top of the MS loop, which is two bars, check if we need to progress
+        // top of the MS loop, which is two bars, check if we need to
+        // progress
         // to next loop
-        if (idx == 0) {
-            if (ms->multi_melody_mode && ms->num_melodies > 1) {
+        if (idx == 0)
+        {
+            if (ms->multi_melody_mode && ms->num_melodies > 1)
+            {
                 ms->cur_melody_iteration--;
-                if (ms->cur_melody_iteration == 0) {
+                if (ms->cur_melody_iteration == 0)
+                {
                     int next_melody = (ms->cur_melody + 1) % ms->num_melodies;
-                    if (!ms->m_settings.m_sustain_override) {
-                        for (int i = 0; i < PPNS; i++) {
-                            if (ms->melodies[ms->cur_melody][i] != NULL) {
+                    if (!ms->m_settings.m_sustain_override)
+                    {
+                        for (int i = 0; i < PPNS; i++)
+                        {
+                            if (ms->melodies[ms->cur_melody][i] != NULL)
+                            {
                                 midi_event *ev =
                                     ms->melodies[ms->cur_melody][i];
-                                // COPY all note off events
-                                if (ev->event_type == 128) {
+                                // COPY all note off
+                                // events
+                                if (ev->event_type == 128)
+                                {
                                     midi_event *tmp =
                                         new_midi_event(ev->tick, ev->event_type,
                                                        ev->data1, ev->data2);
@@ -934,7 +1026,8 @@ double minisynth_gennext(void *self)
             }
         }
 
-        if (ms->melodies[ms->cur_melody][idx] != NULL) {
+        if (ms->melodies[ms->cur_melody][idx] != NULL)
+        {
             midi_event *ev = ms->melodies[ms->cur_melody][idx];
             midi_parse_midi_event(ms, ev);
         }
@@ -942,7 +1035,8 @@ double minisynth_gennext(void *self)
 
     minisynth_update(ms);
 
-    if (ms->m_arp.active) {
+    if (ms->m_arp.active)
+    {
         arpeggiate(ms, &ms->m_arp);
     }
     double accum_out_left = 0.0;
@@ -953,8 +1047,10 @@ double minisynth_gennext(void *self)
     double out_left = 0.0;
     double out_right = 0.0;
 
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (ms->m_voices[i])
+        {
             minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
         }
         accum_out_left += mix * out_left;
@@ -981,7 +1077,8 @@ midi_event **minisynth_get_midi_loop(minisynth *self)
 int minisynth_add_event(minisynth *ms, int melody_num, midi_event *ev)
 {
     int tick = ev->tick;
-    while (ms->melodies[melody_num][tick] != NULL) {
+    while (ms->melodies[melody_num][tick] != NULL)
+    {
         if (mixr->debug_mode)
             printf("Gotsz a tick already - bump!\n");
         tick++;
@@ -995,10 +1092,13 @@ int minisynth_add_event(minisynth *ms, int melody_num, midi_event *ev)
 
 void minisynth_clear_melody_ready_for_new_one(minisynth *ms, int melody_num)
 {
-    for (int i = 0; i < PPNS; i++) {
-        if (ms->melodies[melody_num][i] != NULL) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (ms->melodies[melody_num][i] != NULL)
+        {
             midi_event *ev = ms->melodies[melody_num][i];
-            if (ev->event_type == 144) {
+            if (ev->event_type == 144)
+            {
                 free(ms->melodies[melody_num][i]);
                 ms->melodies[melody_num][i] = NULL;
             }
@@ -1008,15 +1108,18 @@ void minisynth_clear_melody_ready_for_new_one(minisynth *ms, int melody_num)
 
 midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
 {
-    if (melody_num >= self->num_melodies) {
+    if (melody_num >= self->num_melodies)
+    {
         printf("Dingjie!\n");
         return NULL;
     }
     // midi_event_loop defined in midimaaan.h
     midi_event **new_midi_events_loop =
         (midi_event **)calloc(PPNS, sizeof(midi_event *));
-    for (int i = 0; i < PPNS; i++) {
-        if (self->melodies[melody_num][i] != NULL) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (self->melodies[melody_num][i] != NULL)
+        {
             midi_event *ev = self->melodies[melody_num][i];
             new_midi_events_loop[i] =
                 new_midi_event(ev->tick, ev->event_type, ev->data1, ev->data2);
@@ -1028,11 +1131,13 @@ midi_event **minisynth_copy_midi_loop(minisynth *self, int melody_num)
 
 void minisynth_add_midi_loop(minisynth *ms, midi_event **events, int melody_num)
 {
-    if (melody_num >= MAX_NUM_MIDI_LOOPS) {
+    if (melody_num >= MAX_NUM_MIDI_LOOPS)
+    {
         printf("Dingjie!\n");
         return;
     }
-    for (int i = 0; i < PPNS; i++) {
+    for (int i = 0; i < PPNS; i++)
+    {
         if (events[i] != NULL)
             ms->melodies[melody_num][i] = events[i];
     }
@@ -1045,12 +1150,15 @@ void minisynth_add_midi_loop(minisynth *ms, midi_event **events, int melody_num)
 void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
                                  int melody_num)
 {
-    if (melody_num >= MAX_NUM_MIDI_LOOPS) {
+    if (melody_num >= MAX_NUM_MIDI_LOOPS)
+    {
         printf("Dingjie!\n");
         return;
     }
-    for (int i = 0; i < PPNS; i++) {
-        if (ms->melodies[melody_num][i] != NULL) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (ms->melodies[melody_num][i] != NULL)
+        {
             free(ms->melodies[melody_num][i]);
             ms->melodies[melody_num][i] = NULL;
         }
@@ -1069,7 +1177,8 @@ void minisynth_toggle_delay_mode(minisynth *ms)
 
 void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth)
 {
-    if (sixteenth >= 16) {
+    if (sixteenth >= 16)
+    {
         printf("Nah, mate, nudge needs to be less than 16\n");
         return;
     }
@@ -1079,8 +1188,10 @@ void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth)
     midi_event **new_midi_events_loop =
         (midi_event **)calloc(PPNS, sizeof(midi_event *));
 
-    for (int i = 0; i < PPNS; i++) {
-        if (orig_loop[i] != NULL) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (orig_loop[i] != NULL)
+        {
             midi_event *ev = orig_loop[i];
             int new_tick = (ev->tick + (sixteenth * sixteenth_of_loop)) % PPNS;
             printf("Old tick: %d with new: %d\n", ev->tick, new_tick);
@@ -1094,7 +1205,8 @@ void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth)
 
 bool is_valid_melody_num(minisynth *ms, int melody_num)
 {
-    if (melody_num < ms->num_melodies) {
+    if (melody_num < ms->num_melodies)
+    {
         return true;
     }
     return false;
@@ -1108,7 +1220,8 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
     if (mixr->debug_mode)
         print_midi_event(note);
 
-    if (update_last_midi) {
+    if (update_last_midi)
+    {
         ms->m_last_midi_note = note;
     }
     minisynth_midi_note_on(ms, note, velocity);
@@ -1121,7 +1234,8 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
     midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
 
-    if (ms->recording) {
+    if (ms->recording)
+    {
         printf("Recording note!\n");
         int note_on_tick = mixr->midi_tick % PPNS;
         midi_event *on_event =
@@ -1133,7 +1247,8 @@ void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
 
         minisynth_add_event(ms, ms->cur_melody, on_event);
     }
-    else {
+    else
+    {
         off_event->delete_after_use = true; // _THIS_ is the magic
         minisynth_add_event(ms, ms->cur_melody, off_event);
     }
@@ -1221,7 +1336,8 @@ void minisynth_rand_settings(minisynth *ms)
 
 bool minisynth_save_settings(minisynth *ms, char *preset_name)
 {
-    if (strlen(preset_name) == 0) {
+    if (strlen(preset_name) == 0)
+    {
         printf("Play tha game, pal, need a name to save yer synth settings "
                "with\n");
         return false;
@@ -1320,7 +1436,8 @@ bool minisynth_list_presets()
 
     char line[256];
 
-    while (fgets(line, sizeof(line), presetzzz)) {
+    while (fgets(line, sizeof(line), presetzzz))
+    {
         printf("%s", line);
     }
 
@@ -1337,7 +1454,8 @@ bool minisynth_check_if_preset_exists(char *preset_to_find)
     char const *sep = "::";
     char *preset_name, *last_s;
 
-    while (fgets(line, sizeof(line), presetzzz)) {
+    while (fgets(line, sizeof(line), presetzzz))
+    {
         preset_name = strtok_r(line, sep, &last_s);
         if (strncmp(preset_to_find, preset_name, 255) == 0)
             return true;
@@ -1348,7 +1466,8 @@ bool minisynth_check_if_preset_exists(char *preset_to_find)
 }
 bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
 {
-    if (strlen(preset_to_load) == 0) {
+    if (strlen(preset_to_load) == 0)
+    {
         printf("Play tha game, pal, need a name to LOAD yer synth settings "
                "with\n");
         return false;
@@ -1360,10 +1479,12 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
     char const *sep = "::";
     char *preset_name, *last_s;
 
-    while (fgets(line, sizeof(line), presetzzz)) {
+    while (fgets(line, sizeof(line), presetzzz))
+    {
         strcpy(chompyline, line);
         preset_name = strtok_r(line, sep, &last_s);
-        if (strncmp(preset_to_load, preset_name, 255) == 0) {
+        if (strncmp(preset_to_load, preset_name, 255) == 0)
+        {
             printf("Found yer PRESET!\n");
             int matches = sscanf(
                 chompyline,
@@ -1595,7 +1716,7 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_delay_wet_mix);
 
     printf(ANSI_COLOR_RESET);
-    //print_modulation_matrix(&ms->m_ms_modmatrix);
+    // print_modulation_matrix(&ms->m_ms_modmatrix);
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
@@ -1635,7 +1756,8 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
 {
     printf("Importing MIDI from %s\n", filename);
     FILE *fp = fopen(filename, "r");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         printf("Couldn't open yer file!\n");
         return;
     }
@@ -1644,7 +1766,8 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
     char const *sep = "::";
     minisynth_morph(ms);
     char line[256];
-    while (fgets(line, sizeof(line), fp)) {
+    while (fgets(line, sizeof(line), fp))
+    {
         printf("%s", line);
         int count = 0;
         int tick = 0;
@@ -1652,11 +1775,14 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
         int midi_note = 0;
         int midi_vel = 0;
         for (item = strtok_r(line, sep, &last_s); item;
-             item = strtok_r(NULL, sep, &last_s)) {
-            switch (count) {
+             item = strtok_r(NULL, sep, &last_s))
+        {
+            switch (count)
+            {
             case 0:
                 tick = atoi(item);
-                if (tick >= PPNS) {
+                if (tick >= PPNS)
+                {
                     printf("TICK OVER!: %d\n", tick);
                     minisynth_add_melody(ms);
                     // tick = tick % PPNS;
@@ -1675,7 +1801,8 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
             count++;
             printf("ITEM! %s\n", item);
         }
-        if (count == 4) {
+        if (count == 4)
+        {
             printf("GOtzz %d %d %d %d %d\n", count, tick, status, midi_note,
                    midi_vel);
             midi_event *ev = new_midi_event(tick, status, midi_note, midi_vel);
@@ -1689,19 +1816,24 @@ void minisynth_import_midi_from_file(minisynth *ms, char *filename)
 
 void minisynth_set_filter_mod(minisynth *ms, double mod)
 {
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         minisynth_voice_set_filter_mod(ms->m_voices[i], mod);
     }
 }
 
 void minisynth_del_self(minisynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         minisynth_voice_free_self(ms->m_voices[i]);
     }
-    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++) {
-        for (int j = 0; j < PPNS; j++) {
-            if (ms->melodies[i][j] != NULL) {
+    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
+    {
+        for (int j = 0; j < PPNS; j++)
+        {
+            if (ms->melodies[i][j] != NULL)
+            {
                 midi_event_free(ms->melodies[i][j]);
                 ms->melodies[i][j] = NULL;
             }
@@ -1725,14 +1857,16 @@ void minisynth_set_generate_mode(minisynth *ms, bool b)
 
 void minisynth_set_backup_mode(minisynth *ms, bool b)
 {
-    if (b) {
+    if (b)
+    {
         minisynth_dupe_melody(ms->melodies[0],
                               ms->backup_melody_while_getting_crazy);
         ms->m_settings_backup_while_getting_crazy = ms->m_settings;
         ms->multi_melody_mode = false;
         ms->cur_melody = 0;
     }
-    else {
+    else
+    {
         minisynth_dupe_melody(ms->backup_melody_while_getting_crazy,
                               ms->melodies[0]);
         ms->m_settings = ms->m_settings_backup_while_getting_crazy;
@@ -1744,13 +1878,15 @@ void minisynth_morph(minisynth *ms)
 {
     int midinotes_seen[10] = {0};
     int midinotes_seen_idx = 0;
-    for (int i = 0; i < PPNS; i++) {
+    for (int i = 0; i < PPNS; i++)
+    {
 
         midi_event *e = ms->melodies[0][i];
 
         if (e != NULL &&
             !is_int_member_in_array(e->data1, midinotes_seen, 10) &&
-            midinotes_seen_idx < 10) {
+            midinotes_seen_idx < 10)
+        {
             midinotes_seen[midinotes_seen_idx++] = e->data1;
         }
 
@@ -1761,24 +1897,30 @@ void minisynth_morph(minisynth *ms)
 
         int num_notes = minisynth_get_num_notes(ms);
 
-        if (e != NULL && e->event_type == 144) {
-            // printf("KEY! %d - %d %d %d\n", i, e->event_type, e->data1,
+        if (e != NULL && e->event_type == 144)
+        {
+            // printf("KEY! %d - %d %d %d\n", i, e->event_type,
+            // e->data1,
             //       e->data2);
 
             int randy = rand() % 4;
             int j = 0;
             int new_note_num = 0;
-            switch (randy) {
+            switch (randy)
+            {
             case 0:
-                if (num_notes > 3) {
+                if (num_notes > 3)
+                {
                     // printf("Removing note\n");
                     minisynth_rm_micro_note(ms, 0, i);
                 }
                 break;
             case 1:
-                if (num_notes < 15) {
+                if (num_notes < 15)
+                {
                     // printf("Duping note\n");
-                    for (j = 1; j < rand_num; j++) {
+                    for (j = 1; j < rand_num; j++)
+                    {
                         int next_note =
                             (i + rand_num2 * PPSIXTEENTH * j) % PPNS;
                         minisynth_add_micro_note(ms, 0, next_note, e->data1);
@@ -1796,7 +1938,8 @@ void minisynth_morph(minisynth *ms)
                 else
                     new_note_num = e->data1 - 5;
 
-                if (new_note_num > 0) {
+                if (new_note_num > 0)
+                {
                     minisynth_rm_micro_note(ms, 0, i);
                     minisynth_add_micro_note(ms, 0, i, new_note_num);
                 }
@@ -1813,7 +1956,8 @@ void minisynth_morph(minisynth *ms)
 
 void minisynth_stop(minisynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
         voice_reset(&ms->m_voices[i]->m_voice);
     }
 }
@@ -1821,8 +1965,10 @@ void minisynth_stop(minisynth *ms)
 int minisynth_get_num_notes(minisynth *ms)
 {
     int notecount = 0;
-    for (int i = 0; i < ms->num_melodies; i++) {
-        for (int j = 0; j < PPNS; j++) {
+    for (int i = 0; i < ms->num_melodies; i++)
+    {
+        for (int j = 0; j < PPNS; j++)
+        {
             midi_event *e = ms->melodies[i][j];
             if (e != NULL && e->event_type == 144)
                 notecount++;
@@ -1835,11 +1981,15 @@ int minisynth_get_notes_from_melody(midi_event **melody,
                                     int return_midi_notes[10])
 {
     int idx = 0;
-    for (int i = 0; i < PPNS; i++) {
-        if (melody[i] != NULL) {
+    for (int i = 0; i < PPNS; i++)
+    {
+        if (melody[i] != NULL)
+        {
             midi_event *e = melody[i];
-            if (e->event_type == 144) { // note on
-                if (!is_int_member_in_array(e->data1, return_midi_notes, 10)) {
+            if (e->event_type == 144)
+            { // note on
+                if (!is_int_member_in_array(e->data1, return_midi_notes, 10))
+                {
                     return_midi_notes[idx++] = e->data1;
                     if (idx == 10)
                         return idx;
@@ -1879,7 +2029,8 @@ void minisynth_make_active_track(void *self, int pattern_num)
 
 void minisynth_print_melodies(minisynth *ms)
 {
-    for (int i = 0; i < ms->num_melodies; i++) {
+    for (int i = 0; i < ms->num_melodies; i++)
+    {
         printf("Pattern Num %d\n", i);
         midi_event **melody = ms->melodies[i];
         midi_melody_print(melody);
@@ -1901,7 +2052,8 @@ void minisynth_add_note(minisynth *ms, int pattern_num, int step, int midi_note)
 void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep,
                               int midi_note)
 {
-    if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS) {
+    if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS)
+    {
         // printf("New Notes!! %d - %d\n", mstep, midi_note);
         midi_event *on = new_midi_event(mstep, 144, midi_note, 128);
         // int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
@@ -1915,7 +2067,8 @@ void minisynth_add_micro_note(minisynth *ms, int pattern_num, int mstep,
         on->tick_off = final_note_off_tick;
         minisynth_add_event(ms, pattern_num, on);
     }
-    else {
+    else
+    {
         printf("Adding MICRO note - not valid melody-num(%d) || step no "
                "good(%d)\n",
                pattern_num, mstep);
@@ -1930,8 +2083,10 @@ void minisynth_rm_note(minisynth *ms, int pattern_num, int step)
 
 void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
 {
-    if (is_valid_melody_num(ms, pat_num) && tick < PPNS) {
-        if (ms->melodies[pat_num][tick] != NULL) {
+    if (is_valid_melody_num(ms, pat_num) && tick < PPNS)
+    {
+        if (ms->melodies[pat_num][tick] != NULL)
+        {
             midi_event *ev = ms->melodies[ms->cur_melody][tick];
             minisynth_midi_note_off(ms, ev->data1, ev->data2, false);
             ms->melodies[ms->cur_melody][tick] = NULL;
@@ -1941,12 +2096,14 @@ void minisynth_rm_micro_note(minisynth *ms, int pat_num, int tick)
             if (tick_off)
                 minisynth_rm_micro_note(ms, pat_num, tick_off);
         }
-        else {
+        else
+        {
             if (mixr->debug_mode)
                 printf("Not a valid midi event at tick: %d\n", tick);
         }
     }
-    else {
+    else
+    {
         printf("Not a valid pattern num: %d \n", pat_num);
     }
 }
@@ -1961,18 +2118,21 @@ void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep, int tostep)
 void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
                              int tostep)
 {
-    if (is_valid_melody_num(ms, pattern_num)) {
-        if (ms->melodies[pattern_num][fromstep] != NULL) {
+    if (is_valid_melody_num(ms, pattern_num))
+    {
+        if (ms->melodies[pattern_num][fromstep] != NULL)
+        {
             minisynth_rm_micro_note(ms, pattern_num, tostep);
             ms->melodies[pattern_num][tostep] =
                 ms->melodies[pattern_num][fromstep];
             ms->melodies[pattern_num][fromstep] = NULL;
         }
-        else {
-            printf(
-                "Woof, cannae move micro note - either fromstep(%d) is NULL or "
-                "tostep(%d) is not less than %d\n",
-                fromstep, tostep, PPNS);
+        else
+        {
+            printf("Woof, cannae move micro note - either fromstep(%d) "
+                   "is NULL or "
+                   "tostep(%d) is not less than %d\n",
+                   fromstep, tostep, PPNS);
         }
     }
 }
@@ -2123,7 +2283,8 @@ void minisynth_set_keytrack_int(minisynth *ms, double val)
 
 void minisynth_set_keytrack(minisynth *ms, unsigned int val)
 {
-    if (val != 0 && val != 1) {
+    if (val != 0 && val != 1)
+    {
         printf("Val must be zero or one\n");
         return;
     }
@@ -2132,7 +2293,8 @@ void minisynth_set_keytrack(minisynth *ms, unsigned int val)
 
 void minisynth_set_legato_mode(minisynth *ms, unsigned int val)
 {
-    if (val != 0 && val != 1) {
+    if (val != 0 && val != 1)
+    {
         printf("Val must be zero or one\n");
         return;
     }
@@ -2141,8 +2303,10 @@ void minisynth_set_legato_mode(minisynth *ms, unsigned int val)
 
 void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val)
 {
-    if (val >= 0 && val <= 1) {
-        switch (lfo_num) {
+    if (val >= 0 && val <= 1)
+    {
+        switch (lfo_num)
+        {
         case (1):
             ms->m_settings.m_lfo1_amp_intensity = val;
         case (2):
@@ -2155,8 +2319,10 @@ void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val)
 
 void minisynth_set_lfo_amp(minisynth *ms, int lfo_num, double val)
 {
-    if (val >= 0 && val <= 1) {
-        switch (lfo_num) {
+    if (val >= 0 && val <= 1)
+    {
+        switch (lfo_num)
+        {
         case (1):
             ms->m_settings.m_lfo1_amplitude = val;
         case (2):
@@ -2169,8 +2335,10 @@ void minisynth_set_lfo_amp(minisynth *ms, int lfo_num, double val)
 
 void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val)
 {
-    if (val >= -1 && val <= 1) {
-        switch (lfo_num) {
+    if (val >= -1 && val <= 1)
+    {
+        switch (lfo_num)
+        {
         case (1):
             ms->m_settings.m_lfo1_filter_fc_intensity = val;
         case (2):
@@ -2183,8 +2351,10 @@ void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val)
 
 void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val)
 {
-    if (val >= 0.02 && val <= 20) {
-        switch (lfo_num) {
+    if (val >= 0.02 && val <= 20)
+    {
+        switch (lfo_num)
+        {
         case (1):
             ms->m_settings.m_lfo1_rate = val;
         case (2):
@@ -2197,8 +2367,10 @@ void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val)
 
 void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val)
 {
-    if (val >= 0 && val <= 1) {
-        switch (lfo_num) {
+    if (val >= 0 && val <= 1)
+    {
+        switch (lfo_num)
+        {
         case (1):
             ms->m_settings.m_lfo1_pan_intensity = val;
         case (2):
@@ -2211,8 +2383,10 @@ void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val)
 
 void minisynth_set_lfo_pitch(minisynth *ms, int lfo_num, double val)
 {
-    if (val >= -1 && val <= 1) {
-        switch (lfo_num) {
+    if (val >= -1 && val <= 1)
+    {
+        switch (lfo_num)
+        {
         case (1):
             ms->m_settings.m_lfo1_osc_pitch_intensity = val;
         case (2):
@@ -2225,8 +2399,10 @@ void minisynth_set_lfo_pitch(minisynth *ms, int lfo_num, double val)
 
 void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val)
 {
-    if (val < MAX_LFO_OSC) {
-        switch (lfo_num) {
+    if (val < MAX_LFO_OSC)
+    {
+        switch (lfo_num)
+        {
         case (1):
             ms->m_settings.m_lfo1_waveform = val;
         case (2):
@@ -2239,7 +2415,8 @@ void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val)
 
 void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val)
 {
-    if (val != 0 && val != 1) {
+    if (val != 0 && val != 1)
+    {
         printf("Val must be zero or one\n");
         return;
     }
@@ -2307,8 +2484,10 @@ void minisynth_set_sustain_override(minisynth *ms, bool b)
 {
     ms->m_settings.m_sustain_override = b;
 
-    for (int i = 0; i < MAX_VOICES; i++) {
-        if (ms->m_voices[i]) {
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (ms->m_voices[i])
+        {
             voice_set_sustain_override(&ms->m_voices[i]->m_voice, b);
         }
     }
@@ -2316,7 +2495,8 @@ void minisynth_set_sustain_override(minisynth *ms, bool b)
 
 void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val)
 {
-    if (val != 0 && val != 1) {
+    if (val != 0 && val != 1)
+    {
         printf("Val must be zero or one\n");
         return;
     }
@@ -2341,7 +2521,8 @@ void minisynth_set_vol(minisynth *ms, double val)
 
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
 {
-    if (val != 0 && val != 1) {
+    if (val != 0 && val != 1)
+    {
         printf("Val must be zero or one\n");
         return;
     }

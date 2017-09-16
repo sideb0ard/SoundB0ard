@@ -1,7 +1,8 @@
 #pragma once
 #include <stdbool.h>
 
-typedef struct delayline {
+typedef struct delayline
+{
     double *m_buffer;
     double m_delay_ms;
     double m_delay_in_samples;

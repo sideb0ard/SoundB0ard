@@ -34,7 +34,8 @@ looper *new_looper(char *filename, double loop_len)
     l->sound_generator.make_active_track = &looper_make_active_track;
     l->sound_generator.type = LOOPER_TYPE;
 
-    for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++) {
+    for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++)
+    {
         l->sample_num_loops[i] = 1;
     }
 
@@ -51,60 +52,77 @@ double looper_gennext(void *self)
         return val;
 
     // wait till start of loop to keep patterns synched
-    if (!l->started) {
-        if (mixr->start_of_loop) {
+    if (!l->started)
+    {
+        if (mixr->start_of_loop)
+        {
             printf("Starting now! 16th tick is %d\n",
                    mixr->sixteenth_note_tick % 16);
             l->started = true;
         }
-        else {
+        else
+        {
             return val;
         }
     }
 
-    if (mixr->start_of_loop && l->resample_pending) {
+    if (mixr->start_of_loop && l->resample_pending)
+    {
         looper_resample_to_loop_size(l);
     }
 
-    if (mixr->start_of_loop && l->change_loopsize_pending) {
+    if (mixr->start_of_loop && l->change_loopsize_pending)
+    {
         printf("PENDING LOOPSIZE FOUND! %d loops for loop num: %d\n",
                l->pending_loop_size, l->pending_loop_num);
         looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
         l->change_loopsize_pending = false;
     }
 
-    if (mixr->start_of_loop) {
-        if (l->stutter_mode) {
-            if (l->stutter_every_n_loops > 0) {
-                if (l->stutter_generation % l->stutter_every_n_loops == 0) {
+    if (mixr->start_of_loop)
+    {
+        if (l->stutter_mode)
+        {
+            if (l->stutter_every_n_loops > 0)
+            {
+                if (l->stutter_generation % l->stutter_every_n_loops == 0)
+                {
                     l->stutter_active = true;
                 }
-                else {
+                else
+                {
                     l->stutter_active = false;
                 }
             }
-            else if (l->max_generation > 0) {
-                if (l->stutter_generation >= l->max_generation) {
+            else if (l->max_generation > 0)
+            {
+                if (l->stutter_generation >= l->max_generation)
+                {
                     looper_set_stutter_mode(l, false);
                 }
             }
             l->stutter_generation++;
         }
 
-        if (l->scramblrrr_mode) {
-            if (l->scramble_every_n_loops > 0) {
+        if (l->scramblrrr_mode)
+        {
+            if (l->scramble_every_n_loops > 0)
+            {
                 if (l->scramble_generation % l->scramble_every_n_loops == 0)
                     l->scramblrrr_active = true;
                 else
                     l->scramblrrr_active = false;
             }
-            else if (l->max_generation > 0) {
-                if (l->scramble_generation >= l->max_generation) {
+            else if (l->max_generation > 0)
+            {
+                if (l->scramble_generation >= l->max_generation)
+                {
                     looper_set_scramble_mode(l, false);
                 }
             }
 
-            if (l->scramblrrr_active) {
+            if (l->scramblrrr_active)
+            {
                 looper_scramble(l);
             }
 
@@ -112,17 +130,21 @@ double looper_gennext(void *self)
         }
     }
 
-    if (l->stutter_active) {
-        if (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0) {
+    if (l->stutter_active)
+    {
+        if (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0)
+        {
             if (mixr->debug_mode)
                 printf("Stutututututter! Current: %d\n",
                        l->stutter_current_16th);
 
-            if (rand() % 100 > 60) {
+            if (rand() % 100 > 60)
+            {
                 if (mixr->debug_mode)
                     printf("Advancing stutter 16th..\n");
                 l->stutter_current_16th++;
-                if (l->stutter_current_16th == 16) {
+                if (l->stutter_current_16th == 16)
+                {
                     l->stutter_current_16th = 0;
                 }
             }
@@ -130,45 +152,54 @@ double looper_gennext(void *self)
     }
 
     // resync after a resample/resize
-    if (l->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0) {
+    if (l->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0)
+    {
         printf("Resyncing after resample...zzzz\n");
         l->samples[l->cur_sample]->position = 0;
         l->scramblrrr->position = 0;
         l->just_been_resampled = false;
     }
 
-    if (l->samples[l->cur_sample]->position == 0) {
+    if (l->samples[l->cur_sample]->position == 0)
+    {
 
-        if (l->multi_sample_mode) {
+        if (l->multi_sample_mode)
+        {
             l->cur_sample_iteration--;
-            if (l->cur_sample_iteration == 0) {
+            if (l->cur_sample_iteration == 0)
+            {
                 l->cur_sample = (l->cur_sample + 1) % l->num_samples;
                 l->cur_sample_iteration = l->sample_num_loops[l->cur_sample];
             }
         }
     }
 
-    if (l->stutter_active) {
+    if (l->stutter_active)
+    {
         int len16th = l->scramblrrr->resampled_file_size / 16;
         int stutidx = (l->samples[l->cur_sample]->position % len16th) +
                       l->stutter_current_16th * len16th;
         val = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
     }
-    else if (l->scramblrrr_active) {
+    else if (l->scramblrrr_active)
+    {
         val = l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
     }
-    else {
+    else
+    {
         val = l->samples[l->cur_sample]
                   ->resampled_file_bytes[l->samples[l->cur_sample]->position];
     }
 
-    if (l->scramblrrr->position == l->scramblrrr->resampled_file_size) {
+    if (l->scramblrrr->position == l->scramblrrr->resampled_file_size)
+    {
         l->scramblrrr->position = 0;
     }
 
     l->samples[l->cur_sample]->position++;
     if (l->samples[l->cur_sample]->position ==
-        l->samples[l->cur_sample]->resampled_file_size) {
+        l->samples[l->cur_sample]->resampled_file_size)
+    {
         l->samples[l->cur_sample]->position = 0;
     }
 
@@ -185,7 +216,8 @@ void looper_add_sample(looper *s, char *filename, int loop_len)
 {
     printf("looper!, adding a new SAMPLE!\n");
 
-    if (s->num_samples > MAX_SAMPLES_PER_LOOPER) {
+    if (s->num_samples > MAX_SAMPLES_PER_LOOPER)
+    {
         printf("Already have max num samples\n");
         return;
     }
@@ -202,7 +234,8 @@ file_sample *looper_create_sample(char *filename, int loop_len)
     fs->position = 0;
     fs->loop_len = loop_len;
 
-    if (strncmp(filename, "none", 4) != 0) {
+    if (strncmp(filename, "none", 4) != 0)
+    {
         sample_import_file_contents(fs, filename);
     }
     sample_resample_to_loop_size(fs);
@@ -234,7 +267,8 @@ void sample_import_file_contents(file_sample *fs, char *filename)
 
     sf_info.format = 0;
     snd_file = sf_open(full_filename, SFM_READ, &sf_info);
-    if (!snd_file) {
+    if (!snd_file)
+    {
         printf("Err opening %s : %d\n", full_filename, sf_error(snd_file));
         return;
     }
@@ -243,7 +277,8 @@ void sample_import_file_contents(file_sample *fs, char *filename)
     printf("Making buffer size of %d\n", bufsize);
 
     int *buffer = (int *)calloc(bufsize, sizeof(int));
-    if (buffer == NULL) {
+    if (buffer == NULL)
+    {
         perror("Ooft, memory issues, mate!\n");
         sf_close(snd_file);
         return;
@@ -261,7 +296,8 @@ void sample_import_file_contents(file_sample *fs, char *filename)
 
 void looper_resample_to_loop_size(looper *l)
 {
-    for (int i = 0; i < l->num_samples; i++) {
+    for (int i = 0; i < l->num_samples; i++)
+    {
         sample_resample_to_loop_size(l->samples[i]);
     }
     sample_resample_to_loop_size(l->scramblrrr);
@@ -272,7 +308,8 @@ void looper_change_loop_len(looper *l, int sample_num, int loop_len)
 {
     printf("LOOP CHANGE CALLED! sampleNUm: %d and looplen: %d\n", sample_num,
            loop_len);
-    if (loop_len > 0 && sample_num < l->num_samples) {
+    if (loop_len > 0 && sample_num < l->num_samples)
+    {
         file_sample *fs = l->samples[sample_num];
 
         fs->loop_len = loop_len;
@@ -295,18 +332,21 @@ void sample_resample_to_loop_size(file_sample *fs)
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
-    if (resampled_file_bytes == NULL) {
+    if (resampled_file_bytes == NULL)
+    {
         printf("Memory barf in looper resample\n");
         return;
     }
 
-    if (strncmp("none", fs->filename, 4) != 0) {
+    if (strncmp("none", fs->filename, 4) != 0)
+    {
         int *table = fs->orig_file_bytes;
         double bufsize = fs->orig_file_size;
 
         double position = 0;
         double incr = (double)fs->orig_file_size / loop_len_in_samples;
-        for (int i = 0; i < loop_len_in_samples; i++) {
+        for (int i = 0; i < loop_len_in_samples; i++)
+        {
             int base_index = (int)position;
             unsigned long next_index = base_index + 1;
             double frac, slope, val;
@@ -318,8 +358,10 @@ void sample_resample_to_loop_size(file_sample *fs)
             val += (frac * slope);
             position += incr;
 
-            if (position >= bufsize) {
-                printf("POSITION: %f // BUFSIZR: %f My job here is done\n",
+            if (position >= bufsize)
+            {
+                printf("POSITION: %f // BUFSIZR: %f My job here is "
+                       "done\n",
                        position, bufsize);
                 break;
             }
@@ -330,7 +372,8 @@ void sample_resample_to_loop_size(file_sample *fs)
 
         bool is_previous_buffer =
             fs->resampled_file_bytes != NULL ? true : false;
-        if (is_previous_buffer) {
+        if (is_previous_buffer)
+        {
             double *oldbuf = fs->resampled_file_bytes;
             int old_relative_position =
                 (100 / fs->resampled_file_size) * fs->position;
@@ -362,7 +405,8 @@ void looper_status(void *self, wchar_t *status_string)
 
     int strlen_left = MAX_PS_STRING_SZ - wcslen(status_string);
     wchar_t looper_details[strlen_left];
-    for (int i = 0; i < l->num_samples; i++) {
+    for (int i = 0; i < l->num_samples; i++)
+    {
         swprintf(looper_details, 128,
                  L"\n      [" WANSI_COLOR_WHITE "%d" WCOOL_COLOR_GREEN "]"
                  " %s - looplen: %d numloops: %d",
@@ -412,7 +456,8 @@ double looper_getvol(void *self)
 void looper_setvol(void *self, double v)
 {
     looper *l = (looper *)self;
-    if (v < 0.0 || v > 1.0) {
+    if (v < 0.0 || v > 1.0)
+    {
         return;
     }
     l->vol = v;
@@ -420,7 +465,8 @@ void looper_setvol(void *self, double v)
 
 void looper_change_num_loops(looper *s, int sample_num, int num_loops)
 {
-    if (sample_num < s->num_samples && num_loops > 0) {
+    if (sample_num < s->num_samples && num_loops > 0)
+    {
         s->sample_num_loops[sample_num] = num_loops;
     }
 }
@@ -431,7 +477,8 @@ void looper_set_scramble_mode(looper *s, bool b)
     s->scramblrrr_mode = b;
     s->scramble_counter = 0;
     s->scramble_generation = 0;
-    if (s->scramblrrr_mode == true) {
+    if (s->scramblrrr_mode == true)
+    {
         int len = s->samples[s->cur_sample]->resampled_file_size;
         for (int i = 0; i < len; i++)
             s->scramblrrr->resampled_file_bytes[i] =
@@ -470,7 +517,8 @@ void looper_scramble(looper *s)
     double fourth16th[len16th];
     double seventh16th[len16th];
 
-    for (int i = 0; i < len16th; i++) {
+    for (int i = 0; i < len16th; i++)
+    {
         first16th[i] = scrambled[i];
         rev16th[(len16th - 1) - i] = scrambled[i];
         third16th[i] = scrambled[i + len16th * 3];
@@ -490,8 +538,8 @@ void looper_scramble(looper *s)
     int PCT_CHANCE_SILENCE_LAST_QUARTER = 0;
     int PCT_CHANCE_16TH = 0;
 
-    if (s->scramble_every_n_loops >
-        0) { // this is more punchy and extreme as it happens only once every n
+    if (s->scramble_every_n_loops > 0)
+    { // this is more punchy and extreme as it happens only once every n
         should_run = true;
         PCT_CHANCE_YOLO = 45;
         PCT_CHANCE_REV = 25;
@@ -499,8 +547,8 @@ void looper_scramble(looper *s)
         PCT_CHANCE_SILENCE_LAST_QUARTER = 1;
         PCT_CHANCE_16TH = 7;
     }
-    else if (mixr->cur_sample % (s->scramblrrr->resampled_file_size * 4) ==
-             0) { // this is the evolver
+    else if (mixr->cur_sample % (s->scramblrrr->resampled_file_size * 4) == 0)
+    { // this is the evolver
         should_run = true;
         PCT_CHANCE_YOLO = 25;
         PCT_CHANCE_REV = 25;
@@ -509,20 +557,25 @@ void looper_scramble(looper *s)
         PCT_CHANCE_16TH = 7;
     }
 
-    if (should_run) {
+    if (should_run)
+    {
         bool we_third16th = false;
         bool we_fourth16th = false;
         bool we_seventh16th = false;
 
-        for (int i = 0; i < len; i++) {
+        for (int i = 0; i < len; i++)
+        {
 
-            if (i % len16th == 0) {
+            if (i % len16th == 0)
+            {
                 s->scramble_counter++;
-                if (yolo || reverse) {
+                if (yolo || reverse)
+                {
                     yolo = false;
                     reverse = false;
                 }
-                else {
+                else
+                {
                     if (rand() % 100 < PCT_CHANCE_YOLO)
                         yolo = true;
                     else if (rand() % 100 < PCT_CHANCE_REV)
@@ -540,18 +593,22 @@ void looper_scramble(looper *s)
                     we_seventh16th = true;
             }
 
-            if (yolo) {
+            if (yolo)
+            {
                 scrambled[i] = first16th[i % len16th];
             }
-            else if (reverse) {
+            else if (reverse)
+            {
                 scrambled[i] = rev16th[i % len16th];
             }
-            else {
+            else
+            {
                 if (s->scramble_counter % 2 == 0)
                     // s->scramblrrr->resampled_file_bytes[i] =
                     scrambled[i] =
                         s->samples[s->cur_sample]->resampled_file_bytes[i];
-                else {
+                else
+                {
                     if (we_third16th)
                         scrambled[(i + len16th * 2) % len] =
                             third16th[i % len16th];
@@ -572,14 +629,16 @@ void looper_scramble(looper *s)
             rand() % 100 < PCT_CHANCE_COPY_FIRST_HALF ? true : false;
         silence_last_quarter = rand() % 100 < PCT_CHANCE_YOLO ? true : false;
 
-        if (copy_first_half) {
+        if (copy_first_half)
+        {
             int halflen = len / 2;
             for (int i = 0; i < halflen; i++)
                 scrambled[i + halflen] =
                     s->samples[s->cur_sample]->resampled_file_bytes[i];
         }
 
-        if (silence_last_quarter) {
+        if (silence_last_quarter)
+        {
             int quartlen = len / 4;
             for (int i = quartlen * 3; i < len; i++)
                 scrambled[i] = 0;
@@ -590,7 +649,8 @@ void looper_scramble(looper *s)
         printf("Looper: Max Gen: %d // Current Gen: %d\n", s->max_generation,
                s->scramble_generation);
 
-    if (s->max_generation > 0 && s->scramble_generation >= s->max_generation) {
+    if (s->max_generation > 0 && s->scramble_generation >= s->max_generation)
+    {
         printf("Max GEn! We outta here... peace\n");
         looper_set_scramble_mode(s, false);
     }
@@ -598,7 +658,8 @@ void looper_scramble(looper *s)
 
 void looper_del_self(looper *s)
 {
-    for (int i = 0; i < s->num_samples; i++) {
+    for (int i = 0; i < s->num_samples; i++)
+    {
         printf("Dleeeting samples\n");
         file_sample_free(s->samples[i]);
     }
@@ -607,7 +668,8 @@ void looper_del_self(looper *s)
 
 void file_sample_free(file_sample *fs)
 {
-    if (strncmp(fs->filename, "none", 4) != 0) {
+    if (strncmp(fs->filename, "none", 4) != 0)
+    {
         printf("Dleeeting original file bytes\n");
         free(fs->orig_file_bytes);
         printf("Dleeeting resampeld file bytes\n");

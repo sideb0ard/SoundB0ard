@@ -41,7 +41,8 @@ void dynamics_processor_init(dynamics_processor *dp)
         envelope_detector_init(&dp->m_right_detector, dp->m_attack_ms,
                                dp->m_release_ms, false, DETECT_MODE_RMS, true);
     }
-    else {
+    else
+    {
         envelope_detector_init(&dp->m_left_detector, dp->m_attack_ms,
                                dp->m_release_ms, true, DETECT_MODE_RMS, true);
         envelope_detector_init(&dp->m_right_detector, dp->m_attack_ms,
@@ -62,7 +63,8 @@ double dynamics_processor_calc_compression_gain(double detector_val,
         cs = 1;
 
     if (kneewidth > 0 && detector_val > (threshold - kneewidth / 2.0) &&
-        detector_val < threshold + kneewidth / 2.0) {
+        detector_val < threshold + kneewidth / 2.0)
+    {
         double x[2];
         double y[2];
         x[0] = threshold - kneewidth / 2.0;
@@ -87,7 +89,8 @@ double dynamics_processor_calc_downward_expander_gain(double detector_val,
     if (gate)
         es = -1;
     if (kneewidth > 0 && detector_val > (threshold - kneewidth / 2.0) &&
-        detector_val < threshold + kneewidth / 2.0) {
+        detector_val < threshold + kneewidth / 2.0)
+    {
         double x[2];
         double y[2];
         x[0] = threshold - kneewidth / 2.0;
@@ -121,7 +124,8 @@ void dynamics_processor_set_threshold(dynamics_processor *dp, double val)
 
 void dynamics_processor_set_attack_ms(dynamics_processor *dp, double val)
 {
-    if (val >= 1 && val <= 300) {
+    if (val >= 1 && val <= 300)
+    {
         dp->m_attack_ms = val;
         envelope_detector_setattacktime(&dp->m_left_detector, val);
         envelope_detector_setattacktime(&dp->m_right_detector, val);
@@ -132,7 +136,8 @@ void dynamics_processor_set_attack_ms(dynamics_processor *dp, double val)
 
 void dynamics_processor_set_release_ms(dynamics_processor *dp, double val)
 {
-    if (val >= 20 && val <= 5000) {
+    if (val >= 20 && val <= 5000)
+    {
         dp->m_release_ms = val;
         envelope_detector_setreleasetime(&dp->m_left_detector, val);
         envelope_detector_setreleasetime(&dp->m_right_detector, val);
@@ -195,13 +200,16 @@ void dynamics_processor_set_processor_type(dynamics_processor *dp,
 void dynamics_processor_set_time_constant(dynamics_processor *dp,
                                           unsigned int val)
 {
-    if (val < 2) {
+    if (val < 2)
+    {
         dp->m_time_constant = val;
-        if (val == 0) { // digital
+        if (val == 0)
+        { // digital
             envelope_detector_settcmodeanalog(&dp->m_left_detector, false);
             envelope_detector_settcmodeanalog(&dp->m_right_detector, false);
         }
-        else {
+        else
+        {
             envelope_detector_settcmodeanalog(&dp->m_left_detector, true);
             envelope_detector_settcmodeanalog(&dp->m_right_detector, true);
         }
@@ -253,13 +261,15 @@ double dynamics_processor_process(void *self, double input)
     double link_detector = left_detector;
     double gn = 1.;
 
-    if (dp->m_stereo_link == 1) {
+    if (dp->m_stereo_link == 1)
+    {
         link_detector = 0.5 * (pow(10.0, left_detector / 20.0) +
                                pow(10.0, right_detector / 20.0));
         link_detector = 20.0 * log10(link_detector);
     }
 
-    if (dp->m_processor_type == COMP) {
+    if (dp->m_processor_type == COMP)
+    {
         gn = dynamics_processor_calc_compression_gain(
             link_detector, dp->m_threshold, dp->m_ratio, dp->m_knee_width,
             false);
@@ -287,7 +297,8 @@ double dynamics_processor_process(void *self, double input)
 void dynamics_processor_set_external_source(dynamics_processor *dp,
                                             unsigned int val)
 {
-    if (val < 99) {
+    if (val < 99)
+    {
         if (mixer_is_valid_soundgen_num(mixr, val))
             dp->m_external_source = val;
     }

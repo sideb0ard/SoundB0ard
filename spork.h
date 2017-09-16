@@ -7,7 +7,8 @@
 // #include "reverb.h"
 #include "sound_generator.h"
 
-typedef struct spork {
+typedef struct spork
+{
     SOUNDGEN sg;
     wt_oscillator m_osc;
     // lfo m_lfo;

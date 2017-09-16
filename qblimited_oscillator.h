@@ -4,7 +4,8 @@
 
 typedef struct qblimited_oscillator qb_osc;
 
-typedef struct qblimited_oscillator {
+typedef struct qblimited_oscillator
+{
     oscillator osc;
 } qblimited_oscillator;
 

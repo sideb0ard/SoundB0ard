@@ -156,41 +156,47 @@ void voice_prepare_for_play(voice *v)
     v->m_dca.m_mod_source_velocity = DEST_DCA_VELOCITY;
     v->m_dca.m_mod_source_pan = DEST_DCA_PAN;
 
-    if (v->m_osc1) {
+    if (v->m_osc1)
+    {
         v->m_osc1->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc1->m_mod_source_fo = DEST_OSC1_FO;
         v->m_osc1->m_mod_source_pulse_width = DEST_OSC1_PULSEWIDTH;
         v->m_osc1->m_mod_source_amp = DEST_OSC1_OUTPUT_AMP;
     }
 
-    if (v->m_osc2) {
+    if (v->m_osc2)
+    {
         v->m_osc2->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc2->m_mod_source_fo = DEST_OSC2_FO;
         v->m_osc2->m_mod_source_pulse_width = DEST_OSC2_PULSEWIDTH;
         v->m_osc2->m_mod_source_amp = DEST_OSC2_OUTPUT_AMP;
     }
 
-    if (v->m_osc3) {
+    if (v->m_osc3)
+    {
         v->m_osc3->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc3->m_mod_source_fo = DEST_OSC3_FO;
         v->m_osc3->m_mod_source_pulse_width = DEST_OSC3_PULSEWIDTH;
         v->m_osc3->m_mod_source_amp = DEST_OSC3_OUTPUT_AMP;
     }
 
-    if (v->m_osc4) {
+    if (v->m_osc4)
+    {
         v->m_osc4->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_osc4->m_mod_source_fo = DEST_OSC4_FO;
         v->m_osc4->m_mod_source_pulse_width = DEST_OSC4_PULSEWIDTH;
         v->m_osc4->m_mod_source_amp = DEST_OSC4_OUTPUT_AMP;
     }
 
-    if (v->m_filter1) {
+    if (v->m_filter1)
+    {
         v->m_filter1->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_filter1->m_mod_source_fc = DEST_FILTER1_FC;
         v->m_filter1->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
     }
 
-    if (v->m_filter2) {
+    if (v->m_filter2)
+    {
         v->m_filter2->m_v_modmatrix = &v->m_v_modmatrix;
         v->m_filter2->m_mod_source_fc = DEST_FILTER2_FC;
         v->m_filter2->m_mod_source_fc_control = DEST_ALL_FILTER_KEYTRACK;
@@ -284,7 +290,8 @@ void voice_update(voice *v)
 {
     v->m_voice_mode = v->m_global_voice_params->voice_mode;
     if (v->m_portamento_time_msec !=
-        v->m_global_voice_params->portamento_time_msec) {
+        v->m_global_voice_params->portamento_time_msec)
+    {
         v->m_portamento_time_msec =
             v->m_global_voice_params->portamento_time_msec;
         if (v->m_portamento_time_msec == 0.0)
@@ -329,14 +336,16 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
 {
     v->m_osc_pitch = frequency;
 
-    if (!v->m_note_on && !v->m_note_pending) {
+    if (!v->m_note_on && !v->m_note_pending)
+    {
         v->m_midi_note_number = midi_note;
         v->m_midi_velocity = midi_velocity;
         v->m_v_modmatrix.m_sources[SOURCE_VELOCITY] =
             (double)v->m_midi_velocity;
         v->m_v_modmatrix.m_sources[SOURCE_MIDI_NOTE_NUM] =
             (double)v->m_midi_note_number;
-        if (v->m_portamento_inc > 0.0 && last_note_frequency >= 0) {
+        if (v->m_portamento_inc > 0.0 && last_note_frequency >= 0)
+        {
             v->m_modulo_portamento = 0.0;
             v->m_portamento_semitones =
                 semitones_between_frequencies(last_note_frequency, frequency);
@@ -351,7 +360,8 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
             if (v->m_osc4)
                 v->m_osc4->m_osc_fo = v->m_portamento_start;
         }
-        else {
+        else
+        {
             if (v->m_osc1)
                 v->m_osc1->m_osc_fo = v->m_osc_pitch;
             if (v->m_osc2)
@@ -406,14 +416,17 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
 
     v->m_note_pending = true;
 
-    if (v->m_portamento_inc > 0.0 && last_note_frequency > 0) {
-        if (v->m_modulo_portamento > 0.0) {
+    if (v->m_portamento_inc > 0.0 && last_note_frequency > 0)
+    {
+        if (v->m_modulo_portamento > 0.0)
+        {
             double portamento_pitch_mult = pitch_shift_multiplier(
                 v->m_modulo_portamento * v->m_portamento_semitones);
             v->m_portamento_start =
                 v->m_portamento_start * portamento_pitch_mult;
         }
-        else {
+        else
+        {
             v->m_portamento_start = last_note_frequency;
         }
         v->m_modulo_portamento = 0.0;
@@ -429,12 +442,15 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
 
 void voice_note_off(voice *v, unsigned int midi_note)
 {
-    if (v->m_note_on && voice_can_note_off(v)) {
-        if (v->m_note_pending && (midi_note == v->m_midi_note_number_pending)) {
+    if (v->m_note_on && voice_can_note_off(v))
+    {
+        if (v->m_note_pending && (midi_note == v->m_midi_note_number_pending))
+        {
             v->m_note_pending = false;
             return;
         }
-        if (midi_note != v->m_midi_note_number) {
+        if (midi_note != v->m_midi_note_number)
+        {
             return;
         }
 
@@ -453,8 +469,10 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
     if (!v->m_note_on)
         return false;
 
-    if (voice_is_voice_done(v) || v->m_note_pending) {
-        if (voice_is_voice_done(v) && !v->m_note_pending) {
+    if (voice_is_voice_done(v) || v->m_note_pending)
+    {
+        if (voice_is_voice_done(v) && !v->m_note_pending)
+        {
             if (v->m_osc1)
                 v->m_osc1->stop_oscillator(v->m_osc1);
             if (v->m_osc2)
@@ -486,7 +504,8 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
             return false;
         }
         else if (v->m_note_pending &&
-                 (voice_is_voice_done(v) || voice_in_legato_mode(v))) {
+                 (voice_is_voice_done(v) || voice_in_legato_mode(v)))
+        {
             v->m_midi_note_number = v->m_midi_note_number_pending;
             v->m_midi_velocity = v->m_midi_velocity_pending;
             v->m_osc_pitch = v->m_osc_pitch_pending;
@@ -520,7 +539,8 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
             if (v->m_osc4)
                 v->m_osc4->m_midi_note_number = v->m_midi_note_number;
 
-            if (!v->m_legato_mode) {
+            if (!v->m_legato_mode)
+            {
                 if (v->m_osc1)
                     v->m_osc1->reset_oscillator(v->m_osc1);
                 if (v->m_osc2)
@@ -544,8 +564,10 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
     }
 
     // portamento block
-    if (v->m_portamento_inc > 0.0 && v->m_osc1->m_osc_fo != v->m_osc_pitch) {
-        if (v->m_modulo_portamento >= 1.0) {
+    if (v->m_portamento_inc > 0.0 && v->m_osc1->m_osc_fo != v->m_osc_pitch)
+    {
+        if (v->m_modulo_portamento >= 1.0)
+        {
             v->m_modulo_portamento = 0.0;
 
             if (v->m_osc1)
@@ -557,7 +579,8 @@ bool voice_gennext(voice *v, double *left_output, double *right_output)
             if (v->m_osc4)
                 v->m_osc4->m_osc_fo = v->m_osc_pitch;
         }
-        else {
+        else
+        {
             double portamento_pitch =
                 v->m_portamento_start *
                 pitch_shift_multiplier(v->m_modulo_portamento *

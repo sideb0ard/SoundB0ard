@@ -14,17 +14,20 @@
 #define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_SOUNDGEN 100
 
-typedef struct environment_variable {
+typedef struct environment_variable
+{
     char key[ENVIRONMENT_KEY_SIZE];
     int val;
 } env_var;
 
-typedef struct soundgen_track {
+typedef struct soundgen_track
+{
     int soundgen_num;
     int soundgen_track_num;
 } soundgen_track;
 
-typedef struct scene {
+typedef struct scene
+{
     int num_bars_to_play;
     int num_tracks;
     soundgen_track soundgen_tracks[MAX_TRACKS_PER_SCENE];
@@ -32,7 +35,8 @@ typedef struct scene {
 
 typedef unsigned int compat_key_list[6];
 
-typedef struct t_mixer {
+typedef struct t_mixer
+{
 
     SOUNDGEN **sound_generators;
     int soundgen_num;  // actual number of SGs

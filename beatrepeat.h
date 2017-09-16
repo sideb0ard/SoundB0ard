@@ -5,7 +5,8 @@
 
 #include "fx.h"
 
-typedef struct beatrepeat {
+typedef struct beatrepeat
+{
     fx m_fx;
     double *m_buffer;
     size_t m_buffer_size;

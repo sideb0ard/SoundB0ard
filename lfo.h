@@ -2,7 +2,8 @@
 
 #include "oscillator.h"
 
-typedef struct lfo {
+typedef struct lfo
+{
     oscillator osc;
 } lfo;
 

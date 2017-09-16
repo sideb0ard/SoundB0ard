@@ -22,14 +22,16 @@ void sparky(char *instr)
     char *sep = ",; ";
     char *word, *brkt;
     for (word = strtok_r(str, sep, &brkt); word;
-         word = strtok_r(NULL, sep, &brkt)) {
+         word = strtok_r(NULL, sep, &brkt))
+    {
         sparkvals[numvals++] = atof(word);
     }
 
     // int sparklen = numvals*2 + 1;
     int sparklen = numvals + 1;
     wchar_t sparkline[sparklen];
-    for (int i = 0; i < numvals; i++) {
+    for (int i = 0; i < numvals; i++)
+    {
         int idx =
             (int)floor(scaleybum(0, 1.1, 0, wcslen(sparkchars), sparkvals[i]));
         sparkline[i] = sparkchars[idx];

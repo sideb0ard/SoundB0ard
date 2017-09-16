@@ -60,11 +60,13 @@ void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }
 
 bool osc_check_wrap_modulo(oscillator *self)
 {
-    if (self->m_inc > 0 && self->m_modulo >= 1.0) {
+    if (self->m_inc > 0 && self->m_modulo >= 1.0)
+    {
         self->m_modulo -= 1.0;
         return true;
     }
-    if (self->m_inc < 0 && self->m_modulo <= 0.0) {
+    if (self->m_inc < 0 && self->m_modulo <= 0.0)
+    {
         self->m_modulo += 1.0;
         return true;
     }
@@ -122,7 +124,8 @@ void osc_reset(oscillator *self)
 
 void osc_update(oscillator *self)
 {
-    if (self->m_global_oscillator_params) {
+    if (self->m_global_oscillator_params)
+    {
         if (self->m_global_oscillator_params->osc_fo >= 0)
             self->m_osc_fo = self->m_global_oscillator_params->osc_fo;
 
@@ -142,7 +145,8 @@ void osc_update(oscillator *self)
         self->m_lfo_mode = LFORFREE;
 
     // --- get from matrix Sources
-    if (self->m_v_modmatrix) {
+    if (self->m_v_modmatrix)
+    {
         // --- zero is norm for these
         self->m_fo_mod =
             self->m_v_modmatrix->m_destinations[self->m_mod_source_fo];

@@ -5,7 +5,8 @@
 #define NUM_TABLES 9
 
 typedef struct wt_oscillator wt_osc;
-typedef struct wt_oscillator {
+typedef struct wt_oscillator
+{
 
     double m_read_index;
     double m_quad_phase_read_index;

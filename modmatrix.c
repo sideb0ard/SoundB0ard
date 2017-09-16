@@ -77,7 +77,8 @@ modmatrix *new_modmatrix(void)
 int get_matrix_size(modmatrix *self)
 {
     int sz = 0;
-    for (int i = 0; i < MAX_SOURCES * MAX_DESTINATIONS; i++) {
+    for (int i = 0; i < MAX_SOURCES * MAX_DESTINATIONS; i++)
+    {
         matrixrow *mr = self->m_matrix_core[i];
         if (mr)
             sz++;
@@ -100,7 +101,8 @@ void matrix_clear_destinations(modmatrix *self)
 
 void create_matrix_core(modmatrix *self)
 {
-    if (self->m_matrix_core) {
+    if (self->m_matrix_core)
+    {
         delete_matrix_core(self);
     }
 
@@ -112,7 +114,8 @@ void clear_matrix_core(modmatrix *self)
 {
     if (!self->m_matrix_core)
         return;
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
+    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+    {
         free(self->m_matrix_core[i]);
     }
     self->m_num_rows_in_matrix_core = 0;
@@ -129,7 +132,8 @@ matrixrow **get_matrix_core(modmatrix *self) { return self->m_matrix_core; }
 
 void set_matrix_core(modmatrix *self, matrixrow **matrix)
 {
-    if (self->m_matrix_core) {
+    if (self->m_matrix_core)
+    {
         clear_matrix_core(self);
         free(self->m_matrix_core);
     }
@@ -153,7 +157,8 @@ bool matrix_row_exists(modmatrix *self, unsigned sourceidx, unsigned destidx)
     if (!self->m_matrix_core)
         return false;
 
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
+    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+    {
         matrixrow *mr = self->m_matrix_core[i];
         if (mr->m_source_index == sourceidx &&
             mr->m_destination_index == destidx)
@@ -168,10 +173,12 @@ bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
     if (!self->m_matrix_core)
         return false;
 
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
+    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+    {
         matrixrow *mr = self->m_matrix_core[i];
         if (mr->m_source_index == sourceidx &&
-            mr->m_destination_index == destidx) {
+            mr->m_destination_index == destidx)
+        {
             mr->m_enable = enable;
             return true;
         }
@@ -211,12 +218,15 @@ matrixrow *create_matrix_row(unsigned src, unsigned dest, double *intensity,
 
 void print_modulation_matrix(modmatrix *self)
 {
-    if (!self->m_matrix_core) {
+    if (!self->m_matrix_core)
+    {
         printf("NAE MATRIX CORE, MATE!\n");
         return;
     }
-    for (int layer = 0; layer < 2; layer++) {
-        for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
+    for (int layer = 0; layer < 2; layer++)
+    {
+        for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+        {
 
             matrixrow *mr = self->m_matrix_core[i];
 
@@ -224,7 +234,8 @@ void print_modulation_matrix(modmatrix *self)
                 continue; // shouldn't happen. but jist in case!
             if (!mr->m_enable)
                 continue;
-            if (!check_destination_layer(layer, mr)) {
+            if (!check_destination_layer(layer, mr))
+            {
                 continue;
             }
 
@@ -238,14 +249,16 @@ void print_modulation_matrix(modmatrix *self)
 void do_modulation_matrix(modmatrix *self, unsigned layer)
 {
 
-    if (!self->m_matrix_core) {
+    if (!self->m_matrix_core)
+    {
         printf("NAE MATRIX CORE, MATE!\n");
         return;
     }
 
     matrix_clear_destinations(self);
 
-    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++) {
+    for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+    {
 
         matrixrow *mr = self->m_matrix_core[i];
 
@@ -253,13 +266,15 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
             continue; // shouldn't happen. but jist in case!
         if (!mr->m_enable)
             continue;
-        if (!check_destination_layer(layer, mr)) {
+        if (!check_destination_layer(layer, mr))
+        {
             continue;
         }
 
         double src = self->m_sources[mr->m_source_index];
 
-        switch (mr->m_source_transform) {
+        switch (mr->m_source_transform)
+        {
         case TRANSFORM_UNIPOLAR_TO_BIPOLAR:
             // src = unipolar_to_bipolar(src);
             break;
@@ -295,7 +310,8 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         // destination += source*intensity*range
         double modval = src * (*mr->m_mod_intensity) * (*mr->m_mod_range);
 
-        switch (mr->m_destination_index) {
+        switch (mr->m_destination_index)
+        {
         case DEST_ALL_OSC_FO:
             self->m_destinations[DEST_OSC1_FO] += modval;
             self->m_destinations[DEST_OSC2_FO] += modval;

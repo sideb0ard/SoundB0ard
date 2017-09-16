@@ -11,7 +11,8 @@
 #define MAX_CONCURRENT_GRAINS 1000
 #define MAX_GRAIN_STREAM_LEN_SEC 10 // assuming a loop is never more than 10sec
 
-typedef struct sound_grain {
+typedef struct sound_grain
+{
     int grain_len_samples;
     int audiobuffer_num;
     int audiobuffer_start_idx;
@@ -25,13 +26,15 @@ typedef struct sound_grain {
     int doppelganger_idx;
 } sound_grain;
 
-enum {
+enum
+{
     GRAIN_SELECTION_STATIC,
     GRAIN_SELECTION_RANDOM,
     GRAIN_NUM_SELECTION_MODES
 };
 
-typedef struct granulator {
+typedef struct granulator
+{
     SOUNDGEN sound_generator;
 
     bool active;

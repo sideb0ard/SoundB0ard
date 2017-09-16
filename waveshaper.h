@@ -5,7 +5,8 @@
 #include "defjams.h"
 #include "fx.h"
 
-typedef struct waveshaper {
+typedef struct waveshaper
+{
     fx m_fx;                      // API
     double m_arc_tan_k_pos;       // 0.10 - 20
     double m_arc_tan_k_neg;       // 0.10 - 20

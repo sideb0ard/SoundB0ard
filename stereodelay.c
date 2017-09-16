@@ -48,7 +48,8 @@ void stereo_delay_set_mode(stereodelay *d, unsigned mode)
 
 void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms)
 {
-    if (delay_ms >= 0 && delay_ms <= 2000) {
+    if (delay_ms >= 0 && delay_ms <= 2000)
+    {
         d->m_delay_time_ms = delay_ms;
         stereo_delay_update(d);
     }
@@ -58,7 +59,8 @@ void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms)
 
 void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)
 {
-    if (feedback_percent >= -100 && feedback_percent <= 100) {
+    if (feedback_percent >= -100 && feedback_percent <= 100)
+    {
         d->m_feedback_percent = feedback_percent;
         stereo_delay_update(d);
     }
@@ -68,7 +70,8 @@ void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)
 
 void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)
 {
-    if (delay_ratio >= -1 && delay_ratio <= 1) {
+    if (delay_ratio >= -1 && delay_ratio <= 1)
+    {
         d->m_delay_ratio = delay_ratio;
         stereo_delay_update(d);
     }
@@ -78,7 +81,8 @@ void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)
 
 void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix)
 {
-    if (wet_mix >= 0 && wet_mix <= 100) {
+    if (wet_mix >= 0 && wet_mix <= 100)
+    {
         d->m_wet_mix = wet_mix;
         stereo_delay_update(d);
     }
@@ -88,20 +92,24 @@ void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix)
 
 void stereo_delay_update(stereodelay *d)
 {
-    if (d->m_mode == TAP1 || d->m_mode == TAP2) {
-        if (d->m_delay_ratio < 0) {
+    if (d->m_mode == TAP1 || d->m_mode == TAP2)
+    {
+        if (d->m_delay_ratio < 0)
+        {
             d->m_tap2_left_delay_time_ms =
                 -d->m_delay_ratio * d->m_delay_time_ms;
             d->m_tap2_right_delay_time_ms =
                 (1.0 + d->m_delay_ratio) * d->m_delay_time_ms;
         }
-        else if (d->m_delay_ratio > 0) {
+        else if (d->m_delay_ratio > 0)
+        {
             d->m_tap2_left_delay_time_ms =
                 (1.0 - d->m_delay_ratio) * d->m_delay_time_ms;
             d->m_tap2_right_delay_time_ms =
                 d->m_delay_ratio * d->m_delay_time_ms;
         }
-        else {
+        else
+        {
             d->m_tap2_left_delay_time_ms = 0.0;
             d->m_tap2_right_delay_time_ms = 0.0;
         }
@@ -115,17 +123,20 @@ void stereo_delay_update(stereodelay *d)
     d->m_tap2_left_delay_time_ms = 0.0;
     d->m_tap2_right_delay_time_ms = 0.0;
 
-    if (d->m_delay_ratio < 0) {
+    if (d->m_delay_ratio < 0)
+    {
         delayline_set_delay_ms(&d->m_left_delay,
                                -d->m_delay_ratio * d->m_delay_time_ms);
         delayline_set_delay_ms(&d->m_right_delay, d->m_delay_time_ms);
     }
-    else if (d->m_delay_ratio > 0) {
+    else if (d->m_delay_ratio > 0)
+    {
         delayline_set_delay_ms(&d->m_left_delay, d->m_delay_time_ms);
         delayline_set_delay_ms(&d->m_right_delay,
                                d->m_delay_ratio * d->m_delay_time_ms);
     }
-    else {
+    else
+    {
         delayline_set_delay_ms(&d->m_left_delay, d->m_delay_time_ms);
         delayline_set_delay_ms(&d->m_right_delay, d->m_delay_time_ms);
     }
@@ -146,15 +157,18 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
     double left_tap2_out = 0.0;
     double right_tap2_out = 0.0;
 
-    switch (d->m_mode) {
-    case TAP1: {
+    switch (d->m_mode)
+    {
+    case TAP1:
+    {
         left_tap2_out = delayline_read_delay_at(&d->m_left_delay,
                                                 d->m_tap2_left_delay_time_ms);
         right_tap2_out = delayline_read_delay_at(&d->m_right_delay,
                                                  d->m_tap2_right_delay_time_ms);
         break;
     }
-    case TAP2: {
+    case TAP2:
+    {
         left_tap2_out = delayline_read_delay_at(&d->m_left_delay,
                                                 d->m_tap2_left_delay_time_ms);
         right_tap2_out = delayline_read_delay_at(&d->m_right_delay,
@@ -167,7 +181,8 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
                              (d->m_feedback_percent / 100.0);
         break;
     }
-    case PINGPONG: {
+    case PINGPONG:
+    {
         left_delay_in =
             *input_right + right_delay_out * (d->m_feedback_percent / 100.0);
         right_delay_in =

@@ -13,13 +13,16 @@ void build_euclidean_pattern_int(int level, int *bitmap_int,
                                  int *bitmap_position, int *count,
                                  int *remainderrr)
 {
-    if (level == -1) {
+    if (level == -1)
+    {
         *bitmap_int = *bitmap_int << 1;
     }
-    else if (level == -2) {
+    else if (level == -2)
+    {
         *bitmap_int = (*bitmap_int << 1) + 1;
     }
-    else {
+    else
+    {
         for (int i = 0; i < count[level]; i++)
             build_euclidean_pattern_int(level - 1, bitmap_int, bitmap_position,
                                         count, remainderrr);
@@ -32,7 +35,8 @@ void build_euclidean_pattern_int(int level, int *bitmap_int,
 int create_euclidean_rhythm(int num_beats, int len_pattern)
 // https://ics-web.sns.ornl.gov/timing/Rep-Rate%20Tech%20Note.pdf
 {
-    if (num_beats > len_pattern) {
+    if (num_beats > len_pattern)
+    {
         printf("Are ye nuts, man?!\n");
         return 0;
     }
@@ -45,7 +49,8 @@ int create_euclidean_rhythm(int num_beats, int len_pattern)
     // array tells us how many level l −1 strings make up a level l string.
     int count[len_pattern];
 
-    for (int i = 0; i < len_pattern; i++) {
+    for (int i = 0; i < len_pattern; i++)
+    {
         remainderrr[i] = count[i] = 0;
     }
 
@@ -53,7 +58,8 @@ int create_euclidean_rhythm(int num_beats, int len_pattern)
     int divisor = len_pattern - num_beats;
     remainderrr[0] = num_beats;
     int level = 0;
-    do {
+    do
+    {
         count[level] = divisor / remainderrr[level];
         remainderrr[level + 1] = divisor % remainderrr[level];
         divisor = remainderrr[level];
@@ -80,10 +86,13 @@ void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array,
     else if (gridsize == SIXTEENTH)
         steps = 15;
 
-    for (int i = steps; i >= 0; i--) {
-        if (bitpattern & 1 << i) {
+    for (int i = steps; i >= 0; i--)
+    {
+        if (bitpattern & 1 << i)
+        {
             int bitposition = 0;
-            switch (gridsize) {
+            switch (gridsize)
+            {
             case (TWENTYFOURTH):
                 bitposition = (steps - i) * PPTWENTYFOURTH;
                 break;
@@ -92,7 +101,8 @@ void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array,
                 bitposition = (steps - i) * PPSIXTEENTH;
                 break;
             }
-            if (bitposition < len_pattern_array) {
+            if (bitposition < len_pattern_array)
+            {
                 pattern_array[bitposition] = 1;
             }
         }
@@ -102,8 +112,10 @@ void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array,
 int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)
 {
     int first_position = 0;
-    for (int i = num_of_bits_to_align_with; i >= 0; i--) {
-        if (num & (1 << i)) {
+    for (int i = num_of_bits_to_align_with; i >= 0; i--)
+    {
+        if (num & (1 << i))
+        {
             first_position = i;
             break;
         }
@@ -118,7 +130,8 @@ int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)
 
 void char_binary_version_of_int(int num, char bin_num[17])
 {
-    for (int i = 15; i >= 0; i--) {
+    for (int i = 15; i >= 0; i--)
+    {
         if (num & 1 << i)
             bin_num[15 - i] = '1';
         else
@@ -133,7 +146,8 @@ unsigned int gimme_a_bitwise_int(int bit_pattern_enum, int t)
 {
     // unsigned int result;
     char result;
-    switch (bit_pattern_enum) {
+    switch (bit_pattern_enum)
+    {
     case 0:
         result = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
     case 1:
@@ -155,8 +169,10 @@ unsigned int gimme_a_bitwise_int(int bit_pattern_enum, int t)
 void print_pattern(int *pattern_array, int len_pattern_array)
 {
     printf("PP\n\n");
-    for (int i = 0; i < len_pattern_array; i++) {
-        if (pattern_array[i]) {
+    for (int i = 0; i < len_pattern_array; i++)
+    {
+        if (pattern_array[i])
+        {
             printf("PATTERN ON: %d\n", i);
             printf("PATTERN SIZTEENTH: %d\n", i / PPSIXTEENTH);
         }
@@ -166,8 +182,10 @@ void print_pattern(int *pattern_array, int len_pattern_array)
 int pattern_as_int_representation(seq_pattern p)
 {
     int pattern_as_int = 0;
-    for (int i = 0; i < 16; i++) {
-        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH)) {
+    for (int i = 0; i < 16; i++)
+    {
+        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+        {
             int cur_bit = pow(2, 15 - i);
             pattern_as_int = pattern_as_int | cur_bit;
         }

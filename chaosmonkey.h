@@ -7,9 +7,14 @@
 #include "minisynth.h"
 #include "sound_generator.h"
 
-enum { CHAOS_ONE, CHAOS_TWO };
+enum
+{
+    CHAOS_ONE,
+    CHAOS_TWO
+};
 
-typedef struct chaosmonkey {
+typedef struct chaosmonkey
+{
     SOUNDGEN sound_generator;
     int frequency_of_wakeup;    // seconds
     int chance_of_interruption; // percent likelihood

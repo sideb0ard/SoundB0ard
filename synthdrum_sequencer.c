@@ -17,7 +17,8 @@ synthdrum_sequencer *new_synthdrum_seq()
 
     sds->vol = 0.6;
     sds->started = false;
-    for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++) {
+    for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++)
+    {
         sds->metadata[i].played = 0.0;
         sds->metadata[i].playing = 0.0;
     }
@@ -155,18 +156,21 @@ double sds_gennext(void *self)
     // POSITIONAL
     int idx = mixr->midi_tick % PPBAR;
 
-    if (!sds->active) {
+    if (!sds->active)
+    {
         return val;
     }
 
-    if (!sds->started) {
+    if (!sds->started)
+    {
         if (idx == 0)
             sds->started = true;
         else
             return val;
     }
 
-    if (mixr->is_midi_tick) {
+    if (mixr->is_midi_tick)
+    {
         if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
             sds_trigger(sds);
     }
@@ -174,23 +178,29 @@ double sds_gennext(void *self)
 
     // END POSITIONAL /////////////////////////////////////////
 
-    if (sds->m_eg1.m_state == SUSTAIN) {
+    if (sds->m_eg1.m_state == SUSTAIN)
+    {
         sds->eg1_sustain_counter++;
-        if (sds->eg1_sustain_counter >= sds->eg1_sustain_len_in_samples) {
+        if (sds->eg1_sustain_counter >= sds->eg1_sustain_len_in_samples)
+        {
             sds->eg1_sustain_counter = 0;
             sds->m_eg1.m_state = RELEASE;
         }
     }
-    if (sds->m_eg2.m_state == SUSTAIN) {
+    if (sds->m_eg2.m_state == SUSTAIN)
+    {
         sds->eg2_sustain_counter++;
-        if (sds->eg2_sustain_counter >= sds->eg2_sustain_len_in_samples) {
+        if (sds->eg2_sustain_counter >= sds->eg2_sustain_len_in_samples)
+        {
             sds->eg2_sustain_counter = 0;
             sds->m_eg2.m_state = RELEASE;
         }
     }
-    if (sds->m_eg3.m_state == SUSTAIN) {
+    if (sds->m_eg3.m_state == SUSTAIN)
+    {
         sds->eg3_sustain_counter++;
-        if (sds->eg3_sustain_counter >= sds->eg3_sustain_len_in_samples) {
+        if (sds->eg3_sustain_counter >= sds->eg3_sustain_len_in_samples)
+        {
             sds->eg3_sustain_counter = 0;
             sds->m_eg3.m_state = RELEASE;
         }
@@ -259,8 +269,10 @@ void sds_trigger(synthdrum_sequencer *sds)
 
 bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
 {
-    if (strlen(name) == 0) {
-        printf("Play tha game, pal, need a name to save yer synthdrum settings "
+    if (strlen(name) == 0)
+    {
+        printf("Play tha game, pal, need a name to save yer synthdrum "
+               "settings "
                "with\n");
         return false;
     }
@@ -325,16 +337,19 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
 bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
 {
     FILE *fp = fopen(DRUMSYNTH_SAVED_SETUPS_FILENAME, "r");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         printf("Dingie!\n");
         return false;
     }
     char line[256];
     char patch_name[52];
-    while (fgets(line, sizeof(line), fp)) {
+    while (fgets(line, sizeof(line), fp))
+    {
         printf("%s", line);
         sscanf(line, "%s", patch_name);
-        if (strncmp(patch_name, name, 255) == 0) {
+        if (strncmp(patch_name, name, 255) == 0)
+        {
             printf("MATCH PATCH NAME %s\n", patch_name);
             printf("BEFORE OSC_FO %f\n", sds->m_osc1.osc.m_osc_fo);
             int num = sscanf(
@@ -397,12 +412,14 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
 bool synthdrum_list_patches()
 {
     FILE *fp = fopen(DRUMSYNTH_SAVED_SETUPS_FILENAME, "r");
-    if (fp == NULL) {
+    if (fp == NULL)
+    {
         printf("Dingie!\n");
         return false;
     }
     char line[256];
-    while (fgets(line, sizeof(line), fp)) {
+    while (fgets(line, sizeof(line), fp))
+    {
         printf("%s", line);
     }
     fclose(fp);
@@ -418,11 +435,13 @@ void synthdrum_del_self(synthdrum_sequencer *sds)
 void synthdrum_set_osc_wav(synthdrum_sequencer *sds, int osc_num,
                            unsigned int wave)
 {
-    if (!(wave < MAX_OSC)) {
+    if (!(wave < MAX_OSC))
+    {
         printf("WAV has to be between 0 and %d\n", MAX_OSC - 1);
         return;
     }
-    switch (osc_num) {
+    switch (osc_num)
+    {
     case (1):
         sds->m_osc1.osc.m_waveform = wave;
         break;
@@ -433,8 +452,10 @@ void synthdrum_set_osc_wav(synthdrum_sequencer *sds, int osc_num,
 }
 void synthdrum_set_osc_fo(synthdrum_sequencer *sds, int osc_num, double freq)
 {
-    if (freq >= OSC_FO_MIN && freq <= OSC_FO_MAX) {
-        switch (osc_num) {
+    if (freq >= OSC_FO_MIN && freq <= OSC_FO_MAX)
+    {
+        switch (osc_num)
+        {
         case (1):
             sds->m_osc1.osc.m_osc_fo = freq;
             break;
@@ -443,7 +464,8 @@ void synthdrum_set_osc_fo(synthdrum_sequencer *sds, int osc_num, double freq)
             break;
         }
     }
-    else {
+    else
+    {
         printf("FREQ has to be between %d and %d\n", OSC_FO_MIN,
                OSC_FO_MAX - 1);
         return;
@@ -452,8 +474,10 @@ void synthdrum_set_osc_fo(synthdrum_sequencer *sds, int osc_num, double freq)
 
 void synthdrum_set_eg_attack(synthdrum_sequencer *sds, int eg_num, double val)
 {
-    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS) {
-        switch (eg_num) {
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
+    {
+        switch (eg_num)
+        {
         case (1):
             eg_set_attack_time_msec(&sds->m_eg1, val);
             break;
@@ -471,8 +495,10 @@ void synthdrum_set_eg_attack(synthdrum_sequencer *sds, int eg_num, double val)
 }
 void synthdrum_set_eg_decay(synthdrum_sequencer *sds, int eg_num, double val)
 {
-    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS) {
-        switch (eg_num) {
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
+    {
+        switch (eg_num)
+        {
         case (1):
             eg_set_decay_time_msec(&sds->m_eg1, val);
             break;
@@ -492,9 +518,11 @@ void synthdrum_set_eg_decay(synthdrum_sequencer *sds, int eg_num, double val)
 void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
                                  double val)
 {
-    if (val >= 0 && val <= 5000) {
+    if (val >= 0 && val <= 5000)
+    {
         int samples_val = SAMPLE_RATE / 1000. * val;
-        switch (eg_num) {
+        switch (eg_num)
+        {
         case (1):
             sds->eg1_sustain_len_in_samples = samples_val;
             break;
@@ -513,8 +541,10 @@ void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
 
 void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val)
 {
-    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS) {
-        switch (eg_num) {
+    if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
+    {
+        switch (eg_num)
+        {
         case (1):
             eg_set_release_time_msec(&sds->m_eg1, val);
             break;
@@ -541,8 +571,10 @@ void synthdrum_set_eg2_osc_intensity(synthdrum_sequencer *sds, double val)
 
 void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val)
 {
-    if (val >= 0 && val <= 1.0) {
-        switch (osc_num) {
+    if (val >= 0 && val <= 1.0)
+    {
+        switch (osc_num)
+        {
         case (1):
             sds->osc1_amp = val;
             break;

@@ -87,7 +87,8 @@ void eg_reset(envelope_generator *self)
 
     eg_calculate_release_time(self);
 
-    if (self->m_reset_to_zero) {
+    if (self->m_reset_to_zero)
+    {
         self->m_envelope_output = 0.0;
     }
 }
@@ -95,12 +96,14 @@ void eg_reset(envelope_generator *self)
 void eg_set_eg_mode(envelope_generator *self, unsigned int mode)
 {
     self->m_eg_mode = mode;
-    if (self->m_eg_mode == ANALOG) {
+    if (self->m_eg_mode == ANALOG)
+    {
         self->m_attack_tco = exp(-1.5); // fast attack
         self->m_decay_tco = exp(-4.95);
         self->m_release_tco = self->m_decay_tco;
     }
-    else {
+    else
+    {
         self->m_attack_tco = pow(10.0, -96.0 / 20.0);
         self->m_decay_tco = self->m_attack_tco;
         self->m_release_tco = self->m_decay_tco;
@@ -177,7 +180,8 @@ void eg_set_sustain_level(envelope_generator *self, double level)
 void eg_set_sustain_override(envelope_generator *self, bool b)
 {
     self->m_sustain_override = b;
-    if (self->m_release_pending && !self->m_sustain_override) {
+    if (self->m_release_pending && !self->m_sustain_override)
+    {
         self->m_release_pending = false;
         eg_note_off(self);
     }
@@ -186,7 +190,8 @@ void eg_set_sustain_override(envelope_generator *self, bool b)
 void eg_start_eg(envelope_generator *self)
 {
     if (self->m_legato_mode && self->m_state != OFFF &&
-        self->m_state != RELEASE) {
+        self->m_state != RELEASE)
+    {
         return;
     }
 
@@ -219,9 +224,11 @@ void eg_init_global_parameters(envelope_generator *self,
 
 void eg_update(envelope_generator *self)
 {
-    if (self->m_global_eg_params) {
+    if (self->m_global_eg_params)
+    {
         if (self->m_attack_time_msec !=
-            self->m_global_eg_params->attack_time_msec) {
+            self->m_global_eg_params->attack_time_msec)
+        {
             eg_set_attack_time_msec(self,
                                     self->m_global_eg_params->attack_time_msec);
         }
@@ -245,17 +252,20 @@ void eg_update(envelope_generator *self)
         self->m_legato_mode = self->m_global_eg_params->legato_mode;
     }
 
-    if (!self->m_v_modmatrix) {
+    if (!self->m_v_modmatrix)
+    {
         return;
     }
 
     // --- with mod matrix, when value is 0 there is NO modulation, so here
     if (self->m_mod_source_eg_attack_scaling != DEST_NONE &&
-        self->m_attack_time_scalar == 1.0) {
+        self->m_attack_time_scalar == 1.0)
+    {
         double scale =
             self->m_v_modmatrix
                 ->m_destinations[self->m_mod_source_eg_attack_scaling];
-        if (self->m_attack_time_scalar != 1.0 - scale) {
+        if (self->m_attack_time_scalar != 1.0 - scale)
+        {
             self->m_attack_time_scalar = 1.0 - scale;
             eg_calculate_attack_time(self);
         }
@@ -264,17 +274,20 @@ void eg_update(envelope_generator *self)
     // --- for vel->attack and note#->decay scaling modulation
     //     NOTE: make sure this is only called ONCE during a new note event!
     if (self->m_mod_source_eg_decay_scaling != DEST_NONE &&
-        self->m_decay_time_scalar == 1.0) {
+        self->m_decay_time_scalar == 1.0)
+    {
         double scale =
             self->m_v_modmatrix
                 ->m_destinations[self->m_mod_source_eg_decay_scaling];
-        if (self->m_decay_time_scalar != 1.0 - scale) {
+        if (self->m_decay_time_scalar != 1.0 - scale)
+        {
             self->m_decay_time_scalar = 1.0 - scale;
             eg_calculate_decay_time(self);
         }
     }
 
-    if (self->m_mod_source_sustain_override != DEST_NONE) {
+    if (self->m_mod_source_sustain_override != DEST_NONE)
+    {
         printf("SUSTAIN OVERRIDE IS NOT DEST NONE!??\n");
         double sustain =
             self->m_v_modmatrix
@@ -288,80 +301,97 @@ void eg_update(envelope_generator *self)
 
 double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 {
-    switch (self->m_state) {
-    case OFFF: {
+    switch (self->m_state)
+    {
+    case OFFF:
+    {
         if (self->m_reset_to_zero)
             self->m_envelope_output = 0.0;
         break;
     }
-    case ATTACK: {
+    case ATTACK:
+    {
         self->m_envelope_output =
             self->m_attack_offset +
             self->m_envelope_output * self->m_attack_coeff;
         if (self->m_envelope_output >= 1.0 ||
-            self->m_attack_time_scalar * self->m_attack_time_msec <= 0.0) {
+            self->m_attack_time_scalar * self->m_attack_time_msec <= 0.0)
+        {
             self->m_envelope_output = 1.0;
             self->m_state = DECAY;
             break;
         }
         break;
     }
-    case DECAY: {
+    case DECAY:
+    {
         self->m_envelope_output = self->m_decay_offset +
                                   self->m_envelope_output * self->m_decay_coeff;
         if (self->m_envelope_output <= self->m_sustain_level ||
-            self->m_decay_time_scalar * self->m_decay_time_msec <= 0.0) {
+            self->m_decay_time_scalar * self->m_decay_time_msec <= 0.0)
+        {
             self->m_envelope_output = self->m_sustain_level;
             self->m_state = SUSTAIN;
             break;
         }
         break;
     }
-    case SUSTAIN: {
+    case SUSTAIN:
+    {
         self->m_envelope_output = self->m_sustain_level;
         break;
     }
-    case RELEASE: {
-        if (self->m_sustain_override) {
+    case RELEASE:
+    {
+        if (self->m_sustain_override)
+        {
             // printf("SUSTAIN OVERRIDE!\n");
             self->m_envelope_output = self->m_sustain_level;
             break;
         }
-        else {
-            // printf("ELSE: ENV OUTPUT %f\n", self->m_envelope_output);
+        else
+        {
+            // printf("ELSE: ENV OUTPUT %f\n",
+            // self->m_envelope_output);
             self->m_envelope_output =
                 self->m_release_offset +
                 self->m_envelope_output * self->m_release_coeff;
-            // printf("else: ENV OUTPUT NOW %f offset %f release coeff %f\n",
+            // printf("else: ENV OUTPUT NOW %f offset %f release
+            // coeff %f\n",
             // self->m_envelope_output, self->m_release_offset,
             // self->m_release_coeff);
         }
 
-        if (self->m_envelope_output <= 0.0 ||
-            self->m_release_time_msec <= 0.0) {
+        if (self->m_envelope_output <= 0.0 || self->m_release_time_msec <= 0.0)
+        {
             self->m_envelope_output = 0.0;
             self->m_state = OFFF;
             break;
         }
         break;
     }
-    case SHUTDOWN: {
-        if (self->m_reset_to_zero) {
+    case SHUTDOWN:
+    {
+        if (self->m_reset_to_zero)
+        {
             self->m_envelope_output += self->m_inc_shutdown;
-            if (self->m_envelope_output <= 0) {
+            if (self->m_envelope_output <= 0)
+            {
                 self->m_envelope_output = 0.0;
                 self->m_state = OFFF;
                 break;
             }
         }
-        else {
+        else
+        {
             self->m_state = OFFF;
         }
         break;
     }
     }
 
-    if (self->m_v_modmatrix) {
+    if (self->m_v_modmatrix)
+    {
         self->m_v_modmatrix->m_sources[self->m_mod_dest_eg_output] =
             self->m_envelope_output;
         self->m_v_modmatrix->m_sources[self->m_mod_dest_eg_biased_output] =
@@ -376,15 +406,18 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
 
 void eg_note_off(envelope_generator *self)
 {
-    if (self->m_sustain_override) {
+    if (self->m_sustain_override)
+    {
         self->m_release_pending = true;
         return;
     }
 
-    if (self->m_envelope_output > 0) {
+    if (self->m_envelope_output > 0)
+    {
         self->m_state = RELEASE;
     }
-    else {
+    else
+    {
         self->m_state = OFFF;
     }
 }

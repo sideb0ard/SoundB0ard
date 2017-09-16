@@ -43,7 +43,8 @@ void envelope_follower_init(envelope_follower *ef)
         envelope_detector_init(&ef->m_right_detector, ef->m_attack_ms,
                                ef->m_release_ms, false, DETECT_MODE_RMS, false);
     }
-    else {
+    else
+    {
         envelope_detector_init(&ef->m_left_detector, ef->m_attack_ms,
                                ef->m_release_ms, true, DETECT_MODE_RMS, true);
         envelope_detector_init(&ef->m_right_detector, ef->m_attack_ms,
@@ -177,7 +178,8 @@ void envelope_follower_set_threshold(envelope_follower *ef, double val)
 
 void envelope_follower_set_attack_ms(envelope_follower *ef, double val)
 {
-    if (val >= 10 && val <= 100) {
+    if (val >= 10 && val <= 100)
+    {
         ef->m_attack_ms = val;
         envelope_detector_setattacktime(&ef->m_left_detector, val);
         envelope_detector_setattacktime(&ef->m_right_detector, val);
@@ -188,7 +190,8 @@ void envelope_follower_set_attack_ms(envelope_follower *ef, double val)
 
 void envelope_follower_set_release_ms(envelope_follower *ef, double val)
 {
-    if (val >= 20 && val <= 250) {
+    if (val >= 20 && val <= 250)
+    {
         ef->m_release_ms = val;
         envelope_detector_setreleasetime(&ef->m_left_detector, val);
         envelope_detector_setreleasetime(&ef->m_right_detector, val);
@@ -208,13 +211,16 @@ void envelope_follower_set_q(envelope_follower *ef, double val)
 void envelope_follower_set_time_constant(envelope_follower *ef,
                                          unsigned int val)
 {
-    if (val < 2) {
+    if (val < 2)
+    {
         ef->m_time_constant = val;
-        if (val == 0) { // analog
+        if (val == 0)
+        { // analog
             envelope_detector_settcmodeanalog(&ef->m_left_detector, true);
             envelope_detector_settcmodeanalog(&ef->m_right_detector, true);
         }
-        else {
+        else
+        {
             envelope_detector_settcmodeanalog(&ef->m_left_detector, false);
             envelope_detector_settcmodeanalog(&ef->m_right_detector, false);
         }

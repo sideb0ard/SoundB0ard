@@ -38,8 +38,10 @@ ENVELOPE maxpoint(const ENVELOPE *points, long npoints)
     point.value = points[0].value;
     point.time = points[0].time;
 
-    for (int i = 1; i < npoints; i++) {
-        if (point.value < points[i].value) {
+    for (int i = 1; i < npoints; i++)
+    {
+        if (point.value < points[i].value)
+        {
             point.value = points[i].value;
             point.time = points[i].time;
         }
@@ -148,7 +150,8 @@ ENVSTREAM *new_envelope_stream(int env_len,
         return NULL;
 
     ENVELOPE *points;
-    switch (type) {
+    switch (type)
+    {
     case 0:
         points = newpoints();
         stream->npoints = 4;
@@ -180,7 +183,8 @@ ENVSTREAM *new_envelope_stream(int env_len,
 
 void free_stream(ENVSTREAM *stream)
 {
-    if (stream && stream->points) {
+    if (stream && stream->points)
+    {
         free(stream->points);
         stream->points = NULL;
     }
@@ -193,13 +197,16 @@ double envelope_stream_tick(ENVSTREAM *stream)
     thisval = stream->leftpoint.value + (stream->height * frac);
 
     stream->curpos += stream->incr;
-    if (stream->curpos > stream->rightpoint.time) {
+    if (stream->curpos > stream->rightpoint.time)
+    {
         stream->ileft++;
         stream->iright++;
-        if (stream->iright < stream->npoints) {
+        if (stream->iright < stream->npoints)
+        {
             _env_updatepoints(stream);
         }
-        else {
+        else
+        {
             _env_reset(stream);
         }
     }

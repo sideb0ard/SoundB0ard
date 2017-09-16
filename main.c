@@ -52,7 +52,8 @@ static int paCallback(const void *inputBuffer, void *outputBuffer,
     (void)timeInfo;
     (void)statusFlags;
 
-    for (unsigned long i = 0; i < framesPerBuffer; i++) {
+    for (unsigned long i = 0; i < framesPerBuffer; i++)
+    {
         float val = 0;
         val = mixer_gennext(mixr);
         *out++ = val;
@@ -68,7 +69,8 @@ int main()
 
     //// run the MIDI event looprrr...
     pthread_t midi_th;
-    if (pthread_create(&midi_th, NULL, midiman, NULL)) {
+    if (pthread_create(&midi_th, NULL, midiman, NULL))
+    {
         fprintf(stderr, "Errrr, wit tha midi..\n");
         return -1;
     }
@@ -88,14 +90,16 @@ int main()
                                SAMPLE_RATE, paFramesPerBufferUnspecified,
                                paCallback, mixr);
 
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         printf("Errrrr! couldn't open Portaudio default stream: %s\n",
                Pa_GetErrorText(err));
         exit(-1);
     }
 
     err = Pa_StartStream(stream);
-    if (err != paNoError) {
+    if (err != paNoError)
+    {
         printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
         exit(-1);
     }

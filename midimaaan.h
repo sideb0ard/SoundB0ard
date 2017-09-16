@@ -9,7 +9,8 @@ typedef struct spork spork;
 
 typedef enum { OCTAVE_CHANGE } custom_event_type;
 
-typedef struct midi_event {
+typedef struct midi_event
+{
     unsigned tick;
     unsigned event_type;
     unsigned data1;

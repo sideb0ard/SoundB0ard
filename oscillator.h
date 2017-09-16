@@ -20,15 +20,43 @@
 #define DEFAULT_LFO_RATE 0.5
 
 // --- for PITCHED Oscillators
-enum { SINE, SAW1, SAW2, SAW3, TRI, SQUARE, NOISE, PNOISE, MAX_OSC };
+enum
+{
+    SINE,
+    SAW1,
+    SAW2,
+    SAW3,
+    TRI,
+    SQUARE,
+    NOISE,
+    PNOISE,
+    MAX_OSC
+};
 // --- for LFOs
-enum { sine, usaw, dsaw, tri, square, expo, rsh, qrsh, MAX_LFO_OSC };
+enum
+{
+    sine,
+    usaw,
+    dsaw,
+    tri,
+    square,
+    expo,
+    rsh,
+    qrsh,
+    MAX_LFO_OSC
+};
 // --- for LFOs - MODE
-enum { LFOSYNC, LFOSHOT, LFORFREE };
+enum
+{
+    LFOSYNC,
+    LFOSHOT,
+    LFORFREE
+};
 
 typedef struct oscillator oscillator;
 
-struct oscillator {
+struct oscillator
+{
 
     // modulation matrix, owned by voice we are part of
     modmatrix *m_v_modmatrix;

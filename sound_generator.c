@@ -20,21 +20,26 @@ static int soundgen_add_fx(SOUNDGEN *self, fx *f)
 {
 
     fx **new_effects = NULL;
-    if (self->effects_size <= self->effects_num) {
-        if (self->effects_size == 0) {
+    if (self->effects_size <= self->effects_num)
+    {
+        if (self->effects_size == 0)
+        {
             self->effects_size = DEFAULT_ARRAY_SIZE;
         }
-        else {
+        else
+        {
             self->effects_size *= 2;
         }
 
         new_effects =
             (fx **)realloc(self->effects, self->effects_size * sizeof(fx *));
-        if (new_effects == NULL) {
+        if (new_effects == NULL)
+        {
             printf("Ooh, burney - cannae allocate memory for new effects");
             exit(1);
         }
-        else {
+        else
+        {
             self->effects = new_effects;
         }
     }
@@ -149,9 +154,11 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
 
 double effector(SOUNDGEN *self, double val)
 {
-    for (int i = 0; i < self->effects_num; i++) {
+    for (int i = 0; i < self->effects_num; i++)
+    {
         fx *f = self->effects[i];
-        if (f->enabled) {
+        if (f->enabled)
+        {
             val = f->process(f, val);
         }
     }
@@ -166,21 +173,27 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
 {
     printf("Booya, adding a new envelope to SOUNDGEN!\n");
     ENVSTREAM **new_envelopes = NULL;
-    if (self->envelopes_size <= self->envelopes_num) {
-        if (self->envelopes_size == 0) {
+    if (self->envelopes_size <= self->envelopes_num)
+    {
+        if (self->envelopes_size == 0)
+        {
             self->envelopes_size = DEFAULT_ARRAY_SIZE;
         }
-        else {
+        else
+        {
             self->envelopes_size *= 2;
         }
 
         new_envelopes = (ENVSTREAM **)realloc(
             self->envelopes, self->envelopes_size * sizeof(ENVSTREAM *));
-        if (new_envelopes == NULL) {
-            printf("Ooh, burney - cannae allocate memory for new envelopes");
+        if (new_envelopes == NULL)
+        {
+            printf("Ooh, burney - cannae allocate memory for new "
+                   "envelopes");
             return -1;
         }
-        else {
+        else
+        {
             self->envelopes = new_envelopes;
         }
     }
@@ -194,13 +207,17 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
 double envelopor(SOUNDGEN *self, double val)
 {
 
-    if (self->envelopes_num > 0 && self->envelopes_enabled) {
-        for (int i = 0; i < self->envelopes_num; i++) {
+    if (self->envelopes_num > 0 && self->envelopes_enabled)
+    {
+        for (int i = 0; i < self->envelopes_num; i++)
+        {
             double mix_env = envelope_stream_tick(self->envelopes[i]);
-            if (self->envelopes[i]->started) {
+            if (self->envelopes[i]->started)
+            {
                 val *= mix_env;
             }
-            else if (mix_env == 1) {
+            else if (mix_env == 1)
+            {
                 self->envelopes[i]->started = 1;
                 val *= mix_env;
             }

@@ -6,7 +6,8 @@
 
 typedef struct filter_ckthreefive filter_ck35;
 
-struct filter_ckthreefive {
+struct filter_ckthreefive
+{
 
     filter f; // base class
     double m_k;

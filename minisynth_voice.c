@@ -159,13 +159,15 @@ void minisynth_voice_update(minisynth_voice *msv)
     unsigned int current_voice_mode = msv->m_voice.m_voice_mode;
 
     voice_update(&msv->m_voice);
-    if (msv->m_voice.m_voice_mode != current_voice_mode) {
+    if (msv->m_voice.m_voice_mode != current_voice_mode)
+    {
         msv->m_voice.m_voice_mode =
             msv->m_voice.m_global_voice_params->voice_mode;
         msv->m_osc3.osc.m_octave = -1.0;
         msv->m_voice.m_global_synth_params->osc4_params.waveform = NOISE;
 
-        switch (msv->m_voice.m_voice_mode) {
+        switch (msv->m_voice.m_voice_mode)
+        {
         case Saw3:
             msv->m_voice.m_global_synth_params->osc1_params.waveform = SAW1;
             msv->m_voice.m_global_synth_params->osc2_params.waveform = SAW1;
@@ -219,7 +221,8 @@ void minisynth_voice_reset(minisynth_voice *msv)
 bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
                              double *right_output)
 {
-    if (!voice_gennext(&msv->m_voice, left_output, right_output)) {
+    if (!voice_gennext(&msv->m_voice, left_output, right_output))
+    {
         return false;
     }
 

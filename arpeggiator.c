@@ -28,12 +28,16 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
     if ((mixr->is_thirtysecond && arp->rate == ATHIRTYSECOND) ||
         (mixr->is_sixteenth && arp->rate == ASIXTEENTH) ||
         (mixr->is_eighth && arp->rate == AEIGHTH) ||
-        (mixr->is_quarter && arp->rate == AQUARTER)) {
-        if (arp->single_note_repeat) {
+        (mixr->is_quarter && arp->rate == AQUARTER))
+    {
+        if (arp->single_note_repeat)
+        {
             note = ms->m_last_midi_note;
         }
-        else {
-            switch (arp->cur_step) {
+        else
+        {
+            switch (arp->cur_step)
+            {
             case (ROOT):
                 note = ms->m_last_midi_note;
                 break;
@@ -50,7 +54,8 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
             minisynth_handle_midi_note(ms, note + (12 * arp->cur_octave),
                                        velocity, false);
 
-        switch (arp->mode) {
+        switch (arp->mode)
+        {
         case (UP):
             if (arp->cur_step == FIFTH)
                 arp->cur_octave = (arp->cur_octave + 1) % arp->octave_range;
@@ -58,7 +63,8 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
             arp->cur_step = (arp->cur_step + 1) % MAX_ARP_STEPS;
             break;
         case (DOWN):
-            if (arp->cur_step == ROOT) {
+            if (arp->cur_step == ROOT)
+            {
                 arp->cur_octave--;
                 if (arp->cur_octave < 0)
                     arp->cur_octave = arp->octave_range - 1;
@@ -68,8 +74,10 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
                 arp->cur_step--;
             break;
         case (UPDOWN):
-            if (arp->direction == UP) {
-                if (arp->cur_step == FIFTH) {
+            if (arp->direction == UP)
+            {
+                if (arp->cur_step == FIFTH)
+                {
                     if (arp->cur_octave == arp->octave_range - 1)
                         arp->direction = DOWN;
                     else
@@ -78,10 +86,13 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
                 }
                 arp->cur_step = (arp->cur_step + 1) % MAX_ARP_STEPS;
             }
-            else {
-                if (arp->cur_step == ROOT) {
+            else
+            {
+                if (arp->cur_step == ROOT)
+                {
                     arp->cur_octave--;
-                    if (arp->cur_octave < 0) {
+                    if (arp->cur_octave < 0)
+                    {
                         arp->cur_octave = 0;
                         arp->direction = UP;
                     }

@@ -9,7 +9,8 @@
 wt_osc *wt_osc_new()
 {
     wt_osc *wt = (wt_osc *)calloc(1, sizeof(wt_osc));
-    if (wt == NULL) {
+    if (wt == NULL)
+    {
         printf("Nae mem\n");
         return NULL;
     }
@@ -42,7 +43,8 @@ void wt_reset(wt_osc *wt)
 
 double wt_do_oscillate(wt_osc *wt, double *quad_outval)
 {
-    if (!wt->noteon) {
+    if (!wt->noteon)
+    {
         return 0.0;
         *quad_outval = 0.0;
     }
@@ -56,7 +58,8 @@ double wt_do_oscillate(wt_osc *wt, double *quad_outval)
     double outval = 0.0;
     *quad_outval = 0.0;
 
-    switch (wt->waveform) {
+    switch (wt->waveform)
+    {
     case (0): // sine
         outval = lin_terp(0, 1, wt->m_sine_array[read_index],
                           wt->m_sine_array[read_index_next], frac);
@@ -72,7 +75,8 @@ double wt_do_oscillate(wt_osc *wt, double *quad_outval)
                 lin_terp(0, 1, wt->m_saw_array[quad_read_index],
                          wt->m_saw_array[quad_read_index_next], frac);
         }
-        else {
+        else
+        {
             outval = lin_terp(0, 1, wt->m_saw_array_bl5[read_index],
                               wt->m_saw_array_bl5[read_index_next], frac);
             *quad_outval =
@@ -89,7 +93,8 @@ double wt_do_oscillate(wt_osc *wt, double *quad_outval)
                 lin_terp(0, 1, wt->m_triangle_array[quad_read_index],
                          wt->m_triangle_array[quad_read_index_next], frac);
         }
-        else {
+        else
+        {
             outval = lin_terp(0, 1, wt->m_triangle_array_bl5[read_index],
                               wt->m_triangle_array_bl5[read_index_next], frac);
             *quad_outval =
@@ -106,7 +111,8 @@ double wt_do_oscillate(wt_osc *wt, double *quad_outval)
                 lin_terp(0, 1, wt->m_square_array[quad_read_index],
                          wt->m_square_array[quad_read_index_next], frac);
         }
-        else {
+        else
+        {
             outval = lin_terp(0, 1, wt->m_square_array_bl5[read_index],
                               wt->m_square_array_bl5[read_index_next], frac);
             *quad_outval =
@@ -121,12 +127,14 @@ double wt_do_oscillate(wt_osc *wt, double *quad_outval)
                                 wt->m_sine_array[quad_read_index_next], frac);
     }
 
-    if (wt->m_invert) {
+    if (wt->m_invert)
+    {
         outval *= -1.0;
         *quad_outval *= -1.0;
     }
 
-    if (wt->polarity == 1) { // bipolar
+    if (wt->polarity == 1)
+    { // bipolar
         outval /= 2.0;
         outval += 0.5;
 
@@ -174,7 +182,8 @@ void wt_create_wave_tables(wt_osc *wt)
     double max_saw = 0.;
     double max_sqr = 0.;
 
-    for (int i = 0; i < WT_LENGTH; i++) {
+    for (int i = 0; i < WT_LENGTH; i++)
+    {
         wt->m_sine_array[i] = sin(((double)i / WT_LENGTH) * (2 * M_PI));
         wt->m_saw_array[i] = i < 512 ? ms1 * i + bs1 : ms2 * (i - 511) + bs2;
 
@@ -191,14 +200,16 @@ void wt_create_wave_tables(wt_osc *wt)
         wt->m_square_array_bl5[i] = 0.;
         wt->m_triangle_array_bl5[i] = 0.;
 
-        for (int g = 1; g <= 6; g++) {
+        for (int g = 1; g <= 6; g++)
+        {
             double n = (double)g;
             wt->m_saw_array_bl5[i] += pow((float)-1.0, (float)(g + 1)) *
                                       (1.0 / n) *
                                       sin(2.0 * M_PI * i * n / WT_LENGTH);
         }
 
-        for (int g = 0; g <= 3; g++) {
+        for (int g = 0; g <= 3; g++)
+        {
             double n = (double)g;
             wt->m_triangle_array_bl5[i] +=
                 pow((float)-1.0, (float)n) *
@@ -206,18 +217,21 @@ void wt_create_wave_tables(wt_osc *wt)
                 sin(2.0 * M_PI * (2.0 * n + 1) * i / (float)WT_LENGTH);
         }
 
-        for (int g = 1; g <= 5; g += 2) {
+        for (int g = 1; g <= 5; g += 2)
+        {
             double n = (double)g;
             wt->m_square_array_bl5[i] +=
                 (1.0 / n) * sin(2.0 * M_PI * i * n / (float)WT_LENGTH);
         }
 
-        if (i == 0) {
+        if (i == 0)
+        {
             max_saw = wt->m_saw_array_bl5[i];
             max_tri = wt->m_triangle_array_bl5[i];
             max_sqr = wt->m_square_array_bl5[i];
         }
-        else {
+        else
+        {
             if (wt->m_saw_array_bl5[i] > max_saw)
                 max_saw = wt->m_saw_array_bl5[i];
             if (wt->m_triangle_array_bl5[i] > max_tri)
@@ -226,7 +240,8 @@ void wt_create_wave_tables(wt_osc *wt)
                 max_sqr = wt->m_square_array_bl5[i];
         }
     }
-    for (int i = 0; i < WT_LENGTH; i++) {
+    for (int i = 0; i < WT_LENGTH; i++)
+    {
         wt->m_saw_array_bl5[i] /= max_saw;
         wt->m_triangle_array_bl5[i] /= max_tri;
         wt->m_square_array_bl5[i] /= max_sqr;

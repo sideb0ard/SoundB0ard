@@ -6,7 +6,8 @@
 
 #define AMP_MOD_RANGE -96 // -96dB
 
-typedef struct dca {
+typedef struct dca
+{
 
     modmatrix *m_v_modmatrix;
 

@@ -48,7 +48,8 @@ void envelope_detector_settcmodeanalog(envelope_detector *ed, bool analogtc)
 
 double envelope_detector_detect(envelope_detector *ed, double input)
 {
-    switch (ed->m_detectmode) {
+    switch (ed->m_detectmode)
+    {
     case 0:
         input = fabs(input);
     case 1:
@@ -72,7 +73,8 @@ double envelope_detector_detect(envelope_detector *ed, double input)
     ed->m_envelope = min(ed->m_envelope, 1.0);
     ed->m_envelope = max(ed->m_envelope, 0.0);
 
-    if (ed->m_logdetector) {
+    if (ed->m_logdetector)
+    {
         if (ed->m_envelope <= 0)
             return -96.0;
         return 20 * log10(ed->m_envelope);

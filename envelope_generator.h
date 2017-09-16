@@ -9,9 +9,14 @@
 #define EG_MAXTIME_MS 5000
 #define EG_DEFAULT_STATE_TIME 100
 
-enum { ANALOG, DIGITAL };
+enum
+{
+    ANALOG,
+    DIGITAL
+};
 
-enum {
+enum
+{
     OFFF, // name clash in defjams
     ATTACK,
     DECAY,
@@ -20,7 +25,8 @@ enum {
     SHUTDOWN
 };
 
-typedef struct envelope_generator {
+typedef struct envelope_generator
+{
 
     modmatrix *m_v_modmatrix;
 

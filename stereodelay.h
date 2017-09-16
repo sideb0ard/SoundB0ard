@@ -8,7 +8,8 @@
 
 typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;
 
-typedef struct stereodelay {
+typedef struct stereodelay
+{
     fx m_fx; // API
     delayline m_left_delay, m_right_delay;
     double m_delay_time_ms;    // 0 - 2000

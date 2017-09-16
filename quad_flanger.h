@@ -2,7 +2,8 @@
 
 #include "modular_delay.h"
 
-typedef struct quad_flanger {
+typedef struct quad_flanger
+{
     fx m_fx;
     modular_delay m_moddelay_left;
     modular_delay m_moddelay_right;

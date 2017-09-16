@@ -79,7 +79,8 @@ bool ddl_process_audio_frame(ddlmodule *d, double *input_buffer,
 {
     double xn = input_buffer[0];
     double yn = d->m_buffer[d->m_read_index];
-    if (d->m_read_index == d->m_write_index && d->m_delay_in_samples < 1.0) {
+    if (d->m_read_index == d->m_write_index && d->m_delay_in_samples < 1.0)
+    {
         yn = xn;
     }
 
@@ -112,7 +113,8 @@ bool ddl_process_audio_frame(ddlmodule *d, double *input_buffer,
         d->m_write_index = 0;
 
     d->m_read_index++;
-    if (d->m_read_index >= d->m_buffer_size) {
+    if (d->m_read_index >= d->m_buffer_size)
+    {
         d->m_read_index = 0;
     }
 

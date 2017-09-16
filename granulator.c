@@ -94,7 +94,8 @@ double granulator_gennext(void *self)
     granulator *g = (granulator *)self;
     double val = 0;
 
-    if (g->external_source_sg != -1) {
+    if (g->external_source_sg != -1)
+    {
         g->audio_buffer[g->audio_buffer_write_idx] =
             mixr->soundgen_cur_val[g->external_source_sg];
         g->audio_buffer_write_idx++;
@@ -102,10 +103,11 @@ double granulator_gennext(void *self)
             g->audio_buffer_write_idx = 0;
     }
 
-    if (g->sequencer_mode && g->m_seq.num_patterns > 0) {
+    if (g->sequencer_mode && g->m_seq.num_patterns > 0)
+    {
         int idx = mixr->midi_tick % PPBAR;
-        if (mixr->is_midi_tick &&
-            g->m_seq.patterns[g->m_seq.cur_pattern][idx]) {
+        if (mixr->is_midi_tick && g->m_seq.patterns[g->m_seq.cur_pattern][idx])
+        {
             granulator_start(g);
         }
         else if (mixr->is_sixteenth)
@@ -123,7 +125,8 @@ double granulator_gennext(void *self)
     osc_update((oscillator *)&g->m_lfo2);
     osc_update((oscillator *)&g->m_lfo3);
 
-    if (g->graindur_lfo_on) {
+    if (g->graindur_lfo_on)
+    {
         double lfo1_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo1_min, g->m_lfo1_max, lfo1_out);
@@ -132,7 +135,8 @@ double granulator_gennext(void *self)
         //    g->grain_duration_ms = g->m_lfo1_min;
     }
 
-    if (g->grainps_lfo_on) {
+    if (g->grainps_lfo_on)
+    {
         double lfo2_out = lfo_do_oscillate((oscillator *)&g->m_lfo2, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo2_min, g->m_lfo2_max, lfo2_out);
@@ -141,7 +145,8 @@ double granulator_gennext(void *self)
         //    g->grains_per_sec = g->m_lfo2_min;
     }
 
-    if (g->grainscanfile_lfo_on) {
+    if (g->grainscanfile_lfo_on)
+    {
         double lfo3_out = lfo_do_oscillate((oscillator *)&g->m_lfo3, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo3_min, g->m_lfo3_max, lfo3_out);
@@ -187,9 +192,11 @@ double granulator_gennext(void *self)
             g->num_active_grains -= num_deactivated;
         }
 
-        for (int i = 0; i < g->highest_grain_num; i++) {
+        for (int i = 0; i < g->highest_grain_num; i++)
+        {
             int grain_idx = sound_grain_generate_idx(&g->m_grains[i]);
-            if (grain_idx != -99) {
+            if (grain_idx != -99)
+            {
                 if (grain_idx < 0)
                     printf("VLIMEY!\n");
                 int modified_idx = grain_idx % g->audio_buffer_len;
@@ -198,7 +205,8 @@ double granulator_gennext(void *self)
                                        0 /* zero means first grain idx*/);
             }
             grain_idx = sound_grain_gen_doppelganger_idx(&g->m_grains[i]);
-            if (grain_idx != -99) {
+            if (grain_idx != -99)
+            {
                 int modified_idx = grain_idx % g->audio_buffer_len;
                 val += g->audio_buffer[modified_idx] *
                        sound_grain_env(&g->m_grains[i], 1 /* 1 means
@@ -280,7 +288,8 @@ double granulator_getvol(void *self)
 void granulator_setvol(void *self, double v)
 {
     granulator *g = (granulator *)self;
-    if (v < 0.0 || v > 1.0) {
+    if (v < 0.0 || v > 1.0)
+    {
         return;
     }
     g->vol = v;
@@ -333,19 +342,22 @@ int sound_grain_generate_idx(sound_grain *g)
 
     g->audiobuffer_cur_pos += g->audiobuffer_pitch;
     int end_buffer = g->audiobuffer_start_idx + g->grain_len_samples;
-    if (g->audiobuffer_cur_pos >= end_buffer) {
+    if (g->audiobuffer_cur_pos >= end_buffer)
+    {
         g->audiobuffer_cur_pos -= g->grain_len_samples;
         if (g->deactivation_pending)
             g->active = false;
     }
-    else if (g->audiobuffer_cur_pos < g->audiobuffer_start_idx) {
+    else if (g->audiobuffer_cur_pos < g->audiobuffer_start_idx)
+    {
         g->audiobuffer_cur_pos = end_buffer - g->audiobuffer_cur_pos;
         if (g->deactivation_pending)
             g->active = false;
     }
 
-    if (g->doppelganger_started) { // started by grain_envelope, when we enter
-                                   // release
+    if (g->doppelganger_started)
+    { // started by grain_envelope, when we enter
+        // release
         g->doppelganger_idx += g->audiobuffer_pitch;
         if (g->doppelganger_idx >= end_buffer)
             g->doppelganger_idx -= g->grain_len_samples;
@@ -396,11 +408,13 @@ void granulator_import_file(granulator *g, char *filename)
 
 void granulator_set_external_source(granulator *g, int sound_gen_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, sound_gen_num)) {
+    if (mixer_is_valid_soundgen_num(mixr, sound_gen_num))
+    {
         g->external_source_sg = sound_gen_num;
         int looplen = mixr->loop_len_in_samples;
         double *buffer = calloc(looplen, sizeof(double));
-        if (buffer) {
+        if (buffer)
+        {
             if (g->audio_buffer)
                 free(g->audio_buffer);
             g->audio_buffer = buffer;
@@ -414,7 +428,8 @@ int granulator_calculate_grain_spacing(granulator *g)
 {
     int looplen_in_seconds = mixr->loop_len_in_samples / (double)SAMPLE_RATE;
     g->num_grains_per_looplen = looplen_in_seconds * g->grains_per_sec;
-    if (g->num_grains_per_looplen == 0) {
+    if (g->num_grains_per_looplen == 0)
+    {
         g->num_grains_per_looplen = 2; // whoops! dn't wanna div by 0 below
     }
     int spacing = mixr->loop_len_in_samples / g->num_grains_per_looplen;
@@ -449,7 +464,8 @@ void granulator_set_grain_release_size_pct(granulator *g, int release_pct)
 
 void granulator_set_grain_buffer_position(granulator *g, int pos)
 {
-    if (pos < 0 || pos > 100) {
+    if (pos < 0 || pos > 100)
+    {
         printf("file position should be a percent\n");
         return;
     }
@@ -474,7 +490,8 @@ void granulator_set_grain_pitch(granulator *g, int pitch)
 
 void granulator_set_selection_mode(granulator *g, unsigned int mode)
 {
-    if (mode >= GRAIN_NUM_SELECTION_MODES) {
+    if (mode >= GRAIN_NUM_SELECTION_MODES)
+    {
         printf("Selection must be < %d\n", GRAIN_NUM_SELECTION_MODES);
         return;
     }
@@ -483,7 +500,8 @@ void granulator_set_selection_mode(granulator *g, unsigned int mode)
 
 void granulator_set_sequencer_mode(granulator *g, bool b)
 {
-    if (b != 0 && b != 1) {
+    if (b != 0 && b != 1)
+    {
         printf("not BOOLEY BOOLEY!\n");
         return;
     }
@@ -497,8 +515,10 @@ void granulator_set_sequencer_mode(granulator *g, bool b)
 int granulator_get_available_grain_num(granulator *g)
 {
     int idx = 0;
-    while (idx < MAX_CONCURRENT_GRAINS) {
-        if (!g->m_grains[idx].active) {
+    while (idx < MAX_CONCURRENT_GRAINS)
+    {
+        if (!g->m_grains[idx].active)
+        {
             if (idx > g->highest_grain_num)
                 g->highest_grain_num = idx;
             return idx;
@@ -512,10 +532,12 @@ int granulator_get_available_grain_num(granulator *g)
 int granulator_deactivate_other_grains(granulator *g)
 {
     int num_deactivated = 0;
-    for (int i = 0; i < g->highest_grain_num; i++) {
+    for (int i = 0; i < g->highest_grain_num; i++)
+    {
         if (i == g->cur_grain_num)
             continue;
-        if (g->m_grains[i].active && !g->m_grains[i].deactivation_pending) {
+        if (g->m_grains[i].active && !g->m_grains[i].deactivation_pending)
+        {
             g->m_grains[i].deactivation_pending = true;
             num_deactivated++;
         }
@@ -525,8 +547,10 @@ int granulator_deactivate_other_grains(granulator *g)
 
 void granulator_set_lfo_amp(granulator *g, int lfonum, double amp)
 {
-    if (amp >= 0.0 && amp <= 1.0) {
-        switch (lfonum) {
+    if (amp >= 0.0 && amp <= 1.0)
+    {
+        switch (lfonum)
+        {
         case (1):
             g->m_lfo1.osc.m_amplitude = amp;
             break;
@@ -544,8 +568,10 @@ void granulator_set_lfo_amp(granulator *g, int lfonum, double amp)
 
 void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice)
 {
-    if (voice < MAX_LFO_OSC) {
-        switch (lfonum) {
+    if (voice < MAX_LFO_OSC)
+    {
+        switch (lfonum)
+        {
         case (1):
             g->m_lfo1.osc.m_waveform = voice;
             break;
@@ -564,8 +590,10 @@ void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice)
 void granulator_set_lfo_rate(granulator *g, int lfonum, double rate)
 {
     // if (rate >= MIN_LFO_RATE && rate <= MAX_LFO_RATE)
-    if (rate >= 0 && rate <= MAX_LFO_RATE) {
-        switch (lfonum) {
+    if (rate >= 0 && rate <= MAX_LFO_RATE)
+    {
+        switch (lfonum)
+        {
         case (1):
             g->m_lfo1.osc.m_osc_fo = rate;
             g->lfo1_sync = false;
@@ -588,7 +616,8 @@ void granulator_set_lfo_min(granulator *g, int lfonum, double minval)
 {
     if (minval < 0)
         return;
-    switch (lfonum) {
+    switch (lfonum)
+    {
     case (1):
         g->m_lfo1_min = minval;
         break;
@@ -603,7 +632,8 @@ void granulator_set_lfo_min(granulator *g, int lfonum, double minval)
 
 void granulator_set_lfo_max(granulator *g, int lfonum, double maxval)
 {
-    switch (lfonum) {
+    switch (lfonum)
+    {
     case (1):
         if (maxval > g->m_lfo1_min)
             g->m_lfo1_max = maxval;
@@ -625,7 +655,8 @@ void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops)
     int looplen_in_samples = 60 / mixr->bpm * SAMPLE_RATE;
     double osc_fo = (double)SAMPLE_RATE / (looplen_in_samples * numloops);
     printf("Setting LFO %d sync to %f\n", lfonum, osc_fo);
-    switch (lfonum) {
+    switch (lfonum)
+    {
     case (1):
         g->m_lfo1.osc.m_osc_fo = osc_fo;
         g->lfo1_sync = true;

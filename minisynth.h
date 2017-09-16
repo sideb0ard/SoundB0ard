@@ -48,7 +48,8 @@
 
 static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 
-typedef struct synthsettings {
+typedef struct synthsettings
+{
     char m_settings_name[256];
 
     unsigned int m_voice_mode;
@@ -111,7 +112,8 @@ typedef struct synthsettings {
     double m_sustain_time_sixteenth;
 } synthsettings;
 
-typedef struct minisynth {
+typedef struct minisynth
+{
     SOUNDGEN sound_generator;
 
     int tick; // current 16th note tick from mixer

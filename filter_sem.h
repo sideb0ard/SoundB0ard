@@ -5,7 +5,8 @@
 
 typedef struct filter_sem filter_sem;
 
-struct filter_sem {
+struct filter_sem
+{
 
     filter f; // base class
     double m_alpha;
