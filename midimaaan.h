@@ -2,6 +2,7 @@
 
 #include "fx.h"
 #include "pthread.h"
+#include "defjams.h"
 #include <stdbool.h>
 
 typedef struct minisynth minisynth;
@@ -20,7 +21,7 @@ typedef struct midi_event
                        // key off
 } midi_event;
 
-typedef midi_event *midi_events_loop_t[PPNS];
+typedef midi_event *midi_events_loop[PPNS];
 
 void *midiman(void *);
 

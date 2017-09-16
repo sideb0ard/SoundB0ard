@@ -76,12 +76,12 @@ void *midiman()
                         (minisynth *)mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
 
-                    if (ms->recording)
+                    if (ms->base.recording)
                     {
                         int tick = mixr->midi_tick % PPNS;
                         midi_event *ev =
                             new_midi_event(tick, status, data1, data2);
-                        minisynth_add_event(ms, ms->cur_melody, ev);
+                        synthbase_add_event(&ms->base, ms->base.cur_melody, ev);
                     }
 
                     midi_event ev;
@@ -402,7 +402,7 @@ void midi_parse_midi_event(minisynth *ms, midi_event *ev)
 
     if (ev->delete_after_use)
     {
-        ms->melodies[ms->cur_melody][ev->tick] = NULL;
+        ms->base.melodies[ms->base.cur_melody][ev->tick] = NULL;
         if (mixr->debug_mode)
             printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
         free(ev);

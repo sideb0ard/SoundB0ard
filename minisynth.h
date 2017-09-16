@@ -14,37 +14,8 @@
 #include "sound_generator.h"
 #include "stereodelay.h"
 
+#include "synthbase.h"
 #include "minisynth_voice.h"
-
-#define MAX_NUM_MIDI_LOOPS 64
-#define MAX_VOICES 3
-
-#define MIN_DETUNE_CENTS -50.0
-#define MAX_DETUNE_CENTS 50.0
-#define DEFAULT_DETUNE_CENTS 0.0
-
-#define MIN_PULSE_WIDTH_PCT 1.0
-#define MAX_PULSE_WIDTH_PCT 99.0
-#define DEFAULT_PULSE_WIDTH_PCT 50.0
-#define MIN_NOISE_OSC_AMP_DB -96.0
-#define MAX_NOISE_OSC_AMP_DB 0.0
-#define DEFAULT_NOISE_OSC_AMP_DB -96.0
-#define MIN_SUB_OSC_AMP_DB -96.0
-#define MAX_SUB_OSC_AMP_DB 0.0
-#define DEFAULT_SUB_OSC_AMP_DB -96.0
-
-#define DEFAULT_LEGATO_MODE 0
-#define DEFAULT_RESET_TO_ZERO 0
-#define DEFAULT_FILTER_KEYTRACK 0
-#define DEFAULT_FILTER_KEYTRACK_INTENSITY 0.5
-#define DEFAULT_VELOCITY_TO_ATTACK 0
-#define DEFAULT_NOTE_TO_DECAY 0
-#define DEFAULT_MIDI_PITCHBEND 0
-#define DEFAULT_MIDI_MODWHEEL 0
-#define DEFAULT_MIDI_VOLUME 127
-#define DEFAULT_MIDI_PAN 64
-#define DEFAULT_MIDI_EXPRESSION 0
-#define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
 
 static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 
@@ -115,23 +86,9 @@ typedef struct synthsettings
 typedef struct minisynth
 {
     SOUNDGEN sound_generator;
-
-    int tick; // current 16th note tick from mixer
-    midi_events_loop_t melodies[MAX_NUM_MIDI_LOOPS];
-    int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];
-    midi_events_loop_t backup_melody_while_getting_crazy;
-
-    int num_melodies;
-    int cur_melody;
-    int cur_melody_iteration;
-
-    bool multi_melody_mode;
-    bool multi_melody_loop_countdown_started;
+    synthbase base;
 
     bool active;
-
-    bool recording;
-    unsigned int m_midi_knob_mode; // midi routings, 1..3
 
     minisynth_voice *m_voices[MAX_VOICES];
 
@@ -148,16 +105,6 @@ typedef struct minisynth
     synthsettings m_settings;
     synthsettings m_settings_backup_while_getting_crazy;
 
-    bool morph_mode; // magical
-    int morph_every_n_loops;
-    int morph_generation;
-
-    bool generate_mode; // magical
-    int generate_every_n_loops;
-    int generate_generation;
-
-    int max_generation;
-
     int m_last_midi_note;
     arpeggiator m_arp;
 
@@ -171,24 +118,25 @@ double minisynth_gennext(void *self);
 void minisynth_status(void *self, wchar_t *status_string);
 void minisynth_setvol(void *self, double v);
 double minisynth_getvol(void *self);
+void minisynth_sg_start(void *self);
+void minisynth_sg_stop(void *self);
+
 ////////////////////////////////////
 
-// Will Pirkle model
 bool minisynth_prepare_for_play(minisynth *synth);
-
-void minisynth_clear_melody_ready_for_new_one(minisynth *ms, int melody_num);
 void minisynth_stop(minisynth *ms);
-
 void minisynth_update(minisynth *synth);
 
-void minisynth_generate_melody(minisynth *ms, int melody_num, int max_notes,
-                               int max_steps);
+void minisynth_midi_control(minisynth *self, unsigned int data1,
+        unsigned int data2);
 
 void minisynth_increment_voice_timestamps(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *synth,
                                                       unsigned int midi_note);
 
+void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
+                                bool update_last_midi);
 bool minisynth_midi_note_on(minisynth *self, unsigned int midinote,
                             unsigned int velocity);
 bool minisynth_midi_note_off(minisynth *self, unsigned int midinote,
@@ -197,44 +145,17 @@ void minisynth_midi_mod_wheel(minisynth *self, unsigned int data1,
                               unsigned int data2);
 void minisynth_midi_pitchbend(minisynth *self, unsigned int data1,
                               unsigned int data2);
-void minisynth_midi_control(minisynth *self, unsigned int data1,
-                            unsigned int data2);
-
-void minisynth_set_multi_melody_mode(minisynth *self, bool melody_mode);
-void minisynth_set_melody_loop_num(minisynth *self, int melody_num,
-                                   int loop_num);
-int minisynth_add_melody(minisynth *self);
-void minisynth_dupe_melody(midi_event **from, midi_event **to);
-void minisynth_switch_melody(minisynth *self, unsigned int melody_num);
-void minisynth_reset_melody(minisynth *self, unsigned int melody_num);
-void minisynth_reset_melody_all(minisynth *self);
 void minisynth_reset_voices(minisynth *self);
-void minisynth_melody_to_string(minisynth *self, int melody_num,
-                                wchar_t scratch[33]);
-int minisynth_add_event(minisynth *self, int pattern_num, midi_event *ev);
-void minisynth_delete_event(minisynth *ms, int pat_num, int tick);
 
-midi_event **minisynth_get_midi_loop(minisynth *self);
-midi_event **minisynth_copy_midi_loop(minisynth *self, int pattern_num);
-void minisynth_add_midi_loop(minisynth *self, midi_event **events,
-                             int pattern_num);
-void minisynth_replace_midi_loop(minisynth *ms, midi_event **events,
-                                 int melody_num);
 void minisynth_toggle_delay_mode(minisynth *ms);
 
 void minisynth_rand_settings(minisynth *ms);
-void minisynth_print_melodies(minisynth *ms);
 void minisynth_print_settings(minisynth *ms);
 bool minisynth_save_settings(minisynth *ms, char *preset_name);
 bool minisynth_load_settings(minisynth *ms, char *preset_name);
 bool minisynth_list_presets(void);
 bool minisynth_check_if_preset_exists(char *preset_to_find);
 
-void minisynth_nudge_melody(minisynth *ms, int melody_num, int sixteenth);
-bool is_valid_melody_num(minisynth *ns, int melody_num);
-
-void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
-                                bool update_last_midi);
 void minisynth_set_arpeggiate(minisynth *ms, bool b);
 void minisynth_set_arpeggiate_latch(minisynth *ms, bool b);
 void minisynth_set_arpeggiate_single_note_repeat(minisynth *ms, bool b);
@@ -242,35 +163,10 @@ void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val);
 void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode);
 void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode);
 
-void minisynth_import_midi_from_file(minisynth *ms, char *filename);
 void minisynth_set_filter_mod(minisynth *ms, double mod);
 void minisynth_del_self(minisynth *ms);
 
-void minisynth_set_generate_mode(minisynth *ms, bool b);
-void minisynth_set_morph_mode(minisynth *ms, bool b);
-void minisynth_set_backup_mode(minisynth *ms, bool b);
-void minisynth_morph(minisynth *ms);
-int minisynth_get_notes_from_melody(midi_event **melody,
-                                    int return_midi_notes[10]);
-
-void minisynth_sg_start(void *self);
-void minisynth_sg_stop(void *self);
-
-int minisynth_get_num_tracks(void *self);
-int minisynth_get_num_notes(minisynth *ms);
-void minisynth_make_active_track(void *self, int pattern_num);
-
 void minisynth_print(minisynth *ms);
-void minisynth_add_note(minisynth *ms, int pattern_num, int step,
-                        int midi_note);
-void minisynth_rm_note(minisynth *ms, int pattern_num, int step);
-void minisynth_mv_note(minisynth *ms, int pattern_num, int fromstep,
-                       int tostep);
-void minisynth_add_micro_note(minisynth *ms, int pattern_num, int step,
-                              int midi_note);
-void minisynth_rm_micro_note(minisynth *ms, int pattern_num, int step);
-void minisynth_mv_micro_note(minisynth *ms, int pattern_num, int fromstep,
-                             int tostep);
 
 void minisynth_set_attack_time_ms(minisynth *ms, double val);
 void minisynth_set_decay_time_ms(minisynth *ms, double val);

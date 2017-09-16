@@ -9,6 +9,7 @@
 #include "mixer.h"
 #include "obliquestrategies.h"
 #include "utils.h"
+#include "synthbase.h"
 
 extern mixer *mixr;
 
@@ -153,7 +154,7 @@ void chaosmonkey_add_note_at_random_time(minisynth *ms, int note)
     midi_event *off_event = new_midi_event(note_off_tick, 128, note, 126);
     off_event->delete_after_use = true;
 
-    minisynth_add_event(ms, ms->cur_melody, on_event);
+    synthbase_add_event(&ms->base, ms->base.cur_melody, on_event);
 
     return;
 }

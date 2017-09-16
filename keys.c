@@ -71,9 +71,9 @@ void keys(int soundgen_num)
                 ms->m_settings.m_octave++;
                 break;
             case 114:
-                ms->recording = 1 - ms->recording;
+                ms->base.recording = 1 - ms->base.recording;
                 printf("Toggling REC to %s\n",
-                       ms->recording ? "true" : "false");
+                       ms->base.recording ? "true" : "false");
                 break;
             case 122:
                 printf("SAW3 mode\n");

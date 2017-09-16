@@ -34,6 +34,7 @@ OBJ = \
 	help.o \
 	keys.o \
 	lfo.o \
+	looper.o \
 	main.o \
 	midi_freq_table.o \
 	midimaaan.o \
@@ -47,12 +48,12 @@ OBJ = \
 	oscillator.o \
 	qblimited_oscillator.o \
 	reverb.o \
-	looper.o \
 	sbmsg.o \
 	sparkline.o \
 	spork.o \
 	stereodelay.o \
 	sound_generator.o \
+	synthbase.o \
 	synthdrum_sequencer.o \
 	table.o \
 	utils.o \
