@@ -32,6 +32,18 @@ extern const char *key_names[NUM_KEYS];
 extern const int key_midi_mapping[NUM_KEYS];
 extern const compat_key_list compat_keys[NUM_KEYS];
 
+const wchar_t *s_status_colors[] = {
+    WCOOL_COLOR_PINK,      // SYNTH_TYPE
+    WCOOL_COLOR_MAUVE,     // LOOPER_TYPE
+    WCOOL_COLOR_YELLOW,    // BITWIZE_TYPE
+    WANSI_COLOR_DEEP_RED,  // GRANULATOR_TYPE
+    WANSI_COLOR_GREEN_TOO, // SEQUENCER_TYPE
+    WANSI_COLOR_MAGENTA,   // SYNTHDRUM_TYPE
+    WANSI_COLOR_CYAN,      // ALGORITHM_TYPE
+    WANSI_COLOR_GREEN,     // CHAOSMONKEY_TYPE
+    WANSI_COLOR_BLUE       // SPORK_TYPE
+};
+
 mixer *new_mixer()
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
@@ -128,8 +140,16 @@ void mixer_ps(mixer *mixr)
             wchar_t wss[MAX_PS_STRING_SZ];
             memset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
-            wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET "  %ls\n", i,
-                    wss);
+
+            wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
+
+            if (mixr->sound_generators[i]->active)
+            {
+                wprintf(s_status_colors[mixr->sound_generators[i]->type]);
+            }
+            wprintf(L"  %ls\n", wss);
+            wprintf(WANSI_COLOR_RESET);
+
             if (mixr->sound_generators[i]->effects_num > 0 ||
                 mixr->sound_generators[i]->envelopes_num > 0)
             {

@@ -88,8 +88,6 @@ typedef struct minisynth
     SOUNDGEN sound_generator;
     synthbase base;
 
-    bool active;
-
     minisynth_voice *m_voices[MAX_VOICES];
 
     // global modmatrix, core is shared by all voices

@@ -21,6 +21,7 @@ typedef struct t_soundgen
     int (*get_num_tracks)(void *self);
 
     sound_generator_type type;
+    bool active;
 
     int effects_size; // size of array
     int effects_num;  // num of effects

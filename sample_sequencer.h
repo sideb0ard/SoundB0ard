@@ -37,7 +37,6 @@ typedef struct sample_sequencer
 
     int swing;
 
-    bool active;
     bool started; // to sync at top of loop
 
     double vol;

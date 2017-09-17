@@ -60,7 +60,6 @@ typedef struct synthdrum_sequencer
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
     int mod_semitones_range;
-    bool active;
     bool started;
 
 } synthdrum_sequencer;

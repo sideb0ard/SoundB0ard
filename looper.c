@@ -15,7 +15,7 @@ looper *new_looper(char *filename, double loop_len)
 {
     looper *l = (looper *)calloc(1, sizeof(looper));
     l->vol = 0.7;
-    l->active = true;
+    l->sound_generator.active = true;
     l->started = false;
     l->just_been_resampled = false;
     l->loop_len = loop_len;
@@ -48,7 +48,7 @@ double looper_gennext(void *self)
     looper *l = (looper *)self;
     double val = 0;
 
-    if (!l->active)
+    if (!l->sound_generator.active)
         return val;
 
     // wait till start of loop to keep patterns synched
@@ -390,13 +390,13 @@ void sample_resample_to_loop_size(file_sample *fs)
 void looper_status(void *self, wchar_t *status_string)
 {
     looper *l = (looper *)self;
-    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_GREEN
-             "[LOOPER] Vol:%.2lf MultiMode:%s CurSample:%d MaxGen:%d  "
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             L"[LOOPER] Vol:%.2lf MultiMode:%s CurSample:%d MaxGen:%d  "
              "Active:%s Position:%d SampleLength:%d\n"
              "      ScramblrrrMode:%s ScrambleGen:%d ScrambleEveryN:%d "
              "StutterMode:%s StutterGen:%d StutterEveryN:%d\n",
              l->vol, l->multi_sample_mode ? "true" : "false", l->cur_sample,
-             l->max_generation, l->active ? " true" : "false",
+             l->max_generation, l->sound_generator.active ? " true" : "false",
              l->samples[l->cur_sample]->position,
              l->samples[l->cur_sample]->resampled_file_size,
              l->scramblrrr_mode ? "true" : "false", l->scramble_generation,
@@ -408,19 +408,17 @@ void looper_status(void *self, wchar_t *status_string)
     for (int i = 0; i < l->num_samples; i++)
     {
         swprintf(looper_details, 128,
-                 L"\n      [" WANSI_COLOR_WHITE "%d" WCOOL_COLOR_GREEN "]"
-                 " %s - looplen: %d numloops: %d",
-                 i, l->samples[i]->filename, l->samples[i]->loop_len,
+                 L"\n      [%d] %s - looplen: %d numloops: %d", i,
+                 l->samples[i]->filename, l->samples[i]->loop_len,
                  l->sample_num_loops[i]);
         wcslcat(status_string, looper_details, strlen_left);
     }
-    wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void looper_start(void *self)
 {
     looper *l = (looper *)self;
-    l->active = true;
+    l->sound_generator.active = true;
     // l->started = false;
     // l->samples[l->cur_sample]->position = 0;
     // l->scramblrrr->position = 0;
@@ -429,7 +427,7 @@ void looper_start(void *self)
 void looper_stop(void *self)
 {
     looper *l = (looper *)self;
-    l->active = false;
+    l->sound_generator.active = false;
     l->started = false;
     l->samples[l->cur_sample]->position = 0;
     l->scramblrrr->position = 0;

@@ -98,41 +98,39 @@ synthdrum_sequencer *new_synthdrum_seq()
 void sds_status(void *self, wchar_t *ss)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
-    swprintf(
-        ss, MAX_PS_STRING_SZ, WANSI_COLOR_GREEN
-        "[SYNTHDRUM] Name: %s Vol: %.2f "
-        "distortion_threshold:%.2f " WANSI_COLOR_GREEN_TOO
-        "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f" WANSI_COLOR_GREEN
-        "\n      eg1_attack:%.2f eg1_decay:%.2f eg1_sustain_level:%.2f "
-        "eg1_sustain_ms:%.2f eg1_release:%.2f " WANSI_COLOR_GREEN_TOO
-        "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f "
-        "mod_pitch_semitones:%d" WANSI_COLOR_GREEN
-        "\n      eg2_attack:%.2f eg2_decay:%.2f eg2_sustain_level:%.2f "
-        "eg2_sustain_ms:%.2f eg2_release:%.2f "
-        "eg2_osc2_int:%.2f" WANSI_COLOR_GREEN_TOO
-        "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_level:%.2f "
-        "eg3_sustain_ms:%.2f eg3_release:%.2f" WANSI_COLOR_GREEN
-        "\n      filter_type:%d freq:%2.f q:%2.f" WANSI_COLOR_GREEN_TOO,
+    swprintf(ss, MAX_PS_STRING_SZ,
+             L"[SYNTHDRUM] Name: %s Vol: %.2f distortion_threshold:%.2f "
+             "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f"
+             "\n      eg1_attack:%.2f eg1_decay:%.2f eg1_sustain_level:%.2f "
+             "eg1_sustain_ms:%.2f eg1_release:%.2f "
+             "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f "
+             "mod_pitch_semitones:%d"
+             "\n      eg2_attack:%.2f eg2_decay:%.2f eg2_sustain_level:%.2f "
+             "eg2_sustain_ms:%.2f eg2_release:%.2f "
+             "eg2_osc2_int:%.2f"
+             "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_level:%.2f "
+             "eg3_sustain_ms:%.2f eg3_release:%.2f"
+             "\n      filter_type:%d freq:%2.f q:%2.f",
 
-        sds->m_patch_name, sds->vol, sds->m_distortion_threshold,
+             sds->m_patch_name, sds->vol, sds->m_distortion_threshold,
 
-        sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo, sds->osc1_amp,
-        sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
-        sds->m_eg1.m_sustain_level,
-        sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg1.m_release_time_msec,
+             sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo,
+             sds->osc1_amp, sds->m_eg1.m_attack_time_msec,
+             sds->m_eg1.m_decay_time_msec, sds->m_eg1.m_sustain_level,
+             sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+             sds->m_eg1.m_release_time_msec,
 
-        sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
-        sds->mod_semitones_range, sds->m_eg2.m_attack_time_msec,
-        sds->m_eg2.m_decay_time_msec, sds->m_eg2.m_sustain_level,
-        sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+             sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
+             sds->mod_semitones_range, sds->m_eg2.m_attack_time_msec,
+             sds->m_eg2.m_decay_time_msec, sds->m_eg2.m_sustain_level,
+             sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+             sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
 
-        sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
-        sds->m_eg3.m_sustain_level,
-        sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-        sds->m_eg3.m_release_time_msec, sds->m_filter_type, sds->m_filter_fc,
-        sds->m_filter_q);
+             sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
+             sds->m_eg3.m_sustain_level,
+             sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
+             sds->m_eg3.m_release_time_msec, sds->m_filter_type,
+             sds->m_filter_fc, sds->m_filter_q);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -156,7 +154,7 @@ double sds_gennext(void *self)
     // POSITIONAL
     int idx = mixr->midi_tick % PPBAR;
 
-    if (!sds->active)
+    if (!sds->sg.active)
     {
         return val;
     }
@@ -590,13 +588,13 @@ void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val)
 void sds_start(void *self)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
-    sds->active = true;
+    sds->sg.active = true;
 }
 
 void sds_stop(void *self)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
-    sds->active = false;
+    sds->sg.active = false;
 }
 
 int sds_get_num_tracks(void *self)

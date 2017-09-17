@@ -14,6 +14,8 @@
 #define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_SOUNDGEN 100
 
+typedef enum { Q32, Q16, Q8, Q4 } quantize_size;
+
 typedef struct environment_variable
 {
     char key[ENVIRONMENT_KEY_SIZE];
@@ -35,7 +37,7 @@ typedef struct scene
 
 typedef unsigned int compat_key_list[6];
 
-typedef struct t_mixer
+typedef struct mixer
 {
 
     SOUNDGEN **sound_generators;
@@ -89,6 +91,7 @@ typedef struct t_mixer
     double volume;
 
     unsigned int key;
+    unsigned int quantize;
 
 } mixer;
 

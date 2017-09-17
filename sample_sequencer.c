@@ -24,7 +24,7 @@ sample_sequencer *new_sample_seq(char *filename)
 
     sample_seq_import_file(seq, filename);
 
-    seq->active = true;
+    seq->sound_generator.active = true;
     seq->started = false;
 
     seq->vol = 0.7;
@@ -76,7 +76,7 @@ double sample_seq_gennext(void *self)
     sample_sequencer *seq = (sample_sequencer *)self;
     double val = 0;
 
-    if (!seq->active)
+    if (!seq->sound_generator.active)
         return val;
 
     int idx = mixr->midi_tick % PPBAR;
@@ -160,8 +160,8 @@ void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_BLUE "[SAMPLE SEQ] \"%s\" Vol: %.2lf Active: %s",
-             seq->filename, seq->vol, seq->active ? "true" : "false");
+             L"[SAMPLE SEQ] \"%s\" Vol: %.2lf Active: %s", seq->filename,
+             seq->vol, seq->sound_generator.active ? "true" : "false");
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);
@@ -278,13 +278,13 @@ int get_a_sample_seq_position(sample_sequencer *ss)
 void sample_start(void *self)
 {
     sample_sequencer *s = (sample_sequencer *)self;
-    s->active = true;
+    s->sound_generator.active = true;
     // sample_sequencer_reset_samples(s);
 }
 
 void sample_stop(void *self)
 {
     sample_sequencer *s = (sample_sequencer *)self;
-    s->active = false;
+    s->sound_generator.active = false;
     sample_sequencer_reset_samples(s);
 }

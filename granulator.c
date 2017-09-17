@@ -115,11 +115,8 @@ double granulator_gennext(void *self)
         seq_tick(&g->m_seq);
     }
 
-    if (!g->active)
-        return val;
-
     if (g->m_eg1.m_state == OFFF)
-        g->active = false;
+        g->sound_generator.active = false;
 
     osc_update((oscillator *)&g->m_lfo1);
     osc_update((oscillator *)&g->m_lfo2);
@@ -227,8 +224,8 @@ double granulator_gennext(void *self)
 void granulator_status(void *self, wchar_t *status_string)
 {
     granulator *g = (granulator *)self;
-    swprintf(status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_ORANGE
-             "[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d "
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d "
              "quasi_grain_fudge:%d"
              " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
              "      grain_file_pos:%d grain_pitch:%d selection_mode:%d "
@@ -268,15 +265,15 @@ void granulator_start(void *self)
 {
     granulator *g = (granulator *)self;
     eg_start_eg(&g->m_eg1);
-    g->active = true;
+    g->sound_generator.active = true;
 }
 
 void granulator_stop(void *self)
 {
     granulator *g = (granulator *)self;
-    // g->active = false;
     g->started = false;
     eg_release(&g->m_eg1);
+    g->sound_generator.active = false;
 }
 
 double granulator_getvol(void *self)

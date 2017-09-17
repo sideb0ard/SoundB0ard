@@ -37,7 +37,6 @@ typedef struct granulator
 {
     SOUNDGEN sound_generator;
 
-    bool active;
     bool started;
     bool have_active_buffer;
 

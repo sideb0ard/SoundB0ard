@@ -37,7 +37,6 @@ typedef struct looper
     bool multi_sample_mode;
     // bool multi_sample_loop_countdown_started;
 
-    bool active;
     bool started;
     bool just_been_resampled;
 

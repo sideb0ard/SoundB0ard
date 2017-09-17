@@ -131,7 +131,7 @@ minisynth *new_minisynth(void)
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);
 
-    ms->active = true;
+    ms->sound_generator.active = true;
     return ms;
 }
 
@@ -467,8 +467,8 @@ void minisynth_status(void *self, wchar_t *status_string)
     }
 
     swprintf(
-        status_string, MAX_PS_STRING_SZ, WCOOL_COLOR_PINK
-        "[SYNTH '%s'] - Vol: %.2f Active: %s "
+        status_string, MAX_PS_STRING_SZ,
+        L"[SYNTH '%s'] - Vol: %.2f Active: %s "
         "DelayMode: %d Mode: %ls"
         "\n      A:%.2f D:%.2f R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f "
         "rate:%.2f "
@@ -479,8 +479,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f EG1sus:%d Eg2sus:%d Eg3sus:%d Eg4sus:%d",
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
-        ms->active ? "true" : "false", ms->m_settings.m_delay_mode,
-        s_mode_names[ms->m_settings.m_voice_mode],
+        ms->sound_generator.active ? "true" : "false",
+        ms->m_settings.m_delay_mode, s_mode_names[ms->m_settings.m_voice_mode],
         ms->m_settings.m_attack_time_msec, ms->m_settings.m_decay_time_msec,
         ms->m_settings.m_release_time_msec, ms->m_settings.m_sustain_level,
         ms->m_settings.m_volume_db, ms->m_settings.m_lfo1_amplitude,
@@ -526,7 +526,7 @@ double minisynth_gennext(void *self)
 
     minisynth *ms = (minisynth *)self;
 
-    if (!ms->active)
+    if (!ms->sound_generator.active)
         return 0.0;
 
     int idx = synthbase_gennext(&ms->base);
@@ -1149,13 +1149,13 @@ void minisynth_stop(minisynth *ms)
 void minisynth_sg_start(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    ms->active = true;
+    ms->sound_generator.active = true;
 }
 
 void minisynth_sg_stop(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    ms->active = false;
+    ms->sound_generator.active = false;
     minisynth_stop(ms);
 }
 
