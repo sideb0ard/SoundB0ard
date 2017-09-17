@@ -14,8 +14,8 @@
 #include "sound_generator.h"
 #include "stereodelay.h"
 
-#include "synthbase.h"
 #include "minisynth_voice.h"
+#include "synthbase.h"
 
 static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
 
@@ -128,7 +128,7 @@ void minisynth_stop(minisynth *ms);
 void minisynth_update(minisynth *synth);
 
 void minisynth_midi_control(minisynth *self, unsigned int data1,
-        unsigned int data2);
+                            unsigned int data2);
 
 void minisynth_increment_voice_timestamps(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice(minisynth *synth);

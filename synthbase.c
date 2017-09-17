@@ -1,11 +1,11 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "synthbase.h"
 #include "defjams.h"
-#include "sequencer_utils.h"
-#include "utils.h"
 #include "mixer.h"
+#include "sequencer_utils.h"
+#include "synthbase.h"
+#include "utils.h"
 
 extern const int key_midi_mapping[NUM_KEYS];
 extern const char *key_names[NUM_KEYS];
@@ -33,8 +33,6 @@ void synthbase_init(synthbase *base)
             base->melodies[i][j] = NULL;
         }
     }
-
-
 }
 
 void synthbase_free_melodies(synthbase *base)
@@ -51,7 +49,6 @@ void synthbase_free_melodies(synthbase *base)
         }
     }
 }
-
 
 void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
                                int max_steps)
@@ -128,10 +125,7 @@ void synthbase_set_melody_loop_num(synthbase *self, int melody_num,
     self->melody_multiloop_count[melody_num] = loop_num;
 }
 
-int synthbase_add_melody(synthbase *ms)
-{
-    return ms->num_melodies++;
-}
+int synthbase_add_melody(synthbase *ms) { return ms->num_melodies++; }
 
 void synthbase_dupe_melody(midi_event **from, midi_event **to)
 {
@@ -205,11 +199,9 @@ void synthbase_melody_to_string(synthbase *base, int melody_num,
 // sound generator interface //////////////
 void synthbase_status(synthbase *base, wchar_t *status_string)
 {
-    swprintf(
-        status_string, MAX_PS_STRING_SZ,
-        L"[BASE] Multi: %s, CurMelody:%d",
-        base->multi_melody_mode ? "true" : "false",
-        base->cur_melody);
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             L"\n      Multi: %s, CurMelody:%d",
+             base->multi_melody_mode ? "true" : "false", base->cur_melody);
 
     for (int i = 0; i < base->num_melodies; i++)
     {
@@ -229,13 +221,14 @@ int synthbase_gennext(synthbase *base)
     if (mixr->sixteenth_note_tick != base->tick)
     {
         base->tick = mixr->sixteenth_note_tick;
-        if (base->tick % 64 == 0)
+        if (base->tick % 32 == 0)
         {
             if (base->generate_mode)
             {
                 if (base->generate_every_n_loops > 0)
                 {
-                    if (base->generate_generation % base->generate_every_n_loops ==
+                    if (base->generate_generation %
+                            base->generate_every_n_loops ==
                         0)
                     {
                         synthbase_set_backup_mode(base, true);
@@ -277,7 +270,8 @@ int synthbase_gennext(synthbase *base)
                 base->cur_melody_iteration--;
                 if (base->cur_melody_iteration == 0)
                 {
-                    int next_melody = (base->cur_melody + 1) % base->num_melodies;
+                    int next_melody =
+                        (base->cur_melody + 1) % base->num_melodies;
                     for (int i = 0; i < PPNS; i++)
                     {
                         if (base->melodies[base->cur_melody][i] != NULL)
@@ -308,7 +302,7 @@ int synthbase_gennext(synthbase *base)
             return idx;
         }
     }
-    return 0;
+    return -1;
 }
 
 midi_event **synthbase_get_midi_loop(synthbase *self)
@@ -466,7 +460,7 @@ void synthbase_set_backup_mode(synthbase *ms, bool b)
     {
         synthbase_dupe_melody(ms->melodies[0],
                               ms->backup_melody_while_getting_crazy);
-        //ms->m_settings_backup_while_getting_crazy = ms->m_settings;
+        // ms->m_settings_backup_while_getting_crazy = ms->m_settings;
         ms->multi_melody_mode = false;
         ms->cur_melody = 0;
     }
@@ -474,7 +468,7 @@ void synthbase_set_backup_mode(synthbase *ms, bool b)
     {
         synthbase_dupe_melody(ms->backup_melody_while_getting_crazy,
                               ms->melodies[0]);
-        //ms->m_settings = ms->m_settings_backup_while_getting_crazy;
+        // ms->m_settings = ms->m_settings_backup_while_getting_crazy;
         ms->multi_melody_mode = true;
     }
 }
@@ -634,10 +628,10 @@ void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
         // printf("New Notes!! %d - %d\n", mstep, midi_note);
         midi_event *on = new_midi_event(mstep, 144, midi_note, 128);
         // int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
-        int note_off_tick =
-            (mstep + 4) %
-             //(int)(PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth) - 7) %
-            PPNS;
+        int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) %
+                            //(int)(PPSIXTEENTH *
+                            // ms->m_settings.m_sustain_time_sixteenth) - 7) %
+                            PPNS;
         midi_event *off = new_midi_event(note_off_tick, 128, midi_note, 128);
 
         int final_note_off_tick = synthbase_add_event(ms, pattern_num, off);
@@ -665,7 +659,7 @@ void synthbase_rm_micro_note(synthbase *ms, int pat_num, int tick)
         if (ms->melodies[pat_num][tick] != NULL)
         {
             midi_event *ev = ms->melodies[ms->cur_melody][tick];
-            //synthbase_midi_note_off(ms, ev->data1, ev->data2, false);
+            // synthbase_midi_note_off(ms, ev->data1, ev->data2, false);
             ms->melodies[ms->cur_melody][tick] = NULL;
             int tick_off = ev->tick_off;
             free(ev);
@@ -726,7 +720,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
 
     char *item, *last_s;
     char const *sep = "::";
-    //minisynth_morph(ms);
+    // minisynth_morph(ms);
     char line[256];
     while (fgets(line, sizeof(line), fp))
     {

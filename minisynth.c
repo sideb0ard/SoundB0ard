@@ -289,11 +289,11 @@ void minisynth_update(minisynth *ms)
 }
 
 void minisynth_midi_control(minisynth *self, unsigned int data1,
-        unsigned int data2)
+                            unsigned int data2)
 {
-    (void) self;
-    (void) data1;
-    (void) data2;
+    (void)self;
+    (void)data1;
+    (void)data2;
 }
 
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
@@ -404,7 +404,6 @@ void minisynth_reset_voices(minisynth *ms)
     }
 }
 
-
 void minisynth_increment_voice_timestamps(minisynth *ms)
 {
     for (int i = 0; i < MAX_VOICES; i++)
@@ -480,8 +479,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
         "NoiseOsc Db: %2.f EG1sus:%d Eg2sus:%d Eg3sus:%d Eg4sus:%d",
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
-        ms->active ? "true" : "false",
-        ms->m_settings.m_delay_mode,
+        ms->active ? "true" : "false", ms->m_settings.m_delay_mode,
         s_mode_names[ms->m_settings.m_voice_mode],
         ms->m_settings.m_attack_time_msec, ms->m_settings.m_decay_time_msec,
         ms->m_settings.m_release_time_msec, ms->m_settings.m_sustain_level,
@@ -531,9 +529,10 @@ double minisynth_gennext(void *self)
     if (!ms->active)
         return 0.0;
 
-    int note = synthbase_gennext(&ms->base);
-    if (note){
-        midi_event *ev = ms->base.melodies[ms->base.cur_melody][note];
+    int idx = synthbase_gennext(&ms->base);
+    if (idx >= 0)
+    {
+        midi_event *ev = ms->base.melodies[ms->base.cur_melody][idx];
         midi_parse_midi_event(ms, ev);
     }
 
@@ -1134,17 +1133,7 @@ void minisynth_del_self(minisynth *ms)
         minisynth_voice_free_self(ms->m_voices[i]);
     }
     synthbase_free_melodies(&ms->base);
-    //for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
-    //{
-    //    for (int j = 0; j < PPNS; j++)
-    //    {
-    //        if (ms->melodies[i][j] != NULL)
-    //        {
-    //            midi_event_free(ms->melodies[i][j]);
-    //            ms->melodies[i][j] = NULL;
-    //        }
-    //    }
-    //}
+
     printf("Deleting MINISYNTH self\n");
     free(ms);
 }

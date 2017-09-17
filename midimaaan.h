@@ -1,8 +1,8 @@
 #pragma once
 
+#include "defjams.h"
 #include "fx.h"
 #include "pthread.h"
-#include "defjams.h"
 #include <stdbool.h>
 
 typedef struct minisynth minisynth;

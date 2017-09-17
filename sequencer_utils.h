@@ -1,7 +1,7 @@
 #pragma once
 
-#include <wchar.h>
 #include "sequencer.h"
+#include <wchar.h>
 
 // https://ics-web.sns.ornl.gov/timing/Rep-Rate%20Tech%20Note.pdf
 void build_euclidean_pattern_int(int level, int *bitmap_int,

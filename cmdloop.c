@@ -1085,7 +1085,8 @@ void interpret(char *line)
                         if (strncmp("melody", wurds[3], 6) == 0 ||
                             strncmp("pattern", wurds[3], 7) == 0)
                         {
-                            int new_melody_num = synthbase_add_melody(&ms->base);
+                            int new_melody_num =
+                                synthbase_add_melody(&ms->base);
                             if (num_wurds > 4)
                             {
                                 char_melody_to_midi_melody(ms, new_melody_num,
@@ -1103,8 +1104,8 @@ void interpret(char *line)
                         int melody_num = atoi(wurds[3]);
                         int max_notes = atoi(wurds[4]);
                         int max_steps = atoi(wurds[5]);
-                        synthbase_generate_melody(&ms->base, melody_num, max_notes,
-                                                  max_steps);
+                        synthbase_generate_melody(&ms->base, melody_num,
+                                                  max_notes, max_steps);
                     }
                     else if (strncmp("rand", wurds[2], 4) == 0)
                     {
@@ -1116,8 +1117,8 @@ void interpret(char *line)
                         int melody_num = atoi(wurds[3]);
                         int max_notes = atoi(wurds[4]);
                         int max_steps = atoi(wurds[5]);
-                        synthbase_generate_melody(&ms->base, melody_num, max_notes,
-                                                  max_steps);
+                        synthbase_generate_melody(&ms->base, melody_num,
+                                                  max_notes, max_steps);
                     }
                     else if (strncmp("change", wurds[2], 6) == 0)
                     {
@@ -1152,8 +1153,8 @@ void interpret(char *line)
                                     printf("Adding"
                                            " note"
                                            "\n");
-                                    synthbase_add_note(&ms->base, melody_num, tick,
-                                                       midi_note);
+                                    synthbase_add_note(&ms->base, melody_num,
+                                                       tick, midi_note);
                                 }
                             }
                             else if (strncmp("mv", wurds[4], 2) == 0)
@@ -1162,8 +1163,8 @@ void interpret(char *line)
                                 int totick = atoi(wurds[6]);
                                 printf("MV'ing "
                                        "note\n");
-                                synthbase_mv_note(&ms->base, melody_num, fromtick,
-                                                  totick);
+                                synthbase_mv_note(&ms->base, melody_num,
+                                                  fromtick, totick);
                             }
                             else if (strncmp("rm", wurds[4], 2) == 0)
                             {
@@ -1183,8 +1184,8 @@ void interpret(char *line)
                                            "g "
                                            "note"
                                            "\n");
-                                    synthbase_add_micro_note(&ms->base, melody_num,
-                                                             tick, midi_note);
+                                    synthbase_add_micro_note(
+                                        &ms->base, melody_num, tick, midi_note);
                                 }
                             }
                             else if (strncmp("melody", wurds[4], 6) == 0 ||
@@ -1208,7 +1209,8 @@ void interpret(char *line)
                                 int tick = atoi(wurds[5]);
                                 printf("Rm'ing "
                                        "note\n");
-                                synthbase_rm_micro_note(&ms->base, melody_num, tick);
+                                synthbase_rm_micro_note(&ms->base, melody_num,
+                                                        tick);
                             }
                         }
                     }
@@ -1234,8 +1236,8 @@ void interpret(char *line)
                                        soundgen_num, pattern_num, sg2,
                                        pattern_num2);
 
-                                midi_event **melody =
-                                    synthbase_copy_midi_loop(&ms->base, pattern_num);
+                                midi_event **melody = synthbase_copy_midi_loop(
+                                    &ms->base, pattern_num);
 
                                 synthbase_replace_midi_loop(&ms2->base, melody,
                                                             pattern_num2);
@@ -1262,15 +1264,17 @@ void interpret(char *line)
                             }
                             int tick = atoi(wurds[4]);
                             if (tick < PPNS)
-                                synthbase_rm_micro_note(&ms->base, melody, tick);
+                                synthbase_rm_micro_note(&ms->base, melody,
+                                                        tick);
                         }
                     }
                     else if (strncmp("dupe", wurds[2], 4) == 0)
                     {
                         int pattern_num = atoi(wurds[3]);
                         int new_pattern_num = synthbase_add_melody(&ms->base);
-                        synthbase_dupe_melody(&ms->base.melodies[pattern_num],
-                                              &ms->base.melodies[new_pattern_num]);
+                        synthbase_dupe_melody(
+                            ms->base.melodies[pattern_num],
+                            ms->base.melodies[new_pattern_num]);
                     }
                     else if (strncmp("import", wurds[2], 6) == 0)
                     {
@@ -1327,8 +1331,8 @@ void interpret(char *line)
                         }
                         else
                         { // just toggle
-                            synthbase_set_generate_mode(&ms->base,
-                                                        1 - ms->base.generate_mode);
+                            synthbase_set_generate_mode(
+                                &ms->base, 1 - ms->base.generate_mode);
                         }
 
                         printf("Synth GENERATE mode : %s\n",
@@ -1356,8 +1360,8 @@ void interpret(char *line)
                                    "along %d "
                                    "sixteenthzzzz!\n",
                                    sixteenth);
-                            synthbase_nudge_melody(&ms->base, ms->base.cur_melody,
-                                                   sixteenth);
+                            synthbase_nudge_melody(
+                                &ms->base, ms->base.cur_melody, sixteenth);
                         }
                     }
                     else if (strncmp("print", wurds[2], 5) == 0)
@@ -1370,7 +1374,8 @@ void interpret(char *line)
                         if (is_valid_melody_num(&ms->base, melody_num))
                         {
                             printf("QuantiZe!\n");
-                            midi_event **melody = ms->base.melodies[ms->base.cur_melody];
+                            midi_event **melody =
+                                ms->base.melodies[ms->base.cur_melody];
                             midi_melody_quantize(melody);
                         }
                     }

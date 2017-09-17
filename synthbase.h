@@ -65,17 +65,17 @@ typedef struct synthbase
 
 void synthbase_init(synthbase *base);
 void synthbase_free_melodies(synthbase *base);
-    //for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
-    //{
-    //    for (int j = 0; j < PPNS; j++)
-    //    {
-    //        if (ms->melodies[i][j] != NULL)
-    //        {
-    //            midi_event_free(ms->melodies[i][j]);
-    //            ms->melodies[i][j] = NULL;
-    //        }
-    //    }
-    //}
+// for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
+//{
+//    for (int j = 0; j < PPNS; j++)
+//    {
+//        if (ms->melodies[i][j] != NULL)
+//        {
+//            midi_event_free(ms->melodies[i][j]);
+//            ms->melodies[i][j] = NULL;
+//        }
+//    }
+//}
 
 int synthbase_gennext(synthbase *base);
 void synthbase_status(synthbase *base, wchar_t *status_string);
@@ -123,9 +123,9 @@ void synthbase_add_note(synthbase *base, int pattern_num, int step,
                         int midi_note);
 void synthbase_rm_note(synthbase *base, int pattern_num, int step);
 void synthbase_mv_note(synthbase *base, int pattern_num, int fromstep,
-                   int tostep);
+                       int tostep);
 void synthbase_add_micro_note(synthbase *base, int pattern_num, int step,
-                          int midi_note);
+                              int midi_note);
 void synthbase_rm_micro_note(synthbase *base, int pattern_num, int step);
 void synthbase_mv_micro_note(synthbase *base, int pattern_num, int fromstep,
                              int tostep);

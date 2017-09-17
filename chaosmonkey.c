@@ -8,8 +8,8 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "obliquestrategies.h"
-#include "utils.h"
 #include "synthbase.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
