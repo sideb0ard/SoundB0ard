@@ -107,6 +107,7 @@ int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr, double freq);
 int add_chaosmonkey(int soundgen);
 int add_minisynth(mixer *mixr);
+int add_digisynth(mixer *mixr, char *filename);
 // int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
 int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                       bool start_on_first_beat);

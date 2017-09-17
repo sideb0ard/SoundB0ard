@@ -502,7 +502,6 @@ void minisynth_status(void *self, wchar_t *status_string)
     wchar_t scratch[512];
     synthbase_status(&ms->base, scratch);
     wcscat(status_string, scratch);
-    wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void minisynth_setvol(void *self, double v)

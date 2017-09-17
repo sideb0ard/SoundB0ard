@@ -18,6 +18,7 @@
 #include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
+#include "digisynth.h"
 #include "distortion.h"
 #include "dynamics_processor.h"
 #include "envelope.h"
@@ -1064,10 +1065,27 @@ void interpret(char *line)
                 if (num_wurds > 2)
                 {
                     minisynth *ms = (minisynth *)mixr->sound_generators[sgnum];
-                    char_melody_to_midi_melody(ms, 0, wurds, 2, num_wurds);
+                    char_melody_to_midi_melody(&ms->base, 0, wurds, 2, num_wurds);
                 }
             }
-            if (strncmp("ls", wurds[1], 2) == 0)
+            else if (strncmp("digi", wurds[1], 4) == 0)
+            {
+                if (strlen(wurds[2]) != 0)
+                {
+                    int sgnum = add_digisynth(mixr, wurds[2]);
+                    if (num_wurds > 2)
+                    {
+                        digisynth *ds = (digisynth *)mixr->sound_generators[sgnum];
+                        char_melody_to_midi_melody(&ds->base, 0, wurds, 2, num_wurds);
+                    }
+                }
+                else
+                {
+                    printf("Need to give me a sample name for a digisynth..\n");
+                }
+            }
+
+            else if (strncmp("ls", wurds[1], 2) == 0)
             {
                 minisynth_list_presets();
             }
@@ -1090,7 +1108,7 @@ void interpret(char *line)
                                 synthbase_add_melody(&ms->base);
                             if (num_wurds > 4)
                             {
-                                char_melody_to_midi_melody(ms, new_melody_num,
+                                char_melody_to_midi_melody(&ms->base, new_melody_num,
                                                            wurds, 4, num_wurds);
                             }
                         }
@@ -1193,7 +1211,7 @@ void interpret(char *line)
                                      strncmp("pattern", wurds[4], 7) == 0)
                             {
                                 synthbase_reset_melody(&ms->base, melody_num);
-                                char_melody_to_midi_melody(ms, melody_num,
+                                char_melody_to_midi_melody(&ms->base, melody_num,
                                                            wurds, 5, num_wurds);
                             }
                             else if (strncmp("mmv", wurds[4], 2) == 0)
@@ -2769,7 +2787,7 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     return false;
 }
 
-void char_melody_to_midi_melody(minisynth *ms, int dest_melody,
+void char_melody_to_midi_melody(synthbase *base, int dest_melody,
                                 char char_array[NUM_WURDS][SIZE_OF_WURD],
                                 int start, int end)
 {
@@ -2847,15 +2865,15 @@ void char_melody_to_midi_melody(minisynth *ms, int dest_melody,
             if (midi_note != 0)
             {
                 printf("Adding %d:%d\n", tick, midi_note);
-                synthbase_add_note(&ms->base, dest_melody, tick, midi_note);
+                synthbase_add_note(base, dest_melody, tick, midi_note);
             }
         }
 
         if (chord_found)
         {
-            synthbase_add_note(&ms->base, dest_melody, tick, chnotes.root);
-            synthbase_add_note(&ms->base, dest_melody, tick, chnotes.third);
-            synthbase_add_note(&ms->base, dest_melody, tick, chnotes.fifth);
+            synthbase_add_note(base, dest_melody, tick, chnotes.root);
+            synthbase_add_note(base, dest_melody, tick, chnotes.third);
+            synthbase_add_note(base, dest_melody, tick, chnotes.fifth);
         }
     }
 }

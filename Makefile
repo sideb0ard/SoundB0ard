@@ -15,6 +15,8 @@ OBJ = \
 	cmdloop.o \
 	dca.o \
 	ddlmodule.o \
+	digisynth.o \
+	digisynth_voice.o \
 	distortion.o \
 	delayline.o \
 	dynamics_processor.o \

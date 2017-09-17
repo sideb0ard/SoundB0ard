@@ -12,11 +12,14 @@ typedef struct digisynth
     SOUNDGEN sound_generator;
     synthbase base;
 
-    digisynth_voice *m_voices[MAX_VOICES];
+    char audiofile[1024];
+    digisynth_voice m_voices[MAX_VOICES];
+
+    double vol;
 
 } digisynth;
 
-digisynth *new_digisynth(void);
+digisynth *new_digisynth(char *filename);
 
 // sound generator interface //////////////
 double digisynth_gennext(void *self);

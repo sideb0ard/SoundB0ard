@@ -15,6 +15,7 @@
 #include "granulator.h"
 #include "looper.h"
 #include "minisynth.h"
+#include "digisynth.h"
 #include "mixer.h"
 #include "sample_sequencer.h"
 #include "sbmsg.h"
@@ -288,6 +289,13 @@ int add_minisynth(mixer *mixr)
     printf("Adding a MINISYNTH!!...\n");
     minisynth *ms = new_minisynth();
     return add_sound_generator(mixr, (SOUNDGEN *)ms);
+}
+
+int add_digisynth(mixer *mixr, char *filename)
+{
+    printf("Adding a DIGISYNTH!!...\n");
+    digisynth *ds = new_digisynth(filename);
+    return add_sound_generator(mixr, (SOUNDGEN *)ds);
 }
 
 int add_looper(mixer *mixr, char *filename, double loop_len)
