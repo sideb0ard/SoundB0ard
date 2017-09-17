@@ -95,6 +95,6 @@ void sample_set_file_name(file_sample *fs, char *filename);
 void sample_resample_to_loop_size(file_sample *fs);
 
 void file_sample_free(file_sample *fs);
-void looper_del_self(looper *s);
+void looper_del_self(void *self);
 
 #endif // LOOPER_H

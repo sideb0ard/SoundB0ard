@@ -88,6 +88,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->sg.stop = &sds_stop;
     sds->sg.get_num_tracks = &sds_get_num_tracks;
     sds->sg.make_active_track = &sds_make_active_track;
+    sds->sg.self_destruct = &synthdrum_del_self;
     sds->sg.type = SYNTHDRUM_TYPE;
     sds->mod_semitones_range = 4;
     sds_start(sds);
@@ -424,8 +425,9 @@ bool synthdrum_list_patches()
     return true;
 }
 
-void synthdrum_del_self(synthdrum_sequencer *sds)
+void synthdrum_del_self(void *self)
 {
+    synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     printf("Deleting Synthdrum self\n");
     free(sds);
 }

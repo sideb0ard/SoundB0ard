@@ -32,6 +32,7 @@ looper *new_looper(char *filename, double loop_len)
     l->sound_generator.stop = &looper_stop;
     l->sound_generator.get_num_tracks = &looper_get_num_tracks;
     l->sound_generator.make_active_track = &looper_make_active_track;
+    l->sound_generator.self_destruct = &looper_del_self;
     l->sound_generator.type = LOOPER_TYPE;
 
     for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++)
@@ -654,14 +655,15 @@ void looper_scramble(looper *s)
     }
 }
 
-void looper_del_self(looper *s)
+void looper_del_self(void *self)
 {
-    for (int i = 0; i < s->num_samples; i++)
+    looper *l = (looper *)self;
+    for (int i = 0; i < l->num_samples; i++)
     {
         printf("Dleeeting samples\n");
-        file_sample_free(s->samples[i]);
+        file_sample_free(l->samples[i]);
     }
-    free(s);
+    free(l);
 }
 
 void file_sample_free(file_sample *fs)

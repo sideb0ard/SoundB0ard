@@ -98,7 +98,8 @@ typedef enum {
 } key_mode; // to switch key control routing
 
 typedef enum {
-    SYNTH_TYPE,
+    MINISYNTH_TYPE,
+    DIGISYNTH_TYPE,
     LOOPER_TYPE,
     BITWIZE_TYPE,
     GRANULATOR_TYPE,

@@ -33,7 +33,8 @@ extern const int key_midi_mapping[NUM_KEYS];
 extern const compat_key_list compat_keys[NUM_KEYS];
 
 const wchar_t *s_status_colors[] = {
-    WCOOL_COLOR_PINK,      // SYNTH_TYPE
+    WCOOL_COLOR_PINK,      // MINISYNTH_TYPE
+    WCOOL_COLOR_ORANGE,    // DIGISYNTH_TYPE
     WCOOL_COLOR_MAUVE,     // LOOPER_TYPE
     WCOOL_COLOR_YELLOW,    // BITWIZE_TYPE
     WANSI_COLOR_DEEP_RED,  // GRANULATOR_TYPE
@@ -508,49 +509,7 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
         SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
         mixr->sound_generators[soundgen_num] = NULL;
-        switch (sg->type)
-        {
-        case (SYNTH_TYPE):
-            printf("DELASYNTH!\n");
-            minisynth *ms = (minisynth *)sg;
-            minisynth_del_self(ms);
-            break;
-        case (LOOPER_TYPE):
-            printf("DELALOOPER!\n");
-            looper *l = (looper *)sg;
-            looper_del_self(l);
-            break;
-        case (GRANULATOR_TYPE):
-            printf("DELETINGA GRANNY!\n");
-            granulator *g = (granulator *)sg;
-            granulator_del_self(g);
-            break;
-        case (BITWIZE_TYPE):
-            printf("DELABIT!\n");
-            break;
-        case (SEQUENCER_TYPE):
-            printf("DELASEQ!\n");
-            sample_sequencer *s = (sample_sequencer *)sg;
-            sample_seq_del(s);
-            break;
-        case (SYNTHDRUM_TYPE):
-            printf("DELASYNTHDRUM!\n");
-            synthdrum_sequencer *sds = (synthdrum_sequencer *)sg;
-            synthdrum_del_self(sds);
-            break;
-        case (ALGORITHM_TYPE):
-            printf("DELALGO!\n");
-            break;
-        case (CHAOSMONKEY_TYPE):
-            printf("DELAMONKEY!\n");
-            break;
-        case (SPORK_TYPE):
-            printf("DELASPORKT!\n");
-            break;
-        case (NUM_SOUNDGEN_TYPE):
-            // should never happen
-            break;
-        }
+        sg->self_destruct(sg);
     }
     return true;
 }

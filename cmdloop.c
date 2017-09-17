@@ -1075,7 +1075,8 @@ void interpret(char *line)
             {
                 int soundgen_num = atoi(wurds[1]);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type == SYNTH_TYPE)
+                    mixr->sound_generators[soundgen_num]->type ==
+                        MINISYNTH_TYPE)
                 {
                     minisynth *ms =
                         (minisynth *)mixr->sound_generators[soundgen_num];
@@ -1221,7 +1222,7 @@ void interpret(char *line)
                         int pattern_num2 = 0;
                         sscanf(wurds[4], "%d:%d", &sg2, &pattern_num2);
                         if (mixer_is_valid_soundgen_num(mixr, sg2) &&
-                            mixr->sound_generators[sg2]->type == SYNTH_TYPE)
+                            mixr->sound_generators[sg2]->type == MINISYNTH_TYPE)
                         {
                             minisynth *ms2 =
                                 (minisynth *)mixr->sound_generators[sg2];

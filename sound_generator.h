@@ -19,6 +19,7 @@ typedef struct t_soundgen
     void (*stop)(void *self);
     void (*make_active_track)(void *self, int track_num);
     int (*get_num_tracks)(void *self);
+    void (*self_destruct)(void *self);
 
     sound_generator_type type;
     bool active;

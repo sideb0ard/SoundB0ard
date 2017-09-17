@@ -45,7 +45,8 @@ minisynth *new_minisynth(void)
     ms->sound_generator.stop = &minisynth_sg_stop;
     ms->sound_generator.get_num_tracks = &synthbase_get_num_tracks;
     ms->sound_generator.make_active_track = &synthbase_make_active_track;
-    ms->sound_generator.type = SYNTH_TYPE;
+    ms->sound_generator.self_destruct = &minisynth_del_self;
+    ms->sound_generator.type = MINISYNTH_TYPE;
 
     strncpy(ms->m_settings.m_settings_name, "DEFAULT", 7);
 
@@ -1126,8 +1127,9 @@ void minisynth_set_filter_mod(minisynth *ms, double mod)
     }
 }
 
-void minisynth_del_self(minisynth *ms)
+void minisynth_del_self(void *self)
 {
+    minisynth *ms = (minisynth *)self;
     for (int i = 0; i < MAX_VOICES; i++)
     {
         minisynth_voice_free_self(ms->m_voices[i]);

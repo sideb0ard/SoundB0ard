@@ -135,6 +135,6 @@ int sound_grain_generate_idx(sound_grain *g);
 int sound_grain_gen_doppelganger_idx(sound_grain *g);
 double sound_grain_env(sound_grain *g, int idx_num);
 
-void granulator_del_self(granulator *g);
+void granulator_del_self(void *self);
 
 #endif // GRANULATOR

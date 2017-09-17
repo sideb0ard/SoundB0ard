@@ -37,6 +37,7 @@ sample_sequencer *new_sample_seq(char *filename)
     seq->sound_generator.stop = &sample_stop;
     seq->sound_generator.get_num_tracks = &sample_seq_get_num_tracks;
     seq->sound_generator.make_active_track = &sample_seq_make_active_track;
+    seq->sound_generator.self_destruct = &sampleseq_del_self;
     seq->sound_generator.type = SEQUENCER_TYPE;
 
     stereo_delay_prepare_for_play(&seq->m_delay_fx);
@@ -243,8 +244,9 @@ void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
     }
 }
 
-void sample_seq_del(sample_sequencer *s)
+void sampleseq_del_self(void *self)
 {
+    sample_sequencer *s = (sample_sequencer *)self;
     printf("Deleting sample buffer\n");
     free(s->buffer);
     printf("Deleting SAMPLESEQUENCER SELF- bye!\n");

@@ -41,6 +41,7 @@ granulator *new_granulator(char *filename)
     g->sound_generator.stop = &granulator_stop;
     g->sound_generator.get_num_tracks = &granulator_get_num_tracks;
     g->sound_generator.make_active_track = &granulator_make_active_track;
+    g->sound_generator.self_destruct = &granulator_del_self;
     g->sound_generator.type = GRANULATOR_TYPE;
 
     if (strncmp(filename, "none", 4) != 0)
@@ -292,9 +293,10 @@ void granulator_setvol(void *self, double v)
     g->vol = v;
 }
 
-void granulator_del_self(granulator *g)
+void granulator_del_self(void *self)
 {
     // TODO delete file
+    granulator *g = (granulator *)self;
     free(g);
 }
 
