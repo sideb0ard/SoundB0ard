@@ -48,4 +48,5 @@ void audiofile_data_import_file_contents(audiofile_data *afd, char *filename)
     strncpy(afd->filename, full_filename, 2047);
     // set meta info - samplecount etc...
     afd->samplecount = audio_buffer_len;
+
 }

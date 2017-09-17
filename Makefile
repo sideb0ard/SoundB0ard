@@ -9,6 +9,7 @@ OBJ = \
 	algorithm.o \
 	arpeggiator.o \
 	audioutils.o \
+	audiofile_data.o \
 	basicfilterpass.o \
 	beatrepeat.o \
 	chaosmonkey.o \
@@ -50,6 +51,7 @@ OBJ = \
 	oscillator.o \
 	qblimited_oscillator.o \
 	reverb.o \
+	sample_oscillator.o \
 	sbmsg.o \
 	sparkline.o \
 	spork.o \
