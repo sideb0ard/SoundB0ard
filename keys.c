@@ -8,6 +8,7 @@
 #include <unistd.h>
 
 #include "defjams.h"
+#include "digisynth.h"
 #include "keys.h"
 #include "midimaaan.h"
 #include "minisynth.h"
@@ -15,6 +16,7 @@
 #include "utils.h"
 
 extern mixer *mixr;
+static int s_keys_octave = 2;
 
 void keys(int soundgen_num)
 {
@@ -29,7 +31,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    minisynth *ms = (minisynth *)mixr->sound_generators[soundgen_num];
+    synthbase *base = get_synthbase(mixr->sound_generators[soundgen_num]);
 
     int ch = 0;
     int quit = 0;
@@ -64,65 +66,63 @@ void keys(int soundgen_num)
                 break;
             case 49:
                 printf("Down an octave...\n");
-                ms->m_settings.m_octave--;
+                s_keys_octave--;
                 break;
             case 50:
                 printf("Up an octave...\n");
-                ms->m_settings.m_octave++;
+                s_keys_octave++;
                 break;
             case 114:
-                ms->base.recording = 1 - ms->base.recording;
+                base->recording = 1 - base->recording;
                 printf("Toggling REC to %s\n",
-                       ms->base.recording ? "true" : "false");
+                       base->recording ? "true" : "false");
                 break;
-            case 122:
-                printf("SAW3 mode\n");
-                ms->m_settings.m_voice_mode = 0;
-                break;
-            case 120:
-                printf("SQR3 mode\n");
-                ms->m_settings.m_voice_mode = 1;
-                break;
-            case 99:
-                printf("SAW2SQR mode\n");
-                ms->m_settings.m_voice_mode = 2;
-                break;
-            case 118:
-                printf("TRI2SAW mode\n");
-                ms->m_settings.m_voice_mode = 3;
-                break;
-            case 98:
-                printf("TRI2SQR mode\n");
-                ms->m_settings.m_voice_mode = 4;
-                break;
-            case 91:
-                printf("RANDOM MONDY mode!\n");
-                minisynth_rand_settings(ms);
-                break;
-            case 110:
-                ms->m_settings.m_lfo1_waveform =
-                    (++ms->m_settings.m_lfo1_waveform) % MAX_LFO_OSC;
-                printf("LFO! Mode Toggle: %d MaxLFO: %d\n",
-                       ms->m_settings.m_lfo1_waveform, MAX_LFO_OSC);
-                break;
-            case 109:
             // mixer_toggle_key_mode(mixr);
             // printf("Switching KEY mode -- %d\n",
             //       mixr->m_key_controller_mode);
             // break;
+            case 91:
+                if (mixr->sound_generators[soundgen_num]->type ==
+                    MINISYNTH_TYPE)
+                {
+                    printf("RANDOM MONDY mode!\n");
+                    minisynth *ms =
+                        (minisynth *)mixr->sound_generators[soundgen_num];
+                    minisynth_rand_settings(ms);
+                }
+                else if (mixr->sound_generators[soundgen_num]->type ==
+                         DIGISYNTH_TYPE)
+                {
+                    digisynth *ds =
+                        (digisynth *)mixr->sound_generators[soundgen_num];
+                    printf("RANDOM MONDY mode NAE DIGI YET!\n");
+                }
+                break;
             default:
                 // play note
-                midi_num =
-                    ch_midi_lookup(ch, ms->m_settings.m_octave, textnote);
+                midi_num = ch_midi_lookup(ch, s_keys_octave, textnote);
                 printf("MIDI: %s [%d]\n", textnote, midi_num);
-                int fake_velocity = 100; // TODO real velocity
+                int fake_velocity = 128; // TODO real velocity
                 if (midi_num != -1)
                 {
-                    minisynth_handle_midi_note(ms, midi_num, fake_velocity,
-                                               true);
+                    if (mixr->sound_generators[soundgen_num]->type ==
+                        MINISYNTH_TYPE)
+                    {
+                        minisynth *ms =
+                            (minisynth *)mixr->sound_generators[soundgen_num];
+                        minisynth_handle_midi_note(ms, midi_num, fake_velocity,
+                                                   true);
+                        minisynth_update(ms);
+                    }
+                    else if (mixr->sound_generators[soundgen_num]->type ==
+                             DIGISYNTH_TYPE)
+                    {
+                        digisynth *ds =
+                            (digisynth *)mixr->sound_generators[soundgen_num];
+                        printf("KEYS! nae digi yet!\n");
+                    }
                 }
             }
-            minisynth_update(ms);
         }
     }
     tcsetattr(0, TCSANOW, &old_info);

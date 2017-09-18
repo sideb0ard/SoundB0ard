@@ -110,6 +110,23 @@ void interpret(char *line)
             if (bpm > 0)
                 mixer_update_bpm(mixr, bpm);
         }
+        else if (strncmp("quantize", wurds[0], 8) == 0)
+        {
+            int quanta = atoi(wurds[1]);
+            switch (quanta)
+            {
+            case (32):
+                mixr->quantize = Q32;
+            case (16):
+                mixr->quantize = Q16;
+            case (8):
+                mixr->quantize = Q8;
+            case (4):
+                mixr->quantize = Q4;
+            default:
+                printf("nae danger, mate, quantize yer heid..\n");
+            }
+        }
 
         else if (strncmp("keys", wurds[0], 4) == 0)
         {
@@ -197,12 +214,24 @@ void interpret(char *line)
         }
         else if (strncmp("start", wurds[0], 5) == 0)
         {
-            int soundgen_num = atoi(wurds[1]);
-            if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+            if (strncmp(wurds[1], "all", 3) == 0)
             {
-                printf("Starting SOUND GEN %d\n", soundgen_num);
-                SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
-                sg->start(sg);
+                for (int i = 0; i < mixr->soundgen_num; i++)
+                {
+                    SOUNDGEN *sg = mixr->sound_generators[i];
+                    if (sg != NULL)
+                        sg->start(sg);
+                }
+            }
+            else
+            {
+                int soundgen_num = atoi(wurds[1]);
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+                {
+                    printf("Starting SOUND GEN %d\n", soundgen_num);
+                    SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+                    sg->start(sg);
+                }
             }
         }
         else if (strncmp("stop", wurds[0], 5) == 0)
