@@ -1,6 +1,6 @@
+#include "digisynth.h"
 #include <stdlib.h>
 #include <string.h>
-#include "digisynth.h"
 
 digisynth *new_digisynth(char *filename)
 {
@@ -41,18 +41,17 @@ digisynth *new_digisynth(char *filename)
 // sound generator interface //////////////
 double digisynth_gennext(void *self)
 {
-    (void) self;
+    (void)self;
     return 0.2;
 }
 
 void digisynth_status(void *self, wchar_t *status_string)
 {
     printf("DIGI STATUS!\n");
-    digisynth *ds = (digisynth*) self;
-    swprintf(
-        status_string, MAX_PS_STRING_SZ,
-        L"[DIGISYNTH '%s'] - Vol: %.2f Active: %s\n",
-        ds->audiofile, ds->vol, ds->sound_generator.active ? "true" : "false");
+    digisynth *ds = (digisynth *)self;
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             L"[DIGISYNTH '%s'] - Vol: %.2f Active: %s\n", ds->audiofile,
+             ds->vol, ds->sound_generator.active ? "true" : "false");
     wchar_t scratch[512];
     synthbase_status(&ds->base, scratch);
     wcscat(status_string, scratch);
@@ -60,25 +59,24 @@ void digisynth_status(void *self, wchar_t *status_string)
 
 void digisynth_setvol(void *self, double v)
 {
-    digisynth *ds = (digisynth*) self;
+    digisynth *ds = (digisynth *)self;
     ds->vol = v;
 }
 
 double digisynth_getvol(void *self)
 {
-    digisynth *ds = (digisynth*) self;
+    digisynth *ds = (digisynth *)self;
     return ds->vol;
 }
 
-
 void digisynth_sg_start(void *self)
 {
-    digisynth *ds = (digisynth*) self;
+    digisynth *ds = (digisynth *)self;
     ds->sound_generator.active = true;
 }
 void digisynth_sg_stop(void *self)
 {
-    digisynth *ds = (digisynth*) self;
+    digisynth *ds = (digisynth *)self;
     ds->sound_generator.active = false;
 }
 

@@ -5,7 +5,7 @@
 
 typedef struct digisynth_voice
 {
-    sampleosc  m_osc1;
+    sampleosc m_osc1;
     filter_sem m_filter;
 } digisynth_voice;
 

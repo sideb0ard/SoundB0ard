@@ -1065,7 +1065,8 @@ void interpret(char *line)
                 if (num_wurds > 2)
                 {
                     minisynth *ms = (minisynth *)mixr->sound_generators[sgnum];
-                    char_melody_to_midi_melody(&ms->base, 0, wurds, 2, num_wurds);
+                    char_melody_to_midi_melody(&ms->base, 0, wurds, 2,
+                                               num_wurds);
                 }
             }
             else if (strncmp("digi", wurds[1], 4) == 0)
@@ -1075,8 +1076,10 @@ void interpret(char *line)
                     int sgnum = add_digisynth(mixr, wurds[2]);
                     if (num_wurds > 2)
                     {
-                        digisynth *ds = (digisynth *)mixr->sound_generators[sgnum];
-                        char_melody_to_midi_melody(&ds->base, 0, wurds, 2, num_wurds);
+                        digisynth *ds =
+                            (digisynth *)mixr->sound_generators[sgnum];
+                        char_melody_to_midi_melody(&ds->base, 0, wurds, 2,
+                                                   num_wurds);
                     }
                 }
                 else
@@ -1084,7 +1087,6 @@ void interpret(char *line)
                     printf("Need to give me a sample name for a digisynth..\n");
                 }
             }
-
             else if (strncmp("ls", wurds[1], 2) == 0)
             {
                 minisynth_list_presets();
@@ -1093,143 +1095,24 @@ void interpret(char *line)
             {
                 int soundgen_num = atoi(wurds[1]);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type ==
-                        MINISYNTH_TYPE)
+                    is_synth(mixr->sound_generators[soundgen_num]))
                 {
-                    minisynth *ms =
-                        (minisynth *)mixr->sound_generators[soundgen_num];
+                    // ALL THE SYNTHBASE COMMONALITY - BELOW DOES ACTIONS BASED
+                    // ON WHICH KIND OF SYNTH
+
+                    synthbase *base =
+                        get_synthbase(mixr->sound_generators[soundgen_num]);
 
                     if (strncmp("add", wurds[2], 3) == 0)
                     {
                         if (strncmp("melody", wurds[3], 6) == 0 ||
                             strncmp("pattern", wurds[3], 7) == 0)
                         {
-                            int new_melody_num =
-                                synthbase_add_melody(&ms->base);
+                            int new_melody_num = synthbase_add_melody(base);
                             if (num_wurds > 4)
                             {
-                                char_melody_to_midi_melody(&ms->base, new_melody_num,
+                                char_melody_to_midi_melody(base, new_melody_num,
                                                            wurds, 4, num_wurds);
-                            }
-                        }
-                    }
-                    else if (strncmp("arp", wurds[2], 3) == 0)
-                    {
-                        ms->base.recording = false;
-                        minisynth_set_arpeggiate(ms, 1 - ms->m_arp.active);
-                    }
-                    else if (strncmp("generate", wurds[2], 8) == 0)
-                    {
-                        int melody_num = atoi(wurds[3]);
-                        int max_notes = atoi(wurds[4]);
-                        int max_steps = atoi(wurds[5]);
-                        synthbase_generate_melody(&ms->base, melody_num,
-                                                  max_notes, max_steps);
-                    }
-                    else if (strncmp("rand", wurds[2], 4) == 0)
-                    {
-                        minisynth_rand_settings(ms);
-                    }
-                    else if (strncmp("genrand", wurds[2], 4) == 0)
-                    {
-                        minisynth_rand_settings(ms);
-                        int melody_num = atoi(wurds[3]);
-                        int max_notes = atoi(wurds[4]);
-                        int max_steps = atoi(wurds[5]);
-                        synthbase_generate_melody(&ms->base, melody_num,
-                                                  max_notes, max_steps);
-                    }
-                    else if (strncmp("change", wurds[2], 6) == 0)
-                    {
-                        if (parse_minisynth_settings_change(ms, wurds))
-                        {
-                            continue;
-                        }
-                        int melody_num = atoi(wurds[3]);
-                        if (is_valid_melody_num(&ms->base, melody_num))
-                        {
-                            if (strncmp("numloops", wurds[4], 8) == 0)
-                            {
-                                int numloops = atoi(wurds[5]);
-                                if (numloops != 0)
-                                {
-                                    synthbase_set_melody_loop_num(
-                                        &ms->base, melody_num, numloops);
-                                    printf("NUMLOO"
-                                           "PS "
-                                           "Now "
-                                           "%d\n",
-                                           numloops);
-                                }
-                            }
-                            else if (strncmp("add", wurds[4], 3) == 0)
-                            {
-                                int tick = 0;
-                                int midi_note = 0;
-                                sscanf(wurds[5], "%d:%d", &tick, &midi_note);
-                                if (midi_note != 0)
-                                {
-                                    printf("Adding"
-                                           " note"
-                                           "\n");
-                                    synthbase_add_note(&ms->base, melody_num,
-                                                       tick, midi_note);
-                                }
-                            }
-                            else if (strncmp("mv", wurds[4], 2) == 0)
-                            {
-                                int fromtick = atoi(wurds[5]);
-                                int totick = atoi(wurds[6]);
-                                printf("MV'ing "
-                                       "note\n");
-                                synthbase_mv_note(&ms->base, melody_num,
-                                                  fromtick, totick);
-                            }
-                            else if (strncmp("rm", wurds[4], 2) == 0)
-                            {
-                                int tick = atoi(wurds[5]);
-                                printf("Rm'ing "
-                                       "note\n");
-                                synthbase_rm_note(&ms->base, melody_num, tick);
-                            }
-                            else if (strncmp("madd", wurds[4], 4) == 0)
-                            {
-                                int tick = 0;
-                                int midi_note = 0;
-                                sscanf(wurds[5], "%d:%d", &tick, &midi_note);
-                                if (midi_note != 0)
-                                {
-                                    printf("MAddin"
-                                           "g "
-                                           "note"
-                                           "\n");
-                                    synthbase_add_micro_note(
-                                        &ms->base, melody_num, tick, midi_note);
-                                }
-                            }
-                            else if (strncmp("melody", wurds[4], 6) == 0 ||
-                                     strncmp("pattern", wurds[4], 7) == 0)
-                            {
-                                synthbase_reset_melody(&ms->base, melody_num);
-                                char_melody_to_midi_melody(&ms->base, melody_num,
-                                                           wurds, 5, num_wurds);
-                            }
-                            else if (strncmp("mmv", wurds[4], 2) == 0)
-                            {
-                                int fromtick = atoi(wurds[5]);
-                                int totick = atoi(wurds[6]);
-                                printf("MMV'ing "
-                                       "note\n");
-                                synthbase_mv_micro_note(&ms->base, melody_num,
-                                                        fromtick, totick);
-                            }
-                            else if (strncmp("mrm", wurds[4], 3) == 0)
-                            {
-                                int tick = atoi(wurds[5]);
-                                printf("Rm'ing "
-                                       "note\n");
-                                synthbase_rm_micro_note(&ms->base, melody_num,
-                                                        tick);
                             }
                         }
                     }
@@ -1240,12 +1123,13 @@ void interpret(char *line)
                         int pattern_num2 = 0;
                         sscanf(wurds[4], "%d:%d", &sg2, &pattern_num2);
                         if (mixer_is_valid_soundgen_num(mixr, sg2) &&
-                            mixr->sound_generators[sg2]->type == MINISYNTH_TYPE)
+                            is_synth(mixr->sound_generators[sg2]))
                         {
-                            minisynth *ms2 =
-                                (minisynth *)mixr->sound_generators[sg2];
-                            if (is_valid_melody_num(&ms->base, pattern_num) &&
-                                is_valid_melody_num(&ms2->base, pattern_num2))
+                            synthbase *sb2 =
+                                get_synthbase(mixr->sound_generators[sg2]);
+
+                            if (is_valid_melody_num(base, pattern_num) &&
+                                is_valid_melody_num(sb2, pattern_num2))
                             {
 
                                 printf("Copying SYNTH "
@@ -1255,10 +1139,10 @@ void interpret(char *line)
                                        soundgen_num, pattern_num, sg2,
                                        pattern_num2);
 
-                                midi_event **melody = synthbase_copy_midi_loop(
-                                    &ms->base, pattern_num);
+                                midi_event **melody =
+                                    synthbase_copy_midi_loop(base, pattern_num);
 
-                                synthbase_replace_midi_loop(&ms2->base, melody,
+                                synthbase_replace_midi_loop(sb2, melody,
                                                             pattern_num2);
                             }
                         }
@@ -1275,7 +1159,7 @@ void interpret(char *line)
                         else
                         {
                             int melody = atoi(wurds[3]);
-                            if (is_valid_melody_num(&ms->base, melody))
+                            if (is_valid_melody_num(base, melody))
                             {
                                 printf("MELODY "
                                        "DELETE "
@@ -1283,54 +1167,39 @@ void interpret(char *line)
                             }
                             int tick = atoi(wurds[4]);
                             if (tick < PPNS)
-                                synthbase_rm_micro_note(&ms->base, melody,
-                                                        tick);
+                                synthbase_rm_micro_note(base, melody, tick);
                         }
                     }
                     else if (strncmp("dupe", wurds[2], 4) == 0)
                     {
                         int pattern_num = atoi(wurds[3]);
-                        int new_pattern_num = synthbase_add_melody(&ms->base);
-                        synthbase_dupe_melody(
-                            ms->base.melodies[pattern_num],
-                            ms->base.melodies[new_pattern_num]);
+                        int new_pattern_num = synthbase_add_melody(base);
+                        synthbase_dupe_melody(base->melodies[pattern_num],
+                                              base->melodies[new_pattern_num]);
                     }
                     else if (strncmp("import", wurds[2], 6) == 0)
                     {
                         printf("Importing file\n");
-                        synthbase_import_midi_from_file(&ms->base, wurds[3]);
+                        synthbase_import_midi_from_file(base, wurds[3]);
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0)
                     {
+                        // TODO - wurk for digisynth too
                         keys(soundgen_num);
                     }
-                    else if (strncmp("load", wurds[2], 4) == 0)
-                    {
-                        char preset_name[20];
-                        strncpy(preset_name, wurds[3], 19);
-                        minisynth_load_settings(ms, preset_name);
-                    }
-                    else if (strncmp("midi", wurds[2], 4) == 0)
-                    {
-                        mixr->midi_control_destination = SYNTH;
-                        mixr->active_midi_soundgen_num = soundgen_num;
-                    }
-                    else if (strncmp("genmode", wurds[2], 8) == 0)
+                    else if (strncmp("generate", wurds[2], 8) == 0)
                     {
                         if (strncmp("every", wurds[3], 5) == 0)
                         {
                             int num_gens = atoi(wurds[4]);
                             if (num_gens > 0)
                             {
-                                synthbase_set_generate_mode(&ms->base, true);
-                                ms->base.morph_every_n_loops = num_gens;
+                                synthbase_set_generate_mode(base, true);
+                                base->morph_every_n_loops = num_gens;
                             }
                             else
                             {
-                                printf("Need a "
-                                       "number for "
-                                       "every "
-                                       "'n'\n");
+                                printf("Need a number for every 'n'\n");
                             }
                         }
                         else if (strncmp("for", wurds[3], 3) == 0)
@@ -1338,8 +1207,8 @@ void interpret(char *line)
                             int num_gens = atoi(wurds[4]);
                             if (num_gens > 0)
                             {
-                                synthbase_set_generate_mode(&ms->base, true);
-                                ms->base.max_generation = num_gens;
+                                synthbase_set_generate_mode(base, true);
+                                base->max_generation = num_gens;
                             }
                             else
                             {
@@ -1349,26 +1218,32 @@ void interpret(char *line)
                             }
                         }
                         else
-                        { // just toggle
-                            synthbase_set_generate_mode(
-                                &ms->base, 1 - ms->base.generate_mode);
+                        {
+                            int melody_num = atoi(wurds[3]);
+                            int max_notes = atoi(wurds[4]);
+                            int max_steps = atoi(wurds[5]);
+                            synthbase_generate_melody(base, melody_num,
+                                                      max_notes, max_steps);
                         }
-
-                        printf("Synth GENERATE mode : %s\n",
-                               ms->base.generate_mode ? "true" : "false");
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0)
                     {
                         if (strncmp("true", wurds[3], 4) == 0)
                         {
-                            synthbase_set_multi_melody_mode(&ms->base, true);
+                            synthbase_set_multi_melody_mode(base, true);
                         }
                         else if (strncmp("false", wurds[3], 5) == 0)
                         {
-                            synthbase_set_multi_melody_mode(&ms->base, false);
+                            synthbase_set_multi_melody_mode(base, false);
                         }
+                        else // toggle
+                        {
+                            synthbase_set_multi_melody_mode(
+                                base, 1 - base->multi_melody_mode);
+                        }
+
                         printf("Synth multi mode : %s\n",
-                               ms->base.multi_melody_mode ? "true" : "false");
+                               base->multi_melody_mode ? "true" : "false");
                     }
                     else if (strncmp("nudge", wurds[2], 5) == 0)
                     {
@@ -1379,87 +1254,226 @@ void interpret(char *line)
                                    "along %d "
                                    "sixteenthzzzz!\n",
                                    sixteenth);
-                            synthbase_nudge_melody(
-                                &ms->base, ms->base.cur_melody, sixteenth);
+                            synthbase_nudge_melody(base, base->cur_melody,
+                                                   sixteenth);
                         }
-                    }
-                    else if (strncmp("print", wurds[2], 5) == 0)
-                    {
-                        minisynth_print(ms);
                     }
                     else if (strncmp("quantize", wurds[2], 8) == 0)
                     {
                         int melody_num = atoi(wurds[3]);
-                        if (is_valid_melody_num(&ms->base, melody_num))
+                        if (is_valid_melody_num(base, melody_num))
                         {
                             printf("QuantiZe!\n");
                             midi_event **melody =
-                                ms->base.melodies[ms->base.cur_melody];
+                                base->melodies[base->cur_melody];
                             midi_melody_quantize(melody);
                         }
-                    }
-                    else if (strncmp("rand", wurds[2], 4) == 0)
-                    {
-                        minisynth_rand_settings(ms);
                     }
                     else if (strncmp("reset", wurds[2], 5) == 0)
                     {
                         if (strncmp("all", wurds[3], 3) == 0)
                         {
-                            synthbase_reset_melody_all(&ms->base);
+                            synthbase_reset_melody_all(base);
                         }
                         else
                         {
                             int melody_num = atoi(wurds[3]);
-                            synthbase_reset_melody(&ms->base, melody_num);
+                            synthbase_reset_melody(base, melody_num);
                         }
-                    }
-                    else if (strncmp("save", wurds[2], 4) == 0)
-                    {
-                        char preset_name[20];
-                        strncpy(preset_name, wurds[3], 19);
-                        minisynth_save_settings(ms, preset_name);
                     }
                     else if (strncmp("switch", wurds[2], 6) == 0 ||
                              strncmp("CurMelody", wurds[2], 9) == 0)
                     {
                         int melody_num = atoi(wurds[3]);
-                        synthbase_switch_melody(&ms->base, melody_num);
+                        synthbase_switch_melody(base, melody_num);
                     }
-                    else if (strncmp("sustain", wurds[2], 5) == 0)
+                    else // individual PATTERN/MELODIES manipulation
                     {
-                        if (strncmp("true", wurds[3], 4) == 0)
+                        int melody_num = atoi(wurds[2]);
+                        if (is_valid_melody_num(base, melody_num))
                         {
-                            minisynth_set_sustain_override(ms, true);
-                        }
-                        else if (strncmp("false", wurds[3], 5) == 0)
-                        {
-                            minisynth_set_sustain_override(ms, false);
-                        }
-                        printf("Synth Sustain Override : %s\n",
-                               ms->m_settings.m_sustain_override ? "true"
-                                                                 : "false");
-                        for (int i = 0; i < MAX_VOICES; i++)
-                        {
-                            if (ms->m_voices[i])
+                            if (strncmp("numloops", wurds[3], 8) == 0)
                             {
-                                printf("EG sustain: "
-                                       "%d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg1.m_sustain_override);
-                                printf("EG sustain: "
-                                       "%d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg2.m_sustain_override);
-                                printf("EG sustain: "
-                                       "%d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg3.m_sustain_override);
-                                printf("EG sustain: "
-                                       "%d\n",
-                                       ms->m_voices[i]
-                                           ->m_voice.m_eg4.m_sustain_override);
+                                int numloops = atoi(wurds[4]);
+                                if (numloops != 0)
+                                {
+                                    synthbase_set_melody_loop_num(
+                                        base, melody_num, numloops);
+                                    printf("NUMLOO"
+                                           "PS "
+                                           "Now "
+                                           "%d\n",
+                                           numloops);
+                                }
                             }
+                            else if (strncmp("add", wurds[3], 3) == 0)
+                            {
+                                int tick = 0;
+                                int midi_note = 0;
+                                sscanf(wurds[4], "%d:%d", &tick, &midi_note);
+                                if (midi_note != 0)
+                                {
+                                    printf("Adding"
+                                           " note"
+                                           "\n");
+                                    synthbase_add_note(base, melody_num, tick,
+                                                       midi_note);
+                                }
+                            }
+                            else if (strncmp("mv", wurds[3], 2) == 0)
+                            {
+                                int fromtick = atoi(wurds[4]);
+                                int totick = atoi(wurds[5]);
+                                printf("MV'ing "
+                                       "note\n");
+                                synthbase_mv_note(base, melody_num, fromtick,
+                                                  totick);
+                            }
+                            else if (strncmp("rm", wurds[3], 2) == 0)
+                            {
+                                int tick = atoi(wurds[4]);
+                                printf("Rm'ing "
+                                       "note\n");
+                                synthbase_rm_note(base, melody_num, tick);
+                            }
+                            else if (strncmp("madd", wurds[3], 4) == 0)
+                            {
+                                int tick = 0;
+                                int midi_note = 0;
+                                sscanf(wurds[4], "%d:%d", &tick, &midi_note);
+                                if (midi_note != 0)
+                                {
+                                    printf("MAddin"
+                                           "g "
+                                           "note"
+                                           "\n");
+                                    synthbase_add_micro_note(base, melody_num,
+                                                             tick, midi_note);
+                                }
+                            }
+                            else if (strncmp("melody", wurds[3], 6) == 0 ||
+                                     strncmp("pattern", wurds[3], 7) == 0)
+                            {
+                                synthbase_reset_melody(base, melody_num);
+                                char_melody_to_midi_melody(base, melody_num,
+                                                           wurds, 5, num_wurds);
+                            }
+                            else if (strncmp("mmv", wurds[3], 2) == 0)
+                            {
+                                int fromtick = atoi(wurds[4]);
+                                int totick = atoi(wurds[5]);
+                                printf("MMV'ing "
+                                       "note\n");
+                                synthbase_mv_micro_note(base, melody_num,
+                                                        fromtick, totick);
+                            }
+                            else if (strncmp("mrm", wurds[3], 3) == 0)
+                            {
+                                int tick = atoi(wurds[4]);
+                                printf("Rm'ing "
+                                       "note\n");
+                                synthbase_rm_micro_note(base, melody_num, tick);
+                            }
+                        }
+
+                        if (mixr->sound_generators[soundgen_num]->type ==
+                            MINISYNTH_TYPE)
+                        {
+                            minisynth *ms =
+                                (minisynth *)
+                                    mixr->sound_generators[soundgen_num];
+                            if (parse_minisynth_settings_change(ms, wurds))
+                            {
+                                continue;
+                            }
+                            else if (strncmp("sustain", wurds[2], 5) == 0)
+                            {
+                                if (strncmp("true", wurds[3], 4) == 0)
+                                {
+                                    minisynth_set_sustain_override(ms, true);
+                                }
+                                else if (strncmp("false", wurds[3], 5) == 0)
+                                {
+                                    minisynth_set_sustain_override(ms, false);
+                                }
+                                printf("Synth Sustain Override : %s\n",
+                                       ms->m_settings.m_sustain_override
+                                           ? "true"
+                                           : "false");
+                                for (int i = 0; i < MAX_VOICES; i++)
+                                {
+                                    if (ms->m_voices[i])
+                                    {
+                                        printf("EG sustain: "
+                                               "%d\n",
+                                               ms->m_voices[i]
+                                                   ->m_voice.m_eg1
+                                                   .m_sustain_override);
+                                        printf("EG sustain: "
+                                               "%d\n",
+                                               ms->m_voices[i]
+                                                   ->m_voice.m_eg2
+                                                   .m_sustain_override);
+                                        printf("EG sustain: "
+                                               "%d\n",
+                                               ms->m_voices[i]
+                                                   ->m_voice.m_eg3
+                                                   .m_sustain_override);
+                                        printf("EG sustain: "
+                                               "%d\n",
+                                               ms->m_voices[i]
+                                                   ->m_voice.m_eg4
+                                                   .m_sustain_override);
+                                    }
+                                }
+                            }
+                            else if (strncmp("print", wurds[2], 5) == 0)
+                            {
+                                minisynth_print(ms);
+                            }
+                            else if (strncmp("load", wurds[2], 4) == 0)
+                            {
+                                char preset_name[20];
+                                strncpy(preset_name, wurds[3], 19);
+                                minisynth_load_settings(ms, preset_name);
+                            }
+                            else if (strncmp("genrand", wurds[2], 4) == 0)
+                            {
+                                printf("GENRAND!\n");
+                                minisynth_rand_settings(ms);
+                                int melody_num = atoi(wurds[3]);
+                                int max_notes = atoi(wurds[4]);
+                                int max_steps = atoi(wurds[5]);
+                                synthbase_generate_melody(&ms->base, melody_num,
+                                                          max_notes, max_steps);
+                            }
+                            else if (strncmp("arp", wurds[2], 3) == 0)
+                            {
+                                ms->base.recording = false;
+                                minisynth_set_arpeggiate(ms,
+                                                         1 - ms->m_arp.active);
+                            }
+                            else if (strncmp("rand", wurds[2], 4) == 0)
+                            {
+                                minisynth_rand_settings(ms);
+                            }
+                            else if (strncmp("rand", wurds[2], 4) == 0)
+                            {
+                                minisynth_rand_settings(ms);
+                            }
+                            else if (strncmp("save", wurds[2], 4) == 0)
+                            {
+                                char preset_name[20];
+                                strncpy(preset_name, wurds[3], 19);
+                                minisynth_save_settings(ms, preset_name);
+                            }
+                        }
+                        else if (mixr->sound_generators[soundgen_num]->type ==
+                                 DIGISYNTH_TYPE)
+                        {
+                            digisynth *ms =
+                                (digisynth *)
+                                    mixr->sound_generators[soundgen_num];
                         }
                     }
                 }
@@ -2384,400 +2398,400 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
 
 bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
 {
-    if (strncmp("attackms", wurds[3], 8) == 0)
+    if (strncmp("attackms", wurds[2], 8) == 0)
     {
         printf("Minisynth change Attack Time Ms!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_attack_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("decayms", wurds[3], 7) == 0)
+    else if (strncmp("decayms", wurds[2], 7) == 0)
     {
         printf("Minisynth change Decay Time MS!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_decay_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("releasems", wurds[3], 7) == 0)
+    else if (strncmp("releasems", wurds[2], 7) == 0)
     {
         printf("Minisynth change Release Time MS!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_release_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("delayfb", wurds[3], 7) == 0)
+    else if (strncmp("delayfb", wurds[2], 7) == 0)
     {
         printf("Minisynth change Delay Feedback!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_delay_feedback_pct(ms, val);
         return true;
     }
-    else if (strncmp("delayr", wurds[3], 6) == 0)
+    else if (strncmp("delayr", wurds[2], 6) == 0)
     {
         printf("Minisynth change Delay Ratio!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_delay_ratio(ms, val);
         return true;
     }
-    else if (strncmp("delaymode", wurds[3], 9) == 0)
+    else if (strncmp("delaymode", wurds[2], 9) == 0)
     {
         printf("Minisynth change DELAY MODE!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_delay_mode(ms, val);
         return true;
     }
-    else if (strncmp("delayms", wurds[3], 7) == 0)
+    else if (strncmp("delayms", wurds[2], 7) == 0)
     {
         printf("Minisynth change Delay Time Ms!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_delay_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("delaymx", wurds[3], 7) == 0)
+    else if (strncmp("delaymx", wurds[2], 7) == 0)
     {
         printf("Minisynth change Delay Wet Mix!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_delay_wetmix(ms, val);
         return true;
     }
-    else if (strncmp("detune", wurds[3], 6) == 0)
+    else if (strncmp("detune", wurds[2], 6) == 0)
     {
         printf("Minisynth change DETUNE!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_detune(ms, val);
         return true;
     }
-    else if (strncmp("eg1dcaint", wurds[3], 9) == 0)
+    else if (strncmp("eg1dcaint", wurds[2], 9) == 0)
     {
         printf("Minisynth change EG1 DCA Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_eg1_dca_int(ms, val);
         return true;
     }
-    else if (strncmp("eg1filterint", wurds[3], 12) == 0)
+    else if (strncmp("eg1filterint", wurds[2], 12) == 0)
     {
         printf("Minisynth change EG1 Filter Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_eg1_filter_int(ms, val);
         return true;
     }
-    else if (strncmp("eg1oscint", wurds[3], 9) == 0)
+    else if (strncmp("eg1oscint", wurds[2], 9) == 0)
     {
         printf("Minisynth change EG1 Osc Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_eg1_osc_int(ms, val);
         return true;
     }
-    else if (strncmp("fc", wurds[3], 2) == 0)
+    else if (strncmp("fc", wurds[2], 2) == 0)
     {
         printf("Minisynth change Filter Cutoff!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_filter_fc(ms, val);
         return true;
     }
-    else if (strncmp("fq", wurds[3], 2) == 0)
+    else if (strncmp("fq", wurds[2], 2) == 0)
     {
         printf("Minisynth change Filter Qualivity!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_filter_fq(ms, val);
         return true;
     }
-    else if (strncmp("filtertype", wurds[3], 4) == 0)
+    else if (strncmp("filtertype", wurds[2], 4) == 0)
     {
         printf("Minisynth change Filter TYPE!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_filter_type(ms, val);
         return true;
     }
-    else if (strncmp("saturation", wurds[3], 10) == 0)
+    else if (strncmp("saturation", wurds[2], 10) == 0)
     {
         printf("Minisynth change Filter SATURATION!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_filter_saturation(ms, val);
         return true;
     }
-    else if (strncmp("nlp", wurds[3], 3) == 0)
+    else if (strncmp("nlp", wurds[2], 3) == 0)
     {
         printf("Minisynth change Filter NLP!\n");
-        unsigned val = atoi(wurds[4]);
+        unsigned val = atoi(wurds[3]);
         minisynth_set_filter_nlp(ms, val);
         return true;
     }
-    else if (strncmp("ktint", wurds[3], 5) == 0)
+    else if (strncmp("ktint", wurds[2], 5) == 0)
     {
         printf("Minisynth change Filter Keytrack Intensity!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_keytrack_int(ms, val);
         return true;
     }
-    else if (strncmp("kt", wurds[3], 2) == 0)
+    else if (strncmp("kt", wurds[2], 2) == 0)
     {
         printf("Minisynth change Filter Keytrack!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_keytrack(ms, val);
         return true;
     }
-    else if (strncmp("legato", wurds[3], 6) == 0)
+    else if (strncmp("legato", wurds[2], 6) == 0)
     {
         printf("Minisynth change LEGATO!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_legato_mode(ms, val);
         return true;
     }
-    else if (strncmp("lfo1wave", wurds[3], 7) == 0)
+    else if (strncmp("lfo1wave", wurds[2], 7) == 0)
     {
         printf("Minisynth change LFO1 Wave!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_lfo_wave(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1ampint", wurds[3], 10) == 0)
+    else if (strncmp("lfo1ampint", wurds[2], 10) == 0)
     {
         printf("Minisynth change LFO1 Amp Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_amp_int(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1amp", wurds[3], 7) == 0)
+    else if (strncmp("lfo1amp", wurds[2], 7) == 0)
     {
         printf("Minisynth change LFO1 AMP!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_amp(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1filterint", wurds[3], 13) == 0)
+    else if (strncmp("lfo1filterint", wurds[2], 13) == 0)
     {
         printf("Minisynth change LFO1 Filter FC Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_filter_fc_int(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1rate", wurds[3], 8) == 0)
+    else if (strncmp("lfo1rate", wurds[2], 8) == 0)
     {
         printf("Minisynth change LFO1 rate!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_rate(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1panint", wurds[3], 10) == 0)
+    else if (strncmp("lfo1panint", wurds[2], 10) == 0)
     {
         printf("Minisynth change LFO1 Pan Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_pan_int(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1pitch", wurds[3], 9) == 0)
+    else if (strncmp("lfo1pitch", wurds[2], 9) == 0)
     {
         printf("Minisynth change LFO1 Pitch!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_pitch(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo2wave", wurds[3], 7) == 0)
+    else if (strncmp("lfo2wave", wurds[2], 7) == 0)
     {
         printf("Minisynth change LFO2 Wave!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_lfo_wave(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2ampint", wurds[3], 10) == 0)
+    else if (strncmp("lfo2ampint", wurds[2], 10) == 0)
     {
         printf("Minisynth change LFO2 Amp Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_amp_int(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2amp", wurds[3], 7) == 0)
+    else if (strncmp("lfo2amp", wurds[2], 7) == 0)
     {
         printf("Minisynth change LFO2 AMP!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_amp(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2filterint", wurds[3], 13) == 0)
+    else if (strncmp("lfo2filterint", wurds[2], 13) == 0)
     {
         printf("Minisynth change LFO2 Filter FC Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_filter_fc_int(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2rate", wurds[3], 8) == 0)
+    else if (strncmp("lfo2rate", wurds[2], 8) == 0)
     {
         printf("Minisynth change LFO2 rate!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_rate(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2panint", wurds[3], 10) == 0)
+    else if (strncmp("lfo2panint", wurds[2], 10) == 0)
     {
         printf("Minisynth change LFO2 Pan Int!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_pan_int(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2pitch", wurds[3], 9) == 0)
+    else if (strncmp("lfo2pitch", wurds[2], 9) == 0)
     {
         printf("Minisynth change LFO2 Pitch!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_lfo_pitch(ms, 2, val);
         return true;
     }
-    else if (strncmp("ndscale", wurds[3], 7) == 0)
+    else if (strncmp("ndscale", wurds[2], 7) == 0)
     {
         printf("Minisynth change Note Number to Decay Scaling!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_note_to_decay_scaling(ms, val);
         return true;
     }
-    else if (strncmp("noisedb", wurds[3], 7) == 0)
+    else if (strncmp("noisedb", wurds[2], 7) == 0)
     {
         printf("Minisynth change Noise Osc DB!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_noise_osc_db(ms, val);
         return true;
     }
-    else if (strncmp("oct", wurds[3], 3) == 0)
+    else if (strncmp("oct", wurds[2], 3) == 0)
     {
         printf("Minisynth change OCTAVE!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_octave(ms, val);
         return true;
     }
-    else if (strncmp("pitchrange", wurds[3], 10) == 0)
+    else if (strncmp("pitchrange", wurds[2], 10) == 0)
     {
         printf("Minisynth change Pitchbend RANGE!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_pitchbend_range(ms, val);
         return true;
     }
-    else if (strncmp("porta", wurds[3], 5) == 0)
+    else if (strncmp("porta", wurds[2], 5) == 0)
     {
         printf("Minisynth change PORTAMENTO Time!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_portamento_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("pw", wurds[3], 2) == 0)
+    else if (strncmp("pw", wurds[2], 2) == 0)
     {
         printf("Minisynth change PULSEWIDTH Pct!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_pulsewidth_pct(ms, val);
         return true;
     }
-    else if (strncmp("subosc", wurds[3], 6) == 0)
+    else if (strncmp("subosc", wurds[2], 6) == 0)
     {
         printf("Minisynth change SubOSC DB!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_sub_osc_db(ms, val);
         return true;
     }
-    else if (strncmp("sustainlvl", wurds[3], 10) == 0)
+    else if (strncmp("sustainlvl", wurds[2], 10) == 0)
     {
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         printf("Minisynth change Sustain Level! %.2f\n", val);
         minisynth_set_sustain(ms, val);
         return true;
     }
-    else if (strncmp("sustainms", wurds[3], 9) == 0)
+    else if (strncmp("sustainms", wurds[2], 9) == 0)
     {
         printf("Minisynth change Sustain Time ms!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_sustain_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("sustain16th", wurds[3], 11) == 0)
+    else if (strncmp("sustain16th", wurds[2], 11) == 0)
     {
         printf("Minisynth change Sustain Time 16th!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_sustain_time_sixteenth(ms, val);
         return true;
     }
-    else if (strncmp("sustain", wurds[3], 7) == 0)
+    else if (strncmp("sustain", wurds[2], 7) == 0)
     {
         printf("Minisynth change SUSTAIN OVERRIDE!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_sustain_override(ms, val);
         return true;
     }
-    else if (strncmp("vascale", wurds[3], 7) == 0)
+    else if (strncmp("vascale", wurds[2], 7) == 0)
     {
         printf("Minisynth change Velocity to Attack Scaling!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_velocity_to_attack_scaling(ms, val);
         return true;
     }
-    else if (strncmp("voice", wurds[3], 5) == 0)
+    else if (strncmp("voice", wurds[2], 5) == 0)
     {
         printf("Minisynth change VOICE!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_voice_mode(ms, val);
         return true;
     }
-    else if (strncmp("vol", wurds[3], 3) == 0)
+    else if (strncmp("vol", wurds[2], 3) == 0)
     {
         printf("Minisynth change VOLUME!\n");
-        double val = atof(wurds[4]);
+        double val = atof(wurds[3]);
         minisynth_set_vol(ms, val);
         return true;
     }
-    else if (strncmp("zero", wurds[3], 4) == 0)
+    else if (strncmp("zero", wurds[2], 4) == 0)
     {
         printf("Minisynth change REST-To-ZERO!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_reset_to_zero(ms, val);
         return true;
     }
-    else if (strncmp("arplatch", wurds[3], 8) == 0)
+    else if (strncmp("arplatch", wurds[2], 8) == 0)
     {
         printf("Minisynth change ARP Latch!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         if (val == 0 || val == 1)
             minisynth_set_arpeggiate_latch(ms, val);
         else
             printf("Gimme a 0 or 1\n");
         return true;
     }
-    else if (strncmp("arprepeat", wurds[3], 9) == 0)
+    else if (strncmp("arprepeat", wurds[2], 9) == 0)
     {
         printf("Minisynth change ARP Repeat!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         if (val == 0 || val == 1)
             minisynth_set_arpeggiate_single_note_repeat(ms, val);
         else
             printf("Gimme a 0 or 1\n");
         return true;
     }
-    else if (strncmp("arpoctrange", wurds[3], 11) == 0)
+    else if (strncmp("arpoctrange", wurds[2], 11) == 0)
     {
         printf("Minisynth change ARP Oct Range!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_arpeggiate_octave_range(ms, val);
         return true;
     }
-    else if (strncmp("arpmode", wurds[3], 7) == 0)
+    else if (strncmp("arpmode", wurds[2], 7) == 0)
     {
         printf("Minisynth change ARP Mode!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_arpeggiate_mode(ms, val);
         return true;
     }
-    else if (strncmp("arprate", wurds[3], 7) == 0)
+    else if (strncmp("arprate", wurds[2], 7) == 0)
     {
         printf("Minisynth change ARP Rate!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         minisynth_set_arpeggiate_rate(ms, val);
         return true;
     }
-    else if (strncmp("arpcurstep", wurds[3], 11) == 0)
+    else if (strncmp("arpcurstep", wurds[2], 11) == 0)
     {
         printf("you don't change Minisynth curstep - it increments by "
                "itself!\n");
         return true;
     }
-    else if (strncmp("arp", wurds[3], 3) == 0)
+    else if (strncmp("arp", wurds[2], 3) == 0)
     {
         printf("Minisynth change ARP!\n");
-        int val = atoi(wurds[4]);
+        int val = atoi(wurds[3]);
         if (val == 0 || val == 1)
             minisynth_set_arpeggiate(ms, val);
         else

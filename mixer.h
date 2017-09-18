@@ -142,4 +142,7 @@ bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
 bool mixer_is_soundgen_in_scene(int soundgen_num, scene *scene_num);
 bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
+// TODO this doesn't really belong here
+synthbase *get_synthbase(SOUNDGEN *self);
+
 #endif // MIXER_H

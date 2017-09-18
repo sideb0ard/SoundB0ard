@@ -467,37 +467,31 @@ void minisynth_status(void *self, wchar_t *status_string)
         minisynth_print(ms);
     }
 
-    swprintf(
-        status_string, MAX_PS_STRING_SZ,
-        L"[SYNTH '%s'] - Vol: %.2f Active: %s "
-        "DelayMode: %d Mode: %ls"
-        "\n      A:%.2f D:%.2f R:%.2f S:%.2f Amp: %2.f LFO1 amp: %.2f "
-        "rate:%.2f "
-        "SustainOverride: %s Sustain Time(ms): %.2f Filter FC: %.2f Filter Q: "
-        "%2.f"
-        "\n      Delay ms: %.2f Feedback Pct:%.2f Delay Ratio: %.2f Wet Mix: "
-        "%2.f"
-        "\n      Detune Cents: %.2f Pulse Width Pct:%.2f SubOsc Db: %.2f "
-        "NoiseOsc Db: %2.f EG1sus:%d Eg2sus:%d Eg3sus:%d Eg4sus:%d",
-        ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
-        ms->sound_generator.active ? "true" : "false",
-        ms->m_settings.m_delay_mode, s_mode_names[ms->m_settings.m_voice_mode],
-        ms->m_settings.m_attack_time_msec, ms->m_settings.m_decay_time_msec,
-        ms->m_settings.m_release_time_msec, ms->m_settings.m_sustain_level,
-        ms->m_settings.m_volume_db, ms->m_settings.m_lfo1_amplitude,
-        ms->m_settings.m_lfo1_rate,
-        ms->m_settings.m_sustain_override ? "true" : "false",
-        ms->m_settings.m_sustain_time_ms,
-        ms->m_voices[0]->m_moog_ladder_filter.f.m_fc,
-        ms->m_settings.m_q_control, ms->m_settings.m_delay_time_msec,
-        ms->m_settings.m_delay_feedback_pct, ms->m_settings.m_delay_ratio,
-        ms->m_settings.m_delay_wet_mix, ms->m_settings.m_detune_cents,
-        ms->m_settings.m_pulse_width_pct, ms->m_settings.m_sub_osc_db,
-        ms->m_settings.m_noise_osc_db,
-        ms->m_voices[0]->m_voice.m_eg1.m_sustain_override,
-        ms->m_voices[0]->m_voice.m_eg2.m_sustain_override,
-        ms->m_voices[0]->m_voice.m_eg3.m_sustain_override,
-        ms->m_voices[0]->m_voice.m_eg4.m_sustain_override);
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d]\n"
+             "      lfo1wave:%s(%d)[0-7] lfo1rate:%.2f lfo1amp:%.2f",
+             ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
+             s_mode_names[ms->m_settings.m_voice_mode],
+             ms->m_settings.m_voice_mode, MAX_VOICE_CHOICE - 1,
+             s_lfo_mode_names[ms->m_settings.m_lfo1_waveform],
+             ms->m_settings.m_lfo1_waveform, ms->m_settings.m_lfo1_amplitude,
+             ms->m_settings.m_lfo1_rate);
+    // ms->m_settings.m_delay_mode,
+    // ms->m_settings.m_attack_time_msec, ms->m_settings.m_decay_time_msec,
+    // ms->m_settings.m_release_time_msec, ms->m_settings.m_sustain_level,
+    // ms->m_settings.m_volume_db,
+    // ms->m_settings.m_sustain_override ? "true" : "false",
+    // ms->m_settings.m_sustain_time_ms,
+    // ms->m_voices[0]->m_moog_ladder_filter.f.m_fc,
+    // ms->m_settings.m_q_control, ms->m_settings.m_delay_time_msec,
+    // ms->m_settings.m_delay_feedback_pct, ms->m_settings.m_delay_ratio,
+    // ms->m_settings.m_delay_wet_mix, ms->m_settings.m_detune_cents,
+    // ms->m_settings.m_pulse_width_pct, ms->m_settings.m_sub_osc_db,
+    // ms->m_settings.m_noise_osc_db,
+    // ms->m_voices[0]->m_voice.m_eg1.m_sustain_override,
+    // ms->m_voices[0]->m_voice.m_eg2.m_sustain_override,
+    // ms->m_voices[0]->m_voice.m_eg3.m_sustain_override,
+    // ms->m_voices[0]->m_voice.m_eg4.m_sustain_override);
 
     wchar_t scratch[512];
     synthbase_status(&ms->base, scratch);

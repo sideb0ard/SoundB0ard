@@ -36,6 +36,7 @@ typedef struct t_soundgen
 
 } SOUNDGEN;
 
+bool is_synth(SOUNDGEN *self);
 int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth);
 int add_basicfilter_soundgen(SOUNDGEN *self);
 int add_compressor_soundgen(SOUNDGEN *self);

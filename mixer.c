@@ -10,12 +10,12 @@
 #include "algorithm.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
+#include "digisynth.h"
 #include "envelope.h"
 #include "fx.h"
 #include "granulator.h"
 #include "looper.h"
 #include "minisynth.h"
-#include "digisynth.h"
 #include "mixer.h"
 #include "sample_sequencer.h"
 #include "sbmsg.h"
@@ -655,4 +655,19 @@ void mixer_preview_track(mixer *mixr, char *filename)
     (void)mixr;
     (void)filename;
     // TODO
+}
+
+synthbase *get_synthbase(SOUNDGEN *self)
+{
+    if (self->type == MINISYNTH_TYPE)
+    {
+        minisynth *ms = (minisynth *)self;
+        return &ms->base;
+    }
+    else if (self->type == DIGISYNTH_TYPE)
+    {
+        digisynth *ds = (digisynth *)self;
+        return &ds->base;
+    }
+    return NULL;
 }

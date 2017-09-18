@@ -225,3 +225,11 @@ double envelopor(SOUNDGEN *self, double val)
     }
     return val;
 }
+
+bool is_synth(SOUNDGEN *self)
+{
+    if (self->type == MINISYNTH_TYPE || self->type == DIGISYNTH_TYPE)
+        return true;
+
+    return false;
+}

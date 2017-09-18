@@ -25,11 +25,7 @@ double sampleosc_do_oscillate(oscillator *self, double *quad_phase_output)
     return 0.4;
 }
 
-void sampleosc_start_oscillator(oscillator *self)
-{
-}
-void sampleosc_stop_oscillator(oscillator *self)
-{}
+void sampleosc_start_oscillator(oscillator *self) {}
+void sampleosc_stop_oscillator(oscillator *self) {}
 
-void sampleosc_reset_oscillator(oscillator *self)
-{}
+void sampleosc_reset_oscillator(oscillator *self) {}
