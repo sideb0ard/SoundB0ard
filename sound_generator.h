@@ -1,5 +1,4 @@
-#ifndef SOUNDGEN_H
-#define SOUNDGEN_H
+#pragma once
 
 #include <stdbool.h>
 #include <wchar.h>
@@ -8,7 +7,7 @@
 #include "envelope.h"
 #include "fx.h"
 
-typedef struct t_soundgen
+typedef struct soundgenerator
 {
     // void (*gennext)(void *self, double* frame_vals, int framesPerBuffer);
     double (*gennext)(void *self);
@@ -34,24 +33,22 @@ typedef struct t_soundgen
     ENVSTREAM **envelopes;
     int envelopes_enabled; // bool
 
-} SOUNDGEN;
+} soundgenerator;
 
-bool is_synth(SOUNDGEN *self);
-int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth);
-int add_basicfilter_soundgen(SOUNDGEN *self);
-int add_compressor_soundgen(SOUNDGEN *self);
-int add_distortion_soundgen(SOUNDGEN *self);
-int add_decimator_soundgen(SOUNDGEN *self);
-int add_delay_soundgen(SOUNDGEN *self, float duration);
-int add_moddelay_soundgen(SOUNDGEN *self);
-int add_modfilter_soundgen(SOUNDGEN *self);
-int add_follower_soundgen(SOUNDGEN *self);
-int add_reverb_soundgen(SOUNDGEN *self);
-int add_waveshape_soundgen(SOUNDGEN *self);
-int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type);
-double effector(SOUNDGEN *self, double val);
+bool is_synth(soundgenerator *self);
+int add_beatrepeat_soundgen(soundgenerator *self, int nbeats, int sixteenth);
+int add_basicfilter_soundgen(soundgenerator *self);
+int add_compressor_soundgen(soundgenerator *self);
+int add_distortion_soundgen(soundgenerator *self);
+int add_decimator_soundgen(soundgenerator *self);
+int add_delay_soundgen(soundgenerator *self, float duration);
+int add_moddelay_soundgen(soundgenerator *self);
+int add_modfilter_soundgen(soundgenerator *self);
+int add_follower_soundgen(soundgenerator *self);
+int add_reverb_soundgen(soundgenerator *self);
+int add_waveshape_soundgen(soundgenerator *self);
+int add_freq_pass_soundgen(soundgenerator *self, float freq, fx_type pass_type);
+double effector(soundgenerator *self, double val);
 
-int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e);
-double envelopor(SOUNDGEN *self, double val);
-
-#endif // SOUNDGEN_H
+int add_envelope_soundgen(soundgenerator *self, ENVSTREAM *e);
+double envelopor(soundgenerator *self, double val);

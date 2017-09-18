@@ -50,9 +50,9 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
             }
         }
 
-        if (note > 8)
-            minisynth_handle_midi_note(ms, note + (12 * arp->cur_octave),
-                                       velocity, false);
+        // if (note > 8)
+        //     synth_handle_midi_note(ms, note + (12 * arp->cur_octave),
+        //                                velocity, false);
 
         switch (arp->mode)
         {

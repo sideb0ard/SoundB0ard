@@ -19,7 +19,7 @@ typedef struct pattern_hit_metadata
 
 typedef struct synthdrum_sequencer
 {
-    SOUNDGEN sg;
+    soundgenerator sg;
     sequencer m_seq;
     char m_patch_name[512];
     double vol;

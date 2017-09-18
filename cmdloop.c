@@ -218,7 +218,7 @@ void interpret(char *line)
             {
                 for (int i = 0; i < mixr->soundgen_num; i++)
                 {
-                    SOUNDGEN *sg = mixr->sound_generators[i];
+                    soundgenerator *sg = mixr->sound_generators[i];
                     if (sg != NULL)
                         sg->start(sg);
                 }
@@ -229,7 +229,7 @@ void interpret(char *line)
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
                 {
                     printf("Starting SOUND GEN %d\n", soundgen_num);
-                    SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+                    soundgenerator *sg = mixr->sound_generators[soundgen_num];
                     sg->start(sg);
                 }
             }
@@ -240,7 +240,7 @@ void interpret(char *line)
             {
                 for (int i = 0; i < mixr->soundgen_num; i++)
                 {
-                    SOUNDGEN *sg = mixr->sound_generators[i];
+                    soundgenerator *sg = mixr->sound_generators[i];
                     if (sg != NULL)
                         sg->stop(sg);
                 }
@@ -251,7 +251,7 @@ void interpret(char *line)
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
                 {
                     printf("Stopping SOUND GEN %d\n", soundgen_num);
-                    SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+                    soundgenerator *sg = mixr->sound_generators[soundgen_num];
                     sg->stop(sg);
                 }
             }
@@ -399,8 +399,8 @@ void interpret(char *line)
                                                  num_wurds);
                 int sgnum = add_sound_generator(
                     mixr,
-                    (SOUNDGEN *)sds); //  add_seq_char_pattern(mixr,
-                                      //  wurds[1], pattern);
+                    (soundgenerator *)sds); //  add_seq_char_pattern(mixr,
+                                            //  wurds[1], pattern);
                 printf("New Sound Generator (SD): %d\n", sgnum);
                 pattern_char_to_pattern(
                     &sds->m_seq, pattern,
@@ -614,8 +614,8 @@ void interpret(char *line)
                                                  num_wurds);
                 int sgnum = add_sound_generator(
                     mixr,
-                    (SOUNDGEN *)s); //  add_seq_char_pattern(mixr,
-                                    //  wurds[1], pattern);
+                    (soundgenerator *)s); //  add_seq_char_pattern(mixr,
+                                          //  wurds[1], pattern);
                 pattern_char_to_pattern(
                     &s->m_seq, pattern,
                     s->m_seq.patterns[s->m_seq.num_patterns++]);
@@ -692,7 +692,7 @@ void interpret(char *line)
             {
                 printf("VALID!\n");
                 int soundgen_num = add_granulator(mixr, wurds[1]);
-                printf("SOUNDGEN %d\n", soundgen_num);
+                printf("soundgenerator %d\n", soundgen_num);
             }
             else
             {
@@ -907,7 +907,7 @@ void interpret(char *line)
                 int loop_len = atoi(wurds[2]);
                 // if (loop_len > 0) {
                 int soundgen_num = add_looper(mixr, wurds[1], loop_len);
-                printf("SOUNDGEN %d\n", soundgen_num);
+                printf("soundgenerator %d\n", soundgen_num);
                 mixr->midi_control_destination = MIDILOOPER;
                 mixr->active_midi_soundgen_num = soundgen_num;
                 //}
@@ -1385,7 +1385,7 @@ void interpret(char *line)
                             {
                                 synthbase_reset_melody(base, melody_num);
                                 char_melody_to_midi_melody(base, melody_num,
-                                                           wurds, 5, num_wurds);
+                                                           wurds, 4, num_wurds);
                             }
                             else if (strncmp("mmv", wurds[3], 2) == 0)
                             {

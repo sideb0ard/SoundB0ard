@@ -12,7 +12,7 @@
 
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
-#define MAX_NUM_SOUNDGEN 100
+#define MAX_NUM_soundgenerator 100
 
 typedef enum { Q32, Q16, Q8, Q4 } quantize_size;
 
@@ -40,14 +40,14 @@ typedef unsigned int compat_key_list[6];
 typedef struct mixer
 {
 
-    SOUNDGEN **sound_generators;
+    soundgenerator **sound_generators;
     int soundgen_num;  // actual number of SGs
     int soundgen_size; // number of memory slots reserved for SGszz
 
-    double soundgen_cur_val[MAX_NUM_SOUNDGEN]; // cache for current val,
-                                               // currently used for sidechain
-                                               // compressor TODO there are no
-                                               // checks for this num
+    double soundgen_cur_val[MAX_NUM_soundgenerator]; // cache for current val,
+    // currently used for sidechain
+    // compressor TODO there are no
+    // checks for this num
 
     env_var environment[ENVIRONMENT_ARRAY_SIZE];
     int env_var_count;
@@ -113,7 +113,7 @@ int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                       bool start_on_first_beat);
 int add_looper(mixer *mixr, char *filename, double loop_len);
 int add_granulator(mixer *mixr, char *filename);
-int add_sound_generator(mixer *mixr, SOUNDGEN *sg);
+int add_sound_generator(mixer *mixr, soundgenerator *sg);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
@@ -143,6 +143,8 @@ bool mixer_is_soundgen_in_scene(int soundgen_num, scene *scene_num);
 bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
 // TODO this doesn't really belong here
-synthbase *get_synthbase(SOUNDGEN *self);
+synthbase *get_synthbase(soundgenerator *self);
+void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
+                            bool update_last_midi);
 
 #endif // MIXER_H

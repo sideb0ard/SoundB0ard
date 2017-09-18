@@ -527,7 +527,7 @@ double minisynth_gennext(void *self)
     if (idx >= 0)
     {
         midi_event *ev = ms->base.melodies[ms->base.cur_melody][idx];
-        midi_parse_midi_event(ms, ev);
+        midi_parse_midi_event((soundgenerator *)ms, ev);
     }
 
     minisynth_update(ms);
@@ -570,48 +570,6 @@ void minisynth_toggle_delay_mode(minisynth *ms)
 {
     ms->m_settings.m_delay_mode =
         ++(ms->m_settings.m_delay_mode) % MAX_NUM_DELAY_MODE;
-}
-
-// TODO - better function name - this is programatic calls, which
-// basically adds a matching delete after use event i.e. == a note off
-void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
-                                bool update_last_midi)
-{
-    if (mixr->debug_mode)
-        print_midi_event(note);
-
-    if (update_last_midi)
-    {
-        ms->m_last_midi_note = note;
-    }
-    minisynth_midi_note_on(ms, note, velocity);
-
-    int note_off_tick =
-        (mixr->midi_tick +
-         (PPSIXTEENTH * (int)ms->m_settings.m_sustain_time_sixteenth - 7)) %
-        PPNS;
-
-    midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
-    ////////////////////////
-
-    if (ms->base.recording)
-    {
-        printf("Recording note!\n");
-        int note_on_tick = mixr->midi_tick % PPNS;
-        midi_event *on_event =
-            new_midi_event(note_on_tick, 144, note, velocity);
-
-        int final_note_off_tick =
-            synthbase_add_event(&ms->base, ms->base.cur_melody, off_event);
-        on_event->tick_off = final_note_off_tick;
-
-        synthbase_add_event(&ms->base, ms->base.cur_melody, on_event);
-    }
-    else
-    {
-        off_event->delete_after_use = true; // _THIS_ is the magic
-        synthbase_add_event(&ms->base, ms->base.cur_melody, off_event);
-    }
 }
 
 void minisynth_rand_settings(minisynth *ms)

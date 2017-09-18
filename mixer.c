@@ -234,9 +234,9 @@ void vol_change(mixer *mixr, int sg, float vol)
     mixr->sound_generators[sg]->setvol(mixr->sound_generators[sg], vol);
 }
 
-int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
+int add_sound_generator(mixer *mixr, soundgenerator *sg)
 {
-    SOUNDGEN **new_soundgens = NULL;
+    soundgenerator **new_soundgens = NULL;
 
     if (mixr->soundgen_size <= mixr->soundgen_num)
     {
@@ -249,8 +249,9 @@ int add_sound_generator(mixer *mixr, SOUNDGEN *sg)
             mixr->soundgen_size *= 2;
         }
 
-        new_soundgens = (SOUNDGEN **)realloc(
-            mixr->sound_generators, mixr->soundgen_size * sizeof(SOUNDGEN *));
+        new_soundgens = (soundgenerator **)realloc(
+            mixr->sound_generators,
+            mixr->soundgen_size * sizeof(soundgenerator *));
         if (new_soundgens == NULL)
         {
             printf("Ooh, burney - cannae allocate memory for new sounds");
@@ -269,33 +270,33 @@ int mixer_add_spork(mixer *mixr, double freq)
 {
     printf("Adding an SPORK, mo!\n");
     spork *s = new_spork(freq);
-    return add_sound_generator(mixr, (SOUNDGEN *)s);
+    return add_sound_generator(mixr, (soundgenerator *)s);
 }
 
 int add_algorithm(char *line)
 {
     algorithm *a = new_algorithm(line);
-    return add_sound_generator(mixr, (SOUNDGEN *)a);
+    return add_sound_generator(mixr, (soundgenerator *)a);
 }
 
 int add_chaosmonkey(int soundgen)
 {
     chaosmonkey *cm = new_chaosmonkey(soundgen);
-    return add_sound_generator(mixr, (SOUNDGEN *)cm);
+    return add_sound_generator(mixr, (soundgenerator *)cm);
 }
 
 int add_minisynth(mixer *mixr)
 {
     printf("Adding a MINISYNTH!!...\n");
     minisynth *ms = new_minisynth();
-    return add_sound_generator(mixr, (SOUNDGEN *)ms);
+    return add_sound_generator(mixr, (soundgenerator *)ms);
 }
 
 int add_digisynth(mixer *mixr, char *filename)
 {
     printf("Adding a DIGISYNTH!!...\n");
     digisynth *ds = new_digisynth(filename);
-    return add_sound_generator(mixr, (SOUNDGEN *)ds);
+    return add_sound_generator(mixr, (soundgenerator *)ds);
 }
 
 int add_looper(mixer *mixr, char *filename, double loop_len)
@@ -307,7 +308,7 @@ int add_looper(mixer *mixr, char *filename, double loop_len)
         printf("Barfed on looper creation\n");
         return -1;
     }
-    return add_sound_generator(mixr, (SOUNDGEN *)l);
+    return add_sound_generator(mixr, (soundgenerator *)l);
 }
 
 int add_granulator(mixer *mixr, char *filename)
@@ -315,7 +316,7 @@ int add_granulator(mixer *mixr, char *filename)
     printf("ADDING A GRANNY!\n");
     granulator *g = new_granulator(filename);
     printf("GOT A GRAANY\n");
-    return add_sound_generator(mixr, (SOUNDGEN *)g);
+    return add_sound_generator(mixr, (soundgenerator *)g);
 }
 
 double mixer_gennext(mixer *mixr)
@@ -515,7 +516,7 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-        SOUNDGEN *sg = mixr->sound_generators[soundgen_num];
+        soundgenerator *sg = mixr->sound_generators[soundgen_num];
         mixr->sound_generators[soundgen_num] = NULL;
         sg->self_destruct(sg);
     }
@@ -657,7 +658,7 @@ void mixer_preview_track(mixer *mixr, char *filename)
     // TODO
 }
 
-synthbase *get_synthbase(SOUNDGEN *self)
+synthbase *get_synthbase(soundgenerator *self)
 {
     if (self->type == MINISYNTH_TYPE)
     {
@@ -670,4 +671,58 @@ synthbase *get_synthbase(SOUNDGEN *self)
         return &ds->base;
     }
     return NULL;
+}
+
+// TODO - better function name - this is programatic calls, which
+// basically adds a matching delete after use event i.e. == a note off
+void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
+                            bool update_last_midi)
+{
+    if (mixr->debug_mode)
+        print_midi_event(note);
+
+    if (sg->type == MINISYNTH_TYPE)
+    {
+        minisynth *ms = (minisynth *)sg;
+        if (update_last_midi)
+        {
+            ms->m_last_midi_note = note;
+        }
+        minisynth_midi_note_on(ms, note, velocity);
+    }
+    else if (sg->type == DIGISYNTH_TYPE)
+    {
+        digisynth *ds = (digisynth *)sg;
+        digisynth_midi_note_on(ds, note, velocity);
+    }
+
+    synthbase *base = get_synthbase(sg);
+
+    int note_off_tick =
+        (mixr->midi_tick +
+         //(PPSIXTEENTH * (int)ms->m_settings.m_sustain_time_sixteenth - 7)) %
+         (PPSIXTEENTH * 4 - 7)) %
+        PPNS;
+
+    midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
+    ////////////////////////
+
+    if (base->recording)
+    {
+        printf("Recording note!\n");
+        int note_on_tick = mixr->midi_tick % PPNS;
+        midi_event *on_event =
+            new_midi_event(note_on_tick, 144, note, velocity);
+
+        int final_note_off_tick =
+            synthbase_add_event(base, base->cur_melody, off_event);
+
+        on_event->tick_off = final_note_off_tick;
+        synthbase_add_event(base, base->cur_melody, on_event);
+    }
+    else
+    {
+        off_event->delete_after_use = true; // _THIS_ is the magic
+        synthbase_add_event(base, base->cur_melody, off_event);
+    }
 }

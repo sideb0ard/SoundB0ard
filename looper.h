@@ -25,7 +25,7 @@ typedef struct file_sample
 
 typedef struct looper
 {
-    SOUNDGEN sound_generator;
+    soundgenerator sound_generator;
 
     file_sample *samples[MAX_SAMPLES_PER_LOOPER];
     int sample_num_loops[MAX_SAMPLES_PER_LOOPER];

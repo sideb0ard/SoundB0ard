@@ -105,22 +105,8 @@ void keys(int soundgen_num)
                 int fake_velocity = 128; // TODO real velocity
                 if (midi_num != -1)
                 {
-                    if (mixr->sound_generators[soundgen_num]->type ==
-                        MINISYNTH_TYPE)
-                    {
-                        minisynth *ms =
-                            (minisynth *)mixr->sound_generators[soundgen_num];
-                        minisynth_handle_midi_note(ms, midi_num, fake_velocity,
-                                                   true);
-                        minisynth_update(ms);
-                    }
-                    else if (mixr->sound_generators[soundgen_num]->type ==
-                             DIGISYNTH_TYPE)
-                    {
-                        digisynth *ds =
-                            (digisynth *)mixr->sound_generators[soundgen_num];
-                        printf("KEYS! nae digi yet!\n");
-                    }
+                    synth_handle_midi_note(mixr->sound_generators[soundgen_num],
+                                           midi_num, fake_velocity, true);
                 }
             }
         }

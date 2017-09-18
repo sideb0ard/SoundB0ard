@@ -3,6 +3,7 @@
 #include "defjams.h"
 #include "fx.h"
 #include "pthread.h"
+#include "sound_generator.h"
 #include <stdbool.h>
 
 typedef struct minisynth minisynth;
@@ -31,7 +32,7 @@ midi_event *new_midi_event(int tick, int event_type, int data1, int data2);
 void midi_event_free(midi_event *ms);
 void print_midi_event_rec(midi_event *ev);
 
-void midi_parse_midi_event(minisynth *ms, midi_event *ev);
+void midi_parse_midi_event(soundgenerator *sg, midi_event *ev);
 
 void midi_melody_print(midi_event **melody);
 void midi_melody_quantize(midi_event **melody);

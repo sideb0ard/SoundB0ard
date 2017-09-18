@@ -15,7 +15,7 @@ enum
 
 typedef struct chaosmonkey
 {
-    SOUNDGEN sound_generator;
+    soundgenerator sound_generator;
     int frequency_of_wakeup;    // seconds
     int chance_of_interruption; // percent likelihood
     bool make_suggestion;

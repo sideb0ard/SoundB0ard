@@ -21,7 +21,7 @@ typedef struct t_sample_pos
 
 typedef struct sample_sequencer
 {
-    SOUNDGEN sound_generator;
+    soundgenerator sound_generator;
     sequencer m_seq;
     sample_pos sample_positions[PPBAR];
     int samples_now_playing[MAX_CONCURRENT_SAMPLES]; // contains midi tick of

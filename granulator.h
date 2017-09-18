@@ -35,7 +35,7 @@ enum
 
 typedef struct granulator
 {
-    SOUNDGEN sound_generator;
+    soundgenerator sound_generator;
 
     bool started;
     bool have_active_buffer;

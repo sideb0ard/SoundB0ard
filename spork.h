@@ -9,7 +9,7 @@
 
 typedef struct spork
 {
-    SOUNDGEN sg;
+    soundgenerator sg;
     wt_oscillator m_osc;
     // lfo m_lfo;
     // qblimited_oscillator m_osc1;

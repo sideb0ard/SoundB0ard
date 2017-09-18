@@ -9,13 +9,14 @@
 
 typedef struct digisynth
 {
-    SOUNDGEN sound_generator;
+    soundgenerator sound_generator;
     synthbase base;
 
     char audiofile[1024];
     digisynth_voice m_voices[MAX_VOICES];
 
     double vol;
+    double m_last_note_frequency;
 
 } digisynth;
 
@@ -39,10 +40,11 @@ void digisynth_del_self(void *self);
 
 // void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
 //                                bool update_last_midi);
-// bool minisynth_midi_note_on(minisynth *self, unsigned int midinote,
-//                            unsigned int velocity);
-// bool minisynth_midi_note_off(minisynth *self, unsigned int midinote,
-//                             unsigned int velocity, bool all_notes_off);
+
+bool digisynth_midi_note_on(digisynth *self, unsigned int midinote,
+                            unsigned int velocity);
+bool digisynth_midi_note_off(digisynth *self, unsigned int midinote,
+                             unsigned int velocity, bool all_notes_off);
 // void minisynth_toggle_delay_mode(minisynth *ms);
 //
 // void minisynth_print_settings(minisynth *ms);

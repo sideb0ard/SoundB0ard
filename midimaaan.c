@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "defjams.h"
+#include "digisynth.h"
 #include "looper.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
@@ -89,7 +90,7 @@ void *midiman()
                     ev.data1 = data1;
                     ev.data2 = data2;
                     ev.delete_after_use = false;
-                    midi_parse_midi_event(ms, &ev);
+                    midi_parse_midi_event((soundgenerator *)ms, &ev);
                 }
                 else if (mixr->midi_control_destination == DELAYFX)
                 {
@@ -371,38 +372,62 @@ void midi_delay_control(fx *e, int data1, int data2)
     //}
 }
 
-void midi_parse_midi_event(minisynth *ms, midi_event *ev)
+void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
 {
-    switch (ev->event_type)
+    if (sg->type == MINISYNTH_TYPE)
     {
-    case (144):
-    { // Hex 0x80
-        ms->m_last_midi_note = ev->data1;
-        minisynth_midi_note_on(ms, ev->data1, ev->data2);
-        break;
+        minisynth *ms = (minisynth *)sg;
+
+        switch (ev->event_type)
+        {
+        case (144):
+        { // Hex 0x80
+            ms->m_last_midi_note = ev->data1;
+            minisynth_midi_note_on(ms, ev->data1, ev->data2);
+            break;
+        }
+        case (128):
+        { // Hex 0x90
+            minisynth_midi_note_off(ms, ev->data1, ev->data2, true);
+            break;
+        }
+        case (176):
+        { // Hex 0xB0
+            minisynth_midi_control(ms, ev->data1, ev->data2);
+            break;
+        }
+        case (224):
+        { // Hex 0xE0
+            minisynth_midi_pitchbend(ms, ev->data1, ev->data2);
+            break;
+        }
+        default:
+            printf(
+                "HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
+        }
     }
-    case (128):
-    { // Hex 0x90
-        minisynth_midi_note_off(ms, ev->data1, ev->data2, true);
-        break;
-    }
-    case (176):
-    { // Hex 0xB0
-        minisynth_midi_control(ms, ev->data1, ev->data2);
-        break;
-    }
-    case (224):
-    { // Hex 0xE0
-        minisynth_midi_pitchbend(ms, ev->data1, ev->data2);
-        break;
-    }
-    default:
-        printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
+    else if (sg->type == DIGISYNTH_TYPE)
+    {
+        digisynth *ds = (digisynth *)sg;
+        switch (ev->event_type)
+        {
+        case (144):
+        { // Hex 0x80
+            digisynth_midi_note_on(ds, ev->data1, ev->data2);
+            break;
+        }
+        case (128):
+        { // Hex 0x90
+            digisynth_midi_note_off(ds, ev->data1, ev->data2, true);
+            break;
+        }
+        }
     }
 
+    synthbase *base = get_synthbase(sg);
     if (ev->delete_after_use)
     {
-        ms->base.melodies[ms->base.cur_melody][ev->tick] = NULL;
+        base->melodies[base->cur_melody][ev->tick] = NULL;
         if (mixr->debug_mode)
             printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
         free(ev);

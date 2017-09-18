@@ -12,7 +12,7 @@ typedef enum { TICK, S16TH, LOOP } frequency;
 
 typedef struct algorithm
 {
-    SOUNDGEN sound_generator;
+    soundgenerator sound_generator;
     char command[MAX_CMD_LEN];
     char afterthought[5][MAX_CMD_LEN];
     unsigned int frequency;

@@ -16,7 +16,7 @@
 #include "stereodelay.h"
 #include "waveshaper.h"
 
-static int soundgen_add_fx(SOUNDGEN *self, fx *f)
+static int soundgen_add_fx(soundgenerator *self, fx *f)
 {
 
     fx **new_effects = NULL;
@@ -50,70 +50,70 @@ static int soundgen_add_fx(SOUNDGEN *self, fx *f)
     return self->effects_num++;
 }
 
-int add_delay_soundgen(SOUNDGEN *self, float duration)
+int add_delay_soundgen(soundgenerator *self, float duration)
 {
-    printf("Booya, adding a new DELAY to SOUNDGEN: %f!\n", duration);
+    printf("Booya, adding a new DELAY to soundgenerator: %f!\n", duration);
     stereodelay *sd = new_stereo_delay(duration);
     return soundgen_add_fx(self, (fx *)sd);
 }
 
-int add_reverb_soundgen(SOUNDGEN *self)
+int add_reverb_soundgen(soundgenerator *self)
 {
-    printf("Booya, adding a new REVERB to SOUNDGEN!\n");
+    printf("Booya, adding a new REVERB to soundgenerator!\n");
     reverb *r = new_reverb();
     return soundgen_add_fx(self, (fx *)r);
 }
 
-int add_waveshape_soundgen(SOUNDGEN *self)
+int add_waveshape_soundgen(soundgenerator *self)
 {
     printf("WAVshape\n");
     waveshaper *ws = new_waveshaper();
     return soundgen_add_fx(self, (fx *)ws);
 }
 
-int add_basicfilter_soundgen(SOUNDGEN *self)
+int add_basicfilter_soundgen(soundgenerator *self)
 {
     printf("Fffuuuuhfilter!\n");
     filterpass *fp = new_filterpass();
     return soundgen_add_fx(self, (fx *)fp);
 }
 
-int add_compressor_soundgen(SOUNDGEN *self)
+int add_compressor_soundgen(soundgenerator *self)
 {
     printf("COMPresssssion!\n");
     dynamics_processor *dp = new_dynamics_processor();
     return soundgen_add_fx(self, (fx *)dp);
 }
 
-int add_follower_soundgen(SOUNDGEN *self)
+int add_follower_soundgen(soundgenerator *self)
 {
     printf("RAWK! ENvelope Followerrr!\n");
     envelope_follower *ef = new_envelope_follower();
     return soundgen_add_fx(self, (fx *)ef);
 }
 
-int add_beatrepeat_soundgen(SOUNDGEN *self, int nbeats, int sixteenth)
+int add_beatrepeat_soundgen(soundgenerator *self, int nbeats, int sixteenth)
 {
     printf("RAR! BEATREPEAT all up in this kittycat\n");
     beatrepeat *b = new_beatrepeat(nbeats, sixteenth);
     return soundgen_add_fx(self, (fx *)b);
 }
 
-int add_moddelay_soundgen(SOUNDGEN *self)
+int add_moddelay_soundgen(soundgenerator *self)
 {
-    printf("Booya, adding a new MODDELAY to SOUNDGEN!\n");
+    printf("Booya, adding a new MODDELAY to soundgenerator!\n");
     mod_delay *md = new_mod_delay();
     return soundgen_add_fx(self, (fx *)md);
 }
 
-int add_modfilter_soundgen(SOUNDGEN *self)
+int add_modfilter_soundgen(soundgenerator *self)
 {
-    printf("Booya, adding a new MODFILTERRRRR to SOUNDGEN!\n");
+    printf("Booya, adding a new MODFILTERRRRR to soundgenerator!\n");
     modfilter *mf = new_modfilter();
     return soundgen_add_fx(self, (fx *)mf);
 }
 
-int add_decimator_soundgen(SOUNDGEN *self)
+int add_decimator_soundgen(soundgenerator *self)
 {
     printf("RAR! DECIMATOR all up in this kittycat\n");
     // fx *e = new_decimator();
@@ -128,16 +128,16 @@ int add_decimator_soundgen(SOUNDGEN *self)
     return self->effects_num;
 }
 
-int add_distortion_soundgen(SOUNDGEN *self)
+int add_distortion_soundgen(soundgenerator *self)
 {
     printf("BOOYA! Distortion all up in this kittycat\n");
     distortion *d = new_distortion();
     return soundgen_add_fx(self, (fx *)d);
 }
 
-int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
+int add_freq_pass_soundgen(soundgenerator *self, float freq, fx_type pass_type)
 {
-    printf("Booya, adding a new *PASS to SOUNDGEN: %f!\n", freq);
+    printf("Booya, adding a new *PASS to soundgenerator: %f!\n", freq);
     (void)pass_type;
 
     // fx *e = new_freq_pass(freq, pass_type);
@@ -152,7 +152,7 @@ int add_freq_pass_soundgen(SOUNDGEN *self, float freq, fx_type pass_type)
     return self->effects_num;
 }
 
-double effector(SOUNDGEN *self, double val)
+double effector(soundgenerator *self, double val)
 {
     for (int i = 0; i < self->effects_num; i++)
     {
@@ -168,10 +168,10 @@ double effector(SOUNDGEN *self, double val)
 
 //////////////////////////////////////////////////////
 
-// int add_envelope_soundgen(SOUNDGEN *self, int env_len, int type)
-int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
+// int add_envelope_soundgen(soundgenerator *self, int env_len, int type)
+int add_envelope_soundgen(soundgenerator *self, ENVSTREAM *e)
 {
-    printf("Booya, adding a new envelope to SOUNDGEN!\n");
+    printf("Booya, adding a new envelope to soundgenerator!\n");
     ENVSTREAM **new_envelopes = NULL;
     if (self->envelopes_size <= self->envelopes_num)
     {
@@ -204,7 +204,7 @@ int add_envelope_soundgen(SOUNDGEN *self, ENVSTREAM *e)
     return self->envelopes_num++;
 }
 
-double envelopor(SOUNDGEN *self, double val)
+double envelopor(soundgenerator *self, double val)
 {
 
     if (self->envelopes_num > 0 && self->envelopes_enabled)
@@ -226,7 +226,7 @@ double envelopor(SOUNDGEN *self, double val)
     return val;
 }
 
-bool is_synth(SOUNDGEN *self)
+bool is_synth(soundgenerator *self)
 {
     if (self->type == MINISYNTH_TYPE || self->type == DIGISYNTH_TYPE)
         return true;
