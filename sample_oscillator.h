@@ -3,12 +3,23 @@
 #include "audiofile_data.h"
 #include "oscillator.h"
 
-typedef struct sample_oscillator sampleosc;
+enum
+{
+    SAMPLE_LOOP,
+    SAMPLE_ONESHOT
+};
 
+typedef struct sample_oscillator sampleosc;
 typedef struct sample_oscillator
 {
     oscillator osc;
     audiofile_data afd;
+
+    bool is_single_cycle;
+    bool is_pitchless;
+
+    unsigned int loop_mode;
+
     double m_read_idx;
 
 } sample_oscillator;
@@ -22,7 +33,5 @@ void sampleosc_stop_oscillator(oscillator *self);
 void sampleosc_reset_oscillator(oscillator *self);
 void sampleosc_update(oscillator *self);
 
-double sampleosc_do_oscillate(oscillator *self, double *quad_phase_output);
-
 double sampleosc_read_sample_buffer(sampleosc *sosc);
-void sampleosc_inc_and_check_idx(sampleosc *sosc);
+double sampleosc_do_oscillate(oscillator *self, double *quad_phase_output);

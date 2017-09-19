@@ -52,7 +52,7 @@ bool digisynth_voice_gennext(digisynth_voice *dv, double *out_left,
     dca_update(&dv->m_voice.m_dca);
     // moog_update((filter *)&msv->m_moog_ladder_filter);
 
-    osc_update((oscillator *)&dv->m_osc1);
+    sampleosc_update((oscillator *)&dv->m_osc1);
     double osc_out =
         sampleosc_do_oscillate((oscillator *)&dv->m_osc1, NULL) * env_out;
 
