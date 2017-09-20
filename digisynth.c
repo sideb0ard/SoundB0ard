@@ -27,8 +27,8 @@ digisynth *new_digisynth(char *filename)
     ds->sound_generator.start = &digisynth_sg_start;
     ds->sound_generator.stop = &digisynth_sg_stop;
     ds->sound_generator.self_destruct = &digisynth_del_self;
-    ds->sound_generator.get_num_tracks = &synthbase_get_num_tracks;
-    ds->sound_generator.make_active_track = &synthbase_make_active_track;
+    ds->sound_generator.get_num_tracks = &digisynth_get_num_tracks;
+    ds->sound_generator.make_active_track = &digisynth_make_active_track;
     ds->sound_generator.type = DIGISYNTH_TYPE;
     ds->sound_generator.active = true;
 
@@ -78,6 +78,8 @@ double digisynth_gennext(void *self)
     // accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
 
     accum_out_left *= ds->vol;
+    accum_out_left = effector(&ds->sound_generator, accum_out_left);
+    accum_out_left = envelopor(&ds->sound_generator, accum_out_left);
 
     return accum_out_left;
 }
@@ -103,6 +105,18 @@ double digisynth_getvol(void *self)
 {
     digisynth *ds = (digisynth *)self;
     return ds->vol;
+}
+
+int digisynth_get_num_tracks(void *self)
+{
+    digisynth *ds = (digisynth *)self;
+    return synthbase_get_num_tracks(&ds->base);
+}
+
+void digisynth_make_active_track(void *self, int tracknum)
+{
+    digisynth *ds = (digisynth *)self;
+    synthbase_make_active_track(&ds->base, tracknum);
 }
 
 void digisynth_sg_start(void *self)

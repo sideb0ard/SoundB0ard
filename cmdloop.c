@@ -338,6 +338,8 @@ void interpret(char *line)
                             mixer_add_soundgen_track_to_scene(
                                 mixr, scene_num, sg_num, sg_track_num);
                         }
+                        else
+                            printf("WHUT? INVALID?!\n");
                     }
                     else if (strncmp("cp", wurds[2], 2) == 0)
                     {
@@ -1500,9 +1502,10 @@ void interpret(char *line)
                         else if (mixr->sound_generators[soundgen_num]->type ==
                                  DIGISYNTH_TYPE)
                         {
-                            digisynth *ms =
+                            digisynth *ds =
                                 (digisynth *)
                                     mixr->sound_generators[soundgen_num];
+                            (void)ds;
                         }
                     }
                 }

@@ -118,6 +118,8 @@ void minisynth_setvol(void *self, double v);
 double minisynth_getvol(void *self);
 void minisynth_sg_start(void *self);
 void minisynth_sg_stop(void *self);
+int minisynth_get_num_tracks(void *self);
+void minisynth_make_active_track(void *self, int tracknum);
 
 ////////////////////////////////////
 

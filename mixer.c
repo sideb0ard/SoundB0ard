@@ -374,11 +374,6 @@ double mixer_gennext(mixer *mixr)
         mixr->start_of_loop = true;
         if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0))
         {
-            printf("BUG! START OF LOOP - sample: %d, midi_tick: %d "
-                   "sixteenth: "
-                   "%d\n",
-                   mixr->cur_sample, mixr->midi_tick,
-                   mixr->sixteenth_note_tick);
             mixr->sixteenth_note_tick = 0;
             mixr->midi_tick = 0;
         }
@@ -395,11 +390,8 @@ double mixer_gennext(mixer *mixr)
         mixr->start_of_loop = false;
     }
 
-    // if (mixr->scene_mode && mixr->start_of_loop) {
     if (mixr->start_of_loop)
     {
-        // printf("Top of the bar\n");
-
         if (mixr->scene_start_pending)
         {
             mixer_play_scene(mixr, mixr->current_scene);
@@ -459,8 +451,10 @@ void mixer_play_scene(mixer *mixr, int scene_num)
         int soundgen_track_num = s->soundgen_tracks[i].soundgen_track_num;
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
+            printf("MIXER SCENE - STARTING %d\n", soundgen_num);
             mixr->sound_generators[soundgen_num]->start(
                 mixr->sound_generators[soundgen_num]);
+            printf("MIXER SCENE - MAKE_ACTIVE_TRACK %d\n", soundgen_num);
             mixr->sound_generators[soundgen_num]->make_active_track(
                 mixr->sound_generators[soundgen_num], soundgen_track_num);
         }
@@ -527,9 +521,7 @@ bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
 {
     if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num &&
         mixr->sound_generators[soundgen_num] != NULL)
-    {
         return true;
-    }
     return false;
 }
 
@@ -543,7 +535,6 @@ bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num)
 {
-    printf("Inside is valid soundgen track num..\n");
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
         track_num < mixr->sound_generators[soundgen_num]->get_num_tracks(
                         mixr->sound_generators[soundgen_num]))
@@ -592,7 +583,6 @@ bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
 
     s->num_tracks++;
 
-    printf("ALL good here\n");
     return true;
 }
 

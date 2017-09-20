@@ -96,6 +96,7 @@ void keys(int soundgen_num)
                     digisynth *ds =
                         (digisynth *)mixr->sound_generators[soundgen_num];
                     printf("RANDOM MONDY mode NAE DIGI YET!\n");
+                    (void)ds;
                 }
                 break;
             default:

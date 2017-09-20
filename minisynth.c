@@ -43,8 +43,8 @@ minisynth *new_minisynth(void)
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.start = &minisynth_sg_start;
     ms->sound_generator.stop = &minisynth_sg_stop;
-    ms->sound_generator.get_num_tracks = &synthbase_get_num_tracks;
-    ms->sound_generator.make_active_track = &synthbase_make_active_track;
+    ms->sound_generator.get_num_tracks = &minisynth_get_num_tracks;
+    ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.self_destruct = &minisynth_del_self;
     ms->sound_generator.type = MINISYNTH_TYPE;
 
@@ -512,6 +512,18 @@ double minisynth_getvol(void *self)
 {
     minisynth *ms = (minisynth *)self;
     return ms->m_settings.m_volume_db;
+}
+
+int minisynth_get_num_tracks(void *self)
+{
+    minisynth *ms = (minisynth *)self;
+    return synthbase_get_num_tracks(&ms->base);
+}
+
+void minisynth_make_active_track(void *self, int tracknum)
+{
+    minisynth *ms = (minisynth *)self;
+    synthbase_make_active_track(&ms->base, tracknum);
 }
 
 // void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
@@ -1006,21 +1018,20 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_filter_keytrack_intensity);
     // TODO - where's type? // whats NLP?
 
-    // printf(COOL_COLOR_MAUVE); // ARPEGGIATORRRR
-    // printf("Arp Active (arp): %s [0,1]\n", ms->m_arp.active ? "true" :
-    // "false");
-    // printf("Arp Latch (arplatch): %s [0,1]\n",
-    //       ms->m_arp.latch ? "true" : "false");
-    // printf("Arp Single Note Repeat (arprepeat): %s [0,1]\n",
-    //       ms->m_arp.single_note_repeat ? "true" : "false");
-    // printf("Arp Octave Range (arpoctrange): %d [1,4]\n",
-    //       ms->m_arp.octave_range);
-    // printf("Arp Mode (arpmode): %s [0,3]\n",
-    //       arp_mode_to_string[ms->m_arp.mode]);
-    // printf("Arp Rate (arprate): %s [0,2]\n",
-    //       arp_rate_to_string[ms->m_arp.rate]);
-    // printf("Arp Cur Step (arpcurstep): %s\n",
-    //       arp_cur_step_to_string[ms->m_arp.cur_step]);
+    printf(COOL_COLOR_MAUVE); // ARPEGGIATORRRR
+    printf("Arp Active (arp): %s [0,1]\n", ms->m_arp.active ? "true" : "false");
+    printf("Arp Latch (arplatch): %s [0,1]\n",
+           ms->m_arp.latch ? "true" : "false");
+    printf("Arp Single Note Repeat (arprepeat): %s [0,1]\n",
+           ms->m_arp.single_note_repeat ? "true" : "false");
+    printf("Arp Octave Range (arpoctrange): %d [1,4]\n",
+           ms->m_arp.octave_range);
+    printf("Arp Mode (arpmode): %s [0,3]\n",
+           arp_mode_to_string[ms->m_arp.mode]);
+    printf("Arp Rate (arprate): %s [0,2]\n",
+           arp_rate_to_string[ms->m_arp.rate]);
+    printf("Arp Cur Step (arpcurstep): %s\n",
+           arp_cur_step_to_string[ms->m_arp.cur_step]);
 
     printf(ANSI_COLOR_WHITE); // DELAY
     printf("Delay Feedback Pct (delayfb): %f [0-100]\n",
@@ -1101,12 +1112,14 @@ void minisynth_stop(minisynth *ms)
 
 void minisynth_sg_start(void *self)
 {
+    printf("SYNTH START SCENE\n");
     minisynth *ms = (minisynth *)self;
     ms->sound_generator.active = true;
 }
 
 void minisynth_sg_stop(void *self)
 {
+    printf("SYNTH STOP SCENE\n");
     minisynth *ms = (minisynth *)self;
     ms->sound_generator.active = false;
     minisynth_stop(ms);

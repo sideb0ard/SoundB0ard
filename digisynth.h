@@ -31,6 +31,8 @@ double digisynth_getvol(void *self);
 void digisynth_sg_start(void *self);
 void digisynth_sg_stop(void *self);
 void digisynth_del_self(void *self);
+int digisynth_get_num_tracks(void *self);
+void digisynth_make_active_track(void *self, int tracknum);
 
 ////////////////////////////////////
 

@@ -279,6 +279,7 @@ int get_a_sample_seq_position(sample_sequencer *ss)
 
 void sample_start(void *self)
 {
+    printf("START SCENE!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     s->sound_generator.active = true;
     // sample_sequencer_reset_samples(s);
@@ -286,6 +287,7 @@ void sample_start(void *self)
 
 void sample_stop(void *self)
 {
+    printf("STOP SCENE!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     s->sound_generator.active = false;
     sample_sequencer_reset_samples(s);
