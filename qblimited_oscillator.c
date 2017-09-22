@@ -76,30 +76,6 @@ double qb_do_sawtooth(oscillator *self, double modulo, double dInc)
                                       true); /* no interpolation */
     }
 
-    // --- or do PolyBLEP
-    // out = dTrivialSaw + doPolyBLEP_2(modulo,
-    //								  abs(dInc),/*
-    // abs(dInc)
-    // is
-    // for
-    // FM
-    // synthesis
-    // with
-    // negative
-    // frequencies */
-    //								  1.0,
-    ///*
-    // sawtooth
-    // edge
-    //=
-    // 1.0
-    //*/
-    //								  false);
-    ///*
-    // falling
-    // edge
-    //*/
-
     return out;
 }
 

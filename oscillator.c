@@ -38,7 +38,7 @@ void osc_new_settings(oscillator *osc)
     osc->m_semitones = 0.0;
     osc->m_cents = 0.0;
     osc->m_fo_ratio = 1.0;
-    osc->m_lfo_mode = 0;
+    osc->m_lfo_mode = 0; // LFOSYNC
 
     // --- pitched
     osc->m_waveform = SINE;

@@ -27,6 +27,7 @@ typedef struct synthsettings
 
     unsigned int m_lfo1_waveform;
     unsigned int m_lfo1_dest;
+    unsigned int m_lfo1_mode;
     double m_lfo1_rate;
     double m_lfo1_amplitude;
     double m_lfo1_amp_intensity;
@@ -36,6 +37,7 @@ typedef struct synthsettings
 
     unsigned int m_lfo2_waveform;
     unsigned int m_lfo2_dest;
+    unsigned int m_lfo2_mode;
     double m_lfo2_rate;
     double m_lfo2_amplitude;
     double m_lfo2_amp_intensity;
@@ -151,6 +153,8 @@ void minisynth_toggle_delay_mode(minisynth *ms);
 
 void minisynth_rand_settings(minisynth *ms);
 void minisynth_print_settings(minisynth *ms);
+void minisynth_print_melodies(minisynth *ms);
+void minisynth_print_modulation_routings(minisynth *ms);
 bool minisynth_save_settings(minisynth *ms, char *preset_name);
 bool minisynth_load_settings(minisynth *ms, char *preset_name);
 bool minisynth_list_presets(void);
@@ -196,6 +200,7 @@ void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_pitch(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val);
+void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val);
 
 void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_noise_osc_db(minisynth *ms, double val);

@@ -1460,7 +1460,19 @@ void interpret(char *line)
                             }
                             else if (strncmp("print", wurds[2], 5) == 0)
                             {
-                                minisynth_print(ms);
+                                if (strncmp(wurds[3], "melody", 6) == 0 ||
+                                    strncmp(wurds[3], "melodies", 8) == 0)
+                                {
+                                    minisynth_print_melodies(ms);
+                                }
+                                else if (strncmp(wurds[3], "mod", 3) == 0 ||
+                                         strncmp(wurds[3], "routing", 7) == 0 ||
+                                         strncmp(wurds[3], "route", 5) == 0)
+                                {
+                                    minisynth_print_modulation_routings(ms);
+                                }
+                                else
+                                    minisynth_print(ms);
                             }
                             else if (strncmp("load", wurds[2], 4) == 0)
                             {

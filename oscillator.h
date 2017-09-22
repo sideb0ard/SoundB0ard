@@ -32,6 +32,7 @@ enum
     PNOISE,
     MAX_OSC
 };
+
 // --- for LFOs
 enum
 {
@@ -45,12 +46,14 @@ enum
     qrsh,
     MAX_LFO_OSC
 };
+
 // --- for LFOs - MODE
 enum
 {
     LFOSYNC,
     LFOSHOT,
-    LFORFREE
+    LFORFREE,
+    LFO_MAX_MODE
 };
 
 typedef struct oscillator oscillator;
@@ -79,7 +82,7 @@ struct oscillator
 
     // --- modulo counter and inc for timebase
     double m_modulo; // modulo counter 0->1
-    double m_inc;    // phase inc = fo/fs
+    double m_inc;    // phase inc = Freq/SR
 
     // --- more pitch mods
     double m_octave;    // octave tweak
@@ -90,7 +93,7 @@ struct oscillator
     double m_pulse_width_control;
 
     unsigned m_waveform;
-    unsigned m_lfo_mode;
+    unsigned m_lfo_mode; // 0-2 LFOSYNC, LFOSHOT, LFOFREE
 
     unsigned m_midi_note_number;
 

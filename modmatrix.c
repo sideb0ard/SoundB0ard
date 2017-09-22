@@ -239,8 +239,11 @@ void print_modulation_matrix(modmatrix *self)
                 continue;
             }
 
-            printf("From %s => %s\n", s_source_enum_to_name[mr->m_source_index],
-                   s_dest_enum_to_name[mr->m_destination_index]);
+            printf("From %s => %s ModIntensity:%.2f ModRange:%.2f Enabled?%s\n",
+                   s_source_enum_to_name[mr->m_source_index],
+                   s_dest_enum_to_name[mr->m_destination_index],
+                   (*mr->m_mod_intensity), (*mr->m_mod_range),
+                   mr->m_enable ? "true" : "false");
         }
     }
 }

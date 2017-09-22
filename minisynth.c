@@ -14,11 +14,12 @@ extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
 // defined in minisynth_voice.h
-const wchar_t *s_mode_names[] = {L"SAW3",    L"SQR3",    L"SAW2SQR",
-                                 L"TRI2SAW", L"TRI2SQR", L"SIN2SQR"};
+const wchar_t *s_voice_names[] = {L"SAW3",    L"SQR3",    L"SAW2SQR",
+                                  L"TRI2SAW", L"TRI2SQR", L"SIN2SQR"};
 
 // defined in oscillator.h
-const char *s_lfo_mode_names[] = {"SINE",   "USAW", "DSAW", "TRI",
+const char *s_lfo_mode_names[] = {"SYNC", "SHOT", "FREE"};
+const char *s_lfo_wave_names[] = {"SINE",   "USAW", "DSAW", "TRI",
                                   "SQUARE", "EXPO", "RSH",  "QRSH"};
 
 const char *s_filter_type_names[] = {"LPF1", "HPF1", "LPF2", "HPF2", "BPF2",
@@ -237,6 +238,15 @@ void minisynth_update(minisynth *ms)
     ms->m_global_synth_params.lfo1_params.amplitude =
         ms->m_settings.m_lfo1_amplitude;
     ms->m_global_synth_params.lfo1_params.osc_fo = ms->m_settings.m_lfo1_rate;
+    ms->m_global_synth_params.lfo1_params.lfo_mode = ms->m_settings.m_lfo1_mode;
+
+    // --- lfo2:
+    ms->m_global_synth_params.lfo2_params.waveform =
+        ms->m_settings.m_lfo2_waveform;
+    ms->m_global_synth_params.lfo2_params.amplitude =
+        ms->m_settings.m_lfo2_amplitude;
+    ms->m_global_synth_params.lfo2_params.osc_fo = ms->m_settings.m_lfo2_rate;
+    ms->m_global_synth_params.lfo2_params.lfo_mode = ms->m_settings.m_lfo2_mode;
 
     // --- eg1:
     ms->m_global_synth_params.eg1_params.attack_time_msec =
@@ -467,15 +477,20 @@ void minisynth_status(void *self, wchar_t *status_string)
         minisynth_print(ms);
     }
 
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d]\n"
-             "      lfo1wave:%s(%d)[0-7] lfo1rate:%.2f lfo1amp:%.2f",
-             ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
-             s_mode_names[ms->m_settings.m_voice_mode],
-             ms->m_settings.m_voice_mode, MAX_VOICE_CHOICE - 1,
-             s_lfo_mode_names[ms->m_settings.m_lfo1_waveform],
-             ms->m_settings.m_lfo1_waveform, ms->m_settings.m_lfo1_amplitude,
-             ms->m_settings.m_lfo1_rate);
+    swprintf(
+        status_string, MAX_PS_STRING_SZ,
+        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d]\n"
+        "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f lfo1amp:%.2f",
+        ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
+        s_voice_names[ms->m_settings.m_voice_mode], ms->m_settings.m_voice_mode,
+        MAX_VOICE_CHOICE - 1,
+
+        // LFO1
+        s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
+        ms->m_settings.m_lfo1_waveform,
+        s_lfo_mode_names[ms->m_settings.m_lfo1_mode],
+        ms->m_settings.m_lfo1_mode, ms->m_settings.m_lfo1_rate,
+        ms->m_settings.m_lfo1_amplitude);
     // ms->m_settings.m_delay_mode,
     // ms->m_settings.m_attack_time_msec, ms->m_settings.m_decay_time_msec,
     // ms->m_settings.m_release_time_msec, ms->m_settings.m_sustain_level,
@@ -551,7 +566,7 @@ double minisynth_gennext(void *self)
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    float mix = 0.25;
+    float mix = 1.0 / MAX_VOICES;
 
     double out_left = 0.0;
     double out_right = 0.0;
@@ -922,12 +937,12 @@ void minisynth_print_settings(minisynth *ms)
     printf("///////////////////// SYNTHzzz! ///////////////////////\n");
     printf("voice: %ls - %d [0-5] "
            "(saw3,sqr3,saw2sqr,tri2saw,tri2sqr,sin2sqr)\n",
-           s_mode_names[ms->m_settings.m_voice_mode],
+           s_voice_names[ms->m_settings.m_voice_mode],
            ms->m_settings.m_voice_mode); // unsigned
     printf(COOL_COLOR_GREEN);            // LFO1
     printf(
         "lfo1wave: %s - %d [0-7] (sine,usaw,dsaw,tri,square,expo,rsh,qrsh)\n",
-        s_lfo_mode_names[ms->m_settings.m_lfo1_waveform],
+        s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
         ms->m_settings.m_lfo1_waveform); // unsigned
     printf("lfo1dest: %s - %d [0-3]\n",
            s_dest_enum_to_name[ms->m_settings.m_lfo1_dest],
@@ -944,7 +959,7 @@ void minisynth_print_settings(minisynth *ms)
     printf(COOL_COLOR_YELLOW); // LFO2
     printf(
         "lfo2wave: %s - %d [0-7] (sine,usaw,dsaw,tri,square,expo,rsh,qrsh)\n",
-        s_lfo_mode_names[ms->m_settings.m_lfo2_waveform],
+        s_lfo_wave_names[ms->m_settings.m_lfo2_waveform],
         ms->m_settings.m_lfo2_waveform); // unsigned
     printf("lfo1dest: %s - %d [0-3]\n",
            s_dest_enum_to_name[ms->m_settings.m_lfo2_dest],
@@ -1045,7 +1060,16 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_delay_wet_mix);
 
     printf(ANSI_COLOR_RESET);
-    // print_modulation_matrix(&ms->m_ms_modmatrix);
+}
+
+void minisynth_print_melodies(minisynth *ms)
+{
+    synthbase_print_melodies(&ms->base);
+}
+
+void minisynth_print_modulation_routings(minisynth *ms)
+{
+    print_modulation_matrix(&ms->m_ms_modmatrix);
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
@@ -1125,11 +1149,7 @@ void minisynth_sg_stop(void *self)
     minisynth_stop(ms);
 }
 
-void minisynth_print(minisynth *ms)
-{
-    minisynth_print_settings(ms);
-    synthbase_print_melodies(&ms->base);
-}
+void minisynth_print(minisynth *ms) { minisynth_print_settings(ms); }
 
 void minisynth_set_attack_time_ms(minisynth *ms, double val)
 {
@@ -1405,6 +1425,22 @@ void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val)
     }
     else
         printf("val must be between 0 and %d\n", MAX_LFO_OSC);
+}
+
+void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val)
+{
+    if (val < LFO_MAX_MODE)
+    {
+        switch (lfo_num)
+        {
+        case (1):
+            ms->m_settings.m_lfo1_mode = val;
+        case (2):
+            ms->m_settings.m_lfo2_mode = val;
+        }
+    }
+    else
+        printf("val must be between 0 and %d\n", LFO_MAX_MODE - 1);
 }
 
 void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val)
