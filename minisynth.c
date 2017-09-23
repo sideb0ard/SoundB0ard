@@ -61,16 +61,19 @@ minisynth *new_minisynth(void)
 
     // LFO1 routings
     ms->m_settings.m_lfo1_osc_pitch_intensity = 0.0;
-    ms->m_settings.m_lfo1_osc_pitch_enabled = true;
+    ms->m_settings.m_lfo1_osc_pitch_enabled = false;
 
     ms->m_settings.m_lfo1_filter_fc_intensity = 0.0;
-    ms->m_settings.m_lfo1_filter_fc_enabled = true;
+    ms->m_settings.m_lfo1_filter_fc_enabled = false;
 
     ms->m_settings.m_lfo1_amp_intensity = 0.0;
-    ms->m_settings.m_lfo1_amp_enabled = true;
+    ms->m_settings.m_lfo1_amp_enabled = false;
 
     ms->m_settings.m_lfo1_pan_intensity = 0.0;
-    ms->m_settings.m_lfo1_pan_enabled = true;
+    ms->m_settings.m_lfo1_pan_enabled = false;
+
+    ms->m_settings.m_lfo1_pulsewidth_intensity = 0.0;
+    ms->m_settings.m_lfo1_pulsewidth_enabled = false;
 
     // LFO2
     ms->m_settings.m_lfo2_waveform = 0;
@@ -79,24 +82,27 @@ minisynth *new_minisynth(void)
 
     // LFO2 routings
     ms->m_settings.m_lfo2_osc_pitch_intensity = 0.0;
-    ms->m_settings.m_lfo2_osc_pitch_enabled = true;
+    ms->m_settings.m_lfo2_osc_pitch_enabled = false;
 
     ms->m_settings.m_lfo2_filter_fc_intensity = 0.0;
-    ms->m_settings.m_lfo2_filter_fc_enabled = true;
+    ms->m_settings.m_lfo2_filter_fc_enabled = false;
 
     ms->m_settings.m_lfo2_amp_intensity = 0.0;
-    ms->m_settings.m_lfo2_amp_enabled = true;
+    ms->m_settings.m_lfo2_amp_enabled = false;
 
     ms->m_settings.m_lfo2_pan_intensity = 0.0;
-    ms->m_settings.m_lfo2_pan_enabled = true;
+    ms->m_settings.m_lfo2_pan_enabled = false;
+
+    ms->m_settings.m_lfo2_pulsewidth_intensity = 0.0;
+    ms->m_settings.m_lfo2_pulsewidth_enabled = false;
 
     ms->m_settings.m_fc_control = FILTER_FC_DEFAULT;
     ms->m_settings.m_q_control = FILTER_Q_DEFAULT;
 
     ms->m_settings.m_eg1_osc_intensity = 0.0;
-    ms->m_settings.m_eg1_osc_enabled = true;
+    ms->m_settings.m_eg1_osc_enabled = false;
     ms->m_settings.m_eg1_filter_intensity = 0.0;
-    ms->m_settings.m_eg1_filter_enabled = true;
+    ms->m_settings.m_eg1_filter_enabled = false;
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_eg1_dca_enabled = true;
 
@@ -194,6 +200,7 @@ void minisynth_update(minisynth *ms)
     // --- intensities
     ms->m_global_synth_params.voice_params.filter_keytrack_intensity =
         ms->m_settings.m_filter_keytrack_intensity;
+
     ms->m_global_synth_params.voice_params.lfo1_filter1_mod_intensity =
         ms->m_settings.m_lfo1_filter_fc_intensity;
     ms->m_global_synth_params.voice_params.lfo1_osc_mod_intensity =
@@ -202,6 +209,15 @@ void minisynth_update(minisynth *ms)
         ms->m_settings.m_lfo1_amp_intensity;
     ms->m_global_synth_params.voice_params.lfo1_dca_pan_mod_intensity =
         ms->m_settings.m_lfo1_pan_intensity;
+
+    ms->m_global_synth_params.voice_params.lfo2_filter1_mod_intensity =
+        ms->m_settings.m_lfo2_filter_fc_intensity;
+    ms->m_global_synth_params.voice_params.lfo2_osc_mod_intensity =
+        ms->m_settings.m_lfo2_osc_pitch_intensity;
+    ms->m_global_synth_params.voice_params.lfo2_dca_amp_mod_intensity =
+        ms->m_settings.m_lfo2_amp_intensity;
+    ms->m_global_synth_params.voice_params.lfo2_dca_pan_mod_intensity =
+        ms->m_settings.m_lfo2_pan_intensity;
 
     ms->m_global_synth_params.voice_params.eg1_osc_mod_intensity =
         ms->m_settings.m_eg1_osc_intensity;
@@ -291,7 +307,7 @@ void minisynth_update(minisynth *ms)
         ms->m_settings.m_volume_db;
 
     // --- enable/disable mod matrix stuff
-    // LFO routings
+    // LFO1 routings
     if (ms->m_settings.m_lfo1_osc_pitch_enabled == 1)
         enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO1, DEST_ALL_OSC_FO,
                           true); // enable
@@ -325,6 +341,42 @@ void minisynth_update(minisynth *ms)
                           DEST_ALL_OSC_PULSEWIDTH, true); // enable
     else
         enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO1,
+                          DEST_ALL_OSC_PULSEWIDTH, false);
+
+    // LFO2
+    if (ms->m_settings.m_lfo2_osc_pitch_enabled == 1)
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_ALL_OSC_FO,
+                          true); // enable
+    else
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_ALL_OSC_FO,
+                          false);
+
+    if (ms->m_settings.m_lfo2_filter_fc_enabled == 1)
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_ALL_FILTER_FC,
+                          true); // enable
+    else
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_ALL_FILTER_FC,
+                          false);
+
+    if (ms->m_settings.m_lfo2_amp_enabled == 1)
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_DCA_AMP,
+                          true); // enable
+    else
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_DCA_AMP,
+                          false);
+
+    if (ms->m_settings.m_lfo2_pan_enabled == 1)
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_DCA_PAN,
+                          true); // enable
+    else
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2, DEST_DCA_PAN,
+                          false);
+
+    if (ms->m_settings.m_lfo2_pulsewidth_enabled == 1)
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2,
+                          DEST_ALL_OSC_PULSEWIDTH, true); // enable
+    else
+        enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_LFO2,
                           DEST_ALL_OSC_PULSEWIDTH, false);
 
     // EG1 routings
@@ -571,6 +623,13 @@ void minisynth_status(void *self, wchar_t *status_string)
         "      lfo1_filter_enabled:%d lfo1_filter_intensity:%.2f\n"
         "      lfo1_amp_enabled:%d lfo1_amp_intensity:%.2f\n"
         "      lfo1_pan_enabled:%d lfo1_pan_intensity:%.2f\n"
+        "      [lfo2]\n"
+        "      lfo2wave:%s(%d)[0-7] lfo2mode:%s(%d) lfo2rate:%.2f "
+        "lfo2amp:%.2f\n"
+        "      lfo2_osc_enabled:%d lfo2_osc_intensity:%.2f\n"
+        "      lfo2_filter_enabled:%d lfo2_filter_intensity:%.2f\n"
+        "      lfo2_amp_enabled:%d lfo2_amp_intensity:%.2f\n"
+        "      lfo2_pan_enabled:%d lfo2_pan_intensity:%.2f\n"
         "      [eg1]\n"
         "      attackms:%.2f decayms:%.2f sustainlvl:%.2f releasems:%.2f "
         "sustain? %s\n"
@@ -597,6 +656,19 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_lfo1_filter_fc_intensity,
         ms->m_settings.m_lfo1_amp_enabled, ms->m_settings.m_lfo1_amp_intensity,
         ms->m_settings.m_lfo1_pan_enabled, ms->m_settings.m_lfo1_pan_intensity,
+
+        // LFO2
+        s_lfo_wave_names[ms->m_settings.m_lfo2_waveform],
+        ms->m_settings.m_lfo2_waveform,
+        s_lfo_mode_names[ms->m_settings.m_lfo2_mode],
+        ms->m_settings.m_lfo2_mode, ms->m_settings.m_lfo2_rate,
+        ms->m_settings.m_lfo2_amplitude,
+        ms->m_settings.m_lfo2_osc_pitch_enabled,
+        ms->m_settings.m_lfo2_osc_pitch_intensity,
+        ms->m_settings.m_lfo2_filter_fc_enabled,
+        ms->m_settings.m_lfo2_filter_fc_intensity,
+        ms->m_settings.m_lfo2_amp_enabled, ms->m_settings.m_lfo2_amp_intensity,
+        ms->m_settings.m_lfo2_pan_enabled, ms->m_settings.m_lfo2_pan_intensity,
 
         // EG1
         ms->m_settings.m_attack_time_msec, ms->m_settings.m_decay_time_msec,
@@ -1249,14 +1321,12 @@ void minisynth_stop(minisynth *ms)
 
 void minisynth_sg_start(void *self)
 {
-    printf("SYNTH START SCENE\n");
     minisynth *ms = (minisynth *)self;
     ms->sound_generator.active = true;
 }
 
 void minisynth_sg_stop(void *self)
 {
-    printf("SYNTH STOP SCENE\n");
     minisynth *ms = (minisynth *)self;
     ms->sound_generator.active = false;
     minisynth_stop(ms);
@@ -1460,8 +1530,10 @@ void minisynth_set_lfo_osc_enable(minisynth *ms, int lfo_num, int val)
         {
         case (1):
             ms->m_settings.m_lfo1_osc_pitch_enabled = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_osc_pitch_enabled = val;
+            break;
         }
     }
     else
@@ -1476,8 +1548,10 @@ void minisynth_set_lfo_amp_enable(minisynth *ms, int lfo_num, int val)
         {
         case (1):
             ms->m_settings.m_lfo1_amp_enabled = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_amp_enabled = val;
+            break;
         }
     }
     else
@@ -1492,8 +1566,10 @@ void minisynth_set_lfo_filter_enable(minisynth *ms, int lfo_num, int val)
         {
         case (1):
             ms->m_settings.m_lfo1_filter_fc_enabled = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_filter_fc_enabled = val;
+            break;
         }
     }
     else
@@ -1508,8 +1584,10 @@ void minisynth_set_lfo_pan_enable(minisynth *ms, int lfo_num, int val)
         {
         case (1):
             ms->m_settings.m_lfo1_pan_enabled = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_pan_enabled = val;
+            break;
         }
     }
     else
@@ -1524,8 +1602,10 @@ void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val)
         {
         case (1):
             ms->m_settings.m_lfo1_amp_intensity = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_amp_intensity = val;
+            break;
         }
     }
     else
@@ -1540,8 +1620,10 @@ void minisynth_set_lfo_amp(minisynth *ms, int lfo_num, double val)
         {
         case (1):
             ms->m_settings.m_lfo1_amplitude = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_amplitude = val;
+            break;
         }
     }
     else
@@ -1556,8 +1638,10 @@ void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val)
         {
         case (1):
             ms->m_settings.m_lfo1_filter_fc_intensity = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_filter_fc_intensity = val;
+            break;
         }
     }
     else
@@ -1572,8 +1656,10 @@ void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val)
         {
         case (1):
             ms->m_settings.m_lfo1_rate = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_rate = val;
+            break;
         }
     }
     else
@@ -1588,8 +1674,10 @@ void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val)
         {
         case (1):
             ms->m_settings.m_lfo1_pan_intensity = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_pan_intensity = val;
+            break;
         }
     }
     else
@@ -1604,8 +1692,10 @@ void minisynth_set_lfo_osc_int(minisynth *ms, int lfo_num, double val)
         {
         case (1):
             ms->m_settings.m_lfo1_osc_pitch_intensity = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_osc_pitch_intensity = val;
+            break;
         }
     }
     else
@@ -1620,8 +1710,10 @@ void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val)
         {
         case (1):
             ms->m_settings.m_lfo1_waveform = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_waveform = val;
+            break;
         }
     }
     else
@@ -1636,8 +1728,10 @@ void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val)
         {
         case (1):
             ms->m_settings.m_lfo1_mode = val;
+            break;
         case (2):
             ms->m_settings.m_lfo2_mode = val;
+            break;
         }
     }
     else

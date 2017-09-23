@@ -69,6 +69,10 @@ typedef struct synthsettings
     double m_lfo2_pan_intensity;
     bool m_lfo2_pan_enabled;
 
+    // LFO2 -> Pulse Width
+    double m_lfo2_pulsewidth_intensity;
+    bool m_lfo2_pulsewidth_enabled;
+
     // EG1
     double m_attack_time_msec;
     double m_decay_time_msec;

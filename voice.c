@@ -60,7 +60,7 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
     row = create_matrix_row(
         SOURCE_PITCHBEND, DEST_ALL_OSC_FO, &v->m_default_mod_intensity,
         &v->m_global_voice_params->osc_fo_pitchbend_mod_range, TRANSFORM_NONE,
-        true);
+        false);
     add_matrix_row(matrix, row);
 
     // MIDI Volume CC07

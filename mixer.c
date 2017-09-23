@@ -451,10 +451,8 @@ void mixer_play_scene(mixer *mixr, int scene_num)
         int soundgen_track_num = s->soundgen_tracks[i].soundgen_track_num;
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            printf("MIXER SCENE - STARTING %d\n", soundgen_num);
             mixr->sound_generators[soundgen_num]->start(
                 mixr->sound_generators[soundgen_num]);
-            printf("MIXER SCENE - MAKE_ACTIVE_TRACK %d\n", soundgen_num);
             mixr->sound_generators[soundgen_num]->make_active_track(
                 mixr->sound_generators[soundgen_num], soundgen_track_num);
         }

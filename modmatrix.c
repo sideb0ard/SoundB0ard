@@ -233,8 +233,6 @@ void print_modulation_matrix(modmatrix *self)
 
             if (!mr)
                 continue; // shouldn't happen. but jist in case!
-            if (!mr->m_enable)
-                continue;
             if (!check_destination_layer(layer, mr))
             {
                 continue;
