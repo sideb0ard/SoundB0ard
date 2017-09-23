@@ -2504,25 +2504,46 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_detune(ms, val);
         return true;
     }
-    else if (strncmp("eg1dcaint", wurds[2], 9) == 0)
+    else if (strncmp("eg1_osc_enabled", wurds[2], 9) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("Minisynth EG1 Osc Enable? %d!\n", val);
+        minisynth_set_eg1_osc_enable(ms, val);
+        return true;
+    }
+    else if (strncmp("eg1_osc_intensity", wurds[2], 9) == 0)
+    {
+        printf("Minisynth change EG1 Osc Int!\n");
+        double val = atof(wurds[3]);
+        minisynth_set_eg1_osc_int(ms, val);
+        return true;
+    }
+    else if (strncmp("eg1_dca_enabled", wurds[2], 14) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("Minisynth EG1 DCA Enable? %d!\n", val);
+        minisynth_set_eg1_dca_enable(ms, val);
+        return true;
+    }
+    else if (strncmp("eg1_dca_intensity", wurds[2], 9) == 0)
     {
         printf("Minisynth change EG1 DCA Int!\n");
         double val = atof(wurds[3]);
         minisynth_set_eg1_dca_int(ms, val);
         return true;
     }
-    else if (strncmp("eg1filterint", wurds[2], 12) == 0)
+    else if (strncmp("eg1_filter_enabled", wurds[2], 14) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("Minisynth EG1 Filter Enable? %d!\n", val);
+        minisynth_set_eg1_filter_enable(ms, val);
+        return true;
+    }
+    else if (strncmp("eg1_filter_intensity", wurds[2], 12) == 0)
     {
         printf("Minisynth change EG1 Filter Int!\n");
         double val = atof(wurds[3]);
         minisynth_set_eg1_filter_int(ms, val);
-        return true;
-    }
-    else if (strncmp("eg1oscint", wurds[2], 9) == 0)
-    {
-        printf("Minisynth change EG1 Osc Int!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_eg1_osc_int(ms, val);
         return true;
     }
     else if (strncmp("fc", wurds[2], 2) == 0)

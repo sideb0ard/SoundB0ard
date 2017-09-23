@@ -576,7 +576,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "sustain? %s\n"
         "      eg1_osc_enabled:%d eg1_osc_intensity%.2f\n"
         "      eg1_filter_enabled:%d eg1_filter_intensity%.2f\n"
-        "      eg1_amp_enabled:%d eg1_amp_intensity%.2f\n"
+        "      eg1_dca_enabled:%d eg1_dca_intensity%.2f\n"
         "      [filter]\n"
         "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n",
 
@@ -1336,6 +1336,14 @@ void minisynth_set_detune(minisynth *ms, double val)
         printf("val must be between -100 and 100\n");
 }
 
+void minisynth_set_eg1_dca_enable(minisynth *ms, int val)
+{
+    if (val == 0 || val == 1)
+        ms->m_settings.m_eg1_dca_enabled = val;
+    else
+        printf("val must be boolean 0 or 1\n");
+}
+
 void minisynth_set_eg1_dca_int(minisynth *ms, double val)
 {
     if (val >= -1 && val <= 1)
@@ -1344,12 +1352,28 @@ void minisynth_set_eg1_dca_int(minisynth *ms, double val)
         printf("val must be between -1 and 1\n");
 }
 
+void minisynth_set_eg1_filter_enable(minisynth *ms, int val)
+{
+    if (val == 0 || val == 1)
+        ms->m_settings.m_eg1_filter_enabled = val;
+    else
+        printf("val must be boolean 0 or 1\n");
+}
+
 void minisynth_set_eg1_filter_int(minisynth *ms, double val)
 {
     if (val >= -1 && val <= 1)
         ms->m_settings.m_eg1_filter_intensity = val;
     else
         printf("val must be between -1 and 1\n");
+}
+
+void minisynth_set_eg1_osc_enable(minisynth *ms, int val)
+{
+    if (val == 0 || val == 1)
+        ms->m_settings.m_eg1_osc_enabled = val;
+    else
+        printf("val must be boolean 0 or 1\n");
 }
 
 void minisynth_set_eg1_osc_int(minisynth *ms, double val)
