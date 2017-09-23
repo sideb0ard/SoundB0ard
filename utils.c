@@ -610,6 +610,7 @@ double parabolic_sine(double x, bool high_precision)
 }
 
 double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }
+double bipolar_to_unipolar(double value) { return 0.5 * value + 0.5; }
 
 double convex_transform(double value)
 {

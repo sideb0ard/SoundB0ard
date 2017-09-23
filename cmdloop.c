@@ -1460,8 +1460,7 @@ void interpret(char *line)
                             }
                             else if (strncmp("print", wurds[2], 5) == 0)
                             {
-                                if (strncmp(wurds[3], "melody", 6) == 0 ||
-                                    strncmp(wurds[3], "melodies", 8) == 0)
+                                if (strncmp(wurds[3], "melodies", 8) == 0)
                                 {
                                     minisynth_print_melodies(ms);
                                 }
@@ -2589,25 +2588,11 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_lfo_wave(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1ampint", wurds[2], 10) == 0)
+    else if (strncmp("lfo1mode", wurds[2], 7) == 0)
     {
-        printf("Minisynth change LFO1 Amp Int!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_lfo_amp_int(ms, 1, val);
-        return true;
-    }
-    else if (strncmp("lfo1amp", wurds[2], 7) == 0)
-    {
-        printf("Minisynth change LFO1 AMP!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_lfo_amp(ms, 1, val);
-        return true;
-    }
-    else if (strncmp("lfo1filterint", wurds[2], 13) == 0)
-    {
-        printf("Minisynth change LFO1 Filter FC Int!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_lfo_filter_fc_int(ms, 1, val);
+        printf("Minisynth change LFO1 MODE!\n");
+        int val = atoi(wurds[3]);
+        minisynth_set_lfo_mode(ms, 1, val);
         return true;
     }
     else if (strncmp("lfo1rate", wurds[2], 8) == 0)
@@ -2617,67 +2602,151 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_lfo_rate(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1panint", wurds[2], 10) == 0)
+    else if (strncmp("lfo1amp", wurds[2], 7) == 0)
+    {
+        printf("Minisynth change LFO1 AMP!\n");
+        double val = atof(wurds[3]);
+        minisynth_set_lfo_amp(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_osc_enabled", wurds[2], 16) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("LFO1->OSC routing enable? %d!\n", val);
+        minisynth_set_lfo_osc_enable(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_osc_intensity", wurds[2], 16) == 0)
+    {
+        double val = atof(wurds[3]);
+        printf("LFO1->OSC intensity %f!\n", val);
+        minisynth_set_lfo_osc_int(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_filter_enabled", wurds[2], 16) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("LFO1->FILTER routing enable? %d!\n", val);
+        minisynth_set_lfo_filter_enable(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_filter_intensity", wurds[2], 21) == 0)
+    {
+        double val = atof(wurds[3]);
+        printf("LFO1->FILTER intensity %f!\n", val);
+        minisynth_set_lfo_filter_fc_int(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_amp_enabled", wurds[2], 16) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("LFO1->AMP routing enable? %d!\n", val);
+        minisynth_set_lfo_amp_enable(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_amp_intensity", wurds[2], 16) == 0)
+    {
+        double val = atof(wurds[3]);
+        printf("LFO1->AMP intensity %f!\n", val);
+        minisynth_set_lfo_amp_int(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_pan_enabled", wurds[2], 16) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("LFO1->PAN routing enable? %d!\n", val);
+        minisynth_set_lfo_pan_enable(ms, 1, val);
+        return true;
+    }
+    else if (strncmp("lfo1_pan_intensity", wurds[2], 10) == 0)
     {
         printf("Minisynth change LFO1 Pan Int!\n");
         double val = atof(wurds[3]);
         minisynth_set_lfo_pan_int(ms, 1, val);
         return true;
     }
-    else if (strncmp("lfo1pitch", wurds[2], 9) == 0)
-    {
-        printf("Minisynth change LFO1 Pitch!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_lfo_pitch(ms, 1, val);
-        return true;
-    }
     else if (strncmp("lfo2wave", wurds[2], 7) == 0)
     {
-        printf("Minisynth change LFO2 Wave!\n");
+        printf("Minisynth change lfo2 Wave!\n");
         int val = atoi(wurds[3]);
         minisynth_set_lfo_wave(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2ampint", wurds[2], 10) == 0)
+    else if (strncmp("lfo2mode", wurds[2], 7) == 0)
     {
-        printf("Minisynth change LFO2 Amp Int!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_lfo_amp_int(ms, 2, val);
-        return true;
-    }
-    else if (strncmp("lfo2amp", wurds[2], 7) == 0)
-    {
-        printf("Minisynth change LFO2 AMP!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_lfo_amp(ms, 2, val);
-        return true;
-    }
-    else if (strncmp("lfo2filterint", wurds[2], 13) == 0)
-    {
-        printf("Minisynth change LFO2 Filter FC Int!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_lfo_filter_fc_int(ms, 2, val);
+        printf("Minisynth change lfo2 MODE!\n");
+        int val = atoi(wurds[3]);
+        minisynth_set_lfo_mode(ms, 2, val);
         return true;
     }
     else if (strncmp("lfo2rate", wurds[2], 8) == 0)
     {
-        printf("Minisynth change LFO2 rate!\n");
+        printf("Minisynth change lfo2 rate!\n");
         double val = atof(wurds[3]);
         minisynth_set_lfo_rate(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2panint", wurds[2], 10) == 0)
+    else if (strncmp("lfo2amp", wurds[2], 7) == 0)
     {
-        printf("Minisynth change LFO2 Pan Int!\n");
+        printf("Minisynth change lfo2 AMP!\n");
         double val = atof(wurds[3]);
-        minisynth_set_lfo_pan_int(ms, 2, val);
+        minisynth_set_lfo_amp(ms, 2, val);
         return true;
     }
-    else if (strncmp("lfo2pitch", wurds[2], 9) == 0)
+    else if (strncmp("lfo2_osc_enabled", wurds[2], 16) == 0)
     {
-        printf("Minisynth change LFO2 Pitch!\n");
+        int val = atoi(wurds[3]);
+        printf("lfo2->OSC routing enable? %d!\n", val);
+        minisynth_set_lfo_osc_enable(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2_osc_intensity", wurds[2], 16) == 0)
+    {
         double val = atof(wurds[3]);
-        minisynth_set_lfo_pitch(ms, 2, val);
+        printf("lfo2->OSC intensity %f!\n", val);
+        minisynth_set_lfo_osc_int(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2_filter_enabled", wurds[2], 16) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("lfo2->FILTER routing enable? %d!\n", val);
+        minisynth_set_lfo_filter_enable(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2_filter_intensity", wurds[2], 21) == 0)
+    {
+        double val = atof(wurds[3]);
+        printf("lfo2->FILTER intensity %f!\n", val);
+        minisynth_set_lfo_filter_fc_int(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2_amp_enabled", wurds[2], 16) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("lfo2->AMP routing enable? %d!\n", val);
+        minisynth_set_lfo_amp_enable(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2_amp_intensity", wurds[2], 16) == 0)
+    {
+        double val = atof(wurds[3]);
+        printf("lfo2->AMP intensity %f!\n", val);
+        minisynth_set_lfo_amp_int(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2_pan_enabled", wurds[2], 16) == 0)
+    {
+        int val = atoi(wurds[3]);
+        printf("lfo2->PAN routing enable? %d!\n", val);
+        minisynth_set_lfo_pan_enable(ms, 2, val);
+        return true;
+    }
+    else if (strncmp("lfo2_pan_intensity", wurds[2], 10) == 0)
+    {
+        printf("Minisynth change lfo2 Pan Int!\n");
+        double val = atof(wurds[3]);
+        minisynth_set_lfo_pan_int(ms, 2, val);
         return true;
     }
     else if (strncmp("ndscale", wurds[2], 7) == 0)

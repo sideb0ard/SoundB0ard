@@ -36,6 +36,7 @@ void itoa(int n, char s[]);
 void reverse(char s[]);
 
 double unipolar_to_bipolar(double value);
+double bipolar_to_unipolar(double value);
 
 double convex_transform(double value);
 double convex_inverted_transform(double value);

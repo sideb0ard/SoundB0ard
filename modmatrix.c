@@ -4,6 +4,7 @@
 
 #include "midi_freq_table.h"
 #include "modmatrix.h"
+#include "utils.h"
 
 const char *s_source_enum_to_name[] = {"SOURCE_NONE",
                                        "SOURCE_LFO1",
@@ -248,6 +249,85 @@ void print_modulation_matrix(modmatrix *self)
     }
 }
 
+void print_modulation_matrix_info_lfo1(modmatrix *self, wchar_t *status_string)
+{
+    if (!self->m_matrix_core)
+    {
+        printf("NAE MATRIX CORE, MATE!\n");
+        return;
+    }
+    swprintf(status_string, 1024, L"");
+    wchar_t scratch[1024];
+
+    for (int layer = 0; layer < 2; layer++)
+    {
+        for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+        {
+
+            matrixrow *mr = self->m_matrix_core[i];
+
+            if (!mr)
+                continue; // shouldn't happen. but jist in case!
+            if (mr->m_source_index != SOURCE_LFO1)
+                continue;
+            if (!mr->m_enable)
+                continue;
+            if (!check_destination_layer(layer, mr))
+            {
+                continue;
+            }
+
+            swprintf(
+                scratch, 1023,
+                L"      Dest:%s ModIntensity:%.2f ModRange:%.2f Enabled?%s\n",
+                s_dest_enum_to_name[mr->m_destination_index],
+                (*mr->m_mod_intensity), (*mr->m_mod_range),
+                mr->m_enable ? "true" : "false");
+            wcscat(status_string, scratch);
+        }
+    }
+}
+
+void print_modulation_matrix_info_eg1(modmatrix *self, wchar_t *status_string)
+{
+    if (!self->m_matrix_core)
+    {
+        printf("NAE MATRIX CORE, MATE!\n");
+        return;
+    }
+    swprintf(status_string, 1024, L"");
+    wchar_t scratch[1024];
+
+    for (int layer = 0; layer < 2; layer++)
+    {
+        for (int i = 0; i < self->m_num_rows_in_matrix_core; i++)
+        {
+
+            matrixrow *mr = self->m_matrix_core[i];
+
+            if (!mr)
+                continue; // shouldn't happen. but jist in case!
+            if (mr->m_source_index != SOURCE_EG1 &&
+                mr->m_source_index != SOURCE_BIASED_EG1)
+                continue;
+            if (!mr->m_enable)
+                continue;
+            if (!check_destination_layer(layer, mr))
+            {
+                continue;
+            }
+
+            swprintf(
+                scratch, 1023,
+                L"      Dest:%s ModIntensity:%.2f ModRange:%.2f Enabled?%s\n",
+                s_dest_enum_to_name[mr->m_destination_index],
+                (*mr->m_mod_intensity), (*mr->m_mod_range),
+                mr->m_enable ? "true" : "false");
+            wcscat(status_string, scratch);
+        }
+    }
+}
+
 // this is the REAL mod matrix, yehhhhhh!
 void do_modulation_matrix(modmatrix *self, unsigned layer)
 {
@@ -279,10 +359,10 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
         switch (mr->m_source_transform)
         {
         case TRANSFORM_UNIPOLAR_TO_BIPOLAR:
-            // src = unipolar_to_bipolar(src);
+            src = unipolar_to_bipolar(src);
             break;
         case TRANSFORM_BIPOLAR_TO_UNIPOLAR:
-            // src = bipolar_to_unipolar(src);
+            src = bipolar_to_unipolar(src);
             break;
         case TRANSFORM_MIDI_TO_ATTENUATION:
             // src = mma_midi_to_atten(src);

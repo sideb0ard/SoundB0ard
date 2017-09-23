@@ -30,21 +30,46 @@ typedef struct synthsettings
     unsigned int m_lfo1_mode;
     double m_lfo1_rate;
     double m_lfo1_amplitude;
-    double m_lfo1_amp_intensity;
-    double m_lfo1_filter_fc_intensity;
+
+    // LFO1 -> OSC FO
     double m_lfo1_osc_pitch_intensity;
+    bool m_lfo1_osc_pitch_enabled;
+
+    // LFO1 -> FILTER
+    double m_lfo1_filter_fc_intensity;
+    bool m_lfo1_filter_fc_enabled;
+
+    // LFO1 -> DCA
+    double m_lfo1_amp_intensity;
+    bool m_lfo1_amp_enabled;
     double m_lfo1_pan_intensity;
+    bool m_lfo1_pan_enabled;
+
+    // LFO1 -> Pulse Width
+    double m_lfo1_pulsewidth_intensity;
+    bool m_lfo1_pulsewidth_enabled;
 
     unsigned int m_lfo2_waveform;
     unsigned int m_lfo2_dest;
     unsigned int m_lfo2_mode;
     double m_lfo2_rate;
     double m_lfo2_amplitude;
-    double m_lfo2_amp_intensity;
-    double m_lfo2_filter_fc_intensity;
-    double m_lfo2_osc_pitch_intensity;
-    double m_lfo2_pan_intensity;
 
+    // LFO2 -> OSC FO
+    double m_lfo2_osc_pitch_intensity;
+    bool m_lfo2_osc_pitch_enabled;
+
+    // LFO2 -> FILTER
+    double m_lfo2_filter_fc_intensity;
+    bool m_lfo2_filter_fc_enabled;
+
+    // LFO2 -> DCA
+    double m_lfo2_amp_intensity;
+    bool m_lfo2_amp_enabled;
+    double m_lfo2_pan_intensity;
+    bool m_lfo2_pan_enabled;
+
+    // EG1
     double m_attack_time_msec;
     double m_decay_time_msec;
     double m_release_time_msec;
@@ -64,22 +89,35 @@ typedef struct synthsettings
     double m_pulse_width_pct;
     double m_sub_osc_db;
     double m_noise_osc_db;
-    double m_eg1_dca_intensity;
-    double m_eg1_filter_intensity;
+
+    // EG1 -> OSC
     double m_eg1_osc_intensity;
+    bool m_eg1_osc_enabled;
+
+    // EG1 -> FILTER
+    double m_eg1_filter_intensity;
+    bool m_eg1_filter_enabled;
+
+    // EG1 -> DCA
+    double m_eg1_dca_intensity;
+    bool m_eg1_dca_enabled;
+
     double m_filter_keytrack_intensity;
 
     int m_octave;
     int m_pitchbend_range;
+
     unsigned int m_legato_mode;
     unsigned int m_reset_to_zero;
     unsigned int m_filter_keytrack;
     unsigned int m_filter_type;
     double m_filter_saturation;
+
     unsigned int m_nlp;
     unsigned int m_velocity_to_attack_scaling;
     unsigned int m_note_number_to_decay_scaling;
     double m_portamento_time_msec;
+
     unsigned int m_sustain_override;
     double m_sustain_time_ms;
     double m_sustain_time_sixteenth;
@@ -152,9 +190,15 @@ void minisynth_reset_voices(minisynth *self);
 void minisynth_toggle_delay_mode(minisynth *ms);
 
 void minisynth_rand_settings(minisynth *ms);
+
 void minisynth_print_settings(minisynth *ms);
 void minisynth_print_melodies(minisynth *ms);
 void minisynth_print_modulation_routings(minisynth *ms);
+void minisynth_print_lfo1_routing_info(minisynth *ms, wchar_t *scratch);
+void minisynth_print_lfo2_routing_info(minisynth *ms, wchar_t *scratch);
+void minisynth_print_eg1_routing_info(minisynth *ms, wchar_t *scratch);
+void minisynth_print_eg2_routing_info(minisynth *ms, wchar_t *scratch);
+
 bool minisynth_save_settings(minisynth *ms, char *preset_name);
 bool minisynth_load_settings(minisynth *ms, char *preset_name);
 bool minisynth_list_presets(void);
@@ -182,8 +226,11 @@ void minisynth_set_delay_time_ms(minisynth *ms, double val);
 void minisynth_set_delay_wetmix(minisynth *ms, double val);
 void minisynth_set_detune(minisynth *ms, double val);
 void minisynth_set_eg1_dca_int(minisynth *ms, double val);
+void minisynth_set_eg1_dca_enable(minisynth *ms, int val);
 void minisynth_set_eg1_filter_int(minisynth *ms, double val);
+void minisynth_set_eg1_filter_enable(minisynth *ms, int val);
 void minisynth_set_eg1_osc_int(minisynth *ms, double val);
+void minisynth_set_eg1_osc_enable(minisynth *ms, int val);
 void minisynth_set_filter_fc(minisynth *ms, double val);
 void minisynth_set_filter_fq(minisynth *ms, double val);
 void minisynth_set_filter_type(minisynth *ms, unsigned int val);
@@ -193,12 +240,16 @@ void minisynth_set_keytrack_int(minisynth *ms, double val);
 void minisynth_set_keytrack(minisynth *ms, unsigned int val);
 void minisynth_set_legato_mode(minisynth *ms, unsigned int val);
 // LFO
+void minisynth_set_lfo_amp_enable(minisynth *ms, int lfo_num, int val);
 void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_amp(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_filter_enable(minisynth *ms, int lfo_num, int val);
 void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_pan_enable(minisynth *ms, int lfo_num, int val);
 void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val);
-void minisynth_set_lfo_pitch(minisynth *ms, int lfo_num, double val);
+void minisynth_set_lfo_osc_enable(minisynth *ms, int lfo_num, int val);
+void minisynth_set_lfo_osc_int(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val);
 void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val);
 

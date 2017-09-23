@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <wchar.h>
 
 typedef enum {
     SOURCE_NONE,
@@ -153,6 +154,8 @@ bool check_destination_layer(unsigned layer, matrixrow *row);
 void do_modulation_matrix(modmatrix *self, unsigned layer);
 
 void print_modulation_matrix(modmatrix *self);
+void print_modulation_matrix_info_lfo1(modmatrix *self, wchar_t *status_string);
+void print_modulation_matrix_info_eg1(modmatrix *self, wchar_t *status_string);
 
 matrixrow *create_matrix_row(unsigned src, unsigned dest, double *intensity,
                              double *range, unsigned transformation,
