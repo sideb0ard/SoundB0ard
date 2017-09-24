@@ -196,7 +196,7 @@ void eg_start_eg(envelope_generator *self)
     }
 
     // NOTE: has caused issues -
-    // eg_reset(self);
+    eg_reset(self);
     self->m_state = ATTACK;
 }
 
@@ -206,7 +206,11 @@ void eg_release(envelope_generator *self)
         self->m_state = RELEASE;
 }
 
-void eg_stop_eg(envelope_generator *self) { self->m_state = OFFF; }
+void eg_stop_eg(envelope_generator *self)
+{
+    printf("EG_STOP_EG called!\n");
+    self->m_state = OFFF;
+}
 
 void eg_init_global_parameters(envelope_generator *self,
                                global_eg_params *params)
@@ -220,12 +224,20 @@ void eg_init_global_parameters(envelope_generator *self,
     self->m_global_eg_params->shutdown_time_msec = self->m_shutdown_time_msec;
     self->m_global_eg_params->reset_to_zero = self->m_reset_to_zero;
     self->m_global_eg_params->legato_mode = self->m_legato_mode;
+    self->m_global_eg_params->sustain_override = self->m_sustain_override;
 }
 
 void eg_update(envelope_generator *self)
 {
     if (self->m_global_eg_params)
     {
+        if (self->m_sustain_override !=
+            self->m_global_eg_params->sustain_override)
+        {
+            eg_set_sustain_override(self,
+                                    self->m_global_eg_params->sustain_override);
+        }
+
         if (self->m_attack_time_msec !=
             self->m_global_eg_params->attack_time_msec)
         {
@@ -285,18 +297,6 @@ void eg_update(envelope_generator *self)
             eg_calculate_decay_time(self);
         }
     }
-
-    if (self->m_mod_source_sustain_override != DEST_NONE)
-    {
-        printf("SUSTAIN OVERRIDE IS NOT DEST NONE!??\n");
-        double sustain =
-            self->m_v_modmatrix
-                ->m_destinations[self->m_mod_source_sustain_override];
-        if (sustain == 0)
-            eg_set_sustain_override(self, false);
-        else
-            eg_set_sustain_override(self, true);
-    }
 }
 
 double eg_do_envelope(envelope_generator *self, double *p_biased_output)
@@ -345,21 +345,14 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
     {
         if (self->m_sustain_override)
         {
-            // printf("SUSTAIN OVERRIDE!\n");
             self->m_envelope_output = self->m_sustain_level;
             break;
         }
         else
         {
-            // printf("ELSE: ENV OUTPUT %f\n",
-            // self->m_envelope_output);
             self->m_envelope_output =
                 self->m_release_offset +
                 self->m_envelope_output * self->m_release_coeff;
-            // printf("else: ENV OUTPUT NOW %f offset %f release
-            // coeff %f\n",
-            // self->m_envelope_output, self->m_release_offset,
-            // self->m_release_coeff);
         }
 
         if (self->m_envelope_output <= 0.0 || self->m_release_time_msec <= 0.0)

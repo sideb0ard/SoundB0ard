@@ -301,6 +301,8 @@ void minisynth_update(minisynth *ms)
         (bool)ms->m_settings.m_reset_to_zero;
     ms->m_global_synth_params.eg1_params.legato_mode =
         (bool)ms->m_settings.m_legato_mode;
+    ms->m_global_synth_params.eg1_params.sustain_override =
+        (bool)ms->m_settings.m_sustain_override;
 
     // --- dca:
     ms->m_global_synth_params.dca_params.amplitude_db =
@@ -1799,7 +1801,6 @@ void minisynth_set_sub_osc_db(minisynth *ms, double val)
 void minisynth_set_sustain(minisynth *ms, double val)
 {
     if (val >= 0 && val <= 1)
-        // ms->m_settings.m_sub_osc_db = val;
         ms->m_settings.m_sustain_level = val;
     else
         printf("val must be between 0 and 1\n");
@@ -1808,14 +1809,6 @@ void minisynth_set_sustain(minisynth *ms, double val)
 void minisynth_set_sustain_override(minisynth *ms, bool b)
 {
     ms->m_settings.m_sustain_override = b;
-
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        if (ms->m_voices[i])
-        {
-            voice_set_sustain_override(&ms->m_voices[i]->m_voice, b);
-        }
-    }
 }
 
 void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val)

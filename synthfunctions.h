@@ -40,6 +40,7 @@ typedef struct
     double shutdown_time_msec; // shutdown is a time
     bool reset_to_zero;
     bool legato_mode;
+    bool sustain_override;
 } global_eg_params;
 
 // DCA GENERATOR //////////////////////

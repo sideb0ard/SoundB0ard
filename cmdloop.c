@@ -884,11 +884,6 @@ void interpret(char *line)
                         int release = atoi(wurds[3]);
                         eg_set_release_time_msec(&g->m_eg1, release);
                     }
-                    // else if (strncmp("eg_state", wurds[2], 8)
-                    // == 0) {
-                    //    //int state = atoi(wurds[3]);
-                    //    // eg_set_state(&g->m_eg1, state);
-                    //}
                     else
                     {
                         printf("ELSEY SEQUENCE!\n");
@@ -907,12 +902,10 @@ void interpret(char *line)
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0)
             {
                 int loop_len = atoi(wurds[2]);
-                // if (loop_len > 0) {
                 int soundgen_num = add_looper(mixr, wurds[1], loop_len);
                 printf("soundgenerator %d\n", soundgen_num);
                 mixr->midi_control_destination = MIDILOOPER;
                 mixr->active_midi_soundgen_num = soundgen_num;
-                //}
             }
             else
             {
@@ -1416,47 +1409,6 @@ void interpret(char *line)
                             if (parse_minisynth_settings_change(ms, wurds))
                             {
                                 continue;
-                            }
-                            else if (strncmp("sustain", wurds[2], 5) == 0)
-                            {
-                                if (strncmp("true", wurds[3], 4) == 0)
-                                {
-                                    minisynth_set_sustain_override(ms, true);
-                                }
-                                else if (strncmp("false", wurds[3], 5) == 0)
-                                {
-                                    minisynth_set_sustain_override(ms, false);
-                                }
-                                printf("Synth Sustain Override : %s\n",
-                                       ms->m_settings.m_sustain_override
-                                           ? "true"
-                                           : "false");
-                                for (int i = 0; i < MAX_VOICES; i++)
-                                {
-                                    if (ms->m_voices[i])
-                                    {
-                                        printf("EG sustain: "
-                                               "%d\n",
-                                               ms->m_voices[i]
-                                                   ->m_voice.m_eg1
-                                                   .m_sustain_override);
-                                        printf("EG sustain: "
-                                               "%d\n",
-                                               ms->m_voices[i]
-                                                   ->m_voice.m_eg2
-                                                   .m_sustain_override);
-                                        printf("EG sustain: "
-                                               "%d\n",
-                                               ms->m_voices[i]
-                                                   ->m_voice.m_eg3
-                                                   .m_sustain_override);
-                                        printf("EG sustain: "
-                                               "%d\n",
-                                               ms->m_voices[i]
-                                                   ->m_voice.m_eg4
-                                                   .m_sustain_override);
-                                    }
-                                }
                             }
                             else if (strncmp("print", wurds[2], 5) == 0)
                             {
