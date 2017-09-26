@@ -515,15 +515,24 @@ int is_valid_osc(char *string)
     }
 }
 
+// from https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
+inline double fast_pow(double a, double b) {
+  union {
+    double d;
+    int x[2];
+  } u = { a };
+  u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
+  u.x[0] = 0;
+  return u.d;
+}
+
 double pitch_shift_multiplier(double pitch_shift_semitones)
 // from Will Pirkle book 'Designing Software Synthesizer Plug-Ins...'
 {
     if (pitch_shift_semitones == 0)
         return 1.0;
-
-    // 2^(N/12)
-    //      return fastPow(2.0, dPitchShiftSemitones/12.0);
-    return pow(2.0, pitch_shift_semitones / 12.0);
+    //return pow(2.0, pitch_shift_semitones / 12.0);
+    return fast_pow(2.0, pitch_shift_semitones / 12.0);
 }
 
 void calculate_pan_values(double pan_total, double *pan_left, double *pan_right)
