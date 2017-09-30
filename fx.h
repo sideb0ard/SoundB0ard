@@ -6,6 +6,7 @@
 typedef enum {
     BASICFILTER,
     BEATREPEAT,
+    BITCRUSH,
     COMPRESSOR,
     DECIMATOR,
     DELAY,

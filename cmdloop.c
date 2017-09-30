@@ -15,6 +15,7 @@
 #include "audioutils.h"
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
+#include "bitcrush.h"
 #include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
@@ -1532,6 +1533,14 @@ void interpret(char *line)
             }
         }
         // FX COMMANDS
+        else if (strncmp("bitcrush", wurds[0], 8) == 0)
+        {
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+            {
+                add_bitcrush_soundgen(mixr->sound_generators[soundgen_num]);
+            }
+        }
         else if (strncmp("compressor", wurds[0], 10) == 0)
         {
             int soundgen_num = atoi(wurds[1]);
@@ -1813,6 +1822,15 @@ void interpret(char *line)
                         waveshaper_set_stages(ws, val);
                     else if (strncmp("invert", wurds[3], 5) == 0)
                         waveshaper_set_invert_stages(ws, val);
+                }
+                else if (f->type == BITCRUSH)
+                {
+                    bitcrush *bc = (bitcrush *)f;
+                    int val = atof(wurds[4]);
+                    if (strncmp("bitdepth", wurds[3], 8) == 0)
+                        bitcrush_set_bitdepth(bc, val);
+                    else if (strncmp("bitrate", wurds[3], 7) == 0)
+                        bitcrush_set_bitrate(bc, val);
                 }
                 else if (f->type == BASICFILTER)
                 {

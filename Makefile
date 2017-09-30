@@ -12,6 +12,7 @@ OBJ = \
 	audiofile_data.o \
 	basicfilterpass.o \
 	beatrepeat.o \
+	bitcrush.o \
 	chaosmonkey.o \
 	cmdloop.o \
 	dca.o \

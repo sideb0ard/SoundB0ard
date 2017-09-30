@@ -38,6 +38,7 @@ typedef struct soundgenerator
 bool is_synth(soundgenerator *self);
 int add_beatrepeat_soundgen(soundgenerator *self, int nbeats, int sixteenth);
 int add_basicfilter_soundgen(soundgenerator *self);
+int add_bitcrush_soundgen(soundgenerator *self);
 int add_compressor_soundgen(soundgenerator *self);
 int add_distortion_soundgen(soundgenerator *self);
 int add_decimator_soundgen(soundgenerator *self);

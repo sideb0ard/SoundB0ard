@@ -4,6 +4,7 @@
 
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
+#include "bitcrush.h"
 #include "defjams.h"
 #include "distortion.h"
 #include "dynamics_processor.h"
@@ -76,6 +77,13 @@ int add_basicfilter_soundgen(soundgenerator *self)
     printf("Fffuuuuhfilter!\n");
     filterpass *fp = new_filterpass();
     return soundgen_add_fx(self, (fx *)fp);
+}
+
+int add_bitcrush_soundgen(soundgenerator *self)
+{
+    printf("BITCRUSH!\n");
+    bitcrush *bc = new_bitcrush();
+    return soundgen_add_fx(self, (fx*)bc);
 }
 
 int add_compressor_soundgen(soundgenerator *self)
