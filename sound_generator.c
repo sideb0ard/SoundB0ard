@@ -83,7 +83,7 @@ int add_bitcrush_soundgen(soundgenerator *self)
 {
     printf("BITCRUSH!\n");
     bitcrush *bc = new_bitcrush();
-    return soundgen_add_fx(self, (fx*)bc);
+    return soundgen_add_fx(self, (fx *)bc);
 }
 
 int add_compressor_soundgen(soundgenerator *self)

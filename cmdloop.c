@@ -1826,11 +1826,13 @@ void interpret(char *line)
                 else if (f->type == BITCRUSH)
                 {
                     bitcrush *bc = (bitcrush *)f;
-                    int val = atof(wurds[4]);
+                    double val = atof(wurds[4]);
                     if (strncmp("bitdepth", wurds[3], 8) == 0)
                         bitcrush_set_bitdepth(bc, val);
                     else if (strncmp("bitrate", wurds[3], 7) == 0)
                         bitcrush_set_bitrate(bc, val);
+                    else if (strncmp("sample_hold_freq", wurds[3], 16) == 0)
+                        bitcrush_set_sample_hold_freq(bc, val);
                 }
                 else if (f->type == BASICFILTER)
                 {

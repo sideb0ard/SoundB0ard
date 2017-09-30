@@ -515,15 +515,17 @@ int is_valid_osc(char *string)
     }
 }
 
-// from https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
-inline double fast_pow(double a, double b) {
-  union {
-    double d;
-    int x[2];
-  } u = { a };
-  u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
-  u.x[0] = 0;
-  return u.d;
+// from
+// https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
+inline double fast_pow(double a, double b)
+{
+    union {
+        double d;
+        int x[2];
+    } u = {a};
+    u.x[1] = (int)(b * (u.x[1] - 1072632447) + 1072632447);
+    u.x[0] = 0;
+    return u.d;
 }
 
 double pitch_shift_multiplier(double pitch_shift_semitones)
@@ -531,7 +533,7 @@ double pitch_shift_multiplier(double pitch_shift_semitones)
 {
     if (pitch_shift_semitones == 0)
         return 1.0;
-    //return pow(2.0, pitch_shift_semitones / 12.0);
+    // return pow(2.0, pitch_shift_semitones / 12.0);
     return fast_pow(2.0, pitch_shift_semitones / 12.0);
 }
 
@@ -918,4 +920,13 @@ inline double lagrpol(double *x, double *y, int n, double xbar)
         fx += l * y[i];
     }
     return (fx);
+}
+
+double clamp(double min, double max, double v)
+{
+    if (v < min)
+        return min;
+    if (v > max)
+        return max;
+    return v;
 }
