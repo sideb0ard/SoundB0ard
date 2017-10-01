@@ -51,6 +51,7 @@ minisynth *new_minisynth(void)
 
     strncpy(ms->m_settings.m_settings_name, "DEFAULT", 7);
 
+    ms->m_settings.m_monophonic = false;
     ms->m_settings.m_voice_mode = 0;
     ms->m_settings.m_detune_cents = 0.0;
 
@@ -448,6 +449,14 @@ void minisynth_midi_control(minisynth *self, unsigned int data1,
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
                             unsigned int velocity)
 {
+    if (ms->m_settings.m_monophonic)
+    {
+        minisynth_voice *msv = ms->m_voices[0];
+        voice_note_on(&msv->m_voice, midinote, velocity,
+                      get_midi_freq(midinote), ms->m_last_note_frequency);
+        ms->m_last_note_frequency = get_midi_freq(midinote);
+        return true;
+    }
     bool steal_note = true;
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -617,7 +626,7 @@ void minisynth_status(void *self, wchar_t *status_string)
 
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d]\n"
+        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d\n"
         "      [lfo1]\n"
         "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f "
         "lfo1amp:%.2f\n"
@@ -644,7 +653,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         // VOICE + GENERAL
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
         s_voice_names[ms->m_settings.m_voice_mode], ms->m_settings.m_voice_mode,
-        MAX_VOICE_CHOICE - 1,
+        MAX_VOICE_CHOICE - 1, ms->m_settings.m_monophonic,
 
         // LFO1
         s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
@@ -791,6 +800,8 @@ void minisynth_rand_settings(minisynth *ms)
     printf("Randomizing SYNTH!\n");
 
     ms->m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
+    ms->m_settings.m_monophonic = rand() % 2;
+
     ms->m_settings.m_lfo1_waveform = rand() % MAX_LFO_OSC;
     ms->m_settings.m_lfo1_rate =
         ((float)rand()) / RAND_MAX * (MAX_LFO_RATE - MIN_LFO_RATE) +
@@ -798,23 +809,40 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_lfo1_amplitude = ((float)rand()) / RAND_MAX;
     ms->m_settings.m_lfo1_osc_pitch_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
+    ms->m_settings.m_lfo1_osc_pitch_enabled = rand() % 2;
     ms->m_settings.m_lfo1_filter_fc_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
+    ms->m_settings.m_lfo1_filter_fc_enabled = rand() % 2;
     // ms->m_settings.m_lfo1_amp_intensity = ((float)rand() /
-    // (float)(RAND_MAX));
+    //(float)(RAND_MAX));
+    // ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo1_pan_intensity = ((float)rand() /
-    // (float)(RAND_MAX));
+    //(float)(RAND_MAX));
+    // ms->m_settings.m_lfo1_pan_enabled = rand() % 2;
+    ms->m_settings.m_lfo1_pulsewidth_intensity =
+        ((float)rand() / (float)(RAND_MAX));
+    ms->m_settings.m_lfo1_pulsewidth_enabled = rand() % 2;
 
     ms->m_settings.m_lfo2_waveform = rand() % MAX_LFO_OSC;
+    ms->m_settings.m_lfo2_rate =
+        ((float)rand()) / RAND_MAX * (MAX_LFO_RATE - MIN_LFO_RATE) +
+        MIN_LFO_RATE;
     ms->m_settings.m_lfo2_amplitude = ((float)rand()) / RAND_MAX;
     ms->m_settings.m_lfo2_osc_pitch_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
+    ms->m_settings.m_lfo2_osc_pitch_enabled = rand() % 2;
     ms->m_settings.m_lfo2_filter_fc_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
+    ms->m_settings.m_lfo2_filter_fc_enabled = rand() % 2;
     // ms->m_settings.m_lfo2_amp_intensity = ((float)rand() /
-    // (float)(RAND_MAX));
+    //(float)(RAND_MAX));
+    // ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo2_pan_intensity = ((float)rand() /
-    // (float)(RAND_MAX));
+    //(float)(RAND_MAX));
+    // ms->m_settings.m_lfo2_pan_enabled = rand() % 2;
+    ms->m_settings.m_lfo2_pulsewidth_intensity =
+        ((float)rand() / (float)(RAND_MAX));
+    ms->m_settings.m_lfo2_pulsewidth_enabled = rand() % 2;
 
     ms->m_settings.m_detune_cents = (rand() % 200) - 100;
 
@@ -823,15 +851,15 @@ void minisynth_rand_settings(minisynth *ms)
         FILTER_FC_MIN;
     ms->m_settings.m_q_control = rand() % 10;
 
-    ms->m_settings.m_attack_time_msec = (rand() % 400) + 50;
-    ms->m_settings.m_decay_time_msec = (rand() % 400) + 50;
-    ms->m_settings.m_release_time_msec = (rand() % 400) + 50;
+    ms->m_settings.m_attack_time_msec = (rand() % 700) + 5;
+    ms->m_settings.m_decay_time_msec = (rand() % 700) + 5;
+    ms->m_settings.m_release_time_msec = (rand() % 600) + 5;
     ms->m_settings.m_pulse_width_pct = rand() % 100;
 
     ms->m_settings.m_delay_ratio =
         (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
     ms->m_settings.m_delay_time_msec = rand() % 300;
-    ms->m_settings.m_delay_feedback_pct = rand() % 30;
+    ms->m_settings.m_delay_feedback_pct = rand() % 70;
     ms->m_settings.m_delay_wet_mix = rand() % 60;
     minisynth_set_delay_wetmix(ms, ((float)rand() / (float)(RAND_MAX)));
 
@@ -850,18 +878,18 @@ void minisynth_rand_settings(minisynth *ms)
     //////// ms->m_settings.m_volume_db = 1.0;
     ms->m_settings.m_legato_mode = rand() % 2;
     // ms->m_settings.m_pitchbend_range = rand() % 12;
-    // ms->m_settings.m_reset_to_zero = rand() % 2;
-    // ms->m_settings.m_filter_keytrack = rand() % 2;
-    // ms->m_settings.m_filter_keytrack_intensity =
-    //    (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
-    // ms->m_settings.m_velocity_to_attack_scaling = rand() % 2;
-    // ms->m_settings.m_note_number_to_decay_scaling = rand() % 2;
+    ms->m_settings.m_reset_to_zero = rand() % 2;
+    ms->m_settings.m_filter_keytrack = rand() % 2;
+    ms->m_settings.m_filter_keytrack_intensity =
+        (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
+    ms->m_settings.m_velocity_to_attack_scaling = rand() % 2;
+    ms->m_settings.m_note_number_to_decay_scaling = rand() % 2;
     ms->m_settings.m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
     ////ms->m_settings.m_eg1_dca_intensity =
     ////    (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
-    // ms->m_settings.m_sustain_override = rand() % 2;
-    ////ms->m_settings.m_sustain_time_ms = rand() % 1000;
-    ////ms->m_settings.m_sustain_time_sixteenth = rand() % 5;
+    ms->m_settings.m_sustain_override = rand() % 2;
+    ms->m_settings.m_sustain_time_ms = rand() % 1000;
+    ms->m_settings.m_sustain_time_sixteenth = rand() % 5;
 
     minisynth_print_settings(ms);
 }
@@ -890,6 +918,9 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
     settings_count++;
 
     fprintf(presetzzz, "::voice_mode=%d", ms->m_settings.m_voice_mode);
+    settings_count++;
+
+    fprintf(presetzzz, "::monophonic=%d", ms->m_settings.m_monophonic);
     settings_count++;
 
     // LFO1
@@ -1170,6 +1201,11 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
             else if (strcmp(setting_key, "voice_mode") == 0)
             {
                 ms->m_settings.m_voice_mode = scratch_val;
+                settings_count++;
+            }
+            else if (strcmp(setting_key, "monophonic") == 0)
+            {
+                ms->m_settings.m_monophonic = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_waveform") == 0)
@@ -2260,4 +2296,9 @@ void minisynth_set_sustain_time_ms(minisynth *ms, double val)
         ms->m_settings.m_sustain_time_ms = val;
     else
         printf("val must be between 10 and 2000\n");
+}
+
+void minisynth_set_monophonic(minisynth *ms, bool b)
+{
+    ms->m_settings.m_monophonic = b;
 }

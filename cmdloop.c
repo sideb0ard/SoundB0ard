@@ -84,7 +84,7 @@ void interpret(char *line)
          cmd = strtok_r(NULL, sep, &last_s))
     {
 
-        char tmp[128];
+        char tmp[1024];
         strncpy((char *)tmp, cmd, 127);
 
         int num_wurds = parse_wurds_from_cmd(wurds, tmp);
@@ -1204,7 +1204,7 @@ void interpret(char *line)
                     }
                     else if (strncmp("import", wurds[2], 6) == 0)
                     {
-                        printf("Importing file\n");
+                        printf("Importing file %s\n", wurds[3]);
                         synthbase_import_midi_from_file(base, wurds[3]);
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0)
@@ -1452,9 +1452,10 @@ void interpret(char *line)
                             {
                                 minisynth_rand_settings(ms);
                             }
-                            else if (strncmp("rand", wurds[2], 4) == 0)
+                            else if (strncmp("mono", wurds[2], 4) == 0)
                             {
-                                minisynth_rand_settings(ms);
+                                int mono = atoi(wurds[3]);
+                                minisynth_set_monophonic(ms, mono);
                             }
                             else if (strncmp("save", wurds[2], 4) == 0)
                             {

@@ -722,7 +722,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
     char *item, *last_s;
     char const *sep = "::";
     // minisynth_morph(ms);
-    char line[256];
+    char line[4096];
     while (fgets(line, sizeof(line), fp))
     {
         printf("%s", line);

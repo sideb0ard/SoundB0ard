@@ -4,7 +4,7 @@
 #include "sequencer.h"
 #include <stdbool.h>
 
-#define SIZE_OF_WURD 41 // 40 char word plus terminator
+#define SIZE_OF_WURD 256
 #define NUM_WURDS 25
 
 void print_prompt(void);

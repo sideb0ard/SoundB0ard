@@ -24,6 +24,7 @@ typedef struct synthsettings
     char m_settings_name[256];
 
     unsigned int m_voice_mode;
+    bool m_monophonic;
 
     unsigned int m_lfo1_waveform;
     unsigned int m_lfo1_dest;
@@ -272,3 +273,4 @@ void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_voice_mode(minisynth *ms, unsigned int val);
 void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
+void minisynth_set_monophonic(minisynth *ms, bool b);
