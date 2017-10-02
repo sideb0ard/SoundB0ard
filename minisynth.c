@@ -164,6 +164,8 @@ minisynth *new_minisynth(void)
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);
 
+    bytebeat_init(&ms->bytr);
+
     ms->sound_generator.active = true;
     return ms;
 }
@@ -626,7 +628,7 @@ void minisynth_status(void *self, wchar_t *status_string)
 
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d\n"
+        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d bytebeat:%d\n"
         "      [lfo1]\n"
         "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f "
         "lfo1amp:%.2f\n"
@@ -653,7 +655,9 @@ void minisynth_status(void *self, wchar_t *status_string)
         // VOICE + GENERAL
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
         s_voice_names[ms->m_settings.m_voice_mode], ms->m_settings.m_voice_mode,
-        MAX_VOICE_CHOICE - 1, ms->m_settings.m_monophonic,
+        MAX_VOICE_CHOICE - 1,
+        ms->m_settings.m_monophonic,
+        ms->m_settings.m_bytebeat_active,
 
         // LFO1
         s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
@@ -785,6 +789,11 @@ double minisynth_gennext(void *self)
     accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
 
     accum_out_left *= ms->m_settings.m_volume_db;
+
+    if (ms->m_settings.m_bytebeat_active)
+    {
+        accum_out_left *= bytebeat_gennext(&ms->bytr);
+    }
 
     return accum_out_left;
 }
@@ -2301,4 +2310,8 @@ void minisynth_set_sustain_time_ms(minisynth *ms, double val)
 void minisynth_set_monophonic(minisynth *ms, bool b)
 {
     ms->m_settings.m_monophonic = b;
+}
+void minisynth_set_bytebeat(minisynth *ms, bool b)
+{
+    ms->m_settings.m_bytebeat_active = b;
 }

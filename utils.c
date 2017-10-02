@@ -600,9 +600,17 @@ void reverse(char s[])
 double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
                  double cur_val)
 {
+    double return_val = 0;
+
     double cur_range = cur_max - cur_min;
-    double new_range = new_max - new_min;
-    return (((cur_val - cur_min) / cur_range) * new_range) + new_min;
+    if (cur_range == 0)
+        return_val = new_min;
+    else {
+        double new_range = new_max - new_min;
+        return_val = (((cur_val - cur_min) * new_range) / cur_range) + new_min;
+    }
+
+    return return_val;
 }
 
 const double B = 4.0 / (float)M_PI;

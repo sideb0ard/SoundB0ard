@@ -13,6 +13,7 @@ OBJ = \
 	basicfilterpass.o \
 	beatrepeat.o \
 	bitcrush.o \
+	bytebeat/bytebeat.o \
 	chaosmonkey.o \
 	cmdloop.o \
 	dca.o \

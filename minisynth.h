@@ -4,6 +4,7 @@
 #include <wchar.h>
 
 #include "arpeggiator.h"
+#include "bytebeat/bytebeat.h"
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"
@@ -126,6 +127,8 @@ typedef struct synthsettings
     unsigned int m_sustain_override;
     double m_sustain_time_ms;
     double m_sustain_time_sixteenth;
+
+    bool m_bytebeat_active;
 } synthsettings;
 
 typedef struct minisynth
@@ -150,6 +153,8 @@ typedef struct minisynth
 
     int m_last_midi_note;
     arpeggiator m_arp;
+
+    bytebeat bytr;
 
 } minisynth;
 
@@ -274,3 +279,4 @@ void minisynth_set_voice_mode(minisynth *ms, unsigned int val);
 void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
 void minisynth_set_monophonic(minisynth *ms, bool b);
+void minisynth_set_bytebeat(minisynth *ms, bool b);

@@ -1448,6 +1448,11 @@ void interpret(char *line)
                                 minisynth_set_arpeggiate(ms,
                                                          1 - ms->m_arp.active);
                             }
+                            else if (strncmp("bytebeat", wurds[2], 8) == 0)
+                            {
+                                bool b = atoi(wurds[3]);
+                                minisynth_set_bytebeat(ms, b);
+                            }
                             else if (strncmp("rand", wurds[2], 4) == 0)
                             {
                                 minisynth_rand_settings(ms);
