@@ -13,7 +13,7 @@ void bytebeat_init(bytebeat *b)
 double bytebeat_gennext(bytebeat *b)
 {
     int t = mixr->cur_sample;
-    uint32_t bitpart = 0;
+    char bitpart = 0;
 	switch (b->pattern_num) {
     case 0:
         bitpart = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
@@ -32,8 +32,11 @@ double bytebeat_gennext(bytebeat *b)
         bitpart = (t * (t >> 13 | t >> 4)) >> (t >> 3);
     }
 
-    double scaled = scaleybum(0, 9000000, -1.0, 1, bitpart);
+    double scaled = scaleybum(CHAR_MIN, CHAR_MAX, -1.0, 1, bitpart);
+    //printf("ORIG VAL:%d (min:%d max:%d) // SCALED: %f\n", bitpart, CHAR_MIN, CHAR_MAX, scaled);
 
+    if (scaled > 1 || scaled < -1)
+        printf("BYTEBITTEN IN THE BUTT! OVER > 1!! %f (orig - %d)\n", scaled, bitpart);
     return scaled;
 
 }

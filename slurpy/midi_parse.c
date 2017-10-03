@@ -93,6 +93,15 @@ void parse_midi(char *midifile)
     printf("Type: %s len:%lu\n", s_type_id_names[cur_chunk.type], cur_chunk.len);
     printf("Format Type:%d Num MTrk Chunks:%d PPQN:%d\n", format_type, num_mtrk_chunks, ppqn);
 
+    for (int i = 0; i < num_mtrk_chunks; i++)
+    {
+        numread = fread(chunk_header, 1 /* byte */, 8 /* num x */, fp);
+        if (numread != 8) { printf("Didn't read what i expected\n"); }
+        cur_chunk = parse_chunk_header(chunk_header);
+        printf("Type: %s len:%lu\n", s_type_id_names[cur_chunk.type], cur_chunk.len);
+        fseek(fp, cur_chunk.len, SEEK_CUR);
+    }
+
 }
 
 int main(int argc, char **argv)
