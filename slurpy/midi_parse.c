@@ -18,7 +18,6 @@ typedef struct chunk_info
 
 void print_binary_string(unsigned char byte)
 {
-    printf("BYTE: %d\n", byte);
     byte & 128 ? printf("1") : printf("0");
     byte & 64 ? printf("1") : printf("0");
     byte & 32 ? printf("1") : printf("0");
@@ -39,16 +38,23 @@ typedef struct header_info
 
 int read_var_len_variable(FILE *fp, int *chunk_left)
 {
-    //int value = 0;
-    char cur_byte = fgetc(fp);
-    //value = cur_byte & 0x7f;
-    printf("ENTRY BYTE IS %d\n", cur_byte);
-    print_binary_string(cur_byte);
+    int value = 0;
+    unsigned char cur_byte;
+
+    cur_byte = fgetc(fp);
+    (*chunk_left)--;
+    //print_binary_string(cur_byte);
+
+    //printf("& %d\n", cur_byte & 0x80);
+    if (!(cur_byte & 0x80))
+        return cur_byte;
+
+    value = cur_byte;
     do
     {
-        //value = (value << 7) + ((cur_byte = fgetc(fp)) & 0x7F);
         cur_byte = fgetc(fp);
         (*chunk_left)--;
+        value = (value << 7) + (cur_byte & 0x7F);
         printf("ONGOING BYTE IS %d\n", cur_byte);
         print_binary_string(cur_byte);
     } while ( cur_byte & 0x80);
@@ -147,15 +153,14 @@ bool parse_midi_file(char *midifile)
     header_info h_info = parse_header_chunk(fp);
     printf("Format Type:%d Num MTrk Chunks:%d PPQN:%d\n", h_info.format_type, h_info.num_mtrk_chunks, h_info.ppqn);
 
-    size_t numread;
     char chunk_header[8] = {0};
     chunk_info cur_chunk;
-    int delta_time = 0;
 
-    //for (int i = 0; i < h_info.num_mtrk_chunks; i++)
-    for (int i = 0; i < 1; i++)
+    for (int i = 0; i < h_info.num_mtrk_chunks; i++)
+    //for (int i = 0; i < 1; i++)
     {
-        numread = fread(chunk_header, 1 /* byte */, 8 /* num x */, fp); // 4 bytes for type, 4 for size
+        printf("\nCHUNK%d\n", i);
+        size_t numread = fread(chunk_header, 1 /* byte */, 8 /* num x */, fp); // 4 bytes for type, 4 for size
         if (numread != 8) { printf("Didn't read what i expected\n"); }
         cur_chunk = parse_chunk_header(chunk_header);
 
@@ -164,32 +169,187 @@ bool parse_midi_file(char *midifile)
             printf("Skipping %lu bytes as chunk type is unknown\n", cur_chunk.len);
             fseek(fp, cur_chunk.len, SEEK_CUR);
         }
-        printf("Type: %s len:%lu\n", s_type_id_names[cur_chunk.type], cur_chunk.len);
+        printf("Type: %s len:%lu\n\n", s_type_id_names[cur_chunk.type], cur_chunk.len);
 
+        int delta_time = 0;
         int chunk_left = cur_chunk.len;
+        unsigned char status_running = 0;
         while (chunk_left > 0)
         {
-            unsigned char cur_byte = 0;
-            numread = fread(&cur_byte, 1, 1, fp);
-            chunk_left -= numread;
+            // 1. get delta-time
+            delta_time += read_var_len_variable(fp, &chunk_left);
+            printf("DELTA TIME:%d\n", delta_time);
 
-            if (cur_byte & 255) // Meta Event
+            unsigned char cur_byte = 0;
+
+            // 2. get status
+            cur_byte = fgetc(fp);
+            chunk_left--;
+
+            if (cur_byte == 0xff) // Meta Event
             {
-                //numread = fread(&cur_byte, 1, 1, fp);
-                //chunk_left -= numread;
-                printf("Ooh! META event! Type:%d %x\n", cur_byte, cur_byte);
-                //int len = read_var_len_variable(fp, &chunk_left);
-                //printf("Len is %d\n", len);
+                // Meta-event type
+                numread = fread(&cur_byte, 1, 1, fp);
+                chunk_left -= numread;
+                printf("META event! Type:%d %x\n", cur_byte, cur_byte);
+
+                int len = read_var_len_variable(fp, &chunk_left);
+                printf("Len is %d - skipping!\n", len);
+                chunk_left -= len;
+                fseek(fp, len, SEEK_CUR);
+
+                // reset status_running;
+                status_running = 0;
+
             }
-            else if (cur_byte & 240) // sysex event
+            else if ((cur_byte == 0xf0) || // sysex event
+                     (cur_byte == 0xf7))
             {
-                printf("Ooh! Sysex event %d %x!\n", cur_byte, cur_byte);
+                printf("SYSEX event %d %x!\n", cur_byte, cur_byte);
+                int len = read_var_len_variable(fp, &chunk_left);
+                printf("Len is %d - No idea how to deal with SysEx - skipping!\n", len);
+                chunk_left -= len;
+                fseek(fp, len, SEEK_CUR);
+                // reset status_running;
+                status_running = 0;
             }
-            else
+            else 
             {
-                printf("Normy:%d %x!\n",cur_byte, cur_byte);
+
+                unsigned char left_nib = (cur_byte | 0x0f) - 0x0f;
+                unsigned char right_nib = (cur_byte | 0xf0) - 0xf0;
+
+                if (left_nib == 0x80)
+                {
+                    unsigned char key;
+                    unsigned char velocity;
+                    numread = fread(&key, 1, 1, fp);
+                    chunk_left -= numread;
+                    numread = fread(&velocity, 1, 1, fp);
+                    chunk_left -= numread;
+                    printf("NOTE OFF on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+                    status_running = cur_byte;
+                }
+                else if (left_nib == 0x90)
+                {
+                    unsigned char key;
+                    unsigned char velocity;
+                    numread = fread(&key, 1, 1, fp);
+                    chunk_left -= numread;
+                    numread = fread(&velocity, 1, 1, fp);
+                    chunk_left -= numread;
+                    printf("NOTE On on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+                    status_running = cur_byte;
+                }
+                else if (left_nib == 0xa0)
+                {
+                    unsigned char key;
+                    unsigned char val; // pressure
+                    numread = fread(&key, 1, 1, fp);
+                    chunk_left -= numread;
+                    numread = fread(&val, 1, 1, fp);
+                    chunk_left -= numread;
+                    printf("Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
+                    status_running = cur_byte;
+                }
+                else if (left_nib == 0xb0)
+                {
+                    unsigned char controller_number;
+                    unsigned char val;
+                    numread = fread(&controller_number, 1, 1, fp);
+                    chunk_left -= numread;
+                    numread = fread(&val, 1, 1, fp);
+                    chunk_left -= numread;
+                    printf("Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    status_running = cur_byte;
+                }
+                else if (left_nib == 0xc0)
+                {
+                    printf("Program Change: Channel :%d\n", right_nib);
+                    numread = fread(&cur_byte, 1, 1, fp);
+                    chunk_left -= numread;
+                    // discarded for the moment
+                    printf("Discarding data %d %x\n", cur_byte, cur_byte);
+                    status_running = cur_byte;
+                }
+                else if (left_nib == 0xd0)
+                {
+                    printf("Channel PRessur:%d\n", right_nib);
+                    numread = fread(&cur_byte, 1, 1, fp);
+                    chunk_left -= numread;
+                    // discarded for the moment
+                    printf("Discarding data %d %x\n", cur_byte, cur_byte);
+                    status_running = cur_byte;
+                }
+                else if (left_nib == 0xe0)
+                {
+                    unsigned char controller_number;
+                    unsigned char val;
+                    numread = fread(&controller_number, 1, 1, fp);
+                    chunk_left -= numread;
+                    numread = fread(&val, 1, 1, fp);
+                    chunk_left -= numread;
+                    printf("Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                }
+                else
+                {
+                    printf("USE RUNNING STATUS! %d %x\n", status_running, status_running);
+                    left_nib = (status_running | 0x0f) - 0x0f;
+                    right_nib = (status_running | 0xf0) - 0xf0;
+
+                    if (left_nib == 0x80)
+                    {
+                        unsigned char key = cur_byte;
+                        unsigned char velocity;
+                        numread = fread(&velocity, 1, 1, fp);
+                        chunk_left -= numread;
+                        printf("NOTE OFF on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+                    }
+                    else if (left_nib == 0x90)
+                    {
+                        unsigned char key = cur_byte;
+                        unsigned char velocity;
+                        numread = fread(&velocity, 1, 1, fp);
+                        chunk_left -= numread;
+                        printf("NOTE On on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+                    }
+                    else if (left_nib == 0xa0)
+                    {
+                        unsigned char key = cur_byte;
+                        unsigned char val; // pressure
+                        numread = fread(&val, 1, 1, fp);
+                        chunk_left -= numread;
+                        printf("Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
+                    }
+                    else if (left_nib == 0xb0)
+                    {
+                        unsigned char controller_number = cur_byte;
+                        unsigned char val;
+                        numread = fread(&val, 1, 1, fp);
+                        chunk_left -= numread;
+                        printf("Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    }
+                    else if (left_nib == 0xc0)
+                    {
+                        printf("Program Change: Channel :%d\n", right_nib);
+                        printf("Discarding data %d %x\n", cur_byte, cur_byte);
+                    }
+                    else if (left_nib == 0xd0)
+                    {
+                        printf("Channel PRessur:%d\n", right_nib);
+                        printf("Discarding data %d %x\n", cur_byte, cur_byte);
+                    }
+                    else if (left_nib == 0xe0)
+                    {
+                        unsigned char controller_number = cur_byte;
+                        unsigned char val;
+                        numread = fread(&val, 1, 1, fp);
+                        chunk_left -= numread;
+                        printf("Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    }
+                }
             }
-            print_binary_string(cur_byte);
+            printf("\n");
         }
 
         //fseek(fp, cur_chunk.len, SEEK_CUR);
