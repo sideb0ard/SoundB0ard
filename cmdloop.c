@@ -594,6 +594,12 @@ void interpret(char *line)
                                "patches.. \n");
                         synthdrum_open_patch(sds, wurds[3]);
                     }
+                    else if (strncmp("rand", wurds[2], 4) == 0 ||
+                             strncmp("randomize", wurds[2], 9) == 0)
+                    {
+                        printf("Ra-rarararrandom SYNTHDRUM patch!\n");
+                        synthdrum_randomize(sds);
+                    }
                     else
                     {
                         printf("SYNTHDRUM SEQ!\n");

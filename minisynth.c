@@ -822,6 +822,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_lfo1_filter_fc_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
     ms->m_settings.m_lfo1_filter_fc_enabled = rand() % 2;
+    ms->m_settings.m_filter_type = rand() % NUM_FILTER_TYPES;
     // ms->m_settings.m_lfo1_amp_intensity = ((float)rand() /
     //(float)(RAND_MAX));
     // ms->m_settings.m_lfo1_amp_enabled = rand() % 2;

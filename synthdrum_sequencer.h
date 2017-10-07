@@ -96,3 +96,5 @@ void synthdrum_set_filter_freq(synthdrum_sequencer *sds, double val);
 void synthdrum_set_filter_q(synthdrum_sequencer *sds, double val);
 void synthdrum_set_filter_type(synthdrum_sequencer *sds, unsigned int val);
 void synthdrum_set_mod_semitones_range(synthdrum_sequencer *sds, int val);
+
+void synthdrum_randomize(synthdrum_sequencer *sds);

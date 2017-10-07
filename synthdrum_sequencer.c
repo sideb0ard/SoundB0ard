@@ -96,6 +96,56 @@ synthdrum_sequencer *new_synthdrum_seq()
     return sds;
 }
 
+void synthdrum_randomize(synthdrum_sequencer *sds)
+{
+
+    sds->m_osc1.osc.m_waveform = rand() % MAX_OSC;
+    sds->m_osc1.osc.m_osc_fo = rand() % 140;
+    sds->osc1_amp = ((float)rand()) / RAND_MAX;
+    osc_update(&sds->m_osc1.osc);
+
+    sds->m_osc2.osc.m_waveform = rand() % MAX_OSC;
+    sds->m_osc2.osc.m_osc_fo = rand() % 140;
+    sds->osc2_amp = ((float)rand()) / RAND_MAX;
+    osc_update(&sds->m_osc2.osc);
+
+    eg_set_attack_time_msec(&sds->m_eg1, rand() % 100);
+    eg_set_decay_time_msec(&sds->m_eg1, rand() % 100);
+    eg_set_release_time_msec(&sds->m_eg1, rand() % 10);
+    eg_set_sustain_level(&sds->m_eg1, ((float)rand()) / RAND_MAX);
+    sds->eg1_sustain_ms = rand() % 200;
+    sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg1_sustain_ms;
+    sds->eg1_sustain_counter = 0;
+    sds->eg2_osc2_intensity = ((float)rand()) / RAND_MAX;
+
+    // osc2 pitch envelope
+    eg_set_attack_time_msec(&sds->m_eg2, rand() % 100);
+    eg_set_decay_time_msec(&sds->m_eg2, rand() % 100);
+    eg_set_release_time_msec(&sds->m_eg2, rand() % 100);
+    eg_set_sustain_level(&sds->m_eg2, ((float)rand()) / RAND_MAX);
+    sds->eg2_sustain_ms = rand() % 200;
+    sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg2_sustain_ms;
+    sds->eg2_sustain_counter = 0;
+    sds->eg2_osc2_intensity = ((float)rand()) / RAND_MAX;
+
+    // output amp envelope
+    eg_set_attack_time_msec(&sds->m_eg3, rand() % 100);
+    eg_set_decay_time_msec(&sds->m_eg3, rand() % 100);
+    eg_set_release_time_msec(&sds->m_eg3, rand() % 100);
+    eg_set_sustain_level(&sds->m_eg3, ((float)rand()) / RAND_MAX);
+    sds->eg3_sustain_ms = rand() % 200;
+    sds->eg3_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg3_sustain_ms;
+    sds->eg3_sustain_counter = 0;
+
+    sds->m_filter_type = rand() % NUM_FILTER_TYPES;
+    sds->m_filter_fc = rand() % 1800;
+    sds->m_filter_q = ((float)rand()) / RAND_MAX;
+
+    filter_set_type((filter *)&sds->m_filter, sds->m_filter_type);
+    filter_set_fc_control((filter *)&sds->m_filter, sds->m_filter_fc);
+    moog_set_qcontrol((filter *)&sds->m_filter, sds->m_filter_q);
+    sds->m_distortion_threshold = ((float)rand()) / RAND_MAX;
+}
 void sds_status(void *self, wchar_t *ss)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
