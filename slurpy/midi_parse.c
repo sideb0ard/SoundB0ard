@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <math.h>
 
 // MIDI file format into from:
 // http://valentin.dasdeck.com/midi/midifile.htm
@@ -43,23 +44,19 @@ int read_var_len_variable(FILE *fp, int *chunk_left)
 
     cur_byte = fgetc(fp);
     (*chunk_left)--;
-    //print_binary_string(cur_byte);
 
-    //printf("& %d\n", cur_byte & 0x80);
     if (!(cur_byte & 0x80))
-        return cur_byte;
+        return cur_byte & 0x7F;
 
-    value = cur_byte;
+    value = cur_byte & 0x7F;
     do
     {
         cur_byte = fgetc(fp);
         (*chunk_left)--;
         value = (value << 7) + (cur_byte & 0x7F);
-        printf("ONGOING BYTE IS %d\n", cur_byte);
-        print_binary_string(cur_byte);
     } while ( cur_byte & 0x80);
 
-    return 1;
+    return value;
 }
 
 void pack_int(char *from, char *dest, int len)
@@ -153,11 +150,11 @@ bool parse_midi_file(char *midifile)
     header_info h_info = parse_header_chunk(fp);
     printf("Format Type:%d Num MTrk Chunks:%d PPQN:%d\n", h_info.format_type, h_info.num_mtrk_chunks, h_info.ppqn);
 
+    double multiplier = 960. / h_info.ppqn;
     char chunk_header[8] = {0};
     chunk_info cur_chunk;
 
     for (int i = 0; i < h_info.num_mtrk_chunks; i++)
-    //for (int i = 0; i < 1; i++)
     {
         printf("\nCHUNK%d\n", i);
         size_t numread = fread(chunk_header, 1 /* byte */, 8 /* num x */, fp); // 4 bytes for type, 4 for size
@@ -169,20 +166,23 @@ bool parse_midi_file(char *midifile)
             printf("Skipping %lu bytes as chunk type is unknown\n", cur_chunk.len);
             fseek(fp, cur_chunk.len, SEEK_CUR);
         }
-        printf("Type: %s len:%lu\n\n", s_type_id_names[cur_chunk.type], cur_chunk.len);
+        printf("ChunkType: %s len:%lu\n\n", s_type_id_names[cur_chunk.type], cur_chunk.len);
 
         int delta_time = 0;
         int chunk_left = cur_chunk.len;
         unsigned char status_running = 0;
+        unsigned char cur_status = 0;
+        unsigned char cur_note = 0;
+        unsigned char cur_velocity = 0;
+        bool is_note_event;
         while (chunk_left > 0)
         {
+            is_note_event = false;
+
             // 1. get delta-time
             delta_time += read_var_len_variable(fp, &chunk_left);
-            printf("DELTA TIME:%d\n", delta_time);
 
             unsigned char cur_byte = 0;
-
-            // 2. get status
             cur_byte = fgetc(fp);
             chunk_left--;
 
@@ -191,12 +191,17 @@ bool parse_midi_file(char *midifile)
                 // Meta-event type
                 numread = fread(&cur_byte, 1, 1, fp);
                 chunk_left -= numread;
-                printf("META event! Type:%d %x\n", cur_byte, cur_byte);
 
                 int len = read_var_len_variable(fp, &chunk_left);
-                printf("Len is %d - skipping!\n", len);
                 chunk_left -= len;
                 fseek(fp, len, SEEK_CUR);
+
+                if (cur_byte == 0x2f)
+                {
+                    printf("META EVENT! END OF TRACK\n");
+                }
+                else
+                    printf("META event! Type:%d %x - (len: %d) skipping!\n", cur_byte, cur_byte, len);
 
                 // reset status_running;
                 status_running = 0;
@@ -205,9 +210,8 @@ bool parse_midi_file(char *midifile)
             else if ((cur_byte == 0xf0) || // sysex event
                      (cur_byte == 0xf7))
             {
-                printf("SYSEX event %d %x!\n", cur_byte, cur_byte);
                 int len = read_var_len_variable(fp, &chunk_left);
-                printf("Len is %d - No idea how to deal with SysEx - skipping!\n", len);
+                printf("SYSEX EVENT %d %x (len:%d) - skipping!\n", cur_byte, cur_byte, len);
                 chunk_left -= len;
                 fseek(fp, len, SEEK_CUR);
                 // reset status_running;
@@ -215,7 +219,6 @@ bool parse_midi_file(char *midifile)
             }
             else 
             {
-
                 unsigned char left_nib = (cur_byte | 0x0f) - 0x0f;
                 unsigned char right_nib = (cur_byte | 0xf0) - 0xf0;
 
@@ -227,7 +230,11 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&velocity, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("NOTE OFF on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+
+                    cur_note = key;
+                    cur_velocity = velocity;
+                    cur_status = 128;
+                    is_note_event = true;
                     status_running = cur_byte;
                 }
                 else if (left_nib == 0x90)
@@ -238,7 +245,11 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&velocity, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("NOTE On on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+
+                    cur_note = key;
+                    cur_velocity = velocity;
+                    cur_status = 144;
+                    is_note_event = true;
                     status_running = cur_byte;
                 }
                 else if (left_nib == 0xa0)
@@ -249,7 +260,7 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&val, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
+                    printf("MIDI Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
                     status_running = cur_byte;
                 }
                 else if (left_nib == 0xb0)
@@ -260,26 +271,22 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&val, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    printf("MIDI Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
                     status_running = cur_byte;
                 }
                 else if (left_nib == 0xc0)
                 {
-                    printf("Program Change: Channel :%d\n", right_nib);
                     numread = fread(&cur_byte, 1, 1, fp);
                     chunk_left -= numread;
-                    // discarded for the moment
-                    printf("Discarding data %d %x\n", cur_byte, cur_byte);
                     status_running = cur_byte;
+                    printf("MIDI Program Change: Channel :%d\n", right_nib);
                 }
                 else if (left_nib == 0xd0)
                 {
-                    printf("Channel PRessur:%d\n", right_nib);
                     numread = fread(&cur_byte, 1, 1, fp);
                     chunk_left -= numread;
-                    // discarded for the moment
-                    printf("Discarding data %d %x\n", cur_byte, cur_byte);
                     status_running = cur_byte;
+                    printf("MIDI Channel PRessur:%d\n", right_nib);
                 }
                 else if (left_nib == 0xe0)
                 {
@@ -289,11 +296,12 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&val, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    printf("MIDI Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    status_running = cur_byte;
                 }
                 else
                 {
-                    printf("USE RUNNING STATUS! %d %x\n", status_running, status_running);
+                    // no status byte seen, use STATUS RUNNING
                     left_nib = (status_running | 0x0f) - 0x0f;
                     right_nib = (status_running | 0xf0) - 0xf0;
 
@@ -303,7 +311,12 @@ bool parse_midi_file(char *midifile)
                         unsigned char velocity;
                         numread = fread(&velocity, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("NOTE OFF on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+                        // printf("MIDI NOTE OFF on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+                        cur_note = key;
+                        cur_velocity = velocity;
+                        cur_status = 128;
+                        is_note_event = true;
+
                     }
                     else if (left_nib == 0x90)
                     {
@@ -311,7 +324,17 @@ bool parse_midi_file(char *midifile)
                         unsigned char velocity;
                         numread = fread(&velocity, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("NOTE On on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+
+
+                        cur_note = key;
+                        cur_velocity = velocity;
+                        is_note_event = true;
+
+                        if (velocity == 0)
+                            cur_status = 128;
+                        else
+                            cur_status = 144;
+
                     }
                     else if (left_nib == 0xa0)
                     {
@@ -319,7 +342,7 @@ bool parse_midi_file(char *midifile)
                         unsigned char val; // pressure
                         numread = fread(&val, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
+                        printf("MID Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
                     }
                     else if (left_nib == 0xb0)
                     {
@@ -327,17 +350,15 @@ bool parse_midi_file(char *midifile)
                         unsigned char val;
                         numread = fread(&val, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                        printf("MIDI Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
                     }
                     else if (left_nib == 0xc0)
                     {
-                        printf("Program Change: Channel :%d\n", right_nib);
-                        printf("Discarding data %d %x\n", cur_byte, cur_byte);
+                        printf("MIDI Program Change: Channel :%d\n", right_nib);
                     }
                     else if (left_nib == 0xd0)
                     {
-                        printf("Channel PRessur:%d\n", right_nib);
-                        printf("Discarding data %d %x\n", cur_byte, cur_byte);
+                        printf("MIDI Channel PRessur:%d\n", right_nib);
                     }
                     else if (left_nib == 0xe0)
                     {
@@ -345,11 +366,16 @@ bool parse_midi_file(char *midifile)
                         unsigned char val;
                         numread = fread(&val, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                        printf("MIDI Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
                     }
                 }
             }
-            printf("\n");
+            if (is_note_event)
+            {
+                double delta = delta_time * multiplier;
+                int scaled_delta = (delta - floor(delta) > 0.5) ? ceil(delta) : floor(delta);
+                printf("%d::%d::%d::%d\n", scaled_delta, cur_status, cur_note, cur_velocity);
+            }
         }
 
         //fseek(fp, cur_chunk.len, SEEK_CUR);
