@@ -271,26 +271,11 @@ int synthbase_gennext(synthbase *base)
                 base->cur_melody_iteration--;
                 if (base->cur_melody_iteration == 0)
                 {
+                    minisynth_midi_note_off((minisynth *)base, 0, 0, true);
+
                     int next_melody =
                         (base->cur_melody + 1) % base->num_melodies;
-                    for (int i = 0; i < PPNS; i++)
-                    {
-                        if (base->melodies[base->cur_melody][i] != NULL)
-                        {
-                            midi_event *ev =
-                                base->melodies[base->cur_melody][i];
-                            // COPY all note off
-                            // events
-                            if (ev->event_type == 128)
-                            {
-                                midi_event *tmp =
-                                    new_midi_event(ev->tick, ev->event_type,
-                                                   ev->data1, ev->data2);
-                                tmp->delete_after_use = true;
-                                synthbase_add_event(base, next_melody, tmp);
-                            }
-                        }
-                    }
+
                     base->cur_melody = next_melody;
                     base->cur_melody_iteration =
                         base->melody_multiloop_count[base->cur_melody];
@@ -313,6 +298,7 @@ midi_event **synthbase_get_midi_loop(synthbase *self)
 
 int synthbase_add_event(synthbase *base, int melody_num, midi_event *ev)
 {
+    printf("ADDING EVENT!\n");
     int tick = ev->tick;
     while (base->melodies[melody_num][tick] != NULL)
     {
@@ -726,6 +712,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
     while (fgets(line, sizeof(line), fp))
     {
         printf("%s", line);
+        int max_tick = PPNS * base->num_melodies;
         int count = 0;
         int tick = 0;
         int status = 0;
@@ -738,11 +725,11 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
             {
             case 0:
                 tick = atoi(item);
-                if (tick >= PPNS)
+                if (tick >= max_tick)
                 {
                     printf("TICK OVER!: %d\n", tick);
                     synthbase_add_melody(base);
-                    // tick = tick % PPNS;
+                    tick = tick % PPNS;
                 }
                 break;
             case 1:

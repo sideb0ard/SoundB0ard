@@ -605,7 +605,8 @@ double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
     double cur_range = cur_max - cur_min;
     if (cur_range == 0)
         return_val = new_min;
-    else {
+    else
+    {
         double new_range = new_max - new_min;
         return_val = (((cur_val - cur_min) * new_range) / cur_range) + new_min;
     }

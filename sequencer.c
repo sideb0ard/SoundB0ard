@@ -349,9 +349,12 @@ void next_euclidean_generation(sequencer *s, int pattern_num)
     memset(&s->patterns[pattern_num], 0, PPBAR * sizeof(int));
     int rand_steps = (rand() % 9) + 1;
     int bitpattern = create_euclidean_rhythm(rand_steps, s->pattern_len);
-    if (rand() % 2 == 1)
+    if (rand() % 2)
         bitpattern =
             shift_bits_to_leftmost_position(bitpattern, s->pattern_len);
+    if (rand() % 2) // mask first half
+        bitpattern = (bitpattern | 65280) - 65280;
+
     convert_bitshift_pattern_to_pattern(
         bitpattern, (int *)&s->patterns[pattern_num], PPBAR, s->gridsteps);
 }

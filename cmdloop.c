@@ -586,9 +586,7 @@ void interpret(char *line)
                         printf("Saving SYNTHDRUM patch..\n");
                         synthdrum_save_patch(sds, wurds[3]);
                     }
-                    else if (strncmp("open", wurds[2], 4) == 0 ||
-                             strncmp("import", wurds[2], 6) == 0 ||
-                             strncmp("load", wurds[2], 4) == 0)
+                    else if (strncmp("open", wurds[2], 4) == 0)
                     {
                         printf("Opening SYNTHDRUM "
                                "patches.. \n");
@@ -648,7 +646,6 @@ void interpret(char *line)
                         mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("load", wurds[2], 4) == 0 ||
-                             strncmp("open", wurds[2], 4) == 0 ||
                              strncmp("import", wurds[2], 6) == 0)
                     {
                         if (is_valid_file(wurds[3]))
@@ -660,6 +657,8 @@ void interpret(char *line)
                                     mixr->sound_generators[soundgen_num];
                             sample_seq_import_file(s, wurds[3]);
                         }
+                        else
+                            printf("%s is not a valid file\n", wurds[3]);
                     }
                     else
                     {

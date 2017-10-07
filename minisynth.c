@@ -506,6 +506,7 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
             if (ms->m_voices[i])
                 voice_note_off(&ms->m_voices[i]->m_voice, midinote);
         }
+        return true;
     }
 
     for (int i = 0; i < MAX_VOICES; i++)
@@ -628,7 +629,8 @@ void minisynth_status(void *self, wchar_t *status_string)
 
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d bytebeat:%d\n"
+        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d "
+        L"bytebeat:%d\n"
         "      [lfo1]\n"
         "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f "
         "lfo1amp:%.2f\n"
@@ -655,8 +657,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         // VOICE + GENERAL
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
         s_voice_names[ms->m_settings.m_voice_mode], ms->m_settings.m_voice_mode,
-        MAX_VOICE_CHOICE - 1,
-        ms->m_settings.m_monophonic,
+        MAX_VOICE_CHOICE - 1, ms->m_settings.m_monophonic,
         ms->m_settings.m_bytebeat_active,
 
         // LFO1
@@ -859,12 +860,12 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_fc_control =
         ((float)rand()) / RAND_MAX * (FILTER_FC_MAX - FILTER_FC_MIN) +
         FILTER_FC_MIN;
-    ms->m_settings.m_q_control = rand() % 10;
+    ms->m_settings.m_q_control = (rand() % 9) + 1;
 
     ms->m_settings.m_attack_time_msec = (rand() % 700) + 5;
     ms->m_settings.m_decay_time_msec = (rand() % 700) + 5;
     ms->m_settings.m_release_time_msec = (rand() % 600) + 5;
-    ms->m_settings.m_pulse_width_pct = rand() % 100;
+    ms->m_settings.m_pulse_width_pct = (rand() % 99) + 1;
 
     ms->m_settings.m_delay_ratio =
         (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
@@ -876,7 +877,7 @@ void minisynth_rand_settings(minisynth *ms)
     // ms->m_settings.m_sustain_level = ((float)rand()) / RAND_MAX;
     ms->m_settings.m_octave = rand() % 3 + 1;
 
-    ms->m_settings.m_portamento_time_msec = rand() % 400;
+    ms->m_settings.m_portamento_time_msec = rand() % 5000;
 
     ms->m_settings.m_sub_osc_db = -1.0 * (rand() % 96);
     // ms->m_settings.m_eg1_osc_intensity =
@@ -891,7 +892,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_reset_to_zero = rand() % 2;
     ms->m_settings.m_filter_keytrack = rand() % 2;
     ms->m_settings.m_filter_keytrack_intensity =
-        (((float)rand() / (float)(RAND_MAX)) * 10) + 0.51;
+        (((float)rand() / (float)(RAND_MAX)) * 9) + 0.51;
     ms->m_settings.m_velocity_to_attack_scaling = rand() % 2;
     ms->m_settings.m_note_number_to_decay_scaling = rand() % 2;
     ms->m_settings.m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
