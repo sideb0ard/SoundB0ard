@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include "audioutils.h"
+#include "utils.h"
 
 void pa_setup(void)
 {
@@ -55,7 +56,8 @@ chord_midi_notes get_midi_notes_from_char_chord(const char *chord)
         chnotes.third = 18; // Gm
         chnotes.fifth = 21; // B
     }
-    else if (strncmp(chord, "E_MINOR", 7) == 0)
+    else if (strncmp(chord, "E_MINOR", 7) == 0 ||
+             strncmp(chord, "E_FLAT_MAJOR", 12) == 0)
     {
         chnotes.root = 16;  // E
         chnotes.third = 19; // G
@@ -85,7 +87,8 @@ chord_midi_notes get_midi_notes_from_char_chord(const char *chord)
         chnotes.third = 23; // B
         chnotes.fifth = 26; // D
     }
-    else if (strncmp(chord, "A_MINOR", 7) == 0)
+    else if (strncmp(chord, "A_MINOR", 7) == 0 ||
+             strncmp(chord, "A_FLAT_MAJOR", 12) == 0)
     {
         chnotes.root = 12;  // C
         chnotes.third = 16; // E
@@ -109,6 +112,22 @@ chord_midi_notes get_midi_notes_from_char_chord(const char *chord)
         chnotes.third = 15; // Em
         chnotes.fifth = 18; // Gm
     }
+    else
+        printf("COULDN't FIND NOTES FOR %s\n", chord);
 
     return chnotes;
+}
+
+void get_chord_compat_keys(int keynum, int vals[4])
+{
+    vals[0] = keynum;
+    for (int i = 1; i < 4; i++)
+    {
+        int randy = rand() % 6;
+        while (is_int_member_in_array(randy, vals, 4))
+        {
+            randy = rand() % 6;
+        }
+        vals[i] = randy;
+    }
 }

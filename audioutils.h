@@ -19,3 +19,5 @@ typedef struct chord_midi_notes
 } chord_midi_notes;
 
 chord_midi_notes get_midi_notes_from_char_chord(const char *chord);
+
+void get_chord_compat_keys(int keynum, int vals[4]);
