@@ -59,41 +59,52 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
         printf("Not a valid melody number\n");
         return;
     }
+
     synthbase_reset_melody(base, melody_num);
 
     if (max_notes == 0)
-        max_notes = 4;
+        max_notes = 5;
     if (max_steps == 0)
         max_steps = 9;
 
-    printf("KEY IS %s\n", key_names[mixr->key]);
-
-    int keyz[4] = {0};
-    get_chord_compat_keys(mixr->key, keyz);
-
-    int rand_steps = (rand() % max_steps) + 1;
-    int bitpattern = create_euclidean_rhythm(rand_steps, 32);
-    if (rand() % 2 == 1)
-        bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-
-    // printf("Pattern is %d\n", bitpattern);
-    for (int i = 31; i >= 0; i--)
+    // printf("MAX NOTES %d MAX STEPS: %d\n", max_notes, max_steps);
+    int rand_num_notes = (rand() % max_notes);
+    if (rand_num_notes == 0)
+        rand_num_notes = 1;
+    int generated_melody_note_num[NUM_COMPAT_NOTES];
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+        generated_melody_note_num[i] = -99;
+    int generated_melody_note_num_idx = 0;
+    while (generated_melody_note_num_idx < rand_num_notes)
     {
-        if (bitpattern & 1 << i)
+        int randy = rand() % (NUM_COMPAT_NOTES);
+        if (!is_int_member_in_array(randy, generated_melody_note_num,
+                                    NUM_COMPAT_NOTES))
         {
-            int randkey = keyz[rand() % 4];
+            generated_melody_note_num[generated_melody_note_num_idx++] = randy;
+        }
+    }
 
-            printf("Adding randkye %s %d\n",
-                   key_names[compat_keys[mixr->key][randkey]],
-                   compat_keys[mixr->key][randkey]);
-            chord_midi_notes chnotes = {0, 0, 0};
-            chnotes = get_midi_notes_from_char_chord(
-                key_names[compat_keys[mixr->key][randkey]]);
-            printf("CHNOTES %d %d %d\n", chnotes.root, chnotes.third,
-                   chnotes.fifth);
-            synthbase_add_note(base, melody_num, 31 - i, chnotes.root);
-            synthbase_add_note(base, melody_num, 31 - i, chnotes.third);
-            synthbase_add_note(base, melody_num, 31 - i, chnotes.fifth);
+    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+    {
+        if (generated_melody_note_num[i] != -99)
+        {
+            int idx = generated_melody_note_num[i];
+
+            int rand_steps = (rand() % max_steps) + 1;
+            int bitpattern = create_euclidean_rhythm(rand_steps, 32);
+            if (rand() % 2 == 1)
+                bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
+
+            for (int i = 31; i >= 0; i--)
+            {
+                if (bitpattern & 1 << i)
+                {
+                    synthbase_add_note(
+                        base, melody_num, 31 - i,
+                        key_midi_mapping[compat_keys[mixr->key][idx]]); // THIS!
+                }
+            }
         }
     }
 }
@@ -282,7 +293,6 @@ midi_event **synthbase_get_midi_loop(synthbase *self)
 
 int synthbase_add_event(synthbase *base, int melody_num, midi_event *ev)
 {
-    printf("ADDING EVENT!\n");
     int tick = ev->tick;
     while (base->melodies[melody_num][tick] != NULL)
     {

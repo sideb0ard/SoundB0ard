@@ -18,14 +18,11 @@ lfo *lfo_new()
     osc_new_settings(&l->osc);
     lfo_set_soundgenerator_interface(l);
 
-    l->osc.m_fo = DEFAULT_LFO_RATE;
-
     return l;
 }
 
 void lfo_set_soundgenerator_interface(lfo *l)
 {
-    l->osc.do_oscillate = &lfo_do_oscillate;
     l->osc.do_oscillate = &lfo_do_oscillate;
     l->osc.start_oscillator = &lfo_start_oscillator;
     l->osc.stop_oscillator = &lfo_stop_oscillator;
@@ -33,6 +30,8 @@ void lfo_set_soundgenerator_interface(lfo *l)
     l->osc.update_oscillator = &osc_update; // base clase impl
 
     l->osc.m_lfo_mode = LFOSYNC;
+    l->osc.m_fo = DEFAULT_LFO_RATE;
+    l->osc.m_osc_fo = DEFAULT_LFO_RATE;
 }
 
 double lfo_do_oscillate(oscillator *self, double *quad_phase_output)

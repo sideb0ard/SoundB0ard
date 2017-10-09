@@ -1851,10 +1851,26 @@ void interpret(char *line)
                     double val = atof(wurds[4]);
                     if (strncmp("freq", wurds[3], 4) == 0)
                         filter_set_fc_control(&fp->m_filter.f, val);
-                    if (strncmp("q", wurds[3], 4) == 0)
+                    else if (strncmp("q", wurds[3], 4) == 0)
                         moog_set_qcontrol(&fp->m_filter.f, val);
                     else if (strncmp("type", wurds[3], 4) == 0)
                         filter_set_type(&fp->m_filter.f, val);
+                    else if (strncmp("lfo1_active", wurds[3], 11) == 0)
+                        filterpass_set_lfo_active(fp, 1, val);
+                    else if (strncmp("lfo1_type", wurds[3], 9) == 0)
+                        filterpass_set_lfo_type(fp, 1, val);
+                    else if (strncmp("lfo1_amp", wurds[3], 9) == 0)
+                        filterpass_set_lfo_amp(fp, 1, val);
+                    else if (strncmp("lfo1_rate", wurds[3], 9) == 0)
+                        filterpass_set_lfo_rate(fp, 1, val);
+                    else if (strncmp("lfo2_active", wurds[3], 11) == 0)
+                        filterpass_set_lfo_active(fp, 2, val);
+                    else if (strncmp("lfo2_type", wurds[3], 9) == 0)
+                        filterpass_set_lfo_type(fp, 2, val);
+                    else if (strncmp("lfo2_amp", wurds[3], 9) == 0)
+                        filterpass_set_lfo_amp(fp, 2, val);
+                    else if (strncmp("lfo2_rate", wurds[3], 9) == 0)
+                        filterpass_set_lfo_rate(fp, 2, val);
                 }
                 else if (f->type == BEATREPEAT)
                 {

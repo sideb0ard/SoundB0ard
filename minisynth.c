@@ -809,6 +809,7 @@ void minisynth_rand_settings(minisynth *ms)
 {
     printf("Randomizing SYNTH!\n");
 
+    strncpy(ms->m_settings.m_settings_name, "-- random UNSAVED--", 256);
     ms->m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
     ms->m_settings.m_monophonic = rand() % 2;
 
