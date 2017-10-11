@@ -11,12 +11,12 @@ void arpeggiator_init(arpeggiator *arp)
 {
     arp->active = false;
     arp->latch = true;
-    arp->single_note_repeat = false;
+    arp->single_note_repeat = true;
     arp->cur_octave = 0;
     arp->octave_range = 1;
     arp->mode = UP;
     arp->direction = UP;
-    arp->rate = ASIXTEENTH;
+    arp->rate = AQUARTER;
     arp->cur_step = ROOT;
 }
 
@@ -32,20 +32,20 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
     {
         if (arp->single_note_repeat)
         {
-            note = ms->m_last_midi_note;
+            note = ms->m_last_midi_notes[MAX_VOICES - 1];
         }
         else
         {
             switch (arp->cur_step)
             {
             case (ROOT):
-                note = ms->m_last_midi_note;
+                note = ms->m_last_midi_notes[MAX_VOICES - 1];
                 break;
             case (THIRD):
-                note = ms->m_last_midi_note + 4;
+                note = ms->m_last_midi_notes[MAX_VOICES - 1] + 4;
                 break;
             case (FIFTH):
-                note = ms->m_last_midi_note + 7;
+                note = ms->m_last_midi_notes[MAX_VOICES - 1] + 7;
                 break;
             }
         }

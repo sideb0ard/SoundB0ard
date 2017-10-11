@@ -674,7 +674,7 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
         minisynth *ms = (minisynth *)sg;
         if (update_last_midi)
         {
-            ms->m_last_midi_note = note;
+            minisynth_add_last_note(ms, note);
         }
         minisynth_midi_note_on(ms, note, velocity);
     }

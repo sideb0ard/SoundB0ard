@@ -67,6 +67,7 @@ typedef struct sequencer
     int shuffle_every_n_loops;
 
     bool bitwise_on;
+    int bitwise_counter;
     unsigned int bitwise_mode;
     int bitwise_generation;
     int bitwise_every_n_loops;

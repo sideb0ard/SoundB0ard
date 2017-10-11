@@ -195,9 +195,12 @@ void synthbase_melody_to_string(synthbase *base, int melody_num,
 // sound generator interface //////////////
 void synthbase_status(synthbase *base, wchar_t *status_string)
 {
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             L"\n      Multi: %s, CurMelody:%d",
-             base->multi_melody_mode ? "true" : "false", base->cur_melody);
+    swprintf(status_string, MAX_PS_STRING_SZ, L"\n      Multi: %s, "
+                                              L"CurMelody:%d generate:%d "
+                                              L"gen_gen:%d gen_every_n:%d",
+             base->multi_melody_mode ? "true" : "false", base->cur_melody,
+             base->generate_mode, base->generate_generation,
+             base->generate_every_n_loops);
 
     for (int i = 0; i < base->num_melodies; i++)
     {

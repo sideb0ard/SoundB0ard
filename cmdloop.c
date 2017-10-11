@@ -1225,7 +1225,7 @@ void interpret(char *line)
                             if (num_gens > 0)
                             {
                                 synthbase_set_generate_mode(base, true);
-                                base->morph_every_n_loops = num_gens;
+                                base->generate_every_n_loops = num_gens;
                             }
                             else
                             {
@@ -1246,6 +1246,11 @@ void interpret(char *line)
                                        "number for "
                                        "'for'\n");
                             }
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0)
+                        {
+                            printf("Disabling generate mode\n");
+                            synthbase_set_generate_mode(base, false);
                         }
                         else
                         {
@@ -2313,9 +2318,16 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                 printf("Need a number for 'for'\n");
             }
         }
+        else if (strncmp("mode", wurds[3], 4) == 0)
+        {
+            int bitwise_mode = atoi(wurds[4]);
+            printf("Setting bitwise mode! %d\n", bitwise_mode);
+            if (bitwise_mode > 0)
+                seq_set_bitwise_mode(seq, bitwise_mode);
+        }
         else
         {
-            seq_set_bitwise(seq, 1 - seq->game_of_life_on);
+            seq_set_bitwise(seq, 1 - seq->bitwise_on);
         }
     }
     else if (strncmp("generate", wurds[2], 8) == 0)

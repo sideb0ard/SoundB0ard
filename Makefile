@@ -67,11 +67,11 @@ OBJ = \
 	wt_oscillator.o \
 	waveshaper.o
 
-LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile
+LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
 
 INCDIR=/usr/local/include
 LIBDIR=/usr/local/lib
-CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -I$(INCDIR)
+CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -pg -I$(INCDIR)
 
 %.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)

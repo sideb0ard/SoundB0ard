@@ -142,22 +142,26 @@ void char_binary_version_of_int(int num, char bin_num[17])
 
 bool seq_pattern_sixteenth_has_hit();
 
-unsigned int gimme_a_bitwise_int(int bit_pattern_enum, int t)
+unsigned short gimme_a_bitwise_int(int bit_pattern_enum, int t)
 {
-    // unsigned int result;
-    char result;
+    unsigned short result = 0;
     switch (bit_pattern_enum)
     {
     case 0:
-        result = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
+        result = ((t >> 4 & t) | (t >> 8 | t % 7));
+        break;
     case 1:
         result = (t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6);
+        break;
     case 2:
         result = (t * (t >> 5 | t >> 8)) >> (t >> 16);
+        break;
     case 3:
         result = (t * (t >> 3 | t >> 4)) >> (t >> 7);
+        break;
     case 4:
         result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
+        break;
     default:
         result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
     }

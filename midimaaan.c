@@ -382,7 +382,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (144):
         { // Hex 0x80
-            ms->m_last_midi_note = ev->data1;
+            minisynth_add_last_note(ms, ev->data1);
             minisynth_midi_note_on(ms, ev->data1, ev->data2);
             break;
         }
@@ -428,8 +428,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     if (ev->delete_after_use)
     {
         base->melodies[base->cur_melody][ev->tick] = NULL;
-        if (mixr->debug_mode)
-            printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
+        // if (mixr->debug_mode)
+        printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
         free(ev);
     }
 }

@@ -151,7 +151,7 @@ typedef struct minisynth
     synthsettings m_settings;
     synthsettings m_settings_backup_while_getting_crazy;
 
-    int m_last_midi_note;
+    int m_last_midi_notes[MAX_VOICES];
     arpeggiator m_arp;
 
     bytebeat bytr;
@@ -280,3 +280,4 @@ void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
 void minisynth_set_monophonic(minisynth *ms, bool b);
 void minisynth_set_bytebeat(minisynth *ms, bool b);
+void minisynth_add_last_note(minisynth *ms, unsigned int val);

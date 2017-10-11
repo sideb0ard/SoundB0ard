@@ -139,9 +139,10 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_sustain_time_ms = 400;
     ms->m_settings.m_sustain_time_sixteenth = 4;
 
-    ms->m_last_midi_note = 0;
     for (int i = 0; i < MAX_VOICES; i++)
     {
+        ms->m_last_midi_notes[i] = 0;
+
         ms->m_voices[i] = new_minisynth_voice();
         if (!ms->m_voices[i])
             return NULL; // would be bad
@@ -451,6 +452,9 @@ void minisynth_midi_control(minisynth *self, unsigned int data1,
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
                             unsigned int velocity)
 {
+    printf("PLAYING NOTE%d (Last notes:%d %d %d)\n", midinote,
+           ms->m_last_midi_notes[0], ms->m_last_midi_notes[1],
+           ms->m_last_midi_notes[2]);
     if (ms->m_settings.m_monophonic)
     {
         minisynth_voice *msv = ms->m_voices[0];
@@ -479,8 +483,8 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
 
     if (steal_note)
     {
-        if (mixr->debug_mode)
-            printf("STEAL NOTE\n");
+        // if (mixr->debug_mode)
+        printf("STEAL NOTE\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(ms);
         if (msv)
         {
@@ -630,7 +634,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d "
-        L"bytebeat:%d\n"
+        L"bytebeat:%d last_midi_notes:%d %d %d\n"
         "      [lfo1]\n"
         "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f "
         "lfo1amp:%.2f\n"
@@ -652,13 +656,15 @@ void minisynth_status(void *self, wchar_t *status_string)
         "      eg1_filter_enabled:%d eg1_filter_intensity%.2f\n"
         "      eg1_dca_enabled:%d eg1_dca_intensity%.2f\n"
         "      [filter]\n"
-        "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n",
+        "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n"
+        "      [arp] arp:%d arprepeat:%d arpmode:%d[0-3] arprate:%d[0-3]",
 
         // VOICE + GENERAL
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
         s_voice_names[ms->m_settings.m_voice_mode], ms->m_settings.m_voice_mode,
         MAX_VOICE_CHOICE - 1, ms->m_settings.m_monophonic,
-        ms->m_settings.m_bytebeat_active,
+        ms->m_settings.m_bytebeat_active, ms->m_last_midi_notes[0],
+        ms->m_last_midi_notes[1], ms->m_last_midi_notes[2],
 
         // LFO1
         s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
@@ -697,7 +703,13 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         // FILTER1
         s_filter_type_names[ms->m_settings.m_filter_type],
-        ms->m_settings.m_fc_control, ms->m_settings.m_q_control);
+        ms->m_settings.m_fc_control, ms->m_settings.m_q_control,
+
+        // ARP
+        ms->m_arp.active, ms->m_arp.single_note_repeat, ms->m_arp.mode,
+        ms->m_arp.rate
+
+        );
 
     wchar_t scratch[1024];
     synthbase_status(&ms->base, scratch);
@@ -2317,4 +2329,11 @@ void minisynth_set_monophonic(minisynth *ms, bool b)
 void minisynth_set_bytebeat(minisynth *ms, bool b)
 {
     ms->m_settings.m_bytebeat_active = b;
+}
+
+void minisynth_add_last_note(minisynth *ms, unsigned int val)
+{
+    for (int i = 1; i < MAX_VOICES; i++)
+        ms->m_last_midi_notes[i - 1] = ms->m_last_midi_notes[i];
+    ms->m_last_midi_notes[MAX_VOICES - 1] = val;
 }

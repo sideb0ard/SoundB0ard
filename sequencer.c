@@ -70,6 +70,7 @@ void seq_init(sequencer *seq)
     seq->bitwise_on = false;
     seq->bitwise_mode = 0;
     seq->bitwise_generation = 0;
+    seq->bitwise_counter = 1044;
     seq->bitwise_every_n_loops = 0;
 
     seq->sloppiness = 0;
@@ -216,37 +217,52 @@ bool seq_tick(sequencer *seq)
                 }
                 seq->markov_generation++;
             }
-            // else if (seq->bitwise_on) {
-            //    if (seq->bitwise_every_n_loops > 0) {
-            //        if (seq->bitwise_generation %
-            //        seq->bitwise_every_n_loops
-            //        ==
-            //            0) {
-            //            seq_set_backup_mode(seq, true);
-            //            int new_pattern =
-            //            gimme_a_bitwise_int(seq->bitwise_mode,
-            //                                                  mixr->cur_sample);
-            //            seq->patterns[seq->cur_pattern] = new_pattern;
-            //        }
-            //        else {
-            //            seq_set_backup_mode(seq, false);
-            //        }
-            //    }
-            //    else if (seq->max_generation > 0) {
-            //        if (seq->bitwise_generation >=
-            //        seq->max_generation) {
-            //            seq->bitwise_generation = 0;
-            //            seq_set_bitwise(seq, false);
-            //        }
-            //    }
-            //    else {
-            //        int new_pattern =
-            //        gimme_a_bitwise_int(seq->bitwise_mode,
-            //                                              mixr->cur_sample);
-            //        seq->patterns[seq->cur_pattern] = new_pattern;
-            //    }
-            //    seq->bitwise_generation++;
-            //}
+            else if (seq->bitwise_on)
+            {
+                bool gen_new_pattern = false;
+                if (seq->bitwise_every_n_loops > 0)
+                {
+                    if (seq->bitwise_generation % seq->bitwise_every_n_loops ==
+                        0)
+                    {
+                        seq_set_backup_mode(seq, true);
+                        gen_new_pattern = true;
+                    }
+                    else
+                    {
+                        seq_set_backup_mode(seq, false);
+                    }
+                }
+                else if (seq->max_generation > 0 &&
+                         seq->bitwise_generation > seq->max_generation)
+                {
+                    seq->bitwise_generation = 0;
+                    seq_set_bitwise(seq, false);
+                }
+                else
+                {
+                    gen_new_pattern = true;
+                }
+
+                if (gen_new_pattern)
+                {
+                    int bit_pattern = gimme_a_bitwise_int(seq->bitwise_mode,
+                                                          seq->bitwise_counter);
+
+                    // char blah[17] = {0};
+                    // char_binary_version_of_int(bit_pattern, blah);
+                    // printf("BITWIZER! got %s\n", blah);
+
+                    memset(&seq->patterns[seq->cur_pattern], 0,
+                           PPBAR * sizeof(int));
+                    convert_bitshift_pattern_to_pattern(
+                        bit_pattern, (int *)&seq->patterns[seq->cur_pattern],
+                        PPBAR, seq->gridsteps);
+
+                    seq->bitwise_counter++;
+                }
+                seq->bitwise_generation++;
+            }
             if (seq->randamp_on)
             {
                 if (seq->randamp_every_n_loops > 0)
@@ -811,15 +827,16 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         L"\n      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d "
         "markov: %d markov_mode: %s(%d) Markov_Every_n: %d Multi: %d Max Gen: "
-        "%d"
-        L"\n      Bitwise: %d Bitwise_every_n: %d Euclidean: %d Euclid_n: %d"
+        "%d\n      Bitwise: %d Bitwise mode:%d Bitwise_every_n: %d Euclidean: "
+        "%d Euclid_n: %d"
         "sloppy: %d shuffle_on: %d shuffle_every_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
         seq->pattern_len, seq->markov_on, s_markov_mode[seq->markov_mode],
         seq->markov_mode, seq->markov_every_n_loops, seq->multi_pattern_mode,
-        seq->max_generation, seq->bitwise_on, seq->bitwise_every_n_loops,
-        seq->euclidean_on, seq->euclidean_every_n_loops, seq->sloppiness,
-        seq->shuffle_on, seq->shuffle_every_n_loops);
+        seq->max_generation, seq->bitwise_on, seq->bitwise_mode,
+        seq->bitwise_every_n_loops, seq->euclidean_on,
+        seq->euclidean_every_n_loops, seq->sloppiness, seq->shuffle_on,
+        seq->shuffle_every_n_loops);
     wchar_t pattern_details[128];
     char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];
@@ -994,6 +1011,7 @@ void seq_set_markov_mode(sequencer *s, unsigned int mode)
 
 void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
 {
+    printf("Setting BITWISE mode\n");
     s->bitwise_mode = mode;
 }
 
