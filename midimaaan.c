@@ -428,8 +428,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     if (ev->delete_after_use)
     {
         base->melodies[base->cur_melody][ev->tick] = NULL;
-        // if (mixr->debug_mode)
-        printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
+        if (mixr->debug_mode)
+            printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
         free(ev);
     }
 }

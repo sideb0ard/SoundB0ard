@@ -71,7 +71,7 @@ LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
 
 INCDIR=/usr/local/include
 LIBDIR=/usr/local/lib
-CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -pg -I$(INCDIR)
+CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -pg -I$(INCDIR) -O3
 
 %.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)

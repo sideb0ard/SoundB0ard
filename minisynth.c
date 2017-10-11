@@ -452,9 +452,9 @@ void minisynth_midi_control(minisynth *self, unsigned int data1,
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
                             unsigned int velocity)
 {
-    printf("PLAYING NOTE%d (Last notes:%d %d %d)\n", midinote,
-           ms->m_last_midi_notes[0], ms->m_last_midi_notes[1],
-           ms->m_last_midi_notes[2]);
+    // printf("PLAYING NOTE%d (Last notes:%d %d %d)\n", midinote,
+    //       ms->m_last_midi_notes[0], ms->m_last_midi_notes[1],
+    //       ms->m_last_midi_notes[2]);
     if (ms->m_settings.m_monophonic)
     {
         minisynth_voice *msv = ms->m_voices[0];
@@ -483,8 +483,8 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
 
     if (steal_note)
     {
-        // if (mixr->debug_mode)
-        printf("STEAL NOTE\n");
+        if (mixr->debug_mode)
+            printf("STEAL NOTE\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(ms);
         if (msv)
         {
