@@ -43,11 +43,11 @@ looper *new_looper(char *filename, double loop_len)
     return l;
 }
 
-double looper_gennext(void *self)
+stereo_val looper_gennext(void *self)
 // void looper_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
     looper *l = (looper *)self;
-    double val = 0;
+    stereo_val val = {0, 0};
 
     if (!l->sound_generator.active)
         return val;
@@ -180,16 +180,24 @@ double looper_gennext(void *self)
         int len16th = l->scramblrrr->resampled_file_size / 16;
         int stutidx = (l->samples[l->cur_sample]->position % len16th) +
                       l->stutter_current_16th * len16th;
-        val = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
+        val.left = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
+        val.right = l->samples[l->cur_sample]->resampled_file_bytes[stutidx];
     }
     else if (l->scramblrrr_active)
     {
-        val = l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
+        val.left =
+            l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
+        val.right =
+            l->scramblrrr->resampled_file_bytes[l->scramblrrr->position++];
     }
     else
     {
-        val = l->samples[l->cur_sample]
-                  ->resampled_file_bytes[l->samples[l->cur_sample]->position];
+        val.left =
+            l->samples[l->cur_sample]
+                ->resampled_file_bytes[l->samples[l->cur_sample]->position];
+        val.right =
+            l->samples[l->cur_sample]
+                ->resampled_file_bytes[l->samples[l->cur_sample]->position];
     }
 
     if (l->scramblrrr->position == l->scramblrrr->resampled_file_size)
@@ -207,10 +215,14 @@ double looper_gennext(void *self)
     // if (val > 1 || val < -1)
     //    printf("BURNIE - looper OVERLOAD!\n");
 
-    val = effector(&l->sound_generator, val);
-    val = envelopor(&l->sound_generator, val);
+    double scratch = 0;
+    scratch = effector(&l->sound_generator, val.left);
+    scratch = envelopor(&l->sound_generator, val.left);
 
-    return val * l->vol;
+    val.left = scratch * l->vol;
+    val.right = scratch * l->vol;
+
+    return val;
 }
 
 void looper_add_sample(looper *s, char *filename, int loop_len)

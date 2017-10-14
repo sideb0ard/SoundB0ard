@@ -30,7 +30,7 @@ typedef struct spork
 } spork;
 
 spork *new_spork(double freq);
-double spork_gennext(void *sg);
+stereo_val spork_gennext(void *sg);
 
 void spork_status(void *self, wchar_t *ss);
 double spork_getvol(void *self);

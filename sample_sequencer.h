@@ -70,7 +70,7 @@ void sample_seq_status(void *self, wchar_t *ss);
 void sample_seq_setvol(void *self, double v);
 void sample_start(void *self);
 void sample_stop(void *self);
-double sample_seq_gennext(void *self);
+stereo_val sample_seq_gennext(void *self);
 double sample_seq_getvol(void *self);
 
 void sample_seq_import_file(sample_sequencer *s, char *filename);

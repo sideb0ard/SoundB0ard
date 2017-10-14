@@ -3,6 +3,7 @@
 
 #include <portaudio.h>
 
+#include "defjams.h"
 #include "fx.h"
 #include "minisynth.h"
 #include "sbmsg.h"
@@ -44,7 +45,8 @@ typedef struct mixer
     int soundgen_num;  // actual number of SGs
     int soundgen_size; // number of memory slots reserved for SGszz
 
-    double soundgen_cur_val[MAX_NUM_soundgenerator]; // cache for current val,
+    stereo_val
+        soundgen_cur_val[MAX_NUM_soundgenerator]; // cache for current val,
     // currently used for sidechain
     // compressor TODO there are no
     // checks for this num

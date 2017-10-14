@@ -72,7 +72,7 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool val)
     cm->take_action = val;
 }
 
-double chaosmonkey_gen_next(void *self)
+stereo_val chaosmonkey_gen_next(void *self)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
     (void)cm;
@@ -125,7 +125,7 @@ double chaosmonkey_gen_next(void *self)
     //    }
     //}
 
-    return 0.0;
+    return (stereo_val){0, 0};
 }
 
 void chaosmonkey_status(void *self, wchar_t *status_string)

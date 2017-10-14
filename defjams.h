@@ -137,3 +137,9 @@ typedef enum {
     MIDISYNTHDRUM,
     MIDILOOPER
 } midi_control_type;
+
+typedef struct stereo_val
+{
+    double left;
+    double right;
+} stereo_val;

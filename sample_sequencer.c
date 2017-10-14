@@ -72,13 +72,13 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
     }
 }
 
-double sample_seq_gennext(void *self)
+stereo_val sample_seq_gennext(void *self)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     double val = 0;
 
     if (!seq->sound_generator.active)
-        return val;
+        return (stereo_val){0, 0};
 
     int idx = mixr->midi_tick % PPBAR;
 
@@ -91,7 +91,7 @@ double sample_seq_gennext(void *self)
         }
         else
         {
-            return val;
+            return (stereo_val){0, 0};
         }
     }
 
@@ -142,10 +142,13 @@ double sample_seq_gennext(void *self)
     stereo_delay_set_delay_ratio(&seq->m_delay_fx, seq->m_delay_ratio);
     stereo_delay_set_wet_mix(&seq->m_delay_fx, seq->m_wet_mix);
     stereo_delay_update(&seq->m_delay_fx);
-    double out = 0.0;
-    stereo_delay_process_audio(&seq->m_delay_fx, &val, &val, &out, &out);
+    double out_left = 0.0;
+    double out_right = 0.0;
+    stereo_delay_process_audio(&seq->m_delay_fx, &val, &val, &out_left,
+                               &out_right);
 
-    return out * seq->vol;
+    return (stereo_val){.left = out_left * seq->vol,
+                        .right = out_right * seq->vol};
 }
 
 sample_sequencer *new_sample_seq_from_char_pattern(char *filename,

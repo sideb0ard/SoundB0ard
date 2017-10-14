@@ -197,17 +197,17 @@ void sds_setvol(void *self, double v)
     return;
 }
 
-double sds_gennext(void *self)
+stereo_val sds_gennext(void *self)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
-    double val = 0.0;
+    stereo_val out = {0, 0};
 
     // POSITIONAL
     int idx = mixr->midi_tick % PPBAR;
 
     if (!sds->sg.active)
     {
-        return val;
+        return out;
     }
 
     if (!sds->started)
@@ -215,7 +215,7 @@ double sds_gennext(void *self)
         if (idx == 0)
             sds->started = true;
         else
-            return val;
+            return out;
     }
 
     if (mixr->is_midi_tick)
@@ -290,7 +290,11 @@ double sds_gennext(void *self)
 
     almost_out = effector(&sds->sg, almost_out);
     almost_out = envelopor(&sds->sg, almost_out);
-    return almost_out;
+
+    out.left = almost_out;
+    out.right = almost_out;
+
+    return out;
 }
 
 double sds_getvol(void *self)

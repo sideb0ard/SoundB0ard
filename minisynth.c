@@ -754,14 +754,13 @@ void minisynth_make_active_track(void *self, int tracknum)
     synthbase_make_active_track(&ms->base, tracknum);
 }
 
-// void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
-double minisynth_gennext(void *self)
+stereo_val minisynth_gennext(void *self)
 {
 
     minisynth *ms = (minisynth *)self;
 
     if (!ms->sound_generator.active)
-        return 0.0;
+        return (stereo_val){0, 0};
 
     int idx = synthbase_gennext(&ms->base);
     if (idx >= 0)
@@ -800,15 +799,13 @@ double minisynth_gennext(void *self)
 
     accum_out_left = effector(&ms->sound_generator, accum_out_left);
     accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
-
     accum_out_left *= ms->m_settings.m_volume_db;
 
-    if (ms->m_settings.m_bytebeat_active)
-    {
-        accum_out_left *= bytebeat_gennext(&ms->bytr);
-    }
+    accum_out_right = effector(&ms->sound_generator, accum_out_right);
+    accum_out_right = envelopor(&ms->sound_generator, accum_out_right);
+    accum_out_right *= ms->m_settings.m_volume_db;
 
-    return accum_out_left;
+    return (stereo_val){.left = accum_out_left, .right = accum_out_right};
 }
 
 void minisynth_toggle_delay_mode(minisynth *ms)
@@ -914,6 +911,8 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_sustain_override = rand() % 2;
     ms->m_settings.m_sustain_time_ms = rand() % 1000;
     ms->m_settings.m_sustain_time_sixteenth = rand() % 5;
+
+    minisynth_update(ms);
 
     minisynth_print_settings(ms);
 }
@@ -1718,47 +1717,6 @@ void minisynth_print_modulation_routings(minisynth *ms)
     print_modulation_matrix(&ms->m_ms_modmatrix);
 }
 
-void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
-
-void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)
-{
-    ms->m_arp.latch = b;
-}
-
-void minisynth_set_arpeggiate_single_note_repeat(minisynth *ms, bool b)
-{
-    ms->m_arp.single_note_repeat = b;
-}
-void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val)
-{
-    if (val >= 1 && val <= 4)
-        ms->m_arp.octave_range = val;
-    else
-        printf("Val must be between 1 and 4\n");
-}
-void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode)
-{
-    if (mode < MAX_ARP_MODE)
-        ms->m_arp.mode = mode;
-    else
-        printf("Val must be < %d\n", MAX_ARP_MODE);
-}
-void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode)
-{
-    if (mode < MAX_ARP_RATE)
-        ms->m_arp.rate = mode;
-    else
-        printf("Val must be < %d\n", MAX_ARP_RATE);
-}
-
-void minisynth_set_filter_mod(minisynth *ms, double mod)
-{
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        minisynth_voice_set_filter_mod(ms->m_voices[i], mod);
-    }
-}
-
 void minisynth_del_self(void *self)
 {
     minisynth *ms = (minisynth *)self;
@@ -1791,6 +1749,50 @@ void minisynth_sg_stop(void *self)
     minisynth *ms = (minisynth *)self;
     ms->sound_generator.active = false;
     minisynth_stop(ms);
+}
+
+void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
+
+void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)
+{
+    ms->m_arp.latch = b;
+}
+
+void minisynth_set_arpeggiate_single_note_repeat(minisynth *ms, bool b)
+{
+    ms->m_arp.single_note_repeat = b;
+}
+
+void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val)
+{
+    if (val >= 1 && val <= 4)
+        ms->m_arp.octave_range = val;
+    else
+        printf("Val must be between 1 and 4\n");
+}
+
+void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode)
+{
+    if (mode < MAX_ARP_MODE)
+        ms->m_arp.mode = mode;
+    else
+        printf("Val must be < %d\n", MAX_ARP_MODE);
+}
+
+void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode)
+{
+    if (mode < MAX_ARP_RATE)
+        ms->m_arp.rate = mode;
+    else
+        printf("Val must be < %d\n", MAX_ARP_RATE);
+}
+
+void minisynth_set_filter_mod(minisynth *ms, double mod)
+{
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        minisynth_voice_set_filter_mod(ms->m_voices[i], mod);
+    }
 }
 
 void minisynth_print(minisynth *ms) { minisynth_print_settings(ms); }

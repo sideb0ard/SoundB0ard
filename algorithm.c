@@ -122,7 +122,7 @@ void algorithm_process_afterthought(algorithm *self)
     }
 }
 
-double algorithm_gen_next(void *self)
+stereo_val algorithm_gen_next(void *self)
 {
     algorithm *a = (algorithm *)self;
     switch (a->frequency)
@@ -144,7 +144,7 @@ double algorithm_gen_next(void *self)
         }
         break;
     }
-    return 0;
+    return (stereo_val){0, 0};
 }
 
 void algorithm_status(void *self, wchar_t *status_string)

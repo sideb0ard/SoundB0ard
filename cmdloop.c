@@ -1478,6 +1478,8 @@ void interpret(char *line)
                                 strncpy(preset_name, wurds[3], 19);
                                 minisynth_save_settings(ms, preset_name);
                             }
+
+                            minisynth_update(ms);
                         }
                         else if (mixr->sound_generators[soundgen_num]->type ==
                                  DIGISYNTH_TYPE)

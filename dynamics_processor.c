@@ -250,7 +250,8 @@ double dynamics_processor_process(void *self, double input)
 
     double left_detector_input = input;
     if (dp->m_external_source >= 0)
-        left_detector_input = mixr->soundgen_cur_val[dp->m_external_source];
+        left_detector_input =
+            mixr->soundgen_cur_val[dp->m_external_source].left;
 
     double left_detector =
         envelope_detector_detect(&dp->m_left_detector, left_detector_input);

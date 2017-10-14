@@ -89,8 +89,7 @@ granulator *new_granulator(char *filename)
     return g;
 }
 
-double granulator_gennext(void *self)
-// void granulator_gennext(void* self, double* frame_vals, int framesPerBuffer)
+stereo_val granulator_gennext(void *self)
 {
     granulator *g = (granulator *)self;
     double val = 0;
@@ -98,7 +97,7 @@ double granulator_gennext(void *self)
     if (g->external_source_sg != -1)
     {
         g->audio_buffer[g->audio_buffer_write_idx] =
-            mixr->soundgen_cur_val[g->external_source_sg];
+            mixr->soundgen_cur_val[g->external_source_sg].left;
         g->audio_buffer_write_idx++;
         if (g->audio_buffer_write_idx >= g->audio_buffer_len)
             g->audio_buffer_write_idx = 0;
@@ -219,7 +218,9 @@ double granulator_gennext(void *self)
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
 
-    return val * g->vol * eg_amp;
+    double out_val = val * g->vol * eg_amp;
+
+    return (stereo_val){.left = out_val, .right = out_val};
 }
 
 void granulator_status(void *self, wchar_t *status_string)

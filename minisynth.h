@@ -161,8 +161,7 @@ typedef struct minisynth
 minisynth *new_minisynth(void);
 
 // sound generator interface //////////////
-double minisynth_gennext(void *self);
-// void minisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
+stereo_val minisynth_gennext(void *self);
 void minisynth_status(void *self, wchar_t *status_string);
 void minisynth_setvol(void *self, double v);
 double minisynth_getvol(void *self);

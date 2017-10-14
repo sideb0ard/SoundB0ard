@@ -36,19 +36,24 @@ spork *new_spork(double freq)
     return s;
 }
 
-double spork_gennext(void *sg)
+stereo_val spork_gennext(void *sg)
 {
     spork *s = (spork *)sg;
 
-    double return_val = 0.;
+    stereo_val return_val = {0, 0};
+    double scratch_val;
     if (!s->active)
         return return_val;
 
     double quad_return_val = 0.;
-    return_val = wt_do_oscillate(&s->m_osc, &quad_return_val);
-    return_val = effector(&s->sg, return_val);
-    return_val = envelopor(&s->sg, return_val);
-    return return_val * s->m_volume;
+    scratch_val = wt_do_oscillate(&s->m_osc, &quad_return_val);
+    scratch_val = effector(&s->sg, scratch_val);
+    scratch_val = envelopor(&s->sg, scratch_val);
+
+    return_val.left = scratch_val * s->m_volume;
+    return_val.right = scratch_val * s->m_volume;
+
+    return return_val;
 }
 
 void spork_status(void *self, wchar_t *ss)

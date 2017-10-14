@@ -43,12 +43,12 @@ digisynth *new_digisynth(char *filename)
 }
 
 // sound generator interface //////////////
-double digisynth_gennext(void *self)
+stereo_val digisynth_gennext(void *self)
 {
     digisynth *ds = (digisynth *)self;
 
     if (!ds->sound_generator.active)
-        return 0.0;
+        return (stereo_val){0, 0};
 
     int idx = synthbase_gennext(&ds->base);
     if (idx >= 0)
@@ -81,7 +81,11 @@ double digisynth_gennext(void *self)
     accum_out_left = effector(&ds->sound_generator, accum_out_left);
     accum_out_left = envelopor(&ds->sound_generator, accum_out_left);
 
-    return accum_out_left;
+    accum_out_right *= ds->vol;
+    accum_out_right = effector(&ds->sound_generator, accum_out_right);
+    accum_out_right = envelopor(&ds->sound_generator, accum_out_right);
+
+    return (stereo_val){.left = accum_out_left, .right = accum_out_right};
 }
 
 void digisynth_status(void *self, wchar_t *status_string)

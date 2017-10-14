@@ -26,7 +26,7 @@ int extract_cmds_from_line(algorithm *self, char *line);
 void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd);
 void algorithm_process_afterthought(algorithm *self);
 
-double algorithm_gen_next(void *self);
+stereo_val algorithm_gen_next(void *self);
 void algorithm_status(void *self, wchar_t *ss);
 void algorithm_setvol(void *self, double v);
 double algorithm_getvol(void *self);

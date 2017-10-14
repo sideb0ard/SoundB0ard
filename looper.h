@@ -79,8 +79,7 @@ void looper_switch_sample(looper *s, int sample_num);
 void looper_resample_to_loop_size(looper *s);
 void looper_change_loop_len(looper *s, int sample_num, int loop_len);
 void looper_change_num_loops(looper *s, int sample_num, int num_loops);
-// void looper_gennext(void* self, double* frame_vals, int framesPerBuffer);
-double looper_gennext(void *self);
+stereo_val looper_gennext(void *self);
 
 void looper_status(void *self, wchar_t *ss);
 void looper_setvol(void *self, double v);

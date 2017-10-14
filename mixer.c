@@ -321,7 +321,7 @@ int add_granulator(mixer *mixr, char *filename)
 
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
-    for (int i = 0, j = 0; i < frames_per_buffer; i++, j+=2)
+    for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
         if (mixr->cur_sample % mixr->samples_per_midi_tick == 0)
         {
@@ -333,7 +333,8 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->is_midi_tick = false;
         }
 
-        if (mixr->cur_sample % ((PPSIXTEENTH / 2) * mixr->samples_per_midi_tick) ==
+        if (mixr->cur_sample %
+                ((PPSIXTEENTH / 2) * mixr->samples_per_midi_tick) ==
             0)
         { // thirty second
             mixr->is_thirtysecond = true;
@@ -353,7 +354,9 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->is_sixteenth = false;
         }
 
-        if (mixr->cur_sample % (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) == 0)
+        if (mixr->cur_sample %
+                (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) ==
+            0)
         {
             mixr->is_eighth = true;
         }
@@ -392,22 +395,26 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->start_of_loop = false;
         }
 
-        double output_val = 0.0;
+        double output_left = 0.0;
+        double output_right = 0.0;
         if (mixr->soundgen_num > 0)
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
                 if (mixr->sound_generators[i] != NULL)
                 {
-                    mixr->soundgen_cur_val[i] = mixr->sound_generators[i]->gennext(
-                        mixr->sound_generators[i]);
-                    output_val += mixr->soundgen_cur_val[i];
+                    mixr->soundgen_cur_val[i] =
+                        mixr->sound_generators[i]->gennext(
+                            mixr->sound_generators[i]);
+                    output_left += mixr->soundgen_cur_val[i].left;
+                    output_right += mixr->soundgen_cur_val[i].right;
                 }
             }
         }
 
-        out[j] = mixr->volume * (output_val / 1.53);
-        out[j+1] = mixr->volume * (output_val / 1.53);
+        out[j] = mixr->volume * (output_left / 1.53);
+        out[j + 1] = mixr->volume * (output_right / 1.53);
+
         mixr->cur_sample++;
     }
 
