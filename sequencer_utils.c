@@ -142,7 +142,7 @@ void char_binary_version_of_int(int num, char bin_num[17])
 
 bool seq_pattern_sixteenth_has_hit();
 
-unsigned short gimme_a_bitwise_int(int bit_pattern_enum, int t)
+unsigned short gimme_a_bitwise_short(int bit_pattern_enum, int t)
 {
     unsigned short result = 0;
     switch (bit_pattern_enum)
