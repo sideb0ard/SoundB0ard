@@ -24,7 +24,6 @@ digisynth *new_digisynth(char *filename);
 
 // sound generator interface //////////////
 stereo_val digisynth_gennext(void *self);
-// void digisynth_gennext(void* self, double* frame_vals, int framesPerBuffer);
 void digisynth_status(void *self, wchar_t *status_string);
 void digisynth_setvol(void *self, double v);
 double digisynth_getvol(void *self);
@@ -35,13 +34,6 @@ int digisynth_get_num_tracks(void *self);
 void digisynth_make_active_track(void *self, int tracknum);
 
 ////////////////////////////////////
-
-// bool digisynth_prepare_for_play(digisynth *synth);
-// void digisynth_stop(digisynth *ms);
-// void digisynth_update(digisynth *synth);
-
-// void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
-//                                bool update_last_midi);
 
 bool digisynth_midi_note_on(digisynth *self, unsigned int midinote,
                             unsigned int velocity);

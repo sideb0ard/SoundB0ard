@@ -104,11 +104,14 @@ void keys(int soundgen_num)
                 midi_num = ch_midi_lookup(ch, s_keys_octave, textnote);
                 printf("MIDI: %s [%d]\n", textnote, midi_num);
                 int fake_velocity = 128; // TODO real velocity
-                if (midi_num != -1)
+                if (midi_num >= 0)
                 {
                     synth_handle_midi_note(mixr->sound_generators[soundgen_num],
                                            midi_num, fake_velocity, true);
                 }
+                else
+                    printf("check yer MIDI notes! that ain't valid shit: %d\n",
+                           midi_num);
             }
         }
     }

@@ -57,8 +57,6 @@ stereo_val digisynth_gennext(void *self)
         midi_parse_midi_event((soundgenerator *)self, ev);
     }
 
-    // minisynth_update(ms);
-
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 

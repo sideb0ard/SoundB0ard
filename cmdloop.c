@@ -1177,7 +1177,7 @@ void interpret(char *line)
                             }
                         }
                     }
-                    else if (strncmp("delete", wurds[2], 3) == 0)
+                    else if (strncmp("delete", wurds[2], 6) == 0)
                     {
                         if (strncmp("melody", wurds[3], 6) == 0)
                         {
@@ -1419,6 +1419,7 @@ void interpret(char *line)
                                     mixr->sound_generators[soundgen_num];
                             if (parse_minisynth_settings_change(ms, wurds))
                             {
+                                minisynth_update(ms);
                                 continue;
                             }
                             else if (strncmp("print", wurds[2], 5) == 0)

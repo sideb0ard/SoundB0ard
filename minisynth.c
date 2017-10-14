@@ -452,9 +452,7 @@ void minisynth_midi_control(minisynth *self, unsigned int data1,
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
                             unsigned int velocity)
 {
-    // printf("PLAYING NOTE%d (Last notes:%d %d %d)\n", midinote,
-    //       ms->m_last_midi_notes[0], ms->m_last_midi_notes[1],
-    //       ms->m_last_midi_notes[2]);
+
     if (ms->m_settings.m_monophonic)
     {
         minisynth_voice *msv = ms->m_voices[0];
@@ -463,6 +461,7 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
         ms->m_last_note_frequency = get_midi_freq(midinote);
         return true;
     }
+
     bool steal_note = true;
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -908,7 +907,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
     ////ms->m_settings.m_eg1_dca_intensity =
     ////    (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
-    ms->m_settings.m_sustain_override = rand() % 2;
+    // ms->m_settings.m_sustain_override = rand() % 2;
     ms->m_settings.m_sustain_time_ms = rand() % 1000;
     ms->m_settings.m_sustain_time_sixteenth = rand() % 5;
 

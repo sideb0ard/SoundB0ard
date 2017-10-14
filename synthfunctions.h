@@ -1,6 +1,8 @@
 #ifndef SBSHELL_SYNTH_FUNCTION_H_
 #define SBSHELL_SYNTH_FUNCTION_H_
 
+#include <math.h>
+
 // OSCILLATOR ///////////////////////////
 typedef struct
 {
@@ -134,5 +136,29 @@ typedef struct
     global_eg_params eg4_params;
     global_dca_params dca_params;
 } global_synth_params;
+
+inline double midi_to_pan_value(unsigned int midi_val)
+{
+    // see MMA DLS Level 2 Spec; controls are asymmetrical
+    if (midi_val == 64)
+        return 0.0;
+    else if (midi_val <= 1) // 0 or 1
+        return -1.0;
+
+    return 2.0 * (double)midi_val / 127.0 - 1.0;
+}
+
+inline double mma_midi_to_atten_dB(unsigned int midi_val)
+{
+    if (midi_val == 0)
+        return -96.0; // dB floor
+
+    return 20.0 * log10((127.0 * 127.0) / ((float)midi_val * (float)midi_val));
+}
+
+inline double midi_to_bipolar(unsigned int midi_val)
+{
+    return 2.0 * (double)midi_val / 127.0 - 1.0;
+}
 
 #endif // SBSHELL_SYNTH_FUNCTION_H_

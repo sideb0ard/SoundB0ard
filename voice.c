@@ -127,21 +127,21 @@ void voice_prepare_for_play(voice *v)
     v->m_eg1.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG1;
     v->m_eg1.m_mod_source_eg_attack_scaling = DEST_EG1_ATTACK_SCALING;
     v->m_eg1.m_mod_source_eg_decay_scaling = DEST_EG1_DECAY_SCALING;
-    // v->m_eg1.m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
+    v->m_eg1.m_mod_source_sustain_override = DEST_EG1_SUSTAIN_OVERRIDE;
 
     v->m_eg2.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg2.m_mod_dest_eg_output = SOURCE_EG2;
     v->m_eg2.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG2;
     v->m_eg2.m_mod_source_eg_attack_scaling = DEST_EG2_ATTACK_SCALING;
     v->m_eg2.m_mod_source_eg_decay_scaling = DEST_EG2_DECAY_SCALING;
-    // v->m_eg2.m_mod_source_sustain_override = DEST_EG2_SUSTAIN_OVERRIDE;
+    v->m_eg2.m_mod_source_sustain_override = DEST_EG2_SUSTAIN_OVERRIDE;
 
     v->m_eg3.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg3.m_mod_dest_eg_output = SOURCE_EG3;
     v->m_eg3.m_mod_dest_eg_biased_output = SOURCE_BIASED_EG3;
     v->m_eg3.m_mod_source_eg_attack_scaling = DEST_EG3_ATTACK_SCALING;
     v->m_eg3.m_mod_source_eg_decay_scaling = DEST_EG3_DECAY_SCALING;
-    // v->m_eg3.m_mod_source_sustain_override = DEST_EG3_SUSTAIN_OVERRIDE;
+    v->m_eg3.m_mod_source_sustain_override = DEST_EG3_SUSTAIN_OVERRIDE;
 
     v->m_eg4.m_v_modmatrix = &v->m_v_modmatrix;
     v->m_eg4.m_mod_dest_eg_output = SOURCE_EG4;
@@ -408,7 +408,10 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
     //
     // this checks if we're already stealing this note - then no-op, just rturn
     if (v->m_note_pending && v->m_midi_note_number_pending == midi_note)
+    {
+        printf("NO-OP!\n");
         return;
+    }
 
     v->m_midi_note_number_pending = midi_note;
     v->m_midi_velocity_pending = midi_velocity;

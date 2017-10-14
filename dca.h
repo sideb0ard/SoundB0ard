@@ -26,11 +26,8 @@ typedef struct dca
     double m_amplitude_control;
 
     double m_pan_control;
-
     double m_amp_mod_db;
-
     double m_eg_mod;
-
     double m_pan_mod;
 
 } dca;

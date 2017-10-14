@@ -4,6 +4,7 @@
 
 #include "midi_freq_table.h"
 #include "modmatrix.h"
+#include "synthfunctions.h"
 #include "utils.h"
 
 const char *s_source_enum_to_name[] = {"SOURCE_NONE",
@@ -329,7 +330,6 @@ void print_modulation_matrix_info_eg1(modmatrix *self, wchar_t *status_string)
 // this is the REAL mod matrix, yehhhhhh!
 void do_modulation_matrix(modmatrix *self, unsigned layer)
 {
-
     if (!self->m_matrix_core)
     {
         printf("NAE MATRIX CORE, MATE!\n");
@@ -363,16 +363,16 @@ void do_modulation_matrix(modmatrix *self, unsigned layer)
             src = bipolar_to_unipolar(src);
             break;
         case TRANSFORM_MIDI_TO_ATTENUATION:
-            // src = mma_midi_to_atten(src);
+            src = mma_midi_to_atten_db(src);
             break;
         case TRANSFORM_MIDI_TO_PAN:
-            // src = midi_to_pan_value(src);
+            src = midi_to_pan_value(src);
             break;
         case TRANSFORM_MIDI_SWITCH:
             src = src > 63 ? 1.0 : 0.0;
             break;
         case TRANSFORM_MIDI_TO_BIPOLAR:
-            // src = midi_to_bipolar(src);
+            src = midi_to_bipolar(src);
             break;
         case TRANSFORM_NOTE_NUMBER_TO_FREQUENCY:
             src = get_midi_freq(src);
