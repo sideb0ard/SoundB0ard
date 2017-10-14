@@ -754,3 +754,28 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
     synthbase_set_multi_melody_mode(base, true);
     fclose(fp);
 }
+
+int synthbase_change_octave_melody(synthbase *base, int melody_num,
+                                   int direction)
+{
+    printf("Changing octave of %d - direction: %s\n", melody_num,
+           direction == 1 ? "UP" : "DOWN");
+    if (is_valid_melody_num(base, melody_num))
+    {
+        for (int i = 0; i < PPNS; i++)
+            if (base->melodies[melody_num][i] != NULL)
+            {
+                int new_midi_num = base->melodies[melody_num][i]->data1;
+                if (direction == 1) // up
+                    new_midi_num += 12;
+                else
+                    new_midi_num -= 12;
+                if (new_midi_num >= 0 && new_midi_num < 128)
+                    base->melodies[melody_num][i]->data1 = new_midi_num;
+            }
+    }
+    else
+        return 1;
+
+    return 0;
+}

@@ -154,7 +154,8 @@ typedef struct minisynth
     int m_last_midi_notes[MAX_VOICES];
     arpeggiator m_arp;
 
-    bytebeat bytr;
+    // bytebeat bytr;
+    int m_bytebeat_counter;
 
 } minisynth;
 

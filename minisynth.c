@@ -165,7 +165,7 @@ minisynth *new_minisynth(void)
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);
 
-    bytebeat_init(&ms->bytr);
+    // bytebeat_init(&ms->bytr);
 
     ms->sound_generator.active = true;
     return ms;
@@ -760,6 +760,11 @@ stereo_val minisynth_gennext(void *self)
 
     if (!ms->sound_generator.active)
         return (stereo_val){0, 0};
+
+    // short nom = gimme_a_bitwise_short(2, ms->m_bytebeat_counter++);
+    // double nomnom = scaleybum(-32768, 32787, -1, 1, nom);
+    // return (stereo_val){nomnom, nomnom};
+    // printf("NOM: %d NOMNOM:%.2f\n", nom, nomnom);
 
     int idx = synthbase_gennext(&ms->base);
     if (idx >= 0)

@@ -246,8 +246,8 @@ bool seq_tick(sequencer *seq)
 
                 if (gen_new_pattern)
                 {
-                    int bit_pattern = gimme_a_bitwise_short(seq->bitwise_mode,
-                                                          seq->bitwise_counter);
+                    int bit_pattern = gimme_a_bitwise_short(
+                        seq->bitwise_mode, seq->bitwise_counter);
 
                     // char blah[17] = {0};
                     // char_binary_version_of_int(bit_pattern, blah);

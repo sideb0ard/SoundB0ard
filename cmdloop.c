@@ -1409,6 +1409,18 @@ void interpret(char *line)
                                        "note\n");
                                 synthbase_rm_micro_note(base, melody_num, tick);
                             }
+                            else if (strncmp("up", wurds[3], 2) == 0)
+                            {
+                                printf("UP OCTAVE!\n");
+                                synthbase_change_octave_melody(base, melody_num,
+                                                               1);
+                            }
+                            else if (strncmp("down", wurds[3], 4) == 0)
+                            {
+                                printf("DOWN OCTAVE!\n");
+                                synthbase_change_octave_melody(base, melody_num,
+                                                               0);
+                            }
                         }
 
                         if (mixr->sound_generators[soundgen_num]->type ==

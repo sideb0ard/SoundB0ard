@@ -115,6 +115,8 @@ void synthbase_morph(synthbase *base);
 int synthbase_get_notes_from_melody(midi_event **melody,
                                     int return_midi_notes[10]);
 
+int synthbase_change_octave_melody(synthbase *base, int pattern_num,
+                                   int direction);
 int synthbase_get_num_tracks(void *self);
 int synthbase_get_num_notes(synthbase *base);
 void synthbase_make_active_track(void *self, int pattern_num);
