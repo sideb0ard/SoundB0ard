@@ -41,40 +41,26 @@ const compat_key_list compat_keys[] = {
     {F_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, C_MAJOR,
      D_FLAT_MAJOR}};
 
-static int paCallback(const void *inputBuffer, void *outputBuffer,
-                      unsigned long framesPerBuffer,
-                      const PaStreamCallbackTimeInfo *timeInfo,
-                      PaStreamCallbackFlags statusFlags, void *userData)
+static int paCallback(const void *input_buffer, void *output_buffer,
+                      unsigned long frames_per_buffer,
+                      const PaStreamCallbackTimeInfo *time_info,
+                      PaStreamCallbackFlags status_flags, void *user_data)
 {
-    mixer *mixr = (mixer *)userData;
-    float *out = (float *)outputBuffer;
-    (void)inputBuffer;
-    (void)timeInfo;
-    (void)statusFlags;
+    mixer *mixr = (mixer *)user_data;
+    float *out = (float *)output_buffer;
+    (void)input_buffer;
+    (void)time_info;
+    (void)status_flags;
 
-    for (unsigned long i = 0; i < framesPerBuffer; i++)
-    {
-        float val = 0;
-        val = mixer_gennext(mixr);
-        *out++ = val;
-        *out++ = val;
-    }
-    return 0;
+    int ret = mixer_gennext(mixr, out, frames_per_buffer);
+
+    return ret;
 }
 
 int main()
 {
 
     srand(time(NULL));
-
-    //// run the MIDI event looprrr...
-    pthread_t midi_th;
-    if (pthread_create(&midi_th, NULL, midiman, NULL))
-    {
-        fprintf(stderr, "Errrr, wit tha midi..\n");
-        return -1;
-    }
-    pthread_detach(midi_th);
 
     // PortAudio start me up!
     pa_setup();

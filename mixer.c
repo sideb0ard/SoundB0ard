@@ -319,114 +319,99 @@ int add_granulator(mixer *mixr, char *filename)
     return add_sound_generator(mixr, (soundgenerator *)g);
 }
 
-double mixer_gennext(mixer *mixr)
+int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
-    if (mixr->cur_sample % mixr->samples_per_midi_tick == 0)
+    for (int i = 0, j = 0; i < frames_per_buffer; i++, j+=2)
     {
-        mixr->midi_tick++; // 1 midi tick (or pulse)
-        mixr->is_midi_tick = true;
-    }
-    else
-    {
-        mixr->is_midi_tick = false;
-    }
-
-    if (mixr->cur_sample % ((PPSIXTEENTH / 2) * mixr->samples_per_midi_tick) ==
-        0)
-    { // thirty second
-        mixr->is_thirtysecond = true;
-    }
-    else
-    {
-        mixr->is_thirtysecond = false;
-    }
-
-    if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0)
-    {
-        mixr->sixteenth_note_tick++; // for seq machine resolution
-        mixr->is_sixteenth = true;
-    }
-    else
-    {
-        mixr->is_sixteenth = false;
-    }
-
-    if (mixr->cur_sample % (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) == 0)
-    {
-        mixr->is_eighth = true;
-    }
-    else
-    {
-        mixr->is_eighth = false;
-    }
-
-    if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0)
-    {
-        mixr->is_quarter = true;
-    }
-    else
-    {
-        mixr->is_quarter = false;
-    }
-
-    if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0)
-    {
-        mixr->start_of_loop = true;
-        if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0))
+        if (mixr->cur_sample % mixr->samples_per_midi_tick == 0)
         {
-            mixr->sixteenth_note_tick = 0;
-            mixr->midi_tick = 0;
+            mixr->midi_tick++; // 1 midi tick (or pulse)
+            mixr->is_midi_tick = true;
         }
-        if (mixr->debug_mode)
+        else
         {
-            printf("START OF LOOP - sample: %d, midi_tick: %d "
-                   "sixteenth: %d\n",
-                   mixr->cur_sample, mixr->midi_tick,
-                   mixr->sixteenth_note_tick);
-        }
-    }
-    else
-    {
-        mixr->start_of_loop = false;
-    }
-
-    if (mixr->start_of_loop)
-    {
-        if (mixr->scene_start_pending)
-        {
-            mixer_play_scene(mixr, mixr->current_scene);
-            mixr->scene_start_pending = false;
+            mixr->is_midi_tick = false;
         }
 
-        // if (mixr->current_scene_bar_count >=
-        //        mixr->scenes[mixr->current_scene].num_bars_to_play ||
-        //    mixr->scene_start_pending) {
-        //    mixr->current_scene = (mixr->current_scene + 1) %
-        //    mixr->num_scenes;
-        //    mixr->current_scene_bar_count = 0;
-
-        //    // printf("SCENE MODE CHANGE %d!\n", mixr->current_scene);
-        //}
-        // mixr->current_scene_bar_count++;
-    }
-
-    double output_val = 0.0;
-    if (mixr->soundgen_num > 0)
-    {
-        for (int i = 0; i < mixr->soundgen_num; i++)
+        if (mixr->cur_sample % ((PPSIXTEENTH / 2) * mixr->samples_per_midi_tick) ==
+            0)
+        { // thirty second
+            mixr->is_thirtysecond = true;
+        }
+        else
         {
-            if (mixr->sound_generators[i] != NULL)
+            mixr->is_thirtysecond = false;
+        }
+
+        if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0)
+        {
+            mixr->sixteenth_note_tick++; // for seq machine resolution
+            mixr->is_sixteenth = true;
+        }
+        else
+        {
+            mixr->is_sixteenth = false;
+        }
+
+        if (mixr->cur_sample % (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) == 0)
+        {
+            mixr->is_eighth = true;
+        }
+        else
+        {
+            mixr->is_eighth = false;
+        }
+
+        if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0)
+        {
+            mixr->is_quarter = true;
+        }
+        else
+        {
+            mixr->is_quarter = false;
+        }
+
+        if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0)
+        {
+            mixr->start_of_loop = true;
+            if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0))
             {
-                mixr->soundgen_cur_val[i] = mixr->sound_generators[i]->gennext(
-                    mixr->sound_generators[i]);
-                output_val += mixr->soundgen_cur_val[i];
+                mixr->sixteenth_note_tick = 0;
+                mixr->midi_tick = 0;
+            }
+            if (mixr->debug_mode)
+            {
+                printf("START OF LOOP - sample: %d, midi_tick: %d "
+                       "sixteenth: %d\n",
+                       mixr->cur_sample, mixr->midi_tick,
+                       mixr->sixteenth_note_tick);
             }
         }
+        else
+        {
+            mixr->start_of_loop = false;
+        }
+
+        double output_val = 0.0;
+        if (mixr->soundgen_num > 0)
+        {
+            for (int i = 0; i < mixr->soundgen_num; i++)
+            {
+                if (mixr->sound_generators[i] != NULL)
+                {
+                    mixr->soundgen_cur_val[i] = mixr->sound_generators[i]->gennext(
+                        mixr->sound_generators[i]);
+                    output_val += mixr->soundgen_cur_val[i];
+                }
+            }
+        }
+
+        out[j] = mixr->volume * (output_val / 1.53);
+        out[j+1] = mixr->volume * (output_val / 1.53);
+        mixr->cur_sample++;
     }
 
-    mixr->cur_sample++;
-
-    return mixr->volume * (output_val / 1.53);
+    return 0;
 }
 
 void mixer_play_scene(mixer *mixr, int scene_num)
