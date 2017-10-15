@@ -1173,10 +1173,11 @@ void interpret(char *line)
                                        soundgen_num, pattern_num, sg2,
                                        pattern_num2);
 
-                                midi_event **melody =
-                                    synthbase_copy_midi_loop(base, pattern_num);
+                                midi_events_loop loop_copy;
+                                synthbase_copy_midi_loop(base, pattern_num,
+                                                         &loop_copy);
 
-                                synthbase_replace_midi_loop(sb2, melody,
+                                synthbase_replace_midi_loop(sb2, &loop_copy,
                                                             pattern_num2);
                             }
                         }
@@ -1208,8 +1209,8 @@ void interpret(char *line)
                     {
                         int pattern_num = atoi(wurds[3]);
                         int new_pattern_num = synthbase_add_melody(base);
-                        synthbase_dupe_melody(base->melodies[pattern_num],
-                                              base->melodies[new_pattern_num]);
+                        synthbase_dupe_melody(&base->melodies[pattern_num],
+                                              &base->melodies[new_pattern_num]);
                     }
                     else if (strncmp("import", wurds[2], 6) == 0)
                     {
@@ -1303,9 +1304,8 @@ void interpret(char *line)
                         if (is_valid_melody_num(base, melody_num))
                         {
                             printf("QuantiZe!\n");
-                            midi_event **melody =
-                                base->melodies[base->cur_melody];
-                            midi_melody_quantize(melody);
+                            midi_melody_quantize(
+                                &base->melodies[base->cur_melody]);
                         }
                     }
                     else if (strncmp("reset", wurds[2], 5) == 0)

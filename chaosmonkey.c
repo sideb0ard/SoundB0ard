@@ -149,10 +149,10 @@ void chaosmonkey_add_note_at_random_time(minisynth *ms, int note)
     int rand_timing = rand() % 16;
     int note_on_tick = (mixr->midi_tick + rand_timing * PPQN) % PPNS;
     int note_off_tick = (note_on_tick + 3 * PPQN + 7) % PPNS;
-    midi_event *on_event = new_midi_event(note_on_tick, 144, note, 126);
-    on_event->delete_after_use = true;
-    midi_event *off_event = new_midi_event(note_off_tick, 128, note, 126);
-    off_event->delete_after_use = true;
+    midi_event on_event = new_midi_event(note_on_tick, 144, note, 126);
+    on_event.delete_after_use = true;
+    midi_event off_event = new_midi_event(note_off_tick, 128, note, 126);
+    off_event.delete_after_use = true;
 
     synthbase_add_event(&ms->base, ms->base.cur_melody, on_event);
 

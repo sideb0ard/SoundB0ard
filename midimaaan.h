@@ -13,7 +13,7 @@ typedef enum { OCTAVE_CHANGE } custom_event_type;
 
 typedef struct midi_event
 {
-    unsigned tick;
+    int tick; // set to -1 if event is not in use
     unsigned event_type;
     unsigned data1;
     unsigned data2;
@@ -22,19 +22,20 @@ typedef struct midi_event
                        // key off
 } midi_event;
 
-typedef midi_event *midi_events_loop[PPNS];
+typedef midi_event midi_events_loop[PPNS];
 
 void *midiman(void *);
 
 void midi_delay_control(fx *e, int data1, int data2);
 
-midi_event *new_midi_event(int tick, int event_type, int data1, int data2);
-void midi_event_free(midi_event *ms);
-void print_midi_event_rec(midi_event *ev);
+midi_event new_blank_midi_event(void);
+midi_event new_midi_event(int tick, int event_type, int data1, int data2);
+void midi_event_clear(midi_events_loop melody, int tick_to_clear);
+void print_midi_event_rec(midi_event ev);
 
-void midi_parse_midi_event(soundgenerator *sg, midi_event *ev);
+void midi_parse_midi_event(soundgenerator *sg, midi_event ev);
 
-void midi_melody_print(midi_event **melody);
-void midi_melody_quantize(midi_event **melody);
+void midi_melody_print(midi_events_loop *melody);
+void midi_melody_quantize(midi_events_loop *melody);
 
 void spork_parse_midi(spork *s, int data1, int data2);

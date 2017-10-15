@@ -53,7 +53,7 @@ stereo_val digisynth_gennext(void *self)
     int idx = synthbase_gennext(&ds->base);
     if (idx >= 0)
     {
-        midi_event *ev = ds->base.melodies[ds->base.cur_melody][idx];
+        midi_event ev = ds->base.melodies[ds->base.cur_melody][idx];
         midi_parse_midi_event((soundgenerator *)self, ev);
     }
 

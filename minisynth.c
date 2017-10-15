@@ -769,7 +769,7 @@ stereo_val minisynth_gennext(void *self)
     int idx = synthbase_gennext(&ms->base);
     if (idx >= 0)
     {
-        midi_event *ev = ms->base.melodies[ms->base.cur_melody][idx];
+        midi_event ev = ms->base.melodies[ms->base.cur_melody][idx];
         midi_parse_midi_event((soundgenerator *)ms, ev);
     }
 
@@ -1728,8 +1728,6 @@ void minisynth_del_self(void *self)
     {
         minisynth_voice_free_self(ms->m_voices[i]);
     }
-    synthbase_free_melodies(&ms->base);
-
     printf("Deleting MINISYNTH self\n");
     free(ms);
 }

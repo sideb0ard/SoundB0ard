@@ -80,7 +80,7 @@ void *midiman()
                     if (ms->base.recording)
                     {
                         int tick = mixr->midi_tick % PPNS;
-                        midi_event *ev =
+                        midi_event ev =
                             new_midi_event(tick, status, data1, data2);
                         synthbase_add_event(&ms->base, ms->base.cur_melody, ev);
                     }
@@ -90,7 +90,7 @@ void *midiman()
                     ev.data1 = data1;
                     ev.data2 = data2;
                     ev.delete_after_use = false;
-                    midi_parse_midi_event((soundgenerator *)ms, &ev);
+                    midi_parse_midi_event((soundgenerator *)ms, ev);
                 }
                 else if (mixr->midi_control_destination == DELAYFX)
                 {
@@ -136,29 +136,29 @@ void *midiman()
     return NULL;
 }
 
-void print_midi_event_rec(midi_event *ev)
+void print_midi_event_rec(midi_event ev)
 {
-    printf("[Midi] %d note: %d\n", ev->tick, ev->data1);
+    printf("[Midi] %d note: %d\n", ev.tick, ev.data1);
 }
 
-midi_event *new_midi_event(int tick, int event_type, int data1, int data2)
+midi_event new_blank_midi_event()
 {
-    midi_event *ev = (midi_event *)calloc(1, sizeof(midi_event));
-    if (ev == NULL)
-    {
-        printf("BIG PROBS MATE\n");
-        return NULL;
-    }
-    ev->tick = tick;
-    ev->event_type = event_type;
-    ev->data1 = data1;
-    ev->data2 = data2;
-    ev->delete_after_use = false;
-
+    midi_event ev = {.tick = -1,
+                     .event_type = 0,
+                     .data1 = 0,
+                     .data2 = 0,
+                     .delete_after_use = false};
     return ev;
 }
-
-void midi_event_free(midi_event *ev) { free(ev); }
+midi_event new_midi_event(int tick, int event_type, int data1, int data2)
+{
+    midi_event ev = {.tick = tick,
+                     .event_type = event_type,
+                     .data1 = data1,
+                     .data2 = data2,
+                     .delete_after_use = false};
+    return ev;
+}
 
 void spork_parse_midi(spork *s, int data1, int data2)
 {
@@ -166,54 +166,6 @@ void spork_parse_midi(spork *s, int data1, int data2)
     (void)data1;
     (void)data2;
     printf("SPORKMIDIiii!\n");
-    // double scaley_val = 0.0;
-    // switch (data1) {
-    // case 1:
-    //    scaley_val = scaleybum(0, 127, 0.0, 1.0, data2);
-    //    printf("VOLUME!\n");
-    //    s->m_volume = scaley_val;
-    //    break;
-    // case 2:
-    //    scaley_val = scaleybum(0, 127, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-    //    s->m_lfo.osc.m_osc_fo = scaley_val;
-    //    printf("LFO RATE! %f\n", s->m_lfo.osc.m_osc_fo);
-
-    //    break;
-    // case 3:
-    //    scaley_val = scaleybum(0, 127, 0, 1, data2);
-    //    s->m_lfo.osc.m_amplitude = scaley_val;
-    //    printf("LFO AMP!! %f\n", s->m_lfo.osc.m_amplitude);
-    //    break;
-    // case 4:
-    //    scaley_val = scaleybum(0, 127, 10, 220, data2);
-    //    printf("OSC FREQ!!\n");
-    //    s->m_osc1.osc.m_osc_fo = scaley_val;
-    //    s->m_osc2.osc.m_osc_fo = scaley_val * 2;
-    //    s->m_osc3.osc.m_osc_fo = scaley_val / 3;
-    //    break;
-    // case 5:
-    //    scaley_val = scaleybum(0, 128, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-    //    printf("FILTER FC! %f\n", scaley_val);
-    //    s->m_filter.f.m_fc_control = scaley_val;
-    //    break;
-    // case 6:
-    //    scaley_val = scaleybum(0, 127, 0, 100, data2);
-    //    printf("Reverb Pre Delay Ms!\n");
-    //    s->m_reverb->m_pre_delay_msec = scaley_val;
-    //    break;
-    // case 7:
-    //    scaley_val = scaleybum(0, 127, 0, 5000, data2);
-    //    printf("Reverb Time!\n");
-    //    s->m_reverb->m_rt60 = scaley_val;
-    //    break;
-    // case 8:
-    //    scaley_val = scaleybum(0, 127, 0, 100, data2);
-    //    printf("Reverb Wet Mix!\n");
-    //    s->m_reverb->m_wet_pct = scaley_val;
-    //    break;
-    // default:
-    //    printf("SOMthing else\n");
-    //}
 }
 
 void midi_delay_control(fx *e, int data1, int data2)
@@ -225,180 +177,35 @@ void midi_delay_control(fx *e, int data1, int data2)
     }
     (void)data1;
     (void)data2;
-
-    // double scaley_val;
-    // if (e->type == DELAY) {
-    //    stereodelay *d = e->delay;
-    //    switch (data1) {
-    //    case 1:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
-    //        data2);
-    //        printf("OPTION1!\n");
-    //        break;
-    //    case 2:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
-    //        data2);
-    //        printf("OPTION2!\n");
-    //        break;
-    //    case 3:
-    //        scaley_val = scaleybum(0, 127, 0, 1, data2);
-    //        printf("OPTION3!\n");
-    //        break;
-    //    case 4:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
-    //        data2);
-    //        printf("OPTION4!\n");
-    //        break;
-    //    case 5:
-    //        scaley_val = scaleybum(0, 127, 0, 2000, data2);
-    //        printf("DELAY TIME! %f\n", scaley_val);
-    //        stereo_delay_set_delay_time_ms(d, scaley_val);
-    //        break;
-    //    case 6:
-    //        // scaley_val = scaleybum(0, 128, -100, 100, data2);
-    //        scaley_val = scaleybum(0, 127, 20, 100, data2);
-    //        printf("DELAY FEEDBACK! %f\n", scaley_val);
-    //        stereo_delay_set_feedback_percent(d, scaley_val);
-    //        break;
-    //    case 7:
-    //        scaley_val = scaleybum(0, 127, -0.9, 0.9, data2);
-    //        printf("DELAY RATIO! %f\n", scaley_val);
-    //        stereo_delay_set_delay_ratio(d, scaley_val);
-    //        break;
-    //    case 8:
-    //        scaley_val = scaleybum(0, 127, 0, 1, data2);
-    //        printf("DELAY MIX! %f\n", scaley_val);
-    //        stereo_delay_set_wet_mix(d, scaley_val);
-    //        break;
-    //    default:
-    //        printf("SOMthing else\n");
-    //    }
-    //}
-    // else if (e->type == MODDELAY) {
-    //    mod_delay *d = e->moddelay;
-    //    switch (data1) {
-    //    case 1:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
-    //        data2);
-    //        printf("OPTION1!\n");
-    //        break;
-    //    case 2:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
-    //        data2);
-    //        printf("OPTION2!\n");
-    //        break;
-    //    case 3:
-    //        scaley_val = scaleybum(0, 127, 0, 1, data2);
-    //        printf("OPTION3!\n");
-    //        break;
-    //    case 4:
-    //        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS,
-    //        data2);
-    //        printf("OPTION4!\n");
-    //        break;
-    //    case 5:
-    //        scaley_val = scaleybum(0, 128, 0, 100, data2);
-    //        printf("MOD DELAY DDEPTH ! %f\n", scaley_val);
-    //        d->m_depth = scaley_val;
-    //        break;
-    //    case 6:
-    //        // scaley_val = scaleybum(0, 128, -100, 100, data2);
-    //        scaley_val = scaleybum(0, 128, 0.02, 5.0, data2);
-    //        printf("MOD DELAY RATE ! %f\n", scaley_val);
-    //        d->m_rate = scaley_val;
-    //        break;
-    //    case 7:
-    //        scaley_val = scaleybum(0, 127, -100, 100, data2);
-    //        printf("MOD DELAY FEEDBACK PCT! %f\n", scaley_val);
-    //        d->m_feedback_percent = scaley_val;
-    //        break;
-    //    case 8:
-    //        scaley_val = scaleybum(0, 127, 0, 30, data2);
-    //        printf("MODDELAY CHORUS OFFSET! %f\n", scaley_val);
-    //        d->m_chorus_offset = scaley_val;
-    //        break;
-    //    default:
-    //        printf("SOMthing else\n");
-    //    }
-    //}
-    // else if (e->type == REVERB) {
-    //    reverb *r = e->r;
-    //    switch (data1) {
-    //    case 1:
-    //        scaley_val = scaleybum(0, 127, 0, 100, data2);
-    //        printf("Reverb Pre Delay Ms!\n");
-    //        r->m_pre_delay_msec = scaley_val;
-    //        break;
-    //    case 2:
-    //        scaley_val = scaleybum(0, 127, -96, 0, data2);
-    //        printf("Reverb Pre Delay Atten DB!\n");
-    //        r->m_pre_delay_atten_db = scaley_val;
-    //        break;
-    //    case 3:
-    //        scaley_val = scaleybum(0, 127, 0, 5000, data2);
-    //        printf("Reverb Time!\n");
-    //        r->m_rt60 = scaley_val;
-    //        break;
-    //    case 4:
-    //        scaley_val = scaleybum(0, 127, 0, 100, data2);
-    //        printf("Reverb Wet Mix!\n");
-    //        r->m_wet_pct = scaley_val;
-    //        break;
-    //    case 5:
-    //        scaley_val = scaleybum(0, 128, 0, 1, data2);
-    //        printf("Reverb Bandwidth - Input Diffusion! %f\n", scaley_val);
-    //        r->m_input_lpf_g = scaley_val;
-    //        break;
-    //    case 6:
-    //        scaley_val = scaleybum(0, 128, 0, 100, data2);
-    //        printf("Reverb Input Diffusion Delay ms! %f\n", scaley_val);
-    //        r->m_apf_1_delay_msec = scaley_val;
-    //        break;
-    //    case 7:
-    //        scaley_val = scaleybum(0, 127, -1, 1, data2);
-    //        printf("Reverb Input Diffusion APF 1 co-efficient ! %f\n",
-    //               scaley_val);
-    //        r->m_apf_1_g = scaley_val;
-    //        break;
-    //    case 8:
-    //        scaley_val = scaleybum(0, 127, 0, 100, data2);
-    //        printf("Reverb Input APF 2 delay msec ! %f\n", scaley_val);
-    //        r->m_apf_2_delay_msec = scaley_val;
-    //        break;
-    //    default:
-    //        printf("SOMthing else\n");
-    //    }
-    //    reverb_cook_variables(r);
-    //}
 }
 
-void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
+void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
 {
     if (sg->type == MINISYNTH_TYPE)
     {
         minisynth *ms = (minisynth *)sg;
 
-        switch (ev->event_type)
+        switch (ev.event_type)
         {
         case (144):
         { // Hex 0x80
-            minisynth_add_last_note(ms, ev->data1);
-            minisynth_midi_note_on(ms, ev->data1, ev->data2);
+            minisynth_add_last_note(ms, ev.data1);
+            minisynth_midi_note_on(ms, ev.data1, ev.data2);
             break;
         }
         case (128):
         { // Hex 0x90
-            minisynth_midi_note_off(ms, ev->data1, ev->data2, true);
+            minisynth_midi_note_off(ms, ev.data1, ev.data2, true);
             break;
         }
         case (176):
         { // Hex 0xB0
-            minisynth_midi_control(ms, ev->data1, ev->data2);
+            minisynth_midi_control(ms, ev.data1, ev.data2);
             break;
         }
         case (224):
         { // Hex 0xE0
-            minisynth_midi_pitchbend(ms, ev->data1, ev->data2);
+            minisynth_midi_pitchbend(ms, ev.data1, ev.data2);
             break;
         }
         default:
@@ -409,41 +216,43 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     else if (sg->type == DIGISYNTH_TYPE)
     {
         digisynth *ds = (digisynth *)sg;
-        switch (ev->event_type)
+        switch (ev.event_type)
         {
         case (144):
         { // Hex 0x80
-            digisynth_midi_note_on(ds, ev->data1, ev->data2);
+            digisynth_midi_note_on(ds, ev.data1, ev.data2);
             break;
         }
         case (128):
         { // Hex 0x90
-            digisynth_midi_note_off(ds, ev->data1, ev->data2, true);
+            digisynth_midi_note_off(ds, ev.data1, ev.data2, true);
             break;
         }
         }
     }
 
     synthbase *base = get_synthbase(sg);
-    if (ev->delete_after_use)
+    if (ev.delete_after_use)
     {
-        base->melodies[base->cur_melody][ev->tick] = NULL;
-        if (mixr->debug_mode)
-            printf("DELETing TEMP TICK! %d note: %d\n", ev->tick, ev->data1);
-        free(ev);
+        base->melodies[base->cur_melody][ev.tick].tick = -1;
     }
 }
 
-void midi_melody_quantize(midi_event **melody)
+void midi_melody_quantize(midi_events_loop *melody)
 {
     printf("Quantizzzzzzing\n");
+
+    midi_events_loop quantized_loop;
+
     for (int i = 0; i < PPNS; i++)
     {
-        if (melody[i])
+        quantized_loop[i].tick = -1;
+        midi_event ev = (*melody)[i];
+        if (ev.tick != -1)
         {
-            int tick = melody[i]->tick;
+            int tick = ev.tick;
             int amendedtick = 0;
-            printf("TICK NOM: %d\n", melody[i]->tick);
+            printf("TICK NOM: %d\n", tick);
             int tickdiv16 = tick / PPSIXTEENTH;
             int lower16th = tickdiv16 * PPSIXTEENTH;
             int upper16th = lower16th + PPSIXTEENTH;
@@ -452,27 +261,25 @@ void midi_melody_quantize(midi_event **melody)
             else
                 amendedtick = upper16th;
 
-            // TODO - do i need a mutex or protection here -
-            // melody[tick] is
-            // being read from other thread
-            melody[i]->tick = amendedtick;
+            ev.tick = amendedtick;
+            quantized_loop[amendedtick] = ev;
             printf("Amended TICK: %d\n", amendedtick);
         }
     }
+
+    for (int i = 0; i < PPNS; i++)
+        (*melody)[i] = quantized_loop[i];
 }
 
-void midi_melody_print(midi_event **melody)
+void midi_melody_print(midi_events_loop *loop)
 {
     for (int i = 0; i < PPNS; i++)
     {
-        if (melody[i])
+        midi_event ev = (*loop)[i];
+        if (ev.tick != -1)
         {
-            int tick = melody[i]->tick;
-            int data1 = melody[i]->data1;
-            int data2 = melody[i]->data2;
-            int typeint = melody[i]->event_type;
             char type[20] = {0};
-            switch (typeint)
+            switch (ev.event_type)
             {
             case (144):
                 strcpy(type, "note_on");
@@ -490,11 +297,10 @@ void midi_melody_print(midi_event **melody)
                 strcpy(type, "no_idea");
                 break;
             }
-            int delete = melody[i]->delete_after_use;
             printf("[Tick: %5d] - note: %4d velocity: %4d type: %s "
                    "tick_off: %d delete_after_use: %s\n",
-                   tick, data1, data2, type, melody[i]->tick_off,
-                   delete ? "true" : "false");
+                   ev.tick, ev.data1, ev.data2, type, ev.tick_off,
+                   ev.delete_after_use ? "true" : "false");
         }
     }
 }

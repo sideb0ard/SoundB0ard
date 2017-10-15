@@ -64,18 +64,6 @@ typedef struct synthbase
 } synthbase;
 
 void synthbase_init(synthbase *base);
-void synthbase_free_melodies(synthbase *base);
-// for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
-//{
-//    for (int j = 0; j < PPNS; j++)
-//    {
-//        if (ms->melodies[i][j] != NULL)
-//        {
-//            midi_event_free(ms->melodies[i][j]);
-//            ms->melodies[i][j] = NULL;
-//        }
-//    }
-//}
 
 int synthbase_gennext(synthbase *base);
 void synthbase_status(synthbase *base, wchar_t *status_string);
@@ -87,22 +75,21 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
 void synthbase_set_multi_melody_mode(synthbase *self, bool melody_mode);
 void synthbase_set_melody_loop_num(synthbase *self, int melody_num,
                                    int loop_num);
+
 int synthbase_add_melody(synthbase *self);
-void synthbase_dupe_melody(midi_event **from, midi_event **to);
+void synthbase_dupe_melody(midi_events_loop *from, midi_events_loop *to);
 void synthbase_switch_melody(synthbase *self, unsigned int melody_num);
 void synthbase_reset_melody(synthbase *self, unsigned int melody_num);
 void synthbase_reset_melody_all(synthbase *self);
 void synthbase_reset_voices(synthbase *self);
 void synthbase_melody_to_string(synthbase *self, int melody_num,
                                 wchar_t scratch[33]);
-int synthbase_add_event(synthbase *self, int pattern_num, midi_event *ev);
+int synthbase_add_event(synthbase *self, int pattern_num, midi_event ev);
 void synthbase_delete_event(synthbase *base, int pat_num, int tick);
 
-midi_event **synthbase_get_midi_loop(synthbase *self);
-midi_event **synthbase_copy_midi_loop(synthbase *self, int pattern_num);
-void synthbase_add_midi_loop(synthbase *self, midi_event **events,
-                             int pattern_num);
-void synthbase_replace_midi_loop(synthbase *base, midi_event **events,
+void synthbase_copy_midi_loop(synthbase *self, int pattern_num,
+                              midi_events_loop *target_loop);
+void synthbase_replace_midi_loop(synthbase *base, midi_events_loop *source_loop,
                                  int melody_num);
 void synthbase_print_melodies(synthbase *base);
 void synthbase_nudge_melody(synthbase *base, int melody_num, int sixteenth);
@@ -112,7 +99,7 @@ void synthbase_set_generate_mode(synthbase *base, bool b);
 void synthbase_set_morph_mode(synthbase *base, bool b);
 void synthbase_set_backup_mode(synthbase *base, bool b);
 void synthbase_morph(synthbase *base);
-int synthbase_get_notes_from_melody(midi_event **melody,
+int synthbase_get_notes_from_melody(midi_events_loop *loop,
                                     int return_midi_notes[10]);
 
 int synthbase_change_octave_melody(synthbase *base, int pattern_num,

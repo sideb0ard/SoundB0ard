@@ -693,25 +693,24 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
          (PPSIXTEENTH * 4 - 7)) %
         PPNS;
 
-    midi_event *off_event = new_midi_event(note_off_tick, 128, note, velocity);
+    midi_event off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
 
     if (base->recording)
     {
         printf("Recording note!\n");
         int note_on_tick = mixr->midi_tick % PPNS;
-        midi_event *on_event =
-            new_midi_event(note_on_tick, 144, note, velocity);
+        midi_event on_event = new_midi_event(note_on_tick, 144, note, velocity);
 
         int final_note_off_tick =
             synthbase_add_event(base, base->cur_melody, off_event);
 
-        on_event->tick_off = final_note_off_tick;
+        on_event.tick_off = final_note_off_tick;
         synthbase_add_event(base, base->cur_melody, on_event);
     }
     else
     {
-        off_event->delete_after_use = true; // _THIS_ is the magic
+        off_event.delete_after_use = true; // _THIS_ is the magic
         synthbase_add_event(base, base->cur_melody, off_event);
     }
 }
