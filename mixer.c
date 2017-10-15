@@ -395,6 +395,15 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->start_of_loop = false;
         }
 
+        if (mixr->start_of_loop)
+        {
+            if (mixr->scene_start_pending)
+            {
+                mixer_play_scene(mixr, mixr->current_scene);
+                mixr->scene_start_pending = false;
+            }
+        }
+
         double output_left = 0.0;
         double output_right = 0.0;
         if (mixr->soundgen_num > 0)

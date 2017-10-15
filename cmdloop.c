@@ -1148,13 +1148,17 @@ void interpret(char *line)
                     }
                     else if (strncmp("cp", wurds[2], 2) == 0)
                     {
+                        printf("CP!\n");
                         int pattern_num = atoi(wurds[3]);
                         int sg2 = 0;
                         int pattern_num2 = 0;
                         sscanf(wurds[4], "%d:%d", &sg2, &pattern_num2);
+                        printf("CP'ing %d:%d to %d:%d\n", soundgen_num,
+                               pattern_num, sg2, pattern_num2);
                         if (mixer_is_valid_soundgen_num(mixr, sg2) &&
                             is_synth(mixr->sound_generators[sg2]))
                         {
+                            printf("ALL VALID!\n");
                             synthbase *sb2 =
                                 get_synthbase(mixr->sound_generators[sg2]);
 

@@ -408,10 +408,7 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
     //
     // this checks if we're already stealing this note - then no-op, just rturn
     if (v->m_note_pending && v->m_midi_note_number_pending == midi_note)
-    {
-        printf("NO-OP!\n");
         return;
-    }
 
     v->m_midi_note_number_pending = midi_note;
     v->m_midi_velocity_pending = midi_velocity;
