@@ -274,8 +274,6 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
         return false;
     }
 
-    minisynth_voice_update(msv);
-
     //// layer 0 //////////////////////////////
     do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 0);
 

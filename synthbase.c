@@ -226,8 +226,7 @@ int synthbase_gennext(synthbase *base)
     {
         int idx = mixr->midi_tick % PPNS;
         // top of the base loop, which is two bars, check if we need to
-        // progress
-        // to next loop
+        // progress to next loop
         if (idx == 0)
         {
             if (base->multi_melody_mode && base->num_melodies > 1)
@@ -235,7 +234,10 @@ int synthbase_gennext(synthbase *base)
                 base->cur_melody_iteration--;
                 if (base->cur_melody_iteration == 0)
                 {
-                    minisynth_midi_note_off((minisynth *)base, 0, 0, true);
+                    minisynth_midi_note_off((minisynth *)base,
+                                            0,
+                                            0,
+                                            true /* all notes off */ );
 
                     int next_melody =
                         (base->cur_melody + 1) % base->num_melodies;

@@ -439,6 +439,10 @@ void minisynth_update(minisynth *ms)
     stereo_delay_set_wet_mix(&ms->m_delay_fx, ms->m_settings.m_delay_wet_mix);
     stereo_delay_set_mode(&ms->m_delay_fx, ms->m_settings.m_delay_mode);
     stereo_delay_update(&ms->m_delay_fx);
+
+    for (int i = 0; i < MAX_VOICES; i++)
+        if (ms->m_voices[i])
+            minisynth_voice_update(ms->m_voices[i]);
 }
 
 void minisynth_midi_control(minisynth *self, unsigned int data1,
@@ -773,12 +777,9 @@ stereo_val minisynth_gennext(void *self)
         midi_parse_midi_event((soundgenerator *)ms, ev);
     }
 
-    minisynth_update(ms);
-
     if (ms->m_arp.active)
-    {
         arpeggiate(ms, &ms->m_arp);
-    }
+
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
@@ -790,9 +791,8 @@ stereo_val minisynth_gennext(void *self)
     for (int i = 0; i < MAX_VOICES; i++)
     {
         if (ms->m_voices[i])
-        {
             minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
-        }
+
         accum_out_left += mix * out_left;
         accum_out_right += mix * out_right;
     }
