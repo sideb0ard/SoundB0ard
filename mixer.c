@@ -207,8 +207,8 @@ void mixer_update_bpm(mixer *mixr, int bpm)
             }
             if (mixr->sound_generators[i]->type == LOOPER_TYPE)
             {
-                looper_resample_to_loop_size(
-                    (looper *)mixr->sound_generators[i]);
+                looper *l = (looper *)mixr->sound_generators[i];
+                looper_update_incr(l);
             }
         }
     }
