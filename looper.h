@@ -12,14 +12,15 @@
 typedef struct file_sample
 {
     char *filename;
-    double *buffer;
-    int bufsize;
-    double position;
+    int *orig_file_bytes;
+    int orig_file_size;
+    double *resampled_file_bytes;
+    int resampled_file_size;
+    int position;
     int samplerate;
     int channels;
     int frames;
     int loop_len;
-    double incr;
 } file_sample;
 
 typedef struct looper
@@ -37,6 +38,7 @@ typedef struct looper
     // bool multi_sample_loop_countdown_started;
 
     bool started;
+    bool just_been_resampled;
 
     bool scramblrrr_mode;
     bool scramblrrr_active;
@@ -56,6 +58,7 @@ typedef struct looper
 
     double vol;
 
+    bool resample_pending;
     bool change_loopsize_pending;
     int pending_loop_size;
     int pending_loop_num;
@@ -63,6 +66,7 @@ typedef struct looper
 
 looper *new_looper(char *filename, double loop_len); // loop_len in bars
 void looper_add_sample(looper *s, char *filename, int loop_len);
+file_sample *looper_create_sample(char *filename, int loop_len);
 
 void looper_scramble(looper *s);
 void looper_set_scramble_mode(looper *s, bool b);
@@ -70,10 +74,9 @@ void looper_set_max_generation(looper *s, int max);
 
 void looper_set_stutter_mode(looper *s, bool b);
 
-void looper_update_incr(looper *l);
-void looper_sample_update_incr(file_sample *s);
 void looper_set_multi_sample_mode(looper *s, bool multi);
 void looper_switch_sample(looper *s, int sample_num);
+void looper_resample_to_loop_size(looper *s);
 void looper_change_loop_len(looper *s, int sample_num, int loop_len);
 void looper_change_num_loops(looper *s, int sample_num, int num_loops);
 stereo_val looper_gennext(void *self);
@@ -88,6 +91,7 @@ int looper_get_num_tracks(void *self);
 
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);
+void sample_resample_to_loop_size(file_sample *fs);
 
 void file_sample_free(file_sample *fs);
 void looper_del_self(void *self);

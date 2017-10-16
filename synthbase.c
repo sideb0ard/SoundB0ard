@@ -234,8 +234,10 @@ int synthbase_gennext(synthbase *base)
                 base->cur_melody_iteration--;
                 if (base->cur_melody_iteration == 0)
                 {
-                    minisynth_midi_note_off((minisynth *)base, 0, 0,
-                                            true /* all notes off */);
+                    minisynth_midi_note_off((minisynth *)base,
+                                            0,
+                                            0,
+                                            true /* all notes off */ );
 
                     int next_melody =
                         (base->cur_melody + 1) % base->num_melodies;
