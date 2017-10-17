@@ -44,7 +44,6 @@ looper *new_looper(char *filename, double loop_len)
 }
 
 stereo_val looper_gennext(void *self)
-// void looper_gennext(void* self, double* frame_vals, int framesPerBuffer)
 {
     looper *l = (looper *)self;
     stereo_val val = {0, 0};
@@ -195,9 +194,19 @@ stereo_val looper_gennext(void *self)
         val.left =
             l->samples[l->cur_sample]
                 ->resampled_file_bytes[l->samples[l->cur_sample]->position];
-        val.right =
-            l->samples[l->cur_sample]
-                ->resampled_file_bytes[l->samples[l->cur_sample]->position];
+        if (l->samples[l->cur_sample]->channels > 0)
+        {
+            val.right =
+                l->samples[l->cur_sample]
+                    ->resampled_file_bytes[l->samples[l->cur_sample]->position];
+        }
+        else
+        {
+            val.right =
+                l->samples[l->cur_sample]
+                    ->resampled_file_bytes[l->samples[l->cur_sample]->position +
+                                           1];
+        }
     }
 
     if (l->scramblrrr->position == l->scramblrrr->resampled_file_size)
@@ -206,6 +215,9 @@ stereo_val looper_gennext(void *self)
     }
 
     l->samples[l->cur_sample]->position++;
+    if (l->samples[l->cur_sample]->channels > 0)
+        l->samples[l->cur_sample]->position++;
+
     if (l->samples[l->cur_sample]->position ==
         l->samples[l->cur_sample]->resampled_file_size)
     {
@@ -218,8 +230,13 @@ stereo_val looper_gennext(void *self)
     double scratch = 0;
     scratch = effector(&l->sound_generator, val.left);
     scratch = envelopor(&l->sound_generator, val.left);
-
     val.left = scratch * l->vol;
+
+    if (l->samples[l->cur_sample]->channels > 0)
+    {
+        scratch = effector(&l->sound_generator, val.right);
+        scratch = envelopor(&l->sound_generator, val.right);
+    }
     val.right = scratch * l->vol;
 
     return val;
@@ -289,7 +306,7 @@ void sample_import_file_contents(file_sample *fs, char *filename)
     int bufsize = sf_info.channels * sf_info.frames;
     printf("Making buffer size of %d\n", bufsize);
 
-    int *buffer = (int *)calloc(bufsize, sizeof(int));
+    double *buffer = (double *)calloc(bufsize, sizeof(double));
     if (buffer == NULL)
     {
         perror("Ooft, memory issues, mate!\n");
@@ -297,7 +314,7 @@ void sample_import_file_contents(file_sample *fs, char *filename)
         return;
     }
 
-    sf_readf_int(snd_file, buffer, bufsize);
+    sf_readf_double(snd_file, buffer, bufsize);
     sf_close(snd_file);
 
     fs->orig_file_bytes = buffer;
@@ -335,16 +352,20 @@ void looper_change_loop_len(looper *l, int sample_num, int loop_len)
 
 void sample_resample_to_loop_size(file_sample *fs)
 {
+    printf("FILe is %s\n", fs->filename);
     printf("BUFSIZE is %d\n", fs->orig_file_size);
     printf("FRAMES is %d\n", fs->frames);
     printf("CHANNELS is %d\n", fs->channels);
 
-    int loop_len_in_samples = fs->frames;
+    int loop_len_in_samples = mixr->loop_len_in_samples;
+
     if (fs->loop_len != 0)
-        loop_len_in_samples = mixr->loop_len_in_samples * fs->loop_len;
+        loop_len_in_samples =
+            mixr->loop_len_in_samples * fs->loop_len * fs->channels;
 
     double *resampled_file_bytes =
         (double *)calloc(loop_len_in_samples, sizeof(double));
+
     if (resampled_file_bytes == NULL)
     {
         printf("Memory barf in looper resample\n");
@@ -353,15 +374,16 @@ void sample_resample_to_loop_size(file_sample *fs)
 
     if (strncmp("none", fs->filename, 4) != 0)
     {
-        int *table = fs->orig_file_bytes;
+        double *table = fs->orig_file_bytes;
         double bufsize = fs->orig_file_size;
 
         double position = 0;
-        double incr = (double)fs->orig_file_size / loop_len_in_samples;
+        double incr =
+            ((double)fs->orig_file_size / loop_len_in_samples) * fs->channels;
         for (int i = 0; i < loop_len_in_samples; i++)
         {
             int base_index = (int)position;
-            unsigned long next_index = base_index + 1;
+            unsigned long next_index = base_index + fs->channels;
             double frac, slope, val;
 
             frac = position - base_index;
@@ -379,8 +401,17 @@ void sample_resample_to_loop_size(file_sample *fs)
                 break;
             }
 
-            // convert from 16bit int to double between 0 and 1
-            resampled_file_bytes[i] = val / 2147483648.0;
+            resampled_file_bytes[i] = val;
+
+            if (fs->channels > 1)
+            {
+                base_index++;
+                next_index++;
+                double right_val = table[base_index];
+                slope = table[next_index] - right_val;
+                right_val += (frac * slope);
+                resampled_file_bytes[i++] = right_val;
+            }
         }
 
         bool is_previous_buffer =
@@ -421,9 +452,9 @@ void looper_status(void *self, wchar_t *status_string)
     for (int i = 0; i < l->num_samples; i++)
     {
         swprintf(looper_details, 128,
-                 L"\n      [%d] %s - looplen: %d numloops: %d", i,
+                 L"\n      [%d] %s - looplen:%d numloops:%d stereo:%d", i,
                  l->samples[i]->filename, l->samples[i]->loop_len,
-                 l->sample_num_loops[i]);
+                 l->sample_num_loops[i], l->samples[i]->channels > 1 ? 1 : 0);
         wcslcat(status_string, looper_details, strlen_left);
     }
 }

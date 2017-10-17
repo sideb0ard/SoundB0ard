@@ -12,7 +12,6 @@
 #include <readline/readline.h>
 
 #include "algorithm.h"
-#include "audioutils.h"
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "bitcrush.h"
@@ -1130,6 +1129,8 @@ void interpret(char *line)
                     // ALL THE SYNTHBASE COMMONALITY - BELOW DOES ACTIONS BASED
                     // ON WHICH KIND OF SYNTH
 
+                    printf("SYNTHBASE STIFF?\n");
+
                     synthbase *base =
                         get_synthbase(mixr->sound_generators[soundgen_num]);
 
@@ -1219,7 +1220,6 @@ void interpret(char *line)
                     }
                     else if (strncmp("keys", wurds[2], 4) == 0)
                     {
-                        // TODO - wurk for digisynth too
                         keys(soundgen_num);
                     }
                     else if (strncmp("generate", wurds[2], 8) == 0)
@@ -1347,17 +1347,8 @@ void interpret(char *line)
                             }
                             else if (strncmp("add", wurds[3], 3) == 0)
                             {
-                                int tick = 0;
-                                int midi_note = 0;
-                                sscanf(wurds[4], "%d:%d", &tick, &midi_note);
-                                if (midi_note != 0)
-                                {
-                                    printf("Adding"
-                                           " note"
-                                           "\n");
-                                    synthbase_add_note(base, melody_num, tick,
-                                                       midi_note);
-                                }
+                                char_melody_to_midi_melody(base, melody_num,
+                                                           wurds, 4, num_wurds);
                             }
                             else if (strncmp("mv", wurds[3], 2) == 0)
                             {
@@ -1376,7 +1367,8 @@ void interpret(char *line)
                                 synthbase_rm_note(base, melody_num, tick);
                             }
                             else if (strncmp("madd", wurds[3], 4) == 0)
-                            {
+                            { // TODO - give this support for chords - atm its
+                              // just single midi note
                                 int tick = 0;
                                 int midi_note = 0;
                                 sscanf(wurds[4], "%d:%d", &tick, &midi_note);
@@ -2973,69 +2965,12 @@ void char_melody_to_midi_melody(synthbase *base, int dest_melody,
     {
         int tick = 0;
         int midi_note = 0;
-        char char_note[3] = {0};
-        bool chord_found = false;
         chord_midi_notes chnotes = {0, 0, 0};
-        sscanf(char_array[i], "%d:%s", &tick, char_note);
-        if (strncasecmp(char_note, "c", 1) == 0)
+        if (extract_chord_from_char_notation(char_array[i], &tick, &chnotes))
         {
-            chnotes = get_midi_notes_from_char_chord("C_MAJOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "dm", 2) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("D_MINOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "d", 1) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("D_MAJOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "em", 2) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("E_MINOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "e", 1) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("E_MAJOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "f", 1) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("F_MAJOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "gm", 2) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("G_MINOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "g", 1) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("G_MAJOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "am", 2) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("A_MINOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "a", 1) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("A_MAJOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "bm", 2) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("B_MINOR");
-            chord_found = true;
-        }
-        else if (strncasecmp(char_note, "b", 1) == 0)
-        {
-            chnotes = get_midi_notes_from_char_chord("B_MAJOR");
-            chord_found = true;
+            synthbase_add_note(base, dest_melody, tick, chnotes.root);
+            synthbase_add_note(base, dest_melody, tick, chnotes.third);
+            synthbase_add_note(base, dest_melody, tick, chnotes.fifth);
         }
         else
         {
@@ -3046,12 +2981,75 @@ void char_melody_to_midi_melody(synthbase *base, int dest_melody,
                 synthbase_add_note(base, dest_melody, tick, midi_note);
             }
         }
-
-        if (chord_found)
-        {
-            synthbase_add_note(base, dest_melody, tick, chnotes.root);
-            synthbase_add_note(base, dest_melody, tick, chnotes.third);
-            synthbase_add_note(base, dest_melody, tick, chnotes.fifth);
-        }
     }
+}
+
+bool extract_chord_from_char_notation(char *wurd, int *tick,
+                                      chord_midi_notes *chnotes)
+{
+    char char_note[3] = {0};
+    sscanf(wurd, "%d:%s", tick, char_note);
+
+    if (strncasecmp(char_note, "c", 1) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("C_MAJOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "dm", 2) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("D_MINOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "d", 1) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("D_MAJOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "em", 2) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("E_MINOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "e", 1) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("E_MAJOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "f", 1) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("F_MAJOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "gm", 2) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("G_MINOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "g", 1) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("G_MAJOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "am", 2) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("A_MINOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "a", 1) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("A_MAJOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "bm", 2) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("B_MINOR");
+        return true;
+    }
+    else if (strncasecmp(char_note, "b", 1) == 0)
+    {
+        *chnotes = get_midi_notes_from_char_chord("B_MAJOR");
+        return true;
+    }
+
+    return false;
 }

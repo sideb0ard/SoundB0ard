@@ -12,15 +12,19 @@
 typedef struct file_sample
 {
     char *filename;
-    int *orig_file_bytes;
+
+    double *orig_file_bytes;
     int orig_file_size;
+
     double *resampled_file_bytes;
     int resampled_file_size;
+
     int position;
     int samplerate;
     int channels;
     int frames;
     int loop_len;
+
 } file_sample;
 
 typedef struct looper
