@@ -70,14 +70,14 @@ typedef struct mixer
 
     double bpm;
 
-    int samples_per_midi_tick;
+    int frames_per_midi_tick;
     int midi_ticks_per_ms;
     int sixteenth_note_tick;
     int cur_sample; // inverse of SAMPLE RATE
     int midi_tick;
 
     // informational for other sound generators
-    unsigned int loop_len_in_samples;
+    unsigned int loop_len_in_frames;
     unsigned int loop_len_in_ticks;
 
     bool start_of_loop; // true for one sample during loop time

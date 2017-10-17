@@ -131,7 +131,7 @@ stereo_val looper_gennext(void *self)
     //     }
     // }
 
-    //if (l->stutter_active)
+    // if (l->stutter_active)
     //{
     //    if (mixr->cur_sample % (l->scramblrrr->resampled_file_size / 16) == 0)
     //    {
@@ -163,7 +163,6 @@ stereo_val looper_gennext(void *self)
 
     if (l->samples[l->cur_sample]->position == 0)
     {
-
         if (l->multi_sample_mode)
         {
             l->cur_sample_iteration--;
@@ -217,7 +216,7 @@ stereo_val looper_gennext(void *self)
     }
 
     l->samples[l->cur_sample]->position++;
-    if (l->samples[l->cur_sample]->channels > 0)
+    if (l->samples[l->cur_sample]->channels > 1)
         l->samples[l->cur_sample]->position++;
 
     if (l->samples[l->cur_sample]->position ==
@@ -359,7 +358,8 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("CHANNELS is %d\n", fs->channels);
     printf("LOOPLEN is %.2f\n", fs->loop_len);
 
-    int resampled_buffer_size = mixr->loop_len_in_samples * fs->loop_len * fs->channels;
+    int resampled_buffer_size =
+        mixr->loop_len_in_frames * fs->loop_len * fs->channels;
 
     double *resampled_file_bytes =
         (double *)calloc(resampled_buffer_size, sizeof(double));
@@ -401,27 +401,16 @@ void sample_resample_to_loop_size(file_sample *fs)
             }
 
             resampled_file_bytes[i] = val;
-
-            //if (fs->channels > 1)
-            //{
-            //    base_index++;
-            //    next_index++;
-            //    double right_val = table[base_index];
-            //    slope = table[next_index] - right_val;
-            //    right_val += (frac * slope);
-            //    resampled_file_bytes[++i] = right_val;
-            //}
         }
 
-        bool is_previous_buffer =
-            fs->resampled_file_bytes != NULL ? true : false;
-        if (is_previous_buffer)
+        if (fs->resampled_file_bytes) // previous resample
         {
             double *oldbuf = fs->resampled_file_bytes;
             int old_relative_position =
                 (100 / fs->resampled_file_size) * fs->position;
 
-            fs->position = (resampled_buffer_size / 100) * old_relative_position;
+            fs->position =
+                (resampled_buffer_size / 100) * old_relative_position;
             free(oldbuf);
         }
     }
@@ -547,7 +536,7 @@ void looper_scramble(looper *s)
     // if (s->scramblrrr->loop_len != 0)
     //    len16th = len / s->scramblrrr->loop_len / 16;
     // else
-    len16th = mixr->loop_len_in_samples / 16;
+    len16th = mixr->loop_len_in_frames / 16;
 
     // take a copy of the first 16th that we can randomly inject below.
     double first16th[len16th];

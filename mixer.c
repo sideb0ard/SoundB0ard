@@ -187,9 +187,8 @@ void mixer_update_bpm(mixer *mixr, int bpm)
 {
     printf("Changing bpm to %d\n", bpm);
     mixr->bpm = bpm;
-    mixr->samples_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
-    mixr->midi_ticks_per_ms = PPQN * bpm / 60000; /// TODO - used?
-    mixr->loop_len_in_samples = mixr->samples_per_midi_tick * PPBAR;
+    mixr->frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
+    mixr->loop_len_in_frames = mixr->frames_per_midi_tick * PPBAR;
     mixr->loop_len_in_ticks = PPBAR;
     mixr->sixteenth_note_tick = -1;
     mixr->midi_tick = -1;
@@ -322,7 +321,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
     for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
-        if (mixr->cur_sample % mixr->samples_per_midi_tick == 0)
+        if (mixr->cur_sample % mixr->frames_per_midi_tick == 0)
         {
             mixr->midi_tick++; // 1 midi tick (or pulse)
             mixr->is_midi_tick = true;
@@ -333,7 +332,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         }
 
         if (mixr->cur_sample %
-                ((PPSIXTEENTH / 2) * mixr->samples_per_midi_tick) ==
+                ((PPSIXTEENTH / 2) * mixr->frames_per_midi_tick) ==
             0)
         { // thirty second
             mixr->is_thirtysecond = true;
@@ -343,7 +342,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->is_thirtysecond = false;
         }
 
-        if (mixr->cur_sample % (PPSIXTEENTH * mixr->samples_per_midi_tick) == 0)
+        if (mixr->cur_sample % (PPSIXTEENTH * mixr->frames_per_midi_tick) == 0)
         {
             mixr->sixteenth_note_tick++; // for seq machine resolution
             mixr->is_sixteenth = true;
@@ -353,8 +352,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->is_sixteenth = false;
         }
 
-        if (mixr->cur_sample %
-                (PPSIXTEENTH * 2 * mixr->samples_per_midi_tick) ==
+        if (mixr->cur_sample % (PPSIXTEENTH * 2 * mixr->frames_per_midi_tick) ==
             0)
         {
             mixr->is_eighth = true;
@@ -364,7 +362,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->is_eighth = false;
         }
 
-        if (mixr->cur_sample % (PPQN * mixr->samples_per_midi_tick) == 0)
+        if (mixr->cur_sample % (PPQN * mixr->frames_per_midi_tick) == 0)
         {
             mixr->is_quarter = true;
         }
@@ -373,7 +371,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             mixr->is_quarter = false;
         }
 
-        if (mixr->cur_sample % (PPBAR * mixr->samples_per_midi_tick) == 0)
+        if (mixr->cur_sample % (PPBAR * mixr->frames_per_midi_tick) == 0)
         {
             mixr->start_of_loop = true;
             if (mixr->start_of_loop && (mixr->sixteenth_note_tick % 16 != 0))
