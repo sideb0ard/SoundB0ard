@@ -19,6 +19,9 @@ typedef struct file_sample
     double *resampled_file_bytes;
     int resampled_file_size;
 
+    // copy of resampled, same size
+    double *scrambled_file_bytes;
+
     int position;
     int samplerate;
     int channels;
@@ -33,13 +36,11 @@ typedef struct looper
 
     file_sample *samples[MAX_SAMPLES_PER_LOOPER];
     int sample_num_loops[MAX_SAMPLES_PER_LOOPER];
-    file_sample *scramblrrr; // for storing scrambled effect version of loop
     int loop_len;
     int num_samples;
     int cur_sample;
     int cur_sample_iteration;
     bool multi_sample_mode;
-    // bool multi_sample_loop_countdown_started;
 
     bool started;
     bool just_been_resampled;

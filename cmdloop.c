@@ -1363,7 +1363,7 @@ void interpret(char *line)
                                 synthbase_rm_note(base, melody_num, tick);
                             }
                             else if (strncmp("madd", wurds[3], 4) == 0)
-                            {   // TODO - give this support for chords - atm its
+                            { // TODO - give this support for chords - atm its
                                 // just single midi note
                                 int tick = 0;
                                 int midi_note = 0;
