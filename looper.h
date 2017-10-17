@@ -23,7 +23,7 @@ typedef struct file_sample
     int samplerate;
     int channels;
     int frames;
-    int loop_len;
+    double loop_len;
 
 } file_sample;
 
@@ -64,7 +64,7 @@ typedef struct looper
 
     bool resample_pending;
     bool change_loopsize_pending;
-    int pending_loop_size;
+    double pending_loop_size;
     int pending_loop_num;
 } looper;
 
@@ -81,7 +81,7 @@ void looper_set_stutter_mode(looper *s, bool b);
 void looper_set_multi_sample_mode(looper *s, bool multi);
 void looper_switch_sample(looper *s, int sample_num);
 void looper_resample_to_loop_size(looper *s);
-void looper_change_loop_len(looper *s, int sample_num, int loop_len);
+void looper_change_loop_len(looper *s, int sample_num, double loop_len);
 void looper_change_num_loops(looper *s, int sample_num, int num_loops);
 stereo_val looper_gennext(void *self);
 

@@ -940,22 +940,18 @@ void interpret(char *line)
                         {
                             if (strncmp("looplen", wurds[4], 8) == 0)
                             {
-                                int looplen = atoi(wurds[5]);
+                                double looplen = atoi(wurds[5]);
                                 s->pending_loop_num = sample_num;
                                 s->pending_loop_size = looplen;
                                 s->change_loopsize_pending = true;
-                                printf("CHANGEING "
-                                       "PENDING "
-                                       "..\n");
+                                printf("CHANGE PENDING\n");
                             }
                             else if (strncmp("numloops", wurds[4], 8) == 0)
                             {
                                 int numloops = atoi(wurds[5]);
                                 if (numloops != 0)
-                                {
                                     looper_change_num_loops(s, sample_num,
                                                             numloops);
-                                }
                             }
                         }
                     }
