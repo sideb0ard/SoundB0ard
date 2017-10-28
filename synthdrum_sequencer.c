@@ -1,12 +1,10 @@
 #include "synthdrum_sequencer.h"
-#include "mixer.h"
 #include "sequencer_utils.h"
 #include "utils.h"
 #include <math.h>
 #include <stdlib.h>
 #include <string.h>
 
-extern mixer *mixr;
 extern char *state_strings;
 
 synthdrum_sequencer *new_synthdrum_seq()
@@ -197,18 +195,17 @@ void sds_setvol(void *self, double v)
     return;
 }
 
-stereo_val sds_gennext(void *self)
+stereo_val sds_gennext(void *self, mixer_timing_info timing_info)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     stereo_val out = {0, 0};
-
-    // POSITIONAL
-    int idx = mixr->midi_tick % PPBAR;
 
     if (!sds->sg.active)
     {
         return out;
     }
+
+    int idx = timing_info.midi_tick % PPBAR;
 
     if (!sds->started)
     {
@@ -218,12 +215,12 @@ stereo_val sds_gennext(void *self)
             return out;
     }
 
-    if (mixr->is_midi_tick)
+    if (timing_info.is_midi_tick)
     {
         if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
             sds_trigger(sds);
     }
-    seq_tick(&sds->m_seq);
+    seq_tick(&sds->m_seq, timing_info);
 
     // END POSITIONAL /////////////////////////////////////////
 

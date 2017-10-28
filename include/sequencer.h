@@ -3,6 +3,8 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include "defjams.h"
+
 #define GRIDWIDTH (SEQUENCER_PATTERN_LEN / 4)
 #define INTEGER_LENGTH pow(2, SEQUENCER_PATTERN_LEN)
 
@@ -79,7 +81,7 @@ typedef struct sequencer
 } sequencer;
 
 void seq_init(sequencer *s);
-bool seq_tick(sequencer *s);
+bool seq_tick(sequencer *s, mixer_timing_info timing_info);
 void seq_status(sequencer *s, wchar_t *status_string);
 
 void seq_set_sample_amp(sequencer *s, int pattern_num, int pattern_position,

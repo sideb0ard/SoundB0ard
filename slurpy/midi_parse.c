@@ -1,14 +1,19 @@
+#include <math.h>
 #include <stdbool.h>
 #include <stdio.h>
-#include <string.h>
 #include <stdlib.h>
-#include <math.h>
+#include <string.h>
 
 // MIDI file format into from:
 // http://valentin.dasdeck.com/midi/midifile.htm
 // https://www.csie.ntu.edu.tw/~r92092/ref/midi/
 
-enum chunk_type_id { MTHD, MTRK, UNKNOWN };
+enum chunk_type_id
+{
+    MTHD,
+    MTRK,
+    UNKNOWN
+};
 static char *s_type_id_names[] = {"MThd", "MTrk", "Unknown"};
 
 typedef struct chunk_info
@@ -54,7 +59,7 @@ int read_var_len_variable(FILE *fp, int *chunk_left)
         cur_byte = fgetc(fp);
         (*chunk_left)--;
         value = (value << 7) + (cur_byte & 0x7F);
-    } while ( cur_byte & 0x80);
+    } while (cur_byte & 0x80);
 
     return value;
 }
@@ -71,9 +76,9 @@ chunk_info parse_chunk_header(char chunk_header[8])
     strncpy(chunk_type, chunk_header, 4);
 
     int chunk_len = 0;
-    char *packed_len = (char*)&chunk_len;
+    char *packed_len = (char *)&chunk_len;
     for (int i = 0; i < 4; i++)
-        packed_len[i] = chunk_header[7-i];
+        packed_len[i] = chunk_header[7 - i];
 
     chunk_info info;
 
@@ -97,21 +102,22 @@ header_info parse_header_chunk(FILE *fp)
 
     // format type first
     fread(scratch, 1, 2, fp);
-    packed_scratch = (char*)&h_info.format_type;
+    packed_scratch = (char *)&h_info.format_type;
     pack_int(scratch, packed_scratch, 2);
 
     // num of MTrk chunks
     fread(scratch, 1, 2, fp);
-    packed_scratch = (char*)&h_info.num_mtrk_chunks;
+    packed_scratch = (char *)&h_info.num_mtrk_chunks;
     pack_int(scratch, packed_scratch, 2);
 
     // Pulses Per Quart Note
     fread(scratch, 1, 2, fp);
-    packed_scratch = (char*)&h_info.ppqn;
+    packed_scratch = (char *)&h_info.ppqn;
     pack_int(scratch, packed_scratch, 2);
     if (h_info.ppqn & 32768)
     {
-        printf("Whoa, this file doesn't use PPQN - its' on some SMTPE frame shit - lazy Thor hasn't implemented this - bailing!\n");
+        printf("Whoa, this file doesn't use PPQN - its' on some SMTPE frame "
+               "shit - lazy Thor hasn't implemented this - bailing!\n");
         exit(-1);
     }
 
@@ -122,7 +128,11 @@ bool is_midi_file(FILE *fp)
 {
     char chunk_header[8] = {0};
     int numread = fread(chunk_header, 1 /* byte */, 8 /* num x */, fp);
-    if (numread != 8) { printf("Didn't read what i expected\n"); return false;}
+    if (numread != 8)
+    {
+        printf("Didn't read what i expected\n");
+        return false;
+    }
 
     chunk_info cur_chunk = parse_chunk_header(chunk_header);
     if (cur_chunk.type == MTHD)
@@ -148,7 +158,8 @@ bool parse_midi_file(char *midifile)
         return false;
     }
     header_info h_info = parse_header_chunk(fp);
-    printf("Format Type:%d Num MTrk Chunks:%d PPQN:%d\n", h_info.format_type, h_info.num_mtrk_chunks, h_info.ppqn);
+    printf("Format Type:%d Num MTrk Chunks:%d PPQN:%d\n", h_info.format_type,
+           h_info.num_mtrk_chunks, h_info.ppqn);
 
     double multiplier = 960. / h_info.ppqn;
     char chunk_header[8] = {0};
@@ -157,16 +168,22 @@ bool parse_midi_file(char *midifile)
     for (int i = 0; i < h_info.num_mtrk_chunks; i++)
     {
         printf("\nCHUNK%d\n", i);
-        size_t numread = fread(chunk_header, 1 /* byte */, 8 /* num x */, fp); // 4 bytes for type, 4 for size
-        if (numread != 8) { printf("Didn't read what i expected\n"); }
+        size_t numread = fread(chunk_header, 1 /* byte */, 8 /* num x */,
+                               fp); // 4 bytes for type, 4 for size
+        if (numread != 8)
+        {
+            printf("Didn't read what i expected\n");
+        }
         cur_chunk = parse_chunk_header(chunk_header);
 
         if (cur_chunk.type != MTRK)
         {
-            printf("Skipping %lu bytes as chunk type is unknown\n", cur_chunk.len);
+            printf("Skipping %lu bytes as chunk type is unknown\n",
+                   cur_chunk.len);
             fseek(fp, cur_chunk.len, SEEK_CUR);
         }
-        printf("ChunkType: %s len:%lu\n\n", s_type_id_names[cur_chunk.type], cur_chunk.len);
+        printf("ChunkType: %s len:%lu\n\n", s_type_id_names[cur_chunk.type],
+               cur_chunk.len);
 
         int delta_time = 0;
         int chunk_left = cur_chunk.len;
@@ -201,23 +218,24 @@ bool parse_midi_file(char *midifile)
                     printf("META EVENT! END OF TRACK\n");
                 }
                 else
-                    printf("META event! Type:%d %x - (len: %d) skipping!\n", cur_byte, cur_byte, len);
+                    printf("META event! Type:%d %x - (len: %d) skipping!\n",
+                           cur_byte, cur_byte, len);
 
                 // reset status_running;
                 status_running = 0;
-
             }
             else if ((cur_byte == 0xf0) || // sysex event
                      (cur_byte == 0xf7))
             {
                 int len = read_var_len_variable(fp, &chunk_left);
-                printf("SYSEX EVENT %d %x (len:%d) - skipping!\n", cur_byte, cur_byte, len);
+                printf("SYSEX EVENT %d %x (len:%d) - skipping!\n", cur_byte,
+                       cur_byte, len);
                 chunk_left -= len;
                 fseek(fp, len, SEEK_CUR);
                 // reset status_running;
                 status_running = 0;
             }
-            else 
+            else
             {
                 unsigned char left_nib = (cur_byte | 0x0f) - 0x0f;
                 unsigned char right_nib = (cur_byte | 0xf0) - 0xf0;
@@ -260,7 +278,9 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&val, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("MIDI Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
+                    printf("MIDI Polyphonic Key PRESS on Channel:%d Key:%d "
+                           "Velocity:%d\n",
+                           right_nib, key, val);
                     status_running = cur_byte;
                 }
                 else if (left_nib == 0xb0)
@@ -271,7 +291,9 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&val, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("MIDI Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    printf("MIDI Control Change! Channel:%d "
+                           "controller_number:%d Velocity:%d\n",
+                           right_nib, controller_number, val);
                     status_running = cur_byte;
                 }
                 else if (left_nib == 0xc0)
@@ -296,7 +318,9 @@ bool parse_midi_file(char *midifile)
                     chunk_left -= numread;
                     numread = fread(&val, 1, 1, fp);
                     chunk_left -= numread;
-                    printf("MIDI Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                    printf("MIDI Pitch Wheel Change :%d controller_number:%d "
+                           "Velocity:%d\n",
+                           right_nib, controller_number, val);
                     status_running = cur_byte;
                 }
                 else
@@ -311,12 +335,12 @@ bool parse_midi_file(char *midifile)
                         unsigned char velocity;
                         numread = fread(&velocity, 1, 1, fp);
                         chunk_left -= numread;
-                        // printf("MIDI NOTE OFF on Channel:%d Key:%d Velocity:%d\n", right_nib, key, velocity);
+                        // printf("MIDI NOTE OFF on Channel:%d Key:%d
+                        // Velocity:%d\n", right_nib, key, velocity);
                         cur_note = key;
                         cur_velocity = velocity;
                         cur_status = 128;
                         is_note_event = true;
-
                     }
                     else if (left_nib == 0x90)
                     {
@@ -324,7 +348,6 @@ bool parse_midi_file(char *midifile)
                         unsigned char velocity;
                         numread = fread(&velocity, 1, 1, fp);
                         chunk_left -= numread;
-
 
                         cur_note = key;
                         cur_velocity = velocity;
@@ -334,7 +357,6 @@ bool parse_midi_file(char *midifile)
                             cur_status = 128;
                         else
                             cur_status = 144;
-
                     }
                     else if (left_nib == 0xa0)
                     {
@@ -342,7 +364,9 @@ bool parse_midi_file(char *midifile)
                         unsigned char val; // pressure
                         numread = fread(&val, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("MID Polyphonic Key PRESS on Channel:%d Key:%d Velocity:%d\n", right_nib, key, val);
+                        printf("MID Polyphonic Key PRESS on Channel:%d Key:%d "
+                               "Velocity:%d\n",
+                               right_nib, key, val);
                     }
                     else if (left_nib == 0xb0)
                     {
@@ -350,7 +374,9 @@ bool parse_midi_file(char *midifile)
                         unsigned char val;
                         numread = fread(&val, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("MIDI Control Change! Channel:%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                        printf("MIDI Control Change! Channel:%d "
+                               "controller_number:%d Velocity:%d\n",
+                               right_nib, controller_number, val);
                     }
                     else if (left_nib == 0xc0)
                     {
@@ -366,26 +392,29 @@ bool parse_midi_file(char *midifile)
                         unsigned char val;
                         numread = fread(&val, 1, 1, fp);
                         chunk_left -= numread;
-                        printf("MIDI Pitch Wheel Change :%d controller_number:%d Velocity:%d\n", right_nib, controller_number, val);
+                        printf("MIDI Pitch Wheel Change :%d "
+                               "controller_number:%d Velocity:%d\n",
+                               right_nib, controller_number, val);
                     }
                 }
             }
             if (is_note_event)
             {
                 double delta = delta_time * multiplier;
-                int scaled_delta = (delta - floor(delta) > 0.5) ? ceil(delta) : floor(delta);
-                printf("%d::%d::%d::%d\n", scaled_delta, cur_status, cur_note, cur_velocity);
+                int scaled_delta =
+                    (delta - floor(delta) > 0.5) ? ceil(delta) : floor(delta);
+                printf("%d::%d::%d::%d\n", scaled_delta, cur_status, cur_note,
+                       cur_velocity);
             }
         }
 
-        //fseek(fp, cur_chunk.len, SEEK_CUR);
+        // fseek(fp, cur_chunk.len, SEEK_CUR);
 
-        //if (i != (num_mtrk_chunks-1))
+        // if (i != (num_mtrk_chunks-1))
         //    fseek(fp, cur_chunk.len, SEEK_CUR);
     }
 
     return true;
-
 }
 
 int main(int argc, char **argv)
@@ -398,6 +427,4 @@ int main(int argc, char **argv)
 
     if (!parse_midi_file(argv[1]))
         return -1;
-
 }
-

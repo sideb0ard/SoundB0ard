@@ -122,13 +122,14 @@ void algorithm_process_afterthought(algorithm *self)
     }
 }
 
-stereo_val algorithm_gen_next(void *self)
+stereo_val algorithm_gen_next(void *self, mixer_timing_info timing_info)
 {
     algorithm *a = (algorithm *)self;
     switch (a->frequency)
     {
     case LOOP:
-        if (!a->has_started && (mixr->midi_tick % mixr->loop_len_in_ticks == 0))
+        if (!a->has_started &&
+            (timing_info.midi_tick % timing_info.loop_len_in_ticks == 0))
         {
             a->has_started = true;
             char now_cmd[MAX_CMD_LEN] = {0};
@@ -138,7 +139,7 @@ stereo_val algorithm_gen_next(void *self)
             interpret(now_cmd);
             algorithm_process_afterthought(a);
         }
-        else if (mixr->midi_tick % mixr->loop_len_in_ticks != 0)
+        else if (timing_info.midi_tick % timing_info.loop_len_in_ticks != 0)
         {
             a->has_started = false;
         }

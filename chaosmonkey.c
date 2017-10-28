@@ -72,10 +72,11 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool val)
     cm->take_action = val;
 }
 
-stereo_val chaosmonkey_gen_next(void *self)
+stereo_val chaosmonkey_gen_next(void *self, mixer_timing_info timing_info)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
     (void)cm;
+    (void)timing_info;
     // osc_update(&cm->m_lfo.osc);
     // double unused_quad = 0.0;
     // double lfo_out = lfo_do_oscillate(&cm->m_lfo.osc, &unused_quad);
@@ -90,7 +91,7 @@ stereo_val chaosmonkey_gen_next(void *self)
     //     break;
     // }
 
-    if (mixr->is_sixteenth)
+    if (mixr->timing_info.is_sixteenth)
     {
     }
     //    if (mixr->soundgen_num > 1) // chaos monkey is counted as one
@@ -147,7 +148,8 @@ void chaosmonkey_setvol(void *self, double v)
 void chaosmonkey_add_note_at_random_time(minisynth *ms, int note)
 {
     int rand_timing = rand() % 16;
-    int note_on_tick = (mixr->midi_tick + rand_timing * PPQN) % PPNS;
+    int note_on_tick =
+        (mixr->timing_info.midi_tick + rand_timing * PPQN) % PPNS;
     int note_off_tick = (note_on_tick + 3 * PPQN + 7) % PPNS;
     midi_event on_event = new_midi_event(note_on_tick, 144, note, 126);
     on_event.delete_after_use = true;

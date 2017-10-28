@@ -89,7 +89,7 @@ granulator *new_granulator(char *filename)
     return g;
 }
 
-stereo_val granulator_gennext(void *self)
+stereo_val granulator_gennext(void *self, mixer_timing_info timing_info)
 {
     granulator *g = (granulator *)self;
     double val = 0;
@@ -105,14 +105,15 @@ stereo_val granulator_gennext(void *self)
 
     if (g->sequencer_mode && g->m_seq.num_patterns > 0)
     {
-        int idx = mixr->midi_tick % PPBAR;
-        if (mixr->is_midi_tick && g->m_seq.patterns[g->m_seq.cur_pattern][idx])
+        int idx = timing_info.midi_tick % PPBAR;
+        if (timing_info.is_midi_tick &&
+            g->m_seq.patterns[g->m_seq.cur_pattern][idx])
         {
             granulator_start(g);
         }
-        else if (mixr->is_sixteenth)
+        else if (timing_info.is_sixteenth)
             granulator_stop(g);
-        seq_tick(&g->m_seq);
+        seq_tick(&g->m_seq, timing_info);
     }
 
     if (g->m_eg1.m_state == OFFF)
@@ -162,10 +163,10 @@ stereo_val granulator_gennext(void *self)
     if (g->have_active_buffer) // file buffer or external in
     {
         int spacing = granulator_calculate_grain_spacing(g);
-        if (mixr->cur_sample >
+        if (timing_info.cur_sample >
             g->last_grain_launched_sample_time + spacing) // new grain time
         {
-            g->last_grain_launched_sample_time = mixr->cur_sample;
+            g->last_grain_launched_sample_time = timing_info.cur_sample;
             g->cur_grain_num = granulator_get_available_grain_num(g);
 
             int duration = g->grain_duration_ms * 44.1;
@@ -411,7 +412,7 @@ void granulator_set_external_source(granulator *g, int sound_gen_num)
     if (mixer_is_valid_soundgen_num(mixr, sound_gen_num))
     {
         g->external_source_sg = sound_gen_num;
-        int looplen = mixr->loop_len_in_frames;
+        int looplen = mixr->timing_info.loop_len_in_frames;
         double *buffer = calloc(looplen, sizeof(double));
         if (buffer)
         {
@@ -426,13 +427,15 @@ void granulator_set_external_source(granulator *g, int sound_gen_num)
 
 int granulator_calculate_grain_spacing(granulator *g)
 {
-    int looplen_in_seconds = mixr->loop_len_in_frames / (double)SAMPLE_RATE;
+    int looplen_in_seconds =
+        mixr->timing_info.loop_len_in_frames / (double)SAMPLE_RATE;
     g->num_grains_per_looplen = looplen_in_seconds * g->grains_per_sec;
     if (g->num_grains_per_looplen == 0)
     {
         g->num_grains_per_looplen = 2; // whoops! dn't wanna div by 0 below
     }
-    int spacing = mixr->loop_len_in_frames / g->num_grains_per_looplen;
+    int spacing =
+        mixr->timing_info.loop_len_in_frames / g->num_grains_per_looplen;
     return spacing;
 }
 

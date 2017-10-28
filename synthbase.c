@@ -180,12 +180,12 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-int synthbase_gennext(synthbase *base)
+int synthbase_gennext(synthbase *base, mixer_timing_info timing_info)
 {
 
-    if (mixr->sixteenth_note_tick != base->tick)
+    if (timing_info.sixteenth_note_tick != base->tick)
     {
-        base->tick = mixr->sixteenth_note_tick;
+        base->tick = timing_info.sixteenth_note_tick;
         if (base->tick % 32 == 0)
         {
             if (base->generate_mode)
@@ -222,9 +222,9 @@ int synthbase_gennext(synthbase *base)
         }
     }
 
-    if (mixr->is_midi_tick)
+    if (timing_info.is_midi_tick)
     {
-        int idx = mixr->midi_tick % PPNS;
+        int idx = timing_info.midi_tick % PPNS;
         // top of the base loop, which is two bars, check if we need to
         // progress to next loop
         if (idx == 0)

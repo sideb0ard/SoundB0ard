@@ -16,7 +16,7 @@ beatrepeat *new_beatrepeat(int nbeats, int sixteenth)
     b->m_fx.process = &beatrepeat_gennext;
 
     // TODO - this doesn't handle a change of BPM
-    b->m_buffer_size = mixr->loop_len_in_frames;
+    b->m_buffer_size = mixr->timing_info.loop_len_in_frames;
     b->m_buffer = (double *)calloc(b->m_buffer_size, sizeof(double));
     b->m_sixteenth_note_size = b->m_buffer_size / 16;
     b->m_num_beats_to_repeat = nbeats;
@@ -39,7 +39,7 @@ double beatrepeat_gennext(void *self, double inval)
     beatrepeat *b = (beatrepeat *)self;
 
     // if ( mixr->sixteenth_note_tick % 16 == b->m_selected_sixteenth
-    if (mixr->sixteenth_note_tick % 16 == 0 && !b->m_recording &&
+    if (mixr->timing_info.sixteenth_note_tick % 16 == 0 && !b->m_recording &&
         !b->m_have_recording)
     {
         printf("Starting recording samples...\n");
@@ -61,19 +61,20 @@ double beatrepeat_gennext(void *self, double inval)
 
     if (b->m_have_recording && b->m_active)
     {
-        size_t relative_sample = mixr->cur_sample % mixr->loop_len_in_frames;
+        size_t relative_sample =
+            mixr->timing_info.cur_sample % mixr->timing_info.loop_len_in_frames;
         size_t start_of_beat_repeat =
             ((b->m_selected_sixteenth + 1) * b->m_sixteenth_note_size) %
-            mixr->loop_len_in_frames;
+            mixr->timing_info.loop_len_in_frames;
         size_t end_of_beat_repeat =
             (start_of_beat_repeat +
              (b->m_sixteenth_note_size * b->m_num_beats_to_repeat)) %
-            mixr->loop_len_in_frames;
+            mixr->timing_info.loop_len_in_frames;
 
         if (end_of_beat_repeat < start_of_beat_repeat)
         {
             if ((relative_sample > start_of_beat_repeat &&
-                 relative_sample < mixr->loop_len_in_frames) ||
+                 relative_sample < mixr->timing_info.loop_len_in_frames) ||
                 (relative_sample > 0 && relative_sample < end_of_beat_repeat))
             {
                 return inval +

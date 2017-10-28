@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#include "delay.h"
 #include "../defjams.h"
 #include "../utils.h"
+#include "delay.h"
 
 void delay_init(delay *d, int delay_length)
 {
@@ -18,7 +18,6 @@ void delay_init(delay *d, int delay_length)
 
     d->m_buffer_size = delay_length;
     d->m_buffer = calloc(d->m_buffer_size, sizeof(double));
-
 }
 
 void delay_reset_delay(delay *d)
@@ -32,8 +31,9 @@ void delay_reset_delay(delay *d)
 
 void delay_cook_variables(delay *d)
 {
-    d->m_output_attenuation = pow((float)10.0, (float)d->m_output_attenuation_db/(float)20.0);
-    d->m_delay_in_samples = d->m_delay_ms*(SAMPLE_RATE/1000.0);
+    d->m_output_attenuation =
+        pow((float)10.0, (float)d->m_output_attenuation_db / (float)20.0);
+    d->m_delay_in_samples = d->m_delay_ms * (SAMPLE_RATE / 1000.0);
     d->m_read_index = d->m_write_index - (int)d->m_delay_in_samples;
     if (d->m_read_index < 0)
         d->m_read_index += d->m_buffer_size;
@@ -73,14 +73,14 @@ double delay_read_delay(delay *d)
 
     double yn_1 = d->m_buffer[read_index_1];
 
-    double frac_delay = d->m_delay_in_samples - (int) d->m_delay_in_samples;
+    double frac_delay = d->m_delay_in_samples - (int)d->m_delay_in_samples;
 
-    return lin_terp(0,  1, yn, yn_1, frac_delay);
+    return lin_terp(0, 1, yn, yn_1, frac_delay);
 }
 
 double delay_read_delay_at(delay *d, double msec)
 {
-    double delay_in_samples = msec*((double)SAMPLE_RATE/1000.0);
+    double delay_in_samples = msec * ((double)SAMPLE_RATE / 1000.0);
     int read_index = d->m_write_index - (int)delay_in_samples;
 
     double yn = d->m_buffer[read_index];
@@ -91,9 +91,9 @@ double delay_read_delay_at(delay *d, double msec)
 
     double yn_1 = d->m_buffer[read_index_1];
 
-    double frac_delay = d->m_delay_in_samples - (int) d->m_delay_in_samples;
+    double frac_delay = d->m_delay_in_samples - (int)d->m_delay_in_samples;
 
-    return lin_terp(0,  1, yn, yn_1, frac_delay);
+    return lin_terp(0, 1, yn, yn_1, frac_delay);
 }
 
 bool delay_process_audio(delay *d, double *in, double *out)

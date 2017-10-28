@@ -1,4 +1,5 @@
 #pragma once
+#include <stdbool.h>
 
 typedef struct one_pole_lpf
 {

@@ -814,8 +814,9 @@ inline float lin_terp(float x1, float x2, float y1, float y2, float x)
 
 void print_midi_event(int midi_num)
 {
-    printf("MIDI ON tick: %d // relative tick: %d midi: %d\n", mixr->midi_tick,
-           mixr->midi_tick % PPBAR, midi_num);
+    printf("MIDI ON tick: %d // relative tick: %d midi: %d\n",
+           mixr->timing_info.midi_tick, mixr->timing_info.midi_tick % PPBAR,
+           midi_num);
 }
 
 float fasttan(float x)

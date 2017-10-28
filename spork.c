@@ -36,9 +36,10 @@ spork *new_spork(double freq)
     return s;
 }
 
-stereo_val spork_gennext(void *sg)
+stereo_val spork_gennext(void *sg, mixer_timing_info timing_info)
 {
     spork *s = (spork *)sg;
+    (void)timing_info;
 
     stereo_val return_val = {0, 0};
     double scratch_val;

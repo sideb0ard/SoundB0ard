@@ -1,7 +1,7 @@
 #pragma once
 
-#include "biquad.h"
 #include "../fx.h"
+#include "biquad.h"
 
 typedef struct resonant_lpf
 {
@@ -16,9 +16,8 @@ typedef struct resonant_lpf
 } resonant_lpf;
 
 void resonant_lpf_reset(resonant_lpf *lpf);
-void resonant_lpf_calculate_lpf_coeffs(resonant_lpf *lpf, double cutoff, double q);
+void resonant_lpf_calculate_lpf_coeffs(resonant_lpf *lpf, double cutoff,
+                                       double q);
 
 void resonant_lpf_status(void *self, char *status_string);
 double resonant_lpf_process(void *self, double input);
-
-

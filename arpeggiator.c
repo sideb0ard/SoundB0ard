@@ -25,10 +25,10 @@ void arpeggiate(minisynth *ms, arpeggiator *arp)
     int note = 0;
     int velocity = 100;
 
-    if ((mixr->is_thirtysecond && arp->rate == ATHIRTYSECOND) ||
-        (mixr->is_sixteenth && arp->rate == ASIXTEENTH) ||
-        (mixr->is_eighth && arp->rate == AEIGHTH) ||
-        (mixr->is_quarter && arp->rate == AQUARTER))
+    if ((mixr->timing_info.is_thirtysecond && arp->rate == ATHIRTYSECOND) ||
+        (mixr->timing_info.is_sixteenth && arp->rate == ASIXTEENTH) ||
+        (mixr->timing_info.is_eighth && arp->rate == AEIGHTH) ||
+        (mixr->timing_info.is_quarter && arp->rate == AQUARTER))
     {
         if (arp->single_note_repeat)
         {

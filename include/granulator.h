@@ -95,7 +95,7 @@ typedef struct granulator
 
 granulator *new_granulator(char *filename);
 
-stereo_val granulator_gennext(void *self);
+stereo_val granulator_gennext(void *self, mixer_timing_info timing_info);
 void granulator_status(void *self, wchar_t *ss);
 void granulator_setvol(void *self, double v);
 double granulator_getvol(void *self);

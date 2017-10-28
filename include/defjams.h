@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #define SAMPLE_RATE (44100)
 #define FRAMES_PER_BUFFER (64)
 
@@ -137,6 +139,26 @@ typedef enum {
     MIDISYNTHDRUM,
     MIDILOOPER
 } midi_control_type;
+
+typedef struct mixer_timing_info
+{
+    int frames_per_midi_tick;
+    int midi_ticks_per_ms;
+    int sixteenth_note_tick;
+    int cur_sample; // inverse of SAMPLE RATE
+    int midi_tick;
+
+    // informational for other sound generators
+    unsigned int loop_len_in_frames;
+    unsigned int loop_len_in_ticks;
+
+    bool start_of_loop; // true for one sample during loop time
+    bool is_thirtysecond;
+    bool is_sixteenth;
+    bool is_eighth;
+    bool is_quarter;
+    bool is_midi_tick;
+} mixer_timing_info;
 
 typedef struct stereo_val
 {

@@ -1,6 +1,6 @@
 #pragma once
-#include <stdbool.h>
 #include "delay.h"
+#include <stdbool.h>
 
 typedef struct lpf_comb_filter
 {

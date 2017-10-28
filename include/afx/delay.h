@@ -1,7 +1,7 @@
 #pragma once
 
-#include <stdbool.h>
 #include <math.h>
+#include <stdbool.h>
 
 typedef struct delay
 {

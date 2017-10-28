@@ -1,5 +1,5 @@
-#include "../defjams.h"
 #include "combfilter.h"
+#include "../defjams.h"
 
 void comb_filter_init(comb_filter *c, int delay_len)
 {
@@ -14,9 +14,10 @@ void comb_filter_set_comb_g(comb_filter *c, double comb_g)
 
 void comb_filter_set_comb_g_with_rt_sixty(comb_filter *c, double rt)
 {
-    double exponent = -3.0*c->m_delay.m_delay_in_samples*(1.0/SAMPLE_RATE);
+    double exponent =
+        -3.0 * c->m_delay.m_delay_in_samples * (1.0 / SAMPLE_RATE);
     rt /= 1000.0;
-    c->m_comb_g = pow((float)10.0, exponent/rt);
+    c->m_comb_g = pow((float)10.0, exponent / rt);
 }
 
 bool comb_filter_process_audio(comb_filter *c, double *in, double *out)

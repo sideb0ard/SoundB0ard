@@ -79,7 +79,7 @@ void *midiman()
 
                     if (ms->base.recording)
                     {
-                        int tick = mixr->midi_tick % PPNS;
+                        int tick = mixr->timing_info.midi_tick % PPNS;
                         midi_event ev =
                             new_midi_event(tick, status, data1, data2);
                         synthbase_add_event(&ms->base, ms->base.cur_melody, ev);

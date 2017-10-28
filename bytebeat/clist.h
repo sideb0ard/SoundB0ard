@@ -2,12 +2,14 @@
 
 #include <stdlib.h>
 
-typedef struct CListElmt_ {
+typedef struct CListElmt_
+{
     void *data;
     struct CListElmt_ *next;
 } CListElmt;
 
-typedef struct CList_ {
+typedef struct CList_
+{
     int size;
     int (*match)(const void *key1, const void *key2);
     void (*destroy)(void *data);

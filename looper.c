@@ -41,7 +41,7 @@ looper *new_looper(char *filename, double loop_len)
     return l;
 }
 
-stereo_val looper_gennext(void *self)
+stereo_val looper_gennext(void *self, mixer_timing_info timing_info)
 {
     looper *l = (looper *)self;
     stereo_val val = {0, 0};
@@ -52,10 +52,10 @@ stereo_val looper_gennext(void *self)
     // wait till start of loop to keep patterns synched
     if (!l->started)
     {
-        if (mixr->start_of_loop)
+        if (timing_info.start_of_loop)
         {
             printf("Starting now! 16th tick is %d\n",
-                   mixr->sixteenth_note_tick % 16);
+                   timing_info.sixteenth_note_tick % 16);
             l->started = true;
         }
         else
@@ -64,12 +64,12 @@ stereo_val looper_gennext(void *self)
         }
     }
 
-    if (mixr->start_of_loop && l->resample_pending)
+    if (timing_info.start_of_loop && l->resample_pending)
     {
         looper_resample_to_loop_size(l);
     }
 
-    if (mixr->start_of_loop && l->change_loopsize_pending)
+    if (timing_info.start_of_loop && l->change_loopsize_pending)
     {
         printf("PENDING LOOPSIZE FOUND! %.2f loops for loop num: %d\n",
                l->pending_loop_size, l->pending_loop_num);
@@ -78,7 +78,7 @@ stereo_val looper_gennext(void *self)
     }
 
     // UPDATE MODES IF NEEDED
-    if (mixr->start_of_loop)
+    if (timing_info.start_of_loop)
     {
         if (l->stutter_mode)
         {
@@ -119,7 +119,7 @@ stereo_val looper_gennext(void *self)
 
     if (l->stutter_active)
     {
-        if (mixr->cur_sample %
+        if (timing_info.cur_sample %
                 (l->samples[l->cur_sample]->resampled_file_size / 16) ==
             0)
         {
@@ -138,7 +138,7 @@ stereo_val looper_gennext(void *self)
     }
 
     // resync after a resample/resize
-    if (l->just_been_resampled && mixr->sixteenth_note_tick % 16 == 0)
+    if (l->just_been_resampled && timing_info.sixteenth_note_tick % 16 == 0)
     {
         printf("Resyncing after resample...zzzz\n");
         l->samples[l->cur_sample]->position = 0;
@@ -324,7 +324,7 @@ void sample_resample_to_loop_size(file_sample *fs)
     printf("LOOPLEN is %.2f\n", fs->loop_len);
 
     int resampled_buffer_size =
-        mixr->loop_len_in_frames * fs->loop_len * fs->channels;
+        mixr->timing_info.loop_len_in_frames * fs->loop_len * fs->channels;
 
     double *resampled_file_bytes =
         (double *)calloc(resampled_buffer_size, sizeof(double));
@@ -499,7 +499,7 @@ void looper_scramble(looper *l)
     file_sample *s = l->samples[l->cur_sample];
 
     double *scrambled = s->scrambled_file_bytes;
-    int len16th = mixr->loop_len_in_frames / 16 / s->channels;
+    int len16th = mixr->timing_info.loop_len_in_frames / 16 / s->channels;
 
     // take a copy of the first 16th that we can randomly inject below.
     double first16th[len16th];
@@ -540,7 +540,7 @@ void looper_scramble(looper *l)
         PCT_CHANCE_SILENCE_LAST_QUARTER = 1;
         PCT_CHANCE_16TH = 7;
     }
-    else if (mixr->cur_sample % (s->resampled_file_size * 4) == 0)
+    else if (mixr->timing_info.cur_sample % (s->resampled_file_size * 4) == 0)
     { // this is the evolver
         should_run = true;
         PCT_CHANCE_YOLO = 25;

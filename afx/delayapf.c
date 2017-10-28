@@ -1,5 +1,5 @@
-#include "../defjams.h"
 #include "delayapf.h"
+#include "../defjams.h"
 
 void delay_apf_init(delay_apf *d, int delay_len)
 {
@@ -7,10 +7,7 @@ void delay_apf_init(delay_apf *d, int delay_len)
     d->m_apf_g = 0;
 }
 
-void delay_apf_set_apf_g(delay_apf *d, double g)
-{
-    d->m_apf_g  = g;
-}
+void delay_apf_set_apf_g(delay_apf *d, double g) { d->m_apf_g = g; }
 
 bool delay_apf_process_audio(delay_apf *d, double *in, double *out)
 {

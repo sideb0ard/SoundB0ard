@@ -91,7 +91,8 @@ $(TARGET): $(OBJ)
 
 clean:
 	rm -f *.o *~ $(TARGET)
+	find $(OBJDIR) -name "*.o" -exec rm {} \;
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
 
 format:
-	clang-format -i *{c,h}
+	find . -type f -name "*.[ch]" -exec clang-format -i {} \;

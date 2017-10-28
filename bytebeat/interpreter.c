@@ -4,22 +4,32 @@
 #include <string.h>
 
 #include "../mixer.h"
-#include "stack.h"
 #include "interpreter.h"
+#include "stack.h"
 
 extern mixer *mixr;
 
-enum direction { LEFT, RIGHT };
+enum direction
+{
+    LEFT,
+    RIGHT
+};
 
-enum unary_or_binary { UNARY, BINARY };
+enum unary_or_binary
+{
+    UNARY,
+    BINARY
+};
 
-enum token_type {
+enum token_type
+{
     NUMBER,
     OPERATOR,
     TEE_TOKEN,
 };
 
-enum ops {
+enum ops
+{
     LEFTSHIFT,
     RIGHTSHIFT,
     XOR,
@@ -40,7 +50,8 @@ enum ops {
 char *ops[] = {"<<", ">>", "^", "|", "~", "&", "+",
                "-",  "*",  "/", "%", "(", ")", "t"};
 
-typedef struct token {
+typedef struct token
+{
     int type;
     int val;
 } token;
@@ -48,7 +59,8 @@ typedef struct token {
 int associativity(int op); // left or right
 int bin_or_uni(int op);
 int calc(int operator, int first_operand, int val);
-int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens, int *tmp_token_num);
+int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
+               int *tmp_token_num);
 int parse_bytebeat(char *pattern, Stack *stack);
 char parse_rpn(Stack *rpn_stack);
 int precedence(int op);
@@ -77,7 +89,8 @@ bool isvalid_char(char *ch)
                                 '/', '*', '&', '%', '(', ')', 't'};
 
     int acceptable_len = strlen(acceptable);
-    for (int i = 0; i < acceptable_len; i++) {
+    for (int i = 0; i < acceptable_len; i++)
+    {
         if (*ch == acceptable[i])
             return true;
     }
@@ -88,7 +101,8 @@ bool isvalid_pattern(char *pattern)
 {
     int pattern_len = strlen(pattern);
 
-    for (int i = 0; i < pattern_len; i++) {
+    for (int i = 0; i < pattern_len; i++)
+    {
         // printf("%c (%d)\n", pattern[i], pattern[i]);
         if (pattern[i] == 0 || pattern[i] == 32) // EOF or space
             continue;
@@ -102,7 +116,8 @@ bool isvalid_pattern(char *pattern)
 // http://en.cppreference.com/w/c/language/operator_precedence
 int precedence(int op)
 {
-    switch (op) {
+    switch (op)
+    {
     case 0: // left and right shift
     case 1:
         return 4;
@@ -131,7 +146,8 @@ int precedence(int op)
 
 int associativity(int op)
 {
-    switch (op) {
+    switch (op)
+    {
     case 4:
         return RIGHT;
     default:
@@ -141,7 +157,8 @@ int associativity(int op)
 
 int bin_or_uni(int op)
 {
-    switch (op) {
+    switch (op)
+    {
     case 4: // bitwise NOT ~
         return UNARY;
     default:
@@ -152,7 +169,8 @@ int bin_or_uni(int op)
 int parse_bytebeat(char *pattern, Stack *rpn_stack)
 {
 
-    if (!isvalid_pattern(pattern)) {
+    if (!isvalid_pattern(pattern))
+    {
         printf("Beat it ya val jerk - acceptables chars are 0-9,"
                "<, >, |, ^, ~, +, -, /, *, &, %%\n");
         return EXIT_FAILURE;
@@ -166,18 +184,21 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
     char *sep = " ";
     char *wurd, *wurdleft;
     for (wurd = strtok_r(pattern, sep, &wurdleft); wurd;
-         wurd = strtok_r(NULL, sep, &wurdleft)) {
+         wurd = strtok_r(NULL, sep, &wurdleft))
+    {
         token *toke = calloc(1, sizeof(token));
-        //printf("\nToken is %s\n", wurd);
+        // printf("\nToken is %s\n", wurd);
         int val = atoi(wurd);
-        if (val != 0) {
-            //printf("NUM! %d\n", val);
+        if (val != 0)
+        {
+            // printf("NUM! %d\n", val);
             toke->type = NUMBER;
             toke->val = val;
             stack_push(rpn_stack, (void *)(toke));
         }
-        else {
-            //printf("OP! %s\n", wurd);
+        else
+        {
+            // printf("OP! %s\n", wurd);
 
             toke->type = OPERATOR;
             if (strcmp(wurd, "<<") == 0)
@@ -208,34 +229,41 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
                 toke->val = RIGHTBRACKET;
             else if (strcmp(wurd, "t") == 0)
                 toke->val = TEE;
-            else {
+            else
+            {
                 printf("OOFT!\n");
                 return 1;
             }
-            if (toke->val == TEE) {
+            if (toke->val == TEE)
+            {
                 toke->type = TEE_TOKEN;
                 toke->val = TEE;
                 stack_push(rpn_stack, (void *)(toke));
                 continue;
             }
-            if (toke->val == LEFTBRACKET) {
+            if (toke->val == LEFTBRACKET)
+            {
                 stack_push(operatorz, (void *)(toke));
                 continue;
             }
-            if (toke->val == RIGHTBRACKET) {
-                //printf("RIGHT BRACKET!\n");
-                while (stack_size(operatorz) > 0) {
-                    //printf("STACKSIZE %d\n", stack_size(operatorz));
+            if (toke->val == RIGHTBRACKET)
+            {
+                // printf("RIGHT BRACKET!\n");
+                while (stack_size(operatorz) > 0)
+                {
+                    // printf("STACKSIZE %d\n", stack_size(operatorz));
 
                     token *top_o_the_stack = stack_peek(operatorz);
 
-                    //printf("Looking at %s\n", ops[top_o_the_stack->val]);
+                    // printf("Looking at %s\n", ops[top_o_the_stack->val]);
 
-                    if (top_o_the_stack->val == LEFTBRACKET) {
-                        //printf("WOOP - found bracjet!\n");
+                    if (top_o_the_stack->val == LEFTBRACKET)
+                    {
+                        // printf("WOOP - found bracjet!\n");
                         stack_pop(operatorz, (void **)&top_o_the_stack);
                     }
-                    else {
+                    else
+                    {
                         stack_pop(operatorz, (void **)&top_o_the_stack);
                         stack_push(rpn_stack, (void *)(top_o_the_stack));
                     }
@@ -243,18 +271,23 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
                 continue;
             }
 
-            if (stack_size(operatorz) > 0) {
+            if (stack_size(operatorz) > 0)
+            {
                 token *top_o_the_stack = stack_peek(operatorz);
-                if (top_o_the_stack->val == LEFTBRACKET) {
+                if (top_o_the_stack->val == LEFTBRACKET)
+                {
                     stack_push(operatorz, (void *)(toke));
                     continue;
                 }
-                //printf("STACK SIZE GRETR THAN 0: %d\n", stack_size(operatorz));
+                // printf("STACK SIZE GRETR THAN 0: %d\n",
+                // stack_size(operatorz));
                 bool wurk_it = true;
-                while (wurk_it && stack_size(operatorz) > 0) {
+                while (wurk_it && stack_size(operatorz) > 0)
+                {
                     token *top_o_the_stack = stack_peek(operatorz);
                     // printf(
-                    //     "PRECEDENCE OF ME %d, precedence of top of stack %d\n",
+                    //     "PRECEDENCE OF ME %d, precedence of top of stack
+                    //     %d\n",
                     //     precedence(toke->val),
                     //     precedence(top_o_the_stack->val));
                     // printf("ASSOCIATIVITY OF ME %s, ASSOCIATIVITY of top of "
@@ -267,31 +300,36 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
                           precedence(top_o_the_stack->val))) ||
                         ((associativity(toke->val) == RIGHT) &&
                          (precedence(toke->val) <
-                          precedence(top_o_the_stack->val)))) {
-                        //printf("POPing to PUSH\n");
+                          precedence(top_o_the_stack->val))))
+                    {
+                        // printf("POPing to PUSH\n");
                         if (stack_pop(operatorz, (void **)&top_o_the_stack) ==
-                            0) {
+                            0)
+                        {
                             stack_push(rpn_stack, (void *)top_o_the_stack);
                         }
-                        else {
+                        else
+                        {
                             printf("Couldnae pop, mate\n");
                         }
                     }
-                    else {
+                    else
+                    {
                         wurk_it = false;
-                        //printf("WURKIT False\n");
+                        // printf("WURKIT False\n");
                     }
                 }
             }
             stack_push(operatorz, (void *)(toke));
         }
-        //printf("STACK_SIZE(operatorz): %d\n", stack_size(operatorz));
-        //printf("STACK_SIZE(rpn_stack): %d\n", stack_size(rpn_stack));
+        // printf("STACK_SIZE(operatorz): %d\n", stack_size(operatorz));
+        // printf("STACK_SIZE(rpn_stack): %d\n", stack_size(rpn_stack));
     }
 
     token *re_token;
 
-    while (stack_pop(operatorz, (void **)&re_token) == 0) {
+    while (stack_pop(operatorz, (void **)&re_token) == 0)
+    {
         stack_push(rpn_stack, (void *)re_token);
     }
 
@@ -302,7 +340,8 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
 
 int calc(int operator, int first_operand, int second_operand)
 {
-    switch (operator) {
+    switch (operator)
+    {
     case 0: // left shift
         return first_operand << second_operand;
     case 1: // right shift
@@ -330,51 +369,58 @@ int calc(int operator, int first_operand, int second_operand)
     }
 }
 
-
-int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens, int *tmp_token_num)
+int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
+               int *tmp_token_num)
 {
-   if (re_token->type == NUMBER) {
-       tmp_tokens[*tmp_token_num].type = NUMBER;
-       tmp_tokens[*tmp_token_num].val = re_token->val;
-       stack_push(ans_stack, (void *)&tmp_tokens[(*tmp_token_num)++]);
-   }
-   else if (re_token->type == TEE_TOKEN) {
-       tmp_tokens[*tmp_token_num].type = NUMBER;
-       tmp_tokens[*tmp_token_num].val = mixr->tick;
-       stack_push(ans_stack, (void *)&tmp_tokens[(*tmp_token_num)++]);
-   }
-   else if (re_token->type == OPERATOR) {
-       if (bin_or_uni(re_token->val) == UNARY) {
-           token *first_operand;
-           stack_pop(ans_stack, (void **)&first_operand);
-           int ans = ~first_operand->val;
-           first_operand->val = ans;
-           stack_push(ans_stack, (void *)first_operand);
-       }
-       else { // BINARY operator
-           if (stack_size(ans_stack) < 2) {
-               printf("Barf, not enough operands on stack\n");
-               return 1;
-           }
-           token *second_operand;
-           stack_pop(ans_stack, (void **)&second_operand);
+    if (re_token->type == NUMBER)
+    {
+        tmp_tokens[*tmp_token_num].type = NUMBER;
+        tmp_tokens[*tmp_token_num].val = re_token->val;
+        stack_push(ans_stack, (void *)&tmp_tokens[(*tmp_token_num)++]);
+    }
+    else if (re_token->type == TEE_TOKEN)
+    {
+        tmp_tokens[*tmp_token_num].type = NUMBER;
+        tmp_tokens[*tmp_token_num].val = mixr->tick;
+        stack_push(ans_stack, (void *)&tmp_tokens[(*tmp_token_num)++]);
+    }
+    else if (re_token->type == OPERATOR)
+    {
+        if (bin_or_uni(re_token->val) == UNARY)
+        {
+            token *first_operand;
+            stack_pop(ans_stack, (void **)&first_operand);
+            int ans = ~first_operand->val;
+            first_operand->val = ans;
+            stack_push(ans_stack, (void *)first_operand);
+        }
+        else
+        { // BINARY operator
+            if (stack_size(ans_stack) < 2)
+            {
+                printf("Barf, not enough operands on stack\n");
+                return 1;
+            }
+            token *second_operand;
+            stack_pop(ans_stack, (void **)&second_operand);
 
-           token *first_operand;
-           stack_pop(ans_stack, (void **)&first_operand);
+            token *first_operand;
+            stack_pop(ans_stack, (void **)&first_operand);
 
-           char ans = calc(re_token->val, first_operand->val,
-                          second_operand->val);
+            char ans =
+                calc(re_token->val, first_operand->val, second_operand->val);
 
-           tmp_tokens[*tmp_token_num].type = NUMBER;
-           tmp_tokens[*tmp_token_num].val = ans;
-           stack_push(ans_stack, (void *)&tmp_tokens[(*tmp_token_num)++]);
-       }
-   }
-   else {
-       printf("Wowo, nelly!\n");
-       return -1;
-   }
-   return 0;
+            tmp_tokens[*tmp_token_num].type = NUMBER;
+            tmp_tokens[*tmp_token_num].val = ans;
+            stack_push(ans_stack, (void *)&tmp_tokens[(*tmp_token_num)++]);
+        }
+    }
+    else
+    {
+        printf("Wowo, nelly!\n");
+        return -1;
+    }
+    return 0;
 }
 
 char parse_rpn(Stack *rpn_stack)
@@ -387,7 +433,7 @@ char parse_rpn(Stack *rpn_stack)
     stack_init(&ans_stack, NULL);
 
     ListElmt *listee = rpn_stack->head;
-    while(listee->next != NULL)
+    while (listee->next != NULL)
     {
         token *re_token = listee->data;
         eval_token(re_token, &ans_stack, tmp_tokens, &tmp_token_num);
@@ -398,12 +444,14 @@ char parse_rpn(Stack *rpn_stack)
 
     char ret_val = -1;
 
-    if (stack_size(&ans_stack) == 1) {
+    if (stack_size(&ans_stack) == 1)
+    {
         token *atoke;
         stack_pop(&ans_stack, (void **)&atoke);
         ret_val = atoke->val;
     }
-    else {
+    else
+    {
         printf("Nah man, too many items on stack, sumthing is fucked\n");
     }
 
@@ -417,7 +465,8 @@ void reverse_stack(Stack *stack)
     stack_init(rev_stack, NULL);
 
     token *tokey;
-    while (stack_size(stack) > 0) {
+    while (stack_size(stack) > 0)
+    {
         stack_pop(stack, (void **)&tokey);
         stack_push(rev_stack, (void *)tokey);
     }
