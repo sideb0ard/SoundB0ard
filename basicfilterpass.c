@@ -5,6 +5,7 @@
 #include "basicfilterpass.h"
 #include "defjams.h"
 #include "filter_moogladder.h"
+#include "utils.h"
 
 const char *filtertype_to_name[] = {"LPF1", "HPF1", "LPF2", "HPF2", "BPF2",
                                     "BSF2", "LPF4", "HPF4", "BPF4"};
@@ -67,7 +68,8 @@ double filterpass_process_audio(void *self, double input)
     {
         osc_update((oscillator *)&fp->m_lfo2);
         lfo2_val = lfo_do_oscillate((oscillator *)&fp->m_lfo2, NULL);
-        moog_set_qcontrol((filter *)&fp->m_filter, lfo2_val);
+        moog_set_qcontrol((filter *)&fp->m_filter,
+                          bipolar_to_unipolar(lfo2_val));
     }
 
     moog_update((filter *)&fp->m_filter);

@@ -15,7 +15,7 @@ extern char *s_lfo_mode_names;
 granulator *new_granulator(char *filename)
 {
     granulator *g = (granulator *)calloc(1, sizeof(granulator));
-    g->vol = 0.7;
+    g->vol = 0.4;
     // g->active = true;
     g->started = false;
     g->have_active_buffer = false;

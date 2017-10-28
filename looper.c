@@ -199,13 +199,13 @@ stereo_val looper_gennext(void *self)
 
     double scratch = 0;
     scratch = effector(&l->sound_generator, val.left);
-    scratch = envelopor(&l->sound_generator, val.left);
+    scratch = envelopor(&l->sound_generator, scratch);
     val.left = scratch * l->vol;
 
     if (s->channels > 1)
     {
         scratch = effector(&l->sound_generator, val.right);
-        scratch = envelopor(&l->sound_generator, val.right);
+        scratch = envelopor(&l->sound_generator, scratch);
     }
     val.right = scratch * l->vol;
 

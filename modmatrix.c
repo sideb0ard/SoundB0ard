@@ -94,11 +94,9 @@ void matrix_clear_sources(modmatrix *self)
         self->m_sources[i] = 0.0;
 }
 
-void matrix_clear_destinations(modmatrix *self)
+inline void matrix_clear_destinations(modmatrix *self)
 {
     memset(self->m_destinations, 0, sizeof(double) * MAX_DESTINATIONS);
-    // for (int i = 0; i < MAX_DESTINATIONS; i++)
-    //    self->m_destinations[i] = 0.0;
 }
 
 void create_matrix_core(modmatrix *self)
@@ -188,7 +186,7 @@ bool enable_matrix_row(modmatrix *self, unsigned sourceidx, unsigned destidx,
     return false;
 }
 
-bool check_destination_layer(unsigned layer, matrixrow *row)
+bool inline check_destination_layer(unsigned layer, matrixrow *row)
 {
     bool layer0 = false;
     if (row->m_destination_index >= DEST_LFO1_FO &&

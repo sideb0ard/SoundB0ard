@@ -528,7 +528,7 @@ inline double fast_pow(double a, double b)
     return u.d;
 }
 
-double pitch_shift_multiplier(double pitch_shift_semitones)
+inline double pitch_shift_multiplier(double pitch_shift_semitones)
 // from Will Pirkle book 'Designing Software Synthesizer Plug-Ins...'
 {
     if (pitch_shift_semitones == 0)
@@ -537,7 +537,8 @@ double pitch_shift_multiplier(double pitch_shift_semitones)
     return fast_pow(2.0, pitch_shift_semitones / 12.0);
 }
 
-void calculate_pan_values(double pan_total, double *pan_left, double *pan_right)
+inline void calculate_pan_values(double pan_total, double *pan_left,
+                                 double *pan_right)
 {
     *pan_left = cos((M_PI / 4.0) * (pan_total + 1.0));
     *pan_right = sin((M_PI / 4.0) * (pan_total + 1.0));
@@ -587,8 +588,8 @@ void reverse(char s[])
 // new_min, new_max
 // algo from
 // http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
-double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
-                 double cur_val)
+inline double scaleybum(double cur_min, double cur_max, double new_min,
+                        double new_max, double cur_val)
 {
     double return_val = 0;
 
@@ -610,7 +611,7 @@ const double P = 0.225;
 // http://devmaster.net/posts/9648/fast-and-accurate-sine-cosine
 // input is -pi to +pi
 // i took it from the Will Pirkle Synth book.
-double parabolic_sine(double x, bool high_precision)
+inline double parabolic_sine(double x, bool high_precision)
 {
     double y = B * x + C * x * fabs(x);
 
@@ -619,10 +620,10 @@ double parabolic_sine(double x, bool high_precision)
     return y;
 }
 
-double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }
-double bipolar_to_unipolar(double value) { return 0.5 * value + 0.5; }
+inline double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }
+inline double bipolar_to_unipolar(double value) { return 0.5 * value + 0.5; }
 
-double convex_transform(double value)
+inline double convex_transform(double value)
 {
     if (value <= CONVEX_LIMIT)
         return 0.0;
@@ -636,7 +637,7 @@ double convex_transform(double value)
 
         value = the unipolar (0 -> 1) value to convert
 */
-double convex_inverted_transform(double value)
+inline double convex_inverted_transform(double value)
 {
     if (value >= CONCAVE_LIMIT)
         return 0.0;
@@ -672,7 +673,7 @@ double concave_inverted_transform(double value)
     return -(5.0 / 12.0) * log10(value);
 }
 
-double do_white_noise()
+inline double do_white_noise()
 {
     float noise = 0.0;
 
@@ -685,7 +686,7 @@ double do_white_noise()
     return noise;
 }
 
-double do_pn_sequence(unsigned *pn_register)
+inline double do_pn_sequence(unsigned *pn_register)
 {
     // get the bits
     unsigned b0 =
@@ -721,7 +722,7 @@ double do_pn_sequence(unsigned *pn_register)
     return out;
 }
 
-void check_wrap_index(double *index)
+inline void check_wrap_index(double *index)
 {
     while (*index < 0.0)
         *index += 1.0;
@@ -730,45 +731,35 @@ void check_wrap_index(double *index)
         *index -= 1.0;
 }
 
-double do_blep_n(const double *blep_table, double table_len, double modulo,
-                 double inc, double height, bool rising_edge,
-                 double points_per_side, bool interpolate)
+inline double do_blep_n(const double *blep_table, double table_len,
+                        double modulo, double inc, double height,
+                        bool rising_edge, double points_per_side,
+                        bool interpolate)
 {
-    // return value
     double blep = 0.0;
-
-    // t = the distance from the discontinuity
     double t = 0.0;
 
-    // --- find the center of table (discontinuity location)
-    double dTableCenter = table_len / 2.0 - 1;
+    double table_center = table_len / 2.0 - 1;
 
-    // LEFT side of edge
-    // -1 < t < 0
     for (int i = 1; i <= (int)points_per_side; i++)
     {
         if (modulo > 1.0 - (double)i * inc)
         {
-            // --- calculate distance
             t = (modulo - 1.0) / (points_per_side * inc);
+            float idx = (1.0 + t) * table_center;
 
-            // --- get index
-            float fIndex = (1.0 + t) * dTableCenter;
-
-            // --- truncation
             if (interpolate)
             {
-                blep = blep_table[(int)fIndex];
+                blep = blep_table[(int)idx];
             }
             else
             {
-                float fIndex = (1.0 + t) * dTableCenter;
-                float frac = fIndex - (int)fIndex;
-                blep = lin_terp(0, 1, blep_table[(int)fIndex],
-                                blep_table[(int)fIndex + 1], frac);
+                float idx = (1.0 + t) * table_center;
+                float frac = idx - (int)idx;
+                blep = lin_terp(0, 1, blep_table[(int)idx],
+                                blep_table[(int)idx + 1], frac);
             }
 
-            // --- subtract for falling, add for rising edge
             if (!rising_edge)
                 blep *= -1.0;
 
@@ -776,35 +767,26 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
         }
     }
 
-    // RIGHT side of discontinuity
-    // 0 <= t < 1
     for (int i = 1; i <= (int)points_per_side; i++)
     {
         if (modulo < (double)i * inc)
         {
-            // calculate distance
             t = modulo / (points_per_side * inc);
+            float idx = t * table_center + (table_center + 1.0);
 
-            // --- get index
-            float fIndex = t * dTableCenter + (dTableCenter + 1.0);
-
-            // truncation
             if (interpolate)
-            {
-                blep = blep_table[(int)fIndex];
-            }
+                blep = blep_table[(int)idx];
             else
             {
-                float frac = fIndex - (int)fIndex;
-                if ((int)fIndex + 1 >= table_len)
-                    blep = lin_terp(0, 1, blep_table[(int)fIndex],
-                                    blep_table[0], frac);
+                float frac = idx - (int)idx;
+                if ((int)idx + 1 >= table_len)
+                    blep = lin_terp(0, 1, blep_table[(int)idx], blep_table[0],
+                                    frac);
                 else
-                    blep = lin_terp(0, 1, blep_table[(int)fIndex],
-                                    blep_table[(int)fIndex + 1], frac);
+                    blep = lin_terp(0, 1, blep_table[(int)idx],
+                                    blep_table[(int)idx + 1], frac);
             }
 
-            // subtract for falling, add for rising edge
             if (!rising_edge)
                 blep *= -1.0;
 
@@ -815,7 +797,7 @@ double do_blep_n(const double *blep_table, double table_len, double modulo,
     return 0.0;
 }
 
-float lin_terp(float x1, float x2, float y1, float y2, float x)
+inline float lin_terp(float x1, float x2, float y1, float y2, float x)
 {
     float denom = x2 - x1;
     if (denom == 0)
@@ -867,7 +849,7 @@ double semitones_between_frequencies(double start_freq, double end_freq)
     return fastlog2(end_freq / start_freq) * 12.0;
 }
 
-double mma_midi_to_atten_db(unsigned int midi_val)
+double inline mma_midi_to_atten_db(unsigned int midi_val)
 {
     if (midi_val == 0)
         return -96.0; // dB floor

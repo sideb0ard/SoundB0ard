@@ -17,7 +17,6 @@ typedef struct
     unsigned int waveform;      // to store type
     // --- LFOs
     unsigned int lfo_mode; // to store MODE
-    // --- CSampleOscillators
     unsigned int loop_mode;
 } global_oscillator_params;
 
