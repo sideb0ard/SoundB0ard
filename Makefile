@@ -69,9 +69,11 @@ OBJ = \
 
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
 
-INCDIR=/usr/local/include
+ODIR = obj
+INCDIRS=-I/usr/local/include -Iinclude/
 LIBDIR=/usr/local/lib
-CFLAGS = -std=c11 -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -g -pg -I$(INCDIR) -O3
+WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
+CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
 
 %.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)

@@ -4,7 +4,6 @@
 #include <wchar.h>
 
 #include "arpeggiator.h"
-#include "bytebeat/bytebeat.h"
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"
