@@ -1,81 +1,81 @@
 CC = clang++
-OBJ = \
-	afx/biquad.o \
-	afx/combfilter.o \
-	afx/delay.o \
-	afx/delayapf.o  \
-	afx/lpfcombfilter.o \
-	afx/onepolelpf.o \
-	algorithm.o \
-	arpeggiator.o \
-	audioutils.o \
-	audiofile_data.o \
-	basicfilterpass.o \
-	beatrepeat.o \
-	bitcrush.o \
-	bytebeat/bytebeat.o \
-	chaosmonkey.o \
-	cmdloop.o \
-	dca.o \
-	ddlmodule.o \
-	digisynth.o \
-	digisynth_voice.o \
-	distortion.o \
-	delayline.o \
-	dynamics_processor.o \
-	sample_sequencer.o \
-	sequencer.o \
-	sequencer_utils.o \
-	envelope.o \
-	envelope_generator.o \
-	envelope_follower.o \
-	envelope_detector.o \
-	filter.o \
-	filter_ckthreefive.o \
-	filter_moogladder.o \
-	filter_onepole.o \
-	filter_sem.o \
-	granulator.o \
-	help.o \
-	keys.o \
-	lfo.o \
-	looper.o \
-	main.o \
-	midi_freq_table.o \
-	midimaaan.o \
-	minisynth.o \
-	minisynth_voice.o \
-	mixer.o \
-	modmatrix.o \
-	modfilter.o \
-	modular_delay.o \
-	obliquestrategies.o \
-	oscillator.o \
-	qblimited_oscillator.o \
-	reverb.o \
-	sample_oscillator.o \
-	sbmsg.o \
-	sparkline.o \
-	spork.o \
-	stereodelay.o \
-	sound_generator.o \
-	synthbase.o \
-	synthdrum_sequencer.o \
-	table.o \
-	utils.o \
-	voice.o \
-	wt_oscillator.o \
-	waveshaper.o
+SRC = \
+	afx/biquad.c \
+	afx/combfilter.c \
+	afx/delay.c \
+	afx/delayapf.c  \
+	afx/lpfcombfilter.c \
+	afx/onepolelpf.c \
+	algorithm.c \
+	arpeggiator.c \
+	audioutils.c \
+	audiofile_data.c \
+	basicfilterpass.c \
+	beatrepeat.c \
+	bitcrush.c \
+	bytebeat/bytebeat.c \
+	chaosmonkey.c \
+	cmdloop.c \
+	dca.c \
+	ddlmodule.c \
+	digisynth.c \
+	digisynth_voice.c \
+	distortion.c \
+	delayline.c \
+	dynamics_processor.c \
+	sample_sequencer.c \
+	sequencer.c \
+	sequencer_utils.c \
+	envelope.c \
+	envelope_generator.c \
+	envelope_follower.c \
+	envelope_detector.c \
+	filter.c \
+	filter_ckthreefive.c \
+	filter_moogladder.c \
+	filter_onepole.c \
+	filter_sem.c \
+	granulator.c \
+	help.c \
+	keys.c \
+	lfo.c \
+	looper.c \
+	main.c \
+	midi_freq_table.c \
+	midimaaan.c \
+	minisynth.c \
+	minisynth_voice.c \
+	mixer.c \
+	modmatrix.c \
+	modfilter.c \
+	modular_delay.c \
+	obliquestrategies.c \
+	oscillator.c \
+	qblimited_oscillator.c \
+	reverb.c \
+	sample_oscillator.c \
+	sbmsg.c \
+	sparkline.c \
+	spork.c \
+	stereodelay.c \
+	sound_generator.c \
+	synthbase.c \
+	synthdrum_sequencer.c \
+	table.c \
+	utils.c \
+	voice.c \
+	wt_oscillator.c \
+	waveshaper.c
 
+OBJDIR = obj
+OBJ = $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
-
-ODIR = obj
-INCDIRS=-I/usr/local/include -Iinclude/
+INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx
 LIBDIR=/usr/local/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
 
-%.o: %.c
+$(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)
 
 TARGET = sbsh
