@@ -89,7 +89,7 @@ granulator *new_granulator(char *filename)
     return g;
 }
 
-stereo_val granulator_gennext(void *self, mixer_timing_info timing_info)
+stereo_val granulator_gennext(void *self)
 {
     granulator *g = (granulator *)self;
     double val = 0;
@@ -105,15 +105,15 @@ stereo_val granulator_gennext(void *self, mixer_timing_info timing_info)
 
     if (g->sequencer_mode && g->m_seq.num_patterns > 0)
     {
-        int idx = timing_info.midi_tick % PPBAR;
-        if (timing_info.is_midi_tick &&
+        int idx = mixr->timing_info.midi_tick % PPBAR;
+        if (mixr->timing_info.is_midi_tick &&
             g->m_seq.patterns[g->m_seq.cur_pattern][idx])
         {
             granulator_start(g);
         }
-        else if (timing_info.is_sixteenth)
+        else if (mixr->timing_info.is_sixteenth)
             granulator_stop(g);
-        seq_tick(&g->m_seq, timing_info);
+        seq_tick(&g->m_seq);
     }
 
     if (g->m_eg1.m_state == OFFF)
@@ -163,10 +163,10 @@ stereo_val granulator_gennext(void *self, mixer_timing_info timing_info)
     if (g->have_active_buffer) // file buffer or external in
     {
         int spacing = granulator_calculate_grain_spacing(g);
-        if (timing_info.cur_sample >
+        if (mixr->timing_info.cur_sample >
             g->last_grain_launched_sample_time + spacing) // new grain time
         {
-            g->last_grain_launched_sample_time = timing_info.cur_sample;
+            g->last_grain_launched_sample_time = mixr->timing_info.cur_sample;
             g->cur_grain_num = granulator_get_available_grain_num(g);
 
             int duration = g->grain_duration_ms * 44.1;

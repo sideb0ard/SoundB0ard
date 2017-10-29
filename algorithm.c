@@ -21,7 +21,7 @@ algorithm *new_algorithm(char *line)
         return NULL;
     }
 
-    a->sound_generator.gennext = &algorithm_gen_next;
+    a->sound_generator.gennext = &algorithm_gennext;
     a->sound_generator.status = &algorithm_status;
     a->sound_generator.setvol = &algorithm_setvol;
     a->sound_generator.getvol = &algorithm_getvol;
@@ -122,14 +122,15 @@ void algorithm_process_afterthought(algorithm *self)
     }
 }
 
-stereo_val algorithm_gen_next(void *self, mixer_timing_info timing_info)
+stereo_val algorithm_gennext(void *self)
 {
     algorithm *a = (algorithm *)self;
     switch (a->frequency)
     {
     case LOOP:
-        if (!a->has_started &&
-            (timing_info.midi_tick % timing_info.loop_len_in_ticks == 0))
+        if (!a->has_started && (mixr->timing_info.midi_tick %
+                                    mixr->timing_info.loop_len_in_ticks ==
+                                0))
         {
             a->has_started = true;
             char now_cmd[MAX_CMD_LEN] = {0};
@@ -139,7 +140,9 @@ stereo_val algorithm_gen_next(void *self, mixer_timing_info timing_info)
             interpret(now_cmd);
             algorithm_process_afterthought(a);
         }
-        else if (timing_info.midi_tick % timing_info.loop_len_in_ticks != 0)
+        else if (mixr->timing_info.midi_tick %
+                     mixr->timing_info.loop_len_in_ticks !=
+                 0)
         {
             a->has_started = false;
         }

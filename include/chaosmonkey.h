@@ -37,6 +37,6 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool);
 
 void chaosmonkey_add_note_at_random_time(minisynth *ms, int note);
 
-stereo_val chaosmonkey_gen_next(void *self, mixer_timing_info timing_info);
+stereo_val chaosmonkey_gennext(void *self);
 void chaosmonkey_status(void *self, wchar_t *ss);
 void chaosmonkey_setvol(void *self, double v);

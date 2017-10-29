@@ -130,6 +130,7 @@ typedef enum {
 } key_type;
 
 typedef enum { MONO, LEGATO } legato_mode;
+
 typedef enum {
     NONE,
     SYNTH,
@@ -144,9 +145,11 @@ typedef struct mixer_timing_info
 {
     int frames_per_midi_tick;
     int midi_ticks_per_ms;
+
     int sixteenth_note_tick;
-    int cur_sample; // inverse of SAMPLE RATE
     int midi_tick;
+
+    int cur_sample; // inverse of SAMPLE RATE
 
     // informational for other sound generators
     unsigned int loop_len_in_frames;

@@ -757,7 +757,7 @@ void minisynth_make_active_track(void *self, int tracknum)
     synthbase_make_active_track(&ms->base, tracknum);
 }
 
-stereo_val minisynth_gennext(void *self, mixer_timing_info timing_info)
+stereo_val minisynth_gennext(void *self)
 {
 
     minisynth *ms = (minisynth *)self;
@@ -770,7 +770,7 @@ stereo_val minisynth_gennext(void *self, mixer_timing_info timing_info)
     // return (stereo_val){nomnom, nomnom};
     // printf("NOM: %d NOMNOM:%.2f\n", nom, nomnom);
 
-    int idx = synthbase_gennext(&ms->base, timing_info);
+    int idx = synthbase_gennext(&ms->base);
     if (idx >= 0)
     {
         midi_event ev = ms->base.melodies[ms->base.cur_melody][idx];

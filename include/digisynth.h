@@ -23,7 +23,7 @@ typedef struct digisynth
 digisynth *new_digisynth(char *filename);
 
 // sound generator interface //////////////
-stereo_val digisynth_gennext(void *self, mixer_timing_info timing_info);
+stereo_val digisynth_gennext(void *self);
 void digisynth_status(void *self, wchar_t *status_string);
 void digisynth_setvol(void *self, double v);
 double digisynth_getvol(void *self);

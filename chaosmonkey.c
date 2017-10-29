@@ -27,7 +27,7 @@ chaosmonkey *new_chaosmonkey(int soundgen)
     lfo_set_soundgenerator_interface(&cm->m_lfo);
     lfo_start_oscillator((oscillator *)&cm->m_lfo);
 
-    cm->sound_generator.gennext = &chaosmonkey_gen_next;
+    cm->sound_generator.gennext = &chaosmonkey_gennext;
     cm->sound_generator.status = &chaosmonkey_status;
     cm->sound_generator.setvol = &chaosmonkey_setvol;
     cm->sound_generator.type = CHAOSMONKEY_TYPE;
@@ -72,11 +72,10 @@ void chaosmonkey_action_mode(chaosmonkey *cm, bool val)
     cm->take_action = val;
 }
 
-stereo_val chaosmonkey_gen_next(void *self, mixer_timing_info timing_info)
+stereo_val chaosmonkey_gennext(void *self)
 {
     chaosmonkey *cm = (chaosmonkey *)self;
     (void)cm;
-    (void)timing_info;
     // osc_update(&cm->m_lfo.osc);
     // double unused_quad = 0.0;
     // double lfo_out = lfo_do_oscillate(&cm->m_lfo.osc, &unused_quad);

@@ -7,12 +7,14 @@
 #include <wchar.h>
 
 #include "defjams.h"
+#include "mixer.h"
 #include "sample_sequencer.h"
 #include "sequencer.h"
 #include "sequencer_utils.h"
 #include "utils.h"
 
 extern wchar_t *sparkchars;
+extern mixer *mixr;
 
 sample_sequencer *new_sample_seq(char *filename)
 {
@@ -70,7 +72,7 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
     }
 }
 
-stereo_val sample_seq_gennext(void *self, mixer_timing_info timing_info)
+stereo_val sample_seq_gennext(void *self)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     double val = 0;
@@ -78,7 +80,7 @@ stereo_val sample_seq_gennext(void *self, mixer_timing_info timing_info)
     if (!seq->sound_generator.active)
         return (stereo_val){0, 0};
 
-    int idx = timing_info.midi_tick % PPBAR;
+    int idx = mixr->timing_info.midi_tick % PPBAR;
 
     // wait till start of loop to keep patterns synched
     if (!seq->started)
@@ -93,7 +95,7 @@ stereo_val sample_seq_gennext(void *self, mixer_timing_info timing_info)
         }
     }
 
-    if (timing_info.is_midi_tick &&
+    if (mixr->timing_info.is_midi_tick &&
         seq->m_seq.patterns[seq->m_seq.cur_pattern][idx])
     {
         int seq_position = get_a_sample_seq_position(seq);
@@ -124,7 +126,7 @@ stereo_val sample_seq_gennext(void *self, mixer_timing_info timing_info)
         }
     }
 
-    seq_tick(&seq->m_seq, timing_info);
+    seq_tick(&seq->m_seq);
 
     val = effector(&seq->sound_generator, val);
     val = envelopor(&seq->sound_generator, val);

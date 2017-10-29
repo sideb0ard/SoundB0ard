@@ -320,80 +320,84 @@ int add_granulator(mixer *mixr, char *filename)
 
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
-    mixer_timing_info mixr_info = mixr->timing_info;
-
     for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
-        if (mixr_info.cur_sample % mixr_info.frames_per_midi_tick == 0)
-        {
-            mixr_info.midi_tick++; // 1 midi tick (or pulse)
-            mixr_info.is_midi_tick = true;
-        }
-        else
-        {
-            mixr_info.is_midi_tick = false;
-        }
-
-        if (mixr_info.cur_sample %
-                ((PPSIXTEENTH / 2) * mixr_info.frames_per_midi_tick) ==
+        if (mixr->timing_info.cur_sample %
+                mixr->timing_info.frames_per_midi_tick ==
             0)
         {
-            mixr_info.is_thirtysecond = true;
+            mixr->timing_info.midi_tick++; // 1 midi tick (or pulse)
+            mixr->timing_info.is_midi_tick = true;
         }
         else
         {
-            mixr_info.is_thirtysecond = false;
+            mixr->timing_info.is_midi_tick = false;
         }
 
-        if (mixr_info.cur_sample %
-                (PPSIXTEENTH * mixr_info.frames_per_midi_tick) ==
+        if (mixr->timing_info.cur_sample %
+                ((PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick) ==
             0)
         {
-            mixr_info.sixteenth_note_tick++; // for seq machine resolution
-            mixr_info.is_sixteenth = true;
+            mixr->timing_info.is_thirtysecond = true;
         }
         else
         {
-            mixr_info.is_sixteenth = false;
+            mixr->timing_info.is_thirtysecond = false;
         }
 
-        if (mixr_info.cur_sample %
-                (PPSIXTEENTH * 2 * mixr_info.frames_per_midi_tick) ==
+        if (mixr->timing_info.cur_sample %
+                (PPSIXTEENTH * mixr->timing_info.frames_per_midi_tick) ==
             0)
         {
-            mixr_info.is_eighth = true;
+            mixr->timing_info
+                .sixteenth_note_tick++; // for seq machine resolution
+            mixr->timing_info.is_sixteenth = true;
         }
         else
         {
-            mixr_info.is_eighth = false;
+            mixr->timing_info.is_sixteenth = false;
         }
 
-        if (mixr_info.cur_sample % (PPQN * mixr_info.frames_per_midi_tick) == 0)
-        {
-            mixr_info.is_quarter = true;
-        }
-        else
-        {
-            mixr_info.is_quarter = false;
-        }
-
-        if (mixr_info.cur_sample % (PPBAR * mixr_info.frames_per_midi_tick) ==
+        if (mixr->timing_info.cur_sample %
+                (PPSIXTEENTH * 2 * mixr->timing_info.frames_per_midi_tick) ==
             0)
         {
-            mixr_info.start_of_loop = true;
-            if (mixr_info.start_of_loop &&
-                (mixr_info.sixteenth_note_tick % 16 != 0))
+            mixr->timing_info.is_eighth = true;
+        }
+        else
+        {
+            mixr->timing_info.is_eighth = false;
+        }
+
+        if (mixr->timing_info.cur_sample %
+                (PPQN * mixr->timing_info.frames_per_midi_tick) ==
+            0)
+        {
+            mixr->timing_info.is_quarter = true;
+        }
+        else
+        {
+            mixr->timing_info.is_quarter = false;
+        }
+
+        if (mixr->timing_info.cur_sample %
+                (PPBAR * mixr->timing_info.frames_per_midi_tick) ==
+            0)
+        {
+            mixr->timing_info.start_of_loop = true;
+            if (mixr->timing_info.start_of_loop &&
+                (mixr->timing_info.sixteenth_note_tick % 16 != 0))
             {
-                mixr_info.sixteenth_note_tick = 0;
-                mixr_info.midi_tick = 0;
+                mixr->timing_info.sixteenth_note_tick = 0;
+                mixr->timing_info.midi_tick = 0;
             }
         }
         else
         {
-            mixr_info.start_of_loop = false;
+            mixr->timing_info.start_of_loop = false;
         }
 
-        if (mixr_info.start_of_loop)
+        if (mixr->timing_info.start_of_loop)
         {
             if (mixr->scene_start_pending)
             {
@@ -412,7 +416,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                 {
                     mixr->soundgen_cur_val[i] =
                         mixr->sound_generators[i]->gennext(
-                            mixr->sound_generators[i], mixr_info);
+                            mixr->sound_generators[i]);
                     output_left += mixr->soundgen_cur_val[i].left;
                     output_right += mixr->soundgen_cur_val[i].right;
                 }
@@ -422,10 +426,9 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         out[j] = mixr->volume * (output_left / 1.53);
         out[j + 1] = mixr->volume * (output_right / 1.53);
 
-        mixr_info.cur_sample++;
+        mixr->timing_info.cur_sample++;
     }
 
-    mixr->timing_info = mixr_info;
     return 0;
 }
 

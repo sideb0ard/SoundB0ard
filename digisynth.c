@@ -43,14 +43,14 @@ digisynth *new_digisynth(char *filename)
 }
 
 // sound generator interface //////////////
-stereo_val digisynth_gennext(void *self, mixer_timing_info timing_info)
+stereo_val digisynth_gennext(void *self)
 {
     digisynth *ds = (digisynth *)self;
 
     if (!ds->sound_generator.active)
         return (stereo_val){0, 0};
 
-    int idx = synthbase_gennext(&ds->base, timing_info);
+    int idx = synthbase_gennext(&ds->base);
     if (idx >= 0)
     {
         midi_event ev = ds->base.melodies[ds->base.cur_melody][idx];

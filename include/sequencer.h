@@ -81,7 +81,7 @@ typedef struct sequencer
 } sequencer;
 
 void seq_init(sequencer *s);
-bool seq_tick(sequencer *s, mixer_timing_info timing_info);
+bool seq_tick(sequencer *s);
 void seq_status(sequencer *s, wchar_t *status_string);
 
 void seq_set_sample_amp(sequencer *s, int pattern_num, int pattern_position,

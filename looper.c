@@ -41,7 +41,7 @@ looper *new_looper(char *filename, double loop_len)
     return l;
 }
 
-stereo_val looper_gennext(void *self, mixer_timing_info timing_info)
+stereo_val looper_gennext(void *self)
 {
     looper *l = (looper *)self;
     stereo_val val = {0, 0};
@@ -52,10 +52,10 @@ stereo_val looper_gennext(void *self, mixer_timing_info timing_info)
     // wait till start of loop to keep patterns synched
     if (!l->started)
     {
-        if (timing_info.start_of_loop)
+        if (mixr->timing_info.start_of_loop)
         {
             printf("Starting now! 16th tick is %d\n",
-                   timing_info.sixteenth_note_tick % 16);
+                   mixr->timing_info.sixteenth_note_tick % 16);
             l->started = true;
         }
         else
@@ -64,12 +64,12 @@ stereo_val looper_gennext(void *self, mixer_timing_info timing_info)
         }
     }
 
-    if (timing_info.start_of_loop && l->resample_pending)
+    if (mixr->timing_info.start_of_loop && l->resample_pending)
     {
         looper_resample_to_loop_size(l);
     }
 
-    if (timing_info.start_of_loop && l->change_loopsize_pending)
+    if (mixr->timing_info.start_of_loop && l->change_loopsize_pending)
     {
         printf("PENDING LOOPSIZE FOUND! %.2f loops for loop num: %d\n",
                l->pending_loop_size, l->pending_loop_num);
@@ -78,7 +78,7 @@ stereo_val looper_gennext(void *self, mixer_timing_info timing_info)
     }
 
     // UPDATE MODES IF NEEDED
-    if (timing_info.start_of_loop)
+    if (mixr->timing_info.start_of_loop)
     {
         if (l->stutter_mode)
         {
@@ -119,7 +119,7 @@ stereo_val looper_gennext(void *self, mixer_timing_info timing_info)
 
     if (l->stutter_active)
     {
-        if (timing_info.cur_sample %
+        if (mixr->timing_info.cur_sample %
                 (l->samples[l->cur_sample]->resampled_file_size / 16) ==
             0)
         {
@@ -138,7 +138,8 @@ stereo_val looper_gennext(void *self, mixer_timing_info timing_info)
     }
 
     // resync after a resample/resize
-    if (l->just_been_resampled && timing_info.sixteenth_note_tick % 16 == 0)
+    if (l->just_been_resampled &&
+        mixr->timing_info.sixteenth_note_tick % 16 == 0)
     {
         printf("Resyncing after resample...zzzz\n");
         l->samples[l->cur_sample]->position = 0;

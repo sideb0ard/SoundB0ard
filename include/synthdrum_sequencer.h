@@ -69,7 +69,7 @@ void synthdrum_del_self(void *self);
 
 void sds_status(void *self, wchar_t *ss);
 void sds_setvol(void *self, double v);
-stereo_val sds_gennext(void *self, mixer_timing_info timing_info);
+stereo_val sds_gennext(void *self);
 double sds_getvol(void *self);
 
 void sds_start(void *self);

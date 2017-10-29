@@ -65,7 +65,7 @@ typedef struct synthbase
 
 void synthbase_init(synthbase *base);
 
-int synthbase_gennext(synthbase *base, mixer_timing_info timing_info);
+int synthbase_gennext(synthbase *base);
 void synthbase_status(synthbase *base, wchar_t *status_string);
 
 void synthbase_clear_melody_ready_for_new_one(synthbase *base, int melody_num);

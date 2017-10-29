@@ -77,11 +77,11 @@ void seq_init(sequencer *seq)
     seq->max_generation = 0;
 }
 
-bool seq_tick(sequencer *seq, mixer_timing_info timing_info)
+bool seq_tick(sequencer *seq)
 {
-    if (timing_info.sixteenth_note_tick != seq->sixteenth_tick)
+    if (mixr->timing_info.sixteenth_note_tick != seq->sixteenth_tick)
     {
-        seq->sixteenth_tick = timing_info.sixteenth_note_tick;
+        seq->sixteenth_tick = mixr->timing_info.sixteenth_note_tick;
 
         if (seq->sixteenth_tick % 4 == 0)
         {
