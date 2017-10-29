@@ -51,8 +51,7 @@ inline double qb_do_sawtooth(oscillator *self, double modulo, double inc)
     // --- NOTE: Fs/8 = Nyquist/4
     if (self->m_fo <= SAMPLE_RATE / 8.0)
     {
-        out = trivial_saw + do_blep_n(&dBLEPTable_8_BLKHAR[0], /* BLEP table */
-                                      4096,      /* BLEP table length */
+        out = trivial_saw + do_blep_n(&blep_table_8_blkhar[0], blep_table_size,
                                       modulo,    /* current phase value */
                                       fabs(inc), /* abs(inc) is for FM
                                                      synthesis with negative
@@ -65,12 +64,11 @@ inline double qb_do_sawtooth(oscillator *self, double modulo, double inc)
     else // to prevent overlapM_PIng BLEPs, default back to 2-point for f >
          // Nyquist/4
     {
-        out = trivial_saw + do_blep_n(&dBLEPTable[0], /* BLEP table */
-                                      4096,           /* BLEP table length */
-                                      modulo,         /* current phase value */
-                                      fabs(inc),      /* abs(inc) is for FM
-                                                          synthesis with negative
-                                                          frequencies */
+        out = trivial_saw + do_blep_n(&blep_table[0], blep_table_size,
+                                      modulo,    /* current phase value */
+                                      fabs(inc), /* abs(inc) is for FM
+                                                     synthesis with negative
+                                                     frequencies */
                                       1.0,   /* sawtooth edge height = 1.0 */
                                       false, /* falling edge */
                                       1,     /* 1 point per side */

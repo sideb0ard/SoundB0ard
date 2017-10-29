@@ -14,12 +14,15 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "utils.h"
+//#include "lookuptables.h"
 
 extern mixer *mixr;
 extern char *strategies[NUM_STATEGIES];
 
 static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
                                "f#", "g",  "g#", "a",  "a#", "b"};
+
+const double blep_table_center = 4096 / 2.0 - 1;
 
 #define CONVEX_LIMIT 0.00398107
 #define CONCAVE_LIMIT 0.99601893
@@ -739,14 +742,12 @@ inline double do_blep_n(const double *blep_table, double table_len,
     double blep = 0.0;
     double t = 0.0;
 
-    double table_center = table_len / 2.0 - 1;
-
     for (int i = 1; i <= (int)points_per_side; i++)
     {
         if (modulo > 1.0 - (double)i * inc)
         {
             t = (modulo - 1.0) / (points_per_side * inc);
-            float idx = (1.0 + t) * table_center;
+            float idx = (1.0 + t) * blep_table_center;
 
             if (interpolate)
             {
@@ -754,7 +755,7 @@ inline double do_blep_n(const double *blep_table, double table_len,
             }
             else
             {
-                float idx = (1.0 + t) * table_center;
+                float idx = (1.0 + t) * blep_table_center;
                 float frac = idx - (int)idx;
                 blep = lin_terp(0, 1, blep_table[(int)idx],
                                 blep_table[(int)idx + 1], frac);
@@ -772,7 +773,7 @@ inline double do_blep_n(const double *blep_table, double table_len,
         if (modulo < (double)i * inc)
         {
             t = modulo / (points_per_side * inc);
-            float idx = t * table_center + (table_center + 1.0);
+            float idx = t * blep_table_center + (blep_table_center + 1.0);
 
             if (interpolate)
                 blep = blep_table[(int)idx];
