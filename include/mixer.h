@@ -116,6 +116,7 @@ void mixer_preview_track(mixer *mixr, char *filename);
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
 
+void mixer_update_timing_info(mixer *mixr);
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,

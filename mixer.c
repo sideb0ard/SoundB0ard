@@ -318,93 +318,74 @@ int add_granulator(mixer *mixr, char *filename)
     return add_sound_generator(mixr, (soundgenerator *)g);
 }
 
+inline void mixer_update_timing_info(mixer *mixr)
+{
+    // size of events measured in frames
+    int size_of_thirtysecond_note =
+        (PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick;
+    int size_of_sixteenth_note = size_of_thirtysecond_note * 2;
+    int size_of_eighth_note = size_of_sixteenth_note * 2;
+    int size_of_quarter_note = size_of_eighth_note * 2;
+    int size_of_loop = PPBAR * mixr->timing_info.frames_per_midi_tick;
+
+    mixr->timing_info.is_midi_tick = false;
+    mixr->timing_info.is_thirtysecond = false;
+    mixr->timing_info.is_sixteenth = false;
+    mixr->timing_info.is_eighth = false;
+    mixr->timing_info.is_quarter = false;
+    mixr->timing_info.start_of_loop = false;
+
+    if (mixr->timing_info.cur_sample % mixr->timing_info.frames_per_midi_tick ==
+        0)
+    {
+        mixr->timing_info.midi_tick++;
+        mixr->timing_info.is_midi_tick = true;
+    }
+
+    if (mixr->timing_info.cur_sample % size_of_thirtysecond_note == 0)
+        mixr->timing_info.is_thirtysecond = true;
+
+    if (mixr->timing_info.cur_sample % size_of_sixteenth_note == 0)
+    {
+        mixr->timing_info.sixteenth_note_tick++; // for seq machine resolution
+        mixr->timing_info.is_sixteenth = true;
+    }
+
+    if (mixr->timing_info.cur_sample % size_of_eighth_note == 0)
+        mixr->timing_info.is_eighth = true;
+
+    if (mixr->timing_info.cur_sample % size_of_quarter_note == 0)
+        mixr->timing_info.is_quarter = true;
+
+    if (mixr->timing_info.cur_sample % size_of_loop == 0)
+    {
+        mixr->timing_info.start_of_loop = true;
+        // fudge factor
+        if (mixr->timing_info.start_of_loop &&
+            (mixr->timing_info.sixteenth_note_tick % 16 != 0))
+        {
+            mixr->timing_info.sixteenth_note_tick = 0;
+            mixr->timing_info.midi_tick = 0;
+        }
+    }
+
+    if (mixr->timing_info.start_of_loop)
+    {
+        if (mixr->scene_start_pending)
+        {
+            mixer_play_scene(mixr, mixr->current_scene);
+            mixr->scene_start_pending = false;
+        }
+    }
+}
+
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
+
     for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
-        if (mixr->timing_info.cur_sample %
-                mixr->timing_info.frames_per_midi_tick ==
-            0)
-        {
-            mixr->timing_info.midi_tick++; // 1 midi tick (or pulse)
-            mixr->timing_info.is_midi_tick = true;
-        }
-        else
-        {
-            mixr->timing_info.is_midi_tick = false;
-        }
 
-        if (mixr->timing_info.cur_sample %
-                ((PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick) ==
-            0)
-        {
-            mixr->timing_info.is_thirtysecond = true;
-        }
-        else
-        {
-            mixr->timing_info.is_thirtysecond = false;
-        }
-
-        if (mixr->timing_info.cur_sample %
-                (PPSIXTEENTH * mixr->timing_info.frames_per_midi_tick) ==
-            0)
-        {
-            mixr->timing_info
-                .sixteenth_note_tick++; // for seq machine resolution
-            mixr->timing_info.is_sixteenth = true;
-        }
-        else
-        {
-            mixr->timing_info.is_sixteenth = false;
-        }
-
-        if (mixr->timing_info.cur_sample %
-                (PPSIXTEENTH * 2 * mixr->timing_info.frames_per_midi_tick) ==
-            0)
-        {
-            mixr->timing_info.is_eighth = true;
-        }
-        else
-        {
-            mixr->timing_info.is_eighth = false;
-        }
-
-        if (mixr->timing_info.cur_sample %
-                (PPQN * mixr->timing_info.frames_per_midi_tick) ==
-            0)
-        {
-            mixr->timing_info.is_quarter = true;
-        }
-        else
-        {
-            mixr->timing_info.is_quarter = false;
-        }
-
-        if (mixr->timing_info.cur_sample %
-                (PPBAR * mixr->timing_info.frames_per_midi_tick) ==
-            0)
-        {
-            mixr->timing_info.start_of_loop = true;
-            if (mixr->timing_info.start_of_loop &&
-                (mixr->timing_info.sixteenth_note_tick % 16 != 0))
-            {
-                mixr->timing_info.sixteenth_note_tick = 0;
-                mixr->timing_info.midi_tick = 0;
-            }
-        }
-        else
-        {
-            mixr->timing_info.start_of_loop = false;
-        }
-
-        if (mixr->timing_info.start_of_loop)
-        {
-            if (mixr->scene_start_pending)
-            {
-                mixer_play_scene(mixr, mixr->current_scene);
-                mixr->scene_start_pending = false;
-            }
-        }
+        mixer_update_timing_info(mixr);
 
         double output_left = 0.0;
         double output_right = 0.0;
