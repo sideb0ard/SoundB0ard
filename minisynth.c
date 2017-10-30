@@ -36,7 +36,7 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
-    synthbase_init(&ms->base);
+    synthbase_init(&ms->base, (void *)ms);
 
     ms->sound_generator.gennext = &minisynth_gennext;
     ms->sound_generator.status = &minisynth_status;
@@ -45,6 +45,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.start = &minisynth_sg_start;
     ms->sound_generator.stop = &minisynth_sg_stop;
     ms->sound_generator.get_num_tracks = &minisynth_get_num_tracks;
+    ms->sound_generator.event_notify = &synthbase_event_notify;
     ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.self_destruct = &minisynth_del_self;
     ms->sound_generator.type = MINISYNTH_TYPE;
@@ -770,12 +771,12 @@ stereo_val minisynth_gennext(void *self)
     // return (stereo_val){nomnom, nomnom};
     // printf("NOM: %d NOMNOM:%.2f\n", nom, nomnom);
 
-    int idx = synthbase_gennext(&ms->base);
-    if (idx >= 0)
-    {
-        midi_event ev = ms->base.melodies[ms->base.cur_melody][idx];
-        midi_parse_midi_event((soundgenerator *)ms, ev);
-    }
+    // int idx = synthbase_gennext(&ms->base);
+    // if (idx >= 0)
+    // {
+    //     midi_event ev = ms->base.melodies[ms->base.cur_melody][idx];
+    //     midi_parse_midi_event((soundgenerator *)ms, ev);
+    // }
 
     if (ms->m_arp.active)
         arpeggiate(ms, &ms->m_arp);

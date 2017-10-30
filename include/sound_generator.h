@@ -18,6 +18,7 @@ typedef struct soundgenerator
     void (*make_active_track)(void *self, int track_num);
     int (*get_num_tracks)(void *self);
     void (*self_destruct)(void *self);
+    void (*event_notify)(void *self, unsigned int event_type);
 
     sound_generator_type type;
     bool active;

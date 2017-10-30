@@ -14,7 +14,7 @@ digisynth *new_digisynth(char *filename)
         return NULL;
     }
 
-    synthbase_init(&ds->base);
+    synthbase_init(&ds->base, (void *)ds);
 
     strncpy(ds->audiofile, filename, 1023);
 
@@ -50,12 +50,12 @@ stereo_val digisynth_gennext(void *self)
     if (!ds->sound_generator.active)
         return (stereo_val){0, 0};
 
-    int idx = synthbase_gennext(&ds->base);
-    if (idx >= 0)
-    {
-        midi_event ev = ds->base.melodies[ds->base.cur_melody][idx];
-        midi_parse_midi_event((soundgenerator *)self, ev);
-    }
+    // int idx = synthbase_gennext(&ds->base);
+    // if (idx >= 0)
+    // {
+    //     midi_event ev = ds->base.melodies[ds->base.cur_melody][idx];
+    //     midi_parse_midi_event((soundgenerator *)self, ev);
+    // }
 
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;

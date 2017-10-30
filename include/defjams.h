@@ -163,6 +163,15 @@ typedef struct mixer_timing_info
     bool is_midi_tick;
 } mixer_timing_info;
 
+typedef enum time_event {
+    TIME_MIDI_TICK,
+    TIME_THIRTYSECOND_TICK,
+    TIME_SIXTEENTH_TICK,
+    TIME_EIGHTH_TICK,
+    TIME_QUARTER_TICK,
+    TIME_START_OF_LOOP_TICK,
+} time_event;
+
 typedef struct stereo_val
 {
     double left;

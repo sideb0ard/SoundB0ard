@@ -136,7 +136,7 @@ typedef struct
     global_dca_params dca_params;
 } global_synth_params;
 
-inline double midi_to_pan_value(unsigned int midi_val)
+static inline double midi_to_pan_value(unsigned int midi_val)
 {
     // see MMA DLS Level 2 Spec; controls are asymmetrical
     if (midi_val == 64)
@@ -155,7 +155,7 @@ inline double mma_midi_to_atten_dB(unsigned int midi_val)
     return 20.0 * log10((127.0 * 127.0) / ((float)midi_val * (float)midi_val));
 }
 
-inline double midi_to_bipolar(unsigned int midi_val)
+static inline double midi_to_bipolar(unsigned int midi_val)
 {
     return 2.0 * (double)midi_val / 127.0 - 1.0;
 }

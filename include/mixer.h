@@ -86,6 +86,8 @@ mixer *new_mixer(void);
 
 void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
+void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
+void mixer_emit_event(mixer *mixr, unsigned int event_type);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_melody(mixer *mixr, int synthnum, int pattern_num);
 

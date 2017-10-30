@@ -183,6 +183,16 @@ void mixer_ps(mixer *mixr)
     printf(ANSI_COLOR_RESET);
 }
 
+void mixer_emit_event(mixer *mixr, unsigned int event_type)
+{
+    for (int i = 0; i < mixr->soundgen_num; ++i)
+    {
+        soundgenerator *sg = mixr->sound_generators[i];
+        if (sg != NULL)
+            sg->event_notify(sg, event_type);
+    }
+}
+
 void mixer_update_bpm(mixer *mixr, int bpm)
 {
     printf("Changing bpm to %d\n", bpm);
@@ -326,6 +336,7 @@ inline void mixer_update_timing_info(mixer *mixr)
     int size_of_sixteenth_note = size_of_thirtysecond_note * 2;
     int size_of_eighth_note = size_of_sixteenth_note * 2;
     int size_of_quarter_note = size_of_eighth_note * 2;
+
     int size_of_loop = PPBAR * mixr->timing_info.frames_per_midi_tick;
 
     mixr->timing_info.is_midi_tick = false;
@@ -340,32 +351,46 @@ inline void mixer_update_timing_info(mixer *mixr)
     {
         mixr->timing_info.midi_tick++;
         mixr->timing_info.is_midi_tick = true;
-    }
+        mixer_emit_event(mixr, TIME_MIDI_TICK);
 
-    if (mixr->timing_info.cur_sample % size_of_thirtysecond_note == 0)
-        mixr->timing_info.is_thirtysecond = true;
-
-    if (mixr->timing_info.cur_sample % size_of_sixteenth_note == 0)
-    {
-        mixr->timing_info.sixteenth_note_tick++; // for seq machine resolution
-        mixr->timing_info.is_sixteenth = true;
-    }
-
-    if (mixr->timing_info.cur_sample % size_of_eighth_note == 0)
-        mixr->timing_info.is_eighth = true;
-
-    if (mixr->timing_info.cur_sample % size_of_quarter_note == 0)
-        mixr->timing_info.is_quarter = true;
-
-    if (mixr->timing_info.cur_sample % size_of_loop == 0)
-    {
-        mixr->timing_info.start_of_loop = true;
-        // fudge factor
-        if (mixr->timing_info.start_of_loop &&
-            (mixr->timing_info.sixteenth_note_tick % 16 != 0))
+        if (mixr->timing_info.cur_sample % size_of_thirtysecond_note == 0)
         {
-            mixr->timing_info.sixteenth_note_tick = 0;
-            mixr->timing_info.midi_tick = 0;
+            mixr->timing_info.is_thirtysecond = true;
+            mixer_emit_event(mixr, TIME_THIRTYSECOND_TICK);
+
+            if (mixr->timing_info.cur_sample % size_of_sixteenth_note == 0)
+            {
+                mixr->timing_info
+                    .sixteenth_note_tick++; // for seq machine resolution
+                mixr->timing_info.is_sixteenth = true;
+                mixer_emit_event(mixr, TIME_SIXTEENTH_TICK);
+
+                if (mixr->timing_info.cur_sample % size_of_eighth_note == 0)
+                {
+                    mixr->timing_info.is_eighth = true;
+                    mixer_emit_event(mixr, TIME_EIGHTH_TICK);
+
+                    if (mixr->timing_info.cur_sample % size_of_quarter_note ==
+                        0)
+                    {
+                        mixr->timing_info.is_quarter = true;
+                        mixer_emit_event(mixr, TIME_QUARTER_TICK);
+                    }
+                }
+            }
+        }
+
+        if (mixr->timing_info.cur_sample % size_of_loop == 0)
+        {
+            mixr->timing_info.start_of_loop = true;
+            // fudge factor
+            if (mixr->timing_info.start_of_loop &&
+                (mixr->timing_info.sixteenth_note_tick % 16 != 0))
+            {
+                mixr->timing_info.sixteenth_note_tick = 0;
+                mixr->timing_info.midi_tick = 0;
+            }
+            mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
         }
     }
 

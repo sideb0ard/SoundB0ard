@@ -37,6 +37,8 @@
 
 typedef struct synthbase
 {
+    void *parent;
+
     int tick; // current 16th note tick from mixer
     midi_events_loop melodies[MAX_NUM_MIDI_LOOPS];
     int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];
@@ -63,10 +65,11 @@ typedef struct synthbase
 
 } synthbase;
 
-void synthbase_init(synthbase *base);
+void synthbase_init(synthbase *base, void *parent);
 
 int synthbase_gennext(synthbase *base);
 void synthbase_status(synthbase *base, wchar_t *status_string);
+void synthbase_event_notify(void *self, unsigned int event_type);
 
 void synthbase_clear_melody_ready_for_new_one(synthbase *base, int melody_num);
 void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
