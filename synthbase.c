@@ -251,6 +251,7 @@ void synthbase_event_notify(void *self, unsigned int event_type)
                 }
             }
         }
+        break;
     }
 }
 

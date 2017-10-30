@@ -93,6 +93,7 @@ void looper_start(void *self);
 void looper_stop(void *self);
 void looper_make_active_track(void *self, int track_num);
 int looper_get_num_tracks(void *self);
+void looper_event_notify(void *self, unsigned int event_type);
 
 void sample_import_file_contents(file_sample *fs, char *filename);
 void sample_set_file_name(file_sample *fs, char *filename);

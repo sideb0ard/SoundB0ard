@@ -31,6 +31,7 @@ looper *new_looper(char *filename, double loop_len)
     l->sound_generator.get_num_tracks = &looper_get_num_tracks;
     l->sound_generator.make_active_track = &looper_make_active_track;
     l->sound_generator.self_destruct = &looper_del_self;
+    l->sound_generator.event_notify = &looper_event_notify;
     l->sound_generator.type = LOOPER_TYPE;
 
     for (int i = 0; i < MAX_SAMPLES_PER_LOOPER; i++)
@@ -41,45 +42,24 @@ looper *new_looper(char *filename, double loop_len)
     return l;
 }
 
-stereo_val looper_gennext(void *self)
+void looper_event_notify(void *self, unsigned int event_type)
 {
-    looper *l = (looper *)self;
-    stereo_val val = {0, 0};
+    looper *l = (looper *) self;
 
-    if (!l->sound_generator.active)
-        return val;
+    switch(event_type){
+    case(TIME_START_OF_LOOP_TICK):
+        if (l->resample_pending)
+            looper_resample_to_loop_size(l);
 
-    // wait till start of loop to keep patterns synched
-    if (!l->started)
-    {
-        if (mixr->timing_info.start_of_loop)
+        if (l->change_loopsize_pending)
         {
-            printf("Starting now! 16th tick is %d\n",
-                   mixr->timing_info.sixteenth_note_tick % 16);
-            l->started = true;
+            printf("PENDING LOOPSIZE FOUND! %.2f loops for loop num: %d\n",
+                   l->pending_loop_size, l->pending_loop_num);
+            looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
+            l->change_loopsize_pending = false;
         }
-        else
-        {
-            return val;
-        }
-    }
 
-    if (mixr->timing_info.start_of_loop && l->resample_pending)
-    {
-        looper_resample_to_loop_size(l);
-    }
-
-    if (mixr->timing_info.start_of_loop && l->change_loopsize_pending)
-    {
-        printf("PENDING LOOPSIZE FOUND! %.2f loops for loop num: %d\n",
-               l->pending_loop_size, l->pending_loop_num);
-        looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
-        l->change_loopsize_pending = false;
-    }
-
-    // UPDATE MODES IF NEEDED
-    if (mixr->timing_info.start_of_loop)
-    {
+        // UPDATE MODES IF NEEDED
         if (l->stutter_mode)
         {
             if (l->stutter_every_n_loops > 0)
@@ -115,13 +95,21 @@ stereo_val looper_gennext(void *self)
 
             l->scramble_generation++;
         }
-    }
 
-    if (l->stutter_active)
-    {
-        if (mixr->timing_info.cur_sample %
-                (l->samples[l->cur_sample]->resampled_file_size / 16) ==
-            0)
+
+        if (l->multi_sample_mode)
+        {
+            l->cur_sample_iteration--;
+            if (l->cur_sample_iteration == 0)
+            {
+                l->cur_sample = (l->cur_sample + 1) % l->num_samples;
+                l->cur_sample_iteration = l->sample_num_loops[l->cur_sample];
+            }
+        }
+        break;
+
+    case(TIME_SIXTEENTH_TICK):
+        if (l->stutter_active)
         {
             if (mixr->debug_mode)
                 printf("Stutututututter! Current: %d\n",
@@ -135,29 +123,40 @@ stereo_val looper_gennext(void *self)
                     l->stutter_current_16th = 0;
             }
         }
-    }
-
-    // resync after a resample/resize
-    if (l->just_been_resampled &&
-        mixr->timing_info.sixteenth_note_tick % 16 == 0)
-    {
-        printf("Resyncing after resample...zzzz\n");
-        l->samples[l->cur_sample]->position = 0;
-        l->just_been_resampled = false;
-    }
-
-    if (l->samples[l->cur_sample]->position == 0)
-    {
-        if (l->multi_sample_mode)
+        // resync after a resample/resize
+        if (l->just_been_resampled)
         {
-            l->cur_sample_iteration--;
-            if (l->cur_sample_iteration == 0)
-            {
-                l->cur_sample = (l->cur_sample + 1) % l->num_samples;
-                l->cur_sample_iteration = l->sample_num_loops[l->cur_sample];
-            }
+            printf("Resyncing after resample...zzzz\n");
+            l->samples[l->cur_sample]->position = 0;
+            l->just_been_resampled = false;
+        }
+        break;
+    }
+}
+
+stereo_val looper_gennext(void *self)
+{
+    looper *l = (looper *)self;
+    stereo_val val = {0, 0};
+
+    if (!l->sound_generator.active)
+        return val;
+
+    // wait till start of loop to keep patterns synched
+    if (!l->started)
+    {
+        if (mixr->timing_info.start_of_loop)
+        {
+            printf("Starting now! 16th tick is %d\n",
+                   mixr->timing_info.sixteenth_note_tick % 16);
+            l->started = true;
+        }
+        else
+        {
+            return val;
         }
     }
+
 
     // actual sample manipulation from here on..
     file_sample *s = l->samples[l->cur_sample];

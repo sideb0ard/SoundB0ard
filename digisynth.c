@@ -26,6 +26,7 @@ digisynth *new_digisynth(char *filename)
     ds->sound_generator.getvol = &digisynth_getvol;
     ds->sound_generator.start = &digisynth_sg_start;
     ds->sound_generator.stop = &digisynth_sg_stop;
+    ds->sound_generator.event_notify = &synthbase_event_notify;
     ds->sound_generator.self_destruct = &digisynth_del_self;
     ds->sound_generator.get_num_tracks = &digisynth_get_num_tracks;
     ds->sound_generator.make_active_track = &digisynth_make_active_track;

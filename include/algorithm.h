@@ -32,3 +32,4 @@ void algorithm_setvol(void *self, double v);
 double algorithm_getvol(void *self);
 void algorithm_start(void *self);
 void algorithm_stop(void *self);
+void algorithm_event_notify(void *self, unsigned int event_type);

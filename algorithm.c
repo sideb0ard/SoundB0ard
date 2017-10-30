@@ -27,9 +27,16 @@ algorithm *new_algorithm(char *line)
     a->sound_generator.getvol = &algorithm_getvol;
     a->sound_generator.start = &algorithm_start;
     a->sound_generator.stop = &algorithm_stop;
+    a->sound_generator.event_notify = &algorithm_event_notify;
     a->sound_generator.type = ALGORITHM_TYPE;
 
     return a;
+}
+
+void algorithm_event_notify(void *self, unsigned int event_type)
+{
+    (void) self;
+    (void) event_type;
 }
 
 int extract_cmds_from_line(algorithm *self, char *line)

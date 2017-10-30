@@ -771,13 +771,6 @@ stereo_val minisynth_gennext(void *self)
     // return (stereo_val){nomnom, nomnom};
     // printf("NOM: %d NOMNOM:%.2f\n", nom, nomnom);
 
-    // int idx = synthbase_gennext(&ms->base);
-    // if (idx >= 0)
-    // {
-    //     midi_event ev = ms->base.melodies[ms->base.cur_melody][idx];
-    //     midi_parse_midi_event((soundgenerator *)ms, ev);
-    // }
-
     if (ms->m_arp.active)
         arpeggiate(ms, &ms->m_arp);
 
