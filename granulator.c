@@ -42,6 +42,7 @@ granulator *new_granulator(char *filename)
     g->sound_generator.get_num_tracks = &granulator_get_num_tracks;
     g->sound_generator.make_active_track = &granulator_make_active_track;
     g->sound_generator.self_destruct = &granulator_del_self;
+    g->sound_generator.event_notify = &granulator_event_notify;
     g->sound_generator.type = GRANULATOR_TYPE;
 
     if (strncmp(filename, "none", 4) != 0)
@@ -89,6 +90,29 @@ granulator *new_granulator(char *filename)
     return g;
 }
 
+void granulator_event_notify(void *self, unsigned int event_type)
+{
+    granulator *g = (granulator *)self;
+    switch (event_type)
+    {
+    case (TIME_MIDI_TICK):
+        // TODO - i don't think this works, but unneeded at the moment
+        if (g->sequencer_mode && g->m_seq.num_patterns > 0)
+        {
+            int idx = mixr->timing_info.midi_tick % PPBAR;
+            if (mixr->timing_info.is_midi_tick &&
+                g->m_seq.patterns[g->m_seq.cur_pattern][idx])
+            {
+                granulator_start(g);
+            }
+            else if (mixr->timing_info.is_sixteenth)
+                granulator_stop(g);
+            seq_tick(&g->m_seq);
+        }
+        break;
+    }
+}
+
 stereo_val granulator_gennext(void *self)
 {
     granulator *g = (granulator *)self;
@@ -101,19 +125,6 @@ stereo_val granulator_gennext(void *self)
         g->audio_buffer_write_idx++;
         if (g->audio_buffer_write_idx >= g->audio_buffer_len)
             g->audio_buffer_write_idx = 0;
-    }
-
-    if (g->sequencer_mode && g->m_seq.num_patterns > 0)
-    {
-        int idx = mixr->timing_info.midi_tick % PPBAR;
-        if (mixr->timing_info.is_midi_tick &&
-            g->m_seq.patterns[g->m_seq.cur_pattern][idx])
-        {
-            granulator_start(g);
-        }
-        else if (mixr->timing_info.is_sixteenth)
-            granulator_stop(g);
-        seq_tick(&g->m_seq);
     }
 
     if (g->m_eg1.m_state == OFFF)

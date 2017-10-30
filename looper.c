@@ -44,10 +44,11 @@ looper *new_looper(char *filename, double loop_len)
 
 void looper_event_notify(void *self, unsigned int event_type)
 {
-    looper *l = (looper *) self;
+    looper *l = (looper *)self;
 
-    switch(event_type){
-    case(TIME_START_OF_LOOP_TICK):
+    switch (event_type)
+    {
+    case (TIME_START_OF_LOOP_TICK):
         if (l->resample_pending)
             looper_resample_to_loop_size(l);
 
@@ -55,7 +56,8 @@ void looper_event_notify(void *self, unsigned int event_type)
         {
             printf("PENDING LOOPSIZE FOUND! %.2f loops for loop num: %d\n",
                    l->pending_loop_size, l->pending_loop_num);
-            looper_change_loop_len(l, l->pending_loop_num, l->pending_loop_size);
+            looper_change_loop_len(l, l->pending_loop_num,
+                                   l->pending_loop_size);
             l->change_loopsize_pending = false;
         }
 
@@ -96,7 +98,6 @@ void looper_event_notify(void *self, unsigned int event_type)
             l->scramble_generation++;
         }
 
-
         if (l->multi_sample_mode)
         {
             l->cur_sample_iteration--;
@@ -108,7 +109,7 @@ void looper_event_notify(void *self, unsigned int event_type)
         }
         break;
 
-    case(TIME_SIXTEENTH_TICK):
+    case (TIME_SIXTEENTH_TICK):
         if (l->stutter_active)
         {
             if (mixr->debug_mode)
@@ -156,7 +157,6 @@ stereo_val looper_gennext(void *self)
             return val;
         }
     }
-
 
     // actual sample manipulation from here on..
     file_sample *s = l->samples[l->cur_sample];

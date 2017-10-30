@@ -76,6 +76,7 @@ void sds_start(void *self);
 void sds_stop(void *self);
 int sds_get_num_tracks(void *self);
 void sds_make_active_track(void *self, int tracknum);
+void sds_event_notify(void *self, unsigned int event_type);
 
 void sds_trigger(synthdrum_sequencer *sds);
 bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name);

@@ -64,6 +64,7 @@ sample_sequencer *new_sample_seq_from_char_array(char *filename, char **pattern,
 int get_a_sample_seq_position(sample_sequencer *ss);
 int sample_seq_get_num_tracks(void *s);
 void sample_seq_make_active_track(void *s, int track_num);
+void sample_seq_event_notify(void *s, unsigned int event_type);
 
 void sampleseq_del_self(void *self);
 void sample_seq_status(void *self, wchar_t *ss);

@@ -198,34 +198,34 @@ void sds_setvol(void *self, double v)
     return;
 }
 
+void sds_event_notify(void *self, unsigned int event_type)
+{
+    synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    int idx;
+    switch (event_type)
+    {
+    case (TIME_START_OF_LOOP_TICK):
+        if (!sds->started)
+            sds->started = true;
+        break;
+    case (TIME_MIDI_TICK):
+        idx = mixr->timing_info.midi_tick % PPBAR;
+        if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
+            sds_trigger(sds);
+        break;
+    case (TIME_SIXTEENTH_TICK):
+        seq_tick(&sds->m_seq);
+        break;
+    }
+}
+
 stereo_val sds_gennext(void *self)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     stereo_val out = {0, 0};
 
-    if (!sds->sg.active)
-    {
+    if (!sds->sg.active || !sds->started)
         return out;
-    }
-
-    int idx = mixr->timing_info.midi_tick % PPBAR;
-
-    if (!sds->started)
-    {
-        if (idx == 0)
-            sds->started = true;
-        else
-            return out;
-    }
-
-    if (mixr->timing_info.is_midi_tick)
-    {
-        if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
-            sds_trigger(sds);
-    }
-    seq_tick(&sds->m_seq);
-
-    // END POSITIONAL /////////////////////////////////////////
 
     if (sds->m_eg1.m_state == SUSTAIN)
     {

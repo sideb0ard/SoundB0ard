@@ -35,8 +35,8 @@ algorithm *new_algorithm(char *line)
 
 void algorithm_event_notify(void *self, unsigned int event_type)
 {
-    (void) self;
-    (void) event_type;
+    (void)self;
+    (void)event_type;
 }
 
 int extract_cmds_from_line(algorithm *self, char *line)

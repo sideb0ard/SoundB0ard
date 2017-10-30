@@ -38,6 +38,7 @@ sample_sequencer *new_sample_seq(char *filename)
     seq->sound_generator.get_num_tracks = &sample_seq_get_num_tracks;
     seq->sound_generator.make_active_track = &sample_seq_make_active_track;
     seq->sound_generator.self_destruct = &sampleseq_del_self;
+    seq->sound_generator.event_notify = &sample_seq_event_notify;
     seq->sound_generator.type = SEQUENCER_TYPE;
 
     stereo_delay_prepare_for_play(&seq->m_delay_fx);
@@ -72,6 +73,35 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
     }
 }
 
+void sample_seq_event_notify(void *self, unsigned int event_type)
+{
+    sample_sequencer *seq = (sample_sequencer *)self;
+    int idx;
+
+    switch (event_type)
+    {
+    case (TIME_SIXTEENTH_TICK):
+        seq_tick(&seq->m_seq);
+        break;
+    case (TIME_MIDI_TICK):
+        idx = mixr->timing_info.midi_tick % PPBAR;
+        if (seq->m_seq.patterns[seq->m_seq.cur_pattern][idx])
+
+        {
+            int seq_position = get_a_sample_seq_position(seq);
+            if (seq_position != -1)
+            {
+                seq->samples_now_playing[seq_position] = idx;
+            }
+        }
+        break;
+    case (TIME_START_OF_LOOP_TICK):
+        if (!seq->started)
+            seq->started = true;
+        break;
+    }
+}
+
 stereo_val sample_seq_gennext(void *self)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
@@ -80,30 +110,9 @@ stereo_val sample_seq_gennext(void *self)
     if (!seq->sound_generator.active)
         return (stereo_val){0, 0};
 
-    int idx = mixr->timing_info.midi_tick % PPBAR;
-
     // wait till start of loop to keep patterns synched
     if (!seq->started)
-    {
-        if (idx == 0)
-        {
-            seq->started = true;
-        }
-        else
-        {
-            return (stereo_val){0, 0};
-        }
-    }
-
-    if (mixr->timing_info.is_midi_tick &&
-        seq->m_seq.patterns[seq->m_seq.cur_pattern][idx])
-    {
-        int seq_position = get_a_sample_seq_position(seq);
-        if (seq_position != -1)
-        {
-            seq->samples_now_playing[seq_position] = idx;
-        }
-    }
+        return (stereo_val){0, 0};
 
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
     {
@@ -125,8 +134,6 @@ stereo_val sample_seq_gennext(void *self)
             }
         }
     }
-
-    seq_tick(&seq->m_seq);
 
     val = effector(&seq->sound_generator, val);
     val = envelopor(&seq->sound_generator, val);

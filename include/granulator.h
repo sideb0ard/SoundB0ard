@@ -103,6 +103,7 @@ void granulator_start(void *self);
 void granulator_stop(void *self);
 int granulator_get_num_tracks(void *self);
 void granulator_make_active_track(void *self, int tracknum);
+void granulator_event_notify(void *self, unsigned int event_type);
 
 void granulator_import_file(granulator *g, char *filename);
 void granulator_set_external_source(granulator *g, int sound_gen_num);
