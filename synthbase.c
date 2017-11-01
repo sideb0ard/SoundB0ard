@@ -202,7 +202,6 @@ void synthbase_event_notify(void *self, unsigned int event_type)
         // progress to next loop
         if (idx == 0)
         {
-            printf("TOP OF LOOP!\n");
             if (base->generate_mode)
             {
                 if (base->generate_every_n_loops > 0)
@@ -215,9 +214,7 @@ void synthbase_event_notify(void *self, unsigned int event_type)
                         synthbase_generate_melody(base, 0, 0, 0);
                     }
                     else
-                    {
                         synthbase_set_backup_mode(base, false);
-                    }
                 }
                 else if (base->max_generation > 0)
                 {
@@ -229,9 +226,8 @@ void synthbase_event_notify(void *self, unsigned int event_type)
                     }
                 }
                 else
-                {
                     synthbase_generate_melody(base, 0, 0, 0);
-                }
+
                 base->generate_generation++;
             }
             else if (base->multi_melody_mode && base->num_melodies > 1)

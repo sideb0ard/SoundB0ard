@@ -76,10 +76,16 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
 void sample_seq_event_notify(void *self, unsigned int event_type)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    int idx;
 
+    if (!seq->sound_generator.active)
+        return;
+
+    int idx;
     switch (event_type)
     {
+    case (TIME_START_OF_LOOP_TICK):
+        seq->started = true;
+        break;
     case (TIME_SIXTEENTH_TICK):
         seq_tick(&seq->m_seq);
         break;
@@ -95,10 +101,6 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
             }
         }
         break;
-    case (TIME_START_OF_LOOP_TICK):
-        if (!seq->started)
-            seq->started = true;
-        break;
     }
 }
 
@@ -106,9 +108,6 @@ stereo_val sample_seq_gennext(void *self)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     double val = 0;
-
-    if (!seq->sound_generator.active)
-        return (stereo_val){0, 0};
 
     // wait till start of loop to keep patterns synched
     if (!seq->started)
@@ -290,7 +289,7 @@ int get_a_sample_seq_position(sample_sequencer *ss)
 
 void sample_start(void *self)
 {
-    printf("START SCENE!\n");
+    printf("START SAMP!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     s->sound_generator.active = true;
     // sample_sequencer_reset_samples(s);
@@ -298,7 +297,7 @@ void sample_start(void *self)
 
 void sample_stop(void *self)
 {
-    printf("STOP SCENE!\n");
+    printf("STOP SAMP!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     s->sound_generator.active = false;
     sample_sequencer_reset_samples(s);
