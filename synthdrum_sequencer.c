@@ -90,6 +90,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->sg.get_num_tracks = &sds_get_num_tracks;
     sds->sg.make_active_track = &sds_make_active_track;
     sds->sg.self_destruct = &synthdrum_del_self;
+    sds->sg.event_notify = &sds_event_notify;
     sds->sg.type = SYNTHDRUM_TYPE;
     sds->mod_semitones_range = 4;
     sds_start(sds);
@@ -201,12 +202,15 @@ void sds_setvol(void *self, double v)
 void sds_event_notify(void *self, unsigned int event_type)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+
+    if (!sds->sg.active)
+        return;
+
     int idx;
     switch (event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
-        if (!sds->started)
-            sds->started = true;
+        sds->started = true;
         break;
     case (TIME_MIDI_TICK):
         idx = mixr->timing_info.midi_tick % PPBAR;
@@ -224,7 +228,7 @@ stereo_val sds_gennext(void *self)
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     stereo_val out = {0, 0};
 
-    if (!sds->sg.active || !sds->started)
+    if (!sds->started)
         return out;
 
     if (sds->m_eg1.m_state == SUSTAIN)
