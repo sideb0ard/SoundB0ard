@@ -8,33 +8,33 @@ SRC = \
 	afx/onepolelpf.c \
 	algorithm.c \
 	arpeggiator.c \
-	audioutils.c \
 	audiofile_data.c \
-	basicfilterpass.c \
-	beatrepeat.c \
-	bitcrush.c \
+	audioutils.c \
+	fx/basicfilterpass.c \
+	fx/beatrepeat.c \
 	bytebeat/bytebeat.c \
 	chaosmonkey.c \
 	cmdloop.c \
 	dca.c \
-	ddlmodule.c \
 	digisynth.c \
 	digisynth_voice.c \
-	distortion.c \
-	delayline.c \
-	dynamics_processor.c \
-	sample_sequencer.c \
-	sequencer.c \
-	sequencer_utils.c \
-	envelope.c \
-	envelope_generator.c \
-	envelope_follower.c \
-	envelope_detector.c \
-	filter.c \
-	filter_ckthreefive.c \
-	filter_moogladder.c \
-	filter_onepole.c \
-	filter_sem.c \
+	filterz/filter.c \
+	filterz/filter_ckthreefive.c \
+	filterz/filter_moogladder.c \
+	filterz/filter_onepole.c \
+	filterz/filter_sem.c \
+	fx/bitcrush.c \
+	fx/ddlmodule.c \
+	fx/delayline.c \
+	fx/distortion.c \
+	fx/dynamics_processor.c \
+	fx/envelope.c \
+	fx/envelope_detector.c \
+	fx/envelope_follower.c \
+	fx/envelope_generator.c \
+	fx/modular_delay.c \
+	fx/stereodelay.c \
+	fx/waveshaper.c \
 	granulator.c \
 	help.c \
 	keys.c \
@@ -46,26 +46,26 @@ SRC = \
 	minisynth.c \
 	minisynth_voice.c \
 	mixer.c \
-	modmatrix.c \
 	modfilter.c \
-	modular_delay.c \
+	modmatrix.c \
 	obliquestrategies.c \
 	oscillator.c \
 	qblimited_oscillator.c \
 	reverb.c \
 	sample_oscillator.c \
+	sample_sequencer.c \
 	sbmsg.c \
+	sequencer.c \
+	sequencer_utils.c \
+	sound_generator.c \
 	sparkline.c \
 	spork.c \
-	stereodelay.c \
-	sound_generator.c \
 	synthbase.c \
 	synthdrum_sequencer.c \
 	table.c \
 	utils.c \
 	voice.c \
-	wt_oscillator.c \
-	waveshaper.c
+	wt_oscillator.c
 
 OBJDIR = obj
 OBJ = $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
@@ -82,9 +82,12 @@ TARGET = sbsh
 
 .PHONE: depend clean
 
-all: $(TARGET)
+all: objdir $(TARGET)
 	@ctags -R *
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
+
+objdir:
+	mkdir -p obj/fx obj/filterz
 
 $(TARGET): $(OBJ)
 	$(CC) $(CFLAGS) -L$(LIBDIR) -o $@ $^ $(LIBS) $(INCS)

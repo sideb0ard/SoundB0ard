@@ -1,7 +1,8 @@
-#include "stereodelay.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
+
+#include "stereodelay.h"
 
 stereodelay *new_stereo_delay(double duration)
 {
