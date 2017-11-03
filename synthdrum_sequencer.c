@@ -213,12 +213,16 @@ void sds_event_notify(void *self, unsigned int event_type)
         sds->started = true;
         break;
     case (TIME_MIDI_TICK):
-        idx = mixr->timing_info.midi_tick % PPBAR;
-        if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
-            sds_trigger(sds);
+        if (sds->started)
+        {
+            idx = mixr->timing_info.midi_tick % PPBAR;
+            if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
+                sds_trigger(sds);
+        }
         break;
     case (TIME_SIXTEENTH_TICK):
-        seq_tick(&sds->m_seq);
+        if (sds->started)
+            seq_tick(&sds->m_seq);
         break;
     }
 }

@@ -87,17 +87,21 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
         seq->started = true;
         break;
     case (TIME_SIXTEENTH_TICK):
-        seq_tick(&seq->m_seq);
+        if (seq->started)
+            seq_tick(&seq->m_seq);
         break;
     case (TIME_MIDI_TICK):
-        idx = mixr->timing_info.midi_tick % PPBAR;
-        if (seq->m_seq.patterns[seq->m_seq.cur_pattern][idx])
-
+        if (seq->started)
         {
-            int seq_position = get_a_sample_seq_position(seq);
-            if (seq_position != -1)
+            idx = mixr->timing_info.midi_tick % PPBAR;
+            if (seq->m_seq.patterns[seq->m_seq.cur_pattern][idx])
+
             {
-                seq->samples_now_playing[seq_position] = idx;
+                int seq_position = get_a_sample_seq_position(seq);
+                if (seq_position != -1)
+                {
+                    seq->samples_now_playing[seq_position] = idx;
+                }
             }
         }
         break;
