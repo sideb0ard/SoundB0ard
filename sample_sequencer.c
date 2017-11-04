@@ -282,12 +282,8 @@ void sample_seq_make_active_track(void *self, int track_num)
 int get_a_sample_seq_position(sample_sequencer *ss)
 {
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
-    {
         if (ss->samples_now_playing[i] == -1)
-        {
             return i;
-        }
-    }
     return -1;
 }
 

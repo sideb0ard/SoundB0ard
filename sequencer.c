@@ -249,10 +249,6 @@ bool seq_tick(sequencer *seq)
                     int bit_pattern = gimme_a_bitwise_short(
                         seq->bitwise_mode, seq->bitwise_counter);
 
-                    // char blah[17] = {0};
-                    // char_binary_version_of_int(bit_pattern, blah);
-                    // printf("BITWIZER! got %s\n", blah);
-
                     memset(&seq->patterns[seq->cur_pattern], 0,
                            PPBAR * sizeof(int));
                     convert_bitshift_pattern_to_pattern(
@@ -498,16 +494,10 @@ void next_markov_generation(sequencer *s)
         int randy = rand() % 100;
         int randyTripleOrDouble = rand() % 100;
 
-        if (mixr->debug_mode)
-            printf("Iiii %d Randy! %d\n", i, randy);
-
         int position = i * PPSIXTEENTH;
 
         if (s->markov_mode == MARKOVHAUS)
         {
-            if (mixr->debug_mode)
-                printf("HAUS MUSIC ALL NIGHT LONG!\n");
-
             switch (i)
             {
             case 0:
