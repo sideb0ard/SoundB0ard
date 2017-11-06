@@ -201,6 +201,16 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->timing_info.loop_len_in_frames =
         mixr->timing_info.frames_per_midi_tick * PPBAR;
     mixr->timing_info.loop_len_in_ticks = PPBAR;
+
+    mixr->timing_info.size_of_thirtysecond_note =
+        (PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick;
+    mixr->timing_info.size_of_sixteenth_note =
+        mixr->timing_info.size_of_thirtysecond_note * 2;
+    mixr->timing_info.size_of_eighth_note =
+        mixr->timing_info.size_of_sixteenth_note * 2;
+    mixr->timing_info.size_of_quarter_note =
+        mixr->timing_info.size_of_eighth_note * 2;
+
     mixr->timing_info.sixteenth_note_tick = -1;
     mixr->timing_info.midi_tick = -1;
     mixr->timing_info.cur_sample = 0;
@@ -331,13 +341,12 @@ int add_granulator(mixer *mixr, char *filename)
 inline void mixer_update_timing_info(mixer *mixr)
 {
     // size of events measured in frames
-    int size_of_thirtysecond_note =
-        (PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick;
-    int size_of_sixteenth_note = size_of_thirtysecond_note * 2;
-    int size_of_eighth_note = size_of_sixteenth_note * 2;
-    int size_of_quarter_note = size_of_eighth_note * 2;
+    int size_of_thirtysecond_note = mixr->timing_info.size_of_thirtysecond_note;
+    int size_of_sixteenth_note = mixr->timing_info.size_of_sixteenth_note;
+    int size_of_eighth_note = mixr->timing_info.size_of_eighth_note;
+    int size_of_quarter_note = mixr->timing_info.size_of_quarter_note;
 
-    int size_of_loop = PPBAR * mixr->timing_info.frames_per_midi_tick;
+    int size_of_loop = mixr->timing_info.loop_len_in_frames;
 
     mixr->timing_info.is_midi_tick = false;
     mixr->timing_info.is_thirtysecond = false;
@@ -402,6 +411,7 @@ inline void mixer_update_timing_info(mixer *mixr)
             mixr->scene_start_pending = false;
         }
     }
+    mixr->timing_info.cur_sample++;
 }
 
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
@@ -409,7 +419,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
     for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
-
         mixer_update_timing_info(mixr);
 
         double output_left = 0.0;
@@ -431,8 +440,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
         out[j] = mixr->volume * (output_left / 1.53);
         out[j + 1] = mixr->volume * (output_right / 1.53);
-
-        mixr->timing_info.cur_sample++;
     }
 
     return 0;

@@ -154,6 +154,10 @@ typedef struct mixer_timing_info
     // informational for other sound generators
     unsigned int loop_len_in_frames;
     unsigned int loop_len_in_ticks;
+    unsigned int size_of_thirtysecond_note;
+    unsigned int size_of_sixteenth_note;
+    unsigned int size_of_eighth_note;
+    unsigned int size_of_quarter_note;
 
     bool start_of_loop; // true for one sample during loop time
     bool is_thirtysecond;
