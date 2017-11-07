@@ -53,7 +53,7 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
     // VELOCITY -> DCA VEL
     row = create_matrix_row(SOURCE_VELOCITY, DEST_DCA_VELOCITY,
                             &v->m_default_mod_intensity,
-                            &v->m_default_mod_range, TRANSFORM_NONE, true);
+                            &v->m_default_mod_range, TRANSFORM_NONE, false);
     add_matrix_row(matrix, row);
 
     // PITCHBEND -> OSC
@@ -67,13 +67,13 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
     row = create_matrix_row(SOURCE_MIDI_VOLUME_CC07, DEST_DCA_AMP,
                             &v->m_default_mod_intensity,
                             &v->m_global_voice_params->amp_mod_range,
-                            TRANSFORM_INVERT_MIDI_NORMALIZE, true);
+                            TRANSFORM_INVERT_MIDI_NORMALIZE, false);
     add_matrix_row(matrix, row);
 
     // MIDI Pan CC10
     row = create_matrix_row(
         SOURCE_MIDI_PAN_CC10, DEST_DCA_PAN, &v->m_default_mod_intensity,
-        &v->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, true);
+        &v->m_default_mod_range, TRANSFORM_MIDI_TO_PAN, false);
     add_matrix_row(matrix, row);
 
     // // MIDI Sustain Pedal

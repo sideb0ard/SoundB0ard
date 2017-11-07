@@ -65,7 +65,7 @@ void moog_update(filter *f)
     moog->m_k = (4.0) * (f->m_q_control - 1.0) / (10.0 - 1.0);
 
     double wd = 2.0 * M_PI * f->m_fc;
-    double T = 1.0 / SAMPLE_RATE;
+    static double T = 1.0 / SAMPLE_RATE;
     double wa = (2.0 / T) * tan(wd * T / 2.0);
     double g = wa * T / 2.0;
 

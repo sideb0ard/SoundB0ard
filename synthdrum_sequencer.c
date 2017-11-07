@@ -37,7 +37,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     osc_new_settings(&sds->m_osc2.osc);
     qb_set_soundgenerator_interface(&sds->m_osc2);
     sds->m_osc2.osc.m_waveform = SINE;
-    sds->m_osc2.osc.m_osc_fo = 94;
+    sds->m_osc2.osc.m_osc_fo = 40;
     sds->osc2_amp = 1.0;
     osc_update(&sds->m_osc2.osc);
 
