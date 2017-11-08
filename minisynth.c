@@ -622,27 +622,31 @@ void minisynth_status(void *self, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d "
         L"bytebeat:%d last_midi_notes:%d %d %d\n"
-        "      [lfo1]\n"
+        "      [" WANSI_COLOR_WHITE "---------lfo1--------" WCOOL_COLOR_PINK
+        "]\n"
         "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f "
         "lfo1amp:%.2f\n"
         "      lfo1_osc_enabled:%d lfo1_osc_intensity:%.2f\n"
         "      lfo1_filter_enabled:%d lfo1_filter_intensity:%.2f\n"
         "      lfo1_amp_enabled:%d lfo1_amp_intensity:%.2f\n"
         "      lfo1_pan_enabled:%d lfo1_pan_intensity:%.2f\n"
-        "      [lfo2]\n"
+        "      [" WANSI_COLOR_WHITE "---------lfo2--------" WCOOL_COLOR_PINK
+        "]\n"
         "      lfo2wave:%s(%d)[0-7] lfo2mode:%s(%d) lfo2rate:%.2f "
         "lfo2amp:%.2f\n"
         "      lfo2_osc_enabled:%d lfo2_osc_intensity:%.2f\n"
         "      lfo2_filter_enabled:%d lfo2_filter_intensity:%.2f\n"
         "      lfo2_amp_enabled:%d lfo2_amp_intensity:%.2f\n"
         "      lfo2_pan_enabled:%d lfo2_pan_intensity:%.2f\n"
-        "      [eg1]\n"
+        "      [" WANSI_COLOR_WHITE "---------eg1---------" WCOOL_COLOR_PINK
+        "]\n"
         "      attackms:%.2f decayms:%.2f sustainlvl:%.2f releasems:%.2f "
         "sustain? %s\n"
         "      eg1_osc_enabled:%d eg1_osc_intensity%.2f\n"
         "      eg1_filter_enabled:%d eg1_filter_intensity%.2f\n"
         "      eg1_dca_enabled:%d eg1_dca_intensity%.2f\n"
-        "      [filter]\n"
+        "      [" WANSI_COLOR_WHITE "---------filter------" WCOOL_COLOR_PINK
+        "]\n"
         "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n"
         "      [arp] arp:%d arprepeat:%d arpmode:%d[0-3] arprate:%d[0-3]",
 
