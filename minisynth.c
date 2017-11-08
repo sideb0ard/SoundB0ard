@@ -109,14 +109,10 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_eg1_dca_enabled = true;
 
     ms->m_settings.m_attack_time_msec = EG_DEFAULT_STATE_TIME;
-    ms->m_settings.m_delay_time_msec = EG_DEFAULT_STATE_TIME;
     ms->m_settings.m_decay_time_msec = EG_DEFAULT_STATE_TIME;
     ms->m_settings.m_release_time_msec = EG_DEFAULT_STATE_TIME;
 
     ms->m_settings.m_pulse_width_pct = OSC_PULSEWIDTH_DEFAULT;
-    ms->m_settings.m_delay_feedback_pct = 0;
-    ms->m_settings.m_delay_ratio = 0;
-    ms->m_settings.m_delay_wet_mix = 0.0;
     ms->m_settings.m_octave = 1;
     ms->m_settings.m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
     ms->m_settings.m_sub_osc_db = -96.000000;
@@ -134,7 +130,6 @@ minisynth *new_minisynth(void)
 
     ms->m_settings.m_velocity_to_attack_scaling = 0;
     ms->m_settings.m_note_number_to_decay_scaling = 0;
-    ms->m_settings.m_delay_mode = 0;
 
     ms->m_settings.m_sustain_override = false;
     ms->m_settings.m_sustain_time_ms = 400;
@@ -183,8 +178,6 @@ bool minisynth_prepare_for_play(minisynth *ms)
             minisynth_voice_prepare_for_play(ms->m_voices[i]);
         }
     }
-
-    stereo_delay_prepare_for_play(&ms->m_delay_fx);
 
     minisynth_update(ms);
     ms->m_last_note_frequency = -1.0;
@@ -430,16 +423,6 @@ void minisynth_update(minisynth *ms)
     else
         enable_matrix_row(&ms->m_ms_modmatrix, SOURCE_MIDI_NOTE_NUM,
                           DEST_ALL_FILTER_KEYTRACK, false);
-
-    // // --- update master FX delay
-    stereo_delay_set_delay_time_ms(&ms->m_delay_fx,
-                                   ms->m_settings.m_delay_time_msec);
-    stereo_delay_set_feedback_percent(&ms->m_delay_fx,
-                                      ms->m_settings.m_delay_feedback_pct);
-    stereo_delay_set_delay_ratio(&ms->m_delay_fx, ms->m_settings.m_delay_ratio);
-    stereo_delay_set_wet_mix(&ms->m_delay_fx, ms->m_settings.m_delay_wet_mix);
-    stereo_delay_set_mode(&ms->m_delay_fx, ms->m_settings.m_delay_mode);
-    stereo_delay_update(&ms->m_delay_fx);
 
     for (int i = 0; i < MAX_VOICES; i++)
         if (ms->m_voices[i])
@@ -791,10 +774,6 @@ stereo_val minisynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    stereo_delay_process_audio(&ms->m_delay_fx, &accum_out_left,
-                               &accum_out_left, &accum_out_left,
-                               &accum_out_right);
-
     accum_out_left = effector(&ms->sound_generator, accum_out_left);
     accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
     accum_out_left *= ms->m_settings.m_volume_db;
@@ -804,12 +783,6 @@ stereo_val minisynth_gennext(void *self)
     accum_out_right *= ms->m_settings.m_volume_db;
 
     return (stereo_val){.left = accum_out_left, .right = accum_out_right};
-}
-
-void minisynth_toggle_delay_mode(minisynth *ms)
-{
-    ms->m_settings.m_delay_mode =
-        ++(ms->m_settings.m_delay_mode) % MAX_NUM_DELAY_MODE;
 }
 
 void minisynth_rand_settings(minisynth *ms)
@@ -875,13 +848,6 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_release_time_msec = (rand() % 600) + 5;
     ms->m_settings.m_pulse_width_pct = (rand() % 99) + 1;
 
-    ms->m_settings.m_delay_ratio =
-        (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
-    ms->m_settings.m_delay_time_msec = rand() % 300;
-    ms->m_settings.m_delay_feedback_pct = rand() % 70;
-    ms->m_settings.m_delay_wet_mix = rand() % 60;
-    minisynth_set_delay_wetmix(ms, ((float)rand() / (float)(RAND_MAX)));
-
     // ms->m_settings.m_sustain_level = ((float)rand()) / RAND_MAX;
     ms->m_settings.m_octave = rand() % 3 + 1;
 
@@ -903,7 +869,6 @@ void minisynth_rand_settings(minisynth *ms)
         (((float)rand() / (float)(RAND_MAX)) * 9) + 0.51;
     ms->m_settings.m_velocity_to_attack_scaling = rand() % 2;
     ms->m_settings.m_note_number_to_decay_scaling = rand() % 2;
-    ms->m_settings.m_delay_mode = rand() % MAX_NUM_DELAY_MODE;
     ////ms->m_settings.m_eg1_dca_intensity =
     ////    (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
     // ms->m_settings.m_sustain_override = rand() % 2;
@@ -1045,19 +1010,6 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
     fprintf(presetzzz, "::fc_control=%f", ms->m_settings.m_fc_control);
     settings_count++;
     fprintf(presetzzz, "::q_control=%f", ms->m_settings.m_q_control);
-    settings_count++;
-
-    fprintf(presetzzz, "::delay_time_msec=%f",
-            ms->m_settings.m_delay_time_msec);
-    settings_count++;
-    fprintf(presetzzz, "::delay_feedback_pct=%f",
-            ms->m_settings.m_delay_feedback_pct);
-    settings_count++;
-    fprintf(presetzzz, "::delay_ratio=%f", ms->m_settings.m_delay_ratio);
-    settings_count++;
-    fprintf(presetzzz, "::delay_wet_mix=%f", ms->m_settings.m_delay_wet_mix);
-    settings_count++;
-    fprintf(presetzzz, "::delay_mode=%d", ms->m_settings.m_delay_mode);
     settings_count++;
 
     fprintf(presetzzz, "::detune_cents=%f", ms->m_settings.m_detune_cents);
@@ -1414,31 +1366,6 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
                 ms->m_settings.m_q_control = scratch_val;
                 settings_count++;
             }
-            else if (strcmp(setting_key, "delay_time_msec") == 0)
-            {
-                ms->m_settings.m_delay_time_msec = scratch_val;
-                settings_count++;
-            }
-            else if (strcmp(setting_key, "delay_feedback_pct") == 0)
-            {
-                ms->m_settings.m_delay_feedback_pct = scratch_val;
-                settings_count++;
-            }
-            else if (strcmp(setting_key, "delay_ratio") == 0)
-            {
-                ms->m_settings.m_delay_ratio = scratch_val;
-                settings_count++;
-            }
-            else if (strcmp(setting_key, "delay_wet_mix") == 0)
-            {
-                ms->m_settings.m_delay_wet_mix = scratch_val;
-                settings_count++;
-            }
-            else if (strcmp(setting_key, "delay_mode") == 0)
-            {
-                ms->m_settings.m_delay_mode = scratch_val;
-                settings_count++;
-            }
             else if (strcmp(setting_key, "detune_cents") == 0)
             {
                 ms->m_settings.m_detune_cents = scratch_val;
@@ -1691,17 +1618,6 @@ void minisynth_print_settings(minisynth *ms)
     printf("Arp Cur Step (arpcurstep): %s\n",
            arp_cur_step_to_string[ms->m_arp.cur_step]);
 
-    printf(ANSI_COLOR_WHITE); // DELAY
-    printf("Delay Feedback Pct (delayfb): %f [0-100]\n",
-           ms->m_settings.m_delay_feedback_pct);
-    printf("Delay Ratio (delayr): %f [-1-1]\n", ms->m_settings.m_delay_ratio);
-    printf("Delay Mode (delaymode): %d [0-%d]\n", ms->m_settings.m_delay_mode,
-           MAX_NUM_DELAY_MODE - 1); // unsigned int
-    printf("Delay Time ms (delayms): %f [%d-%d]\n",
-           ms->m_settings.m_delay_time_msec, EG_MINTIME_MS, 2000);
-    printf("Delay Wet Mix (delaymx): %f [0-1]\n",
-           ms->m_settings.m_delay_wet_mix);
-
     printf(ANSI_COLOR_RESET);
 }
 
@@ -1815,46 +1731,6 @@ void minisynth_set_release_time_ms(minisynth *ms, double val)
         ms->m_settings.m_release_time_msec = val;
     else
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
-}
-
-void minisynth_set_delay_feedback_pct(minisynth *ms, double val)
-{
-    if (val >= 0 && val <= 100)
-        ms->m_settings.m_delay_feedback_pct = val;
-    else
-        printf("val must be between 0 and 100\n");
-}
-
-void minisynth_set_delay_ratio(minisynth *ms, double val)
-{
-    if (val >= -1 && val <= 1)
-        ms->m_settings.m_delay_ratio = val;
-    else
-        printf("val must be between -1 and 1\n");
-}
-
-void minisynth_set_delay_mode(minisynth *ms, unsigned int val)
-{
-    if (val < MAX_NUM_DELAY_MODE)
-        ms->m_settings.m_delay_mode = val;
-    else
-        printf("val must be between 0 and %d\n", MAX_NUM_DELAY_MODE);
-}
-
-void minisynth_set_delay_time_ms(minisynth *ms, double val)
-{
-    if (val >= 0 && val <= 2000)
-        ms->m_settings.m_delay_time_msec = val;
-    else
-        printf("val must be between 0 and 2000\n");
-}
-
-void minisynth_set_delay_wetmix(minisynth *ms, double val)
-{
-    if (val >= 0 && val <= 1)
-        ms->m_settings.m_delay_wet_mix = val;
-    else
-        printf("val must be between 0 and 1\n");
 }
 
 void minisynth_set_detune(minisynth *ms, double val)

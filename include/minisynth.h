@@ -12,7 +12,6 @@
 #include "modmatrix.h"
 #include "oscillator.h"
 #include "sound_generator.h"
-#include "stereodelay.h"
 
 #include "minisynth_voice.h"
 #include "synthbase.h"
@@ -84,12 +83,6 @@ typedef struct synthsettings
     double m_fc_control;
     double m_q_control;
 
-    double m_delay_time_msec;
-    double m_delay_feedback_pct;
-    double m_delay_ratio;
-    double m_delay_wet_mix;
-    unsigned int m_delay_mode;
-
     double m_detune_cents;
     double m_pulse_width_pct;
     double m_sub_osc_db;
@@ -145,8 +138,6 @@ typedef struct minisynth
 
     unsigned int m_midi_rx_channel;
 
-    stereodelay m_delay_fx;
-
     synthsettings m_settings;
     synthsettings m_settings_backup_while_getting_crazy;
 
@@ -196,8 +187,6 @@ void minisynth_midi_pitchbend(minisynth *self, unsigned int data1,
                               unsigned int data2);
 void minisynth_reset_voices(minisynth *self);
 
-void minisynth_toggle_delay_mode(minisynth *ms);
-
 void minisynth_rand_settings(minisynth *ms);
 
 void minisynth_print_settings(minisynth *ms);
@@ -228,11 +217,6 @@ void minisynth_print(minisynth *ms);
 void minisynth_set_attack_time_ms(minisynth *ms, double val);
 void minisynth_set_decay_time_ms(minisynth *ms, double val);
 void minisynth_set_release_time_ms(minisynth *ms, double val);
-void minisynth_set_delay_feedback_pct(minisynth *ms, double val);
-void minisynth_set_delay_ratio(minisynth *ms, double val);
-void minisynth_set_delay_mode(minisynth *ms, unsigned int val);
-void minisynth_set_delay_time_ms(minisynth *ms, double val);
-void minisynth_set_delay_wetmix(minisynth *ms, double val);
 void minisynth_set_detune(minisynth *ms, double val);
 void minisynth_set_eg1_dca_int(minisynth *ms, double val);
 void minisynth_set_eg1_dca_enable(minisynth *ms, int val);

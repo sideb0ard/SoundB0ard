@@ -2480,41 +2480,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_release_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("delayfb", wurds[2], 7) == 0)
-    {
-        printf("Minisynth change Delay Feedback!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_delay_feedback_pct(ms, val);
-        return true;
-    }
-    else if (strncmp("delayr", wurds[2], 6) == 0)
-    {
-        printf("Minisynth change Delay Ratio!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_delay_ratio(ms, val);
-        return true;
-    }
-    else if (strncmp("delaymode", wurds[2], 9) == 0)
-    {
-        printf("Minisynth change DELAY MODE!\n");
-        int val = atoi(wurds[3]);
-        minisynth_set_delay_mode(ms, val);
-        return true;
-    }
-    else if (strncmp("delayms", wurds[2], 7) == 0)
-    {
-        printf("Minisynth change Delay Time Ms!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_delay_time_ms(ms, val);
-        return true;
-    }
-    else if (strncmp("delaymx", wurds[2], 7) == 0)
-    {
-        printf("Minisynth change Delay Wet Mix!\n");
-        double val = atof(wurds[3]);
-        minisynth_set_delay_wetmix(ms, val);
-        return true;
-    }
     else if (strncmp("detune", wurds[2], 6) == 0)
     {
         printf("Minisynth change DETUNE!\n");
