@@ -11,12 +11,12 @@ void arpeggiator_init(arpeggiator *arp)
 {
     arp->active = false;
     arp->latch = true;
-    arp->single_note_repeat = true;
+    arp->single_note_repeat = false;
     arp->cur_octave = 0;
     arp->octave_range = 1;
-    arp->mode = UP;
+    arp->mode = RANDOM;
     arp->direction = UP;
-    arp->rate = AQUARTER;
+    arp->rate = ASIXTEENTH;
     arp->cur_step = ROOT;
 }
 

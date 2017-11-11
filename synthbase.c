@@ -36,6 +36,8 @@ void synthbase_init(synthbase *base, void *parent)
             base->melodies[i][j].tick = -1;
         }
     }
+    for (int i = 0; i < PPNS; ++i)
+        base->backup_melody_while_getting_crazy[i].tick = -1;
 }
 
 void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
@@ -113,7 +115,7 @@ int synthbase_add_melody(synthbase *ms) { return ms->num_melodies++; }
 void synthbase_dupe_melody(midi_events_loop *from, midi_events_loop *to)
 {
     for (int i = 0; i < PPNS; i++)
-        *to[i] = *from[i];
+        (*to)[i] = (*from)[i];
 }
 
 void synthbase_switch_melody(synthbase *ms, unsigned int melody_num)

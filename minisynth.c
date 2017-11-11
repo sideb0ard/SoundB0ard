@@ -620,10 +620,16 @@ void minisynth_status(void *self, wchar_t *status_string)
 
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"[MINISYNTH '%s'] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d "
-        L"bytebeat:%d last_midi_notes:%d %d %d\n"
+        L"[" WANSI_COLOR_WHITE "MINISYNTH '%s'" WCOOL_COLOR_PINK
+        "] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d "
+        "bytebeat:%d last_midi_notes:%d %d %d\n"
+        "filter keytrack(kt)[0-1]: %d detune[-100-100]:%0.2f legato:%d "
+        "note decay scale(ndscale)[01]:%d noisedb[-96-0]:%0.2f\n"
+        "octave[-4-4]:%d pitchrange[0-12]:%d porta ms(porta)[0-5000]:%.2f"
+        "pulse width(pw)[1-99]:%.2f subosc[-96-0]:%.2f\n"
+        "velocity scale(vascale)[0-1]:%d reset to zero[0-1]:%d\n"
         "      [" WANSI_COLOR_WHITE "---------lfo1--------"
-        "------------------------------------"WCOOL_COLOR_PINK"]\n"
+        "------------------------------------" WCOOL_COLOR_PINK "]\n"
         "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f "
         "lfo1amp:%.2f\n"
         "      lfo1_osc_enabled:%d lfo1_osc_intensity:%.2f\n"
@@ -631,7 +637,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "      lfo1_amp_enabled:%d lfo1_amp_intensity:%.2f\n"
         "      lfo1_pan_enabled:%d lfo1_pan_intensity:%.2f\n"
         "      [" WANSI_COLOR_WHITE "---------lfo2--------"
-        "------------------------------------"WCOOL_COLOR_PINK"]\n"
+        "------------------------------------" WCOOL_COLOR_PINK "]\n"
         "      lfo2wave:%s(%d)[0-7] lfo2mode:%s(%d) lfo2rate:%.2f "
         "lfo2amp:%.2f\n"
         "      lfo2_osc_enabled:%d lfo2_osc_intensity:%.2f\n"
@@ -639,16 +645,17 @@ void minisynth_status(void *self, wchar_t *status_string)
         "      lfo2_amp_enabled:%d lfo2_amp_intensity:%.2f\n"
         "      lfo2_pan_enabled:%d lfo2_pan_intensity:%.2f\n"
         "      [" WANSI_COLOR_WHITE "---------eg1---------"
-        "------------------------------------"WCOOL_COLOR_PINK"]\n"
+        "------------------------------------" WCOOL_COLOR_PINK "]\n"
         "      attackms:%.2f decayms:%.2f sustainlvl:%.2f releasems:%.2f "
         "sustain? %s\n"
         "      eg1_osc_enabled:%d eg1_osc_intensity%.2f\n"
         "      eg1_filter_enabled:%d eg1_filter_intensity%.2f\n"
         "      eg1_dca_enabled:%d eg1_dca_intensity%.2f\n"
         "      [" WANSI_COLOR_WHITE "---------filter------"
-        "------------------------------------"WCOOL_COLOR_PINK"]\n"
+        "------------------------------------" WCOOL_COLOR_PINK "]\n"
         "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n"
-        "      [arp] arp:%d arprepeat:%d arpmode:%d[0-3] arprate:%d[0-3]",
+        "      [" WANSI_COLOR_WHITE "arp" WCOOL_COLOR_PINK "] arp:%d "
+        "arprepeat:%d arpmode:%d[0-3] arprate[0-3]:%d arpoctrange[1-4]:%d",
 
         // VOICE + GENERAL
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
@@ -656,6 +663,14 @@ void minisynth_status(void *self, wchar_t *status_string)
         MAX_VOICE_CHOICE - 1, ms->m_settings.m_monophonic,
         ms->m_settings.m_bytebeat_active, ms->m_last_midi_notes[0],
         ms->m_last_midi_notes[1], ms->m_last_midi_notes[2],
+        ms->m_settings.m_filter_keytrack, ms->m_settings.m_detune_cents,
+        ms->m_settings.m_legato_mode,
+        ms->m_settings.m_note_number_to_decay_scaling,
+        ms->m_settings.m_noise_osc_db, ms->m_settings.m_octave,
+        ms->m_settings.m_pitchbend_range, ms->m_settings.m_portamento_time_msec,
+        ms->m_settings.m_pulse_width_pct, ms->m_settings.m_sub_osc_db,
+        ms->m_settings.m_velocity_to_attack_scaling,
+        ms->m_settings.m_reset_to_zero,
 
         // LFO1
         s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
@@ -698,7 +713,7 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         // ARP
         ms->m_arp.active, ms->m_arp.single_note_repeat, ms->m_arp.mode,
-        ms->m_arp.rate
+        ms->m_arp.rate, ms->m_arp.octave_range
 
         );
 
