@@ -768,29 +768,37 @@ stereo_val minisynth_gennext(void *self)
     if (!ms->sound_generator.active)
         return (stereo_val){0, 0};
 
-    // short nom = gimme_a_bitwise_short(2, ms->m_bytebeat_counter++);
-    // double nomnom = scaleybum(-32768, 32787, -1, 1, nom);
-    // return (stereo_val){nomnom, nomnom};
-    // printf("NOM: %d NOMNOM:%.2f\n", nom, nomnom);
-
-    if (ms->m_arp.active)
-        arpeggiate(ms, &ms->m_arp);
-
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    float mix = 1.0 / MAX_VOICES;
-
-    double out_left = 0.0;
-    double out_right = 0.0;
-
-    for (int i = 0; i < MAX_VOICES; i++)
+    if (ms->m_settings.m_bytebeat_active)
     {
-        if (ms->m_voices[i])
-            minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
+        unsigned mode = ms->m_settings.m_bytebeat_mode;
+        short nom_left = gimme_a_bitwise_short(mode, ms->m_bytebeat_counter++);
+        short nom_right = gimme_a_bitwise_short(mode, ms->m_bytebeat_counter++);
+        //double nomnom = scaleybum(-32768, 32787, -1, 1, nom);
+        accum_out_left = scaleybum(-32768, 32787, -1, 1, nom_left);
+        accum_out_right = scaleybum(-32768, 32787, -1, 1, nom_right);
+        //return (stereo_val){nomnom, nomnom};
+    }
+    else
+    {
+        if (ms->m_arp.active)
+            arpeggiate(ms, &ms->m_arp);
 
-        accum_out_left += mix * out_left;
-        accum_out_right += mix * out_right;
+        float mix = 1.0 / MAX_VOICES;
+
+        double out_left = 0.0;
+        double out_right = 0.0;
+
+        for (int i = 0; i < MAX_VOICES; i++)
+        {
+            if (ms->m_voices[i])
+                minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
+
+            accum_out_left += mix * out_left;
+            accum_out_right += mix * out_right;
+        }
     }
 
     accum_out_left = effector(&ms->sound_generator, accum_out_left);
@@ -1683,6 +1691,13 @@ void minisynth_sg_stop(void *self)
 }
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
+
+void minisynth_set_bitwise(minisynth *ms, bool b) { ms->m_settings.m_bytebeat_active = b; }
+void minisynth_set_bitwise_mode(minisynth *ms, int mode )
+{
+   if (mode >= 0 && mode < 5)
+    ms->m_settings.m_bytebeat_mode = mode;
+}
 
 void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)
 {

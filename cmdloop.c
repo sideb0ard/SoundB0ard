@@ -2484,6 +2484,22 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_decay_time_ms(ms, val);
         return true;
     }
+    else if (strncmp("bitwise", wurds[2], 4) == 0)
+    {
+        if (strncmp(wurds[3], "mode", 4) == 0)
+        {
+            int val = atoi(wurds[4]);
+            printf("Changing BITWISE mode: %d\n", val);
+            minisynth_set_bitwise_mode(ms, val);
+        }
+        else
+        {
+            double val = atof(wurds[3]);
+            printf("Minisynth BITWISE %s!\n", val ? "true" : "false");
+            minisynth_set_bitwise(ms, val);
+        }
+        return true;
+    }
     else if (strncmp("releasems", wurds[2], 7) == 0)
     {
         printf("Minisynth change Release Time MS!\n");
