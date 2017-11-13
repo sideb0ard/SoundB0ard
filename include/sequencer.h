@@ -74,6 +74,8 @@ typedef struct sequencer
     int bitwise_generation;
     int bitwise_every_n_loops;
 
+    bool visualize;
+
     int max_generation; // used for game of life, markov chain and bitwise
 
     int sloppiness; // 0 - 10

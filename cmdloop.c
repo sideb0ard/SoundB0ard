@@ -64,7 +64,8 @@ void loopy(void)
     char *line;
     while ((line = readline(prompt)) != NULL)
     {
-        if (line[0] != 0)
+        //if (line[0] != 0)
+        if (line && *line)
         {
             add_history(line);
             interpret(line);
@@ -2375,6 +2376,12 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         {
             seq_set_euclidean(seq, 1 - seq->game_of_life_on);
         }
+    }
+    else if (strncmp("visualize", wurds[2], 9) == 0)
+    {
+        bool b = atoi(wurds[3]);
+        printf("Setting visualize to %s\n", b ? "true" : "false");
+        seq->visualize = b;
     }
     else
     {
