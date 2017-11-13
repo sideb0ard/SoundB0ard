@@ -12,7 +12,7 @@ void sampleosc_init(sampleosc *sosc, char *filename)
     sampleosc_set_oscillator_interface(sosc);
     sosc->is_single_cycle = false;
     sosc->is_pitchless = false;
-    sosc->loop_mode = SAMPLE_LOOP;
+    sosc->loop_mode = SAMPLE_ONESHOT;
     osc_new_settings(&sosc->osc);
 }
 
@@ -97,7 +97,7 @@ void sampleosc_update(oscillator *self)
     double unity_freq =
         sosc->is_single_cycle
             ? (SAMPLE_RATE / (sosc->afd.samplecount / sosc->afd.channels))
-            : get_midi_freq(60); // middle c
+            : get_midi_freq(36); // c
 
     double length = SAMPLE_RATE / unity_freq;
 

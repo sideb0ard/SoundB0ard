@@ -51,17 +51,8 @@ stereo_val digisynth_gennext(void *self)
     if (!ds->sound_generator.active)
         return (stereo_val){0, 0};
 
-    // int idx = synthbase_gennext(&ds->base);
-    // if (idx >= 0)
-    // {
-    //     midi_event ev = ds->base.melodies[ds->base.cur_melody][idx];
-    //     midi_parse_midi_event((soundgenerator *)self, ev);
-    // }
-
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
-
-    float mix = 0.25;
 
     double out_left = 0.0;
     double out_right = 0.0;
@@ -69,12 +60,9 @@ stereo_val digisynth_gennext(void *self)
     for (int i = 0; i < MAX_VOICES; i++)
     {
         digisynth_voice_gennext(&ds->m_voices[i], &out_left, &out_right);
-        accum_out_left += mix * out_left;
-        accum_out_right += mix * out_right;
+        accum_out_left += out_left;
+        accum_out_right += out_right;
     }
-
-    // accum_out_left = effector(&ms->sound_generator, accum_out_left);
-    // accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
 
     accum_out_left *= ds->vol;
     accum_out_left = effector(&ds->sound_generator, accum_out_left);

@@ -2329,9 +2329,13 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         else if (strncmp("mode", wurds[3], 4) == 0)
         {
             int bitwise_mode = atoi(wurds[4]);
-            printf("Setting bitwise mode! %d\n", bitwise_mode);
-            if (bitwise_mode > 0)
+            if (bitwise_mode >= 0 && bitwise_mode < 5)
+            {
+                printf("Setting bitwise mode! %d\n", bitwise_mode);
                 seq_set_bitwise_mode(seq, bitwise_mode);
+            }
+            else
+                printf("Bitwise modes currently only 0-4\n");
         }
         else
         {
