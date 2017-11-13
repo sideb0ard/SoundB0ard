@@ -685,6 +685,8 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
     if (mixr->debug_mode)
         print_midi_event(note);
 
+    int note_off_tick;
+
     if (sg->type == MINISYNTH_TYPE)
     {
         minisynth *ms = (minisynth *)sg;
@@ -693,21 +695,24 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
             minisynth_add_last_note(ms, note);
         }
         minisynth_midi_note_on(ms, note, velocity);
+
+        note_off_tick =
+            (int)(mixr->timing_info.midi_tick +
+                  (PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth - 7) +
+                  (ms->m_settings.m_attack_time_msec *
+                   mixr->timing_info.midi_ticks_per_ms)) %
+            PPNS;
     }
     else if (sg->type == DIGISYNTH_TYPE)
     {
         digisynth *ds = (digisynth *)sg;
         digisynth_midi_note_on(ds, note, velocity);
+
+        note_off_tick =
+            (mixr->timing_info.midi_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
     }
 
     synthbase *base = get_synthbase(sg);
-
-    int note_off_tick =
-        (mixr->timing_info.midi_tick +
-         //(PPSIXTEENTH * (int)ms->m_settings.m_sustain_time_sixteenth - 7)) %
-         (PPSIXTEENTH * 4 - 7)) %
-        PPNS;
-
     midi_event off_event = new_midi_event(note_off_tick, 128, note, velocity);
     ////////////////////////
 

@@ -142,14 +142,6 @@ void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
                             false);
     add_matrix_row(matrix, row);
 
-    // EG1 -> ALL OSC
-    row = create_matrix_row(
-        SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
-        &msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity,
-        &msv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
-        true);
-    add_matrix_row(matrix, row);
-
     // EG1 -> FILTER1 FC
     row = create_matrix_row(
         SOURCE_BIASED_EG1, DEST_ALL_FILTER_FC,
@@ -163,6 +155,14 @@ void minisynth_voice_initialize_modmatrix(minisynth_voice *msv,
         SOURCE_EG1, DEST_DCA_EG,
         &msv->m_voice.m_global_voice_params->eg1_dca_amp_mod_intensity,
         &msv->m_voice.m_default_mod_range, TRANSFORM_NONE, true);
+    add_matrix_row(matrix, row);
+
+    // EG1 -> ALL OSC
+    row = create_matrix_row(
+        SOURCE_BIASED_EG1, DEST_ALL_OSC_FO,
+        &msv->m_voice.m_global_voice_params->eg1_osc_mod_intensity,
+        &msv->m_voice.m_global_voice_params->osc_fo_mod_range, TRANSFORM_NONE,
+        true);
     add_matrix_row(matrix, row);
 }
 

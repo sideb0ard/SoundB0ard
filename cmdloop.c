@@ -64,7 +64,7 @@ void loopy(void)
     char *line;
     while ((line = readline(prompt)) != NULL)
     {
-        //if (line[0] != 0)
+        // if (line[0] != 0)
         if (line && *line)
         {
             add_history(line);

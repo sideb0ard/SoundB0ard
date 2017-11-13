@@ -851,9 +851,8 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         seq->markov_mode, seq->markov_every_n_loops, seq->multi_pattern_mode,
         seq->max_generation, seq->bitwise_on, seq->bitwise_mode,
         seq->bitwise_every_n_loops, seq->euclidean_on,
-        seq->euclidean_every_n_loops, seq->visualize,
-        seq->sloppiness, seq->shuffle_on,
-        seq->shuffle_every_n_loops,
+        seq->euclidean_every_n_loops, seq->visualize, seq->sloppiness,
+        seq->shuffle_on, seq->shuffle_every_n_loops,
         s_bitwise_pattern[seq->bitwise_mode]);
     wchar_t pattern_details[128];
     char spattern[seq->pattern_len + 1];

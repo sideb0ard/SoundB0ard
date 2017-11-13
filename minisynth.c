@@ -623,10 +623,10 @@ void minisynth_status(void *self, wchar_t *status_string)
         L"[" WANSI_COLOR_WHITE "MINISYNTH '%s'" WCOOL_COLOR_PINK
         "] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d "
         "bytebeat:%d last_midi_notes:%d %d %d\n"
-        "filter keytrack(kt)[0-1]: %d detune[-100-100]:%0.2f legato:%d "
-        "note decay scale(ndscale)[01]:%d noisedb[-96-0]:%0.2f\n"
+        "      filter keytrack(kt)[0-1]: %d detune[-100-100]:%0.2f legato:%d "
+        "note decay scale(ndscale)[01]:%d\n      noisedb[-96-0]:%0.2f "
         "octave[-4-4]:%d pitchrange[0-12]:%d porta ms(porta)[0-5000]:%.2f"
-        "pulse width(pw)[1-99]:%.2f subosc[-96-0]:%.2f\n"
+        "\n      pulse width(pw)[1-99]:%.2f subosc[-96-0]:%.2f "
         "velocity scale(vascale)[0-1]:%d reset to zero[0-1]:%d\n"
         "      [" WANSI_COLOR_WHITE "---------lfo1--------"
         "------------------------------------" WCOOL_COLOR_PINK "]\n"

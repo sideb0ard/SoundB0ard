@@ -138,7 +138,6 @@ void eg_calculate_decay_time(envelope_generator *self)
 
 void eg_calculate_release_time(envelope_generator *self)
 {
-    // printf("CALC RELEASE TIME!\n");
     double d_samples = SAMPLE_RATE * (self->m_release_time_msec / 1000.0);
     self->m_release_coeff = exp(
         -log((1.0 + self->m_release_tco) / self->m_release_tco) / d_samples);
