@@ -9,7 +9,6 @@
 #define SIZE_OF_WURD 256
 #define NUM_WURDS 25
 
-void print_prompt(void);
 void loopy(void);
 void interpret(char *line);
 

@@ -776,10 +776,10 @@ stereo_val minisynth_gennext(void *self)
         unsigned mode = ms->m_settings.m_bytebeat_mode;
         short nom_left = gimme_a_bitwise_short(mode, ms->m_bytebeat_counter++);
         short nom_right = gimme_a_bitwise_short(mode, ms->m_bytebeat_counter++);
-        //double nomnom = scaleybum(-32768, 32787, -1, 1, nom);
+        // double nomnom = scaleybum(-32768, 32787, -1, 1, nom);
         accum_out_left = scaleybum(-32768, 32787, -1, 1, nom_left);
         accum_out_right = scaleybum(-32768, 32787, -1, 1, nom_right);
-        //return (stereo_val){nomnom, nomnom};
+        // return (stereo_val){nomnom, nomnom};
     }
     else
     {
@@ -1692,11 +1692,14 @@ void minisynth_sg_stop(void *self)
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
 
-void minisynth_set_bitwise(minisynth *ms, bool b) { ms->m_settings.m_bytebeat_active = b; }
-void minisynth_set_bitwise_mode(minisynth *ms, int mode )
+void minisynth_set_bitwise(minisynth *ms, bool b)
 {
-   if (mode >= 0 && mode < 5)
-    ms->m_settings.m_bytebeat_mode = mode;
+    ms->m_settings.m_bytebeat_active = b;
+}
+void minisynth_set_bitwise_mode(minisynth *ms, int mode)
+{
+    if (mode >= 0 && mode < 5)
+        ms->m_settings.m_bytebeat_mode = mode;
 }
 
 void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)

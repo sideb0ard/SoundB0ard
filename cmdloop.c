@@ -49,13 +49,14 @@ extern char *key_names[NUM_KEYS];
 
 extern wtable *wave_tables[5];
 
-char const *prompt = ANSI_COLOR_MAGENTA "SB#> " ANSI_COLOR_RESET;
-
-void print_prompt()
-{
-    printf("%s", prompt);
-    fflush(stdout);
-}
+//#define READLINE_SAFE_MAGENTA "\001\x1b[35m\002"
+//#define READLINE_SAFE_RESET "\001\x1b[0m\002"
+// char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
+// Turns out OSX uses NetBSD editline to implement readline and it has a
+// bug that means color prompt is broke -
+// https://stackoverflow.com/questions/31329952/colorized-readline-prompt-breaks-control-a
+// TODO(find a fix)
+char const *prompt = "SB#> ";
 
 void loopy(void)
 {
@@ -69,8 +70,8 @@ void loopy(void)
         {
             add_history(line);
             interpret(line);
+            free(line);
         }
-        free(line);
     }
 }
 

@@ -694,9 +694,10 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
         }
         minisynth_midi_note_on(ms, note, velocity);
 
-        //note_off_tick =
+        // note_off_tick =
         //    (int)(mixr->timing_info.midi_tick +
-        //          (PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth - 7) +
+        //          (PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth - 7)
+        //          +
         //          (ms->m_settings.m_attack_time_msec *
         //           mixr->timing_info.midi_ticks_per_ms)) %
         //    PPNS;
@@ -705,7 +706,6 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
     {
         digisynth *ds = (digisynth *)sg;
         digisynth_midi_note_on(ds, note, velocity);
-
     }
 
     int note_off_tick =

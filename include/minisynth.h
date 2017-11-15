@@ -211,7 +211,7 @@ void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode);
 void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode);
 
 void minisynth_set_bitwise(minisynth *ms, bool b);
-void minisynth_set_bitwise_mode(minisynth *ms, int mode );
+void minisynth_set_bitwise_mode(minisynth *ms, int mode);
 
 void minisynth_set_filter_mod(minisynth *ms, double mod);
 void minisynth_del_self(void *self);

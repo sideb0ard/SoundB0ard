@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../mixer.h"
 #include "interpreter.h"
+#include "mixer.h"
 #include "stack.h"
 
 extern mixer *mixr;
@@ -381,7 +381,7 @@ int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
     else if (re_token->type == TEE_TOKEN)
     {
         tmp_tokens[*tmp_token_num].type = NUMBER;
-        tmp_tokens[*tmp_token_num].val = mixr->tick;
+        tmp_tokens[*tmp_token_num].val = mixr->timing_info.midi_tick;
         stack_push(ans_stack, (void *)&tmp_tokens[(*tmp_token_num)++]);
     }
     else if (re_token->type == OPERATOR)
