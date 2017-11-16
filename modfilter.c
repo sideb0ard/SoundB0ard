@@ -179,7 +179,7 @@ void modfilter_set_mod_depth_fc(modfilter *mf, double val)
 
 void modfilter_set_mod_rate_fc(modfilter *mf, double val)
 {
-    if (val >= 0.2 && val <= 10)
+    if (val >= 0.02 && val <= 10)
         mf->m_mod_rate_fc = val;
     else
         printf("Val has to be between 0.2 and 10\n");
@@ -199,7 +199,7 @@ void modfilter_set_mod_depth_q(modfilter *mf, double val)
 
 void modfilter_set_mod_rate_q(modfilter *mf, double val)
 {
-    if (val >= 0.2 && val <= 10)
+    if (val >= 0.02 && val <= 10)
         mf->m_mod_rate_q = val;
     else
         printf("Val has to be between 0.2 and 10\n");

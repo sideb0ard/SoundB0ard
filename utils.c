@@ -222,6 +222,7 @@ void list_sample_dir(char *dir)
                 strcat(filename, ANSI_COLOR_BLUE);
                 strcat(filename, ep->d_name);
                 strcat(filename, "/");
+                strcat(filename, ANSI_COLOR_RESET);
             }
             else
             {
