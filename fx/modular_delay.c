@@ -28,8 +28,8 @@ mod_delay *new_mod_delay()
     md->m_ddl.m_use_external_feedback = false;
     md->m_ddl.m_delay_ms = 0.;
 
-    md->m_lfo.polarity = 1;
-    md->m_lfo.mode = 0;
+    // md->m_lfo.polarity = 1;
+    // md->m_lfo.mode = 0;
 
     // "gui"
     md->m_mod_depth_pct = 50;   // percent
@@ -86,9 +86,9 @@ void mod_delay_cook_mod_type(mod_delay *md)
 
 void mod_delay_update_lfo(mod_delay *md)
 {
-    md->m_lfo.freq = md->m_mod_freq;
-    md->m_lfo.waveform =
-        md->m_lfo_type == 0 ? 2 : 0; // tri or sine // dumb and mixed up
+    md->m_lfo.m_osc.m_osc_fo = md->m_mod_freq;
+    md->m_lfo.m_osc.m_waveform =
+        md->m_lfo_type == 0 ? 3 : 0; // tri or sine // dumb and mixed up
     wt_update(&md->m_lfo);
 }
 

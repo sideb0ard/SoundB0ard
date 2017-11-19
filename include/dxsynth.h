@@ -17,7 +17,17 @@
 
 static const char PRESET_FILENAME[] = "settings/dxsynthpresets.dat";
 
-enum { DX1, DX2, DX3, DX4, DX5, DX6, DX7, DX8 };
+enum
+{
+    DX1,
+    DX2,
+    DX3,
+    DX4,
+    DX5,
+    DX6,
+    DX7,
+    DX8
+};
 
 typedef struct dxsynthsettings
 {
@@ -25,7 +35,7 @@ typedef struct dxsynthsettings
 
     // LFO1     // lfo/hi/def
     double m_lfo1_intensity; // 0/1/0
-    double m_lfo1_rate; // 0.02 / 20 / 0.5
+    double m_lfo1_rate;      // 0.02 / 20 / 0.5
     unsigned int m_lfo1_waveform;
     unsigned int m_lfo1_mod_dest1; // none, AmpMod, Vibrato
     unsigned int m_lfo1_mod_dest2;
@@ -34,9 +44,9 @@ typedef struct dxsynthsettings
 
     // OP1
     unsigned int m_op1_waveform; // SINE, SAW, TRI, SQ
-    double m_op1_ratio; // 0.01/10/1
-    double m_op1_detune_cents; // -100/100/0
-    double m_eg1_attack_ms; // 0/5000/100
+    double m_op1_ratio;          // 0.01/10/1
+    double m_op1_detune_cents;   // -100/100/0
+    double m_eg1_attack_ms;      // 0/5000/100
     double m_eg1_decay_ms;
     double m_eg1_sustain_lvl; // 0/1/0.707
     double m_eg1_release_ms;
@@ -75,9 +85,9 @@ typedef struct dxsynthsettings
 
     // VOICE
     double m_portamento_time_ms; // 0/5000/0
-    double m_volume_db; // -96/20/0
-    int m_pitchbend_range; // 0/12/1
-    unsigned int m_voice_mode; // DX[1-8];
+    double m_volume_db;          // -96/20/0
+    int m_pitchbend_range;       // 0/12/1
+    unsigned int m_voice_mode;   // DX[1-8];
     bool m_velocity_to_attack_scaling;
     bool m_note_number_to_decay_scaling;
     bool m_reset_to_zero;
@@ -99,7 +109,7 @@ typedef struct dxsynth
     dxsynthsettings m_settings;
     dxsynthsettings m_settings_backup_while_getting_crazy;
 
-    //arpeggiator m_arp;
+    // arpeggiator m_arp;
     // bytebeat bytr;
     // int m_bytebeat_counter;
 
@@ -123,22 +133,22 @@ bool dxsynth_prepare_for_play(dxsynth *synth);
 void dxsynth_stop(dxsynth *ms);
 void dxsynth_update(dxsynth *synth);
 
-//void dxsynth_midi_control(dxsynth *self, unsigned int data1,
+// void dxsynth_midi_control(dxsynth *self, unsigned int data1,
 //                            unsigned int data2);
 //
-//void dxsynth_increment_voice_timestamps(dxsynth *synth);
-//dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
-//dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
+// void dxsynth_increment_voice_timestamps(dxsynth *synth);
+// dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
+// dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
 //                                                      unsigned int midi_note);
 
 bool dxsynth_midi_note_on(dxsynth *self, unsigned int midinote,
-                            unsigned int velocity);
+                          unsigned int velocity);
 bool dxsynth_midi_note_off(dxsynth *self, unsigned int midinote,
-                             unsigned int velocity, bool all_notes_off);
+                           unsigned int velocity, bool all_notes_off);
 void dxsynth_midi_mod_wheel(dxsynth *self, unsigned int data1,
-                              unsigned int data2);
+                            unsigned int data2);
 void dxsynth_midi_pitchbend(dxsynth *self, unsigned int data1,
-                              unsigned int data2);
+                            unsigned int data2);
 void dxsynth_reset_voices(dxsynth *self);
 
 void dxsynth_rand_settings(dxsynth *ms);
@@ -174,7 +184,8 @@ void dxsynth_print(dxsynth *ms);
 void dxsynth_set_lfo1_intensity(dxsynth *d, double val);
 void dxsynth_set_lfo1_rate(dxsynth *d, double val);
 void dxsynth_set_lfo1_waveform(dxsynth *d, unsigned int val);
-void dxsynth_set_lfo1_mod_dest(dxsynth *d, unsigned int mod_dest, unsigned int dest);
+void dxsynth_set_lfo1_mod_dest(dxsynth *d, unsigned int mod_dest,
+                               unsigned int dest);
 
 void dxsynth_set_op_waveform(dxsynth *d, unsigned int op, unsigned int val);
 void dxsynth_set_op_ratio(dxsynth *d, unsigned int op, double val);

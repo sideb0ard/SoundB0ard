@@ -38,11 +38,11 @@ void modfilter_init(modfilter *mf)
     mf->m_mod_rate_q = 2.5;
     mf->m_lfo_phase = 0;
 
-    mf->m_fc_lfo.polarity = 1; // unipolar
-    mf->m_fc_lfo.mode = 0;     // normal, not band limited
+    // mf->m_fc_lfo.polarity = 1; // unipolar
+    // mf->m_fc_lfo.mode = 0;     // normal, not band limited
 
-    mf->m_q_lfo.polarity = 1; // unipolar
-    mf->m_q_lfo.mode = 0;     // normal, not band limited
+    // mf->m_q_lfo.polarity = 1; // unipolar
+    // mf->m_q_lfo.mode = 0;     // normal, not band limited
 
     modfilter_update(mf);
 
@@ -52,10 +52,10 @@ void modfilter_init(modfilter *mf)
 
 void modfilter_update(modfilter *mf)
 {
-    mf->m_fc_lfo.freq = mf->m_mod_rate_fc;
-    mf->m_q_lfo.freq = mf->m_mod_rate_q;
-    mf->m_fc_lfo.waveform = mf->m_lfo_waveform;
-    mf->m_q_lfo.waveform = mf->m_lfo_waveform;
+    mf->m_fc_lfo.m_osc.m_osc_fo = mf->m_mod_rate_fc;
+    mf->m_q_lfo.m_osc.m_osc_fo = mf->m_mod_rate_q;
+    mf->m_fc_lfo.m_osc.m_waveform = mf->m_lfo_waveform;
+    mf->m_q_lfo.m_osc.m_waveform = mf->m_lfo_waveform;
     wt_update(&mf->m_fc_lfo);
     wt_update(&mf->m_q_lfo);
 }

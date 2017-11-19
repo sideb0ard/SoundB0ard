@@ -42,11 +42,12 @@ void ddl_cook_variables(ddlmodule *d)
     if (d->m_read_index < 0)
         d->m_read_index += d->m_buffer_size;
 
-    if (d->m_read_index >= d->m_buffer_size)
-        printf("WHOA NELLIE! Before: %d After: %d Buffer Size: %d DelayMs: %f  "
-               "Delay In Samples: %f\n",
-               precookidx, d->m_read_index, d->m_buffer_size, d->m_delay_ms,
-               d->m_delay_in_samples);
+    // if (d->m_read_index >= d->m_buffer_size)
+    //    printf("WHOA NELLIE! Before: %d After: %d Buffer Size: %d DelayMs: %f
+    //    "
+    //           "Delay In Samples: %f\n",
+    //           precookidx, d->m_read_index, d->m_buffer_size, d->m_delay_ms,
+    //           d->m_delay_in_samples);
 }
 
 void ddl_reset_delay(ddlmodule *d)

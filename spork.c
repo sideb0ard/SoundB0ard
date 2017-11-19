@@ -130,9 +130,9 @@ void spork_set_polarity(spork *s, unsigned int polarity)
 
 void spork_update(spork *s)
 {
-    s->m_osc.freq = s->freq;
-    s->m_osc.waveform = s->waveform;
-    s->m_osc.mode = s->mode;
-    s->m_osc.polarity = s->polarity;
+    // s->m_osc.freq = s->freq;
+    // s->m_osc.waveform = s->waveform;
+    // s->m_osc.mode = s->mode;
+    // s->m_osc.polarity = s->polarity;
     wt_update(&s->m_osc);
 }
