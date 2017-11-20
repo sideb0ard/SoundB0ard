@@ -18,6 +18,7 @@ SRC = \
 	dca.c \
 	digisynth.c \
 	digisynth_voice.c \
+	dxsynth_voice.c \
 	filterz/filter.c \
 	filterz/filter_ckthreefive.c \
 	filterz/filter_moogladder.c \
