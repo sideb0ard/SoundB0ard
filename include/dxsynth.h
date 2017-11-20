@@ -134,12 +134,12 @@ void dxsynth_stop(dxsynth *ms);
 void dxsynth_update(dxsynth *synth);
 
 void dxsynth_midi_control(dxsynth *self, unsigned int data1,
-                           unsigned int data2);
+                          unsigned int data2);
 
 void dxsynth_increment_voice_timestamps(dxsynth *synth);
 dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
 dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
-                                                     unsigned int midi_note);
+                                                  unsigned int midi_note);
 
 bool dxsynth_midi_note_on(dxsynth *self, unsigned int midinote,
                           unsigned int velocity);

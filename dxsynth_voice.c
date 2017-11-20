@@ -410,6 +410,9 @@ inline bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     eg3 = eg_do_envelope(&dxv->m_voice.m_eg3, NULL);
     eg4 = eg_do_envelope(&dxv->m_voice.m_eg4, NULL);
 
+    if (eg1 > 0 || eg2 > 0 || eg3 > 0 || eg4 > 0)
+        printf("Eg1:%.2f Eg2:%.2f Eg3:%.2f Eg4:%.2f\n", eg1, eg2, eg3, eg4);
+
     osc_update((oscillator *)&dxv->m_voice.m_lfo1);
     lfo_do_oscillate((oscillator *)&dxv->m_voice.m_lfo1, NULL);
 
@@ -429,7 +432,6 @@ inline bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     case (1):
     {
         out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
-        printf("ALGO01 out4:%2.f\n", out4);
 
         osc_set_phase_mod((oscillator *)&dxv->m_op4,
                           out4 * dxv->m_op4_feedback);

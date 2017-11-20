@@ -325,7 +325,6 @@ int add_dxsynth(mixer *mixr)
     return add_sound_generator(mixr, (soundgenerator *)dx);
 }
 
-
 int add_looper(mixer *mixr, char *filename, double loop_len)
 {
     printf("ADD looper - LOOP LEN %f\n", loop_len);

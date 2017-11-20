@@ -236,8 +236,7 @@ double envelopor(soundgenerator *self, double val)
 
 bool is_synth(soundgenerator *self)
 {
-    if (self->type == MINISYNTH_TYPE ||
-        self->type == DIGISYNTH_TYPE ||
+    if (self->type == MINISYNTH_TYPE || self->type == DIGISYNTH_TYPE ||
         self->type == DXSYNTH_TYPE)
         return true;
 
