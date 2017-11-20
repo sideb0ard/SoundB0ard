@@ -15,7 +15,7 @@
 
 #define MAX_DX_VOICES 16
 
-static const char PRESET_FILENAME[] = "settings/dxsynthpresets.dat";
+static const char DX_PRESET_FILENAME[] = "settings/dxsynthpresets.dat";
 
 enum
 {
@@ -76,10 +76,10 @@ typedef struct dxsynthsettings
     unsigned int m_op4_waveform; // SINE, SAW, TRI, SQ
     double m_op4_ratio;
     double m_op4_detune_cents;
-    double m_eg1_attack_ms;
-    double m_eg1_decay_ms;
-    double m_eg1_sustain_lvl;
-    double m_eg1_release_ms;
+    double m_eg4_attack_ms;
+    double m_eg4_decay_ms;
+    double m_eg4_sustain_lvl;
+    double m_eg4_release_ms;
     double m_op4_output_lvl;
     double m_op4_feedback; // 0/70/0
 
@@ -103,19 +103,19 @@ typedef struct dxsynth
     dxsynth_voice *m_voices[MAX_DX_VOICES];
 
     // global modmatrix, core is shared by all voices
-    modmatrix m_ms_modmatrix; // routing structure for sound generation
+    modmatrix m_global_modmatrix; // routing structure for sound generation
     global_synth_params m_global_synth_params;
 
     dxsynthsettings m_settings;
     dxsynthsettings m_settings_backup_while_getting_crazy;
 
-    // arpeggiator m_arp;
-    // bytebeat bytr;
-    // int m_bytebeat_counter;
+    double vol;
+    double m_last_note_frequency;
 
 } dxsynth;
 
 dxsynth *new_dxsynth(void);
+void dxsynth_del_self(void *self);
 
 // sound generator interface //////////////
 stereo_val dxsynth_gennext(void *self);
@@ -133,13 +133,13 @@ bool dxsynth_prepare_for_play(dxsynth *synth);
 void dxsynth_stop(dxsynth *ms);
 void dxsynth_update(dxsynth *synth);
 
-// void dxsynth_midi_control(dxsynth *self, unsigned int data1,
-//                            unsigned int data2);
-//
-// void dxsynth_increment_voice_timestamps(dxsynth *synth);
-// dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
-// dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
-//                                                      unsigned int midi_note);
+void dxsynth_midi_control(dxsynth *self, unsigned int data1,
+                           unsigned int data2);
+
+void dxsynth_increment_voice_timestamps(dxsynth *synth);
+dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
+dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
+                                                     unsigned int midi_note);
 
 bool dxsynth_midi_note_on(dxsynth *self, unsigned int midinote,
                           unsigned int velocity);
@@ -177,7 +177,6 @@ void dxsynth_set_bitwise(dxsynth *ms, bool b);
 void dxsynth_set_bitwise_mode(dxsynth *ms, int mode);
 
 void dxsynth_set_filter_mod(dxsynth *ms, double mod);
-void dxsynth_del_self(void *self);
 
 void dxsynth_print(dxsynth *ms);
 

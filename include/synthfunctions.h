@@ -160,4 +160,20 @@ static inline double midi_to_bipolar(unsigned int midi_val)
     return 2.0 * (double)midi_val / 127.0 - 1.0;
 }
 
+inline double calculate_dx_amp(double dx_level)
+{
+    // algo all from Will Pirkle
+    double dx_amp  = 0.0;
+    if (dx_level != 0.0)
+    {
+        dx_amp = dx_level;
+        dx_amp -= 99.0;
+        dx_amp /= 1.32;
+
+        dx_amp = (pow(10.0, dx_amp/20.0));
+    }
+    return dx_amp;
+}
+
+
 #endif // SBSHELL_SYNTH_FUNCTION_H_

@@ -11,6 +11,7 @@
 #include "chaosmonkey.h"
 #include "defjams.h"
 #include "digisynth.h"
+#include "dxsynth.h"
 #include "envelope.h"
 #include "fx.h"
 #include "granulator.h"
@@ -317,6 +318,13 @@ int add_digisynth(mixer *mixr, char *filename)
     digisynth *ds = new_digisynth(filename);
     return add_sound_generator(mixr, (soundgenerator *)ds);
 }
+int add_dxsynth(mixer *mixr)
+{
+    printf("Adding a DXSYNTH!!...\n");
+    dxsynth *dx = new_dxsynth();
+    return add_sound_generator(mixr, (soundgenerator *)dx);
+}
+
 
 int add_looper(mixer *mixr, char *filename, double loop_len)
 {
@@ -674,7 +682,16 @@ synthbase *get_synthbase(soundgenerator *self)
         digisynth *ds = (digisynth *)self;
         return &ds->base;
     }
-    return NULL;
+    else if (self->type == DXSYNTH_TYPE)
+    {
+        dxsynth *dx = (dxsynth *)self;
+        return &dx->base;
+    }
+    else
+    {
+        printf("Error! Don't know what type of SYNTH this is\n");
+        return NULL;
+    }
 }
 
 // TODO - better function name - this is programatic calls, which
@@ -706,6 +723,11 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
     {
         digisynth *ds = (digisynth *)sg;
         digisynth_midi_note_on(ds, note, velocity);
+    }
+    else if (sg->type == DXSYNTH_TYPE)
+    {
+        dxsynth *dx = (dxsynth *)sg;
+        dxsynth_midi_note_on(dx, note, velocity);
     }
 
     int note_off_tick =

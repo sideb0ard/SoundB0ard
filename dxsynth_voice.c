@@ -411,7 +411,7 @@ inline bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     eg4 = eg_do_envelope(&dxv->m_voice.m_eg4, NULL);
 
     osc_update((oscillator *)&dxv->m_voice.m_lfo1);
-    lfo_do_oscillate((oscillator *)&dxv->m_voice.m_lfo2, NULL);
+    lfo_do_oscillate((oscillator *)&dxv->m_voice.m_lfo1, NULL);
 
     ////// layer 1 //////////////////////////////
     do_modulation_matrix(&dxv->m_voice.m_v_modmatrix, 1);
@@ -429,6 +429,7 @@ inline bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
     case (1):
     {
         out4 = IMAX * eg4 * qb_do_oscillate((oscillator *)&dxv->m_op4, NULL);
+        printf("ALGO01 out4:%2.f\n", out4);
 
         osc_set_phase_mod((oscillator *)&dxv->m_op4,
                           out4 * dxv->m_op4_feedback);
@@ -614,3 +615,5 @@ inline bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
 
     return true;
 }
+
+void dxsynth_voice_free_self(dxsynth_voice *dxv) { free(dxv); }

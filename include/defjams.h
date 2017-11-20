@@ -102,6 +102,7 @@ typedef enum {
 typedef enum {
     MINISYNTH_TYPE,
     DIGISYNTH_TYPE,
+    DXSYNTH_TYPE,
     LOOPER_TYPE,
     BITWIZE_TYPE,
     GRANULATOR_TYPE,

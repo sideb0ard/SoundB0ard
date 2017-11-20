@@ -21,6 +21,7 @@
 #include "digisynth.h"
 #include "distortion.h"
 #include "dynamics_processor.h"
+#include "dxsynth.h"
 #include "envelope.h"
 #include "envelope_follower.h"
 #include "granulator.h"
@@ -1093,6 +1094,16 @@ void interpret(char *line)
                 {
                     minisynth *ms = (minisynth *)mixr->sound_generators[sgnum];
                     char_melody_to_midi_melody(&ms->base, 0, wurds, 2,
+                                               num_wurds);
+                }
+            }
+            else if (strncmp("dx", wurds[1], 2) == 0)
+            {
+                int sgnum = add_dxsynth(mixr);
+                if (num_wurds > 2)
+                {
+                    dxsynth *dx = (dxsynth *)mixr->sound_generators[sgnum];
+                    char_melody_to_midi_melody(&dx->base, 0, wurds, 2,
                                                num_wurds);
                 }
             }
