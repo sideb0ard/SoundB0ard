@@ -197,6 +197,7 @@ void minisynth_voice_init_global_parameters(minisynth_voice *msv,
 void minisynth_voice_prepare_for_play(minisynth_voice *msv)
 {
     voice_prepare_for_play(&msv->m_voice);
+    msv->m_voice.m_dca.m_mod_source_eg = DEST_DCA_EG;
     minisynth_voice_reset(msv);
 }
 

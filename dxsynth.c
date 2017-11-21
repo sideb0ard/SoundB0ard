@@ -115,6 +115,7 @@ dxsynth *new_dxsynth(void)
 
     dx->m_last_note_frequency = -1.0;
 
+    dx->vol = 1;
     dx->sound_generator.active = true;
     printf("BOOM!\n");
     return dx;
@@ -124,7 +125,7 @@ dxsynth *new_dxsynth(void)
 
 bool dxsynth_prepare_for_play(dxsynth *dx)
 {
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         if (dx->m_voices[i])
         {
@@ -247,7 +248,7 @@ void dxsynth_update(dxsynth *dx)
 
     // DCA
     dx->m_global_synth_params.dca_params.amplitude_db =
-        (bool)dx->m_settings.m_volume_db;
+        dx->m_settings.m_volume_db;
 
     if (dx->m_settings.m_lfo1_mod_dest1 == DX_LFO_DEST_NONE)
     {
@@ -354,7 +355,7 @@ bool dxsynth_midi_note_on(dxsynth *ms, unsigned int midinote,
 
     printf("DX NOTE ON!\n");
     bool steal_note = true;
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         dxsynth_voice *msv = ms->m_voices[i];
         if (!msv)
@@ -396,7 +397,7 @@ bool dxsynth_midi_note_off(dxsynth *ms, unsigned int midinote,
 
     if (all_notes_off)
     {
-        for (int i = 0; i < MAX_VOICES; i++)
+        for (int i = 0; i < MAX_DX_VOICES; i++)
         {
             if (ms->m_voices[i])
                 voice_note_off(&ms->m_voices[i]->m_voice, midinote);
@@ -404,7 +405,7 @@ bool dxsynth_midi_note_off(dxsynth *ms, unsigned int midinote,
         return true;
     }
 
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         dxsynth_voice *msv = dxsynth_get_oldest_voice_with_note(ms, midinote);
         if (msv)
@@ -428,7 +429,7 @@ void dxsynth_midi_pitchbend(dxsynth *ms, unsigned int data1, unsigned int data2)
             // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
             scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
         // printf("Cents to bend - %f\n", scaley_val);
-        for (int i = 0; i < MAX_VOICES; i++)
+        for (int i = 0; i < MAX_DX_VOICES; i++)
         {
             ms->m_voices[i]->m_voice.m_osc1->m_cents = scaley_val;
             ms->m_voices[i]->m_voice.m_osc2->m_cents = scaley_val + 2.5;
@@ -440,7 +441,7 @@ void dxsynth_midi_pitchbend(dxsynth *ms, unsigned int data1, unsigned int data2)
     }
     else
     {
-        for (int i = 0; i < MAX_VOICES; i++)
+        for (int i = 0; i < MAX_DX_VOICES; i++)
         {
             ms->m_voices[i]->m_voice.m_osc1->m_cents = 0;
             ms->m_voices[i]->m_voice.m_osc2->m_cents = 2.5;
@@ -452,7 +453,7 @@ void dxsynth_midi_pitchbend(dxsynth *ms, unsigned int data1, unsigned int data2)
 
 void dxsynth_reset_voices(dxsynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         dxsynth_voice_reset(ms->m_voices[i]);
     }
@@ -460,7 +461,7 @@ void dxsynth_reset_voices(dxsynth *ms)
 
 void dxsynth_increment_voice_timestamps(dxsynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         if (ms->m_voices[i])
         {
@@ -474,7 +475,7 @@ dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *ms)
 {
     int timestamp = -1;
     dxsynth_voice *found_voice = NULL;
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         if (ms->m_voices[i])
         {
@@ -494,7 +495,7 @@ dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *ms,
 {
     int timestamp = -1;
     dxsynth_voice *found_voice = NULL;
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         if (ms->m_voices[i])
         {
@@ -601,35 +602,35 @@ void dxsynth_make_active_track(void *self, int tracknum)
 
 stereo_val dxsynth_gennext(void *self)
 {
-    dxsynth *ms = (dxsynth *)self;
+    dxsynth *dx = (dxsynth *)self;
 
-    if (!ms->sound_generator.active)
+    if (!dx->sound_generator.active)
         return (stereo_val){0, 0};
 
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    float mix = 1.0 / MAX_VOICES;
+    float mix = 1.0 / MAX_DX_VOICES;
 
     double out_left = 0.0;
     double out_right = 0.0;
 
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
-        if (ms->m_voices[i])
-            dxsynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
+        if (dx->m_voices[i])
+            dxsynth_voice_gennext(dx->m_voices[i], &out_left, &out_right);
 
         accum_out_left += mix * out_left;
         accum_out_right += mix * out_right;
     }
 
-    accum_out_left = effector(&ms->sound_generator, accum_out_left);
-    accum_out_left = envelopor(&ms->sound_generator, accum_out_left);
-    accum_out_left *= ms->m_settings.m_volume_db;
+    accum_out_left = effector(&dx->sound_generator, accum_out_left);
+    accum_out_left = envelopor(&dx->sound_generator, accum_out_left);
+    accum_out_left *= dx->vol;
 
-    accum_out_right = effector(&ms->sound_generator, accum_out_right);
-    accum_out_right = envelopor(&ms->sound_generator, accum_out_right);
-    accum_out_right *= ms->m_settings.m_volume_db;
+    accum_out_right = effector(&dx->sound_generator, accum_out_right);
+    accum_out_right = envelopor(&dx->sound_generator, accum_out_right);
+    accum_out_right *= dx->vol;
 
     return (stereo_val){.left = accum_out_left, .right = accum_out_right};
 }
@@ -786,7 +787,7 @@ void dxsynth_print_modulation_routings(dxsynth *ms)
 void dxsynth_del_self(void *self)
 {
     dxsynth *dx = (dxsynth *)self;
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         dxsynth_voice_free_self(dx->m_voices[i]);
     }
@@ -796,7 +797,7 @@ void dxsynth_del_self(void *self)
 
 void dxsynth_stop(dxsynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++)
+    for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         voice_reset(&ms->m_voices[i]->m_voice);
     }

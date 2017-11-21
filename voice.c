@@ -151,7 +151,8 @@ void voice_prepare_for_play(voice *v)
     // v->m_eg4.m_mod_source_sustain_override = DEST_EG4_SUSTAIN_OVERRIDE;
 
     v->m_dca.m_v_modmatrix = &v->m_v_modmatrix;
-    v->m_dca.m_mod_source_eg = DEST_DCA_EG;
+    // v->m_dca.m_mod_source_eg = DEST_DCA_EG; // enabled in minisynth
+    v->m_dca.m_mod_source_eg = DEST_NONE;
     v->m_dca.m_mod_source_amp_db = DEST_DCA_AMP;
     v->m_dca.m_mod_source_velocity = DEST_DCA_VELOCITY;
     v->m_dca.m_mod_source_pan = DEST_DCA_PAN;
