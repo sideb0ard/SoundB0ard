@@ -26,7 +26,8 @@ enum
     DX5,
     DX6,
     DX7,
-    DX8
+    DX8,
+    MAXDX
 };
 
 typedef struct dxsynthsettings
@@ -44,7 +45,7 @@ typedef struct dxsynthsettings
 
     // OP1
     unsigned int m_op1_waveform; // SINE, SAW, TRI, SQ
-    double m_op1_ratio;          // 0.01/10/1
+    double m_op1_ratio;          // 0.1/10/1
     double m_op1_detune_cents;   // -100/100/0
     double m_eg1_attack_ms;      // 0/5000/100
     double m_eg1_decay_ms;
@@ -166,12 +167,12 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_name);
 bool dxsynth_list_presets(void);
 bool dxsynth_check_if_preset_exists(char *preset_to_find);
 
-void dxsynth_set_arpeggiate(dxsynth *ms, bool b);
-void dxsynth_set_arpeggiate_latch(dxsynth *ms, bool b);
-void dxsynth_set_arpeggiate_single_note_repeat(dxsynth *ms, bool b);
-void dxsynth_set_arpeggiate_octave_range(dxsynth *ms, int val);
-void dxsynth_set_arpeggiate_mode(dxsynth *ms, unsigned int mode);
-void dxsynth_set_arpeggiate_rate(dxsynth *ms, unsigned int mode);
+// void dxsynth_set_arpeggiate(dxsynth *ms, bool b);
+// void dxsynth_set_arpeggiate_latch(dxsynth *ms, bool b);
+// void dxsynth_set_arpeggiate_single_note_repeat(dxsynth *ms, bool b);
+// void dxsynth_set_arpeggiate_octave_range(dxsynth *ms, int val);
+// void dxsynth_set_arpeggiate_mode(dxsynth *ms, unsigned int mode);
+// void dxsynth_set_arpeggiate_rate(dxsynth *ms, unsigned int mode);
 
 void dxsynth_set_bitwise(dxsynth *ms, bool b);
 void dxsynth_set_bitwise_mode(dxsynth *ms, int mode);
@@ -193,7 +194,8 @@ void dxsynth_set_eg_attack_ms(dxsynth *d, unsigned int eg, double val);
 void dxsynth_set_eg_decay_ms(dxsynth *d, unsigned int eg, double val);
 void dxsynth_set_eg_release_ms(dxsynth *d, unsigned int eg, double val);
 void dxsynth_set_eg_sustain_lvl(dxsynth *d, unsigned int eg, double val);
-void dxsynth_set_eg_output_lvl(dxsynth *d, unsigned int eg, double val);
+void dxsynth_set_op_output_lvl(dxsynth *d, unsigned int op, double val);
+void dxsynth_set_op4_feedback(dxsynth *d, double val);
 
 void dxsynth_set_portamento_time_ms(dxsynth *d, double val);
 void dxsynth_set_volume_db(dxsynth *d, double val);

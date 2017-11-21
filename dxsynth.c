@@ -89,6 +89,7 @@ dxsynth *new_dxsynth(void)
     dx->m_settings.m_eg4_sustain_lvl = 0.707;
     dx->m_settings.m_eg4_release_ms = 2000;
     dx->m_settings.m_op4_output_lvl = 75;
+    dx->m_settings.m_op4_feedback = 0; // 0-70
 
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
@@ -353,7 +354,6 @@ bool dxsynth_midi_note_on(dxsynth *ms, unsigned int midinote,
                           unsigned int velocity)
 {
 
-    printf("DX NOTE ON!\n");
     bool steal_note = true;
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
@@ -362,7 +362,6 @@ bool dxsynth_midi_note_on(dxsynth *ms, unsigned int midinote,
             return false; // should never happen
         if (!msv->m_voice.m_note_on)
         {
-            printf("DXNOTEON\n");
             dxsynth_increment_voice_timestamps(ms);
             voice_note_on(&msv->m_voice, midinote, velocity,
                           get_midi_freq(midinote), ms->m_last_note_frequency);
@@ -520,8 +519,9 @@ void dxsynth_status(void *self, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         L"[" WANSI_COLOR_WHITE
         "DXSYNTH '%s' algo:%d] - Vol: %.2f Active:%s porta:%.2f "
-        "pitchrange:%d vel2attack:%d note2decay:%d reset2zero:%d legato:%d\n"
-        "      lfo1_intensity:%.2f lfo1_rate:%0.2f lfo1_waveform:%d\n"
+        "pitchrange:%d vel2attack:%d note2decay:%d dxreset2zero:%d legato:%d\n"
+        "      lfo1_intensity:%.2f lfo1_rate:%0.2f lfo1_waveform:%d "
+        "op4feedback:%.2f\n"
         "      lfo1dest1:%s lfo1dest2:%s lfo1dest3:%s lfo1dest4:%s\n"
         "      [Op1] op1wave:%d op1ratio:%.2f op1detune:%.2f eg1attackms:%.2f "
         "eg1decayms:%.2f eg1sustainlvl:%.2f eg1releasems:%.2f op1output:%.2f\n"
@@ -540,7 +540,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
         dx->m_settings.m_reset_to_zero, dx->m_settings.m_legato_mode,
 
         dx->m_settings.m_lfo1_intensity, dx->m_settings.m_lfo1_rate,
-        dx->m_settings.m_lfo1_waveform,
+        dx->m_settings.m_lfo1_waveform, dx->m_settings.m_op4_feedback,
         s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest1],
         s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest2],
         s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest3],
@@ -610,7 +610,8 @@ stereo_val dxsynth_gennext(void *self)
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    float mix = 1.0 / MAX_DX_VOICES;
+    // float mix = 1.0 / MAX_DX_VOICES;
+    float mix = 0.33;
 
     double out_left = 0.0;
     double out_right = 0.0;
@@ -814,4 +815,320 @@ void dxsynth_sg_stop(void *self)
     dxsynth *ms = (dxsynth *)self;
     ms->sound_generator.active = false;
     dxsynth_stop(ms);
+}
+
+void dxsynth_set_lfo1_intensity(dxsynth *d, double val)
+{
+    if (val >= 0.0 && val <= 1.0)
+        d->m_settings.m_lfo1_intensity = val;
+    else
+        printf("Val has to be between 0.0-1.0\n");
+}
+
+void dxsynth_set_lfo1_rate(dxsynth *d, double val)
+{
+    if (val >= 0.02 && val <= 20.0)
+        d->m_settings.m_lfo1_rate = val;
+    else
+        printf("Val has to be between 0.02 - 20.0\n");
+}
+
+void dxsynth_set_lfo1_waveform(dxsynth *d, unsigned int val)
+{
+    if (val < MAX_LFO_OSC)
+        d->m_settings.m_lfo1_waveform = val;
+    else
+        printf("Val has to be between [0-%d]\n", MAX_LFO_OSC);
+}
+
+void dxsynth_set_lfo1_mod_dest(dxsynth *d, unsigned int mod_dest,
+                               unsigned int dest)
+{
+    if (dest > 2)
+    {
+        printf("Dest has to be [0-2]\n");
+        return;
+    }
+    switch (mod_dest)
+    {
+    case (1):
+        d->m_settings.m_lfo1_mod_dest1 = dest;
+        break;
+    case (2):
+        d->m_settings.m_lfo1_mod_dest2 = dest;
+        break;
+    case (3):
+        d->m_settings.m_lfo1_mod_dest3 = dest;
+        break;
+    case (4):
+        d->m_settings.m_lfo1_mod_dest4 = dest;
+        break;
+    default:
+        printf("Huh?! Only got 4 destinations, brah..\n");
+    }
+}
+
+void dxsynth_set_op_waveform(dxsynth *d, unsigned int op, unsigned int val)
+{
+    if (val >= MAX_OSC)
+    {
+        printf("WAV has to be [0-%d)\n", MAX_OSC);
+        return;
+    }
+    switch (op)
+    {
+    case (1):
+        d->m_settings.m_op1_waveform = val;
+        break;
+    case (2):
+        d->m_settings.m_op2_waveform = val;
+        break;
+    case (3):
+        d->m_settings.m_op3_waveform = val;
+        break;
+    case (4):
+        d->m_settings.m_op4_waveform = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+
+void dxsynth_set_op_ratio(dxsynth *d, unsigned int op, double val)
+{
+    if (val < 0.01 || val > 10)
+    {
+        printf("val has to be [0.01-10]\n");
+        return;
+    }
+    switch (op)
+    {
+    case (1):
+        d->m_settings.m_op1_ratio = val;
+        break;
+    case (2):
+        d->m_settings.m_op2_ratio = val;
+        break;
+    case (3):
+        d->m_settings.m_op3_ratio = val;
+        break;
+    case (4):
+        d->m_settings.m_op4_ratio = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+void dxsynth_set_op_detune(dxsynth *d, unsigned int op, double val)
+{
+    if (val < -100 || val > 100)
+    {
+        printf("val has to be [-100-100]\n");
+        return;
+    }
+    switch (op)
+    {
+    case (1):
+        d->m_settings.m_op1_detune_cents = val;
+        break;
+    case (2):
+        d->m_settings.m_op2_detune_cents = val;
+        break;
+    case (3):
+        d->m_settings.m_op3_detune_cents = val;
+        break;
+    case (4):
+        d->m_settings.m_op4_detune_cents = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+
+void dxsynth_set_eg_attack_ms(dxsynth *d, unsigned int eg, double val)
+{
+    if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS)
+    {
+        printf("val has to be [%d - %d]\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+        return;
+    }
+    switch (eg)
+    {
+    case (1):
+        d->m_settings.m_eg1_attack_ms = val;
+        break;
+    case (2):
+        d->m_settings.m_eg2_attack_ms = val;
+        break;
+    case (3):
+        d->m_settings.m_eg3_attack_ms = val;
+        break;
+    case (4):
+        d->m_settings.m_eg4_attack_ms = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+
+void dxsynth_set_eg_decay_ms(dxsynth *d, unsigned int eg, double val)
+{
+    if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS)
+    {
+        printf("val has to be [%d - %d]\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+        return;
+    }
+    switch (eg)
+    {
+    case (1):
+        d->m_settings.m_eg1_decay_ms = val;
+        break;
+    case (2):
+        d->m_settings.m_eg2_decay_ms = val;
+        break;
+    case (3):
+        d->m_settings.m_eg3_decay_ms = val;
+        break;
+    case (4):
+        d->m_settings.m_eg4_decay_ms = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+
+void dxsynth_set_eg_release_ms(dxsynth *d, unsigned int eg, double val)
+{
+    if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS)
+    {
+        printf("val has to be [%d - %d]\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+        return;
+    }
+    switch (eg)
+    {
+    case (1):
+        d->m_settings.m_eg1_release_ms = val;
+        break;
+    case (2):
+        d->m_settings.m_eg2_release_ms = val;
+        break;
+    case (3):
+        d->m_settings.m_eg3_release_ms = val;
+        break;
+    case (4):
+        d->m_settings.m_eg4_release_ms = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+
+void dxsynth_set_eg_sustain_lvl(dxsynth *d, unsigned int eg, double val)
+{
+    if (val < 0 || val > 1)
+    {
+        printf("val has to be [0-1]\n");
+        return;
+    }
+    switch (eg)
+    {
+    case (1):
+        d->m_settings.m_eg1_sustain_lvl = val;
+        break;
+    case (2):
+        d->m_settings.m_eg2_sustain_lvl = val;
+        break;
+    case (3):
+        d->m_settings.m_eg3_sustain_lvl = val;
+        break;
+    case (4):
+        d->m_settings.m_eg4_sustain_lvl = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+
+void dxsynth_set_op_output_lvl(dxsynth *d, unsigned int op, double val)
+{
+    if (val < 0 || val > 99)
+    {
+        printf("val has to be [0-99]\n");
+        return;
+    }
+    switch (op)
+    {
+    case (1):
+        d->m_settings.m_op1_output_lvl = val;
+        break;
+    case (2):
+        d->m_settings.m_op2_output_lvl = val;
+        break;
+    case (3):
+        d->m_settings.m_op3_output_lvl = val;
+        break;
+    case (4):
+        d->m_settings.m_op4_output_lvl = val;
+        break;
+    default:
+        printf("Huh?! Only got 4 operators, brah..\n");
+    }
+}
+
+void dxsynth_set_portamento_time_ms(dxsynth *d, double val)
+{
+    if (val >= 0 && val <= 5000.0)
+        d->m_settings.m_portamento_time_ms = val;
+    else
+        printf("Val has to be between 0 - 5000.0\n");
+}
+
+void dxsynth_set_volume_db(dxsynth *d, double val)
+{
+    if (val >= -96 && val <= 20)
+        d->m_settings.m_volume_db = val;
+    else
+        printf("Val has to be between -96 and 20\n");
+}
+
+void dxsynth_set_pitchbend_range(dxsynth *d, unsigned int val)
+{
+    if (val <= 12)
+        d->m_settings.m_pitchbend_range = val;
+    else
+        printf("Val has to be between 0 and 12\n");
+}
+void dxsynth_set_voice_mode(dxsynth *d, unsigned int val)
+{
+    if (val < MAXDX)
+        d->m_settings.m_voice_mode = val;
+    else
+        printf("Val has to be [0-%d)\n", MAXDX);
+}
+
+void dxsynth_set_velocity_to_attack_scaling(dxsynth *d, bool b)
+{
+    d->m_settings.m_velocity_to_attack_scaling = b;
+}
+void dxsynth_set_note_number_to_decay_scaling(dxsynth *d, bool b)
+{
+    d->m_settings.m_note_number_to_decay_scaling = b;
+}
+
+void dxsynth_set_reset_to_zero(dxsynth *d, bool b)
+{
+    d->m_settings.m_reset_to_zero = b;
+}
+
+void dxsynth_set_legato_mode(dxsynth *d, bool b)
+{
+    d->m_settings.m_legato_mode = b;
+}
+
+void dxsynth_set_op4_feedback(dxsynth *d, double val)
+{
+    if (val >= 0 && val <= 70)
+        d->m_settings.m_op4_feedback = val;
+    else
+        printf("Op4 feedback val has to be [0-70]\n");
 }

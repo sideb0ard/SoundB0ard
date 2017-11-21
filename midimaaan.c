@@ -7,6 +7,7 @@
 
 #include "defjams.h"
 #include "digisynth.h"
+#include "dxsynth.h"
 #include "looper.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
@@ -206,6 +207,38 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         case (224):
         { // Hex 0xE0
             minisynth_midi_pitchbend(ms, ev.data1, ev.data2);
+            break;
+        }
+        default:
+            printf(
+                "HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
+        }
+    }
+    else if (sg->type == DXSYNTH_TYPE)
+    {
+        dxsynth *dx = (dxsynth *)sg;
+
+        switch (ev.event_type)
+        {
+        case (144):
+        { // Hex 0x80
+            // dxsynth_add_last_note(dx, ev.data1);
+            dxsynth_midi_note_on(dx, ev.data1, ev.data2);
+            break;
+        }
+        case (128):
+        { // Hex 0x90
+            dxsynth_midi_note_off(dx, ev.data1, ev.data2, true);
+            break;
+        }
+        case (176):
+        { // Hex 0xB0
+            dxsynth_midi_control(dx, ev.data1, ev.data2);
+            break;
+        }
+        case (224):
+        { // Hex 0xE0
+            dxsynth_midi_pitchbend(dx, ev.data1, ev.data2);
             break;
         }
         default:
