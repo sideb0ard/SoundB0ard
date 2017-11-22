@@ -9,6 +9,7 @@
 
 #include "defjams.h"
 #include "digisynth.h"
+#include "dxsynth.h"
 #include "keys.h"
 #include "midimaaan.h"
 #include "minisynth.h"
@@ -97,6 +98,14 @@ void keys(int soundgen_num)
                         (digisynth *)mixr->sound_generators[soundgen_num];
                     printf("RANDOM MONDY mode NAE DIGI YET!\n");
                     (void)ds;
+                }
+                else if (mixr->sound_generators[soundgen_num]->type ==
+                         DXSYNTH_TYPE)
+                {
+                    dxsynth *dx =
+                        (dxsynth *)mixr->sound_generators[soundgen_num];
+                    printf("RANDOM MONDY DX!\n");
+                    dxsynth_rand_settings(dx);
                 }
                 break;
             default:

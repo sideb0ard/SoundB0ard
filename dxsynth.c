@@ -574,18 +574,18 @@ void dxsynth_status(void *self, wchar_t *status_string)
 
 void dxsynth_setvol(void *self, double v)
 {
-    dxsynth *ms = (dxsynth *)self;
+    dxsynth *dx = (dxsynth *)self;
     if (v < 0.0 || v > 1.0)
     {
         return;
     }
-    ms->m_settings.m_volume_db = v;
+    dx->vol = v;
 }
 
 double dxsynth_getvol(void *self)
 {
-    dxsynth *ms = (dxsynth *)self;
-    return ms->m_settings.m_volume_db;
+    dxsynth *dx = (dxsynth *)self;
+    return dx->vol;
 }
 
 int dxsynth_get_num_tracks(void *self)
@@ -611,7 +611,7 @@ stereo_val dxsynth_gennext(void *self)
     double accum_out_right = 0.0;
 
     // float mix = 1.0 / MAX_DX_VOICES;
-    float mix = 0.33;
+    float mix = 0.25;
 
     double out_left = 0.0;
     double out_right = 0.0;
@@ -636,13 +636,66 @@ stereo_val dxsynth_gennext(void *self)
     return (stereo_val){.left = accum_out_left, .right = accum_out_right};
 }
 
-void dxsynth_rand_settings(dxsynth *ms)
+void dxsynth_rand_settings(dxsynth *dx)
 {
-    printf("Randomizing SYNTH!\n");
+    printf("Randomizing DXSYNTH!\n");
 
-    dxsynth_update(ms);
+    dx->m_settings.m_voice_mode = rand() % 8;
+    //dx->m_settings.m_portamento_time_ms = rand() % 5000;
+    //dx->m_settings.m_pitchbend_range = (rand() % 12) + 1;
+    //dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
+    //dx->m_settings.m_note_number_to_decay_scaling = rand() % 2;
+    //dx->m_settings.m_reset_to_zero = rand() % 2;
+    //dx->m_settings.m_legato_mode = rand() % 2;
 
-    dxsynth_print_settings(ms);
+    dx->m_settings.m_lfo1_intensity = ((float)rand()) / RAND_MAX;
+    dx->m_settings.m_lfo1_rate = 0.02 + ((float)rand()) / (RAND_MAX/20);
+    dx->m_settings.m_lfo1_waveform = rand() % MAX_LFO_OSC;
+    dx->m_settings.m_lfo1_mod_dest1 = rand() % 3;
+    dx->m_settings.m_lfo1_mod_dest2 = rand() % 3;
+    dx->m_settings.m_lfo1_mod_dest3 = rand() % 3;
+    dx->m_settings.m_lfo1_mod_dest4 = rand() % 3;
+
+    //dx->m_settings.m_op1_waveform = rand() % MAX_OSC;
+    dx->m_settings.m_op1_ratio =  0.1 + ((float)rand()) / (RAND_MAX/10);
+    //dx->m_settings.m_op1_detune_cents = (rand() % 200) - 100;
+    //dx->m_settings.m_eg1_attack_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg1_decay_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
+    //dx->m_settings.m_eg1_release_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_op1_output_lvl = ((float)rand()) / RAND_MAX;
+
+    //dx->m_settings.m_op2_waveform = rand() % MAX_OSC;
+    dx->m_settings.m_op2_ratio =  0.1 + ((float)rand()) / (RAND_MAX/10);
+    //dx->m_settings.m_op2_detune_cents = (rand() % 200) - 100;
+    //dx->m_settings.m_eg2_attack_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg2_decay_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg2_sustain_lvl = ((float)rand()) / RAND_MAX;
+    //dx->m_settings.m_eg2_release_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_op2_output_lvl = ((float)rand()) / RAND_MAX;
+
+    //dx->m_settings.m_op3_waveform = rand() % MAX_OSC;
+    dx->m_settings.m_op3_ratio =  0.1 + ((float)rand()) / (RAND_MAX/10);
+    //dx->m_settings.m_op3_detune_cents = (rand() % 200) - 100;
+    //dx->m_settings.m_eg3_attack_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg3_decay_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg3_sustain_lvl = ((float)rand()) / RAND_MAX;
+    //dx->m_settings.m_eg3_release_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_op3_output_lvl = ((float)rand()) / RAND_MAX;
+
+    //dx->m_settings.m_op4_waveform = rand() % MAX_OSC;
+    dx->m_settings.m_op4_ratio =  0.1 + ((float)rand()) / (RAND_MAX/10);
+    //dx->m_settings.m_op4_detune_cents = (rand() % 200) - 100;
+    //dx->m_settings.m_eg4_attack_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg4_decay_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
+    //dx->m_settings.m_eg4_release_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_op4_output_lvl = ((float)rand()) / RAND_MAX;
+    //dx->m_settings.m_op4_feedback = rand() % 70;
+
+
+    dxsynth_update(dx);
+    //dxsynth_print_settings(dx);
 }
 
 bool dxsynth_save_settings(dxsynth *ms, char *preset_name)
