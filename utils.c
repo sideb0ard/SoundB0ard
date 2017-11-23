@@ -914,3 +914,30 @@ double clamp(double min, double max, double v)
         return max;
     return v;
 }
+
+void print_bin_num(int num)
+{
+    int len = sizeof(num)*8;
+    for ( int i = len; i > 0; --i)
+    {
+        if (num & 1 << i)
+            printf("1");
+        else
+            printf("0");
+    }
+    printf("\n");
+}
+int how_many_bits_in_num(unsigned int num)
+{
+    printf("My num is %u\n", num);
+    int len = sizeof(num)*8;
+    int count = 0;
+    for ( int i = len; i > 0; --i)
+    {
+        if (num & 1 << i){
+            count++;
+            printf("Position %d\n", i);
+        }
+    }
+    return count;
+}

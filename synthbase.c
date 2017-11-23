@@ -73,29 +73,46 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
             generated_melody_note_num[generated_melody_note_num_idx++] = randy;
         }
     }
+    printf("Num notes:%d ", rand_num_notes);
+    for (int i = 0; i < rand_num_notes; ++i)
+        printf("%d(%s) ", generated_melody_note_num[i], key_names[generated_melody_note_num[i]]);
+    printf("\n");
 
-    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
-    {
-        if (generated_melody_note_num[i] != -99)
-        {
-            int idx = generated_melody_note_num[i];
 
-            int rand_steps = (rand() % max_steps) + 1;
-            int bitpattern = create_euclidean_rhythm(rand_steps, 32);
-            if (rand() % 2 == 1)
-                bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
+    int rand_steps = (rand() % max_steps);
+    int num_hits = rand_steps;
+    int bitpattern = create_euclidean_rhythm(rand_steps, 32);
+    if (rand() % 2 == 1)
+        bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
+    rand_steps = (rand() % max_steps);
+    num_hits += rand_steps;
+    bitpattern += create_euclidean_rhythm(rand_steps, 32);
 
-            for (int i = 31; i >= 0; i--)
-            {
-                if (bitpattern & 1 << i)
-                {
-                    synthbase_add_note(
-                        base, melody_num, 31 - i,
-                        key_midi_mapping[compat_keys[mixr->key][idx]]); // THIS!
-                }
-            }
-        }
-    }
+    print_bin_num(bitpattern);
+    printf("I gots %d hits\n",  how_many_bits_in_num(bitpattern));
+
+    //for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+    //{
+    //    if (generated_melody_note_num[i] != -99)
+    //    {
+    //        int idx = generated_melody_note_num[i];
+
+    //        int rand_steps = (rand() % max_steps) + 1;
+    //        int bitpattern = create_euclidean_rhythm(rand_steps, 32);
+    //        if (rand() % 2 == 1)
+    //            bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
+
+    //        for (int i = 31; i >= 0; i--)
+    //        {
+    //            if (bitpattern & 1 << i)
+    //            {
+    //                synthbase_add_note(
+    //                    base, melody_num, 31 - i,
+    //                    key_midi_mapping[compat_keys[mixr->key][idx]]); // THIS!
+    //            }
+    //        }
+    //    }
+    //}
 }
 
 void synthbase_set_multi_melody_mode(synthbase *ms, bool melody_mode)

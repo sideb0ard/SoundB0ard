@@ -40,6 +40,8 @@ int create_euclidean_rhythm(int num_beats, int len_pattern)
         printf("Are ye nuts, man?!\n");
         return 0;
     }
+    if (num_beats == 0)
+        return 0;
 
     // The 'remainder'
     // array is used to tell us if the level l string contains a level l − 2
