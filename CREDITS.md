@@ -6,7 +6,6 @@ Mixer setup and name Sound Generator taken from:
 Background theory and introductory C lessons from:  
 ["The Audio Programming Books" Edited by Richard Boulanger and Victor Lazzarini](https://mitpress.mit.edu/books/audio-programming-book)
 
-The Minisynth and DXsynth design, plus multiple plugins gratuitously borrowed from these amazing books by Will Pirkle:  
+The Minisynth and DXsynth design, plus multiple plugins gratuitously borrowed from these amazing books by [Will Pirkle]((http://www.willpirkle.com/about/books/):  
 - "Designing Audio Effect Plug-Ins in C++"
-- "Designing Software Synthesizer Plug-Ins in C++"  
-[http://www.willpirkle.com/about/books/](http://www.willpirkle.com/about/books/)
+- "Designing Software Synthesizer Plug-Ins in C++"
