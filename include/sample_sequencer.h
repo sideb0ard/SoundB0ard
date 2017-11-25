@@ -41,17 +41,6 @@ typedef struct sample_sequencer
 
     double vol;
 
-    filter_moogladder m_filter;
-    double m_fc_control;
-    double m_q_control;
-    stereodelay m_delay_fx;
-
-    double m_delay_time_msec;
-    double m_feedback_pct;
-    double m_delay_ratio;
-    double m_wet_mix;
-    unsigned int m_delay_mode;
-
 } sample_sequencer;
 
 sample_sequencer *new_sample_seq(char *filename);
