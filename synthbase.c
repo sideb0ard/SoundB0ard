@@ -58,16 +58,16 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     if (max_steps == 0)
         max_steps = 9;
 
-    // printf("MAX NOTES %d MAX STEPS: %d\n", max_notes, max_steps);
     // 1. generate NOTES/MELODY
     int rand_num_notes = (rand() % max_notes);
     if (rand_num_notes == 0)
-        rand_num_notes = 1;
-    //int generated_melody_note_num[NUM_COMPAT_NOTES];
+        return;
+
     int generated_melody_note_num[rand_num_notes];
-    for (int i = 0; i < NUM_COMPAT_NOTES; i++)
+    for (int i = 0; i < rand_num_notes; i++)
         generated_melody_note_num[i] = -99;
     int generated_melody_note_num_idx = 0;
+
     while (generated_melody_note_num_idx < rand_num_notes)
     {
         int randy = rand() % (NUM_COMPAT_NOTES);
@@ -103,12 +103,13 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     int generated_melody_note_num_hits[rand_num_notes];
     for (int i = 0 ; i < rand_num_notes; ++i)
         generated_melody_note_num_hits[i] = largest_divisor;
-    //printf("Largest div: %d Remainder:%d\n", largest_divisor, rem);
+
     if (rem > 0)
         generated_melody_note_num_hits[rand()%rand_num_notes] += rem;
 
     //for (int i = 0 ; i < rand_num_notes; i++)
     //    printf("Playing %s %d times\n", key_names[generated_melody_note_num[i]], generated_melody_note_num_hits[i]);
+
 
     int cur_key = 0;
     int cur_key_count = 0;
