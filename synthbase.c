@@ -94,7 +94,7 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     num_steps += rand_steps;
     bitpattern += create_euclidean_rhythm(num_steps, 32);
 
-    print_bin_num(bitpattern);
+    //print_bin_num(bitpattern);
     int num_hits = how_many_bits_in_num(bitpattern);
     //printf("I gots %d hits\n", num_hits);
 
