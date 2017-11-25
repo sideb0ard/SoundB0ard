@@ -23,7 +23,7 @@ wt_osc *wt_osc_new()
 
 void wt_initialize(wt_osc *wt)
 {
-    osc_new_settings(&wt->m_osc);
+    osc_new_settings(&wt->osc);
 
     memset(wt->m_saw_tables, 0, NUM_TABLES * sizeof(double));
     memset(wt->m_tri_tables, 0, NUM_TABLES * sizeof(double));
@@ -47,20 +47,29 @@ void wt_initialize(wt_osc *wt)
     wt->m_square_corr_factor[8] = 0.25;
 
     wt_create_wave_tables(wt);
+    wt->osc.do_oscillate = &wt_do_oscillate;
+    wt->osc.start_oscillator = &wt_start;
+    wt->osc.stop_oscillator = &wt_stop;
+    wt->osc.reset_oscillator = &wt_reset;
+    wt->osc.update_oscillator = &wt_update; // from base class
 }
 
-void wt_reset(wt_osc *wt)
+void wt_reset(oscillator *self)
 {
-    osc_reset(&wt->m_osc);
+    wt_osc *wt = (wt_osc *)self;
+
+    osc_reset(&wt->osc);
     wt->m_read_idx = 0;
     wt->m_read_idx2 = 0;
 
-    wt_update(wt);
+    wt_update(self);
 }
 
-double wt_do_oscillate(wt_osc *wt, double *quad_outval)
+double wt_do_oscillate(oscillator *self, double *quad_outval)
 {
-    if (!wt->m_osc.m_note_on)
+    wt_osc *wt = (wt_osc *)self;
+
+    if (!wt->osc.m_note_on)
     {
         if (quad_outval)
             *quad_outval = 0.0;
@@ -68,7 +77,7 @@ double wt_do_oscillate(wt_osc *wt, double *quad_outval)
         return 0.0;
     }
 
-    if (wt->m_osc.m_waveform == SQUARE && wt->m_current_table_idx >= 0)
+    if (wt->osc.m_waveform == SQUARE && wt->m_current_table_idx >= 0)
     {
         double out = wt_do_square_wave(wt);
         if (quad_outval)
@@ -77,24 +86,24 @@ double wt_do_oscillate(wt_osc *wt, double *quad_outval)
     }
 
     double outval = wt_do_wave_table(wt, &wt->m_read_idx, wt->m_wt_inc);
-    if (wt->m_osc.m_v_modmatrix)
+    if (wt->osc.m_v_modmatrix)
     {
-        wt->m_osc.m_v_modmatrix->m_sources[wt->m_osc.m_mod_dest_output1] =
-            outval * wt->m_osc.m_amplitude * wt->m_osc.m_amp_mod;
-        wt->m_osc.m_v_modmatrix->m_sources[wt->m_osc.m_mod_dest_output2] =
-            outval * wt->m_osc.m_amplitude * wt->m_osc.m_amp_mod;
+        wt->osc.m_v_modmatrix->m_sources[wt->osc.m_mod_dest_output1] =
+            outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
+        wt->osc.m_v_modmatrix->m_sources[wt->osc.m_mod_dest_output2] =
+            outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
     }
 
     if (quad_outval)
-        *quad_outval = outval * wt->m_osc.m_amplitude * wt->m_osc.m_amp_mod;
+        *quad_outval = outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
 
-    return outval * wt->m_osc.m_amplitude * wt->m_osc.m_amp_mod;
+    return outval * wt->osc.m_amplitude * wt->osc.m_amp_mod;
 }
 
 double wt_do_wave_table(wt_osc *wt, double *read_idx, double wt_inc)
 {
     double out = 0.;
-    double mod_read_idx = *read_idx + wt->m_osc.m_phase_mod * WT_LENGTH;
+    double mod_read_idx = *read_idx + wt->osc.m_phase_mod * WT_LENGTH;
     wt_check_wrap_index(&mod_read_idx);
 
     int i_read_idx = abs((int)mod_read_idx);
@@ -115,7 +124,7 @@ double wt_do_square_wave(wt_osc *wt)
 
 double wt_do_square_wave_core(wt_osc *wt, double *read_idx, double wt_inc)
 {
-    double pw = wt->m_osc.m_pulse_width / 100;
+    double pw = wt->osc.m_pulse_width / 100;
     double pwidx = *read_idx + pw * WT_LENGTH;
 
     double saw1 = wt_do_wave_table(wt, read_idx, wt_inc);
@@ -144,14 +153,23 @@ double wt_do_square_wave_core(wt_osc *wt, double *read_idx, double wt_inc)
     return out;
 }
 
-void wt_start(wt_osc *wt) { wt->m_osc.m_note_on = true; }
-
-void wt_stop(wt_osc *wt) { wt->m_osc.m_note_on = false; }
-
-void wt_update(wt_osc *wt)
+void wt_start(oscillator *self)
 {
-    osc_update(&wt->m_osc);
-    wt->m_wt_inc = (double)WT_LENGTH * wt->m_osc.m_inc;
+    wt_osc *wt = (wt_osc *)self;
+    wt->osc.m_note_on = true;
+}
+
+void wt_stop(oscillator *self)
+{
+    wt_osc *wt = (wt_osc *)self;
+    wt->osc.m_note_on = false;
+}
+
+void wt_update(oscillator *self)
+{
+    wt_osc *wt = (wt_osc *)self;
+    osc_update(&wt->osc);
+    wt->m_wt_inc = (double)WT_LENGTH * wt->osc.m_inc;
     wt_select_table(wt);
 }
 
@@ -164,22 +182,22 @@ void wt_select_table(wt_osc *wt)
         return;
     }
 
-    if (wt->m_osc.m_waveform == SAW1 || wt->m_osc.m_waveform == SAW2 ||
-        wt->m_osc.m_waveform == SAW3 || wt->m_osc.m_waveform == SQUARE)
+    if (wt->osc.m_waveform == SAW1 || wt->osc.m_waveform == SAW2 ||
+        wt->osc.m_waveform == SAW3 || wt->osc.m_waveform == SQUARE)
         wt->m_current_table = wt->m_saw_tables[wt->m_current_table_idx];
-    else if (wt->m_osc.m_waveform == TRI)
+    else if (wt->osc.m_waveform == TRI)
         wt->m_current_table = wt->m_tri_tables[wt->m_current_table_idx];
 }
 
 int wt_get_table_index(wt_osc *wt)
 {
-    if (wt->m_osc.m_waveform == SINE)
+    if (wt->osc.m_waveform == SINE)
         return -1;
 
     double seed_freq = 27.5; // A0
     for (int i = 0; i < NUM_TABLES; ++i)
     {
-        if (wt->m_osc.m_fo <= seed_freq)
+        if (wt->osc.m_fo <= seed_freq)
             return i;
 
         seed_freq *= 2.0;

@@ -46,18 +46,18 @@ void modfilter_init(modfilter *mf)
 
     modfilter_update(mf);
 
-    wt_start(&mf->m_fc_lfo);
-    wt_start(&mf->m_q_lfo);
+    wt_start((oscillator *)&mf->m_fc_lfo);
+    wt_start((oscillator *)&mf->m_q_lfo);
 }
 
 void modfilter_update(modfilter *mf)
 {
-    mf->m_fc_lfo.m_osc.m_osc_fo = mf->m_mod_rate_fc;
-    mf->m_q_lfo.m_osc.m_osc_fo = mf->m_mod_rate_q;
-    mf->m_fc_lfo.m_osc.m_waveform = mf->m_lfo_waveform;
-    mf->m_q_lfo.m_osc.m_waveform = mf->m_lfo_waveform;
-    wt_update(&mf->m_fc_lfo);
-    wt_update(&mf->m_q_lfo);
+    mf->m_fc_lfo.osc.m_osc_fo = mf->m_mod_rate_fc;
+    mf->m_q_lfo.osc.m_osc_fo = mf->m_mod_rate_q;
+    mf->m_fc_lfo.osc.m_waveform = mf->m_lfo_waveform;
+    mf->m_q_lfo.osc.m_waveform = mf->m_lfo_waveform;
+    wt_update((oscillator *)&mf->m_fc_lfo);
+    wt_update((oscillator *)&mf->m_q_lfo);
 }
 
 double modfilter_calculate_cutoff_freq(modfilter *mf, double lfo_sample)
@@ -127,12 +127,12 @@ bool modfilter_process_audio(modfilter *mf, double *in, double *out)
     double yn = 0.0;
     double yqn = 0; // quad phase
 
-    yn = wt_do_oscillate(&mf->m_fc_lfo, &yqn);
+    yn = wt_do_oscillate((oscillator *)&mf->m_fc_lfo, &yqn);
     double fc = modfilter_calculate_cutoff_freq(mf, yn);
     double fcq = modfilter_calculate_cutoff_freq(mf, yqn);
     // printf("LFO FC: %f FC: %f\n", yn, fc);
 
-    yn = wt_do_oscillate(&mf->m_q_lfo, &yqn);
+    yn = wt_do_oscillate((oscillator *)&mf->m_q_lfo, &yqn);
     double q = modfilter_calculate_q(mf, yn);
     double qq = modfilter_calculate_q(mf, yqn);
     // printf("LFO Q: %f Q: %f\n", yn, q);

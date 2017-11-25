@@ -39,7 +39,7 @@ mod_delay *new_mod_delay()
     md->m_lfo_type = 0; // TRI or SINE // these don't match other OSC enums
 
     mod_delay_update(md);
-    wt_start(&md->m_lfo);
+    wt_start((oscillator *)&md->m_lfo);
 
     return md;
 }
@@ -86,10 +86,10 @@ void mod_delay_cook_mod_type(mod_delay *md)
 
 void mod_delay_update_lfo(mod_delay *md)
 {
-    md->m_lfo.m_osc.m_osc_fo = md->m_mod_freq;
-    md->m_lfo.m_osc.m_waveform =
+    md->m_lfo.osc.m_osc_fo = md->m_mod_freq;
+    md->m_lfo.osc.m_waveform =
         md->m_lfo_type == 0 ? 3 : 0; // tri or sine // dumb and mixed up
-    wt_update(&md->m_lfo);
+    wt_update((oscillator *)&md->m_lfo);
 }
 
 void mod_delay_update_ddl(mod_delay *md)
@@ -128,7 +128,7 @@ bool mod_delay_process_audio(mod_delay *md, double *input_left,
 
     double yn = 0;
     double yqn = 0;
-    yn = wt_do_oscillate(&md->m_lfo, &yqn);
+    yn = wt_do_oscillate((oscillator *)&md->m_lfo, &yqn);
     // yn = scaleybum(-1.0, 1.0, 0, 1.0, yn);
 
     double delay = 0.0;

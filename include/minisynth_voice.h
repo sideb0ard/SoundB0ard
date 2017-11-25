@@ -3,6 +3,7 @@
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
 #include "voice.h"
+#include "wt_oscillator.h"
 
 typedef enum {
     Saw3,
@@ -18,10 +19,14 @@ typedef struct
 {
     voice m_voice;
 
-    qblimited_oscillator m_osc1;
-    qblimited_oscillator m_osc2;
-    qblimited_oscillator m_osc3;
-    qblimited_oscillator m_osc4;
+    // qblimited_oscillator m_osc1;
+    // qblimited_oscillator m_osc2;
+    // qblimited_oscillator m_osc3;
+    // qblimited_oscillator m_osc4;
+    wt_oscillator m_osc1;
+    wt_oscillator m_osc2;
+    wt_oscillator m_osc3;
+    wt_oscillator m_osc4;
 
     filter_moogladder m_moog_ladder_filter;
 

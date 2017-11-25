@@ -136,8 +136,7 @@ stereo_val sample_seq_gennext(void *self)
     val = effector(&seq->sound_generator, val);
     val = envelopor(&seq->sound_generator, val);
 
-    return (stereo_val){.left = val * seq->vol,
-                        .right = val * seq->vol};
+    return (stereo_val){.left = val * seq->vol, .right = val * seq->vol};
 }
 
 sample_sequencer *new_sample_seq_from_char_pattern(char *filename,

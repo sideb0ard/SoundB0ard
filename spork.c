@@ -46,7 +46,7 @@ stereo_val spork_gennext(void *sg)
         return return_val;
 
     double quad_return_val = 0.;
-    scratch_val = wt_do_oscillate(&s->m_osc, &quad_return_val);
+    scratch_val = wt_do_oscillate((oscillator *)&s->m_osc, &quad_return_val);
     scratch_val = effector(&s->sg, scratch_val);
     scratch_val = envelopor(&s->sg, scratch_val);
 
@@ -80,14 +80,14 @@ void spork_setvol(void *self, double v)
 void spork_start(void *self)
 {
     spork *s = (spork *)self;
-    wt_start(&s->m_osc);
+    wt_start((oscillator *)&s->m_osc);
     s->active = true;
 }
 
 void spork_stop(void *self)
 {
     spork *s = (spork *)self;
-    wt_stop(&s->m_osc);
+    wt_stop((oscillator *)&s->m_osc);
     s->active = false;
 }
 
@@ -134,5 +134,5 @@ void spork_update(spork *s)
     // s->m_osc.waveform = s->waveform;
     // s->m_osc.mode = s->mode;
     // s->m_osc.polarity = s->polarity;
-    wt_update(&s->m_osc);
+    wt_update((oscillator *)&s->m_osc);
 }

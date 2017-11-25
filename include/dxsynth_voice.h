@@ -15,15 +15,14 @@ typedef struct
 {
     voice m_voice;
 
-    // wt_oscillator m_op1;
-    // wt_oscillator m_op2;
-    // wt_oscillator m_op3;
-    // wt_oscillator m_op4;
-
     qblimited_oscillator m_op1;
     qblimited_oscillator m_op2;
     qblimited_oscillator m_op3;
     qblimited_oscillator m_op4;
+    // wt_oscillator m_op1;
+    // wt_oscillator m_op2;
+    // wt_oscillator m_op3;
+    // wt_oscillator m_op4;
 
     double m_op1_feedback;
     double m_op2_feedback;
