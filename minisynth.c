@@ -36,7 +36,7 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
-    synthbase_init(&ms->base, (void *)ms);
+    synthbase_init(&ms->base, (void *)ms, MINISYNTH_TYPE);
 
     ms->sound_generator.gennext = &minisynth_gennext;
     ms->sound_generator.status = &minisynth_status;

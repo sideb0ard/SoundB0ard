@@ -14,7 +14,7 @@ digisynth *new_digisynth(char *filename)
         return NULL;
     }
 
-    synthbase_init(&ds->base, (void *)ds);
+    synthbase_init(&ds->base, (void *)ds, DIGISYNTH_TYPE);
 
     strncpy(ds->audiofile, filename, 1023);
 

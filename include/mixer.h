@@ -4,6 +4,7 @@
 #include <portaudio.h>
 
 #include "defjams.h"
+#include "dxsynth.h"
 #include "fx.h"
 #include "minisynth.h"
 #include "sbmsg.h"
