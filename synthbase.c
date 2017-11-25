@@ -59,10 +59,12 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
         max_steps = 9;
 
     // printf("MAX NOTES %d MAX STEPS: %d\n", max_notes, max_steps);
+    // 1. generate NOTES/MELODY
     int rand_num_notes = (rand() % max_notes);
     if (rand_num_notes == 0)
         rand_num_notes = 1;
-    int generated_melody_note_num[NUM_COMPAT_NOTES];
+    //int generated_melody_note_num[NUM_COMPAT_NOTES];
+    int generated_melody_note_num[rand_num_notes];
     for (int i = 0; i < NUM_COMPAT_NOTES; i++)
         generated_melody_note_num[i] = -99;
     int generated_melody_note_num_idx = 0;
@@ -70,28 +72,61 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     {
         int randy = rand() % (NUM_COMPAT_NOTES);
         if (!is_int_member_in_array(randy, generated_melody_note_num,
-                                    NUM_COMPAT_NOTES))
+                                    rand_num_notes))
         {
             generated_melody_note_num[generated_melody_note_num_idx++] = randy;
         }
     }
-    printf("Num notes:%d ", rand_num_notes);
-    for (int i = 0; i < rand_num_notes; ++i)
-        printf("%d(%s) ", generated_melody_note_num[i],
-               key_names[generated_melody_note_num[i]]);
-    printf("\n");
+    //printf("Num notes:%d ", rand_num_notes);
+    //for (int i = 0; i < rand_num_notes; ++i)
+    //    printf("%d(%s) ", generated_melody_note_num[i],
+    //           key_names[generated_melody_note_num[i]]);
+    //printf("\n");
+    // END NOTES/MELODY
 
-    int rand_steps = (rand() % max_steps);
-    int num_hits = rand_steps;
+    // 2. PLACEMENT OF NOTES
+    int rand_steps = (rand() % max_steps / 2);
+    int num_steps = rand_steps;
     int bitpattern = create_euclidean_rhythm(rand_steps, 32);
     if (rand() % 2 == 1)
         bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-    rand_steps = (rand() % max_steps);
-    num_hits += rand_steps;
-    bitpattern += create_euclidean_rhythm(rand_steps, 32);
+    rand_steps = (rand() % max_steps / 2);
+    num_steps += rand_steps;
+    bitpattern += create_euclidean_rhythm(num_steps, 32);
 
     print_bin_num(bitpattern);
-    printf("I gots %d hits\n", how_many_bits_in_num(bitpattern));
+    int num_hits = how_many_bits_in_num(bitpattern);
+    //printf("I gots %d hits\n", num_hits);
+
+    int largest_divisor = num_hits / rand_num_notes;
+    int rem = num_hits % rand_num_notes;
+    int generated_melody_note_num_hits[rand_num_notes];
+    for (int i = 0 ; i < rand_num_notes; ++i)
+        generated_melody_note_num_hits[i] = largest_divisor;
+    //printf("Largest div: %d Remainder:%d\n", largest_divisor, rem);
+    if (rem > 0)
+        generated_melody_note_num_hits[rand()%rand_num_notes] += rem;
+
+    //for (int i = 0 ; i < rand_num_notes; i++)
+    //    printf("Playing %s %d times\n", key_names[generated_melody_note_num[i]], generated_melody_note_num_hits[i]);
+
+    int cur_key = 0;
+    int cur_key_count = 0;
+    for (int i = 31; i >= 0; i--)
+    {
+        if (bitpattern & 1 << i)
+        {
+            synthbase_add_note(
+                base, melody_num, 31 - i,
+                key_midi_mapping[compat_keys[mixr->key][cur_key]]);
+            cur_key_count++;
+            if (cur_key_count >= generated_melody_note_num_hits[cur_key])
+            {
+                cur_key++;
+                cur_key_count = 0;
+            }
+        }
+    }
 
     // for (int i = 0; i < NUM_COMPAT_NOTES; i++)
     //{
@@ -154,6 +189,17 @@ void synthbase_reset_melody_all(synthbase *ms)
 
 void synthbase_reset_melody(synthbase *base, unsigned int melody_num)
 {
+    if (base->parent_synth_type == MINISYNTH_TYPE)
+    {
+        minisynth *p = (minisynth *)base->parent;
+        minisynth_stop(p);
+    }
+    else if (base->parent_synth_type == DXSYNTH_TYPE)
+    {
+        dxsynth *p = (dxsynth *)base->parent;
+        dxsynth_stop(p);
+    }
+
     if (melody_num < MAX_NUM_MIDI_LOOPS)
     {
         for (int i = 0; i < PPNS; i++)
