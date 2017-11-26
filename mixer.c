@@ -83,21 +83,22 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(COOL_COLOR_GREEN
-           "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_GREEN
-           "] Volume: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           "] Key: " ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN
-           " // BPM: " ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           " // TICK: " ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
-           " // Qtick: " ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
-           " // Scene: " ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
-           " // Debug: " ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
-           "::::: PPQN: %d PPSIXTEENTH: %d PPTWENTYFOURTH: %d PPBAR: %d PPNS: "
-           "%d " ANSI_COLOR_RESET,
-           mixr->volume, key_names[mixr->key], mixr->bpm,
-           mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
-           mixr->current_scene, mixr->debug_mode ? "true" : "false", PPQN,
-           PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS);
+    printf(
+        COOL_COLOR_GREEN
+        "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_GREEN
+        "] Volume:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+        "] Key:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN
+        " // BPM:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+        " // TICK:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
+        " // Qtick:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
+        " // Debug:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
+        "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d \n"
+        "::::: NumScenes:%d ActiveScene:%d MidiRecieverSG:%d" ANSI_COLOR_RESET,
+        mixr->volume, key_names[mixr->key], mixr->bpm,
+        mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
+        mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPTWENTYFOURTH,
+        PPBAR, PPNS, mixr->num_scenes, mixr->current_scene,
+        mixr->active_midi_soundgen_num);
 
     if (mixr->env_var_count > 0)
     {
@@ -114,9 +115,7 @@ void mixer_ps(mixer *mixr)
     if (mixr->num_scenes > 0)
     {
         printf(COOL_COLOR_GREEN "::::: [" ANSI_COLOR_WHITE
-                                "scene mode: %s" COOL_COLOR_GREEN
-                                "] .....] - \n",
-               mixr->scene_mode ? "true" : "false");
+                                "scenes" COOL_COLOR_GREEN "] .....]\n");
         for (int i = 0; i < mixr->num_scenes; i++)
         {
             printf("::::: [%d] - %d bars - ", i,

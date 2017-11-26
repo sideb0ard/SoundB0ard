@@ -75,8 +75,7 @@ void *midiman()
                 {
 
                     soundgenerator *sg =
-                        mixr
-                            ->sound_generators[mixr->active_midi_soundgen_num];
+                        mixr->sound_generators[mixr->active_midi_soundgen_num];
 
                     synthbase *base = get_synthbase(sg);
 

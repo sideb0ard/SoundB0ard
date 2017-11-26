@@ -62,9 +62,10 @@ int main()
 
     srand(time(NULL));
 
-	//// run the MIDI event looprrr...
+    //// run the MIDI event looprrr...
     pthread_t midi_th;
-    if (pthread_create(&midi_th, NULL, midiman, NULL)) {
+    if (pthread_create(&midi_th, NULL, midiman, NULL))
+    {
         fprintf(stderr, "Errrr, wit tha midi..\n");
         return -1;
     }

@@ -77,11 +77,11 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
             generated_melody_note_num[generated_melody_note_num_idx++] = randy;
         }
     }
-    //printf("Num notes:%d ", rand_num_notes);
-    //for (int i = 0; i < rand_num_notes; ++i)
+    // printf("Num notes:%d ", rand_num_notes);
+    // for (int i = 0; i < rand_num_notes; ++i)
     //    printf("%d(%s) ", generated_melody_note_num[i],
     //           key_names[generated_melody_note_num[i]]);
-    //printf("\n");
+    // printf("\n");
     // END NOTES/MELODY
 
     // 2. PLACEMENT OF NOTES
@@ -94,22 +94,23 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     num_steps += rand_steps;
     bitpattern += create_euclidean_rhythm(num_steps, 32);
 
-    //print_bin_num(bitpattern);
+    // print_bin_num(bitpattern);
     int num_hits = how_many_bits_in_num(bitpattern);
-    //printf("I gots %d hits\n", num_hits);
+    // printf("I gots %d hits\n", num_hits);
 
     int largest_divisor = num_hits / rand_num_notes;
     int rem = num_hits % rand_num_notes;
     int generated_melody_note_num_hits[rand_num_notes];
-    for (int i = 0 ; i < rand_num_notes; ++i)
+    for (int i = 0; i < rand_num_notes; ++i)
         generated_melody_note_num_hits[i] = largest_divisor;
 
     if (rem > 0)
-        generated_melody_note_num_hits[rand()%rand_num_notes] += rem;
+        generated_melody_note_num_hits[rand() % rand_num_notes] += rem;
 
-    //for (int i = 0 ; i < rand_num_notes; i++)
-    //    printf("Playing %s %d times\n", key_names[generated_melody_note_num[i]], generated_melody_note_num_hits[i]);
-
+    // for (int i = 0 ; i < rand_num_notes; i++)
+    //    printf("Playing %s %d times\n",
+    //    key_names[generated_melody_note_num[i]],
+    //    generated_melody_note_num_hits[i]);
 
     int cur_key = 0;
     int cur_key_count = 0;

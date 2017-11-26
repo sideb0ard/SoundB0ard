@@ -929,7 +929,7 @@ void print_bin_num(int num)
 }
 int how_many_bits_in_num(unsigned int num)
 {
-    //printf("My num is %u\n", num);
+    // printf("My num is %u\n", num);
     int len = sizeof(num) * 8;
     int count = 0;
     for (int i = len; i > 0; --i)
@@ -937,7 +937,7 @@ int how_many_bits_in_num(unsigned int num)
         if (num & 1 << i)
         {
             count++;
-            //printf("Position %d\n", i);
+            // printf("Position %d\n", i);
         }
     }
     return count;
