@@ -74,16 +74,18 @@ void *midiman()
                 if (mixr->midi_control_destination == SYNTH)
                 {
 
-                    minisynth *ms =
-                        (minisynth *)mixr
+                    soundgenerator *sg =
+                        mixr
                             ->sound_generators[mixr->active_midi_soundgen_num];
 
-                    if (ms->base.recording)
+                    synthbase *base = get_synthbase(sg);
+
+                    if (base->recording)
                     {
                         int tick = mixr->timing_info.midi_tick % PPNS;
                         midi_event ev =
                             new_midi_event(tick, status, data1, data2);
-                        synthbase_add_event(&ms->base, ms->base.cur_melody, ev);
+                        synthbase_add_event(base, base->cur_melody, ev);
                     }
 
                     midi_event ev;
@@ -91,37 +93,7 @@ void *midiman()
                     ev.data1 = data1;
                     ev.data2 = data2;
                     ev.delete_after_use = false;
-                    midi_parse_midi_event((soundgenerator *)ms, ev);
-                }
-                else if (mixr->midi_control_destination == DELAYFX)
-                {
-                    printf("MIDI CONTROLS! DELAY\n");
-                    fx *d =
-                        mixr->sound_generators[mixr->active_midi_soundgen_num]
-                            ->effects[mixr->active_midi_soundgen_effect_num];
-                    switch (status)
-                    {
-                    case (176):
-                    {
-                        midi_delay_control(d, data1, data2);
-                    }
-                    }
-                }
-                else if (mixr->midi_control_destination == MIDISEQUENCER)
-                {
-                    printf("SAMPLE SEQUENCER MIDI CONTROL!\n");
-                    sample_sequencer *s =
-                        (sample_sequencer *)mixr
-                            ->sound_generators[mixr->active_midi_soundgen_num];
-                    sample_seq_parse_midi(s, data1, data2);
-                }
-                else if (mixr->midi_control_destination == MIDISPORK)
-                {
-                    printf("MIDI CONTROLS! SPORK\n");
-                    spork *s =
-                        (spork *)mixr
-                            ->sound_generators[mixr->active_midi_soundgen_num];
-                    spork_parse_midi(s, data1, data2);
+                    midi_parse_midi_event(sg, ev);
                 }
                 else
                 {
@@ -159,25 +131,6 @@ midi_event new_midi_event(int tick, int event_type, int data1, int data2)
                      .data2 = data2,
                      .delete_after_use = false};
     return ev;
-}
-
-void spork_parse_midi(spork *s, int data1, int data2)
-{
-    (void)s;
-    (void)data1;
-    (void)data2;
-    printf("SPORKMIDIiii!\n");
-}
-
-void midi_delay_control(fx *e, int data1, int data2)
-{
-    if (e->type != DELAY && e->type != MODDELAY && e->type != REVERB)
-    {
-        printf("OOft, mate, i'm no an accepted FX - cannae help you out\n");
-        return;
-    }
-    (void)data1;
-    (void)data2;
 }
 
 void midi_parse_midi_event(soundgenerator *sg, midi_event ev)

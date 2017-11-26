@@ -135,11 +135,6 @@ typedef enum { MONO, LEGATO } legato_mode;
 typedef enum {
     NONE,
     SYNTH,
-    DELAYFX,
-    MIDISPORK,
-    MIDISEQUENCER,
-    MIDISYNTHDRUM,
-    MIDILOOPER
 } midi_control_type;
 
 typedef struct mixer_timing_info

@@ -64,7 +64,4 @@ stereo_val sample_seq_gennext(void *self);
 double sample_seq_getvol(void *self);
 
 void sample_seq_import_file(sample_sequencer *s, char *filename);
-void sample_seq_parse_midi(sample_sequencer *s, unsigned int data1,
-                           unsigned int data2);
-
 void sample_sequencer_reset_samples(sample_sequencer *seq);

@@ -628,8 +628,6 @@ void interpret(char *line)
                 pattern_char_to_pattern(
                     &s->m_seq, pattern,
                     s->m_seq.patterns[s->m_seq.num_patterns++]);
-                mixr->midi_control_destination = MIDISEQUENCER;
-                mixr->active_midi_soundgen_num = sgnum;
             }
             else
             {
@@ -644,8 +642,6 @@ void interpret(char *line)
                         printf("MIDI goes to Da Winner .. "
                                "Sequencer %d\n",
                                soundgen_num);
-                        mixr->midi_control_destination = MIDISEQUENCER;
-                        mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("load", wurds[2], 4) == 0 ||
                              strncmp("import", wurds[2], 6) == 0)
@@ -912,8 +908,6 @@ void interpret(char *line)
                 int loop_len = atoi(wurds[2]);
                 int soundgen_num = add_looper(mixr, wurds[1], loop_len);
                 printf("soundgenerator %d\n", soundgen_num);
-                mixr->midi_control_destination = MIDILOOPER;
-                mixr->active_midi_soundgen_num = soundgen_num;
             }
             else
             {
@@ -957,11 +951,6 @@ void interpret(char *line)
                                                             numloops);
                             }
                         }
-                    }
-                    else if (strncmp("midi", wurds[2], 4) == 0)
-                    {
-                        mixr->midi_control_destination = MIDILOOPER;
-                        mixr->active_midi_soundgen_num = soundgen_num;
                     }
                     else if (strncmp("multi", wurds[2], 5) == 0)
                     {
@@ -1100,6 +1089,8 @@ void interpret(char *line)
             else if (strncmp("dx", wurds[1], 2) == 0)
             {
                 int sgnum = add_dxsynth(mixr);
+                mixr->midi_control_destination = SYNTH;
+                mixr->active_midi_soundgen_num = sgnum;
                 if (num_wurds > 2)
                 {
                     dxsynth *dx = (dxsynth *)mixr->sound_generators[sgnum];
@@ -1112,6 +1103,8 @@ void interpret(char *line)
                 if (strlen(wurds[2]) != 0)
                 {
                     int sgnum = add_digisynth(mixr, wurds[2]);
+                    mixr->midi_control_destination = SYNTH;
+                    mixr->active_midi_soundgen_num = sgnum;
                     if (num_wurds > 2)
                     {
                         digisynth *ds =

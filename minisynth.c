@@ -429,12 +429,57 @@ void minisynth_update(minisynth *ms)
             minisynth_voice_update(ms->m_voices[i]);
 }
 
-void minisynth_midi_control(minisynth *self, unsigned int data1,
+void minisynth_midi_control(minisynth *ms, unsigned int data1,
                             unsigned int data2)
 {
-    (void)self;
-    (void)data1;
+    double scaley_val = 0;
     (void)data2;
+    switch(data1)
+    {
+        case(1):
+            printf("Attack\n");
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            ms->m_settings.m_attack_time_msec = scaley_val;
+            break;
+        case(2):
+            printf("Decay\n");
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            ms->m_settings.m_decay_time_msec = scaley_val;
+            break;
+        case(3):
+            printf("Sustain\n");
+            scaley_val = scaleybum(0, 127, 0, 1, data2);
+            ms->m_settings.m_sustain_level = scaley_val;
+            break;
+        case(4):
+            printf("Release\n");
+            scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
+            ms->m_settings.m_release_time_msec = scaley_val;
+            break;
+        case(5):
+            printf("LFO rate\n");
+            scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+            ms->m_settings.m_lfo1_rate = scaley_val;
+            break;
+        case(6):
+            printf("LFO amp\n");
+            scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
+            ms->m_settings.m_lfo1_amplitude = scaley_val;
+            break;
+        case(7):
+            printf("Filter CutOff\n");
+            scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, data2);
+            ms->m_settings.m_fc_control = scaley_val;
+            break;
+        case(8):
+            printf("Filter Q\n");
+            scaley_val = scaleybum(0, 127, 0.02, 10, data2);
+            ms->m_settings.m_q_control = scaley_val;
+            break;
+        default:
+            printf("nah\n");
+    }
+    minisynth_update(ms);
 }
 
 bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
