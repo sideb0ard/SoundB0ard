@@ -83,6 +83,7 @@ void synthbase_set_melody_loop_num(synthbase *self, int melody_num,
 int synthbase_add_melody(synthbase *self);
 void synthbase_dupe_melody(midi_events_loop *from, midi_events_loop *to);
 void synthbase_switch_melody(synthbase *self, unsigned int melody_num);
+void synthbase_stop(synthbase *base);
 void synthbase_reset_melody(synthbase *self, unsigned int melody_num);
 void synthbase_reset_melody_all(synthbase *self);
 void synthbase_reset_voices(synthbase *self);

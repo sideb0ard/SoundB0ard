@@ -61,7 +61,7 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     // 1. generate NOTES/MELODY
     int rand_num_notes = (rand() % max_notes);
     if (rand_num_notes == 0)
-        return;
+        rand_num_notes = 2;
 
     int generated_melody_note_num[rand_num_notes];
     for (int i = 0; i < rand_num_notes; i++)
@@ -129,30 +129,6 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
             }
         }
     }
-
-    // for (int i = 0; i < NUM_COMPAT_NOTES; i++)
-    //{
-    //    if (generated_melody_note_num[i] != -99)
-    //    {
-    //        int idx = generated_melody_note_num[i];
-
-    //        int rand_steps = (rand() % max_steps) + 1;
-    //        int bitpattern = create_euclidean_rhythm(rand_steps, 32);
-    //        if (rand() % 2 == 1)
-    //            bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-
-    //        for (int i = 31; i >= 0; i--)
-    //        {
-    //            if (bitpattern & 1 << i)
-    //            {
-    //                synthbase_add_note(
-    //                    base, melody_num, 31 - i,
-    //                    key_midi_mapping[compat_keys[mixr->key][idx]]); //
-    //                    THIS!
-    //            }
-    //        }
-    //    }
-    //}
 }
 
 void synthbase_set_multi_melody_mode(synthbase *ms, bool melody_mode)
@@ -189,7 +165,7 @@ void synthbase_reset_melody_all(synthbase *ms)
     }
 }
 
-void synthbase_reset_melody(synthbase *base, unsigned int melody_num)
+void synthbase_stop(synthbase *base)
 {
     if (base->parent_synth_type == MINISYNTH_TYPE)
     {
@@ -201,6 +177,11 @@ void synthbase_reset_melody(synthbase *base, unsigned int melody_num)
         dxsynth *p = (dxsynth *)base->parent;
         dxsynth_stop(p);
     }
+}
+
+void synthbase_reset_melody(synthbase *base, unsigned int melody_num)
+{
+    synthbase_stop(base);
 
     if (melody_num < MAX_NUM_MIDI_LOOPS)
     {
@@ -233,12 +214,15 @@ void synthbase_melody_to_string(synthbase *base, int melody_num,
 // sound generator interface //////////////
 void synthbase_status(synthbase *base, wchar_t *status_string)
 {
-    swprintf(status_string, MAX_PS_STRING_SZ, L"\n      Multi: %s, "
-                                              L"CurMelody:%d generate:%d "
-                                              L"gen_gen:%d gen_every_n:%d",
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             L"\n      Multi: %s CurMelody:%d"
+             "generate:%d gen_gen:%d gen_every_n:%d \n"
+             "      morph:%d morph_gen:%d morph_every_n:%d",
+
              base->multi_melody_mode ? "true" : "false", base->cur_melody,
              base->generate_mode, base->generate_generation,
-             base->generate_every_n_loops);
+             base->generate_every_n_loops, base->morph_mode,
+             base->morph_generation, base->morph_every_n_loops);
 
     for (int i = 0; i < base->num_melodies; i++)
     {
@@ -272,36 +256,9 @@ void synthbase_event_notify(void *self, unsigned int event_type)
         // progress to next loop
         if (idx == 0)
         {
-            if (base->generate_mode)
+            if (base->multi_melody_mode && base->num_melodies > 1)
             {
-                if (base->generate_every_n_loops > 0)
-                {
-                    if (base->generate_generation %
-                            base->generate_every_n_loops ==
-                        0)
-                    {
-                        synthbase_set_backup_mode(base, true);
-                        synthbase_generate_melody(base, 0, 0, 0);
-                    }
-                    else
-                        synthbase_set_backup_mode(base, false);
-                }
-                else if (base->max_generation > 0)
-                {
-                    if (base->morph_generation >= base->max_generation)
-                    {
-                        base->morph_generation = 0;
-                        synthbase_set_generate_mode(base, false);
-                        synthbase_set_backup_mode(base, false);
-                    }
-                }
-                else
-                    synthbase_generate_melody(base, 0, 0, 0);
-
-                base->generate_generation++;
-            }
-            else if (base->multi_melody_mode && base->num_melodies > 1)
-            {
+                synthbase_stop(base);
                 base->cur_melody_iteration--;
                 if (base->cur_melody_iteration == 0)
                 {
@@ -319,6 +276,64 @@ void synthbase_event_notify(void *self, unsigned int event_type)
                     base->cur_melody_iteration =
                         base->melody_multiloop_count[base->cur_melody];
                 }
+            }
+
+            if (base->generate_mode)
+            {
+                synthbase_stop(base);
+                if (base->generate_every_n_loops > 0)
+                {
+                    if (base->generate_generation %
+                            base->generate_every_n_loops ==
+                        0)
+                    {
+                        synthbase_set_backup_mode(base, true);
+                        synthbase_generate_melody(base, 0, 0, 0);
+                    }
+                    else
+                        synthbase_set_backup_mode(base, false);
+                }
+                else if (base->max_generation > 0)
+                {
+                    if (base->generate_generation >= base->max_generation)
+                    {
+                        base->generate_generation = 0;
+                        synthbase_set_generate_mode(base, false);
+                        synthbase_set_backup_mode(base, false);
+                    }
+                }
+                else
+                    synthbase_generate_melody(base, 0, 0, 0);
+
+                base->generate_generation++;
+            }
+
+            if (base->morph_mode)
+            {
+                synthbase_stop(base);
+                if (base->morph_every_n_loops > 0)
+                {
+                    if (base->morph_generation % base->morph_every_n_loops == 0)
+                    {
+                        synthbase_set_backup_mode(base, true);
+                        synthbase_morph(base);
+                    }
+                    else
+                        synthbase_set_backup_mode(base, false);
+                }
+                else if (base->max_generation > 0)
+                {
+                    if (base->morph_generation >= base->max_generation)
+                    {
+                        base->morph_generation = 0;
+                        synthbase_set_morph_mode(base, false);
+                        synthbase_set_backup_mode(base, false);
+                    }
+                }
+                else
+                    synthbase_morph(base);
+
+                base->morph_generation++;
             }
         }
         break;
@@ -433,29 +448,84 @@ void synthbase_set_generate_mode(synthbase *ms, bool b)
     synthbase_set_backup_mode(ms, b);
 }
 
-void synthbase_set_backup_mode(synthbase *ms, bool b)
+void synthbase_set_backup_mode(synthbase *base, bool b)
 {
     if (b)
     {
-        synthbase_dupe_melody(&ms->melodies[0],
-                              &ms->backup_melody_while_getting_crazy);
-        // ms->m_settings_backup_while_getting_crazy = ms->m_settings;
-        ms->multi_melody_mode = false;
-        ms->cur_melody = 0;
+        synthbase_dupe_melody(&base->melodies[0],
+                              &base->backup_melody_while_getting_crazy);
+        // base->m_settings_backup_while_getting_crazy = base->m_settings;
+        base->multi_melody_mode = false;
+        base->cur_melody = 0;
     }
     else
     {
-        synthbase_dupe_melody(&ms->backup_melody_while_getting_crazy,
-                              &ms->melodies[0]);
-        // ms->m_settings = ms->m_settings_backup_while_getting_crazy;
-        ms->multi_melody_mode = true;
+        synthbase_dupe_melody(&base->backup_melody_while_getting_crazy,
+                              &base->melodies[0]);
+        // base->m_settings = base->m_settings_backup_while_getting_crazy;
+        base->multi_melody_mode = true;
     }
 }
 
-void synthbase_morph(synthbase *ms)
+void synthbase_morph(synthbase *base)
 {
-    (void)ms;
-    // NO-OP for the moment
+    synthbase_reset_melody(base, 0);
+
+    int max_steps = 10;
+
+    int midi_notes[10];
+    int num_notes = synthbase_get_notes_from_melody(&base->backup_melody_while_getting_crazy, midi_notes);
+
+    if (num_notes == 0)
+    {
+        printf("Whoa nellie! nae notes\n");
+        return;
+    }
+
+    int rand_steps = (rand() % max_steps / 2);
+    int num_steps = rand_steps;
+    int bitpattern = create_euclidean_rhythm(rand_steps, 32);
+    if (rand() % 2 == 1)
+        bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
+    rand_steps = (rand() % max_steps / 2);
+    num_steps += rand_steps;
+    bitpattern += create_euclidean_rhythm(num_steps, 32);
+
+    // print_bin_num(bitpattern);
+    int num_hits = how_many_bits_in_num(bitpattern);
+    // printf("I gots %d hits\n", num_hits);
+
+    int largest_divisor = num_hits / num_notes;
+    int rem = num_hits % num_notes;
+    int generated_melody_note_num_hits[num_notes];
+    for (int i = 0; i < num_notes; ++i)
+        generated_melody_note_num_hits[i] = largest_divisor;
+
+    if (rem > 0)
+        generated_melody_note_num_hits[rand() % num_notes] += rem;
+
+    // for (int i = 0 ; i < rand_num_notes; i++)
+    //    printf("Playing %s %d times\n",
+    //    key_names[generated_melody_note_num[i]],
+    //    generated_melody_note_num_hits[i]);
+
+    int cur_key = 0;
+    int cur_key_count = 0;
+    for (int i = 31; i >= 0; i--)
+    {
+        if (bitpattern & 1 << i)
+        {
+            synthbase_add_note(
+                base, 0, 31 - i,
+                key_midi_mapping[compat_keys[mixr->key][cur_key]]);
+            cur_key_count++;
+            if (cur_key_count >= generated_melody_note_num_hits[cur_key])
+            {
+                cur_key++;
+                cur_key_count = 0;
+            }
+        }
+    }
 }
 
 int synthbase_get_num_notes(synthbase *ms)
@@ -484,12 +554,13 @@ int synthbase_get_notes_from_melody(midi_events_loop *loop,
                 {
                     return_midi_notes[idx++] = ev.data1;
                     if (idx == 10)
-                        return idx;
+                        break;
+                    // return idx;
                 }
             }
         }
     }
-    return idx;
+    return idx; // num notes
 }
 
 int synthbase_get_num_tracks(void *self)

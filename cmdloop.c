@@ -1268,6 +1268,44 @@ void interpret(char *line)
                                                       max_notes, max_steps);
                         }
                     }
+                    else if (strncmp("morph", wurds[2], 8) == 0)
+                    {
+                        if (strncmp("every", wurds[3], 5) == 0)
+                        {
+                            int num_gens = atoi(wurds[4]);
+                            if (num_gens > 0)
+                            {
+                                synthbase_set_morph_mode(base, true);
+                                base->morph_every_n_loops = num_gens;
+                            }
+                            else
+                            {
+                                printf("Need a number for every 'n'\n");
+                            }
+                        }
+                        else if (strncmp("for", wurds[3], 3) == 0)
+                        {
+                            int num_gens = atoi(wurds[4]);
+                            if (num_gens > 0)
+                            {
+                                synthbase_set_morph_mode(base, true);
+                                base->max_generation = num_gens;
+                            }
+                            else
+                                printf("Need a number for 'for'\n");
+                        }
+                        else if (strncmp("false", wurds[3], 5) == 0)
+                        {
+                            printf("Disabling morph mode\n");
+                            synthbase_set_morph_mode(base, false);
+                        }
+                        else
+                        {
+                            printf("toggling morph mode\n");
+                            bool cur_mod = base->morph_mode;
+                            synthbase_set_morph_mode(base, 1 - cur_mod);
+                        }
+                    }
                     else if (strncmp("midi", wurds[2], 4) == 0)
                     {
                         mixr->midi_control_destination = SYNTH;
