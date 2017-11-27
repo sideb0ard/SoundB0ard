@@ -53,82 +53,63 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
 
     synthbase_reset_melody(base, melody_num);
 
+    (void)max_notes;
     if (max_notes == 0)
-        max_notes = 5;
+        max_notes = 6;
     if (max_steps == 0)
         max_steps = 9;
 
-    // 1. generate NOTES/MELODY
-    int rand_num_notes = (rand() % max_notes);
-    if (rand_num_notes == 0)
-        rand_num_notes = 2;
-
-    int generated_melody_note_num[rand_num_notes];
-    for (int i = 0; i < rand_num_notes; i++)
-        generated_melody_note_num[i] = -99;
-    int generated_melody_note_num_idx = 0;
-
-    while (generated_melody_note_num_idx < rand_num_notes)
-    {
-        int randy = rand() % (NUM_COMPAT_NOTES);
-        if (!is_int_member_in_array(randy, generated_melody_note_num,
-                                    rand_num_notes))
-        {
-            generated_melody_note_num[generated_melody_note_num_idx++] = randy;
-        }
-    }
-    // printf("Num notes:%d ", rand_num_notes);
-    // for (int i = 0; i < rand_num_notes; ++i)
-    //    printf("%d(%s) ", generated_melody_note_num[i],
-    //           key_names[generated_melody_note_num[i]]);
-    // printf("\n");
-    // END NOTES/MELODY
-
-    // 2. PLACEMENT OF NOTES
-    int rand_steps = (rand() % max_steps / 2);
-    int num_steps = rand_steps;
-    int bitpattern = create_euclidean_rhythm(rand_steps, 32);
+    int rand_num_steps = rand() % max_steps;
+    int steps = rand_num_steps / 2;
+    unsigned int bitpattern = create_euclidean_rhythm(steps, 32);
     if (rand() % 2 == 1)
         bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-    rand_steps = (rand() % max_steps / 2);
-    num_steps += rand_steps;
-    bitpattern += create_euclidean_rhythm(num_steps, 32);
+    steps = rand_num_steps - steps;
 
-    // print_bin_num(bitpattern);
+    bitpattern |= create_euclidean_rhythm(steps, 32);
+
     int num_hits = how_many_bits_in_num(bitpattern);
-    // printf("I gots %d hits\n", num_hits);
+    if ((num_hits%2) != 0)
+    {
+        for (int i = 0; i < 32; ++i)
+        {
+            if (!(bitpattern & (1 << i)))
+            {
+                bitpattern |= (1 << i);
+                break;
+            }
+        }
+    }
 
-    int largest_divisor = num_hits / rand_num_notes;
-    int rem = num_hits % rand_num_notes;
-    int generated_melody_note_num_hits[rand_num_notes];
-    for (int i = 0; i < rand_num_notes; ++i)
-        generated_melody_note_num_hits[i] = largest_divisor;
+    print_bin_num(bitpattern);
+    printf("Has %d bits\n", how_many_bits_in_num(bitpattern));
 
-    if (rem > 0)
-        generated_melody_note_num_hits[rand() % rand_num_notes] += rem;
-
-    // for (int i = 0 ; i < rand_num_notes; i++)
-    //    printf("Playing %s %d times\n",
-    //    key_names[generated_melody_note_num[i]],
-    //    generated_melody_note_num_hits[i]);
-
-    int cur_key = 0;
-    int cur_key_count = 0;
+    int cur_note = mixr->key;
+    bool note_on = true; // toggle
     for (int i = 31; i >= 0; i--)
     {
         if (bitpattern & 1 << i)
         {
-            synthbase_add_note(
-                base, melody_num, 31 - i,
-                key_midi_mapping[compat_keys[mixr->key][cur_key]]);
-            cur_key_count++;
-            if (cur_key_count >= generated_melody_note_num_hits[cur_key])
+            int step = (31 - i) * PPSIXTEENTH;
+
+            midi_event ev;
+            if (note_on)
             {
-                cur_key++;
-                cur_key_count = 0;
+                printf("Adding NOTE ON!\n");
+                ev = new_midi_event(step, 144, key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
             }
+            else
+            {
+                printf("Adding NOTE OFF!\nn");
+                ev = new_midi_event(step, 128, key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
+                cur_note = get_next_compat_note(cur_note);
+            }
+            synthbase_add_event(base, 0, ev);
+            note_on  = 1 - note_on;
         }
     }
+    mixr->key = cur_note;
+    printf("FINISHED ADDing - note_on should be true - it is %d\n", note_on);
 }
 
 void synthbase_set_multi_melody_mode(synthbase *ms, bool melody_mode)

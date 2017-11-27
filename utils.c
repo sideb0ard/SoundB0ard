@@ -929,16 +929,146 @@ void print_bin_num(int num)
 }
 int how_many_bits_in_num(unsigned int num)
 {
-    // printf("My num is %u\n", num);
+    printf("My num is %u\n", num);
     int len = sizeof(num) * 8;
+    printf("Size of int:%lu len:%d\n", sizeof(num), len);
     int count = 0;
     for (int i = len; i > 0; --i)
     {
         if (num & 1 << i)
         {
             count++;
-            // printf("Position %d\n", i);
+            printf("Position %d\n", i);
         }
     }
     return count;
+}
+
+unsigned int get_next_compat_note(unsigned int cur_key)
+{
+    int rand_num = rand() % 4;
+    switch (cur_key)
+    {
+    case (C_MAJOR):
+        if (rand_num == 0)
+            return C_MAJOR;
+        else if (rand_num == 1)
+            return G_MAJOR;
+        else if (rand_num == 2)
+            return A_MAJOR;
+        else if (rand_num == 3)
+            return F_MAJOR;
+        break;
+    case (G_MAJOR):
+        if (rand_num == 0)
+            return G_MAJOR;
+        else if (rand_num == 1)
+            return E_MAJOR;
+        else if (rand_num == 2)
+            return C_MAJOR;
+        else if (rand_num == 3)
+            return D_MAJOR;
+        break;
+    case (D_MAJOR):
+        if (rand_num == 0)
+            return D_MAJOR;
+        else if (rand_num == 1)
+            return G_MAJOR;
+        else if (rand_num == 2)
+            return B_MAJOR;
+        else if (rand_num == 3)
+            return A_MAJOR;
+        break;
+    case (A_MAJOR):
+        if (rand_num == 0)
+            return A_MAJOR;
+        else if (rand_num == 1)
+            return D_MAJOR;
+        else if (rand_num == 2)
+            return F_SHARP_MAJOR;
+        else if (rand_num == 3)
+            return E_MAJOR;
+        break;
+    case (E_MAJOR):
+        if (rand_num == 0)
+            return E_MAJOR;
+        else if (rand_num == 1)
+            return A_MAJOR;
+        else if (rand_num == 2)
+            return D_FLAT_MAJOR;
+        else if (rand_num == 3)
+            return B_MAJOR;
+        break;
+    case (B_MAJOR):
+        if (rand_num == 0)
+            return B_MAJOR;
+        else if (rand_num == 1)
+            return E_MAJOR;
+        else if (rand_num == 2)
+            return A_FLAT_MAJOR;
+        else if (rand_num == 3)
+            return F_SHARP_MAJOR;
+        break;
+    case (F_SHARP_MAJOR):
+        if (rand_num == 0)
+            return F_SHARP_MAJOR;
+        else if (rand_num == 1)
+            return B_MAJOR;
+        else if (rand_num == 2)
+            return E_FLAT_MAJOR;
+        else if (rand_num == 3)
+            return D_FLAT_MAJOR;
+        break;
+    case (D_FLAT_MAJOR):
+        if (rand_num == 0)
+            return D_FLAT_MAJOR;
+        else if (rand_num == 1)
+            return F_SHARP_MAJOR;
+        else if (rand_num == 2)
+            return B_FLAT_MAJOR;
+        else if (rand_num == 3)
+            return A_FLAT_MAJOR;
+        break;
+    case (A_FLAT_MAJOR):
+        if (rand_num == 0)
+            return A_FLAT_MAJOR;
+        else if (rand_num == 1)
+            return D_FLAT_MAJOR;
+        else if (rand_num == 2)
+            return F_MAJOR;
+        else if (rand_num == 3)
+            return E_FLAT_MAJOR;
+        break;
+    case (E_FLAT_MAJOR):
+        if (rand_num == 0)
+            return E_FLAT_MAJOR;
+        else if (rand_num == 1)
+            return C_MAJOR;
+        else if (rand_num == 2)
+            return A_FLAT_MAJOR;
+        else if (rand_num == 3)
+            return B_FLAT_MAJOR;
+        break;
+    case (B_FLAT_MAJOR):
+        if (rand_num == 0)
+            return B_FLAT_MAJOR;
+        else if (rand_num == 1)
+            return E_FLAT_MAJOR;
+        else if (rand_num == 2)
+            return G_MAJOR;
+        else if (rand_num == 3)
+            return F_MAJOR;
+        break;
+    case (F_MAJOR):
+        if (rand_num == 0)
+            return F_MAJOR;
+        else if (rand_num == 1)
+            return C_MAJOR;
+        else if (rand_num == 2)
+            return B_FLAT_MAJOR;
+        else if (rand_num == 3)
+            return D_MAJOR;
+        break;
+    }
+    return 0;
 }
