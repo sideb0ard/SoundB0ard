@@ -183,6 +183,16 @@ void mixer_ps(mixer *mixr)
     printf(ANSI_COLOR_RESET);
 }
 
+void mixer_print_compat_keys(mixer *mixr)
+{
+    printf("Current KEY is %s. Compats are ", key_names[mixr->key]);
+    for (int i = 0; i < 6; ++i)
+    {
+        printf("%s ", key_names[compat_keys[mixr->key][i]]);
+    }
+    printf("\n");
+}
+
 void mixer_emit_event(mixer *mixr, unsigned int event_type)
 {
     for (int i = 0; i < mixr->soundgen_num; ++i)

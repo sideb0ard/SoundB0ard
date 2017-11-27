@@ -343,11 +343,55 @@ void dxsynth_update(dxsynth *dx)
     }
 }
 
-void dxsynth_midi_control(dxsynth *self, unsigned int data1, unsigned int data2)
+void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
 {
-    (void)self;
-    (void)data1;
-    (void)data2;
+    double val = 0;
+    switch (data1)
+    {
+    case (1):
+        printf("op1ratio\n");
+        val = scaleybum(0, 127, 0.01, 10, data2);
+        dxsynth_set_op_ratio(dx, 1, val);
+        break;
+    case (2):
+        printf("op2ratio\n");
+        val = scaleybum(0, 127, 0.01, 10, data2);
+        dxsynth_set_op_ratio(dx, 2, val);
+        break;
+    case (3):
+        printf("op3ratio\n");
+        val = scaleybum(0, 127, 0.01, 10, data2);
+        dxsynth_set_op_ratio(dx, 3, val);
+        break;
+    case (4):
+        printf("op4ratio\n");
+        val = scaleybum(0, 127, 0.01, 10, data2);
+        dxsynth_set_op_ratio(dx, 4, val);
+        break;
+    case (5):
+        printf("LFO Rate\n");
+        val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+        dxsynth_set_lfo1_rate(dx, val);
+        break;
+    case (6):
+        printf("LFO Intensity\n");
+        val = scaleybum(0, 128, 0.0, 1.0, data2);
+        dxsynth_set_lfo1_intensity(dx, val);
+        break;
+    case (7):
+        printf("Op4Feedback\n");
+        val = scaleybum(0, 127, 0, 70, data2);
+        dxsynth_set_op4_feedback(dx, val);
+        break;
+    case (8):
+        printf("Algo\n");
+        val = scaleybum(0, 127, 1, 8, data2);
+        dxsynth_set_voice_mode(dx, val);
+        break;
+    default:
+        printf("nah\n");
+    }
+    dxsynth_update(dx);
 }
 
 bool dxsynth_midi_note_on(dxsynth *ms, unsigned int midinote,

@@ -474,7 +474,8 @@ void synthbase_morph(synthbase *base)
     int max_steps = 10;
 
     int midi_notes[10];
-    int num_notes = synthbase_get_notes_from_melody(&base->backup_melody_while_getting_crazy, midi_notes);
+    int num_notes = synthbase_get_notes_from_melody(
+        &base->backup_melody_while_getting_crazy, midi_notes);
 
     if (num_notes == 0)
     {

@@ -433,7 +433,6 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
                             unsigned int data2)
 {
     double scaley_val = 0;
-    (void)data2;
     switch (data1)
     {
     case (1):

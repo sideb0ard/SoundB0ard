@@ -131,6 +131,13 @@ void interpret(char *line)
             }
         }
 
+        else if (strncmp("compat", wurds[0], 6) == 0)
+        {
+            if (strncmp("keys", wurds[1], 4) == 0)
+            {
+                mixer_print_compat_keys(mixr);
+            }
+        }
         else if (strncmp("keys", wurds[0], 4) == 0)
         {
             for (int i = 0; i < NUM_KEYS; i++)
