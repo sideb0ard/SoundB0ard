@@ -650,6 +650,14 @@ void interpret(char *line)
                                "Sequencer %d\n",
                                soundgen_num);
                     }
+                    else if (strncmp("morph", wurds[2], 8) == 0)
+                    {
+                        printf("M0RRRPH!\n");
+                        sample_sequencer *s =
+                            (sample_sequencer *)
+                                mixr->sound_generators[soundgen_num];
+                        s->morph = 1 - s->morph;
+                    }
                     else if (strncmp("load", wurds[2], 4) == 0 ||
                              strncmp("import", wurds[2], 6) == 0)
                     {
@@ -2211,24 +2219,38 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         printf("Change gridsteps to %d\n", gridsteps);
         seq_set_gridsteps(seq, gridsteps);
     }
-    else if (strncmp("sloppy", wurds[2], 6) == 0)
+    else if (strncmp("life", wurds[2], 4) == 0)
     {
-        int sloppyjoe = atoi(wurds[3]);
-        seq_set_sloppiness(seq, sloppyjoe);
-    }
-    else if (strncmp("print", wurds[2], 5) == 0)
-    {
-        int pattern_num = atoi(wurds[3]);
-        if (seq_is_valid_pattern_num(seq, pattern_num))
+        if (strncmp("every", wurds[3], 5) == 0)
         {
-            printf("Printing pattern for %d\n", pattern_num);
-            seq_print_pattern(seq, pattern_num);
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0)
+            {
+                seq_set_game_of_life(seq, true);
+                seq->life_every_n_loops = num_gens;
+            }
+            else
+            {
+                printf("Need a number for every 'n'\n");
+            }
         }
-    }
-    else if (strncmp("randamp", wurds[2], 6) == 0)
-    {
-        seq_set_randamp(seq, 1 - seq->randamp_on);
-        printf("Toggling randamp to %s \n", seq->randamp_on ? "true" : "false");
+        else if (strncmp("for", wurds[3], 3) == 0)
+        {
+            int num_gens = atoi(wurds[4]);
+            if (num_gens > 0)
+            {
+                seq_set_game_of_life(seq, true);
+                seq_set_max_generations(seq, num_gens);
+            }
+            else
+            {
+                printf("Need a number for 'for'\n");
+            }
+        }
+        else
+        {
+            seq_set_game_of_life(seq, 1 - seq->game_of_life_on);
+        }
     }
     else if (strncmp("multi", wurds[2], 5) == 0)
     {
@@ -2265,39 +2287,6 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             seq_set_markov_mode(seq, MARKOVSNARE);
         }
     }
-    else if (strncmp("life", wurds[2], 4) == 0)
-    {
-        if (strncmp("every", wurds[3], 5) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_game_of_life(seq, true);
-                seq->life_every_n_loops = num_gens;
-            }
-            else
-            {
-                printf("Need a number for every 'n'\n");
-            }
-        }
-        else if (strncmp("for", wurds[3], 3) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_game_of_life(seq, true);
-                seq_set_max_generations(seq, num_gens);
-            }
-            else
-            {
-                printf("Need a number for 'for'\n");
-            }
-        }
-        else
-        {
-            seq_set_game_of_life(seq, 1 - seq->game_of_life_on);
-        }
-    }
     else if (strncmp("markov", wurds[2], 4) == 0)
     {
         if (strncmp("every", wurds[3], 5) == 0)
@@ -2330,6 +2319,25 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         {
             seq_set_markov(seq, 1 - seq->markov_on);
         }
+    }
+    else if (strncmp("print", wurds[2], 5) == 0)
+    {
+        int pattern_num = atoi(wurds[3]);
+        if (seq_is_valid_pattern_num(seq, pattern_num))
+        {
+            printf("Printing pattern for %d\n", pattern_num);
+            seq_print_pattern(seq, pattern_num);
+        }
+    }
+    else if (strncmp("randamp", wurds[2], 6) == 0)
+    {
+        seq_set_randamp(seq, 1 - seq->randamp_on);
+        printf("Toggling randamp to %s \n", seq->randamp_on ? "true" : "false");
+    }
+    else if (strncmp("sloppy", wurds[2], 6) == 0)
+    {
+        int sloppyjoe = atoi(wurds[3]);
+        seq_set_sloppiness(seq, sloppyjoe);
     }
     else if (strncmp("shuffle", wurds[2], 7) == 0)
     {
@@ -2444,7 +2452,7 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         }
         else
         {
-            seq_set_euclidean(seq, 1 - seq->game_of_life_on);
+            seq_set_euclidean(seq, 1 - seq->euclidean_on);
         }
     }
     else if (strncmp("visualize", wurds[2], 9) == 0)

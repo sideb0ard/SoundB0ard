@@ -65,6 +65,7 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
         seq->sample_positions[i].position = 0;
         seq->sample_positions[i].playing = 0;
         seq->sample_positions[i].played = 0;
+        seq->sample_positions[i].speed = 1;
     }
 }
 
@@ -80,6 +81,10 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
         seq->started = true;
+        if (seq->morph)
+        {
+            printf("MORPHING!\n");
+        }
         break;
     case (TIME_SIXTEENTH_TICK):
         if (seq->started)
@@ -106,7 +111,8 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
 stereo_val sample_seq_gennext(void *self)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    double val = 0;
+    double left_val = 0;
+    double right_val = 0;
 
     // wait till start of loop to keep patterns synched
     if (!seq->started)
@@ -117,13 +123,21 @@ stereo_val sample_seq_gennext(void *self)
         if (seq->samples_now_playing[i] != -1)
         {
             int cur_sample_midi_tick = seq->samples_now_playing[i];
-            val += seq->buffer[seq->sample_positions[cur_sample_midi_tick]
-                                   .position] *
-                   seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
-                                                  [cur_sample_midi_tick];
+            left_val += seq->buffer[seq->sample_positions[cur_sample_midi_tick]
+                                        .position] *
+                        seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
+                                                       [cur_sample_midi_tick];
+            if (seq->channels == 2)
+                right_val +=
+                    seq->buffer[seq->sample_positions[cur_sample_midi_tick]
+                                    .position +
+                                1] *
+                    seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
+                                                   [cur_sample_midi_tick];
             seq->sample_positions[cur_sample_midi_tick].position =
                 seq->sample_positions[cur_sample_midi_tick].position +
-                seq->channels;
+                seq->channels *
+                    seq->sample_positions[cur_sample_midi_tick].speed;
             if ((int)seq->sample_positions[cur_sample_midi_tick].position >=
                 seq->bufsize)
             { // end of playback - so reset
@@ -133,10 +147,18 @@ stereo_val sample_seq_gennext(void *self)
         }
     }
 
-    val = effector(&seq->sound_generator, val);
-    val = envelopor(&seq->sound_generator, val);
+    left_val = effector(&seq->sound_generator, left_val);
+    left_val = envelopor(&seq->sound_generator, left_val);
+    if (seq->channels == 2)
+    {
+        right_val = effector(&seq->sound_generator, right_val);
+        right_val = effector(&seq->sound_generator, right_val);
+    }
+    else
+        right_val = left_val;
 
-    return (stereo_val){.left = val * seq->vol, .right = val * seq->vol};
+    return (stereo_val){.left = left_val * seq->vol,
+                        .right = right_val * seq->vol};
 }
 
 sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
@@ -152,8 +174,9 @@ void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[SAMPLE SEQ] \"%s\" Vol: %.2lf Active: %s", seq->filename,
-             seq->vol, seq->sound_generator.active ? "true" : "false");
+             L"[SAMPLE SEQ] \"%s\" Vol:%.2lf Active:%s Morph:%s", seq->filename,
+             seq->vol, seq->sound_generator.active ? "true" : "false",
+             seq->morph ? "true" : "false");
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);

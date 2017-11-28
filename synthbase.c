@@ -69,7 +69,7 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     bitpattern |= create_euclidean_rhythm(steps, 32);
 
     int num_hits = how_many_bits_in_num(bitpattern);
-    if ((num_hits%2) != 0)
+    if ((num_hits % 2) != 0)
     {
         for (int i = 0; i < 32; ++i)
         {
@@ -96,16 +96,20 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
             if (note_on)
             {
                 printf("Adding NOTE ON!\n");
-                ev = new_midi_event(step, 144, key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
+                ev = new_midi_event(
+                    step, 144,
+                    key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
             }
             else
             {
                 printf("Adding NOTE OFF!\nn");
-                ev = new_midi_event(step, 128, key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
+                ev = new_midi_event(
+                    step, 128,
+                    key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
                 cur_note = get_next_compat_note(cur_note);
             }
             synthbase_add_event(base, 0, ev);
-            note_on  = 1 - note_on;
+            note_on = 1 - note_on;
         }
     }
     mixr->key = cur_note;

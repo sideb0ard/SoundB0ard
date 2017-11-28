@@ -12,11 +12,15 @@
 #define DEFAULT_AMP 0.7
 #define MAX_CONCURRENT_SAMPLES 10 // arbitrary
 
-typedef struct t_sample_pos
+typedef struct sample_pos
 {
     int position;
     int playing;
     int played;
+    double amp;
+    double speed;
+    double start_pos_pct;
+    double end_pos_pct;
 } sample_pos;
 
 typedef struct sample_sequencer
@@ -26,6 +30,7 @@ typedef struct sample_sequencer
     sample_pos sample_positions[PPBAR];
     int samples_now_playing[MAX_CONCURRENT_SAMPLES]; // contains midi tick of
                                                      // current samples
+
     // rathern than walking array -1 means not playing
     char filename[1024];
     int samplerate;
@@ -38,6 +43,8 @@ typedef struct sample_sequencer
     int swing;
 
     bool started; // to sync at top of loop
+
+    bool morph;
 
     double vol;
 
