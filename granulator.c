@@ -210,16 +210,7 @@ stereo_val granulator_gennext(void *self)
                     printf("VLIMEY!\n");
                 int modified_idx = grain_idx % g->audio_buffer_len;
                 val += g->audio_buffer[modified_idx] *
-                       sound_grain_env(&g->m_grains[i],
-                                       0 /* zero means first grain idx*/);
-            }
-            grain_idx = sound_grain_gen_doppelganger_idx(&g->m_grains[i]);
-            if (grain_idx != -99)
-            {
-                int modified_idx = grain_idx % g->audio_buffer_len;
-                val += g->audio_buffer[modified_idx] *
-                       sound_grain_env(&g->m_grains[i], 1 /* 1 means
-                       doppelganger grain idx*/);
+                       sound_grain_env(&g->m_grains[i]);
             }
         }
     }
@@ -339,9 +330,6 @@ void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
     g->attack_time_pct = attack_pct;
     g->release_time_pct = release_pct;
     g->active = true;
-    g->doppelganger_started =
-        false; // start a second grain env, half way through
-    g->doppelganger_idx = starting_idx + (dur / 2);
     g->deactivation_pending = false;
 }
 
@@ -367,34 +355,12 @@ int sound_grain_generate_idx(sound_grain *g)
             g->active = false;
     }
 
-    if (g->doppelganger_started)
-    { // started by grain_envelope, when we enter
-        // release
-        g->doppelganger_idx += g->audiobuffer_pitch;
-        if (g->doppelganger_idx >= end_buffer)
-            g->doppelganger_idx -= g->grain_len_samples;
-        else if (g->doppelganger_idx < g->audiobuffer_start_idx)
-            g->doppelganger_idx += g->grain_len_samples;
-    }
-
     return my_idx;
 }
 
-int sound_grain_gen_doppelganger_idx(sound_grain *g)
+double sound_grain_env(sound_grain *g)
 {
-    if (!g->doppelganger_started)
-        return -99;
-    else
-        return g->doppelganger_idx;
-}
-
-double sound_grain_env(sound_grain *g, int idx_num)
-{
-    int idx = 0;
-    if (idx_num == 0)
-        idx = g->audiobuffer_cur_pos;
-    else if (idx_num == 1)
-        idx = g->doppelganger_idx;
+    int idx = g->audiobuffer_cur_pos;
 
     double env_amp = 1.;
     double percent_pos =

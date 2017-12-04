@@ -22,8 +22,6 @@ typedef struct sound_grain
     int attack_time_pct;  // percent of grain_len_samples
     bool active;
     bool deactivation_pending;
-    bool doppelganger_started;
-    int doppelganger_idx;
 } sound_grain;
 
 enum
@@ -132,8 +130,7 @@ void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops);
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);
 int sound_grain_generate_idx(sound_grain *g);
-int sound_grain_gen_doppelganger_idx(sound_grain *g);
-double sound_grain_env(sound_grain *g, int idx_num);
+double sound_grain_env(sound_grain *g);
 
 void granulator_del_self(void *self);
 
