@@ -41,6 +41,7 @@ typedef struct granulator
     char filename[512];
     double *audio_buffer;
     int audio_buffer_len;
+    int num_channels;
     int audio_buffer_write_idx;
     int external_source_sg; // exclusive - external or file
 

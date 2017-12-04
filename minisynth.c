@@ -542,7 +542,8 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
                 voice_note_off(&ms->m_voices[i]->m_voice, midinote);
         }
         for (int i = 0; i < MAX_VOICES; i++)
-            printf("voice[%d] - off? %s\n", i,  ms->m_voices[i]->m_voice.m_note_on ? "true" : "false");
+            printf("voice[%d] - off? %s\n", i,
+                   ms->m_voices[i]->m_voice.m_note_on ? "true" : "false");
         return true;
     }
 

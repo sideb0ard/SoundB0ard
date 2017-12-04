@@ -64,6 +64,7 @@ SRC = \
 	spork.c \
 	synthbase.c \
 	synthdrum_sequencer.c \
+	synthfunctions.c \
 	table.c \
 	utils.c \
 	voice.c \
@@ -75,7 +76,8 @@ LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
 INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack
 LIBDIR=/usr/local/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
-CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
+#CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
+CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS)
 
 $(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)

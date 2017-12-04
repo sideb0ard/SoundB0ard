@@ -156,10 +156,11 @@ stereo_val granulator_gennext(void *self)
 
     if (g->grainscanfile_lfo_on)
     {
-        double lfo3_out = lfo_do_oscillate((oscillator *)&g->m_lfo3, NULL);
-        double scaley_val =
-            scaleybum(-1, 1, g->m_lfo3_min, g->m_lfo3_max, lfo3_out);
-        g->grain_buffer_position = scaley_val;
+        // double lfo3_out = lfo_do_oscillate((oscillator *)&g->m_lfo3, NULL);
+        // double scaley_val =
+        //    scaleybum(-1, 1, g->m_lfo3_min, g->m_lfo3_max, lfo3_out);
+        // g->grain_buffer_position = scaley_val;
+        g->grain_buffer_position = g->grain_buffer_position + g->num_channels;
         if (g->grain_buffer_position >= g->audio_buffer_len)
             g->grain_buffer_position =
                 g->grain_buffer_position % g->audio_buffer_len;
@@ -380,6 +381,7 @@ void granulator_import_file(granulator *g, char *filename)
     audio_buffer_details deetz =
         import_file_contents(&g->audio_buffer, filename);
     g->audio_buffer_len = deetz.buffer_length;
+    g->num_channels = deetz.num_channels;
     g->external_source_sg = -1;
     g->have_active_buffer = true;
 }

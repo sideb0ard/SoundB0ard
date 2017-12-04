@@ -243,7 +243,7 @@ void synthbase_event_notify(void *self, unsigned int event_type)
         {
             if (base->multi_melody_mode && base->num_melodies > 1)
             {
-                //synthbase_stop(base);
+                // synthbase_stop(base);
                 base->cur_melody_iteration--;
                 if (base->cur_melody_iteration == 0)
                 {
