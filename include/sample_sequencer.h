@@ -45,6 +45,8 @@ typedef struct sample_sequencer
     bool started; // to sync at top of loop
 
     bool morph;
+    int morph_generation;
+    int morph_every_n_loops;
 
     double vol;
 
@@ -72,3 +74,5 @@ double sample_seq_getvol(void *self);
 
 void sample_seq_import_file(sample_sequencer *s, char *filename);
 void sample_sequencer_reset_samples(sample_sequencer *seq);
+void sample_sequencer_morph(sample_sequencer *seq);
+void sample_sequencer_morph_restore(sample_sequencer *seq);

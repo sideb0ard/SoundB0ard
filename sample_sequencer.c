@@ -83,7 +83,16 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
         seq->started = true;
         if (seq->morph)
         {
-            printf("MORPHING!\n");
+            if (seq->morph_every_n_loops > 0)
+            {
+                if (seq->morph_generation % seq->morph_every_n_loops == 0)
+                    sample_sequencer_morph(seq);
+                else
+                    sample_sequencer_morph_restore(seq);
+            }
+            else
+                sample_sequencer_morph(seq);
+            seq->morph_generation++;
         }
         break;
     case (TIME_SIXTEENTH_TICK):
@@ -136,7 +145,6 @@ stereo_val sample_seq_gennext(void *self)
                                                    [cur_sample_midi_tick];
             seq->sample_positions[cur_sample_midi_tick].position =
                 seq->sample_positions[cur_sample_midi_tick].position +
-                seq->channels *
                     seq->sample_positions[cur_sample_midi_tick].speed;
             if ((int)seq->sample_positions[cur_sample_midi_tick].position >=
                 seq->bufsize)
@@ -243,4 +251,48 @@ void sample_stop(void *self)
     sample_sequencer *s = (sample_sequencer *)self;
     s->sound_generator.active = false;
     sample_sequencer_reset_samples(s);
+}
+
+void sample_sequencer_morph(sample_sequencer *seq)
+{
+    int multi1 = (seq->morph_generation % 3) + 1;
+    int multi2 = (seq->morph_generation % 4) + 1;
+
+    const int quart = PPBAR /4;
+    for (int i = 0; i < quart; i++)
+    {
+        if (rand() % 2 == 0)
+            seq->sample_positions[i].speed = 1 * multi1;
+        else
+            seq->sample_positions[i].speed = 1 * multi2;
+    }
+    for (int i = quart; i < quart*2; i++)
+    {
+        if (rand() % 2 == 0)
+            seq->sample_positions[i].speed = 1.25 * multi2;
+        else
+            seq->sample_positions[i].speed = 1.25 * multi1;
+    }
+    for (int i = quart*2; i < quart*3; i++)
+    {
+        if (rand() % 2 == 0)
+            seq->sample_positions[i].speed = 3 * multi1;
+        else
+            seq->sample_positions[i].speed = 2 * multi2;
+    }
+    for (int i = quart*2; i < quart*3; i++)
+    {
+        if (rand() % 2 == 0)
+            seq->sample_positions[i].speed = 4 * multi2;
+        else
+            seq->sample_positions[i].speed = 4.2 * multi1;
+    }
+
+    //seq->morph_generation++;
+}
+
+void sample_sequencer_morph_restore(sample_sequencer *seq)
+{
+    for (int i = 0; i < PPBAR; i++)
+        seq->sample_positions[i].speed = 1;
 }
