@@ -12,6 +12,8 @@
 extern mixer *mixr;
 extern char *s_lfo_mode_names;
 
+static char *s_env_names[] = {"PARABOLIC", "TRAPEZOIDAL", "COSINE"};
+
 granulator *new_granulator(char *filename)
 {
     granulator *g = (granulator *)calloc(1, sizeof(granulator));
@@ -28,6 +30,7 @@ granulator *new_granulator(char *filename)
     g->grain_release_time_pct = 20;
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
+    g->envelope_mode = GRANULATOR_ENV_PARABOLIC;
     g->external_source_sg = -1;
 
     g->grain_pitch = 1;
@@ -211,7 +214,7 @@ stereo_val granulator_gennext(void *self)
                     printf("VLIMEY!\n");
                 int modified_idx = grain_idx % g->audio_buffer_len;
                 val += g->audio_buffer[modified_idx] *
-                       sound_grain_env(&g->m_grains[i]);
+                       sound_grain_env(&g->m_grains[i], g->envelope_mode);
             }
         }
     }
@@ -242,7 +245,8 @@ void granulator_status(void *self, wchar_t *status_string)
              " lfo2_min:%f lfo2_max:%f \n"
              "      grainscan_lfo_on:%s lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
              " lfo3_min:%f lfo3_max:%f \n"
-             "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
+             "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n"
+             "      env_mode:%s\n",
              g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
              g->quasi_grain_fudge, g->grain_duration_ms, g->grains_per_sec,
              g->granular_spray, g->grain_buffer_position, g->grain_pitch,
@@ -258,7 +262,7 @@ void granulator_status(void *self, wchar_t *status_string)
              g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
              g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max,
              g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
-             g->m_eg1.m_state);
+             g->m_eg1.m_state, s_env_names[g->envelope_mode]);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -330,6 +334,13 @@ void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
     g->audiobuffer_pitch = pitch;
     g->attack_time_pct = attack_pct;
     g->release_time_pct = release_pct;
+
+    g->amp = 0;
+    double rdur = 1.0 / dur;
+    double rdur2 = rdur * rdur;
+    g->slope = 4.0 * 1.0 * (rdur - rdur2);
+    g->curve = -8.0 * 1.0 * rdur2;
+
     g->active = true;
     g->deactivation_pending = false;
 }
@@ -359,18 +370,31 @@ int sound_grain_generate_idx(sound_grain *g)
     return my_idx;
 }
 
-double sound_grain_env(sound_grain *g)
+double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
 {
+    double amp = 0;
     int idx = g->audiobuffer_cur_pos;
+    double percent_pos = 0;
 
-    double env_amp = 1.;
-    double percent_pos =
-        100. / g->grain_len_samples * (idx - g->audiobuffer_start_idx);
-    if (percent_pos < g->attack_time_pct)
-        env_amp *= percent_pos / g->attack_time_pct;
-    else if (percent_pos > (100 - g->release_time_pct))
-        env_amp *= (100 - percent_pos) / g->release_time_pct;
-    return env_amp;
+    switch (envelope_mode)
+    {
+    case (GRANULATOR_ENV_PARABOLIC):
+        g->amp = g->amp + g->slope;
+        g->slope = g->slope + g->curve;
+        amp = g->amp;
+        break;
+    case (GRANULATOR_ENV_TRAPEZOIDAL):
+        amp = 1;
+        percent_pos =
+            100. / g->grain_len_samples * (idx - g->audiobuffer_start_idx);
+        if (percent_pos < g->attack_time_pct)
+            amp *= percent_pos / g->attack_time_pct;
+        else if (percent_pos > (100 - g->release_time_pct))
+            amp *= (100 - percent_pos) / g->release_time_pct;
+        break;
+    }
+
+    return amp;
 }
 
 //////////////////////////// end of grain stuff //////////////////////////
@@ -478,6 +502,16 @@ void granulator_set_selection_mode(granulator *g, unsigned int mode)
         return;
     }
     g->selection_mode = mode;
+}
+
+void granulator_set_envelope_mode(granulator *g, unsigned int mode)
+{
+    if (mode >= GRANULATOR_ENV_NUM)
+    {
+        printf("Selection must be < %d\n", GRANULATOR_ENV_NUM);
+        return;
+    }
+    g->envelope_mode = mode;
 }
 
 void granulator_set_sequencer_mode(granulator *g, bool b)

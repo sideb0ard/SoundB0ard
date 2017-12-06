@@ -22,6 +22,9 @@ typedef struct sound_grain
     int attack_time_pct;  // percent of grain_len_samples
     bool active;
     bool deactivation_pending;
+    double amp;
+    double slope;
+    double curve;
 } sound_grain;
 
 enum
@@ -29,6 +32,14 @@ enum
     GRAIN_SELECTION_STATIC,
     GRAIN_SELECTION_RANDOM,
     GRAIN_NUM_SELECTION_MODES
+};
+
+enum
+{
+    GRANULATOR_ENV_PARABOLIC,
+    GRANULATOR_ENV_TRAPEZOIDAL,
+    GRANULATOR_ENV_RAISED_COSINE_BELL,
+    GRANULATOR_ENV_NUM
 };
 
 typedef struct granulator
@@ -59,6 +70,7 @@ typedef struct granulator
     int grain_pitch;
     int num_grains_per_looplen;
     unsigned int selection_mode;
+    unsigned int envelope_mode;
 
     int last_grain_launched_sample_time;
     int grain_attack_time_pct;
@@ -118,6 +130,7 @@ void granulator_set_grain_buffer_position(granulator *g, int position);
 void granulator_set_granular_spray(granulator *g, int spray_ms);
 void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor);
 void granulator_set_selection_mode(granulator *g, unsigned int mode);
+void granulator_set_envelope_mode(granulator *g, unsigned int mode);
 int granulator_get_available_grain_num(granulator *g);
 int granulator_deactivate_other_grains(granulator *g);
 
@@ -131,7 +144,7 @@ void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops);
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);
 int sound_grain_generate_idx(sound_grain *g);
-double sound_grain_env(sound_grain *g);
+double sound_grain_env(sound_grain *g, unsigned int envelope_mode);
 
 void granulator_del_self(void *self);
 

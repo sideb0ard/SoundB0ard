@@ -499,7 +499,7 @@ void looper_scramble(looper *l)
     file_sample *s = l->samples[l->cur_sample];
 
     double *scrambled = s->scrambled_file_bytes;
-    int len16th = mixr->timing_info.loop_len_in_frames / 16 / s->channels;
+    int len16th = (mixr->timing_info.loop_len_in_frames / 16) * s->channels;
 
     // take a copy of the first 16th that we can randomly inject below.
     double first16th[len16th];
@@ -517,6 +517,15 @@ void looper_scramble(looper *l)
         third16th[i] = scrambled[i + len16th * 3];
         fourth16th[i] = scrambled[i + len16th * 4];
         seventh16th[i] = scrambled[i + len16th * 7];
+
+        if (s->channels == 2)
+        {
+            first16th[i + 1] = scrambled[i + 1];
+            rev16th[(len16th - 1) - (i + 1)] = scrambled[i + 1];
+            third16th[i + 1] = scrambled[(i + 1) + len16th * 3];
+            fourth16th[i + 1] = scrambled[(i + 1) + len16th * 4];
+            seventh16th[i + 1] = scrambled[(i + 1) + len16th * 7];
+        }
     }
 
     l->scramble_counter = 0;

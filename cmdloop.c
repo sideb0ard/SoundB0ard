@@ -779,6 +779,12 @@ void interpret(char *line)
                         int mode = atoi(wurds[3]);
                         granulator_set_selection_mode(g, mode);
                     }
+                    else if (strncmp("env_mode", wurds[2], 8) == 0)
+                    {
+                        int mode = atoi(wurds[3]);
+                        printf("ENV MODE is %d\n", mode);
+                        granulator_set_envelope_mode(g, mode);
+                    }
                     else if (strncmp("sequencer_mode", wurds[2], 13) == 0)
                     {
                         int mode = atoi(wurds[3]);
