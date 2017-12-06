@@ -31,6 +31,7 @@ granulator *new_granulator(char *filename)
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->envelope_mode = GRANULATOR_ENV_PARABOLIC;
+    g->movement_mode = 0; // off or on
     g->external_source_sg = -1;
 
     g->grain_pitch = 1;
@@ -113,6 +114,14 @@ void granulator_event_notify(void *self, unsigned int event_type)
             seq_tick(&g->m_seq);
         }
         break;
+    case(TIME_START_OF_LOOP_TICK):
+        if (g->movement_mode)
+        {
+            g->movement_pct = (g->movement_pct + 10) % 100;
+            granulator_set_grain_buffer_position(g, g->movement_pct);
+        }
+        break;
+
     }
 }
 
@@ -246,7 +255,7 @@ void granulator_status(void *self, wchar_t *status_string)
              "      grainscan_lfo_on:%s lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
              " lfo3_min:%f lfo3_max:%f \n"
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n"
-             "      env_mode:%s\n",
+             "      env_mode:%s movement:%d\n",
              g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
              g->quasi_grain_fudge, g->grain_duration_ms, g->grains_per_sec,
              g->granular_spray, g->grain_buffer_position, g->grain_pitch,
@@ -262,7 +271,7 @@ void granulator_status(void *self, wchar_t *status_string)
              g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
              g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max,
              g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
-             g->m_eg1.m_state, s_env_names[g->envelope_mode]);
+             g->m_eg1.m_state, s_env_names[g->envelope_mode], g->movement_mode);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -472,7 +481,7 @@ void granulator_set_grain_buffer_position(granulator *g, int pos)
 {
     if (pos < 0 || pos > 100)
     {
-        printf("file position should be a percent\n");
+        printf("file position should be a percent (not %d)\n", pos);
         return;
     }
     g->grain_buffer_position = (double)pos / 100. * g->audio_buffer_len;
@@ -512,6 +521,11 @@ void granulator_set_envelope_mode(granulator *g, unsigned int mode)
         return;
     }
     g->envelope_mode = mode;
+}
+
+void granulator_set_movement_mode(granulator *g, bool b)
+{
+    g->movement_mode = b;
 }
 
 void granulator_set_sequencer_mode(granulator *g, bool b)

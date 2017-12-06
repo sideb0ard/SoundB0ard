@@ -71,6 +71,8 @@ typedef struct granulator
     int num_grains_per_looplen;
     unsigned int selection_mode;
     unsigned int envelope_mode;
+    unsigned int movement_mode;
+    int movement_pct;
 
     int last_grain_launched_sample_time;
     int grain_attack_time_pct;
@@ -131,6 +133,7 @@ void granulator_set_granular_spray(granulator *g, int spray_ms);
 void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor);
 void granulator_set_selection_mode(granulator *g, unsigned int mode);
 void granulator_set_envelope_mode(granulator *g, unsigned int mode);
+void granulator_set_movement_mode(granulator *g, bool b);
 int granulator_get_available_grain_num(granulator *g);
 int granulator_deactivate_other_grains(granulator *g);
 
