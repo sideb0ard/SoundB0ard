@@ -20,6 +20,8 @@ typedef struct sound_grain
     int audiobuffer_pitch;
     int release_time_pct; // percent of grain_len_samples
     int attack_time_pct;  // percent of grain_len_samples
+    int attack_time_samples;
+    int release_time_samples;
     bool active;
     bool deactivation_pending;
     double amp;
@@ -147,6 +149,8 @@ void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops);
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);
 int sound_grain_generate_idx(sound_grain *g);
+double sound_grain_generate(sound_grain *g, double *audio_buffer,
+                            int num_channels);
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode);
 
 void granulator_del_self(void *self);
