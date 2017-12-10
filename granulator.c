@@ -208,27 +208,17 @@ stereo_val granulator_gennext(void *self)
 
         for (int i = 0; i < g->highest_grain_num; i++)
         {
-            stereo_val tmp = sound_grain_generate(&g->m_grains[i], g->audio_buffer,
-                                        g->audio_buffer_len,
-                                        g->num_channels);
+            stereo_val tmp =
+                sound_grain_generate(&g->m_grains[i], g->audio_buffer,
+                                     g->audio_buffer_len, g->num_channels);
             double env = sound_grain_env(&g->m_grains[i], g->envelope_mode);
             val.left += tmp.left * env;
             val.right += tmp.right * env;
-            // int grain_idx = sound_grain_generate_idx(&g->m_grains[i]);
-            // if (grain_idx != -99)
-            //{
-            //    if (grain_idx < 0)
-            //        printf("VLIMEY!\n");
-            //    val += sound_
-            //    //int modified_idx = grain_idx % g->audio_buffer_len;
-            //    //val += g->audio_buffer[modified_idx] *
-            //    //       sound_grain_env(&g->m_grains[i], g->envelope_mode);
-            //}
         }
     }
 
-    //val = effector(&g->sound_generator, val);
-    //val = envelopor(&g->sound_generator, val);
+    // val = effector(&g->sound_generator, val);
+    // val = envelopor(&g->sound_generator, val);
 
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
@@ -246,7 +236,7 @@ void granulator_status(void *self, wchar_t *status_string)
              L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d "
              "quasi_grain_fudge:%d"
              " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
-             "      grain_file_pos:%d grain_pitch:%d selection_mode:%d "
+             "      grain_file_pos:%d grain_pitch:%f selection_mode:%d "
              "active_grains:%d highest_grain_num:%d sequencer_mode:%s\n"
              "      graindur_lfo_on :%s lfo1_type:%d lfo1_amp:%f lfo1_rate:%f"
              " lfo1_min:%f lfo1_max:%f \n"
@@ -366,50 +356,47 @@ inline static void sound_grain_check_index(double *index, int len, int start,
         *index -= len;
 }
 
-stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer, int audio_buffer_len,
-                            int num_channels)
+stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
+                                int audio_buffer_len, int num_channels)
 {
     stereo_val out = {0., 0.};
     if (!g->active)
         return out;
 
+    int read_idx = (int)g->audiobuffer_cur_pos;
+    double frac = read_idx - g->audiobuffer_cur_pos;
 
-    int end_buffer = g->audiobuffer_start_idx + g->grain_len_samples;
-    //double my_idx = g->audiobuffer_cur_pos;
+    int end_buffer =
+        g->audiobuffer_start_idx + (g->grain_len_samples * num_channels);
 
-    int idx = g->audiobuffer_cur_pos % audio_buffer_len;
-    out.left = audio_buffer[idx];
-    out.right = out.left;
-    //int i_read_idx = abs((int)my_idx);
-    //float frac = my_idx - i_read_idx;
+    if (num_channels == 1)
+    {
+        int read_idx_next = read_idx + 1 > end_buffer - 1
+                                ? g->audiobuffer_start_idx
+                                : read_idx + 1;
+        out.left = lin_terp(0, 1, audio_buffer[read_idx],
+                            audio_buffer[read_idx_next], frac);
+        out.right = out.left;
+    }
+    else if (num_channels == 2)
+    {
 
-    //int read_idx_next = i_read_idx + 1 > end_buffer - 1
-    //                        ? g->audiobuffer_start_idx
-    //                        : i_read_idx + 1;
-    //out = lin_terp(-1, 1, audio_buffer[i_read_idx], audio_buffer[read_idx_next],
-    //               frac);
+        int read_idx_next_left = read_idx + 2 > end_buffer - 1
+                                     ? g->audiobuffer_start_idx
+                                     : read_idx + 2;
+        out.left = lin_terp(0, 1, audio_buffer[read_idx],
+                            audio_buffer[read_idx_next_left], frac);
 
-    // if (num_channels == 1)
-    //{
-    //	//int read_idx_next = i_read_idx + 1 > end_buffer - 1
-    //	//                        ? g->audiobuffer_start_idx
-    //	//                        : i_read_idx + 1;
-    //	//out = lin_terp(0, 1, audio_buffer[i_read_idx],
-    //audio_buffer[read_idx_next],
-    //	//               frac);
-    //}
-    // else if (num_channels == 2)
-    //{
-    //
-    //	int read_idx_next = i_read_idx + 1 > end_buffer - 1
-    //	                        ? g->audiobuffer_start_idx
-    //	                        : i_read_idx + 1;
-    //	out = lin_terp(0, 1, audio_buffer[i_read_idx],
-    //audio_buffer[read_idx_next],
-    //	               frac);
-    //}
+        int read_idx_right = read_idx + 1;
+        int read_idx_next_right = read_idx_right + 2 > end_buffer - 1
+                                      ? g->audiobuffer_start_idx + 1
+                                      : read_idx_right + 2;
+        out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
+                             audio_buffer[read_idx_next_right], frac);
+    }
 
     g->audiobuffer_cur_pos += num_channels;
+
     if (g->audiobuffer_cur_pos >= end_buffer)
     {
         g->audiobuffer_cur_pos -= g->grain_len_samples;
@@ -545,7 +532,7 @@ void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor)
     g->quasi_grain_fudge = fudgefactor;
 }
 
-void granulator_set_grain_pitch(granulator *g, int pitch)
+void granulator_set_grain_pitch(granulator *g, double pitch)
 {
     g->grain_pitch = pitch;
 }

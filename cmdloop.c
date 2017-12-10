@@ -771,7 +771,7 @@ void interpret(char *line)
                     }
                     else if (strncmp("grain_pitch", wurds[2], 10) == 0)
                     {
-                        int pitch = atoi(wurds[3]);
+                        double pitch = atof(wurds[3]);
                         granulator_set_grain_pitch(g, pitch);
                     }
                     else if (strncmp("selection_mode", wurds[2], 14) == 0)

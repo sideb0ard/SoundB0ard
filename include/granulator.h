@@ -17,7 +17,7 @@ typedef struct sound_grain
     int audiobuffer_num;
     int audiobuffer_start_idx;
     int audiobuffer_cur_pos;
-    int audiobuffer_pitch;
+    double audiobuffer_pitch;
     int release_time_pct; // percent of grain_len_samples
     int attack_time_pct;  // percent of grain_len_samples
     int attack_time_samples;
@@ -69,7 +69,7 @@ typedef struct granulator
     int grain_buffer_position;
     int grain_duration_ms;
     int grains_per_sec;
-    int grain_pitch;
+    double grain_pitch;
     int num_grains_per_looplen;
     unsigned int selection_mode;
     unsigned int envelope_mode;
@@ -125,7 +125,7 @@ void granulator_set_external_source(granulator *g, int sound_gen_num);
 
 int granulator_calculate_grain_spacing(granulator *g);
 void granulator_set_sequencer_mode(granulator *g, bool b);
-void granulator_set_grain_pitch(granulator *g, int pitch);
+void granulator_set_grain_pitch(granulator *g, double pitch);
 void granulator_set_grain_duration(granulator *g, int dur);
 void granulator_set_grains_per_sec(granulator *g, int gps);
 void granulator_set_grain_attack_size_pct(granulator *g, int att);
@@ -149,7 +149,7 @@ void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops);
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch);
 stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
-                            int buffer_len, int num_channels);
+                                int buffer_len, int num_channels);
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode);
 
 void granulator_del_self(void *self);
