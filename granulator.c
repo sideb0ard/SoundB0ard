@@ -127,7 +127,7 @@ void granulator_event_notify(void *self, unsigned int event_type)
 stereo_val granulator_gennext(void *self)
 {
     granulator *g = (granulator *)self;
-    double val = 0;
+    stereo_val val = {0., 0.};
 
     if (g->external_source_sg != -1)
     {
@@ -208,8 +208,12 @@ stereo_val granulator_gennext(void *self)
 
         for (int i = 0; i < g->highest_grain_num; i++)
         {
-            val += sound_grain_generate(&g->m_grains[i], g->audio_buffer,
+            stereo_val tmp = sound_grain_generate(&g->m_grains[i], g->audio_buffer,
+                                        g->audio_buffer_len,
                                         g->num_channels);
+            double env = sound_grain_env(&g->m_grains[i], g->envelope_mode);
+            val.left += tmp.left * env;
+            val.right += tmp.right * env;
             // int grain_idx = sound_grain_generate_idx(&g->m_grains[i]);
             // if (grain_idx != -99)
             //{
@@ -223,15 +227,16 @@ stereo_val granulator_gennext(void *self)
         }
     }
 
-    val = effector(&g->sound_generator, val);
-    val = envelopor(&g->sound_generator, val);
+    //val = effector(&g->sound_generator, val);
+    //val = envelopor(&g->sound_generator, val);
 
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
 
-    double out_val = val * g->vol * eg_amp;
+    val.left = val.left * g->vol * eg_amp;
+    val.right = val.right * g->vol * eg_amp;
 
-    return (stereo_val){.left = out_val, .right = out_val};
+    return val;
 }
 
 void granulator_status(void *self, wchar_t *status_string)
@@ -361,25 +366,28 @@ inline static void sound_grain_check_index(double *index, int len, int start,
         *index -= len;
 }
 
-double sound_grain_generate(sound_grain *g, double *audio_buffer,
+stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer, int audio_buffer_len,
                             int num_channels)
 {
+    stereo_val out = {0., 0.};
     if (!g->active)
-        return 0.;
+        return out;
 
-    double out = 0.;
 
     int end_buffer = g->audiobuffer_start_idx + g->grain_len_samples;
-    double my_idx = g->audiobuffer_cur_pos;
+    //double my_idx = g->audiobuffer_cur_pos;
 
-    int i_read_idx = abs((int)my_idx);
-    float frac = my_idx - i_read_idx;
+    int idx = g->audiobuffer_cur_pos % audio_buffer_len;
+    out.left = audio_buffer[idx];
+    out.right = out.left;
+    //int i_read_idx = abs((int)my_idx);
+    //float frac = my_idx - i_read_idx;
 
-    int read_idx_next = i_read_idx + 1 > end_buffer - 1
-                            ? g->audiobuffer_start_idx
-                            : i_read_idx + 1;
-    out = lin_terp(0, 1, audio_buffer[i_read_idx], audio_buffer[read_idx_next],
-                   frac);
+    //int read_idx_next = i_read_idx + 1 > end_buffer - 1
+    //                        ? g->audiobuffer_start_idx
+    //                        : i_read_idx + 1;
+    //out = lin_terp(-1, 1, audio_buffer[i_read_idx], audio_buffer[read_idx_next],
+    //               frac);
 
     // if (num_channels == 1)
     //{
