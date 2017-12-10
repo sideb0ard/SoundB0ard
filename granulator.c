@@ -32,6 +32,7 @@ granulator *new_granulator(char *filename)
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->envelope_mode = GRANULATOR_ENV_PARABOLIC;
     g->movement_mode = 0; // off or on
+    g->reverse_mode = 0;  // off or on
     g->external_source_sg = -1;
 
     g->grain_pitch = 1;
@@ -208,17 +209,19 @@ stereo_val granulator_gennext(void *self)
 
         for (int i = 0; i < g->highest_grain_num; i++)
         {
-            stereo_val tmp =
-                sound_grain_generate(&g->m_grains[i], g->audio_buffer,
-                                     g->audio_buffer_len, g->num_channels);
+            stereo_val tmp = sound_grain_generate(
+                &g->m_grains[i], g->audio_buffer, g->audio_buffer_len,
+                g->num_channels, g->reverse_mode);
             double env = sound_grain_env(&g->m_grains[i], g->envelope_mode);
             val.left += tmp.left * env;
             val.right += tmp.right * env;
         }
     }
 
-    // val = effector(&g->sound_generator, val);
-    // val = envelopor(&g->sound_generator, val);
+    val.left = effector(&g->sound_generator, val.left);
+    val.right = effector(&g->sound_generator, val.right);
+    val.left = envelopor(&g->sound_generator, val.left);
+    val.right = envelopor(&g->sound_generator, val.right);
 
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
@@ -234,7 +237,8 @@ void granulator_status(void *self, wchar_t *status_string)
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d "
-             "quasi_grain_fudge:%d"
+             L"num_channels:%d\n"
+             "      quasi_grain_fudge:%d"
              " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
              "      grain_file_pos:%d grain_pitch:%f selection_mode:%d "
              "active_grains:%d highest_grain_num:%d sequencer_mode:%s\n"
@@ -245,9 +249,11 @@ void granulator_status(void *self, wchar_t *status_string)
              "      grainscan_lfo_on:%s lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
              " lfo3_min:%f lfo3_max:%f \n"
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n"
-             "      env_mode:%s movement:%d\n",
+             "      env_mode:%s movement:%d reverse:%d\n",
              g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
-             g->quasi_grain_fudge, g->grain_duration_ms, g->grains_per_sec,
+             g->num_channels, g->quasi_grain_fudge, g->grain_duration_ms,
+             g->grains_per_sec,
+
              g->granular_spray, g->grain_buffer_position, g->grain_pitch,
              g->selection_mode, g->num_active_grains, g->highest_grain_num,
              g->sequencer_mode ? "true" : "false",
@@ -261,7 +267,8 @@ void granulator_status(void *self, wchar_t *status_string)
              g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
              g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max,
              g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
-             g->m_eg1.m_state, s_env_names[g->envelope_mode], g->movement_mode);
+             g->m_eg1.m_state, s_env_names[g->envelope_mode], g->movement_mode,
+             g->reverse_mode);
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -357,7 +364,8 @@ inline static void sound_grain_check_index(double *index, int len, int start,
 }
 
 stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
-                                int audio_buffer_len, int num_channels)
+                                int audio_buffer_len, int num_channels,
+                                bool reverse)
 {
     stereo_val out = {0., 0.};
     if (!g->active)
@@ -381,10 +389,11 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     else if (num_channels == 2)
     {
 
-        int read_idx_next_left = read_idx + 2 > end_buffer - 1
+        int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
+        int read_idx_next_left = read_idx_left + 2 > end_buffer - 1
                                      ? g->audiobuffer_start_idx
-                                     : read_idx + 2;
-        out.left = lin_terp(0, 1, audio_buffer[read_idx],
+                                     : read_idx_left + 2;
+        out.left = lin_terp(0, 1, audio_buffer[read_idx_left],
                             audio_buffer[read_idx_next_left], frac);
 
         int read_idx_right = read_idx + 1;
@@ -395,7 +404,10 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
                              audio_buffer[read_idx_next_right], frac);
     }
 
-    g->audiobuffer_cur_pos += num_channels;
+    if (reverse)
+        g->audiobuffer_cur_pos -= g->audiobuffer_pitch;
+    else
+        g->audiobuffer_cur_pos += g->audiobuffer_pitch;
 
     if (g->audiobuffer_cur_pos >= end_buffer)
     {
@@ -557,6 +569,7 @@ void granulator_set_envelope_mode(granulator *g, unsigned int mode)
     g->envelope_mode = mode;
 }
 
+void granulator_set_reverse_mode(granulator *g, bool b) { g->reverse_mode = b; }
 void granulator_set_movement_mode(granulator *g, bool b)
 {
     g->movement_mode = b;

@@ -797,6 +797,12 @@ void interpret(char *line)
                         printf("Movement MODE is %d\n", mode);
                         granulator_set_movement_mode(g, mode);
                     }
+                    else if (strncmp("reverse", wurds[2], 8) == 0)
+                    {
+                        int mode = atoi(wurds[3]);
+                        printf("REverse MODE is %d\n", mode);
+                        granulator_set_reverse_mode(g, mode);
+                    }
                     else if (strncmp("lfo1_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
