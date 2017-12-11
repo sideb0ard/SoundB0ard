@@ -16,6 +16,7 @@ typedef struct sound_grain
     int grain_len_frames;
     int audiobuffer_num;
     int audiobuffer_start_idx;
+    int audiobuffer_num_channels;
     double audiobuffer_cur_pos;
     double audiobuffer_inc;
     double audiobuffer_pitch;
@@ -24,10 +25,11 @@ typedef struct sound_grain
     int attack_time_samples;
     int release_time_samples;
     bool active;
-    bool deactivation_pending;
     double amp;
     double slope;
     double curve;
+    bool reverse_mode;
+    double incr;
 } sound_grain;
 
 enum
@@ -140,7 +142,7 @@ void granulator_set_envelope_mode(granulator *g, unsigned int mode);
 void granulator_set_movement_mode(granulator *g, bool b);
 void granulator_set_reverse_mode(granulator *g, bool b);
 int granulator_get_available_grain_num(granulator *g);
-int granulator_deactivate_other_grains(granulator *g);
+int granulator_count_active_grains(granulator *g);
 
 void granulator_set_lfo_amp(granulator *g, int lfonum, double amp);
 void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice);
@@ -150,9 +152,10 @@ void granulator_set_lfo_max(granulator *g, int lfonum, double maxval);
 void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
-                      int release_pct, int pitch);
+                      int release_pct, bool reverse, double pitch,
+                      int num_channels);
 stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
-                                int buffer_len, int num_channels, bool reverse);
+                                int buffer_len);
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode);
 
 void granulator_del_self(void *self);

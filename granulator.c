@@ -201,17 +201,14 @@ stereo_val granulator_gennext(void *self)
             int release_time_pct = g->grain_release_time_pct;
             sound_grain_init(&g->m_grains[g->cur_grain_num], duration,
                              grain_idx, attack_time_pct, release_time_pct,
-                             g->grain_pitch);
-            g->num_active_grains++;
-            int num_deactivated = granulator_deactivate_other_grains(g);
-            g->num_active_grains -= num_deactivated;
+                             g->reverse_mode, g->grain_pitch, g->num_channels);
+            g->num_active_grains = granulator_count_active_grains(g);
         }
 
         for (int i = 0; i < g->highest_grain_num; i++)
         {
             stereo_val tmp = sound_grain_generate(
-                &g->m_grains[i], g->audio_buffer, g->audio_buffer_len,
-                g->num_channels, g->reverse_mode);
+                &g->m_grains[i], g->audio_buffer, g->audio_buffer_len);
             double env = sound_grain_env(&g->m_grains[i], g->envelope_mode);
             val.left += tmp.left * env;
             val.right += tmp.right * env;
@@ -228,6 +225,8 @@ stereo_val granulator_gennext(void *self)
 
     val.left = val.left * g->vol * eg_amp;
     val.right = val.right * g->vol * eg_amp;
+
+    // printf("Vals:%f %f\n", val.left, val.right);
 
     return val;
 }
@@ -269,6 +268,15 @@ void granulator_status(void *self, wchar_t *status_string)
              g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
              g->m_eg1.m_state, s_env_names[g->envelope_mode], g->movement_mode,
              g->reverse_mode);
+
+    for (int i = 0; i < g->num_active_grains; i++)
+    {
+        printf("Grain[%d] active:%s start:%d durInFrames:%d pos:%f incr:%f\n",
+               i, g->m_grains[i].active ? "TRUE" : "FALSE",
+               g->m_grains[i].audiobuffer_start_idx,
+               g->m_grains[i].grain_len_frames,
+               g->m_grains[i].audiobuffer_cur_pos, g->m_grains[i].incr);
+    }
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -332,14 +340,26 @@ int granulator_get_num_tracks(void *self)
 // granulator functions contuine below
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
-                      int release_pct, int pitch)
+                      int release_pct, bool reverse_mode, double pitch,
+                      int num_channels)
 {
-    g->grain_len_frames = dur;
     g->audiobuffer_start_idx = starting_idx;
-    g->audiobuffer_cur_pos = starting_idx;
-    g->audiobuffer_pitch = pitch;
+    g->grain_len_frames = dur;
     g->attack_time_pct = attack_pct;
     g->release_time_pct = release_pct;
+    g->audiobuffer_num_channels = num_channels;
+
+    g->reverse_mode = reverse_mode;
+    if (reverse_mode)
+    {
+        g->audiobuffer_cur_pos = starting_idx + (dur * num_channels) - 1;
+        g->incr = -1.0 * pitch;
+    }
+    else
+    {
+        g->audiobuffer_cur_pos = starting_idx;
+        g->incr = pitch;
+    }
 
     g->attack_time_samples = dur / 100. * attack_pct;
     g->release_time_samples = dur / 100. * release_pct;
@@ -351,76 +371,90 @@ void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
     g->curve = -8.0 * 1.0 * rdur2;
 
     g->active = true;
-    g->deactivation_pending = false;
-}
-
-inline static void sound_grain_check_index(double *index, int len, int start,
-                                           int end)
-{
-    while (*index < start)
-        *index += len;
-    while (*index >= start + len)
-        *index -= len;
 }
 
 stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
-                                int audio_buffer_len, int num_channels,
-                                bool reverse)
+                                int audio_buffer_len)
 {
     stereo_val out = {0., 0.};
     if (!g->active)
         return out;
 
+    int num_channels = g->audiobuffer_num_channels;
+
     int read_idx = (int)g->audiobuffer_cur_pos;
     double frac = read_idx - g->audiobuffer_cur_pos;
+    if (g->reverse_mode)
+        frac = 1.0 - frac;
 
     int end_buffer =
         g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
 
     if (num_channels == 1)
     {
-        int read_idx_next = read_idx + 1 > end_buffer - 1
-                                ? g->audiobuffer_start_idx
-                                : read_idx + 1;
-        out.left = lin_terp(0, 1, audio_buffer[read_idx],
-                            audio_buffer[read_idx_next], frac);
+        if (g->reverse_mode)
+        {
+            int read_idx_next = read_idx - 1 < g->audiobuffer_start_idx
+                                    ? end_buffer - 1
+                                    : read_idx - 1;
+            out.left = lin_terp(0, 1, audio_buffer[read_idx_next],
+                                audio_buffer[read_idx], frac);
+        }
+        else
+        {
+            int read_idx_next = read_idx + 1 > end_buffer - 1
+                                    ? g->audiobuffer_start_idx
+                                    : read_idx + 1;
+            out.left = lin_terp(0, 1, audio_buffer[read_idx],
+                                audio_buffer[read_idx_next], frac);
+        }
         out.right = out.left;
     }
     else if (num_channels == 2)
     {
 
-        int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
-        int read_idx_next_left = read_idx_left + 2 > end_buffer - 1
-                                     ? g->audiobuffer_start_idx
-                                     : read_idx_left + 2;
-        out.left = lin_terp(0, 1, audio_buffer[read_idx_left],
-                            audio_buffer[read_idx_next_left], frac);
+        if (g->reverse_mode)
+        {
+            int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
+            int read_idx_next_left =
+                read_idx_left - 2 < g->audiobuffer_start_idx
+                    ? end_buffer - 1
+                    : read_idx_left - 2;
+            out.left = lin_terp(0, 1, audio_buffer[read_idx_next_left],
+                                audio_buffer[read_idx_left], frac);
 
-        int read_idx_right = read_idx + 1;
-        int read_idx_next_right = read_idx_right + 2 > end_buffer - 1
-                                      ? g->audiobuffer_start_idx + 1
-                                      : read_idx_right + 2;
-        out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
-                             audio_buffer[read_idx_next_right], frac);
+            int read_idx_right = read_idx - 1;
+            int read_idx_next_right =
+                read_idx_right - 2 < g->audiobuffer_start_idx + 1
+                    ? end_buffer - 2
+                    : read_idx_right - 2;
+            out.right = lin_terp(0, 1, audio_buffer[read_idx_next_right],
+                                 audio_buffer[read_idx_right], frac);
+        }
+        else
+        {
+            int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
+            int read_idx_next_left = read_idx_left + 2 > end_buffer - 1
+                                         ? g->audiobuffer_start_idx
+                                         : read_idx_left + 2;
+            out.left = lin_terp(0, 1, audio_buffer[read_idx_left],
+                                audio_buffer[read_idx_next_left], frac);
+
+            int read_idx_right = read_idx + 1;
+            int read_idx_next_right = read_idx_right + 2 > end_buffer - 1
+                                          ? g->audiobuffer_start_idx + 1
+                                          : read_idx_right + 2;
+            out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
+                                 audio_buffer[read_idx_next_right], frac);
+        }
     }
 
-    if (reverse)
-        g->audiobuffer_cur_pos -= g->audiobuffer_pitch;
-    else
-        g->audiobuffer_cur_pos += g->audiobuffer_pitch;
+    g->audiobuffer_cur_pos += g->incr;
 
-    if (g->audiobuffer_cur_pos >= end_buffer)
-    {
-        g->audiobuffer_cur_pos -= g->grain_len_frames;
-        if (g->deactivation_pending)
-            g->active = false;
-    }
-    else if (g->audiobuffer_cur_pos < g->audiobuffer_start_idx)
-    {
-        g->audiobuffer_cur_pos = end_buffer - g->audiobuffer_cur_pos;
-        if (g->deactivation_pending)
-            g->active = false;
-    }
+    if ((g->reverse_mode &&
+         g->audiobuffer_cur_pos < g->audiobuffer_start_idx) ||
+        g->audiobuffer_cur_pos >= end_buffer)
+        g->active = false;
 
     return out;
 }
@@ -606,20 +640,14 @@ int granulator_get_available_grain_num(granulator *g)
     return 0;
 }
 
-int granulator_deactivate_other_grains(granulator *g)
+int granulator_count_active_grains(granulator *g)
 {
-    int num_deactivated = 0;
+    int active = 0;
     for (int i = 0; i < g->highest_grain_num; i++)
-    {
-        if (i == g->cur_grain_num)
-            continue;
-        if (g->m_grains[i].active && !g->m_grains[i].deactivation_pending)
-        {
-            g->m_grains[i].deactivation_pending = true;
-            num_deactivated++;
-        }
-    }
-    return num_deactivated;
+        if (g->m_grains[i].active)
+            active++;
+
+    return active;
 }
 
 void granulator_set_lfo_amp(granulator *g, int lfonum, double amp)
