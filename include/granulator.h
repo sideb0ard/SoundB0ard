@@ -109,6 +109,12 @@ typedef struct granulator
     double m_lfo3_max;
     bool lfo3_sync;
 
+    bool grainpitch_lfo_on;
+    lfo m_lfo4; // file read position
+    double m_lfo4_min;
+    double m_lfo4_max;
+    bool lfo4_sync;
+
     double vol;
 } granulator;
 
@@ -127,6 +133,7 @@ void granulator_event_notify(void *self, unsigned int event_type);
 void granulator_import_file(granulator *g, char *filename);
 void granulator_set_external_source(granulator *g, int sound_gen_num);
 
+void granulator_update_lfos(granulator *g);
 int granulator_calculate_grain_spacing(granulator *g);
 void granulator_set_sequencer_mode(granulator *g, bool b);
 void granulator_set_grain_pitch(granulator *g, double pitch);

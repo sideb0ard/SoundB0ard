@@ -901,6 +901,11 @@ void interpret(char *line)
                         int b = atoi(wurds[3]);
                         g->graindur_lfo_on = b;
                     }
+                    else if (strncmp("grainpitch_lfo_on", wurds[2], 17) == 0)
+                    {
+                        int b = atoi(wurds[3]);
+                        g->grainpitch_lfo_on = b;
+                    }
                     else if (strncmp("grainps_lfo_on", wurds[2], 13) == 0)
                     {
                         int b = atoi(wurds[3]);

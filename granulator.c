@@ -90,6 +90,16 @@ granulator *new_granulator(char *filename)
     g->lfo3_sync = false;
     lfo_start_oscillator((oscillator *)&g->m_lfo3);
 
+    g->grainpitch_lfo_on = false;
+    g->m_lfo4_min = -1.0;
+    g->m_lfo4_max = 1.;
+    osc_new_settings((oscillator *)&g->m_lfo4);
+    lfo_set_soundgenerator_interface(&g->m_lfo4);
+    g->m_lfo4.osc.m_osc_fo = 0.1; // default LFO
+    g->m_lfo4.osc.m_amplitude = 1.;
+    g->lfo4_sync = false;
+    lfo_start_oscillator((oscillator *)&g->m_lfo4);
+
     granulator_start(g);
 
     return g;
@@ -125,26 +135,12 @@ void granulator_event_notify(void *self, unsigned int event_type)
     }
 }
 
-stereo_val granulator_gennext(void *self)
+void granulator_update_lfos(granulator *g)
 {
-    granulator *g = (granulator *)self;
-    stereo_val val = {0., 0.};
-
-    if (g->external_source_sg != -1)
-    {
-        g->audio_buffer[g->audio_buffer_write_idx] =
-            mixr->soundgen_cur_val[g->external_source_sg].left;
-        g->audio_buffer_write_idx++;
-        if (g->audio_buffer_write_idx >= g->audio_buffer_len)
-            g->audio_buffer_write_idx = 0;
-    }
-
-    if (g->m_eg1.m_state == OFFF)
-        g->sound_generator.active = false;
-
     osc_update((oscillator *)&g->m_lfo1);
     osc_update((oscillator *)&g->m_lfo2);
     osc_update((oscillator *)&g->m_lfo3);
+    osc_update((oscillator *)&g->m_lfo4);
 
     if (g->graindur_lfo_on)
     {
@@ -177,6 +173,28 @@ stereo_val granulator_gennext(void *self)
                 g->audio_buffer_len - g->grain_buffer_position;
     }
 
+    if (g->grainpitch_lfo_on)
+        g->grain_pitch = fabs(lfo_do_oscillate((oscillator *)&g->m_lfo4, NULL));
+}
+
+stereo_val granulator_gennext(void *self)
+{
+    granulator *g = (granulator *)self;
+    stereo_val val = {0., 0.};
+
+    if (g->external_source_sg != -1)
+    {
+        g->audio_buffer[g->audio_buffer_write_idx] =
+            mixr->soundgen_cur_val[g->external_source_sg].left;
+        g->audio_buffer_write_idx++;
+        if (g->audio_buffer_write_idx >= g->audio_buffer_len)
+            g->audio_buffer_write_idx = 0;
+    }
+
+    if (g->m_eg1.m_state == OFFF)
+        g->sound_generator.active = false;
+
+    granulator_update_lfos(g);
     if (g->have_active_buffer) // file buffer or external in
     {
         int spacing = granulator_calculate_grain_spacing(g);
@@ -199,6 +217,7 @@ stereo_val granulator_gennext(void *self)
 
             int attack_time_pct = g->grain_attack_time_pct;
             int release_time_pct = g->grain_release_time_pct;
+
             sound_grain_init(&g->m_grains[g->cur_grain_num], duration,
                              grain_idx, attack_time_pct, release_time_pct,
                              g->reverse_mode, g->grain_pitch, g->num_channels);
@@ -235,39 +254,54 @@ void granulator_status(void *self, wchar_t *status_string)
 {
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d "
-             L"num_channels:%d\n"
-             "      quasi_grain_fudge:%d"
-             " grain_duration_ms:%d grains_per_sec:%d grain_spray_ms:%d\n"
-             "      grain_file_pos:%d grain_pitch:%f selection_mode:%d "
-             "active_grains:%d highest_grain_num:%d sequencer_mode:%s\n"
-             "      graindur_lfo_on :%s lfo1_type:%d lfo1_amp:%f lfo1_rate:%f"
-             " lfo1_min:%f lfo1_max:%f \n"
-             "      grainps_lfo_on  :%s lfo2_type:%d lfo2_amp:%f lfo2_rate:%f"
-             " lfo2_min:%f lfo2_max:%f \n"
-             "      grainscan_lfo_on:%s lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
-             " lfo3_min:%f lfo3_max:%f \n"
-             "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n"
-             "      env_mode:%s movement:%d reverse:%d\n",
-             g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
-             g->num_channels, g->quasi_grain_fudge, g->grain_duration_ms,
-             g->grains_per_sec,
+             L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d stereo:%s\n"
+             "      grain_file_pos:%d quasi_grain_fudge:%d grain_spray_ms:%d "
+             "active_grains:%d highest_grain_num:%d\n"
+             "      selection_mode:%d env_mode:%s movement:%d reverse:%d "
+             "sequencer_mode:%s\n"
 
-             g->granular_spray, g->grain_buffer_position, g->grain_pitch,
-             g->selection_mode, g->num_active_grains, g->highest_grain_num,
+             "\n      [grain_pitch:%f] grainpitch_lfo_on:%d\n"
+             "      lfo4_type:%d lfo4_amp:%f lfo4_rate:%f"
+             " lfo4_min:%f lfo4_max:%f \n"
+
+             "\n      [grain_duration_ms:%d] graindur_lfo_on:%d\n"
+             "      lfo1_type:%d lfo1_amp:%f lfo1_rate:%f"
+             " lfo1_min:%f lfo1_max:%f \n"
+
+             "\n      [grains_per_sec:%d] grainps_lfo_on:%d\n"
+             "      lfo2_type:%d lfo2_amp:%f lfo2_rate:%f"
+             " lfo2_min:%f lfo2_max:%f \n"
+
+             "\n      grainscan_lfo_on:%d lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
+             " lfo3_min:%f lfo3_max:%f \n"
+
+             "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
+
+             g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
+             g->num_channels == 2 ? "true" : "false", g->grain_buffer_position,
+             g->quasi_grain_fudge, g->granular_spray, g->num_active_grains,
+             g->highest_grain_num, g->selection_mode,
+             s_env_names[g->envelope_mode], g->movement_mode, g->reverse_mode,
              g->sequencer_mode ? "true" : "false",
-             // s_lfo_mode_names[g->m_lfo1.osc.m_waveform],
-             g->graindur_lfo_on ? "true" : "false", g->m_lfo1.osc.m_waveform,
+
+             g->grain_pitch, g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
+             g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
+             g->m_lfo4_max,
+
+             g->grain_duration_ms, g->graindur_lfo_on, g->m_lfo1.osc.m_waveform,
              g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
-             g->m_lfo1_max, g->grainps_lfo_on ? "true" : "false",
-             g->m_lfo2.osc.m_waveform, g->m_lfo2.osc.m_amplitude,
-             g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min, g->m_lfo2_max,
-             g->grainscanfile_lfo_on ? "true" : "false",
-             g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
-             g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max,
+             g->m_lfo1_max,
+
+             g->grains_per_sec, g->grainps_lfo_on, g->m_lfo2.osc.m_waveform,
+             g->m_lfo2.osc.m_amplitude, g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min,
+             g->m_lfo2_max,
+
+             g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
+             g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
+             g->m_lfo3_max,
+
              g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
-             g->m_eg1.m_state, s_env_names[g->envelope_mode], g->movement_mode,
-             g->reverse_mode);
+             g->m_eg1.m_state);
 
     for (int i = 0; i < g->num_active_grains; i++)
     {
@@ -373,6 +407,14 @@ void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
     g->active = true;
 }
 
+static inline void sound_grain_check_idx(int *index, int buffer_len)
+{
+    while (*index < 0.0)
+        *index += buffer_len;
+    while (*index >= buffer_len)
+        *index -= buffer_len;
+}
+
 stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
                                 int audio_buffer_len)
 {
@@ -383,7 +425,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     int num_channels = g->audiobuffer_num_channels;
 
     int read_idx = (int)g->audiobuffer_cur_pos;
-    double frac = read_idx - g->audiobuffer_cur_pos;
+    double frac = g->audiobuffer_cur_pos - read_idx;
     if (g->reverse_mode)
         frac = 1.0 - frac;
 
@@ -392,61 +434,67 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 
     if (num_channels == 1)
     {
+        int read_idx_next;
         if (g->reverse_mode)
         {
-            int read_idx_next = read_idx - 1 < g->audiobuffer_start_idx
-                                    ? end_buffer - 1
-                                    : read_idx - 1;
-            out.left = lin_terp(0, 1, audio_buffer[read_idx_next],
-                                audio_buffer[read_idx], frac);
+            read_idx_next = read_idx - 1 < g->audiobuffer_start_idx
+                                ? end_buffer - 1
+                                : read_idx - 1;
         }
         else
         {
-            int read_idx_next = read_idx + 1 > end_buffer - 1
-                                    ? g->audiobuffer_start_idx
-                                    : read_idx + 1;
-            out.left = lin_terp(0, 1, audio_buffer[read_idx],
-                                audio_buffer[read_idx_next], frac);
+            read_idx_next = read_idx + 1 > end_buffer - 1
+                                ? g->audiobuffer_start_idx
+                                : read_idx + 1;
         }
+        sound_grain_check_idx(&read_idx, audio_buffer_len);
+        sound_grain_check_idx(&read_idx_next, audio_buffer_len);
+
+        out.left = lin_terp(0, 1, audio_buffer[read_idx],
+                            audio_buffer[read_idx_next], frac);
         out.right = out.left;
     }
     else if (num_channels == 2)
     {
 
+        int read_idx_left;
+        int read_idx_next_left;
+        int read_idx_right;
+        int read_idx_next_right;
+
         if (g->reverse_mode)
         {
-            int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
-            int read_idx_next_left =
-                read_idx_left - 2 < g->audiobuffer_start_idx
-                    ? end_buffer - 1
-                    : read_idx_left - 2;
-            out.left = lin_terp(0, 1, audio_buffer[read_idx_next_left],
-                                audio_buffer[read_idx_left], frac);
+            read_idx_left = (int)g->audiobuffer_cur_pos * 2;
+            read_idx_next_left = read_idx_left - 2 < g->audiobuffer_start_idx
+                                     ? end_buffer - 1
+                                     : read_idx_left - 2;
 
-            int read_idx_right = read_idx_left - 1;
-            int read_idx_next_right =
+            read_idx_right = read_idx_left - 1;
+            read_idx_next_right =
                 read_idx_right - 2 < g->audiobuffer_start_idx + 1
                     ? end_buffer - 2
                     : read_idx_right - 2;
-            out.right = lin_terp(0, 1, audio_buffer[read_idx_next_right],
-                                 audio_buffer[read_idx_right], frac);
         }
         else
         {
-            int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
-            int read_idx_next_left = read_idx_left + 2 > end_buffer - 1
-                                         ? g->audiobuffer_start_idx
-                                         : read_idx_left + 2;
-            out.left = lin_terp(0, 1, audio_buffer[read_idx_left],
-                                audio_buffer[read_idx_next_left], frac);
+            read_idx_left = (int)g->audiobuffer_cur_pos * 2;
+            read_idx_next_left = read_idx_left + 2 > end_buffer - 1
+                                     ? g->audiobuffer_start_idx
+                                     : read_idx_left + 2;
 
-            int read_idx_right = read_idx_left + 1;
-            int read_idx_next_right = read_idx_right + 2 > end_buffer - 1
-                                          ? g->audiobuffer_start_idx + 1
-                                          : read_idx_right + 2;
-            out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
-                                 audio_buffer[read_idx_next_right], frac);
+            read_idx_right = read_idx_left + 1;
+            read_idx_next_right = read_idx_right + 2 > end_buffer - 1
+                                      ? g->audiobuffer_start_idx + 1
+                                      : read_idx_right + 2;
         }
+        sound_grain_check_idx(&read_idx_left, audio_buffer_len);
+        sound_grain_check_idx(&read_idx_next_left, audio_buffer_len);
+        out.left = lin_terp(0, 1, audio_buffer[read_idx_left],
+                            audio_buffer[read_idx_next_left], frac);
+        sound_grain_check_idx(&read_idx_right, audio_buffer_len);
+        sound_grain_check_idx(&read_idx_next_right, audio_buffer_len);
+        out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
+                             audio_buffer[read_idx_next_right], frac);
     }
 
     g->audiobuffer_cur_pos += g->incr;
