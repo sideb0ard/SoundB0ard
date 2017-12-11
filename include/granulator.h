@@ -13,14 +13,14 @@
 
 typedef struct sound_grain
 {
-    int grain_len_samples;
+    int grain_len_frames;
     int audiobuffer_num;
     int audiobuffer_start_idx;
     double audiobuffer_cur_pos;
     double audiobuffer_inc;
     double audiobuffer_pitch;
-    int release_time_pct; // percent of grain_len_samples
-    int attack_time_pct;  // percent of grain_len_samples
+    int release_time_pct; // percent of grain_len_frames
+    int attack_time_pct;  // percent of grain_len_frames
     int attack_time_samples;
     int release_time_samples;
     bool active;

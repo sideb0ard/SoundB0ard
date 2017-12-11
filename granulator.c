@@ -334,7 +334,7 @@ int granulator_get_num_tracks(void *self)
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, int pitch)
 {
-    g->grain_len_samples = dur;
+    g->grain_len_frames = dur;
     g->audiobuffer_start_idx = starting_idx;
     g->audiobuffer_cur_pos = starting_idx;
     g->audiobuffer_pitch = pitch;
@@ -375,7 +375,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     double frac = read_idx - g->audiobuffer_cur_pos;
 
     int end_buffer =
-        g->audiobuffer_start_idx + (g->grain_len_samples * num_channels);
+        g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
 
     if (num_channels == 1)
     {
@@ -411,7 +411,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 
     if (g->audiobuffer_cur_pos >= end_buffer)
     {
-        g->audiobuffer_cur_pos -= g->grain_len_samples;
+        g->audiobuffer_cur_pos -= g->grain_len_frames;
         if (g->deactivation_pending)
             g->active = false;
     }
@@ -441,7 +441,7 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
     case (GRANULATOR_ENV_TRAPEZOIDAL):
         amp = 1;
         percent_pos =
-            100. / g->grain_len_samples * (idx - g->audiobuffer_start_idx);
+            100. / g->grain_len_frames * (idx - g->audiobuffer_start_idx);
         if (percent_pos < g->attack_time_pct)
             amp *= percent_pos / g->attack_time_pct;
         else if (percent_pos > (100 - g->release_time_pct))
