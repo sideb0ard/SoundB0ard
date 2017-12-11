@@ -896,6 +896,37 @@ void interpret(char *line)
                         double max = atof(wurds[3]);
                         granulator_set_lfo_max(g, 3, max);
                     }
+                    else if (strncmp("lfo4_type", wurds[2], 8) == 0)
+                    {
+                        int type = atoi(wurds[3]);
+                        printf("LFO TYPE is %d\n", mode);
+                        granulator_set_lfo_voice(g, 4, type);
+                    }
+                    else if (strncmp("lfo4_amp", wurds[2], 7) == 0)
+                    {
+                        double amp = atof(wurds[3]);
+                        granulator_set_lfo_amp(g, 4, amp);
+                    }
+                    else if (strncmp("lfo4_rate", wurds[2], 8) == 0)
+                    {
+                        double rate = atof(wurds[3]);
+                        granulator_set_lfo_rate(g, 4, rate);
+                    }
+                    else if (strncmp("lfo4_sync", wurds[2], 8) == 0)
+                    {
+                        double loops = atof(wurds[3]);
+                        granulator_set_lfo_sync(g, 4, loops);
+                    }
+                    else if (strncmp("lfo4_min", wurds[2], 8) == 0)
+                    {
+                        double min = atof(wurds[3]);
+                        granulator_set_lfo_min(g, 4, min);
+                    }
+                    else if (strncmp("lfo4_max", wurds[2], 8) == 0)
+                    {
+                        double max = atof(wurds[3]);
+                        granulator_set_lfo_max(g, 4, max);
+                    }
                     else if (strncmp("graindur_lfo_on", wurds[2], 14) == 0)
                     {
                         int b = atoi(wurds[3]);

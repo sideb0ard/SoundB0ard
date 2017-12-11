@@ -91,7 +91,7 @@ granulator *new_granulator(char *filename)
     lfo_start_oscillator((oscillator *)&g->m_lfo3);
 
     g->grainpitch_lfo_on = false;
-    g->m_lfo4_min = -1.0;
+    g->m_lfo4_min = 0.5;
     g->m_lfo4_max = 1.;
     osc_new_settings((oscillator *)&g->m_lfo4);
     lfo_set_soundgenerator_interface(&g->m_lfo4);
@@ -174,7 +174,12 @@ void granulator_update_lfos(granulator *g)
     }
 
     if (g->grainpitch_lfo_on)
-        g->grain_pitch = fabs(lfo_do_oscillate((oscillator *)&g->m_lfo4, NULL));
+    {
+        double lfo4_out = lfo_do_oscillate((oscillator *)&g->m_lfo4, NULL);
+        double scaley_val =
+            scaleybum(-1, 1, g->m_lfo4_min, g->m_lfo4_max, lfo4_out);
+        g->grain_pitch = scaley_val;
+    }
 }
 
 stereo_val granulator_gennext(void *self)
@@ -197,6 +202,7 @@ stereo_val granulator_gennext(void *self)
     granulator_update_lfos(g);
     if (g->have_active_buffer) // file buffer or external in
     {
+        // STEP 1 - calculate if we should launch a new grain
         int spacing = granulator_calculate_grain_spacing(g);
         if (mixr->timing_info.cur_sample >
             g->last_grain_launched_sample_time + spacing) // new grain time
@@ -224,6 +230,7 @@ stereo_val granulator_gennext(void *self)
             g->num_active_grains = granulator_count_active_grains(g);
         }
 
+        // STEP 2 - gather vals from all active grains
         for (int i = 0; i < g->highest_grain_num; i++)
         {
             stereo_val tmp = sound_grain_generate(
@@ -244,8 +251,6 @@ stereo_val granulator_gennext(void *self)
 
     val.left = val.left * g->vol * eg_amp;
     val.right = val.right * g->vol * eg_amp;
-
-    // printf("Vals:%f %f\n", val.left, val.right);
 
     return val;
 }
@@ -425,79 +430,27 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     int num_channels = g->audiobuffer_num_channels;
 
     int read_idx = (int)g->audiobuffer_cur_pos;
-    double frac = g->audiobuffer_cur_pos - read_idx;
-    if (g->reverse_mode)
-        frac = 1.0 - frac;
-
-    int end_buffer =
-        g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
 
     if (num_channels == 1)
     {
-        int read_idx_next;
-        if (g->reverse_mode)
-        {
-            read_idx_next = read_idx - 1 < g->audiobuffer_start_idx
-                                ? end_buffer - 1
-                                : read_idx - 1;
-        }
-        else
-        {
-            read_idx_next = read_idx + 1 > end_buffer - 1
-                                ? g->audiobuffer_start_idx
-                                : read_idx + 1;
-        }
         sound_grain_check_idx(&read_idx, audio_buffer_len);
-        sound_grain_check_idx(&read_idx_next, audio_buffer_len);
-
-        out.left = lin_terp(0, 1, audio_buffer[read_idx],
-                            audio_buffer[read_idx_next], frac);
+        out.left = audio_buffer[read_idx];
         out.right = out.left;
     }
     else if (num_channels == 2)
     {
-
-        int read_idx_left;
-        int read_idx_next_left;
-        int read_idx_right;
-        int read_idx_next_right;
-
-        if (g->reverse_mode)
-        {
-            read_idx_left = (int)g->audiobuffer_cur_pos * 2;
-            read_idx_next_left = read_idx_left - 2 < g->audiobuffer_start_idx
-                                     ? end_buffer - 1
-                                     : read_idx_left - 2;
-
-            read_idx_right = read_idx_left - 1;
-            read_idx_next_right =
-                read_idx_right - 2 < g->audiobuffer_start_idx + 1
-                    ? end_buffer - 2
-                    : read_idx_right - 2;
-        }
-        else
-        {
-            read_idx_left = (int)g->audiobuffer_cur_pos * 2;
-            read_idx_next_left = read_idx_left + 2 > end_buffer - 1
-                                     ? g->audiobuffer_start_idx
-                                     : read_idx_left + 2;
-
-            read_idx_right = read_idx_left + 1;
-            read_idx_next_right = read_idx_right + 2 > end_buffer - 1
-                                      ? g->audiobuffer_start_idx + 1
-                                      : read_idx_right + 2;
-        }
+        int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
+        int read_idx_right = read_idx_left + 1;
         sound_grain_check_idx(&read_idx_left, audio_buffer_len);
-        sound_grain_check_idx(&read_idx_next_left, audio_buffer_len);
-        out.left = lin_terp(0, 1, audio_buffer[read_idx_left],
-                            audio_buffer[read_idx_next_left], frac);
         sound_grain_check_idx(&read_idx_right, audio_buffer_len);
-        sound_grain_check_idx(&read_idx_next_right, audio_buffer_len);
-        out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
-                             audio_buffer[read_idx_next_right], frac);
+        out.left = audio_buffer[read_idx_left];
+        out.right = audio_buffer[read_idx_right];
     }
 
     g->audiobuffer_cur_pos += g->incr;
+
+    int end_buffer =
+        g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
 
     if ((g->reverse_mode &&
          g->audiobuffer_cur_pos < g->audiobuffer_start_idx) ||
@@ -713,6 +666,9 @@ void granulator_set_lfo_amp(granulator *g, int lfonum, double amp)
         case (3):
             g->m_lfo3.osc.m_amplitude = amp;
             break;
+        case (4):
+            g->m_lfo4.osc.m_amplitude = amp;
+            break;
         }
     }
     else
@@ -734,6 +690,9 @@ void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice)
         case (3):
             g->m_lfo3.osc.m_waveform = voice;
             break;
+        case (4):
+            g->m_lfo4.osc.m_waveform = voice;
+            break;
         }
     }
     else
@@ -742,7 +701,6 @@ void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice)
 
 void granulator_set_lfo_rate(granulator *g, int lfonum, double rate)
 {
-    // if (rate >= MIN_LFO_RATE && rate <= MAX_LFO_RATE)
     if (rate >= 0 && rate <= MAX_LFO_RATE)
     {
         switch (lfonum)
@@ -758,6 +716,10 @@ void granulator_set_lfo_rate(granulator *g, int lfonum, double rate)
         case (3):
             g->m_lfo3.osc.m_osc_fo = rate;
             g->lfo3_sync = false;
+            break;
+        case (4):
+            g->m_lfo4.osc.m_osc_fo = rate;
+            g->lfo4_sync = false;
             break;
         }
     }
@@ -780,6 +742,9 @@ void granulator_set_lfo_min(granulator *g, int lfonum, double minval)
     case (3):
         g->m_lfo3_min = minval;
         break;
+    case (4):
+        g->m_lfo4_min = minval;
+        break;
     }
 }
 
@@ -798,6 +763,10 @@ void granulator_set_lfo_max(granulator *g, int lfonum, double maxval)
     case (3):
         if (maxval > g->m_lfo3_min)
             g->m_lfo3_max = maxval;
+        break;
+    case (4):
+        if (maxval > g->m_lfo4_min)
+            g->m_lfo4_max = maxval;
         break;
     }
 }
@@ -821,6 +790,10 @@ void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops)
     case (3):
         g->m_lfo3.osc.m_osc_fo = osc_fo;
         g->lfo3_sync = true;
+        break;
+    case (4):
+        g->m_lfo4.osc.m_osc_fo = osc_fo;
+        g->lfo4_sync = true;
         break;
     }
 }
