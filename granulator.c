@@ -423,7 +423,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
             out.left = lin_terp(0, 1, audio_buffer[read_idx_next_left],
                                 audio_buffer[read_idx_left], frac);
 
-            int read_idx_right = read_idx - 1;
+            int read_idx_right = read_idx_left - 1;
             int read_idx_next_right =
                 read_idx_right - 2 < g->audiobuffer_start_idx + 1
                     ? end_buffer - 2
@@ -440,7 +440,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
             out.left = lin_terp(0, 1, audio_buffer[read_idx_left],
                                 audio_buffer[read_idx_next_left], frac);
 
-            int read_idx_right = read_idx + 1;
+            int read_idx_right = read_idx_left + 1;
             int read_idx_next_right = read_idx_right + 2 > end_buffer - 1
                                           ? g->audiobuffer_start_idx + 1
                                           : read_idx_right + 2;
