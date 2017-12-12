@@ -22,8 +22,8 @@ granulator *new_granulator(char *filename)
     g->started = false;
     g->have_active_buffer = false;
 
-    g->grain_buffer_position = 0;
-    g->granular_spray = 441; // 10 ms * 44.1
+    g->audio_buffer_read_idx = 0;
+    g->granular_spray_frames = 441; // 10ms * (44100/1000)
     g->grain_duration_ms = 50;
     g->grains_per_sec = 30;
     g->grain_attack_time_pct = 20;
@@ -128,8 +128,7 @@ void granulator_event_notify(void *self, unsigned int event_type)
     case (TIME_START_OF_LOOP_TICK):
         if (g->movement_mode)
         {
-            g->movement_pct = (g->movement_pct + 10) % 100;
-            granulator_set_grain_buffer_position(g, g->movement_pct);
+            granulator_set_audio_buffer_read_idx(g, 0);
         }
         break;
     }
@@ -163,14 +162,20 @@ void granulator_update_lfos(granulator *g)
         double lfo3_out = lfo_do_oscillate((oscillator *)&g->m_lfo3, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo3_min, g->m_lfo3_max, lfo3_out);
-        g->grain_buffer_position = scaley_val;
+        double diff;
+        if (g->audio_buffer_read_idx > scaley_val)
+            diff = g->audio_buffer_read_idx - scaley_val;
+        else
+            diff = scaley_val - g->audio_buffer_read_idx;
 
-        if (g->grain_buffer_position >= g->audio_buffer_len)
-            g->grain_buffer_position =
-                g->grain_buffer_position % g->audio_buffer_len;
-        else if (g->grain_buffer_position < 0)
-            g->grain_buffer_position =
-                g->audio_buffer_len - g->grain_buffer_position;
+        g->audio_buffer_read_idx += diff;
+
+        if (g->audio_buffer_read_idx >= g->audio_buffer_len)
+            g->audio_buffer_read_idx =
+                (int)g->audio_buffer_read_idx % g->audio_buffer_len;
+        else if (g->audio_buffer_read_idx < 0)
+            g->audio_buffer_read_idx =
+                g->audio_buffer_len - g->audio_buffer_read_idx;
     }
 
     if (g->grainpitch_lfo_on)
@@ -187,6 +192,13 @@ stereo_val granulator_gennext(void *self)
     granulator *g = (granulator *)self;
     stereo_val val = {0., 0.};
 
+    if (g->movement_mode)
+    {
+        g->audio_buffer_read_idx +=
+            g->audio_buffer_len / (double)mixr->timing_info.loop_len_in_frames;
+        if (g->audio_buffer_read_idx >= g->audio_buffer_len)
+            g->audio_buffer_read_idx = 0;
+    }
     if (g->external_source_sg != -1)
     {
         g->audio_buffer[g->audio_buffer_write_idx] =
@@ -214,12 +226,12 @@ stereo_val granulator_gennext(void *self)
             if (g->quasi_grain_fudge != 0)
                 duration += rand() % g->quasi_grain_fudge;
 
-            int grain_idx = g->grain_buffer_position;
+            int grain_idx = g->audio_buffer_read_idx;
             if (g->selection_mode == GRAIN_SELECTION_RANDOM)
                 grain_idx = rand() % (g->audio_buffer_len - duration);
 
-            if (g->granular_spray > 0)
-                grain_idx += rand() % g->granular_spray;
+            if (g->granular_spray_frames > 0)
+                grain_idx += rand() % g->granular_spray_frames;
 
             int attack_time_pct = g->grain_attack_time_pct;
             int release_time_pct = g->grain_release_time_pct;
@@ -260,7 +272,8 @@ void granulator_status(void *self, wchar_t *status_string)
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d stereo:%s\n"
-             "      grain_file_pos:%d quasi_grain_fudge:%d grain_spray_ms:%d "
+             "      audio_buffer_read_idxs:%d quasi_grain_fudge:%d "
+             "grain_spray_ms:%.2f "
              "active_grains:%d highest_grain_num:%d\n"
              "      selection_mode:%d env_mode:%s movement:%d reverse:%d "
              "sequencer_mode:%s\n"
@@ -283,8 +296,9 @@ void granulator_status(void *self, wchar_t *status_string)
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
 
              g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
-             g->num_channels == 2 ? "true" : "false", g->grain_buffer_position,
-             g->quasi_grain_fudge, g->granular_spray, g->num_active_grains,
+             g->num_channels == 2 ? "true" : "false",
+             (int)g->audio_buffer_read_idx, g->quasi_grain_fudge,
+             g->granular_spray_frames / 44.1, g->num_active_grains,
              g->highest_grain_num, g->selection_mode,
              s_env_names[g->envelope_mode], g->movement_mode, g->reverse_mode,
              g->sequencer_mode ? "true" : "false",
@@ -558,20 +572,19 @@ void granulator_set_grain_release_size_pct(granulator *g, int release_pct)
         g->grain_release_time_pct = release_pct;
 }
 
-void granulator_set_grain_buffer_position(granulator *g, int pos)
+void granulator_set_audio_buffer_read_idx(granulator *g, int pos)
 {
-    if (pos < 0 || pos > 100)
+    if (pos < 0 || pos >= g->audio_buffer_len)
     {
-        printf("file position should be a percent (not %d)\n", pos);
         return;
     }
-    g->grain_buffer_position = (double)pos / 100. * g->audio_buffer_len;
+    g->audio_buffer_read_idx = pos;
 }
 
 void granulator_set_granular_spray(granulator *g, int spray_ms)
 {
-    int spray_samples = spray_ms * 44.1;
-    g->granular_spray = spray_samples;
+    int spray_frames = spray_ms * 44.1;
+    g->granular_spray_frames = spray_frames;
 }
 
 void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor)

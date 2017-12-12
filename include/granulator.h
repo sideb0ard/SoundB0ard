@@ -56,23 +56,23 @@ typedef struct granulator
 
     char filename[512];
     double *audio_buffer;
-    int audio_buffer_len;
     int num_channels;
+    int audio_buffer_len;
+    double audio_buffer_read_idx;
     int audio_buffer_write_idx;
-    int external_source_sg; // exclusive - external or file
+    int external_source_sg; // XOR - external or file
 
     int num_active_grains;
     int highest_grain_num;
     int cur_grain_num;
     sound_grain m_grains[MAX_CONCURRENT_GRAINS];
-    sound_grain m_next_grain;
 
-    int granular_spray;
+    int granular_spray_frames;
     int quasi_grain_fudge;
-    int grain_buffer_position;
     int grain_duration_ms;
     int grains_per_sec;
     double grain_pitch;
+
     int num_grains_per_looplen;
     unsigned int selection_mode;
     unsigned int envelope_mode;
@@ -141,7 +141,7 @@ void granulator_set_grain_duration(granulator *g, int dur);
 void granulator_set_grains_per_sec(granulator *g, int gps);
 void granulator_set_grain_attack_size_pct(granulator *g, int att);
 void granulator_set_grain_release_size_pct(granulator *g, int rel);
-void granulator_set_grain_buffer_position(granulator *g, int position);
+void granulator_set_audio_buffer_read_idx(granulator *g, int position);
 void granulator_set_granular_spray(granulator *g, int spray_ms);
 void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor);
 void granulator_set_selection_mode(granulator *g, unsigned int mode);

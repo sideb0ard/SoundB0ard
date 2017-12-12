@@ -737,7 +737,7 @@ void interpret(char *line)
                     else if (strncmp("grain_file_pos", wurds[2], 14) == 0)
                     {
                         int pos = atoi(wurds[3]);
-                        granulator_set_grain_buffer_position(g, pos);
+                        granulator_set_audio_buffer_read_idx(g, pos);
                     }
                     else if (strncmp("grain_spray_ms", wurds[2], 14) == 0)
                     {
