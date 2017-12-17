@@ -734,7 +734,7 @@ void interpret(char *line)
                         int gps = atoi(wurds[3]);
                         granulator_set_grains_per_sec(g, gps);
                     }
-                    else if (strncmp("grain_file_pos", wurds[2], 14) == 0)
+                    else if (strncmp("audio_buffer_read_idx", wurds[2], 14) == 0)
                     {
                         int pos = atoi(wurds[3]);
                         granulator_set_audio_buffer_read_idx(g, pos);
@@ -751,6 +751,7 @@ void interpret(char *line)
                     }
                     else if (strncmp("extsource", wurds[2], 9) == 0)
                     {
+                        printf("EXTSOURCE!\n");
                         int sg = atoi(wurds[3]);
                         if (mixer_is_valid_soundgen_num(mixr, sg))
                         {

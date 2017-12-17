@@ -18,7 +18,6 @@ granulator *new_granulator(char *filename)
 {
     granulator *g = (granulator *)calloc(1, sizeof(granulator));
     g->vol = 0.4;
-    // g->active = true;
     g->started = false;
     g->have_active_buffer = false;
 
@@ -105,13 +104,15 @@ granulator *new_granulator(char *filename)
     return g;
 }
 
+static bool playing = false;
+static int playing_midi_tick_count = 0;
 void granulator_event_notify(void *self, unsigned int event_type)
 {
     granulator *g = (granulator *)self;
+
     switch (event_type)
     {
     case (TIME_MIDI_TICK):
-        // TODO - i don't think this works, but unneeded at the moment
         if (g->sequencer_mode && g->m_seq.num_patterns > 0)
         {
             int idx = mixr->timing_info.midi_tick % PPBAR;
@@ -119,12 +120,21 @@ void granulator_event_notify(void *self, unsigned int event_type)
                 g->m_seq.patterns[g->m_seq.cur_pattern][idx])
             {
                 granulator_start(g);
+                playing = true;
             }
-            else if (mixr->timing_info.is_sixteenth)
-                granulator_stop(g);
+
             seq_tick(&g->m_seq);
         }
+        if (playing)
+            playing_midi_tick_count++;
         break;
+    case (TIME_SIXTEENTH_TICK):
+        if (playing && playing_midi_tick_count > PPQN / 2)
+        {
+            granulator_stop(g);
+            playing = false;
+            playing_midi_tick_count = 0;
+        }
     case (TIME_START_OF_LOOP_TICK):
         if (g->movement_mode)
         {
@@ -192,6 +202,12 @@ stereo_val granulator_gennext(void *self)
     granulator *g = (granulator *)self;
     stereo_val val = {0., 0.};
 
+    if (!g->sound_generator.active)
+        return val;
+
+    if (g->m_eg1.m_state == OFFF)
+        g->sound_generator.active = false;
+
     if (g->movement_mode)
     {
         g->audio_buffer_read_idx +=
@@ -203,13 +219,12 @@ stereo_val granulator_gennext(void *self)
     {
         g->audio_buffer[g->audio_buffer_write_idx] =
             mixr->soundgen_cur_val[g->external_source_sg].left;
-        g->audio_buffer_write_idx++;
+        g->audio_buffer[g->audio_buffer_write_idx + 1] =
+            mixr->soundgen_cur_val[g->external_source_sg].right;
+        g->audio_buffer_write_idx = g->audio_buffer_write_idx + 2;
         if (g->audio_buffer_write_idx >= g->audio_buffer_len)
             g->audio_buffer_write_idx = 0;
     }
-
-    if (g->m_eg1.m_state == OFFF)
-        g->sound_generator.active = false;
 
     granulator_update_lfos(g);
     if (g->have_active_buffer) // file buffer or external in
@@ -272,8 +287,8 @@ void granulator_status(void *self, wchar_t *status_string)
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d stereo:%s\n"
-             "      audio_buffer_read_idxs:%d quasi_grain_fudge:%d "
-             "grain_spray_ms:%.2f "
+             "      audio_buffer_read_idx:%d audio_buffer_write_idx:%d\n"
+             "      quasi_grain_fudge:%d grain_spray_ms:%.2f "
              "active_grains:%d highest_grain_num:%d\n"
              "      selection_mode:%d env_mode:%s movement:%d reverse:%d "
              "sequencer_mode:%s\n"
@@ -297,7 +312,9 @@ void granulator_status(void *self, wchar_t *status_string)
 
              g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
              g->num_channels == 2 ? "true" : "false",
-             (int)g->audio_buffer_read_idx, g->quasi_grain_fudge,
+             (int)g->audio_buffer_read_idx,
+             g->audio_buffer_write_idx,
+             g->quasi_grain_fudge,
              g->granular_spray_frames / 44.1, g->num_active_grains,
              g->highest_grain_num, g->selection_mode,
              s_env_names[g->envelope_mode], g->movement_mode, g->reverse_mode,
@@ -348,9 +365,7 @@ void granulator_start(void *self)
 void granulator_stop(void *self)
 {
     granulator *g = (granulator *)self;
-    g->started = false;
     eg_release(&g->m_eg1);
-    g->sound_generator.active = false;
 }
 
 double granulator_getvol(void *self)
@@ -519,7 +534,7 @@ void granulator_set_external_source(granulator *g, int sound_gen_num)
     if (mixer_is_valid_soundgen_num(mixr, sound_gen_num))
     {
         g->external_source_sg = sound_gen_num;
-        int looplen = mixr->timing_info.loop_len_in_frames;
+        int looplen = mixr->timing_info.loop_len_in_frames * 2; // stereo
         double *buffer = calloc(looplen, sizeof(double));
         if (buffer)
         {
@@ -625,16 +640,11 @@ void granulator_set_movement_mode(granulator *g, bool b)
 
 void granulator_set_sequencer_mode(granulator *g, bool b)
 {
-    if (b != 0 && b != 1)
-    {
-        printf("not BOOLEY BOOLEY!\n");
-        return;
-    }
-    if (b)
-        g->sequencer_gate = 0;
-    else
-        g->sequencer_gate = 1;
     g->sequencer_mode = b;
+    if (b)
+        granulator_stop(g); // stop so that env fades
+    else
+        granulator_start(g);
 }
 
 int granulator_get_available_grain_num(granulator *g)

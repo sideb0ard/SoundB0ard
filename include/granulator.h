@@ -86,7 +86,6 @@ typedef struct granulator
 
     sequencer m_seq;
     bool sequencer_mode;
-    int sequencer_gate;
 
     envelope_generator m_eg1; // start/stop amp
     envelope_generator m_eg2; // unused so far

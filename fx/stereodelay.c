@@ -19,6 +19,24 @@ stereodelay *new_stereo_delay(double duration)
     d->m_fx.status = &stereo_delay_status;
     d->m_fx.process = &stereo_delay_process_wrapper;
 
+	d->lfo1_on = false;
+    d->m_lfo1_min = 50;
+    d->m_lfo1_max = 80;
+    osc_new_settings((oscillator *)&d->m_lfo1);
+    lfo_set_soundgenerator_interface(&d->m_lfo1);
+    d->m_lfo1.osc.m_osc_fo = 0.01; // default LFO
+    d->m_lfo1.osc.m_amplitude = 1.;
+    lfo_start_oscillator((oscillator *)&d->m_lfo1);
+
+	d->lfo2_on = false;
+    d->m_lfo2_min = 50;
+    d->m_lfo2_max = 80;
+    osc_new_settings((oscillator *)&d->m_lfo2);
+    lfo_set_soundgenerator_interface(&d->m_lfo2);
+    d->m_lfo2.osc.m_osc_fo = 0.01; // default LFO
+    d->m_lfo2.osc.m_amplitude = 1.;
+    lfo_start_oscillator((oscillator *)&d->m_lfo2);
+
     stereo_delay_prepare_for_play(d);
     stereo_delay_update(d);
 

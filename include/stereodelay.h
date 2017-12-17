@@ -5,6 +5,7 @@
 #include "defjams.h"
 #include "delayline.h"
 #include "fx.h"
+#include "lfo.h"
 
 typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;
 
@@ -19,6 +20,16 @@ typedef struct stereodelay
     unsigned m_mode;
     double m_tap2_left_delay_time_ms;
     double m_tap2_right_delay_time_ms;
+
+    lfo m_lfo1;
+    bool lfo1_on;
+    double m_lfo1_min;
+    double m_lfo1_max;
+
+    lfo m_lfo2;
+    bool lfo2_on;
+    double m_lfo2_min;
+    double m_lfo2_max;
 } stereodelay;
 
 stereodelay *new_stereo_delay(double duration);

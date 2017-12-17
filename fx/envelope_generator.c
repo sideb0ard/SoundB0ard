@@ -207,7 +207,6 @@ void eg_release(envelope_generator *self)
 
 void eg_stop_eg(envelope_generator *self)
 {
-    printf("EG_STOP_EG called!\n");
     self->m_state = OFFF;
 }
 
