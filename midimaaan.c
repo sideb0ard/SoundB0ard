@@ -22,9 +22,12 @@ extern mixer *mixr;
 
 void *midiman()
 {
+    printf("MIDI maaaaan!\n");
     pthread_setname_np("Midimaaaan");
 
-    Pm_Initialize();
+    PmError retval = Pm_Initialize();
+    if (retval != pmNoError)
+        printf("Err running Pm_Initialize: %s\n", Pm_GetErrorText(retval));
 
     int cnt;
     const PmDeviceInfo *info;
@@ -39,22 +42,28 @@ void *midiman()
             if (info->input && (strncmp(info->name, "MPKmini2", 8) == 0))
             {
                 dev = i;
+                strncpy(mixr->midi_controller_name, info->name, 127);
+                mixr->have_midi_controller = true;
+                break;
             }
         }
     }
     else
     {
+        Pm_Terminate();
         return NULL;
     }
-    printf("MIDI maaaaan!\n");
+
 
     PortMidiStream *mstream;
-    PmEvent msg[32];
-    PmError retval;
-
     retval = Pm_OpenInput(&mstream, dev, NULL, 512L, NULL, NULL);
     if (retval != pmNoError)
+    {
         printf("Err opening input for MPKmini2: %s\n", Pm_GetErrorText(retval));
+        return NULL;
+    }
+
+    PmEvent msg[32];
     while (1)
     {
         if (Pm_Poll(mstream))

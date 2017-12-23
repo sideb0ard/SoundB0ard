@@ -62,6 +62,8 @@ typedef struct mixer
     int current_scene;
     int current_scene_bar_count;
 
+    bool have_midi_controller;
+    char midi_controller_name[128];
     unsigned int midi_control_destination;
     unsigned int m_midi_controller_mode; // to switch control knob routing
     unsigned int m_key_controller_mode;  // to switch key control routing

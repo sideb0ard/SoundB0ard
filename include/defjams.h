@@ -80,6 +80,8 @@
 #define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
 #define WCOOL_COLOR_ORANGE L"\x1b[38;5;202m"
 
+#define NADA -999
+
 enum
 {
     KICK,

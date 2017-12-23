@@ -47,6 +47,11 @@ const wchar_t *s_status_colors[] = {
     WANSI_COLOR_BLUE       // SPORK_TYPE
 };
 
+const char *s_midi_control_type_name[] = {
+    "NONE",
+    "SYNTH"
+};
+
 mixer *new_mixer()
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
@@ -76,6 +81,8 @@ mixer *new_mixer()
     mixr->num_scenes = 1;
     mixr->current_scene = -1;
 
+    mixr->active_midi_soundgen_num = -99;
+
     mixr->key = C_MAJOR;
 
     return mixr;
@@ -92,13 +99,17 @@ void mixer_ps(mixer *mixr)
         " // TICK:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
         " // Qtick:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
         " // Debug:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
+        "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
         "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d \n"
-        "::::: NumScenes:%d ActiveScene:%d MidiRecieverSG:%d" ANSI_COLOR_RESET,
+        "::::: NumScenes:%d ActiveScene:%d" ANSI_COLOR_RESET,
         mixr->volume, key_names[mixr->key], mixr->bpm,
         mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
-        mixr->debug_mode ? "true" : "false", PPQN, PPSIXTEENTH, PPTWENTYFOURTH,
-        PPBAR, PPNS, mixr->num_scenes, mixr->current_scene,
-        mixr->active_midi_soundgen_num);
+        mixr->debug_mode ? "true" : "false",
+        mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
+        mixr->active_midi_soundgen_num,
+        mixr->active_midi_soundgen_num == -99 ? "NONE" : s_midi_control_type_name[mixr->sound_generators[mixr->active_midi_soundgen_num]->type],
+        PPQN, PPSIXTEENTH, PPTWENTYFOURTH,
+        PPBAR, PPNS, mixr->num_scenes, mixr->current_scene);
 
     if (mixr->env_var_count > 0)
     {

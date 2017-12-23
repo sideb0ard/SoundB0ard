@@ -91,8 +91,6 @@ void interpret(char *line)
 
         int num_wurds = parse_wurds_from_cmd(wurds, tmp);
 
-        // Understanding these commands should make more sense when viewed
-        // against the help output, which details each command
         // (TODO) some kid of doxygen-like scheme to write help output here
 
         //////  MIXER COMMANDS  /////////////////////////
@@ -644,13 +642,7 @@ void interpret(char *line)
                         SEQUENCER_TYPE)
                 {
 
-                    if (strncmp("midi", wurds[2], 4) == 0)
-                    {
-                        printf("MIDI goes to Da Winner .. "
-                               "Sequencer %d\n",
-                               soundgen_num);
-                    }
-                    else if (strncmp("morph", wurds[2], 8) == 0)
+                    if (strncmp("morph", wurds[2], 8) == 0)
                     {
                         printf("M0RRRPH!\n");
                         sample_sequencer *s =
@@ -1135,10 +1127,46 @@ void interpret(char *line)
             }
         }
 
+        else if (strncmp("midi", wurds[0], 4) == 0)
+        {
+            printf("MIDI Time!\n");
+            if (num_wurds == 1)
+                return;
+            //int sgnum = add_minisynth(mixr);
+            //mixr->midi_control_destination = SYNTH;
+            //mixr->active_midi_soundgen_num = sgnum;
+            if (strncmp("init", wurds[1], 4) == 0)
+            {
+                if (!mixr->have_midi_controller)
+                {
+                    printf("Initializing MIDI\n");
+                    //// run the MIDI event looprrr...
+                    pthread_t midi_th;
+                    if (pthread_create(&midi_th, NULL, midiman, NULL))
+                    {
+                        fprintf(stderr, "Errrr, wit tha midi..\n");
+                    }
+                    pthread_detach(midi_th);
+                }
+                else
+                    printf("Already initialized\n");
+            }
+            else
+            {
+                int soundgen_num = atoi(wurds[1]);
+                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+                    is_synth(mixr->sound_generators[soundgen_num]))
+                {
+                    mixr->midi_control_destination = SYNTH;
+                    mixr->active_midi_soundgen_num = soundgen_num;
+                }
+            }
+        }
+
         // SINGLE SHOT SAMPLE PLAYER COMMANDS
         else if (strncmp("play", wurds[0], 4) == 0)
         {
-            printf("Playing onetime sample...\n");
+            printf("Playing onetime sample...[TODO]\n");
         }
 
         // SYNTHESIZER COMMANDS

@@ -62,21 +62,13 @@ int main()
 
     srand(time(NULL));
 
-    //// run the MIDI event looprrr...
-    pthread_t midi_th;
-    if (pthread_create(&midi_th, NULL, midiman, NULL))
-    {
-        fprintf(stderr, "Errrr, wit tha midi..\n");
-        return -1;
-    }
-    pthread_detach(midi_th);
+    mixr = new_mixer();
 
     // PortAudio start me up!
     pa_setup();
 
     PaStream *stream;
     PaError err;
-    mixr = new_mixer();
 
     err = Pa_OpenDefaultStream(&stream,
                                0,         // no input channels
