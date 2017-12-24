@@ -169,6 +169,11 @@ void interpret(char *line)
                     mixer_add_spork(mixr, 440);
                 }
             }
+            else if (strncmp("byte", wurds[1], 4) == 0)
+            {
+                printf("BYTEBEAT! SEQUENCE GEN!\n");
+                mixer_add_sequence_generator(mixr, wurds);
+            }
         }
 
         else if (strncmp("preview", wurds[0], 7) == 0)
@@ -398,6 +403,19 @@ void interpret(char *line)
             }
         }
 
+        else if (strncmp("byte", wurds[0], 8) == 0)
+        {
+                int sgnum = atoi(wurds[1]);
+                if (mixer_is_valid_seq_gen_num(mixr, sgnum))
+                {
+                    sequence_generator *sg = mixr->sequence_generators[sgnum];
+                    if (strncmp("gen", wurds[2], 3) == 0)
+                    {
+                        int num = sg->generate(sg);
+                        printf("NOM!: %d\n", num);
+                    }
+                }
+        }
         else if (strncmp("synthdrum", wurds[0], 9) == 0 ||
                  strncmp("sd", wurds[0], 2) == 0)
         {

@@ -21,6 +21,7 @@
 #include "sample_sequencer.h"
 #include "sbmsg.h"
 #include "sequencer_utils.h"
+#include "sequence_generator.h"
 #include "sound_generator.h"
 #include "spork.h"
 #include "synthdrum_sequencer.h"
@@ -144,6 +145,19 @@ void mixer_ps(mixer *mixr)
             printf("\n");
         }
         printf(ANSI_COLOR_RESET "\n");
+    }
+
+    for (int i = 0; i < mixr->sequence_gen_num; i++)
+    {
+        if (mixr->sequence_generators[i] != NULL)
+        {
+            wchar_t wss[MAX_PS_STRING_SZ];
+            memset(wss, 0, MAX_PS_STRING_SZ);
+            mixr->sequence_generators[i]->status(mixr->sequence_generators[i], wss);
+            wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
+            wprintf(L"  %ls\n", wss);
+            wprintf(WANSI_COLOR_RESET);
+        }
     }
 
     for (int i = 0; i < mixr->soundgen_num; i++)
@@ -306,6 +320,38 @@ int add_sound_generator(mixer *mixr, soundgenerator *sg)
     return mixr->soundgen_num++;
 }
 
+int add_sequence_generator(mixer *mixr, sequence_generator *sg)
+{
+    sequence_generator **new_sequence_gens = NULL;
+
+    if (mixr->sequence_gen_size <= mixr->sequence_gen_num)
+    {
+        if (mixr->sequence_gen_size == 0)
+        {
+            mixr->sequence_gen_size = DEFAULT_ARRAY_SIZE;
+        }
+        else
+        {
+            mixr->sequence_gen_size *= 2;
+        }
+
+        new_sequence_gens = (sequence_generator **)realloc(
+            mixr->sequence_generators,
+            mixr->sequence_gen_size * sizeof(sequence_generator *));
+        if (new_sequence_gens == NULL)
+        {
+            printf("Ooh, burney - cannae allocate memory for new sequences");
+            return -1;
+        }
+        else
+        {
+            mixr->sequence_generators = new_sequence_gens;
+        }
+    }
+    mixr->sequence_generators[mixr->sequence_gen_num] = sg;
+    return mixr->sequence_gen_num++;
+}
+
 int mixer_add_spork(mixer *mixr, double freq)
 {
     printf("Adding an SPORK, mo!\n");
@@ -313,6 +359,12 @@ int mixer_add_spork(mixer *mixr, double freq)
     return add_sound_generator(mixr, (soundgenerator *)s);
 }
 
+int mixer_add_sequence_generator(mixer *mixr, char wurds[NUM_WURDS][SIZE_OF_WURD])
+{
+    printf("Adding an SEQUENCE GENERATOR, yo!\n");
+    sequence_generator *sg = new_sequence_generator(wurds);
+    return add_sequence_generator(mixr, sg);
+}
 int add_algorithm(char *line)
 {
     algorithm *a = new_algorithm(line);
@@ -565,6 +617,15 @@ bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
         return true;
     return false;
 }
+
+bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum)
+{
+    if (sgnum >= 0 && sgnum < mixr->sequence_gen_num &&
+        mixr->sequence_generators[sgnum] != NULL)
+        return true;
+    return false;
+}
+
 
 bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
 {

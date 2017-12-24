@@ -11,6 +11,8 @@
 #define M_PI (3.14159265358897932)
 #endif
 
+#define SIZE_OF_WURD 256
+#define NUM_WURDS 25
 #define DEFAULT_BPM 110
 
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope

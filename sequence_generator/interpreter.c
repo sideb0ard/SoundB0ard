@@ -478,7 +478,6 @@ void reverse_stack(Stack *stack)
 
 Stack *new_rpn_stack(char *apattern)
 {
-    printf("PATTERN! %s\n", apattern);
     char pattern[128];
     strncpy(pattern, apattern, 127);
 

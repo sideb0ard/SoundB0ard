@@ -7,8 +7,6 @@
 #include "sequencer.h"
 #include <stdbool.h>
 
-#define SIZE_OF_WURD 256
-#define NUM_WURDS 25
 
 void loopy(void);
 void interpret(char *line);

@@ -9,6 +9,7 @@
 #include "minisynth.h"
 #include "sbmsg.h"
 #include "sequencer.h"
+#include "sequence_generator.h"
 #include "sound_generator.h"
 #include "table.h"
 
@@ -45,6 +46,10 @@ typedef struct mixer
     soundgenerator **sound_generators;
     int soundgen_num;  // actual number of SGs
     int soundgen_size; // number of memory slots reserved for SGszz
+
+    sequence_generator **sequence_generators;
+    int sequence_gen_num;  // actual number of SGs
+    int sequence_gen_size; // number of memory slots reserved for SGszz
 
     stereo_val
         soundgen_cur_val[MAX_NUM_soundgenerator]; // cache for current val,
@@ -94,6 +99,7 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_melody(mixer *mixr, int synthnum, int pattern_num);
 void mixer_print_compat_keys(mixer *mixr);
+int mixer_add_sequence_generator(mixer *mixr, char wurds[NUM_WURDS][SIZE_OF_WURD]);
 
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);
@@ -108,6 +114,7 @@ int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
 int add_looper(mixer *mixr, char *filename, double loop_len);
 int add_granulator(mixer *mixr, char *filename);
 int add_sound_generator(mixer *mixr, soundgenerator *sg);
+int add_sequence_generator(mixer *mixr, sequence_generator *sg);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
@@ -116,6 +123,7 @@ void freq_change(mixer *mixr, int sig, float freq);
 void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
+bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum);
 void mixer_play_scene(mixer *mixr, int scene_num);
 
 void mixer_preview_track(mixer *mixr, char *filename);
