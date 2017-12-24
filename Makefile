@@ -13,6 +13,10 @@ SRC = \
 	fx/basicfilterpass.c \
 	fx/beatrepeat.c \
 	bytebeat/bytebeat.c \
+	bytebeat/interpreter.c \
+	bytebeat/stack.c \
+	bytebeat/queue.c \
+	bytebeat/list.c \
 	chaosmonkey.c \
 	cmdloop.c \
 	dca.c \
@@ -59,11 +63,6 @@ SRC = \
 	sbmsg.c \
 	sequencer.c \
 	sequencer_utils.c \
-	sequence_generator/sequence_generator.c \
-	sequence_generator/interpreter.c \
-	sequence_generator/stack.c \
-	sequence_generator/queue.c \
-	sequence_generator/list.c \
 	sound_generator.c \
 	sparkline.c \
 	spork.c \

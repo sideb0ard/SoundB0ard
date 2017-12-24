@@ -3,71 +3,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "interpreter.h"
+#include "bytebeat_interpreter.h"
 #include "mixer.h"
 #include "stack.h"
 
 extern mixer *mixr;
 
-enum direction
-{
-    LEFT,
-    RIGHT
-};
-
-enum unary_or_binary
-{
-    UNARY,
-    BINARY
-};
-
-enum token_type
-{
-    NUMBER,
-    OPERATOR,
-    TEE_TOKEN,
-};
-
-enum ops
-{
-    LEFTSHIFT,
-    RIGHTSHIFT,
-    XOR,
-    OR,
-    NOT,
-    AND,
-    PLUS,
-    MINUS,
-    MULTIPLY,
-    DIVIDE,
-    MODULO,
-    LEFTBRACKET,
-    RIGHTBRACKET,
-    TEE // letter 't' time counter
-};
-
 // order must match the enum above
 char *ops[] = {"<<", ">>", "^", "|", "~", "&", "+",
                "-",  "*",  "/", "%", "(", ")", "t"};
-
-typedef struct token
-{
-    int type;
-    int val;
-} token;
-
-int associativity(int op); // left or right
-int bin_or_uni(int op);
-int calc(int operator, int first_operand, int val);
-int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
-               int *tmp_token_num);
-int parse_bytebeat(char *pattern, Stack *stack);
-char parse_rpn(Stack *rpn_stack);
-int precedence(int op);
-bool isnum(char *ch);
-bool isvalid_char(char *ch);
-bool isvalid_pattern(char *pattern);
-void reverse_stack(Stack *rpn_stack);
 
 //////////////////////////////////////////////////////////////////////////////
 
@@ -191,14 +135,14 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
         int val = atoi(wurd);
         if (val != 0)
         {
-            // printf("NUM! %d\n", val);
+            printf("NUM! %d\n", val);
             toke->type = NUMBER;
             toke->val = val;
             stack_push(rpn_stack, (void *)(toke));
         }
         else
         {
-            // printf("OP! %s\n", wurd);
+            printf("OP! %s\n", wurd);
 
             toke->type = OPERATOR;
             if (strcmp(wurd, "<<") == 0)
@@ -478,7 +422,6 @@ void reverse_stack(Stack *stack)
 
 Stack *new_rpn_stack(char *apattern)
 {
-    printf("PATTERN! %s\n", apattern);
     char pattern[128];
     strncpy(pattern, apattern, 127);
 

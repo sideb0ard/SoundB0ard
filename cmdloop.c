@@ -172,7 +172,7 @@ void interpret(char *line)
             else if (strncmp("byte", wurds[1], 4) == 0)
             {
                 printf("BYTEBEAT! SEQUENCE GEN!\n");
-                mixer_add_sequence_generator(mixr, wurds);
+                mixer_add_sequence_generator(mixr, wurds, num_wurds);
             }
         }
 

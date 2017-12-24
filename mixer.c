@@ -359,10 +359,10 @@ int mixer_add_spork(mixer *mixr, double freq)
     return add_sound_generator(mixr, (soundgenerator *)s);
 }
 
-int mixer_add_sequence_generator(mixer *mixr, char wurds[NUM_WURDS][SIZE_OF_WURD])
+int mixer_add_sequence_generator(mixer *mixr, char wurds[][SIZE_OF_WURD], int num_wurds)
 {
     printf("Adding an SEQUENCE GENERATOR, yo!\n");
-    sequence_generator *sg = new_sequence_generator(wurds);
+    sequence_generator *sg = new_sequence_generator(wurds, num_wurds);
     return add_sequence_generator(mixr, sg);
 }
 int add_algorithm(char *line)

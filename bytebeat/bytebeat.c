@@ -1,47 +1,62 @@
-#include "bytebeat.h"
-#include "mixer.h"
+#include <string.h>
+#include <stdlib.h>
+
+#include "sequence_generator.h"
+#include "defjams.h"
+#include "bytebeat_interpreter.h"
 #include "utils.h"
-#include <limits.h>
 
-extern mixer *mixr;
-
-void bytebeat_init(bytebeat *b) { b->pattern_num = 0; }
-
-double bytebeat_gennext(bytebeat *b)
+#define LARGEST_POSSIBLE 2048
+sequence_generator *new_sequence_generator(char wurds[][SIZE_OF_WURD], int num_wurds)
 {
-    int t = mixr->timing_info.cur_sample;
-    char bitpart = 0;
-    switch (b->pattern_num)
+    printf("NUM WURDS %d\n", num_wurds);
+    char *pattern_static[LARGEST_POSSIBLE] = {0};
+    char *pattern = (char*)pattern_static;
+    for (int i = 2; i < num_wurds; i++)
     {
-    case 0:
-        bitpart = t * ((t >> 9 | t >> 13) & 25 & t >> 6);
-        break;
-    case 1:
-        bitpart = (t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6);
-        break;
-    case 2:
-        bitpart = (t * (t >> 5 | t >> 8)) >> (t >> 16);
-        break;
-    case 3:
-        bitpart = (t * (t >> 3 | t >> 4)) >> (t >> 7);
-        break;
-    case 4:
-    default:
-        bitpart = (t * (t >> 13 | t >> 4)) >> (t >> 3);
+        strncat(pattern, wurds[i], SIZE_OF_WURD);
+        strcat(pattern, " ");
     }
+    printf("PATTERN! is %s\n", pattern);
+    //if (!isvalid_pattern(
+    //char *pattern = "t * ( ( t >> 9 | t >> 13 ) & 25 & t >> 6)";
+    if (strlen(pattern) > 1023)
+    {
+        printf("Max pattern size of 1024\n");
+        return NULL;
+    }
+    sequence_generator *sg = calloc(1, sizeof(sequence_generator));
+    if (!sg)
+    {
+        printf("WOOF!\n");
+        return NULL;
+    }
+    strncpy(sg->pattern, pattern, 1023);
+    sg->status = &sequence_generator_status;
+    sg->generate = &sequence_generator_generate;
 
-    double scaled = scaleybum(CHAR_MIN, CHAR_MAX, -1.0, 1, bitpart);
-    // printf("ORIG VAL:%d (min:%d max:%d) // SCALED: %f\n", bitpart, CHAR_MIN,
-    // CHAR_MAX, scaled);
+    sg->rpn_stack = new_rpn_stack(pattern);
 
-    if (scaled > 1 || scaled < -1)
-        printf("BYTEBITTEN IN THE BUTT! OVER > 1!! %f (orig - %d)\n", scaled,
-               bitpart);
-    return scaled;
+    return sg;
 }
-
-void bytebeat_status(bytebeat *b, wchar_t *status_string)
+void sequence_generator_change_pattern(sequence_generator *sg, char *pattern)
 {
-    swprintf(status_string, MAX_PS_STRING_SZ, L"Bytebeatrrr! pattern_num:%d",
-             b->pattern_num);
+    // TODO
 }
+
+void sequence_generator_status(void *self, wchar_t *wstring)
+{
+    sequence_generator *sg = (sequence_generator*) self;
+    swprintf(wstring, MAX_PS_STRING_SZ,
+            L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
+            "pattern: %s", sg->pattern);
+}
+
+int sequence_generator_generate(void *self)
+{
+    sequence_generator *sg = (sequence_generator*) self;
+    char ans = interpreter(sg->rpn_stack);
+    print_bin_num(ans);
+    return ans;
+}
+
