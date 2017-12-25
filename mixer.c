@@ -20,8 +20,8 @@
 #include "mixer.h"
 #include "sample_sequencer.h"
 #include "sbmsg.h"
-#include "sequencer_utils.h"
 #include "sequence_generator.h"
+#include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "spork.h"
 #include "synthdrum_sequencer.h"
@@ -48,10 +48,7 @@ const wchar_t *s_status_colors[] = {
     WANSI_COLOR_BLUE       // SPORK_TYPE
 };
 
-const char *s_midi_control_type_name[] = {
-    "NONE",
-    "SYNTH"
-};
+const char *s_midi_control_type_name[] = {"NONE", "SYNTH"};
 
 mixer *new_mixer()
 {
@@ -91,26 +88,29 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
-    printf(
-        COOL_COLOR_GREEN
-        "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_GREEN
-        "] Volume:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-        "] Key:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN
-        " // BPM:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-        " // TICK:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
-        " // Qtick:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
-        " // Debug:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
-        "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
-        "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d \n"
-        "::::: NumScenes:%d ActiveScene:%d" ANSI_COLOR_RESET,
-        mixr->volume, key_names[mixr->key], mixr->bpm,
-        mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
-        mixr->debug_mode ? "true" : "false",
-        mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
-        mixr->active_midi_soundgen_num,
-        mixr->active_midi_soundgen_num == -99 ? "NONE" : s_midi_control_type_name[mixr->sound_generators[mixr->active_midi_soundgen_num]->type],
-        PPQN, PPSIXTEENTH, PPTWENTYFOURTH,
-        PPBAR, PPNS, mixr->num_scenes, mixr->current_scene);
+    printf(COOL_COLOR_GREEN
+           "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_GREEN
+           "] Volume:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+           "] Key:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN
+           " // BPM:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+           " // TICK:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
+           " // Qtick:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
+           " // Debug:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
+           "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
+           "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d \n"
+           "::::: NumScenes:%d ActiveScene:%d" ANSI_COLOR_RESET,
+           mixr->volume, key_names[mixr->key], mixr->bpm,
+           mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
+           mixr->debug_mode ? "true" : "false",
+           mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
+           mixr->active_midi_soundgen_num,
+           mixr->active_midi_soundgen_num == -99
+               ? "NONE"
+               : s_midi_control_type_name
+                     [mixr->sound_generators[mixr->active_midi_soundgen_num]
+                          ->type],
+           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS, mixr->num_scenes,
+           mixr->current_scene);
 
     if (mixr->env_var_count > 0)
     {
@@ -153,7 +153,8 @@ void mixer_ps(mixer *mixr)
         {
             wchar_t wss[MAX_PS_STRING_SZ];
             memset(wss, 0, MAX_PS_STRING_SZ);
-            mixr->sequence_generators[i]->status(mixr->sequence_generators[i], wss);
+            mixr->sequence_generators[i]->status(mixr->sequence_generators[i],
+                                                 wss);
             wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
             wprintf(L"  %ls\n", wss);
             wprintf(WANSI_COLOR_RESET);
@@ -359,10 +360,11 @@ int mixer_add_spork(mixer *mixr, double freq)
     return add_sound_generator(mixr, (soundgenerator *)s);
 }
 
-int mixer_add_sequence_generator(mixer *mixr, char wurds[][SIZE_OF_WURD], int num_wurds)
+int mixer_add_sequence_generator(mixer *mixr, int num_wurds,
+                                 char wurds[][SIZE_OF_WURD])
 {
     printf("Adding an SEQUENCE GENERATOR, yo!\n");
-    sequence_generator *sg = new_sequence_generator(wurds, num_wurds);
+    sequence_generator *sg = new_sequence_generator(num_wurds, wurds);
     return add_sequence_generator(mixr, sg);
 }
 int add_algorithm(char *line)
@@ -625,7 +627,6 @@ bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum)
         return true;
     return false;
 }
-
 
 bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
 {

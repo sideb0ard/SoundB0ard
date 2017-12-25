@@ -172,7 +172,8 @@ void interpret(char *line)
             else if (strncmp("byte", wurds[1], 4) == 0)
             {
                 printf("BYTEBEAT! SEQUENCE GEN!\n");
-                mixer_add_sequence_generator(mixr, wurds, num_wurds);
+                printf("WURDS[2] %s %p\n", wurds[2], wurds[2]);
+                mixer_add_sequence_generator(mixr, num_wurds - 2, &wurds[2]);
             }
         }
 
@@ -405,16 +406,16 @@ void interpret(char *line)
 
         else if (strncmp("byte", wurds[0], 8) == 0)
         {
-                int sgnum = atoi(wurds[1]);
-                if (mixer_is_valid_seq_gen_num(mixr, sgnum))
+            int sgnum = atoi(wurds[1]);
+            if (mixer_is_valid_seq_gen_num(mixr, sgnum))
+            {
+                sequence_generator *sg = mixr->sequence_generators[sgnum];
+                if (strncmp("gen", wurds[2], 3) == 0)
                 {
-                    sequence_generator *sg = mixr->sequence_generators[sgnum];
-                    if (strncmp("gen", wurds[2], 3) == 0)
-                    {
-                        int num = sg->generate(sg);
-                        printf("NOM!: %d\n", num);
-                    }
+                    int num = sg->generate(sg);
+                    printf("NOM!: %d\n", num);
                 }
+            }
         }
         else if (strncmp("synthdrum", wurds[0], 9) == 0 ||
                  strncmp("sd", wurds[0], 2) == 0)
@@ -744,7 +745,8 @@ void interpret(char *line)
                         int gps = atoi(wurds[3]);
                         granulator_set_grains_per_sec(g, gps);
                     }
-                    else if (strncmp("audio_buffer_read_idx", wurds[2], 14) == 0)
+                    else if (strncmp("audio_buffer_read_idx", wurds[2], 14) ==
+                             0)
                     {
                         int pos = atoi(wurds[3]);
                         granulator_set_audio_buffer_read_idx(g, pos);
@@ -1150,9 +1152,9 @@ void interpret(char *line)
             printf("MIDI Time!\n");
             if (num_wurds == 1)
                 return;
-            //int sgnum = add_minisynth(mixr);
-            //mixr->midi_control_destination = SYNTH;
-            //mixr->active_midi_soundgen_num = sgnum;
+            // int sgnum = add_minisynth(mixr);
+            // mixr->midi_control_destination = SYNTH;
+            // mixr->active_midi_soundgen_num = sgnum;
             if (strncmp("init", wurds[1], 4) == 0)
             {
                 if (!mixr->have_midi_controller)

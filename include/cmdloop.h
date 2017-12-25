@@ -7,7 +7,6 @@
 #include "sequencer.h"
 #include <stdbool.h>
 
-
 void loopy(void);
 void interpret(char *line);
 

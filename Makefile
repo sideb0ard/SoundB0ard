@@ -81,7 +81,7 @@ INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack
 LIBDIR=/usr/local/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 #CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
-CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS)
+CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O0
 
 $(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)

@@ -205,10 +205,7 @@ void eg_release(envelope_generator *self)
         self->m_state = RELEASE;
 }
 
-void eg_stop_eg(envelope_generator *self)
-{
-    self->m_state = OFFF;
-}
+void eg_stop_eg(envelope_generator *self) { self->m_state = OFFF; }
 
 void eg_init_global_parameters(envelope_generator *self,
                                global_eg_params *params)

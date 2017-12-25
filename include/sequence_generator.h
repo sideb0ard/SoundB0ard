@@ -12,10 +12,10 @@ typedef struct sequence_generator
     Stack *rpn_stack;
     void (*status)(void *self, wchar_t *wstring);
     int (*generate)(void *self);
-}
-sequence_generator;
+} sequence_generator;
 
-sequence_generator *new_sequence_generator(char wurds[][SIZE_OF_WURD], int num_wurds);
+sequence_generator *new_sequence_generator(int num_wurds,
+                                           char wurds[][SIZE_OF_WURD]);
 void sequence_generator_change_pattern(sequence_generator *sg, char *pattern);
 void sequence_generator_status(void *self, wchar_t *wstring);
 int sequence_generator_generate(void *self);

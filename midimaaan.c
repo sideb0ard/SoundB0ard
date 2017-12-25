@@ -54,7 +54,6 @@ void *midiman()
         return NULL;
     }
 
-
     PortMidiStream *mstream;
     retval = Pm_OpenInput(&mstream, dev, NULL, 512L, NULL, NULL);
     if (retval != pmNoError)

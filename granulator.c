@@ -312,11 +312,9 @@ void granulator_status(void *self, wchar_t *status_string)
 
              g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
              g->num_channels == 2 ? "true" : "false",
-             (int)g->audio_buffer_read_idx,
-             g->audio_buffer_write_idx,
-             g->quasi_grain_fudge,
-             g->granular_spray_frames / 44.1, g->num_active_grains,
-             g->highest_grain_num, g->selection_mode,
+             (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
+             g->quasi_grain_fudge, g->granular_spray_frames / 44.1,
+             g->num_active_grains, g->highest_grain_num, g->selection_mode,
              s_env_names[g->envelope_mode], g->movement_mode, g->reverse_mode,
              g->sequencer_mode ? "true" : "false",
 

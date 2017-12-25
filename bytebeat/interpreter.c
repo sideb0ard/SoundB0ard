@@ -3,13 +3,13 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "bytebeat_interpreter.h"
+#include "bytebeat.h"
 #include "mixer.h"
 #include "stack.h"
 
 extern mixer *mixr;
 
-// order must match the enum above
+// order must match the ops enum in bytebeat_interpreter.h
 char *ops[] = {"<<", ">>", "^", "|", "~", "&", "+",
                "-",  "*",  "/", "%", "(", ")", "t"};
 
@@ -28,7 +28,6 @@ bool isvalid_char(char *ch)
     if (isnum(ch))
         return true;
 
-    // else check for valid chars in a bitwise operation
     static char acceptable[] = {'<', '>', '^', '|', '~', '&', '+',
                                 '-', '*', '/', '%', '(', ')', 't'};
 
