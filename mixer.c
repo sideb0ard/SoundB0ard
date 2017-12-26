@@ -20,7 +20,7 @@
 #include "mixer.h"
 #include "sample_sequencer.h"
 #include "sbmsg.h"
-#include "sequence_generator.h"
+#include "bitshift.h"
 #include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "spork.h"
@@ -360,13 +360,17 @@ int mixer_add_spork(mixer *mixr, double freq)
     return add_sound_generator(mixr, (soundgenerator *)s);
 }
 
-int mixer_add_sequence_generator(mixer *mixr, int num_wurds,
+int mixer_add_bitshift(mixer *mixr, int num_wurds,
                                  char wurds[][SIZE_OF_WURD])
 {
-    printf("Adding an SEQUENCE GENERATOR, yo!\n");
-    sequence_generator *sg = new_sequence_generator(num_wurds, wurds);
-    return add_sequence_generator(mixr, sg);
+    printf("Adding an BITSHIFT SEQUENCE GENERATOR, yo!\n");
+    sequence_generator *sg = new_bitshift(num_wurds, wurds);
+    if (sg)
+        return add_sequence_generator(mixr, sg);
+    else
+        return -99;
 }
+
 int add_algorithm(char *line)
 {
     algorithm *a = new_algorithm(line);

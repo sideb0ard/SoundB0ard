@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "bytebeat.h"
+#include "bitshift.h"
 #include "mixer.h"
 #include "stack.h"
 
@@ -129,7 +129,7 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
     for (wurd = strtok_r(pattern, sep, &wurdleft); wurd;
          wurd = strtok_r(NULL, sep, &wurdleft))
     {
-        token *toke = calloc(1, sizeof(token));
+        bitshift_token *toke = calloc(1, sizeof(bitshift_token));
         // printf("\nToken is %s\n", wurd);
         int val = atoi(wurd);
         if (val != 0)
@@ -196,7 +196,7 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
                 {
                     // printf("STACKSIZE %d\n", stack_size(operatorz));
 
-                    token *top_o_the_stack = stack_peek(operatorz);
+                    bitshift_token *top_o_the_stack = stack_peek(operatorz);
 
                     // printf("Looking at %s\n", ops[top_o_the_stack->val]);
 
@@ -216,7 +216,7 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
 
             if (stack_size(operatorz) > 0)
             {
-                token *top_o_the_stack = stack_peek(operatorz);
+                bitshift_token *top_o_the_stack = stack_peek(operatorz);
                 if (top_o_the_stack->val == LEFTBRACKET)
                 {
                     stack_push(operatorz, (void *)(toke));
@@ -227,7 +227,7 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
                 bool wurk_it = true;
                 while (wurk_it && stack_size(operatorz) > 0)
                 {
-                    token *top_o_the_stack = stack_peek(operatorz);
+                    bitshift_token *top_o_the_stack = stack_peek(operatorz);
                     // printf(
                     //     "PRECEDENCE OF ME %d, precedence of top of stack
                     //     %d\n",
@@ -269,7 +269,7 @@ int parse_bytebeat(char *pattern, Stack *rpn_stack)
         // printf("STACK_SIZE(rpn_stack): %d\n", stack_size(rpn_stack));
     }
 
-    token *re_token;
+    bitshift_token *re_token;
 
     while (stack_pop(operatorz, (void **)&re_token) == 0)
     {
@@ -312,7 +312,7 @@ int calc(int operator, int first_operand, int second_operand)
     }
 }
 
-int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
+int eval_token(bitshift_token *re_token, Stack *ans_stack, bitshift_token *tmp_tokens,
                int *tmp_token_num)
 {
     if (re_token->type == NUMBER)
@@ -331,7 +331,7 @@ int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
     {
         if (bin_or_uni(re_token->val) == UNARY)
         {
-            token *first_operand;
+            bitshift_token *first_operand;
             stack_pop(ans_stack, (void **)&first_operand);
             int ans = ~first_operand->val;
             first_operand->val = ans;
@@ -344,10 +344,10 @@ int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
                 printf("Barf, not enough operands on stack\n");
                 return 1;
             }
-            token *second_operand;
+            bitshift_token *second_operand;
             stack_pop(ans_stack, (void **)&second_operand);
 
-            token *first_operand;
+            bitshift_token *first_operand;
             stack_pop(ans_stack, (void **)&first_operand);
 
             char ans =
@@ -368,7 +368,7 @@ int eval_token(token *re_token, Stack *ans_stack, token *tmp_tokens,
 
 char parse_rpn(Stack *rpn_stack)
 {
-    token tmp_tokens[30];
+    bitshift_token tmp_tokens[30];
     memset(tmp_tokens, 0, sizeof(tmp_tokens));
     int tmp_token_num = 0;
 
@@ -378,18 +378,18 @@ char parse_rpn(Stack *rpn_stack)
     ListElmt *listee = rpn_stack->head;
     while (listee->next != NULL)
     {
-        token *re_token = listee->data;
+        bitshift_token *re_token = listee->data;
         eval_token(re_token, &ans_stack, tmp_tokens, &tmp_token_num);
         listee = listee->next;
     }
-    token *re_token = listee->data;
+    bitshift_token *re_token = listee->data;
     eval_token(re_token, &ans_stack, tmp_tokens, &tmp_token_num);
 
     char ret_val = -1;
 
     if (stack_size(&ans_stack) == 1)
     {
-        token *atoke;
+        bitshift_token *atoke;
         stack_pop(&ans_stack, (void **)&atoke);
         ret_val = atoke->val;
     }
@@ -407,7 +407,7 @@ void reverse_stack(Stack *stack)
     Stack *rev_stack = calloc(1, sizeof(List));
     stack_init(rev_stack, NULL);
 
-    token *tokey;
+    bitshift_token *tokey;
     while (stack_size(stack) > 0)
     {
         stack_pop(stack, (void **)&tokey);

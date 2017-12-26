@@ -1,82 +1,78 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "bytebeat.h"
+#include "bitshift.h"
 #include "defjams.h"
 #include "sequence_generator.h"
+#include "mixer.h"
 #include "utils.h"
 
+extern mixer *mixr;
 static char *s_token_types[] = {"NUMBER", "OPERATOR", "TEE_TOKEN"};
 static char *s_ops[] = {"<<", ">>", "^", "|", "~", "&", "+",
                         "-",  "*",  "/", "%", "(", ")", "t"};
 
-void print_token(token t)
+void print_tokenized_pattern(bitshift_pattern pattern)
 {
-    char num_val[10] = {0};
-    if (t.type == NUMBER)
-        itoa(t.val, num_val);
-    printf("TOKEN:: TYPE:%s VAL:%s\n", s_token_types[t.type],
-           t.type == NUMBER ? num_val : s_ops[t.val]);
+    for (int i = 0; i < pattern.num_tokens; i++)
+    {
+        bitshift_token t = pattern.tokenized_pattern[i];
+        char char_val[10] = {0};
+        if (t.type == NUMBER)
+            itoa(t.val, char_val);
+        else if (t.type == TEE_TOKEN)
+            itoa(mixr->timing_info.cur_sample, char_val);
+        else
+            strcpy(char_val, s_ops[t.val]);
+
+        printf("TOKEN:: TYPE:%s VAL:%s\n", s_token_types[t.type], char_val);
+    }
 }
 
 #define LARGEST_POSSIBLE 2048
-sequence_generator *new_sequence_generator(int num_wurds,
-                                           char wurds[][SIZE_OF_WURD])
+sequence_generator *new_bitshift(int num_wurds,
+                                 char wurds[][SIZE_OF_WURD])
 {
-    printf("NUM WURDS %d\n", num_wurds);
-    char *pattern_static[LARGEST_POSSIBLE] = {0};
-    char *pattern = (char *)pattern_static;
-    for (int i = 0; i < num_wurds; i++)
+    bitshift_pattern my_pattern;
+    int err = parse_bitshift_tokens_from_wurds(num_wurds, wurds, my_pattern.tokenized_pattern, &my_pattern.num_tokens);
+    if (err)
     {
-        printf("WURDDDDY! %s\n", wurds[i]);
-        strncat(pattern, wurds[i], SIZE_OF_WURD);
-        strcat(pattern, " ");
-    }
-    printf("PATTERN! is %s\n", pattern);
-    token tokenized_pattern[MAX_TOKENS_IN_PATTERN];
-    int err = parse_tokens_from_wurds(num_wurds, wurds, tokenized_pattern);
-    if (!err)
-        for (int i = 0; i < MAX_TOKENS_IN_PATTERN; i++)
-            print_token(tokenized_pattern[i]);
-
-    // if (!isvalid_pattern(
-    // char *pattern = "t * ( ( t >> 9 | t >> 13 ) & 25 & t >> 6)";
-    if (strlen(pattern) > 1023)
-    {
-        printf("Max pattern size of 1024\n");
+        printf("ERR!! %d\n", err);
         return NULL;
     }
-    sequence_generator *sg = calloc(1, sizeof(sequence_generator));
-    if (!sg)
+
+    bitshift *bs = calloc(1, sizeof(bitshift));
+    if (!bs)
     {
         printf("WOOF!\n");
         return NULL;
     }
-    strncpy(sg->pattern, pattern, 1023);
-    sg->status = &sequence_generator_status;
-    sg->generate = &sequence_generator_generate;
+    bs->pattern = my_pattern;
+    bs->sg.status = &bitshift_status;
+    bs->sg.generate = &bitshift_generate;
 
-    sg->rpn_stack = new_rpn_stack(pattern);
+    //sg->rpn_stack = new_rpn_stack(pattern);
 
-    return sg;
+    return (sequence_generator*) bs;
 }
-void sequence_generator_change_pattern(sequence_generator *sg, char *pattern)
+void bitshift_change_pattern(bitshift *sg, char *pattern)
 {
     // TODO
 }
 
-void sequence_generator_status(void *self, wchar_t *wstring)
+void bitshift_status(void *self, wchar_t *wstring)
 {
-    sequence_generator *sg = (sequence_generator *)self;
-    swprintf(wstring, MAX_PS_STRING_SZ,
-             L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
-             "pattern: %s",
-             sg->pattern);
+    bitshift *bs = (bitshift *)self;
+    //swprintf(wstring, MAX_PS_STRING_SZ,
+    //         L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
+    //         "pattern: %s",
+    //         bs->pattern);
+    print_tokenized_pattern(bs->pattern);
 }
 
-int sequence_generator_generate(void *self)
+int bitshift_generate(void *self)
 {
-    // sequence_generator *sg = (sequence_generator*) self;
+    // bitshift *sg = (bitshift*) self;
     // char ans = interpreter(sg->rpn_stack);
     // print_bin_num(ans);
     // return ans;
@@ -141,8 +137,26 @@ static bool isshift_char(char ch)
     return false;
 }
 
-int parse_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
-                            token *tokenized_pattern)
+static bool isvalid_char(char *ch)
+{
+    if (isdigit(*ch))
+        return true;
+
+    static char acceptable[] = {'<', '>', '^', '|', '~', '&', '+',
+                                '-', '*', '/', '%', '(', ')', 't'};
+
+    int acceptable_len = strlen(acceptable);
+    for (int i = 0; i < acceptable_len; i++)
+    {
+        if (*ch == acceptable[i])
+            return true;
+    }
+    return false;
+}
+
+#define MAXLEN_CHAR_NUMBER 50 // arbitrary
+int parse_bitshift_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
+                            bitshift_token *tokenized_pattern, int *num_tokens)
 {
     int tokenized_pattern_idx = 0;
     for (int i = 0; i < argc; i++)
@@ -155,13 +169,13 @@ int parse_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
             } // Space, final frontier, is a NO-OP
             else if (isdigit(*c))
             {
-                char multichar_num[10] = {0};
+                char multichar_num[MAXLEN_CHAR_NUMBER] = {0};
                 int idx = 0;
                 while (isdigit(*(c + 1)))
                     multichar_num[idx++] = *c++;
                 multichar_num[idx++] = *c;
 
-                token t = {NUMBER, atoi(multichar_num)};
+                bitshift_token t = {NUMBER, atoi(multichar_num)};
                 if (tokenized_pattern_idx < MAX_TOKENS_IN_PATTERN)
                     tokenized_pattern[tokenized_pattern_idx++] = t;
                 else
@@ -178,7 +192,7 @@ int parse_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
                     return 1;
                 }
 
-                token t;
+                bitshift_token t;
                 t.type = OPERATOR;
                 if (shifty == '<')
                     t.val = LEFTSHIFT;
@@ -189,7 +203,7 @@ int parse_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
             else if (isvalid_char(c))
             {
                 unsigned int op = which_op(*c);
-                token t;
+                bitshift_token t;
                 if (op == TEE)
                 {
                     t.type = TEE_TOKEN;
@@ -210,5 +224,6 @@ int parse_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
             c++;
         }
     }
+    *num_tokens = tokenized_pattern_idx;
     return 0;
 }

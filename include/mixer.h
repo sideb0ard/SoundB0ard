@@ -99,8 +99,8 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_melody(mixer *mixr, int synthnum, int pattern_num);
 void mixer_print_compat_keys(mixer *mixr);
-int mixer_add_sequence_generator(mixer *mixr, int num_wurds,
-                                 char wurds[][SIZE_OF_WURD]);
+int mixer_add_bitshift(mixer *mixr, int num_wurds,
+                       char wurds[][SIZE_OF_WURD]);
 
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);

@@ -169,11 +169,10 @@ void interpret(char *line)
                     mixer_add_spork(mixr, 440);
                 }
             }
-            else if (strncmp("byte", wurds[1], 4) == 0)
+            else if (strncmp("bitshift", wurds[1], 4) == 0)
             {
-                printf("BYTEBEAT! SEQUENCE GEN!\n");
-                printf("WURDS[2] %s %p\n", wurds[2], wurds[2]);
-                mixer_add_sequence_generator(mixr, num_wurds - 2, &wurds[2]);
+                printf("BITSHIFT! SEQUENCE GEN!\n");
+                mixer_add_bitshift(mixr, num_wurds - 2, &wurds[2]);
             }
         }
 
