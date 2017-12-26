@@ -12,22 +12,36 @@ static char *s_token_types[] = {"NUMBER", "OPERATOR", "TEE_TOKEN"};
 static char *s_ops[] = {"<<", ">>", "^", "|", "~", "&", "+",
                         "-",  "*",  "/", "%", "(", ")", "t"};
 
-void print_tokenized_pattern(bitshift_pattern pattern)
+void tokenized_pattern_to_string(bitshift_pattern *pattern, char *pattern_as_string, int stringlen)
 {
-    for (int i = 0; i < pattern.num_tokens; i++)
+    memset(pattern_as_string, 0, stringlen);
+    int string_idx = 0;
+    for (int i = 0; i < pattern->num_tokens; i++)
     {
-        bitshift_token t = pattern.tokenized_pattern[i];
-        char char_val[10] = {0};
+        bitshift_token t = pattern->tokenized_pattern[i];
+
+        char char_val[100] = {0};
         if (t.type == NUMBER)
             itoa(t.val, char_val);
         else if (t.type == TEE_TOKEN)
             itoa(mixr->timing_info.cur_sample, char_val);
         else
             strcpy(char_val, s_ops[t.val]);
+        if (i != pattern->num_tokens - 1)
+            strcat(char_val, " ");
 
-        printf("TOKEN:: TYPE:%s VAL:%s\n", s_token_types[t.type], char_val);
+        int lenny = strlen(char_val);
+        if ((string_idx + lenny) < stringlen)
+            strncat(pattern_as_string, char_val, lenny);
+        else
+        {
+            printf("Pattern too long for string!\n");
+            return;
+        }
+        string_idx += lenny;
     }
 }
+
 
 #define LARGEST_POSSIBLE 2048
 sequence_generator *new_bitshift(int num_wurds,
@@ -63,11 +77,12 @@ void bitshift_change_pattern(bitshift *sg, char *pattern)
 void bitshift_status(void *self, wchar_t *wstring)
 {
     bitshift *bs = (bitshift *)self;
-    //swprintf(wstring, MAX_PS_STRING_SZ,
-    //         L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
-    //         "pattern: %s",
-    //         bs->pattern);
-    print_tokenized_pattern(bs->pattern);
+    char a_pattern[MAX_PS_STRING_SZ];
+    tokenized_pattern_to_string(&bs->pattern, a_pattern, MAX_PS_STRING_SZ);
+    swprintf(wstring, MAX_PS_STRING_SZ,
+             L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
+             "pattern: %s",
+             a_pattern);
 }
 
 int bitshift_generate(void *self)

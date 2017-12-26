@@ -13,10 +13,6 @@ SRC = \
 	fx/basicfilterpass.c \
 	fx/beatrepeat.c \
 	bitshift/bitshift.c \
-	bitshift/interpreter.c \
-	bitshift/stack.c \
-	bitshift/queue.c \
-	bitshift/list.c \
 	chaosmonkey.c \
 	cmdloop.c \
 	dca.c \

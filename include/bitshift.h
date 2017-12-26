@@ -72,6 +72,7 @@ void bitshift_status(void *self, wchar_t *status_string);
 
 int parse_bitshift_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
                             bitshift_token *tokenized_pattern, int *num_tokens);
+void tokenized_pattern_to_string(bitshift_pattern *pattern, char *pattern_as_string, int stringlen);
 
 //int associativity(int op); // left or right
 //int bin_or_uni(int op);

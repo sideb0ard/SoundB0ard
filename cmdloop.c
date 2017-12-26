@@ -96,7 +96,10 @@ void interpret(char *line)
         //////  MIXER COMMANDS  /////////////////////////
         if (strncmp("help", wurds[0], 4) == 0)
         {
-            print_help();
+            if (rand() % 2)
+                print_help();
+            else
+                oblique_strategy();
         }
 
         else if (strncmp("quit", wurds[0], 4) == 0 ||
@@ -403,7 +406,7 @@ void interpret(char *line)
             }
         }
 
-        else if (strncmp("byte", wurds[0], 8) == 0)
+        else if (strncmp("bitshift", wurds[0], 8) == 0)
         {
             int sgnum = atoi(wurds[1]);
             if (mixer_is_valid_seq_gen_num(mixr, sgnum))
@@ -2182,12 +2185,6 @@ void interpret(char *line)
         else if (strncmp("strategy", wurds[0], 8) == 0)
         {
             oblique_strategy();
-        }
-
-        // default HALP!
-        else
-        {
-            print_help();
         }
     }
 }
