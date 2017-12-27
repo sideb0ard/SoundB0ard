@@ -101,11 +101,100 @@ void bitshift_status(void *self, wchar_t *wstring)
 
 int bitshift_generate(void *self)
 {
-    // bitshift *sg = (bitshift*) self;
-    // char ans = interpreter(sg->rpn_stack);
-    // print_bin_num(ans);
-    // return ans;
-    return 0;
+    bitshift *sg = (bitshift *)self;
+    int num_rpn = sg->pattern.num_rpn_tokens;
+    bitshift_token *rpn_tokens = sg->pattern.rpn_tokenized_pattern;
+
+    int answer_stack_idx = 0;
+    int answer_stack[MAX_TOKENS_IN_PATTERN] = {0};
+
+    for (int i = 0; i < num_rpn; i++)
+    {
+        bitshift_token cur = rpn_tokens[i];
+        char char_val[100] = {0};
+        token_val_to_string(&cur, char_val);
+        printf("Looking at %s\n", char_val);
+        if (cur.type == NUMBER)
+        {
+            answer_stack[answer_stack_idx++] = cur.val;
+        }
+        else if (cur.type == TEE_TOKEN)
+        {
+            answer_stack[answer_stack_idx++] = mixr->timing_info.cur_sample;
+        }
+        else if (cur.type == OPERATOR)
+        {
+            printf("GOTSZ AN OPERATOR\n");
+            if (bin_or_uni(cur.val) == UNARY)
+            {
+                // only UNARY is bitwise NOT ~
+                bitshift_token next = rpn_tokens[++i];
+                if (next.type != NUMBER || next.type != TEE_TOKEN)
+                {
+                    printf("WOW NELLY - NOT A NUMBER!\n");
+                    // TODO - panic
+                }
+                int op1 = next.type == NUMBER ? next.val
+                                              : mixr->timing_info.cur_sample;
+                answer_stack[answer_stack_idx++] = ~op1;
+                printf("WAS UNARY NOT -- answer is %d\n",
+                       answer_stack[answer_stack_idx - 1]);
+            }
+            else
+            {
+                int op2 = answer_stack[--answer_stack_idx];
+                int op1 = answer_stack[--answer_stack_idx];
+
+                printf("OP1 is %d and OP2 is %d\n", op1, op2);
+
+                int answer;
+                switch (cur.val)
+                {
+                case (LEFTSHIFT):
+                    answer = op1 << op2;
+                    break;
+                case (RIGHTSHIFT):
+                    answer = op1 >> op2;
+                    break;
+                case (XOR):
+                    answer = op1 ^ op2;
+                    break;
+                case (OR):
+                    answer = op1 | op2;
+                    break;
+                case (AND):
+                    answer = op1 & op2;
+                    break;
+                case (PLUS):
+                    answer = op1 + op2;
+                    break;
+                case (MINUS):
+                    answer = op1 - op2;
+                    break;
+                case (MULTIPLY):
+                    answer = op1 * op2;
+                    break;
+                case (DIVIDE):
+                    answer = op1 / op2;
+                    break;
+                case (MODULO):
+                    answer = op1 % op2;
+                    break;
+                default:
+                    printf("WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n");
+                }
+                answer_stack[answer_stack_idx++] = answer;
+                printf("WAS BINARY -- answer is %d\n", answer);
+            }
+        }
+    }
+    if (answer_stack_idx != 1)
+    {
+        printf("BARF - STACK IS WRONG!\n");
+        return 0;
+    }
+    else
+        return answer_stack[0];
 }
 
 static unsigned int which_op(char c)
@@ -280,29 +369,26 @@ int precedence(int op)
 {
     switch (op)
     {
-    case 0: // left and right shift
-    case 1:
-        return 4;
-    case 2: // XOR
-        return 2;
-    case 3: // bitwize OR
-        return 1;
-    case 4: // bitwize NOT ~
-        return 7;
-    case 5: // butwize AND
-        return 3;
-    case 6: // PLUS
-    case 7: // MINUS
-        return 5;
-    case 8:  // MULTIPLY
-    case 9:  // DIVIDE
-    case 10: // MODULO
-        return 6;
-    case 11: // left bracket
-    case 12: // right bracket
-        return 0;
+    case (NOT):
+        return 100;
+    case (MULTIPLY):
+    case (DIVIDE):
+    case (MODULO):
+        return 90;
+    case (PLUS):
+    case (MINUS):
+        return 80;
+    case (LEFTSHIFT):
+    case (RIGHTSHIFT):
+        return 70;
+    case (AND):
+        return 60;
+    case (XOR):
+        return 50;
+    case (OR):
+        return 40;
     default:
-        return 99;
+        return -99;
     }
 }
 
@@ -310,7 +396,7 @@ int associativity(int op)
 {
     switch (op)
     {
-    case 4:
+    case XOR:
         return RIGHT;
     default:
         return LEFT;
@@ -321,7 +407,7 @@ int bin_or_uni(int op)
 {
     switch (op)
     {
-    case 4: // bitwise NOT ~
+    case NOT: // bitwise NOT ~
         return UNARY;
     default:
         return BINARY;
@@ -371,14 +457,17 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
                     (!(top_of_op_stack.type == BRACKET &&
                        top_of_op_stack.val == LEFT))))
             {
-                printf("POPPING top o' OP stack: %s %d\n",
-                       s_token_types[top_of_op_stack.type],
-                       top_of_op_stack.val);
+                char char_val[100] = {0};
+                token_val_to_string(&top_of_op_stack, char_val);
+                printf("POPPING top o' OP stack: %s %s\n",
+                       s_token_types[top_of_op_stack.type], char_val);
                 output_stack[output_stack_idx++] =
                     operator_stack[--operator_stack_idx];
                 top_of_op_stack = operator_stack[operator_stack_idx - 1];
             }
-
+            char char_val[100] = {0};
+            token_val_to_string(&cur, char_val);
+            printf("PUSHING %s to OPSTACK!\n", char_val);
             operator_stack[operator_stack_idx++] = cur;
         }
         else if (cur.type == BRACKET)
@@ -390,6 +479,7 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
             }
             else if (cur.val == RIGHT)
             {
+                printf("RIGHT BRACKET!\n");
                 bool found_left = false;
                 bitshift_token top_of_op_stack =
                     operator_stack[operator_stack_idx - 1];
@@ -397,6 +487,9 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
                        (!(top_of_op_stack.type == BRACKET &&
                           top_of_op_stack.val == LEFT)))
                 {
+                    char char_val[100] = {0};
+                    token_val_to_string(&top_of_op_stack, char_val);
+                    printf("PUSHING %s to OUTPUT STACK!\n", char_val);
                     output_stack[output_stack_idx++] =
                         operator_stack[--operator_stack_idx];
                     top_of_op_stack = operator_stack[operator_stack_idx - 1];
