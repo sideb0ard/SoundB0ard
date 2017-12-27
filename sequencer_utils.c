@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
+#include "bitshift.h"
 #include "mixer.h"
 #include "sequencer_utils.h"
 #include "utils.h"
-#include <math.h>
 
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
@@ -146,27 +147,29 @@ bool seq_pattern_sixteenth_has_hit();
 
 unsigned short gimme_a_bitwise_short(int bit_pattern_enum, int t)
 {
-    unsigned short result = 0;
-    switch (bit_pattern_enum)
-    {
-    case 0:
-        result = ((t >> 4 & t) | (t >> 8 | t % 7));
-        break;
-    case 1:
-        result = (t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6);
-        break;
-    case 2:
-        result = (t * (t >> 5 | t >> 8)) >> (t >> 16);
-        break;
-    case 3:
-        result = (t * (t >> 3 | t >> 4)) >> (t >> 7);
-        break;
-    case 4:
-        result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
-        break;
-    default:
-        result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
-    }
+    //unsigned short result = 0;
+    //switch (bit_pattern_enum)
+    //{
+    //case 0:
+    //    result = ((t >> 4 & t) | (t >> 8 | t % 7));
+    //    break;
+    //case 1:
+    //    result = (t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6);
+    //    break;
+    //case 2:
+    //    result = (t * (t >> 5 | t >> 8)) >> (t >> 16);
+    //    break;
+    //case 3:
+    //    result = (t * (t >> 3 | t >> 4)) >> (t >> 7);
+    //    break;
+    //case 4:
+    //    result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
+    //    break;
+    //default:
+    //    result = (t * (t >> 13 | t >> 4)) >> (t >> 3);
+    //}
+    sequence_generator *sg = mixr->sequence_generators[0];
+    unsigned short result = bitshift_generate((void*)sg);
     if (mixr->debug_mode)
         printf("T: %d Result: %d\n", t, result);
     return result;

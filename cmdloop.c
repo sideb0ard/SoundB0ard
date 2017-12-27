@@ -2468,15 +2468,15 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             seq_set_shuffle(seq, 1 - seq->shuffle_on);
         }
     }
-    else if (strncmp("bitwise", wurds[2], 4) == 0)
+    else if (strncmp("bitshift", wurds[2], 4) == 0)
     {
         if (strncmp("every", wurds[3], 5) == 0)
         {
             int num_gens = atoi(wurds[4]);
             if (num_gens > 0)
             {
-                seq_set_bitwise(seq, true);
-                seq->bitwise_every_n_loops = num_gens;
+                seq_set_bitshift(seq, true);
+                seq->bitshift_every_n_loops = num_gens;
             }
             else
             {
@@ -2488,7 +2488,7 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             int num_gens = atoi(wurds[4]);
             if (num_gens > 0)
             {
-                seq_set_bitwise(seq, true);
+                seq_set_bitshift(seq, true);
                 seq_set_max_generations(seq, num_gens);
             }
             else
@@ -2496,20 +2496,21 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                 printf("Need a number for 'for'\n");
             }
         }
-        else if (strncmp("mode", wurds[3], 4) == 0)
+        else if (strncmp("source", wurds[3], 6) == 0
+                || strncmp("src", wurds[3], 3) == 0)
         {
-            int bitwise_mode = atoi(wurds[4]);
-            if (bitwise_mode >= 0 && bitwise_mode < 5)
+            int bitshift_src = atoi(wurds[4]);
+            if (mixer_is_valid_seq_gen_num(mixr, bitshift_src))
             {
-                printf("Setting bitwise mode! %d\n", bitwise_mode);
-                seq_set_bitwise_mode(seq, bitwise_mode);
+                printf("Setting bitshift SRC! %d\n", bitshift_src);
+                seq_set_bitshift_src(seq, bitshift_src);
             }
             else
-                printf("Bitwise modes currently only 0-4\n");
+                printf("not a valid bitshift SRC: %d\n", bitshift_src);
         }
         else
         {
-            seq_set_bitwise(seq, 1 - seq->bitwise_on);
+            seq_set_bitshift(seq, 1 - seq->bitshift_on);
         }
     }
     else if (strncmp("generate", wurds[2], 8) == 0)
@@ -2992,7 +2993,7 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_decay_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("bitwise", wurds[2], 4) == 0)
+    else if (strncmp("bitshift", wurds[2], 4) == 0)
     {
         if (strncmp(wurds[3], "mode", 4) == 0)
         {

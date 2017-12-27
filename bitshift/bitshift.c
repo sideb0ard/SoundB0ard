@@ -18,7 +18,8 @@ void token_val_to_string(bitshift_token *t, char *char_val)
     if (t->type == NUMBER)
         itoa(t->val, char_val);
     else if (t->type == TEE_TOKEN)
-        itoa(mixr->timing_info.cur_sample, char_val);
+        strcpy(char_val, "t");
+        //itoa(mixr->timing_info.cur_sample, char_val);
     else if (t->type == BRACKET)
         strcpy(char_val, s_brackets[t->val]);
     else
@@ -113,7 +114,9 @@ int bitshift_generate(void *self)
         bitshift_token cur = rpn_tokens[i];
         char char_val[100] = {0};
         token_val_to_string(&cur, char_val);
+#ifdef DEBUG_BITSHIFT
         printf("Looking at %s\n", char_val);
+#endif
         if (cur.type == NUMBER)
         {
             answer_stack[answer_stack_idx++] = cur.val;
@@ -124,7 +127,9 @@ int bitshift_generate(void *self)
         }
         else if (cur.type == OPERATOR)
         {
+#ifdef DEBUG_BITSHIFT
             printf("GOTSZ AN OPERATOR\n");
+#endif
             if (bin_or_uni(cur.val) == UNARY)
             {
                 // only UNARY is bitwise NOT ~
@@ -137,15 +142,19 @@ int bitshift_generate(void *self)
                 int op1 = next.type == NUMBER ? next.val
                                               : mixr->timing_info.cur_sample;
                 answer_stack[answer_stack_idx++] = ~op1;
+#ifdef DEBUG_BITSHIFT
                 printf("WAS UNARY NOT -- answer is %d\n",
                        answer_stack[answer_stack_idx - 1]);
+#endif
             }
             else
             {
                 int op2 = answer_stack[--answer_stack_idx];
                 int op1 = answer_stack[--answer_stack_idx];
 
+#ifdef DEBUG_BITSHIFT
                 printf("OP1 is %d and OP2 is %d\n", op1, op2);
+#endif
 
                 int answer;
                 switch (cur.val)
@@ -184,7 +193,9 @@ int bitshift_generate(void *self)
                     printf("WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n");
                 }
                 answer_stack[answer_stack_idx++] = answer;
+#ifdef DEBUG_BITSHIFT
                 printf("WAS BINARY -- answer is %d\n", answer);
+#endif
             }
         }
     }
@@ -433,21 +444,29 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
 
         char char_val[100] = {0};
         token_val_to_string(&cur, char_val);
+#ifdef DEBUG_BITSHIFT
         printf("Looking at %s\n", char_val);
+#endif
 
         if (cur.type == NUMBER)
         {
+#ifdef DEBUG_BITSHIFT
             printf("NUMBER, pushing to output stack\n");
+#endif
             output_stack[output_stack_idx++] = cur;
         }
         else if (cur.type == TEE_TOKEN)
         {
+#ifdef DEBUG_BITSHIFT
             printf("TEE, pushing to output stack\n");
+#endif
             output_stack[output_stack_idx++] = cur;
         }
         else if (cur.type == OPERATOR)
         {
+#ifdef DEBUG_BITSHIFT
             printf("We're an OPERATOR!\n");
+#endif
             bitshift_token top_of_op_stack =
                 operator_stack[operator_stack_idx - 1];
             while (operator_stack_idx > 0 &&
@@ -459,27 +478,35 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
             {
                 char char_val[100] = {0};
                 token_val_to_string(&top_of_op_stack, char_val);
+#ifdef DEBUG_BITSHIFT
                 printf("POPPING top o' OP stack: %s %s\n",
                        s_token_types[top_of_op_stack.type], char_val);
+#endif
                 output_stack[output_stack_idx++] =
                     operator_stack[--operator_stack_idx];
                 top_of_op_stack = operator_stack[operator_stack_idx - 1];
             }
             char char_val[100] = {0};
             token_val_to_string(&cur, char_val);
+#ifdef DEBUG_BITSHIFT
             printf("PUSHING %s to OPSTACK!\n", char_val);
+#endif
             operator_stack[operator_stack_idx++] = cur;
         }
         else if (cur.type == BRACKET)
         {
             if (cur.val == LEFT)
             {
+#ifdef DEBUG_BITSHIFT
                 printf("LEFTY - pushing to operator stack!\n");
+#endif
                 operator_stack[operator_stack_idx++] = cur;
             }
             else if (cur.val == RIGHT)
             {
+#ifdef DEBUG_BITSHIFT
                 printf("RIGHT BRACKET!\n");
+#endif
                 bool found_left = false;
                 bitshift_token top_of_op_stack =
                     operator_stack[operator_stack_idx - 1];
@@ -489,7 +516,9 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
                 {
                     char char_val[100] = {0};
                     token_val_to_string(&top_of_op_stack, char_val);
+#ifdef DEBUG_BITSHIFT
                     printf("PUSHING %s to OUTPUT STACK!\n", char_val);
+#endif
                     output_stack[output_stack_idx++] =
                         operator_stack[--operator_stack_idx];
                     top_of_op_stack = operator_stack[operator_stack_idx - 1];
@@ -497,11 +526,15 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
                 if (!(top_of_op_stack.type == BRACKET &&
                       top_of_op_stack.val == LEFT))
                 {
+#ifdef DEBUG_BITSHIFT
                     printf("Mis-matched - didn't find LEFT BRACKET\n");
+#endif
                 }
                 else
                 {
+#ifdef DEBUG_BITSHIFT
                     printf("FOUND LEFT BRACKET, all good!\n");
+#endif
                     --operator_stack_idx;
                 }
             }
@@ -510,21 +543,29 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
     while (operator_stack_idx > 0)
         output_stack[output_stack_idx++] = operator_stack[--operator_stack_idx];
 
+#ifdef DEBUG_BITSHIFT
     printf("\n\nOUTPUT STACK SIZE: %d\n", output_stack_idx);
+#endif
     for (int i = 0; i < output_stack_idx; i++)
     {
         bitshift_token cur = output_stack[i];
+#ifdef DEBUG_BITSHIFT
         printf("CUR %d:%d\n", cur.type, cur.val);
+#endif
         char char_val[100] = {0};
         token_val_to_string(&cur, char_val);
+#ifdef DEBUG_BITSHIFT
         printf("outputstack %d %s\n", i, char_val);
+#endif
     }
     char a_pattern[MAX_PS_STRING_SZ];
     // tokenized_pattern_to_string(bs->pattern.infix_tokenized_pattern,
     // bs->pattern.num_infix_tokens, a_pattern, MAX_PS_STRING_SZ);
     tokenized_pattern_to_string(output_stack, output_stack_idx, a_pattern,
                                 MAX_PS_STRING_SZ);
+#ifdef DEBUG_BITSHIFT
     printf("TOKEN2STRING: %s\n", a_pattern);
+#endif
     // memset(pattern->rpn_tokenized_pattern, 0, MAX_TOKENS_IN_PATTERN *
     // sizeof(bitshift_token));
     memcpy(pattern->rpn_tokenized_pattern, output_stack,

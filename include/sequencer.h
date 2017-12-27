@@ -68,11 +68,12 @@ typedef struct sequencer
     int shuffle_generation;
     int shuffle_every_n_loops;
 
-    bool bitwise_on;
-    int bitwise_counter;
-    unsigned int bitwise_mode;
-    int bitwise_generation;
-    int bitwise_every_n_loops;
+    bool bitshift_on;
+    int bitshift_counter;
+    unsigned int bitshift_src;
+
+    int bitshift_generation;
+    int bitshift_every_n_loops;
 
     bool visualize;
 
@@ -119,8 +120,8 @@ void seq_set_markov(sequencer *s, bool on);
 void seq_set_markov_mode(sequencer *s, unsigned int mode);
 void seq_set_shuffle(sequencer *s, bool on);
 
-void seq_set_bitwise(sequencer *s, bool on);
-void seq_set_bitwise_mode(sequencer *s, unsigned int mode);
+void seq_set_bitshift(sequencer *s, bool on);
+void seq_set_bitshift_src(sequencer *s, int bitshift_src);
 
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);

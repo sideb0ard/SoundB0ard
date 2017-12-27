@@ -9,6 +9,7 @@
 #include "mixer.h"
 #include "sequencer.h"
 #include "sequencer_utils.h"
+#include "bitshift.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -17,13 +18,6 @@ extern wchar_t *sparkchars;
 const double DEFAULT_AMP = 0.7;
 
 const char *s_markov_mode[] = {"boombap", "haus", "snare"};
-
-const char *s_bitwise_pattern[] = {
-    "((t >> 4 & t) | (t >> 8 | t % 7))",
-    "(t >> 7 | t | t >> 6) * 10 + 4 * ((t & (t >> 13)) | t >> 6)",
-    "(t * (t >> 5 | t >> 8)) >> (t >> 16)",
-    "(t * (t >> 3 | t >> 4)) >> (t >> 7)",
-    "(t * (t >> 13 | t >> 4)) >> (t >> 3)"};
 
 void seq_init(sequencer *seq)
 {
@@ -74,11 +68,11 @@ void seq_init(sequencer *seq)
     seq->markov_generation = 0;
     seq->markov_every_n_loops = 0;
 
-    seq->bitwise_on = false;
-    seq->bitwise_mode = 0;
-    seq->bitwise_generation = 0;
-    seq->bitwise_counter = 1044;
-    seq->bitwise_every_n_loops = 0;
+    seq->bitshift_on = false;
+    seq->bitshift_src = -99;
+    seq->bitshift_generation = 0;
+    seq->bitshift_counter = 1044;
+    seq->bitshift_every_n_loops = 0;
 
     seq->sloppiness = 0;
     seq->max_generation = 0;
@@ -226,12 +220,12 @@ bool seq_tick(sequencer *seq)
                 }
                 seq->markov_generation++;
             }
-            else if (seq->bitwise_on)
+            else if (seq->bitshift_on)
             {
                 bool gen_new_pattern = false;
-                if (seq->bitwise_every_n_loops > 0)
+                if (seq->bitshift_every_n_loops > 0)
                 {
-                    if (seq->bitwise_generation % seq->bitwise_every_n_loops ==
+                    if (seq->bitshift_generation % seq->bitshift_every_n_loops ==
                         0)
                     {
                         seq_set_backup_mode(seq, true);
@@ -243,10 +237,10 @@ bool seq_tick(sequencer *seq)
                     }
                 }
                 else if (seq->max_generation > 0 &&
-                         seq->bitwise_generation > seq->max_generation)
+                         seq->bitshift_generation > seq->max_generation)
                 {
-                    seq->bitwise_generation = 0;
-                    seq_set_bitwise(seq, false);
+                    seq->bitshift_generation = 0;
+                    seq_set_bitshift(seq, false);
                 }
                 else
                 {
@@ -255,25 +249,30 @@ bool seq_tick(sequencer *seq)
 
                 if (gen_new_pattern)
                 {
-                    int bit_pattern = gimme_a_bitwise_short(
-                        seq->bitwise_mode, seq->bitwise_counter);
+                    //int bit_pattern = gimme_a_bitshift_short(
+                    //    seq->bitshift_mode, seq->bitshift_counter);
 
-                    if (seq->visualize)
+                    if (seq->bitshift_src != -99)
                     {
-                        char bit_string[17];
-                        char_binary_version_of_int(bit_pattern, bit_string);
-                        printf("New pattern: %s\n", bit_string);
+                        sequence_generator *sg = mixr->sequence_generators[seq->bitshift_src];
+                        int bit_pattern = bitshift_generate((void*)sg);
+                        if (seq->visualize)
+                        {
+                            char bit_string[17];
+                            char_binary_version_of_int(bit_pattern, bit_string);
+                            printf("New pattern: %s\n", bit_string);
+                        }
+
+                        memset(&seq->patterns[seq->cur_pattern], 0,
+                               PPBAR * sizeof(int));
+                        convert_bitshift_pattern_to_pattern(
+                            bit_pattern, (int *)&seq->patterns[seq->cur_pattern],
+                            PPBAR, seq->gridsteps);
+
+                        seq->bitshift_counter++;
                     }
-
-                    memset(&seq->patterns[seq->cur_pattern], 0,
-                           PPBAR * sizeof(int));
-                    convert_bitshift_pattern_to_pattern(
-                        bit_pattern, (int *)&seq->patterns[seq->cur_pattern],
-                        PPBAR, seq->gridsteps);
-
-                    seq->bitwise_counter++;
                 }
-                seq->bitwise_generation++;
+                seq->bitshift_generation++;
             }
             if (seq->randamp_on)
             {
@@ -842,18 +841,16 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         "      -------------------------------------------------------------\n"
         "      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d "
         "markov: %d markov_mode: %s(%d) Markov_Every_n: %d Multi: %d Max Gen: "
-        "%d\n      Bitwise: %d Bitwise mode:%d Bitwise_every_n: %d Euclidean: "
+        "%d\n      bitshift: %d bitshift src:%d bitshift_every_n: %d Euclidean: "
         "%d Euclid_n: %d visualize:%d"
-        "sloppy: %d shuffle_on: %d shuffle_every_n: %d"
-        "\n      bit pattern: %s",
+        "sloppy: %d shuffle_on: %d shuffle_every_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
         seq->pattern_len, seq->markov_on, s_markov_mode[seq->markov_mode],
         seq->markov_mode, seq->markov_every_n_loops, seq->multi_pattern_mode,
-        seq->max_generation, seq->bitwise_on, seq->bitwise_mode,
-        seq->bitwise_every_n_loops, seq->euclidean_on,
+        seq->max_generation, seq->bitshift_on, seq->bitshift_src,
+        seq->bitshift_every_n_loops, seq->euclidean_on,
         seq->euclidean_every_n_loops, seq->visualize, seq->sloppiness,
-        seq->shuffle_on, seq->shuffle_every_n_loops,
-        s_bitwise_pattern[seq->bitwise_mode]);
+        seq->shuffle_on, seq->shuffle_every_n_loops);
     wchar_t pattern_details[128];
     char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];
@@ -992,10 +989,10 @@ void seq_set_markov(sequencer *s, bool b)
     seq_set_backup_mode(s, b);
 }
 
-void seq_set_bitwise(sequencer *s, bool b)
+void seq_set_bitshift(sequencer *s, bool b)
 {
-    s->bitwise_generation = 0;
-    s->bitwise_on = b;
+    s->bitshift_generation = 0;
+    s->bitshift_on = b;
     seq_set_backup_mode(s, b);
 }
 
@@ -1026,10 +1023,10 @@ void seq_set_markov_mode(sequencer *s, unsigned int mode)
     s->markov_mode = mode;
 }
 
-void seq_set_bitwise_mode(sequencer *s, unsigned int mode)
+void seq_set_bitshift_src(sequencer *s, int src)
 {
-    printf("Setting BITWISE mode\n");
-    s->bitwise_mode = mode;
+    printf("Setting bitshift SRC\n");
+    s->bitshift_src = src;
 }
 
 void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }
