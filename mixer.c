@@ -8,6 +8,7 @@
 #include <portaudio.h>
 
 #include "algorithm.h"
+#include "bitshift.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
 #include "digisynth.h"
@@ -20,7 +21,6 @@
 #include "mixer.h"
 #include "sample_sequencer.h"
 #include "sbmsg.h"
-#include "bitshift.h"
 #include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "spork.h"
@@ -360,8 +360,7 @@ int mixer_add_spork(mixer *mixr, double freq)
     return add_sound_generator(mixr, (soundgenerator *)s);
 }
 
-int mixer_add_bitshift(mixer *mixr, int num_wurds,
-                                 char wurds[][SIZE_OF_WURD])
+int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     printf("Adding an BITSHIFT SEQUENCE GENERATOR, yo!\n");
     sequence_generator *sg = new_bitshift(num_wurds, wurds);

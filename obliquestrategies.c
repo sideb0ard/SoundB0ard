@@ -109,6 +109,5 @@ char *strategies[NUM_STATEGIES] = {
 void oblique_strategy()
 {
     int rand_oblique = rand() % 100;
-    printf(COOL_COLOR_MAUVE "Brian Eno says \"%s\"\n" ANSI_COLOR_RESET,
-           strategies[rand_oblique]);
+    printf(COOL_COLOR_MAUVE "%s\n" ANSI_COLOR_RESET, strategies[rand_oblique]);
 }

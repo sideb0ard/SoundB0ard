@@ -96,10 +96,7 @@ void interpret(char *line)
         //////  MIXER COMMANDS  /////////////////////////
         if (strncmp("help", wurds[0], 4) == 0)
         {
-            if (rand() % 2)
-                print_help();
-            else
-                oblique_strategy();
+            oblique_strategy();
         }
 
         else if (strncmp("quit", wurds[0], 4) == 0 ||
