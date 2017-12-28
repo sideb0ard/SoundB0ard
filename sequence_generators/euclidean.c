@@ -92,8 +92,8 @@ void build_euclidean_pattern_string(int level, char *bitmap_string, int *count,
 int euclidean_generate(void *self, void *data)
 {
     euclidean *e = (euclidean *)self;
-    printf("GENERATING!\nnum_hits:%d num_steps:%d\n", e->num_hits,
-           e->num_steps);
+    //printf("GENERATING!\nnum_hits:%d num_steps:%d\n", e->num_hits,
+    //       e->num_steps);
 
     return create_euclidean_rhythm(e->num_hits, e->num_steps);
 }
@@ -123,15 +123,16 @@ int create_euclidean_rhythm(int num_hits, int num_steps)
     int bitmap_position = 0;
     int bitmap_int = 0;
 
-    char bitmap_string[num_steps + 1];
-    memset(bitmap_string, 0, (num_steps + 1) * sizeof(char));
-    build_euclidean_pattern_string(level, bitmap_string, count, remaindrrr);
-    printf("STRINGPATTERN: %s\n", bitmap_string);
+    // char bitmap_string[num_steps + 1];
+    // memset(bitmap_string, 0, (num_steps + 1) * sizeof(char));
+    // build_euclidean_pattern_string(level, bitmap_string, count, remaindrrr);
+    // printf("STRINGPATTERN: %s\n", bitmap_string);
+
     build_euclidean_pattern_int(level, &bitmap_int, &bitmap_position, count,
                                 remaindrrr);
-    printf("PATTERN int: %d\n", bitmap_int);
-    char bin_ver_num[17];
-    char_binary_version_of_int(bitmap_int, bin_ver_num);
-    printf("PATTERN: %s\n", bin_ver_num);
+    // printf("PATTERN int: %d\n", bitmap_int);
+    // char bin_ver_num[17];
+    // char_binary_version_of_int(bitmap_int, bin_ver_num);
+    // printf("PATTERN: %s\n", bin_ver_num);
     return bitmap_int;
 }

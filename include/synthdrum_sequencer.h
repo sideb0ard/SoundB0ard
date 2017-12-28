@@ -5,7 +5,7 @@
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
-#include "sequencer.h"
+#include "step_sequencer.h"
 #include "sound_generator.h"
 
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =

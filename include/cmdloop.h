@@ -4,7 +4,7 @@
 #include "dxsynth.h"
 #include "looper.h"
 #include "minisynth.h"
-#include "sequencer.h"
+#include "step_sequencer.h"
 #include <stdbool.h>
 
 void loopy(void);

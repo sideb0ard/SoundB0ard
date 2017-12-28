@@ -9,7 +9,7 @@
 #include "minisynth.h"
 #include "sbmsg.h"
 #include "sequence_generator.h"
-#include "sequencer.h"
+#include "step_sequencer.h"
 #include "sound_generator.h"
 #include "table.h"
 

@@ -56,7 +56,7 @@ SRC = \
 	sample_oscillator.c \
 	sample_sequencer.c \
 	sbmsg.c \
-	sequencer.c \
+	step_sequencer.c \
 	sequencer_utils.c \
 	sound_generator.c \
 	sequence_generators/bitshift.c \

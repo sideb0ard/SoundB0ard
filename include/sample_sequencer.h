@@ -1,7 +1,7 @@
 #pragma once
 
 #include "filter_moogladder.h"
-#include "sequencer.h"
+#include "step_sequencer.h"
 #include "sound_generator.h"
 #include "stereodelay.h"
 

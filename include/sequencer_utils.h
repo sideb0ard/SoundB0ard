@@ -1,6 +1,6 @@
 #pragma once
 
-#include "sequencer.h"
+#include "step_sequencer.h"
 #include <wchar.h>
 
 int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with);

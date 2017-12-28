@@ -162,7 +162,7 @@ int bitshift_generate(void *self, void *data)
                 printf("OP1 is %d and OP2 is %d\n", op1, op2);
 #endif
 
-                int answer;
+                int answer = 0;
                 switch (cur.val)
                 {
                 case (LEFTSHIFT):
@@ -190,10 +190,16 @@ int bitshift_generate(void *self, void *data)
                     answer = op1 * op2;
                     break;
                 case (DIVIDE):
-                    answer = op1 / op2;
+                    if (op2 == 0)
+                        printf("MEEEP!(divbyZero)\n");
+                    else
+                        answer = op1 / op2;
                     break;
                 case (MODULO):
-                    answer = op1 % op2;
+                    if (op2 == 0)
+                        printf("MEEEP!(divbyZero)\n");
+                    else
+                        answer = op1 % op2;
                     break;
                 default:
                     printf("WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n");
