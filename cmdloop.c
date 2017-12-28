@@ -165,12 +165,14 @@ void interpret(char *line)
             {
                 if (num_wurds != 4)
                 {
-                    printf("get a life, mate - need to gimme number of hits and number of steps\n");
+                    printf("get a life, mate - need to gimme number of hits "
+                           "and number of steps\n");
                     continue;
                 }
                 int num_hits = atoi(wurds[2]);
                 int num_steps = atoi(wurds[3]);
-                printf("EUCLIDEAN! SEQUENCE GEN num_hits:%d num_steps:%d!\n", num_hits, num_steps);
+                printf("EUCLIDEAN! SEQUENCE GEN num_hits:%d num_steps:%d!\n",
+                       num_hits, num_steps);
                 mixer_add_euclidean(mixr, num_hits, num_steps);
             }
         }
@@ -626,8 +628,8 @@ void interpret(char *line)
                     else
                     {
                         printf("SYNTHDRUM SEQ!\n");
-                        parse_sample_sequencer_command(&sds->m_seq, wurds, num_wurds,
-                                                pattern);
+                        parse_sample_sequencer_command(&sds->m_seq, wurds,
+                                                       num_wurds, pattern);
                     }
                 }
             }
@@ -689,7 +691,8 @@ void interpret(char *line)
                             (sample_sequencer *)
                                 mixr->sound_generators[soundgen_num];
                         sequencer *seq = &s->m_seq;
-                        parse_sample_sequencer_command(seq, wurds, num_wurds, pattern);
+                        parse_sample_sequencer_command(seq, wurds, num_wurds,
+                                                       pattern);
                     }
                 }
             }
@@ -974,7 +977,8 @@ void interpret(char *line)
                         printf("ELSEY SEQUENCE!\n");
                         char *pattern = (char *)calloc(151, sizeof(char));
                         sequencer *seq = &g->m_seq;
-                        parse_sample_sequencer_command(seq, wurds, num_wurds, pattern);
+                        parse_sample_sequencer_command(seq, wurds, num_wurds,
+                                                       pattern);
                         free(pattern);
                     }
                 }
@@ -1936,26 +1940,6 @@ void interpret(char *line)
                              strncmp("default", wurds[3], 7) == 0)
                         dynamics_processor_set_default_sidechain_params(dp);
                 }
-                // else if (f->type == GRANULATOR) {
-                //    granulator *g = (granulator *)f;
-                //    double val = atof(wurds[4]);
-                //    if (strncmp("numgrains", wurds[3], 9) == 0)
-                //        granulator_set_num_grains(g, val);
-                //    else if (strncmp("grainlen", wurds[3], 8) ==
-                //    0)
-                //        granulator_set_grain_len(g, val);
-                //    else if (strncmp("fudge", wurds[3], 5) == 0)
-                //        granulator_set_fudge_factor(g, val);
-                //    else if (strncmp("wetmx", wurds[3], 5) == 0)
-                //        granulator_set_wet_mix(g, val);
-                //    else if (strncmp("locked", wurds[3], 5) == 0)
-                //        granulator_set_locked(g, val);
-                //    else if (strncmp("read_pos", wurds[3], 8) ==
-                //    0)
-                //        granulator_set_read_pos(g, val);
-                //    else if (strncmp("env", wurds[3], 3) == 0)
-                //        granulator_set_apply_env(g, val);
-                //}
                 else if (f->type == REVERB)
                 {
                     reverb *r = (reverb *)f;
@@ -2323,61 +2307,6 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         printf("Sequencer multi mode : %s\n",
                seq->multi_pattern_mode ? "true" : "false");
     }
-    // else if (strncmp("change", wurds[2], 6) == 0) {
-    else if (strncmp("markov_mode", wurds[2], 11) == 0)
-    {
-        printf("MARKOV!\n");
-        if (strncmp("haus", wurds[3], 4) == 0)
-        {
-            printf("HAUS!\n");
-            seq_set_markov_mode(seq, MARKOVHAUS);
-        }
-        else if (strncmp("boombap", wurds[3], 7) == 0 ||
-                 strncmp("hiphop", wurds[3], 6) == 0 ||
-                 strncmp("beats", wurds[3], 5) == 0)
-        {
-            printf("BOOMBAP!\n");
-            seq_set_markov_mode(seq, MARKOVBOOMBAP);
-        }
-        else if (strncmp("snare", wurds[3], 7) == 0)
-        {
-            printf("MARKOVSNARE!\n");
-            seq_set_markov_mode(seq, MARKOVSNARE);
-        }
-    }
-    else if (strncmp("markov", wurds[2], 4) == 0)
-    {
-        if (strncmp("every", wurds[3], 5) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_markov(seq, true);
-                seq->markov_every_n_loops = num_gens;
-            }
-            else
-            {
-                printf("Need a number for every 'n'\n");
-            }
-        }
-        else if (strncmp("for", wurds[3], 3) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_markov(seq, true);
-                seq_set_max_generations(seq, num_gens);
-            }
-            else
-            {
-                printf("Need a number for 'for'\n");
-            }
-        }
-        else
-        {
-            seq_set_markov(seq, 1 - seq->markov_on);
-        }
-    }
     else if (strncmp("print", wurds[2], 5) == 0)
     {
         int pattern_num = atoi(wurds[3]);
@@ -2397,15 +2326,15 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         int sloppyjoe = atoi(wurds[3]);
         seq_set_sloppiness(seq, sloppyjoe);
     }
-    else if (strncmp("shuffle", wurds[2], 7) == 0)
+    else if (strncmp("generate", wurds[2], 4) == 0)
     {
         if (strncmp("every", wurds[3], 5) == 0)
         {
             int num_gens = atoi(wurds[4]);
             if (num_gens > 0)
             {
-                seq_set_shuffle(seq, true);
-                seq->shuffle_every_n_loops = num_gens;
+                seq_set_generate_mode(seq, true);
+                seq->generate_every_n_loops = num_gens;
             }
             else
             {
@@ -2417,40 +2346,7 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             int num_gens = atoi(wurds[4]);
             if (num_gens > 0)
             {
-                seq_set_shuffle(seq, true);
-                seq_set_max_generations(seq, num_gens);
-            }
-            else
-            {
-                printf("Need a number for 'for'\n");
-            }
-        }
-        else
-        {
-            seq_set_shuffle(seq, 1 - seq->shuffle_on);
-        }
-    }
-    else if (strncmp("bitshift", wurds[2], 4) == 0)
-    {
-        if (strncmp("every", wurds[3], 5) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_bitshift(seq, true);
-                seq->bitshift_every_n_loops = num_gens;
-            }
-            else
-            {
-                printf("Need a number for every 'n'\n");
-            }
-        }
-        else if (strncmp("for", wurds[3], 3) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_bitshift(seq, true);
+                seq_set_generate_mode(seq, true);
                 seq_set_max_generations(seq, num_gens);
             }
             else
@@ -2461,58 +2357,18 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         else if (strncmp("source", wurds[3], 6) == 0 ||
                  strncmp("src", wurds[3], 3) == 0)
         {
-            int bitshift_src = atoi(wurds[4]);
-            if (mixer_is_valid_seq_gen_num(mixr, bitshift_src))
+            int generate_src = atoi(wurds[4]);
+            if (mixer_is_valid_seq_gen_num(mixr, generate_src))
             {
-                printf("Setting bitshift SRC! %d\n", bitshift_src);
-                seq_set_bitshift_src(seq, bitshift_src);
+                printf("Setting GENERATE SRC! %d\n", generate_src);
+                seq_set_generate_src(seq, generate_src);
             }
             else
-                printf("not a valid bitshift SRC: %d\n", bitshift_src);
+                printf("not a valid generate SRC: %d\n", generate_src);
         }
         else
         {
-            seq_set_bitshift(seq, 1 - seq->bitshift_on);
-        }
-    }
-    else if (strncmp("generate", wurds[2], 8) == 0)
-    {
-        int pattern_num = atoi(wurds[3]);
-        // TODO - fix
-        //next_euclidean_generation(seq, pattern_num);
-    }
-    else if (strncmp("euclid", wurds[2], 6) == 0)
-    {
-        printf("Euclidean, yo!\n");
-        if (strncmp("every", wurds[3], 5) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_euclidean(seq, true);
-                seq->euclidean_every_n_loops = num_gens;
-            }
-            else
-            {
-                printf("Need a number for every 'n'\n");
-            }
-        }
-        else if (strncmp("for", wurds[3], 3) == 0)
-        {
-            int num_gens = atoi(wurds[4]);
-            if (num_gens > 0)
-            {
-                seq_set_euclidean(seq, true);
-                seq_set_max_generations(seq, num_gens);
-            }
-            else
-            {
-                printf("Need a number for 'for'\n");
-            }
-        }
-        else
-        {
-            seq_set_euclidean(seq, 1 - seq->euclidean_on);
+            seq_set_generate_mode(seq, 1 - seq->generate_mode);
         }
     }
     else if (strncmp("visualize", wurds[2], 9) == 0)

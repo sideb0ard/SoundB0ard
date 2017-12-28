@@ -3,10 +3,10 @@
 #include <string.h>
 
 #include "defjams.h"
+#include "euclidean.h"
 #include "mixer.h"
 #include "sequencer_utils.h"
 #include "synthbase.h"
-#include "euclidean.h"
 #include "utils.h"
 
 extern const int key_midi_mapping[NUM_KEYS];

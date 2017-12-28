@@ -5,17 +5,8 @@
 
 #include "defjams.h"
 
-#define GRIDWIDTH (SEQUENCER_PATTERN_LEN / 4)
-#define INTEGER_LENGTH pow(2, SEQUENCER_PATTERN_LEN)
+#define MAX_SEQUENCER_PATTERNS 10
 
-#define NUM_SEQUENCER_PATTERNS 10
-
-enum
-{
-    MARKOVBOOMBAP,
-    MARKOVHAUS,
-    MARKOVSNARE
-} markovmodez;
 enum
 {
     SIXTEENTH,
@@ -33,13 +24,10 @@ typedef struct sequencer
     unsigned int gridsteps;
     int pattern_len; // 24th or 16th
 
-    int matrix1[GRIDWIDTH][GRIDWIDTH];
-    int matrix2[GRIDWIDTH][GRIDWIDTH];
-
-    seq_pattern patterns[NUM_SEQUENCER_PATTERNS];
-    double pattern_position_amp[NUM_SEQUENCER_PATTERNS][PPBAR];
-    int pattern_num_loops[NUM_SEQUENCER_PATTERNS];
-    int pattern_num_swing_setting[NUM_SEQUENCER_PATTERNS];
+    seq_pattern patterns[MAX_SEQUENCER_PATTERNS];
+    double pattern_position_amp[MAX_SEQUENCER_PATTERNS][PPBAR];
+    int pattern_num_loops[MAX_SEQUENCER_PATTERNS];
+    int pattern_num_swing_setting[MAX_SEQUENCER_PATTERNS];
     seq_pattern backup_pattern_while_getting_crazy; // store current pattern so
                                                     // algorithms can use slot
     int num_patterns;
@@ -47,34 +35,18 @@ typedef struct sequencer
     int cur_pattern_iteration;
     bool multi_pattern_mode;
 
-    bool markov_on;
-    unsigned int markov_mode; // MARKOVHAUS or MARKOVBOOMBAP
-    int markov_generation;
-    int markov_every_n_loops;
+    bool generate_mode;
+    int generate_src;
+    int generate_generation;
+    int generate_max_generation;
+    int generate_every_n_loops;
 
-    bool euclidean_on;
-    int euclidean_src;
-    int euclidean_generation;
-    int euclidean_every_n_loops;
-
+    // randomizes amplitude
     bool randamp_on;
     int randamp_generation;
     int randamp_every_n_loops;
 
-    bool shuffle_on;
-    int shuffle_generation;
-    int shuffle_every_n_loops;
-
-    bool bitshift_on;
-    int bitshift_counter;
-    unsigned int bitshift_src;
-
-    int bitshift_generation;
-    int bitshift_every_n_loops;
-
     bool visualize;
-
-    int max_generation; // used for markov chain and bitwise
 
     int sloppiness; // 0 - 10
 
@@ -91,8 +63,6 @@ void seq_set_sample_amp_from_char_pattern(sequencer *s, int pattern_num,
 void seq_set_random_sample_amp(sequencer *s, int pattern_num);
 void add_char_pattern(sequencer *s, char *pattern);
 void change_char_pattern(sequencer *s, int pattern_num, char *pattern);
-void add_int_pattern(sequencer *s, int pattern);
-void change_int_pattern(sequencer *s, int pattern_num, int pattern);
 
 void seq_set_multi_pattern_mode(sequencer *s, bool multi);
 void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops);
@@ -101,23 +71,10 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern,
                              int final_pattern[PPBAR]);
 void wchar_version_of_amp(sequencer *s, int pattern_num, wchar_t apattern[49]);
 
-int seed_pattern(void);
-int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH]);
-void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH]);
-
-// TODO FIX
-//void next_euclidean_generation(sequencer *s, int pattern_num);
-void next_markov_generation(sequencer *s);
-void next_shuffle_generation(sequencer *s);
-
-void seq_set_euclidean(sequencer *s, bool b);
 void seq_set_randamp(sequencer *s, bool on);
-void seq_set_markov(sequencer *s, bool on);
-void seq_set_markov_mode(sequencer *s, unsigned int mode);
-void seq_set_shuffle(sequencer *s, bool on);
 
-void seq_set_bitshift(sequencer *s, bool on);
-void seq_set_bitshift_src(sequencer *s, int bitshift_src);
+void seq_set_generate_mode(sequencer *s, bool b);
+void seq_set_generate_src(sequencer *s, int generate_src);
 
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);
