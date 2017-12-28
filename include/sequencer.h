@@ -47,16 +47,13 @@ typedef struct sequencer
     int cur_pattern_iteration;
     bool multi_pattern_mode;
 
-    bool game_of_life_on;
-    int life_generation;
-    int life_every_n_loops;
-
     bool markov_on;
     unsigned int markov_mode; // MARKOVHAUS or MARKOVBOOMBAP
     int markov_generation;
     int markov_every_n_loops;
 
     bool euclidean_on;
+    int euclidean_src;
     int euclidean_generation;
     int euclidean_every_n_loops;
 
@@ -77,7 +74,7 @@ typedef struct sequencer
 
     bool visualize;
 
-    int max_generation; // used for game of life, markov chain and bitwise
+    int max_generation; // used for markov chain and bitwise
 
     int sloppiness; // 0 - 10
 
@@ -108,13 +105,12 @@ int seed_pattern(void);
 int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH]);
 void int_to_matrix(int pattern, int matrix[GRIDWIDTH][GRIDWIDTH]);
 
-void next_euclidean_generation(sequencer *s, int pattern_num);
-void next_life_generation(sequencer *s);
+// TODO FIX
+//void next_euclidean_generation(sequencer *s, int pattern_num);
 void next_markov_generation(sequencer *s);
 void next_shuffle_generation(sequencer *s);
 
 void seq_set_euclidean(sequencer *s, bool b);
-void seq_set_game_of_life(sequencer *s, bool on);
 void seq_set_randamp(sequencer *s, bool on);
 void seq_set_markov(sequencer *s, bool on);
 void seq_set_markov_mode(sequencer *s, unsigned int mode);

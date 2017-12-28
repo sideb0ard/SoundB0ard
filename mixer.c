@@ -14,6 +14,7 @@
 #include "digisynth.h"
 #include "dxsynth.h"
 #include "envelope.h"
+#include "euclidean.h"
 #include "fx.h"
 #include "granulator.h"
 #include "looper.h"
@@ -364,6 +365,16 @@ int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     printf("Adding an BITSHIFT SEQUENCE GENERATOR, yo!\n");
     sequence_generator *sg = new_bitshift(num_wurds, wurds);
+    if (sg)
+        return add_sequence_generator(mixr, sg);
+    else
+        return -99;
+}
+
+int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps)
+{
+    printf("Adding an EUCLIDEAN SEQUENCE GENERATOR, yo!\n");
+    sequence_generator *sg = new_euclidean(num_hits, num_steps);
     if (sg)
         return add_sequence_generator(mixr, sg);
     else

@@ -7,6 +7,7 @@
 
 #include "bitshift.h"
 #include "defjams.h"
+#include "euclidean.h"
 #include "mixer.h"
 #include "sequencer.h"
 #include "sequencer_utils.h"
@@ -47,21 +48,14 @@ void seq_init(sequencer *seq)
         }
     }
 
-    seq->game_of_life_on = false;
-    seq->life_generation = 0;
-    seq->life_every_n_loops = 0;
-
-    seq->euclidean_on = false;
-    seq->euclidean_generation = 0;
-    seq->euclidean_every_n_loops = 0;
-
     seq->randamp_on = false;
     seq->randamp_generation = 0;
     seq->randamp_every_n_loops = 0;
 
-    seq->shuffle_on = false;
-    seq->shuffle_generation = 0;
-    seq->shuffle_every_n_loops = 0;
+    seq->euclidean_on = false;
+    seq->euclidean_src = -99;
+    seq->euclidean_generation = 0;
+    seq->euclidean_every_n_loops = 0;
 
     seq->markov_on = false;
     seq->markov_mode = MARKOVBOOMBAP;
@@ -75,6 +69,7 @@ void seq_init(sequencer *seq)
     seq->bitshift_every_n_loops = 0;
 
     seq->sloppiness = 0;
+
     seq->max_generation = 0;
 
     seq->visualize = false;
@@ -134,36 +129,9 @@ bool seq_tick(sequencer *seq)
                 }
             }
 
-            if (seq->game_of_life_on)
+            if (seq->euclidean_on)
             {
-                if (seq->life_every_n_loops > 0)
-                {
-                    if (seq->life_generation % seq->life_every_n_loops == 0)
-                    {
-                        seq_set_backup_mode(seq, true);
-                        next_life_generation(seq);
-                    }
-                    else
-                    {
-                        seq_set_backup_mode(seq, false);
-                    }
-                }
-                else if (seq->max_generation > 0)
-                {
-                    if (seq->life_generation >= seq->max_generation)
-                    {
-                        seq->life_generation = 0;
-                        seq_set_game_of_life(seq, false);
-                    }
-                }
-                else
-                {
-                    next_life_generation(seq);
-                }
-                seq->life_generation++;
-            }
-            else if (seq->euclidean_on)
-            {
+                bool gen_new_pattern = false;
                 if (seq->euclidean_every_n_loops > 0)
                 {
                     if (seq->euclidean_generation %
@@ -171,7 +139,7 @@ bool seq_tick(sequencer *seq)
                         0)
                     {
                         seq_set_backup_mode(seq, true);
-                        next_euclidean_generation(seq, 0);
+                        gen_new_pattern = true;
                     }
                     else
                     {
@@ -188,7 +156,33 @@ bool seq_tick(sequencer *seq)
                 }
                 else
                 {
-                    next_euclidean_generation(seq, 0);
+                    gen_new_pattern = true;
+                }
+                if (gen_new_pattern)
+                {
+                    if (seq->euclidean_src != -99)
+                    {
+                        sequence_generator *sg =
+                            mixr->sequence_generators[seq->bitshift_src];
+                        // int bit_pattern = bitshift_generate((void*)sg,
+                        // (void*) &seq->bitshift_counter);
+                        int bit_pattern = euclidean_generate((void *)sg, NULL);
+                        if (seq->visualize)
+                        {
+                            char bit_string[17];
+                            char_binary_version_of_int(bit_pattern, bit_string);
+                            printf("New pattern: %s\n", bit_string);
+                        }
+
+                        memset(&seq->patterns[seq->cur_pattern], 0,
+                               PPBAR * sizeof(int));
+                        convert_bitshift_pattern_to_pattern(
+                            bit_pattern,
+                            (int *)&seq->patterns[seq->cur_pattern], PPBAR,
+                            seq->gridsteps);
+
+                        seq->bitshift_counter++;
+                    }
                 }
                 seq->euclidean_generation++;
             }
@@ -250,7 +244,6 @@ bool seq_tick(sequencer *seq)
 
                 if (gen_new_pattern)
                 {
-
                     if (seq->bitshift_src != -99)
                     {
                         sequence_generator *sg =
@@ -372,93 +365,6 @@ int matrix_to_int(int matrix[GRIDWIDTH][GRIDWIDTH])
     }
 
     return return_pattern;
-}
-
-void next_euclidean_generation(sequencer *s, int pattern_num)
-{
-    memset(&s->patterns[pattern_num], 0, PPBAR * sizeof(int));
-    int rand_steps = (rand() % 9) + 1;
-    int bitpattern = create_euclidean_rhythm(rand_steps, s->pattern_len);
-    if (rand() % 2)
-        bitpattern =
-            shift_bits_to_leftmost_position(bitpattern, s->pattern_len);
-    if (rand() % 2) // mask first half
-        bitpattern = (bitpattern | 65280) - 65280;
-
-    convert_bitshift_pattern_to_pattern(
-        bitpattern, (int *)&s->patterns[pattern_num], PPBAR, s->gridsteps);
-
-    if (s->visualize)
-    {
-        char bit_string[17];
-        char_binary_version_of_int(bitpattern, bit_string);
-        printf("New pattern: %s\n", bit_string);
-    }
-}
-
-// game of life algo
-void next_life_generation(sequencer *s)
-{
-    memset(s->matrix1, 0, sizeof s->matrix1);
-    memset(s->matrix2, 0, sizeof s->matrix2);
-    int cur_pattern_as_int =
-        pattern_as_int_representation((int *)&s->patterns[s->cur_pattern]);
-    // printf("CUR PATTERN AS INT %d\n", cur_pattern_as_int);
-    int_to_matrix(cur_pattern_as_int, s->matrix1);
-
-    for (int y = 0; y < GRIDWIDTH; y++)
-    {
-        for (int x = 0; x < GRIDWIDTH; x++)
-        {
-            int neighbors = 0;
-
-            // printf("My co-ords y:%d x:%d\n", y, x);
-            for (int rel_y = y - 1; rel_y <= y + 1; rel_y++)
-            {
-                for (int rel_x = x - 1; rel_x <= x + 1; rel_x++)
-                {
-                    int n_y = rel_y;
-                    int n_x = rel_x;
-                    if (n_y < 0)
-                        n_y += GRIDWIDTH;
-                    if (n_y == GRIDWIDTH)
-                        n_y -= GRIDWIDTH;
-                    if (n_x < 0)
-                        n_x += GRIDWIDTH;
-                    if (n_x == GRIDWIDTH)
-                        n_x -= GRIDWIDTH;
-                    if (!(n_x == x && n_y == y))
-                    {
-                        // printf("My neighbs y:%d x:%d val
-                        // - %d\n", n_y, n_x);
-                        if (s->matrix1[n_y][n_x] == 1)
-                            neighbors += 1;
-                    }
-                }
-            }
-            // printf("[%d][%d] - I gots %d neighbors\n", y, x,
-            // neighbors);
-
-            // the RULES
-            if (s->matrix1[y][x] == 0 && neighbors == 3)
-                s->matrix2[y][x] = 1;
-
-            if (s->matrix1[y][x] == 1 && (neighbors == 2 || neighbors == 3))
-                s->matrix2[y][x] = 1;
-
-            if (s->matrix1[y][x] == 1 && (neighbors > 3 || neighbors < 2))
-                s->matrix2[y][x] = 0;
-        }
-    }
-
-    int new_pattern = matrix_to_int(s->matrix2);
-    // printf("NEW PATTERN! %d\n", new_pattern);
-    if (new_pattern == 0)
-        new_pattern = seed_pattern();
-
-    memset(&s->patterns[0], 0, PPBAR * sizeof(int));
-    convert_bitshift_pattern_to_pattern(new_pattern, s->patterns[0], PPBAR,
-                                        SIXTEENTH);
 }
 
 int sloppy_weight(sequencer *s, int position)
@@ -842,17 +748,17 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         L"\n" WANSI_COLOR_CYAN
         "      -------------------------------------------------------------\n"
-        "      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d "
+        "      CurStep: %d Pattern Len: %d "
         "markov: %d markov_mode: %s(%d) Markov_Every_n: %d Multi: %d Max Gen: "
         "%d\n      bitshift: %d bitshift src:%d bitshift_every_n: %d "
         "Euclidean: "
-        "%d Euclid_n: %d visualize:%d"
+        "%d Euclidean Src:%d Euclid_n: %d visualize:%d"
         "sloppy: %d shuffle_on: %d shuffle_every_n: %d",
-        seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,
+        seq->cur_pattern,
         seq->pattern_len, seq->markov_on, s_markov_mode[seq->markov_mode],
         seq->markov_mode, seq->markov_every_n_loops, seq->multi_pattern_mode,
         seq->max_generation, seq->bitshift_on, seq->bitshift_src,
-        seq->bitshift_every_n_loops, seq->euclidean_on,
+        seq->bitshift_every_n_loops, seq->euclidean_on, seq->euclidean_src,
         seq->euclidean_every_n_loops, seq->visualize, seq->sloppiness,
         seq->shuffle_on, seq->shuffle_every_n_loops);
     wchar_t pattern_details[128];
@@ -979,13 +885,6 @@ void seq_set_euclidean(sequencer *s, bool b)
     s->euclidean_on = b;
 }
 
-void seq_set_game_of_life(sequencer *s, bool b)
-{
-    s->life_generation = 0;
-    s->game_of_life_on = b;
-    seq_set_backup_mode(s, b);
-}
-
 void seq_set_markov(sequencer *s, bool b)
 {
     s->markov_generation = 0;
@@ -1031,6 +930,12 @@ void seq_set_bitshift_src(sequencer *s, int src)
 {
     printf("Setting bitshift SRC\n");
     s->bitshift_src = src;
+}
+
+void seq_set_euclidean_src(sequencer *s, int src)
+{
+    printf("Setting EUCLIDEAN SRC\n");
+    s->euclidean_src = src;
 }
 
 void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }

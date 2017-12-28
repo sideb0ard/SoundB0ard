@@ -12,7 +12,6 @@ SRC = \
 	audioutils.c \
 	fx/basicfilterpass.c \
 	fx/beatrepeat.c \
-	bitshift/bitshift.c \
 	chaosmonkey.c \
 	cmdloop.c \
 	dca.c \
@@ -60,6 +59,8 @@ SRC = \
 	sequencer.c \
 	sequencer_utils.c \
 	sound_generator.c \
+	sequence_generators/bitshift.c \
+	sequence_generators/euclidean.c \
 	sparkline.c \
 	spork.c \
 	synthbase.c \
