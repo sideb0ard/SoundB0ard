@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "bitshift.h"
 #include "midi_freq_table.h"
 #include "minisynth.h"
 #include "mixer.h"
@@ -135,6 +136,9 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_sustain_time_ms = 400;
     ms->m_settings.m_sustain_time_sixteenth = 4;
 
+    ms->m_settings.m_bitshift_active = false;
+    ms->m_settings.m_bitshift_src = -99;
+
     for (int i = 0; i < MAX_VOICES; i++)
     {
         ms->m_last_midi_notes[i] = 0;
@@ -160,8 +164,6 @@ minisynth *new_minisynth(void)
     }
     minisynth_update(ms);
     arpeggiator_init(&ms->m_arp);
-
-    // bytebeat_init(&ms->bytr);
 
     ms->sound_generator.active = true;
     return ms;
@@ -666,7 +668,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         L"[" WANSI_COLOR_WHITE "MINISYNTH '%s'" WCOOL_COLOR_PINK
         "] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d "
-        "bytebeat:%d last_midi_notes:%d %d %d\n"
+        "bitshift:%d bitshift_src:%d last_midi_notes:%d %d %d\n"
         "      filter keytrack(kt)[0-1]: %d detune[-100-100]:%0.2f legato:%d "
         "note decay scale(ndscale)[01]:%d\n      noisedb[-96-0]:%0.2f "
         "octave[-4-4]:%d pitchrange[0-12]:%d porta ms(porta)[0-5000]:%.2f"
@@ -705,10 +707,10 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
         s_voice_names[ms->m_settings.m_voice_mode], ms->m_settings.m_voice_mode,
         MAX_VOICE_CHOICE - 1, ms->m_settings.m_monophonic,
-        ms->m_settings.m_bytebeat_active, ms->m_last_midi_notes[0],
-        ms->m_last_midi_notes[1], ms->m_last_midi_notes[2],
-        ms->m_settings.m_filter_keytrack, ms->m_settings.m_detune_cents,
-        ms->m_settings.m_legato_mode,
+        ms->m_settings.m_bitshift_active, ms->m_settings.m_bitshift_src,
+        ms->m_last_midi_notes[0], ms->m_last_midi_notes[1],
+        ms->m_last_midi_notes[2], ms->m_settings.m_filter_keytrack,
+        ms->m_settings.m_detune_cents, ms->m_settings.m_legato_mode,
         ms->m_settings.m_note_number_to_decay_scaling,
         ms->m_settings.m_noise_osc_db, ms->m_settings.m_octave,
         ms->m_settings.m_pitchbend_range, ms->m_settings.m_portamento_time_msec,
@@ -815,22 +817,26 @@ stereo_val minisynth_gennext(void *self)
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    if (ms->m_settings.m_bytebeat_active)
+    if (ms->m_settings.m_bitshift_active &&
+        mixer_is_valid_seq_gen_num(mixr, ms->m_settings.m_bitshift_src))
     {
-        unsigned mode = ms->m_settings.m_bytebeat_mode;
-        short nom_left = gimme_a_bitwise_short(mode, ms->m_bytebeat_counter++);
-        short nom_right = gimme_a_bitwise_short(mode, ms->m_bytebeat_counter++);
-        // double nomnom = scaleybum(-32768, 32787, -1, 1, nom);
-        accum_out_left = scaleybum(-32768, 32787, -1, 1, nom_left);
-        accum_out_right = scaleybum(-32768, 32787, -1, 1, nom_right);
-        // return (stereo_val){nomnom, nomnom};
+        sequence_generator *sg =
+            mixr->sequence_generators[ms->m_settings.m_bitshift_src];
+
+        short nom_left = bitshift_generate((void *)sg, NULL);
+        short nom_right = bitshift_generate((void *)sg, NULL);
+
+        nom_left = (nom_left - 0x80) << 8;
+        nom_right = (nom_right - 0x80) << 8;
+
+        accum_out_left += scaleybum(-32768, 32787, -1, 1, nom_left);
+        accum_out_right += scaleybum(-32768, 32787, -1, 1, nom_right);
     }
     else
     {
+        float mix = 1.0 / MAX_VOICES;
         if (ms->m_arp.active)
             arpeggiate(ms, &ms->m_arp);
-
-        float mix = 1.0 / MAX_VOICES;
 
         double out_left = 0.0;
         double out_right = 0.0;
@@ -1736,14 +1742,10 @@ void minisynth_sg_stop(void *self)
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
 
-void minisynth_set_bitwise(minisynth *ms, bool b)
+void minisynth_set_bitshift_src(minisynth *ms, int src)
 {
-    ms->m_settings.m_bytebeat_active = b;
-}
-void minisynth_set_bitwise_mode(minisynth *ms, int mode)
-{
-    if (mode >= 0 && mode < 5)
-        ms->m_settings.m_bytebeat_mode = mode;
+    if (mixer_is_valid_seq_gen_num(mixr, src))
+        ms->m_settings.m_bitshift_src = src;
 }
 
 void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)
@@ -2281,9 +2283,9 @@ void minisynth_set_monophonic(minisynth *ms, bool b)
 {
     ms->m_settings.m_monophonic = b;
 }
-void minisynth_set_bytebeat(minisynth *ms, bool b)
+void minisynth_set_bitshift(minisynth *ms, bool b)
 {
-    ms->m_settings.m_bytebeat_active = b;
+    ms->m_settings.m_bitshift_active = b;
 }
 
 void minisynth_add_last_note(minisynth *ms, unsigned int val)

@@ -19,7 +19,7 @@ void token_val_to_string(bitshift_token *t, char *char_val)
         itoa(t->val, char_val);
     else if (t->type == TEE_TOKEN)
         strcpy(char_val, "t");
-        //itoa(mixr->timing_info.cur_sample, char_val);
+    // itoa(mixr->timing_info.cur_sample, char_val);
     else if (t->type == BRACKET)
         strcpy(char_val, s_brackets[t->val]);
     else
@@ -100,9 +100,15 @@ void bitshift_status(void *self, wchar_t *wstring)
              infix_pattern, rpn_pattern);
 }
 
-int bitshift_generate(void *self)
+int bitshift_generate(void *self, void *data)
 {
     bitshift *sg = (bitshift *)self;
+    int *t;
+    if (data)
+        t = (int *)data;
+    else
+        t = &mixr->timing_info.cur_sample;
+
     int num_rpn = sg->pattern.num_rpn_tokens;
     bitshift_token *rpn_tokens = sg->pattern.rpn_tokenized_pattern;
 
@@ -123,7 +129,7 @@ int bitshift_generate(void *self)
         }
         else if (cur.type == TEE_TOKEN)
         {
-            answer_stack[answer_stack_idx++] = mixr->timing_info.cur_sample;
+            answer_stack[answer_stack_idx++] = *t;
         }
         else if (cur.type == OPERATOR)
         {

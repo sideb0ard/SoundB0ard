@@ -5,11 +5,11 @@
 #include <string.h>
 #include <wchar.h>
 
+#include "bitshift.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "sequencer.h"
 #include "sequencer_utils.h"
-#include "bitshift.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -225,7 +225,8 @@ bool seq_tick(sequencer *seq)
                 bool gen_new_pattern = false;
                 if (seq->bitshift_every_n_loops > 0)
                 {
-                    if (seq->bitshift_generation % seq->bitshift_every_n_loops ==
+                    if (seq->bitshift_generation %
+                            seq->bitshift_every_n_loops ==
                         0)
                     {
                         seq_set_backup_mode(seq, true);
@@ -249,13 +250,14 @@ bool seq_tick(sequencer *seq)
 
                 if (gen_new_pattern)
                 {
-                    //int bit_pattern = gimme_a_bitshift_short(
-                    //    seq->bitshift_mode, seq->bitshift_counter);
 
                     if (seq->bitshift_src != -99)
                     {
-                        sequence_generator *sg = mixr->sequence_generators[seq->bitshift_src];
-                        int bit_pattern = bitshift_generate((void*)sg);
+                        sequence_generator *sg =
+                            mixr->sequence_generators[seq->bitshift_src];
+                        // int bit_pattern = bitshift_generate((void*)sg,
+                        // (void*) &seq->bitshift_counter);
+                        int bit_pattern = bitshift_generate((void *)sg, NULL);
                         if (seq->visualize)
                         {
                             char bit_string[17];
@@ -266,8 +268,9 @@ bool seq_tick(sequencer *seq)
                         memset(&seq->patterns[seq->cur_pattern], 0,
                                PPBAR * sizeof(int));
                         convert_bitshift_pattern_to_pattern(
-                            bit_pattern, (int *)&seq->patterns[seq->cur_pattern],
-                            PPBAR, seq->gridsteps);
+                            bit_pattern,
+                            (int *)&seq->patterns[seq->cur_pattern], PPBAR,
+                            seq->gridsteps);
 
                         seq->bitshift_counter++;
                     }
@@ -841,7 +844,8 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         "      -------------------------------------------------------------\n"
         "      CurStep: %d life_mode: %d Every_n: %d Pattern Len: %d "
         "markov: %d markov_mode: %s(%d) Markov_Every_n: %d Multi: %d Max Gen: "
-        "%d\n      bitshift: %d bitshift src:%d bitshift_every_n: %d Euclidean: "
+        "%d\n      bitshift: %d bitshift src:%d bitshift_every_n: %d "
+        "Euclidean: "
         "%d Euclid_n: %d visualize:%d"
         "sloppy: %d shuffle_on: %d shuffle_every_n: %d",
         seq->cur_pattern, seq->game_of_life_on, seq->life_every_n_loops,

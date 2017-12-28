@@ -63,7 +63,7 @@ typedef struct bitshift
 } bitshift;
 
 sequence_generator *new_bitshift(int argc, char argv[][SIZE_OF_WURD]);
-int bitshift_generate(void *self);
+int bitshift_generate(void *self, void *data);
 void bitshift_status(void *self, wchar_t *status_string);
 
 int parse_bitshift_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],

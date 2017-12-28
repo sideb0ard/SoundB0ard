@@ -5,7 +5,7 @@
 typedef struct sequence_generator
 {
     void (*status)(void *self, wchar_t *wstring);
-    int (*generate)(void *self);
+    int (*generate)(void *self, void *data);
 } sequence_generator;
 
 void sequence_generator_status(void *self, wchar_t *wstring);

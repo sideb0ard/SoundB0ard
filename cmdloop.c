@@ -411,7 +411,8 @@ void interpret(char *line)
                 sequence_generator *sg = mixr->sequence_generators[sgnum];
                 if (strncmp("gen", wurds[2], 3) == 0)
                 {
-                    int num = sg->generate(sg);
+                    int num =
+                        sg->generate(sg, (void *)&mixr->timing_info.cur_sample);
                     printf("NOM!: %d\n", num);
                 }
             }
@@ -1640,11 +1641,6 @@ void interpret(char *line)
                                 minisynth_set_arpeggiate(ms,
                                                          1 - ms->m_arp.active);
                             }
-                            else if (strncmp("bytebeat", wurds[2], 8) == 0)
-                            {
-                                bool b = atoi(wurds[3]);
-                                minisynth_set_bytebeat(ms, b);
-                            }
                             else if (strncmp("rand", wurds[2], 4) == 0)
                             {
                                 minisynth_rand_settings(ms);
@@ -2496,8 +2492,8 @@ void parse_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
                 printf("Need a number for 'for'\n");
             }
         }
-        else if (strncmp("source", wurds[3], 6) == 0
-                || strncmp("src", wurds[3], 3) == 0)
+        else if (strncmp("source", wurds[3], 6) == 0 ||
+                 strncmp("src", wurds[3], 3) == 0)
         {
             int bitshift_src = atoi(wurds[4]);
             if (mixer_is_valid_seq_gen_num(mixr, bitshift_src))
@@ -2995,17 +2991,18 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("bitshift", wurds[2], 4) == 0)
     {
-        if (strncmp(wurds[3], "mode", 4) == 0)
+        if (strncmp(wurds[3], "source", 6) == 0 ||
+            strncmp(wurds[3], "src", 3) == 0)
         {
-            int val = atoi(wurds[4]);
-            printf("Changing BITWISE mode: %d\n", val);
-            minisynth_set_bitwise_mode(ms, val);
+            int src = atoi(wurds[4]);
+            printf("Changing BITSHIFT SRC: %d\n", src);
+            minisynth_set_bitshift_src(ms, src);
         }
         else
         {
-            double val = atof(wurds[3]);
-            printf("Minisynth BITWISE %s!\n", val ? "true" : "false");
-            minisynth_set_bitwise(ms, val);
+            bool b = atof(wurds[3]);
+            printf("Minisynth BITSHIFT %s!\n", b ? "true" : "false");
+            minisynth_set_bitshift(ms, b);
         }
         return true;
     }

@@ -120,8 +120,8 @@ typedef struct synthsettings
     double m_sustain_time_ms;
     double m_sustain_time_sixteenth;
 
-    bool m_bytebeat_active;
-    unsigned m_bytebeat_mode;
+    bool m_bitshift_active;
+    unsigned m_bitshift_src;
 } synthsettings;
 
 typedef struct minisynth
@@ -145,8 +145,7 @@ typedef struct minisynth
     int m_last_midi_notes[MAX_VOICES];
     arpeggiator m_arp;
 
-    // bytebeat bytr;
-    int m_bytebeat_counter;
+    int m_bitshift_counter;
 
 } minisynth;
 
@@ -210,8 +209,8 @@ void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val);
 void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode);
 void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode);
 
-void minisynth_set_bitwise(minisynth *ms, bool b);
-void minisynth_set_bitwise_mode(minisynth *ms, int mode);
+void minisynth_set_bitshift(minisynth *ms, bool b);
+void minisynth_set_bitshift_src(minisynth *ms, int src);
 
 void minisynth_set_filter_mod(minisynth *ms, double mod);
 void minisynth_del_self(void *self);
@@ -266,5 +265,4 @@ void minisynth_set_voice_mode(minisynth *ms, unsigned int val);
 void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
 void minisynth_set_monophonic(minisynth *ms, bool b);
-void minisynth_set_bytebeat(minisynth *ms, bool b);
 void minisynth_add_last_note(minisynth *ms, unsigned int val);
