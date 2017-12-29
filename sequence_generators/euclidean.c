@@ -135,10 +135,23 @@ int create_euclidean_rhythm(int num_hits, int num_steps)
     build_euclidean_pattern_int(level, &bitmap_int, &bitmap_len, count,
                                 remaindrrr);
     printf("PATTERN int: %d Len:%d\n", bitmap_int, bitmap_len);
-    // char bin_ver_num[17];
-    // char_binary_version_of_int(bitmap_int, bin_ver_num);
-    // printf("PATTERN: %s\n", bin_ver_num);
-    int diff = 16 - num_steps;
-    int aligned_bitmap = bitmap_int << diff;
+    char bin_ver_num[17];
+    char_binary_version_of_int(bitmap_int, bin_ver_num);
+    printf("PATTERN: %s\n", bin_ver_num);
+    int num_of_bits_to_align_with = 16;
+    int diff = num_of_bits_to_align_with - num_steps; // TODO - sort out vagueness about int size
+    // find first set bit
+    int first_bit;
+    for (int i = num_of_bits_to_align_with; i >= 0; i--)
+    {
+        if (bitmap_int & (1 << i))
+        {
+            first_bit = i;
+            break;
+        }
+    }
+
+    int bitshift_by = num_of_bits_to_align_with - (first_bit + 1);
+    int aligned_bitmap = bitmap_int << bitshift_by;
     return aligned_bitmap;
 }
