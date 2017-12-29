@@ -117,7 +117,7 @@ bool seq_tick(sequencer *seq)
                     {
                         sequence_generator *sg =
                             mixr->sequence_generators[seq->generate_src];
-                        int bit_pattern_len = 0;
+                        int bit_pattern_len = 16; // default
                         int bit_pattern =
                             sg->generate((void *)sg, (void *)&bit_pattern_len);
                         if (seq->visualize)

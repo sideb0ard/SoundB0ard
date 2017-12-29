@@ -15,32 +15,20 @@ void convert_bit_pattern_to_step_pattern(int bitpattern, int bitpattern_len,
                                          int len_pattern_array,
                                          unsigned gridsize)
 {
-    int steps = 0;
-    if (gridsize == TWENTYFOURTH)
-        steps = 23;
-    else if (gridsize == SIXTEENTH)
-        steps = 15;
+    int len = sizeof(short) * 8; // TODO: need to clarify this
+    int shiftor = len - 1;
+    double multiplier = len_pattern_array / bitpattern_len;
 
-    for (int i = steps; i >= 0; i--)
+    int idx = 0;
+    for (int i = 0; i < bitpattern_len; i++)
     {
-        if (bitpattern & 1 << i)
+        if (bitpattern & 1 << shiftor)
         {
-            int bitposition = 0;
-            switch (gridsize)
-            {
-            case (TWENTYFOURTH):
-                bitposition = (steps - i) * PPTWENTYFOURTH;
-                break;
-            case (SIXTEENTH):
-            default:
-                bitposition = (steps - i) * PPSIXTEENTH;
-                break;
-            }
-            if (bitposition < len_pattern_array)
-            {
-                pattern_array[bitposition] = 1;
-            }
+            idx = i * multiplier;
+            if (idx < len_pattern_array)
+                pattern_array[idx] = 1;
         }
+        shiftor--;
     }
 }
 

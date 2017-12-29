@@ -918,7 +918,7 @@ double clamp(double min, double max, double v)
 void print_bin_num(int num)
 {
     int len = sizeof(num) * 8;
-    for (int i = len; i > 0; --i)
+    for (int i = len - 1; i >= 0; --i)
     {
         if (num & 1 << i)
             printf("1");
