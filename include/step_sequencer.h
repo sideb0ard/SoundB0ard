@@ -70,6 +70,7 @@ void seq_set_pattern_len(sequencer *s, int len);
 void seq_set_generate_mode(sequencer *s, bool b);
 void seq_set_generate_src(sequencer *s, int generate_src);
 
+void seq_clear_pattern(sequencer *s, int pattern_num);
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);
 

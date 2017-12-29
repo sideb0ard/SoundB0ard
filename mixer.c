@@ -608,10 +608,10 @@ int get_environment_val(char *key, int *return_val)
         if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0)
         {
             *return_val = mixr->environment[i].val;
-            return 0;
+            return 1;
         }
     }
-    return 1;
+    return 0;
 }
 
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
@@ -631,6 +631,14 @@ bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
     if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num &&
         mixr->sound_generators[soundgen_num] != NULL)
         return true;
+    return false;
+}
+
+bool mixer_is_valid_env_var(mixer *mixr, char *key)
+{
+    for (int i = 0; i < mixr->env_var_count; i++)
+        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0)
+            return true;
     return false;
 }
 

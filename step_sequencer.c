@@ -119,6 +119,7 @@ bool seq_tick(sequencer *seq)
                         int bit_pattern_len = 16; // default
                         int bit_pattern =
                             sg->generate((void *)sg, (void *)&bit_pattern_len);
+
                         if (seq->visualize)
                         {
                             char bit_string[17];
@@ -314,6 +315,11 @@ void seq_set_generate_mode(sequencer *s, bool b)
     s->generate_generation = 0;
     s->generate_mode = b;
     seq_set_backup_mode(s, b);
+}
+
+void seq_clear_pattern(sequencer *s, int pattern_num)
+{
+    memset(&s->patterns[pattern_num], 0, PPBAR * sizeof(int));
 }
 
 void seq_set_backup_mode(sequencer *s, bool on)

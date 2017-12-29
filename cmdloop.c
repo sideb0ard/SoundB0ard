@@ -2155,7 +2155,7 @@ void interpret(char *line)
 
         else if (strncmp("beat", wurds[0], 4) == 0)
         {
-            parse_pattern(wurds[1]);
+            parse_pattern(num_wurds - 1, &wurds[1]);
         }
 
         // UTILS

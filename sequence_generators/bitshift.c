@@ -213,7 +213,9 @@ int bitshift_generate(void *self, void *data)
         return 0;
     }
     else
+    {
         return answer_stack[0];
+    }
 }
 
 static unsigned int which_op(char c)

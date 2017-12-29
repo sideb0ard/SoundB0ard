@@ -22,6 +22,8 @@ typedef enum { Q32, Q16, Q8, Q4 } quantize_size;
 typedef struct environment_variable
 {
     char key[ENVIRONMENT_KEY_SIZE];
+    unsigned int env_var_type;
+    void *data;
     int val;
 } env_var;
 
@@ -123,8 +125,6 @@ void freq_change(mixer *mixr, int sig, float freq);
 
 void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);
-bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
-bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum);
 void mixer_play_scene(mixer *mixr, int scene_num);
 
 void mixer_preview_track(mixer *mixr, char *filename);
@@ -135,15 +135,19 @@ int get_environment_val(char *key, int *return_val);
 void mixer_update_timing_info(mixer *mixr);
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
+bool mixer_is_valid_env_var(mixer *mixr, char *key);
+bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum);
+bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num);
+bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
+bool mixer_is_soundgen_in_scene(int soundgen_num, scene *scene_num);
+
 int mixer_add_scene(mixer *mixr, int num_bars);
 bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
                                        int soundgen_num, int soundgen_track);
 bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
                                         int soundgen_num, int soundgen_track);
-bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
-bool mixer_is_soundgen_in_scene(int soundgen_num, scene *scene_num);
 bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
 // TODO this doesn't really belong here
