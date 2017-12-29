@@ -65,6 +65,7 @@ typedef struct bitshift
 sequence_generator *new_bitshift(int argc, char argv[][SIZE_OF_WURD]);
 int bitshift_generate(void *self, void *data);
 void bitshift_status(void *self, wchar_t *status_string);
+void bitshift_event_notify(void *self, unsigned int event_type);
 
 int parse_bitshift_tokens_from_wurds(int argc, char argv[][SIZE_OF_WURD],
                                      bitshift_token *tokenized_pattern,

@@ -7,6 +7,9 @@
 #include "sequencer_utils.h"
 
 extern mixer *mixr;
+
+static char *s_euclid_mode[] = {"STATIC", "UP", "DOWN", "RANDOM"};
+
 sequence_generator *new_euclidean(int num_hits, int num_steps)
 {
     euclidean *e = calloc(1, sizeof(euclidean));
@@ -17,9 +20,16 @@ sequence_generator *new_euclidean(int num_hits, int num_steps)
     }
     e->sg.status = &euclidean_status;
     e->sg.generate = &euclidean_generate;
+    e->sg.event_notify = &euclidean_event_notify;
+    e->sg.type = EUCLIDEAN;
 
     e->num_hits = num_hits;
     e->num_steps = num_steps;
+
+    e->actual_num_hits = num_hits;
+    e->actual_num_steps = num_steps;
+
+    e->mode = EUCLID_STATIC;
 
     printf("NEW EUCLID - numhits:%d steps:%d\n", e->num_hits, e->num_steps);
 
@@ -30,9 +40,12 @@ void euclidean_status(void *self, wchar_t *wstring)
 {
     euclidean *e = (euclidean *)self;
     swprintf(wstring, MAX_PS_STRING_SZ,
-             L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
-             "wee EUCLIDEAN hits:%d steps:%d",
-             e->num_hits, e->num_steps);
+             L"[" WANSI_COLOR_WHITE "EUCLIDEAN GEN ] - " WCOOL_COLOR_PINK
+             "mode:%s hits:%d steps:%d actual_hits:%d actual_steps:%d",
+             s_euclid_mode[e->mode],
+             e->num_hits, e->num_steps,
+             e->actual_num_hits, e->actual_num_steps
+             );
 }
 
 void build_euclidean_pattern_int(int level, int *bitmap_int, int *bitmap_len,
@@ -99,7 +112,7 @@ int euclidean_generate(void *self, void *data)
     if (*pattern_len)
         *pattern_len = e->num_steps;
 
-    return create_euclidean_rhythm(e->num_hits, e->num_steps);
+    return create_euclidean_rhythm(e->actual_num_hits, e->actual_num_steps);
 }
 
 int create_euclidean_rhythm(int num_hits, int num_steps)
@@ -155,4 +168,41 @@ int create_euclidean_rhythm(int num_hits, int num_steps)
     int bitshift_by = num_of_bits_to_align_with - (first_bit + 1);
     int aligned_bitmap = bitmap_int << bitshift_by;
     return aligned_bitmap;
+}
+
+void euclidean_event_notify(void *self, unsigned int event_type)
+{
+    euclidean *e = (euclidean *)self;
+    switch (event_type)
+    {
+    case (TIME_START_OF_LOOP_TICK):
+        if (e->mode == EUCLID_UP)
+            e->actual_num_hits++;
+            if (e->actual_num_hits > e->num_hits )
+                e->actual_num_hits = 1;
+        else if (e->mode == EUCLID_DOWN)
+        {
+            e->actual_num_hits--;
+            if (e->actual_num_hits == 0)
+                e->actual_num_hits = e->num_hits;
+        }
+        else if (e->mode == EUCLID_RANDOM)
+            e->actual_num_hits = rand() % e->num_hits;
+    }
+}
+
+void euclidean_change_hits(euclidean *e, int num_hits)
+{
+    e->num_hits = num_hits;
+}
+
+void euclidean_change_steps(euclidean *e, int num_steps)
+{
+    e->num_steps = num_steps;
+}
+
+void euclidean_change_mode(euclidean *e, unsigned int mode)
+{
+    if (mode < EUCLID_NUM_MODES)
+        e->mode = mode;
 }

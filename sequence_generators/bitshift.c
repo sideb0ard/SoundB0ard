@@ -13,6 +13,34 @@ static char *s_brackets[] = {"(", ")"};
 static char *s_ops[] = {"<<", ">>", "^", "|", "~", "&",
                         "+",  "-",  "*", "/", "%", "t"};
 
+#define LARGEST_POSSIBLE 2048
+sequence_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
+{
+    bitshift_pattern my_pattern;
+    int err = parse_bitshift_tokens_from_wurds(
+        num_wurds, wurds, my_pattern.infix_tokenized_pattern,
+        &my_pattern.num_infix_tokens);
+    if (err)
+    {
+        printf("ERR!! %d\n", err);
+        return NULL;
+    }
+    shunting_yard_algorithm(&my_pattern);
+
+    bitshift *bs = calloc(1, sizeof(bitshift));
+    if (!bs)
+    {
+        printf("WOOF!\n");
+        return NULL;
+    }
+    memcpy(&bs->pattern, &my_pattern, sizeof(my_pattern));
+    bs->sg.status = &bitshift_status;
+    bs->sg.generate = &bitshift_generate;
+    bs->sg.event_notify = &bitshift_event_notify;
+    bs->sg.type = BITSHIFT;
+
+    return (sequence_generator *)bs;
+}
 void token_val_to_string(bitshift_token *t, char *char_val)
 {
     if (t->type == NUMBER)
@@ -51,32 +79,6 @@ void tokenized_pattern_to_string(bitshift_token *pattern, int token_len,
     }
 }
 
-#define LARGEST_POSSIBLE 2048
-sequence_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
-{
-    bitshift_pattern my_pattern;
-    int err = parse_bitshift_tokens_from_wurds(
-        num_wurds, wurds, my_pattern.infix_tokenized_pattern,
-        &my_pattern.num_infix_tokens);
-    if (err)
-    {
-        printf("ERR!! %d\n", err);
-        return NULL;
-    }
-    shunting_yard_algorithm(&my_pattern);
-
-    bitshift *bs = calloc(1, sizeof(bitshift));
-    if (!bs)
-    {
-        printf("WOOF!\n");
-        return NULL;
-    }
-    memcpy(&bs->pattern, &my_pattern, sizeof(my_pattern));
-    bs->sg.status = &bitshift_status;
-    bs->sg.generate = &bitshift_generate;
-
-    return (sequence_generator *)bs;
-}
 void bitshift_change_pattern(bitshift *sg, char *pattern)
 {
     // TODO
@@ -581,4 +583,14 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
     memcpy(pattern->rpn_tokenized_pattern, output_stack,
            MAX_TOKENS_IN_PATTERN * sizeof(bitshift_token));
     pattern->num_rpn_tokens = output_stack_idx;
+}
+
+void bitshift_event_notify(void *self, unsigned int event_type)
+{
+    bitshift *e = (bitshift *)self;
+    switch (event_type)
+    {
+    case (TIME_START_OF_LOOP_TICK):
+        printf("bitshift - got start of loop!\n");
+    }
 }

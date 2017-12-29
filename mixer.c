@@ -228,6 +228,12 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type)
         if (sg != NULL)
             sg->event_notify(sg, event_type);
     }
+    for (int i = 0; i < mixr->sequence_gen_num; ++i)
+    {
+        sequence_generator *sg = mixr->sequence_generators[i];
+        if (sg != NULL)
+            sg->event_notify(sg, event_type);
+    }
 }
 
 void mixer_update_bpm(mixer *mixr, int bpm)

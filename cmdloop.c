@@ -24,6 +24,7 @@
 #include "dynamics_processor.h"
 #include "envelope.h"
 #include "envelope_follower.h"
+#include "euclidean.h"
 #include "granulator.h"
 #include "help.h"
 #include "keys.h"
@@ -416,6 +417,25 @@ void interpret(char *line)
                     int num =
                         sg->generate(sg, (void *)&mixr->timing_info.cur_sample);
                     printf("NOM!: %d\n", num);
+                }
+                if (sg->type == EUCLIDEAN)
+                {
+                    euclidean *e = (euclidean*) sg;
+                    if (strncmp(wurds[2], "mode", 4) == 0)
+                    {
+                        int mode = atoi(wurds[3]);
+                        euclidean_change_mode(e, mode);
+                    }
+                    if (strncmp(wurds[2], "hits", 4) == 0)
+                    {
+                        int val = atoi(wurds[3]);
+                        euclidean_change_hits(e, val);
+                    }
+                    if (strncmp(wurds[2], "steps", 5) == 0)
+                    {
+                        int val = atoi(wurds[3]);
+                        euclidean_change_steps(e, val);
+                    }
                 }
             }
         }
