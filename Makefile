@@ -89,6 +89,7 @@ TARGET = sbsh
 
 all: objdir $(TARGET)
 	@ctags -R *
+	@cscope -b
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:

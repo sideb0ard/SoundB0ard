@@ -3,8 +3,8 @@
 
 #include "envelope_generator.h"
 #include "lfo.h"
-#include "step_sequencer.h"
 #include "sound_generator.h"
+#include "step_sequencer.h"
 #include <stdbool.h>
 #include <wchar.h>
 

@@ -2326,7 +2326,8 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         int sloppyjoe = atoi(wurds[3]);
         seq_set_sloppiness(seq, sloppyjoe);
     }
-    else if (strncmp("generate", wurds[2], 4) == 0)
+    else if (strncmp("generate", wurds[2], 8) == 0 ||
+             strncmp("gen", wurds[2], 3) == 0)
     {
         if (strncmp("every", wurds[3], 5) == 0)
         {

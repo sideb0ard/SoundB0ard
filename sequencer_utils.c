@@ -10,7 +10,8 @@
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
-void convert_bitshift_pattern_to_pattern(int bitpattern, int *pattern_array,
+void convert_bit_pattern_to_step_pattern(int bitpattern, int bitpattern_len,
+                                         int *pattern_array,
                                          int len_pattern_array,
                                          unsigned gridsize)
 {

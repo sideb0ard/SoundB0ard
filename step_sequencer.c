@@ -9,8 +9,8 @@
 #include "defjams.h"
 #include "euclidean.h"
 #include "mixer.h"
-#include "step_sequencer.h"
 #include "sequencer_utils.h"
+#include "step_sequencer.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -117,7 +117,9 @@ bool seq_tick(sequencer *seq)
                     {
                         sequence_generator *sg =
                             mixr->sequence_generators[seq->generate_src];
-                        int bit_pattern = sg->generate((void *)sg, NULL);
+                        int bit_pattern_len = 0;
+                        int bit_pattern =
+                            sg->generate((void *)sg, (void *)&bit_pattern_len);
                         if (seq->visualize)
                         {
                             char bit_string[17];
@@ -127,8 +129,8 @@ bool seq_tick(sequencer *seq)
 
                         memset(&seq->patterns[seq->cur_pattern], 0,
                                PPBAR * sizeof(int));
-                        convert_bitshift_pattern_to_pattern(
-                            bit_pattern,
+                        convert_bit_pattern_to_step_pattern(
+                            bit_pattern, bit_pattern_len,
                             (int *)&seq->patterns[seq->cur_pattern], PPBAR,
                             seq->gridsteps);
                     }

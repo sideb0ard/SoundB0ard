@@ -9,8 +9,8 @@
 #include "minisynth.h"
 #include "sbmsg.h"
 #include "sequence_generator.h"
-#include "step_sequencer.h"
 #include "sound_generator.h"
+#include "step_sequencer.h"
 #include "table.h"
 
 #define MAX_SCENES 100

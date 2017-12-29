@@ -1,8 +1,8 @@
 #pragma once
 
 #include "filter_moogladder.h"
-#include "step_sequencer.h"
 #include "sound_generator.h"
+#include "step_sequencer.h"
 #include "stereodelay.h"
 
 #include <sndfile.h>
