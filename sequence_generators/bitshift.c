@@ -103,11 +103,7 @@ void bitshift_status(void *self, wchar_t *wstring)
 int bitshift_generate(void *self, void *data)
 {
     bitshift *sg = (bitshift *)self;
-    int *t;
-    if (data)
-        t = (int *)data;
-    else
-        t = &mixr->timing_info.cur_sample;
+    int *t = &mixr->timing_info.cur_sample;
 
     int num_rpn = sg->pattern.num_rpn_tokens;
     bitshift_token *rpn_tokens = sg->pattern.rpn_tokenized_pattern;

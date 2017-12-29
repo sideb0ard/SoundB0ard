@@ -65,6 +65,7 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern,
 void wchar_version_of_amp(sequencer *s, int pattern_num, wchar_t apattern[49]);
 
 void seq_set_randamp(sequencer *s, bool on);
+void seq_set_pattern_len(sequencer *s, int len);
 
 void seq_set_generate_mode(sequencer *s, bool b);
 void seq_set_generate_src(sequencer *s, int generate_src);

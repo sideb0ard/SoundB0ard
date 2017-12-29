@@ -210,8 +210,8 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         L"\n" WANSI_COLOR_CYAN
         "      -------------------------------------------------------------\n"
-        "      CurStep: %d Pattern Len: %d Multi:%d visualize:%d sloppy:%d\n"
-        "      generate:%d generate_every_n: %d generate_src:%d Max Gen: %d ",
+        "      CurStep: %d pattern_len: %d multi:%d visualize:%d sloppy:%d\n"
+        "      generate:%d gen_every: %d gen_src:%d max_gen: %d ",
         seq->cur_pattern, seq->pattern_len, seq->multi_pattern_mode,
         seq->visualize, seq->sloppiness, seq->generate_mode,
         seq->generate_every_n_loops, seq->generate_src,
@@ -349,6 +349,12 @@ void seq_set_generate_src(sequencer *s, int src)
 
 void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }
 
+void seq_set_pattern_len(sequencer *s, int len)
+{
+    int ridiculous_size = 101;
+    if (len < ridiculous_size)
+        s->pattern_len = len;
+}
 void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
                                          wchar_t *bin_num)
 {

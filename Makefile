@@ -51,6 +51,7 @@ SRC = \
 	modmatrix.c \
 	obliquestrategies.c \
 	oscillator.c \
+	pattern_parser.c \
 	qblimited_oscillator.c \
 	reverb.c \
 	sample_oscillator.c \

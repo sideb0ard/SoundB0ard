@@ -34,6 +34,7 @@
 #include "modular_delay.h"
 #include "obliquestrategies.h"
 #include "oscillator.h"
+#include "pattern_parser.h"
 #include "reverb.h"
 #include "sample_sequencer.h"
 #include "sequencer_utils.h"
@@ -2152,6 +2153,11 @@ void interpret(char *line)
             add_algorithm(cmd);
         }
 
+        else if (strncmp("beat", wurds[0], 4) == 0)
+        {
+            parse_pattern(wurds[1]);
+        }
+
         // UTILS
         else if (strncmp("chord", wurds[0], 6) == 0)
         {
@@ -2193,15 +2199,15 @@ void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,
     }
     else if (strncmp("all", char_array[start], 3) == 0)
     {
-        if (seq->pattern_len == 16)
-        {
-            strncat(dest_pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 127);
-        }
-        else if (seq->pattern_len == 24)
+        if (seq->pattern_len == 24)
         {
             strncat(dest_pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 "
                                   "15 16 17 18 19 20 21 22 23",
                     151);
+        }
+        else
+        {
+            strncat(dest_pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 127);
         }
     }
     else if (strncmp("none", char_array[start], 4) == 0)
@@ -2356,6 +2362,11 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         {
             seq_set_generate_mode(seq, 1 - seq->generate_mode);
         }
+    }
+    else if (strncmp("pattern_len", wurds[2], 10) == 0)
+    {
+        int len = atoi(wurds[3]);
+        seq_set_pattern_len(seq, len);
     }
     else if (strncmp("visualize", wurds[2], 9) == 0)
     {
@@ -2798,7 +2809,7 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_decay_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("bitshift", wurds[2], 4) == 0)
+    else if (strncmp("gen", wurds[2], 4) == 0)
     {
         if (strncmp(wurds[3], "source", 6) == 0 ||
             strncmp(wurds[3], "src", 3) == 0)
