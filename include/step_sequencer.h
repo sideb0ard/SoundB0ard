@@ -7,12 +7,6 @@
 
 #define MAX_SEQUENCER_PATTERNS 10
 
-enum
-{
-    SIXTEENTH,
-    TWENTYFOURTH
-} sequencer_grid_step;
-
 typedef int seq_pattern[PPBAR];
 
 typedef struct sequencer
@@ -21,8 +15,7 @@ typedef struct sequencer
     int sixteenth_tick;
     int midi_tick;
 
-    unsigned int gridsteps;
-    int pattern_len; // 24th or 16th
+    int pattern_len; // in musical steps, i.e. 24th or 16th
 
     seq_pattern patterns[MAX_SEQUENCER_PATTERNS];
     double pattern_position_amp[MAX_SEQUENCER_PATTERNS][PPBAR];

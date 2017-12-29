@@ -31,7 +31,6 @@ void seq_init(sequencer *seq)
     seq->cur_pattern = 0;
     seq->multi_pattern_mode = true;
     seq->cur_pattern_iteration = 1;
-    seq->gridsteps = SIXTEENTH;
     seq->pattern_len = 16;
 
     for (int i = 0; i < MAX_SEQUENCER_PATTERNS; i++)
@@ -131,8 +130,8 @@ bool seq_tick(sequencer *seq)
                                PPBAR * sizeof(int));
                         convert_bit_pattern_to_step_pattern(
                             bit_pattern, bit_pattern_len,
-                            (int *)&seq->patterns[seq->cur_pattern], PPBAR,
-                            seq->gridsteps);
+                            (int *)&seq->patterns[seq->cur_pattern], PPBAR);
+                        seq->pattern_len = bit_pattern_len;
                     }
                 }
                 seq->generate_generation++;
@@ -177,16 +176,7 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern,
         pattern[sp_count++] = atoi(sp);
     }
     memset(final_pattern, 0, PPBAR * sizeof(int));
-    int mult = 0;
-    switch (s->gridsteps)
-    {
-    case (SIXTEENTH):
-        mult = PPSIXTEENTH;
-        break;
-    case (TWENTYFOURTH):
-        mult = PPTWENTYFOURTH;
-        break;
-    }
+    int mult = PPBAR / s->pattern_len;
 
     for (int i = 0; i < sp_count; i++)
     {
@@ -362,9 +352,10 @@ void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }
 void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
                                          wchar_t *bin_num)
 {
+    int incs = PPBAR / s->pattern_len;
     for (int i = 0; i < s->pattern_len; i++)
     {
-        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+        if (is_int_member_in_array(1, &p[i * incs], incs))
             bin_num[i] = sparkchars[5];
         else
             bin_num[i] = sparkchars[0];
@@ -375,16 +366,7 @@ void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
 void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p,
                                         char *bin_num)
 {
-    int incs = 0;
-    switch (s->pattern_len)
-    {
-    case (24):
-        incs = PPTWENTYFOURTH;
-        break;
-    case (16):
-        incs = PPSIXTEENTH;
-        break;
-    }
+    int incs = PPBAR / s->pattern_len;
     for (int i = 0; i < s->pattern_len; i++)
     {
         if (is_int_member_in_array(1, &p[i * incs], incs))
@@ -393,22 +375,6 @@ void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p,
             bin_num[i] = '0';
     }
     bin_num[s->pattern_len] = '\0';
-}
-
-void seq_set_gridsteps(sequencer *s, unsigned int gridsteps)
-{
-    printf("SEQ! changing gridsteps to %d\n", gridsteps);
-    switch (gridsteps)
-    {
-    case (16):
-        s->gridsteps = SIXTEENTH;
-        s->pattern_len = gridsteps;
-        break;
-    case (24):
-        s->gridsteps = TWENTYFOURTH;
-        s->pattern_len = gridsteps;
-        break;
-    }
 }
 
 void seq_print_pattern(sequencer *s, unsigned int pattern_num)
@@ -437,15 +403,7 @@ bool seq_is_valid_pattern_num(sequencer *d, int pattern_num)
 
 void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 {
-    int multi = 0;
-    if (s->pattern_len == 16)
-    {
-        multi = PPSIXTEENTH;
-    }
-    else if (s->pattern_len == 24)
-    {
-        multi = PPTWENTYFOURTH;
-    }
+    int multi = PPBAR / s->pattern_len;
 
     int mstepfrom = stepfrom * multi;
     int mstepto = stepto * multi;
@@ -455,32 +413,14 @@ void seq_mv_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 
 void seq_add_hit(sequencer *s, int pattern_num, int step)
 {
-    int multi = 0;
-    if (s->pattern_len == 16)
-    {
-        multi = PPSIXTEENTH;
-    }
-    else if (s->pattern_len == 24)
-    {
-        multi = PPTWENTYFOURTH;
-    }
-
+    int multi = PPBAR / s->pattern_len;
     int mstep = step * multi;
     seq_add_micro_hit(s, pattern_num, mstep);
 }
 
 void seq_rm_hit(sequencer *s, int pattern_num, int step)
 {
-    int multi = 0;
-    if (s->pattern_len == 16)
-    {
-        multi = PPSIXTEENTH;
-    }
-    else if (s->pattern_len == 24)
-    {
-        multi = PPTWENTYFOURTH;
-    }
-
+    int multi = PPBAR / s->pattern_len;
     int mstep = step * multi;
     seq_rm_micro_hit(s, pattern_num, mstep);
 }
@@ -539,16 +479,7 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
             0}; // arbitrary - shouldn't have more than 64 hits
         int hitz_to_swing_idx = 0;
 
-        int multi = 0;
-        switch (s->gridsteps)
-        {
-        case (SIXTEENTH):
-            multi = PPSIXTEENTH;
-            break;
-        case (TWENTYFOURTH):
-            multi = PPTWENTYFOURTH;
-            break;
-        }
+        int multi = PPBAR / s->pattern_len;
 
         int idx = multi; // miss out first sixteenth
         while (idx < PPBAR)

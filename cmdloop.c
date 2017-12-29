@@ -2187,10 +2187,6 @@ void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,
 {
     if (strncmp("all24", char_array[start], 5) == 0)
     {
-        if (seq->pattern_len == 16)
-        {
-            seq_set_gridsteps(seq, 24);
-        }
         strncat(dest_pattern,
                 "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23",
                 151);
@@ -2282,17 +2278,6 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
         printf("Adding\n");
         char_array_to_seq_string_pattern(seq, pattern, wurds, 3, num_wurds);
         add_char_pattern(seq, pattern);
-    }
-    else if (strncmp("grid", wurds[2], 4) == 0)
-    {
-        int gridsteps = atoi(wurds[3]);
-        if (gridsteps != 16 && gridsteps != 24)
-        {
-            printf("Gridsteps must be either 16 or 24 (not %d)\n", gridsteps);
-            return;
-        }
-        printf("Change gridsteps to %d\n", gridsteps);
-        seq_set_gridsteps(seq, gridsteps);
     }
     else if (strncmp("multi", wurds[2], 5) == 0)
     {
