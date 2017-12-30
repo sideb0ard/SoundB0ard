@@ -416,7 +416,9 @@ void interpret(char *line)
                 {
                     int num =
                         sg->generate(sg, (void *)&mixr->timing_info.cur_sample);
-                    printf("NOM!: %d\n", num);
+                    char binnum[17] = {0};
+                    char_binary_version_of_int(num, binnum);
+                    printf("NOM!: %d %s\n", num, binnum);
                 }
                 if (sg->type == EUCLIDEAN)
                 {

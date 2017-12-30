@@ -187,18 +187,24 @@ void euclidean_event_notify(void *self, unsigned int event_type)
                 e->actual_num_hits = e->num_hits;
         }
         else if (e->mode == EUCLID_RANDOM)
+        {
             e->actual_num_hits = rand() % e->num_hits;
+            if (e->actual_num_hits == 0)
+                e->actual_num_hits = e->num_hits;
+        }
     }
 }
 
 void euclidean_change_hits(euclidean *e, int num_hits)
 {
     e->num_hits = num_hits;
+    e->actual_num_hits = num_hits;
 }
 
 void euclidean_change_steps(euclidean *e, int num_steps)
 {
     e->num_steps = num_steps;
+    e->actual_num_steps = num_steps;
 }
 
 void euclidean_change_mode(euclidean *e, unsigned int mode)
