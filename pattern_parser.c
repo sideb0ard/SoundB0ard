@@ -187,19 +187,21 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
     // printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level,
     // start_idx, pattern_len);
     int num_children = pgroups[level].num_children;
-    int incr = pattern_len / num_children;
-    pattern_len /= num_children;
-    for (int i = 0; i < num_children; i++)
+    if (num_children != 0)
     {
-        int child = pgroups[level].children[i].level_idx;
-        int chidx = (i * incr) + start_idx;
-        // printf("CHILD:%d plays at pos%d\n", child, chidx);
-        ppositions[(*numpositions)++] = chidx;
-        if (pgroups[level].children[i].new_level)
+        int incr = pattern_len / num_children;
+        for (int i = 0; i < num_children; i++)
         {
-            // printf("NEW LEVEL!\n");
-            work_out_positions(pgroups, child, chidx, incr, ppositions,
-                               numpositions);
+            int child = pgroups[level].children[i].level_idx;
+            int chidx = (i * incr) + start_idx;
+            // printf("CHILD:%d plays at pos%d\n", child, chidx);
+            ppositions[(*numpositions)++] = chidx;
+            if (pgroups[level].children[i].new_level)
+            {
+                // printf("NEW LEVEL!\n");
+                work_out_positions(pgroups, child, chidx, incr, ppositions,
+                                   numpositions);
+            }
         }
     }
 }

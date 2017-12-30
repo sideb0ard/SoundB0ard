@@ -214,7 +214,7 @@ void get_random_sample_from_dir(char *dir, char *return_file_name)
     while ((ep = readdir(dp)))
         count++;
 
-    while (1)
+    while (1 && count > 0)
     {
         rewinddir(dp);
         int randy = rand() % count;
@@ -970,9 +970,9 @@ int how_many_bits_in_num(unsigned int num)
     int len = sizeof(num) * 8;
     printf("Size of int:%lu len:%d\n", sizeof(num), len);
     int count = 0;
-    for (int i = len; i > 0; --i)
+    for (uint32_t i = len; i > 0; --i)
     {
-        if (num & 1 << i)
+        if (num & (1 << i))
         {
             count++;
             printf("Position %d\n", i);

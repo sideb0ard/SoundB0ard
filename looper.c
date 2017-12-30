@@ -328,12 +328,17 @@ void sample_resample_to_loop_size(file_sample *fs)
 
     double *resampled_file_bytes =
         (double *)calloc(resampled_buffer_size, sizeof(double));
-
+    if (!resampled_file_bytes)
+    {
+        printf("BARF!\n");
+        return;
+    }
     double *scrambled_file_bytes =
         (double *)calloc(resampled_buffer_size, sizeof(double));
 
-    if (resampled_file_bytes == NULL)
+    if (!scrambled_file_bytes)
     {
+        free(resampled_file_bytes);
         printf("Memory barf in looper resample\n");
         return;
     }
