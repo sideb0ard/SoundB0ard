@@ -119,6 +119,9 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
     int current_pattern_group = 0;
     int num_pattern_groups = 0;
 
+    pattern_token token_vars[100] = {0};
+    int token_vars_idx = 0;
+
     for (int i = 0; i < num_wurds; i++)
     {
         if (strncmp(wurds[i], "[", 1) == 0)
@@ -132,7 +135,13 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
         else if (strncmp(wurds[i], "]", 1) == 0)
             current_pattern_group = pgroups[current_pattern_group].parent;
         else
+        {
             pgroups[current_pattern_group].num_children++;
+
+            token_vars[token_vars_idx].type = VAR_NAME;
+            strcpy(token_vars[token_vars_idx].value, wurds[i]);
+            token_vars_idx++;
+        }
     }
 
     printf("Num Groups:%d\n", num_pattern_groups);
@@ -152,8 +161,12 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (!is_in_array(ppositions[i], uniq_positions, num_uniq))
             uniq_positions[num_uniq++] = ppositions[i];
 
-    for (int i = 0; i < num_uniq; i++)
-        printf("Play at %d\n", uniq_positions[i]);
+    if (num_uniq != token_vars_idx)
+        printf("Vars and timings don't match, ya numpty\n");
+    else {
+        for (int i = 0; i < num_uniq; i++)
+            printf("Play at %s %d\n", token_vars[i].value, uniq_positions[i]);
+    }
 
     //int sq_bracket_balance = 0;
     //for (int i = 0; i < num_wurds; i++)
