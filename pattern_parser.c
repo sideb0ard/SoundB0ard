@@ -10,97 +10,6 @@
 
 extern mixer *mixr;
 
-enum pattern_token_type
-{
-    SQUARE_BRACKET_LEFT,
-    SQUARE_BRACKET_RIGHT,
-    CURLY_BRACKET_LEFT,
-    CURLY_BRACKET_RIGHT,
-    PAREN_BRACKET_LEFT,
-    PAREN_BRACKET_RIGHT,
-    VAR_NAME
-} pattern_token_type;
-
-#define MAX_PATTERN_CHAR_VAL 100
-typedef struct pattern_token
-{
-    unsigned int type;
-    char value[MAX_PATTERN_CHAR_VAL];
-    int idx;
-} pattern_token;
-
-#define MAX_STACK_SIZE 30
-int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
-                                       char *wurd)
-{
-    //printf("TOKEN IDX:%d\n", *token_idx);
-    //printf("Looking at %s\n", wurd);
-
-    int sq_bracket_balance = 0;
-
-    char *c = wurd;
-    while (*c)
-    {
-        printf("%c\n", *c);
-        if (*c == '[')
-        {
-            sq_bracket_balance++;
-            printf("SQ_LEFTBRACKET!\n");
-        }
-        else if (*c == ']')
-        {
-            sq_bracket_balance--;
-            printf("SQ_RIGHTBRACKET!\n");
-        }
-        else
-            printf("VAR!\n");
-        c++;
-    }
-
-    return sq_bracket_balance;
-}
-
-typedef struct pg_child
-{
-    bool new_level;
-    int level_idx;
-} pg_child;
-
-#define MAX_CHILDREN 20
-typedef struct pattern_group
-{
-    int num_children;
-    pg_child children[MAX_CHILDREN];
-    int parent;
-} pattern_group;
-
-#define MAX_PATTERN 64
-void work_out_positions(pattern_group pgroups[MAX_PATTERN],
-                        int level,
-                        int start_idx,
-                        int pattern_len,
-                        int ppositions[MAX_PATTERN],
-                        int *numpositions)
-{
-
-    //printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level, start_idx, pattern_len);
-    int num_children = pgroups[level].num_children;
-    int incr = pattern_len / num_children;
-    pattern_len /= num_children;
-    for (int i = 0; i < num_children; i++)
-    {
-        int child = pgroups[level].children[i].level_idx;
-        int chidx = (i*incr) + start_idx;
-        //printf("CHILD:%d plays at pos%d\n", child, chidx);
-        ppositions[(*numpositions)++] = chidx;
-        if (pgroups[level].children[i].new_level)
-        {
-            //printf("NEW LEVEL!\n");
-            work_out_positions(pgroups, child, chidx, incr, ppositions, numpositions);
-        }
-    }
-}
-
 static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
 {
     for (int i = 0; i < nums_len; i++)
@@ -228,3 +137,60 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
     // 3. parse groups into var separated patterns
     // 4. apply patterns to var/instruments
 }
+int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
+                                       char *wurd)
+{
+    //printf("TOKEN IDX:%d\n", *token_idx);
+    //printf("Looking at %s\n", wurd);
+
+    int sq_bracket_balance = 0;
+
+    char *c = wurd;
+    while (*c)
+    {
+        printf("%c\n", *c);
+        if (*c == '[')
+        {
+            sq_bracket_balance++;
+            printf("SQ_LEFTBRACKET!\n");
+        }
+        else if (*c == ']')
+        {
+            sq_bracket_balance--;
+            printf("SQ_RIGHTBRACKET!\n");
+        }
+        else
+            printf("VAR!\n");
+        c++;
+    }
+
+    return sq_bracket_balance;
+}
+
+void work_out_positions(pattern_group pgroups[MAX_PATTERN],
+                        int level,
+                        int start_idx,
+                        int pattern_len,
+                        int ppositions[MAX_PATTERN],
+                        int *numpositions)
+{
+
+    //printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level, start_idx, pattern_len);
+    int num_children = pgroups[level].num_children;
+    int incr = pattern_len / num_children;
+    pattern_len /= num_children;
+    for (int i = 0; i < num_children; i++)
+    {
+        int child = pgroups[level].children[i].level_idx;
+        int chidx = (i*incr) + start_idx;
+        //printf("CHILD:%d plays at pos%d\n", child, chidx);
+        ppositions[(*numpositions)++] = chidx;
+        if (pgroups[level].children[i].new_level)
+        {
+            //printf("NEW LEVEL!\n");
+            work_out_positions(pgroups, child, chidx, incr, ppositions, numpositions);
+        }
+    }
+}
+
+
