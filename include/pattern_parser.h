@@ -38,3 +38,4 @@ typedef struct pattern_group
 void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD]);
 void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level, int start_idx, int pattern_len, int ppositions[MAX_PATTERN], int *numpositions);
 int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx, char *wurd);
+void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens);
