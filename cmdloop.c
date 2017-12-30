@@ -422,7 +422,7 @@ void interpret(char *line)
                 }
                 if (sg->type == EUCLIDEAN)
                 {
-                    euclidean *e = (euclidean*) sg;
+                    euclidean *e = (euclidean *)sg;
                     if (strncmp(wurds[2], "mode", 4) == 0)
                     {
                         int mode = atoi(wurds[3]);

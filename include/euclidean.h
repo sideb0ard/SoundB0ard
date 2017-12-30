@@ -3,7 +3,8 @@
 #include "defjams.h"
 #include "sequence_generator.h"
 
-enum euclidean_mode {
+enum euclidean_mode
+{
     EUCLID_STATIC,
     EUCLID_UP,
     EUCLID_DOWN,

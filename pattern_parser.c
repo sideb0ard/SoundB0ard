@@ -10,7 +10,9 @@
 
 extern mixer *mixr;
 
-static char *token_type_names[] = {"SQUARE_LEFT", "SQUARE_RIGHT", "CURLY_LEFT", "CURLY_RIGHT", "PAREN_LEFT", "PAREN_RIGHT", "VAR_NAME"};
+static char *token_type_names[] = {"SQUARE_LEFT", "SQUARE_RIGHT", "CURLY_LEFT",
+                                   "CURLY_RIGHT", "PAREN_LEFT",   "PAREN_RIGHT",
+                                   "VAR_NAME"};
 
 static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
 {
@@ -29,7 +31,8 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
     // 1. parse all wurds into tokens
     int sq_bracket_balance = 0;
     for (int i = 0; i < num_wurds; i++)
-        sq_bracket_balance += extract_tokens_from_pattern_wurds(tokens, &token_idx, wurds[i]);
+        sq_bracket_balance +=
+            extract_tokens_from_pattern_wurds(tokens, &token_idx, wurds[i]);
 
     if (sq_bracket_balance != 0)
     {
@@ -39,7 +42,8 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     for (int i = 0; i < token_idx; i++)
     {
-        printf("Tokens: %s // %s\n", token_type_names[tokens[i].type], tokens[i].value);
+        printf("Tokens: %s // %s\n", token_type_names[tokens[i].type],
+               tokens[i].value);
     }
 
     // 2. parse tokens into ordered groups
@@ -61,7 +65,8 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         {
             pgroups[++num_pattern_groups].parent = current_pattern_group;
             int cur_child = pgroups[current_pattern_group].num_children++;
-            pgroups[current_pattern_group].children[cur_child].level_idx = num_pattern_groups;
+            pgroups[current_pattern_group].children[cur_child].level_idx =
+                num_pattern_groups;
             pgroups[current_pattern_group].children[cur_child].new_level = true;
             current_pattern_group = num_pattern_groups;
         }
@@ -76,14 +81,16 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
 
     printf("Num Groups:%d\n", num_pattern_groups);
     for (int i = 0; i <= num_pattern_groups; i++)
-        printf("Group %d - parent is %d contains %d members\n", i, pgroups[i].parent, pgroups[i].num_children);
+        printf("Group %d - parent is %d contains %d members\n", i,
+               pgroups[i].parent, pgroups[i].num_children);
 
     int level = 0;
     int start_idx = 0;
     int pattern_len = PPBAR;
     int ppositions[MAX_PATTERN] = {0};
     int numpositions;
-    work_out_positions(pgroups, level, start_idx, pattern_len, ppositions, &numpositions);
+    work_out_positions(pgroups, level, start_idx, pattern_len, ppositions,
+                       &numpositions);
 
     int num_uniq = 0;
     int uniq_positions[MAX_PATTERN] = {0};
@@ -127,12 +134,12 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         printf("Play at %s %d\n", var_tokens[i].value, uniq_positions[i]);
         sample_sequencer *seq =
             (sample_sequencer *)mixr->sound_generators[sg_num];
-        seq_add_micro_hit(&seq->m_seq, 0 ,uniq_positions[i]);
+        seq_add_micro_hit(&seq->m_seq, 0, uniq_positions[i]);
     }
 }
 
 int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
-                                       char *wurd)
+                                      char *wurd)
 {
     int sq_bracket_balance = 0;
 
@@ -145,22 +152,22 @@ int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
         if (*c == '[')
         {
             sq_bracket_balance++;
-            //printf("SQ_LEFTBRACKET!\n");
+            // printf("SQ_LEFTBRACKET!\n");
             tokens[(*token_idx)++].type = SQUARE_BRACKET_LEFT;
             c++;
         }
         else if (*c == ']')
         {
             sq_bracket_balance--;
-            //printf("SQ_RIGHTBRACKET!\n");
+            // printf("SQ_RIGHTBRACKET!\n");
             tokens[(*token_idx)++].type = SQUARE_BRACKET_RIGHT;
             c++;
         }
         else
         {
-            while(isalnum(*c))
+            while (isalnum(*c))
                 var_name[var_name_idx++] = *c++;
-            //printf("VAR! %s\n", var_name);
+            // printf("VAR! %s\n", var_name);
             tokens[(*token_idx)].type = VAR_NAME;
             strncpy(tokens[*token_idx].value, var_name, MAX_PATTERN_CHAR_VAL);
             (*token_idx)++;
@@ -170,30 +177,27 @@ int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
     return sq_bracket_balance;
 }
 
-void work_out_positions(pattern_group pgroups[MAX_PATTERN],
-                        int level,
-                        int start_idx,
-                        int pattern_len,
-                        int ppositions[MAX_PATTERN],
-                        int *numpositions)
+void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
+                        int start_idx, int pattern_len,
+                        int ppositions[MAX_PATTERN], int *numpositions)
 {
 
-    //printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level, start_idx, pattern_len);
+    // printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level,
+    // start_idx, pattern_len);
     int num_children = pgroups[level].num_children;
     int incr = pattern_len / num_children;
     pattern_len /= num_children;
     for (int i = 0; i < num_children; i++)
     {
         int child = pgroups[level].children[i].level_idx;
-        int chidx = (i*incr) + start_idx;
-        //printf("CHILD:%d plays at pos%d\n", child, chidx);
+        int chidx = (i * incr) + start_idx;
+        // printf("CHILD:%d plays at pos%d\n", child, chidx);
         ppositions[(*numpositions)++] = chidx;
         if (pgroups[level].children[i].new_level)
         {
-            //printf("NEW LEVEL!\n");
-            work_out_positions(pgroups, child, chidx, incr, ppositions, numpositions);
+            // printf("NEW LEVEL!\n");
+            work_out_positions(pgroups, child, chidx, incr, ppositions,
+                               numpositions);
         }
     }
 }
-
-

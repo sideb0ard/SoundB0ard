@@ -42,10 +42,8 @@ void euclidean_status(void *self, wchar_t *wstring)
     swprintf(wstring, MAX_PS_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "EUCLIDEAN GEN ] - " WCOOL_COLOR_PINK
              "mode:%s hits:%d steps:%d actual_hits:%d actual_steps:%d",
-             s_euclid_mode[e->mode],
-             e->num_hits, e->num_steps,
-             e->actual_num_hits, e->actual_num_steps
-             );
+             s_euclid_mode[e->mode], e->num_hits, e->num_steps,
+             e->actual_num_hits, e->actual_num_steps);
 }
 
 void build_euclidean_pattern_int(int level, int *bitmap_int, int *bitmap_len,
@@ -178,8 +176,8 @@ void euclidean_event_notify(void *self, unsigned int event_type)
     case (TIME_START_OF_LOOP_TICK):
         if (e->mode == EUCLID_UP)
             e->actual_num_hits++;
-            if (e->actual_num_hits > e->num_hits )
-                e->actual_num_hits = 1;
+        if (e->actual_num_hits > e->num_hits)
+            e->actual_num_hits = 1;
         else if (e->mode == EUCLID_DOWN)
         {
             e->actual_num_hits--;

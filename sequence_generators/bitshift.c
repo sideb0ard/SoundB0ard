@@ -588,9 +588,9 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
 void bitshift_event_notify(void *self, unsigned int event_type)
 {
     bitshift *e = (bitshift *)self;
-    //switch (event_type)
+    // switch (event_type)
     //{
-    //case (TIME_START_OF_LOOP_TICK):
+    // case (TIME_START_OF_LOOP_TICK):
     //    // printf("bitshift - got start of loop!\n");
     //}
 }
