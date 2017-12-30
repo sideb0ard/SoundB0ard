@@ -17,6 +17,7 @@ float freqval(char *n);
 int notelookup(char *n);
 int ch_midi_lookup(int ch, int octave, char *keytext);
 void list_sample_dir(char *dirname);
+void get_random_sample_from_dir(char *dir_name, char *random_file);
 void strim(const char *input, char *result);
 void chordie(char *n);
 int conv_bitz(int num);

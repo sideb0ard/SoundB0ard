@@ -88,7 +88,7 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
     int start_idx = 0;
     int pattern_len = PPBAR;
     int ppositions[MAX_PATTERN] = {0};
-    int numpositions;
+    int numpositions = 0;
     work_out_positions(pgroups, level, start_idx, pattern_len, ppositions,
                        &numpositions);
 
@@ -100,7 +100,9 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
 
     if (num_uniq != var_tokens_idx)
     {
-        printf("Vars and timings don't match, ya numpty\n");
+        printf("Vars and timings don't match, ya numpty: num_uniq:%d "
+               "var_tokens:%d\n",
+               num_uniq, var_tokens_idx);
         return;
     }
 

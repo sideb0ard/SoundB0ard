@@ -664,7 +664,49 @@ void interpret(char *line)
 
             char *pattern = (char *)calloc(151, sizeof(char));
 
-            if (is_valid_file(wurds[1]))
+            if (strncmp(wurds[1], "kit", 3) == 0)
+            {
+                char kickfile[512] = {0};
+                get_random_sample_from_dir("kicks", kickfile);
+                printf("Opening %s\n", kickfile);
+                sample_sequencer *bd = new_sample_seq(kickfile);
+                int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
+                pattern_char_to_pattern(
+                    &bd->m_seq, pattern,
+                    bd->m_seq.patterns[bd->m_seq.num_patterns++]);
+                update_environment("bd", bdnum);
+
+                char snarefile[512] = {0};
+                get_random_sample_from_dir("snrs", snarefile);
+                printf("Opening %s\n", snarefile);
+                sample_sequencer *sd = new_sample_seq(snarefile);
+                int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
+                pattern_char_to_pattern(
+                    &sd->m_seq, pattern,
+                    sd->m_seq.patterns[sd->m_seq.num_patterns++]);
+                update_environment("sd", sdnum);
+
+                char highhat[512] = {0};
+                get_random_sample_from_dir("hats", highhat);
+                printf("Opening %s\n", highhat);
+                sample_sequencer *hh = new_sample_seq(highhat);
+                int hhnum = add_sound_generator(mixr, (soundgenerator *)hh);
+                pattern_char_to_pattern(
+                    &hh->m_seq, pattern,
+                    hh->m_seq.patterns[hh->m_seq.num_patterns++]);
+                update_environment("hh", hhnum);
+
+                char perc[512] = {0};
+                get_random_sample_from_dir("perc", perc);
+                printf("Opening %s\n", perc);
+                sample_sequencer *pc = new_sample_seq(perc);
+                int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
+                pattern_char_to_pattern(
+                    &pc->m_seq, pattern,
+                    pc->m_seq.patterns[pc->m_seq.num_patterns++]);
+                update_environment("pc", pcnum);
+            }
+            else if (is_valid_file(wurds[1]))
             {
                 sample_sequencer *s = new_sample_seq(wurds[1]);
                 char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 2,

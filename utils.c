@@ -197,6 +197,43 @@ void faderrr(int sg_num, unsigned int d)
     }
 }
 
+void get_random_sample_from_dir(char *dir, char *return_file_name)
+{
+    char dirname[512] = "./wavs/";
+    strncat(dirname, dir, 128);
+    DIR *dp;
+    struct dirent *ep;
+    dp = opendir(dirname);
+    if (!dp)
+    {
+        printf("Nae dir, mate, nae danger\n");
+        return;
+    }
+
+    int count = 0;
+    while ((ep = readdir(dp)))
+        count++;
+
+    while (1)
+    {
+        rewinddir(dp);
+        int randy = rand() % count;
+        if (randy == 0)
+            randy = 1;
+        for (int i = 0; i < randy; ++i)
+        {
+            ep = readdir(dp);
+        }
+        if (!(strncmp(ep->d_name, ".", 1) == 0))
+            break;
+    }
+    printf("Found %d files in %s -- gonna use %s\n", count, dir, ep->d_name);
+    printf("STRLEN of dirname is %lu and file name is %lu\n", strlen(dirname),
+           strlen(ep->d_name));
+    strcat(return_file_name, dir);
+    strcat(return_file_name, "/");
+    strcat(return_file_name, ep->d_name);
+}
 void list_sample_dir(char *dir)
 {
     char dirname[512] = "./wavs/";
