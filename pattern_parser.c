@@ -33,8 +33,8 @@ typedef struct pattern_token
 int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
                                        char *wurd)
 {
-    printf("TOKEN IDX:%d\n", *token_idx);
-    printf("Looking at %s\n", wurd);
+    //printf("TOKEN IDX:%d\n", *token_idx);
+    //printf("Looking at %s\n", wurd);
 
     int sq_bracket_balance = 0;
 
@@ -82,7 +82,8 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN],
                         int ppositions[MAX_PATTERN],
                         int *numpositions)
 {
-    printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level, start_idx, pattern_len);
+
+    //printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level, start_idx, pattern_len);
     int num_children = pgroups[level].num_children;
     int incr = pattern_len / num_children;
     pattern_len /= num_children;
@@ -90,11 +91,22 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN],
     {
         int child = pgroups[level].children[i].level_idx;
         int chidx = (i*incr) + start_idx;
-        printf("CHILD:%d plays at pos%d\n", child, chidx);
+        //printf("CHILD:%d plays at pos%d\n", child, chidx);
+        ppositions[(*numpositions)++] = chidx;
         if (pgroups[level].children[i].new_level)
-            printf("NEW LEVEL!\n");
-        //work_out_positions(pgroups, child, chidx, incr, ppositions, numpositions);
+        {
+            //printf("NEW LEVEL!\n");
+            work_out_positions(pgroups, child, chidx, incr, ppositions, numpositions);
+        }
     }
+}
+
+static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
+{
+    for (int i = 0; i < nums_len; i++)
+        if (nums[i] == num_to_look_for)
+            return true;
+    return false;
 }
 
 void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
@@ -111,23 +123,16 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp(wurds[i], "[", 1) == 0)
         {
-            printf("New group from %d\n", current_pattern_group);
             pgroups[++num_pattern_groups].parent = current_pattern_group;
-            int num_children = ++pgroups[current_pattern_group].num_children;
-            pgroups[current_pattern_group].children[num_children].level_idx = num_pattern_groups;
-            pgroups[current_pattern_group].children[num_children].new_level = true;
+            int cur_child = pgroups[current_pattern_group].num_children++;
+            pgroups[current_pattern_group].children[cur_child].level_idx = num_pattern_groups;
+            pgroups[current_pattern_group].children[cur_child].new_level = true;
             current_pattern_group = num_pattern_groups;
         }
         else if (strncmp(wurds[i], "]", 1) == 0)
-        {
             current_pattern_group = pgroups[current_pattern_group].parent;
-            printf("Right bracket - back down to %d\n", current_pattern_group);
-        }
         else
-        {
-            printf("var %s\n", wurds[i]);
             pgroups[current_pattern_group].num_children++;
-        }
     }
 
     printf("Num Groups:%d\n", num_pattern_groups);
@@ -137,9 +142,19 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
     int level = 0;
     int start_idx = 0;
     int pattern_len = PPBAR;
-    int ppositions[MAX_PATTERN];
+    int ppositions[MAX_PATTERN] = {0};
     int numpositions;
     work_out_positions(pgroups, level, start_idx, pattern_len, ppositions, &numpositions);
+
+    int num_uniq = 0;
+    int uniq_positions[MAX_PATTERN] = {0};
+    for (int i = 0; i < numpositions; i++)
+        if (!is_in_array(ppositions[i], uniq_positions, num_uniq))
+            uniq_positions[num_uniq++] = ppositions[i];
+
+    for (int i = 0; i < num_uniq; i++)
+        printf("Play at %d\n", uniq_positions[i]);
+
     //int sq_bracket_balance = 0;
     //for (int i = 0; i < num_wurds; i++)
     //{
