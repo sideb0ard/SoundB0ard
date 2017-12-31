@@ -25,7 +25,7 @@ static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
 void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     printf("Got %d wurds\n", num_wurds);
-    pattern_token tokens[MAX_PATTERN];
+    pattern_token tokens[MAX_PATTERN] = {0};
     int token_idx = 0;
 
     // 1. parse all wurds into tokens
