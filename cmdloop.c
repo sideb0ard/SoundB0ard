@@ -63,6 +63,8 @@ char const *prompt = "SB#> ";
 
 void loopy(void)
 {
+    read_history(NULL);
+
     setlocale(LC_ALL, "");
 
     char *line;
@@ -76,6 +78,8 @@ void loopy(void)
             free(line);
         }
     }
+    write_history(NULL);
+    printf("BYTE!\n");
 }
 
 void interpret(char *line)
