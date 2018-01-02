@@ -45,6 +45,12 @@ typedef struct synthbase
     int melody_multiloop_count[MAX_NUM_MIDI_LOOPS];
     midi_events_loop backup_melody_while_getting_crazy;
 
+    int sample_rate;
+    double sample_rate_ratio;
+    int sample_rate_counter;
+    double cached_last_sample_left;
+    double cached_last_sample_right;
+
     int num_melodies;
     int cur_melody;
     int cur_melody_iteration;
@@ -69,6 +75,7 @@ typedef struct synthbase
 void synthbase_init(synthbase *base, void *parent,
                     unsigned int parent_synth_type);
 
+void synthbase_set_sample_rate(synthbase *base, int sample_rate);
 void synthbase_status(synthbase *base, wchar_t *status_string);
 void synthbase_event_notify(void *self, unsigned int event_type);
 

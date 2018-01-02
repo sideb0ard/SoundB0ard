@@ -105,7 +105,8 @@ void bitshift_status(void *self, wchar_t *wstring)
 int bitshift_generate(void *self, void *data)
 {
     bitshift *sg = (bitshift *)self;
-    int *t = &mixr->timing_info.cur_sample;
+    // int *t = &mixr->timing_info.cur_sample;
+    int t = sg->time_counter++;
 
     int num_rpn = sg->pattern.num_rpn_tokens;
     bitshift_token *rpn_tokens = sg->pattern.rpn_tokenized_pattern;
@@ -127,7 +128,7 @@ int bitshift_generate(void *self, void *data)
         }
         else if (cur.type == TEE_TOKEN)
         {
-            answer_stack[answer_stack_idx++] = *t;
+            answer_stack[answer_stack_idx++] = t;
         }
         else if (cur.type == OPERATOR)
         {

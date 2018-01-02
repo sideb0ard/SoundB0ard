@@ -31,6 +31,9 @@ void synthbase_init(synthbase *base, void *parent,
     base->multi_melody_mode = true;
     base->cur_melody_iteration = 1;
 
+    base->sample_rate = 44100;
+    base->sample_rate_counter = 0;
+
     for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
     {
         base->melody_multiloop_count[i] = 1;
@@ -115,6 +118,14 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     }
     mixr->key = cur_note;
     printf("FINISHED ADDing - note_on should be true - it is %d\n", note_on);
+}
+
+void synthbase_set_sample_rate(synthbase *base, int sample_rate)
+{
+    printf("Chh-ch-changing SAMPLE_RATE!: %d\n", sample_rate);
+    base->sample_rate = sample_rate;
+    base->sample_rate_ratio = SAMPLE_RATE / (double)sample_rate;
+    base->sample_rate_counter = 0;
 }
 
 void synthbase_set_multi_melody_mode(synthbase *ms, bool melody_mode)

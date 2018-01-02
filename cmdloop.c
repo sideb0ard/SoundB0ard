@@ -1557,6 +1557,11 @@ void interpret(char *line)
                             synthbase_reset_melody(base, melody_num);
                         }
                     }
+                    else if (strncmp("sample_rate", wurds[2], 11) == 0)
+                    {
+                        int sample_rate = atoi(wurds[3]);
+                        synthbase_set_sample_rate(base, sample_rate);
+                    }
                     else if (strncmp("switch", wurds[2], 6) == 0 ||
                              strncmp("CurMelody", wurds[2], 9) == 0)
                     {
@@ -2886,13 +2891,13 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         {
             int src = atoi(wurds[4]);
             printf("Changing BITSHIFT SRC: %d\n", src);
-            minisynth_set_bitshift_src(ms, src);
+            minisynth_set_generate_src(ms, src);
         }
         else
         {
             bool b = atof(wurds[3]);
             printf("Minisynth BITSHIFT %s!\n", b ? "true" : "false");
-            minisynth_set_bitshift(ms, b);
+            minisynth_set_generate(ms, b);
         }
         return true;
     }

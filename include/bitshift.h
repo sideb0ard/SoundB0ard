@@ -60,6 +60,7 @@ typedef struct bitshift
 {
     sequence_generator sg;
     bitshift_pattern pattern;
+    int time_counter;
 } bitshift;
 
 sequence_generator *new_bitshift(int argc, char argv[][SIZE_OF_WURD]);
