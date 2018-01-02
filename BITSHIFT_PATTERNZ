@@ -1,3 +1,7 @@
 t * ( ( ( t >> 9 ) ^ ( ( t >> 9 ) - 1 ) ^ 1 ) % 13 )
 ( ( ( t >> 6 | t | t >> ( t >> 16 ) ) * 10 + ( ( t >> 11 ) & 7 ) ) & 255 ) / 127 - 1
 ((  ((t*5)&(t>>7)) | ((t*3)&(t>>10))                         ) & 255) / 127 - 1
+
+((2*(t&1)-1)*t)-(t>>8) // deep low bass
+
+https://www.reddit.com/r/bytebeat/comments/20km9l/cool_equations/
