@@ -189,15 +189,11 @@ int bitshift_generate(void *self, void *data)
                     answer = op1 * op2;
                     break;
                 case (DIVIDE):
-                    if (op2 == 0)
-                        printf("MEEEP!(divbyZero)\n");
-                    else
+                    if (op2 != 0)
                         answer = op1 / op2;
                     break;
                 case (MODULO):
-                    if (op2 == 0)
-                        printf("MEEEP!(divbyZero)\n");
-                    else
+                    if (op2 != 0)
                         answer = op1 % op2;
                     break;
                 default:

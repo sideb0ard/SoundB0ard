@@ -4,4 +4,7 @@ t * ( ( ( t >> 9 ) ^ ( ( t >> 9 ) - 1 ) ^ 1 ) % 13 )
 
 ((2*(t&1)-1)*t)-(t>>8) // deep low bass
 
+(((t/91)&t)^((t/90)&t))-1 // nutty
+(t*t)/(t>>13 ^ t>>8)
+
 https://www.reddit.com/r/bytebeat/comments/20km9l/cool_equations/

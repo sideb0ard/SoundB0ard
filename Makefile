@@ -75,7 +75,8 @@ SRC = \
 OBJDIR = obj
 OBJ = $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
-INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack
+
+INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include
 LIBDIR=/usr/local/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 #CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
