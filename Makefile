@@ -76,11 +76,12 @@ OBJDIR = obj
 OBJ = $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
 
+ABLETONASIOINC=-I/Users/sideboard/Code/link/modules/asio-standalone/asio/include
 INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include
 LIBDIR=/usr/local/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
-#CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
-CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O0
+CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
+CPPFLAGS = -std=c++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O0
 
 $(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)
@@ -98,7 +99,7 @@ objdir:
 	mkdir -p obj/fx obj/filterz
 
 $(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -L$(LIBDIR) -o $@ $^ $(LIBS) $(INCS)
+	$(CC) $(CPPFLAGS) -L$(LIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)
 
 clean:
 	rm -f *.o *~ $(TARGET)
@@ -106,4 +107,4 @@ clean:
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
 
 format:
-	find . -type f -name "*.[ch]" -exec clang-format -i {} \;
+	find . -type f -name "*.[ch]" -name "*.cpp" "*.hpp" -exec clang-format -i {} \;
