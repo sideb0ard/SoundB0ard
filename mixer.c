@@ -8,6 +8,7 @@
 #include <portaudio.h>
 
 #include "algorithm.h"
+#include "ableton_link_wrapper.h"
 #include "bitshift.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
@@ -57,6 +58,13 @@ mixer *new_mixer()
     if (mixr == NULL)
     {
         printf("Nae mixer, fucked up!\n");
+        return NULL;
+    }
+    mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
+    if (!mixr->m_ableton_link)
+    {
+        printf("Something fucked up with yer Ableton link, mate."
+                " ye wanna get that seen tae\n");
         return NULL;
     }
 

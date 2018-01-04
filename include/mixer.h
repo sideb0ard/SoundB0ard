@@ -42,6 +42,8 @@ typedef struct scene
 
 typedef unsigned int compat_key_list[6];
 
+typedef struct AbletonLink AbletonLink;
+
 typedef struct mixer
 {
 
@@ -52,6 +54,8 @@ typedef struct mixer
     sequence_generator **sequence_generators;
     int sequence_gen_num;  // actual number of SGs
     int sequence_gen_size; // number of memory slots reserved for SGszz
+
+    AbletonLink *m_ableton_link;
 
     stereo_val
         soundgen_cur_val[MAX_NUM_soundgenerator]; // cache for current val,
