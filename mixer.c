@@ -52,7 +52,7 @@ const wchar_t *s_status_colors[] = {
 
 const char *s_midi_control_type_name[] = {"NONE", "SYNTH"};
 
-mixer *new_mixer()
+mixer *new_mixer(double output_latency)
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
     if (mixr == NULL)
@@ -67,6 +67,7 @@ mixer *new_mixer()
                 " ye wanna get that seen tae\n");
         return NULL;
     }
+    link_set_latency(mixr->m_ableton_link, output_latency);
 
     mixr->volume = 0.7;
     mixer_update_bpm(mixr, DEFAULT_BPM);
@@ -97,6 +98,7 @@ mixer *new_mixer()
 
 void mixer_ps(mixer *mixr)
 {
+    LinkData data = link_get_timing_data_for_display(mixr->m_ableton_link);
     printf(COOL_COLOR_GREEN
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_GREEN
            "] Volume:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
@@ -107,7 +109,7 @@ void mixer_ps(mixer *mixr)
            " // Debug:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
            "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
            "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d \n"
-           "::::: NumScenes:%d ActiveScene:%d" ANSI_COLOR_RESET,
+           "::::: LINK::Quantum:%.2f Tempo:%.2f Beat:%.2f Phase:%.2f NumPeers:%d" ANSI_COLOR_RESET,
            mixr->volume, key_names[mixr->key], mixr->bpm,
            mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false",
@@ -118,8 +120,8 @@ void mixer_ps(mixer *mixr)
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
-           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS, mixr->num_scenes,
-           mixr->current_scene);
+           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS,
+           data.quantum, data.tempo, data.beat, data.phase, data.num_peers);
 
     if (mixr->env_var_count > 0)
     {
@@ -282,6 +284,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
             }
         }
     }
+    link_set_bpm(mixr->m_ableton_link, bpm);
 }
 
 void mixer_vol_change(mixer *mixr, float vol)

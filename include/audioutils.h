@@ -1,6 +1,6 @@
 #pragma once
 
-void pa_setup(void);
+double pa_setup(void);
 void pa_teardown(void);
 
 typedef struct audio_buffer_details

@@ -96,7 +96,7 @@ typedef struct mixer
 
 } mixer;
 
-mixer *new_mixer(void);
+mixer *new_mixer(double output_latency);
 
 void mixer_ps(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);

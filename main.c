@@ -9,6 +9,7 @@
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
+#include "ableton_link_wrapper.h"
 #include "midimaaan.h"
 #include "mixer.h"
 
@@ -46,12 +47,15 @@ static int paCallback(const void *input_buffer, void *output_buffer,
                       const PaStreamCallbackTimeInfo *time_info,
                       PaStreamCallbackFlags status_flags, void *user_data)
 {
-    mixer *mixr = (mixer *)user_data;
-    float *out = (float *)output_buffer;
     (void)input_buffer;
     (void)time_info;
     (void)status_flags;
 
+    float *out = (float *)output_buffer;
+    mixer *mixr = (mixer *)user_data;
+
+
+    link_update_from_main_callback(mixr->m_ableton_link, frames_per_buffer);
     int ret = mixer_gennext(mixr, out, frames_per_buffer);
 
     return ret;
@@ -62,10 +66,10 @@ int main()
 
     srand(time(NULL));
 
-    mixr = new_mixer();
-
     // PortAudio start me up!
-    pa_setup();
+    double output_latency = pa_setup();
+
+    mixr = new_mixer(output_latency);
 
     PaStream *stream;
     PaError err;
