@@ -117,6 +117,12 @@ void interpret(char *line)
             if (bpm > 0)
                 mixer_update_bpm(mixr, bpm);
         }
+
+        else if (strncmp("metronome", wurds[0], 9) == 0)
+        {
+            mixer_add_metronome(mixr);
+        }
+
         else if (strncmp("quantize", wurds[0], 8) == 0)
         {
             int quanta = atoi(wurds[1]);

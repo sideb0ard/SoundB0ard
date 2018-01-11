@@ -115,6 +115,7 @@ typedef enum {
     ALGORITHM_TYPE,
     CHAOSMONKEY_TYPE,
     SPORK_TYPE,
+    METRONOME_TYPE,
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 
@@ -145,6 +146,8 @@ typedef struct mixer_timing_info
 {
     int frames_per_midi_tick;
     int midi_ticks_per_ms;
+
+    double time_of_last_midi_tick;
 
     int sixteenth_note_tick;
     int midi_tick;

@@ -86,10 +86,10 @@ void link_set_latency(AbletonLink *l, double latency)
 }
 
 
-void link_update_from_main_callback(AbletonLink *l, int num_frames)
+double link_update_from_main_callback(AbletonLink *l, int num_frames)
 {
     const auto host_time = l->m_host_time_filter.sampleTimeToHostTime(l->m_sample_time);
-    l->m_hosttime = host_time + l->m_output_latency; // save it for use in other functions during the audio callback
+    //l->m_buffer_begin_at_output = host_time + l->m_output_latency; // save it for use in other functions during the audio callback
     l->m_sample_time += num_frames;
 
     l->m_timeline = l->m_link.captureAudioTimeline();
@@ -105,6 +105,11 @@ void link_update_from_main_callback(AbletonLink *l, int num_frames)
     }
 
     l->m_link.commitAudioTimeline(l->m_timeline);
+
+    //auto int_micros = std::chrono::duration_cast<std::chrono::microseconds>(host_time + l->m_output_latency);
+    auto micros = std::chrono::microseconds(host_time + l->m_output_latency).count();
+    return micros;
+
 }
 
 LinkData link_get_timing_data_for_display(AbletonLink *l)
@@ -172,10 +177,17 @@ double link_get_bpm(AbletonLink *l)
     return timeline.tempo();
 }
 
-double link_get_beat_at_time(AbletonLink *l, int sample_number)
+double link_get_beat_at_time(AbletonLink *l, long long int sample_number)
 {
-    const auto host_time = l->m_hosttime + std::chrono::microseconds(llround(sample_number * MICROS_PER_SAMPLE));
+    const auto host_time = std::chrono::microseconds(llround(sample_number));
     return l->m_timeline.beatAtTime(host_time, l->m_quantum);
+}
+
+double link_get_phase_at_time(AbletonLink *l, long long int sample_number)
+{
+    //const auto host_time = l->m_hosttime + std::chrono::microseconds(llround(sample_number * MICROS_PER_SAMPLE));
+    const auto host_time = std::chrono::microseconds(llround(sample_number));
+    return l->m_timeline.phaseAtTime(host_time, l->m_quantum);
 }
 
 int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }

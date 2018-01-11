@@ -54,8 +54,6 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     float *out = (float *)output_buffer;
     mixer *mixr = (mixer *)user_data;
 
-
-    link_update_from_main_callback(mixr->m_ableton_link, frames_per_buffer);
     int ret = mixer_gennext(mixr, out, frames_per_buffer);
 
     return ret;
@@ -66,9 +64,7 @@ int main()
 
     srand(time(NULL));
 
-    // PortAudio start me up!
     double output_latency = pa_setup();
-
     mixr = new_mixer(output_latency);
 
     PaStream *stream;

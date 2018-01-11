@@ -108,6 +108,8 @@ void mixer_print_compat_keys(mixer *mixr);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 
+int mixer_add_metronome(mixer *mixr);
+
 int add_algorithm(char *line);
 int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr, double freq);
@@ -136,7 +138,7 @@ void mixer_preview_track(mixer *mixr, char *filename);
 void update_environment(char *key, int val);
 int get_environment_val(char *key, int *return_val);
 
-void mixer_update_timing_info(mixer *mixr);
+void mixer_update_timing_info(mixer *mixr, long long int frame_time);
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
 bool mixer_is_valid_env_var(mixer *mixr, char *key);
