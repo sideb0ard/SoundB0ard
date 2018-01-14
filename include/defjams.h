@@ -152,6 +152,9 @@ typedef struct mixer_timing_info
     int sixteenth_note_tick;
     int midi_tick;
 
+    int loop_beat;
+    bool loop_started;
+
     int cur_sample; // inverse of SAMPLE RATE
 
     // informational for other sound generators
@@ -162,6 +165,7 @@ typedef struct mixer_timing_info
     unsigned int size_of_eighth_note;
     unsigned int size_of_quarter_note;
 
+    bool has_started;
     bool start_of_loop; // true for one sample during loop time
     bool is_thirtysecond;
     bool is_sixteenth;

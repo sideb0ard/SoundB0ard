@@ -81,8 +81,10 @@ mixer *new_mixer(double output_latency)
 
     // the lifetime of these booleans is a single sample
 
-    mixr->timing_info.midi_tick = -1;
+    mixr->timing_info.midi_tick = PPQN - 1;
+    mixr->timing_info.loop_beat = 0;
     mixr->timing_info.time_of_last_midi_tick = 0;
+    mixr->timing_info.has_started = false;
     mixr->timing_info.is_midi_tick = true;
     mixr->timing_info.start_of_loop = true;
     mixr->timing_info.is_thirtysecond = true;
@@ -465,42 +467,17 @@ int add_granulator(mixer *mixr, char *filename)
     return add_sound_generator(mixr, (soundgenerator *)g);
 }
 
-inline void mixer_update_timing_info(mixer *mixr, long long int frame_time)
+static void mixer_events_output(mixer *mixr)
 {
-
-    mixr->timing_info.start_of_loop = false;
-    mixr->timing_info.is_midi_tick = false;
     mixr->timing_info.is_thirtysecond = false;
     mixr->timing_info.is_sixteenth = false;
     mixr->timing_info.is_eighth = false;
     mixr->timing_info.is_quarter = false;
 
-    double phase = link_get_phase_at_time(mixr->m_ableton_link, frame_time);
-    double phase_at_last_sample = link_get_phase_at_time(mixr->m_ableton_link, frame_time - micros_per_sample);
-    if (phase < phase_at_last_sample)
-    {
-        //printf("YA FUCING DANCER - START OF LOOOOOP!\n");
-        mixr->timing_info.start_of_loop = true;
-        mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
-    }
-
-
-    double beat_time = link_get_beat_at_time(mixr->m_ableton_link, frame_time);
-    double next_midi_tick = mixr->timing_info.time_of_last_midi_tick + midi_tick_len_as_percent;
-    //printf("MIDI TICK! beattime:%f midi_tick_len_as_percent: %f next_midi_tick:%f\n", beat_time, midi_tick_len_as_percent, next_midi_tick);
-    if (beat_time  > next_midi_tick)
-    {
-        //printf("MIDI TICK! beattime:%f next_midi_tick:%f\n", beat_time, next_midi_tick);
-        mixr->timing_info.time_of_last_midi_tick = beat_time;
-        mixr->timing_info.midi_tick++;
-        mixr->timing_info.is_midi_tick = true;
-        mixer_emit_event(mixr, TIME_MIDI_TICK);
-    }
-
     if (mixr->timing_info.is_midi_tick)
     {
-        // TODO - magic number defined -- it's PPQN(960) / 4
-        // e.g. split quarter into smaller units
+        mixer_emit_event(mixr, TIME_MIDI_TICK);
+
         if (mixr->timing_info.midi_tick % 120 == 0)
         {
             mixr->timing_info.is_thirtysecond = true;
@@ -521,34 +498,40 @@ inline void mixer_update_timing_info(mixer *mixr, long long int frame_time)
                         //printf("BEAT -- midi tick:%d\n", mixr->timing_info.midi_tick);
                         mixr->timing_info.is_quarter = true;
                         mixer_emit_event(mixr, TIME_QUARTER_TICK);
+
+                        if (mixr->timing_info.midi_tick % PPBAR == 0)
+                        {
+                            mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
+                            //printf("START OF LOOP! loop_beat:%d\n", mixr->timing_info.loop_beat);
+
+                            if (mixr->scene_start_pending)
+                            {
+                                mixer_play_scene(mixr, mixr->current_scene);
+                                mixr->scene_start_pending = false;
+                            }
+                        }
                     }
                 }
             }
         }
     }
 
-    if (mixr->timing_info.start_of_loop)
-    {
-        if (mixr->scene_start_pending)
-        {
-            mixer_play_scene(mixr, mixr->current_scene);
-            mixr->scene_start_pending = false;
-        }
-    }
 }
 
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
 
-    double buffer_begin_at_output = link_update_from_main_callback(mixr->m_ableton_link, frames_per_buffer);
+    link_update_from_main_callback(mixr->m_ableton_link, frames_per_buffer);
 
     for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
-        long long frame_time = llround(i * micros_per_sample);
-        mixer_update_timing_info(mixr, buffer_begin_at_output + frame_time);
 
         double output_left = 0.0;
         double output_right = 0.0;
+
+        link_update_mixer_timing_info(mixr->m_ableton_link, &mixr->timing_info, i);
+        mixer_events_output(mixr);
+
         if (mixr->soundgen_num > 0)
         {
             for (int i = 0; i < mixr->soundgen_num; i++)

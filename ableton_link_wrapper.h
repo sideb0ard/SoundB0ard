@@ -1,10 +1,11 @@
 #pragma once
 
-typedef struct AbletonLink AbletonLink;
-
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include <defjams.h>
+typedef struct AbletonLink AbletonLink;
 
 typedef struct LinkData {
     int num_peers;
@@ -23,7 +24,7 @@ typedef struct link_callback_timing_data {
 } link_callback_timing_data;
 
 AbletonLink *new_ableton_link(double bpm);
-double link_update_from_main_callback(AbletonLink *l, int num_frames);
+void link_update_from_main_callback(AbletonLink *l, int num_frames);
 
 void link_set_latency(AbletonLink *l, double latency);
 
@@ -37,8 +38,10 @@ int link_get_samples_per_midi_tick(AbletonLink *l);
 int link_get_loop_len_in_samples(AbletonLink *l);
 double link_get_bpm(AbletonLink *l);
 double link_get_beat_at_time(AbletonLink *l, long long int sample_number);
-double link_get_phase_at_time(AbletonLink *l, long long int sample_number);
+double link_get_phase_at_time(AbletonLink *l, long long int sample_number, int quantum);
 double link_get_current_quantum(AbletonLink *l);
+
+void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *info, int frame_num);
 
 //temp
 void link_set_old_sample_time(AbletonLink *l);

@@ -6,6 +6,8 @@
 #include <ableton/link/HostTimeFilter.hpp>
 #include <ableton/platforms/stl/Clock.hpp>
 
+#include <chrono>
+
 #include "ableton_link_wrapper.h"
 #include "defjams.h"
 #include "mixer.h"
@@ -13,6 +15,7 @@
 extern mixer *mixr;
 
 const auto MICROS_PER_SAMPLE = 1e6 / (double) SAMPLE_RATE;
+const auto midi_tick_len_as_percent = 1. / 960;
 
 struct AbletonLink
 {
@@ -23,6 +26,7 @@ struct AbletonLink
 
     std::chrono::microseconds m_hosttime; // also updated every callback
 
+    std::chrono::microseconds m_buffer_begin_at_output;
     double m_quantum;
     double m_requested_tempo;
     bool m_reset_beat_time;
@@ -86,10 +90,11 @@ void link_set_latency(AbletonLink *l, double latency)
 }
 
 
-double link_update_from_main_callback(AbletonLink *l, int num_frames)
+void link_update_from_main_callback(AbletonLink *l, int num_frames)
 {
     const auto host_time = l->m_host_time_filter.sampleTimeToHostTime(l->m_sample_time);
-    //l->m_buffer_begin_at_output = host_time + l->m_output_latency; // save it for use in other functions during the audio callback
+    l->m_buffer_begin_at_output = host_time + l->m_output_latency; // save it for use in other functions during the audio callback
+
     l->m_sample_time += num_frames;
 
     l->m_timeline = l->m_link.captureAudioTimeline();
@@ -106,10 +111,43 @@ double link_update_from_main_callback(AbletonLink *l, int num_frames)
 
     l->m_link.commitAudioTimeline(l->m_timeline);
 
-    //auto int_micros = std::chrono::duration_cast<std::chrono::microseconds>(host_time + l->m_output_latency);
-    auto micros = std::chrono::microseconds(host_time + l->m_output_latency).count();
-    return micros;
+}
 
+inline void link_inc_midi(AbletonLink *l, mixer_timing_info *timing_info)
+{
+    timing_info->midi_tick++;
+    timing_info->is_midi_tick = true;
+}
+
+void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *timing_info, int frame_num)
+{
+    timing_info->is_midi_tick = false;
+
+    const auto hostTime = l->m_buffer_begin_at_output + std::chrono::microseconds(llround(frame_num * MICROS_PER_SAMPLE));
+    const auto lastSampleHostTime = hostTime - std::chrono::microseconds(llround(MICROS_PER_SAMPLE));
+
+	if (l->m_timeline.beatAtTime(hostTime, l->m_quantum) >= 0.)
+    {
+
+	  auto beat_time = l->m_timeline.beatAtTime(hostTime, l->m_quantum);
+      auto next_frac = (timing_info->midi_tick%960) * midi_tick_len_as_percent;
+      auto next_midi_tick = (int)(beat_time+midi_tick_len_as_percent) + next_frac;
+
+      if (l->m_timeline.phaseAtTime(hostTime, 1) < l->m_timeline.phaseAtTime(lastSampleHostTime, 1)) //  && (timing_info->midi_tick == 0 || timing_info->midi_tick == -1))
+      {
+        timing_info->has_started = true;
+        if ((timing_info->midi_tick + 1) % PPQN == 0)
+        {
+            //std::cout << "ITS A BEAT! " << beat_time << "MIDI TICK:" << timing_info->midi_tick << std::endl;
+            link_inc_midi(l, timing_info);
+        }
+      }
+	  else if (timing_info->has_started && beat_time > next_midi_tick)
+	  {
+        link_inc_midi(l, timing_info);
+        // std::cout << "MIDI TICK:" << timing_info->midi_tick << std::endl;
+      }
+	}
 }
 
 LinkData link_get_timing_data_for_display(AbletonLink *l)
@@ -183,11 +221,11 @@ double link_get_beat_at_time(AbletonLink *l, long long int sample_number)
     return l->m_timeline.beatAtTime(host_time, l->m_quantum);
 }
 
-double link_get_phase_at_time(AbletonLink *l, long long int sample_number)
+double link_get_phase_at_time(AbletonLink *l, long long int sample_number, int quantum)
 {
     //const auto host_time = l->m_hosttime + std::chrono::microseconds(llround(sample_number * MICROS_PER_SAMPLE));
     const auto host_time = std::chrono::microseconds(llround(sample_number));
-    return l->m_timeline.phaseAtTime(host_time, l->m_quantum);
+    return l->m_timeline.phaseAtTime(host_time, quantum);
 }
 
 int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }
