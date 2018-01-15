@@ -63,6 +63,7 @@ bool seq_tick(sequencer *seq)
 {
     if (mixr->timing_info.sixteenth_note_tick != seq->sixteenth_tick)
     {
+        //printf("NOT MY 16TH TICK! %d\n", mixr->timing_info.sixteenth_note_tick);
         seq->sixteenth_tick = mixr->timing_info.sixteenth_note_tick;
 
         if (seq->sixteenth_tick % 16 == 0)
@@ -70,9 +71,11 @@ bool seq_tick(sequencer *seq)
 
             if (seq->multi_pattern_mode)
             {
+                //printf("MULTI BEEP!\n");
                 seq->cur_pattern_iteration--;
                 if (seq->cur_pattern_iteration == 0)
                 {
+                    //printf("BEEP BEEP!\n");
                     seq->cur_pattern =
                         (seq->cur_pattern + 1) % seq->num_patterns;
                     seq->cur_pattern_iteration =

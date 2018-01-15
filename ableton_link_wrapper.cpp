@@ -126,12 +126,9 @@ void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *timing_inf
     const auto hostTime = l->m_buffer_begin_at_output + std::chrono::microseconds(llround(frame_num * MICROS_PER_SAMPLE));
     const auto lastSampleHostTime = hostTime - std::chrono::microseconds(llround(MICROS_PER_SAMPLE));
 
-	if (l->m_timeline.beatAtTime(hostTime, l->m_quantum) >= 0.)
+    auto beat_time = l->m_timeline.beatAtTime(hostTime, l->m_quantum);
+    if (beat_time >= 0.)
     {
-
-	  auto beat_time = l->m_timeline.beatAtTime(hostTime, l->m_quantum);
-      auto next_frac = (timing_info->midi_tick%960) * midi_tick_len_as_percent;
-      auto next_midi_tick = (int)(beat_time+midi_tick_len_as_percent) + next_frac;
 
       if (l->m_timeline.phaseAtTime(hostTime, 1) < l->m_timeline.phaseAtTime(lastSampleHostTime, 1)) //  && (timing_info->midi_tick == 0 || timing_info->midi_tick == -1))
       {
@@ -142,10 +139,12 @@ void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *timing_inf
             link_inc_midi(l, timing_info);
         }
       }
-	  else if (timing_info->has_started && beat_time > next_midi_tick)
+	  else if (timing_info->has_started)
 	  {
-        link_inc_midi(l, timing_info);
-        // std::cout << "MIDI TICK:" << timing_info->midi_tick << std::endl;
+        auto next_frac = (timing_info->midi_tick%960) * midi_tick_len_as_percent;
+        auto next_midi_tick = (int)(beat_time+midi_tick_len_as_percent) + next_frac;
+        if (beat_time > next_midi_tick)
+            link_inc_midi(l, timing_info);
       }
 	}
 }

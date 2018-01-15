@@ -486,6 +486,8 @@ static void mixer_events_output(mixer *mixr)
             if (mixr->timing_info.midi_tick % 240 == 0)
             {
                 mixr->timing_info.is_sixteenth = true;
+                mixr->timing_info.sixteenth_note_tick++;
+
                 mixer_emit_event(mixr, TIME_SIXTEENTH_TICK);
 
                 if (mixr->timing_info.midi_tick % 480 == 0)
