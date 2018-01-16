@@ -132,9 +132,9 @@ void algorithm_process_afterthought(algorithm *self)
 stereo_val algorithm_gennext(void *self)
 {
     algorithm *a = (algorithm *)self;
-    //switch (a->frequency)
+    // switch (a->frequency)
     //{
-    //case LOOP:
+    // case LOOP:
     //    if (!a->has_started && (mixr->timing_info.midi_tick %
     //                                mixr->timing_info.loop_len_in_ticks ==
     //                            0))

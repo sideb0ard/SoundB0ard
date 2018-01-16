@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <metronome.h>
 #include <defjams.h>
+#include <metronome.h>
 
-//typedef struct metronome
+// typedef struct metronome
 //{
 //    soundgenerator sound_generator;
 //
@@ -12,7 +12,7 @@
 
 metronome *new_metronome()
 {
-    metronome *m = (metronome*) calloc(1, sizeof(metronome));
+    metronome *m = (metronome *)calloc(1, sizeof(metronome));
     printf("New Metronome!\n");
 
     m->sound_generator.gennext = &metronome_gennext;
@@ -28,27 +28,17 @@ metronome *new_metronome()
     return m;
 }
 
+stereo_val metronome_gennext(void *self) { return (stereo_val){0, 0}; }
 
-stereo_val metronome_gennext(void *self)
-{
-    return (stereo_val) {0, 0};
-}
-
-void metronome_status(void *self, wchar_t *ss)
-{
-    printf("I'm fine\n");
-}
+void metronome_status(void *self, wchar_t *ss) { printf("I'm fine\n"); }
 void metronome_setvol(void *self, double v)
 {
     // noop
 }
-double metronome_getvol(void *self)
-{
-    return 0.;
-}
+double metronome_getvol(void *self) { return 0.; }
 void metronome_start(void *self)
 {
-    //noop
+    // noop
 }
 
 void metronome_stop(void *self)
@@ -72,6 +62,6 @@ void metronome_event_notify(void *self, unsigned int event_type)
 }
 void metronome_del_self(void *self)
 {
-    metronome *m = (metronome*) self;
+    metronome *m = (metronome *)self;
     free(m);
 }

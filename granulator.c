@@ -35,6 +35,7 @@ granulator *new_granulator(char *filename)
     g->external_source_sg = -1;
 
     g->loop_mode = false;
+    g->loop_len = 1;
 
     g->grain_pitch = 1;
     g->sequencer_mode = false;
@@ -117,14 +118,17 @@ void granulator_event_notify(void *self, unsigned int event_type)
     case (TIME_MIDI_TICK):
         if (g->loop_mode)
         {
-            double rel_pos = mixr->timing_info.midi_tick % PPBAR;
-            rel_pos = 100. / PPBAR * rel_pos;
+            int pulses_per_loop = PPBAR * g->loop_len;
+            // printf("PULSES_PERLOOP:%d\n", pulses_per_loop);
+            // printf("PPBAR:%d and LOOP_LEN:%d\n", PPBAR, g->loop_len);
+            double rel_pos = mixr->timing_info.midi_tick % pulses_per_loop;
+            rel_pos = 100. / pulses_per_loop * rel_pos;
             double new_read_idx = g->audio_buffer_len / 100. * rel_pos;
-            //printf("New read idx should be:%f (%f percent of %d)\n",
+            // printf("New read idx should be:%f (%f percent of %d)\n",
             //       new_read_idx, rel_pos, g->audio_buffer_len);
             g->audio_buffer_read_idx = new_read_idx;
         }
-        //if (g->sequencer_mode && g->m_seq.num_patterns > 0)
+        // if (g->sequencer_mode && g->m_seq.num_patterns > 0)
         //{
         //    int idx = mixr->timing_info.midi_tick % PPBAR;
         //    if (mixr->timing_info.is_midi_tick &&
@@ -136,7 +140,7 @@ void granulator_event_notify(void *self, unsigned int event_type)
 
         //    seq_tick(&g->m_seq);
         //}
-        //if (playing)
+        // if (playing)
         //    playing_midi_tick_count++;
         break;
     case (TIME_SIXTEENTH_TICK):
@@ -219,10 +223,11 @@ stereo_val granulator_gennext(void *self)
     if (g->m_eg1.m_state == OFFF)
         g->sound_generator.active = false;
 
-    //if (g->loop_mode)
+    // if (g->loop_mode)
     //{
     //    g->audio_buffer_read_idx +=
-    //        g->audio_buffer_len / (double)mixr->timing_info.loop_len_in_frames;
+    //        g->audio_buffer_len /
+    //        (double)mixr->timing_info.loop_len_in_frames;
     //    if (g->audio_buffer_read_idx >= g->audio_buffer_len)
     //        g->audio_buffer_read_idx = 0;
     //}
@@ -297,7 +302,8 @@ void granulator_status(void *self, wchar_t *status_string)
 {
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[GRANULATOR] vol:%.2lf source:%s loop_mode:%s extsource:%d len:%d stereo:%s\n"
+             L"[GRANULATOR] vol:%.2lf source:%s loop_mode:%s loop_len:%d "
+             L"extsource:%d len:%d stereo:%s\n"
              "      audio_buffer_read_idx:%d audio_buffer_write_idx:%d "
              "grain_duration_ms:%d grains_per_sec:%d\n"
              "      quasi_grain_fudge:%d grain_spray_ms:%.2f "
@@ -322,17 +328,13 @@ void granulator_status(void *self, wchar_t *status_string)
 
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
 
-             g->vol,
-             g->filename,
-             g->loop_mode ? "true" : "false",
-             g->external_source_sg,
-             g->audio_buffer_len,
+             g->vol, g->filename, g->loop_mode ? "true" : "false", g->loop_len,
+             g->external_source_sg, g->audio_buffer_len,
              g->num_channels == 2 ? "true" : "false",
              (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
-            g->grain_duration_ms,
-            g->grains_per_sec,
-             g->quasi_grain_fudge, g->granular_spray_frames / 44.1,
-             g->num_active_grains, g->highest_grain_num, g->selection_mode,
+             g->grain_duration_ms, g->grains_per_sec, g->quasi_grain_fudge,
+             g->granular_spray_frames / 44.1, g->num_active_grains,
+             g->highest_grain_num, g->selection_mode,
              s_env_names[g->envelope_mode], g->movement_mode, g->reverse_mode,
              g->sequencer_mode ? "true" : "false",
 
@@ -659,6 +661,13 @@ void granulator_set_loop_mode(granulator *g, bool b)
     g->quasi_grain_fudge = 0;
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->granular_spray_frames = 0;
+    g->grain_duration_ms = 100;
+}
+
+void granulator_set_loop_len(granulator *g, int bars)
+{
+    if (bars != 0)
+        g->loop_len = bars;
 }
 
 void granulator_set_sequencer_mode(granulator *g, bool b)

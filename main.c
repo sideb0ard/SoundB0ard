@@ -5,11 +5,11 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+#include "ableton_link_wrapper.h"
 #include "audioutils.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
-#include "ableton_link_wrapper.h"
 #include "midimaaan.h"
 #include "mixer.h"
 
@@ -97,7 +97,7 @@ int main()
         fprintf(stderr, "Errrr, wit tha midi..\n");
     }
     pthread_join(input_th, NULL);
-    //loopy();
+    // loopy();
 
     // all done, time to go home
     pa_teardown();

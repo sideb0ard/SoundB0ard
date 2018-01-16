@@ -885,6 +885,12 @@ void interpret(char *line)
                         printf("loop MODE is %d\n", mode);
                         granulator_set_loop_mode(g, mode);
                     }
+                    else if (strncmp("loop_len", wurds[2], 8) == 0)
+                    {
+                        int len = atoi(wurds[3]);
+                        printf("loop LEN is %d\n", mode);
+                        granulator_set_loop_len(g, len);
+                    }
                     else if (strncmp("sequencer_mode", wurds[2], 13) == 0)
                     {
                         int mode = atoi(wurds[3]);
@@ -1076,8 +1082,19 @@ void interpret(char *line)
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0)
             {
                 int loop_len = atoi(wurds[2]);
-                int soundgen_num = add_looper(mixr, wurds[1], loop_len);
+                if (!loop_len)
+                    loop_len = 1;
+                // int soundgen_num = add_looper(mixr, wurds[1], loop_len);
+                // printf("soundgenerator %d\n", soundgen_num);
+
+                int soundgen_num = add_granulator(mixr, wurds[1]);
                 printf("soundgenerator %d\n", soundgen_num);
+
+                granulator *g =
+                    (granulator *)mixr->sound_generators[soundgen_num];
+
+                granulator_set_loop_mode(g, true);
+                granulator_set_loop_len(g, loop_len);
             }
             else
             {

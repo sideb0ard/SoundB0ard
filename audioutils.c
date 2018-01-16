@@ -24,7 +24,8 @@ double pa_setup(void)
         printf("BARFd on PA_GetDefaultOutputDevice!\n");
         exit(1);
     }
-    double suggested_latency = Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
+    double suggested_latency =
+        Pa_GetDeviceInfo(params.device)->defaultLowOutputLatency;
     printf("SUGGESTED LATENCY: %f\n", suggested_latency);
     return suggested_latency;
 }
