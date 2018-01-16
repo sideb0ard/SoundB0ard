@@ -81,9 +81,9 @@ mixer *new_mixer(double output_latency)
 
     // the lifetime of these booleans is a single sample
 
-    mixr->timing_info.midi_tick = PPQN - 1;
+    mixr->timing_info.midi_tick = -1;
     mixr->timing_info.loop_beat = 0;
-    mixr->timing_info.time_of_last_midi_tick = 0;
+    mixr->timing_info.time_of_next_midi_tick = 0;
     mixr->timing_info.has_started = false;
     mixr->timing_info.is_midi_tick = true;
     mixr->timing_info.start_of_loop = true;

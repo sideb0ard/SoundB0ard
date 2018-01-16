@@ -147,7 +147,7 @@ typedef struct mixer_timing_info
     int frames_per_midi_tick;
     int midi_ticks_per_ms;
 
-    double time_of_last_midi_tick;
+    double time_of_next_midi_tick;
 
     int sixteenth_note_tick;
     int midi_tick;

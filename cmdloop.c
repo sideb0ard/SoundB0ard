@@ -61,7 +61,7 @@ extern wtable *wave_tables[5];
 // TODO(find a fix)
 char const *prompt = "SB#> ";
 
-void loopy(void)
+void *loopy(void *arg)
 {
     read_history(NULL);
 
@@ -80,6 +80,8 @@ void loopy(void)
     }
     write_history(NULL);
     printf("BYTE!\n");
+
+    return NULL;
 }
 
 void interpret(char *line)

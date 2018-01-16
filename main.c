@@ -91,7 +91,13 @@ int main()
         exit(-1);
     }
 
-    loopy();
+    pthread_t input_th;
+    if (pthread_create(&input_th, NULL, loopy, NULL))
+    {
+        fprintf(stderr, "Errrr, wit tha midi..\n");
+    }
+    pthread_join(input_th, NULL);
+    //loopy();
 
     // all done, time to go home
     pa_teardown();

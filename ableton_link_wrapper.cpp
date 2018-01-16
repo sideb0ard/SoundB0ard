@@ -113,10 +113,12 @@ void link_update_from_main_callback(AbletonLink *l, int num_frames)
 
 }
 
-inline void link_inc_midi(AbletonLink *l, mixer_timing_info *timing_info)
+inline void link_inc_midi(AbletonLink *l, mixer_timing_info *timing_info, double beat_at_time)
 {
-    timing_info->midi_tick++;
     timing_info->is_midi_tick = true;
+    //std::cout << "MIDI TICK! " << timing_info->midi_tick << " BEATTIME:" << beat_at_time  << std::endl;
+    timing_info->time_of_next_midi_tick = (double)((int)beat_at_time) + ((timing_info->midi_tick%PPQN) * midi_tick_len_as_percent);
+    timing_info->midi_tick++;
 }
 
 void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *timing_info, int frame_num)
@@ -129,24 +131,14 @@ void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *timing_inf
     auto beat_time = l->m_timeline.beatAtTime(hostTime, l->m_quantum);
     if (beat_time >= 0.)
     {
-
-      if (l->m_timeline.phaseAtTime(hostTime, 1) < l->m_timeline.phaseAtTime(lastSampleHostTime, 1)) //  && (timing_info->midi_tick == 0 || timing_info->midi_tick == -1))
+      if (!timing_info->has_started)
       {
-        timing_info->has_started = true;
-        if ((timing_info->midi_tick + 1) % PPQN == 0)
-        {
-            //std::cout << "ITS A BEAT! " << beat_time << "MIDI TICK:" << timing_info->midi_tick << std::endl;
-            link_inc_midi(l, timing_info);
-        }
-      }
-	  else if (timing_info->has_started)
-	  {
-        auto next_frac = (timing_info->midi_tick%960) * midi_tick_len_as_percent;
-        auto next_midi_tick = (int)(beat_time+midi_tick_len_as_percent) + next_frac;
-        if (beat_time > next_midi_tick)
-            link_inc_midi(l, timing_info);
-      }
-	}
+          timing_info->has_started = true;
+          link_inc_midi(l, timing_info, beat_time);
+	  }
+      else if (beat_time > timing_info->time_of_next_midi_tick)
+          link_inc_midi(l, timing_info, beat_time);
+    }
 }
 
 LinkData link_get_timing_data_for_display(AbletonLink *l)
