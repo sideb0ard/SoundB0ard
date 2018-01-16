@@ -497,15 +497,12 @@ static void mixer_events_output(mixer *mixr)
 
                     if (mixr->timing_info.midi_tick % PPQN == 0)
                     {
-                        //printf("BEAT -- midi tick:%d\n", mixr->timing_info.midi_tick);
                         mixr->timing_info.is_quarter = true;
                         mixer_emit_event(mixr, TIME_QUARTER_TICK);
 
                         if (mixr->timing_info.midi_tick % PPBAR == 0)
                         {
                             mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
-                            //printf("START OF LOOP! loop_beat:%d\n", mixr->timing_info.loop_beat);
-
                             if (mixr->scene_start_pending)
                             {
                                 mixer_play_scene(mixr, mixr->current_scene);
