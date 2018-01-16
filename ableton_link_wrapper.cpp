@@ -44,7 +44,7 @@ struct AbletonLink
           m_sample_time{0},
           m_output_latency(0)
     {
-        m_link.setTempoCallback(update_bpm);
+        //m_link.setTempoCallback(update_bpm);
         m_link.enable(true);
     }
 };
@@ -99,7 +99,7 @@ inline void link_inc_midi(AbletonLink *l, mixer_timing_info *timing_info, double
     timing_info->is_midi_tick = true;
 }
 
-void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *timing_info, int frame_num)
+bool link_is_midi_tick(AbletonLink *l, mixer_timing_info *timing_info, int frame_num)
 {
     timing_info->is_midi_tick = false;
 
@@ -109,14 +109,11 @@ void link_update_mixer_timing_info(AbletonLink *l, mixer_timing_info *timing_inf
     auto beat_time = l->m_timeline.beatAtTime(hostTime, l->m_quantum);
     if (beat_time >= 0.)
     {
-      if (!timing_info->has_started)
-      {
-          timing_info->has_started = true;
-          link_inc_midi(l, timing_info, beat_time);
-	  }
-      else if (beat_time > timing_info->time_of_next_midi_tick)
+      if (beat_time > timing_info->time_of_next_midi_tick)
           link_inc_midi(l, timing_info, beat_time);
     }
+
+    return timing_info->is_midi_tick;
 }
 
 LinkData link_get_timing_data_for_display(AbletonLink *l)

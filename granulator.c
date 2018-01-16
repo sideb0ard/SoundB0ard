@@ -34,6 +34,8 @@ granulator *new_granulator(char *filename)
     g->reverse_mode = 0;  // off or on
     g->external_source_sg = -1;
 
+    g->loop_mode = false;
+
     g->grain_pitch = 1;
     g->sequencer_mode = false;
 
@@ -208,7 +210,7 @@ stereo_val granulator_gennext(void *self)
     if (g->m_eg1.m_state == OFFF)
         g->sound_generator.active = false;
 
-    if (g->movement_mode)
+    if (g->loop_mode)
     {
         g->audio_buffer_read_idx +=
             g->audio_buffer_len / (double)mixr->timing_info.loop_len_in_frames;
@@ -286,7 +288,7 @@ void granulator_status(void *self, wchar_t *status_string)
 {
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[GRANULATOR] vol:%.2lf source:%s extsource:%d len:%d stereo:%s\n"
+             L"[GRANULATOR] vol:%.2lf source:%s loop_mode:%s extsource:%d len:%d stereo:%s\n"
              "      audio_buffer_read_idx:%d audio_buffer_write_idx:%d\n"
              "      quasi_grain_fudge:%d grain_spray_ms:%.2f "
              "active_grains:%d highest_grain_num:%d\n"
@@ -310,7 +312,11 @@ void granulator_status(void *self, wchar_t *status_string)
 
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
 
-             g->vol, g->filename, g->external_source_sg, g->audio_buffer_len,
+             g->vol,
+             g->filename,
+             g->loop_mode ? "true" : "false",
+             g->external_source_sg,
+             g->audio_buffer_len,
              g->num_channels == 2 ? "true" : "false",
              (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
              g->quasi_grain_fudge, g->granular_spray_frames / 44.1,
@@ -634,6 +640,13 @@ void granulator_set_reverse_mode(granulator *g, bool b) { g->reverse_mode = b; }
 void granulator_set_movement_mode(granulator *g, bool b)
 {
     g->movement_mode = b;
+}
+void granulator_set_loop_mode(granulator *g, bool b)
+{
+    g->loop_mode = b;
+    g->quasi_grain_fudge = 0;
+    g->selection_mode = GRAIN_SELECTION_STATIC;
+    g->granular_spray_frames = 0;
 }
 
 void granulator_set_sequencer_mode(granulator *g, bool b)

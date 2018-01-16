@@ -132,29 +132,29 @@ void algorithm_process_afterthought(algorithm *self)
 stereo_val algorithm_gennext(void *self)
 {
     algorithm *a = (algorithm *)self;
-    switch (a->frequency)
-    {
-    case LOOP:
-        if (!a->has_started && (mixr->timing_info.midi_tick %
-                                    mixr->timing_info.loop_len_in_ticks ==
-                                0))
-        {
-            a->has_started = true;
-            char now_cmd[MAX_CMD_LEN] = {0};
-            char stored_cmd[MAX_CMD_LEN] = {0};
-            strncpy(stored_cmd, a->command, MAX_CMD_LEN);
-            algorithm_replace_vars_in_cmd((char *)now_cmd, stored_cmd);
-            interpret(now_cmd);
-            algorithm_process_afterthought(a);
-        }
-        else if (mixr->timing_info.midi_tick %
-                     mixr->timing_info.loop_len_in_ticks !=
-                 0)
-        {
-            a->has_started = false;
-        }
-        break;
-    }
+    //switch (a->frequency)
+    //{
+    //case LOOP:
+    //    if (!a->has_started && (mixr->timing_info.midi_tick %
+    //                                mixr->timing_info.loop_len_in_ticks ==
+    //                            0))
+    //    {
+    //        a->has_started = true;
+    //        char now_cmd[MAX_CMD_LEN] = {0};
+    //        char stored_cmd[MAX_CMD_LEN] = {0};
+    //        strncpy(stored_cmd, a->command, MAX_CMD_LEN);
+    //        algorithm_replace_vars_in_cmd((char *)now_cmd, stored_cmd);
+    //        interpret(now_cmd);
+    //        algorithm_process_afterthought(a);
+    //    }
+    //    else if (mixr->timing_info.midi_tick %
+    //                 mixr->timing_info.loop_len_in_ticks !=
+    //             0)
+    //    {
+    //        a->has_started = false;
+    //    }
+    //    break;
+    //}
     return (stereo_val){0, 0};
 }
 

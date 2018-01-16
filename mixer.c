@@ -528,8 +528,10 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         double output_left = 0.0;
         double output_right = 0.0;
 
-        link_update_mixer_timing_info(mixr->m_ableton_link, &mixr->timing_info, i);
-        mixer_events_output(mixr);
+        mixr->timing_info.cur_sample++;
+
+        if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
+            mixer_events_output(mixr);
 
         if (mixr->soundgen_num > 0)
         {
