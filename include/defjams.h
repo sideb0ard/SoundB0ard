@@ -115,6 +115,7 @@ typedef enum {
     ALGORITHM_TYPE,
     CHAOSMONKEY_TYPE,
     SPORK_TYPE,
+    METRONOME_TYPE,
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 
@@ -146,8 +147,13 @@ typedef struct mixer_timing_info
     int frames_per_midi_tick;
     int midi_ticks_per_ms;
 
+    double time_of_next_midi_tick;
+
     int sixteenth_note_tick;
     int midi_tick;
+
+    int loop_beat;
+    bool loop_started;
 
     int cur_sample; // inverse of SAMPLE RATE
 
@@ -159,6 +165,7 @@ typedef struct mixer_timing_info
     unsigned int size_of_eighth_note;
     unsigned int size_of_quarter_note;
 
+    bool has_started;
     bool start_of_loop; // true for one sample during loop time
     bool is_thirtysecond;
     bool is_sixteenth;

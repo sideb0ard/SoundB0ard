@@ -5,6 +5,7 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
+#include "ableton_link_wrapper.h"
 #include "audioutils.h"
 #include "cmdloop.h"
 #include "defjams.h"
@@ -46,11 +47,12 @@ static int paCallback(const void *input_buffer, void *output_buffer,
                       const PaStreamCallbackTimeInfo *time_info,
                       PaStreamCallbackFlags status_flags, void *user_data)
 {
-    mixer *mixr = (mixer *)user_data;
-    float *out = (float *)output_buffer;
     (void)input_buffer;
     (void)time_info;
     (void)status_flags;
+
+    float *out = (float *)output_buffer;
+    mixer *mixr = (mixer *)user_data;
 
     int ret = mixer_gennext(mixr, out, frames_per_buffer);
 
@@ -62,10 +64,8 @@ int main()
 
     srand(time(NULL));
 
-    mixr = new_mixer();
-
-    // PortAudio start me up!
-    pa_setup();
+    double output_latency = pa_setup();
+    mixr = new_mixer(output_latency);
 
     PaStream *stream;
     PaError err;
@@ -91,7 +91,13 @@ int main()
         exit(-1);
     }
 
-    loopy();
+    pthread_t input_th;
+    if (pthread_create(&input_th, NULL, loopy, NULL))
+    {
+        fprintf(stderr, "Errrr, wit tha midi..\n");
+    }
+    pthread_join(input_th, NULL);
+    // loopy();
 
     // all done, time to go home
     pa_teardown();

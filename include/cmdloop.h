@@ -7,7 +7,7 @@
 #include "step_sequencer.h"
 #include <stdbool.h>
 
-void loopy(void);
+void *loopy(void *arg);
 void interpret(char *line);
 
 int exxit(void);

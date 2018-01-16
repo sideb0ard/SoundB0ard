@@ -42,6 +42,7 @@ SRC = \
 	lfo.c \
 	looper.c \
 	main.c \
+	metronome.c \
 	midi_freq_table.c \
 	midimaaan.c \
 	minisynth.c \
@@ -80,6 +81,8 @@ ABLETONASIOINC=-I/Users/sideboard/Code/link/modules/asio-standalone/asio/include
 INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include
 LIBDIR=/usr/local/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
+#CFLAGS = -std=gnu11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
+#CPPFLAGS = -std=gnu++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O0
 CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
 CPPFLAGS = -std=c++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O0
 
@@ -107,4 +110,4 @@ clean:
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
 
 format:
-	find . -type f -name "*.[ch]" -name "*.cpp" "*.hpp" -exec clang-format -i {} \;
+	find . -type f -name "*.[ch]" -o -name "*.[ch]pp" -exec clang-format -i {} \;

@@ -826,7 +826,8 @@ stereo_val minisynth_gennext(void *self)
 
         short nom_left;
         short nom_right;
-        if (ms->base.sample_rate_counter == 0 || ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
+        if (ms->base.sample_rate_counter == 0 ||
+            ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
         {
             nom_left = bitshift_generate((void *)sg, NULL);
             nom_right = bitshift_generate((void *)sg, NULL);
