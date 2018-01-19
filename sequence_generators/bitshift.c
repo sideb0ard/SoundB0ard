@@ -88,6 +88,7 @@ void bitshift_status(void *self, wchar_t *wstring)
 {
     bitshift *bs = (bitshift *)self;
     int patsy_size = MAX_PS_STRING_SZ / 2;
+    printf("PATERSY SIZE:%d\n", patsy_size);
     char infix_pattern[patsy_size];
     char rpn_pattern[patsy_size];
     tokenized_pattern_to_string(bs->pattern.infix_tokenized_pattern,

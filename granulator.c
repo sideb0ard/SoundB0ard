@@ -59,7 +59,7 @@ granulator *new_granulator(char *filename)
     granulator_set_sequencer_mode(g, false);
 
     envelope_generator_init(&g->m_eg1); // start/stop env
-    g->m_eg1.m_attack_time_msec = 1000;
+    g->m_eg1.m_attack_time_msec = 400;
     g->m_eg1.m_release_time_msec = 750;
 
     g->graindur_lfo_on = false;
@@ -119,29 +119,30 @@ void granulator_event_notify(void *self, unsigned int event_type)
         if (g->loop_mode)
         {
             int pulses_per_loop = PPBAR * g->loop_len;
-            // printf("PULSES_PERLOOP:%d\n", pulses_per_loop);
-            // printf("PPBAR:%d and LOOP_LEN:%d\n", PPBAR, g->loop_len);
             double rel_pos = mixr->timing_info.midi_tick % pulses_per_loop;
             rel_pos = 100. / pulses_per_loop * rel_pos;
             double new_read_idx = g->audio_buffer_len / 100. * rel_pos;
-            // printf("New read idx should be:%f (%f percent of %d)\n",
-            //       new_read_idx, rel_pos, g->audio_buffer_len);
+            if (g->num_channels == 2)
+                new_read_idx -= ((int)new_read_idx & 1);
             g->audio_buffer_read_idx = new_read_idx;
         }
-        // if (g->sequencer_mode && g->m_seq.num_patterns > 0)
-        //{
-        //    int idx = mixr->timing_info.midi_tick % PPBAR;
-        //    if (mixr->timing_info.is_midi_tick &&
-        //        g->m_seq.patterns[g->m_seq.cur_pattern][idx])
-        //    {
-        //        granulator_start(g);
-        //        playing = true;
-        //    }
 
-        //    seq_tick(&g->m_seq);
-        //}
-        // if (playing)
-        //    playing_midi_tick_count++;
+        if (g->sequencer_mode && g->m_seq.num_patterns > 0)
+        {
+            int idx = mixr->timing_info.midi_tick % PPBAR;
+            if (mixr->timing_info.is_midi_tick &&
+                g->m_seq.patterns[g->m_seq.cur_pattern][idx])
+            {
+                granulator_start(g);
+                playing = true;
+            }
+
+            seq_tick(&g->m_seq);
+        }
+
+        if (playing)
+            playing_midi_tick_count++;
+
         break;
     case (TIME_SIXTEENTH_TICK):
         if (playing && playing_midi_tick_count > PPQN / 2)
@@ -150,12 +151,6 @@ void granulator_event_notify(void *self, unsigned int event_type)
             playing = false;
             playing_midi_tick_count = 0;
         }
-    case (TIME_START_OF_LOOP_TICK):
-        if (g->movement_mode)
-        {
-            granulator_set_audio_buffer_read_idx(g, 0);
-        }
-        break;
     }
 }
 
@@ -223,14 +218,6 @@ stereo_val granulator_gennext(void *self)
     if (g->m_eg1.m_state == OFFF)
         g->sound_generator.active = false;
 
-    // if (g->loop_mode)
-    //{
-    //    g->audio_buffer_read_idx +=
-    //        g->audio_buffer_len /
-    //        (double)mixr->timing_info.loop_len_in_frames;
-    //    if (g->audio_buffer_read_idx >= g->audio_buffer_len)
-    //        g->audio_buffer_read_idx = 0;
-    //}
     if (g->external_source_sg != -1)
     {
         g->audio_buffer[g->audio_buffer_write_idx] =
@@ -478,23 +465,18 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 
     int read_idx = (int)g->audiobuffer_cur_pos;
 
-    if (num_channels == 1)
+    sound_grain_check_idx(&read_idx, audio_buffer_len);
+    out.left = audio_buffer[read_idx];
+    if (num_channels > 1)
     {
-        sound_grain_check_idx(&read_idx, audio_buffer_len);
-        out.left = audio_buffer[read_idx];
-        out.right = out.left;
-    }
-    else if (num_channels == 2)
-    {
-        int read_idx_left = (int)g->audiobuffer_cur_pos * 2;
-        int read_idx_right = read_idx_left + 1;
-        sound_grain_check_idx(&read_idx_left, audio_buffer_len);
+        int read_idx_right = read_idx + 1;
         sound_grain_check_idx(&read_idx_right, audio_buffer_len);
-        out.left = audio_buffer[read_idx_left];
         out.right = audio_buffer[read_idx_right];
     }
+    else
+        out.right = out.left;
 
-    g->audiobuffer_cur_pos += g->incr;
+    g->audiobuffer_cur_pos += (g->incr * num_channels);
 
     int end_buffer =
         g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
@@ -502,7 +484,9 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     if ((g->reverse_mode &&
          g->audiobuffer_cur_pos < g->audiobuffer_start_idx) ||
         g->audiobuffer_cur_pos >= end_buffer)
+    {
         g->active = false;
+    }
 
     return out;
 }

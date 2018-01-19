@@ -110,4 +110,4 @@ clean:
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
 
 format:
-	find . -type f -name "*.[ch]" -o -name "*.[ch]pp" -exec clang-format -i {} \;
+	find . -type f -name "*.[ch]" -exec clang-format -i {} \;
