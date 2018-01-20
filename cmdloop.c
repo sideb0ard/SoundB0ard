@@ -331,8 +331,8 @@ void interpret(char *line)
                 memset(pattern, 0, 151);
                 if (is_valid_file(wurds[2]))
                 {
-                    sample_sequencer *s = new_sample_seq(wurds[1]);
-                    char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 2,
+                    sample_sequencer *s = new_sample_seq(wurds[2]);
+                    char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 3,
                                                      num_wurds);
                     int sgnum = add_sound_generator(
                         mixr,
