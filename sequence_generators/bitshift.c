@@ -13,7 +13,11 @@ static char *s_brackets[] = {"(", ")"};
 static char *s_ops[] = {"<<", ">>", "^", "|", "~", "&",
                         "+",  "-",  "*", "/", "%", "t"};
 
+
+// #define DEBUG_BITSHIFT 1
 #define LARGEST_POSSIBLE 2048
+#define PATTERN_STATUS_SIZE 512
+
 sequence_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     bitshift_pattern my_pattern;
@@ -56,6 +60,8 @@ void token_val_to_string(bitshift_token *t, char *char_val)
 void tokenized_pattern_to_string(bitshift_token *pattern, int token_len,
                                  char *pattern_as_string, int stringlen)
 {
+    int n = sizeof(pattern_as_string)/sizeof(pattern_as_string[0]);
+
     memset(pattern_as_string, 0, stringlen);
     int string_idx = 0;
     for (int i = 0; i < token_len; i++)
@@ -77,6 +83,7 @@ void tokenized_pattern_to_string(bitshift_token *pattern, int token_len,
         }
         string_idx += lenny;
     }
+    printf("eND\n");
 }
 
 void bitshift_change_pattern(bitshift *sg, char *pattern)
@@ -87,16 +94,16 @@ void bitshift_change_pattern(bitshift *sg, char *pattern)
 void bitshift_status(void *self, wchar_t *wstring)
 {
     bitshift *bs = (bitshift *)self;
-    int patsy_size = MAX_PS_STRING_SZ / 2;
-    printf("PATERSY SIZE:%d\n", patsy_size);
-    char infix_pattern[patsy_size];
-    char rpn_pattern[patsy_size];
+    char infix_pattern[PATTERN_STATUS_SIZE] = {0};
+    char rpn_pattern[PATTERN_STATUS_SIZE] = {0};
+
+    printf("BEFORESSTR:%s\n", infix_pattern);
     tokenized_pattern_to_string(bs->pattern.infix_tokenized_pattern,
                                 bs->pattern.num_infix_tokens, infix_pattern,
-                                patsy_size);
+                                PATTERN_STATUS_SIZE);
     tokenized_pattern_to_string(bs->pattern.rpn_tokenized_pattern,
                                 bs->pattern.num_rpn_tokens, rpn_pattern,
-                                patsy_size);
+                                PATTERN_STATUS_SIZE);
     swprintf(wstring, MAX_PS_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
              "infix pattern: %s // rpn pattern: %s",
@@ -568,7 +575,7 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
         printf("outputstack %d %s\n", i, char_val);
 #endif
     }
-    char a_pattern[MAX_PS_STRING_SZ];
+    char a_pattern[MAX_PS_STRING_SZ] = {0};
     // tokenized_pattern_to_string(bs->pattern.infix_tokenized_pattern,
     // bs->pattern.num_infix_tokens, a_pattern, MAX_PS_STRING_SZ);
     tokenized_pattern_to_string(output_stack, output_stack_idx, a_pattern,
