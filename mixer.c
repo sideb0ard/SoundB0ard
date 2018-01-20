@@ -111,18 +111,20 @@ void mixer_ps(mixer *mixr)
     printf(COOL_COLOR_GREEN
            "::::: [" ANSI_COLOR_WHITE "MIXING dESK" COOL_COLOR_GREEN
            "] Volume:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           "] Key:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN
-           " // BPM:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+           " Key:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN
            " // TICK:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
            " // Qtick:" ANSI_COLOR_WHITE "%d" COOL_COLOR_GREEN
            " // Debug:" ANSI_COLOR_WHITE "%s" COOL_COLOR_GREEN " :::::\n"
+           "::::: LINK::BPM/Tempo:%.2f Quantum:%.2f Beat:%.2f Phase:%.2f "
+           "NumPeers:%d\n"
            "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
-           "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d \n"
-           "::::: LINK::Quantum:%.2f Tempo:%.2f Beat:%.2f Phase:%.2f "
-           "NumPeers:%d" ANSI_COLOR_RESET,
-           mixr->volume, key_names[mixr->key], mixr->bpm,
+           "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d"
+           ANSI_COLOR_RESET,
+           mixr->volume, key_names[mixr->key],
            mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false",
+           data.tempo,
+           data.quantum, data.beat, data.phase, data.num_peers,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
            mixr->active_midi_soundgen_num == -99
@@ -130,8 +132,7 @@ void mixer_ps(mixer *mixr)
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
-           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS, data.quantum,
-           data.tempo, data.beat, data.phase, data.num_peers);
+           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS);
 
     if (mixr->env_var_count > 0)
     {

@@ -67,6 +67,16 @@ void *loopy(void *arg)
 
     setlocale(LC_ALL, "");
 
+    printf(
+        COOL_COLOR_GREEN
+        " _____                       _ _     _____               _\n"
+        "/  ___|                     | | |   |  _  |             | |\n"
+        "\\ `--.  ___  _   _ _ __   __| | |__ | |/\" | __ _ _ __ __| |\n"
+        " `--. \\/ _ \\| | | | \"_ \\ / _` | \"_ \\|  /| |/ _` | \"__/ _` |\n"
+        "/\\__/ / (_) | |_| | | | | (_| | |_) \\ |_/ / (_| | | | (_| |\n"
+        "\\____/ \\___/ \\__,_|_| |_|\\__,_|_.__/ \\___/ \\__,_|_|  "
+        "\\__,_|\n" ANSI_COLOR_RESET);
+
     char *line;
     while ((line = readline(prompt)) != NULL)
     {
@@ -188,6 +198,153 @@ void interpret(char *line)
                 printf("EUCLIDEAN! SEQUENCE GEN num_hits:%d num_steps:%d!\n",
                        num_hits, num_steps);
                 mixer_add_euclidean(mixr, num_hits, num_steps);
+            }
+            else if (strncmp("digi", wurds[1], 4) == 0
+                    || strncmp("dsynth", wurds[1], 6) == 0
+                    || strncmp("ssynth", wurds[1], 6) == 0)
+            {
+                if (strlen(wurds[2]) != 0)
+                {
+                    int sgnum = add_digisynth(mixr, wurds[2]);
+                    mixr->midi_control_destination = SYNTH;
+                    mixr->active_midi_soundgen_num = sgnum;
+                    if (num_wurds > 2)
+                    {
+                        digisynth *ds =
+                            (digisynth *)mixr->sound_generators[sgnum];
+                        char_melody_to_midi_melody(&ds->base, 0, wurds, 2,
+                                                   num_wurds);
+                    }
+                }
+                else
+                {
+                    printf("Need to give me a sample name for a digisynth..\n");
+                }
+            }
+            else if (strncmp("fm", wurds[1], 2) == 0
+                    || strncmp("dx", wurds[1], 2) == 0)
+            {
+                int sgnum = add_dxsynth(mixr);
+                mixr->midi_control_destination = SYNTH;
+                mixr->active_midi_soundgen_num = sgnum;
+                if (num_wurds > 2)
+                {
+                    dxsynth *dx = (dxsynth *)mixr->sound_generators[sgnum];
+                    char_melody_to_midi_melody(&dx->base, 0, wurds, 2,
+                                               num_wurds);
+                }
+            }
+            else if (strncmp("granulator", wurds[1], 10) == 0
+                    || strncmp("gran", wurds[1], 4) == 0)
+            {
+                if (is_valid_file(wurds[2]) || strncmp(wurds[2], "none", 4) == 0)
+                {
+                    printf("VALID!\n");
+                    int soundgen_num = add_granulator(mixr, wurds[1]);
+                    printf("soundgenerator %d\n", soundgen_num);
+                }
+                else
+                    printf("Need a file ya numpty\n");
+            }
+            else if (strncmp("kit", wurds[1], 3) == 0)
+            {
+                char *pattern = (char *)calloc(151, sizeof(char));
+                memset(pattern, 0, 151);
+
+                char kickfile[512] = {0};
+                get_random_sample_from_dir("kicks", kickfile);
+                printf("Opening %s\n", kickfile);
+                sample_sequencer *bd = new_sample_seq(kickfile);
+                int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
+                pattern_char_to_pattern(
+                    &bd->m_seq, pattern,
+                    bd->m_seq.patterns[bd->m_seq.num_patterns++]);
+                update_environment("bd", bdnum);
+
+                char snarefile[512] = {0};
+                get_random_sample_from_dir("snrs", snarefile);
+                printf("Opening %s\n", snarefile);
+                sample_sequencer *sd = new_sample_seq(snarefile);
+                int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
+                pattern_char_to_pattern(
+                    &sd->m_seq, pattern,
+                    sd->m_seq.patterns[sd->m_seq.num_patterns++]);
+                update_environment("sd", sdnum);
+
+                char highhat[512] = {0};
+                get_random_sample_from_dir("hats", highhat);
+                printf("Opening %s\n", highhat);
+                sample_sequencer *hh = new_sample_seq(highhat);
+                int hhnum = add_sound_generator(mixr, (soundgenerator *)hh);
+                pattern_char_to_pattern(
+                    &hh->m_seq, pattern,
+                    hh->m_seq.patterns[hh->m_seq.num_patterns++]);
+                update_environment("hh", hhnum);
+
+                char perc[512] = {0};
+                get_random_sample_from_dir("perc", perc);
+                printf("Opening %s\n", perc);
+                sample_sequencer *pc = new_sample_seq(perc);
+                int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
+                pattern_char_to_pattern(
+                    &pc->m_seq, pattern,
+                    pc->m_seq.patterns[pc->m_seq.num_patterns++]);
+                update_environment("pc", pcnum);
+
+                free(pattern);
+            }
+            else if (strncmp("looper", wurds[1], 6) == 0)
+            {
+                if (is_valid_file(wurds[2]) || strncmp(wurds[2], "none", 4) == 0)
+                {
+                    int loop_len = atoi(wurds[3]);
+                    if (!loop_len)
+                        loop_len = 1;
+                    // int soundgen_num = add_looper(mixr, wurds[1], loop_len);
+                    // printf("soundgenerator %d\n", soundgen_num);
+
+                    int soundgen_num = add_granulator(mixr, wurds[2]);
+                    printf("soundgenerator %d\n", soundgen_num);
+
+                    granulator *g =
+                        (granulator *)mixr->sound_generators[soundgen_num];
+
+                    granulator_set_loop_mode(g, true);
+                    granulator_set_loop_len(g, loop_len);
+                }
+            }
+            else if (strncmp("moog", wurds[1], 4) == 0)
+            {
+                int sgnum = add_minisynth(mixr);
+                mixr->midi_control_destination = SYNTH;
+                mixr->active_midi_soundgen_num = sgnum;
+                if (num_wurds > 2)
+                {
+                    minisynth *ms = (minisynth *)mixr->sound_generators[sgnum];
+                    char_melody_to_midi_melody(&ms->base, 0, wurds, 2,
+                                               num_wurds);
+                }
+            }
+            else if (strncmp("samp", wurds[1], 4) == 0)
+            {
+                char *pattern = (char *)calloc(151, sizeof(char));
+                memset(pattern, 0, 151);
+                if (is_valid_file(wurds[2]))
+                {
+                    sample_sequencer *s = new_sample_seq(wurds[1]);
+                    char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 2,
+                                                     num_wurds);
+                    int sgnum = add_sound_generator(
+                        mixr,
+                        (soundgenerator *)s); //  add_seq_char_pattern(mixr,
+                                              //  wurds[1], pattern);
+                    pattern_char_to_pattern(
+                        &s->m_seq, pattern,
+                        s->m_seq.patterns[s->m_seq.num_patterns++]);
+
+                    printf("New SG at pos %d\n", sgnum);
+                }
+            free(pattern);
             }
         }
 
@@ -678,45 +835,6 @@ void interpret(char *line)
 
             if (strncmp(wurds[1], "kit", 3) == 0)
             {
-                char kickfile[512] = {0};
-                get_random_sample_from_dir("kicks", kickfile);
-                printf("Opening %s\n", kickfile);
-                sample_sequencer *bd = new_sample_seq(kickfile);
-                int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
-                pattern_char_to_pattern(
-                    &bd->m_seq, pattern,
-                    bd->m_seq.patterns[bd->m_seq.num_patterns++]);
-                update_environment("bd", bdnum);
-
-                char snarefile[512] = {0};
-                get_random_sample_from_dir("snrs", snarefile);
-                printf("Opening %s\n", snarefile);
-                sample_sequencer *sd = new_sample_seq(snarefile);
-                int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
-                pattern_char_to_pattern(
-                    &sd->m_seq, pattern,
-                    sd->m_seq.patterns[sd->m_seq.num_patterns++]);
-                update_environment("sd", sdnum);
-
-                char highhat[512] = {0};
-                get_random_sample_from_dir("hats", highhat);
-                printf("Opening %s\n", highhat);
-                sample_sequencer *hh = new_sample_seq(highhat);
-                int hhnum = add_sound_generator(mixr, (soundgenerator *)hh);
-                pattern_char_to_pattern(
-                    &hh->m_seq, pattern,
-                    hh->m_seq.patterns[hh->m_seq.num_patterns++]);
-                update_environment("hh", hhnum);
-
-                char perc[512] = {0};
-                get_random_sample_from_dir("perc", perc);
-                printf("Opening %s\n", perc);
-                sample_sequencer *pc = new_sample_seq(perc);
-                int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
-                pattern_char_to_pattern(
-                    &pc->m_seq, pattern,
-                    pc->m_seq.patterns[pc->m_seq.num_patterns++]);
-                update_environment("pc", pcnum);
             }
             else if (is_valid_file(wurds[1]))
             {
