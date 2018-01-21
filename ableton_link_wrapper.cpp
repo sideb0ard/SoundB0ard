@@ -45,14 +45,14 @@ struct AbletonLink
     }
 };
 
-void update_bpm(double bpm) { printf("Changing bpm to %.2f\n", bpm); }
+void update_bpm(double bpm) { /* no-op */ };
 
 // c++ wrapper for Ableton Link to call from sbsh
 extern "C" {
 
 AbletonLink *new_ableton_link(double bpm)
 {
-    std::cout << "New Ableton Link object!" << std::endl;
+    //std::cout << "New Ableton Link object!" << std::endl;
     return new AbletonLink(bpm);
 }
 

@@ -227,9 +227,10 @@ void get_random_sample_from_dir(char *dir, char *return_file_name)
         if (!(strncmp(ep->d_name, ".", 1) == 0))
             break;
     }
-    printf("Found %d files in %s -- gonna use %s\n", count, dir, ep->d_name);
-    printf("STRLEN of dirname is %lu and file name is %lu\n", strlen(dirname),
-           strlen(ep->d_name));
+    // printf("Found %d files in %s -- gonna use %s\n", count, dir, ep->d_name);
+    // printf("STRLEN of dirname is %lu and file name is %lu\n",
+    // strlen(dirname),
+    //       strlen(ep->d_name));
     strcat(return_file_name, dir);
     strcat(return_file_name, "/");
     strcat(return_file_name, ep->d_name);

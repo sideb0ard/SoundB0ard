@@ -68,14 +68,15 @@ void *loopy(void *arg)
     setlocale(LC_ALL, "");
 
     printf(
-        COOL_COLOR_GREEN
+        ANSI_COLOR_WHITE
+        "Welcome to...\n" COOL_COLOR_GREEN
         " _____                       _ _     _____               _\n"
         "/  ___|                     | | |   |  _  |             | |\n"
         "\\ `--.  ___  _   _ _ __   __| | |__ | |/\" | __ _ _ __ __| |\n"
         " `--. \\/ _ \\| | | | \"_ \\ / _` | \"_ \\|  /| |/ _` | \"__/ _` |\n"
         "/\\__/ / (_) | |_| | | | | (_| | |_) \\ |_/ / (_| | | | (_| |\n"
         "\\____/ \\___/ \\__,_|_| |_|\\__,_|_.__/ \\___/ \\__,_|_|  "
-        "\\__,_|\n" ANSI_COLOR_RESET);
+        "\\__,_|\n\n" ANSI_COLOR_RESET);
 
     char *line;
     while ((line = readline(prompt)) != NULL)
@@ -89,8 +90,7 @@ void *loopy(void *arg)
         }
     }
     write_history(NULL);
-    printf(COOL_COLOR_PINK
-           "beat it, ya val jerk!!\n" ANSI_COLOR_RESET); // Thrashin' reference
+    exxit();
 
     return NULL;
 }
@@ -255,7 +255,8 @@ void interpret(char *line)
 
                 char kickfile[512] = {0};
                 get_random_sample_from_dir("kicks", kickfile);
-                printf("Opening %s\n", kickfile);
+                printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET,
+                       kickfile);
                 sample_sequencer *bd = new_sample_seq(kickfile);
                 int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
                 pattern_char_to_pattern(
@@ -265,7 +266,8 @@ void interpret(char *line)
 
                 char snarefile[512] = {0};
                 get_random_sample_from_dir("snrs", snarefile);
-                printf("Opening %s\n", snarefile);
+                printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET,
+                       snarefile);
                 sample_sequencer *sd = new_sample_seq(snarefile);
                 int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
                 pattern_char_to_pattern(
@@ -275,7 +277,8 @@ void interpret(char *line)
 
                 char highhat[512] = {0};
                 get_random_sample_from_dir("hats", highhat);
-                printf("Opening %s\n", highhat);
+                printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET,
+                       highhat);
                 sample_sequencer *hh = new_sample_seq(highhat);
                 int hhnum = add_sound_generator(mixr, (soundgenerator *)hh);
                 pattern_char_to_pattern(
@@ -285,7 +288,7 @@ void interpret(char *line)
 
                 char perc[512] = {0};
                 get_random_sample_from_dir("perc", perc);
-                printf("Opening %s\n", perc);
+                printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
                 sample_sequencer *pc = new_sample_seq(perc);
                 int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
                 pattern_char_to_pattern(
@@ -2474,9 +2477,8 @@ bool is_valid_file(char *filename)
 
 int exxit()
 {
-    printf(
-        COOL_COLOR_GREEN
-        "\nBeat it, ya val jerk...\n" ANSI_COLOR_RESET); // Thrashin' reference
+    printf(COOL_COLOR_PINK
+           "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET); // Thrashin' reference
     pa_teardown();
     exit(0);
 }

@@ -1,12 +1,54 @@
 
+// glitchy noise
+(t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1
+(t & ((t%(t>>1&t))|t>>13^t>>5)>>7)-1
 
 
+// spackley
+ ((t/1000)^(t/1001))*t
+
+// low noise melody
+t/((t%(t>>13&t)))
+
+// revers0r
+t>>(8/((t/32)%3))
+
+// ufo
+((t/4)>>(t/4))>>(t>>(t/8))|t>>2
+
+// digeridoo
+((t/4)>>t/4)|(t>>2)
+
+// noisey
 ( ( ( t >> 6 | t | t >> ( t >> 16 ) ) * 10 + ( ( t >> 11 ) & 7 ) ) & 255 ) / 127 - 1
-((  ((t*5)&(t>>7)) | ((t*3)&(t>>10))                         ) & 255) / 127 - 1
+
+// high glitch melody
+(( ((t*5)&(t>>7)) | ((t*3)&(t>>10)) ) & 255) / 127 - 1
+
+// dark
+(t&t>>4)-(t>>13&t)
 
 ((2*(t&1)-1)*t)-(t>>8) // deep low bass
 
 (((t/91)&t)^((t/90)&t))-1 // nutty
+
+// sci-fi
 (t*t)/(t>>13 ^ t>>8)
+
+// hi-wire
+t<<((t>>8&t)|(t>>14&t))
+
+// movement
+t<<((t>>1|t>>8)^(t>>13))
+
+// dialtones
+(t>>4 & t>>8)/(t>>16&t)
+
+(t & (t>>15+(t>>8&t)))*t
+
+(t*t)/(t>>8&t)
+
+// mario GOOD
+t%(t>>10&t)
 
 https://www.reddit.com/r/bytebeat/comments/20km9l/cool_equations/
