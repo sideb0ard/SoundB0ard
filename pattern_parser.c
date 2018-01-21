@@ -173,7 +173,7 @@ int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
             tokens[(*token_idx)++].type = SQUARE_BRACKET_RIGHT;
             c++;
         }
-        else if (*c == '_')
+        else if (*c == '_' || *c == '-')
         {
             printf("BLANK!\n");
             tokens[(*token_idx)++].type = BLANK;

@@ -17,6 +17,9 @@ typedef struct sample_pos
     int position;
     int playing;
     int played;
+    double audiobuffer_cur_pos;
+    double audiobuffer_inc;
+    double audiobuffer_pitch;
     double amp;
     double speed;
     double start_pos_pct;
@@ -38,6 +41,7 @@ typedef struct sample_sequencer
 
     double *buffer;
     int bufsize;
+    double buffer_pitch;
     // int buf_num_channels;
 
     int swing;
@@ -76,3 +80,4 @@ void sample_seq_import_file(sample_sequencer *s, char *filename);
 void sample_sequencer_reset_samples(sample_sequencer *seq);
 void sample_sequencer_morph(sample_sequencer *seq);
 void sample_sequencer_morph_restore(sample_sequencer *seq);
+void sample_sequencer_set_pitch(sample_sequencer *seq, double v);

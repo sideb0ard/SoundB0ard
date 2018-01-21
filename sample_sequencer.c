@@ -49,6 +49,7 @@ void sample_seq_import_file(sample_sequencer *seq, char *filename)
     audio_buffer_details deetz = import_file_contents(&seq->buffer, filename);
     strcpy(seq->filename, deetz.filename);
     seq->bufsize = deetz.buffer_length;
+    seq->buffer_pitch = 1.0;
     seq->samplerate = deetz.sample_rate;
     seq->channels = deetz.num_channels;
     sample_sequencer_reset_samples(seq);
@@ -63,8 +64,11 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
     for (int i = 0; i < PPBAR; i++)
     {
         seq->sample_positions[i].position = 0;
+        seq->sample_positions[i].audiobuffer_cur_pos = 0.;
+        seq->sample_positions[i].audiobuffer_inc = 1.0;
         seq->sample_positions[i].playing = 0;
         seq->sample_positions[i].played = 0;
+        seq->sample_positions[i].speed = 1;
         seq->sample_positions[i].speed = 1;
     }
 }
@@ -132,29 +136,29 @@ stereo_val sample_seq_gennext(void *self)
         if (seq->samples_now_playing[i] != -1)
         {
             int cur_sample_midi_tick = seq->samples_now_playing[i];
-            left_val += seq->buffer[seq->sample_positions[cur_sample_midi_tick]
-                                        .position] *
+            int idx =
+                seq->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos;
+            left_val += seq->buffer[idx] *
                         seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
                                                        [cur_sample_midi_tick];
             if (seq->channels == 2)
             {
                 right_val +=
-                    seq->buffer[seq->sample_positions[cur_sample_midi_tick]
-                                    .position +
-                                1] *
+                    seq->buffer[idx + 1] *
                     seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
                                                    [cur_sample_midi_tick];
             }
-            seq->sample_positions[cur_sample_midi_tick].position =
-                seq->sample_positions[cur_sample_midi_tick].position +
-                (seq->channels *
-                 seq->sample_positions[cur_sample_midi_tick].speed);
+            seq->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
+                seq->sample_positions[cur_sample_midi_tick]
+                    .audiobuffer_cur_pos +
+                (seq->channels * (seq->buffer_pitch));
 
-            if ((int)seq->sample_positions[cur_sample_midi_tick].position >=
-                seq->bufsize)
+            if ((int)seq->sample_positions[cur_sample_midi_tick]
+                    .audiobuffer_cur_pos >= seq->bufsize)
             { // end of playback - so reset
                 seq->samples_now_playing[i] = -1;
-                seq->sample_positions[cur_sample_midi_tick].position = 0;
+                seq->sample_positions[cur_sample_midi_tick]
+                    .audiobuffer_cur_pos = 0;
             }
         }
     }
@@ -186,9 +190,10 @@ void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[SAMPLE SEQ] \"%s\" Vol:%.2lf Active:%s Morph:%s", seq->filename,
-             seq->vol, seq->sound_generator.active ? "true" : "false",
-             seq->morph ? "true" : "false");
+             L"[SAMPLE SEQ] \"%s\" Vol:%.2lf Active:%s Morph:%s Pitch:%.2f",
+             seq->filename, seq->vol,
+             seq->sound_generator.active ? "true" : "false",
+             seq->morph ? "true" : "false", seq->buffer_pitch);
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, seq_status_string);
@@ -299,4 +304,12 @@ void sample_sequencer_morph_restore(sample_sequencer *seq)
 {
     for (int i = 0; i < PPBAR; i++)
         seq->sample_positions[i].speed = 1;
+}
+
+void sample_sequencer_set_pitch(sample_sequencer *seq, double v)
+{
+    if (v >= 0. && v <= 2.0)
+        seq->buffer_pitch = v;
+    else
+        printf("Must be in the range of 0.0 .. 2.0\n");
 }

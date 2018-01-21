@@ -89,7 +89,8 @@ void *loopy(void *arg)
         }
     }
     write_history(NULL);
-    printf("beat it, ya val jerk!!\n"); // Thrashin' reference
+    printf(COOL_COLOR_PINK
+           "beat it, ya val jerk!!\n" ANSI_COLOR_RESET); // Thrashin' reference
 
     return NULL;
 }
@@ -835,64 +836,42 @@ void interpret(char *line)
 
             char *pattern = (char *)calloc(151, sizeof(char));
 
-            if (strncmp(wurds[1], "kit", 3) == 0)
+            int soundgen_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+                mixr->sound_generators[soundgen_num]->type == SEQUENCER_TYPE)
             {
-            }
-            else if (is_valid_file(wurds[1]))
-            {
-                sample_sequencer *s = new_sample_seq(wurds[1]);
-                char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 2,
-                                                 num_wurds);
-                int sgnum = add_sound_generator(
-                    mixr,
-                    (soundgenerator *)s); //  add_seq_char_pattern(mixr,
-                                          //  wurds[1], pattern);
-                pattern_char_to_pattern(
-                    &s->m_seq, pattern,
-                    s->m_seq.patterns[s->m_seq.num_patterns++]);
 
-                printf("New SG at pos %d\n", sgnum);
-            }
-            else
-            {
-                int soundgen_num = atoi(wurds[1]);
-                if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type ==
-                        SEQUENCER_TYPE)
+                sample_sequencer *s =
+                    (sample_sequencer *)mixr->sound_generators[soundgen_num];
+
+                if (strncmp("load", wurds[2], 4) == 0 ||
+                    strncmp("import", wurds[2], 6) == 0)
                 {
-
-                    if (strncmp("morph", wurds[2], 8) == 0)
+                    if (is_valid_file(wurds[3]))
                     {
-                        printf("M0RRRPH!\n");
-                        sample_sequencer *s =
-                            (sample_sequencer *)
-                                mixr->sound_generators[soundgen_num];
-                        s->morph = 1 - s->morph;
-                    }
-                    else if (strncmp("load", wurds[2], 4) == 0 ||
-                             strncmp("import", wurds[2], 6) == 0)
-                    {
-                        if (is_valid_file(wurds[3]))
-                        {
-                            printf("Changing Loaded "
-                                   "FILE!\n");
-                            sample_sequencer *s =
-                                (sample_sequencer *)
-                                    mixr->sound_generators[soundgen_num];
-                            sample_seq_import_file(s, wurds[3]);
-                        }
-                        else
-                            printf("%s is not a valid file\n", wurds[3]);
+                        printf("Changing Loaded "
+                               "FILE!\n");
+                        sample_seq_import_file(s, wurds[3]);
                     }
                     else
-                    {
-                        sample_sequencer *s =
-                            (sample_sequencer *)
-                                mixr->sound_generators[soundgen_num];
-                        sequencer *seq = &s->m_seq;
-                        parse_sample_sequencer_command(seq, wurds, num_wurds,
-                                                       pattern);
-                    }
+                        printf("%s is not a valid file\n", wurds[3]);
+                }
+                else if (strncmp("morph", wurds[2], 8) == 0)
+                {
+                    printf("M0RRRPH!\n");
+                    s->morph = 1 - s->morph;
+                }
+                else if (strncmp("pitch", wurds[2], 5) == 0)
+                {
+                    printf("PITCHHHHy!!\n");
+                    double v = atof(wurds[3]);
+                    sample_sequencer_set_pitch(s, v);
+                }
+                else
+                {
+                    sequencer *seq = &s->m_seq;
+                    parse_sample_sequencer_command(seq, wurds, num_wurds,
+                                                   pattern);
                 }
             }
             free(pattern);

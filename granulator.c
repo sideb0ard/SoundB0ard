@@ -202,7 +202,7 @@ void granulator_update_lfos(granulator *g)
     {
         double lfo4_out = lfo_do_oscillate((oscillator *)&g->m_lfo4, NULL);
         double scaley_val =
-            scaleybum(-1, 1, g->m_lfo4_min, g->m_lfo4_max, lfo4_out);
+            scaleybum(0, 2, g->m_lfo4_min, g->m_lfo4_max, lfo4_out);
         g->grain_pitch = scaley_val;
     }
 }
