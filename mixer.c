@@ -118,13 +118,12 @@ void mixer_ps(mixer *mixr)
            "::::: LINK::BPM/Tempo:%.2f Quantum:%.2f Beat:%.2f Phase:%.2f "
            "NumPeers:%d\n"
            "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
-           "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d PPNS:%d"
-           ANSI_COLOR_RESET,
-           mixr->volume, key_names[mixr->key],
-           mixr->timing_info.midi_tick, mixr->timing_info.sixteenth_note_tick,
-           mixr->debug_mode ? "true" : "false",
-           data.tempo,
-           data.quantum, data.beat, data.phase, data.num_peers,
+           "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d "
+           "PPNS:%d" ANSI_COLOR_RESET,
+           mixr->volume, key_names[mixr->key], mixr->timing_info.midi_tick,
+           mixr->timing_info.sixteenth_note_tick,
+           mixr->debug_mode ? "true" : "false", data.tempo, data.quantum,
+           data.beat, data.phase, data.num_peers,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
            mixr->active_midi_soundgen_num == -99
@@ -187,6 +186,7 @@ void mixer_ps(mixer *mixr)
     {
         if (mixr->sound_generators[i] != NULL)
         {
+            printf("not NULL!\n");
             wchar_t wss[MAX_PS_STRING_SZ];
             memset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
@@ -636,6 +636,10 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
     {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
         soundgenerator *sg = mixr->sound_generators[soundgen_num];
+
+        if (mixr->active_midi_soundgen_num == soundgen_num)
+            mixr->active_midi_soundgen_num = -99;
+
         mixr->sound_generators[soundgen_num] = NULL;
         sg->self_destruct(sg);
     }

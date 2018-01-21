@@ -12,7 +12,7 @@ extern mixer *mixr;
 
 static char *token_type_names[] = {"SQUARE_LEFT", "SQUARE_RIGHT", "CURLY_LEFT",
                                    "CURLY_RIGHT", "PAREN_LEFT",   "PAREN_RIGHT",
-                                   "VAR_NAME"};
+                                   "BLANK",       "VAR_NAME"};
 
 static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
 {
@@ -33,6 +33,7 @@ void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD])
     for (int i = 0; i < num_wurds; i++)
         sq_bracket_balance +=
             extract_tokens_from_pattern_wurds(tokens, &token_idx, wurds[i]);
+    printf("TOKEN_IDX is %d\n", token_idx);
 
     if (sq_bracket_balance != 0)
     {
@@ -72,7 +73,7 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         }
         else if (tokens[i].type == SQUARE_BRACKET_RIGHT)
             current_pattern_group = pgroups[current_pattern_group].parent;
-        else if (tokens[i].type == VAR_NAME)
+        else if (tokens[i].type == BLANK || tokens[i].type == VAR_NAME)
         {
             pgroups[current_pattern_group].num_children++;
             var_tokens[var_tokens_idx++] = tokens[i];
@@ -122,6 +123,9 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
                 seq_clear_pattern(&seq->m_seq, 0);
             }
         }
+        else if (var_tokens[i].type == BLANK)
+        {
+        } // no-op
         else
         {
             printf("NAE Valid ENV VAR! %s\n", var_key);
@@ -131,12 +135,15 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
 
     for (int i = 0; i < num_uniq; i++)
     {
-        int sg_num;
-        get_environment_val(var_tokens[i].value, &sg_num);
-        printf("Play at %s %d\n", var_tokens[i].value, uniq_positions[i]);
-        sample_sequencer *seq =
-            (sample_sequencer *)mixr->sound_generators[sg_num];
-        seq_add_micro_hit(&seq->m_seq, 0, uniq_positions[i]);
+        if (var_tokens[i].type != BLANK)
+        {
+            int sg_num;
+            get_environment_val(var_tokens[i].value, &sg_num);
+            printf("Play at %s %d\n", var_tokens[i].value, uniq_positions[i]);
+            sample_sequencer *seq =
+                (sample_sequencer *)mixr->sound_generators[sg_num];
+            seq_add_micro_hit(&seq->m_seq, 0, uniq_positions[i]);
+        }
     }
 }
 
@@ -145,6 +152,7 @@ int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
 {
     int sq_bracket_balance = 0;
 
+    printf("WURD %s\n", wurd);
     char *c = wurd;
     while (*c)
     {
@@ -154,22 +162,28 @@ int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
         if (*c == '[')
         {
             sq_bracket_balance++;
-            // printf("SQ_LEFTBRACKET!\n");
+            printf("SQ_LEFTBRACKET!\n");
             tokens[(*token_idx)++].type = SQUARE_BRACKET_LEFT;
             c++;
         }
         else if (*c == ']')
         {
             sq_bracket_balance--;
-            // printf("SQ_RIGHTBRACKET!\n");
+            printf("SQ_RIGHTBRACKET!\n");
             tokens[(*token_idx)++].type = SQUARE_BRACKET_RIGHT;
+            c++;
+        }
+        else if (*c == '_')
+        {
+            printf("BLANK!\n");
+            tokens[(*token_idx)++].type = BLANK;
             c++;
         }
         else
         {
             while (isalnum(*c))
                 var_name[var_name_idx++] = *c++;
-            // printf("VAR! %s\n", var_name);
+            printf("VAR! %s\n", var_name);
             tokens[(*token_idx)].type = VAR_NAME;
             strncpy(tokens[*token_idx].value, var_name, MAX_PATTERN_CHAR_VAL);
             (*token_idx)++;

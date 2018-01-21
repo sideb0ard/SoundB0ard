@@ -13,7 +13,6 @@ static char *s_brackets[] = {"(", ")"};
 static char *s_ops[] = {"<<", ">>", "^", "|", "~", "&",
                         "+",  "-",  "*", "/", "%", "t"};
 
-
 // #define DEBUG_BITSHIFT 1
 #define LARGEST_POSSIBLE 2048
 #define PATTERN_STATUS_SIZE 512
@@ -60,7 +59,7 @@ void token_val_to_string(bitshift_token *t, char *char_val)
 void tokenized_pattern_to_string(bitshift_token *pattern, int token_len,
                                  char *pattern_as_string, int stringlen)
 {
-    int n = sizeof(pattern_as_string)/sizeof(pattern_as_string[0]);
+    int n = sizeof(pattern_as_string) / sizeof(pattern_as_string[0]);
 
     memset(pattern_as_string, 0, stringlen);
     int string_idx = 0;

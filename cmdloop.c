@@ -89,7 +89,7 @@ void *loopy(void *arg)
         }
     }
     write_history(NULL);
-    printf("BYTE!\n");
+    printf("beat it, ya val jerk!!\n"); // Thrashin' reference
 
     return NULL;
 }
@@ -199,9 +199,9 @@ void interpret(char *line)
                        num_hits, num_steps);
                 mixer_add_euclidean(mixr, num_hits, num_steps);
             }
-            else if (strncmp("digi", wurds[1], 4) == 0
-                    || strncmp("dsynth", wurds[1], 6) == 0
-                    || strncmp("ssynth", wurds[1], 6) == 0)
+            else if (strncmp("digi", wurds[1], 4) == 0 ||
+                     strncmp("dsynth", wurds[1], 6) == 0 ||
+                     strncmp("ssynth", wurds[1], 6) == 0)
             {
                 if (strlen(wurds[2]) != 0)
                 {
@@ -221,8 +221,8 @@ void interpret(char *line)
                     printf("Need to give me a sample name for a digisynth..\n");
                 }
             }
-            else if (strncmp("fm", wurds[1], 2) == 0
-                    || strncmp("dx", wurds[1], 2) == 0)
+            else if (strncmp("fm", wurds[1], 2) == 0 ||
+                     strncmp("dx", wurds[1], 2) == 0)
             {
                 int sgnum = add_dxsynth(mixr);
                 mixr->midi_control_destination = SYNTH;
@@ -234,10 +234,11 @@ void interpret(char *line)
                                                num_wurds);
                 }
             }
-            else if (strncmp("granulator", wurds[1], 10) == 0
-                    || strncmp("gran", wurds[1], 4) == 0)
+            else if (strncmp("granulator", wurds[1], 10) == 0 ||
+                     strncmp("gran", wurds[1], 4) == 0)
             {
-                if (is_valid_file(wurds[2]) || strncmp(wurds[2], "none", 4) == 0)
+                if (is_valid_file(wurds[2]) ||
+                    strncmp(wurds[2], "none", 4) == 0)
                 {
                     printf("VALID!\n");
                     int soundgen_num = add_granulator(mixr, wurds[1]);
@@ -295,7 +296,8 @@ void interpret(char *line)
             }
             else if (strncmp("looper", wurds[1], 6) == 0)
             {
-                if (is_valid_file(wurds[2]) || strncmp(wurds[2], "none", 4) == 0)
+                if (is_valid_file(wurds[2]) ||
+                    strncmp(wurds[2], "none", 4) == 0)
                 {
                     int loop_len = atoi(wurds[3]);
                     if (!loop_len)
@@ -332,8 +334,8 @@ void interpret(char *line)
                 if (is_valid_file(wurds[2]))
                 {
                     sample_sequencer *s = new_sample_seq(wurds[2]);
-                    char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 3,
-                                                     num_wurds);
+                    char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds,
+                                                     3, num_wurds);
                     int sgnum = add_sound_generator(
                         mixr,
                         (soundgenerator *)s); //  add_seq_char_pattern(mixr,
@@ -344,7 +346,7 @@ void interpret(char *line)
 
                     printf("New SG at pos %d\n", sgnum);
                 }
-            free(pattern);
+                free(pattern);
             }
         }
 

@@ -12,6 +12,7 @@ enum pattern_token_type
     CURLY_BRACKET_RIGHT,
     PAREN_BRACKET_LEFT,
     PAREN_BRACKET_RIGHT,
+    BLANK,
     VAR_NAME
 } pattern_token_type;
 
