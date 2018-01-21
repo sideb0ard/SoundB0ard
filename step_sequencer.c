@@ -172,7 +172,7 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern,
     int pattern[s->pattern_len];
     char const *sep = " ";
 
-    printf("GOtz char_pattern %s\n", char_pattern);
+    //printf("GOtz char_pattern %s\n", char_pattern);
 
     // extract numbers from string into pattern
     for (sp = strtok_r(char_pattern, sep, &sp_last); sp;

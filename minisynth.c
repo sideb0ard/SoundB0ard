@@ -109,9 +109,12 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_eg1_dca_enabled = true;
 
-    ms->m_settings.m_attack_time_msec = EG_DEFAULT_STATE_TIME;
-    ms->m_settings.m_decay_time_msec = EG_DEFAULT_STATE_TIME;
-    ms->m_settings.m_release_time_msec = EG_DEFAULT_STATE_TIME;
+    //ms->m_settings.m_attack_time_msec = EG_DEFAULT_STATE_TIME;
+    //ms->m_settings.m_decay_time_msec = EG_DEFAULT_STATE_TIME;
+    //ms->m_settings.m_release_time_msec = EG_DEFAULT_STATE_TIME;
+    ms->m_settings.m_attack_time_msec = 552;
+    ms->m_settings.m_decay_time_msec = 2953;
+    ms->m_settings.m_release_time_msec = 4330;
 
     ms->m_settings.m_pulse_width_pct = OSC_PULSEWIDTH_DEFAULT;
     ms->m_settings.m_octave = 1;
