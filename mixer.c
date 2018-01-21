@@ -186,7 +186,6 @@ void mixer_ps(mixer *mixr)
     {
         if (mixr->sound_generators[i] != NULL)
         {
-            printf("not NULL!\n");
             wchar_t wss[MAX_PS_STRING_SZ];
             memset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
