@@ -118,6 +118,7 @@ typedef struct granulator
     double loop_len; // bars
 
     bool scramble_mode;
+    int cur_sixteenth; // used to track scramble
 
     double vol;
 } granulator;

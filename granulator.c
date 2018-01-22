@@ -129,7 +129,14 @@ void granulator_event_notify(void *self, unsigned int event_type)
                 new_read_idx = (g->audio_buffer_len-1) - new_read_idx;
             if (g->num_channels == 2)
                 new_read_idx -= ((int)new_read_idx & 1);
-            g->audio_buffer_read_idx = new_read_idx;
+
+            if (g->scramble_mode)
+            {
+                double rel_pos_within_sixteenth = (int) new_read_idx % mixr->timing_info.frames_per_midi_tick;
+                g->audio_buffer_read_idx += rel_pos_within_sixteenth;
+            }
+            else
+                g->audio_buffer_read_idx = new_read_idx;
         }
 
         if (g->sequencer_mode && g->m_seq.num_patterns > 0)
@@ -158,24 +165,28 @@ void granulator_event_notify(void *self, unsigned int event_type)
         }
         if (g->scramble_mode)
         {
-            if (mixr->timing_info.sixteenth_note_tick % 16 == 0)
-                printf("Beginning!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 1)
-                printf("2nd!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 2)
-                printf("3rd!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 3)
-                printf("4th!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 4)
-                printf("5th!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 5)
-                printf("6th!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 6)
-                printf("7th!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 7)
-                printf("8th!\n");
-            else if (mixr->timing_info.sixteenth_note_tick % 16 == 8)
-                printf("HALF!\n");
+            int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
+            g->cur_sixteenth = cur_sixteenth;
+
+            printf("CUR SIXTEENTH!\n");
+            switch(cur_sixteenth) {
+            case(0):
+                g->audio_buffer_read_idx = 0;
+                break;
+            case(6):
+                if (rand() %2)
+                {
+                    printf("JAUMP!!\n");
+                    g->cur_sixteenth = 0;
+                    g->audio_buffer_read_idx = 0;
+                    break;
+                }
+                // else fall through
+            default:
+                g->audio_buffer_read_idx = mixr->timing_info.frames_per_midi_tick * cur_sixteenth;
+                printf("READ IDX = %f\n", g->audio_buffer_read_idx);
+                break;
+            }
         }
     }
 }
