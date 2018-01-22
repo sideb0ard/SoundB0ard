@@ -82,6 +82,7 @@ mixer *new_mixer(double output_latency)
     // the lifetime of these booleans is a single sample
 
     mixr->timing_info.midi_tick = -1;
+    mixr->timing_info.sixteenth_note_tick = -1;
     mixr->timing_info.loop_beat = 0;
     mixr->timing_info.time_of_next_midi_tick = 0;
     mixr->timing_info.has_started = false;
@@ -274,10 +275,6 @@ void mixer_update_bpm(mixer *mixr, int bpm)
         mixr->timing_info.size_of_sixteenth_note * 2;
     mixr->timing_info.size_of_quarter_note =
         mixr->timing_info.size_of_eighth_note * 2;
-
-    // mixr->timing_info.sixteenth_note_tick = -1;
-    // mixr->timing_info.midi_tick = -1;
-    // mixr->timing_info.cur_sample = 0;
 
     for (int i = 0; i < mixr->soundgen_num; i++)
     {

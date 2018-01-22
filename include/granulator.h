@@ -115,7 +115,9 @@ typedef struct granulator
     bool lfo4_sync;
 
     bool loop_mode;
-    int loop_len; // bars
+    double loop_len; // bars
+
+    bool scramble_mode;
 
     double vol;
 } granulator;
@@ -151,7 +153,9 @@ void granulator_set_envelope_mode(granulator *g, unsigned int mode);
 void granulator_set_movement_mode(granulator *g, bool b);
 void granulator_set_reverse_mode(granulator *g, bool b);
 void granulator_set_loop_mode(granulator *g, bool b);
-void granulator_set_loop_len(granulator *g, int bars);
+void granulator_set_loop_len(granulator *g, double bars);
+void granulator_set_scramble_mode(granulator *g, bool b);
+
 int granulator_get_available_grain_num(granulator *g);
 int granulator_count_active_grains(granulator *g);
 

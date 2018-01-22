@@ -298,12 +298,13 @@ void interpret(char *line)
 
                 free(pattern);
             }
-            else if (strncmp("looper", wurds[1], 6) == 0)
+            else if (strncmp("looper", wurds[1], 6) == 0
+                    || strncmp("loop", wurds[1], 4) == 0)
             {
                 if (is_valid_file(wurds[2]) ||
                     strncmp(wurds[2], "none", 4) == 0)
                 {
-                    int loop_len = atoi(wurds[3]);
+                    double loop_len = atof(wurds[3]);
                     if (!loop_len)
                         loop_len = 1;
                     // int soundgen_num = add_looper(mixr, wurds[1], loop_len);
@@ -989,8 +990,8 @@ void interpret(char *line)
                     }
                     else if (strncmp("loop_len", wurds[2], 8) == 0)
                     {
-                        int len = atoi(wurds[3]);
-                        printf("loop LEN is %d\n", mode);
+                        double len = atof(wurds[3]);
+                        printf("loop LEN is %f\n", len);
                         granulator_set_loop_len(g, len);
                     }
                     else if (strncmp("sequencer_mode", wurds[2], 13) == 0)
@@ -1202,154 +1203,104 @@ void interpret(char *line)
             {
                 int soundgen_num = atoi(wurds[1]);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)
+                    mixr->sound_generators[soundgen_num]->type == GRANULATOR_TYPE)
                 {
 
-                    looper *s = (looper *)mixr->sound_generators[soundgen_num];
+                    granulator *g = (granulator *)mixr->sound_generators[soundgen_num];
 
-                    if (strncmp("add", wurds[2], 6) == 0)
+                    if (strncmp("scramble", wurds[2], 8) == 0)
                     {
-                        if (is_valid_file(wurds[3]) ||
-                            strncmp(wurds[3], "none", 4) == 0)
-                        {
-                            int loop_len = atoi(wurds[4]);
-                            if (loop_len > 0)
-                            {
-                                looper_add_sample(s, wurds[3], loop_len);
-                            }
-                        }
+                        bool b = atoi(wurds[3]);
+                        granulator_set_scramble_mode(g, b);
+                        //if (strncmp(wurds[3], "every", 5) == 0)
+                        //{
+                        //    int num_gens = atoi(wurds[4]);
+                        //    if (num_gens > 0)
+                        //    {
+                        //        printf("Scrambling "
+                        //               "every %d n "
+                        //               "loops!\n",
+                        //               num_gens);
+                        //        looper_set_scramble_mode(s, true);
+                        //        s->scramble_every_n_loops = num_gens;
+                        //    }
+                        //    else
+                        //    {
+                        //        printf("Need a "
+                        //               "number for "
+                        //               "every "
+                        //               "'n'\n");
+                        //    }
+                        //}
+                        //else
+                        //{
+                        //    int max_gen = atoi(wurds[3]);
+                        //    if (max_gen > 0)
+                        //    {
+                        //        looper_set_max_generation(s, max_gen);
+                        //        looper_set_scramble_mode(s, true);
+                        //    }
+                        //    else
+                        //    {
+                        //        printf("Toggling "
+                        //               "scramble.."
+                        //               "\n");
+                        //        int new_mode = 1 - s->scramblrrr_mode;
+                        //        looper_set_scramble_mode(s, new_mode);
+                        //    }
+                        //}
                     }
-                    else if (strncmp("change", wurds[2], 6) == 0)
-                    {
-                        int sample_num = atoi(wurds[3]);
-                        if (is_valid_sample_num(s, sample_num))
-                        {
-                            if (strncmp("looplen", wurds[4], 8) == 0)
-                            {
-                                double looplen = atoi(wurds[5]);
-                                s->pending_loop_num = sample_num;
-                                s->pending_loop_size = looplen;
-                                s->change_loopsize_pending = true;
-                                printf("CHANGE PENDING\n");
-                            }
-                            else if (strncmp("numloops", wurds[4], 8) == 0)
-                            {
-                                int numloops = atoi(wurds[5]);
-                                if (numloops != 0)
-                                    looper_change_num_loops(s, sample_num,
-                                                            numloops);
-                            }
-                        }
-                    }
-                    else if (strncmp("multi", wurds[2], 5) == 0)
-                    {
-                        if (strncmp("true", wurds[3], 4) == 0)
-                        {
-                            looper_set_multi_sample_mode(s, true);
-                        }
-                        else if (strncmp("false", wurds[3], 5) == 0)
-                        {
-                            looper_set_multi_sample_mode(s, false);
-                        }
-                        printf("Sampler multi mode : %s\n",
-                               s->multi_sample_mode ? "true" : "false");
-                    }
-                    else if (strncmp("scramble", wurds[2], 8) == 0)
-                    {
-                        if (strncmp(wurds[3], "every", 5) == 0)
-                        {
-                            int num_gens = atoi(wurds[4]);
-                            if (num_gens > 0)
-                            {
-                                printf("Scrambling "
-                                       "every %d n "
-                                       "loops!\n",
-                                       num_gens);
-                                looper_set_scramble_mode(s, true);
-                                s->scramble_every_n_loops = num_gens;
-                            }
-                            else
-                            {
-                                printf("Need a "
-                                       "number for "
-                                       "every "
-                                       "'n'\n");
-                            }
-                        }
-                        else
-                        {
-                            int max_gen = atoi(wurds[3]);
-                            if (max_gen > 0)
-                            {
-                                looper_set_max_generation(s, max_gen);
-                                looper_set_scramble_mode(s, true);
-                            }
-                            else
-                            {
-                                printf("Toggling "
-                                       "scramble.."
-                                       "\n");
-                                int new_mode = 1 - s->scramblrrr_mode;
-                                looper_set_scramble_mode(s, new_mode);
-                            }
-                        }
-                    }
-                    else if (strncmp("stutter", wurds[2], 7) == 0)
-                    {
-                        if (strncmp(wurds[3], "every", 4) == 0)
-                        {
-                            int num_gens = atoi(wurds[4]);
-                            if (num_gens > 0)
-                            {
-                                printf("Stuttering "
-                                       "every %d n "
-                                       "loops!\n",
-                                       num_gens);
-                                looper_set_stutter_mode(s, true);
-                                s->stutter_every_n_loops = num_gens;
-                            }
-                            else
-                            {
-                                printf("Need a "
-                                       "number for "
-                                       "every "
-                                       "'n'\n");
-                            }
-                        }
-                        else if (strncmp(wurds[3], "for", 3) == 0)
-                        {
-                            int max_gen = atoi(wurds[3]);
-                            if (max_gen > 0)
-                            {
-                                looper_set_max_generation(s, max_gen);
-                                looper_set_stutter_mode(s, true);
-                            }
-                            else
-                            {
-                                printf("Need a "
-                                       "number of "
-                                       "loops for "
-                                       "'for'\n");
-                            }
-                        }
-                        else if (strncmp(wurds[3], "true", 4) == 0)
-                            looper_set_stutter_mode(s, true);
-                        else if (strncmp(wurds[3], "false", 5) == 0)
-                            looper_set_stutter_mode(s, false);
-                        else
-                        {
-                            int new_mode = 1 - s->stutter_mode;
-                            printf("Toggling sTUTTER "
-                                   "to %s..\n",
-                                   new_mode ? "true" : "false");
-                            looper_set_stutter_mode(s, new_mode);
-                        }
-                    }
-                    else if (strncmp("switch", wurds[3], 6) == 0)
-                    {
-                        int sample_num = atoi(wurds[3]);
-                        looper_switch_sample(s, sample_num);
-                    }
+                    //else if (strncmp("stutter", wurds[2], 7) == 0)
+                    //{
+                    //    if (strncmp(wurds[3], "every", 4) == 0)
+                    //    {
+                    //        int num_gens = atoi(wurds[4]);
+                    //        if (num_gens > 0)
+                    //        {
+                    //            printf("Stuttering "
+                    //                   "every %d n "
+                    //                   "loops!\n",
+                    //                   num_gens);
+                    //            looper_set_stutter_mode(s, true);
+                    //            s->stutter_every_n_loops = num_gens;
+                    //        }
+                    //        else
+                    //        {
+                    //            printf("Need a "
+                    //                   "number for "
+                    //                   "every "
+                    //                   "'n'\n");
+                    //        }
+                    //    }
+                    //    else if (strncmp(wurds[3], "for", 3) == 0)
+                    //    {
+                    //        int max_gen = atoi(wurds[3]);
+                    //        if (max_gen > 0)
+                    //        {
+                    //            looper_set_max_generation(s, max_gen);
+                    //            looper_set_stutter_mode(s, true);
+                    //        }
+                    //        else
+                    //        {
+                    //            printf("Need a "
+                    //                   "number of "
+                    //                   "loops for "
+                    //                   "'for'\n");
+                    //        }
+                    //    }
+                    //    else if (strncmp(wurds[3], "true", 4) == 0)
+                    //        looper_set_stutter_mode(s, true);
+                    //    else if (strncmp(wurds[3], "false", 5) == 0)
+                    //        looper_set_stutter_mode(s, false);
+                    //    else
+                    //    {
+                    //        int new_mode = 1 - s->stutter_mode;
+                    //        printf("Toggling sTUTTER "
+                    //               "to %s..\n",
+                    //               new_mode ? "true" : "false");
+                    //        looper_set_stutter_mode(s, new_mode);
+                    //    }
+                    //}
                 }
             }
         }

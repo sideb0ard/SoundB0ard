@@ -36,6 +36,7 @@ granulator *new_granulator(char *filename)
 
     g->loop_mode = false;
     g->loop_len = 1;
+    g->scramble_mode = false;
 
     g->grain_pitch = 1;
     g->sequencer_mode = false;
@@ -119,9 +120,13 @@ void granulator_event_notify(void *self, unsigned int event_type)
         if (g->loop_mode)
         {
             int pulses_per_loop = PPBAR * g->loop_len;
+            //printf("PULSES PER LOOP %f\n", pulses_per_loop);
+
             double rel_pos = mixr->timing_info.midi_tick % pulses_per_loop;
             rel_pos = 100. / pulses_per_loop * rel_pos;
             double new_read_idx = g->audio_buffer_len / 100. * rel_pos;
+            if (g->reverse_mode)
+                new_read_idx = (g->audio_buffer_len-1) - new_read_idx;
             if (g->num_channels == 2)
                 new_read_idx -= ((int)new_read_idx & 1);
             g->audio_buffer_read_idx = new_read_idx;
@@ -150,6 +155,27 @@ void granulator_event_notify(void *self, unsigned int event_type)
             granulator_stop(g);
             playing = false;
             playing_midi_tick_count = 0;
+        }
+        if (g->scramble_mode)
+        {
+            if (mixr->timing_info.sixteenth_note_tick % 16 == 0)
+                printf("Beginning!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 1)
+                printf("2nd!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 2)
+                printf("3rd!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 3)
+                printf("4th!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 4)
+                printf("5th!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 5)
+                printf("6th!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 6)
+                printf("7th!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 7)
+                printf("8th!\n");
+            else if (mixr->timing_info.sixteenth_note_tick % 16 == 8)
+                printf("HALF!\n");
         }
     }
 }
@@ -289,8 +315,8 @@ void granulator_status(void *self, wchar_t *status_string)
 {
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[GRANULATOR] vol:%.2lf source:%s loop_mode:%s loop_len:%d "
-             L"extsource:%d len:%d stereo:%s\n"
+             L"[GRANULATOR] vol:%.2lf source:%s loop_mode:%s loop_len:%.2f "
+             "scramble_mode:%d extsource:%d len:%d stereo:%s\n"
              "      audio_buffer_read_idx:%d audio_buffer_write_idx:%d "
              "grain_duration_ms:%d grains_per_sec:%d\n"
              "      quasi_grain_fudge:%d grain_spray_ms:%.2f "
@@ -316,6 +342,7 @@ void granulator_status(void *self, wchar_t *status_string)
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
 
              g->vol, g->filename, g->loop_mode ? "true" : "false", g->loop_len,
+             g->scramble_mode,
              g->external_source_sg, g->audio_buffer_len,
              g->num_channels == 2 ? "true" : "false",
              (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
@@ -646,9 +673,18 @@ void granulator_set_loop_mode(granulator *g, bool b)
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->granular_spray_frames = 0;
     g->grain_duration_ms = 100;
+    g->vol = 0.7;
 }
 
-void granulator_set_loop_len(granulator *g, int bars)
+void granulator_set_scramble_mode(granulator *g, bool b)
+{
+    if (b)
+        granulator_set_loop_mode(g, b);
+
+    g->scramble_mode = b;
+}
+
+void granulator_set_loop_len(granulator *g, double bars)
 {
     if (bars != 0)
         g->loop_len = bars;
