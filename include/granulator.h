@@ -58,6 +58,7 @@ typedef struct granulator
     double *audio_buffer;
     int num_channels;
     int audio_buffer_len;
+    int size_of_sixteenth;
     double audio_buffer_read_idx;
     int audio_buffer_write_idx;
     int external_source_sg; // XOR - external or file
@@ -118,6 +119,7 @@ typedef struct granulator
     double loop_len; // bars
 
     bool scramble_mode;
+    int scramble_diff;
     int cur_sixteenth; // used to track scramble
 
     double vol;

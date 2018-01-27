@@ -56,6 +56,7 @@ granulator *new_granulator(char *filename)
     if (strncmp(filename, "none", 4) != 0)
         granulator_import_file(g, filename);
 
+    int len_of_16th = g->audio_buffer_len / 16.0;
     seq_init(&g->m_seq);
     granulator_set_sequencer_mode(g, false);
 
@@ -120,20 +121,20 @@ void granulator_event_notify(void *self, unsigned int event_type)
         if (g->loop_mode)
         {
             int pulses_per_loop = PPBAR * g->loop_len;
-            //printf("PULSES PER LOOP %f\n", pulses_per_loop);
+            // printf("PULSES PER LOOP %f\n", pulses_per_loop);
 
             double rel_pos = mixr->timing_info.midi_tick % pulses_per_loop;
             rel_pos = 100. / pulses_per_loop * rel_pos;
             double new_read_idx = g->audio_buffer_len / 100. * rel_pos;
             if (g->reverse_mode)
-                new_read_idx = (g->audio_buffer_len-1) - new_read_idx;
+                new_read_idx = (g->audio_buffer_len - 1) - new_read_idx;
             if (g->num_channels == 2)
                 new_read_idx -= ((int)new_read_idx & 1);
 
             if (g->scramble_mode)
             {
-                double rel_pos_within_sixteenth = (int) new_read_idx % mixr->timing_info.frames_per_midi_tick;
-                g->audio_buffer_read_idx += rel_pos_within_sixteenth;
+                g->audio_buffer_read_idx =
+                    new_read_idx + (g->scramble_diff * g->size_of_sixteenth);
             }
             else
                 g->audio_buffer_read_idx = new_read_idx;
@@ -165,27 +166,17 @@ void granulator_event_notify(void *self, unsigned int event_type)
         }
         if (g->scramble_mode)
         {
+            g->scramble_diff = 0;
             int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
-            g->cur_sixteenth = cur_sixteenth;
-
-            printf("CUR SIXTEENTH!\n");
-            switch(cur_sixteenth) {
-            case(0):
-                g->audio_buffer_read_idx = 0;
-                break;
-            case(6):
-                if (rand() %2)
-                {
-                    printf("JAUMP!!\n");
-                    g->cur_sixteenth = 0;
-                    g->audio_buffer_read_idx = 0;
-                    break;
-                }
-                // else fall through
-            default:
-                g->audio_buffer_read_idx = mixr->timing_info.frames_per_midi_tick * cur_sixteenth;
-                printf("READ IDX = %f\n", g->audio_buffer_read_idx);
-                break;
+            if (cur_sixteenth % 2 != 0)
+            {
+                int randy = rand() % 100;
+                if (randy < 25) // repeat the third 16th
+                    g->scramble_diff = 3 - cur_sixteenth;
+                else if (randy > 25 && randy < 50) // repeat the 4th sixteenth
+                    g->scramble_diff = 4 - cur_sixteenth;
+                else if (randy > 25 && randy < 50) // repeat the 7th sixteenth
+                    g->scramble_diff = 7 - cur_sixteenth;
             }
         }
     }
@@ -353,8 +344,7 @@ void granulator_status(void *self, wchar_t *status_string)
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
 
              g->vol, g->filename, g->loop_mode ? "true" : "false", g->loop_len,
-             g->scramble_mode,
-             g->external_source_sg, g->audio_buffer_len,
+             g->scramble_mode, g->external_source_sg, g->audio_buffer_len,
              g->num_channels == 2 ? "true" : "false",
              (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
              g->grain_duration_ms, g->grains_per_sec, g->quasi_grain_fudge,
@@ -567,6 +557,7 @@ void granulator_import_file(granulator *g, char *filename)
     g->num_channels = deetz.num_channels;
     g->external_source_sg = -1;
     g->have_active_buffer = true;
+    g->size_of_sixteenth = g->audio_buffer_len / 16;
 }
 
 void granulator_set_external_source(granulator *g, int sound_gen_num)

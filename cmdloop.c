@@ -298,8 +298,8 @@ void interpret(char *line)
 
                 free(pattern);
             }
-            else if (strncmp("looper", wurds[1], 6) == 0
-                    || strncmp("loop", wurds[1], 4) == 0)
+            else if (strncmp("looper", wurds[1], 6) == 0 ||
+                     strncmp("loop", wurds[1], 4) == 0)
             {
                 if (is_valid_file(wurds[2]) ||
                     strncmp(wurds[2], "none", 4) == 0)
@@ -1203,16 +1203,18 @@ void interpret(char *line)
             {
                 int soundgen_num = atoi(wurds[1]);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type == GRANULATOR_TYPE)
+                    mixr->sound_generators[soundgen_num]->type ==
+                        GRANULATOR_TYPE)
                 {
 
-                    granulator *g = (granulator *)mixr->sound_generators[soundgen_num];
+                    granulator *g =
+                        (granulator *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("scramble", wurds[2], 8) == 0)
                     {
                         bool b = atoi(wurds[3]);
                         granulator_set_scramble_mode(g, b);
-                        //if (strncmp(wurds[3], "every", 5) == 0)
+                        // if (strncmp(wurds[3], "every", 5) == 0)
                         //{
                         //    int num_gens = atoi(wurds[4]);
                         //    if (num_gens > 0)
@@ -1232,7 +1234,7 @@ void interpret(char *line)
                         //               "'n'\n");
                         //    }
                         //}
-                        //else
+                        // else
                         //{
                         //    int max_gen = atoi(wurds[3]);
                         //    if (max_gen > 0)
@@ -1250,7 +1252,7 @@ void interpret(char *line)
                         //    }
                         //}
                     }
-                    //else if (strncmp("stutter", wurds[2], 7) == 0)
+                    // else if (strncmp("stutter", wurds[2], 7) == 0)
                     //{
                     //    if (strncmp(wurds[3], "every", 4) == 0)
                     //    {
