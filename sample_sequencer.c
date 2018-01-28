@@ -209,7 +209,6 @@ sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
 
 void sample_seq_status(void *self, wchar_t *status_string)
 {
-    printf("STATUS!!!\n");
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              L"[SAMPLE SEQ] \"%s\" Vol:%.2lf Active:%s Morph:%s Pitch:%.2f",
@@ -221,7 +220,6 @@ void sample_seq_status(void *self, wchar_t *status_string)
     seq_status(&seq->m_seq, seq_status_string);
     wcscat(status_string, seq_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
-    printf("DONESTATUS!!!\n");
 }
 
 double sample_seq_getvol(void *self)
