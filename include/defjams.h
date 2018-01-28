@@ -19,7 +19,7 @@
 
 #define DEFAULT_ARRAY_SIZE 4
 
-#define MAX_PS_STRING_SZ 204800 // arbitrary
+#define MAX_PS_STRING_SZ 20480 // arbitrary
 
 #define ENVIRONMENT_ARRAY_SIZE 128
 #define ENVIRONMENT_KEY_SIZE 128
@@ -188,3 +188,10 @@ typedef struct stereo_val
     double left;
     double right;
 } stereo_val;
+
+typedef struct parceled_pattern
+{
+    unsigned int type;
+    unsigned int len;
+    int pattern[2*PPBAR]; // max size
+} parceled_pattern;

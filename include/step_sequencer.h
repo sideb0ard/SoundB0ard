@@ -11,7 +11,6 @@ typedef int seq_pattern[PPBAR];
 
 typedef struct sequencer
 {
-
     int sixteenth_tick;
     int midi_tick;
 
@@ -93,3 +92,7 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting);
 
 void seq_set_sloppiness(sequencer *s, int sloppy_setting);
 int sloppy_weight(sequencer *s, int position);
+
+parceled_pattern seq_get_pattern(sequencer *s, int pattern_num);
+void seq_set_pattern(sequencer *s, int pattern_num, parceled_pattern pattern);
+bool seq_is_valid_pattern(sequencer *s, int pattern_num);

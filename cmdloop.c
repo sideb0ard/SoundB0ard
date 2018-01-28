@@ -36,6 +36,7 @@
 #include "obliquestrategies.h"
 #include "oscillator.h"
 #include "pattern_parser.h"
+#include "pattern_transformers.h"
 #include "reverb.h"
 #include "sample_sequencer.h"
 #include "sequencer_utils.h"
@@ -178,6 +179,26 @@ void interpret(char *line)
                 printf("Changing KEY!\n");
                 mixr->key = key;
             }
+        }
+        else if (strncmp("<~", wurds[0], 2) == 0)
+        {
+            printf("LEFTSHIFFFFT!\n");
+            int sg_num;
+            int sg_pattern_num;
+            sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
+            if (mixer_is_valid_soundgen_num(mixr, sg_num))
+            {
+                soundgenerator *sg = (soundgenerator *) mixr->sound_generators[sg_num];
+                if (sg->is_valid_pattern(sg, sg_pattern_num))
+                {
+                    printf("Allgood, valid SG/Pattern\n");
+                    int places_to_shift = atoi(wurds[2]);
+                    printf("LEFT SHIFTING %d:%d by %d places\n", sg_num, sg_pattern_num, places_to_shift);
+                    //left_shift(sg->get_pattern(sg, sg_pattern_num), places_to_shift);
+                    sg->set_pattern(sg, sg_pattern_num, left_shift(sg->get_pattern(sg, sg_pattern_num), places_to_shift));
+                }
+            }
+
         }
         else if (strncmp("new", wurds[0], 3) == 0)
         {
@@ -349,7 +370,7 @@ void interpret(char *line)
                         &s->m_seq, pattern,
                         s->m_seq.patterns[s->m_seq.num_patterns++]);
 
-                    printf("New SG at pos %d\n", sgnum);
+                    printf("New SG at pos %d - has %d patterns\n", sgnum, s->m_seq.num_patterns);
                 }
                 free(pattern);
             }
@@ -381,6 +402,7 @@ void interpret(char *line)
 
         else if (strncmp("ps", wurds[0], 2) == 0)
         {
+            printf("CMD PS\n");
             mixer_ps(mixr);
         }
 

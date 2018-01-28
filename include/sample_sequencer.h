@@ -67,6 +67,7 @@ int get_a_sample_seq_position(sample_sequencer *ss);
 int sample_seq_get_num_tracks(void *s);
 void sample_seq_make_active_track(void *s, int track_num);
 void sample_seq_event_notify(void *s, unsigned int event_type);
+bool sample_sequencer_is_valid_pattern(void *self, int pattern_num);
 
 void sampleseq_del_self(void *self);
 void sample_seq_status(void *self, wchar_t *ss);
@@ -75,6 +76,8 @@ void sample_start(void *self);
 void sample_stop(void *self);
 stereo_val sample_seq_gennext(void *self);
 double sample_seq_getvol(void *self);
+parceled_pattern sample_seq_get_pattern(void *self, int pattern_num);
+void sample_seq_set_pattern(void *self, int pattern_num, parceled_pattern pattern);
 
 void sample_seq_import_file(sample_sequencer *s, char *filename);
 void sample_sequencer_reset_samples(sample_sequencer *seq);

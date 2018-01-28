@@ -410,10 +410,13 @@ void seq_print_pattern(sequencer *s, unsigned int pattern_num)
 
 bool seq_is_valid_pattern_num(sequencer *d, int pattern_num)
 {
+    printf("PATTERN NUM! %d (num_patterns:%d)\n", pattern_num, d->num_patterns);
     if (pattern_num >= 0 && pattern_num < d->num_patterns)
     {
+        printf("VAL!\n");
         return true;
     }
+    printf("NOT VAL?\n");
     return false;
 }
 
@@ -533,4 +536,51 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
 void seq_set_sloppiness(sequencer *s, int sloppy_setting)
 {
     s->sloppiness = sloppy_setting;
+}
+
+parceled_pattern seq_get_pattern(sequencer *s, int pattern_num)
+{
+    printf("\nSEQ_GET_PATTERN starting\n");
+    parceled_pattern return_pattern = {0};
+
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (return_pattern.pattern[i])
+            printf("SQUEAL!! GOTS VALUE!%d\n", return_pattern.pattern[i]);
+    }
+    if (seq_is_valid_pattern_num(s, pattern_num))
+    {
+        return_pattern.len = PPBAR;
+        for (int i = 0; i < PPBAR; i++)
+        {
+            if (s->patterns[pattern_num][i])
+            {
+                printf("SETTING %d\n", i);
+                return_pattern.pattern[i] = 1;
+            }
+        }
+    }
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (return_pattern.pattern[i])
+            printf("RETURN PATTERN SET AT %d\n", i);
+    }
+    printf("SEQ_GET_PATTERN DONE\n");
+    return return_pattern;
+}
+
+void seq_set_pattern(sequencer *s, int pattern_num, parceled_pattern pattern)
+{
+    printf("\nSEQ SET PATTERN STARTING!\n");
+    if (seq_is_valid_pattern_num(s, pattern_num))
+    {
+        printf("valid\n");
+        for (int i = 0; i < PPBAR; ++i)
+        {
+            s->patterns[pattern_num][i] = 0;
+            if (pattern.pattern[i])
+                s->patterns[pattern_num][i] = 1;
+        }
+    }
+    printf("SEQ SET PATTERN DONE!\n");
 }

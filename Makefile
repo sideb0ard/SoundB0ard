@@ -53,6 +53,7 @@ SRC = \
 	obliquestrategies.c \
 	oscillator.c \
 	pattern_parser.c \
+	pattern_transformers/pattern_transformers.c \
 	qblimited_oscillator.c \
 	reverb.c \
 	sample_oscillator.c \
@@ -99,7 +100,7 @@ all: objdir $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	mkdir -p obj/fx obj/filterz
+	mkdir -p obj/fx obj/filterz obj/pattern_transformers
 
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) -L$(LIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)

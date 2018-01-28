@@ -19,6 +19,9 @@ typedef struct soundgenerator
     int (*get_num_tracks)(void *self);
     void (*self_destruct)(void *self);
     void (*event_notify)(void *self, unsigned int event_type);
+    parceled_pattern (*get_pattern)(void *self, int pattern_num);
+    void (*set_pattern)(void *self, int pattern_num, parceled_pattern pattern);
+    bool (*is_valid_pattern)(void *self, int pattern_num);
 
     sound_generator_type type;
     bool active;

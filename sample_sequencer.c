@@ -39,9 +39,30 @@ sample_sequencer *new_sample_seq(char *filename)
     seq->sound_generator.make_active_track = &sample_seq_make_active_track;
     seq->sound_generator.self_destruct = &sampleseq_del_self;
     seq->sound_generator.event_notify = &sample_seq_event_notify;
+    seq->sound_generator.get_pattern = &sample_seq_get_pattern;
+    seq->sound_generator.set_pattern = &sample_seq_set_pattern;
+    seq->sound_generator.is_valid_pattern = &sample_sequencer_is_valid_pattern;
     seq->sound_generator.type = SEQUENCER_TYPE;
 
     return seq;
+}
+
+bool sample_sequencer_is_valid_pattern(void *self, int pattern_num)
+{
+    sample_sequencer *seq = (sample_sequencer *)self;
+    printf("INSIDE SAMPLE SEQ IS VALID - haz %d patterns\n", seq->m_seq.num_patterns);
+    return seq_is_valid_pattern_num(&seq->m_seq, pattern_num);
+}
+
+parceled_pattern sample_seq_get_pattern(void *self, int pattern_num)
+{
+    sample_sequencer *seq = (sample_sequencer *)self;
+    return seq_get_pattern(&seq->m_seq, pattern_num);
+}
+void sample_seq_set_pattern(void *self, int pattern_num, parceled_pattern pattern)
+{
+    sample_sequencer *seq = (sample_sequencer *)self;
+    return seq_set_pattern(&seq->m_seq, pattern_num, pattern);
 }
 
 void sample_seq_import_file(sample_sequencer *seq, char *filename)
@@ -188,6 +209,7 @@ sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
 
 void sample_seq_status(void *self, wchar_t *status_string)
 {
+    printf("STATUS!!!\n");
     sample_sequencer *seq = (sample_sequencer *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              L"[SAMPLE SEQ] \"%s\" Vol:%.2lf Active:%s Morph:%s Pitch:%.2f",
@@ -199,6 +221,7 @@ void sample_seq_status(void *self, wchar_t *status_string)
     seq_status(&seq->m_seq, seq_status_string);
     wcscat(status_string, seq_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
+    printf("DONESTATUS!!!\n");
 }
 
 double sample_seq_getvol(void *self)

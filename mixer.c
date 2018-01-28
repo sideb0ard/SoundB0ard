@@ -174,7 +174,7 @@ void mixer_ps(mixer *mixr)
         if (mixr->sequence_generators[i] != NULL)
         {
             wchar_t wss[MAX_PS_STRING_SZ];
-            memset(wss, 0, MAX_PS_STRING_SZ);
+            wmemset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sequence_generators[i]->status(mixr->sequence_generators[i],
                                                  wss);
             wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
@@ -188,7 +188,7 @@ void mixer_ps(mixer *mixr)
         if (mixr->sound_generators[i] != NULL)
         {
             wchar_t wss[MAX_PS_STRING_SZ];
-            memset(wss, 0, MAX_PS_STRING_SZ);
+            wmemset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sound_generators[i]->status(mixr->sound_generators[i], wss);
 
             wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
