@@ -1274,8 +1274,10 @@ void interpret(char *line)
                         //    }
                         //}
                     }
-                    // else if (strncmp("stutter", wurds[2], 7) == 0)
-                    //{
+                    else if (strncmp("stutter", wurds[2], 7) == 0)
+                    {
+                        bool b = atoi(wurds[3]);
+                        granulator_set_stutter_mode(g, b);
                     //    if (strncmp(wurds[3], "every", 4) == 0)
                     //    {
                     //        int num_gens = atoi(wurds[4]);
@@ -1324,7 +1326,7 @@ void interpret(char *line)
                     //               new_mode ? "true" : "false");
                     //        looper_set_stutter_mode(s, new_mode);
                     //    }
-                    //}
+                    }
                 }
             }
         }

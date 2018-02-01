@@ -120,6 +120,10 @@ typedef struct granulator
 
     bool scramble_mode;
     int scramble_diff;
+
+    bool stutter_mode;
+    int stutter_idx;
+
     int cur_sixteenth; // used to track scramble
 
     double vol;
@@ -158,6 +162,7 @@ void granulator_set_reverse_mode(granulator *g, bool b);
 void granulator_set_loop_mode(granulator *g, bool b);
 void granulator_set_loop_len(granulator *g, double bars);
 void granulator_set_scramble_mode(granulator *g, bool b);
+void granulator_set_stutter_mode(granulator *g, bool b);
 
 int granulator_get_available_grain_num(granulator *g);
 int granulator_count_active_grains(granulator *g);

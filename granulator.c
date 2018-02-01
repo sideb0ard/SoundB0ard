@@ -37,6 +37,8 @@ granulator *new_granulator(char *filename)
     g->loop_mode = false;
     g->loop_len = 1;
     g->scramble_mode = false;
+    g->stutter_mode = false;
+    g->stutter_idx = 0;
 
     g->grain_pitch = 1;
     g->sequencer_mode = false;
@@ -136,6 +138,13 @@ void granulator_event_notify(void *self, unsigned int event_type)
                 g->audio_buffer_read_idx =
                     new_read_idx + (g->scramble_diff * g->size_of_sixteenth);
             }
+            else if (g->stutter_mode)
+            {
+                int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
+                int rel_pos_within_a_sixteenth = new_read_idx - (cur_sixteenth * g->size_of_sixteenth);
+                g->audio_buffer_read_idx =
+                    (g->stutter_idx * g->size_of_sixteenth) + rel_pos_within_a_sixteenth;
+            }
             else
                 g->audio_buffer_read_idx = new_read_idx;
         }
@@ -178,6 +187,13 @@ void granulator_event_notify(void *self, unsigned int event_type)
                 else if (randy > 25 && randy < 50) // repeat the 7th sixteenth
                     g->scramble_diff = 7 - cur_sixteenth;
             }
+        }
+        if (g->stutter_mode)
+        {
+            if (rand() % 100 > 75)
+                g->stutter_idx++;
+            if (g->stutter_idx == 16)
+                g->stutter_idx = 0;
         }
     }
 }
@@ -318,7 +334,7 @@ void granulator_status(void *self, wchar_t *status_string)
     granulator *g = (granulator *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              L"[GRANULATOR] vol:%.2lf source:%s loop_mode:%s loop_len:%.2f "
-             "scramble_mode:%d extsource:%d len:%d stereo:%s\n"
+             "scramble_mode:%d stutter_mode:%d extsource:%d len:%d stereo:%s\n"
              "      audio_buffer_read_idx:%d audio_buffer_write_idx:%d "
              "grain_duration_ms:%d grains_per_sec:%d\n"
              "      quasi_grain_fudge:%d grain_spray_ms:%.2f "
@@ -344,7 +360,7 @@ void granulator_status(void *self, wchar_t *status_string)
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
 
              g->vol, g->filename, g->loop_mode ? "true" : "false", g->loop_len,
-             g->scramble_mode, g->external_source_sg, g->audio_buffer_len,
+             g->scramble_mode, g->stutter_mode, g->external_source_sg, g->audio_buffer_len,
              g->num_channels == 2 ? "true" : "false",
              (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
              g->grain_duration_ms, g->grains_per_sec, g->quasi_grain_fudge,
@@ -675,7 +691,6 @@ void granulator_set_loop_mode(granulator *g, bool b)
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->granular_spray_frames = 0;
     g->grain_duration_ms = 100;
-    g->vol = 0.7;
 }
 
 void granulator_set_scramble_mode(granulator *g, bool b)
@@ -684,6 +699,14 @@ void granulator_set_scramble_mode(granulator *g, bool b)
         granulator_set_loop_mode(g, b);
 
     g->scramble_mode = b;
+}
+
+void granulator_set_stutter_mode(granulator *g, bool b)
+{
+    if (b)
+        granulator_set_loop_mode(g, b);
+
+    g->stutter_mode = b;
 }
 
 void granulator_set_loop_len(granulator *g, double bars)
