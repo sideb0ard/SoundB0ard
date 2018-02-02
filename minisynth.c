@@ -490,6 +490,8 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
                             unsigned int velocity)
 {
 
+    synthbase *b = &ms->base;
+    b->last_midi_note = midinote;
     if (ms->m_settings.m_monophonic)
     {
         minisynth_voice *msv = ms->m_voices[0];
@@ -821,56 +823,53 @@ stereo_val minisynth_gennext(void *self)
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    if (ms->m_settings.m_generate_active &&
-        mixer_is_valid_seq_gen_num(mixr, ms->m_settings.m_generate_src))
+    //if (ms->m_settings.m_generate_active &&
+    //    mixer_is_valid_seq_gen_num(mixr, ms->m_settings.m_generate_src))
+    //{
+    //    sequence_generator *sg =
+    //        mixr->sequence_generators[ms->m_settings.m_generate_src];
+
+        //short nom_left;
+        //short nom_right;
+        //if (ms->base.sample_rate_counter == 0 ||
+        //    ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
+        //{
+        //    nom_left = bitshift_generate((void *)sg, NULL);
+        //    nom_right = bitshift_generate((void *)sg, NULL);
+
+        //    nom_left = (nom_left - 0x80) << 8;
+        //    nom_right = (nom_right - 0x80) << 8;
+
+        //    ms->base.cached_last_sample_left = nom_left;
+        //    ms->base.cached_last_sample_right = nom_right;
+        //}
+        //else
+        //{
+        //    nom_left = ms->base.cached_last_sample_left;
+        //    nom_right = ms->base.cached_last_sample_right;
+        //}
+
+        //ms->base.sample_rate_counter++;
+        //if (ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
+        //    ms->base.sample_rate_counter = 0;
+
+        //accum_out_left += scaleybum(-32768, 32787, -1, 1, nom_left);
+        //accum_out_right += scaleybum(-32768, 32787, -1, 1, nom_right);
+
+    float mix = 1.0 / MAX_VOICES;
+    if (ms->m_arp.active)
+        arpeggiate(ms, &ms->m_arp);
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    for (int i = 0; i < MAX_VOICES; i++)
     {
-        sequence_generator *sg =
-            mixr->sequence_generators[ms->m_settings.m_generate_src];
+        if (ms->m_voices[i])
+            minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
 
-        short nom_left;
-        short nom_right;
-        if (ms->base.sample_rate_counter == 0 ||
-            ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
-        {
-            nom_left = bitshift_generate((void *)sg, NULL);
-            nom_right = bitshift_generate((void *)sg, NULL);
-
-            nom_left = (nom_left - 0x80) << 8;
-            nom_right = (nom_right - 0x80) << 8;
-
-            ms->base.cached_last_sample_left = nom_left;
-            ms->base.cached_last_sample_right = nom_right;
-        }
-        else
-        {
-            nom_left = ms->base.cached_last_sample_left;
-            nom_right = ms->base.cached_last_sample_right;
-        }
-
-        ms->base.sample_rate_counter++;
-        if (ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
-            ms->base.sample_rate_counter = 0;
-
-        accum_out_left += scaleybum(-32768, 32787, -1, 1, nom_left);
-        accum_out_right += scaleybum(-32768, 32787, -1, 1, nom_right);
-    }
-    else
-    {
-        float mix = 1.0 / MAX_VOICES;
-        if (ms->m_arp.active)
-            arpeggiate(ms, &ms->m_arp);
-
-        double out_left = 0.0;
-        double out_right = 0.0;
-
-        for (int i = 0; i < MAX_VOICES; i++)
-        {
-            if (ms->m_voices[i])
-                minisynth_voice_gennext(ms->m_voices[i], &out_left, &out_right);
-
-            accum_out_left += mix * out_left;
-            accum_out_right += mix * out_right;
-        }
+        accum_out_left += mix * out_left;
+        accum_out_right += mix * out_right;
     }
 
     accum_out_left = effector(&ms->sound_generator, accum_out_left);

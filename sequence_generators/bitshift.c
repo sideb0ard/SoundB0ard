@@ -41,7 +41,7 @@ sequence_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
     bs->sg.generate = &bitshift_generate;
     bs->sg.event_notify = &bitshift_event_notify;
     bs->sg.type = BITSHIFT;
-
+    bs->time_counter = 1023; // init value, rather than 0
     return (sequence_generator *)bs;
 }
 void token_val_to_string(bitshift_token *t, char *char_val)

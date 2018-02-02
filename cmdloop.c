@@ -1526,49 +1526,61 @@ void interpret(char *line)
                     {
                         keys(soundgen_num);
                     }
-                    else if (strncmp("generate", wurds[2], 8) == 0)
+                    else if (strncmp("generate", wurds[2], 8) == 0
+                            || strncmp("gen", wurds[2], 3) == 0)
                     {
-                        if (strncmp("every", wurds[3], 5) == 0)
+                        if (strncmp("src", wurds[3], 3) == 0)
                         {
-                            int num_gens = atoi(wurds[4]);
-                            if (num_gens > 0)
-                            {
-                                synthbase_set_generate_mode(base, true);
-                                base->generate_every_n_loops = num_gens;
-                            }
-                            else
-                            {
-                                printf("Need a number for every 'n'\n");
-                            }
-                        }
-                        else if (strncmp("for", wurds[3], 3) == 0)
-                        {
-                            int num_gens = atoi(wurds[4]);
-                            if (num_gens > 0)
-                            {
-                                synthbase_set_generate_mode(base, true);
-                                base->max_generation = num_gens;
-                            }
-                            else
-                            {
-                                printf("Need a "
-                                       "number for "
-                                       "'for'\n");
-                            }
-                        }
-                        else if (strncmp("false", wurds[3], 5) == 0)
-                        {
-                            printf("Disabling generate mode\n");
-                            synthbase_set_generate_mode(base, false);
+                            int src = atoi(wurds[4]);
+                            printf("GEN SRC! %d\n", src);
+                            synthbase_set_generate_src(base, src);
                         }
                         else
                         {
-                            int melody_num = atoi(wurds[3]);
-                            int max_notes = atoi(wurds[4]);
-                            int max_steps = atoi(wurds[5]);
-                            synthbase_generate_melody(base, melody_num,
-                                                      max_notes, max_steps);
+                            bool b = atoi(wurds[3]);
+                            synthbase_set_generate_mode(base, b);
                         }
+                        //if (strncmp("every", wurds[3], 5) == 0)
+                        //{
+                        //    int num_gens = atoi(wurds[4]);
+                        //    if (num_gens > 0)
+                        //    {
+                        //        synthbase_set_generate_mode(base, true);
+                        //        base->generate_every_n_loops = num_gens;
+                        //    }
+                        //    else
+                        //    {
+                        //        printf("Need a number for every 'n'\n");
+                        //    }
+                        //}
+                        //else if (strncmp("for", wurds[3], 3) == 0)
+                        //{
+                        //    int num_gens = atoi(wurds[4]);
+                        //    if (num_gens > 0)
+                        //    {
+                        //        synthbase_set_generate_mode(base, true);
+                        //        base->max_generation = num_gens;
+                        //    }
+                        //    else
+                        //    {
+                        //        printf("Need a "
+                        //               "number for "
+                        //               "'for'\n");
+                        //    }
+                        //}
+                        //else if (strncmp("false", wurds[3], 5) == 0)
+                        //{
+                        //    printf("Disabling generate mode\n");
+                        //    synthbase_set_generate_mode(base, false);
+                        //}
+                        //else
+                        //{
+                        //    int melody_num = atoi(wurds[3]);
+                        //    int max_notes = atoi(wurds[4]);
+                        //    int max_steps = atoi(wurds[5]);
+                        //    synthbase_generate_melody(base, melody_num,
+                        //                              max_notes, max_steps);
+                        //}
                     }
                     else if (strncmp("morph", wurds[2], 8) == 0)
                     {
@@ -2993,23 +3005,23 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_decay_time_ms(ms, val);
         return true;
     }
-    else if (strncmp("gen", wurds[2], 4) == 0)
-    {
-        if (strncmp(wurds[3], "source", 6) == 0 ||
-            strncmp(wurds[3], "src", 3) == 0)
-        {
-            int src = atoi(wurds[4]);
-            printf("Changing BITSHIFT SRC: %d\n", src);
-            minisynth_set_generate_src(ms, src);
-        }
-        else
-        {
-            bool b = atof(wurds[3]);
-            printf("Minisynth BITSHIFT %s!\n", b ? "true" : "false");
-            minisynth_set_generate(ms, b);
-        }
-        return true;
-    }
+    //else if (strncmp("gen", wurds[2], 4) == 0)
+    //{
+    //    if (strncmp(wurds[3], "source", 6) == 0 ||
+    //        strncmp(wurds[3], "src", 3) == 0)
+    //    {
+    //        int src = atoi(wurds[4]);
+    //        printf("Changing BITSHIFT SRC: %d\n", src);
+    //        minisynth_set_generate_src(ms, src);
+    //    }
+    //    else
+    //    {
+    //        bool b = atof(wurds[3]);
+    //        printf("Minisynth BITSHIFT %s!\n", b ? "true" : "false");
+    //        minisynth_set_generate(ms, b);
+    //    }
+    //    return true;
+    //}
     else if (strncmp("releasems", wurds[2], 7) == 0)
     {
         printf("Minisynth change Release Time MS!\n");
