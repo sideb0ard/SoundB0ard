@@ -44,7 +44,8 @@ granulator *new_granulator(char *filename)
     g->sequencer_mode = false;
 
     g->sound_generator.gennext = &granulator_gennext;
-    g->sound_generator.status = &granulator_status;
+    g->sound_generator.ps_status = &granulator_status;
+    g->sound_generator.full_status = &granulator_status;
     g->sound_generator.getvol = &granulator_getvol;
     g->sound_generator.setvol = &granulator_setvol;
     g->sound_generator.start = &granulator_start;

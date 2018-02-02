@@ -22,7 +22,8 @@ algorithm *new_algorithm(char *line)
     }
 
     a->sound_generator.gennext = &algorithm_gennext;
-    a->sound_generator.status = &algorithm_status;
+    a->sound_generator.ps_status = &algorithm_status;
+    a->sound_generator.full_status = &algorithm_status;
     a->sound_generator.setvol = &algorithm_setvol;
     a->sound_generator.getvol = &algorithm_getvol;
     a->sound_generator.start = &algorithm_start;

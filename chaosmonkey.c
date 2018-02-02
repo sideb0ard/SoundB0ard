@@ -28,7 +28,8 @@ chaosmonkey *new_chaosmonkey(int soundgen)
     lfo_start_oscillator((oscillator *)&cm->m_lfo);
 
     cm->sound_generator.gennext = &chaosmonkey_gennext;
-    cm->sound_generator.status = &chaosmonkey_status;
+    cm->sound_generator.ps_status = &chaosmonkey_status;
+    cm->sound_generator.full_status = &chaosmonkey_status;
     cm->sound_generator.setvol = &chaosmonkey_setvol;
     cm->sound_generator.type = CHAOSMONKEY_TYPE;
 

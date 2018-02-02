@@ -10,7 +10,8 @@
 typedef struct soundgenerator
 {
     stereo_val (*gennext)(void *self);
-    void (*status)(void *self, wchar_t *wstring);
+    void (*ps_status)(void *self, wchar_t *wstring);
+    void (*full_status)(void *self, wchar_t *wstring);
     void (*setvol)(void *self, double val);
     double (*getvol)(void *self);
     void (*start)(void *self);

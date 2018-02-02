@@ -189,13 +189,13 @@ void euclidean_event_notify(void *self, unsigned int event_type)
             switch(dice){
             case(0):
                 e->actual_num_hits = 3;
+                break;
             case(1):
                 e->actual_num_hits = 4;
+                break;
             case(2):
-                e->actual_num_hits = 7;
-            case(3):
             default:
-                e->actual_num_hits = 11;
+                e->actual_num_hits = 7;
             }
         }
     }

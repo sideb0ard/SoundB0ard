@@ -21,7 +21,8 @@ digisynth *new_digisynth(char *filename)
     ds->vol = 1.0;
 
     ds->sound_generator.gennext = &digisynth_gennext;
-    ds->sound_generator.status = &digisynth_status;
+    ds->sound_generator.ps_status = &digisynth_status;
+    ds->sound_generator.full_status = &digisynth_status;
     ds->sound_generator.setvol = &digisynth_setvol;
     ds->sound_generator.getvol = &digisynth_getvol;
     ds->sound_generator.start = &digisynth_sg_start;

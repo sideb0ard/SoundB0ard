@@ -16,7 +16,8 @@ metronome *new_metronome()
     printf("New Metronome!\n");
 
     m->sound_generator.gennext = &metronome_gennext;
-    m->sound_generator.status = &metronome_status;
+    m->sound_generator.ps_status = &metronome_status;
+    m->sound_generator.full_status = &metronome_status;
     m->sound_generator.setvol = &metronome_setvol;
     m->sound_generator.getvol = &metronome_getvol;
     m->sound_generator.start = &metronome_start;

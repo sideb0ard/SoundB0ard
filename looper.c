@@ -23,7 +23,8 @@ looper *new_looper(char *filename, double loop_len)
     looper_add_sample(l, filename, loop_len);
 
     l->sound_generator.gennext = &looper_gennext;
-    l->sound_generator.status = &looper_status;
+    l->sound_generator.ps_status = &looper_status;
+    l->sound_generator.full_status = &looper_status;
     l->sound_generator.getvol = &looper_getvol;
     l->sound_generator.setvol = &looper_setvol;
     l->sound_generator.start = &looper_start;

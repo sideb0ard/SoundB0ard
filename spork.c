@@ -17,7 +17,8 @@ spork *new_spork(double freq)
     wt_initialize(&s->m_osc);
 
     s->sg.gennext = &spork_gennext;
-    s->sg.status = &spork_status;
+    s->sg.ps_status = &spork_status;
+    s->sg.full_status = &spork_status;
     s->sg.getvol = &spork_getvol;
     s->sg.setvol = &spork_setvol;
     s->sg.start = &spork_start;

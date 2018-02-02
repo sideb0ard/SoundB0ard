@@ -62,12 +62,8 @@ extern wtable *wave_tables[5];
 // TODO(find a fix)
 char const *prompt = "SB#> ";
 
-void *loopy(void *arg)
+static void print_logo()
 {
-    read_history(NULL);
-
-    setlocale(LC_ALL, "");
-
     printf(
         ANSI_COLOR_WHITE
         "Welcome to...\n" COOL_COLOR_GREEN
@@ -78,6 +74,15 @@ void *loopy(void *arg)
         "/\\__/ / (_) | |_| | | | | (_| | |_) \\ |_/ / (_| | | | (_| |\n"
         "\\____/ \\___/ \\__,_|_| |_|\\__,_|_.__/ \\___/ \\__,_|_|  "
         "\\__,_|\n\n" ANSI_COLOR_RESET);
+}
+
+void *loopy(void *arg)
+{
+    read_history(NULL);
+
+    setlocale(LC_ALL, "");
+
+    print_logo();
 
     char *line;
     while ((line = readline(prompt)) != NULL)
@@ -131,6 +136,19 @@ void interpret(char *line)
             if (bpm > 0)
                 mixer_update_bpm(mixr, bpm);
         }
+
+        else if (strncmp("info", wurds[0], 4) == 0)
+        {
+            int sg = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, sg))
+            {
+                wchar_t wss[MAX_PS_STRING_SZ];
+                wmemset(wss, 0, MAX_PS_STRING_SZ);
+                mixr->sound_generators[sg]->full_status(mixr->sound_generators[sg], wss);
+                wprintf(L"%ls\n", wss);
+            }
+        }
+
 
         else if (strncmp("metronome", wurds[0], 9) == 0)
         {

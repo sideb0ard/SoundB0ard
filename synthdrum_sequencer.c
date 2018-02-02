@@ -82,7 +82,8 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->m_distortion_threshold = 0.707;
 
     sds->sg.gennext = &sds_gennext;
-    sds->sg.status = &sds_status;
+    sds->sg.ps_status = &sds_status;
+    sds->sg.full_status = &sds_status;
     sds->sg.getvol = &sds_getvol;
     sds->sg.setvol = &sds_setvol;
     sds->sg.start = &sds_start;
