@@ -1963,6 +1963,23 @@ void interpret(char *line)
                 add_bitcrush_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
+        else if (strncmp("sidechain", wurds[0], 9) == 0)
+        {
+            int dest_soundgen_num = atoi(wurds[1]);
+            int src_soundgen_num = atoi(wurds[2]);
+            if (mixer_is_valid_soundgen_num(mixr, dest_soundgen_num) &&
+                mixer_is_valid_soundgen_num(mixr, src_soundgen_num))
+            {
+                int fxnum = add_compressor_soundgen(
+                    mixr->sound_generators[dest_soundgen_num]);
+                dynamics_processor *dp =
+                    (dynamics_processor *)mixr
+                        ->sound_generators[dest_soundgen_num]
+                        ->effects[fxnum];
+                dynamics_processor_set_external_source(dp, src_soundgen_num);
+                dynamics_processor_set_default_sidechain_params(dp);
+            }
+        }
         else if (strncmp("compressor", wurds[0], 10) == 0)
         {
             int soundgen_num = atoi(wurds[1]);

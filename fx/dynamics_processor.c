@@ -312,5 +312,5 @@ void dynamics_processor_set_default_sidechain_params(dynamics_processor *dp)
     dynamics_processor_set_threshold(dp, -36);
     dynamics_processor_set_attack_ms(dp, 1);
     dynamics_processor_set_release_ms(dp, 55);
-    dynamics_processor_set_ratio(dp, 1.5);
+    dynamics_processor_set_ratio(dp, 2.5);
 }
