@@ -9,12 +9,12 @@
 
 extern mixer *mixr;
 
-algorithm *new_algorithm(char *line)
+algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     algorithm *a = (algorithm *)calloc(1, sizeof(algorithm));
 
     printf("New algorithm!\n");
-    if (extract_cmds_from_line(a, line))
+    if (extract_cmds_from_line(a, num_wurds, wurds))
     {
         printf("Couldn't part commands from line\n");
         free(a);
@@ -36,53 +36,45 @@ algorithm *new_algorithm(char *line)
 
 void algorithm_event_notify(void *self, unsigned int event_type)
 {
-    (void)self;
-    (void)event_type;
+    algorithm *a = (algorithm*) self;
+
+    switch(event_type){
+        case(TIME_MIDI_TICK):
+            if (a->frequency == TIME_MIDI_TICK)
+                printf("beep!\n");
+            break;
+        case(TIME_THIRTYSECOND_TICK):
+            if (a->frequency == TIME_THIRTYSECOND_TICK)
+                printf("beep!\n");
+            break;
+        case(TIME_SIXTEENTH_TICK):
+            if (a->frequency == TIME_SIXTEENTH_TICK)
+                printf("beep!\n");
+            break;
+        case(TIME_EIGHTH_TICK):
+            if (a->frequency == TIME_EIGHTH_TICK)
+                printf("beep!\n");
+            break;
+        case(TIME_QUARTER_TICK):
+            if (a->frequency == TIME_QUARTER_TICK)
+                printf("beep!\n");
+            break;
+        case(TIME_START_OF_LOOP_TICK):
+            if (a->frequency == TIME_START_OF_LOOP_TICK)
+                printf("beep!\n");
+            break;
+    }
 }
 
-int extract_cmds_from_line(algorithm *self, char *line)
+int extract_cmds_from_line(algorithm *a, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
-    printf("Extracting commands from %s\n", line);
-    int num_cmds = 0;
 
-    char *cmd, *last_s;
-    char const *sep = ";";
-    for (cmd = strtok_r(line, sep, &last_s); cmd;
-         cmd = strtok_r(NULL, sep, &last_s))
+    for (int i = 0; i < num_wurds; i++)
     {
 
-        printf("Cmd: %s\n", cmd);
+        printf("Cmd: %s\n", wurds[i]);
+    }
 
-        if (strncmp("every loop", cmd, 10) == 0 && num_cmds == 0)
-        {
-            self->frequency = LOOP;
-            num_cmds++;
-            printf("Every LOOP numcmds: %d\n", num_cmds);
-        }
-        else if (num_cmds == 1)
-        {
-            strncpy(self->command, cmd, MAX_CMD_LEN);
-            printf("CMD %s\n", cmd);
-            num_cmds++;
-        }
-        else if (num_cmds == 2)
-        {
-            int num_scanned =
-                sscanf(cmd, "%s %s %s %s %s", self->afterthought[0],
-                       self->afterthought[1], self->afterthought[2],
-                       self->afterthought[3], self->afterthought[4]);
-            printf("AFTERTHOUGHT %s (scanned %d)\n", cmd, num_scanned);
-            if (num_scanned == 5 && strncmp("%", self->afterthought[3], 2) == 0)
-            {
-                num_cmds++;
-            }
-        }
-    }
-    if (num_cmds != 3)
-    {
-        printf("DONK! Doesn't have 3 commands\n");
-        return 1;
-    }
     return 0;
 }
 

@@ -6,9 +6,9 @@
 #include "sound_generator.h"
 
 #define MAX_CMDS 10
-#define MAX_CMD_LEN 64
+#define MAX_CMD_LEN 4096
 
-typedef enum { TICK, S16TH, LOOP } frequency;
+//typedef enum { TICK, S16TH, LOOP } frequency;
 
 typedef struct algorithm
 {
@@ -20,9 +20,8 @@ typedef struct algorithm
     bool active;
 } algorithm;
 
-algorithm *new_algorithm(char *line);
-
-int extract_cmds_from_line(algorithm *self, char *line);
+algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD]);
+int extract_cmds_from_line(algorithm *a, int num_wurds, char wurds[][SIZE_OF_WURD]);
 void algorithm_replace_vars_in_cmd(char *updated_cmd, char *stored_cmd);
 void algorithm_process_afterthought(algorithm *self);
 

@@ -413,9 +413,9 @@ int mixer_add_metronome(mixer *mixr)
     return add_sound_generator(mixr, (soundgenerator *)m);
 }
 
-int add_algorithm(char *line)
+int add_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
-    algorithm *a = new_algorithm(line);
+    algorithm *a = new_algorithm(num_wurds, wurds);
     return add_sound_generator(mixr, (soundgenerator *)a);
 }
 

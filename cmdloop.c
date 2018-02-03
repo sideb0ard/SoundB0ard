@@ -220,7 +220,14 @@ void interpret(char *line)
         }
         else if (strncmp("new", wurds[0], 3) == 0)
         {
-            if (strncmp("bitshift", wurds[1], 4) == 0)
+            if (strncmp("algo", wurds[1], 4) == 0)
+            {
+                printf("NUM WURDS!%d\n", num_wurds);
+                for (int i = 0; i < num_wurds; i++)
+                    printf("wurd: %s\n", wurds[i]);
+                add_algorithm(num_wurds - 2, &wurds[2]);
+            }
+            else if (strncmp("bitshift", wurds[1], 4) == 0)
             {
                 printf("BITSHIFT! SEQUENCE GEN!\n");
                 mixer_add_bitshift(mixr, num_wurds - 2, &wurds[2]);
@@ -2361,12 +2368,11 @@ void interpret(char *line)
             update_environment(wurds[1], atoi(wurds[3]));
         }
 
-        else if (strncmp("every", wurds[0], 5) == 0 &&
-                 strncmp("loop", wurds[1], 4) == 0)
-        {
-            printf("Starting an algorithm - with %s!\n", cmd);
-            add_algorithm(cmd);
-        }
+        //else if (strncmp("every", wurds[0], 5) == 0 &&
+        //         strncmp("loop", wurds[1], 4) == 0)
+        //{
+        //    printf("Starting an algorithm - with %s!\n", cmd);
+        //}
 
         else if (strncmp("beat", wurds[0], 4) == 0)
         {

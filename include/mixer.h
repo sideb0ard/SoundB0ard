@@ -110,7 +110,7 @@ int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 
 int mixer_add_metronome(mixer *mixr);
 
-int add_algorithm(char *line);
+int add_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD]);
 int add_bytebeat(mixer *mixr, char *pattern);
 int mixer_add_spork(mixer *mixr, double freq);
 int add_chaosmonkey(int soundgen);
