@@ -2048,9 +2048,13 @@ void interpret(char *line)
         else if (strncmp("waveshape", wurds[0], 6) == 0)
         {
             int soundgen_num = atoi(wurds[1]);
+            int val = atoi(wurds[2]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                add_waveshape_soundgen(mixr->sound_generators[soundgen_num]);
+                int fxnum = add_waveshape_soundgen(mixr->sound_generators[soundgen_num]);
+                waveshaper *w = (waveshaper*) mixr->sound_generators[soundgen_num]->effects[fxnum];
+                if (val != 0)
+                    waveshaper_set_stages(w, val);
             }
         }
         else if (strncmp("distort", wurds[0], 7) == 0)
