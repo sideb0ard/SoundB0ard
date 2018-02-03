@@ -51,8 +51,6 @@ sample_sequencer *new_sample_seq(char *filename)
 bool sample_sequencer_is_valid_pattern(void *self, int pattern_num)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    printf("INSIDE SAMPLE SEQ IS VALID - haz %d patterns\n",
-           seq->m_seq.num_patterns);
     return seq_is_valid_pattern_num(&seq->m_seq, pattern_num);
 }
 

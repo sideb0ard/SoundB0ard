@@ -200,7 +200,6 @@ void interpret(char *line)
         }
         else if (strncmp("<~", wurds[0], 2) == 0)
         {
-            printf("LEFTSHIFFFFT!\n");
             int sg_num;
             int sg_pattern_num;
             sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
@@ -210,12 +209,7 @@ void interpret(char *line)
                     (soundgenerator *)mixr->sound_generators[sg_num];
                 if (sg->is_valid_pattern(sg, sg_pattern_num))
                 {
-                    printf("Allgood, valid SG/Pattern\n");
                     int places_to_shift = atoi(wurds[2]);
-                    printf("LEFT SHIFTING %d:%d by %d places\n", sg_num,
-                           sg_pattern_num, places_to_shift);
-                    // left_shift(sg->get_pattern(sg, sg_pattern_num),
-                    // places_to_shift);
                     sg->set_pattern(
                         sg, sg_pattern_num,
                         left_shift(sg->get_pattern(sg, sg_pattern_num),

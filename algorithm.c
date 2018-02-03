@@ -37,13 +37,11 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
     return a;
 }
 
-static bool should_take_action(algorithm *a)
+static void take_action_or_not(algorithm *a)
 {
-    bool b = false;
     if (a->counter % a->every_n == 0)
-        b = true;
+        interpret(a->command);
     a->counter++;
-    return b;
 }
 
 void algorithm_event_notify(void *self, unsigned int event_type)
@@ -54,49 +52,23 @@ void algorithm_event_notify(void *self, unsigned int event_type)
     {
     case (TIME_THIRTYSECOND_TICK):
         if (a->frequency == TIME_THIRTYSECOND_TICK)
-        {
-            if (should_take_action(a))
-            {
-                printf("THIR32!\n");
-            }
-        }
+            take_action_or_not(a);
         break;
     case (TIME_SIXTEENTH_TICK):
         if (a->frequency == TIME_SIXTEENTH_TICK)
-        {
-            if (should_take_action(a))
-            {
-                printf("T16thth!\n");
-            }
-        }
+            take_action_or_not(a);
         break;
     case (TIME_EIGHTH_TICK):
         if (a->frequency == TIME_EIGHTH_TICK)
-        {
-            if (should_take_action(a))
-            {
-                printf("beep8!\n");
-            }
-            a->counter++;
-        }
+            take_action_or_not(a);
         break;
     case (TIME_QUARTER_TICK):
         if (a->frequency == TIME_QUARTER_TICK)
-        {
-            if (should_take_action(a))
-            {
-                printf("beep4!\n");
-            }
-        }
+            take_action_or_not(a);
         break;
     case (TIME_START_OF_LOOP_TICK):
         if (a->frequency == TIME_START_OF_LOOP_TICK)
-        {
-            if (should_take_action(a))
-            {
-                printf("beepLoop!\n");
-            }
-        }
+            take_action_or_not(a);
         break;
     }
 }
@@ -142,6 +114,19 @@ int extract_cmds_from_line(algorithm *a, int num_wurds,
             printf("ThirzztySecdon!\n");
         }
     }
+    int len_of_cmd_string = 1; // for NULL termination
+    for (int i = 3; i < num_wurds; i++)
+        len_of_cmd_string += strlen(wurds[i]);
+    if (len_of_cmd_string < MAX_CMD_LEN)
+    {
+        for (int i = 3; i < num_wurds; i++)
+        {
+            strcat(a->command, wurds[i]);
+            if (i != (num_wurds - 1))
+                strcat(a->command, " ");
+        }
+    }
+    printf("CMD! %s\n", a->command);
 
     return 0;
 }
