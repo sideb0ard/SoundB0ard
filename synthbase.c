@@ -2,13 +2,13 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "bitshift.h"
 #include "defjams.h"
 #include "euclidean.h"
 #include "mixer.h"
 #include "sequencer_utils.h"
 #include "synthbase.h"
 #include "utils.h"
-#include "bitshift.h"
 
 extern const int key_midi_mapping[NUM_KEYS];
 extern const char *key_names[NUM_KEYS];
@@ -62,22 +62,22 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     synthbase_reset_melody(base, melody_num);
 
     //(void)max_notes;
-    //if (max_notes == 0)
+    // if (max_notes == 0)
     //    max_notes = 6;
-    //if (max_steps == 0)
+    // if (max_steps == 0)
     //    max_steps = 9;
 
-    //int rand_num_steps = rand() % max_steps;
-    //int steps = rand_num_steps / 2;
-    //unsigned int bitpattern = create_euclidean_rhythm(steps, 32);
-    //if (rand() % 2 == 1)
+    // int rand_num_steps = rand() % max_steps;
+    // int steps = rand_num_steps / 2;
+    // unsigned int bitpattern = create_euclidean_rhythm(steps, 32);
+    // if (rand() % 2 == 1)
     //    bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-    //steps = rand_num_steps - steps;
+    // steps = rand_num_steps - steps;
 
-    //bitpattern |= create_euclidean_rhythm(steps, 32);
+    // bitpattern |= create_euclidean_rhythm(steps, 32);
 
-    //int num_hits = how_many_bits_in_num(bitpattern);
-    //if ((num_hits % 2) != 0)
+    // int num_hits = how_many_bits_in_num(bitpattern);
+    // if ((num_hits % 2) != 0)
     //{
     //    for (int i = 0; i < 32; ++i)
     //    {
@@ -89,12 +89,12 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     //    }
     //}
 
-    //print_bin_num(bitpattern);
-    //printf("Has %d bits\n", how_many_bits_in_num(bitpattern));
+    // print_bin_num(bitpattern);
+    // printf("Has %d bits\n", how_many_bits_in_num(bitpattern));
 
-    //int cur_note = mixr->key;
-    //bool note_on = true; // toggle
-    //for (int i = 31; i >= 0; i--)
+    // int cur_note = mixr->key;
+    // bool note_on = true; // toggle
+    // for (int i = 31; i >= 0; i--)
     //{
     //    if (bitpattern & 1 << i)
     //    {
@@ -120,8 +120,8 @@ void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
     //        note_on = 1 - note_on;
     //    }
     //}
-    //mixr->key = cur_note;
-    //printf("FINISHED ADDing - note_on should be true - it is %d\n", note_on);
+    // mixr->key = cur_note;
+    // printf("FINISHED ADDing - note_on should be true - it is %d\n", note_on);
 }
 
 void synthbase_set_sample_rate(synthbase *base, int sample_rate)
@@ -248,7 +248,7 @@ void synthbase_event_notify(void *self, unsigned int event_type)
     case (TIME_START_OF_LOOP_TICK):
 
         if (base->generate_mode &&
-                mixer_is_valid_seq_gen_num(mixr, base->m_generate_src))
+            mixer_is_valid_seq_gen_num(mixr, base->m_generate_src))
         {
             synthbase_clear_melody_ready_for_new_one(base, base->cur_melody);
 
@@ -256,17 +256,19 @@ void synthbase_event_notify(void *self, unsigned int event_type)
                 mixr->sequence_generators[base->m_generate_src];
             int left_bits = bitshift_generate((void *)sg, NULL);
             int right_bits = bitshift_generate((void *)sg, NULL);
-            //printf("START OF LOOP _ GENERATING! GOT BITS:%d and %d\n", left_bits, right_bits);
-            //print_bin_num(left_bits);
-            //print_bin_num(right_bits);
-            int patternlen = sizeof(int)*8; // 32
-            //for (int i = (patternlen - 1); i >= 0; i--)
-            for (int i = 0; i < patternlen ; i++)
+            // printf("START OF LOOP _ GENERATING! GOT BITS:%d and %d\n",
+            // left_bits, right_bits);
+            // print_bin_num(left_bits);
+            // print_bin_num(right_bits);
+            int patternlen = sizeof(int) * 8; // 32
+            // for (int i = (patternlen - 1); i >= 0; i--)
+            for (int i = 0; i < patternlen; i++)
             {
                 int shift_by = patternlen - 1 - i;
                 if (left_bits & 1 << shift_by)
                 {
-                  synthbase_add_note(base, base->cur_melody, i, base->last_midi_note);
+                    synthbase_add_note(base, base->cur_melody, i,
+                                       base->last_midi_note);
                 }
             }
         }
@@ -473,7 +475,6 @@ void synthbase_set_generate_src(synthbase *b, int src)
 {
     if (mixer_is_valid_seq_gen_num(mixr, src))
         b->m_generate_src = src;
-
 }
 
 void synthbase_set_generate_mode(synthbase *ms, bool b)

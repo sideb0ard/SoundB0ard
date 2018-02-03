@@ -144,11 +144,11 @@ void interpret(char *line)
             {
                 wchar_t wss[MAX_PS_STRING_SZ];
                 wmemset(wss, 0, MAX_PS_STRING_SZ);
-                mixr->sound_generators[sg]->full_status(mixr->sound_generators[sg], wss);
+                mixr->sound_generators[sg]->full_status(
+                    mixr->sound_generators[sg], wss);
                 wprintf(L"%ls\n", wss);
             }
         }
-
 
         else if (strncmp("metronome", wurds[0], 9) == 0)
         {
@@ -206,17 +206,22 @@ void interpret(char *line)
             sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
             if (mixer_is_valid_soundgen_num(mixr, sg_num))
             {
-                soundgenerator *sg = (soundgenerator *) mixr->sound_generators[sg_num];
+                soundgenerator *sg =
+                    (soundgenerator *)mixr->sound_generators[sg_num];
                 if (sg->is_valid_pattern(sg, sg_pattern_num))
                 {
                     printf("Allgood, valid SG/Pattern\n");
                     int places_to_shift = atoi(wurds[2]);
-                    printf("LEFT SHIFTING %d:%d by %d places\n", sg_num, sg_pattern_num, places_to_shift);
-                    //left_shift(sg->get_pattern(sg, sg_pattern_num), places_to_shift);
-                    sg->set_pattern(sg, sg_pattern_num, left_shift(sg->get_pattern(sg, sg_pattern_num), places_to_shift));
+                    printf("LEFT SHIFTING %d:%d by %d places\n", sg_num,
+                           sg_pattern_num, places_to_shift);
+                    // left_shift(sg->get_pattern(sg, sg_pattern_num),
+                    // places_to_shift);
+                    sg->set_pattern(
+                        sg, sg_pattern_num,
+                        left_shift(sg->get_pattern(sg, sg_pattern_num),
+                                   places_to_shift));
                 }
             }
-
         }
         else if (strncmp("new", wurds[0], 3) == 0)
         {
@@ -395,7 +400,8 @@ void interpret(char *line)
                         &s->m_seq, pattern,
                         s->m_seq.patterns[s->m_seq.num_patterns++]);
 
-                    printf("New SG at pos %d - has %d patterns\n", sgnum, s->m_seq.num_patterns);
+                    printf("New SG at pos %d - has %d patterns\n", sgnum,
+                           s->m_seq.num_patterns);
                 }
                 free(pattern);
             }
@@ -1303,54 +1309,54 @@ void interpret(char *line)
                     {
                         bool b = atoi(wurds[3]);
                         granulator_set_stutter_mode(g, b);
-                    //    if (strncmp(wurds[3], "every", 4) == 0)
-                    //    {
-                    //        int num_gens = atoi(wurds[4]);
-                    //        if (num_gens > 0)
-                    //        {
-                    //            printf("Stuttering "
-                    //                   "every %d n "
-                    //                   "loops!\n",
-                    //                   num_gens);
-                    //            looper_set_stutter_mode(s, true);
-                    //            s->stutter_every_n_loops = num_gens;
-                    //        }
-                    //        else
-                    //        {
-                    //            printf("Need a "
-                    //                   "number for "
-                    //                   "every "
-                    //                   "'n'\n");
-                    //        }
-                    //    }
-                    //    else if (strncmp(wurds[3], "for", 3) == 0)
-                    //    {
-                    //        int max_gen = atoi(wurds[3]);
-                    //        if (max_gen > 0)
-                    //        {
-                    //            looper_set_max_generation(s, max_gen);
-                    //            looper_set_stutter_mode(s, true);
-                    //        }
-                    //        else
-                    //        {
-                    //            printf("Need a "
-                    //                   "number of "
-                    //                   "loops for "
-                    //                   "'for'\n");
-                    //        }
-                    //    }
-                    //    else if (strncmp(wurds[3], "true", 4) == 0)
-                    //        looper_set_stutter_mode(s, true);
-                    //    else if (strncmp(wurds[3], "false", 5) == 0)
-                    //        looper_set_stutter_mode(s, false);
-                    //    else
-                    //    {
-                    //        int new_mode = 1 - s->stutter_mode;
-                    //        printf("Toggling sTUTTER "
-                    //               "to %s..\n",
-                    //               new_mode ? "true" : "false");
-                    //        looper_set_stutter_mode(s, new_mode);
-                    //    }
+                        //    if (strncmp(wurds[3], "every", 4) == 0)
+                        //    {
+                        //        int num_gens = atoi(wurds[4]);
+                        //        if (num_gens > 0)
+                        //        {
+                        //            printf("Stuttering "
+                        //                   "every %d n "
+                        //                   "loops!\n",
+                        //                   num_gens);
+                        //            looper_set_stutter_mode(s, true);
+                        //            s->stutter_every_n_loops = num_gens;
+                        //        }
+                        //        else
+                        //        {
+                        //            printf("Need a "
+                        //                   "number for "
+                        //                   "every "
+                        //                   "'n'\n");
+                        //        }
+                        //    }
+                        //    else if (strncmp(wurds[3], "for", 3) == 0)
+                        //    {
+                        //        int max_gen = atoi(wurds[3]);
+                        //        if (max_gen > 0)
+                        //        {
+                        //            looper_set_max_generation(s, max_gen);
+                        //            looper_set_stutter_mode(s, true);
+                        //        }
+                        //        else
+                        //        {
+                        //            printf("Need a "
+                        //                   "number of "
+                        //                   "loops for "
+                        //                   "'for'\n");
+                        //        }
+                        //    }
+                        //    else if (strncmp(wurds[3], "true", 4) == 0)
+                        //        looper_set_stutter_mode(s, true);
+                        //    else if (strncmp(wurds[3], "false", 5) == 0)
+                        //        looper_set_stutter_mode(s, false);
+                        //    else
+                        //    {
+                        //        int new_mode = 1 - s->stutter_mode;
+                        //        printf("Toggling sTUTTER "
+                        //               "to %s..\n",
+                        //               new_mode ? "true" : "false");
+                        //        looper_set_stutter_mode(s, new_mode);
+                        //    }
                     }
                 }
             }
@@ -1551,8 +1557,8 @@ void interpret(char *line)
                     {
                         keys(soundgen_num);
                     }
-                    else if (strncmp("generate", wurds[2], 8) == 0
-                            || strncmp("gen", wurds[2], 3) == 0)
+                    else if (strncmp("generate", wurds[2], 8) == 0 ||
+                             strncmp("gen", wurds[2], 3) == 0)
                     {
                         if (strncmp("src", wurds[3], 3) == 0)
                         {
@@ -1565,7 +1571,7 @@ void interpret(char *line)
                             bool b = atoi(wurds[3]);
                             synthbase_set_generate_mode(base, b);
                         }
-                        //if (strncmp("every", wurds[3], 5) == 0)
+                        // if (strncmp("every", wurds[3], 5) == 0)
                         //{
                         //    int num_gens = atoi(wurds[4]);
                         //    if (num_gens > 0)
@@ -1578,7 +1584,7 @@ void interpret(char *line)
                         //        printf("Need a number for every 'n'\n");
                         //    }
                         //}
-                        //else if (strncmp("for", wurds[3], 3) == 0)
+                        // else if (strncmp("for", wurds[3], 3) == 0)
                         //{
                         //    int num_gens = atoi(wurds[4]);
                         //    if (num_gens > 0)
@@ -1593,12 +1599,12 @@ void interpret(char *line)
                         //               "'for'\n");
                         //    }
                         //}
-                        //else if (strncmp("false", wurds[3], 5) == 0)
+                        // else if (strncmp("false", wurds[3], 5) == 0)
                         //{
                         //    printf("Disabling generate mode\n");
                         //    synthbase_set_generate_mode(base, false);
                         //}
-                        //else
+                        // else
                         //{
                         //    int melody_num = atoi(wurds[3]);
                         //    int max_notes = atoi(wurds[4]);
@@ -2368,7 +2374,7 @@ void interpret(char *line)
             update_environment(wurds[1], atoi(wurds[3]));
         }
 
-        //else if (strncmp("every", wurds[0], 5) == 0 &&
+        // else if (strncmp("every", wurds[0], 5) == 0 &&
         //         strncmp("loop", wurds[1], 4) == 0)
         //{
         //    printf("Starting an algorithm - with %s!\n", cmd);
@@ -3029,7 +3035,7 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_decay_time_ms(ms, val);
         return true;
     }
-    //else if (strncmp("gen", wurds[2], 4) == 0)
+    // else if (strncmp("gen", wurds[2], 4) == 0)
     //{
     //    if (strncmp(wurds[3], "source", 6) == 0 ||
     //        strncmp(wurds[3], "src", 3) == 0)

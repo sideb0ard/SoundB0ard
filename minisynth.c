@@ -824,38 +824,38 @@ stereo_val minisynth_gennext(void *self)
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
 
-    //if (ms->m_settings.m_generate_active &&
+    // if (ms->m_settings.m_generate_active &&
     //    mixer_is_valid_seq_gen_num(mixr, ms->m_settings.m_generate_src))
     //{
     //    sequence_generator *sg =
     //        mixr->sequence_generators[ms->m_settings.m_generate_src];
 
-        //short nom_left;
-        //short nom_right;
-        //if (ms->base.sample_rate_counter == 0 ||
-        //    ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
-        //{
-        //    nom_left = bitshift_generate((void *)sg, NULL);
-        //    nom_right = bitshift_generate((void *)sg, NULL);
+    // short nom_left;
+    // short nom_right;
+    // if (ms->base.sample_rate_counter == 0 ||
+    //    ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
+    //{
+    //    nom_left = bitshift_generate((void *)sg, NULL);
+    //    nom_right = bitshift_generate((void *)sg, NULL);
 
-        //    nom_left = (nom_left - 0x80) << 8;
-        //    nom_right = (nom_right - 0x80) << 8;
+    //    nom_left = (nom_left - 0x80) << 8;
+    //    nom_right = (nom_right - 0x80) << 8;
 
-        //    ms->base.cached_last_sample_left = nom_left;
-        //    ms->base.cached_last_sample_right = nom_right;
-        //}
-        //else
-        //{
-        //    nom_left = ms->base.cached_last_sample_left;
-        //    nom_right = ms->base.cached_last_sample_right;
-        //}
+    //    ms->base.cached_last_sample_left = nom_left;
+    //    ms->base.cached_last_sample_right = nom_right;
+    //}
+    // else
+    //{
+    //    nom_left = ms->base.cached_last_sample_left;
+    //    nom_right = ms->base.cached_last_sample_right;
+    //}
 
-        //ms->base.sample_rate_counter++;
-        //if (ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
-        //    ms->base.sample_rate_counter = 0;
+    // ms->base.sample_rate_counter++;
+    // if (ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
+    //    ms->base.sample_rate_counter = 0;
 
-        //accum_out_left += scaleybum(-32768, 32787, -1, 1, nom_left);
-        //accum_out_right += scaleybum(-32768, 32787, -1, 1, nom_right);
+    // accum_out_left += scaleybum(-32768, 32787, -1, 1, nom_left);
+    // accum_out_right += scaleybum(-32768, 32787, -1, 1, nom_right);
 
     float mix = 1.0 / MAX_VOICES;
     if (ms->m_arp.active)

@@ -142,9 +142,11 @@ void granulator_event_notify(void *self, unsigned int event_type)
             else if (g->stutter_mode)
             {
                 int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
-                int rel_pos_within_a_sixteenth = new_read_idx - (cur_sixteenth * g->size_of_sixteenth);
+                int rel_pos_within_a_sixteenth =
+                    new_read_idx - (cur_sixteenth * g->size_of_sixteenth);
                 g->audio_buffer_read_idx =
-                    (g->stutter_idx * g->size_of_sixteenth) + rel_pos_within_a_sixteenth;
+                    (g->stutter_idx * g->size_of_sixteenth) +
+                    rel_pos_within_a_sixteenth;
             }
             else
                 g->audio_buffer_read_idx = new_read_idx;
@@ -361,8 +363,8 @@ void granulator_status(void *self, wchar_t *status_string)
              "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
 
              g->vol, g->filename, g->loop_mode ? "true" : "false", g->loop_len,
-             g->scramble_mode, g->stutter_mode, g->external_source_sg, g->audio_buffer_len,
-             g->num_channels == 2 ? "true" : "false",
+             g->scramble_mode, g->stutter_mode, g->external_source_sg,
+             g->audio_buffer_len, g->num_channels == 2 ? "true" : "false",
              (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
              g->grain_duration_ms, g->grains_per_sec, g->quasi_grain_fudge,
              g->granular_spray_frames / 44.1, g->num_active_grains,

@@ -189,7 +189,8 @@ void mixer_ps(mixer *mixr)
         {
             wchar_t wss[MAX_PS_STRING_SZ];
             wmemset(wss, 0, MAX_PS_STRING_SZ);
-            mixr->sound_generators[i]->ps_status(mixr->sound_generators[i], wss);
+            mixr->sound_generators[i]->ps_status(mixr->sound_generators[i],
+                                                 wss);
 
             wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
 

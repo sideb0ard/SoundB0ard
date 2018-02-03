@@ -193,5 +193,5 @@ typedef struct parceled_pattern
 {
     unsigned int type;
     unsigned int len;
-    int pattern[2*PPBAR]; // max size
+    int pattern[2 * PPBAR]; // max size
 } parceled_pattern;

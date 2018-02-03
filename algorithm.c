@@ -31,48 +31,116 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
     a->sound_generator.event_notify = &algorithm_event_notify;
     a->sound_generator.type = ALGORITHM_TYPE;
 
+    a->counter = 0;
+    a->has_started = false;
+
     return a;
+}
+
+static bool should_take_action(algorithm *a)
+{
+    bool b = false;
+    if (a->counter % a->every_n == 0)
+        b = true;
+    a->counter++;
+    return b;
 }
 
 void algorithm_event_notify(void *self, unsigned int event_type)
 {
-    algorithm *a = (algorithm*) self;
+    algorithm *a = (algorithm *)self;
 
-    switch(event_type){
-        case(TIME_MIDI_TICK):
-            if (a->frequency == TIME_MIDI_TICK)
-                printf("beep!\n");
-            break;
-        case(TIME_THIRTYSECOND_TICK):
-            if (a->frequency == TIME_THIRTYSECOND_TICK)
-                printf("beep!\n");
-            break;
-        case(TIME_SIXTEENTH_TICK):
-            if (a->frequency == TIME_SIXTEENTH_TICK)
-                printf("beep!\n");
-            break;
-        case(TIME_EIGHTH_TICK):
-            if (a->frequency == TIME_EIGHTH_TICK)
-                printf("beep!\n");
-            break;
-        case(TIME_QUARTER_TICK):
-            if (a->frequency == TIME_QUARTER_TICK)
-                printf("beep!\n");
-            break;
-        case(TIME_START_OF_LOOP_TICK):
-            if (a->frequency == TIME_START_OF_LOOP_TICK)
-                printf("beep!\n");
-            break;
+    switch (event_type)
+    {
+    case (TIME_THIRTYSECOND_TICK):
+        if (a->frequency == TIME_THIRTYSECOND_TICK)
+        {
+            if (should_take_action(a))
+            {
+                printf("THIR32!\n");
+            }
+        }
+        break;
+    case (TIME_SIXTEENTH_TICK):
+        if (a->frequency == TIME_SIXTEENTH_TICK)
+        {
+            if (should_take_action(a))
+            {
+                printf("T16thth!\n");
+            }
+        }
+        break;
+    case (TIME_EIGHTH_TICK):
+        if (a->frequency == TIME_EIGHTH_TICK)
+        {
+            if (should_take_action(a))
+            {
+                printf("beep8!\n");
+            }
+            a->counter++;
+        }
+        break;
+    case (TIME_QUARTER_TICK):
+        if (a->frequency == TIME_QUARTER_TICK)
+        {
+            if (should_take_action(a))
+            {
+                printf("beep4!\n");
+            }
+        }
+        break;
+    case (TIME_START_OF_LOOP_TICK):
+        if (a->frequency == TIME_START_OF_LOOP_TICK)
+        {
+            if (should_take_action(a))
+            {
+                printf("beepLoop!\n");
+            }
+        }
+        break;
     }
 }
 
-int extract_cmds_from_line(algorithm *a, int num_wurds, char wurds[][SIZE_OF_WURD])
+int extract_cmds_from_line(algorithm *a, int num_wurds,
+                           char wurds[][SIZE_OF_WURD])
 {
 
-    for (int i = 0; i < num_wurds; i++)
+    if (strncmp(wurds[0], "every", 5) == 0)
     {
+        int every_n = atoi(wurds[1]);
+        printf("Every %d!\n", every_n);
+        if (every_n == 0)
+        {
+            printf("don't be daft, cannae dae 0 times.\n");
+            return -1;
+        }
+        a->every_n = every_n;
 
-        printf("Cmd: %s\n", wurds[i]);
+        if (strncmp(wurds[2], "loop", 4) == 0)
+        {
+            a->frequency = TIME_START_OF_LOOP_TICK;
+            printf("Loop!\n");
+        }
+        else if (strncmp(wurds[2], "4th", 4) == 0)
+        {
+            a->frequency = TIME_QUARTER_TICK;
+            printf("Quart!\n");
+        }
+        else if (strncmp(wurds[2], "8th", 4) == 0)
+        {
+            a->frequency = TIME_EIGHTH_TICK;
+            printf("Eighth!\n");
+        }
+        else if (strncmp(wurds[2], "16th", 4) == 0)
+        {
+            a->frequency = TIME_SIXTEENTH_TICK;
+            printf("Sizteenth!\n");
+        }
+        else if (strncmp(wurds[2], "32nd", 4) == 0)
+        {
+            a->frequency = TIME_THIRTYSECOND_TICK;
+            printf("ThirzztySecdon!\n");
+        }
     }
 
     return 0;

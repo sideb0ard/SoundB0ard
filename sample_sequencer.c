@@ -51,7 +51,8 @@ sample_sequencer *new_sample_seq(char *filename)
 bool sample_sequencer_is_valid_pattern(void *self, int pattern_num)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    printf("INSIDE SAMPLE SEQ IS VALID - haz %d patterns\n", seq->m_seq.num_patterns);
+    printf("INSIDE SAMPLE SEQ IS VALID - haz %d patterns\n",
+           seq->m_seq.num_patterns);
     return seq_is_valid_pattern_num(&seq->m_seq, pattern_num);
 }
 
@@ -60,7 +61,8 @@ parceled_pattern sample_seq_get_pattern(void *self, int pattern_num)
     sample_sequencer *seq = (sample_sequencer *)self;
     return seq_get_pattern(&seq->m_seq, pattern_num);
 }
-void sample_seq_set_pattern(void *self, int pattern_num, parceled_pattern pattern)
+void sample_seq_set_pattern(void *self, int pattern_num,
+                            parceled_pattern pattern)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     return seq_set_pattern(&seq->m_seq, pattern_num, pattern);
@@ -216,11 +218,11 @@ void sample_seq_ps_status(void *self, wchar_t *status_string)
              seq->filename, seq->vol,
              seq->sound_generator.active ? "true" : "false",
              seq->morph ? "true" : "false", seq->buffer_pitch);
-    //wchar_t seq_status_string[MAX_PS_STRING_SZ];
-    //memset(seq_status_string, 0, MAX_PS_STRING_SZ);
-    //seq_status(&seq->m_seq, seq_status_string);
-    //wcscat(status_string, seq_status_string);
-    //wcscat(status_string, WANSI_COLOR_RESET);
+    // wchar_t seq_status_string[MAX_PS_STRING_SZ];
+    // memset(seq_status_string, 0, MAX_PS_STRING_SZ);
+    // seq_status(&seq->m_seq, seq_status_string);
+    // wcscat(status_string, seq_status_string);
+    // wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void sample_seq_full_status(void *self, wchar_t *status_string)
