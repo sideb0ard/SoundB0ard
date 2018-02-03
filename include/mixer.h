@@ -112,7 +112,6 @@ int mixer_add_metronome(mixer *mixr);
 
 int add_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD]);
 int add_bytebeat(mixer *mixr, char *pattern);
-int mixer_add_spork(mixer *mixr, double freq);
 int add_chaosmonkey(int soundgen);
 int add_minisynth(mixer *mixr);
 int add_dxsynth(mixer *mixr);
@@ -120,7 +119,6 @@ int add_digisynth(mixer *mixr, char *filename);
 // int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
 int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                       bool start_on_first_beat);
-int add_looper(mixer *mixr, char *filename, double loop_len);
 int add_granulator(mixer *mixr, char *filename);
 int add_sound_generator(mixer *mixr, soundgenerator *sg);
 int add_sequence_generator(mixer *mixr, sequence_generator *sg);

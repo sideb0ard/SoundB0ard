@@ -40,7 +40,6 @@ SRC = \
 	help.c \
 	keys.c \
 	lfo.c \
-	looper.c \
 	main.c \
 	metronome.c \
 	midi_freq_table.c \
@@ -65,7 +64,6 @@ SRC = \
 	sequence_generators/bitshift.c \
 	sequence_generators/euclidean.c \
 	sparkline.c \
-	spork.c \
 	synthbase.c \
 	synthdrum_sequencer.c \
 	synthfunctions.c \
@@ -97,6 +95,7 @@ TARGET = sbsh
 all: objdir $(TARGET)
 	@ctags -R *
 	@cscope -b
+	@clear
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:

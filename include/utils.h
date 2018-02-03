@@ -8,7 +8,6 @@ void get_full_filename(char *basename, char *destination_fullname);
 
 audio_buffer_details import_file_contents(double **buffer, char *filename);
 void thrunner(SBMSG *msg);
-void *timed_sig_start(void *arg);
 void *fadeup_runrrr(void *arg);
 void *fadedown_runrrr(void *arg);
 void *duck_runrrr(void *arg);

@@ -18,7 +18,6 @@
 #include "euclidean.h"
 #include "fx.h"
 #include "granulator.h"
-#include "looper.h"
 #include "metronome.h"
 #include "minisynth.h"
 #include "mixer.h"
@@ -26,7 +25,6 @@
 #include "sbmsg.h"
 #include "sequencer_utils.h"
 #include "sound_generator.h"
-#include "spork.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
 
@@ -48,7 +46,7 @@ const wchar_t *s_status_colors[] = {
     WANSI_COLOR_MAGENTA,   // SYNTHDRUM_TYPE
     WANSI_COLOR_CYAN,      // ALGORITHM_TYPE
     WANSI_COLOR_GREEN,     // CHAOSMONKEY_TYPE
-    WANSI_COLOR_BLUE       // SPORK_TYPE
+    WANSI_COLOR_BLUE       //
 };
 
 const char *s_midi_control_type_name[] = {"NONE", "SYNTH"};
@@ -286,11 +284,6 @@ void mixer_update_bpm(mixer *mixr, int bpm)
                 update_envelope_stream_bpm(
                     mixr->sound_generators[i]->envelopes[j]);
             }
-            if (mixr->sound_generators[i]->type == LOOPER_TYPE)
-            {
-                looper_resample_to_loop_size(
-                    (looper *)mixr->sound_generators[i]);
-            }
         }
     }
     link_set_bpm(mixr->m_ableton_link, bpm);
@@ -380,13 +373,6 @@ int add_sequence_generator(mixer *mixr, sequence_generator *sg)
     return mixr->sequence_gen_num++;
 }
 
-int mixer_add_spork(mixer *mixr, double freq)
-{
-    printf("Adding an SPORK, mo!\n");
-    spork *s = new_spork(freq);
-    return add_sound_generator(mixr, (soundgenerator *)s);
-}
-
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     printf("Adding an BITSHIFT SEQUENCE GENERATOR, yo!\n");
@@ -444,18 +430,6 @@ int add_dxsynth(mixer *mixr)
     printf("Adding a DXSYNTH!!...\n");
     dxsynth *dx = new_dxsynth();
     return add_sound_generator(mixr, (soundgenerator *)dx);
-}
-
-int add_looper(mixer *mixr, char *filename, double loop_len)
-{
-    printf("ADD looper - LOOP LEN %f\n", loop_len);
-    looper *l = new_looper(filename, loop_len);
-    if (l == NULL)
-    {
-        printf("Barfed on looper creation\n");
-        return -1;
-    }
-    return add_sound_generator(mixr, (soundgenerator *)l);
 }
 
 int add_granulator(mixer *mixr, char *filename)

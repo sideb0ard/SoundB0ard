@@ -31,23 +31,6 @@ const double blep_table_center = 4096 / 2.0 - 1;
 #define EXTRACT_BITS(the_val, bits_start, bits_len)                            \
     ((the_val >> (bits_start - 1)) & ((1 << bits_len) - 1))
 
-// TODO ( this is superflous - no timing is going on )
-void *timed_sig_start(void *arg)
-{
-    SBMSG *msg = (SBMSG *)arg;
-    int sg = -1; // signal generator
-
-    if (strcmp(msg->params, "sloop") == 0)
-    {
-        printf("TIMED .... %f\n", msg->looplen);
-        sg = add_looper(mixr, msg->filename, msg->looplen);
-    }
-    // faderrr(sg, UP);
-
-    // free(msg);
-    return NULL;
-}
-
 void *fadeup_runrrr(void *arg)
 {
     SBMSG *msg = (SBMSG *)arg;
@@ -127,15 +110,7 @@ void thrunner(SBMSG *msg)
     // need to ensure and free(msg) in all subtasks from here
     printf("Got CMD: %s\n", msg->cmd);
     pthread_t pthrrrd;
-    if (strcmp(msg->cmd, "timed_sig_start") == 0)
-    {
-        if (pthread_create(&pthrrrd, NULL, timed_sig_start, msg))
-        {
-            fprintf(stderr, "Err, running phrrread..\n");
-            return;
-        }
-    }
-    else if (strcmp(msg->cmd, "fadeuprrr") == 0)
+    if (strcmp(msg->cmd, "fadeuprrr") == 0)
     {
         if (pthread_create(&pthrrrd, NULL, fadeup_runrrr, msg))
         {

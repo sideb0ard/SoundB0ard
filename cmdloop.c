@@ -41,7 +41,6 @@
 #include "sample_sequencer.h"
 #include "sequencer_utils.h"
 #include "sparkline.h"
-#include "spork.h"
 #include "synthbase.h"
 #include "synthdrum_sequencer.h"
 #include "table.h"
@@ -352,8 +351,6 @@ void interpret(char *line)
                     double loop_len = atof(wurds[3]);
                     if (!loop_len)
                         loop_len = 1;
-                    // int soundgen_num = add_looper(mixr, wurds[1], loop_len);
-                    // printf("soundgenerator %d\n", soundgen_num);
 
                     int soundgen_num = add_granulator(mixr, wurds[2]);
                     printf("soundgenerator %d\n", soundgen_num);
@@ -928,25 +925,6 @@ void interpret(char *line)
             free(pattern);
         }
 
-        else if (strncmp("spork", wurds[0], 5) == 0)
-        {
-            int soundgen_num = atoi(wurds[1]);
-            if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                mixr->sound_generators[soundgen_num]->type == SPORK_TYPE)
-            {
-                spork *s = (spork *)mixr->sound_generators[soundgen_num];
-                printf("Your Spork is my command!\n");
-                double val = atof(wurds[3]);
-                if (strncmp("freq", wurds[2], 4) == 0)
-                    spork_set_freq(s, val);
-                else if (strncmp("waveform", wurds[2], 8) == 0)
-                    spork_set_waveform(s, val);
-                else if (strncmp("mode", wurds[2], 4) == 0)
-                    spork_set_mode(s, val);
-                else if (strncmp("polarity", wurds[2], 4) == 0)
-                    spork_set_polarity(s, val);
-            }
-        }
         // GRANULATOR COMMANDS
         else if (strncmp("granulator", wurds[0], 8) == 0 ||
                  strncmp("gran", wurds[0], 4) == 0)
@@ -1234,8 +1212,6 @@ void interpret(char *line)
                 int loop_len = atoi(wurds[2]);
                 if (!loop_len)
                     loop_len = 1;
-                // int soundgen_num = add_looper(mixr, wurds[1], loop_len);
-                // printf("soundgenerator %d\n", soundgen_num);
 
                 int soundgen_num = add_granulator(mixr, wurds[1]);
                 printf("soundgenerator %d\n", soundgen_num);
@@ -1261,96 +1237,11 @@ void interpret(char *line)
                     {
                         bool b = atoi(wurds[3]);
                         granulator_set_scramble_mode(g, b);
-                        // if (strncmp(wurds[3], "every", 5) == 0)
-                        //{
-                        //    int num_gens = atoi(wurds[4]);
-                        //    if (num_gens > 0)
-                        //    {
-                        //        printf("Scrambling "
-                        //               "every %d n "
-                        //               "loops!\n",
-                        //               num_gens);
-                        //        looper_set_scramble_mode(s, true);
-                        //        s->scramble_every_n_loops = num_gens;
-                        //    }
-                        //    else
-                        //    {
-                        //        printf("Need a "
-                        //               "number for "
-                        //               "every "
-                        //               "'n'\n");
-                        //    }
-                        //}
-                        // else
-                        //{
-                        //    int max_gen = atoi(wurds[3]);
-                        //    if (max_gen > 0)
-                        //    {
-                        //        looper_set_max_generation(s, max_gen);
-                        //        looper_set_scramble_mode(s, true);
-                        //    }
-                        //    else
-                        //    {
-                        //        printf("Toggling "
-                        //               "scramble.."
-                        //               "\n");
-                        //        int new_mode = 1 - s->scramblrrr_mode;
-                        //        looper_set_scramble_mode(s, new_mode);
-                        //    }
-                        //}
                     }
                     else if (strncmp("stutter", wurds[2], 7) == 0)
                     {
                         bool b = atoi(wurds[3]);
                         granulator_set_stutter_mode(g, b);
-                        //    if (strncmp(wurds[3], "every", 4) == 0)
-                        //    {
-                        //        int num_gens = atoi(wurds[4]);
-                        //        if (num_gens > 0)
-                        //        {
-                        //            printf("Stuttering "
-                        //                   "every %d n "
-                        //                   "loops!\n",
-                        //                   num_gens);
-                        //            looper_set_stutter_mode(s, true);
-                        //            s->stutter_every_n_loops = num_gens;
-                        //        }
-                        //        else
-                        //        {
-                        //            printf("Need a "
-                        //                   "number for "
-                        //                   "every "
-                        //                   "'n'\n");
-                        //        }
-                        //    }
-                        //    else if (strncmp(wurds[3], "for", 3) == 0)
-                        //    {
-                        //        int max_gen = atoi(wurds[3]);
-                        //        if (max_gen > 0)
-                        //        {
-                        //            looper_set_max_generation(s, max_gen);
-                        //            looper_set_stutter_mode(s, true);
-                        //        }
-                        //        else
-                        //        {
-                        //            printf("Need a "
-                        //                   "number of "
-                        //                   "loops for "
-                        //                   "'for'\n");
-                        //        }
-                        //    }
-                        //    else if (strncmp(wurds[3], "true", 4) == 0)
-                        //        looper_set_stutter_mode(s, true);
-                        //    else if (strncmp(wurds[3], "false", 5) == 0)
-                        //        looper_set_stutter_mode(s, false);
-                        //    else
-                        //    {
-                        //        int new_mode = 1 - s->stutter_mode;
-                        //        printf("Toggling sTUTTER "
-                        //               "to %s..\n",
-                        //               new_mode ? "true" : "false");
-                        //        looper_set_stutter_mode(s, new_mode);
-                        //    }
                     }
                 }
             }
@@ -2051,8 +1942,11 @@ void interpret(char *line)
             int val = atoi(wurds[2]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                int fxnum = add_waveshape_soundgen(mixr->sound_generators[soundgen_num]);
-                waveshaper *w = (waveshaper*) mixr->sound_generators[soundgen_num]->effects[fxnum];
+                int fxnum = add_waveshape_soundgen(
+                    mixr->sound_generators[soundgen_num]);
+                waveshaper *w =
+                    (waveshaper *)mixr->sound_generators[soundgen_num]
+                        ->effects[fxnum];
                 if (val != 0)
                     waveshaper_set_stages(w, val);
             }
@@ -2132,6 +2026,8 @@ void interpret(char *line)
                     f->enabled = true;
                 else if (strncmp("off", wurds[3], 3) == 0)
                     f->enabled = false;
+                else if (strncmp("toggle", wurds[3], 6) == 0)
+                    f->enabled = 1 - f->enabled;
                 else if (f->type == DELAY)
                 {
                     // printf("Changing Dulay!\n");
@@ -2465,15 +2361,6 @@ void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,
                 strcat(dest_pattern, " ");
         }
     }
-}
-
-bool is_valid_sample_num(looper *s, int sample_num)
-{
-    if (sample_num < s->num_samples)
-    {
-        return true;
-    }
-    return false;
 }
 
 bool is_valid_fx_num(int soundgen_num, int fx_num)

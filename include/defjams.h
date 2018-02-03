@@ -114,7 +114,6 @@ typedef enum {
     SYNTHDRUM_TYPE,
     ALGORITHM_TYPE,
     CHAOSMONKEY_TYPE,
-    SPORK_TYPE,
     METRONOME_TYPE,
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;

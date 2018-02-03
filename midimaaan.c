@@ -8,13 +8,11 @@
 #include "defjams.h"
 #include "digisynth.h"
 #include "dxsynth.h"
-#include "looper.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
 #include "sample_sequencer.h"
-#include "spork.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
 

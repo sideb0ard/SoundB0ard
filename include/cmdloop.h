@@ -2,7 +2,6 @@
 
 #include "audioutils.h"
 #include "dxsynth.h"
-#include "looper.h"
 #include "minisynth.h"
 #include "step_sequencer.h"
 #include <stdbool.h>
@@ -25,6 +24,5 @@ void char_melody_to_midi_melody(synthbase *base, int dest_melody,
 bool extract_chord_from_char_notation(char *wurd, int *tick,
                                       chord_midi_notes *chnotes);
 
-bool is_valid_sample_num(looper *s, int sample_num);
 bool is_valid_fx_num(int soundgen_num, int fx_num);
 bool is_valid_file(char *filename);
