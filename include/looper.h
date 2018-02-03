@@ -1,5 +1,5 @@
-#ifndef GRANULATOR_H
-#define GRANULATOR_H
+#ifndef LOOPER_H
+#define LOOPER_H
 
 #include "envelope_generator.h"
 #include "lfo.h"
@@ -41,13 +41,13 @@ enum
 
 enum
 {
-    GRANULATOR_ENV_PARABOLIC,
-    GRANULATOR_ENV_TRAPEZOIDAL,
-    GRANULATOR_ENV_RAISED_COSINE_BELL,
-    GRANULATOR_ENV_NUM
+    LOOPER_ENV_PARABOLIC,
+    LOOPER_ENV_TRAPEZOIDAL,
+    LOOPER_ENV_RAISED_COSINE_BELL,
+    LOOPER_ENV_NUM
 };
 
-typedef struct granulator
+typedef struct looper
 {
     soundgenerator sound_generator;
 
@@ -127,52 +127,53 @@ typedef struct granulator
     int cur_sixteenth; // used to track scramble
 
     double vol;
-} granulator;
+} looper;
 
-granulator *new_granulator(char *filename);
+looper *new_looper(char *filename);
 
-stereo_val granulator_gennext(void *self);
-void granulator_status(void *self, wchar_t *ss);
-void granulator_setvol(void *self, double v);
-double granulator_getvol(void *self);
-void granulator_start(void *self);
-void granulator_stop(void *self);
-int granulator_get_num_tracks(void *self);
-void granulator_make_active_track(void *self, int tracknum);
-void granulator_event_notify(void *self, unsigned int event_type);
+stereo_val looper_gennext(void *self);
+void looper_status(void *self, wchar_t *ss);
+void looper_setvol(void *self, double v);
+double looper_getvol(void *self);
+void looper_start(void *self);
+void looper_stop(void *self);
+int looper_get_num_tracks(void *self);
+void looper_make_active_track(void *self, int tracknum);
+void looper_event_notify(void *self, unsigned int event_type);
 
-void granulator_import_file(granulator *g, char *filename);
-void granulator_set_external_source(granulator *g, int sound_gen_num);
+void looper_import_file(looper *g, char *filename);
+void looper_set_external_source(looper *g, int sound_gen_num);
 
-void granulator_update_lfos(granulator *g);
-int granulator_calculate_grain_spacing(granulator *g);
-void granulator_set_sequencer_mode(granulator *g, bool b);
-void granulator_set_grain_pitch(granulator *g, double pitch);
-void granulator_set_grain_duration(granulator *g, int dur);
-void granulator_set_grains_per_sec(granulator *g, int gps);
-void granulator_set_grain_attack_size_pct(granulator *g, int att);
-void granulator_set_grain_release_size_pct(granulator *g, int rel);
-void granulator_set_audio_buffer_read_idx(granulator *g, int position);
-void granulator_set_granular_spray(granulator *g, int spray_ms);
-void granulator_set_quasi_grain_fudge(granulator *g, int fudgefactor);
-void granulator_set_selection_mode(granulator *g, unsigned int mode);
-void granulator_set_envelope_mode(granulator *g, unsigned int mode);
-void granulator_set_movement_mode(granulator *g, bool b);
-void granulator_set_reverse_mode(granulator *g, bool b);
-void granulator_set_loop_mode(granulator *g, bool b);
-void granulator_set_loop_len(granulator *g, double bars);
-void granulator_set_scramble_mode(granulator *g, bool b);
-void granulator_set_stutter_mode(granulator *g, bool b);
+void looper_update_lfos(looper *g);
+int looper_calculate_grain_spacing(looper *g);
+void looper_set_sequencer_mode(looper *g, bool b);
+void looper_set_grain_pitch(looper *g, double pitch);
+void looper_set_grain_duration(looper *g, int dur);
+void looper_set_grains_per_sec(looper *g, int gps);
+void looper_set_grain_attack_size_pct(looper *g, int att);
+void looper_set_grain_release_size_pct(looper *g, int rel);
+void looper_set_audio_buffer_read_idx(looper *g, int position);
+void looper_set_granular_spray(looper *g, int spray_ms);
+void looper_set_quasi_grain_fudge(looper *g, int fudgefactor);
+void looper_set_selection_mode(looper *g, unsigned int mode);
+void looper_set_envelope_mode(looper *g, unsigned int mode);
+void looper_set_movement_mode(looper *g, bool b);
+void looper_set_reverse_mode(looper *g, bool b);
+void looper_set_loop_mode(looper *g, bool b);
+void looper_set_granulate_mode(looper *g, bool b);
+void looper_set_loop_len(looper *g, double bars);
+void looper_set_scramble_mode(looper *g, bool b);
+void looper_set_stutter_mode(looper *g, bool b);
 
-int granulator_get_available_grain_num(granulator *g);
-int granulator_count_active_grains(granulator *g);
+int looper_get_available_grain_num(looper *g);
+int looper_count_active_grains(looper *g);
 
-void granulator_set_lfo_amp(granulator *g, int lfonum, double amp);
-void granulator_set_lfo_voice(granulator *g, int lfonum, unsigned int voice);
-void granulator_set_lfo_rate(granulator *g, int lfonum, double rate);
-void granulator_set_lfo_min(granulator *g, int lfonum, double minval);
-void granulator_set_lfo_max(granulator *g, int lfonum, double maxval);
-void granulator_set_lfo_sync(granulator *g, int lfonum, int numloops);
+void looper_set_lfo_amp(looper *g, int lfonum, double amp);
+void looper_set_lfo_voice(looper *g, int lfonum, unsigned int voice);
+void looper_set_lfo_rate(looper *g, int lfonum, double rate);
+void looper_set_lfo_min(looper *g, int lfonum, double minval);
+void looper_set_lfo_max(looper *g, int lfonum, double maxval);
+void looper_set_lfo_sync(looper *g, int lfonum, int numloops);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, bool reverse, double pitch,
@@ -181,6 +182,6 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
                                 int buffer_len);
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode);
 
-void granulator_del_self(void *self);
+void looper_del_self(void *self);
 
-#endif // GRANULATOR
+#endif // LOOPER

@@ -17,7 +17,7 @@
 #include "envelope.h"
 #include "euclidean.h"
 #include "fx.h"
-#include "granulator.h"
+#include "looper.h"
 #include "metronome.h"
 #include "minisynth.h"
 #include "mixer.h"
@@ -41,7 +41,7 @@ const wchar_t *s_status_colors[] = {
     WCOOL_COLOR_ORANGE,    // DIGISYNTH_TYPE
     WCOOL_COLOR_MAUVE,     // LOOPER_TYPE
     WCOOL_COLOR_YELLOW,    // BITWIZE_TYPE
-    WANSI_COLOR_DEEP_RED,  // GRANULATOR_TYPE
+    WANSI_COLOR_DEEP_RED,  // LOOPER_TYPE
     WANSI_COLOR_GREEN_TOO, // SEQUENCER_TYPE
     WANSI_COLOR_MAGENTA,   // SYNTHDRUM_TYPE
     WANSI_COLOR_CYAN,      // ALGORITHM_TYPE
@@ -432,10 +432,10 @@ int add_dxsynth(mixer *mixr)
     return add_sound_generator(mixr, (soundgenerator *)dx);
 }
 
-int add_granulator(mixer *mixr, char *filename)
+int add_looper(mixer *mixr, char *filename)
 {
     printf("ADDING A GRANNY!\n");
-    granulator *g = new_granulator(filename);
+    looper *g = new_looper(filename);
     printf("GOT A GRAANY\n");
     return add_sound_generator(mixr, (soundgenerator *)g);
 }

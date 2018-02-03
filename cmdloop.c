@@ -25,9 +25,9 @@
 #include "envelope.h"
 #include "envelope_follower.h"
 #include "euclidean.h"
-#include "granulator.h"
 #include "help.h"
 #include "keys.h"
+#include "looper.h"
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
@@ -279,14 +279,14 @@ void interpret(char *line)
                                                num_wurds);
                 }
             }
-            else if (strncmp("granulator", wurds[1], 10) == 0 ||
+            else if (strncmp("looper", wurds[1], 10) == 0 ||
                      strncmp("gran", wurds[1], 4) == 0)
             {
                 if (is_valid_file(wurds[2]) ||
                     strncmp(wurds[2], "none", 4) == 0)
                 {
                     printf("VALID!\n");
-                    int soundgen_num = add_granulator(mixr, wurds[1]);
+                    int soundgen_num = add_looper(mixr, wurds[1]);
                     printf("soundgenerator %d\n", soundgen_num);
                 }
                 else
@@ -352,14 +352,13 @@ void interpret(char *line)
                     if (!loop_len)
                         loop_len = 1;
 
-                    int soundgen_num = add_granulator(mixr, wurds[2]);
+                    int soundgen_num = add_looper(mixr, wurds[2]);
                     printf("soundgenerator %d\n", soundgen_num);
 
-                    granulator *g =
-                        (granulator *)mixr->sound_generators[soundgen_num];
+                    looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
-                    granulator_set_loop_mode(g, true);
-                    granulator_set_loop_len(g, loop_len);
+                    looper_set_loop_mode(g, true);
+                    looper_set_loop_len(g, loop_len);
                 }
             }
             else if (strncmp("moog", wurds[1], 4) == 0)
@@ -925,50 +924,49 @@ void interpret(char *line)
             free(pattern);
         }
 
-        // GRANULATOR COMMANDS
-        else if (strncmp("granulator", wurds[0], 8) == 0 ||
-                 strncmp("gran", wurds[0], 4) == 0)
+        // LOOPER COMMANDS
+        else if (strncmp("looper", wurds[0], 8) == 0 ||
+                 strncmp("gran", wurds[0], 4) == 0 ||
+                 strncmp("loop", wurds[0], 4) == 0)
         {
             if (is_valid_file(wurds[1]) || strncmp(wurds[1], "none", 4) == 0)
             {
                 printf("VALID!\n");
-                int soundgen_num = add_granulator(mixr, wurds[1]);
+                int soundgen_num = add_looper(mixr, wurds[1]);
                 printf("soundgenerator %d\n", soundgen_num);
             }
             else
             {
                 int soundgen_num = atoi(wurds[1]);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type ==
-                        GRANULATOR_TYPE)
+                    mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)
                 {
-                    granulator *g =
-                        (granulator *)mixr->sound_generators[soundgen_num];
+                    looper *g = (looper *)mixr->sound_generators[soundgen_num];
                     if (strncmp("grain_duration_ms", wurds[2], 14) == 0)
                     {
                         int dur = atoi(wurds[3]);
-                        granulator_set_grain_duration(g, dur);
+                        looper_set_grain_duration(g, dur);
                     }
                     else if (strncmp("grains_per_sec", wurds[2], 14) == 0)
                     {
                         int gps = atoi(wurds[3]);
-                        granulator_set_grains_per_sec(g, gps);
+                        looper_set_grains_per_sec(g, gps);
                     }
                     else if (strncmp("audio_buffer_read_idx", wurds[2], 14) ==
                              0)
                     {
                         int pos = atoi(wurds[3]);
-                        granulator_set_audio_buffer_read_idx(g, pos);
+                        looper_set_audio_buffer_read_idx(g, pos);
                     }
                     else if (strncmp("grain_spray_ms", wurds[2], 14) == 0)
                     {
                         int spray = atoi(wurds[3]);
-                        granulator_set_granular_spray(g, spray);
+                        looper_set_granular_spray(g, spray);
                     }
                     else if (strncmp("quasi_grain_fudge", wurds[2], 17) == 0)
                     {
                         int fudge = atoi(wurds[3]);
-                        granulator_set_quasi_grain_fudge(g, fudge);
+                        looper_set_quasi_grain_fudge(g, fudge);
                     }
                     else if (strncmp("extsource", wurds[2], 9) == 0)
                     {
@@ -979,7 +977,7 @@ void interpret(char *line)
                             printf("GRAN is following "
                                    "%d\n",
                                    sg);
-                            granulator_set_external_source(g, sg);
+                            looper_set_external_source(g, sg);
                         }
                     }
                     else if (strncmp("file", wurds[2], 4) == 0 ||
@@ -988,178 +986,178 @@ void interpret(char *line)
                     {
                         if (is_valid_file(wurds[3]))
                         {
-                            granulator_import_file(g, wurds[3]);
+                            looper_import_file(g, wurds[3]);
                         }
                     }
                     else if (strncmp("grain_pitch", wurds[2], 10) == 0)
                     {
                         double pitch = atof(wurds[3]);
-                        granulator_set_grain_pitch(g, pitch);
+                        looper_set_grain_pitch(g, pitch);
                     }
                     else if (strncmp("selection_mode", wurds[2], 14) == 0)
                     {
                         int mode = atoi(wurds[3]);
-                        granulator_set_selection_mode(g, mode);
+                        looper_set_selection_mode(g, mode);
                     }
                     else if (strncmp("env_mode", wurds[2], 8) == 0)
                     {
                         int mode = atoi(wurds[3]);
                         printf("ENV MODE is %d\n", mode);
-                        granulator_set_envelope_mode(g, mode);
+                        looper_set_envelope_mode(g, mode);
                     }
                     else if (strncmp("loop_mode", wurds[2], 9) == 0)
                     {
                         int mode = atoi(wurds[3]);
                         printf("loop MODE is %d\n", mode);
-                        granulator_set_loop_mode(g, mode);
+                        looper_set_loop_mode(g, mode);
                     }
                     else if (strncmp("loop_len", wurds[2], 8) == 0)
                     {
                         double len = atof(wurds[3]);
                         printf("loop LEN is %f\n", len);
-                        granulator_set_loop_len(g, len);
+                        looper_set_loop_len(g, len);
                     }
                     else if (strncmp("sequencer_mode", wurds[2], 13) == 0)
                     {
                         int mode = atoi(wurds[3]);
                         printf("MODE is %d\n", mode);
-                        granulator_set_sequencer_mode(g, mode);
+                        looper_set_sequencer_mode(g, mode);
                     }
                     else if (strncmp("movement", wurds[2], 8) == 0)
                     {
                         int mode = atoi(wurds[3]);
                         printf("Movement MODE is %d\n", mode);
-                        granulator_set_movement_mode(g, mode);
+                        looper_set_movement_mode(g, mode);
                     }
                     else if (strncmp("reverse", wurds[2], 8) == 0)
                     {
                         int mode = atoi(wurds[3]);
                         printf("REverse MODE is %d\n", mode);
-                        granulator_set_reverse_mode(g, mode);
+                        looper_set_reverse_mode(g, mode);
                     }
                     else if (strncmp("lfo1_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", mode);
-                        granulator_set_lfo_voice(g, 1, type);
+                        looper_set_lfo_voice(g, 1, type);
                     }
                     else if (strncmp("lfo1_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
-                        granulator_set_lfo_amp(g, 1, amp);
+                        looper_set_lfo_amp(g, 1, amp);
                     }
                     else if (strncmp("lfo1_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
-                        granulator_set_lfo_rate(g, 1, rate);
+                        looper_set_lfo_rate(g, 1, rate);
                     }
                     else if (strncmp("lfo1_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
-                        granulator_set_lfo_sync(g, 1, loops);
+                        looper_set_lfo_sync(g, 1, loops);
                     }
                     else if (strncmp("lfo1_min", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
-                        granulator_set_lfo_min(g, 1, min);
+                        looper_set_lfo_min(g, 1, min);
                     }
                     else if (strncmp("lfo1_max", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
-                        granulator_set_lfo_max(g, 1, max);
+                        looper_set_lfo_max(g, 1, max);
                     }
                     else if (strncmp("lfo2_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", mode);
-                        granulator_set_lfo_voice(g, 2, type);
+                        looper_set_lfo_voice(g, 2, type);
                     }
                     else if (strncmp("lfo2_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
-                        granulator_set_lfo_amp(g, 2, amp);
+                        looper_set_lfo_amp(g, 2, amp);
                     }
                     else if (strncmp("lfo2_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
-                        granulator_set_lfo_rate(g, 2, rate);
+                        looper_set_lfo_rate(g, 2, rate);
                     }
                     else if (strncmp("lfo2_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
-                        granulator_set_lfo_sync(g, 2, loops);
+                        looper_set_lfo_sync(g, 2, loops);
                     }
                     else if (strncmp("lfo2_min", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
-                        granulator_set_lfo_min(g, 2, min);
+                        looper_set_lfo_min(g, 2, min);
                     }
                     else if (strncmp("lfo2_max", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
-                        granulator_set_lfo_max(g, 2, max);
+                        looper_set_lfo_max(g, 2, max);
                     }
                     else if (strncmp("lfo3_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", mode);
-                        granulator_set_lfo_voice(g, 3, type);
+                        looper_set_lfo_voice(g, 3, type);
                     }
                     else if (strncmp("lfo3_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
-                        granulator_set_lfo_amp(g, 3, amp);
+                        looper_set_lfo_amp(g, 3, amp);
                     }
                     else if (strncmp("lfo3_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
-                        granulator_set_lfo_rate(g, 3, rate);
+                        looper_set_lfo_rate(g, 3, rate);
                     }
                     else if (strncmp("lfo3_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
-                        granulator_set_lfo_sync(g, 3, loops);
+                        looper_set_lfo_sync(g, 3, loops);
                     }
                     else if (strncmp("lfo3_min", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
-                        granulator_set_lfo_min(g, 3, min);
+                        looper_set_lfo_min(g, 3, min);
                     }
                     else if (strncmp("lfo3_max", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
-                        granulator_set_lfo_max(g, 3, max);
+                        looper_set_lfo_max(g, 3, max);
                     }
                     else if (strncmp("lfo4_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", mode);
-                        granulator_set_lfo_voice(g, 4, type);
+                        looper_set_lfo_voice(g, 4, type);
                     }
                     else if (strncmp("lfo4_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
-                        granulator_set_lfo_amp(g, 4, amp);
+                        looper_set_lfo_amp(g, 4, amp);
                     }
                     else if (strncmp("lfo4_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
-                        granulator_set_lfo_rate(g, 4, rate);
+                        looper_set_lfo_rate(g, 4, rate);
                     }
                     else if (strncmp("lfo4_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
-                        granulator_set_lfo_sync(g, 4, loops);
+                        looper_set_lfo_sync(g, 4, loops);
                     }
                     else if (strncmp("lfo4_min", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
-                        granulator_set_lfo_min(g, 4, min);
+                        looper_set_lfo_min(g, 4, min);
                     }
                     else if (strncmp("lfo4_max", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
-                        granulator_set_lfo_max(g, 4, max);
+                        looper_set_lfo_max(g, 4, max);
                     }
                     else if (strncmp("graindur_lfo_on", wurds[2], 14) == 0)
                     {
@@ -1213,35 +1211,32 @@ void interpret(char *line)
                 if (!loop_len)
                     loop_len = 1;
 
-                int soundgen_num = add_granulator(mixr, wurds[1]);
+                int soundgen_num = add_looper(mixr, wurds[1]);
                 printf("soundgenerator %d\n", soundgen_num);
 
-                granulator *g =
-                    (granulator *)mixr->sound_generators[soundgen_num];
+                looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
-                granulator_set_loop_mode(g, true);
-                granulator_set_loop_len(g, loop_len);
+                looper_set_loop_mode(g, true);
+                looper_set_loop_len(g, loop_len);
             }
             else
             {
                 int soundgen_num = atoi(wurds[1]);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                    mixr->sound_generators[soundgen_num]->type ==
-                        GRANULATOR_TYPE)
+                    mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)
                 {
 
-                    granulator *g =
-                        (granulator *)mixr->sound_generators[soundgen_num];
+                    looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
                     if (strncmp("scramble", wurds[2], 8) == 0)
                     {
                         bool b = atoi(wurds[3]);
-                        granulator_set_scramble_mode(g, b);
+                        looper_set_scramble_mode(g, b);
                     }
                     else if (strncmp("stutter", wurds[2], 7) == 0)
                     {
                         bool b = atoi(wurds[3]);
-                        granulator_set_stutter_mode(g, b);
+                        looper_set_stutter_mode(g, b);
                     }
                 }
             }
@@ -1905,13 +1900,6 @@ void interpret(char *line)
                 add_follower_soundgen(mixr->sound_generators[soundgen_num]);
             }
         }
-        // else if (strncmp("granulator", wurds[0], 8) == 0 ||
-        //         strncmp("gran", wurds[0], 4) == 0) {
-        //    int soundgen_num = atoi(wurds[1]);
-        //    if (mixer_is_valid_soundgen_num(mixr, soundgen_num)) {
-        //        add_granulator_soundgen(mixr->sound_generators[soundgen_num]);
-        //    }
-        //}
         else if (strncmp("moddelay", wurds[0], 7) == 0)
         {
             int soundgen_num = atoi(wurds[1]);

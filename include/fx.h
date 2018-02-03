@@ -10,7 +10,6 @@ typedef enum {
     COMPRESSOR,
     DECIMATOR,
     DELAY,
-    GRANULATOR,
     MODDELAY,
     MODFILTER,
     DISTORTION,

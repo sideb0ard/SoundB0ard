@@ -119,7 +119,7 @@ int add_digisynth(mixer *mixr, char *filename);
 // int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
 int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
                       bool start_on_first_beat);
-int add_granulator(mixer *mixr, char *filename);
+int add_looper(mixer *mixr, char *filename);
 int add_sound_generator(mixer *mixr, soundgenerator *sg);
 int add_sequence_generator(mixer *mixr, sequence_generator *sg);
 int add_effect(mixer *mixr);

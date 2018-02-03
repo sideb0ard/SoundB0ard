@@ -36,10 +36,10 @@ SRC = \
 	fx/modular_delay.c \
 	fx/stereodelay.c \
 	fx/waveshaper.c \
-	granulator.c \
 	help.c \
 	keys.c \
 	lfo.c \
+	looper.c \
 	main.c \
 	metronome.c \
 	midi_freq_table.c \
