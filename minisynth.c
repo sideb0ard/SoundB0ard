@@ -707,7 +707,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         "------------------------------------" WCOOL_COLOR_PINK "]\n"
         "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n"
         "      [" WANSI_COLOR_WHITE "arp" WCOOL_COLOR_PINK "] arp:%d "
-        "arprepeat:%d arpmode:%d[0-3] arprate[0-3]:%d arpoctrange[1-4]:%d",
+        "arprepeat:%d arpmode:%d[0-3] arprate[0-3]:%d arpoctrange[1-4]:%d\n"
+        "      last_midi_note:%d sustain_len_ms:%d",
 
         // VOICE + GENERAL
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
@@ -766,7 +767,10 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         // ARP
         ms->m_arp.active, ms->m_arp.single_note_repeat, ms->m_arp.mode,
-        ms->m_arp.rate, ms->m_arp.octave_range
+        ms->m_arp.rate, ms->m_arp.octave_range,
+
+        // SYNTHBASE
+        ms->base.last_midi_note, ms->base.sustain_len_ms
 
         );
 
@@ -823,39 +827,6 @@ stereo_val minisynth_gennext(void *self)
 
     double accum_out_left = 0.0;
     double accum_out_right = 0.0;
-
-    // if (ms->m_settings.m_generate_active &&
-    //    mixer_is_valid_seq_gen_num(mixr, ms->m_settings.m_generate_src))
-    //{
-    //    sequence_generator *sg =
-    //        mixr->sequence_generators[ms->m_settings.m_generate_src];
-
-    // short nom_left;
-    // short nom_right;
-    // if (ms->base.sample_rate_counter == 0 ||
-    //    ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
-    //{
-    //    nom_left = bitshift_generate((void *)sg, NULL);
-    //    nom_right = bitshift_generate((void *)sg, NULL);
-
-    //    nom_left = (nom_left - 0x80) << 8;
-    //    nom_right = (nom_right - 0x80) << 8;
-
-    //    ms->base.cached_last_sample_left = nom_left;
-    //    ms->base.cached_last_sample_right = nom_right;
-    //}
-    // else
-    //{
-    //    nom_left = ms->base.cached_last_sample_left;
-    //    nom_right = ms->base.cached_last_sample_right;
-    //}
-
-    // ms->base.sample_rate_counter++;
-    // if (ms->base.sample_rate_counter > ms->base.sample_rate_ratio)
-    //    ms->base.sample_rate_counter = 0;
-
-    // accum_out_left += scaleybum(-32768, 32787, -1, 1, nom_left);
-    // accum_out_right += scaleybum(-32768, 32787, -1, 1, nom_right);
 
     float mix = 1.0 / MAX_VOICES;
     if (ms->m_arp.active)
@@ -1743,10 +1714,11 @@ void minisynth_del_self(void *self)
 
 void minisynth_stop(minisynth *ms)
 {
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        voice_reset(&ms->m_voices[i]->m_voice);
-    }
+    minisynth_midi_note_off(ms, 0, 0, true);
+    // for (int i = 0; i < MAX_VOICES; i++)
+    //{
+    //    voice_reset(&ms->m_voices[i]->m_voice);
+    //}
 }
 
 void minisynth_sg_start(void *self)

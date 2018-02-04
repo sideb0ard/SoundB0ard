@@ -116,6 +116,22 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     }
                 }
             }
+            else if (strncmp("note_on", wurds[2], 7) == 0)
+            {
+                for (int i = 3; i < num_wurds; i++)
+                {
+                    int six16th = atoi(wurds[i]) % (16 * SYNTH_NUM_BARS);
+                    printf("NOTE ON!! 16th:%d\n", six16th);
+                    synthbase_add_note(base, base->cur_melody, six16th, base->last_midi_note);
+                }
+            }
+            else if (strncmp("sustain_note_ms", wurds[2], 15) == 0)
+            {
+                int sustain_note_ms = atoi(wurds[3]);
+                if (sustain_note_ms > 0)
+                    synthbase_set_sustain_note_ms(base, sustain_note_ms);
+
+            }
             else if (strncmp("delete", wurds[2], 6) == 0)
             {
                 if (strncmp("melody", wurds[3], 6) == 0)
@@ -166,8 +182,9 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 else
                 {
-                    bool b = atoi(wurds[3]);
-                    synthbase_set_generate_mode(base, b);
+                    //bool b = atoi(wurds[3]);
+                    //synthbase_set_generate_mode(base, b);
+                    synthbase_generate_melody(base);
                 }
                 // if (strncmp("every", wurds[3], 5) == 0)
                 //{
@@ -445,16 +462,6 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         char preset_name[20];
                         strncpy(preset_name, wurds[3], 19);
                         minisynth_load_settings(ms, preset_name);
-                    }
-                    else if (strncmp("genrand", wurds[2], 4) == 0)
-                    {
-                        printf("GENRAND!\n");
-                        minisynth_rand_settings(ms);
-                        int melody_num = atoi(wurds[3]);
-                        int max_notes = atoi(wurds[4]);
-                        int max_steps = atoi(wurds[5]);
-                        synthbase_generate_melody(&ms->base, melody_num,
-                                                  max_notes, max_steps);
                     }
                     else if (strncmp("arp", wurds[2], 3) == 0)
                     {

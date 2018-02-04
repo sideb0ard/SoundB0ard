@@ -117,7 +117,7 @@ void mixer_ps(mixer *mixr)
            "NumPeers:%d\n"
            "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
            "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d "
-           "PPNS:%d" ANSI_COLOR_RESET,
+           "PPNS:%d midi_ticks_per_ms:%.2f" ANSI_COLOR_RESET,
            mixr->volume, key_names[mixr->key], mixr->timing_info.midi_tick,
            mixr->timing_info.sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false", data.tempo, data.quantum,
@@ -129,7 +129,7 @@ void mixer_ps(mixer *mixr)
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
-           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS);
+           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS, mixr->timing_info.midi_ticks_per_ms);
 
     if (mixr->env_var_count > 0)
     {
@@ -264,6 +264,8 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->timing_info.loop_len_in_frames =
         mixr->timing_info.frames_per_midi_tick * PPBAR;
     mixr->timing_info.loop_len_in_ticks = PPBAR;
+
+    mixr->timing_info.midi_ticks_per_ms = PPQN / (60.0 / bpm * 1000);
 
     mixr->timing_info.size_of_thirtysecond_note =
         (PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick;

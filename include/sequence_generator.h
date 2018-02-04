@@ -17,5 +17,5 @@ typedef struct sequence_generator
     void (*event_notify)(void *self, unsigned int event_type);
 } sequence_generator;
 
-void sequence_generator_status(void *self, wchar_t *wstring);
-int sequence_generator_generate(void *self);
+// void sequence_generator_status(void *self, wchar_t *wstring);
+// int sequence_generator_generate(void *self);

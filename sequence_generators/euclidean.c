@@ -104,11 +104,8 @@ void build_euclidean_pattern_string(int level, char *bitmap_string, int *count,
 int euclidean_generate(void *self, void *data)
 {
     euclidean *e = (euclidean *)self;
-    // printf("GENERATING!\nnum_hits:%d num_steps:%d\n", e->num_hits,
-    //       e->num_steps);
-    int *pattern_len = (int *)data;
-    if (*pattern_len)
-        *pattern_len = e->num_steps;
+    printf("GENERATING!\nnum_hits:%d num_steps:%d\n", e->num_hits,
+          e->num_steps);
 
     return create_euclidean_rhythm(e->actual_num_hits, e->actual_num_steps);
 }

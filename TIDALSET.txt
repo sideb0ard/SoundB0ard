@@ -13,3 +13,6 @@ notes/garageyChord.aiff
 
 dloops/abraDrumLoop4Bar.aiff
 dloops/reesepiece.aif
+
+// all the speeds
+loops//bassDubC1bar.aiff

@@ -37,6 +37,8 @@ void synthbase_init(synthbase *base, void *parent,
 
     base->m_generate_src = -99;
     base->last_midi_note = 60;
+    base->sustain_len_ms = 200;
+    base->live_code_mode = true;
 
     for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
     {
@@ -50,78 +52,27 @@ void synthbase_init(synthbase *base, void *parent,
         base->backup_melody_while_getting_crazy[i].tick = -1;
 }
 
-void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
-                               int max_steps)
+void synthbase_generate_melody(synthbase *base)
 {
-    if (!is_valid_melody_num(base, melody_num))
+    if (mixer_is_valid_seq_gen_num(mixr, base->m_generate_src))
     {
-        printf("Not a valid melody number\n");
-        return;
+        synthbase_stop(base);
+        sequence_generator *sg = mixr->sequence_generators[base->m_generate_src];
+        int left_bits = sg->generate(sg, NULL);
+
+        printf("GOT BITS! %d\n", left_bits);
+
+        int patternlen = sizeof(int) * 8; // 32
+        for (int i = 0; i < patternlen; i++)
+        {
+            int shift_by = patternlen - 1 - i;
+            if (left_bits & 1 << shift_by)
+            {
+                synthbase_add_note(base, base->cur_melody, i,
+                                   base->last_midi_note);
+            }
+        }
     }
-
-    synthbase_reset_melody(base, melody_num);
-
-    //(void)max_notes;
-    // if (max_notes == 0)
-    //    max_notes = 6;
-    // if (max_steps == 0)
-    //    max_steps = 9;
-
-    // int rand_num_steps = rand() % max_steps;
-    // int steps = rand_num_steps / 2;
-    // unsigned int bitpattern = create_euclidean_rhythm(steps, 32);
-    // if (rand() % 2 == 1)
-    //    bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-    // steps = rand_num_steps - steps;
-
-    // bitpattern |= create_euclidean_rhythm(steps, 32);
-
-    // int num_hits = how_many_bits_in_num(bitpattern);
-    // if ((num_hits % 2) != 0)
-    //{
-    //    for (int i = 0; i < 32; ++i)
-    //    {
-    //        if (!(bitpattern & (1 << i)))
-    //        {
-    //            bitpattern |= (1 << i);
-    //            break;
-    //        }
-    //    }
-    //}
-
-    // print_bin_num(bitpattern);
-    // printf("Has %d bits\n", how_many_bits_in_num(bitpattern));
-
-    // int cur_note = mixr->key;
-    // bool note_on = true; // toggle
-    // for (int i = 31; i >= 0; i--)
-    //{
-    //    if (bitpattern & 1 << i)
-    //    {
-    //        int step = (31 - i) * PPSIXTEENTH;
-
-    //        midi_event ev;
-    //        if (note_on)
-    //        {
-    //            printf("Adding NOTE ON!\n");
-    //            ev = new_midi_event(
-    //                step, 144,
-    //                key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
-    //        }
-    //        else
-    //        {
-    //            printf("Adding NOTE OFF!\nn");
-    //            ev = new_midi_event(
-    //                step, 128,
-    //                key_midi_mapping[compat_keys[mixr->key][cur_note]], 128);
-    //            cur_note = get_next_compat_note(cur_note);
-    //        }
-    //        synthbase_add_event(base, 0, ev);
-    //        note_on = 1 - note_on;
-    //    }
-    //}
-    // mixr->key = cur_note;
-    // printf("FINISHED ADDing - note_on should be true - it is %d\n", note_on);
 }
 
 void synthbase_set_sample_rate(synthbase *base, int sample_rate)
@@ -218,12 +169,14 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     swprintf(status_string, MAX_PS_STRING_SZ,
              L"\n      Multi: %s CurMelody:%d"
              "generate:%d gen_src:%d gen_every_n:%d \n"
-             "      morph:%d morph_gen:%d morph_every_n:%d",
+             "      morph:%d morph_gen:%d morph_every_n:%d "
+             "last_midi_note:%d sustain_len_ms:%d",
 
              base->multi_melody_mode ? "true" : "false", base->cur_melody,
              base->generate_mode, base->m_generate_src,
              base->generate_every_n_loops, base->morph_mode,
-             base->morph_generation, base->morph_every_n_loops);
+             base->morph_generation, base->morph_every_n_loops,
+             base->last_midi_note, base->sustain_len_ms);
 
     for (int i = 0; i < base->num_melodies; i++)
     {
@@ -246,33 +199,7 @@ void synthbase_event_notify(void *self, unsigned int event_type)
     switch (event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
-
-        if (base->generate_mode &&
-            mixer_is_valid_seq_gen_num(mixr, base->m_generate_src))
-        {
-            synthbase_clear_melody_ready_for_new_one(base, base->cur_melody);
-
-            sequence_generator *sg =
-                mixr->sequence_generators[base->m_generate_src];
-            int left_bits = bitshift_generate((void *)sg, NULL);
-            int right_bits = bitshift_generate((void *)sg, NULL);
-            // printf("START OF LOOP _ GENERATING! GOT BITS:%d and %d\n",
-            // left_bits, right_bits);
-            // print_bin_num(left_bits);
-            // print_bin_num(right_bits);
-            int patternlen = sizeof(int) * 8; // 32
-            // for (int i = (patternlen - 1); i >= 0; i--)
-            for (int i = 0; i < patternlen; i++)
-            {
-                int shift_by = patternlen - 1 - i;
-                if (left_bits & 1 << shift_by)
-                {
-                    synthbase_add_note(base, base->cur_melody, i,
-                                       base->last_midi_note);
-                }
-            }
-        }
-
+        break;
     case (TIME_MIDI_TICK):
         idx = mixr->timing_info.midi_tick % PPNS;
         if (base->melodies[base->cur_melody][idx].tick != -1)
@@ -306,65 +233,8 @@ void synthbase_event_notify(void *self, unsigned int event_type)
                         base->melody_multiloop_count[base->cur_melody];
                 }
             }
-
-            if (base->generate_mode)
-            {
-                synthbase_stop(base);
-                if (base->generate_every_n_loops > 0)
-                {
-                    if (base->generate_generation %
-                            base->generate_every_n_loops ==
-                        0)
-                    {
-                        synthbase_set_backup_mode(base, true);
-                        synthbase_generate_melody(base, 0, 0, 0);
-                    }
-                    else
-                        synthbase_set_backup_mode(base, false);
-                }
-                else if (base->max_generation > 0)
-                {
-                    if (base->generate_generation >= base->max_generation)
-                    {
-                        base->generate_generation = 0;
-                        synthbase_set_generate_mode(base, false);
-                        synthbase_set_backup_mode(base, false);
-                    }
-                }
-                else
-                    synthbase_generate_melody(base, 0, 0, 0);
-
-                base->generate_generation++;
-            }
-
-            if (base->morph_mode)
-            {
-                synthbase_stop(base);
-                if (base->morph_every_n_loops > 0)
-                {
-                    if (base->morph_generation % base->morph_every_n_loops == 0)
-                    {
-                        synthbase_set_backup_mode(base, true);
-                        synthbase_morph(base);
-                    }
-                    else
-                        synthbase_set_backup_mode(base, false);
-                }
-                else if (base->max_generation > 0)
-                {
-                    if (base->morph_generation >= base->max_generation)
-                    {
-                        base->morph_generation = 0;
-                        synthbase_set_morph_mode(base, false);
-                        synthbase_set_backup_mode(base, false);
-                    }
-                }
-                else
-                    synthbase_morph(base);
-
-                base->morph_generation++;
-            }
         }
+
         break;
     }
 }
@@ -630,17 +500,17 @@ void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
 {
     if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS)
     {
-        // printf("New Notes!! %d - %d\n", mstep, midi_note);
+        printf("New Notes!! %d - %d\n", mstep, midi_note);
         midi_event on = new_midi_event(mstep, 144, midi_note, 128);
-        // int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) % PPNS;
-        int note_off_tick = (mstep + (PPSIXTEENTH * 4 - 7)) %
-                            //(int)(PPSIXTEENTH *
-                            // ms->m_settings.m_sustain_time_sixteenth) - 7) %
-                            PPNS;
-        midi_event off = new_midi_event(note_off_tick, 128, midi_note, 128);
+        //int note_off_tick = (int)(ms->sustain_len_ms * mixr->timing_info.midi_ticks_per_ms) % PPNS;
+        //printf("NOTE OFF TICK IS %d\n", note_off_tick);
+        //midi_event off = new_midi_event(note_off_tick, 128, midi_note, 128);
 
-        int final_note_off_tick = synthbase_add_event(ms, pattern_num, off);
-        on.tick_off = final_note_off_tick;
+        if (ms->live_code_mode)
+        {
+            on.delete_after_use = true;
+        }
+
         synthbase_add_event(ms, pattern_num, on);
     }
     else
@@ -794,4 +664,10 @@ int synthbase_change_octave_melody(synthbase *base, int melody_num,
         return 1;
 
     return 0;
+}
+
+void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
+{
+    if (sustain_note_ms > 0)
+        base->sustain_len_ms = sustain_note_ms;
 }

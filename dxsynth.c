@@ -894,13 +894,7 @@ void dxsynth_del_self(void *self)
     free(dx);
 }
 
-void dxsynth_stop(dxsynth *ms)
-{
-    for (int i = 0; i < MAX_DX_VOICES; i++)
-    {
-        voice_reset(&ms->m_voices[i]->m_voice);
-    }
-}
+void dxsynth_stop(dxsynth *dx) { dxsynth_midi_note_off(dx, 0, 0, true); }
 
 void dxsynth_sg_start(void *self)
 {

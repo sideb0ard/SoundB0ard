@@ -59,6 +59,7 @@ typedef struct synthbase
     bool multi_melody_loop_countdown_started;
 
     bool recording;
+    bool live_code_mode;
 
     bool morph_mode; // magical
     int morph_every_n_loops;
@@ -69,6 +70,8 @@ typedef struct synthbase
     int m_generate_src;
     int generate_every_n_loops;
     int generate_generation;
+
+    int sustain_len_ms;
 
     int max_generation;
 
@@ -82,8 +85,7 @@ void synthbase_status(synthbase *base, wchar_t *status_string);
 void synthbase_event_notify(void *self, unsigned int event_type);
 
 void synthbase_clear_melody_ready_for_new_one(synthbase *base, int melody_num);
-void synthbase_generate_melody(synthbase *base, int melody_num, int max_notes,
-                               int max_steps);
+void synthbase_generate_melody(synthbase *base);
 
 void synthbase_set_multi_melody_mode(synthbase *self, bool melody_mode);
 void synthbase_set_melody_loop_num(synthbase *self, int melody_num,
@@ -109,6 +111,7 @@ void synthbase_print_melodies(synthbase *base);
 void synthbase_nudge_melody(synthbase *base, int melody_num, int sixteenth);
 bool is_valid_melody_num(synthbase *ns, int melody_num);
 void synthbase_import_midi_from_file(synthbase *base, char *filename);
+void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms);
 void synthbase_set_generate_src(synthbase *base, int src);
 void synthbase_set_generate_mode(synthbase *base, bool b);
 void synthbase_set_morph_mode(synthbase *base, bool b);
