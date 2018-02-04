@@ -18,7 +18,6 @@
 #include "euclidean.h"
 #include "fx.h"
 #include "looper.h"
-#include "metronome.h"
 #include "minisynth.h"
 #include "mixer.h"
 #include "sample_sequencer.h"
@@ -391,13 +390,6 @@ int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps)
         return add_sequence_generator(mixr, sg);
     else
         return -99;
-}
-
-int mixer_add_metronome(mixer *mixr)
-{
-    printf("Adding metronome!\n");
-    metronome *m = new_metronome();
-    return add_sound_generator(mixr, (soundgenerator *)m);
 }
 
 int add_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])

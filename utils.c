@@ -7,6 +7,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/stat.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -530,6 +531,26 @@ int is_valid_osc(char *string)
     {
         return 0;
     }
+}
+
+bool is_valid_file(char *filename)
+{
+    printf("IS valid? %s\n", filename);
+    if (strlen(filename) == 0)
+    {
+        printf("That ain't no valid file where i come from..\n");
+        return false;
+    }
+    char cwd[1024];
+    getcwd(cwd, 1024);
+    char *subdir = "/wavs/";
+    char full_filename[strlen(cwd) + strlen(filename) + strlen(subdir)];
+    strcpy(full_filename, cwd);
+    strcat(full_filename, subdir);
+    strcat(full_filename, filename);
+
+    struct stat buffer;
+    return (stat(full_filename, &buffer) == 0);
 }
 
 // from

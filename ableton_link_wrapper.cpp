@@ -9,7 +9,6 @@
 #include <chrono>
 
 #include "ableton_link_wrapper.h"
-#include "defjams.h"
 #include "mixer.h"
 
 extern mixer *mixr;

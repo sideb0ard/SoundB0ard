@@ -108,8 +108,6 @@ void mixer_print_compat_keys(mixer *mixr);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 
-int mixer_add_metronome(mixer *mixr);
-
 int add_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD]);
 int add_bytebeat(mixer *mixr, char *pattern);
 int add_chaosmonkey(int soundgen);

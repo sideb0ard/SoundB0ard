@@ -21,6 +21,7 @@ void strim(const char *input, char *result);
 void chordie(char *n);
 int conv_bitz(int num);
 int is_valid_osc(char *string);
+bool is_valid_file(char *filename);
 void related_notes(char root_note[4], double *second_note, double *third_note);
 double pitch_shift_multiplier(double pitch_shift_semitones);
 double fast_pow(double a, double b);

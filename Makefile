@@ -14,6 +14,12 @@ SRC = \
 	fx/beatrepeat.c \
 	chaosmonkey.c \
 	cmdloop.c \
+	cmdloop/fx_cmds.c \
+	cmdloop/looper_cmds.c \
+	cmdloop/mixer_cmds.c \
+	cmdloop/new_item_cmds.c \
+	cmdloop/stepper_cmds.c \
+	cmdloop/synth_cmds.c \
 	dca.c \
 	digisynth.c \
 	digisynth_voice.c \
@@ -41,7 +47,6 @@ SRC = \
 	lfo.c \
 	looper.c \
 	main.c \
-	metronome.c \
 	midi_freq_table.c \
 	midimaaan.c \
 	minisynth.c \
@@ -99,7 +104,7 @@ all: objdir $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	mkdir -p obj/fx obj/filterz obj/pattern_transformers
+	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop
 
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) -L$(LIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)
