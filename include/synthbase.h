@@ -66,6 +66,7 @@ typedef struct synthbase
     int morph_generation;
 
     int last_midi_note;
+    int root_midi_note;
     bool generate_mode; // magical
     int m_generate_src;
     int generate_every_n_loops;
@@ -83,6 +84,8 @@ void synthbase_init(synthbase *base, void *parent,
 void synthbase_set_sample_rate(synthbase *base, int sample_rate);
 void synthbase_status(synthbase *base, wchar_t *status_string);
 void synthbase_event_notify(void *self, unsigned int event_type);
+void synthbase_set_rand_key(synthbase *base);
+void synthbase_set_root_key(synthbase *base, int root_key);
 
 void synthbase_clear_melody_ready_for_new_one(synthbase *base, int melody_num);
 void synthbase_generate_melody(synthbase *base);

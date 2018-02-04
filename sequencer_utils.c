@@ -50,16 +50,16 @@ int shift_bits_to_leftmost_position(int num, int num_of_bits_to_align_with)
     return ret_num;
 }
 
-void char_binary_version_of_int(int num, char bin_num[17])
+void char_binary_version_of_int(int num, char bin_num[33])
 {
-    for (int i = 15; i >= 0; i--)
+    for (int i = 31; i >= 0; i--)
     {
         if (num & 1 << i)
-            bin_num[15 - i] = '1';
+            bin_num[31 - i] = '1';
         else
-            bin_num[15 - i] = '0';
+            bin_num[31 - i] = '0';
     }
-    bin_num[16] = '\0';
+    bin_num[33] = '\0';
 }
 
 void print_pattern(int *pattern_array, int len_pattern_array)

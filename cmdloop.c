@@ -133,25 +133,25 @@ void interpret(char *line)
             exxit();
 
         else if (parse_fx_cmd(num_wurds, wurds))
-            return;
+            continue;
 
         else if (parse_looper_cmd(num_wurds, wurds))
-            return;
+            continue;
 
         else if (parse_mixer_cmd(num_wurds, wurds))
-            return;
+            continue;
 
         else if (parse_new_item_cmd(num_wurds, wurds))
-            return;
+            continue;
 
         else if (parse_pattern_cmd(num_wurds, wurds))
-            return;
+            continue;
 
         else if (parse_synth_cmd(num_wurds, wurds))
-            return;
+            continue;
 
         else if (parse_stepper_cmd(num_wurds, wurds))
-            return;
+            continue;
     }
 }
 

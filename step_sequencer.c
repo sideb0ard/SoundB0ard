@@ -126,7 +126,7 @@ bool seq_tick(sequencer *seq)
 
                         if (seq->visualize)
                         {
-                            char bit_string[17];
+                            char bit_string[33];
                             char_binary_version_of_int(bit_pattern, bit_string);
                             printf("New pattern: %s\n", bit_string);
                         }

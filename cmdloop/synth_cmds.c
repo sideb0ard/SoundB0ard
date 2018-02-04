@@ -130,6 +130,15 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 if (sustain_note_ms > 0)
                     synthbase_set_sustain_note_ms(base, sustain_note_ms);
             }
+            else if (strncmp("rand_note", wurds[2], 8) == 0)
+            {
+                synthbase_set_rand_key(base);
+            }
+            else if (strncmp("root_note", wurds[2], 8) == 0)
+            {
+                int root_key = atoi(wurds[3]);
+                synthbase_set_root_key(base, root_key);
+            }
             else if (strncmp("delete", wurds[2], 6) == 0)
             {
                 if (strncmp("melody", wurds[3], 6) == 0)
@@ -434,6 +443,11 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
         printf("DXSynth change portamento time ms:%.2f!\n", ms);
         dxsynth_set_portamento_time_ms(dx, ms);
         return true;
+    }
+    else if (strncmp("rand", wurds[2], 4) == 0)
+    {
+        printf("RAND DX!\n");
+        dxsynth_rand_settings(dx);
     }
     else if (strncmp("pitchrange", wurds[2], 10) == 0)
     {

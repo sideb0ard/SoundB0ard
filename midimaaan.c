@@ -140,6 +140,8 @@ midi_event new_midi_event(int tick, int event_type, int data1, int data2)
 
 void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
 {
+    int cur_midi_tick = mixr->timing_info.midi_tick % PPNS;
+
     if (sg->type == MINISYNTH_TYPE)
     {
         minisynth *ms = (minisynth *)sg;
@@ -148,7 +150,6 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         {
         case (144):
         { // Hex 0x80
-            int cur_midi_tick = mixr->timing_info.midi_tick % PPNS;
             minisynth_add_last_note(ms, ev.data1);
             minisynth_midi_note_on(ms, ev.data1, ev.data2);
 
@@ -190,6 +191,12 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         { // Hex 0x80
             // dxsynth_add_last_note(dx, ev.data1);
             dxsynth_midi_note_on(dx, ev.data1, ev.data2);
+            int sustain_time_in_ticks =
+                dx->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
+            int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPNS;
+            midi_event off = new_midi_event(note_off_tick, 128, ev.data1, 128);
+            off.delete_after_use = true;
+            synthbase_add_event(&dx->base, 0, off);
             break;
         }
         case (128):
@@ -220,6 +227,12 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         case (144):
         { // Hex 0x80
             digisynth_midi_note_on(ds, ev.data1, ev.data2);
+            int sustain_time_in_ticks =
+                ds->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
+            int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPNS;
+            midi_event off = new_midi_event(note_off_tick, 128, ev.data1, 128);
+            off.delete_after_use = true;
+            synthbase_add_event(&ds->base, 0, off);
             break;
         }
         case (128):

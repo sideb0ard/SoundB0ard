@@ -37,6 +37,7 @@ void synthbase_init(synthbase *base, void *parent,
 
     base->m_generate_src = -99;
     base->last_midi_note = 60;
+    base->root_midi_note = 60;
     base->sustain_len_ms = 200;
     base->live_code_mode = true;
 
@@ -63,6 +64,7 @@ void synthbase_generate_melody(synthbase *base)
         uint16_t right_bits = sg->generate(sg, NULL);
 
         int32_t ored_bits = (left_bits << 16) | right_bits;
+        //print_bin_num(ored_bits);
 
         int patternlen = 32;
         for (int i = 0; i < patternlen; i++)
@@ -172,12 +174,13 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
              L"\n      Multi: %s CurMelody:%d"
              "generate:%d gen_src:%d gen_every_n:%d \n"
              "      morph:%d morph_gen:%d morph_every_n:%d "
-             "last_midi_note:%d sustain_len_ms:%d",
+             "root_midi_note:%d last_midi_note:%d sustain_len_ms:%d",
 
              base->multi_melody_mode ? "true" : "false", base->cur_melody,
              base->generate_mode, base->m_generate_src,
              base->generate_every_n_loops, base->morph_mode,
              base->morph_generation, base->morph_every_n_loops,
+             base->root_midi_note,
              base->last_midi_note, base->sustain_len_ms);
 
     for (int i = 0; i < base->num_melodies; i++)
@@ -603,4 +606,25 @@ void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
 {
     if (sustain_note_ms > 0)
         base->sustain_len_ms = sustain_note_ms;
+}
+
+void synthbase_set_rand_key(synthbase *base)
+{
+    int dice = rand() % 3;
+    switch(dice){
+        case(0):
+            base->last_midi_note = base->root_midi_note;
+            break;
+        case(1):
+            base->last_midi_note = base->root_midi_note + 4;
+            break;
+        case(2):
+            base->last_midi_note = base->root_midi_note + 7;
+            break;
+    }
+}
+
+void synthbase_set_root_key(synthbase *base, int root_key)
+{
+    base->root_midi_note = root_key;
 }
