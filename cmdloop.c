@@ -51,6 +51,7 @@
 #include <looper_cmds.h>
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
+#include <pattern_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
 
@@ -141,6 +142,9 @@ void interpret(char *line)
             return;
 
         else if (parse_new_item_cmd(num_wurds, wurds))
+            return;
+
+        else if (parse_pattern_cmd(num_wurds, wurds))
             return;
 
         else if (parse_synth_cmd(num_wurds, wurds))

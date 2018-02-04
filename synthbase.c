@@ -57,16 +57,18 @@ void synthbase_generate_melody(synthbase *base)
     if (mixer_is_valid_seq_gen_num(mixr, base->m_generate_src))
     {
         synthbase_stop(base);
-        sequence_generator *sg = mixr->sequence_generators[base->m_generate_src];
-        int left_bits = sg->generate(sg, NULL);
+        sequence_generator *sg =
+            mixr->sequence_generators[base->m_generate_src];
+        uint16_t left_bits = sg->generate(sg, NULL);
+        uint16_t right_bits = sg->generate(sg, NULL);
 
-        printf("GOT BITS! %d\n", left_bits);
+        int32_t ored_bits = (left_bits << 16) | right_bits;
 
-        int patternlen = sizeof(int) * 8; // 32
+        int patternlen = 32;
         for (int i = 0; i < patternlen; i++)
         {
             int shift_by = patternlen - 1 - i;
-            if (left_bits & 1 << shift_by)
+            if (ored_bits & 1 << shift_by)
             {
                 synthbase_add_note(base, base->cur_melody, i,
                                    base->last_midi_note);
@@ -347,13 +349,6 @@ void synthbase_set_generate_src(synthbase *b, int src)
         b->m_generate_src = src;
 }
 
-void synthbase_set_generate_mode(synthbase *ms, bool b)
-{
-    printf("SYNTHBASE GEN!:%s\n", b ? "true" : "false");
-    ms->generate_mode = b;
-    synthbase_set_backup_mode(ms, b);
-}
-
 void synthbase_set_backup_mode(synthbase *base, bool b)
 {
     if (b)
@@ -370,68 +365,6 @@ void synthbase_set_backup_mode(synthbase *base, bool b)
                               &base->melodies[0]);
         // base->m_settings = base->m_settings_backup_while_getting_crazy;
         base->multi_melody_mode = true;
-    }
-}
-
-void synthbase_morph(synthbase *base)
-{
-    synthbase_reset_melody(base, 0);
-
-    int max_steps = 10;
-
-    int midi_notes[10];
-    int num_notes = synthbase_get_notes_from_melody(
-        &base->backup_melody_while_getting_crazy, midi_notes);
-
-    if (num_notes == 0)
-    {
-        printf("Whoa nellie! nae notes\n");
-        return;
-    }
-
-    int rand_steps = (rand() % max_steps / 2);
-    int num_steps = rand_steps;
-    int bitpattern = create_euclidean_rhythm(rand_steps, 32);
-    if (rand() % 2 == 1)
-        bitpattern = shift_bits_to_leftmost_position(bitpattern, 32);
-    rand_steps = (rand() % max_steps / 2);
-    num_steps += rand_steps;
-    bitpattern += create_euclidean_rhythm(num_steps, 32);
-
-    // print_bin_num(bitpattern);
-    int num_hits = how_many_bits_in_num(bitpattern);
-    // printf("I gots %d hits\n", num_hits);
-
-    int largest_divisor = num_hits / num_notes;
-    int rem = num_hits % num_notes;
-    int generated_melody_note_num_hits[num_notes];
-    for (int i = 0; i < num_notes; ++i)
-        generated_melody_note_num_hits[i] = largest_divisor;
-
-    if (rem > 0)
-        generated_melody_note_num_hits[rand() % num_notes] += rem;
-
-    // for (int i = 0 ; i < rand_num_notes; i++)
-    //    printf("Playing %s %d times\n",
-    //    key_names[generated_melody_note_num[i]],
-    //    generated_melody_note_num_hits[i]);
-
-    int cur_key = 0;
-    int cur_key_count = 0;
-    for (int i = 31; i >= 0; i--)
-    {
-        if (bitpattern & 1 << i)
-        {
-            synthbase_add_note(
-                base, 0, 31 - i,
-                key_midi_mapping[compat_keys[mixr->key][cur_key]]);
-            cur_key_count++;
-            if (cur_key_count >= generated_melody_note_num_hits[cur_key])
-            {
-                cur_key++;
-                cur_key_count = 0;
-            }
-        }
     }
 }
 
@@ -500,11 +433,11 @@ void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
 {
     if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS)
     {
-        printf("New Notes!! %d - %d\n", mstep, midi_note);
         midi_event on = new_midi_event(mstep, 144, midi_note, 128);
-        //int note_off_tick = (int)(ms->sustain_len_ms * mixr->timing_info.midi_ticks_per_ms) % PPNS;
-        //printf("NOTE OFF TICK IS %d\n", note_off_tick);
-        //midi_event off = new_midi_event(note_off_tick, 128, midi_note, 128);
+        // int note_off_tick = (int)(ms->sustain_len_ms *
+        // mixr->timing_info.midi_ticks_per_ms) % PPNS;
+        // printf("NOTE OFF TICK IS %d\n", note_off_tick);
+        // midi_event off = new_midi_event(note_off_tick, 128, midi_note, 128);
 
         if (ms->live_code_mode)
         {

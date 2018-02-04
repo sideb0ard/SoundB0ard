@@ -1,3 +1,5 @@
+#pragma once
+
 #include <defjams.h>
 
 bool is_valid_fx_num(int soundgen_num, int fx_num);

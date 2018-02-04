@@ -152,7 +152,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
             minisynth_add_last_note(ms, ev.data1);
             minisynth_midi_note_on(ms, ev.data1, ev.data2);
 
-            int sustain_time_in_ticks = ms->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
+            int sustain_time_in_ticks =
+                ms->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
             int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPNS;
             midi_event off = new_midi_event(note_off_tick, 128, ev.data1, 128);
             off.delete_after_use = true;

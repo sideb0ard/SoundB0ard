@@ -65,8 +65,6 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             // ALL THE SYNTHBASE COMMONALITY FIRST, then SPECIFICS synths below
 
-            printf("SYNTHBASE STIFF?\n");
-
             synthbase *base =
                 get_synthbase(mixr->sound_generators[soundgen_num]);
 
@@ -122,7 +120,8 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 {
                     int six16th = atoi(wurds[i]) % (16 * SYNTH_NUM_BARS);
                     printf("NOTE ON!! 16th:%d\n", six16th);
-                    synthbase_add_note(base, base->cur_melody, six16th, base->last_midi_note);
+                    synthbase_add_note(base, base->cur_melody, six16th,
+                                       base->last_midi_note);
                 }
             }
             else if (strncmp("sustain_note_ms", wurds[2], 15) == 0)
@@ -130,7 +129,6 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 int sustain_note_ms = atoi(wurds[3]);
                 if (sustain_note_ms > 0)
                     synthbase_set_sustain_note_ms(base, sustain_note_ms);
-
             }
             else if (strncmp("delete", wurds[2], 6) == 0)
             {
@@ -182,95 +180,16 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 else
                 {
-                    //bool b = atoi(wurds[3]);
-                    //synthbase_set_generate_mode(base, b);
                     synthbase_generate_melody(base);
                 }
-                // if (strncmp("every", wurds[3], 5) == 0)
-                //{
-                //    int num_gens = atoi(wurds[4]);
-                //    if (num_gens > 0)
-                //    {
-                //        synthbase_set_generate_mode(base, true);
-                //        base->generate_every_n_loops = num_gens;
-                //    }
-                //    else
-                //    {
-                //        printf("Need a number for every 'n'\n");
-                //    }
-                //}
-                // else if (strncmp("for", wurds[3], 3) == 0)
-                //{
-                //    int num_gens = atoi(wurds[4]);
-                //    if (num_gens > 0)
-                //    {
-                //        synthbase_set_generate_mode(base, true);
-                //        base->max_generation = num_gens;
-                //    }
-                //    else
-                //    {
-                //        printf("Need a "
-                //               "number for "
-                //               "'for'\n");
-                //    }
-                //}
-                // else if (strncmp("false", wurds[3], 5) == 0)
-                //{
-                //    printf("Disabling generate mode\n");
-                //    synthbase_set_generate_mode(base, false);
-                //}
-                // else
-                //{
-                //    int melody_num = atoi(wurds[3]);
-                //    int max_notes = atoi(wurds[4]);
-                //    int max_steps = atoi(wurds[5]);
-                //    synthbase_generate_melody(base, melody_num,
-                //                              max_notes, max_steps);
-                //}
             }
-            else if (strncmp("morph", wurds[2], 8) == 0)
-            {
-                if (strncmp("every", wurds[3], 5) == 0)
-                {
-                    int num_gens = atoi(wurds[4]);
-                    if (num_gens > 0)
-                    {
-                        synthbase_set_morph_mode(base, true);
-                        base->morph_every_n_loops = num_gens;
-                    }
-                    else
-                    {
-                        printf("Need a number for every 'n'\n");
-                    }
-                }
-                else if (strncmp("for", wurds[3], 3) == 0)
-                {
-                    int num_gens = atoi(wurds[4]);
-                    if (num_gens > 0)
-                    {
-                        synthbase_set_morph_mode(base, true);
-                        base->max_generation = num_gens;
-                    }
-                    else
-                        printf("Need a number for 'for'\n");
-                }
-                else if (strncmp("false", wurds[3], 5) == 0)
-                {
-                    printf("Disabling morph mode\n");
-                    synthbase_set_morph_mode(base, false);
-                }
-                else
-                {
-                    printf("toggling morph mode\n");
-                    bool cur_mod = base->morph_mode;
-                    synthbase_set_morph_mode(base, 1 - cur_mod);
-                }
-            }
+
             else if (strncmp("midi", wurds[2], 4) == 0)
             {
                 mixr->midi_control_destination = SYNTH;
                 mixr->active_midi_soundgen_num = soundgen_num;
             }
+
             else if (strncmp("multi", wurds[2], 5) == 0)
             {
                 if (strncmp("true", wurds[3], 4) == 0)
@@ -290,6 +209,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 printf("Synth multi mode : %s\n",
                        base->multi_melody_mode ? "true" : "false");
             }
+
             else if (strncmp("nudge", wurds[2], 5) == 0)
             {
                 int sixteenth = atoi(wurds[3]);

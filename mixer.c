@@ -129,7 +129,8 @@ void mixer_ps(mixer *mixr)
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
-           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS, mixr->timing_info.midi_ticks_per_ms);
+           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS,
+           mixr->timing_info.midi_ticks_per_ms);
 
     if (mixr->env_var_count > 0)
     {
