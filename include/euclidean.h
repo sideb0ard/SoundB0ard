@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 #include "defjams.h"
 #include "sequence_generator.h"
 
@@ -27,6 +29,7 @@ sequence_generator *new_euclidean(int num_hits, int num_steps);
 int euclidean_generate(void *self, void *data);
 void euclidean_status(void *self, wchar_t *status_string);
 void euclidean_event_notify(void *self, unsigned int event_type);
+void euclidean_set_debug(void *self, bool b);
 
 int create_euclidean_rhythm(int num_hits, int num_steps);
 void euclidean_change_hits(euclidean *e, int num_hits);

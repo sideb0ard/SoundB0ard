@@ -21,6 +21,7 @@ sequence_generator *new_euclidean(int num_hits, int num_steps)
     e->sg.status = &euclidean_status;
     e->sg.generate = &euclidean_generate;
     e->sg.event_notify = &euclidean_event_notify;
+    e->sg.debug = &euclidean_set_debug;
     e->sg.type = EUCLIDEAN;
 
     e->num_hits = num_hits;
@@ -213,4 +214,9 @@ void euclidean_change_mode(euclidean *e, unsigned int mode)
 {
     if (mode < EUCLID_NUM_MODES)
         e->mode = mode;
+}
+void euclidean_set_debug(void *self, bool b)
+{
+    euclidean *e = (euclidean *)self;
+    e->sg.debug = b;
 }
