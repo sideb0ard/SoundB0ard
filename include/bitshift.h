@@ -78,3 +78,6 @@ void shunting_yard_algorithm(bitshift_pattern *pattern);
 int associativity(int op); // left or right
 int bin_or_uni(int op);
 int precedence(int op);
+
+void bitshift_set_time_counter(bitshift *bs, int time);
+void bitshift_set_debug(void *self, bool b);

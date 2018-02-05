@@ -104,22 +104,6 @@ void build_euclidean_pattern_string(int level, char *bitmap_string, int *count,
 int euclidean_generate(void *self, void *data)
 {
     euclidean *e = (euclidean *)self;
-    if (e->mode == RANDOM)
-    {
-        int dice = rand() % 3;
-        switch (dice)
-        {
-        case (0):
-            e->actual_num_hits = 3;
-            break;
-        case (1):
-            e->actual_num_hits = 4;
-            break;
-        case (2):
-            e->actual_num_hits = 7;
-            break;
-        }
-    }
     return create_euclidean_rhythm(e->actual_num_hits, e->actual_num_steps);
 }
 
@@ -195,7 +179,7 @@ void euclidean_event_notify(void *self, unsigned int event_type)
         }
         else if (e->mode == EUCLID_RANDOM)
         {
-            int dice = rand() % 4;
+            int dice = rand() % 3;
             switch (dice)
             {
             case (0):
@@ -209,6 +193,7 @@ void euclidean_event_notify(void *self, unsigned int event_type)
                 e->actual_num_hits = 7;
             }
         }
+        break;
     }
 }
 

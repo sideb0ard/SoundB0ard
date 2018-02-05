@@ -611,6 +611,7 @@ void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
 void synthbase_set_rand_key(synthbase *base)
 {
     int dice = rand() % 3;
+    printf("RAND KEY/NOTE! %d\n", dice);
     switch(dice){
         case(0):
             base->last_midi_note = base->root_midi_note;

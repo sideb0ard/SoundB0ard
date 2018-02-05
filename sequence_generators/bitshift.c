@@ -40,6 +40,7 @@ sequence_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
     bs->sg.status = &bitshift_status;
     bs->sg.generate = &bitshift_generate;
     bs->sg.event_notify = &bitshift_event_notify;
+    bs->sg.set_debug = &bitshift_set_debug;
     bs->sg.type = BITSHIFT;
     bs->time_counter = 1023; // init value, rather than 0
     return (sequence_generator *)bs;
@@ -220,6 +221,8 @@ int bitshift_generate(void *self, void *data)
     }
     else
     {
+        if (sg->sg.debug)
+            printf("Returning %d\n", answer_stack[0]);
         return answer_stack[0];
     }
 }
@@ -591,10 +594,21 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
 
 void bitshift_event_notify(void *self, unsigned int event_type)
 {
-    bitshift *e = (bitshift *)self;
+    bitshift *bs = (bitshift *)self;
     // switch (event_type)
     //{
     // case (TIME_START_OF_LOOP_TICK):
     //    // printf("bitshift - got start of loop!\n");
     //}
+}
+
+void bitshift_set_debug(void *self, bool b)
+{
+    bitshift *bs = (bitshift *)self;
+    bs->sg.debug = b;
+}
+void bitshift_set_time_counter(bitshift *bs, int time)
+{
+    if (time >= 0)
+        bs->time_counter = time;
 }

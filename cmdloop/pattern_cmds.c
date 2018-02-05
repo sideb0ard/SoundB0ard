@@ -12,6 +12,7 @@
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "bitcrush.h"
+#include "bitshift.h"
 #include "chaosmonkey.h"
 #include "defjams.h"
 #include "distortion.h"
@@ -49,6 +50,13 @@ bool parse_pattern_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 char binnum[33] = {0};
                 char_binary_version_of_int(num, binnum);
                 printf("NOM!: %d %s\n", num, binnum);
+            }
+            if (strncmp("time", wurds[2], 4) == 0
+                && sg->type == BITSHIFT)
+            {
+                int itime = atoi(wurds[3]);
+                bitshift *bs = (bitshift*) sg;
+                bitshift_set_time_counter(bs, itime);
             }
             if (sg->type == EUCLIDEAN)
             {
