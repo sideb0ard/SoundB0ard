@@ -90,6 +90,12 @@ enum
     SNARE
 };
 
+enum
+{
+    LEFT,
+    RIGHT
+};
+
 typedef enum {
     MIDI_KNOB_MODE_ONE,
     MIDI_KNOB_MODE_TWO,
@@ -190,5 +196,6 @@ typedef struct parceled_pattern
 {
     unsigned int type;
     unsigned int len;
+    // this is double PPBAR so i can be used for step_seq or synth
     int pattern[2 * PPBAR]; // max size
 } parceled_pattern;

@@ -126,8 +126,9 @@ bool seq_tick(sequencer *seq)
 
                         if (seq->visualize)
                         {
-                            char bit_string[33];
-                            char_binary_version_of_int(bit_pattern, bit_string);
+                            char bit_string[17];
+                            char_binary_version_of_short(bit_pattern,
+                                                         bit_string);
                             printf("New pattern: %s\n", bit_string);
                         }
 
@@ -351,11 +352,7 @@ void seq_set_max_generations(sequencer *s, int max)
     s->generate_max_generation = max;
 }
 
-void seq_set_generate_src(sequencer *s, int src)
-{
-    printf("Setting GENERATE SRC\n");
-    s->generate_src = src;
-}
+void seq_set_generate_src(sequencer *s, int src) { s->generate_src = src; }
 
 void seq_set_randamp(sequencer *s, bool b) { s->randamp_on = b; }
 

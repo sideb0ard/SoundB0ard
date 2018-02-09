@@ -951,7 +951,7 @@ double clamp(double min, double max, double v)
 
 void print_bin_num(int num)
 {
-    int len = sizeof(num) * 8;
+    int len = 16; // short
     for (int i = len - 1; i >= 0; --i)
     {
         if (num & 1 << i)
@@ -1105,4 +1105,26 @@ unsigned int get_next_compat_note(unsigned int cur_key)
         break;
     }
     return 0;
+}
+
+void print_parceled_pattern(parceled_pattern pattern)
+{
+    printf("PATTERN!\n");
+    bool found = false;
+    for (int i = 0; i < pattern.len; i += PPSIXTEENTH)
+    {
+        // printf("%d", pattern.pattern[i]);
+        found = false;
+        for (int j = 0; j < PPSIXTEENTH && !found; j++)
+        {
+            if (pattern.pattern[i + j] == 1)
+            {
+                printf("1");
+                found = true;
+            }
+        }
+        if (!found)
+            printf("0");
+    }
+    puts("\n");
 }

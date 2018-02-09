@@ -21,6 +21,12 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
         return NULL;
     }
 
+    printf("TARGEZ%d:%d\n", a->target_sound_generator,
+           a->target_sound_generator_pattern_num);
+    soundgenerator *sg = mixr->sound_generators[a->target_sound_generator];
+    a->original_pattern =
+        sg->get_pattern(sg, a->target_sound_generator_pattern_num);
+
     a->sound_generator.gennext = &algorithm_gennext;
     a->sound_generator.ps_status = &algorithm_status;
     a->sound_generator.full_status = &algorithm_status;
@@ -33,6 +39,7 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     a->counter = 0;
     a->has_started = false;
+    a->debug = false;
 
     return a;
 }
@@ -41,6 +48,12 @@ static void take_action_or_not(algorithm *a)
 {
     if (a->counter % a->every_n == 0)
         interpret(a->command);
+    else
+    {
+        soundgenerator *sg = mixr->sound_generators[a->target_sound_generator];
+        sg->set_pattern(sg, a->target_sound_generator_pattern_num,
+                        a->original_pattern);
+    }
     a->counter++;
 }
 
@@ -77,6 +90,9 @@ int extract_cmds_from_line(algorithm *a, int num_wurds,
                            char wurds[][SIZE_OF_WURD])
 {
 
+    for (int i = 0; i < num_wurds; i++)
+        printf("[%d] %s\n", i, wurds[i]);
+
     if (strncmp(wurds[0], "every", 5) == 0)
     {
         int every_n = atoi(wurds[1]);
@@ -84,7 +100,7 @@ int extract_cmds_from_line(algorithm *a, int num_wurds,
         if (every_n == 0)
         {
             printf("don't be daft, cannae dae 0 times.\n");
-            return -1;
+            return 1;
         }
         a->every_n = every_n;
 
@@ -113,10 +129,21 @@ int extract_cmds_from_line(algorithm *a, int num_wurds,
             a->frequency = TIME_THIRTYSECOND_TICK;
             printf("ThirzztySecdon!\n");
         }
+        else
+        {
+            printf("Need a time period\n");
+            return 1;
+        }
     }
-    int len_of_cmd_string = 1; // for NULL termination
+    else
+    {
+        printf("Only 'every' is a supported algo currently\n");
+        return 1;
+    }
+
+    int len_of_cmd_string = 0;
     for (int i = 3; i < num_wurds; i++)
-        len_of_cmd_string += strlen(wurds[i]);
+        len_of_cmd_string += strlen(wurds[i]) + 1;
     if (len_of_cmd_string < MAX_CMD_LEN)
     {
         for (int i = 3; i < num_wurds; i++)
@@ -126,6 +153,13 @@ int extract_cmds_from_line(algorithm *a, int num_wurds,
                 strcat(a->command, " ");
         }
     }
+    int soundgen_num = -1;
+    int soundgen_num_pattern_num = -1;
+    sscanf(wurds[4], "%d:%d", &soundgen_num, &soundgen_num_pattern_num);
+    printf("SOUND GEN NUM:%d and pattern %d\n", soundgen_num,
+           soundgen_num_pattern_num);
+    a->target_sound_generator = soundgen_num;
+    a->target_sound_generator_pattern_num = soundgen_num_pattern_num;
     printf("CMD! %s\n", a->command);
 
     return 0;
@@ -208,9 +242,10 @@ void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_RED "[ALGO]%s Post: %s %s %s %s %s", a->command,
-             a->afterthought[0], a->afterthought[1], a->afterthought[2],
-             a->afterthought[3], a->afterthought[4]);
+             WANSI_COLOR_RED "[ALGO Target:%d:%d]%s Post: %s %s %s %s %s",
+             a->target_sound_generator, a->target_sound_generator_pattern_num,
+             a->command, a->afterthought[0], a->afterthought[1],
+             a->afterthought[2], a->afterthought[3], a->afterthought[4]);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

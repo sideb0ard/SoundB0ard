@@ -5,6 +5,7 @@
 #include "euclidean.h"
 #include "mixer.h"
 #include "sequencer_utils.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
@@ -47,8 +48,9 @@ void euclidean_status(void *self, wchar_t *wstring)
              e->actual_num_hits, e->actual_num_steps);
 }
 
-void build_euclidean_pattern_int(int level, int *bitmap_int, int *bitmap_len,
-                                 int *count, int *remainderrr)
+void build_euclidean_pattern_short(int level, uint16_t *bitmap_int,
+                                   uint16_t *bitmap_len, int *count,
+                                   int *remainderrr)
 {
     if (level == -1)
     {
@@ -64,13 +66,13 @@ void build_euclidean_pattern_int(int level, int *bitmap_int, int *bitmap_len,
     {
         for (int i = 0; i < count[level]; i++)
         {
-            build_euclidean_pattern_int(level - 1, bitmap_int, bitmap_len,
-                                        count, remainderrr);
+            build_euclidean_pattern_short(level - 1, bitmap_int, bitmap_len,
+                                          count, remainderrr);
         }
         if (remainderrr[level] != 0)
         {
-            build_euclidean_pattern_int(level - 2, bitmap_int, bitmap_len,
-                                        count, remainderrr);
+            build_euclidean_pattern_short(level - 2, bitmap_int, bitmap_len,
+                                          count, remainderrr);
         }
     }
 }
@@ -102,13 +104,13 @@ void build_euclidean_pattern_string(int level, char *bitmap_string, int *count,
 }
 
 // https://ics-web.sns.ornl.gov/timing/Rep-Rate%20Tech%20Note.pdf
-int euclidean_generate(void *self, void *data)
+uint16_t euclidean_generate(void *self, void *data)
 {
     euclidean *e = (euclidean *)self;
-    return create_euclidean_rhythm(e->actual_num_hits, e->actual_num_steps);
+    return create_euclidean_rhythm(e->actual_num_hits, 16);
 }
 
-int create_euclidean_rhythm(int num_hits, int num_steps)
+uint16_t create_euclidean_rhythm(int num_hits, int num_steps)
 {
     int remaindrrr[num_steps];
     int count[num_steps];
@@ -130,35 +132,41 @@ int create_euclidean_rhythm(int num_hits, int num_steps)
     count[level] = divisor;
 
     // now calculate return value
-    int bitmap_len = 0;
-    int bitmap_int = 0;
+    uint16_t bitmap_len = 0;
+    uint16_t bitmap_int = 0;
 
     // char bitmap_string[num_steps + 1];
     // memset(bitmap_string, 0, (num_steps + 1) * sizeof(char));
     // build_euclidean_pattern_string(level, bitmap_string, count, remaindrrr);
     // printf("STRINGPATTERN: %s\n", bitmap_string);
 
-    build_euclidean_pattern_int(level, &bitmap_int, &bitmap_len, count,
-                                remaindrrr);
-    // printf("PATTERN int: %d Len:%d\n", bitmap_int, bitmap_len);
-    char bin_ver_num[33];
-    char_binary_version_of_int(bitmap_int, bin_ver_num);
+    build_euclidean_pattern_short(level, &bitmap_int, &bitmap_len, count,
+                                  remaindrrr);
+    //// printf("PATTERN int: %d Len:%d\n", bitmap_int, bitmap_len);
+    // char bin_ver_num[17];
+    // char_binary_version_of_short(bitmap_int, bin_ver_num);
     // printf("PATTERN: %s\n", bin_ver_num);
-    int num_of_bits_to_align_with = 16;
+    // print_bin_num(bitmap_int);
+
+    uint16_t max_bits_to_align_with = 16; // max
 
     // find first set bit
-    int first_bit;
-    for (int i = num_of_bits_to_align_with; i >= 0; i--)
+    uint16_t first_bit;
+    for (int i = max_bits_to_align_with; i >= 0; i--)
     {
         if (bitmap_int & (1 << i))
         {
             first_bit = i;
+            // printf("FIRST BIT IS %d\n", i);
             break;
         }
     }
 
-    int bitshift_by = num_of_bits_to_align_with - (first_bit + 1);
-    int aligned_bitmap = bitmap_int << bitshift_by;
+    uint16_t bitshift_by = (max_bits_to_align_with - 1) - first_bit;
+    // printf("SHIfting left by %d places\n", bitshift_by);
+    uint16_t aligned_bitmap = bitmap_int << bitshift_by;
+    // printf("ALLIGNED\n");
+    // print_bin_num(aligned_bitmap);
     return aligned_bitmap;
 }
 

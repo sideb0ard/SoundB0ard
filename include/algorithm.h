@@ -20,6 +20,10 @@ typedef struct algorithm
     int counter;
     bool has_started;
     bool active;
+    bool debug;
+    int target_sound_generator;
+    int target_sound_generator_pattern_num;
+    parceled_pattern original_pattern;
 } algorithm;
 
 algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD]);

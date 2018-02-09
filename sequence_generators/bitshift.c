@@ -42,7 +42,7 @@ sequence_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
     bs->sg.event_notify = &bitshift_event_notify;
     bs->sg.set_debug = &bitshift_set_debug;
     bs->sg.type = BITSHIFT;
-    bs->time_counter = 1023; // init value, rather than 0
+    bs->time_counter = 40761023; // init value, rather than 0
     return (sequence_generator *)bs;
 }
 void token_val_to_string(bitshift_token *t, char *char_val)
@@ -110,14 +110,14 @@ void bitshift_status(void *self, wchar_t *wstring)
              infix_pattern, rpn_pattern);
 }
 
-int bitshift_generate(void *self, void *data)
+uint16_t bitshift_generate(void *self, void *data)
 {
-    bitshift *sg = (bitshift *)self;
+    bitshift *bs = (bitshift *)self;
     // int *t = &mixr->timing_info.cur_sample;
-    int t = sg->time_counter++;
+    int t = bs->time_counter++;
 
-    int num_rpn = sg->pattern.num_rpn_tokens;
-    bitshift_token *rpn_tokens = sg->pattern.rpn_tokenized_pattern;
+    int num_rpn = bs->pattern.num_rpn_tokens;
+    bitshift_token *rpn_tokens = bs->pattern.rpn_tokenized_pattern;
 
     int answer_stack_idx = 0;
     int answer_stack[MAX_TOKENS_IN_PATTERN] = {0};
@@ -127,9 +127,8 @@ int bitshift_generate(void *self, void *data)
         bitshift_token cur = rpn_tokens[i];
         char char_val[100] = {0};
         token_val_to_string(&cur, char_val);
-#ifdef DEBUG_BITSHIFT
-        printf("Looking at %s\n", char_val);
-#endif
+        if (bs->sg.debug)
+            printf("Looking at %s\n", char_val);
         if (cur.type == NUMBER)
         {
             answer_stack[answer_stack_idx++] = cur.val;
@@ -140,9 +139,8 @@ int bitshift_generate(void *self, void *data)
         }
         else if (cur.type == OPERATOR)
         {
-#ifdef DEBUG_BITSHIFT
-            printf("GOTSZ AN OPERATOR\n");
-#endif
+            if (bs->sg.debug)
+                printf("GOTSZ AN OPERATOR\n");
             if (bin_or_uni(cur.val) == UNARY)
             {
                 // only UNARY is bitwise NOT ~
@@ -155,19 +153,17 @@ int bitshift_generate(void *self, void *data)
                 int op1 = next.type == NUMBER ? next.val
                                               : mixr->timing_info.cur_sample;
                 answer_stack[answer_stack_idx++] = ~op1;
-#ifdef DEBUG_BITSHIFT
-                printf("WAS UNARY NOT -- answer is %d\n",
-                       answer_stack[answer_stack_idx - 1]);
-#endif
+                if (bs->sg.debug)
+                    printf("WAS UNARY NOT -- answer is %d\n",
+                           answer_stack[answer_stack_idx - 1]);
             }
             else
             {
                 int op2 = answer_stack[--answer_stack_idx];
                 int op1 = answer_stack[--answer_stack_idx];
 
-#ifdef DEBUG_BITSHIFT
-                printf("OP1 is %d and OP2 is %d\n", op1, op2);
-#endif
+                if (bs->sg.debug)
+                    printf("OP1 is %d and OP2 is %d\n", op1, op2);
 
                 int answer = 0;
                 switch (cur.val)
@@ -208,9 +204,8 @@ int bitshift_generate(void *self, void *data)
                     printf("WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n");
                 }
                 answer_stack[answer_stack_idx++] = answer;
-#ifdef DEBUG_BITSHIFT
-                printf("WAS BINARY -- answer is %d\n", answer);
-#endif
+                if (bs->sg.debug)
+                    printf("WAS BINARY -- answer is %d\n", answer);
             }
         }
     }
@@ -221,7 +216,7 @@ int bitshift_generate(void *self, void *data)
     }
     else
     {
-        if (sg->sg.debug)
+        if (bs->sg.debug)
             printf("Returning %d\n", answer_stack[0]);
         return answer_stack[0];
     }

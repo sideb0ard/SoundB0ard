@@ -182,7 +182,6 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             int generate_src = atoi(wurds[4]);
             if (mixer_is_valid_seq_gen_num(mixr, generate_src))
             {
-                printf("Setting GENERATE SRC! %d\n", generate_src);
                 seq_set_generate_src(seq, generate_src);
             }
             else

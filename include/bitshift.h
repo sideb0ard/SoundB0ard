@@ -4,12 +4,6 @@
 #include "sequence_generator.h"
 #include "stack.h"
 
-enum direction
-{
-    LEFT,
-    RIGHT
-};
-
 enum unary_or_binary
 {
     UNARY,
@@ -64,7 +58,7 @@ typedef struct bitshift
 } bitshift;
 
 sequence_generator *new_bitshift(int argc, char argv[][SIZE_OF_WURD]);
-int bitshift_generate(void *self, void *data);
+uint16_t bitshift_generate(void *self, void *data);
 void bitshift_status(void *self, wchar_t *status_string);
 void bitshift_event_notify(void *self, unsigned int event_type);
 

@@ -64,7 +64,7 @@ void synthbase_generate_melody(synthbase *base)
         uint16_t right_bits = sg->generate(sg, NULL);
 
         int32_t ored_bits = (left_bits << 16) | right_bits;
-        //print_bin_num(ored_bits);
+        // print_bin_num(ored_bits);
 
         int patternlen = 32;
         for (int i = 0; i < patternlen; i++)
@@ -180,8 +180,7 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
              base->generate_mode, base->m_generate_src,
              base->generate_every_n_loops, base->morph_mode,
              base->morph_generation, base->morph_every_n_loops,
-             base->root_midi_note,
-             base->last_midi_note, base->sustain_len_ms);
+             base->root_midi_note, base->last_midi_note, base->sustain_len_ms);
 
     for (int i = 0; i < base->num_melodies; i++)
     {
@@ -612,16 +611,17 @@ void synthbase_set_rand_key(synthbase *base)
 {
     int dice = rand() % 3;
     printf("RAND KEY/NOTE! %d\n", dice);
-    switch(dice){
-        case(0):
-            base->last_midi_note = base->root_midi_note;
-            break;
-        case(1):
-            base->last_midi_note = base->root_midi_note + 4;
-            break;
-        case(2):
-            base->last_midi_note = base->root_midi_note + 7;
-            break;
+    switch (dice)
+    {
+    case (0):
+        base->last_midi_note = base->root_midi_note;
+        break;
+    case (1):
+        base->last_midi_note = base->root_midi_note + 4;
+        break;
+    case (2):
+        base->last_midi_note = base->root_midi_note + 7;
+        break;
     }
 }
 

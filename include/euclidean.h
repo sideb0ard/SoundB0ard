@@ -26,12 +26,12 @@ typedef struct euclidean
 } euclidean;
 
 sequence_generator *new_euclidean(int num_hits, int num_steps);
-int euclidean_generate(void *self, void *data);
+uint16_t euclidean_generate(void *self, void *data);
 void euclidean_status(void *self, wchar_t *status_string);
 void euclidean_event_notify(void *self, unsigned int event_type);
 void euclidean_set_debug(void *self, bool b);
 
-int create_euclidean_rhythm(int num_hits, int num_steps);
+uint16_t create_euclidean_rhythm(int num_hits, int num_steps);
 void euclidean_change_hits(euclidean *e, int num_hits);
 void euclidean_change_steps(euclidean *e, int num_steps);
 void euclidean_change_mode(euclidean *e, unsigned int mode);

@@ -11,6 +11,7 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
+#include "algorithm.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "digisynth.h"
@@ -79,6 +80,29 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         return true;
     }
 
+    else if (strncmp("every", wurds[0], 4) == 0)
+    {
+        algorithm *a = new_algorithm(num_wurds, wurds);
+        add_sound_generator(mixr, (soundgenerator *)a);
+    }
+
+    else if (strncmp("brak", wurds[0], 4) == 0)
+    {
+        int sg_num;
+        int sg_pattern_num;
+        sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
+        if (mixer_is_valid_soundgen_num(mixr, sg_num))
+        {
+            soundgenerator *sg =
+                (soundgenerator *)mixr->sound_generators[sg_num];
+            if (sg->is_valid_pattern(sg, sg_pattern_num))
+            {
+                sg->set_pattern(sg, sg_pattern_num,
+                                brak(sg->get_pattern(sg, sg_pattern_num)));
+            }
+        }
+        return true;
+    }
     else if (strncmp("quantize", wurds[0], 8) == 0)
     {
         int quanta = atoi(wurds[1]);
@@ -127,7 +151,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
-    else if (strncmp("<~", wurds[0], 2) == 0)
+    else if (strncmp("<~", wurds[0], 2) == 0 || strncmp("~>", wurds[0], 2) == 0)
     {
         int sg_num;
         int sg_pattern_num;
@@ -139,9 +163,20 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 int places_to_shift = atoi(wurds[2]);
-                sg->set_pattern(sg, sg_pattern_num,
-                                left_shift(sg->get_pattern(sg, sg_pattern_num),
-                                           places_to_shift));
+                if (strcmp("<~", wurds[0]) == 0)
+                {
+                    sg->set_pattern(
+                        sg, sg_pattern_num,
+                        left_shift(sg->get_pattern(sg, sg_pattern_num),
+                                   places_to_shift));
+                }
+                else
+                {
+                    sg->set_pattern(
+                        sg, sg_pattern_num,
+                        right_shift(sg->get_pattern(sg, sg_pattern_num),
+                                    places_to_shift));
+                }
             }
         }
         return true;
