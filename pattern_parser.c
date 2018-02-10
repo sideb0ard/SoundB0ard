@@ -8,6 +8,8 @@
 #include "sample_sequencer.h"
 #include "sequencer_utils.h"
 
+// algo inspired from https://www.geeksforgeeks.org/check-for-balanced-parentheses-in-an-expression/
+
 extern mixer *mixr;
 
 static char *token_type_names[] = {"SQUARE_LEFT", "SQUARE_RIGHT", "CURLY_LEFT",
