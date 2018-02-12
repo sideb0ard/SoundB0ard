@@ -113,7 +113,7 @@ void interpret(char *line)
     char wurds[NUM_WURDS][SIZE_OF_WURD];
 
     char *cmd, *last_s;
-    char const *sep = ",";
+    char const *sep = ";";
     for (cmd = strtok_r(line, sep, &last_s); cmd;
          cmd = strtok_r(NULL, sep, &last_s))
     {

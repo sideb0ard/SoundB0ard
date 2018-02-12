@@ -1,6 +1,6 @@
 #pragma once
 
-#define MAX_PATTERN 64
+#define MAX_PATTERN 254
 #define MAX_PATTERN_CHAR_VAL 100
 #define MAX_CHILDREN 20
 
@@ -10,8 +10,9 @@ enum pattern_token_type
     SQUARE_BRACKET_RIGHT,
     CURLY_BRACKET_LEFT,
     CURLY_BRACKET_RIGHT,
-    PAREN_BRACKET_LEFT,
-    PAREN_BRACKET_RIGHT,
+    ANGLE_BRACKET_LEFT,
+    ANGLE_BRACKET_RIGHT,
+    ANGLE_EXPRESSION,
     BLANK,
     VAR_NAME
 } pattern_token_type;
@@ -20,7 +21,16 @@ typedef struct pattern_token
 {
     unsigned int type;
     char value[MAX_PATTERN_CHAR_VAL];
-    int idx;
+
+    bool has_multiplier;
+    int  multiplier;
+
+    bool has_divider;
+    int  divider;
+
+    bool has_euclid;
+    int  euclid_hits;
+    int  euclid_steps;
 } pattern_token;
 
 typedef struct pg_child
@@ -36,7 +46,8 @@ typedef struct pattern_group
     int parent;
 } pattern_group;
 
-void parse_pattern(int num_wurds, char wurds[][SIZE_OF_WURD]);
+bool parse_pattern(char *line);
+bool is_valid_pattern(char *line);
 void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
                         int start_idx, int pattern_len,
                         int ppositions[MAX_PATTERN], int *numpositions);

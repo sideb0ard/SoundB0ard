@@ -461,7 +461,28 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     else if (strncmp("beat", wurds[0], 4) == 0)
     {
-        parse_pattern(num_wurds - 1, &wurds[1]);
+        int line_len = 0;
+        for (int i = 1; i < num_wurds; i++)
+        {
+            printf("%s (len:%lu)\n", wurds[i], strlen(wurds[i]));
+            line_len += strlen(wurds[i]);
+        }
+        // add space for a ' ' between wurds
+        // this also has an extra couple chars, but
+        // thats fine.
+        line_len += num_wurds + 1;
+        printf("Reserving line len: %d\n", line_len);
+        char line[line_len];
+        memset(line, 0, line_len*sizeof(char));
+        for (int i = 1; i < num_wurds; i++)
+        {
+            strcat(line, wurds[i]);
+            if (i != num_wurds -1)
+                strcat(line, " ");
+        }
+
+        printf("LINe:%s\n", line);
+        parse_pattern(line);
         return true;
     }
 
