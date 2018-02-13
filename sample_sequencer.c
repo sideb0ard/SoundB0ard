@@ -30,7 +30,8 @@ sample_sequencer *new_sample_seq(char *filename)
     seq->vol = 0.7;
 
     seq->sound_generator.gennext = &sample_seq_gennext;
-    seq->sound_generator.ps_status = &sample_seq_ps_status;
+    // seq->sound_generator.ps_status = &sample_seq_ps_status;
+    seq->sound_generator.ps_status = &sample_seq_full_status;
     seq->sound_generator.full_status = &sample_seq_full_status;
     seq->sound_generator.getvol = &sample_seq_getvol;
     seq->sound_generator.setvol = &sample_seq_setvol;

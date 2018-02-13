@@ -14,6 +14,7 @@
 #define WEE_STACK_SIZE 32
 #define _MAX_VAR_NAME 32
 #define _MAX_TOKENS 128
+#define MAX_DIVISIONS 10
 
 extern mixer *mixr;
 
@@ -25,6 +26,12 @@ typedef struct wee_stack
     unsigned int stack[WEE_STACK_SIZE];
     int idx;
 } wee_stack;
+
+typedef struct division_marker
+{
+    int position;
+    int value;
+} division_marker;
 
 static char *token_type_names[] = {"SQUARE_LEFT",
                                    "SQUARE_RIGHT",
@@ -126,18 +133,32 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
                num_uniq, var_tokens_idx);
         return;
     }
+    division_marker divisions[MAX_DIVISIONS];
+    int num_divisions = 0;
+    int highest_division = 1;
     printf("Num Uniq:%d\n", num_uniq);
     for (int i = 0; i < num_uniq; i++)
     {
         if (var_tokens[i].type == VAR_NAME)
+        {
+            if (var_tokens[i].has_divider)
+            {
+                printf("DIVISORRRR %d!\n", var_tokens[i].divider);
+                divisions[num_divisions].position = uniq_positions[i];
+                divisions[num_divisions].value = var_tokens[i].divider;
+                if (divisions[num_divisions].value > highest_division)
+                    highest_division = divisions[num_divisions].value;
+                num_divisions++;
+            }
             printf("%s at pos %d\n", var_tokens[i].value, uniq_positions[i]);
+        }
         else
             printf("%s at pos %d\n", token_type_names[var_tokens[i].type],
                    uniq_positions[i]);
     }
 
     // 3. verify env vars
-     for (int i = 0; i < var_tokens_idx; i++)
+    for (int i = 0; i < var_tokens_idx; i++)
     {
         char *var_key = var_tokens[i].value;
         if (mixer_is_valid_env_var(mixr, var_key))
@@ -146,10 +167,18 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
             int sg_num;
             if (get_environment_val(var_key, &sg_num))
             {
-                printf("CLEARING %s(%d)\n", var_key, sg_num);
-                sample_sequencer *seq =
-                    (sample_sequencer *)mixr->sound_generators[sg_num];
-                seq_clear_pattern(&seq->m_seq, 0);
+                if (mixer_is_valid_soundgen_num(mixr, sg_num))
+                {
+                    printf("CLEARING %s(%d)\n", var_key, sg_num);
+                    sample_sequencer *seq =
+                        (sample_sequencer *)mixr->sound_generators[sg_num];
+                    seq_clear_pattern(&seq->m_seq, 0);
+                }
+                else
+                {
+                    printf("Whoa, nellie, not a valid pattern to clear\n");
+                    return;
+                }
             }
         }
         else if (var_tokens[i].type == BLANK)
@@ -171,7 +200,31 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
             printf("Play at %s %d\n", var_tokens[i].value, uniq_positions[i]);
             sample_sequencer *seq =
                 (sample_sequencer *)mixr->sound_generators[sg_num];
-            seq_add_micro_hit(&seq->m_seq, 0, uniq_positions[i]);
+            if (highest_division > 0)
+            {
+                printf("%d DIVISIOSN!! Going for %d loops\n", highest_division,
+                       highest_division);
+                seq_set_num_patterns(&seq->m_seq, highest_division);
+            }
+            else
+            {
+                seq_set_num_patterns(&seq->m_seq, 1);
+                printf("SINGLE LOOP, TALLY HO!\n");
+            }
+
+            for (int j = 0; j < highest_division; j++)
+            {
+                printf("BOO!\n");
+                if (var_tokens[i].has_divider)
+                {
+                    if (j % var_tokens[i].divider == 0)
+                        seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
+                    else
+                        printf("SKipping!\n");
+                }
+                else
+                    seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
+            }
         }
     }
 }
@@ -548,6 +601,15 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
                 }
                 expanded_tokens[(*expanded_tokens_idx)++].type =
                     SQUARE_BRACKET_RIGHT;
+            }
+            else if (tokens[i].has_divider)
+            {
+                copy_pattern_token(&expanded_tokens[*expanded_tokens_idx],
+                                   &tokens[i]);
+                expanded_tokens[*expanded_tokens_idx].has_divider = true;
+                expanded_tokens[*expanded_tokens_idx].divider =
+                    tokens[i].divider;
+                (*expanded_tokens_idx)++;
             }
             else
                 copy_pattern_token(&expanded_tokens[(*expanded_tokens_idx)++],

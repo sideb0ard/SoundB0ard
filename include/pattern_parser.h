@@ -23,14 +23,14 @@ typedef struct pattern_token
     char value[MAX_PATTERN_CHAR_VAL];
 
     bool has_multiplier;
-    int  multiplier;
+    int multiplier;
 
     bool has_divider;
-    int  divider;
+    int divider;
 
     bool has_euclid;
-    int  euclid_hits;
-    int  euclid_steps;
+    int euclid_hits;
+    int euclid_steps;
 } pattern_token;
 
 typedef struct pg_child

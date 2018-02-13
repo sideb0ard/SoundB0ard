@@ -96,3 +96,4 @@ int sloppy_weight(sequencer *s, int position);
 parceled_pattern seq_get_pattern(sequencer *s, int pattern_num);
 void seq_set_pattern(sequencer *s, int pattern_num, parceled_pattern pattern);
 bool seq_is_valid_pattern(sequencer *s, int pattern_num);
+bool seq_set_num_patterns(sequencer *s, int num_patterns);

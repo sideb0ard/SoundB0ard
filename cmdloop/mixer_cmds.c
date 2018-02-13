@@ -473,11 +473,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         line_len += num_wurds + 1;
         printf("Reserving line len: %d\n", line_len);
         char line[line_len];
-        memset(line, 0, line_len*sizeof(char));
+        memset(line, 0, line_len * sizeof(char));
         for (int i = 1; i < num_wurds; i++)
         {
             strcat(line, wurds[i]);
-            if (i != num_wurds -1)
+            if (i != num_wurds - 1)
                 strcat(line, " ");
         }
 

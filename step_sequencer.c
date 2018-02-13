@@ -560,3 +560,13 @@ void seq_set_pattern(sequencer *s, int pattern_num, parceled_pattern pattern)
         }
     }
 }
+
+bool seq_set_num_patterns(sequencer *s, int num_patterns)
+{
+    if (num_patterns > 0 && num_patterns < 20)
+    {
+        s->num_patterns = num_patterns;
+        return true;
+    }
+    return false;
+}
