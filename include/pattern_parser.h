@@ -31,6 +31,9 @@ typedef struct pattern_token
     bool has_euclid;
     int euclid_hits;
     int euclid_steps;
+
+    char steps[5][5];
+    int num_steps;
 } pattern_token;
 
 typedef struct pg_child

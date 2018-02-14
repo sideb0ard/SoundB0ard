@@ -98,7 +98,8 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         }
         else if (tokens[i].type == SQUARE_BRACKET_RIGHT)
             current_pattern_group = pgroups[current_pattern_group].parent;
-        else if (tokens[i].type == BLANK || tokens[i].type == VAR_NAME)
+        else if (tokens[i].type == BLANK || tokens[i].type == VAR_NAME ||
+                 tokens[i].type == ANGLE_EXPRESSION)
         {
             pgroups[current_pattern_group].num_children++;
             var_tokens[var_tokens_idx++] = tokens[i];
@@ -151,6 +152,16 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
                 num_divisions++;
             }
             printf("%s at pos %d\n", var_tokens[i].value, uniq_positions[i]);
+        }
+        else if (var_tokens[i].type == ANGLE_EXPRESSION)
+        {
+            printf("Angle expression! NUM STEPS:%d\n", var_tokens[i].num_steps);
+            for (int j = 0; j < var_tokens[i].num_steps; j++)
+            {
+                printf("Step[%d] Var:[%s]\n", j, var_tokens[i].steps[j]);
+            }
+            if (var_tokens[i].num_steps > highest_division)
+                highest_division = var_tokens[i].num_steps;
         }
         else
             printf("%s at pos %d\n", token_type_names[var_tokens[i].type],
@@ -402,8 +413,26 @@ int extract_tokens_from_line(pattern_token *tokens, int *token_idx, char *line)
             }
             c++; // skip the '>'
 
+            printf("Captured an ANGLE_EXPRESSION! %s\n", angle_contents);
             strncpy(tokens[*token_idx].value, angle_contents,
                     MAX_PATTERN_CHAR_VAL - 1);
+            char *wurd, *last_wurd;
+            char const *sep = " ";
+            int var_count = 0;
+            for (wurd = strtok_r(angle_contents, sep, &last_wurd); wurd;
+                 wurd = strtok_r(NULL, sep, &last_wurd))
+            {
+                printf("STROKin %s\n", wurd);
+                strncpy((char *)tokens[*token_idx].steps[var_count], wurd, 4);
+                var_count++;
+                if (var_count > 4)
+                {
+                    printf("ma wee stack overfloweth!\n");
+                    return 1;
+                }
+            }
+            tokens[*token_idx].num_steps = var_count;
+            printf("NUM STEPS Set to %d\n", tokens[*token_idx].num_steps);
             (*token_idx)++;
         }
         else if ((*c == '_') || (*c == '-') || (*c == '~'))
@@ -690,6 +719,15 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
                 copy_pattern_token(&expanded_tokens[(*expanded_tokens_idx)++],
                                    &tokens[i]);
             }
+        }
+        else if (tokens[i].type == ANGLE_EXPRESSION)
+        {
+            copy_pattern_token(&expanded_tokens[*expanded_tokens_idx],
+                               &tokens[i]);
+            expanded_tokens[*expanded_tokens_idx].num_steps = tokens[i].num_steps;
+            for (int j = 0; j < tokens[i].num_steps; j++)
+                strncpy(expanded_tokens[*expanded_tokens_idx].steps[j], tokens[i].steps[j], 4);
+            (*expanded_tokens_idx)++;
         }
         else
         {
