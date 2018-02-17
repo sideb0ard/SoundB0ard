@@ -1,0 +1,6 @@
+notes/slaveChordHit1.aiff
+notes/2stepbass.aiff
+drones/garageDroneReverse.aiff
+streetfighter2//blanka1_1.aiff // loop_len 8
+dloops/pierrehouse.aiff stutter_mode
+dloops/xbeatloop.aif // scramble_mode

@@ -76,6 +76,32 @@ static void print_pattern_tokens(pattern_token tokens[MAX_PATTERN], int len)
     }
 }
 
+static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
+{
+    printf("VALIDATE! %s\n", var_key);
+    if (mixer_is_valid_env_var(mixr, var_key))
+    {
+        printf("Valid ENV VAR! %s\n", var_key);
+        int sg_num;
+        if (get_environment_val(var_key, &sg_num))
+        {
+            if (mixer_is_valid_soundgen_num(mixr, sg_num))
+            {
+                printf("CLEARING %s(%d)\n", var_key, sg_num);
+                sample_sequencer *seq =
+                    (sample_sequencer *)mixr->sound_generators[sg_num];
+                seq_clear_pattern(&seq->m_seq, 0);
+                return true;
+            }
+            else
+            {
+                printf("Whoa, nellie, not a valid pattern to clear\n");
+            }
+        }
+    }
+    return false;
+}
+
 void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
 {
     pattern_group pgroups[MAX_PATTERN] = {};
@@ -172,24 +198,24 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
     for (int i = 0; i < var_tokens_idx; i++)
     {
         char *var_key = var_tokens[i].value;
-        if (mixer_is_valid_env_var(mixr, var_key))
+        if (var_tokens[i].type == VAR_NAME)
         {
-            printf("Valid ENV VAR! %s\n", var_key);
-            int sg_num;
-            if (get_environment_val(var_key, &sg_num))
+            if (!validate_and_clear_env_var(mixr, var_key))
             {
-                if (mixer_is_valid_soundgen_num(mixr, sg_num))
+                printf("VAR NAME Barf! %s\n", var_key);
+                return;
+            }
+        }
+        else if (var_tokens[i].type == ANGLE_EXPRESSION)
+        {
+            for (int j = 0; j < var_tokens[i].num_steps; j++)
+            {
+                if (!validate_and_clear_env_var(mixr, var_tokens[i].steps[j]))
                 {
-                    printf("CLEARING %s(%d)\n", var_key, sg_num);
-                    sample_sequencer *seq =
-                        (sample_sequencer *)mixr->sound_generators[sg_num];
-                    seq_clear_pattern(&seq->m_seq, 0);
-                }
-                else
-                {
-                    printf("Whoa, nellie, not a valid pattern to clear\n");
+                    printf("ANGLE Barf! %s\n", var_tokens[i].steps[j]);
                     return;
                 }
+                printf("Step[%d] Var:[%s]\n", j, var_tokens[i].steps[j]);
             }
         }
         else if (var_tokens[i].type == BLANK)
@@ -204,7 +230,7 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
 
     for (int i = 0; i < num_uniq; i++)
     {
-        if (var_tokens[i].type != BLANK)
+        if (var_tokens[i].type == VAR_NAME)
         {
             int sg_num;
             get_environment_val(var_tokens[i].value, &sg_num);
@@ -235,6 +261,33 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
                 }
                 else
                     seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
+            }
+        }
+        else if (var_tokens[i].type == ANGLE_EXPRESSION)
+        {
+            printf("ANGLE!\n");
+            int sg_num;
+
+            for (int j = 0; j < var_tokens[i].num_steps; j++)
+            {
+                get_environment_val(var_tokens[i].steps[j], &sg_num);
+
+                sample_sequencer *seq =
+                    (sample_sequencer *)mixr->sound_generators[sg_num];
+
+                if (highest_division > 0)
+                {
+                    printf("%d DIVISIOSN!! Going for %d loops\n", highest_division,
+                           highest_division);
+                    seq_set_num_patterns(&seq->m_seq, highest_division);
+                }
+                else
+                {
+                    seq_set_num_patterns(&seq->m_seq, 1);
+                    printf("SINGLE LOOP, TALLY HO!\n");
+                }
+
+                seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
             }
         }
     }
