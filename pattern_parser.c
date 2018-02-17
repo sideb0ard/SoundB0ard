@@ -228,6 +228,7 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         }
     }
 
+    // 3. Place micro hits into patterns
     for (int i = 0; i < num_uniq; i++)
     {
         if (var_tokens[i].type == VAR_NAME)
@@ -765,6 +766,16 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
                         num_right_brackets_seen++;
                     }
                 }
+            }
+            else if (tokens[i].has_divider)
+            {
+                copy_pattern_token(&expanded_tokens[*expanded_tokens_idx],
+                                   &tokens[i]);
+                expanded_tokens[*expanded_tokens_idx].has_divider = true;
+                expanded_tokens[*expanded_tokens_idx].divider =
+                    tokens[i].divider;
+
+                (*expanded_tokens_idx)++;
             }
             else
             {
