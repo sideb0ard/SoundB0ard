@@ -15,7 +15,6 @@
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "bitcrush.h"
-#include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "digisynth.h"
@@ -90,7 +89,6 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             else if (strncmp("pitch", wurds[2], 5) == 0)
             {
-                printf("PITCHHHHy!!\n");
                 double v = atof(wurds[3]);
                 sample_sequencer_set_pitch(s, v);
             }

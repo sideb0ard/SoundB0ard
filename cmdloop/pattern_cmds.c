@@ -13,7 +13,6 @@
 #include "beatrepeat.h"
 #include "bitcrush.h"
 #include "bitshift.h"
-#include "chaosmonkey.h"
 #include "defjams.h"
 #include "distortion.h"
 #include "dynamics_processor.h"

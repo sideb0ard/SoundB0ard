@@ -15,7 +15,6 @@
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "bitcrush.h"
-#include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "digisynth.h"
@@ -53,15 +52,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     if (strncmp("new", wurds[0], 3) == 0)
     {
-        if (strncmp("algo", wurds[1], 4) == 0)
-        {
-            printf("NUM WURDS!%d\n", num_wurds);
-            for (int i = 0; i < num_wurds; i++)
-                printf("wurd: %s\n", wurds[i]);
-            add_algorithm(num_wurds - 2, &wurds[2]);
-        }
-
-        else if (strncmp("bitshift", wurds[1], 4) == 0)
+        if (strncmp("bitshift", wurds[1], 4) == 0)
         {
             printf("BITSHIFT! SEQUENCE GEN!\n");
             mixer_add_bitshift(mixr, num_wurds - 2, &wurds[2]);

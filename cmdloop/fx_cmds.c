@@ -12,7 +12,6 @@
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "bitcrush.h"
-#include "chaosmonkey.h"
 #include "defjams.h"
 #include "distortion.h"
 #include "dynamics_processor.h"

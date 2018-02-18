@@ -12,7 +12,6 @@ SRC = \
 	audioutils.c \
 	fx/basicfilterpass.c \
 	fx/beatrepeat.c \
-	chaosmonkey.c \
 	cmdloop.c \
 	cmdloop/fx_cmds.c \
 	cmdloop/looper_cmds.c \

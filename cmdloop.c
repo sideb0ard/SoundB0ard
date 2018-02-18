@@ -15,7 +15,6 @@
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "bitcrush.h"
-#include "chaosmonkey.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "digisynth.h"

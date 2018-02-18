@@ -10,7 +10,6 @@
 #include "ableton_link_wrapper.h"
 #include "algorithm.h"
 #include "bitshift.h"
-#include "chaosmonkey.h"
 #include "defjams.h"
 #include "digisynth.h"
 #include "dxsynth.h"
@@ -167,11 +166,24 @@ void mixer_ps(mixer *mixr)
         printf(ANSI_COLOR_RESET "\n");
     }
 
+    wchar_t wss[MAX_PS_STRING_SZ];
+
+    for (int i = 0; i < mixr->algorithm_num; i++)
+    {
+        if (mixr->algorithms[i] != NULL)
+        {
+            wmemset(wss, 0, MAX_PS_STRING_SZ);
+            algorithm_status(mixr->algorithms[i], wss);
+            wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
+            wprintf(L"  %ls\n", wss);
+            wprintf(WANSI_COLOR_RESET);
+        }
+    }
+
     for (int i = 0; i < mixr->sequence_gen_num; i++)
     {
         if (mixr->sequence_generators[i] != NULL)
         {
-            wchar_t wss[MAX_PS_STRING_SZ];
             wmemset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sequence_generators[i]->status(mixr->sequence_generators[i],
                                                  wss);
@@ -185,13 +197,11 @@ void mixer_ps(mixer *mixr)
     {
         if (mixr->sound_generators[i] != NULL)
         {
-            wchar_t wss[MAX_PS_STRING_SZ];
             wmemset(wss, 0, MAX_PS_STRING_SZ);
             mixr->sound_generators[i]->ps_status(mixr->sound_generators[i],
                                                  wss);
 
             wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
-
             if (mixr->sound_generators[i]->active)
             {
                 wprintf(s_status_colors[mixr->sound_generators[i]->type]);
@@ -242,6 +252,12 @@ void mixer_print_compat_keys(mixer *mixr)
 
 void mixer_emit_event(mixer *mixr, unsigned int event_type)
 {
+    for (int i = 0; i < mixr->algorithm_num; ++i)
+    {
+        algorithm *a = mixr->algorithms[i];
+        if (a != NULL)
+            algorithm_event_notify(a, event_type);
+    }
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
         soundgenerator *sg = mixr->sound_generators[i];
@@ -375,6 +391,38 @@ int add_sequence_generator(mixer *mixr, sequence_generator *sg)
     return mixr->sequence_gen_num++;
 }
 
+int mixer_add_algorithm(mixer *mixr, algorithm *a)
+{
+    printf("Adding an ALGORITHM, yo!\n");
+    algorithm **new_algorithms = NULL;
+
+    if (mixr->algorithm_size <= mixr->algorithm_num)
+    {
+        if (mixr->algorithm_size == 0)
+        {
+            mixr->algorithm_size = DEFAULT_ARRAY_SIZE;
+        }
+        else
+        {
+            mixr->algorithm_size *= 2;
+        }
+
+        new_algorithms = (algorithm **)realloc(
+            mixr->algorithms, mixr->algorithm_size * sizeof(algorithm *));
+        if (new_algorithms == NULL)
+        {
+            printf("Ooh, burney - cannae allocate memory for new sequences");
+            return -1;
+        }
+        else
+        {
+            mixr->algorithms = new_algorithms;
+        }
+    }
+    mixr->algorithms[mixr->algorithm_num] = a;
+    return mixr->algorithm_num++;
+}
+
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     printf("Adding an BITSHIFT SEQUENCE GENERATOR, yo!\n");
@@ -393,18 +441,6 @@ int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps)
         return add_sequence_generator(mixr, sg);
     else
         return -99;
-}
-
-int add_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
-{
-    algorithm *a = new_algorithm(num_wurds, wurds);
-    return add_sound_generator(mixr, (soundgenerator *)a);
-}
-
-int add_chaosmonkey(int soundgen)
-{
-    chaosmonkey *cm = new_chaosmonkey(soundgen);
-    return add_sound_generator(mixr, (soundgenerator *)cm);
 }
 
 int add_minisynth(mixer *mixr)

@@ -83,7 +83,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     else if (strncmp("every", wurds[0], 4) == 0)
     {
         algorithm *a = new_algorithm(num_wurds, wurds);
-        add_sound_generator(mixr, (soundgenerator *)a);
+        mixer_add_algorithm(mixr, a);
     }
 
     else if (strncmp("brak", wurds[0], 4) == 0)

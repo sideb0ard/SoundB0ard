@@ -278,8 +278,8 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
 
                 if (highest_division > 0)
                 {
-                    printf("%d DIVISIOSN!! Going for %d loops\n", highest_division,
-                           highest_division);
+                    printf("%d DIVISIOSN!! Going for %d loops\n",
+                           highest_division, highest_division);
                     seq_set_num_patterns(&seq->m_seq, highest_division);
                 }
                 else
@@ -788,9 +788,11 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
         {
             copy_pattern_token(&expanded_tokens[*expanded_tokens_idx],
                                &tokens[i]);
-            expanded_tokens[*expanded_tokens_idx].num_steps = tokens[i].num_steps;
+            expanded_tokens[*expanded_tokens_idx].num_steps =
+                tokens[i].num_steps;
             for (int j = 0; j < tokens[i].num_steps; j++)
-                strncpy(expanded_tokens[*expanded_tokens_idx].steps[j], tokens[i].steps[j], 4);
+                strncpy(expanded_tokens[*expanded_tokens_idx].steps[j],
+                        tokens[i].steps[j], 4);
             (*expanded_tokens_idx)++;
         }
         else

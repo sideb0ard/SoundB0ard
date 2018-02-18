@@ -3,6 +3,7 @@
 
 #include <portaudio.h>
 
+#include "algorithm.h"
 #include "defjams.h"
 #include "dxsynth.h"
 #include "fx.h"
@@ -46,6 +47,10 @@ typedef struct AbletonLink AbletonLink;
 
 typedef struct mixer
 {
+
+    algorithm **algorithms;
+    int algorithm_num;
+    int algorithm_size;
 
     soundgenerator **sound_generators;
     int soundgen_num;  // actual number of SGs
@@ -107,10 +112,9 @@ void mixer_generate_melody(mixer *mixr, int synthnum, int pattern_num);
 void mixer_print_compat_keys(mixer *mixr);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
+int mixer_add_algorithm(mixer *mixr, algorithm *a);
 
-int add_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD]);
 int add_bytebeat(mixer *mixr, char *pattern);
-int add_chaosmonkey(int soundgen);
 int add_minisynth(mixer *mixr);
 int add_dxsynth(mixer *mixr);
 int add_digisynth(mixer *mixr, char *filename);

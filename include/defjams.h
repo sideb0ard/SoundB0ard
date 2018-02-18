@@ -84,11 +84,7 @@
 
 #define NADA -999
 
-enum
-{
-    KICK,
-    SNARE
-};
+#define MAX_LENGTH_VAR_VALUE 128
 
 enum
 {
@@ -96,18 +92,20 @@ enum
     RIGHT
 };
 
-typedef enum {
+enum
+{
     MIDI_KNOB_MODE_ONE,
     MIDI_KNOB_MODE_TWO,
     MIDI_KNOB_MODE_THREE,
     MAX_NUM_KNOB_MODES,
-} midi_mode; // to switch control knob routing
+};
 
-typedef enum {
+enum
+{
     KEY_MODE_ONE,
     KEY_MODE_TWO,
     MAX_NUM_KEY_MODES,
-} key_mode; // to switch key control routing
+};
 
 typedef enum {
     MINISYNTH_TYPE,
@@ -117,8 +115,6 @@ typedef enum {
     BITWIZE_TYPE,
     SEQUENCER_TYPE,
     SYNTHDRUM_TYPE,
-    ALGORITHM_TYPE,
-    CHAOSMONKEY_TYPE,
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 
