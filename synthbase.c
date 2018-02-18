@@ -579,8 +579,8 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
 int synthbase_change_octave_melody(synthbase *base, int melody_num,
                                    int direction)
 {
-    printf("Changing octave of %d - direction: %s\n", melody_num,
-           direction == 1 ? "UP" : "DOWN");
+    // printf("Changing octave of %d - direction: %s\n", melody_num,
+    //       direction == 1 ? "UP" : "DOWN");
     if (is_valid_melody_num(base, melody_num))
     {
         for (int i = 0; i < PPNS; i++)

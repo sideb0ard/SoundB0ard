@@ -1,36 +1,11 @@
-#include <locale.h>
-#include <regex.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <wchar.h>
 
-#include "algorithm.h"
-#include "basicfilterpass.h"
-#include "beatrepeat.h"
-#include "bitcrush.h"
-#include "bitshift.h"
-#include "defjams.h"
-#include "distortion.h"
-#include "dynamics_processor.h"
-#include "envelope.h"
-#include "envelope_follower.h"
-#include "euclidean.h"
-#include "mixer.h"
-#include "modfilter.h"
-#include "modular_delay.h"
-#include "reverb.h"
-#include "sequencer_utils.h"
-#include "sparkline.h"
-#include "table.h"
-#include "utils.h"
-#include "waveshaper.h"
-#include <stereodelay.h>
-
+#include <bitshift.h>
+#include <euclidean.h>
+#include <mixer.h>
 #include <pattern_cmds.h>
+#include <sequencer_utils.h>
 
 extern mixer *mixr;
 

@@ -1,57 +1,12 @@
-#include <locale.h>
-#include <regex.h>
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <wchar.h>
 
-#include <readline/history.h>
-#include <readline/readline.h>
-
-#include "algorithm.h"
-#include "basicfilterpass.h"
-#include "beatrepeat.h"
-#include "bitcrush.h"
 #include "cmdloop.h"
-#include "defjams.h"
 #include "digisynth.h"
-#include "distortion.h"
 #include "dxsynth.h"
-#include "dynamics_processor.h"
-#include "envelope.h"
-#include "envelope_follower.h"
-#include "euclidean.h"
-#include "help.h"
-#include "keys.h"
-#include "looper.h"
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "modfilter.h"
-#include "modular_delay.h"
-#include "obliquestrategies.h"
-#include "oscillator.h"
-#include "pattern_parser.h"
-#include "pattern_transformers.h"
-#include "reverb.h"
-#include "sample_sequencer.h"
-#include "sequencer_utils.h"
-#include "sparkline.h"
-#include "synthbase.h"
-#include "synthdrum_sequencer.h"
-#include "table.h"
-#include "utils.h"
-#include "waveshaper.h"
-
-#include <fx_cmds.h>
-#include <looper_cmds.h>
-#include <mixer_cmds.h>
-#include <new_item_cmds.h>
-#include <stepper_cmds.h>
-#include <synth_cmds.h>
 
 extern mixer *mixr;
 bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])

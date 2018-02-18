@@ -52,3 +52,8 @@ t<<((t>>1|t>>8)^(t>>13))
 t%(t>>10&t)
 
 https://www.reddit.com/r/bytebeat/comments/20km9l/cool_equations/
+
+74 * ( t | ( t >> 2 | t >> 16 ) )
+^ THIS WITH
+notes/2stepbass.aiff
+

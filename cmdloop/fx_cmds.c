@@ -1,39 +1,21 @@
 #include <locale.h>
-#include <regex.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/stat.h>
-#include <sys/wait.h>
-#include <unistd.h>
-#include <wchar.h>
 
-#include "algorithm.h"
-#include "basicfilterpass.h"
-#include "beatrepeat.h"
-#include "bitcrush.h"
-#include "defjams.h"
-#include "distortion.h"
-#include "dynamics_processor.h"
-#include "envelope.h"
-#include "envelope_follower.h"
-#include "mixer.h"
-#include "modfilter.h"
-#include "modular_delay.h"
-#include "reverb.h"
-#include "sequencer_utils.h"
-#include "sparkline.h"
-#include "table.h"
-#include "utils.h"
-#include "waveshaper.h"
-#include <stereodelay.h>
-
+#include <basicfilterpass.h>
+#include <beatrepeat.h>
+#include <bitcrush.h>
+#include <distortion.h>
+#include <dynamics_processor.h>
+#include <envelope_follower.h>
 #include <fx_cmds.h>
-#include <looper_cmds.h>
-#include <mixer_cmds.h>
-#include <new_item_cmds.h>
-#include <stepper_cmds.h>
-#include <synth_cmds.h>
+#include <mixer.h>
+#include <modfilter.h>
+#include <modular_delay.h>
+#include <reverb.h>
+#include <stereodelay.h>
+#include <waveshaper.h>
 
 extern mixer *mixr;
 
@@ -376,7 +358,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("lfo2_amp", wurds[3], 9) == 0)
                     filterpass_set_lfo_amp(fp, 2, val);
                 else if (strncmp("lfo2_rate", wurds[3], 9) == 0)
-                    filterpass_set_lfo_rate(fp, 2, val);
+                    filterpass_set_lfo_rate(fp, 3, val);
             }
             else if (f->type == BEATREPEAT)
             {
