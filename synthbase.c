@@ -73,7 +73,7 @@ void synthbase_generate_melody(synthbase *base)
             if (ored_bits & 1 << shift_by)
             {
                 synthbase_add_note(base, base->cur_melody, i,
-                                   base->last_midi_note);
+                                   base->root_midi_note);
             }
         }
     }

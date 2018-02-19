@@ -173,8 +173,6 @@ minisynth_voice *minisynth_get_oldest_voice(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *synth,
                                                       unsigned int midi_note);
 
-// void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
-//                                bool update_last_midi);
 bool minisynth_midi_note_on(minisynth *self, unsigned int midinote,
                             unsigned int velocity);
 bool minisynth_midi_note_off(minisynth *self, unsigned int midinote,

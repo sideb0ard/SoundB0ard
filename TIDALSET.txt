@@ -16,3 +16,8 @@ dloops/reesepiece.aif
 
 // all the speeds
 loops//bassDubC1bar.aiff
+
+loops/duboce.aif loop_len 12
+
+digisynth
+toms/DR660808HighTom.aif

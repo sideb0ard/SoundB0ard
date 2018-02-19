@@ -227,8 +227,6 @@ void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
             else if (strncmp("swing", wurds[4], 5) == 0)
             {
                 int swing_setting = atoi(wurds[5]);
-                printf("changing swing to %d for pattern num %d\n",
-                       swing_setting, pattern_num);
                 seq_swing_pattern(seq, pattern_num, swing_setting);
             }
         }

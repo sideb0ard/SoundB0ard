@@ -13,7 +13,14 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     if (strncmp("syn", wurds[0], 3) == 0)
     {
+        if (strncmp(wurds[1], "ls", 2) == 0)
+        {
+            minisynth_list_presets();
+            return true;
+        }
+
         int soundgen_num = atoi(wurds[1]);
+
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
             is_synth(mixr->sound_generators[soundgen_num]))
         {
@@ -75,7 +82,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     int six16th = atoi(wurds[i]) % (16 * SYNTH_NUM_BARS);
                     printf("NOTE ON!! 16th:%d\n", six16th);
                     synthbase_add_note(base, base->cur_melody, six16th,
-                                       base->last_midi_note);
+                                       base->root_midi_note);
                 }
             }
             else if (strncmp("sustain_note_ms", wurds[2], 15) == 0)

@@ -512,7 +512,7 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
                    4;            // swing moves in incs of 4%
         int num_ppz = multi * 2; // i.e. percent between two increments
         int pulses_to_move = num_ppz / 100.0 * diff;
-        printf("Pulses to move is %d\n", pulses_to_move);
+        //printf("Pulses to move is %d\n", pulses_to_move);
 
         for (int i = 0; i < 64; i++)
         {
