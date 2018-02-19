@@ -14,6 +14,7 @@ SRC = \
 	fx/beatrepeat.c \
 	cmdloop.c \
 	cmdloop/fx_cmds.c \
+	cmdloop/algo_cmds.c \
 	cmdloop/looper_cmds.c \
 	cmdloop/mixer_cmds.c \
 	cmdloop/new_item_cmds.c \

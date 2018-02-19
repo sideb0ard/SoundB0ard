@@ -297,12 +297,10 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     }
                     else if (strncmp("up", wurds[3], 2) == 0)
                     {
-                        printf("UP OCTAVE!\n");
                         synthbase_change_octave_melody(base, melody_num, 1);
                     }
                     else if (strncmp("down", wurds[3], 4) == 0)
                     {
-                        printf("DOWN OCTAVE!\n");
                         synthbase_change_octave_melody(base, melody_num, 0);
                     }
                 }

@@ -46,6 +46,7 @@
 #include "utils.h"
 #include "waveshaper.h"
 
+#include <algo_cmds.h>
 #include <fx_cmds.h>
 #include <looper_cmds.h>
 #include <mixer_cmds.h>
@@ -130,6 +131,9 @@ void interpret(char *line)
         else if (strncmp("quit", wurds[0], 4) == 0 ||
                  strncmp("exit", wurds[0], 4) == 0)
             exxit();
+
+        else if (parse_algo_cmd(num_wurds, wurds))
+            continue;
 
         else if (parse_fx_cmd(num_wurds, wurds))
             continue;

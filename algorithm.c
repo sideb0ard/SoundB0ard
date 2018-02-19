@@ -28,6 +28,7 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
     // a->original_pattern =
     //    sg->get_pattern(sg, a->target_sound_generator_pattern_num);
 
+    a->active = true;
     a->counter = 0;
     a->debug = false;
 
@@ -49,6 +50,9 @@ static void handle_command(algorithm *a)
 void algorithm_event_notify(void *self, unsigned int event_type)
 {
     algorithm *a = (algorithm *)self;
+
+    if (!a->active)
+        return;
 
     bool take_action = false;
     switch (event_type)

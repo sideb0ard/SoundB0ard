@@ -438,7 +438,7 @@ void seq_rm_hit(sequencer *s, int pattern_num, int step)
 
 void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 {
-    printf("SEQ mv micro\n");
+    //printf("SEQ mv micro\n");
     if (seq_is_valid_pattern_num(s, pattern_num))
     {
         if (s->patterns[pattern_num][stepfrom] == 1 && stepto < PPBAR)
@@ -457,7 +457,7 @@ void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 
 void seq_add_micro_hit(sequencer *s, int pattern_num, int step)
 {
-    printf("Add'ing %d\n", step);
+    //printf("Add'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR)
     {
         s->patterns[pattern_num][step] = 1;
@@ -466,7 +466,7 @@ void seq_add_micro_hit(sequencer *s, int pattern_num, int step)
 
 void seq_rm_micro_hit(sequencer *s, int pattern_num, int step)
 {
-    printf("Rm'ing %d\n", step);
+    //printf("Rm'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR)
     {
         s->patterns[pattern_num][step] = 0;
@@ -482,8 +482,8 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
         if (old_swing_setting == swing_setting)
             return;
 
-        printf("Setting pattern %d swing setting to %d\n", pattern_num,
-               swing_setting);
+        //printf("Setting pattern %d swing setting to %d\n", pattern_num,
+        //       swing_setting);
         s->pattern_num_swing_setting[pattern_num] = swing_setting;
 
         int hitz_to_swing[64] = {
@@ -496,12 +496,12 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
         while (idx < PPBAR)
         {
             int next_idx = idx + multi;
-            printf("IDX %d // next idx %d\n", idx, next_idx);
+            //printf("IDX %d // next idx %d\n", idx, next_idx);
             for (; idx < next_idx; idx++)
             {
                 if (s->patterns[s->cur_pattern][idx] == 1)
                 {
-                    printf("Found a hit at %d\n", idx);
+                    //printf("Found a hit at %d\n", idx);
                     hitz_to_swing[hitz_to_swing_idx++] = idx;
                 }
             }
@@ -519,7 +519,6 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
             if (hitz_to_swing[i] == 0)
                 break;
             int hit = hitz_to_swing[i];
-            printf("Going to swing hit %d\n", hit);
             seq_mv_micro_hit(s, pattern_num, hit, hit + pulses_to_move);
         }
     }
