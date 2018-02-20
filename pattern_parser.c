@@ -78,16 +78,13 @@ static void print_pattern_tokens(pattern_token tokens[MAX_PATTERN], int len)
 
 static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
 {
-    printf("VALIDATE! %s\n", var_key);
     if (mixer_is_valid_env_var(mixr, var_key))
     {
-        printf("Valid ENV VAR! %s\n", var_key);
         int sg_num;
         if (get_environment_val(var_key, &sg_num))
         {
             if (mixer_is_valid_soundgen_num(mixr, sg_num))
             {
-                printf("CLEARING %s(%d)\n", var_key, sg_num);
                 sample_sequencer *seq =
                     (sample_sequencer *)mixr->sound_generators[sg_num];
                 seq_clear_pattern(&seq->m_seq, 0);
@@ -132,12 +129,11 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         }
     }
 
-    printf("Num Groups:%d\n", num_pattern_groups);
-    for (int i = 0; i <= num_pattern_groups; i++)
-        printf("Group %d - parent is %d contains %d members\n", i,
-               pgroups[i].parent, pgroups[i].num_children);
+    //for (int i = 0; i <= num_pattern_groups; i++)
+    //    printf("Group %d - parent is %d contains %d members\n", i,
+    //           pgroups[i].parent, pgroups[i].num_children);
 
-    print_pattern_tokens(var_tokens, var_tokens_idx);
+    //print_pattern_tokens(var_tokens, var_tokens_idx);
 
     int level = 0;
     int start_idx = 0;
@@ -163,35 +159,28 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
     division_marker divisions[MAX_DIVISIONS];
     int num_divisions = 0;
     int highest_division = 1;
-    printf("Num Uniq:%d\n", num_uniq);
     for (int i = 0; i < num_uniq; i++)
     {
         if (var_tokens[i].type == VAR_NAME)
         {
             if (var_tokens[i].has_divider)
             {
-                printf("DIVISORRRR %d!\n", var_tokens[i].divider);
                 divisions[num_divisions].position = uniq_positions[i];
                 divisions[num_divisions].value = var_tokens[i].divider;
                 if (divisions[num_divisions].value > highest_division)
                     highest_division = divisions[num_divisions].value;
                 num_divisions++;
             }
-            printf("%s at pos %d\n", var_tokens[i].value, uniq_positions[i]);
         }
         else if (var_tokens[i].type == ANGLE_EXPRESSION)
         {
-            printf("Angle expression! NUM STEPS:%d\n", var_tokens[i].num_steps);
-            for (int j = 0; j < var_tokens[i].num_steps; j++)
-            {
-                printf("Step[%d] Var:[%s]\n", j, var_tokens[i].steps[j]);
-            }
+            //for (int j = 0; j < var_tokens[i].num_steps; j++)
+            //{
+            //    printf("Step[%d] Var:[%s]\n", j, var_tokens[i].steps[j]);
+            //}
             if (var_tokens[i].num_steps > highest_division)
                 highest_division = var_tokens[i].num_steps;
         }
-        else
-            printf("%s at pos %d\n", token_type_names[var_tokens[i].type],
-                   uniq_positions[i]);
     }
 
     // 3. verify env vars
@@ -215,7 +204,7 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
                     printf("ANGLE Barf! %s\n", var_tokens[i].steps[j]);
                     return;
                 }
-                printf("Step[%d] Var:[%s]\n", j, var_tokens[i].steps[j]);
+                //printf("Step[%d] Var:[%s]\n", j, var_tokens[i].steps[j]);
             }
         }
         else if (var_tokens[i].type == BLANK)
@@ -235,30 +224,24 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         {
             int sg_num;
             get_environment_val(var_tokens[i].value, &sg_num);
-            printf("Play at %s %d\n", var_tokens[i].value, uniq_positions[i]);
+            //printf("Play at %s %d\n", var_tokens[i].value, uniq_positions[i]);
             sample_sequencer *seq =
                 (sample_sequencer *)mixr->sound_generators[sg_num];
             if (highest_division > 0)
             {
-                printf("%d DIVISIOSN!! Going for %d loops\n", highest_division,
-                       highest_division);
                 seq_set_num_patterns(&seq->m_seq, highest_division);
             }
             else
             {
                 seq_set_num_patterns(&seq->m_seq, 1);
-                printf("SINGLE LOOP, TALLY HO!\n");
             }
 
             for (int j = 0; j < highest_division; j++)
             {
-                printf("BOO!\n");
                 if (var_tokens[i].has_divider)
                 {
                     if (j % var_tokens[i].divider == 0)
                         seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
-                    else
-                        printf("SKipping!\n");
                 }
                 else
                     seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
@@ -266,7 +249,6 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
         }
         else if (var_tokens[i].type == ANGLE_EXPRESSION)
         {
-            printf("ANGLE!\n");
             int sg_num;
 
             for (int j = 0; j < var_tokens[i].num_steps; j++)
@@ -278,14 +260,11 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
 
                 if (highest_division > 0)
                 {
-                    printf("%d DIVISIOSN!! Going for %d loops\n",
-                           highest_division, highest_division);
                     seq_set_num_patterns(&seq->m_seq, highest_division);
                 }
                 else
                 {
                     seq_set_num_patterns(&seq->m_seq, 1);
-                    printf("SINGLE LOOP, TALLY HO!\n");
                 }
 
                 seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
@@ -809,8 +788,8 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
         // else if (tokens[i].has_euclid)
         //    printf("(%d,%d)", tokens[i].euclid_hits, tokens[i].euclid_steps);
     }
-    printf("EXPANDED PATTERn:\n");
-    print_pattern_tokens(expanded_tokens, (*expanded_tokens_idx));
+    //printf("EXPANDED PATTERn:\n");
+    //print_pattern_tokens(expanded_tokens, (*expanded_tokens_idx));
 }
 
 bool parse_pattern(char *line)
@@ -830,7 +809,7 @@ bool parse_pattern(char *line)
         printf("Error extracting tokens!\n");
         return false;
     }
-    print_pattern_tokens(tokens, token_idx);
+    //print_pattern_tokens(tokens, token_idx);
 
     pattern_token expanded_tokens[MAX_PATTERN] = {};
     int expanded_tokens_idx = 0;

@@ -1,12 +1,6 @@
-notes/slaveChordHit1.aiff
-notes/2stepbass.aiff
-drones/garageDroneReverse.aiff
-streetfighter2//blanka1_1.aiff // loop_len 8
-dloops/pierrehouse.aiff stutter_mode
-dloops/xbeatloop.aif // scramble_mode
+
 
 new loop streetfighter2//blanka1_1.aiff 8
-
 
 new euclidean 3 16
 every 2 16th (p="3 5 7 9 5") pattern 0 hits p
@@ -14,7 +8,7 @@ every 2 16th (p="3 5 7 9 5") pattern 0 hits p
 new digi toms/DR660808CongaMid.aif -- generate from euclidean // root_note 35 29 36
 syn 0 gen src 0
 every 2 16th (n="35 29 36 35 35") syn 0 root_note n
-every 2 16th syn 0 gen c
+every 2 16th syn 0 gen
 
 MINISYNTH 'innerc' // root_note 23
 new moog
@@ -26,9 +20,9 @@ every 6 bar syn 1 gen
 
 new loop dloops/pierrehouse.aiff
 every 1 loop (l="0 0 0 1") loop 2 stutter l
-every 3 loop (l="0 1") loop 2 scramble l
+every 1 loop (l="0 0 0 0 1") loop 2 scramble l
 
-new samp hats/hh8.aif
+new samp hats/hh8.aif all
 every 1 loop (s="0 0 1 2 3") samp 4 change 0 swing s
 
 
@@ -79,3 +73,16 @@ hats/dmx_hh_open.aif
 hats/mawopenhh.aiff
 hats/nord808_ch.aif
 
+syn 1 load wiffle
+
+// PART2
+//////////////////
+
+snrs/heyasnare.aiff
+drones/keydrone.aiff loop_len 2 and 1
+perc/DR660CR78woodblock.aif // root_note 4 //basey
+dloops/keeponDancingDiscoLoop.aiff
+kicks/solid.aiff
+hats/ralphiHatz2.aiff
+
+dloops/comeongirl.aiff

@@ -427,14 +427,13 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int line_len = 0;
         for (int i = 1; i < num_wurds; i++)
         {
-            printf("%s (len:%lu)\n", wurds[i], strlen(wurds[i]));
             line_len += strlen(wurds[i]);
         }
         // add space for a ' ' between wurds
         // this also has an extra couple chars, but
         // thats fine.
         line_len += num_wurds + 1;
-        printf("Reserving line len: %d\n", line_len);
+        //printf("Reserving line len: %d\n", line_len);
         char line[line_len];
         memset(line, 0, line_len * sizeof(char));
         for (int i = 1; i < num_wurds; i++)
@@ -444,7 +443,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 strcat(line, " ");
         }
 
-        printf("LINe:%s\n", line);
+        //printf("LINe:%s\n", line);
         parse_pattern(line);
         return true;
     }
