@@ -86,3 +86,14 @@ kicks/solid.aiff
 hats/ralphiHatz2.aiff
 
 dloops/comeongirl.aiff
+
+kicks/808kick.aif 0 4 8 11
+hats/nord808_ch.aif 2 6 10 14
+
+new bitshift (t*t)/(t>>13 ^ t>>8)
+claps/DR660808Clap.aif every 4
+notes/garageyChord.aiff every 3
+notes/FoolishGPitch.aiff every 4
+dloops/keeponDancingDiscoLoop.aiff
+
+rims/hes23rim1.aif // delay 47 fb 45
