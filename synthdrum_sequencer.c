@@ -217,7 +217,7 @@ void sds_event_notify(void *self, unsigned int event_type)
         if (sds->started)
         {
             idx = mixr->timing_info.midi_tick % PPBAR;
-            if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx])
+            if (sds->m_seq.patterns[sds->m_seq.cur_pattern][idx].event_type)
                 sds_trigger(sds);
         }
         break;

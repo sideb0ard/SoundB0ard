@@ -71,3 +71,4 @@ bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
                             int size_of_array);
 unsigned int get_next_compat_note(unsigned int cur_key);
 void print_parceled_pattern(parceled_pattern pattern);
+bool is_midi_event_in_range(int start_tick, int end_tick, midi_pattern pattern);

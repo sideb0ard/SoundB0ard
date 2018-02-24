@@ -75,12 +75,13 @@ void print_pattern(int *pattern_array, int len_pattern_array)
     }
 }
 
-int pattern_as_int_representation(seq_pattern p)
+int pattern_as_int_representation(midi_pattern p)
 {
     int pattern_as_int = 0;
     for (int i = 0; i < 16; i++)
     {
-        if (is_int_member_in_array(1, &p[i * PPSIXTEENTH], PPSIXTEENTH))
+        int start = i * PPSIXTEENTH;
+        if (is_midi_event_in_range(start, start + PPSIXTEENTH, p))
         {
             int cur_bit = pow(2, 15 - i);
             pattern_as_int = pattern_as_int | cur_bit;

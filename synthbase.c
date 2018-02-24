@@ -40,17 +40,6 @@ void synthbase_init(synthbase *base, void *parent,
     base->root_midi_note = 60;
     base->sustain_len_ms = 200;
     base->live_code_mode = true;
-
-    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
-    {
-        base->melody_multiloop_count[i] = 1;
-        for (int j = 0; j < PPNS; j++)
-        {
-            base->melodies[i][j].tick = -1;
-        }
-    }
-    for (int i = 0; i < PPNS; ++i)
-        base->backup_melody_while_getting_crazy[i].tick = -1;
 }
 
 void synthbase_generate_melody(synthbase *base)
@@ -101,9 +90,9 @@ void synthbase_set_melody_loop_num(synthbase *self, int melody_num,
 
 int synthbase_add_melody(synthbase *ms) { return ms->num_melodies++; }
 
-void synthbase_dupe_melody(midi_events_loop *from, midi_events_loop *to)
+void synthbase_dupe_melody(midi_pattern *from, midi_pattern *to)
 {
-    for (int i = 0; i < PPNS; i++)
+    for (int i = 0; i < PPBAR; i++)
         (*to)[i] = (*from)[i];
 }
 
@@ -141,10 +130,7 @@ void synthbase_reset_melody(synthbase *base, unsigned int melody_num)
 
     if (melody_num < MAX_NUM_MIDI_LOOPS)
     {
-        for (int i = 0; i < PPNS; i++)
-        {
-            base->melodies[melody_num][i].tick = -1;
-        }
+        memset(base->melodies[melody_num], 0, sizeof(midi_pattern));
     }
 }
 
@@ -152,14 +138,13 @@ void synthbase_melody_to_string(synthbase *base, int melody_num,
                                 wchar_t melodystr[33])
 {
     int cur_quart = 0;
-    for (int i = 0; i < PPNS; i += PPSIXTEENTH)
+    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
     {
         melodystr[cur_quart] = sparkchars[0];
         for (int j = i; j < (i + PPSIXTEENTH); j++)
         {
-            if (base->melodies[melody_num][j].tick != -1 &&
-                base->melodies[melody_num][j].event_type == 144)
-            { // 144 is midi note on
+            if (base->melodies[melody_num][j].event_type == MIDI_ON)
+            {
                 melodystr[cur_quart] = sparkchars[5];
             }
         }
@@ -203,90 +188,73 @@ void synthbase_event_notify(void *self, unsigned int event_type)
     switch (event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
+        if (base->multi_melody_mode && base->num_melodies > 1)
+        {
+            // synthbase_stop(base);
+            base->cur_melody_iteration--;
+            if (base->cur_melody_iteration == 0)
+            {
+                if (base->parent_synth_type == MINISYNTH_TYPE)
+                    minisynth_midi_note_off((minisynth *)parent, 0, 0,
+                                            true /* all notes off */);
+                else if (base->parent_synth_type == DXSYNTH_TYPE)
+                    dxsynth_midi_note_off((dxsynth *)parent, 0, 0,
+                                          true /* all notes off */);
+
+                int next_melody = (base->cur_melody + 1) % base->num_melodies;
+
+                base->cur_melody = next_melody;
+                base->cur_melody_iteration =
+                    base->melody_multiloop_count[base->cur_melody];
+            }
+        }
         break;
     case (TIME_MIDI_TICK):
-        idx = mixr->timing_info.midi_tick % PPNS;
-        if (base->melodies[base->cur_melody][idx].tick != -1)
+        idx = mixr->timing_info.midi_tick % PPBAR;
+        if (base->melodies[base->cur_melody][idx].event_type)
         {
             midi_event ev = base->melodies[base->cur_melody][idx];
             midi_parse_midi_event(parent, ev);
         }
 
-        // top of the base loop, which is two bars, check if we need to
-        // progress to next loop
-        if (idx == 0)
-        {
-            if (base->multi_melody_mode && base->num_melodies > 1)
-            {
-                // synthbase_stop(base);
-                base->cur_melody_iteration--;
-                if (base->cur_melody_iteration == 0)
-                {
-                    if (base->parent_synth_type == MINISYNTH_TYPE)
-                        minisynth_midi_note_off((minisynth *)parent, 0, 0,
-                                                true /* all notes off */);
-                    else if (base->parent_synth_type == DXSYNTH_TYPE)
-                        dxsynth_midi_note_off((dxsynth *)parent, 0, 0,
-                                              true /* all notes off */);
-
-                    int next_melody =
-                        (base->cur_melody + 1) % base->num_melodies;
-
-                    base->cur_melody = next_melody;
-                    base->cur_melody_iteration =
-                        base->melody_multiloop_count[base->cur_melody];
-                }
-            }
-        }
-
         break;
     }
 }
 
-int synthbase_add_event(synthbase *base, int melody_num, midi_event ev)
+void synthbase_add_event(synthbase *base, int melody_num, int midi_tick,
+                         midi_event ev)
 {
-    int tick = ev.tick;
-    while (base->melodies[melody_num][tick].tick != -1)
+    int target_tick = midi_tick;
+    while (base->melodies[melody_num][target_tick].event_type)
     {
         if (mixr->debug_mode)
             printf("Gotsz a tick already - bump!\n");
-        tick++;
-        if (tick == PPNS) // wrap around
-            tick = 0;
+        target_tick++;
+        if (target_tick == PPBAR) // wrap around
+            target_tick = 0;
     }
-    ev.tick = tick;
-    base->melodies[melody_num][tick] = ev;
-    return tick;
+    base->melodies[melody_num][target_tick] = ev;
 }
 
 void synthbase_clear_melody_ready_for_new_one(synthbase *ms, int melody_num)
 {
-    for (int i = 0; i < PPNS; i++)
-    {
-        ms->melodies[melody_num][i].tick = -1;
-    }
+    memset(ms->melodies[melody_num], 0, sizeof(midi_pattern));
 }
 
 void synthbase_copy_midi_loop(synthbase *self, int melody_num,
-                              midi_events_loop *target_loop)
+                              midi_pattern target_loop)
 {
     if (melody_num >= self->num_melodies)
     {
         printf("Dingjie!\n");
         return;
     }
-    // midi_event_loop defined in midimaaan.h
-    for (int i = 0; i < PPNS; i++)
-    {
-        (*target_loop)[i].tick = -1; // clear old contents
-        if (self->melodies[melody_num][i].tick != -1)
-        {
-            (*target_loop)[i] = self->melodies[melody_num][i];
-        }
-    }
+    memset(target_loop, 0, sizeof(midi_pattern));
+    for (int i = 0; i < PPBAR; i++)
+        target_loop[i] = self->melodies[melody_num][i];
 }
 
-void synthbase_replace_midi_loop(synthbase *ms, midi_events_loop *source_loop,
+void synthbase_replace_midi_loop(synthbase *ms, midi_pattern source_loop,
                                  int melody_num)
 {
     if (melody_num >= MAX_NUM_MIDI_LOOPS)
@@ -294,12 +262,9 @@ void synthbase_replace_midi_loop(synthbase *ms, midi_events_loop *source_loop,
         printf("Dingjie!\n");
         return;
     }
-    for (int i = 0; i < PPNS; i++)
-    {
-        ms->melodies[melody_num][i].tick = -1;
-        if ((*source_loop)[i].tick != -1)
-            ms->melodies[melody_num][i] = (*source_loop)[i];
-    }
+    memset(ms->melodies[melody_num], 0, sizeof(midi_pattern));
+    for (int i = 0; i < PPBAR; i++)
+        ms->melodies[melody_num][i] = source_loop[i];
     printf("Replaced Melody %d\n", melody_num);
 }
 
@@ -310,20 +275,18 @@ void synthbase_nudge_melody(synthbase *ms, int melody_num, int sixteenth)
         printf("Nah, mate, nudge needs to be less than 16\n");
         return;
     }
-    int sixteenth_of_loop = PPNS / 16.0;
-    midi_events_loop loop_copy;
+    int sixteenth_of_loop = PPBAR / 16.0;
+    midi_pattern loop_copy;
 
     synthbase_copy_midi_loop(ms, melody_num, &loop_copy);
 
-    midi_events_loop new_loop;
-    for (int i = 0; i < PPNS; i++)
+    midi_pattern new_loop;
+    for (int i = 0; i < PPBAR; i++)
     {
-        if (loop_copy[i].tick != -1)
+        if (loop_copy[i].event_type)
         {
-            int new_tick =
-                (loop_copy[i].tick + (sixteenth * sixteenth_of_loop)) % PPNS;
+            int new_tick = (i + (sixteenth * sixteenth_of_loop)) % PPBAR;
             new_loop[new_tick] = loop_copy[i];
-            new_loop[new_tick].tick = new_tick;
         }
     }
 
@@ -374,31 +337,27 @@ int synthbase_get_num_notes(synthbase *ms)
 {
     int notecount = 0;
     for (int i = 0; i < ms->num_melodies; i++)
-        for (int j = 0; j < PPNS; j++)
-            if (ms->melodies[i][j].tick != -1 &&
-                ms->melodies[i][j].event_type == 144)
+        for (int j = 0; j < PPBAR; j++)
+            if (ms->melodies[i][j].event_type == 144)
                 notecount++;
     return notecount;
 }
 
-int synthbase_get_notes_from_melody(midi_events_loop *loop,
+int synthbase_get_notes_from_melody(midi_pattern loop,
                                     int return_midi_notes[10])
 {
     int idx = 0;
-    for (int i = 0; i < PPNS; i++)
+    for (int i = 0; i < PPBAR; i++)
     {
-        midi_event ev = (*loop)[i];
-        if (ev.tick != -1)
-        {
-            if (ev.event_type == 144)
-            { // note on
-                if (!is_int_member_in_array(ev.data1, return_midi_notes, 10))
-                {
-                    return_midi_notes[idx++] = ev.data1;
-                    if (idx == 10)
-                        break;
-                    // return idx;
-                }
+        midi_event ev = loop[i];
+        if (ev.event_type == MIDI_ON)
+        { // note on
+            if (!is_int_member_in_array(ev.data1, return_midi_notes, 10))
+            {
+                return_midi_notes[idx++] = ev.data1;
+                if (idx == 10)
+                    break;
+                // return idx;
             }
         }
     }
@@ -433,20 +392,16 @@ void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note)
 void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
                               int midi_note)
 {
-    if (is_valid_melody_num(ms, pattern_num) && mstep < PPNS)
+    if (is_valid_melody_num(ms, pattern_num) && mstep < PPBAR)
     {
-        midi_event on = new_midi_event(mstep, 144, midi_note, 128);
-        // int note_off_tick = (int)(ms->sustain_len_ms *
-        // mixr->timing_info.midi_ticks_per_ms) % PPNS;
-        // printf("NOTE OFF TICK IS %d\n", note_off_tick);
-        // midi_event off = new_midi_event(note_off_tick, 128, midi_note, 128);
+        midi_event on = new_midi_event(MIDI_ON, midi_note, 128);
 
         if (ms->live_code_mode)
         {
             on.delete_after_use = true;
         }
 
-        synthbase_add_event(ms, pattern_num, on);
+        synthbase_add_event(ms, pattern_num, mstep, on);
     }
     else
     {
@@ -464,20 +419,9 @@ void synthbase_rm_note(synthbase *ms, int pattern_num, int step)
 
 void synthbase_rm_micro_note(synthbase *ms, int pat_num, int tick)
 {
-    if (is_valid_melody_num(ms, pat_num) && tick < PPNS)
+    if (is_valid_melody_num(ms, pat_num) && tick < PPBAR)
     {
-        if (ms->melodies[pat_num][tick].tick != -1)
-        {
-            ms->melodies[ms->cur_melody][tick].tick = -1;
-            int tick_off = ms->melodies[ms->cur_melody][tick].tick_off;
-            if (tick_off >= 0)
-                synthbase_rm_micro_note(ms, pat_num, tick_off);
-        }
-        else
-        {
-            if (mixr->debug_mode)
-                printf("Not a valid midi event at tick: %d\n", tick);
-        }
+        memset(&ms->melodies[ms->cur_melody][tick], 0, sizeof(midi_event));
     }
     else
     {
@@ -497,19 +441,8 @@ void synthbase_mv_micro_note(synthbase *ms, int pattern_num, int fromstep,
 {
     if (is_valid_melody_num(ms, pattern_num))
     {
-        if (ms->melodies[pattern_num][fromstep].tick != -1)
-        {
-            ms->melodies[pattern_num][tostep] =
-                ms->melodies[pattern_num][fromstep];
-            ms->melodies[pattern_num][fromstep].tick = -1;
-        }
-        else
-        {
-            printf("Woof, cannae move micro note - either fromstep(%d) "
-                   "is NULL or "
-                   "tostep(%d) is not less than %d\n",
-                   fromstep, tostep, PPNS);
-        }
+        ms->melodies[pattern_num][tostep] = ms->melodies[pattern_num][fromstep];
+        memset(&ms->melodies[pattern_num][fromstep], 0, sizeof(midi_event));
     }
 }
 
@@ -530,7 +463,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
     while (fgets(line, sizeof(line), fp))
     {
         printf("%s", line);
-        int max_tick = PPNS * base->num_melodies;
+        int max_tick = PPBAR * base->num_melodies;
         int count = 0;
         int tick = 0;
         int status = 0;
@@ -547,7 +480,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
                 {
                     printf("TICK OVER!: %d\n", tick);
                     synthbase_add_melody(base);
-                    tick = tick % PPNS;
+                    tick = tick % PPBAR;
                 }
                 break;
             case 1:
@@ -567,8 +500,8 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
         {
             printf("GOtzz %d %d %d %d %d\n", count, tick, status, midi_note,
                    midi_vel);
-            midi_event ev = new_midi_event(tick, status, midi_note, midi_vel);
-            synthbase_add_event(base, base->cur_melody, ev);
+            midi_event ev = new_midi_event(status, midi_note, midi_vel);
+            synthbase_add_event(base, base->cur_melody, tick, ev);
         }
     }
 
@@ -583,8 +516,8 @@ int synthbase_change_octave_melody(synthbase *base, int melody_num,
     //       direction == 1 ? "UP" : "DOWN");
     if (is_valid_melody_num(base, melody_num))
     {
-        for (int i = 0; i < PPNS; i++)
-            if (base->melodies[melody_num][i].tick != -1)
+        for (int i = 0; i < PPBAR; i++)
+            if (base->melodies[melody_num][i].event_type)
             {
                 int new_midi_num = base->melodies[melody_num][i].data1;
                 if (direction == 1) // up

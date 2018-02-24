@@ -88,8 +88,8 @@ LIBDIR=/usr/local/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 #CFLAGS = -std=gnu11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
 #CPPFLAGS = -std=gnu++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O0
-CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
-CPPFLAGS = -std=c++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O3
+CFLAGS = -std=c11 $(WARNFLAGS) -g -pg $(INCDIRS) -O0
+CPPFLAGS = -std=c++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O0
 
 $(OBJDIR)/%.o: %.c
 	$(CC) -c -o $@ -x c $< $(CFLAGS)

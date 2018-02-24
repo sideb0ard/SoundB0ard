@@ -67,10 +67,10 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                                "%d:%d!\n",
                                soundgen_num, pattern_num, sg2, pattern_num2);
 
-                        midi_events_loop loop_copy;
-                        synthbase_copy_midi_loop(base, pattern_num, &loop_copy);
+                        midi_pattern loop_copy;
+                        synthbase_copy_midi_loop(base, pattern_num, loop_copy);
 
-                        synthbase_replace_midi_loop(sb2, &loop_copy,
+                        synthbase_replace_midi_loop(sb2, loop_copy,
                                                     pattern_num2);
                     }
                 }
@@ -79,7 +79,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 for (int i = 3; i < num_wurds; i++)
                 {
-                    int six16th = atoi(wurds[i]) % (16 * SYNTH_NUM_BARS);
+                    int six16th = atoi(wurds[i]) % 16;
                     printf("NOTE ON!! 16th:%d\n", six16th);
                     synthbase_add_note(base, base->cur_melody, six16th,
                                        base->root_midi_note);
@@ -119,7 +119,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                                "EVENT!\n");
                     }
                     int tick = atoi(wurds[4]);
-                    if (tick < PPNS)
+                    if (tick < PPBAR)
                         synthbase_rm_micro_note(base, melody, tick);
                 }
             }

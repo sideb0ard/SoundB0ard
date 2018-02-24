@@ -166,7 +166,7 @@ uint16_t create_euclidean_rhythm(int num_hits, int num_steps)
     // printf("SHIfting left by %d places\n", bitshift_by);
     uint16_t aligned_bitmap = bitmap_int << bitshift_by;
     // printf("ALLIGNED\n");
-    //print_bin_num(aligned_bitmap);
+    // print_bin_num(aligned_bitmap);
     return aligned_bitmap;
 }
 

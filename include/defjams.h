@@ -19,20 +19,16 @@
 
 #define DEFAULT_ARRAY_SIZE 4
 
-#define MAX_PS_STRING_SZ 20480 // arbitrary
+#define MAX_PS_STRING_SZ 4096 // arbitrary
 
 #define ENVIRONMENT_ARRAY_SIZE 128
 #define ENVIRONMENT_KEY_SIZE 128
 
-#define SYNTH_NUM_BARS 2
 #define PPQN 960 // Pulses Per Quarter Note // one beat
 #define PPSIXTEENTH (PPQN / 4)
 #define PPTWENTYFOURTH (PPQN / 6)
-// #define PPTHIRTYSECOND (PPQN / 8)
+#define PPTHIRTYSECOND (PPQN / 8)
 #define PPBAR (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
-#define PPNS                                                                   \
-    (PPBAR *                                                                   \
-     SYNTH_NUM_BARS) // Pulses per NanoSynth recording loop, i.e 2 loops/bars
 
 #define SEQUENCER_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
 
@@ -90,6 +86,14 @@ enum
 {
     LEFT,
     RIGHT
+};
+
+enum
+{
+    MIDI_ON = 144,
+    MIDI_OFF = 128,
+    MIDI_CONTROL = 176,
+    MIDI_PITCHBEND = 224,
 };
 
 enum
@@ -188,10 +192,17 @@ typedef struct stereo_val
     double right;
 } stereo_val;
 
+typedef struct midi_event
+{
+    unsigned event_type;
+    unsigned data1;
+    unsigned data2;
+    bool delete_after_use;
+} midi_event;
+
+typedef midi_event midi_pattern[PPBAR];
+
 typedef struct parceled_pattern
 {
-    unsigned int type;
-    unsigned int len;
-    // this is double PPBAR so i can be used for step_seq or synth
-    int pattern[2 * PPBAR]; // max size
+    midi_pattern pattern;
 } parceled_pattern;

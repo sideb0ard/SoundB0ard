@@ -156,7 +156,8 @@ void looper_event_notify(void *self, unsigned int event_type)
         {
             int idx = mixr->timing_info.midi_tick % PPBAR;
             if (mixr->timing_info.is_midi_tick &&
-                g->m_seq.patterns[g->m_seq.cur_pattern][idx])
+                g->m_seq.patterns[g->m_seq.cur_pattern][idx].event_type ==
+                    MIDI_ON)
             {
                 looper_start(g);
                 playing = true;

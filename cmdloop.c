@@ -60,6 +60,8 @@ extern char *key_names[NUM_KEYS];
 
 extern wtable *wave_tables[5];
 
+char *initaddr;
+
 //#define READLINE_SAFE_MAGENTA "\001\x1b[35m\002"
 //#define READLINE_SAFE_RESET "\001\x1b[0m\002"
 // char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
@@ -83,8 +85,18 @@ static void print_logo()
         "\\__,_|\n\n" ANSI_COLOR_RESET);
 }
 
+int stacksize()
+{
+    char dummy2, *curptr;
+    curptr = &dummy2;
+
+    return (initaddr - curptr);
+}
+
 void *loopy(void *arg)
 {
+    char dummy;
+    initaddr = &dummy;
     read_history(NULL);
 
     setlocale(LC_ALL, "");
@@ -110,7 +122,7 @@ void *loopy(void *arg)
 
 void interpret(char *line)
 {
-    char wurds[NUM_WURDS][SIZE_OF_WURD];
+    static char wurds[NUM_WURDS][SIZE_OF_WURD];
 
     char *cmd, *last_s;
     char const *sep = ";";

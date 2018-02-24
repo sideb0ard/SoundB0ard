@@ -892,6 +892,16 @@ double inline mma_midi_to_atten_db(unsigned int midi_val)
     return 20.0 * log10((127.0 * 127.0) / ((float)midi_val * (float)midi_val));
 }
 
+bool is_midi_event_in_range(int start_tick, int end_tick, midi_pattern pattern)
+{
+    for (int i = start_tick; i < end_tick; i++)
+    {
+        if (pattern[i].event_type == MIDI_ON)
+            return true;
+    }
+    return false;
+}
+
 bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
                             int size_of_array)
 {
@@ -1110,13 +1120,13 @@ void print_parceled_pattern(parceled_pattern pattern)
 {
     printf("PATTERN!\n");
     bool found = false;
-    for (int i = 0; i < pattern.len; i += PPSIXTEENTH)
+    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
     {
         // printf("%d", pattern.pattern[i]);
         found = false;
         for (int j = 0; j < PPSIXTEENTH && !found; j++)
         {
-            if (pattern.pattern[i + j] == 1)
+            if (pattern.pattern[i + j].event_type == MIDI_ON)
             {
                 printf("1");
                 found = true;

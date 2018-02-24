@@ -39,8 +39,6 @@ void seq_init(sequencer *seq)
         for (int j = 0; j < PPBAR; j++)
         {
             seq->pattern_position_amp[i][j] = DEFAULT_AMP;
-            seq->patterns[i][j] = 0;
-            seq->backup_pattern_while_getting_crazy[j] = 0;
         }
     }
 
@@ -133,7 +131,7 @@ bool seq_tick(sequencer *seq)
                         }
 
                         memset(&seq->patterns[seq->cur_pattern], 0,
-                               PPBAR * sizeof(int));
+                               PPBAR * sizeof(midi_event));
                         convert_bit_pattern_to_step_pattern(
                             bit_pattern, bit_pattern_len,
                             (int *)&seq->patterns[seq->cur_pattern], PPBAR);
@@ -166,7 +164,7 @@ bool seq_tick(sequencer *seq)
 }
 
 void pattern_char_to_pattern(sequencer *s, char *char_pattern,
-                             int final_pattern[PPBAR])
+                             midi_event *final_pattern)
 {
     int sp_count = 0;
     char *sp, *sp_last;
@@ -181,13 +179,13 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern,
     {
         pattern[sp_count++] = atoi(sp);
     }
-    memset(final_pattern, 0, PPBAR * sizeof(int));
+    memset(final_pattern, 0, PPBAR * sizeof(midi_event));
     int mult = PPBAR / s->pattern_len;
 
     for (int i = 0; i < sp_count; i++)
     {
         printf("Adding hit to midi step %d\n", pattern[i] * mult);
-        final_pattern[pattern[i] * mult] = 1;
+        final_pattern[pattern[i] * mult].event_type = MIDI_ON;
     }
 }
 
@@ -324,25 +322,25 @@ void seq_set_generate_mode(sequencer *s, bool b)
 
 void seq_clear_pattern(sequencer *s, int pattern_num)
 {
-    memset(&s->patterns[pattern_num], 0, PPBAR * sizeof(int));
+    memset(&s->patterns[pattern_num], 0, PPBAR * sizeof(midi_event));
 }
 
 void seq_set_backup_mode(sequencer *s, bool on)
 {
     if (on)
     {
-        memset(s->backup_pattern_while_getting_crazy, 0, PPBAR * sizeof(int));
+        memset(s->backup_pattern_while_getting_crazy, 0,
+               PPBAR * sizeof(midi_event));
         memcpy(s->backup_pattern_while_getting_crazy, &s->patterns[0],
-               PPBAR * sizeof(int));
-        // memset(&s->patterns[0], 0, PPBAR * sizeof(int));
+               PPBAR * sizeof(midi_event));
         s->multi_pattern_mode = false;
         s->cur_pattern = 0;
     }
     else
     {
-        memset(&s->patterns[0], 0, PPBAR * sizeof(int));
+        memset(&s->patterns[0], 0, PPBAR * sizeof(midi_event));
         memcpy(&s->patterns[0], s->backup_pattern_while_getting_crazy,
-               PPBAR * sizeof(int));
+               PPBAR * sizeof(midi_event));
         s->multi_pattern_mode = true;
     }
 }
@@ -362,13 +360,14 @@ void seq_set_pattern_len(sequencer *s, int len)
     if (len < ridiculous_size)
         s->pattern_len = len;
 }
-void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
+void seq_wchar_binary_version_of_pattern(sequencer *s, midi_pattern p,
                                          wchar_t *bin_num)
 {
     int incs = PPBAR / s->pattern_len;
     for (int i = 0; i < s->pattern_len; i++)
     {
-        if (is_int_member_in_array(1, &p[i * incs], incs))
+        int start = i * incs;
+        if (is_midi_event_in_range(start, start + incs, p))
             bin_num[i] = sparkchars[5];
         else
             bin_num[i] = sparkchars[0];
@@ -376,13 +375,14 @@ void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
     bin_num[s->pattern_len] = '\0';
 }
 
-void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p,
+void seq_char_binary_version_of_pattern(sequencer *s, midi_pattern p,
                                         char *bin_num)
 {
     int incs = PPBAR / s->pattern_len;
     for (int i = 0; i < s->pattern_len; i++)
     {
-        if (is_int_member_in_array(1, &p[i * incs], incs))
+        int start = i * incs;
+        if (is_midi_event_in_range(start, start + incs, p))
             bin_num[i] = '1';
         else
             bin_num[i] = '0';
@@ -397,7 +397,7 @@ void seq_print_pattern(sequencer *s, unsigned int pattern_num)
         printf("Pattern %d\n", pattern_num);
         for (int i = 0; i < PPBAR; i++)
         {
-            if (s->patterns[pattern_num][i] == 1)
+            if (s->patterns[pattern_num][i].event_type == MIDI_ON)
             {
                 printf("[%d] on\n", i);
             }
@@ -438,13 +438,15 @@ void seq_rm_hit(sequencer *s, int pattern_num, int step)
 
 void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 {
-    //printf("SEQ mv micro\n");
+    // printf("SEQ mv micro\n");
     if (seq_is_valid_pattern_num(s, pattern_num))
     {
-        if (s->patterns[pattern_num][stepfrom] == 1 && stepto < PPBAR)
+        if (s->patterns[pattern_num][stepfrom].event_type == MIDI_ON &&
+            stepto < PPBAR)
         {
-            s->patterns[pattern_num][stepfrom] = 0;
-            s->patterns[pattern_num][stepto] = 1;
+            s->patterns[pattern_num][stepto] =
+                s->patterns[pattern_num][stepfrom];
+            midi_event_clear(&s->patterns[pattern_num][stepfrom]);
         }
         else
         {
@@ -457,19 +459,19 @@ void seq_mv_micro_hit(sequencer *s, int pattern_num, int stepfrom, int stepto)
 
 void seq_add_micro_hit(sequencer *s, int pattern_num, int step)
 {
-    //printf("Add'ing %d\n", step);
+    printf("MICRO Add'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR)
     {
-        s->patterns[pattern_num][step] = 1;
+        s->patterns[pattern_num][step].event_type = MIDI_ON;
     }
 }
 
 void seq_rm_micro_hit(sequencer *s, int pattern_num, int step)
 {
-    //printf("Rm'ing %d\n", step);
+    // printf("Rm'ing %d\n", step);
     if (seq_is_valid_pattern_num(s, pattern_num) && step < PPBAR)
     {
-        s->patterns[pattern_num][step] = 0;
+        midi_event_clear(&s->patterns[pattern_num][step]);
     }
 }
 
@@ -482,7 +484,7 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
         if (old_swing_setting == swing_setting)
             return;
 
-        //printf("Setting pattern %d swing setting to %d\n", pattern_num,
+        // printf("Setting pattern %d swing setting to %d\n", pattern_num,
         //       swing_setting);
         s->pattern_num_swing_setting[pattern_num] = swing_setting;
 
@@ -496,12 +498,12 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
         while (idx < PPBAR)
         {
             int next_idx = idx + multi;
-            //printf("IDX %d // next idx %d\n", idx, next_idx);
+            // printf("IDX %d // next idx %d\n", idx, next_idx);
             for (; idx < next_idx; idx++)
             {
-                if (s->patterns[s->cur_pattern][idx] == 1)
+                if (s->patterns[s->cur_pattern][idx].event_type == MIDI_ON)
                 {
-                    //printf("Found a hit at %d\n", idx);
+                    // printf("Found a hit at %d\n", idx);
                     hitz_to_swing[hitz_to_swing_idx++] = idx;
                 }
             }
@@ -512,7 +514,7 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
                    4;            // swing moves in incs of 4%
         int num_ppz = multi * 2; // i.e. percent between two increments
         int pulses_to_move = num_ppz / 100.0 * diff;
-        //printf("Pulses to move is %d\n", pulses_to_move);
+        // printf("Pulses to move is %d\n", pulses_to_move);
 
         for (int i = 0; i < 64; i++)
         {
@@ -531,18 +533,12 @@ void seq_set_sloppiness(sequencer *s, int sloppy_setting)
 
 parceled_pattern seq_get_pattern(sequencer *s, int pattern_num)
 {
-    parceled_pattern return_pattern = {0};
+    parceled_pattern return_pattern = {};
 
     if (seq_is_valid_pattern_num(s, pattern_num))
     {
-        return_pattern.len = PPBAR;
         for (int i = 0; i < PPBAR; i++)
-        {
-            if (s->patterns[pattern_num][i])
-            {
-                return_pattern.pattern[i] = 1;
-            }
-        }
+            return_pattern.pattern[i] = s->patterns[pattern_num][i];
     }
     return return_pattern;
 }
@@ -552,11 +548,7 @@ void seq_set_pattern(sequencer *s, int pattern_num, parceled_pattern pattern)
     if (seq_is_valid_pattern_num(s, pattern_num))
     {
         for (int i = 0; i < PPBAR; ++i)
-        {
-            s->patterns[pattern_num][i] = 0;
-            if (pattern.pattern[i])
-                s->patterns[pattern_num][i] = 1;
-        }
+            s->patterns[pattern_num][i] = pattern.pattern[i];
     }
 }
 

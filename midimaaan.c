@@ -87,10 +87,9 @@ void *midiman()
 
                     if (base->recording)
                     {
-                        int tick = mixr->timing_info.midi_tick % PPNS;
-                        midi_event ev =
-                            new_midi_event(tick, status, data1, data2);
-                        synthbase_add_event(base, base->cur_melody, ev);
+                        int tick = mixr->timing_info.midi_tick % PPBAR;
+                        midi_event ev = new_midi_event(status, data1, data2);
+                        synthbase_add_event(base, base->cur_melody, tick, ev);
                     }
 
                     midi_event ev;
@@ -116,22 +115,12 @@ void *midiman()
 
 void print_midi_event_rec(midi_event ev)
 {
-    printf("[Midi] %d note: %d\n", ev.tick, ev.data1);
+    printf("[Midi] note: %d\n", ev.data1);
 }
 
-midi_event new_blank_midi_event()
+midi_event new_midi_event(int event_type, int data1, int data2)
 {
-    midi_event ev = {.tick = -1,
-                     .event_type = 0,
-                     .data1 = 0,
-                     .data2 = 0,
-                     .delete_after_use = false};
-    return ev;
-}
-midi_event new_midi_event(int tick, int event_type, int data1, int data2)
-{
-    midi_event ev = {.tick = tick,
-                     .event_type = event_type,
+    midi_event ev = {.event_type = event_type,
                      .data1 = data1,
                      .data2 = data2,
                      .delete_after_use = false};
@@ -140,7 +129,7 @@ midi_event new_midi_event(int tick, int event_type, int data1, int data2)
 
 void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
 {
-    int cur_midi_tick = mixr->timing_info.midi_tick % PPNS;
+    int cur_midi_tick = mixr->timing_info.midi_tick % PPBAR;
 
     if (sg->type == MINISYNTH_TYPE)
     {
@@ -148,7 +137,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
 
         switch (ev.event_type)
         {
-        case (144):
+        case (MIDI_ON):
         { // Hex 0x80
             minisynth_add_last_note(ms, ev.data1);
             minisynth_midi_note_on(ms, ev.data1, ev.data2);
@@ -158,25 +147,24 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
                 int sustain_time_in_ticks = ms->base.sustain_len_ms *
                                             mixr->timing_info.midi_ticks_per_ms;
                 int note_off_tick =
-                    (cur_midi_tick + sustain_time_in_ticks) % PPNS;
-                midi_event off =
-                    new_midi_event(note_off_tick, 128, ev.data1, 128);
+                    (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
+                midi_event off = new_midi_event(128, ev.data1, 128);
                 off.delete_after_use = true;
-                synthbase_add_event(&ms->base, 0, off);
+                synthbase_add_event(&ms->base, 0, note_off_tick, off);
             }
             break;
         }
-        case (128):
+        case (MIDI_OFF):
         { // Hex 0x90
             minisynth_midi_note_off(ms, ev.data1, ev.data2, false);
             break;
         }
-        case (176):
+        case (MIDI_CONTROL):
         { // Hex 0xB0
             minisynth_midi_control(ms, ev.data1, ev.data2);
             break;
         }
-        case (224):
+        case (MIDI_PITCHBEND):
         { // Hex 0xE0
             minisynth_midi_pitchbend(ms, ev.data1, ev.data2);
             break;
@@ -198,10 +186,10 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
             dxsynth_midi_note_on(dx, ev.data1, ev.data2);
             int sustain_time_in_ticks =
                 dx->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
-            int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPNS;
-            midi_event off = new_midi_event(note_off_tick, 128, ev.data1, 128);
+            int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
+            midi_event off = new_midi_event(128, ev.data1, 128);
             off.delete_after_use = true;
-            synthbase_add_event(&dx->base, 0, off);
+            synthbase_add_event(&dx->base, 0, note_off_tick, off);
             break;
         }
         case (128):
@@ -229,18 +217,18 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         digisynth *ds = (digisynth *)sg;
         switch (ev.event_type)
         {
-        case (144):
+        case (MIDI_ON):
         { // Hex 0x80
             digisynth_midi_note_on(ds, ev.data1, ev.data2);
             int sustain_time_in_ticks =
                 ds->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
-            int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPNS;
-            midi_event off = new_midi_event(note_off_tick, 128, ev.data1, 128);
+            int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
+            midi_event off = new_midi_event(128, ev.data1, 128);
             off.delete_after_use = true;
-            synthbase_add_event(&ds->base, 0, off);
+            synthbase_add_event(&ds->base, 0, note_off_tick, off);
             break;
         }
-        case (128):
+        case (MIDI_OFF):
         { // Hex 0x90
             digisynth_midi_note_off(ds, ev.data1, ev.data2, true);
             break;
@@ -251,49 +239,45 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
     synthbase *base = get_synthbase(sg);
     if (ev.delete_after_use)
     {
-        base->melodies[base->cur_melody][ev.tick].tick = -1;
+        midi_event_clear(&ev);
     }
 }
 
-void midi_melody_quantize(midi_events_loop *melody)
+void midi_melody_quantize(midi_pattern *melody)
 {
     printf("Quantizzzzzzing\n");
 
-    midi_events_loop quantized_loop;
+    midi_pattern quantized_loop = {};
 
-    for (int i = 0; i < PPNS; i++)
+    for (int i = 0; i < PPBAR; i++)
     {
-        quantized_loop[i].tick = -1;
         midi_event ev = (*melody)[i];
-        if (ev.tick != -1)
+        if (ev.event_type)
         {
-            int tick = ev.tick;
             int amendedtick = 0;
-            printf("TICK NOM: %d\n", tick);
-            int tickdiv16 = tick / PPSIXTEENTH;
+            int tickdiv16 = i / PPSIXTEENTH;
             int lower16th = tickdiv16 * PPSIXTEENTH;
             int upper16th = lower16th + PPSIXTEENTH;
-            if ((tick - lower16th) < (upper16th - tick))
+            if ((i - lower16th) < (upper16th - i))
                 amendedtick = lower16th;
             else
                 amendedtick = upper16th;
 
-            ev.tick = amendedtick;
             quantized_loop[amendedtick] = ev;
             printf("Amended TICK: %d\n", amendedtick);
         }
     }
 
-    for (int i = 0; i < PPNS; i++)
+    for (int i = 0; i < PPBAR; i++)
         (*melody)[i] = quantized_loop[i];
 }
 
-void midi_melody_print(midi_events_loop *loop)
+void midi_melody_print(midi_pattern *loop)
 {
-    for (int i = 0; i < PPNS; i++)
+    for (int i = 0; i < PPBAR; i++)
     {
         midi_event ev = (*loop)[i];
-        if (ev.tick != -1)
+        if (ev.event_type)
         {
             char type[20] = {0};
             switch (ev.event_type)
@@ -315,9 +299,18 @@ void midi_melody_print(midi_events_loop *loop)
                 break;
             }
             printf("[Tick: %5d] - note: %4d velocity: %4d type: %s "
-                   "tick_off: %d delete_after_use: %s\n",
-                   ev.tick, ev.data1, ev.data2, type, ev.tick_off,
+                   "delete_after_use: %s\n",
+                   i, ev.data1, ev.data2, type,
                    ev.delete_after_use ? "true" : "false");
         }
     }
 }
+void midi_event_cp(midi_event *from, midi_event *to)
+{
+    to->event_type = from->event_type;
+    to->data1 = from->data1;
+    to->data2 = from->data2;
+    to->delete_after_use = from->delete_after_use;
+}
+
+void midi_event_clear(midi_event *ev) { memset(ev, 0, sizeof(midi_event)); }

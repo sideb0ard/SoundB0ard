@@ -130,7 +130,8 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
         if (seq->started)
         {
             idx = mixr->timing_info.midi_tick % PPBAR;
-            if (seq->m_seq.patterns[seq->m_seq.cur_pattern][idx])
+            if (seq->m_seq.patterns[seq->m_seq.cur_pattern][idx].event_type ==
+                MIDI_ON)
 
             {
                 int seq_position = get_a_sample_seq_position(seq);

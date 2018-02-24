@@ -116,7 +116,7 @@ void mixer_ps(mixer *mixr)
            "NumPeers:%d\n"
            "::::: MIDI Controller:%s MidiReceiverSG:%d MidiType:%s\n"
            "::::: PPQN:%d PPSIXTEENTH:%d PPTWENTYFOURTH:%d PPBAR:%d "
-           "PPNS:%d midi_ticks_per_ms:%.2f" ANSI_COLOR_RESET,
+           "midi_ticks_per_ms:%.2f" ANSI_COLOR_RESET,
            mixr->volume, key_names[mixr->key], mixr->timing_info.midi_tick,
            mixr->timing_info.sixteenth_note_tick,
            mixr->debug_mode ? "true" : "false", data.tempo, data.quantum,
@@ -128,7 +128,7 @@ void mixer_ps(mixer *mixr)
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
-           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR, PPNS,
+           PPQN, PPSIXTEENTH, PPTWENTYFOURTH, PPBAR,
            mixr->timing_info.midi_ticks_per_ms);
 
     if (mixr->env_var_count > 0)
@@ -842,7 +842,7 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
         //          +
         //          (ms->m_settings.m_attack_time_msec *
         //           mixr->timing_info.midi_ticks_per_ms)) %
-        //    PPNS;
+        //    PPBAR;
     }
     else if (sg->type == DIGISYNTH_TYPE)
     {
@@ -856,27 +856,24 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
     }
 
     int note_off_tick =
-        (mixr->timing_info.midi_tick + (PPSIXTEENTH * 4 - 7)) % PPNS;
+        (mixr->timing_info.midi_tick + (PPSIXTEENTH * 4 - 7)) % PPBAR;
 
     synthbase *base = get_synthbase(sg);
-    midi_event off_event = new_midi_event(note_off_tick, 128, note, velocity);
+    midi_event off_event = new_midi_event(128, note, velocity);
     ////////////////////////
 
     if (base->recording)
     {
         printf("Recording note!\n");
-        int note_on_tick = mixr->timing_info.midi_tick % PPNS;
-        midi_event on_event = new_midi_event(note_on_tick, 144, note, velocity);
+        int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
+        midi_event on_event = new_midi_event(144, note, velocity);
 
-        int final_note_off_tick =
-            synthbase_add_event(base, base->cur_melody, off_event);
-
-        on_event.tick_off = final_note_off_tick;
-        synthbase_add_event(base, base->cur_melody, on_event);
+        synthbase_add_event(base, base->cur_melody, note_off_tick, off_event);
+        synthbase_add_event(base, base->cur_melody, note_on_tick, on_event);
     }
     else
     {
         off_event.delete_after_use = true; // _THIS_ is the magic
-        synthbase_add_event(base, base->cur_melody, off_event);
+        synthbase_add_event(base, base->cur_melody, note_off_tick, off_event);
     }
 }

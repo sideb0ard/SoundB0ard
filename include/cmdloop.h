@@ -9,6 +9,8 @@
 void *loopy(void *arg);
 void interpret(char *line);
 
+int stacksize(void);
+
 int exxit(void);
 int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line);
 void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],

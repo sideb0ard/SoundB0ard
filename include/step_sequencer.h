@@ -7,8 +7,6 @@
 
 #define MAX_SEQUENCER_PATTERNS 10
 
-typedef int seq_pattern[PPBAR];
-
 typedef struct sequencer
 {
     int sixteenth_tick;
@@ -16,12 +14,12 @@ typedef struct sequencer
 
     int pattern_len; // in musical steps, i.e. 24th or 16th
 
-    seq_pattern patterns[MAX_SEQUENCER_PATTERNS];
+    midi_pattern patterns[MAX_SEQUENCER_PATTERNS];
     double pattern_position_amp[MAX_SEQUENCER_PATTERNS][PPBAR];
     int pattern_num_loops[MAX_SEQUENCER_PATTERNS];
     int pattern_num_swing_setting[MAX_SEQUENCER_PATTERNS];
-    seq_pattern backup_pattern_while_getting_crazy; // store current pattern so
-                                                    // algorithms can use slot
+    midi_pattern backup_pattern_while_getting_crazy; // store current pattern so
+                                                     // algorithms can use slot
     int num_patterns;
     int cur_pattern;
     int cur_pattern_iteration;
@@ -60,7 +58,7 @@ void seq_set_multi_pattern_mode(sequencer *s, bool multi);
 void seq_change_num_loops(sequencer *s, int pattern_num, int num_loops);
 
 void pattern_char_to_pattern(sequencer *s, char *char_pattern,
-                             int final_pattern[PPBAR]);
+                             midi_event *final_pattern);
 void wchar_version_of_amp(sequencer *s, int pattern_num, wchar_t apattern[49]);
 
 void seq_set_randamp(sequencer *s, bool on);
@@ -73,9 +71,9 @@ void seq_clear_pattern(sequencer *s, int pattern_num);
 void seq_set_backup_mode(sequencer *s, bool on);
 void seq_set_max_generations(sequencer *s, int max);
 
-void seq_wchar_binary_version_of_pattern(sequencer *s, seq_pattern p,
+void seq_wchar_binary_version_of_pattern(sequencer *s, midi_pattern p,
                                          wchar_t *bin_num);
-void seq_char_binary_version_of_pattern(sequencer *s, seq_pattern p,
+void seq_char_binary_version_of_pattern(sequencer *s, midi_pattern p,
                                         char *bin_num);
 void seq_set_gridsteps(sequencer *s, unsigned int gridsteps);
 void seq_print_pattern(sequencer *s, unsigned int pattern_num);
