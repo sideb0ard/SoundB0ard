@@ -5,13 +5,14 @@
 #include <string.h>
 #include <wchar.h>
 
-#include "bitshift.h"
-#include "defjams.h"
-#include "euclidean.h"
-#include "mixer.h"
-#include "sequencer_utils.h"
-#include "step_sequencer.h"
-#include "utils.h"
+#include <bitshift.h>
+#include <defjams.h>
+#include <euclidean.h>
+#include <mixer.h>
+#include <pattern_parser.h>
+#include <sequencer_utils.h>
+#include <step_sequencer.h>
+#include <utils.h>
 
 extern mixer *mixr;
 extern wchar_t *sparkchars;
@@ -171,7 +172,7 @@ void pattern_char_to_pattern(sequencer *s, char *char_pattern,
     int pattern[s->pattern_len];
     char const *sep = " ";
 
-    // printf("GOtz char_pattern %s\n", char_pattern);
+    printf("GOtz char_pattern %s\n", char_pattern);
 
     // extract numbers from string into pattern
     for (sp = strtok_r(char_pattern, sep, &sp_last); sp;
@@ -531,24 +532,21 @@ void seq_set_sloppiness(sequencer *s, int sloppy_setting)
     s->sloppiness = sloppy_setting;
 }
 
-parceled_pattern seq_get_pattern(sequencer *s, int pattern_num)
+midi_event *seq_get_pattern(sequencer *s, int pattern_num)
 {
-    parceled_pattern return_pattern = {};
-
     if (seq_is_valid_pattern_num(s, pattern_num))
-    {
-        for (int i = 0; i < PPBAR; i++)
-            return_pattern.pattern[i] = s->patterns[pattern_num][i];
-    }
-    return return_pattern;
+        return s->patterns[pattern_num];
+    else
+        return NULL;
 }
 
-void seq_set_pattern(sequencer *s, int pattern_num, parceled_pattern pattern)
+void seq_set_pattern(sequencer *s, int pattern_num, midi_event *pattern)
 {
     if (seq_is_valid_pattern_num(s, pattern_num))
     {
+        clear_pattern(s->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; ++i)
-            s->patterns[pattern_num][i] = pattern.pattern[i];
+            s->patterns[pattern_num][i] = pattern[i];
     }
 }
 

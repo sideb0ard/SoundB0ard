@@ -202,7 +202,17 @@ typedef struct midi_event
 
 typedef midi_event midi_pattern[PPBAR];
 
-typedef struct parceled_pattern
+typedef enum {
+    MIDI_PATTERN, // numbers
+    NOTE_PATTERN, // alphanums
+    BEAT_PATTERN, // env variables
+    STEP_PATTERN, // individual step sequencers
+} pattern_type;
+
+typedef struct pattern_target
 {
-    midi_pattern pattern;
-} parceled_pattern;
+    int soundgen_num;
+    int soundgen_pattern_num;
+    unsigned int pattern_type;
+    midi_pattern *pattern;
+} pattern_target;

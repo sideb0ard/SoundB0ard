@@ -1,5 +1,5 @@
 #include <defjams.h>
 
-parceled_pattern left_shift(parceled_pattern in_pattern, int places);
-parceled_pattern right_shift(parceled_pattern in_pattern, int places);
-parceled_pattern brak(parceled_pattern in_pattern);
+void left_shift(midi_event *in_pattern, int places);
+void right_shift(midi_event *in_pattern, int places);
+void brak(midi_event *in_pattern);

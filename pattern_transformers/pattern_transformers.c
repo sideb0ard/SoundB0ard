@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #include <pattern_transformers.h>
+#include <pattern_parser.h>
 
 static void pattern_check_idx(int *idx, int pattern_len)
 {
@@ -10,15 +11,15 @@ static void pattern_check_idx(int *idx, int pattern_len)
         *idx -= pattern_len;
 }
 
-static parceled_pattern _shift(parceled_pattern in_pattern, int places,
+static void _shift(midi_event *in_pattern, int places,
                                int direction)
 {
-    parceled_pattern out_pattern = {};
+    midi_event out_pattern[PPBAR] = {};
     // printf("\nLEFT SHIFT!\n");
     places = places * PPSIXTEENTH;
     for (int i = 0; i < PPBAR; i++)
     {
-        if (in_pattern.pattern[i].event_type)
+        if (in_pattern[i].event_type)
         {
             // printf("BIT ON AT %d\n", i);
             int target_idx = 0;
@@ -29,34 +30,38 @@ static parceled_pattern _shift(parceled_pattern in_pattern, int places,
 
             pattern_check_idx(&target_idx, PPBAR);
 
-            out_pattern.pattern[target_idx] = in_pattern.pattern[i];
+            out_pattern[target_idx] = in_pattern[i];
         }
     }
-    return out_pattern;
+    clear_pattern(in_pattern);
+    for (int i = 0; i < PPBAR; i++)
+        in_pattern[i] = out_pattern[i];
 }
 
-parceled_pattern left_shift(parceled_pattern in_pattern, int places)
+void left_shift(midi_event *in_pattern, int places)
 {
     return _shift(in_pattern, places, LEFT);
 }
 
-parceled_pattern right_shift(parceled_pattern in_pattern, int places)
+void right_shift(midi_event *in_pattern, int places)
 {
     return _shift(in_pattern, places, RIGHT);
 }
 
-parceled_pattern brak(parceled_pattern in_pattern)
+void brak(midi_event *in_pattern)
 {
-    parceled_pattern out_pattern = {};
+    midi_event out_pattern[PPBAR] = {};
     for (int i = 0; i < PPBAR; i++)
     {
-        if (in_pattern.pattern[i].event_type)
+        if (in_pattern[i].event_type)
         {
             int target_idx = i / 2;
             pattern_check_idx(&target_idx, PPBAR);
-            out_pattern.pattern[target_idx] = in_pattern.pattern[i];
+            out_pattern[target_idx] = in_pattern[i];
         }
     }
-    out_pattern = right_shift(out_pattern, 4);
-    return out_pattern;
+    right_shift(out_pattern, 4);
+    clear_pattern(in_pattern);
+    for (int i = 0; i < PPBAR; i++)
+        in_pattern[i] = out_pattern[i];
 }

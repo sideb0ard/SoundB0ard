@@ -1116,7 +1116,7 @@ unsigned int get_next_compat_note(unsigned int cur_key)
     return 0;
 }
 
-void print_parceled_pattern(parceled_pattern pattern)
+void print_parceled_pattern(midi_event *pattern)
 {
     printf("PATTERN!\n");
     bool found = false;
@@ -1126,7 +1126,7 @@ void print_parceled_pattern(parceled_pattern pattern)
         found = false;
         for (int j = 0; j < PPSIXTEENTH && !found; j++)
         {
-            if (pattern.pattern[i + j].event_type == MIDI_ON)
+            if (pattern[i + j].event_type == MIDI_ON)
             {
                 printf("1");
                 found = true;

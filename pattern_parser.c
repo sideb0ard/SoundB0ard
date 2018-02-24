@@ -17,8 +17,9 @@
 
 #define WEE_STACK_SIZE 32
 #define _MAX_VAR_NAME 32
-#define _MAX_TOKENS 128
+#define MAX_TOKENS 128
 #define MAX_DIVISIONS 10
+#define MAX_GENERATED_PATTERNS 16
 
 extern mixer *mixr;
 
@@ -103,14 +104,16 @@ static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
     return false;
 }
 
-void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
+int generate_patterns_from_tokens(pattern_target *patterns, pattern_token tokens[MAX_PATTERN], int num_tokens)
 {
 
     pattern_group *pgroups = calloc(MAX_PATTERN, sizeof(pattern_group));
     int current_pattern_group = 0;
     int num_pattern_groups = 0;
 
-    pattern_token *var_tokens = calloc(_MAX_TOKENS, sizeof(pattern_token));
+    // var_tokens are the content tokens, where something should happen
+    // as opposed to the tokens to be be expanded, like brackets
+    pattern_token *var_tokens = calloc(MAX_TOKENS, sizeof(pattern_token));
     int var_tokens_idx = 0;
 
     for (int i = 0; i < num_tokens; i++)
@@ -142,6 +145,7 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
     work_out_positions(pgroups, level, start_idx, pattern_len, ppositions,
                        &numpositions);
 
+    // validation ..
     int num_uniq = 0;
     int uniq_positions[MAX_PATTERN] = {};
     for (int i = 0; i < numpositions; i++)
@@ -155,6 +159,9 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
                num_uniq, var_tokens_idx);
         goto cleanup_and_return;
     }
+
+    // TODO - rename - division here indicates the / and < symbols which
+    // create events over multiple loop length
     division_marker divisions[MAX_DIVISIONS];
     int num_divisions = 0;
     int highest_division = 1;
@@ -177,6 +184,10 @@ void parse_tokens_into_groups(pattern_token tokens[MAX_PATTERN], int num_tokens)
                 highest_division = var_tokens[i].num_steps;
         }
     }
+
+    print_pattern_tokens(var_tokens, var_tokens_idx);
+    for (int i = 0; i < num_uniq; i++)
+        printf("pos:[%d] %s\n", uniq_positions[i], var_tokens[i].value);
 
     // TODO - chop here - this should differ when used in
     // sample_seq, beat or synth
@@ -511,6 +522,7 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
     int num_children = pgroups[level].num_children;
     if (num_children != 0)
     {
+        // TODO - call euclidean here rather than simple division
         int incr = pattern_len / num_children;
         for (int i = 0; i < num_children; i++)
         {
@@ -772,8 +784,10 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
     }
 }
 
-bool parse_pattern(char *line)
+static char *s_ptypes[] = {"MIDI", "NOTE", "BEAT", "STEP"};
+bool parse_pattern(char *line, unsigned int pattern_type, int target_sg)
 {
+    printf("Parsing a %s pattern - destination:%d\n", s_ptypes[pattern_type], target_sg);
     if (!is_valid_pattern(line))
     {
         printf("Belched on yer pattern, mate. it was stinky\n");
@@ -800,11 +814,17 @@ bool parse_pattern(char *line)
     expand_the_expanders(tokens, token_idx, expanded_tokens,
                          &expanded_tokens_idx);
 
-    parse_tokens_into_groups(expanded_tokens, expanded_tokens_idx);
+    pattern_target patterns[MAX_GENERATED_PATTERNS] = {};
+    int num_patterns = generate_patterns_from_tokens(patterns, expanded_tokens, expanded_tokens_idx);
 
 tidy_up_and_return:
     free(tokens);
     free(expanded_tokens);
 
     return true;
+}
+
+void clear_pattern(midi_event *pattern)
+{
+    memset(pattern, 0, sizeof(midi_event) * PPBAR);
 }

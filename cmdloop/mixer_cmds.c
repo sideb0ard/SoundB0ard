@@ -60,8 +60,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 (soundgenerator *)mixr->sound_generators[sg_num];
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
-                sg->set_pattern(sg, sg_pattern_num,
-                                brak(sg->get_pattern(sg, sg_pattern_num)));
+                midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
+                brak(pattern);
             }
         }
         return true;
@@ -126,20 +126,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 int places_to_shift = atoi(wurds[2]);
+                midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
                 if (strcmp("<~", wurds[0]) == 0)
-                {
-                    sg->set_pattern(
-                        sg, sg_pattern_num,
-                        left_shift(sg->get_pattern(sg, sg_pattern_num),
-                                   places_to_shift));
-                }
+                    left_shift(pattern, places_to_shift);
                 else
-                {
-                    sg->set_pattern(
-                        sg, sg_pattern_num,
-                        right_shift(sg->get_pattern(sg, sg_pattern_num),
-                                    places_to_shift));
-                }
+                    right_shift(pattern, places_to_shift);
             }
         }
         return true;
@@ -424,22 +415,42 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     else if (strncmp("beat", wurds[0], 4) == 0)
     {
+        int starting_idx = 1; // wurds[0] is "beat"
+        unsigned int pattern_type = BEAT_PATTERN;
+        int target_sg = -1;
+
+        if (strncmp("add", wurds[2], 3) == 0)
+        {
+            int sg_num = atoi(wurds[1]);
+            if (mixer_is_valid_soundgen_num(mixr, sg_num))
+            {
+                starting_idx = 3;
+                pattern_type = STEP_PATTERN;
+                target_sg = sg_num;
+            }
+            else
+            {
+                printf("NAe valid target for adding pattern to. you on drugs?\n");
+                return true;
+            }
+        }
+
         int line_len = 0;
-        for (int i = 1; i < num_wurds; i++)
+        for (int i = starting_idx; i < num_wurds; i++)
         {
             line_len += strlen(wurds[i]);
         }
         line_len += num_wurds + 1;
         char line[line_len];
         memset(line, 0, line_len * sizeof(char));
-        for (int i = 1; i < num_wurds; i++)
+        for (int i = starting_idx; i < num_wurds; i++)
         {
             strcat(line, wurds[i]);
             if (i != num_wurds - 1)
                 strcat(line, " ");
         }
 
-        parse_pattern(line);
+        parse_pattern(line, pattern_type, target_sg);
         return true;
     }
 

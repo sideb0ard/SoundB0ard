@@ -55,13 +55,14 @@ bool sample_sequencer_is_valid_pattern(void *self, int pattern_num)
     return seq_is_valid_pattern_num(&seq->m_seq, pattern_num);
 }
 
-parceled_pattern sample_seq_get_pattern(void *self, int pattern_num)
+midi_event *sample_seq_get_pattern(void *self, int pattern_num)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     return seq_get_pattern(&seq->m_seq, pattern_num);
 }
+
 void sample_seq_set_pattern(void *self, int pattern_num,
-                            parceled_pattern pattern)
+                            midi_event *pattern)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     return seq_set_pattern(&seq->m_seq, pattern_num, pattern);
