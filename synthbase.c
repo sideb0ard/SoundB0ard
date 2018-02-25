@@ -266,11 +266,8 @@ void synthbase_nudge_melody(synthbase *ms, int melody_num, int sixteenth)
 
 bool is_valid_melody_num(synthbase *ms, int melody_num)
 {
-    printf("IS VALID? %d < %d?\n", melody_num, ms->num_melodies);
-    if (melody_num < ms->num_melodies)
-    {
+    if (melody_num >= 0 && melody_num < ms->num_melodies)
         return true;
-    }
     return false;
 }
 

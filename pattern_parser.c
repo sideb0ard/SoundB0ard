@@ -175,9 +175,9 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
         goto cleanup_and_return;
     }
 
-    print_pattern_tokens(var_tokens, var_tokens_idx);
-    for (int i = 0; i < num_uniq; i++)
-        printf("pos:[%d] %s\n", uniq_positions[i], var_tokens[i].value);
+    //print_pattern_tokens(var_tokens, var_tokens_idx);
+    //for (int i = 0; i < num_uniq; i++)
+    //    printf("pos:[%d] %s\n", uniq_positions[i], var_tokens[i].value);
 
     for (int i = 0; i < num_uniq; i++)
     {
@@ -707,7 +707,6 @@ static char *s_ptypes[] = {"MIDI", "NOTE", "BEAT", "STEP"};
 bool parse_pattern(char *line, midi_event *target_pattern,
                    unsigned int pattern_type)
 {
-    printf("Parsing a %s pattern\n", s_ptypes[pattern_type]);
     if (!is_valid_pattern(line))
     {
         printf("Belched on yer pattern, mate. it was stinky\n");

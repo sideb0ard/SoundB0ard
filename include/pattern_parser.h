@@ -1,5 +1,9 @@
 #pragma once
 
+#include <stdbool.h>
+
+#include <defjams.h>
+
 #define MAX_PATTERN 254
 #define MAX_PATTERN_CHAR_VAL 100
 #define MAX_CHILDREN 20

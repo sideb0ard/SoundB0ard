@@ -29,7 +29,6 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             synthbase *base =
                 get_synthbase(mixr->sound_generators[soundgen_num]);
 
-            printf("YO! here with '%s'\n", wurds[2]);
             if (strncmp("add", wurds[2], 3) == 0)
             {
                 if (strncmp("melody", wurds[3], 6) == 0 ||
