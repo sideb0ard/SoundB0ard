@@ -72,7 +72,7 @@ typedef struct synthbase
     int generate_every_n_loops;
     int generate_generation;
 
-    int sustain_len_ms;
+    int sustain_note_ms;
 
     int max_generation;
 
@@ -107,10 +107,6 @@ void synthbase_add_event(synthbase *self, int pattern_num, int midi_tick,
                          midi_event ev);
 void synthbase_delete_event(synthbase *base, int pat_num, int tick);
 
-void synthbase_copy_midi_loop(synthbase *self, int pattern_num,
-                              midi_pattern target_loop);
-void synthbase_replace_midi_loop(synthbase *base, midi_pattern source_loop,
-                                 int melody_num);
 void synthbase_print_melodies(synthbase *base);
 void synthbase_nudge_melody(synthbase *base, int melody_num, int sixteenth);
 bool is_valid_melody_num(synthbase *ns, int melody_num);
@@ -140,3 +136,5 @@ void synthbase_add_micro_note(synthbase *base, int pattern_num, int step,
 void synthbase_rm_micro_note(synthbase *base, int pattern_num, int step);
 void synthbase_mv_micro_note(synthbase *base, int pattern_num, int fromstep,
                              int tostep);
+midi_event *synthbase_get_pattern(synthbase *base, int pattern_num);
+void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern);

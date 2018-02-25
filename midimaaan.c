@@ -144,7 +144,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
 
             if (!mixr->have_midi_controller)
             {
-                int sustain_time_in_ticks = ms->base.sustain_len_ms *
+                int sustain_time_in_ticks = ms->base.sustain_note_ms *
                                             mixr->timing_info.midi_ticks_per_ms;
                 int note_off_tick =
                     (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
@@ -185,7 +185,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
             // dxsynth_add_last_note(dx, ev.data1);
             dxsynth_midi_note_on(dx, ev.data1, ev.data2);
             int sustain_time_in_ticks =
-                dx->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
+                dx->base.sustain_note_ms * mixr->timing_info.midi_ticks_per_ms;
             int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
             midi_event off = new_midi_event(128, ev.data1, 128);
             off.delete_after_use = true;
@@ -221,7 +221,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         { // Hex 0x80
             digisynth_midi_note_on(ds, ev.data1, ev.data2);
             int sustain_time_in_ticks =
-                ds->base.sustain_len_ms * mixr->timing_info.midi_ticks_per_ms;
+                ds->base.sustain_note_ms * mixr->timing_info.midi_ticks_per_ms;
             int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
             midi_event off = new_midi_event(128, ev.data1, 128);
             off.delete_after_use = true;
@@ -272,11 +272,11 @@ void midi_melody_quantize(midi_pattern *melody)
         (*melody)[i] = quantized_loop[i];
 }
 
-void midi_melody_print(midi_pattern *loop)
+void midi_melody_print(midi_event *loop)
 {
     for (int i = 0; i < PPBAR; i++)
     {
-        midi_event ev = (*loop)[i];
+        midi_event ev = loop[i];
         if (ev.event_type)
         {
             char type[20] = {0};
@@ -314,3 +314,60 @@ void midi_event_cp(midi_event *from, midi_event *to)
 }
 
 void midi_event_clear(midi_event *ev) { memset(ev, 0, sizeof(midi_event)); }
+
+int get_midi_note_from_string(char *string)
+{
+    if (strlen(string) > 4)
+    {
+        printf("DINGIE!\n");
+        return -1;
+    }
+    char note[3] = {};
+    int octave = -1;
+    sscanf(string, "%[a-z#]%d", note, &octave);
+    if (octave == -1)
+        return -1;
+    octave *= 12;
+
+    printf("MIDI NOTE:%s %d \n", note, octave);
+    //// twelve semitones:
+    //// C C#/Db D D#/Eb E F F#/Gb G G#/Ab A A#/Bb B
+    ////
+    if (!strcasecmp("c", note))
+        return 0 + octave;
+    else if (!strcasecmp("c#", note))
+        return 1 + octave;
+    else if (!strcasecmp("db", note))
+        return 1 + octave;
+    else if (!strcasecmp("d", note))
+        return 2 + octave;
+    else if (!strcasecmp("d#", note))
+        return 3 + octave;
+    else if (!strcasecmp("eb", note))
+        return 3 + octave;
+    else if (!strcasecmp("e", note))
+        return 4 + octave;
+    else if (!strcasecmp("f", note))
+        return 5 + octave;
+    else if (!strcasecmp("f#", note))
+        return 6 + octave;
+    else if (!strcasecmp("gb", note))
+        return 6 + octave;
+    else if (!strcasecmp("g", note))
+        return 7 + octave;
+    else if (!strcasecmp("g#", note))
+        return 8 + octave;
+    else if (!strcasecmp("ab", note))
+        return 8 + octave;
+    else if (!strcasecmp("a", note))
+        return 9 + octave;
+    else if (!strcasecmp("a#", note))
+        return 10 + octave;
+    else if (!strcasecmp("bb", note))
+        return 10 + octave;
+    else if (!strcasecmp("b", note))
+        return 11 + octave;
+    else
+        return -1;
+
+}

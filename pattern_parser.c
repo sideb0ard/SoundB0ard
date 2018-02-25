@@ -12,6 +12,7 @@
 #include <defjams.h>
 #include <euclidean.h>
 #include <mixer.h>
+#include <midimaaan.h>
 #include <pattern_parser.h>
 #include <sample_sequencer.h>
 
@@ -54,6 +55,15 @@ static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
         if (nums[i] == num_to_look_for)
             return true;
     return false;
+}
+
+static void print_pattern(midi_event *pattern)
+{
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (pattern[i].event_type)
+            printf("[%d] %d\n", i, pattern[i].event_type);
+    }
 }
 
 static void print_pattern_tokens(pattern_token tokens[MAX_PATTERN], int len)
@@ -104,8 +114,10 @@ static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
     return false;
 }
 
-int generate_patterns_from_tokens(pattern_target *patterns, pattern_token tokens[MAX_PATTERN], int num_tokens)
+bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN], int num_tokens, midi_event *pattern, unsigned int pattern_type)
 {
+
+    bool return_val = true;
 
     pattern_group *pgroups = calloc(MAX_PATTERN, sizeof(pattern_group));
     int current_pattern_group = 0;
@@ -139,11 +151,11 @@ int generate_patterns_from_tokens(pattern_target *patterns, pattern_token tokens
 
     int level = 0;
     int start_idx = 0;
-    int pattern_len = PPBAR;
     int ppositions[MAX_PATTERN] = {};
     int numpositions = 0;
-    work_out_positions(pgroups, level, start_idx, pattern_len, ppositions,
+    work_out_positions(pgroups, level, start_idx, PPBAR, ppositions,
                        &numpositions);
+    free(pgroups);
 
     // validation ..
     int num_uniq = 0;
@@ -157,140 +169,45 @@ int generate_patterns_from_tokens(pattern_target *patterns, pattern_token tokens
         printf("Vars and timings don't match, ya numpty: num_uniq:%d "
                "var_tokens:%d\n",
                num_uniq, var_tokens_idx);
+        return_val = false;
         goto cleanup_and_return;
-    }
-
-    // TODO - rename - division here indicates the / and < symbols which
-    // create events over multiple loop length
-    division_marker divisions[MAX_DIVISIONS];
-    int num_divisions = 0;
-    int highest_division = 1;
-    for (int i = 0; i < num_uniq; i++)
-    {
-        if (var_tokens[i].type == VAR_NAME)
-        {
-            if (var_tokens[i].has_divider)
-            {
-                divisions[num_divisions].position = uniq_positions[i];
-                divisions[num_divisions].value = var_tokens[i].divider;
-                if (divisions[num_divisions].value > highest_division)
-                    highest_division = divisions[num_divisions].value;
-                num_divisions++;
-            }
-        }
-        else if (var_tokens[i].type == ANGLE_EXPRESSION)
-        {
-            if (var_tokens[i].num_steps > highest_division)
-                highest_division = var_tokens[i].num_steps;
-        }
     }
 
     print_pattern_tokens(var_tokens, var_tokens_idx);
     for (int i = 0; i < num_uniq; i++)
         printf("pos:[%d] %s\n", uniq_positions[i], var_tokens[i].value);
 
-    // TODO - chop here - this should differ when used in
-    // sample_seq, beat or synth
 
-    // 3. verify env vars
-    for (int i = 0; i < var_tokens_idx; i++)
-    {
-        char *var_key = var_tokens[i].value;
-        if (var_tokens[i].type == VAR_NAME)
-        {
-            if (!validate_and_clear_env_var(mixr, var_key))
-            {
-                printf("VAR NAME Barf! %s\n", var_key);
-                goto cleanup_and_return;
-            }
-        }
-        else if (var_tokens[i].type == ANGLE_EXPRESSION)
-        {
-            for (int j = 0; j < var_tokens[i].num_steps; j++)
-            {
-                if (!validate_and_clear_env_var(mixr, var_tokens[i].steps[j]))
-                {
-                    printf("ANGLE Barf! %s\n", var_tokens[i].steps[j]);
-                    goto cleanup_and_return;
-                }
-                // printf("Step[%d] Var:[%s]\n", j, var_tokens[i].steps[j]);
-            }
-        }
-        else if (var_tokens[i].type == BLANK)
-        {
-        } // no-op
-        else
-        {
-            printf("NAE Valid ENV VAR! %s\n", var_key);
-            goto cleanup_and_return;
-        }
-    }
-
-    printf("VERIFIED\n");
     for (int i = 0; i < num_uniq; i++)
     {
         if (var_tokens[i].type == VAR_NAME)
         {
-            int sg_num;
-            get_environment_val(var_tokens[i].value, &sg_num);
-            printf("Play at %s %d\n", var_tokens[i].value, uniq_positions[i]);
-            sample_sequencer *seq =
-                (sample_sequencer *)mixr->sound_generators[sg_num];
-            if (highest_division > 0)
+            pattern[uniq_positions[i]].event_type = MIDI_ON;
+            if (pattern_type == MIDI_PATTERN)
             {
-                seq_set_num_patterns(&seq->m_seq, highest_division);
+                pattern[uniq_positions[i]].data1 = atoi(var_tokens[i].value);
+                pattern[uniq_positions[i]].data2 = 128; // velocity
             }
-            else
+            else if (pattern_type == NOTE_PATTERN)
             {
-                seq_set_num_patterns(&seq->m_seq, 1);
-            }
-
-            for (int j = 0; j < highest_division; j++)
-            {
-                if (var_tokens[i].has_divider)
-                {
-                    if (j % var_tokens[i].divider == 0)
-                        seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
-                }
-                else
-                    seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
-            }
-        }
-        else if (var_tokens[i].type == ANGLE_EXPRESSION)
-        {
-            int sg_num;
-
-            for (int j = 0; j < var_tokens[i].num_steps; j++)
-            {
-                get_environment_val(var_tokens[i].steps[j], &sg_num);
-
-                sample_sequencer *seq =
-                    (sample_sequencer *)mixr->sound_generators[sg_num];
-
-                if (highest_division > 0)
-                {
-                    seq_set_num_patterns(&seq->m_seq, highest_division);
-                }
-                else
-                {
-                    seq_set_num_patterns(&seq->m_seq, 1);
-                }
-
-                seq_add_micro_hit(&seq->m_seq, j, uniq_positions[i]);
+                int midi_num = get_midi_note_from_string(var_tokens[i].value);
+                printf("NOTE! %d\n", midi_num);
+                pattern[uniq_positions[i]].data1 = midi_num;
+                pattern[uniq_positions[i]].data2 = 128; // velocity
             }
         }
     }
 
 cleanup_and_return:
-    free(pgroups);
     free(var_tokens);
+    return return_val;
 }
 
 static bool is_valid_token_char(char c)
 {
     if (isalnum(c) || c == '/' || c == '*' || c == '(' || c == ')' ||
         c == ',' || c == '<' || c == '>' || c == '{' || c == '}' || c == '~' ||
-        c == '_' || c == '-')
+        c == '_' || c == '-' || c == '!')
         return true;
     return false;
 }
@@ -310,10 +227,10 @@ static bool is_start_of_modifier(char *c)
 
 static bool is_valid_token_name(char *token_name)
 {
-    // pretty weak, just checks if starts with alnum
+    // pretty weak, just checks if starts with alnum or bang
     // followed by optional expander
     regex_t valid_token_rx;
-    regcomp(&valid_token_rx, "^[[:alnum:]]+[\\*/(]?", REG_EXTENDED | REG_ICASE);
+    regcomp(&valid_token_rx, "^[[:alnum:]!]+[\\*/(]?", REG_EXTENDED | REG_ICASE);
     bool ret = false;
     if (regexec(&valid_token_rx, token_name, 0, NULL, 0) == 0)
         ret = true;
@@ -785,9 +702,9 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
 }
 
 static char *s_ptypes[] = {"MIDI", "NOTE", "BEAT", "STEP"};
-bool parse_pattern(char *line, unsigned int pattern_type, int target_sg)
+bool parse_pattern(char *line, midi_event *target_pattern, unsigned int pattern_type)
 {
-    printf("Parsing a %s pattern - destination:%d\n", s_ptypes[pattern_type], target_sg);
+    printf("Parsing a %s pattern\n", s_ptypes[pattern_type]);
     if (!is_valid_pattern(line))
     {
         printf("Belched on yer pattern, mate. it was stinky\n");
@@ -809,13 +726,11 @@ bool parse_pattern(char *line, unsigned int pattern_type, int target_sg)
         return_val = false;
         goto tidy_up_and_return;
     }
-    // print_pattern_tokens(tokens, token_idx);
-
     expand_the_expanders(tokens, token_idx, expanded_tokens,
                          &expanded_tokens_idx);
 
-    pattern_target patterns[MAX_GENERATED_PATTERNS] = {};
-    int num_patterns = generate_patterns_from_tokens(patterns, expanded_tokens, expanded_tokens_idx);
+    if (!generate_pattern_from_tokens(expanded_tokens, expanded_tokens_idx, target_pattern, pattern_type))
+        return_val = false;
 
 tidy_up_and_return:
     free(tokens);

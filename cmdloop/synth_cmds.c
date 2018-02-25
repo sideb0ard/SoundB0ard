@@ -29,6 +29,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             synthbase *base =
                 get_synthbase(mixr->sound_generators[soundgen_num]);
 
+            printf("YO! here with '%s'\n", wurds[2]);
             if (strncmp("add", wurds[2], 3) == 0)
             {
                 if (strncmp("melody", wurds[3], 6) == 0 ||
@@ -67,11 +68,8 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                                "%d:%d!\n",
                                soundgen_num, pattern_num, sg2, pattern_num2);
 
-                        midi_pattern loop_copy;
-                        synthbase_copy_midi_loop(base, pattern_num, loop_copy);
-
-                        synthbase_replace_midi_loop(sb2, loop_copy,
-                                                    pattern_num2);
+                        midi_event *loop_copy = synthbase_get_pattern(base, pattern_num);
+                        synthbase_set_pattern(sb2, pattern_num2, loop_copy);
                     }
                 }
             }
@@ -87,6 +85,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             else if (strncmp("sustain_note_ms", wurds[2], 15) == 0)
             {
+                printf("ME!\n");
                 int sustain_note_ms = atoi(wurds[3]);
                 if (sustain_note_ms > 0)
                     synthbase_set_sustain_note_ms(base, sustain_note_ms);

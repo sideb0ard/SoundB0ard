@@ -208,11 +208,3 @@ typedef enum {
     BEAT_PATTERN, // env variables
     STEP_PATTERN, // individual step sequencers
 } pattern_type;
-
-typedef struct pattern_target
-{
-    int soundgen_num;
-    int soundgen_pattern_num;
-    unsigned int pattern_type;
-    midi_pattern *pattern;
-} pattern_target;

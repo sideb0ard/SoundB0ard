@@ -49,12 +49,12 @@ typedef struct pattern_group
     int parent;
 } pattern_group;
 
-bool parse_pattern(char *line, unsigned int pattern_type, int target_sg);
+bool parse_pattern(char *line, midi_event *target_pattern, unsigned int pattern_type);
 bool is_valid_pattern(char *line);
 void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
                         int start_idx, int pattern_len,
                         int ppositions[MAX_PATTERN], int *numpositions);
 int extract_tokens_from_pattern_wurds(pattern_token *tokens, int *token_idx,
                                       char *wurd);
-int generate_patterns_from_tokens(pattern_target *patterns, pattern_token tokens[MAX_PATTERN], int num_tokens);
+bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN], int num_tokens, midi_event *pattern, unsigned int pattern_type);
 void clear_pattern(midi_event *pattern);

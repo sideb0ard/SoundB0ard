@@ -49,6 +49,8 @@ minisynth *new_minisynth(void)
     ms->sound_generator.get_num_tracks = &minisynth_get_num_tracks;
     ms->sound_generator.event_notify = &synthbase_event_notify;
     ms->sound_generator.make_active_track = &minisynth_make_active_track;
+    ms->sound_generator.set_pattern = &minisynth_set_pattern;
+    ms->sound_generator.get_pattern = &minisynth_get_pattern;
     ms->sound_generator.self_destruct = &minisynth_del_self;
     ms->sound_generator.type = MINISYNTH_TYPE;
 
@@ -708,7 +710,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n"
         "      [" WANSI_COLOR_WHITE "arp" WCOOL_COLOR_PINK "] arp:%d "
         "arprepeat:%d arpmode:%d[0-3] arprate[0-3]:%d arpoctrange[1-4]:%d\n"
-        "      last_midi_note:%d sustain_len_ms:%d",
+        "      last_midi_note:%d sustain_note_ms:%d",
 
         // VOICE + GENERAL
         ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
@@ -770,7 +772,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_arp.rate, ms->m_arp.octave_range,
 
         // SYNTHBASE
-        ms->base.last_midi_note, ms->base.sustain_len_ms
+        ms->base.last_midi_note, ms->base.sustain_note_ms
 
         );
 
@@ -2287,4 +2289,22 @@ void minisynth_add_last_note(minisynth *ms, unsigned int val)
     for (int i = 1; i < MAX_VOICES; i++)
         ms->m_last_midi_notes[i - 1] = ms->m_last_midi_notes[i];
     ms->m_last_midi_notes[MAX_VOICES - 1] = val;
+}
+
+midi_event *minisynth_get_pattern(void *self, int pattern_num)
+{
+    synthbase *base =
+        get_synthbase(self);
+    if (base)
+        return synthbase_get_pattern(base, pattern_num);
+
+    return NULL;
+}
+
+void minisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
+{
+    synthbase *base =
+        get_synthbase(self);
+    if (base)
+        synthbase_set_pattern(base, pattern_num, pattern);
 }

@@ -16,5 +16,6 @@ void midi_event_clear(midi_event *ev);
 
 void midi_parse_midi_event(soundgenerator *sg, midi_event ev);
 
-void midi_melody_print(midi_pattern *melody);
+void midi_melody_print(midi_event *pattern);
 void midi_melody_quantize(midi_pattern *melody);
+int get_midi_note_from_string(char *string);

@@ -7,6 +7,7 @@
 #include "euclidean.h"
 #include "mixer.h"
 #include "sequencer_utils.h"
+#include <pattern_parser.h>
 #include "synthbase.h"
 #include "utils.h"
 
@@ -38,7 +39,7 @@ void synthbase_init(synthbase *base, void *parent,
     base->m_generate_src = -99;
     base->last_midi_note = 60;
     base->root_midi_note = 60;
-    base->sustain_len_ms = 200;
+    base->sustain_note_ms = 200;
     base->live_code_mode = true;
 }
 
@@ -159,13 +160,13 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
              L"\n      Multi: %s CurMelody:%d"
              "generate:%d gen_src:%d gen_every_n:%d \n"
              "      morph:%d morph_gen:%d morph_every_n:%d "
-             "root_midi_note:%d last_midi_note:%d sustain_len_ms:%d",
+             "root_midi_note:%d last_midi_note:%d sustain_note_ms:%d",
 
              base->multi_melody_mode ? "true" : "false", base->cur_melody,
              base->generate_mode, base->m_generate_src,
              base->generate_every_n_loops, base->morph_mode,
              base->morph_generation, base->morph_every_n_loops,
-             base->root_midi_note, base->last_midi_note, base->sustain_len_ms);
+             base->root_midi_note, base->last_midi_note, base->sustain_note_ms);
 
     for (int i = 0; i < base->num_melodies; i++)
     {
@@ -241,60 +242,31 @@ void synthbase_clear_melody_ready_for_new_one(synthbase *ms, int melody_num)
     memset(ms->melodies[melody_num], 0, sizeof(midi_pattern));
 }
 
-void synthbase_copy_midi_loop(synthbase *self, int melody_num,
-                              midi_pattern target_loop)
-{
-    if (melody_num >= self->num_melodies)
-    {
-        printf("Dingjie!\n");
-        return;
-    }
-    memset(target_loop, 0, sizeof(midi_pattern));
-    for (int i = 0; i < PPBAR; i++)
-        target_loop[i] = self->melodies[melody_num][i];
-}
-
-void synthbase_replace_midi_loop(synthbase *ms, midi_pattern source_loop,
-                                 int melody_num)
-{
-    if (melody_num >= MAX_NUM_MIDI_LOOPS)
-    {
-        printf("Dingjie!\n");
-        return;
-    }
-    memset(ms->melodies[melody_num], 0, sizeof(midi_pattern));
-    for (int i = 0; i < PPBAR; i++)
-        ms->melodies[melody_num][i] = source_loop[i];
-    printf("Replaced Melody %d\n", melody_num);
-}
-
 void synthbase_nudge_melody(synthbase *ms, int melody_num, int sixteenth)
 {
     if (sixteenth >= 16)
-    {
-        printf("Nah, mate, nudge needs to be less than 16\n");
-        return;
-    }
-    int sixteenth_of_loop = PPBAR / 16.0;
-    midi_pattern loop_copy;
+        sixteenth = sixteenth % 16;
 
-    synthbase_copy_midi_loop(ms, melody_num, &loop_copy);
+    int sixteenth_of_loop = PPBAR / 16.0;
+
+    midi_event *source_pattern = synthbase_get_pattern(ms, melody_num);
 
     midi_pattern new_loop;
     for (int i = 0; i < PPBAR; i++)
     {
-        if (loop_copy[i].event_type)
+        if (source_pattern[i].event_type)
         {
             int new_tick = (i + (sixteenth * sixteenth_of_loop)) % PPBAR;
-            new_loop[new_tick] = loop_copy[i];
+            new_loop[new_tick] = source_pattern[i];
         }
     }
 
-    synthbase_replace_midi_loop(ms, &new_loop, melody_num);
+    synthbase_set_pattern(ms, melody_num, new_loop);
 }
 
 bool is_valid_melody_num(synthbase *ms, int melody_num)
 {
+    printf("IS VALID? %d < %d?\n", melody_num, ms->num_melodies);
     if (melody_num < ms->num_melodies)
     {
         return true;
@@ -380,7 +352,7 @@ void synthbase_make_active_track(void *self, int pattern_num)
 void synthbase_print_melodies(synthbase *ms)
 {
     for (int i = 0; i < ms->num_melodies; i++)
-        midi_melody_print(&ms->melodies[i]);
+        midi_melody_print(ms->melodies[i]);
 }
 
 void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note)
@@ -537,7 +509,7 @@ int synthbase_change_octave_melody(synthbase *base, int melody_num,
 void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
 {
     if (sustain_note_ms > 0)
-        base->sustain_len_ms = sustain_note_ms;
+        base->sustain_note_ms = sustain_note_ms;
 }
 
 void synthbase_set_rand_key(synthbase *base)
@@ -561,4 +533,28 @@ void synthbase_set_rand_key(synthbase *base)
 void synthbase_set_root_key(synthbase *base, int root_key)
 {
     base->root_midi_note = root_key;
+}
+
+midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)
+{
+    if (is_valid_melody_num(base, pattern_num))
+        return base->melodies[pattern_num];
+    return NULL;
+}
+
+void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
+{
+    synthbase *base = (synthbase*) self;
+    printf("SET PATTERN!\n");
+    midi_melody_print(pattern);
+    printf("PATTERN NUM! %d\n", pattern_num);
+    if (is_valid_melody_num(base, pattern_num))
+    {
+        printf("VALUD!\n");
+        clear_pattern(base->melodies[pattern_num]);
+        for (int i = 0; i < PPBAR; i++)
+        {
+            base->melodies[pattern_num][i] = pattern[i];
+        }
+    }
 }
