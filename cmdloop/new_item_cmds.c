@@ -5,7 +5,9 @@
 #include <digisynth.h>
 #include <looper.h>
 #include <mixer.h>
+#include <pattern_parser.h>
 #include <sample_sequencer.h>
+#include <synthdrum_sequencer.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -49,8 +51,8 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 if (num_wurds > 2)
                 {
                     digisynth *ds = (digisynth *)mixr->sound_generators[sgnum];
-                    char_melody_to_midi_melody(&ds->base, 0, wurds, 2,
-                                               num_wurds);
+                    char_pattern_to_midi_pattern(&ds->base, 0, wurds, 2,
+                                                 num_wurds);
                 }
             }
             else
@@ -68,7 +70,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (num_wurds > 2)
             {
                 dxsynth *dx = (dxsynth *)mixr->sound_generators[sgnum];
-                char_melody_to_midi_melody(&dx->base, 0, wurds, 2, num_wurds);
+                char_pattern_to_midi_pattern(&dx->base, 0, wurds, 2, num_wurds);
             }
         }
 
@@ -150,31 +152,46 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (num_wurds > 2)
             {
                 minisynth *ms = (minisynth *)mixr->sound_generators[sgnum];
-                char_melody_to_midi_melody(&ms->base, 0, wurds, 2, num_wurds);
+                char_pattern_to_midi_pattern(&ms->base, 0, wurds, 2, num_wurds);
             }
         }
 
-        else if (strncmp("samp", wurds[1], 4) == 0)
+        else if (strncmp("samp", wurds[1], 4) == 0 ||
+                 strncmp("step", wurds[1], 4) == 0)
         {
-            char *pattern = (char *)calloc(151, sizeof(char));
-            memset(pattern, 0, 151);
-            if (is_valid_file(wurds[2]))
+            int sgnum = -1;
+            if (strncmp("synth", wurds[2], 5) == 0)
+            {
+                synthdrum_sequencer *ds = new_synthdrum_seq();
+                sgnum = add_sound_generator(mixr, (soundgenerator *)ds);
+            }
+            else if (is_valid_file(wurds[2]))
             {
                 sample_sequencer *s = new_sample_seq(wurds[2]);
-                char_array_to_seq_string_pattern(&s->m_seq, pattern, wurds, 3,
-                                                 num_wurds);
-                int sgnum = add_sound_generator(
-                    mixr,
-                    (soundgenerator *)s); //  add_seq_char_pattern(mixr,
-                                          //  wurds[1], pattern);
-                pattern_char_to_pattern(
-                    &s->m_seq, pattern,
-                    s->m_seq.patterns[s->m_seq.num_patterns++]);
-
-                printf("New SG at pos %d - has %d patterns\n", sgnum,
-                       s->m_seq.num_patterns);
+                sgnum = add_sound_generator(mixr, (soundgenerator *)s);
             }
-            free(pattern);
+            if (sgnum != -1)
+            {
+                printf("SG! %d\n", sgnum);
+                int line_len = 0;
+                for (int i = 3; i < num_wurds; i++)
+                    line_len += strlen(wurds[i]);
+                line_len += num_wurds + 1;
+                char line[line_len];
+                memset(line, 0, line_len * sizeof(char));
+                for (int i = 3; i < num_wurds; i++)
+                {
+                    strcat(line, wurds[i]);
+                    if (i != num_wurds - 1)
+                        strcat(line, " ");
+                }
+
+                midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
+                soundgenerator *sg = mixr->sound_generators[sgnum];
+                if (parse_pattern(line, pattern, STEP_PATTERN))
+                    sg->set_pattern(sg, 0, pattern);
+                free(pattern);
+            }
         }
 
         return true;

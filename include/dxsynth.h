@@ -125,7 +125,8 @@ void dxsynth_setvol(void *self, double v);
 double dxsynth_getvol(void *self);
 void dxsynth_sg_start(void *self);
 void dxsynth_sg_stop(void *self);
-int dxsynth_get_num_tracks(void *self);
+int dxsynth_get_num_patterns(void *self);
+void dxsynth_set_num_patterns(void *self, int num_patterns);
 void dxsynth_make_active_track(void *self, int tracknum);
 
 ////////////////////////////////////
@@ -155,7 +156,7 @@ void dxsynth_reset_voices(dxsynth *self);
 void dxsynth_rand_settings(dxsynth *ms);
 
 void dxsynth_print_settings(dxsynth *ms);
-void dxsynth_print_melodies(dxsynth *ms);
+void dxsynth_print_patterns(dxsynth *ms);
 void dxsynth_print_modulation_routings(dxsynth *ms);
 void dxsynth_print_lfo1_routing_info(dxsynth *ms, wchar_t *scratch);
 void dxsynth_print_lfo2_routing_info(dxsynth *ms, wchar_t *scratch);

@@ -683,7 +683,7 @@ bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-        track_num < mixr->sound_generators[soundgen_num]->get_num_tracks(
+        track_num < mixr->sound_generators[soundgen_num]->get_num_patterns(
                         mixr->sound_generators[soundgen_num]))
         return true;
 
@@ -858,12 +858,12 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
         int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
         midi_event on_event = new_midi_event(144, note, velocity);
 
-        synthbase_add_event(base, base->cur_melody, note_off_tick, off_event);
-        synthbase_add_event(base, base->cur_melody, note_on_tick, on_event);
+        synthbase_add_event(base, base->cur_pattern, note_off_tick, off_event);
+        synthbase_add_event(base, base->cur_pattern, note_on_tick, on_event);
     }
     else
     {
         off_event.delete_after_use = true; // _THIS_ is the magic
-        synthbase_add_event(base, base->cur_melody, note_off_tick, off_event);
+        synthbase_add_event(base, base->cur_pattern, note_off_tick, off_event);
     }
 }

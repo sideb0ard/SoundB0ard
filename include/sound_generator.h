@@ -17,7 +17,8 @@ typedef struct soundgenerator
     void (*start)(void *self);
     void (*stop)(void *self);
     void (*make_active_track)(void *self, int track_num);
-    int (*get_num_tracks)(void *self);
+    int (*get_num_patterns)(void *self);
+    void (*set_num_patterns)(void *self, int num_patterns);
     void (*self_destruct)(void *self);
     void (*event_notify)(void *self, unsigned int event_type);
     midi_event *(*get_pattern)(void *self, int pattern_num);
@@ -25,6 +26,7 @@ typedef struct soundgenerator
     bool (*is_valid_pattern)(void *self, int pattern_num);
 
     sound_generator_type type;
+    int num_patterns;
     bool active;
 
     int effects_size; // size of array

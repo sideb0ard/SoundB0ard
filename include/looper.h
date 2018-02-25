@@ -137,7 +137,8 @@ void looper_setvol(void *self, double v);
 double looper_getvol(void *self);
 void looper_start(void *self);
 void looper_stop(void *self);
-int looper_get_num_tracks(void *self);
+int looper_get_num_patterns(void *self);
+void looper_set_num_patterns(void *self, int num_patterns);
 void looper_make_active_track(void *self, int tracknum);
 void looper_event_notify(void *self, unsigned int event_type);
 

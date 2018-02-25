@@ -74,7 +74,8 @@ double sds_getvol(void *self);
 
 void sds_start(void *self);
 void sds_stop(void *self);
-int sds_get_num_tracks(void *self);
+int sds_get_num_patterns(void *self);
+void sds_set_num_patterns(void *self, int num_patterns);
 void sds_make_active_track(void *self, int tracknum);
 void sds_event_notify(void *self, unsigned int event_type);
 
@@ -99,3 +100,6 @@ void synthdrum_set_filter_type(synthdrum_sequencer *sds, unsigned int val);
 void synthdrum_set_mod_semitones_range(synthdrum_sequencer *sds, int val);
 
 void synthdrum_randomize(synthdrum_sequencer *sds);
+
+midi_event *synthdrum_get_pattern(void *self, int pattern_num);
+void synthdrum_set_pattern(void *self, int pattern_num, midi_event *pattern);

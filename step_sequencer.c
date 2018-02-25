@@ -62,8 +62,6 @@ bool seq_tick(sequencer *seq)
 {
     if (mixr->timing_info.sixteenth_note_tick != seq->sixteenth_tick)
     {
-        // printf("NOT MY 16TH TICK! %d\n",
-        // mixr->timing_info.sixteenth_note_tick);
         seq->sixteenth_tick = mixr->timing_info.sixteenth_note_tick;
 
         if (seq->sixteenth_tick % 16 == 0)

@@ -89,7 +89,7 @@ void *midiman()
                     {
                         int tick = mixr->timing_info.midi_tick % PPBAR;
                         midi_event ev = new_midi_event(status, data1, data2);
-                        synthbase_add_event(base, base->cur_melody, tick, ev);
+                        synthbase_add_event(base, base->cur_pattern, tick, ev);
                     }
 
                     midi_event ev;
@@ -243,7 +243,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
     }
 }
 
-void midi_melody_quantize(midi_pattern *melody)
+void midi_pattern_quantize(midi_pattern *pattern)
 {
     printf("Quantizzzzzzing\n");
 
@@ -251,7 +251,7 @@ void midi_melody_quantize(midi_pattern *melody)
 
     for (int i = 0; i < PPBAR; i++)
     {
-        midi_event ev = (*melody)[i];
+        midi_event ev = (*pattern)[i];
         if (ev.event_type)
         {
             int amendedtick = 0;
@@ -269,10 +269,10 @@ void midi_melody_quantize(midi_pattern *melody)
     }
 
     for (int i = 0; i < PPBAR; i++)
-        (*melody)[i] = quantized_loop[i];
+        (*pattern)[i] = quantized_loop[i];
 }
 
-void midi_melody_print(midi_event *loop)
+void midi_pattern_print(midi_event *loop)
 {
     for (int i = 0; i < PPBAR; i++)
     {

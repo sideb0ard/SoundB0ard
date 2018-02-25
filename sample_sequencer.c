@@ -37,7 +37,8 @@ sample_sequencer *new_sample_seq(char *filename)
     seq->sound_generator.setvol = &sample_seq_setvol;
     seq->sound_generator.start = &sample_start;
     seq->sound_generator.stop = &sample_stop;
-    seq->sound_generator.get_num_tracks = &sample_seq_get_num_tracks;
+    seq->sound_generator.get_num_patterns = &sample_seq_get_num_patterns;
+    seq->sound_generator.set_num_patterns = &sample_seq_set_num_patterns;
     seq->sound_generator.make_active_track = &sample_seq_make_active_track;
     seq->sound_generator.self_destruct = &sampleseq_del_self;
     seq->sound_generator.event_notify = &sample_seq_event_notify;
@@ -265,10 +266,16 @@ void sampleseq_del_self(void *self)
     free(s);
 }
 
-int sample_seq_get_num_tracks(void *self)
+int sample_seq_get_num_patterns(void *self)
 {
     sample_sequencer *s = (sample_sequencer *)self;
     return s->m_seq.num_patterns;
+}
+
+void sample_seq_set_num_patterns(void *self, int num_patterns)
+{
+    sample_sequencer *s = (sample_sequencer *)self;
+    s->m_seq.num_patterns = num_patterns;
 }
 
 void sample_seq_make_active_track(void *self, int track_num)

@@ -50,7 +50,8 @@ looper *new_looper(char *filename)
     g->sound_generator.setvol = &looper_setvol;
     g->sound_generator.start = &looper_start;
     g->sound_generator.stop = &looper_stop;
-    g->sound_generator.get_num_tracks = &looper_get_num_tracks;
+    g->sound_generator.get_num_patterns = &looper_get_num_patterns;
+    g->sound_generator.set_num_patterns = &looper_set_num_patterns;
     g->sound_generator.make_active_track = &looper_make_active_track;
     g->sound_generator.self_destruct = &looper_del_self;
     g->sound_generator.event_notify = &looper_event_notify;
@@ -451,10 +452,16 @@ void looper_make_active_track(void *self, int track_num)
     (void)track_num;
 }
 
-int looper_get_num_tracks(void *self)
+int looper_get_num_patterns(void *self)
 {
     (void)self;
     return 1;
+}
+
+void looper_set_num_patterns(void *self, int num_patterns)
+{
+    (void)self;
+    (void)num_patterns;
 }
 
 //////////////////////////// grain stuff //////////////////////////

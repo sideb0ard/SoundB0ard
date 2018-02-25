@@ -88,10 +88,12 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->sg.setvol = &sds_setvol;
     sds->sg.start = &sds_start;
     sds->sg.stop = &sds_stop;
-    sds->sg.get_num_tracks = &sds_get_num_tracks;
+    sds->sg.get_num_patterns = &sds_get_num_patterns;
     sds->sg.make_active_track = &sds_make_active_track;
     sds->sg.self_destruct = &synthdrum_del_self;
     sds->sg.event_notify = &sds_event_notify;
+    sds->sg.set_pattern = &synthdrum_set_pattern;
+    sds->sg.get_pattern = &synthdrum_get_pattern;
     sds->sg.type = SYNTHDRUM_TYPE;
     sds->mod_semitones_range = 4;
     sds_start(sds);
@@ -662,10 +664,16 @@ void sds_stop(void *self)
     sds->sg.active = false;
 }
 
-int sds_get_num_tracks(void *self)
+int sds_get_num_patterns(void *self)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
     return sds->m_seq.num_patterns;
+}
+
+void sds_set_num_patterns(void *self, int num_patterns)
+{
+    synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    sds->m_seq.num_patterns = num_patterns;
 }
 
 void sds_make_active_track(void *self, int track_num)
@@ -701,4 +709,16 @@ void synthdrum_set_filter_type(synthdrum_sequencer *sds, unsigned int val)
 void synthdrum_set_mod_semitones_range(synthdrum_sequencer *sds, int val)
 {
     sds->mod_semitones_range = val;
+}
+
+midi_event *synthdrum_get_pattern(void *self, int pattern_num)
+{
+    synthdrum_sequencer *seq = (synthdrum_sequencer *)self;
+    return seq_get_pattern(&seq->m_seq, pattern_num);
+}
+
+void synthdrum_set_pattern(void *self, int pattern_num, midi_event *pattern)
+{
+    synthdrum_sequencer *seq = (synthdrum_sequencer *)self;
+    return seq_set_pattern(&seq->m_seq, pattern_num, pattern);
 }

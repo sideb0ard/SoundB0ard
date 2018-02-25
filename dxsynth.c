@@ -31,7 +31,8 @@ dxsynth *new_dxsynth(void)
     dx->sound_generator.getvol = &dxsynth_getvol;
     dx->sound_generator.start = &dxsynth_sg_start;
     dx->sound_generator.stop = &dxsynth_sg_stop;
-    dx->sound_generator.get_num_tracks = &dxsynth_get_num_tracks;
+    dx->sound_generator.get_num_patterns = &dxsynth_get_num_patterns;
+    dx->sound_generator.set_num_patterns = &dxsynth_set_num_patterns;
     dx->sound_generator.event_notify = &synthbase_event_notify;
     dx->sound_generator.make_active_track = &dxsynth_make_active_track;
     dx->sound_generator.self_destruct = &dxsynth_del_self;
@@ -636,10 +637,16 @@ double dxsynth_getvol(void *self)
     return dx->vol;
 }
 
-int dxsynth_get_num_tracks(void *self)
+int dxsynth_get_num_patterns(void *self)
 {
     dxsynth *ms = (dxsynth *)self;
-    return synthbase_get_num_tracks(&ms->base);
+    return synthbase_get_num_patterns(&ms->base);
+}
+
+void dxsynth_set_num_patterns(void *self, int num_patterns)
+{
+    dxsynth *ms = (dxsynth *)self;
+    synthbase_set_num_patterns(&ms->base, num_patterns);
 }
 
 void dxsynth_make_active_track(void *self, int tracknum)
@@ -875,9 +882,9 @@ void dxsynth_print_settings(dxsynth *ms)
     printf(ANSI_COLOR_RESET);
 }
 
-void dxsynth_print_melodies(dxsynth *ms)
+void dxsynth_print_patterns(dxsynth *ms)
 {
-    synthbase_print_melodies(&ms->base);
+    synthbase_print_patterns(&ms->base);
 }
 
 void dxsynth_print_modulation_routings(dxsynth *ms)

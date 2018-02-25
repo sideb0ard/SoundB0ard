@@ -156,7 +156,8 @@ void minisynth_setvol(void *self, double v);
 double minisynth_getvol(void *self);
 void minisynth_sg_start(void *self);
 void minisynth_sg_stop(void *self);
-int minisynth_get_num_tracks(void *self);
+int minisynth_get_num_patterns(void *self);
+void minisynth_set_num_patterns(void *self, int num_patterns);
 void minisynth_make_active_track(void *self, int tracknum);
 
 ////////////////////////////////////
@@ -186,7 +187,7 @@ void minisynth_reset_voices(minisynth *self);
 void minisynth_rand_settings(minisynth *ms);
 
 void minisynth_print_settings(minisynth *ms);
-void minisynth_print_melodies(minisynth *ms);
+void minisynth_print_patterns(minisynth *ms);
 void minisynth_print_modulation_routings(minisynth *ms);
 void minisynth_print_lfo1_routing_info(minisynth *ms, wchar_t *scratch);
 void minisynth_print_lfo2_routing_info(minisynth *ms, wchar_t *scratch);

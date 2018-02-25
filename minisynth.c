@@ -46,7 +46,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.start = &minisynth_sg_start;
     ms->sound_generator.stop = &minisynth_sg_stop;
-    ms->sound_generator.get_num_tracks = &minisynth_get_num_tracks;
+    ms->sound_generator.get_num_patterns = &minisynth_get_num_patterns;
     ms->sound_generator.event_notify = &synthbase_event_notify;
     ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.set_pattern = &minisynth_set_pattern;
@@ -807,10 +807,16 @@ double minisynth_getvol(void *self)
     return ms->m_settings.m_volume_db;
 }
 
-int minisynth_get_num_tracks(void *self)
+int minisynth_get_num_patterns(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    return synthbase_get_num_tracks(&ms->base);
+    return synthbase_get_num_patterns(&ms->base);
+}
+
+void minisynth_set_num_patterns(void *self, int num_patterns)
+{
+    minisynth *ms = (minisynth *)self;
+    synthbase_set_num_patterns(&ms->base, num_patterns);
 }
 
 void minisynth_make_active_track(void *self, int tracknum)
@@ -1693,9 +1699,9 @@ void minisynth_print_settings(minisynth *ms)
     printf(ANSI_COLOR_RESET);
 }
 
-void minisynth_print_melodies(minisynth *ms)
+void minisynth_print_patterns(minisynth *ms)
 {
-    synthbase_print_melodies(&ms->base);
+    synthbase_print_patterns(&ms->base);
 }
 
 void minisynth_print_modulation_routings(minisynth *ms)

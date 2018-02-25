@@ -31,7 +31,8 @@ digisynth *new_digisynth(char *filename)
     ds->sound_generator.stop = &digisynth_sg_stop;
     ds->sound_generator.event_notify = &synthbase_event_notify;
     ds->sound_generator.self_destruct = &digisynth_del_self;
-    ds->sound_generator.get_num_tracks = &digisynth_get_num_tracks;
+    ds->sound_generator.get_num_patterns = &digisynth_get_num_patterns;
+    ds->sound_generator.set_num_patterns = &digisynth_set_num_patterns;
     ds->sound_generator.make_active_track = &digisynth_make_active_track;
     ds->sound_generator.set_pattern = &digisynth_set_pattern;
     ds->sound_generator.get_pattern = &digisynth_get_pattern;
@@ -103,10 +104,16 @@ double digisynth_getvol(void *self)
     return ds->vol;
 }
 
-int digisynth_get_num_tracks(void *self)
+int digisynth_get_num_patterns(void *self)
 {
     digisynth *ds = (digisynth *)self;
-    return synthbase_get_num_tracks(&ds->base);
+    return synthbase_get_num_patterns(&ds->base);
+}
+
+void digisynth_set_num_patterns(void *self, int num_patterns)
+{
+    digisynth *ds = (digisynth *)self;
+    synthbase_set_num_patterns(&ds->base, num_patterns);
 }
 
 void digisynth_make_active_track(void *self, int tracknum)

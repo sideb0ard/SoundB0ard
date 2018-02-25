@@ -175,8 +175,8 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
         goto cleanup_and_return;
     }
 
-    //print_pattern_tokens(var_tokens, var_tokens_idx);
-    //for (int i = 0; i < num_uniq; i++)
+    // print_pattern_tokens(var_tokens, var_tokens_idx);
+    // for (int i = 0; i < num_uniq; i++)
     //    printf("pos:[%d] %s\n", uniq_positions[i], var_tokens[i].value);
 
     for (int i = 0; i < num_uniq; i++)
