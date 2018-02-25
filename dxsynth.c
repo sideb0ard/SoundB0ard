@@ -35,6 +35,8 @@ dxsynth *new_dxsynth(void)
     dx->sound_generator.event_notify = &synthbase_event_notify;
     dx->sound_generator.make_active_track = &dxsynth_make_active_track;
     dx->sound_generator.self_destruct = &dxsynth_del_self;
+    dx->sound_generator.set_pattern = &dxsynth_set_pattern;
+    dx->sound_generator.get_pattern = &dxsynth_get_pattern;
     dx->sound_generator.type = DXSYNTH_TYPE;
 
     strncpy(dx->m_settings.m_settings_name, "DEFAULT", 7);
@@ -1223,4 +1225,20 @@ void dxsynth_set_op4_feedback(dxsynth *d, double val)
         d->m_settings.m_op4_feedback = val;
     else
         printf("Op4 feedback val has to be [0-70]\n");
+}
+
+midi_event *dxsynth_get_pattern(void *self, int pattern_num)
+{
+    synthbase *base = get_synthbase(self);
+    if (base)
+        return synthbase_get_pattern(base, pattern_num);
+
+    return NULL;
+}
+
+void dxsynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
+{
+    synthbase *base = get_synthbase(self);
+    if (base)
+        synthbase_set_pattern(base, pattern_num, pattern);
 }

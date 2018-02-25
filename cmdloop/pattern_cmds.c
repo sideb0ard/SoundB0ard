@@ -61,8 +61,8 @@ bool parse_pattern_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
-    else if (strncmp("beat", wurds[0], 4) == 0
-            || strncmp("note", wurds[0], 4) == 0)
+    else if (strncmp("beat", wurds[0], 4) == 0 ||
+             strncmp("note", wurds[0], 4) == 0)
     {
         int sg_num;
         int sg_pattern_num;
@@ -88,8 +88,10 @@ bool parse_pattern_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
             midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
             int pattern_type = -1;
-            if (strncmp("beat", wurds[0], 4) == 0) pattern_type = STEP_PATTERN;
-            else pattern_type = NOTE_PATTERN;
+            if (strncmp("beat", wurds[0], 4) == 0)
+                pattern_type = STEP_PATTERN;
+            else
+                pattern_type = NOTE_PATTERN;
             if (parse_pattern(line, pattern, pattern_type))
             {
                 soundgenerator *sg = mixr->sound_generators[sg_num];

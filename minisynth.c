@@ -2293,8 +2293,7 @@ void minisynth_add_last_note(minisynth *ms, unsigned int val)
 
 midi_event *minisynth_get_pattern(void *self, int pattern_num)
 {
-    synthbase *base =
-        get_synthbase(self);
+    synthbase *base = get_synthbase(self);
     if (base)
         return synthbase_get_pattern(base, pattern_num);
 
@@ -2303,8 +2302,7 @@ midi_event *minisynth_get_pattern(void *self, int pattern_num)
 
 void minisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    synthbase *base =
-        get_synthbase(self);
+    synthbase *base = get_synthbase(self);
     if (base)
         synthbase_set_pattern(base, pattern_num, pattern);
 }

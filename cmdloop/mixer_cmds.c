@@ -412,7 +412,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         return true;
     }
 
-
     // UTILS
     else if (strncmp("chord", wurds[0], 6) == 0)
     {

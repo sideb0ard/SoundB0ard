@@ -156,7 +156,6 @@ bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
                                         int soundgen_num, int soundgen_track);
 bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
-// TODO this doesn't really belong here
 synthbase *get_synthbase(soundgenerator *self);
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi);

@@ -68,7 +68,8 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                                "%d:%d!\n",
                                soundgen_num, pattern_num, sg2, pattern_num2);
 
-                        midi_event *loop_copy = synthbase_get_pattern(base, pattern_num);
+                        midi_event *loop_copy =
+                            synthbase_get_pattern(base, pattern_num);
                         synthbase_set_pattern(sb2, pattern_num2, loop_copy);
                     }
                 }

@@ -61,8 +61,7 @@ midi_event *sample_seq_get_pattern(void *self, int pattern_num)
     return seq_get_pattern(&seq->m_seq, pattern_num);
 }
 
-void sample_seq_set_pattern(void *self, int pattern_num,
-                            midi_event *pattern)
+void sample_seq_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
     return seq_set_pattern(&seq->m_seq, pattern_num, pattern);

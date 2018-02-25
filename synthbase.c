@@ -7,9 +7,9 @@
 #include "euclidean.h"
 #include "mixer.h"
 #include "sequencer_utils.h"
-#include <pattern_parser.h>
 #include "synthbase.h"
 #include "utils.h"
+#include <pattern_parser.h>
 
 extern const int key_midi_mapping[NUM_KEYS];
 extern const char *key_names[NUM_KEYS];
@@ -544,7 +544,7 @@ midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)
 
 void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    synthbase *base = (synthbase*) self;
+    synthbase *base = (synthbase *)self;
     printf("SET PATTERN!\n");
     midi_melody_print(pattern);
     printf("PATTERN NUM! %d\n", pattern_num);

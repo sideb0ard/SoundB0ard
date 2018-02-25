@@ -819,8 +819,6 @@ synthbase *get_synthbase(soundgenerator *self)
     }
 }
 
-// TODO - better function name - this is programatic calls, which
-// basically adds a matching delete after use event i.e. == a note off
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi)
 {
@@ -835,14 +833,6 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
             minisynth_add_last_note(ms, note);
         }
         minisynth_midi_note_on(ms, note, velocity);
-
-        // note_off_tick =
-        //    (int)(mixr->timing_info.midi_tick +
-        //          (PPSIXTEENTH * ms->m_settings.m_sustain_time_sixteenth - 7)
-        //          +
-        //          (ms->m_settings.m_attack_time_msec *
-        //           mixr->timing_info.midi_ticks_per_ms)) %
-        //    PPBAR;
     }
     else if (sg->type == DIGISYNTH_TYPE)
     {

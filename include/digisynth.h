@@ -32,6 +32,8 @@ void digisynth_sg_stop(void *self);
 void digisynth_del_self(void *self);
 int digisynth_get_num_tracks(void *self);
 void digisynth_make_active_track(void *self, int tracknum);
+midi_event *digisynth_get_pattern(void *self, int pattern_num);
+void digisynth_set_pattern(void *self, int pattern_num, midi_event *pattern);
 
 ////////////////////////////////////
 

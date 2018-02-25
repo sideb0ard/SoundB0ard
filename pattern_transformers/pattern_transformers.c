@@ -1,7 +1,7 @@
 #include <stdio.h>
 
-#include <pattern_transformers.h>
 #include <pattern_parser.h>
+#include <pattern_transformers.h>
 
 static void pattern_check_idx(int *idx, int pattern_len)
 {
@@ -11,8 +11,7 @@ static void pattern_check_idx(int *idx, int pattern_len)
         *idx -= pattern_len;
 }
 
-static void _shift(midi_event *in_pattern, int places,
-                               int direction)
+static void _shift(midi_event *in_pattern, int places, int direction)
 {
     midi_event out_pattern[PPBAR] = {};
     // printf("\nLEFT SHIFT!\n");

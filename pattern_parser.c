@@ -11,8 +11,8 @@
 #include <cmdloop.h>
 #include <defjams.h>
 #include <euclidean.h>
-#include <mixer.h>
 #include <midimaaan.h>
+#include <mixer.h>
 #include <pattern_parser.h>
 #include <sample_sequencer.h>
 
@@ -114,7 +114,9 @@ static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
     return false;
 }
 
-bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN], int num_tokens, midi_event *pattern, unsigned int pattern_type)
+bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
+                                  int num_tokens, midi_event *pattern,
+                                  unsigned int pattern_type)
 {
 
     bool return_val = true;
@@ -177,7 +179,6 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN], int num_tok
     for (int i = 0; i < num_uniq; i++)
         printf("pos:[%d] %s\n", uniq_positions[i], var_tokens[i].value);
 
-
     for (int i = 0; i < num_uniq; i++)
     {
         if (var_tokens[i].type == VAR_NAME)
@@ -230,7 +231,8 @@ static bool is_valid_token_name(char *token_name)
     // pretty weak, just checks if starts with alnum or bang
     // followed by optional expander
     regex_t valid_token_rx;
-    regcomp(&valid_token_rx, "^[[:alnum:]!]+[\\*/(]?", REG_EXTENDED | REG_ICASE);
+    regcomp(&valid_token_rx, "^[[:alnum:]!]+[\\*/(]?",
+            REG_EXTENDED | REG_ICASE);
     bool ret = false;
     if (regexec(&valid_token_rx, token_name, 0, NULL, 0) == 0)
         ret = true;
@@ -702,7 +704,8 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
 }
 
 static char *s_ptypes[] = {"MIDI", "NOTE", "BEAT", "STEP"};
-bool parse_pattern(char *line, midi_event *target_pattern, unsigned int pattern_type)
+bool parse_pattern(char *line, midi_event *target_pattern,
+                   unsigned int pattern_type)
 {
     printf("Parsing a %s pattern\n", s_ptypes[pattern_type]);
     if (!is_valid_pattern(line))
@@ -729,7 +732,8 @@ bool parse_pattern(char *line, midi_event *target_pattern, unsigned int pattern_
     expand_the_expanders(tokens, token_idx, expanded_tokens,
                          &expanded_tokens_idx);
 
-    if (!generate_pattern_from_tokens(expanded_tokens, expanded_tokens_idx, target_pattern, pattern_type))
+    if (!generate_pattern_from_tokens(expanded_tokens, expanded_tokens_idx,
+                                      target_pattern, pattern_type))
         return_val = false;
 
 tidy_up_and_return:

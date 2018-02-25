@@ -369,5 +369,4 @@ int get_midi_note_from_string(char *string)
         return 11 + octave;
     else
         return -1;
-
 }

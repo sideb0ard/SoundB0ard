@@ -78,8 +78,7 @@ void sample_stop(void *self);
 stereo_val sample_seq_gennext(void *self);
 double sample_seq_getvol(void *self);
 midi_event *sample_seq_get_pattern(void *self, int pattern_num);
-void sample_seq_set_pattern(void *self, int pattern_num,
-                            midi_event *pattern);
+void sample_seq_set_pattern(void *self, int pattern_num, midi_event *pattern);
 
 void sample_seq_import_file(sample_sequencer *s, char *filename);
 void sample_sequencer_reset_samples(sample_sequencer *seq);

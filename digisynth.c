@@ -1,7 +1,9 @@
-#include "digisynth.h"
-#include "midi_freq_table.h"
 #include <stdlib.h>
 #include <string.h>
+
+#include "digisynth.h"
+#include "midi_freq_table.h"
+#include "mixer.h"
 
 digisynth *new_digisynth(char *filename)
 {
@@ -31,6 +33,8 @@ digisynth *new_digisynth(char *filename)
     ds->sound_generator.self_destruct = &digisynth_del_self;
     ds->sound_generator.get_num_tracks = &digisynth_get_num_tracks;
     ds->sound_generator.make_active_track = &digisynth_make_active_track;
+    ds->sound_generator.set_pattern = &digisynth_set_pattern;
+    ds->sound_generator.get_pattern = &digisynth_get_pattern;
     ds->sound_generator.type = DIGISYNTH_TYPE;
     ds->sound_generator.active = true;
 
@@ -176,4 +180,20 @@ bool digisynth_midi_note_off(digisynth *ds, unsigned int midinote,
         voice_note_off(&ds->m_voices[i].m_voice, midinote);
     }
     return true;
+}
+
+midi_event *digisynth_get_pattern(void *self, int pattern_num)
+{
+    synthbase *base = get_synthbase(self);
+    if (base)
+        return synthbase_get_pattern(base, pattern_num);
+
+    return NULL;
+}
+
+void digisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
+{
+    synthbase *base = get_synthbase(self);
+    if (base)
+        synthbase_set_pattern(base, pattern_num, pattern);
 }
