@@ -47,6 +47,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.start = &minisynth_sg_start;
     ms->sound_generator.stop = &minisynth_sg_stop;
     ms->sound_generator.get_num_patterns = &minisynth_get_num_patterns;
+    ms->sound_generator.set_num_patterns = &minisynth_set_num_patterns;
     ms->sound_generator.event_notify = &synthbase_event_notify;
     ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.set_pattern = &minisynth_set_pattern;
@@ -815,6 +816,7 @@ int minisynth_get_num_patterns(void *self)
 
 void minisynth_set_num_patterns(void *self, int num_patterns)
 {
+    printf("SETTING NUm!%d\n", num_patterns);
     minisynth *ms = (minisynth *)self;
     synthbase_set_num_patterns(&ms->base, num_patterns);
 }

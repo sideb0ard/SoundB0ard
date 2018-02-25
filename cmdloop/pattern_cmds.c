@@ -96,8 +96,9 @@ bool parse_pattern_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 soundgenerator *sg = mixr->sound_generators[sg_num];
                 int num_patterns = sg->get_num_patterns(sg);
+                printf("NUM PAYYTERSN! %d\n", num_patterns);
                 if (num_patterns <= sg_pattern_num)
-                    sg->set_num_patterns(sg, sg_pattern_num - 1);
+                    sg->set_num_patterns(sg, sg_pattern_num + 1);
                 sg->set_pattern(sg, sg_pattern_num, pattern);
             }
             free(pattern);

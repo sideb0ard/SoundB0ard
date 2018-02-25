@@ -32,6 +32,8 @@ void synthbase_init(synthbase *base, void *parent,
 
     base->multi_pattern_mode = true;
     base->cur_pattern_iteration = 1;
+    for (int i = 0; i< MAX_NUM_MIDI_LOOPS; i++)
+        base->pattern_multiloop_count[i] = 1;
 
     base->sample_rate = 44100;
     base->sample_rate_counter = 0;
@@ -71,6 +73,7 @@ void synthbase_generate_pattern(synthbase *base)
 
 void synthbase_set_sample_rate(synthbase *base, int sample_rate)
 {
+    // does sample and hold to sample down
     printf("Chh-ch-changing SAMPLE_RATE!: %d\n", sample_rate);
     base->sample_rate = sample_rate;
     base->sample_rate_ratio = SAMPLE_RATE / (double)sample_rate;
@@ -341,6 +344,7 @@ int synthbase_get_num_patterns(void *self)
 
 void synthbase_set_num_patterns(void *self, int num_patterns)
 {
+    printf("BASS! how low can you go!\n");
     synthbase *ms = (synthbase *)self;
     ms->num_patterns = num_patterns;
 }
