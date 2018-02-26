@@ -269,8 +269,12 @@ void synthbase_nudge_pattern(synthbase *ms, int pattern_num, int sixteenth)
 
 bool is_valid_pattern_num(synthbase *ms, int pattern_num)
 {
-    if (pattern_num >= 0 && pattern_num < ms->num_patterns)
+    if (pattern_num >= 0 && pattern_num < MAX_NUM_MIDI_LOOPS)
+    {
+        if (pattern_num >= ms->num_patterns)
+            ms->num_patterns = pattern_num + 1;
         return true;
+    }
     return false;
 }
 

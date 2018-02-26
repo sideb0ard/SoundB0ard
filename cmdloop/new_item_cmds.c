@@ -46,13 +46,11 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (strlen(wurds[2]) != 0)
             {
                 int sgnum = add_digisynth(mixr, wurds[2]);
-                mixr->midi_control_destination = SYNTH;
-                mixr->active_midi_soundgen_num = sgnum;
-                if (num_wurds > 2)
+                if (sgnum != -1)
                 {
-                    digisynth *ds = (digisynth *)mixr->sound_generators[sgnum];
-                    char_pattern_to_midi_pattern(&ds->base, 0, wurds, 2,
-                                                 num_wurds);
+                    soundgenerator *sg = mixr->sound_generators[sgnum];
+                    check_and_set_pattern(sg, 0, NOTE_PATTERN, &wurds[3],
+                                          num_wurds - 3);
                 }
             }
             else
@@ -65,12 +63,11 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                  strncmp("dx", wurds[1], 2) == 0)
         {
             int sgnum = add_dxsynth(mixr);
-            mixr->midi_control_destination = SYNTH;
-            mixr->active_midi_soundgen_num = sgnum;
-            if (num_wurds > 2)
+            if (sgnum != -1)
             {
-                dxsynth *dx = (dxsynth *)mixr->sound_generators[sgnum];
-                char_pattern_to_midi_pattern(&dx->base, 0, wurds, 2, num_wurds);
+                soundgenerator *sg = mixr->sound_generators[sgnum];
+                check_and_set_pattern(sg, 0, NOTE_PATTERN, &wurds[2],
+                                      num_wurds - 2);
             }
         }
 
@@ -130,12 +127,11 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         else if (strncmp("moog", wurds[1], 4) == 0)
         {
             int sgnum = add_minisynth(mixr);
-            mixr->midi_control_destination = SYNTH;
-            mixr->active_midi_soundgen_num = sgnum;
-            if (num_wurds > 2)
+            if (sgnum != -1)
             {
-                minisynth *ms = (minisynth *)mixr->sound_generators[sgnum];
-                char_pattern_to_midi_pattern(&ms->base, 0, wurds, 2, num_wurds);
+                soundgenerator *sg = mixr->sound_generators[sgnum];
+                check_and_set_pattern(sg, 0, NOTE_PATTERN, &wurds[2],
+                                      num_wurds - 2);
             }
         }
 
@@ -155,25 +151,9 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             if (sgnum != -1)
             {
-                printf("SG! %d\n", sgnum);
-                int line_len = 0;
-                for (int i = 3; i < num_wurds; i++)
-                    line_len += strlen(wurds[i]);
-                line_len += num_wurds + 1;
-                char line[line_len];
-                memset(line, 0, line_len * sizeof(char));
-                for (int i = 3; i < num_wurds; i++)
-                {
-                    strcat(line, wurds[i]);
-                    if (i != num_wurds - 1)
-                        strcat(line, " ");
-                }
-
-                midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
                 soundgenerator *sg = mixr->sound_generators[sgnum];
-                if (parse_pattern(line, pattern, STEP_PATTERN))
-                    sg->set_pattern(sg, 0, pattern);
-                free(pattern);
+                check_and_set_pattern(sg, 0, STEP_PATTERN, &wurds[3],
+                                      num_wurds - 3);
             }
         }
 

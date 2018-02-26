@@ -746,3 +746,26 @@ void clear_pattern(midi_event *pattern)
 {
     memset(pattern, 0, sizeof(midi_event) * PPBAR);
 }
+
+void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
+                           unsigned int pattern_type,
+                           char wurds[][SIZE_OF_WURD], int num_wurds)
+{
+    int line_len = 0;
+    for (int i = 0; i < num_wurds; i++)
+        line_len += strlen(wurds[i]);
+    line_len += num_wurds + 1;
+    char line[line_len];
+    memset(line, 0, line_len * sizeof(char));
+    for (int i = 0; i < num_wurds; i++)
+    {
+        strcat(line, wurds[i]);
+        if (i != num_wurds - 1)
+            strcat(line, " ");
+    }
+
+    midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
+    if (parse_pattern(line, pattern, pattern_type))
+        sg->set_pattern(sg, target_pattern_num, pattern);
+    free(pattern);
+}

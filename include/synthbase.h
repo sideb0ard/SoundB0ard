@@ -6,7 +6,7 @@
 #include "midimaaan.h"
 
 #define MAX_NUM_MIDI_LOOPS 64
-#define MAX_VOICES 4
+#define MAX_VOICES 3
 
 #define MIN_DETUNE_CENTS -50.0
 #define MAX_DETUNE_CENTS 50.0

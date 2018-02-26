@@ -3,6 +3,7 @@
 #include <stdbool.h>
 
 #include <defjams.h>
+#include <sound_generator.h>
 
 #define MAX_PATTERN 254
 #define MAX_PATTERN_CHAR_VAL 100
@@ -65,3 +66,6 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
                                   int num_tokens, midi_event *pattern,
                                   unsigned int pattern_type);
 void clear_pattern(midi_event *pattern);
+void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
+                           unsigned int pattern_type,
+                           char wurds[][SIZE_OF_WURD], int num_wurds);
