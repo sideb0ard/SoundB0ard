@@ -450,7 +450,7 @@ void voice_note_off(voice *v, unsigned int midi_note)
             v->m_note_pending = false;
             return;
         }
-        if (midi_note != v->m_midi_note_number)
+        if (midi_note != v->m_midi_note_number && midi_note != -1)
         {
             return;
         }

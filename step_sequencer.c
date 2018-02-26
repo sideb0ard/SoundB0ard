@@ -28,7 +28,7 @@ void seq_init(sequencer *seq)
         0; // TODO - this is less relevant, now that i also have 24th
     seq->midi_tick = 0;
 
-    seq->num_patterns = 0;
+    seq->num_patterns = 1;
     seq->cur_pattern = 0;
     seq->multi_pattern_mode = true;
     seq->cur_pattern_iteration = 1;

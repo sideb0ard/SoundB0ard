@@ -32,7 +32,7 @@ void synthbase_init(synthbase *base, void *parent,
 
     base->multi_pattern_mode = true;
     base->cur_pattern_iteration = 1;
-    for (int i = 0; i< MAX_NUM_MIDI_LOOPS; i++)
+    for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
         base->pattern_multiloop_count[i] = 1;
 
     base->sample_rate = 44100;

@@ -29,10 +29,10 @@ void minisynth_voice_init(minisynth_voice *msv)
     osc_new_settings(&msv->m_osc4.osc);
     qb_set_soundgenerator_interface(&msv->m_osc4);
     // or use wavetable versions
-    //wt_initialize(&msv->m_osc1);
-    //wt_initialize(&msv->m_osc2);
-    //wt_initialize(&msv->m_osc3);
-    //wt_initialize(&msv->m_osc4);
+    // wt_initialize(&msv->m_osc1);
+    // wt_initialize(&msv->m_osc2);
+    // wt_initialize(&msv->m_osc3);
+    // wt_initialize(&msv->m_osc4);
 
     // attach oscillators to my base class
     msv->m_voice.m_osc1 = (oscillator *)&msv->m_osc1;

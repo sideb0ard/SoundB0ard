@@ -550,7 +550,7 @@ bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
         for (int i = 0; i < MAX_VOICES; i++)
         {
             if (ms->m_voices[i])
-                voice_note_off(&ms->m_voices[i]->m_voice, midinote);
+                voice_note_off(&ms->m_voices[i]->m_voice, -1);
         }
         return true;
     }
@@ -663,6 +663,8 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
     return found_voice;
 }
 
+static char *s_env_states[] = {"OFF",     "ATTACK",  "DECAY",
+                               "SUSTAIN", "RELEASE", "SHUTDOWN"};
 // sound generator interface //////////////
 void minisynth_status(void *self, wchar_t *status_string)
 {
@@ -671,6 +673,16 @@ void minisynth_status(void *self, wchar_t *status_string)
     if (mixr->debug_mode)
     {
         minisynth_print(ms);
+    }
+
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        minisynth_voice *v = ms->m_voices[i];
+        printf("VOICE[%d] Note on: %d ENV State:%s %s %s %s\n", i,
+               v->m_voice.m_note_on, s_env_states[v->m_voice.m_eg1.m_state],
+               s_env_states[v->m_voice.m_eg2.m_state],
+               s_env_states[v->m_voice.m_eg3.m_state],
+               s_env_states[v->m_voice.m_eg4.m_state]);
     }
 
     swprintf(

@@ -76,17 +76,11 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         else if (strncmp("kit", wurds[1], 3) == 0)
         {
-            char *pattern = (char *)calloc(151, sizeof(char));
-            memset(pattern, 0, 151);
-
             char kickfile[512] = {0};
             get_random_sample_from_dir("kicks", kickfile);
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, kickfile);
             sample_sequencer *bd = new_sample_seq(kickfile);
             int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
-            pattern_char_to_pattern(
-                &bd->m_seq, pattern,
-                bd->m_seq.patterns[bd->m_seq.num_patterns++]);
             update_environment("bd", bdnum);
 
             char snarefile[512] = {0};
@@ -94,9 +88,6 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, snarefile);
             sample_sequencer *sd = new_sample_seq(snarefile);
             int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
-            pattern_char_to_pattern(
-                &sd->m_seq, pattern,
-                sd->m_seq.patterns[sd->m_seq.num_patterns++]);
             update_environment("sd", sdnum);
 
             char highhat[512] = {0};
@@ -104,9 +95,6 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, highhat);
             sample_sequencer *hh = new_sample_seq(highhat);
             int hhnum = add_sound_generator(mixr, (soundgenerator *)hh);
-            pattern_char_to_pattern(
-                &hh->m_seq, pattern,
-                hh->m_seq.patterns[hh->m_seq.num_patterns++]);
             update_environment("hh", hhnum);
 
             char perc[512] = {0};
@@ -114,12 +102,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
             sample_sequencer *pc = new_sample_seq(perc);
             int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
-            pattern_char_to_pattern(
-                &pc->m_seq, pattern,
-                pc->m_seq.patterns[pc->m_seq.num_patterns++]);
             update_environment("pc", pcnum);
-
-            free(pattern);
         }
 
         else if (strncmp("looper", wurds[1], 6) == 0 ||

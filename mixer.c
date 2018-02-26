@@ -480,6 +480,16 @@ static void mixer_events_output(mixer *mixr)
 
     if (mixr->timing_info.is_midi_tick)
     {
+        if (mixr->timing_info.midi_tick % PPBAR == 0)
+        {
+            mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
+            if (mixr->scene_start_pending)
+            {
+                mixer_play_scene(mixr, mixr->current_scene);
+                mixr->scene_start_pending = false;
+            }
+        }
+
         mixer_emit_event(mixr, TIME_MIDI_TICK);
 
         if (mixr->timing_info.midi_tick % 120 == 0)
@@ -503,16 +513,6 @@ static void mixer_events_output(mixer *mixr)
                     {
                         mixr->timing_info.is_quarter = true;
                         mixer_emit_event(mixr, TIME_QUARTER_TICK);
-
-                        if (mixr->timing_info.midi_tick % PPBAR == 0)
-                        {
-                            mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
-                            if (mixr->scene_start_pending)
-                            {
-                                mixer_play_scene(mixr, mixr->current_scene);
-                                mixr->scene_start_pending = false;
-                            }
-                        }
                     }
                 }
             }
