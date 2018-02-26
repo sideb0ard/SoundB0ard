@@ -13,8 +13,8 @@ int stacksize(void);
 
 int exxit(void);
 int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line);
-void parse_sample_sequencer_command(sequencer *seq, char wurds[][SIZE_OF_WURD],
-                                    int num_wurds, char *pattern);
+bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
+                                  char wurds[][SIZE_OF_WURD], int num_wurds);
 bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD]);
 bool parse_dxsynth_settings_change(dxsynth *ms, char wurds[][SIZE_OF_WURD]);
 void char_array_to_seq_string_pattern(sequencer *s, char *dest_pattern,

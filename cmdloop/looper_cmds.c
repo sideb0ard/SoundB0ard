@@ -282,15 +282,6 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     int release = atoi(wurds[3]);
                     eg_set_release_time_msec(&g->m_eg1, release);
                 }
-                else
-                {
-                    printf("ELSEY SEQUENCE!\n");
-                    char *pattern = (char *)calloc(151, sizeof(char));
-                    sequencer *seq = &g->m_seq;
-                    parse_sample_sequencer_command(seq, wurds, num_wurds,
-                                                   pattern);
-                    free(pattern);
-                }
             }
         }
         return true;

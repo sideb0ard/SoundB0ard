@@ -242,3 +242,10 @@ bool is_synth(soundgenerator *self)
 
     return false;
 }
+
+bool is_stepper(soundgenerator *self)
+{
+    if (self->type == SYNTHDRUM_TYPE || self->type == SEQUENCER_TYPE)
+        return true;
+    return false;
+}

@@ -404,8 +404,12 @@ void seq_print_pattern(sequencer *s, unsigned int pattern_num)
 
 bool seq_is_valid_pattern_num(sequencer *d, int pattern_num)
 {
-    if (pattern_num >= 0 && pattern_num < d->num_patterns)
+    if (pattern_num >= 0 && pattern_num < MAX_NUM_MIDI_LOOPS)
+    {
+        if (pattern_num >= d->num_patterns)
+            d->num_patterns = pattern_num + 1;
         return true;
+    }
     return false;
 }
 
