@@ -67,19 +67,19 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_lfo1_amplitude = 1.0;
 
     // LFO1 routings
-    ms->m_settings.m_lfo1_osc_pitch_intensity = 0.0;
+    ms->m_settings.m_lfo1_osc_pitch_intensity = 0.7;
     ms->m_settings.m_lfo1_osc_pitch_enabled = false;
 
-    ms->m_settings.m_lfo1_filter_fc_intensity = 0.0;
+    ms->m_settings.m_lfo1_filter_fc_intensity = 0.7;
     ms->m_settings.m_lfo1_filter_fc_enabled = false;
 
-    ms->m_settings.m_lfo1_amp_intensity = 0.0;
+    ms->m_settings.m_lfo1_amp_intensity = 0.7;
     ms->m_settings.m_lfo1_amp_enabled = false;
 
-    ms->m_settings.m_lfo1_pan_intensity = 0.0;
+    ms->m_settings.m_lfo1_pan_intensity = 0.7;
     ms->m_settings.m_lfo1_pan_enabled = false;
 
-    ms->m_settings.m_lfo1_pulsewidth_intensity = 0.0;
+    ms->m_settings.m_lfo1_pulsewidth_intensity = 0.7;
     ms->m_settings.m_lfo1_pulsewidth_enabled = false;
 
     // LFO2
@@ -88,19 +88,19 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_lfo2_amplitude = 1.0;
 
     // LFO2 routings
-    ms->m_settings.m_lfo2_osc_pitch_intensity = 0.0;
+    ms->m_settings.m_lfo2_osc_pitch_intensity = 0.7;
     ms->m_settings.m_lfo2_osc_pitch_enabled = false;
 
-    ms->m_settings.m_lfo2_filter_fc_intensity = 0.0;
+    ms->m_settings.m_lfo2_filter_fc_intensity = 0.7;
     ms->m_settings.m_lfo2_filter_fc_enabled = false;
 
-    ms->m_settings.m_lfo2_amp_intensity = 0.0;
+    ms->m_settings.m_lfo2_amp_intensity = 0.7;
     ms->m_settings.m_lfo2_amp_enabled = false;
 
-    ms->m_settings.m_lfo2_pan_intensity = 0.0;
+    ms->m_settings.m_lfo2_pan_intensity = 0.7;
     ms->m_settings.m_lfo2_pan_enabled = false;
 
-    ms->m_settings.m_lfo2_pulsewidth_intensity = 0.0;
+    ms->m_settings.m_lfo2_pulsewidth_intensity = 0.7;
     ms->m_settings.m_lfo2_pulsewidth_enabled = false;
 
     ms->m_settings.m_fc_control = FILTER_FC_DEFAULT;

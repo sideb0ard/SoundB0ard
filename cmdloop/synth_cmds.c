@@ -773,7 +773,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             printf("Importing file %s\n", wurds[3]);
             synthbase_import_midi_from_file(base, wurds[3]);
         }
-        else if (strncmp("keys", wurds[2], 4) == 0)
+        else if (strncmp("keys", wurds[0], 4) == 0)
         {
             keys(soundgen_num);
         }

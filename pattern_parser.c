@@ -18,7 +18,7 @@
 
 #define WEE_STACK_SIZE 32
 #define _MAX_VAR_NAME 32
-#define MAX_TOKENS 128
+#define MAX_TOKENS 512
 #define MAX_DIVISIONS 10
 #define MAX_GENERATED_PATTERNS 16
 
