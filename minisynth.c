@@ -40,8 +40,7 @@ minisynth *new_minisynth(void)
     synthbase_init(&ms->base, (void *)ms, MINISYNTH_TYPE);
 
     ms->sound_generator.gennext = &minisynth_gennext;
-    ms->sound_generator.ps_status = &minisynth_status;
-    ms->sound_generator.full_status = &minisynth_status;
+    ms->sound_generator.status = &minisynth_status;
     ms->sound_generator.setvol = &minisynth_setvol;
     ms->sound_generator.getvol = &minisynth_getvol;
     ms->sound_generator.start = &minisynth_sg_start;

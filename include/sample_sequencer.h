@@ -71,8 +71,7 @@ void sample_seq_event_notify(void *s, unsigned int event_type);
 bool sample_sequencer_is_valid_pattern(void *self, int pattern_num);
 
 void sampleseq_del_self(void *self);
-void sample_seq_ps_status(void *self, wchar_t *ss);
-void sample_seq_full_status(void *self, wchar_t *ss);
+void sample_seq_status(void *self, wchar_t *status_string);
 void sample_seq_setvol(void *self, double v);
 void sample_start(void *self);
 void sample_stop(void *self);

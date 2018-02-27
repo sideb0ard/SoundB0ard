@@ -25,8 +25,7 @@ dxsynth *new_dxsynth(void)
     synthbase_init(&dx->base, (void *)dx, DXSYNTH_TYPE);
 
     dx->sound_generator.gennext = &dxsynth_gennext;
-    dx->sound_generator.ps_status = &dxsynth_status;
-    dx->sound_generator.full_status = &dxsynth_status;
+    dx->sound_generator.status = &dxsynth_status;
     dx->sound_generator.setvol = &dxsynth_setvol;
     dx->sound_generator.getvol = &dxsynth_getvol;
     dx->sound_generator.start = &dxsynth_sg_start;

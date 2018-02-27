@@ -30,9 +30,7 @@ sample_sequencer *new_sample_seq(char *filename)
     seq->vol = 0.7;
 
     seq->sound_generator.gennext = &sample_seq_gennext;
-    // seq->sound_generator.ps_status = &sample_seq_ps_status;
-    seq->sound_generator.ps_status = &sample_seq_full_status;
-    seq->sound_generator.full_status = &sample_seq_full_status;
+    seq->sound_generator.status = &sample_seq_status;
     seq->sound_generator.getvol = &sample_seq_getvol;
     seq->sound_generator.setvol = &sample_seq_setvol;
     seq->sound_generator.start = &sample_start;
@@ -211,33 +209,22 @@ sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
     return seq;
 }
 
-void sample_seq_ps_status(void *self, wchar_t *status_string)
+void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[SAMPLE SEQ] \"%s\" Vol:%.2lf Active:%s Morph:%s Pitch:%.2f",
-             seq->filename, seq->vol,
-             seq->sound_generator.active ? "true" : "false",
-             seq->morph ? "true" : "false", seq->buffer_pitch);
-    // wchar_t seq_status_string[MAX_PS_STRING_SZ];
-    // memset(seq_status_string, 0, MAX_PS_STRING_SZ);
-    // seq_status(&seq->m_seq, seq_status_string);
-    // wcscat(status_string, seq_status_string);
-    // wcscat(status_string, WANSI_COLOR_RESET);
-}
+    wchar_t local_status_string[MAX_PS_STRING_SZ] = {};
+    swprintf(local_status_string, MAX_PS_STRING_SZ,
+             L" \"%s\" vol:%.2lf pitch:%.2f num_patterns:%d", seq->filename,
+             seq->vol, seq->buffer_pitch, seq->m_seq.num_patterns);
 
-void sample_seq_full_status(void *self, wchar_t *status_string)
-{
-    sample_sequencer *seq = (sample_sequencer *)self;
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[SAMPLE SEQ] \"%s\" Vol:%.2lf Active:%s Morph:%s Pitch:%.2f",
-             seq->filename, seq->vol,
-             seq->sound_generator.active ? "true" : "false",
-             seq->morph ? "true" : "false", seq->buffer_pitch);
-    wchar_t seq_status_string[MAX_PS_STRING_SZ];
-    memset(seq_status_string, 0, MAX_PS_STRING_SZ);
-    seq_status(&seq->m_seq, seq_status_string);
-    wcscat(status_string, seq_status_string);
+    if (seq->sound_generator.active)
+        wcscat(status_string, WANSI_COLOR_BLUE);
+
+    wcscat(status_string, local_status_string);
+
+    memset(local_status_string, 0, MAX_PS_STRING_SZ);
+    seq_status(&seq->m_seq, local_status_string);
+    wcscat(status_string, local_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

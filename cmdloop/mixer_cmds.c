@@ -28,20 +28,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         return true;
     }
 
-    else if (strncmp("info", wurds[0], 4) == 0)
-    {
-        int sg = atoi(wurds[1]);
-        if (mixer_is_valid_soundgen_num(mixr, sg))
-        {
-            wchar_t wss[MAX_PS_STRING_SZ];
-            wmemset(wss, 0, MAX_PS_STRING_SZ);
-            mixr->sound_generators[sg]->full_status(mixr->sound_generators[sg],
-                                                    wss);
-            wprintf(L"%ls\n", wss);
-        }
-        return true;
-    }
-
     else if (strncmp("every", wurds[0], 4) == 0)
     {
         algorithm *a = new_algorithm(num_wurds, wurds);

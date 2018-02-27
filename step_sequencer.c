@@ -207,16 +207,6 @@ int sloppy_weight(sequencer *s, int position)
 
 void seq_status(sequencer *seq, wchar_t *status_string)
 {
-    swprintf(
-        status_string, MAX_PS_STRING_SZ,
-        L"\n" WANSI_COLOR_CYAN
-        "      -------------------------------------------------------------\n"
-        "      CurStep: %d pattern_len: %d multi:%d visualize:%d sloppy:%d\n"
-        "      generate:%d gen_every: %d gen_src:%d max_gen: %d ",
-        seq->cur_pattern, seq->pattern_len, seq->multi_pattern_mode,
-        seq->visualize, seq->sloppiness, seq->generate_mode,
-        seq->generate_every_n_loops, seq->generate_src,
-        seq->generate_max_generation);
     wchar_t pattern_details[128];
     char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];
@@ -225,12 +215,11 @@ void seq_status(sequencer *seq, wchar_t *status_string)
         seq_char_binary_version_of_pattern(seq, seq->patterns[i], spattern);
         wchar_version_of_amp(seq, i, apattern);
         swprintf(pattern_details, 127,
-                 L"\n      [%d] - [%s] %ls  numloops: %d Swing: %d", i,
+                 L"\n           [%d] - [%s] %ls  numloops: %d Swing: %d", i,
                  spattern, apattern, seq->pattern_num_loops[i],
                  seq->pattern_num_swing_setting[i]);
         wcscat(status_string, pattern_details);
     }
-    wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 // TODO - fix this - being lazy and want it finished NOW!

@@ -6,9 +6,10 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
-#include "cmdloop.h"
-#include "mixer.h"
-#include "obliquestrategies.h"
+#include <cmdloop.h>
+#include <mixer.h>
+#include <obliquestrategies.h>
+#include <utils.h>
 
 #include <algo_cmds.h>
 #include <fx_cmds.h>
@@ -32,20 +33,6 @@ extern wtable *wave_tables[5];
 // https://stackoverflow.com/questions/31329952/colorized-readline-prompt-breaks-control-a
 // TODO(find a fix)
 char const *prompt = "SB#> ";
-
-static void print_logo()
-{
-    printf(
-        ANSI_COLOR_WHITE
-        "Welcome to...\n" COOL_COLOR_GREEN
-        " _____                       _ _     _____               _\n"
-        "/  ___|                     | | |   |  _  |             | |\n"
-        "\\ `--.  ___  _   _ _ __   __| | |__ | |/\" | __ _ _ __ __| |\n"
-        " `--. \\/ _ \\| | | | \"_ \\ / _` | \"_ \\|  /| |/ _` | \"__/ _` |\n"
-        "/\\__/ / (_) | |_| | | | | (_| | |_) \\ |_/ / (_| | | | (_| |\n"
-        "\\____/ \\___/ \\__,_|_| |_|\\__,_|_.__/ \\___/ \\__,_|_|  "
-        "\\__,_|\n\n" ANSI_COLOR_RESET);
-}
 
 void *loopy(void *arg)
 {

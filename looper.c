@@ -44,8 +44,7 @@ looper *new_looper(char *filename)
     g->sequencer_mode = false;
 
     g->sound_generator.gennext = &looper_gennext;
-    g->sound_generator.ps_status = &looper_status;
-    g->sound_generator.full_status = &looper_status;
+    g->sound_generator.status = &looper_status;
     g->sound_generator.getvol = &looper_getvol;
     g->sound_generator.setvol = &looper_setvol;
     g->sound_generator.start = &looper_start;
