@@ -160,23 +160,16 @@ void synthbase_pattern_to_string(synthbase *base, int pattern_num,
 void synthbase_status(synthbase *base, wchar_t *status_string)
 {
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"\n      Multi: %s Curpattern:%d"
-             "generate:%d gen_src:%d gen_every_n:%d \n"
-             "      morph:%d morph_gen:%d morph_every_n:%d "
-             "root_midi_note:%d last_midi_note:%d sustain_note_ms:%d",
-
-             base->multi_pattern_mode ? "true" : "false", base->cur_pattern,
-             base->generate_mode, base->m_generate_src,
-             base->generate_every_n_loops, base->morph_mode,
-             base->morph_generation, base->morph_every_n_loops,
-             base->root_midi_note, base->last_midi_note, base->sustain_note_ms);
+             WANSI_COLOR_WHITE "           "
+                               "root_midi_note:%d sustain_note_ms:%d",
+             base->root_midi_note, base->sustain_note_ms);
 
     for (int i = 0; i < base->num_patterns; i++)
     {
         wchar_t patternstr[33] = {0};
         wchar_t scratch[128] = {0};
         synthbase_pattern_to_string(base, i, patternstr);
-        swprintf(scratch, 127, L"\n      [%d]  %ls  numloops: %d", i,
+        swprintf(scratch, 127, L"\n           [%d]  %ls  numloops: %d", i,
                  patternstr, base->pattern_multiloop_count[i]);
         wcscat(status_string, scratch);
     }

@@ -136,14 +136,13 @@ typedef struct minisynth
     global_synth_params m_global_synth_params;
 
     double m_last_note_frequency;
-
     unsigned int m_midi_rx_channel;
 
     synthsettings m_settings;
     synthsettings m_settings_backup_while_getting_crazy;
 
-    int m_last_midi_notes[MAX_VOICES];
-    arpeggiator m_arp;
+    // int m_last_midi_notes[MAX_VOICES];
+    // arpeggiator m_arp;
 
 } minisynth;
 
@@ -262,6 +261,5 @@ void minisynth_set_voice_mode(minisynth *ms, unsigned int val);
 void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
 void minisynth_set_monophonic(minisynth *ms, bool b);
-void minisynth_add_last_note(minisynth *ms, unsigned int val);
 midi_event *minisynth_get_pattern(void *self, int pattern_num);
 void minisynth_set_pattern(void *self, int pattern_num, midi_event *pattern);

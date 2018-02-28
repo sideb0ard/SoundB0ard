@@ -139,7 +139,6 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            minisynth_add_last_note(ms, ev.data1);
             minisynth_midi_note_on(ms, ev.data1, ev.data2);
 
             if (!mixr->have_midi_controller)

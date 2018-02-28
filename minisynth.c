@@ -15,21 +15,16 @@ extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
 // defined in minisynth_voice.h
-const wchar_t *s_voice_names[] = {L"SAW3",    L"SQR3",    L"SAW2SQR",
-                                  L"TRI2SAW", L"TRI2SQR", L"SIN2SQR"};
+const wchar_t *s_voice_names[] = {L"saw3",    L"sqr3",    L"saw2sqr",
+                                  L"tri2saw", L"tri2sqr", L"sin2sqr"};
 
 // defined in oscillator.h
-const char *s_lfo_mode_names[] = {"SYNC", "SHOT", "FREE"};
-const char *s_lfo_wave_names[] = {"SINE",   "USAW", "DSAW", "TRI",
-                                  "SQUARE", "EXPO", "RSH",  "QRSH"};
+const char *s_lfo_mode_names[] = {"sync", "shot", "free"};
+const char *s_lfo_wave_names[] = {"sine", "usaw", "dsaw", "tri ",
+                                  "squa", "expo", "rsh ", "qrsh"};
 
-const char *s_filter_type_names[] = {"LPF1", "HPF1", "LPF2", "HPF2", "BPF2",
-                                     "BSF2", "LPF4", "HPF4", "BPF4"};
-
-const char *arp_mode_to_string[] = {"UP", "DOWN", "UPDOWN", "RANDOM"};
-const char *arp_cur_step_to_string[] = {"ROOT", "THIRD", "FIFTH"};
-const char *arp_rate_to_string[] = {"THIRTYSECOND", "SIXTEENTH", "EIGHTH",
-                                    "QUARTER"};
+const char *s_filter_type_names[] = {"lpf1", "hpf1", "lpf2", "hpf2", "bpf2",
+                                     "bsf2", "lpf4", "hpf4", "bpf4"};
 
 minisynth *new_minisynth(void)
 {
@@ -54,7 +49,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.self_destruct = &minisynth_del_self;
     ms->sound_generator.type = MINISYNTH_TYPE;
 
-    strncpy(ms->m_settings.m_settings_name, "DEFAULT", 7);
+    strncpy(ms->m_settings.m_settings_name, "default", 7);
 
     ms->m_settings.m_monophonic = false;
     ms->m_settings.m_voice_mode = 0;
@@ -147,8 +142,6 @@ minisynth *new_minisynth(void)
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
-        ms->m_last_midi_notes[i] = 0;
-
         ms->m_voices[i] = new_minisynth_voice();
         if (!ms->m_voices[i])
             return NULL; // would be bad
@@ -169,9 +162,8 @@ minisynth *new_minisynth(void)
                                  get_matrix_core(&ms->m_ms_modmatrix));
     }
     minisynth_update(ms);
-    arpeggiator_init(&ms->m_arp);
-
     ms->sound_generator.active = true;
+
     return ms;
 }
 
@@ -672,109 +664,145 @@ void minisynth_status(void *self, wchar_t *status_string)
         minisynth_print(ms);
     }
 
+    // clang-format off
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"[" WANSI_COLOR_WHITE "MINISYNTH '%s'" WCOOL_COLOR_PINK
-        "] - Vol: %.2f voice:%ls(%d)[0-%d] mono:%d sample_rate:%d sr_ratio:%f"
-        "generate:%d generate_src:%d last_midi_notes:%d %d %d\n"
-        "      filter keytrack(kt)[0-1]: %d detune[-100-100]:%0.2f legato:%d "
-        "note decay scale(ndscale)[01]:%d\n      noisedb[-96-0]:%0.2f "
-        "octave[-4-4]:%d pitchrange[0-12]:%d porta ms(porta)[0-5000]:%.2f"
-        "\n      pulse width(pw)[1-99]:%.2f subosc[-96-0]:%.2f "
-        "velocity scale(vascale)[0-1]:%d reset to zero[0-1]:%d\n"
-        "      [" WANSI_COLOR_WHITE "---------lfo1--------"
-        "------------------------------------" WCOOL_COLOR_PINK "]\n"
-        "      lfo1wave:%s(%d)[0-7] lfo1mode:%s(%d) lfo1rate:%.2f "
-        "lfo1amp:%.2f\n"
-        "      lfo1_osc_enabled:%d lfo1_osc_intensity:%.2f\n"
-        "      lfo1_filter_enabled:%d lfo1_filter_intensity:%.2f\n"
-        "      lfo1_amp_enabled:%d lfo1_amp_intensity:%.2f\n"
-        "      lfo1_pan_enabled:%d lfo1_pan_intensity:%.2f\n"
-        "      [" WANSI_COLOR_WHITE "---------lfo2--------"
-        "------------------------------------" WCOOL_COLOR_PINK "]\n"
-        "      lfo2wave:%s(%d)[0-7] lfo2mode:%s(%d) lfo2rate:%.2f "
-        "lfo2amp:%.2f\n"
-        "      lfo2_osc_enabled:%d lfo2_osc_intensity:%.2f\n"
-        "      lfo2_filter_enabled:%d lfo2_filter_intensity:%.2f\n"
-        "      lfo2_amp_enabled:%d lfo2_amp_intensity:%.2f\n"
-        "      lfo2_pan_enabled:%d lfo2_pan_intensity:%.2f\n"
-        "      [" WANSI_COLOR_WHITE "---------eg1---------"
-        "------------------------------------" WCOOL_COLOR_PINK "]\n"
-        "      attackms:%.2f decayms:%.2f sustainlvl:%.2f releasems:%.2f "
-        "sustain? %s\n"
-        "      eg1_osc_enabled:%d eg1_osc_intensity%.2f\n"
-        "      eg1_filter_enabled:%d eg1_filter_intensity%.2f\n"
-        "      eg1_dca_enabled:%d eg1_dca_intensity%.2f\n"
-        "      [" WANSI_COLOR_WHITE "---------filter------"
-        "------------------------------------" WCOOL_COLOR_PINK "]\n"
-        "      filtertype:%s[0-8] fc:%.2f fq:%.2f\n"
-        "      [" WANSI_COLOR_WHITE "arp" WCOOL_COLOR_PINK "] arp:%d "
-        "arprepeat:%d arpmode:%d[0-3] arprate[0-3]:%d arpoctrange[1-4]:%d\n"
-        "      last_midi_note:%d sustain_note_ms:%d",
+        WCOOL_COLOR_PINK " [" WANSI_COLOR_WHITE "%s" WCOOL_COLOR_PINK
+        "] vol:%.1f voice:%ls(%d) mono:%d detune:%0.f legato:%d kt:%d ndscale:%.0fd\n"
+        "           "
+        "noisedb:%.0f octave:%d pitchrange:%d porta:%d pw:%.0f subosc:%.0f vascale:%d zero:%d\n"
+        WCOOL_COLOR_ORANGE "           "
+        "lfo1wave:%s(%d) lfo1mode:%s(%d) "
+        WCOOL_COLOR_YELLOW "    "
+        "lfo2wave:%s(%d) lfo2mode:%s(%d)\n"
+        WCOOL_COLOR_ORANGE "           "
+        "lfo1_filter_en:%d lfo1_filter_int:%4.1f"
+        WCOOL_COLOR_YELLOW " "
+        "lfo2_filter_en:%d lfo2_filter_int:%.1f\n"
+        WCOOL_COLOR_ORANGE "           "
+        "lfo1_osc_en:%d    lfo1_osc_int:%4.1f"
+        WCOOL_COLOR_YELLOW "    "
+        "lfo2_osc_en:%d    lfo2_osc_int:%.1f\n"
+        WCOOL_COLOR_ORANGE "           "
+        "lfo1_amp_en:%d    lfo1_amp_int:%4.1f"
+        WCOOL_COLOR_YELLOW "    "
+        "lfo2_amp_en:%d    lfo2_amp_int:%.1f\n"
+        WCOOL_COLOR_ORANGE "           "
+        "lfo1_pan_en:%d    lfo1_pan_int:%4.1f"
+        WCOOL_COLOR_YELLOW "    "
+        "lfo2_pan_en:%d    lfo2_pan_int:%.1f\n"
+        WCOOL_COLOR_ORANGE "           "
+        "lfo1rate:%04.1f    lfo1amp:%.1f"
+        WCOOL_COLOR_YELLOW "          "
+        "lfo2rate:%04.1f    lfo2amp:%.1f\n"
 
-        // VOICE + GENERAL
-        ms->m_settings.m_settings_name, ms->m_settings.m_volume_db,
-        s_voice_names[ms->m_settings.m_voice_mode], ms->m_settings.m_voice_mode,
-        MAX_VOICE_CHOICE - 1, ms->m_settings.m_monophonic, ms->base.sample_rate,
-        ms->base.sample_rate_ratio, ms->m_settings.m_generate_active,
-        ms->m_settings.m_generate_src, ms->m_last_midi_notes[0],
-        ms->m_last_midi_notes[1], ms->m_last_midi_notes[2],
-        ms->m_settings.m_filter_keytrack, ms->m_settings.m_detune_cents,
+        WCOOL_COLOR_PINK
+        "           eg1_filter_en:%d  eg1_filter_int:%.1f   eg1_osc_en:%d     eg1_osc_int:%.1f\n"
+        "           eg1_dca_en:%d     eg1_dca_int:%.1f      sustain:%d        sustainlvl:%.1f\n"
+        "           attackms:%4.0f    decayms:%4.0f         releasems:%4.0f\n"
+
+        WCOOL_COLOR_ORANGE "           "
+        "filter:%s[0-8] fc:%6.1f fq:%4.1f\n",
+
+        ms->m_settings.m_settings_name,
+        ms->m_settings.m_volume_db,
+        s_voice_names[ms->m_settings.m_voice_mode],
+        ms->m_settings.m_voice_mode,
+        ms->m_settings.m_monophonic,
+        ms->m_settings.m_detune_cents,
         ms->m_settings.m_legato_mode,
+        ms->m_settings.m_filter_keytrack,
         ms->m_settings.m_note_number_to_decay_scaling,
-        ms->m_settings.m_noise_osc_db, ms->m_settings.m_octave,
-        ms->m_settings.m_pitchbend_range, ms->m_settings.m_portamento_time_msec,
-        ms->m_settings.m_pulse_width_pct, ms->m_settings.m_sub_osc_db,
+        ms->m_settings.m_noise_osc_db,
+        ms->m_settings.m_octave,
+        ms->m_settings.m_pitchbend_range,
+        ms->m_settings.m_portamento_time_msec,
+        ms->m_settings.m_pulse_width_pct,
+        ms->m_settings.m_sub_osc_db,
         ms->m_settings.m_velocity_to_attack_scaling,
         ms->m_settings.m_reset_to_zero,
 
         // LFO1
         s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
         ms->m_settings.m_lfo1_waveform,
-        s_lfo_mode_names[ms->m_settings.m_lfo1_mode],
-        ms->m_settings.m_lfo1_mode, ms->m_settings.m_lfo1_rate,
-        ms->m_settings.m_lfo1_amplitude,
-        ms->m_settings.m_lfo1_osc_pitch_enabled,
-        ms->m_settings.m_lfo1_osc_pitch_intensity,
-        ms->m_settings.m_lfo1_filter_fc_enabled,
-        ms->m_settings.m_lfo1_filter_fc_intensity,
-        ms->m_settings.m_lfo1_amp_enabled, ms->m_settings.m_lfo1_amp_intensity,
-        ms->m_settings.m_lfo1_pan_enabled, ms->m_settings.m_lfo1_pan_intensity,
 
-        // LFO2
+        s_lfo_mode_names[ms->m_settings.m_lfo1_mode],
+        ms->m_settings.m_lfo1_mode,
+
+        //// LFO2
         s_lfo_wave_names[ms->m_settings.m_lfo2_waveform],
         ms->m_settings.m_lfo2_waveform,
+
         s_lfo_mode_names[ms->m_settings.m_lfo2_mode],
-        ms->m_settings.m_lfo2_mode, ms->m_settings.m_lfo2_rate,
-        ms->m_settings.m_lfo2_amplitude,
-        ms->m_settings.m_lfo2_osc_pitch_enabled,
-        ms->m_settings.m_lfo2_osc_pitch_intensity,
+        ms->m_settings.m_lfo2_mode,
+        // LFO1
+        ms->m_settings.m_lfo1_filter_fc_enabled,
+        ms->m_settings.m_lfo1_filter_fc_intensity,
+
+        //// LFO2
         ms->m_settings.m_lfo2_filter_fc_enabled,
         ms->m_settings.m_lfo2_filter_fc_intensity,
-        ms->m_settings.m_lfo2_amp_enabled, ms->m_settings.m_lfo2_amp_intensity,
-        ms->m_settings.m_lfo2_pan_enabled, ms->m_settings.m_lfo2_pan_intensity,
 
-        // EG1
-        ms->m_settings.m_attack_time_msec, ms->m_settings.m_decay_time_msec,
-        ms->m_settings.m_sustain_level, ms->m_settings.m_release_time_msec,
-        ms->m_settings.m_sustain_override ? "true" : "false",
-        ms->m_settings.m_eg1_osc_enabled, ms->m_settings.m_eg1_osc_intensity,
+        // LFO1
+        ms->m_settings.m_lfo1_osc_pitch_enabled,
+        ms->m_settings.m_lfo1_osc_pitch_intensity,
+
+        //// LFO2
+        ms->m_settings.m_lfo2_osc_pitch_enabled,
+        ms->m_settings.m_lfo2_osc_pitch_intensity,
+
+        // LFO1
+        ms->m_settings.m_lfo1_amp_enabled,
+        ms->m_settings.m_lfo1_amp_intensity,
+
+        //// LFO2
+        ms->m_settings.m_lfo2_amp_enabled,
+        ms->m_settings.m_lfo2_amp_intensity,
+
+        // LFO1
+        ms->m_settings.m_lfo1_pan_enabled,
+        ms->m_settings.m_lfo1_pan_intensity,
+
+        //// LFO2
+        ms->m_settings.m_lfo2_pan_enabled,
+        ms->m_settings.m_lfo2_pan_intensity,
+
+        // LFO1
+        ms->m_settings.m_lfo1_rate,
+        ms->m_settings.m_lfo1_amplitude,
+        //// LFO2
+        ms->m_settings.m_lfo2_rate,
+        ms->m_settings.m_lfo2_amplitude,
+
         ms->m_settings.m_eg1_filter_enabled,
-        ms->m_settings.m_eg1_filter_intensity, ms->m_settings.m_eg1_dca_enabled,
+        ms->m_settings.m_eg1_filter_intensity,
+
+        ms->m_settings.m_eg1_osc_enabled,
+        ms->m_settings.m_eg1_osc_intensity,
+
+        ms->m_settings.m_eg1_dca_enabled,
         ms->m_settings.m_eg1_dca_intensity,
+
+        ms->m_settings.m_sustain_override,
+        ms->m_settings.m_sustain_level,
+
+        ms->m_settings.m_attack_time_msec,
+        ms->m_settings.m_decay_time_msec,
+
+        ms->m_settings.m_release_time_msec,
+
 
         // FILTER1
         s_filter_type_names[ms->m_settings.m_filter_type],
-        ms->m_settings.m_fc_control, ms->m_settings.m_q_control,
+        // FILTER1
+        ms->m_settings.m_fc_control,
+        ms->m_settings.m_q_control
 
-        // ARP
-        ms->m_arp.active, ms->m_arp.single_note_repeat, ms->m_arp.mode,
-        ms->m_arp.rate, ms->m_arp.octave_range,
-
-        // SYNTHBASE
-        ms->base.last_midi_note, ms->base.sustain_note_ms
 
         );
+
+
+
 
     wchar_t scratch[1024];
     synthbase_status(&ms->base, scratch);
@@ -838,8 +866,6 @@ stereo_val minisynth_gennext(void *self)
     double accum_out_right = 0.0;
 
     float mix = 1.0 / MAX_VOICES;
-    if (ms->m_arp.active)
-        arpeggiate(ms, &ms->m_arp);
 
     double out_left = 0.0;
     double out_right = 0.0;
@@ -1682,21 +1708,6 @@ void minisynth_print_settings(minisynth *ms)
            ms->m_settings.m_filter_keytrack_intensity);
     // TODO - where's type? // whats NLP?
 
-    printf(COOL_COLOR_MAUVE); // ARPEGGIATORRRR
-    printf("Arp Active (arp): %s [0,1]\n", ms->m_arp.active ? "true" : "false");
-    printf("Arp Latch (arplatch): %s [0,1]\n",
-           ms->m_arp.latch ? "true" : "false");
-    printf("Arp Single Note Repeat (arprepeat): %s [0,1]\n",
-           ms->m_arp.single_note_repeat ? "true" : "false");
-    printf("Arp Octave Range (arpoctrange): %d [1,4]\n",
-           ms->m_arp.octave_range);
-    printf("Arp Mode (arpmode): %s [0,3]\n",
-           arp_mode_to_string[ms->m_arp.mode]);
-    printf("Arp Rate (arprate): %s [0,2]\n",
-           arp_rate_to_string[ms->m_arp.rate]);
-    printf("Arp Cur Step (arpcurstep): %s\n",
-           arp_cur_step_to_string[ms->m_arp.cur_step]);
-
     printf(ANSI_COLOR_RESET);
 }
 
@@ -1743,46 +1754,10 @@ void minisynth_sg_stop(void *self)
     minisynth_stop(ms);
 }
 
-void minisynth_set_arpeggiate(minisynth *ms, bool b) { ms->m_arp.active = b; }
-
 void minisynth_set_generate_src(minisynth *ms, int src)
 {
     if (mixer_is_valid_seq_gen_num(mixr, src))
         ms->m_settings.m_generate_src = src;
-}
-
-void minisynth_set_arpeggiate_latch(minisynth *ms, bool b)
-{
-    ms->m_arp.latch = b;
-}
-
-void minisynth_set_arpeggiate_single_note_repeat(minisynth *ms, bool b)
-{
-    ms->m_arp.single_note_repeat = b;
-}
-
-void minisynth_set_arpeggiate_octave_range(minisynth *ms, int val)
-{
-    if (val >= 1 && val <= 4)
-        ms->m_arp.octave_range = val;
-    else
-        printf("Val must be between 1 and 4\n");
-}
-
-void minisynth_set_arpeggiate_mode(minisynth *ms, unsigned int mode)
-{
-    if (mode < MAX_ARP_MODE)
-        ms->m_arp.mode = mode;
-    else
-        printf("Val must be < %d\n", MAX_ARP_MODE);
-}
-
-void minisynth_set_arpeggiate_rate(minisynth *ms, unsigned int mode)
-{
-    if (mode < MAX_ARP_RATE)
-        ms->m_arp.rate = mode;
-    else
-        printf("Val must be < %d\n", MAX_ARP_RATE);
 }
 
 void minisynth_set_filter_mod(minisynth *ms, double mod)
@@ -2289,13 +2264,6 @@ void minisynth_set_monophonic(minisynth *ms, bool b)
 void minisynth_set_generate(minisynth *ms, bool b)
 {
     ms->m_settings.m_generate_active = b;
-}
-
-void minisynth_add_last_note(minisynth *ms, unsigned int val)
-{
-    for (int i = 1; i < MAX_VOICES; i++)
-        ms->m_last_midi_notes[i - 1] = ms->m_last_midi_notes[i];
-    ms->m_last_midi_notes[MAX_VOICES - 1] = val;
 }
 
 midi_event *minisynth_get_pattern(void *self, int pattern_num)

@@ -420,23 +420,23 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_decay_time_ms(ms, val);
     else if (strncmp("detune", wurds[2], 6) == 0)
         minisynth_set_detune(ms, val);
-    else if (strncmp("eg1_osc_enabled", wurds[2], 9) == 0)
+    else if (strncmp("eg1_osc_en", wurds[2], 9) == 0)
         minisynth_set_eg1_osc_enable(ms, val);
-    else if (strncmp("eg1_osc_intensity", wurds[2], 9) == 0)
+    else if (strncmp("eg1_osc_int", wurds[2], 9) == 0)
         minisynth_set_eg1_osc_int(ms, val);
-    else if (strncmp("eg1_dca_enabled", wurds[2], 14) == 0)
+    else if (strncmp("eg1_dca_en", wurds[2], 14) == 0)
         minisynth_set_eg1_dca_enable(ms, val);
-    else if (strncmp("eg1_dca_intensity", wurds[2], 9) == 0)
+    else if (strncmp("eg1_dca_int", wurds[2], 9) == 0)
         minisynth_set_eg1_dca_int(ms, val);
-    else if (strncmp("eg1_filter_enabled", wurds[2], 14) == 0)
+    else if (strncmp("eg1_filter_en", wurds[2], 14) == 0)
         minisynth_set_eg1_filter_enable(ms, val);
-    else if (strncmp("eg1_filter_intensity", wurds[2], 12) == 0)
+    else if (strncmp("eg1_filter_int", wurds[2], 12) == 0)
         minisynth_set_eg1_filter_int(ms, val);
     else if (strncmp("fc", wurds[2], 2) == 0)
         minisynth_set_filter_fc(ms, val);
     else if (strncmp("fq", wurds[2], 2) == 0)
         minisynth_set_filter_fq(ms, val);
-    else if (strncmp("filtertype", wurds[2], 4) == 0)
+    else if (strncmp("filter", wurds[2], 4) == 0)
         minisynth_set_filter_type(ms, val);
     else if (strncmp("ktint", wurds[2], 5) == 0)
         minisynth_set_keytrack_int(ms, val);
@@ -452,21 +452,21 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_lfo_rate(ms, 1, val);
     else if (strncmp("lfo1amp", wurds[2], 7) == 0)
         minisynth_set_lfo_amp(ms, 1, val);
-    else if (strncmp("lfo1_osc_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo1_osc_en", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_enable(ms, 1, val);
-    else if (strncmp("lfo1_osc_intensity", wurds[2], 16) == 0)
+    else if (strncmp("lfo1_osc_int", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_int(ms, 1, val);
-    else if (strncmp("lfo1_filter_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo1_filter_en", wurds[2], 16) == 0)
         minisynth_set_lfo_filter_enable(ms, 1, val);
-    else if (strncmp("lfo1_filter_intensity", wurds[2], 21) == 0)
+    else if (strncmp("lfo1_filter_int", wurds[2], 21) == 0)
         minisynth_set_lfo_filter_fc_int(ms, 1, val);
-    else if (strncmp("lfo1_amp_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo1_amp_en", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_enable(ms, 1, val);
-    else if (strncmp("lfo1_amp_intensity", wurds[2], 16) == 0)
+    else if (strncmp("lfo1_amp_int", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_int(ms, 1, val);
-    else if (strncmp("lfo1_pan_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo1_pan_en", wurds[2], 16) == 0)
         minisynth_set_lfo_pan_enable(ms, 1, val);
-    else if (strncmp("lfo1_pan_intensity", wurds[2], 10) == 0)
+    else if (strncmp("lfo1_pan_int", wurds[2], 10) == 0)
         minisynth_set_lfo_pan_int(ms, 1, val);
     else if (strncmp("lfo2wave", wurds[2], 7) == 0)
         minisynth_set_lfo_wave(ms, 2, val);
@@ -476,21 +476,21 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_lfo_rate(ms, 2, val);
     else if (strncmp("lfo2amp", wurds[2], 7) == 0)
         minisynth_set_lfo_amp(ms, 2, val);
-    else if (strncmp("lfo2_osc_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo2_osc_en", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_enable(ms, 2, val);
-    else if (strncmp("lfo2_osc_intensity", wurds[2], 16) == 0)
+    else if (strncmp("lfo2_osc_int", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_int(ms, 2, val);
-    else if (strncmp("lfo2_filter_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo2_filter_en", wurds[2], 16) == 0)
         minisynth_set_lfo_filter_enable(ms, 2, val);
-    else if (strncmp("lfo2_filter_intensity", wurds[2], 21) == 0)
+    else if (strncmp("lfo2_filter_int", wurds[2], 21) == 0)
         minisynth_set_lfo_filter_fc_int(ms, 2, val);
-    else if (strncmp("lfo2_amp_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo2_amp_en", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_enable(ms, 2, val);
-    else if (strncmp("lfo2_amp_intensity", wurds[2], 16) == 0)
+    else if (strncmp("lfo2_amp_int", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_int(ms, 2, val);
-    else if (strncmp("lfo2_pan_enabled", wurds[2], 16) == 0)
+    else if (strncmp("lfo2_pan_en", wurds[2], 16) == 0)
         minisynth_set_lfo_pan_enable(ms, 2, val);
-    else if (strncmp("lfo2_pan_intensity", wurds[2], 10) == 0)
+    else if (strncmp("lfo2_pan_int", wurds[2], 10) == 0)
         minisynth_set_lfo_pan_int(ms, 2, val);
     else if (strncmp("load", wurds[2], 4) == 0)
     {

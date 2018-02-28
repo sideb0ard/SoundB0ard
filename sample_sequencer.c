@@ -214,7 +214,7 @@ void sample_seq_status(void *self, wchar_t *status_string)
     sample_sequencer *seq = (sample_sequencer *)self;
     wchar_t local_status_string[MAX_PS_STRING_SZ] = {};
     swprintf(local_status_string, MAX_PS_STRING_SZ,
-             L" \"%s\" vol:%.2lf pitch:%.2f num_patterns:%d", seq->filename,
+             L" %s vol:%.2lf pitch:%.2f num_patterns:%d", seq->filename,
              seq->vol, seq->buffer_pitch, seq->m_seq.num_patterns);
 
     if (seq->sound_generator.active)

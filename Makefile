@@ -7,7 +7,6 @@ SRC = \
 	afx/lpfcombfilter.c \
 	afx/onepolelpf.c \
 	algorithm.c \
-	arpeggiator.c \
 	audiofile_data.c \
 	audioutils.c \
 	fx/basicfilterpass.c \

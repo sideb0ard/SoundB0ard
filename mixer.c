@@ -111,13 +111,13 @@ void mixer_ps(mixer *mixr)
     print_logo();
     printf(COOL_COLOR_GREEN
            "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-           "::::: vol:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
+           ":::::::::: vol:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " bpm:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " quantum:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " beat:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
-           "::::: MIDI controller:%s sg_receiver:%d midi_type:%s\n" ANSI_COLOR_RESET,
+           ":::::::::: MIDI controller:%s sg_receiver:%d midi_type:%s\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
@@ -143,12 +143,11 @@ void mixer_ps(mixer *mixr)
 
     if (mixr->num_scenes > 1)
     {
-        printf(COOL_COLOR_GREEN "\n::::: [" ANSI_COLOR_WHITE
-                                "scenes" COOL_COLOR_GREEN "] .....]\n");
+        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "scenes" COOL_COLOR_GREEN
+                                "]\n");
         for (int i = 0; i < mixr->num_scenes; i++)
         {
-            printf("::::: [%d] - %d bars - ", i,
-                   mixr->scenes[i].num_bars_to_play);
+            printf(":::::::::: [%d] ", i);
             for (int j = 0; j < mixr->scenes[i].num_tracks; j++)
             {
                 if (mixr->scenes[i].soundgen_tracks[j].soundgen_num != -1)
@@ -167,8 +166,8 @@ void mixer_ps(mixer *mixr)
     wchar_t wss[MAX_PS_STRING_SZ] = {};
     if (mixr->algorithm_num > 0)
     {
-        printf(COOL_COLOR_GREEN "\n::::: [" ANSI_COLOR_WHITE
-                                "algorithms" COOL_COLOR_GREEN "] .....]\n");
+        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
+                                "algorithms" COOL_COLOR_GREEN "]\n");
         for (int i = 0; i < mixr->algorithm_num; i++)
         {
             if (mixr->algorithms[i] != NULL)
@@ -184,9 +183,8 @@ void mixer_ps(mixer *mixr)
 
     if (mixr->sequence_gen_num > 0)
     {
-        printf(COOL_COLOR_GREEN "\n::::: [" ANSI_COLOR_WHITE
-                                "sequence generators" COOL_COLOR_GREEN
-                                "] .....]\n");
+        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
+                                "sequence generators" COOL_COLOR_GREEN "]\n");
         for (int i = 0; i < mixr->sequence_gen_num; i++)
         {
             if (mixr->sequence_generators[i] != NULL)
@@ -203,9 +201,8 @@ void mixer_ps(mixer *mixr)
 
     if (mixr->soundgen_num > 0)
     {
-        printf(COOL_COLOR_GREEN "\n:::::::::: [" ANSI_COLOR_WHITE
-                                "sound generators" COOL_COLOR_GREEN
-                                "] .....]\n");
+        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
+                                "sound generators" COOL_COLOR_GREEN "]\n");
         for (int i = 0; i < mixr->soundgen_num; i++)
         {
             if (mixr->sound_generators[i] != NULL)
@@ -215,7 +212,7 @@ void mixer_ps(mixer *mixr)
                                                   wss);
 
                 // clang-format off
-                wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE "%s %2d" WCOOL_COLOR_GREEN "] " WANSI_COLOR_RESET,
+                wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE "%s %02d" WCOOL_COLOR_GREEN "] " WANSI_COLOR_RESET,
                         s_sg_names[mixr->sound_generators[i]->type], i);
                 wprintf(L"%ls", wss);
                 wprintf(WANSI_COLOR_RESET);
@@ -842,10 +839,6 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
     if (sg->type == MINISYNTH_TYPE)
     {
         minisynth *ms = (minisynth *)sg;
-        if (update_last_midi)
-        {
-            minisynth_add_last_note(ms, note);
-        }
         minisynth_midi_note_on(ms, note, velocity);
     }
     else if (sg->type == DIGISYNTH_TYPE)
