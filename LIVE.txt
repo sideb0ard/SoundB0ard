@@ -7,7 +7,7 @@ every 2 16th (p="3 5 7 9 5") pattern 0 hits p
 
 new digi toms/DR660808CongaMid.aif -- generate from euclidean // root_note 35 29 36
 syn 0 gen src 0
-every 2 16th (n="35 29 36 35 35") syn 0 root_note n
+every 2 16th (n="35 29 36 35 35") syn 0 midi_note n
 every 2 16th syn 0 gen
 
 MINISYNTH 'innerc' // root_note 23

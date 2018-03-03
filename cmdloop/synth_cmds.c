@@ -763,10 +763,10 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         {
             synthbase_set_rand_key(base);
         }
-        else if (strncmp("root_note", wurds[0], 8) == 0)
+        else if (strncmp("midi_note", wurds[0], 8) == 0)
         {
-            int root_key = atoi(wurds[3]);
-            synthbase_set_root_key(base, root_key);
+            int midi_note = atoi(wurds[1]);
+            synthbase_set_midi_note(base, midi_note);
         }
         else if (strncmp("import", wurds[0], 6) == 0)
         {

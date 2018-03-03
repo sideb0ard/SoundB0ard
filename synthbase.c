@@ -24,9 +24,6 @@ void synthbase_init(synthbase *base, void *parent,
     base->parent_synth_type = parent_synth_type;
 
     base->num_patterns = 1;
-    base->morph_mode = false;
-    base->morph_every_n_loops = 0;
-    base->morph_generation = 0;
     base->max_generation = 0;
 
     base->multi_pattern_mode = true;
@@ -51,17 +48,13 @@ void synthbase_generate_pattern(synthbase *base)
         synthbase_stop(base);
         sequence_generator *sg =
             mixr->sequence_generators[base->m_generate_src];
-        uint16_t left_bits = sg->generate(sg, NULL);
-        uint16_t right_bits = sg->generate(sg, NULL);
+        uint16_t bits = sg->generate(sg, NULL);
 
-        int32_t ored_bits = (left_bits << 16) | right_bits;
-        // print_bin_num(ored_bits);
-
-        int patternlen = 32;
+        int patternlen = 16;
         for (int i = 0; i < patternlen; i++)
         {
             int shift_by = patternlen - 1 - i;
-            if (ored_bits & 1 << shift_by)
+            if (bits & (1 << shift_by))
             {
                 synthbase_add_note(base, base->cur_pattern, i, base->midi_note);
             }
@@ -186,8 +179,7 @@ void synthbase_event_notify(void *self, unsigned int event_type)
         idx = mixr->timing_info.midi_tick % PPBAR;
         if (base->patterns[base->cur_pattern][idx].event_type)
         {
-            midi_event ev = base->patterns[base->cur_pattern][idx];
-            midi_parse_midi_event(parent, ev);
+            midi_parse_midi_event(parent,  &base->patterns[base->cur_pattern][idx]);
         }
 
         break;
@@ -245,12 +237,6 @@ bool is_valid_pattern_num(synthbase *ms, int pattern_num)
         return true;
     }
     return false;
-}
-
-void synthbase_set_morph_mode(synthbase *ms, bool b)
-{
-    ms->morph_mode = b;
-    synthbase_set_backup_mode(ms, b);
 }
 
 void synthbase_set_generate_src(synthbase *b, int src)
@@ -410,7 +396,6 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
 
     char *item, *last_s;
     char const *sep = "::";
-    // minisynth_morph(ms);
     char line[4096];
     while (fgets(line, sizeof(line), fp))
     {
@@ -510,9 +495,9 @@ void synthbase_set_rand_key(synthbase *base)
     }
 }
 
-void synthbase_set_root_key(synthbase *base, int root_key)
+void synthbase_set_midi_note(synthbase *base, int note)
 {
-    base->midi_note = root_key;
+    base->midi_note = note;
 }
 
 midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)

@@ -193,8 +193,11 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
             {
                 int midi_num = get_midi_note_from_string(var_tokens[i].value);
                 printf("NOTE! %d\n", midi_num);
-                pattern[uniq_positions[i]].data1 = midi_num;
-                pattern[uniq_positions[i]].data2 = 128; // velocity
+                if (midi_num != -1)
+                {
+                    pattern[uniq_positions[i]].data1 = midi_num;
+                    pattern[uniq_positions[i]].data2 = 128; // velocity
+                }
             }
         }
     }

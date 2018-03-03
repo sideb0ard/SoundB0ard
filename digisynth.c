@@ -84,9 +84,9 @@ void digisynth_status(void *self, wchar_t *status_string)
 {
     digisynth *ds = (digisynth *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[DIGISYNTH '%s'] - Vol: %.2f Active: %s\n", ds->audiofile,
-             ds->vol, ds->sound_generator.active ? "true" : "false");
-    wchar_t scratch[512];
+             WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW " vol: %.2f active: %s midi_note:%d gen_src:%d", ds->audiofile,
+             ds->vol, ds->sound_generator.active ? "true" : "false", ds->base.midi_note, ds->base.m_generate_src);
+    wchar_t scratch[1024] = {};
     synthbase_status(&ds->base, scratch);
     wcscat(status_string, scratch);
 }

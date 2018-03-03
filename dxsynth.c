@@ -39,7 +39,7 @@ dxsynth *new_dxsynth(void)
     dx->sound_generator.get_pattern = &dxsynth_get_pattern;
     dx->sound_generator.type = DXSYNTH_TYPE;
 
-    strncpy(dx->m_settings.m_settings_name, "DEFAULT", 7);
+    strncpy(dx->m_settings.m_settings_name, "default", 7);
     dx->m_settings.m_volume_db = 0;
     dx->m_settings.m_voice_mode = 0;
     dx->m_settings.m_portamento_time_ms = 0;

@@ -61,10 +61,6 @@ typedef struct synthbase
     bool recording;
     bool live_code_mode;
 
-    bool morph_mode; // magical
-    int morph_every_n_loops;
-    int morph_generation;
-
     int last_midi_note;
     int midi_note;
     bool generate_mode; // magical
@@ -85,7 +81,7 @@ void synthbase_set_sample_rate(synthbase *base, int sample_rate);
 void synthbase_status(synthbase *base, wchar_t *status_string);
 void synthbase_event_notify(void *self, unsigned int event_type);
 void synthbase_set_rand_key(synthbase *base);
-void synthbase_set_root_key(synthbase *base, int root_key);
+void synthbase_set_midi_note(synthbase *base, int root_key);
 
 void synthbase_clear_pattern_ready_for_new_one(synthbase *base,
                                                int pattern_num);

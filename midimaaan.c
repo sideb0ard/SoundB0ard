@@ -97,7 +97,7 @@ void *midiman()
                     ev.data1 = data1;
                     ev.data2 = data2;
                     ev.delete_after_use = false;
-                    midi_parse_midi_event(sg, ev);
+                    midi_parse_midi_event(sg, &ev);
                 }
                 else
                 {
@@ -127,7 +127,7 @@ midi_event new_midi_event(int event_type, int data1, int data2)
     return ev;
 }
 
-void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
+void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
 {
     int cur_midi_tick = mixr->timing_info.midi_tick % PPBAR;
 
@@ -135,11 +135,11 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
     {
         minisynth *ms = (minisynth *)sg;
 
-        switch (ev.event_type)
+        switch (ev->event_type)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            minisynth_midi_note_on(ms, ev.data1, ev.data2);
+            minisynth_midi_note_on(ms, ev->data1, ev->data2);
 
             if (!mixr->have_midi_controller)
             {
@@ -147,7 +147,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
                                             mixr->timing_info.midi_ticks_per_ms;
                 int note_off_tick =
                     (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-                midi_event off = new_midi_event(128, ev.data1, 128);
+                midi_event off = new_midi_event(MIDI_OFF, ev->data1, 128);
                 off.delete_after_use = true;
                 synthbase_add_event(&ms->base, 0, note_off_tick, off);
             }
@@ -155,17 +155,17 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
         }
         case (MIDI_OFF):
         { // Hex 0x90
-            minisynth_midi_note_off(ms, ev.data1, ev.data2, false);
+            minisynth_midi_note_off(ms, ev->data1, ev->data2, false);
             break;
         }
         case (MIDI_CONTROL):
         { // Hex 0xB0
-            minisynth_midi_control(ms, ev.data1, ev.data2);
+            minisynth_midi_control(ms, ev->data1, ev->data2);
             break;
         }
         case (MIDI_PITCHBEND):
         { // Hex 0xE0
-            minisynth_midi_pitchbend(ms, ev.data1, ev.data2);
+            minisynth_midi_pitchbend(ms, ev->data1, ev->data2);
             break;
         }
         default:
@@ -177,33 +177,33 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
     {
         dxsynth *dx = (dxsynth *)sg;
 
-        switch (ev.event_type)
+        switch (ev->event_type)
         {
         case (144):
         { // Hex 0x80
-            // dxsynth_add_last_note(dx, ev.data1);
-            dxsynth_midi_note_on(dx, ev.data1, ev.data2);
+            // dxsynth_add_last_note(dx, ev->data1);
+            dxsynth_midi_note_on(dx, ev->data1, ev->data2);
             int sustain_time_in_ticks =
                 dx->base.sustain_note_ms * mixr->timing_info.midi_ticks_per_ms;
             int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-            midi_event off = new_midi_event(128, ev.data1, 128);
+            midi_event off = new_midi_event(128, ev->data1, 128);
             off.delete_after_use = true;
             synthbase_add_event(&dx->base, 0, note_off_tick, off);
             break;
         }
         case (128):
         { // Hex 0x90
-            dxsynth_midi_note_off(dx, ev.data1, ev.data2, true);
+            dxsynth_midi_note_off(dx, ev->data1, ev->data2, true);
             break;
         }
         case (176):
         { // Hex 0xB0
-            dxsynth_midi_control(dx, ev.data1, ev.data2);
+            dxsynth_midi_control(dx, ev->data1, ev->data2);
             break;
         }
         case (224):
         { // Hex 0xE0
-            dxsynth_midi_pitchbend(dx, ev.data1, ev.data2);
+            dxsynth_midi_pitchbend(dx, ev->data1, ev->data2);
             break;
         }
         default:
@@ -214,31 +214,31 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event ev)
     else if (sg->type == DIGISYNTH_TYPE)
     {
         digisynth *ds = (digisynth *)sg;
-        switch (ev.event_type)
+        switch (ev->event_type)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            digisynth_midi_note_on(ds, ev.data1, ev.data2);
+            digisynth_midi_note_on(ds, ev->data1, ev->data2);
             int sustain_time_in_ticks =
                 ds->base.sustain_note_ms * mixr->timing_info.midi_ticks_per_ms;
             int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-            midi_event off = new_midi_event(128, ev.data1, 128);
+            midi_event off = new_midi_event(128, ev->data1, 128);
             off.delete_after_use = true;
             synthbase_add_event(&ds->base, 0, note_off_tick, off);
             break;
         }
         case (MIDI_OFF):
         { // Hex 0x90
-            digisynth_midi_note_off(ds, ev.data1, ev.data2, true);
+            digisynth_midi_note_off(ds, ev->data1, ev->data2, true);
             break;
         }
         }
     }
 
     synthbase *base = get_synthbase(sg);
-    if (ev.delete_after_use)
+    if (ev->delete_after_use)
     {
-        midi_event_clear(&ev);
+        midi_event_clear(ev);
     }
 }
 
@@ -312,7 +312,9 @@ void midi_event_cp(midi_event *from, midi_event *to)
     to->delete_after_use = from->delete_after_use;
 }
 
-void midi_event_clear(midi_event *ev) { memset(ev, 0, sizeof(midi_event)); }
+void midi_event_clear(midi_event *ev) {
+    memset(ev, 0, sizeof(midi_event));
+}
 
 int get_midi_note_from_string(char *string)
 {
@@ -336,13 +338,13 @@ int get_midi_note_from_string(char *string)
         return 0 + octave;
     else if (!strcasecmp("c#", note))
         return 1 + octave;
-    else if (!strcasecmp("db", note))
+    else if (!strcasecmp("dm", note))
         return 1 + octave;
     else if (!strcasecmp("d", note))
         return 2 + octave;
     else if (!strcasecmp("d#", note))
         return 3 + octave;
-    else if (!strcasecmp("eb", note))
+    else if (!strcasecmp("em", note))
         return 3 + octave;
     else if (!strcasecmp("e", note))
         return 4 + octave;
@@ -350,19 +352,19 @@ int get_midi_note_from_string(char *string)
         return 5 + octave;
     else if (!strcasecmp("f#", note))
         return 6 + octave;
-    else if (!strcasecmp("gb", note))
+    else if (!strcasecmp("gm", note))
         return 6 + octave;
     else if (!strcasecmp("g", note))
         return 7 + octave;
     else if (!strcasecmp("g#", note))
         return 8 + octave;
-    else if (!strcasecmp("ab", note))
+    else if (!strcasecmp("am", note))
         return 8 + octave;
     else if (!strcasecmp("a", note))
         return 9 + octave;
     else if (!strcasecmp("a#", note))
         return 10 + octave;
-    else if (!strcasecmp("bb", note))
+    else if (!strcasecmp("bm", note))
         return 10 + octave;
     else if (!strcasecmp("b", note))
         return 11 + octave;

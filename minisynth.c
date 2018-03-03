@@ -667,7 +667,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     // clang-format off
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        WCOOL_COLOR_YELLOW "\"" WANSI_COLOR_WHITE "%s\"\n" WCOOL_COLOR_YELLOW
+        WANSI_COLOR_WHITE "%s\n" WCOOL_COLOR_YELLOW
         "vol:%.1f  voice:" WANSI_COLOR_WHITE "%ls" WCOOL_COLOR_YELLOW "(%d)  midi_note:%d mono:%d detune:%0.f legato:%d kt:%d ndscale:%.0fd\n"
         "noisedb:%.0f  octave:%d  pitchrange:%d  porta:%d  pw:%.0f  subosc:%.0f  vascale:%d zero:%d\n"
 
