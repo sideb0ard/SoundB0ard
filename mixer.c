@@ -212,7 +212,7 @@ void mixer_ps(mixer *mixr)
                                                   wss);
 
                 // clang-format off
-                wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE "%s %02d" WCOOL_COLOR_GREEN "] " WANSI_COLOR_RESET,
+                wprintf(WCOOL_COLOR_GREEN "["WANSI_COLOR_WHITE "%s %d" WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET,
                         s_sg_names[mixr->sound_generators[i]->type], i);
                 wprintf(L"%ls", wss);
                 wprintf(WANSI_COLOR_RESET);

@@ -72,3 +72,4 @@ bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
 unsigned int get_next_compat_note(unsigned int cur_key);
 bool is_midi_event_in_range(int start_tick, int end_tick, midi_pattern pattern);
 void print_logo(void);
+void pattern_to_string(midi_event *pattern, wchar_t *patternstr);

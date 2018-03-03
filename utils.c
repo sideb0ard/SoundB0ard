@@ -18,6 +18,7 @@
 //#include "lookuptables.h"
 
 extern mixer *mixr;
+extern const wchar_t *sparkchars;
 extern char *strategies[NUM_STATEGIES];
 
 static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
@@ -1156,4 +1157,23 @@ void print_logo()
         "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
         ANSI_COLOR_RESET);
     // clang-format on
+}
+
+void pattern_to_string(midi_event *pattern, wchar_t *patternstr)
+{
+    int cur_quart = 0;
+    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
+    {
+        patternstr[cur_quart] = sparkchars[0];
+        patternstr[cur_quart + 1] = sparkchars[0];
+        for (int j = i; j < (i + PPSIXTEENTH); j++)
+        {
+            if (pattern[j].event_type == MIDI_ON)
+            {
+                patternstr[cur_quart] = sparkchars[5];
+                patternstr[cur_quart + 1] = sparkchars[5];
+            }
+        }
+        cur_quart += 2;
+    }
 }

@@ -16,7 +16,6 @@ extern const char *key_names[NUM_KEYS];
 extern const compat_key_list compat_keys[NUM_KEYS];
 
 extern mixer *mixr;
-extern const wchar_t *sparkchars;
 
 void synthbase_init(synthbase *base, void *parent,
                     unsigned int parent_synth_type)
@@ -40,7 +39,7 @@ void synthbase_init(synthbase *base, void *parent,
 
     base->m_generate_src = -99;
     base->last_midi_note = 60;
-    base->root_midi_note = 60;
+    base->midi_note = 60;
     base->sustain_note_ms = 200;
     base->live_code_mode = true;
 }
@@ -64,8 +63,7 @@ void synthbase_generate_pattern(synthbase *base)
             int shift_by = patternlen - 1 - i;
             if (ored_bits & 1 << shift_by)
             {
-                synthbase_add_note(base, base->cur_pattern, i,
-                                   base->root_midi_note);
+                synthbase_add_note(base, base->cur_pattern, i, base->midi_note);
             }
         }
     }
@@ -138,39 +136,19 @@ void synthbase_reset_pattern(synthbase *base, unsigned int pattern_num)
     }
 }
 
-void synthbase_pattern_to_string(synthbase *base, int pattern_num,
-                                 wchar_t patternstr[33])
-{
-    int cur_quart = 0;
-    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
-    {
-        patternstr[cur_quart] = sparkchars[0];
-        for (int j = i; j < (i + PPSIXTEENTH); j++)
-        {
-            if (base->patterns[pattern_num][j].event_type == MIDI_ON)
-            {
-                patternstr[cur_quart] = sparkchars[5];
-            }
-        }
-        cur_quart++;
-    }
-}
-
 // sound generator interface //////////////
 void synthbase_status(synthbase *base, wchar_t *status_string)
 {
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_WHITE "           "
-                               "root_midi_note:%d sustain_note_ms:%d",
-             base->root_midi_note, base->sustain_note_ms);
+    wchar_t scratch[256] = {0};
+    wchar_t patternstr[33] = {0};
 
+    printf("NUMPPATERN? %d\n", base->num_patterns);
     for (int i = 0; i < base->num_patterns; i++)
     {
-        wchar_t patternstr[33] = {0};
-        wchar_t scratch[128] = {0};
-        synthbase_pattern_to_string(base, i, patternstr);
-        swprintf(scratch, 127, L"\n           [%d]  %ls  numloops: %d", i,
-                 patternstr, base->pattern_multiloop_count[i]);
+        pattern_to_string(base->patterns[i], patternstr);
+        printf("PATZY? %ls\n", patternstr);
+        swprintf(scratch, 255, L"\n[%d]  %ls  numloops: %d", i, patternstr,
+                 base->pattern_multiloop_count[i]);
         wcscat(status_string, scratch);
     }
     wcscat(status_string, WANSI_COLOR_RESET);
@@ -523,20 +501,20 @@ void synthbase_set_rand_key(synthbase *base)
     switch (dice)
     {
     case (0):
-        base->last_midi_note = base->root_midi_note;
+        base->last_midi_note = base->midi_note;
         break;
     case (1):
-        base->last_midi_note = base->root_midi_note + 4;
+        base->last_midi_note = base->midi_note + 4;
         break;
     case (2):
-        base->last_midi_note = base->root_midi_note + 7;
+        base->last_midi_note = base->midi_note + 7;
         break;
     }
 }
 
 void synthbase_set_root_key(synthbase *base, int root_key)
 {
-    base->root_midi_note = root_key;
+    base->midi_note = root_key;
 }
 
 midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)

@@ -667,47 +667,36 @@ void minisynth_status(void *self, wchar_t *status_string)
     // clang-format off
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        WCOOL_COLOR_PINK " [" WANSI_COLOR_WHITE "%s" WCOOL_COLOR_PINK
-        "] vol:%.1f voice:%ls(%d) mono:%d detune:%0.f legato:%d kt:%d ndscale:%.0fd\n"
-        "           "
-        "noisedb:%.0f octave:%d pitchrange:%d porta:%d pw:%.0f subosc:%.0f vascale:%d zero:%d\n"
-        WCOOL_COLOR_ORANGE "           "
-        "lfo1wave:%s(%d) lfo1mode:%s(%d) "
-        WCOOL_COLOR_YELLOW "    "
-        "lfo2wave:%s(%d) lfo2mode:%s(%d)\n"
-        WCOOL_COLOR_ORANGE "           "
-        "lfo1_filter_en:%d lfo1_filter_int:%4.1f"
-        WCOOL_COLOR_YELLOW " "
-        "lfo2_filter_en:%d lfo2_filter_int:%.1f\n"
-        WCOOL_COLOR_ORANGE "           "
-        "lfo1_osc_en:%d    lfo1_osc_int:%4.1f"
-        WCOOL_COLOR_YELLOW "    "
-        "lfo2_osc_en:%d    lfo2_osc_int:%.1f\n"
-        WCOOL_COLOR_ORANGE "           "
-        "lfo1_amp_en:%d    lfo1_amp_int:%4.1f"
-        WCOOL_COLOR_YELLOW "    "
-        "lfo2_amp_en:%d    lfo2_amp_int:%.1f\n"
-        WCOOL_COLOR_ORANGE "           "
-        "lfo1_pan_en:%d    lfo1_pan_int:%4.1f"
-        WCOOL_COLOR_YELLOW "    "
-        "lfo2_pan_en:%d    lfo2_pan_int:%.1f\n"
-        WCOOL_COLOR_ORANGE "           "
-        "lfo1rate:%04.1f    lfo1amp:%.1f"
-        WCOOL_COLOR_YELLOW "          "
-        "lfo2rate:%04.1f    lfo2amp:%.1f\n"
+        WCOOL_COLOR_YELLOW "\"" WANSI_COLOR_WHITE "%s\"\n" WCOOL_COLOR_YELLOW
+        "vol:%.1f  voice:" WANSI_COLOR_WHITE "%ls" WCOOL_COLOR_YELLOW "(%d)  midi_note:%d mono:%d detune:%0.f legato:%d kt:%d ndscale:%.0fd\n"
+        "noisedb:%.0f  octave:%d  pitchrange:%d  porta:%d  pw:%.0f  subosc:%.0f  vascale:%d zero:%d\n"
+
+        WCOOL_COLOR_ORANGE
+        "lfo1wave:%s(%d)     lfo1mode:%s(%d)  lfo1rate:%04.1f    lfo1amp:%.1f\n"
+        "lfo1_filter_en:%d     lfo1_osc_en:%d     lfo1_pan_en:%d    lfo1_amp_en:%d\n"
+        "lfo1_filter_int:%3.1f  lfo1_osc_int:%3.1f  lfo1_pan_int:%3.1f lfo1_amp_int:%3.1f\n"
 
         WCOOL_COLOR_PINK
-        "           eg1_filter_en:%d  eg1_filter_int:%.1f   eg1_osc_en:%d     eg1_osc_int:%.1f\n"
-        "           eg1_dca_en:%d     eg1_dca_int:%.1f      sustain:%d        sustainlvl:%.1f\n"
-        "           attackms:%4.0f    decayms:%4.0f         releasems:%4.0f\n"
+        "lfo2wave:%s(%d)     lfo2mode:%s(%d)  lfo2rate:%04.1f    lfo2amp:%.1f\n"
+        "lfo2_filter_en:%d     lfo2_osc_en:%d     lfo2_pan_en:%d    lfo2_amp_en:%d\n"
+        "lfo2_filter_int:%3.1f  lfo2_osc_int:%3.1f  lfo2_pan_int:%3.1f lfo2_amp_int:%3.1f\n"
 
-        WCOOL_COLOR_ORANGE "           "
-        "filter:%s[0-8] fc:%6.1f fq:%4.1f\n",
+
+        WCOOL_COLOR_ORANGE
+        "eg1_filter_en:%d      eg1_osc_en:%d      eg1_dca_en:%d     sustain:%d\n"
+        "eg1_filter_int:%.1f   eg1_osc_int:%.1f   eg1_dca_int:%.1f  sustainlvl:%.1f\n"
+        "attackms:%4.0f        decayms:%4.0f      releasems:%4.0f   sustain_note_ms:%.1f\n"
+
+        WCOOL_COLOR_PINK
+        "filter:%s(%d)[0-8]  fc:%6.1f        fq:%4.1f"
+
+        WCOOL_COLOR_YELLOW,
 
         ms->m_settings.m_settings_name,
         ms->m_settings.m_volume_db,
         s_voice_names[ms->m_settings.m_voice_mode],
         ms->m_settings.m_voice_mode,
+        ms->base.midi_note,
         ms->m_settings.m_monophonic,
         ms->m_settings.m_detune_cents,
         ms->m_settings.m_legato_mode,
@@ -725,86 +714,59 @@ void minisynth_status(void *self, wchar_t *status_string)
         // LFO1
         s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
         ms->m_settings.m_lfo1_waveform,
-
         s_lfo_mode_names[ms->m_settings.m_lfo1_mode],
         ms->m_settings.m_lfo1_mode,
-
-        //// LFO2
-        s_lfo_wave_names[ms->m_settings.m_lfo2_waveform],
-        ms->m_settings.m_lfo2_waveform,
-
-        s_lfo_mode_names[ms->m_settings.m_lfo2_mode],
-        ms->m_settings.m_lfo2_mode,
-        // LFO1
-        ms->m_settings.m_lfo1_filter_fc_enabled,
-        ms->m_settings.m_lfo1_filter_fc_intensity,
-
-        //// LFO2
-        ms->m_settings.m_lfo2_filter_fc_enabled,
-        ms->m_settings.m_lfo2_filter_fc_intensity,
-
-        // LFO1
-        ms->m_settings.m_lfo1_osc_pitch_enabled,
-        ms->m_settings.m_lfo1_osc_pitch_intensity,
-
-        //// LFO2
-        ms->m_settings.m_lfo2_osc_pitch_enabled,
-        ms->m_settings.m_lfo2_osc_pitch_intensity,
-
-        // LFO1
-        ms->m_settings.m_lfo1_amp_enabled,
-        ms->m_settings.m_lfo1_amp_intensity,
-
-        //// LFO2
-        ms->m_settings.m_lfo2_amp_enabled,
-        ms->m_settings.m_lfo2_amp_intensity,
-
-        // LFO1
-        ms->m_settings.m_lfo1_pan_enabled,
-        ms->m_settings.m_lfo1_pan_intensity,
-
-        //// LFO2
-        ms->m_settings.m_lfo2_pan_enabled,
-        ms->m_settings.m_lfo2_pan_intensity,
-
-        // LFO1
         ms->m_settings.m_lfo1_rate,
         ms->m_settings.m_lfo1_amplitude,
-        //// LFO2
+        ms->m_settings.m_lfo1_filter_fc_enabled,
+        ms->m_settings.m_lfo1_osc_pitch_enabled,
+        ms->m_settings.m_lfo1_pan_enabled,
+        ms->m_settings.m_lfo1_amp_enabled,
+        ms->m_settings.m_lfo1_filter_fc_intensity,
+        ms->m_settings.m_lfo1_osc_pitch_intensity,
+        ms->m_settings.m_lfo1_pan_intensity,
+        ms->m_settings.m_lfo1_amp_intensity,
+
+        // LFO2
+        s_lfo_wave_names[ms->m_settings.m_lfo2_waveform],
+        ms->m_settings.m_lfo2_waveform,
+        s_lfo_mode_names[ms->m_settings.m_lfo2_mode],
+        ms->m_settings.m_lfo2_mode,
         ms->m_settings.m_lfo2_rate,
         ms->m_settings.m_lfo2_amplitude,
+        ms->m_settings.m_lfo2_filter_fc_enabled,
+        ms->m_settings.m_lfo2_osc_pitch_enabled,
+        ms->m_settings.m_lfo2_pan_enabled,
+        ms->m_settings.m_lfo2_amp_enabled,
+        ms->m_settings.m_lfo2_filter_fc_intensity,
+        ms->m_settings.m_lfo2_osc_pitch_intensity,
+        ms->m_settings.m_lfo2_pan_intensity,
+        ms->m_settings.m_lfo2_amp_intensity,
 
+        // EG1
         ms->m_settings.m_eg1_filter_enabled,
-        ms->m_settings.m_eg1_filter_intensity,
-
         ms->m_settings.m_eg1_osc_enabled,
-        ms->m_settings.m_eg1_osc_intensity,
-
         ms->m_settings.m_eg1_dca_enabled,
-        ms->m_settings.m_eg1_dca_intensity,
-
         ms->m_settings.m_sustain_override,
+        ms->m_settings.m_eg1_filter_intensity,
+        ms->m_settings.m_eg1_osc_intensity,
+        ms->m_settings.m_eg1_dca_intensity,
         ms->m_settings.m_sustain_level,
-
         ms->m_settings.m_attack_time_msec,
         ms->m_settings.m_decay_time_msec,
-
         ms->m_settings.m_release_time_msec,
+        ms->base.sustain_note_ms,
 
 
         // FILTER1
         s_filter_type_names[ms->m_settings.m_filter_type],
-        // FILTER1
+        ms->m_settings.m_filter_type,
         ms->m_settings.m_fc_control,
         ms->m_settings.m_q_control
 
-
         );
 
-
-
-
-    wchar_t scratch[1024];
+    wchar_t scratch[1024] = {};
     synthbase_status(&ms->base, scratch);
     wcscat(status_string, scratch);
 }

@@ -222,7 +222,7 @@ void sample_seq_status(void *self, wchar_t *status_string)
 
     wcscat(status_string, local_status_string);
 
-    memset(local_status_string, 0, MAX_PS_STRING_SZ);
+    wmemset(local_status_string, 0, MAX_PS_STRING_SZ);
     seq_status(&seq->m_seq, local_status_string);
     wcscat(status_string, local_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);

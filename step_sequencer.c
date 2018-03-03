@@ -207,16 +207,18 @@ int sloppy_weight(sequencer *s, int position)
 
 void seq_status(sequencer *seq, wchar_t *status_string)
 {
-    wchar_t pattern_details[128];
-    char spattern[seq->pattern_len + 1];
+    wchar_t pattern_details[256];
+    wchar_t patternstr[33] = {0};
+    // char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];
     for (int i = 0; i < seq->num_patterns; i++)
     {
-        seq_char_binary_version_of_pattern(seq, seq->patterns[i], spattern);
+        // seq_char_binary_version_of_pattern(seq, seq->patterns[i], spattern);
+        pattern_to_string(seq->patterns[i], patternstr);
         wchar_version_of_amp(seq, i, apattern);
-        swprintf(pattern_details, 127,
-                 L"\n           [%d] - [%s] %ls  numloops: %d Swing: %d", i,
-                 spattern, apattern, seq->pattern_num_loops[i],
+        swprintf(pattern_details, 255,
+                 L"\n[%d]  %ls  %ls  numloops: %d Swing: %d", i, patternstr,
+                 apattern, seq->pattern_num_loops[i],
                  seq->pattern_num_swing_setting[i]);
         wcscat(status_string, pattern_details);
     }

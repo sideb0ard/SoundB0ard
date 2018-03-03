@@ -750,7 +750,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                 int six16th = atoi(wurds[i]) % 16;
                 printf("NOTE ON!! 16th:%d\n", six16th);
                 synthbase_add_note(base, base->cur_pattern, six16th,
-                                   base->root_midi_note);
+                                   base->midi_note);
             }
         }
         else if (strncmp("sustain_note_ms", wurds[0], 15) == 0)
