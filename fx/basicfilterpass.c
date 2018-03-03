@@ -37,16 +37,17 @@ filterpass *new_filterpass()
 void filterpass_status(void *self, char *status_string)
 {
     filterpass *fp = (filterpass *)self;
+    // clang-format off
     snprintf(status_string, MAX_PS_STRING_SZ,
-             "MOOGLADDER! freq:%.2f q:%.2f type:%s "
-             "lfo1_active:%d lfo1_type:%d lfo1_amp:%.2f lfo1_rate:%.2f "
-             "lfo2_active:%d lfo2_type:%d lfo2_amp:%.2f lfo2_rate:%.2f",
+             "freq:%.2f q:%.2f type:%s lfo1_active:%d lfo1_type:%d lfo1_amp:%.2f\n"
+             "lfo1_rate:%.2f lfo2_active:%d lfo2_type:%d lfo2_amp:%.2f lfo2_rate:%.2f",
              fp->m_filter.f.m_fc_control, fp->m_filter.f.m_q_control,
              filtertype_to_name[fp->m_filter.f.m_filter_type],
              fp->m_lfo1_active, fp->m_lfo1.osc.m_waveform,
              fp->m_lfo1.osc.m_amplitude, fp->m_lfo1.osc.m_osc_fo,
              fp->m_lfo2_active, fp->m_lfo2.osc.m_waveform,
              fp->m_lfo2.osc.m_amplitude, fp->m_lfo2.osc.m_osc_fo);
+    // clang-format on
 }
 
 double filterpass_process_audio(void *self, double input)
