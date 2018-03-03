@@ -88,6 +88,8 @@ void synthdrum_set_osc_wav(synthdrum_sequencer *sds, int osc_num,
 void synthdrum_set_osc_fo(synthdrum_sequencer *sds, int osc_num, double freq);
 void synthdrum_set_eg_attack(synthdrum_sequencer *sds, int eg_num, double val);
 void synthdrum_set_eg_decay(synthdrum_sequencer *sds, int eg_num, double val);
+void synthdrum_set_eg_sustain_lvl(synthdrum_sequencer *sds, int eg_num,
+                                  double val);
 void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
                                  double val);
 void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val);

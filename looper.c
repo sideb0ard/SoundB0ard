@@ -336,75 +336,64 @@ stereo_val looper_gennext(void *self)
 void looper_status(void *self, wchar_t *status_string)
 {
     looper *g = (looper *)self;
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             L"[LOOPER] vol:%.2lf source:%s loop_mode:%s loop_len:%.2f "
-             "scramble_mode:%d stutter_mode:%d extsource:%d len:%d stereo:%s\n"
-             "      audio_buffer_read_idx:%d audio_buffer_write_idx:%d "
-             "grain_duration_ms:%d grains_per_sec:%d\n"
-             "      quasi_grain_fudge:%d grain_spray_ms:%.2f "
-             "active_grains:%d highest_grain_num:%d\n"
-             "      selection_mode:%d env_mode:%s movement:%d reverse:%d "
-             "sequencer_mode:%s\n"
+    swprintf(
+        status_string, MAX_PS_STRING_SZ, WANSI_COLOR_WHITE
+        "source:%s" WCOOL_COLOR_MAUVE " vol:%.2lf loop_mode:%s loop_len:%.2f\n"
+        "scramble:%d stutter:%d stereo:%s grain_dur_ms:%d grains_per_sec:%d\n"
+        "quasi_grain_fudge:%d grain_spray_ms:%.2f active_grains:%d "
+        "highest_grain_num:%d\n"
+        "selection_mode:%d env_mode:%s movement:%d reverse:%d pitch:%.2f\n"
 
-             "\n      [grain_pitch:%f] grainpitch_lfo_on:%d\n"
-             "      lfo4_type:%d lfo4_amp:%f lfo4_rate:%f"
-             " lfo4_min:%f lfo4_max:%f \n"
+        "gp_lfo_on:%d l4_type:%d l4_amp:%.2f l4_rate:%.2f l4_min:%.2f "
+        "l4_max:%.2f\n"
+        "graindur_lfo_on:%d l1_type:%d l1_amp:%.2f l1_rate:%.2f lfo1_min:%.0f "
+        "lfo1_max:%.0f\n"
+        "grainps_lfo_on:%d l2_type:%d l2_amp:%.2f l2_rate:%.2f l2_min:%.0f "
+        "l2_max:%.2f \n"
+        "grainscan_lfo_on:%d l3_type:%d l3_amp:%.2f l3_rate:%.2f"
+        " l3_min:%.2f l3_max:%.2f \n"
+        "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
 
-             "\n      [grain_duration_ms:%d] graindur_lfo_on:%d\n"
-             "      lfo1_type:%d lfo1_amp:%f lfo1_rate:%f"
-             " lfo1_min:%f lfo1_max:%f \n"
+        g->filename, g->vol, g->loop_mode ? "true" : "false", g->loop_len,
+        g->scramble_mode, g->stutter_mode,
+        g->num_channels == 2 ? "true" : "false", g->grain_duration_ms,
+        g->grains_per_sec, g->quasi_grain_fudge,
+        g->granular_spray_frames / 44.1, g->num_active_grains,
+        g->highest_grain_num, g->selection_mode, s_env_names[g->envelope_mode],
+        g->movement_mode, g->reverse_mode,
 
-             "\n      [grains_per_sec:%d] grainps_lfo_on:%d\n"
-             "      lfo2_type:%d lfo2_amp:%f lfo2_rate:%f"
-             " lfo2_min:%f lfo2_max:%f \n"
+        g->grain_pitch, g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
+        g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
+        g->m_lfo4_max,
 
-             "\n      grainscan_lfo_on:%d lfo3_type:%d lfo3_amp:%f lfo3_rate:%f"
-             " lfo3_min:%f lfo3_max:%f \n"
+        g->grain_duration_ms, g->graindur_lfo_on, g->m_lfo1.osc.m_waveform,
+        g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
+        g->m_lfo1_max,
 
-             "      eg_amp_attack_ms:%.2f eg_amp_release_ms:%.2f eg_state:%d\n",
+        g->grains_per_sec, g->grainps_lfo_on, g->m_lfo2.osc.m_waveform,
+        g->m_lfo2.osc.m_amplitude, g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min,
+        g->m_lfo2_max,
 
-             g->vol, g->filename, g->loop_mode ? "true" : "false", g->loop_len,
-             g->scramble_mode, g->stutter_mode, g->external_source_sg,
-             g->audio_buffer_len, g->num_channels == 2 ? "true" : "false",
-             (int)g->audio_buffer_read_idx, g->audio_buffer_write_idx,
-             g->grain_duration_ms, g->grains_per_sec, g->quasi_grain_fudge,
-             g->granular_spray_frames / 44.1, g->num_active_grains,
-             g->highest_grain_num, g->selection_mode,
-             s_env_names[g->envelope_mode], g->movement_mode, g->reverse_mode,
-             g->sequencer_mode ? "true" : "false",
+        g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
+        g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
+        g->m_lfo3_max,
 
-             g->grain_pitch, g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
-             g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
-             g->m_lfo4_max,
+        g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
+        g->m_eg1.m_state);
 
-             g->grain_duration_ms, g->graindur_lfo_on, g->m_lfo1.osc.m_waveform,
-             g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
-             g->m_lfo1_max,
+    // for (int i = 0; i < g->num_active_grains; i++)
+    //{
+    //    printf("Grain[%d] active:%s start:%d durInFrames:%d pos:%f incr:%f\n",
+    //           i, g->m_grains[i].active ? "TRUE" : "FALSE",
+    //           g->m_grains[i].audiobuffer_start_idx,
+    //           g->m_grains[i].grain_len_frames,
+    //           g->m_grains[i].audiobuffer_cur_pos, g->m_grains[i].incr);
+    //}
 
-             g->grains_per_sec, g->grainps_lfo_on, g->m_lfo2.osc.m_waveform,
-             g->m_lfo2.osc.m_amplitude, g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min,
-             g->m_lfo2_max,
-
-             g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
-             g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
-             g->m_lfo3_max,
-
-             g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
-             g->m_eg1.m_state);
-
-    for (int i = 0; i < g->num_active_grains; i++)
-    {
-        printf("Grain[%d] active:%s start:%d durInFrames:%d pos:%f incr:%f\n",
-               i, g->m_grains[i].active ? "TRUE" : "FALSE",
-               g->m_grains[i].audiobuffer_start_idx,
-               g->m_grains[i].grain_len_frames,
-               g->m_grains[i].audiobuffer_cur_pos, g->m_grains[i].incr);
-    }
-
-    wchar_t seq_status_string[MAX_PS_STRING_SZ];
-    memset(seq_status_string, 0, MAX_PS_STRING_SZ);
-    seq_status(&g->m_seq, seq_status_string);
-    wcscat(status_string, seq_status_string);
+    // wchar_t seq_status_string[MAX_PS_STRING_SZ];
+    // wmemset(seq_status_string, 0, MAX_PS_STRING_SZ);
+    // seq_status(&g->m_seq, seq_status_string);
+    // wcscat(status_string, seq_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

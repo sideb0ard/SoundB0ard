@@ -142,11 +142,9 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t scratch[256] = {0};
     wchar_t patternstr[33] = {0};
 
-    printf("NUMPPATERN? %d\n", base->num_patterns);
     for (int i = 0; i < base->num_patterns; i++)
     {
         pattern_to_string(base->patterns[i], patternstr);
-        printf("PATZY? %ls\n", patternstr);
         swprintf(scratch, 255, L"\n[%d]  %ls  numloops: %d", i, patternstr,
                  base->pattern_multiloop_count[i]);
         wcscat(status_string, scratch);

@@ -49,7 +49,7 @@ const wchar_t *s_status_colors[] = {
 
 const char *s_midi_control_type_name[] = {"NONE", "SYNTH"};
 
-const char *s_sg_names[] = {"moog", "digi", "dx  ", "loop", "step", "step"};
+const char *s_sg_names[] = {"moog", "digi", "dx", "loop", "step", "step"};
 
 const double micros_per_sample = 1e6 / SAMPLE_RATE;
 const double midi_tick_len_as_percent = 1.0 / PPQN;

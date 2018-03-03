@@ -153,24 +153,24 @@ void synthdrum_randomize(synthdrum_sequencer *sds)
 void sds_status(void *self, wchar_t *ss)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    // clang-format off
     swprintf(ss, MAX_PS_STRING_SZ,
-             L"[SYNTHDRUM] Name: %s Vol: %.2f distortion_threshold:%.2f "
-             "\n      Osc1 osc1_wav:%d osc1_fo:%.2f osc1_amp:%.2f"
-             "\n      eg1_attack:%.2f eg1_decay:%.2f eg1_sustain_level:%.2f "
-             "eg1_sustain_ms:%.2f eg1_release:%.2f "
-             "\n      Osc2 osc2_wav:%d osc2_fo:%.2f osc2_amp:%.2f "
-             "mod_pitch_semitones:%d"
-             "\n      eg2_attack:%.2f eg2_decay:%.2f eg2_sustain_level:%.2f "
-             "eg2_sustain_ms:%.2f eg2_release:%.2f "
-             "eg2_osc2_int:%.2f"
-             "\n      eg3_attack:%.2f eg3_decay:%.2f eg3_sustain_level:%.2f "
-             "eg3_sustain_ms:%.2f eg3_release:%.2f"
-             "\n      filter_type:%d freq:%2.f q:%2.f",
+             WANSI_COLOR_WHITE "%s " WANSI_COLOR_RED "vol:%.2f distortion_threshold:%.2f\n"
+             "o1_wav:%d o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
+             "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_sus_ms:%.2f e1_rel:%.2f\n"
+             WANSI_COLOR_DEEP_RED
+             "o2_wav:%d o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
+             "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f eg2_sus_ms:%.2f e2_rel:%.2f\n"
+             WANSI_COLOR_RED
+             "e3_att:%.2f e3_dec:%.2f e3_sus_lvl:%.2f e3_sus_ms:%.2f e3_rel:%.2f\n"
+             WANSI_COLOR_DEEP_RED
+             "filter_type:%d freq:%.2f q:%.2f",
 
              sds->m_patch_name, sds->vol, sds->m_distortion_threshold,
 
              sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo,
-             sds->osc1_amp, sds->m_eg1.m_attack_time_msec,
+             sds->osc1_amp, sds->eg2_osc2_intensity,
+             sds->m_eg1.m_attack_time_msec,
              sds->m_eg1.m_decay_time_msec, sds->m_eg1.m_sustain_level,
              sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
              sds->m_eg1.m_release_time_msec,
@@ -179,13 +179,14 @@ void sds_status(void *self, wchar_t *ss)
              sds->mod_semitones_range, sds->m_eg2.m_attack_time_msec,
              sds->m_eg2.m_decay_time_msec, sds->m_eg2.m_sustain_level,
              sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-             sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+             sds->m_eg2.m_release_time_msec,
 
              sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
              sds->m_eg3.m_sustain_level,
              sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
              sds->m_eg3.m_release_time_msec, sds->m_filter_type,
              sds->m_filter_fc, sds->m_filter_q);
+    // clang-format on
 
     wchar_t seq_status_string[MAX_PS_STRING_SZ];
     memset(seq_status_string, 0, MAX_PS_STRING_SZ);
@@ -577,6 +578,28 @@ void synthdrum_set_eg_decay(synthdrum_sequencer *sds, int eg_num, double val)
     else
         printf("Val has to be between %d and %d\n", EG_MINTIME_MS,
                EG_MAXTIME_MS);
+}
+
+void synthdrum_set_eg_sustain_lvl(synthdrum_sequencer *sds, int eg_num,
+                                  double val)
+{
+    if (val >= 0. && val <= 1.)
+    {
+        switch (eg_num)
+        {
+        case (1):
+            eg_set_sustain_level(&sds->m_eg1, val);
+            break;
+        case (2):
+            eg_set_sustain_level(&sds->m_eg2, val);
+            break;
+        case (3):
+            eg_set_sustain_level(&sds->m_eg3, val);
+            break;
+        }
+    }
+    else
+        printf("Val has to be between 0 and 1\n");
 }
 
 void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,

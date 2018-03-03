@@ -13,8 +13,8 @@ extern const wchar_t *sparkchars;
 extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
-static char *s_dx_dest_names[] = {"DX_DEST_NONE", "DX_DEST_AMP_MOD",
-                                  "DX_DEST_VIBRATO"};
+static char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
+                                  "dx_dest_vibrato"};
 
 dxsynth *new_dxsynth(void)
 {
@@ -563,32 +563,29 @@ void dxsynth_status(void *self, wchar_t *status_string)
 {
     dxsynth *dx = (dxsynth *)self;
 
+    // clang-format off
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        L"[" WANSI_COLOR_WHITE
-        "DXSYNTH '%s' algo:%d] - Vol: %.2f Active:%s porta:%.2f "
-        "pitchrange:%d vel2attack:%d note2decay:%d dxreset2zero:%d legato:%d\n"
-        "      lfo1_intensity:%.2f lfo1_rate:%0.2f lfo1_waveform:%d "
-        "op4feedback:%.2f\n"
-        "      lfo1dest1:%s lfo1dest2:%s lfo1dest3:%s lfo1dest4:%s\n"
-        "      [Op1] op1wave:%d op1ratio:%.2f op1detune:%.2f eg1attackms:%.2f "
-        "eg1decayms:%.2f eg1sustainlvl:%.2f eg1releasems:%.2f op1output:%.2f\n"
-        "      [Op2] op2wave:%d op2ratio:%.2f op2detune:%.2f eg2attackms:%.2f "
-        "eg2decayms:%.2f eg2sustainlvl:%.2f eg2releasems:%.2f op2output:%.2f\n"
-        "      [Op3] op3wave:%d op3ratio:%.2f op3detune:%.2f eg3attackms:%.2f "
-        "eg3decayms:%.2f eg3sustainlvl:%.2f eg3releasems:%.2f op3output:%.2f\n"
-        "      [Op4] op4wave:%d op4ratio:%.2f op4detune:%.2f eg4attackms:%.2f "
-        "eg4decayms:%.2f eg4sustainlvl:%.2f eg4releasems:%.2f op4output:%.2f\n",
+        WANSI_COLOR_WHITE
+        "%s " WANSI_COLOR_CYAN "algo:%d vol: %.1f active:%s porta:%.1f pitchrange:%d op4fb:%.2f\n"
+        "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_int:%.2f l1_rate:%0.2f\n"
+        "l1_dest1:%s l1_dest2:%s l1_dest3:%s l1_dest4:%s\n"
+        "o1wav:%d o1rat:%.2f o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n"
+        "o2wav:%d o2rat:%.2f o2det:%.2f e2att:%.2f e2dec:%.2f e2sus:%.2f e2rel:%.2f\n"
+        "o3wav:%d o3rat:%.2f o3det:%.2f e3att:%.2f e3dec:%.2f e3sus:%.2f e3rel:%.2f\n"
+        "o4wav:%d o4rat:%.2f o4det:%.2f e4att:%.2f e4dec:%.2f e4sus:%.2f e4rel:%.2f\n"
+        "op1out:%.2f op2out:%.2f op3out:%.2f op4out:%.2f",
 
         dx->m_settings.m_settings_name, dx->m_settings.m_voice_mode, dx->vol,
         dx->sound_generator.active ? "true" : " false",
         dx->m_settings.m_portamento_time_ms, dx->m_settings.m_pitchbend_range,
+        dx->m_settings.m_op4_feedback,
         dx->m_settings.m_velocity_to_attack_scaling,
         dx->m_settings.m_note_number_to_decay_scaling,
         dx->m_settings.m_reset_to_zero, dx->m_settings.m_legato_mode,
 
         dx->m_settings.m_lfo1_intensity, dx->m_settings.m_lfo1_rate,
-        dx->m_settings.m_lfo1_waveform, dx->m_settings.m_op4_feedback,
+        dx->m_settings.m_lfo1_waveform,
         s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest1],
         s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest2],
         s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest3],
@@ -597,24 +594,28 @@ void dxsynth_status(void *self, wchar_t *status_string)
         dx->m_settings.m_op1_waveform, dx->m_settings.m_op1_ratio,
         dx->m_settings.m_op1_detune_cents, dx->m_settings.m_eg1_attack_ms,
         dx->m_settings.m_eg1_decay_ms, dx->m_settings.m_eg1_sustain_lvl,
-        dx->m_settings.m_eg1_release_ms, dx->m_settings.m_op1_output_lvl,
+        dx->m_settings.m_eg1_release_ms,
 
         dx->m_settings.m_op2_waveform, dx->m_settings.m_op2_ratio,
         dx->m_settings.m_op2_detune_cents, dx->m_settings.m_eg2_attack_ms,
         dx->m_settings.m_eg2_decay_ms, dx->m_settings.m_eg2_sustain_lvl,
-        dx->m_settings.m_eg2_release_ms, dx->m_settings.m_op2_output_lvl,
+        dx->m_settings.m_eg2_release_ms,
 
         dx->m_settings.m_op3_waveform, dx->m_settings.m_op3_ratio,
         dx->m_settings.m_op3_detune_cents, dx->m_settings.m_eg3_attack_ms,
         dx->m_settings.m_eg3_decay_ms, dx->m_settings.m_eg3_sustain_lvl,
-        dx->m_settings.m_eg3_release_ms, dx->m_settings.m_op3_output_lvl,
+        dx->m_settings.m_eg3_release_ms,
 
         dx->m_settings.m_op4_waveform, dx->m_settings.m_op4_ratio,
         dx->m_settings.m_op4_detune_cents, dx->m_settings.m_eg4_attack_ms,
         dx->m_settings.m_eg4_decay_ms, dx->m_settings.m_eg4_sustain_lvl,
-        dx->m_settings.m_eg4_release_ms, dx->m_settings.m_op4_output_lvl
-
+        dx->m_settings.m_eg4_release_ms,
+        dx->m_settings.m_op1_output_lvl,
+        dx->m_settings.m_op2_output_lvl,
+        dx->m_settings.m_op3_output_lvl,
+        dx->m_settings.m_op4_output_lvl
         );
+    // clang-format off
     wchar_t scratch[1024];
     synthbase_status(&dx->base, scratch);
     wcscat(status_string, scratch);
