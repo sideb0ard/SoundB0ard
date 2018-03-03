@@ -444,54 +444,62 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_keytrack(ms, val);
     else if (strncmp("legato", wurds[2], 6) == 0)
         minisynth_set_legato_mode(ms, val);
-    else if (strncmp("lfo1wave", wurds[2], 7) == 0)
+    else if (strncmp("l1wave", wurds[2], 7) == 0)
         minisynth_set_lfo_wave(ms, 1, val);
-    else if (strncmp("lfo1mode", wurds[2], 7) == 0)
+    else if (strncmp("l1mode", wurds[2], 7) == 0)
         minisynth_set_lfo_mode(ms, 1, val);
-    else if (strncmp("lfo1rate", wurds[2], 8) == 0)
+    else if (strncmp("l1rate", wurds[2], 8) == 0)
         minisynth_set_lfo_rate(ms, 1, val);
-    else if (strncmp("lfo1amp", wurds[2], 7) == 0)
+    else if (strncmp("l1amp", wurds[2], 7) == 0)
         minisynth_set_lfo_amp(ms, 1, val);
-    else if (strncmp("lfo1_osc_en", wurds[2], 16) == 0)
+    else if (strncmp("l1_osc_en", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_enable(ms, 1, val);
-    else if (strncmp("lfo1_osc_int", wurds[2], 16) == 0)
+    else if (strncmp("l1_osc_int", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_int(ms, 1, val);
-    else if (strncmp("lfo1_filter_en", wurds[2], 16) == 0)
+    else if (strncmp("l1_filter_en", wurds[2], 16) == 0)
         minisynth_set_lfo_filter_enable(ms, 1, val);
-    else if (strncmp("lfo1_filter_int", wurds[2], 21) == 0)
+    else if (strncmp("l1_filter_int", wurds[2], 21) == 0)
         minisynth_set_lfo_filter_fc_int(ms, 1, val);
-    else if (strncmp("lfo1_amp_en", wurds[2], 16) == 0)
+    else if (strncmp("l1_amp_en", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_enable(ms, 1, val);
-    else if (strncmp("lfo1_amp_int", wurds[2], 16) == 0)
+    else if (strncmp("l1_amp_int", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_int(ms, 1, val);
-    else if (strncmp("lfo1_pan_en", wurds[2], 16) == 0)
+    else if (strncmp("l1_pan_en", wurds[2], 16) == 0)
         minisynth_set_lfo_pan_enable(ms, 1, val);
-    else if (strncmp("lfo1_pan_int", wurds[2], 10) == 0)
+    else if (strncmp("l1_pan_int", wurds[2], 10) == 0)
         minisynth_set_lfo_pan_int(ms, 1, val);
-    else if (strncmp("lfo2wave", wurds[2], 7) == 0)
+    else if (strncmp("l1_pw_en", wurds[2], 16) == 0)
+        minisynth_set_lfo_pulsewidth_enable(ms, 1, val);
+    else if (strncmp("l1_pw_int", wurds[2], 10) == 0)
+        minisynth_set_lfo_pulsewidth_int(ms, 1, val);
+    else if (strncmp("l2wave", wurds[2], 7) == 0)
         minisynth_set_lfo_wave(ms, 2, val);
-    else if (strncmp("lfo2mode", wurds[2], 7) == 0)
+    else if (strncmp("l2mode", wurds[2], 7) == 0)
         minisynth_set_lfo_mode(ms, 2, val);
-    else if (strncmp("lfo2rate", wurds[2], 8) == 0)
+    else if (strncmp("l2rate", wurds[2], 8) == 0)
         minisynth_set_lfo_rate(ms, 2, val);
-    else if (strncmp("lfo2amp", wurds[2], 7) == 0)
+    else if (strncmp("l2amp", wurds[2], 7) == 0)
         minisynth_set_lfo_amp(ms, 2, val);
-    else if (strncmp("lfo2_osc_en", wurds[2], 16) == 0)
+    else if (strncmp("l2_osc_en", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_enable(ms, 2, val);
-    else if (strncmp("lfo2_osc_int", wurds[2], 16) == 0)
+    else if (strncmp("l2_osc_int", wurds[2], 16) == 0)
         minisynth_set_lfo_osc_int(ms, 2, val);
-    else if (strncmp("lfo2_filter_en", wurds[2], 16) == 0)
+    else if (strncmp("l2_filter_en", wurds[2], 16) == 0)
         minisynth_set_lfo_filter_enable(ms, 2, val);
-    else if (strncmp("lfo2_filter_int", wurds[2], 21) == 0)
+    else if (strncmp("l2_filter_int", wurds[2], 21) == 0)
         minisynth_set_lfo_filter_fc_int(ms, 2, val);
-    else if (strncmp("lfo2_amp_en", wurds[2], 16) == 0)
+    else if (strncmp("l2_amp_en", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_enable(ms, 2, val);
-    else if (strncmp("lfo2_amp_int", wurds[2], 16) == 0)
+    else if (strncmp("l2_amp_int", wurds[2], 16) == 0)
         minisynth_set_lfo_amp_int(ms, 2, val);
-    else if (strncmp("lfo2_pan_en", wurds[2], 16) == 0)
+    else if (strncmp("l2_pan_en", wurds[2], 16) == 0)
         minisynth_set_lfo_pan_enable(ms, 2, val);
-    else if (strncmp("lfo2_pan_int", wurds[2], 10) == 0)
+    else if (strncmp("l2_pan_int", wurds[2], 10) == 0)
         minisynth_set_lfo_pan_int(ms, 2, val);
+    else if (strncmp("l2_pw_en", wurds[2], 16) == 0)
+        minisynth_set_lfo_pulsewidth_enable(ms, 2, val);
+    else if (strncmp("l2_pw_int", wurds[2], 10) == 0)
+        minisynth_set_lfo_pulsewidth_int(ms, 2, val);
     else if (strncmp("load", wurds[2], 4) == 0)
     {
         char preset_name[20];
@@ -755,7 +763,8 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         }
         else if (strncmp("sustain_note_ms", wurds[0], 15) == 0)
         {
-            int sustain_note_ms = atoi(wurds[3]);
+            int sustain_note_ms = atoi(wurds[1]);
+            printf("SETTing sustain ms: %d\n", sustain_note_ms);
             if (sustain_note_ms > 0)
                 synthbase_set_sustain_note_ms(base, sustain_note_ms);
         }
@@ -770,7 +779,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         }
         else if (strncmp("import", wurds[0], 6) == 0)
         {
-            printf("Importing file %s\n", wurds[3]);
+            printf("Importing file %s\n", wurds[1]);
             synthbase_import_midi_from_file(base, wurds[3]);
         }
         else if (strncmp("keys", wurds[0], 4) == 0)

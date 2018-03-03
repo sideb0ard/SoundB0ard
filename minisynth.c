@@ -672,23 +672,23 @@ void minisynth_status(void *self, wchar_t *status_string)
         "noisedb:%.0f  octave:%d  pitchrange:%d  porta:%d  pw:%.0f  subosc:%.0f  vascale:%d zero:%d\n"
 
         WCOOL_COLOR_ORANGE
-        "lfo1wave:%s(%d)     lfo1mode:%s(%d)  lfo1rate:%04.1f    lfo1amp:%.1f\n"
-        "lfo1_filter_en:%d     lfo1_osc_en:%d     lfo1_pan_en:%d    lfo1_amp_en:%d\n"
-        "lfo1_filter_int:%4.1f lfo1_osc_int:%3.1f  lfo1_pan_int:%3.1f lfo1_amp_int:%3.1f\n"
+        "l1wave:%s(%d)     l1mode:%s(%d)  l1rate:%04.1f    l1amp:%.1f\n"
+        "l1_filter_en:%d     l1_osc_en:%d     l1_pan_en:%d    l1_amp_en:%d    l1_pw_en:%d\n"
+        "l1_filter_int:%4.1f l1_osc_int:%3.1f  l1_pan_int:%3.1f l1_amp_int:%3.1f l1_pw_int:%3.1f\n"
 
         WCOOL_COLOR_PINK
-        "lfo2wave:%s(%d)     lfo2mode:%s(%d)  lfo2rate:%04.1f    lfo2amp:%.1f\n"
-        "lfo2_filter_en:%d     lfo2_osc_en:%d     lfo2_pan_en:%d    lfo2_amp_en:%d\n"
-        "lfo2_filter_int:%3.1f  lfo2_osc_int:%3.1f  lfo2_pan_int:%3.1f lfo2_amp_int:%3.1f\n"
+        "l2wave:%s(%d)     l2mode:%s(%d)  l2rate:%04.1f    l2amp:%.1f\n"
+        "l2_filter_en:%d     l2_osc_en:%d     l2_pan_en:%d    l2_amp_en:%d    l2_pw_en:%d\n"
+        "l2_filter_int:%4.1f l2_osc_int:%3.1f  l2_pan_int:%3.1f l2_amp_int:%3.1f l2_pw_int:%3.1f\n"
 
 
         WCOOL_COLOR_ORANGE
-        "eg1_filter_en:%d      eg1_osc_en:%d      eg1_dca_en:%d     sustain:%d\n"
-        "eg1_filter_int:%.1f   eg1_osc_int:%.1f   eg1_dca_int:%.1f  sustainlvl:%.1f\n"
-        "attackms:%4.0f        decayms:%4.0f      releasems:%4.0f   sustain_note_ms:%.1f\n"
+        "eg1_filter_en:%d    eg1_osc_en:%d    eg1_dca_en:%d    sustain:%d\n"
+        "eg1_filter_int:%.1f eg1_osc_int:%.1f eg1_dca_int:%.1f sustainlvl:%.1f\n"
+        "attackms:%4.0f      decayms:%4.0f    releasems:%4.0f  sustain_note_ms:%d\n"
 
         WCOOL_COLOR_PINK
-        "filter:%s(%d)[0-8]  fc:%6.1f        fq:%4.1f"
+        "filter:%s(%d)     fc:%6.1f      fq:%4.1f"
 
         WCOOL_COLOR_YELLOW,
 
@@ -722,10 +722,12 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_lfo1_osc_pitch_enabled,
         ms->m_settings.m_lfo1_pan_enabled,
         ms->m_settings.m_lfo1_amp_enabled,
+        ms->m_settings.m_lfo1_pulsewidth_enabled,
         ms->m_settings.m_lfo1_filter_fc_intensity,
         ms->m_settings.m_lfo1_osc_pitch_intensity,
         ms->m_settings.m_lfo1_pan_intensity,
         ms->m_settings.m_lfo1_amp_intensity,
+        ms->m_settings.m_lfo1_pulsewidth_intensity,
 
         // LFO2
         s_lfo_wave_names[ms->m_settings.m_lfo2_waveform],
@@ -738,10 +740,12 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_lfo2_osc_pitch_enabled,
         ms->m_settings.m_lfo2_pan_enabled,
         ms->m_settings.m_lfo2_amp_enabled,
+        ms->m_settings.m_lfo2_pulsewidth_enabled,
         ms->m_settings.m_lfo2_filter_fc_intensity,
         ms->m_settings.m_lfo2_osc_pitch_intensity,
         ms->m_settings.m_lfo2_pan_intensity,
         ms->m_settings.m_lfo2_amp_intensity,
+        ms->m_settings.m_lfo2_pulsewidth_intensity,
 
         // EG1
         ms->m_settings.m_eg1_filter_enabled,
@@ -1952,6 +1956,24 @@ void minisynth_set_lfo_pan_enable(minisynth *ms, int lfo_num, int val)
         printf("Must be a boolean 0 or 1\n");
 }
 
+void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num, unsigned int val)
+{
+    if (val == 0 || val == 1)
+    {
+        switch (lfo_num)
+        {
+        case (1):
+            ms->m_settings.m_lfo1_pulsewidth_enabled = val;
+            break;
+        case (2):
+            ms->m_settings.m_lfo2_pulsewidth_enabled = val;
+            break;
+        }
+    }
+    else
+        printf("Must be a boolean 0 or 1\n");
+}
+
 void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val)
 {
     if (val >= 0 && val <= 1)
@@ -2005,6 +2027,25 @@ void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val)
     else
         printf("val must be between -1 and 1\n");
 }
+
+void minisynth_set_lfo_pulsewidth_int(minisynth *ms, int lfo_num, double val)
+{
+    if (val >= -1 && val <= 1)
+    {
+        switch (lfo_num)
+        {
+        case (1):
+            ms->m_settings.m_lfo1_pulsewidth_intensity = val;
+            break;
+        case (2):
+            ms->m_settings.m_lfo2_pulsewidth_intensity = val;
+            break;
+        }
+    }
+    else
+        printf("val must be between -1 and 1\n");
+}
+
 
 void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val)
 {

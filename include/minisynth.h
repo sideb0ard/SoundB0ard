@@ -244,6 +244,8 @@ void minisynth_set_lfo_osc_enable(minisynth *ms, int lfo_num, int val);
 void minisynth_set_lfo_osc_int(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val);
 void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val);
+void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num, unsigned int val);
+void minisynth_set_lfo_pulsewidth_int(minisynth *ms, int lfo_num, double val);
 
 void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_noise_osc_db(minisynth *ms, double val);

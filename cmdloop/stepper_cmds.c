@@ -17,6 +17,12 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         strncmp("step", wurds[0], 4) == 0 || strncmp("beat", wurds[0], 4) == 0)
     {
 
+        if (strncmp("ls", wurds[1], 2) == 0)
+        {
+            synthdrum_list_patches();
+            return true;
+        }
+
         int soundgen_num = -1;
         int target_pattern_num = -1;
         sscanf(wurds[1], "%d:%d", &soundgen_num, &target_pattern_num);
@@ -56,7 +62,7 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             else if (mixr->sound_generators[soundgen_num]->type ==
                      SYNTHDRUM_TYPE)
             {
-                parse_dx_command(soundgen_num, &wurds[2], num_wurds - 2);
+                parse_drumsynth_cmd(soundgen_num, &wurds[2], num_wurds - 2);
             }
         }
         return true;
@@ -64,18 +70,27 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     return false;
 }
 
-bool parse_dx_command(int soundgen_num, char wurds[][SIZE_OF_WURD],
-                      int num_wurds)
+bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
+                         int num_wurds)
 {
     (void)num_wurds;
     double val = atof(wurds[1]);
-    printf("DX! val:%f\n", val);
+    printf("Drum synth! val:%f\n", val);
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
         mixr->sound_generators[soundgen_num]->type == SYNTHDRUM_TYPE)
     {
         synthdrum_sequencer *synth =
             (synthdrum_sequencer *)mixr->sound_generators[soundgen_num];
-        if (strncmp("distortion_threshold", wurds[0], 20) == 0)
+        if (strncmp("save", wurds[0], 4) == 0)
+        {
+            synthdrum_save_patch(synth, wurds[1]);
+        }
+        if (strncmp("open", wurds[0], 4) == 0 ||
+            strncmp("load", wurds[0], 4) == 0)
+        {
+            synthdrum_open_patch(synth, wurds[1]);
+        }
+        else if (strncmp("distortion_threshold", wurds[0], 20) == 0)
         {
             synthdrum_set_distortion_threshold(synth, val);
         }

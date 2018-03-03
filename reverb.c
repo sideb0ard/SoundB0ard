@@ -34,7 +34,7 @@ reverb *new_reverb(void)
     r->m_apf_4_g = 0.6;
 
     r->m_lpf2_g2 = 0.25;
-    r->m_rt60 = 1000;
+    r->m_rt60 = 100;
     r->m_wet_pct = 50;
 
     reverb_init_reverb(r);
@@ -216,21 +216,11 @@ bool reverb_process_audio(reverb *r, double *in, double *out,
 void reverb_status(void *self, char *status_string)
 {
     reverb *r = (reverb *)self;
+    // clang-format off
     snprintf(status_string, MAX_PS_STRING_SZ,
-             "predelayms:%.2f predelayattDb:%.2f inputLPFg:%.2f lpf2g2:%2.f  "
-             "reverbtime:%.2f wetmx:%2.f APF1delayms:%.2f APF1g:%.2f "
-             "APF2delayms:%.2f APF2g:%.2f APF3delayms:%.2f APF3g:%.2f "
-             "APF4delayms:%.2f APF4g:%.2f comb1delayms:%.2f comb2delayms:%.2f "
-             "comb3delayms:%.2f comb4delayms:%.2f comb5delayms:%.2f "
-             "comb6delayms:%.2f comb7delayms:%.2f comb8delayms:%.2f",
-             r->m_pre_delay_msec, r->m_pre_delay_atten_db, r->m_input_lpf_g,
-             r->m_lpf2_g2, r->m_rt60, r->m_wet_pct, r->m_apf_1_delay_msec,
-             r->m_apf_1_g, r->m_apf_2_delay_msec, r->m_apf_2_g,
-             r->m_apf_3_delay_msec, r->m_apf_3_g, r->m_apf_4_delay_msec,
-             r->m_apf_4_g, r->m_comb_1_delay_msec, r->m_comb_2_delay_msec,
-             r->m_comb_3_delay_msec, r->m_comb_4_delay_msec,
-             r->m_comb_5_delay_msec, r->m_comb_6_delay_msec,
-             r->m_comb_7_delay_msec, r->m_comb_8_delay_msec);
+             "predelayms:%.2f reverbtime:%.0f wetmx:%.1f",
+             r->m_pre_delay_msec, r->m_rt60, r->m_wet_pct);
+    // clang-format on
 }
 
 double reverb_process_wrapper(void *self, double input)
