@@ -179,7 +179,8 @@ void synthbase_event_notify(void *self, unsigned int event_type)
         idx = mixr->timing_info.midi_tick % PPBAR;
         if (base->patterns[base->cur_pattern][idx].event_type)
         {
-            midi_parse_midi_event(parent,  &base->patterns[base->cur_pattern][idx]);
+            midi_parse_midi_event(parent,
+                                  &base->patterns[base->cur_pattern][idx]);
         }
 
         break;

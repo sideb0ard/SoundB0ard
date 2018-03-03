@@ -10,24 +10,15 @@
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
-void convert_bit_pattern_to_step_pattern(int bitpattern, int bitpattern_len,
-                                         int *pattern_array,
-                                         int len_pattern_array)
+void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
+                                         midi_event *pattern, int len_pattern)
 {
-    int len = sizeof(short) * 8; // TODO: need to clarify this
-    int shiftor = len - 1;
-    double multiplier = len_pattern_array / bitpattern_len;
 
-    int idx = 0;
     for (int i = 0; i < bitpattern_len; i++)
     {
-        if (bitpattern & 1 << shiftor)
-        {
-            idx = i * multiplier;
-            if (idx < len_pattern_array)
-                pattern_array[idx] = 1;
-        }
-        shiftor--;
+        int shift_by = bitpattern_len - 1 - i;
+        if (bitpattern & 1 << shift_by)
+            pattern[i * PPSIXTEENTH].event_type = MIDI_ON;
     }
 }
 

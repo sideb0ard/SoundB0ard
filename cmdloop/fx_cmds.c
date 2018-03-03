@@ -196,34 +196,35 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     else if (strncmp("fx", wurds[0], 2) == 0)
     {
-        int soundgen_num = atoi(wurds[1]);
-        int fx_num = atoi(wurds[2]);
+        int soundgen_num = -1;
+        int fx_num = -1;
+        sscanf(wurds[1], "%d:%d", &soundgen_num, &fx_num);
         if (is_valid_fx_num(soundgen_num, fx_num))
         {
             fx *f = mixr->sound_generators[soundgen_num]->effects[fx_num];
 
-            if (strncmp("on", wurds[3], 2) == 0)
+            if (strncmp("on", wurds[2], 2) == 0)
                 f->enabled = true;
-            else if (strncmp("off", wurds[3], 3) == 0)
+            else if (strncmp("off", wurds[2], 3) == 0)
                 f->enabled = false;
-            else if (strncmp("toggle", wurds[3], 6) == 0)
+            else if (strncmp("toggle", wurds[2], 6) == 0)
                 f->enabled = 1 - f->enabled;
             else if (f->type == DELAY)
             {
                 // printf("Changing Dulay!\n");
                 stereodelay *sd = (stereodelay *)f;
-                double val = atof(wurds[4]);
+                double val = atof(wurds[3]);
                 // keep these strings in sync with status()
                 // output
-                if (strncmp("delayms", wurds[3], 7) == 0)
+                if (strncmp("delayms", wurds[2], 7) == 0)
                     stereo_delay_set_delay_time_ms(sd, val);
-                else if (strncmp("fb", wurds[3], 2) == 0)
+                else if (strncmp("fb", wurds[2], 2) == 0)
                     stereo_delay_set_feedback_percent(sd, val);
-                else if (strncmp("ratio", wurds[3], 5) == 0)
+                else if (strncmp("ratio", wurds[2], 5) == 0)
                     stereo_delay_set_delay_ratio(sd, val);
-                else if (strncmp("wetmx", wurds[3], 5) == 0)
+                else if (strncmp("wetmx", wurds[2], 5) == 0)
                     stereo_delay_set_wet_mix(sd, val);
-                else if (strncmp("mode", wurds[3], 4) == 0)
+                else if (strncmp("mode", wurds[2], 4) == 0)
                     stereo_delay_set_mode(sd, val);
                 else
                     printf("<bleurgh!>\n");
@@ -231,196 +232,196 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             else if (f->type == COMPRESSOR)
             {
                 dynamics_processor *dp = (dynamics_processor *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("inputgain", wurds[3], 9) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("inputgain", wurds[2], 9) == 0)
                     dynamics_processor_set_inputgain_db(dp, val);
-                else if (strncmp("threshold", wurds[3], 9) == 0)
+                else if (strncmp("threshold", wurds[2], 9) == 0)
                     dynamics_processor_set_threshold(dp, val);
-                else if (strncmp("attackms", wurds[3], 8) == 0)
+                else if (strncmp("attackms", wurds[2], 8) == 0)
                     dynamics_processor_set_attack_ms(dp, val);
-                else if (strncmp("releasems", wurds[3], 9) == 0)
+                else if (strncmp("releasems", wurds[2], 9) == 0)
                     dynamics_processor_set_release_ms(dp, val);
-                else if (strncmp("ratio", wurds[3], 5) == 0)
+                else if (strncmp("ratio", wurds[2], 5) == 0)
                     dynamics_processor_set_ratio(dp, val);
-                else if (strncmp("outputgain", wurds[3], 10) == 0)
+                else if (strncmp("outputgain", wurds[2], 10) == 0)
                     dynamics_processor_set_outputgain_db(dp, val);
-                else if (strncmp("kneewidth", wurds[3], 9) == 0)
+                else if (strncmp("kneewidth", wurds[2], 9) == 0)
                     dynamics_processor_set_knee_width(dp, val);
-                else if (strncmp("lookahead", wurds[3], 9) == 0)
+                else if (strncmp("lookahead", wurds[2], 9) == 0)
                     dynamics_processor_set_lookahead_delay_ms(dp, val);
-                else if (strncmp("stereolink", wurds[3], 9) == 0)
+                else if (strncmp("stereolink", wurds[2], 9) == 0)
                     dynamics_processor_set_stereo_link(dp, val);
-                else if (strncmp("type", wurds[3], 4) == 0)
+                else if (strncmp("type", wurds[2], 4) == 0)
                     dynamics_processor_set_processor_type(dp, val);
-                else if (strncmp("mode", wurds[3], 4) == 0)
+                else if (strncmp("mode", wurds[2], 4) == 0)
                     dynamics_processor_set_time_constant(dp, val);
-                else if (strncmp("extsource", wurds[3], 9) == 0)
+                else if (strncmp("extsource", wurds[2], 9) == 0)
                     dynamics_processor_set_external_source(dp, val);
-                else if (strncmp("def", wurds[3], 3) == 0 ||
-                         strncmp("default", wurds[3], 7) == 0)
+                else if (strncmp("def", wurds[2], 3) == 0 ||
+                         strncmp("default", wurds[2], 7) == 0)
                     dynamics_processor_set_default_sidechain_params(dp);
             }
             else if (f->type == REVERB)
             {
                 reverb *r = (reverb *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("predelayms", wurds[3], 10) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("predelayms", wurds[2], 10) == 0)
                     reverb_set_pre_delay_msec(r, val);
-                else if (strncmp("predelayattDb", wurds[3], 13) == 0)
+                else if (strncmp("predelayattDb", wurds[2], 13) == 0)
                     reverb_set_pre_delay_atten_db(r, val);
-                else if (strncmp("inputLPFg", wurds[3], 9) == 0)
+                else if (strncmp("inputLPFg", wurds[2], 9) == 0)
                     reverb_set_input_lpf_g(r, val);
-                else if (strncmp("lpf2g2", wurds[3], 6) == 0)
+                else if (strncmp("lpf2g2", wurds[2], 6) == 0)
                     reverb_set_lpf2_g2(r, val);
-                else if (strncmp("reverbtime", wurds[3], 10) == 0)
+                else if (strncmp("reverbtime", wurds[2], 10) == 0)
                     reverb_set_rt60(r, val);
-                else if (strncmp("wetmx", wurds[3], 5) == 0)
+                else if (strncmp("wetmx", wurds[2], 5) == 0)
                     reverb_set_wet_pct(r, val);
-                else if (strncmp("APF1delayms", wurds[3], 11) == 0)
+                else if (strncmp("APF1delayms", wurds[2], 11) == 0)
                     reverb_set_apf_delay_msec(r, 1, val);
-                else if (strncmp("APF1g", wurds[3], 5) == 0)
+                else if (strncmp("APF1g", wurds[2], 5) == 0)
                     reverb_set_apf_g(r, 1, val);
-                else if (strncmp("APF2delayms", wurds[3], 11) == 0)
+                else if (strncmp("APF2delayms", wurds[2], 11) == 0)
                     reverb_set_apf_delay_msec(r, 2, val);
-                else if (strncmp("APF2g", wurds[3], 5) == 0)
+                else if (strncmp("APF2g", wurds[2], 5) == 0)
                     reverb_set_apf_g(r, 2, val);
-                else if (strncmp("APF3delayms", wurds[3], 11) == 0)
+                else if (strncmp("APF3delayms", wurds[2], 11) == 0)
                     reverb_set_apf_delay_msec(r, 3, val);
-                else if (strncmp("APF3g", wurds[3], 5) == 0)
+                else if (strncmp("APF3g", wurds[2], 5) == 0)
                     reverb_set_apf_g(r, 3, val);
-                else if (strncmp("APF4delayms", wurds[3], 11) == 0)
+                else if (strncmp("APF4delayms", wurds[2], 11) == 0)
                     reverb_set_apf_delay_msec(r, 4, val);
-                else if (strncmp("APF4g", wurds[3], 5) == 0)
+                else if (strncmp("APF4g", wurds[2], 5) == 0)
                     reverb_set_apf_g(r, 4, val);
-                else if (strncmp("comb1delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb1delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 1, val);
-                else if (strncmp("comb2delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb2delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 2, val);
-                else if (strncmp("comb3delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb3delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 3, val);
-                else if (strncmp("comb4delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb4delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 4, val);
-                else if (strncmp("comb5delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb5delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 5, val);
-                else if (strncmp("comb6delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb6delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 6, val);
-                else if (strncmp("comb7delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb7delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 7, val);
-                else if (strncmp("comb8delayms", wurds[3], 12) == 0)
+                else if (strncmp("comb8delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 8, val);
             }
             else if (f->type == WAVESHAPER)
             {
                 waveshaper *ws = (waveshaper *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("k_pos", wurds[3], 5) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("k_pos", wurds[2], 5) == 0)
                     waveshaper_set_arc_tan_k_pos(ws, val);
-                else if (strncmp("k_neg", wurds[3], 5) == 0)
+                else if (strncmp("k_neg", wurds[2], 5) == 0)
                     waveshaper_set_arc_tan_k_neg(ws, val);
-                else if (strncmp("stages", wurds[3], 5) == 0)
+                else if (strncmp("stages", wurds[2], 5) == 0)
                     waveshaper_set_stages(ws, val);
-                else if (strncmp("invert", wurds[3], 5) == 0)
+                else if (strncmp("invert", wurds[2], 5) == 0)
                     waveshaper_set_invert_stages(ws, val);
             }
             else if (f->type == BITCRUSH)
             {
                 bitcrush *bc = (bitcrush *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("bitdepth", wurds[3], 8) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("bitdepth", wurds[2], 8) == 0)
                     bitcrush_set_bitdepth(bc, val);
-                else if (strncmp("bitrate", wurds[3], 7) == 0)
+                else if (strncmp("bitrate", wurds[2], 7) == 0)
                     bitcrush_set_bitrate(bc, val);
-                else if (strncmp("sample_hold_freq", wurds[3], 16) == 0)
+                else if (strncmp("sample_hold_freq", wurds[2], 16) == 0)
                     bitcrush_set_sample_hold_freq(bc, val);
             }
             else if (f->type == BASICFILTER)
             {
                 filterpass *fp = (filterpass *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("freq", wurds[3], 4) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("freq", wurds[2], 4) == 0)
                     filter_set_fc_control(&fp->m_filter.f, val);
-                else if (strncmp("q", wurds[3], 4) == 0)
+                else if (strncmp("q", wurds[2], 4) == 0)
                     moog_set_qcontrol(&fp->m_filter.f, val);
-                else if (strncmp("type", wurds[3], 4) == 0)
+                else if (strncmp("type", wurds[2], 4) == 0)
                     filter_set_type(&fp->m_filter.f, val);
-                else if (strncmp("lfo1_active", wurds[3], 11) == 0)
+                else if (strncmp("lfo1_active", wurds[2], 11) == 0)
                     filterpass_set_lfo_active(fp, 1, val);
-                else if (strncmp("lfo1_type", wurds[3], 9) == 0)
+                else if (strncmp("lfo1_type", wurds[2], 9) == 0)
                     filterpass_set_lfo_type(fp, 1, val);
-                else if (strncmp("lfo1_amp", wurds[3], 9) == 0)
+                else if (strncmp("lfo1_amp", wurds[2], 9) == 0)
                     filterpass_set_lfo_amp(fp, 1, val);
-                else if (strncmp("lfo1_rate", wurds[3], 9) == 0)
+                else if (strncmp("lfo1_rate", wurds[2], 9) == 0)
                     filterpass_set_lfo_rate(fp, 1, val);
-                else if (strncmp("lfo2_active", wurds[3], 11) == 0)
+                else if (strncmp("lfo2_active", wurds[2], 11) == 0)
                     filterpass_set_lfo_active(fp, 2, val);
-                else if (strncmp("lfo2_type", wurds[3], 9) == 0)
+                else if (strncmp("lfo2_type", wurds[2], 9) == 0)
                     filterpass_set_lfo_type(fp, 2, val);
-                else if (strncmp("lfo2_amp", wurds[3], 9) == 0)
+                else if (strncmp("lfo2_amp", wurds[2], 9) == 0)
                     filterpass_set_lfo_amp(fp, 2, val);
-                else if (strncmp("lfo2_rate", wurds[3], 9) == 0)
+                else if (strncmp("lfo2_rate", wurds[2], 9) == 0)
                     filterpass_set_lfo_rate(fp, 3, val);
             }
             else if (f->type == BEATREPEAT)
             {
                 beatrepeat *br = (beatrepeat *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("numbeats", wurds[3], 8) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("numbeats", wurds[2], 8) == 0)
                     beatrepeat_change_num_beats_to_repeat(br, val);
-                else if (strncmp("sixteenth", wurds[3], 9) == 0)
+                else if (strncmp("sixteenth", wurds[2], 9) == 0)
                     beatrepeat_change_selected_sixteenth(br, val);
             }
             else if (f->type == DISTORTION)
             {
                 distortion *d = (distortion *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("threshold", wurds[3], 9) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("threshold", wurds[2], 9) == 0)
                     distortion_set_threshold(d, val);
             }
             else if (f->type == ENVELOPEFOLLOWER)
             {
                 envelope_follower *ef = (envelope_follower *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("pregain", wurds[3], 4) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("pregain", wurds[2], 4) == 0)
                     envelope_follower_set_pregain_db(ef, val);
-                else if (strncmp("threshold", wurds[3], 9) == 0)
+                else if (strncmp("threshold", wurds[2], 9) == 0)
                     envelope_follower_set_threshold(ef, val);
-                else if (strncmp("attackms", wurds[3], 8) == 0)
+                else if (strncmp("attackms", wurds[2], 8) == 0)
                     envelope_follower_set_attack_ms(ef, val);
-                else if (strncmp("releasems", wurds[3], 9) == 0)
+                else if (strncmp("releasems", wurds[2], 9) == 0)
                     envelope_follower_set_release_ms(ef, val);
-                else if (strncmp("q", wurds[3], 1) == 0)
+                else if (strncmp("q", wurds[2], 1) == 0)
                     envelope_follower_set_q(ef, val);
-                else if (strncmp("mode", wurds[3], 4) == 0)
+                else if (strncmp("mode", wurds[2], 4) == 0)
                     envelope_follower_set_time_constant(ef, val);
-                else if (strncmp("dir", wurds[3], 4) == 0)
+                else if (strncmp("dir", wurds[2], 4) == 0)
                     envelope_follower_set_direction(ef, val);
             }
 
             else if (f->type == MODDELAY)
             {
                 mod_delay *md = (mod_delay *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("depth", wurds[3], 5) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("depth", wurds[2], 5) == 0)
                 {
                     mod_delay_set_depth(md, val);
                 }
-                else if (strncmp("rate", wurds[3], 4) == 0)
+                else if (strncmp("rate", wurds[2], 4) == 0)
                 {
                     mod_delay_set_rate(md, val);
                 }
-                else if (strncmp("fb", wurds[3], 8) == 0)
+                else if (strncmp("fb", wurds[2], 8) == 0)
                 {
                     mod_delay_set_feedback_percent(md, val);
                 }
-                else if (strncmp("offset", wurds[3], 12) == 0)
+                else if (strncmp("offset", wurds[2], 12) == 0)
                 {
                     mod_delay_set_chorus_offset(md, val);
                 }
-                else if (strncmp("type", wurds[3], 7) == 0)
+                else if (strncmp("type", wurds[2], 7) == 0)
                 {
                     mod_delay_set_mod_type(md, (unsigned int)val);
                 }
-                else if (strncmp("lfo", wurds[3], 7) == 0)
+                else if (strncmp("lfo", wurds[2], 7) == 0)
                 {
                     mod_delay_set_lfo_type(md, (unsigned int)val);
                 }
@@ -428,28 +429,28 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             else if (f->type == MODFILTER)
             {
                 modfilter *mf = (modfilter *)f;
-                double val = atof(wurds[4]);
-                if (strncmp("depthfc", wurds[3], 7) == 0)
+                double val = atof(wurds[3]);
+                if (strncmp("depthfc", wurds[2], 7) == 0)
                 {
                     modfilter_set_mod_depth_fc(mf, val);
                 }
-                else if (strncmp("ratefc", wurds[3], 6) == 0)
+                else if (strncmp("ratefc", wurds[2], 6) == 0)
                 {
                     modfilter_set_mod_rate_fc(mf, val);
                 }
-                else if (strncmp("depthq", wurds[3], 6) == 0)
+                else if (strncmp("depthq", wurds[2], 6) == 0)
                 {
                     modfilter_set_mod_depth_q(mf, val);
                 }
-                else if (strncmp("rateq", wurds[3], 5) == 0)
+                else if (strncmp("rateq", wurds[2], 5) == 0)
                 {
                     modfilter_set_mod_rate_q(mf, val);
                 }
-                else if (strncmp("phase", wurds[3], 8) == 0)
+                else if (strncmp("phase", wurds[2], 8) == 0)
                 {
                     modfilter_set_lfo_phase(mf, val);
                 }
-                else if (strncmp("lfo", wurds[3], 3) == 0)
+                else if (strncmp("lfo", wurds[2], 3) == 0)
                 {
                     modfilter_set_lfo_waveform(mf, val);
                 }
@@ -465,10 +466,12 @@ bool is_valid_fx_num(int soundgen_num, int fx_num)
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
         if (mixr->sound_generators[soundgen_num]->effects_num > 0 &&
+            fx_num >= 0 &&
             fx_num < mixr->sound_generators[soundgen_num]->effects_num)
         {
             return true;
         }
     }
+    printf("FX %d isn't valid\n", fx_num);
     return false;
 }

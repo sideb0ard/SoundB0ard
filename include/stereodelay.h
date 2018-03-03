@@ -7,7 +7,7 @@
 #include "fx.h"
 #include "lfo.h"
 
-typedef enum { NORM, TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;
+typedef enum { TAP1, TAP2, PINGPONG, MAX_NUM_DELAY_MODE } delay_mode;
 
 typedef struct stereodelay
 {

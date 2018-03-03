@@ -224,15 +224,14 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
     return true;
 }
 
+static char *s_delay_mode[] = {"tap1", "tap2", "pingpong"};
 void stereo_delay_status(void *self, char *status_string)
 {
     stereodelay *sd = (stereodelay *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "delayms:%.2f fb:%.2f ratio:%.2f "
-                                              "wetmx:%.2f mode:%d "
-                                              "tap2left:%.2f tap2right:%.2f",
+    snprintf(status_string, MAX_PS_STRING_SZ, "delayms:%.0f fb:%.2f ratio:%.2f "
+                                              "wetmx:%.2f mode:%s(%d)",
              sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio,
-             sd->m_wet_mix, sd->m_mode, sd->m_tap2_left_delay_time_ms,
-             sd->m_tap2_right_delay_time_ms);
+             sd->m_wet_mix, s_delay_mode[sd->m_mode], sd->m_mode);
 }
 
 double stereo_delay_process_wrapper(void *self, double input)

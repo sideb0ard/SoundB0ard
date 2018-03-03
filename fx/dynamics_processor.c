@@ -221,11 +221,11 @@ void dynamics_processor_set_time_constant(dynamics_processor *dp,
 void dynamics_processor_status(void *self, char *status_string)
 {
     dynamics_processor *dp = (dynamics_processor *)self;
+    // clang-format off
     snprintf(status_string, MAX_PS_STRING_SZ,
-             "inputgain:%.2f threshold:%.2f attackms:%.2f releasems:%.2f "
-             "ratio:%.2f outputgain:%.2f kneewidth:%.2f lookahead:%.2f "
-             "sterolink:%s(%d)"
-             "\n      [type:%s(%d) mode:%s(%d) extsource:%s(%d)",
+             "inputgain:%.2f threshold:%.2f attackms:%.2f releasems:%.2f ratio:%.2f\n"
+             "outputgain:%.2f kneewidth:%.2f lookahead:%.2f sterolink:%s(%d)"
+             "\ntype:%s(%d) mode:%s(%d) extsource:%s(%d)",
              dp->m_inputgain_db, dp->m_threshold, dp->m_attack_ms,
              dp->m_release_ms, dp->m_ratio, dp->m_outputgain_db,
              dp->m_knee_width, dp->m_lookahead_delay_ms,
@@ -234,6 +234,7 @@ void dynamics_processor_status(void *self, char *status_string)
              dp->m_processor_type, dp->m_time_constant ? "DIGITAL" : "ANALOG",
              dp->m_time_constant, dp->m_external_source < 0 ? "off" : "on",
              dp->m_external_source);
+    // clang-format on
 }
 
 double dynamics_processor_process(void *self, double input)

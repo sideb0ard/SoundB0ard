@@ -126,14 +126,13 @@ bool seq_tick(sequencer *seq)
                             char bit_string[17];
                             char_binary_version_of_short(bit_pattern,
                                                          bit_string);
-                            printf("New pattern: %s\n", bit_string);
                         }
 
                         memset(&seq->patterns[seq->cur_pattern], 0,
                                PPBAR * sizeof(midi_event));
-                        convert_bit_pattern_to_step_pattern(
+                        convert_bit_pattern_to_midi_pattern(
                             bit_pattern, bit_pattern_len,
-                            (int *)&seq->patterns[seq->cur_pattern], PPBAR);
+                            seq->patterns[seq->cur_pattern], PPBAR);
                         seq->pattern_len = bit_pattern_len;
                     }
                 }

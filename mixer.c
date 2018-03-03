@@ -232,14 +232,14 @@ void mixer_ps(mixer *mixr)
                             printf(ANSI_COLOR_RESET);
                         char fx_status[512];
                         f->status(f, fx_status);
-                        printf("\n      [fx %d:%d %s]", i, j, fx_status);
+                        printf("\n[fx %d:%d %s]", i, j, fx_status);
                     }
                     printf(ANSI_COLOR_RESET);
                     printf(COOL_COLOR_GREEN);
                     for (int j = 0;
                          j < mixr->sound_generators[i]->envelopes_num; j++)
                     {
-                        printf("\n      [envelope]\n");
+                        printf("\n[envelope]");
                     }
                     printf(ANSI_COLOR_RESET);
                 }

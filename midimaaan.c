@@ -312,9 +312,7 @@ void midi_event_cp(midi_event *from, midi_event *to)
     to->delete_after_use = from->delete_after_use;
 }
 
-void midi_event_clear(midi_event *ev) {
-    memset(ev, 0, sizeof(midi_event));
-}
+void midi_event_clear(midi_event *ev) { memset(ev, 0, sizeof(midi_event)); }
 
 int get_midi_note_from_string(char *string)
 {

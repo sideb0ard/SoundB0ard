@@ -674,7 +674,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         WCOOL_COLOR_ORANGE
         "lfo1wave:%s(%d)     lfo1mode:%s(%d)  lfo1rate:%04.1f    lfo1amp:%.1f\n"
         "lfo1_filter_en:%d     lfo1_osc_en:%d     lfo1_pan_en:%d    lfo1_amp_en:%d\n"
-        "lfo1_filter_int:%3.1f  lfo1_osc_int:%3.1f  lfo1_pan_int:%3.1f lfo1_amp_int:%3.1f\n"
+        "lfo1_filter_int:%4.1f lfo1_osc_int:%3.1f  lfo1_pan_int:%3.1f lfo1_amp_int:%3.1f\n"
 
         WCOOL_COLOR_PINK
         "lfo2wave:%s(%d)     lfo2mode:%s(%d)  lfo2rate:%04.1f    lfo2amp:%.1f\n"
