@@ -960,8 +960,8 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
         return false;
     }
     printf("Saving '%s' settings for Minisynth to file %s\n", preset_name,
-           PRESET_FILENAME);
-    FILE *presetzzz = fopen(PRESET_FILENAME, "a+");
+           MOOG_PRESET_FILENAME);
+    FILE *presetzzz = fopen(MOOG_PRESET_FILENAME, "a+");
     if (presetzzz == NULL)
     {
         printf("Couldn't save settings!!\n");
@@ -1165,26 +1165,9 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
     return true;
 }
 
-bool minisynth_list_presets()
-{
-    FILE *presetzzz = fopen(PRESET_FILENAME, "r+");
-    if (presetzzz == NULL)
-        return false;
-
-    char line[256];
-    while (fgets(line, sizeof(line), presetzzz))
-    {
-        printf("%s\n", line);
-    }
-
-    fclose(presetzzz);
-
-    return true;
-}
-
 bool minisynth_check_if_preset_exists(char *preset_to_find)
 {
-    FILE *presetzzz = fopen(PRESET_FILENAME, "r+");
+    FILE *presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
     if (presetzzz == NULL)
         return false;
 
@@ -1216,7 +1199,7 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
     char setting_val[512];
     double scratch_val = 0.;
 
-    FILE *presetzzz = fopen(PRESET_FILENAME, "r+");
+    FILE *presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
     if (presetzzz == NULL)
         return false;
 

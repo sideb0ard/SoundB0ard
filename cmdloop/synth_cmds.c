@@ -19,7 +19,14 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp(wurds[1], "ls", 2) == 0)
         {
-            minisynth_list_presets();
+            if (strncmp("moog", wurds[0], 4) == 0)
+            {
+                synthbase_list_presets(MINISYNTH_TYPE);
+            }
+            else if (strncmp("dx", wurds[0], 2) == 0)
+            {
+                synthbase_list_presets(DXSYNTH_TYPE);
+            }
             return true;
         }
 
@@ -74,6 +81,15 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     {
         int algo = atoi(wurds[3]);
         dxsynth_set_voice_mode(dx, algo);
+    }
+    else if (strncmp("open", wurds[2], 4) == 0 ||
+             strncmp("load", wurds[2], 4) == 0)
+    {
+        dxsynth_load_settings(dx, wurds[3]);
+    }
+    else if (strncmp("save", wurds[2], 4) == 0)
+    {
+        dxsynth_save_settings(dx, wurds[3]);
     }
     else if (strncmp("porta", wurds[2], 5) == 0)
     {
@@ -137,7 +153,7 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
         dxsynth_set_lfo1_rate(dx, val);
         return true;
     }
-    else if (strncmp("l1_wave", wurds[2], 13) == 0)
+    else if (strncmp("l1_wav", wurds[2], 13) == 0)
     {
         unsigned int val = atoi(wurds[3]);
         printf("DXSynth change LFO1 waveform:%d!\n", val);

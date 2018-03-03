@@ -41,13 +41,14 @@ void minisynth_voice_init(minisynth_voice *msv)
     msv->m_voice.m_osc4 = (oscillator *)&msv->m_osc4;
 
     // initialize my filter
-    filter_moog_init(&msv->m_moog_ladder_filter);
+    filter_moog_init(&msv->m_filter);
+    // filter_ck35_init(&msv->m_filter);
 
     // attach to base class
-    msv->m_voice.m_filter1 = (filter *)&msv->m_moog_ladder_filter;
+    msv->m_voice.m_filter1 = (filter *)&msv->m_filter;
     msv->m_voice.m_filter2 = NULL;
 
-    msv->m_moog_ladder_filter.f.m_aux_control = 0.0;
+    msv->m_filter.f.m_aux_control = 0.0;
 
     // voice mode 0
     msv->m_osc1.osc.m_waveform = SAW1;
@@ -297,7 +298,8 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     do_modulation_matrix(&msv->m_voice.m_v_modmatrix, 1);
 
     dca_update(&msv->m_voice.m_dca);
-    moog_update((filter *)&msv->m_moog_ladder_filter);
+    // msv->m_filter.f.update((filter *)&msv->m_filter);
+    moog_update((filter *)&msv->m_filter);
 
     osc_update((oscillator *)&msv->m_osc1);
     osc_update((oscillator *)&msv->m_osc2);
@@ -310,7 +312,8 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
                      0.333 * qb_do_oscillate((oscillator *)&msv->m_osc4, NULL);
 
     double filter_out =
-        moog_gennext((filter *)&msv->m_moog_ladder_filter, osc_mix);
+        // msv->m_filter.f.gennext((filter *)&msv->m_filter, osc_mix);
+        moog_gennext((filter *)&msv->m_filter, osc_mix);
 
     dca_gennext(&msv->m_voice.m_dca, filter_out, filter_out, left_output,
                 right_output);
@@ -320,7 +323,8 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
 
 void minisynth_voice_set_filter_mod(minisynth_voice *ms, double mod)
 {
-    filter_set_fc_mod(&ms->m_moog_ladder_filter.f, mod);
+    // filter_set_fc_mod(&ms->m_moog_ladder_filter.f, mod);
+    ms->m_filter.f.set_fc_mod(&ms->m_filter.f, mod);
 }
 
 void minisynth_voice_free_self(minisynth_voice *ms) { free(ms); }

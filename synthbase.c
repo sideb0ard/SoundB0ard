@@ -524,3 +524,30 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
         }
     }
 }
+
+bool synthbase_list_presets(unsigned int synthtype)
+{
+    FILE *presetzzz = NULL;
+    switch (synthtype)
+    {
+    case (MINISYNTH_TYPE):
+        presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
+        break;
+    case (DXSYNTH_TYPE):
+        presetzzz = fopen(DX_PRESET_FILENAME, "r+");
+        break;
+    }
+
+    if (presetzzz == NULL)
+        return false;
+
+    char line[256];
+    while (fgets(line, sizeof(line), presetzzz))
+    {
+        printf("%s\n", line);
+    }
+
+    fclose(presetzzz);
+
+    return true;
+}

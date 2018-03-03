@@ -10,6 +10,12 @@
 filter_ck35 *new_filter_ck35()
 {
     filter_ck35 *ck35 = (filter_ck35 *)calloc(1, sizeof(filter_ck35));
+    filter_ck35_init(ck35);
+    return ck35;
+}
+
+void filter_ck35_init(filter_ck35 *ck35)
+{
     filter_setup(&ck35->f);
 
     onepole_setup(&ck35->m_LPF1);
@@ -33,8 +39,6 @@ filter_ck35 *new_filter_ck35()
     ck35->f.gennext = &ck_gennext;
     ck35->f.update = &ck_update;
     ck35->f.reset = &filter_reset;
-
-    return ck35;
 }
 
 void ck_set_qcontrol(filter *f, double qcontrol)

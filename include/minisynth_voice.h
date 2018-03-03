@@ -1,5 +1,6 @@
 #pragma once
 
+#include "filter_ckthreefive.h"
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
 #include "voice.h"
@@ -28,7 +29,8 @@ typedef struct
     // wt_oscillator m_osc3;
     // wt_oscillator m_osc4;
 
-    filter_moogladder m_moog_ladder_filter;
+    filter_moogladder m_filter;
+    // filter_ckthreefive m_filter;
 
 } minisynth_voice;
 

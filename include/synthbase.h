@@ -74,9 +74,13 @@ typedef struct synthbase
 
 } synthbase;
 
+static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
+static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
+
 void synthbase_init(synthbase *base, void *parent,
                     unsigned int parent_synth_type);
 
+bool synthbase_list_presets(unsigned int type);
 void synthbase_set_sample_rate(synthbase *base, int sample_rate);
 void synthbase_status(synthbase *base, wchar_t *status_string);
 void synthbase_event_notify(void *self, unsigned int event_type);

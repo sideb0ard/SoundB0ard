@@ -15,8 +15,6 @@
 
 #define MAX_DX_VOICES 16
 
-static const char DX_PRESET_FILENAME[] = "settings/dxsynthpresets.dat";
-
 enum
 {
     DX1,

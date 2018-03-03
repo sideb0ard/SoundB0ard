@@ -16,8 +16,6 @@
 #include "minisynth_voice.h"
 #include "synthbase.h"
 
-static const char PRESET_FILENAME[] = "settings/synthpresets.dat";
-
 typedef struct synthsettings
 {
     char m_settings_name[256];
@@ -195,7 +193,6 @@ void minisynth_print_eg2_routing_info(minisynth *ms, wchar_t *scratch);
 
 bool minisynth_save_settings(minisynth *ms, char *preset_name);
 bool minisynth_load_settings(minisynth *ms, char *preset_name);
-bool minisynth_list_presets(void);
 bool minisynth_check_if_preset_exists(char *preset_to_find);
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b);
@@ -244,7 +241,8 @@ void minisynth_set_lfo_osc_enable(minisynth *ms, int lfo_num, int val);
 void minisynth_set_lfo_osc_int(minisynth *ms, int lfo_num, double val);
 void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val);
 void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val);
-void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num, unsigned int val);
+void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num,
+                                         unsigned int val);
 void minisynth_set_lfo_pulsewidth_int(minisynth *ms, int lfo_num, double val);
 
 void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
