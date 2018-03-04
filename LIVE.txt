@@ -38,6 +38,10 @@ melody c3 f3 dm3 am3
 
 
 new step kicks/garageKick.aiff bd*4
+moog drexy
+moog 0:0 f3*2 c2*3
+
+hats/hes23ohh0.aif
 
 new step hats/hh8.aif hh*16
 step 3:1 hh*8 hh*6
@@ -72,6 +76,7 @@ new step kicks/avalinoKick.aiff bd*4
 sidechain pierrehouse with avalino
 
 stop avalino, stop pierre
+
 
 start avalino
 snrs/angelSnare.aiff
@@ -140,3 +145,17 @@ notes/FoolishGPitch.aiff every 4
 dloops/keeponDancingDiscoLoop.aiff
 
 rims/hes23rim1.aif // delay 47 fb 45
+
+bpm 130
+dloops/thinkloop1bar3.aiff
+dloops/thinkloop1bar4.aiff
+dloops/thinkloop1bar1.aiff
+loops/djsharmain.aiff // stutter every 4 scramble every 3
+kicks/tuffKick.aiff bd*4
+hats/nord808_ch.aif [~ hh]*4
+notes/front2WestChord1.aiff
+bpm 94
+dloops/shabbaBeat1bar.aif
+
+
+
