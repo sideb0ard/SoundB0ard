@@ -70,9 +70,16 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     else if (strncmp("filter", wurds[0], 6) == 0)
     {
         int soundgen_num = atoi(wurds[1]);
+        int freq = atoi(wurds[2]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_basicfilter_soundgen(mixr->sound_generators[soundgen_num]);
+            int f_num = add_basicfilter_soundgen(mixr->sound_generators[soundgen_num]);
+            if (freq != 0)
+            {
+                soundgenerator *sg = mixr->sound_generators[soundgen_num];
+                filterpass *fp = (filterpass *) sg->effects[f_num];
+                filter_set_fc_control(&fp->m_filter.f, freq);
+            }
         }
         return true;
     }

@@ -696,7 +696,6 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
     bool cmd_found = true;
     if (pattern_num != -1)
     {
-        printf("GOTS A TARGET PATTERN NUM!\n");
         if (is_valid_pattern_num(base, pattern_num))
         {
             if (strncmp("cp", wurds[0], 2) == 0)

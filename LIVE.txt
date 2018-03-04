@@ -1,38 +1,69 @@
 
-
 new loop streetfighter2//blanka1_1.aiff 8
+
+new moog
+load baordy
+moog 2:0 c3*2 g4*4
+moog 0:1 c3*2 [g4*2 f5*2]
+every 3 bar (d="down down up up") moog 2:0 d
+
+kicks/avalinoKick.aiff bd*2
+filter 300
+
+moog 0:2 g5 [g3*3 f2]
+
+loop loops/avalinoPaulStrecth.aiff 3 // its loud
+vol 0.2
+sidechain it with avalinoKick
+
+moog load modular
+moog 0:0 d2*2 [a2*2 c2]
 
 new euclidean 3 16
 every 2 16th (p="3 5 7 9 5") pattern 0 hits p
 
-new digi toms/DR660808CongaMid.aif -- generate from euclidean // root_note 35 29 36
-syn 0 gen src 0
-every 2 16th (n="35 29 36 35 35") syn 0 midi_note n
-every 2 16th syn 0 gen
+new digi toms/DR660808CongaMid.aif
+digi 1 gen src 0
+every 3 16th (n="35 29 36 35 35") digi 1 midi_note n
+every 2 16th digi 1 gen
 
-MINISYNTH 'innerc' // root_note 23
-new moog
-syn 1 load innercc
-syn 1 root_note 23
-syn 1 gen src 0
-every 6 bar syn 1 gen
+new step kicks/garageKick.aiff bd*4
 
+new step hats/hh8.aif hh*16
+step 3:1 hh*8 hh*6
+step 3:2 hh*6 hh*3
+
+every 3 bar (d="up up down down") digi 1:0 d
+
+kicks/808kick.aif
+step 0:1 [[bd ~ ~ bd] ~ ] [[bd ~ ~ ~] ~ bd]
+step 0:2 [[bd ~ ~ bd] ~ ] [[~ bd ~ ~] ~ bd]
+loops/houseintro.aiff
+stutter // modfilter
+snrs/hes23sd13.aif
+hats/hh8.aif
 
 new loop dloops/pierrehouse.aiff
 every 1 loop (l="0 0 0 1") loop 2 stutter l
 every 1 loop (l="0 0 0 0 1") loop 2 scramble l
 
-new samp hats/hh8.aif all
+new loop dloops/pierrehouse.aiff; sidechain 5 2
+
 every 1 loop (s="0 0 1 2 3") samp 4 change 0 swing s
 
+MINISYNTH 'innerc' // root_note 23
+new moog
+moog 6 load innercc
+moog 6 root_note 23
+moog 6 gen src 0
+every 4 bar moog 6 gen
 
 74 * ( t | ( t >> 2 | t >> 16 ) )
 ^ THIS WITH
-new samp notes/2stepbass.aiff
-samp 4 gen every 3
+new step notes/2stepbass.aiff
+step 4 gen every 3
 
-
-new samp kicks/avalinoKick.aiff 0 3 8 11
+new step kicks/avalinoKick.aiff bd*4
 sidechain pierrehouse with avalino
 
 stop avalino, stop pierre
@@ -40,12 +71,12 @@ stop avalino, stop pierre
 start avalino
 snrs/angelSnare.aiff
 
-hats/angelHat.aiff 2 6 10 14
+hats/angelHat.aiff [~ hh]*4
 
 beat bd*3 ~ bd*2 ~
 
 
-new samp notes/slaveChordHit1.aiff
+new step notes/slaveChordHit1.aiff
 gen src euclidean
 every 2 bar (p="1 1.3 1.4 1.7") samp 7 pitch p
 every 2 bar (p="0.5 0.6 0.7 0.8 0.9 1") samp 7 pitch p
@@ -60,8 +91,6 @@ gen src 1
 
 ***ambient breakdowndd
 loops/glitchBitloopo.aif
-loops/WaveLoop.aiff
-loops/djsharmain.aiff 2
 noises/CosmicClay_bip.aif 12
 noises/CosmicClay_bip.aif 6
 noises/CosmicClay_bip.aif 4
@@ -74,6 +103,13 @@ hats/mawopenhh.aiff
 hats/nord808_ch.aif
 
 syn 1 load wiffle
+
+
+moog open sporky
+moog 1:0 [c3 [c4 e3]]*2
+moog 1:1 [c4 [c3 e4]]*2
+moog 1:2 [c2 [c2 e3]]*2
+every 1 bar (d="0 3 5 10") moog 1 detune d
 
 // PART2
 //////////////////

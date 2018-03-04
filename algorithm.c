@@ -25,9 +25,6 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
         return NULL;
     }
 
-    // a->original_pattern =
-    //    sg->get_pattern(sg, a->target_sound_generator_pattern_num);
-
     a->active = true;
     a->counter = 0;
     a->debug = false;
