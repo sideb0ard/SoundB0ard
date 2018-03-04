@@ -5,6 +5,7 @@
 
 #include "algorithm.h"
 #include "cmdloop.h"
+#include <looper.h>
 #include "mixer.h"
 #include "utils.h"
 
@@ -36,9 +37,35 @@ static void handle_command(algorithm *a)
 {
     if (a->counter % a->every_n == 0)
     {
-        algorithm_replace_vars_in_cmd(a);
-        // printf("UPDated cmd: %s\n", a->runnable_command);
-        interpret(a->runnable_command);
+        if (a->env.type == STUTTER_TYPE)
+        {
+            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
+            looper_set_stutter_mode(loop, 1);
+        }
+        else if (a->env.type == SCRAMBLER_TYPE)
+        {
+            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
+            looper_set_scramble_mode(loop, 1);
+        }
+        else
+        {
+            algorithm_replace_vars_in_cmd(a);
+            // printf("UPDated cmd: %s\n", a->runnable_command);
+            interpret(a->runnable_command);
+        }
+    }
+    else
+    {
+        if (a->env.type == STUTTER_TYPE)
+        {
+            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
+            looper_set_stutter_mode(loop, 0);
+        }
+        else if (a->env.type == SCRAMBLER_TYPE)
+        {
+            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
+            looper_set_scramble_mode(loop, 0);
+        }
     }
 
     a->counter++;
@@ -166,24 +193,32 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
         strncpy(env, line + env_match_group[1].rm_so, env_len);
         printf("ENV: %s\n", env);
 
-        if (strncmp(env, "scramble", 8) == 0)
-        {
-            printf("SCRAMBLER!\n");
-        }
-        else if (strncmp(env, "stutter", 7) == 0)
-        {
-            printf("STUTTER!\n");
-        }
-
-        if (!extract_env_details(a, env))
-            result = false;
-
         int cmd_len = env_match_group[2].rm_eo - env_match_group[2].rm_so;
         if (cmd_len <= MAX_CMD_LEN)
             strncpy(a->command, line + env_match_group[2].rm_so, cmd_len);
         else
             result = false;
         printf("CMD: %s\n", a->command);
+
+        if (strncmp(env, "scramble", 8) == 0
+            || strncmp(env, "stutter", 7) == 0)
+        {
+            printf("SCRA/TUUTMBLER!\n");
+            char localwurd[5] = {};
+            int looper_num = -1;
+            sscanf(a->command, "%s %d", localwurd, &looper_num);
+            if (strncmp(localwurd, "loop", 4) == 0
+                    && looper_num != 1)
+            {
+                a->env.target_soundgen = looper_num;
+                if (strncmp(env, "sc", 2) == 0)
+                    a->env.type = SCRAMBLER_TYPE;
+                else
+                    a->env.type = STUTTER_TYPE;
+            }
+        }
+        else if (!extract_env_details(a, env))
+            result = false;
     }
     else
     {

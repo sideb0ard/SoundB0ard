@@ -17,6 +17,10 @@ enum
 {
     LIST_TYPE,
     SCALAR_TYPE,
+    SCRAMBLER_TYPE,
+    STUTTER_TYPE,
+    MAX_ALGO_TYPES
+
 };
 
 enum
@@ -41,6 +45,9 @@ typedef struct algo_environment
     // only used for step type
     unsigned int op;
     char variable_scalar_value[MAX_VAR_VAL_LEN];
+
+    unsigned int target_soundgen;
+    int target_action_counter;
 } algo_environment;
 
 typedef struct algorithm
