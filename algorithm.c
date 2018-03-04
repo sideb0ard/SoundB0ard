@@ -166,6 +166,15 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
         strncpy(env, line + env_match_group[1].rm_so, env_len);
         printf("ENV: %s\n", env);
 
+        if (strncmp(env, "scramble", 8) == 0)
+        {
+            printf("SCRAMBLER!\n");
+        }
+        else if (strncmp(env, "stutter", 7) == 0)
+        {
+            printf("STUTTER!\n");
+        }
+
         if (!extract_env_details(a, env))
             result = false;
 

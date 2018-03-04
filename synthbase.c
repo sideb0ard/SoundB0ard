@@ -246,6 +246,11 @@ void synthbase_set_generate_src(synthbase *b, int src)
         b->m_generate_src = src;
 }
 
+void synthbase_set_chord_mode(synthbase *base, bool b)
+{
+    base->m_chord_mode = b;
+}
+
 void synthbase_set_backup_mode(synthbase *base, bool b)
 {
     if (b)
@@ -520,7 +525,17 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
         clear_pattern(base->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {
-            base->patterns[pattern_num][i] = pattern[i];
+            synthbase_add_event(base, pattern_num, i, pattern[i]);
+            //base->patterns[pattern_num][i] = pattern[i];
+            if (base->m_chord_mode && pattern[i].event_type)
+            {
+                printf("midi note: %d\n", pattern[i].data1);
+                midi_event copy = pattern[i];
+                copy.data1 = pattern[i].data1 + 4;
+                synthbase_add_event(base, pattern_num, i, copy);
+                copy.data1 = pattern[i].data1 + 7;
+                synthbase_add_event(base, pattern_num, i, copy);
+            }
         }
     }
 }

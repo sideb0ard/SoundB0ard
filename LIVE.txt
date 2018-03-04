@@ -1,20 +1,21 @@
-
-new loop streetfighter2//blanka1_1.aiff 8
-
+play KauaiAmbience2Chickens.aiff
 new moog
 load baordy
-moog 2:0 c3*2 g4*4
+moog 0:0 c3*2 g4*4
 moog 0:1 c3*2 [g4*2 f5*2]
 every 3 bar (d="down down up up") moog 2:0 d
 
 kicks/avalinoKick.aiff bd*2
-filter 300
+filter 1000hats/hh8.aif
 
 moog 0:2 g5 [g3*3 f2]
 
 loop loops/avalinoPaulStrecth.aiff 3 // its loud
 vol 0.2
 sidechain it with avalinoKick
+
+stop avalino
+new step claps/2stepgrant.aiff [~ sd]*2
 
 moog load modular
 moog 0:0 d2*2 [a2*2 c2]
@@ -24,8 +25,17 @@ every 2 16th (p="3 5 7 9 5") pattern 0 hits p
 
 new digi toms/DR660808CongaMid.aif
 digi 1 gen src 0
-every 3 16th (n="35 29 36 35 35") digi 1 midi_note n
-every 2 16th digi 1 gen
+every 3 16th (n="44 43 47 48 56 56 59 55") digi 6 midi_note n
+every 1 bar (d="down down up up") digi 4:0 d
+
+74 * ( t | ( t >> 2 | t >> 16 ) )
+^ THIS WITH
+new step notes/2stepbass.aiff
+step 4 gen every 3
+
+STRINGS/PAD
+melody c3 f3 dm3 am3
+
 
 new step kicks/garageKick.aiff bd*4
 
@@ -38,7 +48,7 @@ every 3 bar (d="up up down down") digi 1:0 d
 kicks/808kick.aif
 step 0:1 [[bd ~ ~ bd] ~ ] [[bd ~ ~ ~] ~ bd]
 step 0:2 [[bd ~ ~ bd] ~ ] [[~ bd ~ ~] ~ bd]
-loops/houseintro.aiff
+loops/houseintro.aiff 3
 stutter // modfilter
 snrs/hes23sd13.aif
 hats/hh8.aif
@@ -58,11 +68,6 @@ moog 6 root_note 23
 moog 6 gen src 0
 every 4 bar moog 6 gen
 
-74 * ( t | ( t >> 2 | t >> 16 ) )
-^ THIS WITH
-new step notes/2stepbass.aiff
-step 4 gen every 3
-
 new step kicks/avalinoKick.aiff bd*4
 sidechain pierrehouse with avalino
 
@@ -75,6 +80,8 @@ hats/angelHat.aiff [~ hh]*4
 
 beat bd*3 ~ bd*2 ~
 
+
+new loop streetfighter2//blanka1_1.aiff 8
 
 new step notes/slaveChordHit1.aiff
 gen src euclidean

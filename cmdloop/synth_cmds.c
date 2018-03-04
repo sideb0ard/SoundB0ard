@@ -766,6 +766,12 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                 // TODO parse pattern
             }
         }
+        if (strncmp("chord", wurds[0], 5) == 0)
+        {
+            bool b = atoi(wurds[1]);
+            printf("Setting CHORD_MODE to %s\n", b ? "ON" : "OFF");
+            synthbase_set_chord_mode(base, b);
+        }
         else if (strncmp("note_on", wurds[0], 7) == 0)
         {
             for (int i = 3; i < num_wurds; i++)

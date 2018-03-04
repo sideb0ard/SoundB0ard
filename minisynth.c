@@ -770,9 +770,9 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         );
 
-    //wchar_t scratch[1024] = {};
-    //synthbase_status(&ms->base, scratch);
-    //wcscat(status_string, scratch);
+    wchar_t scratch[1024] = {};
+    synthbase_status(&ms->base, scratch);
+    wcscat(status_string, scratch);
 }
 
 void minisynth_print_lfo1_routing_info(minisynth *ms, wchar_t *scratch)
