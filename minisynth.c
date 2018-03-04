@@ -668,8 +668,8 @@ void minisynth_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE "%s\n" WCOOL_COLOR_YELLOW
-        "vol:%.1f  voice:" WANSI_COLOR_WHITE "%ls" WCOOL_COLOR_YELLOW "(%d)  midi_note:%d mono:%d detune:%0.f legato:%d kt:%d ndscale:%.0fd\n"
-        "noisedb:%.0f  octave:%d  pitchrange:%d  porta:%d  pw:%.0f  subosc:%.0f  vascale:%d zero:%d\n"
+        "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" WCOOL_COLOR_YELLOW "(%d) midi_note:%d mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
+        "noisedb:%3.0f octave:%d  pitchrange:%d porta:%.0f  pw:%.0f subosc:%3.0f vascale:%d zero:%d\n"
 
         WCOOL_COLOR_ORANGE
         "l1wave:%s(%d)     l1mode:%s(%d)  l1rate:%04.1f    l1amp:%.1f\n"
@@ -770,9 +770,9 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         );
 
-    wchar_t scratch[1024] = {};
-    synthbase_status(&ms->base, scratch);
-    wcscat(status_string, scratch);
+    //wchar_t scratch[1024] = {};
+    //synthbase_status(&ms->base, scratch);
+    //wcscat(status_string, scratch);
 }
 
 void minisynth_print_lfo1_routing_info(minisynth *ms, wchar_t *scratch)
