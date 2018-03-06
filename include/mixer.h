@@ -2,6 +2,7 @@
 #define MIXER_H
 
 #include <portaudio.h>
+#include <pthread.h>
 
 #include "algorithm.h"
 #include "defjams.h"
@@ -55,6 +56,7 @@ typedef struct mixer
     soundgenerator **sound_generators;
     int soundgen_num;  // actual number of SGs
     int soundgen_size; // number of memory slots reserved for SGszz
+    pthread_mutex_t sg_mutex;
 
     sequence_generator **sequence_generators;
     int sequence_gen_num;  // actual number of SGs

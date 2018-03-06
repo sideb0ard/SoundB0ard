@@ -859,6 +859,16 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             int pattern_num = atoi(wurds[1]);
             synthbase_switch_pattern(base, pattern_num);
         }
+        else if (strncmp("up", wurds[0], 2) == 0)
+        {
+            for (int i = 0; i < base->num_patterns; i++)
+                synthbase_change_octave_pattern(base, i, 1);
+        }
+        else if (strncmp("down", wurds[0], 4) == 0)
+        {
+            for (int i = 0; i < base->num_patterns; i++)
+                synthbase_change_octave_pattern(base, i, 0);
+        }
         else
             cmd_found = false;
     }

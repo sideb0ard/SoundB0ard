@@ -101,6 +101,10 @@ mixer *new_mixer(double output_latency)
 
     mixr->key = C_MAJOR;
 
+    // possible TODO - should i de-initialize?
+    // is that cleaner code?
+    pthread_mutex_init(&mixr->sg_mutex, NULL);
+
     return mixr;
 }
 
@@ -363,7 +367,9 @@ int add_sound_generator(mixer *mixr, soundgenerator *sg)
         }
         else
         {
+            pthread_mutex_lock(&mixr->sg_mutex);
             mixr->sound_generators = new_soundgens;
+            pthread_mutex_unlock(&mixr->sg_mutex);
         }
     }
     mixr->sound_generators[mixr->soundgen_num] = sg;
@@ -549,6 +555,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
         if (mixr->soundgen_num > 0)
         {
+            pthread_mutex_lock(&mixr->sg_mutex);
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
                 if (mixr->sound_generators[i] != NULL)
@@ -560,6 +567,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                     output_right += mixr->soundgen_cur_val[i].right;
                 }
             }
+            pthread_mutex_unlock(&mixr->sg_mutex);
         }
 
         out[j] = mixr->volume * (output_left / 1.53);

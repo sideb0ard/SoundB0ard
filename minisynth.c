@@ -672,12 +672,12 @@ void minisynth_status(void *self, wchar_t *status_string)
         "noisedb:%3.0f octave:%d  pitchrange:%d porta:%.0f  pw:%.0f subosc:%3.0f vascale:%d zero:%d\n"
 
         WCOOL_COLOR_ORANGE
-        "l1wave:%s(%d)     l1mode:%s(%d)  l1rate:%04.1f    l1amp:%.1f\n"
+        "l1wave:%s(%d)     l1mode:%s(%d)  l1rate:%05.2f   l1amp:%.1f\n"
         "l1_filter_en:%d     l1_osc_en:%d     l1_pan_en:%d    l1_amp_en:%d    l1_pw_en:%d\n"
         "l1_filter_int:%4.1f l1_osc_int:%3.1f  l1_pan_int:%3.1f l1_amp_int:%3.1f l1_pw_int:%3.1f\n"
 
         WCOOL_COLOR_PINK
-        "l2wave:%s(%d)     l2mode:%s(%d)  l2rate:%04.1f    l2amp:%.1f\n"
+        "l2wave:%s(%d)     l2mode:%s(%d)  l2rate:%05.2f   l2amp:%.1f\n"
         "l2_filter_en:%d     l2_osc_en:%d     l2_pan_en:%d    l2_amp_en:%d    l2_pw_en:%d\n"
         "l2_filter_int:%4.1f l2_osc_int:%3.1f  l2_pan_int:%3.1f l2_amp_int:%3.1f l2_pw_int:%3.1f\n"
 
