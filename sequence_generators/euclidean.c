@@ -31,7 +31,7 @@ sequence_generator *new_euclidean(int num_hits, int num_steps)
     e->actual_num_hits = num_hits;
     e->actual_num_steps = num_steps;
 
-    e->mode = EUCLID_STATIC;
+    e->mode = EUCLID_RANDOM;
 
     printf("NEW EUCLID - numhits:%d steps:%d\n", e->num_hits, e->num_steps);
 
@@ -175,11 +175,13 @@ void euclidean_event_notify(void *self, unsigned int event_type)
     euclidean *e = (euclidean *)self;
     switch (event_type)
     {
-    case (TIME_START_OF_LOOP_TICK):
+    case (TIME_QUARTER_TICK):
         if (e->mode == EUCLID_UP)
+        {
             e->actual_num_hits++;
-        if (e->actual_num_hits > e->num_hits)
-            e->actual_num_hits = 1;
+            if (e->actual_num_hits > e->num_hits)
+                e->actual_num_hits = 1;
+        }
         else if (e->mode == EUCLID_DOWN)
         {
             e->actual_num_hits--;
@@ -188,18 +190,20 @@ void euclidean_event_notify(void *self, unsigned int event_type)
         }
         else if (e->mode == EUCLID_RANDOM)
         {
-            int dice = rand() % 3;
+            int dice = rand() % 4;
             switch (dice)
             {
             case (0):
                 e->actual_num_hits = 3;
                 break;
             case (1):
-                e->actual_num_hits = 4;
+                e->actual_num_hits = 5;
                 break;
             case (2):
-            default:
                 e->actual_num_hits = 7;
+            case (3):
+            default:
+                e->actual_num_hits = 9;
             }
         }
         break;

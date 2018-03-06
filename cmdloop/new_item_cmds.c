@@ -24,19 +24,11 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         else if (strncmp("euclid", wurds[1], 6) == 0)
         {
-            if (num_wurds != 4)
-            {
-                printf("get a life, mate - need to gimme number of hits "
-                       "and number of steps\n");
-            }
-            else
-            {
-                int num_hits = atoi(wurds[2]);
-                int num_steps = atoi(wurds[3]);
-                printf("EUCLIDEAN! SEQUENCE GEN num_hits:%d num_steps:%d!\n",
-                       num_hits, num_steps);
-                mixer_add_euclidean(mixr, num_hits, num_steps);
-            }
+            int num_hits = atoi(wurds[2]);
+            int num_steps = atoi(wurds[3]);
+            printf("EUCLIDEAN! SEQUENCE GEN num_hits:%d num_steps:%d!\n",
+                   num_hits, num_steps);
+            mixer_add_euclidean(mixr, 3, 16);
         }
 
         else if (strncmp("digi", wurds[1], 4) == 0 ||

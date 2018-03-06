@@ -1,53 +1,66 @@
 play KauaiAmbience2Chickens.aiff
 new moog
 load baordy
-moog 0:0 c3*2 g4*4
-moog 0:1 c3*2 [g4*2 f5*2]
+
+moog 0:0 c1*2 g2*4
+moog 0:1 c1*2 [g2*2 f4*2]
+moog 0:2 c1*3 [g2 f4 bm2]
+
+moog 0:0 c2 g3
+moog 0:1 c2*2 g3*4
+moog 0:2 c2*2 [g3*2 f4*2]
 every 3 bar (d="down down up up") moog 2:0 d
 
-kicks/avalinoKick.aiff bd*2
-filter 1000hats/hh8.aif
+kicks/avalinoKick.aiff bd*2; filter 1 1000
+step 1:1 bd [bd ~ ~ bd]
+step 1:0 numloops 3
 
-moog 0:2 g5 [g3*3 f2]
+moog 0:3 g5 [g3*3 f2]
 
 loop loops/avalinoPaulStrecth.aiff 3 // its loud
 vol 0.2
 sidechain it with avalinoKick
 
-stop avalino
-new step claps/2stepgrant.aiff [~ sd]*2
-
-moog load modular
-moog 0:0 d2*2 [a2*2 c2]
-
 new euclidean 3 16
 every 2 16th (p="3 5 7 9 5") pattern 0 hits p
-
-new digi toms/DR660808CongaMid.aif
-digi 1 gen src 0
-every 3 16th (n="44 43 47 48 56 56 59 55") digi 6 midi_note n
-every 1 bar (d="down down up up") digi 4:0 d
+stop avalino
+new step claps/2stepgrant.aiff [~ sd]*2
 
 74 * ( t | ( t >> 2 | t >> 16 ) )
 ^ THIS WITH
 new step notes/2stepbass.aiff
 step 4 gen every 3
 
-STRINGS/PAD
-melody c3 f3 dm3 am3
+new step hats/hh8.aif hh*16
+step 3:1 hh*8 hh*6
+^ pitch every 3 bar p="0.7 0.9 1 1.3 1.5 2") step 5 pitch p
 
+moog 0 reset all
+STRINGS/PAD
+stringey
+melody c3 f3 dm3 am3
+moog 0:2 am3*3 c3*2 dm3*3
+
+step 1 gen src 1
+step 1 gen every 4
+
+new digi toms/DR660808CongaMid.aif
+digi 1 gen src 0
+every 3 16th (n="44 43 47 48 56 56 59 55") digi 6 midi_note n
+every 2 4th digi 6:0 down
+
+moog 0:1 [c2*2 c2] c3*2 am3
+
+#moog load modular
+#moog 0:0 d2*2 [a2*2 c2]
 
 new step kicks/garageKick.aiff bd*4
 moog drexy
+^ this should still have the melody from stringey above
 moog 0:0 f3*2 c2*3
 
-hats/hes23ohh0.aif
-
-new step hats/hh8.aif hh*16
-step 3:1 hh*8 hh*6
-step 3:2 hh*6 hh*3
-
-every 3 bar (d="up up down down") digi 1:0 d
+hats/hes23ohh0.aif [~ hh]*2 // numloops 7
+step 8:1 [~ hh]*4
 
 kicks/808kick.aif
 step 0:1 [[bd ~ ~ bd] ~ ] [[bd ~ ~ ~] ~ bd]
@@ -55,7 +68,6 @@ step 0:2 [[bd ~ ~ bd] ~ ] [[~ bd ~ ~] ~ bd]
 loops/houseintro.aiff 3
 stutter // modfilter
 snrs/hes23sd13.aif
-hats/hh8.aif
 
 new loop dloops/pierrehouse.aiff
 every 1 loop (l="0 0 0 1") loop 2 stutter l
@@ -67,24 +79,15 @@ every 1 loop (s="0 0 1 2 3") samp 4 change 0 swing s
 
 MINISYNTH 'innerc' // root_note 23
 new moog
-moog 6 load innercc
-moog 6 root_note 23
-moog 6 gen src 0
+moog x load innercc
+moog x root_note 23
+moog x gen src 0
 every 4 bar moog 6 gen
+waveshape 3
 
-new step kicks/avalinoKick.aiff bd*4
-sidechain pierrehouse with avalino
-
-stop avalino, stop pierre
-
-
-start avalino
 snrs/angelSnare.aiff
 
 hats/angelHat.aiff [~ hh]*4
-
-beat bd*3 ~ bd*2 ~
-
 
 new loop streetfighter2//blanka1_1.aiff 8
 
@@ -93,13 +96,13 @@ gen src euclidean
 every 2 bar (p="1 1.3 1.4 1.7") samp 7 pitch p
 every 2 bar (p="0.5 0.6 0.7 0.8 0.9 1") samp 7 pitch p
 
+new digi notes/garageyChord.aiff
+every 2 bar (n="36 28") digi 18 midi_note n
+gen src 1
+
 dloops/808drumloop.aiff
 dloops/808drumloopLetsGetHype.aiff
 stutter and scramble modes
-
-notes/garageyChord.aiff
-every 2 bar (n="36 28") syn 16 root_note n
-gen src 1
 
 ***ambient breakdowndd
 loops/glitchBitloopo.aif
@@ -153,9 +156,29 @@ dloops/thinkloop1bar1.aiff
 loops/djsharmain.aiff // stutter every 4 scramble every 3
 kicks/tuffKick.aiff bd*4
 hats/nord808_ch.aif [~ hh]*4
-notes/front2WestChord1.aiff
+notes/front2WestChord1.aiff  // pitch 0.7
 bpm 94
 dloops/shabbaBeat1bar.aif
 
 
+loops/rainforrest.aiff
+dloops/808drumloopLetsGetHype.aiff
 
+dloops/hiphousenasty1brroll.aiff
+
+drones/garageDroneForward.aiff
+loops/DIsharkywaterLoop.aiff
+
+dloops/pierrehouse.aiff
+notes/garageyChord.aiff
+
+dloops/abraDrumLoop4Bar.aiff
+dloops/reesepiece.aif
+
+// all the speeds
+loops//bassDubC1bar.aiff
+
+loops/duboce.aif loop_len 12
+
+digisynth
+toms/DR660808HighTom.aif
