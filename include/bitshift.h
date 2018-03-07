@@ -41,6 +41,8 @@ typedef struct bitshift_token
     int val;
 } bitshift_token;
 
+static const char BITSHIFT_PRESET_FILENAME[] = "settings/bitshiftz.dat";
+
 #define MAX_TOKENS_IN_PATTERN 100 // arbitrary
 typedef struct bitshift_pattern
 {
@@ -75,3 +77,5 @@ int precedence(int op);
 
 void bitshift_set_time_counter(bitshift *bs, int time);
 void bitshift_set_debug(void *self, bool b);
+bool bitshift_save(bitshift *bs, char *preset_name);
+bool bitshift_load(bitshift *bs, char *preset_name);

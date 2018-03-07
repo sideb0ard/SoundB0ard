@@ -102,8 +102,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 else if (strncmp("scramble", wurds[2], 8) == 0)
                 {
-                    bool b = atoi(wurds[3]);
-                    looper_set_scramble_mode(g, b);
+                    looper_set_scramble_pending(g);
                 }
                 else if (strncmp("sequencer_mode", wurds[2], 13) == 0)
                 {
@@ -113,8 +112,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 else if (strncmp("stutter", wurds[2], 8) == 0)
                 {
-                    bool b = atoi(wurds[3]);
-                    looper_set_stutter_mode(g, b);
+                    looper_set_stutter_pending(g);
                 }
                 else if (strncmp("movement", wurds[2], 8) == 0)
                 {

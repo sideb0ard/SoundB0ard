@@ -37,35 +37,9 @@ static void handle_command(algorithm *a)
 {
     if (a->counter % a->every_n == 0)
     {
-        if (a->env.type == STUTTER_TYPE)
-        {
-            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
-            looper_set_stutter_mode(loop, 1);
-        }
-        else if (a->env.type == SCRAMBLER_TYPE)
-        {
-            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
-            looper_set_scramble_mode(loop, 1);
-        }
-        else
-        {
-            algorithm_replace_vars_in_cmd(a);
-            // printf("UPDated cmd: %s\n", a->runnable_command);
-            interpret(a->runnable_command);
-        }
-    }
-    else
-    {
-        if (a->env.type == STUTTER_TYPE)
-        {
-            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
-            looper_set_stutter_mode(loop, 0);
-        }
-        else if (a->env.type == SCRAMBLER_TYPE)
-        {
-            looper *loop = (looper *) mixr->sound_generators[a->env.target_soundgen];
-            looper_set_scramble_mode(loop, 0);
-        }
+        algorithm_replace_vars_in_cmd(a);
+        // printf("UPDated cmd: %s\n", a->runnable_command);
+        interpret(a->runnable_command);
     }
 
     a->counter++;

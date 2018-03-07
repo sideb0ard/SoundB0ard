@@ -607,3 +607,28 @@ void bitshift_set_time_counter(bitshift *bs, int time)
     if (time >= 0)
         bs->time_counter = time;
 }
+
+bool bitshift_save(bitshift *bs, char *name)
+{
+    if (strlen(name) == 0)
+    {
+        printf("hey, ya fanny - need a name!\n");
+        return false;
+    }
+    printf("Saving %s to file %s\n", name, BITSHIFT_PRESET_FILENAME);
+    FILE *presetz = fopen(BITSHIFT_PRESET_FILENAME, "a+");
+    if (presetz == NULL)
+    {
+        printf("nae danger!\n");
+        return false;
+    }
+    int settings_count = 0;
+    fprintf(presetz, "::name=%s", name);
+    settings_count++;
+    fprintf(presetz, "::num_infix_tokens=%d", bs->pattern.num_infix_tokens);
+    fprintf(presetz, "::num_rpn_tokens=%d", bs->pattern.num_rpn_tokens);
+
+    fclose(presetz);
+    return true;
+    // TODO finish
+}

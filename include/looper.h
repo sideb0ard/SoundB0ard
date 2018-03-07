@@ -118,9 +118,11 @@ typedef struct looper
     bool loop_mode;
     double loop_len; // bars
 
+    bool scramble_pending;
     bool scramble_mode;
     int scramble_diff;
 
+    bool stutter_pending;
     bool stutter_mode;
     int stutter_idx;
 
@@ -163,8 +165,8 @@ void looper_set_reverse_mode(looper *g, bool b);
 void looper_set_loop_mode(looper *g, bool b);
 void looper_set_granulate_mode(looper *g, bool b);
 void looper_set_loop_len(looper *g, double bars);
-void looper_set_scramble_mode(looper *g, bool b);
-void looper_set_stutter_mode(looper *g, bool b);
+void looper_set_scramble_pending(looper *g);
+void looper_set_stutter_pending(looper *g);
 
 int looper_get_available_grain_num(looper *g);
 int looper_count_active_grains(looper *g);

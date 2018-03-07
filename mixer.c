@@ -273,15 +273,17 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type)
         if (a != NULL)
             algorithm_event_notify(a, event_type);
     }
-    for (int i = 0; i < mixr->soundgen_num; ++i)
-    {
-        soundgenerator *sg = mixr->sound_generators[i];
-        if (sg != NULL)
-            sg->event_notify(sg, event_type);
-    }
+
     for (int i = 0; i < mixr->sequence_gen_num; ++i)
     {
         sequence_generator *sg = mixr->sequence_generators[i];
+        if (sg != NULL)
+            sg->event_notify(sg, event_type);
+    }
+
+    for (int i = 0; i < mixr->soundgen_num; ++i)
+    {
+        soundgenerator *sg = mixr->sound_generators[i];
         if (sg != NULL)
             sg->event_notify(sg, event_type);
     }

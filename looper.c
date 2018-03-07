@@ -120,6 +120,23 @@ void looper_event_notify(void *self, unsigned int event_type)
 
     switch (event_type)
     {
+    case(TIME_START_OF_LOOP_TICK):
+        if (g->scramble_pending)
+        {
+            g->scramble_mode = true;
+            g->scramble_pending = false;
+        }
+        else
+            g->scramble_mode = false;
+
+        if (g->stutter_pending)
+        {
+            g->stutter_mode = true;
+            g->stutter_pending = false;
+        }
+        else
+            g->stutter_mode = false;
+
     case (TIME_MIDI_TICK):
         if (g->loop_mode)
         {
@@ -697,20 +714,16 @@ void looper_set_granulate_mode(looper *g, bool b)
     }
 }
 
-void looper_set_scramble_mode(looper *g, bool b)
+void looper_set_scramble_pending(looper *g)
 {
-    if (b)
-        looper_set_loop_mode(g, b);
-
-    g->scramble_mode = b;
+    looper_set_loop_mode(g, true);
+    g->scramble_pending = true;
 }
 
-void looper_set_stutter_mode(looper *g, bool b)
+void looper_set_stutter_pending(looper *g)
 {
-    if (b)
-        looper_set_loop_mode(g, b);
-
-    g->stutter_mode = b;
+    looper_set_loop_mode(g, true);
+    g->stutter_pending = true;
 }
 
 void looper_set_loop_len(looper *g, double bars)
