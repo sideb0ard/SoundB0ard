@@ -9,7 +9,7 @@ moog 0:2 c1*3 [g2 f4 bm2]
 moog 0:0 c2 g3
 moog 0:1 c2*2 g3*4
 moog 0:2 c2*2 [g3*2 f4*2]
-every 3 bar (d="down down up up") moog 2:0 d
+every 3 bar (d="down down up up") moog d
 
 kicks/avalinoKick.aiff bd*2; filter 1 1000
 step 1:1 bd [bd ~ ~ bd]
@@ -29,6 +29,7 @@ new step claps/2stepgrant.aiff [~ sd]*2
 74 * ( t | ( t >> 2 | t >> 16 ) )
 ^ THIS WITH
 new step notes/2stepbass.aiff
+^ vol 0.5
 step 4 gen every 3
 
 new step hats/hh8.aif hh*16
@@ -45,14 +46,13 @@ step 1 gen src 1
 step 1 gen every 4
 
 new digi toms/DR660808CongaMid.aif
+waveshape 6 2
 digi 1 gen src 0
 every 3 16th (n="44 43 47 48 56 56 59 55") digi 6 midi_note n
 every 2 4th digi 6:0 down
+every 4 16th digi 6 gen
 
 moog 0:1 [c2*2 c2] c3*2 am3
-
-#moog load modular
-#moog 0:0 d2*2 [a2*2 c2]
 
 new step kicks/garageKick.aiff bd*4
 moog drexy
@@ -62,12 +62,18 @@ moog 0:0 f3*2 c2*3
 hats/hes23ohh0.aif [~ hh]*2 // numloops 7
 step 8:1 [~ hh]*4
 
-kicks/808kick.aif
-step 0:1 [[bd ~ ~ bd] ~ ] [[bd ~ ~ ~] ~ bd]
-step 0:2 [[bd ~ ~ bd] ~ ] [[~ bd ~ ~] ~ bd]
+stop toms/DR660808CongaMid.aif
+
+kicks/808kick.aif bd
+
 loops/houseintro.aiff 3
 stutter // modfilter
-snrs/hes23sd13.aif
+
+stop garageKick
+new step snrs/hes23sd13.aif
+^ gen src bitshift ; gen every 4 ; start garageKick;
+
+start toms/DR660808CongaMid.aif
 
 new loop dloops/pierrehouse.aiff
 every 1 loop (l="0 0 0 1") loop 2 stutter l
@@ -93,7 +99,6 @@ new loop streetfighter2//blanka1_1.aiff 8
 
 new step notes/slaveChordHit1.aiff
 gen src euclidean
-every 2 bar (p="1 1.3 1.4 1.7") samp 7 pitch p
 every 2 bar (p="0.5 0.6 0.7 0.8 0.9 1") samp 7 pitch p
 
 new digi notes/garageyChord.aiff
@@ -112,6 +117,7 @@ noises/CosmicClay_bip.aif 4
 noises/CosmicClay_bip.aif 2
 
 kicks/kick8.aif 0 4 8 12
+very 2 bar (p="1 1.3 1.4 1.7") samp 7 pitch p
 hats
 hats/dmx_hh_open.aif
 hats/mawopenhh.aiff
@@ -133,13 +139,16 @@ snrs/heyasnare.aiff
 drones/keydrone.aiff loop_len 2 and 1
 perc/DR660CR78woodblock.aif // root_note 4 //basey
 dloops/keeponDancingDiscoLoop.aiff
-kicks/solid.aiff
+Gkicks/solid.aiff
 hats/ralphiHatz2.aiff
 
 dloops/comeongirl.aiff
 
 kicks/808kick.aif 0 4 8 11
 hats/nord808_ch.aif 2 6 10 14
+# step 0:1 [[bd ~ ~ bd] ~ ] [[bd ~ ~ ~] ~ bd]
+# step 0:2 [[bd ~ ~ bd] ~ ] [[~ bd ~ ~] ~ bd]
+
 
 new bitshift (t*t)/(t>>13 ^ t>>8)
 claps/DR660808Clap.aif every 4
