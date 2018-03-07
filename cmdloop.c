@@ -16,7 +16,7 @@
 #include <looper_cmds.h>
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
-#include <pattern_cmds.h>
+#include <sequence_generator_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
 
@@ -99,7 +99,7 @@ void interpret(char *line)
         else if (parse_new_item_cmd(num_wurds, wurds))
             continue;
 
-        else if (parse_pattern_cmd(num_wurds, wurds))
+        else if (parse_sequence_generator_cmd(num_wurds, wurds))
             continue;
 
         else if (parse_synth_cmd(num_wurds, wurds))

@@ -65,7 +65,7 @@ typedef struct synthbase
     int last_midi_note;
     int midi_note;
     bool generate_mode; // magical
-    int m_generate_src;
+    int generate_src;
     int generate_every_n_loops;
     int generate_generation;
 

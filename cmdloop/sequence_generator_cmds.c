@@ -4,15 +4,16 @@
 #include <bitshift.h>
 #include <euclidean.h>
 #include <mixer.h>
-#include <pattern_cmds.h>
 #include <pattern_parser.h>
+#include <sequence_generator_cmds.h>
 #include <sequencer_utils.h>
 
 extern mixer *mixr;
 
-bool parse_pattern_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
+bool parse_sequence_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
-    if (strncmp("pattern", wurds[0], 7) == 0)
+    if (strncmp("sequence", wurds[0], 7) == 0 ||
+        strncmp("seq", wurds[3], 3) == 0)
     {
         int sgnum = atoi(wurds[1]);
         if (mixer_is_valid_seq_gen_num(mixr, sgnum))
@@ -21,7 +22,7 @@ bool parse_pattern_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
             if (strncmp("debug", wurds[2], 5) == 0)
             {
-                printf("Enabling DEBUG on PATTERN GEN %d\n", sgnum);
+                printf("Enabling DEBUG on sequence GEN %d\n", sgnum);
                 int enable = atoi(wurds[3]);
                 sg->set_debug(sg, enable);
             }
@@ -33,13 +34,13 @@ bool parse_pattern_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 char_binary_version_of_short(num, binnum);
                 printf("NOM!: %d %s\n", num, binnum);
             }
-            if (strncmp("time", wurds[2], 4) == 0 && sg->type == BITSHIFT)
+            else if (strncmp("time", wurds[2], 4) == 0 && sg->type == BITSHIFT)
             {
                 int itime = atoi(wurds[3]);
                 bitshift *bs = (bitshift *)sg;
                 bitshift_set_time_counter(bs, itime);
             }
-            if (sg->type == EUCLIDEAN)
+            else if (sg->type == EUCLIDEAN)
             {
                 euclidean *e = (euclidean *)sg;
                 if (strncmp(wurds[2], "mode", 4) == 0)

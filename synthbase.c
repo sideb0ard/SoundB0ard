@@ -34,7 +34,7 @@ void synthbase_init(synthbase *base, void *parent,
     base->sample_rate = 44100;
     base->sample_rate_counter = 0;
 
-    base->m_generate_src = -99;
+    base->generate_src = -99;
     base->last_midi_note = 60;
     base->midi_note = 60;
     base->sustain_note_ms = 200;
@@ -43,11 +43,11 @@ void synthbase_init(synthbase *base, void *parent,
 
 void synthbase_generate_pattern(synthbase *base)
 {
-    if (mixer_is_valid_seq_gen_num(mixr, base->m_generate_src))
+    if (mixer_is_valid_seq_gen_num(mixr, base->generate_src))
     {
         synthbase_stop(base);
         sequence_generator *sg =
-            mixr->sequence_generators[base->m_generate_src];
+            mixr->sequence_generators[base->generate_src];
         uint16_t bits = sg->generate(sg, NULL);
 
         int patternlen = 16;
@@ -243,7 +243,7 @@ bool is_valid_pattern_num(synthbase *ms, int pattern_num)
 void synthbase_set_generate_src(synthbase *b, int src)
 {
     if (mixer_is_valid_seq_gen_num(mixr, src))
-        b->m_generate_src = src;
+        b->generate_src = src;
 }
 
 void synthbase_set_chord_mode(synthbase *base, bool b)

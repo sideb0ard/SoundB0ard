@@ -17,7 +17,7 @@ SRC = \
 	cmdloop/looper_cmds.c \
 	cmdloop/mixer_cmds.c \
 	cmdloop/new_item_cmds.c \
-	cmdloop/pattern_cmds.c \
+	cmdloop/sequence_generator_cmds.c \
 	cmdloop/stepper_cmds.c \
 	cmdloop/synth_cmds.c \
 	dca.c \
