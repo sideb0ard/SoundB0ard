@@ -83,7 +83,6 @@ void tokenized_pattern_to_string(bitshift_token *pattern, int token_len,
         }
         string_idx += lenny;
     }
-    printf("eND\n");
 }
 
 void bitshift_change_pattern(bitshift *sg, char *pattern)
@@ -97,7 +96,6 @@ void bitshift_status(void *self, wchar_t *wstring)
     char infix_pattern[PATTERN_STATUS_SIZE] = {0};
     char rpn_pattern[PATTERN_STATUS_SIZE] = {0};
 
-    printf("BEFORESSTR:%s\n", infix_pattern);
     tokenized_pattern_to_string(bs->pattern.infix_tokenized_pattern,
                                 bs->pattern.num_infix_tokens, infix_pattern,
                                 PATTERN_STATUS_SIZE);
@@ -106,7 +104,7 @@ void bitshift_status(void *self, wchar_t *wstring)
                                 PATTERN_STATUS_SIZE);
     swprintf(wstring, MAX_PS_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
-             "infix pattern: %s // rpn pattern: %s",
+             "infix pattern: %s\nrpn pattern: %s",
              infix_pattern, rpn_pattern);
 }
 

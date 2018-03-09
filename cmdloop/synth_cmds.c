@@ -766,7 +766,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                 // TODO parse pattern
             }
         }
-        if (strncmp("chord", wurds[0], 5) == 0)
+        else if (strncmp("chord", wurds[0], 5) == 0)
         {
             bool b = atoi(wurds[1]);
             printf("Setting CHORD_MODE to %s\n", b ? "ON" : "OFF");
@@ -781,6 +781,11 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                 synthbase_add_note(base, base->cur_pattern, six16th,
                                    base->midi_note);
             }
+        }
+        else if (strncmp("num_patterns", wurds[0], 12) == 0)
+        {
+            int val = atoi(wurds[1]);
+            synthbase_set_num_patterns(base, val);
         }
         else if (strncmp("sustain_note_ms", wurds[0], 15) == 0)
         {
@@ -810,16 +815,8 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         else if (strncmp("generate", wurds[0], 8) == 0 ||
                  strncmp("gen", wurds[0], 3) == 0)
         {
-            if (strncmp("src", wurds[1], 3) == 0)
-            {
-                int src = atoi(wurds[2]);
-                printf("GEN SRC! %d\n", src);
-                synthbase_set_generate_src(base, src);
-            }
-            else
-            {
-                synthbase_generate_pattern(base);
-            }
+            int src = atoi(wurds[1]);
+            synthbase_generate_pattern(base, src);
         }
 
         else if (strncmp("midi", wurds[0], 4) == 0)

@@ -2,29 +2,38 @@ play KauaiAmbience2Chickens.aiff
 new moog
 load baordy
 
-moog 0:0 c1*2 g2*4
-moog 0:1 c1*2 [g2*2 f4*2]
-moog 0:2 c1*3 [g2 f4 bm2]
+alt: load morphy
+midi_note 36
+add bitshift
+new bitshift 74 * ( t | ( t >> 2 | t >> 16 ) )
+gen every 5 4th
+then later every 3 4th
+every 2 bar (p="28 32 36") moog 0 midi_note p
 
-moog 0:0 c2 g3
-moog 0:1 c2*2 g3*4
-moog 0:2 c2*2 [g3*2 f4*2]
-every 3 bar (d="down down up up") moog d
+
+new bitshift (t*t)/(t>>13 ^ t>>8)
+
+moog 0:0 c2
+moog 0:1 g3*2
+moog 0:2 c2*2 g3*4
+moog 0:3 c2*2 [g3*2 f3*2]
+every 3 bar (d="down up up down") moog 0 d
+moog 0:0 c2 [g2 f1]
 
 kicks/avalinoKick.aiff bd*2; filter 1 1000
 step 1:1 bd [bd ~ ~ bd]
 step 1:0 numloops 3
 
-moog 0:3 g5 [g3*3 f2]
+moog 0:0 g5 [g3*3 f2]
 
 loop loops/avalinoPaulStrecth.aiff 3 // its loud
 vol 0.2
 sidechain it with avalinoKick
 
-new euclidean 3 16
-every 2 16th (p="3 5 7 9 5") pattern 0 hits p
 stop avalino
 new step claps/2stepgrant.aiff [~ sd]*2
+new euclid
+
 
 74 * ( t | ( t >> 2 | t >> 16 ) )
 ^ THIS WITH
@@ -167,6 +176,7 @@ kicks/tuffKick.aiff bd*4
 hats/nord808_ch.aif [~ hh]*4
 notes/front2WestChord1.aiff  // pitch 0.7
 bpm 94
+dloops/abraDrumLoop4Bar.aiff
 dloops/shabbaBeat1bar.aif
 
 
@@ -181,7 +191,6 @@ loops/DIsharkywaterLoop.aiff
 dloops/pierrehouse.aiff
 notes/garageyChord.aiff
 
-dloops/abraDrumLoop4Bar.aiff
 dloops/reesepiece.aif
 
 // all the speeds
@@ -191,3 +200,9 @@ loops/duboce.aif loop_len 12
 
 digisynth
 toms/DR660808HighTom.aif
+
+# OLD BEGINNING
+# moog 0:0 c1*2 g2*4
+# moog 0:1 c1*2 [g2*2 f4*2]
+# moog 0:2 c1*3 [g2 f4 bm2]
+0:2 c1*3 [g2 f4 bm2]

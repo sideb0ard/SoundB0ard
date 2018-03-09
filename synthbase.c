@@ -41,13 +41,13 @@ void synthbase_init(synthbase *base, void *parent,
     base->live_code_mode = true;
 }
 
-void synthbase_generate_pattern(synthbase *base)
+void synthbase_generate_pattern(synthbase *base, int gen_src)
 {
-    if (mixer_is_valid_seq_gen_num(mixr, base->generate_src))
+    if (mixer_is_valid_seq_gen_num(mixr, gen_src))
     {
         synthbase_stop(base);
         sequence_generator *sg =
-            mixr->sequence_generators[base->generate_src];
+            mixr->sequence_generators[gen_src];
         uint16_t bits = sg->generate(sg, NULL);
 
         int patternlen = 16;
@@ -158,7 +158,7 @@ void synthbase_event_notify(void *self, unsigned int event_type)
         {
             // synthbase_stop(base);
             base->cur_pattern_iteration--;
-            if (base->cur_pattern_iteration == 0)
+            if (base->cur_pattern_iteration <= 0)
             {
                 if (base->parent_synth_type == MINISYNTH_TYPE)
                     minisynth_midi_note_off((minisynth *)parent, 0, 0,
@@ -309,9 +309,12 @@ int synthbase_get_num_patterns(void *self)
 
 void synthbase_set_num_patterns(void *self, int num_patterns)
 {
-    printf("BASS! how low can you go!\n");
+    printf("BASS! how low can you go %d!\n", num_patterns);
     synthbase *ms = (synthbase *)self;
-    ms->num_patterns = num_patterns;
+    if (num_patterns > 0)
+    {
+        ms->num_patterns = num_patterns;
+    }
 }
 
 void synthbase_make_active_track(void *self, int pattern_num)
