@@ -1817,6 +1817,8 @@ void minisynth_set_filter_fq(minisynth *ms, double val)
 
 void minisynth_set_filter_type(minisynth *ms, unsigned int val)
 {
+    if (val == BSF2 || val == LPF1 || val == HPF1)
+        printf("warning! useless change - %d not possible with moog\n", val);
     if (val < NUM_FILTER_TYPES)
         ms->m_settings.m_filter_type = val;
     else
