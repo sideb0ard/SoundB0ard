@@ -5,9 +5,9 @@
 
 #include "algorithm.h"
 #include "cmdloop.h"
-#include <looper.h>
 #include "mixer.h"
 #include "utils.h"
+#include <looper.h>
 
 extern mixer *mixr;
 
@@ -174,15 +174,13 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
             result = false;
         printf("CMD: %s\n", a->command);
 
-        if (strncmp(env, "scramble", 8) == 0
-            || strncmp(env, "stutter", 7) == 0)
+        if (strncmp(env, "scramble", 8) == 0 || strncmp(env, "stutter", 7) == 0)
         {
             printf("SCRA/TUUTMBLER!\n");
             char localwurd[5] = {};
             int looper_num = -1;
             sscanf(a->command, "%s %d", localwurd, &looper_num);
-            if (strncmp(localwurd, "loop", 4) == 0
-                    && looper_num != 1)
+            if (strncmp(localwurd, "loop", 4) == 0 && looper_num != 1)
             {
                 a->env.target_soundgen = looper_num;
                 if (strncmp(env, "sc", 2) == 0)

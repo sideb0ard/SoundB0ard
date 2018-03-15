@@ -46,8 +46,7 @@ void synthbase_generate_pattern(synthbase *base, int gen_src)
     if (mixer_is_valid_seq_gen_num(mixr, gen_src))
     {
         synthbase_stop(base);
-        sequence_generator *sg =
-            mixr->sequence_generators[gen_src];
+        sequence_generator *sg = mixr->sequence_generators[gen_src];
         uint16_t bits = sg->generate(sg, NULL);
 
         int patternlen = 16;
@@ -529,7 +528,7 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
         for (int i = 0; i < PPBAR; i++)
         {
             synthbase_add_event(base, pattern_num, i, pattern[i]);
-            //base->patterns[pattern_num][i] = pattern[i];
+            // base->patterns[pattern_num][i] = pattern[i];
             if (base->m_chord_mode && pattern[i].event_type)
             {
                 printf("midi note: %d\n", pattern[i].data1);

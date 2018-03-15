@@ -563,11 +563,15 @@ void dxsynth_status(void *self, wchar_t *status_string)
 {
     dxsynth *dx = (dxsynth *)self;
 
+    char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
+    if (dx->sound_generator.active)
+        INSTRUMENT_COLOR = ANSI_COLOR_CYAN;
+
     // clang-format off
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE
-        "%s " WANSI_COLOR_CYAN "algo:%d vol: %.1f active:%s porta:%.1f pitchrange:%d op4fb:%.2f\n"
+        "%s " "%s" "algo:%d vol: %.1f active:%s porta:%.1f pitchrange:%d op4fb:%.2f\n"
         "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n"
         "l1_dest1:%s l1_dest2:%s l1_dest3:%s l1_dest4:%s\n"
         "o1wav:%d o1rat:%.2f o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n"
@@ -577,6 +581,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
         "op1out:%.2f op2out:%.2f op3out:%.2f op4out:%.2f",
 
         dx->m_settings.m_settings_name,
+        INSTRUMENT_COLOR,
         dx->m_settings.m_voice_mode, dx->vol,
         dx->sound_generator.active ? "true" : " false",
         dx->m_settings.m_portamento_time_ms,

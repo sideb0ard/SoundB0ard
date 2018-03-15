@@ -153,20 +153,31 @@ void synthdrum_randomize(synthdrum_sequencer *sds)
 void sds_status(void *self, wchar_t *ss)
 {
     synthdrum_sequencer *sds = (synthdrum_sequencer *)self;
+    char *INSTRUMENT_RED = ANSI_COLOR_RESET;
+    char *INSTRUMENT_DEEP_RED = ANSI_COLOR_RESET;
+    if (sds->sg.active)
+    {
+        INSTRUMENT_RED = ANSI_COLOR_RED;
+        INSTRUMENT_DEEP_RED = ANSI_COLOR_DEEP_RED;
+    }
+
     // clang-format off
     swprintf(ss, MAX_PS_STRING_SZ,
-             WANSI_COLOR_WHITE "%s " WANSI_COLOR_RED "vol:%.2f distortion_threshold:%.2f\n"
+             WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f distortion_threshold:%.2f\n"
              "o1_wav:%d o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
              "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_sus_ms:%.2f e1_rel:%.2f\n"
-             WANSI_COLOR_DEEP_RED
+             "%s"
              "o2_wav:%d o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
              "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f eg2_sus_ms:%.2f e2_rel:%.2f\n"
-             WANSI_COLOR_RED
+             "%s"
              "e3_att:%.2f e3_dec:%.2f e3_sus_lvl:%.2f e3_sus_ms:%.2f e3_rel:%.2f\n"
-             WANSI_COLOR_DEEP_RED
+             "%s"
              "filter_type:%d freq:%.2f q:%.2f",
 
-             sds->m_patch_name, sds->vol, sds->m_distortion_threshold,
+             sds->m_patch_name,
+             INSTRUMENT_RED,
+             sds->vol,
+             sds->m_distortion_threshold,
 
              sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo,
              sds->osc1_amp, sds->eg2_osc2_intensity,
@@ -175,16 +186,21 @@ void sds_status(void *self, wchar_t *ss)
              sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
              sds->m_eg1.m_release_time_msec,
 
+             INSTRUMENT_DEEP_RED,
              sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
              sds->mod_semitones_range, sds->m_eg2.m_attack_time_msec,
              sds->m_eg2.m_decay_time_msec, sds->m_eg2.m_sustain_level,
              sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
              sds->m_eg2.m_release_time_msec,
 
+             INSTRUMENT_RED,
              sds->m_eg3.m_attack_time_msec, sds->m_eg3.m_decay_time_msec,
              sds->m_eg3.m_sustain_level,
              sds->eg3_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
-             sds->m_eg3.m_release_time_msec, sds->m_filter_type,
+             sds->m_eg3.m_release_time_msec,
+
+             INSTRUMENT_DEEP_RED,
+             sds->m_filter_type,
              sds->m_filter_fc, sds->m_filter_q);
     // clang-format on
 

@@ -1,4 +1,4 @@
-nplay KauaiAmbience2Chickens.aiff
+play KauaiAmbience2Chickens.aiff
 
 new moog
 load pulsar
@@ -39,8 +39,6 @@ vol 0 0.3
 STRINGS/PAD
 stringey
 melody c3 f3 dm3 am3
-midi_note 37
-gen bitshift
 moog 0:2 am3*2 c3*2 c2 [dm3 am2]
 
 step 1 gen src 1
@@ -48,9 +46,8 @@ step 1 gen every 4
 
 new digi toms/DR660808CongaMid.aif
 waveshape 6 2
-digi 1 gen src 0
 every 3 16th (n="44 43 47 48 56 56 59 55") digi 6 midi_note n
-every 4 16th digi 6 gen
+every 4 16th digi 6 gen 0
 
 moog 0:1 [c2*2 c2] c3*2 am3
 
@@ -94,26 +91,31 @@ snrs/angelSnare.aiff
 hats/angelHat.aiff [~ hh]*4
 
 new loop streetfighter2//blanka1_1.aiff 8
-loops/rainforrest.aiff
+loops/rainforrest.aiff 2
 
 bpm 105
 new bitshift (t*t)/(t>>13 ^ t>>8)
 claps/DR660808Clap.aif every 4
 notes/garageyChord.aiff every 3 // midi_note 30 // 23
 notes/FoolishGPitch.aiff every 4  // midi_note 30
-dloops/abraDrumLoop4Bar.aiff
 rims/hes23rim1.aif // delay 47 fb 45
+dloops/abraDrumLoop4Bar.aiff
 new digi toms/DR660808HighTom.aif // midi_note 34
+perc/DR660Laser.aif
+noises/gunclickdouble.aiff
 
+dloops/thinkloop1bar3.aiff
+dloops/thinkloop1bar4.aiff
+dloops/thinkloop1bar1.aiff
+loops/djsharmain.aiff // stutter every 4 scramble every 3
 
-
-
-
-
+noises/SNDdoublewhooshit.aiff p="35 36 28 29 35"
+noises/Woodblock2_bip.aif
+notes/front2WestChord1.aiff
 
 new step notes/slaveChordHit1.aiff
 gen src euclidean
-every 2 bar (p="0.5 0.6 0.7 0.8 0.9 1") samp 7 pitch p
+every 3 16th (p="1.3 1.7") step 29 pitch p
 
 dloops/808drumloop.aiff
 dloops/808drumloopLetsGetHype.aiff
@@ -139,17 +141,13 @@ snrs/heyasnare.aiff
 drones/keydrone.aiff loop_len 2 and 1
 perc/DR660CR78woodblock.aif // root_note 4 //basey
 dloops/keeponDancingDiscoLoop.aiff
-Gkicks/solid.aiff
+kicks/solid.aiff
 hats/ralphiHatz2.aiff
-
-dloops/comeongirl.aiff
 
 kicks/808kick.aif 0 4 8 11
 hats/nord808_ch.aif 2 6 10 14
 
 
-bpm 120
-new step notes/front2WestChord1.aiff  // pitch 0.7
 dloops/hiphousenasty1brroll.aiff
 dloops/shabbaBeat1bar.aif
 dloops/808drumloopLetsGetHype.aiff
@@ -159,16 +157,9 @@ dloops/pierrehouse.aiff
 
 
 
-dloops/keeponDancingDiscoLoop.aiff
-
 drones/garageDroneForward.aiff
 loops/DIsharkywaterLoop.aiff
 
-
-dloops/thinkloop1bar3.aiff
-dloops/thinkloop1bar4.aiff
-dloops/thinkloop1bar1.aiff
-loops/djsharmain.aiff // stutter every 4 scramble every 3
 
 
 syn 1 load wiffle

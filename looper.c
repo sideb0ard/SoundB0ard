@@ -120,7 +120,7 @@ void looper_event_notify(void *self, unsigned int event_type)
 
     switch (event_type)
     {
-    case(TIME_START_OF_LOOP_TICK):
+    case (TIME_START_OF_LOOP_TICK):
         if (g->scramble_pending)
         {
             g->scramble_mode = true;
@@ -353,9 +353,15 @@ stereo_val looper_gennext(void *self)
 void looper_status(void *self, wchar_t *status_string)
 {
     looper *g = (looper *)self;
+    char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
+    if (g->sound_generator.active)
+        INSTRUMENT_COLOR = COOL_COLOR_MAUVE;
+
     swprintf(
         status_string, MAX_PS_STRING_SZ, WANSI_COLOR_WHITE
-        "source:%s" WCOOL_COLOR_MAUVE " vol:%.2lf loop_mode:%s loop_len:%.2f\n"
+        "source:%s"
+        "%s"
+        " vol:%.2lf loop_mode:%s loop_len:%.2f\n"
         "scramble:%d stutter:%d stereo:%s grain_dur_ms:%d grains_per_sec:%d\n"
         "quasi_grain_fudge:%d grain_spray_ms:%.2f active_grains:%d "
         "highest_grain_num:%d\n"
@@ -371,8 +377,8 @@ void looper_status(void *self, wchar_t *status_string)
         " l3_min:%.2f l3_max:%.2f \n"
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
 
-        g->filename, g->vol, g->loop_mode ? "true" : "false", g->loop_len,
-        g->scramble_mode, g->stutter_mode,
+        g->filename, INSTRUMENT_COLOR, g->vol, g->loop_mode ? "true" : "false",
+        g->loop_len, g->scramble_mode, g->stutter_mode,
         g->num_channels == 2 ? "true" : "false", g->grain_duration_ms,
         g->grains_per_sec, g->quasi_grain_fudge,
         g->granular_spray_frames / 44.1, g->num_active_grains,
@@ -398,19 +404,6 @@ void looper_status(void *self, wchar_t *status_string)
         g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
         g->m_eg1.m_state);
 
-    // for (int i = 0; i < g->num_active_grains; i++)
-    //{
-    //    printf("Grain[%d] active:%s start:%d durInFrames:%d pos:%f incr:%f\n",
-    //           i, g->m_grains[i].active ? "TRUE" : "FALSE",
-    //           g->m_grains[i].audiobuffer_start_idx,
-    //           g->m_grains[i].grain_len_frames,
-    //           g->m_grains[i].audiobuffer_cur_pos, g->m_grains[i].incr);
-    //}
-
-    // wchar_t seq_status_string[MAX_PS_STRING_SZ];
-    // wmemset(seq_status_string, 0, MAX_PS_STRING_SZ);
-    // seq_status(&g->m_seq, seq_status_string);
-    // wcscat(status_string, seq_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

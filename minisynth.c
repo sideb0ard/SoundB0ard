@@ -100,9 +100,9 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_fc_control = FILTER_FC_DEFAULT;
     ms->m_settings.m_q_control = FILTER_Q_DEFAULT;
 
-    ms->m_settings.m_eg1_osc_intensity = 0.0;
+    ms->m_settings.m_eg1_osc_intensity = 0.7;
     ms->m_settings.m_eg1_osc_enabled = false;
-    ms->m_settings.m_eg1_filter_intensity = 0.0;
+    ms->m_settings.m_eg1_filter_intensity = 0.7;
     ms->m_settings.m_eg1_filter_enabled = false;
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_eg1_dca_enabled = true;
@@ -664,37 +664,50 @@ void minisynth_status(void *self, wchar_t *status_string)
         minisynth_print(ms);
     }
 
+    char *INSTRUMENT_YELLOW = ANSI_COLOR_RESET;
+    char *INSTRUMENT_ORANGE = ANSI_COLOR_RESET;
+    char *INSTRUMENT_PINK = ANSI_COLOR_RESET;
+    if (ms->sound_generator.active)
+    {
+        INSTRUMENT_YELLOW = COOL_COLOR_YELLOW;
+        INSTRUMENT_ORANGE = COOL_COLOR_ORANGE;
+        INSTRUMENT_PINK = COOL_COLOR_PINK;
+    }
+
     // clang-format off
     swprintf(
         status_string, MAX_PS_STRING_SZ,
-        WANSI_COLOR_WHITE "%s\n" WCOOL_COLOR_YELLOW
-        "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" WCOOL_COLOR_YELLOW "(%d) midi_note:%d mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
+        WANSI_COLOR_WHITE "%s\n"
+        "%s"
+        "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) midi_note:%d mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
         "noisedb:%3.0f octave:%d  pitchrange:%d porta:%.0f  pw:%.0f subosc:%3.0f vascale:%d zero:%d\n"
 
-        WCOOL_COLOR_ORANGE
-        "l1wave:%s(%d)     l1mode:%s(%d)  l1rate:%05.2f   l1amp:%.1f\n"
-        "l1_filter_en:%d     l1_osc_en:%d     l1_pan_en:%d    l1_amp_en:%d    l1_pw_en:%d\n"
-        "l1_filter_int:%4.1f l1_osc_int:%3.1f  l1_pan_int:%3.1f l1_amp_int:%3.1f l1_pw_int:%3.1f\n"
+        "%s"
+        "l1wave:%s(%d)      l1mode:%s(%d)   l1rate:%05.2f     l1amp:%.1f\n"
+        "l1_filter_en:%d      l1_osc_en:%d      l1_pan_en:%d      l1_amp_en:%d     l1_pw_en:%d\n"
+        "l1_filter_int:%4.1f  l1_osc_int:%4.1f  l1_pan_int:%4.1f  l1_amp_int:%4.1f l1_pw_int:%3.1f\n"
 
-        WCOOL_COLOR_PINK
-        "l2wave:%s(%d)     l2mode:%s(%d)  l2rate:%05.2f   l2amp:%.1f\n"
-        "l2_filter_en:%d     l2_osc_en:%d     l2_pan_en:%d    l2_amp_en:%d    l2_pw_en:%d\n"
-        "l2_filter_int:%4.1f l2_osc_int:%3.1f  l2_pan_int:%3.1f l2_amp_int:%3.1f l2_pw_int:%3.1f\n"
+        "%s"
+        "l2wave:%s(%d)      l2mode:%s(%d)   l2rate:%05.2f     l2amp:%.1f\n"
+        "l2_filter_en:%d      l2_osc_en:%d      l2_pan_en:%d      l2_amp_en:%d     l2_pw_en:%d\n"
+        "l2_filter_int:%4.1f  l2_osc_int:%4.1f  l2_pan_int:%4.1f  l2_amp_int:%4.1f l2_pw_int:%3.1f\n"
 
 
-        WCOOL_COLOR_ORANGE
-        "eg1_filter_en:%d    eg1_osc_en:%d    eg1_dca_en:%d    sustain:%d\n"
-        "eg1_filter_int:%.1f eg1_osc_int:%.1f eg1_dca_int:%.1f sustainlvl:%.1f\n"
-        "attackms:%4.0f      decayms:%4.0f    releasems:%4.0f  sustain_note_ms:%d\n"
+        "%s"
+        "eg1_filter_en:%d     eg1_osc_en:%d     eg1_dca_en:%d     sustain:%d\n"
+        "eg1_filter_int:%4.1f eg1_osc_int:%4.1f eg1_dca_int:%4.1f sustainlvl:%.1f\n"
+        "attackms:%4.0f       decayms:%4.0f     releasems:%4.0f   sustain_note_ms:%d\n"
 
-        WCOOL_COLOR_PINK
-        "filter:%s(%d)     fc:%6.1f      fq:%4.1f"
+        "%s"
+        "filter:%s(%d)      fc:%7.1f       fq:%4.1f"
 
-        WCOOL_COLOR_YELLOW,
+        "%s",
 
         ms->m_settings.m_settings_name,
+        INSTRUMENT_YELLOW,
         ms->m_settings.m_volume_db,
         s_voice_names[ms->m_settings.m_voice_mode],
+        INSTRUMENT_YELLOW,
         ms->m_settings.m_voice_mode,
         ms->base.midi_note,
         ms->m_settings.m_monophonic,
@@ -712,6 +725,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_reset_to_zero,
 
         // LFO1
+        INSTRUMENT_ORANGE,
         s_lfo_wave_names[ms->m_settings.m_lfo1_waveform],
         ms->m_settings.m_lfo1_waveform,
         s_lfo_mode_names[ms->m_settings.m_lfo1_mode],
@@ -730,6 +744,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_lfo1_pulsewidth_intensity,
 
         // LFO2
+        INSTRUMENT_PINK,
         s_lfo_wave_names[ms->m_settings.m_lfo2_waveform],
         ms->m_settings.m_lfo2_waveform,
         s_lfo_mode_names[ms->m_settings.m_lfo2_mode],
@@ -748,6 +763,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_lfo2_pulsewidth_intensity,
 
         // EG1
+        INSTRUMENT_ORANGE,
         ms->m_settings.m_eg1_filter_enabled,
         ms->m_settings.m_eg1_osc_enabled,
         ms->m_settings.m_eg1_dca_enabled,
@@ -763,11 +779,13 @@ void minisynth_status(void *self, wchar_t *status_string)
 
 
         // FILTER1
+        INSTRUMENT_PINK,
         s_filter_type_names[ms->m_settings.m_filter_type],
         ms->m_settings.m_filter_type,
         ms->m_settings.m_fc_control,
-        ms->m_settings.m_q_control
+        ms->m_settings.m_q_control,
 
+        INSTRUMENT_YELLOW
         );
 
     wchar_t scratch[1024] = {};

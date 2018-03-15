@@ -62,7 +62,7 @@ void *loopy(void *arg)
 
 void interpret(char *line)
 {
-    static char wurds[NUM_WURDS][SIZE_OF_WURD];
+    char wurds[NUM_WURDS][SIZE_OF_WURD] = {};
 
     char *cmd, *last_s;
     char const *sep = ";";

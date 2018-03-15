@@ -212,16 +212,22 @@ sample_sequencer *new_sample_seq_from_char_pattern(char *filename,
 void sample_seq_status(void *self, wchar_t *status_string)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
+
+    char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
+    if (seq->sound_generator.active)
+    {
+        INSTRUMENT_COLOR = ANSI_COLOR_BLUE;
+    }
+
     wchar_t local_status_string[MAX_PS_STRING_SZ] = {};
-    swprintf(local_status_string, MAX_PS_STRING_SZ, WANSI_COLOR_WHITE
-             "%s\n" WANSI_COLOR_BLUE "vol:%.2lf pitch:%.2f num_patterns:%d "
-             "gen_mode:%d gen_src:%d gen_every:%d",
-             seq->filename, seq->vol, seq->buffer_pitch,
+    swprintf(local_status_string, MAX_PS_STRING_SZ,
+             WANSI_COLOR_WHITE "%s\n"
+                               "%s"
+                               "vol:%.2lf pitch:%.2f num_patterns:%d "
+                               "gen_mode:%d gen_src:%d gen_every:%d",
+             seq->filename, INSTRUMENT_COLOR, seq->vol, seq->buffer_pitch,
              seq->m_seq.num_patterns, seq->m_seq.generate_mode,
              seq->m_seq.generate_src, seq->m_seq.generate_every_n_loops);
-
-    if (seq->sound_generator.active)
-        wcscat(status_string, WANSI_COLOR_BLUE);
 
     wcscat(status_string, local_status_string);
 

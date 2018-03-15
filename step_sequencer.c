@@ -208,11 +208,9 @@ void seq_status(sequencer *seq, wchar_t *status_string)
 {
     wchar_t pattern_details[256];
     wchar_t patternstr[33] = {0};
-    // char spattern[seq->pattern_len + 1];
     wchar_t apattern[seq->pattern_len + 1];
     for (int i = 0; i < seq->num_patterns; i++)
     {
-        // seq_char_binary_version_of_pattern(seq, seq->patterns[i], spattern);
         pattern_to_string(seq->patterns[i], patternstr);
         wchar_version_of_amp(seq, i, apattern);
         swprintf(pattern_details, 255,
