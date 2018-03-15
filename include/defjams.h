@@ -17,7 +17,7 @@
 
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 
-#define DEFAULT_ARRAY_SIZE 4
+#define DEFAULT_ARRAY_SIZE 32
 
 #define MAX_PS_STRING_SZ 4096 // arbitrary
 

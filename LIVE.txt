@@ -64,7 +64,7 @@ stop toms/DR660808CongaMid.aif
 kicks/808kick.aif bd
 
 loops/houseintro.aiff 3
-stutter // modfilter
+stutter //
 
 stop garageKick
 new step snrs/hes23sd13.aif

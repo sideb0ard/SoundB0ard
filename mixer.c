@@ -209,6 +209,7 @@ void mixer_ps(mixer *mixr)
                                 "sound generators" COOL_COLOR_GREEN "]\n");
         for (int i = 0; i < mixr->soundgen_num; i++)
         {
+            pthread_mutex_lock(&mixr->sg_mutex);
             if (mixr->sound_generators[i] != NULL)
             {
                 wmemset(wss, 0, MAX_PS_STRING_SZ);
@@ -249,6 +250,7 @@ void mixer_ps(mixer *mixr)
                 }
                 printf("\n\n");
             }
+            pthread_mutex_unlock(&mixr->sg_mutex);
         }
     }
 
@@ -283,9 +285,11 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type)
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
+        pthread_mutex_lock(&mixr->sg_mutex);
         soundgenerator *sg = mixr->sound_generators[i];
         if (sg != NULL)
             sg->event_notify(sg, event_type);
+        pthread_mutex_unlock(&mixr->sg_mutex);
     }
 }
 
@@ -312,6 +316,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
 
     for (int i = 0; i < mixr->soundgen_num; i++)
     {
+        pthread_mutex_lock(&mixr->sg_mutex);
         if (mixr->sound_generators[i] != NULL)
         {
             for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++)
@@ -320,6 +325,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
                     mixr->sound_generators[i]->envelopes[j]);
             }
         }
+        pthread_mutex_unlock(&mixr->sg_mutex);
     }
     link_set_bpm(mixr->m_ableton_link, bpm);
 }
@@ -350,6 +356,7 @@ int add_sound_generator(mixer *mixr, soundgenerator *sg)
 
     if (mixr->soundgen_size <= mixr->soundgen_num)
     {
+        pthread_mutex_lock(&mixr->sg_mutex);
         if (mixr->soundgen_size == 0)
         {
             mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
@@ -369,10 +376,9 @@ int add_sound_generator(mixer *mixr, soundgenerator *sg)
         }
         else
         {
-            pthread_mutex_lock(&mixr->sg_mutex);
             mixr->sound_generators = new_soundgens;
-            pthread_mutex_unlock(&mixr->sg_mutex);
         }
+        pthread_mutex_unlock(&mixr->sg_mutex);
     }
     mixr->sound_generators[mixr->soundgen_num] = sg;
     return mixr->soundgen_num++;
@@ -546,7 +552,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
     for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
-
         double output_left = 0.0;
         double output_right = 0.0;
 
@@ -557,9 +562,9 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
         if (mixr->soundgen_num > 0)
         {
-            pthread_mutex_lock(&mixr->sg_mutex);
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
+                pthread_mutex_lock(&mixr->sg_mutex);
                 if (mixr->sound_generators[i] != NULL)
                 {
                     mixr->soundgen_cur_val[i] =
@@ -568,8 +573,8 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                     output_left += mixr->soundgen_cur_val[i].left;
                     output_right += mixr->soundgen_cur_val[i].right;
                 }
+                pthread_mutex_unlock(&mixr->sg_mutex);
             }
-            pthread_mutex_unlock(&mixr->sg_mutex);
         }
 
         out[j] = mixr->volume * (output_left / 1.53);
@@ -584,11 +589,13 @@ void mixer_play_scene(mixer *mixr, int scene_num)
     scene *s = &mixr->scenes[scene_num];
     for (int i = 0; i < mixr->soundgen_num; i++)
     {
+        pthread_mutex_lock(&mixr->sg_mutex);
         if (!mixer_is_soundgen_in_scene(i, s) &&
             mixer_is_valid_soundgen_num(mixr, i))
         {
             mixr->sound_generators[i]->stop(mixr->sound_generators[i]);
         }
+        pthread_mutex_unlock(&mixr->sg_mutex);
     }
 
     for (int i = 0; i < s->num_tracks; i++)
@@ -599,6 +606,7 @@ void mixer_play_scene(mixer *mixr, int scene_num)
             continue;
         }
         int soundgen_track_num = s->soundgen_tracks[i].soundgen_track_num;
+        pthread_mutex_lock(&mixr->sg_mutex);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
             mixr->sound_generators[soundgen_num]->start(
@@ -612,6 +620,7 @@ void mixer_play_scene(mixer *mixr, int scene_num)
                    "the scene\n");
             s->soundgen_tracks[i].soundgen_num = -1;
         }
+        pthread_mutex_unlock(&mixr->sg_mutex);
     }
 }
 

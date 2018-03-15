@@ -107,6 +107,7 @@ void interpret(char *line)
 
         else if (parse_stepper_cmd(num_wurds, wurds))
             continue;
+
     }
 }
 
