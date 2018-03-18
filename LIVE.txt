@@ -1,3 +1,7 @@
+*************************************
+*  SIDEB0ARD, in SAN FRANCISCO
+*************************************
+
 play KauaiAmbience2Chickens.aiff
 
 new moog
@@ -36,6 +40,11 @@ step 3:1 hh*8 hh*6
 
 moog 0 reset all
 vol 0 0.3
+*************************************
+*  SIDEB0ARD, in SAN FRANCISCO
+*************************************
+
+
 STRINGS/PAD
 stringey
 melody c3 f3 dm3 am3
@@ -75,6 +84,10 @@ start toms/DR660808CongaMid.aif
 new loop dloops/pierrehouse.aiff ; down houseintro
 sidechain garage
 
+*************************************
+*  SIDEB0ARD, in SAN FRANCISCO
+*************************************
+
 kicks/tuffKick.aiff bd*4
 
 MINISYNTH 'innerc' // root_note 23
@@ -86,11 +99,6 @@ every 4 bar moog 6 gen
 waveshape 3
 
 
-snrs/angelSnare.aiff
-
-hats/angelHat.aiff [~ hh]*4
-
-new loop streetfighter2//blanka1_1.aiff 8
 loops/rainforrest.aiff 2
 
 bpm 105
@@ -101,8 +109,30 @@ notes/FoolishGPitch.aiff every 4  // midi_note 30
 rims/hes23rim1.aif // delay 47 fb 45
 dloops/abraDrumLoop4Bar.aiff
 new digi toms/DR660808HighTom.aif // midi_note 34
-perc/DR660Laser.aif
+perc/DR660Laser.aif // pitch 0.7
 noises/gunclickdouble.aiff
+
+bpm 110
+kicks/2stepKICK.aiff bd*4
+
+perc/DR660CR78woodblock.aif // root_note 4 //basey
+
+snrs/snare20.aif [~ sd]*2
+new bitshift t >> (t | 13) ^ every 6
+perc/2stepPERC.aiff
+^  ~ [~ ~ ~ pc]  [~ pc ~ ~ ] ~
+euclid every t
+new step hats/2stepOPENhh.aiff [~ hh]*4
+
+
+kicks/BASSrhythmKICK.aiff
+dloops/808drumloop.aiff
+dloops/808drumloopLetsGetHype.aiff
+stutter and scramble modes
+
+dloops/pierrehouse.aiff
+dloops/hiphousenasty1brroll.aiff
+
 
 dloops/thinkloop1bar3.aiff
 dloops/thinkloop1bar4.aiff
@@ -117,9 +147,6 @@ new step notes/slaveChordHit1.aiff
 gen src euclidean
 every 3 16th (p="1.3 1.7") step 29 pitch p
 
-dloops/808drumloop.aiff
-dloops/808drumloopLetsGetHype.aiff
-stutter and scramble modes
 
 ***ambient breakdowndd
 loops/glitchBitloopo.aif
@@ -139,43 +166,13 @@ hats/nord808_ch.aif
 
 snrs/heyasnare.aiff
 drones/keydrone.aiff loop_len 2 and 1
-perc/DR660CR78woodblock.aif // root_note 4 //basey
 dloops/keeponDancingDiscoLoop.aiff
 kicks/solid.aiff
 hats/ralphiHatz2.aiff
 
-kicks/808kick.aif 0 4 8 11
 hats/nord808_ch.aif 2 6 10 14
 
 
-dloops/hiphousenasty1brroll.aiff
-dloops/shabbaBeat1bar.aif
-dloops/808drumloopLetsGetHype.aiff
-dloops/pierrehouse.aiff
-
-
-
-
-
-drones/garageDroneForward.aiff
 loops/DIsharkywaterLoop.aiff
 
-
-
-syn 1 load wiffle
-
-moog open sporky
-moog 1:0 [c3 [c4 e3]]*2
-moog 1:1 [c4 [c3 e4]]*2
-moog 1:2 [c2 [c2 e3]]*2
-every 1 bar (d="0 3 5 10") moog 1 detune d
-
-new digi notes/garageyChord.aiff
-every 2 bar (n="36 28") digi 18 midi_note n
-gen src 1
-
-
-moog 0:2 c1*2 [g2 f3 bm2 f3]
-moog 0:2 c1*3 [g2 f4 bm2]
-moog 0:0 g5 [g3*3 f2]
 
