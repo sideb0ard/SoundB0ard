@@ -129,7 +129,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("l1_type", wurds[2], 8) == 0)
                 {
                     int type = atoi(wurds[3]);
-                    printf("LFO TYPE is %d\n", mode);
+                    printf("LFO TYPE is %d\n", type);
                     looper_set_lfo_voice(g, 1, type);
                 }
                 else if (strncmp("l1_amp", wurds[2], 7) == 0)
@@ -160,7 +160,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("l2_type", wurds[2], 8) == 0)
                 {
                     int type = atoi(wurds[3]);
-                    printf("LFO TYPE is %d\n", mode);
+                    printf("LFO TYPE is %d\n", type);
                     looper_set_lfo_voice(g, 2, type);
                 }
                 else if (strncmp("l2_amp", wurds[2], 7) == 0)
@@ -191,7 +191,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("l3_type", wurds[2], 8) == 0)
                 {
                     int type = atoi(wurds[3]);
-                    printf("LFO TYPE is %d\n", mode);
+                    printf("LFO TYPE is %d\n", type);
                     looper_set_lfo_voice(g, 3, type);
                 }
                 else if (strncmp("l3_amp", wurds[2], 7) == 0)
@@ -222,7 +222,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("l4_type", wurds[2], 8) == 0)
                 {
                     int type = atoi(wurds[3]);
-                    printf("LFO TYPE is %d\n", mode);
+                    printf("LFO TYPE is %d\n", type);
                     looper_set_lfo_voice(g, 4, type);
                 }
                 else if (strncmp("l4_amp", wurds[2], 7) == 0)

@@ -1,7 +1,7 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include <portaudio.h>
+#include "portaudio.h"
 #include <pthread.h>
 
 #include "algorithm.h"

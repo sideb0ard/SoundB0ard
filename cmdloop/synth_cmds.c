@@ -602,9 +602,9 @@ void char_pattern_to_midi_pattern(synthbase *base, int dest_pattern,
         chord_midi_notes chnotes = {0, 0, 0};
         if (extract_chord_from_char_notation(char_array[i], &tick, &chnotes))
         {
-            synthbase_add_note(base, dest_pattern, tick, chnotes.root);
-            synthbase_add_note(base, dest_pattern, tick, chnotes.third);
-            synthbase_add_note(base, dest_pattern, tick, chnotes.fifth);
+            synthbase_add_note(base, dest_pattern, tick, chnotes.root, true);
+            synthbase_add_note(base, dest_pattern, tick, chnotes.third, true);
+            synthbase_add_note(base, dest_pattern, tick, chnotes.fifth, true);
         }
         else
         {
@@ -612,7 +612,7 @@ void char_pattern_to_midi_pattern(synthbase *base, int dest_pattern,
             if (midi_note != 0)
             {
                 printf("Adding %d:%d\n", tick, midi_note);
-                synthbase_add_note(base, dest_pattern, tick, midi_note);
+                synthbase_add_note(base, dest_pattern, tick, midi_note, true);
             }
         }
     }
@@ -779,7 +779,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                 int six16th = atoi(wurds[i]) % 16;
                 printf("NOTE ON!! 16th:%d\n", six16th);
                 synthbase_add_note(base, base->cur_pattern, six16th,
-                                   base->midi_note);
+                                   base->midi_note, true);
             }
         }
         else if (strncmp("num_patterns", wurds[0], 12) == 0)
@@ -812,11 +812,18 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         {
             keys(soundgen_num);
         }
+        else if (strncmp("genone", wurds[0], 6) == 0 ||
+                 strncmp("genonce", wurds[0], 7) == 0)
+        {
+            int src = atoi(wurds[1]);
+            synthbase_generate_pattern(base, src, false);
+        }
         else if (strncmp("generate", wurds[0], 8) == 0 ||
+                 strncmp("genkeep", wurds[0], 7) == 0 ||
                  strncmp("gen", wurds[0], 3) == 0)
         {
             int src = atoi(wurds[1]);
-            synthbase_generate_pattern(base, src);
+            synthbase_generate_pattern(base, src, true);
         }
 
         else if (strncmp("midi", wurds[0], 4) == 0)

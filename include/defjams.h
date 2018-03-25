@@ -90,6 +90,12 @@ enum
 
 enum
 {
+    UP,
+    DOWN
+};
+
+enum
+{
     MIDI_ON = 144,
     MIDI_OFF = 128,
     MIDI_CONTROL = 176,

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "arpeggiator.h"
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"

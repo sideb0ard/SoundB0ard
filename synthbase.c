@@ -41,7 +41,7 @@ void synthbase_init(synthbase *base, void *parent,
     base->live_code_mode = true;
 }
 
-void synthbase_generate_pattern(synthbase *base, int gen_src)
+void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note)
 {
     if (mixer_is_valid_seq_gen_num(mixr, gen_src))
     {
@@ -55,7 +55,7 @@ void synthbase_generate_pattern(synthbase *base, int gen_src)
             int shift_by = patternlen - 1 - i;
             if (bits & (1 << shift_by))
             {
-                synthbase_add_note(base, base->cur_pattern, i, base->midi_note);
+                synthbase_add_note(base, base->cur_pattern, i, base->midi_note, keep_note);
             }
         }
     }
@@ -329,20 +329,20 @@ void synthbase_print_patterns(synthbase *ms)
         midi_pattern_print(ms->patterns[i]);
 }
 
-void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note)
+void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note, bool keep_note)
 {
     int mstep = step * PPSIXTEENTH;
-    synthbase_add_micro_note(ms, pattern_num, mstep, midi_note);
+    synthbase_add_micro_note(ms, pattern_num, mstep, midi_note, keep_note);
 }
 
 void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
-                              int midi_note)
+                              int midi_note, bool keep_note)
 {
     if (is_valid_pattern_num(ms, pattern_num) && mstep < PPBAR)
     {
         midi_event on = new_midi_event(MIDI_ON, midi_note, 128);
 
-        if (ms->live_code_mode)
+        if (!keep_note)
         {
             on.delete_after_use = true;
         }
