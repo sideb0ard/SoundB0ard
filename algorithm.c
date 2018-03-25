@@ -114,8 +114,9 @@ static bool extract_env_details(algorithm *a, char *env)
 
     regmatch_t var_step_match[4];
     regex_t step_rgx;
-    regcomp(&step_rgx, "^[[:space:]]*([[:alnum:]]+)[[:space:]]*=[[:space:]]*([["
-                       ":alnum:]]+)[[:space:]]*;(.*)\"",
+    regcomp(&step_rgx,
+            "^[[:space:]]*([[:alnum:]]+)[[:space:]]*=[[:space:]]*([["
+            ":alnum:]]+)[[:space:]]*;(.*)\"",
             REG_EXTENDED | REG_ICASE);
 
     if (regexec(&list_rgx, env, 3, var_list_match, 0) == 0)
@@ -322,7 +323,8 @@ void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
     swprintf(
-        status_string, MAX_PS_STRING_SZ, WANSI_COLOR_RED
+        status_string, MAX_PS_STRING_SZ,
+        WANSI_COLOR_RED
         "[ALGO] Every %d x %s Env(type:%s Var:%s Val:%s)  Cmd: %s ListLen:%d\n"
         "             (input_line:%s)",
         a->every_n, s_event_frequency[a->frequency], s_env_type[a->env.type],

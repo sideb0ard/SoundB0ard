@@ -35,16 +35,18 @@ void synthbase_init(synthbase *base, void *parent,
     base->sample_rate_counter = 0;
 
     base->generate_src = -99;
-    base->last_midi_note = 60;
-    base->midi_note = 60;
+    base->last_midi_note = 23;
+    base->midi_note = 23;
     base->sustain_note_ms = 200;
-    base->live_code_mode = true;
+    base->note_mode = true;
 }
 
 void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note)
 {
     if (mixer_is_valid_seq_gen_num(mixr, gen_src))
     {
+        synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
+
         synthbase_stop(base);
         sequence_generator *sg = mixr->sequence_generators[gen_src];
         uint16_t bits = sg->generate(sg, NULL);
@@ -55,7 +57,8 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note)
             int shift_by = patternlen - 1 - i;
             if (bits & (1 << shift_by))
             {
-                synthbase_add_note(base, base->cur_pattern, i, base->midi_note, keep_note);
+                synthbase_add_note(base, base->cur_pattern, i, base->midi_note,
+                                   keep_note);
             }
         }
     }
@@ -134,6 +137,10 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t scratch[256] = {0};
     wchar_t patternstr[33] = {0};
 
+    swprintf(scratch, 255, L"\nnote_mode:%d chord_mode:%d", base->note_mode,
+             base->chord_mode);
+    wcscat(status_string, scratch);
+    memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)
     {
         pattern_to_string(base->patterns[i], patternstr);
@@ -245,10 +252,9 @@ void synthbase_set_generate_src(synthbase *b, int src)
         b->generate_src = src;
 }
 
-void synthbase_set_chord_mode(synthbase *base, bool b)
-{
-    base->m_chord_mode = b;
-}
+void synthbase_set_note_mode(synthbase *base, bool b) { base->note_mode = b; }
+
+void synthbase_set_chord_mode(synthbase *base, bool b) { base->chord_mode = b; }
 
 void synthbase_set_backup_mode(synthbase *base, bool b)
 {
@@ -329,7 +335,8 @@ void synthbase_print_patterns(synthbase *ms)
         midi_pattern_print(ms->patterns[i]);
 }
 
-void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note, bool keep_note)
+void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note,
+                        bool keep_note)
 {
     int mstep = step * PPSIXTEENTH;
     synthbase_add_micro_note(ms, pattern_num, mstep, midi_note, keep_note);
@@ -529,7 +536,7 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
         {
             synthbase_add_event(base, pattern_num, i, pattern[i]);
             // base->patterns[pattern_num][i] = pattern[i];
-            if (base->m_chord_mode && pattern[i].event_type)
+            if (base->chord_mode && pattern[i].event_type)
             {
                 printf("midi note: %d\n", pattern[i].data1);
                 midi_event copy = pattern[i];

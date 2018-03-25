@@ -117,7 +117,8 @@ enum
     MAX_NUM_KEY_MODES,
 };
 
-typedef enum {
+typedef enum
+{
     MINISYNTH_TYPE,
     DIGISYNTH_TYPE,
     DXSYNTH_TYPE,
@@ -127,7 +128,8 @@ typedef enum {
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 
-typedef enum {
+typedef enum
+{
     C_MAJOR,       // midi 24
     G_MAJOR,       //  31
     D_MAJOR,       // 26
@@ -143,9 +145,14 @@ typedef enum {
     NUM_KEYS
 } key_type;
 
-typedef enum { MONO, LEGATO } legato_mode;
+typedef enum
+{
+    MONO,
+    LEGATO
+} legato_mode;
 
-typedef enum {
+typedef enum
+{
     NONE,
     SYNTH,
 } midi_control_type;
@@ -182,7 +189,8 @@ typedef struct mixer_timing_info
     bool is_midi_tick;
 } mixer_timing_info;
 
-typedef enum time_event {
+typedef enum time_event
+{
     TIME_MIDI_TICK,
     TIME_THIRTYSECOND_TICK,
     TIME_SIXTEENTH_TICK,
@@ -207,7 +215,8 @@ typedef struct midi_event
 
 typedef midi_event midi_pattern[PPBAR];
 
-typedef enum {
+typedef enum
+{
     MIDI_PATTERN, // numbers
     NOTE_PATTERN, // alphanums
     BEAT_PATTERN, // env variables

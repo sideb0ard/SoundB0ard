@@ -4,7 +4,13 @@
 #include "fx.h"
 #include "wt_oscillator.h"
 
-typedef enum { FLANGER, VIBRATO, CHORUS, MAX_MOD_TYPE } modular_type;
+typedef enum
+{
+    FLANGER,
+    VIBRATO,
+    CHORUS,
+    MAX_MOD_TYPE
+} modular_type;
 
 typedef struct mod_delay
 {

@@ -59,8 +59,8 @@ typedef struct synthbase
     bool multi_pattern_loop_countdown_started;
 
     bool recording;
-    bool live_code_mode;
-    bool m_chord_mode;
+    bool note_mode;
+    bool chord_mode;
 
     int last_midi_note;
     int midi_note;
@@ -116,6 +116,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename);
 void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms);
 void synthbase_set_generate_src(synthbase *base, int src);
 void synthbase_set_chord_mode(synthbase *base, bool b);
+void synthbase_set_note_mode(synthbase *base, bool b);
 void synthbase_set_morph_mode(synthbase *base, bool b);
 void synthbase_set_backup_mode(synthbase *base, bool b);
 void synthbase_morph(synthbase *base);

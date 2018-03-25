@@ -149,9 +149,10 @@ bool mod_delay_process_audio(mod_delay *md, double *input_left,
 void mod_delay_status(void *self, char *status_string)
 {
     mod_delay *md = (mod_delay *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "depth:%.2f rate:%.2f "
-                                              "fb:%.2f offset:%.2f "
-                                              "type:%s lfo:%s",
+    snprintf(status_string, MAX_PS_STRING_SZ,
+             "depth:%.2f rate:%.2f "
+             "fb:%.2f offset:%.2f "
+             "type:%s lfo:%s",
              md->m_mod_depth_pct, md->m_mod_freq, md->m_feedback_percent,
              md->m_chorus_offset, mod_type_as_string[md->m_mod_type],
              md->m_lfo_type ? "SIN" : "TRI");

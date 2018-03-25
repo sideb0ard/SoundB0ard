@@ -6,7 +6,8 @@
 #include "voice.h"
 #include "wt_oscillator.h"
 
-typedef enum {
+typedef enum
+{
     Saw3,
     Sqr3,
     Saw2Sqr,

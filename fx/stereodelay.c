@@ -192,12 +192,12 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
                                                 d->m_tap2_left_delay_time_ms);
         right_tap2_out = delayline_read_delay_at(&d->m_right_delay,
                                                  d->m_tap2_right_delay_time_ms);
-        left_delay_in = *input_left +
-                        (0.5 * left_delay_out + 0.5 * left_tap2_out) *
-                            (d->m_feedback_percent / 100.0);
-        right_delay_in = *input_right +
-                         (0.5 * right_delay_out + 0.5 * right_tap2_out) *
-                             (d->m_feedback_percent / 100.0);
+        left_delay_in =
+            *input_left + (0.5 * left_delay_out + 0.5 * left_tap2_out) *
+                              (d->m_feedback_percent / 100.0);
+        right_delay_in =
+            *input_right + (0.5 * right_delay_out + 0.5 * right_tap2_out) *
+                               (d->m_feedback_percent / 100.0);
         break;
     }
     case PINGPONG:
@@ -228,8 +228,9 @@ static char *s_delay_mode[] = {"tap1", "tap2", "pingpong"};
 void stereo_delay_status(void *self, char *status_string)
 {
     stereodelay *sd = (stereodelay *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "delayms:%.0f fb:%.2f ratio:%.2f "
-                                              "wetmx:%.2f mode:%s(%d)",
+    snprintf(status_string, MAX_PS_STRING_SZ,
+             "delayms:%.0f fb:%.2f ratio:%.2f "
+             "wetmx:%.2f mode:%s(%d)",
              sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio,
              sd->m_wet_mix, s_delay_mode[sd->m_mode], sd->m_mode);
 }

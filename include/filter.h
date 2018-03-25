@@ -13,7 +13,8 @@
 #define FILTER_Q_DEFAULT 0.707  // butterworth (noidea!)
 #define FILTER_TYPE_DEFAULT LPF4
 
-typedef enum {
+typedef enum
+{
     LPF1,
     HPF1,
     LPF2,

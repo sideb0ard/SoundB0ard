@@ -361,34 +361,35 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
            DRUMSYNTH_SAVED_SETUPS_FILENAME);
     FILE *filetosave = fopen(DRUMSYNTH_SAVED_SETUPS_FILENAME, "a");
 
-    fprintf(filetosave, "%s"     // m_patch_name
-                        " %f"    // vol
-                        " %f"    // distortion_threshold
-                        " %d"    // m_osc1.osc.m_waveform
-                        " %f"    // m_osc1.osc.m_osc_fo
-                        " %f"    // osc1_amp
-                        " %d"    // m_osc2.osc.m_waveform
-                        " %f"    // m_osc2.osc.m_osc_fo
-                        " %f"    // osc2_amp
-                        " %f"    // m_eg1.m_attack_time_msec
-                        " %f"    // m_eg1.m_decay_time_msec
-                        " %f"    // m_eg1.m_sustain_level
-                        " %f"    // eg1_sustain_len_in_samples
-                        " %f"    // m_eg1.m_release_time_msec
-                        " %f"    // m_eg2.m_attack_time_msec
-                        " %f"    // m_eg2.m_decay_time_msec
-                        " %f"    // m_eg2.m_sustain_level
-                        " %f"    // eg2_sustain_len_in_samples
-                        " %f"    // m_eg2.m_release_time_msec
-                        " %f"    // eg2_osc2_intensity
-                        " %f"    // m_eg3.m_attack_time_msec
-                        " %f"    // m_eg3.m_decay_time_msec
-                        " %f"    // m_eg2.m_sustain_level
-                        " %f"    // eg3_sustain_len_in_samples
-                        " %f"    // m_eg3.m_release_time_msec
-                        " %d"    // filter type
-                        " %f"    // filter fc_control
-                        " %f\n", // filter q_control
+    fprintf(filetosave,
+            "%s"     // m_patch_name
+            " %f"    // vol
+            " %f"    // distortion_threshold
+            " %d"    // m_osc1.osc.m_waveform
+            " %f"    // m_osc1.osc.m_osc_fo
+            " %f"    // osc1_amp
+            " %d"    // m_osc2.osc.m_waveform
+            " %f"    // m_osc2.osc.m_osc_fo
+            " %f"    // osc2_amp
+            " %f"    // m_eg1.m_attack_time_msec
+            " %f"    // m_eg1.m_decay_time_msec
+            " %f"    // m_eg1.m_sustain_level
+            " %f"    // eg1_sustain_len_in_samples
+            " %f"    // m_eg1.m_release_time_msec
+            " %f"    // m_eg2.m_attack_time_msec
+            " %f"    // m_eg2.m_decay_time_msec
+            " %f"    // m_eg2.m_sustain_level
+            " %f"    // eg2_sustain_len_in_samples
+            " %f"    // m_eg2.m_release_time_msec
+            " %f"    // eg2_osc2_intensity
+            " %f"    // m_eg3.m_attack_time_msec
+            " %f"    // m_eg3.m_decay_time_msec
+            " %f"    // m_eg2.m_sustain_level
+            " %f"    // eg3_sustain_len_in_samples
+            " %f"    // m_eg3.m_release_time_msec
+            " %d"    // filter type
+            " %f"    // filter fc_control
+            " %f\n", // filter q_control
             sds->m_patch_name, sds->vol, sds->m_distortion.m_threshold,
 
             sds->m_osc1.osc.m_waveform, sds->m_osc1.osc.m_osc_fo, sds->osc1_amp,
@@ -408,7 +409,7 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
 
             sds->m_filter_type, sds->m_filter_fc, sds->m_filter_q
 
-            );
+    );
 
     fclose(filetosave);
     return true;
@@ -433,34 +434,35 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
             printf("MATCH PATCH NAME %s\n", patch_name);
             printf("BEFORE OSC_FO %f\n", sds->m_osc1.osc.m_osc_fo);
             int num = sscanf(
-                line, "%s"      // m_patch_name
-                      " %lf"    // vol
-                      " %lf"    // distortion_threshold
-                      " %d"     // m_osc1.osc.m_waveform
-                      " %lf"    // m_osc1.osc.m_osc_fo
-                      " %lf"    // osc1_amp
-                      " %d"     // m_osc2.osc.m_waveform
-                      " %lf"    // m_osc2.osc.m_osc_fo
-                      " %lf"    // osc2_amp
-                      " %lf"    // m_eg1.m_attack_time_msec
-                      " %lf"    // m_eg1.m_decay_time_msec
-                      " %lf"    // m_eg1.m_sustain_level
-                      " %lf"    // eg1_sustain_len_in_samples
-                      " %lf"    // m_eg1.m_release_time_msec
-                      " %lf"    // m_eg2.m_attack_time_msec
-                      " %lf"    // m_eg2.m_decay_time_msec
-                      " %lf"    // m_eg2.m_sustain_level
-                      " %lf"    // eg2_sustain_len_in_samples
-                      " %lf"    // m_eg2.m_release_time_msec
-                      " %lf"    // eg2_osc2_intensity
-                      " %lf"    // m_eg3.m_attack_time_msec
-                      " %lf"    // m_eg3.m_decay_time_msec
-                      " %lf"    // m_eg2.m_sustain_level
-                      " %lf"    // eg3_sustain_len_in_samples
-                      " %lf"    // m_eg3.m_release_time_msec
-                      " %d"     // filter type
-                      " %lf"    // filter fc_control
-                      " %lf\n", // filter q_control
+                line,
+                "%s"      // m_patch_name
+                " %lf"    // vol
+                " %lf"    // distortion_threshold
+                " %d"     // m_osc1.osc.m_waveform
+                " %lf"    // m_osc1.osc.m_osc_fo
+                " %lf"    // osc1_amp
+                " %d"     // m_osc2.osc.m_waveform
+                " %lf"    // m_osc2.osc.m_osc_fo
+                " %lf"    // osc2_amp
+                " %lf"    // m_eg1.m_attack_time_msec
+                " %lf"    // m_eg1.m_decay_time_msec
+                " %lf"    // m_eg1.m_sustain_level
+                " %lf"    // eg1_sustain_len_in_samples
+                " %lf"    // m_eg1.m_release_time_msec
+                " %lf"    // m_eg2.m_attack_time_msec
+                " %lf"    // m_eg2.m_decay_time_msec
+                " %lf"    // m_eg2.m_sustain_level
+                " %lf"    // eg2_sustain_len_in_samples
+                " %lf"    // m_eg2.m_release_time_msec
+                " %lf"    // eg2_osc2_intensity
+                " %lf"    // m_eg3.m_attack_time_msec
+                " %lf"    // m_eg3.m_decay_time_msec
+                " %lf"    // m_eg2.m_sustain_level
+                " %lf"    // eg3_sustain_len_in_samples
+                " %lf"    // m_eg3.m_release_time_msec
+                " %d"     // filter type
+                " %lf"    // filter fc_control
+                " %lf\n", // filter q_control
                 sds->m_patch_name, &sds->vol, &sds->m_distortion.m_threshold,
 
                 &sds->m_osc1.osc.m_waveform, &sds->m_osc1.osc.m_osc_fo,

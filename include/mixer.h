@@ -19,7 +19,13 @@
 #define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_soundgenerator 100
 
-typedef enum { Q32, Q16, Q8, Q4 } quantize_size;
+typedef enum
+{
+    Q32,
+    Q16,
+    Q8,
+    Q4
+} quantize_size;
 
 typedef struct environment_variable
 {

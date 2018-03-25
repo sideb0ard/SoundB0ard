@@ -3,7 +3,8 @@
 
 #include <stdbool.h>
 
-typedef enum {
+typedef enum
+{
     BASICFILTER,
     BEATREPEAT,
     BITCRUSH,

@@ -6,7 +6,10 @@
 #include "sound_generator.h"
 #include <stdbool.h>
 
-typedef enum { OCTAVE_CHANGE } custom_event_type;
+typedef enum
+{
+    OCTAVE_CHANGE
+} custom_event_type;
 
 void *midiman(void *);
 

@@ -358,7 +358,8 @@ void looper_status(void *self, wchar_t *status_string)
         INSTRUMENT_COLOR = COOL_COLOR_MAUVE;
 
     swprintf(
-        status_string, MAX_PS_STRING_SZ, WANSI_COLOR_WHITE
+        status_string, MAX_PS_STRING_SZ,
+        WANSI_COLOR_WHITE
         "source:%s"
         "%s"
         " vol:%.2lf loop_mode:%s loop_len:%.2f\n"

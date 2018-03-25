@@ -28,8 +28,9 @@ void waveshaper_init(waveshaper *ws)
 void waveshaper_status(void *self, char *status_string)
 {
     waveshaper *ws = (waveshaper *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "k_pos:%.2f k_neg:%.2f"
-                                              "stages:%d invert:%d",
+    snprintf(status_string, MAX_PS_STRING_SZ,
+             "k_pos:%.2f k_neg:%.2f"
+             "stages:%d invert:%d",
              ws->m_arc_tan_k_pos, ws->m_arc_tan_k_neg, ws->m_stages,
              ws->m_invert_stages);
 }

@@ -3,7 +3,8 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-typedef enum {
+typedef enum
+{
     SOURCE_NONE,
     SOURCE_LFO1,
     SOURCE_LFO2,
@@ -30,7 +31,8 @@ typedef enum {
     MAX_SOURCES
 } matrix_sources;
 
-typedef enum {
+typedef enum
+{
     DEST_NONE,
 
     // --- LAYER 0 DESTINATIONS
@@ -99,7 +101,8 @@ typedef enum {
     MAX_DESTINATIONS
 } matrix_destinations;
 
-typedef enum {
+typedef enum
+{
     TRANSFORM_NONE,
     TRANSFORM_UNIPOLAR_TO_BIPOLAR,
     TRANSFORM_BIPOLAR_TO_UNIPOLAR,
