@@ -822,14 +822,19 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                  strncmp("genonce", wurds[0], 7) == 0)
         {
             int src = atoi(wurds[1]);
-            synthbase_generate_pattern(base, src, false);
+            synthbase_generate_pattern(base, src, false, false);
+        }
+        else if (strncmp("gensave", wurds[0], 7) == 0)
+        {
+            int src = atoi(wurds[1]);
+            synthbase_generate_pattern(base, src, false, true);
         }
         else if (strncmp("generate", wurds[0], 8) == 0 ||
                  strncmp("genkeep", wurds[0], 7) == 0 ||
                  strncmp("gen", wurds[0], 3) == 0)
         {
             int src = atoi(wurds[1]);
-            synthbase_generate_pattern(base, src, true);
+            synthbase_generate_pattern(base, src, true, false);
         }
 
         else if (strncmp("midi", wurds[0], 4) == 0)

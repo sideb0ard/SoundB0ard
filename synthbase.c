@@ -38,13 +38,19 @@ void synthbase_init(synthbase *base, void *parent,
     base->last_midi_note = 23;
     base->midi_note = 23;
     base->sustain_note_ms = 200;
-    base->note_mode = true;
+    base->note_mode = false;
 }
 
-void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note)
+void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note, bool save_pattern)
 {
     if (mixer_is_valid_seq_gen_num(mixr, gen_src))
     {
+        if (save_pattern)
+        {
+            synthbase_set_backup_mode(base, true);
+            base->restore_pending = true;
+        }
+
         synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
 
         synthbase_stop(base);
@@ -160,7 +166,13 @@ void synthbase_event_notify(void *self, unsigned int event_type)
     switch (event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
-        if (base->multi_pattern_mode && base->num_patterns > 1)
+        if (base->restore_pending)
+        {
+            synthbase_dupe_pattern(&base->backup_pattern_while_getting_crazy,
+                                   &base->patterns[base->cur_pattern]);
+            base->restore_pending = false;
+        }
+        else if (base->multi_pattern_mode && base->num_patterns > 1)
         {
             // synthbase_stop(base);
             base->cur_pattern_iteration--;
@@ -244,12 +256,6 @@ bool is_valid_pattern_num(synthbase *ms, int pattern_num)
         return true;
     }
     return false;
-}
-
-void synthbase_set_generate_src(synthbase *b, int src)
-{
-    if (mixer_is_valid_seq_gen_num(mixr, src))
-        b->generate_src = src;
 }
 
 void synthbase_set_note_mode(synthbase *base, bool b) { base->note_mode = b; }

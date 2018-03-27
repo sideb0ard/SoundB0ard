@@ -69,6 +69,8 @@ typedef struct synthbase
     int generate_every_n_loops;
     int generate_generation;
 
+    bool restore_pending;
+
     int sustain_note_ms;
 
     int max_generation;
@@ -90,7 +92,7 @@ void synthbase_set_midi_note(synthbase *base, int root_key);
 
 void synthbase_clear_pattern_ready_for_new_one(synthbase *base,
                                                int pattern_num);
-void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_notes);
+void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_notes, bool restore_pattern);
 
 void synthbase_set_multi_pattern_mode(synthbase *self, bool pattern_mode);
 void synthbase_set_pattern_loop_num(synthbase *self, int pattern_num,
