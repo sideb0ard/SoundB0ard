@@ -6,6 +6,7 @@
 
 #include "algorithm.h"
 #include "defjams.h"
+#include "digisynth.h"
 #include "dxsynth.h"
 #include "fx.h"
 #include "minisynth.h"

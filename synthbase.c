@@ -41,7 +41,8 @@ void synthbase_init(synthbase *base, void *parent,
     base->note_mode = false;
 }
 
-void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note, bool save_pattern)
+void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
+                                bool save_pattern)
 {
     if (mixer_is_valid_seq_gen_num(mixr, gen_src))
     {
@@ -51,7 +52,7 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note, bo
             base->restore_pending = true;
         }
 
-        synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
+        // synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
 
         synthbase_stop(base);
         sequence_generator *sg = mixr->sequence_generators[gen_src];
@@ -124,6 +125,11 @@ void synthbase_stop(synthbase *base)
     {
         dxsynth *p = (dxsynth *)base->parent;
         dxsynth_stop(p);
+    }
+    else if (base->parent_synth_type == DIGISYNTH_TYPE)
+    {
+        digisynth *d = (digisynth *)base->parent;
+        digisynth_stop(d);
     }
 }
 

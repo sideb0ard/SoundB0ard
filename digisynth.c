@@ -85,10 +85,12 @@ void digisynth_status(void *self, wchar_t *status_string)
     digisynth *ds = (digisynth *)self;
     swprintf(status_string, MAX_PS_STRING_SZ,
              WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
-                               " vol: %.2f active: %s midi_note:%d gen_src:%d",
+                               " vol: %.2f active: %s midi_note:%d gen_src:%d "
+                               "sample_len:%d read_idx:%d",
              ds->audiofile, ds->vol,
              ds->sound_generator.active ? "true" : "false", ds->base.midi_note,
-             ds->base.generate_src);
+             ds->base.generate_src, ds->m_voices[0].m_osc1.afd.samplecount,
+             ds->m_voices[0].m_osc1.m_read_idx);
     wchar_t scratch[1024] = {};
     synthbase_status(&ds->base, scratch);
     wcscat(status_string, scratch);
@@ -133,6 +135,7 @@ void digisynth_sg_stop(void *self)
 {
     digisynth *ds = (digisynth *)self;
     ds->sound_generator.active = false;
+    digisynth_stop(ds);
 }
 
 void digisynth_del_self(void *self)
@@ -141,10 +144,10 @@ void digisynth_del_self(void *self)
     free(ds);
 }
 
+void digisynth_stop(digisynth *d) { digisynth_midi_note_off(d, 0, 0, true); }
 ////////////////////////////////////
 
 // bool digisynth_prepare_for_play(digisynth *synth);
-// void digisynth_stop(digisynth *ms);
 // void digisynth_update(digisynth *synth);
 
 // void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,

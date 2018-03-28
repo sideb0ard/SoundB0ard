@@ -14,6 +14,7 @@ void sampleosc_init(sampleosc *sosc, char *filename)
     sosc->is_pitchless = false;
     sosc->loop_mode = SAMPLE_ONESHOT;
     osc_new_settings(&sosc->osc);
+    sampleosc_reset_oscillator(&sosc->osc);
 }
 
 void sampleosc_set_oscillator_interface(sampleosc *sosc)
@@ -46,6 +47,9 @@ double sampleosc_read_sample_buffer(sampleosc *sosc)
 
     int read_idx = sosc->m_read_idx;
     double frac = sosc->m_read_idx - read_idx;
+
+    if (sosc->m_read_idx > sosc->afd.samplecount)
+        printf("OSC IDX TOO BIG %f\n", sosc->m_read_idx);
 
     if (sosc->afd.channels == 1)
     {
@@ -94,19 +98,19 @@ void sampleosc_update(oscillator *self)
         return;
     }
 
-    double unity_freq =
-        sosc->is_single_cycle
-            ? (SAMPLE_RATE / (sosc->afd.samplecount / sosc->afd.channels))
-            : get_midi_freq(36); // c
+    double unity_freq = sosc->is_single_cycle
+                            ? (SAMPLE_RATE / ((float)sosc->afd.samplecount /
+                                              (float)sosc->afd.channels))
+                            : get_midi_freq(36); // c
 
     double length = SAMPLE_RATE / unity_freq;
 
     sosc->osc.m_inc *= length;
 
-    if (sosc->m_read_idx >= sosc->afd.samplecount)
-    {
-        sosc->m_read_idx -= sosc->afd.samplecount;
-    }
+    // if (sosc->m_read_idx >= sosc->afd.samplecount)
+    //{
+    //    sosc->m_read_idx -= sosc->afd.samplecount;
+    //}
 }
 
 double sampleosc_do_oscillate(oscillator *self, double *quad_phase_output)
@@ -132,14 +136,19 @@ double sampleosc_do_oscillate(oscillator *self, double *quad_phase_output)
         if (sosc->m_read_idx >
             (double)(sosc->afd.samplecount - sosc->afd.channels - 1) /
                 sosc->afd.channels)
+        {
             sosc->m_read_idx = -1;
+        }
     }
     else
     {
         if (sosc->m_read_idx >
             (double)(sosc->afd.samplecount - sosc->afd.channels - 1) /
                 sosc->afd.channels)
+        {
+            printf("BEYOND! %f\n", sosc->m_read_idx);
             sosc->m_read_idx = 0;
+        }
     }
 
     return left_output;
