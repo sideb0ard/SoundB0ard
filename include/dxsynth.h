@@ -125,6 +125,7 @@ void dxsynth_sg_stop(void *self);
 int dxsynth_get_num_patterns(void *self);
 void dxsynth_set_num_patterns(void *self, int num_patterns);
 void dxsynth_make_active_track(void *self, int tracknum);
+bool dxsynth_is_valid_pattern(void *self, int pattern_num);
 
 ////////////////////////////////////
 

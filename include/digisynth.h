@@ -36,6 +36,7 @@ void digisynth_set_num_patterns(void *self, int num_patterns);
 void digisynth_make_active_track(void *self, int tracknum);
 midi_event *digisynth_get_pattern(void *self, int pattern_num);
 void digisynth_set_pattern(void *self, int pattern_num, midi_event *pattern);
+bool digisynth_is_valid_pattern(void *self, int pattern_num);
 
 ////////////////////////////////////
 

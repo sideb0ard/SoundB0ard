@@ -76,6 +76,7 @@ void sds_start(void *self);
 void sds_stop(void *self);
 int sds_get_num_patterns(void *self);
 void sds_set_num_patterns(void *self, int num_patterns);
+bool synthdrum_is_valid_pattern(void *self, int pattern_num);
 void sds_make_active_track(void *self, int tracknum);
 void sds_event_notify(void *self, unsigned int event_type);
 

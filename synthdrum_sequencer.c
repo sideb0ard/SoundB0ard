@@ -93,11 +93,18 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->sg.event_notify = &sds_event_notify;
     sds->sg.set_pattern = &synthdrum_set_pattern;
     sds->sg.get_pattern = &synthdrum_get_pattern;
+    sds->sg.is_valid_pattern = &synthdrum_is_valid_pattern;
     sds->sg.type = SYNTHDRUM_TYPE;
     sds->mod_semitones_range = 4;
     sds_start(sds);
 
     return sds;
+}
+
+bool synthdrum_is_valid_pattern(void *self, int pattern_num)
+{
+    synthdrum_sequencer *seq = (synthdrum_sequencer *)self;
+    return seq_is_valid_pattern_num(&seq->m_seq, pattern_num);
 }
 
 void synthdrum_randomize(synthdrum_sequencer *sds)

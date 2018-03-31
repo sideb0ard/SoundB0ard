@@ -155,6 +155,7 @@ void minisynth_sg_stop(void *self);
 int minisynth_get_num_patterns(void *self);
 void minisynth_set_num_patterns(void *self, int num_patterns);
 void minisynth_make_active_track(void *self, int tracknum);
+bool minisynth_is_valid_pattern(void *self, int pattern_num);
 
 ////////////////////////////////////
 

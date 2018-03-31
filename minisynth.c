@@ -47,6 +47,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.set_pattern = &minisynth_set_pattern;
     ms->sound_generator.get_pattern = &minisynth_get_pattern;
     ms->sound_generator.self_destruct = &minisynth_del_self;
+    ms->sound_generator.is_valid_pattern = &minisynth_is_valid_pattern;
     ms->sound_generator.type = MINISYNTH_TYPE;
 
     strncpy(ms->m_settings.m_settings_name, "default", 7);
@@ -166,6 +167,13 @@ minisynth *new_minisynth(void)
 
     return ms;
 }
+
+bool minisynth_is_valid_pattern(void *self, int pattern_num)
+{
+    minisynth *ms = (minisynth *)self;
+    return is_valid_pattern_num(&ms->base, pattern_num);
+}
+
 
 ////////////////////////////////////
 

@@ -37,6 +37,7 @@ dxsynth *new_dxsynth(void)
     dx->sound_generator.self_destruct = &dxsynth_del_self;
     dx->sound_generator.set_pattern = &dxsynth_set_pattern;
     dx->sound_generator.get_pattern = &dxsynth_get_pattern;
+    dx->sound_generator.is_valid_pattern = &dxsynth_is_valid_pattern;
     dx->sound_generator.type = DXSYNTH_TYPE;
 
     strncpy(dx->m_settings.m_settings_name, "default", 7);
@@ -123,6 +124,12 @@ dxsynth *new_dxsynth(void)
     dx->sound_generator.active = true;
     printf("BOOM!\n");
     return dx;
+}
+
+bool dxsynth_is_valid_pattern(void *self, int pattern_num)
+{
+    dxsynth *dx = (dxsynth *)self;
+    return is_valid_pattern_num(&dx->base, pattern_num);
 }
 
 ////////////////////////////////////

@@ -35,6 +35,7 @@ digisynth *new_digisynth(char *filename)
     ds->sound_generator.make_active_track = &digisynth_make_active_track;
     ds->sound_generator.set_pattern = &digisynth_set_pattern;
     ds->sound_generator.get_pattern = &digisynth_get_pattern;
+    ds->sound_generator.is_valid_pattern = &digisynth_is_valid_pattern;
     ds->sound_generator.type = DIGISYNTH_TYPE;
     ds->sound_generator.active = true;
 
@@ -47,6 +48,13 @@ digisynth *new_digisynth(char *filename)
 
     return ds;
 }
+
+bool digisynth_is_valid_pattern(void *self, int pattern_num)
+{
+    digisynth *digi = (digisynth *)self;
+    return is_valid_pattern_num(&digi->base, pattern_num);
+}
+
 
 // sound generator interface //////////////
 stereo_val digisynth_gennext(void *self)
