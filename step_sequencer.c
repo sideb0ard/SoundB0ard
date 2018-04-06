@@ -472,46 +472,41 @@ void seq_swing_pattern(sequencer *s, int pattern_num, int swing_setting)
         int old_swing_setting = s->pattern_num_swing_setting[pattern_num];
         if (old_swing_setting == swing_setting)
             return;
-
-        // printf("Setting pattern %d swing setting to %d\n", pattern_num,
-        //       swing_setting);
         s->pattern_num_swing_setting[pattern_num] = swing_setting;
 
-        int hitz_to_swing[64] = {
-            0}; // arbitrary - shouldn't have more than 64 hits
-        int hitz_to_swing_idx = 0;
+        int swing_diff = swing_setting - old_swing_setting;
 
-        int multi = PPBAR / s->pattern_len;
-
-        int idx = multi; // miss out first sixteenth
-        while (idx < PPBAR)
+        midi_event new_pattern[PPBAR] = {};
+        midi_event *cur_pattern = seq_get_pattern(s, pattern_num);
+        bool even16th = true;
+        for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
         {
-            int next_idx = idx + multi;
-            // printf("IDX %d // next idx %d\n", idx, next_idx);
-            for (; idx < next_idx; idx++)
+            for (int j = 0; j < PPSIXTEENTH; j++)
             {
-                if (s->patterns[s->cur_pattern][idx].event_type == MIDI_ON)
+                int idx = i + j;
+                if (cur_pattern[idx].event_type)
                 {
-                    // printf("Found a hit at %d\n", idx);
-                    hitz_to_swing[hitz_to_swing_idx++] = idx;
+                    if (even16th)
+                    {
+                        // clean copy
+                        new_pattern[idx] = cur_pattern[idx];
+                    }
+                    else
+                    {
+                        int new_idx =
+                            idx + swing_diff * 19; // TODO magic number 19 midi
+                                                   // ticks per 4% swing
+                        while (new_idx < 0)
+                            new_idx = PPBAR - new_idx;
+                        while (new_idx >= PPBAR)
+                            new_idx = new_idx - PPBAR;
+                        new_pattern[new_idx] = cur_pattern[idx];
+                    }
                 }
             }
-            idx += multi;
+            even16th = 1 - even16th;
         }
-
-        int diff = (swing_setting - old_swing_setting) *
-                   4;            // swing moves in incs of 4%
-        int num_ppz = multi * 2; // i.e. percent between two increments
-        int pulses_to_move = num_ppz / 100.0 * diff;
-        // printf("Pulses to move is %d\n", pulses_to_move);
-
-        for (int i = 0; i < 64; i++)
-        {
-            if (hitz_to_swing[i] == 0)
-                break;
-            int hit = hitz_to_swing[i];
-            seq_mv_micro_hit(s, pattern_num, hit, hit + pulses_to_move);
-        }
+        seq_set_pattern(s, pattern_num, new_pattern);
     }
 }
 

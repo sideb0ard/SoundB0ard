@@ -172,12 +172,12 @@ void sds_status(void *self, wchar_t *ss)
     swprintf(ss, MAX_PS_STRING_SZ,
              WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f distortion_threshold:%.2f\n"
              "o1_wav:%d o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
-             "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_sus_ms:%.2f e1_rel:%.2f\n"
+             "OSC1 AMP ENV:: e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_sus_ms:%.2f e1_rel:%.2f\n"
              "%s"
              "o2_wav:%d o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
-             "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f eg2_sus_ms:%.2f e2_rel:%.2f\n"
+             "OSC2 PITCH ENV:: e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f eg2_sus_ms:%.2f e2_rel:%.2f\n"
              "%s"
-             "e3_att:%.2f e3_dec:%.2f e3_sus_lvl:%.2f e3_sus_ms:%.2f e3_rel:%.2f\n"
+             "output AMP ENV:: e3_att:%.2f e3_dec:%.2f e3_sus_lvl:%.2f e3_sus_ms:%.2f e3_rel:%.2f\n"
              "%s"
              "filter_type:%d freq:%.2f q:%.2f",
 

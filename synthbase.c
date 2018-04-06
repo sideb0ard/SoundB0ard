@@ -537,12 +537,11 @@ midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)
 void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
     synthbase *base = (synthbase *)self;
-    printf("SET PATTERN!\n");
-    midi_pattern_print(pattern);
-    printf("PATTERN NUM! %d\n", pattern_num);
+    //printf("SET PATTERN!\n");
+    //midi_pattern_print(pattern);
+    //printf("PATTERN NUM! %d\n", pattern_num);
     if (is_valid_pattern_num(base, pattern_num))
     {
-        printf("VALUD!\n");
         clear_pattern(base->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {
@@ -550,7 +549,7 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
             // base->patterns[pattern_num][i] = pattern[i];
             if (base->chord_mode && pattern[i].event_type)
             {
-                printf("midi note: %d\n", pattern[i].data1);
+                //printf("midi note: %d\n", pattern[i].data1);
                 midi_event copy = pattern[i];
                 copy.data1 = pattern[i].data1 + 4;
                 synthbase_add_event(base, pattern_num, i, copy);

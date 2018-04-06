@@ -30,20 +30,20 @@ typedef struct synthdrum_sequencer
     qblimited_oscillator m_osc2;
     double osc2_amp;
 
-    // osc1 amp
+    // osc1 amp ENV
     envelope_generator m_eg1;
     double eg1_sustain_len_in_samples;
     int eg1_sustain_ms;
     int eg1_sustain_counter;
 
-    // osc2 pitch
+    // osc2 pitch ENV
     envelope_generator m_eg2;
     double eg2_osc2_intensity;
     double eg2_sustain_len_in_samples;
     int eg2_sustain_ms;
     int eg2_sustain_counter;
 
-    // output amp
+    // output amp ENV
     envelope_generator m_eg3;
     double eg3_sustain_len_in_samples;
     int eg3_sustain_ms;

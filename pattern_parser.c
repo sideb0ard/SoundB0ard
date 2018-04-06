@@ -15,6 +15,7 @@
 #include <mixer.h>
 #include <pattern_parser.h>
 #include <sample_sequencer.h>
+#include <sequencer_utils.h>
 
 #define WEE_STACK_SIZE 32
 #define _MAX_VAR_NAME 32
@@ -57,14 +58,14 @@ static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
     return false;
 }
 
-static void print_pattern(midi_event *pattern)
-{
-    for (int i = 0; i < PPBAR; i++)
-    {
-        if (pattern[i].event_type)
-            printf("[%d] %d\n", i, pattern[i].event_type);
-    }
-}
+// static void print_pattern(midi_event *pattern)
+//{
+//    for (int i = 0; i < PPBAR; i++)
+//    {
+//        if (pattern[i].event_type)
+//            printf("[%d] %d\n", i, pattern[i].event_type);
+//    }
+//}
 
 static void print_pattern_tokens(pattern_token tokens[MAX_PATTERN], int len)
 {
@@ -439,24 +440,60 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
                         int ppositions[MAX_PATTERN], int *numpositions)
 {
 
-    // printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level,
-    // start_idx, pattern_len);
+    printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level,
+           start_idx, pattern_len);
     int num_children = pgroups[level].num_children;
     if (num_children != 0)
     {
-        // TODO - call euclidean here rather than simple division
-        int incr = pattern_len / num_children;
+        // int incr = pattern_len / num_children;
+        int pattern_ratio = pattern_len / PPSIXTEENTH;
+        printf("I haz %d children - ratio is %d\n", num_children,
+              pattern_ratio);
+        uint16_t euclid_pattern =
+            create_euclidean_rhythm(num_children, pattern_ratio);
+
+        char bin_num[17] = {};
+        char_binary_version_of_short(euclid_pattern, bin_num);
+        printf("My euclid bin pattern is %s\n", bin_num);
+
+        int posz[num_children];
+        int posz_idx = 0;
+        for (int i = 0; i < pattern_ratio; i++)
+        {
+            int rel_position = 1 << (15 - i);
+            if (rel_position & euclid_pattern)
+            {
+                posz[posz_idx] = (i * PPSIXTEENTH) + start_idx;
+                printf("POS %d is %d\n", posz_idx, posz[posz_idx]);
+                posz_idx++;
+            }
+        }
+        int child_pattern_len = pattern_len;
         for (int i = 0; i < num_children; i++)
         {
+            // int chidx = (i * incr) + start_idx;
+            int chidx = posz[i];
+            printf("POSITION[%d] %d\n", i, chidx);
             int child = pgroups[level].children[i].level_idx;
-            int chidx = (i * incr) + start_idx;
-            // printf("CHILD:%d plays at pos%d\n", child, chidx);
-            ppositions[(*numpositions)++] = chidx;
+            //    printf("OLD CHILD:%d plays at pos%d\n", child, chidx);
+            ppositions[(*numpositions)++] = posz[i];
             if (pgroups[level].children[i].new_level)
             {
-                // printf("NEW LEVEL!\n");
-                work_out_positions(pgroups, child, chidx, incr, ppositions,
-                                   numpositions);
+                printf("NEW LEVEL! i+1:%d num_children:%d\n", i+1, num_children);
+                if ((i+1) < num_children)
+                {
+                    printf("less! posi+1:%d - posi:%d\n", posz[i+1], posz[i]);
+                    child_pattern_len = posz[i + 1] - posz[i];
+                }
+                else
+                {
+                    printf("else! pattern len:%d minus pos[i]:%d\n", pattern_len, posz[i]);
+                    child_pattern_len = (pattern_len+start_idx) - posz[i];
+                }
+                printf("NOW CHILD LEN IS %d\n", child_pattern_len);
+                printf("HONK! i is %d and num_child = %d\n", i, num_children);
+                work_out_positions(pgroups, child, chidx, child_pattern_len,
+                                   ppositions, numpositions);
             }
         }
     }

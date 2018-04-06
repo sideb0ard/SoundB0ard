@@ -90,7 +90,7 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
         seq->sample_positions[i].audiobuffer_inc = 1.0;
         seq->sample_positions[i].playing = 0;
         seq->sample_positions[i].played = 0;
-        seq->sample_positions[i].speed = 1;
+        seq->sample_positions[i].amp = 1;
         seq->sample_positions[i].speed = 1;
     }
 }
