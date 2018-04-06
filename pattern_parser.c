@@ -446,52 +446,30 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
     if (num_children != 0)
     {
         // int incr = pattern_len / num_children;
-        int pattern_ratio = pattern_len / PPSIXTEENTH;
-        printf("I haz %d children - ratio is %d\n", num_children,
-              pattern_ratio);
-        uint16_t euclid_pattern =
-            create_euclidean_rhythm(num_children, pattern_ratio);
-
-        char bin_num[17] = {};
-        char_binary_version_of_short(euclid_pattern, bin_num);
-        printf("My euclid bin pattern is %s\n", bin_num);
+        int pattern_ratio = 16 / (pattern_len / PPSIXTEENTH);
+        uint16_t euclid_pattern = create_euclidean_rhythm(num_children, 16);
 
         int posz[num_children];
         int posz_idx = 0;
-        for (int i = 0; i < pattern_ratio; i++)
+        for (int i = 0; i < 16; i++)
         {
             int rel_position = 1 << (15 - i);
             if (rel_position & euclid_pattern)
-            {
-                posz[posz_idx] = (i * PPSIXTEENTH) + start_idx;
-                printf("POS %d is %d\n", posz_idx, posz[posz_idx]);
-                posz_idx++;
-            }
+                posz[posz_idx++] =
+                    ((i / pattern_ratio) * PPSIXTEENTH) + start_idx;
         }
         int child_pattern_len = pattern_len;
         for (int i = 0; i < num_children; i++)
         {
-            // int chidx = (i * incr) + start_idx;
             int chidx = posz[i];
-            printf("POSITION[%d] %d\n", i, chidx);
             int child = pgroups[level].children[i].level_idx;
-            //    printf("OLD CHILD:%d plays at pos%d\n", child, chidx);
             ppositions[(*numpositions)++] = posz[i];
             if (pgroups[level].children[i].new_level)
             {
-                printf("NEW LEVEL! i+1:%d num_children:%d\n", i+1, num_children);
-                if ((i+1) < num_children)
-                {
-                    printf("less! posi+1:%d - posi:%d\n", posz[i+1], posz[i]);
+                if ((i + 1) < num_children)
                     child_pattern_len = posz[i + 1] - posz[i];
-                }
                 else
-                {
-                    printf("else! pattern len:%d minus pos[i]:%d\n", pattern_len, posz[i]);
-                    child_pattern_len = (pattern_len+start_idx) - posz[i];
-                }
-                printf("NOW CHILD LEN IS %d\n", child_pattern_len);
-                printf("HONK! i is %d and num_child = %d\n", i, num_children);
+                    child_pattern_len = (pattern_len + start_idx) - posz[i];
                 work_out_positions(pgroups, child, chidx, child_pattern_len,
                                    ppositions, numpositions);
             }
