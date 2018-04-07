@@ -440,13 +440,12 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
                         int ppositions[MAX_PATTERN], int *numpositions)
 {
 
-    printf("Looking at Level:%d start_idx:%d pattern_len: %d\n", level,
-           start_idx, pattern_len);
     int num_children = pgroups[level].num_children;
+    //printf("Looking at Level:%d start_idx:%d pattern_len:%d num_children:%d\n",
+    //       level, start_idx, pattern_len, num_children);
     if (num_children != 0)
     {
-        // int incr = pattern_len / num_children;
-        int pattern_ratio = 16 / (pattern_len / PPSIXTEENTH);
+        double pattern_ratio = 16 / (pattern_len / PPSIXTEENTH);
         uint16_t euclid_pattern = create_euclidean_rhythm(num_children, 16);
 
         int posz[num_children];
@@ -455,23 +454,31 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
         {
             int rel_position = 1 << (15 - i);
             if (rel_position & euclid_pattern)
+            {
                 posz[posz_idx++] =
                     ((i / pattern_ratio) * PPSIXTEENTH) + start_idx;
+                //printf("i:%d pattern_ratio:%f posz[i]:%d\n", i, pattern_ratio,
+                //       posz[posz_idx]);
+            }
         }
         int child_pattern_len = pattern_len;
         for (int i = 0; i < num_children; i++)
         {
             int chidx = posz[i];
             int child = pgroups[level].children[i].level_idx;
-            ppositions[(*numpositions)++] = posz[i];
+            ppositions[(*numpositions)++] = chidx;
+            //printf("CHILD:%d chidx:%d numpositions:%d\n", child, chidx,
+            //       *numpositions);
             if (pgroups[level].children[i].new_level)
             {
+                //printf("New level!\n");
                 if ((i + 1) < num_children)
                     child_pattern_len = posz[i + 1] - posz[i];
                 else
                     child_pattern_len = (pattern_len + start_idx) - posz[i];
                 work_out_positions(pgroups, child, chidx, child_pattern_len,
                                    ppositions, numpositions);
+                //printf("POPPED BACK from New level!\n");
             }
         }
     }
