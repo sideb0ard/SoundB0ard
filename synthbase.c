@@ -34,7 +34,7 @@ void synthbase_init(synthbase *base, void *parent,
     base->sample_rate = 44100;
     base->sample_rate_counter = 0;
 
-    base->generate_src = -99;
+    // base->generate_src = -99;
     base->last_midi_note = 23;
     base->midi_note = 23;
     base->sustain_note_ms = 200;
@@ -549,7 +549,6 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
             // base->patterns[pattern_num][i] = pattern[i];
             if (base->chord_mode && pattern[i].event_type)
             {
-                //printf("midi note: %d\n", pattern[i].data1);
                 midi_event copy = pattern[i];
                 copy.data1 = pattern[i].data1 + 4;
                 synthbase_add_event(base, pattern_num, i, copy);

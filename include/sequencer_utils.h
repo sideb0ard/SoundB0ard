@@ -13,5 +13,5 @@ int pattern_as_int_representation(midi_pattern p);
 void wchar_binary_version_of_short(int num, wchar_t bin_num[17]);
 void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
                                          midi_event *pattern,
-                                         int len_pattern_array);
+                                         int division, int offset);
 void print_pattern(int *pattern_array, int len_pattern_array);

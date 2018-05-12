@@ -224,9 +224,10 @@ void sample_seq_status(void *self, wchar_t *status_string)
              WANSI_COLOR_WHITE "%s\n"
                                "%s"
                                "vol:%.2lf pitch:%.2f num_patterns:%d "
-                               "gen_mode:%d gen_src:%d gen_every:%d",
+                               "gen_en:%d gen_mode:%d gen_src:%d gen_every:%d",
              seq->filename, INSTRUMENT_COLOR, seq->vol, seq->buffer_pitch,
-             seq->m_seq.num_patterns, seq->m_seq.generate_mode,
+             seq->m_seq.num_patterns, seq->m_seq.generate_en,
+             seq->m_seq.generate_mode,
              seq->m_seq.generate_src, seq->m_seq.generate_every_n_loops);
 
     wcscat(status_string, local_status_string);

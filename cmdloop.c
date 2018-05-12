@@ -126,7 +126,7 @@ int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)
     return num_wurds;
 }
 
-void char_array_to_seq_string_pattern(sequencer *seq, char *dest_pattern,
+void char_array_to_seq_string_pattern(step_sequencer *seq, char *dest_pattern,
                                       char char_array[NUM_WURDS][SIZE_OF_WURD],
                                       int start, int end)
 {

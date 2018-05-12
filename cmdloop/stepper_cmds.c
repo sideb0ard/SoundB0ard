@@ -206,7 +206,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                                   char wurds[][SIZE_OF_WURD], int num_wurds)
 {
     soundgenerator *sg = mixr->sound_generators[soundgen_num];
-    sequencer *seq;
+    step_sequencer *seq;
     if (mixr->sound_generators[soundgen_num]->type == SEQUENCER_TYPE)
     {
         sample_sequencer *s = (sample_sequencer *)sg;
@@ -257,7 +257,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                 int num_gens = atoi(wurds[4]);
                 if (num_gens > 0)
                 {
-                    seq_set_generate_mode(seq, true);
+                    seq_set_generate_enable(seq, true);
                     seq->generate_every_n_loops = num_gens;
                 }
                 else
@@ -270,13 +270,18 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                 int num_gens = atoi(wurds[4]);
                 if (num_gens > 0)
                 {
-                    seq_set_generate_mode(seq, true);
+                    seq_set_generate_enable(seq, true);
                     seq_set_max_generations(seq, num_gens);
                 }
                 else
                 {
                     printf("Need a number for 'for'\n");
                 }
+            }
+            else if (strncmp("mode", wurds[3], 4) == 0)
+            {
+                int mode = atoi(wurds[4]);
+                seq_set_generate_mode(seq, mode);
             }
             else if (strncmp("source", wurds[3], 6) == 0 ||
                      strncmp("src", wurds[3], 3) == 0)
@@ -291,7 +296,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
             }
             else
             {
-                seq_set_generate_mode(seq, 1 - seq->generate_mode);
+                seq_set_generate_enable(seq, 1 - seq->generate_en);
             }
         }
         else if (strncmp("multi", wurds[2], 5) == 0)

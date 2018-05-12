@@ -85,19 +85,16 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("env_mode", wurds[2], 8) == 0)
                 {
                     int mode = atoi(wurds[3]);
-                    printf("ENV MODE is %d\n", mode);
                     looper_set_envelope_mode(g, mode);
                 }
                 else if (strncmp("loop_mode", wurds[2], 9) == 0)
                 {
                     int mode = atoi(wurds[3]);
-                    printf("loop MODE is %d\n", mode);
                     looper_set_loop_mode(g, mode);
                 }
                 else if (strncmp("loop_len", wurds[2], 8) == 0)
                 {
                     double len = atof(wurds[3]);
-                    printf("loop LEN is %f\n", len);
                     looper_set_loop_len(g, len);
                 }
                 else if (strncmp("scramble", wurds[2], 8) == 0)
@@ -107,7 +104,6 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("sequencer_mode", wurds[2], 13) == 0)
                 {
                     int mode = atoi(wurds[3]);
-                    printf("MODE is %d\n", mode);
                     looper_set_sequencer_mode(g, mode);
                 }
                 else if (strncmp("stutter", wurds[2], 8) == 0)
@@ -117,19 +113,16 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("movement", wurds[2], 8) == 0)
                 {
                     int mode = atoi(wurds[3]);
-                    printf("Movement MODE is %d\n", mode);
                     looper_set_movement_mode(g, mode);
                 }
                 else if (strncmp("reverse", wurds[2], 8) == 0)
                 {
                     int mode = atoi(wurds[3]);
-                    printf("REverse MODE is %d\n", mode);
                     looper_set_reverse_mode(g, mode);
                 }
                 else if (strncmp("l1_type", wurds[2], 8) == 0)
                 {
                     int type = atoi(wurds[3]);
-                    printf("LFO TYPE is %d\n", type);
                     looper_set_lfo_voice(g, 1, type);
                 }
                 else if (strncmp("l1_amp", wurds[2], 7) == 0)

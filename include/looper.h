@@ -85,7 +85,7 @@ typedef struct looper
     int grain_attack_time_pct;
     int grain_release_time_pct;
 
-    sequencer m_seq;
+    step_sequencer m_seq;
     bool sequencer_mode;
 
     envelope_generator m_eg1; // start/stop amp

@@ -712,12 +712,12 @@ void dxsynth_rand_settings(dxsynth *dx)
     printf("Randomizing DXSYNTH!\n");
 
     dx->m_settings.m_voice_mode = rand() % 8;
-    dx->m_settings.m_portamento_time_ms = rand() % 5000;
-    dx->m_settings.m_pitchbend_range = (rand() % 12) + 1;
-    dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
-    dx->m_settings.m_note_number_to_decay_scaling = rand() % 2;
-    dx->m_settings.m_reset_to_zero = rand() % 2;
-    dx->m_settings.m_legato_mode = rand() % 2;
+    //dx->m_settings.m_portamento_time_ms = rand() % 5000;
+    //dx->m_settings.m_pitchbend_range = (rand() % 12) + 1;
+    //dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
+    //dx->m_settings.m_note_number_to_decay_scaling = rand() % 2;
+    //dx->m_settings.m_reset_to_zero = rand() % 2;
+    //dx->m_settings.m_legato_mode = rand() % 2;
 
     dx->m_settings.m_lfo1_intensity = ((float)rand()) / RAND_MAX;
     dx->m_settings.m_lfo1_rate = 0.02 + ((float)rand()) / (RAND_MAX / 20);
@@ -762,7 +762,7 @@ void dxsynth_rand_settings(dxsynth *dx)
     // dx->m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
     // dx->m_settings.m_eg4_release_ms = rand()% EG_MAXTIME_MS;
     // dx->m_settings.m_op4_output_lvl = ((float)rand()) / RAND_MAX;
-    // dx->m_settings.m_op4_feedback = rand() % 70;
+    dx->m_settings.m_op4_feedback = rand() % 70;
 
     dxsynth_update(dx);
     // dxsynth_print_settings(dx);

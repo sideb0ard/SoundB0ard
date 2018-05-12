@@ -4,6 +4,8 @@
 #include "portaudio.h"
 #include <pthread.h>
 
+#include "ableton_link_wrapper.h"
+
 #include "algorithm.h"
 #include "defjams.h"
 #include "digisynth.h"
@@ -51,7 +53,7 @@ typedef struct scene
 
 typedef unsigned int compat_key_list[6];
 
-typedef struct AbletonLink AbletonLink;
+// struct AbletonLink AbletonLink;
 
 typedef struct mixer
 {

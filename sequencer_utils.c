@@ -11,14 +11,17 @@ extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
 void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
-                                         midi_event *pattern, int len_pattern)
+                                         midi_event *pattern, int division, int offset)
 {
+
+    int pulses = PPSIXTEENTH / division;
 
     for (int i = 0; i < bitpattern_len; i++)
     {
         int shift_by = bitpattern_len - 1 - i;
+        int idx = offset + (i * pulses);
         if (bitpattern & 1 << shift_by)
-            pattern[i * PPSIXTEENTH].event_type = MIDI_ON;
+            pattern[idx].event_type = MIDI_ON;
     }
 }
 

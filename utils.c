@@ -1161,19 +1161,19 @@ void print_logo()
 
 void pattern_to_string(midi_event *pattern, wchar_t *patternstr)
 {
-    int cur_quart = 0;
+    int cur_sixteenth = 0;
     for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
     {
-        patternstr[cur_quart] = sparkchars[0];
-        patternstr[cur_quart + 1] = sparkchars[0];
+        patternstr[cur_sixteenth] = sparkchars[0];
+        patternstr[cur_sixteenth + 1] = sparkchars[0];
         for (int j = i; j < (i + PPSIXTEENTH); j++)
         {
             if (pattern[j].event_type == MIDI_ON)
             {
-                patternstr[cur_quart] = sparkchars[5];
-                patternstr[cur_quart + 1] = sparkchars[5];
+                patternstr[cur_sixteenth] = sparkchars[5];
+                patternstr[cur_sixteenth + 1] = sparkchars[5];
             }
         }
-        cur_quart += 2;
+        cur_sixteenth += 2;
     }
 }
