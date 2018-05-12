@@ -90,7 +90,7 @@ void sample_sequencer_reset_samples(sample_sequencer *seq)
         seq->sample_positions[i].audiobuffer_inc = 1.0;
         seq->sample_positions[i].playing = 0;
         seq->sample_positions[i].played = 0;
-        seq->sample_positions[i].amp = 1;
+        seq->sample_positions[i].amp = 0;
         seq->sample_positions[i].speed = 1;
     }
 }
@@ -159,17 +159,18 @@ stereo_val sample_seq_gennext(void *self)
         if (seq->samples_now_playing[i] != -1)
         {
             int cur_sample_midi_tick = seq->samples_now_playing[i];
+            int velocity =
+                seq->m_seq
+                    .patterns[seq->m_seq.cur_pattern][cur_sample_midi_tick]
+                    .data2;
+            double amp = scaleybum(0, 127, 0, 1, velocity);
             int idx =
                 seq->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos;
-            left_val += seq->buffer[idx] *
-                        seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
-                                                       [cur_sample_midi_tick];
+            left_val += seq->buffer[idx] * amp;
+
             if (seq->channels == 2)
             {
-                right_val +=
-                    seq->buffer[idx + 1] *
-                    seq->m_seq.pattern_position_amp[seq->m_seq.cur_pattern]
-                                                   [cur_sample_midi_tick];
+                right_val += seq->buffer[idx + 1] * amp;
             }
             seq->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
                 seq->sample_positions[cur_sample_midi_tick]

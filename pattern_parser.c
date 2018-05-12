@@ -185,20 +185,15 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
         if (var_tokens[i].type == VAR_NAME)
         {
             pattern[uniq_positions[i]].event_type = MIDI_ON;
+            pattern[uniq_positions[i]].data2 = DEFAULT_VELOCITY;
             if (pattern_type == MIDI_PATTERN)
-            {
                 pattern[uniq_positions[i]].data1 = atoi(var_tokens[i].value);
-                pattern[uniq_positions[i]].data2 = 128; // velocity
-            }
             else if (pattern_type == NOTE_PATTERN)
             {
                 int midi_num = get_midi_note_from_string(var_tokens[i].value);
                 printf("NOTE! %d\n", midi_num);
                 if (midi_num != -1)
-                {
                     pattern[uniq_positions[i]].data1 = midi_num;
-                    pattern[uniq_positions[i]].data2 = 128; // velocity
-                }
             }
         }
     }

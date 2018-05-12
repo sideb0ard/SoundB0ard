@@ -19,6 +19,8 @@
 
 #define DEFAULT_ARRAY_SIZE 32
 
+#define DEFAULT_VELOCITY 92
+
 #define MAX_PS_STRING_SZ 4096 // arbitrary
 
 #define ENVIRONMENT_ARRAY_SIZE 128

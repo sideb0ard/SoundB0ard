@@ -306,12 +306,6 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
             printf("Sequencer multi mode : %s\n",
                    seq->multi_pattern_mode ? "true" : "false");
         }
-        else if (strncmp("randamp", wurds[2], 6) == 0)
-        {
-            step_set_randamp(seq, 1 - seq->randamp_on);
-            printf("Toggling randamp to %s \n",
-                   seq->randamp_on ? "true" : "false");
-        }
         else if (strncmp("visualize", wurds[2], 9) == 0)
         {
             bool b = atoi(wurds[3]);

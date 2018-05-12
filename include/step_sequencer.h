@@ -15,7 +15,6 @@ typedef struct step_sequencer
     int pattern_len; // in musical steps, i.e. 24th or 16th
 
     midi_pattern patterns[MAX_SEQUENCER_PATTERNS];
-    double pattern_position_amp[MAX_SEQUENCER_PATTERNS][PPBAR];
     int pattern_num_loops[MAX_SEQUENCER_PATTERNS];
     int pattern_num_swing_setting[MAX_SEQUENCER_PATTERNS];
     midi_pattern backup_pattern_while_getting_crazy; // store current pattern so
@@ -32,11 +31,6 @@ typedef struct step_sequencer
     int generate_max_generation;
     int generate_every_n_loops;
 
-    // randomizes amplitude
-    bool randamp_on;
-    int randamp_generation;
-    int randamp_every_n_loops;
-
     bool visualize;
 
     int sloppiness; // 0 - 10
@@ -47,10 +41,8 @@ void step_init(step_sequencer *s);
 bool step_tick(step_sequencer *s);
 void step_status(step_sequencer *s, wchar_t *status_string);
 
-void step_set_sample_amp(step_sequencer *s, int pattern_num,
-                         int pattern_position, double v);
-void step_set_sample_amp_from_char_pattern(step_sequencer *s, int pattern_num,
-                                           char *amp_pattern);
+void step_set_sample_velocity(step_sequencer *s, int pattern_num,
+                              int pattern_position, unsigned int v);
 void step_set_random_sample_amp(step_sequencer *s, int pattern_num);
 void add_char_pattern(step_sequencer *s, char *pattern);
 void change_char_pattern(step_sequencer *s, int pattern_num, char *pattern);
@@ -63,7 +55,6 @@ void pattern_char_to_pattern(step_sequencer *s, char *char_pattern,
 void wchar_version_of_amp(step_sequencer *s, int pattern_num,
                           wchar_t apattern[49]);
 
-void step_set_randamp(step_sequencer *s, bool on);
 void step_set_pattern_len(step_sequencer *s, int len);
 
 void step_set_generate_mode(step_sequencer *s, unsigned int mode);

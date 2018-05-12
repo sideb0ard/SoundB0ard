@@ -22,7 +22,10 @@ void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
         int shift_by = bitpattern_len - 1 - i;
         int idx = offset + (i * pulses);
         if (bitpattern & 1 << shift_by)
+        {
             pattern[idx].event_type = MIDI_ON;
+            pattern[idx].data2 = DEFAULT_VELOCITY;
+        }
     }
 }
 

@@ -34,19 +34,6 @@ void step_init(step_sequencer *seq)
     seq->cur_pattern_iteration = 1;
     seq->pattern_len = 16;
 
-    for (int i = 0; i < MAX_SEQUENCER_PATTERNS; i++)
-    {
-        seq->pattern_num_loops[i] = 1;
-        for (int j = 0; j < PPBAR; j++)
-        {
-            seq->pattern_position_amp[i][j] = DEFAULT_AMP;
-        }
-    }
-
-    seq->randamp_on = false;
-    seq->randamp_generation = 0;
-    seq->randamp_every_n_loops = 0;
-
     seq->generate_en = false;
     seq->generate_src = -99;
     seq->generate_generation = 0;
@@ -152,23 +139,6 @@ bool step_tick(step_sequencer *seq)
                 }
                 seq->generate_generation++;
             }
-
-            if (seq->randamp_on)
-            {
-                if (seq->randamp_every_n_loops > 0)
-                {
-                    if (seq->randamp_generation % seq->randamp_every_n_loops ==
-                        0)
-                    {
-                        step_set_random_sample_amp(seq, seq->cur_pattern);
-                    }
-                }
-                else
-                {
-                    step_set_random_sample_amp(seq, seq->cur_pattern);
-                }
-                seq->randamp_generation++;
-            }
         }
         return true;
     }
@@ -240,8 +210,8 @@ void wchar_version_of_amp(step_sequencer *s, int pattern_num, wchar_t *apattern)
 {
     for (int i = 0; i < s->pattern_len; i++)
     {
-        double amp = s->pattern_position_amp[pattern_num][i];
-        int idx = (int)floor(scaleybum(0, 1.1, 0, wcslen(sparkchars), amp));
+        int v = s->patterns[pattern_num][i].data2;
+        int idx = (int)floor(scaleybum(0, 127, 0, wcslen(sparkchars), v));
         apattern[i] = sparkchars[idx];
         // wprintf(L"\n%lc\n", sparkchars[3]);
     }
@@ -259,43 +229,13 @@ void change_char_pattern(step_sequencer *s, int pattern_num, char *pattern)
     pattern_char_to_pattern(s, pattern, s->patterns[pattern_num]);
 }
 
-void step_set_sample_amp(step_sequencer *s, int pattern_num,
-                         int pattern_position, double v)
+void step_set_sample_velocity(step_sequencer *s, int pattern_num,
+                              int pattern_position, unsigned int v)
 {
-    s->pattern_position_amp[pattern_num][pattern_position] = v;
-}
-
-void step_set_random_sample_amp(step_sequencer *s, int pattern_num)
-{
-    for (int i = 0; i < s->pattern_len; i++)
-    {
-        double randy = (double)rand() / (double)RAND_MAX;
-        step_set_sample_amp(s, pattern_num, i, randy);
-    }
-}
-
-void step_set_sample_amp_from_char_pattern(step_sequencer *s, int pattern_num,
-                                           char *amp_pattern)
-{
-    printf("Ooh, setting amps to %s\n", amp_pattern);
-
-    int sp_count = 0;
-    char *sp, *sp_last, *spattern[32];
-    char const *sep = " ";
-
-    printf("CHARPATT %s\n", amp_pattern);
-    // extract numbers from string into spattern
-    for (sp = strtok_r(amp_pattern, sep, &sp_last); sp;
-         sp = strtok_r(NULL, sep, &sp_last))
-    {
-        spattern[sp_count++] = sp;
-    }
-
-    for (int i = 0; i < sp_count; i++)
-    {
-        printf("[%d] -- %s\n", i, spattern[i]);
-        step_set_sample_amp(s, pattern_num, atof(spattern[i]), 1);
-    }
+    if (v < 128)
+        s->patterns[pattern_num][pattern_position].data2 = v;
+    else
+        printf("Nae chance, velocity has to be between 0-127\n");
 }
 
 void step_set_multi_pattern_mode(step_sequencer *s, bool multi)
@@ -360,8 +300,6 @@ void step_set_generate_mode(step_sequencer *s, int unsigned mode)
         s->generate_mode = mode;
 }
 
-void step_set_randamp(step_sequencer *s, bool b) { s->randamp_on = b; }
-
 void step_set_pattern_len(step_sequencer *s, int len)
 {
     int ridiculous_size = 101;
@@ -407,7 +345,8 @@ void step_print_pattern(step_sequencer *s, unsigned int pattern_num)
         {
             if (s->patterns[pattern_num][i].event_type == MIDI_ON)
             {
-                printf("[%d] on\n", i);
+                printf("[%d] on - velocity = %d\n", i,
+                       s->patterns[pattern_num][i].data2);
             }
         }
     }
@@ -476,6 +415,7 @@ void step_add_micro_hit(step_sequencer *s, int pattern_num, int step)
     if (step_is_valid_pattern_num(s, pattern_num) && step < PPBAR)
     {
         s->patterns[pattern_num][step].event_type = MIDI_ON;
+        s->patterns[pattern_num][step].data2 = DEFAULT_VELOCITY;
     }
 }
 
