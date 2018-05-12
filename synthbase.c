@@ -537,9 +537,9 @@ midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)
 void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
     synthbase *base = (synthbase *)self;
-    //printf("SET PATTERN!\n");
-    //midi_pattern_print(pattern);
-    //printf("PATTERN NUM! %d\n", pattern_num);
+    // printf("SET PATTERN!\n");
+    // midi_pattern_print(pattern);
+    // printf("PATTERN NUM! %d\n", pattern_num);
     if (is_valid_pattern_num(base, pattern_num))
     {
         clear_pattern(base->patterns[pattern_num]);

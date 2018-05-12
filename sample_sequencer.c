@@ -20,7 +20,7 @@ sample_sequencer *new_sample_seq(char *filename)
 {
     sample_sequencer *seq =
         (sample_sequencer *)calloc(1, sizeof(sample_sequencer));
-    seq_init(&seq->m_seq);
+    step_init(&seq->m_seq);
 
     sample_seq_import_file(seq, filename);
 
@@ -51,19 +51,19 @@ sample_sequencer *new_sample_seq(char *filename)
 bool sample_sequencer_is_valid_pattern(void *self, int pattern_num)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    return seq_is_valid_pattern_num(&seq->m_seq, pattern_num);
+    return step_is_valid_pattern_num(&seq->m_seq, pattern_num);
 }
 
 midi_event *sample_seq_get_pattern(void *self, int pattern_num)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    return seq_get_pattern(&seq->m_seq, pattern_num);
+    return step_get_pattern(&seq->m_seq, pattern_num);
 }
 
 void sample_seq_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
     sample_sequencer *seq = (sample_sequencer *)self;
-    return seq_set_pattern(&seq->m_seq, pattern_num, pattern);
+    return step_set_pattern(&seq->m_seq, pattern_num, pattern);
 }
 
 void sample_seq_import_file(sample_sequencer *seq, char *filename)
@@ -123,7 +123,7 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
         break;
     case (TIME_SIXTEENTH_TICK):
         if (seq->started)
-            seq_tick(&seq->m_seq);
+            step_tick(&seq->m_seq);
         break;
     case (TIME_MIDI_TICK):
         if (seq->started)
@@ -227,13 +227,13 @@ void sample_seq_status(void *self, wchar_t *status_string)
                                "gen_en:%d gen_mode:%d gen_src:%d gen_every:%d",
              seq->filename, INSTRUMENT_COLOR, seq->vol, seq->buffer_pitch,
              seq->m_seq.num_patterns, seq->m_seq.generate_en,
-             seq->m_seq.generate_mode,
-             seq->m_seq.generate_src, seq->m_seq.generate_every_n_loops);
+             seq->m_seq.generate_mode, seq->m_seq.generate_src,
+             seq->m_seq.generate_every_n_loops);
 
     wcscat(status_string, local_status_string);
 
     wmemset(local_status_string, 0, MAX_PS_STRING_SZ);
-    seq_status(&seq->m_seq, local_status_string);
+    step_status(&seq->m_seq, local_status_string);
     wcscat(status_string, local_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
 }

@@ -14,7 +14,7 @@ synthdrum_sequencer *new_synthdrum_seq()
 {
     printf("New Drum Synth!\n");
     synthdrum_sequencer *sds = calloc(1, sizeof(synthdrum_sequencer));
-    seq_init(&sds->m_seq);
+    step_init(&sds->m_seq);
 
     sds->vol = 0.6;
     sds->started = false;
@@ -104,7 +104,7 @@ synthdrum_sequencer *new_synthdrum_seq()
 bool synthdrum_is_valid_pattern(void *self, int pattern_num)
 {
     synthdrum_sequencer *seq = (synthdrum_sequencer *)self;
-    return seq_is_valid_pattern_num(&seq->m_seq, pattern_num);
+    return step_is_valid_pattern_num(&seq->m_seq, pattern_num);
 }
 
 void synthdrum_randomize(synthdrum_sequencer *sds)
@@ -211,10 +211,10 @@ void sds_status(void *self, wchar_t *ss)
              sds->m_filter_fc, sds->m_filter_q);
     // clang-format on
 
-    wchar_t seq_status_string[MAX_PS_STRING_SZ];
-    memset(seq_status_string, 0, MAX_PS_STRING_SZ);
-    seq_status(&sds->m_seq, seq_status_string);
-    wcscat(ss, seq_status_string);
+    wchar_t step_status_string[MAX_PS_STRING_SZ];
+    memset(step_status_string, 0, MAX_PS_STRING_SZ);
+    step_status(&sds->m_seq, step_status_string);
+    wcscat(ss, step_status_string);
     wcscat(ss, WANSI_COLOR_RESET);
 }
 
@@ -248,7 +248,7 @@ void sds_event_notify(void *self, unsigned int event_type)
         break;
     case (TIME_SIXTEENTH_TICK):
         if (sds->started)
-            seq_tick(&sds->m_seq);
+            step_tick(&sds->m_seq);
         break;
     }
 }
@@ -761,11 +761,11 @@ void synthdrum_set_mod_semitones_range(synthdrum_sequencer *sds, int val)
 midi_event *synthdrum_get_pattern(void *self, int pattern_num)
 {
     synthdrum_sequencer *seq = (synthdrum_sequencer *)self;
-    return seq_get_pattern(&seq->m_seq, pattern_num);
+    return step_get_pattern(&seq->m_seq, pattern_num);
 }
 
 void synthdrum_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
     synthdrum_sequencer *seq = (synthdrum_sequencer *)self;
-    return seq_set_pattern(&seq->m_seq, pattern_num, pattern);
+    return step_set_pattern(&seq->m_seq, pattern_num, pattern);
 }

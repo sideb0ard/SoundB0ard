@@ -174,7 +174,6 @@ bool minisynth_is_valid_pattern(void *self, int pattern_num)
     return is_valid_pattern_num(&ms->base, pattern_num);
 }
 
-
 ////////////////////////////////////
 
 bool minisynth_prepare_for_play(minisynth *ms)

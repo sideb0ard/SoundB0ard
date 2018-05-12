@@ -69,7 +69,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (sg_src->is_valid_pattern(sg_src, sg_src_pattern_num) &&
                 sg_dst->is_valid_pattern(sg_dst, sg_dst_pattern_num))
             {
-                //printf("Copying from %d:%d to %d:%d\n", sg_src_num,
+                // printf("Copying from %d:%d to %d:%d\n", sg_src_num,
                 //       sg_src_pattern_num, sg_dst_num, sg_dst_pattern_num);
                 midi_event *pattern =
                     sg_src->get_pattern(sg_src, sg_src_pattern_num);

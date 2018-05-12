@@ -55,7 +55,6 @@ bool digisynth_is_valid_pattern(void *self, int pattern_num)
     return is_valid_pattern_num(&digi->base, pattern_num);
 }
 
-
 // sound generator interface //////////////
 stereo_val digisynth_gennext(void *self)
 {

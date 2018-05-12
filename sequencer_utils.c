@@ -11,7 +11,8 @@ extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
 void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
-                                         midi_event *pattern, int division, int offset)
+                                         midi_event *pattern, int division,
+                                         int offset)
 {
 
     int pulses = PPSIXTEENTH / division;

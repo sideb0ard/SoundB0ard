@@ -103,7 +103,7 @@ static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
             {
                 sample_sequencer *seq =
                     (sample_sequencer *)mixr->sound_generators[sg_num];
-                seq_clear_pattern(&seq->m_seq, 0);
+                step_clear_pattern(&seq->m_seq, 0);
                 return true;
             }
             else
@@ -441,7 +441,8 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
 {
 
     int num_children = pgroups[level].num_children;
-    //printf("Looking at Level:%d start_idx:%d pattern_len:%d num_children:%d\n",
+    // printf("Looking at Level:%d start_idx:%d pattern_len:%d
+    // num_children:%d\n",
     //       level, start_idx, pattern_len, num_children);
     if (num_children != 0)
     {
@@ -457,7 +458,8 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
             {
                 posz[posz_idx++] =
                     ((i / pattern_ratio) * PPSIXTEENTH) + start_idx;
-                //printf("i:%d pattern_ratio:%f posz[i]:%d\n", i, pattern_ratio,
+                // printf("i:%d pattern_ratio:%f posz[i]:%d\n", i,
+                // pattern_ratio,
                 //       posz[posz_idx]);
             }
         }
@@ -467,18 +469,18 @@ void work_out_positions(pattern_group pgroups[MAX_PATTERN], int level,
             int chidx = posz[i];
             int child = pgroups[level].children[i].level_idx;
             ppositions[(*numpositions)++] = chidx;
-            //printf("CHILD:%d chidx:%d numpositions:%d\n", child, chidx,
+            // printf("CHILD:%d chidx:%d numpositions:%d\n", child, chidx,
             //       *numpositions);
             if (pgroups[level].children[i].new_level)
             {
-                //printf("New level!\n");
+                // printf("New level!\n");
                 if ((i + 1) < num_children)
                     child_pattern_len = posz[i + 1] - posz[i];
                 else
                     child_pattern_len = (pattern_len + start_idx) - posz[i];
                 work_out_positions(pgroups, child, chidx, child_pattern_len,
                                    ppositions, numpositions);
-                //printf("POPPED BACK from New level!\n");
+                // printf("POPPED BACK from New level!\n");
             }
         }
     }

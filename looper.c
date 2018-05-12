@@ -60,7 +60,7 @@ looper *new_looper(char *filename)
         looper_import_file(g, filename);
 
     int len_of_16th = g->audio_buffer_len / 16.0;
-    seq_init(&g->m_seq);
+    step_init(&g->m_seq);
     looper_set_sequencer_mode(g, false);
 
     envelope_generator_init(&g->m_eg1); // start/stop env
@@ -180,7 +180,7 @@ void looper_event_notify(void *self, unsigned int event_type)
                 playing = true;
             }
 
-            seq_tick(&g->m_seq);
+            step_tick(&g->m_seq);
         }
 
         if (playing)

@@ -222,22 +222,22 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
 
     if (target_pattern_num != -1)
     {
-        if (seq_is_valid_pattern_num(seq, target_pattern_num))
+        if (step_is_valid_pattern_num(seq, target_pattern_num))
         {
             if (strncmp("print", wurds[2], 5) == 0)
-                seq_print_pattern(seq, target_pattern_num);
+                step_print_pattern(seq, target_pattern_num);
             else if (strncmp("numloops", wurds[2], 8) == 0)
             {
                 int numloops = atoi(wurds[3]);
                 if (numloops != 0)
                 {
-                    seq_change_num_loops(seq, target_pattern_num, numloops);
+                    step_change_num_loops(seq, target_pattern_num, numloops);
                 }
             }
             else if (strncmp("swing", wurds[2], 5) == 0)
             {
                 int swing_setting = atoi(wurds[3]);
-                seq_swing_pattern(seq, target_pattern_num, swing_setting);
+                step_swing_pattern(seq, target_pattern_num, swing_setting);
             }
             else
             {
@@ -257,7 +257,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                 int num_gens = atoi(wurds[4]);
                 if (num_gens > 0)
                 {
-                    seq_set_generate_enable(seq, true);
+                    step_set_generate_enable(seq, true);
                     seq->generate_every_n_loops = num_gens;
                 }
                 else
@@ -270,8 +270,8 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                 int num_gens = atoi(wurds[4]);
                 if (num_gens > 0)
                 {
-                    seq_set_generate_enable(seq, true);
-                    seq_set_max_generations(seq, num_gens);
+                    step_set_generate_enable(seq, true);
+                    step_set_max_generations(seq, num_gens);
                 }
                 else
                 {
@@ -281,7 +281,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
             else if (strncmp("mode", wurds[3], 4) == 0)
             {
                 int mode = atoi(wurds[4]);
-                seq_set_generate_mode(seq, mode);
+                step_set_generate_mode(seq, mode);
             }
             else if (strncmp("source", wurds[3], 6) == 0 ||
                      strncmp("src", wurds[3], 3) == 0)
@@ -289,26 +289,26 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                 int generate_src = atoi(wurds[4]);
                 if (mixer_is_valid_seq_gen_num(mixr, generate_src))
                 {
-                    seq_set_generate_src(seq, generate_src);
+                    step_set_generate_src(seq, generate_src);
                 }
                 else
                     printf("not a valid generate SRC: %d\n", generate_src);
             }
             else
             {
-                seq_set_generate_enable(seq, 1 - seq->generate_en);
+                step_set_generate_enable(seq, 1 - seq->generate_en);
             }
         }
         else if (strncmp("multi", wurds[2], 5) == 0)
         {
             bool b = atoi(wurds[3]);
-            seq_set_multi_pattern_mode(seq, b);
+            step_set_multi_pattern_mode(seq, b);
             printf("Sequencer multi mode : %s\n",
                    seq->multi_pattern_mode ? "true" : "false");
         }
         else if (strncmp("randamp", wurds[2], 6) == 0)
         {
-            seq_set_randamp(seq, 1 - seq->randamp_on);
+            step_set_randamp(seq, 1 - seq->randamp_on);
             printf("Toggling randamp to %s \n",
                    seq->randamp_on ? "true" : "false");
         }
