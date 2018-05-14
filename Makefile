@@ -15,6 +15,7 @@ SRC = \
 	cmdloop/fx_cmds.c \
 	cmdloop/algo_cmds.c \
 	cmdloop/looper_cmds.c \
+	cmdloop/midi_cmds.c \
 	cmdloop/mixer_cmds.c \
 	cmdloop/new_item_cmds.c \
 	cmdloop/sequence_generator_cmds.c \

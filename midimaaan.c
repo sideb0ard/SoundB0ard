@@ -373,3 +373,17 @@ int get_midi_note_from_string(char *string)
     else
         return -1;
 }
+
+void midi_pattern_set_velocity(midi_event *pattern, unsigned int midi_tick, unsigned int velocity)
+{
+    if (!pattern)
+    {
+        printf("Dingie, gimme a REAL pattern!\n");
+        return;
+    }
+
+    if (midi_tick < PPBAR && velocity < 128)
+        pattern[midi_tick].data2 = velocity;
+    else
+        printf("Nae valid!? Midi_tick:%d // velocity:%d\n", midi_tick, velocity);
+}

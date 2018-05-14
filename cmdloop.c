@@ -14,6 +14,7 @@
 #include <algo_cmds.h>
 #include <fx_cmds.h>
 #include <looper_cmds.h>
+#include <midi_cmds.h>
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
 #include <sequence_generator_cmds.h>
@@ -91,6 +92,9 @@ void interpret(char *line)
             continue;
 
         else if (parse_looper_cmd(num_wurds, wurds))
+            continue;
+
+        else if (parse_midi_cmd(num_wurds, wurds))
             continue;
 
         else if (parse_mixer_cmd(num_wurds, wurds))
