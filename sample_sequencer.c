@@ -290,7 +290,7 @@ void sample_start(void *self)
     printf("START SAMP!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     if (s->sound_generator.active)
-        return; //no-op
+        return; // no-op
     sample_sequencer_reset_samples(s);
     s->sound_generator.active = true;
 }

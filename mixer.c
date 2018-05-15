@@ -702,8 +702,7 @@ bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-        track_num >= 0 &&
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num) && track_num >= 0 &&
         track_num < mixr->sound_generators[soundgen_num]->get_num_patterns(
                         mixr->sound_generators[soundgen_num]))
         return true;
