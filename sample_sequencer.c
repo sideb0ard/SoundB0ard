@@ -137,6 +137,8 @@ void sample_seq_event_notify(void *self, unsigned int event_type)
                 if (seq_position != -1)
                 {
                     seq->samples_now_playing[seq_position] = idx;
+                    seq->velocity_now_playing[seq_position] =
+                        seq->m_seq.patterns[seq->m_seq.cur_pattern][idx].data2;
                 }
             }
         }
@@ -150,19 +152,12 @@ stereo_val sample_seq_gennext(void *self)
     double left_val = 0;
     double right_val = 0;
 
-    // wait till start of loop to keep patterns synched
-    if (!seq->started)
-        return (stereo_val){0, 0};
-
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
     {
         if (seq->samples_now_playing[i] != -1)
         {
             int cur_sample_midi_tick = seq->samples_now_playing[i];
-            int velocity =
-                seq->m_seq
-                    .patterns[seq->m_seq.cur_pattern][cur_sample_midi_tick]
-                    .data2;
+            int velocity = seq->velocity_now_playing[i];
             double amp = scaleybum(0, 127, 0, 1, velocity);
             int idx =
                 seq->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos;
@@ -294,8 +289,10 @@ void sample_start(void *self)
 {
     printf("START SAMP!\n");
     sample_sequencer *s = (sample_sequencer *)self;
+    if (s->sound_generator.active)
+        return; //no-op
+    sample_sequencer_reset_samples(s);
     s->sound_generator.active = true;
-    // sample_sequencer_reset_samples(s);
 }
 
 void sample_stop(void *self)
@@ -303,7 +300,6 @@ void sample_stop(void *self)
     printf("STOP SAMP!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     s->sound_generator.active = false;
-    sample_sequencer_reset_samples(s);
 }
 
 void sample_sequencer_morph(sample_sequencer *seq)

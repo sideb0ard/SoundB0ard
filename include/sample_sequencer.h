@@ -33,6 +33,7 @@ typedef struct sample_sequencer
     sample_pos sample_positions[PPBAR];
     int samples_now_playing[MAX_CONCURRENT_SAMPLES]; // contains midi tick of
                                                      // current samples
+    int velocity_now_playing[MAX_CONCURRENT_SAMPLES];
 
     // rathern than walking array -1 means not playing
     char filename[1024];

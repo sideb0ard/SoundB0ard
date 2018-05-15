@@ -330,6 +330,7 @@ int get_midi_note_from_string(char *string)
     sscanf(string, "%[a-z#]%d", note, &octave);
     if (octave == -1)
         return -1;
+    octave++;
     octave *= 12;
 
     printf("MIDI NOTE:%s %d \n", note, octave);
@@ -340,13 +341,13 @@ int get_midi_note_from_string(char *string)
         return 0 + octave;
     else if (!strcasecmp("c#", note))
         return 1 + octave;
-    else if (!strcasecmp("dm", note))
+    else if (!strcasecmp("db", note))
         return 1 + octave;
     else if (!strcasecmp("d", note))
         return 2 + octave;
     else if (!strcasecmp("d#", note))
         return 3 + octave;
-    else if (!strcasecmp("em", note))
+    else if (!strcasecmp("eb", note))
         return 3 + octave;
     else if (!strcasecmp("e", note))
         return 4 + octave;
@@ -354,19 +355,19 @@ int get_midi_note_from_string(char *string)
         return 5 + octave;
     else if (!strcasecmp("f#", note))
         return 6 + octave;
-    else if (!strcasecmp("gm", note))
+    else if (!strcasecmp("gb", note))
         return 6 + octave;
     else if (!strcasecmp("g", note))
         return 7 + octave;
     else if (!strcasecmp("g#", note))
         return 8 + octave;
-    else if (!strcasecmp("am", note))
+    else if (!strcasecmp("ab", note))
         return 8 + octave;
     else if (!strcasecmp("a", note))
         return 9 + octave;
     else if (!strcasecmp("a#", note))
         return 10 + octave;
-    else if (!strcasecmp("bm", note))
+    else if (!strcasecmp("bb", note))
         return 10 + octave;
     else if (!strcasecmp("b", note))
         return 11 + octave;
