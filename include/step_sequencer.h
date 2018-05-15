@@ -31,6 +31,11 @@ typedef struct step_sequencer
     int generate_max_generation;
     int generate_every_n_loops;
 
+    // randomizes amplitude
+    bool randamp_on;
+    int randamp_generation;
+    int randamp_every_n_loops;
+
     bool visualize;
 
     int sloppiness; // 0 - 10
@@ -55,6 +60,7 @@ void pattern_char_to_pattern(step_sequencer *s, char *char_pattern,
 void wchar_version_of_amp(step_sequencer *s, int pattern_num,
                           wchar_t apattern[49]);
 
+void step_set_randamp(step_sequencer *s, bool on);
 void step_set_pattern_len(step_sequencer *s, int len);
 
 void step_set_generate_mode(step_sequencer *s, unsigned int mode);

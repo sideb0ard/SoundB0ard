@@ -40,6 +40,9 @@ void step_init(step_sequencer *seq)
     seq->generate_every_n_loops = 0;
     seq->generate_max_generation = 0;
 
+    for (int i = 0; i < MAX_SEQUENCER_PATTERNS; i++)
+        seq->pattern_num_loops[i] = 1;
+
     seq->sloppiness = 0;
 
     seq->visualize = false;
@@ -56,11 +59,9 @@ bool step_tick(step_sequencer *seq)
 
             if (seq->multi_pattern_mode)
             {
-                // printf("MULTI BEEP!\n");
                 seq->cur_pattern_iteration--;
                 if (seq->cur_pattern_iteration == 0)
                 {
-                    // printf("BEEP BEEP!\n");
                     seq->cur_pattern =
                         (seq->cur_pattern + 1) % seq->num_patterns;
                     seq->cur_pattern_iteration =
@@ -139,6 +140,22 @@ bool step_tick(step_sequencer *seq)
                 }
                 seq->generate_generation++;
             }
+            if (seq->randamp_on)
+            {
+                if (seq->randamp_every_n_loops > 0)
+                {
+                    if (seq->randamp_generation % seq->randamp_every_n_loops ==
+                        0)
+                    {
+                        step_set_random_sample_amp(seq, seq->cur_pattern);
+                    }
+                }
+                else
+                {
+                    step_set_random_sample_amp(seq, seq->cur_pattern);
+                }
+                seq->randamp_generation++;
+            }
         }
         return true;
     }
@@ -196,10 +213,8 @@ void step_status(step_sequencer *seq, wchar_t *status_string)
     for (int i = 0; i < seq->num_patterns; i++)
     {
         pattern_to_string(seq->patterns[i], patternstr);
-        wchar_version_of_amp(seq, i, apattern);
-        swprintf(pattern_details, 255,
-                 L"\n[%d]  %ls  %ls  numloops:%d Swing:%d", i, patternstr,
-                 apattern, seq->pattern_num_loops[i],
+        swprintf(pattern_details, 255, L"\n[%d]  %ls numloops:%d swing:%d", i,
+                 patternstr, seq->pattern_num_loops[i],
                  seq->pattern_num_swing_setting[i]);
         wcscat(status_string, pattern_details);
     }
@@ -506,3 +521,17 @@ bool step_set_num_patterns(step_sequencer *s, int num_patterns)
     }
     return false;
 }
+
+void step_set_random_sample_amp(step_sequencer *s, int pattern_num)
+{
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (s->patterns[pattern_num][i].event_type == MIDI_ON)
+        {
+            int randy = rand() % 128;
+            step_set_sample_velocity(s, pattern_num, i, randy);
+        }
+    }
+}
+
+void step_set_randamp(step_sequencer *s, bool b) { s->randamp_on = b; }

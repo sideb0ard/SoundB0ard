@@ -207,7 +207,7 @@ static bool is_valid_token_char(char c)
 {
     if (isalnum(c) || c == '/' || c == '*' || c == '(' || c == ')' ||
         c == ',' || c == '<' || c == '>' || c == '{' || c == '}' || c == '~' ||
-        c == '_' || c == '-' || c == '!')
+        c == '_' || c == '-' || c == '!' || c == '#')
         return true;
     return false;
 }

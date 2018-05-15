@@ -1170,8 +1170,9 @@ void pattern_to_string(midi_event *pattern, wchar_t *patternstr)
         {
             if (pattern[j].event_type == MIDI_ON)
             {
-                patternstr[cur_sixteenth] = sparkchars[5];
-                patternstr[cur_sixteenth + 1] = sparkchars[5];
+                int sparklevel = scaleybum(0, 127, 0, 5, pattern[j].data2);
+                patternstr[cur_sixteenth] = sparkchars[sparklevel];
+                patternstr[cur_sixteenth + 1] = sparkchars[sparklevel];
             }
         }
         cur_sixteenth += 2;
