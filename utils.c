@@ -348,16 +348,18 @@ int notelookup(char *n)
 }
 
 // float chfreqlookup(int ch, void *p)
-int ch_midi_lookup(int ch, int octave, char *keytext)
+//int ch_midi_lookup(int ch, int octave, char *keytext)
+int input_key_to_char_note(int ch, int octave, char *keytext)
 {
-    int cur_octave_midi_num = octave * 12;
+    // numbers from http://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
+    int cur_octave_midi_num = 12 + (octave * 12);
     int next_octave = cur_octave_midi_num + 12;
 
     int midi_num = -1;
 
     switch (ch)
     {
-    case 97:
+    case 97: // C - a
         midi_num = 0 + cur_octave_midi_num; // C
         strncpy(keytext, "C", 1);
         break;

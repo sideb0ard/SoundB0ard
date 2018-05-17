@@ -132,18 +132,18 @@ typedef enum
 
 typedef enum
 {
-    C_MAJOR,       // midi 24
-    G_MAJOR,       //  31
-    D_MAJOR,       // 26
-    A_MAJOR,       // 33
-    E_MAJOR,       // 28
-    B_MAJOR,       // 35
-    F_SHARP_MAJOR, // 30
-    D_FLAT_MAJOR,  // 25
-    A_FLAT_MAJOR,  // 32
-    E_FLAT_MAJOR,  // 27
-    B_FLAT_MAJOR,  // 34
-    F_MAJOR,       // 29
+    C_MAJOR,
+    G_MAJOR,
+    D_MAJOR,
+    A_MAJOR,
+    E_MAJOR,
+    B_MAJOR,
+    F_SHARP_MAJOR,
+    D_FLAT_MAJOR,
+    A_FLAT_MAJOR,
+    E_FLAT_MAJOR,
+    B_FLAT_MAJOR,
+    F_MAJOR,
     NUM_KEYS
 } key_type;
 

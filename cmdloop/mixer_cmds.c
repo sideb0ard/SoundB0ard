@@ -99,6 +99,17 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
+    else if (strncmp("notes", wurds[0], 5) == 0)
+    {
+        printf("NOTES!\n");
+        //int key = atoi(wurds[1]);
+        //if (key >= 0 && key < NUM_KEYS)
+        //{
+        //    printf("Changing KEY!\n");
+        //    mixr->key = key;
+        //}
+        return true;
+    }
     else if (strncmp("<~", wurds[0], 2) == 0 || strncmp("~>", wurds[0], 2) == 0)
     {
         int sg_num;

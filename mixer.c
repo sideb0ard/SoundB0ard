@@ -121,7 +121,7 @@ void mixer_ps(mixer *mixr)
            " beat:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
-           ":::::::::: MIDI controller:%s sg_receiver:%d midi_type:%s\n" ANSI_COLOR_RESET,
+           ":::::::::: MIDI controller:%s sg_receiver:%d midi_type:%s key:%s\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
@@ -129,7 +129,7 @@ void mixer_ps(mixer *mixr)
                ? "NONE"
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
-                          ->type]);
+                          ->type], key_names[mixr->key]);
     // clang-format on
 
     // TODO - create env command to print these
@@ -258,6 +258,15 @@ void mixer_ps(mixer *mixr)
 void mixer_print_compat_keys(mixer *mixr)
 {
     printf("Current KEY is %s. Compats are ", key_names[mixr->key]);
+    for (int i = 0; i < 6; ++i)
+    {
+        printf("%s ", key_names[compat_keys[mixr->key][i]]);
+    }
+    printf("\n");
+}
+void mixer_print_notes(mixer *mixr)
+{
+    printf("Current KEY is %s. Compat NOTEs are:", key_names[mixr->key]);
     for (int i = 0; i < 6; ++i)
     {
         printf("%s ", key_names[compat_keys[mixr->key][i]]);

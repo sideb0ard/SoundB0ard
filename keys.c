@@ -110,7 +110,7 @@ void keys(int soundgen_num)
                 break;
             default:
                 // play note
-                midi_num = ch_midi_lookup(ch, s_keys_octave, textnote);
+                midi_num = input_key_to_char_note(ch, s_keys_octave, textnote);
                 printf("MIDI: %s%d [%d]\n", textnote, s_keys_octave, midi_num);
                 int fake_velocity = 128; // TODO real velocity
                 if (midi_num >= 0)

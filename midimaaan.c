@@ -337,42 +337,44 @@ int get_midi_note_from_string(char *string)
     //// twelve semitones:
     //// C C#/Db D D#/Eb E F F#/Gb G G#/Ab A A#/Bb B
     ////
+    int midinotenum = -1;
     if (!strcasecmp("c", note))
-        return 0 + octave;
+        midinotenum = 0 + octave;
     else if (!strcasecmp("c#", note))
-        return 1 + octave;
+        midinotenum  = 1 + octave;
     else if (!strcasecmp("db", note))
-        return 1 + octave;
+        midinotenum  = 1 + octave;
     else if (!strcasecmp("d", note))
-        return 2 + octave;
+        midinotenum  = 2 + octave;
     else if (!strcasecmp("d#", note))
-        return 3 + octave;
+        midinotenum  = 3 + octave;
     else if (!strcasecmp("eb", note))
-        return 3 + octave;
+        midinotenum  = 3 + octave;
     else if (!strcasecmp("e", note))
-        return 4 + octave;
+        midinotenum  = 4 + octave;
     else if (!strcasecmp("f", note))
-        return 5 + octave;
+        midinotenum  = 5 + octave;
     else if (!strcasecmp("f#", note))
-        return 6 + octave;
+        midinotenum  = 6 + octave;
     else if (!strcasecmp("gb", note))
-        return 6 + octave;
+        midinotenum  = 6 + octave;
     else if (!strcasecmp("g", note))
-        return 7 + octave;
+        midinotenum  = 7 + octave;
     else if (!strcasecmp("g#", note))
-        return 8 + octave;
+        midinotenum  = 8 + octave;
     else if (!strcasecmp("ab", note))
-        return 8 + octave;
+        midinotenum  = 8 + octave;
     else if (!strcasecmp("a", note))
-        return 9 + octave;
+        midinotenum  = 9 + octave;
     else if (!strcasecmp("a#", note))
-        return 10 + octave;
+        midinotenum  = 10 + octave;
     else if (!strcasecmp("bb", note))
-        return 10 + octave;
+        midinotenum  = 10 + octave;
     else if (!strcasecmp("b", note))
-        return 11 + octave;
-    else
-        return -1;
+        midinotenum  = 11 + octave;
+    printf("MIDI NOTE NUM:%d \n", midinotenum);
+
+    return midinotenum;
 }
 
 void midi_pattern_set_velocity(midi_event *pattern, unsigned int midi_tick,
