@@ -31,8 +31,6 @@ extern ENVSTREAM *ampstream;
 extern mixer *mixr;
 
 extern const char *key_names[NUM_KEYS];
-extern const int key_midi_mapping[NUM_KEYS];
-extern const compat_key_list compat_keys[NUM_KEYS];
 
 const wchar_t *s_status_colors[] = {
     WCOOL_COLOR_PINK,      // MINISYNTH_TYPE
@@ -99,7 +97,7 @@ mixer *new_mixer(double output_latency)
 
     mixr->active_midi_soundgen_num = -99;
 
-    mixr->key = C_MAJOR;
+    mixr->key = C;
 
     // possible TODO - should i de-initialize?
     // is that cleaner code?
@@ -255,22 +253,13 @@ void mixer_ps(mixer *mixr)
     printf(ANSI_COLOR_RESET);
 }
 
-void mixer_print_compat_keys(mixer *mixr)
-{
-    printf("Current KEY is %s. Compats are ", key_names[mixr->key]);
-    for (int i = 0; i < 6; ++i)
-    {
-        printf("%s ", key_names[compat_keys[mixr->key][i]]);
-    }
-    printf("\n");
-}
 void mixer_print_notes(mixer *mixr)
 {
     printf("Current KEY is %s. Compat NOTEs are:", key_names[mixr->key]);
-    for (int i = 0; i < 6; ++i)
-    {
-        printf("%s ", key_names[compat_keys[mixr->key][i]]);
-    }
+    // for (int i = 0; i < 6; ++i)
+    //{
+    //    printf("%s ", key_names[compat_keys[mixr->key][i]]);
+    //}
     printf("\n");
 }
 

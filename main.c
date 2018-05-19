@@ -16,31 +16,8 @@
 mixer *mixr;
 const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
 
-const char *key_names[] = {
-    "C_MAJOR",      "G_MAJOR",      "D_MAJOR",       "A_MAJOR",
-    "E_MAJOR",      "B_MAJOR",      "F_SHARP_MAJOR", "D_FLAT_MAJOR",
-    "A_FLAT_MAJOR", "E_FLAT_MAJOR", "B_FLAT_MAJOR",  "F_MAJOR",
-};
-
-const int key_midi_mapping[] = {24, 31, 26, 33, 28, 35, 30, 25, 32, 27, 34, 29};
-
-// typedef unsigned int compat_key_list[6];
-const compat_key_list compat_keys[] = {
-    {C_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, F_MAJOR, G_MAJOR, A_FLAT_MAJOR},
-    {G_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, C_MAJOR, D_MAJOR, E_FLAT_MAJOR},
-    {D_MAJOR, E_FLAT_MAJOR, F_SHARP_MAJOR, G_MAJOR, A_MAJOR, B_FLAT_MAJOR},
-    {A_MAJOR, B_FLAT_MAJOR, D_FLAT_MAJOR, D_MAJOR, E_MAJOR, F_SHARP_MAJOR},
-    {E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, A_MAJOR, B_MAJOR, D_FLAT_MAJOR},
-    {B_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR},
-    {F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, B_MAJOR, D_FLAT_MAJOR,
-     E_FLAT_MAJOR},
-    {D_FLAT_MAJOR, E_FLAT_MAJOR, E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR,
-     B_FLAT_MAJOR},
-    {A_FLAT_MAJOR, B_FLAT_MAJOR, B_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, E_MAJOR},
-    {E_FLAT_MAJOR, E_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, B_MAJOR},
-    {B_FLAT_MAJOR, B_MAJOR, D_FLAT_MAJOR, E_FLAT_MAJOR, F_MAJOR, F_SHARP_MAJOR},
-    {F_MAJOR, F_SHARP_MAJOR, A_FLAT_MAJOR, B_FLAT_MAJOR, C_MAJOR,
-     D_FLAT_MAJOR}};
+const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
+                           "G", "G_SHARP", "A", "A_SHARP", "B"};
 
 static int paCallback(const void *input_buffer, void *output_buffer,
                       unsigned long frames_per_buffer,

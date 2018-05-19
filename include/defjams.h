@@ -132,20 +132,20 @@ typedef enum
 
 typedef enum
 {
-    C_MAJOR,
-    G_MAJOR,
-    D_MAJOR,
-    A_MAJOR,
-    E_MAJOR,
-    B_MAJOR,
-    F_SHARP_MAJOR,
-    D_FLAT_MAJOR,
-    A_FLAT_MAJOR,
-    E_FLAT_MAJOR,
-    B_FLAT_MAJOR,
-    F_MAJOR,
+    C,
+    C_SHARP,
+    D,
+    D_SHARP,
+    E,
+    F,
+    F_SHARP,
+    G,
+    G_SHARP,
+    A,
+    A_SHARP,
+    B,
     NUM_KEYS
-} key_type;
+} key;
 
 typedef enum
 {

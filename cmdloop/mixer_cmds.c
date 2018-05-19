@@ -70,15 +70,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         return true;
     }
 
-    else if (strncmp("compat", wurds[0], 6) == 0)
-    {
-        if (strncmp("keys", wurds[1], 4) == 0)
-        {
-            mixer_print_compat_keys(mixr);
-        }
-        return true;
-    }
-
     else if (strncmp("keys", wurds[0], 4) == 0)
     {
         for (int i = 0; i < NUM_KEYS; i++)
@@ -91,19 +82,20 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("key", wurds[0], 3) == 0)
     {
-        int key = atoi(wurds[1]);
-        if (key >= 0 && key < NUM_KEYS)
-        {
-            printf("Changing KEY!\n");
-            mixr->key = key;
-        }
+        printf("Changing KEY!\n");
+        if (strncasecmp(wurds[1], "c", 1))
+            mixr->key = C;
+        else if (strncasecmp(wurds[1], "c#", 2) ||
+                 strncasecmp(wurds[1], "db", 2) ||
+                 strncasecmp(wurds[1], "dm", 2))
+            mixr->key = C_SHARP;
         return true;
     }
     else if (strncmp("notes", wurds[0], 5) == 0)
     {
         printf("NOTES!\n");
-        //int key = atoi(wurds[1]);
-        //if (key >= 0 && key < NUM_KEYS)
+        // int key = atoi(wurds[1]);
+        // if (key >= 0 && key < NUM_KEYS)
         //{
         //    printf("Changing KEY!\n");
         //    mixr->key = key;

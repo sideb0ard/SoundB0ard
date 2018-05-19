@@ -120,7 +120,6 @@ void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
 void mixer_emit_event(mixer *mixr, unsigned int event_type);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
-void mixer_print_compat_keys(mixer *mixr);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_algorithm(mixer *mixr, algorithm *a);

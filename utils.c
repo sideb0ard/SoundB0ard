@@ -348,10 +348,11 @@ int notelookup(char *n)
 }
 
 // float chfreqlookup(int ch, void *p)
-//int ch_midi_lookup(int ch, int octave, char *keytext)
+// int ch_midi_lookup(int ch, int octave, char *keytext)
 int input_key_to_char_note(int ch, int octave, char *keytext)
 {
-    // numbers from http://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
+    // numbers from
+    // http://www.inspiredacoustics.com/en/MIDI_note_numbers_and_center_frequencies
     int cur_octave_midi_num = 12 + (octave * 12);
     int next_octave = cur_octave_midi_num + 12;
 
@@ -359,7 +360,7 @@ int input_key_to_char_note(int ch, int octave, char *keytext)
 
     switch (ch)
     {
-    case 97: // C - a
+    case 97:                                // C - a
         midi_num = 0 + cur_octave_midi_num; // C
         strncpy(keytext, "C", 1);
         break;
@@ -645,14 +646,14 @@ inline double scaleybum(double cur_min, double cur_max, double new_min,
     return return_val;
 }
 
-const double B = 4.0 / (float)M_PI;
-const double C = -4.0 / ((float)M_PI * (float)M_PI);
-const double P = 0.225;
 // http://devmaster.net/posts/9648/fast-and-accurate-sine-cosine
 // input is -pi to +pi
 // i took it from the Will Pirkle Synth book.
 inline double parabolic_sine(double x, bool high_precision)
 {
+    const double B = 4.0 / (float)M_PI;
+    const double C = -4.0 / ((float)M_PI * (float)M_PI);
+    const double P = 0.225;
     double y = B * x + C * x * fabs(x);
 
     if (high_precision)
@@ -988,135 +989,6 @@ int how_many_bits_in_num(unsigned int num)
         }
     }
     return count;
-}
-
-unsigned int get_next_compat_note(unsigned int cur_key)
-{
-    int rand_num = rand() % 4;
-    switch (cur_key)
-    {
-    case (C_MAJOR):
-        if (rand_num == 0)
-            return C_MAJOR;
-        else if (rand_num == 1)
-            return G_MAJOR;
-        else if (rand_num == 2)
-            return A_MAJOR;
-        else if (rand_num == 3)
-            return F_MAJOR;
-        break;
-    case (G_MAJOR):
-        if (rand_num == 0)
-            return G_MAJOR;
-        else if (rand_num == 1)
-            return E_MAJOR;
-        else if (rand_num == 2)
-            return C_MAJOR;
-        else if (rand_num == 3)
-            return D_MAJOR;
-        break;
-    case (D_MAJOR):
-        if (rand_num == 0)
-            return D_MAJOR;
-        else if (rand_num == 1)
-            return G_MAJOR;
-        else if (rand_num == 2)
-            return B_MAJOR;
-        else if (rand_num == 3)
-            return A_MAJOR;
-        break;
-    case (A_MAJOR):
-        if (rand_num == 0)
-            return A_MAJOR;
-        else if (rand_num == 1)
-            return D_MAJOR;
-        else if (rand_num == 2)
-            return F_SHARP_MAJOR;
-        else if (rand_num == 3)
-            return E_MAJOR;
-        break;
-    case (E_MAJOR):
-        if (rand_num == 0)
-            return E_MAJOR;
-        else if (rand_num == 1)
-            return A_MAJOR;
-        else if (rand_num == 2)
-            return D_FLAT_MAJOR;
-        else if (rand_num == 3)
-            return B_MAJOR;
-        break;
-    case (B_MAJOR):
-        if (rand_num == 0)
-            return B_MAJOR;
-        else if (rand_num == 1)
-            return E_MAJOR;
-        else if (rand_num == 2)
-            return A_FLAT_MAJOR;
-        else if (rand_num == 3)
-            return F_SHARP_MAJOR;
-        break;
-    case (F_SHARP_MAJOR):
-        if (rand_num == 0)
-            return F_SHARP_MAJOR;
-        else if (rand_num == 1)
-            return B_MAJOR;
-        else if (rand_num == 2)
-            return E_FLAT_MAJOR;
-        else if (rand_num == 3)
-            return D_FLAT_MAJOR;
-        break;
-    case (D_FLAT_MAJOR):
-        if (rand_num == 0)
-            return D_FLAT_MAJOR;
-        else if (rand_num == 1)
-            return F_SHARP_MAJOR;
-        else if (rand_num == 2)
-            return B_FLAT_MAJOR;
-        else if (rand_num == 3)
-            return A_FLAT_MAJOR;
-        break;
-    case (A_FLAT_MAJOR):
-        if (rand_num == 0)
-            return A_FLAT_MAJOR;
-        else if (rand_num == 1)
-            return D_FLAT_MAJOR;
-        else if (rand_num == 2)
-            return F_MAJOR;
-        else if (rand_num == 3)
-            return E_FLAT_MAJOR;
-        break;
-    case (E_FLAT_MAJOR):
-        if (rand_num == 0)
-            return E_FLAT_MAJOR;
-        else if (rand_num == 1)
-            return C_MAJOR;
-        else if (rand_num == 2)
-            return A_FLAT_MAJOR;
-        else if (rand_num == 3)
-            return B_FLAT_MAJOR;
-        break;
-    case (B_FLAT_MAJOR):
-        if (rand_num == 0)
-            return B_FLAT_MAJOR;
-        else if (rand_num == 1)
-            return E_FLAT_MAJOR;
-        else if (rand_num == 2)
-            return G_MAJOR;
-        else if (rand_num == 3)
-            return F_MAJOR;
-        break;
-    case (F_MAJOR):
-        if (rand_num == 0)
-            return F_MAJOR;
-        else if (rand_num == 1)
-            return C_MAJOR;
-        else if (rand_num == 2)
-            return B_FLAT_MAJOR;
-        else if (rand_num == 3)
-            return D_MAJOR;
-        break;
-    }
-    return 0;
 }
 
 void print_parceled_pattern(midi_event *pattern)

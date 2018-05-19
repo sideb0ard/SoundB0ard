@@ -325,13 +325,13 @@ int get_midi_note_from_string(char *string)
         printf("DINGIE!\n");
         return -1;
     }
-    char note[3] = {};
+    char note[3] = {0};
     int octave = -1;
     sscanf(string, "%[a-z#]%d", note, &octave);
     if (octave == -1)
         return -1;
-    octave++;
-    octave *= 12;
+
+    octave = 12 + (octave * 12);
 
     printf("MIDI NOTE:%s %d \n", note, octave);
     //// twelve semitones:
@@ -340,38 +340,33 @@ int get_midi_note_from_string(char *string)
     int midinotenum = -1;
     if (!strcasecmp("c", note))
         midinotenum = 0 + octave;
-    else if (!strcasecmp("c#", note))
-        midinotenum  = 1 + octave;
-    else if (!strcasecmp("db", note))
-        midinotenum  = 1 + octave;
+    else if (!strcasecmp("c#", note) || !strcasecmp("db", note) ||
+             !strcasecmp("dm", note))
+        midinotenum = 1 + octave;
     else if (!strcasecmp("d", note))
-        midinotenum  = 2 + octave;
-    else if (!strcasecmp("d#", note))
-        midinotenum  = 3 + octave;
-    else if (!strcasecmp("eb", note))
-        midinotenum  = 3 + octave;
+        midinotenum = 2 + octave;
+    else if (!strcasecmp("d#", note) || !strcasecmp("eb", note) ||
+             !strcasecmp("em", note))
+        midinotenum = 3 + octave;
     else if (!strcasecmp("e", note))
-        midinotenum  = 4 + octave;
+        midinotenum = 4 + octave;
     else if (!strcasecmp("f", note))
-        midinotenum  = 5 + octave;
-    else if (!strcasecmp("f#", note))
-        midinotenum  = 6 + octave;
-    else if (!strcasecmp("gb", note))
-        midinotenum  = 6 + octave;
+        midinotenum = 5 + octave;
+    else if (!strcasecmp("f#", note) || !strcasecmp("gb", note) ||
+             !strcasecmp("gm", note))
+        midinotenum = 6 + octave;
     else if (!strcasecmp("g", note))
-        midinotenum  = 7 + octave;
-    else if (!strcasecmp("g#", note))
-        midinotenum  = 8 + octave;
-    else if (!strcasecmp("ab", note))
-        midinotenum  = 8 + octave;
+        midinotenum = 7 + octave;
+    else if (!strcasecmp("g#", note) || !strcasecmp("ab", note) ||
+             !strcasecmp("am", note))
+        midinotenum = 8 + octave;
     else if (!strcasecmp("a", note))
-        midinotenum  = 9 + octave;
-    else if (!strcasecmp("a#", note))
-        midinotenum  = 10 + octave;
-    else if (!strcasecmp("bb", note))
-        midinotenum  = 10 + octave;
+        midinotenum = 9 + octave;
+    else if (!strcasecmp("a#", note) || !strcasecmp("bb", note) ||
+             !strcasecmp("bm", note))
+        midinotenum = 10 + octave;
     else if (!strcasecmp("b", note))
-        midinotenum  = 11 + octave;
+        midinotenum = 11 + octave;
     printf("MIDI NOTE NUM:%d \n", midinotenum);
 
     return midinotenum;
