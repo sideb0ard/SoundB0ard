@@ -8,6 +8,7 @@
 #include <new_item_cmds.h>
 #include <obliquestrategies.h>
 #include <pattern_transformers.h>
+#include <sequencer_utils.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
 #include <utils.h>
@@ -70,6 +71,71 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         return true;
     }
 
+    else if (strncmp("gen", wurds[0], 3) == 0)
+    {
+        if (strncmp("melody", wurds[1], 6) == 0)
+        {
+            int generator = atoi(wurds[2]);
+            int dest_sg_num;
+            int dest_sg_pattern_num;
+            sscanf(wurds[3], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
+            if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
+                mixer_is_valid_seq_gen_num(mixr, generator))
+            {
+                printf("Generating pattern from %d to apply to %d:%d\n",
+                       generator, dest_sg_num, dest_sg_pattern_num);
+                sequence_generator *seqg = mixr->sequence_generators[generator];
+                short int num =
+                    seqg->generate(seqg, (void *)&mixr->timing_info.cur_sample);
+                char binnum[17] = {0};
+                char_binary_version_of_short(num, binnum);
+                printf("NOM!: %d %s\n", num, binnum);
+                // int num_bits = how_many_bits_in_num(num);
+                // printf("NUM_BITS:%d\n", num_bits);
+                midi_event pattern[PPBAR] = {0};
+                soundgenerator *sg =
+                    (soundgenerator *)mixr->sound_generators[dest_sg_num];
+                synthbase *base = get_synthbase(sg);
+                int note = 0;
+                int midi_note = 0;
+                int len = sizeof(short int) * 8;
+                printf("len:%d\n", len);
+                for (int i = 0; i < len; i++)
+                {
+                    if (num & (1 << (15 - i)))
+                    {
+                        printf("MEEP! i:%d\n", i);
+                        if (i == 0 || i == (len - 1))
+                        {
+                            printf("ROOT!\n");
+                            note = mixr->key;
+                        }
+                        else
+                        {
+                            int randy = rand() % 8;
+                            printf("RANDY! %d\n", randy);
+                            note = mixr->notes[randy];
+                        }
+                        int midi_tick = PPSIXTEENTH * i;
+                        int octave = synthbase_get_octave(base);
+                        int midi_note =
+                            get_midi_note_from_mixer_key(note, octave);
+                        printf("Note:%s midi_note:%d Position %d Tick:%d\n",
+                               key_names[note], midi_note, i, midi_tick);
+                        midi_event ev = {.event_type = MIDI_ON,
+                                         .data1 = midi_note,
+                                         .data2 = DEFAULT_VELOCITY};
+                        pattern[midi_tick] = ev;
+                    }
+                }
+                midi_pattern_print(pattern);
+                synthbase_set_pattern(base, dest_sg_pattern_num, pattern);
+            }
+            else
+                printf("Usage: gen melody <gen_num> "
+                       "<dest_sg_num>:<dest_sg_pattern_num>\n");
+        }
+    }
     else if (strncmp("keys", wurds[0], 4) == 0)
     {
         for (int i = 0; i < NUM_KEYS; i++)
@@ -82,18 +148,51 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("key", wurds[0], 3) == 0)
     {
-        printf("Changing KEY!\n");
-        if (strncasecmp(wurds[1], "c", 1))
-            mixr->key = C;
-        else if (strncasecmp(wurds[1], "c#", 2) ||
-                 strncasecmp(wurds[1], "db", 2) ||
-                 strncasecmp(wurds[1], "dm", 2))
+        printf("Changing KEY %s!\n", wurds[1]);
+        if (strncasecmp(wurds[1], "c#", 2) == 0 ||
+            strncasecmp(wurds[1], "db", 2) == 0 ||
+            strncasecmp(wurds[1], "dm", 2) == 0)
             mixr->key = C_SHARP;
+        else if (strncasecmp(wurds[1], "d#", 2) == 0 ||
+                 strncasecmp(wurds[1], "eb", 2) == 0 ||
+                 strncasecmp(wurds[1], "em", 2) == 0)
+            mixr->key = D_SHARP;
+        else if (strncasecmp(wurds[1], "f#", 2) == 0 ||
+                 strncasecmp(wurds[1], "gb", 2) == 0 ||
+                 strncasecmp(wurds[1], "gm", 2) == 0)
+            mixr->key = F_SHARP;
+        else if (strncasecmp(wurds[1], "g#", 2) == 0 ||
+                 strncasecmp(wurds[1], "ab", 2) == 0 ||
+                 strncasecmp(wurds[1], "am", 2) == 0)
+            mixr->key = G_SHARP;
+        else if (strncasecmp(wurds[1], "a#", 2) == 0 ||
+                 strncasecmp(wurds[1], "bb", 2) == 0 ||
+                 strncasecmp(wurds[1], "bm", 2) == 0)
+            mixr->key = A_SHARP;
+        else if (strncasecmp(wurds[1], "c", 1) == 0)
+            mixr->key = C;
+        else if (strncasecmp(wurds[1], "d", 1) == 0)
+            mixr->key = D;
+        else if (strncasecmp(wurds[1], "e", 1) == 0)
+            mixr->key = E;
+        else if (strncasecmp(wurds[1], "f", 1) == 0)
+            mixr->key = F;
+        else if (strncasecmp(wurds[1], "g", 1) == 0)
+            mixr->key = G;
+        else if (strncasecmp(wurds[1], "a", 1) == 0)
+            mixr->key = A;
+        else if (strncasecmp(wurds[1], "b", 1) == 0)
+            mixr->key = B;
+
+        mixer_set_notes(mixr);
         return true;
     }
     else if (strncmp("notes", wurds[0], 5) == 0)
     {
-        printf("NOTES!\n");
+        printf("NOTES in KEY!\n");
+
+        for (int i = 0; i < 8; i++)
+            printf("%s\n", key_names[mixr->notes[i]]);
         // int key = atoi(wurds[1]);
         // if (key >= 0 && key < NUM_KEYS)
         //{

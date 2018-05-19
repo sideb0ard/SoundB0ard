@@ -371,6 +371,11 @@ int get_midi_note_from_string(char *string)
 
     return midinotenum;
 }
+int get_midi_note_from_mixer_key(unsigned int key, int octave)
+{
+    int midi_octave = 12 + (octave * 12);
+    return key + midi_octave;
+}
 
 void midi_pattern_set_velocity(midi_event *pattern, unsigned int midi_tick,
                                unsigned int velocity)

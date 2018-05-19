@@ -22,6 +22,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev);
 void midi_pattern_print(midi_event *pattern);
 void midi_pattern_quantize(midi_pattern *pattern);
 int get_midi_note_from_string(char *string);
+int get_midi_note_from_mixer_key(unsigned int key, int octave);
 
 void midi_pattern_set_velocity(midi_event *pattern, unsigned int midi_tick,
                                unsigned int velocity);

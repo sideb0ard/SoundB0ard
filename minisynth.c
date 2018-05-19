@@ -116,7 +116,7 @@ minisynth *new_minisynth(void)
     ms->m_settings.m_release_time_msec = 35;
 
     ms->m_settings.m_pulse_width_pct = OSC_PULSEWIDTH_DEFAULT;
-    ms->m_settings.m_octave = 1;
+    ms->m_settings.m_octave = 3;
     ms->m_settings.m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
     ms->m_settings.m_sub_osc_db = -96.000000;
 

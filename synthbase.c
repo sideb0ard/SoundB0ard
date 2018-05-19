@@ -37,6 +37,7 @@ void synthbase_init(synthbase *base, void *parent,
     // base->generate_src = -99;
     base->last_midi_note = 23;
     base->midi_note = 23;
+    base->octave = 3;
     base->sustain_note_ms = 200;
     base->note_mode = false;
 }
@@ -585,3 +586,11 @@ bool synthbase_list_presets(unsigned int synthtype)
 
     return true;
 }
+
+void synthbase_set_octave(synthbase *base, int octave)
+{
+    if (octave >= -1 && octave < 10)
+        base->octave = octave;
+}
+
+int synthbase_get_octave(synthbase *base) { return base->octave; }

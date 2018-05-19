@@ -64,6 +64,7 @@ typedef struct synthbase
 
     int last_midi_note;
     int midi_note;
+    int octave;
 
     // bool generate_mode; // magical
     // int generate_src;
@@ -146,3 +147,6 @@ void synthbase_mv_micro_note(synthbase *base, int pattern_num, int fromstep,
                              int tostep);
 midi_event *synthbase_get_pattern(synthbase *base, int pattern_num);
 void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern);
+
+void synthbase_set_octave(synthbase *base, int octave);
+int synthbase_get_octave(synthbase *base);

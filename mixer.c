@@ -98,6 +98,7 @@ mixer *new_mixer(double output_latency)
     mixr->active_midi_soundgen_num = -99;
 
     mixr->key = C;
+    mixer_set_notes(mixr);
 
     // possible TODO - should i de-initialize?
     // is that cleaner code?
@@ -880,4 +881,16 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
         off_event.delete_after_use = true; // _THIS_ is the magic
         synthbase_add_event(base, base->cur_pattern, note_off_tick, off_event);
     }
+}
+
+void mixer_set_notes(mixer *mixr)
+{
+    mixr->notes[0] = mixr->key;
+    mixr->notes[1] = (mixr->key + 2) % NUM_KEYS;
+    mixr->notes[2] = (mixr->key + 4) % NUM_KEYS;
+    mixr->notes[3] = (mixr->key + 5) % NUM_KEYS;
+    mixr->notes[4] = (mixr->key + 7) % NUM_KEYS;
+    mixr->notes[5] = (mixr->key + 9) % NUM_KEYS;
+    mixr->notes[6] = (mixr->key + 11) % NUM_KEYS;
+    mixr->notes[7] = (mixr->key + 12) % NUM_KEYS;
 }
