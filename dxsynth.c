@@ -454,7 +454,7 @@ bool dxsynth_midi_note_off(dxsynth *dx, unsigned int midinote,
         {
             dxsynth_voice *dxv = dx->m_voices[i];
             if (dxv)
-                voice_note_off(&dxv->m_voice, midinote);
+                voice_note_off(&dxv->m_voice, -1);
         }
         return true;
     }
