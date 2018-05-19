@@ -99,7 +99,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 int note = 0;
                 int midi_note = 0;
                 int len = sizeof(short int) * 8;
-                printf("len:%d\n", len);
                 for (int i = 0; i < len; i++)
                 {
                     if (num & (1 << (15 - i)))
@@ -118,7 +117,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         }
                         int midi_tick = PPSIXTEENTH * i;
                         int octave = synthbase_get_octave(base);
-                        printf("OCTAVE!%d\n", octave);
+                        //printf("OCTAVE!%d\n", octave);
                         int midi_note =
                             get_midi_note_from_mixer_key(note, octave);
                         //printf("Note:%s midi_note:%d Position %d Tick:%d\n",
@@ -129,7 +128,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         pattern[midi_tick] = ev;
                     }
                 }
-                midi_pattern_print(pattern);
+                //midi_pattern_print(pattern);
                 synthbase_set_pattern(base, dest_sg_pattern_num, pattern);
             }
             else

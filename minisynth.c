@@ -2290,6 +2290,7 @@ midi_event *minisynth_get_pattern(void *self, int pattern_num)
 
 void minisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
+    minisynth_stop(self);
     synthbase *base = get_synthbase(self);
     if (base)
         synthbase_set_pattern(base, pattern_num, pattern);

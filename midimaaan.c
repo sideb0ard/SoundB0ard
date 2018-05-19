@@ -155,7 +155,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                 midi_event off = new_midi_event(MIDI_OFF, note, 128);
                 off.delete_after_use = true;
-                synthbase_add_event(&ms->base, 0, note_off_tick, off);
+                synthbase_add_event(&ms->base, ms->base.cur_pattern,
+                                    note_off_tick, off);
             }
             break;
         }
