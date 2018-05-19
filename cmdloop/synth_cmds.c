@@ -806,6 +806,12 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             int midi_note = atoi(wurds[1]);
             synthbase_set_midi_note(base, midi_note);
         }
+        else if (strncmp("oct", wurds[0], 3) == 0 ||
+                 strncmp("octave", wurds[0], 6) == 0)
+        {
+            int oct = atoi(wurds[1]);
+            synthbase_set_octave(base, oct);
+        }
         else if (strncmp("import", wurds[0], 6) == 0)
         {
             printf("Importing file %s\n", wurds[1]);

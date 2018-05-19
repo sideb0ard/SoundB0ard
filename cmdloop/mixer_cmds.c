@@ -82,14 +82,14 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
                 mixer_is_valid_seq_gen_num(mixr, generator))
             {
-                printf("Generating pattern from %d to apply to %d:%d\n",
-                       generator, dest_sg_num, dest_sg_pattern_num);
+                //printf("Generating pattern from %d to apply to %d:%d\n",
+                //       generator, dest_sg_num, dest_sg_pattern_num);
                 sequence_generator *seqg = mixr->sequence_generators[generator];
                 short int num =
                     seqg->generate(seqg, (void *)&mixr->timing_info.cur_sample);
-                char binnum[17] = {0};
-                char_binary_version_of_short(num, binnum);
-                printf("NOM!: %d %s\n", num, binnum);
+                //char binnum[17] = {0};
+                //char_binary_version_of_short(num, binnum);
+                //printf("NOM!: %d %s\n", num, binnum);
                 // int num_bits = how_many_bits_in_num(num);
                 // printf("NUM_BITS:%d\n", num_bits);
                 midi_event pattern[PPBAR] = {0};
@@ -104,24 +104,25 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 {
                     if (num & (1 << (15 - i)))
                     {
-                        printf("MEEP! i:%d\n", i);
+                        //printf("MEEP! i:%d\n", i);
                         if (i == 0 || i == (len - 1))
                         {
-                            printf("ROOT!\n");
+                            //printf("ROOT!\n");
                             note = mixr->key;
                         }
                         else
                         {
                             int randy = rand() % 8;
-                            printf("RANDY! %d\n", randy);
+                            //printf("RANDY! %d\n", randy);
                             note = mixr->notes[randy];
                         }
                         int midi_tick = PPSIXTEENTH * i;
                         int octave = synthbase_get_octave(base);
+                        printf("OCTAVE!%d\n", octave);
                         int midi_note =
                             get_midi_note_from_mixer_key(note, octave);
-                        printf("Note:%s midi_note:%d Position %d Tick:%d\n",
-                               key_names[note], midi_note, i, midi_tick);
+                        //printf("Note:%s midi_note:%d Position %d Tick:%d\n",
+                        //       key_names[note], midi_note, i, midi_tick);
                         midi_event ev = {.event_type = MIDI_ON,
                                          .data1 = midi_note,
                                          .data2 = DEFAULT_VELOCITY};

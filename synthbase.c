@@ -150,8 +150,8 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t scratch[256] = {0};
     wchar_t patternstr[33] = {0};
 
-    swprintf(scratch, 255, L"\nnote_mode:%d chord_mode:%d", base->note_mode,
-             base->chord_mode);
+    swprintf(scratch, 255, L"\nnote_mode:%d chord_mode:%d octave:%d", base->note_mode,
+             base->chord_mode, base->octave);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)
