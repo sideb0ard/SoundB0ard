@@ -76,64 +76,92 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (strncmp("melody", wurds[1], 6) == 0)
         {
             int generator = atoi(wurds[2]);
-            int dest_sg_num;
-            int dest_sg_pattern_num;
+            int dest_sg_num = -1;
+            int dest_sg_pattern_num = -1;
             sscanf(wurds[3], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
-            if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
-                mixer_is_valid_seq_gen_num(mixr, generator))
+
+            int num_bars = atoi(wurds[4]);
+            if (!num_bars)
+                num_bars = 1;
+            if (num_bars > 4)
             {
-                //printf("Generating pattern from %d to apply to %d:%d\n",
-                //       generator, dest_sg_num, dest_sg_pattern_num);
+                printf("Num bars has be 1, 2, 3 or 4\n");
+                return true;
+            }
+
+            if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
+                mixer_is_valid_seq_gen_num(mixr, generator) &&
+                dest_sg_pattern_num != -1 && num_bars >= 0 && num_bars <= 4)
+            {
                 sequence_generator *seqg = mixr->sequence_generators[generator];
                 short int num =
                     seqg->generate(seqg, (void *)&mixr->timing_info.cur_sample);
-                //char binnum[17] = {0};
-                //char_binary_version_of_short(num, binnum);
-                //printf("NOM!: %d %s\n", num, binnum);
-                // int num_bits = how_many_bits_in_num(num);
-                // printf("NUM_BITS:%d\n", num_bits);
-                midi_event pattern[PPBAR] = {0};
+
                 soundgenerator *sg =
                     (soundgenerator *)mixr->sound_generators[dest_sg_num];
                 synthbase *base = get_synthbase(sg);
-                int note = 0;
-                int midi_note = 0;
-                int len = sizeof(short int) * 8;
-                for (int i = 0; i < len; i++)
+
+                int multiplier = 1;
+                switch (num_bars)
                 {
-                    if (num & (1 << (15 - i)))
-                    {
-                        //printf("MEEP! i:%d\n", i);
-                        if (i == 0 || i == (len - 1))
-                        {
-                            //printf("ROOT!\n");
-                            note = mixr->key;
-                        }
-                        else
-                        {
-                            int randy = rand() % 8;
-                            //printf("RANDY! %d\n", randy);
-                            note = mixr->notes[randy];
-                        }
-                        int midi_tick = PPSIXTEENTH * i;
-                        int octave = synthbase_get_octave(base);
-                        //printf("OCTAVE!%d\n", octave);
-                        int midi_note =
-                            get_midi_note_from_mixer_key(note, octave);
-                        //printf("Note:%s midi_note:%d Position %d Tick:%d\n",
-                        //       key_names[note], midi_note, i, midi_tick);
-                        midi_event ev = {.event_type = MIDI_ON,
-                                         .data1 = midi_note,
-                                         .data2 = DEFAULT_VELOCITY};
-                        pattern[midi_tick] = ev;
-                    }
+                case (0):
+                case (1):
+                    multiplier = PPSIXTEENTH;
+                    break;
+                case (2):
+                    multiplier = PPSIXTEENTH * 2;
+                    break;
+                case (3):
+                    multiplier = PPSIXTEENTH * 3;
+                    break;
+                case (4):
+                    multiplier = PPSIXTEENTH * 4;
+                    break;
                 }
-                //midi_pattern_print(pattern);
-                synthbase_set_pattern(base, dest_sg_pattern_num, pattern);
+
+                for (int i = 0; i < num_bars; i++)
+                {
+                    int note = 0;
+                    int midi_note = 0;
+                    int midi_tick = 0;
+                    int octave = 0;
+
+                    midi_event pattern[PPBAR] = {0};
+
+                    int len = (sizeof(short int) * 8) / num_bars;
+                    for (int j = 0; j < len; j++)
+                    {
+                        if (num & (1 << (15 - j)))
+                        {
+                            if ((j == 0 && i == 0) ||
+                                (j == (len - 1) && i == num_bars - 1))
+                                note = mixr->key;
+                            else
+                            {
+                                int randy = rand() % 8;
+                                note = mixr->notes[randy];
+                            }
+                            midi_tick = multiplier * j;
+                            octave = synthbase_get_octave(base);
+                            if (rand() % 100 > 90)
+                                octave++;
+                            midi_note =
+                                get_midi_note_from_mixer_key(note, octave);
+                            midi_event ev = {.event_type = MIDI_ON,
+                                             .data1 = midi_note,
+                                             .data2 = DEFAULT_VELOCITY};
+                            pattern[midi_tick] = ev;
+                        }
+                    }
+                    // midi_pattern_print(pattern);
+                    synthbase_set_pattern(base, dest_sg_pattern_num, pattern);
+                    dest_sg_pattern_num++;
+                }
             }
             else
                 printf("Usage: gen melody <gen_num> "
-                       "<dest_sg_num>:<dest_sg_pattern_num>\n");
+                       "<dest_sg_num>:<dest_sg_pattern_num> <num_bars:default "
+                       "1>\n");
         }
     }
     else if (strncmp("keys", wurds[0], 4) == 0)

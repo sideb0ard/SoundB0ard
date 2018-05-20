@@ -793,7 +793,6 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         else if (strncmp("sustain_note_ms", wurds[0], 15) == 0)
         {
             int sustain_note_ms = atoi(wurds[1]);
-            printf("SETTing sustain ms: %d\n", sustain_note_ms);
             if (sustain_note_ms > 0)
                 synthbase_set_sustain_note_ms(base, sustain_note_ms);
         }

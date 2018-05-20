@@ -44,6 +44,7 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int sg_num = -1;
         int pattern_num = -1;
         sscanf(wurds[1], "%d:%d", &sg_num, &pattern_num);
+        printf("SG_NUM! %d\n", sg_num);
         if (mixer_is_valid_soundgen_track_num(mixr, sg_num, pattern_num))
         {
             printf("SG:%d Pattern %d\n", sg_num, pattern_num);
@@ -51,6 +52,24 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 (soundgenerator *)mixr->sound_generators[sg_num];
             midi_event *pattern = sg->get_pattern(sg, pattern_num);
             midi_pattern_print(pattern);
+        }
+        else
+        {
+            sg_num = atoi(wurds[1]);
+            printf("ELSE! sg_num:%d\n", sg_num);
+            if (mixer_is_valid_soundgen_num(mixr, sg_num))
+            {
+                printf("TRUWE!\n");
+                soundgenerator *sg =
+                    (soundgenerator *)mixr->sound_generators[sg_num];
+                synthbase *base = get_synthbase(sg);
+                for (int i = 0; i < base->num_patterns; i++)
+                {
+                    printf("PATTERN NUM %d\n", i);
+                    midi_event *pattern = sg->get_pattern(sg, i);
+                    midi_pattern_print(pattern);
+                }
+            }
         }
 
         return true;
