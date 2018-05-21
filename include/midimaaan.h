@@ -26,3 +26,4 @@ int get_midi_note_from_mixer_key(unsigned int key, int octave);
 
 void midi_pattern_set_velocity(midi_event *pattern, unsigned int midi_tick,
                                unsigned int velocity);
+void midi_pattern_rand_amp(midi_event *pattern);

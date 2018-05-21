@@ -394,3 +394,12 @@ void midi_pattern_set_velocity(midi_event *pattern, unsigned int midi_tick,
         printf("Nae valid!? Midi_tick:%d // velocity:%d\n", midi_tick,
                velocity);
 }
+
+void midi_pattern_rand_amp(midi_event *pattern)
+{
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (pattern[i].event_type == MIDI_ON)
+            pattern[i].data2 = rand() % 127;
+    }
+}

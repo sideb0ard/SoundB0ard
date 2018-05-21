@@ -71,6 +71,21 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         return true;
     }
 
+    else if (strncmp("randamp", wurds[0], 7) == 0)
+    {
+        int sg_num = -1;
+        int sg_pattern_num = -1;
+        sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
+        if (mixer_is_valid_soundgen_num(mixr, sg_num))
+        {
+            soundgenerator *sg = mixr->sound_generators[sg_num];
+            if (sg->is_valid_pattern(sg, sg_pattern_num))
+            {
+                midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
+                midi_pattern_rand_amp(pattern);
+            }
+        }
+    }
     else if (strncmp("gen", wurds[0], 3) == 0)
     {
         if (strncmp("melody", wurds[1], 6) == 0)

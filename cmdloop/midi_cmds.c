@@ -62,8 +62,8 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 printf("TRUWE!\n");
                 soundgenerator *sg =
                     (soundgenerator *)mixr->sound_generators[sg_num];
-                synthbase *base = get_synthbase(sg);
-                for (int i = 0; i < base->num_patterns; i++)
+                int num_patterns = sg->get_num_patterns(sg);
+                for (int i = 0; i < num_patterns; i++)
                 {
                     printf("PATTERN NUM %d\n", i);
                     midi_event *pattern = sg->get_pattern(sg, i);
