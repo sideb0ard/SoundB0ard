@@ -116,6 +116,13 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
         }
 
+        if (strncmp("markov", wurds[1], 6) == 0)
+        {
+            printf("MARkOV! SEQUENCE GEN!\n");
+            unsigned int type = atoi(wurds[2]);
+            mixer_add_markov(mixr, type);
+        }
+
         else if (strncmp("moog", wurds[1], 4) == 0)
         {
             int sgnum = add_minisynth(mixr);

@@ -69,6 +69,7 @@ SRC = \
 	sound_generator.c \
 	sequence_generators/bitshift.c \
 	sequence_generators/euclidean.c \
+	sequence_generators/markov.c \
 	sparkline.c \
 	synthbase.c \
 	synthdrum_sequencer.c \

@@ -17,6 +17,7 @@
 #include "euclidean.h"
 #include "fx.h"
 #include "looper.h"
+#include "markov.h"
 #include "minisynth.h"
 #include "mixer.h"
 #include "sample_sequencer.h"
@@ -445,6 +446,16 @@ int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     printf("Adding an BITSHIFT SEQUENCE GENERATOR, yo!\n");
     sequence_generator *sg = new_bitshift(num_wurds, wurds);
+    if (sg)
+        return add_sequence_generator(mixr, sg);
+    else
+        return -99;
+}
+
+int mixer_add_markov(mixer *mixr, unsigned int type)
+{
+    printf("Adding an MARKOV SEQUENCE GENERATOR, yo!\n");
+    sequence_generator *sg = new_markov(type);
     if (sg)
         return add_sequence_generator(mixr, sg);
     else
