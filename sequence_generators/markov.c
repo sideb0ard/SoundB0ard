@@ -84,7 +84,7 @@ uint16_t markov_generate(void *self, void *data)
         third = rand_percent();
         if (third > 50 && third < 75)
             pattern |= BEAT9;
-        if (third >= 75)
+        else if (third >= 75)
             pattern |= BEAT10;
         else if (third >= 90)
             pattern |= BEAT11;
@@ -112,11 +112,11 @@ uint16_t markov_generate(void *self, void *data)
             pattern |= BEAT4;
         else if (second >= 80)
             pattern |= BEAT6;
-        if (second > 90)
+        else if (second > 90)
             pattern |= BEAT7;
 
         third = rand_percent();
-        if (third < 10)
+        if (third > 10)
             pattern |= BEAT8;
         if (third > 50 && third < 75)
             pattern |= BEAT9;

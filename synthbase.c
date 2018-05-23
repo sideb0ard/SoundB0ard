@@ -543,6 +543,7 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
     // printf("PATTERN NUM! %d\n", pattern_num);
     if (is_valid_pattern_num(base, pattern_num))
     {
+        synthbase_stop(base);
         clear_pattern(base->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {
