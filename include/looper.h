@@ -20,9 +20,9 @@ typedef struct sound_grain
     double audiobuffer_cur_pos;
     double audiobuffer_inc;
     double audiobuffer_pitch;
-    int release_time_pct; // percent of grain_len_frames
-    int attack_time_pct;  // percent of grain_len_frames
+    int attack_time_pct; // percent of grain_len_frames
     int attack_time_samples;
+    int release_time_pct; // percent of grain_len_frames
     int release_time_samples;
     bool active;
     double amp;
@@ -47,6 +47,13 @@ enum
     LOOPER_ENV_NUM
 };
 
+enum
+{
+    LOOPER_LOOP_MODE,
+    LOOPER_STATIC_MODE,
+    LOOPER_MAX_MODES,
+};
+
 typedef struct looper
 {
     soundgenerator sound_generator;
@@ -68,8 +75,8 @@ typedef struct looper
     int cur_grain_num;
     sound_grain m_grains[MAX_CONCURRENT_GRAINS];
 
-    int granular_spray_frames;
-    int quasi_grain_fudge;
+    int granular_spray_frames; // random off-set from starting idx
+    int quasi_grain_fudge;     // random variation from length of grain
     int grain_duration_ms;
     int grains_per_sec;
     double grain_pitch;
@@ -86,7 +93,6 @@ typedef struct looper
     int grain_release_time_pct;
 
     step_sequencer m_seq;
-    bool sequencer_mode;
 
     envelope_generator m_eg1; // start/stop amp
     envelope_generator m_eg2; // unused so far
@@ -115,8 +121,8 @@ typedef struct looper
     double m_lfo4_max;
     bool lfo4_sync;
 
-    bool loop_mode;
-    double loop_len; // bars
+    unsigned int loop_mode; // enums above - LOOP, STEP, STATIC
+    double loop_len;        // bars
 
     bool scramble_pending;
     bool scramble_mode;
@@ -125,6 +131,10 @@ typedef struct looper
     bool stutter_pending;
     bool stutter_mode;
     int stutter_idx;
+
+    bool step_pending;
+    bool step_mode;
+    int step_diff;
 
     int cur_sixteenth; // used to track scramble
 
@@ -143,13 +153,15 @@ int looper_get_num_patterns(void *self);
 void looper_set_num_patterns(void *self, int num_patterns);
 void looper_make_active_track(void *self, int tracknum);
 void looper_event_notify(void *self, unsigned int event_type);
+bool looper_is_valid_pattern(void *self, int pattern_num);
+midi_event *looper_get_pattern(void *self, int pattern_num);
+void looper_set_pattern(void *self, int pattern_num, midi_event *pattern);
 
 void looper_import_file(looper *g, char *filename);
 void looper_set_external_source(looper *g, int sound_gen_num);
 
 void looper_update_lfos(looper *g);
 int looper_calculate_grain_spacing(looper *g);
-void looper_set_sequencer_mode(looper *g, bool b);
 void looper_set_grain_pitch(looper *g, double pitch);
 void looper_set_grain_duration(looper *g, int dur);
 void looper_set_grains_per_sec(looper *g, int gps);
@@ -162,11 +174,11 @@ void looper_set_selection_mode(looper *g, unsigned int mode);
 void looper_set_envelope_mode(looper *g, unsigned int mode);
 void looper_set_movement_mode(looper *g, bool b);
 void looper_set_reverse_mode(looper *g, bool b);
-void looper_set_loop_mode(looper *g, bool b);
-void looper_set_granulate_mode(looper *g, bool b);
+void looper_set_loop_mode(looper *g, unsigned int m);
 void looper_set_loop_len(looper *g, double bars);
 void looper_set_scramble_pending(looper *g);
 void looper_set_stutter_pending(looper *g);
+void looper_set_step_pending(looper *g);
 
 int looper_get_available_grain_num(looper *g);
 int looper_count_active_grains(looper *g);

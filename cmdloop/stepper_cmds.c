@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <cmdloop.h>
+#include <looper.h>
 #include <mixer.h>
 #include <pattern_parser.h>
 #include <sample_sequencer.h>
@@ -216,6 +217,11 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
     {
         synthdrum_sequencer *s = (synthdrum_sequencer *)sg;
         seq = &s->m_seq;
+    }
+    else if (mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)
+    {
+        looper *l = (looper *)sg;
+        seq = &l->m_seq;
     }
 
     bool cmd_found = true;

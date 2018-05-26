@@ -108,9 +108,9 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
                 if (strncmp("gran", wurds[1], 4) == 0)
-                    looper_set_granulate_mode(g, true);
+                    looper_set_loop_mode(g, LOOPER_STATIC_MODE);
                 else
-                    looper_set_loop_mode(g, true);
+                    looper_set_loop_mode(g, LOOPER_LOOP_MODE);
 
                 looper_set_loop_len(g, loop_len);
             }

@@ -112,7 +112,80 @@ bool step_tick(step_sequencer *seq)
                         int pattern_offset = 0;
                         int division = 1;
                         if (seq->generate_mode == 1)
+                        {
                             division = 4;
+                            for (int i = 0; i < division; i++)
+                            {
+                                pattern_offset = i * (PPBAR / division);
+
+                                int bit_pattern_len = 16; // WTF?
+                                int bit_pattern = sg->generate(
+                                    (void *)sg, (void *)&bit_pattern_len);
+
+                                if (seq->visualize)
+                                {
+                                    char bit_string[17];
+                                    char_binary_version_of_short(bit_pattern,
+                                                                 bit_string);
+                                    printf("PATTERN: %s\n", bit_string);
+                                }
+
+                                convert_bit_pattern_to_midi_pattern(
+                                    bit_pattern, bit_pattern_len,
+                                    seq->patterns[seq->cur_pattern], division,
+                                    pattern_offset);
+
+                                seq->pattern_len = bit_pattern_len;
+                            }
+                        }
+                        else if (seq->generate_mode == 2)
+                        {
+                            // printf("MODE2MOFO!\n");
+                            // pattern_offset = i * (PPBAR / division);
+                            int division = 1;
+                            int pattern_offset = 0;
+
+                            int bit_pattern_len = 16; // default
+                            int bit_pattern = sg->generate(
+                                (void *)sg, (void *)&bit_pattern_len);
+
+                            if (seq->visualize)
+                            {
+                                char bit_string[17];
+                                char_binary_version_of_short(bit_pattern,
+                                                             bit_string);
+                                printf("PATTERN: %s\n", bit_string);
+                            }
+
+                            convert_bit_pattern_to_midi_pattern(
+                                bit_pattern, bit_pattern_len,
+                                seq->patterns[seq->cur_pattern], division,
+                                pattern_offset);
+
+                            int randy = rand() % 100;
+                            if (randy > 50)
+                            {
+                                division = 4;
+                                pattern_offset = PPBAR / division;
+                                bit_pattern = sg->generate(
+                                    (void *)sg, (void *)&bit_pattern_len);
+                                if (randy > 90)
+                                    pattern_offset = 3 * pattern_offset;
+                                else if (randy > 80)
+                                    pattern_offset = 2 * pattern_offset;
+                                else if (randy > 60)
+                                    pattern_offset = 1 * pattern_offset;
+                                else
+                                    pattern_offset = 0;
+
+                                convert_bit_pattern_to_midi_pattern(
+                                    bit_pattern, bit_pattern_len,
+                                    seq->patterns[seq->cur_pattern], division,
+                                    pattern_offset);
+                            }
+
+                            seq->pattern_len = bit_pattern_len;
+                        }
                         for (int i = 0; i < division; i++)
                         {
                             pattern_offset = i * (PPBAR / division);
@@ -311,7 +384,7 @@ void step_set_generate_src(step_sequencer *s, int src)
 
 void step_set_generate_mode(step_sequencer *s, int unsigned mode)
 {
-    if (mode < 2)
+    if (mode < 3)
         s->generate_mode = mode;
 }
 
