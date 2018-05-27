@@ -28,16 +28,12 @@ extern wtable *wave_tables[5];
 
 #define READLINE_SAFE_MAGENTA "\001\x1b[35m\002"
 #define READLINE_SAFE_RESET "\001\x1b[0m\002"
- char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
-// Turns out OSX uses NetBSD editline to implement readline and it has a
-// bug that means color prompt is broke -
-// https://stackoverflow.com/questions/31329952/colorized-readline-prompt-breaks-control-a
-// TODO(find a fix)
-//char const *prompt = "SB#> ";
+#define MAXLINE 128
+char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 
 void *loopy(void *arg)
 {
-    //using_history ();
+    static char last_line[MAXLINE] = {};
 
     char dummy;
     read_history(NULL);
@@ -49,10 +45,14 @@ void *loopy(void *arg)
     char *line;
     while ((line = readline(prompt)) != NULL)
     {
-        // if (line[0] != 0)
-        if (line && *line)
+        if (strlen(line) != 0)
         {
-            add_history(line);
+            if (strncmp(last_line, line, MAXLINE) != 0)
+            {
+                add_history(line);
+                strncpy(last_line, line, MAXLINE);
+            }
+
             interpret(line);
         }
         free(line);
