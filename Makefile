@@ -84,9 +84,10 @@ OBJ = $(patsubst %.c, $(OBJDIR)/%.o, $(SRC))
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler
 
 ABLETONASIOINC=-I/Users/sideboard/Code/link/modules/asio-standalone/asio/include
-INCDIRS=-I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include -I/Users/sideboard/homebrew/include
+INCDIRS=-I/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/include -I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include -I/Users/sideboard/homebrew/include
 LIBDIR=/usr/local/lib
 HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
+READLINELIBDIR=/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 #CFLAGS = -std=gnu11 $(WARNFLAGS) -g -pg $(INCDIRS) -O3
 #CPPFLAGS = -std=gnu++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O0
@@ -109,7 +110,7 @@ objdir:
 	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop
 
 $(TARGET): $(OBJ)
-	$(CC) $(CPPFLAGS) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)
+	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)
 
 clean:
 	rm -f *.o *~ $(TARGET)
