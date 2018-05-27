@@ -207,17 +207,13 @@ void looper_event_notify(void *self, unsigned int event_type)
                     if (g->m_seq.patterns[g->m_seq.cur_pattern][idx]
                             .event_type == MIDI_ON)
                     {
-                        printf("PING %d!\n", mixr->timing_info.midi_tick);
-                        //        //g->audio_buffer_read_idx = 0;
-                        //        //looper_start(g);
-                        //        // playing = true;
-                        //        int cur_sixteenth =
-                        //        mixr->timing_info.sixteenth_note_tick % 16;
-                        //        g->audio_buffer_read_idx =
-                        //            new_read_idx - (cur_sixteenth *
-                        //            g->size_of_sixteenth);
+                        int cur_sixteenth =
+                            mixr->timing_info.sixteenth_note_tick % 16;
+                        g->step_diff = 0 - cur_sixteenth;
                     }
-                    g->audio_buffer_read_idx = new_read_idx;
+                    g->audio_buffer_read_idx =
+                        new_read_idx +
+                        (g->step_diff * g->size_of_sixteenth);
                 }
                 else
                     g->audio_buffer_read_idx = new_read_idx;
@@ -230,12 +226,7 @@ void looper_event_notify(void *self, unsigned int event_type)
         {
             if (g->step_mode)
                 step_tick(&g->m_seq);
-            // if (playing && playing_midi_tick_count > PPSIXTEENTH)
-            //{
-            //    looper_stop(g);
-            //    playing = false;
-            //    playing_midi_tick_count = 0;
-            //}
+
             if (g->scramble_mode)
             {
                 g->scramble_diff = 0;
@@ -757,19 +748,16 @@ void looper_set_loop_mode(looper *g, unsigned int m)
 }
 void looper_set_scramble_pending(looper *g)
 {
-    looper_set_loop_mode(g, LOOPER_LOOP_MODE);
     g->scramble_pending = true;
 }
 
 void looper_set_stutter_pending(looper *g)
 {
-    looper_set_loop_mode(g, LOOPER_LOOP_MODE);
     g->stutter_pending = true;
 }
 
 void looper_set_step_pending(looper *g)
 {
-    looper_set_loop_mode(g, LOOPER_LOOP_MODE);
     g->step_pending = true;
 }
 

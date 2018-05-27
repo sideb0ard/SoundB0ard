@@ -34,10 +34,9 @@ void synthbase_init(synthbase *base, void *parent,
     base->sample_rate = 44100;
     base->sample_rate_counter = 0;
 
-    // base->generate_src = -99;
     base->last_midi_note = 23;
     base->midi_note = 23;
-    base->octave = 3;
+    base->octave = -0;
     base->sustain_note_ms = 200;
     base->note_mode = false;
 }
