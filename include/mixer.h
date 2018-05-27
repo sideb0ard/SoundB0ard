@@ -126,6 +126,8 @@ int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_markov(mixer *mixr, unsigned int type);
 
+int mixer_print_timing_info(mixer *mixr);
+
 int add_bytebeat(mixer *mixr, char *pattern);
 int add_minisynth(mixer *mixr);
 int add_dxsynth(mixer *mixr);

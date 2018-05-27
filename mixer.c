@@ -78,6 +78,7 @@ mixer *new_mixer(double output_latency)
 
     // the lifetime of these booleans is a single sample
 
+    mixr->timing_info.cur_sample = -1;
     mixr->timing_info.midi_tick = -1;
     mixr->timing_info.sixteenth_note_tick = -1;
     mixr->timing_info.loop_beat = 0;
@@ -509,18 +510,6 @@ static void mixer_events_output(mixer *mixr)
 
     if (mixr->timing_info.is_midi_tick)
     {
-        if (mixr->timing_info.midi_tick % PPBAR == 0)
-        {
-            mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
-            if (mixr->scene_start_pending)
-            {
-                mixer_play_scene(mixr, mixr->current_scene);
-                mixr->scene_start_pending = false;
-            }
-        }
-
-        mixer_emit_event(mixr, TIME_MIDI_TICK);
-
         if (mixr->timing_info.midi_tick % 120 == 0)
         {
             mixr->timing_info.is_thirtysecond = true;
@@ -530,6 +519,9 @@ static void mixer_events_output(mixer *mixr)
             {
                 mixr->timing_info.is_sixteenth = true;
                 mixr->timing_info.sixteenth_note_tick++;
+
+                //printf("\nSIXTEENTH! tick:%d\n", mixr->timing_info.sixteenth_note_tick);
+                //mixer_print_timing_info(mixr);
 
                 mixer_emit_event(mixr, TIME_SIXTEENTH_TICK);
 
@@ -546,9 +538,23 @@ static void mixer_events_output(mixer *mixr)
                 }
             }
         }
+
+        if (mixr->timing_info.midi_tick % PPBAR == 0)
+        {
+            mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
+            if (mixr->scene_start_pending)
+            {
+                mixer_play_scene(mixr, mixr->current_scene);
+                mixr->scene_start_pending = false;
+            }
+        }
+
+        mixer_emit_event(mixr, TIME_MIDI_TICK);
+
     }
 }
 
+//static bool first_run = true;
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
 
@@ -562,7 +568,14 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         mixr->timing_info.cur_sample++;
 
         if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
+        {
+            //if (first_run)
+            //{
+            //    mixer_print_timing_info(mixr);
+            //    first_run = false;
+            //}
             mixer_events_output(mixr);
+        }
 
         if (mixr->soundgen_num > 0)
         {
@@ -904,4 +917,34 @@ void mixer_set_notes(mixer *mixr)
     mixr->notes[5] = (mixr->key + 9) % NUM_KEYS;
     mixr->notes[6] = (mixr->key + 11) % NUM_KEYS;
     mixr->notes[7] = (mixr->key + 12) % NUM_KEYS;
+}
+
+int mixer_print_timing_info(mixer *mixr)
+{
+    mixer_timing_info *info = &mixr->timing_info;
+    printf("TIMING INFO!\n");
+    printf("============\n");
+    printf("FRAMES per midi tick:%d\n", info->frames_per_midi_tick);
+    printf("MIDI ticks per ms:%f\n", info->midi_ticks_per_ms);
+    printf("TIME of next MIDI tick:%f\n", info->time_of_next_midi_tick);
+    printf("SIXTEENTH NOTE tick:%d\n", info->sixteenth_note_tick);
+    printf("MIDI tick:%d\n", info->midi_tick);
+    printf("LOOP beat:%d\n", info->loop_beat);
+    printf("LOOP Started:%d\n", info->loop_started);
+    printf("CUR SAMPLE:%d\n", info->cur_sample);
+    printf("Loop_len_in_frames:%d\n", info->loop_len_in_frames);
+    printf("Loop_len_in_ticks:%d\n", info->loop_len_in_ticks);
+    printf("Size of 1/32 note:%d\n", info->size_of_thirtysecond_note);
+    printf("Size of 1/16 note:%d\n", info->size_of_sixteenth_note);
+    printf("Size of 1/8 note:%d\n", info->size_of_eighth_note);
+    printf("Size of 1/4 note:%d\n", info->size_of_quarter_note);
+
+    printf("Has_started:%d\n", info->has_started);
+    printf("Start of loop:%d\n", info->start_of_loop);
+    printf("Is 1/32:%d\n", info->is_thirtysecond);
+    printf("Is 1/16:%d\n", info->is_sixteenth);
+    printf("Is 1/8:%d\n", info->is_eighth);
+    printf("Is 1/4:%d\n", info->is_quarter);
+    printf("Is midi_tick:%d\n", info->is_midi_tick);
+    return 0;
 }
