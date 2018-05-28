@@ -176,9 +176,9 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
         goto cleanup_and_return;
     }
 
-    //print_pattern_tokens(var_tokens, var_tokens_idx);
-    //printf("New algorithm!\n");
-    //for (int i = 0; i < num_uniq; i++)
+    // print_pattern_tokens(var_tokens, var_tokens_idx);
+    // printf("New algorithm!\n");
+    // for (int i = 0; i < num_uniq; i++)
     //    printf("pos:[%d] %s\n", uniq_positions[i], var_tokens[i].value);
 
     for (int i = 0; i < num_uniq; i++)
@@ -411,13 +411,13 @@ int extract_tokens_from_line(pattern_token *tokens, int *token_idx, char *line)
             int var_name_idx = 0;
             while (is_valid_token_char(*c))
                 var_name[var_name_idx++] = *c++;
-            //printf("VAR_NAME:%s\n", var_name);
+            // printf("VAR_NAME:%s\n", var_name);
             if (is_valid_token_name(var_name))
             {
                 tokens[(*token_idx)].type = VAR_NAME;
                 strncpy(tokens[*token_idx].value, var_name,
                         MAX_PATTERN_CHAR_VAL);
-                //printf("IN HERE! val is %s\n", tokens[*token_idx].value);
+                // printf("IN HERE! val is %s\n", tokens[*token_idx].value);
                 grep_expander(var_name, &tokens[*token_idx]);
                 (*token_idx)++;
             }

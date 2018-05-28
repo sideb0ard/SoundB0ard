@@ -211,13 +211,13 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
 
-    //for (int i = 0; i < num_wurds; i++)
+    // for (int i = 0; i < num_wurds; i++)
     //    printf("[%d] %s\n", i, wurds[i]);
 
     if (strncmp(wurds[0], "every", 5) == 0)
     {
         int every_n = atoi(wurds[1]);
-        //printf("Every %d!\n", every_n);
+        // printf("Every %d!\n", every_n);
         if (every_n == 0)
         {
             printf("don't be daft, cannae dae 0 times.\n");
@@ -229,28 +229,28 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
             strncmp(wurds[2], "bar", 3) == 0)
         {
             a->frequency = TIME_START_OF_LOOP_TICK;
-            //printf("Loop!\n");
+            // printf("Loop!\n");
         }
         else if (strncmp(wurds[2], "4th", 4) == 0 ||
                  strncmp(wurds[2], "quart", 5) == 0)
         {
             a->frequency = TIME_QUARTER_TICK;
-            //printf("Quart!\n");
+            // printf("Quart!\n");
         }
         else if (strncmp(wurds[2], "8th", 4) == 0)
         {
             a->frequency = TIME_EIGHTH_TICK;
-            //printf("Eighth!\n");
+            // printf("Eighth!\n");
         }
         else if (strncmp(wurds[2], "16th", 4) == 0)
         {
             a->frequency = TIME_SIXTEENTH_TICK;
-            //printf("Sizteenth!\n");
+            // printf("Sizteenth!\n");
         }
         else if (strncmp(wurds[2], "32nd", 4) == 0)
         {
             a->frequency = TIME_THIRTYSECOND_TICK;
-            //printf("ThirzztySecdon!\n");
+            // printf("ThirzztySecdon!\n");
         }
         else
         {
@@ -279,7 +279,7 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                 strcat(line, " ");
         }
     }
-    //printf("CMD! %s\n", line);
+    // printf("CMD! %s\n", line);
     if (!extract_and_validate_environment(a, line))
         return false;
 

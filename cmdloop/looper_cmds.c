@@ -29,11 +29,16 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
-                if (target_pattern_num != -1)
+                // if (target_pattern_num != -1)
+                //{
+                //    looper_set_step_pending(g);
+                //    parse_step_sequencer_command(
+                //        soundgen_num, target_pattern_num, wurds, num_wurds);
+                //}
+                if (parse_step_sequencer_command(
+                        soundgen_num, target_pattern_num, wurds, num_wurds))
                 {
-                    looper_set_step_pending(g);
-                    parse_step_sequencer_command(
-                        soundgen_num, target_pattern_num, wurds, num_wurds);
+                    // no-op - command found
                 }
                 else
                 {
@@ -45,7 +50,12 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     else if (strncmp("grains_per_sec", wurds[2], 14) == 0)
                     {
                         int gps = atoi(wurds[3]);
-                        looper_set_grains_per_sec(g, gps);
+                        looper_set_grain_density(g, gps);
+                    }
+                    else if (strncmp("density_dur_sync", wurds[2], 16) == 0)
+                    {
+                        bool b = atoi(wurds[3]);
+                        looper_set_density_duration_sync(g, b);
                     }
                     else if (strncmp("audio_buffer_read_idx", wurds[2], 14) ==
                              0)
@@ -117,10 +127,9 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     {
                         looper_set_stutter_pending(g);
                     }
-                    else if (strncmp("movement", wurds[2], 8) == 0)
+                    else if (strncmp("step", wurds[2], 4) == 0)
                     {
-                        int mode = atoi(wurds[3]);
-                        looper_set_movement_mode(g, mode);
+                        looper_set_step_pending(g);
                     }
                     else if (strncmp("reverse", wurds[2], 8) == 0)
                     {

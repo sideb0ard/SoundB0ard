@@ -520,8 +520,9 @@ static void mixer_events_output(mixer *mixr)
                 mixr->timing_info.is_sixteenth = true;
                 mixr->timing_info.sixteenth_note_tick++;
 
-                //printf("\nSIXTEENTH! tick:%d\n", mixr->timing_info.sixteenth_note_tick);
-                //mixer_print_timing_info(mixr);
+                // printf("\nSIXTEENTH! tick:%d\n",
+                // mixr->timing_info.sixteenth_note_tick);
+                // mixer_print_timing_info(mixr);
 
                 mixer_emit_event(mixr, TIME_SIXTEENTH_TICK);
 
@@ -550,11 +551,10 @@ static void mixer_events_output(mixer *mixr)
         }
 
         mixer_emit_event(mixr, TIME_MIDI_TICK);
-
     }
 }
 
-//static bool first_run = true;
+// static bool first_run = true;
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
 
@@ -569,7 +569,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
         if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
         {
-            //if (first_run)
+            // if (first_run)
             //{
             //    mixer_print_timing_info(mixr);
             //    first_run = false;

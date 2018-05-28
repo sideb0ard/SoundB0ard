@@ -23,15 +23,12 @@ looper *new_looper(char *filename)
 
     g->audio_buffer_read_idx = 0;
     g->granular_spray_frames = 441; // 10ms * (44100/1000)
-    g->grain_duration_ms = 50;
-    g->grains_per_sec = 30;
     g->grain_attack_time_pct = 2;
     g->grain_release_time_pct = 5;
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->envelope_mode = LOOPER_ENV_PARABOLIC;
-    g->movement_mode = 0; // bool
-    g->reverse_mode = 0;  // bool
+    g->reverse_mode = 0; // bool
     g->external_source_sg = -1;
 
     g->loop_mode = LOOPER_LOOP_MODE;
@@ -41,6 +38,12 @@ looper *new_looper(char *filename)
     g->stutter_idx = 0;
 
     g->grain_pitch = 1;
+
+    // g->grain_duration_ms = 50;
+    // g->grains_per_sec = 30;
+    g->density_duration_sync = true;
+    g->fill_factor = 2.;
+    looper_set_grain_density(g, 30);
 
     g->sound_generator.gennext = &looper_gennext;
     g->sound_generator.status = &looper_status;
@@ -142,6 +145,7 @@ void looper_event_notify(void *self, unsigned int event_type)
     case (TIME_START_OF_LOOP_TICK):
 
         g->started = true;
+        g->step_diff = 0;
 
         if (g->scramble_pending)
         {
@@ -159,13 +163,13 @@ void looper_event_notify(void *self, unsigned int event_type)
         else
             g->stutter_mode = false;
 
-        if (g->step_pending)
-        {
-            g->step_mode = true;
-            g->step_pending = false;
-        }
-        else
-            g->step_mode = false;
+        // if (g->step_pending)
+        //{
+        //    g->step_mode = true;
+        //    g->step_pending = false;
+        //}
+        // else
+        //    g->step_mode = false;
 
         break;
 
@@ -201,22 +205,22 @@ void looper_event_notify(void *self, unsigned int event_type)
                         (g->stutter_idx * g->size_of_sixteenth) +
                         rel_pos_within_a_sixteenth;
                 }
-                else if (g->step_mode)
+                int idx = mixr->timing_info.midi_tick % PPBAR;
+                if (g->m_seq.patterns[g->m_seq.cur_pattern][idx].event_type ==
+                    MIDI_ON)
                 {
-                    int idx = mixr->timing_info.midi_tick % PPBAR;
-                    if (g->m_seq.patterns[g->m_seq.cur_pattern][idx]
-                            .event_type == MIDI_ON)
-                    {
-                        int cur_sixteenth =
-                            mixr->timing_info.sixteenth_note_tick % 16;
+                    int cur_sixteenth =
+                        mixr->timing_info.sixteenth_note_tick % 16;
+                    int randy = rand() % 100;
+                    if (randy < 20)
+                        g->step_diff = 4 - cur_sixteenth;
+                    else if (randy < 50)
+                        g->step_diff = 8 - cur_sixteenth;
+                    else
                         g->step_diff = 0 - cur_sixteenth;
-                    }
-                    g->audio_buffer_read_idx =
-                        new_read_idx +
-                        (g->step_diff * g->size_of_sixteenth);
                 }
-                else
-                    g->audio_buffer_read_idx = new_read_idx;
+                g->audio_buffer_read_idx =
+                    new_read_idx + (g->step_diff * g->size_of_sixteenth);
             }
         }
         break;
@@ -224,8 +228,7 @@ void looper_event_notify(void *self, unsigned int event_type)
     case (TIME_SIXTEENTH_TICK):
         if (g->started)
         {
-            if (g->step_mode)
-                step_tick(&g->m_seq);
+            step_tick(&g->m_seq);
 
             if (g->scramble_mode)
             {
@@ -400,45 +403,45 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE
-        "source:%s"
-        "%s"
-        " vol:%.2lf read_idx:%.2f\n"
-        "loop_mode:%s loop_len:%.2f scramble:%d stutter:%d step:%d stereo:%s\n"
-        "grain_dur_ms:%d grains_per_sec:%d quasi_grain_fudge:%d "
-        "grain_spray_ms:%.2f\n"
-        "active_grains:%d highest_grain_num:%d selection_mode:%d env_mode:%s\n"
-        "movement:%d reverse:%d pitch:%.2f\n"
-        "gp_lfo_on:%d l4_type:%d l4_amp:%.2f l4_rate:%.2f l4_min:%.2f "
-        "l4_max:%.2f\n"
-        "graindur_lfo_on:%d l1_type:%d l1_amp:%.2f l1_rate:%.2f lfo1_min:%.0f "
-        "lfo1_max:%.0f\n"
-        "grainps_lfo_on:%d l2_type:%d l2_amp:%.2f l2_rate:%.2f l2_min:%.0f "
-        "l2_max:%.2f \n"
-        "grainscan_lfo_on:%d l3_type:%d l3_amp:%.2f l3_rate:%.2f"
-        " l3_min:%.2f l3_max:%.2f \n"
+        "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s\n"
+        "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
+        "gen_src:%d gen_every_n:%d gen_en:%d\n"
+        "grain_dur_ms:%d grains_per_sec:%d density_dur_sync:%d "
+        "quasi_grain_fudge:%d\n"
+        "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
+
+        //"gp_lfo_on:%d l4_type:%d l4_amp:%.2f l4_rate:%.2f l4_min:%.2f "
+        //"l4_max:%.2f\n"
+        //"graindur_lfo_on:%d l1_type:%d l1_amp:%.2f l1_rate:%.2f lfo1_min:%.0f
+        //" "lfo1_max:%.0f\n" "grainps_lfo_on:%d l2_type:%d l2_amp:%.2f
+        // l2_rate:%.2f l2_min:%.0f " "l2_max:%.2f \n" "grainscan_lfo_on:%d
+        // l3_type:%d l3_amp:%.2f l3_rate:%.2f" " l3_min:%.2f l3_max:%.2f \n"
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
 
-        g->filename, INSTRUMENT_COLOR, g->vol, g->audio_buffer_read_idx,
+        g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
         s_loop_mode_names[g->loop_mode], g->loop_len, g->scramble_mode,
-        g->stutter_mode, g->step_mode, g->num_channels == 2 ? "true" : "false",
-        g->grain_duration_ms, g->grains_per_sec, g->quasi_grain_fudge,
-        g->granular_spray_frames / 44.1, g->num_active_grains,
-        g->highest_grain_num, g->selection_mode, s_env_names[g->envelope_mode],
-        g->movement_mode, g->reverse_mode, g->grain_pitch, g->grainpitch_lfo_on,
-        g->m_lfo4.osc.m_waveform, g->m_lfo4.osc.m_amplitude,
-        g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min, g->m_lfo4_max,
+        g->stutter_mode, g->step_mode, g->reverse_mode, g->m_seq.generate_src,
+        g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
 
-        g->grain_duration_ms, g->graindur_lfo_on, g->m_lfo1.osc.m_waveform,
-        g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
-        g->m_lfo1_max,
+        g->grain_duration_ms, g->grains_per_sec, g->density_duration_sync,
+        g->quasi_grain_fudge, g->fill_factor, g->granular_spray_frames / 44.1,
+        g->selection_mode, s_env_names[g->envelope_mode],
 
-        g->grains_per_sec, g->grainps_lfo_on, g->m_lfo2.osc.m_waveform,
-        g->m_lfo2.osc.m_amplitude, g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min,
-        g->m_lfo2_max,
+        // g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
+        // g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
+        // g->m_lfo4_max,
 
-        g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
-        g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
-        g->m_lfo3_max,
+        // g->grain_duration_ms, g->graindur_lfo_on, g->m_lfo1.osc.m_waveform,
+        // g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
+        // g->m_lfo1_max,
+
+        // g->grains_per_sec, g->grainps_lfo_on, g->m_lfo2.osc.m_waveform,
+        // g->m_lfo2.osc.m_amplitude, g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min,
+        // g->m_lfo2_max,
+
+        // g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
+        // g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
+        // g->m_lfo3_max,
 
         g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
         g->m_eg1.m_state);
@@ -661,16 +664,19 @@ int looper_calculate_grain_spacing(looper *g)
     return spacing;
 }
 
-void looper_set_grain_duration(looper *g, int dur)
+void looper_set_grain_duration(looper *l, int dur)
 {
-    // if (dur < MAX_GRAIN_DURATION) {
-    g->grain_duration_ms = dur;
-    //} else
-    //    printf("Sorry, grain duration must be under %d\n",
-    //    MAX_GRAIN_DURATION);
+    l->grain_duration_ms = dur;
+    if (l->density_duration_sync)
+        l->grains_per_sec = (1000. / l->grain_duration_ms) * l->fill_factor;
 }
 
-void looper_set_grains_per_sec(looper *g, int gps) { g->grains_per_sec = gps; }
+void looper_set_grain_density(looper *l, int gps)
+{
+    l->grains_per_sec = gps;
+    if (l->density_duration_sync)
+        l->grain_duration_ms = (l->fill_factor / l->grains_per_sec) * 1000;
+}
 
 void looper_set_grain_attack_size_pct(looper *g, int attack_pct)
 {
@@ -727,7 +733,6 @@ void looper_set_envelope_mode(looper *g, unsigned int mode)
 }
 
 void looper_set_reverse_mode(looper *g, bool b) { g->reverse_mode = b; }
-void looper_set_movement_mode(looper *g, bool b) { g->movement_mode = b; }
 void looper_set_loop_mode(looper *g, unsigned int m)
 {
     g->loop_mode = m;
@@ -746,20 +751,11 @@ void looper_set_loop_mode(looper *g, unsigned int m)
         g->grain_duration_ms = 100;
     }
 }
-void looper_set_scramble_pending(looper *g)
-{
-    g->scramble_pending = true;
-}
+void looper_set_scramble_pending(looper *g) { g->scramble_pending = true; }
 
-void looper_set_stutter_pending(looper *g)
-{
-    g->stutter_pending = true;
-}
+void looper_set_stutter_pending(looper *g) { g->stutter_pending = true; }
 
-void looper_set_step_pending(looper *g)
-{
-    g->step_pending = true;
-}
+void looper_set_step_pending(looper *g) { g->step_pending = true; }
 
 void looper_set_loop_len(looper *g, double bars)
 {
@@ -939,4 +935,15 @@ void looper_set_lfo_sync(looper *g, int lfonum, int numloops)
         g->lfo4_sync = true;
         break;
     }
+}
+
+void looper_set_fill_factor(looper *l, double fill_factor)
+{
+    if (fill_factor >= 0. && fill_factor <= 2.)
+        l->fill_factor = fill_factor;
+}
+
+void looper_set_density_duration_sync(looper *l, bool b)
+{
+    l->density_duration_sync = b;
 }

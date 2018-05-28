@@ -79,13 +79,13 @@ typedef struct looper
     int quasi_grain_fudge;     // random variation from length of grain
     int grain_duration_ms;
     int grains_per_sec;
+    bool density_duration_sync; // keep duration and per_sec aligned
+    double fill_factor;         // used for density_duration_sync
     double grain_pitch;
 
     int num_grains_per_looplen;
     unsigned int selection_mode;
     unsigned int envelope_mode;
-    unsigned int movement_mode;
-    int movement_pct;
     unsigned int reverse_mode;
 
     int last_grain_launched_sample_time;
@@ -164,7 +164,7 @@ void looper_update_lfos(looper *g);
 int looper_calculate_grain_spacing(looper *g);
 void looper_set_grain_pitch(looper *g, double pitch);
 void looper_set_grain_duration(looper *g, int dur);
-void looper_set_grains_per_sec(looper *g, int gps);
+void looper_set_grain_density(looper *g, int gps);
 void looper_set_grain_attack_size_pct(looper *g, int att);
 void looper_set_grain_release_size_pct(looper *g, int rel);
 void looper_set_audio_buffer_read_idx(looper *g, int position);
@@ -172,7 +172,6 @@ void looper_set_granular_spray(looper *g, int spray_ms);
 void looper_set_quasi_grain_fudge(looper *g, int fudgefactor);
 void looper_set_selection_mode(looper *g, unsigned int mode);
 void looper_set_envelope_mode(looper *g, unsigned int mode);
-void looper_set_movement_mode(looper *g, bool b);
 void looper_set_reverse_mode(looper *g, bool b);
 void looper_set_loop_mode(looper *g, unsigned int m);
 void looper_set_loop_len(looper *g, double bars);
@@ -198,5 +197,8 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode);
 
 void looper_del_self(void *self);
+
+void looper_set_fill_factor(looper *l, double fill_factor);
+void looper_set_density_duration_sync(looper *l, bool b);
 
 #endif // LOOPER
