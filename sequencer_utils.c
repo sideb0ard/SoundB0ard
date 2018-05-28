@@ -6,6 +6,7 @@
 #include "mixer.h"
 #include "sequencer_utils.h"
 #include "utils.h"
+#include <euclidean.h>
 
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
@@ -16,15 +17,28 @@ void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
 {
 
     int pulses = PPSIXTEENTH / division;
+    bool triplet_set = false;
 
     for (int i = 0; i < bitpattern_len; i++)
     {
         int shift_by = bitpattern_len - 1 - i;
         int idx = offset + (i * pulses);
+        if (idx >= PPBAR)
+            idx = idx - PPBAR;
         if (bitpattern & 1 << shift_by)
         {
+            // printf("IDX:%d!\n", idx);
             pattern[idx].event_type = MIDI_ON;
             pattern[idx].data2 = DEFAULT_VELOCITY;
+            if (rand() % 100 > 95 && !triplet_set)
+            {
+                uint16_t euc = create_euclidean_rhythm(3, 16);
+                int small_offset = i * pulses;
+                // printf("Ooh, random triplet!\n");
+                convert_bit_pattern_to_midi_pattern(euc, 16, pattern, 8,
+                                                    small_offset);
+                triplet_set = true;
+            }
         }
     }
 }

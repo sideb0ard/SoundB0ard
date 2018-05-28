@@ -146,7 +146,7 @@ void looper_event_notify(void *self, unsigned int event_type)
 
         g->started = true;
         g->step_diff = 0;
-        g->reverse_mode = false;
+        //g->reverse_mode = false;
 
         if (g->scramble_pending)
         {
@@ -215,8 +215,8 @@ void looper_event_notify(void *self, unsigned int event_type)
                         int cur_sixteenth =
                             mixr->timing_info.sixteenth_note_tick % 16;
                         g->step_diff = 0 - cur_sixteenth;
-                        looper_set_reverse_mode(g, false);
-                        g->grain_pitch = 1;
+                        //looper_set_reverse_mode(g, false);
+                        //g->grain_pitch = 1;
 
                         int randy = rand() % 100;
                         if (randy < 20)
@@ -421,7 +421,7 @@ void looper_status(void *self, wchar_t *status_string)
         WANSI_COLOR_WHITE
         "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s\n"
         "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
-        "gen_src:%d gen_every_n:%d gen_en:%d\n"
+        "gen_src:%d gen_every_n:%d gen_en:%d gen_mode:%d\n"
         "grain_dur_ms:%d grains_per_sec:%d density_dur_sync:%d "
         "quasi_grain_fudge:%d\n"
         "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
@@ -437,7 +437,7 @@ void looper_status(void *self, wchar_t *status_string)
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
         s_loop_mode_names[g->loop_mode], g->loop_len, g->scramble_mode,
         g->stutter_mode, g->step_mode, g->reverse_mode, g->m_seq.generate_src,
-        g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
+        g->m_seq.generate_every_n_loops, g->m_seq.generate_en, g->m_seq.generate_mode,
 
         g->grain_duration_ms, g->grains_per_sec, g->density_duration_sync,
         g->quasi_grain_fudge, g->fill_factor, g->granular_spray_frames / 44.1,
