@@ -115,6 +115,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 soundgenerator *sg =
                     (soundgenerator *)mixr->sound_generators[dest_sg_num];
                 synthbase *base = get_synthbase(sg);
+                if (!base)
+                {
+                    printf("Can't do nuttin' for ya, man!\n");
+                    return true;
+                }
 
                 int multiplier = 1;
                 switch (num_bars)

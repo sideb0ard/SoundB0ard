@@ -35,7 +35,7 @@ void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
                 uint16_t euc = create_euclidean_rhythm(3, 16);
                 int small_offset = i * pulses;
                 // printf("Ooh, random triplet!\n");
-                convert_bit_pattern_to_midi_pattern(euc, 16, pattern, 8,
+                convert_bit_pattern_to_midi_pattern(euc, 16, pattern, 16,
                                                     small_offset);
                 triplet_set = true;
             }

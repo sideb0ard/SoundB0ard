@@ -31,6 +31,8 @@ typedef struct step_sequencer
     int generate_max_generation;
     int generate_every_n_loops;
 
+    bool allow_triplets;
+
     // randomizes amplitude
     bool randamp_on;
     int randamp_generation;

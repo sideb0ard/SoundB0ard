@@ -146,7 +146,6 @@ void looper_event_notify(void *self, unsigned int event_type)
 
         g->started = true;
         g->step_diff = 0;
-        //g->reverse_mode = false;
 
         if (g->scramble_pending)
         {
@@ -215,8 +214,7 @@ void looper_event_notify(void *self, unsigned int event_type)
                         int cur_sixteenth =
                             mixr->timing_info.sixteenth_note_tick % 16;
                         g->step_diff = 0 - cur_sixteenth;
-                        //looper_set_reverse_mode(g, false);
-                        //g->grain_pitch = 1;
+                        looper_set_reverse_mode(g, false);
 
                         int randy = rand() % 100;
                         if (randy < 20)
@@ -227,12 +225,6 @@ void looper_event_notify(void *self, unsigned int event_type)
                             g->step_diff = 12 - cur_sixteenth;
                         else if (randy < 60)
                             looper_set_reverse_mode(g, true);
-                        //else if (randy < 63)
-                        //    g->grain_pitch = 1.2;
-                        //else if (randy < 65)
-                        //    g->grain_pitch = 1.5;
-                        //else if (randy < 67)
-                        //    g->grain_pitch = .8;
                     }
                     g->audio_buffer_read_idx =
                         new_read_idx + (g->step_diff * g->size_of_sixteenth);
@@ -474,7 +466,7 @@ void looper_start(void *self)
     looper *g = (looper *)self;
     eg_start_eg(&g->m_eg1);
     g->sound_generator.active = true;
-    g->started = false;
+    //g->started = false;
 }
 
 void looper_stop(void *self)
