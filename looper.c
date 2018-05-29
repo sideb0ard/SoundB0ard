@@ -30,6 +30,7 @@ looper *new_looper(char *filename)
     g->envelope_mode = LOOPER_ENV_PARABOLIC;
     g->reverse_mode = 0; // bool
     g->external_source_sg = -1;
+    g->buffer_is_full = false;
 
     g->loop_mode = LOOPER_LOOP_MODE;
     g->loop_len = 1;
@@ -39,8 +40,6 @@ looper *new_looper(char *filename)
 
     g->grain_pitch = 1;
 
-    // g->grain_duration_ms = 50;
-    // g->grains_per_sec = 30;
     g->density_duration_sync = true;
     g->fill_factor = 2.;
     looper_set_grain_density(g, 30);
@@ -64,7 +63,6 @@ looper *new_looper(char *filename)
     if (strncmp(filename, "none", 4) != 0)
         looper_import_file(g, filename);
 
-    int len_of_16th = g->audio_buffer_len / 16.0;
     step_init(&g->m_seq);
 
     envelope_generator_init(&g->m_eg1); // start/stop env
@@ -331,7 +329,7 @@ stereo_val looper_gennext(void *self)
     if (g->m_eg1.m_state == OFFF)
         g->sound_generator.active = false;
 
-    if (g->external_source_sg != -1)
+    if (g->external_source_sg != -1 && !g->buffer_is_full)
     {
         if (mixer_is_valid_soundgen_num(mixr, g->external_source_sg))
         {
@@ -341,7 +339,11 @@ stereo_val looper_gennext(void *self)
                 mixr->soundgen_cur_val[g->external_source_sg].right;
             g->audio_buffer_write_idx = g->audio_buffer_write_idx + 2;
             if (g->audio_buffer_write_idx >= g->audio_buffer_len)
+            {
+                printf("FINISHED RECn a LOOP!\n");
                 g->audio_buffer_write_idx = 0;
+                g->buffer_is_full = true;
+            }
         }
     }
 
@@ -358,7 +360,7 @@ stereo_val looper_gennext(void *self)
 
             int duration = g->grain_duration_ms * 44.1;
             if (g->quasi_grain_fudge != 0)
-                duration += rand() % g->quasi_grain_fudge;
+                duration += rand() % (int)(g->quasi_grain_fudge * 44.1);
 
             int grain_idx = g->audio_buffer_read_idx;
             if (g->selection_mode == GRAIN_SELECTION_RANDOM)
@@ -412,8 +414,9 @@ void looper_status(void *self, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE
         "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s\n"
-        "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
-        "gen_src:%d gen_every_n:%d gen_en:%d gen_mode:%d\n"
+        "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
+        "buffer_is_full:%d\n"
+        "gen_src:%d gen_every_n:%d gen_en:%d gen_mode:%d extsource:%d\n"
         "grain_dur_ms:%d grains_per_sec:%d density_dur_sync:%d "
         "quasi_grain_fudge:%d\n"
         "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
@@ -428,8 +431,9 @@ void looper_status(void *self, wchar_t *status_string)
 
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
         s_loop_mode_names[g->loop_mode], g->loop_len, g->scramble_mode,
-        g->stutter_mode, g->step_mode, g->reverse_mode, g->m_seq.generate_src,
-        g->m_seq.generate_every_n_loops, g->m_seq.generate_en, g->m_seq.generate_mode,
+        g->stutter_mode, g->step_mode, g->reverse_mode, g->buffer_is_full,
+        g->m_seq.generate_src, g->m_seq.generate_every_n_loops,
+        g->m_seq.generate_en, g->m_seq.generate_mode, g->external_source_sg,
 
         g->grain_duration_ms, g->grains_per_sec, g->density_duration_sync,
         g->quasi_grain_fudge, g->fill_factor, g->granular_spray_frames / 44.1,
@@ -466,7 +470,7 @@ void looper_start(void *self)
     looper *g = (looper *)self;
     eg_start_eg(&g->m_eg1);
     g->sound_generator.active = true;
-    //g->started = false;
+    // g->started = false;
 }
 
 void looper_stop(void *self)
@@ -650,12 +654,17 @@ void looper_set_external_source(looper *g, int sound_gen_num)
         if (buffer)
         {
             if (g->audio_buffer)
+            {
                 free(g->audio_buffer);
+                g->buffer_is_full = false;
+            }
+
             g->audio_buffer = buffer;
             g->audio_buffer_len = looplen;
+            g->have_active_buffer = true;
+            g->num_channels = 2;
         }
     }
-    g->have_active_buffer = true;
 }
 
 int looper_calculate_grain_spacing(looper *g)
@@ -954,4 +963,25 @@ void looper_set_fill_factor(looper *l, double fill_factor)
 void looper_set_density_duration_sync(looper *l, bool b)
 {
     l->density_duration_sync = b;
+}
+
+void looper_dump_buffer(looper *l)
+{
+    printf("Buffer is full:%d\n", l->buffer_is_full);
+    printf("Buffer Len:%d\n", l->audio_buffer_len);
+    printf("Rdx Idx:%f Write Idx:%d\n", l->audio_buffer_read_idx,
+           l->audio_buffer_write_idx);
+    printf("Num active grains:%d\n", l->num_active_grains);
+    // for (int i = 0; i < l->audio_buffer_len; i+=2)
+    //    printf("Left:%f Right:%f\n", l->audio_buffer[i],
+    //    l->audio_buffer[i+1]);
+    for (int i = 0; i < l->highest_grain_num; i++)
+    {
+        sound_grain *g = &l->m_grains[i];
+        printf("Grain:%d len:%d, buf_num:%d start_idx:%d cur_pos:%f inc:%f "
+               "active:%d\n",
+               i, g->grain_len_frames, g->audiobuffer_num,
+               g->audiobuffer_start_idx, g->audiobuffer_cur_pos,
+               g->audiobuffer_inc, g->active);
+    }
 }

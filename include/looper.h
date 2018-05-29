@@ -69,6 +69,7 @@ typedef struct looper
     double audio_buffer_read_idx;
     int audio_buffer_write_idx;
     int external_source_sg; // XOR - external or file
+    bool buffer_is_full;
 
     int num_active_grains;
     int highest_grain_num;
@@ -200,5 +201,6 @@ void looper_del_self(void *self);
 
 void looper_set_fill_factor(looper *l, double fill_factor);
 void looper_set_density_duration_sync(looper *l, bool b);
+void looper_dump_buffer(looper *l);
 
 #endif // LOOPER

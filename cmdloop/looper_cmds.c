@@ -73,6 +73,8 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         int fudge = atoi(wurds[3]);
                         looper_set_quasi_grain_fudge(g, fudge);
                     }
+                    else if (strncmp("debug", wurds[2], 5) == 0)
+                        looper_dump_buffer(g);
                     else if (strncmp("extsource", wurds[2], 9) == 0)
                     {
                         printf("EXTSOURCE!\n");

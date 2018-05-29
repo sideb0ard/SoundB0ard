@@ -20,7 +20,7 @@
 
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
-#define MAX_NUM_soundgenerator 100
+#define MAX_NUM_SOUNDGENERATOR 100
 
 typedef enum
 {
@@ -74,10 +74,13 @@ typedef struct mixer
     AbletonLink *m_ableton_link;
 
     stereo_val
-        soundgen_cur_val[MAX_NUM_soundgenerator]; // cache for current val,
+        soundgen_cur_val[MAX_NUM_SOUNDGENERATOR]; // cache for current val,
     // currently used for sidechain
     // compressor TODO there are no
     // checks for this num
+    double
+        soundgen_volume[MAX_NUM_SOUNDGENERATOR]; // separating instrument amp
+    // from mixer volume per channel
 
     env_var environment[ENVIRONMENT_ARRAY_SIZE];
     int env_var_count;
