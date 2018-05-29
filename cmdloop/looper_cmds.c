@@ -77,13 +77,9 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         looper_dump_buffer(g);
                     else if (strncmp("extsource", wurds[2], 9) == 0)
                     {
-                        printf("EXTSOURCE!\n");
                         int sg = atoi(wurds[3]);
                         if (mixer_is_valid_soundgen_num(mixr, sg))
                         {
-                            printf("GRAN is following "
-                                   "%d\n",
-                                   sg);
                             looper_set_external_source(g, sg);
                         }
                     }

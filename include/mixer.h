@@ -78,8 +78,7 @@ typedef struct mixer
     // currently used for sidechain
     // compressor TODO there are no
     // checks for this num
-    double
-        soundgen_volume[MAX_NUM_SOUNDGENERATOR]; // separating instrument amp
+    double soundgen_volume[MAX_NUM_SOUNDGENERATOR]; // separating instrument amp
     // from mixer volume per channel
 
     env_var environment[ENVIRONMENT_ARRAY_SIZE];

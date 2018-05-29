@@ -31,6 +31,7 @@ looper *new_looper(char *filename)
     g->reverse_mode = 0; // bool
     g->external_source_sg = -1;
     g->buffer_is_full = false;
+    g->should_start_recording = false;
 
     g->loop_mode = LOOPER_LOOP_MODE;
     g->loop_len = 1;
@@ -161,13 +162,8 @@ void looper_event_notify(void *self, unsigned int event_type)
         else
             g->stutter_mode = false;
 
-        // if (g->step_pending)
-        //{
-        //    g->step_mode = true;
-        //    g->step_pending = false;
-        //}
-        // else
-        //    g->step_mode = false;
+        if (!g->should_start_recording)
+            g->should_start_recording = true;
 
         break;
 
@@ -331,18 +327,20 @@ stereo_val looper_gennext(void *self)
 
     if (g->external_source_sg != -1 && !g->buffer_is_full)
     {
-        if (mixer_is_valid_soundgen_num(mixr, g->external_source_sg))
+        if (g->should_start_recording)
         {
-            g->audio_buffer[g->audio_buffer_write_idx] =
-                mixr->soundgen_cur_val[g->external_source_sg].left;
-            g->audio_buffer[g->audio_buffer_write_idx + 1] =
-                mixr->soundgen_cur_val[g->external_source_sg].right;
-            g->audio_buffer_write_idx = g->audio_buffer_write_idx + 2;
-            if (g->audio_buffer_write_idx >= g->audio_buffer_len)
+            if (mixer_is_valid_soundgen_num(mixr, g->external_source_sg))
             {
-                printf("FINISHED RECn a LOOP!\n");
-                g->audio_buffer_write_idx = 0;
-                g->buffer_is_full = true;
+                g->audio_buffer[g->audio_buffer_write_idx] =
+                    mixr->soundgen_cur_val[g->external_source_sg].left;
+                g->audio_buffer[g->audio_buffer_write_idx + 1] =
+                    mixr->soundgen_cur_val[g->external_source_sg].right;
+                g->audio_buffer_write_idx = g->audio_buffer_write_idx + 2;
+                if (g->audio_buffer_write_idx >= g->audio_buffer_len)
+                {
+                    g->audio_buffer_write_idx = 0;
+                    g->buffer_is_full = true;
+                }
             }
         }
     }
@@ -661,8 +659,10 @@ void looper_set_external_source(looper *g, int sound_gen_num)
 
             g->audio_buffer = buffer;
             g->audio_buffer_len = looplen;
-            g->have_active_buffer = true;
             g->num_channels = 2;
+            g->have_active_buffer = true;
+            g->size_of_sixteenth = g->audio_buffer_len / 16;
+            g->should_start_recording = false; // reset
         }
     }
 }

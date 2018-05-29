@@ -70,6 +70,7 @@ typedef struct looper
     int audio_buffer_write_idx;
     int external_source_sg; // XOR - external or file
     bool buffer_is_full;
+    bool should_start_recording; // wait for start of loop
 
     int num_active_grains;
     int highest_grain_num;
