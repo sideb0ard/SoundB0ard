@@ -794,3 +794,17 @@ void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
         sg->set_pattern(sg, target_pattern_num, pattern);
     free(pattern);
 }
+
+void pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
+{
+    int target_tick = midi_tick;
+    while (pattern[target_tick].event_type)
+    {
+        if (mixr->debug_mode)
+            printf("Gotsz a tick already - bump!\n");
+        target_tick++;
+        if (target_tick == PPBAR) // wrap around
+            target_tick = 0;
+    }
+    pattern[target_tick] = ev;
+}

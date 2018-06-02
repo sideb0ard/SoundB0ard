@@ -214,16 +214,8 @@ void synthbase_event_notify(void *self, unsigned int event_type)
 void synthbase_add_event(synthbase *base, int pattern_num, int midi_tick,
                          midi_event ev)
 {
-    int target_tick = midi_tick;
-    while (base->patterns[pattern_num][target_tick].event_type)
-    {
-        if (mixr->debug_mode)
-            printf("Gotsz a tick already - bump!\n");
-        target_tick++;
-        if (target_tick == PPBAR) // wrap around
-            target_tick = 0;
-    }
-    base->patterns[pattern_num][target_tick] = ev;
+    midi_event *pattern = base->patterns[pattern_num];
+    pattern_add_event(pattern, midi_tick, ev);
 }
 
 void synthbase_clear_pattern_ready_for_new_one(synthbase *ms, int pattern_num)

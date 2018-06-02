@@ -42,7 +42,12 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 else
                 {
-                    if (strncmp("grain_dur_ms", wurds[2], 14) == 0)
+                    if (strncmp("gate_mode", wurds[2], 9) == 0)
+                    {
+                        bool b = atoi(wurds[3]);
+                        looper_set_gate_mode(g, b);
+                    }
+                    else if (strncmp("grain_dur_ms", wurds[2], 14) == 0)
                     {
                         int dur = atoi(wurds[3]);
                         looper_set_grain_duration(g, dur);

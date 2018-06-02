@@ -219,6 +219,14 @@ void looper_event_notify(void *self, unsigned int event_type)
                             g->step_diff = 12 - cur_sixteenth;
                         else if (randy < 60)
                             looper_set_reverse_mode(g, true);
+
+                        if (g->gate_mode)
+                            looper_start(g);
+                    }
+                    else if (g->m_seq.patterns[g->m_seq.cur_pattern][idx]
+                            .event_type == MIDI_OFF && g->gate_mode)
+                    {
+                        looper_stop(g);
                     }
                     g->audio_buffer_read_idx =
                         new_read_idx + (g->step_diff * g->size_of_sixteenth);
@@ -230,6 +238,10 @@ void looper_event_notify(void *self, unsigned int event_type)
     case (TIME_SIXTEENTH_TICK):
         if (g->started)
         {
+            if (mixr->timing_info.sixteenth_note_tick != g->m_seq.sixteenth_tick)
+            {
+                //printf("nOTE OFF!\n");
+            }
             step_tick(&g->m_seq);
 
             if (g->scramble_mode)
@@ -411,10 +423,10 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE
-        "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s\n"
+        "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s gate_mode:%d\n"
         "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
-        "gen_src:%d gen_every_n:%d gen_en:%d gen_mode:%d extsource:%d\n"
+        "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
         "grain_dur_ms:%d grains_per_sec:%d density_dur_sync:%d "
         "quasi_grain_fudge:%d\n"
         "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
@@ -428,7 +440,7 @@ void looper_status(void *self, wchar_t *status_string)
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
 
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
-        s_loop_mode_names[g->loop_mode], g->loop_len, g->scramble_mode,
+        s_loop_mode_names[g->loop_mode], g->gate_mode, g->loop_len, g->scramble_mode,
         g->stutter_mode, g->step_mode, g->reverse_mode, g->buffer_is_full,
         g->m_seq.generate_src, g->m_seq.generate_every_n_loops,
         g->m_seq.generate_en, g->m_seq.generate_mode, g->external_source_sg,
@@ -984,4 +996,8 @@ void looper_dump_buffer(looper *l)
                g->audiobuffer_start_idx, g->audiobuffer_cur_pos,
                g->audiobuffer_inc, g->active);
     }
+}
+void looper_set_gate_mode(looper *g, bool b)
+{
+    g->gate_mode = b;
 }

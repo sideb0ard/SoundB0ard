@@ -134,9 +134,11 @@ typedef struct looper
     bool stutter_mode;
     int stutter_idx;
 
-    bool step_pending;
+    bool step_pending; // TODO get rid of?
     bool step_mode;
     int step_diff;
+
+    bool gate_mode; // use midi to trigger env amp
 
     int cur_sixteenth; // used to track scramble
 
@@ -161,6 +163,7 @@ void looper_set_pattern(void *self, int pattern_num, midi_event *pattern);
 
 void looper_import_file(looper *g, char *filename);
 void looper_set_external_source(looper *g, int sound_gen_num);
+void looper_set_gate_mode(looper *g, bool b);
 
 void looper_update_lfos(looper *g);
 int looper_calculate_grain_spacing(looper *g);
