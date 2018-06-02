@@ -149,6 +149,8 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     else if (strncmp("l1_rate", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
+        if (strncmp("sync", wurds[3], 4) == 0)
+            val = mixer_get_khz_per_bar(mixr);
         printf("DXSynth change LFO1 rate!%.2f\n", val);
         dxsynth_set_lfo1_rate(dx, val);
         return true;
@@ -465,7 +467,11 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     else if (strncmp("l1mode", wurds[2], 7) == 0)
         minisynth_set_lfo_mode(ms, 1, val);
     else if (strncmp("l1rate", wurds[2], 8) == 0)
+    {
+        if (strncmp("sync", wurds[3], 4) == 0)
+            val = mixer_get_khz_per_bar(mixr);
         minisynth_set_lfo_rate(ms, 1, val);
+    }
     else if (strncmp("l1amp", wurds[2], 7) == 0)
         minisynth_set_lfo_amp(ms, 1, val);
     else if (strncmp("l1_osc_en", wurds[2], 16) == 0)
@@ -493,7 +499,11 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     else if (strncmp("l2mode", wurds[2], 7) == 0)
         minisynth_set_lfo_mode(ms, 2, val);
     else if (strncmp("l2rate", wurds[2], 8) == 0)
+    {
+        if (strncmp("sync", wurds[3], 4) == 0)
+            val = mixer_get_khz_per_bar(mixr);
         minisynth_set_lfo_rate(ms, 2, val);
+    }
     else if (strncmp("l2amp", wurds[2], 7) == 0)
         minisynth_set_lfo_amp(ms, 2, val);
     else if (strncmp("l2_osc_en", wurds[2], 16) == 0)

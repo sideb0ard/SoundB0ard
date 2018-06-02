@@ -948,3 +948,10 @@ int mixer_print_timing_info(mixer *mixr)
     printf("Is midi_tick:%d\n", info->is_midi_tick);
     return 0;
 }
+
+double mixer_get_khz_per_bar(mixer *mixr)
+{
+
+    double khz = 1000. / mixr->bpm;
+    return khz / 4.;
+}

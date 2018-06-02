@@ -359,7 +359,11 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("lfo1_amp", wurds[2], 9) == 0)
                     filterpass_set_lfo_amp(fp, 1, val);
                 else if (strncmp("lfo1_rate", wurds[2], 9) == 0)
+                {
+                    if (strncmp("sync", wurds[3], 4) == 0)
+                        val = mixer_get_khz_per_bar(mixr);
                     filterpass_set_lfo_rate(fp, 1, val);
+                }
                 else if (strncmp("lfo2_active", wurds[2], 11) == 0)
                     filterpass_set_lfo_active(fp, 2, val);
                 else if (strncmp("lfo2_type", wurds[2], 9) == 0)
@@ -367,7 +371,11 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("lfo2_amp", wurds[2], 9) == 0)
                     filterpass_set_lfo_amp(fp, 2, val);
                 else if (strncmp("lfo2_rate", wurds[2], 9) == 0)
+                {
+                    if (strncmp("sync", wurds[3], 4) == 0)
+                        val = mixer_get_khz_per_bar(mixr);
                     filterpass_set_lfo_rate(fp, 3, val);
+                }
             }
             else if (f->type == BEATREPEAT)
             {
@@ -415,6 +423,8 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 else if (strncmp("rate", wurds[2], 4) == 0)
                 {
+                    if (strncmp("sync", wurds[3], 4) == 0)
+                        val = mixer_get_khz_per_bar(mixr);
                     mod_delay_set_rate(md, val);
                 }
                 else if (strncmp("fb", wurds[2], 8) == 0)
@@ -440,10 +450,14 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 double val = atof(wurds[3]);
                 if (strncmp("depthfc", wurds[2], 7) == 0)
                 {
+                    if (strncmp("sync", wurds[3], 4) == 0)
+                        val = mixer_get_khz_per_bar(mixr);
                     modfilter_set_mod_depth_fc(mf, val);
                 }
                 else if (strncmp("ratefc", wurds[2], 6) == 0)
                 {
+                    if (strncmp("sync", wurds[3], 4) == 0)
+                        val = mixer_get_khz_per_bar(mixr);
                     modfilter_set_mod_rate_fc(mf, val);
                 }
                 else if (strncmp("depthq", wurds[2], 6) == 0)
