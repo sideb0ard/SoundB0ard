@@ -8,6 +8,7 @@
 #include "looper.h"
 #include "mixer.h"
 #include "utils.h"
+#include <pattern_parser.h>
 
 extern mixer *mixr;
 extern char *s_lfo_mode_names;
@@ -109,6 +110,9 @@ looper *new_looper(char *filename)
     g->m_lfo4.osc.m_amplitude = 1.;
     g->lfo4_sync = false;
     lfo_start_oscillator((oscillator *)&g->m_lfo4);
+
+    g->gate_mode = false;
+    g->sustain_ms = 300;
 
     looper_start(g);
 
@@ -221,11 +225,24 @@ void looper_event_notify(void *self, unsigned int event_type)
                             looper_set_reverse_mode(g, true);
 
                         if (g->gate_mode)
+                        {
+                            midi_event *pattern =
+                                g->m_seq.patterns[g->m_seq.cur_pattern];
+                            int off_tick =
+                                (int)(idx +
+                                      (g->sustain_ms *
+                                       mixr->timing_info.midi_ticks_per_ms)) %
+                                PPBAR;
+                            midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
+                            pattern_add_event(pattern, off_tick, off_event);
                             looper_start(g);
+                        }
                     }
                     else if (g->m_seq.patterns[g->m_seq.cur_pattern][idx]
-                            .event_type == MIDI_OFF && g->gate_mode)
+                                     .event_type == MIDI_OFF &&
+                             g->gate_mode)
                     {
+                        midi_event_clear(&g->m_seq.patterns[g->m_seq.cur_pattern][idx]);
                         looper_stop(g);
                     }
                     g->audio_buffer_read_idx =
@@ -238,9 +255,10 @@ void looper_event_notify(void *self, unsigned int event_type)
     case (TIME_SIXTEENTH_TICK):
         if (g->started)
         {
-            if (mixr->timing_info.sixteenth_note_tick != g->m_seq.sixteenth_tick)
+            if (mixr->timing_info.sixteenth_note_tick !=
+                g->m_seq.sixteenth_tick)
             {
-                //printf("nOTE OFF!\n");
+                // printf("nOTE OFF!\n");
             }
             step_tick(&g->m_seq);
 
@@ -423,7 +441,8 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE
-        "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s gate_mode:%d\n"
+        "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s\n"
+        "gate_mode:%d sustain_ms:%d\n"
         "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
         "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
@@ -440,10 +459,11 @@ void looper_status(void *self, wchar_t *status_string)
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
 
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
-        s_loop_mode_names[g->loop_mode], g->gate_mode, g->loop_len, g->scramble_mode,
-        g->stutter_mode, g->step_mode, g->reverse_mode, g->buffer_is_full,
-        g->m_seq.generate_src, g->m_seq.generate_every_n_loops,
-        g->m_seq.generate_en, g->m_seq.generate_mode, g->external_source_sg,
+        s_loop_mode_names[g->loop_mode], g->gate_mode, g->sustain_ms, g->loop_len,
+        g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
+        g->buffer_is_full, g->m_seq.generate_src,
+        g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
+        g->m_seq.generate_mode, g->external_source_sg,
 
         g->grain_duration_ms, g->grains_per_sec, g->density_duration_sync,
         g->quasi_grain_fudge, g->fill_factor, g->granular_spray_frames / 44.1,
@@ -997,7 +1017,9 @@ void looper_dump_buffer(looper *l)
                g->audiobuffer_inc, g->active);
     }
 }
-void looper_set_gate_mode(looper *g, bool b)
+void looper_set_gate_mode(looper *g, bool b) { g->gate_mode = b; }
+void looper_set_sustain_ms(looper *l, int sustain_ms)
 {
-    g->gate_mode = b;
+    if (sustain_ms >= 0)
+        l->sustain_ms = sustain_ms;
 }

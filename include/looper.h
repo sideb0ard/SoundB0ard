@@ -139,6 +139,7 @@ typedef struct looper
     int step_diff;
 
     bool gate_mode; // use midi to trigger env amp
+    int sustain_ms; // for gating notes
 
     int cur_sixteenth; // used to track scramble
 
@@ -206,5 +207,7 @@ void looper_del_self(void *self);
 void looper_set_fill_factor(looper *l, double fill_factor);
 void looper_set_density_duration_sync(looper *l, bool b);
 void looper_dump_buffer(looper *l);
+
+void looper_set_sustain_ms(looper *l, int sustain_ms);
 
 #endif // LOOPER
