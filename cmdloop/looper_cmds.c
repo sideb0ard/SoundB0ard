@@ -62,11 +62,17 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         bool b = atoi(wurds[3]);
                         looper_set_density_duration_sync(g, b);
                     }
-                    else if (strncmp("audio_buffer_read_idx", wurds[2], 14) ==
+                    else if (strncmp("idx", wurds[2], 333) ==
                              0)
                     {
-                        int pos = atoi(wurds[3]);
-                        looper_set_audio_buffer_read_idx(g, pos);
+                        unsigned int pos_perc = atoi(wurds[3]);
+                        if (pos_perc <= 100)
+                        {
+                            double pos = g->audio_buffer_len / 100 * pos_perc;
+                            looper_set_audio_buffer_read_idx(g, pos);
+                        }
+                        else
+                            printf("idx should be a percent val\n");
                     }
                     else if (strncmp("grain_spray_ms", wurds[2], 14) == 0)
                     {

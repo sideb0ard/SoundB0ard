@@ -349,6 +349,36 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
+    else if (strncmp("invert", wurds[0], 6) == 0)
+    {
+        // e.g. invert 0 0:0 1:0
+        int sequence_gen_num = atoi(wurds[1]);
+
+        int sg1_num = 0;
+        int sg1_track_num = 0;
+        sscanf(wurds[2], "%d:%d", &sg1_num, &sg1_track_num);
+
+        int sg2_num = 0;
+        int sg2_track_num = 0;
+        sscanf(wurds[3], "%d:%d", &sg2_num, &sg2_track_num);
+        if (mixer_is_valid_soundgen_track_num(mixr, sg1_num, sg1_track_num) &&
+            mixer_is_valid_soundgen_track_num(mixr, sg2_num, sg2_track_num) &&
+                mixer_is_valid_seq_gen_num(mixr, sequence_gen_num))
+        {
+            sequence_generator *sg = mixr->sequence_generators[sequence_gen_num];
+            uint16_t bit_pattern = sg->generate(sg, NULL);
+            uint16_t inverted_bit_pattern = ~bit_pattern;
+
+            midi_event pattern[PPBAR];
+            convert_bit_pattern_to_midi_pattern(bit_pattern, 16, pattern, 1, 0);
+            soundgenerator *s1 = mixr->sound_generators[sg1_num];
+            s1->set_pattern(s1, sg1_track_num, pattern);
+
+            convert_bit_pattern_to_midi_pattern(inverted_bit_pattern, 16, pattern, 1, 0);
+            soundgenerator *s2 = mixr->sound_generators[sg2_num];
+            s2->set_pattern(s2, sg1_track_num, pattern);
+        }
+    }
     else if (strncmp("stop", wurds[0], 5) == 0)
     {
         if (strncmp(wurds[1], "all", 3) == 0)

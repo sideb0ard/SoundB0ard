@@ -442,7 +442,7 @@ void looper_status(void *self, wchar_t *status_string)
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE
         "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s\n"
-        "gate_mode:%d sustain_ms:%d\n"
+        "gate_mode:%d idx:%.0f\n"
         "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
         "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
@@ -456,10 +456,10 @@ void looper_status(void *self, wchar_t *status_string)
         //" "lfo1_max:%.0f\n" "grainps_lfo_on:%d l2_type:%d l2_amp:%.2f
         // l2_rate:%.2f l2_min:%.0f " "l2_max:%.2f \n" "grainscan_lfo_on:%d
         // l3_type:%d l3_amp:%.2f l3_rate:%.2f" " l3_min:%.2f l3_max:%.2f \n"
-        "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
+        "eg_attack_ms:%.2f sustain_ms:%d eg_release_ms:%.2f eg_state:%d",
 
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
-        s_loop_mode_names[g->loop_mode], g->gate_mode, g->sustain_ms, g->loop_len,
+        s_loop_mode_names[g->loop_mode], g->gate_mode, g->audio_buffer_read_idx, g->loop_len,
         g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
         g->buffer_is_full, g->m_seq.generate_src,
         g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
@@ -485,7 +485,7 @@ void looper_status(void *self, wchar_t *status_string)
         // g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
         // g->m_lfo3_max,
 
-        g->m_eg1.m_attack_time_msec, g->m_eg1.m_release_time_msec,
+        g->m_eg1.m_attack_time_msec, g->sustain_ms, g->m_eg1.m_release_time_msec,
         g->m_eg1.m_state);
 
     wchar_t local_status_string[MAX_PS_STRING_SZ] = {};
