@@ -20,7 +20,7 @@ void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
     clear_pattern(pattern);
 
     int pulses = PPSIXTEENTH / division;
-    //bool triplet_set = false;
+    // bool triplet_set = false;
 
     for (int i = 0; i < bitpattern_len; i++)
     {
@@ -33,7 +33,7 @@ void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
             // printf("IDX:%d!\n", idx);
             pattern[idx].event_type = MIDI_ON;
             pattern[idx].data2 = DEFAULT_VELOCITY;
-            //if (rand() % 100 > 95 && !triplet_set)
+            // if (rand() % 100 > 95 && !triplet_set)
             //{
             //    uint16_t euc = create_euclidean_rhythm(3, 16);
             //    int small_offset = i * pulses;

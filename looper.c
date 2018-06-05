@@ -231,7 +231,7 @@ void looper_event_notify(void *self, unsigned int event_type)
                         midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
                         pattern_add_event(pattern, off_tick, off_event);
                         looper_start(g);
-                        //printf("[%d] ON idx is %d -- setting off to "
+                        // printf("[%d] ON idx is %d -- setting off to "
                         //       "off_tick:%d\n",
                         //       idx, (int)new_read_idx, off_tick);
                     }
@@ -240,7 +240,7 @@ void looper_event_notify(void *self, unsigned int event_type)
                                  .event_type == MIDI_OFF &&
                          g->gate_mode)
                 {
-                    //printf("[%d] OFF\n", idx);
+                    // printf("[%d] OFF\n", idx);
                     midi_event_clear(
                         &g->m_seq.patterns[g->m_seq.cur_pattern][idx]);
                     looper_stop(g);
@@ -346,7 +346,7 @@ stereo_val looper_gennext(void *self)
         return val;
 
     if (g->m_eg1.m_state == OFFF)
-       g->sound_generator.active = false;
+        g->sound_generator.active = false;
 
     if (g->external_source_sg != -1 && !g->buffer_is_full)
     {
@@ -434,8 +434,8 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_PS_STRING_SZ,
         WANSI_COLOR_WHITE
-        "source:%s %s vol:%.2lf pitch:%.2f loop_mode:%s\n"
-        "gate_mode:%d idx:%.0f buf_len:%d\n"
+        "source:%s %s vol:%.2lf pitch:%.2f\n"
+        "loop_mode:%s gate_mode:%d idx:%.0f buf_len:%d\n"
         "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
         "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
@@ -443,19 +443,26 @@ void looper_status(void *self, wchar_t *status_string)
         "quasi_grain_fudge:%d\n"
         "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
 
-        //"gp_lfo_on:%d l4_type:%d l4_amp:%.2f l4_rate:%.2f l4_min:%.2f "
-        //"l4_max:%.2f\n"
-        //"graindur_lfo_on:%d l1_type:%d l1_amp:%.2f l1_rate:%.2f lfo1_min:%.0f
-        //" "lfo1_max:%.0f\n" "grainps_lfo_on:%d l2_type:%d l2_amp:%.2f
-        // l2_rate:%.2f l2_min:%.0f " "l2_max:%.2f \n" "grainscan_lfo_on:%d
-        // l3_type:%d l3_amp:%.2f l3_rate:%.2f" " l3_min:%.2f l3_max:%.2f \n"
+        "[Grain Pitch LFO]\n"
+        "gp_on:%d gp_type:%d gp_amp:%.2f gp_rate:%.2f gp_lo:%.2f gp_hi:%.2f\n"
+
+        "[Grain Duration LFO]\n"
+        "gd_on:%d gd_type:%d gd_amp:%.2f gd_rate:%.2f gd_lo:%.2f gd_hi:%.2f\n"
+
+        "[Grains Per Sec LFO]\n"
+        "gps_on:%d gps_type:%d gps_amp:%.2f gps_rate:%.2f gps_lo:%.2f "
+        "gps_hi:%.2f\n"
+
+        "[Grain Scan LFO]\n"
+        "gs_on:%d gs_type:%d gs_amp:%.2f gs_rate:%.2f gs_lo:%.2f gs_hi:%.2f\n"
+
+        "[Envelope Generator]\n"
         "eg_attack_ms:%.2f sustain_ms:%d eg_release_ms:%.2f eg_state:%d",
 
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
         s_loop_mode_names[g->loop_mode], g->gate_mode, g->audio_buffer_read_idx,
-        g->audio_buffer_len,
-        g->loop_len, g->scramble_mode, g->stutter_mode, g->step_mode,
-        g->reverse_mode, g->buffer_is_full, g->m_seq.generate_src,
+        g->audio_buffer_len, g->loop_len, g->scramble_mode, g->stutter_mode,
+        g->step_mode, g->reverse_mode, g->buffer_is_full, g->m_seq.generate_src,
         g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
         g->m_seq.generate_mode, g->external_source_sg,
 
@@ -463,21 +470,19 @@ void looper_status(void *self, wchar_t *status_string)
         g->quasi_grain_fudge, g->fill_factor, g->granular_spray_frames / 44.1,
         g->selection_mode, s_env_names[g->envelope_mode],
 
-        // g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
-        // g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
-        // g->m_lfo4_max,
+        g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
+        g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
+        g->m_lfo4_max,
 
-        // g->grain_duration_ms, g->graindur_lfo_on, g->m_lfo1.osc.m_waveform,
-        // g->m_lfo1.osc.m_amplitude, g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min,
-        // g->m_lfo1_max,
+        g->graindur_lfo_on, g->m_lfo1.osc.m_waveform, g->m_lfo1.osc.m_amplitude,
+        g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min, g->m_lfo1_max,
 
-        // g->grains_per_sec, g->grainps_lfo_on, g->m_lfo2.osc.m_waveform,
-        // g->m_lfo2.osc.m_amplitude, g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min,
-        // g->m_lfo2_max,
+        g->grainps_lfo_on, g->m_lfo2.osc.m_waveform, g->m_lfo2.osc.m_amplitude,
+        g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min, g->m_lfo2_max,
 
-        // g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
-        // g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
-        // g->m_lfo3_max,
+        g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
+        g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
+        g->m_lfo3_max,
 
         g->m_eg1.m_attack_time_msec, g->sustain_ms,
         g->m_eg1.m_release_time_msec, g->m_eg1.m_state);

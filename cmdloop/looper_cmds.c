@@ -29,12 +29,6 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
-                // if (target_pattern_num != -1)
-                //{
-                //    looper_set_step_pending(g);
-                //    parse_step_sequencer_command(
-                //        soundgen_num, target_pattern_num, wurds, num_wurds);
-                //}
                 if (parse_step_sequencer_command(
                         soundgen_num, target_pattern_num, wurds, num_wurds))
                 {
@@ -62,8 +56,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         bool b = atoi(wurds[3]);
                         looper_set_density_duration_sync(g, b);
                     }
-                    else if (strncmp("idx", wurds[2], 333) ==
-                             0)
+                    else if (strncmp("idx", wurds[2], 333) == 0)
                     {
                         unsigned int pos_perc = atoi(wurds[3]);
                         if (pos_perc <= 100)
@@ -150,149 +143,159 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         int mode = atoi(wurds[3]);
                         looper_set_reverse_mode(g, mode);
                     }
-                    else if (strncmp("l1_type", wurds[2], 8) == 0)
+
+                    // Grain Duration LFO
+                    else if (strncmp("gd_on", wurds[2], 14) == 0)
+                    {
+                        int b = atoi(wurds[3]);
+                        g->graindur_lfo_on = b;
+                    }
+                    else if (strncmp("gd_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         looper_set_lfo_voice(g, 1, type);
                     }
-                    else if (strncmp("l1_amp", wurds[2], 7) == 0)
+                    else if (strncmp("gd_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
                         looper_set_lfo_amp(g, 1, amp);
                     }
-                    else if (strncmp("l1_rate", wurds[2], 8) == 0)
+                    else if (strncmp("gd_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
                         looper_set_lfo_rate(g, 1, rate);
                     }
-                    else if (strncmp("l1_sync", wurds[2], 8) == 0)
+                    else if (strncmp("gd_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
                         looper_set_lfo_sync(g, 1, loops);
                     }
-                    else if (strncmp("l1_min", wurds[2], 8) == 0)
+                    else if (strncmp("gd_lo", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
                         looper_set_lfo_min(g, 1, min);
                     }
-                    else if (strncmp("l1_max", wurds[2], 8) == 0)
+                    else if (strncmp("gd_hi", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
                         looper_set_lfo_max(g, 1, max);
                     }
-                    else if (strncmp("l2_type", wurds[2], 8) == 0)
+
+                    // Grains Per Sec LFO
+                    else if (strncmp("gps_on", wurds[2], 13) == 0)
+                    {
+                        int b = atoi(wurds[3]);
+                        g->grainps_lfo_on = b;
+                    }
+                    else if (strncmp("gps_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", type);
                         looper_set_lfo_voice(g, 2, type);
                     }
-                    else if (strncmp("l2_amp", wurds[2], 7) == 0)
+                    else if (strncmp("gps_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
                         looper_set_lfo_amp(g, 2, amp);
                     }
-                    else if (strncmp("l2_rate", wurds[2], 8) == 0)
+                    else if (strncmp("gps_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
                         looper_set_lfo_rate(g, 2, rate);
                     }
-                    else if (strncmp("l2_sync", wurds[2], 8) == 0)
+                    else if (strncmp("gps_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
                         looper_set_lfo_sync(g, 2, loops);
                     }
-                    else if (strncmp("l2_min", wurds[2], 8) == 0)
+                    else if (strncmp("gps_lo", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
                         looper_set_lfo_min(g, 2, min);
                     }
-                    else if (strncmp("l2_max", wurds[2], 8) == 0)
+                    else if (strncmp("gps_hi", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
                         looper_set_lfo_max(g, 2, max);
                     }
-                    else if (strncmp("l3_type", wurds[2], 8) == 0)
+
+                    // Grain Scan LFO
+                    else if (strncmp("gs_on", wurds[2], 16) == 0)
+                    {
+                        int b = atoi(wurds[3]);
+                        g->grainscanfile_lfo_on = b;
+                    }
+                    else if (strncmp("gs_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", type);
                         looper_set_lfo_voice(g, 3, type);
                     }
-                    else if (strncmp("l3_amp", wurds[2], 7) == 0)
+                    else if (strncmp("gs_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
                         looper_set_lfo_amp(g, 3, amp);
                     }
-                    else if (strncmp("l3_rate", wurds[2], 8) == 0)
+                    else if (strncmp("gs_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
                         looper_set_lfo_rate(g, 3, rate);
                     }
-                    else if (strncmp("l3_sync", wurds[2], 8) == 0)
+                    else if (strncmp("gs_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
                         looper_set_lfo_sync(g, 3, loops);
                     }
-                    else if (strncmp("l3_min", wurds[2], 8) == 0)
+                    else if (strncmp("gs_lo", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
                         looper_set_lfo_min(g, 3, min);
                     }
-                    else if (strncmp("l3_max", wurds[2], 8) == 0)
+                    else if (strncmp("gs_hi", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
                         looper_set_lfo_max(g, 3, max);
                     }
-                    else if (strncmp("l4_type", wurds[2], 8) == 0)
+
+                    // GRAIN PITCH LFO
+                    else if (strncmp("gp_on", wurds[2], 17) == 0)
+                    {
+                        int b = atoi(wurds[3]);
+                        g->grainpitch_lfo_on = b;
+                    }
+                    else if (strncmp("gp_type", wurds[2], 8) == 0)
                     {
                         int type = atoi(wurds[3]);
                         printf("LFO TYPE is %d\n", type);
                         looper_set_lfo_voice(g, 4, type);
                     }
-                    else if (strncmp("l4_amp", wurds[2], 7) == 0)
+                    else if (strncmp("gp_amp", wurds[2], 7) == 0)
                     {
                         double amp = atof(wurds[3]);
                         looper_set_lfo_amp(g, 4, amp);
                     }
-                    else if (strncmp("l4_rate", wurds[2], 8) == 0)
+                    else if (strncmp("gp_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
                         looper_set_lfo_rate(g, 4, rate);
                     }
-                    else if (strncmp("l4_sync", wurds[2], 8) == 0)
+                    else if (strncmp("gp_sync", wurds[2], 8) == 0)
                     {
                         double loops = atof(wurds[3]);
                         looper_set_lfo_sync(g, 4, loops);
                     }
-                    else if (strncmp("l4_min", wurds[2], 8) == 0)
+                    else if (strncmp("gp_lo", wurds[2], 8) == 0)
                     {
                         double min = atof(wurds[3]);
                         looper_set_lfo_min(g, 4, min);
                     }
-                    else if (strncmp("l4_max", wurds[2], 8) == 0)
+                    else if (strncmp("gp_hi", wurds[2], 8) == 0)
                     {
                         double max = atof(wurds[3]);
                         looper_set_lfo_max(g, 4, max);
                     }
-                    else if (strncmp("graindur_lfo_on", wurds[2], 14) == 0)
-                    {
-                        int b = atoi(wurds[3]);
-                        g->graindur_lfo_on = b;
-                    }
-                    else if (strncmp("gp_lfo_on", wurds[2], 17) == 0)
-                    {
-                        int b = atoi(wurds[3]);
-                        g->grainpitch_lfo_on = b;
-                    }
-                    else if (strncmp("grainps_lfo_on", wurds[2], 13) == 0)
-                    {
-                        int b = atoi(wurds[3]);
-                        g->grainps_lfo_on = b;
-                    }
-                    else if (strncmp("grainscan_lfo_on", wurds[2], 16) == 0)
-                    {
-                        int b = atoi(wurds[3]);
-                        g->grainscanfile_lfo_on = b;
-                    }
+
+                    // Env Gen
                     else if (strncmp("eg_attack_ms", wurds[2], 16) == 0)
                     {
                         int attack = atoi(wurds[3]);
