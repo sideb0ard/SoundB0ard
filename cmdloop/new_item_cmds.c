@@ -93,6 +93,17 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
             update_environment("pc", pcnum);
         }
+        else if (strncmp("perc", wurds[1], 4) == 0)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                char perc[512] = {0};
+                get_random_sample_from_dir("perc", perc);
+                printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
+                sample_sequencer *s = new_sample_seq(perc);
+                add_sound_generator(mixr, (soundgenerator *)s);
+            }
+        }
 
         else if (strncmp("looper", wurds[1], 6) == 0 ||
                  strncmp("loop", wurds[1], 4) == 0 ||

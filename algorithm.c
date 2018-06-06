@@ -295,11 +295,16 @@ void algorithm_status(void *self, wchar_t *status_string)
         ALGO_COLOR = COOL_COLOR_PINK;
 
     swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_WHITE "%sprocess:%s step:%d event:%s Env(type:%s "
-                               "Var:%s Val:%s)  Cmd: %s ListLen:%d\n"
-                               "             (input_line:%s)",
-             ALGO_COLOR, s_process_type[a->process_type], a->step,
-             s_event_type[a->event_type], s_env_type[a->env.type],
+             WANSI_COLOR_WHITE
+             "%sprocess:" WANSI_COLOR_WHITE "%s"
+             "%s step:" WANSI_COLOR_WHITE "%d"
+             "%s event:" WANSI_COLOR_WHITE "%s"
+             "%s env:(type:%s var:%s val:%s)\n"
+             "        Cmd: %s ListLen:%d (input_line:%s)",
+             ALGO_COLOR, s_process_type[a->process_type],
+             ALGO_COLOR, a->step,
+             ALGO_COLOR, s_event_type[a->event_type],
+             ALGO_COLOR, s_env_type[a->env.type],
              a->env.variable_key,
              a->env.type == LIST_TYPE
                  ? a->env.variable_list_vals[a->env.list_idx]
