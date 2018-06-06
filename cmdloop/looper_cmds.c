@@ -163,6 +163,13 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     else if (strncmp("gd_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
+                        if (strncmp(wurds[3],"sync",4) == 0)
+                        {
+                           rate = mixer_get_khz_per_bar(mixr);
+                           int bars = atoi(wurds[4]);
+                           if (bars > 0)
+                               rate /= bars;
+                        }
                         looper_set_lfo_rate(g, 1, rate);
                     }
                     else if (strncmp("gd_sync", wurds[2], 8) == 0)
@@ -201,6 +208,13 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     else if (strncmp("gps_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
+                        if (strncmp(wurds[3],"sync",4) == 0)
+                        {
+                           rate = mixer_get_khz_per_bar(mixr);
+                           int bars = atoi(wurds[4]);
+                           if (bars > 0)
+                               rate /= bars;
+                        }
                         looper_set_lfo_rate(g, 2, rate);
                     }
                     else if (strncmp("gps_sync", wurds[2], 8) == 0)
@@ -239,6 +253,13 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     else if (strncmp("gs_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
+                        if (strncmp(wurds[3],"sync",4) == 0)
+                        {
+                           rate = mixer_get_khz_per_bar(mixr);
+                           int bars = atoi(wurds[4]);
+                           if (bars > 0)
+                               rate /= bars;
+                        }
                         looper_set_lfo_rate(g, 3, rate);
                     }
                     else if (strncmp("gs_sync", wurds[2], 8) == 0)
@@ -277,6 +298,13 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     else if (strncmp("gp_rate", wurds[2], 8) == 0)
                     {
                         double rate = atof(wurds[3]);
+                        if (strncmp(wurds[3],"sync",4) == 0)
+                        {
+                           rate = mixer_get_khz_per_bar(mixr);
+                           int bars = atoi(wurds[4]);
+                           if (bars > 0)
+                               rate /= bars;
+                        }
                         looper_set_lfo_rate(g, 4, rate);
                     }
                     else if (strncmp("gp_sync", wurds[2], 8) == 0)
