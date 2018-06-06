@@ -50,10 +50,19 @@ typedef struct algo_environment
     int target_action_counter;
 } algo_environment;
 
+// process_type
+enum {
+    EVERY,
+    OVER,
+};
+
 typedef struct algorithm
 {
-    int every_n; // i.e every_n frequency e.g. every 4 loops or every 3rd 16th
-    unsigned int frequency;
+    // e.g. every 3 bar (step="x y z") loop %d scramble
+    unsigned int process_type; // EVERY, OVER
+    int step;
+    unsigned int event_type; // e.g. MIDI_TICK, SIXTEENTH, BAR
+
     int counter; // keeps track of which n we're on
 
     bool has_env;

@@ -11,8 +11,9 @@
 
 extern mixer *mixr;
 
-const char *s_event_frequency[] = {"MIDI_TICK", "THIRTYSECOND", "SIXTEENTH",
-                                   "EIGHTH",    "QUARTER",      "BAR"};
+const char *s_event_type[] = {"midi", "32nd", "16th", "8th", "4th", "bar"};
+const char *s_process_type[] = {"every", "over"};
+const char *s_env_type[] = {"LIST", "STEP"};
 
 algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
@@ -20,7 +21,7 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     if (!extract_cmds_from_line(a, num_wurds, wurds))
     {
-        printf("Couldn't part commands from line\n");
+        printf("Couldn't parse commands from line\n");
         free(a);
         return NULL;
     }
@@ -34,7 +35,7 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 
 static void handle_command(algorithm *a)
 {
-    if (a->counter % a->every_n == 0)
+    if (a->counter % a->step == 0)
     {
         algorithm_replace_vars_in_cmd(a);
         // printf("UPDated cmd: %s\n", a->runnable_command);
@@ -51,32 +52,7 @@ void algorithm_event_notify(void *self, unsigned int event_type)
     if (!a->active)
         return;
 
-    bool take_action = false;
-    switch (event_type)
-    {
-    case (TIME_THIRTYSECOND_TICK):
-        if (a->frequency == TIME_THIRTYSECOND_TICK)
-            take_action = true;
-        break;
-    case (TIME_SIXTEENTH_TICK):
-        if (a->frequency == TIME_SIXTEENTH_TICK)
-            take_action = true;
-        break;
-    case (TIME_EIGHTH_TICK):
-        if (a->frequency == TIME_EIGHTH_TICK)
-            take_action = true;
-        break;
-    case (TIME_QUARTER_TICK):
-        if (a->frequency == TIME_QUARTER_TICK)
-            take_action = true;
-        break;
-    case (TIME_START_OF_LOOP_TICK):
-        if (a->frequency == TIME_START_OF_LOOP_TICK)
-            take_action = true;
-        break;
-    }
-
-    if (take_action)
+    if (event_type == a->event_type)
         handle_command(a);
 }
 
@@ -207,60 +183,54 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
     return result;
 }
 
+void print_algo_help()
+{
+    printf("Usage: <every|over> n <bar|4th|8th|16th|32nd> [(<step=\"x y "
+           "z..\"|rand=\"x y z..\"|osc=\"lo hi\">)] process \%%s\n");
+}
+
 bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
 
-    // for (int i = 0; i < num_wurds; i++)
-    //    printf("[%d] %s\n", i, wurds[i]);
-
     if (strncmp(wurds[0], "every", 5) == 0)
     {
-        int every_n = atoi(wurds[1]);
-        // printf("Every %d!\n", every_n);
-        if (every_n == 0)
-        {
-            printf("don't be daft, cannae dae 0 times.\n");
-            return false;
-        }
-        a->every_n = every_n;
-
-        if (strncmp(wurds[2], "loop", 4) == 0 ||
-            strncmp(wurds[2], "bar", 3) == 0)
-        {
-            a->frequency = TIME_START_OF_LOOP_TICK;
-            // printf("Loop!\n");
-        }
-        else if (strncmp(wurds[2], "4th", 4) == 0 ||
-                 strncmp(wurds[2], "quart", 5) == 0)
-        {
-            a->frequency = TIME_QUARTER_TICK;
-            // printf("Quart!\n");
-        }
-        else if (strncmp(wurds[2], "8th", 4) == 0)
-        {
-            a->frequency = TIME_EIGHTH_TICK;
-            // printf("Eighth!\n");
-        }
-        else if (strncmp(wurds[2], "16th", 4) == 0)
-        {
-            a->frequency = TIME_SIXTEENTH_TICK;
-            // printf("Sizteenth!\n");
-        }
-        else if (strncmp(wurds[2], "32nd", 4) == 0)
-        {
-            a->frequency = TIME_THIRTYSECOND_TICK;
-            // printf("ThirzztySecdon!\n");
-        }
-        else
-        {
-            printf("Need a time period\n");
-            return false;
-        }
+        a->process_type = EVERY;
+    }
+    else if (strncmp(wurds[0], "over", 4) == 0)
+    {
+        a->process_type = OVER;
     }
     else
     {
-        printf("Only 'every' is a supported algo currently\n");
+        printf("Need a process type - 'every' or 'over'\n");
+        return false;
+    }
+
+    int step = atoi(wurds[1]);
+    if (step == 0)
+    {
+        printf("don't be daft, cannae dae 0 times.\n");
+        return false;
+    }
+    a->step = step;
+
+    if (strncmp(wurds[2], "loop", 4) == 0 || strncmp(wurds[2], "bar", 3) == 0)
+        a->event_type = TIME_START_OF_LOOP_TICK;
+    else if (strncmp(wurds[2], "midi", 4) == 0)
+        a->event_type = TIME_MIDI_TICK;
+    else if (strncmp(wurds[2], "4th", 3) == 0 ||
+             strncmp(wurds[2], "quart", 5) == 0)
+        a->event_type = TIME_QUARTER_TICK;
+    else if (strncmp(wurds[2], "8th", 4) == 0)
+        a->event_type = TIME_EIGHTH_TICK;
+    else if (strncmp(wurds[2], "16th", 4) == 0)
+        a->event_type = TIME_SIXTEENTH_TICK;
+    else if (strncmp(wurds[2], "32nd", 4) == 0)
+        a->event_type = TIME_THIRTYSECOND_TICK;
+    else
+    {
+        printf("Need a time period\n");
         return false;
     }
 
@@ -317,20 +287,24 @@ void algorithm_replace_vars_in_cmd(algorithm *a)
         }
     }
 }
-const char *s_env_type[] = {"LIST", "STEP"};
 void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
-    swprintf(
-        status_string, MAX_PS_STRING_SZ,
-        WANSI_COLOR_RED
-        "[ALGO] Every %d x %s Env(type:%s Var:%s Val:%s)  Cmd: %s ListLen:%d\n"
-        "             (input_line:%s)",
-        a->every_n, s_event_frequency[a->frequency], s_env_type[a->env.type],
-        a->env.variable_key,
-        a->env.type == LIST_TYPE ? a->env.variable_list_vals[a->env.list_idx]
-                                 : a->env.variable_scalar_value,
-        a->command, a->env.list_len, a->input_line);
+    char *ALGO_COLOR = ANSI_COLOR_RESET;
+    if (a->active)
+        ALGO_COLOR = COOL_COLOR_PINK;
+
+    swprintf(status_string, MAX_PS_STRING_SZ,
+             WANSI_COLOR_WHITE "%sprocess:%s step:%d event:%s Env(type:%s "
+                               "Var:%s Val:%s)  Cmd: %s ListLen:%d\n"
+                               "             (input_line:%s)",
+             ALGO_COLOR, s_process_type[a->process_type], a->step,
+             s_event_type[a->event_type], s_env_type[a->env.type],
+             a->env.variable_key,
+             a->env.type == LIST_TYPE
+                 ? a->env.variable_list_vals[a->env.list_idx]
+                 : a->env.variable_scalar_value,
+             a->command, a->env.list_len, a->input_line);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

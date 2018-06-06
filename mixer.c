@@ -179,8 +179,8 @@ void mixer_ps(mixer *mixr)
             {
                 wmemset(wss, 0, MAX_PS_STRING_SZ);
                 algorithm_status(mixr->algorithms[i], wss);
-                wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
-                wprintf(L"  %ls\n", wss);
+                wprintf(WCOOL_COLOR_GREEN "["WANSI_COLOR_WHITE "algo %d" WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET, i);
+                wprintf(L"%ls\n", wss);
                 wprintf(WANSI_COLOR_RESET);
             }
         }

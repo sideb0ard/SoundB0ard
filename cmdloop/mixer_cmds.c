@@ -21,18 +21,24 @@ extern wtable *wave_tables[5];
 bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
 
+    bool cmd_found = false;
+
     if (strncmp("bpm", wurds[0], 3) == 0)
     {
         int bpm = atoi(wurds[1]);
         if (bpm > 0)
             mixer_update_bpm(mixr, bpm);
-        return true;
+
+        cmd_found = true;
     }
 
     else if (strncmp("every", wurds[0], 4) == 0)
     {
         algorithm *a = new_algorithm(num_wurds, wurds);
-        mixer_add_algorithm(mixr, a);
+        if (a)
+            mixer_add_algorithm(mixr, a);
+
+        cmd_found = true;
     }
 
     else if (strncmp("brak", wurds[0], 4) == 0)
@@ -50,7 +56,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 brak(pattern);
             }
         }
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("quantize", wurds[0], 8) == 0)
     {
@@ -68,7 +74,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         default:
             printf("nae danger, mate, quantize yer heid..\n");
         }
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("randamp", wurds[0], 7) == 0)
@@ -85,6 +91,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 midi_pattern_rand_amp(pattern);
             }
         }
+        cmd_found = true;
     }
     else if (strncmp("gen", wurds[0], 3) == 0)
     {
@@ -183,6 +190,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                        "<dest_sg_num>:<dest_sg_pattern_num> <num_bars:default "
                        "1>\n");
         }
+        cmd_found = true;
     }
     else if (strncmp("keys", wurds[0], 4) == 0)
     {
@@ -192,7 +200,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("%d [%s] ", i, key);
         }
         printf("\n");
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("key", wurds[0], 3) == 0)
     {
@@ -233,7 +241,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             mixr->key = B;
 
         mixer_set_notes(mixr);
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("notes", wurds[0], 5) == 0)
     {
@@ -247,7 +255,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         //    printf("Changing KEY!\n");
         //    mixr->key = key;
         //}
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("<~", wurds[0], 2) == 0 || strncmp("~>", wurds[0], 2) == 0)
     {
@@ -268,7 +276,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     right_shift(pattern, places_to_shift);
             }
         }
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("preview", wurds[0], 7) == 0)
     {
@@ -276,7 +284,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             mixer_preview_track(mixr, wurds[1]);
         }
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("debug", wurds[0], 5) == 0)
@@ -293,14 +301,13 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("Disabling debug mode\n");
             mixr->debug_mode = false;
         }
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("ps", wurds[0], 2) == 0)
     {
-        printf("CMD PS\n");
         mixer_ps(mixr);
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("quiet", wurds[0], 5) == 0 ||
@@ -308,12 +315,12 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         for (int i = 0; i < mixr->soundgen_num; i++)
             mixr->sound_generators[i]->setvol(mixr->sound_generators[i], 0.0);
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("ls", wurds[0], 2) == 0)
     {
         list_sample_dir(wurds[1]);
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("rm", wurds[0], 3) == 0)
@@ -324,7 +331,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("Deleting SOUND GEN %d\n", soundgen_num);
             mixer_del_soundgen(mixr, soundgen_num);
         }
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("start", wurds[0], 5) == 0)
     {
@@ -347,7 +354,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 sg->start(sg);
             }
         }
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("invert", wurds[0], 6) == 0)
     {
@@ -380,6 +387,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             soundgenerator *s2 = mixr->sound_generators[sg2_num];
             s2->set_pattern(s2, sg1_track_num, pattern);
         }
+        cmd_found = true;
     }
     else if (strncmp("stop", wurds[0], 5) == 0)
     {
@@ -402,7 +410,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 sg->stop(sg);
             }
         }
-        return true;
+        cmd_found = true;
     }
     else if (strncmp("down", wurds[0], 4) == 0 ||
              strncmp("up", wurds[0], 3) == 0)
@@ -422,7 +430,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             thrunner(msg);
         }
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("vol", wurds[0], 3) == 0)
@@ -441,7 +449,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 vol_change(mixr, soundgen_num, vol);
             }
         }
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("scene", wurds[0], 5) == 0)
@@ -537,28 +545,28 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
             }
         }
-        return true;
+        cmd_found = true;
     }
     // PROGRAMMING CMDS
     else if (strncmp("var", wurds[0], 3) == 0 && strncmp("=", wurds[2], 1) == 0)
     {
         printf("Oooh! %s = %s\n", wurds[1], wurds[3]);
         update_environment(wurds[1], atoi(wurds[3]));
-        return true;
+        cmd_found = true;
     }
 
     // UTILS
     else if (strncmp("chord", wurds[0], 6) == 0)
     {
         chordie(wurds[1]);
-        return true;
+        cmd_found = true;
     }
 
     else if (strncmp("strategy", wurds[0], 8) == 0)
     {
         oblique_strategy();
-        return true;
+        cmd_found = true;
     }
 
-    return false;
+    return cmd_found;
 }
