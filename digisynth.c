@@ -90,7 +90,7 @@ stereo_val digisynth_gennext(void *self)
 void digisynth_status(void *self, wchar_t *status_string)
 {
     digisynth *ds = (digisynth *)self;
-    swprintf(status_string, MAX_PS_STRING_SZ,
+    swprintf(status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
                                " vol: %.2f active: %s midi_note:%d "
                                "sample_len:%d read_idx:%d",

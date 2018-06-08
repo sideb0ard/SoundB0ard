@@ -37,7 +37,7 @@ void bitcrush_update(bitcrush *bc)
 void bitcrush_status(void *self, char *status_string)
 {
     bitcrush *bc = (bitcrush *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "bitdepth:%d bitrate:%d sample_hold_freq:%.2f", bc->bitdepth,
              bc->bitrate, bc->sample_hold_freq);
 }

@@ -38,7 +38,7 @@ void filterpass_status(void *self, char *status_string)
 {
     filterpass *fp = (filterpass *)self;
     // clang-format off
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "freq:%.2f q:%.2f type:%s lfo1_active:%d lfo1_type:%d lfo1_amp:%.2f\n"
              "lfo1_rate:%.2f lfo2_active:%d lfo2_type:%d lfo2_amp:%.2f lfo2_rate:%.2f",
              fp->m_filter.f.m_fc_control, fp->m_filter.f.m_q_control,

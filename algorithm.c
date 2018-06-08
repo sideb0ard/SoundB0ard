@@ -13,6 +13,7 @@ extern mixer *mixr;
 
 const char *s_event_type[] = {"midi", "32nd", "16th", "8th", "4th", "bar"};
 const char *s_process_type[] = {"every", "over"};
+const char *s_var_select_type[] = {"rand", "osc", "step"};
 const char *s_env_type[] = {"LIST", "STEP"};
 
 algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
@@ -27,7 +28,7 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
 
     a->active = true;
-    a->counter = 0;
+    a->process_step_counter = 0;
     a->debug = false;
 
     return a;
@@ -35,14 +36,13 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 
 static void handle_command(algorithm *a)
 {
-    if (a->counter % a->step == 0)
+    if (a->process_step_counter % a->process_step == 0)
     {
         algorithm_replace_vars_in_cmd(a);
-        // printf("UPDated cmd: %s\n", a->runnable_command);
         interpret(a->runnable_command);
     }
 
-    a->counter++;
+    a->process_step_counter++;
 }
 
 void algorithm_event_notify(void *self, unsigned int event_type)
@@ -64,9 +64,9 @@ static bool extract_list_elements(algorithm *a, char *list)
     for (tok = strtok_r(list, sep, &last_tok); tok;
          tok = strtok_r(NULL, sep, &last_tok))
     {
-        strncpy(a->env.variable_list_vals[a->env.list_len++], tok,
+        strncpy(a->env.variable_list_vals[a->env.variable_list_len++], tok,
                 MAX_VAR_VAL_LEN);
-        if (a->env.list_len >= MAX_LIST_ITEMS)
+        if (a->env.variable_list_len >= MAX_LIST_ITEMS)
         {
             result = false;
             break;
@@ -75,52 +75,17 @@ static bool extract_list_elements(algorithm *a, char *list)
     return result;
 }
 
-static bool extract_env_details(algorithm *a, char *env)
+int algorithm_get_var_select_type_from_string(char *wurd)
 {
-    // can either be a list denoted by quotes e.g. "0.2 0.6 0.7"
-    // or else steps, similar to for loop, denoted by two ";"
-    bool result = true;
+    int var_select_type = -1;
+    if (strncmp(wurd, "rand", 4) == 0)
+        var_select_type = VAR_RAND;
+    else if (strncmp(wurd, "osc", 3) == 0)
+        var_select_type = VAR_OSC;
+    else
+        var_select_type = VAR_STEP; // default
 
-    regmatch_t var_list_match[3];
-    regex_t list_rgx;
-    regcomp(&list_rgx,
-            "^[[:space:]]*([[:alnum:]]+)[[:space:]]*=[[:space:]]*\"(.*)\"",
-            REG_EXTENDED | REG_ICASE);
-
-    regmatch_t var_step_match[4];
-    regex_t step_rgx;
-    regcomp(&step_rgx,
-            "^[[:space:]]*([[:alnum:]]+)[[:space:]]*=[[:space:]]*([["
-            ":alnum:]]+)[[:space:]]*;(.*)\"",
-            REG_EXTENDED | REG_ICASE);
-
-    if (regexec(&list_rgx, env, 3, var_list_match, 0) == 0)
-    {
-        printf("OOh! got a list!\n");
-        a->env.type = LIST_TYPE;
-        int var_name_len = var_list_match[1].rm_eo - var_list_match[1].rm_so;
-        if (var_name_len <= MAX_VAR_KEY_LEN)
-        {
-            strncpy(a->env.variable_key, env + var_list_match[1].rm_so,
-                    var_name_len);
-        }
-        else
-            result = false;
-        printf("KEY! %s Type:%d\n", a->env.variable_key, a->env.type);
-
-        int list_len = var_list_match[2].rm_eo - var_list_match[2].rm_so;
-        char list[list_len + 1];
-        list[list_len] = '\0';
-        strncpy(list, env + var_list_match[2].rm_so, list_len);
-        printf("LIST: %s\n", list);
-        if (!extract_list_elements(a, list))
-            result = false;
-    }
-    else if (regexec(&step_rgx, env, 4, var_step_match, 0) == 0)
-    {
-        printf("AH! steps!\n");
-    }
-    return result;
+    return var_select_type;
 }
 
 static bool extract_and_validate_environment(algorithm *a, char *line)
@@ -130,42 +95,48 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
     strncpy(a->input_line, line, MAX_CMD_LEN - 1);
 
     printf("LINE! %s\n", line);
-    regmatch_t env_match_group[3];
+    regmatch_t env_match_group[4];
     regex_t env_rgx;
-    regcomp(&env_rgx, "^\\((.*)\\)(.*)", REG_EXTENDED | REG_ICASE);
-    if (regexec(&env_rgx, line, 3, env_match_group, 0) == 0)
+    regcomp(&env_rgx, "^[[:space:]]*([[:alnum:]]*)*[[:space:]]*\"(.*)\"(.*)",
+            REG_EXTENDED | REG_ICASE);
+    if (regexec(&env_rgx, line, 4, env_match_group, 0) == 0)
     {
         a->has_env = true;
-        printf("FOUND an ENV!\n");
-        int env_len = env_match_group[1].rm_eo - env_match_group[1].rm_so;
-        char env[env_len + 1];
-        env[env_len] = '\0';
-        strncpy(env, line + env_match_group[1].rm_so, env_len);
-        printf("ENV: %s\n", env);
+        int var_select_len =
+            env_match_group[1].rm_eo - env_match_group[1].rm_so;
+        if (var_select_len == 0)
+        {
+            a->var_select_type = VAR_STEP;
+        }
+        else
+        {
+            char var_select_type[var_select_len + 1];
+            var_select_type[var_select_len] = '\0';
+            strncpy(var_select_type, line + env_match_group[1].rm_so,
+                    var_select_len);
 
-        int cmd_len = env_match_group[2].rm_eo - env_match_group[2].rm_so;
+            a->var_select_type =
+                algorithm_get_var_select_type_from_string(var_select_type);
+        }
+        printf("VAR PROC TYPE:%s\n", s_var_select_type[a->var_select_type]);
+
+        int var_list_len = env_match_group[2].rm_eo - env_match_group[2].rm_so;
+        char var_list[var_list_len + 1];
+        var_list[var_list_len] = '\0';
+        strncpy(var_list, line + env_match_group[2].rm_so, var_list_len);
+        strncpy(a->env.variable_list_string, var_list, MAX_STATIC_STRING_SZ);
+        printf("VARKLISTSTRNG is %s or list? %s\n", a->env.variable_list_string,
+               var_list);
+
+        int cmd_len = env_match_group[3].rm_eo - env_match_group[3].rm_so;
         if (cmd_len <= MAX_CMD_LEN)
-            strncpy(a->command, line + env_match_group[2].rm_so, cmd_len);
+            strncpy(a->command, line + env_match_group[3].rm_so, cmd_len);
         else
             result = false;
+
         printf("CMD: %s\n", a->command);
 
-        if (strncmp(env, "scramble", 8) == 0 || strncmp(env, "stutter", 7) == 0)
-        {
-            printf("SCRA/TUUTMBLER!\n");
-            char localwurd[5] = {};
-            int looper_num = -1;
-            sscanf(a->command, "%s %d", localwurd, &looper_num);
-            if (strncmp(localwurd, "loop", 4) == 0 && looper_num != 1)
-            {
-                a->env.target_soundgen = looper_num;
-                if (strncmp(env, "sc", 2) == 0)
-                    a->env.type = SCRAMBLER_TYPE;
-                else
-                    a->env.type = STUTTER_TYPE;
-            }
-        }
-        else if (!extract_env_details(a, env))
+        if (!extract_list_elements(a, var_list))
             result = false;
     }
     else
@@ -189,17 +160,32 @@ void print_algo_help()
            "z..\"|rand=\"x y z..\"|osc=\"lo hi\">)] process \%%s\n");
 }
 
+int algorithm_get_event_type_from_string(char *wurd)
+{
+    int event_type = -1;
+
+    if (strncmp(wurd, "loop", 4) == 0 || strncmp(wurd, "bar", 3) == 0)
+        event_type = TIME_START_OF_LOOP_TICK;
+    else if (strncmp(wurd, "midi", 4) == 0)
+        event_type = TIME_MIDI_TICK;
+    else if (strncmp(wurd, "4th", 3) == 0 || strncmp(wurd, "quart", 5) == 0)
+        event_type = TIME_QUARTER_TICK;
+    else if (strncmp(wurd, "8th", 4) == 0)
+        event_type = TIME_EIGHTH_TICK;
+    else if (strncmp(wurd, "16th", 4) == 0)
+        event_type = TIME_SIXTEENTH_TICK;
+    else if (strncmp(wurd, "32nd", 4) == 0)
+        event_type = TIME_THIRTYSECOND_TICK;
+
+    return event_type;
+}
 bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
 
-    if (strncmp(wurds[0], "every", 5) == 0)
+    if (strncmp(wurds[0], "every", 5) == 0 || strncmp(wurds[0], "over", 4) == 0)
     {
         a->process_type = EVERY;
-    }
-    else if (strncmp(wurds[0], "over", 4) == 0)
-    {
-        a->process_type = OVER;
     }
     else
     {
@@ -213,22 +199,11 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
         printf("don't be daft, cannae dae 0 times.\n");
         return false;
     }
-    a->step = step;
+    a->process_step = step;
 
-    if (strncmp(wurds[2], "loop", 4) == 0 || strncmp(wurds[2], "bar", 3) == 0)
-        a->event_type = TIME_START_OF_LOOP_TICK;
-    else if (strncmp(wurds[2], "midi", 4) == 0)
-        a->event_type = TIME_MIDI_TICK;
-    else if (strncmp(wurds[2], "4th", 3) == 0 ||
-             strncmp(wurds[2], "quart", 5) == 0)
-        a->event_type = TIME_QUARTER_TICK;
-    else if (strncmp(wurds[2], "8th", 4) == 0)
-        a->event_type = TIME_EIGHTH_TICK;
-    else if (strncmp(wurds[2], "16th", 4) == 0)
-        a->event_type = TIME_SIXTEENTH_TICK;
-    else if (strncmp(wurds[2], "32nd", 4) == 0)
-        a->event_type = TIME_THIRTYSECOND_TICK;
-    else
+    a->event_type = algorithm_get_event_type_from_string(wurds[2]);
+
+    if (a->event_type == -1)
     {
         printf("Need a time period\n");
         return false;
@@ -258,35 +233,44 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
 
 void algorithm_replace_vars_in_cmd(algorithm *a)
 {
-    if (a->env.type == LIST_TYPE)
+    char replacement_value[MAX_VAR_VAL_LEN] = {};
+
+    if (a->var_select_type == VAR_STEP)
     {
-        char cur_var_value[MAX_VAR_VAL_LEN] = {};
-        strncpy(cur_var_value, a->env.variable_list_vals[a->env.list_idx++],
+        strncpy(replacement_value,
+                a->env.variable_list_vals[a->env.variable_list_idx++],
                 MAX_VAR_VAL_LEN - 1);
-        if (a->env.list_idx >= a->env.list_len)
-            a->env.list_idx = 0;
+        if (a->env.variable_list_idx >= a->env.variable_list_len)
+            a->env.variable_list_idx = 0;
         // printf("CUR VAL! %s\n", cur_var_value);
+    }
+    else if (a->var_select_type == VAR_RAND)
+    {
+        strncpy(replacement_value,
+                a->env.variable_list_vals[rand() % a->env.variable_list_len],
+                MAX_VAR_VAL_LEN - 1);
+    }
 
-        memset(a->runnable_command, 0, MAX_CMD_LEN);
+    memset(a->runnable_command, 0, MAX_CMD_LEN);
 
-        char orig_cmd[MAX_CMD_LEN] = {};
-        strcpy(orig_cmd, a->command);
+    char orig_cmd[MAX_CMD_LEN] = {};
+    strcpy(orig_cmd, a->command);
 
-        char *toke, *last_toke;
-        char const *sep = " ";
-        for (toke = strtok_r(orig_cmd, sep, &last_toke); toke;
-             toke = strtok_r(NULL, sep, &last_toke))
-        {
+    char *toke, *last_toke;
+    char const *sep = " ";
+    for (toke = strtok_r(orig_cmd, sep, &last_toke); toke;
+         toke = strtok_r(NULL, sep, &last_toke))
+    {
 
-            if (strncmp(a->env.variable_key, toke, MAX_VAR_KEY_LEN) == 0)
-                strcat(a->runnable_command, cur_var_value);
-            else
-                strcat(a->runnable_command, toke);
+        if (strncmp("%s", toke, MAX_VAR_KEY_LEN) == 0)
+            strcat(a->runnable_command, replacement_value);
+        else
+            strcat(a->runnable_command, toke);
 
-            strcat(a->runnable_command, " ");
-        }
+        strcat(a->runnable_command, " ");
     }
 }
+
 void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
@@ -294,22 +278,17 @@ void algorithm_status(void *self, wchar_t *status_string)
     if (a->active)
         ALGO_COLOR = COOL_COLOR_PINK;
 
-    swprintf(status_string, MAX_PS_STRING_SZ,
-             WANSI_COLOR_WHITE
-             "%sprocess:" WANSI_COLOR_WHITE "%s"
-             "%s step:" WANSI_COLOR_WHITE "%d"
-             "%s event:" WANSI_COLOR_WHITE "%s"
-             "%s env:(type:%s var:%s val:%s)\n"
-             "        Cmd: %s ListLen:%d (input_line:%s)",
-             ALGO_COLOR, s_process_type[a->process_type],
-             ALGO_COLOR, a->step,
-             ALGO_COLOR, s_event_type[a->event_type],
-             ALGO_COLOR, s_env_type[a->env.type],
-             a->env.variable_key,
-             a->env.type == LIST_TYPE
-                 ? a->env.variable_list_vals[a->env.list_idx]
-                 : a->env.variable_scalar_value,
-             a->command, a->env.list_len, a->input_line);
+    swprintf(status_string, MAX_STATIC_STRING_SZ,
+             WANSI_COLOR_WHITE "%sprocess:" WANSI_COLOR_WHITE "%s"
+                               "%s step:" WANSI_COLOR_WHITE "%d"
+                               "%s event:" WANSI_COLOR_WHITE "%s"
+                               "%s var_select:" WANSI_COLOR_WHITE "%s"
+                               "%s var_list:" WANSI_COLOR_WHITE "%s\n"
+                               "%s         cmd:" WANSI_COLOR_WHITE "%s",
+             ALGO_COLOR, s_process_type[a->process_type], ALGO_COLOR,
+             a->process_step, ALGO_COLOR, s_event_type[a->event_type],
+             ALGO_COLOR, s_var_select_type[a->var_select_type], ALGO_COLOR,
+             a->env.variable_list_string, ALGO_COLOR, a->command);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

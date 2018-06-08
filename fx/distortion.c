@@ -29,7 +29,7 @@ void distortion_set_threshold(distortion *d, double val)
 void distortion_status(void *self, char *status_string)
 {
     distortion *d = (distortion *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "Distortion! threshold:%.2f",
+    snprintf(status_string, MAX_STATIC_STRING_SZ, "Distortion! threshold:%.2f",
              d->m_threshold);
 }
 

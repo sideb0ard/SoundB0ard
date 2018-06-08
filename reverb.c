@@ -217,7 +217,7 @@ void reverb_status(void *self, char *status_string)
 {
     reverb *r = (reverb *)self;
     // clang-format off
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "predelayms:%.2f reverbtime:%.0f wetmx:%.1f",
              r->m_pre_delay_msec, r->m_rt60, r->m_wet_pct);
     // clang-format on

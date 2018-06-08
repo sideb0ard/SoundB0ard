@@ -102,7 +102,7 @@ void bitshift_status(void *self, wchar_t *wstring)
     tokenized_pattern_to_string(bs->pattern.rpn_tokenized_pattern,
                                 bs->pattern.num_rpn_tokens, rpn_pattern,
                                 PATTERN_STATUS_SIZE);
-    swprintf(wstring, MAX_PS_STRING_SZ,
+    swprintf(wstring, MAX_STATIC_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "SEQUENCE GEN ] - " WCOOL_COLOR_PINK
              "infix pattern: %s\nrpn pattern: %s",
              infix_pattern, rpn_pattern);
@@ -570,11 +570,11 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
         printf("outputstack %d %s\n", i, char_val);
 #endif
     }
-    char a_pattern[MAX_PS_STRING_SZ] = {0};
+    char a_pattern[MAX_STATIC_STRING_SZ] = {0};
     // tokenized_pattern_to_string(bs->pattern.infix_tokenized_pattern,
-    // bs->pattern.num_infix_tokens, a_pattern, MAX_PS_STRING_SZ);
+    // bs->pattern.num_infix_tokens, a_pattern, MAX_STATIC_STRING_SZ);
     tokenized_pattern_to_string(output_stack, output_stack_idx, a_pattern,
-                                MAX_PS_STRING_SZ);
+                                MAX_STATIC_STRING_SZ);
 #ifdef DEBUG_BITSHIFT
     printf("TOKEN2STRING: %s\n", a_pattern);
 #endif

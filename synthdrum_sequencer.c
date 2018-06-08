@@ -169,7 +169,7 @@ void sds_status(void *self, wchar_t *ss)
     }
 
     // clang-format off
-    swprintf(ss, MAX_PS_STRING_SZ,
+    swprintf(ss, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f distortion_threshold:%.2f\n"
              "o1_wav:%d o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
              "OSC1 AMP ENV:: e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_sus_ms:%.2f e1_rel:%.2f\n"
@@ -211,8 +211,8 @@ void sds_status(void *self, wchar_t *ss)
              sds->m_filter_fc, sds->m_filter_q);
     // clang-format on
 
-    wchar_t step_status_string[MAX_PS_STRING_SZ];
-    memset(step_status_string, 0, MAX_PS_STRING_SZ);
+    wchar_t step_status_string[MAX_STATIC_STRING_SZ];
+    memset(step_status_string, 0, MAX_STATIC_STRING_SZ);
     step_status(&sds->m_seq, step_status_string);
     wcscat(ss, step_status_string);
     wcscat(ss, WANSI_COLOR_RESET);

@@ -222,7 +222,7 @@ void dynamics_processor_status(void *self, char *status_string)
 {
     dynamics_processor *dp = (dynamics_processor *)self;
     // clang-format off
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "inputgain:%.2f threshold:%.2f attackms:%.2f releasems:%.2f ratio:%.2f\n"
              "outputgain:%.2f kneewidth:%.2f lookahead:%.2f sterolink:%s(%d)"
              "\ntype:%s(%d) mode:%s(%d) extsource:%s(%d)",

@@ -48,7 +48,7 @@ sequence_generator *new_markov(unsigned int type)
 void markov_status(void *self, wchar_t *wstring)
 {
     markov *m = (markov *)self;
-    swprintf(wstring, MAX_PS_STRING_SZ,
+    swprintf(wstring, MAX_STATIC_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "MARKOV SEQUENCE GEN ] - " WCOOL_COLOR_PINK
              "type:%s\n",
              s_markov_types[m->markov_type]);

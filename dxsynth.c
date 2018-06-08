@@ -576,7 +576,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
 
     // clang-format off
     swprintf(
-        status_string, MAX_PS_STRING_SZ,
+        status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
         "%s " "%s" "algo:%d vol: %.1f active:%s porta:%.1f pitchrange:%d op4fb:%.2f\n"
         "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n"

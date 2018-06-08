@@ -432,7 +432,7 @@ void looper_status(void *self, wchar_t *status_string)
         INSTRUMENT_COLOR = ANSI_COLOR_RED;
 
     swprintf(
-        status_string, MAX_PS_STRING_SZ,
+        status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
         "source:%s %s vol:%.2lf pitch:%.2f\n"
         "loop_mode:%s gate_mode:%d idx:%.0f buf_len:%d\n"
@@ -487,7 +487,7 @@ void looper_status(void *self, wchar_t *status_string)
         g->m_eg1.m_attack_time_msec, g->sustain_ms,
         g->m_eg1.m_release_time_msec, g->m_eg1.m_state);
 
-    wchar_t local_status_string[MAX_PS_STRING_SZ] = {};
+    wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
     step_status(&g->m_seq, local_status_string);
     wcscat(status_string, local_status_string);
 

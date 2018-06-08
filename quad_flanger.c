@@ -54,7 +54,7 @@ bool quad_flanger_process_audio(quad_flanger *qf, double *input_left,
 void quad_flanger_status(void *self, char *status_string)
 {
     quad_flanger *qf = (quad_flanger *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "depth:%.2f rate:%.2f "
              "fb:%.2f lfo:%s ",
              qf->m_mod_depth_pct, qf->m_mod_freq, qf->m_feedback_percent,

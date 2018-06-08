@@ -21,7 +21,7 @@
 
 #define DEFAULT_VELOCITY 92
 
-#define MAX_PS_STRING_SZ 4096 // arbitrary
+#define MAX_STATIC_STRING_SZ 4096 // arbitrary
 
 #define ENVIRONMENT_ARRAY_SIZE 128
 #define ENVIRONMENT_KEY_SIZE 128

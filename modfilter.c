@@ -161,7 +161,7 @@ double modfilter_process_wrapper(void *self, double input)
 void modfilter_status(void *self, char *status_string)
 {
     modfilter *mf = (modfilter *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f lfo:%d phase:%d",
              mf->m_mod_depth_fc, mf->m_mod_rate_fc, mf->m_mod_depth_q,
              mf->m_mod_rate_q, mf->m_lfo_waveform, mf->m_lfo_phase);

@@ -215,8 +215,8 @@ void sample_seq_status(void *self, wchar_t *status_string)
         INSTRUMENT_COLOR = ANSI_COLOR_BLUE;
     }
 
-    wchar_t local_status_string[MAX_PS_STRING_SZ] = {};
-    swprintf(local_status_string, MAX_PS_STRING_SZ,
+    wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
+    swprintf(local_status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%s %s vol:%.2lf pitch:%.2f\n"
                                "multi:%d num_patterns:%d "
                                "gen_en:%d gen_mode:%d gen_src:%d gen_every:%d",
@@ -227,7 +227,7 @@ void sample_seq_status(void *self, wchar_t *status_string)
 
     wcscat(status_string, local_status_string);
 
-    wmemset(local_status_string, 0, MAX_PS_STRING_SZ);
+    wmemset(local_status_string, 0, MAX_STATIC_STRING_SZ);
     step_status(&seq->m_seq, local_status_string);
     wcscat(status_string, local_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);

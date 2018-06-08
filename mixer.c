@@ -168,7 +168,7 @@ void mixer_ps(mixer *mixr)
         printf(ANSI_COLOR_RESET "\n");
     }
 
-    wchar_t wss[MAX_PS_STRING_SZ] = {};
+    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
     if (mixr->algorithm_num > 0)
     {
         printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
@@ -177,9 +177,12 @@ void mixer_ps(mixer *mixr)
         {
             if (mixr->algorithms[i] != NULL)
             {
-                wmemset(wss, 0, MAX_PS_STRING_SZ);
+                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
                 algorithm_status(mixr->algorithms[i], wss);
-                wprintf(WCOOL_COLOR_GREEN "["WANSI_COLOR_WHITE "algo %d" WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET, i);
+                wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE
+                                          "algo %d" WCOOL_COLOR_GREEN
+                                          "] " WANSI_COLOR_RESET,
+                        i);
                 wprintf(L"%ls\n", wss);
                 wprintf(WANSI_COLOR_RESET);
             }
@@ -194,7 +197,7 @@ void mixer_ps(mixer *mixr)
         {
             if (mixr->sequence_generators[i] != NULL)
             {
-                wmemset(wss, 0, MAX_PS_STRING_SZ);
+                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
                 mixr->sequence_generators[i]->status(
                     mixr->sequence_generators[i], wss);
                 wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
@@ -212,7 +215,7 @@ void mixer_ps(mixer *mixr)
         {
             if (mixr->sound_generators[i] != NULL)
             {
-                wmemset(wss, 0, MAX_PS_STRING_SZ);
+                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
                 mixr->sound_generators[i]->status(mixr->sound_generators[i],
                                                   wss);
 

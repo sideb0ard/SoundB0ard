@@ -228,7 +228,7 @@ static char *s_delay_mode[] = {"tap1", "tap2", "pingpong"};
 void stereo_delay_status(void *self, char *status_string)
 {
     stereodelay *sd = (stereodelay *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "delayms:%.0f fb:%.2f ratio:%.2f "
              "wetmx:%.2f mode:%s(%d)",
              sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio,

@@ -41,7 +41,7 @@ sequence_generator *new_euclidean(int num_hits, int num_steps)
 void euclidean_status(void *self, wchar_t *wstring)
 {
     euclidean *e = (euclidean *)self;
-    swprintf(wstring, MAX_PS_STRING_SZ,
+    swprintf(wstring, MAX_STATIC_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "EUCLIDEAN GEN ] - " WCOOL_COLOR_PINK
              "mode:%s hits:%d steps:%d actual_hits:%d actual_steps:%d",
              s_euclid_mode[e->mode], e->num_hits, e->num_steps,

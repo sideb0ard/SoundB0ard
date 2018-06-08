@@ -151,7 +151,7 @@ double envelope_follower_process_wrapper(void *self, double input)
 void envelope_follower_status(void *self, char *status_string)
 {
     envelope_follower *ef = (envelope_follower *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "pregain:%.2f threshold:%.2f "
              "attackms:%.2f releasems:%.2f "
              "q:%.2f mode:%s(%d) dir:%s(%d)",

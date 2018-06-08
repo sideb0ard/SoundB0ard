@@ -62,8 +62,8 @@ void resonant_lpf_calculate_lpf_coeffs(resonant_lpf *lpf, double cutoff,
 void resonant_lpf_status(void *self, char *status_string)
 {
     resonant_lpf *lpf = (resonant_lpf *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "fc:%.2f q:%.2f", lpf->m_fc_hz,
-             lpf->m_q);
+    snprintf(status_string, MAX_STATIC_STRING_SZ, "fc:%.2f q:%.2f",
+             lpf->m_fc_hz, lpf->m_q);
 }
 
 double resonant_lpf_process(void *self, double input)

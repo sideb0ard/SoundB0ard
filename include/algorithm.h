@@ -16,9 +16,7 @@
 enum
 {
     LIST_TYPE,
-    SCALAR_TYPE,
-    SCRAMBLER_TYPE,
-    STUTTER_TYPE,
+    OSC_TYPE,
     MAX_ALGO_TYPES
 
 };
@@ -32,26 +30,28 @@ enum
     RAND_OP,
 };
 
+enum
+{
+    VAR_RAND,
+    VAR_OSC,
+    VAR_STEP,
+};
+
 typedef struct algo_environment
 {
-    unsigned int type; // list or step
-    char variable_key[MAX_VAR_KEY_LEN];
-
-    // only used for list type
-    int list_idx;
-    int list_len;
+    int variable_list_idx;
+    int variable_list_len;
+    char variable_list_string[MAX_STATIC_STRING_SZ];
     char variable_list_vals[MAX_LIST_ITEMS][MAX_VAR_VAL_LEN];
-
-    // only used for step type
-    unsigned int op;
-    char variable_scalar_value[MAX_VAR_VAL_LEN];
 
     unsigned int target_soundgen;
     int target_action_counter;
+
 } algo_environment;
 
 // process_type
-enum {
+enum
+{
     EVERY,
     OVER,
 };
@@ -59,11 +59,11 @@ enum {
 typedef struct algorithm
 {
     // e.g. every 3 bar (step="x y z") loop %d scramble
-    unsigned int process_type; // EVERY, OVER
-    int step;
-    unsigned int event_type; // e.g. MIDI_TICK, SIXTEENTH, BAR
-
-    int counter; // keeps track of which n we're on
+    unsigned int event_type;   // e.g. MIDI_TICK, SIXTEENTH, BAR
+    unsigned int process_type; // EVERY, OVER * OVER only makes sense with OSC
+    unsigned int process_step;
+    unsigned int process_step_counter;
+    unsigned int var_select_type; // RAND, OSC or STEP
 
     bool has_env;
     algo_environment env;
@@ -87,3 +87,5 @@ void algorithm_status(void *self, wchar_t *ss);
 void algorithm_start(algorithm *a);
 void algorithm_stop(algorithm *a);
 void algorithm_event_notify(void *self, unsigned int event_type);
+int algorithm_get_event_type_from_string(char *wurd);
+int algorithm_get_var_select_type_from_string(char *wurd);

@@ -149,7 +149,7 @@ bool mod_delay_process_audio(mod_delay *md, double *input_left,
 void mod_delay_status(void *self, char *status_string)
 {
     mod_delay *md = (mod_delay *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ,
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
              "depth:%.2f rate:%.2f "
              "fb:%.2f offset:%.2f "
              "type:%s lfo:%s",

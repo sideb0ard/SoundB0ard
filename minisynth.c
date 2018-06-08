@@ -683,7 +683,7 @@ void minisynth_status(void *self, wchar_t *status_string)
 
     // clang-format off
     swprintf(
-        status_string, MAX_PS_STRING_SZ,
+        status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE "%s\n"
         "%s"
         "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) midi_note:%d mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"

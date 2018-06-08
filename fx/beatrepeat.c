@@ -30,7 +30,7 @@ beatrepeat *new_beatrepeat(int nbeats, int sixteenth)
 void beatrepeat_status(void *self, char *status_string)
 {
     beatrepeat *b = (beatrepeat *)self;
-    snprintf(status_string, MAX_PS_STRING_SZ, "numbeats:%zu sixteenth:%zu",
+    snprintf(status_string, MAX_STATIC_STRING_SZ, "numbeats:%zu sixteenth:%zu",
              b->m_num_beats_to_repeat, b->m_selected_sixteenth);
 }
 
