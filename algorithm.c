@@ -36,10 +36,18 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 
 static void handle_command(algorithm *a)
 {
-    if (a->process_step_counter % a->process_step == 0)
+    if (((a->process_type == EVERY) &&
+         (a->process_step_counter % a->process_step == 0)) ||
+        a->process_type == OVER)
     {
-        algorithm_replace_vars_in_cmd(a);
-        interpret(a->runnable_command);
+        if (a->has_env)
+        {
+            algorithm_replace_vars_in_cmd(a);
+            interpret(a->runnable_command);
+        }
+        else
+            interpret(a->command);
+
     }
 
     a->process_step_counter++;
@@ -52,7 +60,8 @@ void algorithm_event_notify(void *self, unsigned int event_type)
     if (!a->active)
         return;
 
-    if (event_type == a->event_type)
+    if (event_type == a->event_type ||
+        (event_type == TIME_MIDI_TICK && a->process_type == OVER))
         handle_command(a);
 }
 
@@ -101,24 +110,22 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
             REG_EXTENDED | REG_ICASE);
     if (regexec(&env_rgx, line, 4, env_match_group, 0) == 0)
     {
+        int var_select_type = VAR_STEP;
         a->has_env = true;
         int var_select_len =
             env_match_group[1].rm_eo - env_match_group[1].rm_so;
-        if (var_select_len == 0)
+        if (var_select_len != 0)
         {
-            a->var_select_type = VAR_STEP;
-        }
-        else
-        {
-            char var_select_type[var_select_len + 1];
-            var_select_type[var_select_len] = '\0';
-            strncpy(var_select_type, line + env_match_group[1].rm_so,
+            char var_select_type_string[var_select_len + 1];
+            var_select_type_string[var_select_len] = '\0';
+            strncpy(var_select_type_string, line + env_match_group[1].rm_so,
                     var_select_len);
 
-            a->var_select_type =
-                algorithm_get_var_select_type_from_string(var_select_type);
+            var_select_type = algorithm_get_var_select_type_from_string(
+                var_select_type_string);
         }
-        printf("VAR PROC TYPE:%s\n", s_var_select_type[a->var_select_type]);
+        printf("VAR SELECT TYPE:%s\n", s_var_select_type[var_select_type]);
+        algorithm_set_var_select_type(a, var_select_type);
 
         int var_list_len = env_match_group[2].rm_eo - env_match_group[2].rm_so;
         char var_list[var_list_len + 1];
@@ -183,9 +190,13 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
 
-    if (strncmp(wurds[0], "every", 5) == 0 || strncmp(wurds[0], "over", 4) == 0)
+    if (strncmp(wurds[0], "every", 5) == 0)
     {
         a->process_type = EVERY;
+    }
+    else if (strncmp(wurds[0], "over", 4) == 0)
+    {
+        a->process_type = OVER;
     }
     else
     {
@@ -250,6 +261,47 @@ void algorithm_replace_vars_in_cmd(algorithm *a)
                 a->env.variable_list_vals[rand() % a->env.variable_list_len],
                 MAX_VAR_VAL_LEN - 1);
     }
+    else if (a->var_select_type == VAR_OSC)
+    {
+        if (a->env.variable_list_len > 2)
+        {
+            double lo = atof(a->env.variable_list_vals[0]);
+            double hi = atof(a->env.variable_list_vals[1]);
+            if (lo < hi)
+            {
+                int num_ticks_per_cycle =
+                    mixer_get_ticks_per_cycle_unit(mixr, a->event_type) *
+                    a->process_step;
+                int cur_midi_tick =
+                    mixr->timing_info.midi_tick % num_ticks_per_cycle;
+                double relative_position = 0;
+                int halfway = num_ticks_per_cycle / 2.0;
+                if (cur_midi_tick < halfway)
+                {
+                    relative_position = scaleybum(0, num_ticks_per_cycle, lo,
+                                                  hi, cur_midi_tick * 2);
+                }
+                else
+                {
+                    relative_position =
+                        scaleybum(0, num_ticks_per_cycle, lo, hi,
+                                  (halfway - (cur_midi_tick - halfway)) * 2);
+                }
+
+                itoa(relative_position, replacement_value);
+            }
+            else
+            {
+                printf("Lo and Hi don't look good: %f and %f\n", lo, hi);
+                return;
+            }
+        }
+        else
+        {
+            printf("Need two list values to OSC between\n");
+            return;
+        }
+    }
 
     memset(a->runnable_command, 0, MAX_CMD_LEN);
 
@@ -294,3 +346,15 @@ void algorithm_status(void *self, wchar_t *status_string)
 
 void algorithm_start(algorithm *a) { a->active = true; }
 void algorithm_stop(algorithm *a) { a->active = false; }
+
+void algorithm_set_var_select_type(algorithm *a, unsigned int var_select_type)
+{
+    if (var_select_type < MAX_VAR_SELECT_TYPES)
+    {
+        a->var_select_type = var_select_type;
+        if (var_select_type == VAR_OSC)
+            a->process_type = OVER;
+        else
+            a->process_type = EVERY;
+    }
+}

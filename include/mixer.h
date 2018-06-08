@@ -175,11 +175,13 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 void mixer_set_notes(mixer *mixr);
 
 double mixer_get_khz_per_bar(mixer *mixr);
+int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
 
 synthbase *get_synthbase(soundgenerator *self);
 // this is in mixer.h rather than synthbase, as mixer needs to transform sg
 // first
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi);
+
 
 #endif // MIXER_H

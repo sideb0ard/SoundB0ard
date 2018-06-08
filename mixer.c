@@ -958,3 +958,24 @@ double mixer_get_khz_per_bar(mixer *mixr)
     double khz = 1000. / mixr->bpm;
     return khz / 4.;
 }
+
+int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
+{
+    int ticks = 0;
+    switch (event_type)
+    {
+    case (TIME_START_OF_LOOP_TICK):
+        ticks = mixr->timing_info.loop_len_in_ticks;
+    case (TIME_MIDI_TICK):
+        ticks = 1;
+    case (TIME_QUARTER_TICK):
+        ticks = PPQN;
+    case (TIME_EIGHTH_TICK):
+        ticks = PPQN / 2;
+    case (TIME_SIXTEENTH_TICK):
+        ticks = PPQN / 4;
+    case (TIME_THIRTYSECOND_TICK):
+        ticks = PPQN / 8;
+    }
+    return ticks;
+}

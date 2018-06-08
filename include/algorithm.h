@@ -15,14 +15,6 @@
 
 enum
 {
-    LIST_TYPE,
-    OSC_TYPE,
-    MAX_ALGO_TYPES
-
-};
-
-enum
-{
     INC_OP,
     SUB_OP,
     MULTI_OP,
@@ -35,6 +27,7 @@ enum
     VAR_RAND,
     VAR_OSC,
     VAR_STEP,
+    MAX_VAR_SELECT_TYPES,
 };
 
 typedef struct algo_environment
@@ -54,6 +47,7 @@ enum
 {
     EVERY,
     OVER,
+    MAX_ALGO_PROCESS_TYPE,
 };
 
 typedef struct algorithm
@@ -89,3 +83,4 @@ void algorithm_stop(algorithm *a);
 void algorithm_event_notify(void *self, unsigned int event_type);
 int algorithm_get_event_type_from_string(char *wurd);
 int algorithm_get_var_select_type_from_string(char *wurd);
+void algorithm_set_var_select_type(algorithm *s, unsigned int var_select_type);

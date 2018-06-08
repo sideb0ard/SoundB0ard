@@ -41,7 +41,7 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 int var_select_type =
                     algorithm_get_var_select_type_from_string(wurds[3]);
-                a->var_select_type = var_select_type;
+                algorithm_set_var_select_type(a, var_select_type);
             }
             else if (strncmp("var_list", wurds[2], 8) == 0)
             {
