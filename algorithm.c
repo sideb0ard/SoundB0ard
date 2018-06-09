@@ -136,7 +136,6 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
             var_select_type = algorithm_get_var_select_type_from_string(
                 var_select_type_string);
         }
-        printf("VAR SELECT TYPE:%s\n", s_var_select_type[var_select_type]);
         algorithm_set_var_select_type(a, var_select_type);
 
         int var_list_len = env_match_group[2].rm_eo - env_match_group[2].rm_so;
@@ -150,7 +149,8 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
         int cmd_len = env_match_group[3].rm_eo - env_match_group[3].rm_so;
         if (cmd_len <= MAX_CMD_LEN)
         {
-            char cmd[cmd_len];
+            char cmd[cmd_len + 1];
+            cmd[cmd_len] = '\0';
             strncpy(cmd, line + env_match_group[3].rm_so, cmd_len);
             algorithm_set_cmd(a, cmd);
         }
@@ -372,6 +372,7 @@ void algorithm_set_var_select_type(algorithm *a, unsigned int var_select_type)
 }
 bool algorithm_set_cmd(algorithm *a, char *cmd)
 {
+    printf("SETCMD! giotsz:%s\n", cmd);
     if (strlen(cmd) <= MAX_CMD_LEN)
     {
         strncpy(a->command, cmd, MAX_CMD_LEN);
