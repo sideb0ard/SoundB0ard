@@ -84,3 +84,5 @@ void algorithm_event_notify(void *self, unsigned int event_type);
 int algorithm_get_event_type_from_string(char *wurd);
 int algorithm_get_var_select_type_from_string(char *wurd);
 void algorithm_set_var_select_type(algorithm *s, unsigned int var_select_type);
+bool algorithm_set_cmd(algorithm *s, char *cmd);
+bool algorithm_set_var_list(algorithm *s, char *var_list);

@@ -11,11 +11,9 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     if (strncmp("algo", wurds[0], 4) == 0)
     {
-        printf("ALGO!\n");
         int algo_num = atoi(wurds[1]);
         if (is_valid_algo_num(algo_num))
         {
-            printf("valid\n");
             algorithm *a = mixr->algorithms[algo_num];
 
             if (strncmp("on", wurds[2], 2) == 0 ||
@@ -37,19 +35,41 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else
                     printf("Nah!\n");
             }
+            else if (strncmp("process", wurds[2], 10) == 0)
+            {
+                if (strncmp(wurds[3], "over", 4) == 0)
+                    algorithm_set_var_select_type(a, VAR_OSC);
+                else
+                    algorithm_set_var_select_type(a, VAR_STEP);
+            }
             else if (strncmp("var_select", wurds[2], 10) == 0)
             {
                 int var_select_type =
                     algorithm_get_var_select_type_from_string(wurds[3]);
                 algorithm_set_var_select_type(a, var_select_type);
             }
-            else if (strncmp("var_list", wurds[2], 8) == 0)
+            else if (strncmp("var_list", wurds[2], 8) == 0 ||
+                    strncmp("cmd", wurds[2], 3) == 0)
             {
-                printf("VAR_LIST! %s\n", wurds[3]);
-            }
-            else if (strncmp("cmd", wurds[2], 3) == 0)
-            {
-                printf("NEW CMD! %s\n", wurds[3]);
+                int wurds_left = num_wurds - 3;
+                int size_of_wurds_left = wurds_left; // pre-alloc spaces and NULL
+                for (int i = 3; i < num_wurds; ++i)
+                {
+                    size_of_wurds_left += strlen(wurds[i]);
+                }
+                char concat_wurds[size_of_wurds_left];
+                memset(concat_wurds, 0, size_of_wurds_left);
+                for (int i = 3; i < num_wurds; ++i)
+                {
+                    strcat(concat_wurds, wurds[i]);
+                    if (i < num_wurds -1)
+                        strcat(concat_wurds, " ");
+                }
+
+                if (strncmp("var_list", wurds[2], 8) == 0)
+                    algorithm_set_var_list(a, concat_wurds);
+                else
+                    algorithm_set_cmd(a, concat_wurds);
             }
         }
 
@@ -60,12 +80,7 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
 bool is_valid_algo_num(int algo_num)
 {
-    printf("VALID? Algo num:%d\n", algo_num);
     if (algo_num >= 0 && algo_num < mixr->algorithm_num)
-    {
-        printf("TRUE!\n");
         return true;
-    }
-    printf("FALSE!\n");
     return false;
 }

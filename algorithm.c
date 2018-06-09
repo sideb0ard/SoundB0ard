@@ -65,23 +65,35 @@ void algorithm_event_notify(void *self, unsigned int event_type)
         handle_command(a);
 }
 
-static bool extract_list_elements(algorithm *a, char *list)
+ bool algorithm_set_var_list(algorithm *a, char *list)
 {
-    bool result = true;
+    int len = strlen(list);
+    if (list[0] != '"' && list[len-1] != '"')
+    {
+        printf("Var list needs to be enclosed in double quotes. Sorry, bra\n");
+        return false;
+    }
+    int new_len = len - 1; // minus both quotes, but plus one for '\0'
+    char quote_stripped_list[new_len];
+    memset(quote_stripped_list, 0, new_len);
+    strncpy(quote_stripped_list, list+1, len-2);
+
+    strncpy(a->env.variable_list_string, quote_stripped_list, MAX_STATIC_STRING_SZ);
     char const *sep = " ";
     char *tok, *last_tok;
-    for (tok = strtok_r(list, sep, &last_tok); tok;
+    a->env.variable_list_len = 0;
+    for (tok = strtok_r(quote_stripped_list, sep, &last_tok); tok;
          tok = strtok_r(NULL, sep, &last_tok))
     {
         strncpy(a->env.variable_list_vals[a->env.variable_list_len++], tok,
                 MAX_VAR_VAL_LEN);
         if (a->env.variable_list_len >= MAX_LIST_ITEMS)
         {
-            result = false;
-            break;
+            return false;
         }
     }
-    return result;
+
+    return true;
 }
 
 int algorithm_get_var_select_type_from_string(char *wurd)
@@ -106,7 +118,7 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
     printf("LINE! %s\n", line);
     regmatch_t env_match_group[4];
     regex_t env_rgx;
-    regcomp(&env_rgx, "^[[:space:]]*([[:alnum:]]*)*[[:space:]]*\"(.*)\"(.*)",
+    regcomp(&env_rgx, "^[[:space:]]*([[:alnum:]]*)*[[:space:]]*(\".*\")(.*)",
             REG_EXTENDED | REG_ICASE);
     if (regexec(&env_rgx, line, 4, env_match_group, 0) == 0)
     {
@@ -131,20 +143,20 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
         char var_list[var_list_len + 1];
         var_list[var_list_len] = '\0';
         strncpy(var_list, line + env_match_group[2].rm_so, var_list_len);
-        strncpy(a->env.variable_list_string, var_list, MAX_STATIC_STRING_SZ);
-        printf("VARKLISTSTRNG is %s or list? %s\n", a->env.variable_list_string,
-               var_list);
+
+        if (!algorithm_set_var_list(a, var_list))
+            result = false;
 
         int cmd_len = env_match_group[3].rm_eo - env_match_group[3].rm_so;
         if (cmd_len <= MAX_CMD_LEN)
-            strncpy(a->command, line + env_match_group[3].rm_so, cmd_len);
+        {
+            char cmd[cmd_len];
+            strncpy(cmd, line + env_match_group[3].rm_so, cmd_len);
+            algorithm_set_cmd(a, cmd);
+        }
         else
             result = false;
 
-        printf("CMD: %s\n", a->command);
-
-        if (!extract_list_elements(a, var_list))
-            result = false;
     }
     else
     {
@@ -357,4 +369,13 @@ void algorithm_set_var_select_type(algorithm *a, unsigned int var_select_type)
         else
             a->process_type = EVERY;
     }
+}
+bool algorithm_set_cmd(algorithm *a, char *cmd)
+{
+    if (strlen(cmd) <= MAX_CMD_LEN)
+    {
+        strncpy(a->command, cmd, MAX_CMD_LEN);
+        return true;
+    }
+    return false;
 }
