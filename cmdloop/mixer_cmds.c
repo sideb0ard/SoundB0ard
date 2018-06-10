@@ -405,7 +405,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                printf("Stopping SOUND GEN %d\n", soundgen_num);
                 soundgenerator *sg = mixr->sound_generators[soundgen_num];
                 sg->stop(sg);
             }

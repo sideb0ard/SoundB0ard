@@ -71,8 +71,9 @@ looper *new_looper(char *filename)
     g->m_eg1.m_attack_time_msec = 10;
     g->m_eg1.m_release_time_msec = 50;
 
+    // Grain Duration
     g->graindur_lfo_on = false;
-    g->m_lfo1_min = 50;
+    g->m_lfo1_min = 10;
     g->m_lfo1_max = 80;
     osc_new_settings((oscillator *)&g->m_lfo1);
     lfo_set_soundgenerator_interface(&g->m_lfo1);
@@ -81,9 +82,10 @@ looper *new_looper(char *filename)
     g->lfo1_sync = false;
     lfo_start_oscillator((oscillator *)&g->m_lfo1);
 
+    // Grain Density / Grains Per Second
     g->grainps_lfo_on = false;
-    g->m_lfo2_min = 50;
-    g->m_lfo2_max = 90;
+    g->m_lfo2_min = 20;
+    g->m_lfo2_max = 50;
     osc_new_settings((oscillator *)&g->m_lfo2);
     lfo_set_soundgenerator_interface(&g->m_lfo2);
     g->m_lfo2.osc.m_osc_fo = 0.01; // default LFO
@@ -102,8 +104,8 @@ looper *new_looper(char *filename)
     lfo_start_oscillator((oscillator *)&g->m_lfo3);
 
     g->grainpitch_lfo_on = false;
-    g->m_lfo4_min = 0.5;
-    g->m_lfo4_max = 1.;
+    g->m_lfo4_min = 0.9;
+    g->m_lfo4_max = 1.1;
     osc_new_settings((oscillator *)&g->m_lfo4);
     lfo_set_soundgenerator_interface(&g->m_lfo4);
     g->m_lfo4.osc.m_osc_fo = 0.1; // default LFO
@@ -296,7 +298,8 @@ void looper_update_lfos(looper *g)
         double lfo1_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo1_min, g->m_lfo1_max, lfo1_out);
-        g->grain_duration_ms = scaley_val;
+        //g->grain_duration_ms = scaley_val;
+        looper_set_grain_duration(g, scaley_val);
     }
 
     if (g->grainps_lfo_on)
@@ -304,7 +307,8 @@ void looper_update_lfos(looper *g)
         double lfo2_out = lfo_do_oscillate((oscillator *)&g->m_lfo2, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo2_min, g->m_lfo2_max, lfo2_out);
-        g->grains_per_sec = scaley_val;
+        //g->grains_per_sec = scaley_val;
+        looper_set_grain_density(g, scaley_val);
     }
 
     if (g->grainscanfile_lfo_on)

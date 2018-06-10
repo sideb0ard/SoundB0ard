@@ -286,7 +286,6 @@ int get_a_sample_seq_position(sample_sequencer *ss)
 
 void sample_start(void *self)
 {
-    printf("START SAMP!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     if (s->sound_generator.active)
         return; // no-op
@@ -296,7 +295,6 @@ void sample_start(void *self)
 
 void sample_stop(void *self)
 {
-    printf("STOP SAMP!\n");
     sample_sequencer *s = (sample_sequencer *)self;
     s->sound_generator.active = false;
 }
