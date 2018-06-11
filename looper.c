@@ -13,7 +13,7 @@
 extern mixer *mixr;
 extern char *s_lfo_mode_names;
 
-static char *s_env_names[] = {"PARABOLIC", "TRAPEZOIDAL", "COSINE"};
+static char *s_env_names[] = {"PARABOLIC", "TRAPEZOIDAL", "TUKEY"};
 static char *s_loop_mode_names[] = {"LOOP", "STATIC"};
 
 looper *new_looper(char *filename)
@@ -29,6 +29,7 @@ looper *new_looper(char *filename)
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->envelope_mode = LOOPER_ENV_PARABOLIC;
+    g->envelope_taper_ratio = 0.5;
     g->reverse_mode = 0; // bool
     g->external_source_sg = -1;
     g->buffer_is_full = false;
@@ -298,7 +299,7 @@ void looper_update_lfos(looper *g)
         double lfo1_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo1_min, g->m_lfo1_max, lfo1_out);
-        //g->grain_duration_ms = scaley_val;
+        // g->grain_duration_ms = scaley_val;
         looper_set_grain_duration(g, scaley_val);
     }
 
@@ -307,7 +308,7 @@ void looper_update_lfos(looper *g)
         double lfo2_out = lfo_do_oscillate((oscillator *)&g->m_lfo2, NULL);
         double scaley_val =
             scaleybum(-1, 1, g->m_lfo2_min, g->m_lfo2_max, lfo2_out);
-        //g->grains_per_sec = scaley_val;
+        // g->grains_per_sec = scaley_val;
         looper_set_grain_density(g, scaley_val);
     }
 
@@ -615,7 +616,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     if (num_channels > 1)
     {
         int read_idx_right = read_idx + 1;
-        sound_grain_check_idx(&read_idx_right, audio_buffer_len);
+        //sound_grain_check_idx(&read_idx_right, audio_buffer_len);
         out.right = audio_buffer[read_idx_right];
     }
     else
@@ -640,7 +641,10 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
 {
     double amp = 0;
     int idx = g->audiobuffer_cur_pos;
+    int len = g->grain_len_frames;
     double percent_pos = 0;
+    int relative_position = 0;
+    double a = 0.5;
 
     switch (envelope_mode)
     {
@@ -657,6 +661,10 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
             amp *= percent_pos / g->attack_time_pct;
         else if (percent_pos > (100 - g->release_time_pct))
             amp *= (100 - percent_pos) / g->release_time_pct;
+        break;
+    case (LOOPER_ENV_TUKEY_WINDOW):
+        relative_position = g->audiobuffer_cur_pos - g->audiobuffer_start_idx;
+        amp = 0.5 * (1 + cos(M_PI*((relative_position*2/(0.5*(g->grain_len_frames-1))) -1)));
         break;
     }
 

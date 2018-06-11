@@ -20,6 +20,7 @@ typedef struct sound_grain
     double audiobuffer_cur_pos;
     double audiobuffer_inc;
     double audiobuffer_pitch;
+
     int attack_time_pct; // percent of grain_len_frames
     int attack_time_samples;
     int release_time_pct; // percent of grain_len_frames
@@ -43,7 +44,7 @@ enum
 {
     LOOPER_ENV_PARABOLIC,
     LOOPER_ENV_TRAPEZOIDAL,
-    LOOPER_ENV_RAISED_COSINE_BELL,
+    LOOPER_ENV_TUKEY_WINDOW,
     LOOPER_ENV_NUM
 };
 
@@ -88,6 +89,7 @@ typedef struct looper
     int num_grains_per_looplen;
     unsigned int selection_mode;
     unsigned int envelope_mode;
+    double envelope_taper_ratio; // 0.0...1.0
     unsigned int reverse_mode;
 
     int last_grain_launched_sample_time;

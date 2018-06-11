@@ -1,0 +1,4 @@
+
+new gran loops/JungleBassNeedleWobble.aiff; loop 0 loop_mode 0
+
+loops/2stepchords2bar.aiff
