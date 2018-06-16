@@ -110,6 +110,7 @@ typedef struct mixer
     double volume;
 
     unsigned int key;
+    unsigned int octave;
     unsigned int notes[8];
     unsigned int quantize;
 
@@ -173,6 +174,7 @@ bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
 bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
 void mixer_set_notes(mixer *mixr);
+void mixer_set_octave(mixer *mixr, int octave);
 
 double mixer_get_khz_per_bar(mixer *mixr);
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
@@ -182,6 +184,5 @@ synthbase *get_synthbase(soundgenerator *self);
 // first
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi);
-
 
 #endif // MIXER_H

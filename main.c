@@ -19,6 +19,8 @@ const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
 
+const char *chord_type_names[] = {"MAJOR", "MINOR", "DIMINISHED"};
+
 static int paCallback(const void *input_buffer, void *output_buffer,
                       unsigned long frames_per_buffer,
                       const PaStreamCallbackTimeInfo *time_info,

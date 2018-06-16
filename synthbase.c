@@ -54,6 +54,9 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
 
         // synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
 
+        midi_event *pattern = base->patterns[base->cur_pattern];
+        clear_pattern(pattern);
+
         synthbase_stop(base);
         sequence_generator *sg = mixr->sequence_generators[gen_src];
         uint16_t bits = sg->generate(sg, NULL);
@@ -149,8 +152,9 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t scratch[256] = {0};
     wchar_t patternstr[33] = {0};
 
-    swprintf(scratch, 255, L"\nnote_mode:%d chord_mode:%d octave:%d",
-             base->note_mode, base->chord_mode, base->octave);
+    swprintf(scratch, 255,
+             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note:%d",
+             base->note_mode, base->chord_mode, base->octave, base->midi_note);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)

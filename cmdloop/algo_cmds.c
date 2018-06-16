@@ -49,10 +49,11 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 algorithm_set_var_select_type(a, var_select_type);
             }
             else if (strncmp("var_list", wurds[2], 8) == 0 ||
-                    strncmp("cmd", wurds[2], 3) == 0)
+                     strncmp("cmd", wurds[2], 3) == 0)
             {
                 int wurds_left = num_wurds - 3;
-                int size_of_wurds_left = wurds_left; // pre-alloc spaces and NULL
+                int size_of_wurds_left =
+                    wurds_left; // pre-alloc spaces and NULL
                 for (int i = 3; i < num_wurds; ++i)
                 {
                     size_of_wurds_left += strlen(wurds[i]);
@@ -62,7 +63,7 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 for (int i = 3; i < num_wurds; ++i)
                 {
                     strcat(concat_wurds, wurds[i]);
-                    if (i < num_wurds -1)
+                    if (i < num_wurds - 1)
                         strcat(concat_wurds, " ");
                 }
 

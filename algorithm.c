@@ -47,7 +47,6 @@ static void handle_command(algorithm *a)
         }
         else
             interpret(a->command);
-
     }
 
     a->process_step_counter++;
@@ -65,10 +64,10 @@ void algorithm_event_notify(void *self, unsigned int event_type)
         handle_command(a);
 }
 
- bool algorithm_set_var_list(algorithm *a, char *list)
+bool algorithm_set_var_list(algorithm *a, char *list)
 {
     int len = strlen(list);
-    if (list[0] != '"' && list[len-1] != '"')
+    if (list[0] != '"' && list[len - 1] != '"')
     {
         printf("Var list needs to be enclosed in double quotes. Sorry, bra\n");
         return false;
@@ -76,9 +75,10 @@ void algorithm_event_notify(void *self, unsigned int event_type)
     int new_len = len - 1; // minus both quotes, but plus one for '\0'
     char quote_stripped_list[new_len];
     memset(quote_stripped_list, 0, new_len);
-    strncpy(quote_stripped_list, list+1, len-2);
+    strncpy(quote_stripped_list, list + 1, len - 2);
 
-    strncpy(a->env.variable_list_string, quote_stripped_list, MAX_STATIC_STRING_SZ);
+    strncpy(a->env.variable_list_string, quote_stripped_list,
+            MAX_STATIC_STRING_SZ);
     char const *sep = " ";
     char *tok, *last_tok;
     a->env.variable_list_len = 0;
@@ -156,7 +156,6 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
         }
         else
             result = false;
-
     }
     else
     {

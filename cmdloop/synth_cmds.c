@@ -601,102 +601,102 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     return to_update;
 }
 
-void char_pattern_to_midi_pattern(synthbase *base, int dest_pattern,
-                                  char char_array[NUM_WURDS][SIZE_OF_WURD],
-                                  int start, int end)
-{
-    for (int i = start; i < end; i++)
-    {
-        int tick = 0;
-        int midi_note = 0;
-        chord_midi_notes chnotes = {0, 0, 0};
-        if (extract_chord_from_char_notation(char_array[i], &tick, &chnotes))
-        {
-            synthbase_add_note(base, dest_pattern, tick, chnotes.root, true);
-            synthbase_add_note(base, dest_pattern, tick, chnotes.third, true);
-            synthbase_add_note(base, dest_pattern, tick, chnotes.fifth, true);
-        }
-        else
-        {
-            sscanf(char_array[i], "%d:%d", &tick, &midi_note);
-            if (midi_note != 0)
-            {
-                printf("Adding %d:%d\n", tick, midi_note);
-                synthbase_add_note(base, dest_pattern, tick, midi_note, true);
-            }
-        }
-    }
-}
-
-bool extract_chord_from_char_notation(char *wurd, int *tick,
-                                      chord_midi_notes *chnotes)
-{
-    char char_note[3] = {0};
-    sscanf(wurd, "%d:%s", tick, char_note);
-
-    if (strncasecmp(char_note, "c", 1) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("C_MAJOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "dm", 2) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("D_MINOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "d", 1) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("D_MAJOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "em", 2) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("E_MINOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "e", 1) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("E_MAJOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "f", 1) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("F_MAJOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "gm", 2) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("G_MINOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "g", 1) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("G_MAJOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "am", 2) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("A_MINOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "a", 1) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("A_MAJOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "bm", 2) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("B_MINOR");
-        return true;
-    }
-    else if (strncasecmp(char_note, "b", 1) == 0)
-    {
-        *chnotes = get_midi_notes_from_char_chord("B_MAJOR");
-        return true;
-    }
-
-    return false;
-}
+// void char_pattern_to_midi_pattern(synthbase *base, int dest_pattern,
+//                                  char char_array[NUM_WURDS][SIZE_OF_WURD],
+//                                  int start, int end)
+//{
+//    for (int i = start; i < end; i++)
+//    {
+//        int tick = 0;
+//        int midi_note = 0;
+//        chord_midi_notes chnotes = {0, 0, 0};
+//        if (extract_chord_from_char_notation(char_array[i], &tick, &chnotes))
+//        {
+//            synthbase_add_note(base, dest_pattern, tick, chnotes.root, true);
+//            synthbase_add_note(base, dest_pattern, tick, chnotes.third, true);
+//            synthbase_add_note(base, dest_pattern, tick, chnotes.fifth, true);
+//        }
+//        else
+//        {
+//            sscanf(char_array[i], "%d:%d", &tick, &midi_note);
+//            if (midi_note != 0)
+//            {
+//                printf("Adding %d:%d\n", tick, midi_note);
+//                synthbase_add_note(base, dest_pattern, tick, midi_note, true);
+//            }
+//        }
+//    }
+//}
+//
+// bool extract_chord_from_char_notation(char *wurd, int *tick,
+//                                      chord_midi_notes *chnotes)
+//{
+//    char char_note[3] = {0};
+//    sscanf(wurd, "%d:%s", tick, char_note);
+//
+//    if (strncasecmp(char_note, "c", 1) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("C_MAJOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "dm", 2) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("D_MINOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "d", 1) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("D_MAJOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "em", 2) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("E_MINOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "e", 1) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("E_MAJOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "f", 1) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("F_MAJOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "gm", 2) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("G_MINOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "g", 1) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("G_MAJOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "am", 2) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("A_MINOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "a", 1) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("A_MAJOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "bm", 2) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("B_MINOR");
+//        return true;
+//    }
+//    else if (strncasecmp(char_note, "b", 1) == 0)
+//    {
+//        *chnotes = get_midi_notes_from_char_chord("B_MAJOR");
+//        return true;
+//    }
+//
+//    return false;
+//}
 
 bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                          char wurds[][SIZE_OF_WURD], int num_wurds)

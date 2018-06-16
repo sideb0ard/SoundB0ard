@@ -100,6 +100,7 @@ mixer *new_mixer(double output_latency)
     mixr->active_midi_soundgen_num = -99;
 
     mixr->key = C;
+    mixr->octave = 3;
     mixer_set_notes(mixr);
 
     // possible TODO - should i de-initialize?
@@ -122,7 +123,7 @@ void mixer_ps(mixer *mixr)
            " beat:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
-           ":::::::::: MIDI controller:%s sg_receiver:%d midi_type:%s key:%s\n" ANSI_COLOR_RESET,
+           ":::::::::: MIDI controller:%s sg_receiver:%d midi_type:%s key:%s octave:%d\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
@@ -130,7 +131,7 @@ void mixer_ps(mixer *mixr)
                ? "NONE"
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
-                          ->type], key_names[mixr->key]);
+                          ->type], key_names[mixr->key], mixr->octave);
     // clang-format on
 
     // TODO - create env command to print these
@@ -913,13 +914,13 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
 void mixer_set_notes(mixer *mixr)
 {
     mixr->notes[0] = mixr->key;
-    mixr->notes[1] = (mixr->key + 2) % NUM_KEYS;
-    mixr->notes[2] = (mixr->key + 4) % NUM_KEYS;
-    mixr->notes[3] = (mixr->key + 5) % NUM_KEYS;
-    mixr->notes[4] = (mixr->key + 7) % NUM_KEYS;
-    mixr->notes[5] = (mixr->key + 9) % NUM_KEYS;
-    mixr->notes[6] = (mixr->key + 11) % NUM_KEYS;
-    mixr->notes[7] = (mixr->key + 12) % NUM_KEYS;
+    mixr->notes[1] = (mixr->key + 2) % NUM_KEYS;  // W step
+    mixr->notes[2] = (mixr->key + 4) % NUM_KEYS;  // W step
+    mixr->notes[3] = (mixr->key + 5) % NUM_KEYS;  // H step
+    mixr->notes[4] = (mixr->key + 7) % NUM_KEYS;  // W step
+    mixr->notes[5] = (mixr->key + 9) % NUM_KEYS;  // W step
+    mixr->notes[6] = (mixr->key + 11) % NUM_KEYS; // W step
+    mixr->notes[7] = (mixr->key + 12) % NUM_KEYS; // H step
 }
 
 int mixer_print_timing_info(mixer *mixr)
@@ -978,4 +979,9 @@ int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
         ticks = PPQN / 8;
     }
     return ticks;
+}
+void mixer_set_octave(mixer *mixr, int octave)
+{
+    if (octave > -10 && octave < 10)
+        mixr->octave = octave;
 }

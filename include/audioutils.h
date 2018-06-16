@@ -18,6 +18,15 @@ typedef struct chord_midi_notes
     int fifth;
 } chord_midi_notes;
 
-chord_midi_notes get_midi_notes_from_char_chord(const char *chord);
+enum
+{
+    MAJOR_CHORD,
+    MINOR_CHORD,
+    DIMINISHED_CHORD,
+    NUM_CHORD_TYPES,
+}; // chord type
 
-void get_chord_compat_keys(int keynum, int vals[4]);
+int get_chord_type(unsigned int scale_degree);
+// void get_chord_compat_keys(int keynum, int vals[4]);
+void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
+                               int octave, chord_midi_notes *chnotes);

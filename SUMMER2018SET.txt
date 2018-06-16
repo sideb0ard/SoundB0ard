@@ -1,4 +1,261 @@
 
+ALGO1
+bpm 160
 new gran loops/JungleBassNeedleWobble.aiff; loop 0 loop_mode 0
+perc/DR660CR78woodblock.aif // root_note 4 //basey
+noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
 
-loops/2stepchords2bar.aiff
+ALGO2
+
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+             _____                       _ _     _____               _
+            /  ___|                     | | |   |  _  |             | |
+            \ `--.  ___  _   _ _ __   __| | |__ | |/" | __ _ _ __ __| |
+             `--. \/ _ \| | | | "_ \ / _` | "_ \|  /| |/ _` | "__/ _` |
+            /\__/ / (_) | |_| | | | | (_| | |_) \ |_/ / (_| | | | (_| |
+            \____/ \___/ \__,_|_| |_|\__,_|_.__/ \___/ \__,_|_|  \__,_|
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:::::::::: vol:0.70 bpm:150.00 quantum:4.00 beat:18592.87 phase:0.87 num_peers:0
+:::::::::: MIDI controller:NONE sg_receiver:-99 midi_type:NONE key:C
+
+[scenes]
+:::::::::: [0] (1,0)(3,0)(4,0)(2,0)
+:::::::::: [1] (1,0)(3,0)(4,0)(2,0)(15,0)
+:::::::::: [2] (1,0)(3,0)(4,0)(9,0)
+:::::::::: [3] (1,0)(9,0)(2,0)(3,0)
+:::::::::: [4] (1,0)(23,0)(1,0)(2,0)
+:::::::::: [5] (1,0)(9,0)(2,0)(3,0)(18,0)
+:::::::::: [6] (1,0)(2,0)(3,0)(11,0)(23,0)
+:::::::::: [7] (1,0)(2,0)(3,0)(18,0)(11,0)(9,0)(18,0)(1,0)(9,0)
+:::::::::: [8] (1,0)(2,0)(3,0)(11,0)(23,0)
+:::::::::: [9] (23,0)
+
+
+[algorithms]
+[algo 0] process:every step:2 event:bar var_select:rand var_list:
+         cmd:loop 0 scramble
+[algo 1] process:every step:7 event:bar var_select:rand var_list:
+         cmd:loop 0 stutter
+[algo 2] process:every step:2 event:bar var_select:rand var_list:
+         cmd:invert 1 2:0 3:0
+[algo 3] process:every step:7 event:16th var_select:rand var_list:
+         cmd:step 2:0 swing 2
+[algo 4] process:every step:7 event:16th var_select:rand var_list:
+         cmd:step 3:0 swing 4
+[algo 5] process:every step:15 event:16th var_select:rand var_list:
+         cmd:randamp 3:0
+[algo 6] process:every step:15 event:16th var_select:rand var_list:
+         cmd:randamp 2:0
+[algo 7] process:every step:3 event:bar var_select:rand var_list:1 2
+         cmd: step 3 pitch %s
+[algo 8] process:every step:4 event:bar var_select:rand var_list:1 2
+         cmd: step 2 pitch %s
+[algo 9] process:every step:2 event:bar var_select:rand var_list:
+         cmd:loop 6 scramble
+[algo 10] process:every step:5 event:bar var_select:rand var_list:
+         cmd:loop 6 stutter
+[algo 11] process:every step:3 event:bar var_select:rand var_list:2 1 1.75 1.5
+         cmd: loop 8 pitch %s
+[algo 12] process:every step:3 event:bar var_select:rand var_list:
+         cmd:loop scramble
+[algo 13] process:every step:3 event:bar var_select:rand var_list:
+         cmd:loop 8 scramble
+[algo 14] process:every step:4 event:bar var_select:rand var_list:
+         cmd:loop 8 stutter
+[algo 15] process:every step:7 event:bar var_select:rand var_list:1 4
+         cmd: stop %s
+[algo 16] process:every step:12 event:bar var_select:rand var_list:
+         cmd:start 1
+[algo 17] process:every step:8 event:bar var_select:rand var_list:
+         cmd:start 4
+[algo 18] process:every step:1 event:bar var_select:rand var_list:45 66 55 69
+         cmd: fx 4:0 fb %s
+[algo 19] process:every step:7 event:bar var_select:rand var_list:
+         cmd:stop 6
+[algo 20] process:every step:13 event:bar var_select:rand var_list:
+         cmd:stop 8
+[algo 21] process:every step:3 event:bar var_select:rand var_list:
+         cmd:start 8
+[algo 22] process:every step:4 event:bar var_select:rand var_list:
+         cmd:start 6
+[algo 23] process:every step:7 event:bar var_select:rand var_list:
+         cmd:loop 9 scramble
+[algo 24] process:every step:5 event:bar var_select:rand var_list:
+         cmd:loop 9 stutter
+[algo 25] process:every step:7 event:16th var_select:rand var_list:48 43 41
+         cmd: digi 11 midi_note %s
+[algo 26] process:every step:2 event:bar var_select:rand var_list:
+         cmd:digi 11 genonce 4
+[algo 27] process:every step:3 event:bar var_select:rand var_list:
+         cmd:cp 1:0 11:0
+[algo 28] process:every step:4 event:bar var_select:rand var_list:
+         cmd:digi 11 genonce 0
+[algo 29] process:every step:4 event:16th var_select:rand var_list:
+         cmd:cp 11:0 14:0
+[algo 30] process:every step:3 event:bar var_select:rand var_list:
+         cmd:loop 15 scramble
+[algo 31] process:every step:7 event:bar var_select:rand var_list:
+         cmd:loop 15 stutter
+[algo 32] process:every step:7 event:16th var_select:rand var_list:2 2 2 2 2 2 2 2 2 2 1 3
+         cmd: loop 15 pitch %s
+[algo 33] process:every step:3 event:bar var_select:rand var_list:
+         cmd:loop 17 scramble
+[algo 34] process:every step:7 event:bar var_select:rand var_list:
+         cmd:loop 17 stutter
+[algo 35] process:every step:2 event:bar var_select:rand var_list:
+         cmd:loop 18 scramble
+[algo 36] process:every step:2 event:bar var_select:rand var_list:
+         cmd:loop 20 scramble
+[algo 37] process:every step:3 event:bar var_select:rand var_list:
+         cmd:loop 21 stutter
+[algo 38] process:every step:4 event:bar var_select:rand var_list:
+         cmd:loop 21 scramble
+[algo 39] process:every step:2 event:bar var_select:rand var_list:
+         cmd:loop 23 stutter
+[algo 40] process:every step:7 event:bar var_select:rand var_list:
+         cmd:loop 23 scramble
+[algo 41] process:every step:1 event:bar var_select:rand var_list:0 1 2 3 4 5 6 7 8 9
+         cmd: scene %s
+[algo 42] process:every step:1 event:bar var_select:rand var_list:
+         cmd:loop 26 scramble
+[algo 43] process:every step:7 event:bar var_select:rand var_list:
+         cmd:loop 27 scramble
+[algo 44] process:every step:9 event:bar var_select:rand var_list:
+         cmd:loop 27 stutter
+[algo 45] process:every step:1 event:bar var_select:step var_list:740 750 760 770 780 800 820 840 1200 830 790 770 760 750 747
+         cmd: fx 23:0 freq %s
+[algo 46] process:every step:8 event:16th var_select:step var_list:2 13 40 100 140 200 400 744
+         cmd: fx 23:1 delayms %s
+[algo 47] process:every step:11 event:16th var_select:step var_list:2 10 14 20 40 44 55
+         cmd: fx 23:1 fb %s
+
+[sequence generators]
+[ 0]  [MARKOV SEQUENCE GEN ] - type:GARAGE
+
+[ 1]  [MARKOV SEQUENCE GEN ] - type:HATS
+
+[ 2]  [EUCLIDEAN GEN ] - mode:RANDOM hits:3 steps:16 actual_hits:9 actual_steps:16
+[ 3]  [SEQUENCE GEN ] - infix pattern: t << ( ( t >> 1 | t >> 8 ) ^ ( t >> 13 ) )
+rpn pattern: t t 1 >> t 8 >> | t 13 >> ^ <<
+[ 4]  [SEQUENCE GEN ] - infix pattern: ( t * t ) / ( t >> 13 ^ t >> 8 )
+rpn pattern: t t * t 13 >> t 8 >> ^ /
+
+[sound generators]
+[step 1] kicks/CLunkT.aiff  vol:0.70 pitch:1.00
+multi:0 num_patterns:1 gen_en:1 gen_mode:0 gen_src:0 gen_every:1
+[0]  ▅▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ numloops:1 swing:0
+
+[step 2] hats/DR660Hihatlightclosed.aif  vol:0.20 pitch:1.00
+multi:1 num_patterns:1 gen_en:0 gen_mode:0 gen_src:-99 gen_every:0
+[0]  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▃▃▁▁▁▁▁▁▁▁▃▃▅▅▁▁▆▆ numloops:1 swing:2
+
+[step 3] hats/cloeyhatz.aiff  vol:0.30 pitch:1.00
+multi:1 num_patterns:1 gen_en:0 gen_mode:0 gen_src:-99 gen_every:0
+[0]  ▂▂▁▁▁▁▁▁▆▆▁▁▁▁▁▁▁▁▁▁▁▁▅▅▁▁▁▁▁▁▁▁ numloops:1 swing:4
+
+[step 4] snrs/slaveSnare.aiff  vol:0.70 pitch:1.00
+multi:1 num_patterns:1 gen_en:1 gen_mode:0 gen_src:2 gen_every:12
+[0]  ▁▁▁▁▁▁▁▁▅▅▁▁▁▁▁▁▁▁▁▁▁▁▁▁▅▅▁▁▁▁▁▁ numloops:1 swing:0
+[fx 4:0 delayms:23 fb:45.00 ratio:0.20 wetmx:0.70 mode:pingpong(2)]
+[envelope]
+
+[loop 9] source:loops/FingersFadeBassStrings.aiff  vol:0.00 pitch:1.00
+loop_mode:LOOP gate_mode:0 idx:46192 buf_len:199530
+loop_len:1.00 scramble:0 stutter:1 step:0 reverse:0 buffer_is_full:0
+gen_src:4 gen_every_n:7 gen_en:1 gen mode:0 extsource:-1
+grain_dur_ms:100 grains_per_sec:30 density_dur_sync:1 quasi_grain_fudge:0
+fill_factor:2.00 grain_spray_ms:0.00 selection_mode:0 env_mode:PARABOLIC
+[Grain Pitch LFO]
+gp_on:0 gp_type:0 gp_amp:1.00 gp_rate:0.10 gp_lo:0.90 gp_hi:1.10
+[Grain Duration LFO]
+gd_on:0 gd_type:0 gd_amp:1.00 gd_rate:0.01 gd_lo:10.00 gd_hi:80.00
+[Grains Per Sec LFO]
+gps_on:0 gps_type:0 gps_amp:1.00 gps_rate:0.01 gps_lo:20.00 gps_hi:50.00
+[Grain Scan LFO]
+gs_on:0 gs_type:0 gs_amp:1.00 gs_rate:0.01 gs_lo:0.00 gs_hi:199530.00
+[Envelope Generator]
+eg_attack_ms:10.00 sustain_ms:50 eg_release_ms:50.00 eg_state:3
+[0]  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ numloops:1 swing:0
+[fx 9:0 inputgain:0.00 threshold:0.00 attackms:20.00 releasems:1000.00 ratio:1.00
+outputgain:2.00 kneewidth:0.00 lookahead:0.00 sterolink:OFF(0)
+type:COMP(0) mode:ANALOG(0) extsource:off(-99)]
+[fx 9:1 freq:12000.00 q:1.00 type:HPF4 lfo1_active:0 lfo1_type:0 lfo1_amp:1.00
+lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50]
+
+[digi 11] notes/mood2SwingNoteGlitch.aiff vol: 1.00 active: false midi_note:48 sample_len:13882 read_idx:0
+note_mode:0 chord_mode:0 octave:0 midi_note:48
+[0]  ▁▁▁▁▁▁▁▁▁▁▇▇▇▇▁▁▇▇▇▇▁▁▁▁▁▁▁▁▁▁▇▇  numloops: 1
+[fx 11:0 k_pos:1.00 k_neg:1.00stages:2 invert:0]
+
+[loop 15] source:loops/busitACID.aiff  vol:0.15 pitch:2.00
+loop_mode:LOOP gate_mode:0 idx:57766 buf_len:64151
+loop_len:0.50 scramble:0 stutter:0 step:0 reverse:0 buffer_is_full:0
+gen_src:1 gen_every_n:17 gen_en:1 gen mode:0 extsource:-1
+grain_dur_ms:100 grains_per_sec:30 density_dur_sync:1 quasi_grain_fudge:0
+fill_factor:2.00 grain_spray_ms:0.00 selection_mode:0 env_mode:PARABOLIC
+[Grain Pitch LFO]
+gp_on:0 gp_type:0 gp_amp:1.00 gp_rate:0.10 gp_lo:0.90 gp_hi:1.10
+[Grain Duration LFO]
+gd_on:0 gd_type:0 gd_amp:1.00 gd_rate:0.01 gd_lo:10.00 gd_hi:80.00
+[Grains Per Sec LFO]
+gps_on:0 gps_type:0 gps_amp:1.00 gps_rate:0.01 gps_lo:20.00 gps_hi:50.00
+[Grain Scan LFO]
+gs_on:0 gs_type:0 gs_amp:1.00 gs_rate:0.01 gs_lo:0.00 gs_hi:64151.00
+[Envelope Generator]
+eg_attack_ms:10.00 sustain_ms:50 eg_release_ms:50.00 eg_state:0
+[0]  ▁▁▅▅▁▁▁▁▁▁▁▁▅▅▅▅▅▅▁▁▅▅▁▁▅▅▅▅▅▅▅▅ numloops:1 swing:0
+[fx 15:0 inputgain:0.00 threshold:-36.00 attackms:1.00 releasems:55.00 ratio:2.50
+outputgain:0.00 kneewidth:0.00 lookahead:0.00 sterolink:OFF(0)
+type:COMP(0) mode:ANALOG(0) extsource:on(16)]
+[fx 15:1 freq:12000.00 q:1.00 type:HPF4 lfo1_active:0 lfo1_type:0 lfo1_amp:1.00
+lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50]
+
+[loop 23] source:loops/HARDCOREmelodySLOWLOUD.aiff  vol:0.70 pitch:1.00
+loop_mode:LOOP gate_mode:0 idx:643928 buf_len:880272
+loop_len:1.00 scramble:0 stutter:1 step:0 reverse:0 buffer_is_full:0
+gen_src:2 gen_every_n:13 gen_en:1 gen mode:0 extsource:-1
+grain_dur_ms:100 grains_per_sec:30 density_dur_sync:1 quasi_grain_fudge:0
+fill_factor:2.00 grain_spray_ms:0.00 selection_mode:0 env_mode:PARABOLIC
+[Grain Pitch LFO]
+gp_on:0 gp_type:0 gp_amp:1.00 gp_rate:0.10 gp_lo:0.90 gp_hi:1.10
+[Grain Duration LFO]
+gd_on:0 gd_type:0 gd_amp:1.00 gd_rate:0.01 gd_lo:10.00 gd_hi:80.00
+[Grains Per Sec LFO]
+gps_on:0 gps_type:0 gps_amp:1.00 gps_rate:0.01 gps_lo:20.00 gps_hi:50.00
+[Grain Scan LFO]
+gs_on:0 gs_type:0 gs_amp:1.00 gs_rate:0.01 gs_lo:0.00 gs_hi:880272.00
+[Envelope Generator]
+eg_attack_ms:10.00 sustain_ms:50 eg_release_ms:50.00 eg_state:3
+[0]  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ numloops:1 swing:0
+[fx 23:0 freq:780.00 q:1.00 type:BPF2 lfo1_active:0 lfo1_type:0 lfo1_amp:1.00
+lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50]
+[fx 23:1 delayms:200 fb:2.00 ratio:0.20 wetmx:0.70 mode:pingpong(2)]
+[fx 23:2 freq:12000.00 q:1.00 type:LPF4 lfo1_active:0 lfo1_type:0 lfo1_amp:1.00
+lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50]
+[fx 23:3 freq:12000.00 q:1.00 type:LPF4 lfo1_active:0 lfo1_type:0 lfo1_amp:1.00
+lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50]
+[fx 23:4 freq:12000.00 q:1.00 type:LPF4 lfo1_active:0 lfo1_type:0 lfo1_amp:1.00
+lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50]
+
+[loop 27] source:strings/breoknRiser.aiff  vol:0.40 pitch:1.00
+loop_mode:LOOP gate_mode:0 idx:51589 buf_len:445680
+loop_len:2.00 scramble:0 stutter:0 step:0 reverse:0 buffer_is_full:0
+gen_src:2 gen_every_n:7 gen_en:1 gen mode:0 extsource:-1
+grain_dur_ms:100 grains_per_sec:30 density_dur_sync:1 quasi_grain_fudge:0
+fill_factor:2.00 grain_spray_ms:0.00 selection_mode:0 env_mode:PARABOLIC
+[Grain Pitch LFO]
+gp_on:0 gp_type:0 gp_amp:1.00 gp_rate:0.10 gp_lo:0.90 gp_hi:1.10
+[Grain Duration LFO]
+gd_on:0 gd_type:0 gd_amp:1.00 gd_rate:0.01 gd_lo:10.00 gd_hi:80.00
+[Grains Per Sec LFO]
+gps_on:0 gps_type:0 gps_amp:1.00 gps_rate:0.01 gps_lo:20.00 gps_hi:50.00
+[Grain Scan LFO]
+gs_on:0 gs_type:0 gs_amp:1.00 gs_rate:0.01 gs_lo:0.00 gs_hi:445680.00
+[Envelope Generator]
+eg_attack_ms:10.00 sustain_ms:50 eg_release_ms:50.00 eg_state:3
+[0]  ▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁▁ numloops:1 swing:0
+[fx 27:0 freq:16000.00 q:1.00 type:HPF4 lfo1_active:0 lfo1_type:0 lfo1_amp:1.00
+lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50]

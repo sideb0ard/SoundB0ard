@@ -15,6 +15,7 @@
 
 extern mixer *mixr;
 extern char *key_names[NUM_KEYS];
+extern char *chord_type_names[NUM_CHORD_TYPES];
 
 extern wtable *wave_tables[5];
 
@@ -243,19 +244,44 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         mixer_set_notes(mixr);
         cmd_found = true;
     }
+    else if (strncmp("octave", wurds[0], 6) == 0)
+    {
+        int oct = atoi(wurds[1]);
+        mixer_set_octave(mixr, oct);
+    }
     else if (strncmp("notes", wurds[0], 5) == 0)
     {
         printf("NOTES in KEY!\n");
 
         for (int i = 0; i < 8; i++)
             printf("%s\n", key_names[mixr->notes[i]]);
-        // int key = atoi(wurds[1]);
-        // if (key >= 0 && key < NUM_KEYS)
-        //{
-        //    printf("Changing KEY!\n");
-        //    mixr->key = key;
-        //}
         cmd_found = true;
+    }
+    else if (strncmp("chords", wurds[0], 6) == 0)
+    {
+        printf("CHORDS in KEY!\n");
+
+        for (int i = 0; i < 8; i++)
+            printf("%s %s\n", key_names[mixr->notes[i]],
+                   chord_type_names[get_chord_type(i)]);
+        cmd_found = true;
+    }
+    else if (strncmp("chord", wurds[0], 5) == 0)
+    {
+        if (strncmp("gen", wurds[1], 3) == 0)
+        {
+            for (int i = 0; i < 4; i++)
+            {
+                int note_num = rand() % 8;
+                int note = mixr->notes[note_num];
+                unsigned int chord_type = get_chord_type(note_num);
+                printf("%s %s\n", key_names[note],
+                       chord_type_names[chord_type]);
+                chord_midi_notes chnotes;
+                get_midi_notes_from_chord(note, chord_type, mixr->octave,
+                                          &chnotes);
+            }
+        }
     }
     else if (strncmp("<~", wurds[0], 2) == 0 || strncmp("~>", wurds[0], 2) == 0)
     {
@@ -349,7 +375,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                printf("Starting SOUND GEN %d\n", soundgen_num);
                 soundgenerator *sg = mixr->sound_generators[soundgen_num];
                 sg->start(sg);
             }

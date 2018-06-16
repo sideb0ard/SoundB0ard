@@ -616,7 +616,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     if (num_channels > 1)
     {
         int read_idx_right = read_idx + 1;
-        //sound_grain_check_idx(&read_idx_right, audio_buffer_len);
+        // sound_grain_check_idx(&read_idx_right, audio_buffer_len);
         out.right = audio_buffer[read_idx_right];
     }
     else
@@ -664,7 +664,9 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
         break;
     case (LOOPER_ENV_TUKEY_WINDOW):
         relative_position = g->audiobuffer_cur_pos - g->audiobuffer_start_idx;
-        amp = 0.5 * (1 + cos(M_PI*((relative_position*2/(0.5*(g->grain_len_frames-1))) -1)));
+        amp = 0.5 * (1 + cos(M_PI * ((relative_position * 2 /
+                                      (0.5 * (g->grain_len_frames - 1))) -
+                                     1)));
         break;
     }
 
