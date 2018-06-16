@@ -883,7 +883,7 @@ stereo_val minisynth_gennext(void *self)
 
 void minisynth_rand_settings(minisynth *ms)
 {
-    printf("Randomizing SYNTH!\n");
+    //printf("Randomizing SYNTH!\n");
 
     strncpy(ms->m_settings.m_settings_name, "-- random UNSAVED--", 256);
     ms->m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
@@ -973,7 +973,7 @@ void minisynth_rand_settings(minisynth *ms)
 
     minisynth_update(ms);
 
-    minisynth_print_settings(ms);
+    //minisynth_print_settings(ms);
 }
 
 bool minisynth_save_settings(minisynth *ms, char *preset_name)

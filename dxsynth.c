@@ -709,7 +709,7 @@ stereo_val dxsynth_gennext(void *self)
 
 void dxsynth_rand_settings(dxsynth *dx)
 {
-    printf("Randomizing DXSYNTH!\n");
+    //printf("Randomizing DXSYNTH!\n");
 
     dx->m_settings.m_voice_mode = rand() % 8;
     //dx->m_settings.m_portamento_time_ms = rand() % 5000;
