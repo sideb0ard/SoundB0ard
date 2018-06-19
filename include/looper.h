@@ -14,12 +14,13 @@
 typedef struct sound_grain
 {
     int grain_len_frames;
+    int grain_counter_frames;
     int audiobuffer_num;
     int audiobuffer_start_idx;
     int audiobuffer_num_channels;
     double audiobuffer_cur_pos;
-    double audiobuffer_inc;
     double audiobuffer_pitch;
+    double incr;
 
     int attack_time_pct; // percent of grain_len_frames
     int attack_time_samples;
@@ -30,7 +31,6 @@ typedef struct sound_grain
     double slope;
     double curve;
     bool reverse_mode;
-    double incr;
 } sound_grain;
 
 enum

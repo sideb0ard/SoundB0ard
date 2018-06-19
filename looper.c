@@ -140,8 +140,6 @@ void looper_set_pattern(void *self, int pattern_num, midi_event *pattern)
     return step_set_pattern(&l->m_seq, pattern_num, pattern);
 }
 
-static bool playing = false;
-static int playing_midi_tick_count = 0;
 void looper_event_notify(void *self, unsigned int event_type)
 {
     looper *g = (looper *)self;
@@ -185,6 +183,8 @@ void looper_event_notify(void *self, unsigned int event_type)
 
             if (g->reverse_mode)
                 new_read_idx = (g->audio_buffer_len - 1) - new_read_idx;
+
+            // this ensures new_read_idx is even
             if (g->num_channels == 2)
                 new_read_idx -= ((int)new_read_idx & 1);
 
@@ -390,7 +390,7 @@ stereo_val looper_gennext(void *self)
 
             int grain_idx = g->audio_buffer_read_idx;
             if (g->selection_mode == GRAIN_SELECTION_RANDOM)
-                grain_idx = rand() % (g->audio_buffer_len - duration);
+                grain_idx = rand() % (g->audio_buffer_len - (duration*g->num_channels));
 
             if (g->granular_spray_frames > 0)
                 grain_idx += rand() % g->granular_spray_frames;
@@ -564,6 +564,7 @@ void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
 {
     g->audiobuffer_start_idx = starting_idx;
     g->grain_len_frames = dur;
+    g->grain_counter_frames = 0;
     g->attack_time_pct = attack_pct;
     g->release_time_pct = release_pct;
     g->audiobuffer_num_channels = num_channels;
@@ -624,12 +625,14 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 
     g->audiobuffer_cur_pos += (g->incr * num_channels);
 
-    int end_buffer =
-        g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
+    g->grain_counter_frames++;
+    //int end_buffer =
+    //    g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
 
-    if ((g->reverse_mode &&
-         g->audiobuffer_cur_pos < g->audiobuffer_start_idx) ||
-        g->audiobuffer_cur_pos >= end_buffer)
+    //if ((g->reverse_mode &&
+    //     g->audiobuffer_cur_pos < g->audiobuffer_start_idx) ||
+    //    g->audiobuffer_cur_pos >= end_buffer)
+    if (g->grain_counter_frames > g->grain_len_frames)
     {
         g->active = false;
     }
@@ -1023,11 +1026,11 @@ void looper_dump_buffer(looper *l)
     for (int i = 0; i < l->highest_grain_num; i++)
     {
         sound_grain *g = &l->m_grains[i];
-        printf("Grain:%d len:%d, buf_num:%d start_idx:%d cur_pos:%f inc:%f "
+        printf("Grain:%d len:%d, buf_num:%d start_idx:%d cur_pos:%f incr:%f "
                "active:%d\n",
                i, g->grain_len_frames, g->audiobuffer_num,
                g->audiobuffer_start_idx, g->audiobuffer_cur_pos,
-               g->audiobuffer_inc, g->active);
+               g->incr, g->active);
     }
 }
 void looper_set_gate_mode(looper *g, bool b) { g->gate_mode = b; }

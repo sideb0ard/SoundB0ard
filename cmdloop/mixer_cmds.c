@@ -42,6 +42,24 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         cmd_found = true;
     }
 
+    else if (strncmp("fuckup", wurds[0], 6) == 0)
+    {
+        char fwurds[6][SIZE_OF_WURD] = {"every", "3", "bar", "loop"};
+        strcpy(fwurds[4], wurds[1]);
+        strcpy(fwurds[5], "scramble");
+        algorithm *a = new_algorithm(6, fwurds);
+        if (a)
+            mixer_add_algorithm(mixr, a);
+
+        strcpy(fwurds[1], "7");
+        strcpy(fwurds[5], "stutter");
+        a = new_algorithm(6, fwurds);
+        if (a)
+            mixer_add_algorithm(mixr, a);
+
+        cmd_found = true;
+    }
+
     else if (strncmp("brak", wurds[0], 4) == 0)
     {
         int sg_num;
