@@ -390,7 +390,8 @@ stereo_val looper_gennext(void *self)
 
             int grain_idx = g->audio_buffer_read_idx;
             if (g->selection_mode == GRAIN_SELECTION_RANDOM)
-                grain_idx = rand() % (g->audio_buffer_len - (duration*g->num_channels));
+                grain_idx = rand() % (g->audio_buffer_len -
+                                      (duration * g->num_channels));
 
             if (g->granular_spray_frames > 0)
                 grain_idx += rand() % g->granular_spray_frames;
@@ -439,7 +440,7 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
-        "source:%s %s vol:%.2lf pitch:%.2f\n"
+        "source:%s %s vol:%.2lf pitch:%.2f stereo:%d\n"
         "loop_mode:%s gate_mode:%d idx:%.0f buf_len:%d\n"
         "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
@@ -464,7 +465,7 @@ void looper_status(void *self, wchar_t *status_string)
         "[Envelope Generator]\n"
         "eg_attack_ms:%.2f sustain_ms:%d eg_release_ms:%.2f eg_state:%d",
 
-        g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
+        g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch, g->num_channels > 1 ? 1 : 0,
         s_loop_mode_names[g->loop_mode], g->gate_mode, g->audio_buffer_read_idx,
         g->audio_buffer_len, g->loop_len, g->scramble_mode, g->stutter_mode,
         g->step_mode, g->reverse_mode, g->buffer_is_full, g->m_seq.generate_src,
@@ -611,27 +612,34 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     int num_channels = g->audiobuffer_num_channels;
 
     int read_idx = (int)g->audiobuffer_cur_pos;
-
+    double frac = g->audiobuffer_cur_pos - read_idx;
     sound_grain_check_idx(&read_idx, audio_buffer_len);
-    out.left = audio_buffer[read_idx];
-    if (num_channels > 1)
+
+    if (num_channels == 1)
     {
-        int read_idx_right = read_idx + 1;
-        // sound_grain_check_idx(&read_idx_right, audio_buffer_len);
-        out.right = audio_buffer[read_idx_right];
-    }
-    else
+        int read_next_idx = read_idx + 1;
+        sound_grain_check_idx(&read_next_idx, audio_buffer_len);
+        out.left = lin_terp(0, 1, audio_buffer[read_idx], audio_buffer[read_next_idx], frac);
         out.right = out.left;
+    }
+    else if (num_channels == 2)
+    {
+        int read_next_idx = read_idx + 2;
+        sound_grain_check_idx(&read_next_idx, audio_buffer_len);
+        out.left = lin_terp(0, 1, audio_buffer[read_idx],
+                            audio_buffer[read_next_idx], frac);
+
+        int read_idx_right = read_idx + 1;
+        sound_grain_check_idx(&read_idx_right, audio_buffer_len);
+        int read_next_idx_right = read_idx_right + 2;
+        sound_grain_check_idx(&read_next_idx_right, audio_buffer_len);
+        out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
+                             audio_buffer[read_next_idx_right], frac);
+    }
 
     g->audiobuffer_cur_pos += (g->incr * num_channels);
 
     g->grain_counter_frames++;
-    //int end_buffer =
-    //    g->audiobuffer_start_idx + (g->grain_len_frames * num_channels);
-
-    //if ((g->reverse_mode &&
-    //     g->audiobuffer_cur_pos < g->audiobuffer_start_idx) ||
-    //    g->audiobuffer_cur_pos >= end_buffer)
     if (g->grain_counter_frames > g->grain_len_frames)
     {
         g->active = false;
@@ -1029,8 +1037,8 @@ void looper_dump_buffer(looper *l)
         printf("Grain:%d len:%d, buf_num:%d start_idx:%d cur_pos:%f incr:%f "
                "active:%d\n",
                i, g->grain_len_frames, g->audiobuffer_num,
-               g->audiobuffer_start_idx, g->audiobuffer_cur_pos,
-               g->incr, g->active);
+               g->audiobuffer_start_idx, g->audiobuffer_cur_pos, g->incr,
+               g->active);
     }
 }
 void looper_set_gate_mode(looper *g, bool b) { g->gate_mode = b; }
