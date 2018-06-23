@@ -148,7 +148,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 chord_midi_notes chnotes = {0};
                 get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
-                                          mixr->octave, &chnotes);
+                                          synthbase_get_octave(base), &chnotes);
 
                 int multiplier = 1;
                 switch (num_bars)
