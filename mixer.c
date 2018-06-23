@@ -32,6 +32,7 @@ extern ENVSTREAM *ampstream;
 extern mixer *mixr;
 
 extern const char *key_names[NUM_KEYS];
+extern char *chord_type_names[NUM_CHORD_TYPES];
 
 const wchar_t *s_status_colors[] = {
     WCOOL_COLOR_PINK,      // MINISYNTH_TYPE
@@ -123,7 +124,7 @@ void mixer_ps(mixer *mixr)
            " beat:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
-           ":::::::::: MIDI controller:%s sg_receiver:%d midi_type:%s key:%s octave:%d\n" ANSI_COLOR_RESET,
+           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s key:%s chord:%s %s octave:%d\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
@@ -131,7 +132,9 @@ void mixer_ps(mixer *mixr)
                ? "NONE"
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
-                          ->type], key_names[mixr->key], mixr->octave);
+                          ->type],
+           key_names[mixr->key], key_names[mixr->chord],
+           chord_type_names[mixr->chord_type], mixr->octave);
     // clang-format on
 
     // TODO - create env command to print these
@@ -573,6 +576,33 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
         if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
         {
+            if (mixr->timing_info.midi_tick % PPBAR == 0)
+            {
+                //printf("Start of bar!\n");
+                mixr->bar_counter++;
+                if (mixr->bar_counter % 4 == 0)
+                {
+                    int chance = rand() % 3;
+                    unsigned int scale_degree = 0;
+                    if (chance == 0)
+                    {
+                        scale_degree = 0;
+                    }
+                    else if (chance == 1)
+                    {
+                        scale_degree = 3;
+                    }
+                    else if (chance == 2)
+                    {
+                        scale_degree = 4;
+                    }
+                    unsigned int root = mixr->notes[scale_degree];
+                    unsigned int chord_type = get_chord_type(scale_degree);
+                    //printf("Changing CHORD TO %s %s\n", key_names[root],
+                    //       chord_type_names[chord_type]);
+                    mixer_change_chord(mixr, root, chord_type);
+                }
+            }
             // if (first_run)
             //{
             //    mixer_print_timing_info(mixr);
@@ -984,4 +1014,18 @@ void mixer_set_octave(mixer *mixr, int octave)
 {
     if (octave > -10 && octave < 10)
         mixr->octave = octave;
+}
+
+void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
+{
+    if (root < NUM_KEYS && chord_type < NUM_CHORD_TYPES)
+    {
+        mixr->chord = root;
+        mixr->chord_type = chord_type;
+    }
+}
+
+int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree)
+{
+    return mixr->key + scale_degree;
 }

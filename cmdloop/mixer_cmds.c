@@ -146,6 +146,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     printf("Can't do nuttin' for ya, man!\n");
                     return true;
                 }
+                chord_midi_notes chnotes = {0};
+                get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
+                                          mixr->octave, &chnotes);
 
                 int multiplier = 1;
                 switch (num_bars)
@@ -167,10 +170,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
                 for (int i = 0; i < num_bars; i++)
                 {
-                    int note = 0;
                     int midi_note = 0;
                     int midi_tick = 0;
-                    int octave = 0;
 
                     midi_event pattern[PPBAR] = {0};
 
@@ -181,18 +182,26 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         {
                             if ((j == 0 && i == 0) ||
                                 (j == (len - 1) && i == num_bars - 1))
-                                note = mixr->key;
+                                midi_note = chnotes.root;
                             else
                             {
-                                int randy = rand() % 8;
-                                note = mixr->notes[randy];
+                                int randy = rand() % 3;
+                                switch (randy)
+                                {
+                                case (0):
+                                    midi_note = chnotes.root;
+                                    break;
+                                case (1):
+                                    midi_note = chnotes.third;
+                                    break;
+                                case (2):
+                                    midi_note = chnotes.fifth;
+                                    break;
+                                }
                             }
                             midi_tick = multiplier * j;
-                            octave = synthbase_get_octave(base);
                             if (rand() % 100 > 90)
-                                octave++;
-                            midi_note =
-                                get_midi_note_from_mixer_key(note, octave);
+                                midi_note += 12; // up an octave
                             midi_event ev = {.event_type = MIDI_ON,
                                              .data1 = midi_note,
                                              .data2 = DEFAULT_VELOCITY};
@@ -269,10 +278,12 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("notes", wurds[0], 5) == 0)
     {
-        printf("NOTES in KEY!\n");
+        printf("NOTES in CHORD!\n");
 
-        for (int i = 0; i < 8; i++)
-            printf("%s\n", key_names[mixr->notes[i]]);
+        chord_midi_notes chnotes = {0};
+        get_midi_notes_from_chord(mixr->chord, mixr->chord_type, mixr->octave,
+                                  &chnotes);
+        printf("%d %d %d\n", chnotes.root, chnotes.third, chnotes.fifth);
         cmd_found = true;
     }
     else if (strncmp("chords", wurds[0], 6) == 0)

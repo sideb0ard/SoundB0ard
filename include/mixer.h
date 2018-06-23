@@ -109,7 +109,10 @@ typedef struct mixer
 
     double volume;
 
+    int bar_counter; // every 4 bar, change chord
     unsigned int key;
+    unsigned int chord;
+    unsigned int chord_type;
     unsigned int octave;
     unsigned int notes[8];
     unsigned int quantize;
@@ -178,6 +181,8 @@ void mixer_set_octave(mixer *mixr, int octave);
 
 double mixer_get_khz_per_bar(mixer *mixr);
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
+void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type);
+int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
 
 synthbase *get_synthbase(soundgenerator *self);
 // this is in mixer.h rather than synthbase, as mixer needs to transform sg

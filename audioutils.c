@@ -58,6 +58,7 @@ void get_chord_compat_keys(int keynum, int vals[4])
         vals[i] = randy;
     }
 }
+
 int get_chord_type(unsigned int scale_degree)
 {
     if (scale_degree == 0 || scale_degree == 3 || scale_degree == 4 ||
@@ -100,8 +101,8 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
     else
         fifth_midi = get_midi_note_from_mixer_key(fifth_note, octave);
 
-    printf("ROOT MIDI:%d THIRD:%d FIFTH:%d\n", root_midi, third_midi,
-           fifth_midi);
+    //printf("ROOT MIDI:%d THIRD:%d FIFTH:%d\n", root_midi, third_midi,
+    //       fifth_midi);
 
     chnotes->root = root_midi;
     chnotes->third = third_midi;
