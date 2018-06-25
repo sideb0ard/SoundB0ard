@@ -55,8 +55,23 @@ typedef unsigned int compat_key_list[6];
 
 // struct AbletonLink AbletonLink;
 
+typedef struct preview_buffer
+{
+    char filename[512];
+    double *audio_buffer;
+    int num_channels;
+    int audio_buffer_len;
+    int audio_buffer_read_idx;
+    bool enabled;
+} preview_buffer;
+
+stereo_val preview_buffer_generate(preview_buffer *buffy);
+void preview_buffer_import_file(preview_buffer *buffy, char *filename);
+
 typedef struct mixer
 {
+
+    preview_buffer preview;
 
     algorithm **algorithms;
     int algorithm_num;
@@ -131,6 +146,7 @@ int mixer_add_algorithm(mixer *mixr, algorithm *a);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_markov(mixer *mixr, unsigned int type);
+void mixer_preview_audio(mixer *mixr, char *filename);
 
 int mixer_print_timing_info(mixer *mixr);
 
@@ -153,9 +169,8 @@ void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);
 void mixer_play_scene(mixer *mixr, int scene_num);
 
-void mixer_preview_track(mixer *mixr, char *filename);
-
 void update_environment(char *key, int val);
+
 int get_environment_val(char *key, int *return_val);
 
 void mixer_update_timing_info(mixer *mixr, long long int frame_time);
@@ -181,7 +196,8 @@ void mixer_set_octave(mixer *mixr, int octave);
 
 double mixer_get_khz_per_bar(mixer *mixr);
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
-void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type);
+void mixer_change_chord(mixer *mixr, unsigned int root,
+                        unsigned int chord_type);
 int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
 
 synthbase *get_synthbase(soundgenerator *self);

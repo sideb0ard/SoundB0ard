@@ -465,10 +465,11 @@ void looper_status(void *self, wchar_t *status_string)
         "[Envelope Generator]\n"
         "eg_attack_ms:%.2f sustain_ms:%d eg_release_ms:%.2f eg_state:%d",
 
-        g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch, g->num_channels > 1 ? 1 : 0,
-        s_loop_mode_names[g->loop_mode], g->gate_mode, g->audio_buffer_read_idx,
-        g->audio_buffer_len, g->loop_len, g->scramble_mode, g->stutter_mode,
-        g->step_mode, g->reverse_mode, g->buffer_is_full, g->m_seq.generate_src,
+        g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
+        g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
+        g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
+        g->loop_len, g->scramble_mode, g->stutter_mode, g->step_mode,
+        g->reverse_mode, g->buffer_is_full, g->m_seq.generate_src,
         g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
         g->m_seq.generate_mode, g->external_source_sg,
 
@@ -619,7 +620,8 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     {
         int read_next_idx = read_idx + 1;
         sound_grain_check_idx(&read_next_idx, audio_buffer_len);
-        out.left = lin_terp(0, 1, audio_buffer[read_idx], audio_buffer[read_next_idx], frac);
+        out.left = lin_terp(0, 1, audio_buffer[read_idx],
+                            audio_buffer[read_next_idx], frac);
         out.right = out.left;
     }
     else if (num_channels == 2)

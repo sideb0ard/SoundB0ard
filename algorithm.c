@@ -201,7 +201,7 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
 
-    //for (int i = 0; i < num_wurds; i++)
+    // for (int i = 0; i < num_wurds; i++)
     //    printf("WURD:%s\n", wurds[i]);
 
     if (strncmp(wurds[0], "every", 5) == 0)

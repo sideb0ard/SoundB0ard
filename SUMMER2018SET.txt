@@ -32,3 +32,12 @@ rpn pattern: t t * t 13 >> t 8 >> ^ /
 [step 0] perc/CrackleDonnaBreath.aiff  vol:0.70 pitch:1.00
 [step 1] noises/NeedleJump.aiff  vol:0.30 pitch:1.00
 [step 2] perc/cracklPERC2.aiff  vol:0.70 pitch:1.00
+
+ALGO7
+loops/ohmdrum.aiff
+dloops/tecnAe.aiff
+loops/HARDCOREmelody.aiff
+new bitshift ((t/1000)^(t/1001))*t
+dx rar - octave 2
+
+dloops/acidSquelchBeat.aiff

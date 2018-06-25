@@ -101,7 +101,7 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
     else
         fifth_midi = get_midi_note_from_mixer_key(fifth_note, octave);
 
-    //printf("ROOT MIDI:%d THIRD:%d FIFTH:%d\n", root_midi, third_midi,
+    // printf("ROOT MIDI:%d THIRD:%d FIFTH:%d\n", root_midi, third_midi,
     //       fifth_midi);
 
     chnotes->root = root_midi;

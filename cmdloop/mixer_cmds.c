@@ -33,12 +33,23 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         cmd_found = true;
     }
 
-    else if (strncmp("every", wurds[0], 4) == 0)
+    else if (strncmp("every", wurds[0], 5) == 0)
     {
         algorithm *a = new_algorithm(num_wurds, wurds);
         if (a)
             mixer_add_algorithm(mixr, a);
 
+        cmd_found = true;
+    }
+
+    else if (strncmp("play", wurds[0], 4) == 0 ||
+             strncmp("preview", wurds[0], 7) == 0)
+    {
+        if (is_valid_file(wurds[1]))
+        {
+            printf("PLAY YO preview! %s\n", wurds[1]);
+            mixer_preview_audio(mixr, wurds[1]);
+        }
         cmd_found = true;
     }
 
@@ -330,14 +341,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else
                     right_shift(pattern, places_to_shift);
             }
-        }
-        cmd_found = true;
-    }
-    else if (strncmp("preview", wurds[0], 7) == 0)
-    {
-        if (is_valid_file(wurds[1]))
-        {
-            mixer_preview_track(mixr, wurds[1]);
         }
         cmd_found = true;
     }

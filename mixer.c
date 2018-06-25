@@ -124,8 +124,10 @@ void mixer_ps(mixer *mixr)
            " beat:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
+           ":::::::::: preview_enabled:%d filename:%s\n"
            ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s key:%s chord:%s %s octave:%d\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
+           mixr->preview.enabled, mixr->preview.filename,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
            mixr->active_midi_soundgen_num == -99
@@ -574,11 +576,18 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
         mixr->timing_info.cur_sample++;
 
+        if (mixr->preview.enabled)
+        {
+            stereo_val preview_audio = preview_buffer_generate(&mixr->preview);
+            output_left += preview_audio.left;
+            output_right += preview_audio.right;
+        }
+
         if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
         {
             if (mixr->timing_info.midi_tick % PPBAR == 0)
             {
-                //printf("Start of bar!\n");
+                // printf("Start of bar!\n");
                 mixr->bar_counter++;
                 if (mixr->bar_counter % 4 == 0)
                 {
@@ -598,7 +607,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                     }
                     unsigned int root = mixr->notes[scale_degree];
                     unsigned int chord_type = get_chord_type(scale_degree);
-                    //printf("Changing CHORD TO %s %s\n", key_names[root],
+                    // printf("Changing CHORD TO %s %s\n", key_names[root],
                     //       chord_type_names[chord_type]);
                     mixer_change_chord(mixr, root, chord_type);
                 }
@@ -865,13 +874,6 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
     return true;
 }
 
-void mixer_preview_track(mixer *mixr, char *filename)
-{
-    (void)mixr;
-    (void)filename;
-    // TODO
-}
-
 synthbase *get_synthbase(soundgenerator *self)
 {
     if (self->type == MINISYNTH_TYPE)
@@ -1028,4 +1030,42 @@ void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
 int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree)
 {
     return mixr->key + scale_degree;
+}
+
+void mixer_preview_audio(mixer *mixr, char *filename)
+{
+    preview_buffer_import_file(&mixr->preview, filename);
+}
+
+void preview_buffer_import_file(preview_buffer *buffy, char *filename)
+{
+    strncpy(buffy->filename, filename, 512);
+    audio_buffer_details deetz =
+        import_file_contents(&buffy->audio_buffer, filename);
+    buffy->audio_buffer_len = deetz.buffer_length;
+    buffy->num_channels = deetz.num_channels;
+    buffy->audio_buffer_read_idx = 0;
+    buffy->enabled = true;
+}
+
+stereo_val preview_buffer_generate(preview_buffer *buffy)
+{
+    stereo_val ret = {.0, .0};
+    if (!buffy->enabled || !buffy->audio_buffer)
+        return ret;
+
+    ret.left = buffy->audio_buffer[buffy->audio_buffer_read_idx];
+    if (buffy->num_channels == 1)
+        ret.right = ret.left;
+    else
+        ret.right = buffy->audio_buffer[buffy->audio_buffer_read_idx + 1];
+
+    buffy->audio_buffer_read_idx += buffy->num_channels;
+    if (buffy->audio_buffer_read_idx >= buffy->audio_buffer_len)
+    {
+        buffy->audio_buffer_read_idx = 0;
+        buffy->enabled = false;
+    }
+
+    return ret;
 }
