@@ -704,77 +704,13 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
     synthbase *base = get_synthbase(mixr->sound_generators[soundgen_num]);
 
     bool cmd_found = true;
-    if (pattern_num != -1)
+    // synthbase specific first, then patterns below
+    if (pattern_num == -1)
     {
-        if (is_valid_pattern_num(base, pattern_num))
+        if (strncmp("arp", wurds[0], 3) == 0)
         {
-            if (strncmp("cp", wurds[0], 2) == 0)
-            {
-                int sg2 = 0;
-                int pattern_num2 = 0;
-                sscanf(wurds[1], "%d:%d", &sg2, &pattern_num2);
-                printf("CP'ing %d:%d to %d:%d\n", soundgen_num, pattern_num,
-                       sg2, pattern_num2);
-                if (mixer_is_valid_soundgen_num(mixr, sg2) &&
-                    is_synth(mixr->sound_generators[sg2]))
-                {
-                    synthbase *sb2 = get_synthbase(mixr->sound_generators[sg2]);
-
-                    if (is_valid_pattern_num(base, pattern_num) &&
-                        is_valid_pattern_num(sb2, pattern_num2))
-                    {
-
-                        midi_event *loop_copy =
-                            synthbase_get_pattern(base, pattern_num);
-                        synthbase_set_pattern(sb2, pattern_num2, loop_copy);
-                    }
-                }
-            }
-            else if (strncmp("dupe", wurds[0], 4) == 0)
-            {
-                int new_pattern_num = synthbase_add_pattern(base);
-                synthbase_dupe_pattern(&base->patterns[pattern_num],
-                                       &base->patterns[new_pattern_num]);
-            }
-            else if (strncmp("numloops", wurds[0], 8) == 0)
-            {
-                int numloops = atoi(wurds[1]);
-                if (numloops != 0)
-                {
-                    synthbase_set_pattern_loop_num(base, pattern_num, numloops);
-                    printf("NUMLOOPS Now %d\n", numloops);
-                }
-            }
-            else if (strncmp("up", wurds[0], 2) == 0)
-            {
-                synthbase_change_octave_pattern(base, pattern_num, 1);
-            }
-            else if (strncmp("down", wurds[0], 4) == 0)
-            {
-                synthbase_change_octave_pattern(base, pattern_num, 0);
-            }
-            else if (strncmp("quantize", wurds[0], 8) == 0)
-            {
-                midi_pattern_quantize(&base->patterns[pattern_num]);
-            }
-            else
-            {
-                soundgenerator *sg = mixr->sound_generators[soundgen_num];
-                check_and_set_pattern(sg, pattern_num, NOTE_PATTERN, &wurds[0],
-                                      num_wurds);
-            }
-        }
-    }
-    else
-    {
-        if (strncmp("add", wurds[0], 3) == 0)
-        {
-            if (strncmp("melody", wurds[3], 6) == 0 ||
-                strncmp("pattern", wurds[3], 7) == 0)
-            {
-                int new_pattern_num = synthbase_add_pattern(base);
-                // TODO parse pattern
-            }
+            bool enable = atoi(wurds[1]);
+            synthbase_set_arp(base, enable);
         }
         else if (strncmp("chord_mode", wurds[0], 10) == 0)
         {
@@ -898,6 +834,67 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         }
         else
             cmd_found = false;
+    }
+    else
+    {
+        if (is_valid_pattern_num(base, pattern_num))
+        {
+            if (strncmp("cp", wurds[0], 2) == 0)
+            {
+                int sg2 = 0;
+                int pattern_num2 = 0;
+                sscanf(wurds[1], "%d:%d", &sg2, &pattern_num2);
+                printf("CP'ing %d:%d to %d:%d\n", soundgen_num, pattern_num,
+                       sg2, pattern_num2);
+                if (mixer_is_valid_soundgen_num(mixr, sg2) &&
+                    is_synth(mixr->sound_generators[sg2]))
+                {
+                    synthbase *sb2 = get_synthbase(mixr->sound_generators[sg2]);
+
+                    if (is_valid_pattern_num(base, pattern_num) &&
+                        is_valid_pattern_num(sb2, pattern_num2))
+                    {
+
+                        midi_event *loop_copy =
+                            synthbase_get_pattern(base, pattern_num);
+                        synthbase_set_pattern(sb2, pattern_num2, loop_copy);
+                    }
+                }
+            }
+            else if (strncmp("dupe", wurds[0], 4) == 0)
+            {
+                int new_pattern_num = synthbase_add_pattern(base);
+                synthbase_dupe_pattern(&base->patterns[pattern_num],
+                                       &base->patterns[new_pattern_num]);
+            }
+            else if (strncmp("numloops", wurds[0], 8) == 0)
+            {
+                int numloops = atoi(wurds[1]);
+                if (numloops != 0)
+                {
+                    synthbase_set_pattern_loop_num(base, pattern_num, numloops);
+                    printf("NUMLOOPS Now %d\n", numloops);
+                }
+            }
+            else if (strncmp("up", wurds[0], 2) == 0)
+            {
+                synthbase_change_octave_pattern(base, pattern_num, 1);
+            }
+            else if (strncmp("down", wurds[0], 4) == 0)
+            {
+                synthbase_change_octave_pattern(base, pattern_num, 0);
+            }
+            else if (strncmp("quantize", wurds[0], 8) == 0)
+            {
+                midi_pattern_quantize(&base->patterns[pattern_num]);
+            }
+            else
+            {
+                soundgenerator *sg = mixr->sound_generators[soundgen_num];
+                check_and_set_pattern(sg, pattern_num, NOTE_PATTERN, &wurds[0],
+                                      num_wurds);
+            }
+        }
     }
     return cmd_found;
 }

@@ -66,6 +66,8 @@ typedef struct synthbase
     int midi_note;
     int octave;
 
+    bool arp;
+
     // bool generate_mode; // magical
     // int generate_src;
     // int generate_every_n_loops;
@@ -150,3 +152,5 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern);
 
 void synthbase_set_octave(synthbase *base, int octave);
 int synthbase_get_octave(synthbase *base);
+
+void synthbase_set_arp(synthbase *base, bool b);

@@ -42,8 +42,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         cmd_found = true;
     }
 
-    else if (strncmp("play", wurds[0], 4) == 0 ||
-             strncmp("preview", wurds[0], 7) == 0)
+    else if (strncmp("pl", wurds[0], 2) == 0 ||
+             strncmp("preview", wurds[0], 7) == 0 ||
+             strncmp("play", wurds[0], 4) == 0)
     {
         if (is_valid_file(wurds[1]))
         {

@@ -190,18 +190,21 @@ void euclidean_event_notify(void *self, unsigned int event_type)
         }
         else if (e->mode == EUCLID_RANDOM)
         {
-            int dice = rand() % 4;
+            int dice = rand() % 5;
             switch (dice)
             {
             case (0):
                 e->actual_num_hits = 3;
                 break;
             case (1):
-                e->actual_num_hits = 5;
+                e->actual_num_hits = 4;
                 break;
             case (2):
-                e->actual_num_hits = 7;
+                e->actual_num_hits = 5;
+                break;
             case (3):
+                e->actual_num_hits = 7;
+            case (4):
             default:
                 e->actual_num_hits = 9;
             }

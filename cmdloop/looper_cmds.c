@@ -111,12 +111,12 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         int mode = atoi(wurds[3]);
                         looper_set_envelope_mode(g, mode);
                     }
-                    else if (strncmp("loop_mode", wurds[2], 9) == 0)
+                    else if (strncmp("mode", wurds[2], 4) == 0)
                     {
                         unsigned int mode = atoi(wurds[3]);
                         looper_set_loop_mode(g, mode);
                     }
-                    else if (strncmp("loop_len", wurds[2], 8) == 0)
+                    else if (strncmp("len", wurds[2], 3) == 0)
                     {
                         double len = atof(wurds[3]);
                         looper_set_loop_len(g, len);

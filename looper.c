@@ -441,8 +441,8 @@ void looper_status(void *self, wchar_t *status_string)
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
         "source:%s %s vol:%.2lf pitch:%.2f stereo:%d\n"
-        "loop_mode:%s gate_mode:%d idx:%.0f buf_len:%d\n"
-        "loop_len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
+        "mode:%s gate_mode:%d idx:%.0f buf_len:%d\n"
+        "len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
         "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
         "grain_dur_ms:%d grains_per_sec:%d density_dur_sync:%d "

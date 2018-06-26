@@ -36,7 +36,8 @@ void synthbase_init(synthbase *base, void *parent,
 
     base->last_midi_note = 23;
     base->midi_note = 23;
-    base->octave = -0;
+    base->octave = 1;
+    base->arp = false;
     base->sustain_note_ms = 200;
     base->note_mode = false;
 }
@@ -153,8 +154,8 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t patternstr[33] = {0};
 
     swprintf(scratch, 255,
-             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note:%d",
-             base->note_mode, base->chord_mode, base->octave, base->midi_note);
+             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note:%d arp:%d",
+             base->note_mode, base->chord_mode, base->octave, base->midi_note, base->arp);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)
@@ -590,3 +591,8 @@ void synthbase_set_octave(synthbase *base, int octave)
 }
 
 int synthbase_get_octave(synthbase *base) { return base->octave; }
+
+void synthbase_set_arp(synthbase *base, bool b)
+{
+    base->arp = b;
+}
