@@ -15,6 +15,9 @@ extern const int key_midi_mapping[NUM_KEYS];
 extern const char *key_names[NUM_KEYS];
 extern const compat_key_list compat_keys[NUM_KEYS];
 
+const char *s_arp_mode[] = {"UP", "DOWN", "UPDOWN", "RAND"};
+const char *s_arp_speed[] = {"32", "16", "8", "4"};
+
 extern mixer *mixr;
 
 void synthbase_init(synthbase *base, void *parent,
@@ -34,10 +37,14 @@ void synthbase_init(synthbase *base, void *parent,
     base->sample_rate = 44100;
     base->sample_rate_counter = 0;
 
-    base->last_midi_note = 23;
     base->midi_note = 23;
     base->octave = 1;
-    base->arp = false;
+
+    base->arp.enable = false;
+    base->arp.direction = UP;
+    base->arp.mode = ARP_UP;
+    base->arp.speed = ARP_16;
+
     base->sustain_note_ms = 200;
     base->note_mode = false;
 }
@@ -154,8 +161,12 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t patternstr[33] = {0};
 
     swprintf(scratch, 255,
-             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note:%d arp:%d",
-             base->note_mode, base->chord_mode, base->octave, base->midi_note, base->arp);
+             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note:%d\n"
+             L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
+             base->note_mode, base->chord_mode, base->octave, base->midi_note,
+             base->arp.enable, base->arp.last_midi_notes[0],
+             base->arp.last_midi_notes[1], base->arp.last_midi_notes[2],
+             s_arp_speed[base->arp.speed], s_arp_mode[base->arp.mode]);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)
@@ -211,7 +222,14 @@ void synthbase_event_notify(void *self, unsigned int event_type)
             midi_parse_midi_event(parent,
                                   &base->patterns[base->cur_pattern][idx]);
         }
-
+        break;
+    case (TIME_SIXTEENTH_TICK):
+        if (base->arp.enable)
+        {
+            midi_event on =
+                new_midi_event(MIDI_ON, arp_next_note(&base->arp), 128);
+            midi_parse_midi_event(parent, &on);
+        }
         break;
     }
 }
@@ -501,24 +519,6 @@ void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
         base->sustain_note_ms = sustain_note_ms;
 }
 
-void synthbase_set_rand_key(synthbase *base)
-{
-    int dice = rand() % 3;
-    printf("RAND KEY/NOTE! %d\n", dice);
-    switch (dice)
-    {
-    case (0):
-        base->last_midi_note = base->midi_note;
-        break;
-    case (1):
-        base->last_midi_note = base->midi_note + 4;
-        break;
-    case (2):
-        base->last_midi_note = base->midi_note + 7;
-        break;
-    }
-}
-
 void synthbase_set_midi_note(synthbase *base, int note)
 {
     base->midi_note = note;
@@ -592,7 +592,80 @@ void synthbase_set_octave(synthbase *base, int octave)
 
 int synthbase_get_octave(synthbase *base) { return base->octave; }
 
-void synthbase_set_arp(synthbase *base, bool b)
+void synthbase_enable_arp(synthbase *base, bool b) { base->arp.enable = b; }
+
+void arp_add_last_note(arpeggiator *arp, int note)
 {
-    base->arp = b;
+    bool found = false;
+    for (int i = 0; i < (MAX_NOTES_ARP); i++)
+    {
+        if (arp->last_midi_notes[i] == note)
+        {
+            found = true;
+            break;
+        }
+    }
+    if (!found)
+    {
+        for (int i = 0; i < (MAX_NOTES_ARP - 1); i++)
+            arp->last_midi_notes[i] = arp->last_midi_notes[i + 1];
+        arp->last_midi_notes[MAX_NOTES_ARP - 1] = note;
+    }
+}
+
+int arp_next_note(arpeggiator *arp)
+{
+    int midi_note = -1;
+    if (arp->mode == ARP_UP)
+    {
+        midi_note = arp->last_midi_notes[arp->last_midi_notes_idx++];
+        if (arp->last_midi_notes_idx >= MAX_NOTES_ARP)
+            arp->last_midi_notes_idx = 0;
+    }
+    else if (arp->mode == ARP_DOWN)
+    {
+        midi_note = arp->last_midi_notes[arp->last_midi_notes_idx--];
+        if (arp->last_midi_notes_idx <= 0)
+            arp->last_midi_notes_idx = MAX_NOTES_ARP - 1;
+    }
+    else if (arp->mode == ARP_UPDOWN)
+    {
+        midi_note = arp->last_midi_notes[arp->last_midi_notes_idx];
+        if (arp->direction == UP)
+        {
+            arp->last_midi_notes_idx++;
+            if (arp->last_midi_notes_idx >= MAX_NOTES_ARP)
+            {
+                arp->last_midi_notes_idx--;
+                arp->direction = DOWN;
+            }
+        }
+        else
+        {
+            arp->last_midi_notes_idx--;
+            if (arp->last_midi_notes_idx <= 0)
+            {
+                arp->last_midi_notes_idx++;
+                arp->direction = UP;
+            }
+        }
+    }
+    else if (arp->mode == ARP_RAND)
+    {
+        midi_note = arp->last_midi_notes[rand() % MAX_NOTES_ARP];
+    }
+
+    return midi_note;
+}
+
+void synthbase_set_arp_speed(synthbase *base, unsigned int speed)
+{
+    if (speed < ARP_MAX_SPEEDS)
+        base->arp.speed = speed;
+}
+
+void synthbase_set_arp_mode(synthbase *base, unsigned int mode)
+{
+    if (mode < ARP_MAX_MODES)
+        base->arp.mode = mode;
 }

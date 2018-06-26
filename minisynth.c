@@ -493,7 +493,6 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
 {
 
     synthbase *b = &ms->base;
-    // b->last_midi_note = midinote;
     if (ms->m_settings.m_monophonic)
     {
         minisynth_voice *msv = ms->m_voices[0];

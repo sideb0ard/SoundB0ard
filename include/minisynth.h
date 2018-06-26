@@ -138,8 +138,6 @@ typedef struct minisynth
     synthsettings m_settings;
     synthsettings m_settings_backup_while_getting_crazy;
 
-    // int m_last_midi_notes[MAX_VOICES];
-    // arpeggiator m_arp;
 
 } minisynth;
 

@@ -707,10 +707,20 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
     // synthbase specific first, then patterns below
     if (pattern_num == -1)
     {
+        if (strncmp("arp_mode", wurds[0], 8) == 0)
+        {
+            unsigned int mode = atoi(wurds[1]);
+            synthbase_set_arp_mode(base, mode);
+        }
+        if (strncmp("arp_speed", wurds[0], 9) == 0)
+        {
+            unsigned int speed = atoi(wurds[1]);
+            synthbase_set_arp_speed(base, speed);
+        }
         if (strncmp("arp", wurds[0], 3) == 0)
         {
             bool enable = atoi(wurds[1]);
-            synthbase_set_arp(base, enable);
+            synthbase_enable_arp(base, enable);
         }
         else if (strncmp("chord_mode", wurds[0], 10) == 0)
         {
@@ -741,10 +751,6 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             int sustain_note_ms = atoi(wurds[1]);
             if (sustain_note_ms > 0)
                 synthbase_set_sustain_note_ms(base, sustain_note_ms);
-        }
-        else if (strncmp("rand_note", wurds[0], 8) == 0)
-        {
-            synthbase_set_rand_key(base);
         }
         else if (strncmp("midi_note", wurds[0], 8) == 0)
         {

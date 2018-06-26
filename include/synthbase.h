@@ -35,6 +35,35 @@
 #define DEFAULT_MIDI_EXPRESSION 0
 #define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
 
+#define MAX_NOTES_ARP 3
+
+enum {
+    ARP_UP,
+    ARP_DOWN,
+    ARP_UPDOWN,
+    ARP_RAND,
+    ARP_MAX_MODES,
+};
+
+enum {
+    ARP_32,
+    ARP_16,
+    ARP_8,
+    ARP_4,
+    ARP_MAX_SPEEDS,
+};
+
+
+typedef struct arpeggiator
+{
+    bool enable;
+    unsigned int mode;
+    unsigned int speed;
+    unsigned int direction; // track UP or DOWN for arp mode UPDOWN
+    int last_midi_notes[MAX_NOTES_ARP];
+    int last_midi_notes_idx;
+} arpeggiator;
+
 typedef struct synthbase
 {
     void *parent;
@@ -62,11 +91,11 @@ typedef struct synthbase
     bool note_mode;
     bool chord_mode;
 
-    int last_midi_note;
     int midi_note;
     int octave;
 
-    bool arp;
+    arpeggiator arp;
+    // arpeggiator m_arp;
 
     // bool generate_mode; // magical
     // int generate_src;
@@ -153,4 +182,9 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern);
 void synthbase_set_octave(synthbase *base, int octave);
 int synthbase_get_octave(synthbase *base);
 
-void synthbase_set_arp(synthbase *base, bool b);
+
+void synthbase_enable_arp(synthbase *base, bool b);
+void synthbase_set_arp_speed(synthbase *base, unsigned int speed);
+void synthbase_set_arp_mode(synthbase *base, unsigned int mode);
+int arp_next_note(arpeggiator *arp);
+void arp_add_last_note(arpeggiator *arp, int note);

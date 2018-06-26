@@ -137,6 +137,11 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     if (base->note_mode)
         note = base->midi_note;
 
+    if (!ev->delete_after_use)
+    {
+        arp_add_last_note(&base->arp, note);
+    }
+
     if (sg->type == MINISYNTH_TYPE)
     {
         minisynth *ms = (minisynth *)sg;
@@ -147,6 +152,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         { // Hex 0x80
             minisynth_midi_note_on(ms, note, ev->data2);
 
+            // assumption here is that we want to generate event off if we don't
+            // have a controller
             if (!mixr->have_midi_controller)
             {
                 int sustain_time_in_ticks = ms->base.sustain_note_ms *
