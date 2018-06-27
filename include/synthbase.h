@@ -37,7 +37,8 @@
 
 #define MAX_NOTES_ARP 3
 
-enum {
+enum
+{
     ARP_UP,
     ARP_DOWN,
     ARP_UPDOWN,
@@ -45,14 +46,14 @@ enum {
     ARP_MAX_MODES,
 };
 
-enum {
+enum
+{
     ARP_32,
     ARP_16,
     ARP_8,
     ARP_4,
     ARP_MAX_SPEEDS,
 };
-
 
 typedef struct arpeggiator
 {
@@ -182,9 +183,9 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern);
 void synthbase_set_octave(synthbase *base, int octave);
 int synthbase_get_octave(synthbase *base);
 
-
 void synthbase_enable_arp(synthbase *base, bool b);
 void synthbase_set_arp_speed(synthbase *base, unsigned int speed);
 void synthbase_set_arp_mode(synthbase *base, unsigned int mode);
+void synthbase_do_arp(synthbase *base, soundgenerator *sg);
 int arp_next_note(arpeggiator *arp);
 void arp_add_last_note(arpeggiator *arp, int note);

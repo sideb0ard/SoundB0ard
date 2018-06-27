@@ -120,9 +120,9 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
             randy_fifth = fifth_midi - 12;
 
         if (randy_root > 0 && randy_root < 128)
-            root_midi =  randy_root;
+            root_midi = randy_root;
         if (randy_fifth > 0 && randy_fifth < 128)
-            fifth_midi =  randy_fifth;
+            fifth_midi = randy_fifth;
     }
 
     chnotes->root = root_midi;

@@ -124,7 +124,8 @@ typedef struct mixer
 
     double volume;
 
-    int bar_counter; // every 4 bar, change chord
+    int bars_per_chord;
+    int bar_counter;
     unsigned int key;
     unsigned int chord;
     unsigned int chord_type;
@@ -137,6 +138,10 @@ typedef struct mixer
 mixer *new_mixer(double output_latency);
 
 void mixer_ps(mixer *mixr);
+void mixer_status_seqz(mixer *mixr);
+void mixer_status_sgz(mixer *mixr);
+void mixer_status_mixr(mixer *mixr);
+void mixer_status_algoz(mixer *mixr);
 void mixer_update_bpm(mixer *mixr, int bpm);
 void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
 void mixer_emit_event(mixer *mixr, unsigned int event_type);
@@ -193,6 +198,7 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
 void mixer_set_notes(mixer *mixr);
 void mixer_set_octave(mixer *mixr, int octave);
+void mixer_set_bars_per_chord(mixer *mixr, int bars);
 
 double mixer_get_khz_per_bar(mixer *mixr);
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);

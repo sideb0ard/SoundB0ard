@@ -32,7 +32,31 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         cmd_found = true;
     }
+    // individual status types
+    else if (strncmp("seqz", wurds[0], 4) == 0)
+    {
+        mixer_status_seqz(mixr);
+    }
+    else if (strncmp("sgz", wurds[0], 3) == 0)
+    {
+        mixer_status_sgz(mixr);
+    }
+    else if (strncmp("mixr", wurds[0], 4) == 0)
+    {
+        mixer_status_mixr(mixr);
+    }
+    else if (strncmp("algoz", wurds[0], 4) == 0)
+    {
+        mixer_status_algoz(mixr);
+    }
 
+    else if (strncmp("bars_per_chord", wurds[0], 15) == 0)
+    {
+        int bars = atoi(wurds[1]);
+        mixer_set_bars_per_chord(mixr, bars);
+
+        cmd_found = true;
+    }
     else if (strncmp("every", wurds[0], 5) == 0)
     {
         algorithm *a = new_algorithm(num_wurds, wurds);

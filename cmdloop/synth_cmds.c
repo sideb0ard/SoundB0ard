@@ -715,7 +715,23 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         else if (strncmp("arp_speed", wurds[0], 9) == 0)
         {
             unsigned int speed = atoi(wurds[1]);
-            synthbase_set_arp_speed(base, speed);
+            switch (speed)
+            {
+            case (32):
+                synthbase_set_arp_speed(base, ARP_32);
+                break;
+            case (16):
+                synthbase_set_arp_speed(base, ARP_16);
+                break;
+            case (8):
+                synthbase_set_arp_speed(base, ARP_8);
+                break;
+            case (4):
+                synthbase_set_arp_speed(base, ARP_4);
+                break;
+            default:
+                printf("Speed has to be one of 32, 16, 8 or 4\n");
+            }
         }
         else if (strncmp("arp", wurds[0], 3) == 0)
         {

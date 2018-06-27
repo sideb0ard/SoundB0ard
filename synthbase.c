@@ -223,13 +223,21 @@ void synthbase_event_notify(void *self, unsigned int event_type)
                                   &base->patterns[base->cur_pattern][idx]);
         }
         break;
+    case (TIME_THIRTYSECOND_TICK):
+        if (base->arp.enable && base->arp.speed == ARP_32)
+            synthbase_do_arp(base, parent);
+        break;
     case (TIME_SIXTEENTH_TICK):
-        if (base->arp.enable)
-        {
-            midi_event on =
-                new_midi_event(MIDI_ON, arp_next_note(&base->arp), 128);
-            midi_parse_midi_event(parent, &on);
-        }
+        if (base->arp.enable && base->arp.speed == ARP_16)
+            synthbase_do_arp(base, parent);
+        break;
+    case (TIME_EIGHTH_TICK):
+        if (base->arp.enable && base->arp.speed == ARP_8)
+            synthbase_do_arp(base, parent);
+        break;
+    case (TIME_QUARTER_TICK):
+        if (base->arp.enable && base->arp.speed == ARP_4)
+            synthbase_do_arp(base, parent);
         break;
     }
 }
@@ -616,43 +624,50 @@ void arp_add_last_note(arpeggiator *arp, int note)
 int arp_next_note(arpeggiator *arp)
 {
     int midi_note = -1;
-    if (arp->mode == ARP_UP)
+    bool found = false;
+    for (int i = 0; i < 3 && !found; i++)
     {
-        midi_note = arp->last_midi_notes[arp->last_midi_notes_idx++];
-        if (arp->last_midi_notes_idx >= MAX_NOTES_ARP)
-            arp->last_midi_notes_idx = 0;
-    }
-    else if (arp->mode == ARP_DOWN)
-    {
-        midi_note = arp->last_midi_notes[arp->last_midi_notes_idx--];
-        if (arp->last_midi_notes_idx <= 0)
-            arp->last_midi_notes_idx = MAX_NOTES_ARP - 1;
-    }
-    else if (arp->mode == ARP_UPDOWN)
-    {
-        midi_note = arp->last_midi_notes[arp->last_midi_notes_idx];
-        if (arp->direction == UP)
+        if (arp->mode == ARP_UP)
         {
-            arp->last_midi_notes_idx++;
+            midi_note = arp->last_midi_notes[arp->last_midi_notes_idx++];
             if (arp->last_midi_notes_idx >= MAX_NOTES_ARP)
-            {
-                arp->last_midi_notes_idx--;
-                arp->direction = DOWN;
-            }
+                arp->last_midi_notes_idx = 0;
         }
-        else
+        else if (arp->mode == ARP_DOWN)
         {
-            arp->last_midi_notes_idx--;
+            midi_note = arp->last_midi_notes[arp->last_midi_notes_idx--];
             if (arp->last_midi_notes_idx <= 0)
+                arp->last_midi_notes_idx = MAX_NOTES_ARP - 1;
+        }
+        else if (arp->mode == ARP_UPDOWN)
+        {
+            midi_note = arp->last_midi_notes[arp->last_midi_notes_idx];
+            if (arp->direction == UP)
             {
                 arp->last_midi_notes_idx++;
-                arp->direction = UP;
+                if (arp->last_midi_notes_idx >= MAX_NOTES_ARP)
+                {
+                    arp->last_midi_notes_idx--;
+                    arp->direction = DOWN;
+                }
+            }
+            else
+            {
+                arp->last_midi_notes_idx--;
+                if (arp->last_midi_notes_idx <= 0)
+                {
+                    arp->last_midi_notes_idx++;
+                    arp->direction = UP;
+                }
             }
         }
-    }
-    else if (arp->mode == ARP_RAND)
-    {
-        midi_note = arp->last_midi_notes[rand() % MAX_NOTES_ARP];
+        else if (arp->mode == ARP_RAND)
+        {
+            midi_note = arp->last_midi_notes[rand() % MAX_NOTES_ARP];
+        }
+
+        if (midi_note != -1)
+            found = true;
     }
 
     return midi_note;
@@ -668,4 +683,18 @@ void synthbase_set_arp_mode(synthbase *base, unsigned int mode)
 {
     if (mode < ARP_MAX_MODES)
         base->arp.mode = mode;
+}
+
+void synthbase_do_arp(synthbase *base, soundgenerator *parent)
+{
+    int midi_note = arp_next_note(&base->arp);
+    if (midi_note != -1)
+    {
+        int idx = mixr->timing_info.midi_tick % PPBAR;
+        if (base->patterns[base->cur_pattern][idx].event_type != MIDI_ON)
+        {
+            midi_event on = new_midi_event(MIDI_ON, midi_note, 128);
+            midi_parse_midi_event(parent, &on);
+        }
+    }
 }

@@ -103,6 +103,7 @@ mixer *new_mixer(double output_latency)
     mixr->key = C;
     mixr->octave = 3;
     mixer_set_notes(mixr);
+    mixr->bars_per_chord = 4;
 
     // possible TODO - should i de-initialize?
     // is that cleaner code?
@@ -111,11 +112,10 @@ mixer *new_mixer(double output_latency)
     return mixr;
 }
 
-void mixer_ps(mixer *mixr)
+void mixer_status_mixr(mixer *mixr)
 {
     LinkData data = link_get_timing_data_for_display(mixr->m_ableton_link);
     // clang-format off
-    print_logo();
     printf(COOL_COLOR_GREEN
            "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
            ":::::::::: vol:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
@@ -125,7 +125,8 @@ void mixer_ps(mixer *mixr)
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
            ":::::::::: preview_enabled:%d filename:%s\n"
-           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s key:%s chord:%s %s octave:%d\n" ANSI_COLOR_RESET,
+           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s\n"
+           ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->preview.enabled, mixr->preview.filename,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
@@ -136,7 +137,7 @@ void mixer_ps(mixer *mixr)
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
            key_names[mixr->key], key_names[mixr->chord],
-           chord_type_names[mixr->chord_type], mixr->octave);
+           chord_type_names[mixr->chord_type], mixr->octave, mixr->bars_per_chord);
     // clang-format on
 
     // TODO - create env command to print these
@@ -173,7 +174,9 @@ void mixer_ps(mixer *mixr)
         }
         printf(ANSI_COLOR_RESET "\n");
     }
-
+}
+void mixer_status_algoz(mixer *mixr)
+{
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
     if (mixr->algorithm_num > 0)
     {
@@ -194,7 +197,10 @@ void mixer_ps(mixer *mixr)
             }
         }
     }
-
+}
+void mixer_status_seqz(mixer *mixr)
+{
+    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
     if (mixr->sequence_gen_num > 0)
     {
         printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
@@ -212,7 +218,10 @@ void mixer_ps(mixer *mixr)
             }
         }
     }
-
+}
+void mixer_status_sgz(mixer *mixr)
+{
+    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
     if (mixr->soundgen_num > 0)
     {
         printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
@@ -261,7 +270,16 @@ void mixer_ps(mixer *mixr)
             }
         }
     }
+}
 
+void mixer_ps(mixer *mixr)
+{
+
+    print_logo();
+    mixer_status_mixr(mixr);
+    mixer_status_algoz(mixr);
+    mixer_status_seqz(mixr);
+    mixer_status_sgz(mixr);
     printf(ANSI_COLOR_RESET);
 }
 
@@ -589,26 +607,26 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             {
                 // printf("Start of bar!\n");
                 mixr->bar_counter++;
-                if (mixr->bar_counter % 4 == 0)
+                if (mixr->bar_counter % mixr->bars_per_chord == 0)
                 {
-                    int chance = rand() % 3;
+                    int chance = rand() % 100;
                     unsigned int scale_degree = 0;
-                    if (chance == 0)
+                    if (chance < 30)
                     {
                         scale_degree = 0;
                     }
-                    else if (chance == 1)
+                    else if (chance < 50)
                     {
                         scale_degree = 3;
                     }
-                    else if (chance == 2)
+                    else if (chance < 75)
                     {
                         scale_degree = 4;
                     }
+                    else
+                        scale_degree = 5;
                     unsigned int root = mixr->notes[scale_degree];
                     unsigned int chord_type = get_chord_type(scale_degree);
-                    // printf("Changing CHORD TO %s %s\n", key_names[root],
-                    //       chord_type_names[chord_type]);
                     mixer_change_chord(mixr, root, chord_type);
                 }
             }
@@ -1016,6 +1034,11 @@ void mixer_set_octave(mixer *mixr, int octave)
 {
     if (octave > -10 && octave < 10)
         mixr->octave = octave;
+}
+void mixer_set_bars_per_chord(mixer *mixr, int bars)
+{
+    if (bars > 0 && bars < 32)
+        mixr->bars_per_chord = bars;
 }
 
 void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
