@@ -580,7 +580,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
         WANSI_COLOR_WHITE
         "%s " "%s" "algo:%d vol: %.1f active:%s porta:%.1f pitchrange:%d op4fb:%.2f\n"
         "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n"
-        "l1_dest1:%s l1_dest2:%s l1_dest3:%s l1_dest4:%s\n"
+        "l1_dest1:%s l1_dest2:%s\nl1_dest3:%s l1_dest4:%s\n"
         "o1wav:%d o1rat:%.2f o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n"
         "o2wav:%d o2rat:%.2f o2det:%.2f e2att:%.2f e2dec:%.2f e2sus:%.2f e2rel:%.2f\n"
         "o3wav:%d o3rat:%.2f o3det:%.2f e3att:%.2f e3dec:%.2f e3sus:%.2f e3rel:%.2f\n"

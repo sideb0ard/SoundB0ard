@@ -76,7 +76,6 @@ int main()
         fprintf(stderr, "Errrr, wit tha midi..\n");
     }
     pthread_join(input_th, NULL);
-    // loopy();
 
     // all done, time to go home
     pa_teardown();

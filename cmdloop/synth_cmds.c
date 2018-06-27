@@ -735,7 +735,6 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         }
         else if (strncmp("arp", wurds[0], 3) == 0)
         {
-            printf("EN/DIS-ABLE ARP!\n");
             bool enable = atoi(wurds[1]);
             synthbase_enable_arp(base, enable);
         }

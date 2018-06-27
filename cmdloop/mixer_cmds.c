@@ -150,8 +150,12 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("gen", wurds[0], 3) == 0)
     {
-        if (strncmp("melody", wurds[1], 6) == 0)
+        if (strncmp("melody", wurds[1], 6) == 0 ||
+            strncmp("once", wurds[1], 4) == 0)
         {
+            bool once = false;
+            if (strncmp("once", wurds[1], 4) == 0)
+                once = true;
             int generator = atoi(wurds[2]);
             int dest_sg_num = -1;
             int dest_sg_pattern_num = -1;
@@ -241,6 +245,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                             midi_event ev = {.event_type = MIDI_ON,
                                              .data1 = midi_note,
                                              .data2 = DEFAULT_VELOCITY};
+                            if (once)
+                                ev.delete_after_use = true;
                             pattern[midi_tick] = ev;
                         }
                     }
