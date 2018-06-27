@@ -50,8 +50,8 @@ const float midi_freq_table[128] = {
 
 float get_midi_freq(int midinum)
 {
-    // float freq = midi_freq_table[midinum];
-    // printf("MIDI:%d Freq:%f\n", midinum, freq);
-    // return freq;
+    if (midinum < 0 || midinum > 127)
+        midinum = 0;
+
     return midi_freq_table[midinum];
 }

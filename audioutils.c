@@ -105,14 +105,25 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
     //       fifth_midi);
 
     int randy = rand() % 100;
-    if (randy > 97)
-        root_midi += 12;
-    else if (randy > 95)
-        root_midi -= 12;
-    else if (randy > 92)
-        fifth_midi += 12;
-    else if (randy > 90)
-        fifth_midi -= 12;
+    if (randy > 90)
+    {
+        int randy_root = 0;
+        int randy_fifth = 0;
+
+        if (randy > 97)
+            randy_root = root_midi + 12;
+        else if (randy > 95)
+            randy_root = root_midi - 12;
+        else if (randy > 92)
+            randy_fifth = fifth_midi + 12;
+        else if (randy > 90)
+            randy_fifth = fifth_midi - 12;
+
+        if (randy_root > 0 && randy_root < 128)
+            root_midi =  randy_root;
+        if (randy_fifth > 0 && randy_fifth < 128)
+            fifth_midi =  randy_fifth;
+    }
 
     chnotes->root = root_midi;
     chnotes->third = third_midi;
