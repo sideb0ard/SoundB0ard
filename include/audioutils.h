@@ -16,6 +16,7 @@ typedef struct chord_midi_notes
     int root;
     int third;
     int fifth;
+    int seventh;
 } chord_midi_notes;
 
 enum

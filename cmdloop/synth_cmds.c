@@ -712,13 +712,14 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             unsigned int mode = atoi(wurds[1]);
             synthbase_set_arp_mode(base, mode);
         }
-        if (strncmp("arp_speed", wurds[0], 9) == 0)
+        else if (strncmp("arp_speed", wurds[0], 9) == 0)
         {
             unsigned int speed = atoi(wurds[1]);
             synthbase_set_arp_speed(base, speed);
         }
-        if (strncmp("arp", wurds[0], 3) == 0)
+        else if (strncmp("arp", wurds[0], 3) == 0)
         {
+            printf("EN/DIS-ABLE ARP!\n");
             bool enable = atoi(wurds[1]);
             synthbase_enable_arp(base, enable);
         }
