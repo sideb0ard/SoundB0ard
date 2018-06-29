@@ -1113,7 +1113,7 @@ void mixer_check_for_midi_messages(mixer *mixr)
             int data1 = Pm_MessageData1(msg[i].message);
             int data2 = Pm_MessageData2(msg[i].message);
 
-            if (mixr->debug_mode)
+            if (mixr->midi_print_notes)
                 printf("[MIDI message] status:%d data1:%d "
                        "data2:%d\n",
                        status, data1, data2);

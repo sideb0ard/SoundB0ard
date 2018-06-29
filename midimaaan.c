@@ -90,7 +90,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
 
     if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
     {
-        arp_add_last_note(&base->arp, note);
+        if (ev->event_type == MIDI_ON)
+            arp_add_last_note(&base->arp, note);
     }
 
     if (sg->type == MINISYNTH_TYPE)
