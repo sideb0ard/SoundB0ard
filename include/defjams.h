@@ -209,8 +209,8 @@ typedef struct stereo_val
 
 enum
 {
-    EXTERNAL_DEVICE,
     INTERNAL_SYNTH,
+    EXTERNAL_DEVICE,
 }; // source of midi event
 
 typedef struct midi_event

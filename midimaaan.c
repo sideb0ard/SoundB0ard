@@ -88,7 +88,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     if (base->note_mode)
         note = base->midi_note;
 
-    if (!ev->delete_after_use)
+    if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
     {
         arp_add_last_note(&base->arp, note);
     }
@@ -145,13 +145,17 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         case (144):
         { // Hex 0x80
             dxsynth_midi_note_on(dx, note, ev->data2);
-            int sustain_time_in_ticks =
-                dx->base.sustain_note_ms * mixr->timing_info.midi_ticks_per_ms;
-            int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-            midi_event off = new_midi_event(128, note, 128);
-            off.delete_after_use = true;
-            synthbase_add_event(&dx->base, dx->base.cur_pattern, note_off_tick,
-                                off);
+            if (ev->source != EXTERNAL_DEVICE)
+            {
+                int sustain_time_in_ticks = dx->base.sustain_note_ms *
+                                            mixr->timing_info.midi_ticks_per_ms;
+                int note_off_tick =
+                    (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
+                midi_event off = new_midi_event(128, note, 128);
+                off.delete_after_use = true;
+                synthbase_add_event(&dx->base, dx->base.cur_pattern,
+                                    note_off_tick, off);
+            }
             break;
         }
         case (128):
