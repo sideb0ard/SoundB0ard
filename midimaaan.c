@@ -18,7 +18,7 @@
 
 extern mixer *mixr;
 
-void *midiman()
+void *midi_init()
 {
     printf("MIDI maaaaan!\n");
     pthread_setname_np("Midimaaaan");
@@ -41,7 +41,6 @@ void *midiman()
             {
                 dev = i;
                 strncpy(mixr->midi_controller_name, info->name, 127);
-                mixr->have_midi_controller = true;
                 break;
             }
         }
@@ -52,63 +51,15 @@ void *midiman()
         return NULL;
     }
 
-    PortMidiStream *mstream;
-    retval = Pm_OpenInput(&mstream, dev, NULL, 512L, NULL, NULL);
+    retval = Pm_OpenInput(&mixr->midi_stream, dev, NULL, 512L, NULL, NULL);
     if (retval != pmNoError)
     {
         printf("Err opening input for MPKmini2: %s\n", Pm_GetErrorText(retval));
+        Pm_Terminate();
         return NULL;
     }
 
-    PmEvent msg[32];
-    while (1)
-    {
-        if (Pm_Poll(mstream))
-        {
-            cnt = Pm_Read(mstream, msg, 32);
-            for (int i = 0; i < cnt; i++)
-            {
-                int status = Pm_MessageStatus(msg[i].message);
-                int data1 = Pm_MessageData1(msg[i].message);
-                int data2 = Pm_MessageData2(msg[i].message);
-
-                if (mixr->debug_mode)
-                    printf("[MIDI message] status:%d data1:%d "
-                           "data2:%d\n",
-                           status, data1, data2);
-
-                if (mixr->midi_control_destination == SYNTH)
-                {
-
-                    soundgenerator *sg =
-                        mixr->sound_generators[mixr->active_midi_soundgen_num];
-
-                    synthbase *base = get_synthbase(sg);
-
-                    if (base->recording)
-                    {
-                        int tick = mixr->timing_info.midi_tick % PPBAR;
-                        midi_event ev = new_midi_event(status, data1, data2);
-                        synthbase_add_event(base, base->cur_pattern, tick, ev);
-                    }
-
-                    midi_event ev;
-                    ev.event_type = status;
-                    ev.data1 = data1;
-                    ev.data2 = data2;
-                    ev.delete_after_use = false;
-                    midi_parse_midi_event(sg, &ev);
-                }
-                else
-                {
-                    printf("Got midi but not connected to "
-                           "synth\n");
-                }
-            }
-        }
-    }
-    Pm_Close(mstream);
-    Pm_Terminate();
+    mixr->have_midi_controller = true;
 
     return NULL;
 }
@@ -152,9 +103,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         { // Hex 0x80
             minisynth_midi_note_on(ms, note, ev->data2);
 
-            // assumption here is that we want to generate event off if we don't
-            // have a controller
-            if (!mixr->have_midi_controller)
+            if (ev->source != EXTERNAL_DEVICE)
             {
                 int sustain_time_in_ticks = ms->base.sustain_note_ms *
                                             mixr->timing_info.midi_ticks_per_ms;

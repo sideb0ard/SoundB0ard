@@ -125,7 +125,7 @@ void mixer_status_mixr(mixer *mixr)
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
            ":::::::::: preview_enabled:%d filename:%s\n"
-           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s\n"
+           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s midi_print:%d\n"
            ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->preview.enabled, mixr->preview.filename,
@@ -136,6 +136,7 @@ void mixer_status_mixr(mixer *mixr)
                : s_midi_control_type_name
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
+           mixr->midi_print_notes,
            key_names[mixr->key], key_names[mixr->chord],
            chord_type_names[mixr->chord_type], mixr->octave, mixr->bars_per_chord);
     // clang-format on
@@ -537,6 +538,8 @@ static void mixer_events_output(mixer *mixr)
 
     if (mixr->timing_info.is_midi_tick)
     {
+        mixer_check_for_midi_messages(mixr);
+
         if (mixr->timing_info.midi_tick % 120 == 0)
         {
             mixr->timing_info.is_thirtysecond = true;
@@ -1092,4 +1095,57 @@ stereo_val preview_buffer_generate(preview_buffer *buffy)
     }
 
     return ret;
+}
+
+void mixer_enable_print_midi(mixer *mixr, bool b)
+{
+    mixr->midi_print_notes = b;
+}
+void mixer_check_for_midi_messages(mixer *mixr)
+{
+    PmEvent msg[32];
+    if (Pm_Poll(mixr->midi_stream))
+    {
+        int cnt = Pm_Read(mixr->midi_stream, msg, 32);
+        for (int i = 0; i < cnt; i++)
+        {
+            int status = Pm_MessageStatus(msg[i].message);
+            int data1 = Pm_MessageData1(msg[i].message);
+            int data2 = Pm_MessageData2(msg[i].message);
+
+            if (mixr->debug_mode)
+                printf("[MIDI message] status:%d data1:%d "
+                       "data2:%d\n",
+                       status, data1, data2);
+
+            if (mixr->midi_control_destination == SYNTH)
+            {
+
+                soundgenerator *sg =
+                    mixr->sound_generators[mixr->active_midi_soundgen_num];
+
+                synthbase *base = get_synthbase(sg);
+
+                if (base->recording)
+                {
+                    int tick = mixr->timing_info.midi_tick % PPBAR;
+                    midi_event ev = new_midi_event(status, data1, data2);
+                    synthbase_add_event(base, base->cur_pattern, tick, ev);
+                }
+
+                midi_event ev;
+                ev.source = EXTERNAL_DEVICE;
+                ev.event_type = status;
+                ev.data1 = data1;
+                ev.data2 = data2;
+                ev.delete_after_use = false;
+                midi_parse_midi_event(sg, &ev);
+            }
+            else
+            {
+                printf("Got midi but not connected to "
+                       "synth\n");
+            }
+        }
+    }
 }

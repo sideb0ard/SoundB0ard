@@ -47,7 +47,6 @@ void synthbase_init(synthbase *base, void *parent,
     for (int i = 0; i < MAX_NOTES_ARP; i++)
         base->arp.last_midi_notes[i] = -1;
 
-
     base->sustain_note_ms = 200;
     base->note_mode = false;
 }

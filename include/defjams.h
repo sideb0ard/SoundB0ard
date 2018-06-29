@@ -207,8 +207,15 @@ typedef struct stereo_val
     double right;
 } stereo_val;
 
+enum
+{
+    EXTERNAL_DEVICE,
+    INTERNAL_SYNTH,
+}; // source of midi event
+
 typedef struct midi_event
 {
+    unsigned int source;
     unsigned event_type;
     unsigned data1;
     unsigned data2;

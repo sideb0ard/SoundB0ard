@@ -11,7 +11,7 @@ typedef enum
     OCTAVE_CHANGE
 } custom_event_type;
 
-void *midiman(void *);
+void *midi_init(void *);
 
 midi_event new_midi_event(int event_type, int data1, int data2);
 void midi_event_cp(midi_event *from, midi_event *to);

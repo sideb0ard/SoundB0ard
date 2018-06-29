@@ -2,6 +2,7 @@
 #define MIXER_H
 
 #include "portaudio.h"
+#include "portmidi.h"
 #include <pthread.h>
 
 #include "ableton_link_wrapper.h"
@@ -106,7 +107,10 @@ typedef struct mixer
     int current_scene;
     int current_scene_bar_count;
 
+    PortMidiStream *midi_stream;
     bool have_midi_controller;
+
+    bool midi_print_notes;
     char midi_controller_name[128];
     unsigned int midi_control_destination;
     unsigned int m_midi_controller_mode; // to switch control knob routing
@@ -205,10 +209,12 @@ int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
 void mixer_change_chord(mixer *mixr, unsigned int root,
                         unsigned int chord_type);
 int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
+void mixer_enable_print_midi(mixer *mixr, bool b);
+void mixer_check_for_midi_messages(mixer *mixr);
 
-synthbase *get_synthbase(soundgenerator *self);
-// this is in mixer.h rather than synthbase, as mixer needs to transform sg
+// these are in mixer.h rather than synthbase, as mixer needs to transform sg
 // first
+synthbase *get_synthbase(soundgenerator *self);
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi);
 

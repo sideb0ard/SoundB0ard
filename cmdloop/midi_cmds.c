@@ -94,20 +94,20 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         return true;
     }
+    else if (strncmp("midi_print", wurds[0], 10) == 0)
+    {
+        bool b = atoi(wurds[1]);
+        mixer_enable_print_midi(mixr, b);
+    }
     else if (strncmp("midi", wurds[0], 4) == 0)
     {
         printf("MIDI Time!\n");
-        // int sgnum = add_minisynth(mixr);
-        // mixr->midi_control_destination = SYNTH;
-        // mixr->active_midi_soundgen_num = sgnum;
         if (strncmp("init", wurds[1], 4) == 0)
         {
             if (!mixr->have_midi_controller)
             {
-                printf("Initializing MIDI\n");
-                //// run the MIDI event looprrr...
                 pthread_t midi_th;
-                if (pthread_create(&midi_th, NULL, midiman, NULL))
+                if (pthread_create(&midi_th, NULL, midi_init, NULL))
                 {
                     fprintf(stderr, "Errrr, wit tha midi..\n");
                 }
