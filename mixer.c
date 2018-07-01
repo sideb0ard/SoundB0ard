@@ -1006,11 +1006,11 @@ int mixer_print_timing_info(mixer *mixr)
     return 0;
 }
 
-double mixer_get_khz_per_bar(mixer *mixr)
+double mixer_get_hz_per_bar(mixer *mixr)
 {
 
-    double khz = 1000. / mixr->bpm;
-    return khz / 4.;
+    double hz_per_beat = (60. / mixr->bpm);
+    return hz_per_beat;
 }
 
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
@@ -1020,16 +1020,22 @@ int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
         ticks = mixr->timing_info.loop_len_in_ticks;
+        break;
     case (TIME_MIDI_TICK):
         ticks = 1;
+        break;
     case (TIME_QUARTER_TICK):
         ticks = PPQN;
+        break;
     case (TIME_EIGHTH_TICK):
         ticks = PPQN / 2;
+        break;
     case (TIME_SIXTEENTH_TICK):
         ticks = PPQN / 4;
+        break;
     case (TIME_THIRTYSECOND_TICK):
         ticks = PPQN / 8;
+        break;
     }
     return ticks;
 }

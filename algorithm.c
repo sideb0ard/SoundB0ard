@@ -277,7 +277,7 @@ void algorithm_replace_vars_in_cmd(algorithm *a)
     }
     else if (a->var_select_type == VAR_OSC)
     {
-        if (a->env.variable_list_len > 2)
+        if (a->env.variable_list_len >= 2)
         {
             double lo = atof(a->env.variable_list_vals[0]);
             double hi = atof(a->env.variable_list_vals[1]);
@@ -301,8 +301,7 @@ void algorithm_replace_vars_in_cmd(algorithm *a)
                         scaleybum(0, num_ticks_per_cycle, lo, hi,
                                   (halfway - (cur_midi_tick - halfway)) * 2);
                 }
-
-                itoa(relative_position, replacement_value);
+                sprintf(replacement_value, "%f", relative_position);
             }
             else
             {

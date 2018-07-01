@@ -165,7 +165,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         double rate = atof(wurds[3]);
                         if (strncmp(wurds[3], "sync", 4) == 0)
                         {
-                            rate = mixer_get_khz_per_bar(mixr);
+                            rate = mixer_get_hz_per_bar(mixr);
                             int bars = atoi(wurds[4]);
                             if (bars > 0)
                                 rate /= bars;
@@ -210,7 +210,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         double rate = atof(wurds[3]);
                         if (strncmp(wurds[3], "sync", 4) == 0)
                         {
-                            rate = mixer_get_khz_per_bar(mixr);
+                            rate = mixer_get_hz_per_bar(mixr);
                             int bars = atoi(wurds[4]);
                             if (bars > 0)
                                 rate /= bars;
@@ -255,7 +255,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         double rate = atof(wurds[3]);
                         if (strncmp(wurds[3], "sync", 4) == 0)
                         {
-                            rate = mixer_get_khz_per_bar(mixr);
+                            rate = mixer_get_hz_per_bar(mixr);
                             int bars = atoi(wurds[4]);
                             if (bars > 0)
                                 rate /= bars;
@@ -300,7 +300,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         double rate = atof(wurds[3]);
                         if (strncmp(wurds[3], "sync", 4) == 0)
                         {
-                            rate = mixer_get_khz_per_bar(mixr);
+                            rate = mixer_get_hz_per_bar(mixr);
                             int bars = atoi(wurds[4]);
                             if (bars > 0)
                                 rate /= bars;

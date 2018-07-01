@@ -204,7 +204,7 @@ void mixer_set_notes(mixer *mixr);
 void mixer_set_octave(mixer *mixr, int octave);
 void mixer_set_bars_per_chord(mixer *mixr, int bars);
 
-double mixer_get_khz_per_bar(mixer *mixr);
+double mixer_get_hz_per_bar(mixer *mixr);
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
 void mixer_change_chord(mixer *mixr, unsigned int root,
                         unsigned int chord_type);
