@@ -1,0 +1,113 @@
+dloops/hausBreakBeat.aiff
+waveshape
+
+digi 2 notes/technoNoteSingle.aiff w/ HATS_MASK
+every 4 bar gen melody 0 1:0
+
+step noises/sndNoize.aiff w/ HATS_MASK
+
+new gran loops/pumpUpDaJAM.aiff 4
+
+step synth load  warppe // markov HIPHOP
+every 1 bar rand "40 50 60 74" step 4 o1_fo %s
+
+every 3 invert markov hats
+hats/dmx_hh_cl.aif
+hats/hh8.aif
+
+
+loops/MrFINGERSspeedBass.aiff
+filter 3000 // LFO sync
+
+
+claps/technotron.aiff
+
+breakdown::
+cut dloops/hausBreakBeat.aiff
+filter loops/MrFINGERSspeedBass.aiff 0.03
+
+
+# drones/moodIIswing.aiff
+
+
+dloops/rabveBreaskB.aiff
+
+
+moog aqua
+moog 12:0 ~ f4*3 ~ a4
+moog 12:1 ~ f4*3 ~ [~ ~ a4 ~]
+moog 12  l1_filter_en 1
+moog 12 l1rate 8
+
+loops/raveBass.aiff
+
+strings/darkMoWaxStrings.aiff
+
+
+[moog 10] rumbllrrSQR // gen melody HIPHOP
+
+kicks/BASSk.aiff
+
+claps/djkhaledClap.aiff
+dloops/NeedleClickBeat.aiff // pitch 2 len 0.5
+waveshape 2
+
+invert
+hats/dmx_hh_cl.aif
+hats/hh8.aif
+
+ALGO1
+bpm 160
+new gran loops/JungleBassNeedleWobble.aiff; loop 0 loop_mode 0
+perc/DR660CR78woodblock.aif // root_note 4 //basey
+noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
+
+ALGO2
+[sequence generators]
+[sound generators]
+[step 1] kicks/CLunkT.aiff  vol:0.70 pitch:1.00
+[step 2] hats/DR660Hihatlightclosed.aif  vol:0.20 pitch:1.00
+[step 3] hats/cloeyhatz.aiff  vol:0.30 pitch:1.00
+[step 4] snrs/slaveSnare.aiff  vol:0.70 pitch:1.00
+[loop 9] source:loops/FingersFadeBassStrings.aiff  vol:0.00 pitch:1.00
+[loop 15] source:loops/busitACID.aiff  vol:0.15 pitch:2.00
+[loop 23] source:loops/HARDCOREmelodySLOWLOUD.aiff  vol:0.70 pitch:1.00
+[loop 27] source:strings/breoknRiser.aiff  vol:0.40 pitch:1.00
+
+##################
+
+[algorithms]
+[algo 0] process:every step:3 event:bar var_select:rand var_list:
+         cmd:invert 0 0:0 2:0
+[algo 1] process:every step:7 event:bar var_select:rand var_list:
+         cmd:invert 0 1:0 0:0
+
+[ 1]  [SEQUENCE GEN ] - infix pattern: ( t * t ) / ( t >> 13 ^ t >> 8 )
+rpn pattern: t t * t 13 >> t 8 >> ^ /
+
+[sound generators]
+[step 0] perc/CrackleDonnaBreath.aiff  vol:0.70 pitch:1.00
+[step 1] noises/NeedleJump.aiff  vol:0.30 pitch:1.00
+[step 2] perc/cracklPERC2.aiff  vol:0.70 pitch:1.00
+
+ALGO7
+loops/ohmdrum.aiff
+dloops/tecnAe.aiff
+loops/HARDCOREmelody.aiff
+new bitshift ((t/1000)^(t/1001))*t
+dx rar - octave 2
+
+dloops/acidSquelchBeat.aiff
+loops/JungleBassNeedleWobble.aiff
+fuckup
+
+perc/DR660CR78woodblock.aif
+
+
+dx rzrrr and rzr235 // midi_note 35 dx 6 gen euclid
+every 3 bar rand "35 39 42" dx 6 midi_note %s
+
+BPM 120
+dloops/mkLikeloop.aiff
+loops/raveStabsCmon.aiff
+loops/innercitystylesound.aiff
