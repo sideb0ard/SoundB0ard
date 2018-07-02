@@ -37,7 +37,10 @@ void synthbase_init(synthbase *base, void *parent,
     base->sample_rate = 44100;
     base->sample_rate_counter = 0;
 
-    base->midi_note = 23;
+    base->midi_note_1 = 24; // C0
+    base->midi_note_2 = 32; // G#0
+    base->midi_note_3 = 31; // G0
+
     base->octave = 1;
 
     base->arp.enable = false;
@@ -77,7 +80,7 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
             int shift_by = patternlen - 1 - i;
             if (bits & (1 << shift_by))
             {
-                synthbase_add_note(base, base->cur_pattern, i, base->midi_note,
+                synthbase_add_note(base, base->cur_pattern, i, base->midi_note_1,
                                    keep_note);
             }
         }
@@ -163,9 +166,11 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t patternstr[33] = {0};
 
     swprintf(scratch, 255,
-             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note:%d\n"
+             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note_1:%d"
+             L"midi_note_2:%d midi_note_3:%d\n"
              L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
-             base->note_mode, base->chord_mode, base->octave, base->midi_note,
+             base->note_mode, base->chord_mode, base->octave,
+             base->midi_note_1, base->midi_note_2, base->midi_note_3,
              base->arp.enable, base->arp.last_midi_notes[0],
              base->arp.last_midi_notes[1], base->arp.last_midi_notes[2],
              s_arp_speed[base->arp.speed], s_arp_mode[base->arp.mode]);
@@ -529,9 +534,19 @@ void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
         base->sustain_note_ms = sustain_note_ms;
 }
 
-void synthbase_set_midi_note(synthbase *base, int note)
+void synthbase_set_midi_note(synthbase *base, int midi_note_num, int note)
 {
-    base->midi_note = note;
+    switch(midi_note_num){
+    case(1):
+        base->midi_note_1 = note;
+        break;
+    case(2):
+        base->midi_note_2 = note;
+        break;
+    case(3):
+        base->midi_note_3 = note;
+        break;
+    }
 }
 
 midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)

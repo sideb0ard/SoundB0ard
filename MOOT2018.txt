@@ -111,3 +111,6 @@ BPM 120
 dloops/mkLikeloop.aiff
 loops/raveStabsCmon.aiff
 loops/innercitystylesound.aiff
+
+dloops/GetHype.aiff
+every 2 bar rand "1 0.7 1.4 2" loop 0 pitch %s

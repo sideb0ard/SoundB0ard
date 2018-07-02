@@ -57,7 +57,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         cmd_found = true;
     }
-    else if (strncmp("every", wurds[0], 5) == 0)
+    else if (strncmp("every", wurds[0], 5) == 0 || 
+             strncmp("over", wurds[0], 4) == 0)
     {
         algorithm *a = new_algorithm(num_wurds, wurds);
         if (a)
@@ -151,11 +152,19 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     else if (strncmp("gen", wurds[0], 3) == 0)
     {
         if (strncmp("melody", wurds[1], 6) == 0 ||
-            strncmp("once", wurds[1], 4) == 0)
+            strncmp("once", wurds[1], 4) == 0 ||
+            strncmp("top", wurds[1], 3) == 0 ||
+            strncmp("riff", wurds[1], 4) == 0)
         {
             bool once = false;
+            bool riff = false;
+            bool top = false; // like a riff but higher
             if (strncmp("once", wurds[1], 4) == 0)
                 once = true;
+            if (strncmp("riff", wurds[1], 4) == 0)
+                riff = true;
+            if (strncmp("top", wurds[1], 3) == 0)
+                riff = true;
             int generator = atoi(wurds[2]);
             int dest_sg_num = -1;
             int dest_sg_pattern_num = -1;
@@ -239,9 +248,30 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                                     break;
                                 }
                             }
-                            midi_tick = multiplier * j;
+                            if (riff)
+                            {
+                                if (j < 12)
+                                    midi_note = base->midi_note_1;
+                                else if (j < 14)
+                                    midi_note = base->midi_note_2;
+                                else
+                                    midi_note = base->midi_note_3;
+                            }
+                            else if (top)
+                            {
+                                int randy = rand() % 100;
+                                if (randy < 70)
+                                    midi_note = base->midi_note_1 + 12;
+                                else if (randy < 85)
+                                    midi_note = base->midi_note_2 + 12;
+                                else
+                                    midi_note = base->midi_note_3 + 12;
+                            }
+
                             if (rand() % 100 > 90)
                                 midi_note += 12; // up an octave
+
+                            midi_tick = multiplier * j;
                             midi_event ev = {.event_type = MIDI_ON,
                                              .data1 = midi_note,
                                              .data2 = DEFAULT_VELOCITY};

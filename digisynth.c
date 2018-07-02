@@ -92,10 +92,14 @@ void digisynth_status(void *self, wchar_t *status_string)
     digisynth *ds = (digisynth *)self;
     swprintf(status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
-                               " vol: %.2f active: %s midi_note:%d "
+                               " vol: %.2f active: %s midi_note_1:%d "
+                               "midi_note_2:%d midi_note_3:%d "
                                "sample_len:%d read_idx:%d",
              ds->audiofile, ds->vol,
-             ds->sound_generator.active ? "true" : "false", ds->base.midi_note,
+             ds->sound_generator.active ? "true" : "false",
+             ds->base.midi_note_1,
+             ds->base.midi_note_2,
+             ds->base.midi_note_3,
              ds->m_voices[0].m_osc1.afd.samplecount,
              ds->m_voices[0].m_osc1.m_read_idx);
     wchar_t scratch[1024] = {};

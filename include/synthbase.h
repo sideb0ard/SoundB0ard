@@ -92,7 +92,9 @@ typedef struct synthbase
     bool note_mode;
     bool chord_mode;
 
-    int midi_note;
+    int midi_note_1;
+    int midi_note_2;
+    int midi_note_3;
     int octave;
 
     arpeggiator arp;
@@ -122,7 +124,7 @@ void synthbase_set_sample_rate(synthbase *base, int sample_rate);
 void synthbase_status(synthbase *base, wchar_t *status_string);
 void synthbase_event_notify(void *self, unsigned int event_type);
 void synthbase_set_rand_key(synthbase *base);
-void synthbase_set_midi_note(synthbase *base, int root_key);
+void synthbase_set_midi_note(synthbase *base, int midi_note_idx, int root_key);
 
 void synthbase_clear_pattern_ready_for_new_one(synthbase *base,
                                                int pattern_num);

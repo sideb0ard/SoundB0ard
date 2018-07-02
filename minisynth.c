@@ -687,7 +687,8 @@ void minisynth_status(void *self, wchar_t *status_string)
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE "%s\n"
         "%s"
-        "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) midi_note:%d mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
+        "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) "
+        "mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
 
         "osc1:%s(%d) osc2:%s(%d) osc3:%s(%d) osc4:%s(%d)\n"
 
@@ -720,7 +721,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         s_voice_names[ms->m_settings.m_voice_mode],
         INSTRUMENT_YELLOW,
         ms->m_settings.m_voice_mode,
-        ms->base.midi_note,
+
         ms->m_settings.m_monophonic,
         ms->m_settings.m_detune_cents,
         ms->m_settings.m_legato_mode,

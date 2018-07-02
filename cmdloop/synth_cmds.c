@@ -616,7 +616,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             bool b = atoi(wurds[1]);
             synthbase_set_chord_mode(base, b);
         }
-        else if (strncmp("note_mode", wurds[0], 10) == 0)
+        else if (strncmp("note_mode", wurds[0], 9) == 0)
         {
             bool b = atoi(wurds[1]);
             synthbase_set_note_mode(base, b);
@@ -627,7 +627,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             {
                 int six16th = atoi(wurds[i]) % 16;
                 synthbase_add_note(base, base->cur_pattern, six16th,
-                                   base->midi_note, true);
+                                   base->midi_note_1, true);
             }
         }
         else if (strncmp("num_patterns", wurds[0], 12) == 0)
@@ -641,10 +641,20 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             if (sustain_note_ms > 0)
                 synthbase_set_sustain_note_ms(base, sustain_note_ms);
         }
-        else if (strncmp("midi_note", wurds[0], 8) == 0)
+        else if (strncmp("midi_note_1", wurds[0], 11) == 0)
         {
             int midi_note = atoi(wurds[1]);
-            synthbase_set_midi_note(base, midi_note);
+            synthbase_set_midi_note(base, 1, midi_note);
+        }
+        else if (strncmp("midi_note_2", wurds[0], 11) == 0)
+        {
+            int midi_note = atoi(wurds[1]);
+            synthbase_set_midi_note(base, 2, midi_note);
+        }
+        else if (strncmp("midi_note_3", wurds[0], 11) == 0)
+        {
+            int midi_note = atoi(wurds[1]);
+            synthbase_set_midi_note(base, 3, midi_note);
         }
         else if (strncmp("oct", wurds[0], 3) == 0 ||
                  strncmp("octave", wurds[0], 6) == 0)

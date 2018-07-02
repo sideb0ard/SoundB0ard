@@ -85,8 +85,16 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     synthbase *base = get_synthbase(sg);
 
     int note = ev->data1;
-    if (base->note_mode)
-        note = base->midi_note;
+    //if (base->note_mode)
+    //{
+    //    int randy = rand() % 100;
+    //    if (randy < 70)
+    //        note = base->midi_note_1;
+    //    else if (randy < 85)
+    //        note = base->midi_note_2;
+    //    else
+    //        note = base->midi_note_3;
+    //}
 
     if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
     {

@@ -76,25 +76,23 @@ uint16_t markov_generate(void *self, void *data)
             pattern |= BEAT0;
 
         second = rand_percent();
-        if (second > 70 && second < 80)
-            pattern |= BEAT4;
-        else if (second >= 80)
+        if (second > 50)
             pattern |= BEAT7;
+        if (second >= 90)
+            pattern |= BEAT5;
 
         third = rand_percent();
-        if (third > 50 && third < 75)
-            pattern |= BEAT9;
-        else if (third >= 75)
+        if (third > 50)
             pattern |= BEAT10;
-        else if (third >= 90)
+        if (third >= 75)
             pattern |= BEAT11;
+        else if (third >= 90)
+            pattern |= BEAT9;
 
         fourth = rand_percent();
-        if (third > 50 && third < 75)
+        if (third > 60)
             pattern |= BEAT13;
-        else if (third >= 75 && third < 90)
-            pattern |= BEAT14;
-        else if (third >= 90)
+        if (third >= 90)
             pattern |= BEAT15;
 
         break;
@@ -102,35 +100,27 @@ uint16_t markov_generate(void *self, void *data)
         first = rand_percent();
         if (first > 10)
             pattern |= BEAT0;
-        if (first > 70 && first < 90)
-            pattern |= BEAT2;
-        else if (first >= 90)
+        if (first > 60)
             pattern |= BEAT3;
+        if (first >= 90)
+            pattern |= BEAT2;
 
         second = rand_percent();
-        if (second > 70 && second < 80)
-            pattern |= BEAT4;
-        else if (second >= 80)
+        if (second > 80)
             pattern |= BEAT6;
-        else if (second > 90)
-            pattern |= BEAT7;
 
         third = rand_percent();
         if (third > 10)
-            pattern |= BEAT8;
-        if (third > 50 && third < 75)
             pattern |= BEAT9;
-        else if (third >= 75 && third < 90)
+        if (third > 60)
             pattern |= BEAT10;
         else if (third >= 90)
             pattern |= BEAT11;
 
         fourth = rand_percent();
-        if (third > 50 && third < 75)
+        if (third > 80)
             pattern |= BEAT13;
-        else if (third >= 75 && third < 90)
-            pattern |= BEAT14;
-        else if (third >= 90)
+        if (third >= 90)
             pattern |= BEAT15;
 
         break;
