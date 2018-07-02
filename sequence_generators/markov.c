@@ -8,7 +8,7 @@
 #include "utils.h"
 
 extern mixer *mixr;
-static char *s_markov_types[] = {"GARAGE", "HIPHOP", "HATS"};
+static char *s_markov_types[] = {"GARAGE", "HIPHOP", "HATS", "HATS_MASK"};
 
 #define BEAT0 32768
 #define BEAT1 16384
@@ -136,6 +136,11 @@ uint16_t markov_generate(void *self, void *data)
         break;
     case (HATS):
         for (int i = 0; i < 16; i++)
+            if (rand_percent() > 40)
+                pattern |= 1 << (15 - i);
+        break;
+    case (HATS_MASK):
+        for (int i = 10; i < 16; i++)
             if (rand_percent() > 40)
                 pattern |= 1 << (15 - i);
         break;

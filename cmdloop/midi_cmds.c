@@ -6,6 +6,29 @@
 
 extern mixer *mixr;
 
+static void midi_launch_init(mixer *mixr)
+{
+    if (!mixr->have_midi_controller)
+    {
+        pthread_t midi_th;
+        if (pthread_create(&midi_th, NULL, midi_init, NULL))
+        {
+            fprintf(stderr, "Errrr, wit tha midi..\n");
+        }
+        pthread_detach(midi_th);
+    }
+}
+
+static void midi_set_destination(mixer *mixr, int soundgen_num)
+{
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
+        is_synth(mixr->sound_generators[soundgen_num]))
+    {
+        mixr->midi_control_destination = SYNTH;
+        mixr->active_midi_soundgen_num = soundgen_num;
+    }
+}
+
 bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
 
@@ -103,28 +126,18 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         printf("MIDI Time!\n");
         if (strncmp("init", wurds[1], 4) == 0)
+            midi_launch_init(mixr);
+        else if (strncmp("moog", wurds[1], 4) == 0)
         {
-            if (!mixr->have_midi_controller)
-            {
-                pthread_t midi_th;
-                if (pthread_create(&midi_th, NULL, midi_init, NULL))
-                {
-                    fprintf(stderr, "Errrr, wit tha midi..\n");
-                }
-                pthread_detach(midi_th);
-            }
-            else
-                printf("Already initialized\n");
+            midi_launch_init(mixr);
+            int sg_num = add_minisynth(mixr);
+            if (sg_num != -1)
+                midi_set_destination(mixr, sg_num);
         }
         else
         {
             int soundgen_num = atoi(wurds[1]);
-            if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                is_synth(mixr->sound_generators[soundgen_num]))
-            {
-                mixr->midi_control_destination = SYNTH;
-                mixr->active_midi_soundgen_num = soundgen_num;
-            }
+            midi_set_destination(mixr, soundgen_num);
         }
         return true;
     }

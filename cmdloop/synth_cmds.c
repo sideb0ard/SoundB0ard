@@ -76,7 +76,6 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
 bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
 {
-    printf("PARSLEYDX!\n");
     if (strncmp("algo", wurds[2], 4) == 0)
     {
         int algo = atoi(wurds[3]);
@@ -94,55 +93,46 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     else if (strncmp("porta", wurds[2], 5) == 0)
     {
         double ms = atof(wurds[3]);
-        printf("DXSynth change portamento time ms:%.2f!\n", ms);
         dxsynth_set_portamento_time_ms(dx, ms);
         return true;
     }
     else if (strncmp("rand", wurds[2], 4) == 0)
     {
-        printf("RAND DX!\n");
         dxsynth_rand_settings(dx);
     }
     else if (strncmp("pitchrange", wurds[2], 10) == 0)
     {
         int val = atoi(wurds[3]);
-        printf("DXSynth change pitchrange:%d!\n", val);
         dxsynth_set_pitchbend_range(dx, val);
         return true;
     }
     else if (strncmp("vel2att", wurds[2], 10) == 0)
     {
         bool val = atoi(wurds[3]);
-        printf("DXSynth change velocity to attack!%s\n",
-               val ? "true" : "false");
         dxsynth_set_velocity_to_attack_scaling(dx, val);
         return true;
     }
     else if (strncmp("note2dec", wurds[2], 10) == 0)
     {
         bool val = atoi(wurds[3]);
-        printf("DXSynth change note to decay!?%s\n", val ? "true" : "false");
         dxsynth_set_note_number_to_decay_scaling(dx, val);
         return true;
     }
     else if (strncmp("reset2zero", wurds[2], 10) == 0)
     {
         bool val = atoi(wurds[3]);
-        printf("DXSynth change reset to zero!?%s\n", val ? "true" : "false");
         dxsynth_set_reset_to_zero(dx, val);
         return true;
     }
     else if (strncmp("legato", wurds[2], 6) == 0)
     {
         bool val = atoi(wurds[3]);
-        printf("DXSynth change legato!\n");
         dxsynth_set_legato_mode(dx, val);
         return true;
     }
     else if (strncmp("l1_int", wurds[2], 14) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change LFO1 intensity:%.2f!\n", val);
         dxsynth_set_lfo1_intensity(dx, val);
         return true;
     }
@@ -151,32 +141,27 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
         double val = atof(wurds[3]);
         if (strncmp("sync", wurds[3], 4) == 0)
             val = mixer_get_hz_per_bar(mixr);
-        printf("VAL IS %f\n", val);
         int division = atoi(wurds[4]);
         if (division > 0)
             val *= division;
-        printf("DXSynth change LFO1 rate!%.2f\n", val);
         dxsynth_set_lfo1_rate(dx, val);
         return true;
     }
     else if (strncmp("l1_wav", wurds[2], 13) == 0)
     {
         unsigned int val = atoi(wurds[3]);
-        printf("DXSynth change LFO1 waveform:%d!\n", val);
         dxsynth_set_lfo1_waveform(dx, val);
         return true;
     }
     else if (strncmp("l1_dest1", wurds[2], 9) == 0)
     {
         unsigned int dest = atoi(wurds[3]);
-        printf("DXSynth change LFO1 dest1:%d!\n", dest);
         dxsynth_set_lfo1_mod_dest(dx, 1, dest);
         return true;
     }
     else if (strncmp("l1_dest2", wurds[2], 9) == 0)
     {
         unsigned int dest = atoi(wurds[3]);
-        printf("DXSynth change LFO1 dest2:%d!\n", dest);
         dxsynth_set_lfo1_mod_dest(dx, 2, dest);
         return true;
     }
@@ -190,63 +175,54 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     else if (strncmp("l1_dest4", wurds[2], 9) == 0)
     {
         unsigned int dest = atoi(wurds[3]);
-        printf("DXSynth change LFO1 dest4:%d!\n", dest);
         dxsynth_set_lfo1_mod_dest(dx, 4, dest);
         return true;
     }
     else if (strncmp("o1wav", wurds[2], 7) == 0)
     {
         unsigned int val = atoi(wurds[3]);
-        printf("DXSynth change OP1 wave:%d!\n", val);
         dxsynth_set_op_waveform(dx, 1, val);
         return true;
     }
     else if (strncmp("o1rat", wurds[2], 8) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP1 ratio:%.2f!\n", val);
         dxsynth_set_op_ratio(dx, 1, val);
         return true;
     }
     else if (strncmp("o1det", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP1 detune:%.2f!\n", val);
         dxsynth_set_op_detune(dx, 1, val);
         return true;
     }
     else if (strncmp("e1att", wurds[2], 11) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG1 attack ms:%.2f!\n", val);
         dxsynth_set_eg_attack_ms(dx, 1, val);
         return true;
     }
     else if (strncmp("e1dec", wurds[2], 10) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG1 decay ms:%.2f!\n", val);
         dxsynth_set_eg_decay_ms(dx, 1, val);
         return true;
     }
     else if (strncmp("e1sus", wurds[2], 13) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG1 sustain lvl:%.2f!\n", val);
         dxsynth_set_eg_sustain_lvl(dx, 1, val);
         return true;
     }
     else if (strncmp("e1rel", wurds[2], 12) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG1 release ms:%.2f!\n", val);
         dxsynth_set_eg_release_ms(dx, 1, val);
         return true;
     }
     else if (strncmp("op1out", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP1 output:%.2f!\n", val);
         dxsynth_set_op_output_lvl(dx, 1, val);
         return true;
     }
@@ -254,56 +230,48 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     else if (strncmp("o2wav", wurds[2], 7) == 0)
     {
         unsigned int val = atoi(wurds[3]);
-        printf("DXSynth change OP2 wave:%d!\n", val);
         dxsynth_set_op_waveform(dx, 2, val);
         return true;
     }
     else if (strncmp("o2rat", wurds[2], 8) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP2 ratio:%.2f!\n", val);
         dxsynth_set_op_ratio(dx, 2, val);
         return true;
     }
     else if (strncmp("o2det", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP2 detune:%.2f!\n", val);
         dxsynth_set_op_detune(dx, 2, val);
         return true;
     }
     else if (strncmp("e2att", wurds[2], 11) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG2 attack ms:%.2f!\n", val);
         dxsynth_set_eg_attack_ms(dx, 2, val);
         return true;
     }
     else if (strncmp("e2dec", wurds[2], 10) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG2 decay ms:%.2f!\n", val);
         dxsynth_set_eg_decay_ms(dx, 2, val);
         return true;
     }
     else if (strncmp("e2sus", wurds[2], 13) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG2 sustain lvl:%.2f!\n", val);
         dxsynth_set_eg_sustain_lvl(dx, 2, val);
         return true;
     }
     else if (strncmp("e2rel", wurds[2], 12) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG2 release ms:%.2f!\n", val);
         dxsynth_set_eg_release_ms(dx, 2, val);
         return true;
     }
     else if (strncmp("op2out", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP2 output:%.2f!\n", val);
         dxsynth_set_op_output_lvl(dx, 2, val);
         return true;
     }
@@ -311,56 +279,48 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     else if (strncmp("o3wav", wurds[2], 7) == 0)
     {
         unsigned int val = atoi(wurds[3]);
-        printf("DXSynth change OP3 wave:%d!\n", val);
         dxsynth_set_op_waveform(dx, 3, val);
         return true;
     }
     else if (strncmp("o3rat", wurds[2], 8) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP3 ratio:%.2f!\n", val);
         dxsynth_set_op_ratio(dx, 3, val);
         return true;
     }
     else if (strncmp("o3det", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP3 detune:%.2f!\n", val);
         dxsynth_set_op_detune(dx, 3, val);
         return true;
     }
     else if (strncmp("e3att", wurds[2], 11) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG3 attack ms:%.2f!\n", val);
         dxsynth_set_eg_attack_ms(dx, 3, val);
         return true;
     }
     else if (strncmp("e3dec", wurds[2], 10) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG3 decay ms:%.2f!\n", val);
         dxsynth_set_eg_decay_ms(dx, 3, val);
         return true;
     }
     else if (strncmp("e3sus", wurds[2], 13) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG3 sustain lvl:%.2f!\n", val);
         dxsynth_set_eg_sustain_lvl(dx, 3, val);
         return true;
     }
     else if (strncmp("e3rel", wurds[2], 12) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG3 release ms:%.2f!\n", val);
         dxsynth_set_eg_release_ms(dx, 3, val);
         return true;
     }
     else if (strncmp("op3out", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP3 output:%.2f!\n", val);
         dxsynth_set_op_output_lvl(dx, 3, val);
         return true;
     }
@@ -368,63 +328,54 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     else if (strncmp("o4wav", wurds[2], 7) == 0)
     {
         unsigned int val = atoi(wurds[3]);
-        printf("DXSynth change OP4 wave:%d!\n", val);
         dxsynth_set_op_waveform(dx, 4, val);
         return true;
     }
     else if (strncmp("o4rat", wurds[2], 8) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP4 ratio:%.2f!\n", val);
         dxsynth_set_op_ratio(dx, 4, val);
         return true;
     }
     else if (strncmp("o4det", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP4 detune:%.2f!\n", val);
         dxsynth_set_op_detune(dx, 4, val);
         return true;
     }
     else if (strncmp("e4att", wurds[2], 11) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG4 attack ms:%.2f!\n", val);
         dxsynth_set_eg_attack_ms(dx, 4, val);
         return true;
     }
     else if (strncmp("e4dec", wurds[2], 10) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG4 decay ms:%.2f!\n", val);
         dxsynth_set_eg_decay_ms(dx, 4, val);
         return true;
     }
     else if (strncmp("e4sus", wurds[2], 13) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG4 sustain lvl:%.2f!\n", val);
         dxsynth_set_eg_sustain_lvl(dx, 4, val);
         return true;
     }
     else if (strncmp("e4rel", wurds[2], 12) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change EG4 release ms:%.2f!\n", val);
         dxsynth_set_eg_release_ms(dx, 4, val);
         return true;
     }
     else if (strncmp("op4out", wurds[2], 9) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP4 output:%.2f!\n", val);
         dxsynth_set_op_output_lvl(dx, 4, val);
         return true;
     }
     else if (strncmp("op4fb", wurds[2], 11) == 0)
     {
         double val = atof(wurds[3]);
-        printf("DXSynth change OP4 feedback:%.2f!\n", val);
         dxsynth_set_op4_feedback(dx, val);
         return true;
     }
@@ -477,7 +428,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         int division = atoi(wurds[4]);
         if (division > 0)
             val *= division;
-        printf("VAL IS %f\n", val);
         minisynth_set_lfo_rate(ms, 1, val);
     }
     else if (strncmp("l1amp", wurds[2], 7) == 0)
@@ -551,6 +501,14 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_note_to_decay_scaling(ms, val);
     else if (strncmp("noisedb", wurds[2], 7) == 0)
         minisynth_set_noise_osc_db(ms, val);
+    else if (strncmp("osc1", wurds[2], 4) == 0)
+        minisynth_set_osc_type(ms, 1, val);
+    else if (strncmp("osc2", wurds[2], 4) == 0)
+        minisynth_set_osc_type(ms, 2, val);
+    else if (strncmp("osc3", wurds[2], 4) == 0)
+        minisynth_set_osc_type(ms, 3, val);
+    else if (strncmp("osc4", wurds[2], 4) == 0)
+        minisynth_set_osc_type(ms, 4, val);
     else if (strncmp("oct", wurds[2], 3) == 0)
         minisynth_set_octave(ms, val);
     else if (strncmp("pitchrange", wurds[2], 10) == 0)
@@ -612,102 +570,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     return to_update;
 }
 
-// void char_pattern_to_midi_pattern(synthbase *base, int dest_pattern,
-//                                  char char_array[NUM_WURDS][SIZE_OF_WURD],
-//                                  int start, int end)
-//{
-//    for (int i = start; i < end; i++)
-//    {
-//        int tick = 0;
-//        int midi_note = 0;
-//        chord_midi_notes chnotes = {0, 0, 0};
-//        if (extract_chord_from_char_notation(char_array[i], &tick, &chnotes))
-//        {
-//            synthbase_add_note(base, dest_pattern, tick, chnotes.root, true);
-//            synthbase_add_note(base, dest_pattern, tick, chnotes.third, true);
-//            synthbase_add_note(base, dest_pattern, tick, chnotes.fifth, true);
-//        }
-//        else
-//        {
-//            sscanf(char_array[i], "%d:%d", &tick, &midi_note);
-//            if (midi_note != 0)
-//            {
-//                printf("Adding %d:%d\n", tick, midi_note);
-//                synthbase_add_note(base, dest_pattern, tick, midi_note, true);
-//            }
-//        }
-//    }
-//}
-//
-// bool extract_chord_from_char_notation(char *wurd, int *tick,
-//                                      chord_midi_notes *chnotes)
-//{
-//    char char_note[3] = {0};
-//    sscanf(wurd, "%d:%s", tick, char_note);
-//
-//    if (strncasecmp(char_note, "c", 1) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("C_MAJOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "dm", 2) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("D_MINOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "d", 1) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("D_MAJOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "em", 2) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("E_MINOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "e", 1) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("E_MAJOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "f", 1) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("F_MAJOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "gm", 2) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("G_MINOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "g", 1) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("G_MAJOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "am", 2) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("A_MINOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "a", 1) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("A_MAJOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "bm", 2) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("B_MINOR");
-//        return true;
-//    }
-//    else if (strncasecmp(char_note, "b", 1) == 0)
-//    {
-//        *chnotes = get_midi_notes_from_char_chord("B_MAJOR");
-//        return true;
-//    }
-//
-//    return false;
-//}
 
 bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                          char wurds[][SIZE_OF_WURD], int num_wurds)

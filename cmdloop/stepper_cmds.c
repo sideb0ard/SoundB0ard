@@ -76,7 +76,6 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
 {
     (void)num_wurds;
     double val = atof(wurds[1]);
-    printf("Drum synth! val:%f\n", val);
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
         mixr->sound_generators[soundgen_num]->type == SYNTHDRUM_TYPE)
     {

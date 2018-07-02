@@ -245,6 +245,7 @@ void minisynth_set_lfo_pulsewidth_int(minisynth *ms, int lfo_num, double val);
 void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_noise_osc_db(minisynth *ms, double val);
 void minisynth_set_octave(minisynth *ms, int val);
+void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type);
 void minisynth_set_pitchbend_range(minisynth *ms, int val);
 void minisynth_set_portamento_time_ms(minisynth *ms, double val);
 void minisynth_set_pulsewidth_pct(minisynth *ms, double val);

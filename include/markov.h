@@ -8,6 +8,7 @@ enum
     GARAGE,
     HIPHOP,
     HATS,
+    HATS_MASK,
     NUM_MARKOV_STYLES
 };
 

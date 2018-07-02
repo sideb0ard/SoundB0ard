@@ -45,7 +45,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         mixer_status_mixr(mixr);
     }
-    else if (strncmp("algoz", wurds[0], 4) == 0)
+    else if (strncmp("algoz", wurds[0], 5) == 0)
     {
         mixer_status_algoz(mixr);
     }

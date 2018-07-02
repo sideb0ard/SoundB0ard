@@ -18,6 +18,8 @@ extern const char *s_dest_enum_to_name[];
 const wchar_t *s_voice_names[] = {L"saw3",    L"sqr3",    L"saw2sqr",
                                   L"tri2saw", L"tri2sqr", L"sin2sqr"};
 
+char *s_waveform_names[] = {"SINE",   "SAW1",  "SAW2",   "SAW3",   "TRI",
+                            "SQUARE", "NOISE", "PNOISE", "MAX_OSC"};
 // defined in oscillator.h
 const char *s_lfo_mode_names[] = {"sync", "shot", "free"};
 const char *s_lfo_wave_names[] = {"sine", "usaw", "dsaw", "tri ",
@@ -686,6 +688,9 @@ void minisynth_status(void *self, wchar_t *status_string)
         WANSI_COLOR_WHITE "%s\n"
         "%s"
         "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) midi_note:%d mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
+
+        "osc1:%s(%d) osc2:%s(%d) osc3:%s(%d) osc4:%s(%d)\n"
+
         "noisedb:%3.0f octave:%d  pitchrange:%d porta:%.0f  pw:%.0f subosc:%3.0f vascale:%d zero:%d\n"
 
         "%s"
@@ -705,7 +710,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "attackms:%4.0f       decayms:%4.0f     releasems:%4.0f   sustain_note_ms:%d\n"
 
         "%s"
-        "filter:%s(%d)      fc:%7.1f       fq:%4.1f"
+        "filter:%s(%d)      fc:%7.1f       fq:%4.1f       aux:%0.2f"
 
         "%s",
 
@@ -721,6 +726,16 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_legato_mode,
         ms->m_settings.m_filter_keytrack,
         ms->m_settings.m_note_number_to_decay_scaling,
+
+        s_waveform_names[ms->m_global_synth_params.osc1_params.waveform],
+        ms->m_global_synth_params.osc1_params.waveform,
+        s_waveform_names[ms->m_global_synth_params.osc2_params.waveform],
+        ms->m_global_synth_params.osc2_params.waveform,
+        s_waveform_names[ms->m_global_synth_params.osc3_params.waveform],
+        ms->m_global_synth_params.osc3_params.waveform,
+        s_waveform_names[ms->m_global_synth_params.osc4_params.waveform],
+        ms->m_global_synth_params.osc4_params.waveform,
+
         ms->m_settings.m_noise_osc_db,
         ms->m_settings.m_octave,
         ms->m_settings.m_pitchbend_range,
@@ -790,6 +805,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_filter_type,
         ms->m_settings.m_fc_control,
         ms->m_settings.m_q_control,
+        ms->m_settings.m_q_control, //TODO
 
         INSTRUMENT_YELLOW
         );
@@ -2293,4 +2309,28 @@ void minisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
     synthbase *base = get_synthbase(self);
     if (base)
         synthbase_set_pattern(base, pattern_num, pattern);
+}
+
+void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type)
+{
+    if ( osc > 0
+       && osc < 4
+       && osc_type < MAX_OSC)
+    {
+        printf("Setting OSC %d to %s(%d)\n", osc, s_waveform_names[osc_type], osc_type);
+        switch(osc){
+        case(1):
+            ms->m_global_synth_params.osc1_params.waveform = osc_type;
+            break;
+        case(2):
+            ms->m_global_synth_params.osc2_params.waveform = osc_type;
+            break;
+        case(3):
+            ms->m_global_synth_params.osc3_params.waveform = osc_type;
+            break;
+        case(4):
+            ms->m_global_synth_params.osc4_params.waveform = osc_type;
+            break;
+        }
+    }
 }
