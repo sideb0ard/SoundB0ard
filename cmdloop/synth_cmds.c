@@ -411,6 +411,8 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_filter_fq(ms, val);
     else if (strncmp("filter", wurds[2], 4) == 0)
         minisynth_set_filter_type(ms, val);
+    else if (strncmp("hard_sync", wurds[2], 9) == 0)
+        minisynth_set_hard_sync(ms, val);
     else if (strncmp("ktint", wurds[2], 5) == 0)
         minisynth_set_keytrack_int(ms, val);
     else if (strncmp("kt", wurds[2], 2) == 0)

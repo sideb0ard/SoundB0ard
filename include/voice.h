@@ -16,6 +16,7 @@ typedef struct voice
     modmatrix m_v_modmatrix;
 
     bool m_note_on;
+    bool hard_sync;
     unsigned int m_timestamp;
 
     unsigned int m_midi_note_number;

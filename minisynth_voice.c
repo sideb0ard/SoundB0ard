@@ -306,10 +306,24 @@ bool minisynth_voice_gennext(minisynth_voice *msv, double *left_output,
     osc_update((oscillator *)&msv->m_osc3);
     osc_update((oscillator *)&msv->m_osc4);
 
-    double osc_mix = 0.333 * qb_do_oscillate((oscillator *)&msv->m_osc1, NULL) +
-                     0.333 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
-                     0.333 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL) +
-                     0.333 * qb_do_oscillate((oscillator *)&msv->m_osc4, NULL);
+    double osc_mix = 0.;
+    if (msv->m_voice.hard_sync)
+    {
+        qb_do_oscillate((oscillator *)&msv->m_osc1, NULL);
+        if (msv->m_osc1.osc.just_wrapped)
+            qb_start_oscillator((oscillator *)&msv->m_osc2);
+
+        osc_mix = 0.5 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
+                  0.5 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL) +
+                  qb_do_oscillate((oscillator *)&msv->m_osc4, NULL);
+    }
+    else
+    {
+        osc_mix = 0.333 * qb_do_oscillate((oscillator *)&msv->m_osc1, NULL) +
+                  0.333 * qb_do_oscillate((oscillator *)&msv->m_osc2, NULL) +
+                  0.333 * qb_do_oscillate((oscillator *)&msv->m_osc3, NULL) +
+                  qb_do_oscillate((oscillator *)&msv->m_osc4, NULL);
+    }
 
     double filter_out =
         // msv->m_filter.f.gennext((filter *)&msv->m_filter, osc_mix);

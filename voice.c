@@ -290,6 +290,7 @@ bool voice_in_legato_mode(voice *v) { return v->m_eg1.m_legato_mode; }
 void voice_update(voice *v)
 {
     v->m_voice_mode = v->m_global_voice_params->voice_mode;
+    v->hard_sync = v->m_global_voice_params->hard_sync;
     if (v->m_portamento_time_msec !=
         v->m_global_voice_params->portamento_time_msec)
     {

@@ -74,6 +74,7 @@ struct oscillator
 
     global_oscillator_params *m_global_oscillator_params;
 
+    bool just_wrapped; // true for one sample period. Used for hard sync
     bool m_note_on;
     // --- user controls or MIDI
     double m_osc_fo;    // oscillator frequency from MIDI note number

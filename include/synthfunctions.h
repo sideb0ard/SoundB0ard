@@ -55,6 +55,7 @@ typedef struct
 typedef struct
 {
     unsigned int voice_mode;
+    bool hard_sync;
     double hs_ratio; // hard sync
     double portamento_time_msec;
 

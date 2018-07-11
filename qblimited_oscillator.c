@@ -126,7 +126,10 @@ inline double qb_do_oscillate(oscillator *self, double *aux_output)
 
     double out = 0.0;
 
-    bool bWrap = osc_check_wrap_modulo(self);
+    self->just_wrapped = false;
+    bool wrap = osc_check_wrap_modulo(self);
+    if (wrap)
+        self->just_wrapped = true;
 
     double calc_modulo = self->m_modulo + self->m_phase_mod;
     check_wrap_index(&calc_modulo);
@@ -156,7 +159,7 @@ inline double qb_do_oscillate(oscillator *self, double *aux_output)
 
     case TRI:
     {
-        if (bWrap)
+        if (wrap)
             self->m_dpw_square_modulator *= -1.0;
 
         out = qb_do_triangle(calc_modulo, self->m_inc, self->m_fo,

@@ -196,6 +196,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
 
 void minisynth_update(minisynth *ms)
 {
+    ms->m_global_synth_params.voice_params.hard_sync = ms->m_settings.hard_sync;
     ms->m_global_synth_params.voice_params.voice_mode =
         ms->m_settings.m_voice_mode;
     ms->m_global_synth_params.voice_params.portamento_time_msec =
@@ -688,7 +689,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         WANSI_COLOR_WHITE "%s\n"
         "%s"
         "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) "
-        "mono:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
+        "mono:%d hard_sync:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
 
         "osc1:%s(%d) osc2:%s(%d) osc3:%s(%d) osc4:%s(%d)\n"
 
@@ -723,6 +724,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_voice_mode,
 
         ms->m_settings.m_monophonic,
+        ms->m_settings.hard_sync,
         ms->m_settings.m_detune_cents,
         ms->m_settings.m_legato_mode,
         ms->m_settings.m_filter_keytrack,
@@ -2334,4 +2336,10 @@ void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type)
             break;
         }
     }
+}
+
+void minisynth_set_hard_sync(minisynth *ms, bool val)
+{
+    // TODO - add to export / load functions
+    ms->m_settings.hard_sync = val;
 }
