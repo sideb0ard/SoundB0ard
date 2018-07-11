@@ -21,11 +21,18 @@ static void midi_launch_init(mixer *mixr)
 
 static void midi_set_destination(mixer *mixr, int soundgen_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-        is_synth(mixr->sound_generators[soundgen_num]))
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
-        mixr->midi_control_destination = SYNTH;
-        mixr->active_midi_soundgen_num = soundgen_num;
+        if (is_synth(mixr->sound_generators[soundgen_num]))
+        {
+            mixr->midi_control_destination = SYNTH;
+            mixr->active_midi_soundgen_num = soundgen_num;
+        }
+        else if (mixr->sound_generators[soundgen_num]->type == SYNTHDRUM_TYPE)
+        {
+            mixr->midi_control_destination = DRUMSYNTH;
+            mixr->active_midi_soundgen_num = soundgen_num;
+        }
     }
 }
 
@@ -121,6 +128,15 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         bool b = atoi(wurds[1]);
         mixer_enable_print_midi(mixr, b);
+    }
+    else if (strncmp("midi_bank", wurds[0], 10) == 0)
+    {
+        int b = atoi(wurds[1]);
+        mixer_set_midi_bank(mixr, b);
+    }
+    else if (strncmp("midiii", wurds[0], 6) == 0)
+    {
+        midi_launch_init(mixr);
     }
     else if (strncmp("midi", wurds[0], 4) == 0)
     {

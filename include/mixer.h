@@ -114,7 +114,7 @@ typedef struct mixer
     char midi_controller_name[128];
     unsigned int midi_control_destination;
     unsigned int m_midi_controller_mode; // to switch control knob routing
-    unsigned int m_key_controller_mode;  // to switch key control routing
+    unsigned int midi_bank_num;
 
     int active_midi_soundgen_num;
     int active_midi_soundgen_effect_num;
@@ -211,6 +211,7 @@ void mixer_change_chord(mixer *mixr, unsigned int root,
 int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
 void mixer_enable_print_midi(mixer *mixr, bool b);
 void mixer_check_for_midi_messages(mixer *mixr);
+void mixer_set_midi_bank(mixer *mixr, int num);
 
 // these are in mixer.h rather than synthbase, as mixer needs to transform sg
 // first

@@ -157,6 +157,7 @@ typedef enum
 {
     NONE,
     SYNTH,
+    DRUMSYNTH,
 } midi_control_type;
 
 typedef struct mixer_timing_info
@@ -219,6 +220,7 @@ typedef struct midi_event
     unsigned event_type;
     unsigned data1;
     unsigned data2;
+    int hold; // millisecond hold value
     bool delete_after_use;
 } midi_event;
 

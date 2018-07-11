@@ -47,7 +47,7 @@ const wchar_t *s_status_colors[] = {
     WANSI_COLOR_BLUE       //
 };
 
-const char *s_midi_control_type_name[] = {"NONE", "SYNTH"};
+const char *s_midi_control_type_name[] = {"NONE", "SYNTH", "DRUMSYNTH"};
 
 const char *s_sg_names[] = {"moog", "digi", "dx", "loop", "step", "step"};
 
@@ -125,7 +125,7 @@ void mixer_status_mixr(mixer *mixr)
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
            ":::::::::: preview_enabled:%d filename:%s\n"
-           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s midi_print:%d\n"
+           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s midi_print:%d midi_bank:%d\n"
            ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d\n" ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->preview.enabled, mixr->preview.filename,
@@ -137,6 +137,7 @@ void mixer_status_mixr(mixer *mixr)
                      [mixr->sound_generators[mixr->active_midi_soundgen_num]
                           ->type],
            mixr->midi_print_notes,
+           mixr->midi_bank_num,
            key_names[mixr->key], key_names[mixr->chord],
            chord_type_names[mixr->chord_type], mixr->octave, mixr->bars_per_chord);
     // clang-format on
@@ -1119,6 +1120,18 @@ void mixer_check_for_midi_messages(mixer *mixr)
             int data1 = Pm_MessageData1(msg[i].message);
             int data2 = Pm_MessageData2(msg[i].message);
 
+            if (status == 176)
+            {
+                if (data1 == 9)
+                    mixer_set_midi_bank(mixr, 0);
+                if (data1 == 10)
+                    mixer_set_midi_bank(mixr, 1);
+                if (data1 == 11)
+                    mixer_set_midi_bank(mixr, 2);
+                if (data1 == 12)
+                    mixer_set_midi_bank(mixr, 3);
+            }
+
             if (mixr->midi_print_notes)
                 printf("[MIDI message] status:%d data1:%d "
                        "data2:%d\n",
@@ -1147,6 +1160,19 @@ void mixer_check_for_midi_messages(mixer *mixr)
                 ev.delete_after_use = false;
                 midi_parse_midi_event(sg, &ev);
             }
+            else if (mixr->midi_control_destination == DRUMSYNTH)
+            {
+                soundgenerator *sg =
+                    mixr->sound_generators[mixr->active_midi_soundgen_num];
+
+                midi_event ev;
+                ev.source = EXTERNAL_DEVICE;
+                ev.event_type = status;
+                ev.data1 = data1;
+                ev.data2 = data2;
+                ev.delete_after_use = false;
+                midi_parse_midi_event(sg, &ev);
+            }
             else
             {
                 printf("Got midi but not connected to "
@@ -1154,4 +1180,10 @@ void mixer_check_for_midi_messages(mixer *mixr)
             }
         }
     }
+}
+
+void mixer_set_midi_bank(mixer *mixr, int num)
+{
+    if (num >= 0 && num < 4)
+        mixr->midi_bank_num = num;
 }

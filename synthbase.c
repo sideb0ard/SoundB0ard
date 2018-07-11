@@ -585,9 +585,24 @@ bool synthbase_list_presets(unsigned int synthtype)
         return false;
 
     char line[256];
+    char setting_key[512];
+    char setting_val[512];
+
+    char *tok, *last_tok;
+    char const *sep = "::";
+
     while (fgets(line, sizeof(line), presetzzz))
     {
-        printf("%s\n", line);
+        for (tok = strtok_r(line, sep, &last_tok); tok;
+             tok = strtok_r(NULL, sep, &last_tok))
+        {
+            sscanf(tok, "%[^=]=%s", setting_key, setting_val);
+            if (strcmp(setting_key, "name") == 0)
+            {
+                printf("%s\n", setting_val);
+                break;
+            }
+        }
     }
 
     fclose(presetzzz);

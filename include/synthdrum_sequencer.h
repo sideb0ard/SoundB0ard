@@ -32,22 +32,17 @@ typedef struct synthdrum_sequencer
 
     // osc1 amp ENV
     envelope_generator m_eg1;
+    double eg1_osc1_intensity;
     double eg1_sustain_len_in_samples;
     int eg1_sustain_ms;
     int eg1_sustain_counter;
 
-    // osc2 pitch ENV
+    // COMBINED osc2 pitch ENV and output ENV
     envelope_generator m_eg2;
     double eg2_osc2_intensity;
     double eg2_sustain_len_in_samples;
     int eg2_sustain_ms;
     int eg2_sustain_counter;
-
-    // output amp ENV
-    envelope_generator m_eg3;
-    double eg3_sustain_len_in_samples;
-    int eg3_sustain_ms;
-    int eg3_sustain_counter;
 
     int m_filter_type;
     double m_filter_fc;
@@ -94,7 +89,7 @@ void synthdrum_set_eg_sustain_lvl(synthdrum_sequencer *sds, int eg_num,
 void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
                                  double val);
 void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val);
-void synthdrum_set_eg2_osc_intensity(synthdrum_sequencer *sds, double val);
+void synthdrum_set_eg_osc_intensity(synthdrum_sequencer *sds, int eg, int osc, double val);
 void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val);
 void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val);
 void synthdrum_set_filter_freq(synthdrum_sequencer *sds, double val);

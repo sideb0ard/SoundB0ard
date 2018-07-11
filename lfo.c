@@ -65,7 +65,7 @@ double lfo_do_oscillate(oscillator *self, double *quad_phase_output)
         return 0.0;
     }
 
-    // for QP output
+    // for Quad Phase output
     // advance modulo by 0.25 = 90 degrees
     double quad_modulo = self->m_modulo + 0.25;
 

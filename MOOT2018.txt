@@ -1,36 +1,67 @@
-dloops/hausBreakBeat.aiff
-waveshape
+bpm 140
+play VoicesBirdsTenneseeTrailMay282018.aiff
+new gran drones/garageDroneForward.aiff
+every 3 bar rand "0 1" loop 0 mode %s
 
+new markov 2
+new step hats/dmx_hh_cl.aif
+new step hats/hh8.aif
+every 3 invert markov hats
+
+dloops/IshDooIt.aiff
+new gran loops/pumpUpDaJAM.aiff 4
+
+new markov 3
+new digi notes/technoNoteSingle.aiff
 digi 2 notes/technoNoteSingle.aiff w/ HATS_MASK
 every 4 bar gen melody 0 1:0
 
-step noises/sndNoize.aiff w/ HATS_MASK
+claps/technotron.aiff
 
-new gran loops/pumpUpDaJAM.aiff 4
+step noises/sndNoize.aiff w/ HATS_MASK
+dloops/acidSquelchBeat.aiff 2
+
+odloops/BroknFingersBeat2.aiff
+
+loops/FingersFadeBassStrings.aiff D vol:0.00 pitch:1.00
+loops/busitACID.aiff  vol:0.15 pitch:2.00
+
+dloops/mkLikeloop.aiff
+new loop loops/raveStabsCmon.aiff 2
+new loop loops/innercitystylesound.aiff 2
+
+drones/moodIIswing.aiff
+dloops/rabveBreaskB.aiff
+
+
+
+new bitshift ((t/4)>>t/4)|(t>>2)
+moog GNARL // octave 0
+every 4 bar gen riff 0 0:0
+every 3 bar rand "4 8 16 32" moog 0 l1rate sync %s
+over 16 bar osc "800 18000" moog 0 fc %s
+
+dloops/mkLikeloop.aiff
+
+dloops/hausBreakBeat.aiff
+waveshape
+
+
 
 step synth load  warppe // markov HIPHOP
 every 1 bar rand "40 50 60 74" step 4 o1_fo %s
 
-every 3 invert markov hats
-hats/dmx_hh_cl.aif
-hats/hh8.aif
 
 
 loops/MrFINGERSspeedBass.aiff
 filter 3000 // LFO sync
 
 
-claps/technotron.aiff
-
 breakdown::
 cut dloops/hausBreakBeat.aiff
 filter loops/MrFINGERSspeedBass.aiff 0.03
 
 
-# drones/moodIIswing.aiff
-
-
-dloops/rabveBreaskB.aiff
 
 
 moog aqua
@@ -64,26 +95,14 @@ noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
 
 ALGO2
 [sequence generators]
-[sound generators]
-[step 1] kicks/CLunkT.aiff  vol:0.70 pitch:1.00
-[step 2] hats/DR660Hihatlightclosed.aif  vol:0.20 pitch:1.00
-[step 3] hats/cloeyhatz.aiff  vol:0.30 pitch:1.00
-[step 4] snrs/slaveSnare.aiff  vol:0.70 pitch:1.00
-[loop 9] source:loops/FingersFadeBassStrings.aiff  vol:0.00 pitch:1.00
-[loop 15] source:loops/busitACID.aiff  vol:0.15 pitch:2.00
-[loop 23] source:loops/HARDCOREmelodySLOWLOUD.aiff  vol:0.70 pitch:1.00
-[loop 27] source:strings/breoknRiser.aiff  vol:0.40 pitch:1.00
+kicks/CLunkT.aiff  vol:0.70 pitch:1.00
+hats/DR660Hihatlightclosed.aif  vol:0.20 pitch:1.00
+hats/cloeyhatz.aiff  vol:0.30 pitch:1.00
+snrs/slaveSnare.aiff  vol:0.70 pitch:1.00
+loops/HARDCOREmelodySLOWLOUD.aiff  vol:0.70 pitch:1.00
+strings/breoknRiser.aiff  vol:0.40 pitch:1.00
 
 ##################
-
-[algorithms]
-[algo 0] process:every step:3 event:bar var_select:rand var_list:
-         cmd:invert 0 0:0 2:0
-[algo 1] process:every step:7 event:bar var_select:rand var_list:
-         cmd:invert 0 1:0 0:0
-
-[ 1]  [SEQUENCE GEN ] - infix pattern: ( t * t ) / ( t >> 13 ^ t >> 8 )
-rpn pattern: t t * t 13 >> t 8 >> ^ /
 
 [sound generators]
 [step 0] perc/CrackleDonnaBreath.aiff  vol:0.70 pitch:1.00
@@ -97,7 +116,6 @@ loops/HARDCOREmelody.aiff
 new bitshift ((t/1000)^(t/1001))*t
 dx rar - octave 2
 
-dloops/acidSquelchBeat.aiff
 loops/JungleBassNeedleWobble.aiff
 fuckup
 
@@ -108,9 +126,11 @@ dx rzrrr and rzr235 // midi_note 35 dx 6 gen euclid
 every 3 bar rand "35 39 42" dx 6 midi_note %s
 
 BPM 120
-dloops/mkLikeloop.aiff
-loops/raveStabsCmon.aiff
-loops/innercitystylesound.aiff
 
 dloops/GetHype.aiff
 every 2 bar rand "1 0.7 1.4 2" loop 0 pitch %s
+
+
+kicks/sludgekick.aiff // MARKOV HIPHOP
+moog drexy midi notes 55 51 50
+MARKOV 2 // gen riff

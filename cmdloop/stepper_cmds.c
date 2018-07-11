@@ -108,7 +108,7 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
         }
         else if (strncmp("e2_o2_int", wurds[0], 8) == 0)
         {
-            synthdrum_set_eg2_osc_intensity(synth, val);
+            synthdrum_set_eg_osc_intensity(synth, 2, 2, val);
         }
         else if (strncmp("e1_att", wurds[0], 6) == 0)
         {

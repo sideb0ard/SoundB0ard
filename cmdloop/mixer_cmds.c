@@ -271,10 +271,17 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                             if (rand() % 100 > 90)
                                 midi_note += 12; // up an octave
 
+                            int velocity = (rand() % 100) + 28;
                             midi_tick = multiplier * j;
+                            if (midi_tick % PPQN == 0)
+                                velocity = 128;
+
+                            int hold_time_ms = (rand() % 2000) + 130;
                             midi_event ev = {.event_type = MIDI_ON,
                                              .data1 = midi_note,
-                                             .data2 = DEFAULT_VELOCITY};
+                                             .data2 = velocity,
+                                             .hold = hold_time_ms
+                            };
                             if (once)
                                 ev.delete_after_use = true;
                             pattern[midi_tick] = ev;
