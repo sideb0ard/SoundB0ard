@@ -1,4 +1,24 @@
-bpm 140
+ALGO1
+bpm 160
+new loop loops/JungleBassNeedleWobble.aiff;
+
+new moog
+moog 1 load drexy
+
+new bitshift ((t/4)>>t/4)|(t>>2)
+every 4 bar moog 1 genonce 0
+every 3 bar gen riff 0 1:0
+every 5 bar moog 1:0
+
+
+perc/DR660CR78woodblock.aif // root_note 4 //basey
+every 6 bar gen riff 
+
+new digi noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
+every 1 bar rand "35 36 28 29 35" digi 3 midi_note_1 %s
+every 2 bar digi 3 gen 1
+
+
 play VoicesBirdsTenneseeTrailMay282018.aiff
 new gran drones/garageDroneForward.aiff
 every 3 bar rand "0 1" loop 0 mode %s
@@ -10,16 +30,17 @@ every 3 invert markov hats
 
 dloops/IshDooIt.aiff
 new gran loops/pumpUpDaJAM.aiff 4
+dloops/acidSquelchBeat.aiff 2
+
+claps/technotron.aiff
 
 new markov 3
 new digi notes/technoNoteSingle.aiff
 digi 2 notes/technoNoteSingle.aiff w/ HATS_MASK
 every 4 bar gen melody 0 1:0
 
-claps/technotron.aiff
 
 step noises/sndNoize.aiff w/ HATS_MASK
-dloops/acidSquelchBeat.aiff 2
 
 odloops/BroknFingersBeat2.aiff
 

@@ -19,7 +19,7 @@ static char *s_loop_mode_names[] = {"LOOP", "STATIC"};
 looper *new_looper(char *filename)
 {
     looper *g = (looper *)calloc(1, sizeof(looper));
-    g->vol = 0.4;
+    g->vol = 0.7;
     g->have_active_buffer = false;
 
     g->audio_buffer_read_idx = 0;

@@ -1,9 +1,21 @@
 
 ALGO1
 bpm 160
-new gran loops/JungleBassNeedleWobble.aiff; loop 0 loop_mode 0
+new gran loops/JungleBassNeedleWobble.aiff;
+
+new moog
+moog 1 load drexy
+
+new bitshift ((t/4)>>t/4)|(t>>2)
+every 4 bar moog 1 genonce 0
+
+
 perc/DR660CR78woodblock.aif // root_note 4 //basey
-noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
+every 6 bar gen riff 
+
+new digi noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
+every 1 bar rand "35 36 28 29 35" digi 3 midi_note_1 %s
+every 2 bar digi 3 gen 1
 
 ALGO2
 [sequence generators]
