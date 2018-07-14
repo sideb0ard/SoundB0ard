@@ -245,7 +245,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1freq
-                    double freq = scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
+                    double freq =
+                        scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
                     printf("FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 1, freq);
                 }
@@ -253,7 +254,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1freq
-                    double freq = scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
+                    double freq =
+                        scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
                     printf("FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 2, freq);
                 }

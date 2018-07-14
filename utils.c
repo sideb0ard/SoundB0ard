@@ -29,6 +29,7 @@ const double blep_table_center = 4096 / 2.0 - 1;
 #define CONVEX_LIMIT 0.00398107
 #define CONCAVE_LIMIT 0.99601893
 #define ARC4RANDOMMAX 4294967295 // (2^32 - 1)
+#define MAX_DIR_ENTRIES 512
 
 #define EXTRACT_BITS(the_val, bits_start, bits_len)                            \
     ((the_val >> (bits_start - 1)) & ((1 << bits_len) - 1))
@@ -212,9 +213,37 @@ void get_random_sample_from_dir(char *dir, char *return_file_name)
     strcat(return_file_name, "/");
     strcat(return_file_name, ep->d_name);
 }
+
+static void switch_wurds(char **wurds, int idx_1, int idx_2)
+{
+    char *scratch = wurds[idx_1];
+    wurds[idx_1] = wurds[idx_2];
+    wurds[idx_2] = scratch;
+}
+
+static bool first_wurd_before_second(char *first_wurd, char *second_wurd)
+{
+    if (strncmp(first_wurd, second_wurd, MAX_STATIC_STRING_SZ) > 0)
+        return true;
+    return false;
+}
+
+static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
+{
+    if (lower_idx >= upper_idx)
+        return;
+    int middle_idx = lower_idx;
+    for (int i = lower_idx + 1; i < upper_idx; i++)
+        if (!first_wurd_before_second(wurds[i], wurds[middle_idx]))
+            switch_wurds(wurds, ++middle_idx, i);
+    switch_wurds(wurds, lower_idx, middle_idx);
+    qsort_char_array(wurds, lower_idx, middle_idx - 1);
+    qsort_char_array(wurds, middle_idx + 1, upper_idx);
+}
+
 void list_sample_dir(char *dir)
 {
-    char dirname[512] = "./wavs/";
+    char dirname[MAX_STATIC_STRING_SZ] = SAMPLE_DIR;
 
     bool have_subdir = false;
     if (0 != strcmp(dir, ""))
@@ -223,6 +252,9 @@ void list_sample_dir(char *dir)
     if (have_subdir)
         strcat(dirname, dir);
 
+    char *dirfiles[MAX_DIR_ENTRIES] = {};
+    int dirfiles_idx = 0;
+
     DIR *dp;
     struct dirent *ep;
     dp = opendir(dirname);
@@ -230,7 +262,7 @@ void list_sample_dir(char *dir)
     {
         while ((ep = readdir(dp)))
         {
-            char filename[512] = "";
+            char *filename = calloc(1, MAX_STATIC_STRING_SZ);
             if (ep->d_type == DT_DIR)
             {
                 // strcat(filename, "\x1b[34m");
@@ -252,9 +284,15 @@ void list_sample_dir(char *dir)
             }
 
             if (strncmp(ep->d_name, ".", 1) != 0)
-                puts(filename);
+                dirfiles[dirfiles_idx++] = filename;
         }
         (void)closedir(dp);
+
+        qsort_char_array(dirfiles, 0, dirfiles_idx);
+        for (int i = 0; i < dirfiles_idx; i++)
+            printf("%s\n", dirfiles[i]);
+        for (int i = 0; i < dirfiles_idx; i++)
+            free(dirfiles[i]);
     }
     else
     {

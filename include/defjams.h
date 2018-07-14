@@ -15,13 +15,15 @@
 #define NUM_WURDS 25
 #define DEFAULT_BPM 110
 
+#define SAMPLE_DIR "./wavs/"
+
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 
 #define DEFAULT_ARRAY_SIZE 32
 
 #define DEFAULT_VELOCITY 92
 
-#define MAX_STATIC_STRING_SZ 4096 // arbitrary
+#define MAX_STATIC_STRING_SZ 1024 // arbitrary
 
 #define ENVIRONMENT_ARRAY_SIZE 128
 #define ENVIRONMENT_KEY_SIZE 128

@@ -89,7 +89,8 @@ void synthdrum_set_eg_sustain_lvl(synthdrum_sequencer *sds, int eg_num,
 void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
                                  double val);
 void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val);
-void synthdrum_set_eg_osc_intensity(synthdrum_sequencer *sds, int eg, int osc, double val);
+void synthdrum_set_eg_osc_intensity(synthdrum_sequencer *sds, int eg, int osc,
+                                    double val);
 void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val);
 void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val);
 void synthdrum_set_filter_freq(synthdrum_sequencer *sds, double val);

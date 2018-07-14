@@ -572,7 +572,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     return to_update;
 }
 
-
 bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                          char wurds[][SIZE_OF_WURD], int num_wurds)
 {

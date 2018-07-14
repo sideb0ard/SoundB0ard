@@ -1,3 +1,5 @@
+TrainStHelena.aiff
+
 ALGO1
 bpm 160
 new loop loops/JungleBassNeedleWobble.aiff;
@@ -10,29 +12,68 @@ every 4 bar moog 1 genonce 0
 every 3 bar gen riff 0 1:0
 every 5 bar moog 1:0
 
-
 perc/DR660CR78woodblock.aif // root_note 4 //basey
-every 6 bar gen riff 
+every 6 bar gen riff
 
 new digi noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
 every 1 bar rand "35 36 28 29 35" digi 3 midi_note_1 %s
 every 2 bar digi 3 gen 1
 
 
-play VoicesBirdsTenneseeTrailMay282018.aiff
-new gran drones/garageDroneForward.aiff
-every 3 bar rand "0 1" loop 0 mode %s
+new gran loops/pumpUpDaJAM.aiff 4; 
+dloops/acidSquelchBeat.aiff 2
+dloops/IshDooIt.aiff
+
+claps/technotron.aiff
+kicks/avalinoKickVoc.aiff
+dloops/mkLikeloop.aiff
+sidechain mk with avalinoKick
+
+loops/busitACID.aiff  vol:0.15 pitch:2.00
+loops/FingersFadeBassStrings.aiff D vol:0.00 pitch:1.00
+
+ALGO2
+[sequence generators]
+kicks/CLunkT.aiff  vol:0.70 pitch:1.00
+hats/DR660Hihatlightclosed.aif  vol:0.20 pitch:1.00
+hats/cloeyhatz.aiff  vol:0.30 pitch:1.00
+snrs/slaveSnare.aiff  vol:0.70 pitch:1.00
+loops/HARDCOREmelodySLOWLOUD.aiff  vol:0.70 pitch:1.00
+strings/breoknRiser.aiff  vol:0.40 pitch:1.00
+
+##################
+
+stop mk
+
+new loop loops/raveStabsCmon.aiff 2
+new loop loops/innercitystylesound.aiff 2; down Fingers; start mk
+
+
+new gran drones/moodIIswing.aiff 4; down ravestabsCmon
+filter moodII w lfo1_active and rate 0.07
 
 new markov 2
 new step hats/dmx_hh_cl.aif
 new step hats/hh8.aif
 every 3 invert markov hats
 
-dloops/IshDooIt.aiff
-new gran loops/pumpUpDaJAM.aiff 4
-dloops/acidSquelchBeat.aiff 2
+delay hats 230
+every 1 bar rand "44 77 80 65 46" fx 18:0 fb %s
 
-claps/technotron.aiff
+filter on hats too, lfo active, fast
+
+dloops/rabveBreaskB.aiff
+
+
+cut dloops/hausBreakBeat.aiff
+
+
+
+
+play VoicesBirdsTenneseeTrailMay282018.aiff
+new gran drones/garageDroneForward.aiff
+every 3 bar rand "0 1" loop 0 mode %s
+
 
 new markov 3
 new digi notes/technoNoteSingle.aiff
@@ -44,15 +85,9 @@ step noises/sndNoize.aiff w/ HATS_MASK
 
 odloops/BroknFingersBeat2.aiff
 
-loops/FingersFadeBassStrings.aiff D vol:0.00 pitch:1.00
-loops/busitACID.aiff  vol:0.15 pitch:2.00
 
-dloops/mkLikeloop.aiff
-new loop loops/raveStabsCmon.aiff 2
-new loop loops/innercitystylesound.aiff 2
 
 drones/moodIIswing.aiff
-dloops/rabveBreaskB.aiff
 
 
 
@@ -62,7 +97,6 @@ every 4 bar gen riff 0 0:0
 every 3 bar rand "4 8 16 32" moog 0 l1rate sync %s
 over 16 bar osc "800 18000" moog 0 fc %s
 
-dloops/mkLikeloop.aiff
 
 dloops/hausBreakBeat.aiff
 waveshape
@@ -79,7 +113,6 @@ filter 3000 // LFO sync
 
 
 breakdown::
-cut dloops/hausBreakBeat.aiff
 filter loops/MrFINGERSspeedBass.aiff 0.03
 
 
@@ -114,16 +147,6 @@ new gran loops/JungleBassNeedleWobble.aiff; loop 0 loop_mode 0
 perc/DR660CR78woodblock.aif // root_note 4 //basey
 noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
 
-ALGO2
-[sequence generators]
-kicks/CLunkT.aiff  vol:0.70 pitch:1.00
-hats/DR660Hihatlightclosed.aif  vol:0.20 pitch:1.00
-hats/cloeyhatz.aiff  vol:0.30 pitch:1.00
-snrs/slaveSnare.aiff  vol:0.70 pitch:1.00
-loops/HARDCOREmelodySLOWLOUD.aiff  vol:0.70 pitch:1.00
-strings/breoknRiser.aiff  vol:0.40 pitch:1.00
-
-##################
 
 [sound generators]
 [step 0] perc/CrackleDonnaBreath.aiff  vol:0.70 pitch:1.00

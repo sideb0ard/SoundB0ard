@@ -80,8 +80,8 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
             int shift_by = patternlen - 1 - i;
             if (bits & (1 << shift_by))
             {
-                synthbase_add_note(base, base->cur_pattern, i, base->midi_note_1,
-                                   keep_note);
+                synthbase_add_note(base, base->cur_pattern, i,
+                                   base->midi_note_1, keep_note);
             }
         }
     }
@@ -169,11 +169,11 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
              L"\nnote_mode:%d chord_mode:%d octave:%d midi_note_1:%d"
              L"midi_note_2:%d midi_note_3:%d\n"
              L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
-             base->note_mode, base->chord_mode, base->octave,
-             base->midi_note_1, base->midi_note_2, base->midi_note_3,
-             base->arp.enable, base->arp.last_midi_notes[0],
-             base->arp.last_midi_notes[1], base->arp.last_midi_notes[2],
-             s_arp_speed[base->arp.speed], s_arp_mode[base->arp.mode]);
+             base->note_mode, base->chord_mode, base->octave, base->midi_note_1,
+             base->midi_note_2, base->midi_note_3, base->arp.enable,
+             base->arp.last_midi_notes[0], base->arp.last_midi_notes[1],
+             base->arp.last_midi_notes[2], s_arp_speed[base->arp.speed],
+             s_arp_mode[base->arp.mode]);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)
@@ -536,14 +536,15 @@ void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
 
 void synthbase_set_midi_note(synthbase *base, int midi_note_num, int note)
 {
-    switch(midi_note_num){
-    case(1):
+    switch (midi_note_num)
+    {
+    case (1):
         base->midi_note_1 = note;
         break;
-    case(2):
+    case (2):
         base->midi_note_2 = note;
         break;
-    case(3):
+    case (3):
         base->midi_note_3 = note;
         break;
     }

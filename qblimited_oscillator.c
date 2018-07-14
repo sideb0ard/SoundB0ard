@@ -6,7 +6,6 @@
 #include "qblimited_oscillator.h"
 #include "utils.h"
 
-
 qb_osc *qb_osc_new()
 {
     qb_osc *qb = (qb_osc *)calloc(1, sizeof(qb_osc));
