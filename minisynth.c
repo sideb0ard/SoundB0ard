@@ -989,9 +989,9 @@ void minisynth_rand_settings(minisynth *ms)
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
     ms->m_settings.m_lfo1_filter_fc_enabled = rand() % 2;
     ms->m_settings.m_filter_type = rand() % NUM_FILTER_TYPES;
-    // ms->m_settings.m_lfo1_amp_intensity = ((float)rand() /
-    //(float)(RAND_MAX));
-    // ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
+     ms->m_settings.m_lfo1_amp_intensity = ((float)rand() /
+    (float)(RAND_MAX));
+    ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo1_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
     // ms->m_settings.m_lfo1_pan_enabled = rand() % 2;
@@ -1010,9 +1010,9 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_lfo2_filter_fc_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
     ms->m_settings.m_lfo2_filter_fc_enabled = rand() % 2;
-    // ms->m_settings.m_lfo2_amp_intensity = ((float)rand() /
-    //(float)(RAND_MAX));
-    // ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
+    ms->m_settings.m_lfo2_amp_intensity = ((float)rand() /
+    (float)(RAND_MAX));
+    ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo2_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
     // ms->m_settings.m_lfo2_pan_enabled = rand() % 2;
@@ -1025,7 +1025,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_fc_control =
         ((float)rand()) / RAND_MAX * (FILTER_FC_MAX - FILTER_FC_MIN) +
         FILTER_FC_MIN;
-    ms->m_settings.m_q_control = (rand() % 9) + 1;
+    ms->m_settings.m_q_control = (rand() % 8) + 1;
 
     ms->m_settings.m_attack_time_msec = (rand() % 700) + 5;
     ms->m_settings.m_decay_time_msec = (rand() % 700) + 5;

@@ -185,6 +185,7 @@ int get_environment_val(char *key, int *return_val);
 void mixer_update_timing_info(mixer *mixr, long long int frame_time);
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
+bool mixer_is_valid_algo(mixer *mixr, int algo_num);
 bool mixer_is_valid_env_var(mixer *mixr, char *key);
 bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum);
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);

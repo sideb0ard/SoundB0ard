@@ -47,6 +47,16 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("algoz", wurds[0], 5) == 0)
     {
+        printf("AGLOZ!\n");
+        if (strncmp("off", wurds[1], 3) == 0)
+            for (int i = 0; i < mixr->algorithm_num; i++)
+            {
+                if (mixer_is_valid_algo(mixr, i))
+                {
+                    algorithm *a = mixr->algorithms[i];
+                    algorithm_stop(a);
+                }
+            }
         mixer_status_algoz(mixr);
     }
 

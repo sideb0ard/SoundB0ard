@@ -87,6 +87,9 @@ void interpret(char *line)
                  strncmp("exit", wurds[0], 4) == 0)
             exxit();
 
+        else if (parse_mixer_cmd(num_wurds, wurds))
+            continue;
+
         else if (parse_algo_cmd(num_wurds, wurds))
             continue;
 
@@ -97,9 +100,6 @@ void interpret(char *line)
             continue;
 
         else if (parse_midi_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_mixer_cmd(num_wurds, wurds))
             continue;
 
         else if (parse_new_item_cmd(num_wurds, wurds))

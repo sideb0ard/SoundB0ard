@@ -12,7 +12,7 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     if (strncmp("algo", wurds[0], 4) == 0)
     {
         int algo_num = atoi(wurds[1]);
-        if (is_valid_algo_num(algo_num))
+        if (mixer_is_valid_algo(mixr, algo_num))
         {
             algorithm *a = mixr->algorithms[algo_num];
 
@@ -76,12 +76,5 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         return true;
     }
-    return false;
-}
-
-bool is_valid_algo_num(int algo_num)
-{
-    if (algo_num >= 0 && algo_num < mixr->algorithm_num)
-        return true;
     return false;
 }

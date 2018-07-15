@@ -17,8 +17,6 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         strncmp("digi", wurds[0], 4) == 0 || strncmp("dx", wurds[0], 2) == 0 ||
         strncmp("fm", wurds[0], 2) == 0)
     {
-        if (strncmp("digi", wurds[0], 4) == 0)
-            printf("DIGI!\n");
         if (strncmp(wurds[1], "ls", 2) == 0)
         {
             if (strncmp("moog", wurds[0], 4) == 0)

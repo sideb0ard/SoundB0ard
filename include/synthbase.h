@@ -164,7 +164,8 @@ int synthbase_get_notes_from_pattern(midi_pattern loop,
 
 int synthbase_change_octave_pattern(synthbase *base, int pattern_num,
                                     int direction);
-void synthbase_change_octave_midi_notes(synthbase *base, unsigned int direction);
+void synthbase_change_octave_midi_notes(synthbase *base,
+                                        unsigned int direction);
 int synthbase_get_num_patterns(void *self);
 void synthbase_set_num_patterns(void *self, int num_patterns);
 int synthbase_get_num_notes(synthbase *base);

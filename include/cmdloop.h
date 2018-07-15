@@ -1,8 +1,8 @@
 #pragma once
 
 #include "audioutils.h"
-#include "dxsynth.h"
 #include "digisynth.h"
+#include "dxsynth.h"
 #include "minisynth.h"
 #include "step_sequencer.h"
 #include <stdbool.h>

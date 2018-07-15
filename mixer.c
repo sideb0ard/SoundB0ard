@@ -764,6 +764,14 @@ bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
     return false;
 }
 
+bool mixer_is_valid_algo(mixer *mixr, int algo_num)
+{
+    if (algo_num >= 0 && algo_num < mixr->algorithm_num &&
+        mixr->algorithms[algo_num] != NULL)
+        return true;
+    return false;
+}
+
 bool mixer_is_valid_env_var(mixer *mixr, char *key)
 {
     for (int i = 0; i < mixr->env_var_count; i++)

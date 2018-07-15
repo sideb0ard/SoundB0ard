@@ -697,8 +697,7 @@ void sds_make_active_track(void *self, int track_num)
 
 void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val)
 {
-    printf("setting distortion to %f\n", val);
-    if (val >= 0 && val <= 1)
+    if (val > 0 && val < 1)
         sds->m_distortion_threshold = val;
     else
         printf("Val must be between 0 and 1\n");

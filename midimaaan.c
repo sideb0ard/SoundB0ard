@@ -245,8 +245,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1freq
-                    double freq =
-                        scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
+                    double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
                     printf("FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 1, freq);
                 }
@@ -254,8 +253,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1freq
-                    double freq =
-                        scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
+                    double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
                     printf("FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 2, freq);
                 }
@@ -296,9 +294,11 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 }
                 else if (mixr->midi_bank_num == 2)
                 {
-                    double distortion_threshold = scaleybum(0, 127, 0., 1., ev->data2);
+                    double distortion_threshold =
+                        scaleybum(0, 127, 0.1, 0.9, ev->data2);
                     printf("DIST!%f\n", distortion_threshold);
-                    synthdrum_set_distortion_threshold(drumsynth, distortion_threshold);
+                    synthdrum_set_distortion_threshold(drumsynth,
+                                                       distortion_threshold);
                 }
                 break;
             case (5):
