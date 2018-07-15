@@ -1,5 +1,11 @@
 TrainStHelena.aiff
 
+moog 0 load swqSAW
+markov 1
+every 2 bar gen riffonce 0 0:0
+
+step synth acidbeAT
+
 ALGO1
 bpm 160
 new loop loops/JungleBassNeedleWobble.aiff;
@@ -22,7 +28,7 @@ every 2 bar digi 3 gen 1
 
 new gran loops/pumpUpDaJAM.aiff 4; 
 dloops/acidSquelchBeat.aiff 2
-dloops/IshDooIt.aiff
+dloops/IshDooIt.aiff // vol 0.5
 
 claps/technotron.aiff
 kicks/avalinoKickVoc.aiff
@@ -41,7 +47,7 @@ every 7 bar gen riff 0 0:0
 dloops/acidSquelchBeat.aiff 2
 
 loops/busitACID.aiff  vol:0.15 pitch:2.00
-loops/FingersFadeBassStrings.aiff D vol:0.00 pitch:1.00
+loops/Fingover 8 bar osc "6.6 8.8" moog 0 fq %sersFadeBassStrings.aiff D vol:0.00 pitch:1.00
 
 ALGO2
 [sequence generators]
@@ -62,7 +68,7 @@ new loop loops/innercitystylesound.aiff 2; down Fingers; start mk
 
 new gran drones/moodIIswing.aiff 4; down ravestabsCmon
 filter moodII w lfo1_active and rate 0.07
-
+ new loop loops/innercitystylesound.aiff 2
 new markov 2
 new step hats/dmx_hh_cl.aif
 new step hats/hh8.aif
@@ -192,3 +198,13 @@ every 2 bar rand "1 0.7 1.4 2" loop 0 pitch %s
 kicks/sludgekick.aiff // MARKOV HIPHOP
 moog drexy midi notes 55 51 50
 MARKOV 2 // gen riff
+
+
+bpm 140
+moog swqSAW // gen riff every 3
+dloops/xbeatloop.aif 2
+drones/idmMelodyBit.aiff 4 // HPF4
+snrs/giggleSnapSnare.aiff
+step 6:0 ~ ~ ~ [~ s]
+step 6:1 ~ s ~ [~ s*3]
+gen euclid

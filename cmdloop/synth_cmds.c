@@ -36,15 +36,9 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int target_pattern_num = -1;
         sscanf(wurds[1], "%d:%d", &soundgen_num, &target_pattern_num);
 
-        printf("IS VASLID NUM:%d\n",
-               mixer_is_valid_soundgen_num(mixr, soundgen_num));
-        printf("IS SUYNTH :%d\n",
-               is_synth(mixr->sound_generators[soundgen_num]));
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
             is_synth(mixr->sound_generators[soundgen_num]))
         {
-            printf("VALID!\n");
-
             if (parse_synthbase_cmd(soundgen_num, target_pattern_num, &wurds[2],
                                     num_wurds - 2))
             {
@@ -73,7 +67,6 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 digisynth *ds =
                     (digisynth *)mixr->sound_generators[soundgen_num];
-                printf("DIDIGSYNTH!!\n");
                 if (parse_digisynth_settings_change(ds, wurds))
                 {
                     digisynth_update(ds);
