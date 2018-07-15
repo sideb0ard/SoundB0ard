@@ -17,6 +17,8 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         strncmp("digi", wurds[0], 4) == 0 || strncmp("dx", wurds[0], 2) == 0 ||
         strncmp("fm", wurds[0], 2) == 0)
     {
+        if (strncmp("digi", wurds[0], 4) == 0)
+            printf("DIGI!\n");
         if (strncmp(wurds[1], "ls", 2) == 0)
         {
             if (strncmp("moog", wurds[0], 4) == 0)
@@ -34,9 +36,14 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int target_pattern_num = -1;
         sscanf(wurds[1], "%d:%d", &soundgen_num, &target_pattern_num);
 
+        printf("IS VASLID NUM:%d\n",
+               mixer_is_valid_soundgen_num(mixr, soundgen_num));
+        printf("IS SUYNTH :%d\n",
+               is_synth(mixr->sound_generators[soundgen_num]));
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
             is_synth(mixr->sound_generators[soundgen_num]))
         {
+            printf("VALID!\n");
 
             if (parse_synthbase_cmd(soundgen_num, target_pattern_num, &wurds[2],
                                     num_wurds - 2))
@@ -66,7 +73,11 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 digisynth *ds =
                     (digisynth *)mixr->sound_generators[soundgen_num];
-                (void)ds;
+                printf("DIDIGSYNTH!!\n");
+                if (parse_digisynth_settings_change(ds, wurds))
+                {
+                    digisynth_update(ds);
+                }
             }
         }
         return true;
@@ -381,6 +392,19 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     }
 
     return false;
+}
+
+bool parse_digisynth_settings_change(digisynth *ds, char wurds[][SIZE_OF_WURD])
+{
+    bool to_update = true;
+    if (strncmp("load", wurds[2], 4) == 0 || strncmp("open", wurds[2], 4) == 0)
+    {
+        printf("Loading new file! %s\n", wurds[3]);
+        digisynth_load_wav(ds, wurds[3]);
+    }
+    else
+        to_update = false;
+    return to_update;
 }
 
 bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])

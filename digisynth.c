@@ -49,6 +49,14 @@ digisynth *new_digisynth(char *filename)
     return ds;
 }
 
+void digisynth_load_wav(digisynth *ds, char *filename)
+{
+    strncpy(ds->audiofile, filename, 1023);
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        audiofile_data_import_file_contents(&ds->m_voices[i].m_osc1.afd, filename);;
+    }
+}
 bool digisynth_is_valid_pattern(void *self, int pattern_num)
 {
     digisynth *digi = (digisynth *)self;
@@ -217,4 +225,7 @@ void digisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
     synthbase *base = get_synthbase(self);
     if (base)
         synthbase_set_pattern(base, pattern_num, pattern);
+}
+void digisynth_update(digisynth *ds)
+{
 }

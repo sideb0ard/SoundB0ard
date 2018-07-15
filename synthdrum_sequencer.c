@@ -22,6 +22,7 @@ synthdrum_sequencer *new_synthdrum_seq()
 
     sds->vol = 0.6;
     sds->started = false;
+    sds->reset_osc = true;
     for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++)
     {
         sds->metadata[i].played = 0.0;
@@ -155,17 +156,18 @@ void sds_status(void *self, wchar_t *ss)
 
     // clang-format off
     swprintf(ss, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f distortion_threshold:%.2f\n"
+             WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f reset:%d distortion_threshold:%.2f\n"
              "o1_wav:" "%s""%s" "%s" "(%d) o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
              "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_sus_ms:%.2f e1_rel:%.2f\n"
              "o2_wav:" "%s" "%s" "%s" "(%d) o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
-             "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f eg2_sus_ms:%.2f e2_rel:%.2f\n"
+             "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f e2_sus_ms:%.2f e2_rel:%.2f\n"
              "%s"
              "filter_type:%d freq:%.2f q:%.2f",
 
              sds->m_patch_name,
              INSTRUMENT_RED,
              sds->vol,
+             sds->reset_osc,
              sds->m_distortion_threshold,
 
              ANSI_COLOR_WHITE,
@@ -312,12 +314,14 @@ double sds_getvol(void *self)
 void sds_trigger(synthdrum_sequencer *sds)
 {
     // printf("trigger!\n");
-    osc_reset(&sds->m_osc1.osc);
+    if (sds->reset_osc)
+        osc_reset(&sds->m_osc1.osc);
     sds->m_osc1.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg1);
     sds->eg1_sustain_counter = 0;
 
-    osc_reset(&sds->m_osc2.osc);
+    if (sds->reset_osc)
+        osc_reset(&sds->m_osc2.osc);
     sds->m_osc2.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg2);
     sds->eg2_sustain_counter = 0;
@@ -730,4 +734,9 @@ void synthdrum_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
     synthdrum_sequencer *seq = (synthdrum_sequencer *)self;
     return step_set_pattern(&seq->m_seq, pattern_num, pattern);
+}
+
+void synthdrum_set_reset_osc(synthdrum_sequencer *sds, bool b)
+{
+    sds->reset_osc = b;
 }

@@ -2,6 +2,7 @@
 
 #include "audioutils.h"
 #include "dxsynth.h"
+#include "digisynth.h"
 #include "minisynth.h"
 #include "step_sequencer.h"
 #include <stdbool.h>
@@ -17,6 +18,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                                   char wurds[][SIZE_OF_WURD], int num_wurds);
 bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD]);
 bool parse_dxsynth_settings_change(dxsynth *ms, char wurds[][SIZE_OF_WURD]);
+bool parse_digisynth_settings_change(digisynth *ms, char wurds[][SIZE_OF_WURD]);
 void char_array_to_seq_string_pattern(step_sequencer *s, char *dest_pattern,
                                       char char_array[NUM_WURDS][SIZE_OF_WURD],
                                       int start, int end);

@@ -23,6 +23,7 @@ typedef struct synthdrum_sequencer
     step_sequencer m_seq;
     char m_patch_name[512];
     double vol;
+    bool reset_osc;
 
     qblimited_oscillator m_osc1;
     double osc1_amp;
@@ -82,6 +83,7 @@ bool synthdrum_list_patches(void);
 void synthdrum_set_osc_wav(synthdrum_sequencer *sds, int osc_num,
                            unsigned int wave);
 void synthdrum_set_osc_fo(synthdrum_sequencer *sds, int osc_num, double freq);
+void synthdrum_set_reset_osc(synthdrum_sequencer *sds, bool b);
 void synthdrum_set_eg_attack(synthdrum_sequencer *sds, int eg_num, double val);
 void synthdrum_set_eg_decay(synthdrum_sequencer *sds, int eg_num, double val);
 void synthdrum_set_eg_sustain_lvl(synthdrum_sequencer *sds, int eg_num,

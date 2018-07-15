@@ -21,6 +21,9 @@ typedef struct digisynth
 } digisynth;
 
 digisynth *new_digisynth(char *filename);
+void digisynth_load_wav(digisynth *ds, char *filename);
+
+void digisynth_update(digisynth *ds);
 
 // sound generator interface //////////////
 stereo_val digisynth_gennext(void *self);

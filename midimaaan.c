@@ -246,7 +246,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1freq
                     double freq =
-                        scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
+                        scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
                     printf("FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 1, freq);
                 }
@@ -255,7 +255,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1freq
                     double freq =
-                        scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
+                        scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
                     printf("FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 2, freq);
                 }
@@ -320,7 +320,6 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     // o1 amp ENV decay
                     double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
                                           ev->data2);
-                    printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     synthdrum_set_eg_decay(drumsynth, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
@@ -329,8 +328,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     // o1 amp ENV decay
                     double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
                                           ev->data2);
-                    printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    synthdrum_set_eg_decay(drumsynth, 1, ms);
+                    synthdrum_set_eg_decay(drumsynth, 2, ms);
                 }
                 break;
             case (7):
