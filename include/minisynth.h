@@ -23,6 +23,30 @@ typedef struct synthsettings
     bool m_monophonic;
     bool hard_sync;
 
+    unsigned int osc1_wave;
+    double osc1_amp;
+    int osc1_oct;
+    int osc1_semis;
+    int osc1_cents;
+
+    unsigned int osc2_wave;
+    double osc2_amp;
+    int osc2_oct;
+    int osc2_semis;
+    int osc2_cents;
+
+    unsigned int osc3_wave;
+    double osc3_amp;
+    int osc3_oct;
+    int osc3_semis;
+    int osc3_cents;
+
+    unsigned int osc4_wave;
+    double osc4_amp;
+    int osc4_oct;
+    int osc4_semis;
+    int osc4_cents;
+
     unsigned int m_lfo1_waveform;
     unsigned int m_lfo1_dest;
     unsigned int m_lfo1_mode;
@@ -142,6 +166,7 @@ typedef struct minisynth
 } minisynth;
 
 minisynth *new_minisynth(void);
+void minisynth_load_defaults(minisynth *ms);
 
 // sound generator interface //////////////
 stereo_val minisynth_gennext(void *self);
@@ -226,6 +251,8 @@ void minisynth_set_filter_nlp(minisynth *ms, unsigned int val);
 void minisynth_set_keytrack_int(minisynth *ms, double val);
 void minisynth_set_keytrack(minisynth *ms, unsigned int val);
 void minisynth_set_legato_mode(minisynth *ms, unsigned int val);
+// OSC
+
 // LFO
 void minisynth_set_lfo_amp_enable(minisynth *ms, int lfo_num, int val);
 void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val);
@@ -247,6 +274,8 @@ void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_noise_osc_db(minisynth *ms, double val);
 void minisynth_set_octave(minisynth *ms, int val);
 void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type);
+void minisynth_set_osc_cents(minisynth *ms, unsigned int osc_num, double val);
+void minisynth_set_osc_amp(minisynth *ms, unsigned int osc_num, double val);
 void minisynth_set_pitchbend_range(minisynth *ms, int val);
 void minisynth_set_portamento_time_ms(minisynth *ms, double val);
 void minisynth_set_pulsewidth_pct(minisynth *ms, double val);

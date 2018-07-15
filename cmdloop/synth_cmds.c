@@ -505,8 +505,16 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_noise_osc_db(ms, val);
     else if (strncmp("osc1", wurds[2], 4) == 0)
         minisynth_set_osc_type(ms, 1, val);
+    else if (strncmp("o1amp", wurds[2], 5) == 0)
+        minisynth_set_osc_amp(ms, 1, val);
+    else if (strncmp("o1cents", wurds[2], 7) == 0)
+        minisynth_set_osc_cents(ms, 1, val);
     else if (strncmp("osc2", wurds[2], 4) == 0)
         minisynth_set_osc_type(ms, 2, val);
+    else if (strncmp("o2amp", wurds[2], 5) == 0)
+        minisynth_set_osc_amp(ms, 2, val);
+    else if (strncmp("o2cents", wurds[2], 7) == 0)
+        minisynth_set_osc_cents(ms, 2, val);
     else if (strncmp("osc3", wurds[2], 4) == 0)
         minisynth_set_osc_type(ms, 3, val);
     else if (strncmp("osc4", wurds[2], 4) == 0)
@@ -537,6 +545,11 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     else if (strncmp("rand", wurds[2], 4) == 0)
     {
         minisynth_rand_settings(ms);
+    }
+    else if (strncmp("default", wurds[2], 7) == 0)
+    {
+        printf("Loading defaults\n");
+        minisynth_load_defaults(ms);
     }
     else if (strncmp("releasems", wurds[2], 7) == 0)
         minisynth_set_release_time_ms(ms, val);

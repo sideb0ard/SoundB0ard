@@ -166,7 +166,7 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t patternstr[33] = {0};
 
     swprintf(scratch, 255,
-             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note_1:%d"
+             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note_1:%d "
              L"midi_note_2:%d midi_note_3:%d\n"
              L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
              base->note_mode, base->chord_mode, base->octave, base->midi_note_1,

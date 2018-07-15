@@ -154,17 +154,22 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (strncmp("melody", wurds[1], 6) == 0 ||
             strncmp("once", wurds[1], 4) == 0 ||
             strncmp("top", wurds[1], 3) == 0 ||
+            strncmp("riffonce", wurds[1], 9) == 0 ||
             strncmp("riff", wurds[1], 4) == 0)
         {
             bool once = false;
             bool riff = false;
             bool top = false; // like a riff but higher
-            if (strncmp("once", wurds[1], 4) == 0)
+
+            if (strncmp("once", wurds[1], 4) == 0 ||
+                strncmp("riffonce", wurds[1], 9) == 0)
                 once = true;
+
             if (strncmp("riff", wurds[1], 4) == 0)
                 riff = true;
             if (strncmp("top", wurds[1], 3) == 0)
                 riff = true;
+
             int generator = atoi(wurds[2]);
             int dest_sg_num = -1;
             int dest_sg_pattern_num = -1;

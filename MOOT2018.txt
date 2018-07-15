@@ -29,6 +29,17 @@ kicks/avalinoKickVoc.aiff
 dloops/mkLikeloop.aiff
 sidechain mk with avalinoKick
 
+new bitshift ((t/4)>>t/4)|(t>>2)
+moog 0 load morphy
+over 8 bar osc "6.6 8.8" moog 0 fq %s
+over 2 bar osc "180 3000" moog 0 fc %s
+every 3 bar rand "1 2 3" algo 1 step %s
+every 3 bar moog 0 gen 0
+every 5 bar rand "up down" moog 0 %s
+every 7 bar gen riff 0 0:0
+
+dloops/acidSquelchBeat.aiff 2
+
 loops/busitACID.aiff  vol:0.15 pitch:2.00
 loops/FingersFadeBassStrings.aiff D vol:0.00 pitch:1.00
 
@@ -89,6 +100,9 @@ odloops/BroknFingersBeat2.aiff
 
 drones/moodIIswing.aiff
 
+
+moog 0 load swqSAW
+every 4 bar gen riff 0 0:0
 
 
 new bitshift ((t/4)>>t/4)|(t>>2)

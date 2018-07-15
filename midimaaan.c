@@ -279,9 +279,9 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 }
                 break;
             case (4):
+                printf("K4:: data1:%d data2:%d\n", ev->data1, ev->data2);
                 if (mixr->midi_bank_num == 0)
                 {
-                    printf("K3:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1amp
                     double intensity = scaleybum(0, 127, 0., 1., ev->data2);
                     printf("INT!%f\n", intensity);
@@ -289,18 +289,28 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    printf("K3:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1amp
-                    double amp = scaleybum(0, 127, 0., 1., ev->data2);
-                    printf("AMP!%f\n", amp);
-                    synthdrum_set_osc_amp(drumsynth, 2, amp);
+                    // o2amp
+                    double intensity = scaleybum(0, 127, 0., 1., ev->data2);
+                    printf("INT2!%f\n", intensity);
+                    synthdrum_set_eg_osc_intensity(drumsynth, 2, 2, intensity);
                 }
                 break;
             case (5):
                 if (mixr->midi_bank_num == 0)
                 {
+                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
+                                          ev->data2);
                     printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1 amp ENV attck
+                    synthdrum_set_eg_attack(drumsynth, 1, ms);
+                }
+                else if (mixr->midi_bank_num == 1)
+                {
+                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
+                                          ev->data2);
+                    printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
+                    // o1 amp ENV attck
+                    synthdrum_set_eg_attack(drumsynth, 2, ms);
                 }
                 break;
             case (6):
@@ -308,6 +318,19 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     printf("K6:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1 amp ENV decay
+                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
+                                          ev->data2);
+                    printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
+                    synthdrum_set_eg_decay(drumsynth, 1, ms);
+                }
+                else if (mixr->midi_bank_num == 1)
+                {
+                    printf("K6:: data1:%d data2:%d\n", ev->data1, ev->data2);
+                    // o1 amp ENV decay
+                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
+                                          ev->data2);
+                    printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
+                    synthdrum_set_eg_decay(drumsynth, 1, ms);
                 }
                 break;
             case (7):
@@ -315,6 +338,15 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     printf("K7:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1 amp ENV sustain ms
+                    double ms = scaleybum(0, 128, 1, 2000, ev->data2);
+                    synthdrum_set_eg_sustain_ms(drumsynth, 1, ms);
+                }
+                else if (mixr->midi_bank_num == 1)
+                {
+                    printf("K7:: data1:%d data2:%d\n", ev->data1, ev->data2);
+                    // o1 amp ENV sustain ms
+                    double ms = scaleybum(0, 128, 1, 2000, ev->data2);
+                    synthdrum_set_eg_sustain_ms(drumsynth, 2, ms);
                 }
                 break;
             case (8):
@@ -322,6 +354,17 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     printf("K8:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1 amp ENV releaser
+                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
+                                          ev->data2);
+                    synthdrum_set_eg_release(drumsynth, 1, ms);
+                }
+                else if (mixr->midi_bank_num == 1)
+                {
+                    printf("K8:: data1:%d data2:%d\n", ev->data1, ev->data2);
+                    // o2 amp ENV releaser
+                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
+                                          ev->data2);
+                    synthdrum_set_eg_release(drumsynth, 2, ms);
                 }
                 break;
             }

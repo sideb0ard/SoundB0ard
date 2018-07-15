@@ -52,11 +52,67 @@ minisynth *new_minisynth(void)
     ms->sound_generator.is_valid_pattern = &minisynth_is_valid_pattern;
     ms->sound_generator.type = MINISYNTH_TYPE;
 
+    minisynth_load_defaults(ms);
+
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        ms->m_voices[i] = new_minisynth_voice();
+        if (!ms->m_voices[i])
+            return NULL; // would be bad
+
+        minisynth_voice_init_global_parameters(ms->m_voices[i],
+                                               &ms->m_global_synth_params);
+    }
+
+    // clears out modmatrix sources and resets all oscs, lfos, eg's etc.
+    minisynth_prepare_for_play(ms);
+
+    // use first voice to setup global
+    minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->m_ms_modmatrix);
+
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
+                                 get_matrix_core(&ms->m_ms_modmatrix));
+    }
+    minisynth_update(ms);
+    ms->sound_generator.active = true;
+
+    return ms;
+}
+
+void minisynth_load_defaults(minisynth *ms)
+{
     strncpy(ms->m_settings.m_settings_name, "default", 7);
 
     ms->m_settings.m_monophonic = false;
     ms->m_settings.m_voice_mode = 0;
     ms->m_settings.m_detune_cents = 0.0;
+
+    // OSC1
+    ms->m_settings.osc1_wave = SAW1;
+    ms->m_settings.osc1_amp = 1;
+    ms->m_settings.osc1_oct = 1;
+    ms->m_settings.osc1_semis = 0;
+    ms->m_settings.osc1_cents = 0;
+    // OSC2
+    ms->m_settings.osc2_wave = SAW1;
+    ms->m_settings.osc2_amp = 1;
+    ms->m_settings.osc2_oct = 1;
+    ms->m_settings.osc2_semis = 0;
+    ms->m_settings.osc2_cents = 0;
+    // OSC3
+    ms->m_settings.osc3_wave = SAW1;
+    ms->m_settings.osc3_amp = 0;
+    ms->m_settings.osc3_oct = 0;
+    ms->m_settings.osc3_semis = 0;
+    ms->m_settings.osc3_cents = 0;
+    // OSC4
+    ms->m_settings.osc4_wave = NOISE;
+    ms->m_settings.osc4_amp = 0;
+    ms->m_settings.osc4_oct = 0;
+    ms->m_settings.osc4_semis = 0;
+    ms->m_settings.osc4_cents = 0;
 
     // LFO1
     ms->m_settings.m_lfo1_waveform = 0;
@@ -142,32 +198,6 @@ minisynth *new_minisynth(void)
 
     ms->m_settings.m_generate_active = false;
     ms->m_settings.m_generate_src = -99;
-
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        ms->m_voices[i] = new_minisynth_voice();
-        if (!ms->m_voices[i])
-            return NULL; // would be bad
-
-        minisynth_voice_init_global_parameters(ms->m_voices[i],
-                                               &ms->m_global_synth_params);
-    }
-
-    // clears out modmatrix sources and resets all oscs, lfos, eg's etc.
-    minisynth_prepare_for_play(ms);
-
-    // use first voice to setup global
-    minisynth_voice_initialize_modmatrix(ms->m_voices[0], &ms->m_ms_modmatrix);
-
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
-                                 get_matrix_core(&ms->m_ms_modmatrix));
-    }
-    minisynth_update(ms);
-    ms->sound_generator.active = true;
-
-    return ms;
 }
 
 bool minisynth_is_valid_pattern(void *self, int pattern_num)
@@ -235,6 +265,16 @@ void minisynth_update(minisynth *ms)
         ms->m_settings.m_eg1_dca_intensity;
 
     // --- oscillators:
+    ms->m_global_synth_params.osc1_params.amplitude = ms->m_settings.osc1_amp;
+    ms->m_global_synth_params.osc1_params.octave = ms->m_settings.osc1_oct;
+    ms->m_global_synth_params.osc1_params.semitones = ms->m_settings.osc1_semis;
+    ms->m_global_synth_params.osc1_params.cents = ms->m_settings.osc1_cents;
+
+    ms->m_global_synth_params.osc2_params.amplitude = ms->m_settings.osc2_amp;
+    ms->m_global_synth_params.osc2_params.octave = ms->m_settings.osc2_oct;
+    ms->m_global_synth_params.osc2_params.semitones = ms->m_settings.osc2_semis;
+    ms->m_global_synth_params.osc2_params.cents = ms->m_settings.osc2_cents;
+
     double noise_amplitude =
         ms->m_settings.m_noise_osc_db == -96.0
             ? 0.0
@@ -245,9 +285,15 @@ void minisynth_update(minisynth *ms)
 
     // --- osc3 is sub osc
     ms->m_global_synth_params.osc3_params.amplitude = sub_amplitude;
+    ms->m_global_synth_params.osc3_params.octave = ms->m_settings.osc3_oct;
+    ms->m_global_synth_params.osc3_params.semitones = ms->m_settings.osc3_semis;
+    ms->m_global_synth_params.osc3_params.cents = ms->m_settings.osc3_cents;
 
     // --- osc4 is noise osc
     ms->m_global_synth_params.osc4_params.amplitude = noise_amplitude;
+    ms->m_global_synth_params.osc4_params.octave = ms->m_settings.osc4_oct;
+    ms->m_global_synth_params.osc4_params.semitones = ms->m_settings.osc4_semis;
+    ms->m_global_synth_params.osc4_params.cents = ms->m_settings.osc4_cents;
 
     // --- pulse width
     ms->m_global_synth_params.osc1_params.pulse_width_control =
@@ -691,7 +737,10 @@ void minisynth_status(void *self, wchar_t *status_string)
         "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) "
         "mono:%d hard_sync:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
 
-        "osc1:%s(%d) osc2:%s(%d) osc3:%s(%d) osc4:%s(%d)\n"
+        "osc1:%s(%d) o1amp:%f o1oct:%d o1semi:%d o1cents%d\n"
+        "osc2:%s(%d) o2amp:%f o2oct:%d o2semi:%d o2cents%d\n"
+        "osc3:%s(%d) o3amp:%f o3oct:%d o3semi:%d o3cents%d\n"
+        "osc4:%s(%d) o4amp:%f o4oct:%d o4semi:%d o4cents%d\n"
 
         "noisedb:%3.0f octave:%d  pitchrange:%d porta:%.0f  pw:%.0f subosc:%3.0f vascale:%d zero:%d\n"
 
@@ -712,7 +761,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         "attackms:%4.0f       decayms:%4.0f     releasems:%4.0f   sustain_note_ms:%d\n"
 
         "%s"
-        "filter:%s(%d)      fc:%7.1f       fq:%4.1f       aux:%0.2f"
+        "filter:%s(%d)      fc:%7.1f       fq:%4.1f     aux:%0.2f sat:%0.2f"
 
         "%s",
 
@@ -732,12 +781,32 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         s_waveform_names[ms->m_global_synth_params.osc1_params.waveform],
         ms->m_global_synth_params.osc1_params.waveform,
+        ms->m_global_synth_params.osc1_params.amplitude,
+        ms->m_global_synth_params.osc1_params.octave,
+        ms->m_global_synth_params.osc1_params.semitones,
+        ms->m_global_synth_params.osc1_params.cents,
+
         s_waveform_names[ms->m_global_synth_params.osc2_params.waveform],
         ms->m_global_synth_params.osc2_params.waveform,
+        ms->m_global_synth_params.osc2_params.amplitude,
+        ms->m_global_synth_params.osc2_params.octave,
+        ms->m_global_synth_params.osc2_params.semitones,
+        ms->m_global_synth_params.osc2_params.cents,
+
         s_waveform_names[ms->m_global_synth_params.osc3_params.waveform],
         ms->m_global_synth_params.osc3_params.waveform,
+        ms->m_global_synth_params.osc3_params.amplitude,
+        ms->m_global_synth_params.osc3_params.octave,
+        ms->m_global_synth_params.osc3_params.semitones,
+        ms->m_global_synth_params.osc3_params.cents,
+
         s_waveform_names[ms->m_global_synth_params.osc4_params.waveform],
         ms->m_global_synth_params.osc4_params.waveform,
+        ms->m_global_synth_params.osc4_params.amplitude,
+        ms->m_global_synth_params.osc4_params.octave,
+        ms->m_global_synth_params.osc4_params.semitones,
+        ms->m_global_synth_params.osc4_params.cents,
+
 
         ms->m_settings.m_noise_osc_db,
         ms->m_settings.m_octave,
@@ -809,6 +878,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_fc_control,
         ms->m_settings.m_q_control,
         ms->m_settings.m_q_control, //TODO
+        ms->m_settings.m_filter_saturation,
 
         INSTRUMENT_YELLOW
         );
@@ -1786,6 +1856,65 @@ void minisynth_set_release_time_ms(minisynth *ms, double val)
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
+void minisynth_set_osc_amp(minisynth *ms, unsigned int osc_num, double val)
+{
+    if (osc_num == 0 || osc_num > 4)
+        return;
+
+    if (val >= -1 && val <= 1)
+    {
+        switch(osc_num){
+        case(1):
+        ms->m_settings.osc1_amp
+            = val;
+        break;
+        case(2):
+        ms->m_settings.osc2_amp
+            = val;
+        break;
+        case(3):
+        ms->m_settings.osc3_amp
+            = val;
+        break;
+        case(4):
+        ms->m_settings.osc4_amp
+            = val;
+        break;
+        }
+    }
+    else
+        printf("val must be between -100 and 100\n");
+}
+
+void minisynth_set_osc_cents(minisynth *ms, unsigned int osc_num, double val)
+{
+    if (osc_num == 0 || osc_num > 4)
+        return;
+
+    if (val >= -100 && val <= 100)
+    {
+        switch(osc_num){
+        case(1):
+        ms->m_settings.osc1_cents
+            = val;
+        break;
+        case(2):
+        ms->m_settings.osc2_cents
+            = val;
+        break;
+        case(3):
+        ms->m_settings.osc3_cents
+            = val;
+        break;
+        case(4):
+        ms->m_settings.osc4_cents
+            = val;
+        break;
+        }
+    }
+    else
+        printf("val must be between -100 and 100\n");
+}
 void minisynth_set_detune(minisynth *ms, double val)
 {
     if (val >= -100 && val <= 100)

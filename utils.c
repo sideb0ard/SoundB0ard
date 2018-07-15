@@ -228,10 +228,12 @@ static bool first_wurd_before_second(char *first_wurd, char *second_wurd)
     return false;
 }
 
-static int sort_char_array(char **wurds, int start_idx, int end_idx) {
-    for (int i = 1; i < end_idx; i++) {
-        for (int j = i; j > 0 && first_wurd_before_second(wurds[j-1], wurds[j]);
-             j--)
+static int sort_char_array(char **wurds, int start_idx, int end_idx)
+{
+    for (int i = 1; i < end_idx; i++)
+    {
+        for (int j = i;
+             j > 0 && first_wurd_before_second(wurds[j - 1], wurds[j]); j--)
         {
             switch_wurds(wurds, j - 1, j);
         }
