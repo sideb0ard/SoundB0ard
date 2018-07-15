@@ -56,7 +56,7 @@ inline double qb_do_sawtooth(oscillator *self, double modulo, double inc)
                                       1.0,    /* sawtooth edge height = 1.0 */
                                       false,  /* falling edge */
                                       4,      /* 1 point per side */
-                                      false); /* no interpolation */
+                                      false); /* interpolation */
     }
     else // to prevent overlapM_PIng BLEPs, default back to 2-point for f >
          // Nyquist/4
@@ -69,7 +69,7 @@ inline double qb_do_sawtooth(oscillator *self, double modulo, double inc)
                                       1.0,   /* sawtooth edge height = 1.0 */
                                       false, /* falling edge */
                                       1,     /* 1 point per side */
-                                      true); /* no interpolation */
+                                      true); /* interpolation */
     }
 
     return out;

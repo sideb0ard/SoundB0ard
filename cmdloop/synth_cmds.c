@@ -762,11 +762,13 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         {
             for (int i = 0; i < base->num_patterns; i++)
                 synthbase_change_octave_pattern(base, i, 1);
+            synthbase_change_octave_midi_notes(base, UP);
         }
         else if (strncmp("down", wurds[0], 4) == 0)
         {
             for (int i = 0; i < base->num_patterns; i++)
                 synthbase_change_octave_pattern(base, i, 0);
+            synthbase_change_octave_midi_notes(base, DOWN);
         }
         else
             cmd_found = false;

@@ -294,6 +294,12 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     printf("INT2!%f\n", intensity);
                     synthdrum_set_eg_osc_intensity(drumsynth, 2, 2, intensity);
                 }
+                else if (mixr->midi_bank_num == 2)
+                {
+                    double distortion_threshold = scaleybum(0, 127, 0., 1., ev->data2);
+                    printf("DIST!%f\n", distortion_threshold);
+                    synthdrum_set_distortion_threshold(drumsynth, distortion_threshold);
+                }
                 break;
             case (5):
                 if (mixr->midi_bank_num == 0)

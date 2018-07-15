@@ -717,3 +717,19 @@ void synthbase_do_arp(synthbase *base, soundgenerator *parent)
         }
     }
 }
+
+void synthbase_change_octave_midi_notes(synthbase *base, unsigned int direction)
+{
+    if (direction == UP)
+    {
+        base->midi_note_1 += 12;
+        base->midi_note_2 += 12;
+        base->midi_note_3 += 12;
+    }
+    else
+    {
+        base->midi_note_1 -= 12;
+        base->midi_note_2 -= 12;
+        base->midi_note_3 -= 12;
+    }
+}

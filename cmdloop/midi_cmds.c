@@ -3,6 +3,7 @@
 
 #include <midi_cmds.h>
 #include <mixer.h>
+#include <synthdrum_sequencer.h>
 
 extern mixer *mixr;
 
@@ -147,6 +148,14 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             midi_launch_init(mixr);
             int sg_num = add_minisynth(mixr);
+            if (sg_num != -1)
+                midi_set_destination(mixr, sg_num);
+        }
+        else if (strncmp("drum", wurds[1], 4) == 0)
+        {
+            midi_launch_init(mixr);
+            synthdrum_sequencer *ds = new_synthdrum_seq();
+            int sg_num = add_sound_generator(mixr, (soundgenerator *)ds);
             if (sg_num != -1)
                 midi_set_destination(mixr, sg_num);
         }
