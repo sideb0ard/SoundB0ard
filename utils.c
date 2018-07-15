@@ -228,13 +228,24 @@ static bool first_wurd_before_second(char *first_wurd, char *second_wurd)
     return false;
 }
 
+static int sort_char_array(char **wurds, int start_idx, int end_idx) {
+    for (int i = 1; i < end_idx; i++) {
+        for (int j = i; j > 0 && first_wurd_before_second(wurds[j-1], wurds[j]);
+             j--)
+        {
+            switch_wurds(wurds, j - 1, j);
+        }
+    }
+    return 0;
+}
+
 static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
 {
     if (lower_idx >= upper_idx)
         return;
     int middle_idx = lower_idx;
     for (int i = lower_idx + 1; i < upper_idx; i++)
-        if (!first_wurd_before_second(wurds[i], wurds[middle_idx]))
+        if (!first_wurd_before_second(wurds[i], wurds[lower_idx]))
             switch_wurds(wurds, ++middle_idx, i);
     switch_wurds(wurds, lower_idx, middle_idx);
     qsort_char_array(wurds, lower_idx, middle_idx - 1);
@@ -288,7 +299,7 @@ void list_sample_dir(char *dir)
         }
         (void)closedir(dp);
 
-        qsort_char_array(dirfiles, 0, dirfiles_idx);
+        sort_char_array(dirfiles, 0, dirfiles_idx);
         for (int i = 0; i < dirfiles_idx; i++)
             printf("%s\n", dirfiles[i]);
         for (int i = 0; i < dirfiles_idx; i++)
