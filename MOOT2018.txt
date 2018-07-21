@@ -1,7 +1,10 @@
-TrainStHelena.aiff
 ALGO1
+
 bpm 160
 new loop loops/JungleBassNeedleWobble.aiff;
+
+
+play dloops/rocksteady_vocal.aif
 
 new bitshift ((t/4)>>t/4)|(t>>2)
 new step notes/2stepbass.aiff
@@ -11,20 +14,29 @@ step 1 gen every 3
 new moog
 moog 2 load drexy
 every 2 bar moog 2 genonce 0
+every 5 bar gen riff 0 2:0
+
+
+new digi notes/technoNoteSingle.aiff
+digi 3 up; digi 3 up
+every 2 bar gen riffonce 0 3:0
+
+
+#  new markov 3
+#  new digi noises/SNDdoublewhooshit.aiff
+#  every 1 bar rand "35 36 28 29 35" digi 4 midi_note_1 %s
+every 3 bar digi 4 gen 1
+
+stop 0; every 2 bar digi 4 gen 0
+
+new loop dloops/rabveBreaskB.aiff; fuckup 5; start 0; stop 1; stop 2
+vol 4 0.6
 
 stop 0
 
-new markov 2
-new digi noises/SNDdoublewhooshit.aiff
-vol 3 0.4
-every 3 16th rand "35 36 28 29 35" digi 3 midi_note_1 %s
-every 3 bar gen riffonce 1 3:0
-
-new loop dloops/rabveBreaskB.aiff
-fuckup 4
-bitcrush 4
-every 1 bar "4 6 8 16" fx 4:0 bitdepth %s
-every 3 bar rand "1 2 1.5 1.2" loop 4 pitch %s
+bitcrush 5
+every 1 bar "4 6 8 16" fx 5:0 bitdepth %s
+every 3 bar rand "1 2 1.5 1.2" loop 5 pitch %s
 
 
 stop all; start 3;
@@ -35,49 +47,65 @@ fuckup 5
 
 new loop loops/raveLooprr.aiff 2
 fuckup 6
-every 3 bar stop 6
-every 4 bar start 6
 
-moog 2 load swqSAW
-fx 2:0 off
-markov 1
-every 2 bar gen riffonce 0 0:0
+stop all; start 4; start 5; start 6
 
-every 2 bar "up down" moog 2 %s
+stop 5
 
-new bitshift 74 * ( t | ( t >> 2 | t >> 16 ) )
 
-new loop loops/pumpUpDaJAM.aiff 4;
-new loop dloops/acidSquelchBeat.aiff 2
-dloops/IshDooIt.aiff // vol 0.5
+moog 2 load ven0m
+markov 2 // hats
+every 3 bar gen melody 2 2:0
+start 2
 
-claps/technotron.aiff
+loop 6 pitch 2; stop 4
+start 4; loop 6 pitch 1
+
+/////////////// BPN 140
+stop 6; stop 4 // only synth
+new step claps/technotron.aiff [~ cp]*2
+new euclid
+step 7 gen src euclid
+step 7 gen every 8
+
 kicks/avalinoKickVoc.aiff
 dloops/mkLikeloop.aiff
 sidechain mk with avalinoKick
+fuckup 9
 
-new bitshift ((t/4)>>t/4)|(t>>2)
-moog 0 load morphy
-over 8 bar osc "6.6 8.8" moog 0 fq %s
-over 2 bar osc "180 3000" moog 0 fc %s
-every 3 bar rand "1 2 3" algo 1 step %s
-every 3 bar moog 0 gen 0
-every 5 bar rand "up down" moog 0 %s
-every 7 bar gen riff 0 0:0
+new loop loops/pumpUpDaJAM.aiff 4;
 
-dloops/acidSquelchBeat.aiff 2
+stop avalino
+
+new loop dloops/acidSquelchBeat.aiff 2
+new loop dloops/acidSquelchBeat.aiff 2; down 2
+
+
+
+env dloops/mkLikeloop.aiff 7 0
+
+//      moog 0 load morphy
+//      over 8 bar osc "6.6 8.8" moog 2 fq %s
+//      over 2 bar osc "180 3000" moog 2 fc %s
+//      every 3 bar rand "1 2 3" algo 1 step %s
+//      every 3 bar moog 0 gen 0
+//      every 5 bar rand "up down" moog 0 %s
+//      every 7 bar gen riff 0 0:0
+
 
 loops/busitACID.aiff  vol:0.15 pitch:2.00
-loops/Fingover 8 bar osc "6.6 8.8" moog 0 fq %sersFadeBassStrings.aiff D vol:0.00 pitch:1.00
+new loop loops/FingersFadeBassStrings.aiff
 
 ALGO2
 [sequence generators]
 kicks/CLunkT.aiff  vol:0.70 pitch:1.00
-hats/DR660Hihatlightclosed.aif  vol:0.20 pitch:1.00
-hats/cloeyhatz.aiff  vol:0.30 pitch:1.00
+
 snrs/slaveSnare.aiff  vol:0.70 pitch:1.00
-loops/HARDCOREmelodySLOWLOUD.aiff  vol:0.70 pitch:1.00
 strings/breoknRiser.aiff  vol:0.40 pitch:1.00
+
+new loop loops/FingersFadeBassStrings.aiff
+new loop dloops/brandyxmen2bar1.aif 2
+
 
 ##################
 
@@ -106,8 +134,17 @@ dloops/rabveBreaskB.aiff
 cut dloops/hausBreakBeat.aiff
 
 
+loops/toddterrybass1bar.aiff
 
 
+moog 2 load sharpie
+new bitshift ((t/1000)^(t/1001))*t
+every 2 bar gen riff 6 31:0
+
+over 4 bar osc "180 18000" moog 31 fc %s
+
+
+over 4 bar osc "180 18000" moog 31 fc %s
 play VoicesBirdsTenneseeTrailMay282018.aiff
 new gran drones/garageDroneForward.aiff
 every 3 bar rand "0 1" loop 0 mode %s
@@ -122,107 +159,43 @@ every 4 bar gen melody 0 1:0
 step noises/sndNoize.aiff w/ HATS_MASK
 
 odloops/BroknFingersBeat2.aiff
+loops/raveBass.aiff
 
+
+//  moog aqua
+//  over 4 bar osc "180 18000" moog X fc %s
+//  over 3 bar osc "1 8" moog 31 fq %s
+//  every 8 bar "down down up up" moog 31 %s
 
 
 drones/moodIIswing.aiff
 
-
-moog 0 load swqSAW
-every 4 bar gen riff 0 0:0
-
-
-new bitshift ((t/4)>>t/4)|(t>>2)
-moog GNARL // octave 0
-every 4 bar gen riff 0 0:0
-every 3 bar rand "4 8 16 32" moog 0 l1rate sync %s
-over 16 bar osc "800 18000" moog 0 fc %s
-
-
-dloops/hausBreakBeat.aiff
-waveshape
-
-
-
-step synth load  warppe // markov HIPHOP
-every 1 bar rand "40 50 60 74" step 4 o1_fo %s
-
-
-
-loops/MrFINGERSspeedBass.aiff
-filter 3000 // LFO sync
-
-
-breakdown::
-filter loops/MrFINGERSspeedBass.aiff 0.03
-
-
-
-
-moog aqua
-moog 12:0 ~ f4*3 ~ a4
-moog 12:1 ~ f4*3 ~ [~ ~ a4 ~]
-moog 12  l1_filter_en 1
-moog 12 l1rate 8
-
-loops/raveBass.aiff
-
-strings/darkMoWaxStrings.aiff
-
-
-[moog 10] rumbllrrSQR // gen melody HIPHOP
-
-kicks/BASSk.aiff
-
+new step kicks/808Kkick.wav // bd*4 // gen markov hiphop every 3
+perc/2STEPperc2.aiff
 claps/djkhaledClap.aiff
 dloops/NeedleClickBeat.aiff // pitch 2 len 0.5
-waveshape 2
-
-invert
-hats/dmx_hh_cl.aif
-hats/hh8.aif
-
-ALGO1
-bpm 160
-new gran loops/JungleBassNeedleWobble.aiff; loop 0 loop_mode 0
-perc/DR660CR78woodblock.aif // root_note 4 //basey
-noises/SNDdoublewhooshit.aiff p="35 36 28 29 35" ??
 
 
-[sound generators]
-[step 0] perc/CrackleDonnaBreath.aiff  vol:0.70 pitch:1.00
-[step 1] noises/NeedleJump.aiff  vol:0.30 pitch:1.00
-[step 2] perc/cracklPERC2.aiff  vol:0.70 pitch:1.00
+loops/ohmdrum.aiff // NICE - highpass filter
+every 3 bar rand "0 1" loop 42 mode %s
+
+dloops/tecnAe.aiff
+
+new loop loops/HARDCOREmelody.aiff 2
+every 3 bar rand "1 1.5 2" loop 45 pitch %s
+
+step noises/NeedleJump.aiff ~ ~ ~ nj
 
 ALGO7
-loops/ohmdrum.aiff
-dloops/tecnAe.aiff
-loops/HARDCOREmelody.aiff
 new bitshift ((t/1000)^(t/1001))*t
-dx rar - octave 2
-
-loops/JungleBassNeedleWobble.aiff
-fuckup
+dx d2 - octave 2
+every 3 bar gen riff HATS_MASK dx
 
 perc/DR660CR78woodblock.aif
-
-
-dx rzrrr and rzr235 // midi_note 35 dx 6 gen euclid
-every 3 bar rand "35 39 42" dx 6 midi_note %s
-
-BPM 120
 
 dloops/GetHype.aiff
 every 2 bar rand "1 0.7 1.4 2" loop 0 pitch %s
 
-
-kicks/sludgekick.aiff // MARKOV HIPHOP
-moog drexy midi notes 55 51 50
-MARKOV 2 // gen riff
-
-
-bpm 140
-moog swqSAW // gen riff every 3
 dloops/xbeatloop.aif 2
 drones/idmMelodyBit.aiff 4 // HPF4
 snrs/giggleSnapSnare.aiff

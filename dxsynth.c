@@ -40,6 +40,47 @@ dxsynth *new_dxsynth(void)
     dx->sound_generator.is_valid_pattern = &dxsynth_is_valid_pattern;
     dx->sound_generator.type = DXSYNTH_TYPE;
 
+    dxsynth_reset(dx);
+
+    for (int i = 0; i < MAX_DX_VOICES; i++)
+    {
+        dx->m_voices[i] = new_dxsynth_voice();
+        if (!dx->m_voices[i])
+            return NULL; // would be bad
+
+        dxsynth_voice_init_global_parameters(dx->m_voices[i],
+                                             &dx->m_global_synth_params);
+    }
+
+    dxsynth_prepare_for_play(dx);
+
+    // use first voice to setup global
+    dxsynth_voice_initialize_modmatrix(dx->m_voices[0],
+                                       &dx->m_global_modmatrix);
+
+    for (int i = 0; i < MAX_DX_VOICES; i++)
+    {
+        voice_set_modmatrix_core(&dx->m_voices[i]->m_voice,
+                                 get_matrix_core(&dx->m_global_modmatrix));
+    }
+    dxsynth_update(dx);
+
+    dx->m_last_note_frequency = -1.0;
+
+    dx->vol = 1;
+    dx->sound_generator.active = true;
+    printf("BOOM!\n");
+    return dx;
+}
+
+bool dxsynth_is_valid_pattern(void *self, int pattern_num)
+{
+    dxsynth *dx = (dxsynth *)self;
+    return is_valid_pattern_num(&dx->base, pattern_num);
+}
+
+void dxsynth_reset(dxsynth *dx)
+{
     strncpy(dx->m_settings.m_settings_name, "default", 7);
     dx->m_settings.m_volume_db = 0;
     dx->m_settings.m_voice_mode = 0;
@@ -94,44 +135,7 @@ dxsynth *new_dxsynth(void)
     dx->m_settings.m_eg4_release_ms = 2000;
     dx->m_settings.m_op4_output_lvl = 75;
     dx->m_settings.m_op4_feedback = 0; // 0-70
-
-    for (int i = 0; i < MAX_DX_VOICES; i++)
-    {
-        dx->m_voices[i] = new_dxsynth_voice();
-        if (!dx->m_voices[i])
-            return NULL; // would be bad
-
-        dxsynth_voice_init_global_parameters(dx->m_voices[i],
-                                             &dx->m_global_synth_params);
-    }
-
-    dxsynth_prepare_for_play(dx);
-
-    // use first voice to setup global
-    dxsynth_voice_initialize_modmatrix(dx->m_voices[0],
-                                       &dx->m_global_modmatrix);
-
-    for (int i = 0; i < MAX_DX_VOICES; i++)
-    {
-        voice_set_modmatrix_core(&dx->m_voices[i]->m_voice,
-                                 get_matrix_core(&dx->m_global_modmatrix));
-    }
-    dxsynth_update(dx);
-
-    dx->m_last_note_frequency = -1.0;
-
-    dx->vol = 1;
-    dx->sound_generator.active = true;
-    printf("BOOM!\n");
-    return dx;
 }
-
-bool dxsynth_is_valid_pattern(void *self, int pattern_num)
-{
-    dxsynth *dx = (dxsynth *)self;
-    return is_valid_pattern_num(&dx->base, pattern_num);
-}
-
 ////////////////////////////////////
 
 bool dxsynth_prepare_for_play(dxsynth *dx)
@@ -709,12 +713,14 @@ stereo_val dxsynth_gennext(void *self)
 
 void dxsynth_rand_settings(dxsynth *dx)
 {
+    dxsynth_reset(dx);
+    return;
     //printf("Randomizing DXSYNTH!\n");
 
-    dx->m_settings.m_voice_mode = rand() % 8;
+    //dx->m_settings.m_voice_mode = rand() % 8;
     //dx->m_settings.m_portamento_time_ms = rand() % 5000;
     //dx->m_settings.m_pitchbend_range = (rand() % 12) + 1;
-    //dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
+    ////dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
     //dx->m_settings.m_note_number_to_decay_scaling = rand() % 2;
     //dx->m_settings.m_reset_to_zero = rand() % 2;
     //dx->m_settings.m_legato_mode = rand() % 2;
@@ -727,43 +733,44 @@ void dxsynth_rand_settings(dxsynth *dx)
     dx->m_settings.m_lfo1_mod_dest3 = rand() % 3;
     dx->m_settings.m_lfo1_mod_dest4 = rand() % 3;
 
-    // dx->m_settings.m_op1_waveform = rand() % MAX_OSC;
-    dx->m_settings.m_op1_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    // dx->m_settings.m_op1_detune_cents = (rand() % 200) - 100;
-    // dx->m_settings.m_eg1_attack_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg1_decay_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
-    // dx->m_settings.m_eg1_release_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_op1_output_lvl = ((float)rand()) / RAND_MAX;
+    //dx->m_settings.m_op1_waveform = rand() % MAX_OSC;
+    //dx->m_settings.m_op1_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    //dx->m_settings.m_op1_detune_cents = (rand() % 200) - 100;
+    //dx->m_settings.m_eg1_attack_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg1_decay_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
+    //dx->m_settings.m_eg1_release_ms = rand()% EG_MAXTIME_MS;
+    //dx->m_settings.m_op1_output_lvl = ((float)rand()) / RAND_MAX;
 
-    // dx->m_settings.m_op2_waveform = rand() % MAX_OSC;
+    dx->m_settings.m_op2_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op2_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    // dx->m_settings.m_op2_detune_cents = (rand() % 200) - 100;
-    // dx->m_settings.m_eg2_attack_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg2_decay_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg2_sustain_lvl = ((float)rand()) / RAND_MAX;
-    // dx->m_settings.m_eg2_release_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_op2_output_lvl = ((float)rand()) / RAND_MAX;
+    dx->m_settings.m_op2_detune_cents = (rand() % 200) - 100;
+    dx->m_settings.m_eg2_attack_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_eg2_decay_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_eg2_sustain_lvl = ((float)rand()) / RAND_MAX;
+    dx->m_settings.m_eg2_release_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_op2_output_lvl = ((float)rand()) / RAND_MAX;
 
-    // dx->m_settings.m_op3_waveform = rand() % MAX_OSC;
+    dx->m_settings.m_op3_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op3_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    // dx->m_settings.m_op3_detune_cents = (rand() % 200) - 100;
-    // dx->m_settings.m_eg3_attack_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg3_decay_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg3_sustain_lvl = ((float)rand()) / RAND_MAX;
-    // dx->m_settings.m_eg3_release_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_op3_output_lvl = ((float)rand()) / RAND_MAX;
+    dx->m_settings.m_op3_detune_cents = (rand() % 200) - 100;
+    dx->m_settings.m_eg3_attack_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_eg3_decay_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_eg3_sustain_lvl = ((float)rand()) / RAND_MAX;
+    dx->m_settings.m_eg3_release_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_op3_output_lvl = ((float)rand()) / RAND_MAX;
 
-    // dx->m_settings.m_op4_waveform = rand() % MAX_OSC;
+    dx->m_settings.m_op4_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op4_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    // dx->m_settings.m_op4_detune_cents = (rand() % 200) - 100;
-    // dx->m_settings.m_eg4_attack_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg4_decay_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
-    // dx->m_settings.m_eg4_release_ms = rand()% EG_MAXTIME_MS;
-    // dx->m_settings.m_op4_output_lvl = ((float)rand()) / RAND_MAX;
+    dx->m_settings.m_op4_detune_cents = (rand() % 200) - 100;
+    dx->m_settings.m_eg4_attack_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_eg4_decay_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
+    dx->m_settings.m_eg4_release_ms = rand()% EG_MAXTIME_MS;
+    dx->m_settings.m_op4_output_lvl = ((float)rand()) / RAND_MAX;
     dx->m_settings.m_op4_feedback = rand() % 70;
 
+    printf("UPDATE!\n");
     dxsynth_update(dx);
     // dxsynth_print_settings(dx);
 }

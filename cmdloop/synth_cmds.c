@@ -82,15 +82,18 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     {
         int algo = atoi(wurds[3]);
         dxsynth_set_voice_mode(dx, algo);
+        return true;
     }
     else if (strncmp("open", wurds[2], 4) == 0 ||
              strncmp("load", wurds[2], 4) == 0)
     {
         dxsynth_load_settings(dx, wurds[3]);
+        return true;
     }
     else if (strncmp("save", wurds[2], 4) == 0)
     {
         dxsynth_save_settings(dx, wurds[3]);
+        return true;
     }
     else if (strncmp("porta", wurds[2], 5) == 0)
     {
@@ -100,7 +103,9 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("rand", wurds[2], 4) == 0)
     {
+        printf("RND!\n");
         dxsynth_rand_settings(dx);
+        return true;
     }
     else if (strncmp("pitchrange", wurds[2], 10) == 0)
     {

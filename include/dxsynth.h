@@ -113,6 +113,7 @@ typedef struct dxsynth
 } dxsynth;
 
 dxsynth *new_dxsynth(void);
+void dxsynth_reset(dxsynth *dx);
 void dxsynth_del_self(void *self);
 
 // sound generator interface //////////////
