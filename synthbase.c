@@ -166,14 +166,14 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t patternstr[33] = {0};
 
     swprintf(scratch, 255,
-             L"\nnote_mode:%d chord_mode:%d octave:%d midi_note_1:%d "
-             L"midi_note_2:%d midi_note_3:%d\n"
+             L"\nnote_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
+             L"midi_note_1:%d midi_note_2:%d midi_note_3:%d\n"
              L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
-             base->note_mode, base->chord_mode, base->octave, base->midi_note_1,
-             base->midi_note_2, base->midi_note_3, base->arp.enable,
-             base->arp.last_midi_notes[0], base->arp.last_midi_notes[1],
-             base->arp.last_midi_notes[2], s_arp_speed[base->arp.speed],
-             s_arp_mode[base->arp.mode]);
+             base->note_mode, base->chord_mode, base->octave,
+             base->sustain_note_ms, base->midi_note_1, base->midi_note_2,
+             base->midi_note_3, base->arp.enable, base->arp.last_midi_notes[0],
+             base->arp.last_midi_notes[1], base->arp.last_midi_notes[2],
+             s_arp_speed[base->arp.speed], s_arp_mode[base->arp.mode]);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)

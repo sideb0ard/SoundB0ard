@@ -114,8 +114,7 @@ typedef struct synthsettings
     bool m_eg1_dca_enabled;
 
     unsigned int m_eg1_sustain_override;
-    double m_eg1_sustain_time_ms;
-    double m_eg1_sustain_time_sixteenth;
+
 
     // EG2  ////////////////////////////////////////
     double m_eg2_attack_time_msec;
@@ -136,8 +135,6 @@ typedef struct synthsettings
     bool m_eg2_dca_enabled;
 
     unsigned int m_eg2_sustain_override;
-    double m_eg2_sustain_time_ms;
-    double m_eg2_sustain_time_sixteenth;
 
     ///////////////////////////////////////////////////////////////
 
@@ -273,10 +270,6 @@ void minisynth_set_eg_filter_enable(minisynth *ms, unsigned int osc_num,
 void minisynth_set_eg_osc_int(minisynth *ms, unsigned int osc_num, double val);
 void minisynth_set_eg_osc_enable(minisynth *ms, unsigned int osc_num, int val);
 void minisynth_set_eg_sustain(minisynth *ms, unsigned int osc_num, double val);
-void minisynth_set_eg_sustain_time_ms(minisynth *ms, unsigned int osc_num,
-                                      double val);
-void minisynth_set_eg_sustain_time_sixteenth(minisynth *ms,
-                                             unsigned int osc_num, double val);
 void minisynth_set_eg_sustain_override(minisynth *ms, unsigned int osc_num,
                                        bool b);
 

@@ -408,9 +408,9 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     bool to_update = true;
     double val = atof(wurds[3]);
 
-    if (strncmp("eg1_attackms", wurds[2], 11) == 0)
+    if (strncmp("eg1_attack", wurds[2], 11) == 0)
         minisynth_set_eg_attack_time_ms(ms, 1, val);
-    else if (strncmp("eg1_decayms", wurds[2], 10) == 0)
+    else if (strncmp("eg1_decay", wurds[2], 10) == 0)
         minisynth_set_eg_decay_time_ms(ms, 1, val);
     else if (strncmp("eg1_osc_en", wurds[2], 10) == 0)
         minisynth_set_eg_osc_enable(ms, 1, val);
@@ -424,14 +424,10 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_eg_filter_enable(ms, 1, val);
     else if (strncmp("eg1_filter_int", wurds[2], 14) == 0)
         minisynth_set_eg_filter_int(ms, 1, val);
-    else if (strncmp("eg1_releasems", wurds[2], 13) == 0)
+    else if (strncmp("eg1_release", wurds[2], 13) == 0)
         minisynth_set_eg_release_time_ms(ms, 1, val);
     else if (strncmp("eg1_sustainlvl", wurds[2], 13) == 0)
         minisynth_set_eg_sustain(ms, 1, val);
-    else if (strncmp("eg1_sustainms", wurds[2], 10) == 0)
-        minisynth_set_eg_sustain_time_ms(ms, 1, val);
-    else if (strncmp("eg1_sustain16th", wurds[2], 15) == 0)
-        minisynth_set_eg_sustain_time_sixteenth(ms, 1, val);
     else if (strncmp("eg1_sustain", wurds[2], 11) == 0)
         minisynth_set_eg_sustain_override(ms, 1, val);
 
@@ -455,10 +451,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_eg_release_time_ms(ms, 2, val);
     else if (strncmp("eg2_sustainlvl", wurds[2], 13) == 0)
         minisynth_set_eg_sustain(ms, 2, val);
-    else if (strncmp("eg2_sustainms", wurds[2], 10) == 0)
-        minisynth_set_eg_sustain_time_ms(ms, 2, val);
-    else if (strncmp("eg2_sustain16th", wurds[2], 15) == 0)
-        minisynth_set_eg_sustain_time_sixteenth(ms, 2, val);
     else if (strncmp("eg2_sustain", wurds[2], 11) == 0)
         minisynth_set_eg_sustain_override(ms, 2, val);
 
