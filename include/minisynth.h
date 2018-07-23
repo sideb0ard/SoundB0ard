@@ -95,20 +95,11 @@ typedef struct synthsettings
     double m_lfo2_pulsewidth_intensity;
     bool m_lfo2_pulsewidth_enabled;
 
-    // EG1
-    double m_attack_time_msec;
-    double m_decay_time_msec;
-    double m_release_time_msec;
-    double m_sustain_level;
-
-    double m_volume_db;
-    double m_fc_control;
-    double m_q_control;
-
-    double m_detune_cents;
-    double m_pulse_width_pct;
-    double m_sub_osc_db;
-    double m_noise_osc_db;
+    // EG1  ////////////////////////////////////////
+    double m_eg1_attack_time_msec;
+    double m_eg1_decay_time_msec;
+    double m_eg1_release_time_msec;
+    double m_eg1_sustain_level;
 
     // EG1 -> OSC
     double m_eg1_osc_intensity;
@@ -122,10 +113,47 @@ typedef struct synthsettings
     double m_eg1_dca_intensity;
     bool m_eg1_dca_enabled;
 
+    unsigned int m_eg1_sustain_override;
+    double m_eg1_sustain_time_ms;
+    double m_eg1_sustain_time_sixteenth;
+
+    // EG2  ////////////////////////////////////////
+    double m_eg2_attack_time_msec;
+    double m_eg2_decay_time_msec;
+    double m_eg2_release_time_msec;
+    double m_eg2_sustain_level;
+
+    // EG2 -> OSC
+    double m_eg2_osc_intensity;
+    bool m_eg2_osc_enabled;
+
+    // EG2 -> FILTER
+    double m_eg2_filter_intensity;
+    bool m_eg2_filter_enabled;
+
+    // EG2 -> DCA
+    double m_eg2_dca_intensity;
+    bool m_eg2_dca_enabled;
+
+    unsigned int m_eg2_sustain_override;
+    double m_eg2_sustain_time_ms;
+    double m_eg2_sustain_time_sixteenth;
+
+    ///////////////////////////////////////////////////////////////
+
     double m_filter_keytrack_intensity;
 
     int m_octave;
     int m_pitchbend_range;
+
+    double m_volume_db;
+    double m_fc_control;
+    double m_q_control;
+
+    double m_detune_cents;
+    double m_pulse_width_pct;
+    double m_sub_osc_db;
+    double m_noise_osc_db;
 
     unsigned int m_legato_mode;
     unsigned int m_reset_to_zero;
@@ -137,10 +165,6 @@ typedef struct synthsettings
     unsigned int m_velocity_to_attack_scaling;
     unsigned int m_note_number_to_decay_scaling;
     double m_portamento_time_msec;
-
-    unsigned int m_sustain_override;
-    double m_sustain_time_ms;
-    double m_sustain_time_sixteenth;
 
     bool m_generate_active;
     unsigned m_generate_src;
@@ -232,17 +256,30 @@ void minisynth_set_filter_mod(minisynth *ms, double mod);
 void minisynth_del_self(void *self);
 
 void minisynth_print(minisynth *ms);
-
-void minisynth_set_attack_time_ms(minisynth *ms, double val);
-void minisynth_set_decay_time_ms(minisynth *ms, double val);
-void minisynth_set_release_time_ms(minisynth *ms, double val);
 void minisynth_set_detune(minisynth *ms, double val);
-void minisynth_set_eg1_dca_int(minisynth *ms, double val);
-void minisynth_set_eg1_dca_enable(minisynth *ms, int val);
-void minisynth_set_eg1_filter_int(minisynth *ms, double val);
-void minisynth_set_eg1_filter_enable(minisynth *ms, int val);
-void minisynth_set_eg1_osc_int(minisynth *ms, double val);
-void minisynth_set_eg1_osc_enable(minisynth *ms, int val);
+
+void minisynth_set_eg_attack_time_ms(minisynth *ms, unsigned int osc_num,
+                                     double val);
+void minisynth_set_eg_decay_time_ms(minisynth *ms, unsigned int osc_num,
+                                    double val);
+void minisynth_set_eg_release_time_ms(minisynth *ms, unsigned int osc_num,
+                                      double val);
+void minisynth_set_eg_dca_int(minisynth *ms, unsigned int osc_num, double val);
+void minisynth_set_eg_dca_enable(minisynth *ms, unsigned int osc_num, int val);
+void minisynth_set_eg_filter_int(minisynth *ms, unsigned int osc_num,
+                                 double val);
+void minisynth_set_eg_filter_enable(minisynth *ms, unsigned int osc_num,
+                                    int val);
+void minisynth_set_eg_osc_int(minisynth *ms, unsigned int osc_num, double val);
+void minisynth_set_eg_osc_enable(minisynth *ms, unsigned int osc_num, int val);
+void minisynth_set_eg_sustain(minisynth *ms, unsigned int osc_num, double val);
+void minisynth_set_eg_sustain_time_ms(minisynth *ms, unsigned int osc_num,
+                                      double val);
+void minisynth_set_eg_sustain_time_sixteenth(minisynth *ms,
+                                             unsigned int osc_num, double val);
+void minisynth_set_eg_sustain_override(minisynth *ms, unsigned int osc_num,
+                                       bool b);
+
 void minisynth_set_filter_fc(minisynth *ms, double val);
 void minisynth_set_filter_fq(minisynth *ms, double val);
 void minisynth_set_filter_type(minisynth *ms, unsigned int val);
@@ -280,10 +317,6 @@ void minisynth_set_pitchbend_range(minisynth *ms, int val);
 void minisynth_set_portamento_time_ms(minisynth *ms, double val);
 void minisynth_set_pulsewidth_pct(minisynth *ms, double val);
 void minisynth_set_sub_osc_db(minisynth *ms, double val);
-void minisynth_set_sustain(minisynth *ms, double val);
-void minisynth_set_sustain_time_ms(minisynth *ms, double val);
-void minisynth_set_sustain_time_sixteenth(minisynth *ms, double val);
-void minisynth_set_sustain_override(minisynth *ms, bool b);
 void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_voice_mode(minisynth *ms, unsigned int val);
 void minisynth_set_vol(minisynth *ms, double val);

@@ -407,24 +407,63 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
 {
     bool to_update = true;
     double val = atof(wurds[3]);
-    if (strncmp("attackms", wurds[2], 8) == 0)
-        minisynth_set_attack_time_ms(ms, val);
-    else if (strncmp("decayms", wurds[2], 7) == 0)
-        minisynth_set_decay_time_ms(ms, val);
+
+    if (strncmp("eg1_attackms", wurds[2], 11) == 0)
+        minisynth_set_eg_attack_time_ms(ms, 1, val);
+    else if (strncmp("eg1_decayms", wurds[2], 10) == 0)
+        minisynth_set_eg_decay_time_ms(ms, 1, val);
+    else if (strncmp("eg1_osc_en", wurds[2], 10) == 0)
+        minisynth_set_eg_osc_enable(ms, 1, val);
+    else if (strncmp("eg1_osc_int", wurds[2], 10) == 0)
+        minisynth_set_eg_osc_int(ms, 1, val);
+    else if (strncmp("eg1_dca_en", wurds[2], 10) == 0)
+        minisynth_set_eg_dca_enable(ms, 1, val);
+    else if (strncmp("eg1_dca_int", wurds[2], 11) == 0)
+        minisynth_set_eg_dca_int(ms, 1, val);
+    else if (strncmp("eg1_filter_en", wurds[2], 12) == 0)
+        minisynth_set_eg_filter_enable(ms, 1, val);
+    else if (strncmp("eg1_filter_int", wurds[2], 14) == 0)
+        minisynth_set_eg_filter_int(ms, 1, val);
+    else if (strncmp("eg1_releasems", wurds[2], 13) == 0)
+        minisynth_set_eg_release_time_ms(ms, 1, val);
+    else if (strncmp("eg1_sustainlvl", wurds[2], 13) == 0)
+        minisynth_set_eg_sustain(ms, 1, val);
+    else if (strncmp("eg1_sustainms", wurds[2], 10) == 0)
+        minisynth_set_eg_sustain_time_ms(ms, 1, val);
+    else if (strncmp("eg1_sustain16th", wurds[2], 15) == 0)
+        minisynth_set_eg_sustain_time_sixteenth(ms, 1, val);
+    else if (strncmp("eg1_sustain", wurds[2], 11) == 0)
+        minisynth_set_eg_sustain_override(ms, 1, val);
+
+    else if (strncmp("eg2_attackms", wurds[2], 11) == 0)
+        minisynth_set_eg_attack_time_ms(ms, 2, val);
+    else if (strncmp("eg2_decayms", wurds[2], 10) == 0)
+        minisynth_set_eg_decay_time_ms(ms, 2, val);
+    else if (strncmp("eg2_osc_en", wurds[2], 10) == 0)
+        minisynth_set_eg_osc_enable(ms, 2, val);
+    else if (strncmp("eg2_osc_int", wurds[2], 10) == 0)
+        minisynth_set_eg_osc_int(ms, 2, val);
+    else if (strncmp("eg2_dca_en", wurds[2], 10) == 0)
+        minisynth_set_eg_dca_enable(ms, 2, val);
+    else if (strncmp("eg2_dca_int", wurds[2], 11) == 0)
+        minisynth_set_eg_dca_int(ms, 2, val);
+    else if (strncmp("eg2_filter_en", wurds[2], 12) == 0)
+        minisynth_set_eg_filter_enable(ms, 2, val);
+    else if (strncmp("eg2_filter_int", wurds[2], 14) == 0)
+        minisynth_set_eg_filter_int(ms, 2, val);
+    else if (strncmp("eg2_releasems", wurds[2], 13) == 0)
+        minisynth_set_eg_release_time_ms(ms, 2, val);
+    else if (strncmp("eg2_sustainlvl", wurds[2], 13) == 0)
+        minisynth_set_eg_sustain(ms, 2, val);
+    else if (strncmp("eg2_sustainms", wurds[2], 10) == 0)
+        minisynth_set_eg_sustain_time_ms(ms, 2, val);
+    else if (strncmp("eg2_sustain16th", wurds[2], 15) == 0)
+        minisynth_set_eg_sustain_time_sixteenth(ms, 2, val);
+    else if (strncmp("eg2_sustain", wurds[2], 11) == 0)
+        minisynth_set_eg_sustain_override(ms, 2, val);
+
     else if (strncmp("detune", wurds[2], 6) == 0)
         minisynth_set_detune(ms, val);
-    else if (strncmp("eg1_osc_en", wurds[2], 9) == 0)
-        minisynth_set_eg1_osc_enable(ms, val);
-    else if (strncmp("eg1_osc_int", wurds[2], 9) == 0)
-        minisynth_set_eg1_osc_int(ms, val);
-    else if (strncmp("eg1_dca_en", wurds[2], 14) == 0)
-        minisynth_set_eg1_dca_enable(ms, val);
-    else if (strncmp("eg1_dca_int", wurds[2], 9) == 0)
-        minisynth_set_eg1_dca_int(ms, val);
-    else if (strncmp("eg1_filter_en", wurds[2], 14) == 0)
-        minisynth_set_eg1_filter_enable(ms, val);
-    else if (strncmp("eg1_filter_int", wurds[2], 12) == 0)
-        minisynth_set_eg1_filter_int(ms, val);
     else if (strncmp("fc", wurds[2], 2) == 0)
         minisynth_set_filter_fc(ms, val);
     else if (strncmp("fq", wurds[2], 2) == 0)
@@ -571,8 +610,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         printf("Loading defaults\n");
         minisynth_load_defaults(ms);
     }
-    else if (strncmp("releasems", wurds[2], 7) == 0)
-        minisynth_set_release_time_ms(ms, val);
     else if (strncmp("save", wurds[2], 4) == 0)
     {
         char preset_name[20];
@@ -583,14 +620,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_filter_saturation(ms, val);
     else if (strncmp("subosc", wurds[2], 6) == 0)
         minisynth_set_sub_osc_db(ms, val);
-    else if (strncmp("sustainlvl", wurds[2], 10) == 0)
-        minisynth_set_sustain(ms, val);
-    else if (strncmp("sustainms", wurds[2], 9) == 0)
-        minisynth_set_sustain_time_ms(ms, val);
-    else if (strncmp("sustain16th", wurds[2], 11) == 0)
-        minisynth_set_sustain_time_sixteenth(ms, val);
-    else if (strncmp("sustain", wurds[2], 7) == 0)
-        minisynth_set_sustain_override(ms, val);
     else if (strncmp("vascale", wurds[2], 7) == 0)
         minisynth_set_velocity_to_attack_scaling(ms, val);
     else if (strncmp("voice", wurds[2], 5) == 0)

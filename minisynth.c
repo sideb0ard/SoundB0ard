@@ -159,6 +159,7 @@ void minisynth_load_defaults(minisynth *ms)
     ms->m_settings.m_fc_control = FILTER_FC_DEFAULT;
     ms->m_settings.m_q_control = FILTER_Q_DEFAULT;
 
+    /// EG1 //////////////////////////////////////////
     ms->m_settings.m_eg1_osc_intensity = 0.7;
     ms->m_settings.m_eg1_osc_enabled = false;
     ms->m_settings.m_eg1_filter_intensity = 0.7;
@@ -166,19 +167,38 @@ void minisynth_load_defaults(minisynth *ms)
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_eg1_dca_enabled = true;
 
-    // ms->m_settings.m_attack_time_msec = EG_DEFAULT_STATE_TIME;
-    // ms->m_settings.m_decay_time_msec = EG_DEFAULT_STATE_TIME;
-    // ms->m_settings.m_release_time_msec = EG_DEFAULT_STATE_TIME;
-    ms->m_settings.m_attack_time_msec = 52;
-    ms->m_settings.m_decay_time_msec = 30;
-    ms->m_settings.m_release_time_msec = 35;
+    ms->m_settings.m_eg1_attack_time_msec = 52;
+    ms->m_settings.m_eg1_decay_time_msec = 30;
+    ms->m_settings.m_eg1_release_time_msec = 35;
+
+    ms->m_settings.m_eg1_sustain_level = 0.9;
+    ms->m_settings.m_eg1_sustain_override = false;
+    ms->m_settings.m_eg1_sustain_time_ms = 400;
+    ms->m_settings.m_eg1_sustain_time_sixteenth = 4;
+
+    /// EG2 //////////////////////////////////////////
+    ms->m_settings.m_eg2_osc_intensity = 0.7;
+    ms->m_settings.m_eg2_osc_enabled = false;
+    ms->m_settings.m_eg2_filter_intensity = 0.7;
+    ms->m_settings.m_eg2_filter_enabled = false;
+    ms->m_settings.m_eg2_dca_intensity = 1.0;
+    ms->m_settings.m_eg2_dca_enabled = false;
+
+    ms->m_settings.m_eg2_attack_time_msec = 52;
+    ms->m_settings.m_eg2_decay_time_msec = 30;
+    ms->m_settings.m_eg2_release_time_msec = 35;
+
+    ms->m_settings.m_eg2_sustain_level = 0.9;
+    ms->m_settings.m_eg2_sustain_override = false;
+    ms->m_settings.m_eg2_sustain_time_ms = 400;
+    ms->m_settings.m_eg2_sustain_time_sixteenth = 4;
+    ///////////////////////////////////////////////////
 
     ms->m_settings.m_pulse_width_pct = OSC_PULSEWIDTH_DEFAULT;
     ms->m_settings.m_octave = ms->base.octave;
     ms->m_settings.m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
     ms->m_settings.m_sub_osc_db = -96.000000;
 
-    ms->m_settings.m_sustain_level = 0.9;
     ms->m_settings.m_noise_osc_db = -96.000000;
     ms->m_settings.m_volume_db = 0.7;
     ms->m_settings.m_legato_mode = DEFAULT_LEGATO_MODE;
@@ -191,10 +211,6 @@ void minisynth_load_defaults(minisynth *ms)
 
     ms->m_settings.m_velocity_to_attack_scaling = 0;
     ms->m_settings.m_note_number_to_decay_scaling = 0;
-
-    ms->m_settings.m_sustain_override = false;
-    ms->m_settings.m_sustain_time_ms = 400;
-    ms->m_settings.m_sustain_time_sixteenth = 4;
 
     ms->m_settings.m_generate_active = false;
     ms->m_settings.m_generate_src = -99;
@@ -344,19 +360,19 @@ void minisynth_update(minisynth *ms)
 
     // --- eg1:
     ms->m_global_synth_params.eg1_params.attack_time_msec =
-        ms->m_settings.m_attack_time_msec;
+        ms->m_settings.m_eg1_attack_time_msec;
     ms->m_global_synth_params.eg1_params.decay_time_msec =
-        ms->m_settings.m_decay_time_msec;
+        ms->m_settings.m_eg1_decay_time_msec;
     ms->m_global_synth_params.eg1_params.sustain_level =
-        ms->m_settings.m_sustain_level;
+        ms->m_settings.m_eg1_sustain_level;
     ms->m_global_synth_params.eg1_params.release_time_msec =
-        ms->m_settings.m_release_time_msec;
+        ms->m_settings.m_eg1_release_time_msec;
     ms->m_global_synth_params.eg1_params.reset_to_zero =
         (bool)ms->m_settings.m_reset_to_zero;
     ms->m_global_synth_params.eg1_params.legato_mode =
         (bool)ms->m_settings.m_legato_mode;
     ms->m_global_synth_params.eg1_params.sustain_override =
-        (bool)ms->m_settings.m_sustain_override;
+        (bool)ms->m_settings.m_eg1_sustain_override;
 
     // --- dca:
     ms->m_global_synth_params.dca_params.amplitude_db =
@@ -494,22 +510,22 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
     case (1):
         // printf("Attack\n");
         scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        ms->m_settings.m_attack_time_msec = scaley_val;
+        ms->m_settings.m_eg1_attack_time_msec = scaley_val;
         break;
     case (2):
         // printf("Decay\n");
         scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        ms->m_settings.m_decay_time_msec = scaley_val;
+        ms->m_settings.m_eg1_decay_time_msec = scaley_val;
         break;
     case (3):
         // printf("Sustain\n");
         scaley_val = scaleybum(0, 127, 0, 1, data2);
-        ms->m_settings.m_sustain_level = scaley_val;
+        ms->m_settings.m_eg1_sustain_level = scaley_val;
         break;
     case (4):
         // printf("Release\n");
         scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        ms->m_settings.m_release_time_msec = scaley_val;
+        ms->m_settings.m_eg1_release_time_msec = scaley_val;
         break;
     case (5):
         // printf("LFO rate\n");
@@ -756,12 +772,17 @@ void minisynth_status(void *self, wchar_t *status_string)
 
 
         "%s"
-        "eg1_filter_en:%d     eg1_osc_en:%d     eg1_dca_en:%d     sustain:%d\n"
-        "eg1_filter_int:%4.1f eg1_osc_int:%4.1f eg1_dca_int:%4.1f sustainlvl:%.1f\n"
-        "attackms:%4.0f       decayms:%4.0f     releasems:%4.0f   sustain_note_ms:%d\n"
+        "eg1_filter_en:%d     eg1_osc_en:%d     eg1_dca_en:%d     eg1_sustain:%d\n"
+        "eg1_filter_int:%4.1f eg1_osc_int:%4.1f eg1_dca_int:%4.1f eg1_sustainlvl:%.1f\n"
+        "eg1_attack:%4.0f     eg1_decay:%4.0f   eg1_release:%4.0f eg1_sustain_note_ms:%d\n"
 
         "%s"
-        "filter:%s(%d)      fc:%7.1f       fq:%4.1f     aux:%0.2f sat:%0.2f"
+        "eg2_filter_en:%d     eg2_osc_en:%d     eg2_dca_en:%d     eg2_sustain:%d\n"
+        "eg2_filter_int:%4.1f eg2_osc_int:%4.1f eg2_dca_int:%4.1f eg2_sustainlvl:%.1f\n"
+        "eg2_attack:%4.0f     eg2_decay:%4.0f   eg2_release:%4.0f eg2_sustain_note_ms:%d\n"
+
+        "%s"
+        "filter:%s(%d)      fc:%7.1f       fq:%4.1f          aux:%0.2f sat:%0.2f"
 
         "%s",
 
@@ -860,19 +881,34 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_eg1_filter_enabled,
         ms->m_settings.m_eg1_osc_enabled,
         ms->m_settings.m_eg1_dca_enabled,
-        ms->m_settings.m_sustain_override,
+        ms->m_settings.m_eg1_sustain_override,
         ms->m_settings.m_eg1_filter_intensity,
         ms->m_settings.m_eg1_osc_intensity,
         ms->m_settings.m_eg1_dca_intensity,
-        ms->m_settings.m_sustain_level,
-        ms->m_settings.m_attack_time_msec,
-        ms->m_settings.m_decay_time_msec,
-        ms->m_settings.m_release_time_msec,
+        ms->m_settings.m_eg1_sustain_level,
+        ms->m_settings.m_eg1_attack_time_msec,
+        ms->m_settings.m_eg1_decay_time_msec,
+        ms->m_settings.m_eg1_release_time_msec,
+        ms->base.sustain_note_ms,
+
+        // EG2
+        INSTRUMENT_PINK,
+        ms->m_settings.m_eg2_filter_enabled,
+        ms->m_settings.m_eg2_osc_enabled,
+        ms->m_settings.m_eg2_dca_enabled,
+        ms->m_settings.m_eg2_sustain_override,
+        ms->m_settings.m_eg2_filter_intensity,
+        ms->m_settings.m_eg2_osc_intensity,
+        ms->m_settings.m_eg2_dca_intensity,
+        ms->m_settings.m_eg2_sustain_level,
+        ms->m_settings.m_eg2_attack_time_msec,
+        ms->m_settings.m_eg2_decay_time_msec,
+        ms->m_settings.m_eg2_release_time_msec,
         ms->base.sustain_note_ms,
 
 
         // FILTER1
-        INSTRUMENT_PINK,
+        INSTRUMENT_ORANGE,
         s_filter_type_names[ms->m_settings.m_filter_type],
         ms->m_settings.m_filter_type,
         ms->m_settings.m_fc_control,
@@ -1027,9 +1063,9 @@ void minisynth_rand_settings(minisynth *ms)
         FILTER_FC_MIN;
     ms->m_settings.m_q_control = (rand() % 8) + 1;
 
-    ms->m_settings.m_attack_time_msec = (rand() % 700) + 5;
-    ms->m_settings.m_decay_time_msec = (rand() % 700) + 5;
-    ms->m_settings.m_release_time_msec = (rand() % 600) + 5;
+    ms->m_settings.m_eg1_attack_time_msec = (rand() % 700) + 5;
+    ms->m_settings.m_eg1_decay_time_msec = (rand() % 700) + 5;
+    ms->m_settings.m_eg1_release_time_msec = (rand() % 600) + 5;
     ms->m_settings.m_pulse_width_pct = (rand() % 99) + 1;
 
     // ms->m_settings.m_sustain_level = ((float)rand()) / RAND_MAX;
@@ -1056,8 +1092,8 @@ void minisynth_rand_settings(minisynth *ms)
     ////ms->m_settings.m_eg1_dca_intensity =
     ////    (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
     // ms->m_settings.m_sustain_override = rand() % 2;
-    ms->m_settings.m_sustain_time_ms = rand() % 1000;
-    ms->m_settings.m_sustain_time_sixteenth = rand() % 5;
+    ms->m_settings.m_eg1_sustain_time_ms = rand() % 1000;
+    ms->m_settings.m_eg1_sustain_time_sixteenth = rand() % 5;
 
     minisynth_update(ms);
 
@@ -1178,15 +1214,15 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
     settings_count++;
     // EG1
     fprintf(presetzzz, "::attack_time_msec=%f",
-            ms->m_settings.m_attack_time_msec);
+            ms->m_settings.m_eg1_attack_time_msec);
     settings_count++;
     fprintf(presetzzz, "::decay_time_msec=%f",
-            ms->m_settings.m_decay_time_msec);
+            ms->m_settings.m_eg1_decay_time_msec);
     settings_count++;
     fprintf(presetzzz, "::release_time_msec=%f",
-            ms->m_settings.m_release_time_msec);
+            ms->m_settings.m_eg1_release_time_msec);
     settings_count++;
-    fprintf(presetzzz, "::sustain_level=%f", ms->m_settings.m_sustain_level);
+    fprintf(presetzzz, "::sustain_level=%f", ms->m_settings.m_eg1_sustain_level);
     settings_count++;
 
     fprintf(presetzzz, "::volume_db=%f", ms->m_settings.m_volume_db);
@@ -1263,13 +1299,13 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
     settings_count++;
 
     fprintf(presetzzz, "::sustain_override=%d",
-            ms->m_settings.m_sustain_override);
+            ms->m_settings.m_eg1_sustain_override);
     settings_count++;
     fprintf(presetzzz, "::sustain_time_ms=%f",
-            ms->m_settings.m_sustain_time_ms);
+            ms->m_settings.m_eg1_sustain_time_ms);
     settings_count++;
     fprintf(presetzzz, "::sustain_time_sixteenth=%f",
-            ms->m_settings.m_sustain_time_sixteenth);
+            ms->m_settings.m_eg1_sustain_time_sixteenth);
     settings_count++;
     fprintf(presetzzz, ":::\n");
 
@@ -1500,22 +1536,22 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
             }
             else if (strcmp(setting_key, "attack_time_msec") == 0)
             {
-                ms->m_settings.m_attack_time_msec = scratch_val;
+                ms->m_settings.m_eg1_attack_time_msec = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "decay_time_msec") == 0)
             {
-                ms->m_settings.m_decay_time_msec = scratch_val;
+                ms->m_settings.m_eg1_decay_time_msec = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "release_time_msec") == 0)
             {
-                ms->m_settings.m_release_time_msec = scratch_val;
+                ms->m_settings.m_eg1_release_time_msec = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "sustain_level") == 0)
             {
-                ms->m_settings.m_sustain_level = scratch_val;
+                ms->m_settings.m_eg1_sustain_level = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "volume_db") == 0)
@@ -1645,17 +1681,17 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
             }
             else if (strcmp(setting_key, "sustain_override") == 0)
             {
-                ms->m_settings.m_sustain_override = scratch_val;
+                ms->m_settings.m_eg1_sustain_override = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "sustain_time_ms") == 0)
             {
-                ms->m_settings.m_sustain_time_ms = scratch_val;
+                ms->m_settings.m_eg1_sustain_time_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "sustain_time_sixteenth") == 0)
             {
-                ms->m_settings.m_sustain_time_sixteenth = scratch_val;
+                ms->m_settings.m_eg1_sustain_time_sixteenth = scratch_val;
                 settings_count++;
             }
         }
@@ -1737,19 +1773,19 @@ void minisynth_print_settings(minisynth *ms)
 
     printf(COOL_COLOR_PINK); // EG
     printf("EG1 Attack time ms (attackms): %f [%d-%d]\n",
-           ms->m_settings.m_attack_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
+           ms->m_settings.m_eg1_attack_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
     printf("EG1 Decay Time ms (decayms): %f [%d-%d]\n",
-           ms->m_settings.m_decay_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
+           ms->m_settings.m_eg1_decay_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
     printf("EG1 Release Time ms (releasems): %f [%d-%d]\n",
-           ms->m_settings.m_release_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
+           ms->m_settings.m_eg1_release_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
     printf("EG1 Sustain Level (sustainlvl): %f [0-1]\n",
-           ms->m_settings.m_sustain_level);
+           ms->m_settings.m_eg1_sustain_level);
     printf("EG1 Sustain Time ms  (sustainms): %f [10-2000]\n",
-           ms->m_settings.m_sustain_time_ms);
+           ms->m_settings.m_eg1_sustain_time_ms);
     printf("EG1 Sustain Time Sixteenths  (sustain16th): %f [1-16]\n",
-           ms->m_settings.m_sustain_time_sixteenth);
+           ms->m_settings.m_eg1_sustain_time_sixteenth);
     printf("EG1 Sustain Override (sustain): %d [0,1]\n",
-           ms->m_settings.m_sustain_override); // bool
+           ms->m_settings.m_eg1_sustain_override); // bool
     printf("EG1 DCA Intensity (eg1dcaint): %f [-1 - 1]\n",
            ms->m_settings.m_eg1_dca_intensity);
     printf("EG1 Filter Intensity (eg1filterint): %f [-1 - 1]\n",
@@ -1832,26 +1868,41 @@ void minisynth_set_filter_mod(minisynth *ms, double mod)
 
 void minisynth_print(minisynth *ms) { minisynth_print_settings(ms); }
 
-void minisynth_set_attack_time_ms(minisynth *ms, double val)
+void minisynth_set_eg_attack_time_ms(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
-        ms->m_settings.m_attack_time_msec = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_attack_time_msec = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_attack_time_msec = val;
+    }
     else
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
-void minisynth_set_decay_time_ms(minisynth *ms, double val)
+void minisynth_set_eg_decay_time_ms(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
-        ms->m_settings.m_decay_time_msec = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_decay_time_msec = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_decay_time_msec = val;
+    }
     else
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
-void minisynth_set_release_time_ms(minisynth *ms, double val)
+void minisynth_set_eg_release_time_ms(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
-        ms->m_settings.m_release_time_msec = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_release_time_msec = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_release_time_msec = val;
+    }
     else
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
@@ -1923,50 +1974,80 @@ void minisynth_set_detune(minisynth *ms, double val)
         printf("val must be between -100 and 100\n");
 }
 
-void minisynth_set_eg1_dca_enable(minisynth *ms, int val)
+void minisynth_set_eg_dca_enable(minisynth *ms, unsigned int osc_num, int val)
 {
     if (val == 0 || val == 1)
-        ms->m_settings.m_eg1_dca_enabled = val;
+    {
+        if (osc_num == 1)
+            ms->m_settings.m_eg1_dca_enabled = val;
+        else if (osc_num == 2)
+            ms->m_settings.m_eg2_dca_enabled = val;
+    }
     else
         printf("val must be boolean 0 or 1\n");
 }
 
-void minisynth_set_eg1_dca_int(minisynth *ms, double val)
+void minisynth_set_eg_dca_int(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= -1 && val <= 1)
-        ms->m_settings.m_eg1_dca_intensity = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_dca_intensity = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_dca_intensity = val;
+    }
     else
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_eg1_filter_enable(minisynth *ms, int val)
+void minisynth_set_eg_filter_enable(minisynth *ms, unsigned int eg_num, int val)
 {
     if (val == 0 || val == 1)
-        ms->m_settings.m_eg1_filter_enabled = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_filter_enabled = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_filter_enabled = val;
+    }
     else
         printf("val must be boolean 0 or 1\n");
 }
 
-void minisynth_set_eg1_filter_int(minisynth *ms, double val)
+void minisynth_set_eg_filter_int(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= -1 && val <= 1)
-        ms->m_settings.m_eg1_filter_intensity = val;
+    {
+        if (eg_num ==1 )
+            ms->m_settings.m_eg1_filter_intensity = val;
+        else if (eg_num ==2 )
+            ms->m_settings.m_eg2_filter_intensity = val;
+    }
     else
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_eg1_osc_enable(minisynth *ms, int val)
+void minisynth_set_eg_osc_enable(minisynth *ms, unsigned int eg_num, int val)
 {
     if (val == 0 || val == 1)
-        ms->m_settings.m_eg1_osc_enabled = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_osc_enabled = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_osc_enabled = val;
+    }
     else
         printf("val must be boolean 0 or 1\n");
 }
 
-void minisynth_set_eg1_osc_int(minisynth *ms, double val)
+void minisynth_set_eg_osc_int(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= -1 && val <= 1)
-        ms->m_settings.m_eg1_osc_intensity = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_osc_intensity = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_osc_intensity = val;
+    }
     else
         printf("val must be between -1 and 1\n");
 }
@@ -2352,17 +2433,25 @@ void minisynth_set_sub_osc_db(minisynth *ms, double val)
         printf("val must be between -96 and 0\n");
 }
 
-void minisynth_set_sustain(minisynth *ms, double val)
+void minisynth_set_eg_sustain(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= 0 && val <= 1)
-        ms->m_settings.m_sustain_level = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_sustain_level = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_sustain_level = val;
+    }
     else
         printf("val must be between 0 and 1\n");
 }
 
-void minisynth_set_sustain_override(minisynth *ms, bool b)
+void minisynth_set_eg_sustain_override(minisynth *ms, unsigned int eg_num, bool b)
 {
-    ms->m_settings.m_sustain_override = b;
+    if (eg_num == 1)
+        ms->m_settings.m_eg1_sustain_override = b;
+    else if (eg_num == 2)
+        ms->m_settings.m_eg2_sustain_override = b;
 }
 
 void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val)
@@ -2401,18 +2490,28 @@ void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
     ms->m_settings.m_reset_to_zero = val;
 }
 
-void minisynth_set_sustain_time_sixteenth(minisynth *ms, double val)
+void minisynth_set_eg_sustain_time_sixteenth(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= 1 && val <= 16)
-        ms->m_settings.m_sustain_time_sixteenth = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_sustain_time_sixteenth = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_sustain_time_sixteenth = val;
+    }
     else
         printf("val must be between 1 and 16\n");
 }
 
-void minisynth_set_sustain_time_ms(minisynth *ms, double val)
+void minisynth_set_eg_sustain_time_ms(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= 10 && val <= 2000)
-        ms->m_settings.m_sustain_time_ms = val;
+    {
+        if (eg_num == 1)
+            ms->m_settings.m_eg1_sustain_time_ms = val;
+        else if (eg_num == 2)
+            ms->m_settings.m_eg2_sustain_time_ms = val;
+    }
     else
         printf("val must be between 10 and 2000\n");
 }
