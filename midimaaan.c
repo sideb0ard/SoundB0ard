@@ -219,84 +219,75 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 if (mixr->midi_bank_num == 0)
                 {
                     // o1wav
-                    printf("K1:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     int wav_type = scaleybum(0, 127, 0, MAX_OSC - 1, ev->data2);
-                    printf("WAV_TYPE! %s -- %d\n", s_synth_waves[wav_type],
-                           wav_type);
+                    // printf("o1 WAV_TYPE! %s -- %d\n",
+                    // s_synth_waves[wav_type],
+                    //       wav_type);
                     synthdrum_set_osc_wav(drumsynth, 1, wav_type);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     // o2wav
-                    printf("K1:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     int wav_type = scaleybum(0, 127, 0, MAX_OSC - 1, ev->data2);
-                    printf("WAV_TYPE! %s -- %d\n", s_synth_waves[wav_type],
-                           wav_type);
+                    // printf("o2 WAV_TYPE! %s -- %d\n",
+                    // s_synth_waves[wav_type],
+                    //       wav_type);
                     synthdrum_set_osc_wav(drumsynth, 2, wav_type);
                 }
                 else if (mixr->midi_bank_num == 2)
                 {
                     // o2wav
-                    printf("K1:: data1:%d data2:%d\n", ev->data1, ev->data2);
+                    // printf("K1:: data1:%d data2:%d\n", ev->data1, ev->data2);
                 }
                 break;
             case (2):
                 if (mixr->midi_bank_num == 0)
                 {
-                    printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1freq
                     double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
-                    printf("FREQ!%f\n", freq);
+                    // printf("o1 FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 1, freq);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    printf("K2:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1freq
+                    // o2freq
                     double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
-                    printf("FREQ!%f\n", freq);
+                    // printf("o2 FREQ!%f\n", freq);
                     synthdrum_set_osc_fo(drumsynth, 2, freq);
                 }
                 break;
             case (3):
                 if (mixr->midi_bank_num == 0)
                 {
-                    printf("K3:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1amp
                     double amp = scaleybum(0, 127, 0., 1., ev->data2);
-                    printf("AMP!%f\n", amp);
+                    // printf("o1 AMP!%f\n", amp);
                     synthdrum_set_osc_amp(drumsynth, 1, amp);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    printf("K3:: data1:%d data2:%d\n", ev->data1, ev->data2);
                     // o1amp
                     double amp = scaleybum(0, 127, 0., 1., ev->data2);
-                    printf("AMP!%f\n", amp);
+                    // printf("o2 AMP!%f\n", amp);
                     synthdrum_set_osc_amp(drumsynth, 2, amp);
                 }
                 break;
             case (4):
-                printf("K4:: data1:%d data2:%d\n", ev->data1, ev->data2);
                 if (mixr->midi_bank_num == 0)
                 {
-                    // o1amp
                     double intensity = scaleybum(0, 127, 0., 1., ev->data2);
-                    printf("INT!%f\n", intensity);
+                    // printf("o1 INT!%f\n", intensity);
                     synthdrum_set_eg_osc_intensity(drumsynth, 1, 1, intensity);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    // o2amp
                     double intensity = scaleybum(0, 127, 0., 1., ev->data2);
-                    printf("INT2!%f\n", intensity);
                     synthdrum_set_eg_osc_intensity(drumsynth, 2, 2, intensity);
                 }
                 else if (mixr->midi_bank_num == 2)
                 {
                     double distortion_threshold =
                         scaleybum(0, 127, 0.1, 0.9, ev->data2);
-                    printf("DIST!%f\n", distortion_threshold);
                     synthdrum_set_distortion_threshold(drumsynth,
                                                        distortion_threshold);
                 }
@@ -304,71 +295,65 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             case (5):
                 if (mixr->midi_bank_num == 0)
                 {
-                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
-                                          ev->data2);
-                    printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1 amp ENV attck
+                    double ms =
+                        scaleybum(0, 128, EG_MINTIME_MS, 800, ev->data2);
                     synthdrum_set_eg_attack(drumsynth, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
-                                          ev->data2);
-                    printf("K5:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1 amp ENV attck
+                    double ms =
+                        scaleybum(0, 128, EG_MINTIME_MS, 700, ev->data2);
                     synthdrum_set_eg_attack(drumsynth, 2, ms);
                 }
                 break;
             case (6):
                 if (mixr->midi_bank_num == 0)
                 {
-                    printf("K6:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1 amp ENV decay
-                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
-                                          ev->data2);
+                    double ms =
+                        scaleybum(0, 128, EG_MINTIME_MS, 2000, ev->data2);
                     synthdrum_set_eg_decay(drumsynth, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    printf("K6:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1 amp ENV decay
-                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
-                                          ev->data2);
+                    double ms =
+                        scaleybum(0, 128, EG_MINTIME_MS, 1000, ev->data2);
                     synthdrum_set_eg_decay(drumsynth, 2, ms);
                 }
                 break;
             case (7):
                 if (mixr->midi_bank_num == 0)
                 {
-                    printf("K7:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1 amp ENV sustain ms
-                    double ms = scaleybum(0, 128, 1, 2000, ev->data2);
-                    synthdrum_set_eg_sustain_ms(drumsynth, 1, ms);
+                    double ms = scaleybum(0, 128, 0, 1, ev->data2);
+                    synthdrum_set_eg_sustain_lvl(drumsynth, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    printf("K7:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1 amp ENV sustain ms
-                    double ms = scaleybum(0, 128, 1, 2000, ev->data2);
-                    synthdrum_set_eg_sustain_ms(drumsynth, 2, ms);
+                    double ms = scaleybum(0, 128, 0, 1, ev->data2);
+                    synthdrum_set_eg_sustain_lvl(drumsynth, 2, ms);
+                }
+                else if (mixr->midi_bank_num == 2)
+                {
+                    double freq = scaleybum(0, 127, 180, 18000, ev->data2);
+                    synthdrum_set_filter_freq(drumsynth, freq);
                 }
                 break;
             case (8):
                 if (mixr->midi_bank_num == 0)
                 {
-                    printf("K8:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o1 amp ENV releaser
                     double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
                                           ev->data2);
                     synthdrum_set_eg_release(drumsynth, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
-                    printf("K8:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                    // o2 amp ENV releaser
                     double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
                                           ev->data2);
                     synthdrum_set_eg_release(drumsynth, 2, ms);
+                }
+                else if (mixr->midi_bank_num == 2)
+                {
+                    double q = scaleybum(0, 127, 1, 8, ev->data2);
+                    synthdrum_set_filter_q(drumsynth, q);
                 }
                 break;
             }

@@ -35,7 +35,7 @@ synthdrum_sequencer *new_synthdrum_seq()
     osc_new_settings(&sds->m_osc1.osc);
     qb_set_soundgenerator_interface(&sds->m_osc1);
     sds->m_osc1.osc.m_waveform = NOISE;
-    sds->osc1_amp = 0.307;
+    sds->osc1_amp = 0.107;
     osc_update(&sds->m_osc1.osc);
 
     // OSC body
@@ -247,24 +247,24 @@ stereo_val sds_gennext(void *self)
     if (!sds->started)
         return out;
 
-    if (sds->m_eg1.m_state == SUSTAIN)
-    {
-        sds->eg1_sustain_counter++;
-        if (sds->eg1_sustain_counter >= sds->eg1_sustain_len_in_samples)
-        {
-            sds->eg1_sustain_counter = 0;
-            sds->m_eg1.m_state = RELEASE;
-        }
-    }
-    if (sds->m_eg2.m_state == SUSTAIN)
-    {
-        sds->eg2_sustain_counter++;
-        if (sds->eg2_sustain_counter >= sds->eg2_sustain_len_in_samples)
-        {
-            sds->eg2_sustain_counter = 0;
-            sds->m_eg2.m_state = RELEASE;
-        }
-    }
+    // if (sds->m_eg1.m_state == SUSTAIN)
+    //{
+    //    sds->eg1_sustain_counter++;
+    //    if (sds->eg1_sustain_counter >= sds->eg1_sustain_len_in_samples)
+    //    {
+    //        sds->eg1_sustain_counter = 0;
+    //        sds->m_eg1.m_state = RELEASE;
+    //    }
+    //}
+    // if (sds->m_eg2.m_state == SUSTAIN)
+    //{
+    //    sds->eg2_sustain_counter++;
+    //    if (sds->eg2_sustain_counter >= sds->eg2_sustain_len_in_samples)
+    //    {
+    //        sds->eg2_sustain_counter = 0;
+    //        sds->m_eg2.m_state = RELEASE;
+    //    }
+    //}
 
     // noise env for initial snap
     double eg1_out = eg_do_envelope(&sds->m_eg1, NULL);
@@ -272,7 +272,7 @@ stereo_val sds_gennext(void *self)
     double osc1_out =
         qb_do_oscillate(&sds->m_osc1.osc, NULL) * eg1_out * sds->osc1_amp;
 
-    // eg2 env -> pitch of OSC2 _AND_ AMP OU:2T
+    // eg2 env -> pitch of OSC2 _AND_ AMP OUT
     double eg2_biased_out = 0;
     double amp_out_env = eg_do_envelope(&sds->m_eg2, &eg2_biased_out);
     double eg2_osc_mod =
@@ -282,19 +282,21 @@ stereo_val sds_gennext(void *self)
     osc_update(&sds->m_osc2.osc);
     double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;
 
+    double combined_osc = osc1_out * sds->osc1_amp + osc2_out * sds->osc2_amp;
+
     sds->m_distortion.m_threshold = sds->m_distortion_threshold;
-    double distorted_out = distortion_process(&sds->m_distortion, osc2_out);
+    double distorted_out = distortion_process(&sds->m_distortion, combined_osc);
 
-    // sds->m_filter.f.m_filter_type = sds->m_filter_type;
-    // sds->m_filter.f.m_fc_control = sds->m_filter_fc;
-    // sds->m_filter.f.m_q_control = sds->m_filter_q;
+    sds->m_filter.f.m_filter_type = sds->m_filter_type;
+    sds->m_filter.f.m_fc_control = sds->m_filter_fc;
+    sds->m_filter.f.m_q_control = sds->m_filter_q;
     moog_update((filter *)&sds->m_filter);
-    double filtered_osc2_out =
-        moog_gennext((filter *)&sds->m_filter, distorted_out);
+    double filtered_out = moog_gennext((filter *)&sds->m_filter, distorted_out);
 
-    double almost_out =
-        (osc1_out * sds->osc1_amp + filtered_osc2_out * sds->osc2_amp) *
-        amp_out_env * sds->vol;
+    double almost_out = filtered_out * amp_out_env * sds->vol;
+    // double almost_out =
+    //    (osc1_out * sds->osc1_amp + osc2_out * sds->osc2_amp) *
+    //    amp_out_env * sds->vol;
 
     almost_out = effector(&sds->sg, almost_out);
     almost_out = envelopor(&sds->sg, almost_out);

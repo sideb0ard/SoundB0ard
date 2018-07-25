@@ -84,7 +84,6 @@ new loop dloops/acidSquelchBeat.aiff 2; down 2
 
 env dloops/mkLikeloop.aiff 7 0
 
-//      moog 0 load morphy
 //      over 8 bar osc "6.6 8.8" moog 2 fq %s
 //      over 2 bar osc "180 3000" moog 2 fc %s
 //      every 3 bar rand "1 2 3" algo 1 step %s
@@ -95,6 +94,7 @@ env dloops/mkLikeloop.aiff 7 0
 
 loops/busitACID.aiff  vol:0.15 pitch:2.00
 new loop loops/FingersFadeBassStrings.aiff
+moog 2 load aciied
 
 ALGO2
 [sequence generators]

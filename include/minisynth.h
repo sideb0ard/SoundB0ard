@@ -115,7 +115,6 @@ typedef struct synthsettings
 
     unsigned int m_eg1_sustain_override;
 
-
     // EG2  ////////////////////////////////////////
     double m_eg2_attack_time_msec;
     double m_eg2_decay_time_msec;

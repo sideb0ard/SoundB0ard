@@ -107,6 +107,8 @@ typedef struct dxsynth
     dxsynthsettings m_settings;
     dxsynthsettings m_settings_backup_while_getting_crazy;
 
+    int active_midi_osc; // for midi controller routing
+
     double vol;
     double m_last_note_frequency;
 
@@ -207,3 +209,4 @@ void dxsynth_set_reset_to_zero(dxsynth *d, bool b);
 void dxsynth_set_legato_mode(dxsynth *d, bool b);
 midi_event *dxsynth_get_pattern(void *self, int pattern_num);
 void dxsynth_set_pattern(void *self, int pattern_num, midi_event *pattern);
+void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num);

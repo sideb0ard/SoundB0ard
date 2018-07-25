@@ -39,6 +39,7 @@ dxsynth *new_dxsynth(void)
     dx->sound_generator.get_pattern = &dxsynth_get_pattern;
     dx->sound_generator.is_valid_pattern = &dxsynth_is_valid_pattern;
     dx->sound_generator.type = DXSYNTH_TYPE;
+    dx->active_midi_osc = 1;
 
     dxsynth_reset(dx);
 
@@ -363,44 +364,129 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
     switch (data1)
     {
     case (1):
-        printf("op1ratio\n");
-        val = scaleybum(0, 127, 0.01, 10, data2);
-        dxsynth_set_op_ratio(dx, 1, val);
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("Algo\n");
+            val = scaleybum(0, 127, 1, 8, data2);
+            dxsynth_set_voice_mode(dx, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            int osc_num = scaleybum(0, 127, 1, 4, data2);
+            printf("OSC%d!\n", osc_num);
+            dxsynth_set_active_midi_osc(dx, osc_num);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     case (2):
-        printf("op2ratio\n");
-        val = scaleybum(0, 127, 0.01, 10, data2);
-        dxsynth_set_op_ratio(dx, 2, val);
+        if (mixr->midi_bank_num == 0)
+        {
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            // wav
+            printf("wav %d\n", dx->active_midi_osc);
+            int osc_type = scaleybum(0, 127, 0, MAX_OSC - 1, data2);
+            dxsynth_set_op_waveform(dx, dx->active_midi_osc, osc_type);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     case (3):
-        printf("op3ratio\n");
-        val = scaleybum(0, 127, 0.01, 10, data2);
-        dxsynth_set_op_ratio(dx, 3, val);
+        if (mixr->midi_bank_num == 0)
+        {
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("opratio %d\n", dx->active_midi_osc);
+            val = scaleybum(0, 127, 0.01, 10, data2);
+            dxsynth_set_op_ratio(dx, dx->active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     case (4):
-        printf("op4ratio\n");
-        val = scaleybum(0, 127, 0.01, 10, data2);
-        dxsynth_set_op_ratio(dx, 4, val);
+        if (mixr->midi_bank_num == 0)
+        {
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("detune %d\n", dx->active_midi_osc);
+            val = scaleybum(0, 127, -100, 100, data2);
+            dxsynth_set_op_detune(dx, dx->active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     case (5):
-        printf("LFO Rate\n");
-        val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-        dxsynth_set_lfo1_rate(dx, val);
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("LFO Rate\n");
+            val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+            dxsynth_set_lfo1_rate(dx, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("attack %d\n", dx->active_midi_osc);
+            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, data2);
+            dxsynth_set_eg_attack_ms(dx, dx->active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     case (6):
-        printf("LFO Intensity\n");
-        val = scaleybum(0, 128, 0.0, 1.0, data2);
-        dxsynth_set_lfo1_intensity(dx, val);
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("LFO Intensity\n");
+            val = scaleybum(0, 128, 0.0, 1.0, data2);
+            dxsynth_set_lfo1_intensity(dx, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("decay %d\n", dx->active_midi_osc);
+            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, data2);
+            dxsynth_set_eg_decay_ms(dx, dx->active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     case (7):
-        printf("Op4Feedback\n");
-        val = scaleybum(0, 127, 0, 70, data2);
-        dxsynth_set_op4_feedback(dx, val);
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("Op4Feedback\n");
+            val = scaleybum(0, 127, 0, 70, data2);
+            dxsynth_set_op4_feedback(dx, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("sustain %d\n", dx->active_midi_osc);
+            val = scaleybum(0, 127, 0, 1, data2);
+            dxsynth_set_eg_sustain_lvl(dx, dx->active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     case (8):
-        printf("Algo\n");
-        val = scaleybum(0, 127, 1, 8, data2);
-        dxsynth_set_voice_mode(dx, val);
+        if (mixr->midi_bank_num == 0)
+        {
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("release %d\n", dx->active_midi_osc);
+            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, data2);
+            dxsynth_set_eg_release_ms(dx, dx->active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
         break;
     default:
         printf("nah\n");
@@ -582,7 +668,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
-        "%s " "%s" "algo:%d vol: %.1f active:%s porta:%.1f pitchrange:%d op4fb:%.2f\n"
+        "%s " "%s" "algo:%d vol: %.1f midi_osc:%d porta:%.1f pitchrange:%d op4fb:%.2f\n"
         "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n"
         "l1_dest1:%s l1_dest2:%s\nl1_dest3:%s l1_dest4:%s\n"
         "o1wav:%d o1rat:%.2f o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n"
@@ -594,7 +680,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
         dx->m_settings.m_settings_name,
         INSTRUMENT_COLOR,
         dx->m_settings.m_voice_mode, dx->vol,
-        dx->sound_generator.active ? "true" : " false",
+        dx->active_midi_osc,
         dx->m_settings.m_portamento_time_ms,
         dx->m_settings.m_pitchbend_range,
         dx->m_settings.m_op4_feedback,
@@ -1603,4 +1689,10 @@ void dxsynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
     synthbase *base = get_synthbase(self);
     if (base)
         synthbase_set_pattern(base, pattern_num, pattern);
+}
+
+void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num)
+{
+    if (osc_num >= 1 && osc_num <= 4)
+        dx->active_midi_osc = osc_num;
 }
