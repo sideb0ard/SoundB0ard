@@ -126,10 +126,6 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
         {
             synthdrum_set_eg_sustain_lvl(synth, 1, val);
         }
-        else if (strncmp("e1_sus_ms", wurds[0], 8) == 0)
-        {
-            synthdrum_set_eg_sustain_ms(synth, 1, val);
-        }
         else if (strncmp("e1_rel", wurds[0], 6) == 0)
         {
             synthdrum_set_eg_release(synth, 1, val);
@@ -162,33 +158,9 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
         {
             synthdrum_set_eg_sustain_lvl(synth, 2, val);
         }
-        else if (strncmp("e2_sus_ms", wurds[0], 8) == 0)
-        {
-            synthdrum_set_eg_sustain_ms(synth, 2, val);
-        }
         else if (strncmp("e2_rel", wurds[0], 6) == 0)
         {
             synthdrum_set_eg_release(synth, 2, val);
-        }
-        else if (strncmp("e3_att", wurds[0], 6) == 0)
-        {
-            synthdrum_set_eg_attack(synth, 2, val);
-        }
-        else if (strncmp("e3_dec", wurds[0], 6) == 0)
-        {
-            synthdrum_set_eg_decay(synth, 2, val);
-        }
-        else if (strncmp("e3_sus_lvl", wurds[0], 10) == 0)
-        {
-            synthdrum_set_eg_sustain_lvl(synth, 3, val);
-        }
-        else if (strncmp("e3_sus_ms", wurds[0], 9) == 0)
-        {
-            synthdrum_set_eg_sustain_ms(synth, 3, val);
-        }
-        else if (strncmp("e3_rel", wurds[0], 6) == 0)
-        {
-            synthdrum_set_eg_release(synth, 3, val);
         }
         else if (strncmp("filter_type", wurds[0], 11) == 0)
         {

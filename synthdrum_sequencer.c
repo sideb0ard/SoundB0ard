@@ -53,8 +53,6 @@ synthdrum_sequencer *new_synthdrum_seq()
     eg_set_release_time_msec(&sds->m_eg1, 1);
     eg_set_sustain_level(&sds->m_eg1, 0.1);
     sds->eg1_sustain_ms = 0;
-    sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg1_sustain_ms;
-    sds->eg1_sustain_counter = 0;
 
     // osc2 pitch envelope AND amp
     envelope_generator_init(&sds->m_eg2);
@@ -63,8 +61,6 @@ synthdrum_sequencer *new_synthdrum_seq()
     eg_set_release_time_msec(&sds->m_eg1, 100);
     eg_set_sustain_level(&sds->m_eg2, 0.1);
     sds->eg2_sustain_ms = 0;
-    sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg2_sustain_ms;
-    sds->eg2_sustain_counter = 0;
     sds->eg2_osc2_intensity = 1;
 
     filter_moog_init(&sds->m_filter);
@@ -120,8 +116,6 @@ void synthdrum_randomize(synthdrum_sequencer *sds)
     eg_set_release_time_msec(&sds->m_eg1, rand() % 10);
     eg_set_sustain_level(&sds->m_eg1, ((float)rand()) / RAND_MAX);
     sds->eg1_sustain_ms = rand() % 200;
-    sds->eg1_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg1_sustain_ms;
-    sds->eg1_sustain_counter = 0;
     sds->eg1_osc1_intensity = ((float)rand()) / RAND_MAX;
 
     // osc2 pitch envelope
@@ -130,8 +124,6 @@ void synthdrum_randomize(synthdrum_sequencer *sds)
     eg_set_release_time_msec(&sds->m_eg2, rand() % 100);
     eg_set_sustain_level(&sds->m_eg2, ((float)rand()) / RAND_MAX);
     sds->eg2_sustain_ms = rand() % 200;
-    sds->eg2_sustain_len_in_samples = SAMPLE_RATE / 1000. * sds->eg2_sustain_ms;
-    sds->eg2_sustain_counter = 0;
     sds->eg2_osc2_intensity = ((float)rand()) / RAND_MAX;
 
     sds->m_filter_type = rand() % NUM_FILTER_TYPES;
@@ -158,9 +150,9 @@ void sds_status(void *self, wchar_t *ss)
     swprintf(ss, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f reset:%d distortion_threshold:%.2f\n"
              "o1_wav:" "%s""%s" "%s" "(%d) o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
-             "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_sus_ms:%.2f e1_rel:%.2f\n"
+             "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_rel:%.2f\n"
              "o2_wav:" "%s" "%s" "%s" "(%d) o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
-             "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f e2_sus_ms:%.2f e2_rel:%.2f\n"
+             "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f e2_rel:%.2f\n"
              "%s"
              "filter_type:%d freq:%.2f q:%.2f",
 
@@ -178,7 +170,6 @@ void sds_status(void *self, wchar_t *ss)
              sds->osc1_amp, sds->eg2_osc2_intensity,
              sds->m_eg1.m_attack_time_msec,
              sds->m_eg1.m_decay_time_msec, sds->m_eg1.m_sustain_level,
-             sds->eg1_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
              sds->m_eg1.m_release_time_msec,
 
              ANSI_COLOR_WHITE,
@@ -188,7 +179,6 @@ void sds_status(void *self, wchar_t *ss)
              sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_fo, sds->osc2_amp,
              sds->mod_semitones_range, sds->m_eg2.m_attack_time_msec,
              sds->m_eg2.m_decay_time_msec, sds->m_eg2.m_sustain_level,
-             sds->eg2_sustain_len_in_samples / (SAMPLE_RATE / 1000.),
              sds->m_eg2.m_release_time_msec,
 
              INSTRUMENT_RED,
@@ -247,25 +237,6 @@ stereo_val sds_gennext(void *self)
     if (!sds->started)
         return out;
 
-    // if (sds->m_eg1.m_state == SUSTAIN)
-    //{
-    //    sds->eg1_sustain_counter++;
-    //    if (sds->eg1_sustain_counter >= sds->eg1_sustain_len_in_samples)
-    //    {
-    //        sds->eg1_sustain_counter = 0;
-    //        sds->m_eg1.m_state = RELEASE;
-    //    }
-    //}
-    // if (sds->m_eg2.m_state == SUSTAIN)
-    //{
-    //    sds->eg2_sustain_counter++;
-    //    if (sds->eg2_sustain_counter >= sds->eg2_sustain_len_in_samples)
-    //    {
-    //        sds->eg2_sustain_counter = 0;
-    //        sds->m_eg2.m_state = RELEASE;
-    //    }
-    //}
-
     // noise env for initial snap
     double eg1_out = eg_do_envelope(&sds->m_eg1, NULL);
     osc_update(&sds->m_osc1.osc);
@@ -320,13 +291,11 @@ void sds_trigger(synthdrum_sequencer *sds)
         osc_reset(&sds->m_osc1.osc);
     sds->m_osc1.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg1);
-    sds->eg1_sustain_counter = 0;
 
     if (sds->reset_osc)
         osc_reset(&sds->m_osc2.osc);
     sds->m_osc2.osc.m_note_on = true;
     eg_start_eg(&sds->m_eg2);
-    sds->eg2_sustain_counter = 0;
 }
 
 bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
@@ -356,12 +325,10 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
             " %f"    // m_eg1.m_attack_time_msec
             " %f"    // m_eg1.m_decay_time_msec
             " %f"    // m_eg1.m_sustain_level
-            " %f"    // eg1_sustain_len_in_samples
             " %f"    // m_eg1.m_release_time_msec
             " %f"    // m_eg2.m_attack_time_msec
             " %f"    // m_eg2.m_decay_time_msec
             " %f"    // m_eg2.m_sustain_level
-            " %f"    // eg2_sustain_len_in_samples
             " %f"    // m_eg2.m_release_time_msec
             " %f"    // eg2_osc2_intensity
             " %d"    // filter type
@@ -373,11 +340,11 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
             sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_osc_fo, sds->osc2_amp,
 
             sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
-            sds->m_eg1.m_sustain_level, sds->eg1_sustain_len_in_samples,
+            sds->m_eg1.m_sustain_level,
             sds->m_eg1.m_release_time_msec,
 
             sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
-            sds->m_eg2.m_sustain_level, sds->eg2_sustain_len_in_samples,
+            sds->m_eg2.m_sustain_level,
             sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
 
             sds->m_filter_type, sds->m_filter_fc, sds->m_filter_q
@@ -420,12 +387,10 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
                 " %lf"    // m_eg1.m_attack_time_msec
                 " %lf"    // m_eg1.m_decay_time_msec
                 " %lf"    // m_eg1.m_sustain_level
-                " %lf"    // eg1_sustain_len_in_samples
                 " %lf"    // m_eg1.m_release_time_msec
                 " %lf"    // m_eg2.m_attack_time_msec
                 " %lf"    // m_eg2.m_decay_time_msec
                 " %lf"    // m_eg2.m_sustain_level
-                " %lf"    // eg2_sustain_len_in_samples
                 " %lf"    // m_eg2.m_release_time_msec
                 " %lf"    // eg2_osc2_intensity
                 " %d"     // filter type
@@ -438,11 +403,11 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
                 &sds->m_osc2.osc.m_osc_fo, &sds->osc2_amp,
 
                 &sds->m_eg1.m_attack_time_msec, &sds->m_eg1.m_decay_time_msec,
-                &sds->m_eg1.m_sustain_level, &sds->eg1_sustain_len_in_samples,
+                &sds->m_eg1.m_sustain_level,
                 &sds->m_eg1.m_release_time_msec,
 
                 &sds->m_eg2.m_attack_time_msec, &sds->m_eg2.m_decay_time_msec,
-                &sds->m_eg2.m_sustain_level, &sds->eg2_sustain_len_in_samples,
+                &sds->m_eg2.m_sustain_level,
                 &sds->m_eg2.m_release_time_msec, &sds->eg2_osc2_intensity,
 
                 &sds->m_filter_type, &sds->m_filter_fc, &sds->m_filter_q);
@@ -587,27 +552,6 @@ void synthdrum_set_eg_sustain_lvl(synthdrum_sequencer *sds, int eg_num,
         printf("Val has to be between 0 and 1\n");
 }
 
-void synthdrum_set_eg_sustain_ms(synthdrum_sequencer *sds, int eg_num,
-                                 double val)
-{
-    if (val >= 0 && val <= 5000)
-    {
-        int samples_val = SAMPLE_RATE / 1000. * val;
-        switch (eg_num)
-        {
-        case (1):
-            sds->eg1_sustain_len_in_samples = samples_val;
-            break;
-        case (2):
-            sds->eg2_sustain_len_in_samples = samples_val;
-            break;
-        }
-    }
-    else
-        printf("Val has to be between %d and %d\n", EG_MINTIME_MS,
-               EG_MAXTIME_MS);
-}
-
 void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
@@ -699,7 +643,7 @@ void sds_make_active_track(void *self, int track_num)
 
 void synthdrum_set_distortion_threshold(synthdrum_sequencer *sds, double val)
 {
-    if (val > 0 && val < 1)
+    if (val >= 0 && val <= 1)
         sds->m_distortion_threshold = val;
     else
         printf("Val must be between 0 and 1\n");

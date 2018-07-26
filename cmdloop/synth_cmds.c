@@ -103,7 +103,6 @@ bool parse_dxsynth_settings_change(dxsynth *dx, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("rand", wurds[2], 4) == 0)
     {
-        printf("RND!\n");
         dxsynth_rand_settings(dx);
         return true;
     }
