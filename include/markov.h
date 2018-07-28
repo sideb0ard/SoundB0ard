@@ -9,6 +9,7 @@ enum
     HIPHOP,
     HATS,
     HATS_MASK,
+    CLAPS,
     NUM_MARKOV_STYLES
 };
 
