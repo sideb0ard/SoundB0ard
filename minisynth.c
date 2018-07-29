@@ -504,22 +504,18 @@ void minisynth_midi_control(minisynth *ms, unsigned int data1,
     switch (data1)
     {
     case (1):
-        // printf("Attack\n");
         scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
         ms->m_settings.m_eg1_attack_time_msec = scaley_val;
         break;
     case (2):
-        // printf("Decay\n");
         scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
         ms->m_settings.m_eg1_decay_time_msec = scaley_val;
         break;
     case (3):
-        // printf("Sustain\n");
         scaley_val = scaleybum(0, 127, 0, 1, data2);
         ms->m_settings.m_eg1_sustain_level = scaley_val;
         break;
     case (4):
-        // printf("Release\n");
         scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
         ms->m_settings.m_eg1_release_time_msec = scaley_val;
         break;
@@ -1021,7 +1017,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_filter_type = rand() % NUM_FILTER_TYPES;
      ms->m_settings.m_lfo1_amp_intensity = ((float)rand() /
     (float)(RAND_MAX));
-    ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
+    //ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo1_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
     // ms->m_settings.m_lfo1_pan_enabled = rand() % 2;
@@ -1042,7 +1038,7 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_lfo2_filter_fc_enabled = rand() % 2;
     ms->m_settings.m_lfo2_amp_intensity = ((float)rand() /
     (float)(RAND_MAX));
-    ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
+    //ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo2_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
     // ms->m_settings.m_lfo2_pan_enabled = rand() % 2;
