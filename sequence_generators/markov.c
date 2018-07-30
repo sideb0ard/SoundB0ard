@@ -8,7 +8,8 @@
 #include "utils.h"
 
 extern mixer *mixr;
-static char *s_markov_types[] = {"GARAGE", "HIPHOP", "HATS", "HATS_MASK", "CLAPS"};
+static char *s_markov_types[] = {"GARAGE", "HIPHOP", "HATS", "HATS_MASK",
+                                 "CLAPS"};
 
 #define BEAT0 32768
 #define BEAT1 16384

@@ -88,11 +88,9 @@ stereo_val digisynth_gennext(void *self)
 
     accum_out_left *= ds->vol;
     accum_out_left = effector(&ds->sound_generator, accum_out_left);
-    accum_out_left = envelopor(&ds->sound_generator, accum_out_left);
 
     accum_out_right *= ds->vol;
     accum_out_right = effector(&ds->sound_generator, accum_out_right);
-    accum_out_right = envelopor(&ds->sound_generator, accum_out_right);
 
     return (stereo_val){.left = accum_out_left, .right = accum_out_right};
 }

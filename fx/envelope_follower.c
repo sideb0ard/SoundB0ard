@@ -14,6 +14,7 @@ envelope_follower *new_envelope_follower()
     ef->m_fx.enabled = true;
     ef->m_fx.status = &envelope_follower_status;
     ef->m_fx.process = &envelope_follower_process_wrapper;
+    ef->m_fx.event_notify = &fx_noop_event_notify;
 
     envelope_follower_init(ef);
 

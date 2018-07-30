@@ -165,7 +165,7 @@ typedef enum
 typedef struct mixer_timing_info
 {
     int frames_per_midi_tick;
-    double midi_ticks_per_ms;
+    double ms_per_midi_tick;
 
     double time_of_next_midi_tick;
 

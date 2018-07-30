@@ -17,6 +17,7 @@ filterpass *new_filterpass()
     fp->m_fx.enabled = true;
     fp->m_fx.status = &filterpass_status;
     fp->m_fx.process = &filterpass_process_audio;
+    fp->m_fx.event_notify = &fx_noop_event_notify;
 
     filter_moog_init(&fp->m_filter);
     fp->m_filter.f.m_aux_control = 0.0;

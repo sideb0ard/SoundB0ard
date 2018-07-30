@@ -13,6 +13,7 @@ distortion *new_distortion(void)
     d->m_fx.enabled = true;
     d->m_fx.process = &distortion_process;
     d->m_fx.status = &distortion_status;
+    d->m_fx.event_notify = &fx_noop_event_notify;
 
     d->m_threshold = 0.707;
     return d;

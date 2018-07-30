@@ -67,7 +67,10 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
-    else if (strncmp("filter", wurds[0], 6) == 0)
+    else if (strncmp("filter", wurds[0], 6) == 0 ||
+             strncmp("lowpass", wurds[0], 8) == 0 ||
+             strncmp("highpass", wurds[0], 9) == 0 ||
+             strncmp("bandpass", wurds[0], 9) == 0)
     {
         int soundgen_num = atoi(wurds[1]);
         int freq = atoi(wurds[2]);
@@ -75,12 +78,14 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             int f_num =
                 add_basicfilter_soundgen(mixr->sound_generators[soundgen_num]);
+            soundgenerator *sg = mixr->sound_generators[soundgen_num];
+            filterpass *fp = (filterpass *)sg->effects[f_num];
             if (freq != 0)
-            {
-                soundgenerator *sg = mixr->sound_generators[soundgen_num];
-                filterpass *fp = (filterpass *)sg->effects[f_num];
                 filter_set_fc_control(&fp->m_filter.f, freq);
-            }
+            if (strncmp("highpass", wurds[0], 8) == 0)
+                filter_set_type(&fp->m_filter.f, HIGHPASS);
+            if (strncmp("bandpass", wurds[0], 8) == 0)
+                filter_set_type(&fp->m_filter.f, BANDPASS);
         }
         return true;
     }
@@ -144,51 +149,23 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
-    else if (strncmp("decimate", wurds[0], 8) == 0)
-    {
-        int soundgen_num = atoi(wurds[1]);
-        if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
-        {
-            add_decimator_soundgen(mixr->sound_generators[soundgen_num]);
-        }
-        return true;
-    }
     else if (strncmp("env", wurds[0], 3) == 0)
     {
         int soundgen_num = atoi(wurds[1]);
+        double bars = atof(wurds[2]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            int loop_len = atoi(wurds[2]);
-            int env_type = atoi(wurds[3]);
-            ENVSTREAM *e = new_envelope_stream(loop_len, env_type);
-            if (e != NULL)
-            {
-                add_envelope_soundgen(mixr->sound_generators[soundgen_num], e);
-            }
-        }
-        return true;
-    }
-    else if (strncmp("lowpass", wurds[0], 8) == 0 ||
-             strncmp("highpass", wurds[0], 9) == 0 ||
-             strncmp("bandpass", wurds[0], 9) == 0)
-    {
-        int soundgen_num = atoi(wurds[1]);
-        if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
-        {
-            int val = atoi(wurds[2]);
-            if (strcmp("lowpass", wurds[0]) == 0)
-                add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
-                                       val, LOWPASS);
-            else if (strcmp("highpass", wurds[0]) == 0)
-                add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
-                                       val, HIGHPASS);
-            else
-                add_freq_pass_soundgen(mixr->sound_generators[soundgen_num],
-                                       val, BANDPASS);
-        }
-        return true;
-    }
+            int fxnum =
+                add_envelope_soundgen(mixr->sound_generators[soundgen_num]);
+            envelope *e = (envelope *)mixr->sound_generators[soundgen_num]
+                              ->effects[fxnum];
+            if (bars == 0)
+                bars = 1;
 
+            envelope_set_length_bars(e, bars);
+        }
+        return true;
+    }
     else if (strncmp("repeat", wurds[0], 6) == 0)
     {
         int soundgen_num = atoi(wurds[1]);
@@ -217,6 +194,25 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 f->enabled = false;
             else if (strncmp("toggle", wurds[2], 6) == 0)
                 f->enabled = 1 - f->enabled;
+            else if (f->type == ENVELOPE)
+            {
+                envelope *e = (envelope *)f;
+                double val = atof(wurds[3]);
+                if (strncmp("len_bars", wurds[2], 8) == 0)
+                    envelope_set_length_bars(e, val);
+                else if (strncmp("type", wurds[2], 4) == 0)
+                    envelope_set_type(e, val);
+                else if (strncmp("mode", wurds[2], 4) == 0)
+                    envelope_set_mode(e, val);
+                else if (strncmp("attack", wurds[2], 6) == 0)
+                    envelope_set_attack_ms(e, val);
+                else if (strncmp("decay", wurds[2], 5) == 0)
+                    envelope_set_decay_ms(e, val);
+                else if (strncmp("sustain", wurds[2], 7) == 0)
+                    envelope_set_sustain_lvl(e, val);
+                else if (strncmp("release", wurds[2], 6) == 0)
+                    envelope_set_release_ms(e, val);
+            }
             else if (f->type == DELAY)
             {
                 // printf("Changing Dulay!\n");

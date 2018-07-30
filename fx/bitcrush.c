@@ -14,6 +14,7 @@ bitcrush *new_bitcrush()
     bc->m_fx.enabled = true;
     bc->m_fx.status = &bitcrush_status;
     bc->m_fx.process = &bitcrush_process_audio;
+    bc->m_fx.event_notify = &fx_noop_event_notify;
 
     return bc;
 }

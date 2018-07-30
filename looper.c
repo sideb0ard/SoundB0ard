@@ -229,7 +229,7 @@ void looper_event_notify(void *self, unsigned int event_type)
                             g->m_seq.patterns[g->m_seq.cur_pattern];
                         int off_tick =
                             (int)(idx + (g->sustain_ms *
-                                         mixr->timing_info.midi_ticks_per_ms)) %
+                                         mixr->timing_info.ms_per_midi_tick)) %
                             PPBAR;
                         midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
                         pattern_add_event(pattern, off_tick, off_event);
@@ -418,8 +418,6 @@ stereo_val looper_gennext(void *self)
 
     val.left = effector(&g->sound_generator, val.left);
     val.right = effector(&g->sound_generator, val.right);
-    val.left = envelopor(&g->sound_generator, val.left);
-    val.right = envelopor(&g->sound_generator, val.right);
 
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);

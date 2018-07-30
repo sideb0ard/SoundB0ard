@@ -27,8 +27,6 @@
 #include "synthdrum_sequencer.h"
 #include "utils.h"
 
-extern ENVSTREAM *ampstream;
-
 extern mixer *mixr;
 
 extern const char *key_names[NUM_KEYS];
@@ -243,8 +241,7 @@ void mixer_status_sgz(mixer *mixr)
                 wprintf(WANSI_COLOR_RESET);
                 // clang-format on
 
-                if (mixr->sound_generators[i]->effects_num > 0 ||
-                    mixr->sound_generators[i]->envelopes_num > 0)
+                if (mixr->sound_generators[i]->effects_num > 0)
                 {
                     printf("      ");
                     for (int j = 0; j < mixr->sound_generators[i]->effects_num;
@@ -258,13 +255,6 @@ void mixer_status_sgz(mixer *mixr)
                         char fx_status[512];
                         f->status(f, fx_status);
                         printf("\n[fx %d:%d %s]", i, j, fx_status);
-                    }
-                    printf(ANSI_COLOR_RESET);
-                    printf(COOL_COLOR_GREEN);
-                    for (int j = 0;
-                         j < mixr->sound_generators[i]->envelopes_num; j++)
-                    {
-                        printf("\n[envelope]");
                     }
                     printf(ANSI_COLOR_RESET);
                 }
@@ -315,7 +305,20 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type)
     {
         soundgenerator *sg = mixr->sound_generators[i];
         if (sg != NULL)
+        {
             sg->event_notify(sg, event_type);
+            if (sg->effects_num > 0)
+            {
+                for (int j = 0; j < sg->effects_num; j++)
+                {
+                    if (sg->effects[j])
+                    {
+                        fx *f = sg->effects[j];
+                        f->event_notify(f, event_type);
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -329,7 +332,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
         mixr->timing_info.frames_per_midi_tick * PPBAR;
     mixr->timing_info.loop_len_in_ticks = PPBAR;
 
-    mixr->timing_info.midi_ticks_per_ms = PPQN / (60.0 / bpm * 1000);
+    mixr->timing_info.ms_per_midi_tick = (60.0 / bpm * 1000) / PPQN;
 
     mixr->timing_info.size_of_thirtysecond_note =
         (PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick;
@@ -340,17 +343,6 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->timing_info.size_of_quarter_note =
         mixr->timing_info.size_of_eighth_note * 2;
 
-    for (int i = 0; i < mixr->soundgen_num; i++)
-    {
-        if (mixr->sound_generators[i] != NULL)
-        {
-            for (int j = 0; j < mixr->sound_generators[i]->envelopes_num; j++)
-            {
-                update_envelope_stream_bpm(
-                    mixr->sound_generators[i]->envelopes[j]);
-            }
-        }
-    }
     link_set_bpm(mixr->m_ableton_link, bpm);
 }
 
@@ -991,7 +983,7 @@ int mixer_print_timing_info(mixer *mixr)
     printf("TIMING INFO!\n");
     printf("============\n");
     printf("FRAMES per midi tick:%d\n", info->frames_per_midi_tick);
-    printf("MIDI ticks per ms:%f\n", info->midi_ticks_per_ms);
+    printf("MS per MIDI tick:%f\n", info->ms_per_midi_tick);
     printf("TIME of next MIDI tick:%f\n", info->time_of_next_midi_tick);
     printf("SIXTEENTH NOTE tick:%d\n", info->sixteenth_note_tick);
     printf("MIDI tick:%d\n", info->midi_tick);

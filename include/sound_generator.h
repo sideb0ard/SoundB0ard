@@ -33,11 +33,6 @@ typedef struct soundgenerator
     fx **effects;
     int effects_on; // bool
 
-    int envelopes_size; // size of array
-    int envelopes_num;  // num of effects
-    ENVSTREAM **envelopes;
-    int envelopes_enabled; // bool
-
 } soundgenerator;
 
 bool is_synth(soundgenerator *self);
@@ -47,15 +42,11 @@ int add_basicfilter_soundgen(soundgenerator *self);
 int add_bitcrush_soundgen(soundgenerator *self);
 int add_compressor_soundgen(soundgenerator *self);
 int add_distortion_soundgen(soundgenerator *self);
-int add_decimator_soundgen(soundgenerator *self);
 int add_delay_soundgen(soundgenerator *self, float duration);
+int add_envelope_soundgen(soundgenerator *self);
 int add_moddelay_soundgen(soundgenerator *self);
 int add_modfilter_soundgen(soundgenerator *self);
 int add_follower_soundgen(soundgenerator *self);
 int add_reverb_soundgen(soundgenerator *self);
 int add_waveshape_soundgen(soundgenerator *self);
-int add_freq_pass_soundgen(soundgenerator *self, float freq, fx_type pass_type);
 double effector(soundgenerator *self, double val);
-
-int add_envelope_soundgen(soundgenerator *self, ENVSTREAM *e);
-double envelopor(soundgenerator *self, double val);

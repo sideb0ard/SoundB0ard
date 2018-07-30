@@ -7,224 +7,142 @@
 
 extern mixer *mixr;
 
-static void _env_updatepoints(ENVSTREAM *stream)
+const char *s_eg_state[] = {"OFF",     "ATTACK",  "DECAY",
+                            "SUSTAIN", "RELEASE", "SHUTDOWN"};
+
+const char *s_eg_type[] = {"ANALOG", "DIGITAL"};
+const char *s_eg_mode[] = {"TRIGGER", "SUSTAIN"};
+
+envelope *new_envelope(void)
 {
-    stream->leftpoint = stream->points[stream->ileft];
-    stream->rightpoint = stream->points[stream->iright];
-    stream->width = stream->rightpoint.time - stream->leftpoint.time;
-    stream->height = stream->rightpoint.value - stream->leftpoint.value;
+    envelope *e = calloc(1, sizeof(envelope));
+    envelope_reset(e);
+
+    e->m_fx.type = ENVELOPE;
+    e->m_fx.enabled = true;
+    e->m_fx.status = &envelope_status;
+    e->m_fx.process = &envelope_process_audio;
+    e->m_fx.event_notify = &envelope_event_notify;
+
+    return e;
 }
 
-static void _env_reset(ENVSTREAM *stream)
+void envelope_reset(envelope *e)
 {
-    stream->curpos = 0.0;
-    stream->ileft = 0;
-    stream->iright = 1;
-    _env_updatepoints(stream);
+    envelope_generator_init(&e->eg);
+    e->eg.m_sustain_level = 0.7;
+    eg_set_attack_time_msec(&e->eg, 300);
+    eg_set_decay_time_msec(&e->eg, 300);
+    eg_set_release_time_msec(&e->eg, 300);
+    e->env_length_ticks = 0;
 }
 
-void update_envelope_stream_bpm(ENVSTREAM *stream)
+void envelope_status(void *self, char *status_string)
 {
-    // 100 is for percent - time of envelope is measured as percent of loop len
-    stream->incr =
-        100.0 / (60.0 / (mixr->bpm) * SAMPLE_RATE * DEFAULT_ENV_LENGTH);
-    printf("called me - BPM IS NOW %f\n", mixr->bpm);
+    envelope *e = (envelope *)self;
+    snprintf(status_string, MAX_STATIC_STRING_SZ,
+             "ENV state:%s len_bars:%.2f len_ticks:%d type:%s mode:%s\n"
+             " attack:%.2f decay:%.2f sustain:%.2f release:%.2f // "
+             "release_tick:%d",
+             s_eg_state[e->eg.m_state], e->env_length_bars, e->env_length_ticks,
+             s_eg_type[e->eg.m_eg_mode], s_eg_mode[e->env_mode],
+             e->eg.m_attack_time_msec, e->eg.m_decay_time_msec,
+             e->eg.m_sustain_level, e->eg.m_release_time_msec, e->release_tick);
 }
 
-ENVELOPE maxpoint(const ENVELOPE *points, long npoints)
+double envelope_process_audio(void *self, double input)
 {
-    ENVELOPE point;
+    envelope *e = (envelope *)self;
+    double env_out = eg_do_envelope(&e->eg, NULL);
 
-    point.value = points[0].value;
-    point.time = points[0].time;
+    // if (e->started)
+    return input * env_out;
 
-    for (int i = 1; i < npoints; i++)
+    return input;
+}
+
+void envelope_set_length_bars(envelope *e, double length_bars)
+{
+    e->env_length_bars = length_bars;
+    envelope_calculate_timings(e);
+}
+
+void envelope_calculate_timings(envelope *e)
+{
+    mixer_timing_info info = mixr->timing_info;
+    int release_time_ticks = e->eg.m_release_time_msec * info.ms_per_midi_tick;
+
+    int env_length_ticks = info.loop_len_in_ticks * e->env_length_bars;
+    int release_tick = env_length_ticks - release_time_ticks;
+    e->env_length_ticks = env_length_ticks;
+    e->env_length_ticks_counter = info.midi_tick % e->env_length_ticks;
+    e->release_tick = release_tick;
+}
+
+void envelope_event_notify(void *self, unsigned int event_type)
+{
+    envelope *e = (envelope *)self;
+    switch (event_type)
     {
-        if (point.value < points[i].value)
+    case (TIME_MIDI_TICK):
+
+        // Envelope Length Cycle Bookkeeping
+        (e->env_length_ticks_counter)++;
+        if (e->env_length_ticks_counter >= e->env_length_ticks)
         {
-            point.value = points[i].value;
-            point.time = points[i].time;
+            printf("START! %s AMP:%f LOOPTICK:%d\n", s_eg_state[e->eg_status],
+                   e->eg.m_envelope_output, e->env_length_ticks_counter);
+            eg_start_eg(&e->eg);
+            e->env_length_ticks_counter = 0;
         }
-    }
-    return point;
-}
-
-ENVELOPE *newpoints()
-{
-
-    ENVELOPE *points = NULL;
-    points = (ENVELOPE *)calloc(4, sizeof(ENVELOPE));
-    if (points == NULL)
-        return NULL;
-    points[0].time = 0.0;
-    points[0].value = 0.1;
-    points[1].time = 15.00;
-    points[1].value = 1.0;
-    points[2].time = 85.00;
-    points[2].value = 1.0;
-    points[3].time = 99.0;
-    points[3].value = 0.1;
-    return points;
-}
-
-ENVELOPE *new_fadein_points()
-{
-
-    ENVELOPE *points = NULL;
-    points = (ENVELOPE *)calloc(7, sizeof(ENVELOPE));
-    if (points == NULL)
-        return NULL;
-    points[0].time = 0.0;
-    points[0].value = 0.1;
-    points[1].time = 45.00;
-    points[1].value = 0.1;
-    points[2].time = 55.00;
-    points[2].value = 0.4;
-    points[3].time = 60.0;
-    points[3].value = 1.0;
-    points[4].time = 80.0;
-    points[4].value = 1.0;
-    points[5].time = 85.0;
-    points[5].value = 0.5;
-    points[6].time = 99.0;
-    points[6].value = 0.1;
-    return points;
-}
-
-ENVELOPE *new_fadeout_points()
-{
-
-    ENVELOPE *points = NULL;
-    points = (ENVELOPE *)calloc(5, sizeof(ENVELOPE));
-    if (points == NULL)
-        return NULL;
-    points[0].time = 0.0;
-    points[0].value = 0.1;
-    points[1].time = 5.00;
-    points[1].value = 1.0;
-    points[2].time = 45.00;
-    points[2].value = 1.0;
-    points[3].time = 50.00;
-    points[3].value = 0.1;
-    points[4].time = 99.0;
-    points[4].value = 0.1;
-    return points;
-}
-
-ENVELOPE *new_wavey_points()
-{
-
-    ENVELOPE *points = NULL;
-    points = (ENVELOPE *)calloc(8, sizeof(ENVELOPE));
-    if (points == NULL)
-        return NULL;
-    points[0].time = 0.0;
-    points[0].value = 0.3;
-    points[1].time = 12.00;
-    points[1].value = 0.6;
-    points[2].time = 24.00;
-    points[2].value = 0.8;
-    points[3].time = 36.00;
-    points[3].value = 0.5;
-    points[4].time = 48.0;
-    points[4].value = 0.4;
-    points[5].time = 60.0;
-    points[5].value = 0.6;
-    points[6].time = 72.0;
-    points[6].value = 0.4;
-    points[7].time = 85.0;
-    points[7].value = 0.3;
-    return points;
-}
-
-ENVSTREAM *new_envelope_stream(int env_len,
-                               int type) // env_len is bars TODO: enum
-{
-
-    if (env_len <= 0)
-        return NULL;
-
-    // ENVSTREAM* stream;
-    ENVSTREAM *stream = (ENVSTREAM *)calloc(1, sizeof(ENVSTREAM));
-    if (stream == NULL)
-        return NULL;
-
-    ENVELOPE *points;
-    switch (type)
-    {
-    case 0:
-        points = newpoints();
-        stream->npoints = 4;
-        break;
-    case 1:
-        points = new_fadein_points();
-        stream->npoints = 7;
-        break;
-    case 2:
-        points = new_fadeout_points();
-        stream->npoints = 5;
-        break;
-    case 3:
-        points = new_wavey_points();
-        stream->npoints = 8;
-        break;
-    default:
-        points = newpoints();
-    }
-
-    // unsigned long npoints = 4;
-    stream->points = points;
-    stream->incr = 100.0 / (60.0 / mixr->bpm * SAMPLE_RATE * env_len * 4);
-
-    _env_reset(stream);
-
-    return stream;
-}
-
-void free_stream(ENVSTREAM *stream)
-{
-    if (stream && stream->points)
-    {
-        free(stream->points);
-        stream->points = NULL;
-    }
-}
-
-double envelope_stream_tick(ENVSTREAM *stream)
-{
-    double thisval, frac;
-    frac = (stream->curpos - stream->leftpoint.time) / stream->width;
-    thisval = stream->leftpoint.value + (stream->height * frac);
-
-    stream->curpos += stream->incr;
-    if (stream->curpos > stream->rightpoint.time)
-    {
-        stream->ileft++;
-        stream->iright++;
-        if (stream->iright < stream->npoints)
+        else if (e->env_length_ticks_counter >= e->release_tick)
         {
-            _env_updatepoints(stream);
+            eg_note_off(&e->eg);
         }
-        else
+
+        if (e->eg_status != e->eg.m_state)
         {
-            _env_reset(stream);
+            e->eg_status = e->eg.m_state;
+            printf("STATECHANGE! %s AMP:%f LOOPTICK:%d\n",
+                   s_eg_state[e->eg_status], e->eg.m_envelope_output,
+                   e->env_length_ticks_counter);
         }
+
+        break;
     }
-    return thisval;
 }
 
-void printbp(ENVELOPE *bp)
+void envelope_set_type(envelope *e, unsigned int type)
 {
-    printf("Time: %f Val: %f\n", bp->time, bp->value);
+    eg_set_eg_mode(&e->eg, type);
 }
 
-void ps_envelope_stream(ENVSTREAM *stream)
+void envelope_set_mode(envelope *e, unsigned int mode)
 {
-    // ENVELOPE tmp = maxpoint(stream->points, 4);
-    // for (int i = 0; i < 4; i++)
-    //  printbp(&stream->points[0]);
-    // printf("Max: %f\n", tmp.value);
+    if (mode < 2)
+        e->env_mode = mode;
+}
 
-    printf("Cur: %f Incr: %f Val: %f\n", stream->curpos, stream->incr,
-           envelope_stream_tick(stream));
+void envelope_set_attack_ms(envelope *e, double val)
+{
+    eg_set_attack_time_msec(&e->eg, val);
+    envelope_calculate_timings(e);
+}
+
+void envelope_set_decay_ms(envelope *e, double val)
+{
+    eg_set_decay_time_msec(&e->eg, val);
+    envelope_calculate_timings(e);
+}
+
+void envelope_set_sustain_lvl(envelope *e, double val)
+{
+    eg_set_sustain_level(&e->eg, val);
+    envelope_calculate_timings(e);
+}
+
+void envelope_set_release_ms(envelope *e, double val)
+{
+    eg_set_release_time_msec(&e->eg, val);
+    envelope_calculate_timings(e);
 }

@@ -14,6 +14,7 @@ beatrepeat *new_beatrepeat(int nbeats, int sixteenth)
     b->m_fx.enabled = true;
     b->m_fx.status = &beatrepeat_status;
     b->m_fx.process = &beatrepeat_gennext;
+    b->m_fx.event_notify = &fx_noop_event_notify;
 
     // TODO - this doesn't handle a change of BPM
     b->m_buffer_size = mixr->timing_info.loop_len_in_frames;

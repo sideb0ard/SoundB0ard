@@ -787,11 +787,9 @@ stereo_val dxsynth_gennext(void *self)
     }
 
     accum_out_left = effector(&dx->sound_generator, accum_out_left);
-    accum_out_left = envelopor(&dx->sound_generator, accum_out_left);
     accum_out_left *= dx->vol;
 
     accum_out_right = effector(&dx->sound_generator, accum_out_right);
-    accum_out_right = envelopor(&dx->sound_generator, accum_out_right);
     accum_out_right *= dx->vol;
 
     return (stereo_val){.left = accum_out_left, .right = accum_out_right};

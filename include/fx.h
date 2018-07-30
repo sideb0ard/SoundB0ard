@@ -11,6 +11,7 @@ typedef enum
     COMPRESSOR,
     DECIMATOR,
     DELAY,
+    ENVELOPE,
     MODDELAY,
     MODFILTER,
     DISTORTION,
@@ -27,6 +28,9 @@ typedef struct fx
     bool enabled;
     void (*status)(void *self, char *string);
     double (*process)(void *self, double input);
+    void (*event_notify)(void *self, unsigned int event_type);
 } fx;
+
+void fx_noop_event_notify(void *self, unsigned int event_type);
 
 #endif

@@ -18,6 +18,7 @@ stereodelay *new_stereo_delay(double duration)
     d->m_fx.enabled = true;
     d->m_fx.status = &stereo_delay_status;
     d->m_fx.process = &stereo_delay_process_wrapper;
+    d->m_fx.event_notify = &fx_noop_event_notify;
 
     d->lfo1_on = false;
     d->m_lfo1_min = 50;

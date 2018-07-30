@@ -20,6 +20,7 @@ mod_delay *new_mod_delay()
     md->m_fx.enabled = true;
     md->m_fx.status = &mod_delay_status;
     md->m_fx.process = &mod_delay_process_wrapper;
+    md->m_fx.event_notify = &fx_noop_event_notify;
 
     md->m_min_delay_msec = 0.0;
     md->m_max_delay_msec = 0.0;

@@ -183,12 +183,8 @@ stereo_val sample_seq_gennext(void *self)
     }
 
     left_val = effector(&seq->sound_generator, left_val);
-    left_val = envelopor(&seq->sound_generator, left_val);
     if (seq->channels == 2)
-    {
         right_val = effector(&seq->sound_generator, right_val);
-        right_val = effector(&seq->sound_generator, right_val);
-    }
     else
         right_val = left_val;
 

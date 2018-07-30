@@ -16,6 +16,7 @@ dynamics_processor *new_dynamics_processor(void)
     dp->m_fx.enabled = true;
     dp->m_fx.process = &dynamics_processor_process;
     dp->m_fx.status = &dynamics_processor_status;
+    dp->m_fx.event_notify = &fx_noop_event_notify;
 
     dp->m_inputgain_db = 0;      // -12 - 20
     dp->m_threshold = 0;         // -60 - 0

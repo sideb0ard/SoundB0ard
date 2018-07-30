@@ -110,7 +110,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             {
                 int sustain_ms = ev->hold ? ev->hold : ms->base.sustain_note_ms;
                 int sustain_time_in_ticks =
-                    sustain_ms * mixr->timing_info.midi_ticks_per_ms;
+                    sustain_ms * mixr->timing_info.ms_per_midi_tick;
 
                 int note_off_tick =
                     (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
@@ -153,7 +153,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             if (ev->source != EXTERNAL_DEVICE)
             {
                 int sustain_time_in_ticks = dx->base.sustain_note_ms *
-                                            mixr->timing_info.midi_ticks_per_ms;
+                                            mixr->timing_info.ms_per_midi_tick;
                 int note_off_tick =
                     (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                 midi_event off = new_midi_event(128, note, 128);
@@ -192,7 +192,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         { // Hex 0x80
             digisynth_midi_note_on(ds, note, ev->data2);
             int sustain_time_in_ticks =
-                ds->base.sustain_note_ms * mixr->timing_info.midi_ticks_per_ms;
+                ds->base.sustain_note_ms * mixr->timing_info.ms_per_midi_tick;
             int note_off_tick = (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
             midi_event off = new_midi_event(128, note, 128);
             off.delete_after_use = true;

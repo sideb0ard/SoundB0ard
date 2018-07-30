@@ -9,8 +9,6 @@ SRC = \
 	algorithm.c \
 	audiofile_data.c \
 	audioutils.c \
-	fx/basicfilterpass.c \
-	fx/beatrepeat.c \
 	cmdloop.c \
 	cmdloop/fx_cmds.c \
 	cmdloop/algo_cmds.c \
@@ -31,6 +29,8 @@ SRC = \
 	filterz/filter_moogladder.c \
 	filterz/filter_onepole.c \
 	filterz/filter_sem.c \
+	fx/basicfilterpass.c \
+	fx/beatrepeat.c \
 	fx/bitcrush.c \
 	fx/ddlmodule.c \
 	fx/delayline.c \
@@ -40,6 +40,7 @@ SRC = \
 	fx/envelope_detector.c \
 	fx/envelope_follower.c \
 	fx/envelope_generator.c \
+	fx/fx.c \
 	fx/modular_delay.c \
 	fx/stereodelay.c \
 	fx/waveshaper.c \

@@ -13,6 +13,7 @@ waveshaper *new_waveshaper()
     ws->m_fx.enabled = true;
     ws->m_fx.status = &waveshaper_status;
     ws->m_fx.process = &waveshaper_process_audio;
+    ws->m_fx.event_notify = &fx_noop_event_notify;
 
     return ws;
 }

@@ -239,6 +239,9 @@ stereo_val sds_gennext(void *self)
 
     // noise env for initial snap
     double eg1_out = eg_do_envelope(&sds->m_eg1, NULL);
+    if (sds->m_eg1.m_eg_mode == SUSTAIN)
+        eg_note_off(&sds->m_eg1);
+
     osc_update(&sds->m_osc1.osc);
     double osc1_out =
         qb_do_oscillate(&sds->m_osc1.osc, NULL) * eg1_out * sds->osc1_amp;
@@ -246,6 +249,9 @@ stereo_val sds_gennext(void *self)
     // eg2 env -> pitch of OSC2 _AND_ AMP OUT
     double eg2_biased_out = 0;
     double amp_out_env = eg_do_envelope(&sds->m_eg2, &eg2_biased_out);
+    if (sds->m_eg2.m_eg_mode == SUSTAIN)
+        eg_note_off(&sds->m_eg2);
+
     double eg2_osc_mod =
         sds->eg2_osc2_intensity * sds->mod_semitones_range * eg2_biased_out;
     sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
@@ -270,7 +276,6 @@ stereo_val sds_gennext(void *self)
     //    amp_out_env * sds->vol;
 
     almost_out = effector(&sds->sg, almost_out);
-    almost_out = envelopor(&sds->sg, almost_out);
 
     out.left = almost_out;
     out.right = almost_out;
@@ -340,12 +345,11 @@ bool synthdrum_save_patch(synthdrum_sequencer *sds, char *name)
             sds->m_osc2.osc.m_waveform, sds->m_osc2.osc.m_osc_fo, sds->osc2_amp,
 
             sds->m_eg1.m_attack_time_msec, sds->m_eg1.m_decay_time_msec,
-            sds->m_eg1.m_sustain_level,
-            sds->m_eg1.m_release_time_msec,
+            sds->m_eg1.m_sustain_level, sds->m_eg1.m_release_time_msec,
 
             sds->m_eg2.m_attack_time_msec, sds->m_eg2.m_decay_time_msec,
-            sds->m_eg2.m_sustain_level,
-            sds->m_eg2.m_release_time_msec, sds->eg2_osc2_intensity,
+            sds->m_eg2.m_sustain_level, sds->m_eg2.m_release_time_msec,
+            sds->eg2_osc2_intensity,
 
             sds->m_filter_type, sds->m_filter_fc, sds->m_filter_q
 
@@ -403,12 +407,11 @@ bool synthdrum_open_patch(synthdrum_sequencer *sds, char *name)
                 &sds->m_osc2.osc.m_osc_fo, &sds->osc2_amp,
 
                 &sds->m_eg1.m_attack_time_msec, &sds->m_eg1.m_decay_time_msec,
-                &sds->m_eg1.m_sustain_level,
-                &sds->m_eg1.m_release_time_msec,
+                &sds->m_eg1.m_sustain_level, &sds->m_eg1.m_release_time_msec,
 
                 &sds->m_eg2.m_attack_time_msec, &sds->m_eg2.m_decay_time_msec,
-                &sds->m_eg2.m_sustain_level,
-                &sds->m_eg2.m_release_time_msec, &sds->eg2_osc2_intensity,
+                &sds->m_eg2.m_sustain_level, &sds->m_eg2.m_release_time_msec,
+                &sds->eg2_osc2_intensity,
 
                 &sds->m_filter_type, &sds->m_filter_fc, &sds->m_filter_q);
 

@@ -121,21 +121,6 @@ int add_modfilter_soundgen(soundgenerator *self)
     return soundgen_add_fx(self, (fx *)mf);
 }
 
-int add_decimator_soundgen(soundgenerator *self)
-{
-    printf("RAR! DECIMATOR all up in this kittycat\n");
-    // fx *e = new_decimator();
-    // if (e == NULL) {
-    //    perror("Couldn't create DECIMATOR effect");
-    //    return -1;
-    //}
-    // self->effects[self->effects_num] = e;
-    // self->effects_on = 1;
-    // printf("done adding effect\n");
-    // return self->effects_num++;
-    return self->effects_num;
-}
-
 int add_distortion_soundgen(soundgenerator *self)
 {
     printf("BOOYA! Distortion all up in this kittycat\n");
@@ -143,21 +128,11 @@ int add_distortion_soundgen(soundgenerator *self)
     return soundgen_add_fx(self, (fx *)d);
 }
 
-int add_freq_pass_soundgen(soundgenerator *self, float freq, fx_type pass_type)
+int add_envelope_soundgen(soundgenerator *self)
 {
-    printf("Booya, adding a new *PASS to soundgenerator: %f!\n", freq);
-    (void)pass_type;
-
-    // fx *e = new_freq_pass(freq, pass_type);
-    // if (e == NULL) {
-    //    perror("Couldn't create effect");
-    //    return -1;
-    //}
-    // self->effects[self->effects_num] = e;
-    // self->effects_on = 1;
-    // printf("done adding effect\n");
-    // return self->effects_num++;
-    return self->effects_num;
+    printf("Booya, adding a new envelope to soundgenerator!\n");
+    envelope *e = new_envelope();
+    return soundgen_add_fx(self, (fx *)e);
 }
 
 double effector(soundgenerator *self, double val)
@@ -168,67 +143,6 @@ double effector(soundgenerator *self, double val)
         if (f->enabled)
         {
             val = f->process(f, val);
-        }
-    }
-
-    return val;
-}
-
-//////////////////////////////////////////////////////
-
-// int add_envelope_soundgen(soundgenerator *self, int env_len, int type)
-int add_envelope_soundgen(soundgenerator *self, ENVSTREAM *e)
-{
-    printf("Booya, adding a new envelope to soundgenerator!\n");
-    ENVSTREAM **new_envelopes = NULL;
-    if (self->envelopes_size <= self->envelopes_num)
-    {
-        if (self->envelopes_size == 0)
-        {
-            self->envelopes_size = DEFAULT_ARRAY_SIZE;
-        }
-        else
-        {
-            self->envelopes_size *= 2;
-        }
-
-        new_envelopes = (ENVSTREAM **)realloc(
-            self->envelopes, self->envelopes_size * sizeof(ENVSTREAM *));
-        if (new_envelopes == NULL)
-        {
-            printf("Ooh, burney - cannae allocate memory for new "
-                   "envelopes");
-            return -1;
-        }
-        else
-        {
-            self->envelopes = new_envelopes;
-        }
-    }
-
-    self->envelopes[self->envelopes_num] = e;
-    self->envelopes_enabled = 1;
-    printf("done adding envelope\n");
-    return self->envelopes_num++;
-}
-
-double envelopor(soundgenerator *self, double val)
-{
-
-    if (self->envelopes_num > 0 && self->envelopes_enabled)
-    {
-        for (int i = 0; i < self->envelopes_num; i++)
-        {
-            double mix_env = envelope_stream_tick(self->envelopes[i]);
-            if (self->envelopes[i]->started)
-            {
-                val *= mix_env;
-            }
-            else if (mix_env == 1)
-            {
-                self->envelopes[i]->started = 1;
-                val *= mix_env;
-            }
         }
     }
     return val;
