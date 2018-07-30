@@ -30,11 +30,11 @@ envelope *new_envelope(void)
 void envelope_reset(envelope *e)
 {
     envelope_generator_init(&e->eg);
-    e->eg.m_sustain_level = 0.7;
+    e->eg.m_state = SUSTAIN;
     eg_set_attack_time_msec(&e->eg, 300);
     eg_set_decay_time_msec(&e->eg, 300);
     eg_set_release_time_msec(&e->eg, 300);
-    e->env_length_ticks = 0;
+    envelope_set_length_bars(e, 1);
 }
 
 void envelope_status(void *self, char *status_string)
@@ -54,17 +54,16 @@ double envelope_process_audio(void *self, double input)
 {
     envelope *e = (envelope *)self;
     double env_out = eg_do_envelope(&e->eg, NULL);
-
-    // if (e->started)
     return input * env_out;
-
-    return input;
 }
 
 void envelope_set_length_bars(envelope *e, double length_bars)
 {
-    e->env_length_bars = length_bars;
-    envelope_calculate_timings(e);
+    if (length_bars > 0)
+    {
+        e->env_length_bars = length_bars;
+        envelope_calculate_timings(e);
+    }
 }
 
 void envelope_calculate_timings(envelope *e)
@@ -72,11 +71,16 @@ void envelope_calculate_timings(envelope *e)
     mixer_timing_info info = mixr->timing_info;
     int release_time_ticks = e->eg.m_release_time_msec * info.ms_per_midi_tick;
 
-    int env_length_ticks = info.loop_len_in_ticks * e->env_length_bars;
-    int release_tick = env_length_ticks - release_time_ticks;
-    e->env_length_ticks = env_length_ticks;
+    e->env_length_ticks = info.loop_len_in_ticks * e->env_length_bars;
+    int release_tick = e->env_length_ticks - release_time_ticks;
+    if (release_tick > 0)
+        e->release_tick = release_tick;
+    else
+    {
+        printf("Barfed on yer envelope -- not enuff runway.\n");
+    }
+
     e->env_length_ticks_counter = info.midi_tick % e->env_length_ticks;
-    e->release_tick = release_tick;
 }
 
 void envelope_event_notify(void *self, unsigned int event_type)
@@ -84,29 +88,24 @@ void envelope_event_notify(void *self, unsigned int event_type)
     envelope *e = (envelope *)self;
     switch (event_type)
     {
+    case (TIME_BPM_CHANGE):
+        envelope_calculate_timings(e);
+        break;
     case (TIME_MIDI_TICK):
 
         // Envelope Length Cycle Bookkeeping
         (e->env_length_ticks_counter)++;
         if (e->env_length_ticks_counter >= e->env_length_ticks)
         {
-            printf("START! %s AMP:%f LOOPTICK:%d\n", s_eg_state[e->eg_status],
-                   e->eg.m_envelope_output, e->env_length_ticks_counter);
             eg_start_eg(&e->eg);
             e->env_length_ticks_counter = 0;
         }
-        else if (e->env_length_ticks_counter >= e->release_tick)
+        else if (e->eg.m_state == SUSTAIN &&
+                 e->env_length_ticks_counter >= e->release_tick)
         {
             eg_note_off(&e->eg);
         }
 
-        if (e->eg_status != e->eg.m_state)
-        {
-            e->eg_status = e->eg.m_state;
-            printf("STATECHANGE! %s AMP:%f LOOPTICK:%d\n",
-                   s_eg_state[e->eg_status], e->eg.m_envelope_output,
-                   e->env_length_ticks_counter);
-        }
 
         break;
     }

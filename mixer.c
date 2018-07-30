@@ -343,6 +343,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->timing_info.size_of_quarter_note =
         mixr->timing_info.size_of_eighth_note * 2;
 
+	mixer_emit_event(mixr, TIME_BPM_CHANGE);
     link_set_bpm(mixr->m_ableton_link, bpm);
 }
 
