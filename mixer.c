@@ -332,7 +332,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
         mixr->timing_info.frames_per_midi_tick * PPBAR;
     mixr->timing_info.loop_len_in_ticks = PPBAR;
 
-    mixr->timing_info.ms_per_midi_tick = (60.0 / bpm * 1000) / PPQN;
+    mixr->timing_info.ms_per_midi_tick = 60000.0 / (bpm * PPQN);
 
     mixr->timing_info.size_of_thirtysecond_note =
         (PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick;

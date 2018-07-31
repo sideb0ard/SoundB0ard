@@ -35,6 +35,7 @@ void envelope_reset(envelope *e)
     eg_set_decay_time_msec(&e->eg, 300);
     eg_set_release_time_msec(&e->eg, 300);
     envelope_set_length_bars(e, 1);
+    e->debug = false;
 }
 
 void envelope_status(void *self, char *status_string)
@@ -43,11 +44,13 @@ void envelope_status(void *self, char *status_string)
     snprintf(status_string, MAX_STATIC_STRING_SZ,
              "ENV state:%s len_bars:%.2f len_ticks:%d type:%s mode:%s\n"
              " attack:%.2f decay:%.2f sustain:%.2f release:%.2f // "
-             "release_tick:%d",
+             "release_tick:%d\n"
+             "debug:%d",
              s_eg_state[e->eg.m_state], e->env_length_bars, e->env_length_ticks,
              s_eg_type[e->eg.m_eg_mode], s_eg_mode[e->env_mode],
              e->eg.m_attack_time_msec, e->eg.m_decay_time_msec,
-             e->eg.m_sustain_level, e->eg.m_release_time_msec, e->release_tick);
+             e->eg.m_sustain_level, e->eg.m_release_time_msec, e->release_tick,
+             e->debug);
 }
 
 double envelope_process_audio(void *self, double input)
@@ -69,7 +72,17 @@ void envelope_set_length_bars(envelope *e, double length_bars)
 void envelope_calculate_timings(envelope *e)
 {
     mixer_timing_info info = mixr->timing_info;
-    int release_time_ticks = e->eg.m_release_time_msec * info.ms_per_midi_tick;
+    // wtf?! - i've no idea why i need to divide by 2 here -
+    // obviously i'm crock at math!
+    int release_time_ticks =
+        (e->eg.m_release_time_msec / info.ms_per_midi_tick) / 2;
+
+    if (e->debug)
+    {
+        printf("RELtimeMS:%.2f // ms per tick:%.2f // rel time ticks:%d\n",
+               e->eg.m_release_time_msec, info.ms_per_midi_tick,
+               release_time_ticks);
+    }
 
     e->env_length_ticks = info.loop_len_in_ticks * e->env_length_bars;
     int release_tick = e->env_length_ticks - release_time_ticks;
@@ -93,8 +106,8 @@ void envelope_event_notify(void *self, unsigned int event_type)
         break;
     case (TIME_MIDI_TICK):
 
-        // Envelope Length Cycle Bookkeeping
         (e->env_length_ticks_counter)++;
+
         if (e->env_length_ticks_counter >= e->env_length_ticks)
         {
             eg_start_eg(&e->eg);
@@ -106,6 +119,13 @@ void envelope_event_notify(void *self, unsigned int event_type)
             eg_note_off(&e->eg);
         }
 
+        if (e->eg.m_state != e->eg_state)
+        {
+            e->eg_state = e->eg.m_state;
+            if (e->debug)
+                printf("NEW STATE:%s tick:%d\n", s_eg_state[e->eg_state],
+                       e->env_length_ticks_counter);
+        }
 
         break;
     }
@@ -137,7 +157,6 @@ void envelope_set_decay_ms(envelope *e, double val)
 void envelope_set_sustain_lvl(envelope *e, double val)
 {
     eg_set_sustain_level(&e->eg, val);
-    envelope_calculate_timings(e);
 }
 
 void envelope_set_release_ms(envelope *e, double val)
@@ -145,3 +164,5 @@ void envelope_set_release_ms(envelope *e, double val)
     eg_set_release_time_msec(&e->eg, val);
     envelope_calculate_timings(e);
 }
+
+void envelope_set_debug(envelope *e, bool b) { e->debug = b; }

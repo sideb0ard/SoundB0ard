@@ -327,3 +327,7 @@ key D
 new loop dloops/whistleRaveBongos.aiff 2
 ^ lots of envelopes, and bitcrush random
 hats/angelHat.aiff
+
+
+/// CHECKOUT
+loops/cracklTechnoBass.aiff

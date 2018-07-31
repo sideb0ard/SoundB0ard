@@ -198,20 +198,22 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 envelope *e = (envelope *)f;
                 double val = atof(wurds[3]);
-                if (strncmp("len_bars", wurds[2], 8) == 0)
-                    envelope_set_length_bars(e, val);
-                else if (strncmp("type", wurds[2], 4) == 0)
-                    envelope_set_type(e, val);
-                else if (strncmp("mode", wurds[2], 4) == 0)
-                    envelope_set_mode(e, val);
-                else if (strncmp("attack", wurds[2], 6) == 0)
+                if (strncmp("attack", wurds[2], 6) == 0)
                     envelope_set_attack_ms(e, val);
+                else if (strncmp("debug", wurds[2], 5) == 0)
+                    envelope_set_debug(e, val);
                 else if (strncmp("decay", wurds[2], 5) == 0)
                     envelope_set_decay_ms(e, val);
-                else if (strncmp("sustain", wurds[2], 7) == 0)
-                    envelope_set_sustain_lvl(e, val);
+                else if (strncmp("len_bars", wurds[2], 8) == 0)
+                    envelope_set_length_bars(e, val);
+                else if (strncmp("mode", wurds[2], 4) == 0)
+                    envelope_set_mode(e, val);
                 else if (strncmp("release", wurds[2], 6) == 0)
                     envelope_set_release_ms(e, val);
+                else if (strncmp("sustain", wurds[2], 7) == 0)
+                    envelope_set_sustain_lvl(e, val);
+                else if (strncmp("type", wurds[2], 4) == 0)
+                    envelope_set_type(e, val);
             }
             else if (f->type == DELAY)
             {
