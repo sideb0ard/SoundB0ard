@@ -438,6 +438,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP1OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 1, val);
         }
         break;
     case (6):
@@ -455,6 +458,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP2OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 2, val);
         }
         break;
     case (7):
@@ -472,6 +478,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP3OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 3, val);
         }
         break;
     case (8):
@@ -486,6 +495,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP4OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 4, val);
         }
         break;
     default:
@@ -928,7 +940,7 @@ bool dxsynth_save_settings(dxsynth *ms, char *preset_name)
     settings_count++;
     fprintf(presetzzz, "::m_eg2_release_ms=%f", ms->m_settings.m_eg2_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op2_output_lvl=%f", ms->m_settings.m_op1_output_lvl);
+    fprintf(presetzzz, "::m_op2_output_lvl=%f", ms->m_settings.m_op2_output_lvl);
     settings_count++;
 
     fprintf(presetzzz, "::m_op3_waveform=%d", ms->m_settings.m_op3_waveform);
@@ -963,6 +975,8 @@ bool dxsynth_save_settings(dxsynth *ms, char *preset_name)
     fprintf(presetzzz, "::m_eg4_release_ms=%f", ms->m_settings.m_eg4_release_ms);
     settings_count++;
     fprintf(presetzzz, "::m_op4_output_lvl=%f", ms->m_settings.m_op4_output_lvl);
+    settings_count++;
+    fprintf(presetzzz, "::m_op4_feedback=%f", ms->m_settings.m_op4_feedback);
     settings_count++;
 
     fprintf(presetzzz, "::m_portamento_time_ms=%f", ms->m_settings.m_portamento_time_ms);
@@ -1072,7 +1086,7 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
             }
             else if (strcmp(setting_key, "m_lfo1_rate") == 0)
             {
-                ms->m_settings.m_lfo1_intensity = scratch_val;
+                ms->m_settings.m_lfo1_rate = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_waveform") == 0)
@@ -1260,6 +1274,11 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
             else if (strcmp(setting_key, "m_op4_output_lvl") == 0)
             {
                 ms->m_settings.m_op4_output_lvl = scratch_val;
+                settings_count++;
+            }
+            else if (strcmp(setting_key, "m_op4_feedback") == 0)
+            {
+                ms->m_settings.m_op4_feedback = scratch_val;
                 settings_count++;
             }
 

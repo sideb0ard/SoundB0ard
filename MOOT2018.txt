@@ -330,4 +330,15 @@ hats/angelHat.aiff
 
 
 /// CHECKOUT
-loops/cracklTechnoBass.aiff
+key A
+new loop loops/cracklTechnoBass.aiff; env 0 1
+every 4 bar rand "3 4 2 1.5" fx 0:0 len_bars %s
+bitcrush 0
+every 1 bar rand "4 6 8 12 16" fx 0:1 bitdepth %s
+delay 0 13
+over 7 bar osc "2 71" fx 0:2 fb %s
+every 4 bar rand "30 60 90 110 160 313" fx 0:2 delayms %s
+fuckup 0
+
+dx w3arp - super bass!
+turn up op2out to tweak
