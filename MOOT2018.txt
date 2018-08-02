@@ -146,17 +146,6 @@ every 4 bar gen melody 0 38:0
 perc/DR660Laser.aif // euclid every 9
 
 
-key Bb
-loops/ACiiiiidBassSquelch.aiff
-dloops/acidrockwow.aiff
-dx pirate // waveshape 2
-every 2 bar rand "0 1" dx 4 octave %s
-loops/techNsaehats.aiff // pitch 1.5
-every 1 bar rand "1 1.5 2" loop 8 pitch %s
-
-new step kicks/technotronBD.aiff b*4
-loops/toddterrybass1bar.aiff // highpass filter, vol 0.5
-
 claps/djkhaledClap.aiff
 
 key B
@@ -233,11 +222,6 @@ distort osc
 
 key Eb
 loops/RAVEBasssss.aiff len 2
-
-key Bb
-loops/ACiiiiidBassSquelch2.aiff
-^ filter 3000
-over 4 bar osc "180 18000" loop X freq %s
 
 
 new loop dloops/hipHouseBreakbeat.aiff 2
@@ -340,5 +324,66 @@ over 7 bar osc "2 71" fx 0:2 fb %s
 every 4 bar rand "30 60 90 110 160 313" fx 0:2 delayms %s
 fuckup 0
 
-dx w3arp - super bass!
-turn up op2out to tweak
+bitshift ( t >> 4 & t >> 8 ) / ( t >> 16 & t )
+dx load icey -- octave -1
+^ filter - over 8 bar osc "180 18000" fx 0:1 freq %s
+every 3 bar "-1 0 1 2" dx 0 octave %s
+every 4 bar gen melody 0 0:0
+
+markov 1
+kicks/stetienneKick.aif b*4
+rand gen every "1 2 3 4"
+
+t % ( t >> 10 & t )
+hats/SNDhat.aiff
+hats/acidHat3.aiff
+^ invert
+
+key Bb
+new bitshift t%(t>>10&t)
+midi dx
+dx 0 load grimeyLOUD
+every 2 bar gen riff 0 0:0
+new filter 0
+over 8 bar osc "180 18000" fx 0:0 freq %s
+ over 7 bar osc "1 7" fx 0:0 q %s
+every 2 bar rand "4 8 16 32" dx 0 arp_speed %s
+every 2 bar rand "0 1" dx 0 arp %s
+
+key Bb
+new loop dloops/raggaTwinWINNAH.aiff 2
+
+
+new digi notes/garageBREATH.aiff
+midi_note_1 34 // Bb
+midi_mode
+every 2 bar digi 3 gen 0
+every 2 bar "down down down up up up" digi 3 %s
+
+key Bb
+loops/ACiiiiidBassSquelch2.aiff
+^ filter 3000
+over 4 bar osc "180 18000" loop X freq %s
+dloops/acidrockwow.aiff
+loops/techNsaehats.aiff // pitch 1.5
+every 1 bar rand "1 1.5 2" loop 8 pitch %s
+new step kicks/technotronBD.aiff b*4
+loops/toddterrybass1bar.aiff // highpass filter, vol 0.5
+
+
+hats/acidHat2.aiff
+
+claps/technotron.aiff
+
+
+
+
+digi notes/mood2SwingNoteGlitch.aiff
+bassthud
+
+
+key Gb
+dloops/slowcoreBss4bar.aif
+
+
+

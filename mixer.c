@@ -349,7 +349,6 @@ void mixer_update_bpm(mixer *mixr, int bpm)
 
 void mixer_vol_change(mixer *mixr, float vol)
 {
-    printf("Changing volume to %f\n", vol);
     if (vol >= 0.0 && vol <= 1.0)
     {
         mixr->volume = vol;
@@ -358,7 +357,6 @@ void mixer_vol_change(mixer *mixr, float vol)
 
 void vol_change(mixer *mixr, int sg, float vol)
 {
-    printf("SG: %d // soungen_num : %d\n", sg, mixr->soundgen_num);
     if (!mixer_is_valid_soundgen_num(mixr, sg))
     {
         printf("Nah mate, returning\n");
