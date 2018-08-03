@@ -383,6 +383,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
     case (2):
         if (mixr->midi_bank_num == 0)
         {
+            printf("Op4Feedback\n");
+            val = scaleybum(0, 127, 0, 70, data2);
+            dxsynth_set_op4_feedback(dx, val);
         }
         else if (mixr->midi_bank_num == 1)
         {
@@ -398,6 +401,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
     case (3):
         if (mixr->midi_bank_num == 0)
         {
+            printf("LFO Rate\n");
+            val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
+            dxsynth_set_lfo1_rate(dx, val);
         }
         else if (mixr->midi_bank_num == 1)
         {
@@ -412,6 +418,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
     case (4):
         if (mixr->midi_bank_num == 0)
         {
+            printf("LFO Intensity\n");
+            val = scaleybum(0, 128, 0.0, 1.0, data2);
+            dxsynth_set_lfo1_intensity(dx, val);
         }
         else if (mixr->midi_bank_num == 1)
         {
@@ -426,9 +435,9 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
     case (5):
         if (mixr->midi_bank_num == 0)
         {
-            printf("LFO Rate\n");
-            val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-            dxsynth_set_lfo1_rate(dx, val);
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP1OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 1, val);
         }
         else if (mixr->midi_bank_num == 1)
         {
@@ -438,17 +447,14 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP1OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 1, val);
         }
         break;
     case (6):
         if (mixr->midi_bank_num == 0)
         {
-            printf("LFO Intensity\n");
-            val = scaleybum(0, 128, 0.0, 1.0, data2);
-            dxsynth_set_lfo1_intensity(dx, val);
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP2OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 2, val);
         }
         else if (mixr->midi_bank_num == 1)
         {
@@ -458,17 +464,14 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP2OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 2, val);
         }
         break;
     case (7):
         if (mixr->midi_bank_num == 0)
         {
-            printf("Op4Feedback\n");
-            val = scaleybum(0, 127, 0, 70, data2);
-            dxsynth_set_op4_feedback(dx, val);
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP3OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 3, val);
         }
         else if (mixr->midi_bank_num == 1)
         {
@@ -478,14 +481,14 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP3OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 3, val);
         }
         break;
     case (8):
         if (mixr->midi_bank_num == 0)
         {
+            val = scaleybum(0, 127, 0, 99, data2);
+            printf("OP4OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(dx, 4, val);
         }
         else if (mixr->midi_bank_num == 1)
         {
@@ -495,9 +498,6 @@ void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
         }
         else if (mixr->midi_bank_num == 2)
         {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP4OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 4, val);
         }
         break;
     default:

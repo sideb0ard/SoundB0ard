@@ -224,7 +224,11 @@ key Eb
 loops/RAVEBasssss.aiff len 2
 
 
+new bitshift (t & (t>>15+(t>>8&t)))*t
+dx load sqwaar
+key C
 new loop dloops/hipHouseBreakbeat.aiff 2
+
 key G
 new loop loops/mrfingersbassENDer.aiff 2
 new loop dloops/Abra4Loop.aiff 0.5
@@ -344,19 +348,30 @@ new bitshift t%(t>>10&t)
 midi dx
 dx 0 load grimeyLOUD
 every 2 bar gen riff 0 0:0
-new filter 0
+filter 0
 over 8 bar osc "180 18000" fx 0:0 freq %s
  over 7 bar osc "1 7" fx 0:0 q %s
 every 2 bar rand "4 8 16 32" dx 0 arp_speed %s
 every 2 bar rand "0 1" dx 0 arp %s
+every 7 16th rand "60 100 200 350 700" dx 0 sustain_note_ms %s
+
+loops/reverbyMoWaxMelody.aiff
 
 key Bb
 new loop dloops/raggaTwinWINNAH.aiff 2
 
 
+new loop loops/toddterrybass1bar.aiff; highpass 4; vol 4 0.4
+new loop loops/rainforrest.aiff 4
+dx still going
+new step kicks/DR660Bassdrum909.aif b*2
+^ markov 0 every 2
+sidechain rainforrest
+
+
 new digi notes/garageBREATH.aiff
 midi_note_1 34 // Bb
-midi_mode
+note_mode
 every 2 bar digi 3 gen 0
 every 2 bar "down down down up up up" digi 3 %s
 

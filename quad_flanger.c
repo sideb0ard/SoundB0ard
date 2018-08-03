@@ -12,8 +12,10 @@ quad_flanger *new_quad_flanger()
 
     // fx API
     qf->m_fx.type = QUADFLANGER;
-    qf->m_fx.status = &quad_flanger_status;
+    qf->m_fx.enabled = true;
     qf->m_fx.process = &quad_flanger_process_wrapper;
+    qf->m_fx.status = &quad_flanger_status;
+    qf->m_fx.event_notify = &fx_noop_event_notify;
 
     // "gui"
     qf->m_mod_depth_pct = 50;    // percent

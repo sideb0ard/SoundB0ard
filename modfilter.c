@@ -14,6 +14,7 @@ modfilter *new_modfilter()
     mf->m_fx.enabled = true;
     mf->m_fx.status = &modfilter_status;
     mf->m_fx.process = &modfilter_process_wrapper;
+    mf->m_fx.event_notify = &fx_noop_event_notify;
 
     return mf;
 }

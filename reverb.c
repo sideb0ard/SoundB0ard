@@ -43,6 +43,7 @@ reverb *new_reverb(void)
     r->m_fx.enabled = true;
     r->m_fx.status = &reverb_status;
     r->m_fx.process = &reverb_process_wrapper;
+    r->m_fx.event_notify = &fx_noop_event_notify;
 
     return r;
 }
