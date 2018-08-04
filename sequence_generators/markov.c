@@ -3,6 +3,7 @@
 
 #include "defjams.h"
 #include "markov.h"
+#include <euclidean.h>
 #include "mixer.h"
 #include "sequence_generator.h"
 #include "utils.h"
@@ -51,8 +52,8 @@ void markov_status(void *self, wchar_t *wstring)
     markov *m = (markov *)self;
     swprintf(wstring, MAX_STATIC_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "MARKOV SEQUENCE GEN ] - " WCOOL_COLOR_PINK
-             "type:%s\n",
-             s_markov_types[m->markov_type]);
+             "type:(%d)%s\n",
+             m->markov_type, s_markov_types[m->markov_type]);
 }
 
 static int rand_percent()
@@ -77,12 +78,14 @@ uint16_t markov_generate(void *self, void *data)
             pattern |= BEAT0;
 
         second = rand_percent();
-        if (second > 50)
+        if (second > 70)
             pattern |= BEAT7;
         if (second >= 90)
             pattern |= BEAT5;
 
         third = rand_percent();
+        if (third > 10)
+            pattern |= BEAT8;
         if (third > 50)
             pattern |= BEAT10;
         if (third >= 75)
@@ -112,11 +115,13 @@ uint16_t markov_generate(void *self, void *data)
 
         third = rand_percent();
         if (third > 10)
+            pattern |= BEAT8;
+        if (third > 40)
             pattern |= BEAT9;
-        if (third > 60)
-            pattern |= BEAT10;
-        else if (third >= 90)
+        if (third > 90)
             pattern |= BEAT11;
+        else if (third >= 60)
+            pattern |= BEAT10;
 
         fourth = rand_percent();
         if (third > 80)
@@ -136,14 +141,21 @@ uint16_t markov_generate(void *self, void *data)
                 pattern |= 1 << (15 - i);
         break;
     case (CLAPS):
-        if (rand_percent() > 10)
-            pattern |= BEAT4;
         if (rand_percent() > 90)
-            pattern |= BEAT7;
-        if (rand_percent() > 95)
-            pattern |= BEAT10;
-        if (rand_percent() > 10)
-            pattern |= BEAT12;
+        {
+            int num_hits = rand() % 7;
+            pattern = create_euclidean_rhythm(num_hits, 16);
+        }
+        else {
+            if (rand_percent() > 10)
+                pattern |= BEAT4;
+            if (rand_percent() > 90)
+                pattern |= BEAT7;
+            if (rand_percent() > 95)
+                pattern |= BEAT10;
+            if (rand_percent() > 10)
+                pattern |= BEAT12;
+        }
         break;
     }
     if (pattern == 0)
@@ -154,3 +166,9 @@ uint16_t markov_generate(void *self, void *data)
 void markov_set_debug(void *self, bool b) {}
 
 void markov_event_notify(void *self, unsigned int event_type) {}
+
+void markov_set_type(markov *m, unsigned int type)
+{
+    if (type < NUM_MARKOV_STYLES)
+        m->markov_type = type;
+}

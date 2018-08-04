@@ -32,7 +32,13 @@ void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
         {
             // printf("IDX:%d!\n", idx);
             pattern[idx].event_type = MIDI_ON;
-            pattern[idx].data2 = DEFAULT_VELOCITY;
+            if (i == 0 || i == 8)
+                pattern[idx].data2 = 128;
+            else
+            {
+                int rand_velocity = (rand() % 50) + 70;
+                pattern[idx].data2 = rand_velocity;
+            }
             // if (rand() % 100 > 95 && !triplet_set)
             //{
             //    uint16_t euc = create_euclidean_rhythm(3, 16);

@@ -3,6 +3,7 @@
 
 #include <bitshift.h>
 #include <euclidean.h>
+#include <markov.h>
 #include <mixer.h>
 #include <pattern_parser.h>
 #include <sequence_generator_cmds.h>
@@ -13,7 +14,7 @@ extern mixer *mixr;
 bool parse_sequence_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     if (strncmp("sequence", wurds[0], 7) == 0 ||
-        strncmp("seq", wurds[3], 3) == 0)
+        strncmp("seq", wurds[0], 3) == 0)
     {
         int sgnum = atoi(wurds[1]);
         if (mixer_is_valid_seq_gen_num(mixr, sgnum))
@@ -57,6 +58,16 @@ bool parse_sequence_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 {
                     int val = atoi(wurds[3]);
                     euclidean_change_steps(e, val);
+                }
+            }
+            else if (sg->type == MARKOV)
+            {
+                markov *m = (markov *)sg;
+                if (strncmp(wurds[2], "type", 4) == 0)
+                {
+                    int type = atoi(wurds[3]);
+                    markov_set_type(m, type);
+
                 }
             }
         }
