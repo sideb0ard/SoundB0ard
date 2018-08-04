@@ -97,3 +97,4 @@ midi_event *step_get_pattern(step_sequencer *s, int pattern_num);
 void step_set_pattern(step_sequencer *s, int pattern_num, midi_event *pattern);
 bool step_is_valid_pattern(step_sequencer *s, int pattern_num);
 bool step_set_num_patterns(step_sequencer *s, int num_patterns);
+void step_set_triplets(step_sequencer *s, bool b);

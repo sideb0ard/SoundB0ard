@@ -112,6 +112,9 @@ uint16_t euclidean_generate(void *self, void *data)
 
 uint16_t create_euclidean_rhythm(int num_hits, int num_steps)
 {
+    if (num_hits == 0 || num_steps == 0)
+        return 0;
+
     int remaindrrr[num_steps];
     int count[num_steps];
     memset(count, 0, num_steps * sizeof(int));

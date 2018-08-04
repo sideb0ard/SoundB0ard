@@ -3,10 +3,10 @@
 
 #include "defjams.h"
 #include "markov.h"
-#include <euclidean.h>
 #include "mixer.h"
 #include "sequence_generator.h"
 #include "utils.h"
+#include <euclidean.h>
 
 extern mixer *mixr;
 static char *s_markov_types[] = {"GARAGE", "HIPHOP", "HATS", "HATS_MASK",
@@ -141,12 +141,14 @@ uint16_t markov_generate(void *self, void *data)
                 pattern |= 1 << (15 - i);
         break;
     case (CLAPS):
-        if (rand_percent() > 90)
+        if (rand_percent() > 10)
         {
             int num_hits = rand() % 7;
-            pattern = create_euclidean_rhythm(num_hits, 16);
+            //pattern = create_euclidean_rhythm(num_hits, 16);
+            pattern = create_euclidean_rhythm(0, 16);
         }
-        else {
+        else
+        {
             if (rand_percent() > 10)
                 pattern |= BEAT4;
             if (rand_percent() > 90)

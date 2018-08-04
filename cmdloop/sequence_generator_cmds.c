@@ -67,7 +67,6 @@ bool parse_sequence_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 {
                     int type = atoi(wurds[3]);
                     markov_set_type(m, type);
-
                 }
             }
         }

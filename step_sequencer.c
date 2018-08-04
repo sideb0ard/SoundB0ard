@@ -112,81 +112,81 @@ bool step_tick(step_sequencer *seq)
 
                         int pattern_offset = 0;
                         int division = 1;
-                        if (seq->generate_mode == 1)
-                        {
-                            division = 4;
-                            for (int i = 0; i < division; i++)
-                            {
-                                pattern_offset = i * (PPBAR / division);
+                        // if (seq->generate_mode == 1)
+                        //{
+                        //    division = 4;
+                        //    for (int i = 0; i < division; i++)
+                        //    {
+                        //        pattern_offset = i * (PPBAR / division);
 
-                                int bit_pattern_len = 16; // WTF?
-                                int bit_pattern = sg->generate(
-                                    (void *)sg, (void *)&bit_pattern_len);
+                        //        int bit_pattern_len = 16; // WTF?
+                        //        int bit_pattern = sg->generate(
+                        //            (void *)sg, (void *)&bit_pattern_len);
 
-                                if (seq->visualize)
-                                {
-                                    char bit_string[17];
-                                    char_binary_version_of_short(bit_pattern,
-                                                                 bit_string);
-                                    printf("PATTERN: %s\n", bit_string);
-                                }
+                        //        if (seq->visualize)
+                        //        {
+                        //            char bit_string[17];
+                        //            char_binary_version_of_short(bit_pattern,
+                        //                                         bit_string);
+                        //            printf("PATTERN: %s\n", bit_string);
+                        //        }
 
-                                convert_bit_pattern_to_midi_pattern(
-                                    bit_pattern, bit_pattern_len,
-                                    seq->patterns[seq->cur_pattern], division,
-                                    pattern_offset);
+                        //        convert_bit_pattern_to_midi_pattern(
+                        //            bit_pattern, bit_pattern_len,
+                        //            seq->patterns[seq->cur_pattern], division,
+                        //            pattern_offset);
 
-                                seq->pattern_len = bit_pattern_len;
-                            }
-                        }
-                        else if (seq->generate_mode == 2)
-                        {
-                            // printf("MODE2MOFO!\n");
-                            // pattern_offset = i * (PPBAR / division);
-                            int division = 1;
-                            int pattern_offset = 0;
+                        //        seq->pattern_len = bit_pattern_len;
+                        //    }
+                        //}
+                        // else if (seq->generate_mode == 2)
+                        //{
+                        //    // printf("MODE2MOFO!\n");
+                        //    // pattern_offset = i * (PPBAR / division);
+                        //    int division = 1;
+                        //    int pattern_offset = 0;
 
-                            int bit_pattern_len = 16; // default
-                            int bit_pattern = sg->generate(
-                                (void *)sg, (void *)&bit_pattern_len);
+                        //    int bit_pattern_len = 16; // default
+                        //    int bit_pattern = sg->generate(
+                        //        (void *)sg, (void *)&bit_pattern_len);
 
-                            if (seq->visualize)
-                            {
-                                char bit_string[17];
-                                char_binary_version_of_short(bit_pattern,
-                                                             bit_string);
-                                printf("PATTERN: %s\n", bit_string);
-                            }
+                        //    if (seq->visualize)
+                        //    {
+                        //        char bit_string[17];
+                        //        char_binary_version_of_short(bit_pattern,
+                        //                                     bit_string);
+                        //        printf("PATTERN: %s\n", bit_string);
+                        //    }
 
-                            convert_bit_pattern_to_midi_pattern(
-                                bit_pattern, bit_pattern_len,
-                                seq->patterns[seq->cur_pattern], division,
-                                pattern_offset);
+                        //    convert_bit_pattern_to_midi_pattern(
+                        //        bit_pattern, bit_pattern_len,
+                        //        seq->patterns[seq->cur_pattern], division,
+                        //        pattern_offset);
 
-                            int randy = rand() % 100;
-                            if (randy > 50)
-                            {
-                                division = 4;
-                                pattern_offset = PPBAR / division;
-                                bit_pattern = sg->generate(
-                                    (void *)sg, (void *)&bit_pattern_len);
-                                if (randy > 90)
-                                    pattern_offset = 3 * pattern_offset;
-                                else if (randy > 80)
-                                    pattern_offset = 2 * pattern_offset;
-                                else if (randy > 60)
-                                    pattern_offset = 1 * pattern_offset;
-                                else
-                                    pattern_offset = 0;
+                        //    int randy = rand() % 100;
+                        //    if (randy > 50)
+                        //    {
+                        //        division = 4;
+                        //        pattern_offset = PPBAR / division;
+                        //        bit_pattern = sg->generate(
+                        //            (void *)sg, (void *)&bit_pattern_len);
+                        //        if (randy > 90)
+                        //            pattern_offset = 3 * pattern_offset;
+                        //        else if (randy > 80)
+                        //            pattern_offset = 2 * pattern_offset;
+                        //        else if (randy > 60)
+                        //            pattern_offset = 1 * pattern_offset;
+                        //        else
+                        //            pattern_offset = 0;
 
-                                convert_bit_pattern_to_midi_pattern(
-                                    bit_pattern, bit_pattern_len,
-                                    seq->patterns[seq->cur_pattern], division,
-                                    pattern_offset);
-                            }
+                        //        convert_bit_pattern_to_midi_pattern(
+                        //            bit_pattern, bit_pattern_len,
+                        //            seq->patterns[seq->cur_pattern], division,
+                        //            pattern_offset);
+                        //    }
 
-                            seq->pattern_len = bit_pattern_len;
-                        }
+                        //    seq->pattern_len = bit_pattern_len;
+                        //}
                         for (int i = 0; i < division; i++)
                         {
                             pattern_offset = i * (PPBAR / division);
@@ -209,6 +209,20 @@ bool step_tick(step_sequencer *seq)
                                 pattern_offset);
 
                             seq->pattern_len = bit_pattern_len;
+                        }
+                        if (seq->allow_triplets)
+                        {
+                            if (rand() % 100 > 95)
+                            {
+                                int quart = 2;
+                                int randy = rand() % 100;
+                                if (randy > 75)
+                                    quart = 1;
+                                else if (randy > 50)
+                                    quart = 3;
+                                pattern_add_triplet(
+                                    seq->patterns[seq->cur_pattern], quart);
+                            }
                         }
                     }
                 }
@@ -609,3 +623,5 @@ void step_set_random_sample_amp(step_sequencer *s, int pattern_num)
 }
 
 void step_set_randamp(step_sequencer *s, bool b) { s->randamp_on = b; }
+
+void step_set_triplets(step_sequencer *s, bool b) { s->allow_triplets = b; }

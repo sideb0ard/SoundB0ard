@@ -210,6 +210,12 @@ loops/gottahavHausePiano.aiff
 
 
 
+dloops/shabbyshabbaBeat1bar.aif
+dloops/shabbaVocal8bar.aif
+dloops/shabbadubloop8bar.aif
+
+key C
+dloops/bombdabss1bar.aiff
 
 
 

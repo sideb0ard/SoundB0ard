@@ -159,8 +159,8 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (sg_num != -1)
                 midi_set_destination(mixr, sg_num);
         }
-        else if (strncmp("fm", wurds[1], 2) == 0
-                || strncmp("dx", wurds[1], 2) == 0)
+        else if (strncmp("fm", wurds[1], 2) == 0 ||
+                 strncmp("dx", wurds[1], 2) == 0)
         {
             midi_launch_init(mixr);
             int sg_num = add_dxsynth(mixr);

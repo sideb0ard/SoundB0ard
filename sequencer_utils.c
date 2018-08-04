@@ -12,6 +12,25 @@
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
+void pattern_add_triplet(midi_event *pattern, unsigned int quarter)
+{
+    if (quarter > 3) // no can do!
+        return;
+
+    int offset = quarter * PPQN;
+    // magic numbers - euclidean position for 3/16
+    // is 0, 5, 10 and PPQN / 16 == 60
+    // therefore 0*60, 5*60 and 10*60
+    int pos[3] = {offset, offset + 300, offset + 600};
+
+    memset(pattern + offset, 0, sizeof(midi_event) * PPQN);
+    for (int i = 0; i < 3; i++)
+    {
+        pattern[pos[i]].event_type = MIDI_ON;
+        pattern[pos[i]].data2 = DEFAULT_VELOCITY;
+    }
+}
+
 void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
                                          midi_event *pattern, int division,
                                          int offset)
@@ -39,15 +58,6 @@ void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
                 int rand_velocity = (rand() % 50) + 70;
                 pattern[idx].data2 = rand_velocity;
             }
-            // if (rand() % 100 > 95 && !triplet_set)
-            //{
-            //    uint16_t euc = create_euclidean_rhythm(3, 16);
-            //    int small_offset = i * pulses;
-            //    // printf("Ooh, random triplet!\n");
-            //    convert_bit_pattern_to_midi_pattern(euc, 16, pattern, 16,
-            //                                        small_offset);
-            //    triplet_set = true;
-            //}
         }
     }
 }

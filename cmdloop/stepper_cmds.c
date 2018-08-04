@@ -297,6 +297,11 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
             printf("Toggling randamp to %s \n",
                    seq->randamp_on ? "true" : "false");
         }
+        else if (strncmp("triplets", wurds[2], 8) == 0)
+        {
+            bool b = atoi(wurds[3]);
+            step_set_triplets(seq, b);
+        }
         else if (strncmp("visualize", wurds[2], 9) == 0)
         {
             bool b = atoi(wurds[3]);
