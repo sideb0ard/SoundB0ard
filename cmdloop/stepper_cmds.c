@@ -42,7 +42,12 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 sample_sequencer *s =
                     (sample_sequencer *)mixr->sound_generators[soundgen_num];
 
-                if (strncmp("load", wurds[2], 4) == 0 ||
+                if (strncmp("end_pos", wurds[2], 7) == 0)
+                {
+                    int pct = atoi(wurds[3]);
+                    sample_sequencer_set_cutoff_percent(s, pct);
+                }
+                else if (strncmp("load", wurds[2], 4) == 0 ||
                     strncmp("import", wurds[2], 6) == 0)
                 {
                     if (is_valid_file(wurds[3]))

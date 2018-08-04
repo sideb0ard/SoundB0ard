@@ -185,18 +185,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int dest_sg_pattern_num = -1;
             sscanf(wurds[3], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
 
-            int num_bars = atoi(wurds[4]);
-            if (!num_bars)
-                num_bars = 1;
-            if (num_bars > 4)
-            {
-                printf("Num bars has be 1, 2, 3 or 4\n");
-                return true;
-            }
-
             if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
                 mixer_is_valid_seq_gen_num(mixr, generator) &&
-                dest_sg_pattern_num != -1 && num_bars >= 0 && num_bars <= 4)
+                dest_sg_pattern_num != -1)
             {
                 sequence_generator *seqg = mixr->sequence_generators[generator];
                 short int num =
@@ -214,97 +205,76 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
                                           synthbase_get_octave(base), &chnotes);
 
-                int multiplier = 1;
-                switch (num_bars)
+                int multiplier = PPSIXTEENTH;
+                int midi_note = 0;
+                int midi_tick = 0;
+
+                midi_event pattern[PPBAR] = {0};
+
+                int len = (sizeof(short int) * 8);
+                for (int j = 0; j < len; j++)
                 {
-                case (0):
-                case (1):
-                    multiplier = PPSIXTEENTH;
-                    break;
-                case (2):
-                    multiplier = PPSIXTEENTH * 2;
-                    break;
-                case (3):
-                    multiplier = PPSIXTEENTH * 3;
-                    break;
-                case (4):
-                    multiplier = PPSIXTEENTH * 4;
-                    break;
-                }
-
-                for (int i = 0; i < num_bars; i++)
-                {
-                    int midi_note = 0;
-                    int midi_tick = 0;
-
-                    midi_event pattern[PPBAR] = {0};
-
-                    int len = (sizeof(short int) * 8) / num_bars;
-                    for (int j = 0; j < len; j++)
+                    if (num & (1 << (15 - j)))
                     {
-                        if (num & (1 << (15 - j)))
+                        if (j == 0 || j == len - 1)
+                            midi_note = chnotes.root;
+                        else
                         {
-                            if ((j == 0 && i == 0) ||
-                                (j == (len - 1) && i == num_bars - 1))
+                            int randy = rand() % 3;
+                            switch (randy)
+                            {
+                            case (0):
                                 midi_note = chnotes.root;
-                            else
-                            {
-                                int randy = rand() % 3;
-                                switch (randy)
-                                {
-                                case (0):
-                                    midi_note = chnotes.root;
-                                    break;
-                                case (1):
-                                    midi_note = chnotes.third;
-                                    break;
-                                case (2):
-                                    midi_note = chnotes.fifth;
-                                    break;
-                                }
+                                break;
+                            case (1):
+                                midi_note = chnotes.third;
+                                break;
+                            case (2):
+                                midi_note = chnotes.fifth;
+                                break;
                             }
-                            if (riff)
-                            {
-                                if (j < 12)
-                                    midi_note = base->midi_note_1;
-                                else if (j < 14)
-                                    midi_note = base->midi_note_2;
-                                else
-                                    midi_note = base->midi_note_3;
-                            }
-                            else if (top)
-                            {
-                                int randy = rand() % 100;
-                                if (randy < 70)
-                                    midi_note = base->midi_note_1 + 12;
-                                else if (randy < 85)
-                                    midi_note = base->midi_note_2 + 12;
-                                else
-                                    midi_note = base->midi_note_3 + 12;
-                            }
-
-                            if (rand() % 100 > 90)
-                                midi_note += 12; // up an octave
-
-                            int velocity = (rand() % 100) + 28;
-                            midi_tick = multiplier * j;
-                            if (midi_tick % PPQN == 0)
-                                velocity = 128;
-
-                            int hold_time_ms = (rand() % 2000) + 130;
-                            midi_event ev = {.event_type = MIDI_ON,
-                                             .data1 = midi_note,
-                                             .data2 = velocity,
-                                             .hold = hold_time_ms};
-                            if (once)
-                                ev.delete_after_use = true;
-                            pattern[midi_tick] = ev;
                         }
+                        if (riff)
+                        {
+                            if (j < 12)
+                                midi_note = base->midi_note_1;
+                            else if (j < 14)
+                                midi_note = base->midi_note_2;
+                            else
+                                midi_note = base->midi_note_3;
+                        }
+                        else if (top)
+                        {
+                            int randy = rand() % 100;
+                            if (randy < 70)
+                                midi_note = base->midi_note_1 + 12;
+                            else if (randy < 85)
+                                midi_note = base->midi_note_2 + 12;
+                            else
+                                midi_note = base->midi_note_3 + 12;
+                        }
+
+                        if (rand() % 100 > 90)
+                            midi_note += 12; // up an octave
+
+                        int velocity = (rand() % 100) + 28;
+                        midi_tick = multiplier * j;
+                        if (midi_tick % PPQN == 0)
+                            velocity = 128;
+
+                        int hold_time_ms = (rand() % 2000) + 130;
+                        midi_event ev = {.event_type = MIDI_ON,
+                                         .data1 = midi_note,
+                                         .data2 = velocity,
+                                         .hold = hold_time_ms};
+                        if (once)
+                            ev.delete_after_use = true;
+                        pattern[midi_tick] = ev;
                     }
-                    // midi_pattern_print(pattern);
-                    synthbase_set_pattern(base, dest_sg_pattern_num, pattern);
-                    dest_sg_pattern_num++;
                 }
+                // midi_pattern_print(pattern);
+                synthbase_set_pattern(base, dest_sg_pattern_num, pattern);
+                dest_sg_pattern_num++;
             }
             else
                 printf("Usage: gen melody <gen_num> "
@@ -495,7 +465,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         cmd_found = true;
     }
-    else if (strncmp("invert", wurds[0], 6) == 0)
+    else if (strncmp("invert", wurds[0], 6) == 0 ||
+             strncmp("blend", wurds[0], 5) == 0)
     {
         // e.g. invert 0 0:0 1:0
         int sequence_gen_num = atoi(wurds[1]);
@@ -513,19 +484,33 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             sequence_generator *sg =
                 mixr->sequence_generators[sequence_gen_num];
+
+            soundgenerator *s1 = mixr->sound_generators[sg1_num];
+            soundgenerator *s2 = mixr->sound_generators[sg2_num];
+
             uint16_t bit_pattern = sg->generate(sg, NULL);
-            uint16_t inverted_bit_pattern = ~bit_pattern;
+
+            uint16_t pattern_1, pattern_2 = 0;
+
+            if (strncmp("invert", wurds[0], 6) == 0)
+            {
+                pattern_1 = bit_pattern;
+                pattern_2 = ~bit_pattern;
+            }
+            else // blend
+            {
+                pattern_1 = bit_pattern & 0xFF00;
+                pattern_2 = bit_pattern & 0x00FF;
+            }
 
             midi_event pattern[PPBAR];
-            convert_bit_pattern_to_midi_pattern(bit_pattern, 16, pattern, 1, 0);
-            soundgenerator *s1 = mixr->sound_generators[sg1_num];
+            convert_bit_pattern_to_midi_pattern(pattern_1, 16, pattern, 1, 0);
             s1->set_pattern(s1, sg1_track_num, pattern);
 
-            convert_bit_pattern_to_midi_pattern(inverted_bit_pattern, 16,
-                                                pattern, 1, 0);
-            soundgenerator *s2 = mixr->sound_generators[sg2_num];
+            convert_bit_pattern_to_midi_pattern(pattern_2, 16, pattern, 1, 0);
             s2->set_pattern(s2, sg1_track_num, pattern);
         }
+
         cmd_found = true;
     }
     else if (strncmp("stop", wurds[0], 5) == 0)

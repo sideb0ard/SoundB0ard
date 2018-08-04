@@ -71,6 +71,7 @@ void sample_seq_import_file(sample_sequencer *seq, char *filename)
     audio_buffer_details deetz = import_file_contents(&seq->buffer, filename);
     strcpy(seq->filename, deetz.filename);
     seq->bufsize = deetz.buffer_length;
+    seq->buf_end_pos = seq->bufsize;
     seq->buffer_pitch = 1.0;
     seq->samplerate = deetz.sample_rate;
     seq->channels = deetz.num_channels;
@@ -173,7 +174,7 @@ stereo_val sample_seq_gennext(void *self)
                 (seq->channels * (seq->buffer_pitch));
 
             if ((int)seq->sample_positions[cur_sample_midi_tick]
-                    .audiobuffer_cur_pos >= seq->bufsize)
+                    .audiobuffer_cur_pos >= seq->buf_end_pos)
             { // end of playback - so reset
                 seq->samples_now_playing[i] = -1;
                 seq->sample_positions[cur_sample_midi_tick]
@@ -213,14 +214,15 @@ void sample_seq_status(void *self, wchar_t *status_string)
 
     wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
     swprintf(local_status_string, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%s %s vol:%.2lf pitch:%.2f triplets:%d\n"
-                               "multi:%d num_patterns:%d "
-                               "gen_en:%d gen_mode:%d gen_src:%d gen_every:%d",
+             WANSI_COLOR_WHITE
+             "%s %s vol:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
+             "multi:%d num_patterns:%d "
+             "gen_en:%d gen_mode:%d gen_src:%d gen_every:%d",
              seq->filename, INSTRUMENT_COLOR, seq->vol, seq->buffer_pitch,
-             seq->m_seq.allow_triplets, seq->m_seq.multi_pattern_mode,
-             seq->m_seq.num_patterns, seq->m_seq.generate_en,
-             seq->m_seq.generate_mode, seq->m_seq.generate_src,
-             seq->m_seq.generate_every_n_loops);
+             seq->m_seq.allow_triplets, seq->buf_end_pos,
+             seq->m_seq.multi_pattern_mode, seq->m_seq.num_patterns,
+             seq->m_seq.generate_en, seq->m_seq.generate_mode,
+             seq->m_seq.generate_src, seq->m_seq.generate_every_n_loops);
 
     wcscat(status_string, local_status_string);
 
@@ -346,4 +348,13 @@ void sample_sequencer_set_pitch(sample_sequencer *seq, double v)
         seq->buffer_pitch = v;
     else
         printf("Must be in the range of 0.0 .. 2.0\n");
+}
+
+void sample_sequencer_set_cutoff_percent(sample_sequencer *seq,
+                                         unsigned int percent)
+{
+    if (percent > 100)
+        return;
+    seq->buf_end_pos = seq->bufsize / 100. * percent;
+    printf("End pos is now %d / %d\n", seq->buf_end_pos, seq->bufsize);
 }
