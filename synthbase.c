@@ -105,6 +105,8 @@ void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
                 else
                     midi_note = base->midi_note_3;
             }
+            else if (base->note_mode)
+                midi_note = base->midi_note_1;
             else if (i == 0 || i == patternlen - 1)
                 midi_note = chnotes.root;
             else

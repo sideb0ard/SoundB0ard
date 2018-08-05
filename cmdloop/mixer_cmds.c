@@ -232,10 +232,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
                 synthbase_apply_bit_pattern(base, num, keep, riff);
             }
-            else
-                printf("Usage: gen melody <gen_num> "
-                       "<dest_sg_num>:<dest_sg_pattern_num> <num_bars:default "
-                       "1>\n");
         }
         cmd_found = true;
     }
