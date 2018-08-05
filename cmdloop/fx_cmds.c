@@ -492,6 +492,5 @@ bool is_valid_fx_num(int soundgen_num, int fx_num)
             return true;
         }
     }
-    printf("FX %d isn't valid\n", fx_num);
     return false;
 }

@@ -15,17 +15,20 @@ new bitshift ((t/1000)^(t/1001))*t
 
 new moog
 moog 2 load drexy
+moog 2 note_mode 1
 every 2 bar moog 2 genonce 0
 every 5 bar gen riff 0 2:0
+waveshape 2
 
 new markov 3
 new digi notes/front2WestChord1.aiff
-high 2?
+digi 3 up
+digi 3 up
 every 4 bar gen riffonce 0 3:0
+waveshape 3 2
 
 new digi noises/SNDdoublewhooshit.aiff
 every 1 bar rand "35 36 28 29 35" digi 4 midi_note_1 %s
-every 3 bar digi 4 gen 1
 
 stop 0; every 2 bar digi 4 gen 0
 
@@ -38,7 +41,7 @@ every 3 bar rand "1 1.5 1.2" loop 5 pitch %s
 
 
 new loop loops/whydyahavetomakearecordboutme.aiff 2
-fuckup 5
+fuckup 6
 
 key ab
 new loop loops/raveLooprr.aiff 2; down 0
@@ -46,103 +49,199 @@ new loop loops/raveLooprr.aiff 2; down 0
 moog 2 load ven0m
 start 2
 
-loop 6 pitch 2; stop 4
-start 4; loop 6 pitch 1
+down 6
 
-stop 6; stop 4 // only synth
-new step claps/technotron.aiff [~ cp]*2
-new euclid
-step 7 gen src euclid
-step 7 gen every 8
+loop 7 pitch 2; stop 5
+start 5; loop 7 pitch 1
 
-kicks/avalinoKickVoc.aiff
-dloops/mkLikeloop.aiff
-sidechain mk with avalinoKick
-fuckup 9
+stop 5 // synth + raveLooprr
+new step claps/technotron.aiff [~ cp]*2; new euclid
+step 8 gen src 3; step 8 gen every 8; start 5
 
-key C
-new loop loops/pumpUpDaJAM.aiff 4;
+new step kicks/avalinoKickVoc.aiff b*4; vol 9 0.6
 
-stop avalino
+new loop dloops/mkLikeloop.aiff;  sidechain 10 9; fuckup 9; down 5
+
+stop 2; stop 8; stop 9
+
+down 7
+
+new loop loops/pumpUpDaJAM.aiff 4; // key c
 
 key Bb
+new loop dloops/acidSquelchBeat.aiff 2; down 1
 new loop dloops/acidSquelchBeat.aiff 2
-new loop dloops/acidSquelchBeat.aiff 2; down 2
 
 
-moog load flexxy0c
+down 10
+
+start 4
+
 
 // down all - except dloops/mkLikeloop.aiff 
 // key Gb / F#
 // new loop loops/FingersFadeBassStrings.aiff
 // stop mk
 
-loops/glitchBitloopo.aif
+new loop loops/glitchBitloopo.aif 0.5
+
+new loop loops/SlamLidellAcciiiid.aiff 2; fuckup 15
+
+moog 2 load grittt
+
+new dx
+dx 16 load murhh
+every 2 bar gen melody 0 16:0
 
 
-new loop loops/SlamLidellAcciiiid.aiff 2
+new markov 4
+new step snrs/slaveSnare.aiff [~ s]*2
+step 17 gen src 4
+step 17 gen every 2
 
-dx murhh
-moog 2 gritt again
+stop 4
+new loop dloops/rabveBreaskB.aiff; fuckup 18
 
+down 15
 
-snrs/slaveSnare.aiff
+######  key f
+######  new loop loops/raveStabsCmon.aiff 2
+######  key Eb
 
-key f
-loops/dresden2barloop.aiff
-
-new loop loops/raveStabsCmon.aiff 2
-key Eb
-new loop loops/innercitystylesound.aiff 2; down Fingers; start mk
-
-dloops/rabveBreaskB.aiff
+stop 18
+new loop loops/innercitystylesound.aiff 2; start 18
 
 
 moog 2 load sharpie
-new bitshift ((t/1000)^(t/1001))*t
-gen
-every 2 bar "3 2 1 0" moog 26 octave %s
 
 new markov 2
 new step hats/dmx_hh_cl.aif ; new step hats/hh8.aif
-every 3 invert markov hats
+every 3 bar invert 5 21:0 22:0
 
-delay hats 30 and 47
-over 8 bar osc "10 70" fx 1:0 fb %s; over 7 bar osc "10 70" fx 2:0 fb %s
+delay 21 23; delay 22 47;
+over 8 bar osc "10 70" fx 21:0 fb %s; over 7 bar osc "10 70" fx 22:0 fb %s
+env 21 4; fx 21:1 sustain 0.6;  env 24 7; fx 22:1 sustain 0.6
+
+down 4
+down 3
 
 new loop dloops/hausBreakBeat.aiff
+fuckup 23; down 18
+down 20
 
-new step kicks/808Kkick.wav // bd*4 // gen markov hiphop every 3
-^ hip hop markov
+down 14
 
-claps/djkhaledClap.aiff
-dloops/NeedleClickBeat.aiff 0.5
+new step kicks/808Kkick.wav b*4
+new markov
+step 24 gen src 6
+step 24 gen every 4
+
+new step claps/djkhaledClap.aiff [~ cp]*2; vol 25 0.5
+
+new loop dloops/NeedleClickBeat.aiff 0.5; down 23
+
+stop 23
+new loop dloops/NeedleClickBeat.aiff 0.5;
+every 3 bar loop 29 scramble
+
 dloops/NeedleClickBeat.aiff 0.5 // pitch 1.5 len 0.5
-^ dx murhh
+start 16 // dx murhh
+up 16
 
 key F
-loops/ohmdrum.aiff // NICE - highpass filter
-loops/dowhiley1Bar.aif
-sidechain dowhile w/ 808
+new loop loops/ohmdrum.aiff; highpass 28
+every 2 bar rand "1 0.5" loop 28 len %s
 
-new moog
-moog aqua
-over 4 bar osc "180 18000" moog X fc %s
-over 3 bar osc "1 8" moog 31 fq %s
-every 8 bar "down down up up" moog 31 %s
+new loop loops/dowhiley1Bar.aif; sidechain 29 24
 
-key Bb
-dloops/jbsscratchbeat.aiff 1
 
-new digi toms/nord808_hitom.aif
-^ arp 1
-every 4 bar gen melody 0 38:0
+down 28; down 29
+
+moog 2 load aqua
+over 4 bar osc "180 18000" moog 2 fc %s
+over 3 bar osc "1 8" moog 2 fq %s
+moog 2 arp 1
+
+key bb; down 26; down 27
+new loop dloops/jbsscratchbeat.aiff 1
+fuckup 30
 
 key Eb
-new looop loops/RAVEBasssss.aiff 2
+new loop loops/RAVEBasssss.aiff 2
 
 
 perc/DR660Laser.aif // euclid every 9
+
+
+new bitshift ( t >> 4 & t >> 8 ) / ( t >> 16 & t )
+new dx
+dx 32 load icey -- octave -1
+filter 32
+over 8 bar osc "180 18000" fx 32:0 freq %s
+every 3 bar "-1 0 1 2" dx 32 octave %s
+every 4 bar gen melody 0 32:0
+
+######  markov 1
+######  kicks/stetienneKick.aif b*4
+######  rand gen every "1 2 3 4"
+######  new bitshift t % ( t >> 10 & t )
+######  new step hats/SNDhat.aiff; new step hats/acidHat3.aiff
+######  every 2 bar invert 8 37:0 38:0
+
+///// down all else except both FM ./...
+
+key Bb
+new bitshift t%(t>>10&t)
+dx 16 load grimeyLOUD
+vol 16 1
+every 2 bar gen riff 0 16:0
+filter 16
+every 7 16th rand "60 100 200 350 700" dx 16 sustain_note_ms %s
+over 8 bar osc "180 18000" fx 16:0 freq %s
+over 7 bar osc "1 7" fx 16:0 q %s
+
+every 2 bar rand "4 8 16 32" dx 16 arp_speed %s
+every 2 bar rand "0 1" dx 16 arp %s
+
+new step kicks/DR660Bassdrum909.aif b*2
+step 33 gen src 6
+step 33 gen every 2
+
+new loop loops/toddterrybass1bar.aiff; highpass 40; vol 40 0.4
+new loop loops/rainforrest.aiff 4; sidechain 41 39
+dx still going
+sidechain rainforrest
+
+new loop dloops/pierrehouse.aiff; vol 42 0.6
+fuckup 36
+
+key Bb
+new loop dloops/acidrockwow.aiff; fuckup 43
+new loop loops/techNsaehats.aiff 0.5
+every 2 bar rand "0.5 1" loop 44 len %s
+every 1 bar rand "1 1.5 2" loop 44 pitch %s
+new step kicks/technotronBD.aiff b*4
+
+
+new step hats/acidHat2.aiff
+step 46 gen src 5; step 46 gen every 1
+
+new loop loops/gottahavHausePiano.aiff; down 44; down 42; down 40
+
+new loop dloops/shabbadubloop8bar.aif 8; fuckup 48
+
+bpm 50
+bpm 1
+
+
+
+dloops/shabbyshabbaBeat1bar.aif
+dloops/shabbaVocal8bar.aif
+dloops/shabbadubloop8bar.aif
+
+key C
+dloops/bombdabss1bar.aiff
+
 
 key A
 new loop loops/HARDCOREmelody.aiff 2
@@ -158,66 +257,6 @@ delay 0 13
 over 7 bar osc "2 71" fx 0:2 fb %s
 every 4 bar rand "30 60 90 110 160 313" fx 0:2 delayms %s
 fuckup 0
-
-bitshift ( t >> 4 & t >> 8 ) / ( t >> 16 & t )
-dx load icey -- octave -1
-^ filter - over 8 bar osc "180 18000" fx 0:1 freq %s
-every 3 bar "-1 0 1 2" dx 0 octave %s
-every 4 bar gen melody 0 0:0
-
-markov 1
-kicks/stetienneKick.aif b*4
-rand gen every "1 2 3 4"
-
-t % ( t >> 10 & t )
-hats/SNDhat.aiff
-hats/acidHat3.aiff
-^ invert
-
-key Bb
-new bitshift t%(t>>10&t)
-midi dx
-dx 0 load grimeyLOUD
-every 2 bar gen riff 0 0:0
-filter 0
-over 8 bar osc "180 18000" fx 0:0 freq %s
- over 7 bar osc "1 7" fx 0:0 q %s
-every 2 bar rand "4 8 16 32" dx 0 arp_speed %s
-every 2 bar rand "0 1" dx 0 arp %s
-every 7 16th rand "60 100 200 350 700" dx 0 sustain_note_ms %s
-
-new step kicks/DR660Bassdrum909.aif b*2
-^ markov 0 every 2
-
-new loop loops/toddterrybass1bar.aiff; highpass 4; vol 4 0.4
-new loop loops/rainforrest.aiff 4
-dx still going
-sidechain rainforrest
-
-
-key Bb
-loops/ACiiiiidBassSquelch2.aiff
-^ filter 3000
-over 4 bar osc "180 18000" loop X freq %s
-dloops/acidrockwow.aiff
-loops/techNsaehats.aiff // pitch 1.5
-every 1 bar rand "1 1.5 2" loop 8 pitch %s
-new step kicks/technotronBD.aiff b*4
-
-
-hats/acidHat2.aiff
-loops/gottahavHausePiano.aiff
-
-
-
-dloops/shabbyshabbaBeat1bar.aif
-dloops/shabbaVocal8bar.aif
-dloops/shabbadubloop8bar.aif
-
-key C
-dloops/bombdabss1bar.aiff
-
-
 
 //////////////////////////////////////////////////////////////////
 
