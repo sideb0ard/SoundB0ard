@@ -32,6 +32,8 @@ extern mixer *mixr;
 extern const char *key_names[NUM_KEYS];
 extern char *chord_type_names[NUM_CHORD_TYPES];
 
+static const char *s_progressions[NUM_PROGRESSIONS] = {"I-IV-V", "I-V-vi-IV"};
+
 const wchar_t *s_status_colors[] = {
     WCOOL_COLOR_PINK,      // MINISYNTH_TYPE
     WCOOL_COLOR_ORANGE,    // DIGISYNTH_TYPE
@@ -101,6 +103,7 @@ mixer *new_mixer(double output_latency)
     mixr->key = C;
     mixr->octave = 3;
     mixer_set_notes(mixr);
+    mixer_set_chord_progression(mixr, 1);
     mixr->bars_per_chord = 4;
 
     // possible TODO - should i de-initialize?
@@ -124,7 +127,8 @@ void mixer_status_mixr(mixer *mixr)
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
            ":::::::::: preview_enabled:%d filename:%s\n"
            ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s midi_print:%d midi_bank:%d\n"
-           ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d\n" ANSI_COLOR_RESET,
+           ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d prog:(%d)%s\n"
+           ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->preview.enabled, mixr->preview.filename,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
@@ -137,7 +141,8 @@ void mixer_status_mixr(mixer *mixr)
            mixr->midi_print_notes,
            mixr->midi_bank_num,
            key_names[mixr->key], key_names[mixr->chord],
-           chord_type_names[mixr->chord_type], mixr->octave, mixr->bars_per_chord);
+           chord_type_names[mixr->chord_type], mixr->octave, mixr->bars_per_chord,
+           mixr->progression_type, s_progressions[mixr->progression_type]);
     // clang-format on
 
     // TODO - create env command to print these
@@ -604,22 +609,12 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                 mixr->bar_counter++;
                 if (mixr->bar_counter % mixr->bars_per_chord == 0)
                 {
-                    int chance = rand() % 100;
-                    unsigned int scale_degree = 0;
-                    if (chance < 30)
-                    {
-                        scale_degree = 0;
-                    }
-                    else if (chance < 50)
-                    {
-                        scale_degree = 3;
-                    }
-                    else if (chance < 75)
-                    {
-                        scale_degree = 4;
-                    }
-                    else
-                        scale_degree = 5;
+                    unsigned int scale_degree =
+                        mixr->prog_degrees[mixr->prog_degrees_idx];
+                    mixr->prog_degrees_idx =
+                        (mixr->prog_degrees_idx + 1) % mixr->prog_len;
+                    // int chance = rand() % 100;
+                    // unsigned int scale_degree = 0;
                     unsigned int root = mixr->notes[scale_degree];
                     unsigned int chord_type = get_chord_type(scale_degree);
                     mixer_change_chord(mixr, root, chord_type);
@@ -1050,6 +1045,27 @@ void mixer_set_bars_per_chord(mixer *mixr, int bars)
         mixr->bars_per_chord = bars;
 }
 
+void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num)
+{
+    if (prog_num < NUM_PROGRESSIONS)
+    {
+        switch(prog_num){
+        case(0):
+            mixr->prog_len = 3;
+            mixr->prog_degrees[0] = 0; // I
+            mixr->prog_degrees[1] = 3; // IV
+            mixr->prog_degrees[2] = 4; // V
+            break;
+        case(1):
+            mixr->prog_len = 4;
+            mixr->prog_degrees[0] = 0; // I
+            mixr->prog_degrees[1] = 4; // IV
+            mixr->prog_degrees[2] = 5; // V
+            mixr->prog_degrees[3] = 3; // V
+            break;
+        }
+    }
+}
 void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
 {
     if (root < NUM_KEYS && chord_type < NUM_CHORD_TYPES)

@@ -22,6 +22,7 @@
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_SOUNDGENERATOR 100
+#define NUM_PROGRESSIONS 2
 
 typedef enum
 {
@@ -130,6 +131,13 @@ typedef struct mixer
 
     int bars_per_chord;
     int bar_counter;
+
+    // chord progressions
+    int prog_len;
+    int prog_degrees[6]; // max prog_len
+    int prog_degrees_idx;
+    unsigned int progression_type;
+
     unsigned int key;
     unsigned int chord;
     unsigned int chord_type;
@@ -207,6 +215,7 @@ void mixer_set_bars_per_chord(mixer *mixr, int bars);
 
 double mixer_get_hz_per_bar(mixer *mixr);
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
+void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num);
 void mixer_change_chord(mixer *mixr, unsigned int root,
                         unsigned int chord_type);
 int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
@@ -219,5 +228,6 @@ void mixer_set_midi_bank(mixer *mixr, int num);
 synthbase *get_synthbase(soundgenerator *self);
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi);
+
 
 #endif // MIXER_H

@@ -124,6 +124,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         cmd_found = true;
     }
+    else if (strncmp("prog", wurds[0], 4) == 0)
+    {
+        int prog_num = atoi(wurds[1]);
+        mixer_set_chord_progression(mixr, prog_num);
+    }
     else if (strncmp("quantize", wurds[0], 8) == 0)
     {
         int quanta = atoi(wurds[1]);
@@ -367,7 +372,10 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     else if (strncmp("ps", wurds[0], 2) == 0)
     {
-        mixer_ps(mixr);
+        if (strncmp("mixr", wurds[1], 4) == 0)
+            mixer_status_mixr(mixr);
+        else
+            mixer_ps(mixr);
         cmd_found = true;
     }
 

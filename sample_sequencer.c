@@ -356,5 +356,4 @@ void sample_sequencer_set_cutoff_percent(sample_sequencer *seq,
     if (percent > 100)
         return;
     seq->buf_end_pos = seq->bufsize / 100. * percent;
-    printf("End pos is now %d / %d\n", seq->buf_end_pos, seq->bufsize);
 }
