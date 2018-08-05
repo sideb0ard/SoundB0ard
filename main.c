@@ -1,6 +1,7 @@
 #include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <signal.h>
 #include <sys/event.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -42,6 +43,7 @@ int main()
 {
 
     srand(time(NULL));
+    signal(SIGINT, SIG_IGN);
 
     double output_latency = pa_setup();
     mixr = new_mixer(output_latency);

@@ -24,6 +24,11 @@ then, `git clone git@github.com:sideb0ard/SBShell.git`,
 run `make`
 and if all is successful, you should have a new `sbsh` command in your directory.
 
+*/ these instructions are out of date!
+    now you also need Ableton Link --
+    https://github.com/Ableton/link -- specifically
+    https://github.com/Ableton/link/releases/tag/Link-1.0.0 ** /*
+
 Load it up:  
 `./sbsh`
 
