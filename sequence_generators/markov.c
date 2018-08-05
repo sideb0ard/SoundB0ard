@@ -144,7 +144,7 @@ uint16_t markov_generate(void *self, void *data)
         if (rand_percent() > 10)
         {
             int num_hits = rand() % 7;
-            //pattern = create_euclidean_rhythm(num_hits, 16);
+            // pattern = create_euclidean_rhythm(num_hits, 16);
             pattern = create_euclidean_rhythm(0, 16);
         }
         else

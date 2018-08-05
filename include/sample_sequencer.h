@@ -43,7 +43,7 @@ typedef struct sample_sequencer
     double *buffer;
     int bufsize;
     int buf_end_pos; // this will always be shorter than bufsize for cutting off
-                // sample earlier
+                     // sample earlier
     double buffer_pitch;
     // int buf_num_channels;
 
@@ -88,4 +88,5 @@ void sample_sequencer_reset_samples(sample_sequencer *seq);
 void sample_sequencer_morph(sample_sequencer *seq);
 void sample_sequencer_morph_restore(sample_sequencer *seq);
 void sample_sequencer_set_pitch(sample_sequencer *seq, double v);
-void sample_sequencer_set_cutoff_percent(sample_sequencer *seq, unsigned int percent);
+void sample_sequencer_set_cutoff_percent(sample_sequencer *seq,
+                                         unsigned int percent);

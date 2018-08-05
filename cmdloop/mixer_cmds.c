@@ -163,21 +163,17 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp("melody", wurds[1], 6) == 0 ||
             strncmp("once", wurds[1], 4) == 0 ||
-            strncmp("top", wurds[1], 3) == 0 ||
             strncmp("riffonce", wurds[1], 9) == 0 ||
             strncmp("riff", wurds[1], 4) == 0)
         {
-            bool once = false;
+            bool keep = true;
             bool riff = false;
-            bool top = false; // like a riff but higher
 
             if (strncmp("once", wurds[1], 4) == 0 ||
                 strncmp("riffonce", wurds[1], 9) == 0)
-                once = true;
+                keep = false;
 
             if (strncmp("riff", wurds[1], 4) == 0)
-                riff = true;
-            if (strncmp("top", wurds[1], 3) == 0)
                 riff = true;
 
             int generator = atoi(wurds[2]);
@@ -190,91 +186,46 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 dest_sg_pattern_num != -1)
             {
                 sequence_generator *seqg = mixr->sequence_generators[generator];
-                short int num =
+                uint16_t num =
                     seqg->generate(seqg, (void *)&mixr->timing_info.cur_sample);
+
+                if (wurds[1][strlen(wurds[1]) - 1] == '2')
+                {
+                    int dest_sg_num_2 = -1;
+                    int dest_sg_pattern_num_2 = -1;
+                    sscanf(wurds[4], "%d:%d", &dest_sg_num_2,
+                           &dest_sg_pattern_num_2);
+                    if (mixer_is_valid_soundgen_num(mixr, dest_sg_num_2) &&
+                        dest_sg_pattern_num_2 != -1)
+                    {
+                        uint16_t bit_pattern_1 = num & 0xFF00;
+                        uint16_t bit_pattern_2 = num & 0x00FF;
+
+                        soundgenerator *sg2 =
+                            (soundgenerator *)
+                                mixr->sound_generators[dest_sg_num_2];
+                        synthbase *b2 = get_synthbase(sg2);
+                        if (b2)
+                        {
+                            synthbase_apply_bit_pattern(b2, bit_pattern_2, keep,
+                                                        riff);
+                        }
+
+                        num = bit_pattern_1;
+                    }
+                }
 
                 soundgenerator *sg =
                     (soundgenerator *)mixr->sound_generators[dest_sg_num];
+
                 synthbase *base = get_synthbase(sg);
                 if (!base)
                 {
                     printf("Can't do nuttin' for ya, man!\n");
                     return true;
                 }
-                chord_midi_notes chnotes = {0};
-                get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
-                                          synthbase_get_octave(base), &chnotes);
 
-                int multiplier = PPSIXTEENTH;
-                int midi_note = 0;
-                int midi_tick = 0;
-
-                midi_event pattern[PPBAR] = {0};
-
-                int len = (sizeof(short int) * 8);
-                for (int j = 0; j < len; j++)
-                {
-                    if (num & (1 << (15 - j)))
-                    {
-                        if (j == 0 || j == len - 1)
-                            midi_note = chnotes.root;
-                        else
-                        {
-                            int randy = rand() % 3;
-                            switch (randy)
-                            {
-                            case (0):
-                                midi_note = chnotes.root;
-                                break;
-                            case (1):
-                                midi_note = chnotes.third;
-                                break;
-                            case (2):
-                                midi_note = chnotes.fifth;
-                                break;
-                            }
-                        }
-                        if (riff)
-                        {
-                            if (j < 12)
-                                midi_note = base->midi_note_1;
-                            else if (j < 14)
-                                midi_note = base->midi_note_2;
-                            else
-                                midi_note = base->midi_note_3;
-                        }
-                        else if (top)
-                        {
-                            int randy = rand() % 100;
-                            if (randy < 70)
-                                midi_note = base->midi_note_1 + 12;
-                            else if (randy < 85)
-                                midi_note = base->midi_note_2 + 12;
-                            else
-                                midi_note = base->midi_note_3 + 12;
-                        }
-
-                        if (rand() % 100 > 90)
-                            midi_note += 12; // up an octave
-
-                        int velocity = (rand() % 100) + 28;
-                        midi_tick = multiplier * j;
-                        if (midi_tick % PPQN == 0)
-                            velocity = 128;
-
-                        int hold_time_ms = (rand() % 2000) + 130;
-                        midi_event ev = {.event_type = MIDI_ON,
-                                         .data1 = midi_note,
-                                         .data2 = velocity,
-                                         .hold = hold_time_ms};
-                        if (once)
-                            ev.delete_after_use = true;
-                        pattern[midi_tick] = ev;
-                    }
-                }
-                // midi_pattern_print(pattern);
-                synthbase_set_pattern(base, dest_sg_pattern_num, pattern);
-                dest_sg_pattern_num++;
+                synthbase_apply_bit_pattern(base, num, keep, riff);
             }
             else
                 printf("Usage: gen melody <gen_num> "

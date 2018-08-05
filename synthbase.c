@@ -67,22 +67,80 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
 
         // synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
 
-        midi_event *pattern = base->patterns[base->cur_pattern];
-        clear_pattern(pattern);
-
-        synthbase_stop(base);
         sequence_generator *sg = mixr->sequence_generators[gen_src];
         uint16_t bits = sg->generate(sg, NULL);
 
-        int patternlen = 16;
-        for (int i = 0; i < patternlen; i++)
+        synthbase_apply_bit_pattern(base, bits, keep_note, false);
+    }
+}
+
+void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
+                                 bool keep_note, bool riff)
+{
+    synthbase_stop(base);
+
+    midi_event *midi_pattern = base->patterns[base->cur_pattern];
+    clear_pattern(midi_pattern);
+
+    chord_midi_notes chnotes = {0};
+    get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
+                              synthbase_get_octave(base), &chnotes);
+
+    int multiplier = PPSIXTEENTH;
+    int midi_note = 0;
+    int midi_tick = 0;
+
+    int patternlen = 16;
+    for (int i = 0; i < patternlen; i++)
+    {
+        int shift_by = patternlen - 1 - i;
+        if (bit_pattern & (1 << shift_by))
         {
-            int shift_by = patternlen - 1 - i;
-            if (bits & (1 << shift_by))
+            if (riff)
             {
-                synthbase_add_note(base, base->cur_pattern, i,
-                                   base->midi_note_1, keep_note);
+                if (i < 12)
+                    midi_note = base->midi_note_1;
+                else if (i < 14)
+                    midi_note = base->midi_note_2;
+                else
+                    midi_note = base->midi_note_3;
             }
+            else if (i == 0 || i == patternlen - 1)
+                midi_note = chnotes.root;
+            else
+            {
+                int randy = rand() % 3;
+                switch (randy)
+                {
+                case (0):
+                    midi_note = chnotes.root;
+                    break;
+                case (1):
+                    midi_note = chnotes.third;
+                    break;
+                case (2):
+                    midi_note = chnotes.fifth;
+                    break;
+                }
+            }
+
+            if (rand() % 100 > 90)
+                midi_note += 12; // up an octave
+
+            int velocity = (rand() % 100) + 28;
+            midi_tick = multiplier * i;
+            if (midi_tick % PPQN == 0)
+                velocity = 128;
+
+            int hold_time_ms = (rand() % 2000) + 130;
+            midi_event ev = {.event_type = MIDI_ON,
+                             .data1 = midi_note,
+                             .data2 = velocity,
+                             .hold = hold_time_ms};
+            if (!keep_note)
+                ev.delete_after_use = true;
+
+            midi_pattern[midi_tick] = ev;
         }
     }
 }
