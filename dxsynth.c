@@ -1069,13 +1069,11 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
         {
             sscanf(tok, "%[^=]=%s", setting_key, setting_val);
             sscanf(setting_val, "%lf", &scratch_val);
-            printf("key:%s val:%f\n", setting_key, scratch_val);
+            //printf("key:%s val:%f\n", setting_key, scratch_val);
             if (strcmp(setting_key, "name") == 0)
             {
                 if (strcmp(setting_val, preset_to_load) != 0)
                     break;
-                else
-                    printf("Found yer preset:%s!\n", setting_val);
                 strcpy(ms->m_settings.m_settings_name, setting_val);
                 settings_count++;
             }
@@ -1323,8 +1321,8 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
                 settings_count++;
             }
         }
-        if (settings_count > 0)
-            printf("Loaded %d settings\n", settings_count);
+        //if (settings_count > 0)
+        //    printf("Loaded %d settings\n", settings_count);
         dxsynth_update(ms);
     }
 

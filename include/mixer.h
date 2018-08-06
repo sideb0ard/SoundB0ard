@@ -229,5 +229,4 @@ synthbase *get_synthbase(soundgenerator *self);
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi);
 
-
 #endif // MIXER_H

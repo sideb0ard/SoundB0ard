@@ -1,7 +1,7 @@
 #include <pthread.h>
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <signal.h>
 #include <sys/event.h>
 #include <sys/time.h>
 #include <sys/types.h>

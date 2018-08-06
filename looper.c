@@ -14,7 +14,7 @@ extern mixer *mixr;
 extern char *s_lfo_mode_names;
 
 static char *s_env_names[] = {"PARABOLIC", "TRAPEZOIDAL", "TUKEY"};
-static char *s_loop_mode_names[] = {"LOOP", "STATIC"};
+static char *s_loop_mode_names[] = {"LOOP", "STATIC", "SMUDGE"};
 
 looper *new_looper(char *filename)
 {
@@ -44,8 +44,8 @@ looper *new_looper(char *filename)
     g->grain_pitch = 1;
 
     g->density_duration_sync = true;
-    g->fill_factor = 2.;
-    looper_set_grain_density(g, 30);
+    g->fill_factor = 3.;
+    looper_set_grain_density(g, 100);
 
     g->sound_generator.gennext = &looper_gennext;
     g->sound_generator.status = &looper_status;
@@ -173,7 +173,7 @@ void looper_event_notify(void *self, unsigned int event_type)
         break;
 
     case (TIME_MIDI_TICK):
-        if (g->loop_mode != LOOPER_STATIC_MODE)
+        if (g->loop_mode == LOOPER_LOOP_MODE)
         {
             int pulses_per_loop = PPBAR * g->loop_len;
 
@@ -741,14 +741,14 @@ void looper_set_grain_duration(looper *l, int dur)
 {
     l->grain_duration_ms = dur;
     if (l->density_duration_sync)
-        l->grains_per_sec = (1000. / l->grain_duration_ms) * l->fill_factor;
+        l->grains_per_sec = 1000. / (l->grain_duration_ms / l->fill_factor);
 }
 
 void looper_set_grain_density(looper *l, int gps)
 {
     l->grains_per_sec = gps;
     if (l->density_duration_sync)
-        l->grain_duration_ms = (l->fill_factor / l->grains_per_sec) * 1000;
+        l->grain_duration_ms = 1000. / l->grains_per_sec * l->fill_factor;
 }
 
 void looper_set_grain_attack_size_pct(looper *g, int attack_pct)
@@ -809,19 +809,16 @@ void looper_set_reverse_mode(looper *g, bool b) { g->reverse_mode = b; }
 void looper_set_loop_mode(looper *g, unsigned int m)
 {
     g->loop_mode = m;
-    if (m == LOOPER_STATIC_MODE)
+    g->selection_mode = GRAIN_SELECTION_STATIC;
+    if (m == LOOPER_SMUDGE_MODE)
     {
         g->quasi_grain_fudge = 220;
-        g->selection_mode = GRAIN_SELECTION_STATIC;
         g->granular_spray_frames = 441; // 10ms * (44100/1000)
-        g->grain_duration_ms = 50;
     }
-    else if (m == LOOPER_LOOP_MODE)
+    else
     {
         g->quasi_grain_fudge = 0;
-        g->selection_mode = GRAIN_SELECTION_STATIC;
         g->granular_spray_frames = 0;
-        g->grain_duration_ms = 100;
     }
 }
 void looper_set_scramble_pending(looper *g) { g->scramble_pending = true; }

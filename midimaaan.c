@@ -94,7 +94,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             if (ev->event_type == MIDI_ON)
                 arp_add_last_note(&base->arp, note);
         }
-        //if (base->note_mode)
+        // if (base->note_mode)
         //    note = base->midi_note_1;
     }
 
