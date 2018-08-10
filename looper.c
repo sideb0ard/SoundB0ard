@@ -45,7 +45,7 @@ looper *new_looper(char *filename)
 
     g->density_duration_sync = true;
     g->fill_factor = 3.;
-    looper_set_grain_density(g, 100);
+    looper_set_grain_density(g, 30);
 
     g->sound_generator.gennext = &looper_gennext;
     g->sound_generator.status = &looper_status;

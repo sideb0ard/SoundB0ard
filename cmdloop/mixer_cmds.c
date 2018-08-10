@@ -39,7 +39,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("sgz", wurds[0], 3) == 0)
     {
-        mixer_status_sgz(mixr);
+        mixer_status_sgz(mixr, true);
     }
     else if (strncmp("mixr", wurds[0], 4) == 0)
     {
@@ -57,7 +57,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     algorithm_stop(a);
                 }
             }
-        mixer_status_algoz(mixr);
+        mixer_status_algoz(mixr, true);
     }
 
     else if (strncmp("bars_per_chord", wurds[0], 15) == 0)
@@ -370,8 +370,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp("mixr", wurds[1], 4) == 0)
             mixer_status_mixr(mixr);
+        else if (strncmp("all", wurds[1], 3) == 0)
+            mixer_ps(mixr, true);
         else
-            mixer_ps(mixr);
+            mixer_ps(mixr, false);
+
         cmd_found = true;
     }
 

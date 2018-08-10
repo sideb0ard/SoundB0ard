@@ -21,7 +21,8 @@ extern mixer *mixr;
 
 bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
-    if (strncmp("bitcrush", wurds[0], 8) == 0)
+    if (strncmp("bitcrush", wurds[0], 8) == 0 ||
+        strncmp("bc", wurds[0], 2) == 0)
     {
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
@@ -125,7 +126,8 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
-    else if (strncmp("waveshape", wurds[0], 6) == 0)
+    else if (strncmp("waveshape", wurds[0], 6) == 0 ||
+             strncmp("ws", wurds[0], 2) == 0)
     {
         int soundgen_num = atoi(wurds[1]);
         int val = atoi(wurds[2]);

@@ -180,7 +180,7 @@ void mixer_status_mixr(mixer *mixr)
         printf(ANSI_COLOR_RESET "\n");
     }
 }
-void mixer_status_algoz(mixer *mixr)
+void mixer_status_algoz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
     if (mixr->algorithm_num > 0)
@@ -191,14 +191,17 @@ void mixer_status_algoz(mixer *mixr)
         {
             if (mixr->algorithms[i] != NULL)
             {
-                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                algorithm_status(mixr->algorithms[i], wss);
-                wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE
-                                          "algo %d" WCOOL_COLOR_GREEN
-                                          "] " WANSI_COLOR_RESET,
-                        i);
-                wprintf(L"%ls\n", wss);
-                wprintf(WANSI_COLOR_RESET);
+                if (mixr->algorithms[i]->active || all)
+                {
+                    wmemset(wss, 0, MAX_STATIC_STRING_SZ);
+                    algorithm_status(mixr->algorithms[i], wss);
+                    wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE
+                                              "algo %d" WCOOL_COLOR_GREEN
+                                              "] " WANSI_COLOR_RESET,
+                            i);
+                    wprintf(L"%ls\n", wss);
+                    wprintf(WANSI_COLOR_RESET);
+                }
             }
         }
     }
@@ -224,7 +227,7 @@ void mixer_status_seqz(mixer *mixr)
         }
     }
 }
-void mixer_status_sgz(mixer *mixr)
+void mixer_status_sgz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
     if (mixr->soundgen_num > 0)
@@ -235,48 +238,56 @@ void mixer_status_sgz(mixer *mixr)
         {
             if (mixr->sound_generators[i] != NULL)
             {
-                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                mixr->sound_generators[i]->status(mixr->sound_generators[i],
-                                                  wss);
-
-                // clang-format off
-                wprintf(WCOOL_COLOR_GREEN "["WANSI_COLOR_WHITE "%s %d" WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET,
-                        s_sg_names[mixr->sound_generators[i]->type], i);
-                wprintf(L"%ls", wss);
-                wprintf(WANSI_COLOR_RESET);
-                // clang-format on
-
-                if (mixr->sound_generators[i]->effects_num > 0)
+                if ((mixr->sound_generators[i]->active &&
+                     mixr->sound_generators[i]->getvol(
+                         mixr->sound_generators[i]) > 0.0) ||
+                    all)
                 {
-                    printf("      ");
-                    for (int j = 0; j < mixr->sound_generators[i]->effects_num;
-                         j++)
+                    wmemset(wss, 0, MAX_STATIC_STRING_SZ);
+                    mixr->sound_generators[i]->status(mixr->sound_generators[i],
+                                                      wss);
+
+                    // clang-format off
+                    wprintf(WCOOL_COLOR_GREEN
+                            "["WANSI_COLOR_WHITE "%s %d"
+                            WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET,
+                            s_sg_names[mixr->sound_generators[i]->type], i);
+                    wprintf(L"%ls", wss);
+                    wprintf(WANSI_COLOR_RESET);
+                    // clang-format on
+
+                    if (mixr->sound_generators[i]->effects_num > 0)
                     {
-                        fx *f = mixr->sound_generators[i]->effects[j];
-                        if (f->enabled)
-                            printf(COOL_COLOR_YELLOW);
-                        else
-                            printf(ANSI_COLOR_RESET);
-                        char fx_status[512];
-                        f->status(f, fx_status);
-                        printf("\n[fx %d:%d %s]", i, j, fx_status);
+                        printf("      ");
+                        for (int j = 0;
+                             j < mixr->sound_generators[i]->effects_num; j++)
+                        {
+                            fx *f = mixr->sound_generators[i]->effects[j];
+                            if (f->enabled)
+                                printf(COOL_COLOR_YELLOW);
+                            else
+                                printf(ANSI_COLOR_RESET);
+                            char fx_status[512];
+                            f->status(f, fx_status);
+                            printf("\n[fx %d:%d %s]", i, j, fx_status);
+                        }
+                        printf(ANSI_COLOR_RESET);
                     }
-                    printf(ANSI_COLOR_RESET);
+                    printf("\n\n");
                 }
-                printf("\n\n");
             }
         }
     }
 }
 
-void mixer_ps(mixer *mixr)
+void mixer_ps(mixer *mixr, bool all)
 {
 
     print_logo();
     mixer_status_mixr(mixr);
-    mixer_status_algoz(mixr);
+    mixer_status_algoz(mixr, all);
     mixer_status_seqz(mixr);
-    mixer_status_sgz(mixr);
+    mixer_status_sgz(mixr, all);
     printf(ANSI_COLOR_RESET);
 }
 

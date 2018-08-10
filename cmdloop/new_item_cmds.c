@@ -107,7 +107,8 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         else if (strncmp("looper", wurds[1], 6) == 0 ||
                  strncmp("loop", wurds[1], 4) == 0 ||
-                 strncmp("gran", wurds[1], 4) == 0)
+                 strncmp("gran", wurds[1], 4) == 0 ||
+                 strncmp("dloop", wurds[1], 5) == 0)
         {
             if (is_valid_file(wurds[2]) || strncmp(wurds[2], "none", 4) == 0)
             {
@@ -119,9 +120,12 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
                 if (strncmp("gran", wurds[1], 4) == 0)
-                    looper_set_loop_mode(g, LOOPER_STATIC_MODE);
+                    looper_set_loop_mode(g, LOOPER_SMUDGE_MODE);
                 else
                     looper_set_loop_mode(g, LOOPER_LOOP_MODE);
+
+                if (strncmp("dloop", wurds[1], 5) == 0)
+                    looper_set_grain_density(g, 100);
 
                 looper_set_loop_len(g, loop_len);
             }

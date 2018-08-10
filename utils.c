@@ -1071,7 +1071,7 @@ void print_logo()
         COOL_COLOR_GREEN
         // style is 'doom' from http://patorjk.com/software/taag/
         "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-        ANSI_COLOR_WHITE
+        COOL_COLOR_YELLOW
         "             _____                       _ _     _____               _\n"
         "            /  ___|                     | | |   |  _  |             | |\n"
         "            \\ `--.  ___  _   _ _ __   __| | |__ | |/\" | __ _ _ __ __| |\n"
