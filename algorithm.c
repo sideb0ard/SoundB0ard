@@ -249,7 +249,7 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                 strcat(line, " ");
         }
     }
-    // printf("CMD! %s\n", line);
+    //printf("aCMD! %s\n", line);
     if (!extract_and_validate_environment(a, line))
         return false;
 

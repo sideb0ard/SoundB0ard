@@ -107,7 +107,7 @@ void dxsynth_reset(dxsynth *dx)
     dx->m_settings.m_eg1_decay_ms = 100;
     dx->m_settings.m_eg1_sustain_lvl = 0.707;
     dx->m_settings.m_eg1_release_ms = 2000;
-    dx->m_settings.m_op1_output_lvl = 75;
+    dx->m_settings.m_op1_output_lvl = 90;
 
     dx->m_settings.m_op2_waveform = SINE;
     dx->m_settings.m_op2_ratio = 1; // 0.01-10
@@ -836,7 +836,7 @@ void dxsynth_rand_settings(dxsynth *dx)
     dx->m_settings.m_eg1_decay_ms = rand()% 300;
     dx->m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
     dx->m_settings.m_eg1_release_ms = rand()% 300;
-    dx->m_settings.m_op1_output_lvl = (rand() % 55) + 35;
+    //dx->m_settings.m_op1_output_lvl = (rand() % 55) + 35;
 
     dx->m_settings.m_op2_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op2_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);

@@ -769,6 +769,16 @@ bool mixer_is_valid_algo(mixer *mixr, int algo_num)
     return false;
 }
 
+bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
+{
+    if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+    {
+        soundgenerator *sg = mixr->sound_generators[soundgen_num];
+        if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
+            return true;
+    }
+    return false;
+}
 bool mixer_is_valid_env_var(mixer *mixr, char *key)
 {
     for (int i = 0; i < mixr->env_var_count; i++)

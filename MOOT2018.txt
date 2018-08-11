@@ -11,7 +11,6 @@ step 1 gen src 0
 step 1 gen every 3
 
 new bitshift ((t/1000)^(t/1001))*t
-every 3 bar rand "0 1" step 1 gen src %s
 
 new moog
 moog 2 load drexy; moog 2 note_mode 1
@@ -31,7 +30,7 @@ stop 0; every 2 bar digi 4 gen 0
 
 new dloop dloops/rabveBreaskB.aiff; fuckup 5; start 0; stop 1; stop 2; stop 3;
 
-bitcrush 5
+down 0; bitcrush 5
 every 1 bar "4 6 8 16" fx 5:0 bitdepth %s
 start 1
 every 3 bar rand "1 1.5 1.2" loop 5 pitch %s
@@ -77,13 +76,13 @@ new dx
 dx 13 load quazzz
 dx 13 note_mode 1; dx 13 midi_note_1 3
 new bitshift (t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1
-every 2 bar gen once x 13:0
+every 2 bar gen once 4 13:0; every 7 bar gen riff 4 13:0
 
-down 10
+down 11
 
 new markov 2
 new step hats/dmx_hh_cl.aif ; new step hats/hh8.aif
-every 3 bar invert 4 14:0 15:0
+every 3 bar invert 5 14:0 15:0
 
 delay 14 23; delay 15 47;
 over 8 bar osc "10 70" fx 14:0 fb %s; over 7 bar osc "10 70" fx 15:0 fb %s
@@ -94,66 +93,87 @@ new markov 4
 new step snrs/slaveSnare.aiff [~ s]*2
 step 20 gen src 5; step 20 gen every 2
 
-new dloop dloops/rabveBreaskB.aiff; fuckup 21; down 16
+new dloop dloops/rabveBreaskB.aiff; fuckup 17; down 10
 
-down 18; down 17
+
+down 12
 
 ######  key f
 ######  new loop loops/raveStabsCmon.aiff 2
 ######  key Eb
 
-down 10
+//  stop 17
+//  new loop loops/innercitystylesound.aiff 2; start 17
 
-stop 21
-new loop loops/innercitystylesound.aiff 2; loop 21 grain_dur_ms 100; start 21
 
-down 19
-
+every 2 bar "up down" dx 13 %s
 
 moog 2 load sharpie
 
 
-new dloop dloops/hausBreakBeat.aiff ; fuckup 23
+new dloop dloops/hausBreakBeat.aiff ; fuckup 17
 
 new step kicks/808Kkick.wav b*4
 new markov
-step 24 gen src 6; step 24 gen every 4
+step 19 gen src 7; step 19 gen every 1
 
 new step claps/djkhaledClap.aiff [~ cp]*2; vol 25 0.5
 
-new loop dloops/NeedleClickBeat.aiff 0.5; down 23
+new loop dloops/NeedleClickBeat.aiff 0.5; down 17
 
-down 22
+down 13
 
-new loop dloops/NeedleClickBeat.aiff 0.5;
+every 2 bar gen riff 0 13:0
+start 13 // dx murhh
+up 13
 
-dloops/NeedleClickBeat.aiff 0.5 // pitch 1.5 len 0.5
-
-every 2 bar gen riff 0 19:0
-start 19 // dx murhh
-up 19
-
-down 21
 
 key F
-new loop loops/ohmdrum.aiff; highpass 28
-every 2 bar rand "1 0.5" loop 28 len %s
+new loop loops/ohmdrum.aiff; highpass 22
+every 2 bar rand "1 0.5" loop 22 len %s
 
-new loop loops/dowhiley1Bar.aif; sidechain 29 24
+stop 19
+step 19 gen every 4; new loop loops/dowhiley1Bar.aif; sidechain 23 19; start 19
 
 down 2
-down 19
+down 13
 
 
-down 28;
+vol 13 1
 
-down 29; moog 2 load aqua
+
+down 22;
+
+moog 2 load aqua
 start 2;
 moog 2 arp 1
 
-key bb; down 26; down 27
-new loop dloops/jbsscratchbeat.aiff 1
-fuckup 30
+
+down 18 //
+
+stop 23; stop 14; stop 15
+new loop dloops/jbsscratchbeat.aiff; fuckup 24
+vol 24 1
+
+new loop loops/rainforrest.aiff 4;
+sidechain 25 19
+
+// 2 still going aqua
+
+new loop loops/toddterrybass1bar.aiff; highpass 26
+fuckup 26
+
+
+key f
+dx 13 load grimeyLOUD
+dx 13 arp 1
+dx 13 down; dx 13 down
+dx 0 octave -1
+
+bpm 110
+
+new dloop dloops/dizzeebeat1barloop.aiff; sidechain 27 19
+start 13
 
 start 24
 
@@ -167,7 +187,6 @@ step 32 gen src 3; step 32 gen every 7
 
 down 31
 dx 19 load icey ; dx 19 octave -1
-new loop loops/rainforrest.aiff 4;start 19; vol 19 0.8
 
 ######  markov 1
 ######  kicks/stetienneKick.aif b*4
@@ -178,9 +197,8 @@ new loop loops/rainforrest.aiff 4;start 19; vol 19 0.8
 
 ///// down all else except both FM ./...
 
-key Bb
-dx 19 load grimeyLOUD
-dx 19 arp 1
+
+
 down 19; down 19
 every 3 bar gen riff 1 19:0;
 
@@ -191,9 +209,12 @@ step 33 gen src 6; step 33 gen every 2
 
 down 28
 
-new loop loops/toddterrybass1bar.aiff; highpass 40;
 new loop loops/rainforrest.aiff 4; sidechain 41 39
 // dx still going
+
+
+
+
 
 down 30
 
@@ -212,6 +233,10 @@ every 2 bar rand "0.5 1" loop 38 len %s; every 1 bar rand "1 1.5 2" loop 38 pitc
 
 down 34
 down 36
+
+dloops/GetHype.aiff
+
+bpm 80 // make sure dx grimeyLOUD still going
 
 new step kicks/technotronBD.aiff b*4
 
@@ -407,6 +432,8 @@ loops/risingAcidLine.aiff 8
 loops/noiZeCrackle.aiff
 loops/glitchBitloopo.aif
 
+key c
+strings/elbtimeout.aiff
 
 key Eb
 loops/takemeback.aiff
@@ -474,7 +501,6 @@ every 2 bar gen melody 0 19:0
 ////////////\\\\\\\\\\\\\\\\\\\\\\///////////////////
 
 dloops/reesepiece.aif 4
-dloops/GetHype.aiff
 dloops/90sboombap2Bar.aif
 dloops/jazzyJeffMono4bar.aif 4
 dloops/hiphousenasty1brroll.aiff; stop 5

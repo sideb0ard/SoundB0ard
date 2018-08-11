@@ -164,6 +164,26 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         cmd_found = true;
     }
+    else if (strncmp("sweep", wurds[0], 5) == 0)
+    {
+        int sg_num = -1;
+        int sg_pattern_num = -1;
+        sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
+        if (mixer_is_valid_fx(mixr, sg_num, sg_pattern_num))
+        {
+            char fwurds[9][SIZE_OF_WURD] = {"over", "8", "bar",
+                                            "osc",
+                                            "\"180 18000\"", "fx"};
+            strcpy(fwurds[6], wurds[1]);
+            strcpy(fwurds[7], "freq");
+            strcpy(fwurds[8], "\%s");
+            algorithm *a = new_algorithm(9, fwurds);
+            if (a)
+                mixer_add_algorithm(mixr, a);
+        }
+
+        cmd_found = true;
+    }
     else if (strncmp("gen", wurds[0], 3) == 0)
     {
         if (strncmp("melody", wurds[1], 6) == 0 ||
