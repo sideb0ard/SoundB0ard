@@ -39,7 +39,7 @@ void step_init(step_sequencer *seq)
     seq->generate_generation = 0;
     seq->generate_every_n_loops = 0;
     seq->generate_max_generation = 0;
-    seq->allow_triplets = false;
+    seq->allow_triplets = true;
 
     for (int i = 0; i < MAX_SEQUENCER_PATTERNS; i++)
         seq->pattern_num_loops[i] = 1;

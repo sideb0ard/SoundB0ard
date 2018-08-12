@@ -68,7 +68,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         cmd_found = true;
     }
     else if (strncmp("every", wurds[0], 5) == 0 ||
-             strncmp("over", wurds[0], 4) == 0)
+             strncmp("over", wurds[0], 4) == 0 ||
+             strncmp("for", wurds[0], 3) == 0)
     {
         algorithm *a = new_algorithm(num_wurds, wurds);
         if (a)
