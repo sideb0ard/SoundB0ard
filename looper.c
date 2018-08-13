@@ -1009,7 +1009,7 @@ void looper_set_lfo_sync(looper *g, int lfonum, int numloops)
 
 void looper_set_fill_factor(looper *l, double fill_factor)
 {
-    if (fill_factor >= 0. && fill_factor <= 2.)
+    if (fill_factor >= 0. && fill_factor <= 10.)
         l->fill_factor = fill_factor;
 }
 

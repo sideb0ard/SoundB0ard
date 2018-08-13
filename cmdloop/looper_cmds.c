@@ -67,6 +67,11 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         else
                             printf("idx should be a percent val\n");
                     }
+                    else if (strncmp("fill_factor", wurds[2], 11) == 0)
+                    {
+                        double ff = atof(wurds[3]);
+                        looper_set_fill_factor(g, ff);
+                    }
                     else if (strncmp("grain_spray_ms", wurds[2], 14) == 0)
                     {
                         int spray = atoi(wurds[3]);

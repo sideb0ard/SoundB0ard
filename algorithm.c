@@ -12,13 +12,17 @@
 extern mixer *mixr;
 
 const char *s_event_type[] = {"midi", "32nd", "16th", "8th", "4th", "bar"};
-const char *s_process_type[] = {"every", "over"};
-const char *s_var_select_type[] = {"rand", "osc", "step"};
+const char *s_process_type[] = {"every", "over", "for"};
+const char *s_var_select_type[] = {"rand", "osc", "step", "for"};
 const char *s_env_type[] = {"LIST", "STEP"};
 
 algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     algorithm *a = (algorithm *)calloc(1, sizeof(algorithm));
+
+    a->active = true;
+    a->process_step_counter = 0;
+    a->debug = false;
 
     if (!extract_cmds_from_line(a, num_wurds, wurds))
     {
@@ -27,10 +31,6 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
         return NULL;
     }
 
-    a->active = true;
-    a->process_step_counter = 0;
-    a->debug = false;
-
     return a;
 }
 
@@ -38,7 +38,7 @@ static void handle_command(algorithm *a)
 {
     if (((a->process_type == EVERY) &&
          (a->process_step_counter % a->process_step == 0)) ||
-        a->process_type == OVER)
+        a->process_type == OVER || a->process_type == FOR)
     {
         if (a->has_env)
         {
@@ -60,7 +60,8 @@ void algorithm_event_notify(void *self, unsigned int event_type)
         return;
 
     if (event_type == a->event_type ||
-        (event_type == TIME_MIDI_TICK && a->process_type == OVER))
+        (event_type == TIME_MIDI_TICK && a->process_type == OVER) ||
+        (event_type == TIME_SIXTEENTH_TICK && a->process_type == FOR))
         handle_command(a);
 }
 
@@ -122,21 +123,27 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
             REG_EXTENDED | REG_ICASE);
     if (regexec(&env_rgx, line, 4, env_match_group, 0) == 0)
     {
-        int var_select_type = VAR_STEP;
         a->has_env = true;
-        int var_select_len =
-            env_match_group[1].rm_eo - env_match_group[1].rm_so;
-        if (var_select_len != 0)
-        {
-            char var_select_type_string[var_select_len + 1];
-            var_select_type_string[var_select_len] = '\0';
-            strncpy(var_select_type_string, line + env_match_group[1].rm_so,
-                    var_select_len);
 
-            var_select_type = algorithm_get_var_select_type_from_string(
-                var_select_type_string);
+        if (a->process_type == FOR)
+            a->var_select_type = VAR_FOR;
+        else
+        {
+            int var_select_type = VAR_STEP;
+            int var_select_len =
+                env_match_group[1].rm_eo - env_match_group[1].rm_so;
+            if (var_select_len != 0)
+            {
+                char var_select_type_string[var_select_len + 1];
+                var_select_type_string[var_select_len] = '\0';
+                strncpy(var_select_type_string, line + env_match_group[1].rm_so,
+                        var_select_len);
+
+                var_select_type = algorithm_get_var_select_type_from_string(
+                    var_select_type_string);
+            }
+            algorithm_set_var_select_type(a, var_select_type);
         }
-        algorithm_set_var_select_type(a, var_select_type);
 
         int var_list_len = env_match_group[2].rm_eo - env_match_group[2].rm_so;
         char var_list[var_list_len + 1];
@@ -145,6 +152,13 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
 
         if (!algorithm_set_var_list(a, var_list))
             result = false;
+
+        if (a->process_type == FOR)
+        {
+            if (a->env.variable_list_len < 2)
+                return false;
+            a->counter = atoi(a->env.variable_list_vals[0]);
+        }
 
         int cmd_len = env_match_group[3].rm_eo - env_match_group[3].rm_so;
         if (cmd_len <= MAX_CMD_LEN)
@@ -201,55 +215,61 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
 
-    // for (int i = 0; i < num_wurds; i++)
-    //    printf("WURD:%s\n", wurds[i]);
-
     if (strncmp(wurds[0], "every", 5) == 0)
-    {
         a->process_type = EVERY;
-    }
     else if (strncmp(wurds[0], "over", 4) == 0)
-    {
         a->process_type = OVER;
-    }
+    else if (strncmp(wurds[0], "for", 3) == 0)
+        a->process_type = FOR;
     else
     {
         printf("Need a process type - 'every' or 'over'\n");
         return false;
     }
 
-    int step = atoi(wurds[1]);
-    if (step == 0)
+    if (a->process_type == FOR)
     {
-        printf("don't be daft, cannae dae 0 times.\n");
-        return false;
+        a->process_step = 1;
+        a->event_type = TIME_QUARTER_TICK;
     }
-    a->process_step = step;
-
-    a->event_type = algorithm_get_event_type_from_string(wurds[2]);
-
-    if (a->event_type == -1)
+    else
     {
-        printf("Need a time period\n");
-        return false;
+        int step = atoi(wurds[1]);
+        if (step == 0)
+        {
+            printf("don't be daft, cannae dae 0 times.\n");
+            return false;
+        }
+        a->process_step = step;
+
+        a->event_type = algorithm_get_event_type_from_string(wurds[2]);
+        if (a->event_type == -1)
+        {
+            printf("Need a time period\n");
+            return false;
+        }
     }
+
+    int rest_of_string_starting_position = 3; // for a OVER or EVERY cmd
+    if (a->process_type == FOR)
+        rest_of_string_starting_position = 1;
 
     char line[MAX_CMD_LEN];
     memset(line, 0, MAX_CMD_LEN);
 
     int len_of_cmd_string = 1; // keep space for null terminator
-    for (int i = 3; i < num_wurds; i++)
+    for (int i = rest_of_string_starting_position; i < num_wurds; i++)
         len_of_cmd_string += strlen(wurds[i]) + 1;
     if (len_of_cmd_string < MAX_CMD_LEN)
     {
-        for (int i = 3; i < num_wurds; i++)
+        for (int i = rest_of_string_starting_position; i < num_wurds; i++)
         {
             strcat(line, wurds[i]);
             if (i != (num_wurds - 1))
                 strcat(line, " ");
         }
     }
-    //printf("aCMD! %s\n", line);
+    // printf("aCMD! %s\n", line);
     if (!extract_and_validate_environment(a, line))
         return false;
 
@@ -274,6 +294,16 @@ void algorithm_replace_vars_in_cmd(algorithm *a)
         strncpy(replacement_value,
                 a->env.variable_list_vals[rand() % a->env.variable_list_len],
                 MAX_VAR_VAL_LEN - 1);
+    }
+    else if (a->var_select_type == VAR_FOR)
+    {
+        char tmpval[MAX_VAR_VAL_LEN] = {};
+        itoa(a->counter, tmpval);
+        strncpy(replacement_value, tmpval, MAX_VAR_VAL_LEN - 1);
+        int end = atoi(a->env.variable_list_vals[1]);
+        (a->counter)++;
+        if (a->counter > end)
+            a->active = false;
     }
     else if (a->var_select_type == VAR_OSC)
     {

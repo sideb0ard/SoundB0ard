@@ -87,6 +87,9 @@ void interpret(char *line)
                  strncmp("exit", wurds[0], 4) == 0)
             exxit();
 
+        else if (strncmp("print", wurds[0], 5) == 0)
+            printf("%s\n", wurds[1]);
+
         else if (parse_mixer_cmd(num_wurds, wurds))
             continue;
 

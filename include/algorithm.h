@@ -27,6 +27,7 @@ enum
     VAR_RAND,
     VAR_OSC,
     VAR_STEP,
+    VAR_FOR,
     MAX_VAR_SELECT_TYPES,
 };
 
@@ -47,6 +48,7 @@ enum
 {
     EVERY,
     OVER,
+    FOR,
     MAX_ALGO_PROCESS_TYPE,
 };
 
@@ -57,6 +59,8 @@ typedef struct algorithm
     unsigned int process_type; // EVERY, OVER * OVER only makes sense with OSC
     unsigned int process_step;
     unsigned int process_step_counter;
+
+    unsigned int counter; // currently just used for FOR increments
     unsigned int var_select_type; // RAND, OSC or STEP
 
     bool has_env;
