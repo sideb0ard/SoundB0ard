@@ -39,7 +39,6 @@ new loop loops/whydyahavetomakearecordboutme.aiff 2; fuckup 6; start 5
 
 key ab
 
-stop 5
 new loop loops/raveLooprr.aiff 2; down 0; start 5
 
 
@@ -51,8 +50,7 @@ fuckup 7; down 0
 loop 7 pitch 2; stop 5
 start 5; loop 7 pitch 1
 
-stop 5 // synth + raveLooprr
-new step claps/technotron.aiff [~ cp]*2; new euclid
+stop 5; new step claps/technotron.aiff [~ cp]*2; new euclid
 step 8 gen src 3; step 8 gen every 8; start 5
 
 new step kicks/avalinoKickVoc.aiff b*2; vol 9 0.6
@@ -75,9 +73,11 @@ new loop dloops/acidSquelchBeat.aiff 2; down 1; fuckup 12
 new dx
 dx 13 load quazzz; dx 13 note_mode 1; dx 13 midi_note_1 3
 new bitshift (t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1
-every 2 bar gen once 4 13:0; every 7 bar gen riff 4 13:0
 
 down 11;
+
+every 2 bar gen once 4 13:0; every 7 bar gen riff 4 13:0
+
 
 new markov 2
 new step hats/dmx_hh_cl.aif ; new step hats/hh8.aif; every 3 bar invert 5 14:0 15:0
@@ -91,12 +91,15 @@ new markov 4
 new step snrs/slaveSnare.aiff [~ s]*2
 step 16 gen src 6; step 16 gen every 2
 
-new dloop dloops/rabveBreaskB.aiff; fuckup 17; down 10
+
+down 10
+
+new dloop dloops/rabveBreaskB.aiff; fuckup 17;
 
 
 down 12
 
-dx 13 octave 0; every 4 bar "up down" dx 13 %s
+### dx 13 octave 0; every 4 bar "up down" dx 13 %s
 
 
 moog 2 load sharpie; start 2; up 2
@@ -105,14 +108,14 @@ moog 2 load sharpie; start 2; up 2
 
 new dloop dloops/hausBreakBeat.aiff ; fuckup 18; vol 18 1
 
-new step kicks/808Kkick.wav b*4 ; down 17
+new step kicks/808Kkick.wav b*4 ; down 17; down 13
 
 
 <enjoy>
 
 new markov
 step 19 gen src 7; step 19 gen every 1
-
+dx 13 up
 dx 13 arp_speed 4; dx 13 arp 1; every 2 bar "4 8" dx 13 arp_speed %s
 
 stop 18; stop 19
@@ -129,15 +132,12 @@ every 7 bar blend 1 2:0 13:0
 dx 13 load murhh; start 13; up 13
 
 
-
-
-
 key F
 
-
-algo 30 off; algo 23 off; algo 24 off
-
 new loop loops/ohmdrum.aiff; highpass 22; every 2 bar rand "1 0.5" loop 22 len %s
+
+
+stop 18; stop 21
 
 stop 19
 step 19:0 b*4
@@ -147,12 +147,12 @@ down 18
 
 down 22
 
-stop 19
+stop 19;
 
 start 19; step 19 gen every 1; up 14
 down 23; stop 2
 
-new loop dloops/jbsscratchbeat.aiff; fuckup 24; stop 21; sidechain 24 19; vol 24 1
+new loop dloops/jbsscratchbeat.aiff; fuckup 24; sidechain 24 19; vol 24 1
 
 stop 19; stop 14
 
@@ -168,15 +168,17 @@ stop 19
 new bitshift t%(t>>10&t)
 every 2 bar gen melody 8 13:0
 every 3 bar gen riff 0 13:0
+algo 30 off; algo 23 off; algo 24 off; algo 33 off
+
 
 key f
 dx 13 load grimeyLOUD
-dx 13 arp 1
 dx 13 down; dx 13 down; dx 0 octave -1
+up 13 ; dx 13 arp 1
 
 bpm 110
 
-new dloop dloops/dizzeebeat1barloop.aiff; sidechain 28 19; start 19; start 13
+new dloop dloops/dizzeebeat1barloop.aiff; sidechain 27 19; start 19;
 
 
 stop all; start 13; start 19; start 15; start 20; up 15; start 26; start 25
@@ -184,30 +186,44 @@ stop all; start 13; start 19; start 15; start 20; up 15; start 26; start 25
 stop all; start 13; start 25; start 26
 
 new markov 5
-algo 39 cmd gen melody 9 13:0 ; 
-dx 13 load muffin ; dx 13 arp 0; dx 13 up; dx 13 up ; dx 13 up
-dx 13 sustain_note_ms 300
-every 2 bar gen riff 9 13:0
+algo 40 cmd gen melody 9 13:0 ;  algo 41 step 7; dx 13 arp 0
 
-new loop loops/xennakisGlitch.aiff len 2; every 4 bar "0.5 1 2" loop 28 pitch %s
+new loop loops/xennakisGlitch.aiff len 2; every 4 bar "0.5 1 2" loop 28 pitch %s;
 
 
-new step kicks/technotronBD.aiff; step 29 gen src 9; step 29 gen every 1;
+new step kicks/technotronBD.aiff; step 29 gen src 9; step 29 gen every 1; filter 29 3000
 fx 25:0 extsource 29; sidechain 28 29
 
 new markov 6
 new step snrs/AbraSnare.aiff
 step 30 gen src 10; step 30 gen every 1
 
+down 26
+
 new loop loops/stringpercloopONNabit.aiff; every 4 bar "0.5 1" loop 31 pitch %s
 
 new step perc/hes23cow.aif; step 32 gen src 2; step 32 gen every 3
+
 
 stop 29; loop 31 mode 2
 
 start 29; loop 31 mode 0
 
-new dloop dloops/raveBreakbeat.aiff 2
+new dloop dloops/raveBreakbeat.aiff 2; 
+
+stop 32; stop 30; down 25
+
+down 31
+
+bpm 30
+play skrslazrs//SHØCK01.wav
+
+
+
+
+
+###################
+
 new loop loops/houseintro.aiff 4 ; sidechain 34 29
 
 
@@ -218,293 +234,8 @@ fuckup 33; fuckup 34
 
 new loop dloops/shabbaVocal8bar.aif 8; fuckup 33
 
-bpm 30
-play skrslazrs//SHØCK01.wav
-
-
 
 
 
 
 ##################################################
-
-new loop loops/HARDCOREmelody.aiff 2; loop 35 grain_dur_ms 200; down 13
-new loop dloops/whistleRaveBongos.aiff 2
-
-new dloop dloops/jazzyJeffMono4bar.aif 4
-
-
-dloops/raggaTwinsPercy2Better.aiff
-every 3 16th rand "1 3 7 12 3" loop 13 len %s
-
-snrs/giggleSnapSnare.aiff
-
-loops/glitchBitloopo.aif
-
-new dloop dloops/acidrockwow.aiff 0.5 ; fuckup 29
-
-
-markov hats_mask
-
-new step rims/5manrim.aiff [~ r]*2
-noises/2stepSTAB.aiff
-
-
-stop all; start 39; start 13; start 28
-
-
-
-
-
-#####   every 7 16th rand "100 200 700 1200" dx 13 sustain_note_ms %s
-#####   dx 13 load perzic; sidechain 13 19
-
-
-moog 2 load flexxy0c; start 2; stop 28
-
-stop 19
-
-
-up 15; start 15
-
-
-
-new dloop loops/raveStabsCmon.aiff 2; start 19
-
-
-down 13
-new dloop loops/cheesyQUaverStabs.aiff 4; loop 31 grain_dur_ms 70
-filter 31; sweep 31:0
-
-
-
-////////////////////////////////////////////////
-
-
-down 14; down 15
-
-
-
-
-
-
-dloops/shabbaVocal8bar.aif
-dloops/shabbadubloop8bar.aif
-
-key C
-dloops/bombdabss1bar.aiff
-
-
-key A
-new loop loops/HARDCOREmelody.aiff 2
-
-
-/// CHECKOUT
-key A
-new loop loops/cracklTechnoBass.aiff; env 0 1
-every 4 bar rand "3 4 2 1.5" fx 0:0 len_bars %s
-bitcrush 0
-every 1 bar rand "4 6 8 12 16" fx 0:1 bitdepth %s
-delay 0 13
-over 7 bar osc "2 71" fx 0:2 fb %s
-every 4 bar rand "30 60 90 110 160 313" fx 0:2 delayms %s
-fuckup 0
-
-//////////////////////////////////////////////////////////////////
-
-claps/technotron.aiff
-
-key B
-loops/houseintro.aiff 4
-
-
-loops/queasyStabs.aiff 2
-^ bitcrush
-
-loops/generationBASS.aiff 2
-
-down all other drums - garageDrums, peshay, acidrockwow
-
-new digi notes/garageBREATH.aiff
-midi_note_1 34 // Bb
-note_mode
-every 2 bar digi 3 gen 0
-every 2 bar "down down down up up up" digi 3 %s
-
-
-stop all; start loops/generationBASS.aiff and loops/gottahavHausePiano.aiff
-loops/foundLoveHatzLoop.aiff
-loops/foundLoveLoop2Bar.aiff
-
-loops/acidSquelchBass.aiff
-loops/getnasty.aiff // pitch 1.2
-
-
-dloops/pierrehouse.aiff
-dloops/keeponDancingDiscoLoop.aiff
-over 3 bar osc "5 10" moog 26 l1rate %s
-
-
-kicks/tuffKick.aiff
-perc/DR660Clave.aif
-
-loops/cheesyQUaverStabs.aiff // filter over 8 bar osc "180 18000" fx X %s
-
-new step hats/acidHat2.aiff h*16 // filter over 7 bar osc "180 18000"
-
-dloops/krushSnareRoll.aiff
-
-
-down loops/cheesyQUaverStabs.aiff
-
-
-end 
-voices/dropthebass.aiff /// stop all ; start 
-bpm 40
-
-/////////////////////////////////
-
-
-key Ab
-drones/moodIIswing.aiff
-
-perc/DR660CR78woodblock.aif
-
-key Gb
-drones/idmMelodyBit.aiff 4 // HPF4
-snrs/giggleSnapSnare.aiff
-step 6:0 ~ ~ ~ [~ s]
-step 6:1 ~ s ~ [~ s*3]
-gen euclid
-
-every 2 bar gen once t / ( ( t % ( t >> 13 & t ) ) )
-over 8 bar osc "20 1200" dx 0 sustain_note_ms %s
-every 1 bar rand "1 2 3 1 1 " dx 0 octave %s
-
-
-key G
-loops/scifipartmelody.aif // pitch 2
-dloops/timbaland2bar.aiff len 2
-distort osc
-
-
-
-new bitshift (t & (t>>15+(t>>8&t)))*t
-
-new loop dloops/hipHouseBreakbeat.aiff 2
-new step perc/chezShaker.aiff
-markov 3
-new digi noises/2stepSTAB.aiff // octave -1
-^ every 2 bar gen markov 3
-
-dloops/sayAprayer2Bar.aiff
-
-
-^ gen from bitsh
-delay 5man 23
-over 10 bar osc "2 66" fx 11:0 fb %s
-
-
-
-perc /.//
-perc/cracklPerc.aiff
-perc/DR660Clave.aif
-perc/DR660Laser.aif
-perc/CrackleDonnaBreath.aiff
-perc/DR660808Cowbell.aif
-perc/2shaker.aif
-perc/2stepPERC.aiff
-perc/mawperc.aiff
-perc/cracklPERC2.aiff
-perc/cracklPerc.aiff
-rims/hes23rim1.aif
-rims/timbaRim.aiff
-rims/nord808_rs.aif
-
-hats/chezHat.aiff
-hats/timbaHat1.aiff
-hats/ralphiHatz2.aiff
-hats/acidHat2.aiff
-notes/FoolishBackGRan.aiff
-notes/FoolishGPitch.aiff
-
-notes/pierre.aiff // pitch 2
-notes/technoNoteDouble.aiff
-
-notes/garageyChord.aiff
-every 2 bar gen riff 0 18:0
-
-toms/DR660808CongaMid.aif
-loops/risingAcidLine.aiff 8
-loops/noiZeCrackle.aiff
-
-key c
-strings/elbtimeout.aiff
-
-key Eb
-loops/takemeback.aiff
-key B
-noises/SBwooshIDM.aiff
-
-new step synth
-step X load tac
-over 8 bar osc "180 300" step 0 e2_dec %s
-over 7 bar osc "180 17000" fx 22:0 freq %s
-over 3 bar osc "1 8" step 0 q %s
-
-new step synth
-step X load bassthud
-^ generate src markov
-
-
-dx load algo4 //  bitshift ((t/4)>>t/4)|(t>>2) // octave -1 and 0
-every 2 bar rand "0 1 2 3 4 5 6" dx 1 algo %s
-every 1 bar "40 60 70 100 200 400"  dx 1 sustain_note_ms %s
-
-key D
-^ lots of envelopes, and bitcrush random
-hats/angelHat.aiff
-
-
-
-
-
-
-digi notes/mood2SwingNoteGlitch.aiff
-bassthud
-
-
-key Gb
-dloops/slowcoreBss4bar.aif
-
-
-
-new loop loops/SlamLidellAcciiiid.aiff 2; fuckup 16
-
-down 11
-
-
-key Gb / F#
-new loop loops/FingersFadeBassStrings.aiff
-
-up volume 17
-waveshape 17 2
-down 12
-down 13
-
-fuckup 17
-
-new loop loops/glitchBitloopo.aif 0.5; down 14; down 15
-every 1 bar rand "1 0.5" loop 18 len %s
-
-moog 2 load grittt
-start 2
-
-dx 19 load murhh
-every 2 bar gen melody 0 19:0
-
-////////////\\\\\\\\\\\\\\\\\\\\\\///////////////////
-
-dloops/reesepiece.aif 4
-dloops/90sboombap2Bar.aif
-dloops/hiphousenasty1brroll.aiff; stop 5
