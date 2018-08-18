@@ -10,7 +10,7 @@
 
 extern mixer *mixr;
 static char *s_markov_types[] = {"GARAGE", "HIPHOP", "HATS", "HATS_MASK",
-                                 "CLAPS"};
+                                 "CLAPS", "RAGGA_KICK", "RAGGA_SNARE"};
 
 #define BEAT0 32768
 #define BEAT1 16384
@@ -141,7 +141,7 @@ uint16_t markov_generate(void *self, void *data)
                 pattern |= 1 << (15 - i);
         break;
     case (CLAPS):
-        if (rand_percent() > 10)
+        if (rand_percent() > 90)
         {
             int num_hits = rand() % 7;
             // pattern = create_euclidean_rhythm(num_hits, 16);
@@ -158,6 +158,39 @@ uint16_t markov_generate(void *self, void *data)
             if (rand_percent() > 10)
                 pattern |= BEAT12;
         }
+        break;
+    case (RAGGA_BEAT):
+        first = rand_percent();
+        if (first > 10)
+            pattern |= BEAT0;
+        if (first > 20)
+            pattern |= BEAT3;
+        if (first >= 90)
+            pattern |= BEAT2;
+
+        second = rand_percent();
+        if (second > 90)
+            pattern |= BEAT7;
+
+        third = rand_percent();
+        if (third > 10)
+            pattern |= BEAT8;
+        if (third > 20)
+            pattern |= BEAT11;
+
+        fourth = rand_percent();
+        if (third > 80)
+            pattern |= BEAT13;
+        if (third >= 90)
+            pattern |= BEAT15;
+        break;
+
+    case (RAGGA_SNARE):
+        first = rand_percent();
+        if (first > 10)
+            pattern |= BEAT6;
+        if (first > 20)
+            pattern |= BEAT14;
         break;
     }
     if (pattern == 0)

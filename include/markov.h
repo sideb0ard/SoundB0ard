@@ -10,6 +10,8 @@ enum
     HATS,
     HATS_MASK,
     CLAPS,
+    RAGGA_BEAT,
+    RAGGA_SNARE,
     NUM_MARKOV_STYLES
 };
 
