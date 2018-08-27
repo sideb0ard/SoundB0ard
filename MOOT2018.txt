@@ -25,20 +25,22 @@ new dloop dloops/rabveBreaskB.aiff; fuckup 5; start 0; stop 1; stop 2; stop 4
 stop 0; start 4
 
 stop 5
+
 stop 4; stop 3; start 0; start 5
 
 bitcrush 5
-every 1 bar "4 6 8 16" fx 5:0 bitdepth %s
-start 1
+every 1 bar "4 6 8 16" fx 5:0 bitdepth %s; start 1
 every 3 bar rand "1 1.5 1.2" loop 5 pitch %s
 
 
-new loop loops/whydyahavetomakearecordboutme.aiff 2; fuckup 6; start 5
 
 
 key ab
 
+new loop loops/whydyahavetomakearecordboutme.aiff 2; fuckup 6;
+
 stop 5
+
 new loop loops/raveLooprr.aiff 2; down 0; start 5
 
 
@@ -68,6 +70,10 @@ fuckup 11; fuckup 10
 
 key Bb
 new loop dloops/acidSquelchBeat.aiff 2; down 1; fuckup 12
+vol 12 0.8
+vol 12 0.9
+
+env 10 4
 
 
 
@@ -111,6 +117,8 @@ new step kicks/808Kkick.wav b*4 ; down 17; down 13
 
 new markov
 step 19 gen src 7; step 19 gen every 1
+
+
 up 13
 dx 13 arp_speed 4; dx 13 arp 1; every 2 bar "4 8" dx 13 arp_speed %s
 stop 18; stop 19
@@ -124,24 +132,24 @@ down 14; down 15; down 13
 every 7 bar blend 1 2:0 13:0
 dx 13 load murhh; start 13; up 13
 
+stop 19; stop 21; stop 18
 
 key F
 new loop loops/ohmdrum.aiff; highpass 22; every 2 bar rand "1 0.5" loop 22 len %s
 
 
-stop 18; stop 21
-
-stop 19; step 19:0 b*4
+step 19:0 b*4
 
 step 19 gen every 4; new loop loops/dowhiley1Bar.aif; sidechain 23 19; start 19
 
-down 18
+
+
 
 down 22
 
-stop 19;
+stop 19; fuckup 23
 
-start 19; step 19 gen every 1; up 14
+start 19; step 19 gen every 1; up 14;
 
 
 down 23; stop 2
@@ -150,9 +158,9 @@ new loop dloops/jbsscratchbeat.aiff; fuckup 24; sidechain 24 19; vol 24 1
 
 stop 19; stop 14
 
-new loop loops/rainforrest.aiff 4; sidechain 25 19; start 19
+new loop loops/rainforrest.aiff 4; sidechain 25 19; start 19; stop 13
 
-new loop loops/toddterrybass1bar.aiff; highpass 26; fuckup 26; stop 19; stop 13
+new loop loops/toddterrybass1bar.aiff; highpass 26; fuckup 26; stop 19;
 
 
 new bitshift t%(t>>10&t)
@@ -160,7 +168,6 @@ every 2 bar gen melody 8 13:0; every 3 bar gen riff 0 13:0
 algo 30 off; algo 23 off; algo 24 off; algo 33 off
 
 
-key f
 dx 13 load grimeyLOUD
 dx 13 down; dx 13 down; dx 0 octave -1
 start 13 ; up 13 ; dx 13 arp 1
@@ -195,12 +202,12 @@ step 30 gen src 10; step 30 gen every 1
 
 
 new loop loops/stringpercloopONNabit.aiff; every 4 bar "0.5 1" loop 31 pitch %s
-
 new step perc/hes23cow.aif; step 32 gen src 2; step 32 gen every 3
 
 
 stop 29; loop 31 mode 2
 
+down 25
 start 29; loop 31 mode 0; new dloop dloops/raveBreakbeat.aiff 2; fuckup 33
 
 
@@ -216,7 +223,18 @@ stop 32; stop 30; down 25; fuckup 34; down 33
 down 13
 down 34
 
-new loop dloops/SNSstutter2.aiff ; ws 35 3
+new loop dloops/SNSstutter2.aiff ; ws 36 3; fuckup 36
+
+bpm 160
+algo 41 off; algo 42 off; algo 39 off
+kicks/2stepKICK2.aiff // garage (7)
+dx rSQer // ragga kick
+midi_note_1:12; note_mode:1
+every 4 bar gen melody 10 13:0 // ragga snare
+
+dx 13 arp 1
+
+
 new loop dloops/shabbaVocal8bar.aif 8; fuckup 36
 
 
@@ -246,8 +264,6 @@ fuckup 33; fuckup 34
 noises/crnchHar.aiff
 
 
-dx rSQer // ragga kick
-midi_note_1:12; note_mode:1
 
 strings/moWaxStringsExcursionsz.aiff
 

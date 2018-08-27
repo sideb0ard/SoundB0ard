@@ -443,24 +443,26 @@ void looper_status(void *self, wchar_t *status_string)
         "len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
         "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
-        "grain_dur_ms:%d grains_per_sec:%d density_dur_sync:%d "
+        "grain_dur_ms:" "%s" "%d" "%s "
+        "grains_per_sec:" "%s" "%d" "%s "
+        "density_dur_sync:%d "
         "quasi_grain_fudge:%d\n"
         "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
 
-        "[Grain Pitch LFO]\n"
+        "[" "%s" "Grain Pitch LFO" "%s" "]\n"
         "gp_on:%d gp_type:%d gp_amp:%.2f gp_rate:%.2f gp_lo:%.2f gp_hi:%.2f\n"
 
-        "[Grain Duration LFO]\n"
+        "[" "%s" "Grain Duration LFO" "%s" "]\n"
         "gd_on:%d gd_type:%d gd_amp:%.2f gd_rate:%.2f gd_lo:%.2f gd_hi:%.2f\n"
 
-        "[Grains Per Sec LFO]\n"
+        "[" "%s" "Grains Per Sec LFO" "%s" "]\n"
         "gps_on:%d gps_type:%d gps_amp:%.2f gps_rate:%.2f gps_lo:%.2f "
         "gps_hi:%.2f\n"
 
-        "[Grain Scan LFO]\n"
+        "[" "%s" "Grain Scan LFO" "%s" "]\n"
         "gs_on:%d gs_type:%d gs_amp:%.2f gs_rate:%.2f gs_lo:%.2f gs_hi:%.2f\n"
 
-        "[Envelope Generator]\n"
+        "[" "%s" "Envelope Generator" "%s" "]\n"
         "eg_attack_ms:%.2f sustain_ms:%d eg_release_ms:%.2f eg_state:%d",
 
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
@@ -471,24 +473,31 @@ void looper_status(void *self, wchar_t *status_string)
         g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
         g->m_seq.generate_mode, g->external_source_sg,
 
-        g->grain_duration_ms, g->grains_per_sec, g->density_duration_sync,
+        ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
+        ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,
+        g->density_duration_sync,
         g->quasi_grain_fudge, g->fill_factor, g->granular_spray_frames / 44.1,
         g->selection_mode, s_env_names[g->envelope_mode],
 
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
         g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
         g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
         g->m_lfo4_max,
 
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
         g->graindur_lfo_on, g->m_lfo1.osc.m_waveform, g->m_lfo1.osc.m_amplitude,
         g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min, g->m_lfo1_max,
 
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
         g->grainps_lfo_on, g->m_lfo2.osc.m_waveform, g->m_lfo2.osc.m_amplitude,
         g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min, g->m_lfo2_max,
 
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
         g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
         g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
         g->m_lfo3_max,
 
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
         g->m_eg1.m_attack_time_msec, g->sustain_ms,
         g->m_eg1.m_release_time_msec, g->m_eg1.m_state);
 

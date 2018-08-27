@@ -1073,12 +1073,14 @@ void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num)
         switch (prog_num)
         {
         case (0):
+            mixr->progression_type = 0;
             mixr->prog_len = 3;
             mixr->prog_degrees[0] = 0; // I
             mixr->prog_degrees[1] = 3; // IV
             mixr->prog_degrees[2] = 4; // V
             break;
         case (1):
+            mixr->progression_type = 1;
             mixr->prog_len = 4;
             mixr->prog_degrees[0] = 0; // I
             mixr->prog_degrees[1] = 4; // IV

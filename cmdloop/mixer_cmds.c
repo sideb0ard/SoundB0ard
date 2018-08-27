@@ -127,6 +127,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("prog", wurds[0], 4) == 0)
     {
+        printf("PROG!\n");
         int prog_num = atoi(wurds[1]);
         mixer_set_chord_progression(mixr, prog_num);
     }
