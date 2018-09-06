@@ -1,4 +1,4 @@
-A7LGO1
+7LGO1
 
 new loop loops/JungleBassNeedleWobble.aiff
 fuckup 0
@@ -8,7 +8,6 @@ new bitshift ((t/4)>>t/4)|(t>>2)
 new step notes/2stepbass.aiff; step 1 gen src 0; step 1 gen every 3
 
 new bitshift ((t/1000)^(t/1001))*t
-
 new moog; moog 2 load drexy; moog 2 note_mode 1
 every 2 bar moog 2 genonce 0; every 5 bar gen riff 0 2:0; ws 2
 
@@ -26,14 +25,11 @@ stop 0; start 4
 
 stop 5
 
-stop 4; stop 3; start 0; start 5
+stop 4; stop 3; start 0; start 5; start 1
 
 bitcrush 5
-every 1 bar "4 6 8 16" fx 5:0 bitdepth %s; start 1
+every 1 bar "4 6 8 16" fx 5:0 bitdepth %s;
 every 3 bar rand "1 1.5 1.2" loop 5 pitch %s
-
-
-
 
 key ab
 
@@ -41,24 +37,23 @@ new loop loops/whydyahavetomakearecordboutme.aiff 2; fuckup 6;
 
 stop 5
 
-new loop loops/raveLooprr.aiff 2; down 0; start 5
-
-
-down 6
+new loop loops/raveLooprr.aiff 2; down 0; start 5 ; down 6
 
 moog 2 load ven0m ; start 2
 fuckup 7; down 0
 
 loop 7 pitch 2; stop 5
+
 start 5; loop 7 pitch 1
 
 stop 5;
+
 new step claps/technotron.aiff [~ cp]*2; new euclid
 step 8 gen src 3; step 8 gen every 8; start 5
 
 new step kicks/avalinoKickVoc.aiff b*2; vol 9 0.6
 
-step 9:0 b*4; new dloop dloops/mkLikeloop.aiff;  sidechain 10 9; fuckup 9; down 5
+step 9:0 b*4; new dloop dloops/mkLikeloop.aiff;  sidechain 10 9; fuckup 10; down 5
 
 stop 2; stop 8; stop 9
 
@@ -69,13 +64,9 @@ new loop loops/pumpUpDaJAM.aiff 4
 fuckup 11; fuckup 10
 
 key Bb
-new loop dloops/acidSquelchBeat.aiff 2; down 1; fuckup 12
-vol 12 0.8
-vol 12 0.9
+new loop dloops/acidSquelchBeat.aiff 2; down 1; fuckup 12; vol 12 0.9
 
-env 10 4
-
-
+down 10
 
 new dx
 dx 13 load quazzz; dx 13 note_mode 1; dx 13 midi_note_1 3
@@ -98,10 +89,8 @@ new step snrs/slaveSnare.aiff [~ s]*2
 step 16 gen src 6; step 16 gen every 2
 
 
-down 10
 
 new dloop dloops/rabveBreaskB.aiff; fuckup 17;
-
 
 down 12
 
@@ -110,35 +99,40 @@ moog 2 load sharpie; start 2; up 2
 
 new dloop dloops/hausBreakBeat.aiff ; fuckup 18; vol 18 1
 
-new step kicks/808Kkick.wav b*4 ; down 17; down 13
+new step kicks/808Kkick.wav b*4 ; down 13
 
 
 <enjoy>
+
+down 17
+
 
 new markov
 step 19 gen src 7; step 19 gen every 1
 
 
-up 13
 dx 13 arp_speed 4; dx 13 arp 1; every 2 bar "4 8" dx 13 arp_speed %s
+up 13
 stop 18; stop 19
 
 new step claps/djkhaledClap.aiff [~ cp]*2; vol 20 0.6
 
-new loop dloops/NeedleClickBeat.aiff 0.5; start 18; start 19; 
+step 20 gen src 6; step 20 gen every 1
+
+new loop dloops/NeedleClickBeat.aiff 0.5; start 18; start 19;
 
 down 14; down 15; down 13
 
 every 7 bar blend 1 2:0 13:0
 dx 13 load murhh; start 13; up 13
 
-stop 19; stop 21; stop 18
+stop 19; stop 18
+
 
 key F
 new loop loops/ohmdrum.aiff; highpass 22; every 2 bar rand "1 0.5" loop 22 len %s
 
-
-step 19:0 b*4
+down 21 ; step 19:0 b*4
 
 step 19 gen every 4; new loop loops/dowhiley1Bar.aif; sidechain 23 19; start 19
 
@@ -151,16 +145,21 @@ stop 19; fuckup 23
 
 start 19; step 19 gen every 1; up 14;
 
+stop 2
 
-down 23; stop 2
+down 23
 
 new loop dloops/jbsscratchbeat.aiff; fuckup 24; sidechain 24 19; vol 24 1
 
-stop 19; stop 14
+stop 14
+
+stop 19
 
 new loop loops/rainforrest.aiff 4; sidechain 25 19; start 19; stop 13
 
-new loop loops/toddterrybass1bar.aiff; highpass 26; fuckup 26; stop 19;
+stop 19
+
+new loop loops/toddterrybass1bar.aiff; highpass 26; fuckup 26
 
 
 new bitshift t%(t>>10&t)
@@ -170,11 +169,12 @@ algo 30 off; algo 23 off; algo 24 off; algo 33 off
 
 dx 13 load grimeyLOUD
 dx 13 down; dx 13 down; dx 0 octave -1
-start 13 ; up 13 ; dx 13 arp 1
+start 13 ; up 13 ; dx 13 arp 1 ; bpm 110
 
-bpm 110
 
 new dloop dloops/dizzeebeat1barloop.aiff; sidechain 27 19; start 19;
+
+vol 15 1
 
 
 stop all; start 13; start 19; start 15; start 20; up 15; start 26; start 25
@@ -185,6 +185,7 @@ start 27
 stop 13
 
 stop all; start 13; start 25; start 26
+
 
 down 26
 
@@ -207,23 +208,45 @@ new step perc/hes23cow.aif; step 32 gen src 2; step 32 gen every 3
 
 stop 29; loop 31 mode 2
 
+
+loop 31 mode 0
+
 down 25
+
 start 29; loop 31 mode 0; new dloop dloops/raveBreakbeat.aiff 2; fuckup 33
-
-
-down 31
 dx 13 load rSQer; dx 13 midi_note_1 12; dx 13 note_mode 1
 
+stop 29
 
-stop 29; stop 30
+down 31
+
 
 new dloop dloops/whistleRaveBongos.aiff 2;
-stop 32; stop 30; down 25; fuckup 34; down 33
+
+// new dloop dloops/sayAprayer2Bar.aiff 2
+// new loop dloops/krushSnareRoll.aiff
+// dloops/keeponDancingDiscoLoop.aiff
+// new dloop dloops/raggaTwinsPercy2Better.aiff
+
+new loop loops/SlamLidellAcciiiid.aiff 2
+
+stop 32; stop 30; fuckup 34; down 33
 
 down 13
+
 down 34
 
 new loop dloops/SNSstutter2.aiff ; ws 36 3; fuckup 36
+
+//  new loop dloops/shabbadubloop8bar.aif 8; fuckup 37
+
+
+bpm 80
+bpm 50
+bpm 30
+play skrslazrs//SHØCK01.wav
+
+=============================
 
 bpm 160
 algo 41 off; algo 42 off; algo 39 off
@@ -235,13 +258,8 @@ every 4 bar gen melody 10 13:0 // ragga snare
 dx 13 arp 1
 
 
-new loop dloops/shabbaVocal8bar.aif 8; fuckup 36
 
 
-bpm 80
-bpm 50
-bpm 30
-play skrslazrs//SHØCK01.wav
 
 
 
