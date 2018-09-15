@@ -49,6 +49,7 @@ start 5; loop 7 pitch 1
 stop 5;
 
 new step claps/technotron.aiff [~ cp]*2; new euclid
+
 step 8 gen src 3; step 8 gen every 8; start 5
 
 new step kicks/avalinoKickVoc.aiff b*2; vol 9 0.6

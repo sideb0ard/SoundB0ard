@@ -24,7 +24,7 @@ looper *new_looper(char *filename)
 
     g->audio_buffer_read_idx = 0;
     g->granular_spray_frames = 441; // 10ms * (44100/1000)
-    g->grain_attack_time_pct = 2;
+    g->grain_attack_time_pct = 5;
     g->grain_release_time_pct = 5;
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
@@ -178,8 +178,8 @@ void looper_event_notify(void *self, unsigned int event_type)
             int pulses_per_loop = PPBAR * g->loop_len;
 
             double rel_pos = mixr->timing_info.midi_tick % pulses_per_loop;
-            rel_pos = 100. / pulses_per_loop * rel_pos;
-            double new_read_idx = g->audio_buffer_len / 100. * rel_pos;
+            double decimal_percent_of_loop = rel_pos / pulses_per_loop;
+            double new_read_idx = decimal_percent_of_loop * g->audio_buffer_len;
 
             if (g->reverse_mode)
                 new_read_idx = (g->audio_buffer_len - 1) - new_read_idx;
@@ -438,6 +438,7 @@ void looper_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
+        // clang-format off
         "source:%s %s vol:%.2lf pitch:%.2f stereo:%d\n"
         "mode:%s gate_mode:%d idx:%.0f buf_len:%d\n"
         "len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
@@ -464,6 +465,7 @@ void looper_status(void *self, wchar_t *status_string)
 
         "[" "%s" "Envelope Generator" "%s" "]\n"
         "eg_attack_ms:%.2f sustain_ms:%d eg_release_ms:%.2f eg_state:%d",
+        // clang-format on
 
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
         g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
@@ -475,31 +477,28 @@ void looper_status(void *self, wchar_t *status_string)
 
         ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
         ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,
-        g->density_duration_sync,
-        g->quasi_grain_fudge, g->fill_factor, g->granular_spray_frames / 44.1,
-        g->selection_mode, s_env_names[g->envelope_mode],
+        g->density_duration_sync, g->quasi_grain_fudge, g->fill_factor,
+        g->granular_spray_frames / 44.1, g->selection_mode,
+        s_env_names[g->envelope_mode],
 
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
-        g->grainpitch_lfo_on, g->m_lfo4.osc.m_waveform,
-        g->m_lfo4.osc.m_amplitude, g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min,
-        g->m_lfo4_max,
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->grainpitch_lfo_on,
+        g->m_lfo4.osc.m_waveform, g->m_lfo4.osc.m_amplitude,
+        g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min, g->m_lfo4_max,
 
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
-        g->graindur_lfo_on, g->m_lfo1.osc.m_waveform, g->m_lfo1.osc.m_amplitude,
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->graindur_lfo_on,
+        g->m_lfo1.osc.m_waveform, g->m_lfo1.osc.m_amplitude,
         g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min, g->m_lfo1_max,
 
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
-        g->grainps_lfo_on, g->m_lfo2.osc.m_waveform, g->m_lfo2.osc.m_amplitude,
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->grainps_lfo_on,
+        g->m_lfo2.osc.m_waveform, g->m_lfo2.osc.m_amplitude,
         g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min, g->m_lfo2_max,
 
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
-        g->grainscanfile_lfo_on, g->m_lfo3.osc.m_waveform,
-        g->m_lfo3.osc.m_amplitude, g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min,
-        g->m_lfo3_max,
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->grainscanfile_lfo_on,
+        g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
+        g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max,
 
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR,
-        g->m_eg1.m_attack_time_msec, g->sustain_ms,
-        g->m_eg1.m_release_time_msec, g->m_eg1.m_state);
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->m_eg1.m_attack_time_msec,
+        g->sustain_ms, g->m_eg1.m_release_time_msec, g->m_eg1.m_state);
 
     wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
     step_status(&g->m_seq, local_status_string);
@@ -659,12 +658,12 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
 {
-    double amp = 0;
-    int idx = g->audiobuffer_cur_pos;
-    int len = g->grain_len_frames;
-    double percent_pos = 0;
-    int relative_position = 0;
-    double a = 0.5;
+    double amp = 1;
+    double relative_position =
+        g->audiobuffer_cur_pos - g->audiobuffer_start_idx;
+    double percent_pos = relative_position /
+                         (g->grain_len_frames * g->audiobuffer_num_channels) *
+                         100;
 
     switch (envelope_mode)
     {
@@ -674,16 +673,16 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
         amp = g->amp;
         break;
     case (LOOPER_ENV_TRAPEZOIDAL):
-        amp = 1;
-        percent_pos =
-            100. / g->grain_len_frames * (idx - g->audiobuffer_start_idx);
         if (percent_pos < g->attack_time_pct)
-            amp *= percent_pos / g->attack_time_pct;
+            amp *= (percent_pos / g->attack_time_pct);
         else if (percent_pos > (100 - g->release_time_pct))
             amp *= (100 - percent_pos) / g->release_time_pct;
+        //printf("cur_pos:%f start:%d len: %d pct_pos:%f AMP:%f\n",
+        //       g->audiobuffer_cur_pos, g->audiobuffer_start_idx,
+        //       g->grain_len_frames * g->audiobuffer_num_channels, percent_pos,
+        //       amp);
         break;
     case (LOOPER_ENV_TUKEY_WINDOW):
-        relative_position = g->audiobuffer_cur_pos - g->audiobuffer_start_idx;
         amp = 0.5 * (1 + cos(M_PI * ((relative_position * 2 /
                                       (0.5 * (g->grain_len_frames - 1))) -
                                      1)));

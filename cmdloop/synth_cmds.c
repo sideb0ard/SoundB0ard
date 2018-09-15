@@ -681,7 +681,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             {
                 int six16th = atoi(wurds[i]) % 16;
                 synthbase_add_note(base, base->cur_pattern, six16th,
-                                   base->midi_note_1, true);
+                                   base->midi_note_1, 128, true);
             }
         }
         else if (strncmp("num_patterns", wurds[0], 12) == 0)
@@ -730,6 +730,11 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         {
             int src = atoi(wurds[1]);
             synthbase_generate_pattern(base, src, false, false);
+        }
+        else if (strncmp("genrec", wurds[0], 6) == 0 ||
+                 strncmp("genrecursive", wurds[0], 7) == 0)
+        {
+            synthbase_generate_recursive_pattern(base);
         }
         else if (strncmp("gensave", wurds[0], 7) == 0)
         {

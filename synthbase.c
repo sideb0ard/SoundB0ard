@@ -74,6 +74,33 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
     }
 }
 
+void synthbase_gen_rec(synthbase *base, int start_idx, int end_idx,
+                       int midi_note, float amp)
+{
+    printf("GEN_REC! start_idx:%d end_idx:%d midi_note:%d amp:%f\n", start_idx,
+           end_idx, midi_note, amp);
+    midi_event *midi_pattern = base->patterns[base->cur_pattern];
+    int middle = (start_idx + end_idx) / 2;
+    if (amp > 70)
+    {
+        synthbase_gen_rec(base, start_idx, middle, midi_note, amp * 0.75);
+        printf("Adding note:%d at pos:%d amp:%f\n", midi_note, middle, amp);
+        synthbase_add_micro_note(base, base->cur_pattern, middle, midi_note, amp,
+                           true);
+        synthbase_gen_rec(base, middle, end_idx, midi_note, amp * 0.75);
+    }
+}
+
+void synthbase_generate_recursive_pattern(synthbase *base)
+{
+    printf("woof!\n");
+    synthbase_stop(base);
+    midi_event *midi_pattern = base->patterns[base->cur_pattern];
+    clear_pattern(midi_pattern);
+
+    synthbase_gen_rec(base, 0, PPBAR - 1, base->midi_note_1, 128);
+}
+
 void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
                                  bool keep_note, bool riff)
 {
@@ -438,18 +465,18 @@ void synthbase_print_patterns(synthbase *ms)
 }
 
 void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note,
-                        bool keep_note)
+                        int amp, bool keep_note)
 {
     int mstep = step * PPSIXTEENTH;
-    synthbase_add_micro_note(ms, pattern_num, mstep, midi_note, keep_note);
+    synthbase_add_micro_note(ms, pattern_num, mstep, midi_note, amp, keep_note);
 }
 
 void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
-                              int midi_note, bool keep_note)
+                              int midi_note, int amp, bool keep_note)
 {
     if (is_valid_pattern_num(ms, pattern_num) && mstep < PPBAR)
     {
-        midi_event on = new_midi_event(MIDI_ON, midi_note, 128);
+        midi_event on = new_midi_event(MIDI_ON, midi_note, amp);
 
         if (!keep_note)
         {

@@ -16,6 +16,7 @@ SRC = \
 	cmdloop/midi_cmds.c \
 	cmdloop/mixer_cmds.c \
 	cmdloop/new_item_cmds.c \
+	cmdloop/pattern_generator_cmds.c \
 	cmdloop/sequence_generator_cmds.c \
 	cmdloop/stepper_cmds.c \
 	cmdloop/synth_cmds.c \
@@ -59,6 +60,7 @@ SRC = \
 	obliquestrategies.c \
 	oscillator.c \
 	pattern_parser.c \
+	pattern_generators/recursive_pattern_gen.c \
 	pattern_transformers/pattern_transformers.c \
 	qblimited_oscillator.c \
 	reverb.c \
@@ -108,7 +110,7 @@ all: objdir $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop
+	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop obj/pattern_generators
 
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)

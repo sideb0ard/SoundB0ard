@@ -4,20 +4,17 @@
 #include <stdint.h>
 #include <wchar.h>
 
-enum sequence_gen_type
+enum pattern_generator_type
 {
-    EUCLIDEAN,
-    BITSHIFT,
-    MARKOV,
-    RECURSIVE_SEQ_GEN,
+    RECURSIVE_PATTERN_TYPE,
 };
 
-typedef struct sequence_generator
+typedef struct pattern_generator
 {
     unsigned int type;
     bool debug;
     void (*status)(void *self, wchar_t *wstring);
-    uint16_t (*generate)(void *self, void *data);
+    void (*generate)(void *self, midi_event *pattern, int midi_note);
     void (*set_debug)(void *self, bool b);
     void (*event_notify)(void *self, unsigned int event_type);
-} sequence_generator;
+} pattern_generator;

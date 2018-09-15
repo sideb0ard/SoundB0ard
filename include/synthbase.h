@@ -130,6 +130,7 @@ void synthbase_clear_pattern_ready_for_new_one(synthbase *base,
                                                int pattern_num);
 void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
                                 bool restore_pattern);
+void synthbase_generate_recursive_pattern(synthbase *base);
 void synthbase_apply_bit_pattern(synthbase *base, uint16_t pattern,
                                  bool keep_note, bool riff);
 
@@ -174,12 +175,12 @@ int synthbase_get_num_notes(synthbase *base);
 void synthbase_make_active_track(void *self, int pattern_num);
 
 void synthbase_add_note(synthbase *base, int pattern_num, int step,
-                        int midi_note, bool keep_note);
+                        int midi_note, int amp, bool keep_note);
 void synthbase_rm_note(synthbase *base, int pattern_num, int step);
 void synthbase_mv_note(synthbase *base, int pattern_num, int fromstep,
                        int tostep);
 void synthbase_add_micro_note(synthbase *base, int pattern_num, int step,
-                              int midi_note, bool keep_note);
+                              int midi_note, int amp, bool keep_note);
 void synthbase_rm_micro_note(synthbase *base, int pattern_num, int step);
 void synthbase_mv_micro_note(synthbase *base, int pattern_num, int fromstep,
                              int tostep);

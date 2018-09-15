@@ -105,6 +105,12 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
         }
 
+        else if (strncmp("recursive", wurds[1], 9) == 0)
+        {
+            printf("RECURSSSIVE, yo!\n");
+            mixer_add_recursive(mixr);
+        }
+
         else if (strncmp("looper", wurds[1], 6) == 0 ||
                  strncmp("loop", wurds[1], 4) == 0 ||
                  strncmp("gran", wurds[1], 4) == 0 ||
