@@ -44,6 +44,10 @@ bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 {
                     recursive_pattern_gen_set_divisor(rpg, val);
                 }
+                else if (strncmp("midi_note", wurds[2], 9) == 0)
+                {
+                    recursive_pattern_gen_set_midi_note(rpg, val);
+                }
                 else if (strncmp("multi", wurds[2], 5) == 0)
                 {
                     recursive_pattern_gen_set_multi(rpg, val);

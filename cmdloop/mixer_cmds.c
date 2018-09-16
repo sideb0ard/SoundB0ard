@@ -200,7 +200,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             pattern_generator *pg = mixr->pattern_generators[pg_num];
             soundgenerator *sg = mixr->sound_generators[dest_sg_num];
             midi_event *pattern = sg->get_pattern(sg, dest_sg_pattern_num);
-            pg->generate(pg, pattern, 47);
+            pg->generate(pg, pattern);
         }
         else
             printf("SUMMIT AINT VALID: SG:%d PG:%d\n", dest_sg_num, pg_num);

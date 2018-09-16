@@ -14,7 +14,7 @@ typedef struct pattern_generator
     unsigned int type;
     bool debug;
     void (*status)(void *self, wchar_t *wstring);
-    void (*generate)(void *self, midi_event *pattern, int midi_note);
+    void (*generate)(void *self, midi_event *pattern);
     void (*set_debug)(void *self, bool b);
     void (*event_notify)(void *self, unsigned int event_type);
 } pattern_generator;
