@@ -659,11 +659,8 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
 {
     double amp = 1;
-    double relative_position =
-        g->audiobuffer_cur_pos - g->audiobuffer_start_idx;
-    double percent_pos = relative_position /
-                         (g->grain_len_frames * g->audiobuffer_num_channels) *
-                         100;
+    double percent_pos =
+        (float)g->grain_counter_frames / g->grain_len_frames * 100;
 
     switch (envelope_mode)
     {
@@ -677,15 +674,20 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
             amp *= (percent_pos / g->attack_time_pct);
         else if (percent_pos > (100 - g->release_time_pct))
             amp *= (100 - percent_pos) / g->release_time_pct;
-        //printf("cur_pos:%f start:%d len: %d pct_pos:%f AMP:%f\n",
-        //       g->audiobuffer_cur_pos, g->audiobuffer_start_idx,
-        //       g->grain_len_frames * g->audiobuffer_num_channels, percent_pos,
-        //       amp);
         break;
     case (LOOPER_ENV_TUKEY_WINDOW):
-        amp = 0.5 * (1 + cos(M_PI * ((relative_position * 2 /
-                                      (0.5 * (g->grain_len_frames - 1))) -
-                                     1)));
+        if (percent_pos < g->attack_time_pct)
+        {
+            amp = (1.0 + cos(M_PI + (M_PI * (g->grain_counter_frames /
+                                             g->attack_time_samples)) *
+                                        (1.0 / 2.0)));
+        }
+        else if (percent_pos > (100 - g->release_time_pct))
+        {
+            amp = (1.0 + cos(M_PI * (g->grain_counter_frames /
+                                     g->release_time_samples)) *
+                             (1.0 / 2.0));
+        }
         break;
     }
 

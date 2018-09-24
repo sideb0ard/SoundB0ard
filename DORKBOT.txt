@@ -1,0 +1,33 @@
+
+new gran loops/xennakisGlitch.aiff
+
+loop 0 idx 50
+
+loop 0 idx 10
+
+over 3 bar osc "20 400" loop 0 grain_dur_ms %s
+
+loop 0 gps_on 1
+
+
+loop 0 mode 1
+
+loop 0 mode 2
+
+loop 0 mode 0
+loop 0 len 16
+
+every 3 bar rand "1 4 8 16" loop 0 len %s
+
+every 7 16th rand "0 2" loop 0 mode %s
+
+bpm 140
+new dloop dloops/raveBreakbeat.aiff 2
+
+scramble
+stutter
+
+new loop loops/reverbyMoWaxMelody.aiff 2
+
+
+loops/tothosedjs.aif
