@@ -31,6 +31,9 @@ typedef struct sound_grain
     double slope;
     double curve;
     bool reverse_mode;
+
+    envelope_generator eg;
+
 } sound_grain;
 
 enum
@@ -45,6 +48,7 @@ enum
     LOOPER_ENV_PARABOLIC,
     LOOPER_ENV_TRAPEZOIDAL,
     LOOPER_ENV_TUKEY_WINDOW,
+    LOOPER_ENV_GENERATOR,
     LOOPER_ENV_NUM
 };
 
@@ -212,5 +216,7 @@ void looper_set_density_duration_sync(looper *l, bool b);
 void looper_dump_buffer(looper *l);
 
 void looper_set_sustain_ms(looper *l, int sustain_ms);
+void looper_set_grain_env_attack_pct(looper *l, int percent);
+void looper_set_grain_env_release_pct(looper *l, int percent);
 
 #endif // LOOPER

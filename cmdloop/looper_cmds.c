@@ -56,7 +56,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         bool b = atoi(wurds[3]);
                         looper_set_density_duration_sync(g, b);
                     }
-                    else if (strncmp("idx", wurds[2], 333) == 0)
+                    else if (strncmp("idx", wurds[2], 3) == 0)
                     {
                         unsigned int pos_perc = atoi(wurds[3]);
                         if (pos_perc <= 100)
@@ -66,6 +66,26 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         }
                         else
                             printf("idx should be a percent val\n");
+                    }
+                    else if (strncmp("atk", wurds[2], 3) == 0)
+                    {
+                        unsigned int attack_ms = atoi(wurds[3]);
+                        if (attack_ms > 0 && attack_ms <= 100)
+                        {
+                            looper_set_grain_env_attack_pct(g, attack_ms);
+                        }
+                        else
+                            printf("atk should be a percent val\n");
+                    }
+                    else if (strncmp("rel", wurds[2], 3) == 0)
+                    {
+                        unsigned int release_ms = atoi(wurds[3]);
+                        if (release_ms > 0 && release_ms <= 100)
+                        {
+                            looper_set_grain_env_release_pct(g, release_ms);
+                        }
+                        else
+                            printf("rel should be a percent val\n");
                     }
                     else if (strncmp("fill_factor", wurds[2], 11) == 0)
                     {

@@ -13,7 +13,7 @@
 extern mixer *mixr;
 extern char *s_lfo_mode_names;
 
-static char *s_env_names[] = {"PARABOLIC", "TRAPEZOIDAL", "TUKEY"};
+static char *s_env_names[] = {"PARABOLIC", "TRAPEZOIDAL", "TUKEY", "GENERATOR"};
 static char *s_loop_mode_names[] = {"LOOP", "STATIC", "SMUDGE"};
 
 looper *new_looper(char *filename)
@@ -24,8 +24,8 @@ looper *new_looper(char *filename)
 
     g->audio_buffer_read_idx = 0;
     g->granular_spray_frames = 441; // 10ms * (44100/1000)
-    g->grain_attack_time_pct = 5;
-    g->grain_release_time_pct = 5;
+    g->grain_attack_time_pct = 15;
+    g->grain_release_time_pct = 15;
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->envelope_mode = LOOPER_ENV_PARABOLIC;
@@ -408,9 +408,16 @@ stereo_val looper_gennext(void *self)
         // STEP 2 - gather vals from all active grains
         for (int i = 0; i < g->highest_grain_num; i++)
         {
-            stereo_val tmp = sound_grain_generate(
-                &g->m_grains[i], g->audio_buffer, g->audio_buffer_len);
-            double env = sound_grain_env(&g->m_grains[i], g->envelope_mode);
+            sound_grain *sgr = &g->m_grains[i];
+            stereo_val tmp =
+                sound_grain_generate(sgr, g->audio_buffer, g->audio_buffer_len);
+            double env = sound_grain_env(sgr, g->envelope_mode);
+            //if (i == 0 && sgr->active && mixr->timing_info.cur_sample % 100 == 0)
+            //{
+            //    double percent_pos = (float)sgr->grain_counter_frames /
+            //                         sgr->grain_len_frames * 100;
+            //    printf("POS:%f ENV: %f\n", percent_pos, env);
+            //}
             val.left += tmp.left * env;
             val.right += tmp.right * env;
         }
@@ -440,7 +447,7 @@ void looper_status(void *self, wchar_t *status_string)
         WANSI_COLOR_WHITE
         // clang-format off
         "source:%s %s vol:%.2lf pitch:%.2f stereo:%d\n"
-        "mode:%s gate_mode:%d idx:%.0f buf_len:%d\n"
+        "mode:%s gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
         "len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
         "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
@@ -470,6 +477,7 @@ void looper_status(void *self, wchar_t *status_string)
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
         g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
         g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
+        g->grain_attack_time_pct, g->grain_release_time_pct,
         g->loop_len, g->scramble_mode, g->stutter_mode, g->step_mode,
         g->reverse_mode, g->buffer_is_full, g->m_seq.generate_src,
         g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
@@ -598,6 +606,17 @@ void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
     g->slope = 4.0 * 1.0 * (rdur - rdur2);
     g->curve = -8.0 * 1.0 * rdur2;
 
+    double loop_len_ms = 1000. * dur / SAMPLE_RATE;
+    double attack_time_ms = loop_len_ms / 100. * attack_pct;
+    double release_time_ms = loop_len_ms / 100. * release_pct;
+    // printf("ATTACKMS: %f RELEASEMS: %f\n", attack_time_ms, release_time_ms);
+
+    envelope_generator_init(&g->eg);
+    eg_set_attack_time_msec(&g->eg, attack_time_ms);
+    eg_set_decay_time_msec(&g->eg, 0);
+    eg_set_release_time_msec(&g->eg, release_time_ms);
+    eg_start_eg(&g->eg);
+
     g->active = true;
 }
 
@@ -687,6 +706,14 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
             amp = (1.0 + cos(M_PI * (g->grain_counter_frames /
                                      g->release_time_samples)) *
                              (1.0 / 2.0));
+        }
+        break;
+    case (LOOPER_ENV_GENERATOR):
+        amp = eg_do_envelope(&g->eg, NULL);
+        // printf("AMP is %f\n", amp);
+        if (percent_pos > (100 - g->release_time_pct))
+        {
+            eg_note_off(&g->eg);
         }
         break;
     }
@@ -1053,4 +1080,15 @@ void looper_set_sustain_ms(looper *l, int sustain_ms)
 {
     if (sustain_ms >= 0)
         l->sustain_ms = sustain_ms;
+}
+
+void looper_set_grain_env_attack_pct(looper *l, int percent)
+{
+    if (percent > 0 && percent < 100)
+        l->grain_attack_time_pct = percent;
+}
+void looper_set_grain_env_release_pct(looper *l, int percent)
+{
+    if (percent > 0 && percent < 100)
+        l->grain_release_time_pct = percent;
 }
