@@ -8,7 +8,7 @@ new bitshift ((t/4)>>t/4)|(t>>2)
 new step notes/2stepbass.aiff; step 1 gen src 0; step 1 gen every 3
 
 new bitshift ((t/1000)^(t/1001))*t
-new moog; moog 2 load drexy; moog 2 note_mode 1
+new moog; moog 2 load drexy; moog 2 single_note_mode 1
 every 2 bar moog 2 genonce 0; every 5 bar gen riff 0 2:0; ws 2
 
 new markov 3
@@ -70,7 +70,7 @@ new loop dloops/acidSquelchBeat.aiff 2; down 1; fuckup 12; vol 12 0.9
 down 10
 
 new dx
-dx 13 load quazzz; dx 13 note_mode 1; dx 13 midi_note_1 3
+dx 13 load quazzz; dx 13 single_note_mode 1; dx 13 midi_note_1 3
 new bitshift (t & ((t%(t>>1&t))|t>>3^t>>4)>>7)-1
 
 down 11;
@@ -215,7 +215,7 @@ loop 31 mode 0
 down 25
 
 start 29; loop 31 mode 0; new dloop dloops/raveBreakbeat.aiff 2; fuckup 33
-dx 13 load rSQer; dx 13 midi_note_1 12; dx 13 note_mode 1
+dx 13 load rSQer; dx 13 midi_note_1 12; dx 13 single_note_mode 1
 
 stop 29
 
@@ -253,7 +253,7 @@ bpm 160
 algo 41 off; algo 42 off; algo 39 off
 kicks/2stepKICK2.aiff // garage (7)
 dx rSQer // ragga kick
-midi_note_1:12; note_mode:1
+midi_note_1:12; single_note_mode:1
 every 4 bar gen melody 10 13:0 // ragga snare
 
 dx 13 arp 1

@@ -51,7 +51,7 @@ void synthbase_init(synthbase *base, void *parent,
         base->arp.last_midi_notes[i] = -1;
 
     base->sustain_note_ms = 200;
-    base->note_mode = false;
+    base->single_note_mode = false;
 }
 
 void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
@@ -132,7 +132,7 @@ void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
                 else
                     midi_note = base->midi_note_3;
             }
-            else if (base->note_mode)
+            else if (base->single_note_mode)
                 midi_note = base->midi_note_1;
             else if (i == 0 || i == patternlen - 1)
                 midi_note = chnotes.root;
@@ -253,10 +253,10 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t patternstr[33] = {0};
 
     swprintf(scratch, 255,
-             L"\nnote_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
+             L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
              L"midi_note_1:%d midi_note_2:%d midi_note_3:%d\n"
              L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
-             base->note_mode, base->chord_mode, base->octave,
+             base->single_note_mode, base->chord_mode, base->octave,
              base->sustain_note_ms, base->midi_note_1, base->midi_note_2,
              base->midi_note_3, base->arp.enable, base->arp.last_midi_notes[0],
              base->arp.last_midi_notes[1], base->arp.last_midi_notes[2],
@@ -381,7 +381,7 @@ bool is_valid_pattern_num(synthbase *ms, int pattern_num)
     return false;
 }
 
-void synthbase_set_note_mode(synthbase *base, bool b) { base->note_mode = b; }
+void synthbase_set_single_note_mode(synthbase *base, bool b) { base->single_note_mode = b; }
 
 void synthbase_set_chord_mode(synthbase *base, bool b) { base->chord_mode = b; }
 

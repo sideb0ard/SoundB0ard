@@ -68,7 +68,7 @@ typedef struct arpeggiator
 typedef struct synthbase
 {
     void *parent;
-    unsigned int parent_synth_type;
+    unsigned int parent_synth_type; // used for casting parent type
 
     int tick; // current 16th note tick from mixer
     midi_pattern patterns[MAX_NUM_MIDI_LOOPS];
@@ -89,7 +89,7 @@ typedef struct synthbase
     bool multi_pattern_loop_countdown_started;
 
     bool recording;
-    bool note_mode;
+    bool single_note_mode; // ignore midi notes, just play midi_note_1
     bool chord_mode;
 
     int midi_note_1;
@@ -158,7 +158,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename);
 void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms);
 void synthbase_set_generate_src(synthbase *base, int src);
 void synthbase_set_chord_mode(synthbase *base, bool b);
-void synthbase_set_note_mode(synthbase *base, bool b);
+void synthbase_set_single_note_mode(synthbase *base, bool b);
 void synthbase_set_morph_mode(synthbase *base, bool b);
 void synthbase_set_backup_mode(synthbase *base, bool b);
 void synthbase_morph(synthbase *base);
