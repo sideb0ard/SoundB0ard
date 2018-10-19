@@ -60,7 +60,7 @@ typedef struct algorithm
     unsigned int process_step;
     unsigned int process_step_counter;
 
-    unsigned int counter; // currently just used for FOR increments
+    unsigned int counter;         // currently just used for FOR increments
     unsigned int var_select_type; // RAND, OSC or STEP
 
     bool has_env;

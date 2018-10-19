@@ -12,13 +12,13 @@
 #include <utils.h>
 
 #include <algo_cmds.h>
+#include <cmdloop/pattern_generator_cmds.h>
 #include <fx_cmds.h>
 #include <looper_cmds.h>
 #include <midi_cmds.h>
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
 #include <sequence_generator_cmds.h>
-#include <cmdloop/pattern_generator_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
 

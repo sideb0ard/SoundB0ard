@@ -85,8 +85,8 @@ void synthbase_gen_rec(synthbase *base, int start_idx, int end_idx,
     {
         synthbase_gen_rec(base, start_idx, middle, midi_note, amp * 0.75);
         printf("Adding note:%d at pos:%d amp:%f\n", midi_note, middle, amp);
-        synthbase_add_micro_note(base, base->cur_pattern, middle, midi_note, amp,
-                           true);
+        synthbase_add_micro_note(base, base->cur_pattern, middle, midi_note,
+                                 amp, true);
         synthbase_gen_rec(base, middle, end_idx, midi_note, amp * 0.75);
     }
 }
@@ -252,15 +252,16 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wchar_t scratch[256] = {0};
     wchar_t patternstr[33] = {0};
 
-    swprintf(scratch, 255,
-             L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
-             L"midi_note_1:%d midi_note_2:%d midi_note_3:%d\n"
-             L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
-             base->single_note_mode, base->chord_mode, base->octave,
-             base->sustain_note_ms, base->midi_note_1, base->midi_note_2,
-             base->midi_note_3, base->arp.enable, base->arp.last_midi_notes[0],
-             base->arp.last_midi_notes[1], base->arp.last_midi_notes[2],
-             s_arp_speed[base->arp.speed], s_arp_mode[base->arp.mode]);
+    swprintf(
+        scratch, 255,
+        L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
+        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d\n"
+        L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
+        base->single_note_mode, base->chord_mode, base->octave,
+        base->sustain_note_ms, base->midi_note_1, base->midi_note_2,
+        base->midi_note_3, base->arp.enable, base->arp.last_midi_notes[0],
+        base->arp.last_midi_notes[1], base->arp.last_midi_notes[2],
+        s_arp_speed[base->arp.speed], s_arp_mode[base->arp.mode]);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)
@@ -381,7 +382,10 @@ bool is_valid_pattern_num(synthbase *ms, int pattern_num)
     return false;
 }
 
-void synthbase_set_single_note_mode(synthbase *base, bool b) { base->single_note_mode = b; }
+void synthbase_set_single_note_mode(synthbase *base, bool b)
+{
+    base->single_note_mode = b;
+}
 
 void synthbase_set_chord_mode(synthbase *base, bool b) { base->chord_mode = b; }
 

@@ -9,8 +9,9 @@
 #include <euclidean.h>
 
 extern mixer *mixr;
-static char *s_markov_types[] = {"GARAGE", "HIPHOP", "HATS", "HATS_MASK",
-                                 "CLAPS", "RAGGA_KICK", "RAGGA_SNARE"};
+static char *s_markov_types[] = {"GARAGE",     "HIPHOP", "HATS",
+                                 "HATS_MASK",  "CLAPS",  "RAGGA_KICK",
+                                 "RAGGA_SNARE"};
 
 #define BEAT0 32768
 #define BEAT1 16384

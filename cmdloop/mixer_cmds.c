@@ -188,7 +188,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     else if (strncmp("genrec", wurds[0], 6) == 0)
     {
         int pg_num = atoi(wurds[1]);
-        //printf("PATTERN GEN! %d\n", pg_num);
+        // printf("PATTERN GEN! %d\n", pg_num);
         int dest_sg_num = -1;
         int dest_sg_pattern_num = -1;
         sscanf(wurds[2], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);

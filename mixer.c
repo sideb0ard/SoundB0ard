@@ -20,13 +20,13 @@
 #include "markov.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include <pattern_generators/recursive_pattern_gen.h>
 #include "sample_sequencer.h"
 #include "sbmsg.h"
 #include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
+#include <pattern_generators/recursive_pattern_gen.h>
 
 extern mixer *mixr;
 
@@ -219,8 +219,8 @@ void mixer_status_patterns(mixer *mixr)
             if (mixr->pattern_generators[i] != NULL)
             {
                 wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                mixr->pattern_generators[i]->status(
-                    mixr->pattern_generators[i], wss);
+                mixr->pattern_generators[i]->status(mixr->pattern_generators[i],
+                                                    wss);
                 wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
                 wprintf(L"  %ls\n", wss);
                 wprintf(WANSI_COLOR_RESET);
@@ -1011,45 +1011,65 @@ synthbase *get_synthbase(soundgenerator *self)
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi)
 {
-    if (mixr->debug_mode)
-        print_midi_event(note);
-
-    if (sg->type == MINISYNTH_TYPE)
-    {
-        minisynth *ms = (minisynth *)sg;
-        minisynth_midi_note_on(ms, note, velocity);
-    }
-    else if (sg->type == DIGISYNTH_TYPE)
-    {
-        digisynth *ds = (digisynth *)sg;
-        digisynth_midi_note_on(ds, note, velocity);
-    }
-    else if (sg->type == DXSYNTH_TYPE)
-    {
-        dxsynth *dx = (dxsynth *)sg;
-        dxsynth_midi_note_on(dx, note, velocity);
-    }
-
-    int note_off_tick =
-        (mixr->timing_info.midi_tick + (PPSIXTEENTH * 4 - 7)) % PPBAR;
-
     synthbase *base = get_synthbase(sg);
-    midi_event off_event = new_midi_event(128, note, velocity);
-    ////////////////////////
+    bool is_chord_mode = base->chord_mode;
 
-    if (base->recording)
+    int midi_notes[3] = {note, 0, 0};
+    int midi_notes_len = 1; // default single note
+    if (is_chord_mode)
     {
-        printf("Recording note!\n");
-        int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
-        midi_event on_event = new_midi_event(144, note, velocity);
-
-        synthbase_add_event(base, base->cur_pattern, note_off_tick, off_event);
-        synthbase_add_event(base, base->cur_pattern, note_on_tick, on_event);
+        midi_notes_len = 3;
+        if (mixr->chord_type == MAJOR_CHORD)
+            midi_notes[1] = note + 4;
+        else
+            midi_notes[1] = note + 3;
+        midi_notes[2] = note + 7;
     }
-    else
+
+    for (int i = 0; i < midi_notes_len; i++)
     {
-        off_event.delete_after_use = true; // _THIS_ is the magic
-        synthbase_add_event(base, base->cur_pattern, note_off_tick, off_event);
+        int note = midi_notes[i];
+        printf("Adding NOTE %d\n", note);
+
+        if (sg->type == MINISYNTH_TYPE)
+        {
+            minisynth *ms = (minisynth *)sg;
+            minisynth_midi_note_on(ms, note, velocity);
+        }
+        else if (sg->type == DIGISYNTH_TYPE)
+        {
+            digisynth *ds = (digisynth *)sg;
+            digisynth_midi_note_on(ds, note, velocity);
+        }
+        else if (sg->type == DXSYNTH_TYPE)
+        {
+            dxsynth *dx = (dxsynth *)sg;
+            dxsynth_midi_note_on(dx, note, velocity);
+        }
+
+        int note_off_tick =
+            (mixr->timing_info.midi_tick + (PPSIXTEENTH * 4 - 7)) % PPBAR;
+
+        midi_event off_event = new_midi_event(128, note, velocity);
+        ////////////////////////
+
+        if (base->recording)
+        {
+            printf("Recording note!\n");
+            int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
+            midi_event on_event = new_midi_event(144, note, velocity);
+
+            synthbase_add_event(base, base->cur_pattern, note_off_tick,
+                                off_event);
+            synthbase_add_event(base, base->cur_pattern, note_on_tick,
+                                on_event);
+        }
+        else
+        {
+            off_event.delete_after_use = true; // _THIS_ is the magic
+            synthbase_add_event(base, base->cur_pattern, note_off_tick,
+                                off_event);
+        }
     }
 }
 

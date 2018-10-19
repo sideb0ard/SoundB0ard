@@ -412,7 +412,8 @@ stereo_val looper_gennext(void *self)
             stereo_val tmp =
                 sound_grain_generate(sgr, g->audio_buffer, g->audio_buffer_len);
             double env = sound_grain_env(sgr, g->envelope_mode);
-            //if (i == 0 && sgr->active && mixr->timing_info.cur_sample % 100 == 0)
+            // if (i == 0 && sgr->active && mixr->timing_info.cur_sample % 100
+            // == 0)
             //{
             //    double percent_pos = (float)sgr->grain_counter_frames /
             //                         sgr->grain_len_frames * 100;
@@ -477,9 +478,9 @@ void looper_status(void *self, wchar_t *status_string)
         g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
         g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
         g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
-        g->grain_attack_time_pct, g->grain_release_time_pct,
-        g->loop_len, g->scramble_mode, g->stutter_mode, g->step_mode,
-        g->reverse_mode, g->buffer_is_full, g->m_seq.generate_src,
+        g->grain_attack_time_pct, g->grain_release_time_pct, g->loop_len,
+        g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
+        g->buffer_is_full, g->m_seq.generate_src,
         g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
         g->m_seq.generate_mode, g->external_source_sg,
 

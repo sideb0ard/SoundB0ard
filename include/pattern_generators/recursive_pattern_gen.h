@@ -21,4 +21,5 @@ void recursive_pattern_gen_set_debug(void *self, bool b);
 void recursive_pattern_gen_set_thresh(recursive_pattern_gen *rpg, float val);
 void recursive_pattern_gen_set_divisor(recursive_pattern_gen *rpg, float val);
 void recursive_pattern_gen_set_multi(recursive_pattern_gen *rpg, float val);
-void recursive_pattern_gen_set_midi_note(recursive_pattern_gen *rpg, int midi_note);
+void recursive_pattern_gen_set_midi_note(recursive_pattern_gen *rpg,
+                                         int midi_note);
