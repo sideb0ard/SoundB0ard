@@ -1138,7 +1138,6 @@ uint16_t mask_from_string(char *stringey_mask)
         for (int i = 0; i < 4; i++)
         {
             int shift_amount = (15 - (i * 4));
-            printf("SHIFT AMOUNT! %d\n", shift_amount);
             int bin_rep = 0;
             if (stringey_mask[i] == 'f')
                 bin_rep = 0b1111;
@@ -1155,11 +1154,9 @@ uint16_t mask_from_string(char *stringey_mask)
             else
                 bin_rep = stringey_mask[i] - '0';
 
-            printf("BINREP!%d\n", bin_rep);
             for (int j = 0; j < 4; j++)
                 if (bin_rep & 1 << (3 - j))
                 {
-                    printf("OH J!\n");
                     bin_mask |= 1 << (shift_amount - j);
                 }
         }
