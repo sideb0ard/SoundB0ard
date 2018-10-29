@@ -455,7 +455,6 @@ int synthbase_get_num_patterns(void *self)
 
 void synthbase_set_num_patterns(void *self, int num_patterns)
 {
-    printf("BASS! how low can you go %d!\n", num_patterns);
     synthbase *ms = (synthbase *)self;
     if (num_patterns > 0)
     {

@@ -210,7 +210,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (strncmp("melody", wurds[1], 6) == 0 ||
             strncmp("once", wurds[1], 4) == 0 ||
             strncmp("riffonce", wurds[1], 9) == 0 ||
-            strncmp("riff", wurds[1], 4) == 0)
+            strncmp("riff", wurds[1], 4) == 0 ||
+            strncmp("sparse", wurds[1], 6) == 0)
         {
             bool keep = true;
             bool riff = false;
@@ -221,6 +222,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
             if (strncmp("riff", wurds[1], 4) == 0)
                 riff = true;
+
 
             int generator = atoi(wurds[2]);
             int dest_sg_num = -1;
@@ -270,6 +272,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     printf("Can't do nuttin' for ya, man!\n");
                     return true;
                 }
+
+                if (strncmp("sparse", wurds[1], 6) == 0)
+                    synthbase_set_num_patterns(base, 2);
+                else
+                    synthbase_set_num_patterns(base, 1);
 
                 synthbase_apply_bit_pattern(base, num, keep, riff);
             }
