@@ -1103,3 +1103,67 @@ void pattern_to_string(midi_event *pattern, wchar_t *patternstr)
         cur_sixteenth += 2;
     }
 }
+
+void mask_to_string(uint16_t mask,
+                    wchar_t *patternstr) // patternstr is 33 chars long
+{
+    for (int i = 0; i < 16; i++)
+    {
+        int pidx = i * 2;
+        patternstr[pidx] = sparkchars[0];
+        patternstr[pidx + 1] = sparkchars[0];
+        if (mask & 1 << (15 - i))
+        {
+            patternstr[pidx] = sparkchars[4];
+            patternstr[pidx + 1] = sparkchars[4];
+        }
+    }
+}
+
+uint16_t mask_from_string(char *stringey_mask)
+{
+    uint16_t bin_mask = 0;
+    if (!stringey_mask)
+        return bin_mask;
+
+    int mask_len = strnlen(stringey_mask, 17);
+    if (mask_len > 15)
+    {
+        for (int i = 0; i < 16; i++)
+            if (stringey_mask[i] == '1')
+                bin_mask |= 1 << (15 - i);
+    }
+    else if (mask_len > 3)
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            int shift_amount = (15 - (i * 4));
+            printf("SHIFT AMOUNT! %d\n", shift_amount);
+            int bin_rep = 0;
+            if (stringey_mask[i] == 'f')
+                bin_rep = 0b1111;
+            else if (stringey_mask[i] == 'e')
+                bin_rep = 0b1110;
+            else if (stringey_mask[i] == 'd')
+                bin_rep = 0b1101;
+            else if (stringey_mask[i] == 'c')
+                bin_rep = 0b1100;
+            else if (stringey_mask[i] == 'b')
+                bin_rep = 0b1011;
+            else if (stringey_mask[i] == 'a')
+                bin_rep = 0b1010;
+            else
+                bin_rep = stringey_mask[i] - '0';
+
+            printf("BINREP!%d\n", bin_rep);
+            for (int j = 0; j < 4; j++)
+                if (bin_rep & 1 << (3 - j))
+                {
+                    printf("OH J!\n");
+                    bin_mask |= 1 << (shift_amount - j);
+                }
+        }
+    }
+
+    return bin_mask;
+}

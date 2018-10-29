@@ -4,6 +4,7 @@
 #include "defjams.h"
 #include "sbmsg.h"
 #include <stdbool.h>
+#include <stdint.h>
 
 void get_full_filename(char *basename, char *destination_fullname);
 
@@ -74,3 +75,5 @@ unsigned int get_next_compat_note(unsigned int cur_key);
 bool is_midi_event_in_range(int start_tick, int end_tick, midi_pattern pattern);
 void print_logo(void);
 void pattern_to_string(midi_event *pattern, wchar_t *patternstr);
+void mask_to_string(uint16_t mask, wchar_t *patternstr);
+uint16_t mask_from_string(char *stringey_mask);

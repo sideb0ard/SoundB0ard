@@ -111,6 +111,9 @@ typedef struct synthbase
 
     int max_generation;
 
+    uint16_t note_mask;
+    bool enable_note_mask;
+
 } synthbase;
 
 static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
@@ -196,3 +199,7 @@ void synthbase_set_arp_mode(synthbase *base, unsigned int mode);
 void synthbase_do_arp(synthbase *base, soundgenerator *sg);
 int arp_next_note(arpeggiator *arp);
 void arp_add_last_note(arpeggiator *arp, int note);
+
+void synthbase_set_note_mask(synthbase *base, uint16_t mask);
+void synthbase_set_enable_note_mask(synthbase *base, bool b);
+bool synthbase_is_masked(synthbase *base);

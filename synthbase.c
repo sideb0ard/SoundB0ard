@@ -123,7 +123,9 @@ void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
         int shift_by = patternlen - 1 - i;
         if (bit_pattern & (1 << shift_by))
         {
-            if (riff)
+            if (base->chord_mode)
+                midi_note = chnotes.root;
+            else if (riff)
             {
                 if (i < 12)
                     midi_note = base->midi_note_1;
@@ -271,6 +273,12 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
                  base->pattern_multiloop_count[i]);
         wcscat(status_string, scratch);
     }
+    memset(scratch, 0, 256);
+    memset(patternstr, 0, 33);
+    mask_to_string(base->note_mask, patternstr);
+    swprintf(scratch, 255, L"\n     %ls  mask (%d)", patternstr,
+             base->note_mask);
+    wcscat(status_string, scratch);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
@@ -823,4 +831,24 @@ void synthbase_change_octave_midi_notes(synthbase *base, unsigned int direction)
         base->midi_note_2 -= 12;
         base->midi_note_3 -= 12;
     }
+}
+
+void synthbase_set_note_mask(synthbase *base, uint16_t mask)
+{
+    base->note_mask = mask;
+}
+
+void synthbase_set_enable_note_mask(synthbase *base, bool b)
+{
+    base->enable_note_mask = b;
+}
+
+bool synthbase_is_masked(synthbase *base)
+{
+    bool is_masked = false;
+    int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
+    int cur_bit = 1 << (15 - cur_sixteenth);
+    if (cur_bit & base->note_mask)
+        is_masked = true;
+    return is_masked;
 }

@@ -118,25 +118,28 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            for (int i = 0; i < midi_notes_len; i++)
+            if (!synthbase_is_masked(&ms->base))
             {
-                int note = midi_notes[i];
-
-                minisynth_midi_note_on(ms, note, ev->data2);
-
-                if (ev->source != EXTERNAL_DEVICE)
+                for (int i = 0; i < midi_notes_len; i++)
                 {
-                    int sustain_ms =
-                        ev->hold ? ev->hold : ms->base.sustain_note_ms;
-                    int sustain_time_in_ticks =
-                        sustain_ms * mixr->timing_info.ms_per_midi_tick;
+                    int note = midi_notes[i];
 
-                    int note_off_tick =
-                        (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-                    midi_event off = new_midi_event(MIDI_OFF, note, 128);
-                    off.delete_after_use = true;
-                    synthbase_add_event(&ms->base, ms->base.cur_pattern,
-                                        note_off_tick, off);
+                    minisynth_midi_note_on(ms, note, ev->data2);
+
+                    if (ev->source != EXTERNAL_DEVICE)
+                    {
+                        int sustain_ms =
+                            ev->hold ? ev->hold : ms->base.sustain_note_ms;
+                        int sustain_time_in_ticks =
+                            sustain_ms * mixr->timing_info.ms_per_midi_tick;
+
+                        int note_off_tick =
+                            (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
+                        midi_event off = new_midi_event(MIDI_OFF, note, 128);
+                        off.delete_after_use = true;
+                        synthbase_add_event(&ms->base, ms->base.cur_pattern,
+                                            note_off_tick, off);
+                    }
                 }
             }
             break;
@@ -173,21 +176,24 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (144):
         { // Hex 0x80
-            for (int i = 0; i < midi_notes_len; i++)
+            if (!synthbase_is_masked(&dx->base))
             {
-                int note = midi_notes[i];
-                dxsynth_midi_note_on(dx, note, ev->data2);
-                if (ev->source != EXTERNAL_DEVICE)
+                for (int i = 0; i < midi_notes_len; i++)
                 {
-                    int sustain_time_in_ticks =
-                        dx->base.sustain_note_ms *
-                        mixr->timing_info.ms_per_midi_tick;
-                    int note_off_tick =
-                        (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-                    midi_event off = new_midi_event(128, note, 128);
-                    off.delete_after_use = true;
-                    synthbase_add_event(&dx->base, dx->base.cur_pattern,
-                                        note_off_tick, off);
+                    int note = midi_notes[i];
+                    dxsynth_midi_note_on(dx, note, ev->data2);
+                    if (ev->source != EXTERNAL_DEVICE)
+                    {
+                        int sustain_time_in_ticks =
+                            dx->base.sustain_note_ms *
+                            mixr->timing_info.ms_per_midi_tick;
+                        int note_off_tick =
+                            (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
+                        midi_event off = new_midi_event(128, note, 128);
+                        off.delete_after_use = true;
+                        synthbase_add_event(&dx->base, dx->base.cur_pattern,
+                                            note_off_tick, off);
+                    }
                 }
             }
             break;

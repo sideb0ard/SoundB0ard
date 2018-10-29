@@ -9,6 +9,7 @@
 #include <mixer.h>
 #include <pattern_parser.h>
 #include <synth_cmds.h>
+#include <utils.h>
 
 extern mixer *mixr;
 bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
@@ -779,6 +780,12 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         {
             int sample_rate = atoi(wurds[1]);
             synthbase_set_sample_rate(base, sample_rate);
+        }
+        else if (strncmp("mask", wurds[0], 4) == 0)
+        {
+            uint16_t mask = mask_from_string(wurds[1]);
+            printf("Mask is %d\n", mask);
+            synthbase_set_note_mask(base, mask);
         }
         else if (strncmp("switch", wurds[0], 6) == 0 ||
                  strncmp("cur_pattern", wurds[2], 9) == 0)
