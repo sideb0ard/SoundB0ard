@@ -86,6 +86,10 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
     {
         synthdrum_sequencer *synth =
             (synthdrum_sequencer *)mixr->sound_generators[soundgen_num];
+        if (strncmp("debug", wurds[0], 5) == 0)
+        {
+            synthdrum_set_debug(synth, val);
+        }
         if (strncmp("save", wurds[0], 4) == 0)
         {
             synthdrum_save_patch(synth, wurds[1]);

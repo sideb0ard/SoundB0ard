@@ -25,21 +25,27 @@ typedef struct synthdrum_sequencer
     double vol;
     bool reset_osc;
 
+    // OSC1 ///////////////////////////
     qblimited_oscillator m_osc1;
     double osc1_amp;
-
-    qblimited_oscillator m_osc2;
-    double osc2_amp;
 
     // osc1 amp ENV
     envelope_generator m_eg1;
     double eg1_osc1_intensity;
     int eg1_sustain_ms;
 
+
+    // OSC2 ///////////////////////////
+    qblimited_oscillator m_osc2;
+    double osc2_amp;
+
     // COMBINED osc2 pitch ENV and output ENV
     envelope_generator m_eg2;
     double eg2_osc2_intensity;
     int eg2_sustain_ms;
+
+
+    // FILTER ///////////////////
 
     int m_filter_type;
     double m_filter_fc;
@@ -47,12 +53,19 @@ typedef struct synthdrum_sequencer
     double m_distortion_threshold;
 
     filter_moogladder m_filter;
+
+    // DISTORTION
     distortion m_distortion;
 
+    // PATTERN METADATA
     pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
     int mod_semitones_range;
     bool started;
+
+    uint16_t cur_state;
+
+    bool debug;
 
 } synthdrum_sequencer;
 
@@ -98,3 +111,4 @@ void synthdrum_randomize(synthdrum_sequencer *sds);
 
 midi_event *synthdrum_get_pattern(void *self, int pattern_num);
 void synthdrum_set_pattern(void *self, int pattern_num, midi_event *pattern);
+void synthdrum_set_debug(synthdrum_sequencer *sds, bool debug);

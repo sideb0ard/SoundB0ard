@@ -13,6 +13,8 @@ extern mixer *mixr;
 // this must be a dupe - sure i already have this..
 const char *s_synth_waves[] = {"SINE", "SAW1",   "SAW2",  "SAW3",
                                "TRI",  "SQUARE", "NOISE", "PNOISE"};
+const char *s_sd_eg_state[] = {"OFF",     "ATTACK",  "DECAY",
+                               "SUSTAIN", "RELEASE", "SHUTDOWN"};
 
 synthdrum_sequencer *new_synthdrum_seq()
 {
@@ -31,45 +33,43 @@ synthdrum_sequencer *new_synthdrum_seq()
 
     strncpy(sds->m_patch_name, "Default", 7);
 
-    // OSC1 transient noise
     osc_new_settings(&sds->m_osc1.osc);
     qb_set_soundgenerator_interface(&sds->m_osc1);
     sds->m_osc1.osc.m_waveform = NOISE;
-    sds->osc1_amp = 0.107;
+    sds->m_osc1.osc.m_osc_fo = 58; // irrelevant when noise
+    sds->osc1_amp = .01;
     osc_update(&sds->m_osc1.osc);
-
-    // OSC body
-    osc_new_settings(&sds->m_osc2.osc);
-    qb_set_soundgenerator_interface(&sds->m_osc2);
-    sds->m_osc2.osc.m_waveform = SINE;
-    sds->m_osc2.osc.m_osc_fo = 40;
-    sds->osc2_amp = 1.0;
-    osc_update(&sds->m_osc2.osc);
 
     // osc1 noise amp env
     envelope_generator_init(&sds->m_eg1);
     eg_set_attack_time_msec(&sds->m_eg1, 1);
-    eg_set_decay_time_msec(&sds->m_eg1, 0);
-    eg_set_release_time_msec(&sds->m_eg1, 1);
-    eg_set_sustain_level(&sds->m_eg1, 0.1);
-    sds->eg1_sustain_ms = 0;
+    eg_set_decay_time_msec(&sds->m_eg1, 1);
+    eg_set_release_time_msec(&sds->m_eg1, 10);
+    eg_set_sustain_level(&sds->m_eg1, 0);
+
+    osc_new_settings(&sds->m_osc2.osc);
+    qb_set_soundgenerator_interface(&sds->m_osc2);
+    sds->m_osc2.osc.m_waveform = SINE;
+    sds->m_osc2.osc.m_osc_fo = 58;
+    sds->osc2_amp = 1.0;
+    osc_update(&sds->m_osc2.osc);
 
     // osc2 pitch envelope AND amp
     envelope_generator_init(&sds->m_eg2);
     eg_set_attack_time_msec(&sds->m_eg2, 1);
-    eg_set_decay_time_msec(&sds->m_eg2, 60);
-    eg_set_release_time_msec(&sds->m_eg1, 100);
-    eg_set_sustain_level(&sds->m_eg2, 0.1);
-    sds->eg2_sustain_ms = 0;
+    eg_set_decay_time_msec(&sds->m_eg2, 50);
+    eg_set_release_time_msec(&sds->m_eg2, 1);
+    eg_set_sustain_level(&sds->m_eg2, 0);
     sds->eg2_osc2_intensity = 1;
 
     filter_moog_init(&sds->m_filter);
     sds->m_filter_type = LPF4;
-    sds->m_filter_fc = 180;
+    sds->m_filter_fc = 18000;
     sds->m_filter_q = 0.707;
     filter_set_type((filter *)&sds->m_filter, sds->m_filter_type);
     filter_set_fc_control((filter *)&sds->m_filter, sds->m_filter_fc);
     moog_set_qcontrol((filter *)&sds->m_filter, sds->m_filter_q);
+
     sds->m_distortion_threshold = 0.707;
 
     sds->sg.gennext = &sds_gennext;
@@ -154,7 +154,7 @@ void sds_status(void *self, wchar_t *ss)
              "o2_wav:" "%s" "%s" "%s" "(%d) o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
              "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f e2_rel:%.2f\n"
              "%s"
-             "filter_type:%d freq:%.2f q:%.2f",
+             "filter_type:%d freq:%.2f q:%.2f // debug:%s",
 
              sds->m_patch_name,
              INSTRUMENT_RED,
@@ -184,7 +184,8 @@ void sds_status(void *self, wchar_t *ss)
              INSTRUMENT_RED,
 
              sds->m_filter_type,
-             sds->m_filter_fc, sds->m_filter_q);
+             sds->m_filter_fc, sds->m_filter_q,
+             sds->debug ? "true" : "false");
     // clang-format on
 
     wchar_t step_status_string[MAX_STATIC_STRING_SZ];
@@ -224,7 +225,7 @@ void sds_event_notify(void *self, unsigned int event_type)
         break;
     case (TIME_SIXTEENTH_TICK):
         if (sds->started)
-            step_tick(&sds->m_seq);
+            step_tick(&sds->m_seq); // TODO rename to pattern generation
         break;
     }
 }
@@ -237,48 +238,46 @@ stereo_val sds_gennext(void *self)
     if (!sds->started)
         return out;
 
-    // noise env for initial snap
-    double eg1_out = eg_do_envelope(&sds->m_eg1, NULL);
-    if (sds->m_eg1.m_eg_mode == SUSTAIN)
+    // TRANSIENT /////////////////
+    // this is for the initial 'Click'
+    double osc1_amp_env = eg_do_envelope(&sds->m_eg1, NULL);
+    if (sds->m_eg1.m_state == SUSTAIN)
         eg_note_off(&sds->m_eg1);
 
     osc_update(&sds->m_osc1.osc);
     double osc1_out =
-        qb_do_oscillate(&sds->m_osc1.osc, NULL) * eg1_out * sds->osc1_amp;
+        qb_do_oscillate(&sds->m_osc1.osc, NULL) * sds->osc1_amp * osc1_amp_env;
 
-    // eg2 env -> pitch of OSC2 _AND_ AMP OUT
-    double eg2_biased_out = 0;
-    double amp_out_env = eg_do_envelope(&sds->m_eg2, &eg2_biased_out);
-    if (sds->m_eg2.m_eg_mode == SUSTAIN)
+    // BODY ///////////////////////////
+    /// EG2 env provides mod pitch of OSC2 _AND_ AMP OUT
+    double pitch_env = 0; // biased output
+    double amp_out_env = eg_do_envelope(&sds->m_eg2, &pitch_env);
+    if (sds->m_eg2.m_state == SUSTAIN)
         eg_note_off(&sds->m_eg2);
 
-    double eg2_osc_mod =
-        sds->eg2_osc2_intensity * sds->mod_semitones_range * eg2_biased_out;
-    sds->m_osc2.osc.m_fo_mod = eg2_osc_mod;
+    sds->m_osc2.osc.m_fo_mod =
+       sds->eg2_osc2_intensity * sds->mod_semitones_range * pitch_env;
 
     osc_update(&sds->m_osc2.osc);
     double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;
 
-    double combined_osc = osc1_out * sds->osc1_amp + osc2_out * sds->osc2_amp;
+    ////////////////
+
+    double combined_osc = (osc1_out + osc2_out) * amp_out_env;
 
     sds->m_distortion.m_threshold = sds->m_distortion_threshold;
-    double distorted_out = distortion_process(&sds->m_distortion, combined_osc);
+    combined_osc = distortion_process(&sds->m_distortion, combined_osc);
 
     sds->m_filter.f.m_filter_type = sds->m_filter_type;
     sds->m_filter.f.m_fc_control = sds->m_filter_fc;
     sds->m_filter.f.m_q_control = sds->m_filter_q;
     moog_update((filter *)&sds->m_filter);
-    double filtered_out = moog_gennext((filter *)&sds->m_filter, distorted_out);
+    combined_osc = moog_gennext((filter *)&sds->m_filter, combined_osc);
 
-    double almost_out = filtered_out * amp_out_env * sds->vol;
-    // double almost_out =
-    //    (osc1_out * sds->osc1_amp + osc2_out * sds->osc2_amp) *
-    //    amp_out_env * sds->vol;
+    combined_osc = effector(&sds->sg, combined_osc);
 
-    almost_out = effector(&sds->sg, almost_out);
-
-    out.left = almost_out;
-    out.right = almost_out;
+    out.left = combined_osc * sds->vol;
+    out.right = combined_osc * sds->vol;
 
     return out;
 }
@@ -577,7 +576,7 @@ void synthdrum_set_eg_release(synthdrum_sequencer *sds, int eg_num, double val)
 void synthdrum_set_eg_osc_intensity(synthdrum_sequencer *sds, int eg, int osc,
                                     double val)
 {
-    if (val >= 0 && val <= 1)
+    if (val >= -1 && val <= 1)
     {
         switch (eg)
         {
@@ -593,7 +592,7 @@ void synthdrum_set_eg_osc_intensity(synthdrum_sequencer *sds, int eg, int osc,
         }
     }
     else
-        printf("Val has to be between 0 and 1\n");
+        printf("Val has to be between -1 and 1\n");
 }
 
 void synthdrum_set_osc_amp(synthdrum_sequencer *sds, int osc_num, double val)
@@ -687,4 +686,8 @@ void synthdrum_set_pattern(void *self, int pattern_num, midi_event *pattern)
 void synthdrum_set_reset_osc(synthdrum_sequencer *sds, bool b)
 {
     sds->reset_osc = b;
+}
+void synthdrum_set_debug(synthdrum_sequencer *sds, bool debug)
+{
+    sds->debug = debug;
 }
