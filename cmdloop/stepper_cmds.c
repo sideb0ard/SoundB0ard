@@ -95,11 +95,8 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
             synthdrum_save_patch(synth, wurds[1]);
         }
         if (strncmp("open", wurds[0], 4) == 0 ||
-            strncmp("load", wurds[0], 4) == 0)
-        {
-            synthdrum_open_patch(synth, wurds[1]);
-        }
-        if (strncmp("import", wurds[0], 6) == 0)
+            strncmp("load", wurds[0], 4) == 0 ||
+            strncmp("import", wurds[0], 6) == 0)
         {
             synthdrum_open_patch(synth, wurds[1]);
         }
@@ -178,6 +175,10 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
         else if (strncmp("freq", wurds[0], 4) == 0)
         {
             synthdrum_set_filter_freq(synth, val);
+        }
+        else if (strncmp("rand", wurds[0], 4) == 0)
+        {
+            synthdrum_randomize(synth);
         }
         else if (strncmp("reset", wurds[0], 5) == 0)
         {

@@ -34,7 +34,6 @@ typedef struct synthdrum_sequencer
     double eg1_osc1_intensity;
     int eg1_sustain_ms;
 
-
     // OSC2 ///////////////////////////
     qblimited_oscillator m_osc2;
     double osc2_amp;
@@ -43,7 +42,6 @@ typedef struct synthdrum_sequencer
     envelope_generator m_eg2;
     double eg2_osc2_intensity;
     int eg2_sustain_ms;
-
 
     // FILTER ///////////////////
 

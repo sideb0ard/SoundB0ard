@@ -102,12 +102,12 @@ void synthdrum_randomize(synthdrum_sequencer *sds)
 {
 
     sds->m_osc1.osc.m_waveform = rand() % MAX_OSC;
-    sds->m_osc1.osc.m_osc_fo = rand() % 140;
+    sds->m_osc1.osc.m_osc_fo = rand() % 1400;
     sds->osc1_amp = ((float)rand()) / RAND_MAX;
     osc_update(&sds->m_osc1.osc);
 
     sds->m_osc2.osc.m_waveform = rand() % MAX_OSC;
-    sds->m_osc2.osc.m_osc_fo = rand() % 140;
+    sds->m_osc2.osc.m_osc_fo = rand() % 1400;
     sds->osc2_amp = ((float)rand()) / RAND_MAX;
     osc_update(&sds->m_osc2.osc);
 
@@ -115,7 +115,7 @@ void synthdrum_randomize(synthdrum_sequencer *sds)
     eg_set_decay_time_msec(&sds->m_eg1, rand() % 100);
     eg_set_release_time_msec(&sds->m_eg1, rand() % 10);
     eg_set_sustain_level(&sds->m_eg1, ((float)rand()) / RAND_MAX);
-    sds->eg1_sustain_ms = rand() % 200;
+    sds->eg1_sustain_ms = rand() % 2000;
     sds->eg1_osc1_intensity = ((float)rand()) / RAND_MAX;
 
     // osc2 pitch envelope
@@ -123,11 +123,11 @@ void synthdrum_randomize(synthdrum_sequencer *sds)
     eg_set_decay_time_msec(&sds->m_eg2, rand() % 100);
     eg_set_release_time_msec(&sds->m_eg2, rand() % 100);
     eg_set_sustain_level(&sds->m_eg2, ((float)rand()) / RAND_MAX);
-    sds->eg2_sustain_ms = rand() % 200;
+    sds->eg2_sustain_ms = rand() % 2000;
     sds->eg2_osc2_intensity = ((float)rand()) / RAND_MAX;
 
     sds->m_filter_type = rand() % NUM_FILTER_TYPES;
-    sds->m_filter_fc = rand() % 1800;
+    sds->m_filter_fc = rand() % 18000;
     sds->m_filter_q = ((float)rand()) / RAND_MAX;
 
     filter_set_type((filter *)&sds->m_filter, sds->m_filter_type);
@@ -256,7 +256,7 @@ stereo_val sds_gennext(void *self)
         eg_note_off(&sds->m_eg2);
 
     sds->m_osc2.osc.m_fo_mod =
-       sds->eg2_osc2_intensity * sds->mod_semitones_range * pitch_env;
+        sds->eg2_osc2_intensity * sds->mod_semitones_range * pitch_env;
 
     osc_update(&sds->m_osc2.osc);
     double osc2_out = qb_do_oscillate(&sds->m_osc2.osc, NULL) * sds->osc2_amp;

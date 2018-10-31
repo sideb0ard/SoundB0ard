@@ -223,7 +223,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (strncmp("riff", wurds[1], 4) == 0)
                 riff = true;
 
-
             int generator = atoi(wurds[2]);
             int dest_sg_num = -1;
             int dest_sg_pattern_num = -1;
