@@ -7,8 +7,8 @@
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
 #include <obliquestrategies.h>
-#include <pattern_utils.h>
 #include <pattern_transformers.h>
+#include <pattern_utils.h>
 #include <sequencer_utils.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>

@@ -1032,7 +1032,6 @@ int how_many_bits_in_num(unsigned int num)
     return count;
 }
 
-
 void print_logo()
 {
     printf(
@@ -1113,4 +1112,3 @@ uint16_t mask_from_string(char *stringey_mask)
 
     return bin_mask;
 }
-

@@ -12,4 +12,3 @@
 
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
-

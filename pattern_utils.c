@@ -1,9 +1,9 @@
-#include <string.h>
 #include <stdlib.h>
+#include <string.h>
 
+#include <mixer.h>
 #include <pattern_utils.h>
 #include <utils.h>
-#include <mixer.h>
 
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
@@ -27,7 +27,8 @@ void midi_pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
     pattern[target_tick] = ev;
 }
 
-bool is_midi_event_in_pattern_range(int start_tick, int end_tick, midi_pattern pattern)
+bool is_midi_event_in_pattern_range(int start_tick, int end_tick,
+                                    midi_pattern pattern)
 {
     for (int i = start_tick; i < end_tick; i++)
     {
@@ -56,8 +57,6 @@ void midi_pattern_add_triplet(midi_event *pattern, unsigned int quarter)
     }
 }
 
-
-
 uint16_t midi_pattern_to_short(midi_event *pattern)
 {
     uint16_t bit_pattern = 0;
@@ -66,7 +65,7 @@ uint16_t midi_pattern_to_short(midi_event *pattern)
         int start = i * PPSIXTEENTH;
         if (is_midi_event_in_pattern_range(start, start + PPSIXTEENTH, pattern))
         {
-            bit_pattern |= 1 << (15-i);
+            bit_pattern |= 1 << (15 - i);
         }
     }
     return bit_pattern;
@@ -92,9 +91,7 @@ void midi_pattern_to_widechar(midi_event *pattern, wchar_t *patternstr)
     }
 }
 
-void short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
-{
-}
+void short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern) {}
 
 void short_to_char(uint16_t num, char bin_num[17])
 {
@@ -108,7 +105,7 @@ void short_to_char(uint16_t num, char bin_num[17])
     bin_num[16] = '\0';
 }
 
-//void print_parceled_pattern(midi_event *pattern)
+// void print_parceled_pattern(midi_event *pattern)
 //{
 //    printf("PATTERN!\n");
 //    bool found = false;

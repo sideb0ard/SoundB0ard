@@ -76,4 +76,3 @@ void print_logo(void);
 
 void mask_to_string(uint16_t mask, wchar_t *patternstr);
 uint16_t mask_from_string(char *stringey_mask);
-

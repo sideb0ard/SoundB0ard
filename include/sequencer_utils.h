@@ -4,4 +4,3 @@
 
 #include <defjams.h>
 #include <step_sequencer.h>
-

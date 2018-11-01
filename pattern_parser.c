@@ -782,4 +782,3 @@ void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
         sg->set_pattern(sg, target_pattern_num, pattern);
     free(pattern);
 }
-

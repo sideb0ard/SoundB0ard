@@ -9,8 +9,8 @@
 #include "sequencer_utils.h"
 #include "synthbase.h"
 #include "utils.h"
-#include <pattern_utils.h>
 #include <pattern_parser.h>
+#include <pattern_utils.h>
 
 extern const int key_midi_mapping[NUM_KEYS];
 extern const char *key_names[NUM_KEYS];
