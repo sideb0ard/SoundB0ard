@@ -71,7 +71,8 @@ uint16_t midi_pattern_to_short(midi_event *pattern)
     return bit_pattern;
 }
 
-void midi_pattern_to_widechar(midi_event *pattern, wchar_t *patternstr)
+void midi_pattern_to_widechar(midi_event *pattern,
+                              wchar_t *patternstr) // len 33
 {
     int cur_sixteenth = 0;
     for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
@@ -91,7 +92,22 @@ void midi_pattern_to_widechar(midi_event *pattern, wchar_t *patternstr)
     }
 }
 
-void short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern) {}
+void short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
+{
+    clear_midi_pattern(dest_pattern);
+    for (int i = 0; i < 15; i++)
+    {
+        if (bit_pattern & (1 << (15 - i)))
+        {
+            int midi_pos = i * PPSIXTEENTH;
+            midi_event *ev = &dest_pattern[midi_pos];
+            ev->data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+            ev->data2 = 128; // velocity
+            ev->event_type = MIDI_ON;
+            ev->source = 0;
+        }
+    }
+}
 
 void short_to_char(uint16_t num, char bin_num[17])
 {
@@ -171,7 +187,5 @@ int shift_bits_to_leftmost_position(uint16_t num, int num_of_bits_to_align_with)
     }
     int bitshift_by = num_of_bits_to_align_with - (first_position + 1);
     int ret_num = num << bitshift_by;
-    // print_binary_version_of_int(num);
-    // print_binary_version_of_int(ret_num);
     return ret_num;
 }

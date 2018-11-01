@@ -186,6 +186,26 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         cmd_found = true;
     }
+    else if (strncmp("scrumpy", wurds[0], 6) == 0)
+    {
+        int pg_num = atoi(wurds[1]);
+        int dest_sg_num = -1;
+        int dest_sg_pattern_num = -1;
+        sscanf(wurds[2], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
+
+        if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
+            mixer_is_valid_seq_gen_num(mixr, pg_num) &&
+            dest_sg_pattern_num != -1)
+        {
+            sequence_generator *pg = mixr->sequence_generators[pg_num];
+            soundgenerator *sg = mixr->sound_generators[dest_sg_num];
+            midi_event *midi_pattern = sg->get_pattern(sg, dest_sg_pattern_num);
+            int bitpattern = pg->generate(pg, NULL);
+            short_to_midi_pattern(bitpattern, midi_pattern);
+        }
+        else
+            printf("SUMMIT AINT VALID: SG:%d PG:%d\n", dest_sg_num, pg_num);
+    }
     else if (strncmp("genrec", wurds[0], 6) == 0)
     {
         int pg_num = atoi(wurds[1]);
