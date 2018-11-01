@@ -72,8 +72,8 @@ double mma_midi_to_atten_db(unsigned int midi_val);
 bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
                             int size_of_array);
 unsigned int get_next_compat_note(unsigned int cur_key);
-bool is_midi_event_in_range(int start_tick, int end_tick, midi_pattern pattern);
 void print_logo(void);
-void pattern_to_string(midi_event *pattern, wchar_t *patternstr);
+
 void mask_to_string(uint16_t mask, wchar_t *patternstr);
 uint16_t mask_from_string(char *stringey_mask);
+

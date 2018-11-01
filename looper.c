@@ -8,7 +8,7 @@
 #include "looper.h"
 #include "mixer.h"
 #include "utils.h"
-#include <pattern_parser.h>
+#include <pattern_utils.h>
 
 extern mixer *mixr;
 extern char *s_lfo_mode_names;
@@ -232,7 +232,7 @@ void looper_event_notify(void *self, unsigned int event_type)
                                          mixr->timing_info.ms_per_midi_tick)) %
                             PPBAR;
                         midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
-                        pattern_add_event(pattern, off_tick, off_event);
+                        midi_pattern_add_event(pattern, off_tick, off_event);
                         looper_start(g);
                         // printf("[%d] ON idx is %d -- setting off to "
                         //       "off_tick:%d\n",

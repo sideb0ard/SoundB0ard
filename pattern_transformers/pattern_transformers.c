@@ -2,6 +2,7 @@
 
 #include <pattern_parser.h>
 #include <pattern_transformers.h>
+#include <pattern_utils.h>
 
 static void pattern_check_idx(int *idx, int pattern_len)
 {
@@ -32,7 +33,7 @@ static void _shift(midi_event *in_pattern, int places, int direction)
             out_pattern[target_idx] = in_pattern[i];
         }
     }
-    clear_pattern(in_pattern);
+    clear_midi_pattern(in_pattern);
     for (int i = 0; i < PPBAR; i++)
         in_pattern[i] = out_pattern[i];
 }
@@ -60,7 +61,7 @@ void brak(midi_event *in_pattern)
         }
     }
     right_shift(out_pattern, 4);
-    clear_pattern(in_pattern);
+    clear_midi_pattern(in_pattern);
     for (int i = 0; i < PPBAR; i++)
         in_pattern[i] = out_pattern[i];
 }

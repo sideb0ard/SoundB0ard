@@ -6,6 +6,7 @@
 #include <markov.h>
 #include <mixer.h>
 #include <pattern_parser.h>
+#include <pattern_utils.h>
 #include <sequence_generator_cmds.h>
 #include <sequencer_utils.h>
 
@@ -32,7 +33,7 @@ bool parse_sequence_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 int num =
                     sg->generate(sg, (void *)&mixr->timing_info.cur_sample);
                 char binnum[17] = {0};
-                char_binary_version_of_short(num, binnum);
+                short_to_char(num, binnum);
                 printf("NOM!: %d %s\n", num, binnum);
             }
             else if (strncmp("time", wurds[2], 4) == 0 && sg->type == BITSHIFT)

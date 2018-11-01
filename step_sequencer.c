@@ -9,7 +9,7 @@
 #include <defjams.h>
 #include <euclidean.h>
 #include <mixer.h>
-#include <pattern_parser.h>
+#include <pattern_utils.h>
 #include <sequencer_utils.h>
 #include <step_sequencer.h>
 #include <utils.h>
@@ -198,8 +198,7 @@ bool step_tick(step_sequencer *seq)
                             if (seq->visualize)
                             {
                                 char bit_string[17];
-                                char_binary_version_of_short(bit_pattern,
-                                                             bit_string);
+                                short_to_char(bit_pattern, bit_string);
                                 printf("PATTERN: %s\n", bit_string);
                             }
 
@@ -220,7 +219,7 @@ bool step_tick(step_sequencer *seq)
                                     quart = 1;
                                 else if (randy > 50)
                                     quart = 3;
-                                pattern_add_triplet(
+                                midi_pattern_add_triplet(
                                     seq->patterns[seq->cur_pattern], quart);
                             }
                         }
@@ -300,7 +299,7 @@ void step_status(step_sequencer *seq, wchar_t *status_string)
     wchar_t apattern[seq->pattern_len + 1];
     for (int i = 0; i < seq->num_patterns; i++)
     {
-        pattern_to_string(seq->patterns[i], patternstr);
+        midi_pattern_to_widechar(seq->patterns[i], patternstr);
         swprintf(pattern_details, 255, L"\n[%d]  %ls numloops:%d swing:%d", i,
                  patternstr, seq->pattern_num_loops[i],
                  seq->pattern_num_swing_setting[i]);
@@ -416,7 +415,7 @@ void step_wchar_binary_version_of_pattern(step_sequencer *s, midi_pattern p,
     for (int i = 0; i < s->pattern_len; i++)
     {
         int start = i * incs;
-        if (is_midi_event_in_range(start, start + incs, p))
+        if (is_midi_event_in_pattern_range(start, start + incs, p))
             bin_num[i] = sparkchars[5];
         else
             bin_num[i] = sparkchars[0];
@@ -431,7 +430,7 @@ void step_char_binary_version_of_pattern(step_sequencer *s, midi_pattern p,
     for (int i = 0; i < s->pattern_len; i++)
     {
         int start = i * incs;
-        if (is_midi_event_in_range(start, start + incs, p))
+        if (is_midi_event_in_pattern_range(start, start + incs, p))
             bin_num[i] = '1';
         else
             bin_num[i] = '0';
@@ -594,7 +593,7 @@ void step_set_pattern(step_sequencer *s, int pattern_num, midi_event *pattern)
 {
     if (step_is_valid_pattern_num(s, pattern_num))
     {
-        clear_pattern(s->patterns[pattern_num]);
+        clear_midi_pattern(s->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; ++i)
             s->patterns[pattern_num][i] = pattern[i];
     }

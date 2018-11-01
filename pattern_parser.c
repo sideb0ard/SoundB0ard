@@ -16,6 +16,7 @@
 #include <pattern_parser.h>
 #include <sample_sequencer.h>
 #include <sequencer_utils.h>
+#include <utils.h>
 
 #define WEE_STACK_SIZE 32
 #define _MAX_VAR_NAME 32
@@ -49,14 +50,6 @@ static char *token_type_names[] = {"SQUARE_LEFT",
                                    "ANGLE_EXPRESSION",
                                    "BLANK",
                                    "VAR_NAME"};
-
-static bool is_in_array(int num_to_look_for, int *nums, int nums_len)
-{
-    for (int i = 0; i < nums_len; i++)
-        if (nums[i] == num_to_look_for)
-            return true;
-    return false;
-}
 
 // static void print_pattern(midi_event *pattern)
 //{
@@ -164,7 +157,7 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
     int num_uniq = 0;
     int uniq_positions[MAX_PATTERN] = {};
     for (int i = 0; i < numpositions; i++)
-        if (!is_in_array(ppositions[i], uniq_positions, num_uniq))
+        if (!is_int_member_in_array(ppositions[i], uniq_positions, num_uniq))
             uniq_positions[num_uniq++] = ppositions[i];
 
     if (num_uniq != var_tokens_idx)
@@ -767,11 +760,6 @@ tidy_up_and_return:
     return true;
 }
 
-void clear_pattern(midi_event *pattern)
-{
-    memset(pattern, 0, sizeof(midi_event) * PPBAR);
-}
-
 void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
                            unsigned int pattern_type,
                            char wurds[][SIZE_OF_WURD], int num_wurds)
@@ -795,16 +783,3 @@ void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
     free(pattern);
 }
 
-void pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
-{
-    int target_tick = midi_tick;
-    while (pattern[target_tick].event_type)
-    {
-        if (mixr->debug_mode)
-            printf("Gotsz a tick already - bump!\n");
-        target_tick++;
-        if (target_tick == PPBAR) // wrap around
-            target_tick = 0;
-    }
-    pattern[target_tick] = ev;
-}

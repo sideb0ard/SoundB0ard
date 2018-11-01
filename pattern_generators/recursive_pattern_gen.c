@@ -5,7 +5,7 @@
 #include <euclidean.h>
 #include <mixer.h>
 #include <pattern_generators/recursive_pattern_gen.h>
-#include <pattern_parser.h>
+#include <pattern_utils.h>
 #include <sequence_generator.h>
 #include <utils.h>
 
@@ -48,7 +48,7 @@ void recurse_pattern(recursive_pattern_gen *rpg, midi_event *midi_pattern,
         return;
 
     midi_event ev = new_midi_event(MIDI_ON, midi_note, amp);
-    pattern_add_event(midi_pattern, start_idx, ev);
+    midi_pattern_add_event(midi_pattern, start_idx, ev);
     if (amp > rpg->threshold)
     {
         recurse_pattern(rpg, midi_pattern, start_idx + (PPQN * rpg->multi),

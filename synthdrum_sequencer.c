@@ -581,13 +581,10 @@ void synthdrum_set_eg_osc_intensity(synthdrum_sequencer *sds, int eg, int osc,
         switch (eg)
         {
         case (1):
-            if (osc == 1)
-                sds->eg1_osc1_intensity = val;
-            else if (osc == 2)
-                sds->eg2_osc2_intensity = val;
+            sds->eg1_osc1_intensity = val;
             break;
         case (2):
-            sds->osc2_amp = val;
+            sds->eg2_osc2_intensity = val;
             break;
         }
     }

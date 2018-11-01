@@ -60,6 +60,7 @@ SRC = \
 	obliquestrategies.c \
 	oscillator.c \
 	pattern_parser.c \
+	pattern_utils.c \
 	pattern_generators/recursive_pattern_gen.c \
 	pattern_transformers/pattern_transformers.c \
 	qblimited_oscillator.c \

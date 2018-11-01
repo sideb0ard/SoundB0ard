@@ -947,16 +947,6 @@ double inline mma_midi_to_atten_db(unsigned int midi_val)
     return 20.0 * log10((127.0 * 127.0) / ((float)midi_val * (float)midi_val));
 }
 
-bool is_midi_event_in_range(int start_tick, int end_tick, midi_pattern pattern)
-{
-    for (int i = start_tick; i < end_tick; i++)
-    {
-        if (pattern[i].event_type == MIDI_ON)
-            return true;
-    }
-    return false;
-}
-
 bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
                             int size_of_array)
 {
@@ -1042,27 +1032,6 @@ int how_many_bits_in_num(unsigned int num)
     return count;
 }
 
-void print_parceled_pattern(midi_event *pattern)
-{
-    printf("PATTERN!\n");
-    bool found = false;
-    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
-    {
-        // printf("%d", pattern.pattern[i]);
-        found = false;
-        for (int j = 0; j < PPSIXTEENTH && !found; j++)
-        {
-            if (pattern[i + j].event_type == MIDI_ON)
-            {
-                printf("1");
-                found = true;
-            }
-        }
-        if (!found)
-            printf("0");
-    }
-    puts("\n");
-}
 
 void print_logo()
 {
@@ -1082,26 +1051,6 @@ void print_logo()
         "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
         ANSI_COLOR_RESET);
     // clang-format on
-}
-
-void pattern_to_string(midi_event *pattern, wchar_t *patternstr)
-{
-    int cur_sixteenth = 0;
-    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
-    {
-        patternstr[cur_sixteenth] = sparkchars[0];
-        patternstr[cur_sixteenth + 1] = sparkchars[0];
-        for (int j = i; j < (i + PPSIXTEENTH); j++)
-        {
-            if (pattern[j].event_type == MIDI_ON)
-            {
-                int sparklevel = scaleybum(0, 127, 0, 5, pattern[j].data2);
-                patternstr[cur_sixteenth] = sparkchars[sparklevel];
-                patternstr[cur_sixteenth + 1] = sparkchars[sparklevel];
-            }
-        }
-        cur_sixteenth += 2;
-    }
 }
 
 void mask_to_string(uint16_t mask,
@@ -1164,3 +1113,4 @@ uint16_t mask_from_string(char *stringey_mask)
 
     return bin_mask;
 }
+

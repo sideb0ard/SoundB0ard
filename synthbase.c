@@ -9,6 +9,7 @@
 #include "sequencer_utils.h"
 #include "synthbase.h"
 #include "utils.h"
+#include <pattern_utils.h>
 #include <pattern_parser.h>
 
 extern const int key_midi_mapping[NUM_KEYS];
@@ -96,7 +97,7 @@ void synthbase_generate_recursive_pattern(synthbase *base)
     printf("woof!\n");
     synthbase_stop(base);
     midi_event *midi_pattern = base->patterns[base->cur_pattern];
-    clear_pattern(midi_pattern);
+    clear_midi_pattern(midi_pattern);
 
     synthbase_gen_rec(base, 0, PPBAR - 1, base->midi_note_1, 128);
 }
@@ -107,7 +108,7 @@ void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
     synthbase_stop(base);
 
     midi_event *midi_pattern = base->patterns[base->cur_pattern];
-    clear_pattern(midi_pattern);
+    clear_midi_pattern(midi_pattern);
 
     chord_midi_notes chnotes = {0};
     get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
@@ -268,7 +269,7 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     memset(scratch, 0, 256);
     for (int i = 0; i < base->num_patterns; i++)
     {
-        pattern_to_string(base->patterns[i], patternstr);
+        midi_pattern_to_widechar(base->patterns[i], patternstr);
         swprintf(scratch, 255, L"\n[%d]  %ls  numloops: %d", i, patternstr,
                  base->pattern_multiloop_count[i]);
         wcscat(status_string, scratch);
@@ -349,12 +350,12 @@ void synthbase_add_event(synthbase *base, int pattern_num, int midi_tick,
                          midi_event ev)
 {
     midi_event *pattern = base->patterns[pattern_num];
-    pattern_add_event(pattern, midi_tick, ev);
+    midi_pattern_add_event(pattern, midi_tick, ev);
 }
 
 void synthbase_clear_pattern_ready_for_new_one(synthbase *ms, int pattern_num)
 {
-    memset(ms->patterns[pattern_num], 0, sizeof(midi_pattern));
+    clear_midi_pattern(ms->patterns[pattern_num]);
 }
 
 void synthbase_nudge_pattern(synthbase *ms, int pattern_num, int sixteenth)
@@ -661,7 +662,7 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
     if (is_valid_pattern_num(base, pattern_num))
     {
         synthbase_stop(base);
-        clear_pattern(base->patterns[pattern_num]);
+        clear_midi_pattern(base->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
             synthbase_add_event(base, pattern_num, i, pattern[i]);
     }
