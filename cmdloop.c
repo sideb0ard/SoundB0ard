@@ -12,7 +12,6 @@
 #include <utils.h>
 
 #include <algo_cmds.h>
-#include <cmdloop/pattern_generator_cmds.h>
 #include <fx_cmds.h>
 #include <looper_cmds.h>
 #include <midi_cmds.h>
@@ -107,9 +106,6 @@ void interpret(char *line)
             continue;
 
         else if (parse_new_item_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_pattern_generator_cmd(num_wurds, wurds))
             continue;
 
         else if (parse_sequence_generator_cmd(num_wurds, wurds))

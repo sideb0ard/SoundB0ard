@@ -26,7 +26,6 @@
 #include "sound_generator.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
-#include <pattern_generators/recursive_pattern_gen.h>
 
 extern mixer *mixr;
 
@@ -207,27 +206,6 @@ void mixer_status_algoz(mixer *mixr, bool all)
         }
     }
 }
-void mixer_status_patterns(mixer *mixr)
-{
-    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    if (mixr->pattern_gen_num > 0)
-    {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
-                                "pattern generators" COOL_COLOR_GREEN "]\n");
-        for (int i = 0; i < mixr->pattern_gen_num; i++)
-        {
-            if (mixr->pattern_generators[i] != NULL)
-            {
-                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                mixr->pattern_generators[i]->status(mixr->pattern_generators[i],
-                                                    wss);
-                wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
-                wprintf(L"  %ls\n", wss);
-                wprintf(WANSI_COLOR_RESET);
-            }
-        }
-    }
-}
 void mixer_status_seqz(mixer *mixr)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
@@ -308,7 +286,6 @@ void mixer_ps(mixer *mixr, bool all)
     print_logo();
     mixer_status_mixr(mixr);
     mixer_status_algoz(mixr, all);
-    mixer_status_patterns(mixr);
     mixer_status_seqz(mixr);
     mixer_status_sgz(mixr, all);
     printf(ANSI_COLOR_RESET);
@@ -438,38 +415,6 @@ int add_sound_generator(mixer *mixr, soundgenerator *sg)
     return mixr->soundgen_num++;
 }
 
-int add_pattern_generator(mixer *mixr, pattern_generator *pg)
-{
-    pattern_generator **new_pattern_gens = NULL;
-
-    if (mixr->pattern_gen_size <= mixr->pattern_gen_num)
-    {
-        if (mixr->pattern_gen_size == 0)
-        {
-            mixr->pattern_gen_size = DEFAULT_ARRAY_SIZE;
-        }
-        else
-        {
-            mixr->pattern_gen_size *= 2;
-        }
-
-        new_pattern_gens = (pattern_generator **)realloc(
-            mixr->pattern_generators,
-            mixr->pattern_gen_size * sizeof(pattern_generator *));
-        if (new_pattern_gens == NULL)
-        {
-            printf("Ooh, burney - cannae allocate memory for new patterns");
-            return -1;
-        }
-        else
-        {
-            mixr->pattern_generators = new_pattern_gens;
-        }
-    }
-    mixr->pattern_generators[mixr->pattern_gen_num] = pg;
-    return mixr->pattern_gen_num++;
-}
-
 int add_sequence_generator(mixer *mixr, sequence_generator *sg)
 {
     sequence_generator **new_sequence_gens = NULL;
@@ -590,16 +535,6 @@ int add_looper(mixer *mixr, char *filename)
     looper *g = new_looper(filename);
     printf("GOT A GRAANY\n");
     return add_sound_generator(mixr, (soundgenerator *)g);
-}
-
-int mixer_add_recursive(mixer *mixr)
-{
-    printf("Adding an RECURSIVE PATTERN GENERATOR, yo!\n");
-    pattern_generator *pg = new_recursive_pattern_gen();
-    if (pg)
-        return add_pattern_generator(mixr, pg);
-    else
-        return -99;
 }
 
 static void mixer_events_output(mixer *mixr)
@@ -852,13 +787,6 @@ bool mixer_is_valid_env_var(mixer *mixr, char *key)
     return false;
 }
 
-bool mixer_is_valid_pattern_gen_num(mixer *mixr, int pgnum)
-{
-    if (pgnum >= 0 && pgnum < mixr->pattern_gen_num &&
-        mixr->pattern_generators[pgnum] != NULL)
-        return true;
-    return false;
-}
 
 bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum)
 {

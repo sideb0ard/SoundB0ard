@@ -16,7 +16,6 @@ SRC = \
 	cmdloop/midi_cmds.c \
 	cmdloop/mixer_cmds.c \
 	cmdloop/new_item_cmds.c \
-	cmdloop/pattern_generator_cmds.c \
 	cmdloop/sequence_generator_cmds.c \
 	cmdloop/stepper_cmds.c \
 	cmdloop/synth_cmds.c \
@@ -61,7 +60,6 @@ SRC = \
 	oscillator.c \
 	pattern_parser.c \
 	pattern_utils.c \
-	pattern_generators/recursive_pattern_gen.c \
 	pattern_transformers/pattern_transformers.c \
 	qblimited_oscillator.c \
 	reverb.c \

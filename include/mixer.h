@@ -13,7 +13,6 @@
 #include "dxsynth.h"
 #include "fx.h"
 #include "minisynth.h"
-#include "pattern_generator.h"
 #include "sbmsg.h"
 #include "sequence_generator.h"
 #include "sound_generator.h"
@@ -79,10 +78,6 @@ typedef struct mixer
     algorithm **algorithms;
     int algorithm_num;
     int algorithm_size;
-
-    pattern_generator **pattern_generators;
-    int pattern_gen_num;  // actual number of SGs
-    int pattern_gen_size; // number of memory slots reserved for SGszz
 
     soundgenerator **sound_generators;
     int soundgen_num;  // actual number of SGs
@@ -155,7 +150,6 @@ typedef struct mixer
 mixer *new_mixer(double output_latency);
 
 void mixer_ps(mixer *mixr, bool all);
-void mixer_status_patterns(mixer *mixr);
 void mixer_status_seqz(mixer *mixr);
 void mixer_status_sgz(mixer *mixr, bool all);
 void mixer_status_mixr(mixer *mixr);
@@ -169,7 +163,6 @@ int mixer_add_algorithm(mixer *mixr, algorithm *a);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_markov(mixer *mixr, unsigned int type);
-int mixer_add_recursive(mixer *mixr);
 void mixer_preview_audio(mixer *mixr, char *filename);
 
 int mixer_print_timing_info(mixer *mixr);
@@ -184,7 +177,6 @@ int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
 int add_looper(mixer *mixr, char *filename);
 int add_sound_generator(mixer *mixr, soundgenerator *sg);
 int add_sequence_generator(mixer *mixr, sequence_generator *sg);
-int add_pattern_generator(mixer *mixr, pattern_generator *pg);
 int add_effect(mixer *mixr);
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
@@ -203,7 +195,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
 bool mixer_is_valid_algo(mixer *mixr, int algo_num);
 bool mixer_is_valid_env_var(mixer *mixr, char *key);
-bool mixer_is_valid_pattern_gen_num(mixer *mixr, int pgnum);
 bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum);
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
