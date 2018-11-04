@@ -41,29 +41,29 @@ void step_init(step_sequencer *seq)
     seq->visualize = false;
 }
 
-void step_tick(step_sequencer *seq)
-{
-    if (mixr->timing_info.sixteenth_note_tick != seq->sixteenth_tick)
-    {
-        seq->sixteenth_tick = mixr->timing_info.sixteenth_note_tick;
-
-        if (seq->sixteenth_tick % 16 == 0)
-        {
-
-            if (seq->multi_pattern_mode)
-            {
-                seq->cur_pattern_iteration--;
-                if (seq->cur_pattern_iteration == 0)
-                {
-                    seq->cur_pattern =
-                        (seq->cur_pattern + 1) % seq->num_patterns;
-                    seq->cur_pattern_iteration =
-                        seq->pattern_num_loops[seq->cur_pattern];
-                }
-            }
-        }
-    }
-}
+//void step_tick(step_sequencer *seq)
+//{
+//    if (mixr->timing_info.sixteenth_note_tick != seq->sixteenth_tick)
+//    {
+//        seq->sixteenth_tick = mixr->timing_info.sixteenth_note_tick;
+//
+//        if (seq->sixteenth_tick % 16 == 0)
+//        {
+//
+//            if (seq->multi_pattern_mode)
+//            {
+//                seq->cur_pattern_iteration--;
+//                if (seq->cur_pattern_iteration == 0)
+//                {
+//                    seq->cur_pattern =
+//                        (seq->cur_pattern + 1) % seq->num_patterns;
+//                    seq->cur_pattern_iteration =
+//                        seq->pattern_num_loops[seq->cur_pattern];
+//                }
+//            }
+//        }
+//    }
+//}
 
 void pattern_char_to_pattern(step_sequencer *s, char *char_pattern,
                              midi_event *final_pattern)

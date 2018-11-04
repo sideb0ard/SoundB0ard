@@ -7,8 +7,8 @@
 #include <wchar.h>
 
 #include "defjams.h"
-#include "mixer.h"
 #include "drumsampler.h"
+#include "mixer.h"
 #include "step_sequencer.h"
 #include "utils.h"
 
@@ -17,9 +17,9 @@ extern mixer *mixr;
 
 drumsampler *new_drumsampler(char *filename)
 {
-    drumsampler *ds =
-        (drumsampler *)calloc(1, sizeof(drumsampler));
-    step_init(&ds->m_seq);
+    drumsampler *ds = (drumsampler *)calloc(1, sizeof(drumsampler));
+
+    sequence_engine_init(&ds->engine, (void *)ds, DRUMSAMPLER_TYPE);
 
     drumsampler_import_file(ds, filename);
 
@@ -32,13 +32,13 @@ drumsampler *new_drumsampler(char *filename)
     ds->sound_generator.status = &drumsampler_status;
     ds->sound_generator.getvol = &drumsampler_getvol;
     ds->sound_generator.setvol = &drumsampler_setvol;
-    ds->sound_generator.start = &sample_start;
-    ds->sound_generator.stop = &sample_stop;
+    ds->sound_generator.start = &drumsampler_start;
+    ds->sound_generator.stop = &drumsampler_stop;
     ds->sound_generator.get_num_patterns = &drumsampler_get_num_patterns;
     ds->sound_generator.set_num_patterns = &drumsampler_set_num_patterns;
     ds->sound_generator.make_active_track = &drumsampler_make_active_track;
     ds->sound_generator.self_destruct = &drumsampler_del_self;
-    ds->sound_generator.event_notify = &drumsampler_event_notify;
+    ds->sound_generator.event_notify = &sequence_engine_event_notify;
     ds->sound_generator.get_pattern = &drumsampler_get_pattern;
     ds->sound_generator.set_pattern = &drumsampler_set_pattern;
     ds->sound_generator.is_valid_pattern = &drumsampler_is_valid_pattern;
@@ -50,19 +50,23 @@ drumsampler *new_drumsampler(char *filename)
 bool drumsampler_is_valid_pattern(void *self, int pattern_num)
 {
     drumsampler *ds = (drumsampler *)self;
-    return step_is_valid_pattern_num(&ds->m_seq, pattern_num);
+    return is_valid_pattern_num(&ds->engine, pattern_num);
 }
 
 midi_event *drumsampler_get_pattern(void *self, int pattern_num)
 {
-    drumsampler *ds = (drumsampler *)self;
-    return step_get_pattern(&ds->m_seq, pattern_num);
+    sequence_engine *engine = get_sequence_engine(self);
+    if (engine)
+        return sequence_engine_get_pattern(engine, pattern_num);
+
+    return NULL;
 }
 
 void drumsampler_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    drumsampler *ds = (drumsampler *)self;
-    return step_set_pattern(&ds->m_seq, pattern_num, pattern);
+    sequence_engine *engine = get_sequence_engine(self);
+    if (engine)
+        sequence_engine_set_pattern(engine, pattern_num, pattern);
 }
 
 void drumsampler_import_file(drumsampler *ds, char *filename)
@@ -95,41 +99,53 @@ void drumsampler_reset_samples(drumsampler *ds)
     }
 }
 
-void drumsampler_event_notify(void *self, unsigned int event_type)
+//void drumsampler_event_notify(void *self, unsigned int event_type)
+//{
+//    drumsampler *ds = (drumsampler *)self;
+//
+//    if (!ds->sound_generator.active)
+//        return;
+//
+//    int idx;
+//    switch (event_type)
+//    {
+//    case (TIME_START_OF_LOOP_TICK):
+//        ds->started = true;
+//        break;
+//    case (TIME_SIXTEENTH_TICK):
+//        if (ds->started)
+//            step_tick(&ds->m_seq);
+//        break;
+//    case (TIME_MIDI_TICK):
+//        if (ds->started)
+//        {
+//            idx = mixr->timing_info.midi_tick % PPBAR;
+//            if (ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].event_type ==
+//                MIDI_ON)
+//
+//            {
+//                int seq_position = get_a_drumsampler_position(ds);
+//                if (seq_position != -1)
+//                {
+//                    ds->samples_now_playing[seq_position] = idx;
+//                    ds->velocity_now_playing[seq_position] =
+//                        ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].data2;
+//                }
+//            }
+//        }
+//        break;
+//    }
+//}
+
+void drumsampler_note_on(drumsampler *ds)
 {
-    drumsampler *ds = (drumsampler *)self;
-
-    if (!ds->sound_generator.active)
-        return;
-
-    int idx;
-    switch (event_type)
+    int idx = mixr->timing_info.midi_tick % PPBAR;
+    int seq_position = get_a_drumsampler_position(ds);
+    if (seq_position != -1)
     {
-    case (TIME_START_OF_LOOP_TICK):
-        ds->started = true;
-        break;
-    case (TIME_SIXTEENTH_TICK):
-        if (ds->started)
-            step_tick(&ds->m_seq);
-        break;
-    case (TIME_MIDI_TICK):
-        if (ds->started)
-        {
-            idx = mixr->timing_info.midi_tick % PPBAR;
-            if (ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].event_type ==
-                MIDI_ON)
-
-            {
-                int seq_position = get_a_drumsampler_position(ds);
-                if (seq_position != -1)
-                {
-                    ds->samples_now_playing[seq_position] = idx;
-                    ds->velocity_now_playing[seq_position] =
-                        ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].data2;
-                }
-            }
-        }
-        break;
+        ds->samples_now_playing[seq_position] = idx;
+        ds->velocity_now_playing[seq_position] =
+            ds->engine.patterns[ds->engine.cur_pattern][idx].data2;
     }
 }
 
@@ -155,16 +171,15 @@ stereo_val drumsampler_gennext(void *self)
                 right_val += ds->buffer[idx + 1] * amp;
             }
             ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
-                ds->sample_positions[cur_sample_midi_tick]
-                    .audiobuffer_cur_pos +
+                ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos +
                 (ds->channels * (ds->buffer_pitch));
 
             if ((int)ds->sample_positions[cur_sample_midi_tick]
                     .audiobuffer_cur_pos >= ds->buf_end_pos)
             { // end of playback - so reset
                 ds->samples_now_playing[i] = -1;
-                ds->sample_positions[cur_sample_midi_tick]
-                    .audiobuffer_cur_pos = 0;
+                ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
+                    0;
             }
         }
     }
@@ -179,14 +194,13 @@ stereo_val drumsampler_gennext(void *self)
                         .right = right_val * ds->vol};
 }
 
-drumsampler *new_drumsampler_from_char_pattern(char *filename,
-                                                   char *pattern)
-{
-    drumsampler *ds = new_drumsampler(filename);
-    pattern_char_to_pattern(&ds->m_seq, pattern,
-                            ds->m_seq.patterns[ds->m_seq.num_patterns++]);
-    return ds;
-}
+//drumsampler *new_drumsampler_from_char_pattern(char *filename, char *pattern)
+//{
+//    drumsampler *ds = new_drumsampler(filename);
+//    pattern_char_to_pattern(&ds->m_seq, pattern,
+//                            ds->m_seq.patterns[ds->m_seq.num_patterns++]);
+//    return ds;
+//}
 
 void drumsampler_status(void *self, wchar_t *status_string)
 {
@@ -204,13 +218,13 @@ void drumsampler_status(void *self, wchar_t *status_string)
              "%s %s vol:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
              "multi:%d num_patterns:%d",
              ds->filename, INSTRUMENT_COLOR, ds->vol, ds->buffer_pitch,
-             ds->m_seq.allow_triplets, ds->buf_end_pos,
-             ds->m_seq.multi_pattern_mode, ds->m_seq.num_patterns);
+             ds->engine.allow_triplets, ds->buf_end_pos,
+             ds->engine.multi_pattern_mode, ds->engine.num_patterns);
 
     wcscat(status_string, local_status_string);
 
     wmemset(local_status_string, 0, MAX_STATIC_STRING_SZ);
-    step_status(&ds->m_seq, local_status_string);
+    sequence_engine_status(&ds->engine, local_status_string);
     wcscat(status_string, local_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
@@ -243,19 +257,19 @@ void drumsampler_del_self(void *self)
 int drumsampler_get_num_patterns(void *self)
 {
     drumsampler *s = (drumsampler *)self;
-    return s->m_seq.num_patterns;
+    return sequence_engine_get_num_patterns(&s->engine);
 }
 
 void drumsampler_set_num_patterns(void *self, int num_patterns)
 {
     drumsampler *s = (drumsampler *)self;
-    s->m_seq.num_patterns = num_patterns;
+    sequence_engine_set_num_patterns(&s->engine, num_patterns);
 }
 
 void drumsampler_make_active_track(void *self, int track_num)
 {
     drumsampler *s = (drumsampler *)self;
-    s->m_seq.cur_pattern = track_num;
+    sequence_engine_make_active_track(&s->engine, track_num);
 }
 
 int get_a_drumsampler_position(drumsampler *ss)
@@ -266,7 +280,7 @@ int get_a_drumsampler_position(drumsampler *ss)
     return -1;
 }
 
-void sample_start(void *self)
+void drumsampler_start(void *self)
 {
     drumsampler *s = (drumsampler *)self;
     if (s->sound_generator.active)
@@ -275,10 +289,11 @@ void sample_start(void *self)
     s->sound_generator.active = true;
 }
 
-void sample_stop(void *self)
+void drumsampler_stop(void *self)
 {
-    drumsampler *s = (drumsampler *)self;
-    s->sound_generator.active = false;
+    drumsampler *ds = (drumsampler *)self;
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+        ds->samples_now_playing[i] = 0;
 }
 
 void drumsampler_set_pitch(drumsampler *ds, double v)
@@ -289,8 +304,7 @@ void drumsampler_set_pitch(drumsampler *ds, double v)
         printf("Must be in the range of 0.0 .. 2.0\n");
 }
 
-void drumsampler_set_cutoff_percent(drumsampler *ds,
-                                         unsigned int percent)
+void drumsampler_set_cutoff_percent(drumsampler *ds, unsigned int percent)
 {
     if (percent > 100)
         return;

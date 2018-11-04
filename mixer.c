@@ -910,30 +910,6 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
     return true;
 }
 
-sequence_engine *get_sequence_engine(soundgenerator *self)
-{
-    if (self->type == MINISYNTH_TYPE)
-    {
-        minisynth *ms = (minisynth *)self;
-        return &ms->engine;
-    }
-    else if (self->type == DIGISYNTH_TYPE)
-    {
-        digisynth *ds = (digisynth *)self;
-        return &ds->engine;
-    }
-    else if (self->type == DXSYNTH_TYPE)
-    {
-        dxsynth *dx = (dxsynth *)self;
-        return &dx->engine;
-    }
-    else
-    {
-        printf("Error! Don't know what type of SYNTH this is\n");
-        return NULL;
-    }
-}
-
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi)
 {
@@ -1246,3 +1222,38 @@ void mixer_set_midi_bank(mixer *mixr, int num)
     if (num >= 0 && num < 4)
         mixr->midi_bank_num = num;
 }
+
+sequence_engine *get_sequence_engine(soundgenerator *self)
+{
+    if (self->type == MINISYNTH_TYPE)
+    {
+        minisynth *ms = (minisynth *)self;
+        return &ms->engine;
+    }
+    else if (self->type == DIGISYNTH_TYPE)
+    {
+        digisynth *ds = (digisynth *)self;
+        return &ds->engine;
+    }
+    else if (self->type == DXSYNTH_TYPE)
+    {
+        dxsynth *dx = (dxsynth *)self;
+        return &dx->engine;
+    }
+    else if (self->type == DRUMSYNTH_TYPE)
+    {
+        drumsynth *ds = (drumsynth *)self;
+        return &ds->engine;
+    }
+    else if (self->type == DRUMSAMPLER_TYPE)
+    {
+        drumsampler *ds = (drumsampler *)self;
+        return &ds->engine;
+    }
+    else
+    {
+        printf("Error! Don't know what type of SYNTH this is\n");
+        return NULL;
+    }
+}
+

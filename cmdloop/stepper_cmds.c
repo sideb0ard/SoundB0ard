@@ -2,12 +2,13 @@
 #include <string.h>
 
 #include <cmdloop.h>
+#include <cmdloop/sequence_engine_cmds.h>
+#include <drumsampler.h>
+#include <drumsynth.h>
 #include <looper.h>
 #include <mixer.h>
 #include <pattern_parser.h>
-#include <drumsampler.h>
 #include <stepper_cmds.h>
-#include <drumsynth.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -31,10 +32,10 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
             is_stepper(mixr->sound_generators[soundgen_num]))
         {
-            if (parse_step_sequencer_command(soundgen_num, target_pattern_num,
-                                             wurds, num_wurds))
+            if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num,
+                                          &wurds[2], num_wurds - 2))
             {
-                // no-op, all good
+                // no-op, we good
             }
             else if (mixr->sound_generators[soundgen_num]->type ==
                      DRUMSAMPLER_TYPE)
@@ -84,8 +85,7 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
         mixr->sound_generators[soundgen_num]->type == DRUMSYNTH_TYPE)
     {
-        drumsynth *synth =
-            (drumsynth *)mixr->sound_generators[soundgen_num];
+        drumsynth *synth = (drumsynth *)mixr->sound_generators[soundgen_num];
         if (strncmp("debug", wurds[0], 5) == 0)
         {
             drumsynth_set_debug(synth, val);
@@ -192,84 +192,84 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
     return true;
 }
 
-bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
-                                  char wurds[][SIZE_OF_WURD], int num_wurds)
-{
-    soundgenerator *sg = mixr->sound_generators[soundgen_num];
-    step_sequencer *seq;
-    if (mixr->sound_generators[soundgen_num]->type == DRUMSAMPLER_TYPE)
-    {
-        drumsampler *s = (drumsampler *)sg;
-        seq = &s->m_seq;
-    }
-    else if (mixr->sound_generators[soundgen_num]->type == DRUMSYNTH_TYPE)
-    {
-        drumsynth *s = (drumsynth *)sg;
-        seq = &s->m_seq;
-    }
-    else if (mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)
-    {
-        looper *l = (looper *)sg;
-        seq = &l->m_seq;
-    }
-
-    bool cmd_found = true;
-
-    if (target_pattern_num != -1)
-    {
-        if (step_is_valid_pattern_num(seq, target_pattern_num))
-        {
-            if (strncmp("print", wurds[2], 5) == 0)
-                step_print_pattern(seq, target_pattern_num);
-            else if (strncmp("numloops", wurds[2], 8) == 0)
-            {
-                int numloops = atoi(wurds[3]);
-                if (numloops != 0)
-                {
-                    step_change_num_loops(seq, target_pattern_num, numloops);
-                }
-            }
-            else if (strncmp("swing", wurds[2], 5) == 0)
-            {
-                int swing_setting = atoi(wurds[3]);
-                step_swing_pattern(seq, target_pattern_num, swing_setting);
-            }
-            else
-            {
-                soundgenerator *sg = mixr->sound_generators[soundgen_num];
-                check_and_set_pattern(sg, target_pattern_num, BEAT_PATTERN,
-                                      &wurds[2], num_wurds - 2);
-            }
-        }
-    }
-    else
-    {
-        if (strncmp("multi", wurds[2], 5) == 0)
-        {
-            bool b = atoi(wurds[3]);
-            step_set_multi_pattern_mode(seq, b);
-            printf("Sequencer multi mode : %s\n",
-                   seq->multi_pattern_mode ? "true" : "false");
-        }
-        else if (strncmp("randamp", wurds[2], 6) == 0)
-        {
-            step_set_randamp(seq, 1 - seq->randamp_on);
-            printf("Toggling randamp to %s \n",
-                   seq->randamp_on ? "true" : "false");
-        }
-        else if (strncmp("triplets", wurds[2], 8) == 0)
-        {
-            bool b = atoi(wurds[3]);
-            step_set_triplets(seq, b);
-        }
-        else if (strncmp("visualize", wurds[2], 9) == 0)
-        {
-            bool b = atoi(wurds[3]);
-            printf("Setting visualize to %s\n", b ? "true" : "false");
-            seq->visualize = b;
-        }
-        else
-            cmd_found = false;
-    }
-    return cmd_found;
-}
+// bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
+//                                  char wurds[][SIZE_OF_WURD], int num_wurds)
+//{
+//    soundgenerator *sg = mixr->sound_generators[soundgen_num];
+//    step_sequencer *seq;
+//    if (mixr->sound_generators[soundgen_num]->type == DRUMSAMPLER_TYPE)
+//    {
+//        drumsampler *s = (drumsampler *)sg;
+//        seq = &s->m_seq;
+//    }
+//    else if (mixr->sound_generators[soundgen_num]->type == DRUMSYNTH_TYPE)
+//    {
+//        drumsynth *s = (drumsynth *)sg;
+//        seq = &s->m_seq;
+//    }
+//    else if (mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)
+//    {
+//        looper *l = (looper *)sg;
+//        seq = &l->m_seq;
+//    }
+//
+//    bool cmd_found = true;
+//
+//    if (target_pattern_num != -1)
+//    {
+//        if (step_is_valid_pattern_num(seq, target_pattern_num))
+//        {
+//            if (strncmp("print", wurds[2], 5) == 0)
+//                step_print_pattern(seq, target_pattern_num);
+//            else if (strncmp("numloops", wurds[2], 8) == 0)
+//            {
+//                int numloops = atoi(wurds[3]);
+//                if (numloops != 0)
+//                {
+//                    step_change_num_loops(seq, target_pattern_num, numloops);
+//                }
+//            }
+//            else if (strncmp("swing", wurds[2], 5) == 0)
+//            {
+//                int swing_setting = atoi(wurds[3]);
+//                step_swing_pattern(seq, target_pattern_num, swing_setting);
+//            }
+//            else
+//            {
+//                soundgenerator *sg = mixr->sound_generators[soundgen_num];
+//                check_and_set_pattern(sg, target_pattern_num, BEAT_PATTERN,
+//                                      &wurds[2], num_wurds - 2);
+//            }
+//        }
+//    }
+//    else
+//    {
+//        if (strncmp("multi", wurds[2], 5) == 0)
+//        {
+//            bool b = atoi(wurds[3]);
+//            step_set_multi_pattern_mode(seq, b);
+//            printf("Sequencer multi mode : %s\n",
+//                   seq->multi_pattern_mode ? "true" : "false");
+//        }
+//        else if (strncmp("randamp", wurds[2], 6) == 0)
+//        {
+//            step_set_randamp(seq, 1 - seq->randamp_on);
+//            printf("Toggling randamp to %s \n",
+//                   seq->randamp_on ? "true" : "false");
+//        }
+//        else if (strncmp("triplets", wurds[2], 8) == 0)
+//        {
+//            bool b = atoi(wurds[3]);
+//            step_set_triplets(seq, b);
+//        }
+//        else if (strncmp("visualize", wurds[2], 9) == 0)
+//        {
+//            bool b = atoi(wurds[3]);
+//            printf("Setting visualize to %s\n", b ? "true" : "false");
+//            seq->visualize = b;
+//        }
+//        else
+//            cmd_found = false;
+//    }
+//    return cmd_found;
+//}

@@ -2,7 +2,7 @@
 
 #include "filter_moogladder.h"
 #include "sound_generator.h"
-#include "step_sequencer.h"
+#include "sequence_engine.h"
 #include "stereodelay.h"
 
 #include <sndfile.h>
@@ -29,7 +29,7 @@ typedef struct sample_pos
 typedef struct drumsampler
 {
     soundgenerator sound_generator;
-    step_sequencer m_seq;
+    sequence_engine engine;
 
     sample_pos sample_positions[PPBAR];
     int samples_now_playing[MAX_CONCURRENT_SAMPLES]; // contains midi tick of
@@ -56,28 +56,25 @@ typedef struct drumsampler
 } drumsampler;
 
 drumsampler *new_drumsampler(char *filename);
-drumsampler *new_drumsampler_from_char_pattern(char *filename,
-                                                   char *pattern);
-drumsampler *new_drumsampler_from_int_pattern(char *filename, int pattern);
-drumsampler *new_drumsampler_from_char_array(char *filename, char **pattern,
-                                                 int nsteps);
+// drumsampler *new_drumsampler_from_char_pattern(char *filename,
+                                                   //char *pattern);
+// drumsampler *new_drumsampler_from_int_pattern(char *filename, int pattern);
+// drumsampler *new_drumsampler_from_char_array(char *filename, char **pattern,
+//                                                  int nsteps);
 
 int get_a_drumsampler_position(drumsampler *ss);
 int drumsampler_get_num_patterns(void *s);
 void drumsampler_set_num_patterns(void *s, int num_patterns);
 void drumsampler_make_active_track(void *s, int track_num);
-void drumsampler_event_notify(void *s, unsigned int event_type);
+// void drumsampler_event_notify(void *s, unsigned int event_type);
 bool drumsampler_is_valid_pattern(void *self, int pattern_num);
 
 void drumsampler_del_self(void *self);
 void drumsampler_status(void *self, wchar_t *status_string);
-
 void drumsampler_setvol(void *self, double v);
 double drumsampler_getvol(void *self);
-
-void sample_start(void *self);
-void sample_stop(void *self);
-
+void drumsampler_start(void *self);
+void drumsampler_stop(void *self);
 stereo_val drumsampler_gennext(void *self);
 
 midi_event *drumsampler_get_pattern(void *self, int pattern_num);
@@ -88,3 +85,4 @@ void drumsampler_reset_samples(drumsampler *seq);
 void drumsampler_set_pitch(drumsampler *seq, double v);
 void drumsampler_set_cutoff_percent(drumsampler *seq,
                                          unsigned int percent);
+void drumsampler_note_on(drumsampler *ds);

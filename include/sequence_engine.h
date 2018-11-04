@@ -68,7 +68,7 @@ typedef struct arpeggiator
 typedef struct sequence_engine
 {
     void *parent;
-    unsigned int parent_synth_type; // used for casting parent type
+    unsigned int parent_type; // used for casting parent type
 
     int tick; // current 16th note tick from mixer
     midi_pattern patterns[MAX_NUM_MIDI_LOOPS];
@@ -88,6 +88,8 @@ typedef struct sequence_engine
     bool multi_pattern_mode;
     bool multi_pattern_loop_countdown_started;
 
+    bool started; // used by drum seq
+    bool allow_triplets;
     bool recording;
     bool single_note_mode; // ignore midi notes, just play midi_note_1
     bool chord_mode;
@@ -103,8 +105,8 @@ typedef struct sequence_engine
 
     int sustain_note_ms;
 
-    uint16_t note_mask;
-    bool enable_note_mask;
+    uint16_t event_mask;
+    bool enable_event_mask;
 
 } sequence_engine;
 
@@ -194,6 +196,6 @@ void sequence_engine_do_arp(sequence_engine *engine, soundgenerator *sg);
 int arp_next_note(arpeggiator *arp);
 void arp_add_last_note(arpeggiator *arp, int note);
 
-void sequence_engine_set_note_mask(sequence_engine *engine, uint16_t mask);
-void sequence_engine_set_enable_note_mask(sequence_engine *engine, bool b);
+void sequence_engine_set_event_mask(sequence_engine *engine, uint16_t mask);
+void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b);
 bool sequence_engine_is_masked(sequence_engine *engine);

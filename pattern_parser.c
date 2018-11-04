@@ -84,29 +84,6 @@ static void print_pattern_tokens(pattern_token tokens[MAX_PATTERN], int len)
     }
 }
 
-static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
-{
-    if (mixer_is_valid_env_var(mixr, var_key))
-    {
-        int sg_num;
-        if (get_environment_val(var_key, &sg_num))
-        {
-            if (mixer_is_valid_soundgen_num(mixr, sg_num))
-            {
-                drumsampler *seq =
-                    (drumsampler *)mixr->sound_generators[sg_num];
-                step_clear_pattern(&seq->m_seq, 0);
-                return true;
-            }
-            else
-            {
-                printf("Whoa, nellie, not a valid pattern to clear\n");
-            }
-        }
-    }
-    return false;
-}
-
 bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
                                   int num_tokens, midi_event *pattern,
                                   unsigned int pattern_type)

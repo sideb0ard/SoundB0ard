@@ -66,7 +66,7 @@ looper *new_looper(char *filename)
     if (strncmp(filename, "none", 4) != 0)
         looper_import_file(g, filename);
 
-    step_init(&g->m_seq);
+    sequence_engine_init(&g->engine, (void *)g, DRUMSYNTH_TYPE);
 
     envelope_generator_init(&g->m_eg1); // start/stop env
     g->m_eg1.m_attack_time_msec = 10;
@@ -125,19 +125,22 @@ looper *new_looper(char *filename)
 bool looper_is_valid_pattern(void *self, int pattern_num)
 {
     looper *l = (looper *)self;
-    return step_is_valid_pattern_num(&l->m_seq, pattern_num);
+    return is_valid_pattern_num(&l->engine, pattern_num);
 }
 
 midi_event *looper_get_pattern(void *self, int pattern_num)
 {
-    looper *l = (looper *)self;
-    return step_get_pattern(&l->m_seq, pattern_num);
+     sequence_engine *engine = get_sequence_engine(self);
+     if (engine)
+         return sequence_engine_get_pattern(engine, pattern_num);
+     return NULL;
 }
 
 void looper_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    looper *l = (looper *)self;
-    return step_set_pattern(&l->m_seq, pattern_num, pattern);
+     sequence_engine *engine = get_sequence_engine(self);
+     if (engine)
+         sequence_engine_set_pattern(engine, pattern_num, pattern);
 }
 
 void looper_event_notify(void *self, unsigned int event_type)
@@ -202,64 +205,64 @@ void looper_event_notify(void *self, unsigned int event_type)
                     (g->stutter_idx * g->size_of_sixteenth) +
                     rel_pos_within_a_sixteenth;
             }
-            else
-            {
-                int idx = mixr->timing_info.midi_tick % PPBAR;
-                if (g->m_seq.patterns[g->m_seq.cur_pattern][idx].event_type ==
-                    MIDI_ON)
-                {
-                    int cur_sixteenth =
-                        mixr->timing_info.sixteenth_note_tick % 16;
-                    g->step_diff = 0 - cur_sixteenth;
-                    looper_set_reverse_mode(g, false);
+            //else
+            //{
+            //    int idx = mixr->timing_info.midi_tick % PPBAR;
+            //    if (g->m_seq.patterns[g->m_seq.cur_pattern][idx].event_type ==
+            //        MIDI_ON)
+            //    {
+            //        int cur_sixteenth =
+            //            mixr->timing_info.sixteenth_note_tick % 16;
+            //        g->step_diff = 0 - cur_sixteenth;
+            //        looper_set_reverse_mode(g, false);
 
-                    int randy = rand() % 100;
-                    if (randy < 20)
-                        g->step_diff = 4 - cur_sixteenth;
-                    else if (randy < 50)
-                        g->step_diff = 8 - cur_sixteenth;
-                    else if (randy < 55)
-                        g->step_diff = 12 - cur_sixteenth;
-                    else if (randy < 60)
-                        looper_set_reverse_mode(g, true);
+            //        int randy = rand() % 100;
+            //        if (randy < 20)
+            //            g->step_diff = 4 - cur_sixteenth;
+            //        else if (randy < 50)
+            //            g->step_diff = 8 - cur_sixteenth;
+            //        else if (randy < 55)
+            //            g->step_diff = 12 - cur_sixteenth;
+            //        else if (randy < 60)
+            //            looper_set_reverse_mode(g, true);
 
-                    if (g->gate_mode)
-                    {
-                        midi_event *pattern =
-                            g->m_seq.patterns[g->m_seq.cur_pattern];
-                        int off_tick =
-                            (int)(idx + (g->sustain_ms *
-                                         mixr->timing_info.ms_per_midi_tick)) %
-                            PPBAR;
-                        midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
-                        midi_pattern_add_event(pattern, off_tick, off_event);
-                        looper_start(g);
-                        // printf("[%d] ON idx is %d -- setting off to "
-                        //       "off_tick:%d\n",
-                        //       idx, (int)new_read_idx, off_tick);
-                    }
-                }
-                else if (g->m_seq.patterns[g->m_seq.cur_pattern][idx]
-                                 .event_type == MIDI_OFF &&
-                         g->gate_mode)
-                {
-                    // printf("[%d] OFF\n", idx);
-                    midi_event_clear(
-                        &g->m_seq.patterns[g->m_seq.cur_pattern][idx]);
-                    looper_stop(g);
-                }
-                g->audio_buffer_read_idx =
-                    new_read_idx + (g->step_diff * g->size_of_sixteenth);
-            }
+            //        if (g->gate_mode)
+            //        {
+            //            midi_event *pattern =
+            //                g->m_seq.patterns[g->m_seq.cur_pattern];
+            //            int off_tick =
+            //                (int)(idx + (g->sustain_ms *
+            //                             mixr->timing_info.ms_per_midi_tick)) %
+            //                PPBAR;
+            //            midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
+            //            midi_pattern_add_event(pattern, off_tick, off_event);
+            //            looper_start(g);
+            //            // printf("[%d] ON idx is %d -- setting off to "
+            //            //       "off_tick:%d\n",
+            //            //       idx, (int)new_read_idx, off_tick);
+            //        }
+            //    }
+            //    else if (g->m_seq.patterns[g->m_seq.cur_pattern][idx]
+            //                     .event_type == MIDI_OFF &&
+            //             g->gate_mode)
+            //    {
+            //        // printf("[%d] OFF\n", idx);
+            //        midi_event_clear(
+            //            &g->m_seq.patterns[g->m_seq.cur_pattern][idx]);
+            //        looper_stop(g);
+            //    }
+            //    g->audio_buffer_read_idx =
+            //        new_read_idx + (g->step_diff * g->size_of_sixteenth);
+            //}
         }
         break;
 
     case (TIME_SIXTEENTH_TICK):
-        if (mixr->timing_info.sixteenth_note_tick != g->m_seq.sixteenth_tick)
-        {
-            // printf("nOTE OFF!\n");
-        }
-        step_tick(&g->m_seq);
+        //if (mixr->timing_info.sixteenth_note_tick != g->m_seq.sixteenth_tick)
+        //{
+        //    // printf("nOTE OFF!\n");
+        //}
+        //step_tick(&g->m_seq);
 
         if (g->scramble_mode)
         {
@@ -508,7 +511,7 @@ void looper_status(void *self, wchar_t *status_string)
         g->sustain_ms, g->m_eg1.m_release_time_msec, g->m_eg1.m_state);
 
     wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
-    step_status(&g->m_seq, local_status_string);
+    sequence_engine_status(&g->engine, local_status_string);
     wcscat(status_string, local_status_string);
 
     wcscat(status_string, WANSI_COLOR_RESET);

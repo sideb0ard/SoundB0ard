@@ -256,12 +256,23 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         }
         }
     }
+    else if (sg->type == DRUMSAMPLER_TYPE)
+    {
+        if (ev->event_type == MIDI_ON)
+        {
+            drumsampler *ds= (drumsampler *)sg;
+            drumsampler_note_on(ds);
+        }
+    }
     else if (sg->type == DRUMSYNTH_TYPE)
     {
         drumsynth *ds= (drumsynth *)sg;
-        // printf("DRUMSYNTH MIDI! Type:%d DATA1:%d DATA2:%d\n", ev->event_type,
-        // ev->data1, ev->data2);
-        if (ev->event_type == 176)
+        if (ev->event_type == MIDI_ON)
+        {
+            drumsynth *ds= (drumsynth *)sg;
+            drumsynth_trigger(ds);
+        }
+        else if (ev->event_type == 176)
         {
             switch (ev->data1)
             {

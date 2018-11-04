@@ -19,7 +19,8 @@ drumsynth *new_drumsynth()
 {
     printf("New Drum Synth!\n");
     drumsynth *ds = calloc(1, sizeof(drumsynth));
-    step_init(&ds->m_seq);
+
+    sequence_engine_init(&ds->engine, (void *)ds, DRUMSYNTH_TYPE);
 
     ds->vol = 0.6;
     ds->started = false;
@@ -65,6 +66,7 @@ drumsynth *new_drumsynth()
     moog_set_qcontrol((filter *)&ds->m_filter, ds->m_filter_q);
 
     ds->m_distortion_threshold = 0.707;
+    ds->mod_semitones_range = 12;
 
     ds->sg.gennext = &drumsynth_gennext;
     ds->sg.status = &drumsynth_status;
@@ -75,21 +77,23 @@ drumsynth *new_drumsynth()
     ds->sg.get_num_patterns = &drumsynth_get_num_patterns;
     ds->sg.make_active_track = &drumsynth_make_active_track;
     ds->sg.self_destruct = &drumsynth_del_self;
-    ds->sg.event_notify = &drumsynth_event_notify;
+    ds->sg.event_notify = &sequence_engine_event_notify;
     ds->sg.set_pattern = &drumsynth_set_pattern;
     ds->sg.get_pattern = &drumsynth_get_pattern;
     ds->sg.is_valid_pattern = &drumsynth_is_valid_pattern;
     ds->sg.type = DRUMSYNTH_TYPE;
-    ds->mod_semitones_range = 12;
+
     drumsynth_start(ds);
+
+    //printf("DRUMSYNTH ACTIVE: %s\n", ds->sg.active ? "true" : "false");
 
     return ds;
 }
 
 bool drumsynth_is_valid_pattern(void *self, int pattern_num)
 {
-    drumsynth *seq = (drumsynth *)self;
-    return step_is_valid_pattern_num(&seq->m_seq, pattern_num);
+    drumsynth *ds = (drumsynth *)self;
+    return is_valid_pattern_num(&ds->engine, pattern_num);
 }
 
 void drumsynth_randomize(drumsynth *ds)
@@ -182,10 +186,10 @@ void drumsynth_status(void *self, wchar_t *ss)
              ds->debug ? "true" : "false");
     // clang-format on
 
-    wchar_t step_status_string[MAX_STATIC_STRING_SZ];
-    memset(step_status_string, 0, MAX_STATIC_STRING_SZ);
-    step_status(&ds->m_seq, step_status_string);
-    wcscat(ss, step_status_string);
+    wchar_t engine_status_string[MAX_STATIC_STRING_SZ];
+    memset(engine_status_string, 0, MAX_STATIC_STRING_SZ);
+    sequence_engine_status(&ds->engine, engine_status_string);
+    wcscat(ss, engine_status_string);
     wcscat(ss, WANSI_COLOR_RESET);
 }
 
@@ -196,41 +200,38 @@ void drumsynth_setvol(void *self, double v)
     return;
 }
 
-void drumsynth_event_notify(void *self, unsigned int event_type)
-{
-    drumsynth *ds = (drumsynth *)self;
-
-    if (!ds->sg.active)
-        return;
-
-    int idx;
-    switch (event_type)
-    {
-    case (TIME_START_OF_LOOP_TICK):
-        ds->started = true;
-        break;
-    case (TIME_MIDI_TICK):
-        if (ds->started)
-        {
-            idx = mixr->timing_info.midi_tick % PPBAR;
-            if (ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].event_type)
-                drumsynth_trigger(ds);
-        }
-        break;
-    case (TIME_SIXTEENTH_TICK):
-        if (ds->started)
-            step_tick(&ds->m_seq); // TODO rename to pattern generation
-        break;
-    }
-}
+//void drumsynth_event_notify(void *self, unsigned int event_type)
+//{
+//    drumsynth *ds = (drumsynth *)self;
+//
+//    if (!ds->sg.active)
+//        return;
+//
+//    int idx;
+//    switch (event_type)
+//    {
+//    case (TIME_START_OF_LOOP_TICK):
+//        ds->started = true;
+//        break;
+//    case (TIME_MIDI_TICK):
+//        if (ds->started)
+//        {
+//            idx = mixr->timing_info.midi_tick % PPBAR;
+//            if (ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].event_type)
+//                drumsynth_trigger(ds);
+//        }
+//        break;
+//    case (TIME_SIXTEENTH_TICK):
+//        if (ds->started)
+//            step_tick(&ds->m_seq); // TODO rename to pattern generation
+//        break;
+//    }
+//}
 
 stereo_val drumsynth_gennext(void *self)
 {
     drumsynth *ds = (drumsynth *)self;
     stereo_val out = {0, 0};
-
-    if (!ds->started)
-        return out;
 
     // TRANSIENT /////////////////
     // this is for the initial 'Click'
@@ -284,7 +285,6 @@ double drumsynth_getvol(void *self)
 
 void drumsynth_trigger(drumsynth *ds)
 {
-    // printf("trigger!\n");
     if (ds->reset_osc)
         osc_reset(&ds->m_osc1.osc);
     ds->m_osc1.osc.m_note_on = true;
@@ -613,25 +613,26 @@ void drumsynth_start(void *self)
 void drumsynth_stop(void *self)
 {
     drumsynth *ds = (drumsynth *)self;
-    ds->sg.active = false;
+    eg_note_off(&ds->m_eg1);
+    eg_note_off(&ds->m_eg2);
 }
 
 int drumsynth_get_num_patterns(void *self)
 {
     drumsynth *ds = (drumsynth *)self;
-    return ds->m_seq.num_patterns;
+    return sequence_engine_get_num_patterns(&ds->engine);
 }
 
 void drumsynth_set_num_patterns(void *self, int num_patterns)
 {
     drumsynth *ds = (drumsynth *)self;
-    ds->m_seq.num_patterns = num_patterns;
+    sequence_engine_set_num_patterns(&ds->engine, num_patterns);
 }
 
 void drumsynth_make_active_track(void *self, int track_num)
 {
     drumsynth *ds = (drumsynth *)self;
-    ds->m_seq.cur_pattern = track_num;
+    sequence_engine_make_active_track(&ds->engine, track_num);
 }
 
 void drumsynth_set_distortion_threshold(drumsynth *ds, double val)
@@ -664,14 +665,17 @@ void drumsynth_set_mod_semitones_range(drumsynth *ds, int val)
 
 midi_event *drumsynth_get_pattern(void *self, int pattern_num)
 {
-    drumsynth *seq = (drumsynth *)self;
-    return step_get_pattern(&seq->m_seq, pattern_num);
+    sequence_engine *engine = get_sequence_engine(self);
+    if (engine)
+        return sequence_engine_get_pattern(engine, pattern_num);
+    return NULL;
 }
 
 void drumsynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    drumsynth *seq = (drumsynth *)self;
-    return step_set_pattern(&seq->m_seq, pattern_num, pattern);
+    sequence_engine *engine = get_sequence_engine(self);
+    if (engine)
+        sequence_engine_set_pattern(engine, pattern_num, pattern);
 }
 
 void drumsynth_set_reset_osc(drumsynth *ds, bool b)

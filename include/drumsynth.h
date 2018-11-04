@@ -6,7 +6,7 @@
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
 #include "sound_generator.h"
-#include "step_sequencer.h"
+#include "sequence_engine.h"
 
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/drumsynthpatches.dat";
@@ -14,7 +14,7 @@ static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
 typedef struct drumsynth
 {
     soundgenerator sg;
-    step_sequencer m_seq;
+    sequence_engine engine;
     char m_patch_name[512];
     double vol;
     bool reset_osc;
@@ -72,7 +72,7 @@ int drumsynth_get_num_patterns(void *self);
 void drumsynth_set_num_patterns(void *self, int num_patterns);
 bool drumsynth_is_valid_pattern(void *self, int pattern_num);
 void drumsynth_make_active_track(void *self, int tracknum);
-void drumsynth_event_notify(void *self, unsigned int event_type);
+// void drumsynth_event_notify(void *self, unsigned int event_type);
 
 void drumsynth_trigger(drumsynth *ds);
 bool drumsynth_save_patch(drumsynth *ds, char *name);

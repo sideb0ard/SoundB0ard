@@ -4,7 +4,7 @@
 #include "envelope_generator.h"
 #include "lfo.h"
 #include "sound_generator.h"
-#include "step_sequencer.h"
+#include "sequence_engine.h"
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -101,7 +101,7 @@ typedef struct looper
     int grain_attack_time_pct;
     int grain_release_time_pct;
 
-    step_sequencer m_seq;
+    sequence_engine engine;
 
     envelope_generator m_eg1; // start/stop amp
     envelope_generator m_eg2; // unused so far
