@@ -131,9 +131,6 @@ void synthbase_set_midi_note(synthbase *base, int midi_note_idx, int root_key);
 
 void synthbase_clear_pattern_ready_for_new_one(synthbase *base,
                                                int pattern_num);
-void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
-                                bool restore_pattern);
-void synthbase_generate_recursive_pattern(synthbase *base);
 void synthbase_apply_bit_pattern(synthbase *base, uint16_t pattern,
                                  bool keep_note, bool riff);
 
@@ -189,6 +186,8 @@ void synthbase_mv_micro_note(synthbase *base, int pattern_num, int fromstep,
                              int tostep);
 midi_event *synthbase_get_pattern(synthbase *base, int pattern_num);
 void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern);
+void synthbase_set_pattern_to_riff(synthbase *base);
+void synthbase_set_pattern_to_melody(synthbase *base);
 
 void synthbase_set_octave(synthbase *base, int octave);
 int synthbase_get_octave(synthbase *base);
@@ -203,3 +202,4 @@ void arp_add_last_note(arpeggiator *arp, int note);
 void synthbase_set_note_mask(synthbase *base, uint16_t mask);
 void synthbase_set_enable_note_mask(synthbase *base, bool b);
 bool synthbase_is_masked(synthbase *base);
+

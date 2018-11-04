@@ -55,25 +55,6 @@ void synthbase_init(synthbase *base, void *parent,
     base->single_note_mode = false;
 }
 
-void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
-                                bool save_pattern)
-{
-    if (mixer_is_valid_pattern_gen_num(mixr, gen_src))
-    {
-        if (save_pattern)
-        {
-            synthbase_set_backup_mode(base, true);
-            base->restore_pending = true;
-        }
-
-        // synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
-
-        pattern_generator *sg = mixr->pattern_generators[gen_src];
-        uint16_t bits = sg->generate(sg, NULL);
-
-        synthbase_apply_bit_pattern(base, bits, keep_note, false);
-    }
-}
 
 void synthbase_gen_rec(synthbase *base, int start_idx, int end_idx,
                        int midi_note, float amp)
@@ -102,42 +83,40 @@ void synthbase_generate_recursive_pattern(synthbase *base)
     synthbase_gen_rec(base, 0, PPBAR - 1, base->midi_note_1, 128);
 }
 
-void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
-                                 bool keep_note, bool riff)
+void synthbase_set_pattern_to_riff(synthbase *base)
 {
-    synthbase_stop(base);
-
     midi_event *midi_pattern = base->patterns[base->cur_pattern];
-    clear_midi_pattern(midi_pattern);
+    for (int i = 0; i < PPBAR; i++)
+    {
+        midi_event *ev = &midi_pattern[i];
+        if (ev->event_type == MIDI_ON || ev->event_type == MIDI_OFF)
+        {
+            if (i < (PPQN * 12))
+                ev->data1 = base->midi_note_1;
+            if (i < (PPQN * 14))
+                ev->data1 = base->midi_note_2;
+            else
+                ev->data1 = base->midi_note_3;
+        }
+    }
+}
+
+void synthbase_set_pattern_to_melody(synthbase *base)
+{
+    midi_event *midi_pattern = base->patterns[base->cur_pattern];
 
     chord_midi_notes chnotes = {0};
     get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
                               synthbase_get_octave(base), &chnotes);
 
-    int multiplier = PPSIXTEENTH;
-    int midi_note = 0;
-    int midi_tick = 0;
-
-    int patternlen = 16;
-    for (int i = 0; i < patternlen; i++)
+    for (int i = 0; i < PPBAR; i++)
     {
-        int shift_by = patternlen - 1 - i;
-        if (bit_pattern & (1 << shift_by))
+        midi_event *ev = &midi_pattern[i];
+        int midi_note = 0;
+        if (ev->event_type == MIDI_ON || ev->event_type == MIDI_OFF)
         {
-            if (base->chord_mode)
-                midi_note = chnotes.root;
-            else if (riff)
-            {
-                if (i < 12)
-                    midi_note = base->midi_note_1;
-                else if (i < 14)
-                    midi_note = base->midi_note_2;
-                else
-                    midi_note = base->midi_note_3;
-            }
-            else if (base->single_note_mode)
-                midi_note = base->midi_note_1;
-            else if (i == 0 || i == patternlen - 1)
+
+            if (i < PPQN || i > PPBAR - PPQN)
                 midi_note = chnotes.root;
             else
             {
@@ -159,20 +138,7 @@ void synthbase_apply_bit_pattern(synthbase *base, uint16_t bit_pattern,
             if (rand() % 100 > 90)
                 midi_note += 12; // up an octave
 
-            int velocity = (rand() % 100) + 28;
-            midi_tick = multiplier * i;
-            if (midi_tick % PPQN == 0)
-                velocity = 128;
-
-            int hold_time_ms = (rand() % 2000) + 130;
-            midi_event ev = {.event_type = MIDI_ON,
-                             .data1 = midi_note,
-                             .data2 = velocity,
-                             .hold = hold_time_ms};
-            if (!keep_note)
-                ev.delete_after_use = true;
-
-            midi_pattern[midi_tick] = ev;
+            ev->data1 = midi_note;
         }
     }
 }
@@ -664,7 +630,15 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
         synthbase_stop(base);
         clear_midi_pattern(base->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
-            synthbase_add_event(base, pattern_num, i, pattern[i]);
+        {
+            midi_event ev = pattern[i];
+            if (base->chord_mode)
+                ev.data1 =
+                    get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+            else if (base->single_note_mode)
+                ev.data1 = base->midi_note_1;
+            synthbase_add_event(base, pattern_num, i, ev);
+        }
     }
 }
 

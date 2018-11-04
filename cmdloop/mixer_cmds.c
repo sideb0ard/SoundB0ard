@@ -197,94 +197,44 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             mixer_is_valid_pattern_gen_num(mixr, pg_num) &&
             dest_sg_pattern_num != -1)
         {
-            soundgenerator *sg = mixr->sound_generators[dest_sg_num];
-            midi_event *midi_pattern = sg->get_pattern(sg, dest_sg_pattern_num);
 
             pattern_generator *pg = mixr->pattern_generators[pg_num];
             uint16_t bitpattern = pg->generate(pg, NULL);
 
-            apply_short_to_midi_pattern(bitpattern, midi_pattern);
+            midi_event midi_pattern[PPBAR] = {};
+            apply_short_to_midi_pattern(bitpattern, (midi_event*)&midi_pattern);
+
+            soundgenerator *sg = mixr->sound_generators[dest_sg_num];
+            sg->set_pattern(sg, 0, (midi_event*)&midi_pattern);
+
+            bool num_wurds_is_odd = num_wurds % 2 == 1;
+            if (num_wurds >= 5 && num_wurds_is_odd)
+            {
+                for (int i = 3; strncmp("#", wurds[i], 1) == 0; i+=2)
+                {
+                    char *wurd = wurds[i+1];
+                    printf("Hashtag! %s\n", wurd);
+                    if (strncmp("once", wurd, 4) == 0)
+                        set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
+                    if (is_synth(sg))
+                    {
+                        synthbase *base = get_synthbase(sg);
+                        if (strncmp("riff", wurd, 4) == 0)
+                            synthbase_set_pattern_to_riff(base);
+                        if (strncmp("melody", wurd, 6) == 0)
+                            synthbase_set_pattern_to_melody(base);
+                        if (strncmp("sparse", wurd, 6) == 0)
+                            synthbase_set_num_patterns(base, 2);
+                    }
+                }
+            }
+
+
         }
         else
             printf("SUMMIT AINT VALID: SG:%d PG:%d\n", dest_sg_num, pg_num);
     }
-    else if (strncmp("gen", wurds[0], 3) == 0)
-    {
-        if (strncmp("melody", wurds[1], 6) == 0 ||
-            strncmp("once", wurds[1], 4) == 0 ||
-            strncmp("riffonce", wurds[1], 9) == 0 ||
-            strncmp("riff", wurds[1], 4) == 0 ||
-            strncmp("sparse", wurds[1], 6) == 0)
-        {
-            bool keep = true;
-            bool riff = false;
 
-            if (strncmp("once", wurds[1], 4) == 0 ||
-                strncmp("riffonce", wurds[1], 9) == 0)
-                keep = false;
-
-            if (strncmp("riff", wurds[1], 4) == 0)
-                riff = true;
-
-            int generator = atoi(wurds[2]);
-            int dest_sg_num = -1;
-            int dest_sg_pattern_num = -1;
-            sscanf(wurds[3], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
-
-            if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
-                mixer_is_valid_pattern_gen_num(mixr, generator) &&
-                dest_sg_pattern_num != -1)
-            {
-                pattern_generator *seqg = mixr->pattern_generators[generator];
-                uint16_t num =
-                    seqg->generate(seqg, (void *)&mixr->timing_info.cur_sample);
-
-                if (wurds[1][strlen(wurds[1]) - 1] == '2')
-                {
-                    int dest_sg_num_2 = -1;
-                    int dest_sg_pattern_num_2 = -1;
-                    sscanf(wurds[4], "%d:%d", &dest_sg_num_2,
-                           &dest_sg_pattern_num_2);
-                    if (mixer_is_valid_soundgen_num(mixr, dest_sg_num_2) &&
-                        dest_sg_pattern_num_2 != -1)
-                    {
-                        uint16_t bit_pattern_1 = num & 0xFF00;
-                        uint16_t bit_pattern_2 = num & 0x00FF;
-
-                        soundgenerator *sg2 =
-                            (soundgenerator *)
-                                mixr->sound_generators[dest_sg_num_2];
-                        synthbase *b2 = get_synthbase(sg2);
-                        if (b2)
-                        {
-                            synthbase_apply_bit_pattern(b2, bit_pattern_2, keep,
-                                                        riff);
-                        }
-
-                        num = bit_pattern_1;
-                    }
-                }
-
-                soundgenerator *sg =
-                    (soundgenerator *)mixr->sound_generators[dest_sg_num];
-
-                synthbase *base = get_synthbase(sg);
-                if (!base)
-                {
-                    printf("Can't do nuttin' for ya, man!\n");
-                    return true;
-                }
-
-                if (strncmp("sparse", wurds[1], 6) == 0)
-                    synthbase_set_num_patterns(base, 2);
-                else
-                    synthbase_set_num_patterns(base, 1);
-
-                synthbase_apply_bit_pattern(base, num, keep, riff);
-            }
-        }
-        cmd_found = true;
-    }
     else if (strncmp("keys", wurds[0], 4) == 0)
     {
         for (int i = 0; i < NUM_KEYS; i++)
@@ -511,10 +461,10 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
 
             midi_event pattern[PPBAR];
-            convert_bit_pattern_to_midi_pattern(pattern_1, 16, pattern, 1, 0);
+            apply_short_to_midi_pattern(pattern_1, pattern);
             s1->set_pattern(s1, sg1_track_num, pattern);
 
-            convert_bit_pattern_to_midi_pattern(pattern_2, 16, pattern, 1, 0);
+            apply_short_to_midi_pattern(pattern_2, pattern);
             s2->set_pattern(s2, sg1_track_num, pattern);
         }
 

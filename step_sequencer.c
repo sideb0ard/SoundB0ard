@@ -34,13 +34,6 @@ void step_init(step_sequencer *seq)
     seq->cur_pattern_iteration = 1;
     seq->pattern_len = 16;
 
-    seq->generate_en = false;
-    seq->generate_src = -99;
-    seq->generate_generation = 0;
-    seq->generate_every_n_loops = 0;
-    seq->generate_max_generation = 0;
-    seq->allow_triplets = true;
-
     for (int i = 0; i < MAX_SEQUENCER_PATTERNS; i++)
         seq->pattern_num_loops[i] = 1;
 
@@ -49,7 +42,7 @@ void step_init(step_sequencer *seq)
     seq->visualize = false;
 }
 
-bool step_tick(step_sequencer *seq)
+void step_tick(step_sequencer *seq)
 {
     if (mixr->timing_info.sixteenth_note_tick != seq->sixteenth_tick)
     {
@@ -69,185 +62,10 @@ bool step_tick(step_sequencer *seq)
                         seq->pattern_num_loops[seq->cur_pattern];
                 }
             }
-
-            if (seq->generate_en)
-            {
-                bool gen_new_pattern = false;
-                if (seq->generate_every_n_loops > 0)
-                {
-                    if (seq->generate_generation %
-                            seq->generate_every_n_loops ==
-                        0)
-                    {
-                        step_set_backup_mode(seq, true);
-                        gen_new_pattern = true;
-                    }
-                    else
-                    {
-                        step_set_backup_mode(seq, false);
-                    }
-                }
-                else if (seq->generate_max_generation > 0)
-                {
-                    if (seq->generate_generation >=
-                        seq->generate_max_generation)
-                    {
-                        seq->generate_generation = 0;
-                        step_set_generate_enable(seq, false);
-                    }
-                }
-                else
-                {
-                    gen_new_pattern = true;
-                }
-                if (gen_new_pattern)
-                {
-                    if (seq->generate_src != -99)
-                    {
-                        pattern_generator *sg =
-                            mixr->pattern_generators[seq->generate_src];
-
-                        memset(&seq->patterns[seq->cur_pattern], 0,
-                               PPBAR * sizeof(midi_event));
-
-                        int pattern_offset = 0;
-                        int division = 1;
-                        // if (seq->generate_mode == 1)
-                        //{
-                        //    division = 4;
-                        //    for (int i = 0; i < division; i++)
-                        //    {
-                        //        pattern_offset = i * (PPBAR / division);
-
-                        //        int bit_pattern_len = 16; // WTF?
-                        //        int bit_pattern = sg->generate(
-                        //            (void *)sg, (void *)&bit_pattern_len);
-
-                        //        if (seq->visualize)
-                        //        {
-                        //            char bit_string[17];
-                        //            char_binary_version_of_short(bit_pattern,
-                        //                                         bit_string);
-                        //            printf("PATTERN: %s\n", bit_string);
-                        //        }
-
-                        //        convert_bit_pattern_to_midi_pattern(
-                        //            bit_pattern, bit_pattern_len,
-                        //            seq->patterns[seq->cur_pattern], division,
-                        //            pattern_offset);
-
-                        //        seq->pattern_len = bit_pattern_len;
-                        //    }
-                        //}
-                        // else if (seq->generate_mode == 2)
-                        //{
-                        //    // printf("MODE2MOFO!\n");
-                        //    // pattern_offset = i * (PPBAR / division);
-                        //    int division = 1;
-                        //    int pattern_offset = 0;
-
-                        //    int bit_pattern_len = 16; // default
-                        //    int bit_pattern = sg->generate(
-                        //        (void *)sg, (void *)&bit_pattern_len);
-
-                        //    if (seq->visualize)
-                        //    {
-                        //        char bit_string[17];
-                        //        char_binary_version_of_short(bit_pattern,
-                        //                                     bit_string);
-                        //        printf("PATTERN: %s\n", bit_string);
-                        //    }
-
-                        //    convert_bit_pattern_to_midi_pattern(
-                        //        bit_pattern, bit_pattern_len,
-                        //        seq->patterns[seq->cur_pattern], division,
-                        //        pattern_offset);
-
-                        //    int randy = rand() % 100;
-                        //    if (randy > 50)
-                        //    {
-                        //        division = 4;
-                        //        pattern_offset = PPBAR / division;
-                        //        bit_pattern = sg->generate(
-                        //            (void *)sg, (void *)&bit_pattern_len);
-                        //        if (randy > 90)
-                        //            pattern_offset = 3 * pattern_offset;
-                        //        else if (randy > 80)
-                        //            pattern_offset = 2 * pattern_offset;
-                        //        else if (randy > 60)
-                        //            pattern_offset = 1 * pattern_offset;
-                        //        else
-                        //            pattern_offset = 0;
-
-                        //        convert_bit_pattern_to_midi_pattern(
-                        //            bit_pattern, bit_pattern_len,
-                        //            seq->patterns[seq->cur_pattern], division,
-                        //            pattern_offset);
-                        //    }
-
-                        //    seq->pattern_len = bit_pattern_len;
-                        //}
-                        for (int i = 0; i < division; i++)
-                        {
-                            pattern_offset = i * (PPBAR / division);
-
-                            int bit_pattern_len = 16; // default
-                            int bit_pattern = sg->generate(
-                                (void *)sg, (void *)&bit_pattern_len);
-
-                            if (seq->visualize)
-                            {
-                                char bit_string[17];
-                                short_to_char(bit_pattern, bit_string);
-                                printf("PATTERN: %s\n", bit_string);
-                            }
-
-                            convert_bit_pattern_to_midi_pattern(
-                                bit_pattern, bit_pattern_len,
-                                seq->patterns[seq->cur_pattern], division,
-                                pattern_offset);
-
-                            seq->pattern_len = bit_pattern_len;
-                        }
-                        if (seq->allow_triplets)
-                        {
-                            if (rand() % 100 > 95)
-                            {
-                                int quart = 2;
-                                int randy = rand() % 100;
-                                if (randy > 75)
-                                    quart = 1;
-                                else if (randy > 50)
-                                    quart = 3;
-                                midi_pattern_add_triplet(
-                                    seq->patterns[seq->cur_pattern], quart);
-                            }
-                        }
-                    }
-                }
-                seq->generate_generation++;
-            }
-            if (seq->randamp_on)
-            {
-                if (seq->randamp_every_n_loops > 0)
-                {
-                    if (seq->randamp_generation % seq->randamp_every_n_loops ==
-                        0)
-                    {
-                        step_set_random_sample_amp(seq, seq->cur_pattern);
-                    }
-                }
-                else
-                {
-                    step_set_random_sample_amp(seq, seq->cur_pattern);
-                }
-                seq->randamp_generation++;
-            }
         }
-        return true;
     }
-    return false;
 }
+
 
 void pattern_char_to_pattern(step_sequencer *s, char *char_pattern,
                              midi_event *final_pattern)
@@ -354,13 +172,6 @@ void step_change_num_loops(step_sequencer *s, int pattern_num, int num_loops)
     }
 }
 
-void step_set_generate_enable(step_sequencer *s, bool b)
-{
-    s->generate_generation = 0;
-    s->generate_en = b;
-    step_set_backup_mode(s, b);
-}
-
 void step_clear_pattern(step_sequencer *s, int pattern_num)
 {
     memset(&s->patterns[pattern_num], 0, PPBAR * sizeof(midi_event));
@@ -384,22 +195,6 @@ void step_set_backup_mode(step_sequencer *s, bool on)
                PPBAR * sizeof(midi_event));
         s->multi_pattern_mode = true;
     }
-}
-
-void step_set_max_generations(step_sequencer *s, int max)
-{
-    s->generate_max_generation = max;
-}
-
-void step_set_generate_src(step_sequencer *s, int src)
-{
-    s->generate_src = src;
-}
-
-void step_set_generate_mode(step_sequencer *s, int unsigned mode)
-{
-    if (mode < 3)
-        s->generate_mode = mode;
 }
 
 void step_set_pattern_len(step_sequencer *s, int len)

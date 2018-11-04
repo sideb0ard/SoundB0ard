@@ -451,7 +451,7 @@ void looper_status(void *self, wchar_t *status_string)
         "mode:%s gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
         "len:%.2f scramble:%d stutter:%d step:%d reverse:%d "
         "buffer_is_full:%d\n"
-        "gen_src:%d gen_every_n:%d gen_en:%d gen mode:%d extsource:%d\n"
+        "extsource:%d\n"
         "grain_dur_ms:" "%s" "%d" "%s "
         "grains_per_sec:" "%s" "%d" "%s "
         "density_dur_sync:%d "
@@ -480,9 +480,8 @@ void looper_status(void *self, wchar_t *status_string)
         g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
         g->grain_attack_time_pct, g->grain_release_time_pct, g->loop_len,
         g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
-        g->buffer_is_full, g->m_seq.generate_src,
-        g->m_seq.generate_every_n_loops, g->m_seq.generate_en,
-        g->m_seq.generate_mode, g->external_source_sg,
+        g->buffer_is_full,
+        g->external_source_sg,
 
         ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
         ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,

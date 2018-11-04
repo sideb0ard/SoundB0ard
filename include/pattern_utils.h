@@ -17,15 +17,12 @@ void midi_pattern_to_widechar(midi_event *pattern, wchar_t *patternstr);
 
 void apply_short_to_midi_pattern(uint16_t bit_pattern,
                                  midi_event *dest_pattern);
+void set_pattern_to_self_destruct(midi_event *pattern);
 void short_to_char(uint16_t num, char bin_num[17]);
 
 // void char_binary_version_of_pattern(seq_pattern p, char bin_num[17]);
 // void wchar_binary_version_of_pattern(seq_pattern p, wchar_t bin_num[17]);
 //
-
-void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
-                                         midi_event *pattern, int division,
-                                         int offset);
 
 int shift_bits_to_leftmost_position(uint16_t num,
                                     int num_of_bits_to_align_with);

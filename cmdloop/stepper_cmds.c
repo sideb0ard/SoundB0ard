@@ -244,57 +244,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
     }
     else
     {
-        if (strncmp("generate", wurds[2], 8) == 0 ||
-            strncmp("gen", wurds[2], 3) == 0)
-        {
-            if (strncmp("every", wurds[3], 5) == 0)
-            {
-                int num_gens = atoi(wurds[4]);
-                if (num_gens > 0)
-                {
-                    step_set_generate_enable(seq, true);
-                    seq->generate_every_n_loops = num_gens;
-                }
-                else
-                {
-                    printf("Need a number for every 'n'\n");
-                }
-            }
-            else if (strncmp("for", wurds[3], 3) == 0)
-            {
-                int num_gens = atoi(wurds[4]);
-                if (num_gens > 0)
-                {
-                    step_set_generate_enable(seq, true);
-                    step_set_max_generations(seq, num_gens);
-                }
-                else
-                {
-                    printf("Need a number for 'for'\n");
-                }
-            }
-            else if (strncmp("mode", wurds[3], 4) == 0)
-            {
-                int mode = atoi(wurds[4]);
-                step_set_generate_mode(seq, mode);
-            }
-            else if (strncmp("source", wurds[3], 6) == 0 ||
-                     strncmp("src", wurds[3], 3) == 0)
-            {
-                int generate_src = atoi(wurds[4]);
-                if (mixer_is_valid_pattern_gen_num(mixr, generate_src))
-                {
-                    step_set_generate_src(seq, generate_src);
-                }
-                else
-                    printf("not a valid generate SRC: %d\n", generate_src);
-            }
-            else
-            {
-                step_set_generate_enable(seq, 1 - seq->generate_en);
-            }
-        }
-        else if (strncmp("multi", wurds[2], 5) == 0)
+        if (strncmp("multi", wurds[2], 5) == 0)
         {
             bool b = atoi(wurds[3]);
             step_set_multi_pattern_mode(seq, b);

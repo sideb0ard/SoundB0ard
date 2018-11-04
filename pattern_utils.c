@@ -3,6 +3,7 @@
 
 #include <mixer.h>
 #include <pattern_utils.h>
+#include <midimaaan.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -53,6 +54,7 @@ void midi_pattern_add_triplet(midi_event *pattern, unsigned int quarter)
     for (int i = 0; i < 3; i++)
     {
         pattern[pos[i]].event_type = MIDI_ON;
+        pattern[pos[i]].data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
         pattern[pos[i]].data2 = DEFAULT_VELOCITY;
     }
 }
@@ -92,23 +94,6 @@ void midi_pattern_to_widechar(midi_event *pattern,
     }
 }
 
-void apply_short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
-{
-    clear_midi_pattern(dest_pattern);
-    for (int i = 0; i < 15; i++)
-    {
-        if (bit_pattern & (1 << (15 - i)))
-        {
-            int midi_pos = i * PPSIXTEENTH;
-            midi_event *ev = &dest_pattern[midi_pos];
-            ev->data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
-            ev->data2 = 128; // velocity
-            ev->event_type = MIDI_ON;
-            ev->source = 0;
-        }
-    }
-}
-
 void short_to_char(uint16_t num, char bin_num[17])
 {
     for (int i = 15; i >= 0; i--)
@@ -143,35 +128,41 @@ void short_to_char(uint16_t num, char bin_num[17])
 //    puts("\n");
 //}
 
-void convert_bit_pattern_to_midi_pattern(int bitpattern, int bitpattern_len,
-                                         midi_event *pattern, int division,
-                                         int offset)
+void apply_short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
 {
-
-    clear_midi_pattern(pattern);
-
-    int pulses = PPSIXTEENTH / division;
-    // bool triplet_set = false;
-
-    for (int i = 0; i < bitpattern_len; i++)
+    clear_midi_pattern(dest_pattern);
+    for (int i = 0; i < 15; i++)
     {
-        int shift_by = bitpattern_len - 1 - i;
-        int idx = offset + (i * pulses);
-        if (idx >= PPBAR)
-            idx = idx - PPBAR;
-        if (bitpattern & 1 << shift_by)
+        if (bit_pattern & (1 << (15 - i)))
         {
-            // printf("IDX:%d!\n", idx);
-            pattern[idx].event_type = MIDI_ON;
+            int midi_pos = i * PPSIXTEENTH;
+            int hold_time_ms = (rand() % 2000) + 130;
+
+            midi_event *ev = &dest_pattern[midi_pos];
+            ev->data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+            ev->event_type = MIDI_ON;
+            ev->source = 0;
+            ev->hold = hold_time_ms;
+
             if (i == 0 || i == 8)
-                pattern[idx].data2 = 128;
+                ev->data2 = 128; // velocity
             else
             {
                 int rand_velocity = (rand() % 50) + 70;
-                pattern[idx].data2 = rand_velocity;
+                ev->data2 = rand_velocity;
             }
         }
     }
+	if (rand() % 100 > 95)
+	{
+	    int quart = 2;
+	    int randy = rand() % 100;
+	    if (randy > 75)
+	        quart = 1;
+	    else if (randy > 50)
+	        quart = 3;
+	    midi_pattern_add_triplet(dest_pattern, quart);
+	}
 }
 
 int shift_bits_to_leftmost_position(uint16_t num, int num_of_bits_to_align_with)
@@ -188,4 +179,14 @@ int shift_bits_to_leftmost_position(uint16_t num, int num_of_bits_to_align_with)
     int bitshift_by = num_of_bits_to_align_with - (first_position + 1);
     int ret_num = num << bitshift_by;
     return ret_num;
+}
+
+void set_pattern_to_self_destruct(midi_event *pattern)
+{
+    for (int i = 0; i < PPBAR; i++)
+    {
+        midi_event *ev = &pattern[i];
+        if (ev->event_type == MIDI_ON || ev->event_type == MIDI_OFF)
+            ev->delete_after_use = true;
+    }
 }

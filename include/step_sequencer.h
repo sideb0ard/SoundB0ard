@@ -24,13 +24,6 @@ typedef struct step_sequencer
     int cur_pattern_iteration;
     bool multi_pattern_mode;
 
-    bool generate_en;
-    int generate_mode;
-    int generate_src;
-    int generate_generation;
-    int generate_max_generation;
-    int generate_every_n_loops;
-
     bool allow_triplets;
 
     // randomizes amplitude
@@ -45,7 +38,7 @@ typedef struct step_sequencer
 } step_sequencer;
 
 void step_init(step_sequencer *s);
-bool step_tick(step_sequencer *s);
+void step_tick(step_sequencer *s);
 void step_status(step_sequencer *s, wchar_t *status_string);
 
 void step_set_sample_velocity(step_sequencer *s, int pattern_num,
@@ -65,13 +58,8 @@ void wchar_version_of_amp(step_sequencer *s, int pattern_num,
 void step_set_randamp(step_sequencer *s, bool on);
 void step_set_pattern_len(step_sequencer *s, int len);
 
-void step_set_generate_mode(step_sequencer *s, unsigned int mode);
-void step_set_generate_enable(step_sequencer *s, bool b);
-void step_set_generate_src(step_sequencer *s, int generate_src);
-
 void step_clear_pattern(step_sequencer *s, int pattern_num);
 void step_set_backup_mode(step_sequencer *s, bool on);
-void step_set_max_generations(step_sequencer *s, int max);
 
 void step_wchar_binary_version_of_pattern(step_sequencer *s, midi_pattern p,
                                           wchar_t *bin_num);
