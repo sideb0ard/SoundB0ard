@@ -11,12 +11,6 @@
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/synthdrumpatches.dat";
 
-typedef struct pattern_hit_metadata
-{
-    bool played;
-    bool playing;
-} pattern_hit_metadata;
-
 typedef struct synthdrum_sequencer
 {
     soundgenerator sg;
@@ -54,9 +48,6 @@ typedef struct synthdrum_sequencer
 
     // DISTORTION
     distortion m_distortion;
-
-    // PATTERN METADATA
-    pattern_hit_metadata metadata[SEQUENCER_PATTERN_LEN];
 
     int mod_semitones_range;
     bool started;

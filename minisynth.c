@@ -1820,7 +1820,7 @@ void minisynth_sg_stop(void *self)
 
 void minisynth_set_generate_src(minisynth *ms, int src)
 {
-    if (mixer_is_valid_seq_gen_num(mixr, src))
+    if (mixer_is_valid_pattern_gen_num(mixr, src))
         ms->m_settings.m_generate_src = src;
 }
 

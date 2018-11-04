@@ -282,7 +282,7 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
                      strncmp("src", wurds[3], 3) == 0)
             {
                 int generate_src = atoi(wurds[4]);
-                if (mixer_is_valid_seq_gen_num(mixr, generate_src))
+                if (mixer_is_valid_pattern_gen_num(mixr, generate_src))
                 {
                     step_set_generate_src(seq, generate_src);
                 }

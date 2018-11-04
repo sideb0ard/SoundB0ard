@@ -34,8 +34,6 @@
 #define PPTHIRTYSECOND (PPQN / 8)
 #define PPBAR (PPQN * 4) // Pulses per loop/bar - i.e 4 * beats
 
-#define SEQUENCER_PATTERN_LEN 16 // 16 1/4 notes i.e. one bar
-
 #define TWO_PI (2.0 * M_PI)
 #define FREQRAD (TWO_PI / SAMPLE_RATE)
 

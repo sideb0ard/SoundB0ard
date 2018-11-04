@@ -104,8 +104,8 @@ bool step_tick(step_sequencer *seq)
                 {
                     if (seq->generate_src != -99)
                     {
-                        sequence_generator *sg =
-                            mixr->sequence_generators[seq->generate_src];
+                        pattern_generator *sg =
+                            mixr->pattern_generators[seq->generate_src];
 
                         memset(&seq->patterns[seq->cur_pattern], 0,
                                PPBAR * sizeof(midi_event));

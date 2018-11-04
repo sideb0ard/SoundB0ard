@@ -58,7 +58,7 @@ void synthbase_init(synthbase *base, void *parent,
 void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
                                 bool save_pattern)
 {
-    if (mixer_is_valid_seq_gen_num(mixr, gen_src))
+    if (mixer_is_valid_pattern_gen_num(mixr, gen_src))
     {
         if (save_pattern)
         {
@@ -68,7 +68,7 @@ void synthbase_generate_pattern(synthbase *base, int gen_src, bool keep_note,
 
         // synthbase_clear_pattern_ready_for_new_one(base, base->cur_pattern);
 
-        sequence_generator *sg = mixr->sequence_generators[gen_src];
+        pattern_generator *sg = mixr->pattern_generators[gen_src];
         uint16_t bits = sg->generate(sg, NULL);
 
         synthbase_apply_bit_pattern(base, bits, keep_note, false);

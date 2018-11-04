@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include "defjams.h"
-#include "sequence_generator.h"
+#include "pattern_generator.h"
 
 enum euclidean_mode
 {
@@ -17,7 +17,7 @@ enum euclidean_mode
 
 typedef struct euclidean
 {
-    sequence_generator sg;
+    pattern_generator sg;
     int num_hits;
     int num_steps;
     unsigned int mode;
@@ -25,7 +25,7 @@ typedef struct euclidean
     int actual_num_steps;
 } euclidean;
 
-sequence_generator *new_euclidean(int num_hits, int num_steps);
+pattern_generator *new_euclidean(int num_hits, int num_steps);
 uint16_t euclidean_generate(void *self, void *data);
 void euclidean_status(void *self, wchar_t *status_string);
 void euclidean_event_notify(void *self, unsigned int event_type);

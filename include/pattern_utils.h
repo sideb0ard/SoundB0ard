@@ -15,7 +15,8 @@ void midi_pattern_add_triplet(midi_event *pattern, unsigned int quarter);
 uint16_t midi_pattern_to_short(midi_event *pattern);
 void midi_pattern_to_widechar(midi_event *pattern, wchar_t *patternstr);
 
-void short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern);
+void apply_short_to_midi_pattern(uint16_t bit_pattern,
+                                 midi_event *dest_pattern);
 void short_to_char(uint16_t num, char bin_num[17]);
 
 // void char_binary_version_of_pattern(seq_pattern p, char bin_num[17]);

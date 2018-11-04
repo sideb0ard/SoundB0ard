@@ -16,7 +16,7 @@ SRC = \
 	cmdloop/midi_cmds.c \
 	cmdloop/mixer_cmds.c \
 	cmdloop/new_item_cmds.c \
-	cmdloop/sequence_generator_cmds.c \
+	cmdloop/pattern_generator_cmds.c \
 	cmdloop/stepper_cmds.c \
 	cmdloop/synth_cmds.c \
 	dca.c \
@@ -69,9 +69,9 @@ SRC = \
 	step_sequencer.c \
 	sequencer_utils.c \
 	sound_generator.c \
-	sequence_generators/bitshift.c \
-	sequence_generators/euclidean.c \
-	sequence_generators/markov.c \
+	pattern_generators/bitshift.c \
+	pattern_generators/euclidean.c \
+	pattern_generators/markov.c \
 	sparkline.c \
 	synthbase.c \
 	synthdrum_sequencer.c \

@@ -92,7 +92,7 @@ void midi_pattern_to_widechar(midi_event *pattern,
     }
 }
 
-void short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
+void apply_short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
 {
     clear_midi_pattern(dest_pattern);
     for (int i = 0; i < 15; i++)

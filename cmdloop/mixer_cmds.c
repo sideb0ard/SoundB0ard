@@ -34,9 +34,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         cmd_found = true;
     }
     // individual status types
-    else if (strncmp("seqz", wurds[0], 4) == 0)
+    else if (strncmp("patz", wurds[0], 4) == 0)
     {
-        mixer_status_seqz(mixr);
+        mixer_status_patz(mixr);
     }
     else if (strncmp("sgz", wurds[0], 3) == 0)
     {
@@ -186,7 +186,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         cmd_found = true;
     }
-    else if (strncmp("scrumpy", wurds[0], 6) == 0)
+    else if (strncmp("apply", wurds[0], 6) == 0)
     {
         int pg_num = atoi(wurds[1]);
         int dest_sg_num = -1;
@@ -194,14 +194,16 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[2], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
 
         if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
-            mixer_is_valid_seq_gen_num(mixr, pg_num) &&
+            mixer_is_valid_pattern_gen_num(mixr, pg_num) &&
             dest_sg_pattern_num != -1)
         {
-            sequence_generator *pg = mixr->sequence_generators[pg_num];
             soundgenerator *sg = mixr->sound_generators[dest_sg_num];
             midi_event *midi_pattern = sg->get_pattern(sg, dest_sg_pattern_num);
-            int bitpattern = pg->generate(pg, NULL);
-            short_to_midi_pattern(bitpattern, midi_pattern);
+
+            pattern_generator *pg = mixr->pattern_generators[pg_num];
+            uint16_t bitpattern = pg->generate(pg, NULL);
+
+            apply_short_to_midi_pattern(bitpattern, midi_pattern);
         }
         else
             printf("SUMMIT AINT VALID: SG:%d PG:%d\n", dest_sg_num, pg_num);
@@ -230,10 +232,10 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             sscanf(wurds[3], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
 
             if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
-                mixer_is_valid_seq_gen_num(mixr, generator) &&
+                mixer_is_valid_pattern_gen_num(mixr, generator) &&
                 dest_sg_pattern_num != -1)
             {
-                sequence_generator *seqg = mixr->sequence_generators[generator];
+                pattern_generator *seqg = mixr->pattern_generators[generator];
                 uint16_t num =
                     seqg->generate(seqg, (void *)&mixr->timing_info.cur_sample);
 
@@ -475,7 +477,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
              strncmp("blend", wurds[0], 5) == 0)
     {
         // e.g. invert 0 0:0 1:0
-        int sequence_gen_num = atoi(wurds[1]);
+        int pattern_gen_num = atoi(wurds[1]);
 
         int sg1_num = 0;
         int sg1_track_num = 0;
@@ -486,10 +488,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[3], "%d:%d", &sg2_num, &sg2_track_num);
         if (mixer_is_valid_soundgen_track_num(mixr, sg1_num, sg1_track_num) &&
             mixer_is_valid_soundgen_track_num(mixr, sg2_num, sg2_track_num) &&
-            mixer_is_valid_seq_gen_num(mixr, sequence_gen_num))
+            mixer_is_valid_pattern_gen_num(mixr, pattern_gen_num))
         {
-            sequence_generator *sg =
-                mixr->sequence_generators[sequence_gen_num];
+            pattern_generator *sg = mixr->pattern_generators[pattern_gen_num];
 
             soundgenerator *s1 = mixr->sound_generators[sg1_num];
             soundgenerator *s2 = mixr->sound_generators[sg2_num];

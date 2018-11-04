@@ -206,20 +206,20 @@ void mixer_status_algoz(mixer *mixr, bool all)
         }
     }
 }
-void mixer_status_seqz(mixer *mixr)
+void mixer_status_patz(mixer *mixr)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    if (mixr->sequence_gen_num > 0)
+    if (mixr->pattern_gen_num > 0)
     {
         printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
-                                "sequence generators" COOL_COLOR_GREEN "]\n");
-        for (int i = 0; i < mixr->sequence_gen_num; i++)
+                                "pattern generators" COOL_COLOR_GREEN "]\n");
+        for (int i = 0; i < mixr->pattern_gen_num; i++)
         {
-            if (mixr->sequence_generators[i] != NULL)
+            if (mixr->pattern_generators[i] != NULL)
             {
                 wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                mixr->sequence_generators[i]->status(
-                    mixr->sequence_generators[i], wss);
+                mixr->pattern_generators[i]->status(mixr->pattern_generators[i],
+                                                    wss);
                 wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
                 wprintf(L"  %ls\n", wss);
                 wprintf(WANSI_COLOR_RESET);
@@ -286,7 +286,7 @@ void mixer_ps(mixer *mixr, bool all)
     print_logo();
     mixer_status_mixr(mixr);
     mixer_status_algoz(mixr, all);
-    mixer_status_seqz(mixr);
+    mixer_status_patz(mixr);
     mixer_status_sgz(mixr, all);
     printf(ANSI_COLOR_RESET);
 }
@@ -310,9 +310,9 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type)
             algorithm_event_notify(a, event_type);
     }
 
-    for (int i = 0; i < mixr->sequence_gen_num; ++i)
+    for (int i = 0; i < mixr->pattern_gen_num; ++i)
     {
-        sequence_generator *sg = mixr->sequence_generators[i];
+        pattern_generator *sg = mixr->pattern_generators[i];
         if (sg != NULL)
             sg->event_notify(sg, event_type);
     }
@@ -415,36 +415,36 @@ int add_sound_generator(mixer *mixr, soundgenerator *sg)
     return mixr->soundgen_num++;
 }
 
-int add_sequence_generator(mixer *mixr, sequence_generator *sg)
+int add_pattern_generator(mixer *mixr, pattern_generator *sg)
 {
-    sequence_generator **new_sequence_gens = NULL;
+    pattern_generator **new_pattern_gens = NULL;
 
-    if (mixr->sequence_gen_size <= mixr->sequence_gen_num)
+    if (mixr->pattern_gen_size <= mixr->pattern_gen_num)
     {
-        if (mixr->sequence_gen_size == 0)
+        if (mixr->pattern_gen_size == 0)
         {
-            mixr->sequence_gen_size = DEFAULT_ARRAY_SIZE;
+            mixr->pattern_gen_size = DEFAULT_ARRAY_SIZE;
         }
         else
         {
-            mixr->sequence_gen_size *= 2;
+            mixr->pattern_gen_size *= 2;
         }
 
-        new_sequence_gens = (sequence_generator **)realloc(
-            mixr->sequence_generators,
-            mixr->sequence_gen_size * sizeof(sequence_generator *));
-        if (new_sequence_gens == NULL)
+        new_pattern_gens = (pattern_generator **)realloc(
+            mixr->pattern_generators,
+            mixr->pattern_gen_size * sizeof(pattern_generator *));
+        if (new_pattern_gens == NULL)
         {
-            printf("Ooh, burney - cannae allocate memory for new sequences");
+            printf("Ooh, burney - cannae allocate memory for new patterns");
             return -1;
         }
         else
         {
-            mixr->sequence_generators = new_sequence_gens;
+            mixr->pattern_generators = new_pattern_gens;
         }
     }
-    mixr->sequence_generators[mixr->sequence_gen_num] = sg;
-    return mixr->sequence_gen_num++;
+    mixr->pattern_generators[mixr->pattern_gen_num] = sg;
+    return mixr->pattern_gen_num++;
 }
 
 int mixer_add_algorithm(mixer *mixr, algorithm *a)
@@ -467,7 +467,7 @@ int mixer_add_algorithm(mixer *mixr, algorithm *a)
             mixr->algorithms, mixr->algorithm_size * sizeof(algorithm *));
         if (new_algorithms == NULL)
         {
-            printf("Ooh, burney - cannae allocate memory for new sequences");
+            printf("Ooh, burney - cannae allocate memory for new algorithms");
             return -1;
         }
         else
@@ -481,30 +481,30 @@ int mixer_add_algorithm(mixer *mixr, algorithm *a)
 
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
-    printf("Adding an BITSHIFT SEQUENCE GENERATOR, yo!\n");
-    sequence_generator *sg = new_bitshift(num_wurds, wurds);
+    printf("Adding an BITSHIFT PATTERN GENERATOR, yo!\n");
+    pattern_generator *sg = new_bitshift(num_wurds, wurds);
     if (sg)
-        return add_sequence_generator(mixr, sg);
+        return add_pattern_generator(mixr, sg);
     else
         return -99;
 }
 
 int mixer_add_markov(mixer *mixr, unsigned int type)
 {
-    printf("Adding an MARKOV SEQUENCE GENERATOR, yo!\n");
-    sequence_generator *sg = new_markov(type);
+    printf("Adding an MARKOV PATTERN GENERATOR, yo!\n");
+    pattern_generator *sg = new_markov(type);
     if (sg)
-        return add_sequence_generator(mixr, sg);
+        return add_pattern_generator(mixr, sg);
     else
         return -99;
 }
 
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps)
 {
-    printf("Adding an EUCLIDEAN SEQUENCE GENERATOR, yo!\n");
-    sequence_generator *sg = new_euclidean(num_hits, num_steps);
+    printf("Adding an EUCLIDEAN PATTERN GENERATOR, yo!\n");
+    pattern_generator *sg = new_euclidean(num_hits, num_steps);
     if (sg)
-        return add_sequence_generator(mixr, sg);
+        return add_pattern_generator(mixr, sg);
     else
         return -99;
 }
@@ -787,11 +787,10 @@ bool mixer_is_valid_env_var(mixer *mixr, char *key)
     return false;
 }
 
-
-bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum)
+bool mixer_is_valid_pattern_gen_num(mixer *mixr, int sgnum)
 {
-    if (sgnum >= 0 && sgnum < mixr->sequence_gen_num &&
-        mixr->sequence_generators[sgnum] != NULL)
+    if (sgnum >= 0 && sgnum < mixr->pattern_gen_num &&
+        mixr->pattern_generators[sgnum] != NULL)
         return true;
     return false;
 }

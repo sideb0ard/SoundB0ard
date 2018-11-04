@@ -18,7 +18,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp("bitshift", wurds[1], 4) == 0)
         {
-            printf("BITSHIFT! SEQUENCE GEN!\n");
+            printf("BITSHIFT! PATTERN GEN!\n");
             mixer_add_bitshift(mixr, num_wurds - 2, &wurds[2]);
         }
 
@@ -26,7 +26,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             int num_hits = atoi(wurds[2]);
             int num_steps = atoi(wurds[3]);
-            printf("EUCLIDEAN! SEQUENCE GEN num_hits:%d num_steps:%d!\n",
+            printf("EUCLIDEAN! PATTERN GEN num_hits:%d num_steps:%d!\n",
                    num_hits, num_steps);
             mixer_add_euclidean(mixr, 3, 16);
         }
@@ -105,7 +105,6 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
         }
 
-
         else if (strncmp("looper", wurds[1], 6) == 0 ||
                  strncmp("loop", wurds[1], 4) == 0 ||
                  strncmp("gran", wurds[1], 4) == 0 ||
@@ -134,7 +133,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         if (strncmp("markov", wurds[1], 6) == 0)
         {
-            printf("MARkOV! SEQUENCE GEN!\n");
+            printf("MARkOV! PATTERN GEN!\n");
             unsigned int type = atoi(wurds[2]);
             mixer_add_markov(mixr, type);
         }

@@ -25,11 +25,6 @@ synthdrum_sequencer *new_synthdrum_seq()
     sds->vol = 0.6;
     sds->started = false;
     sds->reset_osc = true;
-    for (int i = 0; i < SEQUENCER_PATTERN_LEN; i++)
-    {
-        sds->metadata[i].played = 0.0;
-        sds->metadata[i].playing = 0.0;
-    }
 
     strncpy(sds->m_patch_name, "Default", 7);
 

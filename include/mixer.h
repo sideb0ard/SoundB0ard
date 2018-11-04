@@ -13,8 +13,8 @@
 #include "dxsynth.h"
 #include "fx.h"
 #include "minisynth.h"
+#include "pattern_generator.h"
 #include "sbmsg.h"
-#include "sequence_generator.h"
 #include "sound_generator.h"
 #include "step_sequencer.h"
 #include "table.h"
@@ -84,9 +84,9 @@ typedef struct mixer
     int soundgen_size; // number of memory slots reserved for SGszz
     pthread_mutex_t sg_mutex;
 
-    sequence_generator **sequence_generators;
-    int sequence_gen_num;  // actual number of SGs
-    int sequence_gen_size; // number of memory slots reserved for SGszz
+    pattern_generator **pattern_generators;
+    int pattern_gen_num;  // actual number of SGs
+    int pattern_gen_size; // number of memory slots reserved for SGszz
 
     AbletonLink *m_ableton_link;
 
@@ -150,7 +150,7 @@ typedef struct mixer
 mixer *new_mixer(double output_latency);
 
 void mixer_ps(mixer *mixr, bool all);
-void mixer_status_seqz(mixer *mixr);
+void mixer_status_patz(mixer *mixr);
 void mixer_status_sgz(mixer *mixr, bool all);
 void mixer_status_mixr(mixer *mixr);
 void mixer_status_algoz(mixer *mixr, bool all);
@@ -171,16 +171,16 @@ int add_bytebeat(mixer *mixr, char *pattern);
 int add_minisynth(mixer *mixr);
 int add_dxsynth(mixer *mixr);
 int add_digisynth(mixer *mixr, char *filename);
-// int add_seq_char_pattern(mixer *mixr, char *filename, char *pattern);
-int add_seq_euclidean(mixer *mixr, char *filename, int num_beats,
-                      bool start_on_first_beat);
 int add_looper(mixer *mixr, char *filename);
+
 int add_sound_generator(mixer *mixr, soundgenerator *sg);
-int add_sequence_generator(mixer *mixr, sequence_generator *sg);
+
+int add_pattern_generator(mixer *mixr, pattern_generator *sg);
+
 int add_effect(mixer *mixr);
+
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
-void freq_change(mixer *mixr, int sig, float freq);
 
 void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);
@@ -195,7 +195,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
 bool mixer_is_valid_algo(mixer *mixr, int algo_num);
 bool mixer_is_valid_env_var(mixer *mixr, char *key);
-bool mixer_is_valid_seq_gen_num(mixer *mixr, int sgnum);
+bool mixer_is_valid_pattern_gen_num(mixer *mixr, int sgnum);
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num);
