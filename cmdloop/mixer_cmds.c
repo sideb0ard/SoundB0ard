@@ -201,17 +201,18 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             uint16_t bitpattern = pg->generate(pg, NULL);
 
             midi_event midi_pattern[PPBAR] = {};
-            apply_short_to_midi_pattern(bitpattern, (midi_event*)&midi_pattern);
+            apply_short_to_midi_pattern(bitpattern,
+                                        (midi_event *)&midi_pattern);
 
             soundgenerator *sg = mixr->sound_generators[dest_sg_num];
-            sg->set_pattern(sg, 0, (midi_event*)&midi_pattern);
+            sg->set_pattern(sg, 0, (midi_event *)&midi_pattern);
 
             bool num_wurds_is_odd = num_wurds % 2 == 1;
             if (num_wurds >= 5 && num_wurds_is_odd)
             {
-                for (int i = 3; strncmp("#", wurds[i], 1) == 0; i+=2)
+                for (int i = 3; strncmp("#", wurds[i], 1) == 0; i += 2)
                 {
-                    char *wurd = wurds[i+1];
+                    char *wurd = wurds[i + 1];
                     if (strncmp("once", wurd, 4) == 0)
                         set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
                     if (is_synth(sg))
@@ -226,8 +227,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     }
                 }
             }
-
-
         }
         else
             printf("SUMMIT AINT VALID: SG:%d PG:%d\n", dest_sg_num, pg_num);

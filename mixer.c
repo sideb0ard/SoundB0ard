@@ -985,16 +985,16 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
             int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
             midi_event on_event = new_midi_event(144, note, velocity);
 
-            sequence_engine_add_event(engine, engine->cur_pattern, note_off_tick,
-                                off_event);
+            sequence_engine_add_event(engine, engine->cur_pattern,
+                                      note_off_tick, off_event);
             sequence_engine_add_event(engine, engine->cur_pattern, note_on_tick,
-                                on_event);
+                                      on_event);
         }
         else
         {
             off_event.delete_after_use = true; // _THIS_ is the magic
-            sequence_engine_add_event(engine, engine->cur_pattern, note_off_tick,
-                                off_event);
+            sequence_engine_add_event(engine, engine->cur_pattern,
+                                      note_off_tick, off_event);
         }
     }
 }
@@ -1207,7 +1207,8 @@ void mixer_check_for_midi_messages(mixer *mixr)
                 {
                     int tick = mixr->timing_info.midi_tick % PPBAR;
                     midi_event ev = new_midi_event(status, data1, data2);
-                    sequence_engine_add_event(engine, engine->cur_pattern, tick, ev);
+                    sequence_engine_add_event(engine, engine->cur_pattern, tick,
+                                              ev);
                 }
 
                 midi_event ev;

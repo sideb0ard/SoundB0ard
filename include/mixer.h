@@ -224,8 +224,8 @@ void mixer_enable_print_midi(mixer *mixr, bool b);
 void mixer_check_for_midi_messages(mixer *mixr);
 void mixer_set_midi_bank(mixer *mixr, int num);
 
-// these are in mixer.h rather than sequence_engine, as mixer needs to transform sg
-// first
+// these are in mixer.h rather than sequence_engine, as mixer needs to transform
+// sg first
 sequence_engine *get_sequence_engine(soundgenerator *self);
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi);

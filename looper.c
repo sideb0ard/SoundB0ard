@@ -480,8 +480,7 @@ void looper_status(void *self, wchar_t *status_string)
         g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
         g->grain_attack_time_pct, g->grain_release_time_pct, g->loop_len,
         g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
-        g->buffer_is_full,
-        g->external_source_sg,
+        g->buffer_is_full, g->external_source_sg,
 
         ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
         ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,

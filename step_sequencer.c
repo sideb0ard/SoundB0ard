@@ -65,7 +65,6 @@ void step_tick(step_sequencer *seq)
     }
 }
 
-
 void pattern_char_to_pattern(step_sequencer *s, char *char_pattern,
                              midi_event *final_pattern)
 {

@@ -4,8 +4,8 @@
 #include <wchar.h>
 
 #include "digisynth_voice.h"
-#include "sound_generator.h"
 #include "sequence_engine.h"
+#include "sound_generator.h"
 
 typedef struct digisynth
 {

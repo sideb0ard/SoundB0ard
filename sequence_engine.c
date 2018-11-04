@@ -21,7 +21,7 @@ const char *s_arp_speed[] = {"32", "16", "8", "4"};
 extern mixer *mixr;
 
 void sequence_engine_init(sequence_engine *engine, void *parent,
-                    unsigned int parent_synth_type)
+                          unsigned int parent_synth_type)
 {
     engine->parent = parent;
     engine->parent_synth_type = parent_synth_type;
@@ -51,7 +51,6 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
     engine->sustain_note_ms = 200;
     engine->single_note_mode = false;
 }
-
 
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine)
 {
@@ -122,19 +121,23 @@ void sequence_engine_set_sample_rate(sequence_engine *engine, int sample_rate)
     engine->sample_rate_counter = 0;
 }
 
-void sequence_engine_set_multi_pattern_mode(sequence_engine *ms, bool pattern_mode)
+void sequence_engine_set_multi_pattern_mode(sequence_engine *ms,
+                                            bool pattern_mode)
 {
     ms->multi_pattern_mode = pattern_mode;
     ms->cur_pattern_iteration = ms->pattern_multiloop_count[ms->cur_pattern];
 }
 
-void sequence_engine_set_pattern_loop_num(sequence_engine *self, int pattern_num,
-                                    int loop_num)
+void sequence_engine_set_pattern_loop_num(sequence_engine *self,
+                                          int pattern_num, int loop_num)
 {
     self->pattern_multiloop_count[pattern_num] = loop_num;
 }
 
-int sequence_engine_add_pattern(sequence_engine *ms) { return ms->num_patterns++; }
+int sequence_engine_add_pattern(sequence_engine *ms)
+{
+    return ms->num_patterns++;
+}
 
 void sequence_engine_dupe_pattern(midi_pattern *from, midi_pattern *to)
 {
@@ -142,7 +145,8 @@ void sequence_engine_dupe_pattern(midi_pattern *from, midi_pattern *to)
         (*to)[i] = (*from)[i];
 }
 
-void sequence_engine_switch_pattern(sequence_engine *ms, unsigned int pattern_num)
+void sequence_engine_switch_pattern(sequence_engine *ms,
+                                    unsigned int pattern_num)
 {
     if (pattern_num < (unsigned)ms->num_patterns)
         ms->cur_pattern = pattern_num;
@@ -175,7 +179,8 @@ void sequence_engine_stop(sequence_engine *engine)
     }
 }
 
-void sequence_engine_reset_pattern(sequence_engine *engine, unsigned int pattern_num)
+void sequence_engine_reset_pattern(sequence_engine *engine,
+                                   unsigned int pattern_num)
 {
     sequence_engine_stop(engine);
 
@@ -230,8 +235,9 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
     case (TIME_START_OF_LOOP_TICK):
         if (engine->restore_pending)
         {
-            sequence_engine_dupe_pattern(&engine->backup_pattern_while_getting_crazy,
-                                   &engine->patterns[engine->cur_pattern]);
+            sequence_engine_dupe_pattern(
+                &engine->backup_pattern_while_getting_crazy,
+                &engine->patterns[engine->cur_pattern]);
             engine->restore_pending = false;
         }
         else if (engine->multi_pattern_mode && engine->num_patterns > 1)
@@ -247,7 +253,8 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
                     dxsynth_midi_note_off((dxsynth *)parent, 0, 0,
                                           true /* all notes off */);
 
-                int next_pattern = (engine->cur_pattern + 1) % engine->num_patterns;
+                int next_pattern =
+                    (engine->cur_pattern + 1) % engine->num_patterns;
 
                 engine->cur_pattern = next_pattern;
                 engine->cur_pattern_iteration =
@@ -282,19 +289,21 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
     }
 }
 
-void sequence_engine_add_event(sequence_engine *engine, int pattern_num, int midi_tick,
-                         midi_event ev)
+void sequence_engine_add_event(sequence_engine *engine, int pattern_num,
+                               int midi_tick, midi_event ev)
 {
     midi_event *pattern = engine->patterns[pattern_num];
     midi_pattern_add_event(pattern, midi_tick, ev);
 }
 
-void sequence_engine_clear_pattern_ready_for_new_one(sequence_engine *ms, int pattern_num)
+void sequence_engine_clear_pattern_ready_for_new_one(sequence_engine *ms,
+                                                     int pattern_num)
 {
     clear_midi_pattern(ms->patterns[pattern_num]);
 }
 
-void sequence_engine_nudge_pattern(sequence_engine *ms, int pattern_num, int sixteenth)
+void sequence_engine_nudge_pattern(sequence_engine *ms, int pattern_num,
+                                   int sixteenth)
 {
     if (sixteenth >= 16)
         sixteenth = sixteenth % 16;
@@ -332,22 +341,25 @@ void sequence_engine_set_single_note_mode(sequence_engine *engine, bool b)
     engine->single_note_mode = b;
 }
 
-void sequence_engine_set_chord_mode(sequence_engine *engine, bool b) { engine->chord_mode = b; }
+void sequence_engine_set_chord_mode(sequence_engine *engine, bool b)
+{
+    engine->chord_mode = b;
+}
 
 void sequence_engine_set_backup_mode(sequence_engine *engine, bool b)
 {
     if (b)
     {
-        sequence_engine_dupe_pattern(&engine->patterns[0],
-                               &engine->backup_pattern_while_getting_crazy);
+        sequence_engine_dupe_pattern(
+            &engine->patterns[0], &engine->backup_pattern_while_getting_crazy);
         // engine->m_settings_backup_while_getting_crazy = engine->m_settings;
         engine->multi_pattern_mode = false;
         engine->cur_pattern = 0;
     }
     else
     {
-        sequence_engine_dupe_pattern(&engine->backup_pattern_while_getting_crazy,
-                               &engine->patterns[0]);
+        sequence_engine_dupe_pattern(
+            &engine->backup_pattern_while_getting_crazy, &engine->patterns[0]);
         // engine->m_settings = engine->m_settings_backup_while_getting_crazy;
         engine->multi_pattern_mode = true;
     }
@@ -364,7 +376,7 @@ int sequence_engine_get_num_notes(sequence_engine *ms)
 }
 
 int sequence_engine_get_notes_from_pattern(midi_pattern loop,
-                                     int return_midi_notes[10])
+                                           int return_midi_notes[10])
 {
     int idx = 0;
     for (int i = 0; i < PPBAR; i++)
@@ -412,15 +424,17 @@ void sequence_engine_print_patterns(sequence_engine *ms)
         midi_pattern_print(ms->patterns[i]);
 }
 
-void sequence_engine_add_note(sequence_engine *ms, int pattern_num, int step, int midi_note,
-                        int amp, bool keep_note)
+void sequence_engine_add_note(sequence_engine *ms, int pattern_num, int step,
+                              int midi_note, int amp, bool keep_note)
 {
     int mstep = step * PPSIXTEENTH;
-    sequence_engine_add_micro_note(ms, pattern_num, mstep, midi_note, amp, keep_note);
+    sequence_engine_add_micro_note(ms, pattern_num, mstep, midi_note, amp,
+                                   keep_note);
 }
 
-void sequence_engine_add_micro_note(sequence_engine *ms, int pattern_num, int mstep,
-                              int midi_note, int amp, bool keep_note)
+void sequence_engine_add_micro_note(sequence_engine *ms, int pattern_num,
+                                    int mstep, int midi_note, int amp,
+                                    bool keep_note)
 {
     if (is_valid_pattern_num(ms, pattern_num) && mstep < PPBAR)
     {
@@ -459,15 +473,16 @@ void sequence_engine_rm_micro_note(sequence_engine *ms, int pat_num, int tick)
     }
 }
 
-void sequence_engine_mv_note(sequence_engine *ms, int pattern_num, int fromstep, int tostep)
+void sequence_engine_mv_note(sequence_engine *ms, int pattern_num, int fromstep,
+                             int tostep)
 {
     int mfromstep = fromstep * PPSIXTEENTH;
     int mtostep = tostep * PPSIXTEENTH;
     sequence_engine_mv_micro_note(ms, pattern_num, mfromstep, mtostep);
 }
 
-void sequence_engine_mv_micro_note(sequence_engine *ms, int pattern_num, int fromstep,
-                             int tostep)
+void sequence_engine_mv_micro_note(sequence_engine *ms, int pattern_num,
+                                   int fromstep, int tostep)
 {
     if (is_valid_pattern_num(ms, pattern_num))
     {
@@ -476,7 +491,8 @@ void sequence_engine_mv_micro_note(sequence_engine *ms, int pattern_num, int fro
     }
 }
 
-void sequence_engine_import_midi_from_file(sequence_engine *engine, char *filename)
+void sequence_engine_import_midi_from_file(sequence_engine *engine,
+                                           char *filename)
 {
     printf("Importing MIDI from %s\n", filename);
     FILE *fp = fopen(filename, "r");
@@ -538,8 +554,8 @@ void sequence_engine_import_midi_from_file(sequence_engine *engine, char *filena
     fclose(fp);
 }
 
-int sequence_engine_change_octave_pattern(sequence_engine *engine, int pattern_num,
-                                    int direction)
+int sequence_engine_change_octave_pattern(sequence_engine *engine,
+                                          int pattern_num, int direction)
 {
     // printf("Changing octave of %d - direction: %s\n", pattern_num,
     //       direction == 1 ? "UP" : "DOWN");
@@ -563,13 +579,15 @@ int sequence_engine_change_octave_pattern(sequence_engine *engine, int pattern_n
     return 0;
 }
 
-void sequence_engine_set_sustain_note_ms(sequence_engine *engine, int sustain_note_ms)
+void sequence_engine_set_sustain_note_ms(sequence_engine *engine,
+                                         int sustain_note_ms)
 {
     if (sustain_note_ms > 0)
         engine->sustain_note_ms = sustain_note_ms;
 }
 
-void sequence_engine_set_midi_note(sequence_engine *engine, int midi_note_num, int note)
+void sequence_engine_set_midi_note(sequence_engine *engine, int midi_note_num,
+                                   int note)
 {
     switch (midi_note_num)
     {
@@ -585,14 +603,16 @@ void sequence_engine_set_midi_note(sequence_engine *engine, int midi_note_num, i
     }
 }
 
-midi_event *sequence_engine_get_pattern(sequence_engine *engine, int pattern_num)
+midi_event *sequence_engine_get_pattern(sequence_engine *engine,
+                                        int pattern_num)
 {
     if (is_valid_pattern_num(engine, pattern_num))
         return engine->patterns[pattern_num];
     return NULL;
 }
 
-void sequence_engine_set_pattern(void *self, int pattern_num, midi_event *pattern)
+void sequence_engine_set_pattern(void *self, int pattern_num,
+                                 midi_event *pattern)
 {
     sequence_engine *engine = (sequence_engine *)self;
     if (is_valid_pattern_num(engine, pattern_num))
@@ -615,27 +635,27 @@ void sequence_engine_set_pattern(void *self, int pattern_num, midi_event *patter
 bool sequence_engine_list_presets(unsigned int synthtype)
 {
     FILE *presetzzz = NULL;
-    //switch (synthtype)
+    // switch (synthtype)
     //{
-    //case (MINISYNTH_TYPE):
+    // case (MINISYNTH_TYPE):
     //    presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
     //    break;
-    //case (DXSYNTH_TYPE):
+    // case (DXSYNTH_TYPE):
     //    presetzzz = fopen(DX_PRESET_FILENAME, "r+");
     //    break;
     //}
 
-    //if (presetzzz == NULL)
+    // if (presetzzz == NULL)
     //    return false;
 
-    //char line[256];
-    //char setting_key[512];
-    //char setting_val[512];
+    // char line[256];
+    // char setting_key[512];
+    // char setting_val[512];
 
-    //char *tok, *last_tok;
-    //char const *sep = "::";
+    // char *tok, *last_tok;
+    // char const *sep = "::";
 
-    //while (fgets(line, sizeof(line), presetzzz))
+    // while (fgets(line, sizeof(line), presetzzz))
     //{
     //    for (tok = strtok_r(line, sep, &last_tok); tok;
     //         tok = strtok_r(NULL, sep, &last_tok))
@@ -649,7 +669,7 @@ bool sequence_engine_list_presets(unsigned int synthtype)
     //    }
     //}
 
-    //fclose(presetzzz);
+    // fclose(presetzzz);
 
     return true;
 }
@@ -660,9 +680,15 @@ void sequence_engine_set_octave(sequence_engine *engine, int octave)
         engine->octave = octave;
 }
 
-int sequence_engine_get_octave(sequence_engine *engine) { return engine->octave; }
+int sequence_engine_get_octave(sequence_engine *engine)
+{
+    return engine->octave;
+}
 
-void sequence_engine_enable_arp(sequence_engine *engine, bool b) { engine->arp.enable = b; }
+void sequence_engine_enable_arp(sequence_engine *engine, bool b)
+{
+    engine->arp.enable = b;
+}
 
 void arp_add_last_note(arpeggiator *arp, int note)
 {
@@ -761,7 +787,8 @@ void sequence_engine_do_arp(sequence_engine *engine, soundgenerator *parent)
     }
 }
 
-void sequence_engine_change_octave_midi_notes(sequence_engine *engine, unsigned int direction)
+void sequence_engine_change_octave_midi_notes(sequence_engine *engine,
+                                              unsigned int direction)
 {
     if (direction == UP)
     {

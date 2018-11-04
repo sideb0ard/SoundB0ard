@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <midimaaan.h>
 #include <mixer.h>
 #include <pattern_utils.h>
-#include <midimaaan.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -54,7 +54,8 @@ void midi_pattern_add_triplet(midi_event *pattern, unsigned int quarter)
     for (int i = 0; i < 3; i++)
     {
         pattern[pos[i]].event_type = MIDI_ON;
-        pattern[pos[i]].data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+        pattern[pos[i]].data1 =
+            get_midi_note_from_mixer_key(mixr->key, mixr->octave);
         pattern[pos[i]].data2 = DEFAULT_VELOCITY;
     }
 }
@@ -153,16 +154,16 @@ void apply_short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
             }
         }
     }
-	if (rand() % 100 > 95)
-	{
-	    int quart = 2;
-	    int randy = rand() % 100;
-	    if (randy > 75)
-	        quart = 1;
-	    else if (randy > 50)
-	        quart = 3;
-	    midi_pattern_add_triplet(dest_pattern, quart);
-	}
+    if (rand() % 100 > 95)
+    {
+        int quart = 2;
+        int randy = rand() % 100;
+        if (randy > 75)
+            quart = 1;
+        else if (randy > 50)
+            quart = 3;
+        midi_pattern_add_triplet(dest_pattern, quart);
+    }
 }
 
 int shift_bits_to_leftmost_position(uint16_t num, int num_of_bits_to_align_with)

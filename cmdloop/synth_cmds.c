@@ -20,11 +20,11 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp(wurds[1], "ls", 2) == 0)
         {
-            //if (strncmp("moog", wurds[0], 4) == 0)
+            // if (strncmp("moog", wurds[0], 4) == 0)
             //{
             //    sequence_engine_list_presets(MINISYNTH_TYPE);
             //}
-            //else if (strncmp("dx", wurds[0], 2) == 0)
+            // else if (strncmp("dx", wurds[0], 2) == 0)
             //{
             //    sequence_engine_list_presets(DXSYNTH_TYPE);
             //}
@@ -38,8 +38,8 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
             is_synth(mixr->sound_generators[soundgen_num]))
         {
-            if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num, &wurds[2],
-                                    num_wurds - 2))
+            if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num,
+                                          &wurds[2], num_wurds - 2))
             {
                 // no-op, we good
             }
@@ -627,9 +627,10 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
 }
 
 bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
-                         char wurds[][SIZE_OF_WURD], int num_wurds)
+                               char wurds[][SIZE_OF_WURD], int num_wurds)
 {
-    sequence_engine *engine = get_sequence_engine(mixr->sound_generators[soundgen_num]);
+    sequence_engine *engine =
+        get_sequence_engine(mixr->sound_generators[soundgen_num]);
 
     bool cmd_found = true;
     // sequence_engine specific first, then patterns below
@@ -682,7 +683,7 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             {
                 int six16th = atoi(wurds[i]) % 16;
                 sequence_engine_add_note(engine, engine->cur_pattern, six16th,
-                                   engine->midi_note_1, 128, true);
+                                         engine->midi_note_1, 128, true);
             }
         }
         else if (strncmp("num_patterns", wurds[0], 12) == 0)
@@ -799,7 +800,8 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                 if (mixer_is_valid_soundgen_num(mixr, sg2) &&
                     is_synth(mixr->sound_generators[sg2]))
                 {
-                    sequence_engine *sb2 = get_sequence_engine(mixr->sound_generators[sg2]);
+                    sequence_engine *sb2 =
+                        get_sequence_engine(mixr->sound_generators[sg2]);
 
                     if (is_valid_pattern_num(engine, pattern_num) &&
                         is_valid_pattern_num(sb2, pattern_num2))
@@ -807,22 +809,25 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
 
                         midi_event *loop_copy =
                             sequence_engine_get_pattern(engine, pattern_num);
-                        sequence_engine_set_pattern(sb2, pattern_num2, loop_copy);
+                        sequence_engine_set_pattern(sb2, pattern_num2,
+                                                    loop_copy);
                     }
                 }
             }
             else if (strncmp("dupe", wurds[0], 4) == 0)
             {
                 int new_pattern_num = sequence_engine_add_pattern(engine);
-                sequence_engine_dupe_pattern(&engine->patterns[pattern_num],
-                                       &engine->patterns[new_pattern_num]);
+                sequence_engine_dupe_pattern(
+                    &engine->patterns[pattern_num],
+                    &engine->patterns[new_pattern_num]);
             }
             else if (strncmp("numloops", wurds[0], 8) == 0)
             {
                 int numloops = atoi(wurds[1]);
                 if (numloops != 0)
                 {
-                    sequence_engine_set_pattern_loop_num(engine, pattern_num, numloops);
+                    sequence_engine_set_pattern_loop_num(engine, pattern_num,
+                                                         numloops);
                     printf("NUMLOOPS Now %d\n", numloops);
                 }
             }

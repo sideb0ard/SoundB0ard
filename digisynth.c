@@ -105,8 +105,8 @@ void digisynth_status(void *self, wchar_t *status_string)
                                "sample_len:%d read_idx:%d",
              ds->audiofile, ds->vol,
              ds->sound_generator.active ? "true" : "false",
-             ds->engine.midi_note_1, ds->engine.midi_note_2, ds->engine.midi_note_3,
-             ds->m_voices[0].m_osc1.afd.samplecount,
+             ds->engine.midi_note_1, ds->engine.midi_note_2,
+             ds->engine.midi_note_3, ds->m_voices[0].m_osc1.afd.samplecount,
              ds->m_voices[0].m_osc1.m_read_idx);
     wchar_t scratch[1024] = {};
     sequence_engine_status(&ds->engine, scratch);
