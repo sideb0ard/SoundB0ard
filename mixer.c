@@ -910,7 +910,7 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
     return true;
 }
 
-synthbase *get_synthbase(soundgenerator *self)
+sequence_engine *get_sequence_engine(soundgenerator *self)
 {
     if (self->type == MINISYNTH_TYPE)
     {
@@ -937,7 +937,7 @@ synthbase *get_synthbase(soundgenerator *self)
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi)
 {
-    synthbase *base = get_synthbase(sg);
+    sequence_engine *base = get_sequence_engine(sg);
     bool is_chord_mode = base->chord_mode;
 
     int midi_notes[3] = {note, 0, 0};
@@ -985,15 +985,15 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
             int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
             midi_event on_event = new_midi_event(144, note, velocity);
 
-            synthbase_add_event(base, base->cur_pattern, note_off_tick,
+            sequence_engine_add_event(base, base->cur_pattern, note_off_tick,
                                 off_event);
-            synthbase_add_event(base, base->cur_pattern, note_on_tick,
+            sequence_engine_add_event(base, base->cur_pattern, note_on_tick,
                                 on_event);
         }
         else
         {
             off_event.delete_after_use = true; // _THIS_ is the magic
-            synthbase_add_event(base, base->cur_pattern, note_off_tick,
+            sequence_engine_add_event(base, base->cur_pattern, note_off_tick,
                                 off_event);
         }
     }
@@ -1201,13 +1201,13 @@ void mixer_check_for_midi_messages(mixer *mixr)
                 soundgenerator *sg =
                     mixr->sound_generators[mixr->active_midi_soundgen_num];
 
-                synthbase *base = get_synthbase(sg);
+                sequence_engine *base = get_sequence_engine(sg);
 
                 if (base->recording)
                 {
                     int tick = mixr->timing_info.midi_tick % PPBAR;
                     midi_event ev = new_midi_event(status, data1, data2);
-                    synthbase_add_event(base, base->cur_pattern, tick, ev);
+                    sequence_engine_add_event(base, base->cur_pattern, tick, ev);
                 }
 
                 midi_event ev;

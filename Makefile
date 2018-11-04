@@ -72,7 +72,7 @@ SRC = \
 	pattern_generators/euclidean.c \
 	pattern_generators/markov.c \
 	sparkline.c \
-	synthbase.c \
+	sequence_engine.c \
 	synthdrum_sequencer.c \
 	synthfunctions.c \
 	table.c \

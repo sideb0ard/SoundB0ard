@@ -5,12 +5,12 @@
 
 #include "digisynth_voice.h"
 #include "sound_generator.h"
-#include "synthbase.h"
+#include "sequence_engine.h"
 
 typedef struct digisynth
 {
     soundgenerator sound_generator;
-    synthbase base;
+    sequence_engine base;
 
     char audiofile[1024];
     digisynth_voice m_voices[MAX_VOICES];

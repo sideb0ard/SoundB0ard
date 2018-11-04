@@ -13,7 +13,9 @@
 #include "sound_generator.h"
 
 #include "minisynth_voice.h"
-#include "synthbase.h"
+#include "sequence_engine.h"
+
+static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
 
 typedef struct synthsettings
 {
@@ -169,7 +171,7 @@ typedef struct synthsettings
 typedef struct minisynth
 {
     soundgenerator sound_generator;
-    synthbase base;
+    sequence_engine base;
 
     minisynth_voice *m_voices[MAX_VOICES];
 

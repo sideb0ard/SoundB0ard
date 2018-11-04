@@ -10,7 +10,7 @@
 #include "sound_generator.h"
 
 #include "dxsynth_voice.h"
-#include "synthbase.h"
+#include "sequence_engine.h"
 
 #define MAX_DX_VOICES 16
 
@@ -26,6 +26,8 @@ enum
     DX8,
     MAXDX
 };
+
+static const char DX_PRESET_FILENAME[] = "settings/dxpresets.dat";
 
 typedef struct dxsynthsettings
 {
@@ -96,7 +98,7 @@ typedef struct dxsynthsettings
 typedef struct dxsynth
 {
     soundgenerator sound_generator;
-    synthbase base;
+    sequence_engine base;
 
     dxsynth_voice *m_voices[MAX_DX_VOICES];
 

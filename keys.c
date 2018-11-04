@@ -32,7 +32,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    synthbase *base = get_synthbase(mixr->sound_generators[soundgen_num]);
+    sequence_engine *base = get_sequence_engine(mixr->sound_generators[soundgen_num]);
 
     int ch = 0;
     int quit = 0;

@@ -88,7 +88,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
 
     if (is_synth(sg))
     {
-        synthbase *base = get_synthbase(sg);
+        sequence_engine *base = get_sequence_engine(sg);
         if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
         {
             if (ev->event_type == MIDI_ON)
@@ -118,7 +118,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            if (!synthbase_is_masked(&ms->base))
+            if (!sequence_engine_is_masked(&ms->base))
             {
                 for (int i = 0; i < midi_notes_len; i++)
                 {
@@ -137,7 +137,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                             (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                         midi_event off = new_midi_event(MIDI_OFF, note, 128);
                         off.delete_after_use = true;
-                        synthbase_add_event(&ms->base, ms->base.cur_pattern,
+                        sequence_engine_add_event(&ms->base, ms->base.cur_pattern,
                                             note_off_tick, off);
                     }
                 }
@@ -176,7 +176,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (144):
         { // Hex 0x80
-            if (!synthbase_is_masked(&dx->base))
+            if (!sequence_engine_is_masked(&dx->base))
             {
                 for (int i = 0; i < midi_notes_len; i++)
                 {
@@ -191,7 +191,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                             (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                         midi_event off = new_midi_event(128, note, 128);
                         off.delete_after_use = true;
-                        synthbase_add_event(&dx->base, dx->base.cur_pattern,
+                        sequence_engine_add_event(&dx->base, dx->base.cur_pattern,
                                             note_off_tick, off);
                     }
                 }
@@ -239,7 +239,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                 midi_event off = new_midi_event(128, note, 128);
                 off.delete_after_use = true;
-                synthbase_add_event(&ds->base, 0, note_off_tick, off);
+                sequence_engine_add_event(&ds->base, 0, note_off_tick, off);
             }
             break;
         }

@@ -6,7 +6,7 @@
 #include "defjams.h"
 #include "euclidean.h"
 #include "mixer.h"
-#include "synthbase.h"
+#include "sequence_engine.h"
 #include "utils.h"
 #include <pattern_parser.h>
 #include <pattern_utils.h>
@@ -20,7 +20,7 @@ const char *s_arp_speed[] = {"32", "16", "8", "4"};
 
 extern mixer *mixr;
 
-void synthbase_init(synthbase *base, void *parent,
+void sequence_engine_init(sequence_engine *base, void *parent,
                     unsigned int parent_synth_type)
 {
     base->parent = parent;
@@ -53,7 +53,7 @@ void synthbase_init(synthbase *base, void *parent,
 }
 
 
-void synthbase_set_pattern_to_riff(synthbase *base)
+void sequence_engine_set_pattern_to_riff(sequence_engine *base)
 {
     midi_event *midi_pattern = base->patterns[base->cur_pattern];
     for (int i = 0; i < PPBAR; i++)
@@ -71,13 +71,13 @@ void synthbase_set_pattern_to_riff(synthbase *base)
     }
 }
 
-void synthbase_set_pattern_to_melody(synthbase *base)
+void sequence_engine_set_pattern_to_melody(sequence_engine *base)
 {
     midi_event *midi_pattern = base->patterns[base->cur_pattern];
 
     chord_midi_notes chnotes = {0};
     get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
-                              synthbase_get_octave(base), &chnotes);
+                              sequence_engine_get_octave(base), &chnotes);
 
     for (int i = 0; i < PPBAR; i++)
     {
@@ -113,7 +113,7 @@ void synthbase_set_pattern_to_melody(synthbase *base)
     }
 }
 
-void synthbase_set_sample_rate(synthbase *base, int sample_rate)
+void sequence_engine_set_sample_rate(sequence_engine *base, int sample_rate)
 {
     // does sample and hold to sample down
     printf("Chh-ch-changing SAMPLE_RATE!: %d\n", sample_rate);
@@ -122,41 +122,41 @@ void synthbase_set_sample_rate(synthbase *base, int sample_rate)
     base->sample_rate_counter = 0;
 }
 
-void synthbase_set_multi_pattern_mode(synthbase *ms, bool pattern_mode)
+void sequence_engine_set_multi_pattern_mode(sequence_engine *ms, bool pattern_mode)
 {
     ms->multi_pattern_mode = pattern_mode;
     ms->cur_pattern_iteration = ms->pattern_multiloop_count[ms->cur_pattern];
 }
 
-void synthbase_set_pattern_loop_num(synthbase *self, int pattern_num,
+void sequence_engine_set_pattern_loop_num(sequence_engine *self, int pattern_num,
                                     int loop_num)
 {
     self->pattern_multiloop_count[pattern_num] = loop_num;
 }
 
-int synthbase_add_pattern(synthbase *ms) { return ms->num_patterns++; }
+int sequence_engine_add_pattern(sequence_engine *ms) { return ms->num_patterns++; }
 
-void synthbase_dupe_pattern(midi_pattern *from, midi_pattern *to)
+void sequence_engine_dupe_pattern(midi_pattern *from, midi_pattern *to)
 {
     for (int i = 0; i < PPBAR; i++)
         (*to)[i] = (*from)[i];
 }
 
-void synthbase_switch_pattern(synthbase *ms, unsigned int pattern_num)
+void sequence_engine_switch_pattern(sequence_engine *ms, unsigned int pattern_num)
 {
     if (pattern_num < (unsigned)ms->num_patterns)
         ms->cur_pattern = pattern_num;
 }
 
-void synthbase_reset_pattern_all(synthbase *ms)
+void sequence_engine_reset_pattern_all(sequence_engine *ms)
 {
     for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
     {
-        synthbase_reset_pattern(ms, i);
+        sequence_engine_reset_pattern(ms, i);
     }
 }
 
-void synthbase_stop(synthbase *base)
+void sequence_engine_stop(sequence_engine *base)
 {
     if (base->parent_synth_type == MINISYNTH_TYPE)
     {
@@ -175,9 +175,9 @@ void synthbase_stop(synthbase *base)
     }
 }
 
-void synthbase_reset_pattern(synthbase *base, unsigned int pattern_num)
+void sequence_engine_reset_pattern(sequence_engine *base, unsigned int pattern_num)
 {
-    synthbase_stop(base);
+    sequence_engine_stop(base);
 
     if (pattern_num < MAX_NUM_MIDI_LOOPS)
     {
@@ -186,7 +186,7 @@ void synthbase_reset_pattern(synthbase *base, unsigned int pattern_num)
 }
 
 // sound generator interface //////////////
-void synthbase_status(synthbase *base, wchar_t *status_string)
+void sequence_engine_status(sequence_engine *base, wchar_t *status_string)
 {
     wchar_t scratch[256] = {0};
     wchar_t patternstr[33] = {0};
@@ -219,10 +219,10 @@ void synthbase_status(synthbase *base, wchar_t *status_string)
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-void synthbase_event_notify(void *self, unsigned int event_type)
+void sequence_engine_event_notify(void *self, unsigned int event_type)
 {
     soundgenerator *parent = (soundgenerator *)self;
-    synthbase *base = get_synthbase(parent);
+    sequence_engine *base = get_sequence_engine(parent);
     int idx;
 
     switch (event_type)
@@ -230,13 +230,13 @@ void synthbase_event_notify(void *self, unsigned int event_type)
     case (TIME_START_OF_LOOP_TICK):
         if (base->restore_pending)
         {
-            synthbase_dupe_pattern(&base->backup_pattern_while_getting_crazy,
+            sequence_engine_dupe_pattern(&base->backup_pattern_while_getting_crazy,
                                    &base->patterns[base->cur_pattern]);
             base->restore_pending = false;
         }
         else if (base->multi_pattern_mode && base->num_patterns > 1)
         {
-            // synthbase_stop(base);
+            // sequence_engine_stop(base);
             base->cur_pattern_iteration--;
             if (base->cur_pattern_iteration <= 0)
             {
@@ -265,43 +265,43 @@ void synthbase_event_notify(void *self, unsigned int event_type)
         break;
     case (TIME_THIRTYSECOND_TICK):
         if (base->arp.enable && base->arp.speed == ARP_32)
-            synthbase_do_arp(base, parent);
+            sequence_engine_do_arp(base, parent);
         break;
     case (TIME_SIXTEENTH_TICK):
         if (base->arp.enable && base->arp.speed == ARP_16)
-            synthbase_do_arp(base, parent);
+            sequence_engine_do_arp(base, parent);
         break;
     case (TIME_EIGHTH_TICK):
         if (base->arp.enable && base->arp.speed == ARP_8)
-            synthbase_do_arp(base, parent);
+            sequence_engine_do_arp(base, parent);
         break;
     case (TIME_QUARTER_TICK):
         if (base->arp.enable && base->arp.speed == ARP_4)
-            synthbase_do_arp(base, parent);
+            sequence_engine_do_arp(base, parent);
         break;
     }
 }
 
-void synthbase_add_event(synthbase *base, int pattern_num, int midi_tick,
+void sequence_engine_add_event(sequence_engine *base, int pattern_num, int midi_tick,
                          midi_event ev)
 {
     midi_event *pattern = base->patterns[pattern_num];
     midi_pattern_add_event(pattern, midi_tick, ev);
 }
 
-void synthbase_clear_pattern_ready_for_new_one(synthbase *ms, int pattern_num)
+void sequence_engine_clear_pattern_ready_for_new_one(sequence_engine *ms, int pattern_num)
 {
     clear_midi_pattern(ms->patterns[pattern_num]);
 }
 
-void synthbase_nudge_pattern(synthbase *ms, int pattern_num, int sixteenth)
+void sequence_engine_nudge_pattern(sequence_engine *ms, int pattern_num, int sixteenth)
 {
     if (sixteenth >= 16)
         sixteenth = sixteenth % 16;
 
     int sixteenth_of_loop = PPBAR / 16.0;
 
-    midi_event *source_pattern = synthbase_get_pattern(ms, pattern_num);
+    midi_event *source_pattern = sequence_engine_get_pattern(ms, pattern_num);
 
     midi_pattern new_loop;
     for (int i = 0; i < PPBAR; i++)
@@ -313,10 +313,10 @@ void synthbase_nudge_pattern(synthbase *ms, int pattern_num, int sixteenth)
         }
     }
 
-    synthbase_set_pattern(ms, pattern_num, new_loop);
+    sequence_engine_set_pattern(ms, pattern_num, new_loop);
 }
 
-bool is_valid_pattern_num(synthbase *ms, int pattern_num)
+bool is_valid_pattern_num(sequence_engine *ms, int pattern_num)
 {
     if (pattern_num >= 0 && pattern_num < MAX_NUM_MIDI_LOOPS)
     {
@@ -327,18 +327,18 @@ bool is_valid_pattern_num(synthbase *ms, int pattern_num)
     return false;
 }
 
-void synthbase_set_single_note_mode(synthbase *base, bool b)
+void sequence_engine_set_single_note_mode(sequence_engine *base, bool b)
 {
     base->single_note_mode = b;
 }
 
-void synthbase_set_chord_mode(synthbase *base, bool b) { base->chord_mode = b; }
+void sequence_engine_set_chord_mode(sequence_engine *base, bool b) { base->chord_mode = b; }
 
-void synthbase_set_backup_mode(synthbase *base, bool b)
+void sequence_engine_set_backup_mode(sequence_engine *base, bool b)
 {
     if (b)
     {
-        synthbase_dupe_pattern(&base->patterns[0],
+        sequence_engine_dupe_pattern(&base->patterns[0],
                                &base->backup_pattern_while_getting_crazy);
         // base->m_settings_backup_while_getting_crazy = base->m_settings;
         base->multi_pattern_mode = false;
@@ -346,14 +346,14 @@ void synthbase_set_backup_mode(synthbase *base, bool b)
     }
     else
     {
-        synthbase_dupe_pattern(&base->backup_pattern_while_getting_crazy,
+        sequence_engine_dupe_pattern(&base->backup_pattern_while_getting_crazy,
                                &base->patterns[0]);
         // base->m_settings = base->m_settings_backup_while_getting_crazy;
         base->multi_pattern_mode = true;
     }
 }
 
-int synthbase_get_num_notes(synthbase *ms)
+int sequence_engine_get_num_notes(sequence_engine *ms)
 {
     int notecount = 0;
     for (int i = 0; i < ms->num_patterns; i++)
@@ -363,7 +363,7 @@ int synthbase_get_num_notes(synthbase *ms)
     return notecount;
 }
 
-int synthbase_get_notes_from_pattern(midi_pattern loop,
+int sequence_engine_get_notes_from_pattern(midi_pattern loop,
                                      int return_midi_notes[10])
 {
     int idx = 0;
@@ -384,42 +384,42 @@ int synthbase_get_notes_from_pattern(midi_pattern loop,
     return idx; // num notes
 }
 
-int synthbase_get_num_patterns(void *self)
+int sequence_engine_get_num_patterns(void *self)
 {
-    synthbase *ms = (synthbase *)self;
+    sequence_engine *ms = (sequence_engine *)self;
     return ms->num_patterns;
 }
 
-void synthbase_set_num_patterns(void *self, int num_patterns)
+void sequence_engine_set_num_patterns(void *self, int num_patterns)
 {
-    synthbase *ms = (synthbase *)self;
+    sequence_engine *ms = (sequence_engine *)self;
     if (num_patterns > 0)
     {
         ms->num_patterns = num_patterns;
     }
 }
 
-void synthbase_make_active_track(void *self, int pattern_num)
+void sequence_engine_make_active_track(void *self, int pattern_num)
 {
-    synthbase *ms = (synthbase *)self;
+    sequence_engine *ms = (sequence_engine *)self;
     ms->cur_pattern =
         pattern_num; // TODO - standardize - PATTERN? TRACK? pattern?!?!
 }
 
-void synthbase_print_patterns(synthbase *ms)
+void sequence_engine_print_patterns(sequence_engine *ms)
 {
     for (int i = 0; i < ms->num_patterns; i++)
         midi_pattern_print(ms->patterns[i]);
 }
 
-void synthbase_add_note(synthbase *ms, int pattern_num, int step, int midi_note,
+void sequence_engine_add_note(sequence_engine *ms, int pattern_num, int step, int midi_note,
                         int amp, bool keep_note)
 {
     int mstep = step * PPSIXTEENTH;
-    synthbase_add_micro_note(ms, pattern_num, mstep, midi_note, amp, keep_note);
+    sequence_engine_add_micro_note(ms, pattern_num, mstep, midi_note, amp, keep_note);
 }
 
-void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
+void sequence_engine_add_micro_note(sequence_engine *ms, int pattern_num, int mstep,
                               int midi_note, int amp, bool keep_note)
 {
     if (is_valid_pattern_num(ms, pattern_num) && mstep < PPBAR)
@@ -431,7 +431,7 @@ void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
             on.delete_after_use = true;
         }
 
-        synthbase_add_event(ms, pattern_num, mstep, on);
+        sequence_engine_add_event(ms, pattern_num, mstep, on);
     }
     else
     {
@@ -441,13 +441,13 @@ void synthbase_add_micro_note(synthbase *ms, int pattern_num, int mstep,
     }
 }
 
-void synthbase_rm_note(synthbase *ms, int pattern_num, int step)
+void sequence_engine_rm_note(sequence_engine *ms, int pattern_num, int step)
 {
     int mstep = step * PPSIXTEENTH;
-    synthbase_rm_micro_note(ms, pattern_num, mstep);
+    sequence_engine_rm_micro_note(ms, pattern_num, mstep);
 }
 
-void synthbase_rm_micro_note(synthbase *ms, int pat_num, int tick)
+void sequence_engine_rm_micro_note(sequence_engine *ms, int pat_num, int tick)
 {
     if (is_valid_pattern_num(ms, pat_num) && tick < PPBAR)
     {
@@ -459,14 +459,14 @@ void synthbase_rm_micro_note(synthbase *ms, int pat_num, int tick)
     }
 }
 
-void synthbase_mv_note(synthbase *ms, int pattern_num, int fromstep, int tostep)
+void sequence_engine_mv_note(sequence_engine *ms, int pattern_num, int fromstep, int tostep)
 {
     int mfromstep = fromstep * PPSIXTEENTH;
     int mtostep = tostep * PPSIXTEENTH;
-    synthbase_mv_micro_note(ms, pattern_num, mfromstep, mtostep);
+    sequence_engine_mv_micro_note(ms, pattern_num, mfromstep, mtostep);
 }
 
-void synthbase_mv_micro_note(synthbase *ms, int pattern_num, int fromstep,
+void sequence_engine_mv_micro_note(sequence_engine *ms, int pattern_num, int fromstep,
                              int tostep)
 {
     if (is_valid_pattern_num(ms, pattern_num))
@@ -476,7 +476,7 @@ void synthbase_mv_micro_note(synthbase *ms, int pattern_num, int fromstep,
     }
 }
 
-void synthbase_import_midi_from_file(synthbase *base, char *filename)
+void sequence_engine_import_midi_from_file(sequence_engine *base, char *filename)
 {
     printf("Importing MIDI from %s\n", filename);
     FILE *fp = fopen(filename, "r");
@@ -508,7 +508,7 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
                 if (tick >= max_tick)
                 {
                     printf("TICK OVER!: %d\n", tick);
-                    synthbase_add_pattern(base);
+                    sequence_engine_add_pattern(base);
                     tick = tick % PPBAR;
                 }
                 break;
@@ -530,15 +530,15 @@ void synthbase_import_midi_from_file(synthbase *base, char *filename)
             printf("GOtzz %d %d %d %d %d\n", count, tick, status, midi_note,
                    midi_vel);
             midi_event ev = new_midi_event(status, midi_note, midi_vel);
-            synthbase_add_event(base, base->cur_pattern, tick, ev);
+            sequence_engine_add_event(base, base->cur_pattern, tick, ev);
         }
     }
 
-    synthbase_set_multi_pattern_mode(base, true);
+    sequence_engine_set_multi_pattern_mode(base, true);
     fclose(fp);
 }
 
-int synthbase_change_octave_pattern(synthbase *base, int pattern_num,
+int sequence_engine_change_octave_pattern(sequence_engine *base, int pattern_num,
                                     int direction)
 {
     // printf("Changing octave of %d - direction: %s\n", pattern_num,
@@ -563,13 +563,13 @@ int synthbase_change_octave_pattern(synthbase *base, int pattern_num,
     return 0;
 }
 
-void synthbase_set_sustain_note_ms(synthbase *base, int sustain_note_ms)
+void sequence_engine_set_sustain_note_ms(sequence_engine *base, int sustain_note_ms)
 {
     if (sustain_note_ms > 0)
         base->sustain_note_ms = sustain_note_ms;
 }
 
-void synthbase_set_midi_note(synthbase *base, int midi_note_num, int note)
+void sequence_engine_set_midi_note(sequence_engine *base, int midi_note_num, int note)
 {
     switch (midi_note_num)
     {
@@ -585,19 +585,19 @@ void synthbase_set_midi_note(synthbase *base, int midi_note_num, int note)
     }
 }
 
-midi_event *synthbase_get_pattern(synthbase *base, int pattern_num)
+midi_event *sequence_engine_get_pattern(sequence_engine *base, int pattern_num)
 {
     if (is_valid_pattern_num(base, pattern_num))
         return base->patterns[pattern_num];
     return NULL;
 }
 
-void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
+void sequence_engine_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    synthbase *base = (synthbase *)self;
+    sequence_engine *base = (sequence_engine *)self;
     if (is_valid_pattern_num(base, pattern_num))
     {
-        synthbase_stop(base);
+        sequence_engine_stop(base);
         clear_midi_pattern(base->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {
@@ -607,62 +607,62 @@ void synthbase_set_pattern(void *self, int pattern_num, midi_event *pattern)
                     get_midi_note_from_mixer_key(mixr->key, mixr->octave);
             else if (base->single_note_mode)
                 ev.data1 = base->midi_note_1;
-            synthbase_add_event(base, pattern_num, i, ev);
+            sequence_engine_add_event(base, pattern_num, i, ev);
         }
     }
 }
 
-bool synthbase_list_presets(unsigned int synthtype)
+bool sequence_engine_list_presets(unsigned int synthtype)
 {
     FILE *presetzzz = NULL;
-    switch (synthtype)
-    {
-    case (MINISYNTH_TYPE):
-        presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
-        break;
-    case (DXSYNTH_TYPE):
-        presetzzz = fopen(DX_PRESET_FILENAME, "r+");
-        break;
-    }
+    //switch (synthtype)
+    //{
+    //case (MINISYNTH_TYPE):
+    //    presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
+    //    break;
+    //case (DXSYNTH_TYPE):
+    //    presetzzz = fopen(DX_PRESET_FILENAME, "r+");
+    //    break;
+    //}
 
-    if (presetzzz == NULL)
-        return false;
+    //if (presetzzz == NULL)
+    //    return false;
 
-    char line[256];
-    char setting_key[512];
-    char setting_val[512];
+    //char line[256];
+    //char setting_key[512];
+    //char setting_val[512];
 
-    char *tok, *last_tok;
-    char const *sep = "::";
+    //char *tok, *last_tok;
+    //char const *sep = "::";
 
-    while (fgets(line, sizeof(line), presetzzz))
-    {
-        for (tok = strtok_r(line, sep, &last_tok); tok;
-             tok = strtok_r(NULL, sep, &last_tok))
-        {
-            sscanf(tok, "%[^=]=%s", setting_key, setting_val);
-            if (strcmp(setting_key, "name") == 0)
-            {
-                printf("%s\n", setting_val);
-                break;
-            }
-        }
-    }
+    //while (fgets(line, sizeof(line), presetzzz))
+    //{
+    //    for (tok = strtok_r(line, sep, &last_tok); tok;
+    //         tok = strtok_r(NULL, sep, &last_tok))
+    //    {
+    //        sscanf(tok, "%[^=]=%s", setting_key, setting_val);
+    //        if (strcmp(setting_key, "name") == 0)
+    //        {
+    //            printf("%s\n", setting_val);
+    //            break;
+    //        }
+    //    }
+    //}
 
-    fclose(presetzzz);
+    //fclose(presetzzz);
 
     return true;
 }
 
-void synthbase_set_octave(synthbase *base, int octave)
+void sequence_engine_set_octave(sequence_engine *base, int octave)
 {
     if (octave >= -1 && octave < 10)
         base->octave = octave;
 }
 
-int synthbase_get_octave(synthbase *base) { return base->octave; }
+int sequence_engine_get_octave(sequence_engine *base) { return base->octave; }
 
-void synthbase_enable_arp(synthbase *base, bool b) { base->arp.enable = b; }
+void sequence_engine_enable_arp(sequence_engine *base, bool b) { base->arp.enable = b; }
 
 void arp_add_last_note(arpeggiator *arp, int note)
 {
@@ -735,19 +735,19 @@ int arp_next_note(arpeggiator *arp)
     return midi_note;
 }
 
-void synthbase_set_arp_speed(synthbase *base, unsigned int speed)
+void sequence_engine_set_arp_speed(sequence_engine *base, unsigned int speed)
 {
     if (speed < ARP_MAX_SPEEDS)
         base->arp.speed = speed;
 }
 
-void synthbase_set_arp_mode(synthbase *base, unsigned int mode)
+void sequence_engine_set_arp_mode(sequence_engine *base, unsigned int mode)
 {
     if (mode < ARP_MAX_MODES)
         base->arp.mode = mode;
 }
 
-void synthbase_do_arp(synthbase *base, soundgenerator *parent)
+void sequence_engine_do_arp(sequence_engine *base, soundgenerator *parent)
 {
     int midi_note = arp_next_note(&base->arp);
     if (midi_note != -1)
@@ -761,7 +761,7 @@ void synthbase_do_arp(synthbase *base, soundgenerator *parent)
     }
 }
 
-void synthbase_change_octave_midi_notes(synthbase *base, unsigned int direction)
+void sequence_engine_change_octave_midi_notes(sequence_engine *base, unsigned int direction)
 {
     if (direction == UP)
     {
@@ -777,17 +777,17 @@ void synthbase_change_octave_midi_notes(synthbase *base, unsigned int direction)
     }
 }
 
-void synthbase_set_note_mask(synthbase *base, uint16_t mask)
+void sequence_engine_set_note_mask(sequence_engine *base, uint16_t mask)
 {
     base->note_mask = mask;
 }
 
-void synthbase_set_enable_note_mask(synthbase *base, bool b)
+void sequence_engine_set_enable_note_mask(sequence_engine *base, bool b)
 {
     base->enable_note_mask = b;
 }
 
-bool synthbase_is_masked(synthbase *base)
+bool sequence_engine_is_masked(sequence_engine *base)
 {
     bool is_masked = false;
     int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;

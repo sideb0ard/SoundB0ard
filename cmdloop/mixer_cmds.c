@@ -212,18 +212,17 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 for (int i = 3; strncmp("#", wurds[i], 1) == 0; i+=2)
                 {
                     char *wurd = wurds[i+1];
-                    printf("Hashtag! %s\n", wurd);
                     if (strncmp("once", wurd, 4) == 0)
                         set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
                     if (is_synth(sg))
                     {
-                        synthbase *base = get_synthbase(sg);
+                        sequence_engine *base = get_sequence_engine(sg);
                         if (strncmp("riff", wurd, 4) == 0)
-                            synthbase_set_pattern_to_riff(base);
+                            sequence_engine_set_pattern_to_riff(base);
                         if (strncmp("melody", wurd, 6) == 0)
-                            synthbase_set_pattern_to_melody(base);
+                            sequence_engine_set_pattern_to_melody(base);
                         if (strncmp("sparse", wurd, 6) == 0)
-                            synthbase_set_num_patterns(base, 2);
+                            sequence_engine_set_num_patterns(base, 2);
                     }
                 }
             }

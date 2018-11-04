@@ -20,14 +20,14 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp(wurds[1], "ls", 2) == 0)
         {
-            if (strncmp("moog", wurds[0], 4) == 0)
-            {
-                synthbase_list_presets(MINISYNTH_TYPE);
-            }
-            else if (strncmp("dx", wurds[0], 2) == 0)
-            {
-                synthbase_list_presets(DXSYNTH_TYPE);
-            }
+            //if (strncmp("moog", wurds[0], 4) == 0)
+            //{
+            //    sequence_engine_list_presets(MINISYNTH_TYPE);
+            //}
+            //else if (strncmp("dx", wurds[0], 2) == 0)
+            //{
+            //    sequence_engine_list_presets(DXSYNTH_TYPE);
+            //}
             return true;
         }
 
@@ -38,7 +38,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
             is_synth(mixr->sound_generators[soundgen_num]))
         {
-            if (parse_synthbase_cmd(soundgen_num, target_pattern_num, &wurds[2],
+            if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num, &wurds[2],
                                     num_wurds - 2))
             {
                 // no-op, we good
@@ -626,19 +626,19 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     return to_update;
 }
 
-bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
+bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                          char wurds[][SIZE_OF_WURD], int num_wurds)
 {
-    synthbase *base = get_synthbase(mixr->sound_generators[soundgen_num]);
+    sequence_engine *base = get_sequence_engine(mixr->sound_generators[soundgen_num]);
 
     bool cmd_found = true;
-    // synthbase specific first, then patterns below
+    // sequence_engine specific first, then patterns below
     if (pattern_num == -1)
     {
         if (strncmp("arp_mode", wurds[0], 8) == 0)
         {
             unsigned int mode = atoi(wurds[1]);
-            synthbase_set_arp_mode(base, mode);
+            sequence_engine_set_arp_mode(base, mode);
         }
         else if (strncmp("arp_speed", wurds[0], 9) == 0)
         {
@@ -646,16 +646,16 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
             switch (speed)
             {
             case (32):
-                synthbase_set_arp_speed(base, ARP_32);
+                sequence_engine_set_arp_speed(base, ARP_32);
                 break;
             case (16):
-                synthbase_set_arp_speed(base, ARP_16);
+                sequence_engine_set_arp_speed(base, ARP_16);
                 break;
             case (8):
-                synthbase_set_arp_speed(base, ARP_8);
+                sequence_engine_set_arp_speed(base, ARP_8);
                 break;
             case (4):
-                synthbase_set_arp_speed(base, ARP_4);
+                sequence_engine_set_arp_speed(base, ARP_4);
                 break;
             default:
                 printf("Speed has to be one of 32, 16, 8 or 4\n");
@@ -664,63 +664,63 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         else if (strncmp("arp", wurds[0], 3) == 0)
         {
             bool enable = atoi(wurds[1]);
-            synthbase_enable_arp(base, enable);
+            sequence_engine_enable_arp(base, enable);
         }
         else if (strncmp("chord_mode", wurds[0], 10) == 0)
         {
             bool b = atoi(wurds[1]);
-            synthbase_set_chord_mode(base, b);
+            sequence_engine_set_chord_mode(base, b);
         }
         else if (strncmp("single_note_mode", wurds[0], 9) == 0)
         {
             bool b = atoi(wurds[1]);
-            synthbase_set_single_note_mode(base, b);
+            sequence_engine_set_single_note_mode(base, b);
         }
         else if (strncmp("note_on", wurds[0], 7) == 0)
         {
             for (int i = 3; i < num_wurds; i++)
             {
                 int six16th = atoi(wurds[i]) % 16;
-                synthbase_add_note(base, base->cur_pattern, six16th,
+                sequence_engine_add_note(base, base->cur_pattern, six16th,
                                    base->midi_note_1, 128, true);
             }
         }
         else if (strncmp("num_patterns", wurds[0], 12) == 0)
         {
             int val = atoi(wurds[1]);
-            synthbase_set_num_patterns(base, val);
+            sequence_engine_set_num_patterns(base, val);
         }
         else if (strncmp("sustain_note_ms", wurds[0], 15) == 0)
         {
             int sustain_note_ms = atoi(wurds[1]);
             if (sustain_note_ms > 0)
-                synthbase_set_sustain_note_ms(base, sustain_note_ms);
+                sequence_engine_set_sustain_note_ms(base, sustain_note_ms);
         }
         else if (strncmp("midi_note_1", wurds[0], 11) == 0)
         {
             int midi_note = atoi(wurds[1]);
-            synthbase_set_midi_note(base, 1, midi_note);
+            sequence_engine_set_midi_note(base, 1, midi_note);
         }
         else if (strncmp("midi_note_2", wurds[0], 11) == 0)
         {
             int midi_note = atoi(wurds[1]);
-            synthbase_set_midi_note(base, 2, midi_note);
+            sequence_engine_set_midi_note(base, 2, midi_note);
         }
         else if (strncmp("midi_note_3", wurds[0], 11) == 0)
         {
             int midi_note = atoi(wurds[1]);
-            synthbase_set_midi_note(base, 3, midi_note);
+            sequence_engine_set_midi_note(base, 3, midi_note);
         }
         else if (strncmp("oct", wurds[0], 3) == 0 ||
                  strncmp("octave", wurds[0], 6) == 0)
         {
             int oct = atoi(wurds[1]);
-            synthbase_set_octave(base, oct);
+            sequence_engine_set_octave(base, oct);
         }
         else if (strncmp("import", wurds[0], 6) == 0)
         {
             printf("Importing file %s\n", wurds[1]);
-            synthbase_import_midi_from_file(base, wurds[3]);
+            sequence_engine_import_midi_from_file(base, wurds[3]);
         }
         else if (strncmp("keys", wurds[0], 4) == 0)
         {
@@ -736,7 +736,7 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         else if (strncmp("multi", wurds[0], 5) == 0)
         {
             bool b = atoi(wurds[1]);
-            synthbase_set_multi_pattern_mode(base, b);
+            sequence_engine_set_multi_pattern_mode(base, b);
             printf("Synth multi mode : %s\n",
                    base->multi_pattern_mode ? "true" : "false");
         }
@@ -745,42 +745,42 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
         {
             if (strncmp("all", wurds[1], 3) == 0)
             {
-                synthbase_reset_pattern_all(base);
+                sequence_engine_reset_pattern_all(base);
             }
             else
             {
                 int pattern_num = atoi(wurds[1]);
-                synthbase_reset_pattern(base, pattern_num);
+                sequence_engine_reset_pattern(base, pattern_num);
             }
         }
         else if (strncmp("sample_rate", wurds[0], 11) == 0)
         {
             int sample_rate = atoi(wurds[1]);
-            synthbase_set_sample_rate(base, sample_rate);
+            sequence_engine_set_sample_rate(base, sample_rate);
         }
         else if (strncmp("mask", wurds[0], 4) == 0)
         {
             uint16_t mask = mask_from_string(wurds[1]);
             printf("Mask is %d\n", mask);
-            synthbase_set_note_mask(base, mask);
+            sequence_engine_set_note_mask(base, mask);
         }
         else if (strncmp("switch", wurds[0], 6) == 0 ||
                  strncmp("cur_pattern", wurds[2], 9) == 0)
         {
             int pattern_num = atoi(wurds[1]);
-            synthbase_switch_pattern(base, pattern_num);
+            sequence_engine_switch_pattern(base, pattern_num);
         }
         else if (strncmp("up", wurds[0], 2) == 0)
         {
             for (int i = 0; i < base->num_patterns; i++)
-                synthbase_change_octave_pattern(base, i, 1);
-            synthbase_change_octave_midi_notes(base, UP);
+                sequence_engine_change_octave_pattern(base, i, 1);
+            sequence_engine_change_octave_midi_notes(base, UP);
         }
         else if (strncmp("down", wurds[0], 4) == 0)
         {
             for (int i = 0; i < base->num_patterns; i++)
-                synthbase_change_octave_pattern(base, i, 0);
-            synthbase_change_octave_midi_notes(base, DOWN);
+                sequence_engine_change_octave_pattern(base, i, 0);
+            sequence_engine_change_octave_midi_notes(base, DOWN);
         }
         else
             cmd_found = false;
@@ -799,22 +799,22 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                 if (mixer_is_valid_soundgen_num(mixr, sg2) &&
                     is_synth(mixr->sound_generators[sg2]))
                 {
-                    synthbase *sb2 = get_synthbase(mixr->sound_generators[sg2]);
+                    sequence_engine *sb2 = get_sequence_engine(mixr->sound_generators[sg2]);
 
                     if (is_valid_pattern_num(base, pattern_num) &&
                         is_valid_pattern_num(sb2, pattern_num2))
                     {
 
                         midi_event *loop_copy =
-                            synthbase_get_pattern(base, pattern_num);
-                        synthbase_set_pattern(sb2, pattern_num2, loop_copy);
+                            sequence_engine_get_pattern(base, pattern_num);
+                        sequence_engine_set_pattern(sb2, pattern_num2, loop_copy);
                     }
                 }
             }
             else if (strncmp("dupe", wurds[0], 4) == 0)
             {
-                int new_pattern_num = synthbase_add_pattern(base);
-                synthbase_dupe_pattern(&base->patterns[pattern_num],
+                int new_pattern_num = sequence_engine_add_pattern(base);
+                sequence_engine_dupe_pattern(&base->patterns[pattern_num],
                                        &base->patterns[new_pattern_num]);
             }
             else if (strncmp("numloops", wurds[0], 8) == 0)
@@ -822,17 +822,17 @@ bool parse_synthbase_cmd(int soundgen_num, int pattern_num,
                 int numloops = atoi(wurds[1]);
                 if (numloops != 0)
                 {
-                    synthbase_set_pattern_loop_num(base, pattern_num, numloops);
+                    sequence_engine_set_pattern_loop_num(base, pattern_num, numloops);
                     printf("NUMLOOPS Now %d\n", numloops);
                 }
             }
             else if (strncmp("up", wurds[0], 2) == 0)
             {
-                synthbase_change_octave_pattern(base, pattern_num, 1);
+                sequence_engine_change_octave_pattern(base, pattern_num, 1);
             }
             else if (strncmp("down", wurds[0], 4) == 0)
             {
-                synthbase_change_octave_pattern(base, pattern_num, 0);
+                sequence_engine_change_octave_pattern(base, pattern_num, 0);
             }
             else if (strncmp("quantize", wurds[0], 8) == 0)
             {

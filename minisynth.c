@@ -33,7 +33,7 @@ minisynth *new_minisynth(void)
     if (ms == NULL)
         return NULL; // barf
 
-    synthbase_init(&ms->base, (void *)ms, MINISYNTH_TYPE);
+    sequence_engine_init(&ms->base, (void *)ms, MINISYNTH_TYPE);
 
     ms->sound_generator.gennext = &minisynth_gennext;
     ms->sound_generator.status = &minisynth_status;
@@ -43,7 +43,7 @@ minisynth *new_minisynth(void)
     ms->sound_generator.stop = &minisynth_sg_stop;
     ms->sound_generator.get_num_patterns = &minisynth_get_num_patterns;
     ms->sound_generator.set_num_patterns = &minisynth_set_num_patterns;
-    ms->sound_generator.event_notify = &synthbase_event_notify;
+    ms->sound_generator.event_notify = &sequence_engine_event_notify;
     ms->sound_generator.make_active_track = &minisynth_make_active_track;
     ms->sound_generator.set_pattern = &minisynth_set_pattern;
     ms->sound_generator.get_pattern = &minisynth_get_pattern;
@@ -548,7 +548,7 @@ bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
                             unsigned int velocity)
 {
 
-    synthbase *b = &ms->base;
+    sequence_engine *b = &ms->base;
     if (ms->m_settings.m_monophonic)
     {
         minisynth_voice *msv = ms->m_voices[0];
@@ -909,7 +909,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         );
 
     wchar_t scratch[1024] = {};
-    synthbase_status(&ms->base, scratch);
+    sequence_engine_status(&ms->base, scratch);
     wcscat(status_string, scratch);
 }
 
@@ -942,20 +942,20 @@ double minisynth_getvol(void *self)
 int minisynth_get_num_patterns(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    return synthbase_get_num_patterns(&ms->base);
+    return sequence_engine_get_num_patterns(&ms->base);
 }
 
 void minisynth_set_num_patterns(void *self, int num_patterns)
 {
     printf("SETTING NUm!%d\n", num_patterns);
     minisynth *ms = (minisynth *)self;
-    synthbase_set_num_patterns(&ms->base, num_patterns);
+    sequence_engine_set_num_patterns(&ms->base, num_patterns);
 }
 
 void minisynth_make_active_track(void *self, int tracknum)
 {
     minisynth *ms = (minisynth *)self;
-    synthbase_make_active_track(&ms->base, tracknum);
+    sequence_engine_make_active_track(&ms->base, tracknum);
 }
 
 stereo_val minisynth_gennext(void *self)
@@ -1776,7 +1776,7 @@ void minisynth_print_settings(minisynth *ms)
 
 void minisynth_print_patterns(minisynth *ms)
 {
-    synthbase_print_patterns(&ms->base);
+    sequence_engine_print_patterns(&ms->base);
 }
 
 void minisynth_print_modulation_routings(minisynth *ms)
@@ -2466,9 +2466,9 @@ void minisynth_set_generate(minisynth *ms, bool b)
 
 midi_event *minisynth_get_pattern(void *self, int pattern_num)
 {
-    synthbase *base = get_synthbase(self);
+    sequence_engine *base = get_sequence_engine(self);
     if (base)
-        return synthbase_get_pattern(base, pattern_num);
+        return sequence_engine_get_pattern(base, pattern_num);
 
     return NULL;
 }
@@ -2476,9 +2476,9 @@ midi_event *minisynth_get_pattern(void *self, int pattern_num)
 void minisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
     minisynth_stop(self);
-    synthbase *base = get_synthbase(self);
+    sequence_engine *base = get_sequence_engine(self);
     if (base)
-        synthbase_set_pattern(base, pattern_num, pattern);
+        sequence_engine_set_pattern(base, pattern_num, pattern);
 }
 
 void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type)

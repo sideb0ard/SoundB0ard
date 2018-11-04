@@ -16,7 +16,7 @@ digisynth *new_digisynth(char *filename)
         return NULL;
     }
 
-    synthbase_init(&ds->base, (void *)ds, DIGISYNTH_TYPE);
+    sequence_engine_init(&ds->base, (void *)ds, DIGISYNTH_TYPE);
 
     strncpy(ds->audiofile, filename, 1023);
 
@@ -28,7 +28,7 @@ digisynth *new_digisynth(char *filename)
     ds->sound_generator.getvol = &digisynth_getvol;
     ds->sound_generator.start = &digisynth_sg_start;
     ds->sound_generator.stop = &digisynth_sg_stop;
-    ds->sound_generator.event_notify = &synthbase_event_notify;
+    ds->sound_generator.event_notify = &sequence_engine_event_notify;
     ds->sound_generator.self_destruct = &digisynth_del_self;
     ds->sound_generator.get_num_patterns = &digisynth_get_num_patterns;
     ds->sound_generator.set_num_patterns = &digisynth_set_num_patterns;
@@ -109,7 +109,7 @@ void digisynth_status(void *self, wchar_t *status_string)
              ds->m_voices[0].m_osc1.afd.samplecount,
              ds->m_voices[0].m_osc1.m_read_idx);
     wchar_t scratch[1024] = {};
-    synthbase_status(&ds->base, scratch);
+    sequence_engine_status(&ds->base, scratch);
     wcscat(status_string, scratch);
 }
 
@@ -128,19 +128,19 @@ double digisynth_getvol(void *self)
 int digisynth_get_num_patterns(void *self)
 {
     digisynth *ds = (digisynth *)self;
-    return synthbase_get_num_patterns(&ds->base);
+    return sequence_engine_get_num_patterns(&ds->base);
 }
 
 void digisynth_set_num_patterns(void *self, int num_patterns)
 {
     digisynth *ds = (digisynth *)self;
-    synthbase_set_num_patterns(&ds->base, num_patterns);
+    sequence_engine_set_num_patterns(&ds->base, num_patterns);
 }
 
 void digisynth_make_active_track(void *self, int tracknum)
 {
     digisynth *ds = (digisynth *)self;
-    synthbase_make_active_track(&ds->base, tracknum);
+    sequence_engine_make_active_track(&ds->base, tracknum);
 }
 
 void digisynth_sg_start(void *self)
@@ -213,17 +213,17 @@ bool digisynth_midi_note_off(digisynth *ds, unsigned int midinote,
 
 midi_event *digisynth_get_pattern(void *self, int pattern_num)
 {
-    synthbase *base = get_synthbase(self);
+    sequence_engine *base = get_sequence_engine(self);
     if (base)
-        return synthbase_get_pattern(base, pattern_num);
+        return sequence_engine_get_pattern(base, pattern_num);
 
     return NULL;
 }
 
 void digisynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    synthbase *base = get_synthbase(self);
+    sequence_engine *base = get_sequence_engine(self);
     if (base)
-        synthbase_set_pattern(base, pattern_num, pattern);
+        sequence_engine_set_pattern(base, pattern_num, pattern);
 }
 void digisynth_update(digisynth *ds) {}
