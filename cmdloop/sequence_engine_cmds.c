@@ -60,6 +60,11 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             bool b = atoi(wurds[1]);
             sequence_engine_set_single_note_mode(engine, b);
         }
+        else if (strncmp("swing", wurds[0], 5) == 0)
+        {
+            int swing_setting = atoi(wurds[1]);
+            sequence_engine_set_swing_setting(engine, swing_setting);
+        }
         else if (strncmp("note_on", wurds[0], 7) == 0)
         {
             for (int i = 3; i < num_wurds; i++)

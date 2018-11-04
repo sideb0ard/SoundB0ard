@@ -213,12 +213,13 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
         scratch, 255,
         L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
         L"midi_note_1:%d midi_note_2:%d midi_note_3:%d\n"
-        L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s",
+        L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->midi_note_1, engine->midi_note_2,
         engine->midi_note_3, engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
-        s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode]);
+        s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
+        engine->swing_setting);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < engine->num_patterns; i++)
@@ -647,6 +648,9 @@ void sequence_engine_set_pattern(void *self, int pattern_num,
                 ev.data1 = engine->midi_note_1;
             sequence_engine_add_event(engine, pattern_num, i, ev);
         }
+        if (engine->swing_setting > 0)
+            pattern_apply_swing(engine->patterns[pattern_num],
+                                engine->swing_setting);
     }
 }
 
@@ -840,4 +844,9 @@ bool sequence_engine_is_masked(sequence_engine *engine)
     if (cur_bit & engine->event_mask)
         is_masked = true;
     return is_masked;
+}
+void sequence_engine_set_swing_setting(sequence_engine *engine,
+                                       int swing_setting)
+{
+    engine->swing_setting = swing_setting;
 }

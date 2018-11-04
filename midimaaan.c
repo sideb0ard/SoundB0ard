@@ -7,13 +7,13 @@
 
 #include "defjams.h"
 #include "digisynth.h"
+#include "drumsampler.h"
+#include "drumsynth.h"
 #include "dxsynth.h"
 #include "midi_freq_table.h"
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "drumsampler.h"
-#include "drumsynth.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -86,21 +86,15 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     int midi_note = ev->data1;
     bool is_chord_mode = false;
 
-    if (is_synth(sg))
-    {
-        sequence_engine *engine = get_sequence_engine(sg);
-        if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
-        {
-            if (ev->event_type == MIDI_ON)
-                arp_add_last_note(&engine->arp, midi_note);
-        }
-        if (engine->chord_mode)
-            is_chord_mode = true;
-    }
+    sequence_engine *engine = get_sequence_engine(sg);
+
+    if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
+        if (ev->event_type == MIDI_ON)
+            arp_add_last_note(&engine->arp, midi_note);
 
     int midi_notes[3] = {midi_note, 0, 0};
     int midi_notes_len = 1; // default single note
-    if (is_chord_mode)
+    if (engine->chord_mode)
     {
         midi_notes_len = 3;
         if (mixr->chord_type == MAJOR_CHORD)
@@ -118,8 +112,9 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            if (!sequence_engine_is_masked(&ms->engine))
+            if (!sequence_engine_is_masked(engine))
             {
+
                 for (int i = 0; i < midi_notes_len; i++)
                 {
                     int note = midi_notes[i];
@@ -177,8 +172,10 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (144):
         { // Hex 0x80
-            if (!sequence_engine_is_masked(&dx->engine))
+
+            if (!sequence_engine_is_masked(engine))
             {
+
                 for (int i = 0; i < midi_notes_len; i++)
                 {
                     int note = midi_notes[i];
@@ -231,17 +228,23 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            for (int i = 0; i < midi_notes_len; i++)
+            if (!sequence_engine_is_masked(engine))
             {
-                int note = midi_notes[i];
-                digisynth_midi_note_on(ds, note, ev->data2);
-                int sustain_time_in_ticks = ds->engine.sustain_note_ms *
-                                            mixr->timing_info.ms_per_midi_tick;
-                int note_off_tick =
-                    (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-                midi_event off = new_midi_event(128, note, 128);
-                off.delete_after_use = true;
-                sequence_engine_add_event(&ds->engine, 0, note_off_tick, off);
+
+                for (int i = 0; i < midi_notes_len; i++)
+                {
+                    int note = midi_notes[i];
+                    digisynth_midi_note_on(ds, note, ev->data2);
+                    int sustain_time_in_ticks =
+                        ds->engine.sustain_note_ms *
+                        mixr->timing_info.ms_per_midi_tick;
+                    int note_off_tick =
+                        (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
+                    midi_event off = new_midi_event(128, note, 128);
+                    off.delete_after_use = true;
+                    sequence_engine_add_event(&ds->engine, 0, note_off_tick,
+                                              off);
+                }
             }
             break;
         }
@@ -260,17 +263,23 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     {
         if (ev->event_type == MIDI_ON)
         {
-            drumsampler *ds= (drumsampler *)sg;
-            drumsampler_note_on(ds);
+            if (!sequence_engine_is_masked(engine))
+            {
+                drumsampler *ds = (drumsampler *)sg;
+                drumsampler_note_on(ds);
+            }
         }
     }
     else if (sg->type == DRUMSYNTH_TYPE)
     {
-        drumsynth *ds= (drumsynth *)sg;
+        drumsynth *ds = (drumsynth *)sg;
         if (ev->event_type == MIDI_ON)
         {
-            drumsynth *ds= (drumsynth *)sg;
-            drumsynth_trigger(ds);
+            if (!sequence_engine_is_masked(engine))
+            {
+                drumsynth *ds = (drumsynth *)sg;
+                drumsynth_trigger(ds);
+            }
         }
         else if (ev->event_type == 176)
         {

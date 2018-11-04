@@ -26,3 +26,6 @@ void short_to_char(uint16_t num, char bin_num[17]);
 
 int shift_bits_to_leftmost_position(uint16_t num,
                                     int num_of_bits_to_align_with);
+
+void pattern_replace(midi_event *src_pattern, midi_event *dst_pattern);
+void pattern_apply_swing(midi_event *pattern, int swing_setting);

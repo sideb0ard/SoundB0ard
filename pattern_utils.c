@@ -191,3 +191,47 @@ void set_pattern_to_self_destruct(midi_event *pattern)
             ev->delete_after_use = true;
     }
 }
+
+void pattern_replace(midi_event *src_pattern, midi_event *dst_pattern)
+{
+    if(src_pattern && dst_pattern)
+    {
+        clear_midi_pattern(dst_pattern);
+        for (int i = 0; i < PPBAR; ++i)
+            dst_pattern[i] = src_pattern[i];
+    }
+}
+
+void pattern_apply_swing(midi_event *pattern, int swing_setting)
+{
+    midi_event new_pattern[PPBAR] = {};
+    bool even16th = true;
+    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
+    {
+        for (int j = 0; j < PPSIXTEENTH; j++)
+        {
+            int idx = i + j;
+            if (pattern[idx].event_type)
+            {
+                if (even16th)
+                {
+                    // clean copy
+                    new_pattern[idx] = pattern[idx];
+                }
+                else
+                {
+                    int new_idx =
+                        idx + swing_setting * 19; // TODO magic number 19 midi
+                                                  // ticks per 4% swing
+                    while (new_idx < 0)
+                        new_idx = PPBAR - new_idx;
+                    while (new_idx >= PPBAR)
+                        new_idx = new_idx - PPBAR;
+                    new_pattern[new_idx] = pattern[idx];
+                }
+            }
+        }
+        even16th = 1 - even16th;
+    }
+    // step_set_pattern(s, pattern_num, new_pattern);
+}

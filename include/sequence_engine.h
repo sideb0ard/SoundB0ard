@@ -93,6 +93,7 @@ typedef struct sequence_engine
     bool recording;
     bool single_note_mode; // ignore midi notes, just play midi_note_1
     bool chord_mode;
+    int swing_setting;
 
     int midi_note_1;
     int midi_note_2;
@@ -199,3 +200,4 @@ void arp_add_last_note(arpeggiator *arp, int note);
 void sequence_engine_set_event_mask(sequence_engine *engine, uint16_t mask);
 void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b);
 bool sequence_engine_is_masked(sequence_engine *engine);
+void sequence_engine_set_swing_setting(sequence_engine *engine, int swing_setting);
