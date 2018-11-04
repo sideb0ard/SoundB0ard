@@ -9,7 +9,6 @@
 #include <obliquestrategies.h>
 #include <pattern_transformers.h>
 #include <pattern_utils.h>
-#include <sequencer_utils.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
 #include <utils.h>

@@ -6,7 +6,6 @@
 #include "midi_freq_table.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "sequencer_utils.h"
 #include "utils.h"
 
 extern mixer *mixr;

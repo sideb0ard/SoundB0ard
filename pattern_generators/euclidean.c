@@ -4,7 +4,6 @@
 #include "defjams.h"
 #include "euclidean.h"
 #include "mixer.h"
-#include "sequencer_utils.h"
 #include "utils.h"
 
 extern mixer *mixr;

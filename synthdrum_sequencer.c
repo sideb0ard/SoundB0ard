@@ -3,7 +3,6 @@
 #include <string.h>
 
 #include "mixer.h"
-#include "sequencer_utils.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
 

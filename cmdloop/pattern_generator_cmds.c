@@ -8,7 +8,6 @@
 #include <pattern_generator_cmds.h>
 #include <pattern_parser.h>
 #include <pattern_utils.h>
-#include <sequencer_utils.h>
 
 extern mixer *mixr;
 

@@ -6,7 +6,6 @@
 #include "defjams.h"
 #include "euclidean.h"
 #include "mixer.h"
-#include "sequencer_utils.h"
 #include "synthbase.h"
 #include "utils.h"
 #include <pattern_parser.h>
@@ -28,8 +27,6 @@ void synthbase_init(synthbase *base, void *parent,
     base->parent_synth_type = parent_synth_type;
 
     base->num_patterns = 1;
-    base->max_generation = 0;
-
     base->multi_pattern_mode = true;
     base->cur_pattern_iteration = 1;
     for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
@@ -55,33 +52,6 @@ void synthbase_init(synthbase *base, void *parent,
     base->single_note_mode = false;
 }
 
-
-void synthbase_gen_rec(synthbase *base, int start_idx, int end_idx,
-                       int midi_note, float amp)
-{
-    printf("GEN_REC! start_idx:%d end_idx:%d midi_note:%d amp:%f\n", start_idx,
-           end_idx, midi_note, amp);
-    midi_event *midi_pattern = base->patterns[base->cur_pattern];
-    int middle = (start_idx + end_idx) / 2;
-    if (amp > 70)
-    {
-        synthbase_gen_rec(base, start_idx, middle, midi_note, amp * 0.75);
-        printf("Adding note:%d at pos:%d amp:%f\n", midi_note, middle, amp);
-        synthbase_add_micro_note(base, base->cur_pattern, middle, midi_note,
-                                 amp, true);
-        synthbase_gen_rec(base, middle, end_idx, midi_note, amp * 0.75);
-    }
-}
-
-void synthbase_generate_recursive_pattern(synthbase *base)
-{
-    printf("woof!\n");
-    synthbase_stop(base);
-    midi_event *midi_pattern = base->patterns[base->cur_pattern];
-    clear_midi_pattern(midi_pattern);
-
-    synthbase_gen_rec(base, 0, PPBAR - 1, base->midi_note_1, 128);
-}
 
 void synthbase_set_pattern_to_riff(synthbase *base)
 {

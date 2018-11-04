@@ -67,7 +67,6 @@ SRC = \
 	sample_sequencer.c \
 	sbmsg.c \
 	step_sequencer.c \
-	sequencer_utils.c \
 	sound_generator.c \
 	pattern_generators/bitshift.c \
 	pattern_generators/euclidean.c \

@@ -9,7 +9,6 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "sample_sequencer.h"
-#include "sequencer_utils.h"
 #include "step_sequencer.h"
 #include "utils.h"
 

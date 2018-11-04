@@ -15,7 +15,6 @@
 #include <mixer.h>
 #include <pattern_parser.h>
 #include <sample_sequencer.h>
-#include <sequencer_utils.h>
 #include <utils.h>
 
 #define WEE_STACK_SIZE 32

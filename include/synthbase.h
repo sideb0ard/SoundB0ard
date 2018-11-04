@@ -98,18 +98,10 @@ typedef struct synthbase
     int octave;
 
     arpeggiator arp;
-    // arpeggiator m_arp;
-
-    // bool generate_mode; // magical
-    // int generate_src;
-    // int generate_every_n_loops;
-    // int generate_generation;
 
     bool restore_pending;
 
     int sustain_note_ms;
-
-    int max_generation;
 
     uint16_t note_mask;
     bool enable_note_mask;

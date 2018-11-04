@@ -10,7 +10,6 @@
 #include <euclidean.h>
 #include <mixer.h>
 #include <pattern_utils.h>
-#include <sequencer_utils.h>
 #include <step_sequencer.h>
 #include <utils.h>
 

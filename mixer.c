@@ -22,7 +22,6 @@
 #include "mixer.h"
 #include "sample_sequencer.h"
 #include "sbmsg.h"
-#include "sequencer_utils.h"
 #include "sound_generator.h"
 #include "synthdrum_sequencer.h"
 #include "utils.h"
