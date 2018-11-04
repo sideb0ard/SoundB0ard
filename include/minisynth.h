@@ -171,7 +171,7 @@ typedef struct synthsettings
 typedef struct minisynth
 {
     soundgenerator sound_generator;
-    sequence_engine base;
+    sequence_engine engine;
 
     minisynth_voice *m_voices[MAX_VOICES];
 

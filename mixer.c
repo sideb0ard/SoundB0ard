@@ -915,17 +915,17 @@ sequence_engine *get_sequence_engine(soundgenerator *self)
     if (self->type == MINISYNTH_TYPE)
     {
         minisynth *ms = (minisynth *)self;
-        return &ms->base;
+        return &ms->engine;
     }
     else if (self->type == DIGISYNTH_TYPE)
     {
         digisynth *ds = (digisynth *)self;
-        return &ds->base;
+        return &ds->engine;
     }
     else if (self->type == DXSYNTH_TYPE)
     {
         dxsynth *dx = (dxsynth *)self;
-        return &dx->base;
+        return &dx->engine;
     }
     else
     {
@@ -937,8 +937,8 @@ sequence_engine *get_sequence_engine(soundgenerator *self)
 void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
                             bool update_last_midi)
 {
-    sequence_engine *base = get_sequence_engine(sg);
-    bool is_chord_mode = base->chord_mode;
+    sequence_engine *engine = get_sequence_engine(sg);
+    bool is_chord_mode = engine->chord_mode;
 
     int midi_notes[3] = {note, 0, 0};
     int midi_notes_len = 1; // default single note
@@ -979,21 +979,21 @@ void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
         midi_event off_event = new_midi_event(128, note, velocity);
         ////////////////////////
 
-        if (base->recording)
+        if (engine->recording)
         {
             printf("Recording note!\n");
             int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
             midi_event on_event = new_midi_event(144, note, velocity);
 
-            sequence_engine_add_event(base, base->cur_pattern, note_off_tick,
+            sequence_engine_add_event(engine, engine->cur_pattern, note_off_tick,
                                 off_event);
-            sequence_engine_add_event(base, base->cur_pattern, note_on_tick,
+            sequence_engine_add_event(engine, engine->cur_pattern, note_on_tick,
                                 on_event);
         }
         else
         {
             off_event.delete_after_use = true; // _THIS_ is the magic
-            sequence_engine_add_event(base, base->cur_pattern, note_off_tick,
+            sequence_engine_add_event(engine, engine->cur_pattern, note_off_tick,
                                 off_event);
         }
     }
@@ -1201,13 +1201,13 @@ void mixer_check_for_midi_messages(mixer *mixr)
                 soundgenerator *sg =
                     mixr->sound_generators[mixr->active_midi_soundgen_num];
 
-                sequence_engine *base = get_sequence_engine(sg);
+                sequence_engine *engine = get_sequence_engine(sg);
 
-                if (base->recording)
+                if (engine->recording)
                 {
                     int tick = mixr->timing_info.midi_tick % PPBAR;
                     midi_event ev = new_midi_event(status, data1, data2);
-                    sequence_engine_add_event(base, base->cur_pattern, tick, ev);
+                    sequence_engine_add_event(engine, engine->cur_pattern, tick, ev);
                 }
 
                 midi_event ev;

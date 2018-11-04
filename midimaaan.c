@@ -88,13 +88,13 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
 
     if (is_synth(sg))
     {
-        sequence_engine *base = get_sequence_engine(sg);
+        sequence_engine *engine = get_sequence_engine(sg);
         if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
         {
             if (ev->event_type == MIDI_ON)
-                arp_add_last_note(&base->arp, midi_note);
+                arp_add_last_note(&engine->arp, midi_note);
         }
-        if (base->chord_mode)
+        if (engine->chord_mode)
             is_chord_mode = true;
     }
 
@@ -118,7 +118,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (MIDI_ON):
         { // Hex 0x80
-            if (!sequence_engine_is_masked(&ms->base))
+            if (!sequence_engine_is_masked(&ms->engine))
             {
                 for (int i = 0; i < midi_notes_len; i++)
                 {
@@ -129,7 +129,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     if (ev->source != EXTERNAL_DEVICE)
                     {
                         int sustain_ms =
-                            ev->hold ? ev->hold : ms->base.sustain_note_ms;
+                            ev->hold ? ev->hold : ms->engine.sustain_note_ms;
                         int sustain_time_in_ticks =
                             sustain_ms * mixr->timing_info.ms_per_midi_tick;
 
@@ -137,7 +137,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                             (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                         midi_event off = new_midi_event(MIDI_OFF, note, 128);
                         off.delete_after_use = true;
-                        sequence_engine_add_event(&ms->base, ms->base.cur_pattern,
+                        sequence_engine_add_event(&ms->engine, ms->engine.cur_pattern,
                                             note_off_tick, off);
                     }
                 }
@@ -176,7 +176,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         {
         case (144):
         { // Hex 0x80
-            if (!sequence_engine_is_masked(&dx->base))
+            if (!sequence_engine_is_masked(&dx->engine))
             {
                 for (int i = 0; i < midi_notes_len; i++)
                 {
@@ -185,13 +185,13 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     if (ev->source != EXTERNAL_DEVICE)
                     {
                         int sustain_time_in_ticks =
-                            dx->base.sustain_note_ms *
+                            dx->engine.sustain_note_ms *
                             mixr->timing_info.ms_per_midi_tick;
                         int note_off_tick =
                             (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                         midi_event off = new_midi_event(128, note, 128);
                         off.delete_after_use = true;
-                        sequence_engine_add_event(&dx->base, dx->base.cur_pattern,
+                        sequence_engine_add_event(&dx->engine, dx->engine.cur_pattern,
                                             note_off_tick, off);
                     }
                 }
@@ -233,13 +233,13 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             {
                 int note = midi_notes[i];
                 digisynth_midi_note_on(ds, note, ev->data2);
-                int sustain_time_in_ticks = ds->base.sustain_note_ms *
+                int sustain_time_in_ticks = ds->engine.sustain_note_ms *
                                             mixr->timing_info.ms_per_midi_tick;
                 int note_off_tick =
                     (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                 midi_event off = new_midi_event(128, note, 128);
                 off.delete_after_use = true;
-                sequence_engine_add_event(&ds->base, 0, note_off_tick, off);
+                sequence_engine_add_event(&ds->engine, 0, note_off_tick, off);
             }
             break;
         }

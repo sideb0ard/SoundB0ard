@@ -98,7 +98,7 @@ typedef struct dxsynthsettings
 typedef struct dxsynth
 {
     soundgenerator sound_generator;
-    sequence_engine base;
+    sequence_engine engine;
 
     dxsynth_voice *m_voices[MAX_DX_VOICES];
 

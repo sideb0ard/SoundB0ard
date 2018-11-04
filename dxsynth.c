@@ -21,7 +21,7 @@ dxsynth *new_dxsynth(void)
     if (dx == NULL)
         return NULL; // barf
 
-    sequence_engine_init(&dx->base, (void *)dx, DXSYNTH_TYPE);
+    sequence_engine_init(&dx->engine, (void *)dx, DXSYNTH_TYPE);
 
     dx->sound_generator.gennext = &dxsynth_gennext;
     dx->sound_generator.status = &dxsynth_status;
@@ -76,7 +76,7 @@ dxsynth *new_dxsynth(void)
 bool dxsynth_is_valid_pattern(void *self, int pattern_num)
 {
     dxsynth *dx = (dxsynth *)self;
-    return is_valid_pattern_num(&dx->base, pattern_num);
+    return is_valid_pattern_num(&dx->engine, pattern_num);
 }
 
 void dxsynth_reset(dxsynth *dx)
@@ -734,7 +734,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
         );
     // clang-format off
     wchar_t scratch[1024] = {};
-    sequence_engine_status(&dx->base, scratch);
+    sequence_engine_status(&dx->engine, scratch);
     wcscat(status_string, scratch);
 }
 
@@ -757,19 +757,19 @@ double dxsynth_getvol(void *self)
 int dxsynth_get_num_patterns(void *self)
 {
     dxsynth *ms = (dxsynth *)self;
-    return sequence_engine_get_num_patterns(&ms->base);
+    return sequence_engine_get_num_patterns(&ms->engine);
 }
 
 void dxsynth_set_num_patterns(void *self, int num_patterns)
 {
     dxsynth *ms = (dxsynth *)self;
-    sequence_engine_set_num_patterns(&ms->base, num_patterns);
+    sequence_engine_set_num_patterns(&ms->engine, num_patterns);
 }
 
 void dxsynth_make_active_track(void *self, int tracknum)
 {
     dxsynth *ms = (dxsynth *)self;
-    sequence_engine_make_active_track(&ms->base, tracknum);
+    sequence_engine_make_active_track(&ms->engine, tracknum);
 }
 
 stereo_val dxsynth_gennext(void *self)
@@ -1339,7 +1339,7 @@ void dxsynth_print_settings(dxsynth *ms)
 
 void dxsynth_print_patterns(dxsynth *ms)
 {
-    sequence_engine_print_patterns(&ms->base);
+    sequence_engine_print_patterns(&ms->engine);
 }
 
 void dxsynth_print_modulation_routings(dxsynth *ms)
@@ -1691,18 +1691,18 @@ void dxsynth_set_op4_feedback(dxsynth *d, double val)
 
 midi_event *dxsynth_get_pattern(void *self, int pattern_num)
 {
-    sequence_engine *base = get_sequence_engine(self);
-    if (base)
-        return sequence_engine_get_pattern(base, pattern_num);
+    sequence_engine *engine = get_sequence_engine(self);
+    if (engine)
+        return sequence_engine_get_pattern(engine, pattern_num);
 
     return NULL;
 }
 
 void dxsynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
 {
-    sequence_engine *base = get_sequence_engine(self);
-    if (base)
-        sequence_engine_set_pattern(base, pattern_num, pattern);
+    sequence_engine *engine = get_sequence_engine(self);
+    if (engine)
+        sequence_engine_set_pattern(engine, pattern_num, pattern);
 }
 
 void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num)

@@ -32,7 +32,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    sequence_engine *base = get_sequence_engine(mixr->sound_generators[soundgen_num]);
+    sequence_engine *engine = get_sequence_engine(mixr->sound_generators[soundgen_num]);
 
     int ch = 0;
     int quit = 0;
@@ -74,9 +74,9 @@ void keys(int soundgen_num)
                 s_keys_octave++;
                 break;
             case 114:
-                base->recording = 1 - base->recording;
+                engine->recording = 1 - engine->recording;
                 printf("Toggling REC to %s\n",
-                       base->recording ? "true" : "false");
+                       engine->recording ? "true" : "false");
                 break;
             // mixer_toggle_key_mode(mixr);
             // printf("Switching KEY mode -- %d\n",

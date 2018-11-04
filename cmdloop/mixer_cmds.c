@@ -216,13 +216,13 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
                     if (is_synth(sg))
                     {
-                        sequence_engine *base = get_sequence_engine(sg);
+                        sequence_engine *engine = get_sequence_engine(sg);
                         if (strncmp("riff", wurd, 4) == 0)
-                            sequence_engine_set_pattern_to_riff(base);
+                            sequence_engine_set_pattern_to_riff(engine);
                         if (strncmp("melody", wurd, 6) == 0)
-                            sequence_engine_set_pattern_to_melody(base);
+                            sequence_engine_set_pattern_to_melody(engine);
                         if (strncmp("sparse", wurd, 6) == 0)
-                            sequence_engine_set_num_patterns(base, 2);
+                            sequence_engine_set_num_patterns(engine, 2);
                     }
                 }
             }

@@ -10,7 +10,7 @@
 typedef struct digisynth
 {
     soundgenerator sound_generator;
-    sequence_engine base;
+    sequence_engine engine;
 
     char audiofile[1024];
     digisynth_voice m_voices[MAX_VOICES];
