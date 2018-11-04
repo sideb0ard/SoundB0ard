@@ -125,8 +125,8 @@ typedef enum
     DIGISYNTH_TYPE,
     DXSYNTH_TYPE,
     LOOPER_TYPE,
-    SEQUENCER_TYPE,
-    SYNTHDRUM_TYPE,
+    DRUMSAMPLER_TYPE,
+    DRUMSYNTH_TYPE,
     NUM_SOUNDGEN_TYPE
 } sound_generator_type;
 
@@ -156,8 +156,8 @@ typedef enum
 typedef enum
 {
     NONE,
-    SYNTH,
-    DRUMSYNTH,
+    MIDI_CONTROL_SYNTH_TYPE,
+    MIDI_CONTROL_DRUMSYNTH_TYPE,
 } midi_control_type;
 
 typedef struct mixer_timing_info

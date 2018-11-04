@@ -5,9 +5,9 @@
 #include <looper.h>
 #include <mixer.h>
 #include <pattern_parser.h>
-#include <sample_sequencer.h>
+#include <drumsampler.h>
 #include <stepper_cmds.h>
-#include <synthdrum_sequencer.h>
+#include <drumsynth.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -20,7 +20,7 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
         if (strncmp("ls", wurds[1], 2) == 0)
         {
-            synthdrum_list_patches();
+            drumsynth_list_patches();
             return true;
         }
 
@@ -37,15 +37,15 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 // no-op, all good
             }
             else if (mixr->sound_generators[soundgen_num]->type ==
-                     SEQUENCER_TYPE)
+                     DRUMSAMPLER_TYPE)
             {
-                sample_sequencer *s =
-                    (sample_sequencer *)mixr->sound_generators[soundgen_num];
+                drumsampler *s =
+                    (drumsampler *)mixr->sound_generators[soundgen_num];
 
                 if (strncmp("end_pos", wurds[2], 7) == 0)
                 {
                     int pct = atoi(wurds[3]);
-                    sample_sequencer_set_cutoff_percent(s, pct);
+                    drumsampler_set_cutoff_percent(s, pct);
                 }
                 else if (strncmp("load", wurds[2], 4) == 0 ||
                          strncmp("import", wurds[2], 6) == 0)
@@ -54,7 +54,7 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     {
                         printf("Changing Loaded "
                                "FILE!\n");
-                        sample_seq_import_file(s, wurds[3]);
+                        drumsampler_import_file(s, wurds[3]);
                     }
                     else
                         printf("%s is not a valid file\n", wurds[3]);
@@ -62,11 +62,11 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else if (strncmp("pitch", wurds[2], 5) == 0)
                 {
                     double v = atof(wurds[3]);
-                    sample_sequencer_set_pitch(s, v);
+                    drumsampler_set_pitch(s, v);
                 }
             }
             else if (mixr->sound_generators[soundgen_num]->type ==
-                     SYNTHDRUM_TYPE)
+                     DRUMSYNTH_TYPE)
             {
                 parse_drumsynth_cmd(soundgen_num, &wurds[2], num_wurds - 2);
             }
@@ -82,111 +82,111 @@ bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
     (void)num_wurds;
     double val = atof(wurds[1]);
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-        mixr->sound_generators[soundgen_num]->type == SYNTHDRUM_TYPE)
+        mixr->sound_generators[soundgen_num]->type == DRUMSYNTH_TYPE)
     {
-        synthdrum_sequencer *synth =
-            (synthdrum_sequencer *)mixr->sound_generators[soundgen_num];
+        drumsynth *synth =
+            (drumsynth *)mixr->sound_generators[soundgen_num];
         if (strncmp("debug", wurds[0], 5) == 0)
         {
-            synthdrum_set_debug(synth, val);
+            drumsynth_set_debug(synth, val);
         }
         if (strncmp("save", wurds[0], 4) == 0)
         {
-            synthdrum_save_patch(synth, wurds[1]);
+            drumsynth_save_patch(synth, wurds[1]);
         }
         if (strncmp("open", wurds[0], 4) == 0 ||
             strncmp("load", wurds[0], 4) == 0 ||
             strncmp("import", wurds[0], 6) == 0)
         {
-            synthdrum_open_patch(synth, wurds[1]);
+            drumsynth_open_patch(synth, wurds[1]);
         }
         else if (strncmp("distortion_threshold", wurds[0], 20) == 0)
         {
-            synthdrum_set_distortion_threshold(synth, val);
+            drumsynth_set_distortion_threshold(synth, val);
         }
         else if (strncmp("o1_wav", wurds[0], 6) == 0)
         {
-            synthdrum_set_osc_wav(synth, 1, val);
+            drumsynth_set_osc_wav(synth, 1, val);
         }
         else if (strncmp("o1_fo", wurds[0], 6) == 0)
         {
-            synthdrum_set_osc_fo(synth, 1, val);
+            drumsynth_set_osc_fo(synth, 1, val);
         }
         else if (strncmp("o1_amp", wurds[0], 6) == 0)
         {
-            synthdrum_set_osc_amp(synth, 1, val);
+            drumsynth_set_osc_amp(synth, 1, val);
         }
         else if (strncmp("e2_o2_int", wurds[0], 8) == 0)
         {
-            synthdrum_set_eg_osc_intensity(synth, 2, 2, val);
+            drumsynth_set_eg_osc_intensity(synth, 2, 2, val);
         }
         else if (strncmp("e1_att", wurds[0], 6) == 0)
         {
-            synthdrum_set_eg_attack(synth, 1, val);
+            drumsynth_set_eg_attack(synth, 1, val);
         }
         else if (strncmp("e1_dec", wurds[0], 6) == 0)
         {
-            synthdrum_set_eg_decay(synth, 1, val);
+            drumsynth_set_eg_decay(synth, 1, val);
         }
         else if (strncmp("e1_sus_lvl", wurds[0], 10) == 0)
         {
-            synthdrum_set_eg_sustain_lvl(synth, 1, val);
+            drumsynth_set_eg_sustain_lvl(synth, 1, val);
         }
         else if (strncmp("e1_rel", wurds[0], 6) == 0)
         {
-            synthdrum_set_eg_release(synth, 1, val);
+            drumsynth_set_eg_release(synth, 1, val);
         }
         else if (strncmp("o2_wav", wurds[0], 6) == 0)
         {
-            synthdrum_set_osc_wav(synth, 2, val);
+            drumsynth_set_osc_wav(synth, 2, val);
         }
         else if (strncmp("o2_fo", wurds[0], 6) == 0)
         {
-            synthdrum_set_osc_fo(synth, 2, val);
+            drumsynth_set_osc_fo(synth, 2, val);
         }
         else if (strncmp("o2_amp", wurds[0], 6) == 0)
         {
-            synthdrum_set_osc_amp(synth, 2, val);
+            drumsynth_set_osc_amp(synth, 2, val);
         }
         else if (strncmp("mod_pitch_semitones", wurds[0], 19) == 0)
         {
-            synthdrum_set_mod_semitones_range(synth, val);
+            drumsynth_set_mod_semitones_range(synth, val);
         }
         else if (strncmp("e2_att", wurds[0], 6) == 0)
         {
-            synthdrum_set_eg_attack(synth, 2, val);
+            drumsynth_set_eg_attack(synth, 2, val);
         }
         else if (strncmp("e2_dec", wurds[0], 6) == 0)
         {
-            synthdrum_set_eg_decay(synth, 2, val);
+            drumsynth_set_eg_decay(synth, 2, val);
         }
         else if (strncmp("e2_sus_lvl", wurds[0], 10) == 0)
         {
-            synthdrum_set_eg_sustain_lvl(synth, 2, val);
+            drumsynth_set_eg_sustain_lvl(synth, 2, val);
         }
         else if (strncmp("e2_rel", wurds[0], 6) == 0)
         {
-            synthdrum_set_eg_release(synth, 2, val);
+            drumsynth_set_eg_release(synth, 2, val);
         }
         else if (strncmp("filter_type", wurds[0], 11) == 0)
         {
-            synthdrum_set_filter_type(synth, val);
+            drumsynth_set_filter_type(synth, val);
         }
         else if (strncmp("freq", wurds[0], 4) == 0)
         {
-            synthdrum_set_filter_freq(synth, val);
+            drumsynth_set_filter_freq(synth, val);
         }
         else if (strncmp("rand", wurds[0], 4) == 0)
         {
-            synthdrum_randomize(synth);
+            drumsynth_randomize(synth);
         }
         else if (strncmp("reset", wurds[0], 5) == 0)
         {
-            synthdrum_set_reset_osc(synth, val);
+            drumsynth_set_reset_osc(synth, val);
         }
         else if (strncmp("q", wurds[0], 1) == 0)
         {
-            synthdrum_set_filter_q(synth, val);
+            drumsynth_set_filter_q(synth, val);
         }
     }
     return true;
@@ -197,14 +197,14 @@ bool parse_step_sequencer_command(int soundgen_num, int target_pattern_num,
 {
     soundgenerator *sg = mixr->sound_generators[soundgen_num];
     step_sequencer *seq;
-    if (mixr->sound_generators[soundgen_num]->type == SEQUENCER_TYPE)
+    if (mixr->sound_generators[soundgen_num]->type == DRUMSAMPLER_TYPE)
     {
-        sample_sequencer *s = (sample_sequencer *)sg;
+        drumsampler *s = (drumsampler *)sg;
         seq = &s->m_seq;
     }
-    else if (mixr->sound_generators[soundgen_num]->type == SYNTHDRUM_TYPE)
+    else if (mixr->sound_generators[soundgen_num]->type == DRUMSYNTH_TYPE)
     {
-        synthdrum_sequencer *s = (synthdrum_sequencer *)sg;
+        drumsynth *s = (drumsynth *)sg;
         seq = &s->m_seq;
     }
     else if (mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)

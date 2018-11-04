@@ -730,7 +730,7 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
 
         else if (strncmp("midi", wurds[0], 4) == 0)
         {
-            mixr->midi_control_destination = SYNTH;
+            mixr->midi_control_destination = MIDI_CONTROL_SYNTH_TYPE;
             mixr->active_midi_soundgen_num = soundgen_num;
         }
 

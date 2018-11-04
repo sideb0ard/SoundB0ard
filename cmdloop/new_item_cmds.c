@@ -3,11 +3,11 @@
 
 #include <cmdloop.h>
 #include <digisynth.h>
+#include <drumsampler.h>
+#include <drumsynth.h>
 #include <looper.h>
 #include <mixer.h>
 #include <pattern_parser.h>
-#include <sample_sequencer.h>
-#include <synthdrum_sequencer.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -68,28 +68,28 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             char kickfile[512] = {0};
             get_random_sample_from_dir("kicks", kickfile);
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, kickfile);
-            sample_sequencer *bd = new_sample_seq(kickfile);
+            drumsampler *bd = new_drumsampler(kickfile);
             int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
             update_environment("bd", bdnum);
 
             char snarefile[512] = {0};
             get_random_sample_from_dir("snrs", snarefile);
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, snarefile);
-            sample_sequencer *sd = new_sample_seq(snarefile);
+            drumsampler *sd = new_drumsampler(snarefile);
             int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
             update_environment("sd", sdnum);
 
             char highhat[512] = {0};
             get_random_sample_from_dir("hats", highhat);
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, highhat);
-            sample_sequencer *hh = new_sample_seq(highhat);
+            drumsampler *hh = new_drumsampler(highhat);
             int hhnum = add_sound_generator(mixr, (soundgenerator *)hh);
             update_environment("hh", hhnum);
 
             char perc[512] = {0};
             get_random_sample_from_dir("perc", perc);
             printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
-            sample_sequencer *pc = new_sample_seq(perc);
+            drumsampler *pc = new_drumsampler(perc);
             int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
             update_environment("pc", pcnum);
         }
@@ -100,7 +100,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 char perc[512] = {0};
                 get_random_sample_from_dir("perc", perc);
                 printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
-                sample_sequencer *s = new_sample_seq(perc);
+                drumsampler *s = new_drumsampler(perc);
                 add_sound_generator(mixr, (soundgenerator *)s);
             }
         }
@@ -153,14 +153,14 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                  strncmp("step", wurds[1], 4) == 0)
         {
             int sgnum = -1;
-            if (strncmp("synth", wurds[2], 5) == 0)
+            if (strlen(wurds[2]) == 0 || strncmp("synth", wurds[2], 5) == 0)
             {
-                synthdrum_sequencer *ds = new_synthdrum_seq();
+                drumsynth *ds = new_drumsynth();
                 sgnum = add_sound_generator(mixr, (soundgenerator *)ds);
             }
             else if (is_valid_file(wurds[2]))
             {
-                sample_sequencer *s = new_sample_seq(wurds[2]);
+                drumsampler *s = new_drumsampler(wurds[2]);
                 sgnum = add_sound_generator(mixr, (soundgenerator *)s);
             }
             if (sgnum != -1)

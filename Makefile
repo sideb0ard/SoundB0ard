@@ -22,6 +22,8 @@ SRC = \
 	dca.c \
 	digisynth.c \
 	digisynth_voice.c \
+	drumsampler.c \
+	drumsynth.c \
 	dxsynth.c \
 	dxsynth_voice.c \
 	filterz/filter.c \
@@ -64,7 +66,6 @@ SRC = \
 	qblimited_oscillator.c \
 	reverb.c \
 	sample_oscillator.c \
-	sample_sequencer.c \
 	sbmsg.c \
 	step_sequencer.c \
 	sound_generator.c \
@@ -73,7 +74,6 @@ SRC = \
 	pattern_generators/markov.c \
 	sparkline.c \
 	sequence_engine.c \
-	synthdrum_sequencer.c \
 	synthfunctions.c \
 	table.c \
 	utils.c \

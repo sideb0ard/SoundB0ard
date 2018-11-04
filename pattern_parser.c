@@ -14,7 +14,7 @@
 #include <midimaaan.h>
 #include <mixer.h>
 #include <pattern_parser.h>
-#include <sample_sequencer.h>
+#include <drumsampler.h>
 #include <utils.h>
 
 #define WEE_STACK_SIZE 32
@@ -93,8 +93,8 @@ static bool validate_and_clear_env_var(mixer *mixr, char *var_key)
         {
             if (mixer_is_valid_soundgen_num(mixr, sg_num))
             {
-                sample_sequencer *seq =
-                    (sample_sequencer *)mixr->sound_generators[sg_num];
+                drumsampler *seq =
+                    (drumsampler *)mixr->sound_generators[sg_num];
                 step_clear_pattern(&seq->m_seq, 0);
                 return true;
             }

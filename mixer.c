@@ -20,10 +20,10 @@
 #include "markov.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "sample_sequencer.h"
+#include "drumsampler.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
-#include "synthdrum_sequencer.h"
+#include "drumsynth.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -39,8 +39,8 @@ const wchar_t *s_status_colors[] = {
     WCOOL_COLOR_MAUVE,     // LOOPER_TYPE
     WCOOL_COLOR_YELLOW,    // BITWIZE_TYPE
     WANSI_COLOR_DEEP_RED,  // LOOPER_TYPE
-    WANSI_COLOR_GREEN_TOO, // SEQUENCER_TYPE
-    WANSI_COLOR_MAGENTA,   // SYNTHDRUM_TYPE
+    WANSI_COLOR_GREEN_TOO, // DRUMSAMPLER_TYPE
+    WANSI_COLOR_MAGENTA,   // DRUMSYNTH_TYPE
     WANSI_COLOR_CYAN,      // ALGORITHM_TYPE
     WANSI_COLOR_GREEN,     // CHAOSMONKEY_TYPE
     WANSI_COLOR_BLUE       //
@@ -1195,7 +1195,7 @@ void mixer_check_for_midi_messages(mixer *mixr)
                        "data2:%d\n",
                        status, data1, data2);
 
-            if (mixr->midi_control_destination == SYNTH)
+            if (mixr->midi_control_destination == MIDI_CONTROL_SYNTH_TYPE)
             {
 
                 soundgenerator *sg =
@@ -1219,7 +1219,7 @@ void mixer_check_for_midi_messages(mixer *mixr)
                 ev.delete_after_use = false;
                 midi_parse_midi_event(sg, &ev);
             }
-            else if (mixr->midi_control_destination == DRUMSYNTH)
+            else if (mixr->midi_control_destination == MIDI_CONTROL_DRUMSYNTH_TYPE)
             {
                 soundgenerator *sg =
                     mixr->sound_generators[mixr->active_midi_soundgen_num];

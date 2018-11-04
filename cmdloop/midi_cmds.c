@@ -3,7 +3,7 @@
 
 #include <midi_cmds.h>
 #include <mixer.h>
-#include <synthdrum_sequencer.h>
+#include <drumsynth.h>
 
 extern mixer *mixr;
 
@@ -26,12 +26,12 @@ static void midi_set_destination(mixer *mixr, int soundgen_num)
     {
         if (is_synth(mixr->sound_generators[soundgen_num]))
         {
-            mixr->midi_control_destination = SYNTH;
+            mixr->midi_control_destination = MIDI_CONTROL_SYNTH_TYPE;
             mixr->active_midi_soundgen_num = soundgen_num;
         }
-        else if (mixr->sound_generators[soundgen_num]->type == SYNTHDRUM_TYPE)
+        else if (mixr->sound_generators[soundgen_num]->type == DRUMSYNTH_TYPE)
         {
-            mixr->midi_control_destination = DRUMSYNTH;
+            mixr->midi_control_destination = MIDI_CONTROL_DRUMSYNTH_TYPE;
             mixr->active_midi_soundgen_num = soundgen_num;
         }
     }
@@ -154,7 +154,7 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         else if (strncmp("drum", wurds[1], 4) == 0)
         {
             midi_launch_init(mixr);
-            synthdrum_sequencer *ds = new_synthdrum_seq();
+            drumsynth *ds = new_drumsynth();
             int sg_num = add_sound_generator(mixr, (soundgenerator *)ds);
             if (sg_num != -1)
                 midi_set_destination(mixr, sg_num);

@@ -4,7 +4,6 @@
 #include "fx.h"
 #include "pthread.h"
 #include "sound_generator.h"
-#include <stdbool.h>
 
 typedef enum
 {

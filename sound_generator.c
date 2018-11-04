@@ -159,7 +159,7 @@ bool is_synth(soundgenerator *self)
 
 bool is_stepper(soundgenerator *self)
 {
-    if (self->type == SYNTHDRUM_TYPE || self->type == SEQUENCER_TYPE)
+    if (self->type == DRUMSYNTH_TYPE || self->type == DRUMSAMPLER_TYPE)
         return true;
     return false;
 }

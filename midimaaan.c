@@ -12,8 +12,8 @@
 #include "midimaaan.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "sample_sequencer.h"
-#include "synthdrum_sequencer.h"
+#include "drumsampler.h"
+#include "drumsynth.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -256,9 +256,9 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         }
         }
     }
-    else if (sg->type == SYNTHDRUM_TYPE)
+    else if (sg->type == DRUMSYNTH_TYPE)
     {
-        synthdrum_sequencer *drumsynth = (synthdrum_sequencer *)sg;
+        drumsynth *ds= (drumsynth *)sg;
         // printf("DRUMSYNTH MIDI! Type:%d DATA1:%d DATA2:%d\n", ev->event_type,
         // ev->data1, ev->data2);
         if (ev->event_type == 176)
@@ -273,7 +273,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     // printf("o1 WAV_TYPE! %s -- %d\n",
                     // s_synth_waves[wav_type],
                     //       wav_type);
-                    synthdrum_set_osc_wav(drumsynth, 1, wav_type);
+                    drumsynth_set_osc_wav(ds, 1, wav_type);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
@@ -282,7 +282,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     // printf("o2 WAV_TYPE! %s -- %d\n",
                     // s_synth_waves[wav_type],
                     //       wav_type);
-                    synthdrum_set_osc_wav(drumsynth, 2, wav_type);
+                    drumsynth_set_osc_wav(ds, 2, wav_type);
                 }
                 else if (mixr->midi_bank_num == 2)
                 {
@@ -296,14 +296,14 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     // o1freq
                     double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
                     // printf("o1 FREQ!%f\n", freq);
-                    synthdrum_set_osc_fo(drumsynth, 1, freq);
+                    drumsynth_set_osc_fo(ds, 1, freq);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     // o2freq
                     double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
                     // printf("o2 FREQ!%f\n", freq);
-                    synthdrum_set_osc_fo(drumsynth, 2, freq);
+                    drumsynth_set_osc_fo(ds, 2, freq);
                 }
                 break;
             case (3):
@@ -312,14 +312,14 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                     // o1amp
                     double amp = scaleybum(0, 127, 0., 1., ev->data2);
                     // printf("o1 AMP!%f\n", amp);
-                    synthdrum_set_osc_amp(drumsynth, 1, amp);
+                    drumsynth_set_osc_amp(ds, 1, amp);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     // o1amp
                     double amp = scaleybum(0, 127, 0., 1., ev->data2);
                     // printf("o2 AMP!%f\n", amp);
-                    synthdrum_set_osc_amp(drumsynth, 2, amp);
+                    drumsynth_set_osc_amp(ds, 2, amp);
                 }
                 break;
             case (4):
@@ -327,18 +327,18 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     double intensity = scaleybum(0, 127, 0., 1., ev->data2);
                     // printf("o1 INT!%f\n", intensity);
-                    synthdrum_set_eg_osc_intensity(drumsynth, 1, 1, intensity);
+                    drumsynth_set_eg_osc_intensity(ds, 1, 1, intensity);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     double intensity = scaleybum(0, 127, 0., 1., ev->data2);
-                    synthdrum_set_eg_osc_intensity(drumsynth, 2, 2, intensity);
+                    drumsynth_set_eg_osc_intensity(ds, 2, 2, intensity);
                 }
                 else if (mixr->midi_bank_num == 2)
                 {
                     double distortion_threshold =
                         scaleybum(0, 127, 0.1, 0.9, ev->data2);
-                    synthdrum_set_distortion_threshold(drumsynth,
+                    drumsynth_set_distortion_threshold(ds,
                                                        distortion_threshold);
                 }
                 break;
@@ -347,13 +347,13 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     double ms =
                         scaleybum(0, 128, EG_MINTIME_MS, 800, ev->data2);
-                    synthdrum_set_eg_attack(drumsynth, 1, ms);
+                    drumsynth_set_eg_attack(ds, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     double ms =
                         scaleybum(0, 128, EG_MINTIME_MS, 700, ev->data2);
-                    synthdrum_set_eg_attack(drumsynth, 2, ms);
+                    drumsynth_set_eg_attack(ds, 2, ms);
                 }
                 break;
             case (6):
@@ -361,30 +361,30 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     double ms =
                         scaleybum(0, 128, EG_MINTIME_MS, 2000, ev->data2);
-                    synthdrum_set_eg_decay(drumsynth, 1, ms);
+                    drumsynth_set_eg_decay(ds, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     double ms =
                         scaleybum(0, 128, EG_MINTIME_MS, 1000, ev->data2);
-                    synthdrum_set_eg_decay(drumsynth, 2, ms);
+                    drumsynth_set_eg_decay(ds, 2, ms);
                 }
                 break;
             case (7):
                 if (mixr->midi_bank_num == 0)
                 {
                     double ms = scaleybum(0, 128, 0, 1, ev->data2);
-                    synthdrum_set_eg_sustain_lvl(drumsynth, 1, ms);
+                    drumsynth_set_eg_sustain_lvl(ds, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     double ms = scaleybum(0, 128, 0, 1, ev->data2);
-                    synthdrum_set_eg_sustain_lvl(drumsynth, 2, ms);
+                    drumsynth_set_eg_sustain_lvl(ds, 2, ms);
                 }
                 else if (mixr->midi_bank_num == 2)
                 {
                     double freq = scaleybum(0, 127, 180, 18000, ev->data2);
-                    synthdrum_set_filter_freq(drumsynth, freq);
+                    drumsynth_set_filter_freq(ds, freq);
                 }
                 break;
             case (8):
@@ -392,18 +392,18 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 {
                     double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
                                           ev->data2);
-                    synthdrum_set_eg_release(drumsynth, 1, ms);
+                    drumsynth_set_eg_release(ds, 1, ms);
                 }
                 else if (mixr->midi_bank_num == 1)
                 {
                     double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
                                           ev->data2);
-                    synthdrum_set_eg_release(drumsynth, 2, ms);
+                    drumsynth_set_eg_release(ds, 2, ms);
                 }
                 else if (mixr->midi_bank_num == 2)
                 {
                     double q = scaleybum(0, 127, 1, 8, ev->data2);
-                    synthdrum_set_filter_q(drumsynth, q);
+                    drumsynth_set_filter_q(ds, q);
                 }
                 break;
             }
