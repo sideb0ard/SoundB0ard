@@ -132,7 +132,7 @@ int sequence_engine_add_pattern(sequence_engine *self);
 void sequence_engine_dupe_pattern(midi_pattern *from, midi_pattern *to);
 void sequence_engine_switch_pattern(sequence_engine *self,
                                     unsigned int pattern_num);
-void sequence_engine_stop(sequence_engine *engine);
+//void sequence_engine_stop(sequence_engine *engine);
 void sequence_engine_reset_pattern(sequence_engine *self,
                                    unsigned int pattern_num);
 void sequence_engine_reset_pattern_all(sequence_engine *self);

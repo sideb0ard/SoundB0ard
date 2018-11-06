@@ -613,8 +613,7 @@ void drumsynth_start(void *self)
 void drumsynth_stop(void *self)
 {
     drumsynth *ds = (drumsynth *)self;
-    eg_note_off(&ds->m_eg1);
-    eg_note_off(&ds->m_eg2);
+    ds->sg.active = false;
 }
 
 int drumsynth_get_num_patterns(void *self)

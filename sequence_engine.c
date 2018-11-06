@@ -163,39 +163,39 @@ void sequence_engine_reset_pattern_all(sequence_engine *ms)
     }
 }
 
-void sequence_engine_stop(sequence_engine *engine)
-{
-    if (engine->parent_type == MINISYNTH_TYPE)
-    {
-        minisynth *p = (minisynth *)engine->parent;
-        minisynth_stop(p);
-    }
-    else if (engine->parent_type == DXSYNTH_TYPE)
-    {
-        dxsynth *p = (dxsynth *)engine->parent;
-        dxsynth_stop(p);
-    }
-    else if (engine->parent_type == DIGISYNTH_TYPE)
-    {
-        digisynth *d = (digisynth *)engine->parent;
-        digisynth_stop(d);
-    }
-    else if (engine->parent_type == DRUMSAMPLER_TYPE)
-    {
-        drumsampler *d = (drumsampler *)engine->parent;
-        drumsampler_stop(d);
-    }
-    else if (engine->parent_type == DRUMSYNTH_TYPE)
-    {
-        drumsynth *d = (drumsynth *)engine->parent;
-        drumsynth_stop(d);
-    }
-}
+//void sequence_engine_stop(sequence_engine *engine)
+//{
+//    if (engine->parent_type == MINISYNTH_TYPE)
+//    {
+//        minisynth *p = (minisynth *)engine->parent;
+//        minisynth_stop(p);
+//    }
+//    else if (engine->parent_type == DXSYNTH_TYPE)
+//    {
+//        dxsynth *p = (dxsynth *)engine->parent;
+//        dxsynth_stop(p);
+//    }
+//    else if (engine->parent_type == DIGISYNTH_TYPE)
+//    {
+//        digisynth *d = (digisynth *)engine->parent;
+//        digisynth_stop(d);
+//    }
+//    else if (engine->parent_type == DRUMSAMPLER_TYPE)
+//    {
+//        drumsampler *d = (drumsampler *)engine->parent;
+//        drumsampler_stop(d);
+//    }
+//    else if (engine->parent_type == DRUMSYNTH_TYPE)
+//    {
+//        drumsynth *d = (drumsynth *)engine->parent;
+//        drumsynth_note_off(d);
+//    }
+//}
 
 void sequence_engine_reset_pattern(sequence_engine *engine,
                                    unsigned int pattern_num)
 {
-    sequence_engine_stop(engine);
+    //sequence_engine_stop(engine);
 
     if (pattern_num < MAX_NUM_MIDI_LOOPS)
     {
@@ -260,7 +260,6 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
         }
         else if (engine->multi_pattern_mode && engine->num_patterns > 1)
         {
-            // sequence_engine_stop(engine);
             engine->cur_pattern_iteration--;
             if (engine->cur_pattern_iteration <= 0)
             {
@@ -636,7 +635,7 @@ void sequence_engine_set_pattern(void *self, int pattern_num,
     sequence_engine *engine = (sequence_engine *)self;
     if (is_valid_pattern_num(engine, pattern_num))
     {
-        sequence_engine_stop(engine);
+        //sequence_engine_stop(engine);
         clear_midi_pattern(engine->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {

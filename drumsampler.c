@@ -292,8 +292,7 @@ void drumsampler_start(void *self)
 void drumsampler_stop(void *self)
 {
     drumsampler *ds = (drumsampler *)self;
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
-        ds->samples_now_playing[i] = 0;
+    ds->sound_generator.active = false;
 }
 
 void drumsampler_set_pitch(drumsampler *ds, double v)

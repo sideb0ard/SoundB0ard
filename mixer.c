@@ -1250,6 +1250,11 @@ sequence_engine *get_sequence_engine(soundgenerator *self)
         drumsampler *ds = (drumsampler *)self;
         return &ds->engine;
     }
+    else if (self->type == LOOPER_TYPE)
+    {
+        looper *lp = (looper *)self;
+        return &lp->engine;
+    }
     else
     {
         printf("Error! Don't know what type of SYNTH this is\n");
