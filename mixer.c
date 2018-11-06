@@ -12,6 +12,8 @@
 #include "bitshift.h"
 #include "defjams.h"
 #include "digisynth.h"
+#include "drumsampler.h"
+#include "drumsynth.h"
 #include "dxsynth.h"
 #include "envelope.h"
 #include "euclidean.h"
@@ -20,10 +22,8 @@
 #include "markov.h"
 #include "minisynth.h"
 #include "mixer.h"
-#include "drumsampler.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
-#include "drumsynth.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -1195,7 +1195,8 @@ void mixer_check_for_midi_messages(mixer *mixr)
                 ev.delete_after_use = false;
                 midi_parse_midi_event(sg, &ev);
             }
-            else if (mixr->midi_control_destination == MIDI_CONTROL_DRUMSYNTH_TYPE)
+            else if (mixr->midi_control_destination ==
+                     MIDI_CONTROL_DRUMSYNTH_TYPE)
             {
                 soundgenerator *sg =
                     mixr->sound_generators[mixr->active_midi_soundgen_num];
@@ -1261,4 +1262,3 @@ sequence_engine *get_sequence_engine(soundgenerator *self)
         return NULL;
     }
 }
-

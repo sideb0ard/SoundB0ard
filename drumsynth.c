@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "mixer.h"
 #include "drumsynth.h"
+#include "mixer.h"
 #include "utils.h"
 
 extern char *state_strings;
@@ -85,7 +85,7 @@ drumsynth *new_drumsynth()
 
     drumsynth_start(ds);
 
-    //printf("DRUMSYNTH ACTIVE: %s\n", ds->sg.active ? "true" : "false");
+    // printf("DRUMSYNTH ACTIVE: %s\n", ds->sg.active ? "true" : "false");
 
     return ds;
 }
@@ -200,7 +200,7 @@ void drumsynth_setvol(void *self, double v)
     return;
 }
 
-//void drumsynth_event_notify(void *self, unsigned int event_type)
+// void drumsynth_event_notify(void *self, unsigned int event_type)
 //{
 //    drumsynth *ds = (drumsynth *)self;
 //
@@ -452,8 +452,7 @@ void drumsynth_del_self(void *self)
     free(ds);
 }
 
-void drumsynth_set_osc_wav(drumsynth *ds, int osc_num,
-                           unsigned int wave)
+void drumsynth_set_osc_wav(drumsynth *ds, int osc_num, unsigned int wave)
 {
     if (!(wave < MAX_OSC))
     {
@@ -529,8 +528,7 @@ void drumsynth_set_eg_decay(drumsynth *ds, int eg_num, double val)
                EG_MAXTIME_MS);
 }
 
-void drumsynth_set_eg_sustain_lvl(drumsynth *ds, int eg_num,
-                                  double val)
+void drumsynth_set_eg_sustain_lvl(drumsynth *ds, int eg_num, double val)
 {
     if (val >= 0. && val <= 1.)
     {
@@ -567,8 +565,7 @@ void drumsynth_set_eg_release(drumsynth *ds, int eg_num, double val)
                EG_MAXTIME_MS);
 }
 
-void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc,
-                                    double val)
+void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc, double val)
 {
     if (val >= -1 && val <= 1)
     {
@@ -677,11 +674,5 @@ void drumsynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
         sequence_engine_set_pattern(engine, pattern_num, pattern);
 }
 
-void drumsynth_set_reset_osc(drumsynth *ds, bool b)
-{
-    ds->reset_osc = b;
-}
-void drumsynth_set_debug(drumsynth *ds, bool debug)
-{
-    ds->debug = debug;
-}
+void drumsynth_set_reset_osc(drumsynth *ds, bool b) { ds->reset_osc = b; }
+void drumsynth_set_debug(drumsynth *ds, bool debug) { ds->debug = debug; }

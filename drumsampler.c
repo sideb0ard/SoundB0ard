@@ -99,7 +99,7 @@ void drumsampler_reset_samples(drumsampler *ds)
     }
 }
 
-//void drumsampler_event_notify(void *self, unsigned int event_type)
+// void drumsampler_event_notify(void *self, unsigned int event_type)
 //{
 //    drumsampler *ds = (drumsampler *)self;
 //
@@ -194,7 +194,7 @@ stereo_val drumsampler_gennext(void *self)
                         .right = right_val * ds->vol};
 }
 
-//drumsampler *new_drumsampler_from_char_pattern(char *filename, char *pattern)
+// drumsampler *new_drumsampler_from_char_pattern(char *filename, char *pattern)
 //{
 //    drumsampler *ds = new_drumsampler(filename);
 //    pattern_char_to_pattern(&ds->m_seq, pattern,

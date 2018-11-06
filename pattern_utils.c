@@ -194,7 +194,7 @@ void set_pattern_to_self_destruct(midi_event *pattern)
 
 void pattern_replace(midi_event *src_pattern, midi_event *dst_pattern)
 {
-    if(src_pattern && dst_pattern)
+    if (src_pattern && dst_pattern)
     {
         clear_midi_pattern(dst_pattern);
         for (int i = 0; i < PPBAR; ++i)

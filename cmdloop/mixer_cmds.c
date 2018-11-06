@@ -19,6 +19,9 @@ extern char *chord_type_names[NUM_CHORD_TYPES];
 
 extern wtable *wave_tables[5];
 
+#define MAX_APPLY_TARGETS 5
+#define MAX_MODIFIERS 5
+
 bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
 
@@ -30,7 +33,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (bpm > 0)
             mixer_update_bpm(mixr, bpm);
 
-        cmd_found = true;
+        goto cmd_found;
     }
     // individual status types
     else if (strncmp("patz", wurds[0], 4) == 0)
@@ -65,7 +68,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int bars = atoi(wurds[1]);
         mixer_set_bars_per_chord(mixr, bars);
 
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("every", wurds[0], 5) == 0 ||
              strncmp("over", wurds[0], 4) == 0 ||
@@ -75,7 +78,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (a)
             mixer_add_algorithm(mixr, a);
 
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("pl", wurds[0], 2) == 0 ||
@@ -87,7 +90,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("PLAY YO preview! %s\n", wurds[1]);
             mixer_preview_audio(mixr, wurds[1]);
         }
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("fuckup", wurds[0], 6) == 0)
@@ -105,7 +108,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (a)
             mixer_add_algorithm(mixr, a);
 
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("brak", wurds[0], 4) == 0)
@@ -123,7 +126,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 brak(pattern);
             }
         }
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("prog", wurds[0], 4) == 0)
     {
@@ -147,7 +150,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         default:
             printf("nae danger, mate, quantize yer heid..\n");
         }
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("randamp", wurds[0], 7) == 0)
@@ -164,7 +167,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 midi_pattern_rand_amp(pattern);
             }
         }
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("sweep", wurds[0], 5) == 0)
     {
@@ -183,53 +186,82 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 mixer_add_algorithm(mixr, a);
         }
 
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("apply", wurds[0], 6) == 0)
     {
         int pg_num = atoi(wurds[1]);
+        if (!mixer_is_valid_pattern_gen_num(mixr, pg_num))
+        {
+            printf("bogey!\n");
+            goto cmd_found;
+        }
+        typedef struct
+        {
+            int sg_num;
+            int sg_pattern_num;
+        } Dest;
+        Dest dests[MAX_APPLY_TARGETS] = {0};
+        int num_dests = 0;
         int dest_sg_num = -1;
         int dest_sg_pattern_num = -1;
-        sscanf(wurds[2], "%d:%d", &dest_sg_num, &dest_sg_pattern_num);
-
-        if (mixer_is_valid_soundgen_num(mixr, dest_sg_num) &&
-            mixer_is_valid_pattern_gen_num(mixr, pg_num) &&
-            dest_sg_pattern_num != -1)
+        int wurd_idx = 2; // next wurds[i]
+        while (sscanf(wurds[wurd_idx], "%d:%d", &dest_sg_num,
+                      &dest_sg_pattern_num) == 2 &&
+               wurd_idx++ < num_wurds && num_dests < MAX_APPLY_TARGETS)
         {
+            dests[num_dests].sg_num = dest_sg_num;
+            dests[num_dests].sg_pattern_num = dest_sg_pattern_num;
+            num_dests++;
+        }
 
-            pattern_generator *pg = mixr->pattern_generators[pg_num];
-            uint16_t bitpattern = pg->generate(pg, NULL);
-
-            midi_event midi_pattern[PPBAR] = {};
-            apply_short_to_midi_pattern(bitpattern,
-                                        (midi_event *)&midi_pattern);
-
-            soundgenerator *sg = mixr->sound_generators[dest_sg_num];
-            sg->set_pattern(sg, 0, (midi_event *)&midi_pattern);
-
-            bool num_wurds_is_odd = num_wurds % 2 == 1;
-            if (num_wurds >= 5 && num_wurds_is_odd)
+        typedef struct
+        {
+            char name[20];
+        } modifier;
+        modifier mods[MAX_MODIFIERS] = {0};
+        int num_modifiers = 0;
+        int num_wurds_left = num_wurds - 1 - wurd_idx;
+        bool num_wurds_left_is_odd = num_wurds_left % 2 == 1;
+        if (num_wurds_left > 0 && num_wurds_left_is_odd)
+        {
+            for (int i = wurd_idx; strncmp("#", wurds[i], 1) == 0 &&
+                                   num_modifiers < MAX_MODIFIERS;
+                 i += 2)
             {
-                for (int i = 3; strncmp("#", wurds[i], 1) == 0; i += 2)
+                strncpy(mods[num_modifiers++].name, wurds[i + 1], 19);
+            }
+        }
+
+        pattern_generator *pg = mixr->pattern_generators[pg_num];
+        uint16_t bitpattern = pg->generate(pg, NULL);
+
+        midi_event midi_pattern[PPBAR] = {};
+        apply_short_to_midi_pattern(bitpattern, (midi_event *)&midi_pattern);
+
+        for (int i = 0; i < num_dests; i++)
+        {
+            if (mixer_is_valid_soundgen_num(mixr, dests[i].sg_num))
+            {
+                soundgenerator *sg = mixr->sound_generators[dests[i].sg_num];
+                sg->set_pattern(sg, dests[i].sg_pattern_num,
+                                (midi_event *)&midi_pattern);
+
+                sequence_engine *engine = get_sequence_engine(sg);
+                for (int j = 0; j < num_modifiers; j++)
                 {
-                    char *wurd = wurds[i + 1];
-                    if (strncmp("once", wurd, 4) == 0)
+                    char *mod = mods[j].name;
+                    if (strncmp("once", mod, 4) == 0)
                         set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
-                    if (is_synth(sg))
-                    {
-                        sequence_engine *engine = get_sequence_engine(sg);
-                        if (strncmp("riff", wurd, 4) == 0)
-                            sequence_engine_set_pattern_to_riff(engine);
-                        if (strncmp("melody", wurd, 6) == 0)
-                            sequence_engine_set_pattern_to_melody(engine);
-                        if (strncmp("sparse", wurd, 6) == 0)
-                            sequence_engine_set_num_patterns(engine, 2);
-                    }
+                    else if (strncmp("riff", mod, 4) == 0)
+                        sequence_engine_set_pattern_to_riff(engine);
+                    else if (strncmp("melody", mod, 6) == 0)
+                        sequence_engine_set_pattern_to_melody(engine);
+                    else if (strncmp("sparse", mod, 6) == 0)
+                        sequence_engine_set_num_patterns(engine, 2);
                 }
             }
         }
-        else
-            printf("SUMMIT AINT VALID: SG:%d PG:%d\n", dest_sg_num, pg_num);
     }
 
     else if (strncmp("keys", wurds[0], 4) == 0)
@@ -240,7 +272,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("%d [%s] ", i, key);
         }
         printf("\n");
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("key", wurds[0], 3) == 0)
     {
@@ -281,7 +313,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             mixr->key = B;
 
         mixer_set_notes(mixr);
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("octave", wurds[0], 6) == 0)
     {
@@ -296,7 +328,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         get_midi_notes_from_chord(mixr->chord, mixr->chord_type, mixr->octave,
                                   &chnotes);
         printf("%d %d %d\n", chnotes.root, chnotes.third, chnotes.fifth);
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("chords", wurds[0], 6) == 0)
     {
@@ -305,7 +337,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         for (int i = 0; i < 8; i++)
             printf("%s %s\n", key_names[mixr->notes[i]],
                    chord_type_names[get_chord_type(i)]);
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("chord", wurds[0], 5) == 0)
     {
@@ -343,7 +375,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     right_shift(pattern, places_to_shift);
             }
         }
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("debug", wurds[0], 5) == 0)
@@ -360,7 +392,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("Disabling debug mode\n");
             mixr->debug_mode = false;
         }
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("ps", wurds[0], 2) == 0)
@@ -372,7 +404,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         else
             mixer_ps(mixr, false);
 
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("quiet", wurds[0], 5) == 0 ||
@@ -380,12 +412,12 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         for (int i = 0; i < mixr->soundgen_num; i++)
             mixr->sound_generators[i]->setvol(mixr->sound_generators[i], 0.0);
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("ls", wurds[0], 2) == 0)
     {
         list_sample_dir(wurds[1]);
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("rm", wurds[0], 3) == 0)
@@ -396,7 +428,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("Deleting SOUND GEN %d\n", soundgen_num);
             mixer_del_soundgen(mixr, soundgen_num);
         }
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("start", wurds[0], 5) == 0)
     {
@@ -418,7 +450,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 sg->start(sg);
             }
         }
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("invert", wurds[0], 6) == 0 ||
              strncmp("blend", wurds[0], 5) == 0)
@@ -464,8 +496,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             apply_short_to_midi_pattern(pattern_2, pattern);
             s2->set_pattern(s2, sg1_track_num, pattern);
         }
-
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("stop", wurds[0], 5) == 0)
     {
@@ -487,7 +518,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 sg->stop(sg);
             }
         }
-        cmd_found = true;
+        goto cmd_found;
     }
     else if (strncmp("down", wurds[0], 4) == 0 ||
              strncmp("up", wurds[0], 3) == 0)
@@ -507,7 +538,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             thrunner(msg);
         }
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("vol", wurds[0], 3) == 0)
@@ -526,7 +557,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 vol_change(mixr, soundgen_num, vol);
             }
         }
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("scene", wurds[0], 5) == 0)
@@ -622,28 +653,30 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
             }
         }
-        cmd_found = true;
+        goto cmd_found;
     }
     // PROGRAMMING CMDS
     else if (strncmp("var", wurds[0], 3) == 0 && strncmp("=", wurds[2], 1) == 0)
     {
         printf("Oooh! %s = %s\n", wurds[1], wurds[3]);
         update_environment(wurds[1], atoi(wurds[3]));
-        cmd_found = true;
+        goto cmd_found;
     }
 
     // UTILS
     else if (strncmp("chord", wurds[0], 6) == 0)
     {
         chordie(wurds[1]);
-        cmd_found = true;
+        goto cmd_found;
     }
 
     else if (strncmp("strategy", wurds[0], 8) == 0)
     {
         oblique_strategy();
-        cmd_found = true;
+        goto cmd_found;
     }
 
-    return cmd_found;
+    return false;
+cmd_found:
+    return true;
 }

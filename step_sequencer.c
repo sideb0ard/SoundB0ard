@@ -41,7 +41,7 @@ void step_init(step_sequencer *seq)
     seq->visualize = false;
 }
 
-//void step_tick(step_sequencer *seq)
+// void step_tick(step_sequencer *seq)
 //{
 //    if (mixr->timing_info.sixteenth_note_tick != seq->sixteenth_tick)
 //    {

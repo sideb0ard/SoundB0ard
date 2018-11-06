@@ -163,7 +163,7 @@ void sequence_engine_reset_pattern_all(sequence_engine *ms)
     }
 }
 
-//void sequence_engine_stop(sequence_engine *engine)
+// void sequence_engine_stop(sequence_engine *engine)
 //{
 //    if (engine->parent_type == MINISYNTH_TYPE)
 //    {
@@ -195,7 +195,7 @@ void sequence_engine_reset_pattern_all(sequence_engine *ms)
 void sequence_engine_reset_pattern(sequence_engine *engine,
                                    unsigned int pattern_num)
 {
-    //sequence_engine_stop(engine);
+    // sequence_engine_stop(engine);
 
     if (pattern_num < MAX_NUM_MIDI_LOOPS)
     {
@@ -635,7 +635,7 @@ void sequence_engine_set_pattern(void *self, int pattern_num,
     sequence_engine *engine = (sequence_engine *)self;
     if (is_valid_pattern_num(engine, pattern_num))
     {
-        //sequence_engine_stop(engine);
+        // sequence_engine_stop(engine);
         clear_midi_pattern(engine->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {

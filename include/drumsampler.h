@@ -1,8 +1,8 @@
 #pragma once
 
 #include "filter_moogladder.h"
-#include "sound_generator.h"
 #include "sequence_engine.h"
+#include "sound_generator.h"
 #include "stereodelay.h"
 
 #include <sndfile.h>
@@ -57,7 +57,7 @@ typedef struct drumsampler
 
 drumsampler *new_drumsampler(char *filename);
 // drumsampler *new_drumsampler_from_char_pattern(char *filename,
-                                                   //char *pattern);
+// char *pattern);
 // drumsampler *new_drumsampler_from_int_pattern(char *filename, int pattern);
 // drumsampler *new_drumsampler_from_char_array(char *filename, char **pattern,
 //                                                  int nsteps);
@@ -83,6 +83,5 @@ void drumsampler_set_pattern(void *self, int pattern_num, midi_event *pattern);
 void drumsampler_import_file(drumsampler *s, char *filename);
 void drumsampler_reset_samples(drumsampler *seq);
 void drumsampler_set_pitch(drumsampler *seq, double v);
-void drumsampler_set_cutoff_percent(drumsampler *seq,
-                                         unsigned int percent);
+void drumsampler_set_cutoff_percent(drumsampler *seq, unsigned int percent);
 void drumsampler_note_on(drumsampler *ds);

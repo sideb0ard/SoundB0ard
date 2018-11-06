@@ -30,11 +30,11 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 looper *g = (looper *)mixr->sound_generators[soundgen_num];
 
-            if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num,
-                                          &wurds[2], num_wurds - 2))
-            {
-                // no-op, we good
-            }
+                if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num,
+                                              &wurds[2], num_wurds - 2))
+                {
+                    // no-op, we good
+                }
                 else
                 {
                     if (strncmp("gate_mode", wurds[2], 9) == 0)

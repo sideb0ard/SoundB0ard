@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <drumsynth.h>
 #include <midi_cmds.h>
 #include <mixer.h>
-#include <drumsynth.h>
 
 extern mixer *mixr;
 

@@ -10,11 +10,11 @@
 
 #include <cmdloop.h>
 #include <defjams.h>
+#include <drumsampler.h>
 #include <euclidean.h>
 #include <midimaaan.h>
 #include <mixer.h>
 #include <pattern_parser.h>
-#include <drumsampler.h>
 #include <utils.h>
 
 #define WEE_STACK_SIZE 32

@@ -5,8 +5,8 @@
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
-#include "sound_generator.h"
 #include "sequence_engine.h"
+#include "sound_generator.h"
 
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/drumsynthpatches.dat";
@@ -78,17 +78,14 @@ void drumsynth_trigger(drumsynth *ds);
 bool drumsynth_save_patch(drumsynth *ds, char *name);
 bool drumsynth_open_patch(drumsynth *ds, char *name);
 bool drumsynth_list_patches(void);
-void drumsynth_set_osc_wav(drumsynth *ds, int osc_num,
-                           unsigned int wave);
+void drumsynth_set_osc_wav(drumsynth *ds, int osc_num, unsigned int wave);
 void drumsynth_set_osc_fo(drumsynth *ds, int osc_num, double freq);
 void drumsynth_set_reset_osc(drumsynth *ds, bool b);
 void drumsynth_set_eg_attack(drumsynth *ds, int eg_num, double val);
 void drumsynth_set_eg_decay(drumsynth *ds, int eg_num, double val);
-void drumsynth_set_eg_sustain_lvl(drumsynth *ds, int eg_num,
-                                  double val);
+void drumsynth_set_eg_sustain_lvl(drumsynth *ds, int eg_num, double val);
 void drumsynth_set_eg_release(drumsynth *ds, int eg_num, double val);
-void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc,
-                                    double val);
+void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc, double val);
 void drumsynth_set_osc_amp(drumsynth *ds, int osc_num, double val);
 void drumsynth_set_distortion_threshold(drumsynth *ds, double val);
 void drumsynth_set_filter_freq(drumsynth *ds, double val);

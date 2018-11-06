@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <cmdloop.h>
+#include <cmdloop/sequence_engine_cmds.h>
 #include <digisynth.h>
 #include <dxsynth.h>
 #include <midimaaan.h>
@@ -10,7 +11,6 @@
 #include <pattern_parser.h>
 #include <synth_cmds.h>
 #include <utils.h>
-#include <cmdloop/sequence_engine_cmds.h>
 
 extern mixer *mixr;
 bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
@@ -626,4 +626,3 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
 
     return to_update;
 }
-
