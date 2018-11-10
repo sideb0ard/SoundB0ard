@@ -55,6 +55,11 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             bool b = atoi(wurds[1]);
             sequence_engine_set_chord_mode(engine, b);
         }
+        else if (strncmp("follow", wurds[0], 6) == 0)
+        {
+            bool b = atoi(wurds[1]);
+            sequence_engine_set_follow_mixer_chords(engine, b);
+        }
         else if (strncmp("single_note_mode", wurds[0], 9) == 0)
         {
             bool b = atoi(wurds[1]);

@@ -108,6 +108,7 @@ typedef struct sequence_engine
 
     uint16_t event_mask;
     bool enable_event_mask;
+    bool follow_mixer_chord_changes;
 
 } sequence_engine;
 
@@ -197,6 +198,7 @@ void sequence_engine_do_arp(sequence_engine *engine, soundgenerator *sg);
 int arp_next_note(arpeggiator *arp);
 void arp_add_last_note(arpeggiator *arp, int note);
 
+void sequence_engine_set_follow_mixer_chords(sequence_engine *engine, bool b);
 void sequence_engine_set_event_mask(sequence_engine *engine, uint16_t mask);
 void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b);
 bool sequence_engine_is_masked(sequence_engine *engine);

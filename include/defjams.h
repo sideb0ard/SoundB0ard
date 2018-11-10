@@ -201,6 +201,7 @@ typedef enum time_event
     TIME_QUARTER_TICK,
     TIME_START_OF_LOOP_TICK,
     TIME_BPM_CHANGE,
+    TIME_CHORD_CHANGE,
 } time_event;
 
 typedef struct stereo_val

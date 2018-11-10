@@ -1090,6 +1090,7 @@ void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
     {
         mixr->chord = root;
         mixr->chord_type = chord_type;
+        mixer_emit_event(mixr, TIME_CHORD_CHANGE);
     }
 }
 

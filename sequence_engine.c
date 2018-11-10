@@ -52,6 +52,7 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
 
     engine->sustain_note_ms = 200;
     engine->single_note_mode = false;
+    engine->follow_mixer_chord_changes = true;
     engine->started = false;
 }
 
@@ -212,11 +213,13 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
     swprintf(
         scratch, 255,
         L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
-        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d\n"
+        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d\n"
         L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->midi_note_1, engine->midi_note_2,
-        engine->midi_note_3, engine->arp.enable, engine->arp.last_midi_notes[0],
+        engine->midi_note_3,
+        engine->follow_mixer_chord_changes,
+        engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
         s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
         engine->swing_setting);
@@ -303,6 +306,10 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
     case (TIME_QUARTER_TICK):
         if (engine->arp.enable && engine->arp.speed == ARP_4)
             sequence_engine_do_arp(engine, parent);
+        break;
+    case (TIME_CHORD_CHANGE):
+        if (engine->follow_mixer_chord_changes)
+            sequence_engine_set_pattern_to_melody(engine);
         break;
     }
 }
@@ -848,4 +855,8 @@ void sequence_engine_set_swing_setting(sequence_engine *engine,
                                        int swing_setting)
 {
     engine->swing_setting = swing_setting;
+}
+void sequence_engine_set_follow_mixer_chords(sequence_engine *engine, bool b)
+{
+    engine->follow_mixer_chord_changes = b;
 }
