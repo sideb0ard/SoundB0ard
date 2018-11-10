@@ -21,8 +21,6 @@ void osc_new_settings(oscillator *osc)
     osc->m_pulse_width_control = OSC_PULSEWIDTH_DEFAULT; // GUI
     osc->m_fo = OSC_FO_DEFAULT;
 
-    // --- seed the random number generator
-    srand(time(NULL));
     osc->m_pn_register = rand();
 
     // --- continue inits
