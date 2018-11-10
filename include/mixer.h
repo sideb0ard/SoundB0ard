@@ -16,7 +16,6 @@
 #include "pattern_generator.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
-#include "step_sequencer.h"
 #include "table.h"
 
 #define MAX_SCENES 100

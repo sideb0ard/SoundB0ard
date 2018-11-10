@@ -152,11 +152,23 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             int sample_rate = atoi(wurds[1]);
             sequence_engine_set_sample_rate(engine, sample_rate);
         }
+        else if (strncmp("mask_every", wurds[0], 10) == 0)
+        {
+            int every_n = atoi(wurds[1]);
+            sequence_engine_set_mask_every(engine, every_n);
+        }
         else if (strncmp("mask", wurds[0], 4) == 0)
         {
             uint16_t mask = mask_from_string(wurds[1]);
             printf("Mask is %d\n", mask);
-            sequence_engine_set_event_mask(engine, mask);
+            int mask_every_n = 1;
+            if (strncmp("every", wurds[2], 5) == 0)
+            {
+                int every_n = atoi(wurds[3]);
+                if (every_n)
+                    mask_every_n = every_n;
+            }
+            sequence_engine_set_event_mask(engine, mask, mask_every_n);
         }
         else if (strncmp("switch", wurds[0], 6) == 0 ||
                  strncmp("cur_pattern", wurds[2], 9) == 0)

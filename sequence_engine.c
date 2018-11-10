@@ -55,6 +55,11 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
     engine->chord_mode = false;
     engine->follow_mixer_chord_changes = true;
     engine->started = false;
+
+    engine->enable_event_mask = false;
+    engine->event_mask = 0;
+    engine->mask_every_n = 1;
+    engine->event_mask_counter = 0;
 }
 
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine)
@@ -210,8 +215,8 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
     memset(scratch, 0, 256);
     memset(patternstr, 0, 33);
     mask_to_string(engine->event_mask, patternstr);
-    swprintf(scratch, 255, L"\n     %ls  mask (%d)", patternstr,
-             engine->event_mask);
+    swprintf(scratch, 255, L"\n     %ls  mask (%d) mask_every %d", patternstr,
+             engine->event_mask, engine->mask_every_n);
     wcscat(status_string, scratch);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
@@ -229,6 +234,7 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
         engine->started = true;
+        engine->event_mask_counter++;
         if (engine->restore_pending)
         {
             sequence_engine_dupe_pattern(
@@ -806,9 +812,11 @@ void sequence_engine_change_octave_midi_notes(sequence_engine *engine,
     }
 }
 
-void sequence_engine_set_event_mask(sequence_engine *engine, uint16_t mask)
+void sequence_engine_set_event_mask(sequence_engine *engine, uint16_t mask,
+                                    int mask_every_n)
 {
     engine->event_mask = mask;
+    engine->mask_every_n = mask_every_n;
 }
 
 void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b)
@@ -816,15 +824,24 @@ void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b)
     engine->enable_event_mask = b;
 }
 
+void sequence_engine_set_mask_every(sequence_engine *engine, int mask_every_n)
+{
+    engine->mask_every_n = mask_every_n;
+}
+
 bool sequence_engine_is_masked(sequence_engine *engine)
 {
     bool is_masked = false;
-    int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
-    int cur_bit = 1 << (15 - cur_sixteenth);
-    if (cur_bit & engine->event_mask)
-        is_masked = true;
+    if (engine->event_mask_counter % engine->mask_every_n == 0)
+    {
+        int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
+        int cur_bit = 1 << (15 - cur_sixteenth);
+        if (cur_bit & engine->event_mask)
+            is_masked = true;
+    }
     return is_masked;
 }
+
 void sequence_engine_set_swing_setting(sequence_engine *engine,
                                        int swing_setting)
 {

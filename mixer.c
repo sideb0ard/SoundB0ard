@@ -612,28 +612,35 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 
         if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
         {
-            if (mixr->timing_info.midi_tick % PPBAR == 0)
+            int current_tick_within_bar = mixr->timing_info.midi_tick % PPBAR;
+            int chance = rand() % 100;
+            bool change_chord = false;
+            if (current_tick_within_bar == 0)
             {
-                // printf("Start of bar!\n");
-                mixr->bar_counter++;
-                if (mixr->bar_counter % mixr->bars_per_chord == 0)
-                {
-                    unsigned int scale_degree =
-                        mixr->prog_degrees[mixr->prog_degrees_idx];
-                    mixr->prog_degrees_idx =
-                        (mixr->prog_degrees_idx + 1) % mixr->prog_len;
-                    // int chance = rand() % 100;
-                    // unsigned int scale_degree = 0;
-                    unsigned int root = mixr->notes[scale_degree];
-                    unsigned int chord_type = get_chord_type(scale_degree);
-                    mixer_change_chord(mixr, root, chord_type);
-                }
+                if (chance > 75)
+                    change_chord = true;
             }
-            // if (first_run)
-            //{
-            //    mixer_print_timing_info(mixr);
-            //    first_run = false;
-            //}
+            else if (current_tick_within_bar == PPQN * 2)
+            {
+                if (chance > 97)
+                    change_chord = true;
+            }
+            else if (current_tick_within_bar == PPQN * 3)
+            {
+                if (chance > 99)
+                    change_chord = true;
+            }
+            if (change_chord)
+            {
+                unsigned int scale_degree =
+                    mixr->prog_degrees[mixr->prog_degrees_idx];
+                mixr->prog_degrees_idx =
+                    (mixr->prog_degrees_idx + 1) % mixr->prog_len;
+                unsigned int root = mixr->notes[scale_degree];
+                unsigned int chord_type = get_chord_type(scale_degree);
+                mixer_change_chord(mixr, root, chord_type);
+            }
+
             mixer_events_output(mixr);
         }
 

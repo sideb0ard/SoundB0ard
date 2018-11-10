@@ -9,7 +9,6 @@
 #include "defjams.h"
 #include "drumsampler.h"
 #include "mixer.h"
-#include "step_sequencer.h"
 #include "utils.h"
 
 extern wchar_t *sparkchars;
