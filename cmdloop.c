@@ -135,45 +135,6 @@ int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)
     return num_wurds;
 }
 
-void char_array_to_seq_string_pattern(step_sequencer *seq, char *dest_pattern,
-                                      char char_array[NUM_WURDS][SIZE_OF_WURD],
-                                      int start, int end)
-{
-    if (strncmp("all24", char_array[start], 5) == 0)
-    {
-        strncat(dest_pattern,
-                "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23",
-                150);
-    }
-    else if (strncmp("all", char_array[start], 3) == 0)
-    {
-        if (seq->pattern_len == 24)
-        {
-            strncat(dest_pattern,
-                    "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 "
-                    "15 16 17 18 19 20 21 22 23",
-                    150);
-        }
-        else
-        {
-            strncat(dest_pattern, "0 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15", 127);
-        }
-    }
-    else if (strncmp("none", char_array[start], 4) == 0)
-    {
-        // no-op
-    }
-    else
-    {
-        for (int i = start; i < end; i++)
-        {
-            strcat(dest_pattern, char_array[i]);
-            if (i != (end - 1))
-                strcat(dest_pattern, " ");
-        }
-    }
-}
-
 int exxit()
 {
     printf(COOL_COLOR_PINK
