@@ -186,7 +186,7 @@ midi_event *sequence_engine_get_pattern(sequence_engine *engine,
 void sequence_engine_set_pattern(void *self, int pattern_num,
                                  midi_event *pattern);
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine);
-void sequence_engine_set_pattern_to_melody(sequence_engine *engine);
+void sequence_engine_set_pattern_to_current_key(sequence_engine *engine);
 
 void sequence_engine_set_octave(sequence_engine *engine, int octave);
 int sequence_engine_get_octave(sequence_engine *engine);

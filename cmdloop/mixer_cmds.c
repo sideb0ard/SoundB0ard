@@ -253,12 +253,12 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     char *mod = mods[j].name;
                     if (strncmp("once", mod, 4) == 0)
                         set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
-                    else if (strncmp("riff", mod, 4) == 0)
-                        sequence_engine_set_pattern_to_riff(engine);
-                    else if (strncmp("melody", mod, 6) == 0)
-                        sequence_engine_set_pattern_to_melody(engine);
-                    else if (strncmp("sparse", mod, 6) == 0)
-                        sequence_engine_set_num_patterns(engine, 2);
+                    //else if (strncmp("riff", mod, 4) == 0)
+                    //    sequence_engine_set_pattern_to_riff(engine);
+                    //else if (strncmp("melody", mod, 6) == 0)
+                    //    sequence_engine_set_pattern_to_key(engine);
+                    //else if (strncmp("sparse", mod, 6) == 0)
+                    //    sequence_engine_set_num_patterns(engine, 2);
                 }
             }
         }

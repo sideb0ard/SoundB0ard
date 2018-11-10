@@ -51,7 +51,8 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
         engine->arp.last_midi_notes[i] = -1;
 
     engine->sustain_note_ms = 200;
-    engine->single_note_mode = false;
+    engine->single_note_mode = false; // opposite is melody mode
+    engine->chord_mode = false;
     engine->follow_mixer_chord_changes = true;
     engine->started = false;
 }
@@ -74,7 +75,7 @@ void sequence_engine_set_pattern_to_riff(sequence_engine *engine)
     }
 }
 
-void sequence_engine_set_pattern_to_melody(sequence_engine *engine)
+void sequence_engine_set_pattern_to_current_key(sequence_engine *engine)
 {
     midi_event *midi_pattern = engine->patterns[engine->cur_pattern];
 
@@ -89,29 +90,35 @@ void sequence_engine_set_pattern_to_melody(sequence_engine *engine)
         if (ev->event_type == MIDI_ON || ev->event_type == MIDI_OFF)
         {
 
-            if (i < PPQN || i > PPBAR - PPQN)
-                midi_note = chnotes.root;
+            if (engine->single_note_mode)
+                ev->data1 = chnotes.root;
             else
             {
-                int randy = rand() % 3;
-                switch (randy)
-                {
-                case (0):
+
+                if (i < PPQN || i > PPBAR - PPQN)
                     midi_note = chnotes.root;
-                    break;
-                case (1):
-                    midi_note = chnotes.third;
-                    break;
-                case (2):
-                    midi_note = chnotes.fifth;
-                    break;
+                else
+                {
+                    int randy = rand() % 3;
+                    switch (randy)
+                    {
+                    case (0):
+                        midi_note = chnotes.root;
+                        break;
+                    case (1):
+                        midi_note = chnotes.third;
+                        break;
+                    case (2):
+                        midi_note = chnotes.fifth;
+                        break;
+                    }
                 }
+
+                if (rand() % 100 > 90)
+                    midi_note += 12; // up an octave
+
+                ev->data1 = midi_note;
             }
-
-            if (rand() % 100 > 90)
-                midi_note += 12; // up an octave
-
-            ev->data1 = midi_note;
         }
     }
 }
@@ -164,40 +171,9 @@ void sequence_engine_reset_pattern_all(sequence_engine *ms)
     }
 }
 
-// void sequence_engine_stop(sequence_engine *engine)
-//{
-//    if (engine->parent_type == MINISYNTH_TYPE)
-//    {
-//        minisynth *p = (minisynth *)engine->parent;
-//        minisynth_stop(p);
-//    }
-//    else if (engine->parent_type == DXSYNTH_TYPE)
-//    {
-//        dxsynth *p = (dxsynth *)engine->parent;
-//        dxsynth_stop(p);
-//    }
-//    else if (engine->parent_type == DIGISYNTH_TYPE)
-//    {
-//        digisynth *d = (digisynth *)engine->parent;
-//        digisynth_stop(d);
-//    }
-//    else if (engine->parent_type == DRUMSAMPLER_TYPE)
-//    {
-//        drumsampler *d = (drumsampler *)engine->parent;
-//        drumsampler_stop(d);
-//    }
-//    else if (engine->parent_type == DRUMSYNTH_TYPE)
-//    {
-//        drumsynth *d = (drumsynth *)engine->parent;
-//        drumsynth_note_off(d);
-//    }
-//}
-
 void sequence_engine_reset_pattern(sequence_engine *engine,
                                    unsigned int pattern_num)
 {
-    // sequence_engine_stop(engine);
-
     if (pattern_num < MAX_NUM_MIDI_LOOPS)
     {
         memset(engine->patterns[pattern_num], 0, sizeof(midi_pattern));
@@ -217,8 +193,7 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
         L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->midi_note_1, engine->midi_note_2,
-        engine->midi_note_3,
-        engine->follow_mixer_chord_changes,
+        engine->midi_note_3, engine->follow_mixer_chord_changes,
         engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
         s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
@@ -309,7 +284,7 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
         break;
     case (TIME_CHORD_CHANGE):
         if (engine->follow_mixer_chord_changes)
-            sequence_engine_set_pattern_to_melody(engine);
+            sequence_engine_set_pattern_to_current_key(engine);
         break;
     }
 }
@@ -642,62 +617,61 @@ void sequence_engine_set_pattern(void *self, int pattern_num,
     sequence_engine *engine = (sequence_engine *)self;
     if (is_valid_pattern_num(engine, pattern_num))
     {
-        // sequence_engine_stop(engine);
+        int default_midi_note =
+            get_midi_note_from_mixer_key(mixr->key, engine->octave);
         clear_midi_pattern(engine->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {
             midi_event ev = pattern[i];
-            if (engine->chord_mode)
-                ev.data1 =
-                    get_midi_note_from_mixer_key(mixr->key, mixr->octave);
-            else if (engine->single_note_mode)
-                ev.data1 = engine->midi_note_1;
+            ev.data1 = default_midi_note;
             sequence_engine_add_event(engine, pattern_num, i, ev);
         }
         if (engine->swing_setting > 0)
             pattern_apply_swing(engine->patterns[pattern_num],
                                 engine->swing_setting);
+
+        sequence_engine_set_pattern_to_current_key(engine);
     }
 }
 
 bool sequence_engine_list_presets(unsigned int synthtype)
 {
     FILE *presetzzz = NULL;
-    // switch (synthtype)
-    //{
-    // case (MINISYNTH_TYPE):
-    //    presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
-    //    break;
-    // case (DXSYNTH_TYPE):
-    //    presetzzz = fopen(DX_PRESET_FILENAME, "r+");
-    //    break;
-    //}
+    switch (synthtype)
+    {
+    case (MINISYNTH_TYPE):
+        presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
+        break;
+    case (DXSYNTH_TYPE):
+        presetzzz = fopen(DX_PRESET_FILENAME, "r+");
+        break;
+    }
 
-    // if (presetzzz == NULL)
-    //    return false;
+    if (presetzzz == NULL)
+        return false;
 
-    // char line[256];
-    // char setting_key[512];
-    // char setting_val[512];
+    char line[256];
+    char setting_key[512];
+    char setting_val[512];
 
-    // char *tok, *last_tok;
-    // char const *sep = "::";
+    char *tok, *last_tok;
+    char const *sep = "::";
 
-    // while (fgets(line, sizeof(line), presetzzz))
-    //{
-    //    for (tok = strtok_r(line, sep, &last_tok); tok;
-    //         tok = strtok_r(NULL, sep, &last_tok))
-    //    {
-    //        sscanf(tok, "%[^=]=%s", setting_key, setting_val);
-    //        if (strcmp(setting_key, "name") == 0)
-    //        {
-    //            printf("%s\n", setting_val);
-    //            break;
-    //        }
-    //    }
-    //}
+    while (fgets(line, sizeof(line), presetzzz))
+    {
+        for (tok = strtok_r(line, sep, &last_tok); tok;
+             tok = strtok_r(NULL, sep, &last_tok))
+        {
+            sscanf(tok, "%[^=]=%s", setting_key, setting_val);
+            if (strcmp(setting_key, "name") == 0)
+            {
+                printf("%s\n", setting_val);
+                break;
+            }
+        }
+    }
 
-    // fclose(presetzzz);
+    fclose(presetzzz);
 
     return true;
 }
