@@ -281,7 +281,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 drumsynth_trigger(ds);
             }
         }
-        else if (ev->event_type == 176)
+        else if (ev->event_type == MIDI_CONTROL)
         {
             switch (ev->data1)
             {
@@ -314,7 +314,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                 if (mixr->midi_bank_num == 0)
                 {
                     // o1freq
-                    double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
+                    double freq =
+                        scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
                     // printf("o1 FREQ!%f\n", freq);
                     drumsynth_set_osc_fo(ds, 1, freq);
                 }

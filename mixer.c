@@ -135,8 +135,7 @@ void mixer_status_mixr(mixer *mixr)
            mixr->active_midi_soundgen_num == -99
                ? "NONE"
                : s_midi_control_type_name
-                     [mixr->sound_generators[mixr->active_midi_soundgen_num]
-                          ->type],
+                     [mixr->midi_control_destination],
            mixr->midi_print_notes,
            mixr->midi_bank_num,
            key_names[mixr->key], key_names[mixr->chord],
@@ -1171,7 +1170,9 @@ void mixer_check_for_midi_messages(mixer *mixr)
                        "data2:%d\n",
                        status, data1, data2);
 
-            if (mixr->midi_control_destination == MIDI_CONTROL_SYNTH_TYPE)
+            if (mixr->midi_control_destination != NONE &&
+                mixer_is_valid_soundgen_num(mixr,
+                                            mixr->active_midi_soundgen_num))
             {
 
                 soundgenerator *sg =
@@ -1186,20 +1187,6 @@ void mixer_check_for_midi_messages(mixer *mixr)
                     sequence_engine_add_event(engine, engine->cur_pattern, tick,
                                               ev);
                 }
-
-                midi_event ev;
-                ev.source = EXTERNAL_DEVICE;
-                ev.event_type = status;
-                ev.data1 = data1;
-                ev.data2 = data2;
-                ev.delete_after_use = false;
-                midi_parse_midi_event(sg, &ev);
-            }
-            else if (mixr->midi_control_destination ==
-                     MIDI_CONTROL_DRUMSYNTH_TYPE)
-            {
-                soundgenerator *sg =
-                    mixr->sound_generators[mixr->active_midi_soundgen_num];
 
                 midi_event ev;
                 ev.source = EXTERNAL_DEVICE;
