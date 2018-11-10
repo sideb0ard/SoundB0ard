@@ -21,14 +21,14 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         if (strncmp(wurds[1], "ls", 2) == 0)
         {
-            // if (strncmp("moog", wurds[0], 4) == 0)
-            //{
-            //    sequence_engine_list_presets(MINISYNTH_TYPE);
-            //}
-            // else if (strncmp("dx", wurds[0], 2) == 0)
-            //{
-            //    sequence_engine_list_presets(DXSYNTH_TYPE);
-            //}
+            if (strncmp("moog", wurds[0], 4) == 0)
+            {
+                sequence_engine_list_presets(MINISYNTH_TYPE);
+            }
+             else if (strncmp("dx", wurds[0], 2) == 0)
+            {
+                sequence_engine_list_presets(DXSYNTH_TYPE);
+            }
             return true;
         }
 

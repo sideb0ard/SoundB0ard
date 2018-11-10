@@ -118,7 +118,7 @@ typedef struct sequence_engine
 void sequence_engine_init(sequence_engine *engine, void *parent,
                           unsigned int parent_synth_type);
 
-// bool sequence_engine_list_presets(unsigned int type);
+bool sequence_engine_list_presets(unsigned int type);
 void sequence_engine_set_sample_rate(sequence_engine *engine, int sample_rate);
 void sequence_engine_status(sequence_engine *engine, wchar_t *status_string);
 void sequence_engine_event_notify(void *self, unsigned int event_type);
