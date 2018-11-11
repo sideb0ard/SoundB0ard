@@ -143,19 +143,6 @@ void mixer_status_mixr(mixer *mixr)
            mixr->progression_type, s_progressions[mixr->progression_type]);
     // clang-format on
 
-    // TODO - create env command to print these
-    // if (mixr->env_var_count > 0)
-    //{
-    //    printf(COOL_COLOR_GREEN "::::: Environment :::::\n");
-    //    for (int i = 0; i < mixr->env_var_count; i++)
-    //    {
-    //        printf("%s - %d\n", mixr->environment[i].key,
-    //               mixr->environment[i].val);
-    //    }
-    //    printf(ANSI_COLOR_RESET);
-    //}
-    // printf("\n");
-
     if (mixr->num_scenes > 1)
     {
         printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "scenes" COOL_COLOR_GREEN

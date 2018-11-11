@@ -171,55 +171,24 @@ void looper_event_notify(void *self, unsigned int event_type)
         if (g->engine.patterns[g->engine.cur_pattern][idx].event_type ==
             MIDI_ON)
         {
-            //printf("[%d] ON\n", idx);
+            // printf("[%d] ON\n", idx);
 
             eg_start_eg(&g->m_eg1);
 
-            midi_event *pattern =
-                g->engine.patterns[g->engine.cur_pattern];
-            int off_tick =
-                (int)(idx + (g->engine.sustain_note_ms *
-                             mixr->timing_info.ms_per_midi_tick)) %
-                PPBAR;
+            midi_event *pattern = g->engine.patterns[g->engine.cur_pattern];
+            int off_tick = (int)(idx + ((g->m_eg1.m_attack_time_msec +
+                                         g->m_eg1.m_decay_time_msec +
+                                         g->engine.sustain_note_ms) *
+                                        mixr->timing_info.ms_per_midi_tick)) %
+                           PPBAR;
             midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
             midi_pattern_add_event(pattern, off_tick, off_event);
-            //int cur_sixteenth =
-            //    mixr->timing_info.sixteenth_note_tick % 16;
-            //g->step_diff = 0 - cur_sixteenth;
-            //looper_set_reverse_mode(g, false);
-
-            //int randy = rand() % 100;
-            //if (randy < 20)
-            //    g->step_diff = 4 - cur_sixteenth;
-            //else if (randy < 50)
-            //    g->step_diff = 8 - cur_sixteenth;
-            //else if (randy < 55)
-            //    g->step_diff = 12 - cur_sixteenth;
-            //else if (randy < 60)
-            //    looper_set_reverse_mode(g, true);
-
-            //if (g->gate_mode)
-            //{
-            //    midi_event *pattern =
-            //        g->engine.patterns[g->engine.cur_pattern];
-            //    int off_tick =
-            //        (int)(idx + (g->sustain_ms *
-            //                     mixr->timing_info.ms_per_midi_tick)) %
-            //        PPBAR;
-            //    midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
-            //    midi_pattern_add_event(pattern, off_tick, off_event);
-            //    looper_start(g);
-            //    // printf("[%d] ON idx is %d -- setting off to "
-            //    //       "off_tick:%d\n",
-            //    //       idx, (int)new_read_idx, off_tick);
-            //}
         }
-        else if (g->engine.patterns[g->engine.cur_pattern][idx]
-                         .event_type == MIDI_OFF)
+        else if (g->engine.patterns[g->engine.cur_pattern][idx].event_type ==
+                 MIDI_OFF)
         {
-            //printf("[%d] OFF\n", idx);
-            midi_event_clear(
-                &g->engine.patterns[g->engine.cur_pattern][idx]);
+            // printf("[%d] OFF\n", idx);
+            midi_event_clear(&g->engine.patterns[g->engine.cur_pattern][idx]);
             g->m_eg1.m_state = RELEASE;
         }
 
@@ -322,13 +291,7 @@ stereo_val looper_gennext(void *self)
             stereo_val tmp =
                 sound_grain_generate(sgr, g->audio_buffer, g->audio_buffer_len);
             double env = sound_grain_env(sgr, g->envelope_mode);
-            // if (i == 0 && sgr->active && mixr->timing_info.cur_sample % 100
-            // == 0)
-            //{
-            //    double percent_pos = (float)sgr->grain_counter_frames /
-            //                         sgr->grain_len_frames * 100;
-            //    printf("POS:%f ENV: %f\n", percent_pos, env);
-            //}
+
             val.left += tmp.left * env;
             val.right += tmp.right * env;
         }
@@ -820,9 +783,4 @@ void looper_set_grain_env_release_pct(looper *l, int percent)
 {
     if (percent > 0 && percent < 100)
         l->grain_release_time_pct = percent;
-}
-
-void looper_trigger_amp_envelope(looper *l)
-{
-    eg_start_eg(&l->m_eg1);
 }

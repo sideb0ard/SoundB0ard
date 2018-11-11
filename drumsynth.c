@@ -140,8 +140,8 @@ void drumsynth_status(void *self, wchar_t *ss)
     char *INSTRUMENT_DEEP_RED = ANSI_COLOR_RESET;
     if (ds->sg.active)
     {
-        INSTRUMENT_RED = ANSI_COLOR_RED;
-        INSTRUMENT_DEEP_RED = ANSI_COLOR_DEEP_RED;
+        INSTRUMENT_RED = COOL_COLOR_YELLOW_MELLOW;
+        INSTRUMENT_DEEP_RED = COOL_COLOR_ORANGE;
     }
 
     // clang-format off

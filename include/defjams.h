@@ -62,6 +62,7 @@
 #define COOL_COLOR_PINK "\x1b[38;5;200m"
 #define COOL_COLOR_MAUVE "\x1b[38;5;135m"
 #define COOL_COLOR_ORANGE "\x1b[38;5;202m"
+#define COOL_COLOR_YELLOW_MELLOW "\x1b[38;5;190m"
 
 #define WANSI_COLOR_BLUE L"\x1b[34m"
 #define WANSI_COLOR_CYAN L"\x1b[36m"
@@ -76,6 +77,7 @@
 #define WANSI_COLOR_YELLOW L"\x1b[33m"
 #define WCOOL_COLOR_GREEN L"\x1b[38;5;47m"
 #define WCOOL_COLOR_YELLOW L"\x1b[38;5;226m"
+#define WCOOL_COLOR_YELLOW_MELLOW L"\x1b[38;5;190m"
 #define WCOOL_COLOR_PINK L"\x1b[38;5;200m"
 #define WCOOL_COLOR_MAUVE L"\x1b[38;5;135m"
 #define WCOOL_COLOR_ORANGE L"\x1b[38;5;202m"
