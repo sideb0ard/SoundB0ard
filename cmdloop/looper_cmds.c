@@ -155,14 +155,10 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     {
                         looper_set_stutter_pending(g);
                     }
-                    else if (strncmp("sustain_ms", wurds[2], 10) == 0)
-                    {
-                        double sustain_ms = atoi(wurds[3]);
-                        looper_set_sustain_ms(g, sustain_ms);
-                    }
                     else if (strncmp("step", wurds[2], 4) == 0)
                     {
-                        looper_set_step_pending(g);
+                        bool b = atoi(wurds[3]);
+                        looper_set_step_mode(g, b);
                     }
                     else if (strncmp("reverse", wurds[2], 8) == 0)
                     {

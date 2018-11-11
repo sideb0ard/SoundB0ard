@@ -116,12 +116,11 @@ typedef struct looper
     bool stutter_mode;
     int stutter_idx;
 
-    bool step_pending; // TODO get rid of?
     bool step_mode;
     int step_diff;
 
+    bool stop_pending; // allow eg to stop
     bool gate_mode; // use midi to trigger env amp
-    int sustain_ms; // for gating notes
 
     int cur_sixteenth; // used to track scramble
 
@@ -164,7 +163,7 @@ void looper_set_loop_mode(looper *g, unsigned int m);
 void looper_set_loop_len(looper *g, double bars);
 void looper_set_scramble_pending(looper *g);
 void looper_set_stutter_pending(looper *g);
-void looper_set_step_pending(looper *g);
+void looper_set_step_mode(looper *g, bool b);
 
 int looper_get_available_grain_num(looper *g);
 int looper_count_active_grains(looper *g);
@@ -182,7 +181,6 @@ void looper_set_fill_factor(looper *l, double fill_factor);
 void looper_set_density_duration_sync(looper *l, bool b);
 void looper_dump_buffer(looper *l);
 
-void looper_set_sustain_ms(looper *l, int sustain_ms);
 void looper_set_grain_env_attack_pct(looper *l, int percent);
 void looper_set_grain_env_release_pct(looper *l, int percent);
 
