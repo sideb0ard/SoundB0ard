@@ -72,48 +72,6 @@ looper *new_looper(char *filename)
     g->m_eg1.m_attack_time_msec = 10;
     g->m_eg1.m_release_time_msec = 50;
 
-    // Grain Duration
-    g->graindur_lfo_on = false;
-    g->m_lfo1_min = 10;
-    g->m_lfo1_max = 80;
-    osc_new_settings((oscillator *)&g->m_lfo1);
-    lfo_set_soundgenerator_interface(&g->m_lfo1);
-    g->m_lfo1.osc.m_osc_fo = 0.01; // default LFO
-    g->m_lfo1.osc.m_amplitude = 1.;
-    g->lfo1_sync = false;
-    lfo_start_oscillator((oscillator *)&g->m_lfo1);
-
-    // Grain Density / Grains Per Second
-    g->grainps_lfo_on = false;
-    g->m_lfo2_min = 20;
-    g->m_lfo2_max = 50;
-    osc_new_settings((oscillator *)&g->m_lfo2);
-    lfo_set_soundgenerator_interface(&g->m_lfo2);
-    g->m_lfo2.osc.m_osc_fo = 0.01; // default LFO
-    g->m_lfo2.osc.m_amplitude = 1.;
-    g->lfo2_sync = false;
-    lfo_start_oscillator((oscillator *)&g->m_lfo2);
-
-    g->grainscanfile_lfo_on = false;
-    g->m_lfo3_min = 0;
-    g->m_lfo3_max = g->audio_buffer_len;
-    osc_new_settings((oscillator *)&g->m_lfo3);
-    lfo_set_soundgenerator_interface(&g->m_lfo3);
-    g->m_lfo3.osc.m_osc_fo = 0.01; // default LFO
-    g->m_lfo3.osc.m_amplitude = 1.;
-    g->lfo3_sync = false;
-    lfo_start_oscillator((oscillator *)&g->m_lfo3);
-
-    g->grainpitch_lfo_on = false;
-    g->m_lfo4_min = 0.9;
-    g->m_lfo4_max = 1.1;
-    osc_new_settings((oscillator *)&g->m_lfo4);
-    lfo_set_soundgenerator_interface(&g->m_lfo4);
-    g->m_lfo4.osc.m_osc_fo = 0.1; // default LFO
-    g->m_lfo4.osc.m_amplitude = 1.;
-    g->lfo4_sync = false;
-    lfo_start_oscillator((oscillator *)&g->m_lfo4);
-
     g->gate_mode = false;
     g->sustain_ms = 50;
 
@@ -285,61 +243,6 @@ void looper_event_notify(void *self, unsigned int event_type)
     }
 }
 
-void looper_update_lfos(looper *g)
-{
-    osc_update((oscillator *)&g->m_lfo1);
-    osc_update((oscillator *)&g->m_lfo2);
-    osc_update((oscillator *)&g->m_lfo3);
-    osc_update((oscillator *)&g->m_lfo4);
-
-    if (g->graindur_lfo_on)
-    {
-        double lfo1_out = lfo_do_oscillate((oscillator *)&g->m_lfo1, NULL);
-        double scaley_val =
-            scaleybum(-1, 1, g->m_lfo1_min, g->m_lfo1_max, lfo1_out);
-        // g->grain_duration_ms = scaley_val;
-        looper_set_grain_duration(g, scaley_val);
-    }
-
-    if (g->grainps_lfo_on)
-    {
-        double lfo2_out = lfo_do_oscillate((oscillator *)&g->m_lfo2, NULL);
-        double scaley_val =
-            scaleybum(-1, 1, g->m_lfo2_min, g->m_lfo2_max, lfo2_out);
-        // g->grains_per_sec = scaley_val;
-        looper_set_grain_density(g, scaley_val);
-    }
-
-    if (g->grainscanfile_lfo_on)
-    {
-        double lfo3_out = lfo_do_oscillate((oscillator *)&g->m_lfo3, NULL);
-        double scaley_val =
-            scaleybum(-1, 1, g->m_lfo3_min, g->m_lfo3_max, lfo3_out);
-        double diff;
-        if (g->audio_buffer_read_idx > scaley_val)
-            diff = g->audio_buffer_read_idx - scaley_val;
-        else
-            diff = scaley_val - g->audio_buffer_read_idx;
-
-        g->audio_buffer_read_idx += diff;
-
-        if (g->audio_buffer_read_idx >= g->audio_buffer_len)
-            g->audio_buffer_read_idx =
-                (int)g->audio_buffer_read_idx % g->audio_buffer_len;
-        else if (g->audio_buffer_read_idx < 0)
-            g->audio_buffer_read_idx =
-                g->audio_buffer_len - g->audio_buffer_read_idx;
-    }
-
-    if (g->grainpitch_lfo_on)
-    {
-        double lfo4_out = lfo_do_oscillate((oscillator *)&g->m_lfo4, NULL);
-        double scaley_val =
-            scaleybum(0, 2, g->m_lfo4_min, g->m_lfo4_max, lfo4_out);
-        g->grain_pitch = scaley_val;
-    }
-}
-
 stereo_val looper_gennext(void *self)
 {
     looper *g = (looper *)self;
@@ -371,7 +274,6 @@ stereo_val looper_gennext(void *self)
         }
     }
 
-    looper_update_lfos(g);
     if (g->have_active_buffer) // file buffer or external in
     {
         // STEP 1 - calculate if we should launch a new grain
@@ -456,19 +358,6 @@ void looper_status(void *self, wchar_t *status_string)
         "quasi_grain_fudge:%d\n"
         "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
 
-        "[" "%s" "Grain Pitch LFO" "%s" "]\n"
-        "gp_on:%d gp_type:%d gp_amp:%.2f gp_rate:%.2f gp_lo:%.2f gp_hi:%.2f\n"
-
-        "[" "%s" "Grain Duration LFO" "%s" "]\n"
-        "gd_on:%d gd_type:%d gd_amp:%.2f gd_rate:%.2f gd_lo:%.2f gd_hi:%.2f\n"
-
-        "[" "%s" "Grains Per Sec LFO" "%s" "]\n"
-        "gps_on:%d gps_type:%d gps_amp:%.2f gps_rate:%.2f gps_lo:%.2f "
-        "gps_hi:%.2f\n"
-
-        "[" "%s" "Grain Scan LFO" "%s" "]\n"
-        "gs_on:%d gs_type:%d gs_amp:%.2f gs_rate:%.2f gs_lo:%.2f gs_hi:%.2f\n"
-
         "[" "%s" "Envelope Generator" "%s" "]\n"
         "eg_attack_ms:%.2f sustain_ms:%d eg_release_ms:%.2f eg_state:%d",
         // clang-format on
@@ -485,22 +374,6 @@ void looper_status(void *self, wchar_t *status_string)
         g->density_duration_sync, g->quasi_grain_fudge, g->fill_factor,
         g->granular_spray_frames / 44.1, g->selection_mode,
         s_env_names[g->envelope_mode],
-
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->grainpitch_lfo_on,
-        g->m_lfo4.osc.m_waveform, g->m_lfo4.osc.m_amplitude,
-        g->m_lfo4.osc.m_osc_fo, g->m_lfo4_min, g->m_lfo4_max,
-
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->graindur_lfo_on,
-        g->m_lfo1.osc.m_waveform, g->m_lfo1.osc.m_amplitude,
-        g->m_lfo1.osc.m_osc_fo, g->m_lfo1_min, g->m_lfo1_max,
-
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->grainps_lfo_on,
-        g->m_lfo2.osc.m_waveform, g->m_lfo2.osc.m_amplitude,
-        g->m_lfo2.osc.m_osc_fo, g->m_lfo2_min, g->m_lfo2_max,
-
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->grainscanfile_lfo_on,
-        g->m_lfo3.osc.m_waveform, g->m_lfo3.osc.m_amplitude,
-        g->m_lfo3.osc.m_osc_fo, g->m_lfo3_min, g->m_lfo3_max,
 
         ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->m_eg1.m_attack_time_msec,
         g->sustain_ms, g->m_eg1.m_release_time_msec, g->m_eg1.m_state);
@@ -892,153 +765,6 @@ int looper_count_active_grains(looper *g)
             active++;
 
     return active;
-}
-
-void looper_set_lfo_amp(looper *g, int lfonum, double amp)
-{
-    if (amp >= 0.0 && amp <= 1.0)
-    {
-        switch (lfonum)
-        {
-        case (1):
-            g->m_lfo1.osc.m_amplitude = amp;
-            break;
-        case (2):
-            g->m_lfo2.osc.m_amplitude = amp;
-            break;
-        case (3):
-            g->m_lfo3.osc.m_amplitude = amp;
-            break;
-        case (4):
-            g->m_lfo4.osc.m_amplitude = amp;
-            break;
-        }
-    }
-    else
-        printf("Amp should be between 0 and 1\n");
-}
-
-void looper_set_lfo_voice(looper *g, int lfonum, unsigned int voice)
-{
-    if (voice < MAX_LFO_OSC)
-    {
-        switch (lfonum)
-        {
-        case (1):
-            g->m_lfo1.osc.m_waveform = voice;
-            break;
-        case (2):
-            g->m_lfo2.osc.m_waveform = voice;
-            break;
-        case (3):
-            g->m_lfo3.osc.m_waveform = voice;
-            break;
-        case (4):
-            g->m_lfo4.osc.m_waveform = voice;
-            break;
-        }
-    }
-    else
-        printf("Voice ENUM should be < %d\n", MAX_LFO_OSC);
-}
-
-void looper_set_lfo_rate(looper *g, int lfonum, double rate)
-{
-    if (rate >= 0 && rate <= MAX_LFO_RATE)
-    {
-        switch (lfonum)
-        {
-        case (1):
-            g->m_lfo1.osc.m_osc_fo = rate;
-            g->lfo1_sync = false;
-            break;
-        case (2):
-            g->m_lfo2.osc.m_osc_fo = rate;
-            g->lfo2_sync = false;
-            break;
-        case (3):
-            g->m_lfo3.osc.m_osc_fo = rate;
-            g->lfo3_sync = false;
-            break;
-        case (4):
-            g->m_lfo4.osc.m_osc_fo = rate;
-            g->lfo4_sync = false;
-            break;
-        }
-    }
-    else
-        printf("LFO rate should be between %f and %f\n", 0., MAX_LFO_RATE);
-}
-
-void looper_set_lfo_min(looper *g, int lfonum, double minval)
-{
-    if (minval < 0)
-        return;
-    switch (lfonum)
-    {
-    case (1):
-        g->m_lfo1_min = minval;
-        break;
-    case (2):
-        g->m_lfo2_min = minval;
-        break;
-    case (3):
-        g->m_lfo3_min = minval;
-        break;
-    case (4):
-        g->m_lfo4_min = minval;
-        break;
-    }
-}
-
-void looper_set_lfo_max(looper *g, int lfonum, double maxval)
-{
-    switch (lfonum)
-    {
-    case (1):
-        if (maxval > g->m_lfo1_min)
-            g->m_lfo1_max = maxval;
-        break;
-    case (2):
-        if (maxval > g->m_lfo2_min)
-            g->m_lfo2_max = maxval;
-        break;
-    case (3):
-        if (maxval > g->m_lfo3_min)
-            g->m_lfo3_max = maxval;
-        break;
-    case (4):
-        if (maxval > g->m_lfo4_min)
-            g->m_lfo4_max = maxval;
-        break;
-    }
-}
-
-void looper_set_lfo_sync(looper *g, int lfonum, int numloops)
-{
-
-    int looplen_in_samples = 60 / mixr->bpm * SAMPLE_RATE;
-    double osc_fo = (double)SAMPLE_RATE / (looplen_in_samples * numloops);
-    printf("Setting LFO %d sync to %f\n", lfonum, osc_fo);
-    switch (lfonum)
-    {
-    case (1):
-        g->m_lfo1.osc.m_osc_fo = osc_fo;
-        g->lfo1_sync = true;
-        break;
-    case (2):
-        g->m_lfo2.osc.m_osc_fo = osc_fo;
-        g->lfo2_sync = true;
-        break;
-    case (3):
-        g->m_lfo3.osc.m_osc_fo = osc_fo;
-        g->lfo3_sync = true;
-        break;
-    case (4):
-        g->m_lfo4.osc.m_osc_fo = osc_fo;
-        g->lfo4_sync = true;
-        break;
-    }
 }
 
 void looper_set_fill_factor(looper *l, double fill_factor)

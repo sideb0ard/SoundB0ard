@@ -2,7 +2,6 @@
 #define LOOPER_H
 
 #include "envelope_generator.h"
-#include "lfo.h"
 #include "sequence_engine.h"
 #include "sound_generator.h"
 #include <stdbool.h>
@@ -106,30 +105,6 @@ typedef struct looper
     envelope_generator m_eg1; // start/stop amp
     envelope_generator m_eg2; // unused so far
 
-    bool graindur_lfo_on;
-    lfo m_lfo1; // grain dur
-    double m_lfo1_min;
-    double m_lfo1_max;
-    bool lfo1_sync;
-
-    bool grainps_lfo_on;
-    lfo m_lfo2; // grains per sec
-    double m_lfo2_min;
-    double m_lfo2_max;
-    bool lfo2_sync;
-
-    bool grainscanfile_lfo_on;
-    lfo m_lfo3; // file read position
-    double m_lfo3_min;
-    double m_lfo3_max;
-    bool lfo3_sync;
-
-    bool grainpitch_lfo_on;
-    lfo m_lfo4; // file read position
-    double m_lfo4_min;
-    double m_lfo4_max;
-    bool lfo4_sync;
-
     unsigned int loop_mode; // enums above - LOOP, STEP, STATIC
     double loop_len;        // bars
 
@@ -173,7 +148,6 @@ void looper_import_file(looper *g, char *filename);
 void looper_set_external_source(looper *g, int sound_gen_num);
 void looper_set_gate_mode(looper *g, bool b);
 
-void looper_update_lfos(looper *g);
 int looper_calculate_grain_spacing(looper *g);
 void looper_set_grain_pitch(looper *g, double pitch);
 void looper_set_grain_duration(looper *g, int dur);
@@ -194,13 +168,6 @@ void looper_set_step_pending(looper *g);
 
 int looper_get_available_grain_num(looper *g);
 int looper_count_active_grains(looper *g);
-
-void looper_set_lfo_amp(looper *g, int lfonum, double amp);
-void looper_set_lfo_voice(looper *g, int lfonum, unsigned int voice);
-void looper_set_lfo_rate(looper *g, int lfonum, double rate);
-void looper_set_lfo_min(looper *g, int lfonum, double minval);
-void looper_set_lfo_max(looper *g, int lfonum, double maxval);
-void looper_set_lfo_sync(looper *g, int lfonum, int numloops);
 
 void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
                       int release_pct, bool reverse, double pitch,
