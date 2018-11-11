@@ -50,18 +50,19 @@ void right_shift(midi_event *in_pattern, int places)
 
 void brak(midi_event *in_pattern)
 {
-    midi_event out_pattern[PPBAR] = {};
+    midi_event scratch_pattern[PPBAR] = {};
     for (int i = 0; i < PPBAR; i++)
     {
         if (in_pattern[i].event_type)
         {
             int target_idx = i / 2;
             pattern_check_idx(&target_idx, PPBAR);
-            out_pattern[target_idx] = in_pattern[i];
+            scratch_pattern[target_idx] = in_pattern[i];
+            scratch_pattern[target_idx].data2 /= 1.5;
         }
     }
-    right_shift(out_pattern, 4);
-    clear_midi_pattern(in_pattern);
+    right_shift(scratch_pattern, 8);
     for (int i = 0; i < PPBAR; i++)
-        in_pattern[i] = out_pattern[i];
+        if (scratch_pattern[i].event_type)
+            midi_pattern_add_event(in_pattern, i, scratch_pattern[i]);
 }
