@@ -367,6 +367,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 int places_to_shift = atoi(wurds[2]);
+                if (!places_to_shift)
+                    places_to_shift = 4;
                 midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
                 if (strcmp("<~", wurds[0]) == 0)
                     left_shift(pattern, places_to_shift);

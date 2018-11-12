@@ -162,8 +162,9 @@ void looper_event_notify(void *self, unsigned int event_type)
                     (g->stutter_idx * g->size_of_sixteenth) +
                     rel_pos_within_a_sixteenth;
             }
-            g->audio_buffer_read_idx =
-                new_read_idx + (g->step_diff * g->size_of_sixteenth);
+            else
+                g->audio_buffer_read_idx =
+                    new_read_idx + (g->step_diff * g->size_of_sixteenth);
         }
 
         // step sequencer
