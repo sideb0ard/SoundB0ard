@@ -25,7 +25,7 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             {
                 sequence_engine_list_presets(MINISYNTH_TYPE);
             }
-             else if (strncmp("dx", wurds[0], 2) == 0)
+            else if (strncmp("dx", wurds[0], 2) == 0)
             {
                 sequence_engine_list_presets(DXSYNTH_TYPE);
             }
@@ -598,7 +598,8 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     {
         minisynth_rand_settings(ms);
     }
-    else if (strncmp("default", wurds[2], 7) == 0)
+    else if (strncmp("default", wurds[2], 7) == 0 ||
+             strncmp("reset", wurds[2], 5) == 0)
     {
         printf("Loading defaults\n");
         minisynth_load_defaults(ms);

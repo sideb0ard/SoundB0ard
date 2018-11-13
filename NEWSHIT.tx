@@ -1,0 +1,28 @@
+new bitshift t>>(8/((t/32)%3))
+new dx
+dx 0 load gnarrrrde
+dx 0 arp 1
+dx 0 single_note_mode 1
+every 2 bar apply 0 0:0
+every 2 bar rand "0 1" dx 0 chord_mode %s
+over 13 bar osc "20 2000" dx 0 sustain_note_ms %s
+
+
+new step boingdum
+markov 1
+
+new step shaker
+markov 3 // hats mask
+
+
+new step crispClap
+markov claps
+
+new step claps/dmx_clap.aif
+every 4 apply markov claps # once
+
+new gran drones/keydrone.aiff
+every 2 bar rand "1 1.2 1.5" loop 7 pitch %s
+
+new dx bitshift // octave 2 - ws 6
+every 4 bar apply hats mask

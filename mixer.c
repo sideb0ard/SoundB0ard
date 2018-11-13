@@ -31,7 +31,8 @@ extern mixer *mixr;
 extern const char *key_names[NUM_KEYS];
 extern char *chord_type_names[NUM_CHORD_TYPES];
 
-static const char *s_progressions[NUM_PROGRESSIONS] = {"I-IV-V", "I-V-vi-IV"};
+static const char *s_progressions[NUM_PROGRESSIONS] = {
+    "I-IV-V", "I-V-vi-IV", "I-vi-IV-V", "vi-ii-V-I"};
 
 const wchar_t *s_status_colors[] = {
     WCOOL_COLOR_PINK,      // MINISYNTH_TYPE
@@ -1071,9 +1072,25 @@ void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num)
             mixr->progression_type = 1;
             mixr->prog_len = 4;
             mixr->prog_degrees[0] = 0; // I
-            mixr->prog_degrees[1] = 4; // IV
-            mixr->prog_degrees[2] = 5; // V
-            mixr->prog_degrees[3] = 3; // V
+            mixr->prog_degrees[1] = 4; // V
+            mixr->prog_degrees[2] = 5; // vi
+            mixr->prog_degrees[3] = 3; // IV
+            break;
+        case (2):
+            mixr->progression_type = 2;
+            mixr->prog_len = 4;
+            mixr->prog_degrees[0] = 0; // I
+            mixr->prog_degrees[1] = 5; // vi
+            mixr->prog_degrees[2] = 3; // IV
+            mixr->prog_degrees[3] = 4; // V
+            break;
+        case (3):
+            mixr->progression_type = 3;
+            mixr->prog_len = 4;
+            mixr->prog_degrees[0] = 5; // vi
+            mixr->prog_degrees[1] = 1; // ii
+            mixr->prog_degrees[2] = 4; // V
+            mixr->prog_degrees[3] = 0; // I
             break;
         }
     }

@@ -51,8 +51,6 @@ minisynth *new_minisynth(void)
     ms->sound_generator.is_valid_pattern = &minisynth_is_valid_pattern;
     ms->sound_generator.type = MINISYNTH_TYPE;
 
-    minisynth_load_defaults(ms);
-
     for (int i = 0; i < MAX_VOICES; i++)
     {
         ms->m_voices[i] = new_minisynth_voice();
@@ -74,6 +72,8 @@ minisynth *new_minisynth(void)
         voice_set_modmatrix_core(&ms->m_voices[i]->m_voice,
                                  get_matrix_core(&ms->m_ms_modmatrix));
     }
+
+    minisynth_load_defaults(ms);
     minisynth_update(ms);
     ms->sound_generator.active = true;
 
@@ -85,23 +85,23 @@ void minisynth_load_defaults(minisynth *ms)
     strncpy(ms->m_settings.m_settings_name, "default", 7);
 
     ms->m_settings.m_monophonic = false;
-    ms->m_settings.m_voice_mode = 0;
+    ms->m_settings.m_voice_mode = Sqr3;
     ms->m_settings.m_detune_cents = 0.0;
 
     // OSC1
-    ms->m_settings.osc1_wave = SAW1;
+    ms->m_settings.osc1_wave = SQUARE;
     ms->m_settings.osc1_amp = 1;
     ms->m_settings.osc1_oct = 1;
     ms->m_settings.osc1_semis = 0;
     ms->m_settings.osc1_cents = 0;
     // OSC2
-    ms->m_settings.osc2_wave = SAW1;
+    ms->m_settings.osc2_wave = SQUARE;
     ms->m_settings.osc2_amp = 1;
     ms->m_settings.osc2_oct = 1;
     ms->m_settings.osc2_semis = 0;
     ms->m_settings.osc2_cents = 0;
     // OSC3
-    ms->m_settings.osc3_wave = SAW1;
+    ms->m_settings.osc3_wave = SQUARE;
     ms->m_settings.osc3_amp = 0;
     ms->m_settings.osc3_oct = 0;
     ms->m_settings.osc3_semis = 0;
@@ -166,9 +166,9 @@ void minisynth_load_defaults(minisynth *ms)
     ms->m_settings.m_eg1_dca_intensity = 1.0;
     ms->m_settings.m_eg1_dca_enabled = true;
 
-    ms->m_settings.m_eg1_attack_time_msec = 52;
-    ms->m_settings.m_eg1_decay_time_msec = 30;
-    ms->m_settings.m_eg1_release_time_msec = 35;
+    ms->m_settings.m_eg1_attack_time_msec = 300;
+    ms->m_settings.m_eg1_decay_time_msec = 300;
+    ms->m_settings.m_eg1_release_time_msec = 300;
 
     ms->m_settings.m_eg1_sustain_level = 0.9;
     ms->m_settings.m_eg1_sustain_override = false;

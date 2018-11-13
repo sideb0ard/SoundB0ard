@@ -21,7 +21,7 @@
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_SOUNDGENERATOR 100
-#define NUM_PROGRESSIONS 2
+#define NUM_PROGRESSIONS 4
 
 typedef enum
 {
