@@ -242,26 +242,26 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
                 &engine->patterns[engine->cur_pattern]);
             engine->restore_pending = false;
         }
-        else if (engine->multi_pattern_mode && engine->num_patterns > 1)
-        {
-            engine->cur_pattern_iteration--;
-            if (engine->cur_pattern_iteration <= 0)
-            {
-                if (engine->parent_type == MINISYNTH_TYPE)
-                    minisynth_midi_note_off((minisynth *)parent, 0, 0,
-                                            true /* all notes off */);
-                else if (engine->parent_type == DXSYNTH_TYPE)
-                    dxsynth_midi_note_off((dxsynth *)parent, 0, 0,
-                                          true /* all notes off */);
+        //else if (engine->multi_pattern_mode && engine->num_patterns > 1)
+        //{
+        //    engine->cur_pattern_iteration--;
+        //    if (engine->cur_pattern_iteration <= 0)
+        //    {
+        //        if (engine->parent_type == MINISYNTH_TYPE)
+        //            minisynth_midi_note_off((minisynth *)parent, 0, 0,
+        //                                    true /* all notes off */);
+        //        else if (engine->parent_type == DXSYNTH_TYPE)
+        //            dxsynth_midi_note_off((dxsynth *)parent, 0, 0,
+        //                                  true /* all notes off */);
 
-                int next_pattern =
-                    (engine->cur_pattern + 1) % engine->num_patterns;
+        //        int next_pattern =
+        //            (engine->cur_pattern + 1) % engine->num_patterns;
 
-                engine->cur_pattern = next_pattern;
-                engine->cur_pattern_iteration =
-                    engine->pattern_multiloop_count[engine->cur_pattern];
-            }
-        }
+        //        engine->cur_pattern = next_pattern;
+        //        engine->cur_pattern_iteration =
+        //            engine->pattern_multiloop_count[engine->cur_pattern];
+        //    }
+        //}
         break;
     case (TIME_MIDI_TICK):
         if (engine->started)

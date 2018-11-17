@@ -6,6 +6,7 @@ dx 0 single_note_mode 1
 every 2 bar apply 0 0:0
 every 2 bar rand "0 1" dx 0 chord_mode %s
 over 13 bar osc "20 2000" dx 0 sustain_note_ms %s
+every 8 bar "0 1" dx 0 arp %s
 
 
 new step boingdum
@@ -26,3 +27,11 @@ every 2 bar rand "1 1.2 1.5" loop 7 pitch %s
 
 new dx bitshift // octave 2 - ws 6
 every 4 bar apply hats mask
+
+
+######################
+
+new bitshift t>>(8/((t/32)%3))
+dx 1 load wuuurop // arp 1 
+
+dloops/krushSnareRoll.aiff

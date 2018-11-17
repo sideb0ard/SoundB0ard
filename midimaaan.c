@@ -283,149 +283,56 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
         }
         else if (ev->event_type == MIDI_CONTROL)
         {
+            double val = 0;
             switch (ev->data1)
             {
             case (1):
+                val =
+                    scaleybum(0, 127, OSC_FO_MIN, 300, ev->data2);
                 if (mixr->midi_bank_num == 0)
-                {
-                    // o1wav
-                    int wav_type = scaleybum(0, 127, 0, MAX_OSC - 1, ev->data2);
-                    // printf("o1 WAV_TYPE! %s -- %d\n",
-                    // s_synth_waves[wav_type],
-                    //       wav_type);
-                    drumsynth_set_osc_wav(ds, 1, wav_type);
-                }
+                    drumsynth_set_osc_fo(ds, 2, val);
                 else if (mixr->midi_bank_num == 1)
-                {
-                    // o2wav
-                    int wav_type = scaleybum(0, 127, 0, MAX_OSC - 1, ev->data2);
-                    // printf("o2 WAV_TYPE! %s -- %d\n",
-                    // s_synth_waves[wav_type],
-                    //       wav_type);
-                    drumsynth_set_osc_wav(ds, 2, wav_type);
-                }
-                else if (mixr->midi_bank_num == 2)
-                {
-                    // o2wav
-                    // printf("K1:: data1:%d data2:%d\n", ev->data1, ev->data2);
-                }
+                    drumsynth_set_osc_fo(ds, 1, val);
                 break;
             case (2):
-                if (mixr->midi_bank_num == 0)
-                {
-                    // o1freq
-                    double freq =
-                        scaleybum(0, 127, OSC_FO_MIN, OSC_FO_MAX, ev->data2);
-                    // printf("o1 FREQ!%f\n", freq);
-                    drumsynth_set_osc_fo(ds, 1, freq);
-                }
-                else if (mixr->midi_bank_num == 1)
-                {
-                    // o2freq
-                    double freq = scaleybum(0, 127, OSC_FO_MIN, 200, ev->data2);
-                    // printf("o2 FREQ!%f\n", freq);
-                    drumsynth_set_osc_fo(ds, 2, freq);
-                }
+                val =
+                    scaleybum(0, 127, 1, 120, ev->data2);
+                drumsynth_set_mod_semitones_range(ds, val);
                 break;
             case (3):
-                if (mixr->midi_bank_num == 0)
-                {
-                    // o1amp
-                    double amp = scaleybum(0, 127, 0., 1., ev->data2);
-                    // printf("o1 AMP!%f\n", amp);
-                    drumsynth_set_osc_amp(ds, 1, amp);
-                }
-                else if (mixr->midi_bank_num == 1)
-                {
-                    // o1amp
-                    double amp = scaleybum(0, 127, 0., 1., ev->data2);
-                    // printf("o2 AMP!%f\n", amp);
-                    drumsynth_set_osc_amp(ds, 2, amp);
-                }
+                val =
+                    scaleybum(0, 127, 180, 18000, ev->data2);
+                drumsynth_set_filter_freq(ds, val);
                 break;
             case (4):
-                if (mixr->midi_bank_num == 0)
-                {
-                    double intensity = scaleybum(0, 127, 0., 1., ev->data2);
-                    // printf("o1 INT!%f\n", intensity);
-                    drumsynth_set_eg_osc_intensity(ds, 1, 1, intensity);
-                }
-                else if (mixr->midi_bank_num == 1)
-                {
-                    double intensity = scaleybum(0, 127, 0., 1., ev->data2);
-                    drumsynth_set_eg_osc_intensity(ds, 2, 2, intensity);
-                }
-                else if (mixr->midi_bank_num == 2)
-                {
-                    double distortion_threshold =
-                        scaleybum(0, 127, 0.1, 0.9, ev->data2);
-                    drumsynth_set_distortion_threshold(ds,
-                                                       distortion_threshold);
-                }
+                val =
+                    scaleybum(0, 127, 1, 8, ev->data2);
+                drumsynth_set_filter_q(ds, val);
                 break;
             case (5):
-                if (mixr->midi_bank_num == 0)
-                {
-                    double ms =
-                        scaleybum(0, 128, EG_MINTIME_MS, 800, ev->data2);
-                    drumsynth_set_eg_attack(ds, 1, ms);
-                }
-                else if (mixr->midi_bank_num == 1)
-                {
-                    double ms =
-                        scaleybum(0, 128, EG_MINTIME_MS, 700, ev->data2);
-                    drumsynth_set_eg_attack(ds, 2, ms);
-                }
-                break;
+                val =
+                    scaleybum(0, 127, 0.1, 0.9, ev->data2);
+                drumsynth_set_distortion_threshold(ds,val);
             case (6):
+                val = scaleybum(0, 128, EG_MINTIME_MS, 800, ev->data2);
                 if (mixr->midi_bank_num == 0)
-                {
-                    double ms =
-                        scaleybum(0, 128, EG_MINTIME_MS, 2000, ev->data2);
-                    drumsynth_set_eg_decay(ds, 1, ms);
-                }
+                    drumsynth_set_eg_attack(ds, 2, val);
                 else if (mixr->midi_bank_num == 1)
-                {
-                    double ms =
-                        scaleybum(0, 128, EG_MINTIME_MS, 1000, ev->data2);
-                    drumsynth_set_eg_decay(ds, 2, ms);
-                }
+                    drumsynth_set_eg_attack(ds, 1, val);
                 break;
             case (7):
+                val = scaleybum(0, 128, EG_MINTIME_MS, 2000, ev->data2);
                 if (mixr->midi_bank_num == 0)
-                {
-                    double ms = scaleybum(0, 128, 0, 1, ev->data2);
-                    drumsynth_set_eg_sustain_lvl(ds, 1, ms);
-                }
+                    drumsynth_set_eg_decay(ds, 2, val);
                 else if (mixr->midi_bank_num == 1)
-                {
-                    double ms = scaleybum(0, 128, 0, 1, ev->data2);
-                    drumsynth_set_eg_sustain_lvl(ds, 2, ms);
-                }
-                else if (mixr->midi_bank_num == 2)
-                {
-                    double freq = scaleybum(0, 127, 180, 18000, ev->data2);
-                    drumsynth_set_filter_freq(ds, freq);
-                }
+                    drumsynth_set_eg_decay(ds, 1, val);
                 break;
             case (8):
+                val = scaleybum(0, 128, 0, 1, ev->data2);
                 if (mixr->midi_bank_num == 0)
-                {
-                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
-                                          ev->data2);
-                    drumsynth_set_eg_release(ds, 1, ms);
-                }
+                    drumsynth_set_eg_sustain_lvl(ds, 2, val);
                 else if (mixr->midi_bank_num == 1)
-                {
-                    double ms = scaleybum(0, 128, EG_MINTIME_MS, EG_MAXTIME_MS,
-                                          ev->data2);
-                    drumsynth_set_eg_release(ds, 2, ms);
-                }
-                else if (mixr->midi_bank_num == 2)
-                {
-                    double q = scaleybum(0, 127, 1, 8, ev->data2);
-                    drumsynth_set_filter_q(ds, q);
-                }
+                    drumsynth_set_eg_sustain_lvl(ds, 1, val);
                 break;
             }
         }
