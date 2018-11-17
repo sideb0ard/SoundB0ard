@@ -161,7 +161,6 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
             else if (pattern_type == NOTE_PATTERN)
             {
                 int midi_num = get_midi_note_from_string(var_tokens[i].value);
-                printf("NOTE! %d\n", midi_num);
                 if (midi_num != -1)
                     pattern[uniq_positions[i]].data1 = midi_num;
             }

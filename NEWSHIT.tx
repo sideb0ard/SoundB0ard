@@ -35,3 +35,26 @@ new bitshift t>>(8/((t/32)%3))
 dx 1 load wuuurop // arp 1 
 
 dloops/krushSnareRoll.aiff
+
+###################
+
+new markov
+new step // bok bok
+every 2 bar apply 0:0
+every 1 bar brak 0:0
+every 11 16th brak 0:0
+every 31 16th step 0:0
+
+new dloop dloops/simple_song.aiff
+
+new bitshift t>>(8/((t/32)%3))
+aesamples//steelxif35.WAV
+aesamples//steelxif19.WAV
+sidechain w/ bok bok
+
+new dx
+dx load glitchrrr
+
+new gran strings/moWaxStringsExcursionsz.aiff
+every 4 bar rand "90 10 50 77 33" loop 6 idx %s
+every 3 bar invert 2 2:0 3:0
