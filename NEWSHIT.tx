@@ -1,5 +1,5 @@
 new bitshift t>>(8/((t/32)%3))
-new dx
+d1 = new dx
 dx 0 load gnarrrrde
 dx 0 arp 1
 dx 0 single_note_mode 1
@@ -39,7 +39,6 @@ dloops/krushSnareRoll.aiff
 ###################
 
 new loop noises/NeedleJump.aiff
-ws 0 3
 distort 0
 fuckup 0
 
@@ -99,4 +98,6 @@ ws 9 3
 every 2 bar apply 1 9:0 # once
 
 
+new moog
+load summertimeStrings // single_note_mode // chord_mode  // eg1_sustain
 

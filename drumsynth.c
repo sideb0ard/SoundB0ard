@@ -320,6 +320,7 @@ bool drumsynth_save_patch(drumsynth *ds, char *name)
             " %d"    // m_osc2.osc.m_waveform
             " %f"    // m_osc2.osc.m_osc_fo
             " %f"    // osc2_amp
+            " %d"    // mod_semitones_range
             " %f"    // m_eg1.m_attack_time_msec
             " %f"    // m_eg1.m_decay_time_msec
             " %f"    // m_eg1.m_sustain_level
@@ -332,10 +333,12 @@ bool drumsynth_save_patch(drumsynth *ds, char *name)
             " %d"    // filter type
             " %f"    // filter fc_control
             " %f\n", // filter q_control
-            ds->m_patch_name, ds->vol, ds->m_distortion.m_threshold,
+            ds->m_patch_name, ds->vol, ds->m_distortion_threshold,
 
             ds->m_osc1.osc.m_waveform, ds->m_osc1.osc.m_osc_fo, ds->osc1_amp,
             ds->m_osc2.osc.m_waveform, ds->m_osc2.osc.m_osc_fo, ds->osc2_amp,
+
+            ds->mod_semitones_range,
 
             ds->m_eg1.m_attack_time_msec, ds->m_eg1.m_decay_time_msec,
             ds->m_eg1.m_sustain_level, ds->m_eg1.m_release_time_msec,
@@ -381,6 +384,7 @@ bool drumsynth_open_patch(drumsynth *ds, char *name)
                 " %d"     // m_osc2.osc.m_waveform
                 " %lf"    // m_osc2.osc.m_osc_fo
                 " %lf"    // osc2_amp
+                " %d"     // mod_semitones_range
                 " %lf"    // m_eg1.m_attack_time_msec
                 " %lf"    // m_eg1.m_decay_time_msec
                 " %lf"    // m_eg1.m_sustain_level
@@ -393,11 +397,13 @@ bool drumsynth_open_patch(drumsynth *ds, char *name)
                 " %d"     // filter type
                 " %lf"    // filter fc_control
                 " %lf\n", // filter q_control
-                ds->m_patch_name, &ds->vol, &ds->m_distortion.m_threshold,
+                ds->m_patch_name, &ds->vol, &ds->m_distortion_threshold,
 
                 &ds->m_osc1.osc.m_waveform, &ds->m_osc1.osc.m_osc_fo,
                 &ds->osc1_amp, &ds->m_osc2.osc.m_waveform,
                 &ds->m_osc2.osc.m_osc_fo, &ds->osc2_amp,
+
+                &ds->mod_semitones_range,
 
                 &ds->m_eg1.m_attack_time_msec, &ds->m_eg1.m_decay_time_msec,
                 &ds->m_eg1.m_sustain_level, &ds->m_eg1.m_release_time_msec,
