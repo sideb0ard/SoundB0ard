@@ -52,10 +52,13 @@ void filter_moog_init(filter_moog *moog)
 
 void moog_set_qcontrol(filter *f, double qcontrol)
 {
-    filter_moog *self = (filter_moog *)f;
-    self->f.m_q_control = qcontrol;
-    self->m_k = (4.0) * (qcontrol - 1.0) / (10.0 - 1.0);
-    // printf("M_K: %f\n", self->m_k);
+    if (qcontrol >= 1 && qcontrol <= 10)
+    {
+        filter_moog *self = (filter_moog *)f;
+        self->f.m_q_control = qcontrol;
+        self->m_k = (4.0) * (qcontrol - 1.0) / (10.0 - 1.0);
+        // printf("M_K: %f\n", self->m_k);
+    }
 }
 
 void moog_update(filter *f)

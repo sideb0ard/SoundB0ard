@@ -38,23 +38,65 @@ dloops/krushSnareRoll.aiff
 
 ###################
 
+new loop noises/NeedleJump.aiff
+ws 0 3
+distort 0
+fuckup 0
+
 new markov
-new step // bok bok
-every 2 bar apply 0:0
-every 1 bar brak 0:0
-every 11 16th brak 0:0
-every 31 16th step 0:0
+new step ; step 1 load bok2bok
+every 2 bar apply 0 1:0
+every 1 bar brak 1:0
+every 11 16th brak 1:0
+every 31 16th step 1:0
+sidechain 0 1
 
-new dloop dloops/simple_song.aiff
-
+new dloop dloops/simple_song.aiff; sidechain 2 1
 new bitshift t>>(8/((t/32)%3))
-aesamples//steelxif35.WAV
-aesamples//steelxif19.WAV
-sidechain w/ bok bok
+new step aesamples//steelxif35.WAV; vol 3 0.4
+new step aesamples//steelxif19.WAV; vol 4 0.5
+every 2 bar invert 1 3:0 4:0
+sidechain 3 1
+sidechain 4 1
 
 new dx
-dx load glitchrrr
+dx 5 load glitchrrr
+every 2 bar apply 1 5:0 # once
+every 4 bar rand "-1 0 1" dx 5 octave %s
+
+stop 2; stop 1
 
 new gran strings/moWaxStringsExcursionsz.aiff
 every 4 bar rand "90 10 50 77 33" loop 6 idx %s
-every 3 bar invert 2 2:0 3:0
+
+start 0; start 2
+every 2 bar rand "0 1" loop 2 reverse %s
+fuckup 2
+
+
+stop 4; stop 1; stop 2; stop 3
+
+new step aesamples//SH09_SNRZ.WAV
+new markov 4
+every 3 bar apply 2 7:0
+every 2 bar brak 7:0
+distort 7
+fx 7:0 threshold 0.5
+delay 7 47
+fx 7:1 fb 34
+
+start 2
+
+stop all; start 5; start 6
+
+new moog
+moog 8 load randNoizzz
+every 2 bar apply 0 8:0 # once
+
+new step notes/mood2SwingNoteGlitch.aiff
+vol 9 1
+ws 9 3
+every 2 bar apply 1 9:0 # once
+
+
+
