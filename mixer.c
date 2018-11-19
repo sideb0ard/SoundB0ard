@@ -105,6 +105,7 @@ mixer *new_mixer(double output_latency)
     mixer_set_notes(mixr);
     mixer_set_chord_progression(mixr, 1);
     mixr->bars_per_chord = 4;
+    mixr->should_progress_chords = false;
 
     // possible TODO - should i de-initialize?
     // is that cleaner code?
@@ -127,7 +128,7 @@ void mixer_status_mixr(mixer *mixr)
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
            ":::::::::: preview_enabled:%d filename:%s\n"
            ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s midi_print:%d midi_bank:%d\n"
-           ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d prog:(%d)%s\n"
+           ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d move:%d prog:(%d)%s\n"
            ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
            mixr->preview.enabled, mixr->preview.filename,
@@ -141,6 +142,7 @@ void mixer_status_mixr(mixer *mixr)
            mixr->midi_bank_num,
            key_names[mixr->key], key_names[mixr->chord],
            chord_type_names[mixr->chord_type], mixr->octave, mixr->bars_per_chord,
+           mixr->should_progress_chords,
            mixr->progression_type, s_progressions[mixr->progression_type]);
     // clang-format on
 
@@ -578,6 +580,31 @@ static void mixer_events_output(mixer *mixr)
     }
 }
 
+bool should_progress_chords(mixer *mixr, int tick)
+{
+    int chance = rand() % 100;
+    if (mixr->should_progress_chords == false)
+        return false;
+
+    if (tick == 0)
+    {
+        if (chance > 75)
+            return true;
+    }
+    else if (tick == PPQN * 2)
+    {
+        if (chance > 97)
+            return true;
+    }
+    else if (tick == PPQN * 3)
+    {
+        if (chance > 99)
+            return true;
+    }
+
+    return false;
+}
+
 // static bool first_run = true;
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
@@ -601,33 +628,8 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
         {
             int current_tick_within_bar = mixr->timing_info.midi_tick % PPBAR;
-            int chance = rand() % 100;
-            bool change_chord = false;
-            if (current_tick_within_bar == 0)
-            {
-                if (chance > 75)
-                    change_chord = true;
-            }
-            else if (current_tick_within_bar == PPQN * 2)
-            {
-                if (chance > 97)
-                    change_chord = true;
-            }
-            else if (current_tick_within_bar == PPQN * 3)
-            {
-                if (chance > 99)
-                    change_chord = true;
-            }
-            if (change_chord)
-            {
-                unsigned int scale_degree =
-                    mixr->prog_degrees[mixr->prog_degrees_idx];
-                mixr->prog_degrees_idx =
-                    (mixr->prog_degrees_idx + 1) % mixr->prog_len;
-                unsigned int root = mixr->notes[scale_degree];
-                unsigned int chord_type = get_chord_type(scale_degree);
-                mixer_change_chord(mixr, root, chord_type);
-            }
+            if (should_progress_chords(mixr, current_tick_within_bar))
+                mixer_next_chord(mixr);
 
             mixer_events_output(mixr);
         }
@@ -1260,4 +1262,18 @@ sequence_engine *get_sequence_engine(soundgenerator *self)
         printf("Error! Don't know what type of SYNTH this is\n");
         return NULL;
     }
+}
+
+void mixer_set_should_progress_chords(mixer *mixr, bool b)
+{
+    mixr->should_progress_chords = b;
+}
+
+void mixer_next_chord(mixer *mixr)
+{
+    unsigned int scale_degree = mixr->prog_degrees[mixr->prog_degrees_idx];
+    mixr->prog_degrees_idx = (mixr->prog_degrees_idx + 1) % mixr->prog_len;
+    unsigned int root = mixr->notes[scale_degree];
+    unsigned int chord_type = get_chord_type(scale_degree);
+    mixer_change_chord(mixr, root, chord_type);
 }

@@ -136,6 +136,7 @@ typedef struct mixer
     int prog_degrees[6]; // max prog_len
     int prog_degrees_idx;
     unsigned int progression_type;
+    bool should_progress_chords;
 
     unsigned int key;
     unsigned int chord;
@@ -222,6 +223,8 @@ int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
 void mixer_enable_print_midi(mixer *mixr, bool b);
 void mixer_check_for_midi_messages(mixer *mixr);
 void mixer_set_midi_bank(mixer *mixr, int num);
+void mixer_set_should_progress_chords(mixer *mixr, bool b);
+void mixer_next_chord(mixer *mixr);
 
 // these are in mixer.h rather than sequence_engine, as mixer needs to transform
 // sg first

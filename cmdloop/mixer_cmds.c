@@ -48,6 +48,15 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         mixer_status_mixr(mixr);
     }
+    else if (strncmp("move", wurds[0], 4) == 0)
+    {
+        bool b = atoi(wurds[1]);
+        mixer_set_should_progress_chords(mixr, b);
+    }
+    else if (strncmp("bump", wurds[0], 4) == 0)
+    {
+        mixer_next_chord(mixr);
+    }
     else if (strncmp("algoz", wurds[0], 5) == 0)
     {
         if (strncmp("off", wurds[1], 3) == 0)
@@ -252,11 +261,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     char *mod = mods[j].name;
                     if (strncmp("once", mod, 4) == 0)
                         set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
-                    //else if (strncmp("riff", mod, 4) == 0)
+                    // else if (strncmp("riff", mod, 4) == 0)
                     //    sequence_engine_set_pattern_to_riff(engine);
-                    //else if (strncmp("melody", mod, 6) == 0)
+                    // else if (strncmp("melody", mod, 6) == 0)
                     //    sequence_engine_set_pattern_to_key(engine);
-                    //else if (strncmp("sparse", mod, 6) == 0)
+                    // else if (strncmp("sparse", mod, 6) == 0)
                     //    sequence_engine_set_num_patterns(engine, 2);
                 }
             }

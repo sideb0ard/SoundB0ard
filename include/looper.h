@@ -120,7 +120,7 @@ typedef struct looper
     int step_diff;
 
     bool stop_pending; // allow eg to stop
-    bool gate_mode; // use midi to trigger env amp
+    bool gate_mode;    // use midi to trigger env amp
 
     int cur_sixteenth; // used to track scramble
 

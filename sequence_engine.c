@@ -51,7 +51,7 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
         engine->arp.last_midi_notes[i] = -1;
 
     engine->sustain_note_ms = 200;
-    engine->single_note_mode = false; // opposite is melody mode
+    engine->single_note_mode = true; // opposite is melody mode
     engine->chord_mode = false;
     engine->follow_mixer_chord_changes = true;
     engine->started = false;
@@ -242,7 +242,7 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
                 &engine->patterns[engine->cur_pattern]);
             engine->restore_pending = false;
         }
-        //else if (engine->multi_pattern_mode && engine->num_patterns > 1)
+        // else if (engine->multi_pattern_mode && engine->num_patterns > 1)
         //{
         //    engine->cur_pattern_iteration--;
         //    if (engine->cur_pattern_iteration <= 0)

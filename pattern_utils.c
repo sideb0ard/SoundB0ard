@@ -233,5 +233,5 @@ void pattern_apply_swing(midi_event *pattern, int swing_setting)
         }
         even16th = 1 - even16th;
     }
-    // step_set_pattern(s, pattern_num, new_pattern);
+    pattern_replace((midi_event *)&new_pattern, pattern);
 }

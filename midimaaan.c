@@ -299,8 +299,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             case (2):
                 if (mixr->midi_bank_num == 0)
                 {
-                    val = scaleybum(0, 127, 1, 10,
-                                    ev->data2);
+                    val = scaleybum(0, 127, 1, 10, ev->data2);
                     drumsynth_set_filter_q(ds, val);
                 }
                 break;
