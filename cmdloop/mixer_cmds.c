@@ -242,10 +242,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
 
         pattern_generator *pg = mixr->pattern_generators[pg_num];
-        uint16_t bitpattern = pg->generate(pg, NULL);
-
         midi_event midi_pattern[PPBAR] = {};
-        apply_short_to_midi_pattern(bitpattern, (midi_event *)&midi_pattern);
+        pg->generate(pg, &midi_pattern);
 
         for (int i = 0; i < num_dests; i++)
         {
@@ -486,7 +484,10 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             soundgenerator *s1 = mixr->sound_generators[sg1_num];
             soundgenerator *s2 = mixr->sound_generators[sg2_num];
 
-            uint16_t bit_pattern = sg->generate(sg, NULL);
+            midi_event midi_pattern[PPBAR] = {};
+            sg->generate(sg, &midi_pattern);
+            uint16_t bit_pattern =
+                midi_pattern_to_short((midi_event *)&midi_pattern);
 
             uint16_t pattern_1, pattern_2 = 0;
 

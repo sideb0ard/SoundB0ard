@@ -5,6 +5,7 @@
 #include "markov.h"
 #include "mixer.h"
 #include "pattern_generator.h"
+#include "pattern_utils.h"
 #include "utils.h"
 #include <euclidean.h>
 
@@ -63,140 +64,143 @@ static int rand_percent()
     return randy;
 }
 
-uint16_t markov_generate(void *self, void *data)
+void markov_generate(void *self, void *data)
 {
     markov *m = (markov *)self;
+    midi_event *midi_pattern = (midi_event*) data;
+
     int first = 0;
     int second = 0;
     int third = 0;
     int fourth = 0;
 
-    uint16_t pattern = 0;
+    uint16_t bit_pattern = 0;
     switch (m->markov_type)
     {
     case (GARAGE):
         if (rand_percent() > 10)
-            pattern |= BEAT0;
+            bit_pattern |= BEAT0;
 
         second = rand_percent();
         if (second > 70)
-            pattern |= BEAT7;
+            bit_pattern |= BEAT7;
         if (second >= 90)
-            pattern |= BEAT5;
+            bit_pattern |= BEAT5;
 
         third = rand_percent();
         if (third > 10)
-            pattern |= BEAT8;
+            bit_pattern |= BEAT8;
         if (third > 50)
-            pattern |= BEAT10;
+            bit_pattern |= BEAT10;
         if (third >= 75)
-            pattern |= BEAT11;
+            bit_pattern |= BEAT11;
         else if (third >= 90)
-            pattern |= BEAT9;
+            bit_pattern |= BEAT9;
 
         fourth = rand_percent();
         if (third > 60)
-            pattern |= BEAT13;
+            bit_pattern |= BEAT13;
         if (third >= 90)
-            pattern |= BEAT15;
+            bit_pattern |= BEAT15;
 
         break;
     case (HIPHOP):
         first = rand_percent();
         if (first > 10)
-            pattern |= BEAT0;
+            bit_pattern |= BEAT0;
         if (first > 60)
-            pattern |= BEAT3;
+            bit_pattern |= BEAT3;
         if (first >= 90)
-            pattern |= BEAT2;
+            bit_pattern |= BEAT2;
 
         second = rand_percent();
         if (second > 80)
-            pattern |= BEAT6;
+            bit_pattern |= BEAT6;
 
         third = rand_percent();
         if (third > 10)
-            pattern |= BEAT8;
+            bit_pattern |= BEAT8;
         if (third > 40)
-            pattern |= BEAT9;
+            bit_pattern |= BEAT9;
         if (third > 90)
-            pattern |= BEAT11;
+            bit_pattern |= BEAT11;
         else if (third >= 60)
-            pattern |= BEAT10;
+            bit_pattern |= BEAT10;
 
         fourth = rand_percent();
         if (third > 80)
-            pattern |= BEAT13;
+            bit_pattern |= BEAT13;
         if (third >= 90)
-            pattern |= BEAT15;
+            bit_pattern |= BEAT15;
 
         break;
     case (HATS):
         for (int i = 0; i < 16; i++)
             if (rand_percent() > 40)
-                pattern |= 1 << (15 - i);
+                bit_pattern |= 1 << (15 - i);
         break;
     case (HATS_MASK):
         for (int i = 10; i < 16; i++)
             if (rand_percent() > 40)
-                pattern |= 1 << (15 - i);
+                bit_pattern |= 1 << (15 - i);
         break;
     case (CLAPS):
         if (rand_percent() > 90)
         {
             int num_hits = rand() % 7;
-            // pattern = create_euclidean_rhythm(num_hits, 16);
-            pattern = create_euclidean_rhythm(0, 16);
+            // bit_pattern = create_euclidean_rhythm(num_hits, 16);
+            bit_pattern = create_euclidean_rhythm(0, 16);
         }
         else
         {
             if (rand_percent() > 10)
-                pattern |= BEAT4;
+                bit_pattern |= BEAT4;
             if (rand_percent() > 90)
-                pattern |= BEAT7;
+                bit_pattern |= BEAT7;
             if (rand_percent() > 95)
-                pattern |= BEAT10;
+                bit_pattern |= BEAT10;
             if (rand_percent() > 10)
-                pattern |= BEAT12;
+                bit_pattern |= BEAT12;
         }
         break;
     case (RAGGA_BEAT):
         first = rand_percent();
         if (first > 10)
-            pattern |= BEAT0;
+            bit_pattern |= BEAT0;
         if (first > 20)
-            pattern |= BEAT3;
+            bit_pattern |= BEAT3;
         if (first >= 90)
-            pattern |= BEAT2;
+            bit_pattern |= BEAT2;
 
         second = rand_percent();
         if (second > 90)
-            pattern |= BEAT7;
+            bit_pattern |= BEAT7;
 
         third = rand_percent();
         if (third > 10)
-            pattern |= BEAT8;
+            bit_pattern |= BEAT8;
         if (third > 20)
-            pattern |= BEAT11;
+            bit_pattern |= BEAT11;
 
         fourth = rand_percent();
         if (third > 80)
-            pattern |= BEAT13;
+            bit_pattern |= BEAT13;
         if (third >= 90)
-            pattern |= BEAT15;
+            bit_pattern |= BEAT15;
         break;
 
     case (RAGGA_SNARE):
         first = rand_percent();
         if (first > 10)
-            pattern |= BEAT6;
+            bit_pattern |= BEAT6;
         if (first > 20)
-            pattern |= BEAT14;
+            bit_pattern |= BEAT14;
         break;
     }
-    if (pattern == 0)
-        return markov_generate(self, data);
-    return pattern;
+    if (bit_pattern == 0)
+        markov_generate(self, data);
+
+    apply_short_to_midi_pattern(bit_pattern, midi_pattern);
 }
 
 void markov_set_debug(void *self, bool b) {}

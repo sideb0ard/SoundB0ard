@@ -29,11 +29,12 @@ bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             else if (strncmp("gen", wurds[2], 3) == 0)
             {
-                int num =
-                    pg->generate(pg, (void *)&mixr->timing_info.cur_sample);
+                midi_event midi_pattern[PPBAR] = {};
+                pg->generate(pg, &midi_pattern);
+                uint16_t bit_pattern = midi_pattern_to_short(midi_pattern);
                 char binnum[17] = {0};
-                short_to_char(num, binnum);
-                printf("NOM!: %d %s\n", num, binnum);
+                short_to_char(bit_pattern, binnum);
+                printf("NOM!: %d %s\n", bit_pattern, binnum);
             }
             else if (strncmp("time", wurds[2], 4) == 0 && pg->type == BITSHIFT)
             {

@@ -5,6 +5,7 @@
 #include "defjams.h"
 #include "mixer.h"
 #include "pattern_generator.h"
+#include "pattern_utils.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -108,11 +109,12 @@ void bitshift_status(void *self, wchar_t *wstring)
              infix_pattern, rpn_pattern);
 }
 
-uint16_t bitshift_generate(void *self, void *data)
+void bitshift_generate(void *self, void *data)
 {
     bitshift *bs = (bitshift *)self;
-    // int *t = &mixr->timing_info.cur_sample;
     int t = bs->time_counter++;
+
+    midi_event *midi_pattern = (midi_event*) data;
 
     int num_rpn = bs->pattern.num_rpn_tokens;
     bitshift_token *rpn_tokens = bs->pattern.rpn_tokenized_pattern;
@@ -210,13 +212,13 @@ uint16_t bitshift_generate(void *self, void *data)
     if (answer_stack_idx != 1)
     {
         printf("BARF - STACK IS WRONG!\n");
-        return 0;
+        return;
     }
     else
     {
         if (bs->sg.debug)
             printf("Returning %d\n", answer_stack[0]);
-        return answer_stack[0];
+        apply_short_to_midi_pattern(answer_stack[0], midi_pattern);
     }
 }
 

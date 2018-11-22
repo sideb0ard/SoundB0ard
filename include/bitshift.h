@@ -60,7 +60,7 @@ typedef struct bitshift
 } bitshift;
 
 pattern_generator *new_bitshift(int argc, char argv[][SIZE_OF_WURD]);
-uint16_t bitshift_generate(void *self, void *data);
+void bitshift_generate(void *self, void *data);
 void bitshift_status(void *self, wchar_t *status_string);
 void bitshift_event_notify(void *self, unsigned int event_type);
 
