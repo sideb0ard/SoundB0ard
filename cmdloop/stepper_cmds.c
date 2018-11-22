@@ -15,8 +15,7 @@ extern mixer *mixr;
 
 bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
-    if (strncmp("samp", wurds[0], 3) == 0 ||
-        strncmp("step", wurds[0], 4) == 0 || strncmp("beat", wurds[0], 4) == 0)
+    if (strncmp("step", wurds[0], 4) == 0)
     {
 
         if (strncmp("ls", wurds[1], 2) == 0)

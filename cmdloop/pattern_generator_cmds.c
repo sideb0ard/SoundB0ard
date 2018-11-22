@@ -73,51 +73,51 @@ bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
-    else if (strncmp("beat", wurds[0], 4) == 0 ||
-             strncmp("note", wurds[0], 4) == 0)
-    {
-        int sg_num;
-        int sg_pattern_num;
-        sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
-        if (mixer_is_valid_soundgen_num(mixr, sg_num))
-        {
+    //else if (strncmp("beat", wurds[0], 4) == 0 ||
+    //         strncmp("note", wurds[0], 4) == 0)
+    //{
+    //    int sg_num;
+    //    int sg_pattern_num;
+    //    sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
+    //    if (mixer_is_valid_soundgen_num(mixr, sg_num))
+    //    {
 
-            int line_len = 0;
-            for (int i = 2; i < num_wurds; i++)
-            {
-                line_len += strlen(wurds[i]);
-            }
-            line_len += num_wurds + 1;
-            char line[line_len];
-            memset(line, 0, line_len * sizeof(char));
+    //        int line_len = 0;
+    //        for (int i = 2; i < num_wurds; i++)
+    //        {
+    //            line_len += strlen(wurds[i]);
+    //        }
+    //        line_len += num_wurds + 1;
+    //        char line[line_len];
+    //        memset(line, 0, line_len * sizeof(char));
 
-            for (int i = 2; i < num_wurds; i++)
-            {
-                strcat(line, wurds[i]);
-                if (i != num_wurds - 1)
-                    strcat(line, " ");
-            }
+    //        for (int i = 2; i < num_wurds; i++)
+    //        {
+    //            strcat(line, wurds[i]);
+    //            if (i != num_wurds - 1)
+    //                strcat(line, " ");
+    //        }
 
-            midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
-            int pattern_type = -1;
-            if (strncmp("beat", wurds[0], 4) == 0)
-                pattern_type = STEP_PATTERN;
-            else
-                pattern_type = NOTE_PATTERN;
-            if (parse_pattern(line, pattern, pattern_type))
-            {
-                soundgenerator *sg = mixr->sound_generators[sg_num];
-                int num_patterns = sg->get_num_patterns(sg);
-                printf("NUM PAYYTERSN! %d\n", num_patterns);
-                if (num_patterns <= sg_pattern_num)
-                    sg->set_num_patterns(sg, sg_pattern_num + 1);
-                pattern_change_info change_info = {.clear_previous = true,
-                                                   .temporary = false};
-                sg->set_pattern(sg, sg_pattern_num, change_info, pattern);
-            }
-            free(pattern);
-            return true;
-        }
-    }
+    //        midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
+    //        int pattern_type = -1;
+    //        if (strncmp("beat", wurds[0], 4) == 0)
+    //            pattern_type = STEP_PATTERN;
+    //        else
+    //            pattern_type = NOTE_PATTERN;
+    //        if (parse_pattern(line, pattern, pattern_type))
+    //        {
+    //            soundgenerator *sg = mixr->sound_generators[sg_num];
+    //            int num_patterns = sg->get_num_patterns(sg);
+    //            printf("NUM PAYYTERSN! %d\n", num_patterns);
+    //            if (num_patterns <= sg_pattern_num)
+    //                sg->set_num_patterns(sg, sg_pattern_num + 1);
+    //            pattern_change_info change_info = {.clear_previous = true,
+    //                                               .temporary = false};
+    //            sg->set_pattern(sg, sg_pattern_num, change_info, pattern);
+    //        }
+    //        free(pattern);
+    //        return true;
+    //    }
+    //}
     return false;
 }

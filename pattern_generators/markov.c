@@ -157,8 +157,11 @@ void markov_generate(void *self, void *data)
                 bit_pattern |= BEAT4;
             if (rand_percent() > 90)
                 bit_pattern |= BEAT7;
-            if (rand_percent() > 95)
+            int randy = rand_percent();
+            if (randy > 95)
                 bit_pattern |= BEAT10;
+            else if (randy > 92)
+                bit_pattern |= BEAT11;
             if (rand_percent() > 10)
                 bit_pattern |= BEAT12;
         }

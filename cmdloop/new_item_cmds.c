@@ -63,35 +63,52 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
         }
 
-        else if (strncmp("kit", wurds[1], 3) == 0)
+        else if (strncmp("kit", wurds[1], 3) == 0 ||
+                 strncmp("beat", wurds[1], 4) == 0)
         {
-            char kickfile[512] = {0};
-            get_random_sample_from_dir("kicks", kickfile);
-            printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, kickfile);
-            drumsampler *bd = new_drumsampler(kickfile);
+            drumsynth *bd = new_drumsynth();
+            drumsynth_open_patch(bd, "thuuud");
             int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
             update_environment("bd", bdnum);
 
-            char snarefile[512] = {0};
-            get_random_sample_from_dir("snrs", snarefile);
-            printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, snarefile);
-            drumsampler *sd = new_drumsampler(snarefile);
+            drumsynth *sd = new_drumsynth();
+            drumsynth_open_patch(sd, "snarrre");
             int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
             update_environment("sd", sdnum);
 
-            char highhat[512] = {0};
-            get_random_sample_from_dir("hats", highhat);
-            printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, highhat);
-            drumsampler *hh = new_drumsampler(highhat);
+            drumsynth *hh = new_drumsynth();
+            drumsynth_open_patch(hh, "closedhh");
             int hhnum = add_sound_generator(mixr, (soundgenerator *)hh);
             update_environment("hh", hhnum);
 
-            char perc[512] = {0};
-            get_random_sample_from_dir("perc", perc);
-            printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
-            drumsampler *pc = new_drumsampler(perc);
-            int pcnum = add_sound_generator(mixr, (soundgenerator *)pc);
-            update_environment("pc", pcnum);
+            if (strncmp("beat", wurds[1], 4) == 0)
+            {
+                char launch_cmd[6][SIZE_OF_WURD] = {"every", "2", "bar", "apply"};
+
+                int drum_markov = mixer_add_markov(mixr, 0);
+                sprintf(launch_cmd[4], "%d", drum_markov);
+                sprintf(launch_cmd[5], "%d:0", bdnum);
+
+                algorithm *a = new_algorithm(6, launch_cmd);
+                if (a)
+                   mixer_add_algorithm(mixr, a);
+
+                int snare_markov = mixer_add_markov(mixr, 4);
+                sprintf(launch_cmd[4], "%d", snare_markov);
+                sprintf(launch_cmd[5], "%d:0", sdnum);
+
+                a = new_algorithm(6, launch_cmd);
+                if (a)
+                   mixer_add_algorithm(mixr, a);
+
+                int hats_markov = mixer_add_markov(mixr, 2);
+                sprintf(launch_cmd[4], "%d", hats_markov);
+                sprintf(launch_cmd[5], "%d:0", hhnum);
+
+                a = new_algorithm(6, launch_cmd);
+                if (a)
+                   mixer_add_algorithm(mixr, a);
+            }
         }
         else if (strncmp("perc", wurds[1], 4) == 0)
         {
@@ -134,8 +151,27 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (strncmp("markov", wurds[1], 6) == 0)
         {
             printf("MARkOV! PATTERN GEN!\n");
-            unsigned int type = atoi(wurds[2]);
-            mixer_add_markov(mixr, type);
+            if (strncmp("garage", wurds[2], 6) == 0 ||
+                strncmp("2step", wurds[2], 5) == 0)
+                mixer_add_markov(mixr, 0);
+            else if (strncmp("hiphop", wurds[2], 6) == 0)
+                mixer_add_markov(mixr, 1);
+            else if (strncmp("hats", wurds[2], 4) == 0)
+                mixer_add_markov(mixr, 2);
+            else if (strncmp("hatsmask", wurds[2], 8) == 0)
+                mixer_add_markov(mixr, 3);
+            else if (strncmp("clap", wurds[2], 4) == 0 ||
+                     strncmp("snare", wurds[2], 5) == 0)
+                mixer_add_markov(mixr, 4);
+            else if (strncmp("raggakick", wurds[2], 9) == 0)
+                mixer_add_markov(mixr, 5);
+            else if (strncmp("raggasnare", wurds[2], 10) == 0)
+                mixer_add_markov(mixr, 6);
+            else
+            {
+                unsigned int type = atoi(wurds[2]);
+                mixer_add_markov(mixr, type);
+            }
         }
 
         else if (strncmp("moog", wurds[1], 4) == 0)
