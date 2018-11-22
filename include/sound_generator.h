@@ -21,7 +21,8 @@ typedef struct soundgenerator
     void (*self_destruct)(void *self);
     void (*event_notify)(void *self, unsigned int event_type);
     midi_event *(*get_pattern)(void *self, int pattern_num);
-    void (*set_pattern)(void *self, int pattern_num, midi_event *pattern);
+    void (*set_pattern)(void *self, int pattern_num,
+                        pattern_change_info change_info, midi_event *pattern);
     bool (*is_valid_pattern)(void *self, int pattern_num);
 
     sound_generator_type type;

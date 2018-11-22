@@ -214,8 +214,10 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
 
                         midi_event *loop_copy =
                             sequence_engine_get_pattern(engine, pattern_num);
+                        pattern_change_info change_info = {
+                            .clear_previous = true, .temporary = false};
                         sequence_engine_set_pattern(sb2, pattern_num2,
-                                                    loop_copy);
+                                                    change_info, loop_copy);
                     }
                 }
             }

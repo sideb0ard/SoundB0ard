@@ -9,6 +9,7 @@ enum pattern_gen_type
     EUCLIDEAN,
     BITSHIFT,
     MARKOV,
+    NUM_GEN_TYPES,
 };
 
 typedef struct pattern_generator

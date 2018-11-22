@@ -252,7 +252,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (mixer_is_valid_soundgen_num(mixr, dests[i].sg_num))
             {
                 soundgenerator *sg = mixr->sound_generators[dests[i].sg_num];
-                sg->set_pattern(sg, dests[i].sg_pattern_num,
+                pattern_change_info change_info = {.clear_previous = true,
+                                                   .temporary = false};
+                sg->set_pattern(sg, dests[i].sg_pattern_num, change_info,
                                 (midi_event *)&midi_pattern);
 
                 sequence_engine *engine = get_sequence_engine(sg);
@@ -499,12 +501,15 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 pattern_2 = bit_pattern & 0x00FF;
             }
 
+            pattern_change_info change_info = {.clear_previous = true,
+                                               .temporary = false};
+
             midi_event pattern[PPBAR];
             apply_short_to_midi_pattern(pattern_1, pattern);
-            s1->set_pattern(s1, sg1_track_num, pattern);
+            s1->set_pattern(s1, sg1_track_num, change_info, pattern);
 
             apply_short_to_midi_pattern(pattern_2, pattern);
-            s2->set_pattern(s2, sg1_track_num, pattern);
+            s2->set_pattern(s2, sg1_track_num, change_info, pattern);
         }
         goto cmd_found;
     }

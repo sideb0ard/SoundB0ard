@@ -206,6 +206,12 @@ typedef enum time_event
     TIME_CHORD_CHANGE,
 } time_event;
 
+typedef struct pattern_change_info
+{
+    bool clear_previous;
+    bool temporary;
+} pattern_change_info;
+
 typedef struct stereo_val
 {
     double left;

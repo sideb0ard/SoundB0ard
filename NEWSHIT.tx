@@ -84,3 +84,20 @@ stop 1
 
 new loop dloops/krushSnareRoll.aiff; vol 9 1; fuckup 9;
 start 1
+
+################
+bpm 90
+step 0 thuuud
+step 1 kicks/technotronBD.aiff
+dx raggalo400sus
+^ apply from [ 1]  [MARKOV PATTERN GEN ] - type:(0)GARAGE
+euclidean is 0
+apply 1 0:0 4:0 // every 2
+apply 1 1:0 2:0 // every 2 
+apply 0 0:0 1:0 // every 9
+apply 0 0:0 2:0 // every 13
+bump every 8 bar
+moog summertimeStrings
+snrs/crushedSnare.aiff
+
+

@@ -141,7 +141,8 @@ void looper_make_active_track(void *self, int tracknum);
 void looper_event_notify(void *self, unsigned int event_type);
 bool looper_is_valid_pattern(void *self, int pattern_num);
 midi_event *looper_get_pattern(void *self, int pattern_num);
-void looper_set_pattern(void *self, int pattern_num, midi_event *pattern);
+void looper_set_pattern(void *self, int pattern_num,
+                        pattern_change_info change_info, midi_event *pattern);
 
 void looper_import_file(looper *g, char *filename);
 void looper_set_external_source(looper *g, int sound_gen_num);

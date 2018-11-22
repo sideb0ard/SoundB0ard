@@ -673,11 +673,12 @@ midi_event *drumsynth_get_pattern(void *self, int pattern_num)
     return NULL;
 }
 
-void drumsynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
+void drumsynth_set_pattern(void *self, int pattern_num,
+                           pattern_change_info change_info, midi_event *pattern)
 {
     sequence_engine *engine = get_sequence_engine(self);
     if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, pattern);
+        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void drumsynth_set_reset_osc(drumsynth *ds, bool b) { ds->reset_osc = b; }

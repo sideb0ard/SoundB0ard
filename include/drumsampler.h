@@ -78,7 +78,9 @@ void drumsampler_stop(void *self);
 stereo_val drumsampler_gennext(void *self);
 
 midi_event *drumsampler_get_pattern(void *self, int pattern_num);
-void drumsampler_set_pattern(void *self, int pattern_num, midi_event *pattern);
+void drumsampler_set_pattern(void *self, int pattern_num,
+                             pattern_change_info change_info,
+                             midi_event *pattern);
 
 void drumsampler_import_file(drumsampler *s, char *filename);
 void drumsampler_reset_samples(drumsampler *seq);

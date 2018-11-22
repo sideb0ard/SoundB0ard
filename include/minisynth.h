@@ -317,5 +317,7 @@ void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
 void minisynth_set_monophonic(minisynth *ms, bool b);
 midi_event *minisynth_get_pattern(void *self, int pattern_num);
-void minisynth_set_pattern(void *self, int pattern_num, midi_event *pattern);
+void minisynth_set_pattern(void *self, int pattern_num,
+                           pattern_change_info change_info,
+                           midi_event *pattern);
 void minisynth_set_hard_sync(minisynth *ms, bool val);

@@ -58,11 +58,12 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (sg_src->is_valid_pattern(sg_src, sg_src_pattern_num) &&
                 sg_dst->is_valid_pattern(sg_dst, sg_dst_pattern_num))
             {
-                // printf("Copying from %d:%d to %d:%d\n", sg_src_num,
-                //       sg_src_pattern_num, sg_dst_num, sg_dst_pattern_num);
+                pattern_change_info change_info = {.clear_previous = true,
+                                                   .temporary = false};
                 midi_event *pattern =
                     sg_src->get_pattern(sg_src, sg_src_pattern_num);
-                sg_dst->set_pattern(sg_dst, sg_dst_pattern_num, pattern);
+                sg_dst->set_pattern(sg_dst, sg_dst_pattern_num, change_info,
+                                    pattern);
             }
             else
                 printf("Tried copying - something went wrong..\n");

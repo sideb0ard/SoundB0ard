@@ -328,7 +328,9 @@ void sequence_engine_nudge_pattern(sequence_engine *ms, int pattern_num,
         }
     }
 
-    sequence_engine_set_pattern(ms, pattern_num, new_loop);
+    pattern_change_info change_info = {.clear_previous = true,
+                                       .temporary = false};
+    sequence_engine_set_pattern(ms, pattern_num, change_info, new_loop);
 }
 
 bool is_valid_pattern_num(sequence_engine *ms, int pattern_num)
@@ -618,6 +620,7 @@ midi_event *sequence_engine_get_pattern(sequence_engine *engine,
 }
 
 void sequence_engine_set_pattern(void *self, int pattern_num,
+                                 pattern_change_info change_info,
                                  midi_event *pattern)
 {
     sequence_engine *engine = (sequence_engine *)self;
@@ -625,11 +628,14 @@ void sequence_engine_set_pattern(void *self, int pattern_num,
     {
         int default_midi_note =
             get_midi_note_from_mixer_key(mixr->key, engine->octave);
-        clear_midi_pattern(engine->patterns[pattern_num]);
+        if (change_info.clear_previous)
+            clear_midi_pattern(engine->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
         {
             midi_event ev = pattern[i];
             ev.data1 = default_midi_note;
+            if (change_info.temporary)
+                ev.delete_after_use = true;
             sequence_engine_add_event(engine, pattern_num, i, ev);
         }
         if (engine->swing_setting > 0)

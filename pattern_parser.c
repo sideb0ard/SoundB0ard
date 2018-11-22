@@ -754,6 +754,10 @@ void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
 
     midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
     if (parse_pattern(line, pattern, pattern_type))
-        sg->set_pattern(sg, target_pattern_num, pattern);
+    {
+        pattern_change_info change_info = {.clear_previous = true,
+                                           .temporary = false};
+        sg->set_pattern(sg, target_pattern_num, change_info, pattern);
+    }
     free(pattern);
 }

@@ -93,11 +93,12 @@ midi_event *looper_get_pattern(void *self, int pattern_num)
     return NULL;
 }
 
-void looper_set_pattern(void *self, int pattern_num, midi_event *pattern)
+void looper_set_pattern(void *self, int pattern_num,
+                        pattern_change_info change_info, midi_event *pattern)
 {
     sequence_engine *engine = get_sequence_engine(self);
     if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, pattern);
+        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void looper_event_notify(void *self, unsigned int event_type)

@@ -187,6 +187,7 @@ void sequence_engine_mv_micro_note(sequence_engine *engine, int pattern_num,
 midi_event *sequence_engine_get_pattern(sequence_engine *engine,
                                         int pattern_num);
 void sequence_engine_set_pattern(void *self, int pattern_num,
+                                 pattern_change_info change_info,
                                  midi_event *pattern);
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine);
 void sequence_engine_set_pattern_to_current_key(sequence_engine *engine);

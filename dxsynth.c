@@ -1698,11 +1698,11 @@ midi_event *dxsynth_get_pattern(void *self, int pattern_num)
     return NULL;
 }
 
-void dxsynth_set_pattern(void *self, int pattern_num, midi_event *pattern)
+void dxsynth_set_pattern(void *self, int pattern_num, pattern_change_info change_info, midi_event *pattern)
 {
     sequence_engine *engine = get_sequence_engine(self);
     if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, pattern);
+        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num)

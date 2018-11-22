@@ -110,7 +110,9 @@ bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 printf("NUM PAYYTERSN! %d\n", num_patterns);
                 if (num_patterns <= sg_pattern_num)
                     sg->set_num_patterns(sg, sg_pattern_num + 1);
-                sg->set_pattern(sg, sg_pattern_num, pattern);
+                pattern_change_info change_info = {.clear_previous = true,
+                                                   .temporary = false};
+                sg->set_pattern(sg, sg_pattern_num, change_info, pattern);
             }
             free(pattern);
             return true;

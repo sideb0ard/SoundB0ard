@@ -30,7 +30,7 @@ pattern_generator *new_euclidean(int num_hits, int num_steps)
     e->actual_num_hits = num_hits;
     e->actual_num_steps = num_steps;
 
-    e->mode = EUCLID_STATIC;
+    e->mode = EUCLID_RANDOM;
 
     printf("NEW EUCLID - numhits:%d steps:%d\n", e->num_hits, e->num_steps);
 
