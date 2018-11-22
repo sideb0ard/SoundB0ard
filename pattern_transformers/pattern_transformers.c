@@ -3,6 +3,7 @@
 #include <pattern_parser.h>
 #include <pattern_transformers.h>
 #include <pattern_utils.h>
+#include <stdlib.h>
 
 static void pattern_check_idx(int *idx, int pattern_len)
 {
@@ -65,4 +66,60 @@ void brak(midi_event *in_pattern)
     for (int i = 0; i < PPBAR; i++)
         if (scratch_pattern[i].event_type)
             midi_pattern_add_event(in_pattern, i, scratch_pattern[i]);
+}
+
+void echo(midi_event *in_pattern)
+{
+    midi_event scratch_pattern[PPBAR] = {};
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (in_pattern[i].event_type)
+        {
+            if (in_pattern[i].data2 > 30)
+            {
+                int target_idx = i + (PPQN / 2);
+                pattern_check_idx(&target_idx, PPBAR);
+                scratch_pattern[target_idx] = in_pattern[i];
+                scratch_pattern[target_idx].data2 /= 2.5;
+                scratch_pattern[target_idx].delete_after_use = true;
+            }
+        }
+    }
+    for (int i = 0; i < PPBAR; i++)
+        if (scratch_pattern[i].event_type)
+            midi_pattern_add_event(in_pattern, i, scratch_pattern[i]);
+}
+
+void dense(midi_event *in_pattern, int density)
+{
+    if (density < 2)
+        return;
+
+    int density_fraction = PPBAR / density;
+    midi_event *scratch_pattern = calloc(sizeof(midi_event), density_fraction);
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (in_pattern[i].event_type)
+        {
+            int target_idx = i / density;
+            pattern_check_idx(&target_idx, PPBAR);
+            scratch_pattern[target_idx] = in_pattern[i];
+            scratch_pattern[target_idx].data2 /= 2.5;
+            scratch_pattern[target_idx].delete_after_use = true;
+        }
+    }
+
+    for (int i = 0; i < PPBAR / density; i++)
+    {
+        if (scratch_pattern[i].event_type)
+        {
+            for (int j = 0; j < density; j++)
+            {
+                midi_pattern_add_event(in_pattern, j * density_fraction,
+                                       scratch_pattern[i]);
+            }
+        }
+    }
+
+    free(scratch_pattern);
 }

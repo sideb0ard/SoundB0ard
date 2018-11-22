@@ -136,6 +136,44 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         goto cmd_found;
     }
+
+    else if (strncmp("dense", wurds[0], 5) == 0)
+    {
+        int sg_num;
+        int sg_pattern_num;
+        sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
+        if (mixer_is_valid_soundgen_num(mixr, sg_num))
+        {
+            soundgenerator *sg =
+                (soundgenerator *)mixr->sound_generators[sg_num];
+            if (sg->is_valid_pattern(sg, sg_pattern_num))
+            {
+                int density = atoi(wurds[2]);
+                if (density < 2)
+                    density = 2;
+                midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
+                dense(pattern, density);
+            }
+        }
+        goto cmd_found;
+    }
+    else if (strncmp("echo", wurds[0], 4) == 0)
+    {
+        int sg_num;
+        int sg_pattern_num;
+        sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
+        if (mixer_is_valid_soundgen_num(mixr, sg_num))
+        {
+            soundgenerator *sg =
+                (soundgenerator *)mixr->sound_generators[sg_num];
+            if (sg->is_valid_pattern(sg, sg_pattern_num))
+            {
+                midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
+                echo(pattern);
+            }
+        }
+        goto cmd_found;
+    }
     else if (strncmp("prog", wurds[0], 4) == 0)
     {
         printf("PROG!\n");
