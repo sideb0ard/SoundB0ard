@@ -28,3 +28,5 @@ void markov_status(void *self, wchar_t *status_string);
 void markov_event_notify(void *self, unsigned int event_type);
 void markov_set_debug(void *self, bool b);
 void markov_set_type(markov *m, unsigned int type);
+
+uint16_t markov_bit_pattern_generate(unsigned int markov_type);

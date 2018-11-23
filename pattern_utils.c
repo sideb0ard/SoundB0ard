@@ -129,6 +129,37 @@ void short_to_char(uint16_t num, char bin_num[17])
 //    puts("\n");
 //}
 
+void apply_short_to_midi_pattern_sub_pattern(uint16_t bit_pattern,
+                                             int start_idx, int pattern_len,
+                                             midi_event *dest_pattern)
+{
+    int ticks_per_quart = pattern_len / 16;
+    //printf("START IDX:%d Len:%d Ticks:%d\n", start_idx, pattern_len, ticks_per_quart);
+    for (int i = 0; i < 15; i++)
+    {
+        if (bit_pattern & (1 << (15 - i)))
+        {
+            int midi_pos = i * ticks_per_quart;
+            pattern_check_idx(&midi_pos, PPBAR);
+            int hold_time_ms = (rand() % 200) + 130;
+
+            midi_event *ev = &dest_pattern[midi_pos];
+            ev->data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+            ev->event_type = MIDI_ON;
+            ev->source = 0;
+            ev->hold = hold_time_ms;
+
+            if (i == 0 || i == 8)
+                ev->data2 = 128; // velocity
+            else
+            {
+                int rand_velocity = (rand() % 50) + 70;
+                ev->data2 = rand_velocity;
+            }
+        }
+    }
+}
+
 void apply_short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
 {
     clear_midi_pattern(dest_pattern);
@@ -234,4 +265,12 @@ void pattern_apply_swing(midi_event *pattern, int swing_setting)
         even16th = 1 - even16th;
     }
     pattern_replace((midi_event *)&new_pattern, pattern);
+}
+
+void pattern_check_idx(int *idx, int pattern_len)
+{
+    if (*idx < 0)
+        *idx += pattern_len;
+    else if (*idx >= pattern_len)
+        *idx -= pattern_len;
 }

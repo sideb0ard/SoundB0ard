@@ -64,18 +64,15 @@ static int rand_percent()
     return randy;
 }
 
-void markov_generate(void *self, void *data)
+uint16_t markov_bit_pattern_generate(unsigned int markov_type)
 {
-    markov *m = (markov *)self;
-    midi_event *midi_pattern = (midi_event*) data;
-
     int first = 0;
     int second = 0;
     int third = 0;
     int fourth = 0;
 
     uint16_t bit_pattern = 0;
-    switch (m->markov_type)
+    switch (markov_type)
     {
     case (GARAGE):
         if (rand_percent() > 10)
@@ -214,11 +211,19 @@ void markov_generate(void *self, void *data)
         break;
     }
     if (bit_pattern == 0)
-        markov_generate(self, data);
+        markov_bit_pattern_generate(markov_type);
 
-    apply_short_to_midi_pattern(bit_pattern, midi_pattern);
+    return bit_pattern;
+
 }
 
+void markov_generate(void *self, void *data)
+{
+    markov *m = (markov *)self;
+    midi_event *midi_pattern = (midi_event*) data;
+    uint16_t bit_pattern = markov_bit_pattern_generate(m->markov_type);
+    apply_short_to_midi_pattern(bit_pattern, midi_pattern);
+}
 void markov_set_debug(void *self, bool b) {}
 
 void markov_event_notify(void *self, unsigned int event_type) {}

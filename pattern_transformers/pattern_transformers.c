@@ -5,14 +5,6 @@
 #include <pattern_utils.h>
 #include <stdlib.h>
 
-static void pattern_check_idx(int *idx, int pattern_len)
-{
-    if (*idx < 0)
-        *idx += pattern_len;
-    else if (*idx >= pattern_len)
-        *idx -= pattern_len;
-}
-
 static void _shift(midi_event *in_pattern, int places, int direction)
 {
     midi_event out_pattern[PPBAR] = {};

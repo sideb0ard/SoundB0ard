@@ -3,6 +3,7 @@
 
 #include <bitshift.h>
 #include <euclidean.h>
+#include <juggler.h>
 #include <markov.h>
 #include <mixer.h>
 #include <pattern_generator_cmds.h>
@@ -60,6 +61,17 @@ bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     int val = atoi(wurds[3]);
                     euclidean_change_steps(e, val);
                 }
+            }
+            else if (pg->type == JUGGLER)
+            {
+                juggler *j = (juggler *)pg;
+                int val = atoi(wurds[3]);
+                if (strncmp(wurds[2], "max_depth", 9) == 0)
+                    juggler_set_max_depth(j, val);
+                else if (strncmp(wurds[2], "pct_probability", 15) == 0)
+                    juggler_set_pct_probability(j, val);
+                else if (strncmp(wurds[2], "debug", 5) == 0)
+                    juggler_set_debug(j, val);
             }
             else if (pg->type == MARKOV)
             {
