@@ -123,3 +123,21 @@ void dense(midi_event *in_pattern, int density)
 
     free(scratch_pattern);
 }
+
+void reverse(midi_event *in_pattern)
+{
+    //printf("REVERSE!\n");
+    midi_event scratch_pattern[PPBAR] = {};
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (in_pattern[i].event_type)
+        {
+            int target_idx = PPBAR - i - 1;
+            scratch_pattern[target_idx] = in_pattern[i];
+        }
+    }
+    clear_midi_pattern(in_pattern);
+    for (int i = 0; i < PPBAR; i++)
+        if (scratch_pattern[i].event_type)
+            midi_pattern_add_event(in_pattern, i, scratch_pattern[i]);
+}

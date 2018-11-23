@@ -659,11 +659,11 @@ void itoa(int n, char s[])
     if (sign < 0)
         s[i++] = '-';
     s[i] = '\0';
-    reverse(s);
+    reverse_string(s);
 }
 
 /* reverse:  reverse string s in place */
-void reverse(char s[])
+void reverse_string(char s[])
 {
     int i, j;
     char c;

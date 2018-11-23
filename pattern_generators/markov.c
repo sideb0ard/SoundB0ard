@@ -10,7 +10,7 @@
 #include <euclidean.h>
 
 extern mixer *mixr;
-static char *s_markov_types[] = {"GARAGE",     "HIPHOP", "HATS",
+static char *s_markov_types[] = {"GARAGE",     "HIPHOP", "HATS", "HATS2",
                                  "HATS_MASK",  "CLAPS",  "RAGGA_KICK",
                                  "RAGGA_SNARE"};
 
@@ -138,6 +138,19 @@ void markov_generate(void *self, void *data)
         for (int i = 0; i < 16; i++)
             if (rand_percent() > 40)
                 bit_pattern |= 1 << (15 - i);
+        break;
+    case (HATS2):
+        for (int i = 0; i < 16; i++)
+        {
+            if (i % 4 == 0)
+            {
+                if (rand_percent() > 40)
+                    bit_pattern |= 1 << (15 - i);
+            } else if ((i % 4) - 3 == 0) {
+                if (rand_percent() > 40)
+                    bit_pattern |= 1 << (15 - i);
+            }
+        }
         break;
     case (HATS_MASK):
         for (int i = 10; i < 16; i++)

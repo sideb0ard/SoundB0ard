@@ -9,6 +9,7 @@ enum pattern_gen_type
     EUCLIDEAN,
     BITSHIFT,
     MARKOV,
+    JUGGLER,
     NUM_GEN_TYPES,
 };
 

@@ -162,6 +162,7 @@ void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
 int mixer_add_algorithm(mixer *mixr, algorithm *a);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
+int mixer_add_juggler(mixer *mixr, unsigned int style);
 int mixer_add_markov(mixer *mixr, unsigned int type);
 void mixer_preview_audio(mixer *mixr, char *filename);
 

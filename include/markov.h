@@ -8,6 +8,7 @@ enum
     GARAGE,
     HIPHOP,
     HATS,
+    HATS2,
     HATS_MASK,
     CLAPS,
     RAGGA_BEAT,

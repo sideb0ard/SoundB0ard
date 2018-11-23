@@ -18,6 +18,7 @@
 #include "envelope.h"
 #include "euclidean.h"
 #include "fx.h"
+#include "juggler.h"
 #include "looper.h"
 #include "markov.h"
 #include "minisynth.h"
@@ -491,6 +492,16 @@ int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps)
 {
     printf("Adding an EUCLIDEAN PATTERN GENERATOR, yo!\n");
     pattern_generator *sg = new_euclidean(num_hits, num_steps);
+    if (sg)
+        return add_pattern_generator(mixr, sg);
+    else
+        return -99;
+}
+
+int mixer_add_juggler(mixer *mixr, unsigned int style)
+{
+    printf("Adding an JUGGLER PATTERN GENERATOR, yo!\n");
+    pattern_generator *sg = new_juggler(style);
     if (sg)
         return add_pattern_generator(mixr, sg);
     else

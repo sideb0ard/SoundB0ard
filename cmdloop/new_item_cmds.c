@@ -63,6 +63,13 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
         }
 
+        else if (strncmp("juggle", wurds[1], 6) == 0)
+        {
+            printf("JUGGLER! PATTERN GEN!\n");
+            mixer_add_juggler(mixr, 0); // 0 is only choice at the mo
+        }
+
+
         else if (strncmp("kit", wurds[1], 3) == 0 ||
                  strncmp("beat", wurds[1], 4) == 0)
         {
@@ -156,17 +163,19 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 mixer_add_markov(mixr, 0);
             else if (strncmp("hiphop", wurds[2], 6) == 0)
                 mixer_add_markov(mixr, 1);
+            else if (strncmp("hatsmask", wurds[2], 8) == 0)
+                mixer_add_markov(mixr, 4);
+            else if (strncmp("hats2", wurds[2], 5) == 0)
+                mixer_add_markov(mixr, 3);
             else if (strncmp("hats", wurds[2], 4) == 0)
                 mixer_add_markov(mixr, 2);
-            else if (strncmp("hatsmask", wurds[2], 8) == 0)
-                mixer_add_markov(mixr, 3);
             else if (strncmp("clap", wurds[2], 4) == 0 ||
                      strncmp("snare", wurds[2], 5) == 0)
-                mixer_add_markov(mixr, 4);
-            else if (strncmp("raggakick", wurds[2], 9) == 0)
                 mixer_add_markov(mixr, 5);
-            else if (strncmp("raggasnare", wurds[2], 10) == 0)
+            else if (strncmp("raggakick", wurds[2], 9) == 0)
                 mixer_add_markov(mixr, 6);
+            else if (strncmp("raggasnare", wurds[2], 10) == 0)
+                mixer_add_markov(mixr, 7);
             else
             {
                 unsigned int type = atoi(wurds[2]);
