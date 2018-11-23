@@ -139,7 +139,7 @@ void apply_short_to_midi_pattern_sub_pattern(uint16_t bit_pattern,
     {
         if (bit_pattern & (1 << (15 - i)))
         {
-            int midi_pos = i * ticks_per_quart;
+            int midi_pos = start_idx + (i * ticks_per_quart);
             pattern_check_idx(&midi_pos, PPBAR);
             int hold_time_ms = (rand() % 200) + 130;
 

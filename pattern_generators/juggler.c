@@ -22,7 +22,7 @@ pattern_generator *new_juggler(unsigned int style)
         return NULL;
     }
     m->juggler_style = style;
-    m->max_depth = 3;
+    m->max_depth = 2;
     m->pct_probability = 60;
 
     m->sg.status = &juggler_status;
@@ -44,24 +44,19 @@ void juggler_status(void *self, wchar_t *wstring)
              j->max_depth, j->pct_probability);
 }
 
-void _juggler_recursive_generation(juggler *j, int start_idx, int pattern_len,
-                                   int depth, midi_event *midi_pattern)
+char *_get_spacer(int depth)
 {
-    if (depth == j->max_depth)
-        return;
+    char *spacer = calloc(sizeof(char), depth + 1);
+    for (int i = 0; i < depth; i++)
+        strcat(spacer, " ");
+    return spacer;
+}
 
-    if (j->debug)
-    {
-        char *spacer = calloc(sizeof(char), depth + 1);
-        for (int i = 0; i < depth; i++)
-            strcat(spacer, " ");
-        printf("%sSTART idx:%d len:%d depth:%d\n", spacer, start_idx,
-               pattern_len, depth);
-        free(spacer);
-    }
-
+void _juggler_apply_pattern(juggler *j, int start_idx, int pattern_len,
+                            int depth, midi_event *midi_pattern)
+{
     int generator = rand() % 2;
-    int rand_steps = rand() % 11;
+    int rand_steps = rand() % 6;
     uint16_t bit_pattern = 0;
     switch (generator)
     {
@@ -72,11 +67,37 @@ void _juggler_recursive_generation(juggler *j, int start_idx, int pattern_len,
         bit_pattern = markov_bit_pattern_generate(0);
         break;
     }
-    char binnum[17] = {0};
-    short_to_char(bit_pattern, binnum);
+
+    if (j->debug)
+    {
+        char binnum[17] = {0};
+        short_to_char(bit_pattern, binnum);
+        char *spacer = _get_spacer(depth);
+        printf("%sbitz: %s for idx:%d len:%d dept:%d\n", spacer, binnum,
+               start_idx, pattern_len, depth);
+        free(spacer);
+    }
 
     apply_short_to_midi_pattern_sub_pattern(bit_pattern, start_idx, pattern_len,
                                             midi_pattern);
+}
+
+void _juggler_recursive_generation(juggler *j, int start_idx, int pattern_len,
+                                   int depth, midi_event *midi_pattern)
+{
+    if (depth == j->max_depth)
+    {
+        _juggler_apply_pattern(j, start_idx, pattern_len, depth, midi_pattern);
+        return;
+    }
+
+    if (j->debug)
+    {
+        char *spacer = _get_spacer(depth);
+        printf("%sSTART idx:%d len:%d depth:%d\n", spacer, start_idx,
+               pattern_len, depth);
+        free(spacer);
+    }
 
     if (rand() % 100 > (100 - j->pct_probability))
     {
@@ -86,6 +107,8 @@ void _juggler_recursive_generation(juggler *j, int start_idx, int pattern_len,
         _juggler_recursive_generation(j, start_idx + pattern_len / 2,
                                       pattern_len / 2, depth, midi_pattern);
     }
+    else
+        _juggler_apply_pattern(j, start_idx, pattern_len, depth, midi_pattern);
 }
 
 void juggler_generate(void *self, void *data)
