@@ -103,6 +103,8 @@ void drumsampler_reset_samples(drumsampler *ds)
 void drumsampler_event_notify(void *self, unsigned int event_type)
 {
     drumsampler *ds = (drumsampler *)self;
+    if (!ds->sound_generator.active)
+        return;
 
     if (event_type == TIME_MIDI_TICK)
     {

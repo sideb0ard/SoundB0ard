@@ -202,9 +202,11 @@ void drumsynth_setvol(void *self, double v)
 
 void drumsynth_event_notify(void *self, unsigned int event_type)
 {
+    drumsynth *ds = (drumsynth *)self;
+    if (!ds->sg.active)
+        return;
     if (event_type == TIME_MIDI_TICK)
     {
-        drumsynth *ds = (drumsynth *)self;
         int idx = mixr->timing_info.midi_tick % PPBAR;
         midi_event *event = &ds->engine.patterns[ds->engine.cur_pattern][idx];
         if (event->event_type == MIDI_ON)
