@@ -20,6 +20,7 @@ SRC = \
 	cmdloop/sequence_engine_cmds.c \
 	cmdloop/stepper_cmds.c \
 	cmdloop/synth_cmds.c \
+	cmdloop/value_generator_cmds.c \
 	dca.c \
 	digisynth.c \
 	digisynth_voice.c \

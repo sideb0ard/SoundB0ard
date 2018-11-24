@@ -1,10 +1,19 @@
+#pragma once
+
 #include <defjams.h>
 
 enum
 {
-    VALUE_LIST_CHAR_TYPE,
-    VALUE_LIST_FLOAT_TYPE,
+    LIST_VALUE_CHAR_TYPE,
+    LIST_VALUE_FLOAT_TYPE,
 };
+
+typedef struct list_value_holder
+{
+    unsigned int value_type;
+    char wurd[SIZE_OF_WURD];
+    float val;
+} list_value_holder;
 
 typedef struct value_generator
 {
@@ -12,11 +21,11 @@ typedef struct value_generator
     unsigned int values_type;
     void *values;
     int cur_idx; // circular idx
-    void (*generate)(void *self, void *return_data);
+    list_value_holder (*generate)(void *self);
     void (*status)(void *self, wchar_t *wstring);
 } value_generator;
 
 value_generator *new_value_generator(unsigned int values_type, int values_len, void *values);
-void value_generator_generate(void *self, void *return_data);
+list_value_holder value_generator_generate(void *self);
 void value_generator_status(void *self, wchar_t *wstring);
 

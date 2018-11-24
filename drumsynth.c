@@ -77,7 +77,7 @@ drumsynth *new_drumsynth()
     ds->sg.get_num_patterns = &drumsynth_get_num_patterns;
     ds->sg.make_active_track = &drumsynth_make_active_track;
     ds->sg.self_destruct = &drumsynth_del_self;
-    ds->sg.event_notify = &sequence_engine_event_notify;
+    ds->sg.event_notify = &drumsynth_event_notify;
     ds->sg.set_pattern = &drumsynth_set_pattern;
     ds->sg.get_pattern = &drumsynth_get_pattern;
     ds->sg.is_valid_pattern = &drumsynth_is_valid_pattern;
@@ -200,33 +200,18 @@ void drumsynth_setvol(void *self, double v)
     return;
 }
 
-// void drumsynth_event_notify(void *self, unsigned int event_type)
-//{
-//    drumsynth *ds = (drumsynth *)self;
-//
-//    if (!ds->sg.active)
-//        return;
-//
-//    int idx;
-//    switch (event_type)
-//    {
-//    case (TIME_START_OF_LOOP_TICK):
-//        ds->started = true;
-//        break;
-//    case (TIME_MIDI_TICK):
-//        if (ds->started)
-//        {
-//            idx = mixr->timing_info.midi_tick % PPBAR;
-//            if (ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].event_type)
-//                drumsynth_trigger(ds);
-//        }
-//        break;
-//    case (TIME_SIXTEENTH_TICK):
-//        if (ds->started)
-//            step_tick(&ds->m_seq); // TODO rename to pattern generation
-//        break;
-//    }
-//}
+void drumsynth_event_notify(void *self, unsigned int event_type)
+{
+    if (event_type == TIME_MIDI_TICK)
+    {
+        drumsynth *ds = (drumsynth *)self;
+        int idx = mixr->timing_info.midi_tick % PPBAR;
+        midi_event *event = &ds->engine.patterns[ds->engine.cur_pattern][idx];
+        if (event->event_type == MIDI_ON)
+            ds->current_velocity = event->data2;
+    }
+    sequence_engine_event_notify(self, event_type);
+}
 
 stereo_val drumsynth_gennext(void *self)
 {
@@ -270,6 +255,9 @@ stereo_val drumsynth_gennext(void *self)
     combined_osc = moog_gennext((filter *)&ds->m_filter, combined_osc);
 
     combined_osc = effector(&ds->sg, combined_osc);
+
+    double midi_velocity = scaleybum(0, 127, 0, 1, ds->current_velocity);
+    combined_osc *= midi_velocity;
 
     out.left = combined_osc * ds->vol;
     out.right = combined_osc * ds->vol;

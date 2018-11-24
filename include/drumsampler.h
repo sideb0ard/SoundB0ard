@@ -36,7 +36,6 @@ typedef struct drumsampler
                                                      // current samples
     int velocity_now_playing[MAX_CONCURRENT_SAMPLES];
 
-    // rathern than walking array -1 means not playing
     char filename[1024];
     int samplerate;
     int channels;
@@ -66,7 +65,7 @@ int get_a_drumsampler_position(drumsampler *ss);
 int drumsampler_get_num_patterns(void *s);
 void drumsampler_set_num_patterns(void *s, int num_patterns);
 void drumsampler_make_active_track(void *s, int track_num);
-// void drumsampler_event_notify(void *s, unsigned int event_type);
+void drumsampler_event_notify(void *s, unsigned int event_type);
 bool drumsampler_is_valid_pattern(void *self, int pattern_num);
 
 void drumsampler_del_self(void *self);

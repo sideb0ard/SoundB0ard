@@ -77,7 +77,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int list_type = -1;
             if (strncmp("fval", wurds[1], 4) == 0)
             {
-                list_type = VALUE_LIST_FLOAT_TYPE;
+                list_type = LIST_VALUE_FLOAT_TYPE;
                 data = calloc(num_items, sizeof(float));
                 float *fdata = (float *)data;
                 for (int i = 0, j = 2; i < num_items; i++, j++)
@@ -88,7 +88,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             else
             {
-                list_type = VALUE_LIST_CHAR_TYPE;
+                list_type = LIST_VALUE_CHAR_TYPE;
                 char **cdata = calloc(num_items, sizeof(char*));
                 for (int i = 0; i < num_items; i++)
                     cdata[i] = calloc(1, sizeof(char)*SIZE_OF_WURD);

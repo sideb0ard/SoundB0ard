@@ -24,13 +24,27 @@ value_generator *new_value_generator(unsigned int values_type, int values_len,
     return vg;
 }
 
-void value_generator_generate(void *self, void *return_data)
+list_value_holder value_generator_generate(void *self)
 {
     value_generator *vg = (value_generator *)self;
-    return_data = &vg->values[vg->cur_idx];
+    list_value_holder return_val = {.value_type = vg->values_type };
+
+    if (vg->values_type == LIST_VALUE_CHAR_TYPE)
+    {
+        char **values = vg->values;
+        char *wurd = values[vg->cur_idx];
+        strcpy(return_val.wurd, wurd);
+    }
+    else
+    {
+          float *values = vg->values;
+        return_val.val = values[vg->cur_idx];
+    }
 
     if (++(vg->cur_idx) >= vg->values_len)
         vg->cur_idx = 0;
+
+    return return_val;
 }
 
 static char *s_value_types[] = {"CHAR*", "FLOAT"};
@@ -41,7 +55,7 @@ void value_generator_status(void *self, wchar_t *wstring)
     char *list_vals = calloc(sizeof(char),  20*SIZE_OF_WURD);
     int num_vals_to_show = vg->values_len < 19 ? vg->values_len : 19;
 
-    if (vg->values_type == VALUE_LIST_CHAR_TYPE)
+    if (vg->values_type == LIST_VALUE_CHAR_TYPE)
     {
         for (int i = 0; i < num_vals_to_show; i++)
         {

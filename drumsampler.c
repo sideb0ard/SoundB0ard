@@ -37,7 +37,7 @@ drumsampler *new_drumsampler(char *filename)
     ds->sound_generator.set_num_patterns = &drumsampler_set_num_patterns;
     ds->sound_generator.make_active_track = &drumsampler_make_active_track;
     ds->sound_generator.self_destruct = &drumsampler_del_self;
-    ds->sound_generator.event_notify = &sequence_engine_event_notify;
+    ds->sound_generator.event_notify = &drumsampler_event_notify;
     ds->sound_generator.get_pattern = &drumsampler_get_pattern;
     ds->sound_generator.set_pattern = &drumsampler_set_pattern;
     ds->sound_generator.is_valid_pattern = &drumsampler_is_valid_pattern;
@@ -100,43 +100,27 @@ void drumsampler_reset_samples(drumsampler *ds)
     }
 }
 
-// void drumsampler_event_notify(void *self, unsigned int event_type)
-//{
-//    drumsampler *ds = (drumsampler *)self;
-//
-//    if (!ds->sound_generator.active)
-//        return;
-//
-//    int idx;
-//    switch (event_type)
-//    {
-//    case (TIME_START_OF_LOOP_TICK):
-//        ds->started = true;
-//        break;
-//    case (TIME_SIXTEENTH_TICK):
-//        if (ds->started)
-//            step_tick(&ds->m_seq);
-//        break;
-//    case (TIME_MIDI_TICK):
-//        if (ds->started)
-//        {
-//            idx = mixr->timing_info.midi_tick % PPBAR;
-//            if (ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].event_type ==
-//                MIDI_ON)
-//
-//            {
-//                int seq_position = get_a_drumsampler_position(ds);
-//                if (seq_position != -1)
-//                {
-//                    ds->samples_now_playing[seq_position] = idx;
-//                    ds->velocity_now_playing[seq_position] =
-//                        ds->m_seq.patterns[ds->m_seq.cur_pattern][idx].data2;
-//                }
-//            }
-//        }
-//        break;
-//    }
-//}
+void drumsampler_event_notify(void *self, unsigned int event_type)
+{
+    drumsampler *ds = (drumsampler *)self;
+
+    if (event_type == TIME_MIDI_TICK)
+    {
+        int idx = mixr->timing_info.midi_tick % PPBAR;
+        midi_event *event = &ds->engine.patterns[ds->engine.cur_pattern][idx];
+        if (event->event_type == MIDI_ON)
+        {
+            int velocity = event->data2;
+            int seq_position = get_a_drumsampler_position(ds);
+            if (seq_position != -1)
+            {
+                ds->samples_now_playing[seq_position] = idx;
+                ds->velocity_now_playing[seq_position] =velocity;
+            }
+        }
+    }
+    sequence_engine_event_notify(self, event_type);
+}
 
 void drumsampler_note_on(drumsampler *ds)
 {

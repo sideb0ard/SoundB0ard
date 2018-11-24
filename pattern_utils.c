@@ -4,6 +4,7 @@
 #include <midimaaan.h>
 #include <mixer.h>
 #include <pattern_utils.h>
+#include <value_generator.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -273,4 +274,20 @@ void pattern_check_idx(int *idx, int pattern_len)
         *idx += pattern_len;
     else if (*idx >= pattern_len)
         *idx -= pattern_len;
+}
+
+void pattern_apply_values(value_generator *vg, midi_event *pattern)
+{
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (pattern[i].event_type)
+        {
+            list_value_holder cur_val = vg->generate(vg);
+
+            if (vg->values_type == LIST_VALUE_FLOAT_TYPE)
+                pattern[i].data2 = cur_val.val;
+            else
+                pattern[i].data1 = get_midi_note_from_string(cur_val.wurd);
+        }
+    }
 }

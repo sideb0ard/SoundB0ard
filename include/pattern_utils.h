@@ -2,6 +2,7 @@
 
 #include <stdint.h>
 #include <wchar.h>
+#include <value_generator.h>
 
 // MIDI PATTERNS
 void clear_midi_pattern(midi_event *pattern);
@@ -34,3 +35,4 @@ int shift_bits_to_leftmost_position(uint16_t num,
 void pattern_replace(midi_event *src_pattern, midi_event *dst_pattern);
 void pattern_apply_swing(midi_event *pattern, int swing_setting);
 void pattern_check_idx(int *idx, int pattern_len);
+void pattern_apply_values(value_generator *vg, midi_event *pattern);

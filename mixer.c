@@ -790,6 +790,14 @@ bool mixer_is_valid_pattern_gen_num(mixer *mixr, int sgnum)
     return false;
 }
 
+bool mixer_is_valid_value_gen_num(mixer *mixr, int vgnum)
+{
+    if (vgnum >= 0 && vgnum < mixr->value_gen_num &&
+        mixr->value_generators[vgnum] != NULL)
+        return true;
+    return false;
+}
+
 bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
 {
     if (mixr->num_scenes > 0 && scene_num < mixr->num_scenes)

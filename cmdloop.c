@@ -18,6 +18,7 @@
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
 #include <pattern_generator_cmds.h>
+#include <value_generator_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
 
@@ -109,6 +110,9 @@ void interpret(char *line)
             continue;
 
         else if (parse_pattern_generator_cmd(num_wurds, wurds))
+            continue;
+
+        else if (parse_value_generator_cmd(num_wurds, wurds))
             continue;
 
         else if (parse_synth_cmd(num_wurds, wurds))

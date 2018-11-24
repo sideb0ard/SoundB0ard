@@ -53,6 +53,7 @@ typedef struct drumsynth
     bool started;
 
     uint16_t cur_state;
+    int current_velocity;
 
     bool debug;
 
@@ -72,7 +73,7 @@ int drumsynth_get_num_patterns(void *self);
 void drumsynth_set_num_patterns(void *self, int num_patterns);
 bool drumsynth_is_valid_pattern(void *self, int pattern_num);
 void drumsynth_make_active_track(void *self, int tracknum);
-// void drumsynth_event_notify(void *self, unsigned int event_type);
+void drumsynth_event_notify(void *self, unsigned int event_type);
 
 void drumsynth_trigger(drumsynth *ds);
 bool drumsynth_save_patch(drumsynth *ds, char *name);

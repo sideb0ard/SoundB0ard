@@ -202,6 +202,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 bool mixer_is_valid_algo(mixer *mixr, int algo_num);
 bool mixer_is_valid_env_var(mixer *mixr, char *key);
 bool mixer_is_valid_pattern_gen_num(mixer *mixr, int sgnum);
+bool mixer_is_valid_value_gen_num(mixer *mixr, int sgnum);
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
 bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num);
