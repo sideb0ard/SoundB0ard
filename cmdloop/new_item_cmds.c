@@ -69,6 +69,39 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             mixer_add_juggler(mixr, 0); // 0 is only choice at the mo
         }
 
+        else if (strncmp("fval", wurds[1], 4) == 0 ||
+                 strncmp("cval", wurds[1], 4) == 0)
+        {
+            void *data;
+            int num_items = num_wurds - 2;
+            int list_type = -1;
+            if (strncmp("fval", wurds[1], 4) == 0)
+            {
+                list_type = VALUE_LIST_FLOAT_TYPE;
+                data = calloc(num_items, sizeof(float));
+                float *fdata = (float *)data;
+                for (int i = 0, j = 2; i < num_items; i++, j++)
+                {
+                    fdata[i] = atof(wurds[j]);
+                    printf("COPied %f\n", fdata[i]);
+                }
+            }
+            else
+            {
+                list_type = VALUE_LIST_CHAR_TYPE;
+                char **cdata = calloc(num_items, sizeof(char*));
+                for (int i = 0; i < num_items; i++)
+                    cdata[i] = calloc(1, sizeof(char)*SIZE_OF_WURD);
+
+                for (int i = 0, j = 2; i < num_items; i++, j++)
+                    strcpy(cdata[i], wurds[j]);
+
+                data = cdata;
+            }
+
+            int vg_num = mixer_add_value_list(
+                mixr, list_type, num_items, data); // ** takes ownership of memory **
+        }
 
         else if (strncmp("kit", wurds[1], 3) == 0 ||
                  strncmp("beat", wurds[1], 4) == 0)
@@ -90,7 +123,8 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
             if (strncmp("beat", wurds[1], 4) == 0)
             {
-                char launch_cmd[6][SIZE_OF_WURD] = {"every", "2", "bar", "apply"};
+                char launch_cmd[6][SIZE_OF_WURD] = {"every", "2", "bar",
+                                                    "apply"};
 
                 int drum_markov = mixer_add_markov(mixr, 0);
                 sprintf(launch_cmd[4], "%d", drum_markov);
@@ -98,7 +132,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
                 algorithm *a = new_algorithm(6, launch_cmd);
                 if (a)
-                   mixer_add_algorithm(mixr, a);
+                    mixer_add_algorithm(mixr, a);
 
                 int snare_markov = mixer_add_markov(mixr, 4);
                 sprintf(launch_cmd[4], "%d", snare_markov);
@@ -106,7 +140,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
                 a = new_algorithm(6, launch_cmd);
                 if (a)
-                   mixer_add_algorithm(mixr, a);
+                    mixer_add_algorithm(mixr, a);
 
                 int hats_markov = mixer_add_markov(mixr, 2);
                 sprintf(launch_cmd[4], "%d", hats_markov);
@@ -114,7 +148,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
                 a = new_algorithm(6, launch_cmd);
                 if (a)
-                   mixer_add_algorithm(mixr, a);
+                    mixer_add_algorithm(mixr, a);
             }
         }
         else if (strncmp("perc", wurds[1], 4) == 0)

@@ -108,10 +108,6 @@ mixer *new_mixer(double output_latency)
     mixr->bars_per_chord = 4;
     mixr->should_progress_chords = false;
 
-    // possible TODO - should i de-initialize?
-    // is that cleaner code?
-    pthread_mutex_init(&mixr->sg_mutex, NULL);
-
     return mixr;
 }
 
@@ -195,6 +191,29 @@ void mixer_status_algoz(mixer *mixr, bool all)
         }
     }
 }
+
+void mixer_status_valz(mixer *mixr)
+{
+    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
+    if (mixr->value_gen_num > 0)
+    {
+        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
+                                "value generators" COOL_COLOR_GREEN "]\n");
+        for (int i = 0; i < mixr->value_gen_num; i++)
+        {
+            if (mixr->value_generators[i] != NULL)
+            {
+                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
+                mixr->value_generators[i]->status(mixr->value_generators[i],
+                                                    wss);
+                wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
+                wprintf(L"  %ls\n", wss);
+                wprintf(WANSI_COLOR_RESET);
+            }
+        }
+    }
+}
+
 void mixer_status_patz(mixer *mixr)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
@@ -277,6 +296,7 @@ void mixer_ps(mixer *mixr, bool all)
     mixer_status_algoz(mixr, all);
     mixer_status_patz(mixr);
     mixer_status_sgz(mixr, all);
+    mixer_status_valz(mixr);
     printf(ANSI_COLOR_RESET);
 }
 
@@ -372,66 +392,27 @@ void vol_change(mixer *mixr, int sg, float vol)
 
 int add_sound_generator(mixer *mixr, soundgenerator *sg)
 {
-    soundgenerator **new_soundgens = NULL;
+    if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)
+        return -99;
 
-    if (mixr->soundgen_size <= mixr->soundgen_num)
-    {
-        pthread_mutex_lock(&mixr->sg_mutex);
-        if (mixr->soundgen_size == 0)
-        {
-            mixr->soundgen_size = DEFAULT_ARRAY_SIZE;
-        }
-        else
-        {
-            mixr->soundgen_size *= 2;
-        }
-
-        new_soundgens = (soundgenerator **)realloc(
-            mixr->sound_generators,
-            mixr->soundgen_size * sizeof(soundgenerator *));
-        if (new_soundgens == NULL)
-        {
-            printf("Ooh, burney - cannae allocate memory for new sounds");
-            return -1;
-        }
-        else
-        {
-            mixr->sound_generators = new_soundgens;
-        }
-        pthread_mutex_unlock(&mixr->sg_mutex);
-    }
     mixr->sound_generators[mixr->soundgen_num] = sg;
     return mixr->soundgen_num++;
 }
 
+int add_value_generator(mixer *mixr, value_generator *vg)
+{
+    if (mixr->value_gen_num == MAX_NUM_VALUE_GENERATORS)
+        return -99;
+
+    mixr->value_generators[mixr->value_gen_num] = vg;
+    return mixr->value_gen_num++;
+}
+
 int add_pattern_generator(mixer *mixr, pattern_generator *sg)
 {
-    pattern_generator **new_pattern_gens = NULL;
+    if (mixr->pattern_gen_num == MAX_NUM_PATTERN_GENERATORS)
+        return -99;
 
-    if (mixr->pattern_gen_size <= mixr->pattern_gen_num)
-    {
-        if (mixr->pattern_gen_size == 0)
-        {
-            mixr->pattern_gen_size = DEFAULT_ARRAY_SIZE;
-        }
-        else
-        {
-            mixr->pattern_gen_size *= 2;
-        }
-
-        new_pattern_gens = (pattern_generator **)realloc(
-            mixr->pattern_generators,
-            mixr->pattern_gen_size * sizeof(pattern_generator *));
-        if (new_pattern_gens == NULL)
-        {
-            printf("Ooh, burney - cannae allocate memory for new patterns");
-            return -1;
-        }
-        else
-        {
-            mixr->pattern_generators = new_pattern_gens;
-        }
-    }
     mixr->pattern_generators[mixr->pattern_gen_num] = sg;
     return mixr->pattern_gen_num++;
 }
@@ -504,6 +485,16 @@ int mixer_add_juggler(mixer *mixr, unsigned int style)
     pattern_generator *sg = new_juggler(style);
     if (sg)
         return add_pattern_generator(mixr, sg);
+    else
+        return -99;
+}
+
+int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len, void *values)
+{
+    printf("Adding a new VALUE LIST GENERATOR!\n");
+    value_generator *vg = new_value_generator(values_type, values_len, values);
+    if (vg)
+        return add_value_generator(mixr, vg);
     else
         return -99;
 }
@@ -649,7 +640,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
-                pthread_mutex_lock(&mixr->sg_mutex);
                 if (mixr->sound_generators[i] != NULL)
                 {
                     mixr->soundgen_cur_val[i] =
@@ -658,7 +648,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                     output_left += mixr->soundgen_cur_val[i].left;
                     output_right += mixr->soundgen_cur_val[i].right;
                 }
-                pthread_mutex_unlock(&mixr->sg_mutex);
             }
         }
 

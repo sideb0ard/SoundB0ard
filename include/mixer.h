@@ -14,13 +14,16 @@
 #include "fx.h"
 #include "minisynth.h"
 #include "pattern_generator.h"
+#include "value_generator.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
 #include "table.h"
 
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
-#define MAX_NUM_SOUNDGENERATOR 100
+#define MAX_NUM_SOUND_GENERATORS 100
+#define MAX_NUM_PATTERN_GENERATORS 100
+#define MAX_NUM_VALUE_GENERATORS 100
 #define NUM_PROGRESSIONS 4
 
 typedef enum
@@ -78,23 +81,23 @@ typedef struct mixer
     int algorithm_num;
     int algorithm_size;
 
-    soundgenerator **sound_generators;
+    soundgenerator *sound_generators[MAX_NUM_SOUND_GENERATORS];
     int soundgen_num;  // actual number of SGs
-    int soundgen_size; // number of memory slots reserved for SGszz
-    pthread_mutex_t sg_mutex;
 
-    pattern_generator **pattern_generators;
-    int pattern_gen_num;  // actual number of SGs
-    int pattern_gen_size; // number of memory slots reserved for SGszz
+    pattern_generator *pattern_generators[MAX_NUM_PATTERN_GENERATORS];
+    int pattern_gen_num;  // actual number of PGs
+
+    value_generator *value_generators[MAX_NUM_VALUE_GENERATORS];
+    int value_gen_num;  // actual number of VGs
 
     AbletonLink *m_ableton_link;
 
     stereo_val
-        soundgen_cur_val[MAX_NUM_SOUNDGENERATOR]; // cache for current val,
+        soundgen_cur_val[MAX_NUM_SOUND_GENERATORS]; // cache for current val,
     // currently used for sidechain
     // compressor TODO there are no
     // checks for this num
-    double soundgen_volume[MAX_NUM_SOUNDGENERATOR]; // separating instrument amp
+    double soundgen_volume[MAX_NUM_SOUND_GENERATORS]; // separating instrument amp
     // from mixer volume per channel
 
     env_var environment[ENVIRONMENT_ARRAY_SIZE];
@@ -150,6 +153,7 @@ typedef struct mixer
 mixer *new_mixer(double output_latency);
 
 void mixer_ps(mixer *mixr, bool all);
+void mixer_status_valz(mixer *mixr);
 void mixer_status_patz(mixer *mixr);
 void mixer_status_sgz(mixer *mixr, bool all);
 void mixer_status_mixr(mixer *mixr);
@@ -164,6 +168,7 @@ int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_juggler(mixer *mixr, unsigned int style);
 int mixer_add_markov(mixer *mixr, unsigned int type);
+int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len, void *values);
 void mixer_preview_audio(mixer *mixr, char *filename);
 
 int mixer_print_timing_info(mixer *mixr);
@@ -175,8 +180,8 @@ int add_digisynth(mixer *mixr, char *filename);
 int add_looper(mixer *mixr, char *filename);
 
 int add_sound_generator(mixer *mixr, soundgenerator *sg);
-
 int add_pattern_generator(mixer *mixr, pattern_generator *sg);
+int add_value_generator(mixer *mixr, value_generator *vg);
 
 int add_effect(mixer *mixr);
 
