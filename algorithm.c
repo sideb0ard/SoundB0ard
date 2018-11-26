@@ -116,7 +116,6 @@ static bool extract_and_validate_environment(algorithm *a, char *line)
 
     strncpy(a->input_line, line, MAX_CMD_LEN - 1);
 
-    printf("LINE! %s\n", line);
     regmatch_t env_match_group[4];
     regex_t env_rgx;
     regcomp(&env_rgx, "^[[:space:]]*([[:alnum:]]*)*[[:space:]]*(\".*\")(.*)",
@@ -269,7 +268,6 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                 strcat(line, " ");
         }
     }
-    // printf("aCMD! %s\n", line);
     if (!extract_and_validate_environment(a, line))
         return false;
 

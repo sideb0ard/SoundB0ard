@@ -18,9 +18,9 @@
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
 #include <pattern_generator_cmds.h>
-#include <value_generator_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
+#include <value_generator_cmds.h>
 
 extern mixer *mixr;
 extern char *key_names[NUM_KEYS];
@@ -36,9 +36,7 @@ void *loopy(void *arg)
 {
     static char last_line[MAXLINE] = {};
 
-    char dummy;
     read_history(NULL);
-
     setlocale(LC_ALL, "");
 
     print_logo();
@@ -64,19 +62,34 @@ void *loopy(void *arg)
     return NULL;
 }
 
+static bool _is_meta_cmd(char *line)
+{
+    if (strncmp("every", line, 5) == 0 || strncmp("over", line, 4) == 0 ||
+        strncmp("for", line, 3) == 0)
+        return true;
+
+    return false;
+}
+
 void interpret(char *line)
 {
     char wurds[NUM_WURDS][SIZE_OF_WURD] = {};
 
+    if (_is_meta_cmd(line))
+    {
+        int num_wurds = parse_wurds_from_cmd(wurds, line);
+        algorithm *a = new_algorithm(num_wurds, wurds);
+        if (a)
+            mixer_add_algorithm(mixr, a);
+    }
+
     char *cmd, *last_s;
     char const *sep = ";";
+    char tmp[1024] = {};
     for (cmd = strtok_r(line, sep, &last_s); cmd;
          cmd = strtok_r(NULL, sep, &last_s))
     {
-
-        char tmp[1024];
         strncpy((char *)tmp, cmd, 127);
-
         int num_wurds = parse_wurds_from_cmd(wurds, tmp);
 
         //////////////////////////////////////////////////////////////////////
