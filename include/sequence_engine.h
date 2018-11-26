@@ -49,9 +49,13 @@ enum
 enum
 {
     ARP_32,
+    ARP_24,
     ARP_16,
+    ARP_12,
     ARP_8,
+    ARP_6,
     ARP_4,
+    ARP_3,
     ARP_MAX_SPEEDS,
 };
 

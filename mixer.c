@@ -568,6 +568,25 @@ static void mixer_events_output(mixer *mixr)
             }
         }
 
+        // so far only used for ARP engines
+        if (mixr->timing_info.midi_tick % 160 == 0)
+        {
+            mixer_emit_event(mixr, TIME_TWENTYFOURTH_TICK);
+
+            if (mixr->timing_info.midi_tick % 320 == 0)
+            {
+                mixer_emit_event(mixr, TIME_TWELTH_TICK);
+
+                if (mixr->timing_info.midi_tick % 640 == 0)
+                {
+                    mixer_emit_event(mixr, TIME_SIXTH_TICK);
+
+                    if (mixr->timing_info.midi_tick % 1280 == 0)
+                        mixer_emit_event(mixr, TIME_THIRD_TICK);
+                }
+            }
+        }
+
         if (mixr->timing_info.midi_tick % PPBAR == 0)
         {
             mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);

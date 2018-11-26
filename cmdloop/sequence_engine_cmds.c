@@ -32,17 +32,29 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             case (32):
                 sequence_engine_set_arp_speed(engine, ARP_32);
                 break;
+            case (24):
+                sequence_engine_set_arp_speed(engine, ARP_24);
+                break;
             case (16):
                 sequence_engine_set_arp_speed(engine, ARP_16);
+                break;
+            case (12):
+                sequence_engine_set_arp_speed(engine, ARP_12);
                 break;
             case (8):
                 sequence_engine_set_arp_speed(engine, ARP_8);
                 break;
+            case (6):
+                sequence_engine_set_arp_speed(engine, ARP_6);
+                break;
             case (4):
                 sequence_engine_set_arp_speed(engine, ARP_4);
                 break;
+            case (3):
+                sequence_engine_set_arp_speed(engine, ARP_3);
+                break;
             default:
-                printf("Speed has to be one of 32, 16, 8 or 4\n");
+                printf("Speed has to be one of 32,24,16,12,8,6,4 or 3\n");
             }
         }
         else if (strncmp("arp", wurds[0], 3) == 0)

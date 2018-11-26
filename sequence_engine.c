@@ -18,7 +18,7 @@ extern const char *key_names[NUM_KEYS];
 extern const compat_key_list compat_keys[NUM_KEYS];
 
 const char *s_arp_mode[] = {"UP", "DOWN", "UPDOWN", "RAND"};
-const char *s_arp_speed[] = {"32", "16", "8", "4"};
+const char *s_arp_speed[] = {"32", "24", "16", "12", "8", "6", "4", "3"};
 
 extern mixer *mixr;
 
@@ -276,16 +276,32 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
         if (engine->arp.enable && engine->arp.speed == ARP_32)
             sequence_engine_do_arp(engine, parent);
         break;
+    case (TIME_TWENTYFOURTH_TICK):
+        if (engine->arp.enable && engine->arp.speed == ARP_24)
+            sequence_engine_do_arp(engine, parent);
+        break;
     case (TIME_SIXTEENTH_TICK):
         if (engine->arp.enable && engine->arp.speed == ARP_16)
+            sequence_engine_do_arp(engine, parent);
+        break;
+    case (TIME_TWELTH_TICK):
+        if (engine->arp.enable && engine->arp.speed == ARP_12)
             sequence_engine_do_arp(engine, parent);
         break;
     case (TIME_EIGHTH_TICK):
         if (engine->arp.enable && engine->arp.speed == ARP_8)
             sequence_engine_do_arp(engine, parent);
         break;
+    case (TIME_SIXTH_TICK):
+        if (engine->arp.enable && engine->arp.speed == ARP_6)
+            sequence_engine_do_arp(engine, parent);
+        break;
     case (TIME_QUARTER_TICK):
         if (engine->arp.enable && engine->arp.speed == ARP_4)
+            sequence_engine_do_arp(engine, parent);
+        break;
+    case (TIME_THIRD_TICK):
+        if (engine->arp.enable && engine->arp.speed == ARP_3)
             sequence_engine_do_arp(engine, parent);
         break;
     case (TIME_CHORD_CHANGE):
