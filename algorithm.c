@@ -77,20 +77,34 @@ bool algorithm_set_var_list(algorithm *a, char *list)
     char quote_stripped_list[new_len];
     memset(quote_stripped_list, 0, new_len);
     strncpy(quote_stripped_list, list + 1, len - 2);
-
     strncpy(a->env.variable_list_string, quote_stripped_list,
             MAX_STATIC_STRING_SZ);
-    char const *sep = " ";
-    char *tok, *last_tok;
-    a->env.variable_list_len = 0;
-    for (tok = strtok_r(quote_stripped_list, sep, &last_tok); tok;
-         tok = strtok_r(NULL, sep, &last_tok))
+
+    if (strstr(quote_stripped_list, ":"))
     {
-        strncpy(a->env.variable_list_vals[a->env.variable_list_len++], tok,
-                MAX_VAR_VAL_LEN);
-        if (a->env.variable_list_len >= MAX_LIST_ITEMS)
+        float start, end, step = 0;
+        sscanf(quote_stripped_list, "%f:%f:%f", &start, &end, &step);
+
+        a->env.has_sequence = true;
+        a->env.low_seq = start;
+        a->env.cur_seq = start;
+        a->env.hi_seq = end;
+        a->env.seq_step = step;
+    }
+    else
+    {
+        char const *sep = " ";
+        char *tok, *last_tok;
+        a->env.variable_list_len = 0;
+        for (tok = strtok_r(quote_stripped_list, sep, &last_tok); tok;
+             tok = strtok_r(NULL, sep, &last_tok))
         {
-            return false;
+            strncpy(a->env.variable_list_vals[a->env.variable_list_len++], tok,
+                    MAX_VAR_VAL_LEN);
+            if (a->env.variable_list_len >= MAX_LIST_ITEMS)
+            {
+                return false;
+            }
         }
     }
 
@@ -253,8 +267,7 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
     if (a->process_type == FOR)
         rest_of_string_starting_position = 1;
 
-    char line[MAX_CMD_LEN];
-    memset(line, 0, MAX_CMD_LEN);
+    char line[MAX_CMD_LEN] = {};
 
     int len_of_cmd_string = 1; // keep space for null terminator
     for (int i = rest_of_string_starting_position; i < num_wurds; i++)
@@ -274,18 +287,29 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
     return true;
 }
 
-void algorithm_replace_vars_in_cmd(algorithm *a)
+static void _get_command_replacement_value(algorithm *a,
+                                           char *replacement_value)
 {
-    char replacement_value[MAX_VAR_VAL_LEN] = {};
-
     if (a->var_select_type == VAR_STEP)
     {
-        strncpy(replacement_value,
-                a->env.variable_list_vals[a->env.variable_list_idx++],
-                MAX_VAR_VAL_LEN - 1);
-        if (a->env.variable_list_idx >= a->env.variable_list_len)
-            a->env.variable_list_idx = 0;
-        // printf("CUR VAL! %s\n", cur_var_value);
+        if (a->env.has_sequence)
+        {
+            sprintf(replacement_value, "%f", a->env.cur_seq);
+            a->env.cur_seq += a->env.seq_step;
+            if (a->env.cur_seq > a->env.hi_seq)
+                a->env.cur_seq = fmod(a->env.cur_seq, a->env.hi_seq) +
+                                 a->env.low_seq -
+                                 1; // minus 1 balances the above 'greater than'
+                                    // which is inclusive of hi_seq
+        }
+        else
+        {
+            strncpy(replacement_value,
+                    a->env.variable_list_vals[a->env.variable_list_idx++],
+                    MAX_VAR_VAL_LEN - 1);
+            if (a->env.variable_list_idx >= a->env.variable_list_len)
+                a->env.variable_list_idx = 0;
+        }
     }
     else if (a->var_select_type == VAR_RAND)
     {
@@ -343,6 +367,12 @@ void algorithm_replace_vars_in_cmd(algorithm *a)
             return;
         }
     }
+}
+
+void algorithm_replace_vars_in_cmd(algorithm *a)
+{
+    char replacement_value[MAX_VAR_VAL_LEN] = {};
+    _get_command_replacement_value(a, replacement_value);
 
     memset(a->runnable_command, 0, MAX_CMD_LEN);
 

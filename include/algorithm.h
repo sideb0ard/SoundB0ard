@@ -38,6 +38,12 @@ typedef struct algo_environment
     char variable_list_string[MAX_STATIC_STRING_SZ];
     char variable_list_vals[MAX_LIST_ITEMS][MAX_VAR_VAL_LEN];
 
+    bool has_sequence;
+    float low_seq;
+    float hi_seq;
+    float cur_seq;
+    float seq_step;
+
     unsigned int target_soundgen;
     int target_action_counter;
 
