@@ -4,8 +4,8 @@
 #include "defjams.h"
 #include "euclidean.h"
 #include "mixer.h"
-#include "utils.h"
 #include "pattern_utils.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
@@ -107,7 +107,7 @@ void build_euclidean_pattern_string(int level, char *bitmap_string, int *count,
 void euclidean_generate(void *self, void *data)
 {
     euclidean *e = (euclidean *)self;
-    midi_event *pattern = (midi_event*) data;
+    midi_event *pattern = (midi_event *)data;
     uint16_t bit_pattern = create_euclidean_rhythm(e->actual_num_hits, 16);
     apply_short_to_midi_pattern(bit_pattern, pattern);
 }

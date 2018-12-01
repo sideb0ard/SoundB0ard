@@ -35,7 +35,7 @@ void beatrepeat_status(void *self, char *status_string)
              b->m_num_beats_to_repeat, b->m_selected_sixteenth);
 }
 
-double beatrepeat_gennext(void *self, double inval)
+stereo_val beatrepeat_gennext(void *self, stereo_val inval)
 {
     beatrepeat *b = (beatrepeat *)self;
 
@@ -50,7 +50,7 @@ double beatrepeat_gennext(void *self, double inval)
 
     if (b->m_recording)
     {
-        b->m_buffer[b->m_buffer_position++] = inval;
+        b->m_buffer[b->m_buffer_position++] = inval.left;
         if (b->m_buffer_position >= b->m_buffer_size)
         {
             b->m_have_recording = true;
@@ -78,8 +78,9 @@ double beatrepeat_gennext(void *self, double inval)
                  relative_sample < mixr->timing_info.loop_len_in_frames) ||
                 (relative_sample > 0 && relative_sample < end_of_beat_repeat))
             {
-                return inval +
+                inval.left +=
                        b->m_buffer[relative_sample % b->m_sixteenth_note_size];
+                inval.right = inval.left;
             }
         }
         else
@@ -91,8 +92,9 @@ double beatrepeat_gennext(void *self, double inval)
                 // b->m_buffer_size);
                 // return inval + b->m_buffer[relative_sample %
                 // b->m_buffer_size];
-                return inval +
+                inval.left +=
                        b->m_buffer[relative_sample % b->m_sixteenth_note_size];
+                inval.right = inval.left;
             }
         }
     }

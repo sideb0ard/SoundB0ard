@@ -28,6 +28,6 @@ void beatrepeat_change_num_beats_to_repeat(beatrepeat *br, int num_beats);
 void beatrepeat_change_selected_sixteenth(beatrepeat *br, int selected);
 
 void beatrepeat_status(void *self, char *status_string);
-double beatrepeat_gennext(void *self, double input);
+stereo_val beatrepeat_gennext(void *self, stereo_val input);
 
 #endif // BEATREPEAT_H_

@@ -6,6 +6,7 @@
 #include <drumsampler.h>
 #include <drumsynth.h>
 #include <looper.h>
+#include <markov.h>
 #include <mixer.h>
 #include <pattern_parser.h>
 #include <utils.h>
@@ -89,9 +90,9 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             else
             {
                 list_type = LIST_VALUE_CHAR_TYPE;
-                char **cdata = calloc(num_items, sizeof(char*));
+                char **cdata = calloc(num_items, sizeof(char *));
                 for (int i = 0; i < num_items; i++)
-                    cdata[i] = calloc(1, sizeof(char)*SIZE_OF_WURD);
+                    cdata[i] = calloc(1, sizeof(char) * SIZE_OF_WURD);
 
                 for (int i = 0, j = 2; i < num_items; i++, j++)
                     strcpy(cdata[i], wurds[j]);
@@ -99,8 +100,9 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 data = cdata;
             }
 
-            int vg_num = mixer_add_value_list(
-                mixr, list_type, num_items, data); // ** takes ownership of memory **
+            int vg_num =
+                mixer_add_value_list(mixr, list_type, num_items,
+                                     data); // ** takes ownership of memory **
         }
 
         else if (strncmp("kit", wurds[1], 3) == 0 ||
@@ -126,7 +128,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 char launch_cmd[6][SIZE_OF_WURD] = {"every", "2", "bar",
                                                     "apply"};
 
-                int drum_markov = mixer_add_markov(mixr, 0);
+                int drum_markov = mixer_add_markov(mixr, GARAGE);
                 sprintf(launch_cmd[4], "%d", drum_markov);
                 sprintf(launch_cmd[5], "%d:0", bdnum);
 
@@ -134,7 +136,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 if (a)
                     mixer_add_algorithm(mixr, a);
 
-                int snare_markov = mixer_add_markov(mixr, 4);
+                int snare_markov = mixer_add_markov(mixr, CLAPS);
                 sprintf(launch_cmd[4], "%d", snare_markov);
                 sprintf(launch_cmd[5], "%d:0", sdnum);
 
@@ -142,7 +144,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 if (a)
                     mixer_add_algorithm(mixr, a);
 
-                int hats_markov = mixer_add_markov(mixr, 2);
+                int hats_markov = mixer_add_markov(mixr, HATS_MASK);
                 sprintf(launch_cmd[4], "%d", hats_markov);
                 sprintf(launch_cmd[5], "%d:0", hhnum);
 
@@ -193,10 +195,10 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             printf("MARkOV! PATTERN GEN!\n");
             if (strncmp("clap", wurds[2], 4) == 0 ||
-                     strncmp("snare", wurds[2], 5) == 0)
+                strncmp("snare", wurds[2], 5) == 0)
                 mixer_add_markov(mixr, 0);
             else if (strncmp("garage", wurds[2], 6) == 0 ||
-                strncmp("2step", wurds[2], 5) == 0)
+                     strncmp("2step", wurds[2], 5) == 0)
                 mixer_add_markov(mixr, 1);
             else if (strncmp("hatsmask", wurds[2], 8) == 0)
                 mixer_add_markov(mixr, 4);

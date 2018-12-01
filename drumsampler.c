@@ -19,6 +19,8 @@ drumsampler *new_drumsampler(char *filename)
     drumsampler *ds = (drumsampler *)calloc(1, sizeof(drumsampler));
 
     sequence_engine_init(&ds->engine, (void *)ds, DRUMSAMPLER_TYPE);
+    envelope_generator_init(&ds->eg);
+    ds->envelope_enabled = false;
 
     drumsampler_import_file(ds, filename);
 
@@ -110,6 +112,7 @@ void drumsampler_note_on(drumsampler *ds)
         ds->velocity_now_playing[seq_position] =
             ds->engine.patterns[ds->engine.cur_pattern][idx].data2;
     }
+    eg_start_eg(&ds->eg);
 }
 
 stereo_val drumsampler_gennext(void *self)
@@ -147,14 +150,17 @@ stereo_val drumsampler_gennext(void *self)
         }
     }
 
-    left_val = effector(&ds->sound_generator, left_val);
-    if (ds->channels == 2)
-        right_val = effector(&ds->sound_generator, right_val);
-    else
-        right_val = left_val;
+    double amp_env = eg_do_envelope(&ds->eg, NULL);
+    if (ds->eg.m_state == SUSTAIN)
+        eg_note_off(&ds->eg);
 
-    return (stereo_val){.left = left_val * ds->vol,
-                        .right = right_val * ds->vol};
+    double volume = ds->vol;
+    if (ds->envelope_enabled)
+        volume *= amp_env;
+
+    stereo_val out = {.left = left_val *volume, .right = right_val * volume};
+    out = effector(&ds->sound_generator, out);
+    return out;
 }
 
 // drumsampler *new_drumsampler_from_char_pattern(char *filename, char *pattern)
@@ -179,9 +185,12 @@ void drumsampler_status(void *self, wchar_t *status_string)
     swprintf(local_status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE
              "%s %s vol:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
+             "eg:%d attack_ms:%.2f decay_ms:%.2f sustain:%.2f release_ms:%.2f\n"
              "multi:%d num_patterns:%d",
              ds->filename, INSTRUMENT_COLOR, ds->vol, ds->buffer_pitch,
-             ds->engine.allow_triplets, ds->buf_end_pos,
+             ds->engine.allow_triplets, ds->buf_end_pos, ds->envelope_enabled,
+             ds->eg.m_attack_time_msec, ds->eg.m_decay_time_msec,
+             ds->eg.m_sustain_level, ds->eg.m_release_time_msec,
              ds->engine.multi_pattern_mode, ds->engine.num_patterns);
 
     wcscat(status_string, local_status_string);
@@ -271,4 +280,25 @@ void drumsampler_set_cutoff_percent(drumsampler *ds, unsigned int percent)
     if (percent > 100)
         return;
     ds->buf_end_pos = ds->bufsize / 100. * percent;
+}
+
+void drumsampler_enable_envelope_generator(drumsampler *ds, bool b)
+{
+    ds->envelope_enabled = b;
+}
+void drumsampler_set_attack_time(drumsampler *ds, double val)
+{
+    eg_set_attack_time_msec(&ds->eg, val);
+}
+void drumsampler_set_decay_time(drumsampler *ds, double val)
+{
+    eg_set_decay_time_msec(&ds->eg, val);
+}
+void drumsampler_set_sustain_lvl(drumsampler *ds, double val)
+{
+    eg_set_sustain_level(&ds->eg, val);
+}
+void drumsampler_set_release_time(drumsampler *ds, double val)
+{
+    eg_set_release_time_msec(&ds->eg, val);
 }

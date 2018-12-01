@@ -29,6 +29,8 @@ typedef struct soundgenerator
     int num_patterns;
     bool active;
 
+    double pan; // between -1(hard left) and 1(hard right)
+
     int effects_size; // size of array
     int effects_num;  // num of effects
     fx **effects;
@@ -50,4 +52,4 @@ int add_modfilter_soundgen(soundgenerator *self);
 int add_follower_soundgen(soundgenerator *self);
 int add_reverb_soundgen(soundgenerator *self);
 int add_waveshape_soundgen(soundgenerator *self);
-double effector(soundgenerator *self, double val);
+stereo_val effector(soundgenerator *self, stereo_val val);

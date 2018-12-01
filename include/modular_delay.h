@@ -44,7 +44,7 @@ bool mod_delay_process_audio(mod_delay *md, double *input_left,
                              double *input_right, double *output_left,
                              double *output_right);
 
-double mod_delay_process_wrapper(void *self, double input);
+stereo_val mod_delay_process_wrapper(void *self, stereo_val input);
 void mod_delay_status(void *self, char *status_string);
 
 void mod_delay_set_depth(mod_delay *md, double val);

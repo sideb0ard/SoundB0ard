@@ -86,13 +86,11 @@ stereo_val digisynth_gennext(void *self)
         accum_out_right += out_right;
     }
 
-    accum_out_left *= ds->vol;
-    accum_out_left = effector(&ds->sound_generator, accum_out_left);
+    stereo_val return_val = {.left = accum_out_left * ds->vol,
+                             .right = accum_out_right * ds->vol};
 
-    accum_out_right *= ds->vol;
-    accum_out_right = effector(&ds->sound_generator, accum_out_right);
-
-    return (stereo_val){.left = accum_out_left, .right = accum_out_right};
+    return_val = effector(&ds->sound_generator, return_val);
+    return return_val;
 }
 
 void digisynth_status(void *self, wchar_t *status_string)

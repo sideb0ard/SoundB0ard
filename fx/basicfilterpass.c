@@ -51,7 +51,7 @@ void filterpass_status(void *self, char *status_string)
     // clang-format on
 }
 
-double filterpass_process_audio(void *self, double input)
+stereo_val filterpass_process_audio(void *self, stereo_val input)
 {
     filterpass *fp = (filterpass *)self;
 
@@ -75,9 +75,10 @@ double filterpass_process_audio(void *self, double input)
     }
 
     moog_update((filter *)&fp->m_filter);
-    double filter_out = moog_gennext((filter *)&fp->m_filter, input);
+    input.left = moog_gennext((filter *)&fp->m_filter, input.left);
+    input.right = moog_gennext((filter *)&fp->m_filter, input.right);
 
-    return filter_out;
+    return input;
 }
 
 void filterpass_set_lfo_active(filterpass *fp, int lfo_num, bool b)

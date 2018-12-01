@@ -14,13 +14,14 @@
 #include "fx.h"
 #include "minisynth.h"
 #include "pattern_generator.h"
-#include "value_generator.h"
 #include "sbmsg.h"
 #include "sound_generator.h"
 #include "table.h"
+#include "value_generator.h"
 
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
+#define MAX_NUM_ALGORITHMS 100
 #define MAX_NUM_SOUND_GENERATORS 100
 #define MAX_NUM_PATTERN_GENERATORS 100
 #define MAX_NUM_VALUE_GENERATORS 100
@@ -77,18 +78,17 @@ typedef struct mixer
 
     preview_buffer preview;
 
-    algorithm **algorithms;
+    algorithm *algorithms[MAX_NUM_ALGORITHMS];
     int algorithm_num;
-    int algorithm_size;
 
     soundgenerator *sound_generators[MAX_NUM_SOUND_GENERATORS];
-    int soundgen_num;  // actual number of SGs
+    int soundgen_num; // actual number of SGs
 
     pattern_generator *pattern_generators[MAX_NUM_PATTERN_GENERATORS];
-    int pattern_gen_num;  // actual number of PGs
+    int pattern_gen_num; // actual number of PGs
 
     value_generator *value_generators[MAX_NUM_VALUE_GENERATORS];
-    int value_gen_num;  // actual number of VGs
+    int value_gen_num; // actual number of VGs
 
     AbletonLink *m_ableton_link;
 
@@ -97,7 +97,8 @@ typedef struct mixer
     // currently used for sidechain
     // compressor TODO there are no
     // checks for this num
-    double soundgen_volume[MAX_NUM_SOUND_GENERATORS]; // separating instrument amp
+    double
+        soundgen_volume[MAX_NUM_SOUND_GENERATORS]; // separating instrument amp
     // from mixer volume per channel
 
     env_var environment[ENVIRONMENT_ARRAY_SIZE];
@@ -168,7 +169,8 @@ int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_juggler(mixer *mixr, unsigned int style);
 int mixer_add_markov(mixer *mixr, unsigned int type);
-int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len, void *values);
+int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len,
+                         void *values);
 void mixer_preview_audio(mixer *mixr, char *filename);
 
 int mixer_print_timing_info(mixer *mixr);

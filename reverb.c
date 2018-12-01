@@ -42,7 +42,7 @@ reverb *new_reverb(void)
     r->m_fx.type = REVERB;
     r->m_fx.enabled = true;
     r->m_fx.status = &reverb_status;
-    r->m_fx.process = &reverb_process_wrapper;
+    r->m_fx.process = &reverb_process_audio;
     r->m_fx.event_notify = &fx_noop_event_notify;
 
     return r;
@@ -140,16 +140,10 @@ void reverb_cook_variables(reverb *r)
     lpf_comb_filter_set_comb_g(&r->m_parallel_cf_8, r->m_lpf2_g2);
 }
 
-bool reverb_process_audio(reverb *r, double *in, double *out,
-                          unsigned int num_input_channels,
-                          unsigned int num_output_channels)
+stereo_val reverb_process_audio(void *self, stereo_val in)
 {
-    double input_sample = in[0];
-    if (num_input_channels == 2)
-    {
-        input_sample += in[1];
-        input_sample *= 0.5;
-    }
+    reverb *r = (reverb *)self;
+    double input_sample = in.left + in.right * 0.5;
 
     double pre_delay_out = 0;
     delay_process_audio(&r->m_pre_delay, &input_sample, &pre_delay_out);
@@ -202,16 +196,14 @@ bool reverb_process_audio(reverb *r, double *in, double *out,
     double apf_4_out = 0;
     delay_apf_process_audio(&r->m_output_apf_4, &damping_lpf_2_out, &apf_4_out);
 
-    out[0] = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
+    stereo_val out = {};
+    out.left = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
              (r->m_wet_pct / 100.0) * (apf_3_out);
 
-    if (num_output_channels == 2)
-    {
-        out[1] = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
-                 (r->m_wet_pct / 100.0) * (apf_4_out);
-    }
+    out.right = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
+             (r->m_wet_pct / 100.0) * (apf_4_out);
 
-    return true;
+    return out;
 }
 
 void reverb_status(void *self, char *status_string)
@@ -222,14 +214,6 @@ void reverb_status(void *self, char *status_string)
              "predelayms:%.2f reverbtime:%.0f wetmx:%.1f",
              r->m_pre_delay_msec, r->m_rt60, r->m_wet_pct);
     // clang-format on
-}
-
-double reverb_process_wrapper(void *self, double input)
-{
-    reverb *r = (reverb *)self;
-    double output = 0;
-    reverb_process_audio(r, &input, &output, 1, 1);
-    return output;
 }
 
 void reverb_set_pre_delay_msec(reverb *r, double val)

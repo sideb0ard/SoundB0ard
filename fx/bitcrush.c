@@ -72,15 +72,17 @@ void bitcrush_set_bitrate(bitcrush *bc, int val)
         printf("Val must be between 200 and %d\n", SAMPLE_RATE);
 }
 
-double bitcrush_process_audio(void *self, double input)
+stereo_val bitcrush_process_audio(void *self, stereo_val input)
 {
     bitcrush *bc = (bitcrush *)self;
     bc->phasor += bc->sample_hold_freq;
     if (bc->phasor >= 1)
     {
         bc->phasor -= 1;
-        bc->last = bc->step * floor((input * bc->inv_step) + 0.5);
+        bc->last = bc->step * floor((input.left * bc->inv_step) + 0.5);
     }
 
-    return bc->last;
+    input.left = bc->last;
+    input.right = bc->last;
+    return input;
 }

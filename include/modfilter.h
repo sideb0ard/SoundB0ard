@@ -36,9 +36,7 @@ void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
                                          double q);
 void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
                                           double q);
-bool modfilter_process_audio(modfilter *mf, double *in, double *out);
-
-double modfilter_process_wrapper(void *self, double input);
+stereo_val modfilter_process_audio(void *self, stereo_val in);
 void modfilter_status(void *self, char *status_string);
 
 void modfilter_set_mod_depth_fc(modfilter *mf, double val);

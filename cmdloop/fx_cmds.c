@@ -317,6 +317,8 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     reverb_set_comb_delay_msec(r, 7, val);
                 else if (strncmp("comb8delayms", wurds[2], 12) == 0)
                     reverb_set_comb_delay_msec(r, 8, val);
+
+                reverb_cook_variables(r);
             }
             else if (f->type == WAVESHAPER)
             {

@@ -39,7 +39,7 @@ void envelope_follower_calculate_right_lpf_coeffs(envelope_follower *ef,
 bool envelope_follower_process_audio(envelope_follower *ef, double *in,
                                      double *out);
 
-double envelope_follower_process_wrapper(void *self, double input);
+stereo_val envelope_follower_process_wrapper(void *self, stereo_val input);
 void envelope_follower_status(void *self, char *status_string);
 
 void envelope_follower_set_pregain_db(envelope_follower *ef, double val);

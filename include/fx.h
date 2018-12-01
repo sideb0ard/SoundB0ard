@@ -1,6 +1,7 @@
 #ifndef FX_H
 #define FX_H
 
+#include <defjams.h>
 #include <stdbool.h>
 
 typedef enum
@@ -27,7 +28,7 @@ typedef struct fx
     fx_type type;
     bool enabled;
     void (*status)(void *self, char *string);
-    double (*process)(void *self, double input);
+    stereo_val (*process)(void *self, stereo_val input);
     void (*event_notify)(void *self, unsigned int event_type);
 } fx;
 

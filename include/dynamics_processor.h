@@ -5,6 +5,7 @@
 #include "afx/lpfcombfilter.h"
 #include "afx/onepolelpf.h"
 
+#include <defjams.h>
 #include "envelope_detector.h"
 #include "fx.h"
 
@@ -56,7 +57,7 @@ double dynamics_processor_calc_downward_expander_gain(double detector_val,
                                                       bool gate);
 
 void dynamics_processor_status(void *self, char *status_string);
-double dynamics_processor_process(void *self, double input);
+stereo_val dynamics_processor_process(void *self, stereo_val input);
 
 void dynamics_processor_set_inputgain_db(dynamics_processor *dp, double val);
 void dynamics_processor_set_threshold(dynamics_processor *dp, double val);

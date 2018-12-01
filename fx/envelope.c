@@ -53,11 +53,13 @@ void envelope_status(void *self, char *status_string)
              e->debug);
 }
 
-double envelope_process_audio(void *self, double input)
+stereo_val envelope_process_audio(void *self, stereo_val input)
 {
     envelope *e = (envelope *)self;
     double env_out = eg_do_envelope(&e->eg, NULL);
-    return input * env_out;
+    input.left *= env_out;
+    input.right *= env_out;
+    return input;
 }
 
 void envelope_set_length_bars(envelope *e, double length_bars)

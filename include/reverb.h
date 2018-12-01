@@ -74,12 +74,9 @@ reverb *new_reverb(void);
 void reverb_init_reverb(reverb *r);
 void reverb_cook_variables(reverb *r);
 
-bool reverb_process_audio(reverb *r, double *in, double *out,
-                          unsigned int num_channels_in,
-                          unsigned int num_channels_out);
+stereo_val reverb_process_audio(void *self, stereo_val in);
 
 void reverb_status(void *self, char *string);
-double reverb_process_wrapper(void *self, double input);
 
 void reverb_set_pre_delay_msec(reverb *r, double val);
 void reverb_set_pre_delay_atten_db(reverb *r, double val);

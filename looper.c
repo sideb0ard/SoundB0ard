@@ -299,14 +299,13 @@ stereo_val looper_gennext(void *self)
         }
     }
 
-    val.left = effector(&g->sound_generator, val.left);
-    val.right = effector(&g->sound_generator, val.right);
-
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
 
     val.left = val.left * g->vol * eg_amp;
     val.right = val.right * g->vol * eg_amp;
+
+    val = effector(&g->sound_generator, val);
 
     return val;
 }

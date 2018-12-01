@@ -39,36 +39,17 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             else if (mixr->sound_generators[soundgen_num]->type ==
                      DRUMSAMPLER_TYPE)
             {
-                drumsampler *s =
+                drumsampler *ds =
                     (drumsampler *)mixr->sound_generators[soundgen_num];
 
-                if (strncmp("end_pos", wurds[2], 7) == 0)
-                {
-                    int pct = atoi(wurds[3]);
-                    drumsampler_set_cutoff_percent(s, pct);
-                }
-                else if (strncmp("load", wurds[2], 4) == 0 ||
-                         strncmp("import", wurds[2], 6) == 0)
-                {
-                    if (is_valid_file(wurds[3]))
-                    {
-                        printf("Changing Loaded "
-                               "FILE!\n");
-                        drumsampler_import_file(s, wurds[3]);
-                    }
-                    else
-                        printf("%s is not a valid file\n", wurds[3]);
-                }
-                else if (strncmp("pitch", wurds[2], 5) == 0)
-                {
-                    double v = atof(wurds[3]);
-                    drumsampler_set_pitch(s, v);
-                }
+                parse_drumsampler_cmd(ds, &wurds[2], num_wurds - 2);
             }
             else if (mixr->sound_generators[soundgen_num]->type ==
                      DRUMSYNTH_TYPE)
             {
-                parse_drumsynth_cmd(soundgen_num, &wurds[2], num_wurds - 2);
+                drumsynth *ds =
+                    (drumsynth *)mixr->sound_generators[soundgen_num];
+                parse_drumsynth_cmd(ds, &wurds[2], num_wurds - 2);
             }
         }
         return true;
@@ -76,117 +57,163 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     return false;
 }
 
-bool parse_drumsynth_cmd(int soundgen_num, char wurds[][SIZE_OF_WURD],
+void parse_drumsampler_cmd(drumsampler *ds, char wurds[][SIZE_OF_WURD],
+                           int num_wurds)
+{
+    if (strncmp("attack_ms", wurds[0], 9) == 0)
+    {
+        float val = atof(wurds[1]);
+        drumsampler_set_attack_time(ds, val);
+    }
+    else if (strncmp("decay_ms", wurds[0], 8) == 0)
+    {
+        float val = atof(wurds[1]);
+        drumsampler_set_decay_time(ds, val);
+    }
+    else if (strncmp("eg", wurds[0], 2) == 0)
+    {
+        bool b = atoi(wurds[1]);
+        drumsampler_enable_envelope_generator(ds, b);
+    }
+    else if (strncmp("end_pos", wurds[0], 7) == 0)
+    {
+        int pct = atoi(wurds[1]);
+        drumsampler_set_cutoff_percent(ds, pct);
+    }
+    else if (strncmp("load", wurds[0], 4) == 0 ||
+             strncmp("import", wurds[0], 6) == 0)
+    {
+        if (is_valid_file(wurds[1]))
+        {
+            printf("Changing Loaded "
+                   "FILE!\n");
+            drumsampler_import_file(ds, wurds[1]);
+        }
+        else
+            printf("%s is not a valid file\n", wurds[1]);
+    }
+    else if (strncmp("pitch", wurds[0], 5) == 0)
+    {
+        double v = atof(wurds[1]);
+        drumsampler_set_pitch(ds, v);
+    }
+    else if (strncmp("release_ms", wurds[0], 9) == 0)
+    {
+        float val = atof(wurds[1]);
+        drumsampler_set_release_time(ds, val);
+    }
+    else if (strncmp("sustain", wurds[0], 7) == 0)
+    {
+        float val = atof(wurds[1]);
+        drumsampler_set_sustain_lvl(ds, val);
+    }
+}
+
+void parse_drumsynth_cmd(drumsynth *ds, char wurds[][SIZE_OF_WURD],
                          int num_wurds)
 {
     (void)num_wurds;
     double val = atof(wurds[1]);
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-        mixr->sound_generators[soundgen_num]->type == DRUMSYNTH_TYPE)
+    if (strncmp("debug", wurds[0], 5) == 0)
     {
-        drumsynth *synth = (drumsynth *)mixr->sound_generators[soundgen_num];
-        if (strncmp("debug", wurds[0], 5) == 0)
-        {
-            drumsynth_set_debug(synth, val);
-        }
-        if (strncmp("save", wurds[0], 4) == 0)
-        {
-            drumsynth_save_patch(synth, wurds[1]);
-        }
-        if (strncmp("open", wurds[0], 4) == 0 ||
-            strncmp("load", wurds[0], 4) == 0 ||
-            strncmp("import", wurds[0], 6) == 0)
-        {
-            drumsynth_open_patch(synth, wurds[1]);
-        }
-        else if (strncmp("distortion_threshold", wurds[0], 20) == 0)
-        {
-            drumsynth_set_distortion_threshold(synth, val);
-        }
-        else if (strncmp("o1_wav", wurds[0], 6) == 0)
-        {
-            drumsynth_set_osc_wav(synth, 1, val);
-        }
-        else if (strncmp("o1_fo", wurds[0], 6) == 0)
-        {
-            drumsynth_set_osc_fo(synth, 1, val);
-        }
-        else if (strncmp("o1_amp", wurds[0], 6) == 0)
-        {
-            drumsynth_set_osc_amp(synth, 1, val);
-        }
-        else if (strncmp("e2_o2_int", wurds[0], 8) == 0)
-        {
-            drumsynth_set_eg_osc_intensity(synth, 2, 2, val);
-        }
-        else if (strncmp("e1_att", wurds[0], 6) == 0)
-        {
-            drumsynth_set_eg_attack(synth, 1, val);
-        }
-        else if (strncmp("e1_dec", wurds[0], 6) == 0)
-        {
-            drumsynth_set_eg_decay(synth, 1, val);
-        }
-        else if (strncmp("e1_sus_lvl", wurds[0], 10) == 0)
-        {
-            drumsynth_set_eg_sustain_lvl(synth, 1, val);
-        }
-        else if (strncmp("e1_rel", wurds[0], 6) == 0)
-        {
-            drumsynth_set_eg_release(synth, 1, val);
-        }
-        else if (strncmp("o2_wav", wurds[0], 6) == 0)
-        {
-            drumsynth_set_osc_wav(synth, 2, val);
-        }
-        else if (strncmp("o2_fo", wurds[0], 6) == 0)
-        {
-            drumsynth_set_osc_fo(synth, 2, val);
-        }
-        else if (strncmp("o2_amp", wurds[0], 6) == 0)
-        {
-            drumsynth_set_osc_amp(synth, 2, val);
-        }
-        else if (strncmp("mod_pitch_semitones", wurds[0], 19) == 0)
-        {
-            drumsynth_set_mod_semitones_range(synth, val);
-        }
-        else if (strncmp("e2_att", wurds[0], 6) == 0)
-        {
-            drumsynth_set_eg_attack(synth, 2, val);
-        }
-        else if (strncmp("e2_dec", wurds[0], 6) == 0)
-        {
-            drumsynth_set_eg_decay(synth, 2, val);
-        }
-        else if (strncmp("e2_sus_lvl", wurds[0], 10) == 0)
-        {
-            drumsynth_set_eg_sustain_lvl(synth, 2, val);
-        }
-        else if (strncmp("e2_rel", wurds[0], 6) == 0)
-        {
-            drumsynth_set_eg_release(synth, 2, val);
-        }
-        else if (strncmp("filter_type", wurds[0], 11) == 0)
-        {
-            drumsynth_set_filter_type(synth, val);
-        }
-        else if (strncmp("freq", wurds[0], 4) == 0)
-        {
-            drumsynth_set_filter_freq(synth, val);
-        }
-        else if (strncmp("rand", wurds[0], 4) == 0)
-        {
-            drumsynth_randomize(synth);
-        }
-        else if (strncmp("reset", wurds[0], 5) == 0)
-        {
-            drumsynth_set_reset_osc(synth, val);
-        }
-        else if (strncmp("q", wurds[0], 1) == 0)
-        {
-            drumsynth_set_filter_q(synth, val);
-        }
+        drumsynth_set_debug(ds, val);
     }
-    return true;
+    if (strncmp("save", wurds[0], 4) == 0)
+    {
+        drumsynth_save_patch(ds, wurds[1]);
+    }
+    if (strncmp("open", wurds[0], 4) == 0 ||
+        strncmp("load", wurds[0], 4) == 0 ||
+        strncmp("import", wurds[0], 6) == 0)
+    {
+        drumsynth_open_patch(ds, wurds[1]);
+    }
+    else if (strncmp("distortion_threshold", wurds[0], 20) == 0)
+    {
+        drumsynth_set_distortion_threshold(ds, val);
+    }
+    else if (strncmp("o1_wav", wurds[0], 6) == 0)
+    {
+        drumsynth_set_osc_wav(ds, 1, val);
+    }
+    else if (strncmp("o1_fo", wurds[0], 6) == 0)
+    {
+        drumsynth_set_osc_fo(ds, 1, val);
+    }
+    else if (strncmp("o1_amp", wurds[0], 6) == 0)
+    {
+        drumsynth_set_osc_amp(ds, 1, val);
+    }
+    else if (strncmp("e2_o2_int", wurds[0], 8) == 0)
+    {
+        drumsynth_set_eg_osc_intensity(ds, 2, 2, val);
+    }
+    else if (strncmp("e1_att", wurds[0], 6) == 0)
+    {
+        drumsynth_set_eg_attack(ds, 1, val);
+    }
+    else if (strncmp("e1_dec", wurds[0], 6) == 0)
+    {
+        drumsynth_set_eg_decay(ds, 1, val);
+    }
+    else if (strncmp("e1_sus_lvl", wurds[0], 10) == 0)
+    {
+        drumsynth_set_eg_sustain_lvl(ds, 1, val);
+    }
+    else if (strncmp("e1_rel", wurds[0], 6) == 0)
+    {
+        drumsynth_set_eg_release(ds, 1, val);
+    }
+    else if (strncmp("o2_wav", wurds[0], 6) == 0)
+    {
+        drumsynth_set_osc_wav(ds, 2, val);
+    }
+    else if (strncmp("o2_fo", wurds[0], 6) == 0)
+    {
+        drumsynth_set_osc_fo(ds, 2, val);
+    }
+    else if (strncmp("o2_amp", wurds[0], 6) == 0)
+    {
+        drumsynth_set_osc_amp(ds, 2, val);
+    }
+    else if (strncmp("mod_pitch_semitones", wurds[0], 19) == 0)
+    {
+        drumsynth_set_mod_semitones_range(ds, val);
+    }
+    else if (strncmp("e2_att", wurds[0], 6) == 0)
+    {
+        drumsynth_set_eg_attack(ds, 2, val);
+    }
+    else if (strncmp("e2_dec", wurds[0], 6) == 0)
+    {
+        drumsynth_set_eg_decay(ds, 2, val);
+    }
+    else if (strncmp("e2_sus_lvl", wurds[0], 10) == 0)
+    {
+        drumsynth_set_eg_sustain_lvl(ds, 2, val);
+    }
+    else if (strncmp("e2_rel", wurds[0], 6) == 0)
+    {
+        drumsynth_set_eg_release(ds, 2, val);
+    }
+    else if (strncmp("filter_type", wurds[0], 11) == 0)
+    {
+        drumsynth_set_filter_type(ds, val);
+    }
+    else if (strncmp("freq", wurds[0], 4) == 0)
+    {
+        drumsynth_set_filter_freq(ds, val);
+    }
+    else if (strncmp("rand", wurds[0], 4) == 0)
+    {
+        drumsynth_randomize(ds);
+    }
+    else if (strncmp("reset", wurds[0], 5) == 0)
+    {
+        drumsynth_set_reset_osc(ds, val);
+    }
+    else if (strncmp("q", wurds[0], 1) == 0)
+    {
+        drumsynth_set_filter_q(ds, val);
+    }
 }

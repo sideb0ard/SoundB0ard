@@ -142,12 +142,14 @@ bool envelope_follower_process_audio(envelope_follower *ef, double *in,
     return true;
 }
 
-double envelope_follower_process_wrapper(void *self, double input)
+stereo_val envelope_follower_process_wrapper(void *self, stereo_val input)
 {
     envelope_follower *ef = (envelope_follower *)self;
     double output = 0;
-    envelope_follower_process_audio(ef, &input, &output);
-    return output;
+    envelope_follower_process_audio(ef, &input.left, &output);
+    input.left = output;
+    input.right = output;
+    return input;
 }
 void envelope_follower_status(void *self, char *status_string)
 {

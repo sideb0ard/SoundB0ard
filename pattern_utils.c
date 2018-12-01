@@ -4,8 +4,8 @@
 #include <midimaaan.h>
 #include <mixer.h>
 #include <pattern_utils.h>
-#include <value_generator.h>
 #include <utils.h>
+#include <value_generator.h>
 
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
@@ -135,7 +135,8 @@ void apply_short_to_midi_pattern_sub_pattern(uint16_t bit_pattern,
                                              midi_event *dest_pattern)
 {
     int ticks_per_quart = pattern_len / 16;
-    //printf("START IDX:%d Len:%d Ticks:%d\n", start_idx, pattern_len, ticks_per_quart);
+    // printf("START IDX:%d Len:%d Ticks:%d\n", start_idx, pattern_len,
+    // ticks_per_quart);
     for (int i = 0; i < 15; i++)
     {
         if (bit_pattern & (1 << (15 - i)))

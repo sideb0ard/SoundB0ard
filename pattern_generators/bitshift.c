@@ -114,7 +114,7 @@ void bitshift_generate(void *self, void *data)
     bitshift *bs = (bitshift *)self;
     int t = bs->time_counter++;
 
-    midi_event *midi_pattern = (midi_event*) data;
+    midi_event *midi_pattern = (midi_event *)data;
 
     int num_rpn = bs->pattern.num_rpn_tokens;
     bitshift_token *rpn_tokens = bs->pattern.rpn_tokenized_pattern;

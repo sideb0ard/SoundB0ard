@@ -28,7 +28,7 @@ typedef struct filterpass
 filterpass *new_filterpass(void);
 
 void filterpass_status(void *self, char *string);
-double filterpass_process_audio(void *self, double input);
+stereo_val filterpass_process_audio(void *self, stereo_val input);
 
 void filterpass_set_lfo_active(filterpass *fp, int lfo_num, bool b);
 void filterpass_set_lfo_rate(filterpass *fp, int lfo_num, double val);

@@ -159,11 +159,11 @@ void mod_delay_status(void *self, char *status_string)
              md->m_lfo_type ? "SIN" : "TRI");
 }
 
-double mod_delay_process_wrapper(void *self, double input)
+stereo_val mod_delay_process_wrapper(void *self, stereo_val input)
 {
     mod_delay *md = (mod_delay *)self;
-    double out = 0.;
-    mod_delay_process_audio(md, &input, &input, &out, &out);
+    stereo_val out = {};
+    mod_delay_process_audio(md, &input.left, &input.right, &out.left, &out.right);
     return out;
 }
 

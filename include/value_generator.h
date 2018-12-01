@@ -25,7 +25,7 @@ typedef struct value_generator
     void (*status)(void *self, wchar_t *wstring);
 } value_generator;
 
-value_generator *new_value_generator(unsigned int values_type, int values_len, void *values);
+value_generator *new_value_generator(unsigned int values_type, int values_len,
+                                     void *values);
 list_value_holder value_generator_generate(void *self);
 void value_generator_status(void *self, wchar_t *wstring);
-

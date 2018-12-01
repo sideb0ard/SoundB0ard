@@ -30,7 +30,7 @@ envelope *new_envelope(void);
 void envelope_reset(envelope *e);
 
 void envelope_status(void *self, char *string);
-double envelope_process_audio(void *self, double input);
+stereo_val envelope_process_audio(void *self, stereo_val input);
 
 void envelope_calculate_timings(envelope *e);
 void envelope_event_notify(void *self, unsigned int event_type);

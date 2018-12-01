@@ -135,7 +135,7 @@ int add_envelope_soundgen(soundgenerator *self)
     return soundgen_add_fx(self, (fx *)e);
 }
 
-double effector(soundgenerator *self, double val)
+stereo_val effector(soundgenerator *self, stereo_val val)
 {
     for (int i = 0; i < self->effects_num; i++)
     {

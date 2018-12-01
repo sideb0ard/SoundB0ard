@@ -1,5 +1,6 @@
 #pragma once
 
+#include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "sequence_engine.h"
 #include "sound_generator.h"
@@ -39,6 +40,9 @@ typedef struct drumsampler
     char filename[1024];
     int samplerate;
     int channels;
+
+    envelope_generator eg;
+    bool envelope_enabled;
 
     double *buffer;
     int bufsize;
@@ -80,3 +84,8 @@ void drumsampler_reset_samples(drumsampler *seq);
 void drumsampler_set_pitch(drumsampler *seq, double v);
 void drumsampler_set_cutoff_percent(drumsampler *seq, unsigned int percent);
 void drumsampler_note_on(drumsampler *ds);
+void drumsampler_enable_envelope_generator(drumsampler *ds, bool b);
+void drumsampler_set_attack_time(drumsampler *ds, double val);
+void drumsampler_set_decay_time(drumsampler *ds, double val);
+void drumsampler_set_sustain_lvl(drumsampler *ds, double val);
+void drumsampler_set_release_time(drumsampler *ds, double val);

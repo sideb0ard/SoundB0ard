@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wchar.h>
 #include <value_generator.h>
+#include <wchar.h>
 
 value_generator *new_value_generator(unsigned int values_type, int values_len,
                                      void *values)
@@ -27,7 +27,7 @@ value_generator *new_value_generator(unsigned int values_type, int values_len,
 list_value_holder value_generator_generate(void *self)
 {
     value_generator *vg = (value_generator *)self;
-    list_value_holder return_val = {.value_type = vg->values_type };
+    list_value_holder return_val = {.value_type = vg->values_type};
 
     if (vg->values_type == LIST_VALUE_CHAR_TYPE)
     {
@@ -37,7 +37,7 @@ list_value_holder value_generator_generate(void *self)
     }
     else
     {
-          float *values = vg->values;
+        float *values = vg->values;
         return_val.val = values[vg->cur_idx];
     }
 
@@ -52,7 +52,7 @@ static char *s_value_types[] = {"CHAR*", "FLOAT"};
 void value_generator_status(void *self, wchar_t *wstring)
 {
     value_generator *vg = (value_generator *)self;
-    char *list_vals = calloc(sizeof(char),  20*SIZE_OF_WURD);
+    char *list_vals = calloc(sizeof(char), 20 * SIZE_OF_WURD);
     int num_vals_to_show = vg->values_len < 19 ? vg->values_len : 19;
 
     if (vg->values_type == LIST_VALUE_CHAR_TYPE)
@@ -63,7 +63,7 @@ void value_generator_status(void *self, wchar_t *wstring)
             char *wurd = values[i];
             printf("WURD %s\n", wurd);
             strcat(list_vals, wurd);
-            if (i != num_vals_to_show -1)
+            if (i != num_vals_to_show - 1)
                 strcat(list_vals, " ");
         }
     }
@@ -75,10 +75,9 @@ void value_generator_status(void *self, wchar_t *wstring)
             float *values = vg->values;
             sprintf(scratch, "%.2f", values[i]);
             strcat(list_vals, scratch);
-            if (i != num_vals_to_show -1)
+            if (i != num_vals_to_show - 1)
                 strcat(list_vals, " ");
         }
-
     }
 
     swprintf(wstring, MAX_STATIC_STRING_SZ,
@@ -86,5 +85,5 @@ void value_generator_status(void *self, wchar_t *wstring)
              "type:%s len:(%d) vals:%s",
              s_value_types[vg->values_type], vg->values_len, list_vals);
 
-   free(list_vals); 
+    free(list_vals);
 }

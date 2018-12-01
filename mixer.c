@@ -205,7 +205,7 @@ void mixer_status_valz(mixer *mixr)
             {
                 wmemset(wss, 0, MAX_STATIC_STRING_SZ);
                 mixr->value_generators[i]->status(mixr->value_generators[i],
-                                                    wss);
+                                                  wss);
                 wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
                 wprintf(L"  %ls\n", wss);
                 wprintf(WANSI_COLOR_RESET);
@@ -420,31 +420,9 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
 int mixer_add_algorithm(mixer *mixr, algorithm *a)
 {
     printf("Adding an ALGORITHM, yo!\n");
-    algorithm **new_algorithms = NULL;
+    if (mixr->soundgen_num == MAX_NUM_ALGORITHMS)
+        return -99;
 
-    if (mixr->algorithm_size <= mixr->algorithm_num)
-    {
-        if (mixr->algorithm_size == 0)
-        {
-            mixr->algorithm_size = DEFAULT_ARRAY_SIZE;
-        }
-        else
-        {
-            mixr->algorithm_size *= 2;
-        }
-
-        new_algorithms = (algorithm **)realloc(
-            mixr->algorithms, mixr->algorithm_size * sizeof(algorithm *));
-        if (new_algorithms == NULL)
-        {
-            printf("Ooh, burney - cannae allocate memory for new algorithms");
-            return -1;
-        }
-        else
-        {
-            mixr->algorithms = new_algorithms;
-        }
-    }
     mixr->algorithms[mixr->algorithm_num] = a;
     return mixr->algorithm_num++;
 }
@@ -489,7 +467,8 @@ int mixer_add_juggler(mixer *mixr, unsigned int style)
         return -99;
 }
 
-int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len, void *values)
+int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len,
+                         void *values)
 {
     printf("Adding a new VALUE LIST GENERATOR!\n");
     value_generator *vg = new_value_generator(values_type, values_len, values);

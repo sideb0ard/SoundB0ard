@@ -22,12 +22,12 @@ bool parse_value_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 if (value_type == LIST_VALUE_CHAR_TYPE)
                 {
                     char wurd[SIZE_OF_WURD] = {};
-                    list_value_holder val= vg->generate(vg);
+                    list_value_holder val = vg->generate(vg);
                     printf("GOTS %s\n", val.wurd);
                 }
                 else
                 {
-                    list_value_holder val= vg->generate(vg);
+                    list_value_holder val = vg->generate(vg);
                     printf("GOTS %f\n", val.val);
                 }
             }

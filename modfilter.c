@@ -13,7 +13,7 @@ modfilter *new_modfilter()
     mf->m_fx.type = MODFILTER;
     mf->m_fx.enabled = true;
     mf->m_fx.status = &modfilter_status;
-    mf->m_fx.process = &modfilter_process_wrapper;
+    mf->m_fx.process = &modfilter_process_audio;
     mf->m_fx.event_notify = &fx_noop_event_notify;
 
     return mf;
@@ -123,8 +123,11 @@ void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
     mf->m_right_lpf.m_b2 = 2.0 * beta;
 }
 
-bool modfilter_process_audio(modfilter *mf, double *in, double *out)
+stereo_val modfilter_process_audio(void *self, stereo_val in)
 {
+    modfilter *mf = (modfilter *)self;
+    stereo_val out = {};
+
     double yn = 0.0;
     double yqn = 0; // quad phase
 
@@ -145,20 +148,13 @@ bool modfilter_process_audio(modfilter *mf, double *in, double *out)
     else
         modfilter_calculate_right_lpf_coeffs(mf, fcq, qq);
 
-    *out = biquad_process(&mf->m_left_lpf, *in);
+    out.left = biquad_process(&mf->m_left_lpf, in.left);
+    out.right = biquad_process(&mf->m_right_lpf, in.right);
 
-    // TODO if stereo, use m_right_lp too
 
-    return true;
+    return out;
 }
 
-double modfilter_process_wrapper(void *self, double input)
-{
-    modfilter *mf = (modfilter *)self;
-    double output = 0;
-    modfilter_process_audio(mf, &input, &output);
-    return output;
-}
 void modfilter_status(void *self, char *status_string)
 {
     modfilter *mf = (modfilter *)self;

@@ -34,14 +34,22 @@ void distortion_status(void *self, char *status_string)
              d->m_threshold);
 }
 
-double distortion_process(void *self, double input)
+stereo_val distortion_process(void *self, stereo_val input)
 {
     distortion *d = (distortion *)self;
     double returnval = 0;
-    if (input >= 0)
-        returnval = fmin(input, d->m_threshold);
+    if (input.left >= 0)
+        input.left = fmin(input.left, d->m_threshold);
     else
-        returnval = fmax(input, -d->m_threshold);
-    returnval /= d->m_threshold;
-    return returnval;
+        input.left = fmax(input.left, -d->m_threshold);
+    input.left /= d->m_threshold;
+
+    if (input.right >= 0)
+        input.right = fmin(input.right, d->m_threshold);
+    else
+        input.right = fmax(input.right, -d->m_threshold);
+    input.right /= d->m_threshold;
+
+    return input;
+
 }

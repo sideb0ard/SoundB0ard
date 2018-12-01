@@ -236,10 +236,10 @@ void stereo_delay_status(void *self, char *status_string)
              sd->m_wet_mix, s_delay_mode[sd->m_mode], sd->m_mode);
 }
 
-double stereo_delay_process_wrapper(void *self, double input)
+stereo_val stereo_delay_process_wrapper(void *self, stereo_val input)
 {
     stereodelay *sd = (stereodelay *)self;
-    double output = 0.;
-    stereo_delay_process_audio(sd, &input, &input, &output, &output);
+    stereo_val output = {};
+    stereo_delay_process_audio(sd, &input.left, &input.right, &output.left, &output.right);
     return output;
 }

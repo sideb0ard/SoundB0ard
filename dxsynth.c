@@ -797,13 +797,9 @@ stereo_val dxsynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    accum_out_left = effector(&dx->sound_generator, accum_out_left);
-    accum_out_left *= dx->vol;
-
-    accum_out_right = effector(&dx->sound_generator, accum_out_right);
-    accum_out_right *= dx->vol;
-
-    return (stereo_val){.left = accum_out_left, .right = accum_out_right};
+    stereo_val out = {.left = accum_out_left * dx->vol, .right = accum_out_right * dx->vol};
+    out = effector(&dx->sound_generator, out);
+    return out;
 }
 
 void dxsynth_rand_settings(dxsynth *dx)

@@ -1,8 +1,8 @@
 #include <defjams.h>
 
 #include <stdint.h>
-#include <wchar.h>
 #include <value_generator.h>
+#include <wchar.h>
 
 // MIDI PATTERNS
 void clear_midi_pattern(midi_event *pattern);
@@ -18,10 +18,9 @@ void midi_pattern_to_widechar(midi_event *pattern, wchar_t *patternstr);
 
 void apply_short_to_midi_pattern(uint16_t bit_pattern,
                                  midi_event *dest_pattern);
-void apply_short_to_midi_pattern_sub_pattern(
-    uint16_t bit_pattern, int start_idx, int pattern_len,
-    midi_event
-        *dest_pattern);
+void apply_short_to_midi_pattern_sub_pattern(uint16_t bit_pattern,
+                                             int start_idx, int pattern_len,
+                                             midi_event *dest_pattern);
 void set_pattern_to_self_destruct(midi_event *pattern);
 void short_to_char(uint16_t num, char bin_num[17]);
 

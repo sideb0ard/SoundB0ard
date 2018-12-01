@@ -41,7 +41,7 @@ typedef struct stereodelay
 stereodelay *new_stereo_delay(double duration);
 
 void stereo_delay_status(void *self, char *string);
-double stereo_delay_process_wrapper(void *self, double input);
+stereo_val stereo_delay_process_wrapper(void *self, stereo_val input);
 
 void stereo_delay_set_mode(stereodelay *d, unsigned mode);
 void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms);

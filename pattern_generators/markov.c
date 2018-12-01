@@ -10,9 +10,9 @@
 #include <euclidean.h>
 
 extern mixer *mixr;
-static char *s_markov_types[] = {"CLAPS", "GARAGE",  "HATS", "HATS2",
-                                 "HATS_MASK","HIPHOP", "HOUSE",  "RAGGA_KICK",
-                                 "RAGGA_SNARE"};
+static char *s_markov_types[] = {"CLAPS", "GARAGE",     "HATS",
+                                 "HATS2", "HATS_MASK",  "HIPHOP",
+                                 "HOUSE", "RAGGA_KICK", "RAGGA_SNARE"};
 
 #define BEAT0 32768
 #define BEAT1 16384
@@ -135,7 +135,9 @@ uint16_t markov_bit_pattern_generate(unsigned int markov_type)
             {
                 if (rand_percent() > 40)
                     bit_pattern |= 1 << (15 - i);
-            } else if ((i % 4) - 3 == 0) {
+            }
+            else if ((i % 4) - 3 == 0)
+            {
                 if (rand_percent() > 40)
                     bit_pattern |= 1 << (15 - i);
             }
@@ -236,13 +238,12 @@ uint16_t markov_bit_pattern_generate(unsigned int markov_type)
         markov_bit_pattern_generate(markov_type);
 
     return bit_pattern;
-
 }
 
 void markov_generate(void *self, void *data)
 {
     markov *m = (markov *)self;
-    midi_event *midi_pattern = (midi_event*) data;
+    midi_event *midi_pattern = (midi_event *)data;
     uint16_t bit_pattern = markov_bit_pattern_generate(m->markov_type);
     apply_short_to_midi_pattern(bit_pattern, midi_pattern);
 }

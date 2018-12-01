@@ -232,8 +232,6 @@ stereo_val drumsynth_gennext(void *self)
 
     double combined_osc = (osc1_out + osc2_out) * amp_out_env;
 
-    ds->m_distortion.m_threshold = ds->m_distortion_threshold;
-    combined_osc = distortion_process(&ds->m_distortion, combined_osc);
 
     ds->m_filter.f.m_filter_type = ds->m_filter_type;
     ds->m_filter.f.m_fc_control = ds->m_filter_fc;
@@ -241,13 +239,14 @@ stereo_val drumsynth_gennext(void *self)
     moog_update((filter *)&ds->m_filter);
     combined_osc = moog_gennext((filter *)&ds->m_filter, combined_osc);
 
-    combined_osc = effector(&ds->sg, combined_osc);
-
     double midi_velocity = scaleybum(0, 127, 0, 1, ds->current_velocity);
-    combined_osc *= midi_velocity;
+    out.left = combined_osc * ds->vol * midi_velocity;
+    out.right  = combined_osc * ds->vol * midi_velocity;
 
-    out.left = combined_osc * ds->vol;
-    out.right = combined_osc * ds->vol;
+    ds->m_distortion.m_threshold = ds->m_distortion_threshold;
+    out = distortion_process(&ds->m_distortion, out);
+
+    out = effector(&ds->sg, out);
 
     return out;
 }

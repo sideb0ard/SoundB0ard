@@ -983,13 +983,10 @@ stereo_val minisynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    accum_out_left = effector(&ms->sound_generator, accum_out_left);
-    accum_out_left *= ms->m_settings.m_volume_db;
+    stereo_val out = {.left = accum_out_left * ms->m_settings.m_volume_db, .right=accum_out_right * ms->m_settings.m_volume_db};
 
-    accum_out_right = effector(&ms->sound_generator, accum_out_right);
-    accum_out_right *= ms->m_settings.m_volume_db;
-
-    return (stereo_val){.left = accum_out_left, .right = accum_out_right};
+    out = effector(&ms->sound_generator, out);
+    return out;
 }
 
 void minisynth_rand_settings(minisynth *ms)

@@ -18,7 +18,7 @@ waveshaper *new_waveshaper(void);
 void waveshaper_init(waveshaper *d);
 
 void waveshaper_status(void *self, char *string);
-double waveshaper_process_audio(void *d, double input);
+stereo_val waveshaper_process_audio(void *d, stereo_val input);
 
 void waveshaper_set_arc_tan_k_pos(waveshaper *d, double val);
 void waveshaper_set_arc_tan_k_neg(waveshaper *d, double val);

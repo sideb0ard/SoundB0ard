@@ -85,7 +85,7 @@ bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         return true;
     }
-    //else if (strncmp("beat", wurds[0], 4) == 0 ||
+    // else if (strncmp("beat", wurds[0], 4) == 0 ||
     //         strncmp("note", wurds[0], 4) == 0)
     //{
     //    int sg_num;

@@ -238,7 +238,7 @@ void dynamics_processor_status(void *self, char *status_string)
     // clang-format on
 }
 
-double dynamics_processor_process(void *self, double input)
+stereo_val dynamics_processor_process(void *self, stereo_val input)
 {
     double returnval = 0;
 
@@ -250,7 +250,7 @@ double dynamics_processor_process(void *self, double input)
     // double xn_l = inputgain * input;
     // double xn_r = 0.;
 
-    double left_detector_input = input;
+    double left_detector_input = input.left;
     if (dp->m_external_source >= 0)
         left_detector_input =
             mixr->soundgen_cur_val[dp->m_external_source].left;
@@ -290,11 +290,14 @@ double dynamics_processor_process(void *self, double input)
             link_detector, dp->m_threshold, dp->m_ratio, dp->m_knee_width,
             true);
 
-    double lookahead_out = 0;
-    delay_process_audio(&dp->m_left_delay, &input, &lookahead_out);
+    double lookahead_left = 0;
+    double lookahead_right = 0;
+    delay_process_audio(&dp->m_left_delay, &input.left, &lookahead_left);
+    delay_process_audio(&dp->m_right_delay, &input.right, &lookahead_right);
 
-    returnval = gn * lookahead_out * outputgain;
-    return returnval;
+    input.left = gn * lookahead_left * outputgain;
+    input.right = gn * lookahead_right * outputgain;
+    return input;
 }
 
 void dynamics_processor_set_external_source(dynamics_processor *dp,
