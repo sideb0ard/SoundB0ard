@@ -35,6 +35,11 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 else
                     printf("Nah!\n");
             }
+            else if (strncmp("debug", wurds[2], 5) == 0)
+            {
+                bool debug = atoi(wurds[3]);
+                algorithm_set_debug(a, debug);
+            }
             else if (strncmp("process", wurds[2], 10) == 0)
             {
                 if (strncmp(wurds[3], "over", 4) == 0)

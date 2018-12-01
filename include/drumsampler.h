@@ -55,17 +55,11 @@ typedef struct drumsampler
 } drumsampler;
 
 drumsampler *new_drumsampler(char *filename);
-// drumsampler *new_drumsampler_from_char_pattern(char *filename,
-// char *pattern);
-// drumsampler *new_drumsampler_from_int_pattern(char *filename, int pattern);
-// drumsampler *new_drumsampler_from_char_array(char *filename, char **pattern,
-//                                                  int nsteps);
 
 int get_a_drumsampler_position(drumsampler *ss);
 int drumsampler_get_num_patterns(void *s);
 void drumsampler_set_num_patterns(void *s, int num_patterns);
 void drumsampler_make_active_track(void *s, int track_num);
-void drumsampler_event_notify(void *s, unsigned int event_type);
 bool drumsampler_is_valid_pattern(void *self, int pattern_num);
 
 void drumsampler_del_self(void *self);

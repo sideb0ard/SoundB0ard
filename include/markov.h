@@ -5,12 +5,13 @@
 
 enum
 {
+    CLAPS,
     GARAGE,
-    HIPHOP,
     HATS,
     HATS2,
     HATS_MASK,
-    CLAPS,
+    HIPHOP,
+    HOUSE,
     RAGGA_BEAT,
     RAGGA_SNARE,
     NUM_MARKOV_STYLES

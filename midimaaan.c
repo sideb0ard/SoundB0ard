@@ -278,6 +278,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             if (!sequence_engine_is_masked(engine))
             {
                 drumsynth *ds = (drumsynth *)sg;
+                ds->current_velocity = ev->data2;
                 drumsynth_trigger(ds);
             }
         }

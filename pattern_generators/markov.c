@@ -10,8 +10,8 @@
 #include <euclidean.h>
 
 extern mixer *mixr;
-static char *s_markov_types[] = {"GARAGE",     "HIPHOP", "HATS", "HATS2",
-                                 "HATS_MASK",  "CLAPS",  "RAGGA_KICK",
+static char *s_markov_types[] = {"CLAPS", "GARAGE",  "HATS", "HATS2",
+                                 "HATS_MASK","HIPHOP", "HOUSE",  "RAGGA_KICK",
                                  "RAGGA_SNARE"};
 
 #define BEAT0 32768
@@ -74,6 +74,28 @@ uint16_t markov_bit_pattern_generate(unsigned int markov_type)
     uint16_t bit_pattern = 0;
     switch (markov_type)
     {
+    case (CLAPS):
+        if (rand_percent() > 90)
+        {
+            int num_hits = rand() % 7;
+            // bit_pattern = create_euclidean_rhythm(num_hits, 16);
+            bit_pattern = create_euclidean_rhythm(0, 16);
+        }
+        else
+        {
+            if (rand_percent() > 10)
+                bit_pattern |= BEAT4;
+            if (rand_percent() > 90)
+                bit_pattern |= BEAT7;
+            int randy = rand_percent();
+            if (randy > 95)
+                bit_pattern |= BEAT10;
+            else if (randy > 92)
+                bit_pattern |= BEAT11;
+            if (rand_percent() > 10)
+                bit_pattern |= BEAT12;
+        }
+        break;
     case (GARAGE):
         if (rand_percent() > 10)
             bit_pattern |= BEAT0;
@@ -100,6 +122,29 @@ uint16_t markov_bit_pattern_generate(unsigned int markov_type)
         if (third >= 90)
             bit_pattern |= BEAT15;
 
+        break;
+    case (HATS):
+        for (int i = 0; i < 16; i++)
+            if (rand_percent() > 40)
+                bit_pattern |= 1 << (15 - i);
+        break;
+    case (HATS2):
+        for (int i = 0; i < 16; i++)
+        {
+            if (i % 4 == 0)
+            {
+                if (rand_percent() > 40)
+                    bit_pattern |= 1 << (15 - i);
+            } else if ((i % 4) - 3 == 0) {
+                if (rand_percent() > 40)
+                    bit_pattern |= 1 << (15 - i);
+            }
+        }
+        break;
+    case (HATS_MASK):
+        for (int i = 10; i < 16; i++)
+            if (rand_percent() > 40)
+                bit_pattern |= 1 << (15 - i);
         break;
     case (HIPHOP):
         first = rand_percent();
@@ -131,50 +176,27 @@ uint16_t markov_bit_pattern_generate(unsigned int markov_type)
             bit_pattern |= BEAT15;
 
         break;
-    case (HATS):
-        for (int i = 0; i < 16; i++)
-            if (rand_percent() > 40)
-                bit_pattern |= 1 << (15 - i);
-        break;
-    case (HATS2):
-        for (int i = 0; i < 16; i++)
-        {
-            if (i % 4 == 0)
-            {
-                if (rand_percent() > 40)
-                    bit_pattern |= 1 << (15 - i);
-            } else if ((i % 4) - 3 == 0) {
-                if (rand_percent() > 40)
-                    bit_pattern |= 1 << (15 - i);
-            }
-        }
-        break;
-    case (HATS_MASK):
-        for (int i = 10; i < 16; i++)
-            if (rand_percent() > 40)
-                bit_pattern |= 1 << (15 - i);
-        break;
-    case (CLAPS):
-        if (rand_percent() > 90)
-        {
-            int num_hits = rand() % 7;
-            // bit_pattern = create_euclidean_rhythm(num_hits, 16);
-            bit_pattern = create_euclidean_rhythm(0, 16);
-        }
-        else
-        {
-            if (rand_percent() > 10)
-                bit_pattern |= BEAT4;
-            if (rand_percent() > 90)
-                bit_pattern |= BEAT7;
-            int randy = rand_percent();
-            if (randy > 95)
-                bit_pattern |= BEAT10;
-            else if (randy > 92)
-                bit_pattern |= BEAT11;
-            if (rand_percent() > 10)
-                bit_pattern |= BEAT12;
-        }
+    case (HOUSE):
+        first = rand_percent();
+        if (first > 10)
+            bit_pattern |= BEAT0;
+        if (first > 90)
+            bit_pattern |= BEAT3;
+
+        second = rand_percent();
+        if (second > 10)
+            bit_pattern |= BEAT4;
+
+        third = rand_percent();
+        if (third > 10)
+            bit_pattern |= BEAT8;
+
+        fourth = rand_percent();
+        if (third > 20)
+            bit_pattern |= BEAT12;
+        if (third >= 90)
+            bit_pattern |= BEAT15;
+
         break;
     case (RAGGA_BEAT):
         first = rand_percent();

@@ -177,11 +177,11 @@ void apply_short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
             ev->source = 0;
             ev->hold = hold_time_ms;
 
-            if (i == 0 || i == 8)
+            if (i % 4 == 0)
                 ev->data2 = 128; // velocity
             else
             {
-                int rand_velocity = (rand() % 50) + 70;
+                int rand_velocity = (rand() % 80) + 38;
                 ev->data2 = rand_velocity;
             }
         }

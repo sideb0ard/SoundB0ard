@@ -84,10 +84,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
              strncmp("play", wurds[0], 4) == 0)
     {
         if (is_valid_file(wurds[1]))
-        {
-            printf("PLAY YO preview! %s\n", wurds[1]);
             mixer_preview_audio(mixr, wurds[1]);
-        }
         goto cmd_found;
     }
 

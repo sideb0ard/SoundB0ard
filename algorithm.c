@@ -11,7 +11,8 @@
 
 extern mixer *mixr;
 
-const char *s_event_type[] = {"midi", "32nd", "16th", "8th", "4th", "bar"};
+const char *s_event_type[] = {"midi", "32nd", "24th", "16th", "12th",
+                              "8th",  "6th",  "4th",  "3rd",  "bar"};
 const char *s_process_type[] = {"every", "over", "for"};
 const char *s_var_select_type[] = {"rand", "osc", "step", "for"};
 const char *s_env_type[] = {"LIST", "STEP"};
@@ -82,7 +83,7 @@ bool algorithm_set_var_list(algorithm *a, char *list)
 
     if (strstr(quote_stripped_list, ":"))
     {
-        float start, end, step = 0;
+        float start, end, step = 1;
         sscanf(quote_stripped_list, "%f:%f:%f", &start, &end, &step);
 
         a->env.has_sequence = true;
@@ -256,6 +257,7 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
         a->process_step = step;
 
         a->event_type = algorithm_get_event_type_from_string(wurds[2]);
+        printf("EVENT TYPE %d\n", a->event_type);
         if (a->event_type == -1)
         {
             printf("Need a time period\n");
@@ -367,6 +369,8 @@ static void _get_command_replacement_value(algorithm *a,
             return;
         }
     }
+    if (a->debug)
+        printf("REPLAcement val:%s\n", replacement_value);
 }
 
 void algorithm_replace_vars_in_cmd(algorithm *a)
@@ -439,3 +443,5 @@ bool algorithm_set_cmd(algorithm *a, char *cmd)
     }
     return false;
 }
+
+void algorithm_set_debug(algorithm *s, bool b) { s->debug = b; }
