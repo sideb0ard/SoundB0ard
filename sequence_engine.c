@@ -50,7 +50,7 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
     for (int i = 0; i < MAX_NOTES_ARP; i++)
         engine->arp.last_midi_notes[i] = -1;
 
-    engine->sustain_note_ms = 200;
+    engine->sustain_note_ms = 500;
     engine->single_note_mode = true; // opposite is melody mode
     engine->chord_mode = false;
     engine->follow_mixer_chord_changes = true;

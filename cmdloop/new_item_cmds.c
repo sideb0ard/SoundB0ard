@@ -109,12 +109,12 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                  strncmp("beat", wurds[1], 4) == 0)
         {
             drumsynth *bd = new_drumsynth();
-            drumsynth_open_patch(bd, "thuuud");
+            drumsynth_open_patch(bd, "hthud");
             int bdnum = add_sound_generator(mixr, (soundgenerator *)bd);
             update_environment("bd", bdnum);
 
             drumsynth *sd = new_drumsynth();
-            drumsynth_open_patch(sd, "snarrre");
+            drumsynth_open_patch(sd, "snrrn");
             int sdnum = add_sound_generator(mixr, (soundgenerator *)sd);
             update_environment("sd", sdnum);
 

@@ -230,6 +230,10 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     stereo_delay_set_feedback_percent(sd, val);
                 else if (strncmp("ratio", wurds[2], 5) == 0)
                     stereo_delay_set_delay_ratio(sd, val);
+                else if (strncmp("synclen", wurds[2], 7) == 0)
+                    stereo_delay_set_sync_len(sd, val);
+                else if (strncmp("sync", wurds[2], 4) == 0)
+                    stereo_delay_set_sync(sd, val);
                 else if (strncmp("wetmx", wurds[2], 5) == 0)
                     stereo_delay_set_wet_mix(sd, val);
                 else if (strncmp("mode", wurds[2], 4) == 0)

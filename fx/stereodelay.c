@@ -1,8 +1,11 @@
+#include <mixer.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <wchar.h>
 
 #include "stereodelay.h"
+
+extern mixer *mixr;
 
 stereodelay *new_stereo_delay(double duration)
 {
@@ -18,7 +21,9 @@ stereodelay *new_stereo_delay(double duration)
     d->m_fx.enabled = true;
     d->m_fx.status = &stereo_delay_status;
     d->m_fx.process = &stereo_delay_process_wrapper;
-    d->m_fx.event_notify = &fx_noop_event_notify;
+    d->m_fx.event_notify = &stereo_delay_event_notify;
+
+    d->sync_len = DELAY_SYNC_QUARTER;
 
     d->lfo1_on = false;
     d->m_lfo1_min = 50;
@@ -42,6 +47,16 @@ stereodelay *new_stereo_delay(double duration)
     stereo_delay_update(d);
 
     return d;
+}
+
+void stereo_delay_event_notify(void *self, unsigned int event_type)
+{
+    if (event_type == TIME_BPM_CHANGE)
+    {
+        stereodelay *sd = (stereodelay *)self;
+        if (sd->sync)
+            stereo_delay_sync_tempo(sd);
+    }
 }
 
 void stereo_delay_reset(stereodelay *d)
@@ -226,20 +241,53 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
 }
 
 static char *s_delay_mode[] = {"tap1", "tap2", "pingpong"};
+static char *s_delay_sync_len[] = {"4th", "8th", "16th"};
 void stereo_delay_status(void *self, char *status_string)
 {
     stereodelay *sd = (stereodelay *)self;
     snprintf(status_string, MAX_STATIC_STRING_SZ,
              "delayms:%.0f fb:%.2f ratio:%.2f "
-             "wetmx:%.2f mode:%s(%d)",
+             "wetmx:%.2f mode:%s(%d) sync:%d synclen:%s(%d)",
              sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio,
-             sd->m_wet_mix, s_delay_mode[sd->m_mode], sd->m_mode);
+             sd->m_wet_mix, s_delay_mode[sd->m_mode], sd->m_mode, sd->sync,
+             s_delay_sync_len[sd->sync_len], sd->sync_len);
 }
 
 stereo_val stereo_delay_process_wrapper(void *self, stereo_val input)
 {
     stereodelay *sd = (stereodelay *)self;
     stereo_val output = {};
-    stereo_delay_process_audio(sd, &input.left, &input.right, &output.left, &output.right);
+    stereo_delay_process_audio(sd, &input.left, &input.right, &output.left,
+                               &output.right);
     return output;
+}
+
+void stereo_delay_sync_tempo(stereodelay *d)
+{
+    double delay_time_quarter_note_ms = 60 / mixr->bpm * 1000;
+    if (d->sync_len == DELAY_SYNC_QUARTER)
+        d->m_delay_time_ms = delay_time_quarter_note_ms;
+    else if (d->sync_len == DELAY_SYNC_EIGHTH)
+        d->m_delay_time_ms = delay_time_quarter_note_ms * 0.5;
+    else if (d->sync_len == DELAY_SYNC_SIXTEENTH)
+        d->m_delay_time_ms = delay_time_quarter_note_ms * 0.25;
+
+    stereo_delay_update(d);
+}
+
+void stereo_delay_set_sync(stereodelay *d, bool b)
+{
+    d->sync = b;
+    if (b)
+        stereo_delay_sync_tempo(d);
+}
+
+void stereo_delay_set_sync_len(stereodelay *d, unsigned int len)
+{
+    if (len < DELAY_SYNC_SIZE)
+    {
+        d->sync_len = len;
+        if (d->sync)
+            stereo_delay_sync_tempo(d);
+    }
 }
