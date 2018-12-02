@@ -35,7 +35,7 @@ reverb *new_reverb(void)
 
     r->m_lpf2_g2 = 0.25;
     r->m_rt60 = 100;
-    r->m_wet_pct = 50;
+    r->m_wet_pct = 20;
 
     reverb_init_reverb(r);
 

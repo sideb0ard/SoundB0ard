@@ -133,9 +133,10 @@ stereo_val drumsampler_gennext(void *self)
             left_val += ds->buffer[idx] * amp;
 
             if (ds->channels == 2)
-            {
                 right_val += ds->buffer[idx + 1] * amp;
-            }
+            else
+                right_val = left_val;
+
             ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
                 ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos +
                 (ds->channels * (ds->buffer_pitch));

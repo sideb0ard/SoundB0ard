@@ -23,7 +23,8 @@ stereodelay *new_stereo_delay(double duration)
     d->m_fx.process = &stereo_delay_process_wrapper;
     d->m_fx.event_notify = &stereo_delay_event_notify;
 
-    d->sync_len = DELAY_SYNC_QUARTER;
+    d->sync = true;
+    d->sync_len = DELAY_SYNC_SIXTEENTH;
 
     d->lfo1_on = false;
     d->m_lfo1_min = 50;
@@ -45,6 +46,8 @@ stereodelay *new_stereo_delay(double duration)
 
     stereo_delay_prepare_for_play(d);
     stereo_delay_update(d);
+
+    stereo_delay_sync_tempo(d);
 
     return d;
 }
