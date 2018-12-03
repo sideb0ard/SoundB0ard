@@ -105,7 +105,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     }
                     else if (strncmp("debug", wurds[2], 5) == 0)
                         looper_dump_buffer(g);
-                    else if (strncmp("extsource", wurds[2], 9) == 0)
+                    else if (strncmp("xsrc", wurds[2], 3) == 0)
                     {
                         int sg = atoi(wurds[3]);
                         if (mixer_is_valid_soundgen_num(mixr, sg))
@@ -147,6 +147,11 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         double len = atof(wurds[3]);
                         looper_set_loop_len(g, len);
                     }
+                    else if (strncmp("reverse", wurds[2], 8) == 0)
+                    {
+                        int mode = atoi(wurds[3]);
+                        looper_set_reverse_mode(g, mode);
+                    }
                     else if (strncmp("scramble", wurds[2], 8) == 0)
                     {
                         looper_set_scramble_pending(g);
@@ -160,10 +165,10 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         bool b = atoi(wurds[3]);
                         looper_set_step_mode(g, b);
                     }
-                    else if (strncmp("reverse", wurds[2], 8) == 0)
+                    else if (strncmp("xmode", wurds[2], 5) == 0)
                     {
-                        int mode = atoi(wurds[3]);
-                        looper_set_reverse_mode(g, mode);
+                        unsigned int mode = atoi(wurds[3]);
+                        looper_set_grain_external_source_mode(g, mode);
                     }
 
                     // Env Gen

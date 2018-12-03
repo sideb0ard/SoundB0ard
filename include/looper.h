@@ -59,6 +59,13 @@ enum
     LOOPER_MAX_MODES,
 };
 
+enum
+{
+    LOOPER_EXTERNAL_MODE_FOLLOW,
+    LOOPER_EXTERNAL_MODE_CAPTURE_ONCE,
+    LOOPER_EXTERNAL_MODE_NUM,
+};
+
 typedef struct looper
 {
     soundgenerator sound_generator;
@@ -74,8 +81,10 @@ typedef struct looper
     double audio_buffer_read_idx;
     int audio_buffer_write_idx;
     int external_source_sg; // XOR - external or file
-    bool buffer_is_full;
-    bool should_start_recording; // wait for start of loop
+    unsigned int external_source_mode; // capture once or follow
+    bool recording;
+    bool record_pending; // wait for start of loop
+    pthread_mutex_t extsource_lock;
 
     int num_active_grains;
     int highest_grain_num;
@@ -184,5 +193,6 @@ void looper_dump_buffer(looper *l);
 
 void looper_set_grain_env_attack_pct(looper *l, int percent);
 void looper_set_grain_env_release_pct(looper *l, int percent);
+void looper_set_grain_external_source_mode(looper *l, unsigned int mode);
 
 #endif // LOOPER
