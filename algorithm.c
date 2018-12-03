@@ -451,7 +451,6 @@ void algorithm_append_target(algorithm *a, char *target)
     strcat(a->command, " ");
     strcat(a->command, target);
     printf("NEW CMD %s\n", a->command);
-
 }
 
 void algorithm_set_debug(algorithm *s, bool b) { s->debug = b; }

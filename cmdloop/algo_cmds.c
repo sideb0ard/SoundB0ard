@@ -21,7 +21,7 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 algorithm_append_target(a, wurds[3]);
             }
             else if (strncmp("on", wurds[2], 2) == 0 ||
-                strncmp("start", wurds[2], 4) == 0)
+                     strncmp("start", wurds[2], 4) == 0)
                 a->active = true;
             else if (strncmp("off", wurds[2], 3) == 0 ||
                      strncmp("stop", wurds[2], 4) == 0)

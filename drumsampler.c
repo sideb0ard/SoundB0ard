@@ -159,7 +159,7 @@ stereo_val drumsampler_gennext(void *self)
     if (ds->envelope_enabled)
         volume *= amp_env;
 
-    stereo_val out = {.left = left_val *volume, .right = right_val * volume};
+    stereo_val out = {.left = left_val * volume, .right = right_val * volume};
     out = effector(&ds->sound_generator, out);
     return out;
 }

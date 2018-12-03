@@ -79,7 +79,7 @@ stereo_val beatrepeat_gennext(void *self, stereo_val inval)
                 (relative_sample > 0 && relative_sample < end_of_beat_repeat))
             {
                 inval.left +=
-                       b->m_buffer[relative_sample % b->m_sixteenth_note_size];
+                    b->m_buffer[relative_sample % b->m_sixteenth_note_size];
                 inval.right = inval.left;
             }
         }
@@ -93,7 +93,7 @@ stereo_val beatrepeat_gennext(void *self, stereo_val inval)
                 // return inval + b->m_buffer[relative_sample %
                 // b->m_buffer_size];
                 inval.left +=
-                       b->m_buffer[relative_sample % b->m_sixteenth_note_size];
+                    b->m_buffer[relative_sample % b->m_sixteenth_note_size];
                 inval.right = inval.left;
             }
         }

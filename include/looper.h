@@ -10,6 +10,18 @@
 #define MAX_CONCURRENT_GRAINS 1000
 #define MAX_GRAIN_STREAM_LEN_SEC 10 // assuming a loop is never more than 10sec
 
+typedef struct sound_grain_params
+{
+    int dur;
+    int starting_idx;
+    int attack_pct;
+    int release_pct;
+    bool reverse_mode;
+    double pitch;
+    int num_channels;
+    int degrade_by;
+} sound_grain_params;
+
 typedef struct sound_grain
 {
     int grain_len_frames;
@@ -20,6 +32,8 @@ typedef struct sound_grain
     double audiobuffer_cur_pos;
     double audiobuffer_pitch;
     double incr;
+
+    int degrade_by;
 
     int attack_time_pct; // percent of grain_len_frames
     int attack_time_samples;
@@ -80,7 +94,7 @@ typedef struct looper
     int size_of_sixteenth;
     double audio_buffer_read_idx;
     int audio_buffer_write_idx;
-    int external_source_sg; // XOR - external or file
+    int external_source_sg;            // XOR - external or file
     unsigned int external_source_mode; // capture once or follow
     bool recording;
     bool record_pending; // wait for start of loop
@@ -131,6 +145,8 @@ typedef struct looper
     bool stop_pending; // allow eg to stop
     bool gate_mode;    // use midi to trigger env amp
 
+    int degrade_by; // percent change to drop bits
+
     int cur_sixteenth; // used to track scramble
 
     double vol;
@@ -178,9 +194,7 @@ void looper_set_step_mode(looper *g, bool b);
 int looper_get_available_grain_num(looper *g);
 int looper_count_active_grains(looper *g);
 
-void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
-                      int release_pct, bool reverse, double pitch,
-                      int num_channels);
+void sound_grain_init(sound_grain *g, sound_grain_params params);
 stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
                                 int buffer_len);
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode);
@@ -194,5 +208,6 @@ void looper_dump_buffer(looper *l);
 void looper_set_grain_env_attack_pct(looper *l, int percent);
 void looper_set_grain_env_release_pct(looper *l, int percent);
 void looper_set_grain_external_source_mode(looper *l, unsigned int mode);
+void looper_set_degrade_by(looper *l, int degradation);
 
 #endif // LOOPER

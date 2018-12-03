@@ -52,5 +52,4 @@ stereo_val distortion_process(void *self, stereo_val input)
     out.right /= d->m_threshold;
 
     return out;
-
 }

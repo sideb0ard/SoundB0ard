@@ -198,10 +198,10 @@ stereo_val reverb_process_audio(void *self, stereo_val in)
 
     stereo_val out = {};
     out.left = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
-             (r->m_wet_pct / 100.0) * (apf_3_out);
+               (r->m_wet_pct / 100.0) * (apf_3_out);
 
     out.right = ((100.0 - r->m_wet_pct) / 100.0) * input_sample +
-             (r->m_wet_pct / 100.0) * (apf_4_out);
+                (r->m_wet_pct / 100.0) * (apf_4_out);
 
     return out;
 }

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <defjams.h>
 #include "fx.h"
+#include <defjams.h>
 
 typedef struct distortion
 {

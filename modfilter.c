@@ -151,7 +151,6 @@ stereo_val modfilter_process_audio(void *self, stereo_val in)
     out.left = biquad_process(&mf->m_left_lpf, in.left);
     out.right = biquad_process(&mf->m_right_lpf, in.right);
 
-
     return out;
 }
 

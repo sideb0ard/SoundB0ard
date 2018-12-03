@@ -163,7 +163,8 @@ stereo_val mod_delay_process_wrapper(void *self, stereo_val input)
 {
     mod_delay *md = (mod_delay *)self;
     stereo_val out = {};
-    mod_delay_process_audio(md, &input.left, &input.right, &out.left, &out.right);
+    mod_delay_process_audio(md, &input.left, &input.right, &out.left,
+                            &out.right);
     return out;
 }
 

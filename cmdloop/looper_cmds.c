@@ -37,7 +37,12 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 }
                 else
                 {
-                    if (strncmp("gate_mode", wurds[2], 9) == 0)
+                    if (strncmp("degrade", wurds[2], 7) == 0)
+                    {
+                        int degrade = atoi(wurds[3]);
+                        looper_set_degrade_by(g, degrade);
+                    }
+                    else if (strncmp("gate_mode", wurds[2], 9) == 0)
                     {
                         bool b = atoi(wurds[3]);
                         looper_set_gate_mode(g, b);

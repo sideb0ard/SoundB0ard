@@ -5,9 +5,9 @@
 #include "afx/lpfcombfilter.h"
 #include "afx/onepolelpf.h"
 
-#include <defjams.h>
 #include "envelope_detector.h"
 #include "fx.h"
+#include <defjams.h>
 
 typedef struct dynamics_processor
 {

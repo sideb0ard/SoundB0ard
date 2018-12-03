@@ -80,6 +80,7 @@ looper *new_looper(char *filename)
     g->m_eg1.m_attack_time_msec = 10;
     g->m_eg1.m_release_time_msec = 50;
 
+    g->degrade_by = 0;
     g->gate_mode = false;
     looper_start(g);
 
@@ -297,10 +298,16 @@ stereo_val looper_gennext(void *self)
                 int attack_time_pct = g->grain_attack_time_pct;
                 int release_time_pct = g->grain_release_time_pct;
 
-                sound_grain_init(&g->m_grains[g->cur_grain_num], duration,
-                                 grain_idx, attack_time_pct, release_time_pct,
-                                 g->reverse_mode, g->grain_pitch,
-                                 g->num_channels);
+                sound_grain_params params = {.dur = duration,
+                                             .starting_idx = grain_idx,
+                                             .attack_pct = attack_time_pct,
+                                             .release_pct = release_time_pct,
+                                             .reverse_mode = g->reverse_mode,
+                                             .pitch = g->grain_pitch,
+                                             .num_channels = g->num_channels,
+                                             .degrade_by = g->degrade_by};
+
+                sound_grain_init(&g->m_grains[g->cur_grain_num], params);
                 g->num_active_grains = looper_count_active_grains(g);
             }
 
@@ -345,7 +352,7 @@ void looper_status(void *self, wchar_t *status_string)
         "source:%s %s vol:%.2lf pitch:%.2f stereo:%d mode:%s\n"
         "gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
         "len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
-        "xsrc:%d rec:%d widx:%d xmode:%s(%d)\n"
+        "xsrc:%d rec:%d widx:%d xmode:%s(%d) degrade:%d\n "
         "grain_dur_ms:" "%s" "%d" "%s "
         "grains_per_sec:" "%s" "%d" "%s "
         "density_dur_sync:%d "
@@ -363,6 +370,7 @@ void looper_status(void *self, wchar_t *status_string)
         g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
         g->external_source_sg, g->recording, g->audio_buffer_write_idx,
         s_external_mode_names[g->external_source_mode], g->external_source_mode,
+        g->degrade_by,
 
         ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
         ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,
@@ -440,41 +448,41 @@ void looper_set_num_patterns(void *self, int num_patterns)
 //////////////////////////// grain stuff //////////////////////////
 // looper functions contuine below
 
-void sound_grain_init(sound_grain *g, int dur, int starting_idx, int attack_pct,
-                      int release_pct, bool reverse_mode, double pitch,
-                      int num_channels)
+void sound_grain_init(sound_grain *g, sound_grain_params params)
 {
-    g->audiobuffer_start_idx = starting_idx;
-    g->grain_len_frames = dur;
+    g->audiobuffer_start_idx = params.starting_idx;
+    g->grain_len_frames = params.dur;
     g->grain_counter_frames = 0;
-    g->attack_time_pct = attack_pct;
-    g->release_time_pct = release_pct;
-    g->audiobuffer_num_channels = num_channels;
+    g->attack_time_pct = params.attack_pct;
+    g->release_time_pct = params.release_pct;
+    g->audiobuffer_num_channels = params.num_channels;
+    g->degrade_by = params.degrade_by;
 
-    g->reverse_mode = reverse_mode;
-    if (reverse_mode)
+    g->reverse_mode = params.reverse_mode;
+    if (params.reverse_mode)
     {
-        g->audiobuffer_cur_pos = starting_idx + (dur * num_channels) - 1;
-        g->incr = -1.0 * pitch;
+        g->audiobuffer_cur_pos =
+            params.starting_idx + (params.dur * params.num_channels) - 1;
+        g->incr = -1.0 * params.pitch;
     }
     else
     {
-        g->audiobuffer_cur_pos = starting_idx;
-        g->incr = pitch;
+        g->audiobuffer_cur_pos = params.starting_idx;
+        g->incr = params.pitch;
     }
 
-    g->attack_time_samples = dur / 100. * attack_pct;
-    g->release_time_samples = dur / 100. * release_pct;
+    g->attack_time_samples = params.dur / 100. * params.attack_pct;
+    g->release_time_samples = params.dur / 100. * params.release_pct;
 
     g->amp = 0;
-    double rdur = 1.0 / dur;
+    double rdur = 1.0 / params.dur;
     double rdur2 = rdur * rdur;
     g->slope = 4.0 * 1.0 * (rdur - rdur2);
     g->curve = -8.0 * 1.0 * rdur2;
 
-    double loop_len_ms = 1000. * dur / SAMPLE_RATE;
-    double attack_time_ms = loop_len_ms / 100. * attack_pct;
-    double release_time_ms = loop_len_ms / 100. * release_pct;
+    double loop_len_ms = 1000. * params.dur / SAMPLE_RATE;
+    double attack_time_ms = loop_len_ms / 100. * params.attack_pct;
+    double release_time_ms = loop_len_ms / 100. * params.release_pct;
     // printf("ATTACKMS: %f RELEASEMS: %f\n", attack_time_ms, release_time_ms);
 
     envelope_generator_init(&g->eg);
@@ -500,6 +508,12 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     stereo_val out = {0., 0.};
     if (!g->active)
         return out;
+
+    if (g->degrade_by > 0)
+    {
+        if (rand() % 100 < g->degrade_by)
+            return out;
+    }
 
     int num_channels = g->audiobuffer_num_channels;
 
@@ -826,4 +840,10 @@ void looper_set_grain_external_source_mode(looper *l, unsigned int mode)
 {
     if (mode < LOOPER_EXTERNAL_MODE_NUM)
         l->external_source_mode = mode;
+}
+
+void looper_set_degrade_by(looper *l, int degradation)
+{
+    if (degradation >= 0 && degradation <= 100)
+        l->degrade_by = degradation;
 }

@@ -43,7 +43,6 @@ typedef struct stereodelay
     bool sync;
     unsigned int sync_len;
 
-
     lfo m_lfo2;
     bool lfo2_on;
     double m_lfo2_min;
@@ -65,7 +64,6 @@ void stereo_delay_set_sync(stereodelay *d, bool b);
 void stereo_delay_set_sync_len(stereodelay *d, unsigned int);
 void stereo_delay_sync_tempo(stereodelay *d);
 void stereo_delay_event_notify(void *self, unsigned int event_type);
-
 
 void stereo_delay_prepare_for_play(stereodelay *d);
 void stereo_delay_reset(stereodelay *d);
