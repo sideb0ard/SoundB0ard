@@ -80,6 +80,16 @@ void parse_drumsampler_cmd(drumsampler *ds, char wurds[][SIZE_OF_WURD],
         int pct = atoi(wurds[1]);
         drumsampler_set_cutoff_percent(ds, pct);
     }
+    else if (strncmp("glitch", wurds[0], 6) == 0)
+    {
+        bool b = atoi(wurds[1]);
+        drumsampler_set_glitch_mode(ds, b);
+    }
+    else if (strncmp("gpct", wurds[0], 4) == 0)
+    {
+        int pct = atoi(wurds[1]);
+        drumsampler_set_glitch_rand_factor(ds, pct);
+    }
     else if (strncmp("load", wurds[0], 4) == 0 ||
              strncmp("import", wurds[0], 6) == 0)
     {

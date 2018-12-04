@@ -32,6 +32,9 @@ typedef struct drumsampler
     soundgenerator sound_generator;
     sequence_engine engine;
 
+    bool glitch_mode;
+    int glitch_rand_factor;
+
     sample_pos sample_positions[PPBAR];
     int samples_now_playing[MAX_CONCURRENT_SAMPLES]; // contains midi tick of
                                                      // current samples
@@ -89,3 +92,5 @@ void drumsampler_set_attack_time(drumsampler *ds, double val);
 void drumsampler_set_decay_time(drumsampler *ds, double val);
 void drumsampler_set_sustain_lvl(drumsampler *ds, double val);
 void drumsampler_set_release_time(drumsampler *ds, double val);
+void drumsampler_set_glitch_mode(drumsampler *ds, bool b);
+void drumsampler_set_glitch_rand_factor(drumsampler *ds, int pct);

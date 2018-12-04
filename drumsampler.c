@@ -29,6 +29,9 @@ drumsampler *new_drumsampler(char *filename)
 
     ds->vol = 0.7;
 
+    ds->glitch_mode = false;
+    ds->glitch_rand_factor = 20;
+
     ds->sound_generator.gennext = &drumsampler_gennext;
     ds->sound_generator.status = &drumsampler_status;
     ds->sound_generator.getvol = &drumsampler_getvol;
@@ -137,6 +140,16 @@ stereo_val drumsampler_gennext(void *self)
             else
                 right_val = left_val;
 
+            if (ds->glitch_mode)
+            {
+                if (ds->sample_positions[cur_sample_midi_tick]
+                            .audiobuffer_cur_pos > (ds->bufsize / 2) &&
+                    rand() % 100 > ds->glitch_rand_factor)
+                {
+                    continue;
+                }
+            }
+
             ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
                 ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos +
                 (ds->channels * (ds->buffer_pitch));
@@ -186,12 +199,14 @@ void drumsampler_status(void *self, wchar_t *status_string)
     swprintf(local_status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE
              "%s %s vol:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
-             "eg:%d attack_ms:%.2f decay_ms:%.2f sustain:%.2f release_ms:%.2f\n"
+             "eg:%d attack_ms:%.0f decay_ms:%.0f sustain:%.2f "
+             "release_ms:%.0f glitch:%d gpct:%d\n"
              "multi:%d num_patterns:%d",
              ds->filename, INSTRUMENT_COLOR, ds->vol, ds->buffer_pitch,
              ds->engine.allow_triplets, ds->buf_end_pos, ds->envelope_enabled,
              ds->eg.m_attack_time_msec, ds->eg.m_decay_time_msec,
              ds->eg.m_sustain_level, ds->eg.m_release_time_msec,
+             ds->glitch_mode, ds->glitch_rand_factor,
              ds->engine.multi_pattern_mode, ds->engine.num_patterns);
 
     wcscat(status_string, local_status_string);
@@ -302,4 +317,15 @@ void drumsampler_set_sustain_lvl(drumsampler *ds, double val)
 void drumsampler_set_release_time(drumsampler *ds, double val)
 {
     eg_set_release_time_msec(&ds->eg, val);
+}
+
+void drumsampler_set_glitch_mode(drumsampler *ds, bool b)
+{
+    ds->glitch_mode = b;
+}
+
+void drumsampler_set_glitch_rand_factor(drumsampler *ds, int pct)
+{
+    if (pct >= 0 && pct <= 100)
+        ds->glitch_rand_factor = pct;
 }
