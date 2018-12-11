@@ -18,6 +18,7 @@
 #include "envelope.h"
 #include "euclidean.h"
 #include "fx.h"
+#include "intdiv.h"
 #include "juggler.h"
 #include "looper.h"
 #include "markov.h"
@@ -441,6 +442,16 @@ int mixer_add_markov(mixer *mixr, unsigned int type)
 {
     printf("Adding an MARKOV PATTERN GENERATOR, yo!\n");
     pattern_generator *sg = new_markov(type);
+    if (sg)
+        return add_pattern_generator(mixr, sg);
+    else
+        return -99;
+}
+
+int mixer_add_intdiv(mixer *mixr, int num_notes, char *allowed_parts)
+{
+    printf("Adding an INTDIV!\n");
+    pattern_generator *sg = new_intdiv(num_notes, allowed_parts);
     if (sg)
         return add_pattern_generator(mixr, sg);
     else

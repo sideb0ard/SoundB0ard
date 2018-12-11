@@ -75,7 +75,7 @@ int main()
     pthread_t input_th;
     if (pthread_create(&input_th, NULL, loopy, NULL))
     {
-        fprintf(stderr, "Errrr, wit tha midi..\n");
+        fprintf(stderr, "Errrr, wit tha Loopy..\n");
     }
     pthread_join(input_th, NULL);
 

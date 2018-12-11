@@ -23,10 +23,7 @@ void apply_short_to_midi_pattern_sub_pattern(uint16_t bit_pattern,
                                              midi_event *dest_pattern);
 void set_pattern_to_self_destruct(midi_event *pattern);
 void short_to_char(uint16_t num, char bin_num[17]);
-
-// void char_binary_version_of_pattern(seq_pattern p, char bin_num[17]);
-// void wchar_binary_version_of_pattern(seq_pattern p, wchar_t bin_num[17]);
-//
+uint16_t char_to_short(char bin_num[17]);
 
 int shift_bits_to_leftmost_position(uint16_t num,
                                     int num_of_bits_to_align_with);

@@ -72,6 +72,7 @@ SRC = \
 	sound_generator.c \
 	pattern_generators/bitshift.c \
 	pattern_generators/euclidean.c \
+	pattern_generators/intdiv.c \
 	pattern_generators/juggler.c \
 	pattern_generators/markov.c \
 	sparkline.c \

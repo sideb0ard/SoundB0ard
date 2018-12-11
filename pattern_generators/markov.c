@@ -101,25 +101,25 @@ uint16_t markov_bit_pattern_generate(unsigned int markov_type)
             bit_pattern |= BEAT0;
 
         second = rand_percent();
-        if (second > 70)
+        if (second > 93)
             bit_pattern |= BEAT7;
-        if (second >= 90)
+        if (second >= 97)
             bit_pattern |= BEAT5;
 
         third = rand_percent();
         if (third > 10)
             bit_pattern |= BEAT8;
-        if (third > 50)
+        if (third > 94)
             bit_pattern |= BEAT10;
-        if (third >= 75)
+        if (third >= 10)
             bit_pattern |= BEAT11;
-        else if (third >= 90)
+        else if (third >= 98)
             bit_pattern |= BEAT9;
 
         fourth = rand_percent();
-        if (third > 60)
+        if (third > 96)
             bit_pattern |= BEAT13;
-        if (third >= 90)
+        if (third >= 98)
             bit_pattern |= BEAT15;
 
         break;

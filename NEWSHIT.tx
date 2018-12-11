@@ -1,3 +1,18 @@
+new bitshift (t >> 3 & t << 7) | t & 3*t
+
+new bitshift ((t/1000)^(t/1001))*t
+new dx
+new dx
+dx 0 load p0p
+dx 1 load sheffielddddBLEEP
+new step hats/reggaHatz.aiff
+dx 0 mask ff00
+dx 1 mask 00ff
+every 2 bar apply 0 0:0 1:0 2:0
+
+
+#########################
+
 new bitshift t>>(8/((t/32)%3))
 new dx
 dx 0 load gnarrrrde

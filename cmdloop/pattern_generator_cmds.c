@@ -3,6 +3,7 @@
 
 #include <bitshift.h>
 #include <euclidean.h>
+#include <intdiv.h>
 #include <juggler.h>
 #include <markov.h>
 #include <mixer.h>
@@ -60,6 +61,22 @@ bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 {
                     int val = atoi(wurds[3]);
                     euclidean_change_steps(e, val);
+                }
+            }
+            else if (pg->type == INTDIV)
+            {
+                intdiv *id = (intdiv *)pg;
+                if (strncmp("print", wurds[2], 5) == 0)
+                    intdiv_print_patterns(id);
+                else if (strncmp("selected", wurds[2], 8) == 0)
+                {
+                    int val = atoi(wurds[3]);
+                    intdiv_set_selected_pattern(id, val);
+                }
+                else if (strncmp("mode", wurds[2], 4) == 0)
+                {
+                    int val = atoi(wurds[3]);
+                    intdiv_set_mode(id, val);
                 }
             }
             else if (pg->type == JUGGLER)

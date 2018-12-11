@@ -10,6 +10,7 @@ enum pattern_gen_type
     BITSHIFT,
     MARKOV,
     JUGGLER,
+    INTDIV,
     NUM_GEN_TYPES,
 };
 

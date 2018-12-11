@@ -108,27 +108,17 @@ void short_to_char(uint16_t num, char bin_num[17])
     bin_num[16] = '\0';
 }
 
-// void print_parceled_pattern(midi_event *pattern)
-//{
-//    printf("PATTERN!\n");
-//    bool found = false;
-//    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
-//    {
-//        // printf("%d", pattern.pattern[i]);
-//        found = false;
-//        for (int j = 0; j < PPSIXTEENTH && !found; j++)
-//        {
-//            if (pattern[i + j].event_type == MIDI_ON)
-//            {
-//                printf("1");
-//                found = true;
-//            }
-//        }
-//        if (!found)
-//            printf("0");
-//    }
-//    puts("\n");
-//}
+uint16_t char_to_short(char bin_num[17])
+{
+    uint16_t num = 0;
+    for (int i = 0; i < 17; i++)
+    {
+        if (bin_num[i] == '1')
+            num |= 1 << (15 - i);
+    }
+
+    return num;
+}
 
 void apply_short_to_midi_pattern_sub_pattern(uint16_t bit_pattern,
                                              int start_idx, int pattern_len,

@@ -5,6 +5,7 @@
 #include <digisynth.h>
 #include <drumsampler.h>
 #include <drumsynth.h>
+#include <intdiv.h>
 #include <looper.h>
 #include <markov.h>
 #include <mixer.h>
@@ -62,6 +63,28 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 check_and_set_pattern(sg, 0, NOTE_PATTERN, &wurds[2],
                                       num_wurds - 2);
             }
+        }
+
+        else if (strncmp("intdiv", wurds[1], 6) == 0)
+        {
+            printf("INTIV! PATTERN GEN!\n");
+            int num_notes = atoi(wurds[2]);
+            int wurds_left = num_wurds - 3;
+            int size_of_wurds_left =
+                wurds_left; // pre-alloc spaces and NULL
+            for (int i = 3; i < num_wurds; ++i)
+            {
+                size_of_wurds_left += strlen(wurds[i]);
+            }
+            char concat_wurds[size_of_wurds_left];
+            memset(concat_wurds, 0, size_of_wurds_left);
+            for (int i = 3; i < num_wurds; ++i)
+            {
+                strcat(concat_wurds, wurds[i]);
+                if (i < num_wurds - 1)
+                    strcat(concat_wurds, " ");
+            }
+            mixer_add_intdiv(mixr, num_notes, concat_wurds);
         }
 
         else if (strncmp("juggle", wurds[1], 6) == 0)

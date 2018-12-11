@@ -57,3 +57,4 @@ https://www.reddit.com/r/bytebeat/comments/20km9l/cool_equations/
 ^ THIS WITH
 notes/2stepbass.aiff
 
+new bitshift (t >> 3 & t << 7) | t & 3*t
