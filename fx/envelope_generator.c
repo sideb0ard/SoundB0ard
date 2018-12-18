@@ -325,7 +325,10 @@ double eg_do_envelope(envelope_generator *self, double *p_biased_output)
             self->m_decay_time_scalar * self->m_decay_time_msec <= 0.0)
         {
             self->m_envelope_output = self->m_sustain_level;
-            self->m_state = SUSTAIN;
+            if (self->drum_mode)
+                self->m_state = RELEASE;
+            else
+                self->m_state = SUSTAIN;
             break;
         }
         break;
@@ -418,4 +421,9 @@ void eg_shutdown(envelope_generator *self)
     self->m_state = SHUTDOWN;
     self->m_sustain_override = false;
     self->m_release_pending = false;
+}
+
+void eg_set_drum_mode(envelope_generator *eg, bool b)
+{
+    eg->drum_mode = b;
 }

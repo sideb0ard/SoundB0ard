@@ -41,6 +41,7 @@ drumsynth *new_drumsynth()
     eg_set_decay_time_msec(&ds->m_eg1, 1);
     eg_set_release_time_msec(&ds->m_eg1, 10);
     eg_set_sustain_level(&ds->m_eg1, 0);
+    eg_set_drum_mode(&ds->m_eg1, true);
 
     osc_new_settings(&ds->m_osc2.osc);
     qb_set_soundgenerator_interface(&ds->m_osc2);
@@ -55,6 +56,7 @@ drumsynth *new_drumsynth()
     eg_set_decay_time_msec(&ds->m_eg2, 70);
     eg_set_release_time_msec(&ds->m_eg2, 1);
     eg_set_sustain_level(&ds->m_eg2, 0);
+    eg_set_drum_mode(&ds->m_eg2, true);
     ds->eg2_osc2_intensity = 1;
 
     filter_moog_init(&ds->m_filter);
@@ -208,8 +210,6 @@ stereo_val drumsynth_gennext(void *self)
     // TRANSIENT /////////////////
     // this is for the initial 'Click'
     double osc1_amp_env = eg_do_envelope(&ds->m_eg1, NULL);
-    if (ds->m_eg1.m_state == SUSTAIN)
-        eg_note_off(&ds->m_eg1);
 
     osc_update(&ds->m_osc1.osc);
     double osc1_out =
@@ -219,8 +219,6 @@ stereo_val drumsynth_gennext(void *self)
     /// EG2 env provides mod pitch of OSC2 _AND_ AMP OUT
     double pitch_env = 0; // biased output
     double amp_out_env = eg_do_envelope(&ds->m_eg2, &pitch_env);
-    if (ds->m_eg2.m_state == SUSTAIN)
-        eg_note_off(&ds->m_eg2);
 
     ds->m_osc2.osc.m_fo_mod =
         ds->eg2_osc2_intensity * ds->mod_semitones_range * pitch_env;

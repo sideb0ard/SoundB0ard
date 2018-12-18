@@ -41,6 +41,7 @@ typedef struct envelope_generator
 
     /////////////////////////////////////////
 
+    bool drum_mode; // no sustain
     bool m_sustain_override;
     bool m_release_pending;
 
@@ -125,3 +126,4 @@ void eg_update(envelope_generator *self);
 double eg_do_envelope(envelope_generator *self, double *p_biased_output);
 
 void eg_release(envelope_generator *self);
+void eg_set_drum_mode(envelope_generator *self, bool b);
