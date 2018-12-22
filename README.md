@@ -12,22 +12,21 @@
 ```
 
 
-Soundb0ard is an interactive music making environment, with which you interact via a unix styled shell.  
+Soundb0ard is an interactive music making environment, with which you interact via a unix styled shell.
 
-To compile and run, you will need to install PortAudio, PortMidi, Exuberant Ctags, and libsndfile:  
-http://www.portaudio.com/  
-http://portmedia.sourceforge.net/portmidi/  
-http://www.mega-nerd.com/libsndfile/  
-http://ctags.sourceforge.net/  
+It uses Ableton Link to sync with other running apps on the same local network. Follow install instructions for Link first - https://github.com/Ableton/link
 
-then, `git clone git@github.com:sideb0ard/SBShell.git`,  
+Other libraries needed are PortAudio, PortMidi, Exuberant Ctags, and libsndfile:
+http://www.portaudio.com/
+http://portmedia.sourceforge.net/portmidi/
+http://www.mega-nerd.com/libsndfile/
+http://ctags.sourceforge.net/
+
+Once all these are installed..
+
+`git clone git@github.com:sideb0ard/SBShell.git`,
 run `make`
 and if all is successful, you should have a new `sbsh` command in your directory.
-
-*/ these instructions are out of date!
-    now you also need Ableton Link --
-    https://github.com/Ableton/link -- specifically
-    https://github.com/Ableton/link/releases/tag/Link-1.0.0 ** /*
 
 Load it up:  
 `./sbsh`
