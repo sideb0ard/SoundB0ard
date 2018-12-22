@@ -18,15 +18,20 @@ void clear_midi_pattern(midi_event *pattern)
 void midi_pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
 {
     int target_tick = midi_tick;
-    while (pattern[target_tick].event_type)
+    int attempt_no = 0;
+    while (pattern[target_tick].event_type && attempt_no < PPBAR)
     {
         if (mixr->debug_mode)
             printf("Gotsz a tick already - bump!\n");
         target_tick++;
         if (target_tick == PPBAR) // wrap around
             target_tick = 0;
+        attempt_no++;
     }
-    pattern[target_tick] = ev;
+    if (attempt_no < PPBAR)
+        pattern[target_tick] = ev;
+    else
+        printf("YAR! add event - no more event spaces - passing!\n");
 }
 
 bool is_midi_event_in_pattern_range(int start_tick, int end_tick,
