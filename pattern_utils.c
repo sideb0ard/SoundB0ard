@@ -10,6 +10,8 @@
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
 
+const int MAX_ADD_ATTEMPTS = 5;
+
 void clear_midi_pattern(midi_event *pattern)
 {
     memset(pattern, 0, sizeof(midi_event) * PPBAR);
@@ -19,7 +21,7 @@ void midi_pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
 {
     int target_tick = midi_tick;
     int attempt_no = 0;
-    while (pattern[target_tick].event_type && attempt_no < PPBAR)
+    while (pattern[target_tick].event_type && attempt_no < MAX_ADD_ATTEMPTS)
     {
         if (mixr->debug_mode)
             printf("Gotsz a tick already - bump!\n");
@@ -28,10 +30,8 @@ void midi_pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
             target_tick = 0;
         attempt_no++;
     }
-    if (attempt_no < PPBAR)
+    if (attempt_no < MAX_ADD_ATTEMPTS)
         pattern[target_tick] = ev;
-    else
-        printf("YAR! add event - no more event spaces - passing!\n");
 }
 
 bool is_midi_event_in_pattern_range(int start_tick, int end_tick,
