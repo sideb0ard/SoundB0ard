@@ -369,7 +369,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->timing_info.size_of_quarter_note =
         mixr->timing_info.size_of_eighth_note * 2;
 
-    mixer_emit_event(mixr, (broadcast_event) {.type = TIME_BPM_CHANGE});
+    mixer_emit_event(mixr, (broadcast_event){.type = TIME_BPM_CHANGE});
     link_set_bpm(mixr->m_ableton_link, bpm);
 }
 
@@ -532,7 +532,8 @@ static void mixer_events_output(mixer *mixr)
         if (mixr->timing_info.midi_tick % 120 == 0)
         {
             mixr->timing_info.is_thirtysecond = true;
-            mixer_emit_event(mixr, (broadcast_event) {.type = TIME_THIRTYSECOND_TICK});
+            mixer_emit_event(mixr,
+                             (broadcast_event){.type = TIME_THIRTYSECOND_TICK});
 
             if (mixr->timing_info.midi_tick % 240 == 0)
             {
@@ -543,17 +544,20 @@ static void mixer_events_output(mixer *mixr)
                 // mixr->timing_info.sixteenth_note_tick);
                 // mixer_print_timing_info(mixr);
 
-                mixer_emit_event(mixr, (broadcast_event) {.type = TIME_SIXTEENTH_TICK});
+                mixer_emit_event(
+                    mixr, (broadcast_event){.type = TIME_SIXTEENTH_TICK});
 
                 if (mixr->timing_info.midi_tick % 480 == 0)
                 {
                     mixr->timing_info.is_eighth = true;
-                    mixer_emit_event(mixr, (broadcast_event) {.type = TIME_EIGHTH_TICK});
+                    mixer_emit_event(
+                        mixr, (broadcast_event){.type = TIME_EIGHTH_TICK});
 
                     if (mixr->timing_info.midi_tick % PPQN == 0)
                     {
                         mixr->timing_info.is_quarter = true;
-                        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_QUARTER_TICK});
+                        mixer_emit_event(
+                            mixr, (broadcast_event){.type = TIME_QUARTER_TICK});
                     }
                 }
             }
@@ -562,25 +566,30 @@ static void mixer_events_output(mixer *mixr)
         // so far only used for ARP engines
         if (mixr->timing_info.midi_tick % 160 == 0)
         {
-            mixer_emit_event(mixr, (broadcast_event) {.type = TIME_TWENTYFOURTH_TICK});
+            mixer_emit_event(mixr,
+                             (broadcast_event){.type = TIME_TWENTYFOURTH_TICK});
 
             if (mixr->timing_info.midi_tick % 320 == 0)
             {
-                mixer_emit_event(mixr, (broadcast_event) {.type = TIME_TWELTH_TICK});
+                mixer_emit_event(mixr,
+                                 (broadcast_event){.type = TIME_TWELTH_TICK});
 
                 if (mixr->timing_info.midi_tick % 640 == 0)
                 {
-                    mixer_emit_event(mixr, (broadcast_event) {.type = TIME_SIXTH_TICK});
+                    mixer_emit_event(
+                        mixr, (broadcast_event){.type = TIME_SIXTH_TICK});
 
                     if (mixr->timing_info.midi_tick % 1280 == 0)
-                        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_THIRD_TICK});
+                        mixer_emit_event(
+                            mixr, (broadcast_event){.type = TIME_THIRD_TICK});
                 }
             }
         }
 
         if (mixr->timing_info.midi_tick % PPBAR == 0)
         {
-            mixer_emit_event(mixr, (broadcast_event) {.type = TIME_START_OF_LOOP_TICK});
+            mixer_emit_event(
+                mixr, (broadcast_event){.type = TIME_START_OF_LOOP_TICK});
             if (mixr->scene_start_pending)
             {
                 mixer_play_scene(mixr, mixr->current_scene);
@@ -588,7 +597,7 @@ static void mixer_events_output(mixer *mixr)
             }
         }
 
-        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_MIDI_TICK});
+        mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
     }
 }
 
@@ -1121,7 +1130,7 @@ void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
     {
         mixr->chord = root;
         mixr->chord_type = chord_type;
-        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_CHORD_CHANGE});
+        mixer_emit_event(mixr, (broadcast_event){.type = TIME_CHORD_CHANGE});
     }
 }
 

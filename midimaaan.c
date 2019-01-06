@@ -87,6 +87,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
     bool is_chord_mode = false;
 
     sequence_engine *engine = get_sequence_engine(sg);
+    if (engine->transpose != 0)
+        midi_note += engine->transpose;
 
     if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
         if (ev->event_type == MIDI_ON)

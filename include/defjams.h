@@ -194,7 +194,6 @@ typedef struct mixer_timing_info
     bool is_midi_tick;
 } mixer_timing_info;
 
-
 typedef enum event_type
 {
     TIME_MIDI_TICK,
@@ -212,7 +211,8 @@ typedef enum event_type
     SEQUENCER_NOTE,
 } event_type;
 
-typedef struct broadcast_event {
+typedef struct broadcast_event
+{
     unsigned int type;
     int sequencer_src; // only for SEQUENCER_NOTE_EVENT
 } broadcast_event;

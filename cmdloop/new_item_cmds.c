@@ -70,8 +70,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("INTIV! PATTERN GEN!\n");
             int num_notes = atoi(wurds[2]);
             int wurds_left = num_wurds - 3;
-            int size_of_wurds_left =
-                wurds_left; // pre-alloc spaces and NULL
+            int size_of_wurds_left = wurds_left; // pre-alloc spaces and NULL
             for (int i = 3; i < num_wurds; ++i)
             {
                 size_of_wurds_left += strlen(wurds[i]);

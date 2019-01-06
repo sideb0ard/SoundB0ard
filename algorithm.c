@@ -449,13 +449,11 @@ void algorithm_status(void *self, wchar_t *status_string)
                                "%s var_select:" WANSI_COLOR_WHITE "%s"
                                "%s var_list:" WANSI_COLOR_WHITE "%s\n"
                                "%s         cmd:" WANSI_COLOR_WHITE "%s",
-             ALGO_COLOR, s_process_type[a->process_type],
-             ALGO_COLOR, a->process_step,
-             ALGO_COLOR, s_event_type[a->event_type],
-             ALGO_COLOR, a->sequencer_src,
-             ALGO_COLOR, s_var_select_type[a->var_select_type],
-             ALGO_COLOR, a->env.variable_list_string,
-             ALGO_COLOR, a->command);
+             ALGO_COLOR, s_process_type[a->process_type], ALGO_COLOR,
+             a->process_step, ALGO_COLOR, s_event_type[a->event_type],
+             ALGO_COLOR, a->sequencer_src, ALGO_COLOR,
+             s_var_select_type[a->var_select_type], ALGO_COLOR,
+             a->env.variable_list_string, ALGO_COLOR, a->command);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

@@ -38,8 +38,8 @@ void intdiv_status(void *self, wchar_t *wstring)
         wstring, MAX_STATIC_STRING_SZ,
         L"[" WANSI_COLOR_WHITE "INTDIV PATTERN GEN ] - " WCOOL_COLOR_PINK
         "selected:%d mode:%s(%d) num_pats:%d num_notes:%d allowed_parts[%s]",
-        id->selected_pattern, s_intdiv_status_names[id->mode], id->mode, id->num_patterns,
-        id->num_parts, id->allowed_part_sizes_as_string);
+        id->selected_pattern, s_intdiv_status_names[id->mode], id->mode,
+        id->num_patterns, id->num_parts, id->allowed_part_sizes_as_string);
 }
 
 static bool _is_allowed(intdiv *id, int part_size)

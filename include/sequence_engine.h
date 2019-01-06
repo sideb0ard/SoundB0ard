@@ -100,6 +100,8 @@ typedef struct sequence_engine
     bool chord_mode;
     int swing_setting;
 
+    int transpose; // half step, i.e. midi num. Added to output value
+
     int midi_note_1;
     int midi_note_2;
     int midi_note_3;
@@ -211,6 +213,7 @@ void sequence_engine_set_follow_mixer_chords(sequence_engine *engine, bool b);
 void sequence_engine_set_event_mask(sequence_engine *engine, uint16_t mask,
                                     int mask_every_n);
 void sequence_engine_set_mask_every(sequence_engine *engine, int mask_every_n);
+void sequence_engine_set_transpose(sequence_engine *engine, int transpose);
 void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b);
 bool sequence_engine_is_masked(sequence_engine *engine);
 void sequence_engine_set_swing_setting(sequence_engine *engine,

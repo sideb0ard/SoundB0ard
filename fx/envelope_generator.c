@@ -423,7 +423,4 @@ void eg_shutdown(envelope_generator *self)
     self->m_release_pending = false;
 }
 
-void eg_set_drum_mode(envelope_generator *eg, bool b)
-{
-    eg->drum_mode = b;
-}
+void eg_set_drum_mode(envelope_generator *eg, bool b) { eg->drum_mode = b; }

@@ -188,6 +188,11 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             int pattern_num = atoi(wurds[1]);
             sequence_engine_switch_pattern(engine, pattern_num);
         }
+        else if (strncmp("transpose", wurds[0], 9) == 0)
+        {
+            int transpose_amount = atoi(wurds[1]);
+            sequence_engine_set_transpose(engine, transpose_amount);
+        }
         else if (strncmp("up", wurds[0], 2) == 0)
         {
             for (int i = 0; i < engine->num_patterns; i++)

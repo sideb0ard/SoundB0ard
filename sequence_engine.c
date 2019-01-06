@@ -195,14 +195,14 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
         scratch, 255,
         L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
         L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d\n"
-        L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d",
+        L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->midi_note_1, engine->midi_note_2,
         engine->midi_note_3, engine->follow_mixer_chord_changes,
         engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
         s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
-        engine->swing_setting);
+        engine->swing_setting, engine->transpose);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
     for (int i = 0; i < engine->num_patterns; i++)
@@ -881,4 +881,10 @@ void sequence_engine_set_swing_setting(sequence_engine *engine,
 void sequence_engine_set_follow_mixer_chords(sequence_engine *engine, bool b)
 {
     engine->follow_mixer_chord_changes = b;
+}
+
+void sequence_engine_set_transpose(sequence_engine *engine, int transpose)
+{
+    if (transpose > -128 && transpose < 128)
+        engine->transpose = transpose;
 }
