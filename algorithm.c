@@ -25,6 +25,8 @@ algorithm *new_algorithm(int num_wurds, char wurds[][SIZE_OF_WURD])
     a->process_step_counter = 0;
     a->debug = false;
 
+    a->sequencer_src = -1;
+
     if (!extract_cmds_from_line(a, num_wurds, wurds))
     {
         printf("Couldn't parse commands from line\n");
@@ -62,9 +64,16 @@ void algorithm_event_notify(void *self, broadcast_event event)
 
     int event_type = event.type;
 
-    if (event_type == a->event_type ||
-        (event_type == TIME_MIDI_TICK && a->process_type == OVER) ||
-        (event_type == TIME_SIXTEENTH_TICK && a->process_type == FOR))
+    if (event_type == a->event_type)
+    {
+        if (event_type == SEQUENCER_NOTE &&
+            event.sequencer_src != a->sequencer_src)
+            return;
+        handle_command(a);
+    }
+    else if (event_type == TIME_MIDI_TICK && a->process_type == OVER)
+        handle_command(a);
+    else if (event_type == TIME_SIXTEENTH_TICK && a->process_type == FOR)
         handle_command(a);
 }
 
@@ -208,9 +217,10 @@ void print_algo_help()
            "z..\"|rand=\"x y z..\"|osc=\"lo hi\">)] process \%%s\n");
 }
 
-int algorithm_get_event_type_from_string(char *wurd)
+int algorithm_set_event_type_from_string(algorithm *a, char *wurd)
 {
     int event_type = -1;
+    int sequencer_src = -1;
 
     if (strncmp(wurd, "loop", 4) == 0 || strncmp(wurd, "bar", 3) == 0)
         event_type = TIME_START_OF_LOOP_TICK;
@@ -224,9 +234,33 @@ int algorithm_get_event_type_from_string(char *wurd)
         event_type = TIME_SIXTEENTH_TICK;
     else if (strncmp(wurd, "32nd", 4) == 0)
         event_type = TIME_THIRTYSECOND_TICK;
+    else if (strncmp(wurd, "note", 4) == 0)
+    {
+        printf("NOTE! event_type is %d\n", event_type);
+        int sg_num = -1;
+        char tmpp[28] = {};
+        sscanf(wurd, "%[^:]:%d", tmpp, &sg_num);
+        printf("SCANFd %d from %s\n", sg_num, wurd);
 
-    return event_type;
+        if (mixer_is_valid_soundgen_num(mixr, sg_num))
+        {
+            printf("Woof! following SoundGen %d!\n", sg_num);
+            sequencer_src = sg_num;
+            event_type = SEQUENCER_NOTE;
+        }
+        else
+            printf("Nah man!\n");
+    }
+
+    if (event_type != -1)
+    {
+        a->event_type = event_type;
+        a->sequencer_src = sequencer_src;
+        return 0;
+    }
+    return -1;
 }
+
 bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
@@ -258,9 +292,9 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
         }
         a->process_step = step;
 
-        a->event_type = algorithm_get_event_type_from_string(wurds[2]);
-        printf("EVENT TYPE %d\n", a->event_type);
-        if (a->event_type == -1)
+        int err = algorithm_set_event_type_from_string(a, wurds[2]);
+        printf("ERR is %d\n", err);
+        if (err == -1)
         {
             printf("Need a time period\n");
             return false;
@@ -411,13 +445,17 @@ void algorithm_status(void *self, wchar_t *status_string)
              WANSI_COLOR_WHITE "%sprocess:" WANSI_COLOR_WHITE "%s"
                                "%s step:" WANSI_COLOR_WHITE "%d"
                                "%s event:" WANSI_COLOR_WHITE "%s"
+                               "%s src:" WANSI_COLOR_WHITE "%d"
                                "%s var_select:" WANSI_COLOR_WHITE "%s"
                                "%s var_list:" WANSI_COLOR_WHITE "%s\n"
                                "%s         cmd:" WANSI_COLOR_WHITE "%s",
-             ALGO_COLOR, s_process_type[a->process_type], ALGO_COLOR,
-             a->process_step, ALGO_COLOR, s_event_type[a->event_type],
-             ALGO_COLOR, s_var_select_type[a->var_select_type], ALGO_COLOR,
-             a->env.variable_list_string, ALGO_COLOR, a->command);
+             ALGO_COLOR, s_process_type[a->process_type],
+             ALGO_COLOR, a->process_step,
+             ALGO_COLOR, s_event_type[a->event_type],
+             ALGO_COLOR, a->sequencer_src,
+             ALGO_COLOR, s_var_select_type[a->var_select_type],
+             ALGO_COLOR, a->env.variable_list_string,
+             ALGO_COLOR, a->command);
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 

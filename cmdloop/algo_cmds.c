@@ -33,10 +33,8 @@ bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             }
             else if (strncmp("event", wurds[2], 5) == 0)
             {
-                int event_type = algorithm_get_event_type_from_string(wurds[3]);
-                if (event_type != -1)
-                    a->event_type = event_type;
-                else
+                int err = algorithm_set_event_type_from_string(a, wurds[3]);
+                if (err != 0)
                     printf("Nah!\n");
             }
             else if (strncmp("debug", wurds[2], 5) == 0)

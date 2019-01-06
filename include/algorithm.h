@@ -66,6 +66,8 @@ typedef struct algorithm
     unsigned int process_step;
     unsigned int process_step_counter;
 
+    int sequencer_src; // used when event_type is sequencer note
+
     unsigned int counter;         // currently just used for FOR increments
     unsigned int var_select_type; // RAND, OSC or STEP
 
@@ -91,7 +93,7 @@ void algorithm_status(void *self, wchar_t *ss);
 void algorithm_start(algorithm *a);
 void algorithm_stop(algorithm *a);
 void algorithm_event_notify(void *self, broadcast_event event);
-int algorithm_get_event_type_from_string(char *wurd);
+int algorithm_set_event_type_from_string(algorithm *a, char *wurd);
 int algorithm_get_var_select_type_from_string(char *wurd);
 void algorithm_set_var_select_type(algorithm *s, unsigned int var_select_type);
 bool algorithm_set_cmd(algorithm *s, char *cmd);
