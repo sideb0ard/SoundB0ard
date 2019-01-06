@@ -53,12 +53,14 @@ static void handle_command(algorithm *a)
     a->process_step_counter++;
 }
 
-void algorithm_event_notify(void *self, unsigned int event_type)
+void algorithm_event_notify(void *self, broadcast_event event)
 {
     algorithm *a = (algorithm *)self;
 
     if (!a->active)
         return;
+
+    int event_type = event.type;
 
     if (event_type == a->event_type ||
         (event_type == TIME_MIDI_TICK && a->process_type == OVER) ||
@@ -229,15 +231,15 @@ bool extract_cmds_from_line(algorithm *a, int num_wurds,
                             char wurds[][SIZE_OF_WURD])
 {
 
-    if (strncmp(wurds[0], "every", 5) == 0)
+    if (strncmp(wurds[0], "every", 5) == 0) // discrete event
         a->process_type = EVERY;
-    else if (strncmp(wurds[0], "over", 4) == 0)
+    else if (strncmp(wurds[0], "over", 4) == 0) // continous event
         a->process_type = OVER;
-    else if (strncmp(wurds[0], "for", 3) == 0)
+    else if (strncmp(wurds[0], "for", 3) == 0) // one-time event
         a->process_type = FOR;
     else
     {
-        printf("Need a process type - 'every' or 'over'\n");
+        printf("Need a process type - 'every', 'over' or 'for'\n");
         return false;
     }
 

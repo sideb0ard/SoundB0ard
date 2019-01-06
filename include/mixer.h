@@ -161,7 +161,7 @@ void mixer_status_mixr(mixer *mixr);
 void mixer_status_algoz(mixer *mixr, bool all);
 void mixer_update_bpm(mixer *mixr, int bpm);
 void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
-void mixer_emit_event(mixer *mixr, unsigned int event_type);
+void mixer_emit_event(mixer *mixr, broadcast_event event);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
 int mixer_add_algorithm(mixer *mixr, algorithm *a);

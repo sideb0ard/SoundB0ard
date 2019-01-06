@@ -29,9 +29,9 @@ typedef struct fx
     bool enabled;
     void (*status)(void *self, char *string);
     stereo_val (*process)(void *self, stereo_val input);
-    void (*event_notify)(void *self, unsigned int event_type);
+    void (*event_notify)(void *self, broadcast_event event);
 } fx;
 
-void fx_noop_event_notify(void *self, unsigned int event_type);
+void fx_noop_event_notify(void *self, broadcast_event event);
 
 #endif

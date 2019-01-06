@@ -103,7 +103,7 @@ void intdiv_generate(void *self, void *data)
 }
 void intdiv_set_debug(void *self, bool b) {}
 
-void intdiv_event_notify(void *self, unsigned int event_type) {}
+void intdiv_event_notify(void *self, broadcast_event event) {}
 
 void intdiv_set_allowed_part_sizes(intdiv *id, char *allowed_parts)
 {

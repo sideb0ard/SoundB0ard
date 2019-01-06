@@ -90,7 +90,7 @@ void algorithm_replace_vars_in_cmd(algorithm *a);
 void algorithm_status(void *self, wchar_t *ss);
 void algorithm_start(algorithm *a);
 void algorithm_stop(algorithm *a);
-void algorithm_event_notify(void *self, unsigned int event_type);
+void algorithm_event_notify(void *self, broadcast_event event);
 int algorithm_get_event_type_from_string(char *wurd);
 int algorithm_get_var_select_type_from_string(char *wurd);
 void algorithm_set_var_select_type(algorithm *s, unsigned int var_select_type);

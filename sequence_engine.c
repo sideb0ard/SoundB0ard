@@ -221,14 +221,17 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-void sequence_engine_event_notify(void *self, unsigned int event_type)
+void sequence_engine_event_notify(void *self, broadcast_event event)
 {
     soundgenerator *parent = (soundgenerator *)self;
     if (!parent->active)
         return;
 
     sequence_engine *engine = get_sequence_engine(parent);
+    int mixer_idx = parent->mixer_idx;
     int idx;
+
+    int event_type = event.type;
 
     switch (event_type)
     {
@@ -268,8 +271,14 @@ void sequence_engine_event_notify(void *self, unsigned int event_type)
         {
             idx = mixr->timing_info.midi_tick % PPBAR;
             if (engine->patterns[engine->cur_pattern][idx].event_type)
-                midi_parse_midi_event(
-                    parent, &engine->patterns[engine->cur_pattern][idx]);
+            {
+                midi_event *ev = &engine->patterns[engine->cur_pattern][idx];
+                if (ev->event_type == MIDI_ON)
+                    mixer_emit_event(
+                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+                                                .sequencer_src = mixer_idx});
+                midi_parse_midi_event(parent, ev);
+            }
         }
         break;
     case (TIME_THIRTYSECOND_TICK):

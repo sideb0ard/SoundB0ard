@@ -79,18 +79,19 @@ typedef struct sequence_engine
     int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS];
     midi_pattern backup_pattern_while_getting_crazy;
 
-    int sample_rate;
-    double sample_rate_ratio;
-    int sample_rate_counter;
-    double cached_last_sample_left;
-    double cached_last_sample_right;
-
     int num_patterns;
     int cur_pattern;
     int cur_pattern_iteration;
 
     bool multi_pattern_mode;
     bool multi_pattern_loop_countdown_started;
+
+    // for sample and hold to downgrade sample_rate
+    int sample_rate;
+    double sample_rate_ratio;
+    int sample_rate_counter;
+    double cached_last_sample_left;
+    double cached_last_sample_right;
 
     bool started; // used by drum seq
     bool allow_triplets;
@@ -125,7 +126,7 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
 bool sequence_engine_list_presets(unsigned int type);
 void sequence_engine_set_sample_rate(sequence_engine *engine, int sample_rate);
 void sequence_engine_status(sequence_engine *engine, wchar_t *status_string);
-void sequence_engine_event_notify(void *self, unsigned int event_type);
+void sequence_engine_event_notify(void *self, broadcast_event event);
 void sequence_engine_set_midi_note(sequence_engine *engine, int midi_note_idx,
                                    int root_key);
 

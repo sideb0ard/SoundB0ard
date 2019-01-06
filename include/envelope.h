@@ -33,7 +33,7 @@ void envelope_status(void *self, char *string);
 stereo_val envelope_process_audio(void *self, stereo_val input);
 
 void envelope_calculate_timings(envelope *e);
-void envelope_event_notify(void *self, unsigned int event_type);
+void envelope_event_notify(void *self, broadcast_event event);
 
 void envelope_set_length_bars(envelope *e, double length_bars);
 void envelope_set_attack_ms(envelope *e, double val);

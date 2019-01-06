@@ -249,7 +249,7 @@ void markov_generate(void *self, void *data)
 }
 void markov_set_debug(void *self, bool b) {}
 
-void markov_event_notify(void *self, unsigned int event_type) {}
+void markov_event_notify(void *self, broadcast_event event) {}
 
 void markov_set_type(markov *m, unsigned int type)
 {

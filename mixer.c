@@ -311,20 +311,20 @@ void mixer_print_notes(mixer *mixr)
     printf("\n");
 }
 
-void mixer_emit_event(mixer *mixr, unsigned int event_type)
+void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
     for (int i = 0; i < mixr->algorithm_num; ++i)
     {
         algorithm *a = mixr->algorithms[i];
         if (a != NULL)
-            algorithm_event_notify(a, event_type);
+            algorithm_event_notify(a, event);
     }
 
     for (int i = 0; i < mixr->pattern_gen_num; ++i)
     {
-        pattern_generator *sg = mixr->pattern_generators[i];
-        if (sg != NULL)
-            sg->event_notify(sg, event_type);
+        pattern_generator *pg = mixr->pattern_generators[i];
+        if (pg != NULL)
+            pg->event_notify(pg, event);
     }
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
@@ -332,7 +332,7 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type)
         soundgenerator *sg = mixr->sound_generators[i];
         if (sg != NULL)
         {
-            sg->event_notify(sg, event_type);
+            sg->event_notify(sg, event);
             if (sg->effects_num > 0)
             {
                 for (int j = 0; j < sg->effects_num; j++)
@@ -340,7 +340,7 @@ void mixer_emit_event(mixer *mixr, unsigned int event_type)
                     if (sg->effects[j])
                     {
                         fx *f = sg->effects[j];
-                        f->event_notify(f, event_type);
+                        f->event_notify(f, event);
                     }
                 }
             }
@@ -369,7 +369,7 @@ void mixer_update_bpm(mixer *mixr, int bpm)
     mixr->timing_info.size_of_quarter_note =
         mixr->timing_info.size_of_eighth_note * 2;
 
-    mixer_emit_event(mixr, TIME_BPM_CHANGE);
+    mixer_emit_event(mixr, (broadcast_event) {.type = TIME_BPM_CHANGE});
     link_set_bpm(mixr->m_ableton_link, bpm);
 }
 
@@ -396,6 +396,7 @@ int add_sound_generator(mixer *mixr, soundgenerator *sg)
     if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)
         return -99;
 
+    sg->mixer_idx = mixr->soundgen_num;
     mixr->sound_generators[mixr->soundgen_num] = sg;
     return mixr->soundgen_num++;
 }
@@ -531,7 +532,7 @@ static void mixer_events_output(mixer *mixr)
         if (mixr->timing_info.midi_tick % 120 == 0)
         {
             mixr->timing_info.is_thirtysecond = true;
-            mixer_emit_event(mixr, TIME_THIRTYSECOND_TICK);
+            mixer_emit_event(mixr, (broadcast_event) {.type = TIME_THIRTYSECOND_TICK});
 
             if (mixr->timing_info.midi_tick % 240 == 0)
             {
@@ -542,17 +543,17 @@ static void mixer_events_output(mixer *mixr)
                 // mixr->timing_info.sixteenth_note_tick);
                 // mixer_print_timing_info(mixr);
 
-                mixer_emit_event(mixr, TIME_SIXTEENTH_TICK);
+                mixer_emit_event(mixr, (broadcast_event) {.type = TIME_SIXTEENTH_TICK});
 
                 if (mixr->timing_info.midi_tick % 480 == 0)
                 {
                     mixr->timing_info.is_eighth = true;
-                    mixer_emit_event(mixr, TIME_EIGHTH_TICK);
+                    mixer_emit_event(mixr, (broadcast_event) {.type = TIME_EIGHTH_TICK});
 
                     if (mixr->timing_info.midi_tick % PPQN == 0)
                     {
                         mixr->timing_info.is_quarter = true;
-                        mixer_emit_event(mixr, TIME_QUARTER_TICK);
+                        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_QUARTER_TICK});
                     }
                 }
             }
@@ -561,25 +562,25 @@ static void mixer_events_output(mixer *mixr)
         // so far only used for ARP engines
         if (mixr->timing_info.midi_tick % 160 == 0)
         {
-            mixer_emit_event(mixr, TIME_TWENTYFOURTH_TICK);
+            mixer_emit_event(mixr, (broadcast_event) {.type = TIME_TWENTYFOURTH_TICK});
 
             if (mixr->timing_info.midi_tick % 320 == 0)
             {
-                mixer_emit_event(mixr, TIME_TWELTH_TICK);
+                mixer_emit_event(mixr, (broadcast_event) {.type = TIME_TWELTH_TICK});
 
                 if (mixr->timing_info.midi_tick % 640 == 0)
                 {
-                    mixer_emit_event(mixr, TIME_SIXTH_TICK);
+                    mixer_emit_event(mixr, (broadcast_event) {.type = TIME_SIXTH_TICK});
 
                     if (mixr->timing_info.midi_tick % 1280 == 0)
-                        mixer_emit_event(mixr, TIME_THIRD_TICK);
+                        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_THIRD_TICK});
                 }
             }
         }
 
         if (mixr->timing_info.midi_tick % PPBAR == 0)
         {
-            mixer_emit_event(mixr, TIME_START_OF_LOOP_TICK);
+            mixer_emit_event(mixr, (broadcast_event) {.type = TIME_START_OF_LOOP_TICK});
             if (mixr->scene_start_pending)
             {
                 mixer_play_scene(mixr, mixr->current_scene);
@@ -587,7 +588,7 @@ static void mixer_events_output(mixer *mixr)
             }
         }
 
-        mixer_emit_event(mixr, TIME_MIDI_TICK);
+        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_MIDI_TICK});
     }
 }
 
@@ -1120,7 +1121,7 @@ void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
     {
         mixr->chord = root;
         mixr->chord_type = chord_type;
-        mixer_emit_event(mixr, TIME_CHORD_CHANGE);
+        mixer_emit_event(mixr, (broadcast_event) {.type = TIME_CHORD_CHANGE});
     }
 }
 

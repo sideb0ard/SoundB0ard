@@ -124,7 +124,7 @@ void juggler_set_debug(void *self, bool b)
     j->debug = b;
 }
 
-void juggler_event_notify(void *self, unsigned int event_type) {}
+void juggler_event_notify(void *self, broadcast_event event) {}
 
 void juggler_set_style(juggler *j, unsigned int style)
 {

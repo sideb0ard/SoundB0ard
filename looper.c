@@ -109,11 +109,11 @@ void looper_set_pattern(void *self, int pattern_num,
         sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
-void looper_event_notify(void *self, unsigned int event_type)
+void looper_event_notify(void *self, broadcast_event event)
 {
     looper *g = (looper *)self;
 
-    switch (event_type)
+    switch (event.type)
     {
     case (TIME_START_OF_LOOP_TICK):
 

@@ -175,10 +175,10 @@ uint16_t create_euclidean_rhythm(int num_hits, int num_steps)
     return aligned_bitmap;
 }
 
-void euclidean_event_notify(void *self, unsigned int event_type)
+void euclidean_event_notify(void *self, broadcast_event event)
 {
     euclidean *e = (euclidean *)self;
-    switch (event_type)
+    switch (event.type)
     {
     case (TIME_QUARTER_TICK):
         if (e->mode == EUCLID_UP)

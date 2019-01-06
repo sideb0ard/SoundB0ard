@@ -587,10 +587,10 @@ void shunting_yard_algorithm(bitshift_pattern *pattern)
     pattern->num_rpn_tokens = output_stack_idx;
 }
 
-void bitshift_event_notify(void *self, unsigned int event_type)
+void bitshift_event_notify(void *self, broadcast_event event)
 {
     bitshift *bs = (bitshift *)self;
-    // switch (event_type)
+    // switch (event.type)
     //{
     // case (TIME_START_OF_LOOP_TICK):
     //    // printf("bitshift - got start of loop!\n");

@@ -28,7 +28,7 @@ typedef struct euclidean
 pattern_generator *new_euclidean(int num_hits, int num_steps);
 void euclidean_generate(void *self, void *data);
 void euclidean_status(void *self, wchar_t *status_string);
-void euclidean_event_notify(void *self, unsigned int event_type);
+void euclidean_event_notify(void *self, broadcast_event event);
 void euclidean_set_debug(void *self, bool b);
 
 uint16_t create_euclidean_rhythm(int num_hits, int num_steps);

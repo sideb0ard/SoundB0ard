@@ -63,7 +63,7 @@ void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix);
 void stereo_delay_set_sync(stereodelay *d, bool b);
 void stereo_delay_set_sync_len(stereodelay *d, unsigned int);
 void stereo_delay_sync_tempo(stereodelay *d);
-void stereo_delay_event_notify(void *self, unsigned int event_type);
+void stereo_delay_event_notify(void *self, broadcast_event event);
 
 void stereo_delay_prepare_for_play(stereodelay *d);
 void stereo_delay_reset(stereodelay *d);

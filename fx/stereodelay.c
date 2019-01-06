@@ -52,9 +52,9 @@ stereodelay *new_stereo_delay(double duration)
     return d;
 }
 
-void stereo_delay_event_notify(void *self, unsigned int event_type)
+void stereo_delay_event_notify(void *self, broadcast_event event)
 {
-    if (event_type == TIME_BPM_CHANGE)
+    if (event.type == TIME_BPM_CHANGE)
     {
         stereodelay *sd = (stereodelay *)self;
         if (sd->sync)

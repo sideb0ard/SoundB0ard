@@ -163,7 +163,7 @@ void looper_stop(void *self);
 int looper_get_num_patterns(void *self);
 void looper_set_num_patterns(void *self, int num_patterns);
 void looper_make_active_track(void *self, int tracknum);
-void looper_event_notify(void *self, unsigned int event_type);
+void looper_event_notify(void *self, broadcast_event event);
 bool looper_is_valid_pattern(void *self, int pattern_num);
 midi_event *looper_get_pattern(void *self, int pattern_num);
 void looper_set_pattern(void *self, int pattern_num,

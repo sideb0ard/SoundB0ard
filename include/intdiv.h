@@ -34,7 +34,7 @@ typedef struct intdiv
 pattern_generator *new_intdiv(int num_parts, char *allowed_parts);
 void intdiv_generate(void *self, void *data);
 void intdiv_status(void *self, wchar_t *status_string);
-void intdiv_event_notify(void *self, unsigned int event_type);
+void intdiv_event_notify(void *self, broadcast_event event);
 void intdiv_set_debug(void *self, bool b);
 void intdiv_set_allowed_part_sizes(intdiv *id, char *allowed_parts);
 void intdiv_set_num_parts(intdiv *id, int num_parts);

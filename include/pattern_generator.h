@@ -21,5 +21,5 @@ typedef struct pattern_generator
     void (*status)(void *self, wchar_t *wstring);
     void (*generate)(void *self, void *data);
     void (*set_debug)(void *self, bool b);
-    void (*event_notify)(void *self, unsigned int event_type);
+    void (*event_notify)(void *self, broadcast_event event);
 } pattern_generator;

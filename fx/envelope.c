@@ -98,10 +98,10 @@ void envelope_calculate_timings(envelope *e)
     e->env_length_ticks_counter = info.midi_tick % e->env_length_ticks;
 }
 
-void envelope_event_notify(void *self, unsigned int event_type)
+void envelope_event_notify(void *self, broadcast_event event)
 {
     envelope *e = (envelope *)self;
-    switch (event_type)
+    switch (event.type)
     {
     case (TIME_BPM_CHANGE):
         envelope_calculate_timings(e);
