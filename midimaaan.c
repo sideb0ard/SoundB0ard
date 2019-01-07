@@ -134,9 +134,7 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                             (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                         midi_event off = new_midi_event(MIDI_OFF, note, 128);
                         off.delete_after_use = true;
-                        sequence_engine_add_event(&ms->engine,
-                                                  ms->engine.cur_pattern,
-                                                  note_off_tick, off);
+                        sequence_engine_add_temporal_event(&ms->engine, note_off_tick, off);
                     }
                 }
             }
@@ -191,9 +189,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                             (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                         midi_event off = new_midi_event(128, note, 128);
                         off.delete_after_use = true;
-                        sequence_engine_add_event(&dx->engine,
-                                                  dx->engine.cur_pattern,
-                                                  note_off_tick, off);
+                        sequence_engine_add_temporal_event(&dx->engine,
+                                                           note_off_tick, off);
                     }
                 }
             }
@@ -244,8 +241,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                         (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                     midi_event off = new_midi_event(128, note, 128);
                     off.delete_after_use = true;
-                    sequence_engine_add_event(&ds->engine, 0, note_off_tick,
-                                              off);
+                    sequence_engine_add_temporal_event(&ds->engine,
+                                                       note_off_tick, off);
                 }
             }
             break;

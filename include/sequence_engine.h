@@ -76,6 +76,7 @@ typedef struct sequence_engine
 
     int tick; // current 16th note tick from mixer
     midi_pattern patterns[MAX_NUM_MIDI_LOOPS];
+    midi_event temporal_events[PPBAR];
     int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS];
     midi_pattern backup_pattern_while_getting_crazy;
 
@@ -154,6 +155,7 @@ void sequence_engine_reset_pattern_all(sequence_engine *self);
 void sequence_engine_reset_voices(sequence_engine *self);
 void sequence_engine_pattern_to_string(sequence_engine *self, int pattern_num,
                                        wchar_t scratch[33]);
+void sequence_engine_add_temporal_event(sequence_engine *self, int midi_tick, midi_event ev);
 void sequence_engine_add_event(sequence_engine *self, int pattern_num,
                                int midi_tick, midi_event ev);
 void sequence_engine_delete_event(sequence_engine *engine, int pat_num,

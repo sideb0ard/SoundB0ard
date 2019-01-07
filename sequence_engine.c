@@ -277,11 +277,24 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
             int idx = ((engine->cur_step * PPSIXTEENTH) +
                            (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
                           PPBAR;
-            //idx = mixr->timing_info.midi_tick % PPBAR;
 
             if (engine->patterns[engine->cur_pattern][idx].event_type)
             {
                 midi_event *ev = &engine->patterns[engine->cur_pattern][idx];
+                if (ev->event_type == MIDI_ON)
+                    mixer_emit_event(
+                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+                                                .sequencer_src = mixer_idx});
+                midi_parse_midi_event(parent, ev);
+            }
+
+            // this temporal_events table is my first pass at a solution to ensure
+            // note off events still happen, even when i'm using the above count_by
+            // which ends up not reaching note off events sometimes.
+            idx = mixr->timing_info.midi_tick % PPBAR;
+            if (engine->temporal_events[idx].event_type)
+            {
+                midi_event *ev = &engine->temporal_events[idx];
                 if (ev->event_type == MIDI_ON)
                     mixer_emit_event(
                         mixr, (broadcast_event){.type = SEQUENCER_NOTE,
@@ -344,6 +357,11 @@ void sequence_engine_add_event(sequence_engine *engine, int pattern_num,
 {
     midi_event *pattern = engine->patterns[pattern_num];
     midi_pattern_add_event(pattern, midi_tick, ev);
+}
+
+void sequence_engine_add_temporal_event(sequence_engine *engine, int midi_tick, midi_event ev)
+{
+    midi_pattern_add_event(engine->temporal_events, midi_tick, ev);
 }
 
 void sequence_engine_clear_pattern_ready_for_new_one(sequence_engine *ms,
@@ -910,6 +928,7 @@ void sequence_engine_set_transpose(sequence_engine *engine, int transpose)
 
 void sequence_engine_set_count_by(sequence_engine *engine, int count_by)
 {
+    sequence_engine_reset_step(engine);
     engine->count_by = count_by;
 }
 
