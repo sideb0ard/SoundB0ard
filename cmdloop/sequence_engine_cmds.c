@@ -67,6 +67,11 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             bool b = atoi(wurds[1]);
             sequence_engine_set_chord_mode(engine, b);
         }
+        else if (strncmp("count_by", wurds[0], 8) == 0)
+        {
+            int count_by = atoi(wurds[1]);
+            sequence_engine_set_count_by(engine, count_by);
+        }
         else if (strncmp("follow", wurds[0], 6) == 0)
         {
             bool b = atoi(wurds[1]);
@@ -152,6 +157,10 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             if (strncmp("all", wurds[1], 3) == 0)
             {
                 sequence_engine_reset_pattern_all(engine);
+            }
+            else if (strncmp("step", wurds[1], 4) == 0)
+            {
+                sequence_engine_reset_step(engine);
             }
             else
             {

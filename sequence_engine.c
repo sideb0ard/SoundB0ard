@@ -60,6 +60,9 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
     engine->event_mask = 0;
     engine->mask_every_n = 1;
     engine->event_mask_counter = 0;
+
+    engine->count_by = 1;
+    engine->cur_step = 0;
 }
 
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine)
@@ -194,11 +197,12 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
     swprintf(
         scratch, 255,
         L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
-        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d\n"
+        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d count_by:%d\n"
         L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->midi_note_1, engine->midi_note_2,
         engine->midi_note_3, engine->follow_mixer_chord_changes,
+        engine->count_by,
         engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
         s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
@@ -269,7 +273,12 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
     case (TIME_MIDI_TICK):
         if (engine->started)
         {
-            idx = mixr->timing_info.midi_tick % PPBAR;
+            int mixer_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
+            int idx = ((engine->cur_step * PPSIXTEENTH) +
+                           (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
+                          PPBAR;
+            //idx = mixr->timing_info.midi_tick % PPBAR;
+
             if (engine->patterns[engine->cur_pattern][idx].event_type)
             {
                 midi_event *ev = &engine->patterns[engine->cur_pattern][idx];
@@ -290,6 +299,9 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
             sequence_engine_do_arp(engine, parent);
         break;
     case (TIME_SIXTEENTH_TICK):
+        if (engine->started)
+            engine->cur_step = (engine->cur_step + engine->count_by) % 16;
+
         if (engine->arp.enable && engine->arp.speed == ARP_16)
             sequence_engine_do_arp(engine, parent);
         break;
@@ -887,4 +899,14 @@ void sequence_engine_set_transpose(sequence_engine *engine, int transpose)
 {
     if (transpose > -128 && transpose < 128)
         engine->transpose = transpose;
+}
+
+void sequence_engine_set_count_by(sequence_engine *engine, int count_by)
+{
+    engine->count_by = count_by;
+}
+
+void sequence_engine_reset_step(sequence_engine *engine)
+{
+    engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }

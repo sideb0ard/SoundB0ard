@@ -79,6 +79,10 @@ typedef struct sequence_engine
     int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS];
     midi_pattern backup_pattern_while_getting_crazy;
 
+    // these two used to traverse the pattern in fun ways
+    int count_by;
+    int cur_step;
+
     int num_patterns;
     int cur_pattern;
     int cur_pattern_iteration;
@@ -218,3 +222,5 @@ void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b);
 bool sequence_engine_is_masked(sequence_engine *engine);
 void sequence_engine_set_swing_setting(sequence_engine *engine,
                                        int swing_setting);
+void sequence_engine_set_count_by(sequence_engine *engine, int count_by);
+void sequence_engine_reset_step(sequence_engine *engine);
