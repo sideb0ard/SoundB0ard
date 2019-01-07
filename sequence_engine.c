@@ -197,12 +197,12 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
     swprintf(
         scratch, 255,
         L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
-        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d count_by:%d\n"
+        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d count_by:%d cur_step:%d\n"
         L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->midi_note_1, engine->midi_note_2,
         engine->midi_note_3, engine->follow_mixer_chord_changes,
-        engine->count_by,
+        engine->count_by, engine->cur_step,
         engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
         s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
@@ -300,7 +300,14 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
         break;
     case (TIME_SIXTEENTH_TICK):
         if (engine->started)
-            engine->cur_step = (engine->cur_step + engine->count_by) % 16;
+        {
+            engine->cur_step += engine->count_by;
+
+            if (engine->cur_step < 0)
+                engine->cur_step += 16;
+            else if (engine->cur_step >= 16)
+                engine->cur_step -= 16;
+        }
 
         if (engine->arp.enable && engine->arp.speed == ARP_16)
             sequence_engine_do_arp(engine, parent);
