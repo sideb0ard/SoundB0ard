@@ -63,6 +63,8 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
 
     engine->count_by = 1;
     engine->cur_step = 0;
+    engine->range_start = 0;
+    engine->range_len = 16;
 }
 
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine)
@@ -196,13 +198,16 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
 
     swprintf(
         scratch, 255,
-        L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d\n"
-        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d count_by:%d cur_step:%d\n"
+        L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d "
+        L"debug:%d\n"
+        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d\n"
+        L"count_by:%d cur_step:%d incr:%d range:%d fold:%d\n"
         L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
-        engine->sustain_note_ms, engine->midi_note_1, engine->midi_note_2,
-        engine->midi_note_3, engine->follow_mixer_chord_changes,
-        engine->count_by, engine->cur_step,
+        engine->sustain_note_ms, engine->debug, engine->midi_note_1,
+        engine->midi_note_2, engine->midi_note_3,
+        engine->follow_mixer_chord_changes, engine->count_by, engine->cur_step,
+        engine->increment_by, engine->range_len, engine->fold,
         engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
         s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
@@ -275,8 +280,8 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
         {
             int mixer_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
             int idx = ((engine->cur_step * PPSIXTEENTH) +
-                           (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
-                          PPBAR;
+                       (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
+                      PPBAR;
 
             if (engine->patterns[engine->cur_pattern][idx].event_type)
             {
@@ -288,9 +293,10 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
                 midi_parse_midi_event(parent, ev);
             }
 
-            // this temporal_events table is my first pass at a solution to ensure
-            // note off events still happen, even when i'm using the above count_by
-            // which ends up not reaching note off events sometimes.
+            // this temporal_events table is my first pass at a solution to
+            // ensure note off events still happen, even when i'm using the
+            // above count_by which ends up not reaching note off events
+            // sometimes.
             idx = mixr->timing_info.midi_tick % PPBAR;
             if (engine->temporal_events[idx].event_type)
             {
@@ -314,12 +320,66 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
     case (TIME_SIXTEENTH_TICK):
         if (engine->started)
         {
-            engine->cur_step += engine->count_by;
 
-            if (engine->cur_step < 0)
-                engine->cur_step += 16;
-            else if (engine->cur_step >= 16)
+            if (engine->debug)
+                printf("CUR_STEP:%d range_start:%d len:%d\n", engine->cur_step,
+                       engine->range_start, engine->range_len);
+
+            if (engine->fold_direction == FOLD_FWD)
+                engine->cur_step += engine->count_by;
+            else
+                engine->cur_step -= engine->count_by;
+
+            if (engine->cur_step < engine->range_start ||
+                engine->cur_step < 0)
+            {
+                int over_by = engine->range_start - engine->cur_step;
+                if (engine->fold)
+                {
+                    engine->cur_step = engine->range_start + over_by;
+                    engine->fold_direction = FOLD_FWD;
+                }
+                else
+                    engine->cur_step =
+                        (engine->range_start + engine->range_len) -
+                        over_by - 1;
+            }
+            else if (engine->cur_step >= 16 ||
+                     engine->cur_step >=
+                         (engine->range_start + engine->range_len))
+            {
+                int over_by = 0;
+                if (engine->cur_step >= 16)
+                    over_by = engine->cur_step - 16;
+                else
+                    over_by = engine->cur_step -
+                              (engine->range_start + engine->range_len);
+
+                if (engine->fold)
+                {
+                    engine->cur_step =
+                        (engine->range_start + engine->range_len) -
+                        over_by - 1;
+                    engine->fold_direction = FOLD_BAK;
+                }
+                else
+                    engine->cur_step = engine->range_start + over_by;
+            }
+
+            if (engine->cur_step >= 16)
                 engine->cur_step -= 16;
+            else if (engine->cur_step < 0)
+                engine->cur_step += 16;
+
+            engine->range_counter++;
+            if (engine->range_counter % engine->range_len == 0)
+            {
+                engine->range_start += engine->increment_by;
+                if (engine->range_start >= 16)
+                    engine->range_start -= 16;
+                else if (engine->range_start < 0)
+                    engine->range_start += 16;
+            }
         }
 
         if (engine->arp.enable && engine->arp.speed == ARP_16)
@@ -359,7 +419,8 @@ void sequence_engine_add_event(sequence_engine *engine, int pattern_num,
     midi_pattern_add_event(pattern, midi_tick, ev);
 }
 
-void sequence_engine_add_temporal_event(sequence_engine *engine, int midi_tick, midi_event ev)
+void sequence_engine_add_temporal_event(sequence_engine *engine, int midi_tick,
+                                        midi_event ev)
 {
     midi_pattern_add_event(engine->temporal_events, midi_tick, ev);
 }
@@ -935,4 +996,25 @@ void sequence_engine_set_count_by(sequence_engine *engine, int count_by)
 void sequence_engine_reset_step(sequence_engine *engine)
 {
     engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
+}
+
+void sequence_engine_set_increment_by(sequence_engine *engine, int incr)
+{
+    engine->increment_by = incr;
+}
+
+void sequence_engine_set_range_len(sequence_engine *engine, int range)
+{
+    engine->range_len = range;
+}
+
+void sequence_engine_set_fold(sequence_engine *engine, bool b)
+{
+    engine->fold = b;
+    engine->fold_direction = FOLD_FWD;
+}
+
+void sequence_engine_set_debug(sequence_engine *engine, bool b)
+{
+    engine->debug = b;
 }

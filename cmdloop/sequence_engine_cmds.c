@@ -72,10 +72,30 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             int count_by = atoi(wurds[1]);
             sequence_engine_set_count_by(engine, count_by);
         }
+        else if (strncmp("debug", wurds[0], 5) == 0)
+        {
+            bool b = atoi(wurds[1]);
+            sequence_engine_set_debug(engine, b);
+        }
+        else if (strncmp("fold", wurds[0], 4) == 0)
+        {
+            bool b = atoi(wurds[1]);
+            sequence_engine_set_fold(engine, b);
+        }
         else if (strncmp("follow", wurds[0], 6) == 0)
         {
             bool b = atoi(wurds[1]);
             sequence_engine_set_follow_mixer_chords(engine, b);
+        }
+        else if (strncmp("incr", wurds[0], 4) == 0)
+        {
+            int incr = atoi(wurds[1]);
+            sequence_engine_set_increment_by(engine, incr);
+        }
+        else if (strncmp("range", wurds[0], 5) == 0)
+        {
+            int val = atoi(wurds[1]);
+            sequence_engine_set_range_len(engine, val);
         }
         else if (strncmp("single_note_mode", wurds[0], 9) == 0)
         {

@@ -48,6 +48,12 @@ enum
 
 enum
 {
+    FOLD_FWD,
+    FOLD_BAK,
+};
+
+enum
+{
     ARP_32,
     ARP_24,
     ARP_16,
@@ -80,9 +86,18 @@ typedef struct sequence_engine
     int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS];
     midi_pattern backup_pattern_while_getting_crazy;
 
-    // these two used to traverse the pattern in fun ways
+    // these used to traverse the pattern in fun ways
     int count_by;
     int cur_step;
+
+    int increment_by;
+    int range_start;
+    int range_len;
+    int range_counter;
+
+    bool fold;
+    bool fold_direction;
+    // end of pattern traversals
 
     int num_patterns;
     int cur_pattern;
@@ -124,6 +139,8 @@ typedef struct sequence_engine
     int event_mask_counter;
 
     bool follow_mixer_chord_changes;
+
+    bool debug;
 
 } sequence_engine;
 
@@ -226,3 +243,7 @@ void sequence_engine_set_swing_setting(sequence_engine *engine,
                                        int swing_setting);
 void sequence_engine_set_count_by(sequence_engine *engine, int count_by);
 void sequence_engine_reset_step(sequence_engine *engine);
+void sequence_engine_set_increment_by(sequence_engine *engine, int incr);
+void sequence_engine_set_range_len(sequence_engine *engine, int range);
+void sequence_engine_set_fold(sequence_engine *engine, bool b);
+void sequence_engine_set_debug(sequence_engine *engine, bool b);
