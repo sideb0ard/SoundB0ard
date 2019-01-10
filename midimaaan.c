@@ -134,7 +134,8 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
                             (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                         midi_event off = new_midi_event(MIDI_OFF, note, 128);
                         off.delete_after_use = true;
-                        sequence_engine_add_temporal_event(&ms->engine, note_off_tick, off);
+                        sequence_engine_add_temporal_event(&ms->engine,
+                                                           note_off_tick, off);
                     }
                 }
             }
@@ -216,8 +217,9 @@ void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
             break;
         }
         default:
-            printf(
-                "HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
+            printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS "
+                   "type: %d\n",
+                   ev->event_type);
         }
     }
     else if (sg->type == DIGISYNTH_TYPE)

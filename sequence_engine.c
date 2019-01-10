@@ -275,18 +275,20 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
     case (TIME_MIDI_TICK):
         if (engine->started)
         {
-            int mixer_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
             int idx = ((engine->cur_step * PPSIXTEENTH) +
                        (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
                       PPBAR;
 
+            if (idx < 0 || idx >= PPBAR)
+                printf("YOUHC! idx out of bounds: %d\n", idx);
+
             if (engine->patterns[engine->cur_pattern][idx].event_type)
             {
                 midi_event *ev = &engine->patterns[engine->cur_pattern][idx];
-                if (ev->event_type == MIDI_ON)
-                    mixer_emit_event(
-                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                                                .sequencer_src = mixer_idx});
+                //if (ev->event_type == MIDI_ON)
+                //    mixer_emit_event(
+                //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+                //                                .sequencer_src = mixer_idx});
                 midi_parse_midi_event(parent, ev);
             }
 
@@ -298,10 +300,10 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
             if (engine->temporal_events[idx].event_type)
             {
                 midi_event *ev = &engine->temporal_events[idx];
-                if (ev->event_type == MIDI_ON)
-                    mixer_emit_event(
-                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                                                .sequencer_src = mixer_idx});
+                //if (ev->event_type == MIDI_ON)
+                //    mixer_emit_event(
+                //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+                //                                .sequencer_src = mixer_idx});
                 midi_parse_midi_event(parent, ev);
             }
         }
@@ -363,10 +365,20 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
                     engine->cur_step = engine->range_start + over_by;
             }
 
-            if (engine->cur_step >= 16)
+            int tries = 0;
+            while (engine->cur_step >= 16 && tries < 5)
+            {
                 engine->cur_step -= 16;
-            else if (engine->cur_step < 0)
+                tries++;
+            }
+            while (engine->cur_step < 0 && tries < 5)
+            {
                 engine->cur_step += 16;
+                tries++;
+            }
+
+            if (engine->cur_step >= 16 || engine->cur_step < 0)
+                printf("UGH! still out of bounds! %d\n", engine->cur_step);
 
             engine->range_counter++;
             if (engine->range_counter % engine->range_len == 0)
