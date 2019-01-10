@@ -285,10 +285,10 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
             if (engine->patterns[engine->cur_pattern][idx].event_type)
             {
                 midi_event *ev = &engine->patterns[engine->cur_pattern][idx];
-                //if (ev->event_type == MIDI_ON)
-                //    mixer_emit_event(
-                //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                //                                .sequencer_src = mixer_idx});
+                if (ev->event_type == MIDI_ON)
+                    mixer_emit_event(
+                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+                                                .sequencer_src = mixer_idx});
                 midi_parse_midi_event(parent, ev);
             }
 
@@ -300,10 +300,10 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
             if (engine->temporal_events[idx].event_type)
             {
                 midi_event *ev = &engine->temporal_events[idx];
-                //if (ev->event_type == MIDI_ON)
-                //    mixer_emit_event(
-                //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                //                                .sequencer_src = mixer_idx});
+                if (ev->event_type == MIDI_ON)
+                    mixer_emit_event(
+                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+                                                .sequencer_src = mixer_idx});
                 midi_parse_midi_event(parent, ev);
             }
         }
