@@ -61,10 +61,7 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
     engine->mask_every_n = 1;
     engine->event_mask_counter = 0;
 
-    engine->count_by = 1;
-    engine->cur_step = 0;
-    engine->range_start = 0;
-    engine->range_len = 16;
+    sequence_engine_reset_step(engine);
 }
 
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine)
@@ -989,13 +986,18 @@ void sequence_engine_set_transpose(sequence_engine *engine, int transpose)
 
 void sequence_engine_set_count_by(sequence_engine *engine, int count_by)
 {
-    sequence_engine_reset_step(engine);
+    engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
     engine->count_by = count_by;
 }
 
 void sequence_engine_reset_step(sequence_engine *engine)
 {
     engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
+    engine->count_by = 1;
+    engine->cur_step = 0;
+    engine->range_start = 0;
+    engine->range_len = 16;
+    engine->fold = 0;
 }
 
 void sequence_engine_set_increment_by(sequence_engine *engine, int incr)
