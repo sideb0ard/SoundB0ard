@@ -130,6 +130,7 @@ typedef struct looper
 
     unsigned int loop_mode; // enums above - LOOP, STEP, STATIC
     double loop_len;        // bars
+    int loop_counter;
 
     bool scramble_pending;
     bool scramble_mode;

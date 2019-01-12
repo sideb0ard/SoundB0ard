@@ -43,7 +43,6 @@ looper *new_looper(char *filename)
     g->recording = false;
 
     g->loop_mode = LOOPER_LOOP_MODE;
-    g->loop_len = 1;
     g->scramble_mode = false;
     g->stutter_mode = false;
     g->stutter_idx = 0;
@@ -111,14 +110,19 @@ void looper_set_pattern(void *self, int pattern_num,
 
 void looper_event_notify(void *self, broadcast_event event)
 {
+    sequence_engine_event_notify(self, event);
+
     looper *g = (looper *)self;
+
+    int cur_sixteenth_midi_base = g->engine.cur_step * PPSIXTEENTH;
+    int cur_midi_idx =
+        cur_sixteenth_midi_base + (mixr->timing_info.midi_tick % PPSIXTEENTH);
 
     switch (event.type)
     {
     case (TIME_START_OF_LOOP_TICK):
 
         g->started = true;
-        g->step_diff = 0;
 
         if (g->scramble_pending)
         {
@@ -147,11 +151,17 @@ void looper_event_notify(void *self, broadcast_event event)
     case (TIME_MIDI_TICK):
         if (g->loop_mode == LOOPER_LOOP_MODE)
         {
-            int pulses_per_loop = PPBAR * g->loop_len;
 
-            double rel_pos = mixr->timing_info.midi_tick % pulses_per_loop;
-            double decimal_percent_of_loop = rel_pos / pulses_per_loop;
+            double pulses_per_loop = PPBAR * g->loop_len;
+            double decimal_percent_of_loop =
+                cur_midi_idx / pulses_per_loop;
             double new_read_idx = decimal_percent_of_loop * g->audio_buffer_len;
+
+            // printf("PPLOOP:%f PPSIXT:%d base:%d rel_midi:%d DEC:%f len:%d "
+            //       "REDXIX:%f\n",
+            //       pulses_per_loop, PPSIXTEENTH, cur_sixteenth_midi_base,
+            //       relative_midi_idx, decimal_percent_of_loop,
+            //       g->audio_buffer_len, new_read_idx);
 
             if (g->reverse_mode)
                 new_read_idx = (g->audio_buffer_len - 1) - new_read_idx;
@@ -167,21 +177,18 @@ void looper_event_notify(void *self, broadcast_event event)
             }
             else if (g->stutter_mode)
             {
-                int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
                 int rel_pos_within_a_sixteenth =
-                    new_read_idx - (cur_sixteenth * g->size_of_sixteenth);
+                    new_read_idx - (g->engine.cur_step * g->size_of_sixteenth);
                 g->audio_buffer_read_idx =
                     (g->stutter_idx * g->size_of_sixteenth) +
                     rel_pos_within_a_sixteenth;
             }
             else
-                g->audio_buffer_read_idx =
-                    new_read_idx + (g->step_diff * g->size_of_sixteenth);
+                g->audio_buffer_read_idx = new_read_idx;
         }
 
-        // step sequencer
-        int idx = mixr->timing_info.midi_tick % PPBAR;
-        if (g->engine.patterns[g->engine.cur_pattern][idx].event_type ==
+        // step sequencer as env generator
+        if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx].event_type ==
             MIDI_ON)
         {
             // printf("[%d] ON\n", idx);
@@ -189,7 +196,7 @@ void looper_event_notify(void *self, broadcast_event event)
             eg_start_eg(&g->m_eg1);
 
             midi_event *pattern = g->engine.patterns[g->engine.cur_pattern];
-            int off_tick = (int)(idx + ((g->m_eg1.m_attack_time_msec +
+            int off_tick = (int)(cur_midi_idx + ((g->m_eg1.m_attack_time_msec +
                                          g->m_eg1.m_decay_time_msec +
                                          g->engine.sustain_note_ms) *
                                         mixr->timing_info.ms_per_midi_tick)) %
@@ -197,11 +204,11 @@ void looper_event_notify(void *self, broadcast_event event)
             midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
             midi_pattern_add_event(pattern, off_tick, off_event);
         }
-        else if (g->engine.patterns[g->engine.cur_pattern][idx].event_type ==
+        else if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx].event_type ==
                  MIDI_OFF)
         {
             // printf("[%d] OFF\n", idx);
-            midi_event_clear(&g->engine.patterns[g->engine.cur_pattern][idx]);
+            midi_event_clear(&g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]);
             g->m_eg1.m_state = RELEASE;
         }
 
@@ -614,7 +621,7 @@ void looper_import_file(looper *g, char *filename)
         g->num_channels = deetz.num_channels;
         g->external_source_sg = -1;
         g->have_active_buffer = true;
-        g->size_of_sixteenth = g->audio_buffer_len / 16;
+        looper_set_loop_len(g, 1);
     }
     else
     {
@@ -763,7 +770,10 @@ void looper_set_step_mode(looper *g, bool b) { g->step_mode = b; }
 void looper_set_loop_len(looper *g, double bars)
 {
     if (bars != 0)
+    {
         g->loop_len = bars;
+        g->size_of_sixteenth = g->audio_buffer_len / 16 * bars;
+    }
 }
 
 int looper_get_available_grain_num(looper *g)
