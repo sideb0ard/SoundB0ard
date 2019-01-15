@@ -20,6 +20,7 @@ typedef struct sound_grain_params
     double pitch;
     int num_channels;
     int degrade_by;
+    bool debug;
 } sound_grain_params;
 
 typedef struct sound_grain
@@ -44,6 +45,7 @@ typedef struct sound_grain
     double slope;
     double curve;
     bool reverse_mode;
+    bool debug;
 
     envelope_generator eg;
 
@@ -150,6 +152,8 @@ typedef struct looper
 
     int cur_sixteenth; // used to track scramble
 
+    bool debug_pending;
+
     double vol;
 } looper;
 
@@ -210,5 +214,6 @@ void looper_set_grain_env_attack_pct(looper *l, int percent);
 void looper_set_grain_env_release_pct(looper *l, int percent);
 void looper_set_grain_external_source_mode(looper *l, unsigned int mode);
 void looper_set_degrade_by(looper *l, int degradation);
+void looper_set_trace_envelope(looper *l);
 
 #endif // LOOPER

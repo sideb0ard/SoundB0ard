@@ -1004,6 +1004,7 @@ void sequence_engine_set_count_by(sequence_engine *engine, int count_by)
 
 void sequence_engine_reset_step(sequence_engine *engine)
 {
+    printf("RESET!\n");
     engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
     engine->count_by = 1;
     engine->cur_step = 0;

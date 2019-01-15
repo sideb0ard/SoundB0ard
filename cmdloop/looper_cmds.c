@@ -170,6 +170,10 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                         bool b = atoi(wurds[3]);
                         looper_set_step_mode(g, b);
                     }
+                    else if (strncmp("trace", wurds[2], 5) == 0)
+                    {
+                        looper_set_trace_envelope(g);
+                    }
                     else if (strncmp("xmode", wurds[2], 5) == 0)
                     {
                         unsigned int mode = atoi(wurds[3]);

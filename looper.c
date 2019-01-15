@@ -29,7 +29,7 @@ looper *new_looper(char *filename)
     g->grain_release_time_pct = 15;
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
-    g->envelope_mode = LOOPER_ENV_PARABOLIC;
+    g->envelope_mode = LOOPER_ENV_GENERATOR;
     g->envelope_taper_ratio = 0.5;
     g->reverse_mode = 0; // bool
     g->external_source_sg = -1;
@@ -43,6 +43,7 @@ looper *new_looper(char *filename)
     g->recording = false;
 
     g->loop_mode = LOOPER_LOOP_MODE;
+    g->loop_counter = -1;
     g->scramble_mode = false;
     g->stutter_mode = false;
     g->stutter_idx = 0;
@@ -114,15 +115,20 @@ void looper_event_notify(void *self, broadcast_event event)
 
     looper *g = (looper *)self;
 
-    int cur_sixteenth_midi_base = g->engine.cur_step * PPSIXTEENTH;
-    int cur_midi_idx =
-        cur_sixteenth_midi_base + (mixr->timing_info.midi_tick % PPSIXTEENTH);
+    int cur_sixteenth_midi_base =
+        (g->loop_counter * PPBAR) + g->engine.cur_step * PPSIXTEENTH;
+    int cur_midi_idx = (cur_sixteenth_midi_base +
+                        (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
+                       PPBAR;
 
     switch (event.type)
     {
     case (TIME_START_OF_LOOP_TICK):
 
         g->started = true;
+        g->loop_counter++; // used to track which 16th we're on if loop != 1 bar
+        float loop_num = fmod(g->loop_counter, g->loop_len);
+        // printf("LOOP # %f\n", loop_num);
 
         if (g->scramble_pending)
         {
@@ -153,8 +159,7 @@ void looper_event_notify(void *self, broadcast_event event)
         {
 
             double pulses_per_loop = PPBAR * g->loop_len;
-            double decimal_percent_of_loop =
-                cur_midi_idx / pulses_per_loop;
+            double decimal_percent_of_loop = cur_midi_idx / pulses_per_loop;
             double new_read_idx = decimal_percent_of_loop * g->audio_buffer_len;
 
             // printf("PPLOOP:%f PPSIXT:%d base:%d rel_midi:%d DEC:%f len:%d "
@@ -188,27 +193,27 @@ void looper_event_notify(void *self, broadcast_event event)
         }
 
         // step sequencer as env generator
-        if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx].event_type ==
-            MIDI_ON)
+        if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]
+                .event_type == MIDI_ON)
         {
-            // printf("[%d] ON\n", idx);
-
             eg_start_eg(&g->m_eg1);
 
             midi_event *pattern = g->engine.patterns[g->engine.cur_pattern];
-            int off_tick = (int)(cur_midi_idx + ((g->m_eg1.m_attack_time_msec +
-                                         g->m_eg1.m_decay_time_msec +
-                                         g->engine.sustain_note_ms) *
-                                        mixr->timing_info.ms_per_midi_tick)) %
-                           PPBAR;
+            int off_tick =
+                (int)(cur_midi_idx + ((g->m_eg1.m_attack_time_msec +
+                                       g->m_eg1.m_decay_time_msec +
+                                       g->engine.sustain_note_ms) *
+                                      mixr->timing_info.ms_per_midi_tick)) %
+                PPBAR;
             midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
             midi_pattern_add_event(pattern, off_tick, off_event);
         }
-        else if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx].event_type ==
-                 MIDI_OFF)
+        else if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]
+                     .event_type == MIDI_OFF)
         {
             // printf("[%d] OFF\n", idx);
-            midi_event_clear(&g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]);
+            midi_event_clear(
+                &g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]);
             g->m_eg1.m_state = RELEASE;
         }
 
@@ -305,6 +310,12 @@ stereo_val looper_gennext(void *self)
                 int attack_time_pct = g->grain_attack_time_pct;
                 int release_time_pct = g->grain_release_time_pct;
 
+                bool enable_debug = false;
+                if (g->debug_pending)
+                {
+                    enable_debug = true;
+                    g->debug_pending = false;
+                }
                 sound_grain_params params = {.dur = duration,
                                              .starting_idx = grain_idx,
                                              .attack_pct = attack_time_pct,
@@ -312,7 +323,8 @@ stereo_val looper_gennext(void *self)
                                              .reverse_mode = g->reverse_mode,
                                              .pitch = g->grain_pitch,
                                              .num_channels = g->num_channels,
-                                             .degrade_by = g->degrade_by};
+                                             .degrade_by = g->degrade_by,
+                                             .debug = enable_debug};
 
                 sound_grain_init(&g->m_grains[g->cur_grain_num], params);
                 g->num_active_grains = looper_count_active_grains(g);
@@ -320,6 +332,7 @@ stereo_val looper_gennext(void *self)
 
             // STEP 2 - gather vals from all active grains
             for (int i = 0; i < g->highest_grain_num; i++)
+            // for (int i = 0; i < 1 && i < g->highest_grain_num; i++)
             {
                 sound_grain *sgr = &g->m_grains[i];
                 stereo_val tmp = sound_grain_generate(sgr, g->audio_buffer,
@@ -464,6 +477,7 @@ void sound_grain_init(sound_grain *g, sound_grain_params params)
     g->release_time_pct = params.release_pct;
     g->audiobuffer_num_channels = params.num_channels;
     g->degrade_by = params.degrade_by;
+    g->debug = params.debug;
 
     g->reverse_mode = params.reverse_mode;
     if (params.reverse_mode)
@@ -564,9 +578,12 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 
 double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
 {
+    if (!g->active)
+        return 0.;
+
     double amp = 1;
-    double percent_pos =
-        (float)g->grain_counter_frames / g->grain_len_frames * 100;
+    double one_percent = g->grain_len_frames / 100.0;
+    double percent_pos = g->grain_counter_frames / one_percent;
 
     switch (envelope_mode)
     {
@@ -582,6 +599,8 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
             amp *= (100 - percent_pos) / g->release_time_pct;
         break;
     case (LOOPER_ENV_TUKEY_WINDOW):
+        // amp = 0.5 * (1 - cos(2 * M_PI * g->grain_counter_frames /
+        //                     g->attack_time_samples));
         if (percent_pos < g->attack_time_pct)
         {
             amp = (1.0 + cos(M_PI + (M_PI * (g->grain_counter_frames /
@@ -597,13 +616,17 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
         break;
     case (LOOPER_ENV_GENERATOR):
         amp = eg_do_envelope(&g->eg, NULL);
-        // printf("AMP is %f\n", amp);
+        // printf("PCT:%f FRAME:%d AMP is %f\n", percent_pos,
+        //      g->grain_counter_frames, amp);
         if (percent_pos > (100 - g->release_time_pct))
         {
             eg_note_off(&g->eg);
         }
         break;
     }
+
+    if (g->debug)
+        printf("%f\n", amp);
 
     return amp;
 }
@@ -857,3 +880,5 @@ void looper_set_degrade_by(looper *l, int degradation)
     if (degradation >= 0 && degradation <= 100)
         l->degrade_by = degradation;
 }
+
+void looper_set_trace_envelope(looper *l) { l->debug_pending = true; }
