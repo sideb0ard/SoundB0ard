@@ -30,6 +30,7 @@ looper *new_looper(char *filename)
     g->quasi_grain_fudge = 220;
     g->selection_mode = GRAIN_SELECTION_STATIC;
     g->envelope_mode = LOOPER_ENV_GENERATOR;
+    g->envelope_mode = LOOPER_ENV_PARABOLIC;
     g->envelope_taper_ratio = 0.5;
     g->reverse_mode = 0; // bool
     g->external_source_sg = -1;
@@ -603,15 +604,21 @@ double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
         //                     g->attack_time_samples));
         if (percent_pos < g->attack_time_pct)
         {
-            amp = (1.0 + cos(M_PI + (M_PI * (g->grain_counter_frames /
-                                             g->attack_time_samples)) *
-                                        (1.0 / 2.0)));
+            amp = (1.0 + cos(M_PI + (M_PI *
+                                     ((double)g->grain_counter_frames /
+                                      g->attack_time_samples) *
+                                     (1.0 / 2.0))));
         }
         else if (percent_pos > (100 - g->release_time_pct))
         {
-            amp = (1.0 + cos(M_PI * (g->grain_counter_frames /
-                                     g->release_time_samples)) *
-                             (1.0 / 2.0));
+            double attack_and_sustain_len_frames =
+                g->grain_len_frames - g->release_time_samples;
+
+            amp =
+                cos(M_PI *
+                    ((g->grain_counter_frames - attack_and_sustain_len_frames) /
+                     g->release_time_samples) *
+                    (1.0 / 2.0));
         }
         break;
     case (LOOPER_ENV_GENERATOR):
