@@ -298,7 +298,7 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             }
             else
             {
-                soundgenerator *sg = mixr->sound_generators[soundgen_num];
+                sound_generator *sg = mixr->sound_generators[soundgen_num];
                 check_and_set_pattern(sg, pattern_num, NOTE_PATTERN, &wurds[0],
                                       num_wurds);
             }

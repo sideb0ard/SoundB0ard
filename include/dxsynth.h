@@ -97,7 +97,7 @@ typedef struct dxsynthsettings
 
 typedef struct dxsynth
 {
-    soundgenerator sound_generator;
+    sound_generator sg;
     sequence_engine engine;
 
     dxsynth_voice *m_voices[MAX_DX_VOICES];
@@ -111,7 +111,6 @@ typedef struct dxsynth
 
     int active_midi_osc; // for midi controller routing
 
-    double vol;
     double m_last_note_frequency;
 
 } dxsynth;
@@ -123,8 +122,6 @@ void dxsynth_del_self(void *self);
 // sound generator interface //////////////
 stereo_val dxsynth_gennext(void *self);
 void dxsynth_status(void *self, wchar_t *status_string);
-void dxsynth_setvol(void *self, double v);
-double dxsynth_getvol(void *self);
 void dxsynth_sg_start(void *self);
 void dxsynth_sg_stop(void *self);
 int dxsynth_get_num_patterns(void *self);

@@ -13,10 +13,9 @@ static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
 
 typedef struct drumsynth
 {
-    soundgenerator sg;
+    sound_generator sg;
     sequence_engine engine;
     char m_patch_name[512];
-    double vol;
     bool reset_osc;
 
     // OSC1 ///////////////////////////
@@ -63,9 +62,7 @@ drumsynth *new_drumsynth(void);
 void drumsynth_del_self(void *self);
 
 void drumsynth_status(void *self, wchar_t *ss);
-void drumsynth_setvol(void *self, double v);
 stereo_val drumsynth_gennext(void *self);
-double drumsynth_getvol(void *self);
 
 void drumsynth_start(void *self);
 void drumsynth_stop(void *self);

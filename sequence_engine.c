@@ -229,7 +229,7 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
 
 void sequence_engine_event_notify(void *self, broadcast_event event)
 {
-    soundgenerator *parent = (soundgenerator *)self;
+    sound_generator *parent = (sound_generator *)self;
     if (!parent->active)
         return;
 
@@ -915,7 +915,7 @@ void sequence_engine_set_arp_mode(sequence_engine *engine, unsigned int mode)
         engine->arp.mode = mode;
 }
 
-void sequence_engine_do_arp(sequence_engine *engine, soundgenerator *parent)
+void sequence_engine_do_arp(sequence_engine *engine, sound_generator *parent)
 {
     int midi_note = arp_next_note(&engine->arp);
     if (midi_note != -1)

@@ -20,7 +20,6 @@ static char *s_external_mode_names[] = {"FOLLOW", "CAPTURE"};
 looper *new_looper(char *filename)
 {
     looper *g = (looper *)calloc(1, sizeof(looper));
-    g->vol = 0.7;
     g->have_active_buffer = false;
 
     g->audio_buffer_read_idx = 0;
@@ -55,21 +54,23 @@ looper *new_looper(char *filename)
     g->fill_factor = 3.;
     looper_set_grain_density(g, 30);
 
-    g->sound_generator.gennext = &looper_gennext;
-    g->sound_generator.status = &looper_status;
-    g->sound_generator.getvol = &looper_getvol;
-    g->sound_generator.setvol = &looper_setvol;
-    g->sound_generator.start = &looper_start;
-    g->sound_generator.stop = &looper_stop;
-    g->sound_generator.get_num_patterns = &looper_get_num_patterns;
-    g->sound_generator.set_num_patterns = &looper_set_num_patterns;
-    g->sound_generator.make_active_track = &looper_make_active_track;
-    g->sound_generator.self_destruct = &looper_del_self;
-    g->sound_generator.event_notify = &looper_event_notify;
-    g->sound_generator.get_pattern = &looper_get_pattern;
-    g->sound_generator.set_pattern = &looper_set_pattern;
-    g->sound_generator.is_valid_pattern = &looper_is_valid_pattern;
-    g->sound_generator.type = LOOPER_TYPE;
+    g->sg.gennext = &looper_gennext;
+    g->sg.status = &looper_status;
+    g->sg.get_volume = &sound_generator_get_volume;
+    g->sg.set_volume = &sound_generator_set_volume;
+    g->sg.get_pan = &sound_generator_get_pan;
+    g->sg.set_pan = &sound_generator_set_pan;
+    g->sg.start = &looper_start;
+    g->sg.stop = &looper_stop;
+    g->sg.get_num_patterns = &looper_get_num_patterns;
+    g->sg.set_num_patterns = &looper_set_num_patterns;
+    g->sg.make_active_track = &looper_make_active_track;
+    g->sg.self_destruct = &looper_del_self;
+    g->sg.event_notify = &looper_event_notify;
+    g->sg.get_pattern = &looper_get_pattern;
+    g->sg.set_pattern = &looper_set_pattern;
+    g->sg.is_valid_pattern = &looper_is_valid_pattern;
+    g->sg.type = LOOPER_TYPE;
 
     if (strncmp(filename, "none", 4) != 0)
         looper_import_file(g, filename);
@@ -80,6 +81,8 @@ looper *new_looper(char *filename)
     envelope_generator_init(&g->m_eg1); // start/stop env
     g->m_eg1.m_attack_time_msec = 10;
     g->m_eg1.m_release_time_msec = 50;
+
+    sound_generator_init(&g->sg);
 
     g->degrade_by = 0;
     g->gate_mode = false;
@@ -253,11 +256,11 @@ stereo_val looper_gennext(void *self)
     looper *g = (looper *)self;
     stereo_val val = {0., 0.};
 
-    if (!g->started || !g->sound_generator.active)
+    if (!g->started || !g->sg.active)
         return val;
 
     if (g->stop_pending && g->m_eg1.m_state == OFFF)
-        g->sound_generator.active = false;
+        g->sg.active = false;
 
     if (g->external_source_sg != -1)
     {
@@ -351,10 +354,10 @@ stereo_val looper_gennext(void *self)
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
 
-    val.left = val.left * g->vol * eg_amp;
-    val.right = val.right * g->vol * eg_amp;
+    val.left = val.left * g->sg.volume * eg_amp;
+    val.right = val.right * g->sg.volume * eg_amp;
 
-    val = effector(&g->sound_generator, val);
+    val = effector(&g->sg, val);
 
     return val;
 }
@@ -363,7 +366,7 @@ void looper_status(void *self, wchar_t *status_string)
 {
     looper *g = (looper *)self;
     char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
-    if (g->sound_generator.active)
+    if (g->sg.active)
         INSTRUMENT_COLOR = ANSI_COLOR_RED;
 
     swprintf(
@@ -384,7 +387,7 @@ void looper_status(void *self, wchar_t *status_string)
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
         // clang-format on
 
-        g->filename, INSTRUMENT_COLOR, g->vol, g->grain_pitch,
+        g->filename, INSTRUMENT_COLOR, g->sg.volume, g->grain_pitch,
         g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
         g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
         g->grain_attack_time_pct, g->grain_release_time_pct, g->loop_len,
@@ -413,7 +416,7 @@ void looper_start(void *self)
 {
     looper *l = (looper *)self;
     eg_start_eg(&l->m_eg1);
-    l->sound_generator.active = true;
+    l->sg.active = true;
     l->stop_pending = false;
     l->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
@@ -423,22 +426,6 @@ void looper_stop(void *self)
     looper *l = (looper *)self;
     eg_release(&l->m_eg1);
     l->stop_pending = true;
-}
-
-double looper_getvol(void *self)
-{
-    looper *g = (looper *)self;
-    return g->vol;
-}
-
-void looper_setvol(void *self, double v)
-{
-    looper *g = (looper *)self;
-    if (v < 0.0 || v > 1.0)
-    {
-        return;
-    }
-    g->vol = v;
 }
 
 void looper_del_self(void *self)

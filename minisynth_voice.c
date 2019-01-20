@@ -21,13 +21,13 @@ void minisynth_voice_init(minisynth_voice *msv)
 
     // initialize all my oscillators
     osc_new_settings(&msv->m_osc1.osc);
-    qb_set_soundgenerator_interface(&msv->m_osc1);
+    qb_set_sound_generator_interface(&msv->m_osc1);
     osc_new_settings(&msv->m_osc2.osc);
-    qb_set_soundgenerator_interface(&msv->m_osc2);
+    qb_set_sound_generator_interface(&msv->m_osc2);
     osc_new_settings(&msv->m_osc3.osc);
-    qb_set_soundgenerator_interface(&msv->m_osc3);
+    qb_set_sound_generator_interface(&msv->m_osc3);
     osc_new_settings(&msv->m_osc4.osc);
-    qb_set_soundgenerator_interface(&msv->m_osc4);
+    qb_set_sound_generator_interface(&msv->m_osc4);
     // or use wavetable versions
     // wt_initialize(&msv->m_osc1);
     // wt_initialize(&msv->m_osc2);

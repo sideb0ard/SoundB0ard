@@ -9,13 +9,12 @@
 
 typedef struct digisynth
 {
-    soundgenerator sound_generator;
+    sound_generator sg;
     sequence_engine engine;
 
     char audiofile[1024];
     digisynth_voice m_voices[MAX_VOICES];
 
-    double vol;
     double m_last_note_frequency;
 
 } digisynth;
@@ -28,8 +27,6 @@ void digisynth_update(digisynth *ds);
 // sound generator interface //////////////
 stereo_val digisynth_gennext(void *self);
 void digisynth_status(void *self, wchar_t *status_string);
-void digisynth_setvol(void *self, double v);
-double digisynth_getvol(void *self);
 void digisynth_stop(digisynth *d);
 void digisynth_sg_start(void *self);
 void digisynth_sg_stop(void *self);

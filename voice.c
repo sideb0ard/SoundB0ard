@@ -36,9 +36,9 @@ void voice_init(voice *v)
     envelope_generator_init(&v->m_eg4);
 
     osc_new_settings((oscillator *)&v->m_lfo1);
-    lfo_set_soundgenerator_interface(&v->m_lfo1);
+    lfo_set_sound_generator_interface(&v->m_lfo1);
     osc_new_settings((oscillator *)&v->m_lfo2);
-    lfo_set_soundgenerator_interface(&v->m_lfo2);
+    lfo_set_sound_generator_interface(&v->m_lfo2);
 
     dca_initialize(&v->m_dca);
 

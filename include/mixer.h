@@ -81,7 +81,7 @@ typedef struct mixer
     algorithm *algorithms[MAX_NUM_ALGORITHMS];
     int algorithm_num;
 
-    soundgenerator *sound_generators[MAX_NUM_SOUND_GENERATORS];
+    sound_generator *sound_generators[MAX_NUM_SOUND_GENERATORS];
     int soundgen_num; // actual number of SGs
 
     pattern_generator *pattern_generators[MAX_NUM_PATTERN_GENERATORS];
@@ -182,7 +182,7 @@ int add_dxsynth(mixer *mixr);
 int add_digisynth(mixer *mixr, char *filename);
 int add_looper(mixer *mixr, char *filename);
 
-int add_sound_generator(mixer *mixr, soundgenerator *sg);
+int add_sound_generator(mixer *mixr, sound_generator *sg);
 int add_pattern_generator(mixer *mixr, pattern_generator *sg);
 int add_value_generator(mixer *mixr, value_generator *vg);
 
@@ -238,8 +238,8 @@ void mixer_next_chord(mixer *mixr);
 
 // these are in mixer.h rather than sequence_engine, as mixer needs to transform
 // sg first
-sequence_engine *get_sequence_engine(soundgenerator *self);
-void synth_handle_midi_note(soundgenerator *sg, int note, int velocity,
+sequence_engine *get_sequence_engine(sound_generator *self);
+void synth_handle_midi_note(sound_generator *sg, int note, int velocity,
                             bool update_last_midi);
 
 #endif // MIXER_H

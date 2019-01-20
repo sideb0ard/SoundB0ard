@@ -35,21 +35,24 @@ minisynth *new_minisynth(void)
 
     sequence_engine_init(&ms->engine, (void *)ms, MINISYNTH_TYPE);
 
-    ms->sound_generator.gennext = &minisynth_gennext;
-    ms->sound_generator.status = &minisynth_status;
-    ms->sound_generator.setvol = &minisynth_setvol;
-    ms->sound_generator.getvol = &minisynth_getvol;
-    ms->sound_generator.start = &minisynth_sg_start;
-    ms->sound_generator.stop = &minisynth_sg_stop;
-    ms->sound_generator.get_num_patterns = &minisynth_get_num_patterns;
-    ms->sound_generator.set_num_patterns = &minisynth_set_num_patterns;
-    ms->sound_generator.event_notify = &sequence_engine_event_notify;
-    ms->sound_generator.make_active_track = &minisynth_make_active_track;
-    ms->sound_generator.set_pattern = &minisynth_set_pattern;
-    ms->sound_generator.get_pattern = &minisynth_get_pattern;
-    ms->sound_generator.self_destruct = &minisynth_del_self;
-    ms->sound_generator.is_valid_pattern = &minisynth_is_valid_pattern;
-    ms->sound_generator.type = MINISYNTH_TYPE;
+    ms->sg.gennext = &minisynth_gennext;
+    ms->sg.status = &minisynth_status;
+    ms->sg.set_volume = &sound_generator_set_volume;
+    ms->sg.get_volume = &sound_generator_get_volume;
+    ms->sg.set_pan = &sound_generator_set_pan;
+    ms->sg.get_pan = &sound_generator_get_pan;
+    ms->sg.start = &minisynth_sg_start;
+    ms->sg.stop = &minisynth_sg_stop;
+    ms->sg.get_num_patterns = &minisynth_get_num_patterns;
+    ms->sg.set_num_patterns = &minisynth_set_num_patterns;
+    ms->sg.event_notify = &sequence_engine_event_notify;
+    ms->sg.make_active_track = &minisynth_make_active_track;
+    ms->sg.set_pattern = &minisynth_set_pattern;
+    ms->sg.get_pattern = &minisynth_get_pattern;
+    ms->sg.self_destruct = &minisynth_del_self;
+    ms->sg.is_valid_pattern = &minisynth_is_valid_pattern;
+    ms->sg.type = MINISYNTH_TYPE;
+    sound_generator_init(&ms->sg);
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -75,7 +78,7 @@ minisynth *new_minisynth(void)
 
     minisynth_load_defaults(ms);
     minisynth_update(ms);
-    ms->sound_generator.active = true;
+    ms->sg.active = true;
 
     return ms;
 }
@@ -195,7 +198,6 @@ void minisynth_load_defaults(minisynth *ms)
     ms->m_settings.m_sub_osc_db = -96.000000;
 
     ms->m_settings.m_noise_osc_db = -96.000000;
-    ms->m_settings.m_volume_db = 0.7;
     ms->m_settings.m_legato_mode = DEFAULT_LEGATO_MODE;
     ms->m_settings.m_pitchbend_range = 1;
     ms->m_settings.m_reset_to_zero = DEFAULT_RESET_TO_ZERO;
@@ -371,7 +373,7 @@ void minisynth_update(minisynth *ms)
 
     // --- dca:
     ms->m_global_synth_params.dca_params.amplitude_db =
-        ms->m_settings.m_volume_db;
+        ms->sg.volume;
 
     // --- enable/disable mod matrix stuff
     // LFO1 routings
@@ -729,7 +731,7 @@ void minisynth_status(void *self, wchar_t *status_string)
     char *INSTRUMENT_YELLOW = ANSI_COLOR_RESET;
     char *INSTRUMENT_ORANGE = ANSI_COLOR_RESET;
     char *INSTRUMENT_PINK = ANSI_COLOR_RESET;
-    if (ms->sound_generator.active)
+    if (ms->sg.active)
     {
         INSTRUMENT_YELLOW = COOL_COLOR_YELLOW;
         INSTRUMENT_ORANGE = COOL_COLOR_ORANGE;
@@ -779,7 +781,7 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         ms->m_settings.m_settings_name,
         INSTRUMENT_YELLOW,
-        ms->m_settings.m_volume_db,
+        ms->sg.volume,
         s_voice_names[ms->m_settings.m_voice_mode],
         INSTRUMENT_YELLOW,
         ms->m_settings.m_voice_mode,
@@ -907,6 +909,7 @@ void minisynth_status(void *self, wchar_t *status_string)
 
         INSTRUMENT_YELLOW
         );
+    // clang-format on
 
     wchar_t scratch[1024] = {};
     sequence_engine_status(&ms->engine, scratch);
@@ -921,22 +924,6 @@ void minisynth_print_lfo1_routing_info(minisynth *ms, wchar_t *scratch)
 void minisynth_print_eg1_routing_info(minisynth *ms, wchar_t *scratch)
 {
     print_modulation_matrix_info_eg1(&ms->m_ms_modmatrix, scratch);
-}
-
-void minisynth_setvol(void *self, double v)
-{
-    minisynth *ms = (minisynth *)self;
-    if (v < 0.0 || v > 1.0)
-    {
-        return;
-    }
-    ms->m_settings.m_volume_db = v;
-}
-
-double minisynth_getvol(void *self)
-{
-    minisynth *ms = (minisynth *)self;
-    return ms->m_settings.m_volume_db;
 }
 
 int minisynth_get_num_patterns(void *self)
@@ -963,7 +950,7 @@ stereo_val minisynth_gennext(void *self)
 
     minisynth *ms = (minisynth *)self;
 
-    if (!ms->sound_generator.active)
+    if (!ms->sg.active)
         return (stereo_val){0, 0};
 
     double accum_out_left = 0.0;
@@ -983,15 +970,16 @@ stereo_val minisynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    stereo_val out = {.left = accum_out_left * ms->m_settings.m_volume_db, .right=accum_out_right * ms->m_settings.m_volume_db};
+    stereo_val out = {.left = accum_out_left * ms->sg.volume,
+                      .right = accum_out_right * ms->sg.volume};
 
-    out = effector(&ms->sound_generator, out);
+    out = effector(&ms->sg, out);
     return out;
 }
 
 void minisynth_rand_settings(minisynth *ms)
 {
-    //printf("Randomizing SYNTH!\n");
+    // printf("Randomizing SYNTH!\n");
 
     strncpy(ms->m_settings.m_settings_name, "-- random UNSAVED--", 256);
     ms->m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
@@ -1009,9 +997,8 @@ void minisynth_rand_settings(minisynth *ms)
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
     ms->m_settings.m_lfo1_filter_fc_enabled = rand() % 2;
     ms->m_settings.m_filter_type = rand() % NUM_FILTER_TYPES;
-     ms->m_settings.m_lfo1_amp_intensity = ((float)rand() /
-    (float)(RAND_MAX));
-    //ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
+    ms->m_settings.m_lfo1_amp_intensity = ((float)rand() / (float)(RAND_MAX));
+    // ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo1_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
     // ms->m_settings.m_lfo1_pan_enabled = rand() % 2;
@@ -1030,9 +1017,8 @@ void minisynth_rand_settings(minisynth *ms)
     ms->m_settings.m_lfo2_filter_fc_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
     ms->m_settings.m_lfo2_filter_fc_enabled = rand() % 2;
-    ms->m_settings.m_lfo2_amp_intensity = ((float)rand() /
-    (float)(RAND_MAX));
-    //ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
+    ms->m_settings.m_lfo2_amp_intensity = ((float)rand() / (float)(RAND_MAX));
+    // ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
     // ms->m_settings.m_lfo2_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
     // ms->m_settings.m_lfo2_pan_enabled = rand() % 2;
@@ -1079,7 +1065,7 @@ void minisynth_rand_settings(minisynth *ms)
 
     minisynth_update(ms);
 
-    //minisynth_print_settings(ms);
+    // minisynth_print_settings(ms);
 }
 
 bool minisynth_save_settings(minisynth *ms, char *preset_name)
@@ -1204,10 +1190,11 @@ bool minisynth_save_settings(minisynth *ms, char *preset_name)
     fprintf(presetzzz, "::release_time_msec=%f",
             ms->m_settings.m_eg1_release_time_msec);
     settings_count++;
-    fprintf(presetzzz, "::sustain_level=%f", ms->m_settings.m_eg1_sustain_level);
+    fprintf(presetzzz, "::sustain_level=%f",
+            ms->m_settings.m_eg1_sustain_level);
     settings_count++;
 
-    fprintf(presetzzz, "::volume_db=%f", ms->m_settings.m_volume_db);
+    fprintf(presetzzz, "::volume_db=%f", ms->sg.volume);
     settings_count++;
     fprintf(presetzzz, "::fc_control=%f", ms->m_settings.m_fc_control);
     settings_count++;
@@ -1532,7 +1519,7 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
             }
             else if (strcmp(setting_key, "volume_db") == 0)
             {
-                ms->m_settings.m_volume_db = scratch_val;
+                ms->sg.volume = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "fc_control") == 0)
@@ -1733,7 +1720,7 @@ void minisynth_print_settings(minisynth *ms)
     printf("Sub OSC Db (subosc): %f [-96-0]\n", ms->m_settings.m_sub_osc_db);
     printf("Velocity to Attack Scaling (vascale): %d [0,1]\n",
            ms->m_settings.m_velocity_to_attack_scaling); // unsigned
-    printf("Volume (vol): %f [0-1]\n", ms->m_settings.m_volume_db);
+    printf("Volume (vol): %f [0-1]\n", ms->sg.volume);
     printf("Reset To Zero (zero): %d [0,1]\n",
            ms->m_settings.m_reset_to_zero); // unsigned
 
@@ -1743,7 +1730,8 @@ void minisynth_print_settings(minisynth *ms)
     printf("EG1 Decay Time ms (decayms): %f [%d-%d]\n",
            ms->m_settings.m_eg1_decay_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
     printf("EG1 Release Time ms (releasems): %f [%d-%d]\n",
-           ms->m_settings.m_eg1_release_time_msec, EG_MINTIME_MS, EG_MAXTIME_MS);
+           ms->m_settings.m_eg1_release_time_msec, EG_MINTIME_MS,
+           EG_MAXTIME_MS);
     printf("EG1 Sustain Level (sustainlvl): %f [0-1]\n",
            ms->m_settings.m_eg1_sustain_level);
     printf("EG1 Sustain Override (sustain): %d [0,1]\n",
@@ -1804,14 +1792,14 @@ void minisynth_stop(minisynth *ms)
 void minisynth_sg_start(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    ms->sound_generator.active = true;
+    ms->sg.active = true;
     ms->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void minisynth_sg_stop(void *self)
 {
     minisynth *ms = (minisynth *)self;
-    ms->sound_generator.active = false;
+    ms->sg.active = false;
     minisynth_stop(ms);
 }
 
@@ -1831,7 +1819,8 @@ void minisynth_set_filter_mod(minisynth *ms, double mod)
 
 void minisynth_print(minisynth *ms) { minisynth_print_settings(ms); }
 
-void minisynth_set_eg_attack_time_ms(minisynth *ms, unsigned int eg_num, double val)
+void minisynth_set_eg_attack_time_ms(minisynth *ms, unsigned int eg_num,
+                                     double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
     {
@@ -1844,7 +1833,8 @@ void minisynth_set_eg_attack_time_ms(minisynth *ms, unsigned int eg_num, double 
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
-void minisynth_set_eg_decay_time_ms(minisynth *ms, unsigned int eg_num, double val)
+void minisynth_set_eg_decay_time_ms(minisynth *ms, unsigned int eg_num,
+                                    double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
     {
@@ -1857,7 +1847,8 @@ void minisynth_set_eg_decay_time_ms(minisynth *ms, unsigned int eg_num, double v
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
-void minisynth_set_eg_release_time_ms(minisynth *ms, unsigned int eg_num, double val)
+void minisynth_set_eg_release_time_ms(minisynth *ms, unsigned int eg_num,
+                                      double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
     {
@@ -1877,23 +1868,20 @@ void minisynth_set_osc_amp(minisynth *ms, unsigned int osc_num, double val)
 
     if (val >= -1 && val <= 1)
     {
-        switch(osc_num){
-        case(1):
-        ms->m_settings.osc1_amp
-            = val;
-        break;
-        case(2):
-        ms->m_settings.osc2_amp
-            = val;
-        break;
-        case(3):
-        ms->m_settings.osc3_amp
-            = val;
-        break;
-        case(4):
-        ms->m_settings.osc4_amp
-            = val;
-        break;
+        switch (osc_num)
+        {
+        case (1):
+            ms->m_settings.osc1_amp = val;
+            break;
+        case (2):
+            ms->m_settings.osc2_amp = val;
+            break;
+        case (3):
+            ms->m_settings.osc3_amp = val;
+            break;
+        case (4):
+            ms->m_settings.osc4_amp = val;
+            break;
         }
     }
     else
@@ -1907,23 +1895,20 @@ void minisynth_set_osc_cents(minisynth *ms, unsigned int osc_num, double val)
 
     if (val >= -100 && val <= 100)
     {
-        switch(osc_num){
-        case(1):
-        ms->m_settings.osc1_cents
-            = val;
-        break;
-        case(2):
-        ms->m_settings.osc2_cents
-            = val;
-        break;
-        case(3):
-        ms->m_settings.osc3_cents
-            = val;
-        break;
-        case(4):
-        ms->m_settings.osc4_cents
-            = val;
-        break;
+        switch (osc_num)
+        {
+        case (1):
+            ms->m_settings.osc1_cents = val;
+            break;
+        case (2):
+            ms->m_settings.osc2_cents = val;
+            break;
+        case (3):
+            ms->m_settings.osc3_cents = val;
+            break;
+        case (4):
+            ms->m_settings.osc4_cents = val;
+            break;
         }
     }
     else
@@ -1980,9 +1965,9 @@ void minisynth_set_eg_filter_int(minisynth *ms, unsigned int eg_num, double val)
 {
     if (val >= -1 && val <= 1)
     {
-        if (eg_num ==1 )
+        if (eg_num == 1)
             ms->m_settings.m_eg1_filter_intensity = val;
-        else if (eg_num ==2 )
+        else if (eg_num == 2)
             ms->m_settings.m_eg2_filter_intensity = val;
     }
     else
@@ -2157,7 +2142,8 @@ void minisynth_set_lfo_pan_enable(minisynth *ms, int lfo_num, int val)
         printf("Must be a boolean 0 or 1\n");
 }
 
-void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num, unsigned int val)
+void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num,
+                                         unsigned int val)
 {
     if (val == 0 || val == 1)
     {
@@ -2246,7 +2232,6 @@ void minisynth_set_lfo_pulsewidth_int(minisynth *ms, int lfo_num, double val)
     else
         printf("val must be between -1 and 1\n");
 }
-
 
 void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val)
 {
@@ -2409,7 +2394,8 @@ void minisynth_set_eg_sustain(minisynth *ms, unsigned int eg_num, double val)
         printf("val must be between 0 and 1\n");
 }
 
-void minisynth_set_eg_sustain_override(minisynth *ms, unsigned int eg_num, bool b)
+void minisynth_set_eg_sustain_override(minisynth *ms, unsigned int eg_num,
+                                       bool b)
 {
     if (eg_num == 1)
         ms->m_settings.m_eg1_sustain_override = b;
@@ -2433,14 +2419,6 @@ void minisynth_set_voice_mode(minisynth *ms, unsigned int val)
         ms->m_settings.m_voice_mode = val;
     else
         printf("val must be between 0 and %d\n", MAX_VOICE_CHOICE);
-}
-
-void minisynth_set_vol(minisynth *ms, double val)
-{
-    if (val >= 0 && val <= 1)
-        ms->m_settings.m_volume_db = val;
-    else
-        printf("val must be between 0 and 1\n");
 }
 
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
@@ -2471,7 +2449,8 @@ midi_event *minisynth_get_pattern(void *self, int pattern_num)
     return NULL;
 }
 
-void minisynth_set_pattern(void *self, int pattern_num, pattern_change_info change_info, midi_event *pattern)
+void minisynth_set_pattern(void *self, int pattern_num,
+                           pattern_change_info change_info, midi_event *pattern)
 {
     minisynth_stop(self);
     sequence_engine *engine = get_sequence_engine(self);
@@ -2481,22 +2460,22 @@ void minisynth_set_pattern(void *self, int pattern_num, pattern_change_info chan
 
 void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type)
 {
-    if ( osc > 0
-       && osc < 4
-       && osc_type < MAX_OSC)
+    if (osc > 0 && osc < 4 && osc_type < MAX_OSC)
     {
-        printf("Setting OSC %d to %s(%d)\n", osc, s_waveform_names[osc_type], osc_type);
-        switch(osc){
-        case(1):
+        printf("Setting OSC %d to %s(%d)\n", osc, s_waveform_names[osc_type],
+               osc_type);
+        switch (osc)
+        {
+        case (1):
             ms->m_global_synth_params.osc1_params.waveform = osc_type;
             break;
-        case(2):
+        case (2):
             ms->m_global_synth_params.osc2_params.waveform = osc_type;
             break;
-        case(3):
+        case (3):
             ms->m_global_synth_params.osc3_params.waveform = osc_type;
             break;
-        case(4):
+        case (4):
             ms->m_global_synth_params.osc4_params.waveform = osc_type;
             break;
         }

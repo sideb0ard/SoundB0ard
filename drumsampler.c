@@ -18,35 +18,36 @@ drumsampler *new_drumsampler(char *filename)
 {
     drumsampler *ds = (drumsampler *)calloc(1, sizeof(drumsampler));
 
-    sequence_engine_init(&ds->engine, (void *)ds, DRUMSAMPLER_TYPE);
-    envelope_generator_init(&ds->eg);
-    ds->envelope_enabled = false;
-
     drumsampler_import_file(ds, filename);
 
-    ds->sound_generator.active = true;
-    ds->started = false;
-
-    ds->vol = 0.7;
-
+    ds->envelope_enabled = false;
     ds->glitch_mode = false;
     ds->glitch_rand_factor = 20;
 
-    ds->sound_generator.gennext = &drumsampler_gennext;
-    ds->sound_generator.status = &drumsampler_status;
-    ds->sound_generator.getvol = &drumsampler_getvol;
-    ds->sound_generator.setvol = &drumsampler_setvol;
-    ds->sound_generator.start = &drumsampler_start;
-    ds->sound_generator.stop = &drumsampler_stop;
-    ds->sound_generator.get_num_patterns = &drumsampler_get_num_patterns;
-    ds->sound_generator.set_num_patterns = &drumsampler_set_num_patterns;
-    ds->sound_generator.make_active_track = &drumsampler_make_active_track;
-    ds->sound_generator.self_destruct = &drumsampler_del_self;
-    ds->sound_generator.event_notify = &sequence_engine_event_notify;
-    ds->sound_generator.get_pattern = &drumsampler_get_pattern;
-    ds->sound_generator.set_pattern = &drumsampler_set_pattern;
-    ds->sound_generator.is_valid_pattern = &drumsampler_is_valid_pattern;
-    ds->sound_generator.type = DRUMSAMPLER_TYPE;
+    ds->sg.gennext = &drumsampler_gennext;
+    ds->sg.status = &drumsampler_status;
+    ds->sg.get_volume = &sound_generator_get_volume;
+    ds->sg.set_volume = &sound_generator_set_volume;
+    ds->sg.get_pan = &sound_generator_get_pan;
+    ds->sg.set_pan = &sound_generator_set_pan;
+    ds->sg.start = &drumsampler_start;
+    ds->sg.stop = &drumsampler_stop;
+    ds->sg.get_num_patterns = &drumsampler_get_num_patterns;
+    ds->sg.set_num_patterns = &drumsampler_set_num_patterns;
+    ds->sg.make_active_track = &drumsampler_make_active_track;
+    ds->sg.self_destruct = &drumsampler_del_self;
+    ds->sg.event_notify = &sequence_engine_event_notify;
+    ds->sg.get_pattern = &drumsampler_get_pattern;
+    ds->sg.set_pattern = &drumsampler_set_pattern;
+    ds->sg.is_valid_pattern = &drumsampler_is_valid_pattern;
+    ds->sg.type = DRUMSAMPLER_TYPE;
+
+    envelope_generator_init(&ds->eg);
+    sequence_engine_init(&ds->engine, (void *)ds, DRUMSAMPLER_TYPE);
+    sound_generator_init(&ds->sg);
+
+    ds->sg.active = true;
+    ds->started = false;
 
     return ds;
 }
@@ -168,12 +169,12 @@ stereo_val drumsampler_gennext(void *self)
     if (ds->eg.m_state == SUSTAIN)
         eg_note_off(&ds->eg);
 
-    double volume = ds->vol;
+    double volume = ds->sg.volume;
     if (ds->envelope_enabled)
         volume *= amp_env;
 
     stereo_val out = {.left = left_val * volume, .right = right_val * volume};
-    out = effector(&ds->sound_generator, out);
+    out = effector(&ds->sg, out);
     return out;
 }
 
@@ -190,7 +191,7 @@ void drumsampler_status(void *self, wchar_t *status_string)
     drumsampler *ds = (drumsampler *)self;
 
     char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
-    if (ds->sound_generator.active)
+    if (ds->sg.active)
     {
         INSTRUMENT_COLOR = ANSI_COLOR_BLUE;
     }
@@ -202,7 +203,7 @@ void drumsampler_status(void *self, wchar_t *status_string)
              "eg:%d attack_ms:%.0f decay_ms:%.0f sustain:%.2f "
              "release_ms:%.0f glitch:%d gpct:%d\n"
              "multi:%d num_patterns:%d",
-             ds->filename, INSTRUMENT_COLOR, ds->vol, ds->buffer_pitch,
+             ds->filename, INSTRUMENT_COLOR, ds->sg.volume, ds->buffer_pitch,
              ds->engine.allow_triplets, ds->buf_end_pos, ds->envelope_enabled,
              ds->eg.m_attack_time_msec, ds->eg.m_decay_time_msec,
              ds->eg.m_sustain_level, ds->eg.m_release_time_msec,
@@ -215,22 +216,6 @@ void drumsampler_status(void *self, wchar_t *status_string)
     sequence_engine_status(&ds->engine, local_status_string);
     wcscat(status_string, local_status_string);
     wcscat(status_string, WANSI_COLOR_RESET);
-}
-
-double drumsampler_getvol(void *self)
-{
-    drumsampler *ds = (drumsampler *)self;
-    return ds->vol;
-}
-
-void drumsampler_setvol(void *self, double v)
-{
-    drumsampler *ds = (drumsampler *)self;
-    if (v < 0.0 || v > 1.0)
-    {
-        return;
-    }
-    ds->vol = v;
 }
 
 void drumsampler_del_self(void *self)
@@ -271,17 +256,17 @@ int get_a_drumsampler_position(drumsampler *ss)
 void drumsampler_start(void *self)
 {
     drumsampler *s = (drumsampler *)self;
-    if (s->sound_generator.active)
+    if (s->sg.active)
         return; // no-op
     drumsampler_reset_samples(s);
-    s->sound_generator.active = true;
+    s->sg.active = true;
     s->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void drumsampler_stop(void *self)
 {
     drumsampler *ds = (drumsampler *)self;
-    ds->sound_generator.active = false;
+    ds->sg.active = false;
 }
 
 void drumsampler_set_pitch(drumsampler *ds, double v)

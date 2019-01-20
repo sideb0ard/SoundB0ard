@@ -16,12 +16,12 @@ qb_osc *qb_osc_new()
     }
 
     osc_new_settings(&qb->osc);
-    qb_set_soundgenerator_interface(qb);
+    qb_set_sound_generator_interface(qb);
 
     return qb;
 }
 
-void qb_set_soundgenerator_interface(qb_osc *qb)
+void qb_set_sound_generator_interface(qb_osc *qb)
 {
     qb->osc.do_oscillate = &qb_do_oscillate;
     qb->osc.start_oscillator = &qb_start_oscillator;

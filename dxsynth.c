@@ -21,24 +21,27 @@ dxsynth *new_dxsynth(void)
     if (dx == NULL)
         return NULL; // barf
 
-    sequence_engine_init(&dx->engine, (void *)dx, DXSYNTH_TYPE);
-
-    dx->sound_generator.gennext = &dxsynth_gennext;
-    dx->sound_generator.status = &dxsynth_status;
-    dx->sound_generator.setvol = &dxsynth_setvol;
-    dx->sound_generator.getvol = &dxsynth_getvol;
-    dx->sound_generator.start = &dxsynth_sg_start;
-    dx->sound_generator.stop = &dxsynth_sg_stop;
-    dx->sound_generator.get_num_patterns = &dxsynth_get_num_patterns;
-    dx->sound_generator.set_num_patterns = &dxsynth_set_num_patterns;
-    dx->sound_generator.event_notify = &sequence_engine_event_notify;
-    dx->sound_generator.make_active_track = &dxsynth_make_active_track;
-    dx->sound_generator.self_destruct = &dxsynth_del_self;
-    dx->sound_generator.set_pattern = &dxsynth_set_pattern;
-    dx->sound_generator.get_pattern = &dxsynth_get_pattern;
-    dx->sound_generator.is_valid_pattern = &dxsynth_is_valid_pattern;
-    dx->sound_generator.type = DXSYNTH_TYPE;
+    dx->sg.gennext = &dxsynth_gennext;
+    dx->sg.status = &dxsynth_status;
+    dx->sg.set_volume = &sound_generator_set_volume;
+    dx->sg.get_volume = &sound_generator_get_volume;
+    dx->sg.set_pan = &sound_generator_set_pan;
+    dx->sg.get_pan = &sound_generator_get_pan;
+    dx->sg.start = &dxsynth_sg_start;
+    dx->sg.stop = &dxsynth_sg_stop;
+    dx->sg.get_num_patterns = &dxsynth_get_num_patterns;
+    dx->sg.set_num_patterns = &dxsynth_set_num_patterns;
+    dx->sg.event_notify = &sequence_engine_event_notify;
+    dx->sg.make_active_track = &dxsynth_make_active_track;
+    dx->sg.self_destruct = &dxsynth_del_self;
+    dx->sg.set_pattern = &dxsynth_set_pattern;
+    dx->sg.get_pattern = &dxsynth_get_pattern;
+    dx->sg.is_valid_pattern = &dxsynth_is_valid_pattern;
+    dx->sg.type = DXSYNTH_TYPE;
     dx->active_midi_osc = 1;
+
+    sequence_engine_init(&dx->engine, (void *)dx, DXSYNTH_TYPE);
+    sound_generator_init(&dx->sg);
 
     dxsynth_reset(dx);
 
@@ -67,8 +70,7 @@ dxsynth *new_dxsynth(void)
 
     dx->m_last_note_frequency = -1.0;
 
-    dx->vol = 1;
-    dx->sound_generator.active = true;
+    dx->sg.active = true;
     printf("BOOM!\n");
     return dx;
 }
@@ -672,7 +674,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
     dxsynth *dx = (dxsynth *)self;
 
     char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
-    if (dx->sound_generator.active)
+    if (dx->sg.active)
         INSTRUMENT_COLOR = ANSI_COLOR_CYAN;
 
     // clang-format off
@@ -690,7 +692,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
 
         dx->m_settings.m_settings_name,
         INSTRUMENT_COLOR,
-        dx->m_settings.m_voice_mode, dx->vol,
+        dx->m_settings.m_voice_mode, dx->sg.volume,
         dx->active_midi_osc,
         dx->m_settings.m_portamento_time_ms,
         dx->m_settings.m_pitchbend_range,
@@ -732,26 +734,10 @@ void dxsynth_status(void *self, wchar_t *status_string)
         dx->m_settings.m_op3_output_lvl,
         dx->m_settings.m_op4_output_lvl
         );
-    // clang-format off
+    // clang-format on
     wchar_t scratch[1024] = {};
     sequence_engine_status(&dx->engine, scratch);
     wcscat(status_string, scratch);
-}
-
-void dxsynth_setvol(void *self, double v)
-{
-    dxsynth *dx = (dxsynth *)self;
-    if (v < 0.0 || v > 1.0)
-    {
-        return;
-    }
-    dx->vol = v;
-}
-
-double dxsynth_getvol(void *self)
-{
-    dxsynth *dx = (dxsynth *)self;
-    return dx->vol;
 }
 
 int dxsynth_get_num_patterns(void *self)
@@ -776,7 +762,7 @@ stereo_val dxsynth_gennext(void *self)
 {
     dxsynth *dx = (dxsynth *)self;
 
-    if (!dx->sound_generator.active)
+    if (!dx->sg.active)
         return (stereo_val){0, 0};
 
     double accum_out_left = 0.0;
@@ -797,21 +783,22 @@ stereo_val dxsynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    stereo_val out = {.left = accum_out_left * dx->vol, .right = accum_out_right * dx->vol};
-    out = effector(&dx->sound_generator, out);
+    stereo_val out = {.left = accum_out_left * dx->sg.volume,
+                      .right = accum_out_right * dx->sg.volume};
+    out = effector(&dx->sg, out);
     return out;
 }
 
 void dxsynth_rand_settings(dxsynth *dx)
 {
-    //dxsynth_reset(dx);
-    //return;
-    //printf("Randomizing DXSYNTH!\n");
+    // dxsynth_reset(dx);
+    // return;
+    // printf("Randomizing DXSYNTH!\n");
 
     dx->m_settings.m_voice_mode = rand() % 8;
     dx->m_settings.m_portamento_time_ms = rand() % 5000;
     dx->m_settings.m_pitchbend_range = (rand() % 12) + 1;
-    //dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
+    // dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
     dx->m_settings.m_note_number_to_decay_scaling = rand() % 2;
     dx->m_settings.m_reset_to_zero = rand() % 2;
     dx->m_settings.m_legato_mode = rand() % 2;
@@ -827,37 +814,37 @@ void dxsynth_rand_settings(dxsynth *dx)
     dx->m_settings.m_op1_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op1_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
     dx->m_settings.m_op1_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg1_attack_ms = rand()% 300;
-    dx->m_settings.m_eg1_decay_ms = rand()% 300;
+    dx->m_settings.m_eg1_attack_ms = rand() % 300;
+    dx->m_settings.m_eg1_decay_ms = rand() % 300;
     dx->m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg1_release_ms = rand()% 300;
-    //dx->m_settings.m_op1_output_lvl = (rand() % 55) + 35;
+    dx->m_settings.m_eg1_release_ms = rand() % 300;
+    // dx->m_settings.m_op1_output_lvl = (rand() % 55) + 35;
 
     dx->m_settings.m_op2_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op2_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
     dx->m_settings.m_op2_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg2_attack_ms = rand()% 300;
-    dx->m_settings.m_eg2_decay_ms = rand()% 400;
+    dx->m_settings.m_eg2_attack_ms = rand() % 300;
+    dx->m_settings.m_eg2_decay_ms = rand() % 400;
     dx->m_settings.m_eg2_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg2_release_ms = rand()% 400;
+    dx->m_settings.m_eg2_release_ms = rand() % 400;
     dx->m_settings.m_op2_output_lvl = (rand() % 55) + 15;
 
     dx->m_settings.m_op3_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op3_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
     dx->m_settings.m_op3_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg3_attack_ms = rand()% 300;
-    dx->m_settings.m_eg3_decay_ms = rand()% 400;
+    dx->m_settings.m_eg3_attack_ms = rand() % 300;
+    dx->m_settings.m_eg3_decay_ms = rand() % 400;
     dx->m_settings.m_eg3_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg3_release_ms = rand()% 400;
+    dx->m_settings.m_eg3_release_ms = rand() % 400;
     dx->m_settings.m_op3_output_lvl = (rand() % 55) + 15;
 
     dx->m_settings.m_op4_waveform = rand() % MAX_OSC;
     dx->m_settings.m_op4_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
     dx->m_settings.m_op4_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg4_attack_ms = rand()% 400;
-    dx->m_settings.m_eg4_decay_ms = rand()% 500;
+    dx->m_settings.m_eg4_attack_ms = rand() % 400;
+    dx->m_settings.m_eg4_decay_ms = rand() % 500;
     dx->m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg4_release_ms = rand()% 500;
+    dx->m_settings.m_eg4_release_ms = rand() % 500;
     dx->m_settings.m_op4_output_lvl = (rand() % 55) + 15;
     dx->m_settings.m_op4_feedback = rand() % 70;
 
@@ -889,102 +876,127 @@ bool dxsynth_save_settings(dxsynth *ms, char *preset_name)
     fprintf(presetzzz, "::name=%s", ms->m_settings.m_settings_name);
     settings_count++;
 
-    fprintf(presetzzz, "::m_lfo1_intensity=%f", ms->m_settings.m_lfo1_intensity);
+    fprintf(presetzzz, "::m_lfo1_intensity=%f",
+            ms->m_settings.m_lfo1_intensity);
     settings_count++;
     fprintf(presetzzz, "::m_lfo1_rate=%f", ms->m_settings.m_lfo1_rate);
     settings_count++;
     fprintf(presetzzz, "::m_lfo1_waveform=%d", ms->m_settings.m_lfo1_waveform);
     settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest1=%d", ms->m_settings.m_lfo1_mod_dest1);
+    fprintf(presetzzz, "::m_lfo1_mod_dest1=%d",
+            ms->m_settings.m_lfo1_mod_dest1);
     settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest2=%d", ms->m_settings.m_lfo1_mod_dest2);
+    fprintf(presetzzz, "::m_lfo1_mod_dest2=%d",
+            ms->m_settings.m_lfo1_mod_dest2);
     settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest3=%d", ms->m_settings.m_lfo1_mod_dest3);
+    fprintf(presetzzz, "::m_lfo1_mod_dest3=%d",
+            ms->m_settings.m_lfo1_mod_dest3);
     settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest4=%d", ms->m_settings.m_lfo1_mod_dest4);
+    fprintf(presetzzz, "::m_lfo1_mod_dest4=%d",
+            ms->m_settings.m_lfo1_mod_dest4);
     settings_count++;
 
     fprintf(presetzzz, "::m_op1_waveform=%d", ms->m_settings.m_op1_waveform);
     settings_count++;
     fprintf(presetzzz, "::m_op1_ratio=%f", ms->m_settings.m_op1_ratio);
     settings_count++;
-    fprintf(presetzzz, "::m_op1_detune_cents=%f", ms->m_settings.m_op1_detune_cents);
+    fprintf(presetzzz, "::m_op1_detune_cents=%f",
+            ms->m_settings.m_op1_detune_cents);
     settings_count++;
     fprintf(presetzzz, "::m_eg1_attack_ms=%f", ms->m_settings.m_eg1_attack_ms);
     settings_count++;
     fprintf(presetzzz, "::m_eg1_decay_ms=%f", ms->m_settings.m_eg1_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg1_sustain_lvl=%f", ms->m_settings.m_eg1_sustain_lvl);
+    fprintf(presetzzz, "::m_eg1_sustain_lvl=%f",
+            ms->m_settings.m_eg1_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg1_release_ms=%f", ms->m_settings.m_eg1_release_ms);
+    fprintf(presetzzz, "::m_eg1_release_ms=%f",
+            ms->m_settings.m_eg1_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op1_output_lvl=%f", ms->m_settings.m_op1_output_lvl);
+    fprintf(presetzzz, "::m_op1_output_lvl=%f",
+            ms->m_settings.m_op1_output_lvl);
     settings_count++;
 
     fprintf(presetzzz, "::m_op2_waveform=%d", ms->m_settings.m_op2_waveform);
     settings_count++;
     fprintf(presetzzz, "::m_op2_ratio=%f", ms->m_settings.m_op2_ratio);
     settings_count++;
-    fprintf(presetzzz, "::m_op2_detune_cents=%f", ms->m_settings.m_op2_detune_cents);
+    fprintf(presetzzz, "::m_op2_detune_cents=%f",
+            ms->m_settings.m_op2_detune_cents);
     settings_count++;
     fprintf(presetzzz, "::m_eg2_attack_ms=%f", ms->m_settings.m_eg2_attack_ms);
     settings_count++;
     fprintf(presetzzz, "::m_eg2_decay_ms=%f", ms->m_settings.m_eg2_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg2_sustain_lvl=%f", ms->m_settings.m_eg2_sustain_lvl);
+    fprintf(presetzzz, "::m_eg2_sustain_lvl=%f",
+            ms->m_settings.m_eg2_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg2_release_ms=%f", ms->m_settings.m_eg2_release_ms);
+    fprintf(presetzzz, "::m_eg2_release_ms=%f",
+            ms->m_settings.m_eg2_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op2_output_lvl=%f", ms->m_settings.m_op2_output_lvl);
+    fprintf(presetzzz, "::m_op2_output_lvl=%f",
+            ms->m_settings.m_op2_output_lvl);
     settings_count++;
 
     fprintf(presetzzz, "::m_op3_waveform=%d", ms->m_settings.m_op3_waveform);
     settings_count++;
     fprintf(presetzzz, "::m_op3_ratio=%f", ms->m_settings.m_op3_ratio);
     settings_count++;
-    fprintf(presetzzz, "::m_op3_detune_cents=%f", ms->m_settings.m_op3_detune_cents);
+    fprintf(presetzzz, "::m_op3_detune_cents=%f",
+            ms->m_settings.m_op3_detune_cents);
     settings_count++;
     fprintf(presetzzz, "::m_eg3_attack_ms=%f", ms->m_settings.m_eg3_attack_ms);
     settings_count++;
     fprintf(presetzzz, "::m_eg3_decay_ms=%f", ms->m_settings.m_eg3_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg3_sustain_lvl=%f", ms->m_settings.m_eg3_sustain_lvl);
+    fprintf(presetzzz, "::m_eg3_sustain_lvl=%f",
+            ms->m_settings.m_eg3_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg3_release_ms=%f", ms->m_settings.m_eg3_release_ms);
+    fprintf(presetzzz, "::m_eg3_release_ms=%f",
+            ms->m_settings.m_eg3_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op3_output_lvl=%f", ms->m_settings.m_op3_output_lvl);
+    fprintf(presetzzz, "::m_op3_output_lvl=%f",
+            ms->m_settings.m_op3_output_lvl);
     settings_count++;
 
     fprintf(presetzzz, "::m_op4_waveform=%d", ms->m_settings.m_op4_waveform);
     settings_count++;
     fprintf(presetzzz, "::m_op4_ratio=%f", ms->m_settings.m_op4_ratio);
     settings_count++;
-    fprintf(presetzzz, "::m_op4_detune_cents=%f", ms->m_settings.m_op4_detune_cents);
+    fprintf(presetzzz, "::m_op4_detune_cents=%f",
+            ms->m_settings.m_op4_detune_cents);
     settings_count++;
     fprintf(presetzzz, "::m_eg4_attack_ms=%f", ms->m_settings.m_eg4_attack_ms);
     settings_count++;
     fprintf(presetzzz, "::m_eg4_decay_ms=%f", ms->m_settings.m_eg4_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg4_sustain_lvl=%f", ms->m_settings.m_eg4_sustain_lvl);
+    fprintf(presetzzz, "::m_eg4_sustain_lvl=%f",
+            ms->m_settings.m_eg4_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg4_release_ms=%f", ms->m_settings.m_eg4_release_ms);
+    fprintf(presetzzz, "::m_eg4_release_ms=%f",
+            ms->m_settings.m_eg4_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op4_output_lvl=%f", ms->m_settings.m_op4_output_lvl);
+    fprintf(presetzzz, "::m_op4_output_lvl=%f",
+            ms->m_settings.m_op4_output_lvl);
     settings_count++;
     fprintf(presetzzz, "::m_op4_feedback=%f", ms->m_settings.m_op4_feedback);
     settings_count++;
 
-    fprintf(presetzzz, "::m_portamento_time_ms=%f", ms->m_settings.m_portamento_time_ms);
+    fprintf(presetzzz, "::m_portamento_time_ms=%f",
+            ms->m_settings.m_portamento_time_ms);
     settings_count++;
     fprintf(presetzzz, "::m_volume_db=%f", ms->m_settings.m_volume_db);
     settings_count++;
-    fprintf(presetzzz, "::m_pitchbend_range=%d", ms->m_settings.m_pitchbend_range);
+    fprintf(presetzzz, "::m_pitchbend_range=%d",
+            ms->m_settings.m_pitchbend_range);
     settings_count++;
     fprintf(presetzzz, "::m_voice_mode=%d", ms->m_settings.m_voice_mode);
     settings_count++;
-    fprintf(presetzzz, "::m_velocity_to_attack_scaling=%d", ms->m_settings.m_velocity_to_attack_scaling);
+    fprintf(presetzzz, "::m_velocity_to_attack_scaling=%d",
+            ms->m_settings.m_velocity_to_attack_scaling);
     settings_count++;
-    fprintf(presetzzz, "::m_note_number_to_decay_scaling=%d", ms->m_settings.m_note_number_to_decay_scaling);
+    fprintf(presetzzz, "::m_note_number_to_decay_scaling=%d",
+            ms->m_settings.m_note_number_to_decay_scaling);
     settings_count++;
     fprintf(presetzzz, "::m_reset_to_zero=%d", ms->m_settings.m_reset_to_zero);
     settings_count++;
@@ -1064,7 +1076,7 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
         {
             sscanf(tok, "%[^=]=%s", setting_key, setting_val);
             sscanf(setting_val, "%lf", &scratch_val);
-            //printf("key:%s val:%f\n", setting_key, scratch_val);
+            // printf("key:%s val:%f\n", setting_key, scratch_val);
             if (strcmp(setting_key, "name") == 0)
             {
                 if (strcmp(setting_val, preset_to_load) != 0)
@@ -1316,7 +1328,7 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
                 settings_count++;
             }
         }
-        //if (settings_count > 0)
+        // if (settings_count > 0)
         //    printf("Loaded %d settings\n", settings_count);
         dxsynth_update(ms);
     }
@@ -1359,14 +1371,14 @@ void dxsynth_stop(dxsynth *dx) { dxsynth_midi_note_off(dx, 0, 0, true); }
 void dxsynth_sg_start(void *self)
 {
     dxsynth *dx = (dxsynth *)self;
-    dx->sound_generator.active = true;
+    dx->sg.active = true;
     dx->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void dxsynth_sg_stop(void *self)
 {
     dxsynth *ms = (dxsynth *)self;
-    ms->sound_generator.active = false;
+    ms->sg.active = false;
     dxsynth_stop(ms);
 }
 
@@ -1695,7 +1707,8 @@ midi_event *dxsynth_get_pattern(void *self, int pattern_num)
     return NULL;
 }
 
-void dxsynth_set_pattern(void *self, int pattern_num, pattern_change_info change_info, midi_event *pattern)
+void dxsynth_set_pattern(void *self, int pattern_num,
+                         pattern_change_info change_info, midi_event *pattern)
 {
     sequence_engine *engine = get_sequence_engine(self);
     if (engine)

@@ -172,7 +172,8 @@ void sequence_engine_reset_pattern_all(sequence_engine *self);
 void sequence_engine_reset_voices(sequence_engine *self);
 void sequence_engine_pattern_to_string(sequence_engine *self, int pattern_num,
                                        wchar_t scratch[33]);
-void sequence_engine_add_temporal_event(sequence_engine *self, int midi_tick, midi_event ev);
+void sequence_engine_add_temporal_event(sequence_engine *self, int midi_tick,
+                                        midi_event ev);
 void sequence_engine_add_event(sequence_engine *self, int pattern_num,
                                int midi_tick, midi_event ev);
 void sequence_engine_delete_event(sequence_engine *engine, int pat_num,
@@ -228,7 +229,7 @@ int sequence_engine_get_octave(sequence_engine *engine);
 void sequence_engine_enable_arp(sequence_engine *engine, bool b);
 void sequence_engine_set_arp_speed(sequence_engine *engine, unsigned int speed);
 void sequence_engine_set_arp_mode(sequence_engine *engine, unsigned int mode);
-void sequence_engine_do_arp(sequence_engine *engine, soundgenerator *sg);
+void sequence_engine_do_arp(sequence_engine *engine, sound_generator *sg);
 int arp_next_note(arpeggiator *arp);
 void arp_add_last_note(arpeggiator *arp, int note);
 

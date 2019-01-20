@@ -735,7 +735,7 @@ tidy_up_and_return:
     return true;
 }
 
-void check_and_set_pattern(soundgenerator *sg, int target_pattern_num,
+void check_and_set_pattern(sound_generator *sg, int target_pattern_num,
                            unsigned int pattern_type,
                            char wurds[][SIZE_OF_WURD], int num_wurds)
 {

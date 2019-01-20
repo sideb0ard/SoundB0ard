@@ -84,7 +84,7 @@ enum
 
 typedef struct looper
 {
-    soundgenerator sound_generator;
+    sound_generator sg;
 
     bool started;
     bool have_active_buffer;
@@ -154,15 +154,12 @@ typedef struct looper
 
     bool debug_pending;
 
-    double vol;
 } looper;
 
 looper *new_looper(char *filename);
 
 stereo_val looper_gennext(void *self);
 void looper_status(void *self, wchar_t *ss);
-void looper_setvol(void *self, double v);
-double looper_getvol(void *self);
 void looper_start(void *self);
 void looper_stop(void *self);
 int looper_get_num_patterns(void *self);

@@ -19,13 +19,13 @@ void dxsynth_voice_init(dxsynth_voice *dxv)
 
     // initialize all oscillators
     osc_new_settings(&dxv->m_op1.osc);
-    qb_set_soundgenerator_interface(&dxv->m_op1);
+    qb_set_sound_generator_interface(&dxv->m_op1);
     osc_new_settings(&dxv->m_op2.osc);
-    qb_set_soundgenerator_interface(&dxv->m_op2);
+    qb_set_sound_generator_interface(&dxv->m_op2);
     osc_new_settings(&dxv->m_op3.osc);
-    qb_set_soundgenerator_interface(&dxv->m_op3);
+    qb_set_sound_generator_interface(&dxv->m_op3);
     osc_new_settings(&dxv->m_op4.osc);
-    qb_set_soundgenerator_interface(&dxv->m_op4);
+    qb_set_sound_generator_interface(&dxv->m_op4);
     // or use wavetable versions
     // wt_initialize(&dxv->m_op1);
     // wt_initialize(&dxv->m_op2);

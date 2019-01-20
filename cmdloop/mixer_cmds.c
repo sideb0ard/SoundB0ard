@@ -113,8 +113,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
-            soundgenerator *sg =
-                (soundgenerator *)mixr->sound_generators[sg_num];
+            sound_generator *sg =
+                (sound_generator *)mixr->sound_generators[sg_num];
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
@@ -131,8 +131,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
-            soundgenerator *sg =
-                (soundgenerator *)mixr->sound_generators[sg_num];
+            sound_generator *sg =
+                (sound_generator *)mixr->sound_generators[sg_num];
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 int density = atoi(wurds[2]);
@@ -151,8 +151,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
-            soundgenerator *sg =
-                (soundgenerator *)mixr->sound_generators[sg_num];
+            sound_generator *sg =
+                (sound_generator *)mixr->sound_generators[sg_num];
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
@@ -168,8 +168,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
-            soundgenerator *sg =
-                (soundgenerator *)mixr->sound_generators[sg_num];
+            sound_generator *sg =
+                (sound_generator *)mixr->sound_generators[sg_num];
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
@@ -210,7 +210,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
-            soundgenerator *sg = mixr->sound_generators[sg_num];
+            sound_generator *sg = mixr->sound_generators[sg_num];
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 midi_event *pattern = sg->get_pattern(sg, sg_pattern_num);
@@ -291,7 +291,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             if (mixer_is_valid_soundgen_num(mixr, dests[i].sg_num))
             {
-                soundgenerator *sg = mixr->sound_generators[dests[i].sg_num];
+                sound_generator *sg = mixr->sound_generators[dests[i].sg_num];
                 pattern_change_info change_info = {.clear_previous = true,
                                                    .temporary = false};
                 sg->set_pattern(sg, dests[i].sg_pattern_num, change_info,
@@ -426,8 +426,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
-            soundgenerator *sg =
-                (soundgenerator *)mixr->sound_generators[sg_num];
+            sound_generator *sg =
+                (sound_generator *)mixr->sound_generators[sg_num];
             if (sg->is_valid_pattern(sg, sg_pattern_num))
             {
                 int places_to_shift = atoi(wurds[2]);
@@ -476,7 +476,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
              strncmp("hush", wurds[0], 4) == 0)
     {
         for (int i = 0; i < mixr->soundgen_num; i++)
-            mixr->sound_generators[i]->setvol(mixr->sound_generators[i], 0.0);
+            mixr->sound_generators[i]->set_volume(mixr->sound_generators[i],
+                                                  0.0);
         goto cmd_found;
     }
     else if (strncmp("ls", wurds[0], 2) == 0)
@@ -501,7 +502,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
-                soundgenerator *sg = mixr->sound_generators[i];
+                sound_generator *sg = mixr->sound_generators[i];
                 if (sg != NULL)
                     sg->start(sg);
             }
@@ -511,7 +512,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                soundgenerator *sg = mixr->sound_generators[soundgen_num];
+                sound_generator *sg = mixr->sound_generators[soundgen_num];
                 sg->start(sg);
             }
         }
@@ -536,8 +537,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             pattern_generator *sg = mixr->pattern_generators[pattern_gen_num];
 
-            soundgenerator *s1 = mixr->sound_generators[sg1_num];
-            soundgenerator *s2 = mixr->sound_generators[sg2_num];
+            sound_generator *s1 = mixr->sound_generators[sg1_num];
+            sound_generator *s2 = mixr->sound_generators[sg2_num];
 
             midi_event midi_pattern[PPBAR] = {};
             sg->generate(sg, &midi_pattern);
@@ -575,7 +576,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
-                soundgenerator *sg = mixr->sound_generators[i];
+                sound_generator *sg = mixr->sound_generators[i];
                 if (sg != NULL)
                     sg->stop(sg);
             }
@@ -585,7 +586,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                soundgenerator *sg = mixr->sound_generators[soundgen_num];
+                sound_generator *sg = mixr->sound_generators[soundgen_num];
                 sg->stop(sg);
             }
         }

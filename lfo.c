@@ -16,12 +16,12 @@ lfo *lfo_new()
     }
 
     osc_new_settings(&l->osc);
-    lfo_set_soundgenerator_interface(l);
+    lfo_set_sound_generator_interface(l);
 
     return l;
 }
 
-void lfo_set_soundgenerator_interface(lfo *l)
+void lfo_set_sound_generator_interface(lfo *l)
 {
     l->osc.do_oscillate = &lfo_do_oscillate;
     l->osc.start_oscillator = &lfo_start_oscillator;

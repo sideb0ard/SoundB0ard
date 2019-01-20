@@ -80,7 +80,7 @@ midi_event new_midi_event(int event_type, int data1, int data2)
     return ev;
 }
 
-void midi_parse_midi_event(soundgenerator *sg, midi_event *ev)
+void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
 {
     int cur_midi_tick = mixr->timing_info.midi_tick % PPBAR;
     int midi_note = ev->data1;

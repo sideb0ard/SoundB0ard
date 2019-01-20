@@ -22,24 +22,25 @@ digisynth *new_digisynth(char *filename)
 
     strncpy(ds->audiofile, filename, 1023);
 
-    ds->vol = 1.0;
-
-    ds->sound_generator.gennext = &digisynth_gennext;
-    ds->sound_generator.status = &digisynth_status;
-    ds->sound_generator.setvol = &digisynth_setvol;
-    ds->sound_generator.getvol = &digisynth_getvol;
-    ds->sound_generator.start = &digisynth_sg_start;
-    ds->sound_generator.stop = &digisynth_sg_stop;
-    ds->sound_generator.event_notify = &sequence_engine_event_notify;
-    ds->sound_generator.self_destruct = &digisynth_del_self;
-    ds->sound_generator.get_num_patterns = &digisynth_get_num_patterns;
-    ds->sound_generator.set_num_patterns = &digisynth_set_num_patterns;
-    ds->sound_generator.make_active_track = &digisynth_make_active_track;
-    ds->sound_generator.set_pattern = &digisynth_set_pattern;
-    ds->sound_generator.get_pattern = &digisynth_get_pattern;
-    ds->sound_generator.is_valid_pattern = &digisynth_is_valid_pattern;
-    ds->sound_generator.type = DIGISYNTH_TYPE;
-    ds->sound_generator.active = true;
+    ds->sg.gennext = &digisynth_gennext;
+    ds->sg.status = &digisynth_status;
+    ds->sg.set_volume = &sound_generator_set_volume;
+    ds->sg.get_volume = &sound_generator_get_volume;
+    ds->sg.set_pan = &sound_generator_set_pan;
+    ds->sg.get_pan = &sound_generator_get_pan;
+    ds->sg.start = &digisynth_sg_start;
+    ds->sg.stop = &digisynth_sg_stop;
+    ds->sg.event_notify = &sequence_engine_event_notify;
+    ds->sg.self_destruct = &digisynth_del_self;
+    ds->sg.get_num_patterns = &digisynth_get_num_patterns;
+    ds->sg.set_num_patterns = &digisynth_set_num_patterns;
+    ds->sg.make_active_track = &digisynth_make_active_track;
+    ds->sg.set_pattern = &digisynth_set_pattern;
+    ds->sg.get_pattern = &digisynth_get_pattern;
+    ds->sg.is_valid_pattern = &digisynth_is_valid_pattern;
+    ds->sg.type = DIGISYNTH_TYPE;
+    ds->sg.active = true;
+    sound_generator_init(&ds->sg);
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -72,7 +73,7 @@ stereo_val digisynth_gennext(void *self)
 {
     digisynth *ds = (digisynth *)self;
 
-    if (!ds->sound_generator.active)
+    if (!ds->sg.active)
         return (stereo_val){0, 0};
 
     double accum_out_left = 0.0;
@@ -88,10 +89,10 @@ stereo_val digisynth_gennext(void *self)
         accum_out_right += out_right;
     }
 
-    stereo_val return_val = {.left = accum_out_left * ds->vol,
-                             .right = accum_out_right * ds->vol};
+    stereo_val return_val = {.left = accum_out_left * ds->sg.volume,
+                             .right = accum_out_right * ds->sg.volume};
 
-    return_val = effector(&ds->sound_generator, return_val);
+    return_val = effector(&ds->sg, return_val);
     return return_val;
 }
 
@@ -103,26 +104,13 @@ void digisynth_status(void *self, wchar_t *status_string)
                                " vol: %.2f active: %s midi_note_1:%d "
                                "midi_note_2:%d midi_note_3:%d "
                                "sample_len:%d read_idx:%d",
-             ds->audiofile, ds->vol,
-             ds->sound_generator.active ? "true" : "false",
+             ds->audiofile, ds->sg.volume, ds->sg.active ? "true" : "false",
              ds->engine.midi_note_1, ds->engine.midi_note_2,
              ds->engine.midi_note_3, ds->m_voices[0].m_osc1.afd.samplecount,
              ds->m_voices[0].m_osc1.m_read_idx);
     wchar_t scratch[1024] = {};
     sequence_engine_status(&ds->engine, scratch);
     wcscat(status_string, scratch);
-}
-
-void digisynth_setvol(void *self, double v)
-{
-    digisynth *ds = (digisynth *)self;
-    ds->vol = v;
-}
-
-double digisynth_getvol(void *self)
-{
-    digisynth *ds = (digisynth *)self;
-    return ds->vol;
 }
 
 int digisynth_get_num_patterns(void *self)
@@ -146,13 +134,13 @@ void digisynth_make_active_track(void *self, int tracknum)
 void digisynth_sg_start(void *self)
 {
     digisynth *ds = (digisynth *)self;
-    ds->sound_generator.active = true;
+    ds->sg.active = true;
     ds->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 void digisynth_sg_stop(void *self)
 {
     digisynth *ds = (digisynth *)self;
-    ds->sound_generator.active = false;
+    ds->sg.active = false;
     digisynth_stop(ds);
 }
 

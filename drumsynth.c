@@ -20,16 +20,13 @@ drumsynth *new_drumsynth()
     printf("New Drum Synth!\n");
     drumsynth *ds = calloc(1, sizeof(drumsynth));
 
-    sequence_engine_init(&ds->engine, (void *)ds, DRUMSYNTH_TYPE);
-
-    ds->vol = 0.6;
     ds->started = false;
     ds->reset_osc = true;
 
     strncpy(ds->m_patch_name, "Default", 7);
 
     osc_new_settings(&ds->m_osc1.osc);
-    qb_set_soundgenerator_interface(&ds->m_osc1);
+    qb_set_sound_generator_interface(&ds->m_osc1);
     ds->m_osc1.osc.m_waveform = NOISE;
     ds->m_osc1.osc.m_osc_fo = 58; // irrelevant when noise
     ds->osc1_amp = .01;
@@ -44,7 +41,7 @@ drumsynth *new_drumsynth()
     eg_set_drum_mode(&ds->m_eg1, true);
 
     osc_new_settings(&ds->m_osc2.osc);
-    qb_set_soundgenerator_interface(&ds->m_osc2);
+    qb_set_sound_generator_interface(&ds->m_osc2);
     ds->m_osc2.osc.m_waveform = SINE;
     ds->m_osc2.osc.m_osc_fo = 58;
     ds->osc2_amp = 1.0;
@@ -72,8 +69,10 @@ drumsynth *new_drumsynth()
 
     ds->sg.gennext = &drumsynth_gennext;
     ds->sg.status = &drumsynth_status;
-    ds->sg.getvol = &drumsynth_getvol;
-    ds->sg.setvol = &drumsynth_setvol;
+    ds->sg.get_volume = &sound_generator_get_volume;
+    ds->sg.set_volume = &sound_generator_set_volume;
+    ds->sg.get_pan = &sound_generator_get_pan;
+    ds->sg.set_pan = &sound_generator_set_pan;
     ds->sg.start = &drumsynth_start;
     ds->sg.stop = &drumsynth_stop;
     ds->sg.get_num_patterns = &drumsynth_get_num_patterns;
@@ -84,6 +83,9 @@ drumsynth *new_drumsynth()
     ds->sg.get_pattern = &drumsynth_get_pattern;
     ds->sg.is_valid_pattern = &drumsynth_is_valid_pattern;
     ds->sg.type = DRUMSYNTH_TYPE;
+
+    sequence_engine_init(&ds->engine, (void *)ds, DRUMSYNTH_TYPE);
+    sound_generator_init(&ds->sg);
 
     drumsynth_start(ds);
 
@@ -158,7 +160,7 @@ void drumsynth_status(void *self, wchar_t *ss)
 
              ds->m_patch_name,
              INSTRUMENT_RED,
-             ds->vol,
+             ds->sg.volume,
              ds->reset_osc,
              ds->m_distortion_threshold,
 
@@ -193,13 +195,6 @@ void drumsynth_status(void *self, wchar_t *ss)
     sequence_engine_status(&ds->engine, engine_status_string);
     wcscat(ss, engine_status_string);
     wcscat(ss, WANSI_COLOR_RESET);
-}
-
-void drumsynth_setvol(void *self, double v)
-{
-    drumsynth *ds = (drumsynth *)self;
-    ds->vol = v;
-    return;
 }
 
 stereo_val drumsynth_gennext(void *self)
@@ -237,8 +232,8 @@ stereo_val drumsynth_gennext(void *self)
     combined_osc = moog_gennext((filter *)&ds->m_filter, combined_osc);
 
     double midi_velocity = scaleybum(0, 127, 0, 1, ds->current_velocity);
-    out.left = combined_osc * ds->vol * midi_velocity;
-    out.right = combined_osc * ds->vol * midi_velocity;
+    out.left = combined_osc * ds->sg.volume * midi_velocity;
+    out.right = combined_osc * ds->sg.volume * midi_velocity;
 
     ds->m_distortion.m_threshold = ds->m_distortion_threshold;
     out = distortion_process(&ds->m_distortion, out);
@@ -246,12 +241,6 @@ stereo_val drumsynth_gennext(void *self)
     out = effector(&ds->sg, out);
 
     return out;
-}
-
-double drumsynth_getvol(void *self)
-{
-    drumsynth *ds = (drumsynth *)self;
-    return ds->vol;
 }
 
 void drumsynth_trigger(drumsynth *ds)
@@ -304,7 +293,7 @@ bool drumsynth_save_patch(drumsynth *ds, char *name)
             " %d"    // filter type
             " %f"    // filter fc_control
             " %f\n", // filter q_control
-            ds->m_patch_name, ds->vol, ds->m_distortion_threshold,
+            ds->m_patch_name, ds->sg.volume, ds->m_distortion_threshold,
 
             ds->m_osc1.osc.m_waveform, ds->m_osc1.osc.m_osc_fo, ds->osc1_amp,
             ds->m_osc2.osc.m_waveform, ds->m_osc2.osc.m_osc_fo, ds->osc2_amp,
@@ -368,7 +357,7 @@ bool drumsynth_open_patch(drumsynth *ds, char *name)
                 " %d"     // filter type
                 " %lf"    // filter fc_control
                 " %lf\n", // filter q_control
-                ds->m_patch_name, &ds->vol, &ds->m_distortion_threshold,
+                ds->m_patch_name, &ds->sg.volume, &ds->m_distortion_threshold,
 
                 &ds->m_osc1.osc.m_waveform, &ds->m_osc1.osc.m_osc_fo,
                 &ds->osc1_amp, &ds->m_osc2.osc.m_waveform,

@@ -29,7 +29,7 @@ typedef struct sample_pos
 
 typedef struct drumsampler
 {
-    soundgenerator sound_generator;
+    sound_generator sg;
     sequence_engine engine;
 
     bool glitch_mode;
@@ -57,8 +57,6 @@ typedef struct drumsampler
     int swing;
     bool started; // to sync at top of loop
 
-    double vol;
-
 } drumsampler;
 
 drumsampler *new_drumsampler(char *filename);
@@ -71,8 +69,6 @@ bool drumsampler_is_valid_pattern(void *self, int pattern_num);
 
 void drumsampler_del_self(void *self);
 void drumsampler_status(void *self, wchar_t *status_string);
-void drumsampler_setvol(void *self, double v);
-double drumsampler_getvol(void *self);
 void drumsampler_start(void *self);
 void drumsampler_stop(void *self);
 stereo_val drumsampler_gennext(void *self);

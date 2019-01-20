@@ -23,11 +23,11 @@ filterpass *new_filterpass()
     fp->m_filter.f.m_aux_control = 0.0;
 
     osc_new_settings((oscillator *)&fp->m_lfo1);
-    lfo_set_soundgenerator_interface(&fp->m_lfo1);
+    lfo_set_sound_generator_interface(&fp->m_lfo1);
     lfo_start_oscillator((oscillator *)&fp->m_lfo1);
 
     osc_new_settings((oscillator *)&fp->m_lfo2);
-    lfo_set_soundgenerator_interface(&fp->m_lfo2);
+    lfo_set_sound_generator_interface(&fp->m_lfo2);
     lfo_start_oscillator((oscillator *)&fp->m_lfo2);
 
     printf("LFO1 freq is %.2f\n", fp->m_lfo1.osc.m_osc_fo);

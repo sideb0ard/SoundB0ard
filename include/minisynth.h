@@ -144,7 +144,6 @@ typedef struct synthsettings
     int m_octave;
     int m_pitchbend_range;
 
-    double m_volume_db;
     double m_fc_control;
     double m_q_control;
 
@@ -170,7 +169,7 @@ typedef struct synthsettings
 
 typedef struct minisynth
 {
-    soundgenerator sound_generator;
+    sound_generator sg;
     sequence_engine engine;
 
     minisynth_voice *m_voices[MAX_VOICES];
@@ -193,8 +192,6 @@ void minisynth_load_defaults(minisynth *ms);
 // sound generator interface //////////////
 stereo_val minisynth_gennext(void *self);
 void minisynth_status(void *self, wchar_t *status_string);
-void minisynth_setvol(void *self, double v);
-double minisynth_getvol(void *self);
 void minisynth_sg_start(void *self);
 void minisynth_sg_stop(void *self);
 int minisynth_get_num_patterns(void *self);
@@ -313,7 +310,6 @@ void minisynth_set_pulsewidth_pct(minisynth *ms, double val);
 void minisynth_set_sub_osc_db(minisynth *ms, double val);
 void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val);
 void minisynth_set_voice_mode(minisynth *ms, unsigned int val);
-void minisynth_set_vol(minisynth *ms, double val);
 void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
 void minisynth_set_monophonic(minisynth *ms, bool b);
 midi_event *minisynth_get_pattern(void *self, int pattern_num);

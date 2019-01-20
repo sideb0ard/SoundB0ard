@@ -618,8 +618,6 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
         minisynth_set_velocity_to_attack_scaling(ms, val);
     else if (strncmp("voice", wurds[2], 5) == 0)
         minisynth_set_voice_mode(ms, val);
-    else if (strncmp("vol", wurds[2], 3) == 0)
-        minisynth_set_vol(ms, val);
     else if (strncmp("zero", wurds[2], 4) == 0)
         minisynth_set_reset_to_zero(ms, val);
     else
