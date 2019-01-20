@@ -5,6 +5,8 @@
 #include "midi_freq_table.h"
 #include "mixer.h"
 
+extern mixer *mixr;
+
 digisynth *new_digisynth(char *filename)
 {
     printf("NEW DIGI SYNTH!\n");
@@ -145,6 +147,7 @@ void digisynth_sg_start(void *self)
 {
     digisynth *ds = (digisynth *)self;
     ds->sound_generator.active = true;
+    ds->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 void digisynth_sg_stop(void *self)
 {

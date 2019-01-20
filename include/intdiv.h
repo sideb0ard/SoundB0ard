@@ -32,7 +32,7 @@ typedef struct intdiv
     int selected_pattern;
 } intdiv;
 
-pattern_generator *new_intdiv(int num_parts, char *allowed_parts);
+pattern_generator *new_intdiv();
 void intdiv_generate(void *self, void *data);
 void intdiv_status(void *self, wchar_t *status_string);
 void intdiv_event_notify(void *self, broadcast_event event);

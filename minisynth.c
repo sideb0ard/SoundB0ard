@@ -1805,6 +1805,7 @@ void minisynth_sg_start(void *self)
 {
     minisynth *ms = (minisynth *)self;
     ms->sound_generator.active = true;
+    ms->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void minisynth_sg_stop(void *self)

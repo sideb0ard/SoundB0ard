@@ -275,6 +275,7 @@ void drumsampler_start(void *self)
         return; // no-op
     drumsampler_reset_samples(s);
     s->sound_generator.active = true;
+    s->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void drumsampler_stop(void *self)

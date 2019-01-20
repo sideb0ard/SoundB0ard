@@ -124,11 +124,12 @@ void mixer_status_mixr(mixer *mixr)
            " beat:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
            " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
-           ":::::::::: preview_enabled:%d filename:%s\n"
+           ":::::::::: cur_16th:%d preview_enabled:%d filename:%s\n"
            ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s midi_print:%d midi_bank:%d\n"
            ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d move:%d prog:(%d)%s\n"
            ANSI_COLOR_RESET,
            mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
+           mixr->timing_info.sixteenth_note_tick % 16,
            mixr->preview.enabled, mixr->preview.filename,
            mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
            mixr->active_midi_soundgen_num,
@@ -449,10 +450,10 @@ int mixer_add_markov(mixer *mixr, unsigned int type)
         return -99;
 }
 
-int mixer_add_intdiv(mixer *mixr, int num_notes, char *allowed_parts)
+int mixer_add_intdiv(mixer *mixr)
 {
     printf("Adding an INTDIV!\n");
-    pattern_generator *sg = new_intdiv(num_notes, allowed_parts);
+    pattern_generator *sg = new_intdiv();
     if (sg)
         return add_pattern_generator(mixr, sg);
     else

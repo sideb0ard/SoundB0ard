@@ -415,6 +415,7 @@ void looper_start(void *self)
     eg_start_eg(&l->m_eg1);
     l->sound_generator.active = true;
     l->stop_pending = false;
+    l->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void looper_stop(void *self)

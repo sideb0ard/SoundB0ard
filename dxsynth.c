@@ -1358,8 +1358,9 @@ void dxsynth_stop(dxsynth *dx) { dxsynth_midi_note_off(dx, 0, 0, true); }
 
 void dxsynth_sg_start(void *self)
 {
-    dxsynth *ms = (dxsynth *)self;
-    ms->sound_generator.active = true;
+    dxsynth *dx = (dxsynth *)self;
+    dx->sound_generator.active = true;
+    dx->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void dxsynth_sg_stop(void *self)

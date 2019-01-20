@@ -319,7 +319,6 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
     case (TIME_SIXTEENTH_TICK):
         if (engine->started)
         {
-
             if (engine->debug)
                 printf("CUR_STEP:%d range_start:%d len:%d\n", engine->cur_step,
                        engine->range_start, engine->range_len);
@@ -329,8 +328,7 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
             else
                 engine->cur_step -= engine->count_by;
 
-            if (engine->cur_step < engine->range_start ||
-                engine->cur_step < 0)
+            if (engine->cur_step < engine->range_start || engine->cur_step < 0)
             {
                 int over_by = engine->range_start - engine->cur_step;
                 if (engine->fold)
@@ -340,8 +338,7 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
                 }
                 else
                     engine->cur_step =
-                        (engine->range_start + engine->range_len) -
-                        over_by - 1;
+                        (engine->range_start + engine->range_len) - over_by - 1;
             }
             else if (engine->cur_step >= 16 ||
                      engine->cur_step >=
@@ -357,8 +354,7 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
                 if (engine->fold)
                 {
                     engine->cur_step =
-                        (engine->range_start + engine->range_len) -
-                        over_by - 1;
+                        (engine->range_start + engine->range_len) - over_by - 1;
                     engine->fold_direction = FOLD_BAK;
                 }
                 else

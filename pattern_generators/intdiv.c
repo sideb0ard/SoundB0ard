@@ -11,7 +11,7 @@ extern mixer *mixr;
 
 static char *s_intdiv_status_names[] = {"STATIC", "RAND"};
 
-pattern_generator *new_intdiv(int num_parts, char *allowed_parts)
+pattern_generator *new_intdiv()
 {
     intdiv *id = calloc(1, sizeof(intdiv));
     if (!id)
@@ -19,9 +19,11 @@ pattern_generator *new_intdiv(int num_parts, char *allowed_parts)
         printf("WOOF!\n");
         return NULL;
     }
-    id->num_parts = num_parts;
+    id->num_parts = 5;
 
-    intdiv_set_allowed_part_sizes(id, allowed_parts);
+    intdiv_set_allowed_part_sizes(id, "\"2 3 4\"");
+
+    id->selected_pattern = 13;
 
     id->sg.status = &intdiv_status;
     id->sg.generate = &intdiv_generate;
