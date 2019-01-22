@@ -392,6 +392,17 @@ void vol_change(mixer *mixr, int sg, float vol)
     mixr->sound_generators[sg]->set_volume(mixr->sound_generators[sg], vol);
 }
 
+void pan_change(mixer *mixr, int sg, float val)
+{
+    if (!mixer_is_valid_soundgen_num(mixr, sg))
+    {
+        printf("Nah mate, returning\n");
+        return;
+    }
+    mixr->sound_generators[sg]->set_pan(mixr->sound_generators[sg], val);
+}
+
+
 int add_sound_generator(mixer *mixr, sound_generator *sg)
 {
     if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)

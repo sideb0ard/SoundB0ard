@@ -354,8 +354,14 @@ stereo_val looper_gennext(void *self)
     eg_update(&g->m_eg1);
     double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
 
-    val.left = val.left * g->sg.volume * eg_amp;
-    val.right = val.right * g->sg.volume * eg_amp;
+    g->sg.pan = fmin(g->sg.pan, 1.0);
+    g->sg.pan = fmax(g->sg.pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(g->sg.pan, &pan_left, &pan_right);
+
+    val.left = val.left * g->sg.volume * eg_amp * pan_left;
+    val.right = val.right * g->sg.volume * eg_amp * pan_right;
 
     val = effector(&g->sg, val);
 
@@ -373,7 +379,7 @@ void looper_status(void *self, wchar_t *status_string)
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
         // clang-format off
-        "source:%s %s vol:%.2lf pitch:%.2f stereo:%d mode:%s\n"
+        "source:%s %s vol:%.2lf pan:%.2lf pitch:%.2f stereo:%d mode:%s\n"
         "gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
         "len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
         "xsrc:%d rec:%d widx:%d xmode:%s(%d) degrade:%d\n "
@@ -387,14 +393,15 @@ void looper_status(void *self, wchar_t *status_string)
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
         // clang-format on
 
-        g->filename, INSTRUMENT_COLOR, g->sg.volume, g->grain_pitch,
-        g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
+        g->filename, INSTRUMENT_COLOR, g->sg.volume, g->sg.pan,
+        g->grain_pitch, g->num_channels > 1 ? 1 : 0,
+        s_loop_mode_names[g->loop_mode],
         g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
         g->grain_attack_time_pct, g->grain_release_time_pct, g->loop_len,
         g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
         g->external_source_sg, g->recording, g->audio_buffer_write_idx,
-        s_external_mode_names[g->external_source_mode], g->external_source_mode,
-        g->degrade_by,
+        s_external_mode_names[g->external_source_mode],
+        g->external_source_mode, g->degrade_by,
 
         ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
         ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,

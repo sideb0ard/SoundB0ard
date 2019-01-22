@@ -372,8 +372,7 @@ void minisynth_update(minisynth *ms)
         (bool)ms->m_settings.m_eg1_sustain_override;
 
     // --- dca:
-    ms->m_global_synth_params.dca_params.amplitude_db =
-        ms->sg.volume;
+    ms->m_global_synth_params.dca_params.amplitude_db = ms->sg.volume;
 
     // --- enable/disable mod matrix stuff
     // LFO1 routings
@@ -743,7 +742,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE "%s\n"
         "%s"
-        "vol:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) "
+        "vol:%.1f pan:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) "
         "mono:%d hard_sync:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
 
         "osc1:%s(%d) o1amp:%f o1oct:%d o1semi:%d o1cents%d\n"
@@ -782,6 +781,7 @@ void minisynth_status(void *self, wchar_t *status_string)
         ms->m_settings.m_settings_name,
         INSTRUMENT_YELLOW,
         ms->sg.volume,
+        ms->sg.pan,
         s_voice_names[ms->m_settings.m_voice_mode],
         INSTRUMENT_YELLOW,
         ms->m_settings.m_voice_mode,
@@ -970,8 +970,14 @@ stereo_val minisynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    stereo_val out = {.left = accum_out_left * ms->sg.volume,
-                      .right = accum_out_right * ms->sg.volume};
+    ms->sg.pan = fmin(ms->sg.pan, 1.0);
+    ms->sg.pan = fmax(ms->sg.pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(ms->sg.pan, &pan_left, &pan_right);
+
+    stereo_val out = {.left = accum_out_left * ms->sg.volume * pan_left,
+                      .right = accum_out_right * ms->sg.volume * pan_right};
 
     out = effector(&ms->sg, out);
     return out;

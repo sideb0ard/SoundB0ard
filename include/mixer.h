@@ -190,6 +190,7 @@ int add_effect(mixer *mixr);
 
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
+void pan_change(mixer *mixr, int sig, float vol);
 
 void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);

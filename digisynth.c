@@ -4,6 +4,7 @@
 #include "digisynth.h"
 #include "midi_freq_table.h"
 #include "mixer.h"
+#include "utils.h"
 
 extern mixer *mixr;
 
@@ -89,8 +90,15 @@ stereo_val digisynth_gennext(void *self)
         accum_out_right += out_right;
     }
 
-    stereo_val return_val = {.left = accum_out_left * ds->sg.volume,
-                             .right = accum_out_right * ds->sg.volume};
+    ds->sg.pan = fmin(ds->sg.pan, 1.0);
+    ds->sg.pan = fmax(ds->sg.pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(ds->sg.pan, &pan_left, &pan_right);
+
+    stereo_val return_val = {.left = accum_out_left * ds->sg.volume * pan_left,
+                             .right =
+                                 accum_out_right * ds->sg.volume * pan_right};
 
     return_val = effector(&ds->sg, return_val);
     return return_val;
@@ -101,12 +109,13 @@ void digisynth_status(void *self, wchar_t *status_string)
     digisynth *ds = (digisynth *)self;
     swprintf(status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
-                               " vol: %.2f active: %s midi_note_1:%d "
+                               " vol:%.2f pan:%.2f active:%s midi_note_1:%d "
                                "midi_note_2:%d midi_note_3:%d "
                                "sample_len:%d read_idx:%d",
-             ds->audiofile, ds->sg.volume, ds->sg.active ? "true" : "false",
-             ds->engine.midi_note_1, ds->engine.midi_note_2,
-             ds->engine.midi_note_3, ds->m_voices[0].m_osc1.afd.samplecount,
+             ds->audiofile, ds->sg.volume, ds->sg.pan,
+             ds->sg.active ? "true" : "false", ds->engine.midi_note_1,
+             ds->engine.midi_note_2, ds->engine.midi_note_3,
+             ds->m_voices[0].m_osc1.afd.samplecount,
              ds->m_voices[0].m_osc1.m_read_idx);
     wchar_t scratch[1024] = {};
     sequence_engine_status(&ds->engine, scratch);

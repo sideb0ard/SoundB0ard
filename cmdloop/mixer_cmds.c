@@ -631,6 +631,16 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         }
         goto cmd_found;
     }
+    else if (strncmp("pan", wurds[0], 3) == 0)
+    {
+        int soundgen_num = atoi(wurds[1]);
+        if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+        {
+            double val = atof(wurds[2]);
+            pan_change(mixr, soundgen_num, val);
+        }
+        goto cmd_found;
+    }
 
     else if (strncmp("scene", wurds[0], 5) == 0)
     {

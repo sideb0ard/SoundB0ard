@@ -681,7 +681,7 @@ void dxsynth_status(void *self, wchar_t *status_string)
     swprintf(
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
-        "%s " "%s" "algo:%d vol: %.1f midi_osc:%d porta:%.1f pitchrange:%d op4fb:%.2f\n"
+        "%s " "%s" "algo:%d vol:%.1f pan:%.1f midi_osc:%d porta:%.1f pitchrange:%d op4fb:%.2f\n"
         "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n"
         "l1_dest1:%s l1_dest2:%s\nl1_dest3:%s l1_dest4:%s\n"
         "o1wav:%d o1rat:%.2f o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n"
@@ -692,7 +692,8 @@ void dxsynth_status(void *self, wchar_t *status_string)
 
         dx->m_settings.m_settings_name,
         INSTRUMENT_COLOR,
-        dx->m_settings.m_voice_mode, dx->sg.volume,
+        dx->m_settings.m_voice_mode,
+        dx->sg.volume, dx->sg.pan,
         dx->active_midi_osc,
         dx->m_settings.m_portamento_time_ms,
         dx->m_settings.m_pitchbend_range,
@@ -783,8 +784,14 @@ stereo_val dxsynth_gennext(void *self)
         accum_out_right += mix * out_right;
     }
 
-    stereo_val out = {.left = accum_out_left * dx->sg.volume,
-                      .right = accum_out_right * dx->sg.volume};
+    dx->sg.pan = fmin(dx->sg.pan, 1.0);
+    dx->sg.pan = fmax(dx->sg.pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(dx->sg.pan, &pan_left, &pan_right);
+
+    stereo_val out = {.left = accum_out_left * dx->sg.volume * pan_left,
+                      .right = accum_out_right * dx->sg.volume * pan_right};
     out = effector(&dx->sg, out);
     return out;
 }

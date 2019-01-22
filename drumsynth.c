@@ -150,7 +150,7 @@ void drumsynth_status(void *self, wchar_t *ss)
 
     // clang-format off
     swprintf(ss, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f reset:%d distortion_threshold:%.2f\n"
+             WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f pan:%.2f reset:%d distortion_threshold:%.2f\n"
              "o1_wav:" "%s""%s" "%s" "(%d) o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
              "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_rel:%.2f\n"
              "o2_wav:" "%s" "%s" "%s" "(%d) o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
@@ -161,6 +161,7 @@ void drumsynth_status(void *self, wchar_t *ss)
              ds->m_patch_name,
              INSTRUMENT_RED,
              ds->sg.volume,
+             ds->sg.pan,
              ds->reset_osc,
              ds->m_distortion_threshold,
 
@@ -231,9 +232,15 @@ stereo_val drumsynth_gennext(void *self)
     moog_update((filter *)&ds->m_filter);
     combined_osc = moog_gennext((filter *)&ds->m_filter, combined_osc);
 
+    ds->sg.pan = fmin(ds->sg.pan, 1.0);
+    ds->sg.pan = fmax(ds->sg.pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(ds->sg.pan, &pan_left, &pan_right);
+
     double midi_velocity = scaleybum(0, 127, 0, 1, ds->current_velocity);
-    out.left = combined_osc * ds->sg.volume * midi_velocity;
-    out.right = combined_osc * ds->sg.volume * midi_velocity;
+    out.left = combined_osc * ds->sg.volume * midi_velocity * pan_left;
+    out.right = combined_osc * ds->sg.volume * midi_velocity * pan_right;
 
     ds->m_distortion.m_threshold = ds->m_distortion_threshold;
     out = distortion_process(&ds->m_distortion, out);

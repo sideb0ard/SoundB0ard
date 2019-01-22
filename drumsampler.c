@@ -173,7 +173,14 @@ stereo_val drumsampler_gennext(void *self)
     if (ds->envelope_enabled)
         volume *= amp_env;
 
-    stereo_val out = {.left = left_val * volume, .right = right_val * volume};
+    ds->sg.pan = fmin(ds->sg.pan, 1.0);
+    ds->sg.pan = fmax(ds->sg.pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(ds->sg.pan, &pan_left, &pan_right);
+
+    stereo_val out = {.left = left_val * volume * pan_left,
+                      .right = right_val * volume * pan_right};
     out = effector(&ds->sg, out);
     return out;
 }
@@ -199,16 +206,17 @@ void drumsampler_status(void *self, wchar_t *status_string)
     wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
     swprintf(local_status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE
-             "%s %s vol:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
+             "%s %s vol:%.2lf pan:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
              "eg:%d attack_ms:%.0f decay_ms:%.0f sustain:%.2f "
              "release_ms:%.0f glitch:%d gpct:%d\n"
              "multi:%d num_patterns:%d",
-             ds->filename, INSTRUMENT_COLOR, ds->sg.volume, ds->buffer_pitch,
-             ds->engine.allow_triplets, ds->buf_end_pos, ds->envelope_enabled,
-             ds->eg.m_attack_time_msec, ds->eg.m_decay_time_msec,
-             ds->eg.m_sustain_level, ds->eg.m_release_time_msec,
-             ds->glitch_mode, ds->glitch_rand_factor,
-             ds->engine.multi_pattern_mode, ds->engine.num_patterns);
+             ds->filename, INSTRUMENT_COLOR, ds->sg.volume, ds->sg.pan,
+             ds->buffer_pitch, ds->engine.allow_triplets, ds->buf_end_pos,
+             ds->envelope_enabled, ds->eg.m_attack_time_msec,
+             ds->eg.m_decay_time_msec, ds->eg.m_sustain_level,
+             ds->eg.m_release_time_msec, ds->glitch_mode,
+             ds->glitch_rand_factor, ds->engine.multi_pattern_mode,
+             ds->engine.num_patterns);
 
     wcscat(status_string, local_status_string);
 
