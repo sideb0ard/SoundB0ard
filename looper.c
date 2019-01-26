@@ -119,11 +119,13 @@ void looper_event_notify(void *self, broadcast_event event)
 
     looper *g = (looper *)self;
 
+    float loop_num = fmod(g->loop_counter, g->loop_len);
     int cur_sixteenth_midi_base =
-        (g->loop_counter * PPBAR) + g->engine.cur_step * PPSIXTEENTH;
+        (loop_num * PPBAR) + g->engine.cur_step * PPSIXTEENTH;
+    double pulses_per_loop = PPBAR * g->loop_len;
     int cur_midi_idx = (cur_sixteenth_midi_base +
                         (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
-                       PPBAR;
+                       (int)pulses_per_loop;
 
     switch (event.type)
     {
@@ -131,8 +133,6 @@ void looper_event_notify(void *self, broadcast_event event)
 
         g->started = true;
         g->loop_counter++; // used to track which 16th we're on if loop != 1 bar
-        float loop_num = fmod(g->loop_counter, g->loop_len);
-        // printf("LOOP # %f\n", loop_num);
 
         if (g->scramble_pending)
         {
@@ -162,15 +162,14 @@ void looper_event_notify(void *self, broadcast_event event)
         if (g->loop_mode == LOOPER_LOOP_MODE)
         {
 
-            double pulses_per_loop = PPBAR * g->loop_len;
             double decimal_percent_of_loop = cur_midi_idx / pulses_per_loop;
             double new_read_idx = decimal_percent_of_loop * g->audio_buffer_len;
 
-            // printf("PPLOOP:%f PPSIXT:%d base:%d rel_midi:%d DEC:%f len:%d "
-            //       "REDXIX:%f\n",
-            //       pulses_per_loop, PPSIXTEENTH, cur_sixteenth_midi_base,
-            //       relative_midi_idx, decimal_percent_of_loop,
-            //       g->audio_buffer_len, new_read_idx);
+            // printf("PPLOOP:%f PPSIXT:%d base:%d cur_midi:%d DEC:%f len:%d "
+            //      "REDXIX:%f\n",
+            //      pulses_per_loop, PPSIXTEENTH, cur_sixteenth_midi_base,
+            //      cur_midi_idx, decimal_percent_of_loop,
+            //      g->audio_buffer_len, new_read_idx);
 
             if (g->reverse_mode)
                 new_read_idx = (g->audio_buffer_len - 1) - new_read_idx;
@@ -224,6 +223,11 @@ void looper_event_notify(void *self, broadcast_event event)
         break;
 
     case (TIME_SIXTEENTH_TICK):
+
+        //printf(
+        //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d midi_idx:%d\n",
+        //    loop_num, g->engine.cur_step, cur_sixteenth_midi_base,
+        //    cur_midi_idx);
 
         if (g->scramble_mode)
         {
@@ -393,15 +397,14 @@ void looper_status(void *self, wchar_t *status_string)
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
         // clang-format on
 
-        g->filename, INSTRUMENT_COLOR, g->sg.volume, g->sg.pan,
-        g->grain_pitch, g->num_channels > 1 ? 1 : 0,
-        s_loop_mode_names[g->loop_mode],
+        g->filename, INSTRUMENT_COLOR, g->sg.volume, g->sg.pan, g->grain_pitch,
+        g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
         g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
         g->grain_attack_time_pct, g->grain_release_time_pct, g->loop_len,
         g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
         g->external_source_sg, g->recording, g->audio_buffer_write_idx,
-        s_external_mode_names[g->external_source_mode],
-        g->external_source_mode, g->degrade_by,
+        s_external_mode_names[g->external_source_mode], g->external_source_mode,
+        g->degrade_by,
 
         ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
         ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,
@@ -425,7 +428,7 @@ void looper_start(void *self)
     eg_start_eg(&l->m_eg1);
     l->sg.active = true;
     l->stop_pending = false;
-    l->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
+    sequence_engine_reset(&l->engine);
 }
 
 void looper_stop(void *self)

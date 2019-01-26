@@ -28,7 +28,6 @@ double sound_generator_get_volume(sound_generator *sg) { return sg->volume; }
 
 void sound_generator_set_volume(sound_generator *sg, double val)
 {
-    printf("SG, SET VOL!\n");
     if (val >= 0.0 && val <= 1.0)
         sg->volume = val;
 }

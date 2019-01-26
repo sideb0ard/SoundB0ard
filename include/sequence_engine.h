@@ -146,6 +146,7 @@ typedef struct sequence_engine
 
 void sequence_engine_init(sequence_engine *engine, void *parent,
                           unsigned int parent_synth_type);
+void sequence_engine_reset(sequence_engine *engine);
 
 bool sequence_engine_list_presets(unsigned int type);
 void sequence_engine_set_sample_rate(sequence_engine *engine, int sample_rate);

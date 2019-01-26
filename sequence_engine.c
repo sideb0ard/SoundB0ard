@@ -1001,7 +1001,6 @@ void sequence_engine_set_count_by(sequence_engine *engine, int count_by)
 void sequence_engine_reset_step(sequence_engine *engine)
 {
     printf("RESET!\n");
-    engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
     engine->count_by = 1;
     engine->cur_step = 0;
     engine->range_start = 0;
@@ -1028,4 +1027,10 @@ void sequence_engine_set_fold(sequence_engine *engine, bool b)
 void sequence_engine_set_debug(sequence_engine *engine, bool b)
 {
     engine->debug = b;
+}
+
+void sequence_engine_reset(sequence_engine *engine)
+{
+    engine->started = false;
+    sequence_engine_reset_step(engine);
 }
