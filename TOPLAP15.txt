@@ -1,0 +1,36 @@
+kicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
+hats/AbraHat.aiff // hatsmask
+claps/distCllap.aiff // raggaclap
+dx glitchrrr // algo 3 + 5
+pads/italiaDream2Bar.aiff // idx 0 10 0 50
+dx 3 load coldGrimeOct1
+new moog // keys
+[Tick:    21] - note:   40 velocity:  128 type: note_off delete_after_use: false
+[Tick:    85] - note:   50 velocity:  128 type: note_on delete_after_use: false
+[Tick:   122] - note:   50 velocity:  128 type: note_on delete_after_use: false
+[Tick:   804] - note:   45 velocity:  128 type: note_on delete_after_use: false
+[Tick:  1038] - note:   50 velocity:  128 type: note_off delete_after_use: false
+[Tick:  1075] - note:   50 velocity:  128 type: note_off delete_after_use: false
+[Tick:  1757] - note:   45 velocity:  128 type: note_off delete_after_use: false
+[Tick:  1898] - note:   45 velocity:  128 type: note_on delete_after_use: false
+[Tick:  1993] - note:   40 velocity:  128 type: note_on delete_after_use: false
+[Tick:  2851] - note:   45 velocity:  128 type: note_off delete_after_use: false
+[Tick:  2908] - note:   40 velocity:  128 type: note_on delete_after_use: false
+[Tick:  2946] - note:   40 velocity:  128 type: note_off delete_after_use: false
+dx 3 load scarlet
+
+loops/rainforrest.aiff
+loops//gasloopbar1.aiff
+
+noises//italiandreambirdnoises.aiff
+
+kicks/808Kkick.wav
+legowelt//Synth-LiteHouseMood.wav
+
+dx rocktagon
+
+
+bpm 88
+dloops/hiphousebreak.aiff // count 1 8 15 // delay fb
+legowelt//Synth-GlassBell3.wav // idx 0 20 0 50 60 20
+dloops/mkLikeloop.aiff

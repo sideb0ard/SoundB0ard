@@ -402,7 +402,6 @@ void pan_change(mixer *mixr, int sg, float val)
     mixr->sound_generators[sg]->set_pan(mixr->sound_generators[sg], val);
 }
 
-
 int add_sound_generator(mixer *mixr, sound_generator *sg)
 {
     if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)
@@ -985,8 +984,10 @@ void synth_handle_midi_note(sound_generator *sg, int note, int velocity,
             dxsynth_midi_note_on(dx, note, velocity);
         }
 
+        int sustain_time_in_ticks =
+            engine->sustain_note_ms * mixr->timing_info.ms_per_midi_tick;
         int note_off_tick =
-            (mixr->timing_info.midi_tick + (PPSIXTEENTH * 4 - 7)) % PPBAR;
+            (mixr->timing_info.midi_tick + sustain_time_in_ticks) % PPBAR;
 
         midi_event off_event = new_midi_event(128, note, velocity);
         ////////////////////////
