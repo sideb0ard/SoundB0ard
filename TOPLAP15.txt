@@ -1,4 +1,17 @@
-kicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
+
+legowelt/Synth-SupertronChoir3.wav // loop 4
+loops/soulsoulstrings2bar.aiff
+loops/rainforrest.aiff
+
+step - load leend
+intdiv
+perc/dubTic.aiff && perc/shimmyshaker.aiff
+
+moog // telefon
+
+moog // telefon
+
+glitchrrrkicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
 hats/AbraHat.aiff // hatsmask
 claps/distCllap.aiff // raggaclap
 dx glitchrrr // algo 3 + 5
@@ -7,19 +20,9 @@ dx 3 load coldGrimeOct1
 new moog // keys
 [Tick:    21] - note:   40 velocity:  128 type: note_off delete_after_use: false
 [Tick:    85] - note:   50 velocity:  128 type: note_on delete_after_use: false
-[Tick:   122] - note:   50 velocity:  128 type: note_on delete_after_use: false
 [Tick:   804] - note:   45 velocity:  128 type: note_on delete_after_use: false
-[Tick:  1038] - note:   50 velocity:  128 type: note_off delete_after_use: false
-[Tick:  1075] - note:   50 velocity:  128 type: note_off delete_after_use: false
-[Tick:  1757] - note:   45 velocity:  128 type: note_off delete_after_use: false
-[Tick:  1898] - note:   45 velocity:  128 type: note_on delete_after_use: false
-[Tick:  1993] - note:   40 velocity:  128 type: note_on delete_after_use: false
-[Tick:  2851] - note:   45 velocity:  128 type: note_off delete_after_use: false
-[Tick:  2908] - note:   40 velocity:  128 type: note_on delete_after_use: false
-[Tick:  2946] - note:   40 velocity:  128 type: note_off delete_after_use: false
 dx 3 load scarlet
 
-loops/rainforrest.aiff
 loops//gasloopbar1.aiff
 
 noises//italiandreambirdnoises.aiff
@@ -34,3 +37,13 @@ bpm 88
 dloops/hiphousebreak.aiff // count 1 8 15 // delay fb
 legowelt//Synth-GlassBell3.wav // idx 0 20 0 50 60 20
 dloops/mkLikeloop.aiff
+
+dloops/PaljoeyBeaat.aiff
+hats/weekendCHat.aiff
+hats/OH_909_15.wav
+perc/dubTic.aiff
+perc/glitchssz.aiff
+kicks/lm1-kick.aif
+kicks/kick2.aif
+
+

@@ -81,10 +81,22 @@ typedef struct sequence_engine
     unsigned int parent_type; // used for casting parent type
 
     int tick; // current 16th note tick from mixer
+
+    // pattern state management
     midi_pattern patterns[MAX_NUM_MIDI_LOOPS];
     midi_event temporal_events[PPBAR];
-    int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS];
+    int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS]; // how many times to play
+                                                     // this loop
     midi_pattern backup_pattern_while_getting_crazy;
+
+    int num_patterns;
+    int cur_pattern;
+    int cur_pattern_iteration;
+
+    bool multi_pattern_mode;
+    bool multi_pattern_loop_countdown_started;
+
+    // end of pattern state management
 
     // these used to traverse the pattern in fun ways
     int count_by;
@@ -98,13 +110,6 @@ typedef struct sequence_engine
     bool fold;
     bool fold_direction;
     // end of pattern traversals
-
-    int num_patterns;
-    int cur_pattern;
-    int cur_pattern_iteration;
-
-    bool multi_pattern_mode;
-    bool multi_pattern_loop_countdown_started;
 
     // for sample and hold to downgrade sample_rate
     int sample_rate;
@@ -135,7 +140,8 @@ typedef struct sequence_engine
 
     uint16_t event_mask;
     bool enable_event_mask;
-    int mask_every_n;
+    int mask_mode; // 0 = MASK 1 = UNMASK
+    int apply_mask_every_n;
     int event_mask_counter;
 
     bool follow_mixer_chord_changes;

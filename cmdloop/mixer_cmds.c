@@ -304,6 +304,13 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                     if (strncmp("once", mod, 4) == 0)
                         set_pattern_to_self_destruct(sg->get_pattern(sg, 0));
 
+                    else if (strncmp("hspeed", mod, 4) == 0)
+                    {
+                        printf("Half speed!\n");
+                    }
+                    else if (strncmp("2speed", mod, 4) == 0)
+                    {
+                    }
                     else if (strncmp("valz", mod, 4) == 0)
                     {
                         if (strlen(mod) != 5)
