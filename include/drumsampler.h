@@ -62,10 +62,6 @@ typedef struct drumsampler
 drumsampler *new_drumsampler(char *filename);
 
 int get_a_drumsampler_position(drumsampler *ss);
-int drumsampler_get_num_patterns(void *s);
-void drumsampler_set_num_patterns(void *s, int num_patterns);
-void drumsampler_make_active_track(void *s, int track_num);
-bool drumsampler_is_valid_pattern(void *self, int pattern_num);
 
 void drumsampler_del_self(void *self);
 void drumsampler_status(void *self, wchar_t *status_string);

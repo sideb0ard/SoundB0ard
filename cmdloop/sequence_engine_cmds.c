@@ -239,7 +239,7 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
     }
     else
     {
-        if (is_valid_pattern_num(engine, pattern_num))
+        if (sequence_engine_is_valid_pattern(engine, pattern_num))
         {
             if (strncmp("cp", wurds[0], 2) == 0)
             {
@@ -254,8 +254,8 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                     sequence_engine *sb2 =
                         get_sequence_engine(mixr->sound_generators[sg2]);
 
-                    if (is_valid_pattern_num(engine, pattern_num) &&
-                        is_valid_pattern_num(sb2, pattern_num2))
+                    if (sequence_engine_is_valid_pattern(engine, pattern_num) &&
+                        sequence_engine_is_valid_pattern(sb2, pattern_num2))
                     {
 
                         midi_event *loop_copy =

@@ -53,17 +53,23 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             sound_generator *sg_src =
                 (sound_generator *)mixr->sound_generators[sg_src_num];
+            sequence_engine *src_engine = get_sequence_engine(sg_src);
+
             sound_generator *sg_dst =
                 (sound_generator *)mixr->sound_generators[sg_dst_num];
-            if (sg_src->is_valid_pattern(sg_src, sg_src_pattern_num) &&
-                sg_dst->is_valid_pattern(sg_dst, sg_dst_pattern_num))
+            sequence_engine *dst_engine = get_sequence_engine(sg_dst);
+
+            if (sequence_engine_is_valid_pattern(src_engine,
+                                                 sg_src_pattern_num) &&
+                sequence_engine_is_valid_pattern(dst_engine,
+                                                 sg_dst_pattern_num))
             {
                 pattern_change_info change_info = {.clear_previous = true,
                                                    .temporary = false};
                 midi_event *pattern =
-                    sg_src->get_pattern(sg_src, sg_src_pattern_num);
-                sg_dst->set_pattern(sg_dst, sg_dst_pattern_num, change_info,
-                                    pattern);
+                    sequence_engine_get_pattern(src_engine, sg_src_pattern_num);
+                sequence_engine_set_pattern(dst_engine, sg_dst_pattern_num,
+                                            change_info, pattern);
             }
             else
                 printf("Tried copying - something went wrong..\n");
@@ -82,7 +88,9 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             printf("SG:%d Pattern %d\n", sg_num, pattern_num);
             sound_generator *sg =
                 (sound_generator *)mixr->sound_generators[sg_num];
-            midi_event *pattern = sg->get_pattern(sg, pattern_num);
+            sequence_engine *engine = get_sequence_engine(sg);
+            midi_event *pattern =
+                sequence_engine_get_pattern(engine, pattern_num);
             midi_pattern_print(pattern);
         }
         else
@@ -94,11 +102,13 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 printf("TRUWE!\n");
                 sound_generator *sg =
                     (sound_generator *)mixr->sound_generators[sg_num];
-                int num_patterns = sg->get_num_patterns(sg);
+                sequence_engine *engine = get_sequence_engine(sg);
+                int num_patterns = sequence_engine_get_num_patterns(engine);
                 for (int i = 0; i < num_patterns; i++)
                 {
                     printf("PATTERN NUM %d\n", i);
-                    midi_event *pattern = sg->get_pattern(sg, i);
+                    midi_event *pattern =
+                        sequence_engine_get_pattern(engine, i);
                     midi_pattern_print(pattern);
                 }
             }
@@ -120,7 +130,9 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                    pattern_num, midi_tick, velocity);
             sound_generator *sg =
                 (sound_generator *)mixr->sound_generators[sg_num];
-            midi_event *pattern = sg->get_pattern(sg, pattern_num);
+            sequence_engine *engine = get_sequence_engine(sg);
+            midi_event *pattern =
+                sequence_engine_get_pattern(engine, pattern_num);
             midi_pattern_set_velocity(pattern, midi_tick, velocity);
         }
 

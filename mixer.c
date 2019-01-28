@@ -713,8 +713,9 @@ void mixer_play_scene(mixer *mixr, int scene_num)
         {
             mixr->sound_generators[soundgen_num]->start(
                 mixr->sound_generators[soundgen_num]);
-            mixr->sound_generators[soundgen_num]->make_active_track(
-                mixr->sound_generators[soundgen_num], soundgen_track_num);
+            sequence_engine_make_active_pattern(
+                get_sequence_engine(mixr->sound_generators[soundgen_num]),
+                soundgen_track_num);
         }
         else
         {
@@ -840,8 +841,8 @@ bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) && track_num >= 0 &&
-        track_num < mixr->sound_generators[soundgen_num]->get_num_patterns(
-                        mixr->sound_generators[soundgen_num]))
+        track_num < sequence_engine_get_num_patterns(get_sequence_engine(
+                        mixr->sound_generators[soundgen_num])))
         return true;
 
     return false;

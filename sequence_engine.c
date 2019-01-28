@@ -251,15 +251,15 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
                 &engine->patterns[engine->cur_pattern]);
             engine->restore_pending = false;
         }
-         else if (engine->multi_pattern_mode && engine->num_patterns > 1)
+        else if (engine->multi_pattern_mode && engine->num_patterns > 1)
         {
             engine->cur_pattern_iteration--;
             if (engine->cur_pattern_iteration <= 0)
             {
-                //if (engine->parent_type == MINISYNTH_TYPE)
+                // if (engine->parent_type == MINISYNTH_TYPE)
                 //    minisynth_midi_note_off((minisynth *)parent, 0, 0,
                 //                            true /* all notes off */);
-                //else if (engine->parent_type == DXSYNTH_TYPE)
+                // else if (engine->parent_type == DXSYNTH_TYPE)
                 //    dxsynth_midi_note_off((dxsynth *)parent, 0, 0,
                 //                          true /* all notes off */);
 
@@ -461,12 +461,12 @@ void sequence_engine_nudge_pattern(sequence_engine *ms, int pattern_num,
     sequence_engine_set_pattern(ms, pattern_num, change_info, new_loop);
 }
 
-bool is_valid_pattern_num(sequence_engine *ms, int pattern_num)
+bool sequence_engine_is_valid_pattern(sequence_engine *engine, int pattern_num)
 {
     if (pattern_num >= 0 && pattern_num < MAX_NUM_MIDI_LOOPS)
     {
-        if (pattern_num >= ms->num_patterns)
-            ms->num_patterns = pattern_num + 1;
+        if (pattern_num >= engine->num_patterns)
+            engine->num_patterns = pattern_num + 1;
         return true;
     }
     return false;
@@ -532,26 +532,23 @@ int sequence_engine_get_notes_from_pattern(midi_pattern loop,
     return idx; // num notes
 }
 
-int sequence_engine_get_num_patterns(void *self)
+int sequence_engine_get_num_patterns(sequence_engine *engine)
 {
-    sequence_engine *ms = (sequence_engine *)self;
-    return ms->num_patterns;
+    return engine->num_patterns;
 }
 
-void sequence_engine_set_num_patterns(void *self, int num_patterns)
+void sequence_engine_set_num_patterns(sequence_engine *engine, int num_patterns)
 {
-    sequence_engine *ms = (sequence_engine *)self;
     if (num_patterns > 0)
     {
-        ms->num_patterns = num_patterns;
+        engine->num_patterns = num_patterns;
     }
 }
 
-void sequence_engine_make_active_track(void *self, int pattern_num)
+void sequence_engine_make_active_pattern(sequence_engine *engine,
+                                         int pattern_num)
 {
-    sequence_engine *ms = (sequence_engine *)self;
-    ms->cur_pattern =
-        pattern_num; // TODO - standardize - PATTERN? TRACK? pattern?!?!
+    engine->cur_pattern = pattern_num;
 }
 
 void sequence_engine_print_patterns(sequence_engine *ms)
@@ -560,19 +557,19 @@ void sequence_engine_print_patterns(sequence_engine *ms)
         midi_pattern_print(ms->patterns[i]);
 }
 
-void sequence_engine_add_note(sequence_engine *ms, int pattern_num, int step,
-                              int midi_note, int amp, bool keep_note)
+void sequence_engine_add_note(sequence_engine *engine, int pattern_num,
+                              int step, int midi_note, int amp, bool keep_note)
 {
     int mstep = step * PPSIXTEENTH;
-    sequence_engine_add_micro_note(ms, pattern_num, mstep, midi_note, amp,
+    sequence_engine_add_micro_note(engine, pattern_num, mstep, midi_note, amp,
                                    keep_note);
 }
 
-void sequence_engine_add_micro_note(sequence_engine *ms, int pattern_num,
+void sequence_engine_add_micro_note(sequence_engine *engine, int pattern_num,
                                     int mstep, int midi_note, int amp,
                                     bool keep_note)
 {
-    if (is_valid_pattern_num(ms, pattern_num) && mstep < PPBAR)
+    if (sequence_engine_is_valid_pattern(engine, pattern_num) && mstep < PPBAR)
     {
         midi_event on = new_midi_event(MIDI_ON, midi_note, amp);
 
@@ -581,7 +578,7 @@ void sequence_engine_add_micro_note(sequence_engine *ms, int pattern_num,
             on.delete_after_use = true;
         }
 
-        sequence_engine_add_event(ms, pattern_num, mstep, on);
+        sequence_engine_add_event(engine, pattern_num, mstep, on);
     }
     else
     {
@@ -599,7 +596,7 @@ void sequence_engine_rm_note(sequence_engine *ms, int pattern_num, int step)
 
 void sequence_engine_rm_micro_note(sequence_engine *ms, int pat_num, int tick)
 {
-    if (is_valid_pattern_num(ms, pat_num) && tick < PPBAR)
+    if (sequence_engine_is_valid_pattern(ms, pat_num) && tick < PPBAR)
     {
         memset(&ms->patterns[ms->cur_pattern][tick], 0, sizeof(midi_event));
     }
@@ -620,7 +617,7 @@ void sequence_engine_mv_note(sequence_engine *ms, int pattern_num, int fromstep,
 void sequence_engine_mv_micro_note(sequence_engine *ms, int pattern_num,
                                    int fromstep, int tostep)
 {
-    if (is_valid_pattern_num(ms, pattern_num))
+    if (sequence_engine_is_valid_pattern(ms, pattern_num))
     {
         ms->patterns[pattern_num][tostep] = ms->patterns[pattern_num][fromstep];
         memset(&ms->patterns[pattern_num][fromstep], 0, sizeof(midi_event));
@@ -695,7 +692,7 @@ int sequence_engine_change_octave_pattern(sequence_engine *engine,
 {
     // printf("Changing octave of %d - direction: %s\n", pattern_num,
     //       direction == 1 ? "UP" : "DOWN");
-    if (is_valid_pattern_num(engine, pattern_num))
+    if (sequence_engine_is_valid_pattern(engine, pattern_num))
     {
         for (int i = 0; i < PPBAR; i++)
             if (engine->patterns[pattern_num][i].event_type)
@@ -739,21 +736,19 @@ void sequence_engine_set_midi_note(sequence_engine *engine, int midi_note_num,
     }
 }
 
-midi_event *sequence_engine_get_pattern(void *self,
+midi_event *sequence_engine_get_pattern(sequence_engine *engine,
                                         int pattern_num)
 {
-    sequence_engine *engine = get_sequence_engine(self);
-    if (is_valid_pattern_num(engine, pattern_num))
+    if (sequence_engine_is_valid_pattern(engine, pattern_num))
         return engine->patterns[pattern_num];
     return NULL;
 }
 
-void sequence_engine_set_pattern(void *self, int pattern_num,
+void sequence_engine_set_pattern(sequence_engine *engine, int pattern_num,
                                  pattern_change_info change_info,
                                  midi_event *pattern)
 {
-    sequence_engine *engine = get_sequence_engine(self);
-    if (is_valid_pattern_num(engine, pattern_num))
+    if (sequence_engine_is_valid_pattern(engine, pattern_num))
     {
         int default_midi_note =
             get_midi_note_from_mixer_key(mixr->key, engine->octave);
@@ -959,7 +954,8 @@ void sequence_engine_set_enable_event_mask(sequence_engine *engine, bool b)
     engine->enable_event_mask = b;
 }
 
-void sequence_engine_set_mask_every(sequence_engine *engine, int apply_mask_every_n)
+void sequence_engine_set_mask_every(sequence_engine *engine,
+                                    int apply_mask_every_n)
 {
     engine->apply_mask_every_n = apply_mask_every_n;
 }
@@ -1034,4 +1030,53 @@ void sequence_engine_reset(sequence_engine *engine)
 {
     engine->started = false;
     sequence_engine_reset_step(engine);
+}
+
+void sequence_engine_pattern_to_half_speed(sequence_engine *engine, int pat_num)
+{
+    if (sequence_engine_is_valid_pattern(engine, pat_num))
+    {
+        midi_event *orig_pattern = sequence_engine_get_pattern(engine, pat_num);
+
+        midi_event midi_pattern_first_half[PPBAR] = {};
+        midi_event midi_pattern_second_half[PPBAR] = {};
+
+        for (int i = 0; i < PPBAR / 2; i++)
+            if (orig_pattern[i].event_type)
+                midi_pattern_first_half[i * 2] = orig_pattern[i];
+
+        for (int i = PPBAR / 2; i < PPBAR; i++)
+            if (orig_pattern[i].event_type)
+                midi_pattern_second_half[i * 2 - PPBAR / 2] = orig_pattern[i];
+
+        pattern_change_info change_info = {.clear_previous = true,
+                                           .temporary = false};
+        sequence_engine_set_pattern(engine, 0, change_info,
+                                    midi_pattern_first_half);
+        sequence_engine_set_pattern(engine, 1, change_info,
+                                    midi_pattern_second_half);
+    }
+}
+
+void sequence_engine_pattern_to_double_speed(sequence_engine *engine,
+                                             int pat_num)
+{
+    if (sequence_engine_is_valid_pattern(engine, pat_num))
+    {
+        midi_event *orig_pattern = sequence_engine_get_pattern(engine, pat_num);
+
+        midi_event doubled_pattern[PPBAR] = {};
+
+        for (int i = 0; i < PPBAR; i++)
+            if (orig_pattern[i].event_type)
+                midi_pattern_add_event(doubled_pattern, i / 2, orig_pattern[i]);
+
+        for (int i = PPBAR / 2; i < PPBAR; i++)
+            if (doubled_pattern[i].event_type)
+                doubled_pattern[i * 2] = doubled_pattern[i];
+
+        pattern_change_info change_info = {.clear_previous = true,
+                                           .temporary = false};
+        sequence_engine_set_pattern(engine, 0, change_info, doubled_pattern);
+    }
 }

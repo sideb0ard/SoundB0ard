@@ -84,6 +84,7 @@ void echo(midi_event *in_pattern)
 
 void dense(midi_event *in_pattern, int density)
 {
+    printf("DENSITY!\n");
     if (density < 2)
         return;
 

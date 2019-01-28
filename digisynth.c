@@ -33,12 +33,6 @@ digisynth *new_digisynth(char *filename)
     ds->sg.stop = &digisynth_sg_stop;
     ds->sg.event_notify = &sequence_engine_event_notify;
     ds->sg.self_destruct = &digisynth_del_self;
-    ds->sg.get_num_patterns = &digisynth_get_num_patterns;
-    ds->sg.set_num_patterns = &digisynth_set_num_patterns;
-    ds->sg.make_active_track = &digisynth_make_active_track;
-    ds->sg.set_pattern = &sequence_engine_set_pattern;
-    ds->sg.get_pattern = &sequence_engine_get_pattern;
-    ds->sg.is_valid_pattern = &digisynth_is_valid_pattern;
     ds->sg.type = DIGISYNTH_TYPE;
     ds->sg.active = true;
     sound_generator_init(&ds->sg);
@@ -62,11 +56,6 @@ void digisynth_load_wav(digisynth *ds, char *filename)
                                             filename);
         ;
     }
-}
-bool digisynth_is_valid_pattern(void *self, int pattern_num)
-{
-    digisynth *digi = (digisynth *)self;
-    return is_valid_pattern_num(&digi->engine, pattern_num);
 }
 
 // sound generator interface //////////////
@@ -120,24 +109,6 @@ void digisynth_status(void *self, wchar_t *status_string)
     wchar_t scratch[1024] = {};
     sequence_engine_status(&ds->engine, scratch);
     wcscat(status_string, scratch);
-}
-
-int digisynth_get_num_patterns(void *self)
-{
-    digisynth *ds = (digisynth *)self;
-    return sequence_engine_get_num_patterns(&ds->engine);
-}
-
-void digisynth_set_num_patterns(void *self, int num_patterns)
-{
-    digisynth *ds = (digisynth *)self;
-    sequence_engine_set_num_patterns(&ds->engine, num_patterns);
-}
-
-void digisynth_make_active_track(void *self, int tracknum)
-{
-    digisynth *ds = (digisynth *)self;
-    sequence_engine_make_active_track(&ds->engine, tracknum);
 }
 
 void digisynth_sg_start(void *self)

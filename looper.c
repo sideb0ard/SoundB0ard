@@ -62,14 +62,8 @@ looper *new_looper(char *filename)
     g->sg.set_pan = &sound_generator_set_pan;
     g->sg.start = &looper_start;
     g->sg.stop = &looper_stop;
-    g->sg.get_num_patterns = &looper_get_num_patterns;
-    g->sg.set_num_patterns = &looper_set_num_patterns;
-    g->sg.make_active_track = &looper_make_active_track;
     g->sg.self_destruct = &looper_del_self;
     g->sg.event_notify = &looper_event_notify;
-    g->sg.get_pattern = &sequence_engine_get_pattern;
-    g->sg.set_pattern = &sequence_engine_set_pattern;
-    g->sg.is_valid_pattern = &looper_is_valid_pattern;
     g->sg.type = LOOPER_TYPE;
 
     if (strncmp(filename, "none", 4) != 0)
@@ -89,12 +83,6 @@ looper *new_looper(char *filename)
     looper_start(g);
 
     return g;
-}
-
-bool looper_is_valid_pattern(void *self, int pattern_num)
-{
-    looper *l = (looper *)self;
-    return is_valid_pattern_num(&l->engine, pattern_num);
 }
 
 void looper_event_notify(void *self, broadcast_event event)
@@ -208,10 +196,10 @@ void looper_event_notify(void *self, broadcast_event event)
 
     case (TIME_SIXTEENTH_TICK):
 
-        //printf(
-        //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d midi_idx:%d\n",
-        //    loop_num, g->engine.cur_step, cur_sixteenth_midi_base,
-        //    cur_midi_idx);
+        // printf(
+        //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d
+        //    midi_idx:%d\n", loop_num, g->engine.cur_step,
+        //    cur_sixteenth_midi_base, cur_midi_idx);
 
         if (g->scramble_mode)
         {
@@ -427,25 +415,6 @@ void looper_del_self(void *self)
     // TODO delete file
     looper *g = (looper *)self;
     free(g);
-}
-
-void looper_make_active_track(void *self, int track_num)
-{
-    // NOOP
-    (void)self;
-    (void)track_num;
-}
-
-int looper_get_num_patterns(void *self)
-{
-    (void)self;
-    return 1;
-}
-
-void looper_set_num_patterns(void *self, int num_patterns)
-{
-    (void)self;
-    (void)num_patterns;
 }
 
 //////////////////////////// grain stuff //////////////////////////

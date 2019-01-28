@@ -155,6 +155,20 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
                           unsigned int parent_synth_type);
 void sequence_engine_reset(sequence_engine *engine);
 
+midi_event *sequence_engine_get_pattern(sequence_engine *engine,
+                                        int pattern_num);
+void sequence_engine_set_pattern(sequence_engine *engine, int pattern_num,
+                                 pattern_change_info change_info,
+                                 midi_event *pattern);
+int sequence_engine_get_num_patterns(sequence_engine *engine);
+void sequence_engine_set_num_patterns(sequence_engine *engine,
+                                      int num_patterns);
+void sequence_engine_make_active_pattern(sequence_engine *engine,
+                                         int pattern_num);
+bool sequence_engine_is_valid_pattern(sequence_engine *engine, int pattern_num);
+
+////////////////////////////////////////////////////////////
+
 bool sequence_engine_list_presets(unsigned int type);
 void sequence_engine_set_sample_rate(sequence_engine *engine, int sample_rate);
 void sequence_engine_status(sequence_engine *engine, wchar_t *status_string);
@@ -190,7 +204,6 @@ void sequence_engine_delete_event(sequence_engine *engine, int pat_num,
 void sequence_engine_print_patterns(sequence_engine *engine);
 void sequence_engine_nudge_pattern(sequence_engine *engine, int pattern_num,
                                    int sixteenth);
-bool is_valid_pattern_num(sequence_engine *ns, int pattern_num);
 void sequence_engine_import_midi_from_file(sequence_engine *engine,
                                            char *filename);
 void sequence_engine_set_sustain_note_ms(sequence_engine *engine,
@@ -205,10 +218,7 @@ int sequence_engine_change_octave_pattern(sequence_engine *engine,
                                           int pattern_num, int direction);
 void sequence_engine_change_octave_midi_notes(sequence_engine *engine,
                                               unsigned int direction);
-int sequence_engine_get_num_patterns(void *self);
-void sequence_engine_set_num_patterns(void *self, int num_patterns);
 int sequence_engine_get_num_notes(sequence_engine *engine);
-void sequence_engine_make_active_track(void *self, int pattern_num);
 
 void sequence_engine_add_note(sequence_engine *engine, int pattern_num,
                               int step, int midi_note, int amp, bool keep_note);
@@ -223,11 +233,6 @@ void sequence_engine_rm_micro_note(sequence_engine *engine, int pattern_num,
                                    int step);
 void sequence_engine_mv_micro_note(sequence_engine *engine, int pattern_num,
                                    int fromstep, int tostep);
-midi_event *sequence_engine_get_pattern(void *self,
-                                        int pattern_num);
-void sequence_engine_set_pattern(void *self, int pattern_num,
-                                 pattern_change_info change_info,
-                                 midi_event *pattern);
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine);
 void sequence_engine_set_pattern_to_current_key(sequence_engine *engine);
 
@@ -256,3 +261,8 @@ void sequence_engine_set_increment_by(sequence_engine *engine, int incr);
 void sequence_engine_set_range_len(sequence_engine *engine, int range);
 void sequence_engine_set_fold(sequence_engine *engine, bool b);
 void sequence_engine_set_debug(sequence_engine *engine, bool b);
+
+void sequence_engine_pattern_to_half_speed(sequence_engine *engine,
+                                           int pat_num);
+void sequence_engine_pattern_to_double_speed(sequence_engine *engine,
+                                             int pat_num);

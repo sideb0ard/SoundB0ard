@@ -22,21 +22,11 @@ typedef struct sound_generator
     void (*start)(void *self);
     void (*stop)(void *self);
 
-    void (*make_active_track)(void *self, int track_num);
-    int (*get_num_patterns)(void *self);
-    void (*set_num_patterns)(void *self, int num_patterns);
-
     void (*event_notify)(void *self, broadcast_event event);
-
-    midi_event *(*get_pattern)(void *self, int pattern_num);
-    void (*set_pattern)(void *self, int pattern_num,
-                        pattern_change_info change_info, midi_event *pattern);
-
-    bool (*is_valid_pattern)(void *self, int pattern_num);
 
     sound_generator_type type;
     int mixer_idx;
-    int num_patterns;
+    //  int num_patterns;
     bool active;
 
     double volume; // between 0 and 1.0

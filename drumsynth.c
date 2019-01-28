@@ -75,13 +75,8 @@ drumsynth *new_drumsynth()
     ds->sg.set_pan = &sound_generator_set_pan;
     ds->sg.start = &drumsynth_start;
     ds->sg.stop = &drumsynth_stop;
-    ds->sg.get_num_patterns = &drumsynth_get_num_patterns;
-    ds->sg.make_active_track = &drumsynth_make_active_track;
     ds->sg.self_destruct = &drumsynth_del_self;
     ds->sg.event_notify = &sequence_engine_event_notify;
-    ds->sg.set_pattern = &sequence_engine_set_pattern;
-    ds->sg.get_pattern = &sequence_engine_get_pattern;
-    ds->sg.is_valid_pattern = &drumsynth_is_valid_pattern;
     ds->sg.type = DRUMSYNTH_TYPE;
 
     sequence_engine_init(&ds->engine, (void *)ds, DRUMSYNTH_TYPE);
@@ -92,12 +87,6 @@ drumsynth *new_drumsynth()
     // printf("DRUMSYNTH ACTIVE: %s\n", ds->sg.active ? "true" : "false");
 
     return ds;
-}
-
-bool drumsynth_is_valid_pattern(void *self, int pattern_num)
-{
-    drumsynth *ds = (drumsynth *)self;
-    return is_valid_pattern_num(&ds->engine, pattern_num);
 }
 
 void drumsynth_randomize(drumsynth *ds)
@@ -584,24 +573,6 @@ void drumsynth_stop(void *self)
 {
     drumsynth *ds = (drumsynth *)self;
     ds->sg.active = false;
-}
-
-int drumsynth_get_num_patterns(void *self)
-{
-    drumsynth *ds = (drumsynth *)self;
-    return sequence_engine_get_num_patterns(&ds->engine);
-}
-
-void drumsynth_set_num_patterns(void *self, int num_patterns)
-{
-    drumsynth *ds = (drumsynth *)self;
-    sequence_engine_set_num_patterns(&ds->engine, num_patterns);
-}
-
-void drumsynth_make_active_track(void *self, int track_num)
-{
-    drumsynth *ds = (drumsynth *)self;
-    sequence_engine_make_active_track(&ds->engine, track_num);
 }
 
 void drumsynth_set_distortion_threshold(drumsynth *ds, double val)

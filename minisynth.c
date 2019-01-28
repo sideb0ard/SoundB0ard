@@ -43,14 +43,8 @@ minisynth *new_minisynth(void)
     ms->sg.get_pan = &sound_generator_get_pan;
     ms->sg.start = &minisynth_sg_start;
     ms->sg.stop = &minisynth_sg_stop;
-    ms->sg.get_num_patterns = &minisynth_get_num_patterns;
-    ms->sg.set_num_patterns = &minisynth_set_num_patterns;
     ms->sg.event_notify = &sequence_engine_event_notify;
-    ms->sg.make_active_track = &minisynth_make_active_track;
-    ms->sg.set_pattern = &sequence_engine_set_pattern;
-    ms->sg.get_pattern = &sequence_engine_get_pattern;
     ms->sg.self_destruct = &minisynth_del_self;
-    ms->sg.is_valid_pattern = &minisynth_is_valid_pattern;
     ms->sg.type = MINISYNTH_TYPE;
     sound_generator_init(&ms->sg);
 
@@ -211,12 +205,6 @@ void minisynth_load_defaults(minisynth *ms)
 
     ms->m_settings.m_generate_active = false;
     ms->m_settings.m_generate_src = -99;
-}
-
-bool minisynth_is_valid_pattern(void *self, int pattern_num)
-{
-    minisynth *ms = (minisynth *)self;
-    return is_valid_pattern_num(&ms->engine, pattern_num);
 }
 
 ////////////////////////////////////
@@ -924,25 +912,6 @@ void minisynth_print_lfo1_routing_info(minisynth *ms, wchar_t *scratch)
 void minisynth_print_eg1_routing_info(minisynth *ms, wchar_t *scratch)
 {
     print_modulation_matrix_info_eg1(&ms->m_ms_modmatrix, scratch);
-}
-
-int minisynth_get_num_patterns(void *self)
-{
-    minisynth *ms = (minisynth *)self;
-    return sequence_engine_get_num_patterns(&ms->engine);
-}
-
-void minisynth_set_num_patterns(void *self, int num_patterns)
-{
-    printf("SETTING NUm!%d\n", num_patterns);
-    minisynth *ms = (minisynth *)self;
-    sequence_engine_set_num_patterns(&ms->engine, num_patterns);
-}
-
-void minisynth_make_active_track(void *self, int tracknum)
-{
-    minisynth *ms = (minisynth *)self;
-    sequence_engine_make_active_track(&ms->engine, tracknum);
 }
 
 stereo_val minisynth_gennext(void *self)

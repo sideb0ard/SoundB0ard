@@ -31,10 +31,6 @@ void digisynth_stop(digisynth *d);
 void digisynth_sg_start(void *self);
 void digisynth_sg_stop(void *self);
 void digisynth_del_self(void *self);
-int digisynth_get_num_patterns(void *self);
-void digisynth_set_num_patterns(void *self, int num_patterns);
-void digisynth_make_active_track(void *self, int tracknum);
-bool digisynth_is_valid_pattern(void *self, int pattern_num);
 
 ////////////////////////////////////
 

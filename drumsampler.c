@@ -32,14 +32,8 @@ drumsampler *new_drumsampler(char *filename)
     ds->sg.set_pan = &sound_generator_set_pan;
     ds->sg.start = &drumsampler_start;
     ds->sg.stop = &drumsampler_stop;
-    ds->sg.get_num_patterns = &drumsampler_get_num_patterns;
-    ds->sg.set_num_patterns = &drumsampler_set_num_patterns;
-    ds->sg.make_active_track = &drumsampler_make_active_track;
     ds->sg.self_destruct = &drumsampler_del_self;
     ds->sg.event_notify = &sequence_engine_event_notify;
-    ds->sg.get_pattern = &sequence_engine_get_pattern;
-    ds->sg.set_pattern = &sequence_engine_set_pattern;
-    ds->sg.is_valid_pattern = &drumsampler_is_valid_pattern;
     ds->sg.type = DRUMSAMPLER_TYPE;
 
     envelope_generator_init(&ds->eg);
@@ -50,12 +44,6 @@ drumsampler *new_drumsampler(char *filename)
     ds->started = false;
 
     return ds;
-}
-
-bool drumsampler_is_valid_pattern(void *self, int pattern_num)
-{
-    drumsampler *ds = (drumsampler *)self;
-    return is_valid_pattern_num(&ds->engine, pattern_num);
 }
 
 void drumsampler_import_file(drumsampler *ds, char *filename)
@@ -215,24 +203,6 @@ void drumsampler_del_self(void *self)
     free(s->buffer);
     printf("Deleting drumsamplerUENCER SELF- bye!\n");
     free(s);
-}
-
-int drumsampler_get_num_patterns(void *self)
-{
-    drumsampler *s = (drumsampler *)self;
-    return sequence_engine_get_num_patterns(&s->engine);
-}
-
-void drumsampler_set_num_patterns(void *self, int num_patterns)
-{
-    drumsampler *s = (drumsampler *)self;
-    sequence_engine_set_num_patterns(&s->engine, num_patterns);
-}
-
-void drumsampler_make_active_track(void *self, int track_num)
-{
-    drumsampler *s = (drumsampler *)self;
-    sequence_engine_make_active_track(&s->engine, track_num);
 }
 
 int get_a_drumsampler_position(drumsampler *ss)

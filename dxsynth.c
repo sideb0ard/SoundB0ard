@@ -29,14 +29,8 @@ dxsynth *new_dxsynth(void)
     dx->sg.get_pan = &sound_generator_get_pan;
     dx->sg.start = &dxsynth_sg_start;
     dx->sg.stop = &dxsynth_sg_stop;
-    dx->sg.get_num_patterns = &dxsynth_get_num_patterns;
-    dx->sg.set_num_patterns = &dxsynth_set_num_patterns;
     dx->sg.event_notify = &sequence_engine_event_notify;
-    dx->sg.make_active_track = &dxsynth_make_active_track;
     dx->sg.self_destruct = &dxsynth_del_self;
-    dx->sg.set_pattern = &sequence_engine_set_pattern;
-    dx->sg.get_pattern = &sequence_engine_get_pattern;
-    dx->sg.is_valid_pattern = &dxsynth_is_valid_pattern;
     dx->sg.type = DXSYNTH_TYPE;
     dx->active_midi_osc = 1;
 
@@ -73,12 +67,6 @@ dxsynth *new_dxsynth(void)
     dx->sg.active = true;
     printf("BOOM!\n");
     return dx;
-}
-
-bool dxsynth_is_valid_pattern(void *self, int pattern_num)
-{
-    dxsynth *dx = (dxsynth *)self;
-    return is_valid_pattern_num(&dx->engine, pattern_num);
 }
 
 void dxsynth_reset(dxsynth *dx)
@@ -739,24 +727,6 @@ void dxsynth_status(void *self, wchar_t *status_string)
     wchar_t scratch[1024] = {};
     sequence_engine_status(&dx->engine, scratch);
     wcscat(status_string, scratch);
-}
-
-int dxsynth_get_num_patterns(void *self)
-{
-    dxsynth *ms = (dxsynth *)self;
-    return sequence_engine_get_num_patterns(&ms->engine);
-}
-
-void dxsynth_set_num_patterns(void *self, int num_patterns)
-{
-    dxsynth *ms = (dxsynth *)self;
-    sequence_engine_set_num_patterns(&ms->engine, num_patterns);
-}
-
-void dxsynth_make_active_track(void *self, int tracknum)
-{
-    dxsynth *ms = (dxsynth *)self;
-    sequence_engine_make_active_track(&ms->engine, tracknum);
 }
 
 stereo_val dxsynth_gennext(void *self)
