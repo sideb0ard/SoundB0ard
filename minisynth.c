@@ -47,8 +47,8 @@ minisynth *new_minisynth(void)
     ms->sg.set_num_patterns = &minisynth_set_num_patterns;
     ms->sg.event_notify = &sequence_engine_event_notify;
     ms->sg.make_active_track = &minisynth_make_active_track;
-    ms->sg.set_pattern = &minisynth_set_pattern;
-    ms->sg.get_pattern = &minisynth_get_pattern;
+    ms->sg.set_pattern = &sequence_engine_set_pattern;
+    ms->sg.get_pattern = &sequence_engine_get_pattern;
     ms->sg.self_destruct = &minisynth_del_self;
     ms->sg.is_valid_pattern = &minisynth_is_valid_pattern;
     ms->sg.type = MINISYNTH_TYPE;
@@ -2444,24 +2444,6 @@ void minisynth_set_monophonic(minisynth *ms, bool b)
 void minisynth_set_generate(minisynth *ms, bool b)
 {
     ms->m_settings.m_generate_active = b;
-}
-
-midi_event *minisynth_get_pattern(void *self, int pattern_num)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        return sequence_engine_get_pattern(engine, pattern_num);
-
-    return NULL;
-}
-
-void minisynth_set_pattern(void *self, int pattern_num,
-                           pattern_change_info change_info, midi_event *pattern)
-{
-    minisynth_stop(self);
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type)

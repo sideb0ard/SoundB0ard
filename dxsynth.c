@@ -34,8 +34,8 @@ dxsynth *new_dxsynth(void)
     dx->sg.event_notify = &sequence_engine_event_notify;
     dx->sg.make_active_track = &dxsynth_make_active_track;
     dx->sg.self_destruct = &dxsynth_del_self;
-    dx->sg.set_pattern = &dxsynth_set_pattern;
-    dx->sg.get_pattern = &dxsynth_get_pattern;
+    dx->sg.set_pattern = &sequence_engine_set_pattern;
+    dx->sg.get_pattern = &sequence_engine_get_pattern;
     dx->sg.is_valid_pattern = &dxsynth_is_valid_pattern;
     dx->sg.type = DXSYNTH_TYPE;
     dx->active_midi_osc = 1;
@@ -1703,23 +1703,6 @@ void dxsynth_set_op4_feedback(dxsynth *d, double val)
         d->m_settings.m_op4_feedback = val;
     else
         printf("Op4 feedback val has to be [0-70]\n");
-}
-
-midi_event *dxsynth_get_pattern(void *self, int pattern_num)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        return sequence_engine_get_pattern(engine, pattern_num);
-
-    return NULL;
-}
-
-void dxsynth_set_pattern(void *self, int pattern_num,
-                         pattern_change_info change_info, midi_event *pattern)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num)

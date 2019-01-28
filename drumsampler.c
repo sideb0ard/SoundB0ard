@@ -37,8 +37,8 @@ drumsampler *new_drumsampler(char *filename)
     ds->sg.make_active_track = &drumsampler_make_active_track;
     ds->sg.self_destruct = &drumsampler_del_self;
     ds->sg.event_notify = &sequence_engine_event_notify;
-    ds->sg.get_pattern = &drumsampler_get_pattern;
-    ds->sg.set_pattern = &drumsampler_set_pattern;
+    ds->sg.get_pattern = &sequence_engine_get_pattern;
+    ds->sg.set_pattern = &sequence_engine_set_pattern;
     ds->sg.is_valid_pattern = &drumsampler_is_valid_pattern;
     ds->sg.type = DRUMSAMPLER_TYPE;
 
@@ -56,24 +56,6 @@ bool drumsampler_is_valid_pattern(void *self, int pattern_num)
 {
     drumsampler *ds = (drumsampler *)self;
     return is_valid_pattern_num(&ds->engine, pattern_num);
-}
-
-midi_event *drumsampler_get_pattern(void *self, int pattern_num)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        return sequence_engine_get_pattern(engine, pattern_num);
-
-    return NULL;
-}
-
-void drumsampler_set_pattern(void *self, int pattern_num,
-                             pattern_change_info change_info,
-                             midi_event *pattern)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void drumsampler_import_file(drumsampler *ds, char *filename)

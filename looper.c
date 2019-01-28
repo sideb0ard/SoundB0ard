@@ -67,8 +67,8 @@ looper *new_looper(char *filename)
     g->sg.make_active_track = &looper_make_active_track;
     g->sg.self_destruct = &looper_del_self;
     g->sg.event_notify = &looper_event_notify;
-    g->sg.get_pattern = &looper_get_pattern;
-    g->sg.set_pattern = &looper_set_pattern;
+    g->sg.get_pattern = &sequence_engine_get_pattern;
+    g->sg.set_pattern = &sequence_engine_set_pattern;
     g->sg.is_valid_pattern = &looper_is_valid_pattern;
     g->sg.type = LOOPER_TYPE;
 
@@ -95,22 +95,6 @@ bool looper_is_valid_pattern(void *self, int pattern_num)
 {
     looper *l = (looper *)self;
     return is_valid_pattern_num(&l->engine, pattern_num);
-}
-
-midi_event *looper_get_pattern(void *self, int pattern_num)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        return sequence_engine_get_pattern(engine, pattern_num);
-    return NULL;
-}
-
-void looper_set_pattern(void *self, int pattern_num,
-                        pattern_change_info change_info, midi_event *pattern)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void looper_event_notify(void *self, broadcast_event event)

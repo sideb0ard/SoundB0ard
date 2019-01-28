@@ -206,7 +206,4 @@ void dxsynth_set_velocity_to_attack_scaling(dxsynth *d, bool b);
 void dxsynth_set_note_number_to_decay_scaling(dxsynth *d, bool b);
 void dxsynth_set_reset_to_zero(dxsynth *d, bool b);
 void dxsynth_set_legato_mode(dxsynth *d, bool b);
-midi_event *dxsynth_get_pattern(void *self, int pattern_num);
-void dxsynth_set_pattern(void *self, int pattern_num,
-                         pattern_change_info change_info, midi_event *pattern);
 void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num);

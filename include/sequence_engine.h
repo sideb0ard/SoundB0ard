@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include "defjams.h"
 #include "midimaaan.h"
 
 #define MAX_NUM_MIDI_LOOPS 64
@@ -222,7 +223,7 @@ void sequence_engine_rm_micro_note(sequence_engine *engine, int pattern_num,
                                    int step);
 void sequence_engine_mv_micro_note(sequence_engine *engine, int pattern_num,
                                    int fromstep, int tostep);
-midi_event *sequence_engine_get_pattern(sequence_engine *engine,
+midi_event *sequence_engine_get_pattern(void *self,
                                         int pattern_num);
 void sequence_engine_set_pattern(void *self, int pattern_num,
                                  pattern_change_info change_info,

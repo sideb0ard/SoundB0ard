@@ -92,8 +92,4 @@ void drumsynth_set_mod_semitones_range(drumsynth *ds, int val);
 
 void drumsynth_randomize(drumsynth *ds);
 
-midi_event *drumsynth_get_pattern(void *self, int pattern_num);
-void drumsynth_set_pattern(void *self, int pattern_num,
-                           pattern_change_info pattern_info,
-                           midi_event *pattern);
 void drumsynth_set_debug(drumsynth *ds, bool debug);

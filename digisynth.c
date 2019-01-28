@@ -36,8 +36,8 @@ digisynth *new_digisynth(char *filename)
     ds->sg.get_num_patterns = &digisynth_get_num_patterns;
     ds->sg.set_num_patterns = &digisynth_set_num_patterns;
     ds->sg.make_active_track = &digisynth_make_active_track;
-    ds->sg.set_pattern = &digisynth_set_pattern;
-    ds->sg.get_pattern = &digisynth_get_pattern;
+    ds->sg.set_pattern = &sequence_engine_set_pattern;
+    ds->sg.get_pattern = &sequence_engine_get_pattern;
     ds->sg.is_valid_pattern = &digisynth_is_valid_pattern;
     ds->sg.type = DIGISYNTH_TYPE;
     ds->sg.active = true;
@@ -209,20 +209,4 @@ bool digisynth_midi_note_off(digisynth *ds, unsigned int midinote,
     return true;
 }
 
-midi_event *digisynth_get_pattern(void *self, int pattern_num)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        return sequence_engine_get_pattern(engine, pattern_num);
-
-    return NULL;
-}
-
-void digisynth_set_pattern(void *self, int pattern_num,
-                           pattern_change_info change_info, midi_event *pattern)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
-}
 void digisynth_update(digisynth *ds) {}

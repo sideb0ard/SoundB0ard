@@ -79,8 +79,8 @@ drumsynth *new_drumsynth()
     ds->sg.make_active_track = &drumsynth_make_active_track;
     ds->sg.self_destruct = &drumsynth_del_self;
     ds->sg.event_notify = &sequence_engine_event_notify;
-    ds->sg.set_pattern = &drumsynth_set_pattern;
-    ds->sg.get_pattern = &drumsynth_get_pattern;
+    ds->sg.set_pattern = &sequence_engine_set_pattern;
+    ds->sg.get_pattern = &sequence_engine_get_pattern;
     ds->sg.is_valid_pattern = &drumsynth_is_valid_pattern;
     ds->sg.type = DRUMSYNTH_TYPE;
 
@@ -630,22 +630,6 @@ void drumsynth_set_filter_type(drumsynth *ds, unsigned int val)
 void drumsynth_set_mod_semitones_range(drumsynth *ds, int val)
 {
     ds->mod_semitones_range = val;
-}
-
-midi_event *drumsynth_get_pattern(void *self, int pattern_num)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        return sequence_engine_get_pattern(engine, pattern_num);
-    return NULL;
-}
-
-void drumsynth_set_pattern(void *self, int pattern_num,
-                           pattern_change_info change_info, midi_event *pattern)
-{
-    sequence_engine *engine = get_sequence_engine(self);
-    if (engine)
-        sequence_engine_set_pattern(engine, pattern_num, change_info, pattern);
 }
 
 void drumsynth_set_reset_osc(drumsynth *ds, bool b) { ds->reset_osc = b; }
