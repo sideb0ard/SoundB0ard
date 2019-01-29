@@ -64,7 +64,7 @@ void _juggler_apply_pattern(juggler *j, int start_idx, int pattern_len,
         bit_pattern = create_euclidean_rhythm(rand_steps, 16);
         break;
     case (1):
-        bit_pattern = markov_bit_pattern_generate(0);
+        //bit_pattern = markov_bit_pattern_generate(0);
         break;
     }
 

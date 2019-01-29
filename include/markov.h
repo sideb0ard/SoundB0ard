@@ -5,6 +5,8 @@
 
 enum
 {
+    CLAP2,
+    KICK2,
     CLAPS,
     GARAGE,
     HATS,
@@ -30,4 +32,4 @@ void markov_event_notify(void *self, broadcast_event event);
 void markov_set_debug(void *self, bool b);
 void markov_set_type(markov *m, unsigned int type);
 
-uint16_t markov_bit_pattern_generate(unsigned int markov_type);
+void markov_pattern_generate(unsigned int markov_type, midi_event *midi_pattern);

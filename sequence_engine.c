@@ -197,11 +197,11 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
         scratch, 255,
         L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d "
         L"debug:%d\n"
-        L"midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d\n"
+        L"num_patterns:%d midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d\n"
         L"count_by:%d cur_step:%d incr:%d range:%d fold:%d\n"
         L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
-        engine->sustain_note_ms, engine->debug, engine->midi_note_1,
+        engine->sustain_note_ms, engine->debug, engine->num_patterns, engine->midi_note_1,
         engine->midi_note_2, engine->midi_note_3,
         engine->follow_mixer_chord_changes, engine->count_by, engine->cur_step,
         engine->increment_by, engine->range_len, engine->fold,
@@ -539,9 +539,10 @@ int sequence_engine_get_num_patterns(sequence_engine *engine)
 
 void sequence_engine_set_num_patterns(sequence_engine *engine, int num_patterns)
 {
-    if (num_patterns > 0)
+    if (num_patterns > 0 && num_patterns < MAX_NUM_MIDI_LOOPS)
     {
         engine->num_patterns = num_patterns;
+        engine->cur_pattern = 0;
     }
 }
 
