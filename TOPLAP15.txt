@@ -1,5 +1,18 @@
+bpm 120
+loop strings/breoknRiser.aiff 4 // C
+loop noises/stream.aiff 4 // C
 
-legowelt/Synth-SupertronChoir3.wav // loop 4
+gran legowelt//Synth-GlassBell3.wav  // G // vol 0.3 // idx 0 10
+
+drones/sheetal.aiff // G
+drones/highdrone.aiff // Eb
+
+pads/italiaDream2Bar.aiff // C
+pads/italiaDream2Bar.aiff // idx 0 10 0 50  // C
+
+
+
+legowelt/Synth-SupertronChoir3.wav // loop 4 // B
 loops/soulsoulstrings2bar.aiff
 loops/rainforrest.aiff
 
@@ -15,7 +28,6 @@ glitchrrrkicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
 hats/AbraHat.aiff // hatsmask
 claps/distCllap.aiff // raggaclap
 dx glitchrrr // algo 3 + 5
-pads/italiaDream2Bar.aiff // idx 0 10 0 50
 dx 3 load coldGrimeOct1
 new moog // keys
 [Tick:    21] - note:   40 velocity:  128 type: note_off delete_after_use: false
@@ -23,19 +35,18 @@ new moog // keys
 [Tick:   804] - note:   45 velocity:  128 type: note_on delete_after_use: false
 dx 3 load scarlet
 
-loops//gasloopbar1.aiff
+loops//gasloopbar1.aiff // Ab
 
-noises//italiandreambirdnoises.aiff
+noises//italiandreambirdnoises.aiff // Ab
 
 kicks/808Kkick.wav
-legowelt//Synth-LiteHouseMood.wav
+legowelt//Synth-LiteHouseMood.wav // C
 
 dx rocktagon
 
 
 bpm 88
 dloops/hiphousebreak.aiff // count 1 8 15 // delay fb
-legowelt//Synth-GlassBell3.wav // idx 0 20 0 50 60 20
 dloops/mkLikeloop.aiff
 
 dloops/PaljoeyBeaat.aiff
@@ -47,3 +58,26 @@ kicks/lm1-kick.aif
 kicks/kick2.aif
 
 
+
+strings/shadesofrhythm4bar.aiff // Gb
+strings/janetSterings.aiff // F
+strings/darkMoWaxStrings.aiff // C
+strings/moWaxStringsExcursionsz.aiff // Eb
+strings/summit.aiff // Db
+strings/yarly.aiff // F
+pads/italiaDream2Bar.aiff // C
+pads/italiandreamhaus.aiff // F
+pads/italiandreamhausTOO.aiff // Bb
+pads/italianDreamWithBirdz.aiff // D
+pads/washey Bb
+
+drones/slowedBradLayner.aiff // D
+drones/moodIIswing.aiff // Ab
+drones/keydrone.aiff // C
+drones/idmMelodyBit.aiff // Gb
+drones/garageDroneReverseMono.aiff // E
+drones/garageDroneForward.aiff // E
+drones/deepdroneA.aiff // A
+drones/deepdrone.aiff // Eb
+drones/airPal.aiff // D
+noises/loon-bird.aiff // Ab
