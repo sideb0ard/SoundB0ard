@@ -355,7 +355,8 @@ void looper_status(void *self, wchar_t *status_string)
         status_string, MAX_STATIC_STRING_SZ,
         WANSI_COLOR_WHITE
         // clang-format off
-        "source:%s %s vol:%.2lf pan:%.2lf pitch:%.2f stereo:%d mode:%s\n"
+        "source:%s %s\n"
+        "vol:%.2lf pan:%.2lf pitch:%.2f stereo:%d mode:%s\n"
         "gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
         "len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
         "xsrc:%d rec:%d widx:%d xmode:%s(%d) degrade:%d\n "

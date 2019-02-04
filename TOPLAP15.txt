@@ -1,30 +1,38 @@
-bpm 120
-loop strings/breoknRiser.aiff 4 // C
-loop noises/stream.aiff 4 // C
+bpm 140
 
+loop noises/stream.aiff 4 // C
 gran legowelt//Synth-GlassBell3.wav  // G // vol 0.3 // idx 0 10
 
-drones/sheetal.aiff // G
-drones/highdrone.aiff // Eb
+moog // martianwater
+noises//italiandreambirdnoises.aiff // Ab
+
+kicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
 
 pads/italiaDream2Bar.aiff // C
 pads/italiaDream2Bar.aiff // idx 0 10 0 50  // C
 
+garage/SideStick_Lindrum_24.wav
+garage/RimDrumtrax05.wav
+garage/BassDrumtrax06.wav
 
+dloops/hiphousebreak.aiff // count 1 8 15 // delay fb
+
+intdiv
+perc/dubTic.aiff && perc/shimmyshaker.aiff
 
 legowelt/Synth-SupertronChoir3.wav // loop 4 // B
+
+
 loops/soulsoulstrings2bar.aiff
 loops/rainforrest.aiff
 
 step - load leend
-intdiv
-perc/dubTic.aiff && perc/shimmyshaker.aiff
 
 moog // telefon
 
 moog // telefon
 
-glitchrrrkicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
+glitchrrr
 hats/AbraHat.aiff // hatsmask
 claps/distCllap.aiff // raggaclap
 dx glitchrrr // algo 3 + 5
@@ -37,8 +45,6 @@ dx 3 load scarlet
 
 loops//gasloopbar1.aiff // Ab
 
-noises//italiandreambirdnoises.aiff // Ab
-
 kicks/808Kkick.wav
 legowelt//Synth-LiteHouseMood.wav // C
 
@@ -46,7 +52,6 @@ dx rocktagon
 
 
 bpm 88
-dloops/hiphousebreak.aiff // count 1 8 15 // delay fb
 dloops/mkLikeloop.aiff
 
 dloops/PaljoeyBeaat.aiff

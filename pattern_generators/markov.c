@@ -78,8 +78,8 @@ void markov_pattern_generate(unsigned int markov_type, midi_event *midi_pattern)
 
     if (markov_type == CLAP2)
     {
-        int shifty1 = 1680 + (rand() % 100);
-        int shifty2 = 2160 + (rand() % 100);
+        int shifty1 = 1680 + (rand() % 80);
+        int shifty2 = 2160 + (rand() % 80);
         int midi_timings[5] = {960, shifty1, 1920, shifty2, 2880};
         for (int i = 0; i < 5; i++)
         {
@@ -286,6 +286,8 @@ void markov_pattern_generate(unsigned int markov_type, midi_event *midi_pattern)
         }
         if (bit_pattern == 0)
             markov_pattern_generate(markov_type, midi_pattern);
+
+        apply_short_to_midi_pattern(bit_pattern, midi_pattern);
     }
 }
 
