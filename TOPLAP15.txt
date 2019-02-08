@@ -4,26 +4,47 @@ loop noises/stream.aiff 4 // C
 gran legowelt//Synth-GlassBell3.wav  // G // vol 0.3 // idx 0 10
 
 moog // martianwater
-noises//italiandreambirdnoises.aiff // Ab
+new loop noises//italiandreambirdnoises.aiff 4 // Ab
 
 kicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
+garage/BassDrumtrax06.wav
 
 pads/italiaDream2Bar.aiff // C
 pads/italiaDream2Bar.aiff // idx 0 10 0 50  // C
 
 garage/SideStick_Lindrum_24.wav
 garage/RimDrumtrax05.wav
-garage/BassDrumtrax06.wav
 
+
+key gb
+new bitshift (37 >> t | t*13) | 25
+dx load deeepend // gen ^
+drones/slowedBradLayner.aiff // D
+strings/shadesofrhythm4bar.aiff // Gb
+hats/timabHat2.aiff
+claps/mawOW.aiff
 dloops/hiphousebreak.aiff // count 1 8 15 // delay fb
 
 intdiv
 perc/dubTic.aiff && perc/shimmyshaker.aiff
 
 legowelt/Synth-SupertronChoir3.wav // loop 4 // B
+drones/garageDroneReverseMono.aiff // E
+drones/garageDroneForward.aiff // E
+markov garage
+kicks/808Kkick.wav
 
 
-loops/soulsoulstrings2bar.aiff
+
+
+
+
+dloops/sayprayer2.aif
+
+
+dx rocktagon
+
+loops/soulsoulstrings2bar.aiff // Ab
 loops/rainforrest.aiff
 
 step - load leend
@@ -45,10 +66,8 @@ dx 3 load scarlet
 
 loops//gasloopbar1.aiff // Ab
 
-kicks/808Kkick.wav
 legowelt//Synth-LiteHouseMood.wav // C
 
-dx rocktagon
 
 
 bpm 88
@@ -64,7 +83,6 @@ kicks/kick2.aif
 
 
 
-strings/shadesofrhythm4bar.aiff // Gb
 strings/janetSterings.aiff // F
 strings/darkMoWaxStrings.aiff // C
 strings/moWaxStringsExcursionsz.aiff // Eb
@@ -76,13 +94,11 @@ pads/italiandreamhausTOO.aiff // Bb
 pads/italianDreamWithBirdz.aiff // D
 pads/washey Bb
 
-drones/slowedBradLayner.aiff // D
-drones/moodIIswing.aiff // Ab
 drones/keydrone.aiff // C
 drones/idmMelodyBit.aiff // Gb
-drones/garageDroneReverseMono.aiff // E
-drones/garageDroneForward.aiff // E
 drones/deepdroneA.aiff // A
 drones/deepdrone.aiff // Eb
 drones/airPal.aiff // D
+
 noises/loon-bird.aiff // Ab
+drones/moodIIswing.aiff // Ab

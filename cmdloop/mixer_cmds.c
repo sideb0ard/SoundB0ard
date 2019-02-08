@@ -353,13 +353,11 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
                     else if (strncmp("hspeed", mod, 6) == 0)
                     {
-                        printf("Half speed!\n");
                         sequence_engine_pattern_to_half_speed(
                             engine, dests[i].sg_pattern_num);
                     }
                     else if (strncmp("2speed", mod, 6) == 0)
                     {
-                        printf("2 speed!\n");
                         sequence_engine_pattern_to_double_speed(
                             engine, dests[i].sg_pattern_num);
                     }
