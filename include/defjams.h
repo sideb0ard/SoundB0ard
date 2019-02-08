@@ -13,7 +13,7 @@
 
 #define SIZE_OF_WURD 256
 #define NUM_WURDS 25
-#define DEFAULT_BPM 160
+#define DEFAULT_BPM 140
 
 #define SAMPLE_DIR "./wavs/"
 

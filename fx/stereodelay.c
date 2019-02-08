@@ -15,7 +15,7 @@ stereodelay *new_stereo_delay(double duration)
     d->m_feedback_percent = 2;
     d->m_delay_ratio = 0.2;
     d->m_wet_mix = 0.7;
-    d->m_mode = PINGPONG;
+    d->m_mode = TAP2;
 
     d->m_fx.type = DELAY;
     d->m_fx.enabled = true;
