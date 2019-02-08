@@ -373,31 +373,31 @@ static void _get_command_replacement_value(algorithm *a,
             double hi = atof(a->env.variable_list_vals[1]);
             if (lo < hi)
             {
-                printf("Lo and Hi don't look good: %f and %f - switching!\n",
-                       lo, hi);
-                double tmp = lo;
-                lo = hi;
-                hi = tmp;
-            }
-            int num_ticks_per_cycle =
-                mixer_get_ticks_per_cycle_unit(mixr, a->event_type) *
-                a->process_step;
-            int cur_midi_tick =
-                mixr->timing_info.midi_tick % num_ticks_per_cycle;
-            double relative_position = 0;
-            int halfway = num_ticks_per_cycle / 2.0;
-            if (cur_midi_tick < halfway)
-            {
-                relative_position = scaleybum(0, num_ticks_per_cycle, lo, hi,
-                                              cur_midi_tick * 2);
+                int num_ticks_per_cycle =
+                    mixer_get_ticks_per_cycle_unit(mixr, a->event_type) *
+                    a->process_step;
+                int cur_midi_tick =
+                    mixr->timing_info.midi_tick % num_ticks_per_cycle;
+                double relative_position = 0;
+                int halfway = num_ticks_per_cycle / 2.0;
+                if (cur_midi_tick < halfway)
+                {
+                    relative_position = scaleybum(0, num_ticks_per_cycle, lo,
+                                                  hi, cur_midi_tick * 2);
+                }
+                else
+                {
+                    relative_position =
+                        scaleybum(0, num_ticks_per_cycle, lo, hi,
+                                  (halfway - (cur_midi_tick - halfway)) * 2);
+                }
+                sprintf(replacement_value, "%f", relative_position);
             }
             else
             {
-                relative_position =
-                    scaleybum(0, num_ticks_per_cycle, lo, hi,
-                              (halfway - (cur_midi_tick - halfway)) * 2);
+                printf("Lo and Hi don't look good: %f and %f\n", lo, hi);
+                return;
             }
-            sprintf(replacement_value, "%f", relative_position);
         }
         else
         {

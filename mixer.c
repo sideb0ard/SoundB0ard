@@ -654,8 +654,8 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         if (mixr->preview.enabled)
         {
             stereo_val preview_audio = preview_buffer_generate(&mixr->preview);
-            output_left += preview_audio.left;
-            output_right += preview_audio.right;
+            output_left += preview_audio.left * 0.6;
+            output_right += preview_audio.right * 0.6;
         }
 
         if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
