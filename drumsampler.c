@@ -39,6 +39,7 @@ drumsampler *new_drumsampler(char *filename)
     envelope_generator_init(&ds->eg);
     sequence_engine_init(&ds->engine, (void *)ds, DRUMSAMPLER_TYPE);
     sound_generator_init(&ds->sg);
+    ds->eg.m_sustain_level = 0;
 
     ds->sg.active = true;
     ds->started = false;

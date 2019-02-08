@@ -1,9 +1,9 @@
-bpm 140
+bpm 140 // 9:42
 
 loop noises/stream.aiff 4 // C
 gran legowelt//Synth-GlassBell3.wav  // G // vol 0.3 // idx 0 10
 
-moog // martianwater
+moog // martianwater or androidDreams
 new loop noises//italiandreambirdnoises.aiff 4 // Ab
 
 kicks/mkKick.aiff // 2step // pitch 0.8 1 1.2 1.4
@@ -34,10 +34,22 @@ drones/garageDroneForward.aiff // E
 markov garage
 kicks/808Kkick.wav
 
+notes/MAWCLONK.aiff
+notes/MAWWelo.aiff
+
+pads/italianDreamWithBirdz.aiff 8 // D
+
+gran pads/washey Bb
 
 
 
-
+legowelt//Synth-LiteHouseMood.wav // C
+markov clap2
+perc/glitchssz.aiff
+kicks/2stepKICK2.aiff
+dloops/comeongirl2bar.aiff
+^ lego loop idx 50
+drones/keydrone.aiff
 
 dloops/sayprayer2.aif
 
@@ -66,18 +78,14 @@ dx 3 load scarlet
 
 loops//gasloopbar1.aiff // Ab
 
-legowelt//Synth-LiteHouseMood.wav // C
-
 
 
 bpm 88
-dloops/mkLikeloop.aiff
 
 dloops/PaljoeyBeaat.aiff
 hats/weekendCHat.aiff
 hats/OH_909_15.wav
 perc/dubTic.aiff
-perc/glitchssz.aiff
 kicks/lm1-kick.aif
 kicks/kick2.aif
 
@@ -91,8 +99,6 @@ strings/yarly.aiff // F
 pads/italiaDream2Bar.aiff // C
 pads/italiandreamhaus.aiff // F
 pads/italiandreamhausTOO.aiff // Bb
-pads/italianDreamWithBirdz.aiff // D
-pads/washey Bb
 
 drones/keydrone.aiff // C
 drones/idmMelodyBit.aiff // Gb
