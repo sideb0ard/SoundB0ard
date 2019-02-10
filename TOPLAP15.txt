@@ -1,4 +1,3 @@
-garage/RimDrumtrax05.wavbpm 140 // 9:42
 
 loop noises/stream.aiff 4 // C
 gran legowelt//Synth-GlassBell3.wav  // G // vol 0.3 // idx 0 10
@@ -13,7 +12,7 @@ garage/BassDrumtrax06.wav
 garage/SideStick_Lindrum_24.wav
 garage/RimDrumtrax05.wav
 
-down Synth
+down Synth-Glass
 
 pads/italiaDream2Bar.aiff // C
 pads/italiaDream2Bar.aiff // idx 0 10 0 50  // C
@@ -23,6 +22,7 @@ hats/weekendCHat.aiff // swing 2 and h*16
 key gb
 new bitshift (37 >> t | t*13) | 25
 dx load deeepend // gen ^
+loops/BSQ_UZI4_BASSDROP.wav
 drones/slowedBradLayner.aiff // D  idx 0 and 50
 strings/shadesofrhythm4bar.aiff // Gb
 hats/timabHat2.aiff
