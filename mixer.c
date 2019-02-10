@@ -109,6 +109,11 @@ mixer *new_mixer(double output_latency)
     mixr->bars_per_chord = 4;
     mixr->should_progress_chords = false;
 
+    mixr->worker.running = true;
+    mixr->worker.have_midi_tick = true;
+    pthread_mutex_init(&mixr->worker.midi_tick_mutex, NULL);
+    pthread_cond_init(&mixr->worker.midi_tick_cond, NULL);
+
     return mixr;
 }
 
@@ -314,12 +319,17 @@ void mixer_print_notes(mixer *mixr)
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
-    for (int i = 0; i < mixr->algorithm_num; ++i)
-    {
-        algorithm *a = mixr->algorithms[i];
-        if (a != NULL)
-            algorithm_event_notify(a, event);
-    }
+    pthread_mutex_lock(&mixr->worker.midi_tick_mutex);
+    mixr->worker.event = event;
+    mixr->worker.have_midi_tick = true;
+    pthread_cond_signal(&mixr->worker.midi_tick_cond);
+    pthread_mutex_unlock(&mixr->worker.midi_tick_mutex);
+    //for (int i = 0; i < mixr->algorithm_num; ++i)
+    //{
+    //    algorithm *a = mixr->algorithms[i];
+    //    if (a != NULL)
+    //        algorithm_event_notify(a, event);
+    //}
 
     for (int i = 0; i < mixr->pattern_gen_num; ++i)
     {

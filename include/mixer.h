@@ -8,6 +8,7 @@
 #include "ableton_link_wrapper.h"
 
 #include "algorithm.h"
+#include "background_worker.h"
 #include "defjams.h"
 #include "digisynth.h"
 #include "dxsynth.h"
@@ -72,6 +73,7 @@ typedef struct preview_buffer
 
 stereo_val preview_buffer_generate(preview_buffer *buffy);
 void preview_buffer_import_file(preview_buffer *buffy, char *filename);
+
 
 typedef struct mixer
 {
@@ -148,6 +150,8 @@ typedef struct mixer
     unsigned int octave;
     unsigned int notes[8];
     unsigned int quantize;
+
+    background_worker worker;
 
 } mixer;
 

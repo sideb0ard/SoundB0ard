@@ -73,10 +73,10 @@ int main()
         exit(-1);
     }
 
-    // this worker will handle algorithms and function work during runtime
-    worker w = {.running = true};
+    // this thread handles background algorithm calculations.
     pthread_t background_worker_th;
-    if (pthread_create(&background_worker_th, NULL, worker_run, &w))
+    if (pthread_create(&background_worker_th, NULL, background_worker_run,
+                       &mixr->worker))
     {
         fprintf(stderr, "Errrr, wit da workaaa..\n");
     }
@@ -90,7 +90,7 @@ int main()
     pthread_join(input_th, NULL);
 
     // close worker thread down
-    w.running = false;
+    mixr->worker.running = false;
     pthread_join(background_worker_th, NULL);
 
     // all done, time to go home
