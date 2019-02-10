@@ -14,6 +14,9 @@ void *background_worker_run(void *arg)
         while (!w->have_midi_tick)
             pthread_cond_wait(&w->midi_tick_cond, &w->midi_tick_mutex);
 
+        mixr->worker.have_midi_tick = false;
+        pthread_mutex_unlock(&w->midi_tick_mutex);
+        pthread_cond_signal(&w->midi_tick_cond);
 
         for (int i = 0; i < mixr->algorithm_num; ++i)
         {
@@ -22,9 +25,6 @@ void *background_worker_run(void *arg)
                 algorithm_event_notify(a, w->event);
         }
 
-        mixr->worker.have_midi_tick = false;
-
-        pthread_mutex_unlock(&w->midi_tick_mutex);
 
     }
     return NULL;

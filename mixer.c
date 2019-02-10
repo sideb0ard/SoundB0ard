@@ -320,11 +320,15 @@ void mixer_print_notes(mixer *mixr)
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
     pthread_mutex_lock(&mixr->worker.midi_tick_mutex);
+    while (mixr->worker.have_midi_tick)
+        pthread_cond_wait(&mixr->worker.midi_tick_cond,
+                          &mixr->worker.midi_tick_mutex);
+
     mixr->worker.event = event;
     mixr->worker.have_midi_tick = true;
-    pthread_cond_signal(&mixr->worker.midi_tick_cond);
     pthread_mutex_unlock(&mixr->worker.midi_tick_mutex);
-    //for (int i = 0; i < mixr->algorithm_num; ++i)
+    pthread_cond_signal(&mixr->worker.midi_tick_cond);
+    // for (int i = 0; i < mixr->algorithm_num; ++i)
     //{
     //    algorithm *a = mixr->algorithms[i];
     //    if (a != NULL)
