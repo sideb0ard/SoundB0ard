@@ -9,7 +9,6 @@ SRC = \
 	algorithm.c \
 	audiofile_data.c \
 	audioutils.c \
-	background_worker.c \
 	cmdloop.c \
 	cmdloop/algo_cmds.c \
 	cmdloop/fx_cmds.c \

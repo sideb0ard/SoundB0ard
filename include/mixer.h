@@ -8,7 +8,6 @@
 #include "ableton_link_wrapper.h"
 
 #include "algorithm.h"
-#include "background_worker.h"
 #include "defjams.h"
 #include "digisynth.h"
 #include "dxsynth.h"
@@ -151,8 +150,6 @@ typedef struct mixer
     unsigned int notes[8];
     unsigned int quantize;
 
-    background_worker worker;
-
 } mixer;
 
 mixer *new_mixer(double output_latency);
@@ -165,6 +162,7 @@ void mixer_status_mixr(mixer *mixr);
 void mixer_status_algoz(mixer *mixr, bool all);
 void mixer_update_bpm(mixer *mixr, int bpm);
 void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
+void mixer_events_output(mixer *mixr);
 void mixer_emit_event(mixer *mixr, broadcast_event event);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
@@ -239,6 +237,7 @@ void mixer_enable_print_midi(mixer *mixr, bool b);
 void mixer_check_for_midi_messages(mixer *mixr);
 void mixer_set_midi_bank(mixer *mixr, int num);
 void mixer_set_should_progress_chords(mixer *mixr, bool b);
+bool should_progress_chords(mixer *mixr, int tick);
 void mixer_next_chord(mixer *mixr);
 
 // these are in mixer.h rather than sequence_engine, as mixer needs to transform

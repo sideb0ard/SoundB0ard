@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#include "../defjams.h"
-#include "../utils.h"
-#include "delay.h"
+#include "defjams.h"
+#include "utils.h"
+#include "afx/delay.h"
 
 void delay_init(delay *d, int delay_length)
 {

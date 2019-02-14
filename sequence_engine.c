@@ -61,6 +61,8 @@ void sequence_engine_init(sequence_engine *engine, void *parent,
     engine->apply_mask_every_n = 1;
     engine->event_mask_counter = 0;
 
+    engine->pct_play = 90; // %
+
     sequence_engine_reset_step(engine);
 }
 
@@ -197,14 +199,15 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
         scratch, 255,
         L"\nsingle_note_mode:%d chord_mode:%d octave:%d sustain_note_ms:%d "
         L"debug:%d\n"
-        L"num_patterns:%d midi_note_1:%d midi_note_2:%d midi_note_3:%d follow:%d\n"
-        L"count_by:%d cur_step:%d incr:%d range:%d fold:%d\n"
+        L"num_patterns:%d midi_note_1:%d midi_note_2:%d midi_note_3:%d "
+        L"follow:%d\n"
+        L"count_by:%d cur_step:%d incr:%d range:%d fold:%d pct_play:%d\n"
         L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
-        engine->sustain_note_ms, engine->debug, engine->num_patterns, engine->midi_note_1,
-        engine->midi_note_2, engine->midi_note_3,
+        engine->sustain_note_ms, engine->debug, engine->num_patterns,
+        engine->midi_note_1, engine->midi_note_2, engine->midi_note_3,
         engine->follow_mixer_chord_changes, engine->count_by, engine->cur_step,
-        engine->increment_by, engine->range_len, engine->fold,
+        engine->increment_by, engine->range_len, engine->fold, engine->pct_play,
         engine->arp.enable, engine->arp.last_midi_notes[0],
         engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
         s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
@@ -285,11 +288,14 @@ void sequence_engine_event_notify(void *self, broadcast_event event)
             if (engine->patterns[engine->cur_pattern][idx].event_type)
             {
                 midi_event *ev = &engine->patterns[engine->cur_pattern][idx];
-                if (ev->event_type == MIDI_ON)
-                    mixer_emit_event(
-                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                                                .sequencer_src = mixer_idx});
-                midi_parse_midi_event(parent, ev);
+                if (rand() % 100 < engine->pct_play)
+                {
+                    if (ev->event_type == MIDI_ON)
+                        mixer_emit_event(mixr, (broadcast_event){
+                                                   .type = SEQUENCER_NOTE,
+                                                   .sequencer_src = mixer_idx});
+                    midi_parse_midi_event(parent, ev);
+                }
             }
 
             // this temporal_events table is my first pass at a solution to
@@ -1080,4 +1086,10 @@ void sequence_engine_pattern_to_double_speed(sequence_engine *engine,
                                            .temporary = false};
         sequence_engine_set_pattern(engine, 0, change_info, doubled_pattern);
     }
+}
+
+void sequence_engine_set_pct_play(sequence_engine *engine, int pct)
+{
+    if (pct >= 0 && pct <= 100)
+        engine->pct_play = pct;
 }

@@ -109,10 +109,10 @@ mixer *new_mixer(double output_latency)
     mixr->bars_per_chord = 4;
     mixr->should_progress_chords = false;
 
-    mixr->worker.running = true;
-    mixr->worker.have_midi_tick = true;
-    pthread_mutex_init(&mixr->worker.midi_tick_mutex, NULL);
-    pthread_cond_init(&mixr->worker.midi_tick_cond, NULL);
+    //mixr->worker.running = true;
+    //mixr->worker.have_midi_tick = true;
+    //pthread_mutex_init(&mixr->worker.midi_tick_mutex, NULL);
+    //pthread_cond_init(&mixr->worker.midi_tick_cond, NULL);
 
     return mixr;
 }
@@ -319,21 +319,12 @@ void mixer_print_notes(mixer *mixr)
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
-    pthread_mutex_lock(&mixr->worker.midi_tick_mutex);
-    while (mixr->worker.have_midi_tick)
-        pthread_cond_wait(&mixr->worker.midi_tick_cond,
-                          &mixr->worker.midi_tick_mutex);
-
-    mixr->worker.event = event;
-    mixr->worker.have_midi_tick = true;
-    pthread_mutex_unlock(&mixr->worker.midi_tick_mutex);
-    pthread_cond_signal(&mixr->worker.midi_tick_cond);
-    // for (int i = 0; i < mixr->algorithm_num; ++i)
-    //{
-    //    algorithm *a = mixr->algorithms[i];
-    //    if (a != NULL)
-    //        algorithm_event_notify(a, event);
-    //}
+    for (int i = 0; i < mixr->algorithm_num; ++i)
+    {
+        algorithm *a = mixr->algorithms[i];
+        if (a != NULL)
+            algorithm_event_notify(a, event);
+    }
 
     for (int i = 0; i < mixr->pattern_gen_num; ++i)
     {
@@ -544,7 +535,7 @@ int add_looper(mixer *mixr, char *filename)
     return add_sound_generator(mixr, (sound_generator *)g);
 }
 
-static void mixer_events_output(mixer *mixr)
+void mixer_events_output(mixer *mixr)
 {
     mixr->timing_info.is_thirtysecond = false;
     mixr->timing_info.is_sixteenth = false;

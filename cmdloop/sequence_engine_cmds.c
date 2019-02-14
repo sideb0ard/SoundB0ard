@@ -172,6 +172,11 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                    engine->multi_pattern_mode ? "true" : "false");
         }
 
+        else if (strncmp("pct_play", wurds[0], 8) == 0)
+        {
+            int pct = atoi(wurds[1]);
+            sequence_engine_set_pct_play(engine, pct);
+        }
         else if (strncmp("reset", wurds[0], 5) == 0)
         {
             if (strncmp("all", wurds[1], 3) == 0)

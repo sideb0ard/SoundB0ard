@@ -147,6 +147,8 @@ typedef struct sequence_engine
 
     bool follow_mixer_chord_changes;
 
+    int pct_play; // percent probabilty note will play
+
     bool debug;
 
 } sequence_engine;
@@ -261,6 +263,7 @@ void sequence_engine_set_increment_by(sequence_engine *engine, int incr);
 void sequence_engine_set_range_len(sequence_engine *engine, int range);
 void sequence_engine_set_fold(sequence_engine *engine, bool b);
 void sequence_engine_set_debug(sequence_engine *engine, bool b);
+void sequence_engine_set_pct_play(sequence_engine *engine, int pct);
 
 void sequence_engine_pattern_to_half_speed(sequence_engine *engine,
                                            int pat_num);

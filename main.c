@@ -8,7 +8,6 @@
 
 #include "ableton_link_wrapper.h"
 #include "audioutils.h"
-#include "background_worker.h"
 #include "cmdloop.h"
 #include "defjams.h"
 #include "envelope.h"
@@ -73,25 +72,12 @@ int main()
         exit(-1);
     }
 
-    // this thread handles background algorithm calculations.
-    pthread_t background_worker_th;
-    if (pthread_create(&background_worker_th, NULL, background_worker_run,
-                       &mixr->worker))
-    {
-        fprintf(stderr, "Errrr, wit da workaaa..\n");
-    }
-
-    // this thread handles user interaction
     pthread_t input_th;
     if (pthread_create(&input_th, NULL, loopy, NULL))
     {
         fprintf(stderr, "Errrr, wit tha Loopy..\n");
     }
     pthread_join(input_th, NULL);
-
-    // close worker thread down
-    mixr->worker.running = false;
-    pthread_join(background_worker_th, NULL);
 
     // all done, time to go home
     pa_teardown();
