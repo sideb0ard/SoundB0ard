@@ -92,6 +92,10 @@ void sequence_engine_set_pattern_to_current_key(sequence_engine *engine)
     get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
                               sequence_engine_get_octave(engine), &chnotes);
 
+    int note2 = chnotes.third;
+    if (rand() % 100 > 50) note2 = chnotes.seventh;
+    if (rand() % 100 > 75) note2 = chnotes.fifth;
+    if (rand() % 100 > 90) note2 = chnotes.seventh;
     for (int i = 0; i < PPBAR; i++)
     {
         midi_event *ev = &midi_pattern[i];
@@ -104,23 +108,11 @@ void sequence_engine_set_pattern_to_current_key(sequence_engine *engine)
             else
             {
 
-                if (i < PPQN || i > PPBAR - PPQN)
-                    midi_note = chnotes.root;
-                else
+                midi_note = chnotes.root;
+                if (i > (PPBAR/2))
                 {
-                    int randy = rand() % 3;
-                    switch (randy)
-                    {
-                    case (0):
-                        midi_note = chnotes.root;
-                        break;
-                    case (1):
-                        midi_note = chnotes.third;
-                        break;
-                    case (2):
-                        midi_note = chnotes.fifth;
-                        break;
-                    }
+                    if (rand() % 100 > 70)
+                        midi_note = note2;
                 }
 
                 if (rand() % 100 > 90)

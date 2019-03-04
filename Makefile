@@ -112,7 +112,7 @@ all: objdir $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop obj/pattern_generators obj/value_generators
+	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop obj/pattern_generators obj/value_generators obj/afx
 
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ ableton_link_wrapper.cpp $(LIBS) $(INCS)
