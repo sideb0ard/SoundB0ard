@@ -9,7 +9,7 @@
 #define MAX_PATTERN_CHAR_VAL 100
 #define MAX_CHILDREN 20
 
-enum pattern_token_type
+enum
 {
     SQUARE_BRACKET_LEFT,
     SQUARE_BRACKET_RIGHT,
@@ -20,7 +20,7 @@ enum pattern_token_type
     ANGLE_EXPRESSION,
     BLANK,
     VAR_NAME
-} pattern_token_type;
+};
 
 typedef struct pattern_token
 {

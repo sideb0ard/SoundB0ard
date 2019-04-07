@@ -20,7 +20,7 @@ extern mixer *mixr;
 
 extern char *s_synth_waves[6];
 
-void* midi_init()
+void* midi_init(void *)
 {
     printf("MIDI maaaaan!\n");
     pthread_setname_np("Midimaaaan");

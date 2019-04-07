@@ -2,6 +2,7 @@
 #include <string.h>
 
 #include <drumsynth.h>
+#include <midimaaan.h>
 #include <midi_cmds.h>
 #include <mixer.h>
 
