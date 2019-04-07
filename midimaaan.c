@@ -71,7 +71,8 @@ void print_midi_event_rec(midi_event ev)
     printf("[Midi] note: %d\n", ev.data1);
 }
 
-midi_event new_midi_event(int event_type, int data1, int data2)
+midi_event new_midi_event(unsigned int event_type, unsigned int data1,
+                          unsigned int data2)
 {
     midi_event ev = {.event_type = event_type,
                      .data1 = data1,
@@ -264,7 +265,7 @@ void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
     }
     else if (sg->type == DRUMSAMPLER_TYPE)
     {
-        //midi_event_print(ev);
+        // midi_event_print(ev);
         if (ev->event_type == MIDI_ON)
         {
             if (!sequence_engine_is_masked(engine))

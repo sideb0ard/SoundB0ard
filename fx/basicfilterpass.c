@@ -12,7 +12,7 @@ const char *filtertype_to_name[] = {"LPF1", "HPF1", "LPF2", "HPF2", "BPF2",
 
 filterpass *new_filterpass()
 {
-    filterpass *fp = calloc(1, sizeof(filterpass));
+    filterpass *fp = (filterpass*) calloc(1, sizeof(filterpass));
     fp->m_fx.type = BASICFILTER;
     fp->m_fx.enabled = true;
     fp->m_fx.status = &filterpass_status;

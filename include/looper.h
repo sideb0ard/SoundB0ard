@@ -119,7 +119,7 @@ typedef struct looper
     unsigned int selection_mode;
     unsigned int envelope_mode;
     double envelope_taper_ratio; // 0.0...1.0
-    unsigned int reverse_mode;
+    bool reverse_mode;
 
     int last_grain_launched_sample_time;
     int grain_attack_time_pct;

@@ -31,7 +31,7 @@ pattern_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     shunting_yard_algorithm(&my_pattern);
 
-    bitshift *bs = calloc(1, sizeof(bitshift));
+    bitshift *bs = (bitshift*) calloc(1, sizeof(bitshift));
     if (!bs)
     {
         printf("WOOF!\n");

@@ -7,7 +7,7 @@
 
 bitcrush *new_bitcrush()
 {
-    bitcrush *bc = calloc(1, sizeof(bitcrush));
+    bitcrush *bc = (bitcrush*) calloc(1, sizeof(bitcrush));
     bitcrush_init(bc);
 
     bc->m_fx.type = BITCRUSH;

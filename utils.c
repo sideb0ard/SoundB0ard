@@ -275,7 +275,7 @@ void list_sample_dir(char *dir)
     {
         while ((ep = readdir(dp)))
         {
-            char *filename = calloc(1, MAX_STATIC_STRING_SZ);
+            char *filename = (char*) calloc(1, MAX_STATIC_STRING_SZ);
             if (ep->d_type == DT_DIR)
             {
                 // strcat(filename, "\x1b[34m");

@@ -13,7 +13,7 @@ static char *s_euclid_mode[] = {"STATIC", "UP", "DOWN", "RANDOM"};
 
 pattern_generator *new_euclidean(int num_hits, int num_steps)
 {
-    euclidean *e = calloc(1, sizeof(euclidean));
+    euclidean *e = (euclidean*) calloc(1, sizeof(euclidean));
     if (!e)
     {
         printf("WOOF!\n");

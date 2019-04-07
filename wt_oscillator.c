@@ -214,8 +214,8 @@ void wt_create_wave_tables(wt_osc *wt)
     double seed_freq = 27.5; // A0
     for (int i = 0; i < NUM_TABLES; ++i)
     {
-        double *saw_table = calloc(WT_LENGTH, sizeof(double));
-        double *tri_table = calloc(WT_LENGTH, sizeof(double));
+        double *saw_table = (double*) calloc(WT_LENGTH, sizeof(double));
+        double *tri_table = (double*) calloc(WT_LENGTH, sizeof(double));
         int harms = (int)((SAMPLE_RATE / 2.0 / seed_freq) - 1.0);
         int half_harms = (int)((float)harms / 2.0);
         double max_saw = 0;

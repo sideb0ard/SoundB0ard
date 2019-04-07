@@ -7,7 +7,7 @@
 
 envelope_follower *new_envelope_follower()
 {
-    envelope_follower *ef = calloc(1, sizeof(envelope_follower));
+    envelope_follower *ef = (envelope_follower*) calloc(1, sizeof(envelope_follower));
     envelope_follower_init(ef);
 
     ef->m_fx.type = ENVELOPEFOLLOWER;

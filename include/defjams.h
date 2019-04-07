@@ -239,9 +239,9 @@ enum
 typedef struct midi_event
 {
     unsigned int source;
-    unsigned event_type;
-    unsigned data1;
-    unsigned data2;
+    unsigned int event_type;
+    unsigned int data1;
+    unsigned int data2;
     int hold; // millisecond hold value
     bool delete_after_use;
 } midi_event;

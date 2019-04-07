@@ -15,7 +15,7 @@ const char *s_eg_mode[] = {"TRIGGER", "SUSTAIN"};
 
 envelope *new_envelope(void)
 {
-    envelope *e = calloc(1, sizeof(envelope));
+    envelope *e = (envelope*) calloc(1, sizeof(envelope));
     envelope_reset(e);
 
     e->m_fx.type = ENVELOPE;

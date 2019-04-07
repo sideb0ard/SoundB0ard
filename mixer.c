@@ -265,7 +265,7 @@ void mixer_status_sgz(mixer *mixr, bool all)
 
                     // clang-format off
                     wprintf(WCOOL_COLOR_GREEN
-                            "["WANSI_COLOR_WHITE "%s %d"
+                            "[" WANSI_COLOR_WHITE "%s %d"
                             WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET,
                             s_sg_names[mixr->sound_generators[i]->type], i);
                     wprintf(L"%ls", wss);
@@ -617,7 +617,6 @@ void mixer_events_output(mixer *mixr)
 
         mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
         lo_send(mixr->processing_addr, "/bpm", NULL);
-
     }
 }
 

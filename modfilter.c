@@ -7,7 +7,7 @@
 
 modfilter *new_modfilter()
 {
-    modfilter *mf = calloc(1, sizeof(modfilter));
+    modfilter *mf = (modfilter*) calloc(1, sizeof(modfilter));
     modfilter_init(mf);
 
     mf->m_fx.type = MODFILTER;

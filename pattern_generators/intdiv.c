@@ -13,7 +13,7 @@ static char *s_intdiv_status_names[] = {"STATIC", "RAND"};
 
 pattern_generator *new_intdiv()
 {
-    intdiv *id = calloc(1, sizeof(intdiv));
+    intdiv *id = (intdiv*) calloc(1, sizeof(intdiv));
     if (!id)
     {
         printf("WOOF!\n");
@@ -112,7 +112,7 @@ void intdiv_set_allowed_part_sizes(intdiv *id, char *allowed_parts)
     strncpy(id->allowed_part_sizes_as_string, allowed_parts, 127);
 
     int allowed_string_sz = strlen(allowed_parts);
-    char *stripped_string = calloc(allowed_string_sz - 1, sizeof(char));
+    char *stripped_string = (char*) calloc(allowed_string_sz - 1, sizeof(char));
     strncpy(stripped_string, allowed_parts + 1, allowed_string_sz - 2);
 
     char const *sep = " ";

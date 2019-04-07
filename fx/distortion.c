@@ -8,7 +8,7 @@ extern mixer *mixr;
 
 distortion *new_distortion(void)
 {
-    distortion *d = calloc(1, sizeof(distortion));
+    distortion *d = (distortion*) calloc(1, sizeof(distortion));
     d->m_fx.type = DISTORTION;
     d->m_fx.enabled = true;
     d->m_fx.process = &distortion_process;

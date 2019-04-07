@@ -619,7 +619,7 @@ void looper_set_external_source(looper *g, int sound_gen_num)
     {
         g->external_source_sg = sound_gen_num;
         int looplen = mixr->timing_info.loop_len_in_frames * 2; // stereo
-        double *buffer = calloc(looplen, sizeof(double));
+        double *buffer = (double*) calloc(looplen, sizeof(double));
         if (buffer)
         {
             if (pthread_mutex_lock(&g->extsource_lock) == 0)

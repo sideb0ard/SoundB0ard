@@ -6,7 +6,7 @@
 
 waveshaper *new_waveshaper()
 {
-    waveshaper *ws = calloc(1, sizeof(waveshaper));
+    waveshaper *ws = (waveshaper*) calloc(1, sizeof(waveshaper));
     waveshaper_init(ws);
 
     ws->m_fx.type = WAVESHAPER;

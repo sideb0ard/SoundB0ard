@@ -91,13 +91,13 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
 
     bool return_val = true;
 
-    pattern_group *pgroups = calloc(MAX_PATTERN, sizeof(pattern_group));
+    pattern_group *pgroups = (pattern_group*) calloc(MAX_PATTERN, sizeof(pattern_group));
     int current_pattern_group = 0;
     int num_pattern_groups = 0;
 
     // var_tokens are the content tokens, where something should happen
     // as opposed to the tokens to be be expanded, like brackets
-    pattern_token *var_tokens = calloc(MAX_TOKENS, sizeof(pattern_token));
+    pattern_token *var_tokens = (pattern_token*) calloc(MAX_TOKENS, sizeof(pattern_token));
     int var_tokens_idx = 0;
 
     for (int i = 0; i < num_tokens; i++)
@@ -709,10 +709,10 @@ bool parse_pattern(char *line, midi_event *target_pattern,
     bool return_val = true;
 
     int token_idx = 0;
-    pattern_token *tokens = calloc(MAX_PATTERN, sizeof(pattern_token));
+    pattern_token *tokens = (pattern_token*) calloc(MAX_PATTERN, sizeof(pattern_token));
 
     int expanded_tokens_idx = 0;
-    pattern_token *expanded_tokens = calloc(MAX_PATTERN, sizeof(pattern_token));
+    pattern_token *expanded_tokens = (pattern_token*) calloc(MAX_PATTERN, sizeof(pattern_token));
 
     int err = 0;
     if ((err = extract_tokens_from_line(tokens, &token_idx, line)))
@@ -752,14 +752,13 @@ void check_and_set_pattern(sound_generator *sg, int target_pattern_num,
             strcat(line, " ");
     }
 
-    midi_event *pattern = calloc(PPBAR, sizeof(midi_event));
-    if (parse_pattern(line, pattern, pattern_type))
+    midi_event pattern = {};
+    if (parse_pattern(line, &pattern, pattern_type))
     {
         pattern_change_info change_info = {.clear_previous = true,
                                            .temporary = false};
         sequence_engine *engine = get_sequence_engine(sg);
         sequence_engine_set_pattern(engine, target_pattern_num, change_info,
-                                    pattern);
+                                    &pattern);
     }
-    free(pattern);
 }

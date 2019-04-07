@@ -33,7 +33,7 @@ static char *s_markov_types[] = {"CLAP2", "KICK2",      "CLAPS",      "GARAGE",
 
 pattern_generator *new_markov(unsigned int type)
 {
-    markov *m = calloc(1, sizeof(markov));
+    markov *m = (markov*) calloc(1, sizeof(markov));
     if (!m)
     {
         printf("WOOF!\n");

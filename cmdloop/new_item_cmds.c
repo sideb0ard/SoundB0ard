@@ -97,9 +97,9 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             else
             {
                 list_type = LIST_VALUE_CHAR_TYPE;
-                char **cdata = calloc(num_items, sizeof(char *));
+                char **cdata = (char **) calloc(num_items, sizeof(char *));
                 for (int i = 0; i < num_items; i++)
-                    cdata[i] = calloc(1, sizeof(char) * SIZE_OF_WURD);
+                    cdata[i] = (char*) calloc(1, sizeof(char) * SIZE_OF_WURD);
 
                 for (int i = 0, j = 2; i < num_items; i++, j++)
                     strcpy(cdata[i], wurds[j]);

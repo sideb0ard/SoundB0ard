@@ -18,7 +18,7 @@ const char *s_ds_eg_state[] = {"OFF",     "ATTACK",  "DECAY",
 drumsynth *new_drumsynth()
 {
     printf("New Drum Synth!\n");
-    drumsynth *ds = calloc(1, sizeof(drumsynth));
+    drumsynth *ds = (drumsynth *) calloc(1, sizeof(drumsynth));
 
     ds->started = false;
     ds->reset_osc = true;

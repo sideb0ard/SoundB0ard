@@ -89,7 +89,7 @@ void dense(midi_event *in_pattern, int density)
         return;
 
     int density_fraction = PPBAR / density;
-    midi_event *scratch_pattern = calloc(sizeof(midi_event), density_fraction);
+    midi_event *scratch_pattern = (midi_event*) calloc(sizeof(midi_event), density_fraction);
     for (int i = 0; i < PPBAR; i++)
     {
         if (in_pattern[i].event_type)
