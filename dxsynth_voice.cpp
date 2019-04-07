@@ -389,7 +389,7 @@ void dxsynth_voice_set_output_egs(dxsynth_voice *dxv)
     }
 }
 
-inline bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
+bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
                                   double *right_output)
 {
     if (!voice_gennext(&dxv->m_voice, left_output, right_output))

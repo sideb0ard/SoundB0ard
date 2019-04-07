@@ -54,9 +54,9 @@ void osc_new_settings(oscillator *osc)
     osc->m_global_oscillator_params = NULL;
 }
 
-inline void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }
+void osc_inc_modulo(oscillator *self) { self->m_modulo += self->m_inc; }
 
-inline bool osc_check_wrap_modulo(oscillator *self)
+ bool osc_check_wrap_modulo(oscillator *self)
 {
     if (self->m_inc > 0 && self->m_modulo >= 1.0)
     {
@@ -102,7 +102,7 @@ void osc_set_pw_mod(oscillator *self, double mod_val)
     self->m_pw_mod = mod_val;
 }
 
-inline void osc_reset(oscillator *self)
+ void osc_reset(oscillator *self)
 {
     self->m_modulo = 0.0;
     self->m_dpw_square_modulator = -1.0;
@@ -120,7 +120,7 @@ inline void osc_reset(oscillator *self)
     self->m_phase_mod = 0.0;
 }
 
-inline void osc_update(oscillator *self)
+ void osc_update(oscillator *self)
 {
     if (self->m_global_oscillator_params)
     {

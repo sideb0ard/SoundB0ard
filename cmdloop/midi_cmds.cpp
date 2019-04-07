@@ -7,7 +7,7 @@
 
 extern mixer *mixr;
 
-static void midi_launch_init(mixer *mixr)
+void midi_launch_init(mixer *mixr)
 {
     if (!mixr->have_midi_controller)
     {
@@ -20,7 +20,7 @@ static void midi_launch_init(mixer *mixr)
     }
 }
 
-static void midi_set_destination(mixer *mixr, int soundgen_num)
+void midi_set_destination(mixer *mixr, int soundgen_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {

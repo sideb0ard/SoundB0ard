@@ -1,6 +1,0 @@
-include/
-libmidifile.a
-slurp
-midiz
-*.mid
-*.txt

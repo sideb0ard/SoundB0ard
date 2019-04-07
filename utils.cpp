@@ -609,7 +609,7 @@ bool is_valid_file(char *filename)
 
 // from
 // https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
-inline double fast_pow(double a, double b)
+double fast_pow(double a, double b)
 {
     union {
         double d;
@@ -620,7 +620,7 @@ inline double fast_pow(double a, double b)
     return u.d;
 }
 
-inline double pitch_shift_multiplier(double pitch_shift_semitones)
+double pitch_shift_multiplier(double pitch_shift_semitones)
 // from Will Pirkle book 'Designing Software Synthesizer Plug-Ins...'
 {
     if (pitch_shift_semitones == 0)
@@ -629,7 +629,7 @@ inline double pitch_shift_multiplier(double pitch_shift_semitones)
     return fast_pow(2.0, pitch_shift_semitones / 12.0);
 }
 
-inline void calculate_pan_values(double pan_total, double *pan_left,
+ void calculate_pan_values(double pan_total, double *pan_left,
                                  double *pan_right)
 {
     *pan_left = cos((M_PI / 4.0) * (pan_total + 1.0));
@@ -680,7 +680,7 @@ void reverse_string(char s[])
 // new_min, new_max
 // algo from
 // http://stackoverflow.com/questions/929103/convert-a-number-range-to-another-range-maintaining-ratio
-inline double scaleybum(double cur_min, double cur_max, double new_min,
+ double scaleybum(double cur_min, double cur_max, double new_min,
                         double new_max, double cur_val)
 {
     double return_val = 0;
@@ -700,7 +700,7 @@ inline double scaleybum(double cur_min, double cur_max, double new_min,
 // http://devmaster.net/posts/9648/fast-and-accurate-sine-cosine
 // input is -pi to +pi
 // i took it from the Will Pirkle Synth book.
-inline double parabolic_sine(double x, bool high_precision)
+ double parabolic_sine(double x, bool high_precision)
 {
     const double B = 4.0 / (float)M_PI;
     const double C = -4.0 / ((float)M_PI * (float)M_PI);
@@ -712,10 +712,10 @@ inline double parabolic_sine(double x, bool high_precision)
     return y;
 }
 
-inline double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }
-inline double bipolar_to_unipolar(double value) { return 0.5 * value + 0.5; }
+ double unipolar_to_bipolar(double value) { return 2.0 * value - 1.0; }
+ double bipolar_to_unipolar(double value) { return 0.5 * value + 0.5; }
 
-inline double convex_transform(double value)
+ double convex_transform(double value)
 {
     if (value <= CONVEX_LIMIT)
         return 0.0;
@@ -729,7 +729,7 @@ inline double convex_transform(double value)
 
         value = the unipolar (0 -> 1) value to convert
 */
-inline double convex_inverted_transform(double value)
+ double convex_inverted_transform(double value)
 {
     if (value >= CONCAVE_LIMIT)
         return 0.0;
@@ -765,7 +765,7 @@ double concave_inverted_transform(double value)
     return -(5.0 / 12.0) * log10(value);
 }
 
-inline double do_white_noise()
+ double do_white_noise()
 {
     float noise = 0.0;
 
@@ -778,7 +778,7 @@ inline double do_white_noise()
     return noise;
 }
 
-inline double do_pn_sequence(unsigned *pn_register)
+ double do_pn_sequence(unsigned *pn_register)
 {
     // get the bits
     unsigned b0 =
@@ -814,7 +814,7 @@ inline double do_pn_sequence(unsigned *pn_register)
     return out;
 }
 
-inline void check_wrap_index(double *index)
+ void check_wrap_index(double *index)
 {
     while (*index < 0.0)
         *index += 1.0;
@@ -823,7 +823,7 @@ inline void check_wrap_index(double *index)
         *index -= 1.0;
 }
 
-inline double do_blep_n(const double *blep_table, double table_len,
+ double do_blep_n(const double *blep_table, double table_len,
                         double modulo, double inc, double height,
                         bool rising_edge, double points_per_side,
                         bool interpolate)
@@ -887,7 +887,7 @@ inline double do_blep_n(const double *blep_table, double table_len,
     return 0.0;
 }
 
-inline float lin_terp(float x1, float x2, float y1, float y2, float x)
+ float lin_terp(float x1, float x2, float y1, float y2, float x)
 {
     float denom = x2 - x1;
     if (denom == 0)
@@ -940,7 +940,7 @@ double semitones_between_frequencies(double start_freq, double end_freq)
     return fastlog2(end_freq / start_freq) * 12.0;
 }
 
-double inline mma_midi_to_atten_db(unsigned int midi_val)
+double  mma_midi_to_atten_db(unsigned int midi_val)
 {
     if (midi_val == 0)
         return -96.0; // dB floor
@@ -976,7 +976,7 @@ bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
    interpolating the first few or last few samples
                 in a table with a fixed size.
 */
-inline double lagrpol(double *x, double *y, int n, double xbar)
+ double lagrpol(double *x, double *y, int n, double xbar)
 {
     int i, j;
     double fx = 0.0;
