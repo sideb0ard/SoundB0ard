@@ -73,7 +73,7 @@ void drumsampler_import_file(drumsampler *s, char *filename);
 void drumsampler_reset_samples(drumsampler *seq);
 void drumsampler_set_pitch(drumsampler *seq, double v);
 void drumsampler_set_cutoff_percent(drumsampler *seq, unsigned int percent);
-void drumsampler_note_on(drumsampler *ds);
+void drumsampler_note_on(drumsampler *ds, midi_event *ev);
 void drumsampler_enable_envelope_generator(drumsampler *ds, bool b);
 void drumsampler_set_attack_time(drumsampler *ds, double val);
 void drumsampler_set_decay_time(drumsampler *ds, double val);

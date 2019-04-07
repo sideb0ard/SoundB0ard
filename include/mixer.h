@@ -4,6 +4,7 @@
 #include "portaudio.h"
 #include "portmidi.h"
 #include <pthread.h>
+#include <lo/lo.h>
 
 #include "ableton_link_wrapper.h"
 
@@ -149,6 +150,8 @@ typedef struct mixer
     unsigned int octave;
     unsigned int notes[8];
     unsigned int quantize;
+
+    lo_address processing_addr;
 
 } mixer;
 

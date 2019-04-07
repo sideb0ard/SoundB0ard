@@ -77,15 +77,14 @@ void drumsampler_reset_samples(drumsampler *ds)
     }
 }
 
-void drumsampler_note_on(drumsampler *ds)
+void drumsampler_note_on(drumsampler *ds, midi_event *ev)
 {
     int idx = mixr->timing_info.midi_tick % PPBAR;
     int seq_position = get_a_drumsampler_position(ds);
     if (seq_position != -1)
     {
         ds->samples_now_playing[seq_position] = idx;
-        ds->velocity_now_playing[seq_position] =
-            ds->engine.patterns[ds->engine.cur_pattern][idx].data2;
+        ds->velocity_now_playing[seq_position] = ev->data2;
     }
     eg_start_eg(&ds->eg);
 }

@@ -2,24 +2,24 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/select.h>
 
 #include <readline/history.h>
 #include <readline/readline.h>
 
-#include <cmdloop.h>
-#include <mixer.h>
-#include <obliquestrategies.h>
-#include <utils.h>
-
 #include <algo_cmds.h>
+#include <cmdloop.h>
 #include <fx_cmds.h>
 #include <looper_cmds.h>
 #include <midi_cmds.h>
+#include <mixer.h>
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
+#include <obliquestrategies.h>
 #include <pattern_generator_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
+#include <utils.h>
 #include <value_generator_cmds.h>
 
 extern mixer *mixr;
@@ -30,34 +30,91 @@ extern wtable *wave_tables[5];
 #define READLINE_SAFE_MAGENTA "\001\x1b[35m\002"
 #define READLINE_SAFE_RESET "\001\x1b[0m\002"
 #define MAXLINE 128
+
 char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
+char const *OSC_LISTEN_PORT = "7771";
+static char last_line[MAXLINE] = {};
+
+static void liblo_error(int num, const char *msg, const char *path)
+{
+    printf("liblo server error %d in path %s: %s\n", num, path, msg);
+}
+
+void readline_cb(char *line)
+{
+    if (NULL == line)
+        exxit();
+    if (strlen(line) != 0)
+    {
+        if (strncmp(last_line, line, MAXLINE) != 0)
+        {
+            add_history(line);
+            strncpy(last_line, line, MAXLINE);
+        }
+        interpret(line);
+    }
+}
 
 void *loopy(void *arg)
 {
-    static char last_line[MAXLINE] = {};
-
-    read_history(NULL);
-    setlocale(LC_ALL, "");
 
     print_logo();
 
-    char *line;
-    while ((line = readline(prompt)) != NULL)
+    read_history(NULL);
+    rl_callback_handler_install(prompt, (rl_vcpfunc_t *)&readline_cb);
+
+    setlocale(LC_ALL, "");
+
+    lo_server s = lo_server_new(OSC_LISTEN_PORT, liblo_error);
+    // lo_server_add_method(s, NULL, NULL, generic_osc_handler, NULL);
+    lo_server_add_method(s, "/trigger", "i", trigger_osc_handler, NULL);
+    int lo_fd = lo_server_get_socket_fd(s);
+
+    fd_set rfds;
+    struct timeval tv;
+
+    int retval;
+
+    if (lo_fd > 0)
     {
-        if (strlen(line) != 0)
+
+        //printf("%s", prompt);
+        //fflush(stdout);
+        while(1)
         {
-            if (strncmp(last_line, line, MAXLINE) != 0)
+
+            FD_ZERO(&rfds);
+            FD_SET(0, &rfds); /* stdin */
+            FD_SET(lo_fd, &rfds);
+
+            retval =
+                select(lo_fd + 1, &rfds, NULL, NULL, NULL); /* no timeout */
+
+            if (retval == -1)
             {
-                add_history(line);
-                strncpy(last_line, line, MAXLINE);
+
+                printf("select() error\n");
+                exit(1);
+            }
+            else if (retval > 0)
+            {
+
+                if (FD_ISSET(0, &rfds))
+                {
+
+                    rl_callback_read_char();
+                }
+                if (FD_ISSET(lo_fd, &rfds))
+                {
+
+                    lo_server_recv_noblock(s, 0);
+                }
             }
 
-            interpret(line);
         }
-        free(line);
     }
-    write_history(NULL);
-    exxit();
+    else
+        printf("Error, liblo -- fd <= zero\n");
 
     return NULL;
 }
@@ -156,6 +213,42 @@ int exxit()
 {
     printf(COOL_COLOR_PINK
            "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET); // Thrashin' reference
+    write_history(NULL);
     pa_teardown();
     exit(0);
+}
+
+int generic_osc_handler(const char *path, const char *types, lo_arg **argv,
+                        int argc, void *data, void *user_data)
+{
+    int i;
+
+    printf("path: <%s>\n", path);
+    for (i = 0; i < argc; i++)
+    {
+        printf("arg %d '%c' ", i, types[i]);
+        lo_arg_pp((lo_type)types[i], argv[i]);
+        printf("\n");
+    }
+    printf("\n");
+    fflush(stdout);
+
+    return 1;
+}
+
+int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
+                        int argc, void *data, void *user_data)
+{
+    // printf("Target %d\n", argv[0]->i);
+    int target_sg = argv[0]->i;
+    fflush(stdout);
+    midi_event _event = new_midi_event(MIDI_ON, 32, 128);
+    _event.source = EXTERNAL_OSC;
+    if (mixer_is_valid_soundgen_num(mixr, target_sg))
+    {
+        sound_generator *sg = mixr->sound_generators[target_sg];
+        midi_parse_midi_event(sg, &_event);
+    }
+
+    return 0;
 }

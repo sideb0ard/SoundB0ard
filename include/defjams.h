@@ -233,6 +233,7 @@ enum
 {
     INTERNAL_SYNTH,
     EXTERNAL_DEVICE,
+    EXTERNAL_OSC,
 }; // source of midi event
 
 typedef struct midi_event

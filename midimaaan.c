@@ -91,8 +91,10 @@ void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
         midi_note += engine->transpose;
 
     if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
+    {
         if (ev->event_type == MIDI_ON)
             arp_add_last_note(&engine->arp, midi_note);
+    }
 
     int midi_notes[3] = {midi_note, 0, 0};
     int midi_notes_len = 1; // default single note
@@ -262,12 +264,13 @@ void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
     }
     else if (sg->type == DRUMSAMPLER_TYPE)
     {
+        //midi_event_print(ev);
         if (ev->event_type == MIDI_ON)
         {
             if (!sequence_engine_is_masked(engine))
             {
                 drumsampler *ds = (drumsampler *)sg;
-                drumsampler_note_on(ds);
+                drumsampler_note_on(ds, ev);
             }
         }
     }
@@ -431,6 +434,28 @@ void midi_event_cp(midi_event *from, midi_event *to)
 }
 
 void midi_event_clear(midi_event *ev) { memset(ev, 0, sizeof(midi_event)); }
+
+void midi_event_print(midi_event *ev)
+{
+    char event_type[10] = {};
+    switch (ev->event_type)
+    {
+    case (144):
+        strncpy(event_type, "ON", 9);
+        break;
+    case (128):
+        strncpy(event_type, "OFF", 9);
+        break;
+    case (176):
+        strncpy(event_type, "CONTROL", 9);
+        break;
+    case (224):
+        strncpy(event_type, "PITCHBEND", 9);
+        break;
+    }
+    printf("EVENT! type:%s data1:%d data2:%d delete?%s\n", event_type,
+           ev->data1, ev->data2, ev->delete_after_use ? "true" : "false");
+}
 
 int get_midi_note_from_string(char *string)
 {

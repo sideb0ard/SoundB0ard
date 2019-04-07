@@ -15,6 +15,7 @@ void *midi_init(void *);
 midi_event new_midi_event(int event_type, int data1, int data2);
 void midi_event_cp(midi_event *from, midi_event *to);
 void midi_event_clear(midi_event *ev);
+void midi_event_print(midi_event *ev);
 
 void midi_parse_midi_event(sound_generator *sg, midi_event *ev);
 

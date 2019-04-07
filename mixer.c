@@ -109,10 +109,11 @@ mixer *new_mixer(double output_latency)
     mixr->bars_per_chord = 4;
     mixr->should_progress_chords = false;
 
-    //mixr->worker.running = true;
-    //mixr->worker.have_midi_tick = true;
-    //pthread_mutex_init(&mixr->worker.midi_tick_mutex, NULL);
-    //pthread_cond_init(&mixr->worker.midi_tick_cond, NULL);
+    // mixr->worker.running = true;
+    // mixr->worker.have_midi_tick = true;
+    // pthread_mutex_init(&mixr->worker.midi_tick_mutex, NULL);
+    // pthread_cond_init(&mixr->worker.midi_tick_cond, NULL);
+    mixr->processing_addr = lo_address_new(NULL, "7770");
 
     return mixr;
 }
@@ -615,6 +616,8 @@ void mixer_events_output(mixer *mixr)
         }
 
         mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
+        lo_send(mixr->processing_addr, "/bpm", NULL);
+
     }
 }
 

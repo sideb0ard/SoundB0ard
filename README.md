@@ -16,11 +16,14 @@ Soundb0ard is an interactive music making environment, with which you interact v
 
 It uses Ableton Link to sync with other running apps on the same local network. Follow install instructions for Link first - https://github.com/Ableton/link
 
-Other libraries needed are PortAudio, PortMidi, Exuberant Ctags, and libsndfile:
+Other libraries needed are PortAudio, PortMidi, Exuberant Ctags, gperf, Cscope, liblo and libsndfile:
 http://www.portaudio.com/
 http://portmedia.sourceforge.net/portmidi/
 http://www.mega-nerd.com/libsndfile/
+https://github.com/radarsat1/liblo
 http://ctags.sourceforge.net/
+
+You'll need to edit the Makefile, there's some hardcoded pathnames with my username, and also my homebrew dir is under ~
 
 Once all these are installed..
 
@@ -28,6 +31,6 @@ Once all these are installed..
 run `make`
 and if all is successful, you should have a new `sbsh` command in your directory.
 
-Load it up:  
+Load it up:
 `./sbsh`
 
