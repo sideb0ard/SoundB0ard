@@ -11,6 +11,8 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <iostream>
+
 #include "cmdloop.h"
 #include "defjams.h"
 #include "mixer.h"
@@ -21,7 +23,7 @@ extern mixer *mixr;
 extern const wchar_t *sparkchars;
 extern char *strategies[NUM_STATEGIES];
 
-static char *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
+static char const *rev_lookup[12] = {"c",  "c#", "d",  "d#", "e",  "f",
                                "f#", "g",  "g#", "a",  "a#", "b"};
 
 const double blep_table_center = 4096 / 2.0 - 1;
@@ -256,7 +258,8 @@ static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
 
 void list_sample_dir(char *dir)
 {
-    char dirname[MAX_STATIC_STRING_SZ] = SAMPLE_DIR;
+    char dirname[MAX_STATIC_STRING_SZ] = "./";
+    strncat(dirname, SAMPLE_DIR, MAX_STATIC_STRING_SZ - strlen(dirname) - 1);
 
     bool have_subdir = false;
     if (0 != strcmp(dir, ""))
@@ -597,11 +600,14 @@ bool is_valid_file(char *filename)
     }
     char cwd[1024];
     getcwd(cwd, 1024);
-    char *subdir = "/wavs/";
-    char full_filename[strlen(cwd) + strlen(filename) + strlen(subdir)];
-    strcpy(full_filename, cwd);
-    strcat(full_filename, subdir);
-    strcat(full_filename, filename);
+    int flen = strlen(cwd) + strlen(filename) + strlen(SAMPLE_DIR) + 1;
+    printf("FLEN:%d\n", flen);
+    char full_filename[flen];
+    strncpy(full_filename, cwd, flen - 1);
+    strncat(full_filename, SAMPLE_DIR, flen - 1 - strlen(full_filename));
+    strncat(full_filename, filename, flen - 1 - strlen(full_filename));
+
+    std::cout << "FILE: " << full_filename << std::endl;
 
     struct stat buffer;
     return (stat(full_filename, &buffer) == 0);

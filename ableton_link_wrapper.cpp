@@ -46,9 +46,6 @@ struct AbletonLink
 
 void update_bpm(double bpm) { /* no-op */ };
 
-// c++ wrapper for Ableton Link to call from sbsh
-extern "C" {
-
 AbletonLink *new_ableton_link(double bpm)
 {
     //std::cout << "New Ableton Link object!" << std::endl;
@@ -162,4 +159,3 @@ double link_get_phase_at_time(AbletonLink *l, long long int sample_number,
 
 int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }
 
-} // extern "C"

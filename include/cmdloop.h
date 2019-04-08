@@ -22,7 +22,6 @@ bool parse_digisynth_settings_change(digisynth *ms, char wurds[][SIZE_OF_WURD]);
 bool is_valid_file(char *filename);
 
 int generic_osc_handler(const char *path, const char *types, lo_arg **argv,
-                    int argc, void *data, void *user_data);
+                        int argc, void *data, void *user_data);
 int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
-                    int argc, void *data, void *user_data);
-
+                        int argc, void *data, void *user_data);

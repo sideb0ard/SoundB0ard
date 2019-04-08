@@ -437,7 +437,7 @@ void algorithm_replace_vars_in_cmd(algorithm *a)
 void algorithm_status(void *self, wchar_t *status_string)
 {
     algorithm *a = (algorithm *)self;
-    char *ALGO_COLOR = ANSI_COLOR_RESET;
+    const char *ALGO_COLOR = ANSI_COLOR_RESET;
     if (a->active)
         ALGO_COLOR = COOL_COLOR_PINK;
 

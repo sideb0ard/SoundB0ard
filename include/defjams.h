@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <string>
 
 #define SAMPLE_RATE (44100)
 #define FRAMES_PER_BUFFER (64)
@@ -15,7 +16,7 @@
 #define NUM_WURDS 25
 #define DEFAULT_BPM 140
 
-#define SAMPLE_DIR "./wavs/"
+#define SAMPLE_DIR "/wavs/"
 
 #define DEFAULT_ENV_LENGTH 8.0 // two bars Envelope
 

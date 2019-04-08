@@ -752,13 +752,13 @@ void check_and_set_pattern(sound_generator *sg, int target_pattern_num,
             strcat(line, " ");
     }
 
-    midi_event pattern = {};
-    if (parse_pattern(line, &pattern, pattern_type))
+    midi_event pattern[PPBAR] = {};
+    if (parse_pattern(line, pattern, pattern_type))
     {
         pattern_change_info change_info = {.clear_previous = true,
                                            .temporary = false};
         sequence_engine *engine = get_sequence_engine(sg);
         sequence_engine_set_pattern(engine, target_pattern_num, change_info,
-                                    &pattern);
+                                    pattern);
     }
 }

@@ -3,8 +3,8 @@
 
 #include "portaudio.h"
 #include "portmidi.h"
-#include <pthread.h>
 #include <lo/lo.h>
+#include <pthread.h>
 
 #include "ableton_link_wrapper.h"
 
@@ -73,7 +73,6 @@ typedef struct preview_buffer
 
 stereo_val preview_buffer_generate(preview_buffer *buffy);
 void preview_buffer_import_file(preview_buffer *buffy, char *filename);
-
 
 typedef struct mixer
 {
