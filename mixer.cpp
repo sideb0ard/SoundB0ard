@@ -616,7 +616,7 @@ void mixer_events_output(mixer *mixr)
         }
 
         mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
-        lo_send(mixr->processing_addr, "/bpm", NULL);
+        //lo_send(mixr->processing_addr, "/bpm", NULL);
     }
 }
 

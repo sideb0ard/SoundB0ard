@@ -68,6 +68,7 @@ void *loopy(void *arg)
     lo_server s = lo_server_new(OSC_LISTEN_PORT, liblo_error);
     // lo_server_add_method(s, NULL, NULL, generic_osc_handler, NULL);
     lo_server_add_method(s, "/trigger", "i", trigger_osc_handler, NULL);
+    lo_server_add_method(s, "/note_on", "ii", osc_note_on_handler, NULL);
     int lo_fd = lo_server_get_socket_fd(s);
 
     fd_set rfds;
@@ -250,5 +251,22 @@ int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
         midi_parse_midi_event(sg, &_event);
     }
 
+    return 0;
+}
+
+int osc_note_on_handler(const char *path, const char *types, lo_arg **argv,
+                        int argc, void *data, void *user_data)
+{
+    int target_sg = argv[0]->i;
+    int midi_note = argv[1]->i;
+    //printf("NOTE_ON! Target:%d midi_note:%d\n", target_sg, midi_note);
+    fflush(stdout);
+    midi_event _event = new_midi_event(MIDI_ON, 12 + midi_note, 128);
+    _event.source = EXTERNAL_OSC;
+    if (mixer_is_valid_soundgen_num(mixr, target_sg))
+    {
+        sound_generator *sg = mixr->sound_generators[target_sg];
+        midi_parse_midi_event(sg, &_event);
+    }
     return 0;
 }

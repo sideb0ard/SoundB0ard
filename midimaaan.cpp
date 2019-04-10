@@ -20,7 +20,7 @@ extern mixer *mixr;
 
 extern char *s_synth_waves[6];
 
-void* midi_init(void *)
+void *midi_init(void *)
 {
     printf("MIDI maaaaan!\n");
     pthread_setname_np("Midimaaaan");
@@ -83,6 +83,12 @@ midi_event new_midi_event(unsigned int event_type, unsigned int data1,
 
 void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
 {
+    if (lo_send(mixr->processing_addr, "/img", "i", sg->mixer_idx) == -1)
+    {
+        printf("OSC error %d: %s\n", lo_address_errno(mixr->processing_addr),
+               lo_address_errstr(mixr->processing_addr));
+    }
+
     int cur_midi_tick = mixr->timing_info.midi_tick % PPBAR;
     int midi_note = ev->data1;
     bool is_chord_mode = false;
