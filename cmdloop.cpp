@@ -68,7 +68,7 @@ void *loopy(void *arg)
     lo_server s = lo_server_new(OSC_LISTEN_PORT, liblo_error);
     // lo_server_add_method(s, NULL, NULL, generic_osc_handler, NULL);
     lo_server_add_method(s, "/trigger", "i", trigger_osc_handler, NULL);
-    lo_server_add_method(s, "/note_on", "ii", osc_note_on_handler, NULL);
+    lo_server_add_method(s, "/note_on", "iiii", osc_note_on_handler, NULL);
     int lo_fd = lo_server_get_socket_fd(s);
 
     fd_set rfds;
@@ -79,9 +79,9 @@ void *loopy(void *arg)
     if (lo_fd > 0)
     {
 
-        //printf("%s", prompt);
-        //fflush(stdout);
-        while(1)
+        // printf("%s", prompt);
+        // fflush(stdout);
+        while (1)
         {
 
             FD_ZERO(&rfds);
@@ -111,7 +111,6 @@ void *loopy(void *arg)
                     lo_server_recv_noblock(s, 0);
                 }
             }
-
         }
     }
     else
@@ -259,9 +258,10 @@ int osc_note_on_handler(const char *path, const char *types, lo_arg **argv,
 {
     int target_sg = argv[0]->i;
     int midi_note = argv[1]->i;
-    //printf("NOTE_ON! Target:%d midi_note:%d\n", target_sg, midi_note);
-    fflush(stdout);
-    midi_event _event = new_midi_event(MIDI_ON, 12 + midi_note, 128);
+    int octave = argv[2]->i;
+    int velocity = argv[3]->i;
+
+    midi_event _event = new_midi_event(MIDI_ON, (octave * 12) + midi_note, velocity);
     _event.source = EXTERNAL_OSC;
     if (mixer_is_valid_soundgen_num(mixr, target_sg))
     {

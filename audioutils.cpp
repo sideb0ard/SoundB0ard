@@ -45,20 +45,6 @@ void pa_teardown(void)
     exit(0);
 }
 
-void get_chord_compat_keys(int keynum, int vals[4])
-{
-    vals[0] = keynum;
-    for (int i = 1; i < 4; i++)
-    {
-        int randy = rand() % 6;
-        while (is_int_member_in_array(randy, vals, 4))
-        {
-            randy = rand() % 6;
-        }
-        vals[i] = randy;
-    }
-}
-
 int get_chord_type(unsigned int scale_degree)
 {
     if (scale_degree == 0 || scale_degree == 3 || scale_degree == 4 ||

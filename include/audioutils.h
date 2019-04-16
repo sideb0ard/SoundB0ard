@@ -28,6 +28,5 @@ enum
 }; // chord type
 
 int get_chord_type(unsigned int scale_degree);
-// void get_chord_compat_keys(int keynum, int vals[4]);
 void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
                                int octave, chord_midi_notes *chnotes);

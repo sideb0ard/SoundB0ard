@@ -12,7 +12,7 @@ extern const wchar_t *sparkchars;
 extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
-static char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
+static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
                                   "dx_dest_vibrato"};
 
 dxsynth *new_dxsynth(void)
@@ -661,9 +661,9 @@ void dxsynth_status(void *self, wchar_t *status_string)
 {
     dxsynth *dx = (dxsynth *)self;
 
-    char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
+    char *INSTRUMENT_COLOR = (char *) ANSI_COLOR_RESET;
     if (dx->sg.active)
-        INSTRUMENT_COLOR = ANSI_COLOR_CYAN;
+        INSTRUMENT_COLOR = (char *) ANSI_COLOR_CYAN;
 
     // clang-format off
     swprintf(
