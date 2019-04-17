@@ -93,6 +93,11 @@ void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
     int midi_note = ev->data1;
     bool is_chord_mode = false;
 
+    if (!is_midi_note_in_key(midi_note, mixr->key))
+    {
+        return;
+    }
+
     sequence_engine *engine = get_sequence_engine(sg);
     if (engine->transpose != 0)
         midi_note += engine->transpose;

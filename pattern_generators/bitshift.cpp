@@ -9,9 +9,9 @@
 #include "utils.h"
 
 extern mixer *mixr;
-static char *s_token_types[] = {"NUMBER", "OPERATOR", "TEE_TOKEN", "BRACKET"};
-static char *s_brackets[] = {"(", ")"};
-static char *s_ops[] = {"<<", ">>", "^", "|", "~", "&",
+static const char *s_token_types[] = {"NUMBER", "OPERATOR", "TEE_TOKEN", "BRACKET"};
+static const char *s_brackets[] = {"(", ")"};
+static const char *s_ops[] = {"<<", ">>", "^", "|", "~", "&",
                         "+",  "-",  "*", "/", "%", "t"};
 
 // #define DEBUG_BITSHIFT 1
@@ -293,9 +293,10 @@ static bool isvalid_char(char *ch)
         return true;
 
     static char acceptable[] = {'<', '>', '^', '|', '~', '&', '+',
-                                '-', '*', '/', '%', '(', ')', 't'};
+                                '-', '*', '/', '%', '(', ')', 't', 0};
 
     int acceptable_len = strlen(acceptable);
+    printf("ACCEPTABLE_LEN: %d\n", acceptable_len);
     for (int i = 0; i < acceptable_len; i++)
     {
         if (*ch == acceptable[i])

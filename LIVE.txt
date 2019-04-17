@@ -2,10 +2,15 @@
 *  SIDEB0ARD, in SAN FRANCISCO
 *************************************
 
+ps
+
+sidechain 0 1
+
+
 play KauaiAmbience2Chickens.aiff
 
 new moog
-load pulsar
+moog 0 load pulsar
 
 moog 0:0 c1*2 g2*4
 moog 0:0 numloops 2
@@ -16,11 +21,14 @@ step 1:1 bd [bd ~ ~ bd]
 step 1:0 numloops 3
 
 stop avalino
+
 new step claps/2stepgrant.aiff [~ sd]*2
+
 gen euclid
 
 loop loops/avalinoPaulStrecth.aiff 3 // its loud
-vol 0.2
+vol 4 0.2
+
 sidechain it with avalinoKick ; start 1
 
 new bitshift 74 * ( t | ( t >> 2 | t >> 16 ) )

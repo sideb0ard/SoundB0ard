@@ -115,3 +115,27 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
     chnotes->third = third_midi;
     chnotes->fifth = fifth_midi;
 }
+
+bool is_midi_note_in_key(unsigned int note, unsigned int key)
+{
+    //printf("NOTE is %d and KEY is %d\n", note, key);
+    // western scale is 2 2 1 2 2 2 1
+    note = note % 12;
+    if (note == key)
+        return true;
+    else if (note == key + 2)
+        return true;
+    else if (note == key + 4)
+        return true;
+    else if (note == key + 5)
+        return true;
+    else if (note == key + 7)
+        return true;
+    else if (note == key + 9)
+        return true;
+    else if (note == key + 11)
+        return true;
+    else if (note == key + 12)
+        return true;
+    return false;
+}
