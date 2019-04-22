@@ -601,13 +601,10 @@ bool is_valid_file(char *filename)
     char cwd[1024];
     getcwd(cwd, 1024);
     int flen = strlen(cwd) + strlen(filename) + strlen(SAMPLE_DIR) + 1;
-    printf("FLEN:%d\n", flen);
     char full_filename[flen];
     strncpy(full_filename, cwd, flen - 1);
     strncat(full_filename, SAMPLE_DIR, flen - 1 - strlen(full_filename));
     strncat(full_filename, filename, flen - 1 - strlen(full_filename));
-
-    std::cout << "FILE: " << full_filename << std::endl;
 
     struct stat buffer;
     return (stat(full_filename, &buffer) == 0);

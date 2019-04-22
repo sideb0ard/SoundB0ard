@@ -11,7 +11,7 @@ LIBDIR=/usr/local/lib
 HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
 READLINELIBDIR=/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
-CPPFLAGS = -std=c++11 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address
+CPPFLAGS = -std=c++17 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address
 
 $(OBJDIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CPPFLAGS)
@@ -29,7 +29,7 @@ objdir:
 	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop obj/pattern_generators obj/value_generators obj/afx
 
 $(TARGET): $(OBJ)
-	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ $(LIBS) $(INCS)
+	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ $(LIBS) $(INCDIRS)
 
 clean:
 	rm -f *.o *~ $(TARGET)
