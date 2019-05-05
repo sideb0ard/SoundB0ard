@@ -6,12 +6,12 @@ OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
 
 ABLETONASIOINC=-I/Users/sideboard/Code/link/modules/asio-standalone/asio/include
-INCDIRS=-I/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/include -I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include -I/Users/sideboard/homebrew/include
+INCDIRS=-I/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/include -I/usr/local/include -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include -I/Users/sideboard/homebrew/include -I${HOME}/Code/range-v3/include/
 LIBDIR=/usr/local/lib
 HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
 READLINELIBDIR=/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
-CPPFLAGS = -std=c++17 $(WARNFLAGS) -g -pg $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address
+CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address -fno-omit-frame-pointer
 
 $(OBJDIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CPPFLAGS)

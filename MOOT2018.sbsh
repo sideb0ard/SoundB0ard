@@ -1,19 +1,25 @@
 7LGO1
 
+bpm 160
 new loop loops/JungleBassNeedleWobble.aiff
 fuckup 0
 
 
 new bitshift ((t/4)>>t/4)|(t>>2)
-new step notes/2stepbass.aiff; step 1 gen src 0; step 1 gen every 3
+
+new step notes/2stepbass.aiff;
+new markov garage
+every 3 bar apply 0 1:0
 
 new bitshift ((t/1000)^(t/1001))*t
+
 new moog; moog 2 load drexy; moog 2 single_note_mode 1
 every 2 bar moog 2 genonce 0; every 5 bar gen riff 0 2:0; ws 2
+every 3 bar apply 0 2:0
 
 new markov 3
 new digi notes/front2WestChord1.aiff; digi 3 up ; digi 3 up
-every 4 bar gen riffonce 0 3:0; waveshape 3 3
+every 4 bar apply 1 3:0
 
 new digi noises/SNDdoublewhooshit.aiff
 every 1 bar rand "35 36 28 29 35" digi 4 midi_note_1 %s
@@ -41,6 +47,8 @@ new loop loops/raveLooprr.aiff 2; down 0; start 5 ; down 6
 
 moog 2 load ven0m ; start 2
 fuckup 7; down 0
+
+ps
 
 loop 7 pitch 2; stop 5
 

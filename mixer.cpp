@@ -357,8 +357,6 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
 
 void mixer_update_bpm(mixer *mixr, int bpm)
 {
-    printf("Changing bpm to %d\n", bpm);
-
     mixr->bpm = bpm;
     mixr->timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
     mixr->timing_info.loop_len_in_frames =
