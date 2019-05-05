@@ -186,14 +186,14 @@ pattern_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
 
     std::cout << "LINE! " << line << std::endl;
 
-    extract_symbols_from_line(line, my_pattern.infix_tokenized_pattern);
-    convert_to_infix(my_pattern.infix_tokenized_pattern,
-                     my_pattern.rpn_tokenized_pattern);
+    extract_symbols_from_line(line, bs->pattern.infix_tokenized_pattern);
+    convert_to_infix(bs->pattern.infix_tokenized_pattern,
+                     bs->pattern.rpn_tokenized_pattern);
 
-    // print_symbols(my_pattern.infix_tokenized_pattern);
-    // print_symbols(my_pattern.rpn_tokenized_pattern);
+    print_symbols(my_pattern.infix_tokenized_pattern);
+    print_symbols(my_pattern.rpn_tokenized_pattern);
 
-    memcpy(&bs->pattern, &my_pattern, sizeof(my_pattern));
+    // memcpy(&bs->pattern, &my_pattern, sizeof(my_pattern));
     bs->sg.status = &bitshift_status;
     bs->sg.generate = &bitshift_generate;
     bs->sg.event_notify = &bitshift_event_notify;
@@ -211,23 +211,32 @@ void bitshift_status(void *self, wchar_t *wstring)
 {
     bitshift *bs = (bitshift *)self;
 
-    for (auto s : bs->pattern.infix_tokenized_pattern)
-        std::cout << s << " ";
+    // for (auto s : bs->pattern.infix_tokenized_pattern)
+    //    std::cout << s << " ";
+    // std::cout << std::endl;
+
+    // for (auto s : bs->pattern.infix_tokenized_pattern)
+    //    std::cout << s << " ";
+    // std::cout << std::endl;
+
+    std::cout << "INFIX LEN:" << bs->pattern.infix_tokenized_pattern.size()
+              << std::endl;
+    for (auto t : bs->pattern.infix_tokenized_pattern)
+        std::cout << t << " ";
     std::cout << std::endl;
+    std::string infix_pattern =
+        symbols_to_string(bs->pattern.infix_tokenized_pattern);
 
-    for (auto s : bs->pattern.infix_tokenized_pattern)
-        std::cout << s << " ";
-    std::cout << std::endl;
+    std::cout << "infix:" << infix_pattern << std::endl;
 
-    // std::string infix_pattern =
-    //    symbols_to_string(bs->pattern.infix_tokenized_pattern);
-    // std::string rpn_pattern =
-    //    symbols_to_string(bs->pattern.rpn_tokenized_pattern);
+    std::string rpn_pattern =
+        symbols_to_string(bs->pattern.rpn_tokenized_pattern);
+    std::cout << "rpn:" << rpn_pattern << std::endl;
 
-    // swprintf(wstring, MAX_STATIC_STRING_SZ,
-    //         L"[" WANSI_COLOR_WHITE "PATTERN GEN ] - " WCOOL_COLOR_PINK
-    //         "infix pattern: %s\nrpn pattern: %s",
-    //         infix_pattern.c_str(), rpn_pattern.c_str());
+    swprintf(wstring, MAX_STATIC_STRING_SZ,
+             L"[" WANSI_COLOR_WHITE "PATTERN GEN ] - " WCOOL_COLOR_PINK
+             "infix pattern: %s\nrpn pattern: %s",
+             infix_pattern.c_str(), rpn_pattern.c_str());
 }
 
 void bitshift_generate(void *self, void *data)
@@ -237,6 +246,95 @@ void bitshift_generate(void *self, void *data)
 
     midi_event *midi_pattern = (midi_event *)data;
 
+    int answer_stack_idx = 0;
+    int answer_stack[100] = {0};
+    std::vector<int> answer_vec = {};
+
+    int len_rpn = bs->pattern.rpn_tokenized_pattern.size();
+    for (int i = 0; i < len_rpn; i++)
+    {
+        Symbol s = bs->pattern.rpn_tokenized_pattern[i];
+
+        if (s.sym_type == SymbolType::NUMBER)
+        {
+            answer_vec.push_back(s.value);
+        }
+        else if (s.sym_type == SymbolType::TEE_TOKEN)
+        {
+            answer_vec.push_back(t);
+        }
+        else if (s.sym_type == SymbolType::OP)
+        {
+            printf("GOTSZ AN OPERATOR\n");
+            if (s.ary == Aryness::UNARY)
+            {
+                Symbol next_token = bs->pattern.rpn_tokenized_pattern[++i];
+                if (next_token.sym_type != SymbolType::NUMBER ||
+                    next_token.sym_type != SymbolType::TEE_TOKEN)
+                {
+                    std::cout << "WOAH, NELLIE, NOT A NUMBER!\n";
+                    // TODO - panic
+                }
+                int op1 = next_token.sym_type == SymbolType::NUMBER
+                              ? next_token.value
+                              : mixr->timing_info.cur_sample;
+
+                answer_vec.push_back(~op1);
+            }
+            else
+            {
+                int op2 = answer_vec.back();
+                answer_vec.pop_back();
+                int op1 = answer_vec.back();
+                answer_vec.pop_back();
+
+                if (bs->sg.debug)
+                    printf("OP1 is %d and OP2 is %d\n", op1, op2);
+
+                int answer = 0;
+                switch (s.op_type)
+                {
+                case (OperatorType::LEFT_SHIFT):
+                    answer = op1 << op2;
+                    break;
+                case (OperatorType::RIGHT_SHIFT):
+                    answer = op1 >> op2;
+                    break;
+                case (OperatorType::XOR):
+                    answer = op1 ^ op2;
+                    break;
+                case (OperatorType::OR):
+                    answer = op1 | op2;
+                    break;
+                case (OperatorType::AND):
+                    answer = op1 & op2;
+                    break;
+                case (OperatorType::PLUS):
+                    answer = op1 + op2;
+                    break;
+                case (OperatorType::MINUS):
+                    answer = op1 - op2;
+                    break;
+                case (OperatorType::MULTIPLY):
+                    answer = op1 * op2;
+                    break;
+                case (OperatorType::DIVIDE):
+                    if (op2 != 0)
+                        answer = op1 / op2;
+                    break;
+                case (OperatorType::MODULO):
+                    if (op2 != 0)
+                        answer = op1 % op2;
+                    break;
+                default:
+                    std::cout << "WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n";
+                }
+                answer_vec.push_back(answer);
+            }
+        }
+    }
+    std::cout << "ANSWER VEC SIZE: " << answer_vec.size();
+    apply_short_to_midi_pattern(answer_vec.back(), midi_pattern);
     // int num_rpn = bs->pattern.num_rpn_tokens;
     // bitshift_token *rpn_tokens = bs->pattern.rpn_tokenized_pattern;
 
@@ -272,7 +370,8 @@ void bitshift_generate(void *self, void *data)
     //                // TODO - panic
     //            }
     //            int op1 = next.type == NUMBER ? next.val
-    //                                          : mixr->timing_info.cur_sample;
+    //                                          :
+    //                                          mixr->timing_info.cur_sample;
     //            answer_stack[answer_stack_idx++] = ~op1;
     //            if (bs->sg.debug)
     //                printf("WAS UNARY NOT -- answer is %d\n",
@@ -322,7 +421,8 @@ void bitshift_generate(void *self, void *data)
     //                    answer = op1 % op2;
     //                break;
     //            default:
-    //                printf("WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n");
+    //                printf("WOOOOAH, NELLY! DONT KNOW WHAT OP YA
+    //                GOT!\n");
     //            }
     //            answer_stack[answer_stack_idx++] = answer;
     //            if (bs->sg.debug)
@@ -386,7 +486,7 @@ void convert_to_infix(const std::vector<Symbol> &tokens,
 {
     std::vector<Symbol> operator_stack;
 
-    for (const Symbol &t : tokens)
+    for (const Symbol t : tokens)
     {
         std::cout << "\nLooking at " << t << std::endl;
         if (t.sym_type == SymbolType::NUMBER)
@@ -406,6 +506,7 @@ void convert_to_infix(const std::vector<Symbol> &tokens,
                 {
                     if (top_of_stack.sym_type == SymbolType::LEFT_PARENS)
                         break;
+
                     operator_stack.pop_back();
                     output_queue.push_back(top_of_stack);
                     std::cout << "POP stack to output: " << top_of_stack
