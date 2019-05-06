@@ -13,11 +13,6 @@
 #include "utils.h"
 
 extern mixer *mixr;
-// static const char *s_token_types[] = {"NUMBER", "OPERATOR", "TEE_TOKEN",
-//                                      "BRACKET"};
-// static const char *s_brackets[] = {"(", ")"};
-// static const char *s_ops[] = {"<<", ">>", "^", "|", "~", "&",
-//                              "+",  "-",  "*", "/", "%", "t"};
 
 namespace
 {
@@ -41,9 +36,7 @@ bool is_number(const std::string &s)
 bool is_operator(const std::string &s)
 {
     if (std::find(ops.begin(), ops.end(), s) != ops.end())
-    {
         return true;
-    }
     return false;
 }
 
@@ -122,42 +115,71 @@ Symbol::Symbol(SymbolType type, int value) : sym_type{type}, value{value} {}
 Symbol::Symbol(SymbolType type, std::string identifier, OperatorType op_type)
     : sym_type{type}, identifier{identifier}, op_type{op_type}
 {
-    if (identifier == "^")
+    if (identifier == "<<")
+    {
+        precedence = 5;
+        associativity = SymbolAssociativity::LEFT;
+        ary = Aryness::BINARY;
+    }
+    else if (identifier == ">>")
+    {
+        precedence = 5;
+        associativity = SymbolAssociativity::LEFT;
+        ary = Aryness::BINARY;
+    }
+    else if (identifier == "^")
+    {
+        precedence = 9;
+        associativity = SymbolAssociativity::LEFT;
+        ary = Aryness::BINARY;
+    }
+    else if (identifier == "|")
+    {
+        precedence = 10;
+        associativity = SymbolAssociativity::LEFT;
+        ary = Aryness::BINARY;
+    }
+    else if (identifier == "~")
+    {
+        precedence = 2;
+        associativity = SymbolAssociativity::RIGHT;
+        ary = Aryness::UNARY;
+    }
+    else if (identifier == "&")
+    {
+        precedence = 8;
+        associativity = SymbolAssociativity::LEFT;
+        ary = Aryness::BINARY;
+    }
+    else if (identifier == "+")
     {
         precedence = 4;
-        associativity = SymbolAssociativity::RIGHT;
-        func = [](int a, int b) {
-            int tot = 0;
-            for (int i = 0; i < b; ++i)
-            {
-                tot += a * a;
-            };
-            return tot;
-        };
+        associativity = SymbolAssociativity::LEFT;
+        ary = Aryness::BINARY;
+    }
+    else if (identifier == "-")
+    {
+        precedence = 4;
+        associativity = SymbolAssociativity::LEFT;
+        ary = Aryness::BINARY;
     }
     else if (identifier == "*")
     {
         precedence = 3;
         associativity = SymbolAssociativity::LEFT;
-        func = [](int a, int b) { return a * b; };
+        ary = Aryness::BINARY;
     }
     else if (identifier == "/")
     {
         precedence = 3;
         associativity = SymbolAssociativity::LEFT;
-        func = [](int a, int b) { return a / b; };
+        ary = Aryness::BINARY;
     }
-    else if (identifier == "+")
+    else if (identifier == "%")
     {
-        precedence = 2;
+        precedence = 3;
         associativity = SymbolAssociativity::LEFT;
-        func = [](int a, int b) { return a + b; };
-    }
-    else if (identifier == "-")
-    {
-        precedence = 2;
-        associativity = SymbolAssociativity::LEFT;
-        func = [](int a, int b) { return a - b; };
+        ary = Aryness::BINARY;
     }
 }
 
@@ -245,9 +267,7 @@ void bitshift_generate(void *self, void *data)
     int t = bs->time_counter++;
 
     midi_event *midi_pattern = (midi_event *)data;
-
-    int answer_stack_idx = 0;
-    int answer_stack[100] = {0};
+    // int answer_stack[100] = {0};
     std::vector<int> answer_vec = {};
 
     int len_rpn = bs->pattern.rpn_tokenized_pattern.size();
@@ -257,23 +277,27 @@ void bitshift_generate(void *self, void *data)
 
         if (s.sym_type == SymbolType::NUMBER)
         {
+            std::cout << "GOTSZ A NUMBER:" << s << std::endl;
             answer_vec.push_back(s.value);
         }
         else if (s.sym_type == SymbolType::TEE_TOKEN)
         {
+            std::cout << "GOTSZ A TEE:" << s << std::endl;
             answer_vec.push_back(t);
         }
         else if (s.sym_type == SymbolType::OP)
         {
-            printf("GOTSZ AN OPERATOR\n");
+            std::cout << "GOTSZ An OP:" << s << std::endl;
             if (s.ary == Aryness::UNARY)
             {
+                // only UNARY is bitwise NOT ~
+                std::cout << "UNARY?! must be a ~" << std::endl;
                 Symbol next_token = bs->pattern.rpn_tokenized_pattern[++i];
                 if (next_token.sym_type != SymbolType::NUMBER ||
                     next_token.sym_type != SymbolType::TEE_TOKEN)
                 {
                     std::cout << "WOAH, NELLIE, NOT A NUMBER!\n";
-                    // TODO - panic
+                    return;
                 }
                 int op1 = next_token.sym_type == SymbolType::NUMBER
                               ? next_token.value
@@ -329,6 +353,7 @@ void bitshift_generate(void *self, void *data)
                 default:
                     std::cout << "WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n";
                 }
+                std::cout << "Answer is " << answer << std::endl;
                 answer_vec.push_back(answer);
             }
         }
@@ -426,7 +451,7 @@ void bitshift_generate(void *self, void *data)
     //            }
     //            answer_stack[answer_stack_idx++] = answer;
     //            if (bs->sg.debug)
-    //                printf("WAS BINARY -- answer is %d\n", answer);
+    //                printf("WAS Aryness::BINARY -- answer is %d\n", answer);
     //        }
     //    }
     //}
@@ -490,6 +515,11 @@ void convert_to_infix(const std::vector<Symbol> &tokens,
     {
         std::cout << "\nLooking at " << t << std::endl;
         if (t.sym_type == SymbolType::NUMBER)
+        {
+            output_queue.push_back(t);
+            std::cout << "Add token to output" << std::endl;
+        }
+        if (t.sym_type == SymbolType::TEE_TOKEN)
         {
             output_queue.push_back(t);
             std::cout << "Add token to output" << std::endl;

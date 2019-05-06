@@ -60,7 +60,6 @@ class Symbol
     // used if type is OP
     OperatorType op_type;
     std::string identifier; // used for print
-    std::function<int(int, int)> func;
     int precedence;
     SymbolAssociativity associativity;
     Aryness ary;
