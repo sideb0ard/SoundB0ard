@@ -183,10 +183,6 @@ Symbol::Symbol(SymbolType type, std::string identifier, OperatorType op_type)
     }
 }
 
-// #define DEBUG_BITSHIFT 1
-#define LARGEST_POSSIBLE 2048
-#define PATTERN_STATUS_SIZE 512
-
 pattern_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
 
@@ -206,22 +202,23 @@ pattern_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
             line.append(" ");
     }
 
-    std::cout << "LINE! " << line << std::endl;
+    // std::cout << "LINE! " << line << std::endl;
 
     extract_symbols_from_line(line, bs->pattern.infix_tokenized_pattern);
     convert_to_infix(bs->pattern.infix_tokenized_pattern,
                      bs->pattern.rpn_tokenized_pattern);
 
-    print_symbols(my_pattern.infix_tokenized_pattern);
-    print_symbols(my_pattern.rpn_tokenized_pattern);
+    // print_symbols(my_pattern.infix_tokenized_pattern);
+    // print_symbols(my_pattern.rpn_tokenized_pattern);
 
-    // memcpy(&bs->pattern, &my_pattern, sizeof(my_pattern));
     bs->sg.status = &bitshift_status;
     bs->sg.generate = &bitshift_generate;
     bs->sg.event_notify = &bitshift_event_notify;
     bs->sg.set_debug = &bitshift_set_debug;
     bs->sg.type = BITSHIFT;
-    bs->time_counter = 40761023; // init value, rather than 0
+    // bs->time_counter = 40761023; // init value, rather than 0
+    bs->time_counter =
+        mixr->timing_info.cur_sample; // init value, rather than 0
     return (pattern_generator *)bs;
 }
 void bitshift_change_pattern(bitshift *sg, char *pattern)
@@ -233,27 +230,11 @@ void bitshift_status(void *self, wchar_t *wstring)
 {
     bitshift *bs = (bitshift *)self;
 
-    // for (auto s : bs->pattern.infix_tokenized_pattern)
-    //    std::cout << s << " ";
-    // std::cout << std::endl;
-
-    // for (auto s : bs->pattern.infix_tokenized_pattern)
-    //    std::cout << s << " ";
-    // std::cout << std::endl;
-
-    std::cout << "INFIX LEN:" << bs->pattern.infix_tokenized_pattern.size()
-              << std::endl;
-    for (auto t : bs->pattern.infix_tokenized_pattern)
-        std::cout << t << " ";
-    std::cout << std::endl;
     std::string infix_pattern =
         symbols_to_string(bs->pattern.infix_tokenized_pattern);
 
-    std::cout << "infix:" << infix_pattern << std::endl;
-
     std::string rpn_pattern =
         symbols_to_string(bs->pattern.rpn_tokenized_pattern);
-    std::cout << "rpn:" << rpn_pattern << std::endl;
 
     swprintf(wstring, MAX_STATIC_STRING_SZ,
              L"[" WANSI_COLOR_WHITE "PATTERN GEN ] - " WCOOL_COLOR_PINK
@@ -267,7 +248,6 @@ void bitshift_generate(void *self, void *data)
     int t = bs->time_counter++;
 
     midi_event *midi_pattern = (midi_event *)data;
-    // int answer_stack[100] = {0};
     std::vector<int> answer_vec = {};
 
     int len_rpn = bs->pattern.rpn_tokenized_pattern.size();
@@ -277,17 +257,20 @@ void bitshift_generate(void *self, void *data)
 
         if (s.sym_type == SymbolType::NUMBER)
         {
-            std::cout << "GOTSZ A NUMBER:" << s << std::endl;
+            if (bs->sg.debug)
+                std::cout << "GOTSZ A NUMBER:" << s << std::endl;
             answer_vec.push_back(s.value);
         }
         else if (s.sym_type == SymbolType::TEE_TOKEN)
         {
-            std::cout << "GOTSZ A TEE:" << s << std::endl;
+            if (bs->sg.debug)
+                std::cout << "GOTSZ A TEE:" << s << std::endl;
             answer_vec.push_back(t);
         }
         else if (s.sym_type == SymbolType::OP)
         {
-            std::cout << "GOTSZ An OP:" << s << std::endl;
+            if (bs->sg.debug)
+                std::cout << "GOTSZ An OP:" << s << std::endl;
             if (s.ary == Aryness::UNARY)
             {
                 // only UNARY is bitwise NOT ~
@@ -353,119 +336,13 @@ void bitshift_generate(void *self, void *data)
                 default:
                     std::cout << "WOOOOAH, NELLY! DONT KNOW WHAT OP YA GOT!\n";
                 }
-                std::cout << "Answer is " << answer << std::endl;
+                if (bs->sg.debug)
+                    std::cout << "Answer is " << answer << std::endl;
                 answer_vec.push_back(answer);
             }
         }
     }
-    std::cout << "ANSWER VEC SIZE: " << answer_vec.size();
     apply_short_to_midi_pattern(answer_vec.back(), midi_pattern);
-    // int num_rpn = bs->pattern.num_rpn_tokens;
-    // bitshift_token *rpn_tokens = bs->pattern.rpn_tokenized_pattern;
-
-    // int answer_stack_idx = 0;
-    // int answer_stack[MAX_TOKENS_IN_PATTERN] = {0};
-
-    // for (int i = 0; i < num_rpn; i++)
-    //{
-    //    bitshift_token cur = rpn_tokens[i];
-    //    char char_val[100] = {0};
-    //    token_val_to_string(&cur, char_val);
-    //    if (bs->sg.debug)
-    //        printf("Looking at %s\n", char_val);
-    //    if (cur.type == NUMBER)
-    //    {
-    //        answer_stack[answer_stack_idx++] = cur.val;
-    //    }
-    //    else if (cur.type == TEE_TOKEN)
-    //    {
-    //        answer_stack[answer_stack_idx++] = t;
-    //    }
-    //    else if (cur.type == OPERATOR)
-    //    {
-    //        if (bs->sg.debug)
-    //            printf("GOTSZ AN OPERATOR\n");
-    //        if (bin_or_uni(cur.val) == UNARY)
-    //        {
-    //            // only UNARY is bitwise NOT ~
-    //            bitshift_token next = rpn_tokens[++i];
-    //            if (next.type != NUMBER || next.type != TEE_TOKEN)
-    //            {
-    //                printf("WOW NELLY - NOT A NUMBER!\n");
-    //                // TODO - panic
-    //            }
-    //            int op1 = next.type == NUMBER ? next.val
-    //                                          :
-    //                                          mixr->timing_info.cur_sample;
-    //            answer_stack[answer_stack_idx++] = ~op1;
-    //            if (bs->sg.debug)
-    //                printf("WAS UNARY NOT -- answer is %d\n",
-    //                       answer_stack[answer_stack_idx - 1]);
-    //        }
-    //        else
-    //        {
-    //            int op2 = answer_stack[--answer_stack_idx];
-    //            int op1 = answer_stack[--answer_stack_idx];
-
-    //            if (bs->sg.debug)
-    //                printf("OP1 is %d and OP2 is %d\n", op1, op2);
-
-    //            int answer = 0;
-    //            switch (cur.val)
-    //            {
-    //            case (LEFTSHIFT):
-    //                answer = op1 << op2;
-    //                break;
-    //            case (RIGHTSHIFT):
-    //                answer = op1 >> op2;
-    //                break;
-    //            case (XOR):
-    //                answer = op1 ^ op2;
-    //                break;
-    //            case (OR):
-    //                answer = op1 | op2;
-    //                break;
-    //            case (AND):
-    //                answer = op1 & op2;
-    //                break;
-    //            case (PLUS):
-    //                answer = op1 + op2;
-    //                break;
-    //            case (MINUS):
-    //                answer = op1 - op2;
-    //                break;
-    //            case (MULTIPLY):
-    //                answer = op1 * op2;
-    //                break;
-    //            case (DIVIDE):
-    //                if (op2 != 0)
-    //                    answer = op1 / op2;
-    //                break;
-    //            case (MODULO):
-    //                if (op2 != 0)
-    //                    answer = op1 % op2;
-    //                break;
-    //            default:
-    //                printf("WOOOOAH, NELLY! DONT KNOW WHAT OP YA
-    //                GOT!\n");
-    //            }
-    //            answer_stack[answer_stack_idx++] = answer;
-    //            if (bs->sg.debug)
-    //                printf("WAS Aryness::BINARY -- answer is %d\n", answer);
-    //        }
-    //    }
-    //}
-    // if (answer_stack_idx != 1)
-    //{
-    //    printf("BARF - STACK IS WRONG!\n");
-    //    return;
-    //}
-    // else
-    //{
-    //    if (bs->sg.debug)
-    //        printf("Returning %d\n", answer_stack[0]);
-    //    apply_short_to_midi_pattern(answer_stack[0], midi_pattern);
-    //}
 }
 
 void bitshift_event_notify(void *self, broadcast_event event)
@@ -665,8 +542,8 @@ void extract_symbols_from_line(const std::string &line,
 
 std::string symbols_to_string(const std::vector<Symbol> symbols)
 {
-    std::ostringstream out;
+    std::ostringstream my_out;
     for (auto s : symbols)
-        out << s << " ";
-    return out.str();
+        my_out << s << " ";
+    return my_out.str();
 }

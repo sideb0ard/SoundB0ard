@@ -2,11 +2,11 @@
 
 bpm 160
 new loop loops/JungleBassNeedleWobble.aiff
+
 fuckup 0
 
 
 new bitshift ((t/4)>>t/4)|(t>>2)
-
 new step notes/2stepbass.aiff;
 new markov garage
 every 3 bar apply 0 1:0
@@ -60,7 +60,8 @@ new step claps/technotron.aiff [~ cp]*2; new euclid
 
 step 8 gen src 3; step 8 gen every 8; start 5
 
-new step kicks/avalinoKickVoc.aiff b*2; vol 9 0.6
+new step kicks/avalinoKickVoc.aiff b*2;
+vol 9 0.6
 
 step 9:0 b*4; new dloop dloops/mkLikeloop.aiff;  sidechain 10 9; fuckup 10; down 5
 

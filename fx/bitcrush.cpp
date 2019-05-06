@@ -7,7 +7,7 @@
 
 bitcrush *new_bitcrush()
 {
-    bitcrush *bc = (bitcrush*) calloc(1, sizeof(bitcrush));
+    bitcrush *bc = (bitcrush *)calloc(1, sizeof(bitcrush));
     bitcrush_init(bc);
 
     bc->m_fx.type = BITCRUSH;
@@ -51,7 +51,7 @@ void bitcrush_set_bitdepth(bitcrush *bc, int val)
         bitcrush_update(bc);
     }
     else
-        printf("Val must be between 1 and 16\n");
+        printf("Val must be between 1 and 16:%d\n", val);
 }
 
 void bitcrush_set_sample_hold_freq(bitcrush *bc, double val)
