@@ -1,4 +1,5 @@
-7LGO1
+bpm 120
+key gb
 
 new gran pads/italiaDream2Bar.aiff // idx 0 10 0 50  // C
 // delay fb
@@ -8,13 +9,17 @@ new dx; dx 1 load deeepend
 every 2 bar apply 0 1:0
 
 new step notes/2stepbass.aiff;
+algo 2 append 2:0
 
-loops/BSQ_UZI4_BASSDROP.wav   # Bb
 new gran drones/slowedBradLayner.aiff // D  idx 0 and 50
 new gran strings/shadesofrhythm4bar.aiff // Gb
 hats/timabHat2.aiff
+new markov hats // every 3 bar # once
+new loop dloops/hiphousebreak.aiff 2
+// count 1 8 15 // delay fb // pitch 1.2 1.4 1
+
 claps/mawOW.aiff
-new loop dloops/hiphousebreak.aiff 2 // count 1 8 15 // delay fb // pitch 1.2 1.4 1
+new markov claps // every 2 #once
 
 new bitshift ((t/4)>>t/4)|(t>>2)
 
@@ -29,14 +34,12 @@ every 2 bar moog 2 genonce 0; every 5 bar gen riff 0 2:0; ws 2
 every 3 bar apply 0 2:0
 
 new markov 3
-new digi notes/front2WestChord1.aiff; digi 3 up ; digi 3 up
-every 4 bar apply 1 3:0
 
 new digi noises/SNDdoublewhooshit.aiff
-every 1 bar rand "35 36 28 29 35" digi 7 midi_note_1 %s
+every 1 bar rand "35 36 28 29 35" digi 11 midi_note_1 %s
 stop 0; 
 every 2 bar apply 0 7:0 # once
-
+ 
 new dloop dloops/rabveBreaskB.aiff; fuckup 5; start 0; stop 1; stop 2; stop 4
 
 stop 0; start 4
@@ -51,11 +54,11 @@ every 3 bar rand "1 1.5 1.2" loop 5 pitch %s
 
 key ab
 
-new loop loops/whydyahavetomakearecordboutme.aiff 2; fuckup 6;
+new loop loops/whydyahavetomakearecordboutme.aiff 2; fuckup 13
 
-stop 8
+stop 12
 
-new loop loops/raveLooprr.aiff 2; down 0; start 5 ; down 6
+new loop loops/raveLooprr.aiff 2; down 0; start 12 ; down 6
 
 moog 2 load ven0m ; start 2
 fuckup 7; down 0
@@ -75,7 +78,7 @@ step 8 gen src 3; step 8 gen every 8; start 5
 new step kicks/avalinoKickVoc.aiff b*2;
 vol 9 0.6
 
-step 9:0 b*4; new dloop dloops/mkLikeloop.aiff;  sidechain 10 9; fuckup 10; down 5
+step 16:0 b*4; new dloop dloops/mkLikeloop.aiff;  sidechain 17 16; fuckup 17; down 14
 
 stop 2; stop 8; stop 9
 
@@ -111,15 +114,15 @@ new step snrs/slaveSnare.aiff [~ s]*2
 step 16 gen src 6; step 16 gen every 2
 
 
-
-new dloop dloops/rabveBreaskB.aiff; fuckup 17;
+ps
+new dloop dloops/rabveBreaskB.aiff; fuckup 24;
 
 down 12
 
 
 moog 2 load sharpie; start 2; up 2
 
-new dloop dloops/hausBreakBeat.aiff ; fuckup 18; vol 18 1
+new dloop dloops/hausBreakBeat.aiff ; fuckup 24; vol 24 1
 
 new step kicks/808Kkick.wav b*4 ; down 13
 
