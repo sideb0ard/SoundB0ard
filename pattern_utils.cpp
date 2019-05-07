@@ -1,6 +1,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include <midimaaan.h>
 #include <mixer.h>
 #include <pattern_utils.h>

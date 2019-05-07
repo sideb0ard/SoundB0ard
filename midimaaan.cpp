@@ -15,6 +15,7 @@
 #include "minisynth.h"
 #include "mixer.h"
 #include "utils.h"
+#include <iostream>
 
 extern mixer *mixr;
 
@@ -95,7 +96,11 @@ void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
 
     if (!is_midi_note_in_key(midi_note, mixr->key))
     {
-        return;
+        // TODO fix!
+        // std::cout << "nah mate, not in key: " << midi_note << " " <<
+        // mixr->key
+        //          << std::endl;
+        // return;
     }
 
     sequence_engine *engine = get_sequence_engine(sg);

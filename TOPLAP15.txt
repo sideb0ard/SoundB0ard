@@ -1,5 +1,9 @@
 loop noises/stream.aiff 4 // C
-gran legowelt//Synth-GlassBell3.wav  // G // vol 0.3 // idx 0 10
+
+new gran legowelt//Synth-GlassBell3.wav  // G
+vol 0 0.3
+//  idx 0 10
+pads/italiaDream2Bar.aiff // idx 0 10 0 50  // C
 
 bitshift ( 37 >> t | t * 13 ) | 25
 moog android2Dream // every 4
