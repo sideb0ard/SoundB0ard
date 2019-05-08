@@ -1,13 +1,6 @@
 bpm 120
 key gb
 
-new gran pads/italiaDream2Bar.aiff // idx 0 10 0 50  // C
-// delay fb
-
-new bitshift (37 >> t | t*13) | 25
-new dx; dx 1 load deeepend
-every 2 bar apply 0 1:0
-
 new step notes/2stepbass.aiff;
 algo 2 append 2:0
 
@@ -36,11 +29,11 @@ every 3 bar apply 0 2:0
 new markov 3
 
 new digi noises/SNDdoublewhooshit.aiff
-every 1 bar rand "35 36 28 29 35" digi 11 midi_note_1 %s
+every 1 bar rand "35 36 28 29 35" digi 6 midi_note_1 %s
 stop 0; 
 every 2 bar apply 0 7:0 # once
  
-new dloop dloops/rabveBreaskB.aiff; fuckup 5; start 0; stop 1; stop 2; stop 4
+new dloop dloops/rabveBreaskB.aiff; 
 
 stop 0; start 4
 

@@ -484,7 +484,7 @@ void extract_symbols_from_line(const std::string &line,
                 while (i < (token_len - 1) && isdigit(token[i + 1]))
                     num << token[i++];
                 num << token[i];
-                symbols.push_back(
+                symbols.emplace_back(
                     Symbol(SymbolType::NUMBER, std::stoi(num.str())));
             }
             else if (token[i] == '<' || token[i] == '>')
@@ -498,23 +498,23 @@ void extract_symbols_from_line(const std::string &line,
                 }
                 std::cout << "SHIFT:" << token[i] << std::endl;
                 if (shifty == '<')
-                    symbols.push_back(
+                    symbols.emplace_back(
                         Symbol(SymbolType::OP, "<<", OperatorType::LEFT_SHIFT));
                 else
-                    symbols.push_back(Symbol(SymbolType::OP, ">>",
-                                             OperatorType::RIGHT_SHIFT));
+                    symbols.emplace_back(Symbol(SymbolType::OP, ">>",
+                                                OperatorType::RIGHT_SHIFT));
             }
             else if (token[i] == '(')
             {
                 std::cout << "PARENS:" << token[i] << std::endl;
-                symbols.push_back(
+                symbols.emplace_back(
                     Symbol(SymbolType::LEFT_PARENS, "(", OperatorType::UNUSED));
             }
             else if (token[i] == ')')
             {
                 std::cout << "PARENS:" << token[i] << std::endl;
-                symbols.push_back(Symbol(SymbolType::RIGHT_PARENS, "(",
-                                         OperatorType::UNUSED));
+                symbols.emplace_back(Symbol(SymbolType::RIGHT_PARENS, "(",
+                                            OperatorType::UNUSED));
             }
             else if (is_valid_char(token[i]))
             {
@@ -522,8 +522,8 @@ void extract_symbols_from_line(const std::string &line,
                 if (token[i] == 't')
                 {
                     std::cout << "T:" << token[i] << std::endl;
-                    symbols.push_back(Symbol(SymbolType::TEE_TOKEN, "t",
-                                             OperatorType::UNUSED));
+                    symbols.emplace_back(Symbol(SymbolType::TEE_TOKEN, "t",
+                                                OperatorType::UNUSED));
                 }
                 else
                 {
@@ -531,7 +531,8 @@ void extract_symbols_from_line(const std::string &line,
                     OperatorType op_type = which_op(token[i]);
                     std::string ident{token[i]};
                     std::cout << "IDENTIFIER: " << ident << std::endl;
-                    symbols.push_back(Symbol(SymbolType::OP, ident, op_type));
+                    symbols.emplace_back(
+                        Symbol(SymbolType::OP, ident, op_type));
                 }
             }
             else
