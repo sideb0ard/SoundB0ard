@@ -142,7 +142,7 @@ void midi_parse_midi_event(sound_generator *sg, midi_event *ev)
 
                     minisynth_midi_note_on(ms, note, ev->data2);
 
-                    if (ev->source != EXTERNAL_DEVICE)
+                    if (ev->source != EXTERNAL_DEVICE) // artificial note off
                     {
                         int sustain_ms =
                             ev->hold ? ev->hold : ms->engine.sustain_note_ms;

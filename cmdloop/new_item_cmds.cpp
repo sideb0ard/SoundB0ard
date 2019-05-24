@@ -97,9 +97,9 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             else
             {
                 list_type = LIST_VALUE_CHAR_TYPE;
-                char **cdata = (char **) calloc(num_items, sizeof(char *));
+                char **cdata = (char **)calloc(num_items, sizeof(char *));
                 for (int i = 0; i < num_items; i++)
-                    cdata[i] = (char*) calloc(1, sizeof(char) * SIZE_OF_WURD);
+                    cdata[i] = (char *)calloc(1, sizeof(char) * SIZE_OF_WURD);
 
                 for (int i = 0, j = 2; i < num_items; i++, j++)
                     strcpy(cdata[i], wurds[j]);
@@ -116,19 +116,19 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                  strncmp("beat", wurds[1], 4) == 0)
         {
             drumsynth *bd = new_drumsynth();
-            drumsynth_open_patch(bd, "hthud");
+            drumsynth_open_patch(bd, (char *)"hthud");
             int bdnum = add_sound_generator(mixr, (sound_generator *)bd);
-            update_environment("bd", bdnum);
+            update_environment((char *)"bd", bdnum);
 
             drumsynth *sd = new_drumsynth();
-            drumsynth_open_patch(sd, "snrrn");
+            drumsynth_open_patch(sd, (char *)"snrrn");
             int sdnum = add_sound_generator(mixr, (sound_generator *)sd);
-            update_environment("sd", sdnum);
+            update_environment((char *)"sd", sdnum);
 
             drumsynth *hh = new_drumsynth();
-            drumsynth_open_patch(hh, "closedhh");
+            drumsynth_open_patch(hh, (char *)"closedhh");
             int hhnum = add_sound_generator(mixr, (sound_generator *)hh);
-            update_environment("hh", hhnum);
+            update_environment((char *)"hh", hhnum);
 
             if (strncmp("beat", wurds[1], 4) == 0)
             {
@@ -165,7 +165,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             for (int i = 0; i < 4; i++)
             {
                 char perc[512] = {0};
-                get_random_sample_from_dir("perc", perc);
+                get_random_sample_from_dir((char *)"perc", perc);
                 printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
                 drumsampler *s = new_drumsampler(perc);
                 add_sound_generator(mixr, (sound_generator *)s);

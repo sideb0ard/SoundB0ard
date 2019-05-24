@@ -1241,20 +1241,18 @@ void mixer_check_for_midi_messages(mixer *mixr)
 
                 sequence_engine *engine = get_sequence_engine(sg);
 
+                midi_event ev = new_midi_event(status, data1, data2);
+
                 if (engine->recording)
                 {
                     int tick = mixr->timing_info.midi_tick % PPBAR;
-                    midi_event ev = new_midi_event(status, data1, data2);
                     sequence_engine_add_event(engine, engine->cur_pattern, tick,
                                               ev);
                 }
 
-                midi_event ev;
                 ev.source = EXTERNAL_DEVICE;
-                ev.event_type = status;
-                ev.data1 = data1;
-                ev.data2 = data2;
                 ev.delete_after_use = false;
+
                 midi_parse_midi_event(sg, &ev);
             }
             else

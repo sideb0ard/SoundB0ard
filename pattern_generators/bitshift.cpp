@@ -414,14 +414,14 @@ void convert_to_infix(const std::vector<Symbol> &tokens,
                     if (top_of_stack.sym_type == SymbolType::LEFT_PARENS)
                         break;
 
-                    operator_stack.pop_back();
                     output_queue.push_back(top_of_stack);
+                    operator_stack.pop_back();
+
                     std::cout << "POP stack to output: " << top_of_stack
                               << std::endl;
                 }
                 else
                 {
-                    std::cout << "ELSE!" << std::endl;
                     break;
                 }
             }
@@ -456,12 +456,8 @@ void convert_to_infix(const std::vector<Symbol> &tokens,
     print_symbols(operator_stack);
     while (!operator_stack.empty())
     {
-        std::cout << "OP STACK LEFT:" << operator_stack.size() << std::endl;
-        Symbol top_of_stack = operator_stack.back();
-        std::cout << "OP STACK LEFT:" << operator_stack.size() << std::endl;
+        output_queue.emplace_back(operator_stack.back());
         operator_stack.pop_back();
-        std::cout << "Pushing " << top_of_stack << " to OUTPUT Q" << std::endl;
-        output_queue.push_back(top_of_stack);
     }
     print_symbols(output_queue);
     print_symbols(operator_stack);
