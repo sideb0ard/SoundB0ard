@@ -1,9 +1,9 @@
 #pragma once
 
+#include "SoundGenerator.h"
 #include "defjams.h"
 #include "fx.h"
 #include "pthread.h"
-#include "sound_generator.h"
 
 typedef enum
 {
@@ -18,7 +18,7 @@ void midi_event_cp(midi_event *from, midi_event *to);
 void midi_event_clear(midi_event *ev);
 void midi_event_print(midi_event *ev);
 
-void midi_parse_midi_event(sound_generator *sg, midi_event *ev);
+void midi_parse_midi_event(SoundGenerator *sg, midi_event *ev);
 
 void midi_pattern_print(midi_event *pattern);
 void midi_pattern_quantize(midi_pattern *pattern);

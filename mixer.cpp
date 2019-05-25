@@ -7,6 +7,7 @@
 
 #include <portaudio.h>
 
+#include "SoundGenerator.h"
 #include "ableton_link_wrapper.h"
 #include "algorithm.h"
 #include "bitshift.h"
@@ -25,7 +26,6 @@
 #include "minisynth.h"
 #include "mixer.h"
 #include "sbmsg.h"
-#include "sound_generator.h"
 #include "utils.h"
 
 extern mixer *mixr;
@@ -336,7 +336,7 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
-        sound_generator *sg = mixr->sound_generators[i];
+        SoundGenerator *sg = mixr->sound_generators[i];
         if (sg != NULL)
         {
             sg->event_notify(sg, event);
@@ -509,21 +509,21 @@ int add_minisynth(mixer *mixr)
 {
     printf("Adding a MINISYNTH!!...\n");
     minisynth *ms = new_minisynth();
-    return add_sound_generator(mixr, (sound_generator *)ms);
+    return add_sound_generator(mixr, (SoundGenerator *)ms);
 }
 
 int add_digisynth(mixer *mixr, char *filename)
 {
     printf("Adding a DIGISYNTH!!...\n");
     digisynth *ds = new_digisynth(filename);
-    return add_sound_generator(mixr, (sound_generator *)ds);
+    return add_sound_generator(mixr, (SoundGenerator *)ds);
 }
 int add_dxsynth(mixer *mixr)
 {
     printf("Adding a DXSYNTH!!...\n");
     dxsynth *dx = new_dxsynth();
     printf("GOT NEW  DXSYNTH!!...\n");
-    return add_sound_generator(mixr, (sound_generator *)dx);
+    return add_sound_generator(mixr, (SoundGenerator *)dx);
 }
 
 int add_looper(mixer *mixr, char *filename)
@@ -531,7 +531,7 @@ int add_looper(mixer *mixr, char *filename)
     printf("ADDING A GRANNY!\n");
     looper *g = new_looper(filename);
     printf("GOT A GRAANY\n");
-    return add_sound_generator(mixr, (sound_generator *)g);
+    return add_sound_generator(mixr, (SoundGenerator *)g);
 }
 
 void mixer_events_output(mixer *mixr)
@@ -774,7 +774,7 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-        sound_generator *sg = mixr->sound_generators[soundgen_num];
+        SoundGenerator *sg = mixr->sound_generators[soundgen_num];
 
         if (mixr->active_midi_soundgen_num == soundgen_num)
             mixr->active_midi_soundgen_num = -99;
@@ -805,7 +805,7 @@ bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
-        sound_generator *sg = mixr->sound_generators[soundgen_num];
+        SoundGenerator *sg = mixr->sound_generators[soundgen_num];
         if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
             return true;
     }
@@ -951,7 +951,7 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
     return true;
 }
 
-void synth_handle_midi_note(sound_generator *sg, int note, int velocity,
+void synth_handle_midi_note(SoundGenerator *sg, int note, int velocity,
                             bool update_last_midi)
 {
     sequence_engine *engine = get_sequence_engine(sg);
@@ -1236,7 +1236,7 @@ void mixer_check_for_midi_messages(mixer *mixr)
                                             mixr->active_midi_soundgen_num))
             {
 
-                sound_generator *sg =
+                SoundGenerator *sg =
                     mixr->sound_generators[mixr->active_midi_soundgen_num];
 
                 sequence_engine *engine = get_sequence_engine(sg);
@@ -1270,7 +1270,7 @@ void mixer_set_midi_bank(mixer *mixr, int num)
         mixr->midi_bank_num = num;
 }
 
-sequence_engine *get_sequence_engine(sound_generator *self)
+sequence_engine *get_sequence_engine(SoundGenerator *self)
 {
     if (self->type == MINISYNTH_TYPE)
     {

@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include "SoundGenerator.h"
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"
@@ -10,7 +11,6 @@
 #include "midimaaan.h"
 #include "modmatrix.h"
 #include "oscillator.h"
-#include "sound_generator.h"
 
 #include "minisynth_voice.h"
 #include "sequence_engine.h"
@@ -167,9 +167,8 @@ typedef struct synthsettings
     unsigned m_generate_src;
 } synthsettings;
 
-typedef struct minisynth
+struct minisynth : public SoundGenerator
 {
-    sound_generator sg;
     sequence_engine engine;
 
     minisynth_voice *m_voices[MAX_VOICES];
@@ -183,8 +182,7 @@ typedef struct minisynth
 
     synthsettings m_settings;
     synthsettings m_settings_backup_while_getting_crazy;
-
-} minisynth;
+};
 
 minisynth *new_minisynth(void);
 void minisynth_load_defaults(minisynth *ms);

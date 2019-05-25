@@ -13,7 +13,7 @@ extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
 static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
-                                  "dx_dest_vibrato"};
+                                        "dx_dest_vibrato"};
 
 dxsynth *new_dxsynth(void)
 {
@@ -23,10 +23,6 @@ dxsynth *new_dxsynth(void)
 
     dx->sg.gennext = &dxsynth_gennext;
     dx->sg.status = &dxsynth_status;
-    dx->sg.set_volume = &sound_generator_set_volume;
-    dx->sg.get_volume = &sound_generator_get_volume;
-    dx->sg.set_pan = &sound_generator_set_pan;
-    dx->sg.get_pan = &sound_generator_get_pan;
     dx->sg.start = &dxsynth_sg_start;
     dx->sg.stop = &dxsynth_sg_stop;
     dx->sg.event_notify = &sequence_engine_event_notify;
@@ -661,9 +657,9 @@ void dxsynth_status(void *self, wchar_t *status_string)
 {
     dxsynth *dx = (dxsynth *)self;
 
-    char *INSTRUMENT_COLOR = (char *) ANSI_COLOR_RESET;
+    char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
     if (dx->sg.active)
-        INSTRUMENT_COLOR = (char *) ANSI_COLOR_CYAN;
+        INSTRUMENT_COLOR = (char *)ANSI_COLOR_CYAN;
 
     // clang-format off
     swprintf(

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "SoundGenerator.h"
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"
@@ -7,7 +8,6 @@
 #include "midimaaan.h"
 #include "modmatrix.h"
 #include "oscillator.h"
-#include "sound_generator.h"
 
 #include "dxsynth_voice.h"
 #include "sequence_engine.h"
@@ -97,7 +97,7 @@ typedef struct dxsynthsettings
 
 typedef struct dxsynth
 {
-    sound_generator sg;
+    SoundGenerator sg;
     sequence_engine engine;
 
     dxsynth_voice *m_voices[MAX_DX_VOICES];

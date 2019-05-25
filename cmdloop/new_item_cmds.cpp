@@ -42,7 +42,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 int sgnum = add_digisynth(mixr, wurds[2]);
                 if (sgnum != -1)
                 {
-                    sound_generator *sg = mixr->sound_generators[sgnum];
+                    SoundGenerator *sg = mixr->sound_generators[sgnum];
                     check_and_set_pattern(sg, 0, NOTE_PATTERN, &wurds[3],
                                           num_wurds - 3);
                 }
@@ -59,7 +59,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int sgnum = add_dxsynth(mixr);
             if (sgnum != -1)
             {
-                sound_generator *sg = mixr->sound_generators[sgnum];
+                SoundGenerator *sg = mixr->sound_generators[sgnum];
                 check_and_set_pattern(sg, 0, NOTE_PATTERN, &wurds[2],
                                       num_wurds - 2);
             }
@@ -117,17 +117,17 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             drumsynth *bd = new_drumsynth();
             drumsynth_open_patch(bd, (char *)"hthud");
-            int bdnum = add_sound_generator(mixr, (sound_generator *)bd);
+            int bdnum = add_sound_generator(mixr, (SoundGenerator *)bd);
             update_environment((char *)"bd", bdnum);
 
             drumsynth *sd = new_drumsynth();
             drumsynth_open_patch(sd, (char *)"snrrn");
-            int sdnum = add_sound_generator(mixr, (sound_generator *)sd);
+            int sdnum = add_sound_generator(mixr, (SoundGenerator *)sd);
             update_environment((char *)"sd", sdnum);
 
             drumsynth *hh = new_drumsynth();
             drumsynth_open_patch(hh, (char *)"closedhh");
-            int hhnum = add_sound_generator(mixr, (sound_generator *)hh);
+            int hhnum = add_sound_generator(mixr, (SoundGenerator *)hh);
             update_environment((char *)"hh", hhnum);
 
             if (strncmp("beat", wurds[1], 4) == 0)
@@ -168,7 +168,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 get_random_sample_from_dir((char *)"perc", perc);
                 printf(ANSI_COLOR_WHITE "Opening %s\n" ANSI_COLOR_RESET, perc);
                 drumsampler *s = new_drumsampler(perc);
-                add_sound_generator(mixr, (sound_generator *)s);
+                add_sound_generator(mixr, (SoundGenerator *)s);
             }
         }
 
@@ -235,7 +235,7 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int sgnum = add_minisynth(mixr);
             if (sgnum != -1)
             {
-                sound_generator *sg = mixr->sound_generators[sgnum];
+                SoundGenerator *sg = mixr->sound_generators[sgnum];
                 check_and_set_pattern(sg, 0, NOTE_PATTERN, &wurds[2],
                                       num_wurds - 2);
             }
@@ -248,16 +248,16 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (strlen(wurds[2]) == 0 || strncmp("synth", wurds[2], 5) == 0)
             {
                 drumsynth *ds = new_drumsynth();
-                sgnum = add_sound_generator(mixr, (sound_generator *)ds);
+                sgnum = add_sound_generator(mixr, (SoundGenerator *)ds);
             }
             else if (is_valid_file(wurds[2]))
             {
                 drumsampler *s = new_drumsampler(wurds[2]);
-                sgnum = add_sound_generator(mixr, (sound_generator *)s);
+                sgnum = add_sound_generator(mixr, (SoundGenerator *)s);
             }
             if (sgnum != -1)
             {
-                sound_generator *sg = mixr->sound_generators[sgnum];
+                SoundGenerator *sg = mixr->sound_generators[sgnum];
                 check_and_set_pattern(sg, 0, STEP_PATTERN, &wurds[3],
                                       num_wurds - 3);
             }

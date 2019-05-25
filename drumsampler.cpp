@@ -14,29 +14,17 @@
 extern wchar_t *sparkchars;
 extern mixer *mixr;
 
-drumsampler *new_drumsampler(char *filename)
+drumsampler::drumsampler(char *filename)
 {
-    drumsampler *ds = (drumsampler *)calloc(1, sizeof(drumsampler));
-
     drumsampler_import_file(ds, filename);
 
-    ds->envelope_enabled = false;
-    ds->glitch_mode = false;
-    ds->glitch_rand_factor = 20;
+    envelope_enabled = false;
+    glitch_mode = false;
+    glitch_rand_factor = 20;
 
-    ds->sg.gennext = &drumsampler_gennext;
-    ds->sg.status = &drumsampler_status;
-    ds->sg.get_volume = &sound_generator_get_volume;
-    ds->sg.set_volume = &sound_generator_set_volume;
-    ds->sg.get_pan = &sound_generator_get_pan;
-    ds->sg.set_pan = &sound_generator_set_pan;
-    ds->sg.start = &drumsampler_start;
-    ds->sg.stop = &drumsampler_stop;
-    ds->sg.self_destruct = &drumsampler_del_self;
-    ds->sg.event_notify = &sequence_engine_event_notify;
-    ds->sg.type = DRUMSAMPLER_TYPE;
+    ds->type = DRUMSAMPLER_TYPE;
 
-    envelope_generator_init(&ds->eg);
+    envelope_generator_init(&eg);
     sequence_engine_init(&ds->engine, (void *)ds, DRUMSAMPLER_TYPE);
     sound_generator_init(&ds->sg);
     ds->eg.m_sustain_level = 0;

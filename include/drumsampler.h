@@ -1,9 +1,9 @@
 #pragma once
 
+#include "SoundGenerator.h"
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "sequence_engine.h"
-#include "sound_generator.h"
 #include "stereodelay.h"
 
 #include <sndfile.h>
@@ -29,7 +29,7 @@ typedef struct sample_pos
 
 typedef struct drumsampler
 {
-    sound_generator sg;
+    SoundGenerator sg;
     sequence_engine engine;
 
     bool glitch_mode;

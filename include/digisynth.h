@@ -3,13 +3,13 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include "SoundGenerator.h"
 #include "digisynth_voice.h"
 #include "sequence_engine.h"
-#include "sound_generator.h"
 
 typedef struct digisynth
 {
-    sound_generator sg;
+    SoundGenerator sg;
     sequence_engine engine;
 
     char audiofile[1024];

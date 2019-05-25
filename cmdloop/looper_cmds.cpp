@@ -17,7 +17,7 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             printf("VALID!\n");
             int soundgen_num = add_looper(mixr, wurds[1]);
-            printf("sound_generator %d\n", soundgen_num);
+            printf("SoundGenerator %d\n", soundgen_num);
         }
         else
         {

@@ -79,7 +79,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             int f_num =
                 add_basicfilter_soundgen(mixr->sound_generators[soundgen_num]);
-            sound_generator *sg = mixr->sound_generators[soundgen_num];
+            SoundGenerator *sg = mixr->sound_generators[soundgen_num];
             filterpass *fp = (filterpass *)sg->effects[f_num];
             if (freq != 0)
                 filter_set_fc_control(&fp->m_filter.f, freq);

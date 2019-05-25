@@ -1,19 +1,19 @@
 #pragma once
 
+#include "SoundGenerator.h"
 #include "defjams.h"
 #include "distortion.h"
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
 #include "sequence_engine.h"
-#include "sound_generator.h"
 
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/drumsynthpatches.dat";
 
 typedef struct drumsynth
 {
-    sound_generator sg;
+    SoundGenerator sg;
     sequence_engine engine;
     char m_patch_name[512];
     bool reset_osc;

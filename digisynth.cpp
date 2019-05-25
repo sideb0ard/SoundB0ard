@@ -23,12 +23,6 @@ digisynth *new_digisynth(char *filename)
 
     strncpy(ds->audiofile, filename, 1023);
 
-    ds->sg.gennext = &digisynth_gennext;
-    ds->sg.status = &digisynth_status;
-    ds->sg.set_volume = &sound_generator_set_volume;
-    ds->sg.get_volume = &sound_generator_get_volume;
-    ds->sg.set_pan = &sound_generator_set_pan;
-    ds->sg.get_pan = &sound_generator_get_pan;
     ds->sg.start = &digisynth_sg_start;
     ds->sg.stop = &digisynth_sg_stop;
     ds->sg.event_notify = &sequence_engine_event_notify;

@@ -244,7 +244,7 @@ int sequence_engine_get_octave(sequence_engine *engine);
 void sequence_engine_enable_arp(sequence_engine *engine, bool b);
 void sequence_engine_set_arp_speed(sequence_engine *engine, unsigned int speed);
 void sequence_engine_set_arp_mode(sequence_engine *engine, unsigned int mode);
-void sequence_engine_do_arp(sequence_engine *engine, sound_generator *sg);
+void sequence_engine_do_arp(sequence_engine *engine, SoundGenerator *sg);
 int arp_next_note(arpeggiator *arp);
 void arp_add_last_note(arpeggiator *arp, int note);
 

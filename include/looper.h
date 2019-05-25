@@ -1,9 +1,9 @@
 #ifndef LOOPER_H
 #define LOOPER_H
 
+#include "SoundGenerator.h"
 #include "envelope_generator.h"
 #include "sequence_engine.h"
-#include "sound_generator.h"
 #include <stdbool.h>
 #include <wchar.h>
 
@@ -84,7 +84,7 @@ enum
 
 typedef struct looper
 {
-    sound_generator sg;
+    SoundGenerator sg;
 
     bool started;
     bool have_active_buffer;
