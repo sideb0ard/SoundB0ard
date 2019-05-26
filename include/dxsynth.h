@@ -103,6 +103,12 @@ class dxsynth : public SoundGenerator
     void status(wchar_t *wstring) override;
     void start() override;
     void stop() override;
+    void noteOn(midi_event ev) override;
+    void noteOff(midi_event ev) override;
+    void allNotesOff() override;
+    void control(midi_event ev) override;
+    void pitchBend(midi_event ev) override;
+    void randomize() override;
 
   public:
     dxsynth_voice *m_voices[MAX_DX_VOICES];
@@ -122,28 +128,14 @@ class dxsynth : public SoundGenerator
 void dxsynth_reset(dxsynth *dx);
 
 bool dxsynth_prepare_for_play(dxsynth *synth);
-void dxsynth_stop(dxsynth *ms);
 void dxsynth_update(dxsynth *synth);
-
-void dxsynth_midi_control(dxsynth *self, unsigned int data1,
-                          unsigned int data2);
 
 void dxsynth_increment_voice_timestamps(dxsynth *synth);
 dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
 dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
                                                   unsigned int midi_note);
 
-bool dxsynth_midi_note_on(dxsynth *self, unsigned int midinote,
-                          unsigned int velocity);
-bool dxsynth_midi_note_off(dxsynth *self, unsigned int midinote,
-                           unsigned int velocity, bool all_notes_off);
-void dxsynth_midi_mod_wheel(dxsynth *self, unsigned int data1,
-                            unsigned int data2);
-void dxsynth_midi_pitchbend(dxsynth *self, unsigned int data1,
-                            unsigned int data2);
 void dxsynth_reset_voices(dxsynth *self);
-
-void dxsynth_rand_settings(dxsynth *ms);
 
 void dxsynth_print_settings(dxsynth *ms);
 void dxsynth_print_patterns(dxsynth *ms);

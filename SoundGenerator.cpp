@@ -1,3 +1,4 @@
+#include <iostream>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -87,7 +88,7 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 
                 noteOn(ev);
 
-                if (ev.source != EXTERNAL_DEVICE) // artificial note off
+                if (ev.source != EXTERNAL_DEVICE) // artificial note-off
                 {
                     int sustain_ms = ev.hold ? ev.hold : engine.sustain_note_ms;
                     int sustain_time_in_ticks =

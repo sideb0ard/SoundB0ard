@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include "SequenceEngine.h"
 #include "bitshift.h"
 #include "defjams.h"

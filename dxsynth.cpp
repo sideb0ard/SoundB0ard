@@ -7,6 +7,8 @@
 #include "mixer.h"
 #include "utils.h"
 
+#include <iostream>
+
 extern mixer *mixr;
 extern const wchar_t *sparkchars;
 extern const char *s_source_enum_to_name[];
@@ -15,8 +17,9 @@ extern const char *s_dest_enum_to_name[];
 static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
                                         "dx_dest_vibrato"};
 
-dxsynth::dxsynth(void)
+dxsynth::dxsynth()
 {
+    std::cout << "NEW DX\n";
     type = DXSYNTH_TYPE;
     active_midi_osc = 1;
 
@@ -25,23 +28,27 @@ dxsynth::dxsynth(void)
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         m_voices[i] = new_dxsynth_voice();
-        if (m_voices[i])
+        if (!m_voices[i])
             return; // would be bad
 
         dxsynth_voice_init_global_parameters(m_voices[i],
                                              &m_global_synth_params);
     }
 
+    std::cout << "DX PREP \n";
     dxsynth_prepare_for_play(this);
 
+    std::cout << "DX INIT MODMATRIX\n";
     // use first voice to setup global
     dxsynth_voice_initialize_modmatrix(m_voices[0], &m_global_modmatrix);
 
+    std::cout << "VOICE SET CORE DX\n";
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         voice_set_modmatrix_core(&m_voices[i]->m_voice,
                                  get_matrix_core(&m_global_modmatrix));
     }
+    std::cout << "UPDATE DX\n";
     dxsynth_update(this);
 
     m_last_note_frequency = -1.0;
@@ -68,7 +75,7 @@ void dxsynth::start()
 void dxsynth::stop()
 {
     active = false;
-    dxsynth_midi_note_off(this, 0, 0, true);
+    allNotesOff();
 }
 
 void dxsynth::status(wchar_t *status_string)
@@ -174,6 +181,250 @@ stereo_val dxsynth::genNext()
                       .right = accum_out_right * volume * pan_right};
     out = effector(this, out);
     return out;
+}
+
+void dxsynth::noteOn(midi_event ev)
+{
+
+    bool steal_note = true;
+    for (int i = 0; i < MAX_DX_VOICES; i++)
+    {
+        dxsynth_voice *msv = m_voices[i];
+        if (!msv)
+            return; // should never happen
+        if (!msv->m_voice.m_note_on)
+        {
+            dxsynth_increment_voice_timestamps(this);
+            voice_note_on(&msv->m_voice, ev.data1, ev.data2,
+                          get_midi_freq(ev.data1), m_last_note_frequency);
+
+            m_last_note_frequency = get_midi_freq(ev.data1);
+            steal_note = false;
+            break;
+        }
+    }
+
+    if (steal_note)
+    {
+        if (mixr->debug_mode)
+            printf("STEAL NOTE\n");
+        dxsynth_voice *msv = dxsynth_get_oldest_voice(this);
+        if (msv)
+        {
+            dxsynth_increment_voice_timestamps(this);
+            voice_note_on(&msv->m_voice, ev.data1, ev.data2,
+                          get_midi_freq(ev.data1), m_last_note_frequency);
+        }
+        m_last_note_frequency = get_midi_freq(ev.data1);
+    }
+}
+
+void dxsynth::allNotesOff()
+{
+    for (int i = 0; i < MAX_DX_VOICES; i++)
+    {
+        dxsynth_voice *dxv = m_voices[i];
+        if (dxv)
+            voice_note_off(&dxv->m_voice, -1);
+    }
+}
+
+void dxsynth::noteOff(midi_event ev)
+{
+
+    for (int i = 0; i < MAX_DX_VOICES; i++)
+    {
+        dxsynth_voice *dxv = dxsynth_get_oldest_voice_with_note(this, ev.data1);
+        if (dxv)
+        {
+            voice_note_off(&dxv->m_voice, ev.data1);
+        }
+    }
+}
+
+void dxsynth::control(midi_event ev)
+{
+    double val = 0;
+    switch (ev.data1)
+    {
+    case (1):
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("Algo\n");
+            val = scaleybum(0, 127, 1, 7, ev.data2);
+            dxsynth_set_voice_mode(this, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            int osc_num = scaleybum(0, 127, 1, 4, ev.data2);
+            printf("OSC%d!\n", osc_num);
+            dxsynth_set_active_midi_osc(this, osc_num);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    case (2):
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("Op4Feedback\n");
+            val = scaleybum(0, 127, 0, 70, ev.data2);
+            dxsynth_set_op4_feedback(this, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            // wav
+            printf("wav %d\n", active_midi_osc);
+            int osc_type = scaleybum(0, 127, 0, MAX_OSC - 1, ev.data2);
+            dxsynth_set_op_waveform(this, active_midi_osc, osc_type);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    case (3):
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("LFO Rate\n");
+            val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, ev.data2);
+            dxsynth_set_lfo1_rate(this, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("opratio %d\n", active_midi_osc);
+            val = scaleybum(0, 127, 0.01, 10, ev.data2);
+            dxsynth_set_op_ratio(this, active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    case (4):
+        if (mixr->midi_bank_num == 0)
+        {
+            printf("LFO Intensity\n");
+            val = scaleybum(0, 128, 0.0, 1.0, ev.data2);
+            dxsynth_set_lfo1_intensity(this, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("detune %d\n", active_midi_osc);
+            val = scaleybum(0, 127, -100, 100, ev.data2);
+            dxsynth_set_op_detune(this, active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    case (5):
+        if (mixr->midi_bank_num == 0)
+        {
+            val = scaleybum(0, 127, 0, 99, ev.data2);
+            printf("OP1OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(this, 1, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("attack %d\n", active_midi_osc);
+            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, ev.data2);
+            dxsynth_set_eg_attack_ms(this, active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    case (6):
+        if (mixr->midi_bank_num == 0)
+        {
+            val = scaleybum(0, 127, 0, 99, ev.data2);
+            printf("OP2OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(this, 2, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("decay %d\n", active_midi_osc);
+            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, ev.data2);
+            dxsynth_set_eg_decay_ms(this, active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    case (7):
+        if (mixr->midi_bank_num == 0)
+        {
+            val = scaleybum(0, 127, 0, 99, ev.data2);
+            printf("OP3OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(this, 3, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("sustain %d\n", active_midi_osc);
+            val = scaleybum(0, 127, 0, 1, ev.data2);
+            dxsynth_set_eg_sustain_lvl(this, active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    case (8):
+        if (mixr->midi_bank_num == 0)
+        {
+            val = scaleybum(0, 127, 0, 99, ev.data2);
+            printf("OP4OUT! %f\n", val);
+            dxsynth_set_op_output_lvl(this, 4, val);
+        }
+        else if (mixr->midi_bank_num == 1)
+        {
+            printf("release %d\n", active_midi_osc);
+            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, ev.data2);
+            dxsynth_set_eg_release_ms(this, active_midi_osc, val);
+        }
+        else if (mixr->midi_bank_num == 2)
+        {
+        }
+        break;
+    default:
+        printf("nah\n");
+    }
+    dxsynth_update(this);
+}
+
+void dxsynth::pitchBend(midi_event ev)
+{
+    unsigned int data1 = ev.data1;
+    unsigned int data2 = ev.data2;
+    // printf("Pitch bend, babee: %d %d\n", data1, data2);
+    int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
+
+    if (actual_pitch_bent_val != 8192)
+    {
+        double normalized_pitch_bent_val =
+            (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
+        double scaley_val =
+            // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
+            scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
+        // printf("Cents to bend - %f\n", scaley_val);
+        for (int i = 0; i < MAX_DX_VOICES; i++)
+        {
+            m_voices[i]->m_voice.m_osc1->m_cents = scaley_val;
+            m_voices[i]->m_voice.m_osc2->m_cents = scaley_val + 2.5;
+            m_voices[i]->m_voice.m_osc3->m_cents = scaley_val;
+            m_voices[i]->m_voice.m_osc4->m_cents = scaley_val + 2.5;
+            m_voices[i]->m_voice.m_v_modmatrix.m_sources[SOURCE_PITCHBEND] =
+                normalized_pitch_bent_val;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < MAX_DX_VOICES; i++)
+        {
+            m_voices[i]->m_voice.m_osc1->m_cents = 0;
+            m_voices[i]->m_voice.m_osc2->m_cents = 2.5;
+            m_voices[i]->m_voice.m_osc3->m_cents = 0;
+            m_voices[i]->m_voice.m_osc4->m_cents = 2.5;
+        }
+    }
 }
 
 void dxsynth_reset(dxsynth *dx)
@@ -453,255 +704,6 @@ void dxsynth_update(dxsynth *dx)
     }
 }
 
-void dxsynth_midi_control(dxsynth *dx, unsigned int data1, unsigned int data2)
-{
-    double val = 0;
-    switch (data1)
-    {
-    case (1):
-        if (mixr->midi_bank_num == 0)
-        {
-            printf("Algo\n");
-            val = scaleybum(0, 127, 1, 7, data2);
-            dxsynth_set_voice_mode(dx, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            int osc_num = scaleybum(0, 127, 1, 4, data2);
-            printf("OSC%d!\n", osc_num);
-            dxsynth_set_active_midi_osc(dx, osc_num);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    case (2):
-        if (mixr->midi_bank_num == 0)
-        {
-            printf("Op4Feedback\n");
-            val = scaleybum(0, 127, 0, 70, data2);
-            dxsynth_set_op4_feedback(dx, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            // wav
-            printf("wav %d\n", dx->active_midi_osc);
-            int osc_type = scaleybum(0, 127, 0, MAX_OSC - 1, data2);
-            dxsynth_set_op_waveform(dx, dx->active_midi_osc, osc_type);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    case (3):
-        if (mixr->midi_bank_num == 0)
-        {
-            printf("LFO Rate\n");
-            val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-            dxsynth_set_lfo1_rate(dx, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            printf("opratio %d\n", dx->active_midi_osc);
-            val = scaleybum(0, 127, 0.01, 10, data2);
-            dxsynth_set_op_ratio(dx, dx->active_midi_osc, val);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    case (4):
-        if (mixr->midi_bank_num == 0)
-        {
-            printf("LFO Intensity\n");
-            val = scaleybum(0, 128, 0.0, 1.0, data2);
-            dxsynth_set_lfo1_intensity(dx, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            printf("detune %d\n", dx->active_midi_osc);
-            val = scaleybum(0, 127, -100, 100, data2);
-            dxsynth_set_op_detune(dx, dx->active_midi_osc, val);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    case (5):
-        if (mixr->midi_bank_num == 0)
-        {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP1OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 1, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            printf("attack %d\n", dx->active_midi_osc);
-            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, data2);
-            dxsynth_set_eg_attack_ms(dx, dx->active_midi_osc, val);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    case (6):
-        if (mixr->midi_bank_num == 0)
-        {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP2OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 2, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            printf("decay %d\n", dx->active_midi_osc);
-            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, data2);
-            dxsynth_set_eg_decay_ms(dx, dx->active_midi_osc, val);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    case (7):
-        if (mixr->midi_bank_num == 0)
-        {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP3OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 3, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            printf("sustain %d\n", dx->active_midi_osc);
-            val = scaleybum(0, 127, 0, 1, data2);
-            dxsynth_set_eg_sustain_lvl(dx, dx->active_midi_osc, val);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    case (8):
-        if (mixr->midi_bank_num == 0)
-        {
-            val = scaleybum(0, 127, 0, 99, data2);
-            printf("OP4OUT! %f\n", val);
-            dxsynth_set_op_output_lvl(dx, 4, val);
-        }
-        else if (mixr->midi_bank_num == 1)
-        {
-            printf("release %d\n", dx->active_midi_osc);
-            val = scaleybum(0, 127, EG_MINTIME_MS, EG_MINTIME_MS, data2);
-            dxsynth_set_eg_release_ms(dx, dx->active_midi_osc, val);
-        }
-        else if (mixr->midi_bank_num == 2)
-        {
-        }
-        break;
-    default:
-        printf("nah\n");
-    }
-    dxsynth_update(dx);
-}
-
-bool dxsynth_midi_note_on(dxsynth *ms, unsigned int midinote,
-                          unsigned int velocity)
-{
-
-    bool steal_note = true;
-    for (int i = 0; i < MAX_DX_VOICES; i++)
-    {
-        dxsynth_voice *msv = ms->m_voices[i];
-        if (!msv)
-            return false; // should never happen
-        if (!msv->m_voice.m_note_on)
-        {
-            dxsynth_increment_voice_timestamps(ms);
-            voice_note_on(&msv->m_voice, midinote, velocity,
-                          get_midi_freq(midinote), ms->m_last_note_frequency);
-
-            ms->m_last_note_frequency = get_midi_freq(midinote);
-            steal_note = false;
-            break;
-        }
-    }
-
-    if (steal_note)
-    {
-        if (mixr->debug_mode)
-            printf("STEAL NOTE\n");
-        dxsynth_voice *msv = dxsynth_get_oldest_voice(ms);
-        if (msv)
-        {
-            dxsynth_increment_voice_timestamps(ms);
-            voice_note_on(&msv->m_voice, midinote, velocity,
-                          get_midi_freq(midinote), ms->m_last_note_frequency);
-        }
-        ms->m_last_note_frequency = get_midi_freq(midinote);
-    }
-
-    return true;
-}
-
-bool dxsynth_midi_note_off(dxsynth *dx, unsigned int midinote,
-                           unsigned int velocity, bool all_notes_off)
-{
-    (void)velocity;
-
-    if (all_notes_off)
-    {
-        for (int i = 0; i < MAX_DX_VOICES; i++)
-        {
-            dxsynth_voice *dxv = dx->m_voices[i];
-            if (dxv)
-                voice_note_off(&dxv->m_voice, -1);
-        }
-        return true;
-    }
-
-    for (int i = 0; i < MAX_DX_VOICES; i++)
-    {
-        dxsynth_voice *dxv = dxsynth_get_oldest_voice_with_note(dx, midinote);
-        if (dxv)
-        {
-            voice_note_off(&dxv->m_voice, midinote);
-        }
-    }
-    return true;
-}
-
-void dxsynth_midi_pitchbend(dxsynth *ms, unsigned int data1, unsigned int data2)
-{
-    // printf("Pitch bend, babee: %d %d\n", data1, data2);
-    int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
-
-    if (actual_pitch_bent_val != 8192)
-    {
-        double normalized_pitch_bent_val =
-            (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
-        double scaley_val =
-            // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
-            scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
-        // printf("Cents to bend - %f\n", scaley_val);
-        for (int i = 0; i < MAX_DX_VOICES; i++)
-        {
-            ms->m_voices[i]->m_voice.m_osc1->m_cents = scaley_val;
-            ms->m_voices[i]->m_voice.m_osc2->m_cents = scaley_val + 2.5;
-            ms->m_voices[i]->m_voice.m_osc3->m_cents = scaley_val;
-            ms->m_voices[i]->m_voice.m_osc4->m_cents = scaley_val + 2.5;
-            ms->m_voices[i]->m_voice.m_v_modmatrix.m_sources[SOURCE_PITCHBEND] =
-                normalized_pitch_bent_val;
-        }
-    }
-    else
-    {
-        for (int i = 0; i < MAX_DX_VOICES; i++)
-        {
-            ms->m_voices[i]->m_voice.m_osc1->m_cents = 0;
-            ms->m_voices[i]->m_voice.m_osc2->m_cents = 2.5;
-            ms->m_voices[i]->m_voice.m_osc3->m_cents = 0;
-            ms->m_voices[i]->m_voice.m_osc4->m_cents = 2.5;
-        }
-    }
-}
-
 void dxsynth_reset_voices(dxsynth *ms)
 {
     for (int i = 0; i < MAX_DX_VOICES; i++)
@@ -762,67 +764,67 @@ dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *ms,
     return found_voice;
 }
 
-void dxsynth_rand_settings(dxsynth *dx)
+void dxsynth::randomize()
 {
     // dxsynth_reset(dx);
     // return;
     // printf("Randomizing DXSYNTH!\n");
 
-    dx->m_settings.m_voice_mode = rand() % 8;
-    dx->m_settings.m_portamento_time_ms = rand() % 5000;
-    dx->m_settings.m_pitchbend_range = (rand() % 12) + 1;
-    // dx->m_settings.m_velocity_to_attack_scaling = rand() % 2;
-    dx->m_settings.m_note_number_to_decay_scaling = rand() % 2;
-    dx->m_settings.m_reset_to_zero = rand() % 2;
-    dx->m_settings.m_legato_mode = rand() % 2;
+    m_settings.m_voice_mode = rand() % 8;
+    m_settings.m_portamento_time_ms = rand() % 5000;
+    m_settings.m_pitchbend_range = (rand() % 12) + 1;
+    // m_settings.m_velocity_to_attack_scaling = rand() % 2;
+    m_settings.m_note_number_to_decay_scaling = rand() % 2;
+    m_settings.m_reset_to_zero = rand() % 2;
+    m_settings.m_legato_mode = rand() % 2;
 
-    dx->m_settings.m_lfo1_intensity = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_lfo1_rate = 0.02 + ((float)rand()) / (RAND_MAX / 20);
-    dx->m_settings.m_lfo1_waveform = rand() % MAX_LFO_OSC;
-    dx->m_settings.m_lfo1_mod_dest1 = rand() % 3;
-    dx->m_settings.m_lfo1_mod_dest2 = rand() % 3;
-    dx->m_settings.m_lfo1_mod_dest3 = rand() % 3;
-    dx->m_settings.m_lfo1_mod_dest4 = rand() % 3;
+    m_settings.m_lfo1_intensity = ((float)rand()) / RAND_MAX;
+    m_settings.m_lfo1_rate = 0.02 + ((float)rand()) / (RAND_MAX / 20);
+    m_settings.m_lfo1_waveform = rand() % MAX_LFO_OSC;
+    m_settings.m_lfo1_mod_dest1 = rand() % 3;
+    m_settings.m_lfo1_mod_dest2 = rand() % 3;
+    m_settings.m_lfo1_mod_dest3 = rand() % 3;
+    m_settings.m_lfo1_mod_dest4 = rand() % 3;
 
-    dx->m_settings.m_op1_waveform = rand() % MAX_OSC;
-    dx->m_settings.m_op1_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    dx->m_settings.m_op1_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg1_attack_ms = rand() % 300;
-    dx->m_settings.m_eg1_decay_ms = rand() % 300;
-    dx->m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg1_release_ms = rand() % 300;
-    // dx->m_settings.m_op1_output_lvl = (rand() % 55) + 35;
+    m_settings.m_op1_waveform = rand() % MAX_OSC;
+    m_settings.m_op1_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op1_detune_cents = (rand() % 20) - 10;
+    m_settings.m_eg1_attack_ms = rand() % 300;
+    m_settings.m_eg1_decay_ms = rand() % 300;
+    m_settings.m_eg1_sustain_lvl = ((float)rand()) / RAND_MAX;
+    m_settings.m_eg1_release_ms = rand() % 300;
+    // m_settings.m_op1_output_lvl = (rand() % 55) + 35;
 
-    dx->m_settings.m_op2_waveform = rand() % MAX_OSC;
-    dx->m_settings.m_op2_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    dx->m_settings.m_op2_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg2_attack_ms = rand() % 300;
-    dx->m_settings.m_eg2_decay_ms = rand() % 400;
-    dx->m_settings.m_eg2_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg2_release_ms = rand() % 400;
-    dx->m_settings.m_op2_output_lvl = (rand() % 55) + 15;
+    m_settings.m_op2_waveform = rand() % MAX_OSC;
+    m_settings.m_op2_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op2_detune_cents = (rand() % 20) - 10;
+    m_settings.m_eg2_attack_ms = rand() % 300;
+    m_settings.m_eg2_decay_ms = rand() % 400;
+    m_settings.m_eg2_sustain_lvl = ((float)rand()) / RAND_MAX;
+    m_settings.m_eg2_release_ms = rand() % 400;
+    m_settings.m_op2_output_lvl = (rand() % 55) + 15;
 
-    dx->m_settings.m_op3_waveform = rand() % MAX_OSC;
-    dx->m_settings.m_op3_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    dx->m_settings.m_op3_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg3_attack_ms = rand() % 300;
-    dx->m_settings.m_eg3_decay_ms = rand() % 400;
-    dx->m_settings.m_eg3_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg3_release_ms = rand() % 400;
-    dx->m_settings.m_op3_output_lvl = (rand() % 55) + 15;
+    m_settings.m_op3_waveform = rand() % MAX_OSC;
+    m_settings.m_op3_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op3_detune_cents = (rand() % 20) - 10;
+    m_settings.m_eg3_attack_ms = rand() % 300;
+    m_settings.m_eg3_decay_ms = rand() % 400;
+    m_settings.m_eg3_sustain_lvl = ((float)rand()) / RAND_MAX;
+    m_settings.m_eg3_release_ms = rand() % 400;
+    m_settings.m_op3_output_lvl = (rand() % 55) + 15;
 
-    dx->m_settings.m_op4_waveform = rand() % MAX_OSC;
-    dx->m_settings.m_op4_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
-    dx->m_settings.m_op4_detune_cents = (rand() % 20) - 10;
-    dx->m_settings.m_eg4_attack_ms = rand() % 400;
-    dx->m_settings.m_eg4_decay_ms = rand() % 500;
-    dx->m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
-    dx->m_settings.m_eg4_release_ms = rand() % 500;
-    dx->m_settings.m_op4_output_lvl = (rand() % 55) + 15;
-    dx->m_settings.m_op4_feedback = rand() % 70;
+    m_settings.m_op4_waveform = rand() % MAX_OSC;
+    m_settings.m_op4_ratio = 0.1 + ((float)rand()) / (RAND_MAX / 10);
+    m_settings.m_op4_detune_cents = (rand() % 20) - 10;
+    m_settings.m_eg4_attack_ms = rand() % 400;
+    m_settings.m_eg4_decay_ms = rand() % 500;
+    m_settings.m_eg4_sustain_lvl = ((float)rand()) / RAND_MAX;
+    m_settings.m_eg4_release_ms = rand() % 500;
+    m_settings.m_op4_output_lvl = (rand() % 55) + 15;
+    m_settings.m_op4_feedback = rand() % 70;
 
     printf("UPDATE!\n");
-    dxsynth_update(dx);
+    dxsynth_update(this);
     // dxsynth_print_settings(dx);
 }
 
