@@ -19,7 +19,7 @@
 
 SoundGenerator::SoundGenerator(){};
 
-extern mixer *mixr;
+// extern mixer *mixr;
 
 double SoundGenerator::getVolume() { return volume; }
 
@@ -32,7 +32,7 @@ void SoundGenerator::setVolume(double val)
 void SoundGenerator::start() { active = true; }
 void SoundGenerator::stop() { active = false; }
 
-void SoundGenerator::parseMidiEvent(midi_event *ev)
+void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 {
     // if (lo_send(mixr->processing_addr, "/img", "i", sg->mixer_idx) == -1)
     //{
@@ -40,45 +40,41 @@ void SoundGenerator::parseMidiEvent(midi_event *ev)
     //           lo_address_errstr(mixr->processing_addr));
     //}
 
-    int cur_midi_tick = mixr->timing_info.midi_tick % PPBAR;
-    int midi_note = ev->data1;
+    int cur_midi_tick = tinfo.midi_tick % PPBAR;
+    int midi_note = ev.data1;
     bool is_chord_mode = false;
 
-    if (!is_midi_note_in_key(midi_note, mixr->key))
-    {
-        // TODO fix!
-        // std::cout << "nah mate, not in key: " << midi_note << " " <<
-        // mixr->key
-        //          << std::endl;
-        // return;
-    }
+    // if (!is_midi_note_in_key(midi_note, mixr->key))
+    //{
+    //    // TODO fix!
+    //    // std::cout << "nah mate, not in key: " << midi_note << " " <<
+    //    // mixr->key
+    //    //          << std::endl;
+    //    // return;
+    //}
 
     if (engine.transpose != 0)
         midi_note += engine.transpose;
 
-    if (!ev->delete_after_use || ev->source == EXTERNAL_DEVICE)
+    if (!ev.delete_after_use || ev.source == EXTERNAL_DEVICE)
     {
-        if (ev->event_type == MIDI_ON)
+        if (ev.event_type == MIDI_ON)
             arp_add_last_note(&engine.arp, midi_note);
     }
 
     int midi_notes[3] = {midi_note, 0, 0};
     int midi_notes_len = 1; // default single note
-    if (engine.chord_mode)
-    {
-        midi_notes_len = 3;
-        if (mixr->chord_type == MAJOR_CHORD)
-            midi_notes[1] = midi_note + 4;
-        else
-            midi_notes[1] = midi_note + 3;
-        midi_notes[2] = midi_note + 7;
-    }
-
-    // if (sg->type == MINISYNTH_TYPE)
+    // if (engine.chord_mode)
     //{
-    //    minisynth *ms = (minisynth *)sg;
+    //    midi_notes_len = 3;
+    //    if (mixr->chord_type == MAJOR_CHORD)
+    //        midi_notes[1] = midi_note + 4;
+    //    else
+    //        midi_notes[1] = midi_note + 3;
+    //    midi_notes[2] = midi_note + 7;
+    //}
 
-    switch (ev->event_type)
+    switch (ev.event_type)
     {
     case (MIDI_ON):
     { // Hex 0x80
@@ -91,19 +87,18 @@ void SoundGenerator::parseMidiEvent(midi_event *ev)
 
                 noteOn(ev);
 
-                if (ev->source != EXTERNAL_DEVICE) // artificial note off
+                if (ev.source != EXTERNAL_DEVICE) // artificial note off
                 {
-                    int sustain_ms =
-                        ev->hold ? ev->hold : engine.sustain_note_ms;
+                    int sustain_ms = ev.hold ? ev.hold : engine.sustain_note_ms;
                     int sustain_time_in_ticks =
-                        sustain_ms * mixr->timing_info.ms_per_midi_tick;
+                        sustain_ms * tinfo.ms_per_midi_tick;
 
                     int note_off_tick =
                         (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
                     midi_event off = new_midi_event(MIDI_OFF, note, 128);
                     off.delete_after_use = true;
-                    sequence_engine_add_temporal_event(&ms->engine,
-                                                       note_off_tick, off);
+                    sequence_engine_add_temporal_event(&engine, note_off_tick,
+                                                       off);
                 }
             }
         }
@@ -114,229 +109,38 @@ void SoundGenerator::parseMidiEvent(midi_event *ev)
         for (int i = 0; i < midi_notes_len; i++)
         {
             int note = midi_notes[i];
-            minisynth_midi_note_off(ms, note, ev->data2, false);
+            noteOff(ev);
         }
         break;
     }
     case (MIDI_CONTROL):
     { // Hex 0xB0
-        minisynth_midi_control(ms, ev->data1, ev->data2);
+        control(ev);
         break;
     }
     case (MIDI_PITCHBEND):
     { // Hex 0xE0
-        minisynth_midi_pitchbend(ms, ev->data1, ev->data2);
+        pitchBend(ev);
         break;
     }
     default:
         printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
     }
-}
-else if (sg->type == DXSYNTH_TYPE)
-{
-    dxsynth *dx = (dxsynth *)sg;
 
-    switch (ev->event_type)
+    if (ev.delete_after_use)
     {
-    case (144):
-    { // Hex 0x80
-
-        if (!sequence_engine_is_masked(engine))
-        {
-
-            for (int i = 0; i < midi_notes_len; i++)
-            {
-                int note = midi_notes[i];
-                dxsynth_midi_note_on(dx, note, ev->data2);
-                if (ev->source != EXTERNAL_DEVICE)
-                {
-                    int sustain_time_in_ticks =
-                        dx->engine.sustain_note_ms *
-                        mixr->timing_info.ms_per_midi_tick;
-                    int note_off_tick =
-                        (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-                    midi_event off = new_midi_event(128, note, 128);
-                    off.delete_after_use = true;
-                    sequence_engine_add_temporal_event(&dx->engine,
-                                                       note_off_tick, off);
-                }
-            }
-        }
-        break;
-    }
-    case (128):
-    { // Hex 0x90
-        for (int i = 0; i < midi_notes_len; i++)
-        {
-            int note = midi_notes[i];
-            dxsynth_midi_note_off(dx, note, ev->data2, true);
-        }
-        break;
-    }
-    case (176):
-    { // Hex 0xB0
-        dxsynth_midi_control(dx, ev->data1, ev->data2);
-        break;
-    }
-    case (224):
-    { // Hex 0xE0
-        dxsynth_midi_pitchbend(dx, ev->data1, ev->data2);
-        break;
-    }
-    default:
-        printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS "
-               "type: %d\n",
-               ev->event_type);
-    }
-}
-else if (sg->type == DIGISYNTH_TYPE)
-{
-    digisynth *ds = (digisynth *)sg;
-    switch (ev->event_type)
-    {
-    case (MIDI_ON):
-    { // Hex 0x80
-        if (!sequence_engine_is_masked(engine))
-        {
-
-            for (int i = 0; i < midi_notes_len; i++)
-            {
-                int note = midi_notes[i];
-                digisynth_midi_note_on(ds, note, ev->data2);
-                int sustain_time_in_ticks = ds->engine.sustain_note_ms *
-                                            mixr->timing_info.ms_per_midi_tick;
-                int note_off_tick =
-                    (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-                midi_event off = new_midi_event(128, note, 128);
-                off.delete_after_use = true;
-                sequence_engine_add_temporal_event(&ds->engine, note_off_tick,
-                                                   off);
-            }
-        }
-        break;
-    }
-    case (MIDI_OFF):
-    { // Hex 0x90
-        for (int i = 0; i < midi_notes_len; i++)
-        {
-            int note = midi_notes[i];
-            digisynth_midi_note_off(ds, note, ev->data2, true);
-        }
-        break;
-    }
-    }
-}
-else if (sg->type == DRUMSAMPLER_TYPE)
-{
-    // midi_event_print(ev);
-    if (ev->event_type == MIDI_ON)
-    {
-        if (!sequence_engine_is_masked(engine))
-        {
-            drumsampler *ds = (drumsampler *)sg;
-            drumsampler_note_on(ds, ev);
-        }
-    }
-}
-else if (sg->type == DRUMSYNTH_TYPE)
-{
-    drumsynth *ds = (drumsynth *)sg;
-    if (ev->event_type == MIDI_ON)
-    {
-        if (!sequence_engine_is_masked(engine))
-        {
-            drumsynth *ds = (drumsynth *)sg;
-            ds->current_velocity = ev->data2;
-            drumsynth_trigger(ds);
-        }
-    }
-    else if (ev->event_type == MIDI_CONTROL)
-    {
-        double val = 0;
-        switch (ev->data1)
-        {
-        case (1):
-            if (mixr->midi_bank_num == 0)
-            {
-                // val = scaleybum(0, 127, 0, MAX_OSC - 1, ev->data2);
-                // drumsynth_set_osc_wav(ds, 1, val);
-                val =
-                    scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, ev->data2);
-                drumsynth_set_filter_freq(ds, val);
-            }
-            break;
-        case (2):
-            if (mixr->midi_bank_num == 0)
-            {
-                val = scaleybum(0, 127, 1, 10, ev->data2);
-                drumsynth_set_filter_q(ds, val);
-            }
-            break;
-        case (3):
-            if (mixr->midi_bank_num == 0)
-            {
-                val = scaleybum(0, 127, 1, 70, ev->data2);
-                drumsynth_set_mod_semitones_range(ds, val);
-            }
-            else if (mixr->midi_bank_num == 1)
-            {
-            }
-            break;
-        case (4):
-            if (mixr->midi_bank_num == 0)
-            {
-                val = scaleybum(0, 127, 0.1, 0.9, ev->data2);
-                drumsynth_set_distortion_threshold(ds, val);
-            }
-            break;
-        case (5):
-            val = scaleybum(0, 127, 0, MAX_OSC - 1, ev->data2);
-            if (mixr->midi_bank_num == 0)
-                drumsynth_set_osc_wav(ds, 2, val);
-            else if (mixr->midi_bank_num == 1)
-                drumsynth_set_osc_wav(ds, 1, val);
-            break;
-        case (6):
-            val = scaleybum(0, 127, OSC_FO_MIN, 400, ev->data2);
-            if (mixr->midi_bank_num == 0)
-                drumsynth_set_osc_fo(ds, 2, val);
-            else if (mixr->midi_bank_num == 1)
-                drumsynth_set_osc_fo(ds, 1, val);
-            break;
-        case (7):
-            val = scaleybum(0, 127, 0, 1, ev->data2);
-            if (mixr->midi_bank_num == 0)
-                drumsynth_set_osc_amp(ds, 2, val);
-            if (mixr->midi_bank_num == 1)
-                drumsynth_set_osc_amp(ds, 1, val);
-            break;
-        case (8):
-            val = scaleybum(0, 127, EG_MINTIME_MS, 1000, ev->data2);
-            if (mixr->midi_bank_num == 0)
-                drumsynth_set_eg_decay(ds, 2, val);
-            if (mixr->midi_bank_num == 1)
-                drumsynth_set_eg_decay(ds, 1, val);
-            break;
-        }
+        midi_event_clear(&ev);
     }
 }
 
-if (ev->delete_after_use)
-{
-    midi_event_clear(ev);
-}
-}
-void SoundGenerator::eventNotify(broadcast_event event)
+void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
     if (!active)
         return;
 
-    // int mixer_idx = parent->mixer_idx;
     int idx;
 
-    int event_type = event.type;
-
-    switch (event_type)
+    switch (event.type)
     {
     case (TIME_START_OF_LOOP_TICK):
         engine.started = true;
@@ -366,7 +170,7 @@ void SoundGenerator::eventNotify(broadcast_event event)
         if (engine.started)
         {
             int idx = ((engine.cur_step * PPSIXTEENTH) +
-                       (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
+                       (tinfo.midi_tick % PPSIXTEENTH)) %
                       PPBAR;
 
             if (idx < 0 || idx >= PPBAR)
@@ -374,14 +178,15 @@ void SoundGenerator::eventNotify(broadcast_event event)
 
             if (engine.patterns[engine.cur_pattern][idx].event_type)
             {
-                midi_event *ev = &engine.patterns[engine.cur_pattern][idx];
+                midi_event ev = engine.patterns[engine.cur_pattern][idx];
                 if (rand() % 100 < engine.pct_play)
                 {
-                    if (ev->event_type == MIDI_ON)
-                        mixer_emit_event(mixr, (broadcast_event){
-                                                   .type = SEQUENCER_NOTE,
-                                                   .sequencer_src = mixer_idx});
-                    midi_parse_midi_event(parent, ev);
+                    // if (ev->event_type == MIDI_ON)
+                    //    mixer_emit_event(mixr, (broadcast_event){
+                    //                               .type = SEQUENCER_NOTE,
+                    //                               .sequencer_src =
+                    //                               mixer_idx});
+                    parseMidiEvent(ev, tinfo);
                 }
             }
 
@@ -389,26 +194,26 @@ void SoundGenerator::eventNotify(broadcast_event event)
             // ensure note off events still happen, even when i'm using the
             // above count_by which ends up not reaching note off events
             // sometimes.
-            idx = mixr->timing_info.midi_tick % PPBAR;
+            idx = tinfo.midi_tick % PPBAR;
             if (engine.temporal_events[idx].event_type)
             {
-                midi_event *ev = &engine.temporal_events[idx];
-                if (ev->event_type == MIDI_ON)
-                    mixer_emit_event(
-                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                                                .sequencer_src = mixer_idx});
-                midi_parse_midi_event(parent, ev);
+                midi_event ev = engine.temporal_events[idx];
+                // if (ev->event_type == MIDI_ON)
+                //    mixer_emit_event(
+                //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+                //                                .sequencer_src = mixer_idx});
+                parseMidiEvent(ev, tinfo);
             }
         }
         break;
     case (TIME_THIRTYSECOND_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_32)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine);
+            break;
     case (TIME_TWENTYFOURTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_24)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine);
+            break;
     case (TIME_SIXTEENTH_TICK):
         if (engine.started)
         {
@@ -480,32 +285,32 @@ void SoundGenerator::eventNotify(broadcast_event event)
         }
 
         if (engine.arp.enable && engine.arp.speed == ARP_16)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine, parent);
+            break;
     case (TIME_TWELTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_12)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine, parent);
+            break;
     case (TIME_EIGHTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_8)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine, parent);
+            break;
     case (TIME_SIXTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_6)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine, parent);
+            break;
     case (TIME_QUARTER_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_4)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine, parent);
+            break;
     case (TIME_THIRD_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_3)
-            sequence_engine_do_arp(engine, parent);
-        break;
+            // sequence_engine_do_arp(engine, parent);
+            break;
     case (TIME_CHORD_CHANGE):
         if (engine.follow_mixer_chord_changes)
-            sequence_engine_set_pattern_to_current_key(engine);
-        break;
+            // sequence_engine_set_pattern_to_current_key(engine);
+            break;
     }
 }
 

@@ -762,8 +762,7 @@ void check_and_set_pattern(SoundGenerator *sg, int target_pattern_num,
     {
         pattern_change_info change_info = {.clear_previous = true,
                                            .temporary = false};
-        sequence_engine *engine = get_sequence_engine(sg);
-        sequence_engine_set_pattern(engine, target_pattern_num, change_info,
-                                    pattern);
+        sequence_engine_set_pattern(&sg->engine, target_pattern_num,
+                                    change_info, pattern);
     }
 }

@@ -70,9 +70,9 @@ looper::looper(char *filename)
     start();
 }
 
-void looper::eventNotify(broadcast_event event)
+void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
-    sequence_engine_event_notify(this, event);
+    SoundGenerator::eventNotify(event, tinfo);
 
     float loop_num = fmod(loop_counter, loop_len);
     int cur_sixteenth_midi_base =

@@ -31,11 +31,10 @@ class drumsampler : public SoundGenerator
   public:
     drumsampler(char *filename);
     ~drumsampler();
-    void status(wchar_t *status_string);
-    void start();
-    void stop();
-    void noteOn(midi_event *ev);
-    stereo_val genNext();
+    void status(wchar_t *status_string) override;
+    stereo_val genNext() override;
+    void start() override;
+    void noteOn(midi_event ev) override;
 
   public:
     bool glitch_mode;

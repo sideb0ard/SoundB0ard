@@ -32,8 +32,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    sequence_engine *engine =
-        get_sequence_engine(mixr->SoundGenerators[soundgen_num]);
+    SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
 
     int ch = 0;
     int quit = 0;
@@ -58,7 +57,7 @@ void keys(int soundgen_num)
         {
             ch = getchar();
             // printf("C %d\n", ch);
-            int midi_num;
+            unsigned int midi_num;
             char textnote[4] = {0};
             switch (ch)
             {
@@ -75,48 +74,27 @@ void keys(int soundgen_num)
                 s_keys_octave++;
                 break;
             case 114:
-                engine->recording = 1 - engine->recording;
+                sg->engine.recording = 1 - sg->engine.recording;
                 printf("Toggling REC to %s\n",
-                       engine->recording ? "true" : "false");
+                       sg->engine.recording ? "true" : "false");
                 break;
             // mixer_toggle_key_mode(mixr);
             // printf("Switching KEY mode -- %d\n",
             //       mixr->m_key_controller_mode);
             // break;
             case 91:
-                if (mixr->SoundGenerators[soundgen_num]->type == MINISYNTH_TYPE)
-                {
-                    printf("RANDOM MONDY mode!\n");
-                    minisynth *ms =
-                        (minisynth *)mixr->SoundGenerators[soundgen_num];
-                    minisynth_rand_settings(ms);
-                }
-                else if (mixr->SoundGenerators[soundgen_num]->type ==
-                         DIGISYNTH_TYPE)
-                {
-                    digisynth *ds =
-                        (digisynth *)mixr->SoundGenerators[soundgen_num];
-                    printf("RANDOM MONDY mode NAE DIGI YET!\n");
-                    (void)ds;
-                }
-                else if (mixr->SoundGenerators[soundgen_num]->type ==
-                         DXSYNTH_TYPE)
-                {
-                    dxsynth *dx =
-                        (dxsynth *)mixr->SoundGenerators[soundgen_num];
-                    printf("RANDOM MONDY DX!\n");
-                    dxsynth_rand_settings(dx);
-                }
+                sg->randomize();
                 break;
             default:
                 // play note
                 midi_num = input_key_to_char_note(ch, s_keys_octave, textnote);
                 printf("MIDI: %s%d [%d]\n", textnote, s_keys_octave, midi_num);
-                int fake_velocity = 128; // TODO real velocity
+                unsigned int fake_velocity = 128; // TODO real velocity
                 if (midi_num >= 0)
                 {
-                    synth_handle_midi_note(mixr->SoundGenerators[soundgen_num],
-                                           midi_num, fake_velocity, true);
+                    sg->noteOn({.event_type = MIDI_ON,
+                                .data1 = midi_num,
+                                .data2 = fake_velocity});
                 }
                 else
                     printf("check yer MIDI notes! that ain't valid shit: %d\n",

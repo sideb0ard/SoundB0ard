@@ -180,6 +180,21 @@ void drumsynth::status(wchar_t *ss)
     wcscat(ss, WANSI_COLOR_RESET);
 }
 
+void drumsynth::noteOn(midi_event ev)
+{
+    if (reset_osc)
+    {
+        osc_reset(&m_osc1.osc);
+        osc_reset(&m_osc2.osc);
+    }
+
+    m_osc1.osc.m_note_on = true;
+    eg_start_eg(&m_eg1);
+
+    m_osc2.osc.m_note_on = true;
+    eg_start_eg(&m_eg2);
+}
+
 void drumsynth_randomize(drumsynth *ds)
 {
 
@@ -216,19 +231,6 @@ void drumsynth_randomize(drumsynth *ds)
     filter_set_fc_control((filter *)&ds->m_filter, ds->m_filter_fc);
     moog_set_qcontrol((filter *)&ds->m_filter, ds->m_filter_q);
     ds->m_distortion_threshold = ((float)rand()) / RAND_MAX;
-}
-
-void drumsynth_trigger(drumsynth *ds)
-{
-    if (ds->reset_osc)
-        osc_reset(&ds->m_osc1.osc);
-    ds->m_osc1.osc.m_note_on = true;
-    eg_start_eg(&ds->m_eg1);
-
-    if (ds->reset_osc)
-        osc_reset(&ds->m_osc2.osc);
-    ds->m_osc2.osc.m_note_on = true;
-    eg_start_eg(&ds->m_eg2);
 }
 
 bool drumsynth_save_patch(drumsynth *ds, char *name)

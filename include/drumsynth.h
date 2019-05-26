@@ -18,6 +18,7 @@ class drumsynth : public SoundGenerator
 
     stereo_val genNext() override;
     void status(wchar_t *ss) override;
+    void noteOn(midi_event ev) override;
 
   public:
     char m_patch_name[512];
@@ -62,7 +63,6 @@ class drumsynth : public SoundGenerator
     bool debug;
 };
 
-void drumsynth_trigger(drumsynth *ds);
 bool drumsynth_save_patch(drumsynth *ds, char *name);
 bool drumsynth_open_patch(drumsynth *ds, char *name);
 bool drumsynth_list_patches(void);

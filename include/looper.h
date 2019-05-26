@@ -89,7 +89,7 @@ class looper : public SoundGenerator
     void status(wchar_t *wstring) override;
     void start() override;
     void stop() override;
-    void eventNotify(broadcast_event event) override;
+    void eventNotify(broadcast_event event, mixer_timing_info tinfo) override;
 
   public:
     bool started;

@@ -337,7 +337,7 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
         SoundGenerator *sg = mixr->SoundGenerators[i];
         if (sg != NULL)
         {
-            sg->eventNotify(event);
+            sg->eventNotify(event, mixr->timing_info);
             if (sg->effects_num > 0)
             {
                 for (int j = 0; j < sg->effects_num; j++)
@@ -1245,7 +1245,7 @@ void mixer_check_for_midi_messages(mixer *mixr)
                 ev.source = EXTERNAL_DEVICE;
                 ev.delete_after_use = false;
 
-                midi_parse_midi_event(sg, &ev);
+                sg->parseMidiEvent(ev, mixr->timing_info);
             }
             else
             {

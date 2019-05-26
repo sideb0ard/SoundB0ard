@@ -1,10 +1,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <SequenceEngine.h>
 #include <cmdloop/sequence_engine_cmds.h>
 #include <mixer.h>
 #include <pattern_parser.h>
-#include <sequence_engine.h>
 #include <utils.h>
 
 extern mixer *mixr;
@@ -12,8 +12,7 @@ extern mixer *mixr;
 bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                                char wurds[][SIZE_OF_WURD], int num_wurds)
 {
-    sequence_engine *engine =
-        get_sequence_engine(mixr->SoundGenerators[soundgen_num]);
+    SequenceEngine *engine = &mixr->SoundGenerators[soundgen_num]->engine;
 
     bool cmd_found = true;
     // sequence_engine specific first, then patterns below
@@ -256,8 +255,7 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                 if (mixer_is_valid_soundgen_num(mixr, sg2) &&
                     is_synth(mixr->SoundGenerators[sg2]))
                 {
-                    sequence_engine *sb2 =
-                        get_sequence_engine(mixr->SoundGenerators[sg2]);
+                    SequenceEngine *sb2 = &mixr->SoundGenerators[sg2]->engine;
 
                     if (sequence_engine_is_valid_pattern(engine, pattern_num) &&
                         sequence_engine_is_valid_pattern(sb2, pattern_num2))

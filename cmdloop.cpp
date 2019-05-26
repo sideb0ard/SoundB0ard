@@ -247,7 +247,7 @@ int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
     if (mixer_is_valid_soundgen_num(mixr, target_sg))
     {
         SoundGenerator *sg = mixr->SoundGenerators[target_sg];
-        midi_parse_midi_event(sg, &_event);
+        sg->parseMidiEvent(_event, mixr->timing_info);
     }
 
     return 0;
@@ -267,7 +267,7 @@ int osc_note_on_handler(const char *path, const char *types, lo_arg **argv,
     if (mixer_is_valid_soundgen_num(mixr, target_sg))
     {
         SoundGenerator *sg = mixr->SoundGenerators[target_sg];
-        midi_parse_midi_event(sg, &_event);
+        sg->parseMidiEvent(_event, mixr->timing_info);
     }
     return 0;
 }

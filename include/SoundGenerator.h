@@ -21,13 +21,16 @@ class SoundGenerator
     virtual void start();
     virtual void stop();
 
-    virtual void noteOn(midi_event *ev){};
-    virtual void noteOff(midi_event *ev){};
+    virtual void noteOn(midi_event ev){};
+    virtual void noteOff(midi_event ev){};
+    virtual void control(midi_event ev){};
+    virtual void pitchBend(midi_event ev){};
+    virtual void randomize(){};
     virtual void allNotesOff(){};
 
-    virtual void eventNotify(broadcast_event event);
+    virtual void eventNotify(broadcast_event event, mixer_timing_info tinfo);
 
-    void parseMidiEvent(midi_event *ev);
+    void parseMidiEvent(midi_event ev, mixer_timing_info tinfo);
 
     void setVolume(double val);
     double getVolume();

@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "defjams.h"
-#include "midimaaan.h"
+#include <defjams.h>
+#include <midimaaan.h>
 
 #define MAX_NUM_MIDI_LOOPS 64
 #define MAX_VOICES 3

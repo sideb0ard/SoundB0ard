@@ -97,7 +97,6 @@ stereo_val drumsampler::genNext()
     double pan_right = 0.707;
     calculate_pan_values(pan, &pan_left, &pan_right);
 
-    std::cout << "L:" << left_val << " R:" << right_val << std::endl;
     stereo_val out = {.left = left_val * amp * pan_left,
                       .right = right_val * amp * pan_right};
     out = effector(this, out);
@@ -142,7 +141,17 @@ void drumsampler::start()
     engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
-void drumsampler::stop() { active = false; }
+void drumsampler::noteOn(midi_event ev)
+{
+    int idx = mixr->timing_info.midi_tick % PPBAR;
+    int seq_position = get_a_drumsampler_position(this);
+    if (seq_position != -1)
+    {
+        samples_now_playing[seq_position] = idx;
+        velocity_now_playing[seq_position] = ev.data2;
+    }
+    eg_start_eg(&eg);
+}
 
 void drumsampler_import_file(drumsampler *ds, char *filename)
 {
@@ -172,18 +181,6 @@ void drumsampler_reset_samples(drumsampler *ds)
         ds->sample_positions[i].amp = 0;
         ds->sample_positions[i].speed = 1;
     }
-}
-
-void drumsampler_note_on(drumsampler *ds, midi_event *ev)
-{
-    int idx = mixr->timing_info.midi_tick % PPBAR;
-    int seq_position = get_a_drumsampler_position(ds);
-    if (seq_position != -1)
-    {
-        ds->samples_now_playing[seq_position] = idx;
-        ds->velocity_now_playing[seq_position] = ev->data2;
-    }
-    eg_start_eg(&ds->eg);
 }
 
 int get_a_drumsampler_position(drumsampler *ss)
