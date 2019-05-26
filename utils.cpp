@@ -154,26 +154,21 @@ void faderrr(int sg_num, unsigned int d)
         while (vol < 0.7)
         {
             vol += 0.0001;
-            mixr->sound_generators[sg_num]->set_volume(
-                mixr->sound_generators[sg_num], vol);
+            mixr->SoundGenerators[sg_num]->setVolume(vol);
             nanosleep(&ts, NULL);
         }
-        mixr->sound_generators[sg_num]->set_volume(
-            mixr->sound_generators[sg_num], 0.7);
+        mixr->SoundGenerators[sg_num]->setVolume(0.7);
     }
     else
     {
-        double vol = mixr->sound_generators[sg_num]->get_volume(
-            mixr->sound_generators[sg_num]);
+        double vol = mixr->SoundGenerators[sg_num]->getVolume();
         while (vol > 0.0)
         {
             vol -= 0.0001;
-            mixr->sound_generators[sg_num]->set_volume(
-                mixr->sound_generators[sg_num], vol);
+            mixr->SoundGenerators[sg_num]->setVolume(vol);
             nanosleep(&ts, NULL);
         }
-        mixr->sound_generators[sg_num]->set_volume(
-            mixr->sound_generators[sg_num], 0.0);
+        mixr->SoundGenerators[sg_num]->setVolume(0.0);
     }
 }
 

@@ -13,88 +13,71 @@
 extern mixer *mixr;
 extern char *s_lfo_mode_names;
 
-static char *s_env_names[] = {"PARABOLIC", "TRAPEZOIDAL", "TUKEY", "GENERATOR"};
-static char *s_loop_mode_names[] = {"LOOP", "STATIC", "SMUDGE"};
-static char *s_external_mode_names[] = {"FOLLOW", "CAPTURE"};
+static char *s_env_names[] = {(char *)"PARABOLIC", (char *)"TRAPEZOIDAL",
+                              (char *)"TUKEY", (char *)"GENERATOR"};
+static char *s_loop_mode_names[] = {(char *)"LOOP", (char *)"STATIC",
+                                    (char *)"SMUDGE"};
+static char *s_external_mode_names[] = {(char *)"FOLLOW", (char *)"CAPTURE"};
 
-looper *new_looper(char *filename)
+looper::looper(char *filename)
 {
-    looper *g = (looper *)calloc(1, sizeof(looper));
-    g->have_active_buffer = false;
+    have_active_buffer = false;
 
-    g->audio_buffer_read_idx = 0;
-    g->granular_spray_frames = 441; // 10ms * (44100/1000)
-    g->grain_attack_time_pct = 15;
-    g->grain_release_time_pct = 15;
-    g->quasi_grain_fudge = 220;
-    g->selection_mode = GRAIN_SELECTION_STATIC;
-    g->envelope_mode = LOOPER_ENV_GENERATOR;
-    g->envelope_mode = LOOPER_ENV_PARABOLIC;
-    g->envelope_taper_ratio = 0.5;
-    g->reverse_mode = 0; // bool
-    g->external_source_sg = -1;
-    g->external_source_mode = LOOPER_EXTERNAL_MODE_FOLLOW;
-    if (pthread_mutex_init(&g->extsource_lock, NULL) != 0)
+    audio_buffer_read_idx = 0;
+    granular_spray_frames = 441; // 10ms * (44100/1000)
+    grain_attack_time_pct = 15;
+    grain_release_time_pct = 15;
+    quasi_grain_fudge = 220;
+    selection_mode = GRAIN_SELECTION_STATIC;
+    envelope_mode = LOOPER_ENV_GENERATOR;
+    envelope_mode = LOOPER_ENV_PARABOLIC;
+    envelope_taper_ratio = 0.5;
+    reverse_mode = 0; // bool
+    external_source_sg = -1;
+    external_source_mode = LOOPER_EXTERNAL_MODE_FOLLOW;
+    if (pthread_mutex_init(&extsource_lock, NULL) != 0)
     {
-        free(g);
         printf("\n mutex init has failed\n");
-        return NULL;
+        return;
     }
-    g->recording = false;
+    recording = false;
 
-    g->loop_mode = LOOPER_LOOP_MODE;
-    g->loop_counter = -1;
-    g->scramble_mode = false;
-    g->stutter_mode = false;
-    g->stutter_idx = 0;
+    loop_mode = LOOPER_LOOP_MODE;
+    loop_counter = -1;
+    scramble_mode = false;
+    stutter_mode = false;
+    stutter_idx = 0;
 
-    g->grain_pitch = 1;
+    grain_pitch = 1;
 
-    g->density_duration_sync = true;
-    g->fill_factor = 3.;
-    looper_set_grain_density(g, 30);
+    density_duration_sync = true;
+    fill_factor = 3.;
+    looper_set_grain_density(this, 30);
 
-    g->sg.gennext = &looper_gennext;
-    g->sg.status = &looper_status;
-    g->sg.get_volume = &sound_generator_get_volume;
-    g->sg.set_volume = &sound_generator_set_volume;
-    g->sg.get_pan = &sound_generator_get_pan;
-    g->sg.set_pan = &sound_generator_set_pan;
-    g->sg.start = &looper_start;
-    g->sg.stop = &looper_stop;
-    g->sg.self_destruct = &looper_del_self;
-    g->sg.event_notify = &looper_event_notify;
-    g->sg.type = LOOPER_TYPE;
+    type = LOOPER_TYPE;
 
     if (strncmp(filename, "none", 4) != 0)
-        looper_import_file(g, filename);
+        looper_import_file(this, filename);
 
-    sequence_engine_init(&g->engine, (void *)g, LOOPER_TYPE);
-    g->engine.sustain_note_ms = 500;
+    engine.sustain_note_ms = 500;
 
-    envelope_generator_init(&g->m_eg1); // start/stop env
-    g->m_eg1.m_attack_time_msec = 10;
-    g->m_eg1.m_release_time_msec = 50;
+    envelope_generator_init(&m_eg1); // start/stop env
+    m_eg1.m_attack_time_msec = 10;
+    m_eg1.m_release_time_msec = 50;
 
-    sound_generator_init(&g->sg);
-
-    g->degrade_by = 0;
-    g->gate_mode = false;
-    looper_start(g);
-
-    return g;
+    degrade_by = 0;
+    gate_mode = false;
+    start();
 }
 
-void looper_event_notify(void *self, broadcast_event event)
+void looper::eventNotify(broadcast_event event)
 {
-    sequence_engine_event_notify(self, event);
+    sequence_engine_event_notify(this, event);
 
-    looper *g = (looper *)self;
-
-    float loop_num = fmod(g->loop_counter, g->loop_len);
+    float loop_num = fmod(loop_counter, loop_len);
     int cur_sixteenth_midi_base =
-        (loop_num * PPBAR) + g->engine.cur_step * PPSIXTEENTH;
-    double pulses_per_loop = PPBAR * g->loop_len;
+        (loop_num * PPBAR) + engine.cur_step * PPSIXTEENTH;
+    double pulses_per_loop = PPBAR * loop_len;
     int cur_midi_idx = (cur_sixteenth_midi_base +
                         (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
                        (int)pulses_per_loop;
@@ -103,93 +86,92 @@ void looper_event_notify(void *self, broadcast_event event)
     {
     case (TIME_START_OF_LOOP_TICK):
 
-        g->started = true;
-        g->loop_counter++; // used to track which 16th we're on if loop != 1 bar
+        started = true;
+        loop_counter++; // used to track which 16th we're on if loop != 1 bar
 
-        if (g->scramble_pending)
+        if (scramble_pending)
         {
-            g->scramble_mode = true;
-            g->scramble_pending = false;
+            scramble_mode = true;
+            scramble_pending = false;
         }
         else
-            g->scramble_mode = false;
+            scramble_mode = false;
 
-        if (g->stutter_pending)
+        if (stutter_pending)
         {
-            g->stutter_mode = true;
-            g->stutter_pending = false;
+            stutter_mode = true;
+            stutter_pending = false;
         }
         else
-            g->stutter_mode = false;
+            stutter_mode = false;
 
-        if (g->record_pending)
+        if (record_pending)
         {
-            g->recording = true;
-            g->record_pending = false;
+            recording = true;
+            record_pending = false;
         }
 
         break;
 
     case (TIME_MIDI_TICK):
-        if (g->loop_mode == LOOPER_LOOP_MODE)
+        if (loop_mode == LOOPER_LOOP_MODE)
         {
 
             double decimal_percent_of_loop = cur_midi_idx / pulses_per_loop;
-            double new_read_idx = decimal_percent_of_loop * g->audio_buffer_len;
+            double new_read_idx = decimal_percent_of_loop * audio_buffer_len;
 
             // printf("PPLOOP:%f PPSIXT:%d base:%d cur_midi:%d DEC:%f len:%d "
             //      "REDXIX:%f\n",
             //      pulses_per_loop, PPSIXTEENTH, cur_sixteenth_midi_base,
             //      cur_midi_idx, decimal_percent_of_loop,
-            //      g->audio_buffer_len, new_read_idx);
+            //      audio_buffer_len, new_read_idx);
 
-            if (g->reverse_mode)
-                new_read_idx = (g->audio_buffer_len - 1) - new_read_idx;
+            if (reverse_mode)
+                new_read_idx = (audio_buffer_len - 1) - new_read_idx;
 
             // this ensures new_read_idx is even
-            if (g->num_channels == 2)
+            if (num_channels == 2)
                 new_read_idx -= ((int)new_read_idx & 1);
 
-            if (g->scramble_mode)
+            if (scramble_mode)
             {
-                g->audio_buffer_read_idx =
-                    new_read_idx + (g->scramble_diff * g->size_of_sixteenth);
+                audio_buffer_read_idx =
+                    new_read_idx + (scramble_diff * size_of_sixteenth);
             }
-            else if (g->stutter_mode)
+            else if (stutter_mode)
             {
                 int rel_pos_within_a_sixteenth =
-                    new_read_idx - (g->engine.cur_step * g->size_of_sixteenth);
-                g->audio_buffer_read_idx =
-                    (g->stutter_idx * g->size_of_sixteenth) +
-                    rel_pos_within_a_sixteenth;
+                    new_read_idx - (engine.cur_step * size_of_sixteenth);
+                audio_buffer_read_idx = (stutter_idx * size_of_sixteenth) +
+                                        rel_pos_within_a_sixteenth;
             }
             else
-                g->audio_buffer_read_idx = new_read_idx;
+                audio_buffer_read_idx = new_read_idx;
         }
 
         // step sequencer as env generator
-        if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]
-                .event_type == MIDI_ON)
+        if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
+            MIDI_ON)
         {
-            eg_start_eg(&g->m_eg1);
+            eg_start_eg(&m_eg1);
 
-            midi_event *pattern = g->engine.patterns[g->engine.cur_pattern];
+            midi_event *pattern = engine.patterns[engine.cur_pattern];
             int off_tick =
-                (int)(cur_midi_idx + ((g->m_eg1.m_attack_time_msec +
-                                       g->m_eg1.m_decay_time_msec +
-                                       g->engine.sustain_note_ms) *
-                                      mixr->timing_info.ms_per_midi_tick)) %
+                (int)(cur_midi_idx +
+                      ((m_eg1.m_attack_time_msec + m_eg1.m_decay_time_msec +
+                        engine.sustain_note_ms) *
+                       mixr->timing_info.ms_per_midi_tick)) %
                 PPBAR;
             midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
             midi_pattern_add_event(pattern, off_tick, off_event);
         }
-        else if (g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]
-                     .event_type == MIDI_OFF)
+        else if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
+                 MIDI_OFF)
         {
             // printf("[%d] OFF\n", idx);
             midi_event_clear(
-                &g->engine.patterns[g->engine.cur_pattern][cur_midi_idx]);
-            g->m_eg1.m_state = RELEASE;
+                &engine.patterns[engine.cur_pattern][cur_midi_idx]);
+            m_eg1.m_state = RELEASE;
         }
 
         break;
@@ -198,158 +180,155 @@ void looper_event_notify(void *self, broadcast_event event)
 
         // printf(
         //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d
-        //    midi_idx:%d\n", loop_num, g->engine.cur_step,
+        //    midi_idx:%d\n", loop_num, engine.cur_step,
         //    cur_sixteenth_midi_base, cur_midi_idx);
 
-        if (g->scramble_mode)
+        if (scramble_mode)
         {
-            g->scramble_diff = 0;
+            scramble_diff = 0;
             int cur_sixteenth = mixr->timing_info.sixteenth_note_tick % 16;
             if (cur_sixteenth % 2 != 0)
             {
                 int randy = rand() % 100;
                 if (randy < 25) // repeat the third 16th
-                    g->scramble_diff = 3 - cur_sixteenth;
+                    scramble_diff = 3 - cur_sixteenth;
                 else if (randy > 25 && randy < 50) // repeat the 4th sixteenth
-                    g->scramble_diff = 4 - cur_sixteenth;
+                    scramble_diff = 4 - cur_sixteenth;
                 else if (randy > 25 && randy < 50) // repeat the 7th sixteenth
-                    g->scramble_diff = 7 - cur_sixteenth;
+                    scramble_diff = 7 - cur_sixteenth;
             }
         }
-        if (g->stutter_mode)
+        if (stutter_mode)
         {
             if (rand() % 100 > 75)
-                g->stutter_idx++;
-            if (g->stutter_idx == 16)
-                g->stutter_idx = 0;
+                stutter_idx++;
+            if (stutter_idx == 16)
+                stutter_idx = 0;
         }
         break;
     }
 }
 
-stereo_val looper_gennext(void *self)
+stereo_val looper::genNext()
 {
-    looper *g = (looper *)self;
     stereo_val val = {0., 0.};
 
-    if (!g->started || !g->sg.active)
+    if (!started || !active)
         return val;
 
-    if (g->stop_pending && g->m_eg1.m_state == OFFF)
-        g->sg.active = false;
+    if (stop_pending && m_eg1.m_state == OFFF)
+        active = false;
 
-    if (g->external_source_sg != -1)
+    if (external_source_sg != -1)
     {
-        if (g->recording)
+        if (recording)
         {
-            if (mixer_is_valid_soundgen_num(mixr, g->external_source_sg))
+            if (mixer_is_valid_soundgen_num(mixr, external_source_sg))
             {
-                g->audio_buffer[g->audio_buffer_write_idx] =
-                    mixr->soundgen_cur_val[g->external_source_sg].left;
-                g->audio_buffer[g->audio_buffer_write_idx + 1] =
-                    mixr->soundgen_cur_val[g->external_source_sg].right;
-                g->audio_buffer_write_idx = g->audio_buffer_write_idx + 2;
+                audio_buffer[audio_buffer_write_idx] =
+                    mixr->soundgen_cur_val[external_source_sg].left;
+                audio_buffer[audio_buffer_write_idx + 1] =
+                    mixr->soundgen_cur_val[external_source_sg].right;
+                audio_buffer_write_idx = audio_buffer_write_idx + 2;
 
-                if (g->audio_buffer_write_idx >= g->audio_buffer_len)
+                if (audio_buffer_write_idx >= audio_buffer_len)
                 {
-                    g->audio_buffer_write_idx = 0;
+                    audio_buffer_write_idx = 0;
 
-                    if (g->external_source_mode ==
+                    if (external_source_mode ==
                         LOOPER_EXTERNAL_MODE_CAPTURE_ONCE)
-                        g->recording = false;
+                        recording = false;
                 }
             }
         }
     }
 
-    if (g->have_active_buffer) // file buffer or external in
+    if (have_active_buffer) // file buffer or external in
     {
-        if (pthread_mutex_trylock(&g->extsource_lock) == 0)
+        if (pthread_mutex_trylock(&extsource_lock) == 0)
         {
             // STEP 1 - calculate if we should launch a new grain
-            int spacing = looper_calculate_grain_spacing(g);
+            int spacing = looper_calculate_grain_spacing(this);
             if (mixr->timing_info.cur_sample >
-                g->last_grain_launched_sample_time + spacing) // new grain time
+                last_grain_launched_sample_time + spacing) // new grain time
             {
-                g->last_grain_launched_sample_time =
-                    mixr->timing_info.cur_sample;
-                g->cur_grain_num = looper_get_available_grain_num(g);
+                last_grain_launched_sample_time = mixr->timing_info.cur_sample;
+                cur_grain_num = looper_get_available_grain_num(this);
 
-                int duration = g->grain_duration_ms * 44.1;
-                if (g->quasi_grain_fudge != 0)
-                    duration += rand() % (int)(g->quasi_grain_fudge * 44.1);
+                int duration = grain_duration_ms * 44.1;
+                if (quasi_grain_fudge != 0)
+                    duration += rand() % (int)(quasi_grain_fudge * 44.1);
 
-                int grain_idx = g->audio_buffer_read_idx;
-                if (g->selection_mode == GRAIN_SELECTION_RANDOM)
-                    grain_idx = rand() % (g->audio_buffer_len -
-                                          (duration * g->num_channels));
+                int grain_idx = audio_buffer_read_idx;
+                if (selection_mode == GRAIN_SELECTION_RANDOM)
+                    grain_idx =
+                        rand() % (audio_buffer_len - (duration * num_channels));
 
-                if (g->granular_spray_frames > 0)
-                    grain_idx += rand() % g->granular_spray_frames;
+                if (granular_spray_frames > 0)
+                    grain_idx += rand() % granular_spray_frames;
 
-                int attack_time_pct = g->grain_attack_time_pct;
-                int release_time_pct = g->grain_release_time_pct;
+                int attack_time_pct = grain_attack_time_pct;
+                int release_time_pct = grain_release_time_pct;
 
                 bool enable_debug = false;
-                if (g->debug_pending)
+                if (debug_pending)
                 {
                     enable_debug = true;
-                    g->debug_pending = false;
+                    debug_pending = false;
                 }
                 sound_grain_params params = {.dur = duration,
                                              .starting_idx = grain_idx,
                                              .attack_pct = attack_time_pct,
                                              .release_pct = release_time_pct,
-                                             .reverse_mode = g->reverse_mode,
-                                             .pitch = g->grain_pitch,
-                                             .num_channels = g->num_channels,
-                                             .degrade_by = g->degrade_by,
+                                             .reverse_mode = reverse_mode,
+                                             .pitch = grain_pitch,
+                                             .num_channels = num_channels,
+                                             .degrade_by = degrade_by,
                                              .debug = enable_debug};
 
-                sound_grain_init(&g->m_grains[g->cur_grain_num], params);
-                g->num_active_grains = looper_count_active_grains(g);
+                sound_grain_init(&m_grains[cur_grain_num], params);
+                num_active_grains = looper_count_active_grains(this);
             }
 
             // STEP 2 - gather vals from all active grains
-            for (int i = 0; i < g->highest_grain_num; i++)
-            // for (int i = 0; i < 1 && i < g->highest_grain_num; i++)
+            for (int i = 0; i < highest_grain_num; i++)
+            // for (int i = 0; i < 1 && i < highest_grain_num; i++)
             {
-                sound_grain *sgr = &g->m_grains[i];
-                stereo_val tmp = sound_grain_generate(sgr, g->audio_buffer,
-                                                      g->audio_buffer_len);
-                double env = sound_grain_env(sgr, g->envelope_mode);
+                sound_grain *sgr = &m_grains[i];
+                stereo_val tmp =
+                    sound_grain_generate(sgr, audio_buffer, audio_buffer_len);
+                double env = sound_grain_env(sgr, envelope_mode);
 
                 val.left += tmp.left * env;
                 val.right += tmp.right * env;
             }
-            if (pthread_mutex_unlock(&g->extsource_lock) != 0)
+            if (pthread_mutex_unlock(&extsource_lock) != 0)
                 printf("Youch, couldn't unlock mutex!\n");
         }
     }
 
-    eg_update(&g->m_eg1);
-    double eg_amp = eg_do_envelope(&g->m_eg1, NULL);
+    eg_update(&m_eg1);
+    double eg_amp = eg_do_envelope(&m_eg1, NULL);
 
-    g->sg.pan = fmin(g->sg.pan, 1.0);
-    g->sg.pan = fmax(g->sg.pan, -1.0);
+    pan = fmin(pan, 1.0);
+    pan = fmax(pan, -1.0);
     double pan_left = 0.707;
     double pan_right = 0.707;
-    calculate_pan_values(g->sg.pan, &pan_left, &pan_right);
+    calculate_pan_values(pan, &pan_left, &pan_right);
 
-    val.left = val.left * g->sg.volume * eg_amp * pan_left;
-    val.right = val.right * g->sg.volume * eg_amp * pan_right;
+    val.left = val.left * volume * eg_amp * pan_left;
+    val.right = val.right * volume * eg_amp * pan_right;
 
-    val = effector(&g->sg, val);
+    val = effector(this, val);
 
     return val;
 }
 
-void looper_status(void *self, wchar_t *status_string)
+void looper::status(wchar_t *status_string)
 {
-    looper *g = (looper *)self;
-    char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
-    if (g->sg.active)
-        INSTRUMENT_COLOR = ANSI_COLOR_RED;
+    char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
+    if (active)
+        INSTRUMENT_COLOR = (char *)ANSI_COLOR_RED;
 
     swprintf(
         status_string, MAX_STATIC_STRING_SZ,
@@ -370,52 +349,46 @@ void looper_status(void *self, wchar_t *status_string)
         "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
         // clang-format on
 
-        g->filename, INSTRUMENT_COLOR, g->sg.volume, g->sg.pan, g->grain_pitch,
-        g->num_channels > 1 ? 1 : 0, s_loop_mode_names[g->loop_mode],
-        g->gate_mode, g->audio_buffer_read_idx, g->audio_buffer_len,
-        g->grain_attack_time_pct, g->grain_release_time_pct, g->loop_len,
-        g->scramble_mode, g->stutter_mode, g->step_mode, g->reverse_mode,
-        g->external_source_sg, g->recording, g->audio_buffer_write_idx,
-        s_external_mode_names[g->external_source_mode], g->external_source_mode,
-        g->degrade_by,
+        filename, INSTRUMENT_COLOR, volume, pan, grain_pitch,
+        num_channels > 1 ? 1 : 0, s_loop_mode_names[loop_mode], gate_mode,
+        audio_buffer_read_idx, audio_buffer_len, grain_attack_time_pct,
+        grain_release_time_pct, loop_len, scramble_mode, stutter_mode,
+        step_mode, reverse_mode, external_source_sg, recording,
+        audio_buffer_write_idx, s_external_mode_names[external_source_mode],
+        external_source_mode, degrade_by,
 
-        ANSI_COLOR_WHITE, g->grain_duration_ms, INSTRUMENT_COLOR,
-        ANSI_COLOR_WHITE, g->grains_per_sec, INSTRUMENT_COLOR,
-        g->density_duration_sync, g->quasi_grain_fudge, g->fill_factor,
-        g->granular_spray_frames / 44.1, g->selection_mode,
-        s_env_names[g->envelope_mode],
+        ANSI_COLOR_WHITE, grain_duration_ms, INSTRUMENT_COLOR, ANSI_COLOR_WHITE,
+        grains_per_sec, INSTRUMENT_COLOR, density_duration_sync,
+        quasi_grain_fudge, fill_factor, granular_spray_frames / 44.1,
+        selection_mode, s_env_names[envelope_mode],
 
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, g->m_eg1.m_attack_time_msec,
-        g->m_eg1.m_release_time_msec, g->m_eg1.m_state);
+        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, m_eg1.m_attack_time_msec,
+        m_eg1.m_release_time_msec, m_eg1.m_state);
 
     wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
-    sequence_engine_status(&g->engine, local_status_string);
+    sequence_engine_status(&engine, local_status_string);
     wcscat(status_string, local_status_string);
 
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-void looper_start(void *self)
+void looper::start()
 {
-    looper *l = (looper *)self;
-    eg_start_eg(&l->m_eg1);
-    l->sg.active = true;
-    l->stop_pending = false;
-    sequence_engine_reset(&l->engine);
+    eg_start_eg(&m_eg1);
+    active = true;
+    stop_pending = false;
+    sequence_engine_reset(&engine);
 }
 
-void looper_stop(void *self)
+void looper::stop()
 {
-    looper *l = (looper *)self;
-    eg_release(&l->m_eg1);
-    l->stop_pending = true;
+    eg_release(&m_eg1);
+    stop_pending = true;
 }
 
-void looper_del_self(void *self)
+looper::~looper()
 {
     // TODO delete file
-    looper *g = (looper *)self;
-    free(g);
 }
 
 //////////////////////////// grain stuff //////////////////////////
@@ -619,7 +592,7 @@ void looper_set_external_source(looper *g, int sound_gen_num)
     {
         g->external_source_sg = sound_gen_num;
         int looplen = mixr->timing_info.loop_len_in_frames * 2; // stereo
-        double *buffer = (double*) calloc(looplen, sizeof(double));
+        double *buffer = (double *)calloc(looplen, sizeof(double));
         if (buffer)
         {
             if (pthread_mutex_lock(&g->extsource_lock) == 0)

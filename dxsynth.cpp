@@ -15,54 +15,165 @@ extern const char *s_dest_enum_to_name[];
 static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
                                         "dx_dest_vibrato"};
 
-dxsynth *new_dxsynth(void)
+dxsynth::dxsynth(void)
 {
-    dxsynth *dx = (dxsynth *)calloc(1, sizeof(dxsynth));
-    if (dx == NULL)
-        return NULL; // barf
+    type = DXSYNTH_TYPE;
+    active_midi_osc = 1;
 
-    dx->sg.gennext = &dxsynth_gennext;
-    dx->sg.status = &dxsynth_status;
-    dx->sg.start = &dxsynth_sg_start;
-    dx->sg.stop = &dxsynth_sg_stop;
-    dx->sg.event_notify = &sequence_engine_event_notify;
-    dx->sg.self_destruct = &dxsynth_del_self;
-    dx->sg.type = DXSYNTH_TYPE;
-    dx->active_midi_osc = 1;
-
-    sequence_engine_init(&dx->engine, (void *)dx, DXSYNTH_TYPE);
-    sound_generator_init(&dx->sg);
-
-    dxsynth_reset(dx);
+    dxsynth_reset(this);
 
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
-        dx->m_voices[i] = new_dxsynth_voice();
-        if (!dx->m_voices[i])
-            return NULL; // would be bad
+        m_voices[i] = new_dxsynth_voice();
+        if (m_voices[i])
+            return; // would be bad
 
-        dxsynth_voice_init_global_parameters(dx->m_voices[i],
-                                             &dx->m_global_synth_params);
+        dxsynth_voice_init_global_parameters(m_voices[i],
+                                             &m_global_synth_params);
     }
 
-    dxsynth_prepare_for_play(dx);
+    dxsynth_prepare_for_play(this);
 
     // use first voice to setup global
-    dxsynth_voice_initialize_modmatrix(dx->m_voices[0],
-                                       &dx->m_global_modmatrix);
+    dxsynth_voice_initialize_modmatrix(m_voices[0], &m_global_modmatrix);
 
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
-        voice_set_modmatrix_core(&dx->m_voices[i]->m_voice,
-                                 get_matrix_core(&dx->m_global_modmatrix));
+        voice_set_modmatrix_core(&m_voices[i]->m_voice,
+                                 get_matrix_core(&m_global_modmatrix));
     }
-    dxsynth_update(dx);
+    dxsynth_update(this);
 
-    dx->m_last_note_frequency = -1.0;
+    m_last_note_frequency = -1.0;
 
-    dx->sg.active = true;
+    active = true;
     printf("BOOM!\n");
-    return dx;
+}
+
+dxsynth::~dxsynth()
+{
+    for (int i = 0; i < MAX_DX_VOICES; i++)
+    {
+        dxsynth_voice_free_self(m_voices[i]);
+    }
+    printf("Deleting dxsynth self\n");
+}
+
+void dxsynth::start()
+{
+    active = true;
+    engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
+}
+
+void dxsynth::stop()
+{
+    active = false;
+    dxsynth_midi_note_off(this, 0, 0, true);
+}
+
+void dxsynth::status(wchar_t *status_string)
+{
+    char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
+    if (active)
+        INSTRUMENT_COLOR = (char *)ANSI_COLOR_CYAN;
+
+    // clang-format off
+    swprintf(
+        status_string, MAX_STATIC_STRING_SZ,
+        WANSI_COLOR_WHITE
+        "%s " "%s" "algo:%d vol:%.1f pan:%.1f midi_osc:%d porta:%.1f pitchrange:%d op4fb:%.2f\n"
+        "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n"
+        "l1_dest1:%s l1_dest2:%s\nl1_dest3:%s l1_dest4:%s\n"
+        "o1wav:%d o1rat:%.2f o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n"
+        "o2wav:%d o2rat:%.2f o2det:%.2f e2att:%.2f e2dec:%.2f e2sus:%.2f e2rel:%.2f\n"
+        "o3wav:%d o3rat:%.2f o3det:%.2f e3att:%.2f e3dec:%.2f e3sus:%.2f e3rel:%.2f\n"
+        "o4wav:%d o4rat:%.2f o4det:%.2f e4att:%.2f e4dec:%.2f e4sus:%.2f e4rel:%.2f\n"
+        "op1out:%.2f op2out:%.2f op3out:%.2f op4out:%.2f",
+
+        m_settings.m_settings_name,
+        INSTRUMENT_COLOR,
+        m_settings.m_voice_mode,
+        volume, pan,
+        active_midi_osc,
+        m_settings.m_portamento_time_ms,
+        m_settings.m_pitchbend_range,
+        m_settings.m_op4_feedback,
+        m_settings.m_velocity_to_attack_scaling,
+        m_settings.m_note_number_to_decay_scaling,
+        m_settings.m_reset_to_zero,
+        m_settings.m_legato_mode,
+
+        m_settings.m_lfo1_waveform,
+        m_settings.m_lfo1_intensity,
+        m_settings.m_lfo1_rate,
+        s_dx_dest_names[m_settings.m_lfo1_mod_dest1],
+        s_dx_dest_names[m_settings.m_lfo1_mod_dest2],
+        s_dx_dest_names[m_settings.m_lfo1_mod_dest3],
+        s_dx_dest_names[m_settings.m_lfo1_mod_dest4],
+
+        m_settings.m_op1_waveform, m_settings.m_op1_ratio,
+        m_settings.m_op1_detune_cents, m_settings.m_eg1_attack_ms,
+        m_settings.m_eg1_decay_ms, m_settings.m_eg1_sustain_lvl,
+        m_settings.m_eg1_release_ms,
+
+        m_settings.m_op2_waveform, m_settings.m_op2_ratio,
+        m_settings.m_op2_detune_cents, m_settings.m_eg2_attack_ms,
+        m_settings.m_eg2_decay_ms, m_settings.m_eg2_sustain_lvl,
+        m_settings.m_eg2_release_ms,
+
+        m_settings.m_op3_waveform, m_settings.m_op3_ratio,
+        m_settings.m_op3_detune_cents, m_settings.m_eg3_attack_ms,
+        m_settings.m_eg3_decay_ms, m_settings.m_eg3_sustain_lvl,
+        m_settings.m_eg3_release_ms,
+
+        m_settings.m_op4_waveform, m_settings.m_op4_ratio,
+        m_settings.m_op4_detune_cents, m_settings.m_eg4_attack_ms,
+        m_settings.m_eg4_decay_ms, m_settings.m_eg4_sustain_lvl,
+        m_settings.m_eg4_release_ms,
+        m_settings.m_op1_output_lvl,
+        m_settings.m_op2_output_lvl,
+        m_settings.m_op3_output_lvl,
+        m_settings.m_op4_output_lvl
+        );
+    // clang-format on
+    wchar_t scratch[1024] = {};
+    sequence_engine_status(&engine, scratch);
+    wcscat(status_string, scratch);
+}
+
+stereo_val dxsynth::genNext()
+{
+    if (!active)
+        return (stereo_val){0, 0};
+
+    double accum_out_left = 0.0;
+    double accum_out_right = 0.0;
+
+    // float mix = 1.0 / MAX_DX_VOICES;
+    float mix = 0.25;
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    for (int i = 0; i < MAX_DX_VOICES; i++)
+    {
+        if (m_voices[i])
+            dxsynth_voice_gennext(m_voices[i], &out_left, &out_right);
+
+        accum_out_left += mix * out_left;
+        accum_out_right += mix * out_right;
+    }
+
+    pan = fmin(pan, 1.0);
+    pan = fmax(pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(pan, &pan_left, &pan_right);
+
+    stereo_val out = {.left = accum_out_left * volume * pan_left,
+                      .right = accum_out_right * volume * pan_right};
+    out = effector(this, out);
+    return out;
 }
 
 void dxsynth_reset(dxsynth *dx)
@@ -122,7 +233,6 @@ void dxsynth_reset(dxsynth *dx)
     dx->m_settings.m_op4_output_lvl = 75;
     dx->m_settings.m_op4_feedback = 0; // 0-70
 }
-////////////////////////////////////
 
 bool dxsynth_prepare_for_play(dxsynth *dx)
 {
@@ -650,116 +760,6 @@ dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *ms,
         }
     }
     return found_voice;
-}
-
-// sound generator interface //////////////
-void dxsynth_status(void *self, wchar_t *status_string)
-{
-    dxsynth *dx = (dxsynth *)self;
-
-    char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
-    if (dx->sg.active)
-        INSTRUMENT_COLOR = (char *)ANSI_COLOR_CYAN;
-
-    // clang-format off
-    swprintf(
-        status_string, MAX_STATIC_STRING_SZ,
-        WANSI_COLOR_WHITE
-        "%s " "%s" "algo:%d vol:%.1f pan:%.1f midi_osc:%d porta:%.1f pitchrange:%d op4fb:%.2f\n"
-        "vel2att:%d note2dec:%d reset2zero:%d legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n"
-        "l1_dest1:%s l1_dest2:%s\nl1_dest3:%s l1_dest4:%s\n"
-        "o1wav:%d o1rat:%.2f o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n"
-        "o2wav:%d o2rat:%.2f o2det:%.2f e2att:%.2f e2dec:%.2f e2sus:%.2f e2rel:%.2f\n"
-        "o3wav:%d o3rat:%.2f o3det:%.2f e3att:%.2f e3dec:%.2f e3sus:%.2f e3rel:%.2f\n"
-        "o4wav:%d o4rat:%.2f o4det:%.2f e4att:%.2f e4dec:%.2f e4sus:%.2f e4rel:%.2f\n"
-        "op1out:%.2f op2out:%.2f op3out:%.2f op4out:%.2f",
-
-        dx->m_settings.m_settings_name,
-        INSTRUMENT_COLOR,
-        dx->m_settings.m_voice_mode,
-        dx->sg.volume, dx->sg.pan,
-        dx->active_midi_osc,
-        dx->m_settings.m_portamento_time_ms,
-        dx->m_settings.m_pitchbend_range,
-        dx->m_settings.m_op4_feedback,
-        dx->m_settings.m_velocity_to_attack_scaling,
-        dx->m_settings.m_note_number_to_decay_scaling,
-        dx->m_settings.m_reset_to_zero,
-        dx->m_settings.m_legato_mode,
-
-        dx->m_settings.m_lfo1_waveform,
-        dx->m_settings.m_lfo1_intensity,
-        dx->m_settings.m_lfo1_rate,
-        s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest1],
-        s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest2],
-        s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest3],
-        s_dx_dest_names[dx->m_settings.m_lfo1_mod_dest4],
-
-        dx->m_settings.m_op1_waveform, dx->m_settings.m_op1_ratio,
-        dx->m_settings.m_op1_detune_cents, dx->m_settings.m_eg1_attack_ms,
-        dx->m_settings.m_eg1_decay_ms, dx->m_settings.m_eg1_sustain_lvl,
-        dx->m_settings.m_eg1_release_ms,
-
-        dx->m_settings.m_op2_waveform, dx->m_settings.m_op2_ratio,
-        dx->m_settings.m_op2_detune_cents, dx->m_settings.m_eg2_attack_ms,
-        dx->m_settings.m_eg2_decay_ms, dx->m_settings.m_eg2_sustain_lvl,
-        dx->m_settings.m_eg2_release_ms,
-
-        dx->m_settings.m_op3_waveform, dx->m_settings.m_op3_ratio,
-        dx->m_settings.m_op3_detune_cents, dx->m_settings.m_eg3_attack_ms,
-        dx->m_settings.m_eg3_decay_ms, dx->m_settings.m_eg3_sustain_lvl,
-        dx->m_settings.m_eg3_release_ms,
-
-        dx->m_settings.m_op4_waveform, dx->m_settings.m_op4_ratio,
-        dx->m_settings.m_op4_detune_cents, dx->m_settings.m_eg4_attack_ms,
-        dx->m_settings.m_eg4_decay_ms, dx->m_settings.m_eg4_sustain_lvl,
-        dx->m_settings.m_eg4_release_ms,
-        dx->m_settings.m_op1_output_lvl,
-        dx->m_settings.m_op2_output_lvl,
-        dx->m_settings.m_op3_output_lvl,
-        dx->m_settings.m_op4_output_lvl
-        );
-    // clang-format on
-    wchar_t scratch[1024] = {};
-    sequence_engine_status(&dx->engine, scratch);
-    wcscat(status_string, scratch);
-}
-
-stereo_val dxsynth_gennext(void *self)
-{
-    dxsynth *dx = (dxsynth *)self;
-
-    if (!dx->sg.active)
-        return (stereo_val){0, 0};
-
-    double accum_out_left = 0.0;
-    double accum_out_right = 0.0;
-
-    // float mix = 1.0 / MAX_DX_VOICES;
-    float mix = 0.25;
-
-    double out_left = 0.0;
-    double out_right = 0.0;
-
-    for (int i = 0; i < MAX_DX_VOICES; i++)
-    {
-        if (dx->m_voices[i])
-            dxsynth_voice_gennext(dx->m_voices[i], &out_left, &out_right);
-
-        accum_out_left += mix * out_left;
-        accum_out_right += mix * out_right;
-    }
-
-    dx->sg.pan = fmin(dx->sg.pan, 1.0);
-    dx->sg.pan = fmax(dx->sg.pan, -1.0);
-    double pan_left = 0.707;
-    double pan_right = 0.707;
-    calculate_pan_values(dx->sg.pan, &pan_left, &pan_right);
-
-    stereo_val out = {.left = accum_out_left * dx->sg.volume * pan_left,
-                      .right = accum_out_right * dx->sg.volume * pan_right};
-    out = effector(&dx->sg, out);
-    return out;
 }
 
 void dxsynth_rand_settings(dxsynth *dx)
@@ -1326,33 +1326,6 @@ void dxsynth_print_patterns(dxsynth *ms)
 void dxsynth_print_modulation_routings(dxsynth *ms)
 {
     print_modulation_matrix(&ms->m_global_modmatrix);
-}
-
-void dxsynth_del_self(void *self)
-{
-    dxsynth *dx = (dxsynth *)self;
-    for (int i = 0; i < MAX_DX_VOICES; i++)
-    {
-        dxsynth_voice_free_self(dx->m_voices[i]);
-    }
-    printf("Deleting dxsynth self\n");
-    free(dx);
-}
-
-void dxsynth_stop(dxsynth *dx) { dxsynth_midi_note_off(dx, 0, 0, true); }
-
-void dxsynth_sg_start(void *self)
-{
-    dxsynth *dx = (dxsynth *)self;
-    dx->sg.active = true;
-    dx->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
-}
-
-void dxsynth_sg_stop(void *self)
-{
-    dxsynth *ms = (dxsynth *)self;
-    ms->sg.active = false;
-    dxsynth_stop(ms);
 }
 
 void dxsynth_set_lfo1_intensity(dxsynth *d, double val)

@@ -8,37 +8,78 @@
 
 extern mixer *mixr;
 
-digisynth *new_digisynth(char *filename)
+digisynth::digisynth(char *filename)
 {
     printf("NEW DIGI SYNTH!\n");
 
-    digisynth *ds = (digisynth *)calloc(1, sizeof(digisynth));
-    if (ds == NULL)
-    {
-        printf("Barfy\n");
-        return NULL;
-    }
+    strncpy(audiofile, filename, 1023);
 
-    sequence_engine_init(&ds->engine, (void *)ds, DIGISYNTH_TYPE);
-
-    strncpy(ds->audiofile, filename, 1023);
-
-    ds->sg.start = &digisynth_sg_start;
-    ds->sg.stop = &digisynth_sg_stop;
-    ds->sg.event_notify = &sequence_engine_event_notify;
-    ds->sg.self_destruct = &digisynth_del_self;
-    ds->sg.type = DIGISYNTH_TYPE;
-    ds->sg.active = true;
-    sound_generator_init(&ds->sg);
+    type = DIGISYNTH_TYPE;
+    active = true;
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
-        digisynth_voice_init(&ds->m_voices[i], filename);
+        digisynth_voice_init(&m_voices[i], filename);
     }
 
-    ds->m_last_note_frequency = -1.0;
+    m_last_note_frequency = -1.0;
+}
 
-    return ds;
+stereo_val digisynth::genNext()
+{
+    if (!active)
+        return (stereo_val){0, 0};
+
+    double accum_out_left = 0.0;
+    double accum_out_right = 0.0;
+
+    double out_left = 0.0;
+    double out_right = 0.0;
+
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        digisynth_voice_gennext(&m_voices[i], &out_left, &out_right);
+        accum_out_left += out_left;
+        accum_out_right += out_right;
+    }
+
+    pan = fmin(pan, 1.0);
+    pan = fmax(pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(pan, &pan_left, &pan_right);
+
+    stereo_val return_val = {.left = accum_out_left * volume * pan_left,
+                             .right = accum_out_right * volume * pan_right};
+
+    // return_val = effector(this, return_val);
+    return return_val;
+}
+
+void digisynth::status(wchar_t *status_string)
+{
+    swprintf(status_string, MAX_STATIC_STRING_SZ,
+             WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
+                               " vol:%.2f pan:%.2f active:%s midi_note_1:%d "
+                               "midi_note_2:%d midi_note_3:%d "
+                               "sample_len:%d read_idx:%d",
+             audiofile, volume, pan, active ? "true" : "false",
+             engine.midi_note_1, engine.midi_note_2, engine.midi_note_3,
+             m_voices[0].m_osc1.afd.samplecount, m_voices[0].m_osc1.m_read_idx);
+    wchar_t scratch[1024] = {};
+    sequence_engine_status(&engine, scratch);
+    wcscat(status_string, scratch);
+}
+
+void digisynth::start()
+{
+    active = true;
+    engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
+}
+void digisynth::stop()
+{
+    active = false;
+    digisynth_midi_note_off(this, 0, 0, true);
 }
 
 void digisynth_load_wav(digisynth *ds, char *filename)
@@ -52,97 +93,6 @@ void digisynth_load_wav(digisynth *ds, char *filename)
     }
 }
 
-// sound generator interface //////////////
-stereo_val digisynth_gennext(void *self)
-{
-    digisynth *ds = (digisynth *)self;
-
-    if (!ds->sg.active)
-        return (stereo_val){0, 0};
-
-    double accum_out_left = 0.0;
-    double accum_out_right = 0.0;
-
-    double out_left = 0.0;
-    double out_right = 0.0;
-
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        digisynth_voice_gennext(&ds->m_voices[i], &out_left, &out_right);
-        accum_out_left += out_left;
-        accum_out_right += out_right;
-    }
-
-    ds->sg.pan = fmin(ds->sg.pan, 1.0);
-    ds->sg.pan = fmax(ds->sg.pan, -1.0);
-    double pan_left = 0.707;
-    double pan_right = 0.707;
-    calculate_pan_values(ds->sg.pan, &pan_left, &pan_right);
-
-    stereo_val return_val = {.left = accum_out_left * ds->sg.volume * pan_left,
-                             .right =
-                                 accum_out_right * ds->sg.volume * pan_right};
-
-    return_val = effector(&ds->sg, return_val);
-    return return_val;
-}
-
-void digisynth_status(void *self, wchar_t *status_string)
-{
-    digisynth *ds = (digisynth *)self;
-    swprintf(status_string, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
-                               " vol:%.2f pan:%.2f active:%s midi_note_1:%d "
-                               "midi_note_2:%d midi_note_3:%d "
-                               "sample_len:%d read_idx:%d",
-             ds->audiofile, ds->sg.volume, ds->sg.pan,
-             ds->sg.active ? "true" : "false", ds->engine.midi_note_1,
-             ds->engine.midi_note_2, ds->engine.midi_note_3,
-             ds->m_voices[0].m_osc1.afd.samplecount,
-             ds->m_voices[0].m_osc1.m_read_idx);
-    wchar_t scratch[1024] = {};
-    sequence_engine_status(&ds->engine, scratch);
-    wcscat(status_string, scratch);
-}
-
-void digisynth_sg_start(void *self)
-{
-    digisynth *ds = (digisynth *)self;
-    ds->sg.active = true;
-    ds->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
-}
-void digisynth_sg_stop(void *self)
-{
-    digisynth *ds = (digisynth *)self;
-    ds->sg.active = false;
-    digisynth_stop(ds);
-}
-
-void digisynth_del_self(void *self)
-{
-    digisynth *ds = (digisynth *)self;
-    free(ds);
-}
-
-void digisynth_stop(digisynth *d) { digisynth_midi_note_off(d, 0, 0, true); }
-////////////////////////////////////
-
-// bool digisynth_prepare_for_play(digisynth *synth);
-// void digisynth_update(digisynth *synth);
-
-// void minisynth_handle_midi_note(minisynth *ms, int note, int velocity,
-//                                bool update_last_midi);
-// void minisynth_toggle_delay_mode(minisynth *ms);
-//
-// void minisynth_print_settings(minisynth *ms);
-// bool minisynth_save_settings(minisynth *ms, char *preset_name);
-// bool minisynth_load_settings(minisynth *ms, char *preset_name);
-////bool minisynth_list_presets(void);
-////bool minisynth_check_if_preset_exists(char *preset_to_find);
-//
-// void minisynth_set_vol(minisynth *ms, double val);
-// void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val);
-//
 bool digisynth_midi_note_on(digisynth *ds, unsigned int midinote,
                             unsigned int velocity)
 {

@@ -26,9 +26,9 @@ bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             sscanf(wurds[1], "%d:%d", &soundgen_num, &target_pattern_num);
             // int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-                mixr->sound_generators[soundgen_num]->type == LOOPER_TYPE)
+                mixr->SoundGenerators[soundgen_num]->type == LOOPER_TYPE)
             {
-                looper *g = (looper *)mixr->sound_generators[soundgen_num];
+                looper *g = (looper *)mixr->SoundGenerators[soundgen_num];
 
                 if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num,
                                               &wurds[2], num_wurds - 2))

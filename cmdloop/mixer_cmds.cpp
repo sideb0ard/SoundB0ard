@@ -114,7 +114,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
             SoundGenerator *sg =
-                (SoundGenerator *)mixr->sound_generators[sg_num];
+                (SoundGenerator *)mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -134,7 +134,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
             SoundGenerator *sg =
-                (SoundGenerator *)mixr->sound_generators[sg_num];
+                (SoundGenerator *)mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -156,7 +156,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
             SoundGenerator *sg =
-                (SoundGenerator *)mixr->sound_generators[sg_num];
+                (SoundGenerator *)mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -173,7 +173,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
             SoundGenerator *sg =
-                (SoundGenerator *)mixr->sound_generators[sg_num];
+                (SoundGenerator *)mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -192,7 +192,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
             SoundGenerator *sg =
-                (SoundGenerator *)mixr->sound_generators[sg_num];
+                (SoundGenerator *)mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -209,7 +209,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
             SoundGenerator *sg =
-                (SoundGenerator *)mixr->sound_generators[sg_num];
+                (SoundGenerator *)mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -252,7 +252,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &sg_num, &sg_pattern_num);
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
-            SoundGenerator *sg = mixr->sound_generators[sg_num];
+            SoundGenerator *sg = mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -335,7 +335,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             if (mixer_is_valid_soundgen_num(mixr, dests[i].sg_num))
             {
-                SoundGenerator *sg = mixr->sound_generators[dests[i].sg_num];
+                SoundGenerator *sg = mixr->SoundGenerators[dests[i].sg_num];
                 sequence_engine *engine = get_sequence_engine(sg);
                 pattern_change_info change_info = {.clear_previous = true,
                                                    .temporary = false};
@@ -485,7 +485,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_num))
         {
             SoundGenerator *sg =
-                (SoundGenerator *)mixr->sound_generators[sg_num];
+                (SoundGenerator *)mixr->SoundGenerators[sg_num];
             sequence_engine *engine = get_sequence_engine(sg);
             if (sequence_engine_is_valid_pattern(engine, sg_pattern_num))
             {
@@ -536,7 +536,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
              strncmp("hush", wurds[0], 4) == 0)
     {
         for (int i = 0; i < mixr->soundgen_num; i++)
-            mixr->sound_generators[i]->setVolume(0.0);
+            mixr->SoundGenerators[i]->setVolume(0.0);
         goto cmd_found;
     }
     else if (strncmp("ls", wurds[0], 2) == 0)
@@ -561,9 +561,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
-                sound_generator *sg = mixr->sound_generators[i];
+                SoundGenerator *sg = mixr->SoundGenerators[i];
                 if (sg != NULL)
-                    sg->start(sg);
+                    sg->start();
             }
         }
         else
@@ -571,8 +571,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                sound_generator *sg = mixr->sound_generators[soundgen_num];
-                sg->start(sg);
+                SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
+                sg->start();
             }
         }
         goto cmd_found;
@@ -596,9 +596,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             pattern_generator *pg = mixr->pattern_generators[pattern_gen_num];
 
-            sound_generator *s1 = mixr->sound_generators[sg1_num];
+            SoundGenerator *s1 = mixr->SoundGenerators[sg1_num];
             sequence_engine *e1 = get_sequence_engine(s1);
-            sound_generator *s2 = mixr->sound_generators[sg2_num];
+            SoundGenerator *s2 = mixr->SoundGenerators[sg2_num];
             sequence_engine *e2 = get_sequence_engine(s2);
 
             midi_event midi_pattern[PPBAR] = {};
@@ -639,9 +639,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
-                sound_generator *sg = mixr->sound_generators[i];
+                SoundGenerator *sg = mixr->SoundGenerators[i];
                 if (sg != NULL)
-                    sg->stop(sg);
+                    sg->stop();
             }
         }
         else
@@ -649,8 +649,8 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int soundgen_num = atoi(wurds[1]);
             if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
             {
-                sound_generator *sg = mixr->sound_generators[soundgen_num];
-                sg->stop(sg);
+                SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
+                sg->stop();
             }
         }
         goto cmd_found;

@@ -6,15 +6,20 @@
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "qblimited_oscillator.h"
-#include "sequence_engine.h"
 
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/drumsynthpatches.dat";
 
-typedef struct drumsynth
+class drumsynth : public SoundGenerator
 {
-    SoundGenerator sg;
-    sequence_engine engine;
+  public:
+    drumsynth();
+    ~drumsynth() = default;
+
+    stereo_val genNext() override;
+    void status(wchar_t *ss) override;
+
+  public:
     char m_patch_name[512];
     bool reset_osc;
 
@@ -55,17 +60,7 @@ typedef struct drumsynth
     int current_velocity;
 
     bool debug;
-
-} drumsynth;
-
-drumsynth *new_drumsynth(void);
-void drumsynth_del_self(void *self);
-
-void drumsynth_status(void *self, wchar_t *ss);
-stereo_val drumsynth_gennext(void *self);
-
-void drumsynth_start(void *self);
-void drumsynth_stop(void *self);
+};
 
 void drumsynth_trigger(drumsynth *ds);
 bool drumsynth_save_patch(drumsynth *ds, char *name);

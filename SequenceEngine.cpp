@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "SequenceEngine.h"
 #include "bitshift.h"
 #include "defjams.h"
 #include "euclidean.h"
 #include "mixer.h"
-#include "sequence_engine.h"
 #include "utils.h"
 #include <drumsampler.h>
 #include <drumsynth.h>
@@ -22,48 +22,44 @@ const char *s_arp_speed[] = {"32", "24", "16", "12", "8", "6", "4", "3"};
 
 extern mixer *mixr;
 
-void sequence_engine_init(sequence_engine *engine, void *parent,
-                          unsigned int parent_type)
+SequenceEngine()
 {
-    engine->parent = parent;
-    engine->parent_type = parent_type;
-
-    engine->num_patterns = 1;
-    engine->multi_pattern_mode = true;
-    engine->cur_pattern_iteration = 1;
+    num_patterns = 1;
+    multi_pattern_mode = true;
+    cur_pattern_iteration = 1;
     for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
-        engine->pattern_multiloop_count[i] = 1;
+        pattern_multiloop_count[i] = 1;
 
-    engine->sample_rate = 44100;
-    engine->sample_rate_counter = 0;
+    sample_rate = 44100;
+    sample_rate_counter = 0;
 
-    engine->midi_note_1 = 24; // C0
-    engine->midi_note_2 = 32; // G#0
-    engine->midi_note_3 = 31; // G0
+    midi_note_1 = 24; // C0
+    midi_note_2 = 32; // G#0
+    midi_note_3 = 31; // G0
 
-    engine->octave = 1;
+    octave = 1;
 
-    engine->arp.enable = false;
-    engine->arp.direction = UP;
-    engine->arp.mode = ARP_UP;
-    engine->arp.speed = ARP_16;
+    arp.enable = false;
+    arp.direction = UP;
+    arp.mode = ARP_UP;
+    arp.speed = ARP_16;
     for (int i = 0; i < MAX_NOTES_ARP; i++)
-        engine->arp.last_midi_notes[i] = -1;
+        arp.last_midi_notes[i] = -1;
 
-    engine->sustain_note_ms = 500;
-    engine->single_note_mode = true; // opposite is melody mode
-    engine->chord_mode = false;
-    engine->follow_mixer_chord_changes = true;
-    engine->started = false;
+    sustain_note_ms = 500;
+    single_note_mode = true; // opposite is melody mode
+    chord_mode = false;
+    follow_mixer_chord_changes = true;
+    started = false;
 
-    engine->enable_event_mask = false;
-    engine->event_mask = 0;
-    engine->apply_mask_every_n = 1;
-    engine->event_mask_counter = 0;
+    enable_event_mask = false;
+    event_mask = 0;
+    apply_mask_every_n = 1;
+    event_mask_counter = 0;
 
-    engine->pct_play = 90; // %
+    pct_play = 90; // %
 
-    sequence_engine_reset_step(engine);
+    sequence_engine_reset_step(this);
 }
 
 void sequence_engine_set_pattern_to_riff(sequence_engine *engine)
@@ -93,9 +89,12 @@ void sequence_engine_set_pattern_to_current_key(sequence_engine *engine)
                               sequence_engine_get_octave(engine), &chnotes);
 
     int note2 = chnotes.third;
-    if (rand() % 100 > 50) note2 = chnotes.seventh;
-    if (rand() % 100 > 75) note2 = chnotes.fifth;
-    if (rand() % 100 > 90) note2 = chnotes.seventh;
+    if (rand() % 100 > 50)
+        note2 = chnotes.seventh;
+    if (rand() % 100 > 75)
+        note2 = chnotes.fifth;
+    if (rand() % 100 > 90)
+        note2 = chnotes.seventh;
     for (int i = 0; i < PPBAR; i++)
     {
         midi_event *ev = &midi_pattern[i];
@@ -109,7 +108,7 @@ void sequence_engine_set_pattern_to_current_key(sequence_engine *engine)
             {
 
                 midi_note = chnotes.root;
-                if (i > (PPBAR/2))
+                if (i > (PPBAR / 2))
                 {
                     if (rand() % 100 > 70)
                         midi_note = note2;
@@ -220,199 +219,6 @@ void sequence_engine_status(sequence_engine *engine, wchar_t *status_string)
              engine->event_mask, engine->apply_mask_every_n);
     wcscat(status_string, scratch);
     wcscat(status_string, WANSI_COLOR_RESET);
-}
-
-void sequence_engine_event_notify(void *self, broadcast_event event)
-{
-    sound_generator *parent = (sound_generator *)self;
-    if (!parent->active)
-        return;
-
-    sequence_engine *engine = get_sequence_engine(parent);
-    int mixer_idx = parent->mixer_idx;
-    int idx;
-
-    int event_type = event.type;
-
-    switch (event_type)
-    {
-    case (TIME_START_OF_LOOP_TICK):
-        engine->started = true;
-        engine->event_mask_counter++;
-        if (engine->restore_pending)
-        {
-            sequence_engine_dupe_pattern(
-                &engine->backup_pattern_while_getting_crazy,
-                &engine->patterns[engine->cur_pattern]);
-            engine->restore_pending = false;
-        }
-        else if (engine->multi_pattern_mode && engine->num_patterns > 1)
-        {
-            engine->cur_pattern_iteration--;
-            if (engine->cur_pattern_iteration <= 0)
-            {
-                // if (engine->parent_type == MINISYNTH_TYPE)
-                //    minisynth_midi_note_off((minisynth *)parent, 0, 0,
-                //                            true /* all notes off */);
-                // else if (engine->parent_type == DXSYNTH_TYPE)
-                //    dxsynth_midi_note_off((dxsynth *)parent, 0, 0,
-                //                          true /* all notes off */);
-
-                int next_pattern =
-                    (engine->cur_pattern + 1) % engine->num_patterns;
-
-                engine->cur_pattern = next_pattern;
-                engine->cur_pattern_iteration =
-                    engine->pattern_multiloop_count[engine->cur_pattern];
-            }
-        }
-        break;
-    case (TIME_MIDI_TICK):
-        if (engine->started)
-        {
-            int idx = ((engine->cur_step * PPSIXTEENTH) +
-                       (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
-                      PPBAR;
-
-            if (idx < 0 || idx >= PPBAR)
-                printf("YOUHC! idx out of bounds: %d\n", idx);
-
-            if (engine->patterns[engine->cur_pattern][idx].event_type)
-            {
-                midi_event *ev = &engine->patterns[engine->cur_pattern][idx];
-                if (rand() % 100 < engine->pct_play)
-                {
-                    if (ev->event_type == MIDI_ON)
-                        mixer_emit_event(mixr, (broadcast_event){
-                                                   .type = SEQUENCER_NOTE,
-                                                   .sequencer_src = mixer_idx});
-                    midi_parse_midi_event(parent, ev);
-                }
-            }
-
-            // this temporal_events table is my first pass at a solution to
-            // ensure note off events still happen, even when i'm using the
-            // above count_by which ends up not reaching note off events
-            // sometimes.
-            idx = mixr->timing_info.midi_tick % PPBAR;
-            if (engine->temporal_events[idx].event_type)
-            {
-                midi_event *ev = &engine->temporal_events[idx];
-                if (ev->event_type == MIDI_ON)
-                    mixer_emit_event(
-                        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                                                .sequencer_src = mixer_idx});
-                midi_parse_midi_event(parent, ev);
-            }
-        }
-        break;
-    case (TIME_THIRTYSECOND_TICK):
-        if (engine->arp.enable && engine->arp.speed == ARP_32)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_TWENTYFOURTH_TICK):
-        if (engine->arp.enable && engine->arp.speed == ARP_24)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_SIXTEENTH_TICK):
-        if (engine->started)
-        {
-            if (engine->debug)
-                printf("CUR_STEP:%d range_start:%d len:%d\n", engine->cur_step,
-                       engine->range_start, engine->range_len);
-
-            if (engine->fold_direction == FOLD_FWD)
-                engine->cur_step += engine->count_by;
-            else
-                engine->cur_step -= engine->count_by;
-
-            if (engine->cur_step < engine->range_start || engine->cur_step < 0)
-            {
-                int over_by = engine->range_start - engine->cur_step;
-                if (engine->fold)
-                {
-                    engine->cur_step = engine->range_start + over_by;
-                    engine->fold_direction = FOLD_FWD;
-                }
-                else
-                    engine->cur_step =
-                        (engine->range_start + engine->range_len) - over_by - 1;
-            }
-            else if (engine->cur_step >= 16 ||
-                     engine->cur_step >=
-                         (engine->range_start + engine->range_len))
-            {
-                int over_by = 0;
-                if (engine->cur_step >= 16)
-                    over_by = engine->cur_step - 16;
-                else
-                    over_by = engine->cur_step -
-                              (engine->range_start + engine->range_len);
-
-                if (engine->fold)
-                {
-                    engine->cur_step =
-                        (engine->range_start + engine->range_len) - over_by - 1;
-                    engine->fold_direction = FOLD_BAK;
-                }
-                else
-                    engine->cur_step = engine->range_start + over_by;
-            }
-
-            int tries = 0;
-            while (engine->cur_step >= 16 && tries < 5)
-            {
-                engine->cur_step -= 16;
-                tries++;
-            }
-            while (engine->cur_step < 0 && tries < 5)
-            {
-                engine->cur_step += 16;
-                tries++;
-            }
-
-            if (engine->cur_step >= 16 || engine->cur_step < 0)
-                printf("UGH! still out of bounds! %d\n", engine->cur_step);
-
-            engine->range_counter++;
-            if (engine->range_counter % engine->range_len == 0)
-            {
-                engine->range_start += engine->increment_by;
-                if (engine->range_start >= 16)
-                    engine->range_start -= 16;
-                else if (engine->range_start < 0)
-                    engine->range_start += 16;
-            }
-        }
-
-        if (engine->arp.enable && engine->arp.speed == ARP_16)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_TWELTH_TICK):
-        if (engine->arp.enable && engine->arp.speed == ARP_12)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_EIGHTH_TICK):
-        if (engine->arp.enable && engine->arp.speed == ARP_8)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_SIXTH_TICK):
-        if (engine->arp.enable && engine->arp.speed == ARP_6)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_QUARTER_TICK):
-        if (engine->arp.enable && engine->arp.speed == ARP_4)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_THIRD_TICK):
-        if (engine->arp.enable && engine->arp.speed == ARP_3)
-            sequence_engine_do_arp(engine, parent);
-        break;
-    case (TIME_CHORD_CHANGE):
-        if (engine->follow_mixer_chord_changes)
-            sequence_engine_set_pattern_to_current_key(engine);
-        break;
-    }
 }
 
 void sequence_engine_add_event(sequence_engine *engine, int pattern_num,
@@ -910,7 +716,7 @@ void sequence_engine_set_arp_mode(sequence_engine *engine, unsigned int mode)
         engine->arp.mode = mode;
 }
 
-void sequence_engine_do_arp(sequence_engine *engine, sound_generator *parent)
+void sequence_engine_do_arp(sequence_engine *engine, SoundGenerator *parent)
 {
     int midi_note = arp_next_note(&engine->arp);
     if (midi_note != -1)

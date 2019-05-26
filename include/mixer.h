@@ -74,7 +74,7 @@ typedef struct preview_buffer
 stereo_val preview_buffer_generate(preview_buffer *buffy);
 void preview_buffer_import_file(preview_buffer *buffy, char *filename);
 
-typedef struct mixer
+struct mixer
 {
 
     preview_buffer preview;
@@ -151,8 +151,7 @@ typedef struct mixer
     unsigned int quantize;
 
     lo_address processing_addr;
-
-} mixer;
+};
 
 mixer *new_mixer(double output_latency);
 
@@ -241,11 +240,5 @@ void mixer_set_midi_bank(mixer *mixr, int num);
 void mixer_set_should_progress_chords(mixer *mixr, bool b);
 bool should_progress_chords(mixer *mixr, int tick);
 void mixer_next_chord(mixer *mixr);
-
-// these are in mixer.h rather than sequence_engine, as mixer needs to transform
-// sg first
-sequence_engine *get_sequence_engine(SoundGenerator *self);
-void synth_handle_midi_note(SoundGenerator *sg, int note, int velocity,
-                            bool update_last_midi);
 
 #endif // MIXER_H

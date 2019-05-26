@@ -3,14 +3,13 @@
 
 #include "SoundGenerator.h"
 #include "envelope_generator.h"
-#include "sequence_engine.h"
 #include <stdbool.h>
 #include <wchar.h>
 
 #define MAX_CONCURRENT_GRAINS 1000
 #define MAX_GRAIN_STREAM_LEN_SEC 10 // assuming a loop is never more than 10sec
 
-typedef struct sound_grain_params
+struct sound_grain_params
 {
     int dur;
     int starting_idx;
@@ -21,9 +20,9 @@ typedef struct sound_grain_params
     int num_channels;
     int degrade_by;
     bool debug;
-} sound_grain_params;
+};
 
-typedef struct sound_grain
+struct sound_grain
 {
     int grain_len_frames;
     int grain_counter_frames;
@@ -48,8 +47,7 @@ typedef struct sound_grain
     bool debug;
 
     envelope_generator eg;
-
-} sound_grain;
+};
 
 enum
 {
@@ -82,10 +80,18 @@ enum
     LOOPER_EXTERNAL_MODE_NUM,
 };
 
-typedef struct looper
+class looper : public SoundGenerator
 {
-    SoundGenerator sg;
+  public:
+    looper(char *filename);
+    ~looper();
+    stereo_val genNext() override;
+    void status(wchar_t *wstring) override;
+    void start() override;
+    void stop() override;
+    void eventNotify(broadcast_event event) override;
 
+  public:
     bool started;
     bool have_active_buffer;
 
@@ -125,8 +131,6 @@ typedef struct looper
     int grain_attack_time_pct;
     int grain_release_time_pct;
 
-    sequence_engine engine;
-
     envelope_generator m_eg1; // start/stop amp
     envelope_generator m_eg2; // unused so far
 
@@ -153,16 +157,8 @@ typedef struct looper
     int cur_sixteenth; // used to track scramble
 
     bool debug_pending;
+};
 
-} looper;
-
-looper *new_looper(char *filename);
-
-stereo_val looper_gennext(void *self);
-void looper_status(void *self, wchar_t *ss);
-void looper_start(void *self);
-void looper_stop(void *self);
-void looper_event_notify(void *self, broadcast_event event);
 void looper_import_file(looper *g, char *filename);
 void looper_set_external_source(looper *g, int sound_gen_num);
 void looper_set_gate_mode(looper *g, bool b);

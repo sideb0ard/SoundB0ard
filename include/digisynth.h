@@ -5,32 +5,27 @@
 
 #include "SoundGenerator.h"
 #include "digisynth_voice.h"
-#include "sequence_engine.h"
 
-typedef struct digisynth
+class digisynth : public SoundGenerator
 {
-    SoundGenerator sg;
-    sequence_engine engine;
+  public:
+    digisynth(char *filename);
+    ~digisynth() {}
+    stereo_val genNext() override;
+    void status(wchar_t *wstring) override;
+    void start() override;
+    void stop() override;
 
+  public:
     char audiofile[1024];
     digisynth_voice m_voices[MAX_VOICES];
 
     double m_last_note_frequency;
+};
 
-} digisynth;
-
-digisynth *new_digisynth(char *filename);
 void digisynth_load_wav(digisynth *ds, char *filename);
 
 void digisynth_update(digisynth *ds);
-
-// sound generator interface //////////////
-stereo_val digisynth_gennext(void *self);
-void digisynth_status(void *self, wchar_t *status_string);
-void digisynth_stop(digisynth *d);
-void digisynth_sg_start(void *self);
-void digisynth_sg_stop(void *self);
-void digisynth_del_self(void *self);
 
 ////////////////////////////////////
 

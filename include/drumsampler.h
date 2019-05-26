@@ -3,7 +3,6 @@
 #include "SoundGenerator.h"
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
-#include "sequence_engine.h"
 #include "stereodelay.h"
 
 #include <sndfile.h>
@@ -27,11 +26,18 @@ typedef struct sample_pos
     double end_pos_pct;
 } sample_pos;
 
-typedef struct drumsampler
+class drumsampler : public SoundGenerator
 {
-    SoundGenerator sg;
-    sequence_engine engine;
+  public:
+    drumsampler(char *filename);
+    ~drumsampler();
+    void status(wchar_t *status_string);
+    void start();
+    void stop();
+    void noteOn(midi_event *ev);
+    stereo_val genNext();
 
+  public:
     bool glitch_mode;
     int glitch_rand_factor;
 
@@ -56,24 +62,13 @@ typedef struct drumsampler
 
     int swing;
     bool started; // to sync at top of loop
-
-} drumsampler;
-
-drumsampler *new_drumsampler(char *filename);
+};
 
 int get_a_drumsampler_position(drumsampler *ss);
-
-void drumsampler_del_self(void *self);
-void drumsampler_status(void *self, wchar_t *status_string);
-void drumsampler_start(void *self);
-void drumsampler_stop(void *self);
-stereo_val drumsampler_gennext(void *self);
-
 void drumsampler_import_file(drumsampler *s, char *filename);
 void drumsampler_reset_samples(drumsampler *seq);
 void drumsampler_set_pitch(drumsampler *seq, double v);
 void drumsampler_set_cutoff_percent(drumsampler *seq, unsigned int percent);
-void drumsampler_note_on(drumsampler *ds, midi_event *ev);
 void drumsampler_enable_envelope_generator(drumsampler *ds, bool b);
 void drumsampler_set_attack_time(drumsampler *ds, double val);
 void drumsampler_set_decay_time(drumsampler *ds, double val);

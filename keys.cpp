@@ -33,7 +33,7 @@ void keys(int soundgen_num)
     tcsetattr(0, TCSANOW, &new_info);
 
     sequence_engine *engine =
-        get_sequence_engine(mixr->sound_generators[soundgen_num]);
+        get_sequence_engine(mixr->SoundGenerators[soundgen_num]);
 
     int ch = 0;
     int quit = 0;
@@ -84,27 +84,26 @@ void keys(int soundgen_num)
             //       mixr->m_key_controller_mode);
             // break;
             case 91:
-                if (mixr->sound_generators[soundgen_num]->type ==
-                    MINISYNTH_TYPE)
+                if (mixr->SoundGenerators[soundgen_num]->type == MINISYNTH_TYPE)
                 {
                     printf("RANDOM MONDY mode!\n");
                     minisynth *ms =
-                        (minisynth *)mixr->sound_generators[soundgen_num];
+                        (minisynth *)mixr->SoundGenerators[soundgen_num];
                     minisynth_rand_settings(ms);
                 }
-                else if (mixr->sound_generators[soundgen_num]->type ==
+                else if (mixr->SoundGenerators[soundgen_num]->type ==
                          DIGISYNTH_TYPE)
                 {
                     digisynth *ds =
-                        (digisynth *)mixr->sound_generators[soundgen_num];
+                        (digisynth *)mixr->SoundGenerators[soundgen_num];
                     printf("RANDOM MONDY mode NAE DIGI YET!\n");
                     (void)ds;
                 }
-                else if (mixr->sound_generators[soundgen_num]->type ==
+                else if (mixr->SoundGenerators[soundgen_num]->type ==
                          DXSYNTH_TYPE)
                 {
                     dxsynth *dx =
-                        (dxsynth *)mixr->sound_generators[soundgen_num];
+                        (dxsynth *)mixr->SoundGenerators[soundgen_num];
                     printf("RANDOM MONDY DX!\n");
                     dxsynth_rand_settings(dx);
                 }
@@ -116,7 +115,7 @@ void keys(int soundgen_num)
                 int fake_velocity = 128; // TODO real velocity
                 if (midi_num >= 0)
                 {
-                    synth_handle_midi_note(mixr->sound_generators[soundgen_num],
+                    synth_handle_midi_note(mixr->SoundGenerators[soundgen_num],
                                            midi_num, fake_velocity, true);
                 }
                 else

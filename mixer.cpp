@@ -252,33 +252,31 @@ void mixer_status_sgz(mixer *mixr, bool all)
                                 "sound generators" COOL_COLOR_GREEN "]\n");
         for (int i = 0; i < mixr->soundgen_num; i++)
         {
-            if (mixr->sound_generators[i] != NULL)
+            if (mixr->SoundGenerators[i] != NULL)
             {
-                if ((mixr->sound_generators[i]->active &&
-                     mixr->sound_generators[i]->get_volume(
-                         mixr->sound_generators[i]) > 0.0) ||
+                if ((mixr->SoundGenerators[i]->active &&
+                     mixr->SoundGenerators[i]->getVolume() > 0.0) ||
                     all)
                 {
                     wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                    mixr->sound_generators[i]->status(mixr->sound_generators[i],
-                                                      wss);
+                    mixr->SoundGenerators[i]->status(wss);
 
                     // clang-format off
                     wprintf(WCOOL_COLOR_GREEN
                             "[" WANSI_COLOR_WHITE "%s %d"
                             WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET,
-                            s_sg_names[mixr->sound_generators[i]->type], i);
+                            s_sg_names[mixr->SoundGenerators[i]->type], i);
                     wprintf(L"%ls", wss);
                     wprintf(WANSI_COLOR_RESET);
                     // clang-format on
 
-                    if (mixr->sound_generators[i]->effects_num > 0)
+                    if (mixr->SoundGenerators[i]->effects_num > 0)
                     {
                         printf("      ");
                         for (int j = 0;
-                             j < mixr->sound_generators[i]->effects_num; j++)
+                             j < mixr->SoundGenerators[i]->effects_num; j++)
                         {
-                            fx *f = mixr->sound_generators[i]->effects[j];
+                            fx *f = mixr->SoundGenerators[i]->effects[j];
                             if (f->enabled)
                                 printf(COOL_COLOR_YELLOW);
                             else
@@ -336,10 +334,10 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
-        SoundGenerator *sg = mixr->sound_generators[i];
+        SoundGenerator *sg = mixr->SoundGenerators[i];
         if (sg != NULL)
         {
-            sg->event_notify(sg, event);
+            sg->eventNotify(event);
             if (sg->effects_num > 0)
             {
                 for (int j = 0; j < sg->effects_num; j++)
@@ -393,7 +391,7 @@ void vol_change(mixer *mixr, int sg, float vol)
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->sound_generators[sg]->set_volume(mixr->sound_generators[sg], vol);
+    mixr->SoundGenerators[sg]->setVolume(vol);
 }
 
 void pan_change(mixer *mixr, int sg, float val)
@@ -403,16 +401,16 @@ void pan_change(mixer *mixr, int sg, float val)
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->sound_generators[sg]->set_pan(mixr->sound_generators[sg], val);
+    mixr->SoundGenerators[sg]->setPan(val);
 }
 
-int add_sound_generator(mixer *mixr, sound_generator *sg)
+int add_sound_generator(mixer *mixr, SoundGenerator *sg)
 {
     if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)
         return -99;
 
     sg->mixer_idx = mixr->soundgen_num;
-    mixr->sound_generators[mixr->soundgen_num] = sg;
+    mixr->SoundGenerators[mixr->soundgen_num] = sg;
     return mixr->soundgen_num++;
 }
 
@@ -508,20 +506,20 @@ int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len,
 int add_minisynth(mixer *mixr)
 {
     printf("Adding a MINISYNTH!!...\n");
-    minisynth *ms = new_minisynth();
+    minisynth *ms = new minisynth();
     return add_sound_generator(mixr, (SoundGenerator *)ms);
 }
 
 int add_digisynth(mixer *mixr, char *filename)
 {
     printf("Adding a DIGISYNTH!!...\n");
-    digisynth *ds = new_digisynth(filename);
+    digisynth *ds = new digisynth(filename);
     return add_sound_generator(mixr, (SoundGenerator *)ds);
 }
 int add_dxsynth(mixer *mixr)
 {
     printf("Adding a DXSYNTH!!...\n");
-    dxsynth *dx = new_dxsynth();
+    dxsynth *dx = new dxsynth();
     printf("GOT NEW  DXSYNTH!!...\n");
     return add_sound_generator(mixr, (SoundGenerator *)dx);
 }
@@ -529,7 +527,7 @@ int add_dxsynth(mixer *mixr)
 int add_looper(mixer *mixr, char *filename)
 {
     printf("ADDING A GRANNY!\n");
-    looper *g = new_looper(filename);
+    looper *g = new looper(filename);
     printf("GOT A GRAANY\n");
     return add_sound_generator(mixr, (SoundGenerator *)g);
 }
@@ -676,11 +674,10 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
-                if (mixr->sound_generators[i] != NULL)
+                if (mixr->SoundGenerators[i] != NULL)
                 {
                     mixr->soundgen_cur_val[i] =
-                        mixr->sound_generators[i]->gennext(
-                            mixr->sound_generators[i]);
+                        mixr->SoundGenerators[i]->genNext();
                     output_left += mixr->soundgen_cur_val[i].left;
                     output_right += mixr->soundgen_cur_val[i].right;
                 }
@@ -702,7 +699,7 @@ void mixer_play_scene(mixer *mixr, int scene_num)
         if (!mixer_is_soundgen_in_scene(i, s) &&
             mixer_is_valid_soundgen_num(mixr, i))
         {
-            mixr->sound_generators[i]->stop(mixr->sound_generators[i]);
+            mixr->SoundGenerators[i]->stop();
         }
     }
 
@@ -716,11 +713,7 @@ void mixer_play_scene(mixer *mixr, int scene_num)
         int soundgen_track_num = s->soundgen_tracks[i].soundgen_track_num;
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            mixr->sound_generators[soundgen_num]->start(
-                mixr->sound_generators[soundgen_num]);
-            sequence_engine_make_active_pattern(
-                get_sequence_engine(mixr->sound_generators[soundgen_num]),
-                soundgen_track_num);
+            mixr->SoundGenerators[soundgen_num]->start();
         }
         else
         {
@@ -774,13 +767,13 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-        SoundGenerator *sg = mixr->sound_generators[soundgen_num];
+        SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
 
         if (mixr->active_midi_soundgen_num == soundgen_num)
             mixr->active_midi_soundgen_num = -99;
 
-        mixr->sound_generators[soundgen_num] = NULL;
-        sg->self_destruct(sg);
+        mixr->SoundGenerators[soundgen_num] = NULL;
+        delete sg;
     }
     return true;
 }
@@ -788,7 +781,7 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
 {
     if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num &&
-        mixr->sound_generators[soundgen_num] != NULL)
+        mixr->SoundGenerators[soundgen_num] != NULL)
         return true;
     return false;
 }
@@ -805,7 +798,7 @@ bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
-        SoundGenerator *sg = mixr->sound_generators[soundgen_num];
+        SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
         if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
             return true;
     }
@@ -846,8 +839,8 @@ bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
                                        int track_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num) && track_num >= 0 &&
-        track_num < sequence_engine_get_num_patterns(get_sequence_engine(
-                        mixr->sound_generators[soundgen_num])))
+        track_num < sequence_engine_get_num_patterns(
+                        &mixr->SoundGenerators[soundgen_num]->engine))
         return true;
 
     return false;
@@ -951,72 +944,73 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
     return true;
 }
 
-void synth_handle_midi_note(SoundGenerator *sg, int note, int velocity,
-                            bool update_last_midi)
-{
-    sequence_engine *engine = get_sequence_engine(sg);
-    bool is_chord_mode = engine->chord_mode;
-
-    int midi_notes[3] = {note, 0, 0};
-    int midi_notes_len = 1; // default single note
-    if (is_chord_mode)
-    {
-        midi_notes_len = 3;
-        if (mixr->chord_type == MAJOR_CHORD)
-            midi_notes[1] = note + 4;
-        else
-            midi_notes[1] = note + 3;
-        midi_notes[2] = note + 7;
-    }
-
-    for (int i = 0; i < midi_notes_len; i++)
-    {
-        int note = midi_notes[i];
-        printf("Adding NOTE %d\n", note);
-
-        if (sg->type == MINISYNTH_TYPE)
-        {
-            minisynth *ms = (minisynth *)sg;
-            minisynth_midi_note_on(ms, note, velocity);
-        }
-        else if (sg->type == DIGISYNTH_TYPE)
-        {
-            digisynth *ds = (digisynth *)sg;
-            digisynth_midi_note_on(ds, note, velocity);
-        }
-        else if (sg->type == DXSYNTH_TYPE)
-        {
-            dxsynth *dx = (dxsynth *)sg;
-            dxsynth_midi_note_on(dx, note, velocity);
-        }
-
-        int sustain_time_in_ticks =
-            engine->sustain_note_ms * mixr->timing_info.ms_per_midi_tick;
-        int note_off_tick =
-            (mixr->timing_info.midi_tick + sustain_time_in_ticks) % PPBAR;
-
-        midi_event off_event = new_midi_event(128, note, velocity);
-        ////////////////////////
-
-        if (engine->recording)
-        {
-            printf("Recording note!\n");
-            int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
-            midi_event on_event = new_midi_event(144, note, velocity);
-
-            sequence_engine_add_event(engine, engine->cur_pattern,
-                                      note_off_tick, off_event);
-            sequence_engine_add_event(engine, engine->cur_pattern, note_on_tick,
-                                      on_event);
-        }
-        else
-        {
-            off_event.delete_after_use = true; // _THIS_ is the magic
-            sequence_engine_add_event(engine, engine->cur_pattern,
-                                      note_off_tick, off_event);
-        }
-    }
-}
+// void synth_handle_midi_note(SoundGenerator *sg, int note, int velocity,
+//                            bool update_last_midi)
+//{
+//    sequence_engine *engine = get_sequence_engine(sg);
+//    bool is_chord_mode = engine->chord_mode;
+//
+//    int midi_notes[3] = {note, 0, 0};
+//    int midi_notes_len = 1; // default single note
+//    if (is_chord_mode)
+//    {
+//        midi_notes_len = 3;
+//        if (mixr->chord_type == MAJOR_CHORD)
+//            midi_notes[1] = note + 4;
+//        else
+//            midi_notes[1] = note + 3;
+//        midi_notes[2] = note + 7;
+//    }
+//
+//    for (int i = 0; i < midi_notes_len; i++)
+//    {
+//        int note = midi_notes[i];
+//        printf("Adding NOTE %d\n", note);
+//
+//        if (sg->type == MINISYNTH_TYPE)
+//        {
+//            minisynth *ms = (minisynth *)sg;
+//            minisynth_midi_note_on(ms, note, velocity);
+//        }
+//        else if (sg->type == DIGISYNTH_TYPE)
+//        {
+//            digisynth *ds = (digisynth *)sg;
+//            digisynth_midi_note_on(ds, note, velocity);
+//        }
+//        else if (sg->type == DXSYNTH_TYPE)
+//        {
+//            dxsynth *dx = (dxsynth *)sg;
+//            dxsynth_midi_note_on(dx, note, velocity);
+//        }
+//
+//        int sustain_time_in_ticks =
+//            engine->sustain_note_ms * mixr->timing_info.ms_per_midi_tick;
+//        int note_off_tick =
+//            (mixr->timing_info.midi_tick + sustain_time_in_ticks) % PPBAR;
+//
+//        midi_event off_event = new_midi_event(128, note, velocity);
+//        ////////////////////////
+//
+//        if (engine->recording)
+//        {
+//            printf("Recording note!\n");
+//            int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
+//            midi_event on_event = new_midi_event(144, note, velocity);
+//
+//            sequence_engine_add_event(engine, engine->cur_pattern,
+//                                      note_off_tick, off_event);
+//            sequence_engine_add_event(engine, engine->cur_pattern,
+//            note_on_tick,
+//                                      on_event);
+//        }
+//        else
+//        {
+//            off_event.delete_after_use = true; // _THIS_ is the magic
+//            sequence_engine_add_event(engine, engine->cur_pattern,
+//                                      note_off_tick, off_event);
+//        }
+//    }
+//}
 
 void mixer_set_notes(mixer *mixr)
 {
@@ -1237,17 +1231,15 @@ void mixer_check_for_midi_messages(mixer *mixr)
             {
 
                 SoundGenerator *sg =
-                    mixr->sound_generators[mixr->active_midi_soundgen_num];
-
-                sequence_engine *engine = get_sequence_engine(sg);
+                    mixr->SoundGenerators[mixr->active_midi_soundgen_num];
 
                 midi_event ev = new_midi_event(status, data1, data2);
 
-                if (engine->recording)
+                if (sg->engine.recording)
                 {
                     int tick = mixr->timing_info.midi_tick % PPBAR;
-                    sequence_engine_add_event(engine, engine->cur_pattern, tick,
-                                              ev);
+                    sequence_engine_add_event(&sg->engine,
+                                              sg->engine.cur_pattern, tick, ev);
                 }
 
                 ev.source = EXTERNAL_DEVICE;
@@ -1268,45 +1260,6 @@ void mixer_set_midi_bank(mixer *mixr, int num)
 {
     if (num >= 0 && num < 4)
         mixr->midi_bank_num = num;
-}
-
-sequence_engine *get_sequence_engine(SoundGenerator *self)
-{
-    if (self->type == MINISYNTH_TYPE)
-    {
-        minisynth *ms = (minisynth *)self;
-        return &ms->engine;
-    }
-    else if (self->type == DIGISYNTH_TYPE)
-    {
-        digisynth *ds = (digisynth *)self;
-        return &ds->engine;
-    }
-    else if (self->type == DXSYNTH_TYPE)
-    {
-        dxsynth *dx = (dxsynth *)self;
-        return &dx->engine;
-    }
-    else if (self->type == DRUMSYNTH_TYPE)
-    {
-        drumsynth *ds = (drumsynth *)self;
-        return &ds->engine;
-    }
-    else if (self->type == DRUMSAMPLER_TYPE)
-    {
-        drumsampler *ds = (drumsampler *)self;
-        return &ds->engine;
-    }
-    else if (self->type == LOOPER_TYPE)
-    {
-        looper *lp = (looper *)self;
-        return &lp->engine;
-    }
-    else
-    {
-        printf("Error! Don't know what type of SYNTH this is\n");
-        return NULL;
-    }
 }
 
 void mixer_set_should_progress_chords(mixer *mixr, bool b)

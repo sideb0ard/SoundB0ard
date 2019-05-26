@@ -27,7 +27,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_bitcrush_soundgen(mixr->sound_generators[soundgen_num]);
+            add_bitcrush_soundgen(mixr->SoundGenerators[soundgen_num]);
         }
         return true;
     }
@@ -39,9 +39,9 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             mixer_is_valid_soundgen_num(mixr, src_soundgen_num))
         {
             int fxnum = add_compressor_soundgen(
-                mixr->sound_generators[dest_soundgen_num]);
+                mixr->SoundGenerators[dest_soundgen_num]);
             dynamics_processor *dp =
-                (dynamics_processor *)mixr->sound_generators[dest_soundgen_num]
+                (dynamics_processor *)mixr->SoundGenerators[dest_soundgen_num]
                     ->effects[fxnum];
             dynamics_processor_set_external_source(dp, src_soundgen_num);
             dynamics_processor_set_default_sidechain_params(dp);
@@ -53,7 +53,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_compressor_soundgen(mixr->sound_generators[soundgen_num]);
+            add_compressor_soundgen(mixr->SoundGenerators[soundgen_num]);
         }
         return true;
     }
@@ -63,7 +63,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
             int delay_len_ms = atoi(wurds[2]);
-            add_delay_soundgen(mixr->sound_generators[soundgen_num],
+            add_delay_soundgen(mixr->SoundGenerators[soundgen_num],
                                delay_len_ms);
         }
         return true;
@@ -78,8 +78,8 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
             int f_num =
-                add_basicfilter_soundgen(mixr->sound_generators[soundgen_num]);
-            SoundGenerator *sg = mixr->sound_generators[soundgen_num];
+                add_basicfilter_soundgen(mixr->SoundGenerators[soundgen_num]);
+            SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
             filterpass *fp = (filterpass *)sg->effects[f_num];
             if (freq != 0)
                 filter_set_fc_control(&fp->m_filter.f, freq);
@@ -95,7 +95,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_follower_soundgen(mixr->sound_generators[soundgen_num]);
+            add_follower_soundgen(mixr->SoundGenerators[soundgen_num]);
         }
         return true;
     }
@@ -104,7 +104,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_moddelay_soundgen(mixr->sound_generators[soundgen_num]);
+            add_moddelay_soundgen(mixr->SoundGenerators[soundgen_num]);
         }
         return true;
     }
@@ -113,7 +113,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_modfilter_soundgen(mixr->sound_generators[soundgen_num]);
+            add_modfilter_soundgen(mixr->SoundGenerators[soundgen_num]);
         }
         return true;
     }
@@ -122,7 +122,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_reverb_soundgen(mixr->sound_generators[soundgen_num]);
+            add_reverb_soundgen(mixr->SoundGenerators[soundgen_num]);
         }
         return true;
     }
@@ -134,8 +134,8 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
             int fxnum =
-                add_waveshape_soundgen(mixr->sound_generators[soundgen_num]);
-            waveshaper *w = (waveshaper *)mixr->sound_generators[soundgen_num]
+                add_waveshape_soundgen(mixr->SoundGenerators[soundgen_num]);
+            waveshaper *w = (waveshaper *)mixr->SoundGenerators[soundgen_num]
                                 ->effects[fxnum];
             if (val != 0)
                 waveshaper_set_stages(w, val);
@@ -147,7 +147,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         int soundgen_num = atoi(wurds[1]);
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
-            add_distortion_soundgen(mixr->sound_generators[soundgen_num]);
+            add_distortion_soundgen(mixr->SoundGenerators[soundgen_num]);
         }
         return true;
     }
@@ -158,9 +158,9 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
             int fxnum =
-                add_envelope_soundgen(mixr->sound_generators[soundgen_num]);
-            envelope *e = (envelope *)mixr->sound_generators[soundgen_num]
-                              ->effects[fxnum];
+                add_envelope_soundgen(mixr->SoundGenerators[soundgen_num]);
+            envelope *e =
+                (envelope *)mixr->SoundGenerators[soundgen_num]->effects[fxnum];
             if (bars == 0)
                 bars = 1;
 
@@ -175,8 +175,8 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             int nbeats = atoi(wurds[2]);
             int sixteenth = atoi(wurds[3]);
-            add_beatrepeat_soundgen(mixr->sound_generators[soundgen_num],
-                                    nbeats, sixteenth);
+            add_beatrepeat_soundgen(mixr->SoundGenerators[soundgen_num], nbeats,
+                                    sixteenth);
         }
         return true;
     }
@@ -188,7 +188,7 @@ bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &soundgen_num, &fx_num);
         if (is_valid_fx_num(soundgen_num, fx_num))
         {
-            fx *f = mixr->sound_generators[soundgen_num]->effects[fx_num];
+            fx *f = mixr->SoundGenerators[soundgen_num]->effects[fx_num];
 
             if (strncmp("on", wurds[2], 2) == 0)
                 f->enabled = true;
@@ -493,9 +493,9 @@ bool is_valid_fx_num(int soundgen_num, int fx_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
-        if (mixr->sound_generators[soundgen_num]->effects_num > 0 &&
+        if (mixr->SoundGenerators[soundgen_num]->effects_num > 0 &&
             fx_num >= 0 &&
-            fx_num < mixr->sound_generators[soundgen_num]->effects_num)
+            fx_num < mixr->SoundGenerators[soundgen_num]->effects_num)
         {
             return true;
         }

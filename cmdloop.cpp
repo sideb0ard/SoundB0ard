@@ -246,7 +246,7 @@ int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
     _event.source = EXTERNAL_OSC;
     if (mixer_is_valid_soundgen_num(mixr, target_sg))
     {
-        sound_generator *sg = mixr->sound_generators[target_sg];
+        SoundGenerator *sg = mixr->SoundGenerators[target_sg];
         midi_parse_midi_event(sg, &_event);
     }
 
@@ -261,11 +261,12 @@ int osc_note_on_handler(const char *path, const char *types, lo_arg **argv,
     int octave = argv[2]->i;
     int velocity = argv[3]->i;
 
-    midi_event _event = new_midi_event(MIDI_ON, (octave * 12) + midi_note, velocity);
+    midi_event _event =
+        new_midi_event(MIDI_ON, (octave * 12) + midi_note, velocity);
     _event.source = EXTERNAL_OSC;
     if (mixer_is_valid_soundgen_num(mixr, target_sg))
     {
-        sound_generator *sg = mixr->sound_generators[target_sg];
+        SoundGenerator *sg = mixr->SoundGenerators[target_sg];
         midi_parse_midi_event(sg, &_event);
     }
     return 0;

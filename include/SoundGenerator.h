@@ -7,14 +7,27 @@
 #include "envelope.h"
 #include "fx.h"
 
+#include "SequenceEngine.h"
+
 class SoundGenerator
 {
   public:
+    SoundGenerator();
+    virtual ~SoundGenerator() = default;
+
     virtual stereo_val genNext() = 0;
     virtual void status(wchar_t *wstring) = 0;
-    // stereo_val (*gennext)(void *self);
-    // void (*status)(void *self, wchar_t *wstring);
-    // void (*self_destruct)(void *self);
+
+    virtual void start();
+    virtual void stop();
+
+    virtual void noteOn(midi_event *ev){};
+    virtual void noteOff(midi_event *ev){};
+    virtual void allNotesOff(){};
+
+    virtual void eventNotify(broadcast_event event);
+
+    void parseMidiEvent(midi_event *ev);
 
     void setVolume(double val);
     double getVolume();
@@ -22,12 +35,11 @@ class SoundGenerator
     void setPan(double val);
     double getPan();
 
-    virtual void start() = 0;
-    virtual void stop() = 0;
-
-    virtual void eventNotify(broadcast_event event) = 0;
-
+  public:
     sound_generator_type type;
+
+    SequenceEngine engine;
+
     int mixer_idx;
     //  int num_patterns;
     bool active;

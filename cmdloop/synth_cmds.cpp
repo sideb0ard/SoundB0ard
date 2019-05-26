@@ -37,36 +37,36 @@ bool parse_synth_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &soundgen_num, &target_pattern_num);
 
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-            is_synth(mixr->sound_generators[soundgen_num]))
+            is_synth(mixr->SoundGenerators[soundgen_num]))
         {
             if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num,
                                           &wurds[2], num_wurds - 2))
             {
                 // no-op, we good
             }
-            else if (mixr->sound_generators[soundgen_num]->type == DXSYNTH_TYPE)
+            else if (mixr->SoundGenerators[soundgen_num]->type == DXSYNTH_TYPE)
             {
-                dxsynth *dx = (dxsynth *)mixr->sound_generators[soundgen_num];
+                dxsynth *dx = (dxsynth *)mixr->SoundGenerators[soundgen_num];
                 if (parse_dxsynth_settings_change(dx, wurds))
                 {
                     dxsynth_update(dx);
                 }
             }
-            else if (mixr->sound_generators[soundgen_num]->type ==
+            else if (mixr->SoundGenerators[soundgen_num]->type ==
                      MINISYNTH_TYPE)
             {
                 minisynth *ms =
-                    (minisynth *)mixr->sound_generators[soundgen_num];
+                    (minisynth *)mixr->SoundGenerators[soundgen_num];
                 if (parse_minisynth_settings_change(ms, wurds))
                 {
                     minisynth_update(ms);
                 }
             }
-            else if (mixr->sound_generators[soundgen_num]->type ==
+            else if (mixr->SoundGenerators[soundgen_num]->type ==
                      DIGISYNTH_TYPE)
             {
                 digisynth *ds =
-                    (digisynth *)mixr->sound_generators[soundgen_num];
+                    (digisynth *)mixr->SoundGenerators[soundgen_num];
                 if (parse_digisynth_settings_change(ds, wurds))
                 {
                     digisynth_update(ds);

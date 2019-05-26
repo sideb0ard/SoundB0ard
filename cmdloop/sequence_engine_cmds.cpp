@@ -13,7 +13,7 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                                char wurds[][SIZE_OF_WURD], int num_wurds)
 {
     sequence_engine *engine =
-        get_sequence_engine(mixr->sound_generators[soundgen_num]);
+        get_sequence_engine(mixr->SoundGenerators[soundgen_num]);
 
     bool cmd_found = true;
     // sequence_engine specific first, then patterns below
@@ -254,10 +254,10 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
                 printf("CP'ing %d:%d to %d:%d\n", soundgen_num, pattern_num,
                        sg2, pattern_num2);
                 if (mixer_is_valid_soundgen_num(mixr, sg2) &&
-                    is_synth(mixr->sound_generators[sg2]))
+                    is_synth(mixr->SoundGenerators[sg2]))
                 {
                     sequence_engine *sb2 =
-                        get_sequence_engine(mixr->sound_generators[sg2]);
+                        get_sequence_engine(mixr->SoundGenerators[sg2]);
 
                     if (sequence_engine_is_valid_pattern(engine, pattern_num) &&
                         sequence_engine_is_valid_pattern(sb2, pattern_num2))
@@ -303,7 +303,7 @@ bool parse_sequence_engine_cmd(int soundgen_num, int pattern_num,
             }
             else
             {
-                SoundGenerator *sg = mixr->sound_generators[soundgen_num];
+                SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
                 check_and_set_pattern(sg, pattern_num, NOTE_PATTERN, &wurds[0],
                                       num_wurds);
             }

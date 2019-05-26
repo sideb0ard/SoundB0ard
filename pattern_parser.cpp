@@ -40,15 +40,15 @@ typedef struct division_marker
     int value;
 } division_marker;
 
-static char *token_type_names[] = {"SQUARE_LEFT",
-                                   "SQUARE_RIGHT",
-                                   "CURLY_LEFT",
-                                   "CURLY_RIGHT",
-                                   "ANGLE_BRACKET_LEFT",
-                                   "ANGLE_BRACKET_RIGHT",
-                                   "ANGLE_EXPRESSION",
-                                   "BLANK",
-                                   "VAR_NAME"};
+static char *token_type_names[] = {(char *)"SQUARE_LEFT",
+                                   (char *)"SQUARE_RIGHT",
+                                   (char *)"CURLY_LEFT",
+                                   (char *)"CURLY_RIGHT",
+                                   (char *)"ANGLE_BRACKET_LEFT",
+                                   (char *)"ANGLE_BRACKET_RIGHT",
+                                   (char *)"ANGLE_EXPRESSION",
+                                   (char *)"BLANK",
+                                   (char *)"VAR_NAME"};
 
 // static void print_pattern(midi_event *pattern)
 //{
@@ -91,13 +91,15 @@ bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
 
     bool return_val = true;
 
-    pattern_group *pgroups = (pattern_group*) calloc(MAX_PATTERN, sizeof(pattern_group));
+    pattern_group *pgroups =
+        (pattern_group *)calloc(MAX_PATTERN, sizeof(pattern_group));
     int current_pattern_group = 0;
     int num_pattern_groups = 0;
 
     // var_tokens are the content tokens, where something should happen
     // as opposed to the tokens to be be expanded, like brackets
-    pattern_token *var_tokens = (pattern_token*) calloc(MAX_TOKENS, sizeof(pattern_token));
+    pattern_token *var_tokens =
+        (pattern_token *)calloc(MAX_TOKENS, sizeof(pattern_token));
     int var_tokens_idx = 0;
 
     for (int i = 0; i < num_tokens; i++)
@@ -696,7 +698,8 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
     }
 }
 
-static char *s_ptypes[] = {"MIDI", "NOTE", "BEAT", "STEP"};
+static char *s_ptypes[] = {(char *)"MIDI", (char *)"NOTE", (char *)"BEAT",
+                           (char *)"STEP"};
 bool parse_pattern(char *line, midi_event *target_pattern,
                    unsigned int pattern_type)
 {
@@ -709,10 +712,12 @@ bool parse_pattern(char *line, midi_event *target_pattern,
     bool return_val = true;
 
     int token_idx = 0;
-    pattern_token *tokens = (pattern_token*) calloc(MAX_PATTERN, sizeof(pattern_token));
+    pattern_token *tokens =
+        (pattern_token *)calloc(MAX_PATTERN, sizeof(pattern_token));
 
     int expanded_tokens_idx = 0;
-    pattern_token *expanded_tokens = (pattern_token*) calloc(MAX_PATTERN, sizeof(pattern_token));
+    pattern_token *expanded_tokens =
+        (pattern_token *)calloc(MAX_PATTERN, sizeof(pattern_token));
 
     int err = 0;
     if ((err = extract_tokens_from_line(tokens, &token_idx, line)))
@@ -735,7 +740,7 @@ tidy_up_and_return:
     return true;
 }
 
-void check_and_set_pattern(sound_generator *sg, int target_pattern_num,
+void check_and_set_pattern(SoundGenerator *sg, int target_pattern_num,
                            unsigned int pattern_type,
                            char wurds[][SIZE_OF_WURD], int num_wurds)
 {

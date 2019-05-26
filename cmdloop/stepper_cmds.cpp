@@ -29,26 +29,26 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         sscanf(wurds[1], "%d:%d", &soundgen_num, &target_pattern_num);
 
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num) &&
-            is_stepper(mixr->sound_generators[soundgen_num]))
+            is_stepper(mixr->SoundGenerators[soundgen_num]))
         {
             if (parse_sequence_engine_cmd(soundgen_num, target_pattern_num,
                                           &wurds[2], num_wurds - 2))
             {
                 // no-op, we good
             }
-            else if (mixr->sound_generators[soundgen_num]->type ==
+            else if (mixr->SoundGenerators[soundgen_num]->type ==
                      DRUMSAMPLER_TYPE)
             {
                 drumsampler *ds =
-                    (drumsampler *)mixr->sound_generators[soundgen_num];
+                    (drumsampler *)mixr->SoundGenerators[soundgen_num];
 
                 parse_drumsampler_cmd(ds, &wurds[2], num_wurds - 2);
             }
-            else if (mixr->sound_generators[soundgen_num]->type ==
+            else if (mixr->SoundGenerators[soundgen_num]->type ==
                      DRUMSYNTH_TYPE)
             {
                 drumsynth *ds =
-                    (drumsynth *)mixr->sound_generators[soundgen_num];
+                    (drumsynth *)mixr->SoundGenerators[soundgen_num];
                 parse_drumsynth_cmd(ds, &wurds[2], num_wurds - 2);
             }
         }

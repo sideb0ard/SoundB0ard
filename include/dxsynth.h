@@ -10,7 +10,6 @@
 #include "oscillator.h"
 
 #include "dxsynth_voice.h"
-#include "sequence_engine.h"
 
 #define MAX_DX_VOICES 16
 
@@ -95,11 +94,17 @@ typedef struct dxsynthsettings
 
 } dxsynthsettings;
 
-typedef struct dxsynth
+class dxsynth : public SoundGenerator
 {
-    SoundGenerator sg;
-    sequence_engine engine;
+  public:
+    dxsynth();
+    ~dxsynth();
+    stereo_val genNext() override;
+    void status(wchar_t *wstring) override;
+    void start() override;
+    void stop() override;
 
+  public:
     dxsynth_voice *m_voices[MAX_DX_VOICES];
 
     // global modmatrix, core is shared by all voices
@@ -112,20 +117,9 @@ typedef struct dxsynth
     int active_midi_osc; // for midi controller routing
 
     double m_last_note_frequency;
+};
 
-} dxsynth;
-
-dxsynth *new_dxsynth(void);
 void dxsynth_reset(dxsynth *dx);
-void dxsynth_del_self(void *self);
-
-// sound generator interface //////////////
-stereo_val dxsynth_gennext(void *self);
-void dxsynth_status(void *self, wchar_t *status_string);
-void dxsynth_sg_start(void *self);
-void dxsynth_sg_stop(void *self);
-
-////////////////////////////////////
 
 bool dxsynth_prepare_for_play(dxsynth *synth);
 void dxsynth_stop(dxsynth *ms);

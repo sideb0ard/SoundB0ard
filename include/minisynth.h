@@ -13,7 +13,6 @@
 #include "oscillator.h"
 
 #include "minisynth_voice.h"
-#include "sequence_engine.h"
 
 static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
 
@@ -167,9 +166,15 @@ typedef struct synthsettings
     unsigned m_generate_src;
 } synthsettings;
 
-struct minisynth : public SoundGenerator
+class minisynth : public SoundGenerator
 {
-    sequence_engine engine;
+  public:
+    minisynth();
+    ~minisynth();
+    stereo_val genNext() override;
+    void status(wchar_t *status_string) override;
+    void start() override;
+    void stop() override;
 
     minisynth_voice *m_voices[MAX_VOICES];
 
@@ -184,16 +189,7 @@ struct minisynth : public SoundGenerator
     synthsettings m_settings_backup_while_getting_crazy;
 };
 
-minisynth *new_minisynth(void);
 void minisynth_load_defaults(minisynth *ms);
-
-// sound generator interface //////////////
-stereo_val minisynth_gennext(void *self);
-void minisynth_status(void *self, wchar_t *status_string);
-void minisynth_sg_start(void *self);
-void minisynth_sg_stop(void *self);
-
-////////////////////////////////////
 
 bool minisynth_prepare_for_play(minisynth *synth);
 void minisynth_stop(minisynth *ms);
@@ -242,7 +238,6 @@ void minisynth_set_generate(minisynth *ms, bool b);
 void minisynth_set_generate_src(minisynth *ms, int src);
 
 void minisynth_set_filter_mod(minisynth *ms, double mod);
-void minisynth_del_self(void *self);
 
 void minisynth_print(minisynth *ms);
 void minisynth_set_detune(minisynth *ms, double val);

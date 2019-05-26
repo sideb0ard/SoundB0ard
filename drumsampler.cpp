@@ -11,29 +11,138 @@
 #include "mixer.h"
 #include "utils.h"
 
+#include <iostream>
+
 extern wchar_t *sparkchars;
 extern mixer *mixr;
 
 drumsampler::drumsampler(char *filename)
 {
-    drumsampler_import_file(ds, filename);
+    drumsampler_import_file(this, filename);
 
     envelope_enabled = false;
     glitch_mode = false;
     glitch_rand_factor = 20;
 
-    ds->type = DRUMSAMPLER_TYPE;
+    type = DRUMSAMPLER_TYPE;
 
     envelope_generator_init(&eg);
-    sequence_engine_init(&ds->engine, (void *)ds, DRUMSAMPLER_TYPE);
-    sound_generator_init(&ds->sg);
-    ds->eg.m_sustain_level = 0;
+    eg.m_sustain_level = 0;
 
-    ds->sg.active = true;
-    ds->started = false;
-
-    return ds;
+    active = true;
+    started = false;
 }
+
+drumsampler::~drumsampler()
+{
+    printf("Deleting sample buffer\n");
+    free(buffer);
+}
+
+stereo_val drumsampler::genNext()
+{
+    double left_val = 0;
+    double right_val = 0;
+
+    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
+    {
+        if (samples_now_playing[i] != -1)
+        {
+            int cur_sample_midi_tick = samples_now_playing[i];
+            int velocity = velocity_now_playing[i];
+            double amp = scaleybum(0, 127, 0, 1, velocity);
+            int idx =
+                sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos;
+            left_val += buffer[idx] * amp;
+
+            if (channels == 2)
+                right_val += buffer[idx + 1] * amp;
+            else
+                right_val = left_val;
+
+            if (glitch_mode)
+            {
+                if (sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos >
+                        (bufsize / 2) &&
+                    rand() % 100 > glitch_rand_factor)
+                {
+                    continue;
+                }
+            }
+
+            sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
+                sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos +
+                (channels * (buffer_pitch));
+
+            if ((int)sample_positions[cur_sample_midi_tick]
+                    .audiobuffer_cur_pos >= buf_end_pos)
+            { // end of playback - so reset
+                samples_now_playing[i] = -1;
+                sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos = 0;
+            }
+        }
+    }
+
+    double amp_env = eg_do_envelope(&eg, NULL);
+    if (eg.m_state == SUSTAIN)
+        eg_note_off(&eg);
+
+    double amp = volume;
+    if (envelope_enabled)
+        amp *= amp_env;
+
+    pan = fmin(pan, 1.0);
+    pan = fmax(pan, -1.0);
+    double pan_left = 0.707;
+    double pan_right = 0.707;
+    calculate_pan_values(pan, &pan_left, &pan_right);
+
+    std::cout << "L:" << left_val << " R:" << right_val << std::endl;
+    stereo_val out = {.left = left_val * amp * pan_left,
+                      .right = right_val * amp * pan_right};
+    out = effector(this, out);
+    return out;
+}
+
+void drumsampler::status(wchar_t *status_string)
+{
+    char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
+    if (active)
+    {
+        INSTRUMENT_COLOR = (char *)ANSI_COLOR_BLUE;
+    }
+
+    wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
+    swprintf(local_status_string, MAX_STATIC_STRING_SZ,
+             WANSI_COLOR_WHITE
+             "%s %s vol:%.2lf pan:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
+             "eg:%d attack_ms:%.0f decay_ms:%.0f sustain:%.2f "
+             "release_ms:%.0f glitch:%d gpct:%d\n"
+             "multi:%d num_patterns:%d",
+             filename, INSTRUMENT_COLOR, volume, pan, buffer_pitch,
+             engine.allow_triplets, buf_end_pos, envelope_enabled,
+             eg.m_attack_time_msec, eg.m_decay_time_msec, eg.m_sustain_level,
+             eg.m_release_time_msec, glitch_mode, glitch_rand_factor,
+             engine.multi_pattern_mode, engine.num_patterns);
+
+    wcscat(status_string, local_status_string);
+
+    wmemset(local_status_string, 0, MAX_STATIC_STRING_SZ);
+    sequence_engine_status(&engine, local_status_string);
+    wcscat(status_string, local_status_string);
+    wcscat(status_string, WANSI_COLOR_RESET);
+}
+
+void drumsampler::start()
+{
+    if (active)
+        return; // no-op
+    drumsampler_reset_samples(this);
+    active = true;
+    engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
+}
+
+void drumsampler::stop() { active = false; }
 
 void drumsampler_import_file(drumsampler *ds, char *filename)
 {
@@ -77,144 +186,12 @@ void drumsampler_note_on(drumsampler *ds, midi_event *ev)
     eg_start_eg(&ds->eg);
 }
 
-stereo_val drumsampler_gennext(void *self)
-{
-    drumsampler *ds = (drumsampler *)self;
-    double left_val = 0;
-    double right_val = 0;
-
-    for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
-    {
-        if (ds->samples_now_playing[i] != -1)
-        {
-            int cur_sample_midi_tick = ds->samples_now_playing[i];
-            int velocity = ds->velocity_now_playing[i];
-            double amp = scaleybum(0, 127, 0, 1, velocity);
-            int idx =
-                ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos;
-            left_val += ds->buffer[idx] * amp;
-
-            if (ds->channels == 2)
-                right_val += ds->buffer[idx + 1] * amp;
-            else
-                right_val = left_val;
-
-            if (ds->glitch_mode)
-            {
-                if (ds->sample_positions[cur_sample_midi_tick]
-                            .audiobuffer_cur_pos > (ds->bufsize / 2) &&
-                    rand() % 100 > ds->glitch_rand_factor)
-                {
-                    continue;
-                }
-            }
-
-            ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
-                ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos +
-                (ds->channels * (ds->buffer_pitch));
-
-            if ((int)ds->sample_positions[cur_sample_midi_tick]
-                    .audiobuffer_cur_pos >= ds->buf_end_pos)
-            { // end of playback - so reset
-                ds->samples_now_playing[i] = -1;
-                ds->sample_positions[cur_sample_midi_tick].audiobuffer_cur_pos =
-                    0;
-            }
-        }
-    }
-
-    double amp_env = eg_do_envelope(&ds->eg, NULL);
-    if (ds->eg.m_state == SUSTAIN)
-        eg_note_off(&ds->eg);
-
-    double volume = ds->sg.volume;
-    if (ds->envelope_enabled)
-        volume *= amp_env;
-
-    ds->sg.pan = fmin(ds->sg.pan, 1.0);
-    ds->sg.pan = fmax(ds->sg.pan, -1.0);
-    double pan_left = 0.707;
-    double pan_right = 0.707;
-    calculate_pan_values(ds->sg.pan, &pan_left, &pan_right);
-
-    stereo_val out = {.left = left_val * volume * pan_left,
-                      .right = right_val * volume * pan_right};
-    out = effector(&ds->sg, out);
-    return out;
-}
-
-// drumsampler *new_drumsampler_from_char_pattern(char *filename, char *pattern)
-//{
-//    drumsampler *ds = new_drumsampler(filename);
-//    pattern_char_to_pattern(&ds->m_seq, pattern,
-//                            ds->m_seq.patterns[ds->m_seq.num_patterns++]);
-//    return ds;
-//}
-
-void drumsampler_status(void *self, wchar_t *status_string)
-{
-    drumsampler *ds = (drumsampler *)self;
-
-    char *INSTRUMENT_COLOR = ANSI_COLOR_RESET;
-    if (ds->sg.active)
-    {
-        INSTRUMENT_COLOR = ANSI_COLOR_BLUE;
-    }
-
-    wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
-    swprintf(local_status_string, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE
-             "%s %s vol:%.2lf pan:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
-             "eg:%d attack_ms:%.0f decay_ms:%.0f sustain:%.2f "
-             "release_ms:%.0f glitch:%d gpct:%d\n"
-             "multi:%d num_patterns:%d",
-             ds->filename, INSTRUMENT_COLOR, ds->sg.volume, ds->sg.pan,
-             ds->buffer_pitch, ds->engine.allow_triplets, ds->buf_end_pos,
-             ds->envelope_enabled, ds->eg.m_attack_time_msec,
-             ds->eg.m_decay_time_msec, ds->eg.m_sustain_level,
-             ds->eg.m_release_time_msec, ds->glitch_mode,
-             ds->glitch_rand_factor, ds->engine.multi_pattern_mode,
-             ds->engine.num_patterns);
-
-    wcscat(status_string, local_status_string);
-
-    wmemset(local_status_string, 0, MAX_STATIC_STRING_SZ);
-    sequence_engine_status(&ds->engine, local_status_string);
-    wcscat(status_string, local_status_string);
-    wcscat(status_string, WANSI_COLOR_RESET);
-}
-
-void drumsampler_del_self(void *self)
-{
-    drumsampler *s = (drumsampler *)self;
-    printf("Deleting sample buffer\n");
-    free(s->buffer);
-    printf("Deleting drumsamplerUENCER SELF- bye!\n");
-    free(s);
-}
-
 int get_a_drumsampler_position(drumsampler *ss)
 {
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
         if (ss->samples_now_playing[i] == -1)
             return i;
     return -1;
-}
-
-void drumsampler_start(void *self)
-{
-    drumsampler *s = (drumsampler *)self;
-    if (s->sg.active)
-        return; // no-op
-    drumsampler_reset_samples(s);
-    s->sg.active = true;
-    s->engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
-}
-
-void drumsampler_stop(void *self)
-{
-    drumsampler *ds = (drumsampler *)self;
-    ds->sg.active = false;
 }
 
 void drumsampler_set_pitch(drumsampler *ds, double v)
