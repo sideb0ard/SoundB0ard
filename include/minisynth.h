@@ -175,6 +175,12 @@ class minisynth : public SoundGenerator
     void status(wchar_t *status_string) override;
     void start() override;
     void stop() override;
+    void noteOn(midi_event ev) override;
+    void noteOff(midi_event ev) override;
+    void control(midi_event ev) override;
+    void pitchBend(midi_event ev) override;
+    void randomize() override;
+    void allNotesOff() override;
 
     minisynth_voice *m_voices[MAX_VOICES];
 
@@ -203,17 +209,7 @@ minisynth_voice *minisynth_get_oldest_voice(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *synth,
                                                       unsigned int midi_note);
 
-bool minisynth_midi_note_on(minisynth *self, unsigned int midinote,
-                            unsigned int velocity);
-bool minisynth_midi_note_off(minisynth *self, unsigned int midinote,
-                             unsigned int velocity, bool all_notes_off);
-void minisynth_midi_mod_wheel(minisynth *self, unsigned int data1,
-                              unsigned int data2);
-void minisynth_midi_pitchbend(minisynth *self, unsigned int data1,
-                              unsigned int data2);
 void minisynth_reset_voices(minisynth *self);
-
-void minisynth_rand_settings(minisynth *ms);
 
 void minisynth_print_settings(minisynth *ms);
 void minisynth_print_patterns(minisynth *ms);

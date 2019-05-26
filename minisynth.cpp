@@ -308,7 +308,7 @@ void minisynth::start()
 void minisynth::stop()
 {
     active = false;
-    minisynth_midi_note_off(this, 0, 0, true);
+    allNotesOff();
 }
 
 void minisynth_load_defaults(minisynth *ms)
@@ -439,6 +439,159 @@ void minisynth_load_defaults(minisynth *ms)
 
     ms->m_settings.m_generate_active = false;
     ms->m_settings.m_generate_src = -99;
+}
+
+void minisynth::control(midi_event ev)
+{
+    double scaley_val = 0;
+    switch (ev.data1)
+    {
+    case (1):
+        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, ev.data2);
+        m_settings.m_eg1_attack_time_msec = scaley_val;
+        break;
+    case (2):
+        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, ev.data2);
+        m_settings.m_eg1_decay_time_msec = scaley_val;
+        break;
+    case (3):
+        scaley_val = scaleybum(0, 127, 0, 1, ev.data2);
+        m_settings.m_eg1_sustain_level = scaley_val;
+        break;
+    case (4):
+        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, ev.data2);
+        m_settings.m_eg1_release_time_msec = scaley_val;
+        break;
+    case (5):
+        // printf("LFO rate\n");
+        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, ev.data2);
+        m_settings.m_lfo1_rate = scaley_val;
+        break;
+    case (6):
+        // printf("LFO amp\n");
+        scaley_val = scaleybum(0, 128, 0.0, 1.0, ev.data2);
+        m_settings.m_lfo1_amplitude = scaley_val;
+        break;
+    case (7):
+        // printf("Filter CutOff\n");
+        scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, ev.data2);
+        m_settings.m_fc_control = scaley_val;
+        break;
+    case (8):
+        // printf("Filter Q\n");
+        scaley_val = scaleybum(0, 127, 0.02, 10, ev.data2);
+        m_settings.m_q_control = scaley_val;
+        break;
+    default:
+        printf("nah\n");
+    }
+    minisynth_update(this);
+}
+
+void minisynth::noteOn(midi_event ev)
+{
+    unsigned int midinote = ev.data1;
+    unsigned int velocity = ev.data2;
+
+    if (m_settings.m_monophonic)
+    {
+        minisynth_voice *msv = m_voices[0];
+        voice_note_on(&msv->m_voice, midinote, velocity,
+                      get_midi_freq(midinote), m_last_note_frequency);
+        m_last_note_frequency = get_midi_freq(midinote);
+        return;
+    }
+
+    bool steal_note = true;
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        minisynth_voice *msv = m_voices[i];
+        if (!msv)
+            return; // should never happen
+        if (!msv->m_voice.m_note_on)
+        {
+            minisynth_increment_voice_timestamps(this);
+            voice_note_on(&msv->m_voice, midinote, velocity,
+                          get_midi_freq(midinote), m_last_note_frequency);
+
+            m_last_note_frequency = get_midi_freq(midinote);
+            steal_note = false;
+            break;
+        }
+    }
+
+    if (steal_note)
+    {
+        if (mixr->debug_mode)
+            printf("STEAL NOTE\n");
+        minisynth_voice *msv = minisynth_get_oldest_voice(this);
+        if (msv)
+        {
+            minisynth_increment_voice_timestamps(this);
+            voice_note_on(&msv->m_voice, midinote, velocity,
+                          get_midi_freq(midinote), m_last_note_frequency);
+        }
+        m_last_note_frequency = get_midi_freq(midinote);
+    }
+}
+
+void minisynth::allNotesOff()
+{
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        if (m_voices[i])
+            voice_note_off(&m_voices[i]->m_voice, -1);
+    }
+}
+
+void minisynth::noteOff(midi_event ev)
+{
+    for (int i = 0; i < MAX_VOICES; i++)
+    {
+        minisynth_voice *msv =
+            minisynth_get_oldest_voice_with_note(this, ev.data1);
+        if (msv)
+        {
+            voice_note_off(&msv->m_voice, ev.data1);
+        }
+    }
+}
+
+void minisynth::pitchBend(midi_event ev)
+{
+    unsigned int data1 = ev.data1;
+    unsigned int data2 = ev.data2;
+    // printf("Pitch bend, babee: %d %d\n", data1, data2);
+    int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
+
+    if (actual_pitch_bent_val != 8192)
+    {
+        double normalized_pitch_bent_val =
+            (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
+        double scaley_val =
+            // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
+            scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
+        // printf("Cents to bend - %f\n", scaley_val);
+        for (int i = 0; i < MAX_VOICES; i++)
+        {
+            m_voices[i]->m_voice.m_osc1->m_cents = scaley_val;
+            m_voices[i]->m_voice.m_osc2->m_cents = scaley_val + 2.5;
+            m_voices[i]->m_voice.m_osc3->m_cents = scaley_val;
+            m_voices[i]->m_voice.m_osc4->m_cents = scaley_val + 2.5;
+            m_voices[i]->m_voice.m_v_modmatrix.m_sources[SOURCE_PITCHBEND] =
+                normalized_pitch_bent_val;
+        }
+    }
+    else
+    {
+        for (int i = 0; i < MAX_VOICES; i++)
+        {
+            m_voices[i]->m_voice.m_osc1->m_cents = 0;
+            m_voices[i]->m_voice.m_osc2->m_cents = 2.5;
+            m_voices[i]->m_voice.m_osc3->m_cents = 0;
+            m_voices[i]->m_voice.m_osc4->m_cents = 2.5;
+        }
+    }
 }
 
 ////////////////////////////////////
@@ -719,165 +872,6 @@ void minisynth_update(minisynth *ms)
             minisynth_voice_update(ms->m_voices[i]);
 }
 
-void minisynth_midi_control(minisynth *ms, unsigned int data1,
-                            unsigned int data2)
-{
-    double scaley_val = 0;
-    switch (data1)
-    {
-    case (1):
-        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        ms->m_settings.m_eg1_attack_time_msec = scaley_val;
-        break;
-    case (2):
-        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        ms->m_settings.m_eg1_decay_time_msec = scaley_val;
-        break;
-    case (3):
-        scaley_val = scaleybum(0, 127, 0, 1, data2);
-        ms->m_settings.m_eg1_sustain_level = scaley_val;
-        break;
-    case (4):
-        scaley_val = scaleybum(0, 127, EG_MINTIME_MS, EG_MAXTIME_MS, data2);
-        ms->m_settings.m_eg1_release_time_msec = scaley_val;
-        break;
-    case (5):
-        // printf("LFO rate\n");
-        scaley_val = scaleybum(0, 128, MIN_LFO_RATE, MAX_LFO_RATE, data2);
-        ms->m_settings.m_lfo1_rate = scaley_val;
-        break;
-    case (6):
-        // printf("LFO amp\n");
-        scaley_val = scaleybum(0, 128, 0.0, 1.0, data2);
-        ms->m_settings.m_lfo1_amplitude = scaley_val;
-        break;
-    case (7):
-        // printf("Filter CutOff\n");
-        scaley_val = scaleybum(0, 127, FILTER_FC_MIN, FILTER_FC_MAX, data2);
-        ms->m_settings.m_fc_control = scaley_val;
-        break;
-    case (8):
-        // printf("Filter Q\n");
-        scaley_val = scaleybum(0, 127, 0.02, 10, data2);
-        ms->m_settings.m_q_control = scaley_val;
-        break;
-    default:
-        printf("nah\n");
-    }
-    minisynth_update(ms);
-}
-
-bool minisynth_midi_note_on(minisynth *ms, unsigned int midinote,
-                            unsigned int velocity)
-{
-
-    if (ms->m_settings.m_monophonic)
-    {
-        minisynth_voice *msv = ms->m_voices[0];
-        voice_note_on(&msv->m_voice, midinote, velocity,
-                      get_midi_freq(midinote), ms->m_last_note_frequency);
-        ms->m_last_note_frequency = get_midi_freq(midinote);
-        return true;
-    }
-
-    bool steal_note = true;
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        minisynth_voice *msv = ms->m_voices[i];
-        if (!msv)
-            return false; // should never happen
-        if (!msv->m_voice.m_note_on)
-        {
-            minisynth_increment_voice_timestamps(ms);
-            voice_note_on(&msv->m_voice, midinote, velocity,
-                          get_midi_freq(midinote), ms->m_last_note_frequency);
-
-            ms->m_last_note_frequency = get_midi_freq(midinote);
-            steal_note = false;
-            break;
-        }
-    }
-
-    if (steal_note)
-    {
-        if (mixr->debug_mode)
-            printf("STEAL NOTE\n");
-        minisynth_voice *msv = minisynth_get_oldest_voice(ms);
-        if (msv)
-        {
-            minisynth_increment_voice_timestamps(ms);
-            voice_note_on(&msv->m_voice, midinote, velocity,
-                          get_midi_freq(midinote), ms->m_last_note_frequency);
-        }
-        ms->m_last_note_frequency = get_midi_freq(midinote);
-    }
-
-    return true;
-}
-
-bool minisynth_midi_note_off(minisynth *ms, unsigned int midinote,
-                             unsigned int velocity, bool all_notes_off)
-{
-    (void)velocity;
-
-    if (all_notes_off)
-    {
-        for (int i = 0; i < MAX_VOICES; i++)
-        {
-            if (ms->m_voices[i])
-                voice_note_off(&ms->m_voices[i]->m_voice, -1);
-        }
-        return true;
-    }
-
-    for (int i = 0; i < MAX_VOICES; i++)
-    {
-        minisynth_voice *msv =
-            minisynth_get_oldest_voice_with_note(ms, midinote);
-        if (msv)
-        {
-            voice_note_off(&msv->m_voice, midinote);
-        }
-    }
-    return true;
-}
-
-void minisynth_midi_pitchbend(minisynth *ms, unsigned int data1,
-                              unsigned int data2)
-{
-    // printf("Pitch bend, babee: %d %d\n", data1, data2);
-    int actual_pitch_bent_val = (int)((data1 & 0x7F) | ((data2 & 0x7F) << 7));
-
-    if (actual_pitch_bent_val != 8192)
-    {
-        double normalized_pitch_bent_val =
-            (float)(actual_pitch_bent_val - 0x2000) / (float)(0x2000);
-        double scaley_val =
-            // scaleybum(0, 16383, -100, 100, normalized_pitch_bent_val);
-            scaleybum(0, 16383, -600, 600, actual_pitch_bent_val);
-        // printf("Cents to bend - %f\n", scaley_val);
-        for (int i = 0; i < MAX_VOICES; i++)
-        {
-            ms->m_voices[i]->m_voice.m_osc1->m_cents = scaley_val;
-            ms->m_voices[i]->m_voice.m_osc2->m_cents = scaley_val + 2.5;
-            ms->m_voices[i]->m_voice.m_osc3->m_cents = scaley_val;
-            ms->m_voices[i]->m_voice.m_osc4->m_cents = scaley_val + 2.5;
-            ms->m_voices[i]->m_voice.m_v_modmatrix.m_sources[SOURCE_PITCHBEND] =
-                normalized_pitch_bent_val;
-        }
-    }
-    else
-    {
-        for (int i = 0; i < MAX_VOICES; i++)
-        {
-            ms->m_voices[i]->m_voice.m_osc1->m_cents = 0;
-            ms->m_voices[i]->m_voice.m_osc2->m_cents = 2.5;
-            ms->m_voices[i]->m_voice.m_osc3->m_cents = 0;
-            ms->m_voices[i]->m_voice.m_osc4->m_cents = 2.5;
-        }
-    }
-}
-
 void minisynth_reset_voices(minisynth *ms)
 {
     for (int i = 0; i < MAX_VOICES; i++)
@@ -948,93 +942,93 @@ void minisynth_print_eg1_routing_info(minisynth *ms, wchar_t *scratch)
     print_modulation_matrix_info_eg1(&ms->m_ms_modmatrix, scratch);
 }
 
-void minisynth_rand_settings(minisynth *ms)
+void minisynth::randomize()
 {
     // printf("Randomizing SYNTH!\n");
 
-    strncpy(ms->m_settings.m_settings_name, "-- random UNSAVED--", 256);
-    ms->m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
-    ms->m_settings.m_monophonic = rand() % 2;
+    strncpy(m_settings.m_settings_name, "-- random UNSAVED--", 256);
+    m_settings.m_voice_mode = rand() % MAX_VOICE_CHOICE;
+    m_settings.m_monophonic = rand() % 2;
 
-    ms->m_settings.m_lfo1_waveform = rand() % MAX_LFO_OSC;
-    ms->m_settings.m_lfo1_rate =
+    m_settings.m_lfo1_waveform = rand() % MAX_LFO_OSC;
+    m_settings.m_lfo1_rate =
         ((float)rand()) / RAND_MAX * (MAX_LFO_RATE - MIN_LFO_RATE) +
         MIN_LFO_RATE;
-    ms->m_settings.m_lfo1_amplitude = ((float)rand()) / RAND_MAX;
-    ms->m_settings.m_lfo1_osc_pitch_intensity =
+    m_settings.m_lfo1_amplitude = ((float)rand()) / RAND_MAX;
+    m_settings.m_lfo1_osc_pitch_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    ms->m_settings.m_lfo1_osc_pitch_enabled = rand() % 2;
-    ms->m_settings.m_lfo1_filter_fc_intensity =
+    m_settings.m_lfo1_osc_pitch_enabled = rand() % 2;
+    m_settings.m_lfo1_filter_fc_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    ms->m_settings.m_lfo1_filter_fc_enabled = rand() % 2;
-    ms->m_settings.m_filter_type = rand() % NUM_FILTER_TYPES;
-    ms->m_settings.m_lfo1_amp_intensity = ((float)rand() / (float)(RAND_MAX));
-    // ms->m_settings.m_lfo1_amp_enabled = rand() % 2;
-    // ms->m_settings.m_lfo1_pan_intensity = ((float)rand() /
+    m_settings.m_lfo1_filter_fc_enabled = rand() % 2;
+    m_settings.m_filter_type = rand() % NUM_FILTER_TYPES;
+    m_settings.m_lfo1_amp_intensity = ((float)rand() / (float)(RAND_MAX));
+    // m_settings.m_lfo1_amp_enabled = rand() % 2;
+    // m_settings.m_lfo1_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
-    // ms->m_settings.m_lfo1_pan_enabled = rand() % 2;
-    ms->m_settings.m_lfo1_pulsewidth_intensity =
+    // m_settings.m_lfo1_pan_enabled = rand() % 2;
+    m_settings.m_lfo1_pulsewidth_intensity =
         ((float)rand() / (float)(RAND_MAX));
-    ms->m_settings.m_lfo1_pulsewidth_enabled = rand() % 2;
+    m_settings.m_lfo1_pulsewidth_enabled = rand() % 2;
 
-    ms->m_settings.m_lfo2_waveform = rand() % MAX_LFO_OSC;
-    ms->m_settings.m_lfo2_rate =
+    m_settings.m_lfo2_waveform = rand() % MAX_LFO_OSC;
+    m_settings.m_lfo2_rate =
         ((float)rand()) / RAND_MAX * (MAX_LFO_RATE - MIN_LFO_RATE) +
         MIN_LFO_RATE;
-    ms->m_settings.m_lfo2_amplitude = ((float)rand()) / RAND_MAX;
-    ms->m_settings.m_lfo2_osc_pitch_intensity =
+    m_settings.m_lfo2_amplitude = ((float)rand()) / RAND_MAX;
+    m_settings.m_lfo2_osc_pitch_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    ms->m_settings.m_lfo2_osc_pitch_enabled = rand() % 2;
-    ms->m_settings.m_lfo2_filter_fc_intensity =
+    m_settings.m_lfo2_osc_pitch_enabled = rand() % 2;
+    m_settings.m_lfo2_filter_fc_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    ms->m_settings.m_lfo2_filter_fc_enabled = rand() % 2;
-    ms->m_settings.m_lfo2_amp_intensity = ((float)rand() / (float)(RAND_MAX));
-    // ms->m_settings.m_lfo2_amp_enabled = rand() % 2;
-    // ms->m_settings.m_lfo2_pan_intensity = ((float)rand() /
+    m_settings.m_lfo2_filter_fc_enabled = rand() % 2;
+    m_settings.m_lfo2_amp_intensity = ((float)rand() / (float)(RAND_MAX));
+    // m_settings.m_lfo2_amp_enabled = rand() % 2;
+    // m_settings.m_lfo2_pan_intensity = ((float)rand() /
     //(float)(RAND_MAX));
-    // ms->m_settings.m_lfo2_pan_enabled = rand() % 2;
-    ms->m_settings.m_lfo2_pulsewidth_intensity =
+    // m_settings.m_lfo2_pan_enabled = rand() % 2;
+    m_settings.m_lfo2_pulsewidth_intensity =
         ((float)rand() / (float)(RAND_MAX));
-    ms->m_settings.m_lfo2_pulsewidth_enabled = rand() % 2;
+    m_settings.m_lfo2_pulsewidth_enabled = rand() % 2;
 
-    ms->m_settings.m_detune_cents = (rand() % 200) - 100;
+    m_settings.m_detune_cents = (rand() % 200) - 100;
 
-    ms->m_settings.m_fc_control =
+    m_settings.m_fc_control =
         ((float)rand()) / RAND_MAX * (FILTER_FC_MAX - FILTER_FC_MIN) +
         FILTER_FC_MIN;
-    ms->m_settings.m_q_control = (rand() % 8) + 1;
+    m_settings.m_q_control = (rand() % 8) + 1;
 
-    ms->m_settings.m_eg1_attack_time_msec = (rand() % 700) + 5;
-    ms->m_settings.m_eg1_decay_time_msec = (rand() % 700) + 5;
-    ms->m_settings.m_eg1_release_time_msec = (rand() % 600) + 5;
-    ms->m_settings.m_pulse_width_pct = (rand() % 99) + 1;
+    m_settings.m_eg1_attack_time_msec = (rand() % 700) + 5;
+    m_settings.m_eg1_decay_time_msec = (rand() % 700) + 5;
+    m_settings.m_eg1_release_time_msec = (rand() % 600) + 5;
+    m_settings.m_pulse_width_pct = (rand() % 99) + 1;
 
-    // ms->m_settings.m_sustain_level = ((float)rand()) / RAND_MAX;
-    ms->m_settings.m_octave = rand() % 3 + 1;
+    // m_settings.m_sustain_level = ((float)rand()) / RAND_MAX;
+    m_settings.m_octave = rand() % 3 + 1;
 
-    ms->m_settings.m_portamento_time_msec = rand() % 5000;
+    m_settings.m_portamento_time_msec = rand() % 5000;
 
-    ms->m_settings.m_sub_osc_db = -1.0 * (rand() % 96);
-    // ms->m_settings.m_eg1_osc_intensity =
+    m_settings.m_sub_osc_db = -1.0 * (rand() % 96);
+    // m_settings.m_eg1_osc_intensity =
     //    (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    ms->m_settings.m_eg1_filter_intensity =
+    m_settings.m_eg1_filter_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 2) - 1;
-    ms->m_settings.m_noise_osc_db = -1.0 * (rand() % 96);
+    m_settings.m_noise_osc_db = -1.0 * (rand() % 96);
 
-    //////// ms->m_settings.m_volume_db = 1.0;
-    ms->m_settings.m_legato_mode = rand() % 2;
-    // ms->m_settings.m_pitchbend_range = rand() % 12;
-    ms->m_settings.m_reset_to_zero = rand() % 2;
-    ms->m_settings.m_filter_keytrack = rand() % 2;
-    ms->m_settings.m_filter_keytrack_intensity =
+    //////// m_settings.m_volume_db = 1.0;
+    m_settings.m_legato_mode = rand() % 2;
+    // m_settings.m_pitchbend_range = rand() % 12;
+    m_settings.m_reset_to_zero = rand() % 2;
+    m_settings.m_filter_keytrack = rand() % 2;
+    m_settings.m_filter_keytrack_intensity =
         (((float)rand() / (float)(RAND_MAX)) * 9) + 0.51;
-    ms->m_settings.m_velocity_to_attack_scaling = rand() % 2;
-    ms->m_settings.m_note_number_to_decay_scaling = rand() % 2;
-    ////ms->m_settings.m_eg1_dca_intensity =
+    m_settings.m_velocity_to_attack_scaling = rand() % 2;
+    m_settings.m_note_number_to_decay_scaling = rand() % 2;
+    ////m_settings.m_eg1_dca_intensity =
     ////    (((float)rand() / (float)(RAND_MAX)) * 2.0) - 1;
-    // ms->m_settings.m_sustain_override = rand() % 2;
+    // m_settings.m_sustain_override = rand() % 2;
 
-    minisynth_update(ms);
+    minisynth_update(this);
 
     // minisynth_print_settings(ms);
 }

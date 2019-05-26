@@ -597,7 +597,7 @@ bool parse_minisynth_settings_change(minisynth *ms, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("rand", wurds[2], 4) == 0)
     {
-        minisynth_rand_settings(ms);
+        ms->randomize();
     }
     else if (strncmp("default", wurds[2], 7) == 0 ||
              strncmp("reset", wurds[2], 5) == 0)
