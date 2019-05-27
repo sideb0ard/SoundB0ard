@@ -62,8 +62,8 @@ void midi_pattern_add_triplet(midi_event *pattern, unsigned int quarter)
     for (int i = 0; i < 3; i++)
     {
         pattern[pos[i]].event_type = MIDI_ON;
-        pattern[pos[i]].data1 =
-            get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+        pattern[pos[i]].data1 = get_midi_note_from_mixer_key(
+            mixr->timing_info.key, mixr->timing_info.octave);
         pattern[pos[i]].data2 = DEFAULT_VELOCITY;
     }
 }
@@ -143,7 +143,8 @@ void apply_short_to_midi_pattern_sub_pattern(uint16_t bit_pattern,
             int hold_time_ms = (rand() % 200) + 130;
 
             midi_event *ev = &dest_pattern[midi_pos];
-            ev->data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+            ev->data1 = get_midi_note_from_mixer_key(mixr->timing_info.key,
+                                                     mixr->timing_info.octave);
             ev->event_type = MIDI_ON;
             ev->source = 0;
             ev->hold = hold_time_ms;
@@ -170,7 +171,8 @@ void apply_short_to_midi_pattern(uint16_t bit_pattern, midi_event *dest_pattern)
             int hold_time_ms = (rand() % 2000) + 130;
 
             midi_event *ev = &dest_pattern[midi_pos];
-            ev->data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+            ev->data1 = get_midi_note_from_mixer_key(mixr->timing_info.key,
+                                                     mixr->timing_info.octave);
             ev->event_type = MIDI_ON;
             ev->source = 0;
             ev->hold = hold_time_ms;

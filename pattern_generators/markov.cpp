@@ -10,9 +10,11 @@
 #include <euclidean.h>
 
 extern mixer *mixr;
-static char *s_markov_types[] = {"CLAP2", "KICK2",      "CLAPS",      "GARAGE",
-                                 "HATS",  "HATS2",      "HATS_MASK",  "HIPHOP",
-                                 "HOUSE", "RAGGA_KICK", "RAGGA_SNARE"};
+static char *s_markov_types[] = {
+    (char *)"CLAP2",      (char *)"KICK2",      (char *)"CLAPS",
+    (char *)"GARAGE",     (char *)"HATS",       (char *)"HATS2",
+    (char *)"HATS_MASK",  (char *)"HIPHOP",     (char *)"HOUSE",
+    (char *)"RAGGA_KICK", (char *)"RAGGA_SNARE"};
 
 #define BEAT0 32768
 #define BEAT1 16384
@@ -33,7 +35,7 @@ static char *s_markov_types[] = {"CLAP2", "KICK2",      "CLAPS",      "GARAGE",
 
 pattern_generator *new_markov(unsigned int type)
 {
-    markov *m = (markov*) calloc(1, sizeof(markov));
+    markov *m = (markov *)calloc(1, sizeof(markov));
     if (!m)
     {
         printf("WOOF!\n");
@@ -72,7 +74,8 @@ void markov_pattern_generate(unsigned int markov_type, midi_event *midi_pattern)
     int fourth = 0;
 
     midi_event ev = {};
-    ev.data1 = get_midi_note_from_mixer_key(mixr->key, mixr->octave);
+    ev.data1 = get_midi_note_from_mixer_key(mixr->timing_info.key,
+                                            mixr->timing_info.octave);
     ev.event_type = MIDI_ON;
     ev.source = 0;
 

@@ -178,6 +178,13 @@ typedef struct mixer_timing_info
 
     int cur_sample; // inverse of SAMPLE RATE
 
+    unsigned int key;
+    unsigned int chord;
+    unsigned int chord_type;
+    unsigned int octave;
+    unsigned int notes[8];
+    unsigned int quantize;
+
     // informational for other sound generators
     unsigned int loop_len_in_frames;
     unsigned int loop_len_in_ticks;
@@ -194,6 +201,22 @@ typedef struct mixer_timing_info
     bool is_quarter;
     bool is_midi_tick;
 } mixer_timing_info;
+
+typedef struct chord_midi_notes
+{
+    int root;
+    int third;
+    int fifth;
+    int seventh;
+} chord_midi_notes;
+
+enum
+{
+    MAJOR_CHORD,
+    MINOR_CHORD,
+    DIMINISHED_CHORD,
+    NUM_CHORD_TYPES,
+}; // chord type
 
 typedef enum event_type
 {

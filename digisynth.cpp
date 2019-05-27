@@ -79,7 +79,7 @@ void digisynth::start()
 void digisynth::stop()
 {
     active = false;
-    digisynth_midi_note_off(this, 0, 0, true);
+    noteOff({});
 }
 
 void digisynth_load_wav(digisynth *ds, char *filename)
@@ -93,35 +93,29 @@ void digisynth_load_wav(digisynth *ds, char *filename)
     }
 }
 
-bool digisynth_midi_note_on(digisynth *ds, unsigned int midinote,
-                            unsigned int velocity)
+void digisynth::noteOn(midi_event ev)
 {
+    unsigned int midinote = ev.data1;
+    unsigned int velocity = ev.data2;
     for (int i = 0; i < MAX_VOICES; i++)
     {
-        digisynth_voice *dsv = &ds->m_voices[i];
+        digisynth_voice *dsv = &m_voices[i];
 
         if (!dsv->m_voice.m_note_on)
         {
             voice_note_on(&dsv->m_voice, midinote, velocity,
-                          get_midi_freq(midinote), ds->m_last_note_frequency);
+                          get_midi_freq(midinote), m_last_note_frequency);
             break;
         }
     }
-
-    return true;
 }
 
-bool digisynth_midi_note_off(digisynth *ds, unsigned int midinote,
-                             unsigned int velocity, bool all_notes_off)
+void digisynth::noteOff(midi_event ev)
 {
-    (void)velocity;
-    (void)all_notes_off;
-
     for (int i = 0; i < MAX_VOICES; i++)
     {
-        voice_note_off(&ds->m_voices[i].m_voice, midinote);
+        voice_note_off(&m_voices[i].m_voice, ev.data1);
     }
-    return true;
 }
 
 void digisynth_update(digisynth *ds) {}

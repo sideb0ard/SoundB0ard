@@ -143,13 +143,6 @@ struct mixer
     unsigned int progression_type;
     bool should_progress_chords;
 
-    unsigned int key;
-    unsigned int chord;
-    unsigned int chord_type;
-    unsigned int octave;
-    unsigned int notes[8];
-    unsigned int quantize;
-
     lo_address processing_addr;
 };
 

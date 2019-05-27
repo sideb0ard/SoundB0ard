@@ -87,7 +87,8 @@ void sequence_engine_set_pattern_to_current_key(SequenceEngine *engine)
     midi_event *midi_pattern = engine->patterns[engine->cur_pattern];
 
     chord_midi_notes chnotes = {0};
-    get_midi_notes_from_chord(mixr->chord, mixr->chord_type,
+    get_midi_notes_from_chord(mixr->timing_info.chord,
+                              mixr->timing_info.chord_type,
                               sequence_engine_get_octave(engine), &chnotes);
 
     int note2 = chnotes.third;
@@ -557,7 +558,7 @@ void sequence_engine_set_pattern(SequenceEngine *engine, int pattern_num,
     if (sequence_engine_is_valid_pattern(engine, pattern_num))
     {
         int default_midi_note =
-            get_midi_note_from_mixer_key(mixr->key, engine->octave);
+            get_midi_note_from_mixer_key(mixr->timing_info.key, engine->octave);
         if (change_info.clear_previous)
             clear_midi_pattern(engine->patterns[pattern_num]);
         for (int i = 0; i < PPBAR; i++)
@@ -717,7 +718,7 @@ void sequence_engine_set_arp_mode(SequenceEngine *engine, unsigned int mode)
         engine->arp.mode = mode;
 }
 
-void sequence_engine_do_arp(SequenceEngine *engine, SoundGenerator *parent)
+bool sequence_engine_do_arp(SequenceEngine *engine, midi_event *ev)
 {
     int midi_note = arp_next_note(&engine->arp);
     if (midi_note != -1)
@@ -725,10 +726,13 @@ void sequence_engine_do_arp(SequenceEngine *engine, SoundGenerator *parent)
         int idx = mixr->timing_info.midi_tick % PPBAR;
         if (engine->patterns[engine->cur_pattern][idx].event_type != MIDI_ON)
         {
-            midi_event on = new_midi_event(MIDI_ON, midi_note, 128);
-            // midi_parse_midi_event(parent, &on);
+            ev->event_type = MIDI_ON;
+            ev->data1 = midi_note;
+            ev->data2 = 128;
+            return true;
         }
     }
+    return false;
 }
 
 void sequence_engine_change_octave_midi_notes(SequenceEngine *engine,

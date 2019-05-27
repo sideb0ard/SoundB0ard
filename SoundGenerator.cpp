@@ -65,15 +65,15 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 
     int midi_notes[3] = {midi_note, 0, 0};
     int midi_notes_len = 1; // default single note
-    // if (engine.chord_mode)
-    //{
-    //    midi_notes_len = 3;
-    //    if (mixr->chord_type == MAJOR_CHORD)
-    //        midi_notes[1] = midi_note + 4;
-    //    else
-    //        midi_notes[1] = midi_note + 3;
-    //    midi_notes[2] = midi_note + 7;
-    //}
+    if (engine.chord_mode)
+    {
+        midi_notes_len = 3;
+        if (tinfo.chord_type == MAJOR_CHORD)
+            midi_notes[1] = midi_note + 4;
+        else
+            midi_notes[1] = midi_note + 3;
+        midi_notes[2] = midi_note + 7;
+    }
 
     switch (ev.event_type)
     {
@@ -209,12 +209,20 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         break;
     case (TIME_THIRTYSECOND_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_32)
-            // sequence_engine_do_arp(engine);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_TWENTYFOURTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_24)
-            // sequence_engine_do_arp(engine);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_SIXTEENTH_TICK):
         if (engine.started)
         {
@@ -286,32 +294,58 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         }
 
         if (engine.arp.enable && engine.arp.speed == ARP_16)
-            // sequence_engine_do_arp(engine, parent);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_TWELTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_12)
-            // sequence_engine_do_arp(engine, parent);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_EIGHTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_8)
-            // sequence_engine_do_arp(engine, parent);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_SIXTH_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_6)
-            // sequence_engine_do_arp(engine, parent);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_QUARTER_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_4)
-            // sequence_engine_do_arp(engine, parent);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_THIRD_TICK):
         if (engine.arp.enable && engine.arp.speed == ARP_3)
-            // sequence_engine_do_arp(engine, parent);
-            break;
+        {
+            midi_event ev{};
+            if (sequence_engine_do_arp(&engine, &ev))
+                noteOn(ev);
+        }
+        break;
     case (TIME_CHORD_CHANGE):
         if (engine.follow_mixer_chord_changes)
-            // sequence_engine_set_pattern_to_current_key(engine);
-            break;
+        {
+            sequence_engine_set_pattern_to_current_key(&engine);
+        }
+        break;
     }
 }
 

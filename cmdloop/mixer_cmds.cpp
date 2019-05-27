@@ -228,13 +228,13 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         switch (quanta)
         {
         case (32):
-            mixr->quantize = Q32;
+            mixr->timing_info.quantize = Q32;
         case (16):
-            mixr->quantize = Q16;
+            mixr->timing_info.quantize = Q16;
         case (8):
-            mixr->quantize = Q8;
+            mixr->timing_info.quantize = Q8;
         case (4):
-            mixr->quantize = Q4;
+            mixr->timing_info.quantize = Q4;
         default:
             printf("nae danger, mate, quantize yer heid..\n");
         }
@@ -396,37 +396,37 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (strncasecmp(wurds[1], "c#", 2) == 0 ||
             strncasecmp(wurds[1], "db", 2) == 0 ||
             strncasecmp(wurds[1], "dm", 2) == 0)
-            mixr->key = C_SHARP;
+            mixr->timing_info.key = C_SHARP;
         else if (strncasecmp(wurds[1], "d#", 2) == 0 ||
                  strncasecmp(wurds[1], "eb", 2) == 0 ||
                  strncasecmp(wurds[1], "em", 2) == 0)
-            mixr->key = D_SHARP;
+            mixr->timing_info.key = D_SHARP;
         else if (strncasecmp(wurds[1], "f#", 2) == 0 ||
                  strncasecmp(wurds[1], "gb", 2) == 0 ||
                  strncasecmp(wurds[1], "gm", 2) == 0)
-            mixr->key = F_SHARP;
+            mixr->timing_info.key = F_SHARP;
         else if (strncasecmp(wurds[1], "g#", 2) == 0 ||
                  strncasecmp(wurds[1], "ab", 2) == 0 ||
                  strncasecmp(wurds[1], "am", 2) == 0)
-            mixr->key = G_SHARP;
+            mixr->timing_info.key = G_SHARP;
         else if (strncasecmp(wurds[1], "a#", 2) == 0 ||
                  strncasecmp(wurds[1], "bb", 2) == 0 ||
                  strncasecmp(wurds[1], "bm", 2) == 0)
-            mixr->key = A_SHARP;
+            mixr->timing_info.key = A_SHARP;
         else if (strncasecmp(wurds[1], "c", 1) == 0)
-            mixr->key = C;
+            mixr->timing_info.key = C;
         else if (strncasecmp(wurds[1], "d", 1) == 0)
-            mixr->key = D;
+            mixr->timing_info.key = D;
         else if (strncasecmp(wurds[1], "e", 1) == 0)
-            mixr->key = E;
+            mixr->timing_info.key = E;
         else if (strncasecmp(wurds[1], "f", 1) == 0)
-            mixr->key = F;
+            mixr->timing_info.key = F;
         else if (strncasecmp(wurds[1], "g", 1) == 0)
-            mixr->key = G;
+            mixr->timing_info.key = G;
         else if (strncasecmp(wurds[1], "a", 1) == 0)
-            mixr->key = A;
+            mixr->timing_info.key = A;
         else if (strncasecmp(wurds[1], "b", 1) == 0)
-            mixr->key = B;
+            mixr->timing_info.key = B;
 
         mixer_set_notes(mixr);
         goto cmd_found;
@@ -441,8 +441,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         printf("NOTES in CHORD!\n");
 
         chord_midi_notes chnotes = {0};
-        get_midi_notes_from_chord(mixr->chord, mixr->chord_type, mixr->octave,
-                                  &chnotes);
+        get_midi_notes_from_chord(mixr->timing_info.chord,
+                                  mixr->timing_info.chord_type,
+                                  mixr->timing_info.octave, &chnotes);
         printf("%d %d %d\n", chnotes.root, chnotes.third, chnotes.fifth);
         goto cmd_found;
     }
@@ -451,7 +452,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         printf("CHORDS in KEY!\n");
 
         for (int i = 0; i < 8; i++)
-            printf("%s %s\n", key_names[mixr->notes[i]],
+            printf("%s %s\n", key_names[mixr->timing_info.notes[i]],
                    chord_type_names[get_chord_type(i)]);
         goto cmd_found;
     }
@@ -462,13 +463,13 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             for (int i = 0; i < 4; i++)
             {
                 int note_num = rand() % 8;
-                int note = mixr->notes[note_num];
+                int note = mixr->timing_info.notes[note_num];
                 unsigned int chord_type = get_chord_type(note_num);
                 printf("%s %s\n", key_names[note],
                        chord_type_names[chord_type]);
                 chord_midi_notes chnotes;
-                get_midi_notes_from_chord(note, chord_type, mixr->octave,
-                                          &chnotes);
+                get_midi_notes_from_chord(note, chord_type,
+                                          mixr->timing_info.octave, &chnotes);
             }
         }
     }

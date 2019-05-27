@@ -15,6 +15,8 @@ class digisynth : public SoundGenerator
     void status(wchar_t *wstring) override;
     void start() override;
     void stop() override;
+    void noteOn(midi_event ev) override;
+    void noteOff(midi_event ev) override;
 
   public:
     char audiofile[1024];
@@ -29,10 +31,6 @@ void digisynth_update(digisynth *ds);
 
 ////////////////////////////////////
 
-bool digisynth_midi_note_on(digisynth *self, unsigned int midinote,
-                            unsigned int velocity);
-bool digisynth_midi_note_off(digisynth *self, unsigned int midinote,
-                             unsigned int velocity, bool all_notes_off);
 // void minisynth_toggle_delay_mode(minisynth *ms);
 //
 // void minisynth_print_settings(minisynth *ms);

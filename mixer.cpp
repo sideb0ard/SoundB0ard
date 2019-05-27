@@ -102,8 +102,8 @@ mixer *new_mixer(double output_latency)
 
     mixr->active_midi_soundgen_num = -99;
 
-    mixr->key = C;
-    mixr->octave = 3;
+    mixr->timing_info.key = C;
+    mixr->timing_info.octave = 3;
     mixer_set_notes(mixr);
     mixer_set_chord_progression(mixr, 1);
     mixr->bars_per_chord = 4;
@@ -145,8 +145,8 @@ void mixer_status_mixr(mixer *mixr)
                      [mixr->midi_control_destination],
            mixr->midi_print_notes,
            mixr->midi_bank_num,
-           key_names[mixr->key], key_names[mixr->chord],
-           chord_type_names[mixr->chord_type], mixr->octave, mixr->bars_per_chord,
+           key_names[mixr->timing_info.key], key_names[mixr->timing_info.chord],
+           chord_type_names[mixr->timing_info.chord_type], mixr->timing_info.octave, mixr->bars_per_chord,
            mixr->should_progress_chords,
            mixr->progression_type, s_progressions[mixr->progression_type]);
     // clang-format on
@@ -308,7 +308,8 @@ void mixer_ps(mixer *mixr, bool all)
 
 void mixer_print_notes(mixer *mixr)
 {
-    printf("Current KEY is %s. Compat NOTEs are:", key_names[mixr->key]);
+    printf("Current KEY is %s. Compat NOTEs are:",
+           key_names[mixr->timing_info.key]);
     // for (int i = 0; i < 6; ++i)
     //{
     //    printf("%s ", key_names[compat_keys[mixr->key][i]]);
@@ -543,6 +544,17 @@ void mixer_events_output(mixer *mixr)
     {
         mixer_check_for_midi_messages(mixr);
 
+        if (mixr->timing_info.midi_tick % PPBAR == 0)
+        {
+            mixer_emit_event(
+                mixr, (broadcast_event){.type = TIME_START_OF_LOOP_TICK});
+            if (mixr->scene_start_pending)
+            {
+                mixer_play_scene(mixr, mixr->current_scene);
+                mixr->scene_start_pending = false;
+            }
+        }
+
         if (mixr->timing_info.midi_tick % 120 == 0)
         {
             mixr->timing_info.is_thirtysecond = true;
@@ -554,8 +566,6 @@ void mixer_events_output(mixer *mixr)
                 mixr->timing_info.is_sixteenth = true;
                 mixr->timing_info.sixteenth_note_tick++;
 
-                // printf("\nSIXTEENTH! tick:%d\n",
-                // mixr->timing_info.sixteenth_note_tick);
                 // mixer_print_timing_info(mixr);
 
                 mixer_emit_event(
@@ -597,17 +607,6 @@ void mixer_events_output(mixer *mixr)
                         mixer_emit_event(
                             mixr, (broadcast_event){.type = TIME_THIRD_TICK});
                 }
-            }
-        }
-
-        if (mixr->timing_info.midi_tick % PPBAR == 0)
-        {
-            mixer_emit_event(
-                mixr, (broadcast_event){.type = TIME_START_OF_LOOP_TICK});
-            if (mixr->scene_start_pending)
-            {
-                mixer_play_scene(mixr, mixr->current_scene);
-                mixr->scene_start_pending = false;
             }
         }
 
@@ -1014,14 +1013,21 @@ bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
 
 void mixer_set_notes(mixer *mixr)
 {
-    mixr->notes[0] = mixr->key;
-    mixr->notes[1] = (mixr->key + 2) % NUM_KEYS;  // W step
-    mixr->notes[2] = (mixr->key + 4) % NUM_KEYS;  // W step
-    mixr->notes[3] = (mixr->key + 5) % NUM_KEYS;  // H step
-    mixr->notes[4] = (mixr->key + 7) % NUM_KEYS;  // W step
-    mixr->notes[5] = (mixr->key + 9) % NUM_KEYS;  // W step
-    mixr->notes[6] = (mixr->key + 11) % NUM_KEYS; // W step
-    mixr->notes[7] = (mixr->key + 12) % NUM_KEYS; // H step
+    mixr->timing_info.notes[0] = mixr->timing_info.key;
+    mixr->timing_info.notes[1] =
+        (mixr->timing_info.key + 2) % NUM_KEYS; // W step
+    mixr->timing_info.notes[2] =
+        (mixr->timing_info.key + 4) % NUM_KEYS; // W step
+    mixr->timing_info.notes[3] =
+        (mixr->timing_info.key + 5) % NUM_KEYS; // H step
+    mixr->timing_info.notes[4] =
+        (mixr->timing_info.key + 7) % NUM_KEYS; // W step
+    mixr->timing_info.notes[5] =
+        (mixr->timing_info.key + 9) % NUM_KEYS; // W step
+    mixr->timing_info.notes[6] =
+        (mixr->timing_info.key + 11) % NUM_KEYS; // W step
+    mixr->timing_info.notes[7] =
+        (mixr->timing_info.key + 12) % NUM_KEYS; // H step
 }
 
 int mixer_print_timing_info(mixer *mixr)
@@ -1090,7 +1096,7 @@ int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
 void mixer_set_octave(mixer *mixr, int octave)
 {
     if (octave > -10 && octave < 10)
-        mixr->octave = octave;
+        mixr->timing_info.octave = octave;
 }
 void mixer_set_bars_per_chord(mixer *mixr, int bars)
 {
@@ -1142,15 +1148,15 @@ void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
 {
     if (root < NUM_KEYS && chord_type < NUM_CHORD_TYPES)
     {
-        mixr->chord = root;
-        mixr->chord_type = chord_type;
+        mixr->timing_info.chord = root;
+        mixr->timing_info.chord_type = chord_type;
         mixer_emit_event(mixr, (broadcast_event){.type = TIME_CHORD_CHANGE});
     }
 }
 
 int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree)
 {
-    return mixr->key + scale_degree;
+    return mixr->timing_info.key + scale_degree;
 }
 
 void mixer_preview_audio(mixer *mixr, char *filename)
@@ -1271,7 +1277,7 @@ void mixer_next_chord(mixer *mixr)
 {
     unsigned int scale_degree = mixr->prog_degrees[mixr->prog_degrees_idx];
     mixr->prog_degrees_idx = (mixr->prog_degrees_idx + 1) % mixr->prog_len;
-    unsigned int root = mixr->notes[scale_degree];
+    unsigned int root = mixr->timing_info.notes[scale_degree];
     unsigned int chord_type = get_chord_type(scale_degree);
     mixer_change_chord(mixr, root, chord_type);
 }

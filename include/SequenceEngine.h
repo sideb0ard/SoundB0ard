@@ -242,7 +242,7 @@ int sequence_engine_get_octave(SequenceEngine *engine);
 void sequence_engine_enable_arp(SequenceEngine *engine, bool b);
 void sequence_engine_set_arp_speed(SequenceEngine *engine, unsigned int speed);
 void sequence_engine_set_arp_mode(SequenceEngine *engine, unsigned int mode);
-void sequence_engine_do_arp(SequenceEngine *engine, SoundGenerator *sg);
+bool sequence_engine_do_arp(SequenceEngine *engine, midi_event *ev);
 int arp_next_note(arpeggiator *arp);
 void arp_add_last_note(arpeggiator *arp, int note);
 
