@@ -82,6 +82,14 @@ midi_event new_midi_event(unsigned int event_type, unsigned int data1,
     return ev;
 }
 
+std::ostream &operator<<(std::ostream &out, const midi_event &ev)
+{
+    out << "MIDIEVENT:"
+        << "Type:" << ev.event_type << " D1:" << ev.data1 << " D2:" << ev.data2
+        << " Delete:" << (ev.delete_after_use ? "true" : "false");
+    return out;
+}
+
 void midi_pattern_quantize(midi_pattern *pattern)
 {
     printf("Quantizzzzzzing\n");

@@ -59,9 +59,10 @@ SequenceEngine::SequenceEngine()
     apply_mask_every_n = 1;
     event_mask_counter = 0;
 
-    pct_play = 90; // %
+    pct_play = 95; // %
 
     sequence_engine_reset_step(this);
+    midi_pattern_print(patterns[cur_pattern]);
 }
 
 void sequence_engine_set_pattern_to_riff(SequenceEngine *engine)

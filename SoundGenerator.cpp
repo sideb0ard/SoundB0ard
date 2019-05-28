@@ -125,7 +125,9 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
         break;
     }
     default:
-        printf("HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS\n");
+        std::cout
+            << "HERE PAL, I've NAE IDEA WHIT KIND OF MIDI EVENT THAT WiS! "
+            << ev << std::endl;
     }
 
     if (ev.delete_after_use)

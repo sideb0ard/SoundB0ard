@@ -1,3 +1,4 @@
+#include <iostream>
 #include <libgen.h>
 #include <sndfile.h>
 #include <stdlib.h>
@@ -74,20 +75,15 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
     SoundGenerator::eventNotify(event, tinfo);
 
-    float loop_num = fmod(loop_counter, loop_len);
-    int cur_sixteenth_midi_base =
-        (loop_num * PPBAR) + engine.cur_step * PPSIXTEENTH;
-    double pulses_per_loop = PPBAR * loop_len;
-    int cur_midi_idx = (cur_sixteenth_midi_base +
-                        (mixr->timing_info.midi_tick % PPSIXTEENTH)) %
-                       (int)pulses_per_loop;
+    int cur_sixteenth_midi_base = engine.cur_step * PPSIXTEENTH;
+    int cur_midi_idx =
+        (cur_sixteenth_midi_base + (mixr->timing_info.midi_tick % PPSIXTEENTH));
 
     switch (event.type)
     {
     case (TIME_START_OF_LOOP_TICK):
 
         started = true;
-        loop_counter++; // used to track which 16th we're on if loop != 1 bar
 
         if (scramble_pending)
         {
@@ -117,8 +113,16 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         if (loop_mode == LOOPER_LOOP_MODE)
         {
 
-            double decimal_percent_of_loop = cur_midi_idx / pulses_per_loop;
-            double new_read_idx = decimal_percent_of_loop * audio_buffer_len;
+            double decimal_percent_of_loop =
+                (100. / PPBAR) * (cur_midi_idx * (1. / loop_len));
+            // std::cout << "CURMIDIIDX:" << cur_midi_idx
+            //          << " P%:" << decimal_percent_of_loop << std::endl;
+            double new_read_idx =
+                audio_buffer_len / 100 * decimal_percent_of_loop;
+            // std::cout << "Readidx:" << new_read_idx
+            //          << " LEN:" << audio_buffer_len
+            //          << " (PCT:" << decimal_percent_of_loop << ")"
+            //          << std::endl;
 
             // printf("PPLOOP:%f PPSIXT:%d base:%d cur_midi:%d DEC:%f len:%d "
             //      "REDXIX:%f\n",
@@ -392,7 +396,7 @@ looper::~looper()
 }
 
 //////////////////////////// grain stuff //////////////////////////
-// looper functions contuine below
+// looper functions continue below
 
 void sound_grain_init(sound_grain *g, sound_grain_params params)
 {

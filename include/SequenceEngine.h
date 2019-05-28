@@ -76,8 +76,6 @@ typedef struct arpeggiator
     int last_midi_notes_idx;
 } arpeggiator;
 
-class SoundGenerator; // fwd decl
-
 class SequenceEngine
 {
   public:
@@ -88,10 +86,10 @@ class SequenceEngine
     int tick; // current 16th note tick from mixer
 
     // pattern state management
-    midi_pattern patterns[MAX_NUM_MIDI_LOOPS];
-    midi_event temporal_events[PPBAR];
-    int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS]; // how many times to play
-                                                     // this loop
+    midi_pattern patterns[MAX_NUM_MIDI_LOOPS] = {};
+    midi_event temporal_events[PPBAR] = {};
+    int pattern_multiloop_count[MAX_NUM_MIDI_LOOPS] = {}; // how many times to
+                                                          // play this loop
     midi_pattern backup_pattern_while_getting_crazy;
 
     int num_patterns;

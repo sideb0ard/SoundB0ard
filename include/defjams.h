@@ -260,15 +260,18 @@ enum
     EXTERNAL_OSC,
 }; // source of midi event
 
-typedef struct midi_event
+class midi_event
 {
+  public:
+    friend std::ostream &operator<<(std::ostream &, const midi_event &);
+
     unsigned int source;
     unsigned int event_type;
     unsigned int data1;
     unsigned int data2;
     int hold; // millisecond hold value
     bool delete_after_use;
-} midi_event;
+};
 
 typedef midi_event midi_pattern[PPBAR];
 

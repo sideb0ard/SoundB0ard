@@ -181,7 +181,7 @@ for "1 40" algo %s off
 
 down 28
 
-new loop dloops/scudBReak.aiff; vol 31 1
+new loop dloops/scudBReak.aiff 2; vol 31 1
 new loop loops/scuddubraggableep.aiff 4
 fuckup 31
 fuckup 32
