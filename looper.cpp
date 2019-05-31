@@ -73,17 +73,29 @@ looper::looper(char *filename)
 
 void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
-    SoundGenerator::eventNotify(event, tinfo);
+    static bool debugc = true;
+    static int debugcount = 0;
 
+    // need to read cur_step before calling SoundGenerator::eventNotify
     int cur_sixteenth_midi_base = engine.cur_step * PPSIXTEENTH;
+    if (cur_sixteenth_midi_base < 0)
+        cur_sixteenth_midi_base = 0;
     int cur_midi_idx =
         (cur_sixteenth_midi_base + (mixr->timing_info.midi_tick % PPSIXTEENTH));
 
-    switch (event.type)
-    {
-    case (TIME_START_OF_LOOP_TICK):
+    SoundGenerator::eventNotify(event, tinfo);
 
-        started = true;
+    if (!engine.started)
+        return;
+    started = true;
+
+    // switch (event.type)
+    //{
+    // case (TIME_START_OF_LOOP_TICK):
+
+    if (tinfo.is_start_of_loop)
+    {
+        loop_counter++;
 
         if (scramble_pending)
         {
@@ -106,87 +118,101 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
             recording = true;
             record_pending = false;
         }
+    }
 
-        break;
+    if (loop_mode == LOOPER_LOOP_MODE)
+    {
+        // used to track which 16th we're on if loop != 1 bar
+        float loop_num = fmod(loop_counter, loop_len);
+        if (loop_num < 0)
+            loop_num = 0;
 
-    case (TIME_MIDI_TICK):
-        if (loop_mode == LOOPER_LOOP_MODE)
+        int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx;
+        double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
+        double new_read_idx = decimal_percent_of_loop * audio_buffer_len;
+        // if (debugc)
+        //    std::cout << "EVENTCOUNT:" << debugcount++
+        //              << " cur_sixteenth_midi_base:" <<
+        //              cur_sixteenth_midi_base
+        //              << " relative_midi_idx:" << relative_midi_idx
+        //              << " Engine.curstep:" << engine.cur_step
+        //              << " Tinfo.midi_tick:" << tinfo.midi_tick
+        //              << " Tinfo.sixteenth_note_tick:"
+        //              << tinfo.sixteenth_note_tick
+        //              << " LoopCounter:" << loop_counter
+        //              << " LoopNum:" << loop_num
+        //              << " cur_midi_idx:" << cur_midi_idx
+        //              << " Pct:" << decimal_percent_of_loop
+        //              << " IDX: " << new_read_idx << " LEN:" <<
+        //              audio_buffer_len
+        //              << std::endl;
+        // if (debugcount > 10)
+        //    debugc = false;
+        // std::cout << "Readidx:" << new_read_idxA
+        //          << " LEN:" << audio_buffer_len
+        //          << " (PCT:" << decimal_percent_of_loop << ")"
+        //          << std::endl;
+
+        // printf("PPLOOP:%f PPSIXT:%d base:%d cur_midi:%d DEC:%f len:%d "
+        //      "REDXIX:%f\n",
+        //      pulses_per_loop, PPSIXTEENTH, cur_sixteenth_midi_base,
+        //      cur_midi_idx, decimal_percent_of_loop,
+        //      audio_buffer_len, new_read_idx);
+
+        if (reverse_mode)
+            new_read_idx = (audio_buffer_len - 1) - new_read_idx;
+
+        // this ensures new_read_idx is even
+        if (num_channels == 2)
+            new_read_idx -= ((int)new_read_idx & 1);
+
+        if (scramble_mode)
         {
-
-            double decimal_percent_of_loop =
-                (100. / PPBAR) * (cur_midi_idx * (1. / loop_len));
-            // std::cout << "CURMIDIIDX:" << cur_midi_idx
-            //          << " P%:" << decimal_percent_of_loop << std::endl;
-            double new_read_idx =
-                audio_buffer_len / 100 * decimal_percent_of_loop;
-            // std::cout << "Readidx:" << new_read_idx
-            //          << " LEN:" << audio_buffer_len
-            //          << " (PCT:" << decimal_percent_of_loop << ")"
-            //          << std::endl;
-
-            // printf("PPLOOP:%f PPSIXT:%d base:%d cur_midi:%d DEC:%f len:%d "
-            //      "REDXIX:%f\n",
-            //      pulses_per_loop, PPSIXTEENTH, cur_sixteenth_midi_base,
-            //      cur_midi_idx, decimal_percent_of_loop,
-            //      audio_buffer_len, new_read_idx);
-
-            if (reverse_mode)
-                new_read_idx = (audio_buffer_len - 1) - new_read_idx;
-
-            // this ensures new_read_idx is even
-            if (num_channels == 2)
-                new_read_idx -= ((int)new_read_idx & 1);
-
-            if (scramble_mode)
-            {
-                audio_buffer_read_idx =
-                    new_read_idx + (scramble_diff * size_of_sixteenth);
-            }
-            else if (stutter_mode)
-            {
-                int rel_pos_within_a_sixteenth =
-                    new_read_idx - (engine.cur_step * size_of_sixteenth);
-                audio_buffer_read_idx = (stutter_idx * size_of_sixteenth) +
-                                        rel_pos_within_a_sixteenth;
-            }
-            else
-                audio_buffer_read_idx = new_read_idx;
+            audio_buffer_read_idx =
+                new_read_idx + (scramble_diff * size_of_sixteenth);
         }
-
-        // step sequencer as env generator
-        if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
-            MIDI_ON)
+        else if (stutter_mode)
         {
-            eg_start_eg(&m_eg1);
-
-            midi_event *pattern = engine.patterns[engine.cur_pattern];
-            int off_tick =
-                (int)(cur_midi_idx +
-                      ((m_eg1.m_attack_time_msec + m_eg1.m_decay_time_msec +
-                        engine.sustain_note_ms) *
-                       mixr->timing_info.ms_per_midi_tick)) %
-                PPBAR;
-            midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
-            midi_pattern_add_event(pattern, off_tick, off_event);
+            int rel_pos_within_a_sixteenth =
+                new_read_idx - (engine.cur_step * size_of_sixteenth);
+            audio_buffer_read_idx =
+                (stutter_idx * size_of_sixteenth) + rel_pos_within_a_sixteenth;
         }
-        else if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
-                 MIDI_OFF)
-        {
-            // printf("[%d] OFF\n", idx);
-            midi_event_clear(
-                &engine.patterns[engine.cur_pattern][cur_midi_idx]);
-            m_eg1.m_state = RELEASE;
-        }
+        else
+            audio_buffer_read_idx = new_read_idx;
+    }
 
-        break;
+    // step sequencer as env generator
+    // if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
+    // MIDI_ON)
+    //{
+    //    eg_start_eg(&m_eg1);
 
-    case (TIME_SIXTEENTH_TICK):
+    //    midi_event *pattern = engine.patterns[engine.cur_pattern];
+    //    int off_tick =
+    //        (int)(cur_midi_idx +
+    //              ((m_eg1.m_attack_time_msec + m_eg1.m_decay_time_msec +
+    //                engine.sustain_note_ms) *
+    //               mixr->timing_info.ms_per_midi_tick)) %
+    //        PPBAR;
+    //    midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
+    //    midi_pattern_add_event(pattern, off_tick, off_event);
+    //}
+    // else if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
+    //         MIDI_OFF)
+    //{
+    //    // printf("[%d] OFF\n", idx);
+    //    midi_event_clear(&engine.patterns[engine.cur_pattern][cur_midi_idx]);
+    //    m_eg1.m_state = RELEASE;
+    //}
 
-        // printf(
-        //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d
-        //    midi_idx:%d\n", loop_num, engine.cur_step,
-        //    cur_sixteenth_midi_base, cur_midi_idx);
+    // printf(
+    //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d
+    //    midi_idx:%d\n", loop_num, engine.cur_step,
+    //    cur_sixteenth_midi_base, cur_midi_idx);
 
+    if (tinfo.is_sixteenth)
+    {
         if (scramble_mode)
         {
             scramble_diff = 0;
@@ -209,7 +235,6 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
             if (stutter_idx == 16)
                 stutter_idx = 0;
         }
-        break;
     }
 }
 

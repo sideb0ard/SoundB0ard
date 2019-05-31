@@ -194,11 +194,15 @@ typedef struct mixer_timing_info
     unsigned int size_of_quarter_note;
 
     bool has_started;
-    bool start_of_loop; // true for one sample during loop time
+    bool is_start_of_loop; // true for one sample during loop time
     bool is_thirtysecond;
+    bool is_twentyfourth;
     bool is_sixteenth;
+    bool is_twelth;
     bool is_eighth;
+    bool is_sixth;
     bool is_quarter;
+    bool is_third;
     bool is_midi_tick;
 } mixer_timing_info;
 

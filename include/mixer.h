@@ -156,7 +156,7 @@ void mixer_status_mixr(mixer *mixr);
 void mixer_status_algoz(mixer *mixr, bool all);
 void mixer_update_bpm(mixer *mixr, int bpm);
 void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
-void mixer_events_output(mixer *mixr);
+void mixer_midi_tick(mixer *mixr);
 void mixer_emit_event(mixer *mixr, broadcast_event event);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);

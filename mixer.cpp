@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <wchar.h>
 
+#include <iostream>
+
 #include <portaudio.h>
 
 #include "SoundGenerator.h"
@@ -88,11 +90,15 @@ mixer *new_mixer(double output_latency)
     mixr->timing_info.time_of_next_midi_tick = 0;
     mixr->timing_info.has_started = false;
     mixr->timing_info.is_midi_tick = true;
-    mixr->timing_info.start_of_loop = true;
+    mixr->timing_info.is_start_of_loop = true;
     mixr->timing_info.is_thirtysecond = true;
+    mixr->timing_info.is_twentyfourth = true;
     mixr->timing_info.is_sixteenth = true;
+    mixr->timing_info.is_twelth = true;
     mixr->timing_info.is_eighth = true;
+    mixr->timing_info.is_sixth = true;
     mixr->timing_info.is_quarter = true;
+    mixr->timing_info.is_third = true;
 
     mixr->scene_mode = false;
     mixr->scene_start_pending = false;
@@ -323,7 +329,7 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
     {
         algorithm *a = mixr->algorithms[i];
         if (a != NULL)
-            algorithm_event_notify(a, event);
+            algorithm_event_notify(a, mixr->timing_info);
     }
 
     for (int i = 0; i < mixr->pattern_gen_num; ++i)
@@ -533,12 +539,17 @@ int add_looper(mixer *mixr, char *filename)
     return add_sound_generator(mixr, (SoundGenerator *)g);
 }
 
-void mixer_events_output(mixer *mixr)
+void mixer_midi_tick(mixer *mixr)
 {
     mixr->timing_info.is_thirtysecond = false;
+    mixr->timing_info.is_twentyfourth = false;
     mixr->timing_info.is_sixteenth = false;
+    mixr->timing_info.is_twelth = false;
     mixr->timing_info.is_eighth = false;
+    mixr->timing_info.is_sixth = false;
     mixr->timing_info.is_quarter = false;
+    mixr->timing_info.is_third = false;
+    mixr->timing_info.is_start_of_loop = false;
 
     if (mixr->timing_info.is_midi_tick)
     {
@@ -546,8 +557,7 @@ void mixer_events_output(mixer *mixr)
 
         if (mixr->timing_info.midi_tick % PPBAR == 0)
         {
-            mixer_emit_event(
-                mixr, (broadcast_event){.type = TIME_START_OF_LOOP_TICK});
+            mixr->timing_info.is_start_of_loop = true;
             if (mixr->scene_start_pending)
             {
                 mixer_play_scene(mixr, mixr->current_scene);
@@ -558,31 +568,18 @@ void mixer_events_output(mixer *mixr)
         if (mixr->timing_info.midi_tick % 120 == 0)
         {
             mixr->timing_info.is_thirtysecond = true;
-            mixer_emit_event(mixr,
-                             (broadcast_event){.type = TIME_THIRTYSECOND_TICK});
 
             if (mixr->timing_info.midi_tick % 240 == 0)
             {
                 mixr->timing_info.is_sixteenth = true;
                 mixr->timing_info.sixteenth_note_tick++;
 
-                // mixer_print_timing_info(mixr);
-
-                mixer_emit_event(
-                    mixr, (broadcast_event){.type = TIME_SIXTEENTH_TICK});
-
                 if (mixr->timing_info.midi_tick % 480 == 0)
                 {
                     mixr->timing_info.is_eighth = true;
-                    mixer_emit_event(
-                        mixr, (broadcast_event){.type = TIME_EIGHTH_TICK});
 
                     if (mixr->timing_info.midi_tick % PPQN == 0)
-                    {
                         mixr->timing_info.is_quarter = true;
-                        mixer_emit_event(
-                            mixr, (broadcast_event){.type = TIME_QUARTER_TICK});
-                    }
                 }
             }
         }
@@ -590,25 +587,26 @@ void mixer_events_output(mixer *mixr)
         // so far only used for ARP engines
         if (mixr->timing_info.midi_tick % 160 == 0)
         {
-            mixer_emit_event(mixr,
-                             (broadcast_event){.type = TIME_TWENTYFOURTH_TICK});
+            mixr->timing_info.is_twentyfourth = true;
 
             if (mixr->timing_info.midi_tick % 320 == 0)
             {
-                mixer_emit_event(mixr,
-                                 (broadcast_event){.type = TIME_TWELTH_TICK});
+                mixr->timing_info.is_twelth = true;
 
                 if (mixr->timing_info.midi_tick % 640 == 0)
                 {
-                    mixer_emit_event(
-                        mixr, (broadcast_event){.type = TIME_SIXTH_TICK});
+                    mixr->timing_info.is_sixth = true;
 
                     if (mixr->timing_info.midi_tick % 1280 == 0)
-                        mixer_emit_event(
-                            mixr, (broadcast_event){.type = TIME_THIRD_TICK});
+                        mixr->timing_info.is_third = true;
                 }
             }
         }
+
+        // std::cout << "Mixer -- midi_tick:" << mixr->timing_info.midi_tick
+        //          << " 16th:" << mixr->timing_info.sixteenth_note_tick
+        //          << " Start of Loop:" << mixr->timing_info.is_start_of_loop
+        //          << std::endl;
 
         mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
         // lo_send(mixr->processing_addr, "/bpm", NULL);
@@ -666,7 +664,7 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
             if (should_progress_chords(mixr, current_tick_within_bar))
                 mixer_next_chord(mixr);
 
-            mixer_events_output(mixr);
+            mixer_midi_tick(mixr);
         }
 
         if (mixr->soundgen_num > 0)
@@ -1051,7 +1049,7 @@ int mixer_print_timing_info(mixer *mixr)
     printf("Size of 1/4 note:%d\n", info->size_of_quarter_note);
 
     printf("Has_started:%d\n", info->has_started);
-    printf("Start of loop:%d\n", info->start_of_loop);
+    printf("Start of loop:%d\n", info->is_start_of_loop);
     printf("Is 1/32:%d\n", info->is_thirtysecond);
     printf("Is 1/16:%d\n", info->is_sixteenth);
     printf("Is 1/8:%d\n", info->is_eighth);

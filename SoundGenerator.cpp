@@ -143,9 +143,8 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 
     int idx;
 
-    switch (event.type)
+    if (tinfo.is_start_of_loop)
     {
-    case (TIME_START_OF_LOOP_TICK):
         engine.started = true;
         engine.event_mask_counter++;
         if (engine.restore_pending)
@@ -168,65 +167,10 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
                     engine.pattern_multiloop_count[engine.cur_pattern];
             }
         }
-        break;
-    case (TIME_MIDI_TICK):
-        if (engine.started)
-        {
-            int idx = ((engine.cur_step * PPSIXTEENTH) +
-                       (tinfo.midi_tick % PPSIXTEENTH)) %
-                      PPBAR;
-
-            if (idx < 0 || idx >= PPBAR)
-                printf("YOUHC! idx out of bounds: %d\n", idx);
-
-            if (engine.patterns[engine.cur_pattern][idx].event_type)
-            {
-                midi_event ev = engine.patterns[engine.cur_pattern][idx];
-                if (rand() % 100 < engine.pct_play)
-                {
-                    // if (ev->event_type == MIDI_ON)
-                    //    mixer_emit_event(mixr, (broadcast_event){
-                    //                               .type = SEQUENCER_NOTE,
-                    //                               .sequencer_src =
-                    //                               mixer_idx});
-                    parseMidiEvent(ev, tinfo);
-                }
-            }
-
-            // this temporal_events table is my first pass at a solution to
-            // ensure note off events still happen, even when i'm using the
-            // above count_by which ends up not reaching note off events
-            // sometimes.
-            idx = tinfo.midi_tick % PPBAR;
-            if (engine.temporal_events[idx].event_type)
-            {
-                midi_event ev = engine.temporal_events[idx];
-                // if (ev->event_type == MIDI_ON)
-                //    mixer_emit_event(
-                //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-                //                                .sequencer_src = mixer_idx});
-                parseMidiEvent(ev, tinfo);
-            }
-        }
-        break;
-    case (TIME_THIRTYSECOND_TICK):
-        if (engine.arp.enable && engine.arp.speed == ARP_32)
-        {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
-        }
-        break;
-    case (TIME_TWENTYFOURTH_TICK):
-        if (engine.arp.enable && engine.arp.speed == ARP_24)
-        {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
-        }
-        break;
-    case (TIME_SIXTEENTH_TICK):
-        if (engine.started)
+    }
+    if (engine.started)
+    {
+        if (tinfo.is_sixteenth)
         {
             if (engine.debug)
                 printf("CUR_STEP:%d range_start:%d len:%d\n", engine.cur_step,
@@ -293,62 +237,117 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
                 else if (engine.range_start < 0)
                     engine.range_start += 16;
             }
+
+            if (engine.arp.enable && engine.arp.speed == ARP_16)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
 
-        if (engine.arp.enable && engine.arp.speed == ARP_16)
+        if (tinfo.is_thirtysecond)
         {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
+            if (engine.arp.enable && engine.arp.speed == ARP_32)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
-        break;
-    case (TIME_TWELTH_TICK):
-        if (engine.arp.enable && engine.arp.speed == ARP_12)
+
+        if (tinfo.is_twentyfourth)
         {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
+            if (engine.arp.enable && engine.arp.speed == ARP_24)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
-        break;
-    case (TIME_EIGHTH_TICK):
-        if (engine.arp.enable && engine.arp.speed == ARP_8)
+        if (tinfo.is_twelth)
         {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
+            if (engine.arp.enable && engine.arp.speed == ARP_12)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
-        break;
-    case (TIME_SIXTH_TICK):
-        if (engine.arp.enable && engine.arp.speed == ARP_6)
+        if (tinfo.is_eighth)
         {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
+            if (engine.arp.enable && engine.arp.speed == ARP_8)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
-        break;
-    case (TIME_QUARTER_TICK):
-        if (engine.arp.enable && engine.arp.speed == ARP_4)
+        if (tinfo.is_sixth)
         {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
+            if (engine.arp.enable && engine.arp.speed == ARP_6)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
-        break;
-    case (TIME_THIRD_TICK):
-        if (engine.arp.enable && engine.arp.speed == ARP_3)
+        if (tinfo.is_quarter)
         {
-            midi_event ev{};
-            if (sequence_engine_do_arp(&engine, &ev))
-                noteOn(ev);
+            if (engine.arp.enable && engine.arp.speed == ARP_4)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
-        break;
-    case (TIME_CHORD_CHANGE):
-        if (engine.follow_mixer_chord_changes)
+        if (tinfo.is_third)
         {
-            sequence_engine_set_pattern_to_current_key(&engine);
+            if (engine.arp.enable && engine.arp.speed == ARP_3)
+            {
+                midi_event ev{};
+                if (sequence_engine_do_arp(&engine, &ev))
+                    noteOn(ev);
+            }
         }
-        break;
-    }
+
+        int idx = ((engine.cur_step * PPSIXTEENTH) +
+                   (tinfo.midi_tick % PPSIXTEENTH)) %
+                  PPBAR;
+
+        if (idx < 0 || idx >= PPBAR)
+            printf("YOUHC! idx out of bounds: %d\n", idx);
+
+        if (engine.patterns[engine.cur_pattern][idx].event_type)
+        {
+            midi_event ev = engine.patterns[engine.cur_pattern][idx];
+            if (rand() % 100 < engine.pct_play)
+            {
+                // if (ev->event_type == MIDI_ON)
+                //    mixer_emit_event(mixr, (broadcast_event){
+                //                               .type = SEQUENCER_NOTE,
+                //                               .sequencer_src =
+                //                               mixer_idx});
+                parseMidiEvent(ev, tinfo);
+            }
+        }
+
+        // this temporal_events table is my first pass at a solution to
+        // ensure note off events still happen, even when i'm using the
+        // above count_by which ends up not reaching note off events
+        // sometimes.
+        idx = tinfo.midi_tick % PPBAR;
+        if (engine.temporal_events[idx].event_type)
+        {
+            midi_event ev = engine.temporal_events[idx];
+            // if (ev->event_type == MIDI_ON)
+            //    mixer_emit_event(
+            //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+            //                                .sequencer_src = mixer_idx});
+            parseMidiEvent(ev, tinfo);
+        }
+
+    } // end if engine.started
 }
 
 double SoundGenerator::getPan() { return pan; }
@@ -378,7 +377,8 @@ static int soundgen_add_fx(SoundGenerator *self, fx *f)
             (fx **)realloc(self->effects, self->effects_size * sizeof(fx *));
         if (new_effects == NULL)
         {
-            printf("Ooh, burney - cannae allocate memory for new effects");
+            printf("Ooh, burney - cannae allocate "
+                   "memory for new effects");
             exit(1);
         }
         else
@@ -395,14 +395,17 @@ static int soundgen_add_fx(SoundGenerator *self, fx *f)
 
 int add_delay_soundgen(SoundGenerator *self, float duration)
 {
-    printf("Booya, adding a new DELAY to SoundGenerator: %f!\n", duration);
+    printf("Booya, adding a new DELAY to "
+           "SoundGenerator: %f!\n",
+           duration);
     stereodelay *sd = new_stereo_delay(duration);
     return soundgen_add_fx(self, (fx *)sd);
 }
 
 int add_reverb_soundgen(SoundGenerator *self)
 {
-    printf("Booya, adding a new REVERB to SoundGenerator!\n");
+    printf("Booya, adding a new REVERB to "
+           "SoundGenerator!\n");
     reverb *r = new_reverb();
     return soundgen_add_fx(self, (fx *)r);
 }
@@ -451,14 +454,16 @@ int add_beatrepeat_soundgen(SoundGenerator *self, int nbeats, int sixteenth)
 
 int add_moddelay_soundgen(SoundGenerator *self)
 {
-    printf("Booya, adding a new MODDELAY to SoundGenerator!\n");
+    printf("Booya, adding a new MODDELAY to "
+           "SoundGenerator!\n");
     mod_delay *md = new_mod_delay();
     return soundgen_add_fx(self, (fx *)md);
 }
 
 int add_modfilter_soundgen(SoundGenerator *self)
 {
-    printf("Booya, adding a new MODFILTERRRRR to SoundGenerator!\n");
+    printf("Booya, adding a new MODFILTERRRRR to "
+           "SoundGenerator!\n");
     modfilter *mf = new_modfilter();
     return soundgen_add_fx(self, (fx *)mf);
 }
@@ -472,7 +477,8 @@ int add_distortion_soundgen(SoundGenerator *self)
 
 int add_envelope_soundgen(SoundGenerator *self)
 {
-    printf("Booya, adding a new envelope to SoundGenerator!\n");
+    printf("Booya, adding a new envelope to "
+           "SoundGenerator!\n");
     envelope *e = new_envelope();
     return soundgen_add_fx(self, (fx *)e);
 }

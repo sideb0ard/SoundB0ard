@@ -810,7 +810,7 @@ void sequence_engine_reset_step(SequenceEngine *engine)
 {
     printf("RESET!\n");
     engine->count_by = 1;
-    engine->cur_step = 0;
+    engine->cur_step = -1;
     engine->range_start = 0;
     engine->range_len = 16;
     engine->fold = 0;

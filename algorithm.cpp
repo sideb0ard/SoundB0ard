@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include "algorithm.h"
 #include "cmdloop.h"
 #include "mixer.h"
@@ -55,25 +57,36 @@ static void handle_command(algorithm *a)
     a->process_step_counter++;
 }
 
-void algorithm_event_notify(void *self, broadcast_event event)
+void algorithm_event_notify(void *self, mixer_timing_info tinfo)
 {
     algorithm *a = (algorithm *)self;
 
     if (!a->active)
         return;
 
-    int event_type = event.type;
+    if (a->event_type == TIME_MIDI_TICK)
+        handle_command(a);
+    else if (a->event_type == TIME_START_OF_LOOP_TICK && tinfo.is_start_of_loop)
+        handle_command(a);
+    else if (a->event_type == TIME_QUARTER_TICK && tinfo.is_quarter)
+        handle_command(a);
+    else if (a->event_type == TIME_EIGHTH_TICK && tinfo.is_eighth)
+        handle_command(a);
+    else if (a->event_type == TIME_SIXTEENTH_TICK && tinfo.is_sixteenth)
+        handle_command(a);
+    else if (a->event_type == TIME_THIRTYSECOND_TICK && tinfo.is_thirtysecond)
+        handle_command(a);
+    // if (event_type == a->event_type)
+    //{
+    //    if (event_type == SEQUENCER_NOTE &&
+    //        event.sequencer_src != a->sequencer_src)
+    //        return;
+    //    handle_command(a);
+    //}
 
-    if (event_type == a->event_type)
-    {
-        if (event_type == SEQUENCER_NOTE &&
-            event.sequencer_src != a->sequencer_src)
-            return;
+    if (a->process_type == OVER)
         handle_command(a);
-    }
-    else if (event_type == TIME_MIDI_TICK && a->process_type == OVER)
-        handle_command(a);
-    else if (event_type == TIME_SIXTEENTH_TICK && a->process_type == FOR)
+    else if (tinfo.is_sixteenth && a->process_type == FOR)
         handle_command(a);
 }
 
