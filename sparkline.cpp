@@ -19,7 +19,7 @@ void sparky(char *instr)
     double sparkvals[MAXCHARS] = {0};
     int numvals = 0;
 
-    char *sep = ",; ";
+    char const *sep = ",; ";
     char *word, *brkt;
     for (word = strtok_r(str, sep, &brkt); word;
          word = strtok_r(NULL, sep, &brkt))

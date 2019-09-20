@@ -4,7 +4,7 @@
 #include "defjams.h"
 #include "obliquestrategies.h"
 
-char *strategies[NUM_STATEGIES] = {
+constexpr char const *strategies[NUM_STATEGIES] = {
     "Abandon desire",
     "Abandon normal instructions",
     "Accept advice",

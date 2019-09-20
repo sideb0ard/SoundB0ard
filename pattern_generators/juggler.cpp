@@ -11,11 +11,11 @@
 #include <markov.h>
 
 extern mixer *mixr;
-static char *s_juggler_styles[] = {"COMPLEX"};
+constexpr char const *s_juggler_styles[] = {"COMPLEX"};
 
 pattern_generator *new_juggler(unsigned int style)
 {
-    juggler *m = (juggler*) calloc(1, sizeof(juggler));
+    juggler *m = (juggler *)calloc(1, sizeof(juggler));
     if (!m)
     {
         printf("WOOF!\n");
@@ -46,7 +46,7 @@ void juggler_status(void *self, wchar_t *wstring)
 
 char *_get_spacer(int depth)
 {
-    char *spacer = (char*) calloc(sizeof(char), depth + 1);
+    char *spacer = (char *)calloc(sizeof(char), depth + 1);
     for (int i = 0; i < depth; i++)
         strcat(spacer, " ");
     return spacer;
@@ -64,7 +64,7 @@ void _juggler_apply_pattern(juggler *j, int start_idx, int pattern_len,
         bit_pattern = create_euclidean_rhythm(rand_steps, 16);
         break;
     case (1):
-        //bit_pattern = markov_bit_pattern_generate(0);
+        // bit_pattern = markov_bit_pattern_generate(0);
         break;
     }
 

@@ -243,8 +243,8 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
     return true;
 }
 
-static char *s_delay_mode[] = {"tap1", "tap2", "pingpong"};
-static char *s_delay_sync_len[] = {"4th", "8th", "16th"};
+constexpr char const *s_delay_mode[] = {"tap1", "tap2", "pingpong"};
+constexpr char const *s_delay_sync_len[] = {"4th", "8th", "16th"};
 void stereo_delay_status(void *self, char *status_string)
 {
     stereodelay *sd = (stereodelay *)self;

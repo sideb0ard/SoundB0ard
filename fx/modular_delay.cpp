@@ -4,7 +4,7 @@
 #include "modular_delay.h"
 #include "utils.h"
 
-static char *mod_type_as_string[] = {"FLANGER", "VIBRATO", "CHORUS"};
+constexpr char const *mod_type_as_string[] = {"FLANGER", "VIBRATO", "CHORUS"};
 
 mod_delay *new_mod_delay()
 {
