@@ -7,10 +7,10 @@
 #include <utility>
 #include <vector>
 
-#include "ast.hpp"
-#include "builtins.hpp"
-#include "evaluator.hpp"
-#include "object.hpp"
+#include <interpreter/ast.hpp>
+#include <interpreter/builtins.hpp>
+#include <interpreter/evaluator.hpp>
+#include <interpreter/object.hpp>
 
 namespace
 {

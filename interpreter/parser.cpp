@@ -6,7 +6,7 @@
 #include <utility>
 #include <vector>
 
-#include "parser.hpp"
+#include <interpreter/parser.hpp>
 
 namespace parser
 {
@@ -21,7 +21,7 @@ std::shared_ptr<ast::Program> Parser::ParseProgram()
 {
     std::shared_ptr<ast::Program> program = std::make_shared<ast::Program>();
 
-    while (cur_token_.type_ != token::EOFF)
+    while (cur_token_.type_ != token::SLANG_EOFF)
     {
         std::shared_ptr<ast::Statement> stmt = ParseStatement();
         if (stmt)
@@ -33,11 +33,11 @@ std::shared_ptr<ast::Program> Parser::ParseProgram()
 
 std::shared_ptr<ast::Statement> Parser::ParseStatement()
 {
-    if (cur_token_.type_.compare(token::LET) == 0)
+    if (cur_token_.type_.compare(token::SLANG_LET) == 0)
         return ParseLetStatement();
-    else if (cur_token_.type_.compare(token::RETURN) == 0)
+    else if (cur_token_.type_.compare(token::SLANG_RETURN) == 0)
         return ParseReturnStatement();
-    else if (cur_token_.type_.compare(token::FOR) == 0)
+    else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
     {
         std::cout << "Found FOR statement!\n";
         return ParseForStatement();
@@ -52,7 +52,7 @@ std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
     std::shared_ptr<ast::LetStatement> stmt =
         std::make_shared<ast::LetStatement>(cur_token_);
 
-    if (!ExpectPeek(token::IDENT))
+    if (!ExpectPeek(token::SLANG_IDENT))
     {
         std::cout << "NO IDENT! - returning nullopt \n";
         return nullptr;
@@ -61,7 +61,7 @@ std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
     stmt->name_ =
         std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
 
-    if (!ExpectPeek(token::ASSIGN))
+    if (!ExpectPeek(token::SLANG_ASSIGN))
     {
         std::cout << "NO ASSIGN! - returning nullopt \n";
         return nullptr;
@@ -71,7 +71,7 @@ std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
 
     stmt->value_ = ParseExpression(Precedence::LOWEST);
 
-    if (PeekTokenIs(token::SEMICOLON))
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
 
     return stmt;
@@ -87,7 +87,7 @@ std::shared_ptr<ast::ReturnStatement> Parser::ParseReturnStatement()
 
     stmt->return_value_ = ParseExpression(Precedence::LOWEST);
 
-    if (PeekTokenIs(token::SEMICOLON))
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
 
     return stmt;
@@ -100,13 +100,13 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
 
     // Starting condition //////////
 
-    if (!ExpectPeek(token::LPAREN))
+    if (!ExpectPeek(token::SLANG_LPAREN))
     {
         std::cout << "NO LPAREN! - returning nullptr \n";
         return nullptr;
     }
 
-    if (!ExpectPeek(token::IDENT))
+    if (!ExpectPeek(token::SLANG_IDENT))
     {
         std::cout << "NO IDENT! - returning nullptr \n";
         return nullptr;
@@ -123,7 +123,7 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
     std::cout << "All good so far - CUR TOKEN is " << cur_token_.literal_
               << std::endl;
 
-    if (!ExpectPeek(token::ASSIGN))
+    if (!ExpectPeek(token::SLANG_ASSIGN))
     {
         std::cout << "NO ASSIGN! - returning nullptr \n";
         return nullptr;
@@ -134,7 +134,7 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
 
     stmt->iterator_value_ = ParseExpression(Precedence::LOWEST);
 
-    if (!ExpectPeek(token::SEMICOLON))
+    if (!ExpectPeek(token::SLANG_SEMICOLON))
     {
         std::cout << "NO SEMICOLON! - returning nullptr \n";
         return nullptr;
@@ -166,7 +166,7 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
               << ". CUR TOKEN is " << cur_token_.literal_ << std::endl;
 
     // Body
-    if (!ExpectPeek(token::RPAREN))
+    if (!ExpectPeek(token::SLANG_RPAREN))
         return nullptr;
     NextToken();
 
@@ -184,7 +184,7 @@ std::shared_ptr<ast::ExpressionStatement> Parser::ParseExpressionStatement()
         std::make_shared<ast::ExpressionStatement>(cur_token_);
     stmt->expression_ = ParseExpression(Precedence::LOWEST);
 
-    if (PeekTokenIs(token::SEMICOLON))
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
 
     return stmt;
@@ -246,10 +246,11 @@ void Parser::PeekError(token::TokenType t)
 
 static bool IsInfixOperator(token::TokenType type)
 {
-    if (type == token::PLUS || type == token::MINUS || type == token::SLASH ||
-        type == token::ASTERISK || type == token::EQ || type == token::NOT_EQ ||
-        type == token::LT || type == token::GT || type == token::LPAREN ||
-        type == token::LBRACKET)
+    if (type == token::SLANG_PLUS || type == token::SLANG_MINUS ||
+        type == token::SLANG_SLASH || type == token::SLANG_ASTERISK ||
+        type == token::SLANG_EQ || type == token::SLANG_NOT_EQ ||
+        type == token::SLANG_LT || type == token::SLANG_GT ||
+        type == token::SLANG_LPAREN || type == token::SLANG_LBRACKET)
     {
         return true;
     }
@@ -267,14 +268,14 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
     if (!left_expr)
         return nullptr;
 
-    while (!PeekTokenIs(token::SEMICOLON) && p < PeekPrecedence())
+    while (!PeekTokenIs(token::SLANG_SEMICOLON) && p < PeekPrecedence())
     {
         if (IsInfixOperator(peek_token_.type_))
         {
             NextToken();
-            if (cur_token_.type_ == token::LPAREN)
+            if (cur_token_.type_ == token::SLANG_LPAREN)
                 left_expr = ParseCallExpression(left_expr);
-            else if (cur_token_.type_ == token::LBRACKET)
+            else if (cur_token_.type_ == token::SLANG_LBRACKET)
                 left_expr = ParseIndexExpression(left_expr);
             else // these are the 'leds' (left denotation)
                 left_expr = ParseInfixExpression(left_expr);
@@ -289,33 +290,33 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
 
 std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
 {
-    if (cur_token_.type_ == token::IDENT)
+    if (cur_token_.type_ == token::SLANG_IDENT)
         return ParseIdentifier();
-    else if (cur_token_.type_ == token::INT)
+    else if (cur_token_.type_ == token::SLANG_INT)
         return ParseIntegerLiteral();
-    else if (cur_token_.type_ == token::INCREMENT)
+    else if (cur_token_.type_ == token::SLANG_INCREMENT)
         return ParsePrefixExpression();
-    else if (cur_token_.type_ == token::DECREMENT)
+    else if (cur_token_.type_ == token::SLANG_DECREMENT)
         return ParsePrefixExpression();
-    else if (cur_token_.type_ == token::BANG)
+    else if (cur_token_.type_ == token::SLANG_BANG)
         return ParsePrefixExpression();
-    else if (cur_token_.type_ == token::MINUS)
+    else if (cur_token_.type_ == token::SLANG_MINUS)
         return ParsePrefixExpression();
-    else if (cur_token_.type_ == token::TRUE)
+    else if (cur_token_.type_ == token::SLANG_TRUE)
         return ParseBoolean();
-    else if (cur_token_.type_ == token::FALSE)
+    else if (cur_token_.type_ == token::SLANG_FALSE)
         return ParseBoolean();
-    else if (cur_token_.type_ == token::LPAREN)
+    else if (cur_token_.type_ == token::SLANG_LPAREN)
         return ParseGroupedExpression();
-    else if (cur_token_.type_ == token::IF)
+    else if (cur_token_.type_ == token::SLANG_IF)
         return ParseIfExpression();
-    else if (cur_token_.type_ == token::FUNCTION)
+    else if (cur_token_.type_ == token::SLANG_FUNCTION)
         return ParseFunctionLiteral();
-    else if (cur_token_.type_ == token::STRING)
+    else if (cur_token_.type_ == token::SLANG_STRING)
         return ParseStringLiteral();
-    else if (cur_token_.type_ == token::LBRACKET)
+    else if (cur_token_.type_ == token::SLANG_LBRACKET)
         return ParseArrayLiteral();
-    else if (cur_token_.type_ == token::LBRACE)
+    else if (cur_token_.type_ == token::SLANG_LBRACE)
         return ParseHashLiteral();
 
     std::cout << "No Prefix parser for " << cur_token_.type_ << std::endl;
@@ -329,14 +330,14 @@ std::shared_ptr<ast::Expression> Parser::ParseIdentifier()
 
 std::shared_ptr<ast::Expression> Parser::ParseBoolean()
 {
-    return std::make_shared<ast::BooleanExpression>(cur_token_,
-                                                    CurTokenIs(token::TRUE));
+    return std::make_shared<ast::BooleanExpression>(
+        cur_token_, CurTokenIs(token::SLANG_TRUE));
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseArrayLiteral()
 {
     auto array_lit = std::make_shared<ast::ArrayLiteral>(cur_token_);
-    array_lit->elements_ = ParseExpressionList(token::RBRACKET);
+    array_lit->elements_ = ParseExpressionList(token::SLANG_RBRACKET);
     return array_lit;
 }
 
@@ -344,13 +345,13 @@ std::shared_ptr<ast::Expression> Parser::ParseHashLiteral()
 {
     auto hash_lit = std::make_shared<ast::HashLiteral>(cur_token_);
 
-    while (!PeekTokenIs(token::RBRACE))
+    while (!PeekTokenIs(token::SLANG_RBRACE))
     {
         NextToken();
         std::shared_ptr<ast::Expression> key =
             ParseExpression(Precedence::LOWEST);
 
-        if (!ExpectPeek(token::COLON))
+        if (!ExpectPeek(token::SLANG_COLON))
             return nullptr;
 
         NextToken();
@@ -359,10 +360,11 @@ std::shared_ptr<ast::Expression> Parser::ParseHashLiteral()
 
         hash_lit->pairs_.insert({key, val});
 
-        if (!PeekTokenIs(token::RBRACE) && !ExpectPeek(token::COMMA))
+        if (!PeekTokenIs(token::SLANG_RBRACE) &&
+            !ExpectPeek(token::SLANG_COMMA))
             return nullptr;
     }
-    if (!ExpectPeek(token::RBRACE))
+    if (!ExpectPeek(token::SLANG_RBRACE))
     {
         return nullptr;
     }
@@ -382,25 +384,25 @@ std::shared_ptr<ast::Expression> Parser::ParseIfExpression()
 {
     auto expression = std::make_shared<ast::IfExpression>(cur_token_);
 
-    if (!ExpectPeek(token::LPAREN))
+    if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;
 
     NextToken();
     expression->condition_ = ParseExpression(Precedence::LOWEST);
 
-    if (!ExpectPeek(token::RPAREN))
+    if (!ExpectPeek(token::SLANG_RPAREN))
         return nullptr;
 
-    if (!ExpectPeek(token::LBRACE))
+    if (!ExpectPeek(token::SLANG_LBRACE))
         return nullptr;
 
     expression->consequence_ = ParseBlockStatement();
 
-    if (PeekTokenIs(token::ELSE))
+    if (PeekTokenIs(token::SLANG_ELSE))
     {
         NextToken();
 
-        if (!ExpectPeek(token::LBRACE))
+        if (!ExpectPeek(token::SLANG_LBRACE))
             return nullptr;
 
         expression->alternative_ = ParseBlockStatement();
@@ -413,12 +415,12 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral()
 {
     auto lit = std::make_shared<ast::FunctionLiteral>(cur_token_);
 
-    if (!ExpectPeek(token::LPAREN))
+    if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;
 
     lit->parameters_ = ParseFunctionParameters();
 
-    if (!ExpectPeek(token::LBRACE))
+    if (!ExpectPeek(token::SLANG_LBRACE))
         return nullptr;
 
     lit->body_ = ParseBlockStatement();
@@ -461,7 +463,7 @@ std::shared_ptr<ast::Expression> Parser::ParseGroupedExpression()
 {
     NextToken();
     std::shared_ptr<ast::Expression> expr = ParseExpression(Precedence::LOWEST);
-    if (!ExpectPeek(token::RPAREN))
+    if (!ExpectPeek(token::SLANG_RPAREN))
         return nullptr;
     return expr;
 }
@@ -488,7 +490,7 @@ std::shared_ptr<ast::BlockStatement> Parser::ParseBlockStatement()
     auto block_stmt = std::make_shared<ast::BlockStatement>(cur_token_);
 
     NextToken();
-    while (!CurTokenIs(token::RBRACE) && !CurTokenIs(token::EOFF))
+    while (!CurTokenIs(token::SLANG_RBRACE) && !CurTokenIs(token::SLANG_EOFF))
     {
         auto stmt = ParseStatement();
         if (stmt)
@@ -502,7 +504,7 @@ std::vector<std::shared_ptr<ast::Identifier>> Parser::ParseFunctionParameters()
 {
     std::vector<std::shared_ptr<ast::Identifier>> identifiers;
 
-    if (PeekTokenIs(token::RPAREN))
+    if (PeekTokenIs(token::SLANG_RPAREN))
     {
         NextToken();
         return identifiers;
@@ -513,7 +515,7 @@ std::vector<std::shared_ptr<ast::Identifier>> Parser::ParseFunctionParameters()
     auto ident =
         std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
     identifiers.push_back(ident);
-    while (PeekTokenIs(token::COMMA))
+    while (PeekTokenIs(token::SLANG_COMMA))
     {
         NextToken();
         NextToken();
@@ -522,7 +524,7 @@ std::vector<std::shared_ptr<ast::Identifier>> Parser::ParseFunctionParameters()
         identifiers.push_back(ident);
     }
 
-    if (!ExpectPeek(token::RPAREN))
+    if (!ExpectPeek(token::SLANG_RPAREN))
     {
         return std::vector<std::shared_ptr<ast::Identifier>>();
     }
@@ -535,7 +537,7 @@ Parser::ParseCallExpression(std::shared_ptr<ast::Expression> funct)
 {
     std::shared_ptr<ast::CallExpression> expr =
         std::make_shared<ast::CallExpression>(cur_token_, funct);
-    expr->arguments_ = ParseExpressionList(token::RPAREN);
+    expr->arguments_ = ParseExpressionList(token::SLANG_RPAREN);
     return expr;
 }
 
@@ -546,7 +548,7 @@ Parser::ParseIndexExpression(std::shared_ptr<ast::Expression> left)
         std::make_shared<ast::IndexExpression>(cur_token_, left);
     NextToken();
     expr->index_ = ParseExpression(Precedence::LOWEST);
-    if (!ExpectPeek(token::RBRACKET))
+    if (!ExpectPeek(token::SLANG_RBRACKET))
     {
         return nullptr;
     }
@@ -566,7 +568,7 @@ Parser::ParseExpressionList(token::TokenType end)
     NextToken();
     listy.push_back(ParseExpression(Precedence::LOWEST));
 
-    while (PeekTokenIs(token::COMMA))
+    while (PeekTokenIs(token::SLANG_COMMA))
     {
         NextToken();
         NextToken();

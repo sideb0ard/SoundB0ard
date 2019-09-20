@@ -1,4 +1,5 @@
-#include "lexer.hpp"
+#include <interpreter/lexer.hpp>
+
 #include <string>
 
 namespace
@@ -97,12 +98,12 @@ token::Token Lexer::NextToken()
         if (PeekChar() == '=')
         {
             ReadChar();
-            tok.type_ = token::EQ;
+            tok.type_ = token::SLANG_EQ;
             tok.literal_ = "==";
         }
         else
         {
-            tok.type_ = token::ASSIGN;
+            tok.type_ = token::SLANG_ASSIGN;
             tok.literal_ = current_char_;
         }
         break;
@@ -110,12 +111,12 @@ token::Token Lexer::NextToken()
         if (PeekChar() == '+')
         {
             ReadChar();
-            tok.type_ = token::INCREMENT;
+            tok.type_ = token::SLANG_INCREMENT;
             tok.literal_ = "++";
         }
         else
         {
-            tok.type_ = token::PLUS;
+            tok.type_ = token::SLANG_PLUS;
             tok.literal_ = current_char_;
         }
         break;
@@ -123,12 +124,12 @@ token::Token Lexer::NextToken()
         if (PeekChar() == '-')
         {
             ReadChar();
-            tok.type_ = token::DECREMENT;
+            tok.type_ = token::SLANG_DECREMENT;
             tok.literal_ = "--";
         }
         else
         {
-            tok.type_ = token::MINUS;
+            tok.type_ = token::SLANG_MINUS;
             tok.literal_ = current_char_;
         }
         break;
@@ -136,73 +137,73 @@ token::Token Lexer::NextToken()
         if (PeekChar() == '=')
         {
             ReadChar();
-            tok.type_ = token::NOT_EQ;
+            tok.type_ = token::SLANG_NOT_EQ;
             tok.literal_ = "!=";
         }
         else
         {
-            tok.type_ = token::BANG;
+            tok.type_ = token::SLANG_BANG;
             tok.literal_ = current_char_;
         }
         break;
     case ('*'):
-        tok.type_ = token::ASTERISK;
+        tok.type_ = token::SLANG_ASTERISK;
         tok.literal_ = current_char_;
         break;
     case ('/'):
-        tok.type_ = token::SLASH;
+        tok.type_ = token::SLANG_SLASH;
         tok.literal_ = current_char_;
         break;
     case ('<'):
-        tok.type_ = token::LT;
+        tok.type_ = token::SLANG_LT;
         tok.literal_ = current_char_;
         break;
     case ('>'):
-        tok.type_ = token::GT;
+        tok.type_ = token::SLANG_GT;
         tok.literal_ = current_char_;
         break;
     case (','):
-        tok.type_ = token::COMMA;
+        tok.type_ = token::SLANG_COMMA;
         tok.literal_ = current_char_;
         break;
     case (';'):
-        tok.type_ = token::SEMICOLON;
+        tok.type_ = token::SLANG_SEMICOLON;
         tok.literal_ = current_char_;
         break;
     case ('('):
-        tok.type_ = token::LPAREN;
+        tok.type_ = token::SLANG_LPAREN;
         tok.literal_ = current_char_;
         break;
     case (')'):
-        tok.type_ = token::RPAREN;
+        tok.type_ = token::SLANG_RPAREN;
         tok.literal_ = current_char_;
         break;
     case ('{'):
-        tok.type_ = token::LBRACE;
+        tok.type_ = token::SLANG_LBRACE;
         tok.literal_ = current_char_;
         break;
     case ('}'):
-        tok.type_ = token::RBRACE;
+        tok.type_ = token::SLANG_RBRACE;
         tok.literal_ = current_char_;
         break;
     case ('['):
-        tok.type_ = token::LBRACKET;
+        tok.type_ = token::SLANG_LBRACKET;
         tok.literal_ = current_char_;
         break;
     case (']'):
-        tok.type_ = token::RBRACKET;
+        tok.type_ = token::SLANG_RBRACKET;
         tok.literal_ = current_char_;
         break;
     case (':'):
-        tok.type_ = token::COLON;
+        tok.type_ = token::SLANG_COLON;
         tok.literal_ = current_char_;
         break;
     case ('"'):
-        tok.type_ = token::STRING;
+        tok.type_ = token::SLANG_STRING;
         tok.literal_ = ReadString();
         break;
     case (0):
-        tok.type_ = token::EOFF;
+        tok.type_ = token::SLANG_EOFF;
         break;
     default:
         if (IsValidIdentifier(current_char_))
@@ -213,13 +214,13 @@ token::Token Lexer::NextToken()
         }
         else if (IsDigit(current_char_))
         {
-            tok.type_ = token::INT;
+            tok.type_ = token::SLANG_INT;
             tok.literal_ = ReadNumber();
             return tok;
         }
         else
         {
-            tok.type_ = token::ILLEGAL;
+            tok.type_ = token::SLANG_ILLEGAL;
             tok.literal_ = current_char_;
         }
     }

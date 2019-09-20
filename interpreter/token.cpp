@@ -2,13 +2,14 @@
 #include <string>
 #include <unordered_map>
 
-#include "token.hpp"
+#include <interpreter/token.hpp>
 
 namespace token
 {
 const std::unordered_map<std::string, TokenType> keywords{
-    {"else", ELSE}, {"false", FALSE}, {"for", FOR},   {"fn", FUNCTION},
-    {"if", IF},     {"let", LET},     {"true", TRUE}, {"return", RETURN}};
+    {"else", SLANG_ELSE},   {"false", SLANG_FALSE},  {"for", SLANG_FOR},
+    {"fn", SLANG_FUNCTION}, {"if", SLANG_IF},        {"let", SLANG_LET},
+    {"true", SLANG_TRUE},   {"return", SLANG_RETURN}};
 
 TokenType LookupIdent(std::string ident)
 {
@@ -16,7 +17,7 @@ TokenType LookupIdent(std::string ident)
         keywords.find(ident);
     if (got != keywords.end())
         return got->second;
-    return IDENT;
+    return SLANG_IDENT;
 }
 
 std::ostream &operator<<(std::ostream &out, const Token &tok)

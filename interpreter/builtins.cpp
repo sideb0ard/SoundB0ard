@@ -1,4 +1,4 @@
-#include "builtins.hpp"
+#include <interpreter/builtins.hpp>
 
 #include <algorithm>
 #include <iostream>
@@ -8,7 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "evaluator.hpp"
+#include <interpreter/evaluator.hpp>
 
 namespace builtin
 {

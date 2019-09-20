@@ -7,9 +7,16 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
+#include <iostream>
+
 #include <algo_cmds.h>
 #include <cmdloop.h>
 #include <fx_cmds.h>
+#include <interpreter/evaluator.hpp>
+#include <interpreter/lexer.hpp>
+#include <interpreter/object.hpp>
+#include <interpreter/parser.hpp>
+#include <interpreter/token.hpp>
 #include <looper_cmds.h>
 #include <midi_cmds.h>
 #include <mixer.h>
@@ -35,6 +42,9 @@ char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 char const *OSC_LISTEN_PORT = "7771";
 static char last_line[MAXLINE] = {};
 
+auto env = std::make_shared<object::Environment>();
+auto lex = std::make_shared<lexer::Lexer>();
+
 static void liblo_error(int num, const char *msg, const char *path)
 {
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
@@ -51,7 +61,23 @@ void readline_cb(char *line)
             add_history(line);
             strncpy(last_line, line, MAXLINE);
         }
-        interpret(line);
+
+        lex->ReadInput(line);
+        std::unique_ptr<parser::Parser> parsley =
+            std::make_unique<parser::Parser>(lex);
+
+        std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+
+        auto evaluated = evaluator::Eval(program, env);
+        if (evaluated)
+        {
+            auto result = evaluated->Inspect();
+            if (result.compare("null") != 0)
+                std::cout << result << std::endl;
+        }
+
+        lex->Reset();
+        // interpret(line);
     }
 }
 

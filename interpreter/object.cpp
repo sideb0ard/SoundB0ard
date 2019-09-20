@@ -1,4 +1,4 @@
-#include "object.hpp"
+#include <interpreter/object.hpp>
 
 #include <memory>
 #include <sstream>

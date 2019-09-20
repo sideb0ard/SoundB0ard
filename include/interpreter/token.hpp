@@ -6,48 +6,48 @@ namespace token
 {
 using TokenType = std::string;
 
-const TokenType ILLEGAL = "ILLEGAL";
-const TokenType EOFF = "EOF";
+const TokenType SLANG_ILLEGAL = "ILLEGAL";
+const TokenType SLANG_EOFF = "EOF";
 
-const TokenType IDENT = "IDENT";
-const TokenType INT = "INT";
-const TokenType STRING = "STRING";
+const TokenType SLANG_IDENT = "IDENT";
+const TokenType SLANG_INT = "INT";
+const TokenType SLANG_STRING = "STRING";
 
-const TokenType ASSIGN = "=";
-const TokenType PLUS = "+";
-const TokenType MINUS = "-";
-const TokenType BANG = "!";
-const TokenType ASTERISK = "*";
-const TokenType SLASH = "/";
+const TokenType SLANG_ASSIGN = "=";
+const TokenType SLANG_PLUS = "+";
+const TokenType SLANG_MINUS = "-";
+const TokenType SLANG_BANG = "!";
+const TokenType SLANG_ASTERISK = "*";
+const TokenType SLANG_SLASH = "/";
 
-const TokenType LT = "<";
-const TokenType GT = ">";
+const TokenType SLANG_LT = "<";
+const TokenType SLANG_GT = ">";
 
-const TokenType COMMA = ",";
-const TokenType COLON = ":";
-const TokenType SEMICOLON = ";";
+const TokenType SLANG_COMMA = ",";
+const TokenType SLANG_COLON = ":";
+const TokenType SLANG_SEMICOLON = ";";
 
-const TokenType LPAREN = "(";
-const TokenType RPAREN = ")";
-const TokenType LBRACE = "{";
-const TokenType RBRACE = "}";
-const TokenType LBRACKET = "[";
-const TokenType RBRACKET = "]";
+const TokenType SLANG_LPAREN = "(";
+const TokenType SLANG_RPAREN = ")";
+const TokenType SLANG_LBRACE = "{";
+const TokenType SLANG_RBRACE = "}";
+const TokenType SLANG_LBRACKET = "[";
+const TokenType SLANG_RBRACKET = "]";
 
-const TokenType FOR = "FOR";
-const TokenType FUNCTION = "FUNCTION";
-const TokenType LET = "LET";
-const TokenType TRUE = "TRUE";
-const TokenType FALSE = "FALSE";
-const TokenType IF = "IF";
-const TokenType ELSE = "ELSE";
-const TokenType RETURN = "RETURN";
+const TokenType SLANG_FOR = "FOR";
+const TokenType SLANG_FUNCTION = "FUNCTION";
+const TokenType SLANG_LET = "LET";
+const TokenType SLANG_TRUE = "TRUE";
+const TokenType SLANG_FALSE = "FALSE";
+const TokenType SLANG_IF = "IF";
+const TokenType SLANG_ELSE = "ELSE";
+const TokenType SLANG_RETURN = "RETURN";
 
-const TokenType EQ = "==";
-const TokenType NOT_EQ = "!=";
+const TokenType SLANG_EQ = "==";
+const TokenType SLANG_NOT_EQ = "!=";
 
-const TokenType INCREMENT = "++";
-const TokenType DECREMENT = "--";
+const TokenType SLANG_INCREMENT = "++";
+const TokenType SLANG_DECREMENT = "--";
 
 class Token
 {

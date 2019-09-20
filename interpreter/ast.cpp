@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "ast.hpp"
+#include <interpreter/ast.hpp>
 
 namespace ast
 {
