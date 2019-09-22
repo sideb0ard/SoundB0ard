@@ -340,7 +340,9 @@ EvalForStatement(std::shared_ptr<ast::ForStatement> for_loop,
     std::shared_ptr<object::Object> result;
     while (IsTruthy(Eval(for_loop->termination_condition_, new_env)))
     {
+        std::cout << "TRUTHY\n";
         result = Eval(for_loop->body_, new_env);
+        std::cout << "RESULT? " << result << std::endl;
         Eval(for_loop->increment_, new_env);
     }
 
@@ -547,7 +549,10 @@ EvalIdentifier(std::shared_ptr<ast::Identifier> ident,
 
     auto builtin = builtin::built_ins[ident->value_];
     if (builtin)
+    {
+        std::cout << "BUILTIN\n";
         return builtin;
+    }
 
     return NewError("identifier not found: %s", ident->value_);
 }
@@ -600,6 +605,7 @@ std::shared_ptr<object::Object>
 ApplyFunction(std::shared_ptr<object::Object> callable,
               std::vector<std::shared_ptr<object::Object>> args)
 {
+    std::cout << "BUILTINZZ\n";
     std::shared_ptr<object::Function> func =
         std::dynamic_pointer_cast<object::Function>(callable);
     if (func)

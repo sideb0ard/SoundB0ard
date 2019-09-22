@@ -303,6 +303,7 @@ void mixer_status_sgz(mixer *mixr, bool all)
 void mixer_ps(mixer *mixr, bool all)
 {
 
+    std::cout << "PS!\n";
     print_logo();
     mixer_status_mixr(mixr);
     mixer_status_algoz(mixr, all);

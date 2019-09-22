@@ -54,6 +54,7 @@ void readline_cb(char *line)
 {
     if (NULL == line)
         exxit();
+
     if (strlen(line) != 0)
     {
         if (strncmp(last_line, line, MAXLINE) != 0)

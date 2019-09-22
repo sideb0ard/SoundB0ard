@@ -536,7 +536,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     }
     else if (strncmp("ls", wurds[0], 2) == 0)
     {
-        list_sample_dir(wurds[1]);
+        list_sample_dir(std::string(wurds[1]));
         goto cmd_found;
     }
 

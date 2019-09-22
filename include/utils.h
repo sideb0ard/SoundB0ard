@@ -18,7 +18,7 @@ float freqval(char *n);
 int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);
 int char_midi_lookup(char *char_midi);
-void list_sample_dir(char *dirname);
+void list_sample_dir(std::string indir = "");
 void get_random_sample_from_dir(char *dir_name, char *random_file);
 void strim(const char *input, char *result);
 void chordie(char *n);

@@ -251,8 +251,9 @@ static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
     qsort_char_array(wurds, middle_idx + 1, upper_idx);
 }
 
-void list_sample_dir(char *dir)
+void list_sample_dir(std::string indir)
 {
+    char const *dir = indir.c_str();
     char dirname[MAX_STATIC_STRING_SZ] = "./";
     strncat(dirname, SAMPLE_DIR, MAX_STATIC_STRING_SZ - strlen(dirname) - 1);
 

@@ -9,6 +9,11 @@
 #include <vector>
 
 #include <interpreter/evaluator.hpp>
+#include <mixer.h>
+#include <mixer_cmds.h>
+#include <utils.h>
+
+extern mixer *mixr;
 
 namespace builtin
 {
@@ -117,6 +122,23 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
+    {"ls", std::make_shared<object::BuiltIn>(
+               [](std::vector<std::shared_ptr<object::Object>> args)
+                   -> std::shared_ptr<object::Object> {
+                   if (args.size() == 1)
+                   {
+                       std::shared_ptr<object::String> dirname =
+                           std::dynamic_pointer_cast<object::String>(args[0]);
+                       if (dirname)
+                           list_sample_dir(dirname->value_);
+                   }
+                   else
+                   {
+                       list_sample_dir("");
+                   }
+
+                   return evaluator::NULLL;
+               })},
     {"push",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
@@ -158,6 +180,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                      return evaluator::NULLL;
                  })},
+    {"ps", std::make_shared<object::BuiltIn>(
+               [](std::vector<std::shared_ptr<object::Object>> args)
+                   -> std::shared_ptr<object::Object> {
+                   mixer_ps(mixr, false);
+                   return evaluator::NULLL;
+               })},
 };
 
 } // namespace builtin
