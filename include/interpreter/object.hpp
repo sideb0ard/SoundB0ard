@@ -24,6 +24,8 @@ constexpr char FUNCTION_OBJ[] = "FUNCTION";
 
 constexpr char STRING_OBJ[] = "STRING";
 
+constexpr char SYNTH_OBJ[] = "SYNTH";
+
 constexpr char BUILTIN_OBJ[] = "BUILTIN";
 
 constexpr char ARRAY_OBJ[] = "ARRAY";
@@ -127,6 +129,17 @@ class Null : public Object
   public:
     ObjectType Type() override;
     std::string Inspect() override;
+};
+
+class Synth : public Object
+{
+  public:
+    Synth();
+    ~Synth() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+    int synth_num_{-1};
 };
 
 class Error : public Object

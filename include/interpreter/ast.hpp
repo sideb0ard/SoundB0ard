@@ -144,6 +144,14 @@ class FunctionLiteral : public Expression
     std::shared_ptr<BlockStatement> body_{nullptr};
 };
 
+class SynthLiteral : public Expression
+{
+  public:
+    SynthLiteral() {}
+    explicit SynthLiteral(Token token) : Expression{token} {}
+    std::string String() const override;
+};
+
 class CallExpression : public Expression
 {
   public:

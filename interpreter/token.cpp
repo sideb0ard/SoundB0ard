@@ -7,9 +7,10 @@
 namespace token
 {
 const std::unordered_map<std::string, TokenType> keywords{
-    {"else", SLANG_ELSE},   {"false", SLANG_FALSE},  {"for", SLANG_FOR},
-    {"fn", SLANG_FUNCTION}, {"if", SLANG_IF},        {"let", SLANG_LET},
-    {"true", SLANG_TRUE},   {"return", SLANG_RETURN}};
+    {"else", SLANG_ELSE},   {"false", SLANG_FALSE}, {"for", SLANG_FOR},
+    {"fn", SLANG_FUNCTION}, {"fm", SLANG_FM_SYNTH}, {"if", SLANG_IF},
+    {"let", SLANG_LET},     {"true", SLANG_TRUE},   {"return", SLANG_RETURN},
+};
 
 TokenType LookupIdent(std::string ident)
 {

@@ -141,6 +141,8 @@ std::string FunctionLiteral::String() const
     return ss.str();
 }
 
+std::string SynthLiteral::String() const { return "FM SYNTH"; }
+
 std::string CallExpression::String() const
 {
     std::stringstream ss;

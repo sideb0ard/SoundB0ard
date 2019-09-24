@@ -5,6 +5,10 @@
 #include <string>
 #include <vector>
 
+#include <mixer.h>
+
+extern mixer *mixr;
+
 namespace object
 {
 
@@ -63,6 +67,11 @@ object::HashKey String::HashKey()
 
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
+
+Synth::Synth() { synth_num_ = add_dxsynth(mixr); }
+
+std::string Synth::Inspect() { return "synth."; }
+ObjectType Synth::Type() { return SYNTH_OBJ; }
 
 std::string ReturnValue::Inspect() { return value_->Inspect(); }
 ObjectType ReturnValue::Type() { return RETURN_VALUE_OBJ; }

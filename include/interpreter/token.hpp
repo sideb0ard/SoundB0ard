@@ -49,6 +49,8 @@ const TokenType SLANG_NOT_EQ = "!=";
 const TokenType SLANG_INCREMENT = "++";
 const TokenType SLANG_DECREMENT = "--";
 
+const TokenType SLANG_FM_SYNTH = "FM_SYNTH";
+
 class Token
 {
   public:

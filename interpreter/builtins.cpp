@@ -186,6 +186,37 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    mixer_ps(mixr, false);
                    return evaluator::NULLL;
                })},
+    {"noteOn",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             if (args.size() == 2)
+             {
+                 std::cout << "NOTE ON MOFO!\n";
+                 auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
+                 if (synth)
+                 {
+                     auto midinum =
+                         std::dynamic_pointer_cast<object::Integer>(args[1]);
+                     std::cout << "JAMMY! Synth Num:" << synth->synth_num_
+                               << " MidiNum:" << midinum->value_ << "\n";
+
+                     // create midi packet
+                     // cast synth_num to synth
+                     // noteOn()
+                     midi_event _event =
+                         new_midi_event(MIDI_ON, midinum->value_, 128);
+                     _event.source = EXTERNAL_OSC;
+                     if (mixer_is_valid_soundgen_num(mixr, synth->synth_num_))
+                     {
+                         SoundGenerator *sg =
+                             mixr->SoundGenerators[synth->synth_num_];
+                         sg->parseMidiEvent(_event, mixr->timing_info);
+                     }
+                 }
+             }
+             return evaluator::NULLL;
+         })},
 };
 
 } // namespace builtin

@@ -248,6 +248,14 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return EvalHashLiteral(hash_lit, env);
     }
 
+    std::shared_ptr<ast::SynthLiteral> synth =
+        std::dynamic_pointer_cast<ast::SynthLiteral>(node);
+    if (synth)
+    {
+        std::cout << "SYNTH LITERAL!\n";
+        return std::make_shared<object::Synth>();
+    }
+
     return NULLL;
 }
 

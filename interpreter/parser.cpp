@@ -28,6 +28,7 @@ std::shared_ptr<ast::Program> Parser::ParseProgram()
             program->statements_.push_back(stmt);
         NextToken();
     }
+    // std::cout << program->String() << std::endl;
     return program;
 }
 
@@ -312,6 +313,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseIfExpression();
     else if (cur_token_.type_ == token::SLANG_FUNCTION)
         return ParseFunctionLiteral();
+    else if (cur_token_.type_ == token::SLANG_FM_SYNTH)
+        return ParseSynthLiteral();
     else if (cur_token_.type_ == token::SLANG_STRING)
         return ParseStringLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACKET)
@@ -426,6 +429,20 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral()
     lit->body_ = ParseBlockStatement();
 
     return lit;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseSynthLiteral()
+{
+    auto synth = std::make_shared<ast::SynthLiteral>(cur_token_);
+
+    if (!ExpectPeek(token::SLANG_LPAREN))
+        return nullptr;
+
+    if (!ExpectPeek(token::SLANG_RPAREN))
+        return nullptr;
+
+    std::cout << "AST SYNTH LITERAL ALL GOOD!\n";
+    return synth;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseStringLiteral()
