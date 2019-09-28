@@ -32,6 +32,8 @@ constexpr char ARRAY_OBJ[] = "ARRAY";
 
 constexpr char HASH_OBJ[] = "HASH";
 
+constexpr char EVERY_OBJ[] = "EVERY";
+
 using ObjectType = std::string;
 
 class HashKey
@@ -140,6 +142,15 @@ class Synth : public Object
     std::string Inspect() override;
 
     int synth_num_{-1};
+};
+
+class Every : public Object
+{
+  public:
+    Every() = default;
+    ~Every() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
 };
 
 class Error : public Object

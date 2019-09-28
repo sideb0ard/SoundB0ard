@@ -256,6 +256,14 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return std::make_shared<object::Synth>();
     }
 
+    std::shared_ptr<ast::EveryExpression> every =
+        std::dynamic_pointer_cast<ast::EveryExpression>(node);
+    if (every)
+    {
+        std::cout << "EVERY Expression!\n";
+        return std::make_shared<object::Every>();
+    }
+
     return NULLL;
 }
 

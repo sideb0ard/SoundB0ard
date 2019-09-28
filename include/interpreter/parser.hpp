@@ -45,6 +45,7 @@ class Parser
 
     std::shared_ptr<ast::Program> ParseProgram();
     bool CheckErrors();
+    void ShowTokens();
 
   private:
     std::shared_ptr<ast::Statement> ParseStatement();
@@ -64,6 +65,7 @@ class Parser
     ParseInfixExpression(std::shared_ptr<ast::Expression> left);
     std::shared_ptr<ast::Expression> ParseGroupedExpression();
     std::shared_ptr<ast::Expression> ParseIfExpression();
+    std::shared_ptr<ast::Expression> ParseEveryExpression();
 
     std::shared_ptr<ast::Expression>
     ParseIndexExpression(std::shared_ptr<ast::Expression> left);
@@ -75,6 +77,7 @@ class Parser
     std::vector<std::shared_ptr<ast::Identifier>> ParseFunctionParameters();
 
     std::shared_ptr<ast::Expression> ParseSynthLiteral();
+    std::shared_ptr<ast::Expression> ParseTimingEventLiteral();
 
     std::shared_ptr<ast::Expression>
     ParseCallExpression(std::shared_ptr<ast::Expression> funct);
@@ -84,6 +87,7 @@ class Parser
     std::shared_ptr<ast::BlockStatement> ParseBlockStatement();
 
     bool ExpectPeek(token::TokenType t);
+    bool ExpectTimingEvent() const;
     bool CurTokenIs(token::TokenType t) const;
     bool PeekTokenIs(token::TokenType t) const;
 

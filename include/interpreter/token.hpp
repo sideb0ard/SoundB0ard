@@ -50,6 +50,18 @@ const TokenType SLANG_INCREMENT = "++";
 const TokenType SLANG_DECREMENT = "--";
 
 const TokenType SLANG_FM_SYNTH = "FM_SYNTH";
+const TokenType SLANG_EVERY = "EVERY";
+
+const TokenType SLANG_TIMING_MIDI_TICK = "MIDI TICK";
+const TokenType SLANG_TIMING_THIRTYSECOND = "THIRTYSECOND";
+const TokenType SLANG_TIMING_TWENTYFOURTH = "TWENTYFOURTH";
+const TokenType SLANG_TIMING_SIXTEENTH = "SIXTEENTH";
+const TokenType SLANG_TIMING_TWELTH = "TWELTH";
+const TokenType SLANG_TIMING_EIGHTH = "EIGHTH";
+const TokenType SLANG_TIMING_SIXTH = "SIXTH";
+const TokenType SLANG_TIMING_QUARTER = "QUARTER";
+const TokenType SLANG_TIMING_THIRD = "THIRD";
+const TokenType SLANG_TIMING_BAR = "BAR";
 
 class Token
 {
