@@ -77,7 +77,7 @@ class Parser
     std::vector<std::shared_ptr<ast::Identifier>> ParseFunctionParameters();
 
     std::shared_ptr<ast::Expression> ParseSynthLiteral();
-    std::shared_ptr<ast::Expression> ParseTimingEventLiteral();
+    ast::TimingEventType ParseTimingEventLiteral();
 
     std::shared_ptr<ast::Expression>
     ParseCallExpression(std::shared_ptr<ast::Expression> funct);

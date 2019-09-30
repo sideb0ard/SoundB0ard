@@ -32,7 +32,7 @@ constexpr char ARRAY_OBJ[] = "ARRAY";
 
 constexpr char HASH_OBJ[] = "HASH";
 
-constexpr char EVERY_OBJ[] = "EVERY";
+constexpr char PROCESS_OBJ[] = "PROCESS";
 
 using ObjectType = std::string;
 
@@ -133,26 +133,6 @@ class Null : public Object
     std::string Inspect() override;
 };
 
-class Synth : public Object
-{
-  public:
-    Synth();
-    ~Synth() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-
-    int synth_num_{-1};
-};
-
-class Every : public Object
-{
-  public:
-    Every() = default;
-    ~Every() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-};
-
 class Error : public Object
 {
   public:
@@ -178,6 +158,38 @@ class Environment
   private:
     std::unordered_map<std::string, std::shared_ptr<Object>> store_;
     std::shared_ptr<Environment> outer_env_;
+};
+
+class Synth : public Object
+{
+  public:
+    Synth();
+    ~Synth() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    int synth_num_{-1};
+};
+
+class Process : public Object
+{
+  public:
+    Process(std::shared_ptr<Environment> env,
+            std::shared_ptr<ast::BlockStatement> body,
+            ast::TimingEventType event_type, int frequency)
+        : env_{env}, body_{body}, event_type_{event_type}, frequency_{
+                                                               frequency} {};
+    ~Process() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    std::shared_ptr<Environment> env_;
+    std::shared_ptr<ast::BlockStatement> body_;
+    ast::TimingEventType event_type_;
+    int frequency_;
+    int process_step_counter{0};
 };
 
 class Function : public Object

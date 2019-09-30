@@ -350,28 +350,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseArrayLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACE)
         return ParseHashLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_MIDI_TICK)
-        return ParseTimingEventLiteral();
     else if (cur_token_.type_ == token::SLANG_EVERY)
         return ParseEveryExpression();
-    else if (cur_token_.type_ == token::SLANG_TIMING_THIRTYSECOND)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_TWENTYFOURTH)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_SIXTEENTH)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_TWELTH)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_EIGHTH)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_SIXTH)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_QUARTER)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_THIRD)
-        return ParseTimingEventLiteral();
-    else if (cur_token_.type_ == token::SLANG_TIMING_BAR)
-        return ParseTimingEventLiteral();
 
     std::cout << "No Prefix parser for " << cur_token_.type_ << std::endl;
     return nullptr;
@@ -477,7 +457,7 @@ std::shared_ptr<ast::Expression> Parser::ParseEveryExpression()
     NextToken();
     ShowTokens();
 
-    expression->frequency_ = ParseIntegerLiteral();
+    expression->frequency_ = std::stoll(cur_token_.literal_, nullptr, 10);
     std::cout << "GOT FREQUENCY?\n";
     ShowTokens();
 
@@ -485,8 +465,6 @@ std::shared_ptr<ast::Expression> Parser::ParseEveryExpression()
         return nullptr;
     NextToken();
     expression->event_type_ = ParseTimingEventLiteral();
-    std::cout << "GOT TIMING EVENT! " << expression->event_type_->String()
-              << std::endl;
 
     ShowTokens();
 
@@ -540,13 +518,30 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthLiteral()
     return synth;
 }
 
-std::shared_ptr<ast::Expression> Parser::ParseTimingEventLiteral()
+ast::TimingEventType Parser::ParseTimingEventLiteral()
 {
-    auto timing_event = std::make_shared<ast::TimingEventLiteral>(cur_token_);
-    std::cout << "TIMING EVENT L:ITERAL! " << timing_event->String()
-              << std::endl;
-
-    return timing_event;
+    if (cur_token_.type_ == token::SLANG_TIMING_MIDI_TICK)
+        return ast::TimingEventType::MIDI_TICK;
+    else if (cur_token_.type_ == token::SLANG_TIMING_THIRTYSECOND)
+        return ast::TimingEventType::THIRTYSECOND;
+    else if (cur_token_.type_ == token::SLANG_TIMING_TWENTYFOURTH)
+        return ast::TimingEventType::TWENTYFOURTH;
+    else if (cur_token_.type_ == token::SLANG_TIMING_SIXTEENTH)
+        return ast::TimingEventType::SIXTEENTH;
+    else if (cur_token_.type_ == token::SLANG_TIMING_TWELTH)
+        return ast::TimingEventType::TWELTH;
+    else if (cur_token_.type_ == token::SLANG_TIMING_EIGHTH)
+        return ast::TimingEventType::EIGHTH;
+    else if (cur_token_.type_ == token::SLANG_TIMING_SIXTH)
+        return ast::TimingEventType::SIXTH;
+    else if (cur_token_.type_ == token::SLANG_TIMING_QUARTER)
+        return ast::TimingEventType::QUARTER;
+    else if (cur_token_.type_ == token::SLANG_TIMING_THIRD)
+        return ast::TimingEventType::THIRD;
+    else if (cur_token_.type_ == token::SLANG_TIMING_BAR)
+        return ast::TimingEventType::BAR;
+    else // default - should never happen?!
+        return ast::TimingEventType::BAR;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseStringLiteral()

@@ -260,8 +260,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::EveryExpression>(node);
     if (every)
     {
-        std::cout << "EVERY Expression!\n";
-        return std::make_shared<object::Every>();
+        std::cout << "PROCESS Expression! Gots" << every->frequency_ << " "
+                  << (int)every->event_type_ << "\n";
+        // return std::make_shared<object::Process>();
     }
 
     return NULLL;

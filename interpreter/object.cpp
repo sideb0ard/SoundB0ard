@@ -73,8 +73,8 @@ Synth::Synth() { synth_num_ = add_dxsynth(mixr); }
 std::string Synth::Inspect() { return "synth."; }
 ObjectType Synth::Type() { return SYNTH_OBJ; }
 
-std::string Every::Inspect() { return "every"; }
-ObjectType Every::Type() { return EVERY_OBJ; }
+std::string Process::Inspect() { return "proccesss"; }
+ObjectType Process::Type() { return PROCESS_OBJ; }
 
 std::string ReturnValue::Inspect() { return value_->Inspect(); }
 ObjectType ReturnValue::Type() { return RETURN_VALUE_OBJ; }

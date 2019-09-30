@@ -121,16 +121,10 @@ std::string IfExpression::String() const
     return ss.str();
 }
 
-std::string TimingEventLiteral::String() const
-{
-    return s_event_type[static_cast<int>(value_)];
-}
-
 std::string EveryExpression::String() const
 {
     std::stringstream ss;
-    ss << "every " << frequency_->String() << " " << event_type_->String()
-       << body_->String();
+    ss << "every " << frequency_ << " " << (int)event_type_ << body_->String();
 
     return ss.str();
 }

@@ -85,41 +85,6 @@ class StringLiteral : public Expression
     std::string value_;
 };
 
-class TimingEventLiteral : public Expression
-{
-  public:
-    TimingEventLiteral() {}
-    explicit TimingEventLiteral(Token token) : Expression{token}
-    {
-        if (token.type_ == token::SLANG_TIMING_MIDI_TICK)
-            value_ = TimingEventType::MIDI_TICK;
-        else if (token.type_ == token::SLANG_TIMING_THIRTYSECOND)
-            value_ = TimingEventType::THIRTYSECOND;
-        else if (token.type_ == token::SLANG_TIMING_TWENTYFOURTH)
-            value_ = TimingEventType::TWENTYFOURTH;
-        else if (token.type_ == token::SLANG_TIMING_SIXTEENTH)
-            value_ = TimingEventType::SIXTEENTH;
-        else if (token.type_ == token::SLANG_TIMING_TWELTH)
-            value_ = TimingEventType::TWELTH;
-        else if (token.type_ == token::SLANG_TIMING_EIGHTH)
-            value_ = TimingEventType::EIGHTH;
-        else if (token.type_ == token::SLANG_TIMING_SIXTH)
-            value_ = TimingEventType::SIXTH;
-        else if (token.type_ == token::SLANG_TIMING_QUARTER)
-            value_ = TimingEventType::QUARTER;
-        else if (token.type_ == token::SLANG_TIMING_THIRD)
-            value_ = TimingEventType::THIRD;
-        else if (token.type_ == token::SLANG_TIMING_BAR)
-            value_ = TimingEventType::BAR;
-        else // default - should never happen?!
-            value_ = TimingEventType::BAR;
-    }
-    std::string String() const override;
-
-  public:
-    TimingEventType value_;
-};
-
 class BooleanExpression : public Expression
 {
   public:
@@ -188,8 +153,8 @@ class EveryExpression : public Expression
     std::string String() const override;
 
   public:
-    std::shared_ptr<Expression> event_type_;
-    std::shared_ptr<Expression> frequency_;
+    ast::TimingEventType event_type_;
+    int64_t frequency_;
     std::shared_ptr<BlockStatement> body_;
 };
 
