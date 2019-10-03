@@ -18,9 +18,9 @@ bool IsTruthy(std::shared_ptr<object::Object> obj)
 {
     if (obj == evaluator::NULLL)
         return false;
-    else if (obj == evaluator::TRUE)
+    else if (obj == evaluator::TTRUE)
         return true;
-    else if (obj == evaluator::FALSE)
+    else if (obj == evaluator::FFALSE)
         return false;
 
     return true;
@@ -262,7 +262,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     {
         std::cout << "PROCESS Expression! Gots" << every->frequency_ << " "
                   << (int)every->event_type_ << "\n";
-        // return std::make_shared<object::Process>();
+        return std::make_shared<object::Process>(
+            env, every->body_, every->event_type_, every->frequency_);
     }
 
     return NULLL;
@@ -459,14 +460,14 @@ EvalStringInfixExpression(std::string op, std::shared_ptr<object::String> left,
 std::shared_ptr<object::Object>
 EvalBangOperatorExpression(std::shared_ptr<object::Object> right)
 {
-    if (right == TRUE)
-        return FALSE;
-    else if (right == FALSE)
-        return TRUE;
+    if (right == TTRUE)
+        return FFALSE;
+    else if (right == FFALSE)
+        return TTRUE;
     else if (right == NULLL)
-        return TRUE;
+        return TTRUE;
     else
-        return FALSE;
+        return FFALSE;
 }
 
 std::shared_ptr<object::Object>
@@ -552,8 +553,8 @@ EvalBlockStatement(std::shared_ptr<ast::BlockStatement> block,
 std::shared_ptr<object::Boolean> NativeBoolToBooleanObject(bool input)
 {
     if (input)
-        return TRUE;
-    return FALSE;
+        return TTRUE;
+    return FFALSE;
 }
 
 std::shared_ptr<object::Object>

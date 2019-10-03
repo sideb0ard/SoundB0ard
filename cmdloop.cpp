@@ -26,10 +26,16 @@
 #include <pattern_generator_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
+#include <tsqueue.hpp>
 #include <utils.h>
 #include <value_generator_cmds.h>
 
 extern mixer *mixr;
+
+using Wrapper =
+    std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
+extern Tsqueue<Wrapper> g_queue;
+
 extern char *key_names[NUM_KEYS];
 
 extern wtable *wave_tables[5];
@@ -42,8 +48,8 @@ char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 char const *OSC_LISTEN_PORT = "7771";
 static char last_line[MAXLINE] = {};
 
-auto env = std::make_shared<object::Environment>();
-auto lex = std::make_shared<lexer::Lexer>();
+auto global_env = std::make_shared<object::Environment>();
+auto global_lex = std::make_shared<lexer::Lexer>();
 
 static void liblo_error(int num, const char *msg, const char *path)
 {
@@ -63,22 +69,7 @@ void readline_cb(char *line)
             strncpy(last_line, line, MAXLINE);
         }
 
-        lex->ReadInput(line);
-        std::unique_ptr<parser::Parser> parsley =
-            std::make_unique<parser::Parser>(lex);
-
-        std::shared_ptr<ast::Program> program = parsley->ParseProgram();
-
-        auto evaluated = evaluator::Eval(program, env);
-        if (evaluated)
-        {
-            auto result = evaluated->Inspect();
-            if (result.compare("null") != 0)
-                std::cout << result << std::endl;
-        }
-
-        lex->Reset();
-        // interpret(line);
+        Interpret(line, global_env);
     }
 }
 
@@ -155,70 +146,90 @@ static bool _is_meta_cmd(char *line)
     return false;
 }
 
-void interpret(char *line)
+void Interpret(char *line, std::shared_ptr<object::Environment> env)
 {
-    char wurds[NUM_WURDS][SIZE_OF_WURD] = {};
+    global_lex->ReadInput(line);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(global_lex);
 
-    if (_is_meta_cmd(line))
-    {
-        int num_wurds = parse_wurds_from_cmd(wurds, line);
-        algorithm *a = new_algorithm(num_wurds, wurds);
-        if (a)
-            mixer_add_algorithm(mixr, a);
-    }
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
 
-    char *cmd, *last_s;
-    char const *sep = ";";
-    char tmp[1024] = {};
-    for (cmd = strtok_r(line, sep, &last_s); cmd;
-         cmd = strtok_r(NULL, sep, &last_s))
-    {
-        strncpy((char *)tmp, cmd, 127);
-        int num_wurds = parse_wurds_from_cmd(wurds, tmp);
+    g_queue.push(std::make_pair(program, env));
+    // auto evaluated = evaluator::Eval(program, env);
+    // if (evaluated)
+    //{
+    //    auto result = evaluated->Inspect();
+    //    if (result.compare("null") != 0)
+    //        std::cout << result << std::endl;
+    //}
 
-        //////////////////////////////////////////////////////////////////////
-
-        if (strncmp("help", wurds[0], 4) == 0)
-            oblique_strategy();
-
-        else if (strncmp("quit", wurds[0], 4) == 0 ||
-                 strncmp("exit", wurds[0], 4) == 0)
-            exxit();
-
-        else if (strncmp("print", wurds[0], 5) == 0)
-            printf("%s\n", wurds[1]);
-
-        else if (parse_mixer_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_algo_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_fx_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_looper_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_midi_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_new_item_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_pattern_generator_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_value_generator_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_synth_cmd(num_wurds, wurds))
-            continue;
-
-        else if (parse_stepper_cmd(num_wurds, wurds))
-            continue;
-    }
+    global_lex->Reset();
 }
+
+// void interpret(char *line)
+//{
+//    char wurds[NUM_WURDS][SIZE_OF_WURD] = {};
+//
+//    // if (_is_meta_cmd(line))
+//    //{
+//    //    int num_wurds = parse_wurds_from_cmd(wurds, line);
+//    //    Process *p = new Process(0, 0, 4);
+//    //    if (p)
+//    //        mixer_add_process(mixr, p);
+//    //}
+//
+//    char *cmd, *last_s;
+//    char const *sep = ";";
+//    char tmp[1024] = {};
+//    for (cmd = strtok_r(line, sep, &last_s); cmd;
+//         cmd = strtok_r(NULL, sep, &last_s))
+//    {
+//        strncpy((char *)tmp, cmd, 127);
+//        int num_wurds = parse_wurds_from_cmd(wurds, tmp);
+//
+//        //////////////////////////////////////////////////////////////////////
+//
+//        if (strncmp("help", wurds[0], 4) == 0)
+//            oblique_strategy();
+//
+//        else if (strncmp("quit", wurds[0], 4) == 0 ||
+//                 strncmp("exit", wurds[0], 4) == 0)
+//            exxit();
+//
+//        else if (strncmp("print", wurds[0], 5) == 0)
+//            printf("%s\n", wurds[1]);
+//
+//        else if (parse_mixer_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_algo_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_fx_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_looper_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_midi_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_new_item_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_pattern_generator_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_value_generator_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_synth_cmd(num_wurds, wurds))
+//            continue;
+//
+//        else if (parse_stepper_cmd(num_wurds, wurds))
+//            continue;
+//    }
+//}
 
 int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)
 {
@@ -241,7 +252,10 @@ int exxit()
     printf(COOL_COLOR_PINK
            "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET); // Thrashin' reference
     write_history(NULL);
+
     pa_teardown();
+    g_queue.close();
+
     exit(0);
 }
 

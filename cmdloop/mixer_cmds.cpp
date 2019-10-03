@@ -60,12 +60,12 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     else if (strncmp("algoz", wurds[0], 5) == 0)
     {
         if (strncmp("off", wurds[1], 3) == 0)
-            for (int i = 0; i < mixr->algorithm_num; i++)
+            for (int i = 0; i < mixr->timers_num; i++)
             {
-                if (mixer_is_valid_algo(mixr, i))
+                if (mixer_is_valid_timer(mixr, i))
                 {
-                    algorithm *a = mixr->algorithms[i];
-                    algorithm_stop(a);
+                    Timer *t = mixr->timers[i];
+                    t->Stop();
                 }
             }
         mixer_status_algoz(mixr, true);
@@ -88,23 +88,24 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         goto cmd_found;
     }
 
-    else if (strncmp("fuckup", wurds[0], 6) == 0)
-    {
-        char fwurds[6][SIZE_OF_WURD] = {"every", "4", "bar", "loop"};
-        strcpy(fwurds[4], wurds[1]);
-        strcpy(fwurds[5], "scramble");
-        algorithm *a = new_algorithm(6, fwurds);
-        if (a)
-            mixer_add_algorithm(mixr, a);
+    // TODO - new version of fuckup!
+    // else if (strncmp("fuckup", wurds[0], 6) == 0)
+    //{
+    //    char fwurds[6][SIZE_OF_WURD] = {"every", "4", "bar", "loop"};
+    //    strcpy(fwurds[4], wurds[1]);
+    //    strcpy(fwurds[5], "scramble");
+    //    Process *p = new_algorithm(6, fwurds);
+    //    if (a)
+    //        mixer_add_algorithm(mixr, a);
 
-        strcpy(fwurds[1], "3");
-        strcpy(fwurds[5], "stutter");
-        a = new_algorithm(6, fwurds);
-        if (a)
-            mixer_add_algorithm(mixr, a);
+    //    strcpy(fwurds[1], "3");
+    //    strcpy(fwurds[5], "stutter");
+    //    a = new_algorithm(6, fwurds);
+    //    if (a)
+    //        mixer_add_algorithm(mixr, a);
 
-        goto cmd_found;
-    }
+    //    goto cmd_found;
+    //}
 
     else if (strncmp("brak", wurds[0], 4) == 0)
     {
@@ -270,9 +271,9 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             strcpy(fwurds[6], wurds[1]);
             strcpy(fwurds[7], "freq");
             strcpy(fwurds[8], "\%s");
-            algorithm *a = new_algorithm(9, fwurds);
-            if (a)
-                mixer_add_algorithm(mixr, a);
+            // algorithm *a = new_algorithm(9, fwurds);
+            // if (a)
+            //    mixer_add_algorithm(mixr, a);
         }
 
         goto cmd_found;

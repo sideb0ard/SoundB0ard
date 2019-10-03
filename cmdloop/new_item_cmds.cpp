@@ -139,25 +139,25 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 sprintf(launch_cmd[4], "%d", drum_markov);
                 sprintf(launch_cmd[5], "%d:0", bdnum);
 
-                algorithm *a = new_algorithm(6, launch_cmd);
-                if (a)
-                    mixer_add_algorithm(mixr, a);
+                // algorithm *a = new_algorithm(6, launch_cmd);
+                // if (a)
+                //    mixer_add_algorithm(mixr, a);
 
-                int snare_markov = mixer_add_markov(mixr, CLAPS);
-                sprintf(launch_cmd[4], "%d", snare_markov);
-                sprintf(launch_cmd[5], "%d:0", sdnum);
+                // int snare_markov = mixer_add_markov(mixr, CLAPS);
+                // sprintf(launch_cmd[4], "%d", snare_markov);
+                // sprintf(launch_cmd[5], "%d:0", sdnum);
 
-                a = new_algorithm(6, launch_cmd);
-                if (a)
-                    mixer_add_algorithm(mixr, a);
+                // a = new_algorithm(6, launch_cmd);
+                // if (a)
+                //    mixer_add_algorithm(mixr, a);
 
-                int hats_markov = mixer_add_markov(mixr, HATS_MASK);
-                sprintf(launch_cmd[4], "%d", hats_markov);
-                sprintf(launch_cmd[5], "%d:0", hhnum);
+                // int hats_markov = mixer_add_markov(mixr, HATS_MASK);
+                // sprintf(launch_cmd[4], "%d", hats_markov);
+                // sprintf(launch_cmd[5], "%d:0", hhnum);
 
-                a = new_algorithm(6, launch_cmd);
-                if (a)
-                    mixer_add_algorithm(mixr, a);
+                // a = new_algorithm(6, launch_cmd);
+                // if (a)
+                //    mixer_add_algorithm(mixr, a);
             }
         }
         else if (strncmp("perc", wurds[1], 4) == 0)

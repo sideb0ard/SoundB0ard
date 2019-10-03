@@ -8,6 +8,8 @@
 #include <vector>
 
 #include "ast.hpp"
+#include <mixer.h>
+#include <timer.hpp>
 
 namespace object
 {
@@ -154,6 +156,7 @@ class Environment
     ~Environment() = default;
     std::shared_ptr<Object> Get(std::string key);
     std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val);
+    void Debug();
 
   private:
     std::unordered_map<std::string, std::shared_ptr<Object>> store_;
@@ -177,9 +180,7 @@ class Process : public Object
   public:
     Process(std::shared_ptr<Environment> env,
             std::shared_ptr<ast::BlockStatement> body,
-            ast::TimingEventType event_type, int frequency)
-        : env_{env}, body_{body}, event_type_{event_type}, frequency_{
-                                                               frequency} {};
+            ast::TimingEventType event_type, int frequency);
     ~Process() = default;
     ObjectType Type() override;
     std::string Inspect() override;
@@ -187,9 +188,10 @@ class Process : public Object
   public:
     std::shared_ptr<Environment> env_;
     std::shared_ptr<ast::BlockStatement> body_;
-    ast::TimingEventType event_type_;
-    int frequency_;
-    int process_step_counter{0};
+    int timer_num;
+    // ast::TimingEventType event_type_;
+    // int frequency_;
+    // int process_step_counter{0};
 };
 
 class Function : public Object

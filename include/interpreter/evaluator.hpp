@@ -10,8 +10,8 @@
 namespace evaluator
 {
 
-inline auto const TRUE = std::make_shared<object::Boolean>(true);
-inline auto const FALSE = std::make_shared<object::Boolean>(false);
+inline auto const TTRUE = std::make_shared<object::Boolean>(true);
+inline auto const FFALSE = std::make_shared<object::Boolean>(false);
 inline auto const NULLL = std::make_shared<object::Null>();
 
 std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,

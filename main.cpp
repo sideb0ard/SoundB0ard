@@ -14,7 +14,16 @@
 #include "midimaaan.h"
 #include "mixer.h"
 
+#include <interpreter/evaluator.hpp>
+#include <interpreter/object.hpp>
+#include <tsqueue.hpp>
+
 mixer *mixr;
+
+using Wrapper =
+    std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
+Tsqueue<Wrapper> g_queue;
+
 const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
@@ -39,6 +48,26 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     return ret;
 }
 
+void *Evaluator(void *arg)
+{
+    while (auto const &Wrapper = g_queue.pop())
+    {
+        if (Wrapper)
+        {
+            auto &[node, env] = *Wrapper;
+            auto evaluated = evaluator::Eval(node, env);
+            if (evaluated)
+            {
+                auto result = evaluated->Inspect();
+                if (result.compare("null") != 0)
+                    std::cout << result << std::endl;
+            }
+        }
+    }
+
+    return nullptr;
+}
+
 int main()
 {
 
@@ -48,10 +77,10 @@ int main()
     double output_latency = pa_setup();
     mixr = new_mixer(output_latency);
 
-    PaStream *stream;
+    PaStream *output_stream;
     PaError err;
 
-    err = Pa_OpenDefaultStream(&stream,
+    err = Pa_OpenDefaultStream(&output_stream,
                                0,         // no input channels
                                2,         // stereo output
                                paFloat32, // 32bit fp output
@@ -65,7 +94,7 @@ int main()
         exit(-1);
     }
 
-    err = Pa_StartStream(stream);
+    err = Pa_StartStream(output_stream);
     if (err != paNoError)
     {
         printf("Errrrr! couldn't start stream: %s\n", Pa_GetErrorText(err));
@@ -77,7 +106,15 @@ int main()
     {
         fprintf(stderr, "Errrr, wit tha Loopy..\n");
     }
+
+    pthread_t eval_th;
+    if (pthread_create(&eval_th, NULL, Evaluator, NULL))
+    {
+        fprintf(stderr, "Errrr, wit tha Evaluator thread!..\n");
+    }
+
     pthread_join(input_th, NULL);
+    pthread_join(eval_th, NULL);
 
     // all done, time to go home
     pa_teardown();

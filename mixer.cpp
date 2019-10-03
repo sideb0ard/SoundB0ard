@@ -11,7 +11,6 @@
 
 #include "SoundGenerator.h"
 #include "ableton_link_wrapper.h"
-#include "algorithm.h"
 #include "bitshift.h"
 #include "defjams.h"
 #include "digisynth.h"
@@ -182,20 +181,21 @@ void mixer_status_mixr(mixer *mixr)
 void mixer_status_algoz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    if (mixr->algorithm_num > 0)
+    if (mixr->timers_num > 0)
     {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
-                                "algorithms" COOL_COLOR_GREEN "]\n");
-        for (int i = 0; i < mixr->algorithm_num; i++)
+        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "timers" COOL_COLOR_GREEN
+                                "]\n");
+        for (int i = 0; i < mixr->timers_num; i++)
         {
-            if (mixr->algorithms[i] != NULL)
+            if (mixr->timers[i] != NULL)
             {
-                if (mixr->algorithms[i]->active || all)
+                if (mixr->timers[i]->active_ || all)
                 {
                     wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                    algorithm_status(mixr->algorithms[i], wss);
+                    mixr->timers[i]->Status(wss);
+                    // algorithm_status(mixr->algorithms[i], wss);
                     wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE
-                                              "algo %d" WCOOL_COLOR_GREEN
+                                              "timer %d" WCOOL_COLOR_GREEN
                                               "] " WANSI_COLOR_RESET,
                             i);
                     wprintf(L"%ls\n", wss);
@@ -326,11 +326,11 @@ void mixer_print_notes(mixer *mixr)
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
-    for (int i = 0; i < mixr->algorithm_num; ++i)
+    for (int i = 0; i < mixr->timers_num; ++i)
     {
-        algorithm *a = mixr->algorithms[i];
-        if (a != NULL)
-            algorithm_event_notify(a, mixr->timing_info);
+        Timer *t = mixr->timers[i];
+        if (t != NULL)
+            t->EventNotify(mixr->timing_info);
     }
 
     for (int i = 0; i < mixr->pattern_gen_num; ++i)
@@ -440,14 +440,14 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
     return mixr->pattern_gen_num++;
 }
 
-int mixer_add_algorithm(mixer *mixr, algorithm *a)
+int mixer_add_timer(mixer *mixr, Timer *t)
 {
-    printf("Adding an ALGORITHM, yo!\n");
-    if (mixr->soundgen_num == MAX_NUM_ALGORITHMS)
+    printf("Adding a TIMER, yo!\n");
+    if (mixr->timers_num == MAX_NUM_TIMERS)
         return -99;
 
-    mixr->algorithms[mixr->algorithm_num] = a;
-    return mixr->algorithm_num++;
+    mixr->timers[mixr->timers_num] = t;
+    return mixr->timers_num++;
 }
 
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
@@ -784,10 +784,9 @@ bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
     return false;
 }
 
-bool mixer_is_valid_algo(mixer *mixr, int algo_num)
+bool mixer_is_valid_timer(mixer *mixr, int t_num)
 {
-    if (algo_num >= 0 && algo_num < mixr->algorithm_num &&
-        mixr->algorithms[algo_num] != NULL)
+    if (t_num >= 0 && t_num < mixr->timers_num && mixr->timers[t_num] != NULL)
         return true;
     return false;
 }

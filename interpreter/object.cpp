@@ -73,6 +73,18 @@ Synth::Synth() { synth_num_ = add_dxsynth(mixr); }
 std::string Synth::Inspect() { return "synth."; }
 ObjectType Synth::Type() { return SYNTH_OBJ; }
 
+Process::Process(std::shared_ptr<Environment> env,
+                 std::shared_ptr<ast::BlockStatement> body,
+                 ast::TimingEventType event_type, int frequency)
+    : env_{env}, body_{body}
+{
+    std::cout << "NEW TYIME! " << frequency << " " << (int)event_type
+              << std::endl;
+    Timer *t = new Timer(0, (int)event_type, frequency);
+    if (t)
+        timer_num = mixer_add_timer(mixr, t);
+};
+
 std::string Process::Inspect() { return "proccesss"; }
 ObjectType Process::Type() { return PROCESS_OBJ; }
 
@@ -119,6 +131,15 @@ std::string Array::Inspect()
     return_val << "[" << elems.str() << "]";
 
     return return_val.str();
+}
+
+void Environment::Debug()
+{
+    for (const auto &it : store_)
+    {
+        std::cout << "Key: " << it.first << " // Val:" << it.second->Inspect()
+                  << std::endl;
+    }
 }
 
 std::shared_ptr<Object> Environment::Get(std::string name)
