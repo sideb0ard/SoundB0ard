@@ -5,7 +5,13 @@
 
 #include <iostream>
 
-#include "defjams.h"
+#include <defjams.h>
+#include <interpreter/ast.hpp>
+
+namespace object
+{
+class Environment;
+}
 
 constexpr int MAX_CMDS = 10;
 constexpr int MAX_CMD_LEN = 4096;
@@ -45,8 +51,11 @@ enum
 class Timer
 {
   public:
-    Timer(unsigned int timer_type, unsigned int event_type, unsigned int step)
-        : timer_type_{timer_type}, event_type_{event_type}, step_{step}
+    Timer(unsigned int timer_type, unsigned int event_type, unsigned int step,
+          std::shared_ptr<object::Environment> env,
+          std::shared_ptr<ast::BlockStatement> body)
+        : timer_type_{timer_type},
+          event_type_{event_type}, step_{step}, env_{env}, body_{body}
     {
         active_ = true;
         step_counter_ = 0;
@@ -73,4 +82,7 @@ class Timer
 
     bool active_;
     bool debug_;
+
+    std::shared_ptr<object::Environment> env_;
+    std::shared_ptr<ast::BlockStatement> body_;
 };

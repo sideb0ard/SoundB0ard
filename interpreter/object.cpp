@@ -6,6 +6,7 @@
 #include <vector>
 
 #include <mixer.h>
+#include <timer.hpp>
 
 extern mixer *mixr;
 
@@ -80,7 +81,7 @@ Process::Process(std::shared_ptr<Environment> env,
 {
     std::cout << "NEW TYIME! " << frequency << " " << (int)event_type
               << std::endl;
-    Timer *t = new Timer(0, (int)event_type, frequency);
+    Timer *t = new Timer(0, (int)event_type, frequency, env, body);
     if (t)
         timer_num = mixer_add_timer(mixr, t);
 };

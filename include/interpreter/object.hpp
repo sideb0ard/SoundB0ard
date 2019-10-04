@@ -7,9 +7,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ast.hpp"
+#include <interpreter/ast.hpp>
 #include <mixer.h>
-#include <timer.hpp>
 
 namespace object
 {

@@ -10,6 +10,7 @@
 #include "timer.hpp"
 #include "utils.h"
 #include <looper.h>
+#include <tsqueue.hpp>
 
 extern mixer *mixr;
 
@@ -19,10 +20,15 @@ const char *s_timer_type[] = {"every", "over", "for"};
 const char *s_var_select_type[] = {"rand", "osc", "step", "for"};
 const char *s_env_type[] = {"LIST", "STEP"};
 
+using Wrapper =
+    std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
+extern Tsqueue<Wrapper> g_queue;
+
 void Timer::Eval()
 {
     std::cout << "BEEP!\n";
 
+    g_queue.push(std::make_pair(body_, env_));
     step_counter_++;
 }
 
