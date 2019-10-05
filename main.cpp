@@ -31,6 +31,8 @@ const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
 
 const char *chord_type_names[] = {"MAJOR", "MINOR", "DIMINISHED"};
 
+extern char const *prompt;
+
 static int paCallback(const void *input_buffer, void *output_buffer,
                       unsigned long frames_per_buffer,
                       const PaStreamCallbackTimeInfo *time_info,
@@ -60,7 +62,10 @@ void *Evaluator(void *arg)
             {
                 auto result = evaluated->Inspect();
                 if (result.compare("null") != 0)
+                {
                     std::cout << result << std::endl;
+                    // std::cout << prompt;
+                }
             }
         }
     }

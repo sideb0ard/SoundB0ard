@@ -567,10 +567,7 @@ EvalIdentifier(std::shared_ptr<ast::Identifier> ident,
 
     auto builtin = builtin::built_ins[ident->value_];
     if (builtin)
-    {
-        std::cout << "BUILTIN\n";
         return builtin;
-    }
 
     return NewError("identifier not found: %s", ident->value_);
 }
@@ -623,7 +620,6 @@ std::shared_ptr<object::Object>
 ApplyFunction(std::shared_ptr<object::Object> callable,
               std::vector<std::shared_ptr<object::Object>> args)
 {
-    std::cout << "BUILTINZZ\n";
     std::shared_ptr<object::Function> func =
         std::dynamic_pointer_cast<object::Function>(callable);
     if (func)
@@ -636,11 +632,9 @@ ApplyFunction(std::shared_ptr<object::Object> callable,
     std::shared_ptr<object::BuiltIn> builtin =
         std::dynamic_pointer_cast<object::BuiltIn>(callable);
     if (builtin)
-    {
         return builtin->func_(args);
-    }
 
-    return NewError("Something funky with yer functions, mate!");
+    return NewError("Something stinky wit yer functions, mate!");
 }
 
 std::shared_ptr<object::Environment>

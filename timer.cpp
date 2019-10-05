@@ -26,8 +26,6 @@ extern Tsqueue<Wrapper> g_queue;
 
 void Timer::Eval()
 {
-    std::cout << "BEEP!\n";
-
     g_queue.push(std::make_pair(body_, env_));
     step_counter_++;
 }
