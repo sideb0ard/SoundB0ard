@@ -1,0 +1,18 @@
+let isTooBig = fn (i, arr) { if (i > (len(arr) -1)) { return true; } return false; }
+
+let Inc = fn(i, arr) { ++i; if (isTooBig(i, arr)) { puts("RESET"); let i = 0; } return i }
+
+
+let i = 0;
+let j = 0;
+let k = 0;
+
+let notes = [75, 70, 47, 76, 84];
+let velz = [ 127, 10, 127, 5, 127, 10, 120];
+let durz = [100, 400, 700, 30, 30, 200, 350];
+
+let dx = fm()
+
+every (1 bar) { noteOn(dx, notes[i], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }
+
+every (21 sixteenth) { noteOn(dx, notes[i], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }
