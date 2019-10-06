@@ -194,6 +194,7 @@ void dxsynth::noteOn(midi_event ev)
             return; // should never happen
         if (!msv->m_voice.m_note_on)
         {
+            std::cout << "VELOCITY IS " << ev.data2 << std::endl;
             dxsynth_increment_voice_timestamps(this);
             voice_note_on(&msv->m_voice, ev.data1, ev.data2,
                           get_midi_freq(ev.data1), m_last_note_frequency);

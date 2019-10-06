@@ -4,6 +4,8 @@
 #include "utils.h"
 #include <stdlib.h>
 
+#include <iostream>
+
 void voice_init(voice *v)
 {
     v->m_portamento_time_msec = 0.0;
@@ -341,6 +343,7 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
     if (!v->m_note_on && !v->m_note_pending)
     {
         v->m_midi_note_number = midi_note;
+        std::cout << "Setting velocity to " << midi_velocity << std::endl;
         v->m_midi_velocity = midi_velocity;
         v->m_v_modmatrix.m_sources[SOURCE_VELOCITY] =
             (double)v->m_midi_velocity;

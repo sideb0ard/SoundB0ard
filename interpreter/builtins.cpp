@@ -209,7 +209,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          if (passed_velocity < 128)
                              velocity = passed_velocity;
                      }
-                     std::cout << "VELOCITY is" << velocity << std::endl;
                      midi_event event_on =
                          new_midi_event(MIDI_ON, midinum, velocity);
                      event_on.source = EXTERNAL_OSC;
