@@ -9,6 +9,8 @@
 #include <vector>
 
 #include <interpreter/evaluator.hpp>
+#include <keys.h>
+#include <midi_cmds.h>
 #include <mixer.h>
 #include <mixer_cmds.h>
 #include <utils.h>
@@ -186,6 +188,29 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    mixer_ps(mixr, false);
                    return evaluator::NULLL;
                })},
+    {"keys",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             if (args.size() == 1)
+             {
+                 auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
+                 if (synth)
+                 {
+                     if (mixer_is_valid_soundgen_num(mixr, synth->synth_num_))
+                     {
+                         midi_set_destination(mixr, synth->synth_num_);
+                     }
+                 }
+             }
+             return evaluator::NULLL;
+         })},
+    {"midiInit", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> args)
+                         -> std::shared_ptr<object::Object> {
+                         midi_launch_init(mixr);
+                         return evaluator::NULLL;
+                     })},
     {"noteOn",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

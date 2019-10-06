@@ -4,7 +4,6 @@
 #include <drumsynth.h>
 #include <midi_cmds.h>
 #include <midimaaan.h>
-#include <mixer.h>
 
 extern mixer *mixr;
 

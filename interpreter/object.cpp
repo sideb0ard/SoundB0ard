@@ -69,7 +69,7 @@ object::HashKey String::HashKey()
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
 
-Synth::Synth() { synth_num_ = add_dxsynth(mixr); }
+Synth::Synth() { synth_num_ = add_minisynth(mixr); }
 
 std::string Synth::Inspect() { return "synth."; }
 ObjectType Synth::Type() { return SYNTH_OBJ; }
