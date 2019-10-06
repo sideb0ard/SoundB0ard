@@ -138,10 +138,25 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 
 void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
+    int idx = tinfo.midi_tick % PPBAR;
+
+    // this temporal_events table is my first pass at a solution to
+    // ensure note off events still happen, even when i'm using the
+    // above count_by which ends up not reaching note off events
+    // sometimes.
+    if (engine.temporal_events[idx].event_type)
+    {
+        midi_event ev = engine.temporal_events[idx];
+        // if (ev->event_type == MIDI_ON)
+        //    mixer_emit_event(
+        //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
+        //                                .sequencer_src = mixer_idx});
+        noteOff(ev);
+        // parseMidiEvent(ev, tinfo);
+    }
+
     if (!active)
         return;
-
-    int idx;
 
     if (tinfo.is_start_of_loop)
     {
@@ -332,22 +347,13 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
             }
         }
 
-        // this temporal_events table is my first pass at a solution to
-        // ensure note off events still happen, even when i'm using the
-        // above count_by which ends up not reaching note off events
-        // sometimes.
-        idx = tinfo.midi_tick % PPBAR;
-        if (engine.temporal_events[idx].event_type)
-        {
-            midi_event ev = engine.temporal_events[idx];
-            // if (ev->event_type == MIDI_ON)
-            //    mixer_emit_event(
-            //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-            //                                .sequencer_src = mixer_idx});
-            parseMidiEvent(ev, tinfo);
-        }
-
     } // end if engine.started
+}
+
+void SoundGenerator::noteOffDelayed(midi_event ev, int event_off_tick)
+{
+    std::cout << "Adding DELAYED note!\n";
+    sequence_engine_add_temporal_event(&engine, event_off_tick, ev);
 }
 
 double SoundGenerator::getPan() { return pan; }

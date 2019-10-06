@@ -190,25 +190,55 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
-             if (args.size() == 2)
+             int args_size = args.size();
+             if (args_size >= 2)
              {
                  auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
                  if (synth)
                  {
                      auto midinum =
-                         std::dynamic_pointer_cast<object::Integer>(args[1]);
+                         std::dynamic_pointer_cast<object::Integer>(args[1])
+                             ->value_;
 
-                     // create midi packet
-                     // cast synth_num to synth
-                     // noteOn()
-                     midi_event _event =
-                         new_midi_event(MIDI_ON, midinum->value_, 128);
-                     _event.source = EXTERNAL_OSC;
+                     int velocity = 127;
+                     if (args_size >= 3)
+                     {
+                         int passed_velocity =
+                             std::dynamic_pointer_cast<object::Integer>(args[2])
+                                 ->value_;
+                         if (passed_velocity < 128)
+                             velocity = passed_velocity;
+                     }
+                     std::cout << "VELOCITY is" << velocity << std::endl;
+                     midi_event event_on =
+                         new_midi_event(MIDI_ON, midinum, velocity);
+                     event_on.source = EXTERNAL_OSC;
+
                      if (mixer_is_valid_soundgen_num(mixr, synth->synth_num_))
                      {
                          SoundGenerator *sg =
                              mixr->SoundGenerators[synth->synth_num_];
-                         sg->parseMidiEvent(_event, mixr->timing_info);
+                         sg->parseMidiEvent(event_on, mixr->timing_info);
+                         // sg->noteOn(event_on);
+
+                         int note_duration_ms = sg->note_duration_ms_;
+                         if (args_size >= 4)
+                         {
+                             note_duration_ms =
+                                 std::dynamic_pointer_cast<object::Integer>(
+                                     args[3])
+                                     ->value_;
+                         }
+                         int duration_in_midi_ticks =
+                             note_duration_ms /
+                             mixr->timing_info.ms_per_midi_tick;
+                         int midi_off_tick = (mixr->timing_info.midi_tick +
+                                              duration_in_midi_ticks) %
+                                             PPBAR;
+
+                         midi_event event_off =
+                             new_midi_event(MIDI_OFF, midinum, velocity);
+                         sg->noteOffDelayed(event_off, midi_off_tick);
                      }
                  }
              }
