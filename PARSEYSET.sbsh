@@ -8,20 +8,33 @@ let j = 0;
 let k = 0;
 let l = 0;
 
-let notesOne = [75, 74, 47, 76, 84];
+let notesOne = [30, 42, 54, 66, 78, 90];
 let notesTwo = [83, 58, 35, 64, 72];
 let notesThree = [51, 46, 33, 52, 60, 55];
 let notesAll = [notesOne, notesTwo, notesThree];
 
-let notes = notesAll[0]
+let notes = notesAll[2]
 
-let velz = [ 127, 10, 127, 5, 127, 10, 120, 127, 30, 50];
-let durz = [100, 40, 700, 1000, 50, 200, 350];
+let velz = [ 10, 20, 40, 60, 80, 100, 127];
+let durz = [10, 30, 50, 70, 140, 200, 400, 600, 750, 1000];
+let durz = [140, 200, 400, 600, 750, 1000];
 
 let dx = fm()
+
+let start = 8
+let end = 13
+let FibGenerator = fn() { let ans = start + end; let start = end; let end = ans; if (end > 100) { let start = 8; let end = 13; } return ans}
+
+every (21 sixteenth) { noteOn(dx, notes[i], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }
+
+let notesThree = reverse(notesThree)
+let velz = reverse(velz)
+let durz = reverse(durz)
+
+
+every (17 sixteenth) { noteOn(dx, notes[j], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }
 
 every (1 bar) { noteOn(dx, notes[i], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }
 
 every (3 bar) { let notes = notesAll[l]; let l = Inc(l, notesAll); puts("L is "); puts(l) }
 
-every (21 sixteenth) { noteOn(dx, notes[i], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }

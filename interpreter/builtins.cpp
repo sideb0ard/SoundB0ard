@@ -294,6 +294,27 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    {"rand",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             if (args.size() != 1)
+                 return evaluator::NewError(
+                     "`rand` requires a single synth argument.");
+
+             auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
+             if (synth)
+             {
+
+                 if (mixer_is_valid_soundgen_num(mixr, synth->synth_num_))
+                 {
+                     SoundGenerator *sg =
+                         mixr->SoundGenerators[synth->synth_num_];
+                     sg->randomize();
+                 }
+             }
+             return evaluator::NULLL;
+         })},
 };
 
 } // namespace builtin
