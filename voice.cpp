@@ -55,7 +55,7 @@ void voice_initialize_modmatrix(voice *v, modmatrix *matrix)
     // VELOCITY -> DCA VEL
     row = create_matrix_row(SOURCE_VELOCITY, DEST_DCA_VELOCITY,
                             &v->m_default_mod_intensity,
-                            &v->m_default_mod_range, TRANSFORM_NONE, false);
+                            &v->m_default_mod_range, TRANSFORM_NONE, true);
     add_matrix_row(matrix, row);
 
     // PITCHBEND -> OSC
@@ -343,7 +343,6 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
     if (!v->m_note_on && !v->m_note_pending)
     {
         v->m_midi_note_number = midi_note;
-        std::cout << "Setting velocity to " << midi_velocity << std::endl;
         v->m_midi_velocity = midi_velocity;
         v->m_v_modmatrix.m_sources[SOURCE_VELOCITY] =
             (double)v->m_midi_velocity;

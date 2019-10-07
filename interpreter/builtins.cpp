@@ -188,6 +188,31 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    mixer_ps(mixr, false);
                    return evaluator::NULLL;
                })},
+    {"reverse",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+             if (input.size() != 1)
+                 return evaluator::NewError(
+                     "`reverse` requires a single array argument.");
+
+             std::shared_ptr<object::Array> array_obj =
+                 std::dynamic_pointer_cast<object::Array>(input[0]);
+             if (!array_obj)
+             {
+                 return evaluator::NewError(
+                     "argument to `reverse` must be an array - got %s",
+                     input[0]->Type());
+             }
+
+             auto return_array =
+                 std::make_shared<object::Array>(array_obj->elements_);
+
+             std::reverse(return_array->elements_.begin(),
+                          return_array->elements_.end());
+
+             return return_array;
+         })},
     {"keys",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -242,8 +267,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      {
                          SoundGenerator *sg =
                              mixr->SoundGenerators[synth->synth_num_];
-                         sg->parseMidiEvent(event_on, mixr->timing_info);
-                         // sg->noteOn(event_on);
+                         // sg->parseMidiEvent(event_on, mixr->timing_info);
+                         sg->noteOn(event_on);
 
                          int note_duration_ms = sg->note_duration_ms_;
                          if (args_size >= 4)
@@ -262,6 +287,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                          midi_event event_off =
                              new_midi_event(MIDI_OFF, midinum, velocity);
+                         event_off.delete_after_use = true;
                          sg->noteOffDelayed(event_off, midi_off_tick);
                      }
                  }

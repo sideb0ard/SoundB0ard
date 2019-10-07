@@ -147,12 +147,8 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     if (engine.temporal_events[idx].event_type)
     {
         midi_event ev = engine.temporal_events[idx];
-        // if (ev->event_type == MIDI_ON)
-        //    mixer_emit_event(
-        //        mixr, (broadcast_event){.type = SEQUENCER_NOTE,
-        //                                .sequencer_src = mixer_idx});
         noteOff(ev);
-        // parseMidiEvent(ev, tinfo);
+        midi_event_clear(&engine.temporal_events[idx]);
     }
 
     if (!active)
@@ -352,7 +348,6 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 
 void SoundGenerator::noteOffDelayed(midi_event ev, int event_off_tick)
 {
-    std::cout << "Adding DELAYED note!\n";
     sequence_engine_add_temporal_event(&engine, event_off_tick, ev);
 }
 

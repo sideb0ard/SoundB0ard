@@ -6,6 +6,8 @@
 #include "defjams.h"
 #include "utils.h"
 
+#include <iostream>
+
 extern const char *s_dest_enum_to_name[];
 dca *new_dca()
 {
@@ -83,9 +85,14 @@ void dca_update(dca *self)
                 self->m_v_modmatrix->m_destinations[self->m_mod_source_amp_db];
 
         if (self->m_mod_source_velocity != DEST_NONE)
+        {
             self->m_midi_velocity =
                 self->m_v_modmatrix
                     ->m_destinations[self->m_mod_source_velocity];
+            // std::cout << "GOT VELoCITY! " << self->m_mod_source_velocity << "
+            // "
+            //          << self->m_midi_velocity << std::endl;
+        }
 
         if (self->m_mod_source_pan != DEST_NONE)
             self->m_pan_mod =
@@ -98,6 +105,7 @@ void dca_update(dca *self)
         self->m_gain = self->m_eg_mod + 1.0;
 
     self->m_gain *= pow(10.0, self->m_amp_mod_db / (double)20.0);
+    self->m_gain *= mma_midi_to_atten(self->m_midi_velocity);
 }
 
 void dca_gennext(dca *self, double left_input, double right_input,

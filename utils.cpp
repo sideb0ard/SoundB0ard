@@ -937,6 +937,13 @@ double semitones_between_frequencies(double start_freq, double end_freq)
     return fastlog2(end_freq / start_freq) * 12.0;
 }
 
+double mma_midi_to_atten(unsigned int midi_val)
+{
+    if (midi_val == 0)
+        return 0.0; // floor
+    return ((double)midi_val * (double)midi_val) / (127.0 * 127.0);
+}
+
 double mma_midi_to_atten_db(unsigned int midi_val)
 {
     if (midi_val == 0)

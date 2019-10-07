@@ -1,18 +1,27 @@
+
+
 let isTooBig = fn (i, arr) { if (i > (len(arr) -1)) { return true; } return false; }
-
-let Inc = fn(i, arr) { ++i; if (isTooBig(i, arr)) { puts("RESET"); let i = 0; } return i }
-
+let Inc = fn(i, arr) { let temp = i + 1; if (isTooBig(temp, arr)) { let i = 0; } else { let i = temp;} return i }
 
 let i = 0;
 let j = 0;
 let k = 0;
+let l = 0;
 
-let notes = [75, 70, 47, 76, 84];
-let velz = [ 127, 10, 127, 5, 127, 10, 120];
-let durz = [100, 400, 700, 30, 30, 200, 350];
+let notesOne = [75, 74, 47, 76, 84];
+let notesTwo = [83, 58, 35, 64, 72];
+let notesThree = [51, 46, 33, 52, 60, 55];
+let notesAll = [notesOne, notesTwo, notesThree];
+
+let notes = notesAll[0]
+
+let velz = [ 127, 10, 127, 5, 127, 10, 120, 127, 30, 50];
+let durz = [100, 40, 700, 1000, 50, 200, 350];
 
 let dx = fm()
 
 every (1 bar) { noteOn(dx, notes[i], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }
+
+every (3 bar) { let notes = notesAll[l]; let l = Inc(l, notesAll); puts("L is "); puts(l) }
 
 every (21 sixteenth) { noteOn(dx, notes[i], velz[j], durz[k]); let i = Inc(i, notes); let j = Inc(j, velz) ; let k = Inc(k, durz); }
