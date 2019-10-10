@@ -246,16 +246,23 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
                  if (synth)
                  {
-                     auto midinum =
-                         std::dynamic_pointer_cast<object::Integer>(args[1])
-                             ->value_;
+                     auto int_object =
+                         std::dynamic_pointer_cast<object::Integer>(args[1]);
+
+                     if (!int_object)
+                         return evaluator::NULLL;
+
+                     auto midinum = int_object->value_;
 
                      int velocity = 127;
                      if (args_size >= 3)
                      {
-                         int passed_velocity =
-                             std::dynamic_pointer_cast<object::Integer>(args[2])
-                                 ->value_;
+                         auto int_obj =
+                             std::dynamic_pointer_cast<object::Integer>(
+                                 args[2]);
+                         if (!int_obj)
+                             return evaluator::NULLL;
+                         int passed_velocity = int_obj->value_;
                          if (passed_velocity < 128)
                              velocity = passed_velocity;
                      }
@@ -273,10 +280,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          int note_duration_ms = sg->note_duration_ms_;
                          if (args_size >= 4)
                          {
-                             note_duration_ms =
+                             auto intr_obj =
                                  std::dynamic_pointer_cast<object::Integer>(
-                                     args[3])
-                                     ->value_;
+                                     args[3]);
+                             note_duration_ms = intr_obj->value_;
                          }
                          int duration_in_midi_ticks =
                              note_duration_ms /

@@ -28,7 +28,8 @@ HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
 READLINELIBDIR=/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 # Flags passed to the preprocessor.
-CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
+CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O0 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
+#CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
 
 $(OBJDIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CPPFLAGS)
