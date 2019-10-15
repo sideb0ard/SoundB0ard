@@ -275,7 +275,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          SoundGenerator *sg =
                              mixr->SoundGenerators[synth->synth_num_];
                          // sg->parseMidiEvent(event_on, mixr->timing_info);
-                         sg->noteOn(event_on);
 
                          int note_duration_ms = sg->note_duration_ms_;
                          if (args_size >= 4)
@@ -283,8 +282,16 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                              auto intr_obj =
                                  std::dynamic_pointer_cast<object::Integer>(
                                      args[3]);
+                             if (!intr_obj)
+                                 return evaluator::NULLL;
+
                              note_duration_ms = intr_obj->value_;
                          }
+
+                         // call noteOn after ensuring we got duration for
+                         // noteOff, otherwise we could have a stuck note.
+                         sg->noteOn(event_on);
+
                          int duration_in_midi_ticks =
                              note_duration_ms /
                              mixr->timing_info.ms_per_midi_tick;
