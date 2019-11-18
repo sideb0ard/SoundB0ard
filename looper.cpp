@@ -30,7 +30,7 @@ looper::looper(char *filename)
     grain_release_time_pct = 15;
     quasi_grain_fudge = 220;
     selection_mode = GRAIN_SELECTION_STATIC;
-    envelope_mode = LOOPER_ENV_GENERATOR;
+    // envelope_mode = LOOPER_ENV_GENERATOR;
     envelope_mode = LOOPER_ENV_PARABOLIC;
     envelope_taper_ratio = 0.5;
     reverse_mode = 0; // bool
@@ -224,7 +224,7 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
                     scramble_diff = 3 - cur_sixteenth;
                 else if (randy > 25 && randy < 50) // repeat the 4th sixteenth
                     scramble_diff = 4 - cur_sixteenth;
-                else if (randy > 25 && randy < 50) // repeat the 7th sixteenth
+                else if (randy > 50 && randy < 75) // repeat the 7th sixteenth
                     scramble_diff = 7 - cur_sixteenth;
             }
         }
