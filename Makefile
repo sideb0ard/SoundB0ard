@@ -15,8 +15,10 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 
 
-SRC = $(wildcard *.cpp) $(wildcard */*.cpp)
+# SRC = $(wildcard *.cpp) $(wildcard */*.cpp)
+SRC = $(shell find src/ -type f -name '*.cpp')
 OBJDIR = obj
+# MAIN = src/main.cpp
 OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
@@ -30,30 +32,40 @@ HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
 READLINELIBDIR=/Users/sideboard/homebrew/opt/readline/lib
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 # Flags passed to the preprocessor.
-CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O0 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include 
+CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O0 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
 #CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
 
 $(OBJDIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CPPFLAGS)
 
 TARGET = sbsh
+TEST_TARGET = sbsh_test
+
+LEXER_TESTS =  tests/lexer_test.cpp
+PARSER_TESTS = tests/parser_test.cpp
+EVAL_TESTS =   tests/evaluator_test.cpp
+OBJECT_TESTS = tests/object_test.cpp
 
 .PHONE: depend clean
 
 all: objdir $(TARGET)
 	@ctags -R *
-	@cscope -b
+	@cscope -R -b
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	mkdir -p obj/fx obj/filterz obj/pattern_transformers obj/cmdloop obj/pattern_generators obj/value_generators obj/afx obj/interpreter obj/interpreter_tests
+	mkdir -p obj/src/fx obj/src/filterz obj/src/pattern_transformers obj/src/cmdloop obj/src/pattern_generators obj/src/value_generators obj/src/afx obj/src/interpreter obj/src/tests
 
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ $(LIBS) $(INCDIRS)
 
+$(TEST_TARGET): $(PARSER_TESTS) $(LEXER_TESTS) $(EVAL_TESTS) $(OBJECT_TESTS) $(GTEST_LIBS) $(OBJ)
+	$(info $$OBJ is [${OBJ}])
+	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -L$(GTEST_LIB_DIR) -lgtest -lpthread -o $@ $^ $(LIBS) $(INCDIRS)
+
 clean:
 	rm -f *.o *~ $(TARGET)
-	find $(OBJDIR) -name "*.o" -exec rm {} \;
+	rm -rf obj/*
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
 
 format:
