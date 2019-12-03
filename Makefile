@@ -15,24 +15,23 @@ GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
 
 
 
-# SRC = $(wildcard *.cpp) $(wildcard */*.cpp)
 SRC = $(shell find src/ -type f -name '*.cpp')
 OBJDIR = obj
-# MAIN = src/main.cpp
 OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
 
-ABLETONASIOINC=-I/Users/sideboard/Code/link/modules/asio-standalone/asio/include
-INCDIRS=-I/Users/sideboard/homebrew/opt/readline/include -I/usr/local/include -Iinclude/interpreter -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include -I/Users/sideboard/homebrew/include -I${HOME}/Code/range-v3/include/
-LIBDIR=/usr/local/lib
+ABLETONASIOINC=/Users/sideboard/Code/link/modules/asio-standalone/asio/include
+READLINEINCDIR=/Users/sideboard/homebrew/opt/readline/include
+INCDIRS=-I/usr/local/include -Iinclude/interpreter -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include -I/Users/sideboard/homebrew/include -I${HOME}/Code/range-v3/include/ -I${ABLETONASIOINC} -I${READLINEINCDIR}
+
 HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
-#READLINELIBDIR=/Users/sideboard/homebrew/Cellar/readline/7.0.3_1/lib
-#READLINEINCDIR=/Users/sideboard/homebrew/opt/readline/include
 READLINELIBDIR=/Users/sideboard/homebrew/opt/readline/lib
+LIBDIRS=-L/usr/local/lib -L${HOMEBREWLIBDIR} -L${READLINELIBDIR}
+
 WARNFLASGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
 # Flags passed to the preprocessor.
-CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O0 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
+CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) -O0 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
 #CPPFLAGS = -std=c++17 $(WARNFLAGS) -g $(INCDIRS) $(ABLETONASIOINC) -O3 -fsanitize=address -fno-omit-frame-pointer -isystem $(GTEST_DIR)/include
 
 $(OBJDIR)/%.o: %.cpp
@@ -46,7 +45,7 @@ PARSER_TESTS = tests/parser_test.cpp
 EVAL_TESTS =   tests/evaluator_test.cpp
 OBJECT_TESTS = tests/object_test.cpp
 
-.PHONE: depend clean
+.PHONY: depend clean
 
 all: objdir $(TARGET)
 	@ctags -R *
@@ -57,11 +56,11 @@ objdir:
 	mkdir -p obj/src/fx obj/src/filterz obj/src/pattern_transformers obj/src/cmdloop obj/src/pattern_generators obj/src/value_generators obj/src/afx obj/src/interpreter obj/src/tests
 
 $(TARGET): $(OBJ)
-	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -o $@ $^ $(LIBS) $(INCDIRS)
+	$(CC) $(CPPFLAGS) $(LIBDIRS) -o $@ $^ $(LIBS) $(INCDIRS)
 
 $(TEST_TARGET): $(PARSER_TESTS) $(LEXER_TESTS) $(EVAL_TESTS) $(OBJECT_TESTS) $(GTEST_LIBS) $(OBJ)
 	$(info $$OBJ is [${OBJ}])
-	$(CC) $(CPPFLAGS) -L$(READLINELIBDIR) -L$(LIBDIR) -L$(HOMEBREWLIBDIR) -L$(GTEST_LIB_DIR) -lgtest -lpthread -o $@ $^ $(LIBS) $(INCDIRS)
+	$(CC) $(CPPFLAGS) $(LIBDIRS) -L$(GTEST_LIB_DIR) -lgtest -lpthread -o $@ $^ $(LIBS) $(INCDIRS)
 
 clean:
 	rm -f *.o *~ $(TARGET)
