@@ -38,12 +38,6 @@ $(OBJDIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CPPFLAGS)
 
 TARGET = sbsh
-TEST_TARGET = sbsh_test
-
-LEXER_TESTS =  tests/lexer_test.cpp
-PARSER_TESTS = tests/parser_test.cpp
-EVAL_TESTS =   tests/evaluator_test.cpp
-OBJECT_TESTS = tests/object_test.cpp
 
 .PHONY: depend clean
 
@@ -58,17 +52,25 @@ objdir:
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) $(LIBDIRS) -o $@ $^ $(LIBS) $(INCDIRS)
 
-$(TEST_TARGET): $(PARSER_TESTS) $(LEXER_TESTS) $(EVAL_TESTS) $(OBJECT_TESTS) $(GTEST_LIBS) $(OBJ)
-	$(info $$OBJ is [${OBJ}])
-	$(CC) $(CPPFLAGS) $(LIBDIRS) -L$(GTEST_LIB_DIR) -lgtest -lpthread -o $@ $^ $(LIBS) $(INCDIRS)
-
 clean:
-	rm -f *.o *~ $(TARGET)
+	rm -f *.o *~ $(TARGET) $(TEST_TARGET)
 	rm -rf obj/*
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
 
 format:
 	find . -type f -name "*.[ch]" -exec clang-format -i {} \;
+
+
+############### TESTzzz ################################################################
+TEST_TARGET = sbsh_test
+TESTS = $(wildcard tests/*.cpp)
+OBJ_MINUS_MAIN = $(filter-out obj/src//main.o, $(OBJ))
+
+#$(TEST_TARGET): $(TESTS) $(GTEST_LIBS) $(OBJ_MINUS_MAIN)
+$(TEST_TARGET): tests/parsey_tests.cpp tests/evaluator_test.cpp $(GTEST_LIBS) $(OBJ_MINUS_MAIN)
+	#$(info $$OBJ_MINUS_MAIN is [${OBJ_MINUS_MAIN}])
+	$(info $$TEZZZTS is [${TESTS}])
+	$(CC) $(CPPFLAGS) $(LIBDIRS) -L$(GTEST_LIB_DIR) -lgtest -lpthread -o $@ $^ $(LIBS) $(INCDIRS)
 
 # Builds gtest.a and gtest_main.a.
 

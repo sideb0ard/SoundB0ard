@@ -34,7 +34,7 @@ extern mixer *mixr;
 
 using Wrapper =
     std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
-extern Tsqueue<Wrapper> g_queue;
+Tsqueue<Wrapper> g_queue;
 
 extern char *key_names[NUM_KEYS];
 

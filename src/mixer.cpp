@@ -29,10 +29,12 @@
 #include "sbmsg.h"
 #include "utils.h"
 
-extern mixer *mixr;
+mixer *mixr;
 
-extern const char *key_names[NUM_KEYS];
-extern char *chord_type_names[NUM_CHORD_TYPES];
+const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
+                           "G", "G_SHARP", "A", "A_SHARP", "B"};
+
+const char *chord_type_names[] = {"MAJOR", "MINOR", "DIMINISHED"};
 
 static const char *s_progressions[NUM_PROGRESSIONS] = {
     "I-IV-V", "I-V-vi-IV", "I-vi-IV-V", "vi-ii-V-I"};

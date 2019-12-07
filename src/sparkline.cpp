@@ -9,7 +9,7 @@
 
 #define MAXCHARS 256 // pretty arbitrary
 
-extern const wchar_t *sparkchars;
+const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
 
 void sparky(char *instr)
 {

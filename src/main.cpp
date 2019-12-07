@@ -18,20 +18,16 @@
 #include <interpreter/object.hpp>
 #include <tsqueue.hpp>
 
-mixer *mixr;
+extern mixer *mixr;
 
 using Wrapper =
     std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
-Tsqueue<Wrapper> g_queue;
+extern Tsqueue<Wrapper> g_queue;
 
-const wchar_t *sparkchars = L"\u2581\u2582\u2583\u2585\u2586\u2587";
-
-const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
-                           "G", "G_SHARP", "A", "A_SHARP", "B"};
-
-const char *chord_type_names[] = {"MAJOR", "MINOR", "DIMINISHED"};
-
-extern char const *prompt;
+extern const wchar_t *sparkchars;
+extern const char *key_names[NUM_KEYS];
+extern const char *prompt;
+extern char *chord_type_names[NUM_CHORD_TYPES];
 
 static int paCallback(const void *input_buffer, void *output_buffer,
                       unsigned long frames_per_buffer,
