@@ -513,7 +513,7 @@ TEST_F(ParserTest, TestPrefixExpressions)
             std::dynamic_pointer_cast<ast::ExpressionStatement>(
                 program->statements_[0]);
         if (!stmt)
-            FAIL() << "program_->statements_[0] is not an ExpressionStatement";
+            FAIL() << "program_->statements_[0] is not an ExpressionStatement ";
 
         std::shared_ptr<ast::PrefixExpression> expr =
             std::dynamic_pointer_cast<ast::PrefixExpression>(stmt->expression_);
@@ -568,7 +568,7 @@ TEST_F(ParserTest, TestInfixExpressions)
             std::dynamic_pointer_cast<ast::ExpressionStatement>(
                 program->statements_[0]);
         if (!stmt)
-            FAIL() << "program_->statements_[0] is not an ExpressionStatement";
+            FAIL() << "program_->statements_[0] is not an ExpressionStatement ";
 
         std::variant<int64_t, std::string, bool> left = tt.left_value;
         std::variant<int64_t, std::string, bool> right = tt.right_value;
