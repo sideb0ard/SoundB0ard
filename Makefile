@@ -1,17 +1,6 @@
 CC = clang++
 
-
 GTEST_DIR =  /Users/sideboard/Code/googletest/googletest
-GTEST_LIB_DIR = /Users/sideboard/Code/googletest/googletest/make
-
-# Google Test libraries
-GTEST_LIBS = libgtest.a libgtest_main.a
-
-# All Google Test headers.  Usually you shouldn't change this
-# definition.
-GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
-                $(GTEST_DIR)/include/gtest/internal/*.h
-
 
 
 
@@ -66,14 +55,22 @@ TEST_TARGET = sbsh_test
 TESTS = $(wildcard tests/*.cpp)
 OBJ_MINUS_MAIN = $(filter-out obj/src//main.o, $(OBJ))
 
+GTEST_LIB_DIR = /Users/sideboard/Code/googletest/googletest/make
+GTEST_LIBS = libgtest.a libgtest_main.a
+
 #$(TEST_TARGET): $(TESTS) $(GTEST_LIBS) $(OBJ_MINUS_MAIN)
 $(TEST_TARGET): tests/parsey_tests.cpp tests/evaluator_test.cpp $(GTEST_LIBS) $(OBJ_MINUS_MAIN)
 	#$(info $$OBJ_MINUS_MAIN is [${OBJ_MINUS_MAIN}])
 	$(info $$TEZZZTS is [${TESTS}])
 	$(CC) $(CPPFLAGS) $(LIBDIRS) -L$(GTEST_LIB_DIR) -lgtest -lpthread -o $@ $^ $(LIBS) $(INCDIRS)
 
-# Builds gtest.a and gtest_main.a.
+# All Google Test headers.  Usually you shouldn't change this
+# definition.
+GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
+                $(GTEST_DIR)/include/gtest/internal/*.h
 
+# Builds gtest.a and gtest_main.a.
+#
 # Usually you shouldn't tweak such internal variables, indicated by a
 # trailing _.
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)

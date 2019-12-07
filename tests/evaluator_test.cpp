@@ -171,37 +171,40 @@ TEST_F(EvaluatorTest, TestBangOperator)
     }
 }
 
-TEST_F(EvaluatorTest, TestIfElseExpression)
-{
-    struct TestCaseInt
-    {
-        std::string input;
-        int64_t expected;
-    };
-    std::vector<TestCaseInt> tests{{"if (true) { 10 }", 10},
-                                   {"if (1) { 10 }", 10},
-                                   {"if (1 < 2) { 10 }", 10},
-                                   {"if (1 > 2) { 10 } else { 20 }", 20},
-                                   {"if (1 < 2) { 10 } else { 20 }", 10}};
-    for (auto tt : tests)
-    {
-        std::cout << "\nTesting! input: " << tt.input << std::endl;
-        auto evaluated = TestEval(tt.input);
+// TEST_F(EvaluatorTest, TestIfElseExpression)
+//{
+// std::cout << "TESYTES" << std::endl;
+// struct TestCaseInt
+//{
+//    std::string input;
+//    int64_t expected;
+//};
+// std::vector<TestCaseInt> tests{{"if (true) { 10 }", 10},
+//                               {"if (1) { 10 }", 10},
+//                               {"if (1 < 2) { 10 }", 10},
+//                               {"if (1 > 2) { 10 } else { 20 }", 20},
+//                               {"if (1 < 2) { 10 } else { 20 }", 10}};
+// for (auto tt : tests)
+//{
+//    std::cout << "Nout...\n";
+//    // std::cout << "\nTesting! input: " << tt.input << std::endl;
+//    // auto evaluated = TestEval(tt.input);
 
-        EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
-    }
+//    // EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
+//
+//}
 
-    ////////////////////
+////////////////////
 
-    std::vector<std::string> nullTests{"if (false) { 10 }",
-                                       "if (1 > 2) { 10 }"};
-    for (auto tt : nullTests)
-    {
-        std::cout << "\nTesting! input: " << tt << std::endl;
-        std::shared_ptr<object::Object> evaluated = TestEval(tt);
-        EXPECT_EQ(evaluated, evaluator::NULLL);
-    }
-}
+// std::vector<std::string> nullTests{"if (false) { 10 }",
+//                                   "if (1 > 2) { 10 }"};
+// for (auto tt : nullTests)
+//{
+//    std::cout << "\nTesting! input: " << tt << std::endl;
+//    std::shared_ptr<object::Object> evaluated = TestEval(tt);
+//    EXPECT_EQ(evaluated, evaluator::NULLL);
+//}
+//}
 //
 // TEST_F(EvaluatorTest, TestReturnStatements)
 //{
