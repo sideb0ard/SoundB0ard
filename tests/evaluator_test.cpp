@@ -449,10 +449,9 @@ TEST_F(EvaluatorTest, TestBuiltInFunctions)
         {R"(len(1))", "argument to `len` not supported, got INTEGER"},
         {R"(len("one", "two"))",
          "Too many arguments for len - can only accept one"},
-        {R"(head(1))", "argument to `head` must be an array - got INTEGER "},
-        {R"(last(1))", " argument to `last` must be an array - got INTEGER "},
-        {R"(push(1, 1))",
-         " argument to `push` must be an array - got INTEGER "},
+        {R"(head(1))", "argument to `head` must be an array - got INTEGER"},
+        {R"(last(1))", "argument to `last` must be an array - got INTEGER"},
+        {R"(push(1, 1))", "argument to `push` must be an array - got INTEGER"},
     };
 
     for (auto &tt : teststrings)

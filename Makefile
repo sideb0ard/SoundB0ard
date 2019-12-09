@@ -2,7 +2,7 @@ CC = clang++
 
 GTEST_DIR =  /Users/sideboard/Code/googletest/googletest
 
-SRC = $(shell find src/ -type f -name '*.cpp')
+SRC = $(shell find src -type f -name '*.cpp')
 OBJDIR = obj
 OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 
@@ -18,10 +18,12 @@ LIBDIRS=-L/usr/local/lib -L${HOMEBREWLIBDIR} -L${READLINELIBDIR}
 
 WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants
 CPPFLAGS = -isystem $(GTEST_DIR)/include
-CXXFLAGS += -std=c++17 $(WARNFLAGS) -g -O0 -fsanitize=address -fno-omit-frame-pointer
+# CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O0 -fsanitize=address -fno-omit-frame-pointer
+CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O0 -fno-omit-frame-pointer
 
 $(OBJDIR)/%.o: %.cpp
 	$(CC) -c -o $@ $< $(CXXFLAGS) $(INCDIRS)
+	@echo
 
 TARGET = sbsh
 
@@ -33,15 +35,15 @@ all: objdir $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	mkdir -p obj/src/fx obj/src/filterz obj/src/pattern_transformers obj/src/cmdloop obj/src/pattern_generators obj/src/value_generators obj/src/afx obj/src/interpreter obj/src/tests
+	find src -type dir -exec mkdir -p obj/{} \;
 
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) $(INCDIRS) $(CXXFLAGS) $(LIBDIRS) $(LIBS) $^ -o $@
 
 clean:
-	rm -f *.o *~ $(TARGET) $(TEST_TARGET)
-	rm -rf obj/*
-	rm -f libgtest.a libgtest_main.a
+	@rm -f *.o *~ $(TARGET) $(TEST_TARGET)
+	@rm -rf obj/*
+	@rm -f libgtest.a libgtest_main.a
 	@echo "\n\x1b[37mCleannnnd..!\x1b[0m"
 
 format:
@@ -53,7 +55,7 @@ format:
 
 TEST_TARGET = sbsh_test
 TESTS = $(wildcard tests/*.cpp)
-OBJ_MINUS_MAIN = $(filter-out obj/src//main.o, $(OBJ))
+OBJ_MINUS_MAIN = $(filter-out obj/src/main.o, $(OBJ))
 
 GTEST_LIB_DIR = .
 GTEST_LIBS = libgtest.a libgtest_main.a

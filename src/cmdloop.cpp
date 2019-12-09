@@ -47,31 +47,62 @@ extern wtable *wave_tables[5];
 char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 char const *OSC_LISTEN_PORT = "7771";
 static char last_line[MAXLINE] = {};
+static char current_line[MAXLINE] = {};
 
 auto global_env = std::make_shared<object::Environment>();
 auto global_lex = std::make_shared<lexer::Lexer>();
 
-static void liblo_error(int num, const char *msg, const char *path)
+namespace
+{
+
+bool IsBalanced(const char *input)
+{
+    // dumb algorithm counting matching number of curly braces.
+    int num_braces = 0;
+    const int len = strlen(input);
+    for (int i = 0; i < len; i++)
+    {
+        if (input[i] == '{')
+            num_braces++;
+        else if (input[i] == '}')
+            num_braces--;
+    }
+
+    return num_braces == 0;
+}
+
+void liblo_error(int num, const char *msg, const char *path)
 {
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
 }
 
-static void readline_cb(char *line)
+void readline_cb(char *line)
 {
     if (NULL == line)
         exxit();
 
     if (strlen(line) != 0)
     {
-        if (strncmp(last_line, line, MAXLINE) != 0)
+        int cur_len = strlen(current_line);
+        int next_len = strlen(line);
+        if (cur_len + next_len < MAXLINE)
         {
-            add_history(line);
-            strncpy(last_line, line, MAXLINE);
-        }
+            strncat(current_line, line, next_len);
+            if (IsBalanced(current_line))
+            {
+                if (strncmp(last_line, current_line, MAXLINE) != 0)
+                {
+                    add_history(current_line);
+                    strncpy(last_line, current_line, MAXLINE);
+                }
 
-        Interpret(line, global_env);
+                Interpret(current_line, global_env);
+                memset(current_line, 0, MAXLINE);
+            }
+        }
     }
 }
+} // namespace
 
 void *loopy(void *arg)
 {
