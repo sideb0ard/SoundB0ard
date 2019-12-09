@@ -16,8 +16,7 @@ HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
 READLINELIBDIR=/Users/sideboard/homebrew/opt/readline/lib
 LIBDIRS=-L/usr/local/lib -L${HOMEBREWLIBDIR} -L${READLINELIBDIR}
 
-dWARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes
-# Flags passed to the preprocessor.
+WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants
 CPPFLAGS = -isystem $(GTEST_DIR)/include
 CXXFLAGS += -std=c++17 $(WARNFLAGS) -g -O0 -fsanitize=address -fno-omit-frame-pointer
 
@@ -34,11 +33,9 @@ all: objdir $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	@echo "OBJdddd"
 	mkdir -p obj/src/fx obj/src/filterz obj/src/pattern_transformers obj/src/cmdloop obj/src/pattern_generators obj/src/value_generators obj/src/afx obj/src/interpreter obj/src/tests
 
 $(TARGET): $(OBJ)
-	@echo "!!Targe!!"
 	$(CC) $(CPPFLAGS) $(INCDIRS) $(CXXFLAGS) $(LIBDIRS) $(LIBS) $^ -o $@
 
 clean:

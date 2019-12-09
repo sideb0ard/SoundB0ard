@@ -44,7 +44,7 @@ void juggler_status(void *self, wchar_t *wstring)
              j->max_depth, j->pct_probability);
 }
 
-char *_get_spacer(int depth)
+static char *_get_spacer(int depth)
 {
     char *spacer = (char *)calloc(sizeof(char), depth + 1);
     for (int i = 0; i < depth; i++)
@@ -52,8 +52,8 @@ char *_get_spacer(int depth)
     return spacer;
 }
 
-void _juggler_apply_pattern(juggler *j, int start_idx, int pattern_len,
-                            int depth, midi_event *midi_pattern)
+static void _juggler_apply_pattern(juggler *j, int start_idx, int pattern_len,
+                                   int depth, midi_event *midi_pattern)
 {
     int generator = rand() % 2;
     int rand_steps = rand() % 6;
@@ -82,8 +82,9 @@ void _juggler_apply_pattern(juggler *j, int start_idx, int pattern_len,
                                             midi_pattern);
 }
 
-void _juggler_recursive_generation(juggler *j, int start_idx, int pattern_len,
-                                   int depth, midi_event *midi_pattern)
+static void _juggler_recursive_generation(juggler *j, int start_idx,
+                                          int pattern_len, int depth,
+                                          midi_event *midi_pattern)
 {
     if (depth == j->max_depth)
     {
@@ -124,7 +125,11 @@ void juggler_set_debug(void *self, bool b)
     j->debug = b;
 }
 
-void juggler_event_notify(void *self, broadcast_event event) {}
+void juggler_event_notify(void *self, broadcast_event event)
+{
+    (void)self;
+    (void)event;
+}
 
 void juggler_set_style(juggler *j, unsigned int style)
 {

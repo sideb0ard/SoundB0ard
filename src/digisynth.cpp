@@ -118,4 +118,4 @@ void digisynth::noteOff(midi_event ev)
     }
 }
 
-void digisynth_update(digisynth *ds) {}
+void digisynth_update(digisynth *ds) { (void)ds; }

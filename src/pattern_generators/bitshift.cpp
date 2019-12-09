@@ -26,29 +26,29 @@ void print_symbols(std::vector<Symbol> syms)
 
 const std::vector<std::string> ops = {"<<", ">>", "^", "|", "~", "&",
                                       "+",  "-",  "*", "/", "%", "t"};
-bool is_number(const std::string &s)
-{
-    return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) {
-                             return !std::isdigit(c);
-                         }) == s.end();
-}
-
-bool is_operator(const std::string &s)
-{
-    if (std::find(ops.begin(), ops.end(), s) != ops.end())
-        return true;
-    return false;
-}
-
-bool is_parenthesis(const std::string &s, SymbolAssociativity sym)
-{
-    if ("(" == s && sym == SymbolAssociativity::LEFT)
-        return true;
-    else if (")" == s && sym == SymbolAssociativity::RIGHT)
-        return true;
-
-    return false;
-}
+// bool is_number(const std::string &s)
+//{
+//    return !s.empty() && std::find_if(s.begin(), s.end(), [](char c) {
+//                             return !std::isdigit(c);
+//                         }) == s.end();
+//}
+//
+// bool is_operator(const std::string &s)
+//{
+//    if (std::find(ops.begin(), ops.end(), s) != ops.end())
+//        return true;
+//    return false;
+//}
+//
+// bool is_parenthesis(const std::string &s, SymbolAssociativity sym)
+//{
+//    if ("(" == s && sym == SymbolAssociativity::LEFT)
+//        return true;
+//    else if (")" == s && sym == SymbolAssociativity::RIGHT)
+//        return true;
+//
+//    return false;
+//}
 
 bool is_valid_char(char ch)
 {
@@ -113,7 +113,7 @@ OperatorType which_op(char c)
 Symbol::Symbol(SymbolType type, int value) : sym_type{type}, value{value} {}
 
 Symbol::Symbol(SymbolType type, std::string identifier, OperatorType op_type)
-    : sym_type{type}, identifier{identifier}, op_type{op_type}
+    : sym_type{type}, op_type{op_type}, identifier{identifier}
 {
     if (identifier == "<<")
     {
@@ -221,10 +221,12 @@ pattern_generator *new_bitshift(int num_wurds, char wurds[][SIZE_OF_WURD])
         mixr->timing_info.cur_sample; // init value, rather than 0
     return (pattern_generator *)bs;
 }
-void bitshift_change_pattern(bitshift *sg, char *pattern)
-{
-    // TODO
-}
+// static void bitshift_change_pattern(bitshift *sg, char *pattern)
+//{
+//    (void)sg;
+//    (void)pattern;
+//    // TODO
+//}
 
 void bitshift_status(void *self, wchar_t *wstring)
 {
@@ -347,7 +349,8 @@ void bitshift_generate(void *self, void *data)
 
 void bitshift_event_notify(void *self, broadcast_event event)
 {
-    bitshift *bs = (bitshift *)self;
+    (void)self;
+    (void)event;
     // no-op
 }
 
@@ -364,6 +367,8 @@ void bitshift_set_time_counter(bitshift *bs, int time)
 
 bool bitshift_save(bitshift *bs, char *name)
 {
+    (void)bs;
+    (void)name;
     return true;
     // TODO finish
 }

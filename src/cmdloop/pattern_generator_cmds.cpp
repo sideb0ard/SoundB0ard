@@ -15,6 +15,7 @@ extern mixer *mixr;
 
 bool parse_pattern_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
+    (void)num_wurds;
     if (strncmp("pattern", wurds[0], 7) == 0 ||
         strncmp("pat", wurds[0], 3) == 0)
     {

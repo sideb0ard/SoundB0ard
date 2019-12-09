@@ -40,5 +40,5 @@ void intdiv_set_debug(void *self, bool b);
 void intdiv_set_allowed_part_sizes(intdiv *id, char const *allowed_parts);
 void intdiv_set_num_parts(intdiv *id, int num_parts);
 void intdiv_print_patterns(intdiv *id);
-void intdiv_set_selected_pattern(intdiv *id, unsigned int pat_num);
+void intdiv_set_selected_pattern(intdiv *id, int pat_num);
 void intdiv_set_mode(intdiv *id, unsigned int mode);

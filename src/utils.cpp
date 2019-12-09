@@ -227,6 +227,7 @@ static bool first_wurd_before_second(char *first_wurd, char *second_wurd)
 
 static int sort_char_array(char **wurds, int start_idx, int end_idx)
 {
+    (void)start_idx;
     for (int i = 1; i < end_idx; i++)
     {
         for (int j = i;
@@ -238,18 +239,18 @@ static int sort_char_array(char **wurds, int start_idx, int end_idx)
     return 0;
 }
 
-static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
-{
-    if (lower_idx >= upper_idx)
-        return;
-    int middle_idx = lower_idx;
-    for (int i = lower_idx + 1; i < upper_idx; i++)
-        if (!first_wurd_before_second(wurds[i], wurds[lower_idx]))
-            switch_wurds(wurds, ++middle_idx, i);
-    switch_wurds(wurds, lower_idx, middle_idx);
-    qsort_char_array(wurds, lower_idx, middle_idx - 1);
-    qsort_char_array(wurds, middle_idx + 1, upper_idx);
-}
+// static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
+//{
+//    if (lower_idx >= upper_idx)
+//        return;
+//    int middle_idx = lower_idx;
+//    for (int i = lower_idx + 1; i < upper_idx; i++)
+//        if (!first_wurd_before_second(wurds[i], wurds[lower_idx]))
+//            switch_wurds(wurds, ++middle_idx, i);
+//    switch_wurds(wurds, lower_idx, middle_idx);
+//    qsort_char_array(wurds, lower_idx, middle_idx - 1);
+//    qsort_char_array(wurds, middle_idx + 1, upper_idx);
+//}
 
 void list_sample_dir(std::string indir)
 {

@@ -11,7 +11,8 @@ const char *dynamics_processor_type_to_char[] = {"COMP", "LIMIT", "EXPAND",
 
 dynamics_processor *new_dynamics_processor(void)
 {
-    dynamics_processor *dp = (dynamics_processor *) calloc(1, sizeof(dynamics_processor));
+    dynamics_processor *dp =
+        (dynamics_processor *)calloc(1, sizeof(dynamics_processor));
     dp->m_fx.type = COMPRESSOR;
     dp->m_fx.enabled = true;
     dp->m_fx.process = &dynamics_processor_process;
@@ -240,8 +241,6 @@ void dynamics_processor_status(void *self, char *status_string)
 
 stereo_val dynamics_processor_process(void *self, stereo_val input)
 {
-    double returnval = 0;
-
     dynamics_processor *dp = (dynamics_processor *)self;
     // double inputgain = pow(10.0, dp->m_inputgain_db / 20.0);
     double outputgain = pow(10.0, dp->m_outputgain_db / 20.0);

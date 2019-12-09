@@ -73,9 +73,6 @@ looper::looper(char *filename)
 
 void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
-    static bool debugc = true;
-    static int debugcount = 0;
-
     // need to read cur_step before calling SoundGenerator::eventNotify
     int cur_sixteenth_midi_base = engine.cur_step * PPSIXTEENTH;
     if (cur_sixteenth_midi_base < 0)
@@ -88,10 +85,6 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     if (!engine.started)
         return;
     started = true;
-
-    // switch (event.type)
-    //{
-    // case (TIME_START_OF_LOOP_TICK):
 
     if (tinfo.is_start_of_loop)
     {
@@ -130,35 +123,6 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx;
         double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
         double new_read_idx = decimal_percent_of_loop * audio_buffer_len;
-        // if (debugc)
-        //    std::cout << "EVENTCOUNT:" << debugcount++
-        //              << " cur_sixteenth_midi_base:" <<
-        //              cur_sixteenth_midi_base
-        //              << " relative_midi_idx:" << relative_midi_idx
-        //              << " Engine.curstep:" << engine.cur_step
-        //              << " Tinfo.midi_tick:" << tinfo.midi_tick
-        //              << " Tinfo.sixteenth_note_tick:"
-        //              << tinfo.sixteenth_note_tick
-        //              << " LoopCounter:" << loop_counter
-        //              << " LoopNum:" << loop_num
-        //              << " cur_midi_idx:" << cur_midi_idx
-        //              << " Pct:" << decimal_percent_of_loop
-        //              << " IDX: " << new_read_idx << " LEN:" <<
-        //              audio_buffer_len
-        //              << std::endl;
-        // if (debugcount > 10)
-        //    debugc = false;
-        // std::cout << "Readidx:" << new_read_idxA
-        //          << " LEN:" << audio_buffer_len
-        //          << " (PCT:" << decimal_percent_of_loop << ")"
-        //          << std::endl;
-
-        // printf("PPLOOP:%f PPSIXT:%d base:%d cur_midi:%d DEC:%f len:%d "
-        //      "REDXIX:%f\n",
-        //      pulses_per_loop, PPSIXTEENTH, cur_sixteenth_midi_base,
-        //      cur_midi_idx, decimal_percent_of_loop,
-        //      audio_buffer_len, new_read_idx);
-
         if (reverse_mode)
             new_read_idx = (audio_buffer_len - 1) - new_read_idx;
 

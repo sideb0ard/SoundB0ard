@@ -21,6 +21,11 @@ extern mixer *mixr;
 
 extern char *s_synth_waves[6];
 
+// static void print_midi_event_rec(midi_event ev)
+//{
+//    printf("[Midi] note: %d\n", ev.data1);
+//}
+
 void *midi_init(void *)
 {
     printf("MIDI maaaaan!\n");
@@ -65,11 +70,6 @@ void *midi_init(void *)
     mixr->have_midi_controller = true;
 
     return NULL;
-}
-
-void print_midi_event_rec(midi_event ev)
-{
-    printf("[Midi] note: %d\n", ev.data1);
 }
 
 midi_event new_midi_event(unsigned int event_type, unsigned int data1,

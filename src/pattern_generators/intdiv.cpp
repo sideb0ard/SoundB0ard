@@ -103,9 +103,17 @@ void intdiv_generate(void *self, void *data)
     uint16_t bit_pattern = id->patterns[pattern_num];
     apply_short_to_midi_pattern(bit_pattern, midi_pattern);
 }
-void intdiv_set_debug(void *self, bool b) {}
+void intdiv_set_debug(void *self, bool b)
+{
+    (void)self;
+    (void)b;
+}
 
-void intdiv_event_notify(void *self, broadcast_event event) {}
+void intdiv_event_notify(void *self, broadcast_event event)
+{
+    (void)self;
+    (void)event;
+}
 
 void intdiv_set_allowed_part_sizes(intdiv *id, char const *allowed_parts)
 {
@@ -140,7 +148,7 @@ void intdiv_print_patterns(intdiv *id)
     }
 }
 
-void intdiv_set_selected_pattern(intdiv *id, unsigned int pat_num)
+void intdiv_set_selected_pattern(intdiv *id, int pat_num)
 {
     if (pat_num < id->num_patterns)
         id->selected_pattern = pat_num;

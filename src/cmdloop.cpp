@@ -56,7 +56,7 @@ static void liblo_error(int num, const char *msg, const char *path)
     printf("liblo server error %d in path %s: %s\n", num, path, msg);
 }
 
-void readline_cb(char *line)
+static void readline_cb(char *line)
 {
     if (NULL == line)
         exxit();
@@ -75,6 +75,7 @@ void readline_cb(char *line)
 
 void *loopy(void *arg)
 {
+    (void)arg;
 
     print_logo();
 
@@ -90,7 +91,6 @@ void *loopy(void *arg)
     int lo_fd = lo_server_get_socket_fd(s);
 
     fd_set rfds;
-    struct timeval tv;
 
     int retval;
 
@@ -137,14 +137,14 @@ void *loopy(void *arg)
     return NULL;
 }
 
-static bool _is_meta_cmd(char *line)
-{
-    if (strncmp("every", line, 5) == 0 || strncmp("over", line, 4) == 0 ||
-        strncmp("for", line, 3) == 0)
-        return true;
-
-    return false;
-}
+// static bool _is_meta_cmd(char *line)
+//{
+//    if (strncmp("every", line, 5) == 0 || strncmp("over", line, 4) == 0 ||
+//        strncmp("for", line, 3) == 0)
+//        return true;
+//
+//    return false;
+//}
 
 void Interpret(char *line, std::shared_ptr<object::Environment> env)
 {
@@ -262,6 +262,9 @@ int exxit()
 int generic_osc_handler(const char *path, const char *types, lo_arg **argv,
                         int argc, void *data, void *user_data)
 {
+    (void)argc;
+    (void)data;
+    (void)user_data;
     int i;
 
     printf("path: <%s>\n", path);
@@ -280,6 +283,11 @@ int generic_osc_handler(const char *path, const char *types, lo_arg **argv,
 int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
                         int argc, void *data, void *user_data)
 {
+    (void)path;
+    (void)types;
+    (void)argc;
+    (void)data;
+    (void)user_data;
     // printf("Target %d\n", argv[0]->i);
     int target_sg = argv[0]->i;
     fflush(stdout);
@@ -297,6 +305,12 @@ int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
 int osc_note_on_handler(const char *path, const char *types, lo_arg **argv,
                         int argc, void *data, void *user_data)
 {
+    (void)path;
+    (void)types;
+    (void)argc;
+    (void)data;
+    (void)user_data;
+
     int target_sg = argv[0]->i;
     int midi_note = argv[1]->i;
     int octave = argv[2]->i;

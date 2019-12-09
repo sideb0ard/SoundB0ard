@@ -9,6 +9,8 @@ extern mixer *mixr;
 
 bool parse_algo_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
+    (void)num_wurds;
+    (void)wurds;
     //    if (strncmp("algo", wurds[0], 4) == 0)
     //    {
     //        int algo_num = atoi(wurds[1]);

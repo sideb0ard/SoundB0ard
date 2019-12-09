@@ -671,6 +671,7 @@ UnwrapReturnValue(std::shared_ptr<object::Object> obj)
 
 //////////// Error shizzle below
 
+void SSprintF(std::ostringstream &msg, const char *s);
 void SSprintF(std::ostringstream &msg, const char *s)
 {
     while (*s)

@@ -14,6 +14,7 @@
 
 extern mixer *mixr;
 
+bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD]);
 bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     if (strncmp("new", wurds[0], 3) == 0)
@@ -107,9 +108,8 @@ bool parse_new_item_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                 data = cdata;
             }
 
-            int vg_num =
-                mixer_add_value_list(mixr, list_type, num_items,
-                                     data); // ** takes ownership of memory **
+            mixer_add_value_list(mixr, list_type, num_items,
+                                 data); // ** takes ownership of memory **
         }
 
         else if (strncmp("kit", wurds[1], 3) == 0 ||

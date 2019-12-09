@@ -8,6 +8,7 @@ extern mixer *mixr;
 
 bool parse_value_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
+    (void)num_wurds;
     if (strncmp("val", wurds[0], 3) == 0)
     {
         int vgnum = atoi(wurds[1]);
@@ -21,7 +22,6 @@ bool parse_value_generator_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 
                 if (value_type == LIST_VALUE_CHAR_TYPE)
                 {
-                    char wurd[SIZE_OF_WURD] = {};
                     list_value_holder val = vg->generate(vg);
                     printf("GOTS %s\n", val.wurd);
                 }

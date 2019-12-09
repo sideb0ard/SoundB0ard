@@ -19,7 +19,8 @@ const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;
 struct AbletonLink
 {
     ableton::Link m_link;
-    ableton::Link::SessionState m_sessionstate; // should be updated in every callback
+    ableton::Link::SessionState
+        m_sessionstate; // should be updated in every callback
     ableton::link::HostTimeFilter<ableton::platforms::stl::Clock>
         m_host_time_filter;
 
@@ -35,7 +36,8 @@ struct AbletonLink
     std::chrono::microseconds m_output_latency;
 
     AbletonLink(double bpm)
-        : m_link{bpm}, m_sessionstate{m_link.captureAudioSessionState()}, m_quantum{4.},
+        : m_link{bpm},
+          m_sessionstate{m_link.captureAudioSessionState()}, m_quantum{4.},
           m_requested_tempo{0}, m_reset_beat_time{false}, m_sample_time{0},
           m_output_latency(0)
     {
@@ -44,11 +46,11 @@ struct AbletonLink
     }
 };
 
-void update_bpm(double bpm) { /* no-op */ };
+void update_bpm(double bpm){/* no-op */};
 
 AbletonLink *new_ableton_link(double bpm)
 {
-    //std::cout << "New Ableton Link object!" << std::endl;
+    // std::cout << "New Ableton Link object!" << std::endl;
     return new AbletonLink(bpm);
 }
 
@@ -102,8 +104,6 @@ bool link_is_midi_tick(AbletonLink *l, mixer_timing_info *timing_info,
     const auto hostTime =
         l->m_buffer_begin_at_output +
         std::chrono::microseconds(llround(frame_num * MICROS_PER_SAMPLE));
-    const auto lastSampleHostTime =
-        hostTime - std::chrono::microseconds(llround(MICROS_PER_SAMPLE));
 
     auto beat_time = l->m_sessionstate.beatAtTime(hostTime, l->m_quantum);
     if (beat_time >= 0.)
@@ -158,4 +158,3 @@ double link_get_phase_at_time(AbletonLink *l, long long int sample_number,
 }
 
 int link_get_sample_time(AbletonLink *l) { return l->m_sample_time; }
-

@@ -21,6 +21,7 @@ extern mixer *mixr;
 
 bool parse_fx_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
+    (void)num_wurds;
     if (strncmp("bitcrush", wurds[0], 8) == 0 ||
         strncmp("bc", wurds[0], 2) == 0)
     {

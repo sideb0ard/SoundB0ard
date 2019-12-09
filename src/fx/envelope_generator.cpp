@@ -5,10 +5,6 @@
 
 #include "defjams.h"
 #include "envelope_generator.h"
-// this ordering should match the enum defined in envelope_header.h
-//
-constexpr char const *state_strings[] = {"OFFF",    "ATTACK",  "DECAY",
-                                         "SUSTAIN", "RELEASE", "SHUTDOWN"};
 
 envelope_generator *new_envelope_generator()
 {

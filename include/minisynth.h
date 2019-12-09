@@ -207,7 +207,7 @@ void minisynth_midi_control(minisynth *self, unsigned int data1,
 void minisynth_increment_voice_timestamps(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice(minisynth *synth);
 minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *synth,
-                                                      unsigned int midi_note);
+                                                      int midi_note);
 
 void minisynth_reset_voices(minisynth *self);
 

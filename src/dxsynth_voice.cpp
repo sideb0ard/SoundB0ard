@@ -130,6 +130,8 @@ void dxsynth_voice_initialize_modmatrix(dxsynth_voice *dxv, modmatrix *matrix)
 }
 
 void dxsynth_voice_set_lfo1_destination(dxsynth_voice *dx, unsigned int op,
+                                        unsigned int dest);
+void dxsynth_voice_set_lfo1_destination(dxsynth_voice *dx, unsigned int op,
                                         unsigned int dest)
 {
     switch (op)
@@ -390,7 +392,7 @@ void dxsynth_voice_set_output_egs(dxsynth_voice *dxv)
 }
 
 bool dxsynth_voice_gennext(dxsynth_voice *dxv, double *left_output,
-                                  double *right_output)
+                           double *right_output)
 {
     if (!voice_gennext(&dxv->m_voice, left_output, right_output))
     {

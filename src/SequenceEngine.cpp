@@ -87,7 +87,7 @@ void sequence_engine_set_pattern_to_current_key(SequenceEngine *engine)
 {
     midi_event *midi_pattern = engine->patterns[engine->cur_pattern];
 
-    chord_midi_notes chnotes = {0};
+    chord_midi_notes chnotes = {};
     get_midi_notes_from_chord(mixr->timing_info.chord,
                               mixr->timing_info.chord_type,
                               sequence_engine_get_octave(engine), &chnotes);

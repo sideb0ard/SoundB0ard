@@ -335,8 +335,8 @@ void voice_reset(voice *v)
     dca_reset(&v->m_dca);
 }
 
-void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
-                   double frequency, double last_note_frequency)
+void voice_note_on(voice *v, int midi_note, int midi_velocity, double frequency,
+                   double last_note_frequency)
 {
     v->m_osc_pitch = frequency;
 
@@ -444,7 +444,7 @@ void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
     eg_shutdown(&v->m_eg4);
 }
 
-void voice_note_off(voice *v, unsigned int midi_note)
+void voice_note_off(voice *v, int midi_note)
 {
     if (v->m_note_on && voice_can_note_off(v))
     {

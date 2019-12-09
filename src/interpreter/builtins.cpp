@@ -185,6 +185,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"ps", std::make_shared<object::BuiltIn>(
                [](std::vector<std::shared_ptr<object::Object>> args)
                    -> std::shared_ptr<object::Object> {
+                   (void)args;
                    mixer_ps(mixr, false);
                    return evaluator::NULLL;
                })},
@@ -233,6 +234,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"midiInit", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
+                         (void)args;
                          midi_launch_init(mixr);
                          return evaluator::NULLL;
                      })},

@@ -182,6 +182,7 @@ void drumsynth::status(wchar_t *ss)
 
 void drumsynth::noteOn(midi_event ev)
 {
+    (void)ev;
     if (reset_osc)
     {
         osc_reset(&m_osc1.osc);
@@ -503,6 +504,7 @@ void drumsynth_set_eg_release(drumsynth *ds, int eg_num, double val)
 
 void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc, double val)
 {
+    (void)osc;
     if (val >= -1 && val <= 1)
     {
         switch (eg)

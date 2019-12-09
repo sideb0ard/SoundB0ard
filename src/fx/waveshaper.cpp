@@ -4,9 +4,26 @@
 
 #include "waveshaper.h"
 
+static double _process_audio(waveshaper *ws, double input)
+{
+    double xn = input;
+    for (unsigned int i = 0; i < ws->m_stages; i++)
+    {
+        if (xn >= 0)
+            xn = (1.0 / atan(ws->m_arc_tan_k_pos)) *
+                 atan(ws->m_arc_tan_k_pos * xn);
+        else
+            xn = (1.0 / atan(ws->m_arc_tan_k_neg)) *
+                 atan(ws->m_arc_tan_k_neg * xn);
+        if (ws->m_invert_stages && i % 2 == 0)
+            xn *= -1.0;
+    }
+    return xn;
+}
+
 waveshaper *new_waveshaper()
 {
-    waveshaper *ws = (waveshaper*) calloc(1, sizeof(waveshaper));
+    waveshaper *ws = (waveshaper *)calloc(1, sizeof(waveshaper));
     waveshaper_init(ws);
 
     ws->m_fx.type = WAVESHAPER;
@@ -68,22 +85,6 @@ void waveshaper_set_invert_stages(waveshaper *d, unsigned int val)
         printf("Val must be 0 or 1\n");
 }
 
-double _process_audio(waveshaper *ws, double input)
-{
-    double xn = input;
-    for (unsigned int i = 0; i < ws->m_stages; i++)
-    {
-        if (xn >= 0)
-            xn = (1.0 / atan(ws->m_arc_tan_k_pos)) *
-                 atan(ws->m_arc_tan_k_pos * xn);
-        else
-            xn = (1.0 / atan(ws->m_arc_tan_k_neg)) *
-                 atan(ws->m_arc_tan_k_neg * xn);
-        if (ws->m_invert_stages && i % 2 == 0)
-            xn *= -1.0;
-    }
-    return xn;
-}
 stereo_val waveshaper_process_audio(void *self, stereo_val input)
 {
     waveshaper *ws = (waveshaper *)self;

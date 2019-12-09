@@ -8,6 +8,7 @@
 #include <utils.h>
 
 extern mixer *mixr;
+bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD]);
 bool parse_looper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     if (strncmp("looper", wurds[0], 8) == 0 ||

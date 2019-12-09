@@ -21,11 +21,11 @@ class SoundGenerator
     virtual void start();
     virtual void stop();
 
-    virtual void noteOn(midi_event ev){};
-    virtual void noteOff(midi_event ev){};
+    virtual void noteOn(midi_event ev) { (void)ev; };
+    virtual void noteOff(midi_event ev) { (void)ev; };
     void noteOffDelayed(midi_event ev, int event_off_tick);
-    virtual void control(midi_event ev){};
-    virtual void pitchBend(midi_event ev){};
+    virtual void control(midi_event ev) { (void)ev; };
+    virtual void pitchBend(midi_event ev) { (void)ev; };
     virtual void randomize(){};
     virtual void allNotesOff(){};
 

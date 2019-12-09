@@ -744,8 +744,7 @@ dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *ms)
     return found_voice;
 }
 
-dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *ms,
-                                                  unsigned int midi_note)
+dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *ms, int midi_note)
 {
     int timestamp = -1;
     dxsynth_voice *found_voice = NULL;
@@ -1315,6 +1314,7 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
 
 void dxsynth_print_settings(dxsynth *ms)
 {
+    (void)ms;
     printf(ANSI_COLOR_WHITE); // CONTROL PANEL
     printf("///////////////////// SYNTHzzz! ///////////////////////\n");
 

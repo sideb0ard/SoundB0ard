@@ -46,7 +46,7 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     return ret;
 }
 
-void *Evaluator(void *arg)
+static void *Evaluator(void *arg)
 {
     while (auto const &Wrapper = g_queue.pop())
     {

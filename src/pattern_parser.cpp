@@ -40,49 +40,15 @@ typedef struct division_marker
     int value;
 } division_marker;
 
-static char *token_type_names[] = {(char *)"SQUARE_LEFT",
-                                   (char *)"SQUARE_RIGHT",
-                                   (char *)"CURLY_LEFT",
-                                   (char *)"CURLY_RIGHT",
-                                   (char *)"ANGLE_BRACKET_LEFT",
-                                   (char *)"ANGLE_BRACKET_RIGHT",
-                                   (char *)"ANGLE_EXPRESSION",
-                                   (char *)"BLANK",
-                                   (char *)"VAR_NAME"};
-
-// static void print_pattern(midi_event *pattern)
-//{
-//    for (int i = 0; i < PPBAR; i++)
-//    {
-//        if (pattern[i].event_type)
-//            printf("[%d] %d\n", i, pattern[i].event_type);
-//    }
-//}
-
-static void print_pattern_tokens(pattern_token tokens[MAX_PATTERN], int len)
-{
-    for (int i = 0; i < len; i++)
-    {
-        if (tokens[i].type == VAR_NAME)
-            printf("%s", tokens[i].value);
-        else if (tokens[i].type == ANGLE_EXPRESSION)
-            printf("<%s>", tokens[i].value);
-        else
-            printf("%s", token_type_names[tokens[i].type]);
-
-        if (tokens[i].has_divider)
-            printf("(/%d)", tokens[i].divider);
-        else if (tokens[i].has_multiplier)
-            printf("(*%d)", tokens[i].multiplier);
-        else if (tokens[i].has_euclid)
-            printf("(%d,%d)", tokens[i].euclid_hits, tokens[i].euclid_steps);
-
-        if (i < (len - 1))
-            printf(" ");
-        else
-            printf("\n\n");
-    }
-}
+// static char *token_type_names[] = {(char *)"SQUARE_LEFT",
+//                                   (char *)"SQUARE_RIGHT",
+//                                   (char *)"CURLY_LEFT",
+//                                   (char *)"CURLY_RIGHT",
+//                                   (char *)"ANGLE_BRACKET_LEFT",
+//                                   (char *)"ANGLE_BRACKET_RIGHT",
+//                                   (char *)"ANGLE_EXPRESSION",
+//                                   (char *)"BLANK",
+//                                   (char *)"VAR_NAME"};
 
 bool generate_pattern_from_tokens(pattern_token tokens[MAX_PATTERN],
                                   int num_tokens, midi_event *pattern,
@@ -291,7 +257,8 @@ static int grep_expander(char *wurd, pattern_token *token)
     return num_to_increment_by;
 }
 
-int extract_tokens_from_line(pattern_token *tokens, int *token_idx, char *line)
+static int extract_tokens_from_line(pattern_token *tokens, int *token_idx,
+                                    char *line)
 {
 
     char *c = line;
@@ -698,8 +665,6 @@ static void expand_the_expanders(pattern_token tokens[MAX_PATTERN], int len,
     }
 }
 
-static char *s_ptypes[] = {(char *)"MIDI", (char *)"NOTE", (char *)"BEAT",
-                           (char *)"STEP"};
 bool parse_pattern(char *line, midi_event *target_pattern,
                    unsigned int pattern_type)
 {

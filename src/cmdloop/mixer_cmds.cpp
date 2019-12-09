@@ -25,8 +25,6 @@ extern wtable *wave_tables[5];
 bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
 
-    bool cmd_found = false;
-
     if (strncmp("bpm", wurds[0], 3) == 0)
     {
         int bpm = atoi(wurds[1]);
@@ -270,7 +268,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
                                             "\"180 18000\"", "fx"};
             strcpy(fwurds[6], wurds[1]);
             strcpy(fwurds[7], "freq");
-            strcpy(fwurds[8], "\%s");
+            strcpy(fwurds[8], "%s");
             // algorithm *a = new_algorithm(9, fwurds);
             // if (a)
             //    mixer_add_algorithm(mixr, a);
@@ -291,7 +289,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             int sg_num;
             int sg_pattern_num;
         } Dest;
-        Dest dests[MAX_APPLY_TARGETS] = {0};
+        Dest dests[MAX_APPLY_TARGETS] = {};
         int num_dests = 0;
         int dest_sg_num = -1;
         int dest_sg_pattern_num = -1;
@@ -309,7 +307,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             char name[20];
         } modifier;
-        modifier mods[MAX_MODIFIERS] = {0};
+        modifier mods[MAX_MODIFIERS] = {};
         int num_modifiers = 0;
         int num_wurds_left = num_wurds - 1 - wurd_idx;
         bool num_wurds_left_is_odd = num_wurds_left % 2 == 1;
@@ -441,7 +439,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         printf("NOTES in CHORD!\n");
 
-        chord_midi_notes chnotes = {0};
+        chord_midi_notes chnotes = {};
         get_midi_notes_from_chord(mixr->timing_info.chord,
                                   mixr->timing_info.chord_type,
                                   mixr->timing_info.octave, &chnotes);
@@ -593,7 +591,7 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             pattern_generator *pg = mixr->pattern_generators[pattern_gen_num];
 
             SoundGenerator *s1 = mixr->SoundGenerators[sg1_num];
-            SoundGenerator *s2 = mixr->SoundGenerators[sg2_num];
+            // SoundGenerator *s2 = mixr->SoundGenerators[sg2_num];
 
             midi_event midi_pattern[PPBAR] = {};
             pg->generate(pg, &midi_pattern);

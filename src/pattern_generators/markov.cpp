@@ -130,7 +130,7 @@ void markov_pattern_generate(unsigned int markov_type, midi_event *midi_pattern)
         case (CLAPS):
             if (rand_percent() > 90)
             {
-                int num_hits = rand() % 7;
+                // int num_hits = rand() % 7;
                 // bit_pattern = create_euclidean_rhythm(num_hits, 16);
                 bit_pattern = create_euclidean_rhythm(0, 16);
             }
@@ -300,9 +300,17 @@ void markov_generate(void *self, void *data)
     midi_event *midi_pattern = (midi_event *)data;
     markov_pattern_generate(m->markov_type, midi_pattern);
 }
-void markov_set_debug(void *self, bool b) {}
+void markov_set_debug(void *self, bool b)
+{
+    (void)self;
+    (void)b;
+}
 
-void markov_event_notify(void *self, broadcast_event event) {}
+void markov_event_notify(void *self, broadcast_event event)
+{
+    (void)self;
+    (void)event;
+}
 
 void markov_set_type(markov *m, unsigned int type)
 {

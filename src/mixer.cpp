@@ -56,9 +56,6 @@ const char *s_midi_control_type_name[] = {"NONE", "SYNTH", "DRUMSYNTH"};
 
 const char *s_sg_names[] = {"MOOG", "DIGI", "DX", "LOOP", "STEP", "STEP"};
 
-const double micros_per_sample = 1e6 / SAMPLE_RATE;
-const double midi_tick_len_as_percent = 1.0 / PPQN;
-
 mixer *new_mixer(double output_latency)
 {
     mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
@@ -315,16 +312,16 @@ void mixer_ps(mixer *mixr, bool all)
     printf(ANSI_COLOR_RESET);
 }
 
-void mixer_print_notes(mixer *mixr)
-{
-    printf("Current KEY is %s. Compat NOTEs are:",
-           key_names[mixr->timing_info.key]);
-    // for (int i = 0; i < 6; ++i)
-    //{
-    //    printf("%s ", key_names[compat_keys[mixr->key][i]]);
-    //}
-    printf("\n");
-}
+// static void mixer_print_notes(mixer *mixr)
+//{
+//    printf("Current KEY is %s. Compat NOTEs are:",
+//           key_names[mixr->timing_info.key]);
+//    // for (int i = 0; i < 6; ++i)
+//    //{
+//    //    printf("%s ", key_names[compat_keys[mixr->key][i]]);
+//    //}
+//    printf("\n");
+//}
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
@@ -710,7 +707,6 @@ void mixer_play_scene(mixer *mixr, int scene_num)
         {
             continue;
         }
-        int soundgen_track_num = s->soundgen_tracks[i].soundgen_track_num;
         if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
         {
             mixr->SoundGenerators[soundgen_num]->start();

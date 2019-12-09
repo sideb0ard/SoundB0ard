@@ -60,6 +60,7 @@ bool parse_stepper_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 void parse_drumsampler_cmd(drumsampler *ds, char wurds[][SIZE_OF_WURD],
                            int num_wurds)
 {
+    (void)num_wurds;
     if (strncmp("attack_ms", wurds[0], 9) == 0)
     {
         float val = atof(wurds[1]);

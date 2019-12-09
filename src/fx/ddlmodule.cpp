@@ -36,7 +36,6 @@ void ddl_cook_variables(ddlmodule *d)
     d->m_wet_level = d->m_wet_level_pct / 100.0;
     d->m_delay_in_samples = d->m_delay_ms * (SAMPLE_RATE / 1000.0);
 
-    int precookidx = d->m_read_index;
     d->m_read_index = d->m_write_index - (int)d->m_delay_in_samples;
 
     if (d->m_read_index < 0)

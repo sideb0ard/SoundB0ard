@@ -48,9 +48,9 @@ void euclidean_status(void *self, wchar_t *wstring)
              e->actual_num_hits, e->actual_num_steps);
 }
 
-void build_euclidean_pattern_short(int level, uint16_t *bitmap_int,
-                                   uint16_t *bitmap_len, int *count,
-                                   int *remainderrr)
+static void build_euclidean_pattern_short(int level, uint16_t *bitmap_int,
+                                          uint16_t *bitmap_len, int *count,
+                                          int *remainderrr)
 {
     if (level == -1)
     {
@@ -77,31 +77,31 @@ void build_euclidean_pattern_short(int level, uint16_t *bitmap_int,
     }
 }
 
-void build_euclidean_pattern_string(int level, char *bitmap_string, int *count,
-                                    int *remaindrrr)
-{
-    if (level == -1)
-    {
-        strcat(bitmap_string, "0");
-    }
-    else if (level == -2)
-    {
-        strcat(bitmap_string, "1");
-    }
-    else
-    {
-        for (int i = 0; i < count[level]; i++)
-        {
-            build_euclidean_pattern_string(level - 1, bitmap_string, count,
-                                           remaindrrr);
-        }
-        if (remaindrrr[level] != 0)
-        {
-            build_euclidean_pattern_string(level - 2, bitmap_string, count,
-                                           remaindrrr);
-        }
-    }
-}
+// static void build_euclidean_pattern_string(int level, char *bitmap_string,
+//                                           int *count, int *remaindrrr)
+//{
+//    if (level == -1)
+//    {
+//        strcat(bitmap_string, "0");
+//    }
+//    else if (level == -2)
+//    {
+//        strcat(bitmap_string, "1");
+//    }
+//    else
+//    {
+//        for (int i = 0; i < count[level]; i++)
+//        {
+//            build_euclidean_pattern_string(level - 1, bitmap_string, count,
+//                                           remaindrrr);
+//        }
+//        if (remaindrrr[level] != 0)
+//        {
+//            build_euclidean_pattern_string(level - 2, bitmap_string, count,
+//                                           remaindrrr);
+//        }
+//    }
+//}
 
 // https://ics-web.sns.ornl.gov/timing/Rep-Rate%20Tech%20Note.pdf
 void euclidean_generate(void *self, void *data)
@@ -156,7 +156,7 @@ uint16_t create_euclidean_rhythm(int num_hits, int num_steps)
     uint16_t max_bits_to_align_with = 16; // max
 
     // find first set bit
-    uint16_t first_bit;
+    uint16_t first_bit = 0;
     for (int i = max_bits_to_align_with; i >= 0; i--)
     {
         if (bitmap_int & (1 << i))

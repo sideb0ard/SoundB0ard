@@ -39,6 +39,7 @@ void midi_set_destination(mixer *mixr, int soundgen_num)
 
 bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
 {
+    (void)num_wurds;
 
     if (strncmp("cp", wurds[0], 2) == 0)
     {

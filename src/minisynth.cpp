@@ -912,7 +912,7 @@ minisynth_voice *minisynth_get_oldest_voice(minisynth *ms)
 }
 
 minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
-                                                      unsigned int midi_note)
+                                                      int midi_note)
 {
     int timestamp = -1;
     minisynth_voice *found_voice = NULL;

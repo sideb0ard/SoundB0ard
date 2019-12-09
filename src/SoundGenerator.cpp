@@ -43,7 +43,7 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 
     int cur_midi_tick = tinfo.midi_tick % PPBAR;
     int midi_note = ev.data1;
-    bool is_chord_mode = false;
+    // bool is_chord_mode = false;
 
     // if (!is_midi_note_in_key(midi_note, mixr->key))
     //{
@@ -109,7 +109,6 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
     { // Hex 0x90
         for (int i = 0; i < midi_notes_len; i++)
         {
-            int note = midi_notes[i];
             noteOff(ev);
         }
         break;
@@ -138,6 +137,7 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 
 void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
+    (void)event;
     int idx = tinfo.midi_tick % PPBAR;
 
     // this temporal_events table is my first pass at a solution to
