@@ -190,6 +190,17 @@ class SampleExpression : public Expression
     std::shared_ptr<Expression> path_;
 };
 
+class ProcessExpression : public Expression
+{
+  public:
+    ProcessExpression() {}
+    explicit ProcessExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> pattern_;
+};
+
 class CallExpression : public Expression
 {
   public:

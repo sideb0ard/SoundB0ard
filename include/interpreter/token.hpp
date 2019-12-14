@@ -54,6 +54,7 @@ const TokenType SLANG_EVERY = "EVERY";
 const TokenType SLANG_PS = "PS";
 const TokenType SLANG_LS = "LS";
 const TokenType SLANG_SAMPLE = "SAMPLE";
+const TokenType SLANG_PROC = "PROC";
 
 const TokenType SLANG_TIMING_MIDI_TICK = "MIDI TICK";
 const TokenType SLANG_TIMING_THIRTYSECOND = "THIRTYSECOND";

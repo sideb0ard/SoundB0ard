@@ -80,6 +80,7 @@ class Parser
 
     std::shared_ptr<ast::Expression> ParseSynthExpression();
     std::shared_ptr<ast::Expression> ParseSampleExpression();
+    std::shared_ptr<ast::Expression> ParseProcessExpression();
     ast::TimingEventType ParseTimingEventLiteral();
 
     std::shared_ptr<ast::Expression>

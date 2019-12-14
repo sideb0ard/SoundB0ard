@@ -173,6 +173,8 @@ std::string SynthExpression::String() const { return "FM SYNTH"; }
 
 std::string SampleExpression::String() const { return "SAMPLE"; }
 
+std::string ProcessExpression::String() const { return "Process"; }
+
 std::string CallExpression::String() const
 {
     std::stringstream ss;
