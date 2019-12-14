@@ -27,12 +27,10 @@ const std::unordered_map<std::string, TokenType> eventtypes{
 
 TokenType LookupIdent(std::string ident)
 {
-    std::cout << "Lookuping up IDENT " << ident << std::endl;
     std::unordered_map<std::string, TokenType>::const_iterator got =
         keywords.find(ident);
     if (got != keywords.end())
     {
-        std::cout << "FOUND KEYWORD! " << got->second << std::endl;
         return got->second;
     }
 

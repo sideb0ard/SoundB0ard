@@ -176,8 +176,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::LsStatement>(node);
     if (ls_expr)
     {
-        std::cout << "GOT LS STATEMENT!!\n";
-
         list_sample_dir("/");
     }
 
@@ -185,8 +183,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::PsStatement>(node);
     if (ps_expr)
     {
-
-        std::cout << "GOT PS STATEMENT!!\n";
         mixer_ps(mixr, true);
     }
 

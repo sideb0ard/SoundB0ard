@@ -93,8 +93,6 @@ token::Token Lexer::NextToken()
 
     SkipWhiteSpace();
 
-    std::cout << "Lexer NextToken~! CHAR si " << current_char_ << "\n";
-
     switch (current_char_)
     {
     case ('='):
@@ -212,7 +210,6 @@ token::Token Lexer::NextToken()
         if (IsValidIdentifier(current_char_))
         {
             tok.literal_ = ReadIdentifier();
-            std::cout << "VALIDO! " << tok << std::endl;
             tok.type_ = token::LookupIdent(tok.literal_);
             return tok;
         }
@@ -235,7 +232,6 @@ token::Token Lexer::NextToken()
 
 std::string Lexer::ReadIdentifier()
 {
-    std::cout << "READING Identifier...\n";
     int position = current_position_;
     while (IsValidIdentifier(current_char_))
         ReadChar();
