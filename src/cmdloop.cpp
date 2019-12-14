@@ -31,6 +31,7 @@
 #include <value_generator_cmds.h>
 
 extern mixer *mixr;
+extern std::mutex g_stdout_mutex;
 
 using Wrapper =
     std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
@@ -81,6 +82,7 @@ void readline_cb(char *line)
     if (NULL == line)
         exxit();
 
+    // const std::lock_guard<std::mutex> lock(g_stdout_mutex);
     if (strlen(line) != 0)
     {
         int cur_len = strlen(current_line);
@@ -102,6 +104,7 @@ void readline_cb(char *line)
         }
     }
 }
+
 } // namespace
 
 void *loopy(void *arg)

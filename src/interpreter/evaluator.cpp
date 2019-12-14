@@ -176,7 +176,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::LsStatement>(node);
     if (ls_expr)
     {
-        list_sample_dir("/");
+        std::string lspath_string = "/";
+        std::shared_ptr<ast::StringLiteral> lspath =
+            std::dynamic_pointer_cast<ast::StringLiteral>(ls_expr->path_);
+        if (lspath)
+            lspath_string = lspath->value_;
+        list_sample_dir(lspath_string);
     }
 
     std::shared_ptr<ast::PsStatement> ps_expr =

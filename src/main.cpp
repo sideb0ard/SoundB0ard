@@ -29,6 +29,8 @@ extern const char *key_names[NUM_KEYS];
 extern const char *prompt;
 extern char *chord_type_names[NUM_CHORD_TYPES];
 
+std::mutex g_stdout_mutex;
+
 static int paCallback(const void *input_buffer, void *output_buffer,
                       unsigned long frames_per_buffer,
                       const PaStreamCallbackTimeInfo *time_info,
@@ -52,6 +54,7 @@ static void *Evaluator(void *arg)
     {
         if (Wrapper)
         {
+            const std::lock_guard<std::mutex> lock(g_stdout_mutex);
             auto &[node, env] = *Wrapper;
             auto evaluated = evaluator::Eval(node, env);
             if (evaluated)
@@ -60,7 +63,6 @@ static void *Evaluator(void *arg)
                 if (result.compare("null") != 0)
                 {
                     std::cout << result << std::endl;
-                    // std::cout << prompt;
                 }
             }
         }
@@ -102,12 +104,14 @@ int main()
         exit(-1);
     }
 
+    // Command Loop
     pthread_t input_th;
     if (pthread_create(&input_th, NULL, loopy, NULL))
     {
         fprintf(stderr, "Errrr, wit tha Loopy..\n");
     }
 
+    // Worker Thread
     pthread_t eval_th;
     if (pthread_create(&eval_th, NULL, Evaluator, NULL))
     {

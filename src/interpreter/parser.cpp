@@ -105,8 +105,12 @@ std::shared_ptr<ast::LsStatement> Parser::ParseLsStatement()
         std::make_shared<ast::LsStatement>(cur_token_);
 
     // TODO - make a list of paths
-    // if (!PeekTokenIs(token::SLANG_SEMICOLON))
-    //    stmt->path_ = ParseStringLiteral();
+    if (!PeekTokenIs(token::SLANG_SEMICOLON))
+    {
+        NextToken();
+        std::cout << "Cur token is " << cur_token_ << std::endl;
+        stmt->path_ = ParseStringLiteral();
+    }
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
