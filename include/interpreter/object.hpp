@@ -27,6 +27,8 @@ constexpr char STRING_OBJ[] = "STRING";
 
 constexpr char SYNTH_OBJ[] = "SYNTH";
 
+constexpr char SAMPLE_OBJ[] = "SAMPLE";
+
 constexpr char BUILTIN_OBJ[] = "BUILTIN";
 
 constexpr char ARRAY_OBJ[] = "ARRAY";
@@ -172,6 +174,18 @@ class Synth : public Object
 
   public:
     int synth_num_{-1};
+};
+
+class Sample : public Object
+{
+  public:
+    Sample(std::string sample_path);
+    ~Sample() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    int sample_num_{-1};
 };
 
 class Process : public Object

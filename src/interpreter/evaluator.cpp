@@ -271,12 +271,27 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return EvalHashLiteral(hash_lit, env);
     }
 
-    std::shared_ptr<ast::SynthLiteral> synth =
-        std::dynamic_pointer_cast<ast::SynthLiteral>(node);
+    std::shared_ptr<ast::SynthExpression> synth =
+        std::dynamic_pointer_cast<ast::SynthExpression>(node);
     if (synth)
     {
-        std::cout << "SYNTH LITERAL!\n";
+        std::cout << "SYNTH EXPRESSION!\n";
         return std::make_shared<object::Synth>();
+    }
+
+    std::shared_ptr<ast::SampleExpression> sample =
+        std::dynamic_pointer_cast<ast::SampleExpression>(node);
+    if (sample)
+    {
+        std::cout << "SAMPLE EXPRESSIOn!\n";
+        std::shared_ptr<ast::StringLiteral> spath =
+            std::dynamic_pointer_cast<ast::StringLiteral>(sample->path_);
+        if (spath)
+        {
+            return std::make_shared<object::Sample>(spath->value_);
+        }
+        else
+            std::cout << "Nae sample path!!\n";
     }
 
     std::shared_ptr<ast::EveryExpression> every =

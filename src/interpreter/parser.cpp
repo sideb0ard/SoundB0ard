@@ -379,7 +379,9 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
     else if (cur_token_.type_ == token::SLANG_FUNCTION)
         return ParseFunctionLiteral();
     else if (cur_token_.type_ == token::SLANG_FM_SYNTH)
-        return ParseSynthLiteral();
+        return ParseSynthExpression();
+    else if (cur_token_.type_ == token::SLANG_SAMPLE)
+        return ParseSampleExpression();
     else if (cur_token_.type_ == token::SLANG_STRING)
         return ParseStringLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACKET)
@@ -540,9 +542,9 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral()
     return lit;
 }
 
-std::shared_ptr<ast::Expression> Parser::ParseSynthLiteral()
+std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 {
-    auto synth = std::make_shared<ast::SynthLiteral>(cur_token_);
+    auto synth = std::make_shared<ast::SynthExpression>(cur_token_);
 
     if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;
@@ -552,6 +554,24 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthLiteral()
 
     std::cout << "AST SYNTH LITERAL ALL GOOD!\n";
     return synth;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
+{
+    auto sample = std::make_shared<ast::SampleExpression>(cur_token_);
+
+    if (!ExpectPeek(token::SLANG_LPAREN))
+        return nullptr;
+
+    NextToken();
+    std::cout << "Cur token is " << cur_token_ << std::endl;
+    sample->path_ = ParseStringLiteral();
+
+    if (!ExpectPeek(token::SLANG_RPAREN))
+        return nullptr;
+
+    std::cout << "AST SAMPLE LITERAL ALL GOOD!\n";
+    return sample;
 }
 
 ast::TimingEventType Parser::ParseTimingEventLiteral()

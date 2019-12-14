@@ -516,6 +516,14 @@ int add_minisynth(mixer *mixr)
     return add_sound_generator(mixr, (SoundGenerator *)ms);
 }
 
+int add_sample(mixer *mixr, std::string sample_path)
+{
+    std::cout << "Adding a SAMPLE!! " << sample_path << std::endl;
+    // drumsampler *s = new drumsampler("kicks/THUMP.aiff");
+    drumsampler *s = new drumsampler(sample_path.data());
+    return add_sound_generator(mixr, (SoundGenerator *)s);
+}
+
 int add_digisynth(mixer *mixr, char *filename)
 {
     printf("Adding a DIGISYNTH!!...\n");

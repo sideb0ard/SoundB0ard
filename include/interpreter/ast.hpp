@@ -171,12 +171,23 @@ class FunctionLiteral : public Expression
     std::shared_ptr<BlockStatement> body_{nullptr};
 };
 
-class SynthLiteral : public Expression
+class SynthExpression : public Expression
 {
   public:
-    SynthLiteral() {}
-    explicit SynthLiteral(Token token) : Expression{token} {}
+    SynthExpression() {}
+    explicit SynthExpression(Token token) : Expression{token} {}
     std::string String() const override;
+};
+
+class SampleExpression : public Expression
+{
+  public:
+    SampleExpression() {}
+    explicit SampleExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> path_;
 };
 
 class CallExpression : public Expression
