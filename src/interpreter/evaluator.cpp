@@ -7,10 +7,14 @@
 #include <utility>
 #include <vector>
 
+#include <utils.h>
+
 #include <interpreter/ast.hpp>
 #include <interpreter/builtins.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/object.hpp>
+
+extern mixer *mixr;
 
 namespace
 {
@@ -166,6 +170,24 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             return val;
         }
         env->Set(let_expr->name_->value_, val);
+    }
+
+    std::shared_ptr<ast::LsStatement> ls_expr =
+        std::dynamic_pointer_cast<ast::LsStatement>(node);
+    if (ls_expr)
+    {
+        std::cout << "GOT LS STATEMENT!!\n";
+
+        list_sample_dir("/");
+    }
+
+    std::shared_ptr<ast::PsStatement> ps_expr =
+        std::dynamic_pointer_cast<ast::PsStatement>(node);
+    if (ps_expr)
+    {
+
+        std::cout << "GOT PS STATEMENT!!\n";
+        mixer_ps(mixr, true);
     }
 
     std::shared_ptr<ast::Identifier> ident =

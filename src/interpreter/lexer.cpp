@@ -1,5 +1,6 @@
 #include <interpreter/lexer.hpp>
 
+#include <iostream>
 #include <string>
 
 namespace
@@ -91,6 +92,8 @@ token::Token Lexer::NextToken()
     token::Token tok;
 
     SkipWhiteSpace();
+
+    std::cout << "Lexer NextToken~! CHAR si " << current_char_ << "\n";
 
     switch (current_char_)
     {
@@ -209,6 +212,7 @@ token::Token Lexer::NextToken()
         if (IsValidIdentifier(current_char_))
         {
             tok.literal_ = ReadIdentifier();
+            std::cout << "VALIDO! " << tok << std::endl;
             tok.type_ = token::LookupIdent(tok.literal_);
             return tok;
         }
@@ -231,6 +235,7 @@ token::Token Lexer::NextToken()
 
 std::string Lexer::ReadIdentifier()
 {
+    std::cout << "READING Identifier...\n";
     int position = current_position_;
     while (IsValidIdentifier(current_char_))
         ReadChar();

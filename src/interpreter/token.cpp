@@ -10,8 +10,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"else", SLANG_ELSE},   {"false", SLANG_FALSE}, {"for", SLANG_FOR},
     {"fn", SLANG_FUNCTION}, {"fm", SLANG_FM_SYNTH}, {"if", SLANG_IF},
     {"let", SLANG_LET},     {"true", SLANG_TRUE},   {"return", SLANG_RETURN},
-    {"every", SLANG_EVERY},
-};
+    {"every", SLANG_EVERY}, {"ps", SLANG_PS},       {"ls", SLANG_LS}};
 
 const std::unordered_map<std::string, TokenType> eventtypes{
     {"midi", SLANG_TIMING_MIDI_TICK},
@@ -28,6 +27,7 @@ const std::unordered_map<std::string, TokenType> eventtypes{
 
 TokenType LookupIdent(std::string ident)
 {
+    std::cout << "Lookuping up IDENT " << ident << std::endl;
     std::unordered_map<std::string, TokenType>::const_iterator got =
         keywords.find(ident);
     if (got != keywords.end())

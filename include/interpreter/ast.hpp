@@ -312,6 +312,23 @@ class ForStatement : public Statement
     std::shared_ptr<BlockStatement> body_;
 };
 
+class LsStatement : public Statement
+{
+  public:
+    explicit LsStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> path_;
+};
+
+class PsStatement : public Statement
+{
+  public:
+    explicit PsStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+};
+
 // ROOT //////////////////////
 
 class Program : public Node

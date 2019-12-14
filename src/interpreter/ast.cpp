@@ -40,6 +40,24 @@ std::string LetStatement::String() const
     return ss.str();
 }
 
+std::string LsStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << ";";
+
+    return ss.str();
+}
+
+std::string PsStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << ";";
+
+    return ss.str();
+}
+
 std::string ForStatement::String() const
 {
     std::stringstream ss;

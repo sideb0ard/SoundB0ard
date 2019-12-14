@@ -42,6 +42,9 @@ if (5 < 10) {
 ++3;
 --3;
 for (i = 0; i < 10; ++i) {};
+ls;
+ls kicks;
+ps;
 )";
 
     std::vector<std::pair<token::TokenType, std::string>> testTokens = {
@@ -99,7 +102,10 @@ for (i = 0; i < 10; ++i) {};
         {token::SLANG_INCREMENT, "++"},   {token::SLANG_IDENT, "i"},
         {token::SLANG_RPAREN, ")"},       {token::SLANG_LBRACE, "{"},
         {token::SLANG_RBRACE, "}"},       {token::SLANG_SEMICOLON, ";"},
-        {token::SLANG_EOFF, ""},
+        {token::SLANG_LS, "ls"},          {token::SLANG_SEMICOLON, ";"},
+        {token::SLANG_LS, "ls"},          {token::SLANG_IDENT, "kicks"},
+        {token::SLANG_SEMICOLON, ";"},    {token::SLANG_PS, "ps"},
+        {token::SLANG_SEMICOLON, ";"},    {token::SLANG_EOFF, ""},
     };
 
     LexerTest()

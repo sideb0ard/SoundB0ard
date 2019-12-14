@@ -1008,4 +1008,55 @@ TEST_F(ParserTest, TestCallExpressionParsing)
     }
 }
 
+TEST_F(ParserTest, TestParsingLsStatement)
+{
+    std::cout << "Testing `ls` statement" << std::endl;
+    std::string input = R"(ls;)";
+    std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(lex);
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+    EXPECT_FALSE(parsley->CheckErrors());
+    ASSERT_EQ(1, program->statements_.size());
+    std::shared_ptr<ast::LsStatement> stmt =
+        std::dynamic_pointer_cast<ast::LsStatement>(program->statements_[0]);
+    if (!stmt)
+        FAIL() << "program->statements_[0] is not an LsStatement";
+
+    // std::shared_ptr<ast::StringLiteral> literal =
+    //    std::dynamic_pointer_cast<ast::StringLiteral>(stmt->expression_);
+    // if (!literal)
+    //    FAIL() << "program->statements_[0] is not a StringLiteral. Got "
+    //           << typeid(&stmt->expression_).name();
+
+    // if (literal->value_.compare("hello world") != 0)
+    //    FAIL() << "literal.value_ is not " << input << ". Got "
+    //           << literal->value_ << std::endl;
+}
+
+TEST_F(ParserTest, TestParsingPsStatement)
+{
+    std::cout << "Testing `ps` statement" << std::endl;
+    std::string input = R"(ps;)";
+    std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(lex);
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+    EXPECT_FALSE(parsley->CheckErrors());
+    ASSERT_EQ(1, program->statements_.size());
+    std::shared_ptr<ast::PsStatement> stmt =
+        std::dynamic_pointer_cast<ast::PsStatement>(program->statements_[0]);
+    if (!stmt)
+        FAIL() << "program->statements_[0] is not an PsStatement";
+
+    // std::shared_ptr<ast::StringLiteral> literal =
+    //    std::dynamic_pointer_cast<ast::StringLiteral>(stmt->expression_);
+    // if (!literal)
+    //    FAIL() << "program->statements_[0] is not a StringLiteral. Got "
+    //           << typeid(&stmt->expression_).name();
+
+    // if (literal->value_.compare("hello world") != 0)
+    //    FAIL() << "literal.value_ is not " << input << ". Got "
+    //           << literal->value_ << std::endl;
+}
 } // namespace

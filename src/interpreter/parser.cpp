@@ -28,16 +28,24 @@ std::shared_ptr<ast::Program> Parser::ParseProgram()
             program->statements_.push_back(stmt);
         NextToken();
     }
-    // std::cout << program->String() << std::endl;
+    std::cout << "PROG: " << program->String() << std::endl;
     return program;
 }
 
 std::shared_ptr<ast::Statement> Parser::ParseStatement()
 {
+    std::cout << "GITTIN PARSEY woth " << cur_token_ << std::endl;
     if (cur_token_.type_.compare(token::SLANG_LET) == 0)
         return ParseLetStatement();
     else if (cur_token_.type_.compare(token::SLANG_RETURN) == 0)
         return ParseReturnStatement();
+    else if (cur_token_.type_.compare(token::SLANG_LS) == 0)
+    {
+        std::cout << " SLANG LS TOKEN ___ \n";
+        return ParseLsStatement();
+    }
+    else if (cur_token_.type_.compare(token::SLANG_PS) == 0)
+        return ParsePsStatement();
     else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
     {
         std::cout << "Found FOR statement!\n";
@@ -87,6 +95,36 @@ std::shared_ptr<ast::ReturnStatement> Parser::ParseReturnStatement()
     NextToken();
 
     stmt->return_value_ = ParseExpression(Precedence::LOWEST);
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::LsStatement> Parser::ParseLsStatement()
+{
+
+    std::cout << "Parsing LSSSSS!\n";
+    std::shared_ptr<ast::LsStatement> stmt =
+        std::make_shared<ast::LsStatement>(cur_token_);
+
+    // TODO - make a list of paths
+    // if (!PeekTokenIs(token::SLANG_SEMICOLON))
+    //    stmt->path_ = ParseStringLiteral();
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::PsStatement> Parser::ParsePsStatement()
+{
+
+    std::cout << "Parsing LSSSSS!\n";
+    std::shared_ptr<ast::PsStatement> stmt =
+        std::make_shared<ast::PsStatement>(cur_token_);
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -250,6 +288,7 @@ void Parser::NextToken()
 {
     cur_token_ = peek_token_;
     peek_token_ = lexer_->NextToken();
+    std::cout << "CUR:" << cur_token_ << " NEXT TOKEN!" << peek_token_ << "\n";
 }
 
 bool Parser::CurTokenIs(token::TokenType t) const
