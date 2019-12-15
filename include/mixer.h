@@ -15,14 +15,14 @@
 #include "fx.h"
 #include "minisynth.h"
 #include "pattern_generator.h"
+#include "process.hpp"
 #include "sbmsg.h"
 #include "table.h"
-#include "timer.hpp"
 #include "value_generator.h"
 
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100
-#define MAX_NUM_TIMERS 100
+#define MAX_NUM_PROC 100
 #define MAX_NUM_SOUND_GENERATORS 100
 #define MAX_NUM_PATTERN_GENERATORS 100
 #define MAX_NUM_VALUE_GENERATORS 100
@@ -79,8 +79,7 @@ struct mixer
 
     preview_buffer preview;
 
-    Timer *timers[MAX_NUM_TIMERS];
-    int timers_num;
+    std::vector<std::shared_ptr<Process>> processes;
 
     SoundGenerator *SoundGenerators[MAX_NUM_SOUND_GENERATORS];
     int soundgen_num; // actual number of SGs
@@ -153,14 +152,14 @@ void mixer_status_valz(mixer *mixr);
 void mixer_status_patz(mixer *mixr);
 void mixer_status_sgz(mixer *mixr, bool all);
 void mixer_status_mixr(mixer *mixr);
-void mixer_status_algoz(mixer *mixr, bool all);
+void mixer_status_procz(mixer *mixr, bool all);
 void mixer_update_bpm(mixer *mixr, int bpm);
 void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
 void mixer_midi_tick(mixer *mixr);
 void mixer_emit_event(mixer *mixr, broadcast_event event);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
-int mixer_add_timer(mixer *mixr, Timer *t);
+int mixer_add_process(mixer *mixr, std::string pattern);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_intdiv(mixer *mixr);
@@ -200,7 +199,7 @@ int get_environment_val(char *key, int *return_val);
 void mixer_update_timing_info(mixer *mixr, long long int frame_time);
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
-bool mixer_is_valid_timer(mixer *mixr, int timer_num);
+bool mixer_is_valid_process(mixer *mixr, int proc_num);
 bool mixer_is_valid_env_var(mixer *mixr, char *key);
 bool mixer_is_valid_pattern_gen_num(mixer *mixr, int sgnum);
 bool mixer_is_valid_value_gen_num(mixer *mixr, int sgnum);

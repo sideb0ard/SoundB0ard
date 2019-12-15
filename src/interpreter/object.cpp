@@ -6,7 +6,7 @@
 #include <vector>
 
 #include <mixer.h>
-#include <timer.hpp>
+#include <process.hpp>
 
 extern mixer *mixr;
 
@@ -80,16 +80,10 @@ Sample::Sample(std::string sample_path)
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
-Process::Process(std::shared_ptr<Environment> env,
-                 std::shared_ptr<ast::BlockStatement> body,
-                 ast::TimingEventType event_type, int frequency)
-    : env_{env}, body_{body}
+Process::Process(std::string pattern)
 {
-    std::cout << "NEW TYIME! " << frequency << " " << (int)event_type
-              << std::endl;
-    Timer *t = new Timer(0, (int)event_type, frequency, env, body);
-    if (t)
-        timer_num = mixer_add_timer(mixr, t);
+    std::cout << "NEW PROC! " << std::endl;
+    proc_num = mixer_add_process(mixr, pattern);
 };
 
 std::string Process::Inspect() { return "proccesss"; }

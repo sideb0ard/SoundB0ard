@@ -1084,4 +1084,39 @@ TEST_F(ParserTest, TestParsingPsStatement)
         FAIL() << "program->statements_[0] is not an PsStatement";
 }
 
+TEST_F(ParserTest, TestParsingProcessExpression)
+{
+    std::cout << "Testing `proc` statement" << std::endl;
+    std::string input = R"(let rhythm = proc(sound, "bd*3 sd"))";
+    std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(lex);
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+    EXPECT_FALSE(parsley->CheckErrors());
+    ASSERT_EQ(1, program->statements_.size());
+    std::shared_ptr<ast::LetStatement> stmt =
+        std::dynamic_pointer_cast<ast::LetStatement>(program->statements_[0]);
+    if (!stmt)
+        FAIL() << "program->statements_[0] is not a LetStatement - got "
+               << program->statements_[0]->String();
+
+    std::shared_ptr<ast::ProcessExpression> expr =
+        std::dynamic_pointer_cast<ast::ProcessExpression>(stmt->value_);
+    if (!expr)
+        FAIL() << "stmt->value_ is not a ProcessExpression - got "
+               << program->statements_[0]->String();
+
+    std::shared_ptr<ast::StringLiteral> target =
+        std::dynamic_pointer_cast<ast::StringLiteral>(expr->target_);
+    if (!target)
+        FAIL() << "process target is not a StringLiteral. Got "
+               << typeid(&expr->target_).name();
+
+    std::shared_ptr<ast::StringLiteral> pattern =
+        std::dynamic_pointer_cast<ast::StringLiteral>(expr->pattern_);
+    if (!pattern)
+        FAIL() << "process pattern_ is not a StringLiteral. Got "
+               << typeid(&expr->pattern_).name();
+}
+
 } // namespace

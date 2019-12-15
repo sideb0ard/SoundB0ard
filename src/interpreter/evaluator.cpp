@@ -294,14 +294,19 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::cout << "Nae sample path!!\n";
     }
 
-    std::shared_ptr<ast::EveryExpression> every =
-        std::dynamic_pointer_cast<ast::EveryExpression>(node);
-    if (every)
+    std::shared_ptr<ast::ProcessExpression> proc =
+        std::dynamic_pointer_cast<ast::ProcessExpression>(node);
+    if (proc)
     {
-        std::cout << "PROCESS Expression! Gots" << every->frequency_ << " "
-                  << (int)every->event_type_ << "\n";
-        return std::make_shared<object::Process>(
-            env, every->body_, every->event_type_, every->frequency_);
+        std::cout << "GOT DA REAL PROCESS Expression!\n";
+        std::shared_ptr<ast::StringLiteral> pattern =
+            std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
+        if (pattern)
+        {
+            return std::make_shared<object::Process>(pattern->value_);
+        }
+        else
+            std::cout << "Nae PATTERMN!!\n";
     }
 
     return NULLL;

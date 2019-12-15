@@ -55,19 +55,6 @@ bool parse_mixer_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
     {
         mixer_next_chord(mixr);
     }
-    else if (strncmp("algoz", wurds[0], 5) == 0)
-    {
-        if (strncmp("off", wurds[1], 3) == 0)
-            for (int i = 0; i < mixr->timers_num; i++)
-            {
-                if (mixer_is_valid_timer(mixr, i))
-                {
-                    Timer *t = mixr->timers[i];
-                    t->Stop();
-                }
-            }
-        mixer_status_algoz(mixr, true);
-    }
 
     else if (strncmp("bars_per_chord", wurds[0], 15) == 0)
     {

@@ -177,30 +177,19 @@ void mixer_status_mixr(mixer *mixr)
         printf(ANSI_COLOR_RESET "\n");
     }
 }
-void mixer_status_algoz(mixer *mixr, bool all)
+void mixer_status_procz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    if (mixr->timers_num > 0)
+    for (auto p : mixr->processes)
     {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "timers" COOL_COLOR_GREEN
-                                "]\n");
-        for (int i = 0; i < mixr->timers_num; i++)
+        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
+                                "Processes" COOL_COLOR_GREEN "]\n");
+        if (p->active_ || all)
         {
-            if (mixr->timers[i] != NULL)
-            {
-                if (mixr->timers[i]->active_ || all)
-                {
-                    wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                    mixr->timers[i]->Status(wss);
-                    // algorithm_status(mixr->algorithms[i], wss);
-                    wprintf(WCOOL_COLOR_GREEN "[" WANSI_COLOR_WHITE
-                                              "timer %d" WCOOL_COLOR_GREEN
-                                              "] " WANSI_COLOR_RESET,
-                            i);
-                    wprintf(L"%ls\n", wss);
-                    wprintf(WANSI_COLOR_RESET);
-                }
-            }
+            wmemset(wss, 0, MAX_STATIC_STRING_SZ);
+            p->Status(wss);
+            wprintf(L"%ls\n", wss);
+            wprintf(WANSI_COLOR_RESET);
         }
     }
 }
@@ -304,7 +293,7 @@ void mixer_ps(mixer *mixr, bool all)
 
     print_logo();
     mixer_status_mixr(mixr);
-    mixer_status_algoz(mixr, all);
+    mixer_status_procz(mixr, all);
     mixer_status_patz(mixr);
     mixer_status_sgz(mixr, all);
     mixer_status_valz(mixr);
@@ -324,11 +313,9 @@ void mixer_ps(mixer *mixr, bool all)
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
-    for (int i = 0; i < mixr->timers_num; ++i)
+    for (auto p : mixr->processes)
     {
-        Timer *t = mixr->timers[i];
-        if (t != NULL)
-            t->EventNotify(mixr->timing_info);
+        p->EventNotify(mixr->timing_info);
     }
 
     for (int i = 0; i < mixr->pattern_gen_num; ++i)
@@ -438,14 +425,12 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
     return mixr->pattern_gen_num++;
 }
 
-int mixer_add_timer(mixer *mixr, Timer *t)
+int mixer_add_process(mixer *mixr, std::string pattern)
 {
-    printf("Adding a TIMER, yo!\n");
-    if (mixr->timers_num == MAX_NUM_TIMERS)
-        return -99;
-
-    mixr->timers[mixr->timers_num] = t;
-    return mixr->timers_num++;
+    auto p = std::make_shared<::Process>(pattern);
+    printf("Adding a PrOCESS, yo!\n");
+    mixr->processes.push_back(p);
+    return 0;
 }
 
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
@@ -789,13 +774,6 @@ bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
     return false;
 }
 
-bool mixer_is_valid_timer(mixer *mixr, int t_num)
-{
-    if (t_num >= 0 && t_num < mixr->timers_num && mixr->timers[t_num] != NULL)
-        return true;
-    return false;
-}
-
 bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
@@ -806,6 +784,7 @@ bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
     }
     return false;
 }
+
 bool mixer_is_valid_env_var(mixer *mixr, char *key)
 {
     for (int i = 0; i < mixr->env_var_count; i++)

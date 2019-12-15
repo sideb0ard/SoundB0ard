@@ -198,6 +198,7 @@ class ProcessExpression : public Expression
     std::string String() const override;
 
   public:
+    std::shared_ptr<Expression> target_;
     std::shared_ptr<Expression> pattern_;
 };
 

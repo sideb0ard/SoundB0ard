@@ -191,20 +191,14 @@ class Sample : public Object
 class Process : public Object
 {
   public:
-    Process(std::shared_ptr<Environment> env,
-            std::shared_ptr<ast::BlockStatement> body,
-            ast::TimingEventType event_type, int frequency);
+    Process(std::string pattern);
     ~Process() = default;
     ObjectType Type() override;
     std::string Inspect() override;
 
   public:
-    std::shared_ptr<Environment> env_;
-    std::shared_ptr<ast::BlockStatement> body_;
-    int timer_num;
-    // ast::TimingEventType event_type_;
-    // int frequency_;
-    // int process_step_counter{0};
+    int proc_num{-1};
+    std::string pattern_;
 };
 
 class Function : public Object

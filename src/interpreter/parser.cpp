@@ -564,8 +564,8 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
 
     if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;
-
     NextToken();
+
     std::cout << "Cur token is " << cur_token_ << std::endl;
     sample->path_ = ParseStringLiteral();
 
@@ -578,14 +578,25 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
 
 std::shared_ptr<ast::Expression> Parser::ParseProcessExpression()
 {
+    // std::string input = R"(let rhythm = proc(sound, "bd*3 sd"))";
     auto process = std::make_shared<ast::ProcessExpression>(cur_token_);
 
     if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;
-
     NextToken();
+
     std::cout << "Cur token is " << cur_token_ << std::endl;
+    process->target_ = ParseStringLiteral();
+
+    if (!ExpectPeek(token::SLANG_COMMA))
+        return nullptr;
+    NextToken();
+
+    std::cout << "Post comma - Cur token is " << cur_token_ << std::endl;
+
     process->pattern_ = ParseStringLiteral();
+    std::cout << "Post Pattern Parsed - Cur token is " << cur_token_
+              << std::endl;
 
     if (!ExpectPeek(token::SLANG_RPAREN))
         return nullptr;
