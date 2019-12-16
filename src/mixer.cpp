@@ -425,9 +425,9 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
     return mixr->pattern_gen_num++;
 }
 
-int mixer_add_process(mixer *mixr, std::string pattern)
+int mixer_add_process(mixer *mixr, std::string target, std::string pattern)
 {
-    auto p = std::make_shared<::Process>(pattern);
+    auto p = std::make_shared<::Process>(target, pattern);
     printf("Adding a PrOCESS, yo!\n");
     mixr->processes.push_back(p);
     return 0;

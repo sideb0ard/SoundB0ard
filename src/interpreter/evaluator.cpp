@@ -299,14 +299,22 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     if (proc)
     {
         std::cout << "GOT DA REAL PROCESS Expression!\n";
-        std::shared_ptr<ast::StringLiteral> pattern =
-            std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
-        if (pattern)
+        std::shared_ptr<ast::StringLiteral> target =
+            std::dynamic_pointer_cast<ast::StringLiteral>(proc->target_);
+        if (target)
         {
-            return std::make_shared<object::Process>(pattern->value_);
+            std::shared_ptr<ast::StringLiteral> pattern =
+                std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
+            if (pattern)
+            {
+                return std::make_shared<object::Process>(target->value_,
+                                                         pattern->value_);
+            }
+            else
+                std::cout << "Nae PATTERMN!!\n";
         }
         else
-            std::cout << "Nae PATTERMN!!\n";
+            std::cout << "Nae TARGET!!\n";
     }
 
     return NULLL;

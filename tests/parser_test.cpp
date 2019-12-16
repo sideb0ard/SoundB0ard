@@ -1111,12 +1111,14 @@ TEST_F(ParserTest, TestParsingProcessExpression)
     if (!target)
         FAIL() << "process target is not a StringLiteral. Got "
                << typeid(&expr->target_).name();
+    EXPECT_EQ(target->value_, "sound");
 
     std::shared_ptr<ast::StringLiteral> pattern =
         std::dynamic_pointer_cast<ast::StringLiteral>(expr->pattern_);
     if (!pattern)
         FAIL() << "process pattern_ is not a StringLiteral. Got "
                << typeid(&expr->pattern_).name();
+    EXPECT_EQ(pattern->value_, "bd*3 sd");
 }
 
 } // namespace

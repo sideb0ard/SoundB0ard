@@ -191,13 +191,14 @@ class Sample : public Object
 class Process : public Object
 {
   public:
-    Process(std::string pattern);
+    Process(std::string target, std::string pattern);
     ~Process() = default;
     ObjectType Type() override;
     std::string Inspect() override;
 
   public:
     int proc_num{-1};
+    std::string target_;
     std::string pattern_;
 };
 

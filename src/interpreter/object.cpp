@@ -80,10 +80,10 @@ Sample::Sample(std::string sample_path)
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
-Process::Process(std::string pattern)
+Process::Process(std::string target, std::string pattern)
 {
     std::cout << "NEW PROC! " << std::endl;
-    proc_num = mixer_add_process(mixr, pattern);
+    proc_num = mixer_add_process(mixr, target, pattern);
 };
 
 std::string Process::Inspect() { return "proccesss"; }
