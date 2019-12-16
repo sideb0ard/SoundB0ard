@@ -27,7 +27,7 @@ extern Tsqueue<Wrapper> g_queue;
 Process::Process(std::string target, std::string pattern)
     : target_{target}, pattern_{pattern}, active_{true}
 {
-    std::cout << "YO, I BEEN PROC TIMING!" << std::endl;
+    std::cout << "YO, I BEEN PROC TIMING! -- pattern:" << pattern << std::endl;
 }
 
 void Process::EventNotify(mixer_timing_info tinfo)
