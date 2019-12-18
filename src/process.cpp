@@ -12,6 +12,8 @@
 #include <looper.h>
 #include <tsqueue.hpp>
 
+#include <pattern_parser/tokenizer.hpp>
+
 extern mixer *mixr;
 
 using Wrapper =
@@ -23,11 +25,21 @@ extern Tsqueue<Wrapper> g_queue;
 //    g_queue.push(std::make_pair(body_, env_));
 //    step_counter_++;
 //}
+//
+
+void Process::ParsePattern()
+{
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern_);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+
+    pattern_parzer->ParsePattern();
+}
 
 Process::Process(std::string target, std::string pattern)
     : target_{target}, pattern_{pattern}, active_{true}
 {
     std::cout << "YO, I BEEN PROC TIMING! -- pattern:" << pattern << std::endl;
+    ParsePattern();
 }
 
 void Process::EventNotify(mixer_timing_info tinfo)

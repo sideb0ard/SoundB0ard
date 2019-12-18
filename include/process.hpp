@@ -7,7 +7,9 @@
 
 #include <SequenceEngine.h>
 #include <defjams.h>
-#include <interpreter/ast.hpp>
+#include <pattern_parser/ast.hpp>
+#include <pattern_parser/parser.hpp>
+#include <pattern_parser/tokenizer.hpp>
 
 class Process
 {
@@ -19,6 +21,7 @@ class Process
     void Stop();
     void EventNotify(mixer_timing_info);
     void SetDebug(bool b);
+    void ParsePattern();
 
   public:
     std::string target_;
@@ -28,5 +31,7 @@ class Process
     bool debug_;
 
   private:
-    SequenceEngine engine;
+    SequenceEngine engine_;
+    std::vector<pattern_parser::PatternNode> pattern_root;
+    // pattern_parser::Parser parser_;
 };
