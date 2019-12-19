@@ -29,15 +29,9 @@ extern Tsqueue<Wrapper> g_queue;
 
 void Process::ParsePattern()
 {
-    std::cout << "\nPARSE PATTERN STARTS!\n\n";
     auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern_);
     auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
-
-    std::shared_ptr<pattern_parser::EventGroup> pattern_event_group =
-        pattern_parzer->ParsePattern();
-
-    for (auto e : pattern_event_group->events_)
-        std::cout << e->String() << std::endl;
+    pattern_root_ = pattern_parzer->ParsePattern();
 }
 
 Process::Process(std::string target, std::string pattern)
@@ -51,35 +45,37 @@ void Process::EventNotify(mixer_timing_info tinfo)
     if (!active_)
         return;
 
-    // if (event_type_ == TIME_MIDI_TICK)
-    //    Eval();
-    // else if (event_type_ == TIME_START_OF_LOOP_TICK &&
-    // tinfo.is_start_of_loop)
-    //{
-    //    Eval();
-    //}
-    // else if (event_type_ == TIME_QUARTER_TICK && tinfo.is_quarter)
-    //    Eval();
-    // else if (event_type_ == TIME_EIGHTH_TICK && tinfo.is_eighth)
-    //    Eval();
-    // else if (event_type_ == TIME_SIXTEENTH_TICK && tinfo.is_sixteenth)
-    //    Eval();
-    // else if (event_type_ == TIME_THIRTYSECOND_TICK && tinfo.is_thirtysecond)
-    //    Eval();
-    //// if (event_type == a->event_type)
-    ////{
-    ////    if (event_type == SEQUENCER_NOTE &&
-    ////        event.sequencer_src != a->sequencer_src)
-    ////        return;
-    ////    handle_command(a);
-    ////}
-
-    // if (timer_type_ == OVER)
-    //    Eval();
-    // else if (tinfo.is_sixteenth && timer_type_ == FOR)
-    //    Eval();
+    else if (tinfo.is_start_of_loop)
+    {
+        std::cout << "Start of LLOP!\n";
+        EvalPattern(pattern_root_->events_, 0, PPBAR);
+    }
 }
 
+void Process::EvalPattern(
+    std::vector<std::shared_ptr<pattern_parser::PatternNode>> &pattern,
+    int target_start, int target_end)
+{
+    // pattern_events_.fill("");
+    int num_events = pattern.size();
+    if (num_events == 0)
+    {
+        std::cout << "NAE EVENTS!\n";
+        return;
+    }
+    std::cout << "GOT " << num_events << " Events. Start is " << target_start
+              << " End is " << target_end << std::endl;
+    int target_len = target_end - target_start;
+    int spacing = target_len / num_events;
+    std::cout << "LEN is " << target_len << " . Spacing is " << spacing
+              << std::endl;
+    for (int i = target_start, j = 0; i < target_len && j < num_events;
+         i += spacing, j++)
+    {
+        std::cout << "-->Event " << j << " at:" << i
+                  << " Node is:" << pattern[j]->String();
+    }
+}
 // bool algorithm_set_var_list(algorithm *a, char *list)
 //{
 //    int len = strlen(list);
