@@ -29,16 +29,20 @@ extern Tsqueue<Wrapper> g_queue;
 
 void Process::ParsePattern()
 {
+    std::cout << "\nPARSE PATTERN STARTS!\n\n";
     auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern_);
     auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
 
-    pattern_parzer->ParsePattern();
+    std::shared_ptr<pattern_parser::EventGroup> pattern_event_group =
+        pattern_parzer->ParsePattern();
+
+    for (auto e : pattern_event_group->events_)
+        std::cout << e->String() << std::endl;
 }
 
 Process::Process(std::string target, std::string pattern)
     : target_{target}, pattern_{pattern}, active_{true}
 {
-    std::cout << "YO, I BEEN PROC TIMING! -- pattern:" << pattern << std::endl;
     ParsePattern();
 }
 

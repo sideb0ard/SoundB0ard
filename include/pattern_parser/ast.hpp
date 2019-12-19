@@ -10,6 +10,16 @@
 namespace pattern_parser
 {
 
+enum EventModifier
+{
+    NONE,
+    MULTIPLY,
+    DIVIDE,
+
+};
+
+static const char *MOD_NAMES[]{"NONE", "MULTIPLY", "DIVIDE"};
+
 class PatternNode
 {
   public:
@@ -21,6 +31,8 @@ class PatternNode
 
   public:
     Token token_;
+    EventModifier modifier_{EventModifier::NONE};
+    int modifier_value_{0};
 };
 
 class Identifier : public PatternNode

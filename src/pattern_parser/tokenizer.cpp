@@ -90,8 +90,6 @@ char Tokenizer::PeekChar()
 pattern_parser::Token Tokenizer::NextToken()
 {
 
-    std::cout << "\nPATTERN PARSER TOKENIZER NEXT TOKEN!" << std::endl;
-
     pattern_parser::Token tok;
 
     SkipWhiteSpace();
@@ -99,49 +97,42 @@ pattern_parser::Token Tokenizer::NextToken()
     switch (current_char_)
     {
     case ('['):
-        std::cout << "LEFT SQUARE!\n";
         tok.type_ = pattern_parser::PATTERN_SQUARE_BRACKET_LEFT;
         tok.literal_ = current_char_;
         break;
     case (']'):
-        std::cout << "RIVHT SQUARE!\n";
         tok.type_ = pattern_parser::PATTERN_SQUARE_BRACKET_RIGHT;
         tok.literal_ = current_char_;
         break;
     case ('*'):
-        std::cout << "MULTIiiiiiii!\n";
         tok.type_ = pattern_parser::PATTERN_MULTIPLIER;
         tok.literal_ = current_char_;
         break;
     case ('/'):
-        std::cout << "DIVIIISSS!\n";
         tok.type_ = pattern_parser::PATTERN_DIVIDER;
         tok.literal_ = current_char_;
         break;
     case (0):
-        std::cout << "WEOF !\n";
         tok.type_ = pattern_parser::PATTERN_EOF;
         break;
     default:
-        std::cout << "DEFAULT !\n";
         if (IsValidIdentifier(current_char_))
         {
             tok.literal_ = ReadIdentifier();
             tok.type_ = pattern_parser::LookupIdent(tok.literal_);
-            std::cout << "    DEFAULT VALID ! " << tok.literal_ << "\n";
             return tok;
         }
-        // else if (IsDigit(current_char_))
-        //{
-        //    tok.type_ = token::SLANG_INT;
-        //    tok.literal_ = ReadNumber();
-        //    return tok;
-        //}
-        // else
-        //{
-        //    tok.type_ = token::SLANG_ILLEGAL;
-        //    tok.literal_ = current_char_;
-        //}
+        else if (IsDigit(current_char_))
+        {
+            tok.type_ = pattern_parser::PATTERN_INT;
+            tok.literal_ = ReadNumber();
+            return tok;
+        }
+        else
+        {
+            tok.type_ = pattern_parser::PATTERN_ILLEGAL;
+            tok.literal_ = current_char_;
+        }
     }
 
     ReadChar();

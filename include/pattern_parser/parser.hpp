@@ -43,7 +43,7 @@ class Parser
   public:
     explicit Parser(std::shared_ptr<pattern_parser::Tokenizer> tokenizer);
 
-    std::shared_ptr<pattern_parser::PatternNode> ParsePattern();
+    std::shared_ptr<pattern_parser::EventGroup> ParsePattern();
     std::shared_ptr<pattern_parser::PatternNode> ParsePatternNode();
     std::shared_ptr<pattern_parser::PatternNode> ParsePatternIdent();
     std::shared_ptr<pattern_parser::PatternNode> ParsePatternGroup();

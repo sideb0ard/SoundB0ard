@@ -173,7 +173,7 @@ class Synth : public Object
     std::string Inspect() override;
 
   public:
-    int synth_num_{-1};
+    int soundgen_id_{-1};
 };
 
 class Sample : public Object
@@ -185,7 +185,7 @@ class Sample : public Object
     std::string Inspect() override;
 
   public:
-    int sample_num_{-1};
+    int soundgen_id_{-1};
 };
 
 class Process : public Object

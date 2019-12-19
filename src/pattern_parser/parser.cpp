@@ -15,42 +15,92 @@ namespace pattern_parser
 Parser::Parser(std::shared_ptr<pattern_parser::Tokenizer> tokenizer)
     : tokenizer_{tokenizer}
 {
-    std::cout << "\n\nPATERN_PARSER_PARZR_PATTEN\n\n";
     NextToken();
     NextToken();
-
-    std::cout << "CUR TOKN" << cur_token_ << " and PEEK" << peek_token_
-              << std::endl;
 }
 
-// std::shared_ptr<ast::ExpressionStatement> Parser::ParseExpressionStatement()
-//{
-//    std::shared_ptr<ast::ExpressionStatement> stmt =
-//        std::make_shared<ast::ExpressionStatement>(cur_token_);
-//    stmt->expression_ = ParseExpression(Precedence::LOWEST);
-//
-//    if (PeekTokenIs(token::SLANG_SEMICOLON))
-//        NextToken();
-//
-//    return stmt;
-//}
+std::shared_ptr<pattern_parser::EventGroup> Parser::ParsePattern()
+{
+    pattern_parser::Token root_token = {pattern_parser::PATTERN_GROUP, "root"};
+    auto pattern_root =
+        std::make_shared<pattern_parser::EventGroup>(root_token);
+
+    int node_counter{0};
+    while (cur_token_.type_ != pattern_parser::PATTERN_EOF)
+    {
+        std::cout << "\n**BING!BING! node #" << ++node_counter << std::endl;
+        std::shared_ptr<pattern_parser::PatternNode> ev = ParsePatternNode();
+        if (ev)
+        {
+            std::cout << "Node Event is " << ev->String() << std::endl;
+            pattern_root->events_.push_back(ev);
+        }
+        else
+            std::cout << "NO PATTERNODE\n";
+        NextToken();
+    }
+
+    std::cout << "//// num events:" << pattern_root->events_.size()
+              << std::endl;
+    return pattern_root;
+}
 
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 {
+    std::cout << "PARSE PATTERN NODE - cur token is " << cur_token_
+              << std::endl;
+
+    std::shared_ptr<pattern_parser::PatternNode> return_node;
+
     if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0)
-        return ParsePatternIdent();
+    {
+        std::cout << "TOKEN TYPE IS IDENT!" << std::endl;
+        return_node = ParsePatternIdent();
+    }
     else if (cur_token_.type_.compare(
                  pattern_parser::PATTERN_SQUARE_BRACKET_LEFT) == 0)
-        return ParsePatternGroup();
+    {
+        std::cout << "TOKEN TYPE IS GROUP!" << std::endl;
+        return_node = ParsePatternGroup();
+    }
     else
         return nullptr;
+
+    if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER) ||
+        PeekTokenIs(pattern_parser::PATTERN_DIVIDER))
+    {
+        std::cout << "OOH, OOH, FOUND MODIFIER!\n\n";
+        if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER))
+        {
+            return_node->modifier_ = EventModifier::MULTIPLY;
+            // std::cout << "Setting MODIFIER TO MULTIPLYyyy - which is "
+            //          << MOD_NAMES[EventModifier::MULTIPLY] << "\n";
+        }
+        else
+        {
+            std::cout << "Setting MODIFIER TO DIIIIIVvvvy\n";
+            return_node->modifier_ = EventModifier::DIVIDE;
+        }
+        NextToken();
+        if (!ExpectPeek(pattern_parser::PATTERN_INT))
+        {
+            std::cerr << "NEED A NUMBER FOR A MODIFIER!!\n";
+            return nullptr;
+        }
+
+        return_node->modifier_value_ = std::stoi(cur_token_.literal_);
+    }
+
+    return return_node;
 }
 
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternIdent()
 {
 
+    std::cout << "  INSIDE PARSE PATTERN IDENT\n";
     std::shared_ptr<pattern_parser::Identifier> node =
-        std::make_shared<pattern_parser::Identifier>(cur_token_, "bumfart");
+        std::make_shared<pattern_parser::Identifier>(cur_token_,
+                                                     cur_token_.literal_);
 
     return node;
 }
@@ -58,27 +108,11 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternIdent()
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternGroup()
 {
 
+    std::cout << "  INSIDE PARSE PATTERN GROUP\n";
     std::shared_ptr<pattern_parser::EventGroup> events =
         std::make_shared<pattern_parser::EventGroup>(cur_token_);
 
     return events;
-}
-
-std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePattern()
-{
-    pattern_parser::Token root_token = {pattern_parser::PATTERN_GROUP, "root"};
-    auto pattern_root =
-        std::make_shared<pattern_parser::EventGroup>(root_token);
-
-    while (cur_token_.type_ != pattern_parser::PATTERN_EOF)
-    {
-        std::cout << "GOt token!\n";
-        std::shared_ptr<pattern_parser::PatternNode> ev = ParsePatternNode();
-        if (ev)
-            pattern_root->events_.push_back(ev);
-        NextToken();
-    }
-    return pattern_root;
 }
 
 bool Parser::CheckErrors()
@@ -111,7 +145,6 @@ void Parser::NextToken()
 {
     cur_token_ = peek_token_;
     peek_token_ = tokenizer_->NextToken();
-    std::cout << "PARSR->NEXTTOKEN:" << cur_token_ << std::endl;
 }
 
 bool Parser::CurTokenIs(pattern_parser::TokenType t) const

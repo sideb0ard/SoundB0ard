@@ -69,13 +69,13 @@ object::HashKey String::HashKey()
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
 
-Synth::Synth() { synth_num_ = add_minisynth(mixr); }
+Synth::Synth() { soundgen_id_ = add_minisynth(mixr); }
 std::string Synth::Inspect() { return "synth."; }
 ObjectType Synth::Type() { return SYNTH_OBJ; }
 
 Sample::Sample(std::string sample_path)
 {
-    sample_num_ = add_sample(mixr, sample_path);
+    soundgen_id_ = add_sample(mixr, sample_path);
 }
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }

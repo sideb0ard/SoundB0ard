@@ -8,12 +8,10 @@ namespace pattern_parser
 {
 
 const std::unordered_map<std::string, pattern_parser::TokenType> keywords{
-    //    {"else", SLANG_ELSE},     {"false", SLANG_FALSE}, {"for", SLANG_FOR},
-    //    {"fn", SLANG_FUNCTION},   {"fm", SLANG_FM_SYNTH}, {"if", SLANG_IF},
-    //    {"let", SLANG_LET},       {"true", SLANG_TRUE},   {"return",
-    //    SLANG_RETURN},
-    //    {"every", SLANG_EVERY},   {"ps", SLANG_PS},       {"ls", SLANG_LS},
-    //    {"sample", SLANG_SAMPLE}, {"proc", SLANG_PROC},
+    {"*", PATTERN_MULTIPLIER},
+    {"/", PATTERN_DIVIDER},
+    {"[", PATTERN_SQUARE_BRACKET_LEFT},
+    {"]", PATTERN_SQUARE_BRACKET_RIGHT},
 };
 
 TokenType LookupIdent(std::string ident)
@@ -25,7 +23,7 @@ TokenType LookupIdent(std::string ident)
         return got->second;
     }
 
-    return ENV_IDENT;
+    return PATTERN_IDENT;
 }
 
 std::ostream &operator<<(std::ostream &out, const pattern_parser::Token &tok)
