@@ -18,7 +18,7 @@ float freqval(char *n);
 int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);
 int char_midi_lookup(char *char_midi);
-void list_sample_dir(char *dirname);
+void list_sample_dir(std::string indir = "");
 void get_random_sample_from_dir(char *dir_name, char *random_file);
 void strim(const char *input, char *result);
 void chordie(char *n);
@@ -68,6 +68,7 @@ double lagrpol(double *x, double *y, int n, double xbar);
 double semitones_between_frequencies(double start_freq, double end_freq);
 double clamp(double min, double max, double v);
 
+double mma_midi_to_atten(unsigned int midi_val);
 double mma_midi_to_atten_db(unsigned int midi_val);
 bool is_int_member_in_array(int member_to_look_for, int *array_to_look_in,
                             int size_of_array);

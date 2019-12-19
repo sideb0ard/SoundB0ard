@@ -133,7 +133,7 @@ void dxsynth_update(dxsynth *synth);
 void dxsynth_increment_voice_timestamps(dxsynth *synth);
 dxsynth_voice *dxsynth_get_oldest_voice(dxsynth *synth);
 dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
-                                                  unsigned int midi_note);
+                                                  int midi_note);
 
 void dxsynth_reset_voices(dxsynth *self);
 

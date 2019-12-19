@@ -14,3 +14,7 @@ LongFormSamples
 wip/
 cscope.out
 sbsh.dSYM/
+libgtest.a
+libgtest_main.a
+sbsh_test
+sbsh_test.dSYM/

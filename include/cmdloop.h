@@ -2,14 +2,20 @@
 
 #include <stdbool.h>
 
+#include <interpreter/object.hpp>
+#include <memory>
+
 #include <lo/lo.h>
 
 #include "audioutils.h"
 #include "digisynth.h"
 #include "dxsynth.h"
 #include "minisynth.h"
+
 void *loopy(void *arg);
-void interpret(char *line);
+// void interpret(char *line);
+
+void Interpret(char *line, std::shared_ptr<object::Environment> env);
 
 int stacksize(void);
 

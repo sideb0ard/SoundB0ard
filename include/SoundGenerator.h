@@ -21,16 +21,21 @@ class SoundGenerator
     virtual void start();
     virtual void stop();
 
-    virtual void noteOn(midi_event ev){};
-    virtual void noteOff(midi_event ev){};
-    virtual void control(midi_event ev){};
-    virtual void pitchBend(midi_event ev){};
+    virtual void noteOn(midi_event ev) { (void)ev; };
+    virtual void noteOff(midi_event ev) { (void)ev; };
+    void noteOffDelayed(midi_event ev, int event_off_tick);
+    virtual void control(midi_event ev) { (void)ev; };
+    virtual void pitchBend(midi_event ev) { (void)ev; };
     virtual void randomize(){};
     virtual void allNotesOff(){};
 
     virtual void eventNotify(broadcast_event event, mixer_timing_info tinfo);
 
     void parseMidiEvent(midi_event ev, mixer_timing_info tinfo);
+
+    // TODO -- implement this generic interface
+    void SetParam(std::string name, double val);
+    double GetParam(std::string name);
 
     void setVolume(double val);
     double getVolume();
@@ -49,6 +54,8 @@ class SoundGenerator
 
     double volume{0.7}; // between 0 and 1.0
     double pan{0.};     // between -1(hard left) and 1(hard right)
+
+    int note_duration_ms_{100};
 
     int effects_size; // size of array
     int effects_num;  // num of effects

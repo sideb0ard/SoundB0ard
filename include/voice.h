@@ -17,12 +17,12 @@ typedef struct voice
 
     bool m_note_on;
     bool hard_sync;
-    unsigned int m_timestamp;
+    int m_timestamp;
 
-    unsigned int m_midi_note_number;
-    unsigned int m_midi_note_number_pending;
-    unsigned int m_midi_velocity;
-    unsigned int m_midi_velocity_pending;
+    int m_midi_note_number;
+    int m_midi_note_number_pending;
+    int m_midi_velocity;
+    int m_midi_velocity_pending;
 
     /////////////////////////////
     oscillator *m_osc1;
@@ -81,9 +81,9 @@ bool voice_in_legato_mode(voice *v);
 void voice_prepare_for_play(voice *v);
 void voice_update(voice *v);
 void voice_reset(voice *v);
-void voice_note_on(voice *v, unsigned int midi_note, unsigned int midi_velocity,
-                   double frequency, double last_note_frequency);
-void voice_note_off(voice *v, unsigned int midi_note);
+void voice_note_on(voice *v, int midi_note, int midi_velocity, double frequency,
+                   double last_note_frequency);
+void voice_note_off(voice *v, int midi_note);
 bool voice_gennext(voice *v, double *left_output, double *right_output);
 void voice_set_sustain_override(voice *v, bool b);
 
