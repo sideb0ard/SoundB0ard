@@ -18,14 +18,14 @@ std::string Identifier::String() const
     return ss.str();
 }
 
-std::string IntegerLiteral::String() const
-{
-
-    std::stringstream ss;
-    ss << token_.literal_;
-    ss << MOD_NAMES[modifier_] << modifier_value_;
-    return ss.str();
-}
+// std::string IntegerLiteral::String() const
+// {
+//
+//     std::stringstream ss;
+//     // ss << token_.literal_;
+//     ss << MOD_NAMES[modifier_] << modifier_value_;
+//     return ss.str();
+// }
 
 std::string EventGroup::String() const
 {

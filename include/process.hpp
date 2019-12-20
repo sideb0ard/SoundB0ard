@@ -27,9 +27,8 @@ class Process
     void EventNotify(mixer_timing_info);
     void SetDebug(bool b);
     void ParsePattern();
-    void EvalPattern(
-        std::vector<std::shared_ptr<pattern_parser::PatternNode>> &pattern,
-        int target_start, int target_end);
+    void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &pattern,
+                     int target_start, int target_end);
 
   public:
     std::string target_;
@@ -40,7 +39,7 @@ class Process
 
   private:
     // SequenceEngine engine_;
-    std::shared_ptr<pattern_parser::EventGroup> pattern_root_;
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
     std::array<MusicalEvent, PPBAR> pattern_events_;
     int loop_counter_;
     // pattern_parser::Parser parser_;
