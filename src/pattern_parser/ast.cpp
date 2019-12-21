@@ -18,24 +18,19 @@ std::string Identifier::String() const
     return ss.str();
 }
 
-// std::string IntegerLiteral::String() const
-// {
-//
-//     std::stringstream ss;
-//     // ss << token_.literal_;
-//     ss << MOD_NAMES[modifier_] << modifier_value_;
-//     return ss.str();
-// }
+int Identifier::NumEvents() const { return 1; }
 
 std::string EventGroup::String() const
 {
     std::stringstream ss;
+    std::cout << "  EventGroup String! num events" << events_.size()
+              << std::endl;
     for (auto &s : events_)
-        ss << s->String();
-
-    ss << MOD_NAMES[modifier_] << modifier_value_;
+        ss << s->String() << " ";
 
     return ss.str();
 }
+
+int EventGroup::NumEvents() const { return events_.size(); }
 
 } // namespace pattern_parser

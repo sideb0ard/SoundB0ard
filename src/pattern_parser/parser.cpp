@@ -41,6 +41,7 @@ std::shared_ptr<pattern_parser::EventGroup> Parser::ParsePattern()
     }
 
     std::cout << "//// num events:" << pattern_root->events_.size()
+              << " DONE WITH PARSEPATTERN\n"
               << std::endl;
     return pattern_root;
 }
@@ -89,6 +90,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 
         if (is_multiplier)
         {
+            std::cout << "Got MULtiplier! " << modifier_value << std::endl;
             auto ev_group = std::make_shared<pattern_parser::EventGroup>();
             for (int j = 0; j < modifier_value; j++)
             {

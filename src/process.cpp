@@ -49,7 +49,6 @@ void Process::EventNotify(mixer_timing_info tinfo)
 
     if (tinfo.is_start_of_loop)
     {
-        std::cout << "Start of LLOP!\n";
         std::fill(pattern_events_.begin(), pattern_events_.end(), nullptr);
         EvalPattern(pattern_root_, 0, PPBAR);
     }
@@ -61,8 +60,6 @@ void Process::EventNotify(mixer_timing_info tinfo)
                           pattern_events_[cur_tick]->target_ + "," +
                           "127, 250)";
 
-        std::cout << "BOOM! Got an event " << cur_tick << " -- CMD Is " << cmd
-                  << std::endl;
         Interpret(cmd.data(), global_env);
     }
 }
@@ -75,8 +72,6 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
     if (leaf_node)
     {
         std::string target = leaf_node->value_;
-        std::cout << "Placing Leaf Node " << target << " at " << target_start
-                  << std::endl;
         pattern_events_[target_start] = std::make_shared<MusicalEvent>(target);
         return;
     }
@@ -85,18 +80,18 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
         std::dynamic_pointer_cast<pattern_parser::EventGroup>(node);
     if (composite_node)
     {
-        std::cout << "COMPOSITE!!\n";
 
         int target_len = target_end - target_start;
-
-        int num_events = composite_node->events_.size();
+        int num_events = composite_node->NumEvents();
         int spacing = target_len / num_events;
-        for (int i = target_start, j = 0; i < target_len && j < num_events;
-             i += spacing, j++)
+
+        for (int i = target_start, event_idx = 0;
+             i < target_end && event_idx < num_events;
+             i += spacing, event_idx++)
         {
             std::shared_ptr<pattern_parser::PatternNode> sub_node =
-                composite_node->events_[j];
-            EvalPattern(sub_node, i, spacing);
+                composite_node->events_[event_idx];
+            EvalPattern(sub_node, i, i + spacing);
         }
     }
 }

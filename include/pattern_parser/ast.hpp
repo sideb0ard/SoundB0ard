@@ -26,6 +26,7 @@ class PatternNode
     PatternNode() = default;
     virtual ~PatternNode() = default;
     virtual std::string String() const = 0;
+    virtual int NumEvents() const = 0;
 
   public:
     // Token token_;
@@ -39,6 +40,7 @@ class Identifier : public PatternNode
     Identifier() {}
     Identifier(std::string val) : value_{val} {}
     std::string String() const override;
+    int NumEvents() const override;
 
   public:
     std::string value_;
@@ -50,6 +52,7 @@ class EventGroup : public PatternNode
     EventGroup() = default;
     // explicit EventGroup(Token toke) : PatternNode{toke} {}
     std::string String() const override;
+    int NumEvents() const override;
 
   public:
     std::vector<std::shared_ptr<PatternNode>> events_;
