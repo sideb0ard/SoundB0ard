@@ -11,8 +11,10 @@
 #include <pattern_parser/parser.hpp>
 #include <pattern_parser/tokenizer.hpp>
 
-class MusicalEvent
+struct MusicalEvent
 {
+    MusicalEvent() = default;
+    MusicalEvent(std::string target) : target_{target} {}
     std::string target_;
 };
 
@@ -40,7 +42,7 @@ class Process
   private:
     // SequenceEngine engine_;
     std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
-    std::array<MusicalEvent, PPBAR> pattern_events_;
+    std::array<std::shared_ptr<MusicalEvent>, PPBAR> pattern_events_;
     int loop_counter_;
     // pattern_parser::Parser parser_;
 };

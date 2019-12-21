@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <iostream>
+#include <sstream>
 
 #include "cmdloop.h"
 #include "mixer.h"
@@ -19,6 +20,7 @@ extern mixer *mixr;
 using Wrapper =
     std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
 extern Tsqueue<Wrapper> g_queue;
+extern std::shared_ptr<object::Environment> global_env;
 
 // void Process::Eval()
 //{
@@ -45,23 +47,37 @@ void Process::EventNotify(mixer_timing_info tinfo)
     if (!active_)
         return;
 
-    else if (tinfo.is_start_of_loop)
+    if (tinfo.is_start_of_loop)
     {
         std::cout << "Start of LLOP!\n";
+        std::fill(pattern_events_.begin(), pattern_events_.end(), nullptr);
         EvalPattern(pattern_root_, 0, PPBAR);
+    }
+
+    int cur_tick = tinfo.midi_tick % PPBAR;
+    if (pattern_events_[cur_tick])
+    {
+        std::string cmd = std::string("noteOn(") +
+                          pattern_events_[cur_tick]->target_ + "," +
+                          "127, 250)";
+
+        std::cout << "BOOM! Got an event " << cur_tick << " -- CMD Is " << cmd
+                  << std::endl;
+        Interpret(cmd.data(), global_env);
     }
 }
 
 void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
                           int target_start, int target_end)
 {
-
     std::shared_ptr<pattern_parser::Identifier> leaf_node =
         std::dynamic_pointer_cast<pattern_parser::Identifier>(node);
     if (leaf_node)
     {
-        std::cout << "Placing Leaf Node " << leaf_node->String() << " at "
-                  << target_start << std::endl;
+        std::string target = leaf_node->value_;
+        std::cout << "Placing Leaf Node " << target << " at " << target_start
+                  << std::endl;
+        pattern_events_[target_start] = std::make_shared<MusicalEvent>(target);
         return;
     }
 
