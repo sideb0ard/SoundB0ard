@@ -53,6 +53,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
     {
         std::fill(pattern_events_.begin(), pattern_events_.end(), nullptr);
         EvalPattern(pattern_root_, 0, PPBAR);
+        ++loop_counter_;
     }
 
     int cur_tick = tinfo.midi_tick % PPBAR;
@@ -69,6 +70,13 @@ void Process::EventNotify(mixer_timing_info tinfo)
 void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
                           int target_start, int target_end)
 {
+
+    int divisor = node->GetDivisor();
+    std::cout << "NODE> " << node->String() << " Loop COUNT:" << loop_counter_
+              << " Divisor:" << divisor << std::endl;
+    if (divisor && (loop_counter_ % divisor != 0))
+        return;
+
     std::shared_ptr<pattern_parser::PatternLeaf> leaf_node =
         std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
     if (leaf_node)

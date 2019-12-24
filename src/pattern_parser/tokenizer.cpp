@@ -8,7 +8,7 @@ namespace
 bool IsValidIdentifier(char c)
 {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' ||
-           c == '/' || c == '-' || c == '.';
+           c == '-' || c == '.';
 }
 bool IsDigit(char c) { return '0' <= c && c <= '9'; }
 

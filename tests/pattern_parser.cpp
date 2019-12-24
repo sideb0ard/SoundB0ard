@@ -138,7 +138,7 @@ TEST_F(PatternParserTest, TestPatternGroupingNestedLevel)
 TEST_F(PatternParserTest, TestPatternDivisor)
 {
 
-    std::string pattern{"[bd bd [bd bd]] sd"};
+    std::string pattern{"bd*3 sd/2"};
     auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
     auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
@@ -157,15 +157,9 @@ TEST_F(PatternParserTest, TestPatternDivisor)
         FAIL() << "Cannot cast nested_bd to PatternGroup!";
     EXPECT_EQ(3, nested_bd->NumEvents());
 
-    auto nested_nested_bd =
-        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
-            nested_bd->events_[2]);
-    if (!nested_nested_bd)
-        FAIL() << "Cannot cast nested_nested_bd to PatternGroup!";
-    EXPECT_EQ(2, nested_nested_bd->NumEvents());
-
     // snare
     EXPECT_EQ(1, events->events_[1]->NumEvents());
+    EXPECT_EQ(2, events->events_[1]->GetDivisor());
 }
 
 } // namespace
