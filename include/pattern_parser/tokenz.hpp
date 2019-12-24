@@ -7,7 +7,7 @@ namespace pattern_parser
 using TokenType = std::string;
 
 const TokenType PATTERN_COMMA = ",";
-const TokenType PATTERN_DIVIDER = "/";
+const TokenType PATTERN_DIVISOR = "/";
 const TokenType PATTERN_EOF = "EOF";
 const TokenType PATTERN_IDENT = "PATTERN_IDENT";
 const TokenType PATTERN_ILLEGAL = "ILLEGAL";

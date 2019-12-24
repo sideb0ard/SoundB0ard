@@ -42,7 +42,7 @@ TEST_F(PatternTokenizerTest, TestTokenz)
     EXPECT_EQ(tok.type_, pattern_parser::PATTERN_SQUARE_BRACKET_RIGHT);
 
     tok = tokenizer->NextToken();
-    EXPECT_EQ(tok.type_, pattern_parser::PATTERN_DIVIDER);
+    EXPECT_EQ(tok.type_, pattern_parser::PATTERN_DIVISOR);
 
     tok = tokenizer->NextToken();
     EXPECT_EQ(tok.type_, pattern_parser::PATTERN_INT);

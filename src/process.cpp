@@ -69,8 +69,8 @@ void Process::EventNotify(mixer_timing_info tinfo)
 void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
                           int target_start, int target_end)
 {
-    std::shared_ptr<pattern_parser::Identifier> leaf_node =
-        std::dynamic_pointer_cast<pattern_parser::Identifier>(node);
+    std::shared_ptr<pattern_parser::PatternLeaf> leaf_node =
+        std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
     if (leaf_node)
     {
         std::string target = leaf_node->value_;
@@ -78,8 +78,8 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
         return;
     }
 
-    std::shared_ptr<pattern_parser::EventGroup> composite_node =
-        std::dynamic_pointer_cast<pattern_parser::EventGroup>(node);
+    std::shared_ptr<pattern_parser::PatternGroup> composite_node =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(node);
     if (composite_node)
     {
 

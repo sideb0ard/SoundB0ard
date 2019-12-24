@@ -10,16 +10,6 @@
 namespace pattern_parser
 {
 
-enum EventModifier
-{
-    NONE,
-    MULTIPLY,
-    DIVIDE,
-
-};
-
-static const char *MOD_NAMES[]{"NONE", "MULTIPLY", "DIVIDE"};
-
 class PatternNode
 {
   public:
@@ -27,18 +17,17 @@ class PatternNode
     virtual ~PatternNode() = default;
     virtual std::string String() const = 0;
     virtual int NumEvents() const = 0;
+    virtual int GetDivisor() const { return divisor_value_; }
 
   public:
-    // Token token_;
-    EventModifier modifier_{EventModifier::NONE};
-    int modifier_value_{0};
+    int divisor_value_{0}; // only set when a divisor is present
 };
 
-class Identifier : public PatternNode
+class PatternLeaf : public PatternNode
 {
   public:
-    Identifier() {}
-    Identifier(std::string val) : value_{val} {}
+    PatternLeaf() {}
+    PatternLeaf(std::string val) : value_{val} {}
     std::string String() const override;
     int NumEvents() const override;
 
@@ -46,11 +35,10 @@ class Identifier : public PatternNode
     std::string value_;
 };
 
-class EventGroup : public PatternNode
+class PatternGroup : public PatternNode
 {
   public:
-    EventGroup() = default;
-    // explicit EventGroup(Token toke) : PatternNode{toke} {}
+    PatternGroup() = default;
     std::string String() const override;
     int NumEvents() const override;
 

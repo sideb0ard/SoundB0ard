@@ -19,9 +19,9 @@ Parser::Parser(std::shared_ptr<pattern_parser::Tokenizer> tokenizer)
     NextToken();
 }
 
-std::shared_ptr<pattern_parser::EventGroup> Parser::ParsePattern()
+std::shared_ptr<pattern_parser::PatternGroup> Parser::ParsePattern()
 {
-    auto pattern_root = std::make_shared<pattern_parser::EventGroup>();
+    auto pattern_root = std::make_shared<pattern_parser::PatternGroup>();
 
     int node_counter{0};
     while (cur_token_.type_ != pattern_parser::PATTERN_EOF)
@@ -54,7 +54,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0)
     {
         std::cout << "TOKEN TYPE IS IDENT!" << cur_token_ << std::endl;
-        return_node = ParsePatternIdent();
+        return_node = ParsePatternLeaf();
     }
     else if (cur_token_.type_.compare(
                  pattern_parser::PATTERN_SQUARE_BRACKET_LEFT) == 0)
@@ -69,7 +69,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     }
 
     if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER) ||
-        PeekTokenIs(pattern_parser::PATTERN_DIVIDER))
+        PeekTokenIs(pattern_parser::PATTERN_DIVISOR))
     {
         std::cout << "OOH, OOH, FOUND MODIFIER!\n\n";
         bool is_multiplier{false};
@@ -82,8 +82,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             std::cerr << "NEED A NUMBER FOR A MODIFIER!!\n";
             return nullptr;
         }
-        int modifier_value = std::stoi(cur_token_.literal_);
-        if (modifier_value == 0)
+        int mod_value = std::stoi(cur_token_.literal_);
+        if (mod_value == 0)
         {
             std::cerr << "MODIFIER can't be 0!!\n";
             return nullptr;
@@ -91,31 +91,24 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 
         if (is_multiplier)
         {
-            std::cout << "Got MULtiplier! " << modifier_value << std::endl;
-            auto ev_group = std::make_shared<pattern_parser::EventGroup>();
-            for (int j = 0; j < modifier_value; j++)
-            {
+            auto ev_group = std::make_shared<pattern_parser::PatternGroup>();
+            for (int i = 0; i < mod_value; ++i)
                 ev_group->events_.push_back(return_node);
-            }
             return ev_group;
         }
         else
-        {
-            std::cout << "Setting MODIFIER TO DIIIIIVvvvy\n";
-            return_node->modifier_ = EventModifier::DIVIDE;
-            return_node->modifier_value_ = modifier_value;
-        }
+            return_node->divisor_value_ = mod_value;
     }
 
     return return_node;
 }
 
-std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternIdent()
+std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 {
 
     std::cout << "  INSIDE PARSE PATTERN IDENT\n";
-    std::shared_ptr<pattern_parser::Identifier> node =
-        std::make_shared<pattern_parser::Identifier>(cur_token_.literal_);
+    std::shared_ptr<pattern_parser::PatternLeaf> node =
+        std::make_shared<pattern_parser::PatternLeaf>(cur_token_.literal_);
 
     return node;
 }
@@ -125,8 +118,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternGroup()
 
     std::cout << "  INSIDE PARSE PATTERN GROUP CUR TOKEN IZ:" << cur_token_
               << std::endl;
-    std::shared_ptr<pattern_parser::EventGroup> ev_group =
-        std::make_shared<pattern_parser::EventGroup>();
+    std::shared_ptr<pattern_parser::PatternGroup> ev_group =
+        std::make_shared<pattern_parser::PatternGroup>();
 
     while (!PeekTokenIs(pattern_parser::PATTERN_SQUARE_BRACKET_RIGHT))
     {

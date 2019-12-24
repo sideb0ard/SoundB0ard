@@ -9,21 +9,22 @@
 namespace pattern_parser
 {
 
-std::string Identifier::String() const
+std::string PatternLeaf::String() const
 {
 
     std::stringstream ss;
     ss << value_;
-    ss << MOD_NAMES[modifier_] << modifier_value_;
+    if (divisor_value_)
+        ss << "/" << divisor_value_;
     return ss.str();
 }
 
-int Identifier::NumEvents() const { return 1; }
+int PatternLeaf::NumEvents() const { return 1; }
 
-std::string EventGroup::String() const
+std::string PatternGroup::String() const
 {
     std::stringstream ss;
-    std::cout << "  EventGroup String! num events" << events_.size()
+    std::cout << "  PatternGroup String! num events" << events_.size()
               << std::endl;
     for (auto &s : events_)
         ss << s->String() << " ";
@@ -31,6 +32,6 @@ std::string EventGroup::String() const
     return ss.str();
 }
 
-int EventGroup::NumEvents() const { return events_.size(); }
+int PatternGroup::NumEvents() const { return events_.size(); }
 
 } // namespace pattern_parser
