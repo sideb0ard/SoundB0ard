@@ -50,7 +50,7 @@ TEST_F(PatternParserTest, TestSingleEventPattern)
         FAIL() << "Cannot cast pattern_root to EventGroup!";
 }
 
-TEST_F(PatternParserTest, TestNestedEventPattern)
+TEST_F(PatternParserTest, TestPatternMultiplier)
 {
 
     std::string pattern{"bd*3 sd"};
@@ -71,6 +71,65 @@ TEST_F(PatternParserTest, TestNestedEventPattern)
     if (!nested_bd)
         FAIL() << "Cannot cast nested_bd to EventGroup!";
     EXPECT_EQ(3, nested_bd->NumEvents());
+
+    // snare
+    EXPECT_EQ(1, events->events_[1]->NumEvents());
+}
+
+TEST_F(PatternParserTest, TestPatternGroupingSingleLevel)
+{
+
+    std::string pattern{"[bd bd bd] sd"};
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
+
+    EXPECT_EQ(2, pattern_root->NumEvents());
+
+    std::shared_ptr<pattern_parser::EventGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::EventGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to EventGroup!";
+
+    auto nested_bd = std::dynamic_pointer_cast<pattern_parser::EventGroup>(
+        events->events_[0]);
+    if (!nested_bd)
+        FAIL() << "Cannot cast nested_bd to EventGroup!";
+    EXPECT_EQ(3, nested_bd->NumEvents());
+
+    // snare
+    EXPECT_EQ(1, events->events_[1]->NumEvents());
+}
+
+TEST_F(PatternParserTest, TestPatternGroupingNestedLevel)
+{
+
+    std::string pattern{"[bd bd [bd bd]] sd"};
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
+
+    EXPECT_EQ(2, pattern_root->NumEvents());
+
+    std::shared_ptr<pattern_parser::EventGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::EventGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to EventGroup!";
+
+    auto nested_bd = std::dynamic_pointer_cast<pattern_parser::EventGroup>(
+        events->events_[0]);
+    if (!nested_bd)
+        FAIL() << "Cannot cast nested_bd to EventGroup!";
+    EXPECT_EQ(3, nested_bd->NumEvents());
+
+    auto nested_nested_bd =
+        std::dynamic_pointer_cast<pattern_parser::EventGroup>(
+            nested_bd->events_[2]);
+    if (!nested_nested_bd)
+        FAIL() << "Cannot cast nested_nested_bd to EventGroup!";
+    EXPECT_EQ(2, nested_nested_bd->NumEvents());
 
     // snare
     EXPECT_EQ(1, events->events_[1]->NumEvents());
