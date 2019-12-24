@@ -22,7 +22,7 @@ class Process
 {
   public:
     Process(std::string target, std::string pattern);
-    ~Process() = default;
+    ~Process();
     void Status(wchar_t *ss);
     void Start();
     void Stop();

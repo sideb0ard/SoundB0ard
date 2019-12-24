@@ -42,6 +42,8 @@ Process::Process(std::string target, std::string pattern)
     ParsePattern();
 }
 
+Process::~Process() { std::cout << "Mixer Process deid!\n"; }
+
 void Process::EventNotify(mixer_timing_info tinfo)
 {
     if (!active_)

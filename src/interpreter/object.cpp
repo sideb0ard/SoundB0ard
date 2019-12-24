@@ -1,5 +1,6 @@
 #include <interpreter/object.hpp>
 
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -83,8 +84,30 @@ ObjectType Sample::Type() { return SAMPLE_OBJ; }
 Process::Process(std::string target, std::string pattern)
 {
     std::cout << "NEW PROC! " << std::endl;
-    proc_num = mixer_add_process(mixr, target, pattern);
+    mixer_process_ = mixer_add_process(mixr, target, pattern);
 };
+
+Process::~Process()
+{
+
+    auto it = std::find(mixr->processes.begin(), mixr->processes.end(),
+                        mixer_process_);
+
+    if (it != mixr->processes.end())
+    {
+        int proc_idx = distance(mixr->processes.begin(), it);
+        std::cout << "Looking up mixr proc - found it at " << proc_idx
+                  << std::endl;
+        mixr->processes[proc_idx]->active_ = false;
+        // mixr->processes.erase(mixr->processes.begin() + proc_idx);
+    }
+    else
+    {
+        std::cerr << "COuldn't find mixr Process object\n";
+    }
+
+    std::cout << "PROC DIED!GONEAWAY\n";
+}
 
 std::string Process::Inspect() { return "proccesss"; }
 ObjectType Process::Type() { return PROCESS_OBJ; }

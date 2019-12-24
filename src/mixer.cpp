@@ -28,8 +28,10 @@
 #include "mixer.h"
 #include "sbmsg.h"
 #include "utils.h"
+#include <interpreter/object.hpp>
 
 mixer *mixr;
+extern std::shared_ptr<object::Environment> global_env;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -177,6 +179,7 @@ void mixer_status_mixr(mixer *mixr)
         printf(ANSI_COLOR_RESET "\n");
     }
 }
+
 void mixer_status_procz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
@@ -193,6 +196,7 @@ void mixer_status_procz(mixer *mixr, bool all)
         }
     }
 }
+void mixer_status_env(mixer *mixr) { global_env->Debug(); }
 
 void mixer_status_valz(mixer *mixr)
 {
@@ -293,6 +297,7 @@ void mixer_ps(mixer *mixr, bool all)
 
     print_logo();
     mixer_status_mixr(mixr);
+    mixer_status_env(mixr);
     mixer_status_procz(mixr, all);
     mixer_status_patz(mixr);
     mixer_status_sgz(mixr, all);
@@ -425,12 +430,13 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
     return mixr->pattern_gen_num++;
 }
 
-int mixer_add_process(mixer *mixr, std::string target, std::string pattern)
+std::shared_ptr<::Process> mixer_add_process(mixer *mixr, std::string target,
+                                             std::string pattern)
 {
     auto p = std::make_shared<::Process>(target, pattern);
     printf("Adding a PrOCESS, yo!\n");
     mixr->processes.push_back(p);
-    return 0;
+    return p;
 }
 
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
