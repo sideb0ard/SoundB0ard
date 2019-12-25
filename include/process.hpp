@@ -42,7 +42,8 @@ class Process
   private:
     // SequenceEngine engine_;
     std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
-    std::array<std::shared_ptr<MusicalEvent>, PPBAR> pattern_events_;
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
+        pattern_events_;
     int loop_counter_;
     // pattern_parser::Parser parser_;
 };

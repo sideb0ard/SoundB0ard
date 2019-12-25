@@ -51,17 +51,19 @@ void Process::EventNotify(mixer_timing_info tinfo)
 
     if (tinfo.is_start_of_loop)
     {
-        std::fill(pattern_events_.begin(), pattern_events_.end(), nullptr);
+        for (int i = 0; i < PPBAR; i++)
+            pattern_events_[i].clear();
         EvalPattern(pattern_root_, 0, PPBAR);
         ++loop_counter_;
     }
 
     int cur_tick = tinfo.midi_tick % PPBAR;
-    if (pattern_events_[cur_tick])
+    std::vector<std::shared_ptr<MusicalEvent>> &events =
+        pattern_events_[cur_tick];
+    for (auto e : events)
     {
-        std::string cmd = std::string("noteOn(") +
-                          pattern_events_[cur_tick]->target_ + "," +
-                          "127, 250)";
+        std::string cmd =
+            std::string("noteOn(") + e->target_ + "," + "127, 250)";
 
         Interpret(cmd.data(), global_env);
     }
@@ -82,7 +84,8 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
     if (leaf_node)
     {
         std::string target = leaf_node->value_;
-        pattern_events_[target_start] = std::make_shared<MusicalEvent>(target);
+        pattern_events_[target_start].push_back(
+            std::make_shared<MusicalEvent>(target));
         return;
     }
 
@@ -90,18 +93,24 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(node);
     if (composite_node)
     {
-
-        int target_len = target_end - target_start;
-        int num_events = composite_node->NumEvents();
-        int spacing = target_len / num_events;
-
-        for (int i = target_start, event_idx = 0;
-             i < target_end && event_idx < num_events;
-             i += spacing, event_idx++)
+        int event_groups_size = composite_node->event_groups_.size();
+        for (int i = 0; i < event_groups_size; i++)
         {
-            std::shared_ptr<pattern_parser::PatternNode> sub_node =
-                composite_node->events_[event_idx];
-            EvalPattern(sub_node, i, i + spacing);
+
+            std::vector<std::shared_ptr<pattern_parser::PatternNode>> &events =
+                composite_node->event_groups_[i];
+            int target_len = target_end - target_start;
+            int num_events = events.size();
+            int spacing = target_len / num_events;
+
+            for (int j = target_start, event_idx = 0;
+                 j < target_end && event_idx < num_events;
+                 j += spacing, event_idx++)
+            {
+                std::shared_ptr<pattern_parser::PatternNode> sub_node =
+                    events[event_idx];
+                EvalPattern(sub_node, j, j + spacing);
+            }
         }
     }
 }

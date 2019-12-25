@@ -31,22 +31,22 @@ std::shared_ptr<pattern_parser::PatternGroup> Parser::ParsePattern()
         if (ev)
         {
             std::cout << "Node Event is " << ev->String() << std::endl;
-            pattern_root->events_.push_back(ev);
+            pattern_root->event_groups_[0].push_back(ev);
         }
         else
             std::cout << "NO PATTERNODE\n";
         NextToken();
     }
 
-    std::cout << "//// num events:" << pattern_root->events_.size()
-              << " DONE WITH PARSEPATTERN\n"
-              << std::endl;
+    // std::cout << "//// num events:" << pattern_root->event_groups_[0].size()
+    //          << " DONE WITH PARSEPATTERN\n"
+    //          << std::endl;
     return pattern_root;
 }
 
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 {
-    std::cout << "PARSE PATTERN NODE - cur token is " << cur_token_
+    std::cout << "\nPARSE PATTERN NODE - cur token is " << cur_token_
               << std::endl;
 
     std::shared_ptr<pattern_parser::PatternNode> return_node;
@@ -93,7 +93,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
         {
             auto ev_group = std::make_shared<pattern_parser::PatternGroup>();
             for (int i = 0; i < mod_value; ++i)
-                ev_group->events_.push_back(return_node);
+                ev_group->event_groups_[0].push_back(return_node);
             return ev_group;
         }
         else
@@ -106,7 +106,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 {
 
-    std::cout << "  INSIDE PARSE PATTERN IDENT\n";
+    std::cout << "INSIDE PARSE PATTERN IDENT:" << cur_token_ << std::endl;
     std::shared_ptr<pattern_parser::PatternLeaf> node =
         std::make_shared<pattern_parser::PatternLeaf>(cur_token_.literal_);
 
@@ -116,17 +116,28 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternGroup()
 {
 
-    std::cout << "  INSIDE PARSE PATTERN GROUP CUR TOKEN IZ:" << cur_token_
+    std::cout << "INSIDE PARSE PATTERN GROUP CUR TOKEN IZ:" << cur_token_
               << std::endl;
     std::shared_ptr<pattern_parser::PatternGroup> ev_group =
         std::make_shared<pattern_parser::PatternGroup>();
 
+    int event_group_idx = 0;
     while (!PeekTokenIs(pattern_parser::PATTERN_SQUARE_BRACKET_RIGHT))
     {
         NextToken();
-        ev_group->events_.push_back(ParsePatternNode());
+        std::cout << "CUR_TOKEN:" << cur_token_ << std::endl;
+        ev_group->event_groups_[event_group_idx].push_back(ParsePatternNode());
+        if (PeekTokenIs(pattern_parser::PATTERN_COMMA))
+        {
+            std::cout << "COMMA FOUND!! Incrementing PATTERN IDX" << std::endl;
+            event_group_idx++;
+            std::vector<std::shared_ptr<pattern_parser::PatternNode>>
+                new_events;
+            ev_group->event_groups_.push_back(new_events);
+            NextToken();
+        }
     }
-    std::cout << "  FINISHED!! PARSE PATTERN GROUP CUR TOKEN IZ:" << cur_token_
+    std::cout << "==FINISHED!! PARSE PATTERN GROUP CUR TOKEN IZ:" << cur_token_
               << std::endl;
     // discard RIGHT BRACKET
     NextToken();

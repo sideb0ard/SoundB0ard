@@ -30,7 +30,11 @@ TEST_F(PatternParserTest, TestEmptyPattern)
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
         pattern_parzer->ParsePattern();
 
-    EXPECT_EQ(0, pattern_root->NumEvents());
+    // std::shared_ptr<pattern_parser::PatternGroup> events =
+    //    std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    // if (!events)
+    //    FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    // EXPECT_EQ(0, events->event_groups_[0].size());
 }
 
 TEST_F(PatternParserTest, TestSingleEventPattern)
@@ -42,12 +46,12 @@ TEST_F(PatternParserTest, TestSingleEventPattern)
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
         pattern_parzer->ParsePattern();
 
-    EXPECT_EQ(1, pattern_root->NumEvents());
-
     std::shared_ptr<pattern_parser::PatternGroup> events =
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
     if (!events)
         FAIL() << "Cannot cast pattern_root to PatternGroup!";
+
+    EXPECT_EQ(1, events->event_groups_[0].size());
 }
 
 TEST_F(PatternParserTest, TestPatternMultiplier)
@@ -59,21 +63,23 @@ TEST_F(PatternParserTest, TestPatternMultiplier)
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
         pattern_parzer->ParsePattern();
 
-    EXPECT_EQ(2, pattern_root->NumEvents());
-
     std::shared_ptr<pattern_parser::PatternGroup> events =
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
     if (!events)
         FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(2, events->event_groups_[0].size());
 
     auto nested_bd = std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
-        events->events_[0]);
+        events->event_groups_[0][0]);
     if (!nested_bd)
         FAIL() << "Cannot cast nested_bd to PatternGroup!";
-    EXPECT_EQ(3, nested_bd->NumEvents());
+    EXPECT_EQ(3, nested_bd->event_groups_[0].size());
 
     // snare
-    EXPECT_EQ(1, events->events_[1]->NumEvents());
+    auto sd = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][1]);
+    if (!sd)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternLeaf!";
 }
 
 TEST_F(PatternParserTest, TestPatternGroupingSingleLevel)
@@ -85,21 +91,23 @@ TEST_F(PatternParserTest, TestPatternGroupingSingleLevel)
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
         pattern_parzer->ParsePattern();
 
-    EXPECT_EQ(2, pattern_root->NumEvents());
-
     std::shared_ptr<pattern_parser::PatternGroup> events =
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
     if (!events)
         FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(2, events->event_groups_[0].size());
 
     auto nested_bd = std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
-        events->events_[0]);
+        events->event_groups_[0][0]);
     if (!nested_bd)
         FAIL() << "Cannot cast nested_bd to PatternGroup!";
-    EXPECT_EQ(3, nested_bd->NumEvents());
+    EXPECT_EQ(3, nested_bd->event_groups_[0].size());
 
     // snare
-    EXPECT_EQ(1, events->events_[1]->NumEvents());
+    auto sd = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][1]);
+    if (!sd)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternLeaf!";
 }
 
 TEST_F(PatternParserTest, TestPatternGroupingNestedLevel)
@@ -111,28 +119,30 @@ TEST_F(PatternParserTest, TestPatternGroupingNestedLevel)
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
         pattern_parzer->ParsePattern();
 
-    EXPECT_EQ(2, pattern_root->NumEvents());
-
     std::shared_ptr<pattern_parser::PatternGroup> events =
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
     if (!events)
         FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(2, events->event_groups_[0].size());
 
     auto nested_bd = std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
-        events->events_[0]);
+        events->event_groups_[0][0]);
     if (!nested_bd)
         FAIL() << "Cannot cast nested_bd to PatternGroup!";
-    EXPECT_EQ(3, nested_bd->NumEvents());
+    EXPECT_EQ(3, nested_bd->event_groups_[0].size());
 
     auto nested_nested_bd =
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
-            nested_bd->events_[2]);
+            nested_bd->event_groups_[0][2]);
     if (!nested_nested_bd)
         FAIL() << "Cannot cast nested_nested_bd to PatternGroup!";
-    EXPECT_EQ(2, nested_nested_bd->NumEvents());
+    EXPECT_EQ(2, nested_nested_bd->event_groups_[0].size());
 
     // snare
-    EXPECT_EQ(1, events->events_[1]->NumEvents());
+    auto sd = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][1]);
+    if (!sd)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternLeaf!";
 }
 
 TEST_F(PatternParserTest, TestPatternDivisor)
@@ -144,22 +154,57 @@ TEST_F(PatternParserTest, TestPatternDivisor)
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
         pattern_parzer->ParsePattern();
 
-    EXPECT_EQ(2, pattern_root->NumEvents());
+    std::shared_ptr<pattern_parser::PatternGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(2, events->event_groups_[0].size());
+
+    auto nested_bd = std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
+        events->event_groups_[0][0]);
+    if (!nested_bd)
+        FAIL() << "Cannot cast nested_bd to PatternGroup!";
+    EXPECT_EQ(3, nested_bd->event_groups_[0].size());
+
+    // snare
+    auto sd = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][1]);
+    if (!sd)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternLeaf!";
+    EXPECT_EQ(2, sd->GetDivisor());
+}
+
+TEST_F(PatternParserTest, TestPatternPolyrhythms)
+{
+
+    std::string pattern{"[bd bd, cp cp cp] sd/2"};
+    // std::string pattern{"[bd bd cp cp cp] sd/2"};
+    std::cout << "Testing: " << pattern << std::endl;
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
 
     std::shared_ptr<pattern_parser::PatternGroup> events =
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
     if (!events)
         FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(2, events->event_groups_[0].size());
 
-    auto nested_bd = std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
-        events->events_[0]);
-    if (!nested_bd)
-        FAIL() << "Cannot cast nested_bd to PatternGroup!";
-    EXPECT_EQ(3, nested_bd->NumEvents());
+    auto polyrhythm = std::dynamic_pointer_cast<pattern_parser::PatternGroup>(
+        events->event_groups_[0][0]);
+    if (!polyrhythm)
+        FAIL() << "Cannot cast events->event_groups[0][0] to PatternGroup!";
+    EXPECT_EQ(2, polyrhythm->event_groups_.size());
+    EXPECT_EQ(2, polyrhythm->event_groups_[0].size());
+    EXPECT_EQ(3, polyrhythm->event_groups_[1].size());
 
     // snare
-    EXPECT_EQ(1, events->events_[1]->NumEvents());
-    EXPECT_EQ(2, events->events_[1]->GetDivisor());
+    auto sd = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][1]);
+    if (!sd)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternLeaf!";
+    EXPECT_EQ(2, sd->GetDivisor());
 }
 
 } // namespace
