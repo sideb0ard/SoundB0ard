@@ -30,11 +30,11 @@ TEST_F(PatternParserTest, TestEmptyPattern)
     std::shared_ptr<pattern_parser::PatternNode> pattern_root =
         pattern_parzer->ParsePattern();
 
-    // std::shared_ptr<pattern_parser::PatternGroup> events =
-    //    std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
-    // if (!events)
-    //    FAIL() << "Cannot cast pattern_root to PatternGroup!";
-    // EXPECT_EQ(0, events->event_groups_[0].size());
+    std::shared_ptr<pattern_parser::PatternGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(0, events->event_groups_[0].size());
 }
 
 TEST_F(PatternParserTest, TestSingleEventPattern)

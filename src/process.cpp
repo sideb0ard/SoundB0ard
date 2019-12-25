@@ -95,6 +95,8 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
                 composite_node->event_groups_[i];
             int target_len = target_end - target_start;
             int num_events = events.size();
+            if (!num_events)
+                continue;
             int spacing = target_len / num_events;
 
             for (int j = target_start, event_idx = 0;
