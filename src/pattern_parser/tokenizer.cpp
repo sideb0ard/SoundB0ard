@@ -8,7 +8,7 @@ namespace
 bool IsValidIdentifier(char c)
 {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' ||
-           c == '/' || c == '-' || c == '.';
+           c == '-' || c == '.';
 }
 bool IsDigit(char c) { return '0' <= c && c <= '9'; }
 
@@ -94,6 +94,8 @@ pattern_parser::Token Tokenizer::NextToken()
 
     SkipWhiteSpace();
 
+    // const TokenType PATTERN_OPEN_ANGLE_BRACKET = "<";
+    // const TokenType PATTERN_CLOSE_ANGLE_BRACKET = ">";
     switch (current_char_)
     {
     case ('['):
@@ -109,7 +111,27 @@ pattern_parser::Token Tokenizer::NextToken()
         tok.literal_ = current_char_;
         break;
     case ('/'):
-        tok.type_ = pattern_parser::PATTERN_DIVIDER;
+        tok.type_ = pattern_parser::PATTERN_DIVISOR;
+        tok.literal_ = current_char_;
+        break;
+    case (','):
+        tok.type_ = pattern_parser::PATTERN_COMMA;
+        tok.literal_ = current_char_;
+        break;
+    case ('('):
+        tok.type_ = pattern_parser::PATTERN_OPEN_PAREN;
+        tok.literal_ = current_char_;
+        break;
+    case (')'):
+        tok.type_ = pattern_parser::PATTERN_CLOSE_PAREN;
+        tok.literal_ = current_char_;
+        break;
+    case ('<'):
+        tok.type_ = pattern_parser::PATTERN_OPEN_ANGLE_BRACKET;
+        tok.literal_ = current_char_;
+        break;
+    case ('>'):
+        tok.type_ = pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET;
         tok.literal_ = current_char_;
         break;
     case (0):
@@ -119,7 +141,7 @@ pattern_parser::Token Tokenizer::NextToken()
         if (IsValidIdentifier(current_char_))
         {
             tok.literal_ = ReadIdentifier();
-            tok.type_ = pattern_parser::LookupIdent(tok.literal_);
+            tok.type_ = PATTERN_IDENT;
             return tok;
         }
         else if (IsDigit(current_char_))

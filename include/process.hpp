@@ -11,25 +11,27 @@
 #include <pattern_parser/parser.hpp>
 #include <pattern_parser/tokenizer.hpp>
 
-class MusicalEvent
+struct MusicalEvent
 {
+    MusicalEvent() = default;
+    MusicalEvent(std::string target) : target_{target} {}
     std::string target_;
 };
 
 class Process
 {
   public:
-    Process(std::string target, std::string pattern);
-    ~Process() = default;
+    Process() = default;
+    ~Process();
     void Status(wchar_t *ss);
     void Start();
     void Stop();
     void EventNotify(mixer_timing_info);
     void SetDebug(bool b);
     void ParsePattern();
-    void EvalPattern(
-        std::vector<std::shared_ptr<pattern_parser::PatternNode>> &pattern,
-        int target_start, int target_end);
+    void Update(std::string target, std::string pattern);
+    void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &pattern,
+                     int target_start, int target_end);
 
   public:
     std::string target_;
@@ -39,9 +41,8 @@ class Process
     bool debug_;
 
   private:
-    // SequenceEngine engine_;
-    std::shared_ptr<pattern_parser::EventGroup> pattern_root_;
-    std::array<MusicalEvent, PPBAR> pattern_events_;
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
+        pattern_events_;
     int loop_counter_;
-    // pattern_parser::Parser parser_;
 };

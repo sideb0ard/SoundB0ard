@@ -190,18 +190,6 @@ class SampleExpression : public Expression
     std::shared_ptr<Expression> path_;
 };
 
-class ProcessExpression : public Expression
-{
-  public:
-    ProcessExpression() {}
-    explicit ProcessExpression(Token token) : Expression{token} {}
-    std::string String() const override;
-
-  public:
-    std::shared_ptr<Expression> target_;
-    std::shared_ptr<Expression> pattern_;
-};
-
 class CallExpression : public Expression
 {
   public:
@@ -296,6 +284,18 @@ class ReturnStatement : public Statement
 
   public:
     std::shared_ptr<Expression> return_value_{nullptr};
+};
+
+class ProcessStatement : public Statement
+{
+  public:
+    explicit ProcessStatement(Token token);
+    std::string String() const override;
+
+  public:
+    int mixer_process_id_{-1};
+    std::shared_ptr<Expression> target_;
+    std::shared_ptr<Expression> pattern_;
 };
 
 class ExpressionStatement : public Statement

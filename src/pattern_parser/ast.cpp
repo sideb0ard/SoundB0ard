@@ -9,31 +9,39 @@
 namespace pattern_parser
 {
 
-std::string Identifier::String() const
+std::string PatternLeaf::String() const
 {
 
     std::stringstream ss;
     ss << value_;
-    ss << MOD_NAMES[modifier_] << modifier_value_;
+    if (divisor_value_)
+        ss << "/" << divisor_value_;
     return ss.str();
 }
 
-std::string IntegerLiteral::String() const
+PatternGroup::PatternGroup()
 {
-
-    std::stringstream ss;
-    ss << token_.literal_;
-    ss << MOD_NAMES[modifier_] << modifier_value_;
-    return ss.str();
+    std::cout << "Pattern Group CREATING A Vector!\n";
+    std::vector<std::shared_ptr<pattern_parser::PatternNode>> first_vec;
+    event_groups_.push_back(first_vec);
 }
 
-std::string EventGroup::String() const
+std::string PatternGroup::String() const
 {
     std::stringstream ss;
-    for (auto &s : events_)
-        ss << s->String();
+    std::cout << "  PatternGroup String! num event groups"
+              << event_groups_.size() << std::endl;
+    for (auto &eg : event_groups_)
+    {
+        for (auto &e : eg)
+        {
+            ss << e->String() << " ";
+        }
+        ss << "\n";
+    }
 
-    ss << MOD_NAMES[modifier_] << modifier_value_;
+    if (divisor_value_)
+        ss << "/" << divisor_value_;
 
     return ss.str();
 }

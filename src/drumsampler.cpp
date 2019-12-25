@@ -143,7 +143,6 @@ void drumsampler::start()
 
 void drumsampler::noteOn(midi_event ev)
 {
-    std::cout << "hitme!\n";
     int idx = mixr->timing_info.midi_tick % PPBAR;
     int seq_position = get_a_drumsampler_position(this);
     if (seq_position != -1)

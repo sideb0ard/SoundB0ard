@@ -294,8 +294,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::cout << "Nae sample path!!\n";
     }
 
-    std::shared_ptr<ast::ProcessExpression> proc =
-        std::dynamic_pointer_cast<ast::ProcessExpression>(node);
+    std::shared_ptr<ast::ProcessStatement> proc =
+        std::dynamic_pointer_cast<ast::ProcessStatement>(node);
     if (proc)
     {
         std::cout << "GOT DA REAL PROCESS Expression!\n";
@@ -307,8 +307,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
             if (pattern)
             {
-                return std::make_shared<object::Process>(target->value_,
-                                                         pattern->value_);
+                mixer_update_process(mixr, proc->mixer_process_id_,
+                                     target->value_, pattern->value_);
             }
             else
                 std::cout << "Nae PATTERMN!!\n";

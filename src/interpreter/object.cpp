@@ -1,5 +1,6 @@
 #include <interpreter/object.hpp>
 
+#include <iostream>
 #include <memory>
 #include <sstream>
 #include <string>
@@ -80,11 +81,20 @@ Sample::Sample(std::string sample_path)
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
-Process::Process(std::string target, std::string pattern)
+Process::Process(int process_id, std::string target, std::string pattern)
 {
     std::cout << "NEW PROC! " << std::endl;
-    proc_num = mixer_add_process(mixr, target, pattern);
+    mixer_process_id_ = process_id;
+    mixer_update_process(mixr, process_id, target, pattern);
 };
+
+Process::~Process()
+{
+
+    mixr->processes_[mixer_process_id_]->active_ = false;
+
+    std::cout << "PROC DIED!GONEAWAY\n";
+}
 
 std::string Process::Inspect() { return "proccesss"; }
 ObjectType Process::Type() { return PROCESS_OBJ; }
