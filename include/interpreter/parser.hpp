@@ -54,6 +54,7 @@ class Parser
     std::shared_ptr<ast::ForStatement> ParseForStatement();
     std::shared_ptr<ast::LsStatement> ParseLsStatement();
     std::shared_ptr<ast::PsStatement> ParsePsStatement();
+    std::shared_ptr<ast::ProcessStatement> ParseProcessStatement();
 
     std::shared_ptr<ast::ExpressionStatement> ParseExpressionStatement();
 
@@ -80,7 +81,6 @@ class Parser
 
     std::shared_ptr<ast::Expression> ParseSynthExpression();
     std::shared_ptr<ast::Expression> ParseSampleExpression();
-    std::shared_ptr<ast::Expression> ParseProcessExpression();
     ast::TimingEventType ParseTimingEventLiteral();
 
     std::shared_ptr<ast::Expression>

@@ -1084,40 +1084,35 @@ TEST_F(ParserTest, TestParsingPsStatement)
         FAIL() << "program->statements_[0] is not an PsStatement";
 }
 
-TEST_F(ParserTest, TestParsingProcessExpression)
+TEST_F(ParserTest, TestParsingProcessStatement)
 {
     std::cout << "Testing `proc` statement" << std::endl;
-    std::string input = R"(let rhythm = proc(sound, "bd*3 sd"))";
+    std::string input = R"(p1 $ sound "bd*3 sd")";
     std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
     std::unique_ptr<parser::Parser> parsley =
         std::make_unique<parser::Parser>(lex);
     std::shared_ptr<ast::Program> program = parsley->ParseProgram();
     EXPECT_FALSE(parsley->CheckErrors());
     ASSERT_EQ(1, program->statements_.size());
-    std::shared_ptr<ast::LetStatement> stmt =
-        std::dynamic_pointer_cast<ast::LetStatement>(program->statements_[0]);
+    std::shared_ptr<ast::ProcessStatement> stmt =
+        std::dynamic_pointer_cast<ast::ProcessStatement>(
+            program->statements_[0]);
     if (!stmt)
-        FAIL() << "program->statements_[0] is not a LetStatement - got "
-               << program->statements_[0]->String();
-
-    std::shared_ptr<ast::ProcessExpression> expr =
-        std::dynamic_pointer_cast<ast::ProcessExpression>(stmt->value_);
-    if (!expr)
-        FAIL() << "stmt->value_ is not a ProcessExpression - got "
+        FAIL() << "program->statements_[0] is not a ProcessStatement - got "
                << program->statements_[0]->String();
 
     std::shared_ptr<ast::StringLiteral> target =
-        std::dynamic_pointer_cast<ast::StringLiteral>(expr->target_);
+        std::dynamic_pointer_cast<ast::StringLiteral>(stmt->target_);
     if (!target)
         FAIL() << "process target is not a StringLiteral. Got "
-               << typeid(&expr->target_).name();
+               << typeid(&stmt->target_).name();
     EXPECT_EQ(target->value_, "sound");
 
     std::shared_ptr<ast::StringLiteral> pattern =
-        std::dynamic_pointer_cast<ast::StringLiteral>(expr->pattern_);
+        std::dynamic_pointer_cast<ast::StringLiteral>(stmt->pattern_);
     if (!pattern)
         FAIL() << "process pattern_ is not a StringLiteral. Got "
-               << typeid(&expr->pattern_).name();
+               << typeid(&stmt->pattern_).name();
     EXPECT_EQ(pattern->value_, "bd*3 sd");
 }
 

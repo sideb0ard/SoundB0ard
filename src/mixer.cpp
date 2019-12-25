@@ -81,6 +81,10 @@ mixer *new_mixer(double output_latency)
         KEY_MODE_ONE; // dunno whether this should be on mixer or synth
     mixr->midi_control_destination = NONE;
 
+    for (int i = 0; i < MAX_NUM_PROC; i++)
+        mixr->processes_[i] = std::make_shared<Process>();
+    mixr->proc_initialized_ = true;
+
     // the lifetime of these booleans is a single sample
 
     mixr->timing_info.cur_sample = -1;
@@ -183,10 +187,8 @@ void mixer_status_mixr(mixer *mixr)
 void mixer_status_procz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    for (auto p : mixr->processes)
+    for (auto p : mixr->processes_)
     {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
-                                "Processes" COOL_COLOR_GREEN "]\n");
         if (p->active_ || all)
         {
             wmemset(wss, 0, MAX_STATIC_STRING_SZ);
@@ -298,7 +300,7 @@ void mixer_ps(mixer *mixr, bool all)
     print_logo();
     mixer_status_mixr(mixr);
     mixer_status_env(mixr);
-    mixer_status_procz(mixr, all);
+    mixer_status_procz(mixr, false);
     mixer_status_patz(mixr);
     mixer_status_sgz(mixr, all);
     mixer_status_valz(mixr);
@@ -318,9 +320,12 @@ void mixer_ps(mixer *mixr, bool all)
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
-    for (auto p : mixr->processes)
+    if (mixr->proc_initialized_)
     {
-        p->EventNotify(mixr->timing_info);
+        for (auto p : mixr->processes_)
+        {
+            p->EventNotify(mixr->timing_info);
+        }
     }
 
     for (int i = 0; i < mixr->pattern_gen_num; ++i)
@@ -430,13 +435,20 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
     return mixr->pattern_gen_num++;
 }
 
-std::shared_ptr<::Process> mixer_add_process(mixer *mixr, std::string target,
-                                             std::string pattern)
+void mixer_update_process(mixer *mixr, int process_id, std::string target,
+                          std::string pattern)
 {
-    auto p = std::make_shared<::Process>(target, pattern);
-    printf("Adding a PrOCESS, yo!\n");
-    mixr->processes.push_back(p);
-    return p;
+    // auto p = std::make_shared<::Process>(target, pattern);
+    if (process_id >= 0 && process_id < MAX_NUM_PROC)
+    {
+        std::cout << "Adding a PrOCESS, yo! ID:" << process_id
+                  << "Target:" << target << " Pattern:" << pattern << "\n";
+        mixr->processes_[process_id]->Update(target, pattern);
+    }
+    else
+    {
+        std::cerr << "WAH! INVALID process id: " << process_id << std::endl;
+    }
 }
 
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])

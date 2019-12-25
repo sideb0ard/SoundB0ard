@@ -79,7 +79,9 @@ struct mixer
 
     preview_buffer preview;
 
-    std::vector<std::shared_ptr<Process>> processes;
+    // std::vector<std::shared_ptr<Process>> processes;
+    std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_;
+    bool proc_initialized_{false};
 
     SoundGenerator *SoundGenerators[MAX_NUM_SOUND_GENERATORS];
     int soundgen_num; // actual number of SGs
@@ -161,8 +163,8 @@ void mixer_midi_tick(mixer *mixr);
 void mixer_emit_event(mixer *mixr, broadcast_event event);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
-std::shared_ptr<::Process> mixer_add_process(mixer *mixr, std::string target,
-                                             std::string pattern);
+void mixer_update_process(mixer *mixr, int process_id, std::string target,
+                          std::string pattern);
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
 int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
 int mixer_add_intdiv(mixer *mixr);

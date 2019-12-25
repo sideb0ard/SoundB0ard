@@ -81,30 +81,17 @@ Sample::Sample(std::string sample_path)
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
-Process::Process(std::string target, std::string pattern)
+Process::Process(int process_id, std::string target, std::string pattern)
 {
     std::cout << "NEW PROC! " << std::endl;
-    mixer_process_ = mixer_add_process(mixr, target, pattern);
+    mixer_process_id_ = process_id;
+    mixer_update_process(mixr, process_id, target, pattern);
 };
 
 Process::~Process()
 {
 
-    auto it = std::find(mixr->processes.begin(), mixr->processes.end(),
-                        mixer_process_);
-
-    if (it != mixr->processes.end())
-    {
-        int proc_idx = distance(mixr->processes.begin(), it);
-        std::cout << "Looking up mixr proc - found it at " << proc_idx
-                  << std::endl;
-        mixr->processes[proc_idx]->active_ = false;
-        // mixr->processes.erase(mixr->processes.begin() + proc_idx);
-    }
-    else
-    {
-        std::cerr << "COuldn't find mixr Process object\n";
-    }
+    mixr->processes_[mixer_process_id_]->active_ = false;
 
     std::cout << "PROC DIED!GONEAWAY\n";
 }

@@ -191,7 +191,7 @@ class Sample : public Object
 class Process : public Object
 {
   public:
-    Process(std::string target, std::string pattern);
+    Process(int process_id, std::string target, std::string pattern);
     ~Process();
     ObjectType Type() override;
     std::string Inspect() override;
@@ -202,7 +202,7 @@ class Process : public Object
     std::string pattern_;
 
   private:
-    std::shared_ptr<::Process> mixer_process_;
+    int mixer_process_id_;
 };
 
 class Function : public Object

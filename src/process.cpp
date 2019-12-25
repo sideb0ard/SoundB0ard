@@ -29,10 +29,13 @@ void Process::ParsePattern()
     pattern_root_ = pattern_parzer->ParsePattern();
 }
 
-Process::Process(std::string target, std::string pattern)
-    : target_{target}, pattern_{pattern}, active_{true}
+void Process::Update(std::string target, std::string pattern)
 {
+    active_ = false;
+    target_ = target;
+    pattern_ = pattern;
     ParsePattern();
+    active_ = true;
 }
 
 Process::~Process() { std::cout << "Mixer Process deid!\n"; }

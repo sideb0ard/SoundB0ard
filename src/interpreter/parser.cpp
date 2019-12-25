@@ -47,6 +47,12 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
     {
         return ParseForStatement();
     }
+    else if (cur_token_.type_.compare(token::SLANG_PROC_ID) == 0)
+    {
+        std::cout << "STATEMENT GOTZX A PROC ID:" << cur_token_.literal_
+                  << std::endl;
+        return ParseProcessStatement();
+    }
     else
         return ParseExpressionStatement();
 }
@@ -382,8 +388,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseSynthExpression();
     else if (cur_token_.type_ == token::SLANG_SAMPLE)
         return ParseSampleExpression();
-    else if (cur_token_.type_ == token::SLANG_PROC)
-        return ParseProcessExpression();
+    // else if (cur_token_.type_ == token::SLANG_PROC)
+    //    return ParseProcessExpression();
     else if (cur_token_.type_ == token::SLANG_STRING)
         return ParseStringLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACKET)
@@ -576,30 +582,27 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
     return sample;
 }
 
-std::shared_ptr<ast::Expression> Parser::ParseProcessExpression()
+std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 {
     // std::string input = R"(let rhythm = proc(sound, "bd*3 sd"))";
-    auto process = std::make_shared<ast::ProcessExpression>(cur_token_);
+    auto process = std::make_shared<ast::ProcessStatement>(cur_token_);
 
-    if (!ExpectPeek(token::SLANG_LPAREN))
+    std::cout << "Process Statement! Process ID is "
+              << process->mixer_process_id_ << std::endl;
+
+    if (!ExpectPeek(token::SLANG_DOLLAR))
         return nullptr;
     NextToken();
 
-    std::cout << "Cur token is " << cur_token_ << std::endl;
+    std::cout << "Post DOLLA BILL YO - Cur token is " << cur_token_
+              << std::endl;
+
     process->target_ = ParseStringLiteral();
-
-    if (!ExpectPeek(token::SLANG_COMMA))
-        return nullptr;
     NextToken();
-
-    std::cout << "Post comma - Cur token is " << cur_token_ << std::endl;
 
     process->pattern_ = ParseStringLiteral();
     std::cout << "Post Pattern Parsed - Cur token is " << cur_token_
               << std::endl;
-
-    if (!ExpectPeek(token::SLANG_RPAREN))
-        return nullptr;
 
     std::cout << "AST PROC EXPRESSION ALL GOOD!\n";
     return process;

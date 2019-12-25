@@ -148,6 +148,10 @@ token::Token Lexer::NextToken()
             tok.literal_ = current_char_;
         }
         break;
+    case ('$'):
+        tok.type_ = token::SLANG_DOLLAR;
+        tok.literal_ = current_char_;
+        break;
     case ('*'):
         tok.type_ = token::SLANG_ASTERISK;
         tok.literal_ = current_char_;
@@ -208,6 +212,13 @@ token::Token Lexer::NextToken()
         tok.type_ = token::SLANG_EOFF;
         break;
     default:
+        if (current_char_ == 'p' && IsDigit(PeekChar()))
+        {
+            tok.literal_ = ReadProcId();
+            std::cout << "PROC IDzz!! " << tok.literal_ << "\n";
+            tok.type_ = token::SLANG_PROC_ID;
+            return tok;
+        }
         if (IsValidIdentifier(current_char_))
         {
             tok.literal_ = ReadIdentifier();
@@ -241,6 +252,17 @@ std::string Lexer::ReadIdentifier()
 
 std::string Lexer::ReadNumber()
 {
+    int position = current_position_;
+    while (IsDigit(current_char_))
+        ReadChar();
+    return input_.substr(position, current_position_ - position);
+}
+
+std::string Lexer::ReadProcId()
+{
+    // discard current 'p'
+    ReadChar();
+
     int position = current_position_;
     while (IsDigit(current_char_))
         ReadChar();

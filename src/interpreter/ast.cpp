@@ -173,7 +173,12 @@ std::string SynthExpression::String() const { return "FM SYNTH"; }
 
 std::string SampleExpression::String() const { return "SAMPLE"; }
 
-std::string ProcessExpression::String() const { return "Process"; }
+ProcessStatement::ProcessStatement(Token token) : Statement(token)
+{
+    mixer_process_id_ = std::stoi(token.literal_);
+}
+
+std::string ProcessStatement::String() const { return "Process"; }
 
 std::string CallExpression::String() const
 {

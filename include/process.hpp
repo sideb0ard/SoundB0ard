@@ -21,7 +21,7 @@ struct MusicalEvent
 class Process
 {
   public:
-    Process(std::string target, std::string pattern);
+    Process() = default;
     ~Process();
     void Status(wchar_t *ss);
     void Start();
@@ -29,6 +29,7 @@ class Process
     void EventNotify(mixer_timing_info);
     void SetDebug(bool b);
     void ParsePattern();
+    void Update(std::string target, std::string pattern);
     void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &pattern,
                      int target_start, int target_end);
 
@@ -40,10 +41,8 @@ class Process
     bool debug_;
 
   private:
-    // SequenceEngine engine_;
     std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
         pattern_events_;
     int loop_counter_;
-    // pattern_parser::Parser parser_;
 };
