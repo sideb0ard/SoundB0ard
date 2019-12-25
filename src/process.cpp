@@ -109,6 +109,16 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
             }
         }
     }
+
+    std::shared_ptr<pattern_parser::PatternMultiStep> multi_node =
+        std::dynamic_pointer_cast<pattern_parser::PatternMultiStep>(node);
+    if (multi_node)
+    {
+        int idx = multi_node->current_val_idx_++ % multi_node->values_.size();
+        std::shared_ptr<pattern_parser::PatternNode> sub_node =
+            multi_node->values_[idx];
+        EvalPattern(sub_node, target_start, target_end);
+    }
 }
 
 void Process::Status(wchar_t *status_string)

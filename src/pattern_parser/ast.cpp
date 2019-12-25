@@ -19,6 +19,19 @@ std::string PatternLeaf::String() const
     return ss.str();
 }
 
+std::string PatternMultiStep::String() const
+{
+
+    std::stringstream ss;
+    for (auto &v : values_)
+        ss << v->String();
+
+    if (divisor_value_)
+        ss << "/" << divisor_value_;
+
+    return ss.str();
+}
+
 PatternGroup::PatternGroup()
 {
     std::cout << "Pattern Group CREATING A Vector!\n";

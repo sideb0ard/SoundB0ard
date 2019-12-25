@@ -207,4 +207,27 @@ TEST_F(PatternParserTest, TestPatternPolyrhythms)
     EXPECT_EQ(2, sd->GetDivisor());
 }
 
+TEST_F(PatternParserTest, TestPatternMultiStep)
+{
+
+    std::string pattern{"bd <sn snd cp>"};
+    std::cout << "Testing: " << pattern << std::endl;
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
+
+    std::shared_ptr<pattern_parser::PatternGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(2, events->event_groups_[0].size());
+
+    auto multi = std::dynamic_pointer_cast<pattern_parser::PatternMultiStep>(
+        events->event_groups_[0][1]);
+    if (!multi)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternMultiStep!";
+    EXPECT_EQ(3, multi->values_.size());
+}
+
 } // namespace

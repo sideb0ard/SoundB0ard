@@ -23,7 +23,6 @@ std::shared_ptr<pattern_parser::PatternGroup> Parser::ParsePattern()
 {
     auto pattern_root = std::make_shared<pattern_parser::PatternGroup>();
 
-    int node_counter{0};
     while (cur_token_.type_ != pattern_parser::PATTERN_EOF)
     {
         std::shared_ptr<pattern_parser::PatternNode> ev = ParsePatternNode();
@@ -34,9 +33,6 @@ std::shared_ptr<pattern_parser::PatternGroup> Parser::ParsePattern()
         NextToken();
     }
 
-    // std::cout << "//// num events:" << pattern_root->event_groups_[0].size()
-    //          << " DONE WITH PARSEPATTERN\n"
-    //          << std::endl;
     return pattern_root;
 }
 
@@ -49,6 +45,9 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     else if (cur_token_.type_.compare(
                  pattern_parser::PATTERN_SQUARE_BRACKET_LEFT) == 0)
         return_node = ParsePatternGroup();
+    else if (cur_token_.type_.compare(
+                 pattern_parser::PATTERN_OPEN_ANGLE_BRACKET) == 0)
+        return_node = ParsePatternMultiStep();
     else
     {
         std::cerr << "RETURNING NULL..." << std::endl;
@@ -94,6 +93,24 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 
     std::shared_ptr<pattern_parser::PatternLeaf> node =
         std::make_shared<pattern_parser::PatternLeaf>(cur_token_.literal_);
+
+    return node;
+}
+
+std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
+{
+
+    std::shared_ptr<pattern_parser::PatternMultiStep> node =
+        std::make_shared<pattern_parser::PatternMultiStep>();
+
+    while (!PeekTokenIs(pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET))
+    {
+        NextToken();
+        node->values_.push_back(ParsePatternNode());
+    }
+
+    std::cout << "IS IT CLOSE BRACKET?" << cur_token_ << std::endl;
+    NextToken();
 
     return node;
 }

@@ -94,8 +94,6 @@ pattern_parser::Token Tokenizer::NextToken()
 
     SkipWhiteSpace();
 
-    // const TokenType PATTERN_OPEN_ANGLE_BRACKET = "<";
-    // const TokenType PATTERN_CLOSE_ANGLE_BRACKET = ">";
     switch (current_char_)
     {
     case ('['):

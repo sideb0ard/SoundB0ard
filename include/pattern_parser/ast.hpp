@@ -33,6 +33,17 @@ class PatternLeaf : public PatternNode
     std::string value_;
 };
 
+class PatternMultiStep : public PatternNode
+{
+  public:
+    PatternMultiStep() {}
+    std::string String() const override;
+
+  public:
+    std::vector<std::shared_ptr<PatternNode>> values_;
+    int current_val_idx_{0};
+};
+
 class PatternGroup : public PatternNode
 {
   public:
