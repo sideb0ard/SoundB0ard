@@ -58,6 +58,8 @@ void Process::EventNotify(mixer_timing_info tinfo)
         pattern_events_[cur_tick];
     for (auto e : events)
     {
+        if (e->target_ == "~") // skip blank markers
+            continue;
         std::string cmd =
             std::string("noteOn(") + e->target_ + "," + "127, 250)";
 
