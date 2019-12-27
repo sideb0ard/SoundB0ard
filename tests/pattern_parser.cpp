@@ -230,7 +230,7 @@ TEST_F(PatternParserTest, TestPatternMultiStep)
     EXPECT_EQ(3, multi->values_.size());
 }
 
-TEST_F(PatternParserTest, TestEuclideanPattern)
+TEST_F(PatternParserTest, TestSingleEuclideanPattern)
 {
 
     std::string pattern{"bd(3,8)"};
@@ -244,7 +244,48 @@ TEST_F(PatternParserTest, TestEuclideanPattern)
         std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
     if (!events)
         FAIL() << "Cannot cast pattern_root to PatternGroup!";
-    EXPECT_EQ(3, events->event_groups_[0].size());
+    ASSERT_EQ(1, events->event_groups_[0].size());
+
+    auto leaf = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][0]);
+    if (!leaf)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternLeaf!";
+
+    EXPECT_EQ(3, leaf->euclidean_hits_);
+    EXPECT_EQ(8, leaf->euclidean_steps_);
+}
+
+TEST_F(PatternParserTest, TestEuclideanAndLeafPattern)
+{
+
+    std::string pattern{"bd(3,8) sn"};
+    std::cout << "Testing: " << pattern << std::endl;
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
+
+    std::shared_ptr<pattern_parser::PatternGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    ASSERT_EQ(2, events->event_groups_[0].size());
+
+    auto euclid = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][0]);
+    if (!euclid)
+        FAIL() << "Cannot cast events->event_groups[0][0] to PatternLeaf!";
+
+    EXPECT_EQ(3, euclid->euclidean_hits_);
+    EXPECT_EQ(8, euclid->euclidean_steps_);
+
+    auto leaf = std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(
+        events->event_groups_[0][1]);
+    if (!leaf)
+        FAIL() << "Cannot cast events->event_groups[0][1] to PatternLeaf!";
+
+    EXPECT_EQ(0, leaf->euclidean_hits_);
+    EXPECT_EQ(0, leaf->euclidean_steps_);
 }
 
 } // namespace

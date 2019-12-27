@@ -13,6 +13,7 @@
 #include <looper.h>
 #include <tsqueue.hpp>
 
+#include <pattern_parser/euclidean.hpp>
 #include <pattern_parser/tokenizer.hpp>
 
 extern mixer *mixr;
@@ -67,18 +68,49 @@ void Process::EventNotify(mixer_timing_info tinfo)
     }
 }
 
-void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
-                          int target_start, int target_end)
+void Process::EvalPattern(
+    std::shared_ptr<pattern_parser::PatternNode> const &node, int target_start,
+    int target_end)
 {
+
+    int target_len = target_end - target_start;
 
     int divisor = node->GetDivisor();
     if (divisor && (loop_counter_ % divisor != 0))
         return;
+    else if (node->euclidean_hits_ && node->euclidean_steps_)
+    {
+        std::string euclidean_string = generate_euclidean_string(
+            node->euclidean_hits_, node->euclidean_steps_);
+        // copy node without hits and steps - TODO - this is only implememnted
+        // for Leaf nodes currently.
+        auto leafy =
+            std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
+        std::shared_ptr<pattern_parser::PatternLeaf> leafy_copy =
+            std::make_shared<pattern_parser::PatternLeaf>(leafy->value_);
+
+        int spacing = target_len / euclidean_string.size();
+        for (int i = 0, new_target_start = target_start;
+             i < target_len && new_target_start < target_len;
+             i++, new_target_start += spacing)
+        {
+            if (euclidean_string[i] == '1')
+                EvalPattern(leafy_copy, new_target_start,
+                            new_target_start + spacing);
+        }
+        return;
+    }
 
     std::shared_ptr<pattern_parser::PatternLeaf> leaf_node =
         std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
     if (leaf_node)
     {
+        if (target_start >= PPBAR)
+        {
+            std::cerr << "MISTAKETHER'NELLIE! idx:" << target_start
+                      << " Is >0 PPBAR:" << PPBAR << std::endl;
+            return;
+        }
         std::string target = leaf_node->value_;
         pattern_events_[target_start].push_back(
             std::make_shared<MusicalEvent>(target));
@@ -95,7 +127,6 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
 
             std::vector<std::shared_ptr<pattern_parser::PatternNode>> &events =
                 composite_node->event_groups_[i];
-            int target_len = target_end - target_start;
             int num_events = events.size();
             if (!num_events)
                 continue;

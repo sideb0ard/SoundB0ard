@@ -30,8 +30,9 @@ class Process
     void SetDebug(bool b);
     void ParsePattern();
     void Update(std::string target, std::string pattern);
-    void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &pattern,
-                     int target_start, int target_end);
+    void
+    EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
+                int target_start, int target_end);
 
   public:
     std::string target_;

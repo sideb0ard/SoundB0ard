@@ -20,6 +20,8 @@ class PatternNode
 
   public:
     int divisor_value_{0}; // only set when a divisor is present
+    int euclidean_hits_{0};
+    int euclidean_steps_{0};
 };
 
 class PatternLeaf : public PatternNode

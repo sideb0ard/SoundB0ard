@@ -86,33 +86,33 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     }
     else if (PeekTokenIs(pattern_parser::PATTERN_OPEN_PAREN))
     {
-        std::cout << "WOOP, EUCLIDEAN!!\n";
-        // e.g. '(3,8)'
+        // Euclidean e.g. '(3,8)'
         // discard open paren
         NextToken();
-        std::cout << "CUUR TOK:" << cur_token_ << std::endl;
+
         if (!ExpectPeek(pattern_parser::PATTERN_INT))
         {
             std::cerr << "NEED A NUMBER FOR A STEP!!\n";
             return nullptr;
         }
+
         int num_hits = std::stoi(cur_token_.literal_);
-        // SHOULD BE COMMA
+
         if (!ExpectPeek(pattern_parser::PATTERN_COMMA))
             return nullptr;
+
         if (!ExpectPeek(pattern_parser::PATTERN_INT))
         {
             std::cerr << "NEED A NUMBER FOR A LEN!!\n";
             return nullptr;
         }
         int num_steps = std::stoi(cur_token_.literal_);
+
         if (!ExpectPeek(pattern_parser::PATTERN_CLOSE_PAREN))
             return nullptr;
 
-        std::cout << "EUCLID SUCCESS****! " << num_hits << " / " << num_steps
-                  << std::endl;
-
-        NextToken();
+        return_node->euclidean_hits_ = num_hits;
+        return_node->euclidean_steps_ = num_steps;
     }
 
     return return_node;
