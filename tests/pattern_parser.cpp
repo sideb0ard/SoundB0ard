@@ -230,4 +230,21 @@ TEST_F(PatternParserTest, TestPatternMultiStep)
     EXPECT_EQ(3, multi->values_.size());
 }
 
+TEST_F(PatternParserTest, TestEuclideanPattern)
+{
+
+    std::string pattern{"bd(3,8)"};
+    std::cout << "Testing: " << pattern << std::endl;
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
+
+    std::shared_ptr<pattern_parser::PatternGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(3, events->event_groups_[0].size());
+}
+
 } // namespace
