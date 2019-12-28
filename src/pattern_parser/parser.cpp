@@ -40,7 +40,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 {
     std::shared_ptr<pattern_parser::PatternNode> return_node;
 
-    if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0)
+    if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0 ||
+        cur_token_.type_.compare(pattern_parser::PATTERN_INT) == 0)
         return_node = ParsePatternLeaf();
     else if (cur_token_.type_.compare(
                  pattern_parser::PATTERN_SQUARE_BRACKET_LEFT) == 0)
@@ -50,7 +51,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
         return_node = ParsePatternMultiStep();
     else
     {
-        std::cerr << "RETURNING NULL..." << std::endl;
+        std::cerr << "RETURNING NULL... cos TOKEN IS " << cur_token_
+                  << std::endl;
         return nullptr;
     }
 
@@ -121,6 +123,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 {
 
+    std::cout << "BEEP!\n";
     std::shared_ptr<pattern_parser::PatternLeaf> node =
         std::make_shared<pattern_parser::PatternLeaf>(cur_token_.literal_);
 

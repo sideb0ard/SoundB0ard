@@ -14,8 +14,12 @@
 struct MusicalEvent
 {
     MusicalEvent() = default;
-    MusicalEvent(std::string target) : target_{target} {}
+    MusicalEvent(std::string target, std::string value)
+        : target_{target}, value_{value}
+    {
+    }
     std::string target_;
+    std::string value_;
 };
 
 class Process

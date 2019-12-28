@@ -57,14 +57,29 @@ void Process::EventNotify(mixer_timing_info tinfo)
     int cur_tick = tinfo.midi_tick % PPBAR;
     std::vector<std::shared_ptr<MusicalEvent>> &events =
         pattern_events_[cur_tick];
-    for (auto e : events)
-    {
-        if (e->target_ == "~") // skip blank markers
-            continue;
-        std::string cmd =
-            std::string("noteOn(") + e->target_ + "," + "127, 250)";
 
-        Interpret(cmd.data(), global_env);
+    if (target_ == "sound")
+    {
+        for (auto e : events)
+        {
+            if (e->value_ == "~") // skip blank markers
+                continue;
+            std::string cmd =
+                std::string("noteOn(") + e->value_ + "," + "127, 250)";
+
+            Interpret(cmd.data(), global_env);
+        }
+    }
+    else if (target_ == "synth")
+    {
+        for (auto e : events)
+        {
+            if (e->value_ == "~") // skip blank markers
+                continue;
+            std::string cmd = std::string("noteOn(fmm,") + e->value_ + ", 250)";
+
+            Interpret(cmd.data(), global_env);
+        }
     }
 }
 
@@ -111,9 +126,9 @@ void Process::EvalPattern(
                       << " Is >0 PPBAR:" << PPBAR << std::endl;
             return;
         }
-        std::string target = leaf_node->value_;
+        std::string value = leaf_node->value_;
         pattern_events_[target_start].push_back(
-            std::make_shared<MusicalEvent>(target));
+            std::make_shared<MusicalEvent>(target_, value));
         return;
     }
 
