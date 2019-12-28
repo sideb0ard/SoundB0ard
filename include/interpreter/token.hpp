@@ -19,6 +19,7 @@ const TokenType SLANG_MINUS = "-";
 const TokenType SLANG_BANG = "!";
 const TokenType SLANG_ASTERISK = "*";
 const TokenType SLANG_SLASH = "/";
+const TokenType SLANG_PIPE = "|";
 
 const TokenType SLANG_LT = "<";
 const TokenType SLANG_GT = ">";

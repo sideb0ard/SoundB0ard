@@ -582,6 +582,16 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
     return sample;
 }
 
+void Parser::ConsumeProcessFunctions()
+{
+
+    while (PeekTokenIs(token::SLANG_PIPE))
+    {
+        NextToken();
+
+        std::cout << "FOUND A PIPE!\n";
+    }
+}
 std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 {
     // std::string input = R"(let rhythm = proc(sound, "bd*3 sd"))";
@@ -605,6 +615,9 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
               << std::endl;
 
     std::cout << "AST PROC EXPRESSION ALL GOOD!\n";
+
+    ConsumeProcessFunctions();
+
     return process;
 }
 

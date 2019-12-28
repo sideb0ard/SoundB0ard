@@ -204,6 +204,10 @@ token::Token Lexer::NextToken()
         tok.type_ = token::SLANG_COLON;
         tok.literal_ = current_char_;
         break;
+    case ('|'):
+        tok.type_ = token::SLANG_PIPE;
+        tok.literal_ = current_char_;
+        break;
     case ('"'):
         tok.type_ = token::SLANG_STRING;
         tok.literal_ = ReadString();
