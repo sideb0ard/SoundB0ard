@@ -55,10 +55,13 @@ void Process::EventNotify(mixer_timing_info tinfo)
     }
 
     int cur_tick = tinfo.midi_tick % PPBAR;
+    if (pattern_events_[cur_tick].size() == 0)
+        return;
+
     std::vector<std::shared_ptr<MusicalEvent>> &events =
         pattern_events_[cur_tick];
 
-    if (target_ == "sound")
+    if (target_ == "sample")
     {
         for (auto e : events)
         {
