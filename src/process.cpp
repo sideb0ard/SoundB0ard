@@ -109,12 +109,14 @@ void Process::EvalPattern(
 
         int spacing = target_len / euclidean_string.size();
         for (int i = 0, new_target_start = target_start;
-             i < target_len && new_target_start < target_len;
+             i < (int)euclidean_string.size() && new_target_start < target_end;
              i++, new_target_start += spacing)
         {
             if (euclidean_string[i] == '1')
+            {
                 EvalPattern(leafy_copy, new_target_start,
                             new_target_start + spacing);
+            }
         }
         return;
     }
