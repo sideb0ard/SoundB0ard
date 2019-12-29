@@ -191,3 +191,8 @@ void Process::Start() { active_ = true; }
 void Process::Stop() { active_ = false; }
 
 void Process::SetDebug(bool b) { debug_ = b; }
+
+void Process::AppendPatternFunction(std::shared_ptr<PatternFunction> func)
+{
+    pattern_functions_.push_back(func);
+}

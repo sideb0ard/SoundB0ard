@@ -123,7 +123,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 {
 
-    std::cout << "BEEP!\n";
     std::shared_ptr<pattern_parser::PatternLeaf> node =
         std::make_shared<pattern_parser::PatternLeaf>(cur_token_.literal_);
 
@@ -142,7 +141,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
         node->values_.push_back(ParsePatternNode());
     }
 
-    std::cout << "IS IT CLOSE BRACKET?" << cur_token_ << std::endl;
     NextToken();
 
     return node;

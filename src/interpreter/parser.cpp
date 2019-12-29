@@ -6,7 +6,10 @@
 #include <utility>
 #include <vector>
 
+#include <defjams.h>
+
 #include <interpreter/parser.hpp>
+#include <pattern_functions.hpp>
 
 namespace parser
 {
@@ -582,14 +585,57 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
     return sample;
 }
 
-void Parser::ConsumeProcessFunctions()
+void Parser::ConsumeProcessFunctions(Process &proc)
 {
 
     while (PeekTokenIs(token::SLANG_PIPE))
     {
+        std::cout << "FOUND A PIPE!\n";
+
         NextToken();
 
-        std::cout << "FOUND A PIPE!\n";
+        if (PeekTokenIs(token::SLANG_EVERY))
+        {
+            NextToken();
+
+            if (!ExpectPeek(token::SLANG_INT))
+            {
+                std::cerr << "Need a Number for 'EVERY'\n";
+                return;
+            }
+
+            int every_n = std::stoi(cur_token_.literal_);
+            std::cout << "BOOM! EVERY " << every_n << "\n";
+            NextToken();
+
+            std::shared_ptr<PatternFunction> stored_func;
+            if (cur_token_.type_ == token::SLANG_REV)
+            {
+                std::cout << "REVERSE!!\n";
+                stored_func = std::make_shared<PatternReverse>();
+            }
+            else if (cur_token_.type_ == token::SLANG_ROTATE_LEFT)
+            {
+                std::cout << "ROT LEFT!!\n";
+                stored_func = std::make_shared<PatternRotate>(LEFT);
+            }
+            else if (cur_token_.type_ == token::SLANG_ROTATE_RIGHT)
+            {
+                std::cout << "ROT RIGHT!!\n";
+                stored_func = std::make_shared<PatternRotate>(RIGHT);
+            }
+            else
+            {
+                std::cout << "DUNNO WHIT KINDA FUNCTION THAT IS PAL:"
+                          << cur_token_ << std::endl;
+                return;
+            }
+
+            auto every_func =
+                std::make_shared<PatternEvery>(every_n, stored_func);
+
+            proc.AppendPatternFunction(every_func);
+        }
     }
 }
 std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
@@ -616,7 +662,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
     std::cout << "AST PROC EXPRESSION ALL GOOD!\n";
 
-    ConsumeProcessFunctions();
+    ConsumeProcessFunctions(process);
 
     return process;
 }

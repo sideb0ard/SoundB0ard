@@ -70,6 +70,11 @@ const TokenType SLANG_TIMING_QUARTER = "QUARTER";
 const TokenType SLANG_TIMING_THIRD = "THIRD";
 const TokenType SLANG_TIMING_BAR = "BAR";
 
+// pattern functions
+const TokenType SLANG_REV = "REVERSE";
+const TokenType SLANG_ROTATE_LEFT = "ROTATE LEFT";
+const TokenType SLANG_ROTATE_RIGHT = "ROTATE RIGHT";
+
 class Token
 {
   public:

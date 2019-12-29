@@ -12,7 +12,6 @@
 #include "utils.h"
 #include <drumsampler.h>
 #include <drumsynth.h>
-#include <pattern_parser.h>
 #include <pattern_utils.h>
 
 extern const int key_midi_mapping[NUM_KEYS];
