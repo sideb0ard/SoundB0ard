@@ -56,7 +56,7 @@ class Parser
     std::shared_ptr<ast::LsStatement> ParseLsStatement();
     std::shared_ptr<ast::PsStatement> ParsePsStatement();
     std::shared_ptr<ast::ProcessStatement> ParseProcessStatement();
-    void ConsumeProcessFunctions(Process &proc);
+    void ConsumePatternFunctions(std::shared_ptr<ast::ProcessStatement> proc);
 
     std::shared_ptr<ast::ExpressionStatement> ParseExpressionStatement();
 

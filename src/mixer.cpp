@@ -451,6 +451,21 @@ void mixer_update_process(mixer *mixr, int process_id, std::string target,
     }
 }
 
+void mixer_process_append_function(mixer *mixr, int process_id,
+                                   std::shared_ptr<PatternFunction> func)
+{
+    if (process_id >= 0 && process_id < MAX_NUM_PROC)
+    {
+        std::cout << "Appending a FUNC TO a PrOCESS, yo! ID:" << process_id
+                  << " " << func->String() << std::endl;
+        mixr->processes_[process_id]->AppendPatternFunction(func);
+    }
+    else
+    {
+        std::cerr << "WAH! INVALID process id: " << process_id << std::endl;
+    }
+}
+
 int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
 {
     printf("Adding an BITSHIFT PATTERN GENERATOR, yo!\n");
@@ -615,7 +630,8 @@ void mixer_midi_tick(mixer *mixr)
 
         // std::cout << "Mixer -- midi_tick:" << mixr->timing_info.midi_tick
         //          << " 16th:" << mixr->timing_info.sixteenth_note_tick
-        //          << " Start of Loop:" << mixr->timing_info.is_start_of_loop
+        //          << " Start of Loop:" <<
+        //          mixr->timing_info.is_start_of_loop
         //          << std::endl;
 
         mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});

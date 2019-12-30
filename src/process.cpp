@@ -51,6 +51,9 @@ void Process::EventNotify(mixer_timing_info tinfo)
         for (int i = 0; i < PPBAR; i++)
             pattern_events_[i].clear();
         EvalPattern(pattern_root_, 0, PPBAR);
+
+        for (auto &f : pattern_functions_)
+            f->TransformPattern(pattern_events_, loop_counter_);
         ++loop_counter_;
     }
 
@@ -185,6 +188,10 @@ void Process::Status(wchar_t *status_string)
              PROC_COLOR, target_.c_str(), pattern_.c_str(),
              active_ ? "true" : "false");
     wcscat(status_string, WANSI_COLOR_RESET);
+
+    std::cout << "PROC - i got " << pattern_functions_.size() << " funcszz\n";
+    for (auto f : pattern_functions_)
+        std::cout << f->String() << std::endl;
 }
 
 void Process::Start() { active_ = true; }

@@ -12,17 +12,6 @@
 #include <pattern_parser/parser.hpp>
 #include <pattern_parser/tokenizer.hpp>
 
-struct MusicalEvent
-{
-    MusicalEvent() = default;
-    MusicalEvent(std::string target, std::string value)
-        : target_{target}, value_{value}
-    {
-    }
-    std::string target_;
-    std::string value_;
-};
-
 class Process
 {
   public:

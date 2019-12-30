@@ -1,5 +1,6 @@
 #pragma once
 
+#include <defjams.h>
 #include <pattern_parser/ast.hpp>
 
 class PatternFunction
@@ -7,8 +8,10 @@ class PatternFunction
   public:
     PatternFunction() = default;
     virtual ~PatternFunction() = default;
-    virtual void
-    TransformPattern(pattern_parser::PatternGroup &pattern) const = 0;
+    virtual std::string String() const = 0;
+    virtual void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) const = 0;
 };
 
 class PatternEvery : public PatternFunction
@@ -18,7 +21,10 @@ class PatternEvery : public PatternFunction
         : every_n_{every_n}, func_{func}
     {
     }
-    void TransformPattern(pattern_parser::PatternGroup &pattern) const override;
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) const override;
+    std::string String() const override;
 
   private:
     int every_n_;
@@ -29,14 +35,20 @@ class PatternReverse : public PatternFunction
 {
   public:
     PatternReverse() = default;
-    void TransformPattern(pattern_parser::PatternGroup &pattern) const override;
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) const override;
+    std::string String() const override;
 };
 
 class PatternRotate : public PatternFunction
 {
   public:
     PatternRotate(unsigned int direction) : direction_{direction} {};
-    void TransformPattern(pattern_parser::PatternGroup &pattern) const override;
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) const override;
+    std::string String() const override;
 
   private:
     unsigned int direction_;
