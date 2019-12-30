@@ -19,6 +19,7 @@ const TokenType SLANG_MINUS = "-";
 const TokenType SLANG_BANG = "!";
 const TokenType SLANG_ASTERISK = "*";
 const TokenType SLANG_SLASH = "/";
+const TokenType SLANG_PIPE = "|";
 
 const TokenType SLANG_LT = "<";
 const TokenType SLANG_GT = ">";
@@ -68,6 +69,11 @@ const TokenType SLANG_TIMING_SIXTH = "SIXTH";
 const TokenType SLANG_TIMING_QUARTER = "QUARTER";
 const TokenType SLANG_TIMING_THIRD = "THIRD";
 const TokenType SLANG_TIMING_BAR = "BAR";
+
+// pattern functions
+const TokenType SLANG_REV = "REVERSE";
+const TokenType SLANG_ROTATE_LEFT = "ROTATE LEFT";
+const TokenType SLANG_ROTATE_RIGHT = "ROTATE RIGHT";
 
 class Token
 {

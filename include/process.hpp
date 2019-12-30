@@ -7,16 +7,10 @@
 
 #include <SequenceEngine.h>
 #include <defjams.h>
+#include <pattern_functions.hpp>
 #include <pattern_parser/ast.hpp>
 #include <pattern_parser/parser.hpp>
 #include <pattern_parser/tokenizer.hpp>
-
-struct MusicalEvent
-{
-    MusicalEvent() = default;
-    MusicalEvent(std::string target) : target_{target} {}
-    std::string target_;
-};
 
 class Process
 {
@@ -30,8 +24,10 @@ class Process
     void SetDebug(bool b);
     void ParsePattern();
     void Update(std::string target, std::string pattern);
-    void EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &pattern,
-                     int target_start, int target_end);
+    void
+    EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
+                int target_start, int target_end);
+    void AppendPatternFunction(std::shared_ptr<PatternFunction> func);
 
   public:
     std::string target_;
@@ -44,5 +40,6 @@ class Process
     std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
         pattern_events_;
+    std::vector<std::shared_ptr<PatternFunction>> pattern_functions_;
     int loop_counter_;
 };

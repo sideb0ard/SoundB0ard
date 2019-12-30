@@ -277,6 +277,17 @@ class midi_event
     bool delete_after_use;
 };
 
+struct MusicalEvent
+{
+    MusicalEvent() = default;
+    MusicalEvent(std::string target, std::string value)
+        : target_{target}, value_{value}
+    {
+    }
+    std::string target_;
+    std::string value_;
+};
+
 typedef midi_event midi_pattern[PPBAR];
 
 typedef enum

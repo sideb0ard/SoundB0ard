@@ -23,7 +23,6 @@ std::shared_ptr<pattern_parser::PatternGroup> Parser::ParsePattern()
 {
     auto pattern_root = std::make_shared<pattern_parser::PatternGroup>();
 
-    int node_counter{0};
     while (cur_token_.type_ != pattern_parser::PATTERN_EOF)
     {
         std::shared_ptr<pattern_parser::PatternNode> ev = ParsePatternNode();
@@ -34,9 +33,6 @@ std::shared_ptr<pattern_parser::PatternGroup> Parser::ParsePattern()
         NextToken();
     }
 
-    // std::cout << "//// num events:" << pattern_root->event_groups_[0].size()
-    //          << " DONE WITH PARSEPATTERN\n"
-    //          << std::endl;
     return pattern_root;
 }
 
@@ -44,14 +40,19 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 {
     std::shared_ptr<pattern_parser::PatternNode> return_node;
 
-    if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0)
+    if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0 ||
+        cur_token_.type_.compare(pattern_parser::PATTERN_INT) == 0)
         return_node = ParsePatternLeaf();
     else if (cur_token_.type_.compare(
                  pattern_parser::PATTERN_SQUARE_BRACKET_LEFT) == 0)
         return_node = ParsePatternGroup();
+    else if (cur_token_.type_.compare(
+                 pattern_parser::PATTERN_OPEN_ANGLE_BRACKET) == 0)
+        return_node = ParsePatternMultiStep();
     else
     {
-        std::cerr << "RETURNING NULL..." << std::endl;
+        std::cerr << "RETURNING NULL... cos TOKEN IS " << cur_token_
+                  << std::endl;
         return nullptr;
     }
 
@@ -85,6 +86,36 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
         else
             return_node->divisor_value_ = mod_value;
     }
+    else if (PeekTokenIs(pattern_parser::PATTERN_OPEN_PAREN))
+    {
+        // Euclidean e.g. '(3,8)'
+        // discard open paren
+        NextToken();
+
+        if (!ExpectPeek(pattern_parser::PATTERN_INT))
+        {
+            std::cerr << "NEED A NUMBER FOR A STEP!!\n";
+            return nullptr;
+        }
+
+        int num_hits = std::stoi(cur_token_.literal_);
+
+        if (!ExpectPeek(pattern_parser::PATTERN_COMMA))
+            return nullptr;
+
+        if (!ExpectPeek(pattern_parser::PATTERN_INT))
+        {
+            std::cerr << "NEED A NUMBER FOR A LEN!!\n";
+            return nullptr;
+        }
+        int num_steps = std::stoi(cur_token_.literal_);
+
+        if (!ExpectPeek(pattern_parser::PATTERN_CLOSE_PAREN))
+            return nullptr;
+
+        return_node->euclidean_hits_ = num_hits;
+        return_node->euclidean_steps_ = num_steps;
+    }
 
     return return_node;
 }
@@ -94,6 +125,23 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 
     std::shared_ptr<pattern_parser::PatternLeaf> node =
         std::make_shared<pattern_parser::PatternLeaf>(cur_token_.literal_);
+
+    return node;
+}
+
+std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
+{
+
+    std::shared_ptr<pattern_parser::PatternMultiStep> node =
+        std::make_shared<pattern_parser::PatternMultiStep>();
+
+    while (!PeekTokenIs(pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET))
+    {
+        NextToken();
+        node->values_.push_back(ParsePatternNode());
+    }
+
+    NextToken();
 
     return node;
 }

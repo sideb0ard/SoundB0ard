@@ -13,6 +13,7 @@
 #include <looper.h>
 #include <tsqueue.hpp>
 
+#include <pattern_parser/euclidean.hpp>
 #include <pattern_parser/tokenizer.hpp>
 
 extern mixer *mixr;
@@ -50,36 +51,92 @@ void Process::EventNotify(mixer_timing_info tinfo)
         for (int i = 0; i < PPBAR; i++)
             pattern_events_[i].clear();
         EvalPattern(pattern_root_, 0, PPBAR);
+
+        for (auto &f : pattern_functions_)
+            f->TransformPattern(pattern_events_, loop_counter_);
         ++loop_counter_;
     }
 
     int cur_tick = tinfo.midi_tick % PPBAR;
+    if (pattern_events_[cur_tick].size() == 0)
+        return;
+
     std::vector<std::shared_ptr<MusicalEvent>> &events =
         pattern_events_[cur_tick];
-    for (auto e : events)
-    {
-        std::string cmd =
-            std::string("noteOn(") + e->target_ + "," + "127, 250)";
 
-        Interpret(cmd.data(), global_env);
+    if (target_ == "sample")
+    {
+        for (auto e : events)
+        {
+            if (e->value_ == "~") // skip blank markers
+                continue;
+            std::string cmd =
+                std::string("noteOn(") + e->value_ + "," + "127, 250)";
+
+            Interpret(cmd.data(), global_env);
+        }
+    }
+    else if (target_ == "synth")
+    {
+        for (auto e : events)
+        {
+            if (e->value_ == "~") // skip blank markers
+                continue;
+            std::string cmd = std::string("noteOn(fmm,") + e->value_ + ", 250)";
+
+            Interpret(cmd.data(), global_env);
+        }
     }
 }
 
-void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
-                          int target_start, int target_end)
+void Process::EvalPattern(
+    std::shared_ptr<pattern_parser::PatternNode> const &node, int target_start,
+    int target_end)
 {
+
+    int target_len = target_end - target_start;
 
     int divisor = node->GetDivisor();
     if (divisor && (loop_counter_ % divisor != 0))
         return;
+    else if (node->euclidean_hits_ && node->euclidean_steps_)
+    {
+        std::string euclidean_string = generate_euclidean_string(
+            node->euclidean_hits_, node->euclidean_steps_);
+        // copy node without hits and steps - TODO - this is only implememnted
+        // for Leaf nodes currently.
+        auto leafy =
+            std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
+        std::shared_ptr<pattern_parser::PatternLeaf> leafy_copy =
+            std::make_shared<pattern_parser::PatternLeaf>(leafy->value_);
+
+        int spacing = target_len / euclidean_string.size();
+        for (int i = 0, new_target_start = target_start;
+             i < (int)euclidean_string.size() && new_target_start < target_end;
+             i++, new_target_start += spacing)
+        {
+            if (euclidean_string[i] == '1')
+            {
+                EvalPattern(leafy_copy, new_target_start,
+                            new_target_start + spacing);
+            }
+        }
+        return;
+    }
 
     std::shared_ptr<pattern_parser::PatternLeaf> leaf_node =
         std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
     if (leaf_node)
     {
-        std::string target = leaf_node->value_;
+        if (target_start >= PPBAR)
+        {
+            std::cerr << "MISTAKETHER'NELLIE! idx:" << target_start
+                      << " Is >0 PPBAR:" << PPBAR << std::endl;
+            return;
+        }
+        std::string value = leaf_node->value_;
         pattern_events_[target_start].push_back(
-            std::make_shared<MusicalEvent>(target));
+            std::make_shared<MusicalEvent>(target_, value));
         return;
     }
 
@@ -93,8 +150,9 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
 
             std::vector<std::shared_ptr<pattern_parser::PatternNode>> &events =
                 composite_node->event_groups_[i];
-            int target_len = target_end - target_start;
             int num_events = events.size();
+            if (!num_events)
+                continue;
             int spacing = target_len / num_events;
 
             for (int j = target_start, event_idx = 0;
@@ -106,6 +164,16 @@ void Process::EvalPattern(std::shared_ptr<pattern_parser::PatternNode> &node,
                 EvalPattern(sub_node, j, j + spacing);
             }
         }
+    }
+
+    std::shared_ptr<pattern_parser::PatternMultiStep> multi_node =
+        std::dynamic_pointer_cast<pattern_parser::PatternMultiStep>(node);
+    if (multi_node)
+    {
+        int idx = multi_node->current_val_idx_++ % multi_node->values_.size();
+        std::shared_ptr<pattern_parser::PatternNode> sub_node =
+            multi_node->values_[idx];
+        EvalPattern(sub_node, target_start, target_end);
     }
 }
 
@@ -120,9 +188,18 @@ void Process::Status(wchar_t *status_string)
              PROC_COLOR, target_.c_str(), pattern_.c_str(),
              active_ ? "true" : "false");
     wcscat(status_string, WANSI_COLOR_RESET);
+
+    std::cout << "PROC - i got " << pattern_functions_.size() << " funcszz\n";
+    for (auto f : pattern_functions_)
+        std::cout << f->String() << std::endl;
 }
 
 void Process::Start() { active_ = true; }
 void Process::Stop() { active_ = false; }
 
 void Process::SetDebug(bool b) { debug_ = b; }
+
+void Process::AppendPatternFunction(std::shared_ptr<PatternFunction> func)
+{
+    pattern_functions_.push_back(func);
+}

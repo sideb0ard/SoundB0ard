@@ -21,6 +21,7 @@ class Parser
     std::shared_ptr<pattern_parser::PatternGroup> ParsePattern();
     std::shared_ptr<pattern_parser::PatternNode> ParsePatternNode();
     std::shared_ptr<pattern_parser::PatternNode> ParsePatternLeaf();
+    std::shared_ptr<pattern_parser::PatternNode> ParsePatternMultiStep();
     std::shared_ptr<pattern_parser::PatternNode> ParsePatternGroup();
 
     bool CheckErrors();

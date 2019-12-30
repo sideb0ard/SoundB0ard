@@ -8,7 +8,7 @@ namespace
 bool IsValidIdentifier(char c)
 {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' ||
-           c == '-' || c == '.';
+           c == '~' || c == '-' || c == '.';
 }
 bool IsDigit(char c) { return '0' <= c && c <= '9'; }
 
@@ -94,8 +94,6 @@ pattern_parser::Token Tokenizer::NextToken()
 
     SkipWhiteSpace();
 
-    // const TokenType PATTERN_OPEN_ANGLE_BRACKET = "<";
-    // const TokenType PATTERN_CLOSE_ANGLE_BRACKET = ">";
     switch (current_char_)
     {
     case ('['):

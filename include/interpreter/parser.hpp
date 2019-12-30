@@ -6,9 +6,10 @@
 #include <unordered_map>
 #include <vector>
 
-#include "ast.hpp"
-#include "lexer.hpp"
-#include "token.hpp"
+#include <interpreter/ast.hpp>
+#include <interpreter/lexer.hpp>
+#include <interpreter/token.hpp>
+#include <process.hpp>
 
 namespace parser
 {
@@ -55,6 +56,7 @@ class Parser
     std::shared_ptr<ast::LsStatement> ParseLsStatement();
     std::shared_ptr<ast::PsStatement> ParsePsStatement();
     std::shared_ptr<ast::ProcessStatement> ParseProcessStatement();
+    void ConsumePatternFunctions(std::shared_ptr<ast::ProcessStatement> proc);
 
     std::shared_ptr<ast::ExpressionStatement> ParseExpressionStatement();
 

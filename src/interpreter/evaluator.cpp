@@ -309,6 +309,55 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             {
                 mixer_update_process(mixr, proc->mixer_process_id_,
                                      target->value_, pattern->value_);
+
+                for (auto &f : proc->functions_)
+                {
+                    std::cout << "GOT A PROCESS FUNCTION! " << f->String()
+                              << "\n";
+                    auto func = std::dynamic_pointer_cast<
+                        ast::PatternFunctionExpression>(f);
+
+                    if (!func)
+                    {
+                        std::cout << "DIDNAE CAST IT\n";
+                        continue;
+                    }
+
+                    if (func->token_.literal_ == "every")
+                    {
+                        std::cout << "EVEYRRRR!\n";
+                        assert(func->arguments_.size() == 2);
+                        auto intval =
+                            std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                                func->arguments_[0]);
+                        auto func_arg = std::dynamic_pointer_cast<
+                            ast::PatternFunctionExpression>(
+                            func->arguments_[1]);
+                        if (!intval || !func_arg)
+                        {
+                            std::cerr << "NAE NAE!\n";
+                            return NULLL;
+                        }
+
+                        auto funcy = std::make_shared<PatternReverse>();
+
+                        auto p_every = std::make_shared<PatternEvery>(
+                            intval->value_, funcy);
+
+                        mixer_process_append_function(
+                            mixr, proc->mixer_process_id_, p_every);
+                    }
+                    else if (func->token_.literal_ == token::SLANG_REV)
+                    {
+                        std::cout << "REV!\n";
+                        assert(func->arguments_.size() == 0);
+                    }
+                    else if (func->token_.literal_ == token::SLANG_ROTATE_LEFT)
+                    {
+                        std::cout << "ROT LEFT!\n";
+                        assert(func->arguments_.size() == 0);
+                    }
+                }
             }
             else
                 std::cout << "Nae PATTERMN!!\n";

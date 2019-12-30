@@ -20,6 +20,8 @@ class PatternNode
 
   public:
     int divisor_value_{0}; // only set when a divisor is present
+    int euclidean_hits_{0};
+    int euclidean_steps_{0};
 };
 
 class PatternLeaf : public PatternNode
@@ -31,6 +33,17 @@ class PatternLeaf : public PatternNode
 
   public:
     std::string value_;
+};
+
+class PatternMultiStep : public PatternNode
+{
+  public:
+    PatternMultiStep() {}
+    std::string String() const override;
+
+  public:
+    std::vector<std::shared_ptr<PatternNode>> values_;
+    int current_val_idx_{0};
 };
 
 class PatternGroup : public PatternNode

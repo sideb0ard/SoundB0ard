@@ -6,7 +6,10 @@
 #include <utility>
 #include <vector>
 
+#include <defjams.h>
+
 #include <interpreter/parser.hpp>
+#include <pattern_functions.hpp>
 
 namespace parser
 {
@@ -388,8 +391,6 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseSynthExpression();
     else if (cur_token_.type_ == token::SLANG_SAMPLE)
         return ParseSampleExpression();
-    // else if (cur_token_.type_ == token::SLANG_PROC)
-    //    return ParseProcessExpression();
     else if (cur_token_.type_ == token::SLANG_STRING)
         return ParseStringLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACKET)
@@ -398,6 +399,10 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseHashLiteral();
     else if (cur_token_.type_ == token::SLANG_EVERY)
         return ParseEveryExpression();
+    else if (cur_token_.type_ == token::SLANG_REV ||
+             cur_token_.type_ == token::SLANG_ROTATE_LEFT ||
+             cur_token_.type_ == token::SLANG_ROTATE_LEFT)
+        return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
 
     std::cout << "No Prefix parser for " << cur_token_.type_ << std::endl;
     return nullptr;
@@ -497,39 +502,6 @@ std::shared_ptr<ast::Expression> Parser::ParseEveryExpression()
     ShowTokens();
     auto expression = std::make_shared<ast::EveryExpression>(cur_token_);
 
-    ShowTokens();
-    if (!ExpectPeek(token::SLANG_LPAREN))
-        return nullptr;
-    NextToken();
-    ShowTokens();
-
-    expression->frequency_ = std::stoll(cur_token_.literal_, nullptr, 10);
-    std::cout << "GOT FREQUENCY?\n";
-    ShowTokens();
-
-    if (!ExpectTimingEvent())
-        return nullptr;
-    NextToken();
-    expression->event_type_ = ParseTimingEventLiteral();
-
-    ShowTokens();
-
-    if (!ExpectPeek(token::SLANG_RPAREN))
-        return nullptr;
-
-    std::cout << "AIIGHT, GOT RPAREN - whats next?\n";
-    ShowTokens();
-    if (!ExpectPeek(token::SLANG_LBRACE))
-        return nullptr;
-    // NextToken();
-
-    std::cout << "AIIGHT, GOT LBRAC E - whats next?\n";
-    ShowTokens();
-
-    expression->body_ = ParseBlockStatement();
-
-    std::cout << "GOOD!" << expression->String() << std::endl;
-
     return expression;
 }
 
@@ -582,29 +554,61 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
     return sample;
 }
 
+void Parser::ConsumePatternFunctions(
+    std::shared_ptr<ast::ProcessStatement> proc)
+{
+
+    std::cout << "\n   ** CONSUME PATTERN FUNCZ A PIPE!\n";
+    NextToken();
+
+    std::cout << "CUR TOKENNN:" << cur_token_ << std::endl;
+    auto func = std::make_shared<ast::PatternFunctionExpression>(cur_token_);
+    NextToken();
+
+    while (!CurTokenIs(token::SLANG_PIPE) && !CurTokenIs(token::SLANG_EOFF))
+    {
+        std::cout << "Not a PIPe - gots" << cur_token_ << std::endl;
+        auto expr = ParseExpression(Precedence::LOWEST);
+        if (expr)
+        {
+            std::cout << "EXPRESSION is " << expr->String() << std::endl;
+            func->arguments_.push_back(expr);
+        }
+        NextToken();
+    }
+    std::cout << "DONE WITH LOOP. CUR TOKEN is: " << cur_token_ << std::endl;
+
+    std::cout << "FUNC has " << func->arguments_.size() << " args\n";
+    for (auto a : func->arguments_)
+        std::cout << "ARG:" << a->String() << std::endl;
+
+    proc->functions_.push_back(func);
+
+    std::cout << "PROC has " << proc->functions_.size() << " functions. "
+              << proc->String() << "\n\n";
+}
+
 std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 {
-    // std::string input = R"(let rhythm = proc(sound, "bd*3 sd"))";
     auto process = std::make_shared<ast::ProcessStatement>(cur_token_);
-
-    std::cout << "Process Statement! Process ID is "
-              << process->mixer_process_id_ << std::endl;
 
     if (!ExpectPeek(token::SLANG_DOLLAR))
         return nullptr;
     NextToken();
 
-    std::cout << "Post DOLLA BILL YO - Cur token is " << cur_token_
-              << std::endl;
-
     process->target_ = ParseStringLiteral();
     NextToken();
 
     process->pattern_ = ParseStringLiteral();
+    NextToken();
     std::cout << "Post Pattern Parsed - Cur token is " << cur_token_
               << std::endl;
 
     std::cout << "AST PROC EXPRESSION ALL GOOD!\n";
+
+    while (CurTokenIs(token::SLANG_PIPE))
+        ConsumePatternFunctions(process);
+
     return process;
 }
 

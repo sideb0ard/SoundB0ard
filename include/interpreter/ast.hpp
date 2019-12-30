@@ -256,6 +256,16 @@ class IndexExpression : public Expression
     std::shared_ptr<Expression> index_{nullptr};
 };
 
+class PatternFunctionExpression : public Expression
+{
+  public:
+    explicit PatternFunctionExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    std::vector<std::shared_ptr<Expression>> arguments_;
+};
+
 ///////////////////////////////////////////////////////////////
 //////////////////////// STATEMENTS............. //////////////
 
@@ -296,6 +306,8 @@ class ProcessStatement : public Statement
     int mixer_process_id_{-1};
     std::shared_ptr<Expression> target_;
     std::shared_ptr<Expression> pattern_;
+
+    std::vector<std::shared_ptr<Expression>> functions_;
 };
 
 class ExpressionStatement : public Statement

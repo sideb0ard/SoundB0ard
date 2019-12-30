@@ -171,15 +171,6 @@ void *loopy(void *arg)
     return NULL;
 }
 
-// static bool _is_meta_cmd(char *line)
-//{
-//    if (strncmp("every", line, 5) == 0 || strncmp("over", line, 4) == 0 ||
-//        strncmp("for", line, 3) == 0)
-//        return true;
-//
-//    return false;
-//}
-
 void Interpret(char *line, std::shared_ptr<object::Environment> env)
 {
     global_lex->ReadInput(line);
@@ -189,96 +180,8 @@ void Interpret(char *line, std::shared_ptr<object::Environment> env)
     std::shared_ptr<ast::Program> program = parsley->ParseProgram();
 
     g_queue.push(std::make_pair(program, env));
-    // auto evaluated = evaluator::Eval(program, env);
-    // if (evaluated)
-    //{
-    //    auto result = evaluated->Inspect();
-    //    if (result.compare("null") != 0)
-    //        std::cout << result << std::endl;
-    //}
 
     global_lex->Reset();
-}
-
-// void interpret(char *line)
-//{
-//    char wurds[NUM_WURDS][SIZE_OF_WURD] = {};
-//
-//    // if (_is_meta_cmd(line))
-//    //{
-//    //    int num_wurds = parse_wurds_from_cmd(wurds, line);
-//    //    Process *p = new Process(0, 0, 4);
-//    //    if (p)
-//    //        mixer_add_process(mixr, p);
-//    //}
-//
-//    char *cmd, *last_s;
-//    char const *sep = ";";
-//    char tmp[1024] = {};
-//    for (cmd = strtok_r(line, sep, &last_s); cmd;
-//         cmd = strtok_r(NULL, sep, &last_s))
-//    {
-//        strncpy((char *)tmp, cmd, 127);
-//        int num_wurds = parse_wurds_from_cmd(wurds, tmp);
-//
-//        //////////////////////////////////////////////////////////////////////
-//
-//        if (strncmp("help", wurds[0], 4) == 0)
-//            oblique_strategy();
-//
-//        else if (strncmp("quit", wurds[0], 4) == 0 ||
-//                 strncmp("exit", wurds[0], 4) == 0)
-//            exxit();
-//
-//        else if (strncmp("print", wurds[0], 5) == 0)
-//            printf("%s\n", wurds[1]);
-//
-//        else if (parse_mixer_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_algo_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_fx_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_looper_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_midi_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_new_item_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_pattern_generator_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_value_generator_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_synth_cmd(num_wurds, wurds))
-//            continue;
-//
-//        else if (parse_stepper_cmd(num_wurds, wurds))
-//            continue;
-//    }
-//}
-
-int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line)
-{
-    memset(wurds, 0, NUM_WURDS * SIZE_OF_WURD);
-    int num_wurds = 0;
-    char const *sep = " ";
-    char *tok, *last_s;
-    for (tok = strtok_r(line, sep, &last_s); tok;
-         tok = strtok_r(NULL, sep, &last_s))
-    {
-        strncpy(wurds[num_wurds++], tok, SIZE_OF_WURD);
-        if (num_wurds == NUM_WURDS)
-            break;
-    }
-    return num_wurds;
 }
 
 int exxit()

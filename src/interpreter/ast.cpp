@@ -173,12 +173,28 @@ std::string SynthExpression::String() const { return "FM SYNTH"; }
 
 std::string SampleExpression::String() const { return "SAMPLE"; }
 
+std::string PatternFunctionExpression::String() const
+{
+    std::stringstream ss;
+    ss << "PATTERN FUNCTION:" << token_.literal_;
+
+    return ss.str();
+}
+
 ProcessStatement::ProcessStatement(Token token) : Statement(token)
 {
     mixer_process_id_ = std::stoi(token.literal_);
 }
 
-std::string ProcessStatement::String() const { return "Process"; }
+std::string ProcessStatement::String() const
+{
+    std::stringstream ss;
+    ss << "Process:" << token_.literal_;
+    for (auto &f : functions_)
+        ss << f->String();
+
+    return ss.str();
+}
 
 std::string CallExpression::String() const
 {
