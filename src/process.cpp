@@ -11,6 +11,7 @@
 #include "process.hpp"
 #include "utils.h"
 #include <looper.h>
+#include <pattern_utils.h>
 #include <tsqueue.hpp>
 
 #include <pattern_parser/euclidean.hpp>
@@ -52,8 +53,11 @@ void Process::EventNotify(mixer_timing_info tinfo)
             pattern_events_[i].clear();
         EvalPattern(pattern_root_, 0, PPBAR);
 
+        // std::cout << "BEFORE:" << PatternPrint(pattern_events_) << std::endl;
         for (auto &f : pattern_functions_)
             f->TransformPattern(pattern_events_, loop_counter_);
+        // std::cout << "AFTER:" << PatternPrint(pattern_events_) << std::endl;
+
         ++loop_counter_;
     }
 

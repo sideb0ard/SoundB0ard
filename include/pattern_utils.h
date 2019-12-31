@@ -32,3 +32,8 @@ void pattern_replace(midi_event *src_pattern, midi_event *dst_pattern);
 void pattern_apply_swing(midi_event *pattern, int swing_setting);
 void pattern_check_idx(int *idx, int pattern_len);
 void pattern_apply_values(value_generator *vg, midi_event *pattern);
+
+// POST DEC 2019 STUFF
+
+std::string PatternPrint(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events);

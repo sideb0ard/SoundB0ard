@@ -291,3 +291,16 @@ void pattern_apply_values(value_generator *vg, midi_event *pattern)
         }
     }
 }
+
+std::string PatternPrint(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events)
+{
+    std::stringstream ss;
+    ss << "PatternEvents: ";
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (events[i].size() > 0)
+            ss << i << " ";
+    }
+    return ss.str();
+}
