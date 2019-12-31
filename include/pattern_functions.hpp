@@ -12,6 +12,7 @@ class PatternFunction
     virtual void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
         int loop_num) const = 0;
+    bool active_{true};
 };
 
 class PatternEvery : public PatternFunction

@@ -85,7 +85,8 @@ Process::Process(int process_id, std::string target, std::string pattern)
 {
     std::cout << "NEW PROC! " << std::endl;
     mixer_process_id_ = process_id;
-    mixer_update_process(mixr, process_id, target, pattern);
+    mixer_update_process(mixr, process_id, target, pattern,
+                         std::vector<std::shared_ptr<PatternFunction>>{});
 };
 
 Process::~Process()

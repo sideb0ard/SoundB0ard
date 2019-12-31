@@ -307,19 +307,16 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
             if (pattern)
             {
-                mixer_update_process(mixr, proc->mixer_process_id_,
-                                     target->value_, pattern->value_);
+                std::vector<std::shared_ptr<PatternFunction>> process_funcz;
 
                 for (auto &f : proc->functions_)
                 {
-                    std::cout << "GOT A PROCESS FUNCTION! " << f->String()
-                              << "\n";
                     auto func = std::dynamic_pointer_cast<
                         ast::PatternFunctionExpression>(f);
 
                     if (!func)
                     {
-                        std::cout << "DIDNAE CAST IT\n";
+                        std::cerr << "DIDNAE CAST YER FUNC\n";
                         continue;
                     }
 
@@ -344,8 +341,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                         auto p_every = std::make_shared<PatternEvery>(
                             intval->value_, funcy);
 
-                        mixer_process_append_function(
-                            mixr, proc->mixer_process_id_, p_every);
+                        process_funcz.push_back(p_every);
                     }
                     else if (func->token_.literal_ == token::SLANG_REV)
                     {
@@ -358,6 +354,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                         assert(func->arguments_.size() == 0);
                     }
                 }
+                // mixer_process_append_function(
+                //    mixr, proc->mixer_process_id_, p_every);
+                mixer_update_process(mixr, proc->mixer_process_id_,
+                                     target->value_, pattern->value_,
+                                     process_funcz);
             }
             else
                 std::cout << "Nae PATTERMN!!\n";
