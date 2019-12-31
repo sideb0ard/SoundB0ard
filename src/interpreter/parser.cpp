@@ -52,8 +52,6 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
     }
     else if (cur_token_.type_.compare(token::SLANG_PROC_ID) == 0)
     {
-        std::cout << "STATEMENT GOTZX A PROC ID:" << cur_token_.literal_
-                  << std::endl;
         return ParseProcessStatement();
     }
     else
@@ -558,7 +556,7 @@ void Parser::ConsumePatternFunctions(
     std::shared_ptr<ast::ProcessStatement> proc)
 {
 
-    std::cout << "\n   ** CONSUME PATTERN FUNCZ A PIPE!\n";
+    // discard pipe '|'
     NextToken();
 
     std::cout << "CUR TOKENNN:" << cur_token_ << std::endl;
@@ -601,10 +599,6 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
     process->pattern_ = ParseStringLiteral();
     NextToken();
-    std::cout << "Post Pattern Parsed - Cur token is " << cur_token_
-              << std::endl;
-
-    std::cout << "AST PROC EXPRESSION ALL GOOD!\n";
 
     while (CurTokenIs(token::SLANG_PIPE))
         ConsumePatternFunctions(process);

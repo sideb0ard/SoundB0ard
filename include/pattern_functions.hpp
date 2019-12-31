@@ -45,7 +45,8 @@ class PatternReverse : public PatternFunction
 class PatternRotate : public PatternFunction
 {
   public:
-    PatternRotate(unsigned int direction) : direction_{direction} {};
+    PatternRotate(unsigned int direction, int num_sixteenth_steps)
+        : direction_{direction}, num_sixteenth_steps_{num_sixteenth_steps} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
         int loop_num) const override;
@@ -53,4 +54,5 @@ class PatternRotate : public PatternFunction
 
   private:
     unsigned int direction_;
+    int num_sixteenth_steps_;
 };
