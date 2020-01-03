@@ -436,14 +436,14 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
 }
 
 void mixer_update_process(mixer *mixr, int process_id, std::string target,
-                          std::string pattern)
+                          std::string pattern,
+                          std::vector<std::shared_ptr<PatternFunction>> funcz)
 {
-    // auto p = std::make_shared<::Process>(target, pattern);
     if (process_id >= 0 && process_id < MAX_NUM_PROC)
     {
         std::cout << "Adding a PrOCESS, yo! ID:" << process_id
                   << "Target:" << target << " Pattern:" << pattern << "\n";
-        mixr->processes_[process_id]->Update(target, pattern);
+        mixr->processes_[process_id]->Update(target, pattern, funcz);
     }
     else
     {

@@ -1116,4 +1116,110 @@ TEST_F(ParserTest, TestParsingProcessStatement)
     EXPECT_EQ(pattern->value_, "bd*3 sd");
 }
 
+TEST_F(ParserTest, TestEveryNPatternFunction)
+{
+
+    std::cout << "Testing `proc` EVERY n statement" << std::endl;
+    std::string input = R"(p1 $ sound "bd*3 sd" | every 3 rev)";
+    std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(lex);
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+    EXPECT_FALSE(parsley->CheckErrors());
+    ASSERT_EQ(1, program->statements_.size());
+
+    auto proc = std::dynamic_pointer_cast<ast::ProcessStatement>(
+        program->statements_[0]);
+    if (!proc)
+        FAIL() << "program->statements_[0] is not a ProcessStatement - got "
+               << program->statements_[0]->String();
+
+    ASSERT_EQ(1, proc->functions_.size());
+
+    auto func_every_n =
+        std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
+            proc->functions_[0]);
+    if (!func_every_n)
+        FAIL()
+            << "proc->functions_[0] is not a PatternFunctionExpression - got "
+            << proc->functions_[0]->String();
+
+    ASSERT_EQ(2, func_every_n->arguments_.size());
+
+    auto every_n = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+        func_every_n->arguments_[0]);
+
+    if (!every_n)
+        FAIL() << "func_every_n->arguments_[0] is not an IntegerLiteral - got "
+               << func_every_n->arguments_[0]->String();
+
+    auto func_arg = std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
+        func_every_n->arguments_[1]);
+
+    if (!func_arg)
+        FAIL() << "func_every_n->arguments_[1] is not a "
+                  "PatternFunctionExpression - got "
+               << func_every_n->arguments_[1]->String();
+}
+
+TEST_F(ParserTest, TestReverseFunction)
+{
+
+    std::cout << "Testing `proc` REVERSE statement" << std::endl;
+    std::string input = R"(p1 $ sound "bd*3 sd" | rev)";
+    std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(lex);
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+    EXPECT_FALSE(parsley->CheckErrors());
+    ASSERT_EQ(1, program->statements_.size());
+
+    auto proc = std::dynamic_pointer_cast<ast::ProcessStatement>(
+        program->statements_[0]);
+    if (!proc)
+        FAIL() << "program->statements_[0] is not a ProcessStatement - got "
+               << program->statements_[0]->String();
+
+    ASSERT_EQ(1, proc->functions_.size());
+
+    auto func_rev = std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
+        proc->functions_[0]);
+    if (!func_rev)
+        FAIL()
+            << "proc->functions_[0] is not a PatternFunctionExpression - got "
+            << proc->functions_[0]->String();
+
+    ASSERT_EQ(0, func_rev->arguments_.size());
+}
+
+TEST_F(ParserTest, TestRotateLeftFunction)
+{
+
+    std::cout << "Testing `proc` ROTATE LEFT statement" << std::endl;
+    std::string input = R"(p1 $ sound "bd*3 sd" | rotl 3)";
+    std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(lex);
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+    EXPECT_FALSE(parsley->CheckErrors());
+    ASSERT_EQ(1, program->statements_.size());
+
+    auto proc = std::dynamic_pointer_cast<ast::ProcessStatement>(
+        program->statements_[0]);
+    if (!proc)
+        FAIL() << "program->statements_[0] is not a ProcessStatement - got "
+               << program->statements_[0]->String();
+
+    ASSERT_EQ(1, proc->functions_.size());
+
+    auto func_rotl = std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
+        proc->functions_[0]);
+    if (!func_rotl)
+        FAIL()
+            << "proc->functions_[0] is not a PatternFunctionExpression - got "
+            << proc->functions_[0]->String();
+
+    ASSERT_EQ(1, func_rotl->arguments_.size());
+}
+
 } // namespace

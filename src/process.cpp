@@ -11,6 +11,7 @@
 #include "process.hpp"
 #include "utils.h"
 #include <looper.h>
+#include <pattern_utils.h>
 #include <tsqueue.hpp>
 
 #include <pattern_parser/euclidean.hpp>
@@ -30,12 +31,18 @@ void Process::ParsePattern()
     pattern_root_ = pattern_parzer->ParsePattern();
 }
 
-void Process::Update(std::string target, std::string pattern)
+void Process::Update(std::string target, std::string pattern,
+                     std::vector<std::shared_ptr<PatternFunction>> funcz)
 {
     active_ = false;
     target_ = target;
     pattern_ = pattern;
     ParsePattern();
+
+    for (auto &oldfz : pattern_functions_)
+        oldfz->active_ = false;
+    for (auto fz : funcz)
+        pattern_functions_.push_back(fz);
     active_ = true;
 }
 
@@ -52,8 +59,15 @@ void Process::EventNotify(mixer_timing_info tinfo)
             pattern_events_[i].clear();
         EvalPattern(pattern_root_, 0, PPBAR);
 
+        // std::cout << "BEFORE:" << PatternPrint(pattern_events_) << std::endl;
         for (auto &f : pattern_functions_)
-            f->TransformPattern(pattern_events_, loop_counter_);
+        {
+            if (f->active_)
+                f->TransformPattern(pattern_events_, loop_counter_);
+            // std::cout << "AFTER:" << PatternPrint(pattern_events_) <<
+            // std::endl;
+        }
+
         ++loop_counter_;
     }
 

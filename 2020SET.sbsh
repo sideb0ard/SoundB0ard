@@ -1,0 +1,11 @@
+let bd = sample(kicks/mkKick.aiff);
+let sn = sample(snrs/angelSnare.aiff);
+let cp = sample(claps/mawClap.aiff)
+
+p1 $ sample "bd <sn*4 cp*2> bd(3,8) sn" | every 7 rev
+
+let fmm = fm()
+p2 $ synth "60 <45*4 ~ 45*2 ~ 44*3 ~ ~ ~> <40(3,8) ~> 57/3" | every 4 rev
+
+let hh = sample(hats/zaphat.aiff)
+p3 $ sample "<hh*16 hh*16 hh*12>" | every 7 rev
