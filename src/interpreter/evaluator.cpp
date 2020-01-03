@@ -294,6 +294,22 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::cout << "Nae sample path!!\n";
     }
 
+    std::shared_ptr<ast::GranularExpression> gran =
+        std::dynamic_pointer_cast<ast::GranularExpression>(node);
+    if (gran)
+    {
+        std::cout << "GRANULAR EXPRESSIOn!\n";
+        std::shared_ptr<ast::StringLiteral> spath =
+            std::dynamic_pointer_cast<ast::StringLiteral>(gran->path_);
+        if (spath)
+        {
+            std::cout << "GOT SPATH!\n";
+            return std::make_shared<object::Granular>(spath->value_);
+        }
+        else
+            std::cout << "Nae sample path!!\n";
+    }
+
     std::shared_ptr<ast::ProcessStatement> proc =
         std::dynamic_pointer_cast<ast::ProcessStatement>(node);
     if (proc)

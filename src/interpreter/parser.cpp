@@ -385,6 +385,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseIfExpression();
     else if (cur_token_.type_ == token::SLANG_FUNCTION)
         return ParseFunctionLiteral();
+    else if (cur_token_.type_ == token::SLANG_GRANULAR)
+        return ParseGranularExpression();
     else if (cur_token_.type_ == token::SLANG_FM_SYNTH)
         return ParseSynthExpression();
     else if (cur_token_.type_ == token::SLANG_SAMPLE)
@@ -532,6 +534,24 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 
     std::cout << "AST SYNTH EXPRESSION ALL GOOD!\n";
     return synth;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseGranularExpression()
+{
+    auto granular = std::make_shared<ast::GranularExpression>(cur_token_);
+
+    if (!ExpectPeek(token::SLANG_LPAREN))
+        return nullptr;
+    NextToken();
+
+    std::cout << "Cur token is " << cur_token_ << std::endl;
+    granular->path_ = ParseStringLiteral();
+
+    if (!ExpectPeek(token::SLANG_RPAREN))
+        return nullptr;
+
+    std::cout << "AST Granular EXPRESSION ALL GOOD!\n";
+    return granular;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()

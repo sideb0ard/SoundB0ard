@@ -55,6 +55,7 @@ const TokenType SLANG_EVERY = "EVERY";
 const TokenType SLANG_PS = "PS";
 const TokenType SLANG_LS = "LS";
 const TokenType SLANG_SAMPLE = "SAMPLE";
+const TokenType SLANG_GRANULAR = "GRANULAR";
 const TokenType SLANG_PROC = "PROC";
 const TokenType SLANG_PROC_ID = "PROC_ID";
 const TokenType SLANG_DOLLAR = "$";

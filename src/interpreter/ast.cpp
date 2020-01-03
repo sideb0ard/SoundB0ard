@@ -173,6 +173,8 @@ std::string SynthExpression::String() const { return "FM SYNTH"; }
 
 std::string SampleExpression::String() const { return "SAMPLE"; }
 
+std::string GranularExpression::String() const { return "GRANULAR"; }
+
 std::string PatternFunctionExpression::String() const
 {
     std::stringstream ss;

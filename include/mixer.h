@@ -184,7 +184,7 @@ int add_minisynth(mixer *mixr);
 int add_dxsynth(mixer *mixr);
 int add_sample(mixer *mixr, std::string sample_path);
 int add_digisynth(mixer *mixr, char *filename);
-int add_looper(mixer *mixr, char *filename);
+int add_looper(mixer *mixr, std::string filename);
 
 int add_sound_generator(mixer *mixr, SoundGenerator *sg);
 int add_pattern_generator(mixer *mixr, pattern_generator *sg);

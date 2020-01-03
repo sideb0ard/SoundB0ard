@@ -101,6 +101,17 @@ void Process::EventNotify(mixer_timing_info tinfo)
             Interpret(cmd.data(), global_env);
         }
     }
+    else if (target_ == "gran")
+    {
+        for (auto e : events)
+        {
+            if (e->value_ == "~") // skip blank markers
+                continue;
+            std::string cmd = std::string("noteOn(str,") + e->value_ + ", 250)";
+
+            Interpret(cmd.data(), global_env);
+        }
+    }
 }
 
 void Process::EvalPattern(

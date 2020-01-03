@@ -190,6 +190,17 @@ class SampleExpression : public Expression
     std::shared_ptr<Expression> path_;
 };
 
+class GranularExpression : public Expression
+{
+  public:
+    GranularExpression() {}
+    explicit GranularExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> path_;
+};
+
 class CallExpression : public Expression
 {
   public:

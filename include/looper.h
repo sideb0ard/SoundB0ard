@@ -90,6 +90,7 @@ class looper : public SoundGenerator
     void start() override;
     void stop() override;
     void eventNotify(broadcast_event event, mixer_timing_info tinfo) override;
+    void noteOn(midi_event ev) override;
 
   public:
     bool started;

@@ -306,7 +306,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          sg->noteOffDelayed(event_off, midi_off_tick);
                      }
                  }
-                 // else
                  auto sample =
                      std::dynamic_pointer_cast<object::Sample>(args[0]);
                  if (sample)
@@ -316,6 +315,17 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      {
                          SoundGenerator *sg =
                              mixr->SoundGenerators[sample->soundgen_id_];
+                         sg->noteOn(event_on);
+                     }
+                 }
+                 auto gran =
+                     std::dynamic_pointer_cast<object::Granular>(args[0]);
+                 if (gran)
+                 {
+                     if (mixer_is_valid_soundgen_num(mixr, gran->soundgen_id_))
+                     {
+                         SoundGenerator *sg =
+                             mixr->SoundGenerators[gran->soundgen_id_];
                          sg->noteOn(event_on);
                      }
                  }

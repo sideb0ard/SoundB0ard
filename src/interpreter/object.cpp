@@ -81,6 +81,13 @@ Sample::Sample(std::string sample_path)
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
+Granular::Granular(std::string sample_path)
+{
+    soundgen_id_ = add_looper(mixr, sample_path);
+}
+std::string Granular::Inspect() { return "Granular."; }
+ObjectType Granular::Type() { return GRANULAR_OBJ; }
+
 Process::Process(int process_id, std::string target, std::string pattern)
 {
     std::cout << "NEW PROC! " << std::endl;

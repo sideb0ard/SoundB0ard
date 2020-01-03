@@ -556,10 +556,10 @@ int add_dxsynth(mixer *mixr)
     return add_sound_generator(mixr, (SoundGenerator *)dx);
 }
 
-int add_looper(mixer *mixr, char *filename)
+int add_looper(mixer *mixr, std::string filename)
 {
     printf("ADDING A GRANNY!\n");
-    looper *g = new looper(filename);
+    looper *g = new looper(filename.data());
     printf("GOT A GRAANY\n");
     return add_sound_generator(mixr, (SoundGenerator *)g);
 }

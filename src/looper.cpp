@@ -807,3 +807,9 @@ void looper_set_degrade_by(looper *l, int degradation)
 }
 
 void looper_set_trace_envelope(looper *l) { l->debug_pending = true; }
+
+void looper::noteOn(midi_event ev)
+{
+    (void)ev;
+    audio_buffer_read_idx = 0;
+}

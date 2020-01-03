@@ -28,6 +28,7 @@ constexpr char STRING_OBJ[] = "STRING";
 constexpr char SYNTH_OBJ[] = "SYNTH";
 
 constexpr char SAMPLE_OBJ[] = "SAMPLE";
+constexpr char GRANULAR_OBJ[] = "GRANULAR";
 
 constexpr char BUILTIN_OBJ[] = "BUILTIN";
 
@@ -181,6 +182,18 @@ class Sample : public Object
   public:
     Sample(std::string sample_path);
     ~Sample() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    int soundgen_id_{-1};
+};
+
+class Granular : public Object
+{
+  public:
+    Granular(std::string Granular_path);
+    ~Granular() = default;
     ObjectType Type() override;
     std::string Inspect() override;
 
