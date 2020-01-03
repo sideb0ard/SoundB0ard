@@ -752,12 +752,22 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
                 else if (func->token_.literal_ == token::SLANG_REV)
                 {
                     std::cout << "REV!\n";
-                    assert(func->arguments_.size() == 0);
                 }
                 else if (func->token_.literal_ == token::SLANG_ROTATE_LEFT)
                 {
-                    std::cout << "ROT LEFT!\n";
-                    assert(func->arguments_.size() == 0);
+                    assert(func->arguments_.size() == 1);
+                    auto intval =
+                        std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                            func->arguments_[0]);
+                    std::cout << "ROT LEFT! by " << intval << "\n";
+                }
+                else if (func->token_.literal_ == token::SLANG_ROTATE_RIGHT)
+                {
+                    assert(func->arguments_.size() == 1);
+                    auto intval =
+                        std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                            func->arguments_[0]);
+                    std::cout << "ROT RIGHT! by " << intval << "\n";
                 }
             }
             // mixer_process_append_function(
