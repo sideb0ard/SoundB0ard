@@ -275,8 +275,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::SynthExpression>(node);
     if (synth)
     {
-        std::cout << "SYNTH EXPRESSION!\n";
-        return std::make_shared<object::Synth>();
+        std::cout << "SYNTH EXPRESSION!: " << synth->token_.type_ << "\n ";
+        if (synth->token_.type_ == token::SLANG_MOOG_SYNTH)
+            return std::make_shared<object::MoogSynth>();
+        else if (synth->token_.type_ == token::SLANG_FM_SYNTH)
+            return std::make_shared<object::FMSynth>();
     }
 
     std::shared_ptr<ast::SampleExpression> sample =

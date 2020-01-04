@@ -70,9 +70,13 @@ object::HashKey String::HashKey()
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
 
-Synth::Synth() { soundgen_id_ = add_minisynth(mixr); }
-std::string Synth::Inspect() { return "synth."; }
-ObjectType Synth::Type() { return SYNTH_OBJ; }
+FMSynth::FMSynth() { soundgen_id_ = add_dxsynth(mixr); }
+std::string FMSynth::Inspect() { return "FM synth."; }
+ObjectType FMSynth::Type() { return SYNTH_OBJ; }
+
+MoogSynth::MoogSynth() { soundgen_id_ = add_minisynth(mixr); }
+std::string MoogSynth::Inspect() { return "Moog synth."; }
+ObjectType MoogSynth::Type() { return SYNTH_OBJ; }
 
 Sample::Sample(std::string sample_path)
 {

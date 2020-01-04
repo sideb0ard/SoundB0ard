@@ -6,6 +6,9 @@ namespace token
 {
 using TokenType = std::string;
 
+// General Programming Language constructs///////
+// ///////
+
 const TokenType SLANG_ILLEGAL = "ILLEGAL";
 const TokenType SLANG_EOFF = "EOF";
 
@@ -19,7 +22,6 @@ const TokenType SLANG_MINUS = "-";
 const TokenType SLANG_BANG = "!";
 const TokenType SLANG_ASTERISK = "*";
 const TokenType SLANG_SLASH = "/";
-const TokenType SLANG_PIPE = "|";
 
 const TokenType SLANG_LT = "<";
 const TokenType SLANG_GT = ">";
@@ -50,27 +52,27 @@ const TokenType SLANG_NOT_EQ = "!=";
 const TokenType SLANG_INCREMENT = "++";
 const TokenType SLANG_DECREMENT = "--";
 
-const TokenType SLANG_FM_SYNTH = "FM_SYNTH";
+// Soundb0ard specific //////////////////
+// /////////////////////////
+
 const TokenType SLANG_EVERY = "EVERY";
+const TokenType SLANG_OVER = "OVER";
 const TokenType SLANG_PS = "PS";
 const TokenType SLANG_LS = "LS";
+
+// instruments
 const TokenType SLANG_SAMPLE = "SAMPLE";
 const TokenType SLANG_GRANULAR = "GRANULAR";
+const TokenType SLANG_FM_SYNTH = "FM_SYNTH";
+const TokenType SLANG_MOOG_SYNTH = "MOOG_SYNTH";
+
 const TokenType SLANG_PROC = "PROC";
 const TokenType SLANG_PROC_ID = "PROC_ID";
-const TokenType SLANG_DOLLAR = "$";
+// Process pattern types
+const TokenType SLANG_DOLLAR = "$"; // environment vars in pattern
+const TokenType SLANG_HASH = "#";   // values in pattern, targets follow
 
-const TokenType SLANG_TIMING_MIDI_TICK = "MIDI TICK";
-const TokenType SLANG_TIMING_THIRTYSECOND = "THIRTYSECOND";
-const TokenType SLANG_TIMING_TWENTYFOURTH = "TWENTYFOURTH";
-const TokenType SLANG_TIMING_SIXTEENTH = "SIXTEENTH";
-const TokenType SLANG_TIMING_TWELTH = "TWELTH";
-const TokenType SLANG_TIMING_EIGHTH = "EIGHTH";
-const TokenType SLANG_TIMING_SIXTH = "SIXTH";
-const TokenType SLANG_TIMING_QUARTER = "QUARTER";
-const TokenType SLANG_TIMING_THIRD = "THIRD";
-const TokenType SLANG_TIMING_BAR = "BAR";
-
+const TokenType SLANG_PIPE = "|"; // separtes pattern functions from pattern
 // pattern functions
 const TokenType SLANG_REV = "REVERSE";
 const TokenType SLANG_ROTATE_LEFT = "ROTATE LEFT";

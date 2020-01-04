@@ -214,23 +214,25 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return return_array;
          })},
-    {"keys",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
-             if (args.size() == 1)
-             {
-                 auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
-                 if (synth)
-                 {
-                     if (mixer_is_valid_soundgen_num(mixr, synth->soundgen_id_))
-                     {
-                         midi_set_destination(mixr, synth->soundgen_id_);
-                     }
-                 }
-             }
-             return evaluator::NULLL;
-         })},
+    // TODO - fix for many synth types
+    //{"keys",
+    // std::make_shared<object::BuiltIn>(
+    //     [](std::vector<std::shared_ptr<object::Object>> args)
+    //         -> std::shared_ptr<object::Object> {
+    //         if (args.size() == 1)
+    //         {
+    //             auto synth =
+    //             std::dynamic_pointer_cast<object::Synth>(args[0]); if (synth)
+    //             {
+    //                 if (mixer_is_valid_soundgen_num(mixr,
+    //                 synth->soundgen_id_))
+    //                 {
+    //                     midi_set_destination(mixr, synth->soundgen_id_);
+    //                 }
+    //             }
+    //         }
+    //         return evaluator::NULLL;
+    //     })},
     {"midiInit", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object> {
@@ -268,13 +270,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      new_midi_event(MIDI_ON, midinum, velocity);
                  event_on.source = EXTERNAL_OSC;
 
-                 auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
-                 if (synth)
+                 auto soundgen =
+                     std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+                 if (soundgen)
                  {
-                     if (mixer_is_valid_soundgen_num(mixr, synth->soundgen_id_))
+                     if (mixer_is_valid_soundgen_num(mixr,
+                                                     soundgen->soundgen_id_))
                      {
                          SoundGenerator *sg =
-                             mixr->SoundGenerators[synth->soundgen_id_];
+                             mixr->SoundGenerators[soundgen->soundgen_id_];
                          // sg->parseMidiEvent(event_on, mixr->timing_info);
 
                          int note_duration_ms = sg->note_duration_ms_;
@@ -306,29 +310,30 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          sg->noteOffDelayed(event_off, midi_off_tick);
                      }
                  }
-                 auto sample =
-                     std::dynamic_pointer_cast<object::Sample>(args[0]);
-                 if (sample)
-                 {
-                     if (mixer_is_valid_soundgen_num(mixr,
-                                                     sample->soundgen_id_))
-                     {
-                         SoundGenerator *sg =
-                             mixr->SoundGenerators[sample->soundgen_id_];
-                         sg->noteOn(event_on);
-                     }
-                 }
-                 auto gran =
-                     std::dynamic_pointer_cast<object::Granular>(args[0]);
-                 if (gran)
-                 {
-                     if (mixer_is_valid_soundgen_num(mixr, gran->soundgen_id_))
-                     {
-                         SoundGenerator *sg =
-                             mixr->SoundGenerators[gran->soundgen_id_];
-                         sg->noteOn(event_on);
-                     }
-                 }
+                 // auto sample =
+                 //    std::dynamic_pointer_cast<object::Sample>(args[0]);
+                 // if (sample)
+                 //{
+                 //    if (mixer_is_valid_soundgen_num(mixr,
+                 //                                    sample->soundgen_id_))
+                 //    {
+                 //        SoundGenerator *sg =
+                 //            mixr->SoundGenerators[sample->soundgen_id_];
+                 //        sg->noteOn(event_on);
+                 //    }
+                 //}
+                 // auto gran =
+                 //    std::dynamic_pointer_cast<object::Granular>(args[0]);
+                 // if (gran)
+                 //{
+                 //    if (mixer_is_valid_soundgen_num(mixr,
+                 //    gran->soundgen_id_))
+                 //    {
+                 //        SoundGenerator *sg =
+                 //            mixr->SoundGenerators[gran->soundgen_id_];
+                 //        sg->noteOn(event_on);
+                 //    }
+                 //}
              }
              return evaluator::NULLL;
          })},
@@ -340,14 +345,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  return evaluator::NewError(
                      "`rand` requires a single synth argument.");
 
-             auto synth = std::dynamic_pointer_cast<object::Synth>(args[0]);
-             if (synth)
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen)
              {
 
-                 if (mixer_is_valid_soundgen_num(mixr, synth->soundgen_id_))
+                 if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
                  {
                      SoundGenerator *sg =
-                         mixr->SoundGenerators[synth->soundgen_id_];
+                         mixr->SoundGenerators[soundgen->soundgen_id_];
                      sg->randomize();
                  }
              }

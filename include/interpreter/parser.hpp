@@ -94,7 +94,6 @@ class Parser
     std::shared_ptr<ast::BlockStatement> ParseBlockStatement();
 
     bool ExpectPeek(token::TokenType t);
-    bool ExpectTimingEvent() const;
     bool CurTokenIs(token::TokenType t) const;
     bool PeekTokenIs(token::TokenType t) const;
 

@@ -260,35 +260,6 @@ bool Parser::ExpectPeek(token::TokenType t)
     }
 }
 
-bool Parser::ExpectTimingEvent() const
-{
-    if (PeekTokenIs(token::SLANG_TIMING_MIDI_TICK))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_THIRTYSECOND))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_THIRTYSECOND))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_TWENTYFOURTH))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_SIXTEENTH))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_TWELTH))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_EIGHTH))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_SIXTH))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_QUARTER))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_THIRD))
-        return true;
-    else if (PeekTokenIs(token::SLANG_TIMING_BAR))
-        return true;
-
-    std::cout << "Youch, nae timing:" << cur_token_.type_ << std::endl;
-    return false;
-}
-
 void Parser::NextToken()
 {
     cur_token_ = peek_token_;
@@ -387,7 +358,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseFunctionLiteral();
     else if (cur_token_.type_ == token::SLANG_GRANULAR)
         return ParseGranularExpression();
-    else if (cur_token_.type_ == token::SLANG_FM_SYNTH)
+    else if (cur_token_.type_ == token::SLANG_FM_SYNTH ||
+             cur_token_.type_ == token::SLANG_MOOG_SYNTH)
         return ParseSynthExpression();
     else if (cur_token_.type_ == token::SLANG_SAMPLE)
         return ParseSampleExpression();
@@ -624,32 +596,6 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         ConsumePatternFunctions(process);
 
     return process;
-}
-
-ast::TimingEventType Parser::ParseTimingEventLiteral()
-{
-    if (cur_token_.type_ == token::SLANG_TIMING_MIDI_TICK)
-        return ast::TimingEventType::MIDI_TICK;
-    else if (cur_token_.type_ == token::SLANG_TIMING_THIRTYSECOND)
-        return ast::TimingEventType::THIRTYSECOND;
-    else if (cur_token_.type_ == token::SLANG_TIMING_TWENTYFOURTH)
-        return ast::TimingEventType::TWENTYFOURTH;
-    else if (cur_token_.type_ == token::SLANG_TIMING_SIXTEENTH)
-        return ast::TimingEventType::SIXTEENTH;
-    else if (cur_token_.type_ == token::SLANG_TIMING_TWELTH)
-        return ast::TimingEventType::TWELTH;
-    else if (cur_token_.type_ == token::SLANG_TIMING_EIGHTH)
-        return ast::TimingEventType::EIGHTH;
-    else if (cur_token_.type_ == token::SLANG_TIMING_SIXTH)
-        return ast::TimingEventType::SIXTH;
-    else if (cur_token_.type_ == token::SLANG_TIMING_QUARTER)
-        return ast::TimingEventType::QUARTER;
-    else if (cur_token_.type_ == token::SLANG_TIMING_THIRD)
-        return ast::TimingEventType::THIRD;
-    else if (cur_token_.type_ == token::SLANG_TIMING_BAR)
-        return ast::TimingEventType::BAR;
-    else // default - should never happen?!
-        return ast::TimingEventType::BAR;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseStringLiteral()

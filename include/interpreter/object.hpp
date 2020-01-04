@@ -165,58 +165,7 @@ class Environment
     std::shared_ptr<Environment> outer_env_;
 };
 
-class Synth : public Object
-{
-  public:
-    Synth();
-    ~Synth() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-
-  public:
-    int soundgen_id_{-1};
-};
-
-class Sample : public Object
-{
-  public:
-    Sample(std::string sample_path);
-    ~Sample() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-
-  public:
-    int soundgen_id_{-1};
-};
-
-class Granular : public Object
-{
-  public:
-    Granular(std::string Granular_path);
-    ~Granular() = default;
-    ObjectType Type() override;
-    std::string Inspect() override;
-
-  public:
-    int soundgen_id_{-1};
-};
-
-class Process : public Object
-{
-  public:
-    Process(int process_id, std::string target, std::string pattern);
-    ~Process();
-    ObjectType Type() override;
-    std::string Inspect() override;
-
-  public:
-    int proc_num{-1};
-    std::string target_;
-    std::string pattern_;
-
-  private:
-    int mixer_process_id_;
-};
+/////////////////////////////////////////////////
 
 class Function : public Object
 {
@@ -249,6 +198,74 @@ class BuiltIn : public Object
   public:
     BuiltInFunc func_;
 };
+
+/////////////////////////////////////////////////
+class SoundGenerator : public Object
+{
+  public:
+    SoundGenerator() = default;
+    ~SoundGenerator() = default;
+    virtual ObjectType Type() = 0;
+    virtual std::string Inspect() = 0;
+
+  public:
+    int soundgen_id_{-1};
+};
+
+class FMSynth : public SoundGenerator
+{
+  public:
+    FMSynth();
+    ~FMSynth() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+};
+
+class MoogSynth : public SoundGenerator
+{
+  public:
+    MoogSynth();
+    ~MoogSynth() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+};
+
+class Sample : public SoundGenerator
+{
+  public:
+    Sample(std::string sample_path);
+    ~Sample() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+};
+
+class Granular : public SoundGenerator
+{
+  public:
+    Granular(std::string Granular_path);
+    ~Granular() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+};
+
+class Process : public Object
+{
+  public:
+    Process(int process_id, std::string target, std::string pattern);
+    ~Process();
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    int proc_num{-1};
+    std::string target_;
+    std::string pattern_;
+
+  private:
+    int mixer_process_id_;
+};
+
+/////////////////////////////////////////////////
 
 class HashPair
 {

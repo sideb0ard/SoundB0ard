@@ -169,7 +169,7 @@ std::string FunctionLiteral::String() const
     return ss.str();
 }
 
-std::string SynthExpression::String() const { return "FM SYNTH"; }
+std::string SynthExpression::String() const { return "SYNTH"; }
 
 std::string SampleExpression::String() const { return "SAMPLE"; }
 
