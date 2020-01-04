@@ -24,6 +24,7 @@ class SoundGenerator
     virtual void noteOn(midi_event ev) { (void)ev; };
     virtual void noteOff(midi_event ev) { (void)ev; };
     void noteOffDelayed(midi_event ev, int event_off_tick);
+
     virtual void control(midi_event ev) { (void)ev; };
     virtual void pitchBend(midi_event ev) { (void)ev; };
     virtual void randomize(){};
@@ -33,9 +34,8 @@ class SoundGenerator
 
     void parseMidiEvent(midi_event ev, mixer_timing_info tinfo);
 
-    // TODO -- implement this generic interface
-    void SetParam(std::string name, double val);
-    double GetParam(std::string name);
+    virtual void SetParam(std::string name, double val) = 0;
+    virtual double GetParam(std::string name) = 0;
 
     void setVolume(double val);
     double getVolume();

@@ -2400,3 +2400,5 @@ void minisynth_set_hard_sync(minisynth *ms, bool val)
     // TODO - add to export / load functions
     ms->m_settings.hard_sync = val;
 }
+void minisynth::SetParam(std::string name, double val) {}
+double minisynth::GetParam(std::string name) { return 0; }

@@ -35,6 +35,8 @@ class drumsampler : public SoundGenerator
     stereo_val genNext() override;
     void start() override;
     void noteOn(midi_event ev) override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
   public:
     bool glitch_mode;

@@ -17,6 +17,8 @@ class digisynth : public SoundGenerator
     void stop() override;
     void noteOn(midi_event ev) override;
     void noteOff(midi_event ev) override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
   public:
     char audiofile[1024];

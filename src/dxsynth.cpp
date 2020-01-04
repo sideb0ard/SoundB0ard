@@ -1652,3 +1652,5 @@ void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num)
     if (osc_num >= 1 && osc_num <= 4)
         dx->active_midi_osc = osc_num;
 }
+void dxsynth::SetParam(std::string name, double val) {}
+double dxsynth::GetParam(std::string name) { return 0; }

@@ -43,7 +43,7 @@ looper::looper(char *filename)
     }
     recording = false;
 
-    loop_mode = LOOPER_LOOP_MODE;
+    loop_mode = LOOPER_SMUDGE_MODE;
     loop_counter = -1;
     scramble_mode = false;
     stutter_mode = false;
@@ -112,6 +112,16 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
             record_pending = false;
         }
     }
+
+    // used to track which 16th we're on if loop != 1 bar
+    float loop_num = fmod(loop_counter, loop_len);
+    if (loop_num < 0)
+        loop_num = 0;
+
+    int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx;
+    double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
+    normalized_audio_buffer_read_idx =
+        decimal_percent_of_loop * audio_buffer_len;
 
     if (loop_mode == LOOPER_LOOP_MODE)
     {
@@ -811,5 +821,7 @@ void looper_set_trace_envelope(looper *l) { l->debug_pending = true; }
 void looper::noteOn(midi_event ev)
 {
     (void)ev;
-    audio_buffer_read_idx = 0;
+    audio_buffer_read_idx = normalized_audio_buffer_read_idx;
 }
+void looper::SetParam(std::string name, double val) {}
+double looper::GetParam(std::string name) { return 0; }

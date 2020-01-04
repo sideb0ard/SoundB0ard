@@ -181,6 +181,8 @@ class minisynth : public SoundGenerator
     void pitchBend(midi_event ev) override;
     void randomize() override;
     void allNotesOff() override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
     minisynth_voice *m_voices[MAX_VOICES];
 

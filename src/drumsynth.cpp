@@ -569,3 +569,6 @@ void drumsynth_set_mod_semitones_range(drumsynth *ds, int val)
 
 void drumsynth_set_reset_osc(drumsynth *ds, bool b) { ds->reset_osc = b; }
 void drumsynth_set_debug(drumsynth *ds, bool debug) { ds->debug = debug; }
+
+void drumsynth::SetParam(std::string name, double val) {}
+double drumsynth::GetParam(std::string name) { return 0; }

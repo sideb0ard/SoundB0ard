@@ -119,3 +119,5 @@ void digisynth::noteOff(midi_event ev)
 }
 
 void digisynth_update(digisynth *ds) { (void)ds; }
+void digisynth::SetParam(std::string name, double val) {}
+double digisynth::GetParam(std::string name) { return 0; }

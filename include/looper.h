@@ -91,6 +91,8 @@ class looper : public SoundGenerator
     void stop() override;
     void eventNotify(broadcast_event event, mixer_timing_info tinfo) override;
     void noteOn(midi_event ev) override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
   public:
     bool started;
@@ -102,6 +104,7 @@ class looper : public SoundGenerator
     int audio_buffer_len;
     int size_of_sixteenth;
     double audio_buffer_read_idx;
+    double normalized_audio_buffer_read_idx;
     int audio_buffer_write_idx;
     int external_source_sg;            // XOR - external or file
     unsigned int external_source_mode; // capture once or follow

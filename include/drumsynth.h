@@ -19,6 +19,8 @@ class drumsynth : public SoundGenerator
     stereo_val genNext() override;
     void status(wchar_t *ss) override;
     void noteOn(midi_event ev) override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
   public:
     char m_patch_name[512];

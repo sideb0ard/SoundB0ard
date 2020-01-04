@@ -237,3 +237,5 @@ void drumsampler_set_glitch_rand_factor(drumsampler *ds, int pct)
     if (pct >= 0 && pct <= 100)
         ds->glitch_rand_factor = pct;
 }
+void drumsampler::SetParam(std::string name, double val) {}
+double drumsampler::GetParam(std::string name) { return 0; }

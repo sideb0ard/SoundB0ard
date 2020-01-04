@@ -109,6 +109,8 @@ class dxsynth : public SoundGenerator
     void control(midi_event ev) override;
     void pitchBend(midi_event ev) override;
     void randomize() override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
   public:
     dxsynth_voice *m_voices[MAX_DX_VOICES];
