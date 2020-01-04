@@ -2400,5 +2400,176 @@ void minisynth_set_hard_sync(minisynth *ms, bool val)
     // TODO - add to export / load functions
     ms->m_settings.hard_sync = val;
 }
-void minisynth::SetParam(std::string name, double val) {}
+
+void minisynth::SetParam(std::string name, double val)
+{
+    if (name == "vol")
+        setVolume(val);
+    else if (name == "pan")
+        setPan(val);
+    else if (name == "voice")
+        minisynth_set_voice_mode(this, val);
+    else if (name == "mono")
+        minisynth_set_monophonic(this, val);
+    else if (name == "hard_sync")
+        minisynth_set_hard_sync(this, val);
+    else if (name == "detune")
+        minisynth_set_detune(this, val);
+    else if (name == "legato")
+        minisynth_set_legato_mode(this, val);
+    else if (name == "kt")
+        minisynth_set_keytrack(this, val);
+    else if (name == "ndscale")
+        minisynth_set_note_to_decay_scaling(this, val);
+    else if (name == "osc1")
+        minisynth_set_lfo_wave(this, 1, val);
+    else if (name == "o1amp")
+        minisynth_set_osc_amp(this, 1, val);
+    else if (name == "o1oct")
+        minisynth_set_octave(this, val);
+    else if (name == "o1semi")
+        minisynth_set_osc_cents(this, 1, val);
+    else if (name == "o1cents")
+        minisynth_set_osc_cents(this, 1, val);
+
+    else if (name == "osc2")
+        minisynth_set_lfo_wave(this, 2, val);
+    else if (name == "o2amp")
+        minisynth_set_osc_amp(this, 2, val);
+    else if (name == "o2oct")
+        minisynth_set_octave(this, val);
+    else if (name == "o2semi")
+        minisynth_set_osc_cents(this, 2, val);
+    else if (name == "o2cents")
+        minisynth_set_osc_cents(this, 2, val);
+
+    else if (name == "osc3")
+        minisynth_set_lfo_wave(this, 3, val);
+    else if (name == "o3amp")
+        minisynth_set_osc_amp(this, 3, val);
+    else if (name == "o3oct")
+        minisynth_set_octave(this, val);
+    else if (name == "o3semi")
+        minisynth_set_osc_cents(this, 3, val);
+    else if (name == "o3cents")
+        minisynth_set_osc_cents(this, 3, val);
+
+    else if (name == "osc4")
+        minisynth_set_lfo_wave(this, 4, val);
+    else if (name == "o4amp")
+        minisynth_set_osc_amp(this, 4, val);
+    else if (name == "o4oct")
+        minisynth_set_octave(this, val);
+    else if (name == "o4semi")
+        minisynth_set_osc_cents(this, 4, val);
+    else if (name == "o4cents")
+        minisynth_set_osc_cents(this, 4, val);
+
+    else if (name == "noisedb")
+        minisynth_set_noise_osc_db(this, val);
+    else if (name == "pitchrange")
+        minisynth_set_pitchbend_range(this, val);
+    else if (name == "porta")
+        minisynth_set_portamento_time_ms(this, val);
+    else if (name == "pw")
+        minisynth_set_pulsewidth_pct(this, val);
+
+    else if (name == "subosc")
+        minisynth_set_sub_osc_db(this, val);
+    else if (name == "vascale")
+        minisynth_set_velocity_to_attack_scaling(this, val);
+    else if (name == "zero")
+        minisynth_set_reset_to_zero(this, val);
+
+    else if (name == "l1wave")
+        minisynth_set_lfo_wave(this, 1, val);
+    else if (name == "l1mode")
+        minisynth_set_lfo_mode(this, 1, val);
+    else if (name == "l1rate")
+        minisynth_set_lfo_rate(this, 1, val);
+    else if (name == "l1amp")
+        minisynth_set_lfo_amp(this, 1, val);
+    else if (name == "l1_filter_en")
+        minisynth_set_lfo_filter_enable(this, 1, val);
+    else if (name == "l1_osc_en")
+        minisynth_set_lfo_osc_enable(this, 1, val);
+    else if (name == "l1_pan_en")
+        minisynth_set_lfo_pan_enable(this, 1, val);
+    else if (name == "l1_amp_en")
+        minisynth_set_lfo_amp_enable(this, 1, val);
+    else if (name == "l1_pw_en")
+        minisynth_set_lfo_pulsewidth_enable(this, 1, val);
+    else if (name == "l1_filter_int")
+        minisynth_set_lfo_filter_fc_int(this, 1, val);
+    else if (name == "l1_osc_int")
+        minisynth_set_lfo_osc_int(this, 1, val);
+    else if (name == "l1_pan_int")
+        minisynth_set_lfo_pan_int(this, 1, val);
+    else if (name == "l1_amp_int")
+        minisynth_set_lfo_amp_int(this, 1, val);
+    else if (name == "l1_pw_int")
+        minisynth_set_lfo_pulsewidth_int(this, 1, val);
+
+    else if (name == "l2wave")
+        minisynth_set_lfo_wave(this, 2, val);
+    else if (name == "l2mode")
+        minisynth_set_lfo_mode(this, 2, val);
+    else if (name == "l2rate")
+        minisynth_set_lfo_rate(this, 2, val);
+    else if (name == "l2amp")
+        minisynth_set_lfo_amp(this, 2, val);
+    else if (name == "l2_filter_en")
+        minisynth_set_lfo_filter_enable(this, 2, val);
+    else if (name == "l2_osc_en")
+        minisynth_set_lfo_osc_enable(this, 2, val);
+    else if (name == "l2_pan_en")
+        minisynth_set_lfo_pan_enable(this, 2, val);
+    else if (name == "l2_amp_en")
+        minisynth_set_lfo_amp_enable(this, 2, val);
+    else if (name == "l2_pw_en")
+        minisynth_set_lfo_pulsewidth_enable(this, 2, val);
+    else if (name == "l2_filter_int")
+        minisynth_set_lfo_filter_fc_int(this, 2, val);
+    else if (name == "l2_osc_int")
+        minisynth_set_lfo_osc_int(this, 2, val);
+    else if (name == "l2_pan_int")
+        minisynth_set_lfo_pan_int(this, 2, val);
+    else if (name == "l2_amp_int")
+        minisynth_set_lfo_amp_int(this, 2, val);
+    else if (name == "l2_pw_int")
+        minisynth_set_lfo_pulsewidth_int(this, 2, val);
+
+    else if (name == "eg1_filter_en")
+        minisynth_set_eg_filter_enable(this, 1, val);
+    else if (name == "eg1_osc_en")
+        minisynth_set_eg_osc_enable(this, 1, val);
+    else if (name == "eg1_dca_en")
+        minisynth_set_eg_dca_enable(this, 1, val);
+    else if (name == "eg1_sustain")
+        minisynth_set_eg_sustain(this, 1, val);
+    else if (name == "eg1_filter_int")
+        minisynth_set_eg_filter_int(this, 1, val);
+    else if (name == "eg1_osc_int")
+        minisynth_set_eg_osc_int(this, 1, val);
+    else if (name == "eg1_dca_int")
+        minisynth_set_eg_dca_int(this, 1, val);
+    else if (name == "eg1_sustainlvl")
+        minisynth_set_eg_sustain(this, 1, val);
+    else if (name == "eg1_attack")
+        minisynth_set_eg_attack_time_ms(this, 1, val);
+    else if (name == "eg1_decay")
+        minisynth_set_eg_decay_time_ms(this, 1, val);
+    else if (name == "eg1_release")
+        minisynth_set_eg_release_time_ms(this, 1, val);
+
+    else if (name == "filter")
+        minisynth_set_filter_type(this, val);
+    else if (name == "fc")
+        minisynth_set_filter_fc(this, val);
+    else if (name == "fq")
+        minisynth_set_filter_fq(this, val);
+    else if (name == "sat")
+        minisynth_set_filter_saturation(this, val);
+}
+
 double minisynth::GetParam(std::string name) { return 0; }
