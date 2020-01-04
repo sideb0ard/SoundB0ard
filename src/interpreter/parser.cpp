@@ -586,8 +586,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         return nullptr;
     NextToken();
 
-    process->target_ = ParseStringLiteral();
-    NextToken();
+    process->target_ = ast::ProcessPatternTarget::ENV;
 
     process->pattern_ = ParseStringLiteral();
     NextToken();

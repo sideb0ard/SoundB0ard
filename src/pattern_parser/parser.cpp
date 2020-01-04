@@ -138,7 +138,9 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
     while (!PeekTokenIs(pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET))
     {
         NextToken();
-        node->values_.push_back(ParsePatternNode());
+        auto nnode = ParsePatternNode();
+        if (nnode)
+            node->values_.push_back(nnode);
     }
 
     NextToken();
@@ -156,7 +158,9 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternGroup()
     while (!PeekTokenIs(pattern_parser::PATTERN_SQUARE_BRACKET_RIGHT))
     {
         NextToken();
-        ev_group->event_groups_[event_group_idx].push_back(ParsePatternNode());
+        auto nnode = ParsePatternNode();
+        if (nnode)
+            ev_group->event_groups_[event_group_idx].push_back(nnode);
         if (PeekTokenIs(pattern_parser::PATTERN_COMMA))
         {
             event_group_idx++;

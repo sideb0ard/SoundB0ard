@@ -1087,7 +1087,7 @@ TEST_F(ParserTest, TestParsingPsStatement)
 TEST_F(ParserTest, TestParsingProcessStatement)
 {
     std::cout << "Testing `proc` statement" << std::endl;
-    std::string input = R"(p1 $ sound "bd*3 sd")";
+    std::string input = R"(p1 $ "bd*3 sd")";
     std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
     std::unique_ptr<parser::Parser> parsley =
         std::make_unique<parser::Parser>(lex);
@@ -1101,12 +1101,7 @@ TEST_F(ParserTest, TestParsingProcessStatement)
         FAIL() << "program->statements_[0] is not a ProcessStatement - got "
                << program->statements_[0]->String();
 
-    std::shared_ptr<ast::StringLiteral> target =
-        std::dynamic_pointer_cast<ast::StringLiteral>(stmt->target_);
-    if (!target)
-        FAIL() << "process target is not a StringLiteral. Got "
-               << typeid(&stmt->target_).name();
-    EXPECT_EQ(target->value_, "sound");
+    EXPECT_EQ(stmt->target_, ast::ProcessPatternTarget::ENV);
 
     std::shared_ptr<ast::StringLiteral> pattern =
         std::dynamic_pointer_cast<ast::StringLiteral>(stmt->pattern_);
@@ -1120,7 +1115,7 @@ TEST_F(ParserTest, TestEveryNPatternFunction)
 {
 
     std::cout << "Testing `proc` EVERY n statement" << std::endl;
-    std::string input = R"(p1 $ sound "bd*3 sd" | every 3 rev)";
+    std::string input = R"(p1 $ "bd*3 sd" | every 3 rev)";
     std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
     std::unique_ptr<parser::Parser> parsley =
         std::make_unique<parser::Parser>(lex);
@@ -1166,7 +1161,7 @@ TEST_F(ParserTest, TestReverseFunction)
 {
 
     std::cout << "Testing `proc` REVERSE statement" << std::endl;
-    std::string input = R"(p1 $ sound "bd*3 sd" | rev)";
+    std::string input = R"(p1 $ "bd*3 sd" | rev)";
     std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
     std::unique_ptr<parser::Parser> parsley =
         std::make_unique<parser::Parser>(lex);
@@ -1196,7 +1191,7 @@ TEST_F(ParserTest, TestRotateLeftFunction)
 {
 
     std::cout << "Testing `proc` ROTATE LEFT statement" << std::endl;
-    std::string input = R"(p1 $ sound "bd*3 sd" | rotl 3)";
+    std::string input = R"(p1 $ "bd*3 sd" | rotl 3)";
     std::shared_ptr<lexer::Lexer> lex = std::make_shared<lexer::Lexer>(input);
     std::unique_ptr<parser::Parser> parsley =
         std::make_unique<parser::Parser>(lex);

@@ -28,6 +28,12 @@ enum class TimingEventType
     BAR,
 };
 
+enum ProcessPatternTarget
+{
+    ENV,    // pattern contains values from environment
+    VALUES, // values in pattern to be applied to list of targets provided
+};
+
 /////////////////// NODE /////////////////
 
 class Node
@@ -315,7 +321,7 @@ class ProcessStatement : public Statement
 
   public:
     int mixer_process_id_{-1};
-    std::shared_ptr<Expression> target_;
+    ProcessPatternTarget target_;
     std::shared_ptr<Expression> pattern_;
 
     std::vector<std::shared_ptr<Expression>> functions_;

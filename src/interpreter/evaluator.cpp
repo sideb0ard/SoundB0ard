@@ -724,9 +724,7 @@ std::shared_ptr<object::Object>
 EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
 {
     std::cout << "GOT DA REAL PROCESS Expression!\n";
-    std::shared_ptr<ast::StringLiteral> target =
-        std::dynamic_pointer_cast<ast::StringLiteral>(proc->target_);
-    if (target)
+    if (proc->target_ == ast::ProcessPatternTarget::ENV)
     {
         std::shared_ptr<ast::StringLiteral> pattern =
             std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
@@ -791,7 +789,7 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
             }
             // mixer_process_append_function(
             //    mixr, proc->mixer_process_id_, p_every);
-            mixer_update_process(mixr, proc->mixer_process_id_, target->value_,
+            mixer_update_process(mixr, proc->mixer_process_id_, "sample",
                                  pattern->value_, process_funcz);
         }
         else
