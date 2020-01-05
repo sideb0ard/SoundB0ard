@@ -571,7 +571,6 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
     if (PeekTokenIs(token::SLANG_DOLLAR))
     {
-        std::cout << "DOLLAR ENVZ\n";
         NextToken();
         NextToken();
 
@@ -579,20 +578,15 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
         process->pattern_ = ParseStringLiteral();
         NextToken();
-
-        while (CurTokenIs(token::SLANG_PIPE))
-            ConsumePatternFunctions(process);
     }
     else if (PeekTokenIs(token::SLANG_HASH))
     {
-        std::cout << "HASH VALZ\n";
         NextToken();
         NextToken();
 
         process->target_type_ = ProcessPatternTarget::VALUES;
 
         process->pattern_ = ParseStringLiteral();
-        std::cout << "NEXT IS " << peek_token_.literal_ << std::endl;
 
         if (!ExpectPeek(token::SLANG_IDENT))
         {
@@ -613,13 +607,12 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
                     cur_token_, cur_token_.literal_);
                 if (target)
                     process->targets_.push_back(target->value_);
-                NextToken();
-                NextToken();
             }
-            else
-                std::cout << "CUR TOKEN IS:" << cur_token_ << std::endl;
         }
+        NextToken();
     }
+    while (CurTokenIs(token::SLANG_PIPE))
+        ConsumePatternFunctions(process);
 
     return process;
 }
