@@ -88,6 +88,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     }
     else if (PeekTokenIs(pattern_parser::PATTERN_OPEN_PAREN))
     {
+        std::cout << "GOT EUCLIDEAN!" << std::endl;
         // Euclidean e.g. '(3,8)'
         // discard open paren
         NextToken();
@@ -115,6 +116,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 
         return_node->euclidean_hits_ = num_hits;
         return_node->euclidean_steps_ = num_steps;
+
+        std::cout << "ALL GOOD!\n";
     }
 
     return return_node;

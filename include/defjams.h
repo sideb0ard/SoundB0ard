@@ -156,6 +156,12 @@ typedef enum
     LEGATO
 } legato_mode;
 
+enum ProcessPatternTarget
+{
+    ENV,    // pattern contains values from environment
+    VALUES, // values in pattern to be applied to list of targets provided
+};
+
 typedef enum
 {
     NONE,
@@ -280,11 +286,7 @@ class midi_event
 struct MusicalEvent
 {
     MusicalEvent() = default;
-    MusicalEvent(std::string target, std::string value)
-        : target_{target}, value_{value}
-    {
-    }
-    std::string target_;
+    MusicalEvent(std::string value) : value_{value} {}
     std::string value_;
 };
 

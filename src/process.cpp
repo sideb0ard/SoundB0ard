@@ -31,11 +31,13 @@ void Process::ParsePattern()
     pattern_root_ = pattern_parzer->ParsePattern();
 }
 
-void Process::Update(std::string target, std::string pattern,
+void Process::Update(ProcessPatternTarget target_type,
+                     std::vector<std::string> targets, std::string pattern,
                      std::vector<std::shared_ptr<PatternFunction>> funcz)
 {
     active_ = false;
-    target_ = target;
+    target_type_ = target_type;
+    targets_ = targets;
     pattern_ = pattern;
     ParsePattern();
 
@@ -78,7 +80,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
     std::vector<std::shared_ptr<MusicalEvent>> &events =
         pattern_events_[cur_tick];
 
-    if (target_ == "sample")
+    if (target_type_ == ProcessPatternTarget::ENV)
     {
         for (auto e : events)
         {
@@ -90,26 +92,18 @@ void Process::EventNotify(mixer_timing_info tinfo)
             Interpret(cmd.data(), global_env);
         }
     }
-    else if (target_ == "synth")
+    else if (target_type_ == ProcessPatternTarget::VALUES)
     {
         for (auto e : events)
         {
             if (e->value_ == "~") // skip blank markers
                 continue;
-            std::string cmd = std::string("noteOn(fmm,") + e->value_ + ", 250)";
-
-            Interpret(cmd.data(), global_env);
-        }
-    }
-    else if (target_ == "gran")
-    {
-        for (auto e : events)
-        {
-            if (e->value_ == "~") // skip blank markers
-                continue;
-            std::string cmd = std::string("noteOn(str,") + e->value_ + ", 250)";
-
-            Interpret(cmd.data(), global_env);
+            for (auto t : targets_)
+            {
+                std::string cmd =
+                    std::string("noteOn(") + t + "," + e->value_ + ", 250)";
+                Interpret(cmd.data(), global_env);
+            }
         }
     }
 }
@@ -132,21 +126,25 @@ void Process::EvalPattern(
         // for Leaf nodes currently.
         auto leafy =
             std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
-        std::shared_ptr<pattern_parser::PatternLeaf> leafy_copy =
-            std::make_shared<pattern_parser::PatternLeaf>(leafy->value_);
-
-        int spacing = target_len / euclidean_string.size();
-        for (int i = 0, new_target_start = target_start;
-             i < (int)euclidean_string.size() && new_target_start < target_end;
-             i++, new_target_start += spacing)
+        if (leafy)
         {
-            if (euclidean_string[i] == '1')
+            std::shared_ptr<pattern_parser::PatternLeaf> leafy_copy =
+                std::make_shared<pattern_parser::PatternLeaf>(leafy->value_);
+
+            int spacing = target_len / euclidean_string.size();
+            for (int i = 0, new_target_start = target_start;
+                 i < (int)euclidean_string.size() &&
+                 new_target_start < target_end;
+                 i++, new_target_start += spacing)
             {
-                EvalPattern(leafy_copy, new_target_start,
-                            new_target_start + spacing);
+                if (euclidean_string[i] == '1')
+                {
+                    EvalPattern(leafy_copy, new_target_start,
+                                new_target_start + spacing);
+                }
             }
+            return;
         }
-        return;
     }
 
     std::shared_ptr<pattern_parser::PatternLeaf> leaf_node =
@@ -161,7 +159,7 @@ void Process::EvalPattern(
         }
         std::string value = leaf_node->value_;
         pattern_events_[target_start].push_back(
-            std::make_shared<MusicalEvent>(target_, value));
+            std::make_shared<MusicalEvent>(value));
         return;
     }
 
@@ -208,9 +206,11 @@ void Process::Status(wchar_t *status_string)
     if (active_)
         PROC_COLOR = COOL_COLOR_PINK;
 
+    std::string target_type =
+        target_type_ == ProcessPatternTarget::ENV ? "ENV" : "VALUES";
     swprintf(status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%sProcess: Target:%s Pattern:%s Active:%s",
-             PROC_COLOR, target_.c_str(), pattern_.c_str(),
+             PROC_COLOR, target_type.c_str(), pattern_.c_str(),
              active_ ? "true" : "false");
     wcscat(status_string, WANSI_COLOR_RESET);
 

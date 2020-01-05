@@ -66,7 +66,7 @@ std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
 
     if (!ExpectPeek(token::SLANG_IDENT))
     {
-        std::cout << "NO IDENT! - returning nullopt \n";
+        std::cout << "NO IDENT! - returning nullptr \n";
         return nullptr;
     }
 
@@ -551,48 +551,75 @@ void Parser::ConsumePatternFunctions(
     // discard pipe '|'
     NextToken();
 
-    std::cout << "CUR TOKENNN:" << cur_token_ << std::endl;
     auto func = std::make_shared<ast::PatternFunctionExpression>(cur_token_);
     NextToken();
 
     while (!CurTokenIs(token::SLANG_PIPE) && !CurTokenIs(token::SLANG_EOFF))
     {
-        std::cout << "Not a PIPe - gots" << cur_token_ << std::endl;
         auto expr = ParseExpression(Precedence::LOWEST);
         if (expr)
-        {
-            std::cout << "EXPRESSION is " << expr->String() << std::endl;
             func->arguments_.push_back(expr);
-        }
         NextToken();
     }
-    std::cout << "DONE WITH LOOP. CUR TOKEN is: " << cur_token_ << std::endl;
-
-    std::cout << "FUNC has " << func->arguments_.size() << " args\n";
-    for (auto a : func->arguments_)
-        std::cout << "ARG:" << a->String() << std::endl;
 
     proc->functions_.push_back(func);
-
-    std::cout << "PROC has " << proc->functions_.size() << " functions. "
-              << proc->String() << "\n\n";
 }
 
 std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 {
     auto process = std::make_shared<ast::ProcessStatement>(cur_token_);
 
-    if (!ExpectPeek(token::SLANG_DOLLAR))
-        return nullptr;
-    NextToken();
+    if (PeekTokenIs(token::SLANG_DOLLAR))
+    {
+        std::cout << "DOLLAR ENVZ\n";
+        NextToken();
+        NextToken();
 
-    process->target_ = ast::ProcessPatternTarget::ENV;
+        process->target_type_ = ProcessPatternTarget::ENV;
 
-    process->pattern_ = ParseStringLiteral();
-    NextToken();
+        process->pattern_ = ParseStringLiteral();
+        NextToken();
 
-    while (CurTokenIs(token::SLANG_PIPE))
-        ConsumePatternFunctions(process);
+        while (CurTokenIs(token::SLANG_PIPE))
+            ConsumePatternFunctions(process);
+    }
+    else if (PeekTokenIs(token::SLANG_HASH))
+    {
+        std::cout << "HASH VALZ\n";
+        NextToken();
+        NextToken();
+
+        process->target_type_ = ProcessPatternTarget::VALUES;
+
+        process->pattern_ = ParseStringLiteral();
+        std::cout << "NEXT IS " << peek_token_.literal_ << std::endl;
+
+        if (!ExpectPeek(token::SLANG_IDENT))
+        {
+            std::cout << "NO IDENT! - returning nullptr \n";
+            return nullptr;
+        }
+        auto target =
+            std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
+        if (target)
+            process->targets_.push_back(target->value_);
+        while (PeekTokenIs(token::SLANG_COMMA))
+        {
+            NextToken();
+            NextToken();
+            if (CurTokenIs(token::SLANG_IDENT))
+            {
+                auto target = std::make_shared<ast::Identifier>(
+                    cur_token_, cur_token_.literal_);
+                if (target)
+                    process->targets_.push_back(target->value_);
+                NextToken();
+                NextToken();
+            }
+            else
+                std::cout << "CUR TOKEN IS:" << cur_token_ << std::endl;
+        }
+    }
 
     return process;
 }

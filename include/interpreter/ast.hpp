@@ -5,7 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "token.hpp"
+#include <defjams.h>
+#include <interpreter/token.hpp>
 
 using ::token::Token;
 
@@ -26,12 +27,6 @@ enum class TimingEventType
     QUARTER,
     THIRD,
     BAR,
-};
-
-enum ProcessPatternTarget
-{
-    ENV,    // pattern contains values from environment
-    VALUES, // values in pattern to be applied to list of targets provided
 };
 
 /////////////////// NODE /////////////////
@@ -321,7 +316,8 @@ class ProcessStatement : public Statement
 
   public:
     int mixer_process_id_{-1};
-    ProcessPatternTarget target_;
+    ProcessPatternTarget target_type_;
+    std::vector<std::string> targets_;
     std::shared_ptr<Expression> pattern_;
 
     std::vector<std::shared_ptr<Expression>> functions_;

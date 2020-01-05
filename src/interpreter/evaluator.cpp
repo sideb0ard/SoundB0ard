@@ -723,80 +723,69 @@ UnwrapReturnValue(std::shared_ptr<object::Object> obj)
 std::shared_ptr<object::Object>
 EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
 {
-    std::cout << "GOT DA REAL PROCESS Expression!\n";
-    if (proc->target_ == ast::ProcessPatternTarget::ENV)
+    std::shared_ptr<ast::StringLiteral> pattern =
+        std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
+    if (pattern)
     {
-        std::shared_ptr<ast::StringLiteral> pattern =
-            std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
-        if (pattern)
+        std::vector<std::shared_ptr<PatternFunction>> process_funcz;
+
+        for (auto &f : proc->functions_)
         {
-            std::vector<std::shared_ptr<PatternFunction>> process_funcz;
+            auto func =
+                std::dynamic_pointer_cast<ast::PatternFunctionExpression>(f);
 
-            for (auto &f : proc->functions_)
+            if (!func)
             {
-                auto func =
-                    std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
-                        f);
-
-                if (!func)
-                {
-                    std::cerr << "DIDNAE CAST YER FUNC\n";
-                    continue;
-                }
-
-                if (func->token_.literal_ == "every")
-                {
-                    std::cout << "EVEYRRRR!\n";
-                    assert(func->arguments_.size() == 2);
-                    auto intval =
-                        std::dynamic_pointer_cast<ast::IntegerLiteral>(
-                            func->arguments_[0]);
-                    auto func_arg = std::dynamic_pointer_cast<
-                        ast::PatternFunctionExpression>(func->arguments_[1]);
-                    if (!intval || !func_arg)
-                    {
-                        std::cerr << "NAE NAE!\n";
-                        return NULLL;
-                    }
-
-                    auto funcy = std::make_shared<PatternReverse>();
-
-                    auto p_every =
-                        std::make_shared<PatternEvery>(intval->value_, funcy);
-
-                    process_funcz.push_back(p_every);
-                }
-                else if (func->token_.literal_ == token::SLANG_REV)
-                {
-                    std::cout << "REV!\n";
-                }
-                else if (func->token_.literal_ == token::SLANG_ROTATE_LEFT)
-                {
-                    assert(func->arguments_.size() == 1);
-                    auto intval =
-                        std::dynamic_pointer_cast<ast::IntegerLiteral>(
-                            func->arguments_[0]);
-                    std::cout << "ROT LEFT! by " << intval << "\n";
-                }
-                else if (func->token_.literal_ == token::SLANG_ROTATE_RIGHT)
-                {
-                    assert(func->arguments_.size() == 1);
-                    auto intval =
-                        std::dynamic_pointer_cast<ast::IntegerLiteral>(
-                            func->arguments_[0]);
-                    std::cout << "ROT RIGHT! by " << intval << "\n";
-                }
+                std::cerr << "DIDNAE CAST YER FUNC\n";
+                continue;
             }
-            // mixer_process_append_function(
-            //    mixr, proc->mixer_process_id_, p_every);
-            mixer_update_process(mixr, proc->mixer_process_id_, "sample",
-                                 pattern->value_, process_funcz);
+
+            if (func->token_.literal_ == "every")
+            {
+                std::cout << "EVEYRRRR!\n";
+                assert(func->arguments_.size() == 2);
+                auto intval = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                    func->arguments_[0]);
+                auto func_arg =
+                    std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
+                        func->arguments_[1]);
+                if (!intval || !func_arg)
+                {
+                    std::cerr << "NAE NAE!\n";
+                    return NULLL;
+                }
+
+                auto funcy = std::make_shared<PatternReverse>();
+
+                auto p_every =
+                    std::make_shared<PatternEvery>(intval->value_, funcy);
+
+                process_funcz.push_back(p_every);
+            }
+            else if (func->token_.literal_ == token::SLANG_REV)
+            {
+                std::cout << "REV!\n";
+            }
+            else if (func->token_.literal_ == token::SLANG_ROTATE_LEFT)
+            {
+                assert(func->arguments_.size() == 1);
+                auto intval = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                    func->arguments_[0]);
+                std::cout << "ROT LEFT! by " << intval << "\n";
+            }
+            else if (func->token_.literal_ == token::SLANG_ROTATE_RIGHT)
+            {
+                assert(func->arguments_.size() == 1);
+                auto intval = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                    func->arguments_[0]);
+                std::cout << "ROT RIGHT! by " << intval << "\n";
+            }
         }
-        else
-            std::cout << "Nae PATTERMN!!\n";
+        mixer_update_process(mixr, proc->mixer_process_id_, proc->target_type_,
+                             proc->targets_, pattern->value_, process_funcz);
     }
     else
-        std::cout << "Nae TARGET!!\n";
+        std::cout << "Nae PATTERMN!!\n";
 
     return NULLL;
 }

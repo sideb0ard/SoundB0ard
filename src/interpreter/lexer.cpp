@@ -152,6 +152,10 @@ token::Token Lexer::NextToken()
         tok.type_ = token::SLANG_DOLLAR;
         tok.literal_ = current_char_;
         break;
+    case ('#'):
+        tok.type_ = token::SLANG_HASH;
+        tok.literal_ = current_char_;
+        break;
     case ('*'):
         tok.type_ = token::SLANG_ASTERISK;
         tok.literal_ = current_char_;

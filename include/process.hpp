@@ -23,7 +23,8 @@ class Process
     void EventNotify(mixer_timing_info);
     void SetDebug(bool b);
     void ParsePattern();
-    void Update(std::string target, std::string pattern,
+    void Update(ProcessPatternTarget target_type,
+                std::vector<std::string> targets, std::string pattern,
                 std::vector<std::shared_ptr<PatternFunction>> funcz);
     void
     EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
@@ -31,7 +32,8 @@ class Process
     void AppendPatternFunction(std::shared_ptr<PatternFunction> func);
 
   public:
-    std::string target_;
+    ProcessPatternTarget target_type_;
+    std::vector<std::string> targets_;
     std::string pattern_;
 
     bool active_;
