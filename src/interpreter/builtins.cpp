@@ -359,6 +359,32 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    //{"set",
+    // std::make_shared<object::BuiltIn>(
+    //     [](std::vector<std::shared_ptr<object::Object>> args)
+    //         -> std::shared_ptr<object::Object> {
+    //         if (args.size() != 2)
+    //         {
+    //             return evaluator::NewError(
+    //                 "`set` requires 3 params - target (var or id), param and
+    //                 " "val. I got " + std::to_string(args.size()) + "vals");
+    //         }
+
+    //         // auto soundgen =
+    //         //    std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+    //         // if (soundgen)
+    //         //{
+
+    //         //    if (mixer_is_valid_soundgen_num(mixr,
+    //         //    soundgen->soundgen_id_))
+    //         //    {
+    //         //        SoundGenerator *sg =
+    //         //            mixr->SoundGenerators[soundgen->soundgen_id_];
+    //         //        sg->Update();
+    //         //    }
+    //         //}
+    //         return evaluator::NULLL;
+    //     })},
 };
 
 } // namespace builtin

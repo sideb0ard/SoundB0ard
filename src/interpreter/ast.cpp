@@ -57,6 +57,14 @@ std::string PsStatement::String() const
 
     return ss.str();
 }
+std::string SetStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << target_ << ":" << param_ << " - " << value_;
+
+    return ss.str();
+}
 
 std::string ForStatement::String() const
 {

@@ -184,6 +184,29 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         list_sample_dir(lspath_string);
     }
 
+    std::shared_ptr<ast::SetStatement> set_stmt =
+        std::dynamic_pointer_cast<ast::SetStatement>(node);
+    if (set_stmt)
+    {
+        std::cout << "YAR! " << set_stmt->target_ << ":" << set_stmt->param_
+                  << ":" << set_stmt->value_ << std::endl;
+        auto target = Eval(set_stmt->target_, env);
+        auto soundgen =
+            std::dynamic_pointer_cast<object::SoundGenerator>(target);
+        if (soundgen)
+        {
+            std::cout << "YA BEAUTY!!\n";
+            if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
+            {
+                SoundGenerator *sg =
+                    mixr->SoundGenerators[soundgen->soundgen_id_];
+                sg->SetParam(set_stmt->param_, set_stmt->value_);
+            }
+        }
+        else
+            std::cout << "YA WEE SHITE!!\n";
+    }
+
     std::shared_ptr<ast::PsStatement> ps_expr =
         std::dynamic_pointer_cast<ast::PsStatement>(node);
     if (ps_expr)

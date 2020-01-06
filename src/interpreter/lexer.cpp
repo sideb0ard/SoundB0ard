@@ -239,7 +239,6 @@ token::Token Lexer::NextToken()
         {
             tok.type_ = token::SLANG_NUMBER;
             tok.literal_ = ReadNumber();
-            std::cout << "Got NUM: " << tok.literal_ << std::endl;
             return tok;
         }
         else

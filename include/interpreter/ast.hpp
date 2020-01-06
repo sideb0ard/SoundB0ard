@@ -360,6 +360,18 @@ class ForStatement : public Statement
     std::shared_ptr<BlockStatement> body_;
 };
 
+class SetStatement : public Statement
+{
+  public:
+    explicit SetStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> target_{nullptr};
+    std::string param_;
+    double value_;
+};
+
 class LsStatement : public Statement
 {
   public:

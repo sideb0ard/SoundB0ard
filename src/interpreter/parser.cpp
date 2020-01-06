@@ -41,19 +41,15 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
     else if (cur_token_.type_.compare(token::SLANG_RETURN) == 0)
         return ParseReturnStatement();
     else if (cur_token_.type_.compare(token::SLANG_LS) == 0)
-    {
         return ParseLsStatement();
-    }
     else if (cur_token_.type_.compare(token::SLANG_PS) == 0)
         return ParsePsStatement();
     else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
-    {
         return ParseForStatement();
-    }
     else if (cur_token_.type_.compare(token::SLANG_PROC_ID) == 0)
-    {
         return ParseProcessStatement();
-    }
+    else if (cur_token_.type_.compare(token::SLANG_SET) == 0)
+        return ParseSetStatement();
     else
         return ParseExpressionStatement();
 }
@@ -121,6 +117,62 @@ std::shared_ptr<ast::LsStatement> Parser::ParseLsStatement()
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
+{
+    std::shared_ptr<ast::SetStatement> stmt =
+        std::make_shared<ast::SetStatement>(cur_token_);
+
+    // Discard 'SET' token
+    // NextToken();
+    std::cout << "SET ME UP YO!" << std::endl;
+    // while (!CurTokenIs(token::SLANG_EOFF))
+    //{
+    //    std::cout << "Cur token is " << cur_token_ << std::endl;
+    //    NextToken();
+    //}
+    std::cout << "Cur token is " << cur_token_ << std::endl;
+    if (!ExpectPeek(token::SLANG_IDENT))
+    {
+        std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    stmt->target_ = ParseIdentifier();
+
+    if (!ExpectPeek(token::SLANG_COLON))
+    {
+        std::cout << "NOT GOT COLON ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    if (!ExpectPeek(token::SLANG_IDENT))
+    {
+        std::cout << "NOT GOT PARAM ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    stmt->param_ = cur_token_.literal_;
+    if (!ExpectPeek(token::SLANG_NUMBER))
+    {
+        std::cout << "NOT GOT NU<M ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    stmt->value_ = std::stod(cur_token_.literal_);
+
+    std::cout << "BOOM! " << stmt->target_ << ":" << stmt->param_ << ":"
+              << stmt->value_ << std::endl;
+    // if (!PeekTokenIs(token::SLANG_SEMICOLON))
+    //{
+    //    stmt->path_ = ParseStringLiteral();
+    //}
+
+    // if (PeekTokenIs(token::SLANG_SEMICOLON))
+    //    NextToken();
 
     return stmt;
 }

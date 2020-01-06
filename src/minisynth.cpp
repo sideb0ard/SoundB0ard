@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include "bitshift.h"
 #include "midi_freq_table.h"
 #include "minisynth.h"
@@ -2403,6 +2405,7 @@ void minisynth_set_hard_sync(minisynth *ms, bool val)
 
 void minisynth::SetParam(std::string name, double val)
 {
+    std::cout << "SET PARAM:" << name << " :" << val << std::endl;
     if (name == "vol")
         setVolume(val);
     else if (name == "pan")
@@ -2570,6 +2573,7 @@ void minisynth::SetParam(std::string name, double val)
         minisynth_set_filter_fq(this, val);
     else if (name == "sat")
         minisynth_set_filter_saturation(this, val);
+    minisynth_update(this);
 }
 
 double minisynth::GetParam(std::string name) { return 0; }
