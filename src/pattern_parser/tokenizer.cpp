@@ -170,14 +170,12 @@ std::string Tokenizer::ReadIdentifier()
 // TODO - tidy up - this is a dupe from Lexer
 std::string Tokenizer::ReadNumber()
 {
-    std::cout << "READ NUM!" << std::endl;
     int position = current_position_;
     bool has_decimal_point{false};
     while (IsDigit(current_char_) || current_char_ == '.')
     {
         if (current_char_ == '.')
         {
-            std::cout << "POINT NUM!" << std::endl;
             if (!has_decimal_point)
                 has_decimal_point = true;
             else
