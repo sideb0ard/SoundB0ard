@@ -179,7 +179,16 @@ void Interpret(char *line, std::shared_ptr<object::Environment> env)
 
     std::shared_ptr<ast::Program> program = parsley->ParseProgram();
 
-    g_queue.push(std::make_pair(program, env));
+    // g_queue.push(std::make_pair(program, env));
+    auto evaluated = evaluator::Eval(program, env);
+    if (evaluated)
+    {
+        auto result = evaluated->Inspect();
+        if (result.compare("null") != 0)
+        {
+            std::cout << result << std::endl;
+        }
+    }
 
     global_lex->Reset();
 }

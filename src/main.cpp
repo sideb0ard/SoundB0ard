@@ -114,14 +114,14 @@ int main()
     }
 
     // Worker Thread
-    pthread_t eval_th;
-    if (pthread_create(&eval_th, NULL, Evaluator, NULL))
-    {
-        fprintf(stderr, "Errrr, wit tha Evaluator thread!..\n");
-    }
+    // pthread_t eval_th;
+    // if (pthread_create(&eval_th, NULL, Evaluator, NULL))
+    //{
+    //    fprintf(stderr, "Errrr, wit tha Evaluator thread!..\n");
+    //}
 
     pthread_join(input_th, NULL);
-    pthread_join(eval_th, NULL);
+    // pthread_join(eval_th, NULL);
 
     // all done, time to go home
     pa_teardown();
