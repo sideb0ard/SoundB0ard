@@ -41,7 +41,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     std::shared_ptr<pattern_parser::PatternNode> return_node;
 
     if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0 ||
-        cur_token_.type_.compare(pattern_parser::PATTERN_INT) == 0)
+        cur_token_.type_.compare(pattern_parser::PATTERN_NUMBER) == 0)
         return_node = ParsePatternLeaf();
     else if (cur_token_.type_.compare(
                  pattern_parser::PATTERN_SQUARE_BRACKET_LEFT) == 0)
@@ -64,7 +64,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             is_multiplier = true;
 
         NextToken();
-        if (!ExpectPeek(pattern_parser::PATTERN_INT))
+        if (!ExpectPeek(pattern_parser::PATTERN_NUMBER))
         {
             std::cerr << "NEED A NUMBER FOR A MODIFIER!!\n";
             return nullptr;
@@ -93,7 +93,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
         // discard open paren
         NextToken();
 
-        if (!ExpectPeek(pattern_parser::PATTERN_INT))
+        if (!ExpectPeek(pattern_parser::PATTERN_NUMBER))
         {
             std::cerr << "NEED A NUMBER FOR A STEP!!\n";
             return nullptr;
@@ -104,7 +104,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
         if (!ExpectPeek(pattern_parser::PATTERN_COMMA))
             return nullptr;
 
-        if (!ExpectPeek(pattern_parser::PATTERN_INT))
+        if (!ExpectPeek(pattern_parser::PATTERN_NUMBER))
         {
             std::cerr << "NEED A NUMBER FOR A LEN!!\n";
             return nullptr;

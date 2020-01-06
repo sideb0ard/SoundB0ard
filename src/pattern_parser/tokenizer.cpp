@@ -144,7 +144,7 @@ pattern_parser::Token Tokenizer::NextToken()
         }
         else if (IsDigit(current_char_))
         {
-            tok.type_ = pattern_parser::PATTERN_INT;
+            tok.type_ = pattern_parser::PATTERN_NUMBER;
             tok.literal_ = ReadNumber();
             return tok;
         }
@@ -167,11 +167,24 @@ std::string Tokenizer::ReadIdentifier()
     return input_.substr(position, current_position_ - position);
 }
 
+// TODO - tidy up - this is a dupe from Lexer
 std::string Tokenizer::ReadNumber()
 {
+    std::cout << "READ NUM!" << std::endl;
     int position = current_position_;
-    while (IsDigit(current_char_))
+    bool has_decimal_point{false};
+    while (IsDigit(current_char_) || current_char_ == '.')
+    {
+        if (current_char_ == '.')
+        {
+            std::cout << "POINT NUM!" << std::endl;
+            if (!has_decimal_point)
+                has_decimal_point = true;
+            else
+                break; // eek, summit wrong, can only be a single place.
+        }
         ReadChar();
+    }
     return input_.substr(position, current_position_ - position);
 }
 

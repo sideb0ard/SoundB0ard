@@ -5,12 +5,14 @@
 
 namespace
 {
+
+bool IsDigit(char c) { return '0' <= c && c <= '9'; }
+
 bool IsValidIdentifier(char c)
 {
     return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' ||
-           c == '/' || c == '-' || c == '.';
+           c == '/' || c == '-' || c == '.' || IsDigit(c);
 }
-bool IsDigit(char c) { return '0' <= c && c <= '9'; }
 
 bool IsBalanced(std::string &input)
 {
@@ -227,7 +229,7 @@ token::Token Lexer::NextToken()
             tok.type_ = token::SLANG_PROC_ID;
             return tok;
         }
-        if (IsValidIdentifier(current_char_))
+        if (IsValidIdentifier(current_char_) && !IsDigit(current_char_))
         {
             tok.literal_ = ReadIdentifier();
             tok.type_ = token::LookupIdent(tok.literal_);
@@ -237,6 +239,7 @@ token::Token Lexer::NextToken()
         {
             tok.type_ = token::SLANG_NUMBER;
             tok.literal_ = ReadNumber();
+            std::cout << "Got NUM: " << tok.literal_ << std::endl;
             return tok;
         }
         else
@@ -260,9 +263,21 @@ std::string Lexer::ReadIdentifier()
 
 std::string Lexer::ReadNumber()
 {
+    std::cout << "READ NUM!" << std::endl;
     int position = current_position_;
-    while (IsDigit(current_char_))
+    bool has_decimal_point{false};
+    while (IsDigit(current_char_) || current_char_ == '.')
+    {
+        if (current_char_ == '.')
+        {
+            std::cout << "POINT NUM!" << std::endl;
+            if (!has_decimal_point)
+                has_decimal_point = true;
+            else
+                break; // eek, summit wrong, can only be a single place.
+        }
         ReadChar();
+    }
     return input_.substr(position, current_position_ - position);
 }
 
