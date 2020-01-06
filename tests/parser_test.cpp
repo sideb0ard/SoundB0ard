@@ -82,10 +82,10 @@ bool TestIdentifier(std::shared_ptr<ast::Expression> expr, std::string val)
     return true;
 }
 
-bool TestIntegerLiteral(std::shared_ptr<ast::Expression> expr, int64_t value)
+bool TestNumberLiteral(std::shared_ptr<ast::Expression> expr, int64_t value)
 {
-    std::shared_ptr<ast::IntegerLiteral> integ =
-        std::dynamic_pointer_cast<ast::IntegerLiteral>(expr);
+    std::shared_ptr<ast::NumberLiteral> integ =
+        std::dynamic_pointer_cast<ast::NumberLiteral>(expr);
     if (!integ)
         return false;
     if (integ->value_ != value)
@@ -121,7 +121,7 @@ bool TestLiteralExpression(std::shared_ptr<ast::Expression> expr,
     if (const auto int_ptr(std::get_if<int64_t>(&val)); int_ptr)
     {
         std::cout << "int!" << *int_ptr << "\n";
-        return TestIntegerLiteral(expr, *int_ptr);
+        return TestNumberLiteral(expr, *int_ptr);
     }
     else if (const auto string_ptr(std::get_if<std::string>(&val)); string_ptr)
     {
@@ -460,7 +460,7 @@ TEST_F(ParserTest, TestIfElseExpression)
     if (!TestIdentifier(alternative->expression_, "y"))
         FAIL() << "Not an IdentifierExpression!\n";
 }
-TEST_F(ParserTest, TestIntegerLiteralExpression)
+TEST_F(ParserTest, TestNumberLiteralExpression)
 {
     std::string input = "5";
     std::unique_ptr<lexer::Lexer> lex = std::make_unique<lexer::Lexer>(input);
@@ -476,10 +476,10 @@ TEST_F(ParserTest, TestIntegerLiteralExpression)
     if (!stmt)
         FAIL() << "program_->statements_[0] is not an ExpressionStatement";
 
-    std::shared_ptr<ast::IntegerLiteral> literal =
-        std::dynamic_pointer_cast<ast::IntegerLiteral>(stmt->expression_);
+    std::shared_ptr<ast::NumberLiteral> literal =
+        std::dynamic_pointer_cast<ast::NumberLiteral>(stmt->expression_);
     if (!literal)
-        FAIL() << "Not an IntegerLiteral - got "
+        FAIL() << "Not an NumberLiteral - got "
                << typeid(&stmt->expression_).name();
     ASSERT_EQ(literal->value_, 5);
     ASSERT_EQ(literal->TokenLiteral(), "5");
@@ -745,7 +745,7 @@ TEST_F(ParserTest, TestParsingArray)
         FAIL() << "len(array.elements_) not 3. got="
                << array_lit->elements_.size();
 
-    TestIntegerLiteral(array_lit->elements_[0], 1);
+    TestNumberLiteral(array_lit->elements_[0], 1);
     TestInfixExpression(array_lit->elements_[1], (int64_t)2, "*", (int64_t)2);
     TestInfixExpression(array_lit->elements_[2], (int64_t)3, "+", (int64_t)3);
 }
@@ -791,7 +791,7 @@ TEST_F(ParserTest, TestParsingHashLiteral)
 
         int expected_value = expected.at(string_lit->String());
 
-        TestIntegerLiteral(it.second, expected_value);
+        TestNumberLiteral(it.second, expected_value);
     }
 }
 
@@ -1170,11 +1170,11 @@ TEST_F(ParserTest, TestEveryNPatternFunction)
 
     ASSERT_EQ(2, func_every_n->arguments_.size());
 
-    auto every_n = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+    auto every_n = std::dynamic_pointer_cast<ast::NumberLiteral>(
         func_every_n->arguments_[0]);
 
     if (!every_n)
-        FAIL() << "func_every_n->arguments_[0] is not an IntegerLiteral - got "
+        FAIL() << "func_every_n->arguments_[0] is not an NumberLiteral - got "
                << func_every_n->arguments_[0]->String();
 
     auto func_arg = std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
@@ -1216,11 +1216,11 @@ TEST_F(ParserTest, TestHashEveryNPatternFunction)
 
     ASSERT_EQ(2, func_every_n->arguments_.size());
 
-    auto every_n = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+    auto every_n = std::dynamic_pointer_cast<ast::NumberLiteral>(
         func_every_n->arguments_[0]);
 
     if (!every_n)
-        FAIL() << "func_every_n->arguments_[0] is not an IntegerLiteral - got "
+        FAIL() << "func_every_n->arguments_[0] is not an NumberLiteral - got "
                << func_every_n->arguments_[0]->String();
 
     auto func_arg = std::dynamic_pointer_cast<ast::PatternFunctionExpression>(

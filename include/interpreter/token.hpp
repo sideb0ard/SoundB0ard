@@ -13,7 +13,7 @@ const TokenType SLANG_ILLEGAL = "ILLEGAL";
 const TokenType SLANG_EOFF = "EOF";
 
 const TokenType SLANG_IDENT = "IDENT";
-const TokenType SLANG_INT = "INT";
+const TokenType SLANG_NUMBER = "NUMBER";
 const TokenType SLANG_STRING = "STRING";
 
 const TokenType SLANG_ASSIGN = "=";

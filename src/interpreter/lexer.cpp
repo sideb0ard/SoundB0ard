@@ -235,7 +235,7 @@ token::Token Lexer::NextToken()
         }
         else if (IsDigit(current_char_))
         {
-            tok.type_ = token::SLANG_INT;
+            tok.type_ = token::SLANG_NUMBER;
             tok.literal_ = ReadNumber();
             return tok;
         }

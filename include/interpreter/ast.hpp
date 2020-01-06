@@ -62,16 +62,16 @@ class Identifier : public Expression
     std::string value_;
 };
 
-class IntegerLiteral : public Expression
+class NumberLiteral : public Expression
 {
   public:
-    IntegerLiteral() {}
-    explicit IntegerLiteral(Token token) : Expression{token} {}
-    IntegerLiteral(Token token, int64_t val) : Expression{token}, value_{val} {}
+    NumberLiteral() {}
+    explicit NumberLiteral(Token token) : Expression{token} {}
+    NumberLiteral(Token token, double val) : Expression{token}, value_{val} {}
     std::string String() const override;
 
   public:
-    int64_t value_;
+    double value_;
 };
 
 class StringLiteral : public Expression

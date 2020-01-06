@@ -291,7 +291,7 @@ std::string InfixExpression::String() const
 }
 
 std::string Identifier::String() const { return value_; }
-std::string IntegerLiteral::String() const { return token_.literal_; }
+std::string NumberLiteral::String() const { return token_.literal_; }
 std::string BooleanExpression::String() const { return token_.literal_; }
 
 } // namespace ast

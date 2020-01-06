@@ -114,8 +114,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     }
 
     // Expressions
-    std::shared_ptr<ast::IntegerLiteral> il =
-        std::dynamic_pointer_cast<ast::IntegerLiteral>(node);
+    std::shared_ptr<ast::NumberLiteral> il =
+        std::dynamic_pointer_cast<ast::NumberLiteral>(node);
     if (il)
     {
         return std::make_shared<object::Integer>(il->value_);
@@ -744,7 +744,7 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
             {
                 std::cout << "EVEYRRRR!\n";
                 assert(func->arguments_.size() == 2);
-                auto intval = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
                     func->arguments_[0]);
                 auto func_arg =
                     std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
@@ -769,14 +769,14 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
             else if (func->token_.literal_ == token::SLANG_ROTATE_LEFT)
             {
                 assert(func->arguments_.size() == 1);
-                auto intval = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
                     func->arguments_[0]);
                 std::cout << "ROT LEFT! by " << intval << "\n";
             }
             else if (func->token_.literal_ == token::SLANG_ROTATE_RIGHT)
             {
                 assert(func->arguments_.size() == 1);
-                auto intval = std::dynamic_pointer_cast<ast::IntegerLiteral>(
+                auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
                     func->arguments_[0]);
                 std::cout << "ROT RIGHT! by " << intval << "\n";
             }

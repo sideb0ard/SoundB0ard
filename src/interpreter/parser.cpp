@@ -336,8 +336,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
 {
     if (cur_token_.type_ == token::SLANG_IDENT)
         return ParseIdentifier();
-    else if (cur_token_.type_ == token::SLANG_INT)
-        return ParseIntegerLiteral();
+    else if (cur_token_.type_ == token::SLANG_NUMBER)
+        return ParseNumberLiteral();
     else if (cur_token_.type_ == token::SLANG_INCREMENT)
         return ParsePrefixExpression();
     else if (cur_token_.type_ == token::SLANG_DECREMENT)
@@ -429,10 +429,10 @@ std::shared_ptr<ast::Expression> Parser::ParseHashLiteral()
     return hash_lit;
 }
 
-std::shared_ptr<ast::Expression> Parser::ParseIntegerLiteral()
+std::shared_ptr<ast::Expression> Parser::ParseNumberLiteral()
 {
-    auto literal = std::make_shared<ast::IntegerLiteral>(cur_token_);
-    int64_t val = std::stoll(cur_token_.literal_, nullptr, 10);
+    auto literal = std::make_shared<ast::NumberLiteral>(cur_token_);
+    double val = std::stod(cur_token_.literal_);
     literal->value_ = val;
     return literal;
 }
