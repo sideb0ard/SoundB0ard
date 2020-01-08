@@ -186,7 +186,7 @@ std::string GranularExpression::String() const { return "GRANULAR"; }
 std::string PatternFunctionExpression::String() const
 {
     std::stringstream ss;
-    ss << "PATTERN FUNCTION:" << token_.literal_;
+    ss << "PATTERN FUNCTION EXPRESSION!:" << token_.literal_;
 
     return ss.str();
 }

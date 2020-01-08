@@ -603,9 +603,11 @@ void Parser::ConsumePatternFunctions(
     // discard pipe '|'
     NextToken();
 
+    // first token is name of function
     auto func = std::make_shared<ast::PatternFunctionExpression>(cur_token_);
     NextToken();
 
+    // the rest are arguments
     while (!CurTokenIs(token::SLANG_PIPE) && !CurTokenIs(token::SLANG_EOFF))
     {
         auto expr = ParseExpression(Precedence::LOWEST);

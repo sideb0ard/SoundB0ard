@@ -24,3 +24,17 @@ void PatternReverse::TransformPattern(
 }
 
 std::string PatternReverse::String() const { return "PatternReeeeeverse"; }
+
+void PatternTranspose::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num) const
+{
+}
+std::string PatternTranspose::String() const { return "PatternTranzzzpose"; }
+
+void PatternRotate::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num) const
+{
+}
+std::string PatternRotate::String() const { return "PatternRoooootate!"; }
