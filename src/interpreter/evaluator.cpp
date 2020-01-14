@@ -207,6 +207,21 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::cout << "YA WEE SHITE!!\n";
     }
 
+    std::shared_ptr<ast::PlayStatement> play_expr =
+        std::dynamic_pointer_cast<ast::PlayStatement>(node);
+    if (play_expr)
+    {
+        std::cout << "PLAY EVAL!\n";
+        std::shared_ptr<ast::StringLiteral> fpath =
+            std::dynamic_pointer_cast<ast::StringLiteral>(play_expr->path_);
+        if (fpath)
+        {
+            char *fname = fpath->value_.data();
+            std::cout << "Filename is " << fpath->value_.c_str() << std::endl;
+            mixer_preview_audio(mixr, fname);
+        }
+    }
+
     std::shared_ptr<ast::PsStatement> ps_expr =
         std::dynamic_pointer_cast<ast::PsStatement>(node);
     if (ps_expr)
@@ -767,6 +782,7 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             std::cerr << "NAE NAE!\n";
             return nullptr;
         }
+        std::cout << "EVERRRRY " << intval->value_ << "!\n";
 
         auto funcy = EvalPatternFunctionExpression(func->arguments_[1]);
         if (funcy)
@@ -787,22 +803,24 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         std::cout << "REV!\n";
         return std::make_shared<PatternReverse>();
     }
-    else if (func->token_.literal_ == token::SLANG_ROTATE_LEFT)
+    else if (func->token_.literal_ == "rotl")
     {
         // if (func->arguments_.size() > 1)
         //{
         //    auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
         //        func->arguments_[0]);
         std::cout << "ROT LEFT!\n";
+        return std::make_shared<PatternRotate>(LEFT, 1);
         //}
     }
-    else if (func->token_.literal_ == token::SLANG_ROTATE_RIGHT)
+    else if (func->token_.literal_ == "rotr")
     {
         // if (func->arguments_.size() > 1)
         //{
         //    auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
         //        func->arguments_[0]);
-        std::cout << "ROT RIGHT!\n";
+        std::cout << "ROT RIGHT! " << RIGHT << "\n";
+        return std::make_shared<PatternRotate>(RIGHT, 1);
         //}
     }
     else

@@ -1177,8 +1177,12 @@ int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree)
 
 void mixer_preview_audio(mixer *mixr, char *filename)
 {
-    mixr->preview.enabled = false;
-    preview_buffer_import_file(&mixr->preview, filename);
+    std::cout << "PREVIEW!! " << filename << std::endl;
+    if (is_valid_file(filename))
+    {
+        mixr->preview.enabled = false;
+        preview_buffer_import_file(&mixr->preview, filename);
+    }
 }
 
 void preview_buffer_import_file(preview_buffer *buffy, char *filename)

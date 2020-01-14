@@ -286,16 +286,12 @@ class midi_event
 struct MusicalEvent
 {
     MusicalEvent() = default;
-    MusicalEvent(std::string value) : value_{value} {}
+    MusicalEvent(std::string value, ProcessPatternTarget target_type)
+        : value_{value}, target_type_{target_type}
+    {
+    }
     std::string value_;
+    ProcessPatternTarget target_type_;
 };
 
 typedef midi_event midi_pattern[PPBAR];
-
-typedef enum
-{
-    MIDI_PATTERN, // numbers
-    NOTE_PATTERN, // alphanums
-    BEAT_PATTERN, // env variables
-    STEP_PATTERN, // individual step sequencers
-} pattern_type;

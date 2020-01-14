@@ -36,5 +36,13 @@ void PatternRotate::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
     int loop_num) const
 {
+    std::cout << "ROTATTRRRR! " << direction_ << ":" << num_sixteenth_steps_
+              << std::endl;
+    if (direction_ == LEFT)
+        std::rotate(events.begin(), events.begin() + (PPSIXTEENTH),
+                    events.end());
+    else if (direction_ == RIGHT)
+        std::rotate(events.begin(), events.begin() + (PPBAR - PPSIXTEENTH),
+                    events.end());
 }
 std::string PatternRotate::String() const { return "PatternRoooootate!"; }

@@ -46,6 +46,8 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
         return ParsePsStatement();
     else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
         return ParseForStatement();
+    else if (cur_token_.type_.compare(token::SLANG_PLAY) == 0)
+        return ParsePlayStatement();
     else if (cur_token_.type_.compare(token::SLANG_PROC_ID) == 0)
         return ParseProcessStatement();
     else if (cur_token_.type_.compare(token::SLANG_SET) == 0)
@@ -108,6 +110,25 @@ std::shared_ptr<ast::LsStatement> Parser::ParseLsStatement()
         std::make_shared<ast::LsStatement>(cur_token_);
 
     // TODO - make a list of paths
+    if (!PeekTokenIs(token::SLANG_SEMICOLON))
+    {
+        NextToken();
+        std::cout << "Cur token is " << cur_token_ << std::endl;
+        stmt->path_ = ParseStringLiteral();
+    }
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::PlayStatement> Parser::ParsePlayStatement()
+{
+    std::cout << "PLaY!\n";
+    std::shared_ptr<ast::PlayStatement> stmt =
+        std::make_shared<ast::PlayStatement>(cur_token_);
+
     if (!PeekTokenIs(token::SLANG_SEMICOLON))
     {
         NextToken();
@@ -425,7 +446,7 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseEveryExpression();
     else if (cur_token_.type_ == token::SLANG_REV ||
              cur_token_.type_ == token::SLANG_ROTATE_LEFT ||
-             cur_token_.type_ == token::SLANG_ROTATE_LEFT)
+             cur_token_.type_ == token::SLANG_ROTATE_RIGHT)
         return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
 
     std::cout << "No Prefix parser for " << cur_token_.type_ << std::endl;

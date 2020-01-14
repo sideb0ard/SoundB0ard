@@ -22,6 +22,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"every", SLANG_EVERY},
     {"over", SLANG_OVER},
     {"set", SLANG_SET},
+    {"play", SLANG_PLAY},
     {"ps", SLANG_PS},
     {"ls", SLANG_LS},
     {"proc", SLANG_PROC},
