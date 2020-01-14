@@ -784,17 +784,22 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         }
         std::cout << "EVERRRRY " << intval->value_ << "!\n";
 
-        auto funcy = EvalPatternFunctionExpression(func->arguments_[1]);
-        if (funcy)
+        auto func_arg_ast = std::make_shared<ast::PatternFunctionExpression>(
+            func->arguments_[1]->token_);
+
+        if (func_arg_ast)
         {
-
+            int args_size = func->arguments_.size();
+            if (args_size > 2)
+            {
+                std::cout << "GOTZ " << args_size << " args\n";
+                for (int i = 2; i < args_size; i++)
+                    func_arg_ast->arguments_.push_back(func->arguments_[i]);
+            }
+            auto func_arg = EvalPatternFunctionExpression(func_arg_ast);
             auto p_every =
-                std::make_shared<PatternEvery>(intval->value_, funcy);
+                std::make_shared<PatternEvery>(intval->value_, func_arg);
 
-            // std::cout << "SIZE OF VARS IS " << func->arguments_.size()
-            //          << std::endl;
-            // for (auto a : func->arguments_)
-            std::cout << "GOT ARG FUNC - RETURNING AN EVERY!\n";
             return p_every;
         }
     }
@@ -803,25 +808,22 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         std::cout << "REV!\n";
         return std::make_shared<PatternReverse>();
     }
-    else if (func->token_.literal_ == "rotl")
+    else if (func->token_.literal_ == "rotl" || func->token_.literal_ == "rotr")
     {
-        // if (func->arguments_.size() > 1)
-        //{
-        //    auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
-        //        func->arguments_[0]);
-        std::cout << "ROT LEFT!\n";
-        return std::make_shared<PatternRotate>(LEFT, 1);
-        //}
-    }
-    else if (func->token_.literal_ == "rotr")
-    {
-        // if (func->arguments_.size() > 1)
-        //{
-        //    auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
-        //        func->arguments_[0]);
-        std::cout << "ROT RIGHT! " << RIGHT << "\n";
-        return std::make_shared<PatternRotate>(RIGHT, 1);
-        //}
+        std::cout << "ROTATE!\n";
+        int num_sixteenth_steps = 1;
+        if (func->arguments_.size() > 0)
+        {
+            auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
+                func->arguments_[0]);
+            if (intval)
+                num_sixteenth_steps = intval->value_;
+        }
+
+        if (func->token_.literal_ == "rotl")
+            return std::make_shared<PatternRotate>(LEFT, num_sixteenth_steps);
+        else
+            return std::make_shared<PatternRotate>(RIGHT, num_sixteenth_steps);
     }
     else
     {
