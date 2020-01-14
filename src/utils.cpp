@@ -1117,3 +1117,27 @@ uint16_t mask_from_string(char *stringey_mask)
 
     return bin_mask;
 }
+
+bool IsDigit(char c) { return '0' <= c && c <= '9'; }
+
+bool IsValidIdentifier(char c)
+{
+    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' ||
+           c == '/' || c == '-' || c == '.' || IsDigit(c);
+}
+
+bool IsBalanced(std::string &input)
+{
+    // dumb algorithm counting matching number of curly braces.
+    int num_braces = 0;
+    const int len = input.length();
+    for (int i = 0; i < len; i++)
+    {
+        if (input[i] == '{')
+            num_braces++;
+        else if (input[i] == '}')
+            num_braces--;
+    }
+
+    return num_braces == 0;
+}

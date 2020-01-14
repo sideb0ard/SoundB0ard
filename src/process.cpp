@@ -88,6 +88,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 continue;
             std::string cmd =
                 std::string("noteOn(") + e->value_ + "," + "127, 250)";
+            std::cout << "COMMAND:" << cmd << std::endl;
 
             Interpret(cmd.data(), global_env);
         }

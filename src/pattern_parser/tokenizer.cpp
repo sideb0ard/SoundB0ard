@@ -1,34 +1,8 @@
 #include <pattern_parser/tokenizer.hpp>
+#include <utils.h>
 
 #include <iostream>
 #include <string>
-
-namespace
-{
-bool IsValidIdentifier(char c)
-{
-    return ('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || c == '_' ||
-           c == '~' || c == '-' || c == '.';
-}
-bool IsDigit(char c) { return '0' <= c && c <= '9'; }
-
-bool IsBalanced(std::string &input)
-{
-    // dumb algorithm counting matching number of curly braces.
-    int num_braces = 0;
-    const int len = input.length();
-    for (int i = 0; i < len; i++)
-    {
-        if (input[i] == '{')
-            num_braces++;
-        else if (input[i] == '}')
-            num_braces--;
-    }
-
-    return num_braces == 0;
-}
-
-} // namespace
 
 namespace pattern_parser
 {
@@ -136,7 +110,7 @@ pattern_parser::Token Tokenizer::NextToken()
         tok.type_ = pattern_parser::PATTERN_EOF;
         break;
     default:
-        if (IsValidIdentifier(current_char_))
+        if (IsValidIdentifier(current_char_) && !IsDigit(current_char_))
         {
             tok.literal_ = ReadIdentifier();
             tok.type_ = PATTERN_IDENT;
