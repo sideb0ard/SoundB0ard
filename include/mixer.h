@@ -8,7 +8,7 @@
 
 #include "ableton_link_wrapper.h"
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "defjams.h"
 #include "digisynth.h"
 #include "dxsynth.h"

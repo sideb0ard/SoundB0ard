@@ -1,7 +1,7 @@
 #ifndef SBMSG_H
 #define SBMSG_H
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 
 typedef struct sbmsg
 {

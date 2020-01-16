@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "digisynth_voice.h"
 
 class digisynth : public SoundGenerator

@@ -9,7 +9,7 @@
 
 #include <portaudio.h>
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "ableton_link_wrapper.h"
 #include "bitshift.h"
 #include "defjams.h"

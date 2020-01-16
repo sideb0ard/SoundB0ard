@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "defjams.h"
 #include "distortion.h"
 #include "envelope_generator.h"

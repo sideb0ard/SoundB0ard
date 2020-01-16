@@ -1,6 +1,6 @@
 #pragma once
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "envelope_generator.h"
 #include "filter_moogladder.h"
 #include "stereodelay.h"

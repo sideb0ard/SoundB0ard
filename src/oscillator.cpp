@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "modmatrix.h"
 #include "oscillator.h"
 #include "utils.h"

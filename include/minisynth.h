@@ -3,7 +3,7 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "dca.h"
 #include "envelope_generator.h"
 #include "filter.h"

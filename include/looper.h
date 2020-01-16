@@ -1,7 +1,7 @@
 #ifndef LOOPER_H
 #define LOOPER_H
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "envelope_generator.h"
 #include <stdbool.h>
 #include <wchar.h>

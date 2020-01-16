@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "SoundGenerator.h"
+#include "soundgenerator.h"
 #include "basicfilterpass.h"
 #include "beatrepeat.h"
 #include "bitcrush.h"
