@@ -37,11 +37,11 @@ class SoundGenerator
     virtual void SetParam(std::string name, double val) = 0;
     virtual double GetParam(std::string name) = 0;
 
-    void setVolume(double val);
-    double getVolume();
+    void SetVolume(double val);
+    double GetVolume();
 
-    void setPan(double val);
-    double getPan();
+    void SetPan(double val);
+    double GetPan();
 
   public:
     sound_generator_type type;

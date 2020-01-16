@@ -46,12 +46,16 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
         return ParsePsStatement();
     else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
         return ParseForStatement();
+    else if (cur_token_.type_.compare(token::SLANG_PAN) == 0)
+        return ParsePanStatement();
     else if (cur_token_.type_.compare(token::SLANG_PLAY) == 0)
         return ParsePlayStatement();
     else if (cur_token_.type_.compare(token::SLANG_PROC_ID) == 0)
         return ParseProcessStatement();
     else if (cur_token_.type_.compare(token::SLANG_SET) == 0)
         return ParseSetStatement();
+    else if (cur_token_.type_.compare(token::SLANG_VOLUME) == 0)
+        return ParseVolumeStatement();
     else
         return ParseExpressionStatement();
 }
@@ -194,6 +198,62 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
 
     // if (PeekTokenIs(token::SLANG_SEMICOLON))
     //    NextToken();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
+{
+    std::shared_ptr<ast::VolumeStatement> stmt =
+        std::make_shared<ast::VolumeStatement>(cur_token_);
+
+    std::cout << "VOL ME UP YO!" << std::endl;
+    if (!ExpectPeek(token::SLANG_IDENT))
+    {
+        std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    stmt->target_ = ParseIdentifier();
+
+    if (!ExpectPeek(token::SLANG_NUMBER))
+    {
+        std::cout << "NOT GOT NU<M ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    stmt->value_ = std::stod(cur_token_.literal_);
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement()
+{
+    std::shared_ptr<ast::PanStatement> stmt =
+        std::make_shared<ast::PanStatement>(cur_token_);
+
+    std::cout << "PAN ME UP YO!" << std::endl;
+    if (!ExpectPeek(token::SLANG_IDENT))
+    {
+        std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    stmt->target_ = ParseIdentifier();
+
+    if (!ExpectPeek(token::SLANG_NUMBER))
+    {
+        std::cout << "NOT GOT NU<M ! Peek token is " << peek_token_
+                  << std::endl;
+        return nullptr;
+    }
+    stmt->value_ = std::stod(cur_token_.literal_);
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
 
     return stmt;
 }

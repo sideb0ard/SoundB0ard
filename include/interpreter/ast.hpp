@@ -399,6 +399,28 @@ class PsStatement : public Statement
     std::string String() const override;
 };
 
+class VolumeStatement : public Statement
+{
+  public:
+    explicit VolumeStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> target_{nullptr};
+    double value_;
+};
+
+class PanStatement : public Statement
+{
+  public:
+    explicit PanStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> target_{nullptr};
+    double value_;
+};
+
 // ROOT //////////////////////
 
 class Program : public Node

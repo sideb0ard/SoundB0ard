@@ -60,7 +60,9 @@ const TokenType SLANG_OVER = "OVER";
 const TokenType SLANG_PS = "PS";
 const TokenType SLANG_LS = "LS";
 const TokenType SLANG_SET = "SET";
+const TokenType SLANG_PAN = "PAN";
 const TokenType SLANG_PLAY = "PLAY";
+const TokenType SLANG_VOLUME = "VOLUME";
 
 // instruments
 const TokenType SLANG_SAMPLE = "SAMPLE";

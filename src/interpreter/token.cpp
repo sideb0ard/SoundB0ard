@@ -22,6 +22,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"every", SLANG_EVERY},
     {"over", SLANG_OVER},
     {"set", SLANG_SET},
+    {"pan", SLANG_PAN},
     {"play", SLANG_PLAY},
     {"ps", SLANG_PS},
     {"ls", SLANG_LS},
@@ -29,6 +30,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"rev", SLANG_REV},
     {"rotl", SLANG_ROTATE_LEFT},
     {"rotr", SLANG_ROTATE_RIGHT},
+    {"vol", SLANG_VOLUME},
 };
 
 TokenType LookupIdent(std::string ident)

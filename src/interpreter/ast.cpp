@@ -74,6 +74,24 @@ std::string SetStatement::String() const
     return ss.str();
 }
 
+std::string VolumeStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << ";";
+
+    return ss.str();
+}
+
+std::string PanStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << ";";
+
+    return ss.str();
+}
+
 std::string ForStatement::String() const
 {
     std::stringstream ss;

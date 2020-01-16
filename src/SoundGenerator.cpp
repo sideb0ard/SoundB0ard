@@ -22,9 +22,9 @@ SoundGenerator::SoundGenerator(){};
 
 // extern mixer *mixr;
 
-double SoundGenerator::getVolume() { return volume; }
+double SoundGenerator::GetVolume() { return volume; }
 
-void SoundGenerator::setVolume(double val)
+void SoundGenerator::SetVolume(double val)
 {
     if (val >= 0.0 && val <= 1.0)
         volume = val;
@@ -351,9 +351,9 @@ void SoundGenerator::noteOffDelayed(midi_event ev, int event_off_tick)
     sequence_engine_add_temporal_event(&engine, event_off_tick, ev);
 }
 
-double SoundGenerator::getPan() { return pan; }
+double SoundGenerator::GetPan() { return pan; }
 
-void SoundGenerator::setPan(double val)
+void SoundGenerator::SetPan(double val)
 {
     if (val >= -1.0 && val <= 1.0)
         pan = val;

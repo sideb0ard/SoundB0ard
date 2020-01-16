@@ -2407,9 +2407,9 @@ void minisynth::SetParam(std::string name, double val)
 {
     std::cout << "SET PARAM:" << name << " :" << val << std::endl;
     if (name == "vol")
-        setVolume(val);
+        SetVolume(val);
     else if (name == "pan")
-        setPan(val);
+        SetPan(val);
     else if (name == "voice")
         minisynth_set_voice_mode(this, val);
     else if (name == "mono")

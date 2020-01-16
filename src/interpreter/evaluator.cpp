@@ -207,6 +207,28 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::cout << "YA WEE SHITE!!\n";
     }
 
+    std::shared_ptr<ast::PanStatement> pan_stmt =
+        std::dynamic_pointer_cast<ast::PanStatement>(node);
+    if (pan_stmt)
+    {
+        std::cout << "PAN EVAL!\n";
+        auto target = Eval(pan_stmt->target_, env);
+        auto soundgen =
+            std::dynamic_pointer_cast<object::SoundGenerator>(target);
+        if (soundgen)
+        {
+            std::cout << "YA BEAUTY!!\n";
+            if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
+            {
+                SoundGenerator *sg =
+                    mixr->SoundGenerators[soundgen->soundgen_id_];
+                sg->SetPan(pan_stmt->value_);
+            }
+        }
+        else
+            std::cout << "PAN, YA WEE SHITE!!\n";
+    }
+
     std::shared_ptr<ast::PlayStatement> play_expr =
         std::dynamic_pointer_cast<ast::PlayStatement>(node);
     if (play_expr)
@@ -228,6 +250,30 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     {
         mixer_ps(mixr, true);
     }
+
+    std::shared_ptr<ast::VolumeStatement> vol_stmt =
+        std::dynamic_pointer_cast<ast::VolumeStatement>(node);
+    if (vol_stmt)
+    {
+        std::cout << "VOL EVAL!\n";
+        auto target = Eval(vol_stmt->target_, env);
+        auto soundgen =
+            std::dynamic_pointer_cast<object::SoundGenerator>(target);
+        if (soundgen)
+        {
+            std::cout << "YA BEAUTY!!\n";
+            if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
+            {
+                SoundGenerator *sg =
+                    mixr->SoundGenerators[soundgen->soundgen_id_];
+                sg->SetVolume(vol_stmt->value_);
+            }
+        }
+        else
+            std::cout << "VOL, YA WEE SHITE!!\n";
+    }
+
+    ///////////////////////////////////////////////////////////////
 
     std::shared_ptr<ast::Identifier> ident =
         std::dynamic_pointer_cast<ast::Identifier>(node);

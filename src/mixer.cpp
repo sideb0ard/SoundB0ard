@@ -255,7 +255,7 @@ void mixer_status_sgz(mixer *mixr, bool all)
             if (mixr->SoundGenerators[i] != NULL)
             {
                 if ((mixr->SoundGenerators[i]->active &&
-                     mixr->SoundGenerators[i]->getVolume() > 0.0) ||
+                     mixr->SoundGenerators[i]->GetVolume() > 0.0) ||
                     all)
                 {
                     wmemset(wss, 0, MAX_STATIC_STRING_SZ);
@@ -394,7 +394,7 @@ void vol_change(mixer *mixr, int sg, float vol)
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->SoundGenerators[sg]->setVolume(vol);
+    mixr->SoundGenerators[sg]->SetVolume(vol);
 }
 
 void pan_change(mixer *mixr, int sg, float val)
@@ -404,7 +404,7 @@ void pan_change(mixer *mixr, int sg, float val)
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->SoundGenerators[sg]->setPan(val);
+    mixr->SoundGenerators[sg]->SetPan(val);
 }
 
 int add_sound_generator(mixer *mixr, SoundGenerator *sg)
