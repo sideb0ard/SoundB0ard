@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <interpreter/evaluator.hpp>
+#include <interpreter/fx_cmds.hpp>
 #include <keys.h>
 #include <midi_cmds.h>
 #include <mixer.h>
@@ -310,33 +311,20 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          sg->noteOffDelayed(event_off, midi_off_tick);
                      }
                  }
-                 // auto sample =
-                 //    std::dynamic_pointer_cast<object::Sample>(args[0]);
-                 // if (sample)
-                 //{
-                 //    if (mixer_is_valid_soundgen_num(mixr,
-                 //                                    sample->soundgen_id_))
-                 //    {
-                 //        SoundGenerator *sg =
-                 //            mixr->SoundGenerators[sample->soundgen_id_];
-                 //        sg->noteOn(event_on);
-                 //    }
-                 //}
-                 // auto gran =
-                 //    std::dynamic_pointer_cast<object::Granular>(args[0]);
-                 // if (gran)
-                 //{
-                 //    if (mixer_is_valid_soundgen_num(mixr,
-                 //    gran->soundgen_id_))
-                 //    {
-                 //        SoundGenerator *sg =
-                 //            mixr->SoundGenerators[gran->soundgen_id_];
-                 //        sg->noteOn(event_on);
-                 //    }
-                 //}
              }
              return evaluator::NULLL;
          })},
+    {"addFx", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> args)
+                      -> std::shared_ptr<object::Object> {
+                      int args_size = args.size();
+                      if (args_size >= 2)
+                      {
+                          std::cout << "BOOM, ADDING FX!\n";
+                          fxcmds::ParseFXCmd(args);
+                      }
+                      return evaluator::NULLL;
+                  })},
     {"rand",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

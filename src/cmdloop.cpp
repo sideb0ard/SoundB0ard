@@ -11,7 +11,6 @@
 
 #include <algo_cmds.h>
 #include <cmdloop.h>
-#include <fx_cmds.h>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/lexer.hpp>
 #include <interpreter/object.hpp>
@@ -179,7 +178,6 @@ void Interpret(char *line, std::shared_ptr<object::Environment> env)
 
     std::shared_ptr<ast::Program> program = parsley->ParseProgram();
 
-    // g_queue.push(std::make_pair(program, env));
     auto evaluated = evaluator::Eval(program, env);
     if (evaluated)
     {

@@ -50,29 +50,6 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     return ret;
 }
 
-static void *Evaluator(void *arg)
-{
-    while (auto const &Wrapper = g_queue.pop())
-    {
-        if (Wrapper)
-        {
-            const std::lock_guard<std::mutex> lock(g_stdout_mutex);
-            auto &[node, env] = *Wrapper;
-            auto evaluated = evaluator::Eval(node, env);
-            if (evaluated)
-            {
-                auto result = evaluated->Inspect();
-                if (result.compare("null") != 0)
-                {
-                    std::cout << result << std::endl;
-                }
-            }
-        }
-    }
-
-    return nullptr;
-}
-
 int main()
 {
 
@@ -113,15 +90,7 @@ int main()
         fprintf(stderr, "Errrr, wit tha Loopy..\n");
     }
 
-    // Worker Thread
-    // pthread_t eval_th;
-    // if (pthread_create(&eval_th, NULL, Evaluator, NULL))
-    //{
-    //    fprintf(stderr, "Errrr, wit tha Evaluator thread!..\n");
-    //}
-
     pthread_join(input_th, NULL);
-    // pthread_join(eval_th, NULL);
 
     // all done, time to go home
     pa_teardown();

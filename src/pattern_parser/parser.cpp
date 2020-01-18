@@ -41,7 +41,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     std::shared_ptr<pattern_parser::PatternNode> return_node;
 
     if (cur_token_.type_.compare(pattern_parser::PATTERN_IDENT) == 0 ||
-        cur_token_.type_.compare(pattern_parser::PATTERN_NUMBER) == 0)
+        cur_token_.type_.compare(pattern_parser::PATTERN_NUMBER) == 0 ||
+        cur_token_.type_.compare(pattern_parser::PATTERN_TILDE) == 0)
         return_node = ParsePatternLeaf();
     else if (cur_token_.type_.compare(
                  pattern_parser::PATTERN_SQUARE_BRACKET_LEFT) == 0)

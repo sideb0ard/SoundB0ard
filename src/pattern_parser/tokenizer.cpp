@@ -106,6 +106,10 @@ pattern_parser::Token Tokenizer::NextToken()
         tok.type_ = pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET;
         tok.literal_ = current_char_;
         break;
+    case ('~'):
+        tok.type_ = pattern_parser::PATTERN_TILDE;
+        tok.literal_ = current_char_;
+        break;
     case (0):
         tok.type_ = pattern_parser::PATTERN_EOF;
         break;
