@@ -3,9 +3,9 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "defjams.h"
-#include "envelope.h"
-#include "fx.h"
+#include <defjams.h>
+#include <fx/envelope.h>
+#include <fx/fx.h>
 
 #include "SequenceEngine.h"
 
@@ -59,7 +59,7 @@ class SoundGenerator
 
     int effects_size; // size of array
     int effects_num;  // num of effects
-    fx **effects;
+    Fx **effects;
     int effects_on; // bool
 };
 

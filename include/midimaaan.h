@@ -1,8 +1,9 @@
 #pragma once
 
-#include "defjams.h"
-#include "fx.h"
-#include "pthread.h"
+#include <pthread.h>
+
+#include <defjams.h>
+#include <fx/fx.h>
 
 typedef enum
 {

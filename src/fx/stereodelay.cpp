@@ -7,224 +7,212 @@
 
 extern mixer *mixr;
 
-stereodelay *new_stereo_delay(double duration)
+StereoDelay::StereoDelay(double duration) : m_delay_time_ms_{duration}
 {
-    stereodelay *d = (stereodelay *)calloc(1, sizeof(stereodelay));
+    m_feedback_percent_ = 2;
+    m_delay_ratio_ = 0.2;
+    m_wet_mix_ = 0.7;
+    m_mode_ = TAP2;
 
-    d->m_delay_time_ms = duration;
-    d->m_feedback_percent = 2;
-    d->m_delay_ratio = 0.2;
-    d->m_wet_mix = 0.7;
-    d->m_mode = TAP2;
+    type_ = DELAY;
+    enabled_ = true;
 
-    d->m_fx.type = DELAY;
-    d->m_fx.enabled = true;
-    d->m_fx.status = &stereo_delay_status;
-    d->m_fx.process = &stereo_delay_process_wrapper;
-    d->m_fx.event_notify = &stereo_delay_event_notify;
+    sync_ = true;
+    sync_len_ = DELAY_SYNC_SIXTEENTH;
 
-    d->sync = true;
-    d->sync_len = DELAY_SYNC_SIXTEENTH;
+    lfo1_on_ = false;
+    m_lfo1_min_ = 50;
+    m_lfo1_max_ = 80;
+    osc_new_settings((oscillator *)&m_lfo1_);
+    lfo_set_sound_generator_interface(&m_lfo1_);
+    m_lfo1_.osc.m_osc_fo = 0.01; // default LFO
+    m_lfo1_.osc.m_amplitude = 1.;
+    lfo_start_oscillator((oscillator *)&m_lfo1_);
 
-    d->lfo1_on = false;
-    d->m_lfo1_min = 50;
-    d->m_lfo1_max = 80;
-    osc_new_settings((oscillator *)&d->m_lfo1);
-    lfo_set_sound_generator_interface(&d->m_lfo1);
-    d->m_lfo1.osc.m_osc_fo = 0.01; // default LFO
-    d->m_lfo1.osc.m_amplitude = 1.;
-    lfo_start_oscillator((oscillator *)&d->m_lfo1);
+    lfo2_on_ = false;
+    m_lfo2_min_ = 50;
+    m_lfo2_max_ = 80;
+    osc_new_settings((oscillator *)&m_lfo2_);
+    lfo_set_sound_generator_interface(&m_lfo2_);
+    m_lfo2_.osc.m_osc_fo = 0.01; // default LFO
+    m_lfo2_.osc.m_amplitude = 1.;
+    lfo_start_oscillator((oscillator *)&m_lfo2_);
 
-    d->lfo2_on = false;
-    d->m_lfo2_min = 50;
-    d->m_lfo2_max = 80;
-    osc_new_settings((oscillator *)&d->m_lfo2);
-    lfo_set_sound_generator_interface(&d->m_lfo2);
-    d->m_lfo2.osc.m_osc_fo = 0.01; // default LFO
-    d->m_lfo2.osc.m_amplitude = 1.;
-    lfo_start_oscillator((oscillator *)&d->m_lfo2);
+    PrepareForPlay();
+    Update();
 
-    stereo_delay_prepare_for_play(d);
-    stereo_delay_update(d);
-
-    stereo_delay_sync_tempo(d);
-
-    return d;
+    SyncTempo();
 }
 
-void stereo_delay_event_notify(void *self, broadcast_event event)
+void StereoDelay::EventNotify(broadcast_event event)
 {
     if (event.type == TIME_BPM_CHANGE)
     {
-        stereodelay *sd = (stereodelay *)self;
-        if (sd->sync)
-            stereo_delay_sync_tempo(sd);
+        if (sync_)
+            SyncTempo();
     }
 }
 
-void stereo_delay_reset(stereodelay *d)
+void StereoDelay::Reset()
 {
-    delayline_reset(&d->m_left_delay);
-    delayline_reset(&d->m_right_delay);
+    delayline_reset(&m_left_delay_);
+    delayline_reset(&m_right_delay_);
 }
 
-void stereo_delay_prepare_for_play(stereodelay *d)
+void StereoDelay::PrepareForPlay()
 {
     // delay line memory allocated here
-    delayline_init(&d->m_left_delay, 2.0 * SAMPLE_RATE);
-    delayline_init(&d->m_right_delay, 2.0 * SAMPLE_RATE);
-    stereo_delay_reset(d);
+    delayline_init(&m_left_delay_, 2.0 * SAMPLE_RATE);
+    delayline_init(&m_right_delay_, 2.0 * SAMPLE_RATE);
+    Reset();
 }
 
-void stereo_delay_set_mode(stereodelay *d, unsigned mode)
+void StereoDelay::SetMode(unsigned mode)
 {
     if (mode < MAX_NUM_DELAY_MODE)
-        d->m_mode = mode;
+        m_mode_ = mode;
     else
         printf("Delay mode must be between 0 and %d\n", MAX_NUM_DELAY_MODE);
 }
 
-void stereo_delay_set_delay_time_ms(stereodelay *d, double delay_ms)
+void StereoDelay::SetDelayTimeMs(double delay_ms)
 {
     if (delay_ms >= 0 && delay_ms <= 2000)
     {
-        d->m_delay_time_ms = delay_ms;
-        stereo_delay_update(d);
+        m_delay_time_ms_ = delay_ms;
+        Update();
     }
     else
         printf("Delay time ms must be between 0 and 2000\n");
 }
 
-void stereo_delay_set_feedback_percent(stereodelay *d, double feedback_percent)
+void StereoDelay::SetFeedbackPercent(double feedback_percent)
 {
     if (feedback_percent >= -100 && feedback_percent <= 100)
     {
-        d->m_feedback_percent = feedback_percent;
-        stereo_delay_update(d);
+        m_feedback_percent_ = feedback_percent;
+        Update();
     }
     else
         printf("Feedback %% must be between -100 and 100\n");
 }
 
-void stereo_delay_set_delay_ratio(stereodelay *d, double delay_ratio)
+void StereoDelay::SetDelayRatio(double delay_ratio)
 {
     if (delay_ratio >= -1 && delay_ratio <= 1)
     {
-        d->m_delay_ratio = delay_ratio;
-        stereo_delay_update(d);
+        m_delay_ratio_ = delay_ratio;
+        Update();
     }
     else
         printf("Delay ratio must be between -1 and 1\n");
 }
 
-void stereo_delay_set_wet_mix(stereodelay *d, double wet_mix)
+void StereoDelay::SetWetMix(double wet_mix)
 {
     if (wet_mix >= 0 && wet_mix <= 100)
     {
-        d->m_wet_mix = wet_mix;
-        stereo_delay_update(d);
+        m_wet_mix_ = wet_mix;
+        Update();
     }
     else
         printf("Wetmix must be between 0 and 100\n");
 }
 
-void stereo_delay_update(stereodelay *d)
+void StereoDelay::Update()
 {
-    if (d->m_mode == TAP1 || d->m_mode == TAP2)
+    if (m_mode_ == TAP1 || m_mode_ == TAP2)
     {
-        if (d->m_delay_ratio < 0)
+        if (m_delay_ratio_ < 0)
         {
-            d->m_tap2_left_delay_time_ms =
-                -d->m_delay_ratio * d->m_delay_time_ms;
-            d->m_tap2_right_delay_time_ms =
-                (1.0 + d->m_delay_ratio) * d->m_delay_time_ms;
+            m_tap2_left_delay_time_ms_ = -m_delay_ratio_ * m_delay_time_ms_;
+            m_tap2_right_delay_time_ms_ =
+                (1.0 + m_delay_ratio_) * m_delay_time_ms_;
         }
-        else if (d->m_delay_ratio > 0)
+        else if (m_delay_ratio_ > 0)
         {
-            d->m_tap2_left_delay_time_ms =
-                (1.0 - d->m_delay_ratio) * d->m_delay_time_ms;
-            d->m_tap2_right_delay_time_ms =
-                d->m_delay_ratio * d->m_delay_time_ms;
+            m_tap2_left_delay_time_ms_ =
+                (1.0 - m_delay_ratio_) * m_delay_time_ms_;
+            m_tap2_right_delay_time_ms_ = m_delay_ratio_ * m_delay_time_ms_;
         }
         else
         {
-            d->m_tap2_left_delay_time_ms = 0.0;
-            d->m_tap2_right_delay_time_ms = 0.0;
+            m_tap2_left_delay_time_ms_ = 0.0;
+            m_tap2_right_delay_time_ms_ = 0.0;
         }
-        delayline_set_delay_ms(&d->m_left_delay, d->m_delay_time_ms);
-        delayline_set_delay_ms(&d->m_right_delay, d->m_delay_time_ms);
+        delayline_set_delay_ms(&m_left_delay_, m_delay_time_ms_);
+        delayline_set_delay_ms(&m_right_delay_, m_delay_time_ms_);
 
         return;
     }
 
     // else
-    d->m_tap2_left_delay_time_ms = 0.0;
-    d->m_tap2_right_delay_time_ms = 0.0;
+    m_tap2_left_delay_time_ms_ = 0.0;
+    m_tap2_right_delay_time_ms_ = 0.0;
 
-    if (d->m_delay_ratio < 0)
+    if (m_delay_ratio_ < 0)
     {
-        delayline_set_delay_ms(&d->m_left_delay,
-                               -d->m_delay_ratio * d->m_delay_time_ms);
-        delayline_set_delay_ms(&d->m_right_delay, d->m_delay_time_ms);
+        delayline_set_delay_ms(&m_left_delay_,
+                               -m_delay_ratio_ * m_delay_time_ms_);
+        delayline_set_delay_ms(&m_right_delay_, m_delay_time_ms_);
     }
-    else if (d->m_delay_ratio > 0)
+    else if (m_delay_ratio_ > 0)
     {
-        delayline_set_delay_ms(&d->m_left_delay, d->m_delay_time_ms);
-        delayline_set_delay_ms(&d->m_right_delay,
-                               d->m_delay_ratio * d->m_delay_time_ms);
+        delayline_set_delay_ms(&m_left_delay_, m_delay_time_ms_);
+        delayline_set_delay_ms(&m_right_delay_,
+                               m_delay_ratio_ * m_delay_time_ms_);
     }
     else
     {
-        delayline_set_delay_ms(&d->m_left_delay, d->m_delay_time_ms);
-        delayline_set_delay_ms(&d->m_right_delay, d->m_delay_time_ms);
+        delayline_set_delay_ms(&m_left_delay_, m_delay_time_ms_);
+        delayline_set_delay_ms(&m_right_delay_, m_delay_time_ms_);
     }
 }
 
-bool stereo_delay_process_audio(stereodelay *d, double *input_left,
-                                double *input_right, double *output_left,
-                                double *output_right)
+bool StereoDelay::process_audio(double *input_left, double *input_right,
+                                double *output_left, double *output_right)
 {
-    double left_delay_out = delayline_read_delay(&d->m_left_delay);
-    double right_delay_out = delayline_read_delay(&d->m_right_delay);
+    double left_delay_out = delayline_read_delay(&m_left_delay);
+    double right_delay_out = delayline_read_delay(&m_right_delay);
 
     double left_delay_in =
-        *input_left + left_delay_out * (d->m_feedback_percent / 100.0);
+        *input_left + left_delay_out * (m_feedback_percent / 100.0);
     double right_delay_in =
-        *input_right + right_delay_out * (d->m_feedback_percent / 100.0);
+        *input_right + right_delay_out * (m_feedback_percent / 100.0);
 
     double left_tap2_out = 0.0;
     double right_tap2_out = 0.0;
 
-    switch (d->m_mode)
+    switch (m_mode)
     {
     case TAP1:
     {
-        left_tap2_out = delayline_read_delay_at(&d->m_left_delay,
-                                                d->m_tap2_left_delay_time_ms);
-        right_tap2_out = delayline_read_delay_at(&d->m_right_delay,
-                                                 d->m_tap2_right_delay_time_ms);
+        left_tap2_out =
+            delayline_read_delay_at(&m_left_delay, m_tap2_left_delay_time_ms);
+        right_tap2_out =
+            delayline_read_delay_at(&m_right_delay, m_tap2_right_delay_time_ms);
         break;
     }
     case TAP2:
     {
-        left_tap2_out = delayline_read_delay_at(&d->m_left_delay,
-                                                d->m_tap2_left_delay_time_ms);
-        right_tap2_out = delayline_read_delay_at(&d->m_right_delay,
-                                                 d->m_tap2_right_delay_time_ms);
+        left_tap2_out =
+            delayline_read_delay_at(&m_left_delay, m_tap2_left_delay_time_ms);
+        right_tap2_out =
+            delayline_read_delay_at(&m_right_delay, m_tap2_right_delay_time_ms);
         left_delay_in =
             *input_left + (0.5 * left_delay_out + 0.5 * left_tap2_out) *
-                              (d->m_feedback_percent / 100.0);
+                              (m_feedback_percent / 100.0);
         right_delay_in =
             *input_right + (0.5 * right_delay_out + 0.5 * right_tap2_out) *
-                               (d->m_feedback_percent / 100.0);
+                               (m_feedback_percent / 100.0);
         break;
     }
     case PINGPONG:
     {
         left_delay_in =
-            *input_right + right_delay_out * (d->m_feedback_percent / 100.0);
+            *input_right + right_delay_out * (m_feedback_percent / 100.0);
         right_delay_in =
-            *input_left + left_delay_out * (d->m_feedback_percent / 100.0);
+            *input_left + left_delay_out * (m_feedback_percent / 100.0);
         break;
     }
     }
@@ -232,65 +220,65 @@ bool stereo_delay_process_audio(stereodelay *d, double *input_left,
     double left_out = 0.0;
     double right_out = 0.0;
 
-    delayline_process_audio(&d->m_left_delay, &left_delay_in, &left_out);
-    delayline_process_audio(&d->m_right_delay, &right_delay_in, &right_out);
+    delayline_process_audio(&m_left_delay, &left_delay_in, &left_out);
+    delayline_process_audio(&m_right_delay, &right_delay_in, &right_out);
 
-    *output_left = *input_left * (1.0 - d->m_wet_mix) +
-                   d->m_wet_mix * (left_out + left_tap2_out);
-    *output_right = *input_right * (1.0 - d->m_wet_mix) +
-                    d->m_wet_mix * (right_out + right_tap2_out);
+    *output_left = *input_left * (1.0 - m_wet_mix) +
+                   m_wet_mix * (left_out + left_tap2_out);
+    *output_right = *input_right * (1.0 - m_wet_mix) +
+                    m_wet_mix * (right_out + right_tap2_out);
 
     return true;
 }
 
 constexpr char const *s_delay_mode[] = {"tap1", "tap2", "pingpong"};
 constexpr char const *s_delay_sync_len[] = {"4th", "8th", "16th"};
-void stereo_delay_status(void *self, char *status_string)
+void StereoDelay::status(void *self, char *status_string)
 {
     stereodelay *sd = (stereodelay *)self;
     snprintf(status_string, MAX_STATIC_STRING_SZ,
              "delayms:%.0f fb:%.2f ratio:%.2f "
              "wetmx:%.2f mode:%s(%d) sync:%d synclen:%s(%d)",
-             sd->m_delay_time_ms, sd->m_feedback_percent, sd->m_delay_ratio,
-             sd->m_wet_mix, s_delay_mode[sd->m_mode], sd->m_mode, sd->sync,
-             s_delay_sync_len[sd->sync_len], sd->sync_len);
+             sm_delay_time_ms, sm_feedback_percent, sm_delay_ratio, sm_wet_mix,
+             s_delay_mode[sm_mode], sm_mode, ssync, s_delay_sync_len[ssync_len],
+             ssync_len);
 }
 
-stereo_val stereo_delay_process_wrapper(void *self, stereo_val input)
+stereo_val StereoDelay::process_wrapper(void *self, stereo_val input)
 {
     stereodelay *sd = (stereodelay *)self;
     stereo_val output = {};
-    stereo_delay_process_audio(sd, &input.left, &input.right, &output.left,
+    StereoDelay::process_audio(sd, &input.left, &input.right, &output.left,
                                &output.right);
     return output;
 }
 
-void stereo_delay_sync_tempo(stereodelay *d)
+void StereoDelay::sync_tempo(stereodelay *d)
 {
     double delay_time_quarter_note_ms = 60 / mixr->bpm * 1000;
-    if (d->sync_len == DELAY_SYNC_QUARTER)
-        d->m_delay_time_ms = delay_time_quarter_note_ms;
-    else if (d->sync_len == DELAY_SYNC_EIGHTH)
-        d->m_delay_time_ms = delay_time_quarter_note_ms * 0.5;
-    else if (d->sync_len == DELAY_SYNC_SIXTEENTH)
-        d->m_delay_time_ms = delay_time_quarter_note_ms * 0.25;
+    if (sync_len == DELAY_SYNC_QUARTER)
+        m_delay_time_ms = delay_time_quarter_note_ms;
+    else if (sync_len == DELAY_SYNC_EIGHTH)
+        m_delay_time_ms = delay_time_quarter_note_ms * 0.5;
+    else if (sync_len == DELAY_SYNC_SIXTEENTH)
+        m_delay_time_ms = delay_time_quarter_note_ms * 0.25;
 
-    stereo_delay_update(d);
+    Update();
 }
 
-void stereo_delay_set_sync(stereodelay *d, bool b)
+void StereoDelay::set_sync(bool b)
 {
-    d->sync = b;
+    sync = b;
     if (b)
-        stereo_delay_sync_tempo(d);
+        StereoDelay::sync_tempo(d);
 }
 
-void stereo_delay_set_sync_len(stereodelay *d, unsigned int len)
+void StereoDelay::set_sync_len(unsigned int len)
 {
     if (len < DELAY_SYNC_SIZE)
     {
-        d->sync_len = len;
-        if (d->sync)
-            stereo_delay_sync_tempo(d);
+        sync_len = len;
+        if (sync)
+            StereoDelay::sync_tempo(d);
     }
 }

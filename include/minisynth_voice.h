@@ -1,10 +1,10 @@
 #pragma once
 
-#include "filter_ckthreefive.h"
-#include "filter_moogladder.h"
-#include "qblimited_oscillator.h"
-#include "voice.h"
-#include "wt_oscillator.h"
+#include <fx/filter_ckthreefive.h>
+#include <fx/filter_moogladder.h>
+#include <qblimited_oscillator.h>
+#include <voice.h>
+#include <wt_oscillator.h>
 
 typedef enum
 {

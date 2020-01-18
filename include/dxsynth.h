@@ -1,15 +1,14 @@
 #pragma once
 
-#include "soundgenerator.h"
-#include "dca.h"
-#include "envelope_generator.h"
-#include "filter.h"
-#include "keys.h"
-#include "midimaaan.h"
-#include "modmatrix.h"
-#include "oscillator.h"
-
-#include "dxsynth_voice.h"
+#include <dca.h>
+#include <dxsynth_voice.h>
+#include <fx/envelope_generator.h>
+#include <fx/filter.h>
+#include <keys.h>
+#include <midimaaan.h>
+#include <modmatrix.h>
+#include <oscillator.h>
+#include <soundgenerator.h>
 
 #define MAX_DX_VOICES 16
 

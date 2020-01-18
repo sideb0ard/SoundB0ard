@@ -1,13 +1,13 @@
 #ifndef SBSHELL_VOICE_H_
 #define SBSHELL_VOICE_H_
 
-#include "dca.h"
-#include "envelope_generator.h"
-#include "filter.h"
-#include "lfo.h"
-#include "modmatrix.h"
-#include "oscillator.h"
-#include "synthfunctions.h"
+#include <dca.h>
+#include <fx/envelope_generator.h>
+#include <fx/filter.h>
+#include <lfo.h>
+#include <modmatrix.h>
+#include <oscillator.h>
+#include <synthfunctions.h>
 
 typedef struct voice
 {

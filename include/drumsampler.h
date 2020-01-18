@@ -1,9 +1,9 @@
 #pragma once
 
-#include "soundgenerator.h"
-#include "envelope_generator.h"
-#include "filter_moogladder.h"
-#include "stereodelay.h"
+#include <fx/envelope_generator.h>
+#include <fx/filter_moogladder.h>
+#include <fx/stereodelay.h>
+#include <soundgenerator.h>
 
 #include <sndfile.h>
 #include <stdbool.h>

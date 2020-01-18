@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "bitcrush.h"
-#include "utils.h"
+#include <fx/bitcrush.h>
+#include <utils.h>
 
 bitcrush *new_bitcrush()
 {

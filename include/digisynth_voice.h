@@ -1,8 +1,8 @@
 #pragma once
 
-#include "filter_sem.h"
-#include "sample_oscillator.h"
-#include "voice.h"
+#include <fx/filter_sem.h>
+#include <sample_oscillator.h>
+#include <voice.h>
 
 typedef struct digisynth_voice
 {

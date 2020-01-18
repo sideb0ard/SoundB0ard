@@ -1,24 +1,23 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include "portaudio.h"
-#include "portmidi.h"
 #include <lo/lo.h>
+#include <portaudio.h>
+#include <portmidi.h>
 #include <pthread.h>
 
-#include "ableton_link_wrapper.h"
-
-#include "soundgenerator.h"
-#include "defjams.h"
-#include "digisynth.h"
-#include "dxsynth.h"
-#include "fx.h"
-#include "minisynth.h"
-#include "pattern_generator.h"
-#include "process.hpp"
-#include "sbmsg.h"
-#include "table.h"
-#include "value_generator.h"
+#include <ableton_link_wrapper.h>
+#include <defjams.h>
+#include <digisynth.h>
+#include <dxsynth.h>
+#include <fx/fx.h>
+#include <minisynth.h>
+#include <pattern_generator.h>
+#include <process.hpp>
+#include <sbmsg.h>
+#include <soundgenerator.h>
+#include <table.h>
+#include <value_generator.h>
 
 #define MAX_SCENES 100
 #define MAX_TRACKS_PER_SCENE 100

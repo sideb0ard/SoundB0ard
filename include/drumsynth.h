@@ -1,11 +1,11 @@
 #pragma once
 
-#include "soundgenerator.h"
-#include "defjams.h"
-#include "distortion.h"
-#include "envelope_generator.h"
-#include "filter_moogladder.h"
-#include "qblimited_oscillator.h"
+#include <defjams.h>
+#include <fx/distortion.h>
+#include <fx/envelope_generator.h>
+#include <fx/filter_moogladder.h>
+#include <qblimited_oscillator.h>
+#include <soundgenerator.h>
 
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/drumsynthpatches.dat";

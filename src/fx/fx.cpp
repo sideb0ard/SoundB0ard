@@ -1,8 +1,7 @@
-#include <fx.h>
+#include <fx/fx.h>
 
-void fx_noop_event_notify(void *self, broadcast_event event)
+void Fx::EventNotify(broadcast_event event)
 {
     // no-op
-    (void)self;
     (void)event;
 }

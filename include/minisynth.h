@@ -3,16 +3,15 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "soundgenerator.h"
-#include "dca.h"
-#include "envelope_generator.h"
-#include "filter.h"
-#include "keys.h"
-#include "midimaaan.h"
-#include "modmatrix.h"
-#include "oscillator.h"
-
-#include "minisynth_voice.h"
+#include <dca.h>
+#include <fx/envelope_generator.h>
+#include <fx/filter.h>
+#include <keys.h>
+#include <midimaaan.h>
+#include <minisynth_voice.h>
+#include <modmatrix.h>
+#include <oscillator.h>
+#include <soundgenerator.h>
 
 static const char MOOG_PRESET_FILENAME[] = "settings/moogpresets.dat";
 

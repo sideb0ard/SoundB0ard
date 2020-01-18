@@ -1,55 +1,49 @@
 #include <stdlib.h>
 
-#include "distortion.h"
-#include "math.h"
-#include "mixer.h"
+#include <math.h>
+
+#include <fx/distortion.h>
+#include <mixer.h>
 
 extern mixer *mixr;
 
-distortion *new_distortion(void)
+Distortion::Distortion()
 {
-    distortion *d = (distortion*) calloc(1, sizeof(distortion));
-    d->m_fx.type = DISTORTION;
-    d->m_fx.enabled = true;
-    d->m_fx.process = &distortion_process;
-    d->m_fx.status = &distortion_status;
-    d->m_fx.event_notify = &fx_noop_event_notify;
+    type_ = DISTORTION;
+    enabled_ = true;
 
-    d->m_threshold = 0.707;
-    return d;
+    m_threshold_ = 0.707;
 }
 
-void distortion_set_threshold(distortion *d, double val)
+void Distortion::SetThreshold(double val)
 {
     if (val >= 0.01 && val <= 1.0)
-        d->m_threshold = val;
+        m_threshold_ = val;
     else
         printf("Val must be between 0.01 and 1\n");
 }
 
-void distortion_status(void *self, char *status_string)
+void Distortion::Status(char *status_string)
 {
-    distortion *d = (distortion *)self;
     snprintf(status_string, MAX_STATIC_STRING_SZ, "Distortion! threshold:%.2f",
-             d->m_threshold);
+             m_threshold_);
 }
 
-stereo_val distortion_process(void *self, stereo_val input)
+stereo_val Distortion::Process(stereo_val input)
 {
     stereo_val out = {};
-    distortion *d = (distortion *)self;
 
     if (input.left >= 0)
-        out.left = fmin(input.left, d->m_threshold);
+        out.left = fmin(input.left, m_threshold_);
     else
-        out.left = fmax(input.left, -d->m_threshold);
-    out.left /= d->m_threshold;
+        out.left = fmax(input.left, -m_threshold_);
+    out.left /= m_threshold_;
 
     if (input.right >= 0)
-        out.right = fmin(input.right, d->m_threshold);
+        out.right = fmin(input.right, m_threshold_);
     else
-        out.right = fmax(input.right, -d->m_threshold);
-    out.right /= d->m_threshold;
+        out.right = fmax(input.right, -m_threshold_);
+    out.right /= m_threshold_;
 
     return out;
 }

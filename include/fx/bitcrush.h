@@ -1,10 +1,17 @@
 #pragma once
 
-#include "defjams.h"
-#include "fx.h"
+#include <defjams.h>
+#include <fx/fx.h>
 
-typedef struct bitcrush
+class Bitcrush : Fx
 {
+    Filterpass();
+    ~Filterpass();
+    void Status(char *string) override;
+    stereo_val Process(stereo_val input) override;
+    void EventNotify(broadcast_event event) override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
     fx m_fx;
     int bitdepth;
     int bitrate;
