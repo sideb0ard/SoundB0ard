@@ -370,6 +370,8 @@ class SetStatement : public Statement
     std::shared_ptr<Expression> target_{nullptr};
     std::string param_;
     double value_;
+
+    int fx_num_ = -1;
 };
 
 class LsStatement : public Statement

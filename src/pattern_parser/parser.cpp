@@ -122,7 +122,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     }
     else if (PeekTokenIs(pattern_parser::PATTERN_QUESTIONMARK))
     {
-        std::cout << "GOT QUESTION MARK!" << std::endl;
         return_node->randomize = true;
         NextToken();
     }

@@ -151,15 +151,9 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
     std::shared_ptr<ast::SetStatement> stmt =
         std::make_shared<ast::SetStatement>(cur_token_);
 
-    // Discard 'SET' token
-    // NextToken();
     std::cout << "SET ME UP YO!" << std::endl;
-    // while (!CurTokenIs(token::SLANG_EOFF))
-    //{
-    //    std::cout << "Cur token is " << cur_token_ << std::endl;
-    //    NextToken();
-    //}
     std::cout << "Cur token is " << cur_token_ << std::endl;
+
     if (!ExpectPeek(token::SLANG_IDENT))
     {
         std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
@@ -174,13 +168,37 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
                   << std::endl;
         return nullptr;
     }
+
     if (!ExpectPeek(token::SLANG_IDENT))
     {
         std::cout << "NOT GOT PARAM ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
+    if (cur_token_.literal_.rfind("fx", 0) == 0)
+    {
+        if (cur_token_.literal_.size() > 2)
+        {
+            int fx_num = std::stoi(cur_token_.literal_.substr(2));
+            std::cout << "FX! " << fx_num << "\n";
+            stmt->fx_num_ = fx_num;
+            if (!ExpectPeek(token::SLANG_COLON))
+            {
+                std::cout << "NOT GOT COLON ! Peek token is " << peek_token_
+                          << std::endl;
+                return nullptr;
+            }
+            NextToken();
+        }
+        else
+        {
+            std::cerr << "Tried FX - no num!\n";
+            return nullptr;
+        }
+    }
     stmt->param_ = cur_token_.literal_;
+    std::cout << "PARAM IS " << stmt->param_ << std::endl;
+
     if (!ExpectPeek(token::SLANG_NUMBER))
     {
         std::cout << "NOT GOT NU<M ! Peek token is " << peek_token_
@@ -191,13 +209,9 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
 
     std::cout << "BOOM! " << stmt->target_ << ":" << stmt->param_ << ":"
               << stmt->value_ << std::endl;
-    // if (!PeekTokenIs(token::SLANG_SEMICOLON))
-    //{
-    //    stmt->path_ = ParseStringLiteral();
-    //}
 
-    // if (PeekTokenIs(token::SLANG_SEMICOLON))
-    //    NextToken();
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
 
     return stmt;
 }
@@ -438,8 +452,8 @@ static bool IsInfixOperator(token::TokenType type)
 
 std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
 {
-    // these are the 'nuds' (null detontations) in the Vaughan Pratt paper 'top
-    // down operator precedence'.
+    // these are the 'nuds' (null detontations) in the Vaughan Pratt paper
+    // 'top down operator precedence'.
     std::shared_ptr<ast::Expression> left_expr = ParseForPrefixExpression();
 
     if (!left_expr)
