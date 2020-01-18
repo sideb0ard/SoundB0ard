@@ -52,7 +52,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
         return_node = ParsePatternMultiStep();
     else
     {
-        std::cerr << "RETURNING NULL... cos TOKEN IS " << cur_token_
+        std::cerr << "rrrrRETURNING NULL... cos TOKEN IS " << cur_token_
                   << std::endl;
         return nullptr;
     }
@@ -120,6 +120,12 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 
         std::cout << "ALL GOOD!\n";
     }
+    else if (PeekTokenIs(pattern_parser::PATTERN_QUESTIONMARK))
+    {
+        std::cout << "GOT QUESTION MARK!" << std::endl;
+        return_node->randomize = true;
+        NextToken();
+    }
 
     return return_node;
 }
@@ -139,7 +145,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
     std::shared_ptr<pattern_parser::PatternMultiStep> node =
         std::make_shared<pattern_parser::PatternMultiStep>();
 
-    while (!PeekTokenIs(pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET))
+    while (!PeekTokenIs(pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET) &&
+           !PeekTokenIs(pattern_parser::PATTERN_EOF))
     {
         NextToken();
         auto nnode = ParsePatternNode();
@@ -159,7 +166,8 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternGroup()
         std::make_shared<pattern_parser::PatternGroup>();
 
     int event_group_idx = 0;
-    while (!PeekTokenIs(pattern_parser::PATTERN_SQUARE_BRACKET_RIGHT))
+    while (!PeekTokenIs(pattern_parser::PATTERN_SQUARE_BRACKET_RIGHT) &&
+           !PeekTokenIs(pattern_parser::PATTERN_EOF))
     {
         NextToken();
         auto nnode = ParsePatternNode();

@@ -157,6 +157,11 @@ void Process::EvalPattern(
                       << " Is >0 PPBAR:" << PPBAR << std::endl;
             return;
         }
+        if (leaf_node->randomize)
+        {
+            if (rand() % 100 < 50)
+                return;
+        }
         std::string value = leaf_node->value_;
         pattern_events_[target_start].push_back(
             std::make_shared<MusicalEvent>(value, target_type_));

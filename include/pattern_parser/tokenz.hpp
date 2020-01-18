@@ -20,6 +20,7 @@ const TokenType PATTERN_CLOSE_PAREN = ")";
 const TokenType PATTERN_OPEN_ANGLE_BRACKET = "<";
 const TokenType PATTERN_CLOSE_ANGLE_BRACKET = ">";
 const TokenType PATTERN_TILDE = "~";
+const TokenType PATTERN_QUESTIONMARK = "?";
 
 class Token
 {
