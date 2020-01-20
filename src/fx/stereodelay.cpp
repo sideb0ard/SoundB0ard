@@ -281,5 +281,21 @@ void StereoDelay::SetSyncLen(unsigned int len)
     }
 }
 
-void StereoDelay::SetParam(std::string name, double val) {}
 double StereoDelay::GetParam(std::string name) { return 0; }
+void StereoDelay::SetParam(std::string name, double val)
+{
+    if (name == "delayms")
+        SetDelayTimeMs(val);
+    else if (name == "fb")
+        SetFeedbackPercent(val);
+    else if (name == "ratio")
+        SetDelayRatio(val);
+    else if (name == "wetmx")
+        SetWetMix(val);
+    else if (name == "mode")
+        SetMode(val);
+    else if (name == "sync")
+        SetSync(val);
+    else if (name == "synclen")
+        SetSyncLen(val);
+}

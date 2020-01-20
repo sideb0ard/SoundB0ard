@@ -41,9 +41,9 @@ class StereoDelay : Fx
     void SetFeedbackPercent(double feedback_percent);
     void SetDelayRatio(double delay_ratio);
     void SetWetMix(double wet_mix);
-
     void SetSync(bool b);
     void SetSyncLen(unsigned int);
+
     void SyncTempo();
 
     void PrepareForPlay();

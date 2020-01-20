@@ -200,7 +200,23 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             {
                 SoundGenerator *sg =
                     mixr->SoundGenerators[soundgen->soundgen_id_];
-                sg->SetParam(set_stmt->param_, set_stmt->value_);
+
+                if (set_stmt->fx_num_ != -1)
+                {
+                    int fx_num = set_stmt->fx_num_;
+                    if (mixer_is_valid_fx(mixr, soundgen->soundgen_id_, fx_num))
+                    {
+                        std::cout << "Setting FX param " << fx_num << ":"
+                                  << set_stmt->param_ << ":" << set_stmt->value_
+                                  << std::endl;
+                        Fx *f = sg->effects[fx_num];
+                        f->SetParam(set_stmt->param_, set_stmt->value_);
+                    }
+                }
+                else
+                {
+                    sg->SetParam(set_stmt->param_, set_stmt->value_);
+                }
             }
         }
         else
