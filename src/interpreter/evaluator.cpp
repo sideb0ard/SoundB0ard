@@ -913,14 +913,16 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
                 process_funcz.push_back(funcy);
         }
 
-        mixer_update_process(mixr, proc->mixer_process_id_, proc->target_type_,
-                             proc->targets_, pattern->value_, process_funcz);
+        mixer_update_process(mixr, proc->mixer_process_id_, proc->process_type_,
+                             proc->process_timer_type_, proc->loop_len_,
+                             proc->command_, proc->target_type_, proc->targets_,
+                             pattern->value_, process_funcz);
     }
     else
         std::cout << "Nae PATTERMN!!\n";
 
     return NULLL;
-}
+} // namespace evaluator
 
 //////////// Error shizzle below
 

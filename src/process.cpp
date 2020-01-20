@@ -19,6 +19,25 @@
 
 extern mixer *mixr;
 
+namespace
+{
+
+std::string ReplaceString(std::string subject, const std::string &search,
+                          const std::string &replace)
+{
+    std::cout << "REPLACE " << search << " WITH " << replace << " in "
+              << subject << std::endl;
+    size_t pos = 0;
+    while ((pos = subject.find(search, pos)) != std::string::npos)
+    {
+        subject.replace(pos, search.length(), replace);
+        pos += replace.length();
+    }
+    return subject;
+}
+
+} // namespace
+
 using Wrapper =
     std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
 extern Tsqueue<Wrapper> g_queue;
@@ -31,14 +50,21 @@ void Process::ParsePattern()
     pattern_root_ = pattern_parzer->ParsePattern();
 }
 
-void Process::Update(ProcessPatternTarget target_type,
+void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
+                     float loop_len, std::string command,
+                     ProcessPatternTarget target_type,
                      std::vector<std::string> targets, std::string pattern,
                      std::vector<std::shared_ptr<PatternFunction>> funcz)
 {
     active_ = false;
+    process_type_ = process_type;
+    timer_type_ = timer_type;
+    loop_len_ = loop_len;
+    command_ = command;
     target_type_ = target_type;
     targets_ = targets;
     pattern_ = pattern;
+
     ParsePattern();
 
     for (auto &oldfz : pattern_functions_)
@@ -55,57 +81,113 @@ void Process::EventNotify(mixer_timing_info tinfo)
     if (!active_)
         return;
 
-    if (tinfo.is_start_of_loop)
+    if (process_type_ == PATTERN_PROCESS)
     {
-        for (int i = 0; i < PPBAR; i++)
-            pattern_events_[i].clear();
-        EvalPattern(pattern_root_, 0, PPBAR);
-
-        // std::cout << "BEFORE:" << PatternPrint(pattern_events_) << std::endl;
-        for (auto &f : pattern_functions_)
+        if (tinfo.is_start_of_loop)
         {
-            if (f->active_)
-                f->TransformPattern(pattern_events_, loop_counter_);
-            // std::cout << "AFTER:" << PatternPrint(pattern_events_) <<
+            for (int i = 0; i < PPBAR; i++)
+                pattern_events_[i].clear();
+            EvalPattern(pattern_root_, 0, PPBAR);
+
+            // std::cout << "BEFORE:" << PatternPrint(pattern_events_) <<
             // std::endl;
-        }
-
-        ++loop_counter_;
-    }
-
-    int cur_tick = tinfo.midi_tick % PPBAR;
-    if (pattern_events_[cur_tick].size() == 0)
-        return;
-
-    std::vector<std::shared_ptr<MusicalEvent>> &events =
-        pattern_events_[cur_tick];
-
-    if (target_type_ == ProcessPatternTarget::ENV)
-    {
-        for (auto e : events)
-        {
-            if (e->value_ == "~") // skip blank markers
-                continue;
-            std::string cmd =
-                std::string("noteOn(") + e->value_ + "," + "127, 250)";
-
-            Interpret(cmd.data(), global_env);
-        }
-    }
-    else if (target_type_ == ProcessPatternTarget::VALUES)
-    {
-        for (auto e : events)
-        {
-            if (e->value_ == "~") // skip blank markers
-                continue;
-            for (auto t : targets_)
+            for (auto &f : pattern_functions_)
             {
-                std::string cmd =
-                    std::string("noteOn(") + t + "," + e->value_ + ", 250)";
-                Interpret(cmd.data(), global_env);
+                if (f->active_)
+                    f->TransformPattern(pattern_events_, loop_counter_);
+                // std::cout << "AFTER:" << PatternPrint(pattern_events_) <<
+                // std::endl;
+            }
+        }
+
+        if (tinfo.is_midi_tick)
+        {
+            int cur_tick = tinfo.midi_tick % PPBAR;
+            if (pattern_events_[cur_tick].size() == 0)
+                return;
+
+            std::vector<std::shared_ptr<MusicalEvent>> &events =
+                pattern_events_[cur_tick];
+
+            if (target_type_ == ProcessPatternTarget::ENV)
+            {
+                for (auto e : events)
+                {
+                    if (e->value_ == "~") // skip blank markers
+                        continue;
+                    std::string cmd =
+                        std::string("noteOn(") + e->value_ + "," + "127, 250)";
+
+                    Interpret(cmd.data(), global_env);
+                }
+            }
+            else if (target_type_ == ProcessPatternTarget::VALUES)
+            {
+                for (auto e : events)
+                {
+                    if (e->value_ == "~") // skip blank markers
+                        continue;
+                    for (auto t : targets_)
+                    {
+                        std::string cmd = std::string("noteOn(") + t + "," +
+                                          e->value_ + ", 250)";
+                        Interpret(cmd.data(), global_env);
+                    }
+                }
             }
         }
     }
+    else if (process_type_ == COMMAND_PROCESS)
+    {
+        if (tinfo.is_midi_tick)
+        {
+            // TODO support fractional loops
+            if (timer_type_ == ProcessTimerType::EVERY)
+            {
+                bool should_run{false};
+                if (loop_len_ > 0 && (loop_counter_ % (int)loop_len_ == 0))
+                    should_run = true;
+
+                // if (tinfo.is_start_of_loop && should_run)
+                if (tinfo.is_start_of_loop && should_run)
+                {
+                    for (int i = 0; i < PPBAR; i++)
+                        pattern_events_[i].clear();
+                    EvalPattern(pattern_root_, 0, PPBAR);
+
+                    int cur_tick = tinfo.midi_tick % PPBAR;
+                    if (pattern_events_[cur_tick].size() == 0)
+                        return;
+
+                    std::vector<std::shared_ptr<MusicalEvent>> &events =
+                        pattern_events_[cur_tick];
+
+                    if (events.size() > 0)
+                    {
+                        std::string new_cmd =
+                            ReplaceString(command_, "%", events[0]->value_);
+                        Interpret(new_cmd.data(), global_env);
+                    }
+                }
+            }
+            else if (timer_type_ == ProcessTimerType::OSCILLATE)
+            {
+                // work out valu
+            }
+            else if (timer_type_ == ProcessTimerType::OVER)
+            {
+                // work out valu
+            }
+            else if (timer_type_ == ProcessTimerType::RAMP)
+            {
+                // work out valu
+                // check if finished and stop if so.
+            }
+        }
+    }
+
+    if (tinfo.is_start_of_loop)
+        ++loop_counter_;
 }
 
 void Process::EvalPattern(
@@ -205,18 +287,24 @@ void Process::EvalPattern(
     }
 }
 
+static const char *s_target_names[] = {"UNDEFINED", "ENV", "VALUES"};
+static const char *s_proc_types[] = {"UNDEFINED", "PATTERN", "COMMAND"};
+static const char *s_proc_timer_types[] = {"UNDEFINED", "EVERY", "OSC", "OVER",
+                                           "RAMP"};
+
 void Process::Status(wchar_t *status_string)
 {
     const char *PROC_COLOR = ANSI_COLOR_RESET;
     if (active_)
         PROC_COLOR = COOL_COLOR_PINK;
 
-    std::string target_type =
-        target_type_ == ProcessPatternTarget::ENV ? "ENV" : "VALUES";
     swprintf(status_string, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%sProcess: Target:%s Pattern:%s Active:%s",
-             PROC_COLOR, target_type.c_str(), pattern_.c_str(),
-             active_ ? "true" : "false");
+             WANSI_COLOR_WHITE "%sProcess// Type:%s TimerType:%s Target:%s "
+                               "Pattern:%s LoopLen:%f Active:%s Command:%s",
+             PROC_COLOR, s_proc_types[process_type_],
+             s_proc_timer_types[timer_type_], s_target_names[target_type_],
+             pattern_.c_str(), loop_len_, active_ ? "true" : "false",
+             command_.c_str());
     wcscat(status_string, WANSI_COLOR_RESET);
 
     std::cout << "PROC - i got " << pattern_functions_.size() << " funcszz\n";

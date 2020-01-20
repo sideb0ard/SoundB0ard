@@ -106,6 +106,7 @@ class Parser
     Precedence PeekPrecedence() const;
     Precedence CurPrecedence() const;
     void NextToken();
+    bool PeekTokenIsPatternCommandTimerType();
 
   private:
     std::shared_ptr<lexer::Lexer> lexer_;

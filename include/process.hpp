@@ -23,7 +23,9 @@ class Process
     void EventNotify(mixer_timing_info);
     void SetDebug(bool b);
     void ParsePattern();
-    void Update(ProcessPatternTarget target_type,
+    void Update(ProcessType process_type, ProcessTimerType timer_type,
+                float loop_len, std::string command,
+                ProcessPatternTarget target_type,
                 std::vector<std::string> targets, std::string pattern,
                 std::vector<std::shared_ptr<PatternFunction>> funcz);
     void
@@ -32,8 +34,17 @@ class Process
     void AppendPatternFunction(std::shared_ptr<PatternFunction> func);
 
   public:
+    ProcessType process_type_;
+
+    // Command Process Vars
+    ProcessTimerType timer_type_;
+    float loop_len_;
+    std::string command_;
+
+    // Pattern Process Vars
     ProcessPatternTarget target_type_;
     std::vector<std::string> targets_;
+
     std::string pattern_;
 
     bool active_;

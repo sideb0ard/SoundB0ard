@@ -435,15 +435,17 @@ int add_pattern_generator(mixer *mixr, pattern_generator *sg)
     return mixr->pattern_gen_num++;
 }
 
-void mixer_update_process(mixer *mixr, int process_id,
-                          ProcessPatternTarget target_type,
+void mixer_update_process(mixer *mixr, int process_id, ProcessType process_type,
+                          ProcessTimerType timer_type, float loop_len,
+                          std::string command, ProcessPatternTarget target_type,
                           std::vector<std::string> targets, std::string pattern,
                           std::vector<std::shared_ptr<PatternFunction>> funcz)
 {
     if (process_id >= 0 && process_id < MAX_NUM_PROC)
     {
-        mixr->processes_[process_id]->Update(target_type, targets, pattern,
-                                             funcz);
+        mixr->processes_[process_id]->Update(process_type, timer_type, loop_len,
+                                             command, target_type, targets,
+                                             pattern, funcz);
     }
     else
     {

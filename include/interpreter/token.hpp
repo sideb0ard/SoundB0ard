@@ -57,6 +57,8 @@ const TokenType SLANG_DECREMENT = "--";
 
 const TokenType SLANG_EVERY = "EVERY";
 const TokenType SLANG_OVER = "OVER";
+const TokenType SLANG_RAMP = "RAMP";
+const TokenType SLANG_OSC = "OSCILLATE";
 const TokenType SLANG_PS = "PS";
 const TokenType SLANG_LS = "LS";
 const TokenType SLANG_SET = "SET";

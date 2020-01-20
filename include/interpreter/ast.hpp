@@ -316,11 +316,20 @@ class ProcessStatement : public Statement
 
   public:
     int mixer_process_id_{-1};
+
+    ProcessType process_type_;
+
+    // Command Process Vars
+    ProcessTimerType process_timer_type_;
+    float loop_len_;
+    std::string command_;
+
+    // Pattern Process Vars
     ProcessPatternTarget target_type_;
     std::vector<std::string> targets_;
-    std::shared_ptr<Expression> pattern_;
-
     std::vector<std::shared_ptr<Expression>> functions_;
+
+    std::shared_ptr<Expression> pattern_;
 };
 
 class ExpressionStatement : public Statement

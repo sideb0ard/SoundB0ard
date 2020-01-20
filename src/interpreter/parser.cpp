@@ -151,12 +151,9 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
     std::shared_ptr<ast::SetStatement> stmt =
         std::make_shared<ast::SetStatement>(cur_token_);
 
-    std::cout << "SET ME UP YO!" << std::endl;
-    std::cout << "Cur token is " << cur_token_ << std::endl;
-
     if (!ExpectPeek(token::SLANG_IDENT))
     {
-        std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
+        std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
@@ -164,14 +161,14 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
 
     if (!ExpectPeek(token::SLANG_COLON))
     {
-        std::cout << "NOT GOT COLON ! Peek token is " << peek_token_
+        std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
 
     if (!ExpectPeek(token::SLANG_IDENT))
     {
-        std::cout << "NOT GOT PARAM ! Peek token is " << peek_token_
+        std::cerr << "NOT GOT PARAM ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
@@ -184,7 +181,7 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
             stmt->fx_num_ = fx_num;
             if (!ExpectPeek(token::SLANG_COLON))
             {
-                std::cout << "NOT GOT COLON ! Peek token is " << peek_token_
+                std::cerr << "NOT GOT COLON ! Peek token is " << peek_token_
                           << std::endl;
                 return nullptr;
             }
@@ -197,18 +194,14 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
         }
     }
     stmt->param_ = cur_token_.literal_;
-    std::cout << "PARAM IS " << stmt->param_ << std::endl;
 
     if (!ExpectPeek(token::SLANG_NUMBER))
     {
-        std::cout << "NOT GOT NU<M ! Peek token is " << peek_token_
+        std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
     stmt->value_ = std::stod(cur_token_.literal_);
-
-    std::cout << "BOOM! " << stmt->target_ << ":" << stmt->param_ << ":"
-              << stmt->value_ << std::endl;
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -723,6 +716,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         NextToken();
         NextToken();
 
+        process->process_type_ = PATTERN_PROCESS;
         process->target_type_ = ProcessPatternTarget::ENV;
 
         process->pattern_ = ParseStringLiteral();
@@ -733,6 +727,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         NextToken();
         NextToken();
 
+        process->process_type_ = PATTERN_PROCESS;
         process->target_type_ = ProcessPatternTarget::VALUES;
 
         process->pattern_ = ParseStringLiteral();
@@ -760,6 +755,47 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         }
         NextToken();
     }
+    else if (PeekTokenIs(token::SLANG_LT))
+    {
+        std::cout << "COMMAND PROCESS!!\n";
+        process->process_type_ = COMMAND_PROCESS;
+        NextToken();
+        if (!PeekTokenIsPatternCommandTimerType())
+        {
+            std::cerr
+                << "Need a Pattern Command TYpe! Over, Every, Osc or Ramp!\n";
+            return nullptr;
+        }
+        NextToken();
+        if (cur_token_.type_ == token::SLANG_EVERY)
+            process->process_timer_type_ = ProcessTimerType::EVERY;
+        else if (cur_token_.type_ == token::SLANG_OSC)
+            process->process_timer_type_ = ProcessTimerType::OSCILLATE;
+        else if (cur_token_.type_ == token::SLANG_OVER)
+            process->process_timer_type_ = ProcessTimerType::OVER;
+        else if (cur_token_.type_ == token::SLANG_RAMP)
+            process->process_timer_type_ = ProcessTimerType::RAMP;
+        NextToken();
+        std::cout << " I GOT : " << cur_token_ << std::endl;
+        if (!CurTokenIs(token::SLANG_NUMBER))
+        {
+            std::cerr << "Need a NUMBER after timer type\n";
+            return nullptr;
+        }
+        std::cout << "LITERAL:" << std::stod(cur_token_.literal_) << std::endl;
+
+        process->loop_len_ = std::stof(cur_token_.literal_);
+        std::cout << "NOW SET: " << process->loop_len_ << std::endl;
+        NextToken();
+
+        std::cout << "EYE I GOT : " << cur_token_ << std::endl;
+        process->pattern_ = ParseStringLiteral();
+        NextToken();
+        std::cout << "NOW EYE I GOT : " << cur_token_ << std::endl;
+        process->command_ = cur_token_.literal_;
+        NextToken();
+    }
+
     while (CurTokenIs(token::SLANG_PIPE))
         ConsumePatternFunctions(process);
 
@@ -926,4 +962,13 @@ void Parser::ShowTokens()
     std::cout << "CUR TOKEN is " << cur_token_.type_ << " // Peek Token is "
               << peek_token_.type_ << std::endl;
 }
+
+bool Parser::PeekTokenIsPatternCommandTimerType()
+{
+    if (PeekTokenIs(token::SLANG_EVERY) || PeekTokenIs(token::SLANG_OVER) ||
+        PeekTokenIs(token::SLANG_RAMP) || PeekTokenIs(token::SLANG_OSC))
+        return true;
+    return false;
+}
+
 } // namespace parser

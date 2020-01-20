@@ -156,8 +156,25 @@ typedef enum
     LEGATO
 } legato_mode;
 
+enum ProcessType
+{
+    NO_PROCESS_TYPE,
+    PATTERN_PROCESS,
+    COMMAND_PROCESS
+};
+
+enum ProcessTimerType
+{
+    NO_PROCESS_TIMER_TYPE,
+    EVERY,
+    OSCILLATE,
+    OVER,
+    RAMP,
+};
+
 enum ProcessPatternTarget
 {
+    NO_PROCESS_PATTERN_TARGET_,
     ENV,    // pattern contains values from environment
     VALUES, // values in pattern to be applied to list of targets provided
 };

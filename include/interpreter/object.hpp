@@ -248,24 +248,24 @@ class Granular : public SoundGenerator
     std::string Inspect() override;
 };
 
-class Process : public Object
-{
-  public:
-    Process(int process_id, ProcessPatternTarget target_type,
-            std::vector<std::string> targets, std::string pattern);
-    ~Process();
-    ObjectType Type() override;
-    std::string Inspect() override;
-
-  public:
-    int proc_num{-1};
-    ProcessPatternTarget target_type_;
-    std::vector<std::string> targets_;
-    std::string pattern_;
-
-  private:
-    int mixer_process_id_;
-};
+// class Process : public Object
+//{
+//  public:
+//    Process(int process_id, ProcessPatternTarget target_type,
+//            std::vector<std::string> targets, std::string pattern);
+//    ~Process();
+//    ObjectType Type() override;
+//    std::string Inspect() override;
+//
+//  public:
+//    int proc_num{-1};
+//    ProcessPatternTarget target_type_;
+//    std::vector<std::string> targets_;
+//    std::string pattern_;
+//
+//  private:
+//    int mixer_process_id_;
+//};
 
 /////////////////////////////////////////////////
 

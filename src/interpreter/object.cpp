@@ -92,25 +92,25 @@ Granular::Granular(std::string sample_path)
 std::string Granular::Inspect() { return "Granular."; }
 ObjectType Granular::Type() { return GRANULAR_OBJ; }
 
-Process::Process(int process_id, ProcessPatternTarget target_type,
-                 std::vector<std::string> targets, std::string pattern)
-{
-    std::cout << "NEW PROC! " << std::endl;
-    mixer_process_id_ = process_id;
-    mixer_update_process(mixr, process_id, target_type, targets, pattern,
-                         std::vector<std::shared_ptr<PatternFunction>>{});
-};
+// Process::Process(int process_id, ProcessPatternTarget target_type,
+//                 std::vector<std::string> targets, std::string pattern)
+//{
+//    std::cout << "NEW PROC! " << std::endl;
+//    mixer_process_id_ = process_id;
+//    mixer_update_process(mixr, process_id, target_type, targets, pattern,
+//                         std::vector<std::shared_ptr<PatternFunction>>{});
+//};
+//
+// Process::~Process()
+//{
+//
+//    mixr->processes_[mixer_process_id_]->active_ = false;
+//
+//    std::cout << "PROC DIED!GONEAWAY\n";
+//}
 
-Process::~Process()
-{
-
-    mixr->processes_[mixer_process_id_]->active_ = false;
-
-    std::cout << "PROC DIED!GONEAWAY\n";
-}
-
-std::string Process::Inspect() { return "proccesss"; }
-ObjectType Process::Type() { return PROCESS_OBJ; }
+// std::string Process::Inspect() { return "proccesss"; }
+// ObjectType Process::Type() { return PROCESS_OBJ; }
 
 std::string ReturnValue::Inspect() { return value_->Inspect(); }
 ObjectType ReturnValue::Type() { return RETURN_VALUE_OBJ; }
