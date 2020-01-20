@@ -177,7 +177,6 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
         if (cur_token_.literal_.size() > 2)
         {
             int fx_num = std::stoi(cur_token_.literal_.substr(2));
-            std::cout << "FX! " << fx_num << "\n";
             stmt->fx_num_ = fx_num;
             if (!ExpectPeek(token::SLANG_COLON))
             {
@@ -516,7 +515,6 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
              cur_token_.type_ == token::SLANG_ROTATE_RIGHT)
         return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
 
-    std::cout << "No Prefix parser for " << cur_token_.type_ << std::endl;
     return nullptr;
 }
 

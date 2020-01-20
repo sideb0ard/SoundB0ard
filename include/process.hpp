@@ -34,15 +34,16 @@ class Process
     void AppendPatternFunction(std::shared_ptr<PatternFunction> func);
 
   public:
-    ProcessType process_type_;
+    ProcessType process_type_{ProcessType::NO_PROCESS_TYPE};
 
     // Command Process Vars
-    ProcessTimerType timer_type_;
-    float loop_len_;
-    std::string command_;
+    ProcessTimerType timer_type_{ProcessTimerType::NO_PROCESS_TIMER_TYPE};
+    float loop_len_{1};
+    std::string command_{};
 
     // Pattern Process Vars
-    ProcessPatternTarget target_type_;
+    ProcessPatternTarget target_type_{
+        ProcessPatternTarget::NO_PROCESS_PATTERN_TARGET};
     std::vector<std::string> targets_;
 
     std::string pattern_;

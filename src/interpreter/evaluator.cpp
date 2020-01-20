@@ -188,14 +188,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::SetStatement>(node);
     if (set_stmt)
     {
-        std::cout << "YAR! " << set_stmt->target_ << ":" << set_stmt->param_
-                  << ":" << set_stmt->value_ << std::endl;
         auto target = Eval(set_stmt->target_, env);
         auto soundgen =
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
-            std::cout << "YA BEAUTY!!\n";
             if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
             {
                 SoundGenerator *sg =
@@ -206,9 +203,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                     int fx_num = set_stmt->fx_num_;
                     if (mixer_is_valid_fx(mixr, soundgen->soundgen_id_, fx_num))
                     {
-                        std::cout << "Setting FX param " << fx_num << ":"
-                                  << set_stmt->param_ << ":" << set_stmt->value_
-                                  << std::endl;
                         Fx *f = sg->effects[fx_num];
                         f->SetParam(set_stmt->param_, set_stmt->value_);
                     }
@@ -219,21 +213,17 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 }
             }
         }
-        else
-            std::cout << "YA WEE SHITE!!\n";
     }
 
     std::shared_ptr<ast::PanStatement> pan_stmt =
         std::dynamic_pointer_cast<ast::PanStatement>(node);
     if (pan_stmt)
     {
-        std::cout << "PAN EVAL!\n";
         auto target = Eval(pan_stmt->target_, env);
         auto soundgen =
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
-            std::cout << "YA BEAUTY!!\n";
             if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
             {
                 SoundGenerator *sg =
@@ -241,8 +231,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 sg->SetPan(pan_stmt->value_);
             }
         }
-        else
-            std::cout << "PAN, YA WEE SHITE!!\n";
     }
 
     std::shared_ptr<ast::PlayStatement> play_expr =
@@ -271,13 +259,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::VolumeStatement>(node);
     if (vol_stmt)
     {
-        std::cout << "VOL EVAL!\n";
         auto target = Eval(vol_stmt->target_, env);
         auto soundgen =
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
-            std::cout << "YA BEAUTY!!\n";
             if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
             {
                 SoundGenerator *sg =
@@ -285,8 +271,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 sg->SetVolume(vol_stmt->value_);
             }
         }
-        else
-            std::cout << "VOL, YA WEE SHITE!!\n";
     }
 
     ///////////////////////////////////////////////////////////////

@@ -25,8 +25,6 @@ namespace
 std::string ReplaceString(std::string subject, const std::string &search,
                           const std::string &replace)
 {
-    std::cout << "REPLACE " << search << " WITH " << replace << " in "
-              << subject << std::endl;
     size_t pos = 0;
     while ((pos = subject.find(search, pos)) != std::string::npos)
     {
@@ -42,6 +40,11 @@ using Wrapper =
     std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
 extern Tsqueue<Wrapper> g_queue;
 extern std::shared_ptr<object::Environment> global_env;
+
+constexpr char const *s_target_names[] = {"UNDEFINED", "ENV", "VALUES"};
+constexpr char const *s_proc_types[] = {"UNDEFINED", "PATTERN", "COMMAND"};
+constexpr char const *s_proc_timer_types[] = {"UNDEFINED", "EVERY", "OSC",
+                                              "OVER", "RAMP"};
 
 void Process::ParsePattern()
 {
@@ -287,16 +290,17 @@ void Process::EvalPattern(
     }
 }
 
-static const char *s_target_names[] = {"UNDEFINED", "ENV", "VALUES"};
-static const char *s_proc_types[] = {"UNDEFINED", "PATTERN", "COMMAND"};
-static const char *s_proc_timer_types[] = {"UNDEFINED", "EVERY", "OSC", "OVER",
-                                           "RAMP"};
-
 void Process::Status(wchar_t *status_string)
 {
     const char *PROC_COLOR = ANSI_COLOR_RESET;
     if (active_)
         PROC_COLOR = COOL_COLOR_PINK;
+
+    std::cout << "Lookup up TIMER TYPE:" << timer_type_ << std::endl;
+    std::cout << " is it: " << s_proc_timer_types[timer_type_] << std::endl;
+
+    std::cout << "LOOKUP UP TARGET_TYPE:" << target_type_ << std::endl;
+    std::cout << " is it: " << s_target_names[target_type_] << std::endl;
 
     swprintf(status_string, MAX_STATIC_STRING_SZ,
              WANSI_COLOR_WHITE "%sProcess// Type:%s TimerType:%s Target:%s "

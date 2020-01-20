@@ -317,15 +317,17 @@ class ProcessStatement : public Statement
   public:
     int mixer_process_id_{-1};
 
-    ProcessType process_type_;
+    ProcessType process_type_{ProcessType::NO_PROCESS_TYPE};
 
     // Command Process Vars
-    ProcessTimerType process_timer_type_;
+    ProcessTimerType process_timer_type_{
+        ProcessTimerType::NO_PROCESS_TIMER_TYPE};
     float loop_len_;
     std::string command_;
 
     // Pattern Process Vars
-    ProcessPatternTarget target_type_;
+    ProcessPatternTarget target_type_{
+        ProcessPatternTarget::NO_PROCESS_PATTERN_TARGET};
     std::vector<std::string> targets_;
     std::vector<std::shared_ptr<Expression>> functions_;
 

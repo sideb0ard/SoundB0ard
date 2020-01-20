@@ -174,7 +174,7 @@ enum ProcessTimerType
 
 enum ProcessPatternTarget
 {
-    NO_PROCESS_PATTERN_TARGET_,
+    NO_PROCESS_PATTERN_TARGET,
     ENV,    // pattern contains values from environment
     VALUES, // values in pattern to be applied to list of targets provided
 };
