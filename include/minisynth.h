@@ -4,8 +4,8 @@
 #include <wchar.h>
 
 #include <dca.h>
-#include <fx/envelope_generator.h>
-#include <fx/filter.h>
+#include <envelope_generator.h>
+#include <filter.h>
 #include <keys.h>
 #include <midimaaan.h>
 #include <minisynth_voice.h>

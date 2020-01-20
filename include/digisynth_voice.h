@@ -1,6 +1,6 @@
 #pragma once
 
-#include <fx/filter_sem.h>
+#include <filter_sem.h>
 #include <sample_oscillator.h>
 #include <voice.h>
 

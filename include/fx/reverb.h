@@ -1,16 +1,36 @@
 #pragma once
 
-#include "afx/combfilter.h"
-#include "afx/delay.h"
-#include "afx/delayapf.h"
-#include "afx/lpfcombfilter.h"
-#include "afx/onepolelpf.h"
-#include "fx.h"
+#include <afx/combfilter.h>
+#include <afx/delay.h>
+#include <afx/delayapf.h>
+#include <afx/lpfcombfilter.h>
+#include <afx/onepolelpf.h>
+#include <fx/fx.h>
 
-typedef struct reverb
+class Reverb : Fx
 {
-    fx m_fx; // API
+  public:
+    Reverb();
+    void Status(char *string) override;
+    stereo_val Process(stereo_val input) override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
+  private:
+    void Init();
+    void CookVariables();
+
+    void SetPreDelayMsec(double val);
+    void SetPreDelayAttenDb(double val);
+    void SetRt60(double val);
+    void SetWetPct(double val);
+    void SetInputLpfG(double val);
+    void SetLpf2G2(double val);
+    void SetApfDelayMsec(int apf_num, double val);
+    void SetApfG(int apf_num, double val);
+    void SetCombDelayMsec(int comb_num, double val);
+
+  private:
     // pre-delay block
     delay m_pre_delay;
 
@@ -67,23 +87,4 @@ typedef struct reverb
     double m_comb_6_delay_msec;
     double m_comb_7_delay_msec;
     double m_comb_8_delay_msec;
-
-} reverb;
-
-reverb *new_reverb(void);
-void reverb_init_reverb(reverb *r);
-void reverb_cook_variables(reverb *r);
-
-stereo_val reverb_process_audio(void *self, stereo_val in);
-
-void reverb_status(void *self, char *string);
-
-void reverb_set_pre_delay_msec(reverb *r, double val);
-void reverb_set_pre_delay_atten_db(reverb *r, double val);
-void reverb_set_rt60(reverb *r, double val);
-void reverb_set_wet_pct(reverb *r, double val);
-void reverb_set_input_lpf_g(reverb *r, double val);
-void reverb_set_lpf2_g2(reverb *r, double val);
-void reverb_set_apf_delay_msec(reverb *r, int apf_num, double val);
-void reverb_set_apf_g(reverb *r, int apf_num, double val);
-void reverb_set_comb_delay_msec(reverb *r, int comb_num, double val);
+};

@@ -152,3 +152,5 @@ void Envelope::SetReleaseMs(double val)
 }
 
 void Envelope::SetDebug(bool b) { debug_ = b; }
+void Envelope::SetParam(std::string name, double val) {}
+double Envelope::GetParam(std::string name) { return 0; }

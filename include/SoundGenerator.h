@@ -17,6 +17,8 @@ class SoundGenerator
 
     virtual stereo_val genNext() = 0;
     virtual void status(wchar_t *wstring) = 0;
+    virtual void SetParam(std::string name, double val) = 0;
+    virtual double GetParam(std::string name) = 0;
 
     virtual void start();
     virtual void stop();
@@ -33,9 +35,6 @@ class SoundGenerator
     virtual void eventNotify(broadcast_event event, mixer_timing_info tinfo);
 
     void parseMidiEvent(midi_event ev, mixer_timing_info tinfo);
-
-    virtual void SetParam(std::string name, double val) = 0;
-    virtual double GetParam(std::string name) = 0;
 
     void SetVolume(double val);
     double GetVolume();
@@ -65,7 +64,6 @@ class SoundGenerator
 
 bool is_synth(SoundGenerator *self);
 bool is_stepper(SoundGenerator *self);
-int add_beatrepeat_soundgen(SoundGenerator *self, int nbeats, int sixteenth);
 int add_basicfilter_soundgen(SoundGenerator *self);
 int add_bitcrush_soundgen(SoundGenerator *self);
 int add_compressor_soundgen(SoundGenerator *self);

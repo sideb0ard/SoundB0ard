@@ -1,7 +1,7 @@
 #ifndef ENVELOPE_H
 #define ENVELOPE_H
 
-#include <fx/envelope_generator.h>
+#include <envelope_generator.h>
 #include <fx/fx.h>
 
 enum
@@ -14,7 +14,6 @@ class Envelope : Fx
 {
   public:
     Envelope();
-    ~Envelope();
     void Status(char *string) override;
     stereo_val Process(stereo_val input) override;
     void EventNotify(broadcast_event event) override;

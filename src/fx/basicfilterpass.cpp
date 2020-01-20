@@ -3,14 +3,14 @@
 #include <stdlib.h>
 
 #include <defjams.h>
+#include <filter_moogladder.h>
 #include <fx/basicfilterpass.h>
-#include <fx/filter_moogladder.h>
 #include <utils.h>
 
 const char *filtertype_to_name[] = {"LPF1", "HPF1", "LPF2", "HPF2", "BPF2",
                                     "BSF2", "LPF4", "HPF4", "BPF4"};
 
-Filterpass ::Filterpass()
+FilterPass ::FilterPass()
 {
     type_ = BASICFILTER;
     enabled_ = true;
@@ -29,7 +29,7 @@ Filterpass ::Filterpass()
     printf("LFO1 freq is %.2f\n", m_lfo1_.osc.m_osc_fo);
 }
 
-void Filterpass::Status(char *status_string)
+void FilterPass::Status(char *status_string)
 {
     // clang-format off
     snprintf(status_string, MAX_STATIC_STRING_SZ,
@@ -44,7 +44,7 @@ void Filterpass::Status(char *status_string)
     // clang-format on
 }
 
-stereo_val Filterpass::Process(stereo_val input)
+stereo_val FilterPass::Process(stereo_val input)
 {
     double lfo1_val = 0.0;
     double lfo2_val = 0.0;
@@ -70,7 +70,30 @@ stereo_val Filterpass::Process(stereo_val input)
     return input;
 }
 
-void Filterpass::SetLfoActive(int lfo_num, bool b)
+void FilterPass::SetParam(std::string name, double val) {}
+double FilterPass::GetParam(std::string name) { return 0; }
+
+void FilterPass::SetLfoType(int lfo_num, unsigned int type)
+{
+    if (type >= MAX_LFO_OSC)
+    {
+        printf("Val out of range - must be < %d\n", MAX_LFO_OSC);
+        return;
+    }
+    switch (lfo_num)
+    {
+    case (1):
+        m_lfo1_.osc.m_waveform = type;
+        break;
+    case (2):
+        m_lfo2_.osc.m_waveform = type;
+        break;
+    default:
+        printf("Only got two LFO's mate - what do you think i am?\n");
+    }
+}
+
+void FilterPass::SetLfoActive(int lfo_num, bool b)
 {
     switch (lfo_num)
     {
@@ -85,7 +108,7 @@ void Filterpass::SetLfoActive(int lfo_num, bool b)
     }
 }
 
-void Filterpass::SetLfoRate(int lfo_num, double val)
+void FilterPass::SetLfoRate(int lfo_num, double val)
 {
     if (val < MIN_LFO_RATE || val > MAX_LFO_RATE)
     {
@@ -106,7 +129,7 @@ void Filterpass::SetLfoRate(int lfo_num, double val)
     }
 }
 
-void Filterpass::SetLfoAmp(int lfo_num, double val)
+void FilterPass::SetLfoAmp(int lfo_num, double val)
 {
     if (val < 0. || val > 1.)
     {
@@ -120,26 +143,6 @@ void Filterpass::SetLfoAmp(int lfo_num, double val)
         break;
     case (2):
         m_lfo2_.osc.m_amplitude = val;
-        break;
-    default:
-        printf("Only got two LFO's mate - what do you think i am?\n");
-    }
-}
-
-void Filterpass::SetLfoType(int lfo_num, unsigned int type)
-{
-    if (type >= MAX_LFO_OSC)
-    {
-        printf("Val out of range - must be < %d\n", MAX_LFO_OSC);
-        return;
-    }
-    switch (lfo_num)
-    {
-    case (1):
-        m_lfo1_.osc.m_waveform = type;
-        break;
-    case (2):
-        m_lfo2_.osc.m_waveform = type;
         break;
     default:
         printf("Only got two LFO's mate - what do you think i am?\n");

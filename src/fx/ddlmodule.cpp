@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "ddlmodule.h"
-#include "defjams.h"
-#include "utils.h"
+#include <defjams.h>
+#include <fx/ddlmodule.h>
+#include <utils.h>
 
 void ddl_initialize(ddlmodule *d)
 {

@@ -12,7 +12,6 @@
 #include "audioutils.h"
 #include "cmdloop.h"
 #include "defjams.h"
-#include "envelope.h"
 #include "midimaaan.h"
 #include "mixer.h"
 

@@ -3,7 +3,7 @@
 #include <stdbool.h>
 
 #include <defjams.h>
-#include <fx/filter_moogladder.h>
+#include <filter_moogladder.h>
 #include <fx/fx.h>
 #include <lfo.h>
 
@@ -15,14 +15,12 @@ enum
     BANDPASS
 };
 
-class Filterpass : Fx
+class FilterPass : Fx
 {
   public:
-    Filterpass();
-    ~Filterpass();
+    FilterPass();
     void Status(char *string) override;
     stereo_val Process(stereo_val input) override;
-    void EventNotify(broadcast_event event) override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
 

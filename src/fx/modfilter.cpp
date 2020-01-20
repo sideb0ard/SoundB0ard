@@ -2,81 +2,73 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "defjams.h"
-#include "modfilter.h"
+#include <defjams.h>
+#include <fx/modfilter.h>
 
-modfilter *new_modfilter()
+ModFilter::ModFilter()
 {
-    modfilter *mf = (modfilter*) calloc(1, sizeof(modfilter));
-    modfilter_init(mf);
+    Init();
 
-    mf->m_fx.type = MODFILTER;
-    mf->m_fx.enabled = true;
-    mf->m_fx.status = &modfilter_status;
-    mf->m_fx.process = &modfilter_process_audio;
-    mf->m_fx.event_notify = &fx_noop_event_notify;
-
-    return mf;
+    type_ = MODFILTER;
+    enabled_ = true;
 }
 
-void modfilter_init(modfilter *mf)
+void ModFilter::Init()
 {
-    biquad_flush_delays(&mf->m_left_lpf);
-    biquad_flush_delays(&mf->m_right_lpf);
+    biquad_flush_delays(&m_left_lpf_);
+    biquad_flush_delays(&m_right_lpf_);
 
-    wt_initialize(&mf->m_fc_lfo);
-    wt_initialize(&mf->m_q_lfo);
+    wt_initialize(&m_fc_lfo_);
+    wt_initialize(&m_q_lfo_);
 
-    mf->m_min_cutoff_freq = 100.;
-    mf->m_max_cutoff_freq = 5000.;
-    mf->m_min_q = 0.577;
-    mf->m_max_q = 10;
+    m_min_cutoff_freq_ = 100.;
+    m_max_cutoff_freq_ = 5000.;
+    m_min_q_ = 0.577;
+    m_max_q_ = 10;
 
-    mf->m_lfo_waveform = sine;
-    mf->m_mod_depth_fc = 50.;
-    mf->m_mod_rate_fc = 2.5;
-    mf->m_mod_depth_q = 50.;
-    mf->m_mod_rate_q = 2.5;
-    mf->m_lfo_phase = 0;
+    m_lfo_waveform_ = sine;
+    m_mod_depth_fc_ = 50.;
+    m_mod_rate_fc_ = 2.5;
+    m_mod_depth_q_ = 50.;
+    m_mod_rate_q_ = 2.5;
+    m_lfo_phase_ = 0;
 
-    // mf->m_fc_lfo.polarity = 1; // unipolar
-    // mf->m_fc_lfo.mode = 0;     // normal, not band limited
+    // m_fc_lfo.polarity = 1; // unipolar
+    // m_fc_lfo.mode = 0;     // normal, not band limited
 
-    // mf->m_q_lfo.polarity = 1; // unipolar
-    // mf->m_q_lfo.mode = 0;     // normal, not band limited
+    // m_q_lfo.polarity = 1; // unipolar
+    // m_q_lfo.mode = 0;     // normal, not band limited
 
-    modfilter_update(mf);
+    Update();
 
-    wt_start((oscillator *)&mf->m_fc_lfo);
-    wt_start((oscillator *)&mf->m_q_lfo);
+    wt_start((oscillator *)&m_fc_lfo_);
+    wt_start((oscillator *)&m_q_lfo_);
 }
 
-void modfilter_update(modfilter *mf)
+void ModFilter::Update()
 {
-    mf->m_fc_lfo.osc.m_osc_fo = mf->m_mod_rate_fc;
-    mf->m_q_lfo.osc.m_osc_fo = mf->m_mod_rate_q;
-    mf->m_fc_lfo.osc.m_waveform = mf->m_lfo_waveform;
-    mf->m_q_lfo.osc.m_waveform = mf->m_lfo_waveform;
-    wt_update((oscillator *)&mf->m_fc_lfo);
-    wt_update((oscillator *)&mf->m_q_lfo);
+    m_fc_lfo_.osc.m_osc_fo = m_mod_rate_fc_;
+    m_q_lfo_.osc.m_osc_fo = m_mod_rate_q_;
+    m_fc_lfo_.osc.m_waveform = m_lfo_waveform_;
+    m_q_lfo_.osc.m_waveform = m_lfo_waveform_;
+    wt_update((oscillator *)&m_fc_lfo_);
+    wt_update((oscillator *)&m_q_lfo_);
 }
 
-double modfilter_calculate_cutoff_freq(modfilter *mf, double lfo_sample)
+double ModFilter::CalculateCutoffFreq(double lfo_sample)
 {
-    return (mf->m_mod_depth_fc / 100.0) *
-               (lfo_sample * (mf->m_max_cutoff_freq - mf->m_min_cutoff_freq)) +
-           mf->m_min_cutoff_freq;
+    return (m_mod_depth_fc_ / 100.0) *
+               (lfo_sample * (m_max_cutoff_freq_ - m_min_cutoff_freq_)) +
+           m_min_cutoff_freq_;
 }
 
-double modfilter_calculate_q(modfilter *mf, double lfo_sample)
+double ModFilter::CalculateQ(double lfo_sample)
 {
-    return (mf->m_mod_depth_q / 100.0) *
-               (lfo_sample * (mf->m_max_q - mf->m_min_q)) +
-           mf->m_min_q;
+    return (m_mod_depth_q_ / 100.0) * (lfo_sample * (m_max_q_ - m_min_q_)) +
+           m_min_q_;
 }
 
-void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
-                                         double q)
+void ModFilter::CalculateLeftLpfCoeffs(double cutoff_freq, double q)
 {
     double theta_c = 2.0 * M_PI * cutoff_freq / (double)SAMPLE_RATE;
     double d = 1.0 / q;
@@ -91,16 +83,15 @@ void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
     double alpha = (0.5 + beta - gamma) / 2.0;
 
     // left channel
-    mf->m_left_lpf.m_a0 = alpha;
-    mf->m_left_lpf.m_a1 = 2.0 * alpha;
-    mf->m_left_lpf.m_a2 = alpha;
-    mf->m_left_lpf.m_b1 =
+    m_left_lpf_.m_a0 = alpha;
+    m_left_lpf_.m_a1 = 2.0 * alpha;
+    m_left_lpf_.m_a2 = alpha;
+    m_left_lpf_.m_b1 =
         -2.0 * gamma; // if b's are negative in the difference equation
-    mf->m_left_lpf.m_b2 = 2.0 * beta;
+    m_left_lpf_.m_b2 = 2.0 * beta;
 }
 
-void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
-                                          double q)
+void ModFilter::CalculateRightLpfCoeffs(double cutoff_freq, double q)
 {
     double theta_c = 2.0 * M_PI * cutoff_freq / (double)SAMPLE_RATE;
     double d = 1.0 / q;
@@ -114,111 +105,111 @@ void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
 
     double alpha = (0.5 + beta - gamma) / 2.0;
 
-    // left channel
-    mf->m_right_lpf.m_a0 = alpha;
-    mf->m_right_lpf.m_a1 = 2.0 * alpha;
-    mf->m_right_lpf.m_a2 = alpha;
-    mf->m_right_lpf.m_b1 =
+    // right channel
+    m_right_lpf_.m_a0 = alpha;
+    m_right_lpf_.m_a1 = 2.0 * alpha;
+    m_right_lpf_.m_a2 = alpha;
+    m_right_lpf_.m_b1 =
         -2.0 * gamma; // if b's are negative in the difference equation
-    mf->m_right_lpf.m_b2 = 2.0 * beta;
+    m_right_lpf_.m_b2 = 2.0 * beta;
 }
 
-stereo_val modfilter_process_audio(void *self, stereo_val in)
+stereo_val ModFilter::Process(stereo_val in)
 {
-    modfilter *mf = (modfilter *)self;
     stereo_val out = {};
 
     double yn = 0.0;
     double yqn = 0; // quad phase
 
-    yn = wt_do_oscillate((oscillator *)&mf->m_fc_lfo, &yqn);
-    double fc = modfilter_calculate_cutoff_freq(mf, yn);
-    double fcq = modfilter_calculate_cutoff_freq(mf, yqn);
+    yn = wt_do_oscillate((oscillator *)&m_fc_lfo_, &yqn);
+    double fc = CalculateCutoffFreq(yn);
+    double fcq = CalculateCutoffFreq(yqn);
     // printf("LFO FC: %f FC: %f\n", yn, fc);
 
-    yn = wt_do_oscillate((oscillator *)&mf->m_q_lfo, &yqn);
-    double q = modfilter_calculate_q(mf, yn);
-    double qq = modfilter_calculate_q(mf, yqn);
+    yn = wt_do_oscillate((oscillator *)&m_q_lfo_, &yqn);
+    double q = CalculateQ(yn);
+    double qq = CalculateQ(yqn);
     // printf("LFO Q: %f Q: %f\n", yn, q);
 
-    modfilter_calculate_left_lpf_coeffs(mf, fc, q);
+    CalculateLeftLpfCoeffs(fc, q);
 
-    if (mf->m_lfo_phase == 0)
-        modfilter_calculate_right_lpf_coeffs(mf, fc, q);
+    if (m_lfo_phase_ == 0)
+        CalculateRightLpfCoeffs(fc, q);
     else
-        modfilter_calculate_right_lpf_coeffs(mf, fcq, qq);
+        CalculateRightLpfCoeffs(fcq, qq);
 
-    out.left = biquad_process(&mf->m_left_lpf, in.left);
-    out.right = biquad_process(&mf->m_right_lpf, in.right);
+    out.left = biquad_process(&m_left_lpf_, in.left);
+    out.right = biquad_process(&m_right_lpf_, in.right);
 
     return out;
 }
 
-void modfilter_status(void *self, char *status_string)
+void ModFilter::Status(char *status_string)
 {
-    modfilter *mf = (modfilter *)self;
     snprintf(status_string, MAX_STATIC_STRING_SZ,
              "depthfc:%.2f ratefc:%.2f depthq:%.2f rateq:%.2f lfo:%d phase:%d",
-             mf->m_mod_depth_fc, mf->m_mod_rate_fc, mf->m_mod_depth_q,
-             mf->m_mod_rate_q, mf->m_lfo_waveform, mf->m_lfo_phase);
+             m_mod_depth_fc_, m_mod_rate_fc_, m_mod_depth_q_, m_mod_rate_q_,
+             m_lfo_waveform_, m_lfo_phase_);
 }
 
-void modfilter_set_mod_depth_fc(modfilter *mf, double val)
+void ModFilter::SetModDepthFc(double val)
 {
     if (val >= 0 && val <= 100)
-        mf->m_mod_depth_fc = val;
+        m_mod_depth_fc_ = val;
     else
         printf("Val has to be between 0 and 100\n");
 
-    modfilter_update(mf);
+    Update();
 }
 
-void modfilter_set_mod_rate_fc(modfilter *mf, double val)
+void ModFilter::SetModRateFc(double val)
 {
     if (val >= 0.02 && val <= 10)
-        mf->m_mod_rate_fc = val;
+        m_mod_rate_fc_ = val;
     else
         printf("Val has to be between 0.2 and 10\n");
 
-    modfilter_update(mf);
+    Update();
 }
 
-void modfilter_set_mod_depth_q(modfilter *mf, double val)
+void ModFilter::SetModDepthQ(double val)
 {
     if (val >= 0 && val <= 100)
-        mf->m_mod_depth_q = val;
+        m_mod_depth_q_ = val;
     else
         printf("Val has to be between 0 and 100\n");
 
-    modfilter_update(mf);
+    Update();
 }
 
-void modfilter_set_mod_rate_q(modfilter *mf, double val)
+void ModFilter::SetModRateQ(double val)
 {
     if (val >= 0.02 && val <= 10)
-        mf->m_mod_rate_q = val;
+        m_mod_rate_q_ = val;
     else
         printf("Val has to be between 0.2 and 10\n");
 
-    modfilter_update(mf);
+    Update();
 }
 
-void modfilter_set_lfo_waveform(modfilter *mf, unsigned int val)
+void ModFilter::SetLfoWaveForm(unsigned int val)
 {
     if (val < 4)
-        mf->m_lfo_waveform = val;
+        m_lfo_waveform_ = val;
     else
         printf("Val has to be between 0 and 3\n");
 
-    modfilter_update(mf);
+    Update();
 }
 
-void modfilter_set_lfo_phase(modfilter *mf, unsigned int val)
+void ModFilter::SetLfoPhase(unsigned int val)
 {
     if (val < 2)
-        mf->m_lfo_phase = val;
+        m_lfo_phase_ = val;
     else
         printf("Val has to be between 0 or 1\n");
 
-    modfilter_update(mf);
+    Update();
 }
+void ModFilter::SetParam(std::string name, double val) {}
+double ModFilter::GetParam(std::string name) { return 0; }

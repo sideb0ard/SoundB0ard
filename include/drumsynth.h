@@ -1,9 +1,9 @@
 #pragma once
 
 #include <defjams.h>
+#include <envelope_generator.h>
+#include <filter_moogladder.h>
 #include <fx/distortion.h>
-#include <fx/envelope_generator.h>
-#include <fx/filter_moogladder.h>
 #include <qblimited_oscillator.h>
 #include <soundgenerator.h>
 
@@ -14,7 +14,6 @@ class drumsynth : public SoundGenerator
 {
   public:
     drumsynth();
-    ~drumsynth() = default;
 
     stereo_val genNext() override;
     void status(wchar_t *ss) override;
@@ -54,7 +53,7 @@ class drumsynth : public SoundGenerator
     filter_moogladder m_filter;
 
     // DISTORTION
-    distortion m_distortion;
+    Distortion m_distortion;
 
     int mod_semitones_range;
     bool started;

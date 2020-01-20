@@ -2,8 +2,8 @@
 
 #include <dca.h>
 #include <dxsynth_voice.h>
-#include <fx/envelope_generator.h>
-#include <fx/filter.h>
+#include <envelope_generator.h>
+#include <filter.h>
 #include <keys.h>
 #include <midimaaan.h>
 #include <modmatrix.h>

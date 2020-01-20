@@ -112,8 +112,8 @@ stereo_val drumsynth::genNext()
     out.left = combined_osc * volume * midi_velocity * pan_left;
     out.right = combined_osc * volume * midi_velocity * pan_right;
 
-    m_distortion.m_threshold = m_distortion_threshold;
-    out = distortion_process(&m_distortion, out);
+    m_distortion.SetParam("threshold", m_distortion_threshold);
+    out = m_distortion.Process(out);
 
     out = effector(this, out);
 

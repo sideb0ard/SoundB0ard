@@ -15,14 +15,6 @@ Distortion::Distortion()
     m_threshold_ = 0.707;
 }
 
-void Distortion::SetThreshold(double val)
-{
-    if (val >= 0.01 && val <= 1.0)
-        m_threshold_ = val;
-    else
-        printf("Val must be between 0.01 and 1\n");
-}
-
 void Distortion::Status(char *status_string)
 {
     snprintf(status_string, MAX_STATIC_STRING_SZ, "Distortion! threshold:%.2f",
@@ -46,4 +38,15 @@ stereo_val Distortion::Process(stereo_val input)
     out.right /= m_threshold_;
 
     return out;
+}
+
+void Distortion::SetParam(std::string name, double val) {}
+double Distortion::GetParam(std::string name) { return 0; }
+
+void Distortion::SetThreshold(double val)
+{
+    if (val >= 0.01 && val <= 1.0)
+        m_threshold_ = val;
+    else
+        printf("Val must be between 0.01 and 1\n");
 }

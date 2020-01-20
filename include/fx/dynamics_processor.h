@@ -21,12 +21,13 @@ class DynamicsProcessor : Fx
 {
   public:
     DynamicsProcessor();
-    ~DynamicsProcessor();
     void Status(char *string) override;
     stereo_val Process(stereo_val input) override;
-    void EventNotify(broadcast_event event) override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
+
+    void SetExternalSource(unsigned int val);
+    void SetDefaultSidechainParams();
 
   private:
     void Init();
@@ -48,8 +49,6 @@ class DynamicsProcessor : Fx
     void SetStereoLink(unsigned int val);
     void SetProcessorType(unsigned int val);
     void SetTimeConstant(unsigned int val);
-    void SetExternalSource(unsigned int val);
-    void SetDefaultSidechainParams();
 
   private:
     envelope_detector m_left_detector_;

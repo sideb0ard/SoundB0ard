@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include <dynamics_processor.h>
+#include <fx/dynamics_processor.h>
 #include <interpreter/fx_cmds.hpp>
 #include <mixer.h>
 
@@ -27,9 +27,7 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
             {
                 std::cout << "Adding a " << str_obj->value_ << std::endl;
 
-                if (str_obj->value_ == "beatrepeat")
-                    add_beatrepeat_soundgen(sg, 3, 12);
-                else if (str_obj->value_ == "bitcrush")
+                if (str_obj->value_ == "bitcrush")
                     add_bitcrush_soundgen(sg);
                 else if (str_obj->value_ == "compressor")
                     add_compressor_soundgen(sg);
@@ -52,11 +50,11 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                                 mixr, soundgen_sidechain_src->soundgen_id_))
                         {
                             int fx_num = add_compressor_soundgen(sg);
-                            dynamics_processor *dp =
-                                (dynamics_processor *)sg->effects[fx_num];
-                            dynamics_processor_set_external_source(
-                                dp, soundgen_sidechain_src->soundgen_id_);
-                            dynamics_processor_set_default_sidechain_params(dp);
+                            DynamicsProcessor *dp =
+                                (DynamicsProcessor *)sg->effects[fx_num];
+                            dp->SetExternalSource(
+                                soundgen_sidechain_src->soundgen_id_);
+                            dp->SetDefaultSidechainParams();
                         }
                     }
                 }

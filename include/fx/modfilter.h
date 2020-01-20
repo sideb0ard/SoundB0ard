@@ -4,44 +4,45 @@
 #include "fx.h"
 #include "wt_oscillator.h"
 
-typedef struct modfilter
+class ModFilter : Fx
 {
-    fx m_fx; // API
-    biquad m_left_lpf;
-    biquad m_right_lpf;
+  public:
+    ModFilter();
+    void Status(char *string) override;
+    stereo_val Process(stereo_val input) override;
+    void SetParam(std::string name, double val) override;
+    double GetParam(std::string name) override;
 
-    wt_oscillator m_fc_lfo;
-    wt_oscillator m_q_lfo;
+  private:
+    void Init();
+    void Update();
+    double CalculateCutoffFreq(double lfo_sample);
+    double CalculateQ(double lfo_sample);
+    void CalculateLeftLpfCoeffs(double cutoff_freq, double q);
+    void CalculateRightLpfCoeffs(double cutoff_freq, double q);
+    void SetModDepthFc(double val);
+    void SetModRateFc(double val);
+    void SetModDepthQ(double val);
+    void SetModRateQ(double val);
+    void SetLfoWaveForm(unsigned int val);
+    void SetLfoPhase(unsigned int val);
 
-    double m_min_cutoff_freq;
-    double m_max_cutoff_freq;
-    double m_min_q;
-    double m_max_q;
+  private:
+    biquad m_left_lpf_;
+    biquad m_right_lpf_;
 
-    double m_mod_depth_fc;
-    double m_mod_rate_fc;
-    double m_mod_depth_q;
-    double m_mod_rate_q;
-    unsigned int m_lfo_waveform;
-    unsigned int m_lfo_phase;
+    wt_oscillator m_fc_lfo_;
+    wt_oscillator m_q_lfo_;
 
-} modfilter;
+    double m_min_cutoff_freq_;
+    double m_max_cutoff_freq_;
+    double m_min_q_;
+    double m_max_q_;
 
-modfilter *new_modfilter(void);
-void modfilter_init(modfilter *mf);
-void modfilter_update(modfilter *mf);
-double modfilter_calculate_cutoff_freq(modfilter *mf, double lfo_sample);
-double modfilter_calculate_q(modfilter *mf, double lfo_sample);
-void modfilter_calculate_left_lpf_coeffs(modfilter *mf, double cutoff_freq,
-                                         double q);
-void modfilter_calculate_right_lpf_coeffs(modfilter *mf, double cutoff_freq,
-                                          double q);
-stereo_val modfilter_process_audio(void *self, stereo_val in);
-void modfilter_status(void *self, char *status_string);
-
-void modfilter_set_mod_depth_fc(modfilter *mf, double val);
-void modfilter_set_mod_rate_fc(modfilter *mf, double val);
-void modfilter_set_mod_depth_q(modfilter *mf, double val);
-void modfilter_set_mod_rate_q(modfilter *mf, double val);
-void modfilter_set_lfo_waveform(modfilter *mf, unsigned int val);
-void modfilter_set_lfo_phase(modfilter *mf, unsigned int val);
+    double m_mod_depth_fc_;
+    double m_mod_rate_fc_;
+    double m_mod_depth_q_;
+    double m_mod_rate_q_;
+    unsigned int m_lfo_waveform_;
+    unsigned int m_lfo_phase_;
+};

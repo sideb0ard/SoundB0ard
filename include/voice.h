@@ -2,8 +2,8 @@
 #define SBSHELL_VOICE_H_
 
 #include <dca.h>
-#include <fx/envelope_generator.h>
-#include <fx/filter.h>
+#include <envelope_generator.h>
+#include <filter.h>
 #include <lfo.h>
 #include <modmatrix.h>
 #include <oscillator.h>

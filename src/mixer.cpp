@@ -9,26 +9,26 @@
 
 #include <portaudio.h>
 
-#include "soundgenerator.h"
-#include "ableton_link_wrapper.h"
-#include "bitshift.h"
-#include "defjams.h"
-#include "digisynth.h"
-#include "drumsampler.h"
-#include "drumsynth.h"
-#include "dxsynth.h"
-#include "envelope.h"
-#include "euclidean.h"
-#include "fx.h"
-#include "intdiv.h"
-#include "juggler.h"
-#include "looper.h"
-#include "markov.h"
-#include "minisynth.h"
-#include "mixer.h"
-#include "sbmsg.h"
-#include "utils.h"
+#include <ableton_link_wrapper.h>
+#include <bitshift.h>
+#include <defjams.h>
+#include <digisynth.h>
+#include <drumsampler.h>
+#include <drumsynth.h>
+#include <dxsynth.h>
+#include <euclidean.h>
+#include <fx/envelope.h>
+#include <fx/fx.h>
+#include <intdiv.h>
 #include <interpreter/object.hpp>
+#include <juggler.h>
+#include <looper.h>
+#include <markov.h>
+#include <minisynth.h>
+#include <mixer.h>
+#include <sbmsg.h>
+#include <soundgenerator.h>
+#include <utils.h>
 
 mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
@@ -123,7 +123,7 @@ mixer *new_mixer(double output_latency)
     // mixr->worker.have_midi_tick = true;
     // pthread_mutex_init(&mixr->worker.midi_tick_mutex, NULL);
     // pthread_cond_init(&mixr->worker.midi_tick_cond, NULL);
-    mixr->processing_addr = lo_address_new(NULL, "7770");
+    // mixr->processing_addr = lo_address_new(NULL, "7770");
 
     return mixr;
 }
@@ -276,13 +276,13 @@ void mixer_status_sgz(mixer *mixr, bool all)
                         for (int j = 0;
                              j < mixr->SoundGenerators[i]->effects_num; j++)
                         {
-                            fx *f = mixr->SoundGenerators[i]->effects[j];
-                            if (f->enabled)
+                            Fx *f = mixr->SoundGenerators[i]->effects[j];
+                            if (f->enabled_)
                                 printf(COOL_COLOR_YELLOW);
                             else
                                 printf(ANSI_COLOR_RESET);
                             char fx_status[512];
-                            f->status(f, fx_status);
+                            f->Status(fx_status);
                             printf("\n[fx %d:%d %s]", i, j, fx_status);
                         }
                         printf(ANSI_COLOR_RESET);
@@ -347,8 +347,8 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
                 {
                     if (sg->effects[j])
                     {
-                        fx *f = sg->effects[j];
-                        f->event_notify(f, event);
+                        Fx *f = sg->effects[j];
+                        f->EventNotify(event);
                     }
                 }
             }

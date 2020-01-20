@@ -1,3 +1,5 @@
+#pragma once
+
 #include <defjams.h>
 
 #include <stdint.h>

@@ -1,7 +1,7 @@
 #pragma once
 
-#include <fx/envelope_generator.h>
-#include <fx/filter_moogladder.h>
+#include <envelope_generator.h>
+#include <filter_moogladder.h>
 #include <fx/stereodelay.h>
 #include <soundgenerator.h>
 

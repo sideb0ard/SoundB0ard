@@ -5,11 +5,11 @@
 
 class Distortion : Fx
 {
+  public:
     Distortion();
-    ~Distortion();
+
     void Status(char *string) override;
     stereo_val Process(stereo_val input) override;
-    void EventNotify(broadcast_event event) override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
 

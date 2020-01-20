@@ -1,6 +1,7 @@
-#include "envelope_detector.h"
-#include "defjams.h"
 #include <math.h>
+
+#include <defjams.h>
+#include <fx/envelope_detector.h>
 
 const float DIGITAL_TC = -2.0;                               // log(1%)
 const float ANALOG_TC = -0.43533393574791066201247090699309; // (log(36.7%)

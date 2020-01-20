@@ -1,8 +1,8 @@
 #include <stdlib.h>
 
-#include "dynamics_processor.h"
-#include "mixer.h"
-#include "utils.h"
+#include <fx/dynamics_processor.h>
+#include <mixer.h>
+#include <utils.h>
 
 extern mixer *mixr;
 
@@ -299,3 +299,5 @@ void DynamicsProcessor::SetDefaultSidechainParams()
     SetReleaseMs(55);
     SetRatio(2.5);
 }
+void DynamicsProcessor::SetParam(std::string name, double val) {}
+double DynamicsProcessor::GetParam(std::string name) { return 0; }

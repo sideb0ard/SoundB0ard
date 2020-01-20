@@ -2,9 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "defjams.h"
-#include "delayline.h"
-#include "utils.h"
+#include <defjams.h>
+#include <fx/delayline.h>
+#include <utils.h>
 
 void delayline_init(delayline *dl, int delay_length)
 {
