@@ -360,33 +360,8 @@ void SoundGenerator::SetPan(double val)
 static int soundgen_add_fx(SoundGenerator *self, Fx *f)
 {
 
-    Fx **new_effects = NULL;
-    if (self->effects_size <= self->effects_num)
-    {
-        if (self->effects_size == 0)
-        {
-            self->effects_size = DEFAULT_ARRAY_SIZE;
-        }
-        else
-        {
-            self->effects_size *= 2;
-        }
-
-        new_effects =
-            (Fx **)realloc(self->effects, self->effects_size * sizeof(Fx *));
-        if (new_effects == NULL)
-        {
-            printf("Ooh, burney - cannae allocate "
-                   "memory for new effects");
-            exit(1);
-        }
-        else
-        {
-            self->effects = new_effects;
-        }
-    }
-    self->effects[self->effects_num] = f;
-    self->effects_on = 1;
+    if (self->effects_num < kMaxNumSoundGenFx)
+        self->effects[self->effects_num] = f;
 
     printf("done adding effect\n");
     return self->effects_num++;

@@ -45,6 +45,8 @@
 
 #define NUM_COMPAT_NOTES 6
 
+constexpr int kMaxNumSoundGenFx = 20;
+
 // #define sparkchars L"\u2581\u2582\u2583\u2585\u2586\u2587"
 
 #define ANSI_COLOR_BLUE "\x1b[34m"

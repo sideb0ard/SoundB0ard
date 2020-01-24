@@ -56,10 +56,9 @@ class SoundGenerator
 
     int note_duration_ms_{100};
 
-    int effects_size; // size of array
-    int effects_num;  // num of effects
-    Fx **effects;
-    int effects_on; // bool
+    int effects_num; // num of effects
+    Fx *effects[kMaxNumSoundGenFx];
+    bool effects_on{true}; // bool
 };
 
 bool is_synth(SoundGenerator *self);
