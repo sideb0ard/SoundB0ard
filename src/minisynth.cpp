@@ -1035,213 +1035,205 @@ void minisynth::randomize()
     // minisynth_print_settings(ms);
 }
 
-bool minisynth_save_settings(minisynth *ms, char *preset_name)
+void minisynth::Save(std::string preset_to_load)
 {
-    if (strlen(preset_name) == 0)
+    if (preset_to_load.empty())
     {
         printf("Play tha game, pal, need a name to save yer synth settings "
                "with\n");
-        return false;
+        return;
     }
+    const char *preset_name = preset_to_load.c_str();
+
     printf("Saving '%s' settings for Minisynth to file %s\n", preset_name,
            MOOG_PRESET_FILENAME);
     FILE *presetzzz = fopen(MOOG_PRESET_FILENAME, "a+");
     if (presetzzz == NULL)
     {
         printf("Couldn't save settings!!\n");
-        return false;
+        return;
     }
 
     int settings_count = 0;
-    strncpy(ms->m_settings.m_settings_name, preset_name, 256);
+    strncpy(m_settings.m_settings_name, preset_name, 256);
 
-    fprintf(presetzzz, "::name=%s", ms->m_settings.m_settings_name);
+    fprintf(presetzzz, "::name=%s", m_settings.m_settings_name);
     settings_count++;
 
-    fprintf(presetzzz, "::voice_mode=%d", ms->m_settings.m_voice_mode);
+    fprintf(presetzzz, "::voice_mode=%d", m_settings.m_voice_mode);
     settings_count++;
 
-    fprintf(presetzzz, "::monophonic=%d", ms->m_settings.m_monophonic);
+    fprintf(presetzzz, "::monophonic=%d", m_settings.m_monophonic);
     settings_count++;
 
     // LFO1
-    fprintf(presetzzz, "::lfo1_waveform=%d", ms->m_settings.m_lfo1_waveform);
+    fprintf(presetzzz, "::lfo1_waveform=%d", m_settings.m_lfo1_waveform);
     settings_count++;
-    fprintf(presetzzz, "::lfo1_dest=%d", ms->m_settings.m_lfo1_dest);
+    fprintf(presetzzz, "::lfo1_dest=%d", m_settings.m_lfo1_dest);
     settings_count++;
-    fprintf(presetzzz, "::lfo1_mode=%d", ms->m_settings.m_lfo1_mode);
+    fprintf(presetzzz, "::lfo1_mode=%d", m_settings.m_lfo1_mode);
     settings_count++;
-    fprintf(presetzzz, "::lfo1_rate=%f", ms->m_settings.m_lfo1_rate);
+    fprintf(presetzzz, "::lfo1_rate=%f", m_settings.m_lfo1_rate);
     settings_count++;
-    fprintf(presetzzz, "::lfo1_amp=%f", ms->m_settings.m_lfo1_amplitude);
+    fprintf(presetzzz, "::lfo1_amp=%f", m_settings.m_lfo1_amplitude);
     settings_count++;
     fprintf(presetzzz, "::lfo1_osc_pitch_intensity=%f",
-            ms->m_settings.m_lfo1_osc_pitch_intensity);
+            m_settings.m_lfo1_osc_pitch_intensity);
     settings_count++;
     fprintf(presetzzz, "::lfo1_osc_pitch_enabled=%d",
-            ms->m_settings.m_lfo1_osc_pitch_enabled);
+            m_settings.m_lfo1_osc_pitch_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo1_filter_fc_intensity=%f",
-            ms->m_settings.m_lfo1_filter_fc_intensity);
+            m_settings.m_lfo1_filter_fc_intensity);
     settings_count++;
     fprintf(presetzzz, "::lfo1_filter_fc_enabled=%d",
-            ms->m_settings.m_lfo1_filter_fc_enabled);
+            m_settings.m_lfo1_filter_fc_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo1_amp_intensity=%f",
-            ms->m_settings.m_lfo1_amp_intensity);
+            m_settings.m_lfo1_amp_intensity);
     settings_count++;
-    fprintf(presetzzz, "::lfo1_amp_enabled=%d",
-            ms->m_settings.m_lfo1_amp_enabled);
+    fprintf(presetzzz, "::lfo1_amp_enabled=%d", m_settings.m_lfo1_amp_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo1_pan_intensity=%f",
-            ms->m_settings.m_lfo1_pan_intensity);
+            m_settings.m_lfo1_pan_intensity);
     settings_count++;
-    fprintf(presetzzz, "::lfo1_pan_enabled=%d",
-            ms->m_settings.m_lfo1_pan_enabled);
+    fprintf(presetzzz, "::lfo1_pan_enabled=%d", m_settings.m_lfo1_pan_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo1_pulsewidth_intensity=%f",
-            ms->m_settings.m_lfo1_pulsewidth_intensity);
+            m_settings.m_lfo1_pulsewidth_intensity);
     settings_count++;
     fprintf(presetzzz, "::lfo1_pulsewidth_enabled=%d",
-            ms->m_settings.m_lfo1_pulsewidth_enabled);
+            m_settings.m_lfo1_pulsewidth_enabled);
     settings_count++;
 
     // LFO2
-    fprintf(presetzzz, "::lfo2_waveform=%d", ms->m_settings.m_lfo2_waveform);
+    fprintf(presetzzz, "::lfo2_waveform=%d", m_settings.m_lfo2_waveform);
     settings_count++;
-    fprintf(presetzzz, "::lfo2_dest=%d", ms->m_settings.m_lfo2_dest);
+    fprintf(presetzzz, "::lfo2_dest=%d", m_settings.m_lfo2_dest);
     settings_count++;
-    fprintf(presetzzz, "::lfo2_mode=%d", ms->m_settings.m_lfo2_mode);
+    fprintf(presetzzz, "::lfo2_mode=%d", m_settings.m_lfo2_mode);
     settings_count++;
-    fprintf(presetzzz, "::lfo2_rate=%f", ms->m_settings.m_lfo2_rate);
+    fprintf(presetzzz, "::lfo2_rate=%f", m_settings.m_lfo2_rate);
     settings_count++;
-    fprintf(presetzzz, "::lfo2_amp=%f", ms->m_settings.m_lfo2_amplitude);
+    fprintf(presetzzz, "::lfo2_amp=%f", m_settings.m_lfo2_amplitude);
     settings_count++;
     fprintf(presetzzz, "::lfo2_osc_pitch_intensity=%f",
-            ms->m_settings.m_lfo2_osc_pitch_intensity);
+            m_settings.m_lfo2_osc_pitch_intensity);
     settings_count++;
     fprintf(presetzzz, "::lfo2_osc_pitch_enabled=%d",
-            ms->m_settings.m_lfo2_osc_pitch_enabled);
+            m_settings.m_lfo2_osc_pitch_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo2_filter_fc_intensity=%f",
-            ms->m_settings.m_lfo2_filter_fc_intensity);
+            m_settings.m_lfo2_filter_fc_intensity);
     settings_count++;
     fprintf(presetzzz, "::lfo2_filter_fc_enabled=%d",
-            ms->m_settings.m_lfo2_filter_fc_enabled);
+            m_settings.m_lfo2_filter_fc_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo2_amp_intensity=%f",
-            ms->m_settings.m_lfo2_amp_intensity);
+            m_settings.m_lfo2_amp_intensity);
     settings_count++;
-    fprintf(presetzzz, "::lfo2_amp_enabled=%d",
-            ms->m_settings.m_lfo2_amp_enabled);
+    fprintf(presetzzz, "::lfo2_amp_enabled=%d", m_settings.m_lfo2_amp_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo2_pan_intensity=%f",
-            ms->m_settings.m_lfo2_pan_intensity);
+            m_settings.m_lfo2_pan_intensity);
     settings_count++;
-    fprintf(presetzzz, "::lfo2_pan_enabled=%d",
-            ms->m_settings.m_lfo2_pan_enabled);
+    fprintf(presetzzz, "::lfo2_pan_enabled=%d", m_settings.m_lfo2_pan_enabled);
     settings_count++;
     fprintf(presetzzz, "::lfo2_pulsewidth_intensity=%f",
-            ms->m_settings.m_lfo2_pulsewidth_intensity);
+            m_settings.m_lfo2_pulsewidth_intensity);
     settings_count++;
     fprintf(presetzzz, "::lfo2_pulsewidth_enabled=%d",
-            ms->m_settings.m_lfo2_pulsewidth_enabled);
+            m_settings.m_lfo2_pulsewidth_enabled);
     settings_count++;
     // EG1
     fprintf(presetzzz, "::attack_time_msec=%f",
-            ms->m_settings.m_eg1_attack_time_msec);
+            m_settings.m_eg1_attack_time_msec);
     settings_count++;
     fprintf(presetzzz, "::decay_time_msec=%f",
-            ms->m_settings.m_eg1_decay_time_msec);
+            m_settings.m_eg1_decay_time_msec);
     settings_count++;
     fprintf(presetzzz, "::release_time_msec=%f",
-            ms->m_settings.m_eg1_release_time_msec);
+            m_settings.m_eg1_release_time_msec);
     settings_count++;
-    fprintf(presetzzz, "::sustain_level=%f",
-            ms->m_settings.m_eg1_sustain_level);
-    settings_count++;
-
-    fprintf(presetzzz, "::volume_db=%f", ms->volume);
-    settings_count++;
-    fprintf(presetzzz, "::fc_control=%f", ms->m_settings.m_fc_control);
-    settings_count++;
-    fprintf(presetzzz, "::q_control=%f", ms->m_settings.m_q_control);
+    fprintf(presetzzz, "::sustain_level=%f", m_settings.m_eg1_sustain_level);
     settings_count++;
 
-    fprintf(presetzzz, "::detune_cents=%f", ms->m_settings.m_detune_cents);
+    fprintf(presetzzz, "::volume_db=%f", volume);
     settings_count++;
-    fprintf(presetzzz, "::pulse_width_pct=%f",
-            ms->m_settings.m_pulse_width_pct);
+    fprintf(presetzzz, "::fc_control=%f", m_settings.m_fc_control);
     settings_count++;
-    fprintf(presetzzz, "::sub_osc_db=%f", ms->m_settings.m_sub_osc_db);
+    fprintf(presetzzz, "::q_control=%f", m_settings.m_q_control);
     settings_count++;
-    fprintf(presetzzz, "::noise_osc_db=%f", ms->m_settings.m_noise_osc_db);
+
+    fprintf(presetzzz, "::detune_cents=%f", m_settings.m_detune_cents);
+    settings_count++;
+    fprintf(presetzzz, "::pulse_width_pct=%f", m_settings.m_pulse_width_pct);
+    settings_count++;
+    fprintf(presetzzz, "::sub_osc_db=%f", m_settings.m_sub_osc_db);
+    settings_count++;
+    fprintf(presetzzz, "::noise_osc_db=%f", m_settings.m_noise_osc_db);
     settings_count++;
 
     fprintf(presetzzz, "::eg1_osc_intensity=%f",
-            ms->m_settings.m_eg1_osc_intensity);
+            m_settings.m_eg1_osc_intensity);
     settings_count++;
-    fprintf(presetzzz, "::eg1_osc_enabled=%d",
-            ms->m_settings.m_eg1_osc_enabled);
+    fprintf(presetzzz, "::eg1_osc_enabled=%d", m_settings.m_eg1_osc_enabled);
     settings_count++;
 
     fprintf(presetzzz, "::eg1_filter_intensity=%f",
-            ms->m_settings.m_eg1_filter_intensity);
+            m_settings.m_eg1_filter_intensity);
     settings_count++;
     fprintf(presetzzz, "::eg1_filter_enabled=%d",
-            ms->m_settings.m_eg1_filter_enabled);
+            m_settings.m_eg1_filter_enabled);
     settings_count++;
 
     fprintf(presetzzz, "::eg1_dca_intensity=%f",
-            ms->m_settings.m_eg1_dca_intensity);
+            m_settings.m_eg1_dca_intensity);
     settings_count++;
-    fprintf(presetzzz, "::eg1_dca_enabled=%d",
-            ms->m_settings.m_eg1_dca_enabled);
+    fprintf(presetzzz, "::eg1_dca_enabled=%d", m_settings.m_eg1_dca_enabled);
     settings_count++;
 
     fprintf(presetzzz, "::filter_keytrack_intensity=%f",
-            ms->m_settings.m_filter_keytrack_intensity);
+            m_settings.m_filter_keytrack_intensity);
     settings_count++;
 
-    fprintf(presetzzz, "::octave=%d", ms->m_settings.m_octave);
+    fprintf(presetzzz, "::octave=%d", m_settings.m_octave);
     settings_count++;
-    fprintf(presetzzz, "::pitchbend_range=%d",
-            ms->m_settings.m_pitchbend_range);
+    fprintf(presetzzz, "::pitchbend_range=%d", m_settings.m_pitchbend_range);
     settings_count++;
 
-    fprintf(presetzzz, "::legato_mode=%d", ms->m_settings.m_legato_mode);
+    fprintf(presetzzz, "::legato_mode=%d", m_settings.m_legato_mode);
     settings_count++;
-    fprintf(presetzzz, "::reset_to_zero=%d", ms->m_settings.m_reset_to_zero);
+    fprintf(presetzzz, "::reset_to_zero=%d", m_settings.m_reset_to_zero);
     settings_count++;
-    fprintf(presetzzz, "::filter_keytrack=%d",
-            ms->m_settings.m_filter_keytrack);
+    fprintf(presetzzz, "::filter_keytrack=%d", m_settings.m_filter_keytrack);
     settings_count++;
-    fprintf(presetzzz, "::filter_type=%d", ms->m_settings.m_filter_type);
+    fprintf(presetzzz, "::filter_type=%d", m_settings.m_filter_type);
     settings_count++;
     fprintf(presetzzz, "::filter_saturation=%f",
-            ms->m_settings.m_filter_saturation);
+            m_settings.m_filter_saturation);
     settings_count++;
 
-    fprintf(presetzzz, "::nlp=%d", ms->m_settings.m_nlp);
+    fprintf(presetzzz, "::nlp=%d", m_settings.m_nlp);
     settings_count++;
     fprintf(presetzzz, "::velocity_to_attack_scaling=%d",
-            ms->m_settings.m_velocity_to_attack_scaling);
+            m_settings.m_velocity_to_attack_scaling);
     settings_count++;
     fprintf(presetzzz, "::note_number_to_decay_scaling=%d",
-            ms->m_settings.m_note_number_to_decay_scaling);
+            m_settings.m_note_number_to_decay_scaling);
     settings_count++;
     fprintf(presetzzz, "::portamento_time_msec=%f",
-            ms->m_settings.m_portamento_time_msec);
+            m_settings.m_portamento_time_msec);
     settings_count++;
 
     fprintf(presetzzz, "::sustain_override=%d",
-            ms->m_settings.m_eg1_sustain_override);
+            m_settings.m_eg1_sustain_override);
     settings_count++;
 
     fprintf(presetzzz, ":::\n");
     fclose(presetzzz);
     printf("Wrote %d settings\n", settings_count++);
-    return true;
+    return;
 }
 
 bool minisynth_check_if_preset_exists(char *preset_to_find)
@@ -1264,14 +1256,18 @@ bool minisynth_check_if_preset_exists(char *preset_to_find)
     fclose(presetzzz);
     return false;
 }
-bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
+// bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
+//{
+//    void Save(std::string preset_name);
+void minisynth::Load(std::string preset_name)
 {
-    if (strlen(preset_to_load) == 0)
+    if (preset_name.empty())
     {
         printf("Play tha game, pal, need a name to LOAD yer synth settings "
                "with\n");
-        return false;
+        return;
     }
+    const char *preset_to_load = preset_name.c_str();
 
     char line[2048];
     char setting_key[512];
@@ -1280,7 +1276,7 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
 
     FILE *presetzzz = fopen(MOOG_PRESET_FILENAME, "r+");
     if (presetzzz == NULL)
-        return false;
+        return;
 
     char *tok, *last_tok;
     char const *sep = "::";
@@ -1294,334 +1290,330 @@ bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
         {
             sscanf(tok, "%[^=]=%s", setting_key, setting_val);
             sscanf(setting_val, "%lf", &scratch_val);
-            printf("key:%s val:%f\n", setting_key, scratch_val);
             if (strcmp(setting_key, "name") == 0)
             {
                 if (strcmp(setting_val, preset_to_load) != 0)
                     break;
-                else
-                    printf("Found yer preset:%s!\n", setting_val);
-                strcpy(ms->m_settings.m_settings_name, setting_val);
+                strcpy(m_settings.m_settings_name, setting_val);
                 settings_count++;
             }
             else if (strcmp(setting_key, "voice_mode") == 0)
             {
-                ms->m_settings.m_voice_mode = scratch_val;
+                m_settings.m_voice_mode = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "monophonic") == 0)
             {
-                ms->m_settings.m_monophonic = scratch_val;
+                m_settings.m_monophonic = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_waveform") == 0)
             {
-                ms->m_settings.m_lfo1_waveform = scratch_val;
+                m_settings.m_lfo1_waveform = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_dest") == 0)
             {
-                ms->m_settings.m_lfo1_dest = scratch_val;
+                m_settings.m_lfo1_dest = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_mode") == 0)
             {
-                ms->m_settings.m_lfo1_mode = scratch_val;
+                m_settings.m_lfo1_mode = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_rate") == 0)
             {
-                ms->m_settings.m_lfo1_rate = scratch_val;
+                m_settings.m_lfo1_rate = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_amp") == 0)
             {
-                ms->m_settings.m_lfo1_amplitude = scratch_val;
+                m_settings.m_lfo1_amplitude = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_osc_pitch_intensity") == 0)
             {
-                ms->m_settings.m_lfo1_osc_pitch_intensity = scratch_val;
+                m_settings.m_lfo1_osc_pitch_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_osc_pitch_enabled") == 0)
             {
-                ms->m_settings.m_lfo1_osc_pitch_enabled = scratch_val;
+                m_settings.m_lfo1_osc_pitch_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_filter_fc_intensity") == 0)
             {
-                ms->m_settings.m_lfo1_filter_fc_intensity = scratch_val;
+                m_settings.m_lfo1_filter_fc_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_filter_fc_enabled") == 0)
             {
-                ms->m_settings.m_lfo1_filter_fc_enabled = scratch_val;
+                m_settings.m_lfo1_filter_fc_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_amp_intensity") == 0)
             {
-                ms->m_settings.m_lfo1_amp_intensity = scratch_val;
+                m_settings.m_lfo1_amp_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_amp_enabled") == 0)
             {
-                ms->m_settings.m_lfo1_amp_enabled = scratch_val;
+                m_settings.m_lfo1_amp_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_pan_intensity") == 0)
             {
-                ms->m_settings.m_lfo1_pan_intensity = scratch_val;
+                m_settings.m_lfo1_pan_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_pan_enabled") == 0)
             {
-                ms->m_settings.m_lfo1_pan_enabled = scratch_val;
+                m_settings.m_lfo1_pan_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_pulsewidth_intensity") == 0)
             {
-                ms->m_settings.m_lfo1_pulsewidth_intensity = scratch_val;
+                m_settings.m_lfo1_pulsewidth_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo1_pulsewidth_enabled") == 0)
             {
-                ms->m_settings.m_lfo1_pulsewidth_enabled = scratch_val;
+                m_settings.m_lfo1_pulsewidth_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_waveform") == 0)
             {
-                ms->m_settings.m_lfo2_waveform = scratch_val;
+                m_settings.m_lfo2_waveform = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_dest") == 0)
             {
-                ms->m_settings.m_lfo2_dest = scratch_val;
+                m_settings.m_lfo2_dest = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_mode") == 0)
             {
-                ms->m_settings.m_lfo2_mode = scratch_val;
+                m_settings.m_lfo2_mode = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_rate") == 0)
             {
-                ms->m_settings.m_lfo2_rate = scratch_val;
+                m_settings.m_lfo2_rate = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_amp") == 0)
             {
-                ms->m_settings.m_lfo2_amplitude = scratch_val;
+                m_settings.m_lfo2_amplitude = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_osc_pitch_intensity") == 0)
             {
-                ms->m_settings.m_lfo2_osc_pitch_intensity = scratch_val;
+                m_settings.m_lfo2_osc_pitch_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_osc_pitch_enabled") == 0)
             {
-                ms->m_settings.m_lfo2_osc_pitch_enabled = scratch_val;
+                m_settings.m_lfo2_osc_pitch_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_filter_fc_intensity") == 0)
             {
-                ms->m_settings.m_lfo2_filter_fc_intensity = scratch_val;
+                m_settings.m_lfo2_filter_fc_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_filter_fc_enabled") == 0)
             {
-                ms->m_settings.m_lfo2_filter_fc_enabled = scratch_val;
+                m_settings.m_lfo2_filter_fc_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_amp_intensity") == 0)
             {
-                ms->m_settings.m_lfo2_amp_intensity = scratch_val;
+                m_settings.m_lfo2_amp_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_amp_enabled") == 0)
             {
-                ms->m_settings.m_lfo2_amp_enabled = scratch_val;
+                m_settings.m_lfo2_amp_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_pan_intensity") == 0)
             {
-                ms->m_settings.m_lfo2_pan_intensity = scratch_val;
+                m_settings.m_lfo2_pan_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_pan_enabled") == 0)
             {
-                ms->m_settings.m_lfo2_pan_enabled = scratch_val;
+                m_settings.m_lfo2_pan_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_pulsewidth_intensity") == 0)
             {
-                ms->m_settings.m_lfo2_pulsewidth_intensity = scratch_val;
+                m_settings.m_lfo2_pulsewidth_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "lfo2_pulsewidth_enabled") == 0)
             {
-                ms->m_settings.m_lfo2_pulsewidth_enabled = scratch_val;
+                m_settings.m_lfo2_pulsewidth_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "attack_time_msec") == 0)
             {
-                ms->m_settings.m_eg1_attack_time_msec = scratch_val;
+                m_settings.m_eg1_attack_time_msec = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "decay_time_msec") == 0)
             {
-                ms->m_settings.m_eg1_decay_time_msec = scratch_val;
+                m_settings.m_eg1_decay_time_msec = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "release_time_msec") == 0)
             {
-                ms->m_settings.m_eg1_release_time_msec = scratch_val;
+                m_settings.m_eg1_release_time_msec = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "sustain_level") == 0)
             {
-                ms->m_settings.m_eg1_sustain_level = scratch_val;
+                m_settings.m_eg1_sustain_level = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "volume_db") == 0)
             {
-                ms->volume = scratch_val;
+                volume = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "fc_control") == 0)
             {
-                ms->m_settings.m_fc_control = scratch_val;
+                m_settings.m_fc_control = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "q_control") == 0)
             {
-                ms->m_settings.m_q_control = scratch_val;
+                m_settings.m_q_control = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "detune_cents") == 0)
             {
-                ms->m_settings.m_detune_cents = scratch_val;
+                m_settings.m_detune_cents = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "pulse_width_pct") == 0)
             {
-                ms->m_settings.m_pulse_width_pct = scratch_val;
+                m_settings.m_pulse_width_pct = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "sub_osc_db") == 0)
             {
-                ms->m_settings.m_sub_osc_db = scratch_val;
+                m_settings.m_sub_osc_db = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "noise_osc_db") == 0)
             {
-                ms->m_settings.m_noise_osc_db = scratch_val;
+                m_settings.m_noise_osc_db = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "eg1_osc_intensity") == 0)
             {
-                ms->m_settings.m_eg1_osc_intensity = scratch_val;
+                m_settings.m_eg1_osc_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "eg1_osc_enabled") == 0)
             {
-                ms->m_settings.m_eg1_osc_enabled = scratch_val;
+                m_settings.m_eg1_osc_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "eg1_filter_intensity") == 0)
             {
-                ms->m_settings.m_eg1_filter_intensity = scratch_val;
+                m_settings.m_eg1_filter_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "eg1_filter_enabled") == 0)
             {
-                ms->m_settings.m_eg1_filter_enabled = scratch_val;
+                m_settings.m_eg1_filter_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "eg1_dca_intensity") == 0)
             {
-                ms->m_settings.m_eg1_dca_intensity = scratch_val;
+                m_settings.m_eg1_dca_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "eg1_dca_enabled") == 0)
             {
-                ms->m_settings.m_eg1_dca_enabled = scratch_val;
+                m_settings.m_eg1_dca_enabled = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "filter_keytrack_intensity") == 0)
             {
-                ms->m_settings.m_filter_keytrack_intensity = scratch_val;
+                m_settings.m_filter_keytrack_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "octave") == 0)
             {
-                ms->m_settings.m_octave = scratch_val;
+                m_settings.m_octave = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "pitchbend_range") == 0)
             {
-                ms->m_settings.m_pitchbend_range = scratch_val;
+                m_settings.m_pitchbend_range = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "legato_mode") == 0)
             {
-                ms->m_settings.m_legato_mode = scratch_val;
+                m_settings.m_legato_mode = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "reset_to_zero") == 0)
             {
-                ms->m_settings.m_reset_to_zero = scratch_val;
+                m_settings.m_reset_to_zero = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "filter_keytrack") == 0)
             {
-                ms->m_settings.m_filter_keytrack = scratch_val;
+                m_settings.m_filter_keytrack = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "filter_type") == 0)
             {
-                ms->m_settings.m_filter_type = scratch_val;
+                m_settings.m_filter_type = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "filter_saturation") == 0)
             {
-                ms->m_settings.m_filter_saturation = scratch_val;
+                m_settings.m_filter_saturation = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "nlp") == 0)
             {
-                ms->m_settings.m_nlp = scratch_val;
+                m_settings.m_nlp = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "velocity_to_attack_scaling") == 0)
             {
-                ms->m_settings.m_velocity_to_attack_scaling = scratch_val;
+                m_settings.m_velocity_to_attack_scaling = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "note_number_to_decay_scaling") == 0)
             {
-                ms->m_settings.m_note_number_to_decay_scaling = scratch_val;
+                m_settings.m_note_number_to_decay_scaling = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "portamento_time_msec") == 0)
             {
-                ms->m_settings.m_portamento_time_msec = scratch_val;
+                m_settings.m_portamento_time_msec = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "sustain_override") == 0)
             {
-                ms->m_settings.m_eg1_sustain_override = scratch_val;
+                m_settings.m_eg1_sustain_override = scratch_val;
                 settings_count++;
             }
         }
-        if (settings_count > 0)
-            printf("Loaded %d settings\n", settings_count);
-        minisynth_update(ms);
+        // if (settings_count > 0)
+        //    printf("Loaded %d settings\n", settings_count);
+        minisynth_update(this);
     }
 
     fclose(presetzzz);
-    return true;
 }
 
 void minisynth_print_settings(minisynth *ms)

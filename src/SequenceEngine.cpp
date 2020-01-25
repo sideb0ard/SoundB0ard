@@ -579,6 +579,8 @@ void sequence_engine_set_pattern(SequenceEngine *engine, int pattern_num,
 
 bool sequence_engine_list_presets(unsigned int synthtype)
 {
+    std::cout << "IT ME!\n";
+
     FILE *presetzzz = NULL;
     switch (synthtype)
     {

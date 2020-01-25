@@ -180,6 +180,36 @@ class SynthExpression : public Expression
     std::string String() const override;
 };
 
+class SynthPresetExpression : public Expression
+{
+  public:
+    SynthPresetExpression() {}
+    explicit SynthPresetExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+};
+
+class SynthLoadExpression : public Expression
+{
+  public:
+    SynthLoadExpression() {}
+    explicit SynthLoadExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    std::string preset_name_;
+};
+
+class SynthSaveExpression : public Expression
+{
+  public:
+    SynthSaveExpression() {}
+    explicit SynthSaveExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    std::string preset_name_;
+};
+
 class SampleExpression : public Expression
 {
   public:

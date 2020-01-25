@@ -31,6 +31,16 @@ void SoundGenerator::SetVolume(double val)
 void SoundGenerator::start() { active = true; }
 void SoundGenerator::stop() { active = false; }
 
+void SoundGenerator::Load(std::string preset_name)
+{
+    std::cout << "BASE CLASS LOAD " << preset_name << " - NO OP!" << std::endl;
+}
+
+void SoundGenerator::Save(std::string preset_name)
+{
+    std::cout << "BASE CLASS SAVE " << preset_name << " - NO OP!" << std::endl;
+}
+
 void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 {
     // if (lo_send(mixr->processing_addr, "/img", "i", sg->mixer_idx) == -1)

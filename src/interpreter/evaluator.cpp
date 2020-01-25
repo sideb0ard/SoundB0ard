@@ -366,6 +366,26 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             return std::make_shared<object::FMSynth>();
     }
 
+    std::shared_ptr<ast::SynthPresetExpression> synth_preset =
+        std::dynamic_pointer_cast<ast::SynthPresetExpression>(node);
+    if (synth_preset)
+    {
+        std::cout << "SYNTH PRESET EXPRESSION!: " << synth_preset->token_.type_
+                  << "\n ";
+        if (synth_preset->token_.type_ == token::SLANG_MOOG_SYNTH)
+        {
+            std::cout << "MINISYNTH TYPE!\n";
+            sequence_engine_list_presets(MINISYNTH_TYPE);
+        }
+        else if (synth_preset->token_.type_ == token::SLANG_FM_SYNTH)
+        {
+            std::cout << "DX TYPE!\n";
+            sequence_engine_list_presets(DXSYNTH_TYPE);
+        }
+        else
+            std::cout << "NOT A SYNTH TYPE!\n";
+    }
+
     std::shared_ptr<ast::SampleExpression> sample =
         std::dynamic_pointer_cast<ast::SampleExpression>(node);
     if (sample)

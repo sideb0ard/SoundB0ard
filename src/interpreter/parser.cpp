@@ -636,6 +636,48 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 {
     auto synth = std::make_shared<ast::SynthExpression>(cur_token_);
 
+    if (PeekTokenIs(token::SLANG_IDENT))
+    {
+        std::cout << "IDENT!\n";
+        if (peek_token_.literal_ == "presets")
+        {
+            std::cout << "PRESETS!\n";
+            auto expr =
+                std::make_shared<ast::SynthPresetExpression>(cur_token_);
+            NextToken();
+            return expr;
+        }
+        else if (peek_token_.literal_ == "load" ||
+                 peek_token_.literal_ == "save")
+        {
+            NextToken();
+            if (!ExpectPeek(token::SLANG_IDENT))
+            {
+                std::cerr << "Need a name for preset!\n";
+                return nullptr;
+            }
+
+            if (peek_token_.literal_ == "load")
+            {
+                std::cout << "LOAD!\n";
+                auto expression =
+                    std::make_shared<ast::SynthLoadExpression>(cur_token_);
+                NextToken();
+                expression->preset_name_ = cur_token_.literal_;
+                return expression;
+            }
+            else
+            {
+                std::cout << "SAVE!\n";
+                auto expression =
+                    std::make_shared<ast::SynthSaveExpression>(cur_token_);
+                NextToken();
+                expression->preset_name_ = cur_token_.literal_;
+                return expression;
+            }
+        }
+    }
+
     if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;
 

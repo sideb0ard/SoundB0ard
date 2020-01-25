@@ -203,7 +203,37 @@ std::string FunctionLiteral::String() const
     return ss.str();
 }
 
-std::string SynthExpression::String() const { return "SYNTH"; }
+std::string SynthExpression::String() const
+{
+    std::stringstream ss;
+    ss << "SYNTH:" << token_.literal_;
+
+    return ss.str();
+}
+
+std::string SynthPresetExpression::String() const
+{
+    std::stringstream ss;
+    ss << "SYNTH PRESET:" << token_.literal_;
+
+    return ss.str();
+}
+
+std::string SynthLoadExpression::String() const
+{
+    std::stringstream ss;
+    ss << "SYNTH LOAD:" << token_.literal_ << ":" << preset_name_;
+
+    return ss.str();
+}
+
+std::string SynthSaveExpression::String() const
+{
+    std::stringstream ss;
+    ss << "SYNTH SAVE:" << token_.literal_ << ":" << preset_name_;
+
+    return ss.str();
+}
 
 std::string SampleExpression::String() const { return "SAMPLE"; }
 

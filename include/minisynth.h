@@ -182,6 +182,8 @@ class minisynth : public SoundGenerator
     void allNotesOff() override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
+    void Save(std::string preset_name) override;
+    void Load(std::string preset_name) override;
 
     minisynth_voice *m_voices[MAX_VOICES];
 
@@ -220,8 +222,6 @@ void minisynth_print_lfo2_routing_info(minisynth *ms, wchar_t *scratch);
 void minisynth_print_eg1_routing_info(minisynth *ms, wchar_t *scratch);
 void minisynth_print_eg2_routing_info(minisynth *ms, wchar_t *scratch);
 
-bool minisynth_save_settings(minisynth *ms, char *preset_name);
-bool minisynth_load_settings(minisynth *ms, char *preset_name);
 bool minisynth_check_if_preset_exists(char *preset_to_find);
 
 void minisynth_set_arpeggiate(minisynth *ms, bool b);

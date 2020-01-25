@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <interpreter/evaluator.hpp>
-#include <interpreter/fx_cmds.hpp>
+#include <interpreter/sound_cmds.hpp>
 #include <keys.h>
 #include <midi_cmds.h>
 #include <mixer.h>
@@ -321,10 +321,38 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       if (args_size >= 2)
                       {
                           std::cout << "BOOM, ADDING FX!\n";
-                          fxcmds::ParseFXCmd(args);
+                          interpreter_sound_cmds::ParseFXCmd(args);
                       }
                       return evaluator::NULLL;
                   })},
+    {"loadPreset", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object> {
+                           int args_size = args.size();
+                           if (args_size >= 2)
+                           {
+                               std::cout << "BOOM, SYNTHZZZ CMD!\n";
+                               auto cmd_name =
+                                   std::make_shared<object::String>("load");
+                               args.push_back(cmd_name);
+                               interpreter_sound_cmds::ParseSynthCmd(args);
+                           }
+                           return evaluator::NULLL;
+                       })},
+    {"savePreset", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object> {
+                           int args_size = args.size();
+                           if (args_size >= 2)
+                           {
+                               std::cout << "BOOM, SYNTHZZZ CMD!\n";
+                               auto cmd_name =
+                                   std::make_shared<object::String>("save");
+                               args.push_back(cmd_name);
+                               interpreter_sound_cmds::ParseSynthCmd(args);
+                           }
+                           return evaluator::NULLL;
+                       })},
     {"rand",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
