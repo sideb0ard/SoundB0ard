@@ -827,160 +827,143 @@ void dxsynth::randomize()
     // dxsynth_print_settings(dx);
 }
 
-bool dxsynth_save_settings(dxsynth *ms, char *preset_name)
+void dxsynth::Save(std::string preset)
 {
-    if (strlen(preset_name) == 0)
+    if (preset.empty())
     {
         printf("Play tha game, pal, need a name to save yer synth settings "
                "with\n");
-        return false;
+        return;
     }
+    const char *preset_name = preset.c_str();
+
     printf("Saving '%s' settings for dxsynth to file %s\n", preset_name,
            DX_PRESET_FILENAME);
     FILE *presetzzz = fopen(DX_PRESET_FILENAME, "a+");
     if (presetzzz == NULL)
     {
         printf("Couldn't save settings!!\n");
-        return false;
+        return;
     }
 
     int settings_count = 0;
-    strncpy(ms->m_settings.m_settings_name, preset_name, 256);
+    strncpy(m_settings.m_settings_name, preset_name, 256);
 
-    fprintf(presetzzz, "::name=%s", ms->m_settings.m_settings_name);
-    settings_count++;
-
-    fprintf(presetzzz, "::m_lfo1_intensity=%f",
-            ms->m_settings.m_lfo1_intensity);
-    settings_count++;
-    fprintf(presetzzz, "::m_lfo1_rate=%f", ms->m_settings.m_lfo1_rate);
-    settings_count++;
-    fprintf(presetzzz, "::m_lfo1_waveform=%d", ms->m_settings.m_lfo1_waveform);
-    settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest1=%d",
-            ms->m_settings.m_lfo1_mod_dest1);
-    settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest2=%d",
-            ms->m_settings.m_lfo1_mod_dest2);
-    settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest3=%d",
-            ms->m_settings.m_lfo1_mod_dest3);
-    settings_count++;
-    fprintf(presetzzz, "::m_lfo1_mod_dest4=%d",
-            ms->m_settings.m_lfo1_mod_dest4);
+    fprintf(presetzzz, "::name=%s", m_settings.m_settings_name);
     settings_count++;
 
-    fprintf(presetzzz, "::m_op1_waveform=%d", ms->m_settings.m_op1_waveform);
+    fprintf(presetzzz, "::m_lfo1_intensity=%f", m_settings.m_lfo1_intensity);
     settings_count++;
-    fprintf(presetzzz, "::m_op1_ratio=%f", ms->m_settings.m_op1_ratio);
+    fprintf(presetzzz, "::m_lfo1_rate=%f", m_settings.m_lfo1_rate);
+    settings_count++;
+    fprintf(presetzzz, "::m_lfo1_waveform=%d", m_settings.m_lfo1_waveform);
+    settings_count++;
+    fprintf(presetzzz, "::m_lfo1_mod_dest1=%d", m_settings.m_lfo1_mod_dest1);
+    settings_count++;
+    fprintf(presetzzz, "::m_lfo1_mod_dest2=%d", m_settings.m_lfo1_mod_dest2);
+    settings_count++;
+    fprintf(presetzzz, "::m_lfo1_mod_dest3=%d", m_settings.m_lfo1_mod_dest3);
+    settings_count++;
+    fprintf(presetzzz, "::m_lfo1_mod_dest4=%d", m_settings.m_lfo1_mod_dest4);
+    settings_count++;
+
+    fprintf(presetzzz, "::m_op1_waveform=%d", m_settings.m_op1_waveform);
+    settings_count++;
+    fprintf(presetzzz, "::m_op1_ratio=%f", m_settings.m_op1_ratio);
     settings_count++;
     fprintf(presetzzz, "::m_op1_detune_cents=%f",
-            ms->m_settings.m_op1_detune_cents);
+            m_settings.m_op1_detune_cents);
     settings_count++;
-    fprintf(presetzzz, "::m_eg1_attack_ms=%f", ms->m_settings.m_eg1_attack_ms);
+    fprintf(presetzzz, "::m_eg1_attack_ms=%f", m_settings.m_eg1_attack_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg1_decay_ms=%f", ms->m_settings.m_eg1_decay_ms);
+    fprintf(presetzzz, "::m_eg1_decay_ms=%f", m_settings.m_eg1_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg1_sustain_lvl=%f",
-            ms->m_settings.m_eg1_sustain_lvl);
+    fprintf(presetzzz, "::m_eg1_sustain_lvl=%f", m_settings.m_eg1_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg1_release_ms=%f",
-            ms->m_settings.m_eg1_release_ms);
+    fprintf(presetzzz, "::m_eg1_release_ms=%f", m_settings.m_eg1_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op1_output_lvl=%f",
-            ms->m_settings.m_op1_output_lvl);
+    fprintf(presetzzz, "::m_op1_output_lvl=%f", m_settings.m_op1_output_lvl);
     settings_count++;
 
-    fprintf(presetzzz, "::m_op2_waveform=%d", ms->m_settings.m_op2_waveform);
+    fprintf(presetzzz, "::m_op2_waveform=%d", m_settings.m_op2_waveform);
     settings_count++;
-    fprintf(presetzzz, "::m_op2_ratio=%f", ms->m_settings.m_op2_ratio);
+    fprintf(presetzzz, "::m_op2_ratio=%f", m_settings.m_op2_ratio);
     settings_count++;
     fprintf(presetzzz, "::m_op2_detune_cents=%f",
-            ms->m_settings.m_op2_detune_cents);
+            m_settings.m_op2_detune_cents);
     settings_count++;
-    fprintf(presetzzz, "::m_eg2_attack_ms=%f", ms->m_settings.m_eg2_attack_ms);
+    fprintf(presetzzz, "::m_eg2_attack_ms=%f", m_settings.m_eg2_attack_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg2_decay_ms=%f", ms->m_settings.m_eg2_decay_ms);
+    fprintf(presetzzz, "::m_eg2_decay_ms=%f", m_settings.m_eg2_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg2_sustain_lvl=%f",
-            ms->m_settings.m_eg2_sustain_lvl);
+    fprintf(presetzzz, "::m_eg2_sustain_lvl=%f", m_settings.m_eg2_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg2_release_ms=%f",
-            ms->m_settings.m_eg2_release_ms);
+    fprintf(presetzzz, "::m_eg2_release_ms=%f", m_settings.m_eg2_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op2_output_lvl=%f",
-            ms->m_settings.m_op2_output_lvl);
+    fprintf(presetzzz, "::m_op2_output_lvl=%f", m_settings.m_op2_output_lvl);
     settings_count++;
 
-    fprintf(presetzzz, "::m_op3_waveform=%d", ms->m_settings.m_op3_waveform);
+    fprintf(presetzzz, "::m_op3_waveform=%d", m_settings.m_op3_waveform);
     settings_count++;
-    fprintf(presetzzz, "::m_op3_ratio=%f", ms->m_settings.m_op3_ratio);
+    fprintf(presetzzz, "::m_op3_ratio=%f", m_settings.m_op3_ratio);
     settings_count++;
     fprintf(presetzzz, "::m_op3_detune_cents=%f",
-            ms->m_settings.m_op3_detune_cents);
+            m_settings.m_op3_detune_cents);
     settings_count++;
-    fprintf(presetzzz, "::m_eg3_attack_ms=%f", ms->m_settings.m_eg3_attack_ms);
+    fprintf(presetzzz, "::m_eg3_attack_ms=%f", m_settings.m_eg3_attack_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg3_decay_ms=%f", ms->m_settings.m_eg3_decay_ms);
+    fprintf(presetzzz, "::m_eg3_decay_ms=%f", m_settings.m_eg3_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg3_sustain_lvl=%f",
-            ms->m_settings.m_eg3_sustain_lvl);
+    fprintf(presetzzz, "::m_eg3_sustain_lvl=%f", m_settings.m_eg3_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg3_release_ms=%f",
-            ms->m_settings.m_eg3_release_ms);
+    fprintf(presetzzz, "::m_eg3_release_ms=%f", m_settings.m_eg3_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op3_output_lvl=%f",
-            ms->m_settings.m_op3_output_lvl);
+    fprintf(presetzzz, "::m_op3_output_lvl=%f", m_settings.m_op3_output_lvl);
     settings_count++;
 
-    fprintf(presetzzz, "::m_op4_waveform=%d", ms->m_settings.m_op4_waveform);
+    fprintf(presetzzz, "::m_op4_waveform=%d", m_settings.m_op4_waveform);
     settings_count++;
-    fprintf(presetzzz, "::m_op4_ratio=%f", ms->m_settings.m_op4_ratio);
+    fprintf(presetzzz, "::m_op4_ratio=%f", m_settings.m_op4_ratio);
     settings_count++;
     fprintf(presetzzz, "::m_op4_detune_cents=%f",
-            ms->m_settings.m_op4_detune_cents);
+            m_settings.m_op4_detune_cents);
     settings_count++;
-    fprintf(presetzzz, "::m_eg4_attack_ms=%f", ms->m_settings.m_eg4_attack_ms);
+    fprintf(presetzzz, "::m_eg4_attack_ms=%f", m_settings.m_eg4_attack_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg4_decay_ms=%f", ms->m_settings.m_eg4_decay_ms);
+    fprintf(presetzzz, "::m_eg4_decay_ms=%f", m_settings.m_eg4_decay_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_eg4_sustain_lvl=%f",
-            ms->m_settings.m_eg4_sustain_lvl);
+    fprintf(presetzzz, "::m_eg4_sustain_lvl=%f", m_settings.m_eg4_sustain_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_eg4_release_ms=%f",
-            ms->m_settings.m_eg4_release_ms);
+    fprintf(presetzzz, "::m_eg4_release_ms=%f", m_settings.m_eg4_release_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_op4_output_lvl=%f",
-            ms->m_settings.m_op4_output_lvl);
+    fprintf(presetzzz, "::m_op4_output_lvl=%f", m_settings.m_op4_output_lvl);
     settings_count++;
-    fprintf(presetzzz, "::m_op4_feedback=%f", ms->m_settings.m_op4_feedback);
+    fprintf(presetzzz, "::m_op4_feedback=%f", m_settings.m_op4_feedback);
     settings_count++;
 
     fprintf(presetzzz, "::m_portamento_time_ms=%f",
-            ms->m_settings.m_portamento_time_ms);
+            m_settings.m_portamento_time_ms);
     settings_count++;
-    fprintf(presetzzz, "::m_volume_db=%f", ms->m_settings.m_volume_db);
+    fprintf(presetzzz, "::m_volume_db=%f", m_settings.m_volume_db);
     settings_count++;
-    fprintf(presetzzz, "::m_pitchbend_range=%d",
-            ms->m_settings.m_pitchbend_range);
+    fprintf(presetzzz, "::m_pitchbend_range=%d", m_settings.m_pitchbend_range);
     settings_count++;
-    fprintf(presetzzz, "::m_voice_mode=%d", ms->m_settings.m_voice_mode);
+    fprintf(presetzzz, "::m_voice_mode=%d", m_settings.m_voice_mode);
     settings_count++;
     fprintf(presetzzz, "::m_velocity_to_attack_scaling=%d",
-            ms->m_settings.m_velocity_to_attack_scaling);
+            m_settings.m_velocity_to_attack_scaling);
     settings_count++;
     fprintf(presetzzz, "::m_note_number_to_decay_scaling=%d",
-            ms->m_settings.m_note_number_to_decay_scaling);
+            m_settings.m_note_number_to_decay_scaling);
     settings_count++;
-    fprintf(presetzzz, "::m_reset_to_zero=%d", ms->m_settings.m_reset_to_zero);
+    fprintf(presetzzz, "::m_reset_to_zero=%d", m_settings.m_reset_to_zero);
     settings_count++;
-    fprintf(presetzzz, "::m_legato_mode=%d", ms->m_settings.m_legato_mode);
+    fprintf(presetzzz, "::m_legato_mode=%d", m_settings.m_legato_mode);
     settings_count++;
 
     fprintf(presetzzz, ":::\n");
     fclose(presetzzz);
     printf("Wrote %d settings\n", settings_count++);
-    return true;
 }
 
 bool dxsynth_list_presets()
@@ -1020,14 +1003,16 @@ bool dxsynth_check_if_preset_exists(char *preset_to_find)
     fclose(presetzzz);
     return false;
 }
-bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
+void dxsynth::Load(std::string preset_name)
 {
-    if (strlen(preset_to_load) == 0)
+    if (preset_name.empty())
     {
         printf("Play tha game, pal, need a name to LOAD yer synth settings "
                "with\n");
-        return false;
+        return;
     }
+
+    const char *preset_to_load = preset_name.c_str();
 
     char line[2048];
     char setting_key[512];
@@ -1036,7 +1021,7 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
 
     FILE *presetzzz = fopen(DX_PRESET_FILENAME, "r+");
     if (presetzzz == NULL)
-        return false;
+        return;
 
     char *tok, *last_tok;
     char const *sep = "::";
@@ -1055,260 +1040,259 @@ bool dxsynth_load_settings(dxsynth *ms, char *preset_to_load)
             {
                 if (strcmp(setting_val, preset_to_load) != 0)
                     break;
-                strcpy(ms->m_settings.m_settings_name, setting_val);
+                strcpy(m_settings.m_settings_name, setting_val);
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_intensity") == 0)
             {
-                ms->m_settings.m_lfo1_intensity = scratch_val;
+                m_settings.m_lfo1_intensity = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_rate") == 0)
             {
-                ms->m_settings.m_lfo1_rate = scratch_val;
+                m_settings.m_lfo1_rate = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_waveform") == 0)
             {
-                ms->m_settings.m_lfo1_waveform = scratch_val;
+                m_settings.m_lfo1_waveform = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_mod_dest1") == 0)
             {
-                ms->m_settings.m_lfo1_mod_dest1 = scratch_val;
+                m_settings.m_lfo1_mod_dest1 = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_mod_dest2") == 0)
             {
-                ms->m_settings.m_lfo1_mod_dest2 = scratch_val;
+                m_settings.m_lfo1_mod_dest2 = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_mod_dest3") == 0)
             {
-                ms->m_settings.m_lfo1_mod_dest3 = scratch_val;
+                m_settings.m_lfo1_mod_dest3 = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_lfo1_mod_dest4") == 0)
             {
-                ms->m_settings.m_lfo1_mod_dest4 = scratch_val;
+                m_settings.m_lfo1_mod_dest4 = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op1_waveform") == 0)
             {
-                ms->m_settings.m_op1_waveform = scratch_val;
+                m_settings.m_op1_waveform = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op1_ratio") == 0)
             {
-                ms->m_settings.m_op1_ratio = scratch_val;
+                m_settings.m_op1_ratio = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op1_detune_cents") == 0)
             {
-                ms->m_settings.m_op1_detune_cents = scratch_val;
+                m_settings.m_op1_detune_cents = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg1_attack_ms") == 0)
             {
-                ms->m_settings.m_eg1_attack_ms = scratch_val;
+                m_settings.m_eg1_attack_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg1_decay_ms") == 0)
             {
-                ms->m_settings.m_eg1_decay_ms = scratch_val;
+                m_settings.m_eg1_decay_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg1_sustain_lvl") == 0)
             {
-                ms->m_settings.m_eg1_sustain_lvl = scratch_val;
+                m_settings.m_eg1_sustain_lvl = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg1_release_ms") == 0)
             {
-                ms->m_settings.m_eg1_release_ms = scratch_val;
+                m_settings.m_eg1_release_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op1_output_lvl") == 0)
             {
-                ms->m_settings.m_op1_output_lvl = scratch_val;
+                m_settings.m_op1_output_lvl = scratch_val;
                 settings_count++;
             }
 
             else if (strcmp(setting_key, "m_op2_waveform") == 0)
             {
-                ms->m_settings.m_op2_waveform = scratch_val;
+                m_settings.m_op2_waveform = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op2_ratio") == 0)
             {
-                ms->m_settings.m_op2_ratio = scratch_val;
+                m_settings.m_op2_ratio = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op2_detune_cents") == 0)
             {
-                ms->m_settings.m_op2_detune_cents = scratch_val;
+                m_settings.m_op2_detune_cents = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg2_attack_ms") == 0)
             {
-                ms->m_settings.m_eg2_attack_ms = scratch_val;
+                m_settings.m_eg2_attack_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg2_decay_ms") == 0)
             {
-                ms->m_settings.m_eg2_decay_ms = scratch_val;
+                m_settings.m_eg2_decay_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg2_sustain_lvl") == 0)
             {
-                ms->m_settings.m_eg2_sustain_lvl = scratch_val;
+                m_settings.m_eg2_sustain_lvl = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg2_release_ms") == 0)
             {
-                ms->m_settings.m_eg2_release_ms = scratch_val;
+                m_settings.m_eg2_release_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op2_output_lvl") == 0)
             {
-                ms->m_settings.m_op2_output_lvl = scratch_val;
+                m_settings.m_op2_output_lvl = scratch_val;
                 settings_count++;
             }
 
             else if (strcmp(setting_key, "m_op3_waveform") == 0)
             {
-                ms->m_settings.m_op3_waveform = scratch_val;
+                m_settings.m_op3_waveform = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op3_ratio") == 0)
             {
-                ms->m_settings.m_op3_ratio = scratch_val;
+                m_settings.m_op3_ratio = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op3_detune_cents") == 0)
             {
-                ms->m_settings.m_op3_detune_cents = scratch_val;
+                m_settings.m_op3_detune_cents = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg3_attack_ms") == 0)
             {
-                ms->m_settings.m_eg3_attack_ms = scratch_val;
+                m_settings.m_eg3_attack_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg3_decay_ms") == 0)
             {
-                ms->m_settings.m_eg3_decay_ms = scratch_val;
+                m_settings.m_eg3_decay_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg3_sustain_lvl") == 0)
             {
-                ms->m_settings.m_eg3_sustain_lvl = scratch_val;
+                m_settings.m_eg3_sustain_lvl = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg3_release_ms") == 0)
             {
-                ms->m_settings.m_eg3_release_ms = scratch_val;
+                m_settings.m_eg3_release_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op3_output_lvl") == 0)
             {
-                ms->m_settings.m_op3_output_lvl = scratch_val;
+                m_settings.m_op3_output_lvl = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op4_waveform") == 0)
             {
-                ms->m_settings.m_op4_waveform = scratch_val;
+                m_settings.m_op4_waveform = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op4_ratio") == 0)
             {
-                ms->m_settings.m_op4_ratio = scratch_val;
+                m_settings.m_op4_ratio = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op4_detune_cents") == 0)
             {
-                ms->m_settings.m_op4_detune_cents = scratch_val;
+                m_settings.m_op4_detune_cents = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg4_attack_ms") == 0)
             {
-                ms->m_settings.m_eg4_attack_ms = scratch_val;
+                m_settings.m_eg4_attack_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg4_decay_ms") == 0)
             {
-                ms->m_settings.m_eg4_decay_ms = scratch_val;
+                m_settings.m_eg4_decay_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg4_sustain_lvl") == 0)
             {
-                ms->m_settings.m_eg4_sustain_lvl = scratch_val;
+                m_settings.m_eg4_sustain_lvl = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_eg4_release_ms") == 0)
             {
-                ms->m_settings.m_eg4_release_ms = scratch_val;
+                m_settings.m_eg4_release_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op4_output_lvl") == 0)
             {
-                ms->m_settings.m_op4_output_lvl = scratch_val;
+                m_settings.m_op4_output_lvl = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_op4_feedback") == 0)
             {
-                ms->m_settings.m_op4_feedback = scratch_val;
+                m_settings.m_op4_feedback = scratch_val;
                 settings_count++;
             }
 
             else if (strcmp(setting_key, "m_portamento_time_ms") == 0)
             {
-                ms->m_settings.m_portamento_time_ms = scratch_val;
+                m_settings.m_portamento_time_ms = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_volume_db") == 0)
             {
-                ms->m_settings.m_volume_db = scratch_val;
+                m_settings.m_volume_db = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_pitchbend_range") == 0)
             {
-                ms->m_settings.m_pitchbend_range = scratch_val;
+                m_settings.m_pitchbend_range = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_voice_mode") == 0)
             {
-                ms->m_settings.m_voice_mode = scratch_val;
+                m_settings.m_voice_mode = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_velocity_to_attack_scaling") == 0)
             {
-                ms->m_settings.m_velocity_to_attack_scaling = scratch_val;
+                m_settings.m_velocity_to_attack_scaling = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_note_number_to_decay_scaling") == 0)
             {
-                ms->m_settings.m_note_number_to_decay_scaling = scratch_val;
+                m_settings.m_note_number_to_decay_scaling = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_reset_to_zero") == 0)
             {
-                ms->m_settings.m_reset_to_zero = scratch_val;
+                m_settings.m_reset_to_zero = scratch_val;
                 settings_count++;
             }
             else if (strcmp(setting_key, "m_legato_mode") == 0)
             {
-                ms->m_settings.m_legato_mode = scratch_val;
+                m_settings.m_legato_mode = scratch_val;
                 settings_count++;
             }
         }
         // if (settings_count > 0)
         //    printf("Loaded %d settings\n", settings_count);
-        dxsynth_update(ms);
+        dxsynth_update(this);
     }
 
     fclose(presetzzz);
-    return true;
 }
 
 void dxsynth_print_settings(dxsynth *ms)

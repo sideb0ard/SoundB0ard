@@ -110,6 +110,8 @@ class dxsynth : public SoundGenerator
     void randomize() override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
+    void Load(std::string preset_name) override;
+    void Save(std::string preset_name) override;
 
   public:
     dxsynth_voice *m_voices[MAX_DX_VOICES];
@@ -146,8 +148,6 @@ void dxsynth_print_lfo2_routing_info(dxsynth *ms, wchar_t *scratch);
 void dxsynth_print_eg1_routing_info(dxsynth *ms, wchar_t *scratch);
 void dxsynth_print_eg2_routing_info(dxsynth *ms, wchar_t *scratch);
 
-bool dxsynth_save_settings(dxsynth *ms, char *preset_name);
-bool dxsynth_load_settings(dxsynth *ms, char *preset_name);
 bool dxsynth_list_presets(void);
 bool dxsynth_check_if_preset_exists(char *preset_to_find);
 
