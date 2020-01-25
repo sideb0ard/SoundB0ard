@@ -179,6 +179,22 @@ void Process::EventNotify(mixer_timing_info tinfo)
             }
             else if (timer_type_ == ProcessTimerType::OVER)
             {
+                float low_target_range{0};
+                float hi_target_range{0};
+                sscanf(pattern_.c_str(), "%f %f", &low_target_range,
+                       &hi_target_range);
+                if (low_target_range < hi_target_range)
+                {
+                    float lower_source_range = 0;
+                    float higher_source_range = loop_len_ * PPBAR;
+                    int cur_tick = tinfo.midi_tick % (int)higher_source_range;
+                    float scaled_val =
+                        scaleybum(lower_source_range, higher_source_range,
+                                  low_target_range, hi_target_range, cur_tick);
+                    std::string new_cmd = ReplaceString(
+                        command_, "%", std::to_string(scaled_val));
+                    Interpret(new_cmd.data(), global_env);
+                }
                 // work out valu
             }
             else if (timer_type_ == ProcessTimerType::RAMP)
