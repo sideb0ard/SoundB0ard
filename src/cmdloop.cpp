@@ -172,9 +172,10 @@ void *loopy(void *arg)
 
 void Interpret(char *line, std::shared_ptr<object::Environment> env)
 {
-    global_lex->ReadInput(line);
-    std::unique_ptr<parser::Parser> parsley =
-        std::make_unique<parser::Parser>(global_lex);
+    // global_lex->ReadInput(line);
+    auto lex = std::make_shared<lexer::Lexer>();
+    lex->ReadInput(line);
+    auto parsley = std::make_unique<parser::Parser>(lex);
 
     std::shared_ptr<ast::Program> program = parsley->ParseProgram();
 
