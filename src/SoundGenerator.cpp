@@ -361,10 +361,13 @@ static int soundgen_add_fx(SoundGenerator *self, Fx *f)
 {
 
     if (self->effects_num < kMaxNumSoundGenFx)
+    {
         self->effects[self->effects_num] = f;
+        printf("done adding effect\n");
+        return self->effects_num++;
+    }
 
-    printf("done adding effect\n");
-    return self->effects_num++;
+    return -1;
 }
 
 int add_delay_soundgen(SoundGenerator *self, float duration)
@@ -445,10 +448,11 @@ int add_envelope_soundgen(SoundGenerator *self)
 
 stereo_val effector(SoundGenerator *self, stereo_val val)
 {
-    for (int i = 0; i < self->effects_num; i++)
+    int num_fx = self->effects_num.load();
+    for (int i = 0; i < num_fx; i++)
     {
         Fx *f = self->effects[i];
-        if (f->enabled_)
+        if (f && f->enabled_)
         {
             val = f->Process(val);
         }

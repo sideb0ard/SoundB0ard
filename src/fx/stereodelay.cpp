@@ -15,7 +15,6 @@ StereoDelay::StereoDelay(double duration) : m_delay_time_ms_{duration}
     m_mode_ = TAP2;
 
     type_ = DELAY;
-    enabled_ = true;
 
     sync_ = true;
     sync_len_ = DELAY_SYNC_SIXTEENTH;
@@ -42,6 +41,8 @@ StereoDelay::StereoDelay(double duration) : m_delay_time_ms_{duration}
     Update();
 
     SyncTempo();
+
+    enabled_ = true;
 }
 
 void StereoDelay::EventNotify(broadcast_event event)

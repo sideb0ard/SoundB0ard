@@ -3,7 +3,7 @@
 
 typedef struct delayline
 {
-    double *m_buffer;
+    double *m_buffer{nullptr};
     double m_delay_ms;
     double m_delay_in_samples;
     int m_read_index;

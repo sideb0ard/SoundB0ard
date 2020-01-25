@@ -56,8 +56,8 @@ class SoundGenerator
 
     int note_duration_ms_{100};
 
-    int effects_num; // num of effects
-    Fx *effects[kMaxNumSoundGenFx];
+    std::atomic<int16_t> effects_num{0}; // num of effects
+    Fx *effects[kMaxNumSoundGenFx] = {};
     bool effects_on{true}; // bool
 };
 

@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iostream>
+
 #include <defjams.h>
 #include <fx/delayline.h>
 #include <utils.h>
