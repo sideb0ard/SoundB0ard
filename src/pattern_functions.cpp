@@ -23,7 +23,7 @@ void PatternEvery::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
     int loop_num) const
 {
-    if (loop_num % every_n_ == (every_n_ - 1))
+    if (loop_num % every_n_ == 0)
         func_->TransformPattern(events, loop_num);
 }
 

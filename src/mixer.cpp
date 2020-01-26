@@ -324,7 +324,12 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
     {
         for (auto p : mixr->processes_)
         {
-            p->EventNotify(mixr->timing_info);
+            if (p->active_)
+            {
+                if (event.type != TIME_MIDI_TICK)
+                    std::cout << "SUMTJING E:LSE!:" << event.type << std::endl;
+                p->EventNotify(mixr->timing_info);
+            }
         }
     }
 

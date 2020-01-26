@@ -92,6 +92,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 pattern_events_[i].clear();
             EvalPattern(pattern_root_, 0, PPBAR);
 
+            int idx = 0;
             for (auto &f : pattern_functions_)
             {
                 if (f->active_)
@@ -102,35 +103,36 @@ void Process::EventNotify(mixer_timing_info tinfo)
         if (tinfo.is_midi_tick)
         {
             int cur_tick = tinfo.midi_tick % PPBAR;
-            if (pattern_events_[cur_tick].size() == 0)
-                return;
-
-            std::vector<std::shared_ptr<MusicalEvent>> &events =
-                pattern_events_[cur_tick];
-
-            if (target_type_ == ProcessPatternTarget::ENV)
+            if (pattern_events_[cur_tick].size() > 0)
             {
-                for (auto e : events)
-                {
-                    if (e->value_ == "~") // skip blank markers
-                        continue;
-                    std::string cmd =
-                        std::string("noteOn(") + e->value_ + "," + "127, 250)";
 
-                    Interpret(cmd.data(), global_env);
-                }
-            }
-            else if (target_type_ == ProcessPatternTarget::VALUES)
-            {
-                for (auto e : events)
+                std::vector<std::shared_ptr<MusicalEvent>> &events =
+                    pattern_events_[cur_tick];
+
+                if (target_type_ == ProcessPatternTarget::ENV)
                 {
-                    if (e->value_ == "~") // skip blank markers
-                        continue;
-                    for (auto t : targets_)
+                    for (auto e : events)
                     {
-                        std::string cmd = std::string("noteOn(") + t + "," +
-                                          e->value_ + ", 250)";
+                        if (e->value_ == "~") // skip blank markers
+                            continue;
+                        std::string cmd = std::string("noteOn(") + e->value_ +
+                                          "," + "127, 250)";
+
                         Interpret(cmd.data(), global_env);
+                    }
+                }
+                else if (target_type_ == ProcessPatternTarget::VALUES)
+                {
+                    for (auto e : events)
+                    {
+                        if (e->value_ == "~") // skip blank markers
+                            continue;
+                        for (auto t : targets_)
+                        {
+                            std::string cmd = std::string("noteOn(") + t + "," +
+                                              e->value_ + ", 250)";
+                            Interpret(cmd.data(), global_env);
+                        }
                     }
                 }
             }
@@ -155,17 +157,18 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     EvalPattern(pattern_root_, 0, PPBAR);
 
                     int cur_tick = tinfo.midi_tick % PPBAR;
-                    if (pattern_events_[cur_tick].size() == 0)
-                        return;
-
-                    std::vector<std::shared_ptr<MusicalEvent>> &events =
-                        pattern_events_[cur_tick];
-
-                    if (events.size() > 0)
+                    if (pattern_events_[cur_tick].size() > 0)
                     {
-                        std::string new_cmd =
-                            ReplaceString(command_, "%", events[0]->value_);
-                        Interpret(new_cmd.data(), global_env);
+
+                        std::vector<std::shared_ptr<MusicalEvent>> &events =
+                            pattern_events_[cur_tick];
+
+                        if (events.size() > 0)
+                        {
+                            std::string new_cmd =
+                                ReplaceString(command_, "%", events[0]->value_);
+                            Interpret(new_cmd.data(), global_env);
+                        }
                     }
                 }
             }
