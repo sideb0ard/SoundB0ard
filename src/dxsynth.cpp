@@ -1635,5 +1635,37 @@ void dxsynth_set_active_midi_osc(dxsynth *dx, int osc_num)
     if (osc_num >= 1 && osc_num <= 4)
         dx->active_midi_osc = osc_num;
 }
-void dxsynth::SetParam(std::string name, double val) {}
+void dxsynth::SetParam(std::string name, double val)
+{
+    if (name == "vol")
+        SetVolume(val);
+    else if (name == "pan")
+        SetPan(val);
+    else if (name == "algo")
+        dxsynth_set_voice_mode(this, val);
+    else if (name == "midi_osc")
+        dxsynth_set_active_midi_osc(this, val);
+    else if (name == "porta")
+        dxsynth_set_portamento_time_ms(this, val);
+    else if (name == "pitchrange")
+        dxsynth_set_pitchbend_range(this, val);
+    else if (name == "op4fb")
+        dxsynth_set_op4_feedback(this, val);
+    else if (name == "vel2att")
+        dxsynth_set_velocity_to_attack_scaling(this, val);
+    else if (name == "note2dec")
+        dxsynth_set_note_number_to_decay_scaling(this, val);
+    else if (name == "reset2zero")
+        dxsynth_set_reset_to_zero(this, val);
+    else if (name == "legato")
+        dxsynth_set_legato_mode(this, val);
+    else if (name == "l1_wav")
+        dxsynth_set_lfo1_waveform(this, val);
+    else if (name == "l1_int")
+        dxsynth_set_lfo1_intensity(this, val);
+    else if (name == "l1_rate")
+        dxsynth_set_lfo1_rate(this, val);
+
+    dxsynth_update(this);
+}
 double dxsynth::GetParam(std::string name) { return 0; }

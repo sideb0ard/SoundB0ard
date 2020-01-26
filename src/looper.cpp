@@ -823,5 +823,48 @@ void looper::noteOn(midi_event ev)
     (void)ev;
     audio_buffer_read_idx = normalized_audio_buffer_read_idx;
 }
-void looper::SetParam(std::string name, double val) {}
+void looper::SetParam(std::string name, double val)
+{
+    if (name == "pitch")
+        looper_set_grain_pitch(this, val);
+    else if (name == "mode")
+        looper_set_loop_mode(this, val);
+    else if (name == "gate_mode")
+        looper_set_gate_mode(this, val);
+    else if (name == "idx")
+    {
+        if (val <= 100)
+        {
+            double pos = audio_buffer_len / 100 * val;
+            looper_set_audio_buffer_read_idx(this, pos);
+        }
+    }
+    else if (name == "len")
+        looper_set_loop_len(this, val);
+    else if (name == "scamble")
+        looper_set_scramble_pending(this);
+    else if (name == "stutter")
+        looper_set_stutter_pending(this);
+    else if (name == "step")
+        looper_set_step_mode(this, val);
+    else if (name == "reverse")
+        looper_set_reverse_mode(this, val);
+    else if (name == "grain_dur_ms")
+        looper_set_grain_duration(this, val);
+    else if (name == "grains_per_sec")
+        looper_set_grain_density(this, val);
+    else if (name == "density_dur_sync")
+        looper_set_density_duration_sync(this, val);
+    else if (name == "quasi_grain_fudge")
+        looper_set_quasi_grain_fudge(this, val);
+    else if (name == "fill_factor")
+        looper_set_fill_factor(this, val);
+    else if (name == "grain_spray_ms")
+        looper_set_granular_spray(this, val);
+    else if (name == "selection_mode")
+        looper_set_selection_mode(this, val);
+    else if (name == "env_mode")
+        looper_set_envelope_mode(this, val);
+}
+
 double looper::GetParam(std::string name) { return 0; }

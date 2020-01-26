@@ -2565,6 +2565,14 @@ void minisynth::SetParam(std::string name, double val)
         minisynth_set_filter_fq(this, val);
     else if (name == "sat")
         minisynth_set_filter_saturation(this, val);
+
+    // else if (name == "arp")
+    //    minisynth_set_arpeggiate(this, val);
+    // else if (name == "arp_speed")
+    //    minisynth_set_arpeggiate_rate(this, val);
+    // else if (name == "arp_mode")
+    //    minisynth_set_arpeggiate_mode(this, val);
+
     minisynth_update(this);
 }
 

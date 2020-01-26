@@ -113,7 +113,16 @@ void Reverb::Status(char *status_string)
     // clang-format on
 }
 
-void Reverb::SetParam(std::string name, double val) {}
+void Reverb::SetParam(std::string name, double val)
+{
+    if (name == "predelayms")
+        SetPreDelayMsec(val);
+    else if (name == "reverbtime")
+        SetRt60(val);
+    else if (name == "wetmx")
+        SetWetPct(val);
+    CookVariables();
+}
 
 double Reverb::GetParam(std::string name) { return 0; }
 
