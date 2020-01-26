@@ -11,14 +11,11 @@ namespace interpreter_sound_cmds
 
 void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
 {
-    std::cout << "PARSXXXXFX\n";
-
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
     if (soundgen)
     {
         if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
         {
-            std::cout << "VALID SOUND GEN!\n";
             SoundGenerator *sg = mixr->SoundGenerators[soundgen->soundgen_id_];
 
             std::shared_ptr<object::String> str_obj =
@@ -71,8 +68,6 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
 
 void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
 {
-    std::cout << "PARSXXXX SYNTH\n";
-
     assert(args.size() == 3);
 
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
@@ -80,13 +75,11 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
     {
         if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
         {
-            std::cout << "VALID SOUND GEN!\n";
             SoundGenerator *sg = mixr->SoundGenerators[soundgen->soundgen_id_];
             std::shared_ptr<object::String> str_obj =
                 std::dynamic_pointer_cast<object::String>(args[1]);
             if (str_obj)
             {
-                std::cout << "GOT A STRING! " << str_obj->value_ << std::endl;
                 std::shared_ptr<object::String> str_cmd =
                     std::dynamic_pointer_cast<object::String>(args[2]);
                 if (str_cmd->value_ == "load")

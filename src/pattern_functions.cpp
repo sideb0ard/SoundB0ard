@@ -44,6 +44,26 @@ void PatternTranspose::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
     int loop_num) const
 {
+    int num_midi_notes_to_adjust = num_octaves_ * 12;
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (events[i].size() > 0)
+        {
+            std::vector<std::shared_ptr<MusicalEvent>> &mevents = events[i];
+            for (auto &e : mevents)
+            {
+                if (e->target_type_ == ProcessPatternTarget::VALUES)
+                {
+                    int str_to_val = std::stoi(e->value_);
+                    if (direction_ == UP)
+                        str_to_val += num_midi_notes_to_adjust;
+                    else
+                        str_to_val -= num_midi_notes_to_adjust;
+                    e->value_ = std::to_string(str_to_val);
+                }
+            }
+        }
+    }
 }
 std::string PatternTranspose::String() const { return "PatternTranzzzpose"; }
 

@@ -905,6 +905,22 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         std::cout << "SWING SETTING:" << swing_setting << std::endl;
         return std::make_shared<PatternSwing>(swing_setting);
     }
+    else if (func->token_.literal_ == "up" || func->token_.literal_ == "down")
+    {
+        std::cout << "UP OR DOWN YO!\n";
+        int num_octaves = 1;
+        if (func->arguments_.size() > 0)
+        {
+            auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
+                func->arguments_[0]);
+            if (intval)
+                num_octaves = intval->value_;
+        }
+        if (func->token_.literal_ == "up")
+            return std::make_shared<PatternTranspose>(UP, num_octaves);
+        else
+            return std::make_shared<PatternTranspose>(DOWN, num_octaves);
+    }
     else
     {
         std::cout << "NAH MAN, DIDN't GET YER FUNCTION 0- i got "
