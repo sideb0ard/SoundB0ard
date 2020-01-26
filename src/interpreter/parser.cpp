@@ -213,7 +213,6 @@ std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
     std::shared_ptr<ast::VolumeStatement> stmt =
         std::make_shared<ast::VolumeStatement>(cur_token_);
 
-    std::cout << "VOL ME UP YO!" << std::endl;
     if (!ExpectPeek(token::SLANG_IDENT))
     {
         std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_

@@ -175,7 +175,36 @@ void Process::EventNotify(mixer_timing_info tinfo)
             }
             else if (timer_type_ == ProcessTimerType::OSCILLATE)
             {
-                // work out valu
+                float low_target_range{0};
+                float hi_target_range{0};
+                sscanf(pattern_.c_str(), "%f %f", &low_target_range,
+                       &hi_target_range);
+                if (low_target_range < hi_target_range)
+                {
+                    float lower_source_range = 0;
+                    float higher_source_range = loop_len_ * PPBAR;
+                    float half_source_range = higher_source_range / 2;
+                    int cur_tick = tinfo.midi_tick % (int)higher_source_range;
+                    float scaled_val{0};
+                    if (cur_tick < (higher_source_range / 2))
+                    {
+                        scaled_val = scaleybum(
+                            lower_source_range, half_source_range,
+                            low_target_range, hi_target_range, cur_tick);
+                    }
+                    else
+                    {
+                        int local_tick =
+                            half_source_range - (cur_tick - half_source_range);
+
+                        scaled_val = scaleybum(
+                            lower_source_range, half_source_range,
+                            low_target_range, hi_target_range, local_tick);
+                    }
+                    std::string new_cmd = ReplaceString(
+                        command_, "%", std::to_string(scaled_val));
+                    Interpret(new_cmd.data(), global_env);
+                }
             }
             else if (timer_type_ == ProcessTimerType::OVER)
             {
@@ -195,12 +224,27 @@ void Process::EventNotify(mixer_timing_info tinfo)
                         command_, "%", std::to_string(scaled_val));
                     Interpret(new_cmd.data(), global_env);
                 }
-                // work out valu
             }
             else if (timer_type_ == ProcessTimerType::RAMP)
             {
-                // work out valu
-                // check if finished and stop if so.
+                float low_target_range{0};
+                float hi_target_range{0};
+                sscanf(pattern_.c_str(), "%f %f", &low_target_range,
+                       &hi_target_range);
+                if (low_target_range != hi_target_range)
+                {
+                    float lower_source_range = 0;
+                    float higher_source_range = loop_len_ * PPBAR;
+                    int cur_tick = tinfo.midi_tick % (int)higher_source_range;
+                    float scaled_val =
+                        scaleybum(lower_source_range, higher_source_range,
+                                  low_target_range, hi_target_range, cur_tick);
+                    if (cur_tick == higher_source_range - 1)
+                        active_ = false;
+                    std::string new_cmd = ReplaceString(
+                        command_, "%", std::to_string(scaled_val));
+                    Interpret(new_cmd.data(), global_env);
+                }
             }
         }
     }
