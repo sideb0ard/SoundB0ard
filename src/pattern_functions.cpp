@@ -68,3 +68,41 @@ void PatternRotate::TransformPattern(
     // PrintPattern(events);
 }
 std::string PatternRotate::String() const { return "PatternRoooootate!"; }
+
+void PatternSwing::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num) const
+{
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
+    bool even16th = true;
+    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
+    {
+        for (int j = 0; j < PPSIXTEENTH; j++)
+        {
+            int idx = i + j;
+            if (events[idx].size() > 0)
+            {
+                if (even16th)
+                {
+                    // clean copy
+                    new_events[idx] = events[idx];
+                }
+                else
+                {
+                    int new_idx =
+                        idx + swing_setting_ * 19; // TODO magic number 19 midi
+                                                   // ticks per 4% swing
+                    while (new_idx < 0)
+                        new_idx = PPBAR - new_idx;
+                    while (new_idx >= PPBAR)
+                        new_idx = new_idx - PPBAR;
+                    new_events[new_idx] = events[idx];
+                }
+            }
+        }
+        even16th = 1 - even16th;
+    }
+    // PrintPattern(new_events);
+    events = new_events;
+}
+std::string PatternSwing::String() const { return "PatternRoooootate!"; }

@@ -71,3 +71,16 @@ class PatternTranspose : public PatternFunction
     unsigned int direction_;
     int num_octaves_;
 };
+
+class PatternSwing : public PatternFunction
+{
+  public:
+    PatternSwing(int swing_setting) : swing_setting_{swing_setting} {};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) const override;
+    std::string String() const override;
+
+  private:
+    int swing_setting_;
+};

@@ -891,6 +891,20 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         else
             return std::make_shared<PatternRotate>(RIGHT, num_sixteenth_steps);
     }
+    else if (func->token_.literal_ == "swing")
+    {
+        std::cout << "SWING!\n";
+        int swing_setting = 50;
+        if (func->arguments_.size() > 0)
+        {
+            auto intval = std::dynamic_pointer_cast<ast::NumberLiteral>(
+                func->arguments_[0]);
+            if (intval)
+                swing_setting = intval->value_;
+        }
+        std::cout << "SWING SETTING:" << swing_setting << std::endl;
+        return std::make_shared<PatternSwing>(swing_setting);
+    }
     else
     {
         std::cout << "NAH MAN, DIDN't GET YER FUNCTION 0- i got "
