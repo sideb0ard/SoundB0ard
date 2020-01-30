@@ -35,7 +35,7 @@ all: objdir $(TARGET)
 	@echo "\n\x1b[37mBoom! make some noise...\x1b[0m"
 
 objdir:
-	find src -type dir -exec mkdir -p obj/{} \;
+	find src -type d -exec mkdir -p obj/{} \;
 
 $(TARGET): $(OBJ)
 	$(CC) $(CPPFLAGS) $(INCDIRS) $(CXXFLAGS) $(LIBDIRS) $(LIBS) $^ -o $@
