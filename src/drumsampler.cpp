@@ -16,7 +16,7 @@
 extern wchar_t *sparkchars;
 extern mixer *mixr;
 
-drumsampler::drumsampler(char *filename)
+DrumSampler::DrumSampler(char *filename)
 {
     drumsampler_import_file(this, filename);
 
@@ -33,13 +33,13 @@ drumsampler::drumsampler(char *filename)
     started = false;
 }
 
-drumsampler::~drumsampler()
+DrumSampler::~DrumSampler()
 {
     printf("Deleting sample buffer\n");
     free(buffer);
 }
 
-stereo_val drumsampler::genNext()
+stereo_val DrumSampler::genNext()
 {
     double left_val = 0;
     double right_val = 0;
@@ -99,11 +99,11 @@ stereo_val drumsampler::genNext()
 
     stereo_val out = {.left = left_val * amp * pan_left,
                       .right = right_val * amp * pan_right};
-    out = effector(this, out);
+    out = Effector(out);
     return out;
 }
 
-void drumsampler::status(wchar_t *status_string)
+void DrumSampler::status(wchar_t *status_string)
 {
     char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
     if (active)
@@ -132,7 +132,7 @@ void drumsampler::status(wchar_t *status_string)
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-void drumsampler::start()
+void DrumSampler::start()
 {
     if (active)
         return; // no-op
@@ -141,7 +141,7 @@ void drumsampler::start()
     engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
-void drumsampler::noteOn(midi_event ev)
+void DrumSampler::noteOn(midi_event ev)
 {
     int idx = mixr->timing_info.midi_tick % PPBAR;
     int seq_position = get_a_drumsampler_position(this);
@@ -153,7 +153,7 @@ void drumsampler::noteOn(midi_event ev)
     eg_start_eg(&eg);
 }
 
-void drumsampler_import_file(drumsampler *ds, char *filename)
+void drumsampler_import_file(DrumSampler *ds, char *filename)
 {
     audio_buffer_details deetz = import_file_contents(&ds->buffer, filename);
     strcpy(ds->filename, deetz.filename);
@@ -165,7 +165,7 @@ void drumsampler_import_file(drumsampler *ds, char *filename)
     drumsampler_reset_samples(ds);
 }
 
-void drumsampler_reset_samples(drumsampler *ds)
+void drumsampler_reset_samples(DrumSampler *ds)
 {
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
     {
@@ -183,15 +183,15 @@ void drumsampler_reset_samples(drumsampler *ds)
     }
 }
 
-int get_a_drumsampler_position(drumsampler *ss)
+int get_a_drumsampler_position(DrumSampler *ds)
 {
     for (int i = 0; i < MAX_CONCURRENT_SAMPLES; i++)
-        if (ss->samples_now_playing[i] == -1)
+        if (ds->samples_now_playing[i] == -1)
             return i;
     return -1;
 }
 
-void drumsampler_set_pitch(drumsampler *ds, double v)
+void drumsampler_set_pitch(DrumSampler *ds, double v)
 {
     if (v >= 0. && v <= 2.0)
         ds->buffer_pitch = v;
@@ -199,43 +199,43 @@ void drumsampler_set_pitch(drumsampler *ds, double v)
         printf("Must be in the range of 0.0 .. 2.0\n");
 }
 
-void drumsampler_set_cutoff_percent(drumsampler *ds, unsigned int percent)
+void drumsampler_set_cutoff_percent(DrumSampler *ds, unsigned int percent)
 {
     if (percent > 100)
         return;
     ds->buf_end_pos = ds->bufsize / 100. * percent;
 }
 
-void drumsampler_enable_envelope_generator(drumsampler *ds, bool b)
+void drumsampler_enable_envelope_generator(DrumSampler *ds, bool b)
 {
     ds->envelope_enabled = b;
 }
-void drumsampler_set_attack_time(drumsampler *ds, double val)
+void drumsampler_set_attack_time(DrumSampler *ds, double val)
 {
     eg_set_attack_time_msec(&ds->eg, val);
 }
-void drumsampler_set_decay_time(drumsampler *ds, double val)
+void drumsampler_set_decay_time(DrumSampler *ds, double val)
 {
     eg_set_decay_time_msec(&ds->eg, val);
 }
-void drumsampler_set_sustain_lvl(drumsampler *ds, double val)
+void drumsampler_set_sustain_lvl(DrumSampler *ds, double val)
 {
     eg_set_sustain_level(&ds->eg, val);
 }
-void drumsampler_set_release_time(drumsampler *ds, double val)
+void drumsampler_set_release_time(DrumSampler *ds, double val)
 {
     eg_set_release_time_msec(&ds->eg, val);
 }
 
-void drumsampler_set_glitch_mode(drumsampler *ds, bool b)
+void drumsampler_set_glitch_mode(DrumSampler *ds, bool b)
 {
     ds->glitch_mode = b;
 }
 
-void drumsampler_set_glitch_rand_factor(drumsampler *ds, int pct)
+void drumsampler_set_glitch_rand_factor(DrumSampler *ds, int pct)
 {
     if (pct >= 0 && pct <= 100)
         ds->glitch_rand_factor = pct;
 }
-void drumsampler::SetParam(std::string name, double val) {}
-double drumsampler::GetParam(std::string name) { return 0; }
+void DrumSampler::SetParam(std::string name, double val) {}
+double DrumSampler::GetParam(std::string name) { return 0; }

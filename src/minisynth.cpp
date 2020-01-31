@@ -31,7 +31,7 @@ const char *s_lfo_wave_names[] = {"sine", "usaw", "dsaw", "tri ",
 const char *s_filter_type_names[] = {"lpf1", "hpf1", "lpf2", "hpf2", "bpf2",
                                      "bsf2", "lpf4", "hpf4", "bpf4"};
 
-minisynth::minisynth()
+MiniSynth::MiniSynth()
 {
     type = MINISYNTH_TYPE;
 
@@ -62,7 +62,7 @@ minisynth::minisynth()
     active = true;
 }
 
-minisynth::~minisynth()
+MiniSynth::~MiniSynth()
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -71,7 +71,7 @@ minisynth::~minisynth()
     printf("Deleting MINISYNTH self\n");
 }
 
-stereo_val minisynth::genNext()
+stereo_val MiniSynth::genNext()
 {
 
     if (!active)
@@ -103,10 +103,10 @@ stereo_val minisynth::genNext()
     stereo_val out = {.left = accum_out_left * volume * pan_left,
                       .right = accum_out_right * volume * pan_right};
 
-    out = effector(this, out);
+    out = Effector(out);
     return out;
 }
-void minisynth::status(wchar_t *status_string)
+void MiniSynth::status(wchar_t *status_string)
 {
     if (mixr->debug_mode)
     {
@@ -301,19 +301,19 @@ void minisynth::status(wchar_t *status_string)
     sequence_engine_status(&engine, scratch);
     wcscat(status_string, scratch);
 }
-void minisynth::start()
+void MiniSynth::start()
 {
     active = true;
     engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
-void minisynth::stop()
+void MiniSynth::stop()
 {
     active = false;
     allNotesOff();
 }
 
-void minisynth_load_defaults(minisynth *ms)
+void minisynth_load_defaults(MiniSynth *ms)
 {
     strncpy(ms->m_settings.m_settings_name, "default", 7);
 
@@ -443,7 +443,7 @@ void minisynth_load_defaults(minisynth *ms)
     ms->m_settings.m_generate_src = -99;
 }
 
-void minisynth::control(midi_event ev)
+void MiniSynth::control(midi_event ev)
 {
     double scaley_val = 0;
     switch (ev.data1)
@@ -490,7 +490,7 @@ void minisynth::control(midi_event ev)
     minisynth_update(this);
 }
 
-void minisynth::noteOn(midi_event ev)
+void MiniSynth::noteOn(midi_event ev)
 {
     unsigned int midinote = ev.data1;
     unsigned int velocity = ev.data2;
@@ -537,7 +537,7 @@ void minisynth::noteOn(midi_event ev)
     }
 }
 
-void minisynth::allNotesOff()
+void MiniSynth::allNotesOff()
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -546,7 +546,7 @@ void minisynth::allNotesOff()
     }
 }
 
-void minisynth::noteOff(midi_event ev)
+void MiniSynth::noteOff(midi_event ev)
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -559,7 +559,7 @@ void minisynth::noteOff(midi_event ev)
     }
 }
 
-void minisynth::pitchBend(midi_event ev)
+void MiniSynth::pitchBend(midi_event ev)
 {
     unsigned int data1 = ev.data1;
     unsigned int data2 = ev.data2;
@@ -598,7 +598,7 @@ void minisynth::pitchBend(midi_event ev)
 
 ////////////////////////////////////
 
-bool minisynth_prepare_for_play(minisynth *ms)
+bool minisynth_prepare_for_play(MiniSynth *ms)
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -614,7 +614,7 @@ bool minisynth_prepare_for_play(minisynth *ms)
     return true;
 }
 
-void minisynth_update(minisynth *ms)
+void minisynth_update(MiniSynth *ms)
 {
     ms->m_global_synth_params.voice_params.hard_sync = ms->m_settings.hard_sync;
     ms->m_global_synth_params.voice_params.voice_mode =
@@ -874,7 +874,7 @@ void minisynth_update(minisynth *ms)
             minisynth_voice_update(ms->m_voices[i]);
 }
 
-void minisynth_reset_voices(minisynth *ms)
+void minisynth_reset_voices(MiniSynth *ms)
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -882,7 +882,7 @@ void minisynth_reset_voices(minisynth *ms)
     }
 }
 
-void minisynth_increment_voice_timestamps(minisynth *ms)
+void minisynth_increment_voice_timestamps(MiniSynth *ms)
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -894,7 +894,7 @@ void minisynth_increment_voice_timestamps(minisynth *ms)
     }
 }
 
-minisynth_voice *minisynth_get_oldest_voice(minisynth *ms)
+minisynth_voice *minisynth_get_oldest_voice(MiniSynth *ms)
 {
     int timestamp = -1;
     minisynth_voice *found_voice = NULL;
@@ -913,7 +913,7 @@ minisynth_voice *minisynth_get_oldest_voice(minisynth *ms)
     return found_voice;
 }
 
-minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
+minisynth_voice *minisynth_get_oldest_voice_with_note(MiniSynth *ms,
                                                       int midi_note)
 {
     int timestamp = -1;
@@ -934,17 +934,17 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(minisynth *ms,
     return found_voice;
 }
 
-void minisynth_print_lfo1_routing_info(minisynth *ms, wchar_t *scratch)
+void minisynth_print_lfo1_routing_info(MiniSynth *ms, wchar_t *scratch)
 {
     print_modulation_matrix_info_lfo1(&ms->m_ms_modmatrix, scratch);
 }
 
-void minisynth_print_eg1_routing_info(minisynth *ms, wchar_t *scratch)
+void minisynth_print_eg1_routing_info(MiniSynth *ms, wchar_t *scratch)
 {
     print_modulation_matrix_info_eg1(&ms->m_ms_modmatrix, scratch);
 }
 
-void minisynth::randomize()
+void MiniSynth::randomize()
 {
     // printf("Randomizing SYNTH!\n");
 
@@ -1035,7 +1035,7 @@ void minisynth::randomize()
     // minisynth_print_settings(ms);
 }
 
-void minisynth::Save(std::string preset_to_load)
+void MiniSynth::Save(std::string preset_to_load)
 {
     if (preset_to_load.empty())
     {
@@ -1256,10 +1256,10 @@ bool minisynth_check_if_preset_exists(char *preset_to_find)
     fclose(presetzzz);
     return false;
 }
-// bool minisynth_load_settings(minisynth *ms, char *preset_to_load)
+// bool minisynth_load_settings(MiniSynth *ms, char *preset_to_load)
 //{
 //    void Save(std::string preset_name);
-void minisynth::Load(std::string preset_name)
+void MiniSynth::Load(std::string preset_name)
 {
     if (preset_name.empty())
     {
@@ -1616,7 +1616,7 @@ void minisynth::Load(std::string preset_name)
     fclose(presetzzz);
 }
 
-void minisynth_print_settings(minisynth *ms)
+void minisynth_print_settings(MiniSynth *ms)
 {
     printf(ANSI_COLOR_WHITE); // CONTROL PANEL
     printf("///////////////////// SYNTHzzz! ///////////////////////\n");
@@ -1718,23 +1718,23 @@ void minisynth_print_settings(minisynth *ms)
     printf(ANSI_COLOR_RESET);
 }
 
-void minisynth_print_patterns(minisynth *ms)
+void minisynth_print_patterns(MiniSynth *ms)
 {
     sequence_engine_print_patterns(&ms->engine);
 }
 
-void minisynth_print_modulation_routings(minisynth *ms)
+void minisynth_print_modulation_routings(MiniSynth *ms)
 {
     print_modulation_matrix(&ms->m_ms_modmatrix);
 }
 
-void minisynth_set_generate_src(minisynth *ms, int src)
+void minisynth_set_generate_src(MiniSynth *ms, int src)
 {
     if (mixer_is_valid_pattern_gen_num(mixr, src))
         ms->m_settings.m_generate_src = src;
 }
 
-void minisynth_set_filter_mod(minisynth *ms, double mod)
+void minisynth_set_filter_mod(MiniSynth *ms, double mod)
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -1742,9 +1742,9 @@ void minisynth_set_filter_mod(minisynth *ms, double mod)
     }
 }
 
-void minisynth_print(minisynth *ms) { minisynth_print_settings(ms); }
+void minisynth_print(MiniSynth *ms) { minisynth_print_settings(ms); }
 
-void minisynth_set_eg_attack_time_ms(minisynth *ms, unsigned int eg_num,
+void minisynth_set_eg_attack_time_ms(MiniSynth *ms, unsigned int eg_num,
                                      double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
@@ -1758,7 +1758,7 @@ void minisynth_set_eg_attack_time_ms(minisynth *ms, unsigned int eg_num,
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
-void minisynth_set_eg_decay_time_ms(minisynth *ms, unsigned int eg_num,
+void minisynth_set_eg_decay_time_ms(MiniSynth *ms, unsigned int eg_num,
                                     double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
@@ -1772,7 +1772,7 @@ void minisynth_set_eg_decay_time_ms(minisynth *ms, unsigned int eg_num,
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
-void minisynth_set_eg_release_time_ms(minisynth *ms, unsigned int eg_num,
+void minisynth_set_eg_release_time_ms(MiniSynth *ms, unsigned int eg_num,
                                       double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
@@ -1786,7 +1786,7 @@ void minisynth_set_eg_release_time_ms(minisynth *ms, unsigned int eg_num,
         printf("val must be between %d and %d\n", EG_MINTIME_MS, EG_MAXTIME_MS);
 }
 
-void minisynth_set_osc_amp(minisynth *ms, unsigned int osc_num, double val)
+void minisynth_set_osc_amp(MiniSynth *ms, unsigned int osc_num, double val)
 {
     if (osc_num == 0 || osc_num > 4)
         return;
@@ -1813,7 +1813,7 @@ void minisynth_set_osc_amp(minisynth *ms, unsigned int osc_num, double val)
         printf("val must be between -100 and 100\n");
 }
 
-void minisynth_set_osc_cents(minisynth *ms, unsigned int osc_num, double val)
+void minisynth_set_osc_cents(MiniSynth *ms, unsigned int osc_num, double val)
 {
     if (osc_num == 0 || osc_num > 4)
         return;
@@ -1839,7 +1839,7 @@ void minisynth_set_osc_cents(minisynth *ms, unsigned int osc_num, double val)
     else
         printf("val must be between -100 and 100\n");
 }
-void minisynth_set_detune(minisynth *ms, double val)
+void minisynth_set_detune(MiniSynth *ms, double val)
 {
     if (val >= -100 && val <= 100)
         ms->m_settings.m_detune_cents = val;
@@ -1847,7 +1847,7 @@ void minisynth_set_detune(minisynth *ms, double val)
         printf("val must be between -100 and 100\n");
 }
 
-void minisynth_set_eg_dca_enable(minisynth *ms, unsigned int osc_num, int val)
+void minisynth_set_eg_dca_enable(MiniSynth *ms, unsigned int osc_num, int val)
 {
     if (val == 0 || val == 1)
     {
@@ -1860,7 +1860,7 @@ void minisynth_set_eg_dca_enable(minisynth *ms, unsigned int osc_num, int val)
         printf("val must be boolean 0 or 1\n");
 }
 
-void minisynth_set_eg_dca_int(minisynth *ms, unsigned int eg_num, double val)
+void minisynth_set_eg_dca_int(MiniSynth *ms, unsigned int eg_num, double val)
 {
     if (val >= -1 && val <= 1)
     {
@@ -1873,7 +1873,7 @@ void minisynth_set_eg_dca_int(minisynth *ms, unsigned int eg_num, double val)
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_eg_filter_enable(minisynth *ms, unsigned int eg_num, int val)
+void minisynth_set_eg_filter_enable(MiniSynth *ms, unsigned int eg_num, int val)
 {
     if (val == 0 || val == 1)
     {
@@ -1886,7 +1886,7 @@ void minisynth_set_eg_filter_enable(minisynth *ms, unsigned int eg_num, int val)
         printf("val must be boolean 0 or 1\n");
 }
 
-void minisynth_set_eg_filter_int(minisynth *ms, unsigned int eg_num, double val)
+void minisynth_set_eg_filter_int(MiniSynth *ms, unsigned int eg_num, double val)
 {
     if (val >= -1 && val <= 1)
     {
@@ -1899,7 +1899,7 @@ void minisynth_set_eg_filter_int(minisynth *ms, unsigned int eg_num, double val)
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_eg_osc_enable(minisynth *ms, unsigned int eg_num, int val)
+void minisynth_set_eg_osc_enable(MiniSynth *ms, unsigned int eg_num, int val)
 {
     if (val == 0 || val == 1)
     {
@@ -1912,7 +1912,7 @@ void minisynth_set_eg_osc_enable(minisynth *ms, unsigned int eg_num, int val)
         printf("val must be boolean 0 or 1\n");
 }
 
-void minisynth_set_eg_osc_int(minisynth *ms, unsigned int eg_num, double val)
+void minisynth_set_eg_osc_int(MiniSynth *ms, unsigned int eg_num, double val)
 {
     if (val >= -1 && val <= 1)
     {
@@ -1925,7 +1925,7 @@ void minisynth_set_eg_osc_int(minisynth *ms, unsigned int eg_num, double val)
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_filter_fc(minisynth *ms, double val)
+void minisynth_set_filter_fc(MiniSynth *ms, double val)
 {
     if (val >= 80 && val <= 18000)
         ms->m_settings.m_fc_control = val;
@@ -1933,7 +1933,7 @@ void minisynth_set_filter_fc(minisynth *ms, double val)
         printf("val must be between 80 and 18000\n");
 }
 
-void minisynth_set_filter_fq(minisynth *ms, double val)
+void minisynth_set_filter_fq(MiniSynth *ms, double val)
 {
     if (val >= 0.5 && val <= 10)
         ms->m_settings.m_q_control = val;
@@ -1941,7 +1941,7 @@ void minisynth_set_filter_fq(minisynth *ms, double val)
         printf("val must be between 0.5 and 10\n");
 }
 
-void minisynth_set_filter_type(minisynth *ms, unsigned int val)
+void minisynth_set_filter_type(MiniSynth *ms, unsigned int val)
 {
     if (val == BSF2 || val == LPF1 || val == HPF1)
         printf("warning! useless change - %d not possible with moog\n", val);
@@ -1951,7 +1951,7 @@ void minisynth_set_filter_type(minisynth *ms, unsigned int val)
         printf("Val must be between 0 and %d\n", NUM_FILTER_TYPES - 1);
 }
 
-void minisynth_set_filter_saturation(minisynth *ms, double val)
+void minisynth_set_filter_saturation(MiniSynth *ms, double val)
 {
     if (val >= 0 && val <= 100)
         ms->m_settings.m_filter_saturation = val;
@@ -1959,7 +1959,7 @@ void minisynth_set_filter_saturation(minisynth *ms, double val)
         printf("Val must be between 0 and 100\n");
 }
 
-void minisynth_set_filter_nlp(minisynth *ms, unsigned int val)
+void minisynth_set_filter_nlp(MiniSynth *ms, unsigned int val)
 {
     if (val < 2)
         ms->m_settings.m_nlp = val;
@@ -1967,7 +1967,7 @@ void minisynth_set_filter_nlp(minisynth *ms, unsigned int val)
         printf("Val must be 0 or 1\n");
 }
 
-void minisynth_set_keytrack_int(minisynth *ms, double val)
+void minisynth_set_keytrack_int(MiniSynth *ms, double val)
 {
     if (val >= 0.5 && val <= 10)
         ms->m_settings.m_filter_keytrack_intensity = val;
@@ -1975,7 +1975,7 @@ void minisynth_set_keytrack_int(minisynth *ms, double val)
         printf("val must be between 0.5 and 10\n");
 }
 
-void minisynth_set_keytrack(minisynth *ms, unsigned int val)
+void minisynth_set_keytrack(MiniSynth *ms, unsigned int val)
 {
     if (val != 0 && val != 1)
     {
@@ -1985,7 +1985,7 @@ void minisynth_set_keytrack(minisynth *ms, unsigned int val)
     ms->m_settings.m_filter_keytrack = val;
 }
 
-void minisynth_set_legato_mode(minisynth *ms, unsigned int val)
+void minisynth_set_legato_mode(MiniSynth *ms, unsigned int val)
 {
     if (val != 0 && val != 1)
     {
@@ -1995,7 +1995,7 @@ void minisynth_set_legato_mode(minisynth *ms, unsigned int val)
     ms->m_settings.m_legato_mode = val;
 }
 
-void minisynth_set_lfo_osc_enable(minisynth *ms, int lfo_num, int val)
+void minisynth_set_lfo_osc_enable(MiniSynth *ms, int lfo_num, int val)
 {
     if (val == 0 || val == 1)
     {
@@ -2013,7 +2013,7 @@ void minisynth_set_lfo_osc_enable(minisynth *ms, int lfo_num, int val)
         printf("Must be a boolean 0 or 1\n");
 }
 
-void minisynth_set_lfo_amp_enable(minisynth *ms, int lfo_num, int val)
+void minisynth_set_lfo_amp_enable(MiniSynth *ms, int lfo_num, int val)
 {
     if (val == 0 || val == 1)
     {
@@ -2031,7 +2031,7 @@ void minisynth_set_lfo_amp_enable(minisynth *ms, int lfo_num, int val)
         printf("Must be a boolean 0 or 1\n");
 }
 
-void minisynth_set_lfo_filter_enable(minisynth *ms, int lfo_num, int val)
+void minisynth_set_lfo_filter_enable(MiniSynth *ms, int lfo_num, int val)
 {
     if (val == 0 || val == 1)
     {
@@ -2049,7 +2049,7 @@ void minisynth_set_lfo_filter_enable(minisynth *ms, int lfo_num, int val)
         printf("Must be a boolean 0 or 1\n");
 }
 
-void minisynth_set_lfo_pan_enable(minisynth *ms, int lfo_num, int val)
+void minisynth_set_lfo_pan_enable(MiniSynth *ms, int lfo_num, int val)
 {
     if (val == 0 || val == 1)
     {
@@ -2067,7 +2067,7 @@ void minisynth_set_lfo_pan_enable(minisynth *ms, int lfo_num, int val)
         printf("Must be a boolean 0 or 1\n");
 }
 
-void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num,
+void minisynth_set_lfo_pulsewidth_enable(MiniSynth *ms, int lfo_num,
                                          unsigned int val)
 {
     if (val == 0 || val == 1)
@@ -2086,7 +2086,7 @@ void minisynth_set_lfo_pulsewidth_enable(minisynth *ms, int lfo_num,
         printf("Must be a boolean 0 or 1\n");
 }
 
-void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val)
+void minisynth_set_lfo_amp_int(MiniSynth *ms, int lfo_num, double val)
 {
     if (val >= 0 && val <= 1)
     {
@@ -2104,7 +2104,7 @@ void minisynth_set_lfo_amp_int(minisynth *ms, int lfo_num, double val)
         printf("val must be between 0 and 1\n");
 }
 
-void minisynth_set_lfo_amp(minisynth *ms, int lfo_num, double val)
+void minisynth_set_lfo_amp(MiniSynth *ms, int lfo_num, double val)
 {
     if (val >= 0 && val <= 1)
     {
@@ -2122,7 +2122,7 @@ void minisynth_set_lfo_amp(minisynth *ms, int lfo_num, double val)
         printf("val must be between 0 and 1\n");
 }
 
-void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val)
+void minisynth_set_lfo_filter_fc_int(MiniSynth *ms, int lfo_num, double val)
 {
     if (val >= -1 && val <= 1)
     {
@@ -2140,7 +2140,7 @@ void minisynth_set_lfo_filter_fc_int(minisynth *ms, int lfo_num, double val)
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_lfo_pulsewidth_int(minisynth *ms, int lfo_num, double val)
+void minisynth_set_lfo_pulsewidth_int(MiniSynth *ms, int lfo_num, double val)
 {
     if (val >= -1 && val <= 1)
     {
@@ -2158,7 +2158,7 @@ void minisynth_set_lfo_pulsewidth_int(minisynth *ms, int lfo_num, double val)
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val)
+void minisynth_set_lfo_rate(MiniSynth *ms, int lfo_num, double val)
 {
     if (val >= 0.02 && val <= 20)
     {
@@ -2176,7 +2176,7 @@ void minisynth_set_lfo_rate(minisynth *ms, int lfo_num, double val)
         printf("val must be between 0.02 and 20\n");
 }
 
-void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val)
+void minisynth_set_lfo_pan_int(MiniSynth *ms, int lfo_num, double val)
 {
     if (val >= 0 && val <= 1)
     {
@@ -2194,7 +2194,7 @@ void minisynth_set_lfo_pan_int(minisynth *ms, int lfo_num, double val)
         printf("val must be between 0 and 1\n");
 }
 
-void minisynth_set_lfo_osc_int(minisynth *ms, int lfo_num, double val)
+void minisynth_set_lfo_osc_int(MiniSynth *ms, int lfo_num, double val)
 {
     if (val >= -1 && val <= 1)
     {
@@ -2212,7 +2212,7 @@ void minisynth_set_lfo_osc_int(minisynth *ms, int lfo_num, double val)
         printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val)
+void minisynth_set_lfo_wave(MiniSynth *ms, int lfo_num, unsigned int val)
 {
     if (val < MAX_LFO_OSC)
     {
@@ -2230,7 +2230,7 @@ void minisynth_set_lfo_wave(minisynth *ms, int lfo_num, unsigned int val)
         printf("val must be between 0 and %d\n", MAX_LFO_OSC);
 }
 
-void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val)
+void minisynth_set_lfo_mode(MiniSynth *ms, int lfo_num, unsigned int val)
 {
     if (val < LFO_MAX_MODE)
     {
@@ -2248,7 +2248,7 @@ void minisynth_set_lfo_mode(minisynth *ms, int lfo_num, unsigned int val)
         printf("val must be between 0 and %d\n", LFO_MAX_MODE - 1);
 }
 
-void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val)
+void minisynth_set_note_to_decay_scaling(MiniSynth *ms, unsigned int val)
 {
     if (val != 0 && val != 1)
     {
@@ -2258,7 +2258,7 @@ void minisynth_set_note_to_decay_scaling(minisynth *ms, unsigned int val)
     ms->m_settings.m_note_number_to_decay_scaling = val;
 }
 
-void minisynth_set_noise_osc_db(minisynth *ms, double val)
+void minisynth_set_noise_osc_db(MiniSynth *ms, double val)
 {
     if (val >= -96 && val <= 0)
         ms->m_settings.m_noise_osc_db = val;
@@ -2266,7 +2266,7 @@ void minisynth_set_noise_osc_db(minisynth *ms, double val)
         printf("val must be between -96 and 0\n");
 }
 
-void minisynth_set_octave(minisynth *ms, int val)
+void minisynth_set_octave(MiniSynth *ms, int val)
 {
     if (val >= -4 && val <= 4)
         ms->m_settings.m_octave = val;
@@ -2274,7 +2274,7 @@ void minisynth_set_octave(minisynth *ms, int val)
         printf("val must be between -4 and 4\n");
 }
 
-void minisynth_set_pitchbend_range(minisynth *ms, int val)
+void minisynth_set_pitchbend_range(MiniSynth *ms, int val)
 {
     if (val >= 0 && val <= 12)
         ms->m_settings.m_pitchbend_range = val;
@@ -2282,7 +2282,7 @@ void minisynth_set_pitchbend_range(minisynth *ms, int val)
         printf("val must be between 0 and 12\n");
 }
 
-void minisynth_set_portamento_time_ms(minisynth *ms, double val)
+void minisynth_set_portamento_time_ms(MiniSynth *ms, double val)
 {
     if (val >= 0 && val <= 5000)
         ms->m_settings.m_portamento_time_msec = val;
@@ -2290,7 +2290,7 @@ void minisynth_set_portamento_time_ms(minisynth *ms, double val)
         printf("val must be between 0 and 5000\n");
 }
 
-void minisynth_set_pulsewidth_pct(minisynth *ms, double val)
+void minisynth_set_pulsewidth_pct(MiniSynth *ms, double val)
 {
     if (val >= 1 && val <= 99)
         ms->m_settings.m_pulse_width_pct = val;
@@ -2298,7 +2298,7 @@ void minisynth_set_pulsewidth_pct(minisynth *ms, double val)
         printf("val must be between 1 and 99\n");
 }
 
-void minisynth_set_sub_osc_db(minisynth *ms, double val)
+void minisynth_set_sub_osc_db(MiniSynth *ms, double val)
 {
     if (val >= -96 && val <= 0)
         ms->m_settings.m_sub_osc_db = val;
@@ -2306,7 +2306,7 @@ void minisynth_set_sub_osc_db(minisynth *ms, double val)
         printf("val must be between -96 and 0\n");
 }
 
-void minisynth_set_eg_sustain(minisynth *ms, unsigned int eg_num, double val)
+void minisynth_set_eg_sustain(MiniSynth *ms, unsigned int eg_num, double val)
 {
     if (val >= 0 && val <= 1)
     {
@@ -2319,7 +2319,7 @@ void minisynth_set_eg_sustain(minisynth *ms, unsigned int eg_num, double val)
         printf("val must be between 0 and 1\n");
 }
 
-void minisynth_set_eg_sustain_override(minisynth *ms, unsigned int eg_num,
+void minisynth_set_eg_sustain_override(MiniSynth *ms, unsigned int eg_num,
                                        bool b)
 {
     if (eg_num == 1)
@@ -2328,7 +2328,7 @@ void minisynth_set_eg_sustain_override(minisynth *ms, unsigned int eg_num,
         ms->m_settings.m_eg2_sustain_override = b;
 }
 
-void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val)
+void minisynth_set_velocity_to_attack_scaling(MiniSynth *ms, unsigned int val)
 {
     if (val != 0 && val != 1)
     {
@@ -2338,7 +2338,7 @@ void minisynth_set_velocity_to_attack_scaling(minisynth *ms, unsigned int val)
     ms->m_settings.m_velocity_to_attack_scaling = val;
 }
 
-void minisynth_set_voice_mode(minisynth *ms, unsigned int val)
+void minisynth_set_voice_mode(MiniSynth *ms, unsigned int val)
 {
     if (val < MAX_VOICE_CHOICE)
         ms->m_settings.m_voice_mode = val;
@@ -2346,7 +2346,7 @@ void minisynth_set_voice_mode(minisynth *ms, unsigned int val)
         printf("val must be between 0 and %d\n", MAX_VOICE_CHOICE);
 }
 
-void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
+void minisynth_set_reset_to_zero(MiniSynth *ms, unsigned int val)
 {
     if (val != 0 && val != 1)
     {
@@ -2356,16 +2356,16 @@ void minisynth_set_reset_to_zero(minisynth *ms, unsigned int val)
     ms->m_settings.m_reset_to_zero = val;
 }
 
-void minisynth_set_monophonic(minisynth *ms, bool b)
+void minisynth_set_monophonic(MiniSynth *ms, bool b)
 {
     ms->m_settings.m_monophonic = b;
 }
-void minisynth_set_generate(minisynth *ms, bool b)
+void minisynth_set_generate(MiniSynth *ms, bool b)
 {
     ms->m_settings.m_generate_active = b;
 }
 
-void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type)
+void minisynth_set_osc_type(MiniSynth *ms, int osc, unsigned int osc_type)
 {
     if (osc > 0 && osc < 4 && osc_type < MAX_OSC)
     {
@@ -2389,13 +2389,13 @@ void minisynth_set_osc_type(minisynth *ms, int osc, unsigned int osc_type)
     }
 }
 
-void minisynth_set_hard_sync(minisynth *ms, bool val)
+void minisynth_set_hard_sync(MiniSynth *ms, bool val)
 {
     // TODO - add to export / load functions
     ms->m_settings.hard_sync = val;
 }
 
-void minisynth::SetParam(std::string name, double val)
+void MiniSynth::SetParam(std::string name, double val)
 {
     std::cout << "SET PARAM:" << name << " :" << val << std::endl;
     if (name == "vol")
@@ -2576,4 +2576,4 @@ void minisynth::SetParam(std::string name, double val)
     minisynth_update(this);
 }
 
-double minisynth::GetParam(std::string name) { return 0; }
+double MiniSynth::GetParam(std::string name) { return 0; }

@@ -278,7 +278,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      if (mixer_is_valid_soundgen_num(mixr,
                                                      soundgen->soundgen_id_))
                      {
-                         SoundGenerator *sg =
+                         auto sg =
                              mixr->SoundGenerators[soundgen->soundgen_id_];
                          // sg->parseMidiEvent(event_on, mixr->timing_info);
 
@@ -367,11 +367,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              {
 
                  if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
-                 {
-                     SoundGenerator *sg =
-                         mixr->SoundGenerators[soundgen->soundgen_id_];
-                     sg->randomize();
-                 }
+                     mixr->SoundGenerators[soundgen->soundgen_id_]->randomize();
              }
              return evaluator::NULLL;
          })},

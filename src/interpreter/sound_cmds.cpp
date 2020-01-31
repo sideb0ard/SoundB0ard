@@ -16,7 +16,7 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
     {
         if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
         {
-            SoundGenerator *sg = mixr->SoundGenerators[soundgen->soundgen_id_];
+            auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
 
             std::shared_ptr<object::String> str_obj =
                 std::dynamic_pointer_cast<object::String>(args[1]);
@@ -25,15 +25,15 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                 std::cout << "Adding a " << str_obj->value_ << std::endl;
 
                 if (str_obj->value_ == "bitcrush")
-                    add_bitcrush_soundgen(sg);
+                    sg->AddBitcrush();
                 else if (str_obj->value_ == "compressor")
-                    add_compressor_soundgen(sg);
+                    sg->AddCompressor();
                 else if (str_obj->value_ == "delay")
-                    add_delay_soundgen(sg, 200);
+                    sg->AddDelay(200);
                 else if (str_obj->value_ == "distort")
-                    add_distortion_soundgen(sg);
+                    sg->AddDistortion();
                 else if (str_obj->value_ == "reverb")
-                    add_reverb_soundgen(sg);
+                    sg->AddReverb();
                 else if (str_obj->value_ == "sidechain")
                 {
                     if (args.size() > 2)
@@ -46,7 +46,7 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                             mixer_is_valid_soundgen_num(
                                 mixr, soundgen_sidechain_src->soundgen_id_))
                         {
-                            int fx_num = add_compressor_soundgen(sg);
+                            int fx_num = sg->AddCompressor();
                             DynamicsProcessor *dp =
                                 (DynamicsProcessor *)sg->effects[fx_num];
                             dp->SetExternalSource(
@@ -56,11 +56,11 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                     }
                 }
                 else if (str_obj->value_ == "moddelay")
-                    add_moddelay_soundgen(sg);
+                    sg->AddModdelay();
                 else if (str_obj->value_ == "modfilter")
-                    add_modfilter_soundgen(sg);
+                    sg->AddModfilter();
                 else if (str_obj->value_ == "waveshape")
-                    add_waveshape_soundgen(sg);
+                    sg->AddWaveshape();
             }
         }
     }
@@ -75,7 +75,7 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
     {
         if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
         {
-            SoundGenerator *sg = mixr->SoundGenerators[soundgen->soundgen_id_];
+            auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
             std::shared_ptr<object::String> str_obj =
                 std::dynamic_pointer_cast<object::String>(args[1]);
             if (str_obj)

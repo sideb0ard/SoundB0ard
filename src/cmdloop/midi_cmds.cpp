@@ -24,7 +24,7 @@ void midi_set_destination(mixer *mixr, int soundgen_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
-        if (is_synth(mixr->SoundGenerators[soundgen_num]))
+        if (mixr->SoundGenerators[soundgen_num]->IsSynth())
         {
             mixr->midi_control_destination = MIDI_CONTROL_SYNTH_TYPE;
             mixr->active_midi_soundgen_num = soundgen_num;
@@ -52,11 +52,9 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_num(mixr, sg_src_num) &&
             mixer_is_valid_soundgen_num(mixr, sg_dst_num))
         {
-            SoundGenerator *sg_src =
-                (SoundGenerator *)mixr->SoundGenerators[sg_src_num];
+            auto sg_src = mixr->SoundGenerators[sg_src_num];
 
-            SoundGenerator *sg_dst =
-                (SoundGenerator *)mixr->SoundGenerators[sg_dst_num];
+            auto sg_dst = mixr->SoundGenerators[sg_dst_num];
 
             if (sequence_engine_is_valid_pattern(&sg_src->engine,
                                                  sg_src_pattern_num) &&
@@ -85,8 +83,7 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         if (mixer_is_valid_soundgen_track_num(mixr, sg_num, pattern_num))
         {
             printf("SG:%d Pattern %d\n", sg_num, pattern_num);
-            SoundGenerator *sg =
-                (SoundGenerator *)mixr->SoundGenerators[sg_num];
+            auto sg = mixr->SoundGenerators[sg_num];
             midi_event *pattern =
                 sequence_engine_get_pattern(&sg->engine, pattern_num);
             midi_pattern_print(pattern);
@@ -98,8 +95,7 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
             if (mixer_is_valid_soundgen_num(mixr, sg_num))
             {
                 printf("TRUWE!\n");
-                SoundGenerator *sg =
-                    (SoundGenerator *)mixr->SoundGenerators[sg_num];
+                auto sg = mixr->SoundGenerators[sg_num];
                 int num_patterns =
                     sequence_engine_get_num_patterns(&sg->engine);
                 for (int i = 0; i < num_patterns; i++)
@@ -126,8 +122,7 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         {
             printf("SG:%d Pattern %d Tick:%d Velocity:%d\n", sg_num,
                    pattern_num, midi_tick, velocity);
-            SoundGenerator *sg =
-                (SoundGenerator *)mixr->SoundGenerators[sg_num];
+            auto sg = mixr->SoundGenerators[sg_num];
             midi_event *pattern =
                 sequence_engine_get_pattern(&sg->engine, pattern_num);
             midi_pattern_set_velocity(pattern, midi_tick, velocity);
@@ -154,29 +149,29 @@ bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD])
         printf("MIDI Time!\n");
         if (strncmp("init", wurds[1], 4) == 0)
             midi_launch_init(mixr);
-        else if (strncmp("moog", wurds[1], 4) == 0)
-        {
-            midi_launch_init(mixr);
-            int sg_num = add_minisynth(mixr);
-            if (sg_num != -1)
-                midi_set_destination(mixr, sg_num);
-        }
-        else if (strncmp("drum", wurds[1], 4) == 0)
-        {
-            midi_launch_init(mixr);
-            drumsynth *ds = new drumsynth();
-            int sg_num = add_sound_generator(mixr, (SoundGenerator *)ds);
-            if (sg_num != -1)
-                midi_set_destination(mixr, sg_num);
-        }
-        else if (strncmp("fm", wurds[1], 2) == 0 ||
-                 strncmp("dx", wurds[1], 2) == 0)
-        {
-            midi_launch_init(mixr);
-            int sg_num = add_dxsynth(mixr);
-            if (sg_num != -1)
-                midi_set_destination(mixr, sg_num);
-        }
+        // else if (strncmp("moog", wurds[1], 4) == 0)
+        //{
+        //    midi_launch_init(mixr);
+        //    int sg_num = add_minisynth(mixr);
+        //    if (sg_num != -1)
+        //        midi_set_destination(mixr, sg_num);
+        //}
+        // else if (strncmp("drum", wurds[1], 4) == 0)
+        //{
+        //    midi_launch_init(mixr);
+        //    drumsynth *ds = new drumsynth();
+        //    int sg_num = add_sound_generator(mixr, (SoundGenerator *)ds);
+        //    if (sg_num != -1)
+        //        midi_set_destination(mixr, sg_num);
+        //}
+        // else if (strncmp("fm", wurds[1], 2) == 0 ||
+        //         strncmp("dx", wurds[1], 2) == 0)
+        //{
+        //    midi_launch_init(mixr);
+        //    int sg_num = add_dxsynth(mixr);
+        //    if (sg_num != -1)
+        //        midi_set_destination(mixr, sg_num);
+        //}
         else
         {
             int soundgen_num = atoi(wurds[1]);

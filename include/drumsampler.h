@@ -26,11 +26,11 @@ typedef struct sample_pos
     double end_pos_pct;
 } sample_pos;
 
-class drumsampler : public SoundGenerator
+class DrumSampler : public SoundGenerator
 {
   public:
-    drumsampler(char *filename);
-    ~drumsampler();
+    DrumSampler(char *filename);
+    ~DrumSampler();
     void status(wchar_t *status_string) override;
     stereo_val genNext() override;
     void start() override;
@@ -65,15 +65,15 @@ class drumsampler : public SoundGenerator
     bool started; // to sync at top of loop
 };
 
-int get_a_drumsampler_position(drumsampler *ss);
-void drumsampler_import_file(drumsampler *s, char *filename);
-void drumsampler_reset_samples(drumsampler *seq);
-void drumsampler_set_pitch(drumsampler *seq, double v);
-void drumsampler_set_cutoff_percent(drumsampler *seq, unsigned int percent);
-void drumsampler_enable_envelope_generator(drumsampler *ds, bool b);
-void drumsampler_set_attack_time(drumsampler *ds, double val);
-void drumsampler_set_decay_time(drumsampler *ds, double val);
-void drumsampler_set_sustain_lvl(drumsampler *ds, double val);
-void drumsampler_set_release_time(drumsampler *ds, double val);
-void drumsampler_set_glitch_mode(drumsampler *ds, bool b);
-void drumsampler_set_glitch_rand_factor(drumsampler *ds, int pct);
+int get_a_drumsampler_position(DrumSampler *ss);
+void drumsampler_import_file(DrumSampler *s, char *filename);
+void drumsampler_reset_samples(DrumSampler *seq);
+void drumsampler_set_pitch(DrumSampler *seq, double v);
+void drumsampler_set_cutoff_percent(DrumSampler *seq, unsigned int percent);
+void drumsampler_enable_envelope_generator(DrumSampler *ds, bool b);
+void drumsampler_set_attack_time(DrumSampler *ds, double val);
+void drumsampler_set_decay_time(DrumSampler *ds, double val);
+void drumsampler_set_sustain_lvl(DrumSampler *ds, double val);
+void drumsampler_set_release_time(DrumSampler *ds, double val);
+void drumsampler_set_glitch_mode(DrumSampler *ds, bool b);
+void drumsampler_set_glitch_rand_factor(DrumSampler *ds, int pct);

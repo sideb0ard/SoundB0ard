@@ -179,7 +179,7 @@ stereo_val dxsynth::genNext()
 
     stereo_val out = {.left = accum_out_left * volume * pan_left,
                       .right = accum_out_right * volume * pan_right};
-    out = effector(this, out);
+    out = Effector(out);
     return out;
 }
 

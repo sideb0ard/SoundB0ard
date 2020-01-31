@@ -302,7 +302,7 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
-        SoundGenerator *sg = mixr->SoundGenerators[i];
+        std::shared_ptr<SoundGenerator> sg = mixr->SoundGenerators[i];
         if (sg != NULL)
         {
             sg->eventNotify(event, mixr->timing_info);
@@ -372,32 +372,14 @@ void pan_change(mixer *mixr, int sg, float val)
     mixr->SoundGenerators[sg]->SetPan(val);
 }
 
-int add_sound_generator(mixer *mixr, SoundGenerator *sg)
+int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
 {
     if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)
-        return -99;
+        return -1;
 
     sg->mixer_idx = mixr->soundgen_num;
     mixr->SoundGenerators[mixr->soundgen_num] = sg;
     return mixr->soundgen_num++;
-}
-
-int add_value_generator(mixer *mixr, value_generator *vg)
-{
-    if (mixr->value_gen_num == MAX_NUM_VALUE_GENERATORS)
-        return -99;
-
-    mixr->value_generators[mixr->value_gen_num] = vg;
-    return mixr->value_gen_num++;
-}
-
-int add_pattern_generator(mixer *mixr, pattern_generator *sg)
-{
-    if (mixr->pattern_gen_num == MAX_NUM_PATTERN_GENERATORS)
-        return -99;
-
-    mixr->pattern_generators[mixr->pattern_gen_num] = sg;
-    return mixr->pattern_gen_num++;
 }
 
 void mixer_update_process(mixer *mixr, int process_id, ProcessType process_type,
@@ -433,101 +415,41 @@ void mixer_process_append_function(mixer *mixr, int process_id,
     }
 }
 
-int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD])
-{
-    printf("Adding an BITSHIFT PATTERN GENERATOR, yo!\n");
-    pattern_generator *sg = new_bitshift(num_wurds, wurds);
-    if (sg)
-        return add_pattern_generator(mixr, sg);
-    else
-        return -99;
-}
-
-int mixer_add_markov(mixer *mixr, unsigned int type)
-{
-    printf("Adding an MARKOV PATTERN GENERATOR, yo!\n");
-    pattern_generator *sg = new_markov(type);
-    if (sg)
-        return add_pattern_generator(mixr, sg);
-    else
-        return -99;
-}
-
-int mixer_add_intdiv(mixer *mixr)
-{
-    printf("Adding an INTDIV!\n");
-    pattern_generator *sg = new_intdiv();
-    if (sg)
-        return add_pattern_generator(mixr, sg);
-    else
-        return -99;
-}
-
-int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps)
-{
-    printf("Adding an EUCLIDEAN PATTERN GENERATOR, yo!\n");
-    pattern_generator *sg = new_euclidean(num_hits, num_steps);
-    if (sg)
-        return add_pattern_generator(mixr, sg);
-    else
-        return -99;
-}
-
-int mixer_add_juggler(mixer *mixr, unsigned int style)
-{
-    printf("Adding an JUGGLER PATTERN GENERATOR, yo!\n");
-    pattern_generator *sg = new_juggler(style);
-    if (sg)
-        return add_pattern_generator(mixr, sg);
-    else
-        return -99;
-}
-
-int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len,
-                         void *values)
-{
-    printf("Adding a new VALUE LIST GENERATOR!\n");
-    value_generator *vg = new_value_generator(values_type, values_len, values);
-    if (vg)
-        return add_value_generator(mixr, vg);
-    else
-        return -99;
-}
-
 int add_minisynth(mixer *mixr)
 {
     printf("Adding a MINISYNTH!!...\n");
-    minisynth *ms = new minisynth();
-    return add_sound_generator(mixr, (SoundGenerator *)ms);
+    auto ms = std::make_shared<MiniSynth>();
+    return add_sound_generator(mixr, ms);
 }
 
 int add_sample(mixer *mixr, std::string sample_path)
 {
     std::cout << "Adding a SAMPLE!! " << sample_path << std::endl;
-    drumsampler *s = new drumsampler(sample_path.data());
-    return add_sound_generator(mixr, (SoundGenerator *)s);
+    auto ds = std::make_shared<DrumSampler>(sample_path.data());
+    return add_sound_generator(mixr, ds);
 }
 
 int add_digisynth(mixer *mixr, char *filename)
 {
     printf("Adding a DIGISYNTH!!...\n");
-    digisynth *ds = new digisynth(filename);
-    return add_sound_generator(mixr, (SoundGenerator *)ds);
+    auto ds = std::make_shared<digisynth>(filename);
+    return add_sound_generator(mixr, ds);
 }
+
 int add_dxsynth(mixer *mixr)
 {
     printf("Adding a DXSYNTH!!...\n");
-    dxsynth *dx = new dxsynth();
+    auto dx = std::make_shared<dxsynth>();
     printf("GOT NEW  DXSYNTH!!...\n");
-    return add_sound_generator(mixr, (SoundGenerator *)dx);
+    return add_sound_generator(mixr, dx);
 }
 
 int add_looper(mixer *mixr, std::string filename)
 {
     printf("ADDING A GRANNY!\n");
-    looper *g = new looper(filename.data());
+    auto loopr = std::make_shared<looper>(filename.data());
     printf("GOT A GRAANY\n");
-    return add_sound_generator(mixr, (SoundGenerator *)g);
+    return add_sound_generator(mixr, loopr);
 }
 
 void mixer_midi_tick(mixer *mixr)
@@ -755,13 +677,13 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-        SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
+        std::shared_ptr<SoundGenerator> sg =
+            mixr->SoundGenerators[soundgen_num];
 
         if (mixr->active_midi_soundgen_num == soundgen_num)
             mixr->active_midi_soundgen_num = -99;
 
-        mixr->SoundGenerators[soundgen_num] = NULL;
-        delete sg;
+        mixr->SoundGenerators[soundgen_num] = nullptr;
     }
     return true;
 }
@@ -778,7 +700,8 @@ bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
-        SoundGenerator *sg = mixr->SoundGenerators[soundgen_num];
+        std::shared_ptr<SoundGenerator> sg =
+            mixr->SoundGenerators[soundgen_num];
         if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
             return true;
     }
@@ -1221,7 +1144,7 @@ void mixer_check_for_midi_messages(mixer *mixr)
                                             mixr->active_midi_soundgen_num))
             {
 
-                SoundGenerator *sg =
+                std::shared_ptr<SoundGenerator> sg =
                     mixr->SoundGenerators[mixr->active_midi_soundgen_num];
 
                 midi_event ev = new_midi_event(status, data1, data2);

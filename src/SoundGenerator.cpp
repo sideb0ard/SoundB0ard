@@ -367,101 +367,101 @@ void SoundGenerator::SetPan(double val)
         pan = val;
 }
 
-static int soundgen_add_fx(SoundGenerator *self, Fx *f)
+int SoundGenerator::AddFx(Fx *f)
 {
 
-    if (self->effects_num < kMaxNumSoundGenFx)
+    if (effects_num < kMaxNumSoundGenFx)
     {
-        self->effects[self->effects_num] = f;
+        effects[effects_num] = f;
         printf("done adding effect\n");
-        return self->effects_num++;
+        return effects_num++;
     }
 
     return -1;
 }
 
-int add_delay_soundgen(SoundGenerator *self, float duration)
+int SoundGenerator::AddDelay(float duration)
 {
     printf("Booya, adding a new DELAY to "
            "SoundGenerator: %f!\n",
            duration);
     StereoDelay *sd = new StereoDelay(duration);
-    return soundgen_add_fx(self, (Fx *)sd);
+    return AddFx((Fx *)sd);
 }
 
-int add_reverb_soundgen(SoundGenerator *self)
+int SoundGenerator::AddReverb()
 {
     printf("Booya, adding a new REVERB to "
            "SoundGenerator!\n");
     Reverb *r = new Reverb();
-    return soundgen_add_fx(self, (Fx *)r);
+    return AddFx((Fx *)r);
 }
 
-int add_waveshape_soundgen(SoundGenerator *self)
+int SoundGenerator::AddWaveshape()
 {
     printf("WAVshape\n");
     WaveShaper *ws = new WaveShaper();
-    return soundgen_add_fx(self, (Fx *)ws);
+    return AddFx((Fx *)ws);
 }
 
-int add_basicfilter_soundgen(SoundGenerator *self)
+int SoundGenerator::AddBasicfilter()
 {
     printf("Fffuuuuhfilter!\n");
     FilterPass *fp = new FilterPass();
-    return soundgen_add_fx(self, (Fx *)fp);
+    return AddFx((Fx *)fp);
 }
 
-int add_bitcrush_soundgen(SoundGenerator *self)
+int SoundGenerator::AddBitcrush()
 {
     printf("BITCRUSH!\n");
     BitCrush *bc = new BitCrush();
-    return soundgen_add_fx(self, (Fx *)bc);
+    return AddFx((Fx *)bc);
 }
 
-int add_compressor_soundgen(SoundGenerator *self)
+int SoundGenerator::AddCompressor()
 {
     printf("COMPresssssion!\n");
     DynamicsProcessor *dp = new DynamicsProcessor();
-    return soundgen_add_fx(self, (Fx *)dp);
+    return AddFx((Fx *)dp);
 }
 
-int add_moddelay_soundgen(SoundGenerator *self)
+int SoundGenerator::AddModdelay()
 {
     printf("Booya, adding a new MODDELAY to "
            "SoundGenerator!\n");
     ModDelay *md = new ModDelay();
-    return soundgen_add_fx(self, (Fx *)md);
+    return AddFx((Fx *)md);
 }
 
-int add_modfilter_soundgen(SoundGenerator *self)
+int SoundGenerator::AddModfilter()
 {
     printf("Booya, adding a new MODFILTERRRRR to "
            "SoundGenerator!\n");
     ModFilter *mf = new ModFilter();
-    return soundgen_add_fx(self, (Fx *)mf);
+    return AddFx((Fx *)mf);
 }
 
-int add_distortion_soundgen(SoundGenerator *self)
+int SoundGenerator::AddDistortion()
 {
     printf("BOOYA! Distortion all up in this kittycat\n");
     Distortion *d = new Distortion();
-    return soundgen_add_fx(self, (Fx *)d);
+    return AddFx((Fx *)d);
 }
 
-int add_envelope_soundgen(SoundGenerator *self)
+int SoundGenerator::AddEnvelope()
 {
     printf("Booya, adding a new envelope to "
            "SoundGenerator!\n");
     Envelope *e = new Envelope();
-    return soundgen_add_fx(self, (Fx *)e);
+    return AddFx((Fx *)e);
 }
 
-stereo_val effector(SoundGenerator *self, stereo_val val)
+stereo_val SoundGenerator::Effector(stereo_val val)
 {
-    int num_fx = self->effects_num.load();
+    int num_fx = effects_num.load();
     for (int i = 0; i < num_fx; i++)
     {
-        Fx *f = self->effects[i];
+        Fx *f = effects[i];
         if (f && f->enabled_)
         {
             val = f->Process(val);
@@ -470,18 +470,18 @@ stereo_val effector(SoundGenerator *self, stereo_val val)
     return val;
 }
 
-bool is_synth(SoundGenerator *self)
+bool SoundGenerator::IsSynth()
 {
-    if (self->type == MINISYNTH_TYPE || self->type == DIGISYNTH_TYPE ||
-        self->type == DXSYNTH_TYPE)
+    if (type == MINISYNTH_TYPE || type == DIGISYNTH_TYPE ||
+        type == DXSYNTH_TYPE)
         return true;
 
     return false;
 }
 
-bool is_stepper(SoundGenerator *self)
+bool SoundGenerator::IsStepper()
 {
-    if (self->type == DRUMSYNTH_TYPE || self->type == DRUMSAMPLER_TYPE)
+    if (type == DRUMSYNTH_TYPE || type == DRUMSAMPLER_TYPE)
         return true;
     return false;
 }

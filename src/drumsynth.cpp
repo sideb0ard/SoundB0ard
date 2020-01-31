@@ -115,7 +115,7 @@ stereo_val drumsynth::genNext()
     m_distortion.SetParam("threshold", m_distortion_threshold);
     out = m_distortion.Process(out);
 
-    out = effector(this, out);
+    out = Effector(out);
 
     return out;
 }

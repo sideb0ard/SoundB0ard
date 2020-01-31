@@ -82,7 +82,7 @@ struct mixer
     std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_;
     bool proc_initialized_{false};
 
-    SoundGenerator *SoundGenerators[MAX_NUM_SOUND_GENERATORS];
+    std::shared_ptr<SoundGenerator> SoundGenerators[MAX_NUM_SOUND_GENERATORS];
     int soundgen_num; // actual number of SGs
 
     pattern_generator *pattern_generators[MAX_NUM_PATTERN_GENERATORS];
@@ -169,29 +169,20 @@ void mixer_update_process(mixer *mixr, int process_id, ProcessType process_type,
 
 void mixer_process_append_function(mixer *mixr, int process_id,
                                    std::shared_ptr<PatternFunction> func);
-int mixer_add_bitshift(mixer *mixr, int num_wurds, char wurds[][SIZE_OF_WURD]);
-int mixer_add_euclidean(mixer *mixr, int num_hits, int num_steps);
-int mixer_add_intdiv(mixer *mixr);
-int mixer_add_juggler(mixer *mixr, unsigned int style);
-int mixer_add_markov(mixer *mixr, unsigned int type);
-int mixer_add_value_list(mixer *mixr, unsigned int values_type, int values_len,
-                         void *values);
 void mixer_preview_audio(mixer *mixr, char *filename);
 
 int mixer_print_timing_info(mixer *mixr);
 
-int add_bytebeat(mixer *mixr, char *pattern);
 int add_minisynth(mixer *mixr);
 int add_dxsynth(mixer *mixr);
 int add_sample(mixer *mixr, std::string sample_path);
 int add_digisynth(mixer *mixr, char *filename);
 int add_looper(mixer *mixr, std::string filename);
 
-int add_sound_generator(mixer *mixr, SoundGenerator *sg);
-int add_pattern_generator(mixer *mixr, pattern_generator *sg);
-int add_value_generator(mixer *mixr, value_generator *vg);
-
-int add_effect(mixer *mixr);
+int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg);
+// int add_pattern_generator(mixer *mixr, pattern_generator *sg);
+// int add_value_generator(mixer *mixr, value_generator *vg);
+// int add_effect(mixer *mixr);
 
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);

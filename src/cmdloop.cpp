@@ -50,7 +50,6 @@ static char last_line[MAXLINE] = {};
 static char current_line[MAXLINE] = {};
 
 auto global_env = std::make_shared<object::Environment>();
-auto global_lex = std::make_shared<lexer::Lexer>();
 
 namespace
 {
@@ -172,7 +171,6 @@ void *loopy(void *arg)
 
 void Interpret(char *line, std::shared_ptr<object::Environment> env)
 {
-    // global_lex->ReadInput(line);
     auto lex = std::make_shared<lexer::Lexer>();
     lex->ReadInput(line);
     auto parsley = std::make_unique<parser::Parser>(lex);
@@ -188,8 +186,6 @@ void Interpret(char *line, std::shared_ptr<object::Environment> env)
             std::cout << result << std::endl;
         }
     }
-
-    global_lex->Reset();
 }
 
 int exxit()
@@ -240,7 +236,7 @@ int trigger_osc_handler(const char *path, const char *types, lo_arg **argv,
     _event.source = EXTERNAL_OSC;
     if (mixer_is_valid_soundgen_num(mixr, target_sg))
     {
-        SoundGenerator *sg = mixr->SoundGenerators[target_sg];
+        std::shared_ptr<SoundGenerator> sg = mixr->SoundGenerators[target_sg];
         sg->parseMidiEvent(_event, mixr->timing_info);
     }
 
@@ -266,7 +262,7 @@ int osc_note_on_handler(const char *path, const char *types, lo_arg **argv,
     _event.source = EXTERNAL_OSC;
     if (mixer_is_valid_soundgen_num(mixr, target_sg))
     {
-        SoundGenerator *sg = mixr->SoundGenerators[target_sg];
+        std::shared_ptr<SoundGenerator> sg = mixr->SoundGenerators[target_sg];
         sg->parseMidiEvent(_event, mixr->timing_info);
     }
     return 0;

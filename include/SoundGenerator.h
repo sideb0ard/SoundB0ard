@@ -61,19 +61,23 @@ class SoundGenerator
     std::atomic<int16_t> effects_num{0}; // num of effects
     Fx *effects[kMaxNumSoundGenFx] = {};
     bool effects_on{true}; // bool
-};
 
-bool is_synth(SoundGenerator *self);
-bool is_stepper(SoundGenerator *self);
-int add_basicfilter_soundgen(SoundGenerator *self);
-int add_bitcrush_soundgen(SoundGenerator *self);
-int add_compressor_soundgen(SoundGenerator *self);
-int add_distortion_soundgen(SoundGenerator *self);
-int add_delay_soundgen(SoundGenerator *self, float duration);
-int add_envelope_soundgen(SoundGenerator *self);
-int add_moddelay_soundgen(SoundGenerator *self);
-int add_modfilter_soundgen(SoundGenerator *self);
-int add_follower_soundgen(SoundGenerator *self);
-int add_reverb_soundgen(SoundGenerator *self);
-int add_waveshape_soundgen(SoundGenerator *self);
-stereo_val effector(SoundGenerator *self, stereo_val val);
+  public:
+    int AddFx(Fx *f);
+    int AddBasicfilter();
+    int AddBitcrush();
+    int AddCompressor();
+    int AddDistortion();
+    int AddDelay(float duration);
+    int AddEnvelope();
+    int AddModdelay();
+    int AddModfilter();
+    int AddFollower();
+    int AddReverb();
+    int AddWaveshape();
+
+    stereo_val Effector(stereo_val val);
+
+    bool IsSynth();
+    bool IsStepper();
+};

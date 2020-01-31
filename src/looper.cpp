@@ -322,7 +322,7 @@ stereo_val looper::genNext()
     val.left = val.left * volume * eg_amp * pan_left;
     val.right = val.right * volume * eg_amp * pan_right;
 
-    val = effector(this, val);
+    val = Effector(val);
 
     return val;
 }

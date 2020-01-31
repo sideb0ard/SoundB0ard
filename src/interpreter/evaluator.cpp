@@ -195,8 +195,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         {
             if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
             {
-                SoundGenerator *sg =
-                    mixr->SoundGenerators[soundgen->soundgen_id_];
+                auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
 
                 if (set_stmt->fx_num_ != -1)
                 {
@@ -226,8 +225,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         {
             if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
             {
-                SoundGenerator *sg =
-                    mixr->SoundGenerators[soundgen->soundgen_id_];
+                auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
                 sg->SetPan(pan_stmt->value_);
             }
         }
@@ -264,8 +262,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         {
             if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
             {
-                SoundGenerator *sg =
-                    mixr->SoundGenerators[soundgen->soundgen_id_];
+                auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
                 sg->SetVolume(vol_stmt->value_);
             }
         }
