@@ -41,6 +41,8 @@ void SoundGenerator::Save(std::string preset_name)
     std::cout << "BASE CLASS SAVE " << preset_name << " - NO OP!" << std::endl;
 }
 
+std::string SoundGenerator::Status() { return std::string{"BASE CLASS, YO"}; }
+
 void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 {
     // if (lo_send(mixr->processing_addr, "/img", "i", sg->mixer_idx) == -1)

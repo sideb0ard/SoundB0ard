@@ -32,6 +32,7 @@ class DrumSampler : public SoundGenerator
     DrumSampler(char *filename);
     ~DrumSampler();
     void status(wchar_t *status_string) override;
+    std::string Status() override;
     stereo_val genNext() override;
     void start() override;
     void noteOn(midi_event ev) override;

@@ -25,11 +25,6 @@ constexpr char FUNCTION_OBJ[] = "FUNCTION";
 
 constexpr char STRING_OBJ[] = "STRING";
 
-constexpr char SYNTH_OBJ[] = "SYNTH";
-
-constexpr char SAMPLE_OBJ[] = "SAMPLE";
-constexpr char GRANULAR_OBJ[] = "GRANULAR";
-
 constexpr char BUILTIN_OBJ[] = "BUILTIN";
 
 constexpr char ARRAY_OBJ[] = "ARRAY";
@@ -37,6 +32,10 @@ constexpr char ARRAY_OBJ[] = "ARRAY";
 constexpr char HASH_OBJ[] = "HASH";
 
 constexpr char PROCESS_OBJ[] = "PROCESS";
+
+constexpr char SYNTH_OBJ[] = "SYNTH";
+constexpr char SAMPLE_OBJ[] = "SAMPLE";
+constexpr char GRANULAR_OBJ[] = "GRANULAR";
 
 using ObjectType = std::string;
 
@@ -159,6 +158,7 @@ class Environment
     std::shared_ptr<Object> Get(std::string key);
     std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val);
     void Debug();
+    std::unordered_map<std::string, int> GetSoundGenerators();
 
   private:
     std::unordered_map<std::string, std::shared_ptr<Object>> store_;

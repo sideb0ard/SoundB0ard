@@ -78,6 +78,15 @@ void dxsynth::stop()
     allNotesOff();
 }
 
+std::string dxsynth::Status()
+{
+    std::stringstream ss;
+    ss << "DxSynth(" << m_settings.m_settings_name << ")"
+       << " algo:" << m_settings.m_voice_mode << " vol:" << volume
+       << " pan:" << pan;
+    return ss.str();
+}
+
 void dxsynth::status(wchar_t *status_string)
 {
     char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;

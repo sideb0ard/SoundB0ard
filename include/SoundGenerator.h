@@ -16,7 +16,9 @@ class SoundGenerator
     virtual ~SoundGenerator() = default;
 
     virtual stereo_val genNext() = 0;
-    virtual void status(wchar_t *wstring) = 0;
+    virtual void status(wchar_t *wstring) = 0; // old status - to be renamed
+                                               // info for more indepth
+    virtual std::string Status();              // new status
     virtual void SetParam(std::string name, double val) = 0;
     virtual double GetParam(std::string name) = 0;
 

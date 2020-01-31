@@ -11,6 +11,17 @@
 
 extern mixer *mixr;
 
+namespace
+{
+bool IsSoundGenerator(object::ObjectType type)
+{
+    if (type == object::SYNTH_OBJ || type == object::SAMPLE_OBJ ||
+        type == object::GRANULAR_OBJ)
+        return true;
+    return false;
+}
+} // namespace
+
 namespace object
 {
 
@@ -164,6 +175,24 @@ void Environment::Debug()
         std::cout << "Key: " << it.first << " // Val:" << it.second->Inspect()
                   << std::endl;
     }
+}
+
+std::unordered_map<std::string, int> Environment::GetSoundGenerators()
+{
+    std::unordered_map<std::string, int> soundgens;
+    for (const auto &it : store_)
+    {
+        if (IsSoundGenerator(it.second->Type()))
+        {
+            auto gen =
+                std::dynamic_pointer_cast<object::SoundGenerator>(it.second);
+            if (gen)
+            {
+                soundgens.insert({it.first, gen->soundgen_id_});
+            }
+        }
+    }
+    return soundgens;
 }
 
 std::shared_ptr<Object> Environment::Get(std::string name)
