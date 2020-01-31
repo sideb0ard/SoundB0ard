@@ -129,14 +129,12 @@ std::shared_ptr<ast::LsStatement> Parser::ParseLsStatement()
 
 std::shared_ptr<ast::PlayStatement> Parser::ParsePlayStatement()
 {
-    std::cout << "PLaY!\n";
     std::shared_ptr<ast::PlayStatement> stmt =
         std::make_shared<ast::PlayStatement>(cur_token_);
 
     if (!PeekTokenIs(token::SLANG_SEMICOLON))
     {
         NextToken();
-        std::cout << "Cur token is " << cur_token_ << std::endl;
         stmt->path_ = ParseStringLiteral();
     }
 

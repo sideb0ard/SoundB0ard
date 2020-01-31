@@ -55,6 +55,7 @@ const TokenType SLANG_DECREMENT = "--";
 // Soundb0ard specific //////////////////
 // /////////////////////////
 
+const TokenType SLANG_BPM = "BPM";
 const TokenType SLANG_EVERY = "EVERY";
 const TokenType SLANG_OVER = "OVER";
 const TokenType SLANG_RAMP = "RAMP";

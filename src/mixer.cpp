@@ -198,51 +198,13 @@ void mixer_status_procz(mixer *mixr, bool all)
         }
     }
 }
-void mixer_status_env(mixer *mixr) { global_env->Debug(); }
-
-void mixer_status_valz(mixer *mixr)
+void mixer_status_env(mixer *mixr)
 {
-    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    if (mixr->value_gen_num > 0)
-    {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
-                                "value generators" COOL_COLOR_GREEN "]\n");
-        for (int i = 0; i < mixr->value_gen_num; i++)
-        {
-            if (mixr->value_generators[i] != NULL)
-            {
-                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                mixr->value_generators[i]->status(mixr->value_generators[i],
-                                                  wss);
-                wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
-                wprintf(L"  %ls\n", wss);
-                wprintf(WANSI_COLOR_RESET);
-            }
-        }
-    }
+    printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "Env" COOL_COLOR_GREEN
+                            "]\n");
+    global_env->Debug();
 }
 
-void mixer_status_patz(mixer *mixr)
-{
-    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    if (mixr->pattern_gen_num > 0)
-    {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
-                                "pattern generators" COOL_COLOR_GREEN "]\n");
-        for (int i = 0; i < mixr->pattern_gen_num; i++)
-        {
-            if (mixr->pattern_generators[i] != NULL)
-            {
-                wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                mixr->pattern_generators[i]->status(mixr->pattern_generators[i],
-                                                    wss);
-                wprintf(WANSI_COLOR_WHITE "[%2d]" WANSI_COLOR_RESET, i);
-                wprintf(L"  %ls\n", wss);
-                wprintf(WANSI_COLOR_RESET);
-            }
-        }
-    }
-}
 void mixer_status_sgz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
@@ -301,9 +263,7 @@ void mixer_ps(mixer *mixr, bool all)
     mixer_status_mixr(mixr);
     mixer_status_env(mixr);
     mixer_status_procz(mixr, false);
-    mixer_status_patz(mixr);
-    mixer_status_sgz(mixr, all);
-    mixer_status_valz(mixr);
+    // mixer_status_sgz(mixr, all);
     printf(ANSI_COLOR_RESET);
 }
 
@@ -544,7 +504,6 @@ int add_minisynth(mixer *mixr)
 int add_sample(mixer *mixr, std::string sample_path)
 {
     std::cout << "Adding a SAMPLE!! " << sample_path << std::endl;
-    // drumsampler *s = new drumsampler("kicks/THUMP.aiff");
     drumsampler *s = new drumsampler(sample_path.data());
     return add_sound_generator(mixr, (SoundGenerator *)s);
 }
@@ -1184,7 +1143,6 @@ int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree)
 
 void mixer_preview_audio(mixer *mixr, char *filename)
 {
-    std::cout << "PREVIEW!! " << filename << std::endl;
     if (is_valid_file(filename))
     {
         mixr->preview.enabled = false;

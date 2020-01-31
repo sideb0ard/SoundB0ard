@@ -425,6 +425,16 @@ class LsStatement : public Statement
     std::shared_ptr<Expression> path_;
 };
 
+class BpmStatement : public Statement
+{
+  public:
+    explicit BpmStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> bpm_val_;
+};
+
 class PlayStatement : public Statement
 {
   public:

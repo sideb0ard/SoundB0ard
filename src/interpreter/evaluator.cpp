@@ -237,13 +237,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::PlayStatement>(node);
     if (play_expr)
     {
-        std::cout << "PLAY EVAL!\n";
         std::shared_ptr<ast::StringLiteral> fpath =
             std::dynamic_pointer_cast<ast::StringLiteral>(play_expr->path_);
         if (fpath)
         {
             char *fname = fpath->value_.data();
-            std::cout << "Filename is " << fpath->value_.c_str() << std::endl;
             mixer_preview_audio(mixr, fname);
         }
     }
