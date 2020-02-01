@@ -43,9 +43,8 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
                     std::shared_ptr<object::Object> right);
 
 std::shared_ptr<object::Object>
-EvalIntegerInfixExpression(std::string op,
-                           std::shared_ptr<object::Integer> left,
-                           std::shared_ptr<object::Integer> right);
+EvalNumberInfixExpression(std::string op, std::shared_ptr<object::Number> left,
+                          std::shared_ptr<object::Number> right);
 
 std::shared_ptr<object::Object>
 EvalStringInfixExpression(std::string op, std::shared_ptr<object::String> left,

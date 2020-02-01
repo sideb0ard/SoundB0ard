@@ -23,10 +23,10 @@ struct EvaluatorTest : public ::testing::Test
 {
 };
 
-bool TestIntegerObject(std::shared_ptr<object::Object> obj, int64_t expected)
+bool TestNumberObject(std::shared_ptr<object::Object> obj, int64_t expected)
 {
-    std::shared_ptr<object::Integer> io =
-        std::dynamic_pointer_cast<object::Integer>(obj);
+    std::shared_ptr<object::Number> io =
+        std::dynamic_pointer_cast<object::Number>(obj);
     if (!io)
     {
         std::cerr << "NOT AN INTEGER OBJECT\n";
@@ -76,7 +76,7 @@ std::shared_ptr<object::Object> TestEval(std::string input)
     return evaluator::Eval(program, env);
 }
 
-TEST_F(EvaluatorTest, TestIntegerExpression)
+TEST_F(EvaluatorTest, TestNumberExpression)
 {
     struct TestCase
     {
@@ -102,7 +102,7 @@ TEST_F(EvaluatorTest, TestIntegerExpression)
     {
         std::cout << "\nTesting! input: " << tt.input << std::endl;
         auto evaluated = TestEval(tt.input);
-        EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
+        EXPECT_TRUE(TestNumberObject(evaluated, tt.expected));
     }
 }
 
@@ -190,7 +190,7 @@ TEST_F(EvaluatorTest, TestIfElseExpression)
         // std::cout << "\nTesting! input: " << tt.input << std::endl;
         // auto evaluated = TestEval(tt.input);
 
-        // EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
+        // EXPECT_TRUE(TestNumberObject(evaluated, tt.expected));
     }
 
     //////////////////
@@ -222,7 +222,7 @@ TEST_F(EvaluatorTest, TestReturnStatements)
     {
         std::cout << "\nTesting! input: " << tt.input << std::endl;
         auto evaluated = TestEval(tt.input);
-        EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
+        EXPECT_TRUE(TestNumberObject(evaluated, tt.expected));
     }
 }
 
@@ -278,7 +278,7 @@ TEST_F(EvaluatorTest, TestLetStatements)
 
     for (auto tt : tests)
     {
-        EXPECT_TRUE(TestIntegerObject(TestEval(tt.input), tt.expected));
+        EXPECT_TRUE(TestNumberObject(TestEval(tt.input), tt.expected));
     }
 }
 
@@ -315,7 +315,7 @@ TEST_F(EvaluatorTest, TestFunctionApplication)
 
     for (auto tt : tests)
     {
-        EXPECT_TRUE(TestIntegerObject(TestEval(tt.input), tt.expected));
+        EXPECT_TRUE(TestNumberObject(TestEval(tt.input), tt.expected));
     }
 }
 
@@ -328,7 +328,7 @@ TEST_F(EvaluatorTest, TestClosures)
  let addTwo = newAdder(2);
  addTwo(2);)";
 
-    TestIntegerObject(TestEval(input), 4);
+    TestNumberObject(TestEval(input), 4);
 }
 
 TEST_F(EvaluatorTest, TestStringConcatentation)
@@ -358,7 +358,7 @@ TEST_F(EvaluatorTest, TestInBuiltFunctions)
                                    {R"(len("hello wurld"))", 11}};
     for (auto &tt : tests)
     {
-        EXPECT_TRUE(TestIntegerObject(TestEval(tt.input), tt.expected));
+        EXPECT_TRUE(TestNumberObject(TestEval(tt.input), tt.expected));
     }
 }
 
@@ -376,9 +376,9 @@ TEST_F(EvaluatorTest, TestArrayLiterals)
 
     ASSERT_EQ(array_obj->elements_.size(), 3);
 
-    EXPECT_TRUE(TestIntegerObject(array_obj->elements_[0], 1));
-    EXPECT_TRUE(TestIntegerObject(array_obj->elements_[1], 4));
-    EXPECT_TRUE(TestIntegerObject(array_obj->elements_[2], 6));
+    EXPECT_TRUE(TestNumberObject(array_obj->elements_[0], 1));
+    EXPECT_TRUE(TestNumberObject(array_obj->elements_[1], 4));
+    EXPECT_TRUE(TestNumberObject(array_obj->elements_[2], 6));
 }
 
 TEST_F(EvaluatorTest, TestArrayIndexExpressions)
@@ -401,7 +401,7 @@ TEST_F(EvaluatorTest, TestArrayIndexExpressions)
     for (auto &tt : tests)
     {
         auto evaluated = TestEval(tt.input);
-        EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
+        EXPECT_TRUE(TestNumberObject(evaluated, tt.expected));
     }
 
     std::vector<std::string> nullTests{"[1, 2, 3][3]", "[1, 2, 3][-1]"};
@@ -433,7 +433,7 @@ TEST_F(EvaluatorTest, TestBuiltInFunctions)
     for (auto &tt : tests)
     {
         auto evaluated = TestEval(tt.input);
-        EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
+        EXPECT_TRUE(TestNumberObject(evaluated, tt.expected));
     }
 
     /////
@@ -489,7 +489,7 @@ TEST_F(EvaluatorTest, TestBuiltInFunctions)
         ASSERT_EQ(tt.expected.size(), arr_obj->elements_.size());
         int elems_size = arr_obj->elements_.size();
         for (int i = 0; i < elems_size; i++)
-            TestIntegerObject(arr_obj->elements_[i], tt.expected[i]);
+            TestNumberObject(arr_obj->elements_[i], tt.expected[i]);
     }
 
     /////////////////////////////
@@ -563,7 +563,7 @@ TEST_F(EvaluatorTest, TestHashLiterals)
         {object::String("one").HashKey(), 1},
         {object::String("two").HashKey(), 2},
         {object::String("three").HashKey(), 3},
-        {object::Integer(4).HashKey(), 4},
+        {object::Number(4).HashKey(), 4},
         {evaluator::TTRUE->HashKey(), 5},
         {evaluator::FFALSE->HashKey(), 6},
     };
@@ -583,7 +583,7 @@ TEST_F(EvaluatorTest, TestHashLiterals)
         if (p == hsh->pairs_.end())
             FAIL() << "No pair found for key in pairs...";
 
-        TestIntegerObject(p->second.value_, expected_value);
+        TestNumberObject(p->second.value_, expected_value);
     }
 }
 
@@ -607,7 +607,7 @@ TEST_F(EvaluatorTest, TestHashIndexExpression)
     for (auto &tt : tests)
     {
         auto evaluated = TestEval(tt.input);
-        EXPECT_TRUE(TestIntegerObject(evaluated, tt.expected));
+        EXPECT_TRUE(TestNumberObject(evaluated, tt.expected));
     }
 
     std::vector<std::string> null_tests{
@@ -640,7 +640,7 @@ TEST_F(EvaluatorTest, TestIncrementOperators)
 
     for (auto tt : tests)
     {
-        EXPECT_TRUE(TestIntegerObject(TestEval(tt.input), tt.expected));
+        EXPECT_TRUE(TestNumberObject(TestEval(tt.input), tt.expected));
     }
 }
 

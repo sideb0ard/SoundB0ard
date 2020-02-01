@@ -16,7 +16,7 @@ namespace object
 constexpr char NULL_OBJ[] = "NULL";
 constexpr char ERROR_OBJ[] = "ERROR";
 
-constexpr char INTEGER_OBJ[] = "INTEGER";
+constexpr char NUMBER_OBJ[] = "NUMBER";
 constexpr char BOOLEAN_OBJ[] = "BOOLEAN";
 
 constexpr char RETURN_VALUE_OBJ[] = "RETURN_VALUE";
@@ -70,16 +70,16 @@ class Object
     virtual std::string Inspect() = 0;
 };
 
-class Integer : public Object
+class Number : public Object
 {
   public:
-    explicit Integer(int64_t val) : value_{val} {};
+    explicit Number(double val) : value_{val} {};
     ObjectType Type() override;
     std::string Inspect() override;
     HashKey HashKey();
 
   public:
-    int64_t value_;
+    double value_;
 };
 
 class Array : public Object

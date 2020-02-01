@@ -103,6 +103,12 @@ token::Token Lexer::NextToken()
             tok.type_ = token::SLANG_DECREMENT;
             tok.literal_ = "--";
         }
+        else if (IsDigit(PeekChar()))
+        {
+            tok.type_ = token::SLANG_NUMBER;
+            tok.literal_ = ReadNumber();
+            return tok;
+        }
         else
         {
             tok.type_ = token::SLANG_MINUS;
@@ -235,18 +241,9 @@ std::string Lexer::ReadIdentifier()
 std::string Lexer::ReadNumber()
 {
     int position = current_position_;
-    bool has_decimal_point{false};
-    while (IsDigit(current_char_) || current_char_ == '.')
-    {
-        if (current_char_ == '.')
-        {
-            if (!has_decimal_point)
-                has_decimal_point = true;
-            else
-                break; // eek, summit wrong, can only be a single place.
-        }
+    while (IsDigit(current_char_) || current_char_ == '.' ||
+           current_char_ == '-')
         ReadChar();
-    }
     return input_.substr(position, current_position_ - position);
 }
 

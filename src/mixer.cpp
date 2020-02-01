@@ -202,7 +202,8 @@ void mixer_status_env(mixer *mixr)
 {
     printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "Env" COOL_COLOR_GREEN
                             "]\n");
-    // global_env->Debug();
+    global_env->Debug();
+
     std::unordered_map<std::string, int> soundgens =
         global_env->GetSoundGenerators();
     for (auto &sg_obj : soundgens)
@@ -210,7 +211,8 @@ void mixer_status_env(mixer *mixr)
         if (mixer_is_valid_soundgen_num(mixr, sg_obj.second))
         {
             auto sb = mixr->SoundGenerators[sg_obj.second];
-            std::cout << sg_obj.first << " = " << sb->Status() << std::endl;
+            std::cout << ANSI_COLOR_WHITE << sg_obj.first << " = "
+                      << sb->Status() << ANSI_COLOR_RESET << std::endl;
         }
     }
 }

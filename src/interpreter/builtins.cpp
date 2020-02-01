@@ -33,7 +33,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         std::dynamic_pointer_cast<object::String>(input[0]);
                     if (str_obj)
                     {
-                        return std::make_shared<object::Integer>(
+                        return std::make_shared<object::Number>(
                             str_obj->value_.size());
                     }
 
@@ -41,7 +41,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         std::dynamic_pointer_cast<object::Array>(input[0]);
                     if (array_obj)
                     {
-                        return std::make_shared<object::Integer>(
+                        return std::make_shared<object::Number>(
                             array_obj->elements_.size());
                     }
 
@@ -249,7 +249,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              if (args_size >= 2)
              {
                  auto int_object =
-                     std::dynamic_pointer_cast<object::Integer>(args[1]);
+                     std::dynamic_pointer_cast<object::Number>(args[1]);
 
                  if (!int_object)
                      return evaluator::NULLL;
@@ -260,7 +260,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  if (args_size >= 3)
                  {
                      auto int_obj =
-                         std::dynamic_pointer_cast<object::Integer>(args[2]);
+                         std::dynamic_pointer_cast<object::Number>(args[2]);
                      if (!int_obj)
                          return evaluator::NULLL;
                      int passed_velocity = int_obj->value_;
@@ -286,7 +286,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          if (args_size >= 4)
                          {
                              auto intr_obj =
-                                 std::dynamic_pointer_cast<object::Integer>(
+                                 std::dynamic_pointer_cast<object::Number>(
                                      args[3]);
                              if (!intr_obj)
                                  return evaluator::NULLL;

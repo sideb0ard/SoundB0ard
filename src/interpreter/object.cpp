@@ -25,7 +25,7 @@ bool IsSoundGenerator(object::ObjectType type)
 namespace object
 {
 
-std::string Integer::Inspect()
+std::string Number::Inspect()
 {
     std::stringstream val;
     val << value_;
@@ -50,8 +50,8 @@ bool operator<(HashKey const &lhs, HashKey const &rhs)
     }
 }
 
-ObjectType Integer::Type() { return INTEGER_OBJ; }
-object::HashKey Integer::HashKey()
+ObjectType Number::Type() { return NUMBER_OBJ; }
+object::HashKey Number::HashKey()
 {
     return object::HashKey(Type(), (uint64_t)value_);
 }
@@ -172,8 +172,9 @@ void Environment::Debug()
 {
     for (const auto &it : store_)
     {
-        std::cout << "Key: " << it.first << " // Val:" << it.second->Inspect()
-                  << std::endl;
+        if (!IsSoundGenerator(it.second->Type()))
+            std::cout << "Key: " << it.first
+                      << " // Val:" << it.second->Inspect() << std::endl;
     }
 }
 

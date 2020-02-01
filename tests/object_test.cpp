@@ -33,12 +33,12 @@ TEST_F(ObjectTest, TestBooleanHashKey)
     EXPECT_NE(true1->HashKey(), false1->HashKey());
 }
 
-TEST_F(ObjectTest, TestIntegerHashKey)
+TEST_F(ObjectTest, TestNumberHashKey)
 {
-    auto one1 = std::make_shared<object::Integer>(1);
-    auto one2 = std::make_shared<object::Integer>(1);
-    auto two1 = std::make_shared<object::Integer>(2);
-    auto two2 = std::make_shared<object::Integer>(2);
+    auto one1 = std::make_shared<object::Number>(1);
+    auto one2 = std::make_shared<object::Number>(1);
+    auto two1 = std::make_shared<object::Number>(2);
+    auto two2 = std::make_shared<object::Number>(2);
     EXPECT_EQ(one1->HashKey(), one2->HashKey());
     EXPECT_EQ(two1->HashKey(), two2->HashKey());
     EXPECT_NE(one1->HashKey(), two1->HashKey());

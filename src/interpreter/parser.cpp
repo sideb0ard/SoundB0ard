@@ -270,7 +270,6 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement()
     std::shared_ptr<ast::PanStatement> stmt =
         std::make_shared<ast::PanStatement>(cur_token_);
 
-    std::cout << "PAN ME UP YO!" << std::endl;
     if (!ExpectPeek(token::SLANG_IDENT))
     {
         std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
@@ -601,7 +600,7 @@ std::shared_ptr<ast::Expression> Parser::ParseNumberLiteral()
     auto literal = std::make_shared<ast::NumberLiteral>(cur_token_);
     double val = std::stod(cur_token_.literal_);
     literal->value_ = val;
-    std::cout << "GIT MA NUM\n";
+    std::cout << "GIT MA NUM " << literal->value_ << "\n";
     return literal;
 }
 

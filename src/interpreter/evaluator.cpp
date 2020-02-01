@@ -42,7 +42,7 @@ bool IsError(std::shared_ptr<object::Object> obj)
 bool IsHashable(std::shared_ptr<object::Object> obj)
 {
     if (obj->Type() == object::BOOLEAN_OBJ ||
-        obj->Type() == object::INTEGER_OBJ || obj->Type() == object::STRING_OBJ)
+        obj->Type() == object::NUMBER_OBJ || obj->Type() == object::STRING_OBJ)
         return true;
     return false;
 }
@@ -54,8 +54,8 @@ object::HashKey MakeHashKey(std::shared_ptr<object::Object> hashkey)
     if (hash_key_bool)
         return hash_key_bool->HashKey();
 
-    std::shared_ptr<object::Integer> hash_key_int =
-        std::dynamic_pointer_cast<object::Integer>(hashkey);
+    std::shared_ptr<object::Number> hash_key_int =
+        std::dynamic_pointer_cast<object::Number>(hashkey);
     if (hash_key_int)
         return hash_key_int->HashKey();
 
@@ -118,7 +118,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::NumberLiteral>(node);
     if (il)
     {
-        return std::make_shared<object::Integer>(il->value_);
+        return std::make_shared<object::Number>(il->value_);
     }
 
     std::shared_ptr<ast::BooleanExpression> be =
@@ -466,7 +466,7 @@ EvalIndexExpression(std::shared_ptr<object::Object> left,
                     std::shared_ptr<object::Object> index)
 {
     if (left->Type() == object::ARRAY_OBJ &&
-        index->Type() == object::INTEGER_OBJ)
+        index->Type() == object::NUMBER_OBJ)
         return EvalArrayIndexExpression(left, index);
     else if (left->Type() == object::HASH_OBJ)
         return EvalHashIndexExpression(left, index);
@@ -481,8 +481,8 @@ EvalArrayIndexExpression(std::shared_ptr<object::Object> array_obj,
     std::shared_ptr<object::Array> my_array =
         std::dynamic_pointer_cast<object::Array>(array_obj);
 
-    std::shared_ptr<object::Integer> int_obj =
-        std::dynamic_pointer_cast<object::Integer>(index);
+    std::shared_ptr<object::Number> int_obj =
+        std::dynamic_pointer_cast<object::Number>(index);
     if (my_array && int_obj)
     {
         int idx = int_obj->value_;
@@ -582,12 +582,12 @@ std::shared_ptr<object::Object>
 EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
                     std::shared_ptr<object::Object> right)
 {
-    if (left->Type() == object::INTEGER_OBJ &&
-        right->Type() == object::INTEGER_OBJ)
+    if (left->Type() == object::NUMBER_OBJ &&
+        right->Type() == object::NUMBER_OBJ)
     {
-        auto leftie = std::dynamic_pointer_cast<object::Integer>(left);
-        auto rightie = std::dynamic_pointer_cast<object::Integer>(right);
-        return EvalIntegerInfixExpression(op, leftie, rightie);
+        auto leftie = std::dynamic_pointer_cast<object::Number>(left);
+        auto rightie = std::dynamic_pointer_cast<object::Number>(right);
+        return EvalNumberInfixExpression(op, leftie, rightie);
     }
     else if (left->Type() == object::STRING_OBJ &&
              right->Type() == object::STRING_OBJ)
@@ -612,19 +612,18 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
 }
 
 std::shared_ptr<object::Object>
-EvalIntegerInfixExpression(std::string op,
-                           std::shared_ptr<object::Integer> left,
-                           std::shared_ptr<object::Integer> right)
+EvalNumberInfixExpression(std::string op, std::shared_ptr<object::Number> left,
+                          std::shared_ptr<object::Number> right)
 {
 
     if (op.compare("+") == 0)
-        return std::make_shared<object::Integer>(left->value_ + right->value_);
+        return std::make_shared<object::Number>(left->value_ + right->value_);
     else if (op.compare("-") == 0)
-        return std::make_shared<object::Integer>(left->value_ - right->value_);
+        return std::make_shared<object::Number>(left->value_ - right->value_);
     else if (op.compare("*") == 0)
-        return std::make_shared<object::Integer>(left->value_ * right->value_);
+        return std::make_shared<object::Number>(left->value_ * right->value_);
     else if (op.compare("/") == 0)
-        return std::make_shared<object::Integer>(left->value_ / right->value_);
+        return std::make_shared<object::Number>(left->value_ / right->value_);
     else if (op.compare("<") == 0)
         return NativeBoolToBooleanObject(left->value_ < right->value_);
     else if (op.compare(">") == 0)
@@ -665,40 +664,40 @@ EvalBangOperatorExpression(std::shared_ptr<object::Object> right)
 std::shared_ptr<object::Object>
 EvalMinusPrefixOperatorExpression(std::shared_ptr<object::Object> right)
 {
-    std::shared_ptr<object::Integer> i =
-        std::dynamic_pointer_cast<object::Integer>(right);
+    std::shared_ptr<object::Number> i =
+        std::dynamic_pointer_cast<object::Number>(right);
     if (!i)
     {
         return NewError("unknown operator: -%s", right->Type());
     }
 
-    return std::make_shared<object::Integer>(-i->value_);
+    return std::make_shared<object::Number>(-i->value_);
 }
 
 std::shared_ptr<object::Object>
 EvalIncrementOperatorExpression(std::shared_ptr<object::Object> right)
 {
-    std::shared_ptr<object::Integer> i =
-        std::dynamic_pointer_cast<object::Integer>(right);
+    std::shared_ptr<object::Number> i =
+        std::dynamic_pointer_cast<object::Number>(right);
     if (!i)
     {
         return NewError("unknown operator: ++%s", right->Type());
     }
 
-    return std::make_shared<object::Integer>(++(i->value_));
+    return std::make_shared<object::Number>(++(i->value_));
 }
 
 std::shared_ptr<object::Object>
 EvalDecrementOperatorExpression(std::shared_ptr<object::Object> right)
 {
-    std::shared_ptr<object::Integer> i =
-        std::dynamic_pointer_cast<object::Integer>(right);
+    std::shared_ptr<object::Number> i =
+        std::dynamic_pointer_cast<object::Number>(right);
     if (!i)
     {
         return NewError("unknown operator: --%s", right->Type());
     }
 
-    return std::make_shared<object::Integer>(--(i->value_));
+    return std::make_shared<object::Number>(--(i->value_));
 }
 
 std::shared_ptr<object::Object>
