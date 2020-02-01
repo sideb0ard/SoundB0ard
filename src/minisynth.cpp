@@ -19,6 +19,9 @@ extern const char *s_dest_enum_to_name[];
 const wchar_t *s_voice_names[] = {L"saw3",    L"sqr3",    L"saw2sqr",
                                   L"tri2saw", L"tri2sqr", L"sin2sqr"};
 
+const char *S_VOICES[] = {"SAW3",    "SQR3",    "SAW2SQR",
+                          "TRI2SAW", "TRI2SQR", "SIN2SQR"};
+
 char *s_waveform_names[] = {
     (char *)"SINE",  (char *)"SAW1",   (char *)"SAW2",
     (char *)"SAW3",  (char *)"TRI",    (char *)"SQUARE",
@@ -106,6 +109,18 @@ stereo_val MiniSynth::genNext()
     out = Effector(out);
     return out;
 }
+
+std::string MiniSynth::Status()
+{
+    std::stringstream ss;
+    ss << COOL_COLOR_YELLOW << "Moog(" << m_settings.m_settings_name << ")"
+       << " vol:" << volume << " pan:" << pan
+       << " voice:" << S_VOICES[m_settings.m_voice_mode] << "("
+       << m_settings.m_voice_mode << ")" << ANSI_COLOR_RESET;
+
+    return ss.str();
+}
+
 void MiniSynth::status(wchar_t *status_string)
 {
     if (mixr->debug_mode)

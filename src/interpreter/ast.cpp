@@ -40,15 +40,26 @@ std::string LetStatement::String() const
     return ss.str();
 }
 
-std::string BpmStatement::String() const
+std::string InfoStatement::String() const
 {
     std::stringstream ss;
     ss << TokenLiteral();
-    ss << bpm_val_;
+    ss << soundgen_identifier_->String();
     ss << ";";
 
     return ss.str();
 }
+
+std::string BpmStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << bpm_val_->String();
+    ss << ";";
+
+    return ss.str();
+}
+
 std::string LsStatement::String() const
 {
     std::stringstream ss;

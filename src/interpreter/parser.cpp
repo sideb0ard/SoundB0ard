@@ -56,6 +56,10 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
         return ParseSetStatement();
     else if (cur_token_.type_.compare(token::SLANG_VOLUME) == 0)
         return ParseVolumeStatement();
+    else if (cur_token_.type_.compare(token::SLANG_BPM) == 0)
+        return ParseBpmStatement();
+    else if (cur_token_.type_.compare(token::SLANG_INFO) == 0)
+        return ParseInfoStatement();
     else
         return ParseExpressionStatement();
 }
@@ -202,6 +206,34 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
+
+    return stmt;
+}
+std::shared_ptr<ast::BpmStatement> Parser::ParseBpmStatement()
+{
+    std::cout << "BPM PARSING!\n";
+    std::shared_ptr<ast::BpmStatement> stmt =
+        std::make_shared<ast::BpmStatement>(cur_token_);
+
+    NextToken();
+    stmt->bpm_val_ = ParseExpression(Precedence::LOWEST);
+    if (!stmt->bpm_val_)
+        return nullptr;
+
+    return stmt;
+}
+
+std::shared_ptr<ast::InfoStatement> Parser::ParseInfoStatement()
+{
+    std::cout << "HINFO!\n";
+    std::shared_ptr<ast::InfoStatement> stmt =
+        std::make_shared<ast::InfoStatement>(cur_token_);
+
+    NextToken();
+    std::cout << "CURT TOKENN is " << cur_token_ << std::endl;
+    stmt->soundgen_identifier_ = ParseExpression(Precedence::LOWEST);
+    if (!stmt->soundgen_identifier_)
+        return nullptr;
 
     return stmt;
 }
@@ -569,6 +601,7 @@ std::shared_ptr<ast::Expression> Parser::ParseNumberLiteral()
     auto literal = std::make_shared<ast::NumberLiteral>(cur_token_);
     double val = std::stod(cur_token_.literal_);
     literal->value_ = val;
+    std::cout << "GIT MA NUM\n";
     return literal;
 }
 

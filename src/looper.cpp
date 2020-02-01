@@ -327,6 +327,14 @@ stereo_val looper::genNext()
     return val;
 }
 
+std::string looper::Status()
+{
+    std::stringstream ss;
+    ss << ANSI_COLOR_RED << "Granular(" << filename << ")"
+       << " vol:" << volume << " pan:" << pan << " pitch:" << grain_pitch
+       << ANSI_COLOR_RESET;
+    return ss.str();
+}
 void looper::status(wchar_t *status_string)
 {
     char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;

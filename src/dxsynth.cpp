@@ -81,9 +81,9 @@ void dxsynth::stop()
 std::string dxsynth::Status()
 {
     std::stringstream ss;
-    ss << "DxSynth(" << m_settings.m_settings_name << ")"
-       << " algo:" << m_settings.m_voice_mode << " vol:" << volume
-       << " pan:" << pan;
+    ss << COOL_COLOR_ORANGE << "DxSynth(" << m_settings.m_settings_name << ")"
+       << " vol:" << volume << " pan:" << pan
+       << " algo:" << m_settings.m_voice_mode << ANSI_COLOR_RESET;
     return ss.str();
 }
 

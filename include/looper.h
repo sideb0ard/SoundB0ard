@@ -87,6 +87,7 @@ class looper : public SoundGenerator
     ~looper();
     stereo_val genNext() override;
     void status(wchar_t *wstring) override;
+    std::string Status() override;
     void start() override;
     void stop() override;
     void eventNotify(broadcast_event event, mixer_timing_info tinfo) override;

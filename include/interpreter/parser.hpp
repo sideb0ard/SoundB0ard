@@ -54,6 +54,8 @@ class Parser
     std::shared_ptr<ast::ReturnStatement> ParseReturnStatement();
     std::shared_ptr<ast::ForStatement> ParseForStatement();
     std::shared_ptr<ast::LsStatement> ParseLsStatement();
+    std::shared_ptr<ast::InfoStatement> ParseInfoStatement();
+    std::shared_ptr<ast::BpmStatement> ParseBpmStatement();
     std::shared_ptr<ast::PsStatement> ParsePsStatement();
     std::shared_ptr<ast::SetStatement> ParseSetStatement();
     std::shared_ptr<ast::PanStatement> ParsePanStatement();

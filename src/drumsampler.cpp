@@ -107,11 +107,13 @@ std::string DrumSampler::Status()
 {
     std::stringstream ss;
 
-    ss << "Sampler(" << filename << ")"
-       << " vol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch;
+    ss << COOL_COLOR_PINK "Sampler(" << filename << ")"
+       << " vol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch
+       << ANSI_COLOR_RESET;
 
     return ss.str();
 }
+
 void DrumSampler::status(wchar_t *status_string)
 {
     char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;

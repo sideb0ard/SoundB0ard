@@ -66,6 +66,7 @@ const TokenType SLANG_SET = "SET";
 const TokenType SLANG_PAN = "PAN";
 const TokenType SLANG_PLAY = "PLAY";
 const TokenType SLANG_VOLUME = "VOLUME";
+const TokenType SLANG_INFO = "INFO";
 
 // instruments
 const TokenType SLANG_SAMPLE = "SAMPLE";

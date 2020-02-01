@@ -218,6 +218,7 @@ void mixer_status_env(mixer *mixr)
 void mixer_status_sgz(mixer *mixr, bool all)
 {
     wchar_t wss[MAX_STATIC_STRING_SZ] = {};
+    // mixr->SoundGenerators[i]->status(wss);
     if (mixr->soundgen_num > 0)
     {
         printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
@@ -273,7 +274,7 @@ void mixer_ps(mixer *mixr, bool all)
     mixer_status_mixr(mixr);
     mixer_status_env(mixr);
     mixer_status_procz(mixr, false);
-    mixer_status_sgz(mixr, all);
+    // mixer_status_sgz(mixr, all);
     printf(ANSI_COLOR_RESET);
 }
 

@@ -172,16 +172,57 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         env->Set(let_expr->name_->value_, val);
     }
 
-    std::shared_ptr<ast::LsStatement> ls_expr =
+    std::shared_ptr<ast::LsStatement> ls_stmt =
         std::dynamic_pointer_cast<ast::LsStatement>(node);
-    if (ls_expr)
+    if (ls_stmt)
     {
         std::string lspath_string = "/";
         std::shared_ptr<ast::StringLiteral> lspath =
-            std::dynamic_pointer_cast<ast::StringLiteral>(ls_expr->path_);
+            std::dynamic_pointer_cast<ast::StringLiteral>(ls_stmt->path_);
         if (lspath)
             lspath_string = lspath->value_;
         list_sample_dir(lspath_string);
+    }
+
+    std::shared_ptr<ast::BpmStatement> bpm_stmt =
+        std::dynamic_pointer_cast<ast::BpmStatement>(node);
+    if (bpm_stmt)
+    {
+        std::cout << "BPM, YO!\n";
+        std::shared_ptr<ast::NumberLiteral> bpm =
+            std::dynamic_pointer_cast<ast::NumberLiteral>(bpm_stmt->bpm_val_);
+        if (bpm)
+            mixer_update_bpm(mixr, bpm->value_);
+    }
+
+    std::shared_ptr<ast::InfoStatement> info_stmt =
+        std::dynamic_pointer_cast<ast::InfoStatement>(node);
+    if (info_stmt)
+    {
+        std::cout << "INFO, YO!\n";
+        auto soundgen_var_name = std::dynamic_pointer_cast<ast::Identifier>(
+            info_stmt->soundgen_identifier_);
+        if (soundgen_var_name)
+        {
+            auto target = Eval(soundgen_var_name, env);
+            auto soundgen =
+                std::dynamic_pointer_cast<object::SoundGenerator>(target);
+            if (soundgen)
+            {
+                wchar_t wss[MAX_STATIC_STRING_SZ] = {};
+                // mixr->SoundGenerators[i]->status(wss);
+                if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
+                {
+                    auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
+
+                    sg->status(wss);
+
+                    std::cout << "INFO, YO! FO: " << soundgen_var_name->value_
+                              << "\n";
+                    std::cout << wss << std::endl;
+                }
+            }
+        }
     }
 
     std::shared_ptr<ast::SetStatement> set_stmt =
@@ -796,8 +837,8 @@ ExtendFunctionEnv(std::shared_ptr<object::Function> fun,
         std::make_shared<object::Environment>(fun->env_);
     if (fun->parameters_.size() != args.size())
     {
-        std::cerr
-            << "Function Eval - args and params not same size, ya numpty!\n";
+        std::cerr << "Function Eval - args and params not same size, ya "
+                     "numpty!\n";
         return new_env;
     }
 

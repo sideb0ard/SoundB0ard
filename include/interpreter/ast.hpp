@@ -435,6 +435,16 @@ class BpmStatement : public Statement
     std::shared_ptr<Expression> bpm_val_;
 };
 
+class InfoStatement : public Statement
+{
+  public:
+    explicit InfoStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+
+  public:
+    std::shared_ptr<Expression> soundgen_identifier_;
+};
+
 class PlayStatement : public Statement
 {
   public:
