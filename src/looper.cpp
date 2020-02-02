@@ -172,13 +172,6 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     //    midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
     //    midi_pattern_add_event(pattern, off_tick, off_event);
     //}
-    // else if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
-    //         MIDI_OFF)
-    //{
-    //    // printf("[%d] OFF\n", idx);
-    //    midi_event_clear(&engine.patterns[engine.cur_pattern][cur_midi_idx]);
-    //    m_eg1.m_state = RELEASE;
-    //}
 
     // printf(
     //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d
@@ -334,7 +327,13 @@ std::string looper::Status()
        << " vol:" << volume << " pan:" << pan << " pitch:" << grain_pitch
        << " idx:" << (int)(100. / audio_buffer_len * audio_buffer_read_idx)
        << " mode:" << s_loop_mode_names[loop_mode] << "(" << loop_mode << ")"
-       << ANSI_COLOR_RESET;
+       << " step:" << step_mode << ANSI_COLOR_RESET;
+
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (engine.temporal_events[i].event_type)
+            std::cout << engine.temporal_events[i].event_type << std::endl;
+    }
     return ss.str();
 }
 std::string looper::Info()
@@ -733,7 +732,18 @@ void looper_set_scramble_pending(looper *g) { g->scramble_pending = true; }
 
 void looper_set_stutter_pending(looper *g) { g->stutter_pending = true; }
 
-void looper_set_step_mode(looper *g, bool b) { g->step_mode = b; }
+void looper_set_step_mode(looper *g, bool b)
+{
+    g->step_mode = b;
+    if (b)
+    {
+        eg_note_off(&g->m_eg1);
+    }
+    else
+    {
+        eg_start_eg(&g->m_eg1);
+    }
+}
 
 void looper_set_loop_len(looper *g, double bars)
 {
@@ -831,8 +841,15 @@ void looper_set_trace_envelope(looper *l) { l->debug_pending = true; }
 void looper::noteOn(midi_event ev)
 {
     (void)ev;
-    audio_buffer_read_idx = normalized_audio_buffer_read_idx;
+    eg_start_eg(&m_eg1);
 }
+
+void looper::noteOff(midi_event ev)
+{
+    (void)ev;
+    eg_note_off(&m_eg1);
+}
+
 void looper::SetParam(std::string name, double val)
 {
     if (name == "pitch")

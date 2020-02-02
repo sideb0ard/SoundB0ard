@@ -92,6 +92,7 @@ class looper : public SoundGenerator
     void stop() override;
     void eventNotify(broadcast_event event, mixer_timing_info tinfo) override;
     void noteOn(midi_event ev) override;
+    void noteOff(midi_event ev) override;
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
 
@@ -139,8 +140,8 @@ class looper : public SoundGenerator
     envelope_generator m_eg1; // start/stop amp
     envelope_generator m_eg2; // unused so far
 
-    unsigned int loop_mode; // enums above - LOOP, STEP, STATIC
-    double loop_len;        // bars
+    unsigned int loop_mode;
+    double loop_len; // bars
     int loop_counter;
 
     bool scramble_pending;

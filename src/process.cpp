@@ -112,8 +112,9 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     {
                         if (e->value_ == "~") // skip blank markers
                             continue;
-                        std::string cmd = std::string("noteOn(") + e->value_ +
-                                          "," + "127, 250)";
+                        std::string cmd =
+                            std::string("noteOn(") + e->value_ + "," +
+                            /*velocity + hold_time_ms **/ "127, 250)";
 
                         Interpret(cmd.data(), global_env);
                     }
@@ -127,7 +128,8 @@ void Process::EventNotify(mixer_timing_info tinfo)
                         for (auto t : targets_)
                         {
                             std::string cmd = std::string("noteOn(") + t + "," +
-                                              e->value_ + ", 250)";
+                                              e->value_ + ", 127, 250)";
+
                             Interpret(cmd.data(), global_env);
                         }
                     }
@@ -164,6 +166,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                         {
                             std::string new_cmd =
                                 ReplaceString(command_, "%", events[0]->value_);
+
                             Interpret(new_cmd.data(), global_env);
                         }
                     }
@@ -199,6 +202,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     }
                     std::string new_cmd = ReplaceString(
                         command_, "%", std::to_string(scaled_val));
+
                     Interpret(new_cmd.data(), global_env);
                 }
             }
@@ -218,6 +222,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                                   low_target_range, hi_target_range, cur_tick);
                     std::string new_cmd = ReplaceString(
                         command_, "%", std::to_string(scaled_val));
+
                     Interpret(new_cmd.data(), global_env);
                 }
             }
@@ -239,6 +244,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                         active_ = false;
                     std::string new_cmd = ReplaceString(
                         command_, "%", std::to_string(scaled_val));
+
                     Interpret(new_cmd.data(), global_env);
                 }
             }

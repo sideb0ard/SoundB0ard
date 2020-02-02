@@ -273,6 +273,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          // call noteOn after ensuring we got duration for
                          // noteOff, otherwise we could have a stuck note.
                          sg->noteOn(event_on);
+                         arp_add_last_note(&sg->engine.arp, midinum);
 
                          int duration_in_midi_ticks =
                              note_duration_ms /
@@ -345,6 +346,19 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
                      mixr->SoundGenerators[soundgen->soundgen_id_]->randomize();
              }
+
+             auto array_obj = std::dynamic_pointer_cast<object::Array>(args[0]);
+             if (array_obj)
+             {
+
+                 int len_elems = array_obj->elements_.size();
+                 if (len_elems > 0)
+                 {
+                     int idx = rand() % len_elems;
+                     return array_obj->elements_[idx];
+                 }
+             }
+
              return evaluator::NULLL;
          })},
     //{"set",
