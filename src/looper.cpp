@@ -332,6 +332,8 @@ std::string looper::Status()
     std::stringstream ss;
     ss << ANSI_COLOR_RED << "Granular(" << filename << ")"
        << " vol:" << volume << " pan:" << pan << " pitch:" << grain_pitch
+       << " idx:" << (int)(100. / audio_buffer_len * audio_buffer_read_idx)
+       << " mode:" << s_loop_mode_names[loop_mode] << "(" << loop_mode << ")"
        << ANSI_COLOR_RESET;
     return ss.str();
 }
@@ -342,9 +344,8 @@ std::string looper::Info()
         INSTRUMENT_COLOR = (char *)ANSI_COLOR_RED;
 
     std::stringstream ss;
-    ss << WANSI_COLOR_WHITE "source:" << filename << INSTRUMENT_COLOR
-       << "vol:" << volume << " pan:" << pan << " pitch:" << grain_pitch
-       << " stereo:" << (num_channels > 1 ? "true" : "false")
+    ss << ANSI_COLOR_WHITE << filename << INSTRUMENT_COLOR << " vol:" << volume
+       << " pan:" << pan << " pitch:" << grain_pitch
        << " mode:" << s_loop_mode_names[loop_mode] << "\n";
 
     //        %d mode:%s\n"

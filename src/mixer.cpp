@@ -207,14 +207,32 @@ void mixer_status_env(mixer *mixr)
 
     std::unordered_map<std::string, int> soundgens =
         global_env->GetSoundGenerators();
-    for (auto &sg_obj : soundgens)
+    for (auto &[var_name, sg_idx] : soundgens)
     {
-        if (mixer_is_valid_soundgen_num(mixr, sg_obj.second))
+        if (mixer_is_valid_soundgen_num(mixr, sg_idx))
         {
-            auto sb = mixr->SoundGenerators[sg_obj.second];
-            std::cout << ANSI_COLOR_WHITE << sg_obj.first
-                      << ANSI_COLOR_RESET " = " << sb->Status()
-                      << ANSI_COLOR_RESET << std::endl;
+            auto sg = mixr->SoundGenerators[sg_idx];
+            std::cout << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
+                      << sg->Status() << ANSI_COLOR_RESET << std::endl;
+
+            std::stringstream margin;
+            for (auto c : var_name)
+                margin << " ";
+            margin << "   "; // for the ' = '
+
+            for (int i = 0; i < sg->effects_num; i++)
+            {
+                std::cout << margin.str();
+                Fx *f = sg->effects[i];
+                if (f->enabled_)
+                    std::cout << COOL_COLOR_YELLOW;
+                else
+                    std::cout << ANSI_COLOR_RESET;
+                char fx_status[512];
+                f->Status(fx_status);
+                std::cout << "fx" << i << " " << fx_status << std::endl;
+            }
+            std::cout << ANSI_COLOR_RESET;
         }
     }
 }

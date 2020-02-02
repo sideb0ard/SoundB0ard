@@ -113,7 +113,7 @@ stereo_val MiniSynth::genNext()
 std::string MiniSynth::Status()
 {
     std::stringstream ss;
-    ss << COOL_COLOR_YELLOW << "Moog(" << m_settings.m_settings_name << ")"
+    ss << ANSI_COLOR_CYAN << "Moog(" << m_settings.m_settings_name << ")"
        << " vol:" << volume << " pan:" << pan
        << " voice:" << S_VOICES[m_settings.m_voice_mode] << "("
        << m_settings.m_voice_mode << ")" << ANSI_COLOR_RESET;
