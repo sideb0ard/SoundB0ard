@@ -17,7 +17,7 @@ class Process
   public:
     Process() = default;
     ~Process();
-    void Status(wchar_t *ss);
+    std::string Status();
     void Start();
     void Stop();
     void EventNotify(mixer_timing_info);

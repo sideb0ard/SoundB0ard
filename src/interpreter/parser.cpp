@@ -600,7 +600,6 @@ std::shared_ptr<ast::Expression> Parser::ParseNumberLiteral()
     auto literal = std::make_shared<ast::NumberLiteral>(cur_token_);
     double val = std::stod(cur_token_.literal_);
     literal->value_ = val;
-    std::cout << "GIT MA NUM " << literal->value_ << "\n";
     return literal;
 }
 

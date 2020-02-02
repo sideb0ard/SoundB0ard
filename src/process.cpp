@@ -41,10 +41,8 @@ using Wrapper =
 extern Tsqueue<Wrapper> g_queue;
 extern std::shared_ptr<object::Environment> global_env;
 
-constexpr char const *s_target_names[] = {"UNDEFINED", "ENV", "VALUES"};
-constexpr char const *s_proc_types[] = {"UNDEFINED", "PATTERN", "COMMAND"};
-constexpr char const *s_proc_timer_types[] = {"UNDEFINED", "EVERY", "OSC",
-                                              "OVER", "RAMP"};
+constexpr char const *s_proc_timer_types[] = {"UNDEFINED", "every", "osc",
+                                              "over", "ramp"};
 
 void Process::ParsePattern()
 {
@@ -92,7 +90,6 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 pattern_events_[i].clear();
             EvalPattern(pattern_root_, 0, PPBAR);
 
-            int idx = 0;
             for (auto &f : pattern_functions_)
             {
                 if (f->active_)
@@ -349,30 +346,58 @@ void Process::EvalPattern(
     }
 }
 
-void Process::Status(wchar_t *status_string)
+std::string Process::Status()
 {
+    std::stringstream ss;
+
     const char *PROC_COLOR = ANSI_COLOR_RESET;
     if (active_)
-        PROC_COLOR = COOL_COLOR_PINK;
+    {
+        if (process_type_ == ProcessType::PATTERN_PROCESS)
+        {
+            if (target_type_ == ProcessPatternTarget::ENV)
+                PROC_COLOR = ANSI_COLOR_CYAN;
+            else
+                PROC_COLOR = ANSI_COLOR_GREEN_TOO;
+        }
+        else if (process_type_ == ProcessType::COMMAND_PROCESS)
+            PROC_COLOR = ANSI_COLOR_GREEN;
+    }
+    ss << PROC_COLOR;
 
-    std::cout << "Lookup up TIMER TYPE:" << timer_type_ << std::endl;
-    std::cout << " is it: " << s_proc_timer_types[timer_type_] << std::endl;
+    if (process_type_ == ProcessType::PATTERN_PROCESS)
+    {
+        if (target_type_ == ProcessPatternTarget::ENV)
+        {
+            ss << "$ \"" << pattern_ << "\"";
+        }
+        else if (target_type_ == ProcessPatternTarget::VALUES)
+        {
+            ss << "# \"" << pattern_ << "\" ";
+            bool firscht = true;
+            for (auto &t : targets_)
+            {
+                if (!firscht)
+                    ss << ",";
+                firscht = false;
+                ss << t;
+            }
+        }
+    }
+    else if (process_type_ == ProcessType::COMMAND_PROCESS)
+    {
+        ss << "< " << s_proc_timer_types[timer_type_] << " " << loop_len_
+           << " \"" << pattern_ << "\" "
+           << " \"" << command_ << "\"";
+    }
 
-    std::cout << "LOOKUP UP TARGET_TYPE:" << target_type_ << std::endl;
-    std::cout << " is it: " << s_target_names[target_type_] << std::endl;
-
-    swprintf(status_string, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%sProcess// Type:%s TimerType:%s Target:%s "
-                               "Pattern:%s LoopLen:%f Active:%s Command:%s",
-             PROC_COLOR, s_proc_types[process_type_],
-             s_proc_timer_types[timer_type_], s_target_names[target_type_],
-             pattern_.c_str(), loop_len_, active_ ? "true" : "false",
-             command_.c_str());
-    wcscat(status_string, WANSI_COLOR_RESET);
-
-    std::cout << "PROC - i got " << pattern_functions_.size() << " funcszz\n";
     for (auto f : pattern_functions_)
-        std::cout << f->String() << std::endl;
+    {
+        if (f->active_)
+            ss << " | " << f->String();
+    }
+
+    return ss.str();
 }
 
 void Process::Start() { active_ = true; }

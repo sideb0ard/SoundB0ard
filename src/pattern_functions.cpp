@@ -1,6 +1,7 @@
 #include <algorithm>
 #include <array>
 #include <iostream>
+#include <sstream>
 
 #include <pattern_functions.hpp>
 
@@ -27,7 +28,12 @@ void PatternEvery::TransformPattern(
         func_->TransformPattern(events, loop_num);
 }
 
-std::string PatternEvery::String() const { return "PatternEvery"; }
+std::string PatternEvery::String() const
+{
+    std::stringstream ss;
+    ss << "every " << every_n_ << " " << func_->String();
+    return ss.str();
+}
 
 void PatternReverse::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
@@ -38,7 +44,7 @@ void PatternReverse::TransformPattern(
                 events.end());
 }
 
-std::string PatternReverse::String() const { return "PatternReeeeeverse"; }
+std::string PatternReverse::String() const { return "rev"; }
 
 void PatternTranspose::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
@@ -65,7 +71,17 @@ void PatternTranspose::TransformPattern(
         }
     }
 }
-std::string PatternTranspose::String() const { return "PatternTranzzzpose"; }
+std::string PatternTranspose::String() const
+{
+
+    std::stringstream ss;
+    if (direction_ == UP)
+        ss << "up ";
+    else
+        ss << "down ";
+    ss << num_octaves_;
+    return ss.str();
+}
 
 void PatternRotate::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
@@ -87,7 +103,16 @@ void PatternRotate::TransformPattern(
     // std::cout << "AFTER:\n";
     // PrintPattern(events);
 }
-std::string PatternRotate::String() const { return "PatternRoooootate!"; }
+std::string PatternRotate::String() const
+{
+    std::stringstream ss;
+    if (direction_ == LEFT)
+        ss << "rotl ";
+    else
+        ss << "rotr ";
+    ss << num_sixteenth_steps_;
+    return ss.str();
+}
 
 void PatternSwing::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
@@ -125,4 +150,11 @@ void PatternSwing::TransformPattern(
     // PrintPattern(new_events);
     events = new_events;
 }
-std::string PatternSwing::String() const { return "PatternRoooootate!"; }
+std::string PatternSwing::String() const
+{
+
+    std::stringstream ss;
+    ss << "swing ";
+    ss << swing_setting_;
+    return ss.str();
+}

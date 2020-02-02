@@ -186,15 +186,16 @@ void mixer_status_mixr(mixer *mixr)
 
 void mixer_status_procz(mixer *mixr, bool all)
 {
-    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    for (auto p : mixr->processes_)
+    std::cout << COOL_COLOR_ORANGE << "\n[" << ANSI_COLOR_WHITE << "Procz"
+              << COOL_COLOR_ORANGE << "]\n";
+
+    for (int i = 0; i < MAX_NUM_PROC; i++)
     {
+        auto &p = mixr->processes_[i];
         if (p->active_ || all)
         {
-            wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-            p->Status(wss);
-            wprintf(L"%ls\n", wss);
-            wprintf(WANSI_COLOR_RESET);
+            std::cout << ANSI_COLOR_WHITE << "p" << i << ANSI_COLOR_RESET << " "
+                      << p->Status() << std::endl;
         }
     }
 }
@@ -211,16 +212,15 @@ void mixer_status_env(mixer *mixr)
         if (mixer_is_valid_soundgen_num(mixr, sg_obj.second))
         {
             auto sb = mixr->SoundGenerators[sg_obj.second];
-            std::cout << ANSI_COLOR_WHITE << sg_obj.first << " = "
-                      << sb->Status() << ANSI_COLOR_RESET << std::endl;
+            std::cout << ANSI_COLOR_WHITE << sg_obj.first
+                      << ANSI_COLOR_RESET " = " << sb->Status()
+                      << ANSI_COLOR_RESET << std::endl;
         }
     }
 }
 
 void mixer_status_sgz(mixer *mixr, bool all)
 {
-    wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-    // mixr->SoundGenerators[i]->status(wss);
     if (mixr->soundgen_num > 0)
     {
         printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
@@ -233,17 +233,12 @@ void mixer_status_sgz(mixer *mixr, bool all)
                      mixr->SoundGenerators[i]->GetVolume() > 0.0) ||
                     all)
                 {
-                    wmemset(wss, 0, MAX_STATIC_STRING_SZ);
-                    mixr->SoundGenerators[i]->status(wss);
 
-                    // clang-format off
-                    wprintf(WCOOL_COLOR_GREEN
-                            "[" WANSI_COLOR_WHITE "%s %d"
-                            WCOOL_COLOR_GREEN"] " WANSI_COLOR_RESET,
-                            s_sg_names[mixr->SoundGenerators[i]->type], i);
-                    wprintf(L"%ls", wss);
-                    wprintf(WANSI_COLOR_RESET);
-                    // clang-format on
+                    std::cout << WCOOL_COLOR_GREEN << "[" << WANSI_COLOR_WHITE
+                              << "s" << i << WCOOL_COLOR_GREEN << "] "
+                              << ANSI_COLOR_RESET;
+                    std::cout << mixr->SoundGenerators[i]->Info()
+                              << ANSI_COLOR_RESET << "\n";
 
                     if (mixr->SoundGenerators[i]->effects_num > 0)
                     {

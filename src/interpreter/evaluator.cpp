@@ -209,17 +209,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 std::dynamic_pointer_cast<object::SoundGenerator>(target);
             if (soundgen)
             {
-                wchar_t wss[MAX_STATIC_STRING_SZ] = {};
-                // mixr->SoundGenerators[i]->status(wss);
                 if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
                 {
                     auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
 
-                    sg->status(wss);
-
-                    std::cout << "INFO, YO! FO: " << soundgen_var_name->value_
-                              << "\n";
-                    std::cout << wss << std::endl;
+                    std::cout << soundgen_var_name->value_ << "\n";
+                    std::cout << sg->Info() << std::endl;
                 }
             }
         }

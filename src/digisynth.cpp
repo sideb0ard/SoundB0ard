@@ -56,19 +56,30 @@ stereo_val digisynth::genNext()
     return return_val;
 }
 
-void digisynth::status(wchar_t *status_string)
+std::string digisynth::Info()
 {
-    swprintf(status_string, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
-                               " vol:%.2f pan:%.2f active:%s midi_note_1:%d "
-                               "midi_note_2:%d midi_note_3:%d "
-                               "sample_len:%d read_idx:%d",
-             audiofile, volume, pan, active ? "true" : "false",
-             engine.midi_note_1, engine.midi_note_2, engine.midi_note_3,
-             m_voices[0].m_osc1.afd.samplecount, m_voices[0].m_osc1.m_read_idx);
-    wchar_t scratch[1024] = {};
-    sequence_engine_status(&engine, scratch);
-    wcscat(status_string, scratch);
+    std::stringstream ss;
+
+    // swprintf(status_string, MAX_STATIC_STRING_SZ,
+    //         WANSI_COLOR_WHITE "%s" WCOOL_COLOR_YELLOW
+    //                           " vol:%.2f pan:%.2f active:%s midi_note_1:%d "
+    //                           "midi_note_2:%d midi_note_3:%d "
+    //                           "sample_len:%d read_idx:%d",
+    //         audiofile, volume, pan, active ? "true" : "false",
+    //         engine.midi_note_1, engine.midi_note_2, engine.midi_note_3,
+    //         m_voices[0].m_osc1.afd.samplecount,
+    //         m_voices[0].m_osc1.m_read_idx);
+    // wchar_t scratch[1024] = {};
+    // sequence_engine_status(&engine, scratch);
+    // wcscat(status_string, scratch);
+    return ss.str();
+}
+
+std::string digisynth::Status()
+{
+    std::stringstream ss;
+    ss << "TODO";
+    return ss.str();
 }
 
 void digisynth::start()

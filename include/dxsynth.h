@@ -99,7 +99,7 @@ class dxsynth : public SoundGenerator
     dxsynth();
     ~dxsynth();
     stereo_val genNext() override;
-    void status(wchar_t *wstring) override;
+    std::string Info() override;
     std::string Status() override;
     void start() override;
     void stop() override;

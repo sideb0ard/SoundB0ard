@@ -120,64 +120,75 @@ stereo_val drumsynth::genNext()
     return out;
 }
 
-void drumsynth::status(wchar_t *ss)
+std::string drumsynth::Info()
 {
-    char *INSTRUMENT_RED = (char *)ANSI_COLOR_RESET;
-    char *INSTRUMENT_DEEP_RED = (char *)ANSI_COLOR_RESET;
-    if (active)
-    {
-        INSTRUMENT_RED = (char *)COOL_COLOR_YELLOW_MELLOW;
-        INSTRUMENT_DEEP_RED = (char *)COOL_COLOR_ORANGE;
-    }
+    std::stringstream ss;
 
-    // clang-format off
-    swprintf(ss, MAX_STATIC_STRING_SZ,
-             WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f pan:%.2f reset:%d distortion_threshold:%.2f\n"
-             "o1_wav:" "%s""%s" "%s" "(%d) o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n"
-             "e1_att:%.2f e1_dec:%.2f e1_sus_lvl:%.2f e1_rel:%.2f\n"
-             "o2_wav:" "%s" "%s" "%s" "(%d) o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n"
-             "e2_att:%.2f e2_dec:%.2f e2_sus_lvl:%.2f e2_rel:%.2f\n"
-             "%s"
-             "filter_type:%d freq:%.2f q:%.2f // debug:%s",
+    // char *INSTRUMENT_RED = (char *)ANSI_COLOR_RESET;
+    // char *INSTRUMENT_DEEP_RED = (char *)ANSI_COLOR_RESET;
+    // if (active)
+    //{
+    //    INSTRUMENT_RED = (char *)COOL_COLOR_YELLOW_MELLOW;
+    //    INSTRUMENT_DEEP_RED = (char *)COOL_COLOR_ORANGE;
+    //}
 
-             m_patch_name,
-             INSTRUMENT_RED,
-             volume,
-             pan,
-             reset_osc,
-             m_distortion_threshold,
+    //// clang-format off
+    // swprintf(ss, MAX_STATIC_STRING_SZ,
+    //         WANSI_COLOR_WHITE "%s " "%s" "vol:%.2f pan:%.2f reset:%d
+    //         distortion_threshold:%.2f\n" "o1_wav:" "%s""%s" "%s" "(%d)
+    //         o1_fo:%.2f o1_amp:%.2f e2_o2_int:%.2f\n" "e1_att:%.2f e1_dec:%.2f
+    //         e1_sus_lvl:%.2f e1_rel:%.2f\n" "o2_wav:" "%s" "%s" "%s" "(%d)
+    //         o2_fo:%.2f o2_amp:%.2f mod_pitch_semitones:%d\n" "e2_att:%.2f
+    //         e2_dec:%.2f e2_sus_lvl:%.2f e2_rel:%.2f\n"
+    //         "%s"
+    //         "filter_type:%d freq:%.2f q:%.2f // debug:%s",
 
-             ANSI_COLOR_WHITE,
-             s_synth_waves[m_osc1.osc.m_waveform],
-             INSTRUMENT_RED,
+    //         m_patch_name,
+    //         INSTRUMENT_RED,
+    //         volume,
+    //         pan,
+    //         reset_osc,
+    //         m_distortion_threshold,
 
-             m_osc1.osc.m_waveform, m_osc1.osc.m_osc_fo,
-             osc1_amp, eg2_osc2_intensity,
-             m_eg1.m_attack_time_msec,
-             m_eg1.m_decay_time_msec, m_eg1.m_sustain_level,
-             m_eg1.m_release_time_msec,
+    //         ANSI_COLOR_WHITE,
+    //         s_synth_waves[m_osc1.osc.m_waveform],
+    //         INSTRUMENT_RED,
 
-             ANSI_COLOR_WHITE,
-             s_synth_waves[m_osc2.osc.m_waveform],
-             INSTRUMENT_DEEP_RED,
+    //         m_osc1.osc.m_waveform, m_osc1.osc.m_osc_fo,
+    //         osc1_amp, eg2_osc2_intensity,
+    //         m_eg1.m_attack_time_msec,
+    //         m_eg1.m_decay_time_msec, m_eg1.m_sustain_level,
+    //         m_eg1.m_release_time_msec,
 
-             m_osc2.osc.m_waveform, m_osc2.osc.m_fo, osc2_amp,
-             mod_semitones_range, m_eg2.m_attack_time_msec,
-             m_eg2.m_decay_time_msec, m_eg2.m_sustain_level,
-             m_eg2.m_release_time_msec,
+    //         ANSI_COLOR_WHITE,
+    //         s_synth_waves[m_osc2.osc.m_waveform],
+    //         INSTRUMENT_DEEP_RED,
 
-             INSTRUMENT_RED,
+    //         m_osc2.osc.m_waveform, m_osc2.osc.m_fo, osc2_amp,
+    //         mod_semitones_range, m_eg2.m_attack_time_msec,
+    //         m_eg2.m_decay_time_msec, m_eg2.m_sustain_level,
+    //         m_eg2.m_release_time_msec,
 
-             m_filter_type,
-             m_filter_fc, m_filter_q,
-             debug ? "true" : "false");
-    // clang-format on
+    //         INSTRUMENT_RED,
 
-    wchar_t engine_status_string[MAX_STATIC_STRING_SZ];
-    memset(engine_status_string, 0, MAX_STATIC_STRING_SZ);
-    sequence_engine_status(&engine, engine_status_string);
-    wcscat(ss, engine_status_string);
-    wcscat(ss, WANSI_COLOR_RESET);
+    //         m_filter_type,
+    //         m_filter_fc, m_filter_q,
+    //         debug ? "true" : "false");
+    //// clang-format on
+
+    // wchar_t engine_status_string[MAX_STATIC_STRING_SZ];
+    // memset(engine_status_string, 0, MAX_STATIC_STRING_SZ);
+    // sequence_engine_status(&engine, engine_status_string);
+    // wcscat(ss, engine_status_string);
+    // wcscat(ss, WANSI_COLOR_RESET);
+    return ss.str();
+}
+
+std::string drumsynth::Status()
+{
+    std::stringstream ss;
+    ss << "TODO";
+    return ss.str();
 }
 
 void drumsynth::noteOn(midi_event ev)

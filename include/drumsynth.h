@@ -16,8 +16,12 @@ class drumsynth : public SoundGenerator
     drumsynth();
 
     stereo_val genNext() override;
-    void status(wchar_t *ss) override;
+
+    std::string Info() override;
+    std::string Status() override;
+
     void noteOn(midi_event ev) override;
+
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
 

@@ -121,200 +121,206 @@ std::string MiniSynth::Status()
     return ss.str();
 }
 
-void MiniSynth::status(wchar_t *status_string)
+std::string MiniSynth::Info()
 {
-    if (mixr->debug_mode)
-    {
-        minisynth_print(this);
-    }
+    std::stringstream ss;
 
-    char *INSTRUMENT_YELLOW = (char *)ANSI_COLOR_RESET;
-    char *INSTRUMENT_ORANGE = (char *)ANSI_COLOR_RESET;
-    char *INSTRUMENT_PINK = (char *)ANSI_COLOR_RESET;
-    if (active)
-    {
-        INSTRUMENT_YELLOW = (char *)COOL_COLOR_YELLOW;
-        INSTRUMENT_ORANGE = (char *)COOL_COLOR_ORANGE;
-        INSTRUMENT_PINK = (char *)COOL_COLOR_PINK;
-    }
+    // if (mixr->debug_mode)
+    //{
+    //    minisynth_print(this);
+    //}
 
-    // clang-format off
-    swprintf(
-        status_string, MAX_STATIC_STRING_SZ,
-        WANSI_COLOR_WHITE "%s\n"
-        "%s"
-        "vol:%.1f pan:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) "
-        "mono:%d hard_sync:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
+    // char *INSTRUMENT_YELLOW = (char *)ANSI_COLOR_RESET;
+    // char *INSTRUMENT_ORANGE = (char *)ANSI_COLOR_RESET;
+    // char *INSTRUMENT_PINK = (char *)ANSI_COLOR_RESET;
+    // if (active)
+    //{
+    //    INSTRUMENT_YELLOW = (char *)COOL_COLOR_YELLOW;
+    //    INSTRUMENT_ORANGE = (char *)COOL_COLOR_ORANGE;
+    //    INSTRUMENT_PINK = (char *)COOL_COLOR_PINK;
+    //}
 
-        "osc1:%s(%d) o1amp:%f o1oct:%d o1semi:%d o1cents%d\n"
-        "osc2:%s(%d) o2amp:%f o2oct:%d o2semi:%d o2cents%d\n"
-        "osc3:%s(%d) o3amp:%f o3oct:%d o3semi:%d o3cents%d\n"
-        "osc4:%s(%d) o4amp:%f o4oct:%d o4semi:%d o4cents%d\n"
+    //// clang-format off
+    // swprintf(
+    //    status_string, MAX_STATIC_STRING_SZ,
+    //    WANSI_COLOR_WHITE "%s\n"
+    //    "%s"
+    //    "vol:%.1f pan:%.1f voice:" WANSI_COLOR_WHITE "%ls" "%s" "(%d) "
+    //    "mono:%d hard_sync:%d detune:%.0f legato:%d kt:%d ndscale:%d\n"
 
-        "noisedb:%3.0f octave:%d  pitchrange:%d porta:%.0f  pw:%.0f subosc:%3.0f vascale:%d zero:%d\n"
+    //    "osc1:%s(%d) o1amp:%f o1oct:%d o1semi:%d o1cents%d\n"
+    //    "osc2:%s(%d) o2amp:%f o2oct:%d o2semi:%d o2cents%d\n"
+    //    "osc3:%s(%d) o3amp:%f o3oct:%d o3semi:%d o3cents%d\n"
+    //    "osc4:%s(%d) o4amp:%f o4oct:%d o4semi:%d o4cents%d\n"
 
-        "%s"
-        "l1wave:%s(%d)      l1mode:%s(%d)   l1rate:%05.2f     l1amp:%.1f\n"
-        "l1_filter_en:%d      l1_osc_en:%d      l1_pan_en:%d      l1_amp_en:%d     l1_pw_en:%d\n"
-        "l1_filter_int:%4.1f  l1_osc_int:%4.1f  l1_pan_int:%4.1f  l1_amp_int:%4.1f l1_pw_int:%3.1f\n"
+    //    "noisedb:%3.0f octave:%d  pitchrange:%d porta:%.0f  pw:%.0f
+    //    subosc:%3.0f vascale:%d zero:%d\n"
 
-        "%s"
-        "l2wave:%s(%d)      l2mode:%s(%d)   l2rate:%05.2f     l2amp:%.1f\n"
-        "l2_filter_en:%d      l2_osc_en:%d      l2_pan_en:%d      l2_amp_en:%d     l2_pw_en:%d\n"
-        "l2_filter_int:%4.1f  l2_osc_int:%4.1f  l2_pan_int:%4.1f  l2_amp_int:%4.1f l2_pw_int:%3.1f\n"
+    //    "%s"
+    //    "l1wave:%s(%d)      l1mode:%s(%d)   l1rate:%05.2f     l1amp:%.1f\n"
+    //    "l1_filter_en:%d      l1_osc_en:%d      l1_pan_en:%d      l1_amp_en:%d
+    //    l1_pw_en:%d\n" "l1_filter_int:%4.1f  l1_osc_int:%4.1f l1_pan_int:%4.1f
+    //    l1_amp_int:%4.1f l1_pw_int:%3.1f\n"
 
+    //    "%s"
+    //    "l2wave:%s(%d)      l2mode:%s(%d)   l2rate:%05.2f     l2amp:%.1f\n"
+    //    "l2_filter_en:%d      l2_osc_en:%d      l2_pan_en:%d      l2_amp_en:%d
+    //    l2_pw_en:%d\n" "l2_filter_int:%4.1f  l2_osc_int:%4.1f l2_pan_int:%4.1f
+    //    l2_amp_int:%4.1f l2_pw_int:%3.1f\n"
 
-        "%s"
-        "eg1_filter_en:%d     eg1_osc_en:%d     eg1_dca_en:%d     eg1_sustain:%d\n"
-        "eg1_filter_int:%4.1f eg1_osc_int:%4.1f eg1_dca_int:%4.1f eg1_sustainlvl:%.1f\n"
-        "eg1_attack:%4.0f     eg1_decay:%4.0f   eg1_release:%4.0f\n"
+    //    "%s"
+    //    "eg1_filter_en:%d     eg1_osc_en:%d     eg1_dca_en:%d
+    //    eg1_sustain:%d\n" "eg1_filter_int:%4.1f eg1_osc_int:%4.1f
+    //    eg1_dca_int:%4.1f eg1_sustainlvl:%.1f\n" "eg1_attack:%4.0f
+    //    eg1_decay:%4.0f   eg1_release:%4.0f\n"
 
-        "%s"
-        "eg2_filter_en:%d     eg2_osc_en:%d     eg2_dca_en:%d     eg2_sustain:%d\n"
-        "eg2_filter_int:%4.1f eg2_osc_int:%4.1f eg2_dca_int:%4.1f eg2_sustainlvl:%.1f\n"
-        "eg2_attack:%4.0f     eg2_decay:%4.0f   eg2_release:%4.0f\n"
+    //    "%s"
+    //    "eg2_filter_en:%d     eg2_osc_en:%d     eg2_dca_en:%d
+    //    eg2_sustain:%d\n" "eg2_filter_int:%4.1f eg2_osc_int:%4.1f
+    //    eg2_dca_int:%4.1f eg2_sustainlvl:%.1f\n" "eg2_attack:%4.0f
+    //    eg2_decay:%4.0f   eg2_release:%4.0f\n"
 
-        "%s"
-        "filter:%s(%d)      fc:%7.1f       fq:%4.1f          aux:%0.2f sat:%0.2f"
+    //    "%s"
+    //    "filter:%s(%d)      fc:%7.1f       fq:%4.1f          aux:%0.2f
+    //    sat:%0.2f"
 
-        "%s",
+    //    "%s",
 
-        m_settings.m_settings_name,
-        INSTRUMENT_YELLOW,
-        volume,
-        pan,
-        s_voice_names[m_settings.m_voice_mode],
-        INSTRUMENT_YELLOW,
-        m_settings.m_voice_mode,
+    //    m_settings.m_settings_name,
+    //    INSTRUMENT_YELLOW,
+    //    volume,
+    //    pan,
+    //    s_voice_names[m_settings.m_voice_mode],
+    //    INSTRUMENT_YELLOW,
+    //    m_settings.m_voice_mode,
 
-        m_settings.m_monophonic,
-        m_settings.hard_sync,
-        m_settings.m_detune_cents,
-        m_settings.m_legato_mode,
-        m_settings.m_filter_keytrack,
-        m_settings.m_note_number_to_decay_scaling,
+    //    m_settings.m_monophonic,
+    //    m_settings.hard_sync,
+    //    m_settings.m_detune_cents,
+    //    m_settings.m_legato_mode,
+    //    m_settings.m_filter_keytrack,
+    //    m_settings.m_note_number_to_decay_scaling,
 
-        s_waveform_names[m_global_synth_params.osc1_params.waveform],
-        m_global_synth_params.osc1_params.waveform,
-        m_global_synth_params.osc1_params.amplitude,
-        m_global_synth_params.osc1_params.octave,
-        m_global_synth_params.osc1_params.semitones,
-        m_global_synth_params.osc1_params.cents,
+    //    s_waveform_names[m_global_synth_params.osc1_params.waveform],
+    //    m_global_synth_params.osc1_params.waveform,
+    //    m_global_synth_params.osc1_params.amplitude,
+    //    m_global_synth_params.osc1_params.octave,
+    //    m_global_synth_params.osc1_params.semitones,
+    //    m_global_synth_params.osc1_params.cents,
 
-        s_waveform_names[m_global_synth_params.osc2_params.waveform],
-        m_global_synth_params.osc2_params.waveform,
-        m_global_synth_params.osc2_params.amplitude,
-        m_global_synth_params.osc2_params.octave,
-        m_global_synth_params.osc2_params.semitones,
-        m_global_synth_params.osc2_params.cents,
+    //    s_waveform_names[m_global_synth_params.osc2_params.waveform],
+    //    m_global_synth_params.osc2_params.waveform,
+    //    m_global_synth_params.osc2_params.amplitude,
+    //    m_global_synth_params.osc2_params.octave,
+    //    m_global_synth_params.osc2_params.semitones,
+    //    m_global_synth_params.osc2_params.cents,
 
-        s_waveform_names[m_global_synth_params.osc3_params.waveform],
-        m_global_synth_params.osc3_params.waveform,
-        m_global_synth_params.osc3_params.amplitude,
-        m_global_synth_params.osc3_params.octave,
-        m_global_synth_params.osc3_params.semitones,
-        m_global_synth_params.osc3_params.cents,
+    //    s_waveform_names[m_global_synth_params.osc3_params.waveform],
+    //    m_global_synth_params.osc3_params.waveform,
+    //    m_global_synth_params.osc3_params.amplitude,
+    //    m_global_synth_params.osc3_params.octave,
+    //    m_global_synth_params.osc3_params.semitones,
+    //    m_global_synth_params.osc3_params.cents,
 
-        s_waveform_names[m_global_synth_params.osc4_params.waveform],
-        m_global_synth_params.osc4_params.waveform,
-        m_global_synth_params.osc4_params.amplitude,
-        m_global_synth_params.osc4_params.octave,
-        m_global_synth_params.osc4_params.semitones,
-        m_global_synth_params.osc4_params.cents,
+    //    s_waveform_names[m_global_synth_params.osc4_params.waveform],
+    //    m_global_synth_params.osc4_params.waveform,
+    //    m_global_synth_params.osc4_params.amplitude,
+    //    m_global_synth_params.osc4_params.octave,
+    //    m_global_synth_params.osc4_params.semitones,
+    //    m_global_synth_params.osc4_params.cents,
 
+    //    m_settings.m_noise_osc_db,
+    //    m_settings.m_octave,
+    //    m_settings.m_pitchbend_range,
+    //    m_settings.m_portamento_time_msec,
+    //    m_settings.m_pulse_width_pct,
+    //    m_settings.m_sub_osc_db,
+    //    m_settings.m_velocity_to_attack_scaling,
+    //    m_settings.m_reset_to_zero,
 
-        m_settings.m_noise_osc_db,
-        m_settings.m_octave,
-        m_settings.m_pitchbend_range,
-        m_settings.m_portamento_time_msec,
-        m_settings.m_pulse_width_pct,
-        m_settings.m_sub_osc_db,
-        m_settings.m_velocity_to_attack_scaling,
-        m_settings.m_reset_to_zero,
+    //    // LFO1
+    //    INSTRUMENT_ORANGE,
+    //    s_lfo_wave_names[m_settings.m_lfo1_waveform],
+    //    m_settings.m_lfo1_waveform,
+    //    s_lfo_mode_names[m_settings.m_lfo1_mode],
+    //    m_settings.m_lfo1_mode,
+    //    m_settings.m_lfo1_rate,
+    //    m_settings.m_lfo1_amplitude,
+    //    m_settings.m_lfo1_filter_fc_enabled,
+    //    m_settings.m_lfo1_osc_pitch_enabled,
+    //    m_settings.m_lfo1_pan_enabled,
+    //    m_settings.m_lfo1_amp_enabled,
+    //    m_settings.m_lfo1_pulsewidth_enabled,
+    //    m_settings.m_lfo1_filter_fc_intensity,
+    //    m_settings.m_lfo1_osc_pitch_intensity,
+    //    m_settings.m_lfo1_pan_intensity,
+    //    m_settings.m_lfo1_amp_intensity,
+    //    m_settings.m_lfo1_pulsewidth_intensity,
 
-        // LFO1
-        INSTRUMENT_ORANGE,
-        s_lfo_wave_names[m_settings.m_lfo1_waveform],
-        m_settings.m_lfo1_waveform,
-        s_lfo_mode_names[m_settings.m_lfo1_mode],
-        m_settings.m_lfo1_mode,
-        m_settings.m_lfo1_rate,
-        m_settings.m_lfo1_amplitude,
-        m_settings.m_lfo1_filter_fc_enabled,
-        m_settings.m_lfo1_osc_pitch_enabled,
-        m_settings.m_lfo1_pan_enabled,
-        m_settings.m_lfo1_amp_enabled,
-        m_settings.m_lfo1_pulsewidth_enabled,
-        m_settings.m_lfo1_filter_fc_intensity,
-        m_settings.m_lfo1_osc_pitch_intensity,
-        m_settings.m_lfo1_pan_intensity,
-        m_settings.m_lfo1_amp_intensity,
-        m_settings.m_lfo1_pulsewidth_intensity,
+    //    // LFO2
+    //    INSTRUMENT_PINK,
+    //    s_lfo_wave_names[m_settings.m_lfo2_waveform],
+    //    m_settings.m_lfo2_waveform,
+    //    s_lfo_mode_names[m_settings.m_lfo2_mode],
+    //    m_settings.m_lfo2_mode,
+    //    m_settings.m_lfo2_rate,
+    //    m_settings.m_lfo2_amplitude,
+    //    m_settings.m_lfo2_filter_fc_enabled,
+    //    m_settings.m_lfo2_osc_pitch_enabled,
+    //    m_settings.m_lfo2_pan_enabled,
+    //    m_settings.m_lfo2_amp_enabled,
+    //    m_settings.m_lfo2_pulsewidth_enabled,
+    //    m_settings.m_lfo2_filter_fc_intensity,
+    //    m_settings.m_lfo2_osc_pitch_intensity,
+    //    m_settings.m_lfo2_pan_intensity,
+    //    m_settings.m_lfo2_amp_intensity,
+    //    m_settings.m_lfo2_pulsewidth_intensity,
 
-        // LFO2
-        INSTRUMENT_PINK,
-        s_lfo_wave_names[m_settings.m_lfo2_waveform],
-        m_settings.m_lfo2_waveform,
-        s_lfo_mode_names[m_settings.m_lfo2_mode],
-        m_settings.m_lfo2_mode,
-        m_settings.m_lfo2_rate,
-        m_settings.m_lfo2_amplitude,
-        m_settings.m_lfo2_filter_fc_enabled,
-        m_settings.m_lfo2_osc_pitch_enabled,
-        m_settings.m_lfo2_pan_enabled,
-        m_settings.m_lfo2_amp_enabled,
-        m_settings.m_lfo2_pulsewidth_enabled,
-        m_settings.m_lfo2_filter_fc_intensity,
-        m_settings.m_lfo2_osc_pitch_intensity,
-        m_settings.m_lfo2_pan_intensity,
-        m_settings.m_lfo2_amp_intensity,
-        m_settings.m_lfo2_pulsewidth_intensity,
+    //    // EG1
+    //    INSTRUMENT_ORANGE,
+    //    m_settings.m_eg1_filter_enabled,
+    //    m_settings.m_eg1_osc_enabled,
+    //    m_settings.m_eg1_dca_enabled,
+    //    m_settings.m_eg1_sustain_override,
+    //    m_settings.m_eg1_filter_intensity,
+    //    m_settings.m_eg1_osc_intensity,
+    //    m_settings.m_eg1_dca_intensity,
+    //    m_settings.m_eg1_sustain_level,
+    //    m_settings.m_eg1_attack_time_msec,
+    //    m_settings.m_eg1_decay_time_msec,
+    //    m_settings.m_eg1_release_time_msec,
 
-        // EG1
-        INSTRUMENT_ORANGE,
-        m_settings.m_eg1_filter_enabled,
-        m_settings.m_eg1_osc_enabled,
-        m_settings.m_eg1_dca_enabled,
-        m_settings.m_eg1_sustain_override,
-        m_settings.m_eg1_filter_intensity,
-        m_settings.m_eg1_osc_intensity,
-        m_settings.m_eg1_dca_intensity,
-        m_settings.m_eg1_sustain_level,
-        m_settings.m_eg1_attack_time_msec,
-        m_settings.m_eg1_decay_time_msec,
-        m_settings.m_eg1_release_time_msec,
+    //    // EG2
+    //    INSTRUMENT_PINK,
+    //    m_settings.m_eg2_filter_enabled,
+    //    m_settings.m_eg2_osc_enabled,
+    //    m_settings.m_eg2_dca_enabled,
+    //    m_settings.m_eg2_sustain_override,
+    //    m_settings.m_eg2_filter_intensity,
+    //    m_settings.m_eg2_osc_intensity,
+    //    m_settings.m_eg2_dca_intensity,
+    //    m_settings.m_eg2_sustain_level,
+    //    m_settings.m_eg2_attack_time_msec,
+    //    m_settings.m_eg2_decay_time_msec,
+    //    m_settings.m_eg2_release_time_msec,
 
-        // EG2
-        INSTRUMENT_PINK,
-        m_settings.m_eg2_filter_enabled,
-        m_settings.m_eg2_osc_enabled,
-        m_settings.m_eg2_dca_enabled,
-        m_settings.m_eg2_sustain_override,
-        m_settings.m_eg2_filter_intensity,
-        m_settings.m_eg2_osc_intensity,
-        m_settings.m_eg2_dca_intensity,
-        m_settings.m_eg2_sustain_level,
-        m_settings.m_eg2_attack_time_msec,
-        m_settings.m_eg2_decay_time_msec,
-        m_settings.m_eg2_release_time_msec,
+    //    // FILTER1
+    //    INSTRUMENT_ORANGE,
+    //    s_filter_type_names[m_settings.m_filter_type],
+    //    m_settings.m_filter_type,
+    //    m_settings.m_fc_control,
+    //    m_settings.m_q_control,
+    //    m_settings.m_q_control, //TODO
+    //    m_settings.m_filter_saturation,
 
+    //    INSTRUMENT_YELLOW
+    //    );
+    //// clang-format on
 
-        // FILTER1
-        INSTRUMENT_ORANGE,
-        s_filter_type_names[m_settings.m_filter_type],
-        m_settings.m_filter_type,
-        m_settings.m_fc_control,
-        m_settings.m_q_control,
-        m_settings.m_q_control, //TODO
-        m_settings.m_filter_saturation,
-
-        INSTRUMENT_YELLOW
-        );
-    // clang-format on
-
-    wchar_t scratch[1024] = {};
-    sequence_engine_status(&engine, scratch);
-    wcscat(status_string, scratch);
+    // wchar_t scratch[1024] = {};
+    // sequence_engine_status(&engine, scratch);
+    // wcscat(status_string, scratch);
+    return ss.str();
 }
 void MiniSynth::start()
 {

@@ -3,8 +3,8 @@
 #include <stdbool.h>
 #include <wchar.h>
 
-#include "soundgenerator.h"
 #include "digisynth_voice.h"
+#include "soundgenerator.h"
 
 class digisynth : public SoundGenerator
 {
@@ -12,7 +12,8 @@ class digisynth : public SoundGenerator
     digisynth(char *filename);
     ~digisynth() {}
     stereo_val genNext() override;
-    void status(wchar_t *wstring) override;
+    std::string Info() override;
+    std::string Status() override;
     void start() override;
     void stop() override;
     void noteOn(midi_event ev) override;

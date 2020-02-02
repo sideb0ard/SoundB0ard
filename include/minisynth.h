@@ -171,7 +171,7 @@ class MiniSynth : public SoundGenerator
     MiniSynth();
     ~MiniSynth();
     stereo_val genNext() override;
-    void status(wchar_t *status_string) override;
+    std::string Info() override;
     std::string Status() override;
     void start() override;
     void stop() override;

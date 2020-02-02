@@ -335,52 +335,53 @@ std::string looper::Status()
        << ANSI_COLOR_RESET;
     return ss.str();
 }
-void looper::status(wchar_t *status_string)
+std::string looper::Info()
 {
     char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
     if (active)
         INSTRUMENT_COLOR = (char *)ANSI_COLOR_RED;
 
-    swprintf(
-        status_string, MAX_STATIC_STRING_SZ,
-        WANSI_COLOR_WHITE
-        // clang-format off
-        "source:%s %s\n"
-        "vol:%.2lf pan:%.2lf pitch:%.2f stereo:%d mode:%s\n"
-        "gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
-        "len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
-        "xsrc:%d rec:%d widx:%d xmode:%s(%d) degrade:%d\n "
-        "grain_dur_ms:" "%s" "%d" "%s "
-        "grains_per_sec:" "%s" "%d" "%s "
-        "density_dur_sync:%d "
-        "quasi_grain_fudge:%d\n"
-        "fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
+    std::stringstream ss;
+    ss << WANSI_COLOR_WHITE "source:" << filename << INSTRUMENT_COLOR
+       << "vol:" << volume << " pan:" << pan << " pitch:" << grain_pitch
+       << " stereo:" << (num_channels > 1 ? "true" : "false")
+       << " mode:" << s_loop_mode_names[loop_mode] << "\n";
 
-        "[" "%s" "Envelope Generator" "%s" "]\n"
-        "eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
-        // clang-format on
+    //        %d mode:%s\n"
+    //"gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
+    //"len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
+    //"xsrc:%d rec:%d widx:%d xmode:%s(%d) degrade:%d\n "
+    //"grain_dur_ms:" "%s" "%d" "%s "
+    //"grains_per_sec:" "%s" "%d" "%s "
+    //"density_dur_sync:%d "
+    //"quasi_grain_fudge:%d\n"
+    //"fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
 
-        filename, INSTRUMENT_COLOR, volume, pan, grain_pitch,
-        num_channels > 1 ? 1 : 0, s_loop_mode_names[loop_mode], gate_mode,
-        audio_buffer_read_idx, audio_buffer_len, grain_attack_time_pct,
-        grain_release_time_pct, loop_len, scramble_mode, stutter_mode,
-        step_mode, reverse_mode, external_source_sg, recording,
-        audio_buffer_write_idx, s_external_mode_names[external_source_mode],
-        external_source_mode, degrade_by,
+    //"[" "%s" "Envelope Generator" "%s" "]\n"
+    //"eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
+    //// clang-format on
 
-        ANSI_COLOR_WHITE, grain_duration_ms, INSTRUMENT_COLOR, ANSI_COLOR_WHITE,
-        grains_per_sec, INSTRUMENT_COLOR, density_duration_sync,
-        quasi_grain_fudge, fill_factor, granular_spray_frames / 44.1,
-        selection_mode, s_env_names[envelope_mode],
+    // num_channels > 1 ? 1 : 0, s_loop_mode_names[loop_mode], gate_mode,
+    // audio_buffer_read_idx, audio_buffer_len, grain_attack_time_pct,
+    // grain_release_time_pct, loop_len, scramble_mode, stutter_mode,
+    // step_mode, reverse_mode, external_source_sg, recording,
+    // audio_buffer_write_idx, s_external_mode_names[external_source_mode],
+    // external_source_mode, degrade_by,
 
-        ANSI_COLOR_WHITE, INSTRUMENT_COLOR, m_eg1.m_attack_time_msec,
-        m_eg1.m_release_time_msec, m_eg1.m_state);
+    // ANSI_COLOR_WHITE, grain_duration_ms, INSTRUMENT_COLOR, ANSI_COLOR_WHITE,
+    // grains_per_sec, INSTRUMENT_COLOR, density_duration_sync,
+    // quasi_grain_fudge, fill_factor, granular_spray_frames / 44.1,
+    // selection_mode, s_env_names[envelope_mode],
 
-    wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
-    sequence_engine_status(&engine, local_status_string);
-    wcscat(status_string, local_status_string);
+    // ANSI_COLOR_WHITE, INSTRUMENT_COLOR, m_eg1.m_attack_time_msec,
+    // m_eg1.m_release_time_msec, m_eg1.m_state);
 
-    wcscat(status_string, WANSI_COLOR_RESET);
+    return ss.str();
+    // wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
+    // sequence_engine_status(&engine, local_status_string);
+    // wcscat(status_string, local_status_string);
+
+    // wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void looper::start()
