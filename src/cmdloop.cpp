@@ -30,11 +30,6 @@
 #include <value_generator_cmds.h>
 
 extern mixer *mixr;
-extern std::mutex g_stdout_mutex;
-
-using Wrapper =
-    std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
-Tsqueue<Wrapper> g_queue;
 
 extern char *key_names[NUM_KEYS];
 
@@ -80,7 +75,6 @@ void readline_cb(char *line)
     if (NULL == line)
         exxit();
 
-    // const std::lock_guard<std::mutex> lock(g_stdout_mutex);
     if (strlen(line) != 0)
     {
         int cur_len = strlen(current_line);
@@ -195,7 +189,6 @@ int exxit()
     write_history(NULL);
 
     pa_teardown();
-    g_queue.close();
 
     exit(0);
 }

@@ -252,7 +252,10 @@ void Process::EventNotify(mixer_timing_info tinfo)
     }
 
     if (tinfo.is_start_of_loop)
+    {
+        // std::cout << "PROC LOOP COUNTER:" << loop_counter_ << std::endl;
         ++loop_counter_;
+    }
 }
 
 void Process::EvalPattern(

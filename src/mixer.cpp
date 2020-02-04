@@ -28,10 +28,12 @@
 #include <mixer.h>
 #include <sbmsg.h>
 #include <soundgenerator.h>
+#include <tsqueue.hpp>
 #include <utils.h>
 
 mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
+extern Tsqueue<mixer_timing_info> g_event_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -306,25 +308,7 @@ void mixer_ps(mixer *mixr, bool all)
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
-    if (mixr->proc_initialized_)
-    {
-        for (auto p : mixr->processes_)
-        {
-            if (p->active_)
-            {
-                if (event.type != TIME_MIDI_TICK)
-                    std::cout << "SUMTJING E:LSE!:" << event.type << std::endl;
-                p->EventNotify(mixr->timing_info);
-            }
-        }
-    }
-
-    for (int i = 0; i < mixr->pattern_gen_num; ++i)
-    {
-        pattern_generator *pg = mixr->pattern_generators[i];
-        if (pg != NULL)
-            pg->event_notify(pg, event);
-    }
+    g_event_queue.push(mixr->timing_info);
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {

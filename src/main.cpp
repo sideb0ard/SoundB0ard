@@ -21,9 +21,7 @@
 
 extern mixer *mixr;
 
-using Wrapper =
-    std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
-extern Tsqueue<Wrapper> g_queue;
+Tsqueue<mixer_timing_info> g_event_queue;
 
 extern const wchar_t *sparkchars;
 extern const char *key_names[NUM_KEYS];
@@ -47,6 +45,25 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     int ret = mixer_gennext(mixr, out, frames_per_buffer);
 
     return ret;
+}
+
+void *process_worker_thread(void *)
+{
+    while (auto const timing_info = g_event_queue.pop())
+    {
+        if (timing_info)
+        {
+            if (mixr->proc_initialized_)
+            {
+                for (auto p : mixr->processes_)
+                {
+                    if (p->active_)
+                        p->EventNotify(*timing_info);
+                }
+            }
+        }
+    }
+    return nullptr;
 }
 
 int main()
@@ -89,7 +106,16 @@ int main()
         fprintf(stderr, "Errrr, wit tha Loopy..\n");
     }
 
+    // Worker Loop
+    pthread_t worker_th;
+    if (pthread_create(&worker_th, NULL, process_worker_thread, NULL))
+    {
+        fprintf(stderr, "Errrr, wit tha Wurker..\n");
+    }
+
     pthread_join(input_th, NULL);
+    g_event_queue.close();
+    pthread_join(worker_th, NULL);
 
     // all done, time to go home
     pa_teardown();
