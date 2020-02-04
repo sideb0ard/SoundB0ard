@@ -53,6 +53,7 @@ dxsynth::dxsynth()
 
     m_last_note_frequency = -1.0;
 
+    Load("RAVER");
     active = true;
     printf("BOOM!\n");
 }
