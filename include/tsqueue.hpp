@@ -32,10 +32,7 @@ template <typename T> void Tsqueue<T>::push(T &&t)
 {
     std::unique_lock<std::mutex> lck(mutex_);
     while (queue_.size() == max_size_ && !end_)
-    {
-        std::cout << "WAItING for lock in PUSH\n";
         cv_full_.wait(lck);
-    }
     assert(!end_);
     queue_.push(std::move(t));
     cv_empty_.notify_one();
@@ -45,10 +42,7 @@ template <typename T> void Tsqueue<T>::push(T const &t)
 {
     std::unique_lock<std::mutex> lck(mutex_);
     while (queue_.size() == max_size_ && !end_)
-    {
-        std::cout << "WAItING for lock in POP\n";
         cv_full_.wait(lck);
-    }
     assert(!end_);
     queue_.push(std::move(t));
     cv_empty_.notify_one();

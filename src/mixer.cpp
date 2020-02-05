@@ -17,6 +17,7 @@
 #include <drumsynth.h>
 #include <dxsynth.h>
 #include <euclidean.h>
+#include <event_queue.h>
 #include <fx/envelope.h>
 #include <fx/fx.h>
 #include <intdiv.h>
@@ -33,7 +34,7 @@
 
 mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
-extern Tsqueue<mixer_timing_info> g_event_queue;
+extern Tsqueue<event_queue_item> g_event_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -203,8 +204,9 @@ void mixer_status_procz(mixer *mixr, bool all)
 }
 void mixer_status_env(mixer *mixr)
 {
-    printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "Env" COOL_COLOR_GREEN
-                            "]\n");
+    std::cout << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Env"
+              << COOL_COLOR_GREEN << "]" << std::endl;
+
     global_env->Debug();
 
     std::unordered_map<std::string, int> soundgens =
@@ -308,7 +310,10 @@ void mixer_ps(mixer *mixr, bool all)
 
 void mixer_emit_event(mixer *mixr, broadcast_event event)
 {
-    g_event_queue.push(mixr->timing_info);
+    event_queue_item ev;
+    ev.type = Event::TIMING_EVENT;
+    ev.timing_info = mixr->timing_info;
+    g_event_queue.push(ev);
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
@@ -390,39 +395,6 @@ int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
     sg->mixer_idx = mixr->soundgen_num;
     mixr->SoundGenerators[mixr->soundgen_num] = sg;
     return mixr->soundgen_num++;
-}
-
-void mixer_update_process(mixer *mixr, int process_id, ProcessType process_type,
-                          ProcessTimerType timer_type, float loop_len,
-                          std::string command, ProcessPatternTarget target_type,
-                          std::vector<std::string> targets, std::string pattern,
-                          std::vector<std::shared_ptr<PatternFunction>> funcz)
-{
-    if (process_id >= 0 && process_id < MAX_NUM_PROC)
-    {
-        mixr->processes_[process_id]->Update(process_type, timer_type, loop_len,
-                                             command, target_type, targets,
-                                             pattern, funcz);
-    }
-    else
-    {
-        std::cerr << "WAH! INVALID process id: " << process_id << std::endl;
-    }
-}
-
-void mixer_process_append_function(mixer *mixr, int process_id,
-                                   std::shared_ptr<PatternFunction> func)
-{
-    if (process_id >= 0 && process_id < MAX_NUM_PROC)
-    {
-        std::cout << "Appending a FUNC TO a PrOCESS, yo! ID:" << process_id
-                  << " " << func->String() << std::endl;
-        mixr->processes_[process_id]->AppendPatternFunction(func);
-    }
-    else
-    {
-        std::cerr << "WAH! INVALID process id: " << process_id << std::endl;
-    }
 }
 
 int add_minisynth(mixer *mixr)

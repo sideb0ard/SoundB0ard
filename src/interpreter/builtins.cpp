@@ -297,7 +297,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       int args_size = args.size();
                       if (args_size >= 2)
                       {
-                          std::cout << "BOOM, ADDING FX!\n";
                           interpreter_sound_cmds::ParseFXCmd(args);
                       }
                       return evaluator::NULLL;
@@ -308,7 +307,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                            int args_size = args.size();
                            if (args_size >= 2)
                            {
-                               std::cout << "BOOM, SYNTHZZZ CMD!\n";
                                auto cmd_name =
                                    std::make_shared<object::String>("load");
                                args.push_back(cmd_name);
@@ -322,7 +320,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                            int args_size = args.size();
                            if (args_size >= 2)
                            {
-                               std::cout << "BOOM, SYNTHZZZ CMD!\n";
                                auto cmd_name =
                                    std::make_shared<object::String>("save");
                                args.push_back(cmd_name);

@@ -2,6 +2,7 @@
 
 #include <stdbool.h>
 #include <string>
+#include <vector>
 
 #define SAMPLE_RATE (44100)
 #define FRAMES_PER_BUFFER (64)

@@ -161,14 +161,6 @@ void mixer_emit_event(mixer *mixr, broadcast_event event);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
 void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
 
-void mixer_update_process(mixer *mixr, int process_id, ProcessType process_type,
-                          ProcessTimerType timer_type, float loop_len,
-                          std::string command, ProcessPatternTarget target_type,
-                          std::vector<std::string> targets, std::string pattern,
-                          std::vector<std::shared_ptr<PatternFunction>> funcz);
-
-void mixer_process_append_function(mixer *mixr, int process_id,
-                                   std::shared_ptr<PatternFunction> func);
 void mixer_preview_audio(mixer *mixr, char *filename);
 
 int mixer_print_timing_info(mixer *mixr);

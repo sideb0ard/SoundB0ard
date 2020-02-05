@@ -18,6 +18,7 @@
 #include <pattern_parser/tokenizer.hpp>
 
 extern mixer *mixr;
+extern Tsqueue<std::string> g_command_queue;
 
 namespace
 {
@@ -36,11 +37,6 @@ std::string ReplaceString(std::string subject, const std::string &search,
 
 } // namespace
 
-using Wrapper =
-    std::pair<std::shared_ptr<ast::Node>, std::shared_ptr<object::Environment>>;
-extern Tsqueue<Wrapper> g_queue;
-extern std::shared_ptr<object::Environment> global_env;
-
 constexpr char const *s_proc_timer_types[] = {"UNDEFINED", "every", "osc",
                                               "over", "ramp"};
 
@@ -48,7 +44,10 @@ void Process::ParsePattern()
 {
     auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern_);
     auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
-    pattern_root_ = pattern_parzer->ParsePattern();
+    auto new_pattern_root = pattern_parzer->ParsePattern();
+    // try lock
+    pattern_root_ = new_pattern_root;
+    // unlock
 }
 
 void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
@@ -116,7 +115,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             std::string("noteOn(") + e->value_ + "," +
                             /*velocity + hold_time_ms **/ "127, 250)";
 
-                        Interpret(cmd.data(), global_env);
+                        g_command_queue.push(cmd);
                     }
                 }
                 else if (target_type_ == ProcessPatternTarget::VALUES)
@@ -130,7 +129,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             std::string cmd = std::string("noteOn(") + t + "," +
                                               e->value_ + ", 127, 250)";
 
-                            Interpret(cmd.data(), global_env);
+                            g_command_queue.push(cmd);
                         }
                     }
                 }
@@ -167,7 +166,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             std::string new_cmd =
                                 ReplaceString(command_, "%", events[0]->value_);
 
-                            Interpret(new_cmd.data(), global_env);
+                            g_command_queue.push(new_cmd);
                         }
                     }
                 }
@@ -203,7 +202,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     std::string new_cmd = ReplaceString(
                         command_, "%", std::to_string(scaled_val));
 
-                    Interpret(new_cmd.data(), global_env);
+                    g_command_queue.push(new_cmd);
                 }
             }
             else if (timer_type_ == ProcessTimerType::OVER)
@@ -223,7 +222,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     std::string new_cmd = ReplaceString(
                         command_, "%", std::to_string(scaled_val));
 
-                    Interpret(new_cmd.data(), global_env);
+                    g_command_queue.push(new_cmd);
                 }
             }
             else if (timer_type_ == ProcessTimerType::RAMP)
@@ -245,7 +244,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     std::string new_cmd = ReplaceString(
                         command_, "%", std::to_string(scaled_val));
 
-                    Interpret(new_cmd.data(), global_env);
+                    g_command_queue.push(new_cmd);
                 }
             }
         }

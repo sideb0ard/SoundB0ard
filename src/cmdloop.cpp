@@ -11,11 +11,6 @@
 
 #include <algo_cmds.h>
 #include <cmdloop.h>
-#include <interpreter/evaluator.hpp>
-#include <interpreter/lexer.hpp>
-#include <interpreter/object.hpp>
-#include <interpreter/parser.hpp>
-#include <interpreter/token.hpp>
 #include <looper_cmds.h>
 #include <midi_cmds.h>
 #include <mixer.h>
@@ -30,6 +25,7 @@
 #include <value_generator_cmds.h>
 
 extern mixer *mixr;
+extern Tsqueue<std::string> g_command_queue;
 
 extern char *key_names[NUM_KEYS];
 
@@ -43,8 +39,6 @@ char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 char const *OSC_LISTEN_PORT = "7771";
 static char last_line[MAXLINE] = {};
 static char current_line[MAXLINE] = {};
-
-auto global_env = std::make_shared<object::Environment>();
 
 namespace
 {
@@ -90,7 +84,7 @@ void readline_cb(char *line)
                     strncpy(last_line, current_line, MAXLINE);
                 }
 
-                Interpret(current_line, global_env);
+                g_command_queue.push(current_line);
                 memset(current_line, 0, MAXLINE);
             }
         }
@@ -161,25 +155,6 @@ void *loopy(void *arg)
         printf("Error, liblo -- fd <= zero\n");
 
     return NULL;
-}
-
-void Interpret(char *line, std::shared_ptr<object::Environment> env)
-{
-    auto lex = std::make_shared<lexer::Lexer>();
-    lex->ReadInput(line);
-    auto parsley = std::make_unique<parser::Parser>(lex);
-
-    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
-
-    auto evaluated = evaluator::Eval(program, env);
-    if (evaluated)
-    {
-        auto result = evaluated->Inspect();
-        if (result.compare("null") != 0)
-        {
-            std::cout << result << std::endl;
-        }
-    }
 }
 
 int exxit()

@@ -16,19 +16,26 @@
 #include "mixer.h"
 
 #include <interpreter/evaluator.hpp>
+#include <interpreter/lexer.hpp>
 #include <interpreter/object.hpp>
+#include <interpreter/parser.hpp>
+#include <interpreter/token.hpp>
+
+#include <event_queue.h>
 #include <tsqueue.hpp>
 
 extern mixer *mixr;
 
-Tsqueue<mixer_timing_info> g_event_queue;
+// Tsqueue<mixer_timing_info> g_event_queue;
+Tsqueue<event_queue_item> g_event_queue;
+Tsqueue<std::string> g_command_queue;
+
+auto global_env = std::make_shared<object::Environment>();
 
 extern const wchar_t *sparkchars;
 extern const char *key_names[NUM_KEYS];
 extern const char *prompt;
 extern char *chord_type_names[NUM_CHORD_TYPES];
-
-std::mutex g_stdout_mutex;
 
 static int paCallback(const void *input_buffer, void *output_buffer,
                       unsigned long frames_per_buffer,
@@ -47,18 +54,71 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     return ret;
 }
 
+void Interpret(char *line, std::shared_ptr<object::Environment> env)
+{
+    auto lex = std::make_shared<lexer::Lexer>();
+    lex->ReadInput(line);
+    auto parsley = std::make_unique<parser::Parser>(lex);
+
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+
+    auto evaluated = evaluator::Eval(program, env);
+    if (evaluated)
+    {
+        auto result = evaluated->Inspect();
+        if (result.compare("null") != 0)
+        {
+            std::cout << result << std::endl;
+        }
+    }
+}
+
+void *command_queue_thread(void *)
+{
+    while (auto cmd = g_command_queue.pop())
+    {
+        if (cmd)
+        {
+            Interpret(cmd->data(), global_env);
+        }
+    }
+    return nullptr;
+}
+
 void *process_worker_thread(void *)
 {
-    while (auto const timing_info = g_event_queue.pop())
+    // while (auto const timing_info = g_event_queue.pop())
+    while (auto const event = g_event_queue.pop())
     {
-        if (timing_info)
+        if (event)
         {
-            if (mixr->proc_initialized_)
+            if (event->type == Event::TIMING_EVENT)
             {
-                for (auto p : mixr->processes_)
+                auto timing_info = event->timing_info;
+
+                if (mixr->proc_initialized_)
                 {
-                    if (p->active_)
-                        p->EventNotify(*timing_info);
+                    for (auto p : mixr->processes_)
+                    {
+                        if (p->active_)
+                            p->EventNotify(timing_info);
+                    }
+                }
+            }
+            else if (event->type == Event::PROCESS_UPDATE_EVENT)
+            {
+                if (event->target_process_id >= 0 &&
+                    event->target_process_id < MAX_NUM_PROC)
+                {
+                    mixr->processes_[event->target_process_id]->Update(
+                        event->process_type, event->timer_type, event->loop_len,
+                        event->command, event->target_type, event->targets,
+                        event->pattern, event->funcz);
+                }
+                else
+                {
+                    std::cerr << "WAH! INVALID process id: "
+                              << event->target_process_id << std::endl;
                 }
             }
         }
@@ -99,7 +159,7 @@ int main()
         exit(-1);
     }
 
-    // Command Loop
+    // Input Loop
     pthread_t input_th;
     if (pthread_create(&input_th, NULL, loopy, NULL))
     {
@@ -113,9 +173,22 @@ int main()
         fprintf(stderr, "Errrr, wit tha Wurker..\n");
     }
 
+    // COmmand Loop
+    pthread_t command_th;
+    if (pthread_create(&command_th, NULL, command_queue_thread, NULL))
+    {
+        fprintf(stderr, "Errrr, wit tha Wurker..\n");
+    }
+
+    //////////////// shutdown
+
     pthread_join(input_th, NULL);
+
     g_event_queue.close();
     pthread_join(worker_th, NULL);
+
+    g_command_queue.close();
+    pthread_join(command_th, NULL);
 
     // all done, time to go home
     pa_teardown();

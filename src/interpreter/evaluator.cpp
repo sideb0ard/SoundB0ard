@@ -9,12 +9,15 @@
 
 #include <utils.h>
 
+#include <event_queue.h>
 #include <interpreter/ast.hpp>
 #include <interpreter/builtins.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/object.hpp>
+#include <tsqueue.hpp>
 
 extern mixer *mixr;
+extern Tsqueue<event_queue_item> g_event_queue;
 
 namespace
 {
@@ -977,10 +980,18 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
                 process_funcz.push_back(funcy);
         }
 
-        mixer_update_process(mixr, proc->mixer_process_id_, proc->process_type_,
-                             proc->process_timer_type_, proc->loop_len_,
-                             proc->command_, proc->target_type_, proc->targets_,
-                             pattern->value_, process_funcz);
+        event_queue_item ev;
+        ev.type = Event::PROCESS_UPDATE_EVENT;
+        ev.target_process_id = proc->mixer_process_id_;
+        ev.process_type = proc->process_type_;
+        ev.timer_type = proc->process_timer_type_;
+        ev.loop_len = proc->loop_len_;
+        ev.command = proc->command_;
+        ev.target_type = proc->target_type_;
+        ev.targets = proc->targets_;
+        ev.pattern = pattern->value_;
+        ev.funcz = process_funcz;
+        g_event_queue.push(ev);
     }
     else
         std::cout << "Nae PATTERMN!!\n";
