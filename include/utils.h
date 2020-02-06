@@ -9,11 +9,6 @@
 void get_full_filename(char *basename, char *destination_fullname);
 
 audio_buffer_details import_file_contents(double **buffer, char *filename);
-void thrunner(SBMSG *msg);
-void *fadeup_runrrr(void *arg);
-void *fadedown_runrrr(void *arg);
-void *duck_runrrr(void *arg);
-void faderrr(int sig_num, unsigned int d);
 float freqval(char *n);
 int notelookup(char *n);
 int input_key_to_char_note(int ch, int octave, char *keytext);

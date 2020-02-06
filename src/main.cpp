@@ -1,10 +1,10 @@
-#include <pthread.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/event.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <thread>
 
 #include <iostream>
 
@@ -73,7 +73,7 @@ void Interpret(char *line, std::shared_ptr<object::Environment> env)
     }
 }
 
-void *command_queue_thread(void *)
+void *command_queue_thread()
 {
     while (auto cmd = g_command_queue.pop())
     {
@@ -85,7 +85,7 @@ void *command_queue_thread(void *)
     return nullptr;
 }
 
-void *process_worker_thread(void *)
+void *process_worker_thread()
 {
     // while (auto const timing_info = g_event_queue.pop())
     while (auto const event = g_event_queue.pop())
@@ -159,36 +159,21 @@ int main()
         exit(-1);
     }
 
-    // Input Loop
-    pthread_t input_th;
-    if (pthread_create(&input_th, NULL, loopy, NULL))
-    {
-        fprintf(stderr, "Errrr, wit tha Loopy..\n");
-    }
+    std::thread input_thread(loopy);
 
-    // Worker Loop
-    pthread_t worker_th;
-    if (pthread_create(&worker_th, NULL, process_worker_thread, NULL))
-    {
-        fprintf(stderr, "Errrr, wit tha Wurker..\n");
-    }
+    std::thread worker_thread(process_worker_thread);
 
-    // COmmand Loop
-    pthread_t command_th;
-    if (pthread_create(&command_th, NULL, command_queue_thread, NULL))
-    {
-        fprintf(stderr, "Errrr, wit tha Wurker..\n");
-    }
+    std::thread command_thread(command_queue_thread);
 
     //////////////// shutdown
 
-    pthread_join(input_th, NULL);
+    input_thread.join();
 
     g_event_queue.close();
-    pthread_join(worker_th, NULL);
+    worker_thread.join();
 
     g_command_queue.close();
-    pthread_join(command_th, NULL);
+    command_thread.join();
 
     // all done, time to go home
     pa_teardown();

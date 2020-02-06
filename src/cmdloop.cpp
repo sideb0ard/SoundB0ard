@@ -93,10 +93,8 @@ void readline_cb(char *line)
 
 } // namespace
 
-void *loopy(void *arg)
+void *loopy()
 {
-    (void)arg;
-
     print_logo();
 
     read_history(NULL);

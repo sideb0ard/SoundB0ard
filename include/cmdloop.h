@@ -2,7 +2,6 @@
 
 #include <stdbool.h>
 
-#include <interpreter/object.hpp>
 #include <memory>
 
 #include <lo/lo.h>
@@ -12,10 +11,7 @@
 #include "dxsynth.h"
 #include "minisynth.h"
 
-void *loopy(void *arg);
-// void interpret(char *line);
-
-void Interpret(char *line, std::shared_ptr<object::Environment> env);
+void *loopy();
 
 int stacksize(void);
 

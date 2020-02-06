@@ -1,7 +1,6 @@
 #include <ctype.h>
 #include <dirent.h>
 #include <math.h>
-#include <pthread.h>
 #include <regex.h>
 #include <sndfile.h>
 #include <stdio.h>
@@ -35,32 +34,6 @@ const double blep_table_center = 4096 / 2.0 - 1;
 
 #define EXTRACT_BITS(the_val, bits_start, bits_len)                            \
     ((the_val >> (bits_start - 1)) & ((1 << bits_len) - 1))
-
-void *fadeup_runrrr(void *arg)
-{
-    SBMSG *msg = (SBMSG *)arg;
-    faderrr(msg->sound_gen_num, UP);
-
-    return NULL;
-}
-void *fadedown_runrrr(void *arg)
-{
-    SBMSG *msg = (SBMSG *)arg;
-    faderrr(msg->sound_gen_num, DOWN);
-
-    return NULL;
-}
-
-void *duck_runrrr(void *arg)
-{
-    SBMSG *msg = (SBMSG *)arg;
-    printf("Duckin' %d\n", msg->sound_gen_num);
-    faderrr(msg->sound_gen_num, DOWN);
-    sleep(rand() % 15);
-    faderrr(msg->sound_gen_num, UP);
-
-    return NULL;
-}
 
 audio_buffer_details import_file_contents(double **buffer, char *filename)
 {
@@ -108,68 +81,6 @@ audio_buffer_details import_file_contents(double **buffer, char *filename)
     deetz.num_channels = sf_info.channels;
 
     return deetz;
-}
-
-void thrunner(SBMSG *msg)
-{
-    // need to ensure and free(msg) in all subtasks from here
-    printf("Got CMD: %s\n", msg->cmd);
-    pthread_t pthrrrd;
-    if (strcmp(msg->cmd, "fadeuprrr") == 0)
-    {
-        if (pthread_create(&pthrrrd, NULL, fadeup_runrrr, msg))
-        {
-            fprintf(stderr, "Err, running phrrread..\n");
-            return;
-        }
-    }
-    else if (strcmp(msg->cmd, "fadedownrrr") == 0)
-    {
-        if (pthread_create(&pthrrrd, NULL, fadedown_runrrr, msg))
-        {
-            fprintf(stderr, "Err, running phrrread..\n");
-            return;
-        }
-    }
-    else if (strcmp(msg->cmd, "duckrrr") == 0)
-    {
-        if (pthread_create(&pthrrrd, NULL, duck_runrrr, msg))
-        {
-            fprintf(stderr, "Err, running phrrread..\n");
-            return;
-        }
-    }
-}
-
-void faderrr(int sg_num, unsigned int d)
-{
-
-    struct timespec ts;
-    ts.tv_sec = 0;
-    ts.tv_nsec = 500000;
-    double vol = 0;
-
-    if (d == UP)
-    {
-        while (vol < 0.7)
-        {
-            vol += 0.0001;
-            mixr->SoundGenerators[sg_num]->SetVolume(vol);
-            nanosleep(&ts, NULL);
-        }
-        mixr->SoundGenerators[sg_num]->SetVolume(0.7);
-    }
-    else
-    {
-        double vol = mixr->SoundGenerators[sg_num]->GetVolume();
-        while (vol > 0.0)
-        {
-            vol -= 0.0001;
-            mixr->SoundGenerators[sg_num]->SetVolume(vol);
-            nanosleep(&ts, NULL);
-        }
-        mixr->SoundGenerators[sg_num]->SetVolume(0.0);
-    }
 }
 
 void get_random_sample_from_dir(char *dir, char *return_file_name)
