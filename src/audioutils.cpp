@@ -42,7 +42,6 @@ void pa_teardown(void)
                Pa_GetErrorText(err));
         exit(-1);
     }
-    exit(0);
 }
 
 int get_chord_type(unsigned int scale_degree)
@@ -118,7 +117,7 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
 
 bool is_midi_note_in_key(unsigned int note, unsigned int key)
 {
-    //printf("NOTE is %d and KEY is %d\n", note, key);
+    // printf("NOTE is %d and KEY is %d\n", note, key);
     // western scale is 2 2 1 2 2 2 1
     note = note % 12;
     if (note == key)

@@ -9,6 +9,7 @@
 
 #include <utils.h>
 
+#include <audio_action_queue.h>
 #include <event_queue.h>
 #include <interpreter/ast.hpp>
 #include <interpreter/builtins.hpp>
@@ -18,6 +19,7 @@
 
 extern mixer *mixr;
 extern Tsqueue<event_queue_item> g_event_queue;
+extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
 
 namespace
 {
@@ -236,6 +238,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             {
                 auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
 
+                // first check if we're setting an FX param
                 if (set_stmt->fx_num_ != -1)
                 {
                     int fx_num = set_stmt->fx_num_;
@@ -245,7 +248,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                         f->SetParam(set_stmt->param_, set_stmt->value_);
                     }
                 }
-                else
+                else // must be a SoundGenerator param
                 {
                     sg->SetParam(set_stmt->param_, set_stmt->value_);
                 }
@@ -287,7 +290,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::PsStatement>(node);
     if (ps_expr)
     {
-        mixer_ps(mixr, true);
+        // mixer_ps(mixr, true);
+        audio_action_queue_item action_req{.type = AudioAction::STATUS};
+        g_audio_action_queue.push(action_req);
     }
 
     std::shared_ptr<ast::VolumeStatement> vol_stmt =

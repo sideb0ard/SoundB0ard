@@ -21,14 +21,15 @@
 #include <interpreter/parser.hpp>
 #include <interpreter/token.hpp>
 
+#include <audio_action_queue.h>
 #include <event_queue.h>
 #include <tsqueue.hpp>
 
 extern mixer *mixr;
 
-// Tsqueue<mixer_timing_info> g_event_queue;
-Tsqueue<event_queue_item> g_event_queue;
+Tsqueue<audio_action_queue_item> g_audio_action_queue;
 Tsqueue<std::string> g_command_queue;
+Tsqueue<event_queue_item> g_event_queue;
 
 auto global_env = std::make_shared<object::Environment>();
 

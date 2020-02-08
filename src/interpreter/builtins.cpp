@@ -8,15 +8,18 @@
 #include <unordered_map>
 #include <vector>
 
+#include <audio_action_queue.h>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/sound_cmds.hpp>
 #include <keys.h>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <mixer_cmds.h>
+#include <tsqueue.hpp>
 #include <utils.h>
 
 extern mixer *mixr;
+extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
 
 namespace builtin
 {
@@ -217,80 +220,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          midi_launch_init(mixr);
                          return evaluator::NULLL;
                      })},
-    {"noteOn",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
-             int args_size = args.size();
-             if (args_size >= 2)
-             {
-                 auto int_object =
-                     std::dynamic_pointer_cast<object::Number>(args[1]);
-
-                 if (!int_object)
-                     return evaluator::NULLL;
-
-                 auto midinum = int_object->value_;
-
-                 int velocity = 127;
-                 if (args_size >= 3)
-                 {
-                     auto int_obj =
-                         std::dynamic_pointer_cast<object::Number>(args[2]);
-                     if (!int_obj)
-                         return evaluator::NULLL;
-                     int passed_velocity = int_obj->value_;
-                     if (passed_velocity < 128)
-                         velocity = passed_velocity;
-                 }
-                 midi_event event_on =
-                     new_midi_event(MIDI_ON, midinum, velocity);
-                 event_on.source = EXTERNAL_OSC;
-
-                 auto soundgen =
-                     std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-                 if (soundgen)
-                 {
-                     if (mixer_is_valid_soundgen_num(mixr,
-                                                     soundgen->soundgen_id_))
-                     {
-                         auto sg =
-                             mixr->SoundGenerators[soundgen->soundgen_id_];
-                         // sg->parseMidiEvent(event_on, mixr->timing_info);
-
-                         int note_duration_ms = sg->note_duration_ms_;
-                         if (args_size >= 4)
-                         {
-                             auto intr_obj =
-                                 std::dynamic_pointer_cast<object::Number>(
-                                     args[3]);
-                             if (!intr_obj)
-                                 return evaluator::NULLL;
-
-                             note_duration_ms = intr_obj->value_;
-                         }
-
-                         // call noteOn after ensuring we got duration for
-                         // noteOff, otherwise we could have a stuck note.
-                         sg->noteOn(event_on);
-                         arp_add_last_note(&sg->engine.arp, midinum);
-
-                         int duration_in_midi_ticks =
-                             note_duration_ms /
-                             mixr->timing_info.ms_per_midi_tick;
-                         int midi_off_tick = (mixr->timing_info.midi_tick +
-                                              duration_in_midi_ticks) %
-                                             PPBAR;
-
-                         midi_event event_off =
-                             new_midi_event(MIDI_OFF, midinum, velocity);
-                         event_off.delete_after_use = true;
-                         sg->noteOffDelayed(event_off, midi_off_tick);
-                     }
-                 }
-             }
-             return evaluator::NULLL;
-         })},
+    {"noteOn", std::make_shared<object::BuiltIn>(
+                   [](std::vector<std::shared_ptr<object::Object>> args)
+                       -> std::shared_ptr<object::Object> {
+                       audio_action_queue_item action_req{
+                           .type = AudioAction::NOTE_ON, .args = args};
+                       g_audio_action_queue.push(action_req);
+                       return evaluator::NULLL;
+                   })},
     {"addFx", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {

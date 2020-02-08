@@ -10,6 +10,7 @@
 #include <portaudio.h>
 
 #include <ableton_link_wrapper.h>
+#include <audio_action_queue.h>
 #include <bitshift.h>
 #include <defjams.h>
 #include <digisynth.h>
@@ -35,6 +36,7 @@
 mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
 extern Tsqueue<event_queue_item> g_event_queue;
+extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -393,7 +395,14 @@ int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
         return -1;
 
     sg->mixer_idx = mixr->soundgen_num;
-    mixr->SoundGenerators[mixr->soundgen_num] = sg;
+    // new message - idx is mixer_idx + shared_ptr is sg - add to mixer action
+    // queue return incr atomic soundgen_num
+    // mixr->SoundGenerators[mixr->soundgen_num] = sg;
+    // mixer_ps(mixr, true);
+    audio_action_queue_item action_req{.type = AudioAction::ADD,
+                                       .mixer_soundgen_idx = mixr->soundgen_num,
+                                       .sg = sg};
+    g_audio_action_queue.push(action_req);
     return mixr->soundgen_num++;
 }
 
@@ -446,67 +455,65 @@ void mixer_midi_tick(mixer *mixr)
     mixr->timing_info.is_third = false;
     mixr->timing_info.is_start_of_loop = false;
 
-    if (mixr->timing_info.is_midi_tick)
+    mixer_check_for_audio_action_queue_messages(mixr);
+    mixer_check_for_midi_messages(mixr); // from external
+
+    if (mixr->timing_info.midi_tick % PPBAR == 0)
     {
-        mixer_check_for_midi_messages(mixr);
-
-        if (mixr->timing_info.midi_tick % PPBAR == 0)
+        mixr->timing_info.is_start_of_loop = true;
+        if (mixr->scene_start_pending)
         {
-            mixr->timing_info.is_start_of_loop = true;
-            if (mixr->scene_start_pending)
-            {
-                mixer_play_scene(mixr, mixr->current_scene);
-                mixr->scene_start_pending = false;
-            }
+            mixer_play_scene(mixr, mixr->current_scene);
+            mixr->scene_start_pending = false;
         }
-
-        if (mixr->timing_info.midi_tick % 120 == 0)
-        {
-            mixr->timing_info.is_thirtysecond = true;
-
-            if (mixr->timing_info.midi_tick % 240 == 0)
-            {
-                mixr->timing_info.is_sixteenth = true;
-                mixr->timing_info.sixteenth_note_tick++;
-
-                if (mixr->timing_info.midi_tick % 480 == 0)
-                {
-                    mixr->timing_info.is_eighth = true;
-
-                    if (mixr->timing_info.midi_tick % PPQN == 0)
-                        mixr->timing_info.is_quarter = true;
-                }
-            }
-        }
-
-        // so far only used for ARP engines
-        if (mixr->timing_info.midi_tick % 160 == 0)
-        {
-            mixr->timing_info.is_twentyfourth = true;
-
-            if (mixr->timing_info.midi_tick % 320 == 0)
-            {
-                mixr->timing_info.is_twelth = true;
-
-                if (mixr->timing_info.midi_tick % 640 == 0)
-                {
-                    mixr->timing_info.is_sixth = true;
-
-                    if (mixr->timing_info.midi_tick % 1280 == 0)
-                        mixr->timing_info.is_third = true;
-                }
-            }
-        }
-
-        // std::cout << "Mixer -- midi_tick:" << mixr->timing_info.midi_tick
-        //          << " 16th:" << mixr->timing_info.sixteenth_note_tick
-        //          << " Start of Loop:" <<
-        //          mixr->timing_info.is_start_of_loop
-        //          << std::endl;
-
-        mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
-        // lo_send(mixr->processing_addr, "/bpm", NULL);
     }
+
+    if (mixr->timing_info.midi_tick % 120 == 0)
+    {
+        mixr->timing_info.is_thirtysecond = true;
+
+        if (mixr->timing_info.midi_tick % 240 == 0)
+        {
+            mixr->timing_info.is_sixteenth = true;
+            mixr->timing_info.sixteenth_note_tick++;
+
+            if (mixr->timing_info.midi_tick % 480 == 0)
+            {
+                mixr->timing_info.is_eighth = true;
+
+                if (mixr->timing_info.midi_tick % PPQN == 0)
+                    mixr->timing_info.is_quarter = true;
+            }
+        }
+    }
+
+    // so far only used for ARP engines
+    if (mixr->timing_info.midi_tick % 160 == 0)
+    {
+        mixr->timing_info.is_twentyfourth = true;
+
+        if (mixr->timing_info.midi_tick % 320 == 0)
+        {
+            mixr->timing_info.is_twelth = true;
+
+            if (mixr->timing_info.midi_tick % 640 == 0)
+            {
+                mixr->timing_info.is_sixth = true;
+
+                if (mixr->timing_info.midi_tick % 1280 == 0)
+                    mixr->timing_info.is_third = true;
+            }
+        }
+    }
+
+    // std::cout << "Mixer -- midi_tick:" << mixr->timing_info.midi_tick
+    //          << " 16th:" << mixr->timing_info.sixteenth_note_tick
+    //          << " Start of Loop:" <<
+    //          mixr->timing_info.is_start_of_loop
+    //          << std::endl;
+
+    mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
+    // lo_send(mixr->processing_addr, "/bpm", NULL);
 }
 
 bool should_progress_chords(mixer *mixr, int tick)
@@ -1092,6 +1099,95 @@ void mixer_enable_print_midi(mixer *mixr, bool b)
 {
     mixr->midi_print_notes = b;
 }
+
+void mixer_check_for_audio_action_queue_messages(mixer *mixr)
+{
+    while (auto action = g_audio_action_queue.try_pop())
+    {
+        if (action)
+        {
+            std::cout << "WOOP, GOT AN AUDIO ACTION!" << std::endl;
+            if (action->type == AudioAction::STATUS)
+                mixer_ps(mixr, true);
+            else if (action->type == AudioAction::ADD)
+                mixr->SoundGenerators[action->mixer_soundgen_idx] = action->sg;
+            else if (action->type == AudioAction::NOTE_ON)
+            {
+                auto args = action->args;
+                int args_size = args.size();
+                if (args_size >= 2)
+                {
+                    auto int_object =
+                        std::dynamic_pointer_cast<object::Number>(args[1]);
+
+                    if (!int_object)
+                        return;
+
+                    auto midinum = int_object->value_;
+
+                    int velocity = 127;
+                    if (args_size >= 3)
+                    {
+                        auto int_obj =
+                            std::dynamic_pointer_cast<object::Number>(args[2]);
+                        if (!int_obj)
+                            return;
+                        int passed_velocity = int_obj->value_;
+                        if (passed_velocity < 128)
+                            velocity = passed_velocity;
+                    }
+                    midi_event event_on =
+                        new_midi_event(MIDI_ON, midinum, velocity);
+                    event_on.source = EXTERNAL_OSC;
+
+                    auto soundgen =
+                        std::dynamic_pointer_cast<object::SoundGenerator>(
+                            args[0]);
+                    if (soundgen)
+                    {
+                        if (mixer_is_valid_soundgen_num(mixr,
+                                                        soundgen->soundgen_id_))
+                        {
+                            auto sg =
+                                mixr->SoundGenerators[soundgen->soundgen_id_];
+                            // sg->parseMidiEvent(event_on, mixr->timing_info);
+
+                            int note_duration_ms = sg->note_duration_ms_;
+                            if (args_size >= 4)
+                            {
+                                auto intr_obj =
+                                    std::dynamic_pointer_cast<object::Number>(
+                                        args[3]);
+                                if (!intr_obj)
+                                    return;
+
+                                note_duration_ms = intr_obj->value_;
+                            }
+
+                            // call noteOn after ensuring we got duration for
+                            // noteOff, otherwise we could have a stuck note.
+                            sg->noteOn(event_on);
+                            arp_add_last_note(&sg->engine.arp, midinum);
+
+                            int duration_in_midi_ticks =
+                                note_duration_ms /
+                                mixr->timing_info.ms_per_midi_tick;
+                            int midi_off_tick = (mixr->timing_info.midi_tick +
+                                                 duration_in_midi_ticks) %
+                                                PPBAR;
+
+                            midi_event event_off =
+                                new_midi_event(MIDI_OFF, midinum, velocity);
+                            event_off.delete_after_use = true;
+                            sg->noteOffDelayed(event_off, midi_off_tick);
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 void mixer_check_for_midi_messages(mixer *mixr)
 {
     PmEvent msg[32];

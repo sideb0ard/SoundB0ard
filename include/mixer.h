@@ -83,7 +83,7 @@ struct mixer
     bool proc_initialized_{false};
 
     std::shared_ptr<SoundGenerator> SoundGenerators[MAX_NUM_SOUND_GENERATORS];
-    int soundgen_num; // actual number of SGs
+    std::atomic_int soundgen_num; // actual number of SGs
 
     pattern_generator *pattern_generators[MAX_NUM_PATTERN_GENERATORS];
     int pattern_gen_num; // actual number of PGs
@@ -221,6 +221,7 @@ void mixer_change_chord(mixer *mixr, unsigned int root,
 int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
 void mixer_enable_print_midi(mixer *mixr, bool b);
 void mixer_check_for_midi_messages(mixer *mixr);
+void mixer_check_for_audio_action_queue_messages(mixer *mixr);
 void mixer_set_midi_bank(mixer *mixr, int num);
 void mixer_set_should_progress_chords(mixer *mixr, bool b);
 bool should_progress_chords(mixer *mixr, int tick);

@@ -19,6 +19,7 @@ template <typename T> struct Tsqueue
     void close();
 
     std::optional<T> pop();
+    std::optional<T> try_pop();
 
   private:
     std::queue<T> queue_;
@@ -57,6 +58,23 @@ template <typename T> std::optional<T> Tsqueue<T>::pop()
     queue_.pop();
     cv_full_.notify_one();
     return t;
+}
+
+template <typename T> std::optional<T> Tsqueue<T>::try_pop()
+{
+    if (mutex_.try_lock())
+    {
+        if (!queue_.empty() && !end_)
+        {
+            T t = std::move(queue_.front());
+            queue_.pop();
+            cv_full_.notify_one();
+            mutex_.unlock();
+            return t;
+        }
+        mutex_.unlock();
+    }
+    return std::nullopt;
 }
 
 template <typename T> void Tsqueue<T>::close()
