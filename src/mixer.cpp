@@ -37,6 +37,7 @@
 mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
 extern Tsqueue<event_queue_item> g_event_queue;
+extern Tsqueue<std::string> g_reply_queue;
 extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
@@ -134,83 +135,58 @@ mixer *new_mixer(double output_latency)
     return mixr;
 }
 
-void mixer_status_mixr(mixer *mixr)
+std::string mixer_status_mixr(mixer *mixr)
 {
     LinkData data = link_get_timing_data_for_display(mixr->m_ableton_link);
     // clang-format off
-    printf(COOL_COLOR_GREEN
-           "\n::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-           ":::::::::: vol:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           " bpm:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           " quantum:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           " beat:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           " phase:" ANSI_COLOR_WHITE "%.2f" COOL_COLOR_GREEN
-           " num_peers:" ANSI_COLOR_WHITE "%d\n" COOL_COLOR_GREEN
-           ":::::::::: cur_16th:%d preview_enabled:%d filename:%s\n"
-           ":::::::::: MIDI cont:%s sg_midi:%d midi_type:%s midi_print:%d midi_bank:%d\n"
-           ":::::::::: key:%s chord:%s %s octave:%d bars_per_chord:%d move:%d prog:(%d)%s\n"
-           ANSI_COLOR_RESET,
-           mixr->volume, data.tempo, data.quantum, data.beat, data.phase, data.num_peers,
-           mixr->timing_info.sixteenth_note_tick % 16,
-           mixr->preview.enabled, mixr->preview.filename,
-           mixr->have_midi_controller ? mixr->midi_controller_name : "NONE",
-           mixr->active_midi_soundgen_num,
-           mixr->active_midi_soundgen_num == -99
-               ? "NONE"
-               : s_midi_control_type_name
-                     [mixr->midi_control_destination],
-           mixr->midi_print_notes,
-           mixr->midi_bank_num,
-           key_names[mixr->timing_info.key], key_names[mixr->timing_info.chord],
-           chord_type_names[mixr->timing_info.chord_type], mixr->timing_info.octave, mixr->bars_per_chord,
-           mixr->should_progress_chords,
-           mixr->progression_type, s_progressions[mixr->progression_type]);
+    std::stringstream ss;
+    ss << COOL_COLOR_GREEN << "\n"
+    << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" 
+    << ":::::::::: vol:" << ANSI_COLOR_WHITE << mixr->volume << COOL_COLOR_GREEN
+    << " bpm:" << ANSI_COLOR_WHITE <<data.tempo << COOL_COLOR_GREEN
+    << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
+    << " beat:" << ANSI_COLOR_WHITE << data.beat << COOL_COLOR_GREEN
+    << " phase:" << ANSI_COLOR_WHITE << data.phase << COOL_COLOR_GREEN
+    << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
+    << ":::::::::: cur_16th:" << mixr->timing_info.sixteenth_note_tick % 16
+    << " preview_enabled:" << mixr->preview.enabled << " filename:" << mixr->preview.filename << "\n"
+    << ":::::::::: key:" << key_names[mixr->timing_info.key] 
+    << " chord:" << key_names[mixr->timing_info.chord] 
+    << " type:"<< chord_type_names[mixr->timing_info.chord_type]
+    << " octave:" << mixr->timing_info.octave << " bars_per_chord:"<< mixr->bars_per_chord
+    << " move:" << mixr->should_progress_chords << " prog:("<< mixr->progression_type << ")" 
+    << s_progressions[mixr->progression_type] << "\n";
     // clang-format on
 
-    if (mixr->num_scenes > 1)
-    {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE "scenes" COOL_COLOR_GREEN
-                                "]\n");
-        for (int i = 0; i < mixr->num_scenes; i++)
-        {
-            printf(":::::::::: [%d] ", i);
-            for (int j = 0; j < mixr->scenes[i].num_tracks; j++)
-            {
-                if (mixr->scenes[i].soundgen_tracks[j].soundgen_num != -1)
-                {
-                    printf(
-                        "(%d,%d)",
-                        mixr->scenes[i].soundgen_tracks[j].soundgen_num,
-                        mixr->scenes[i].soundgen_tracks[j].soundgen_track_num);
-                }
-            }
-            printf("\n");
-        }
-        printf(ANSI_COLOR_RESET "\n");
-    }
+    return ss.str();
 }
 
-void mixer_status_procz(mixer *mixr, bool all)
+std::string mixer_status_procz(mixer *mixr, bool all)
 {
-    std::cout << COOL_COLOR_ORANGE << "\n[" << ANSI_COLOR_WHITE << "Procz"
-              << COOL_COLOR_ORANGE << "]\n";
+    std::stringstream ss;
+    ss << COOL_COLOR_ORANGE << "\n[" << ANSI_COLOR_WHITE << "Procz"
+       << COOL_COLOR_ORANGE << "]\n";
 
     for (int i = 0; i < MAX_NUM_PROC; i++)
     {
         auto &p = mixr->processes_[i];
         if (p->active_ || all)
         {
-            std::cout << ANSI_COLOR_WHITE << "p" << i << ANSI_COLOR_RESET << " "
-                      << p->Status() << std::endl;
+            ss << ANSI_COLOR_WHITE << "p" << i << ANSI_COLOR_RESET << " "
+               << p->Status() << std::endl;
         }
     }
-}
-void mixer_status_env(mixer *mixr)
-{
-    std::cout << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Env"
-              << COOL_COLOR_GREEN << "]" << std::endl;
 
-    global_env->Debug();
+    return ss.str();
+}
+
+std::string mixer_status_env(mixer *mixr)
+{
+    std::stringstream ss;
+    ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Env"
+       << COOL_COLOR_GREEN << "]" << std::endl;
+
+    ss << global_env->Debug();
 
     std::unordered_map<std::string, int> soundgens =
         global_env->GetSoundGenerators();
@@ -219,8 +195,8 @@ void mixer_status_env(mixer *mixr)
         if (mixer_is_valid_soundgen_num(mixr, sg_idx))
         {
             auto sg = mixr->SoundGenerators[sg_idx];
-            std::cout << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
-                      << sg->Status() << ANSI_COLOR_RESET << std::endl;
+            ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
+               << sg->Status() << ANSI_COLOR_RESET << std::endl;
 
             std::stringstream margin;
             for (auto c : var_name)
@@ -229,27 +205,29 @@ void mixer_status_env(mixer *mixr)
 
             for (int i = 0; i < sg->effects_num; i++)
             {
-                std::cout << margin.str();
+                ss << margin.str();
                 Fx *f = sg->effects[i];
                 if (f->enabled_)
-                    std::cout << COOL_COLOR_YELLOW;
+                    ss << COOL_COLOR_YELLOW;
                 else
-                    std::cout << ANSI_COLOR_RESET;
+                    ss << ANSI_COLOR_RESET;
                 char fx_status[512];
                 f->Status(fx_status);
-                std::cout << "fx" << i << " " << fx_status << std::endl;
+                ss << "fx" << i << " " << fx_status << std::endl;
             }
-            std::cout << ANSI_COLOR_RESET;
+            ss << ANSI_COLOR_RESET;
         }
     }
+    return ss.str();
 }
 
-void mixer_status_sgz(mixer *mixr, bool all)
+std::string mixer_status_sgz(mixer *mixr, bool all)
 {
+    std::stringstream ss;
     if (mixr->soundgen_num > 0)
     {
-        printf(COOL_COLOR_GREEN "\n[" ANSI_COLOR_WHITE
-                                "sound generators" COOL_COLOR_GREEN "]\n");
+        ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE
+           << "sound generators" << COOL_COLOR_GREEN << "]\n";
         for (int i = 0; i < mixr->soundgen_num; i++)
         {
             if (mixr->SoundGenerators[i] != NULL)
@@ -259,45 +237,48 @@ void mixer_status_sgz(mixer *mixr, bool all)
                     all)
                 {
 
-                    std::cout << WCOOL_COLOR_GREEN << "[" << WANSI_COLOR_WHITE
-                              << "s" << i << WCOOL_COLOR_GREEN << "] "
-                              << ANSI_COLOR_RESET;
-                    std::cout << mixr->SoundGenerators[i]->Info()
-                              << ANSI_COLOR_RESET << "\n";
+                    ss << WCOOL_COLOR_GREEN << "[" << WANSI_COLOR_WHITE << "s"
+                       << i << WCOOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
+                    ss << mixr->SoundGenerators[i]->Info() << ANSI_COLOR_RESET
+                       << "\n";
 
                     if (mixr->SoundGenerators[i]->effects_num > 0)
                     {
-                        printf("      ");
+                        ss << "      ";
                         for (int j = 0;
                              j < mixr->SoundGenerators[i]->effects_num; j++)
                         {
                             Fx *f = mixr->SoundGenerators[i]->effects[j];
                             if (f->enabled_)
-                                printf(COOL_COLOR_YELLOW);
+                                ss << COOL_COLOR_YELLOW;
                             else
-                                printf(ANSI_COLOR_RESET);
+                                ss << ANSI_COLOR_RESET;
                             char fx_status[512];
                             f->Status(fx_status);
-                            printf("\n[fx %d:%d %s]", i, j, fx_status);
+                            ss << "\n[fx " << i << ":" << j << fx_status << "]";
                         }
-                        printf(ANSI_COLOR_RESET);
+                        ss << ANSI_COLOR_RESET;
                     }
-                    printf("\n\n");
+                    ss << "\n\n";
                 }
             }
         }
     }
+    return ss.str();
 }
 
 void mixer_ps(mixer *mixr, bool all)
 {
+    std::stringstream ss;
+    ss << get_string_logo();
+    ss << mixer_status_mixr(mixr);
+    ss << mixer_status_env(mixr);
+    ss << mixer_status_procz(mixr, false);
+    ss << ANSI_COLOR_RESET;
 
-    print_logo();
-    mixer_status_mixr(mixr);
-    mixer_status_env(mixr);
-    mixer_status_procz(mixr, false);
+    g_reply_queue.push(ss.str());
+
     // mixer_status_sgz(mixr, all);
-    printf(ANSI_COLOR_RESET);
 }
 
 // static void mixer_print_notes(mixer *mixr)
@@ -1107,7 +1088,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
     {
         if (action)
         {
-            std::cout << "GOT ACTION type:" << action->type << std::endl;
             if (action->type == AudioAction::STATUS)
                 mixer_ps(mixr, true);
             else if (action->type == AudioAction::ADD)

@@ -157,7 +157,7 @@ class Environment
     ~Environment() = default;
     std::shared_ptr<Object> Get(std::string key);
     std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val);
-    void Debug();
+    std::string Debug();
     std::unordered_map<std::string, int> GetSoundGenerators();
 
   private:
@@ -247,25 +247,6 @@ class Granular : public SoundGenerator
     ObjectType Type() override;
     std::string Inspect() override;
 };
-
-// class Process : public Object
-//{
-//  public:
-//    Process(int process_id, ProcessPatternTarget target_type,
-//            std::vector<std::string> targets, std::string pattern);
-//    ~Process();
-//    ObjectType Type() override;
-//    std::string Inspect() override;
-//
-//  public:
-//    int proc_num{-1};
-//    ProcessPatternTarget target_type_;
-//    std::vector<std::string> targets_;
-//    std::string pattern_;
-//
-//  private:
-//    int mixer_process_id_;
-//};
 
 /////////////////////////////////////////////////
 

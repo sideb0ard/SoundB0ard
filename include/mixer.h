@@ -149,10 +149,10 @@ struct mixer
 mixer *new_mixer(double output_latency);
 
 void mixer_ps(mixer *mixr, bool all);
-void mixer_status_env(mixer *mixr);
-void mixer_status_mixr(mixer *mixr);
-void mixer_status_procz(mixer *mixr, bool all);
-void mixer_status_sgz(mixer *mixr, bool all);
+std::string mixer_status_env(mixer *mixr);
+std::string mixer_status_mixr(mixer *mixr);
+std::string mixer_status_procz(mixer *mixr, bool all);
+std::string mixer_status_sgz(mixer *mixr, bool all);
 
 void mixer_update_bpm(mixer *mixr, int bpm);
 void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);

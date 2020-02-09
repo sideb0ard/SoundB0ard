@@ -19,6 +19,7 @@
 
 extern Tsqueue<event_queue_item> g_event_queue;
 extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
+extern Tsqueue<std::string> g_reply_queue;
 
 namespace
 {
@@ -69,6 +70,19 @@ object::HashKey MakeHashKey(std::shared_ptr<object::Object> hashkey)
         return hash_key_string->HashKey();
 
     return object::HashKey{};
+}
+
+bool IsValidHex(const std::string &mask)
+{
+    if (mask.size() != 4)
+        return false;
+    for (auto c : mask)
+    {
+        std::cout << "Looking at " << c << std::endl;
+        if (!('a' <= c && c <= 'f') && !('A' <= c && c <= 'Z') && !IsDigit(c))
+            return false;
+    }
+    return true;
 }
 
 } // namespace
@@ -185,7 +199,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::dynamic_pointer_cast<ast::StringLiteral>(ls_stmt->path_);
         if (lspath)
             lspath_string = lspath->value_;
-        list_sample_dir(lspath_string);
+        std::string listing = list_sample_dir(lspath_string);
+        g_reply_queue.push(listing);
     }
 
     std::shared_ptr<ast::BpmStatement> bpm_stmt =
@@ -895,6 +910,26 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
                 std::make_shared<PatternEvery>(intval->value_, func_arg);
 
             return p_every;
+        }
+    }
+    else if (func->token_.literal_ == "mask")
+    {
+        std::cout << "MASK!\n";
+        if (func->arguments_.size() == 1)
+        {
+            std::cout << "GOT A MASK!: " << func->arguments_[0] << std::endl;
+            auto mask_string = std::dynamic_pointer_cast<ast::StringLiteral>(
+                func->arguments_[0]);
+            if (mask_string)
+            {
+                std::cout << "IDENT IS " << mask_string->value_ << std::endl;
+                auto mask = mask_string->value_;
+                if (IsValidHex(mask))
+                {
+                    std::cout << "VALID HEX!\n";
+                    return std::make_shared<PatternMask>(mask);
+                }
+            }
         }
     }
     else if (func->token_.literal_ == "rev")

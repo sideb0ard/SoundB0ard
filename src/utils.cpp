@@ -163,8 +163,11 @@ static int sort_char_array(char **wurds, int start_idx, int end_idx)
 //    qsort_char_array(wurds, middle_idx + 1, upper_idx);
 //}
 
-void list_sample_dir(std::string indir)
+std::string list_sample_dir(std::string indir)
 {
+
+    std::stringstream ss;
+
     char const *dir = indir.c_str();
     char dirname[MAX_STATIC_STRING_SZ] = "./";
     strncat(dirname, SAMPLE_DIR, MAX_STATIC_STRING_SZ - strlen(dirname) - 1);
@@ -214,7 +217,7 @@ void list_sample_dir(std::string indir)
 
         sort_char_array(dirfiles, 0, dirfiles_idx);
         for (int i = 0; i < dirfiles_idx; i++)
-            printf("%s\n", dirfiles[i]);
+            ss << dirfiles[i] << "\n";
         for (int i = 0; i < dirfiles_idx; i++)
             free(dirfiles[i]);
     }
@@ -222,6 +225,7 @@ void list_sample_dir(std::string indir)
     {
         perror("Couldn't open wavs dir\n");
     }
+    return ss.str();
 }
 
 void chordie(char *n)
@@ -948,24 +952,26 @@ int how_many_bits_in_num(unsigned int num)
     return count;
 }
 
-void print_logo()
+std::string get_string_logo()
 {
-    printf(
+    std::stringstream ss;
+    ss <<
         // clang-format off
         COOL_COLOR_GREEN
         // style is 'doom' from http://patorjk.com/software/taag/
-        "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-        COOL_COLOR_YELLOW
-        "             _____                       _ _     _____               _\n"
-        "            /  ___|                     | | |   |  _  |             | |\n"
-        "            \\ `--.  ___  _   _ _ __   __| | |__ | |/\" | __ _ _ __ __| |\n"
-        "             `--. \\/ _ \\| | | | \"_ \\ / _` | \"_ \\|  /| |/ _` | \"__/ _` |\n"
-        "            /\\__/ / (_) | |_| | | | | (_| | |_) \\ |_/ / (_| | | | (_| |\n"
-        "            \\____/ \\___/ \\__,_|_| |_|\\__,_|_.__/ \\___/ \\__,_|_|  \\__,_|\n"
-        COOL_COLOR_GREEN
-        "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-        ANSI_COLOR_RESET);
+        << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
+        << COOL_COLOR_YELLOW
+        << "             _____                       _ _     _____               _\n"
+        << "            /  ___|                     | | |   |  _  |             | |\n"
+        << "            \\ `--.  ___  _   _ _ __   __| | |__ | |/\" | __ _ _ __ __| |\n"
+        << "             `--. \\/ _ \\| | | | \"_ \\ / _` | \"_ \\|  /| |/ _` | \"__/ _` |\n"
+        << "            /\\__/ / (_) | |_| | | | | (_| | |_) \\ |_/ / (_| | | | (_| |\n"
+        << "            \\____/ \\___/ \\__,_|_| |_|\\__,_|_.__/ \\___/ \\__,_|_|  \\__,_|\n"
+        << COOL_COLOR_GREEN
+        << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
+        << ANSI_COLOR_RESET;
     // clang-format on
+    return ss.str();
 }
 
 void mask_to_string(uint16_t mask,

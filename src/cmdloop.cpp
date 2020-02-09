@@ -26,6 +26,7 @@
 
 extern mixer *mixr;
 extern Tsqueue<std::string> g_command_queue;
+extern Tsqueue<std::string> g_reply_queue;
 
 extern char *key_names[NUM_KEYS];
 
@@ -41,7 +42,7 @@ static bool active{true};
 
 void *loopy()
 {
-    print_logo();
+    std::cout << get_string_logo();
     read_history(NULL);
     setlocale(LC_ALL, "");
 
@@ -56,8 +57,14 @@ void *loopy()
                 strncpy(last_line, line, MAXLINE);
             }
             g_command_queue.push(line);
-            free(line);
+            if (strncmp(line, "ps", 2) == 0 || strncmp(line, "ls", 2) == 0)
+            {
+                auto reply = g_reply_queue.pop();
+                if (reply)
+                    std::cout << *reply << std::endl;
+            }
         }
+        free(line);
     }
     exxit();
 
@@ -74,7 +81,8 @@ int exxit()
 
     active = false;
 
-    return 0;
+    //      return 0;
+    exit(0);
 }
 
 int generic_osc_handler(const char *path, const char *types, lo_arg **argv,

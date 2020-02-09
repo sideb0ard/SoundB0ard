@@ -158,3 +158,21 @@ std::string PatternSwing::String() const
     ss << swing_setting_;
     return ss.str();
 }
+
+void PatternMask::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num) const
+{
+    std::cout << "YO MASK\n";
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
+    // PrintPattern(new_events);
+    events = new_events;
+}
+std::string PatternMask::String() const
+{
+
+    std::stringstream ss;
+    ss << "mask: ";
+    ss << mask_;
+    return ss.str();
+}

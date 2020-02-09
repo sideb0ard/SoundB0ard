@@ -84,3 +84,16 @@ class PatternSwing : public PatternFunction
   private:
     int swing_setting_;
 };
+
+class PatternMask : public PatternFunction
+{
+  public:
+    PatternMask(std::string mask) : mask_{mask} {};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) const override;
+    std::string String() const override;
+
+  private:
+    std::string mask_;
+};
