@@ -8,9 +8,17 @@ enum AudioAction
 {
     NO_ACTION,
     ADD,
-    UPDATE,
-    STATUS,
+    ADD_FX,
+    BPM,
+    INFO,
+    LOAD_PRESET,
+    MIDI_INIT,
     NOTE_ON,
+    PREVIEW,
+    RAND,
+    SAVE_PRESET,
+    STATUS,
+    UPDATE,
 };
 
 struct audio_action_queue_item
@@ -28,4 +36,13 @@ struct audio_action_queue_item
 
     // NOTE_ON varz
     std::vector<std::shared_ptr<object::Object>> args;
+
+    // PREVIEW varz
+    std::string preview_filename;
+
+    // ADD_FX varz
+    // PRESET varz
+
+    // BPM varz
+    double new_bpm;
 };

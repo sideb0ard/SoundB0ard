@@ -17,7 +17,6 @@
 #include <interpreter/object.hpp>
 #include <tsqueue.hpp>
 
-extern mixer *mixr;
 extern Tsqueue<event_queue_item> g_event_queue;
 extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
 
@@ -197,7 +196,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::shared_ptr<ast::NumberLiteral> bpm =
             std::dynamic_pointer_cast<ast::NumberLiteral>(bpm_stmt->bpm_val_);
         if (bpm)
-            mixer_update_bpm(mixr, bpm->value_);
+        {
+            audio_action_queue_item action{.type = AudioAction::BPM,
+                                           .new_bpm = bpm->value_};
+            g_audio_action_queue.push(action);
+        }
     }
 
     std::shared_ptr<ast::InfoStatement> info_stmt =
@@ -214,13 +217,10 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 std::dynamic_pointer_cast<object::SoundGenerator>(target);
             if (soundgen)
             {
-                if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
-                {
-                    auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
-
-                    std::cout << soundgen_var_name->value_ << "\n";
-                    std::cout << sg->Info() << std::endl;
-                }
+                audio_action_queue_item action{.type = AudioAction::INFO,
+                                               .param_name =
+                                                   soundgen_var_name->value_};
+                g_audio_action_queue.push(action);
             }
         }
     }
@@ -234,25 +234,13 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
-            if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
-            {
-                auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
-
-                // first check if we're setting an FX param
-                if (set_stmt->fx_num_ != -1)
-                {
-                    int fx_num = set_stmt->fx_num_;
-                    if (mixer_is_valid_fx(mixr, soundgen->soundgen_id_, fx_num))
-                    {
-                        Fx *f = sg->effects[fx_num];
-                        f->SetParam(set_stmt->param_, set_stmt->value_);
-                    }
-                }
-                else // must be a SoundGenerator param
-                {
-                    sg->SetParam(set_stmt->param_, set_stmt->value_);
-                }
-            }
+            audio_action_queue_item action{.type = AudioAction::UPDATE,
+                                           .mixer_soundgen_idx =
+                                               soundgen->soundgen_id_,
+                                           .fx_id = set_stmt->fx_num_,
+                                           .param_name = set_stmt->param_,
+                                           .param_val = set_stmt->value_};
+            g_audio_action_queue.push(action);
         }
     }
 
@@ -265,11 +253,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
-            if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
-            {
-                auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
-                sg->SetPan(pan_stmt->value_);
-            }
+            audio_action_queue_item action{.type = AudioAction::UPDATE,
+                                           .mixer_soundgen_idx =
+                                               soundgen->soundgen_id_,
+                                           .param_name = "pan",
+                                           .param_val = pan_stmt->value_};
+            g_audio_action_queue.push(action);
         }
     }
 
@@ -281,8 +270,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::dynamic_pointer_cast<ast::StringLiteral>(play_expr->path_);
         if (fpath)
         {
-            char *fname = fpath->value_.data();
-            mixer_preview_audio(mixr, fname);
+            audio_action_queue_item action{.type = AudioAction::PREVIEW,
+                                           .preview_filename = fpath->value_};
+            g_audio_action_queue.push(action);
         }
     }
 
@@ -290,7 +280,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::PsStatement>(node);
     if (ps_expr)
     {
-        // mixer_ps(mixr, true);
         audio_action_queue_item action_req{.type = AudioAction::STATUS};
         g_audio_action_queue.push(action_req);
     }
@@ -304,11 +293,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
-            if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
-            {
-                auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
-                sg->SetVolume(vol_stmt->value_);
-            }
+            audio_action_queue_item action{.type = AudioAction::UPDATE,
+                                           .mixer_soundgen_idx =
+                                               soundgen->soundgen_id_,
+                                           .param_name = "volume",
+                                           .param_val = vol_stmt->value_};
+            g_audio_action_queue.push(action);
         }
     }
 

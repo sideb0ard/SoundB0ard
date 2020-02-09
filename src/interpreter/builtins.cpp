@@ -234,36 +234,42 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       int args_size = args.size();
                       if (args_size >= 2)
                       {
-                          interpreter_sound_cmds::ParseFXCmd(args);
+                          audio_action_queue_item action_req{
+                              .type = AudioAction::ADD_FX, .args = args};
+                          g_audio_action_queue.push(action_req);
                       }
                       return evaluator::NULLL;
                   })},
-    {"loadPreset", std::make_shared<object::BuiltIn>(
-                       [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object> {
-                           int args_size = args.size();
-                           if (args_size >= 2)
-                           {
-                               auto cmd_name =
-                                   std::make_shared<object::String>("load");
-                               args.push_back(cmd_name);
-                               interpreter_sound_cmds::ParseSynthCmd(args);
-                           }
-                           return evaluator::NULLL;
-                       })},
-    {"savePreset", std::make_shared<object::BuiltIn>(
-                       [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object> {
-                           int args_size = args.size();
-                           if (args_size >= 2)
-                           {
-                               auto cmd_name =
-                                   std::make_shared<object::String>("save");
-                               args.push_back(cmd_name);
-                               interpreter_sound_cmds::ParseSynthCmd(args);
-                           }
-                           return evaluator::NULLL;
-                       })},
+    {"loadPreset",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             if (args_size >= 2)
+             {
+                 auto cmd_name = std::make_shared<object::String>("load");
+                 args.push_back(cmd_name);
+                 audio_action_queue_item action_req{
+                     .type = AudioAction::LOAD_PRESET, .args = args};
+                 g_audio_action_queue.push(action_req);
+             }
+             return evaluator::NULLL;
+         })},
+    {"savePreset",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             if (args_size >= 2)
+             {
+                 auto cmd_name = std::make_shared<object::String>("save");
+                 args.push_back(cmd_name);
+                 audio_action_queue_item action_req{
+                     .type = AudioAction::SAVE_PRESET, .args = args};
+                 g_audio_action_queue.push(action_req);
+             }
+             return evaluator::NULLL;
+         })},
     {"rand",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -277,8 +283,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              if (soundgen)
              {
 
-                 if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
-                     mixr->SoundGenerators[soundgen->soundgen_id_]->randomize();
+                 audio_action_queue_item action_req{.mixer_soundgen_idx =
+                                                        soundgen->soundgen_id_,
+                                                    .type = AudioAction::RAND};
+                 g_audio_action_queue.push(action_req);
+                 return evaluator::NULLL;
              }
 
              auto array_obj = std::dynamic_pointer_cast<object::Array>(args[0]);
@@ -295,32 +304,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
-    //{"set",
-    // std::make_shared<object::BuiltIn>(
-    //     [](std::vector<std::shared_ptr<object::Object>> args)
-    //         -> std::shared_ptr<object::Object> {
-    //         if (args.size() != 2)
-    //         {
-    //             return evaluator::NewError(
-    //                 "`set` requires 3 params - target (var or id), param and
-    //                 " "val. I got " + std::to_string(args.size()) + "vals");
-    //         }
-
-    //         // auto soundgen =
-    //         //    std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
-    //         // if (soundgen)
-    //         //{
-
-    //         //    if (mixer_is_valid_soundgen_num(mixr,
-    //         //    soundgen->soundgen_id_))
-    //         //    {
-    //         //        SoundGenerator *sg =
-    //         //            mixr->SoundGenerators[soundgen->soundgen_id_];
-    //         //        sg->Update();
-    //         //    }
-    //         //}
-    //         return evaluator::NULLL;
-    //     })},
 };
 
 } // namespace builtin

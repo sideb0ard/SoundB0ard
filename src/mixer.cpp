@@ -23,6 +23,7 @@
 #include <fx/fx.h>
 #include <intdiv.h>
 #include <interpreter/object.hpp>
+#include <interpreter/sound_cmds.hpp>
 #include <juggler.h>
 #include <looper.h>
 #include <markov.h>
@@ -1106,11 +1107,15 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
     {
         if (action)
         {
-            std::cout << "WOOP, GOT AN AUDIO ACTION!" << std::endl;
+            std::cout << "GOT ACTION type:" << action->type << std::endl;
             if (action->type == AudioAction::STATUS)
                 mixer_ps(mixr, true);
             else if (action->type == AudioAction::ADD)
                 mixr->SoundGenerators[action->mixer_soundgen_idx] = action->sg;
+            else if (action->type == AudioAction::ADD_FX)
+                interpreter_sound_cmds::ParseFXCmd(action->args);
+            else if (action->type == AudioAction::BPM)
+                mixer_update_bpm(mixr, action->new_bpm);
             else if (action->type == AudioAction::NOTE_ON)
             {
                 auto args = action->args;
@@ -1183,6 +1188,63 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                         }
                     }
                 }
+            }
+            else if (action->type == AudioAction::UPDATE)
+            {
+                if (mixer_is_valid_soundgen_num(mixr,
+                                                action->mixer_soundgen_idx))
+                {
+                    auto sg = mixr->SoundGenerators[action->mixer_soundgen_idx];
+                    if (action->param_name == "volume")
+                        sg->SetVolume(action->param_val);
+                    else if (action->param_name == "pan")
+                        sg->SetPan(action->param_val);
+                    else
+                    {
+                        // first check if we're setting an FX param
+                        if (action->fx_id != -1)
+                        {
+                            int fx_num = action->fx_id;
+                            if (mixer_is_valid_fx(
+                                    mixr, action->mixer_soundgen_idx, fx_num))
+                            {
+                                Fx *f = sg->effects[fx_num];
+                                f->SetParam(action->param_name,
+                                            action->param_val);
+                            }
+                        }
+                        else // must be a SoundGenerator param
+                        {
+                            sg->SetParam(action->param_name, action->param_val);
+                        }
+                    }
+                }
+            }
+            else if (action->type == AudioAction ::INFO)
+            {
+                if (mixer_is_valid_soundgen_num(mixr,
+                                                action->mixer_soundgen_idx))
+                {
+                    auto sg = mixr->SoundGenerators[action->mixer_soundgen_idx];
+
+                    std::cout << action->param_name << "\n";
+                    std::cout << sg->Info() << std::endl;
+                }
+            }
+            else if (action->type == AudioAction ::SAVE_PRESET ||
+                     action->type == AudioAction::LOAD_PRESET)
+            {
+                interpreter_sound_cmds::ParseSynthCmd(action->args);
+            }
+            else if (action->type == AudioAction::RAND)
+            {
+                mixr->SoundGenerators[action->mixer_soundgen_idx]->randomize();
+            }
+            else if (action->type == AudioAction::PREVIEW)
+            {
+
+                char *fname = action->preview_filename.data();
+                mixer_preview_audio(mixr, fname);
             }
         }
     }
