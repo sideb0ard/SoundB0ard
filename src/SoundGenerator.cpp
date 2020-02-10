@@ -45,33 +45,12 @@ std::string SoundGenerator::Status() { return std::string{"BASE CLASS, YO"}; }
 
 void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
 {
-    // if (lo_send(mixr->processing_addr, "/img", "i", sg->mixer_idx) == -1)
-    //{
-    //    printf("OSC error %d: %s\n", lo_address_errno(mixr->processing_addr),
-    //           lo_address_errstr(mixr->processing_addr));
-    //}
 
     int cur_midi_tick = tinfo.midi_tick % PPBAR;
     int midi_note = ev.data1;
-    // bool is_chord_mode = false;
-
-    // if (!is_midi_note_in_key(midi_note, mixr->key))
-    //{
-    //    // TODO fix!
-    //    // std::cout << "nah mate, not in key: " << midi_note << " " <<
-    //    // mixr->key
-    //    //          << std::endl;
-    //    // return;
-    //}
 
     if (engine.transpose != 0)
         midi_note += engine.transpose;
-
-    if (!ev.delete_after_use || ev.source == EXTERNAL_DEVICE)
-    {
-        if (ev.event_type == MIDI_ON)
-            arp_add_last_note(&engine.arp, midi_note);
-    }
 
     int midi_notes[3] = {midi_note, 0, 0};
     int midi_notes_len = 1; // default single note
@@ -257,78 +236,6 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
                     engine.range_start -= 16;
                 else if (engine.range_start < 0)
                     engine.range_start += 16;
-            }
-
-            if (engine.arp.enable && engine.arp.speed == ARP_16)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
-            }
-        }
-
-        if (tinfo.is_thirtysecond)
-        {
-            if (engine.arp.enable && engine.arp.speed == ARP_32)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
-            }
-        }
-
-        if (tinfo.is_twentyfourth)
-        {
-            if (engine.arp.enable && engine.arp.speed == ARP_24)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
-            }
-        }
-        if (tinfo.is_twelth)
-        {
-            if (engine.arp.enable && engine.arp.speed == ARP_12)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
-            }
-        }
-        if (tinfo.is_eighth)
-        {
-            if (engine.arp.enable && engine.arp.speed == ARP_8)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
-            }
-        }
-        if (tinfo.is_sixth)
-        {
-            if (engine.arp.enable && engine.arp.speed == ARP_6)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
-            }
-        }
-        if (tinfo.is_quarter)
-        {
-            if (engine.arp.enable && engine.arp.speed == ARP_4)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
-            }
-        }
-        if (tinfo.is_third)
-        {
-            if (engine.arp.enable && engine.arp.speed == ARP_3)
-            {
-                midi_event ev{};
-                if (sequence_engine_do_arp(&engine, &ev))
-                    noteOn(ev);
             }
         }
 

@@ -880,7 +880,46 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         return nullptr;
     }
 
-    if (func->token_.literal_ == "every")
+    if (func->token_.literal_ == "arp")
+    {
+        auto arp_func = std::make_shared<PatternArp>();
+        int args_size = func->arguments_.size();
+        std::cout << "ARPP! with " << args_size << " args\n";
+        for (auto a : func->arguments_)
+        {
+            auto speedliteral =
+                std::dynamic_pointer_cast<ast::NumberLiteral>(a);
+            if (speedliteral)
+            {
+                int speedval = speedliteral->value_;
+
+                if (speedval == 16)
+                    arp_func->speed_ = ArpSpeed::ARP_16;
+                else if (speedval == 8)
+                    arp_func->speed_ = ArpSpeed::ARP_8;
+                else if (speedval == 4)
+                    arp_func->speed_ = ArpSpeed::ARP_4;
+            }
+            auto directionliteral =
+                std::dynamic_pointer_cast<ast ::Identifier>(a);
+            if (directionliteral)
+            {
+                std::string directionval = directionliteral->value_;
+                if (directionval == "up")
+                    arp_func->direction_ = ArpDirection::ARP_UP;
+                else if (directionval == "down")
+                    arp_func->direction_ = ArpDirection::ARP_DOWN;
+                else if (directionval == "updown")
+                    arp_func->direction_ = ArpDirection::ARP_UPDOWN;
+                else if (directionval == "rand")
+                    arp_func->direction_ = ArpDirection::ARP_RAND;
+                else if (directionval == "repeat")
+                    arp_func->direction_ = ArpDirection::ARP_REPEAT;
+            }
+        }
+        return arp_func;
+    }
+    else if (func->token_.literal_ == "every")
     {
         std::cout << "EVEYRRRR!\n";
         auto intval =

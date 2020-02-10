@@ -36,45 +36,11 @@
 #define DEFAULT_MIDI_EXPRESSION 0
 #define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
 
-#define MAX_NOTES_ARP 3
-
-enum
-{
-    ARP_UP,
-    ARP_DOWN,
-    ARP_UPDOWN,
-    ARP_RAND,
-    ARP_MAX_MODES,
-};
-
 enum
 {
     FOLD_FWD,
     FOLD_BAK,
 };
-
-enum
-{
-    ARP_32,
-    ARP_24,
-    ARP_16,
-    ARP_12,
-    ARP_8,
-    ARP_6,
-    ARP_4,
-    ARP_3,
-    ARP_MAX_SPEEDS,
-};
-
-typedef struct arpeggiator
-{
-    bool enable;
-    unsigned int mode;
-    unsigned int speed;
-    unsigned int direction; // track UP or DOWN for arp mode UPDOWN
-    int last_midi_notes[MAX_NOTES_ARP];
-    int last_midi_notes_idx;
-} arpeggiator;
 
 class SequenceEngine
 {
@@ -134,8 +100,6 @@ class SequenceEngine
     int midi_note_2;
     int midi_note_3;
     int octave;
-
-    arpeggiator arp;
 
     bool restore_pending;
 
@@ -236,13 +200,6 @@ void sequence_engine_set_pattern_to_current_key(SequenceEngine *engine);
 
 void sequence_engine_set_octave(SequenceEngine *engine, int octave);
 int sequence_engine_get_octave(SequenceEngine *engine);
-
-void sequence_engine_enable_arp(SequenceEngine *engine, bool b);
-void sequence_engine_set_arp_speed(SequenceEngine *engine, unsigned int speed);
-void sequence_engine_set_arp_mode(SequenceEngine *engine, unsigned int mode);
-bool sequence_engine_do_arp(SequenceEngine *engine, midi_event *ev);
-int arp_next_note(arpeggiator *arp);
-void arp_add_last_note(arpeggiator *arp, int note);
 
 void sequence_engine_set_follow_mixer_chords(SequenceEngine *engine, bool b);
 void sequence_engine_set_event_mask(SequenceEngine *engine, uint16_t mask,

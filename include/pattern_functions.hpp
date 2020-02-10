@@ -3,6 +3,22 @@
 #include <defjams.h>
 #include <pattern_parser/ast.hpp>
 
+enum ArpDirection
+{
+    ARP_UP,
+    ARP_DOWN,
+    ARP_UPDOWN,
+    ARP_RAND,
+    ARP_REPEAT,
+};
+
+enum ArpSpeed
+{
+    ARP_16,
+    ARP_8,
+    ARP_4,
+};
+
 class PatternFunction
 {
   public:
@@ -11,7 +27,7 @@ class PatternFunction
     virtual std::string String() const = 0;
     virtual void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) const = 0;
+        int loop_num) = 0;
     bool active_{true};
 };
 
@@ -24,7 +40,7 @@ class PatternEvery : public PatternFunction
     }
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) const override;
+        int loop_num) override;
     std::string String() const override;
 
   private:
@@ -38,7 +54,7 @@ class PatternReverse : public PatternFunction
     PatternReverse() = default;
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) const override;
+        int loop_num) override;
     std::string String() const override;
 };
 
@@ -49,7 +65,7 @@ class PatternRotate : public PatternFunction
         : direction_{direction}, num_sixteenth_steps_{num_sixteenth_steps} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) const override;
+        int loop_num) override;
     std::string String() const override;
 
   private:
@@ -64,7 +80,7 @@ class PatternTranspose : public PatternFunction
         : direction_{direction}, num_octaves_{num_octaves} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) const override;
+        int loop_num) override;
     std::string String() const override;
 
   private:
@@ -78,7 +94,7 @@ class PatternSwing : public PatternFunction
     PatternSwing(int swing_setting) : swing_setting_{swing_setting} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) const override;
+        int loop_num) override;
     std::string String() const override;
 
   private:
@@ -91,10 +107,25 @@ class PatternMask : public PatternFunction
     PatternMask(std::string mask);
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) const override;
+        int loop_num) override;
     std::string String() const override;
 
   private:
     std::string mask_;
     uint16_t bin_mask_{0};
+};
+
+class PatternArp : public PatternFunction
+{
+  public:
+    PatternArp(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+    int last_midi_note_{0};
+    ArpDirection direction_{ArpDirection::ARP_UP};
+    ArpSpeed speed_{ArpSpeed::ARP_16};
 };

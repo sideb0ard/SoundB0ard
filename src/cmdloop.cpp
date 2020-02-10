@@ -57,7 +57,9 @@ void *loopy()
                 strncpy(last_line, line, MAXLINE);
             }
             g_command_queue.push(line);
-            if (strncmp(line, "ps", 2) == 0 || strncmp(line, "ls", 2) == 0)
+            if ((strlen(line) == 2 && strncmp(line, "ps", 2) == 0) ||
+                (strlen(line) == 2 && strncmp(line, "ls", 2) == 0) ||
+                (strncmp(line, "ls ", 3) == 0))
             {
                 auto reply = g_reply_queue.pop();
                 if (reply)

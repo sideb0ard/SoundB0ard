@@ -116,8 +116,7 @@ std::string MiniSynth::Status()
     ss << ANSI_COLOR_CYAN << "Moog(" << m_settings.m_settings_name << ")"
        << " vol:" << volume << " pan:" << pan
        << " voice:" << S_VOICES[m_settings.m_voice_mode] << "("
-       << m_settings.m_voice_mode << ")"
-       << " arp:" << engine.arp.enable << ANSI_COLOR_RESET;
+       << m_settings.m_voice_mode << ")" << ANSI_COLOR_RESET;
 
     return ss.str();
 }
@@ -2420,9 +2419,7 @@ void minisynth_set_hard_sync(MiniSynth *ms, bool val)
 void MiniSynth::SetParam(std::string name, double val)
 {
     std::cout << "SET PARAM:" << name << " :" << val << std::endl;
-    if (name == "arp")
-        sequence_engine_enable_arp(&engine, val);
-    else if (name == "vol")
+    if (name == "vol")
         SetVolume(val);
     else if (name == "pan")
         SetPan(val);

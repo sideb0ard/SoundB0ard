@@ -19,11 +19,32 @@ void PrintPattern(
     }
 }
 
+bool IsArpNote(int i, ArpSpeed speed)
+{
+    switch (speed)
+    {
+    case ArpSpeed::ARP_16:
+        if (i % PPSIXTEENTH == 0)
+            return true;
+        break;
+    case ArpSpeed::ARP_8:
+        if (i % (PPSIXTEENTH * 2) == 0)
+            return true;
+        break;
+    case ArpSpeed::ARP_4:
+        if (i % PPQN == 0)
+            return true;
+        break;
+    }
+
+    return false;
+}
+
 } // namespace
 
 void PatternEvery::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num) const
+    int loop_num)
 {
     if (loop_num % every_n_ == 0)
         func_->TransformPattern(events, loop_num);
@@ -38,7 +59,7 @@ std::string PatternEvery::String() const
 
 void PatternReverse::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num) const
+    int loop_num)
 {
     std::reverse(events.begin(), events.end());
     std::rotate(events.begin(), events.begin() + (PPSIXTEENTH - 1),
@@ -49,7 +70,7 @@ std::string PatternReverse::String() const { return "rev"; }
 
 void PatternTranspose::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num) const
+    int loop_num)
 {
     int num_midi_notes_to_adjust = num_octaves_ * 12;
     for (int i = 0; i < PPBAR; i++)
@@ -86,7 +107,7 @@ std::string PatternTranspose::String() const
 
 void PatternRotate::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num) const
+    int loop_num)
 {
     // std::cout << "ROTATTRRRR! " << direction_ << ":" << num_sixteenth_steps_
     //          << std::endl;
@@ -117,7 +138,7 @@ std::string PatternRotate::String() const
 
 void PatternSwing::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num) const
+    int loop_num)
 {
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
     bool even16th = true;
@@ -194,7 +215,7 @@ PatternMask::PatternMask(std::string mask) : mask_{mask}
 }
 void PatternMask::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num) const
+    int loop_num)
 {
     for (int i = 0; i < 16; i++)
     {
@@ -214,5 +235,88 @@ std::string PatternMask::String() const
     std::stringstream ss;
     ss << "mask ";
     ss << "\"" << mask_ << "\"";
+    return ss.str();
+}
+
+void PatternArp::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+    int counter = 0;
+    for (int i = 0; i < PPBAR; i += PPSIXTEENTH)
+    {
+        std::vector<std::shared_ptr<MusicalEvent>> &mevents = events[i];
+        if (events[i].size() > 0)
+        {
+            if (mevents.size() > 0)
+            {
+                auto midi_event = mevents[0];
+                if (midi_event->target_type_ == ProcessPatternTarget::VALUES)
+                {
+                    last_midi_note_ = std::stoi(midi_event->value_);
+                    counter = 0;
+                }
+            }
+        }
+        else
+        {
+            if (last_midi_note_ != 0)
+            {
+                if (IsArpNote(i, speed_))
+                {
+                    int new_midi_note{0};
+                    if (direction_ == ArpDirection::ARP_UP)
+                    {
+                        if ((counter % 3) == 0)
+                            new_midi_note = last_midi_note_ + 4;
+                        else if ((counter % 3) == 1)
+                            new_midi_note = last_midi_note_ + 7;
+                        else
+                            new_midi_note = last_midi_note_;
+                    }
+                    else if (direction_ == ArpDirection::ARP_DOWN)
+                    {
+                        if ((counter % 3) == 0)
+                            new_midi_note = last_midi_note_ + 7;
+                        else if ((counter % 3) == 1)
+                            new_midi_note = last_midi_note_ + 4;
+                        else
+                            new_midi_note = last_midi_note_;
+                    }
+                    else if (direction_ == ArpDirection::ARP_RAND)
+                    {
+                        int randy = rand() % 3;
+                        if (randy == 0)
+                            new_midi_note = last_midi_note_ + 7;
+                        else if (randy == 1)
+                            new_midi_note = last_midi_note_ + 4;
+                        else
+                            new_midi_note = last_midi_note_;
+                    }
+                    else if (direction_ == ArpDirection::ARP_REPEAT)
+                        new_midi_note = last_midi_note_;
+
+                    if (new_midi_note)
+                    {
+                        auto new_event = std::make_shared<MusicalEvent>(
+                            std::to_string(new_midi_note),
+                            ProcessPatternTarget::VALUES);
+                        mevents.push_back(new_event);
+                    }
+                    counter++;
+                }
+            }
+        }
+    }
+    if (last_midi_note_ != 0)
+    {
+    }
+}
+
+std::string PatternArp::String() const
+{
+
+    std::stringstream ss;
+    ss << "arp";
     return ss.str();
 }

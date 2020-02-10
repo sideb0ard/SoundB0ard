@@ -1152,7 +1152,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             // call noteOn after ensuring we got duration for
                             // noteOff, otherwise we could have a stuck note.
                             sg->noteOn(event_on);
-                            arp_add_last_note(&sg->engine.arp, midinum);
 
                             int duration_in_midi_ticks =
                                 note_duration_ms /

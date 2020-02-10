@@ -40,13 +40,6 @@ SequenceEngine::SequenceEngine()
 
     octave = 1;
 
-    arp.enable = false;
-    arp.direction = UP;
-    arp.mode = ARP_UP;
-    arp.speed = ARP_16;
-    for (int i = 0; i < MAX_NOTES_ARP; i++)
-        arp.last_midi_notes[i] = -1;
-
     sustain_note_ms = 500;
     single_note_mode = true; // opposite is melody mode
     chord_mode = false;
@@ -196,15 +189,12 @@ void sequence_engine_status(SequenceEngine *engine, wchar_t *status_string)
         L"num_patterns:%d midi_note_1:%d midi_note_2:%d midi_note_3:%d "
         L"follow:%d\n"
         L"count_by:%d cur_step:%d incr:%d range:%d fold:%d pct_play:%d\n"
-        L"arp:%d [%d,%d,%d] arp_speed:%s arp_mode:%s swing:%d transpose:%d",
+        L"swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->debug, engine->num_patterns,
         engine->midi_note_1, engine->midi_note_2, engine->midi_note_3,
         engine->follow_mixer_chord_changes, engine->count_by, engine->cur_step,
         engine->increment_by, engine->range_len, engine->fold, engine->pct_play,
-        engine->arp.enable, engine->arp.last_midi_notes[0],
-        engine->arp.last_midi_notes[1], engine->arp.last_midi_notes[2],
-        s_arp_speed[engine->arp.speed], s_arp_mode[engine->arp.mode],
         engine->swing_setting, engine->transpose);
     wcscat(status_string, scratch);
     memset(scratch, 0, 256);
@@ -630,111 +620,6 @@ void sequence_engine_set_octave(SequenceEngine *engine, int octave)
 int sequence_engine_get_octave(SequenceEngine *engine)
 {
     return engine->octave;
-}
-
-void sequence_engine_enable_arp(SequenceEngine *engine, bool b)
-{
-    engine->arp.enable = b;
-}
-
-void arp_add_last_note(arpeggiator *arp, int note)
-{
-    bool found = false;
-    for (int i = 0; i < (MAX_NOTES_ARP); i++)
-    {
-        if (arp->last_midi_notes[i] == note)
-        {
-            found = true;
-            break;
-        }
-    }
-    if (!found)
-    {
-        for (int i = 0; i < (MAX_NOTES_ARP - 1); i++)
-            arp->last_midi_notes[i] = arp->last_midi_notes[i + 1];
-        arp->last_midi_notes[MAX_NOTES_ARP - 1] = note;
-    }
-}
-
-int arp_next_note(arpeggiator *arp)
-{
-    int midi_note = -1;
-    bool found = false;
-    for (int i = 0; i < 3 && !found; i++)
-    {
-        if (arp->mode == ARP_UP)
-        {
-            midi_note = arp->last_midi_notes[arp->last_midi_notes_idx++];
-            if (arp->last_midi_notes_idx >= MAX_NOTES_ARP)
-                arp->last_midi_notes_idx = 0;
-        }
-        else if (arp->mode == ARP_DOWN)
-        {
-            midi_note = arp->last_midi_notes[arp->last_midi_notes_idx--];
-            if (arp->last_midi_notes_idx <= 0)
-                arp->last_midi_notes_idx = MAX_NOTES_ARP - 1;
-        }
-        else if (arp->mode == ARP_UPDOWN)
-        {
-            midi_note = arp->last_midi_notes[arp->last_midi_notes_idx];
-            if (arp->direction == UP)
-            {
-                arp->last_midi_notes_idx++;
-                if (arp->last_midi_notes_idx >= MAX_NOTES_ARP)
-                {
-                    arp->last_midi_notes_idx--;
-                    arp->direction = DOWN;
-                }
-            }
-            else
-            {
-                arp->last_midi_notes_idx--;
-                if (arp->last_midi_notes_idx <= 0)
-                {
-                    arp->last_midi_notes_idx++;
-                    arp->direction = UP;
-                }
-            }
-        }
-        else if (arp->mode == ARP_RAND)
-        {
-            midi_note = arp->last_midi_notes[rand() % MAX_NOTES_ARP];
-        }
-
-        if (midi_note != -1)
-            found = true;
-    }
-
-    return midi_note;
-}
-
-void sequence_engine_set_arp_speed(SequenceEngine *engine, unsigned int speed)
-{
-    if (speed < ARP_MAX_SPEEDS)
-        engine->arp.speed = speed;
-}
-
-void sequence_engine_set_arp_mode(SequenceEngine *engine, unsigned int mode)
-{
-    if (mode < ARP_MAX_MODES)
-        engine->arp.mode = mode;
-}
-
-bool sequence_engine_do_arp(SequenceEngine *engine, midi_event *ev)
-{
-    int midi_note = arp_next_note(&engine->arp);
-    if (midi_note != -1)
-    {
-        int idx = mixr->timing_info.midi_tick % PPBAR;
-        if (engine->patterns[engine->cur_pattern][idx].event_type != MIDI_ON)
-        {
-            ev->event_type = MIDI_ON;
-            ev->data1 = midi_note;
-            ev->data2 = 128;
-            return true;
-        }
-    }
-    return false;
 }
 
 void sequence_engine_change_octave_midi_notes(SequenceEngine *engine,
