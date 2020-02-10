@@ -88,7 +88,7 @@ class PatternSwing : public PatternFunction
 class PatternMask : public PatternFunction
 {
   public:
-    PatternMask(std::string mask) : mask_{mask} {};
+    PatternMask(std::string mask);
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
         int loop_num) const override;
@@ -96,4 +96,5 @@ class PatternMask : public PatternFunction
 
   private:
     std::string mask_;
+    uint16_t bin_mask_{0};
 };

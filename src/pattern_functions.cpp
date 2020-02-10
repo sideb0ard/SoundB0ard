@@ -4,6 +4,7 @@
 #include <sstream>
 
 #include <pattern_functions.hpp>
+#include <utils.h>
 
 namespace
 {
@@ -159,20 +160,59 @@ std::string PatternSwing::String() const
     return ss.str();
 }
 
+PatternMask::PatternMask(std::string mask) : mask_{mask}
+{
+    for (int i = 0; i < 4; i++)
+    {
+        char c = mask_[i];
+        std::cout << "Mask char is " << c << std::endl;
+        int shift_amount = (15 - (i * 4));
+        int bin_rep = 0;
+        if (c == 'f')
+            bin_rep = 0b1111;
+        else if (c == 'e')
+            bin_rep = 0b1110;
+        else if (c == 'd')
+            bin_rep = 0b1101;
+        else if (c == 'c')
+            bin_rep = 0b1100;
+        else if (c == 'b')
+            bin_rep = 0b1011;
+        else if (c == 'a')
+            bin_rep = 0b1010;
+        else
+            bin_rep = c - '0';
+
+        for (int j = 0; j < 4; j++)
+            if (bin_rep & 1 << (3 - j))
+            {
+                bin_mask_ |= 1 << (shift_amount - j);
+            }
+    }
+    auto bit_mask_string = bin_num_to_string(bin_mask_);
+    std::cout << "BIT MASK is " << bit_mask_string << std::endl;
+}
 void PatternMask::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
     int loop_num) const
 {
-    std::cout << "YO MASK\n";
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
-    // PrintPattern(new_events);
-    events = new_events;
+    for (int i = 0; i < 16; i++)
+    {
+        int shift_amount = 15 - i;
+        if (bin_mask_ & 1 << shift_amount)
+        {
+            int start_idx = i * PPSIXTEENTH;
+            int end_idx = start_idx + PPSIXTEENTH;
+            for (int j = start_idx; j < end_idx; j++)
+                events[j].clear();
+        }
+    }
 }
 std::string PatternMask::String() const
 {
 
     std::stringstream ss;
-    ss << "mask: ";
-    ss << mask_;
+    ss << "mask ";
+    ss << "\"" << mask_ << "\"";
     return ss.str();
 }

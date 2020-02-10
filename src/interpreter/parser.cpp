@@ -211,7 +211,6 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
 }
 std::shared_ptr<ast::BpmStatement> Parser::ParseBpmStatement()
 {
-    std::cout << "BPM PARSING!\n";
     std::shared_ptr<ast::BpmStatement> stmt =
         std::make_shared<ast::BpmStatement>(cur_token_);
 

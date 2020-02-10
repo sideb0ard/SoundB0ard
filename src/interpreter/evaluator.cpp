@@ -207,7 +207,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::BpmStatement>(node);
     if (bpm_stmt)
     {
-        std::cout << "BPM, YO!\n";
         std::shared_ptr<ast::NumberLiteral> bpm =
             std::dynamic_pointer_cast<ast::NumberLiteral>(bpm_stmt->bpm_val_);
         if (bpm)

@@ -935,6 +935,21 @@ void print_bin_num(int num)
     }
     printf("\n");
 }
+
+std::string bin_num_to_string(uint16_t num)
+{
+    std::stringstream ss;
+    int len = 16; // short
+    for (int i = len - 1; i >= 0; --i)
+    {
+        if (num & 1 << i)
+            ss << "1";
+        else
+            ss << "0";
+    }
+    return ss.str();
+}
+
 int how_many_bits_in_num(unsigned int num)
 {
     printf("My num is %u\n", num);
