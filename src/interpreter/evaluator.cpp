@@ -944,10 +944,12 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
                     func_arg_ast->arguments_.push_back(func->arguments_[i]);
             }
             auto func_arg = EvalPatternFunctionExpression(func_arg_ast);
-            auto p_every =
-                std::make_shared<PatternEvery>(intval->value_, func_arg);
-
-            return p_every;
+            if (func_arg)
+            {
+                auto p_every =
+                    std::make_shared<PatternEvery>(intval->value_, func_arg);
+                return p_every;
+            }
         }
     }
     else if (func->token_.literal_ == "mask")
