@@ -141,20 +141,19 @@ std::string mixer_status_mixr(mixer *mixr)
     // clang-format off
     std::stringstream ss;
     ss << COOL_COLOR_GREEN << "\n"
-    << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n" 
+    << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
     << ":::::::::: vol:" << ANSI_COLOR_WHITE << mixr->volume << COOL_COLOR_GREEN
     << " bpm:" << ANSI_COLOR_WHITE <<data.tempo << COOL_COLOR_GREEN
     << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
     << " beat:" << ANSI_COLOR_WHITE << data.beat << COOL_COLOR_GREEN
     << " phase:" << ANSI_COLOR_WHITE << data.phase << COOL_COLOR_GREEN
     << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
-    << ":::::::::: cur_16th:" << mixr->timing_info.sixteenth_note_tick % 16
-    << " preview_enabled:" << mixr->preview.enabled << " filename:" << mixr->preview.filename << "\n"
-    << ":::::::::: key:" << key_names[mixr->timing_info.key] 
-    << " chord:" << key_names[mixr->timing_info.chord] 
+    << "::::::::::\n"
+    << ":::::::::: key:" << key_names[mixr->timing_info.key]
+    << " chord:" << key_names[mixr->timing_info.chord]
     << " type:"<< chord_type_names[mixr->timing_info.chord_type]
     << " octave:" << mixr->timing_info.octave << " bars_per_chord:"<< mixr->bars_per_chord
-    << " move:" << mixr->should_progress_chords << " prog:("<< mixr->progression_type << ")" 
+    << " move:" << mixr->should_progress_chords << " prog:("<< mixr->progression_type << ")"
     << s_progressions[mixr->progression_type] << "\n";
     // clang-format on
 

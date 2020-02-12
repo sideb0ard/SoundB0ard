@@ -323,11 +323,11 @@ stereo_val looper::genNext()
 std::string looper::Status()
 {
     std::stringstream ss;
-    ss << ANSI_COLOR_RED << "Granular(" << filename << ")"
-       << " vol:" << volume << " pan:" << pan << " pitch:" << grain_pitch
+    ss << ANSI_COLOR_RED << filename << " vol:" << volume << " pan:" << pan
+       << " pitch:" << grain_pitch
        << " idx:" << (int)(100. / audio_buffer_len * audio_buffer_read_idx)
        << " mode:" << s_loop_mode_names[loop_mode] << "(" << loop_mode << ")"
-       << " step:" << step_mode << ANSI_COLOR_RESET;
+       << " step:" << step_mode << " len:" << loop_len << ANSI_COLOR_RESET;
 
     for (int i = 0; i < PPBAR; i++)
     {
