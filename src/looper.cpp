@@ -20,8 +20,9 @@ static char *s_loop_mode_names[] = {(char *)"LOOP", (char *)"STATIC",
                                     (char *)"SMUDGE"};
 static char *s_external_mode_names[] = {(char *)"FOLLOW", (char *)"CAPTURE"};
 
-looper::looper(char *filename)
+looper::looper(char *filename, bool loop_mode)
 {
+    std::cout << "NEW LOOOOOPPPPPER " << loop_mode << std::endl;
     have_active_buffer = false;
 
     audio_buffer_read_idx = 0;
@@ -43,7 +44,6 @@ looper::looper(char *filename)
     }
     recording = false;
 
-    loop_mode = LOOPER_SMUDGE_MODE;
     loop_counter = -1;
     scramble_mode = false;
     stutter_mode = false;
@@ -68,6 +68,19 @@ looper::looper(char *filename)
 
     degrade_by = 0;
     gate_mode = false;
+
+    if (loop_mode)
+    {
+        std::cout << "ITS LOOP MODE " << loop_mode << "\n";
+        loop_mode_ = LOOPER_LOOP_MODE;
+    }
+    else
+    {
+        loop_mode_ = LOOPER_SMUDGE_MODE;
+        volume = 0.2;
+        std::cout << "Setting VOLUME! " << volume << "\n";
+    }
+
     start();
 }
 
@@ -123,7 +136,7 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     normalized_audio_buffer_read_idx =
         decimal_percent_of_loop * audio_buffer_len;
 
-    if (loop_mode == LOOPER_LOOP_MODE)
+    if (loop_mode_ == LOOPER_LOOP_MODE)
     {
         // used to track which 16th we're on if loop != 1 bar
         float loop_num = fmod(loop_counter, loop_len);
@@ -326,7 +339,7 @@ std::string looper::Status()
     ss << ANSI_COLOR_RED << filename << " vol:" << volume << " pan:" << pan
        << " pitch:" << grain_pitch
        << " idx:" << (int)(100. / audio_buffer_len * audio_buffer_read_idx)
-       << " mode:" << s_loop_mode_names[loop_mode] << "(" << loop_mode << ")"
+       << " mode:" << s_loop_mode_names[loop_mode_] << "(" << loop_mode_ << ")"
        << " step:" << step_mode << " len:" << loop_len << ANSI_COLOR_RESET;
 
     for (int i = 0; i < PPBAR; i++)
@@ -345,7 +358,7 @@ std::string looper::Info()
     std::stringstream ss;
     ss << ANSI_COLOR_WHITE << filename << INSTRUMENT_COLOR << " vol:" << volume
        << " pan:" << pan << " pitch:" << grain_pitch
-       << " mode:" << s_loop_mode_names[loop_mode] << "\n";
+       << " mode:" << s_loop_mode_names[loop_mode_] << "\n";
 
     //        %d mode:%s\n"
     //"gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
@@ -715,7 +728,7 @@ void looper_set_envelope_mode(looper *g, unsigned int mode)
 void looper_set_reverse_mode(looper *g, bool b) { g->reverse_mode = b; }
 void looper_set_loop_mode(looper *g, unsigned int m)
 {
-    g->loop_mode = m;
+    g->loop_mode_ = m;
     g->selection_mode = GRAIN_SELECTION_STATIC;
     if (m == LOOPER_SMUDGE_MODE)
     {
@@ -855,7 +868,10 @@ void looper::SetParam(std::string name, double val)
     if (name == "pitch")
         looper_set_grain_pitch(this, val);
     else if (name == "mode")
+    {
+        std::cout << "Setting grain mode to " << val << std::endl;
         looper_set_loop_mode(this, val);
+    }
     else if (name == "gate_mode")
         looper_set_gate_mode(this, val);
     else if (name == "idx")

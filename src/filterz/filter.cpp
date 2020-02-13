@@ -46,7 +46,7 @@ void filter_set_type(filter *f, unsigned int type)
         printf("Type must be between 0 and %d\n", NUM_FILTER_TYPES - 1);
 }
 
-// void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
+void filter_set_q_control(filter *f, double val) { f->m_q_control = val; }
 
 void filter_update(filter *f)
 {

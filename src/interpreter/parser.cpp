@@ -522,7 +522,9 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseIfExpression();
     else if (cur_token_.type_ == token::SLANG_FUNCTION)
         return ParseFunctionLiteral();
-    else if (cur_token_.type_ == token::SLANG_GRANULAR)
+    else if (cur_token_.type_ == token::SLANG_GRANULAR ||
+             cur_token_.type_ == token::SLANG_GRAIN ||
+             cur_token_.type_ == token::SLANG_LOOP)
         return ParseGranularExpression();
     else if (cur_token_.type_ == token::SLANG_FM_SYNTH ||
              cur_token_.type_ == token::SLANG_MOOG_SYNTH)
@@ -718,6 +720,12 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 std::shared_ptr<ast::Expression> Parser::ParseGranularExpression()
 {
     auto granular = std::make_shared<ast::GranularExpression>(cur_token_);
+    if (cur_token_.type_ == token::SLANG_LOOP)
+    {
+        std::cout << "GOT LOOP TOKEN\n";
+        granular->loop_mode_ = true;
+    }
+    std::cout << "__ LOOP MODE SET TO " << granular->loop_mode_ << "\n";
 
     if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;

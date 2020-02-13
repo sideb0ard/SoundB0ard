@@ -96,9 +96,10 @@ Sample::Sample(std::string sample_path)
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
 
-Granular::Granular(std::string sample_path)
+Granular::Granular(std::string sample_path, bool loop_mode)
 {
-    soundgen_id_ = add_looper(mixr, sample_path);
+    std::cout << "OBJECT! LOOPM ODE IS " << loop_mode << std::endl;
+    soundgen_id_ = add_looper(mixr, sample_path, loop_mode);
 }
 std::string Granular::Inspect() { return "Granular."; }
 ObjectType Granular::Type() { return GRANULAR_OBJ; }

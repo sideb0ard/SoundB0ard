@@ -416,10 +416,10 @@ int add_dxsynth(mixer *mixr)
     return add_sound_generator(mixr, dx);
 }
 
-int add_looper(mixer *mixr, std::string filename)
+int add_looper(mixer *mixr, std::string filename, bool loop_mode)
 {
-    printf("ADDING A GRANNY!\n");
-    auto loopr = std::make_shared<looper>(filename.data());
+    std::cout << "ADDING A GRANNY! loop mode is : " << loop_mode << "\n";
+    auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
     printf("GOT A GRAANY\n");
     return add_sound_generator(mixr, loopr);
 }

@@ -230,6 +230,7 @@ class GranularExpression : public Expression
 
   public:
     std::shared_ptr<Expression> path_;
+    bool loop_mode_{false};
 };
 
 class CallExpression : public Expression

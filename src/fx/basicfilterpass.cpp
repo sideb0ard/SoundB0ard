@@ -34,7 +34,7 @@ void FilterPass::Status(char *status_string)
     // clang-format off
     snprintf(status_string, MAX_STATIC_STRING_SZ,
              "freq:%.2f q:%.2f type:%s lfo1_active:%d lfo1_type:%d lfo1_amp:%.2f\n"
-             "lfo1_rate:%.2f lfo2_active:%d lfo2_type:%d lfo2_amp:%.2f lfo2_rate:%.2f",
+             "     lfo1_rate:%.2f lfo2_active:%d lfo2_type:%d lfo2_amp:%.2f lfo2_rate:%.2f",
              m_filter_.f.m_fc_control, m_filter_.f.m_q_control,
              filtertype_to_name[m_filter_.f.m_filter_type],
              m_lfo1_active_, m_lfo1_.osc.m_waveform,
@@ -70,7 +70,32 @@ stereo_val FilterPass::Process(stereo_val input)
     return input;
 }
 
-void FilterPass::SetParam(std::string name, double val) {}
+void FilterPass::SetParam(std::string name, double val)
+{
+    if (name == "freq")
+        filter_set_fc_control(&m_filter_.f, val);
+    else if (name == "q")
+        filter_set_q_control(&m_filter_.f, val);
+    else if (name == "type")
+        filter_set_type(&m_filter_.f, val);
+    else if (name == "lfo1_active")
+        SetLfoActive(1, val);
+    else if (name == "lfo1_type")
+        SetLfoType(1, val);
+    else if (name == "lfo1_amp")
+        SetLfoAmp(1, val);
+    else if (name == "lfo1_rate")
+        SetLfoRate(1, val);
+    else if (name == "lfo2_active")
+        SetLfoActive(2, val);
+    else if (name == "lfo2_type")
+        SetLfoType(2, val);
+    else if (name == "lfo2_amp")
+        SetLfoAmp(2, val);
+    else if (name == "lfo2_rate")
+        SetLfoRate(2, val);
+}
+
 double FilterPass::GetParam(std::string name) { return 0; }
 
 void FilterPass::SetLfoType(int lfo_num, unsigned int type)

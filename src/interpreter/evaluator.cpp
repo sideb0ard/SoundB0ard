@@ -454,7 +454,13 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         if (spath)
         {
             std::cout << "GOT SPATH!\n";
-            return std::make_shared<object::Granular>(spath->value_);
+            if (gran->loop_mode_)
+            {
+                std::cout << "Got LOOOOP mode\n";
+                return std::make_shared<object::Granular>(spath->value_, true);
+            }
+            else
+                return std::make_shared<object::Granular>(spath->value_, false);
         }
         else
             std::cout << "Nae sample path!!\n";

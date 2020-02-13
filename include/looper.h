@@ -83,7 +83,7 @@ enum
 class looper : public SoundGenerator
 {
   public:
-    looper(char *filename);
+    looper(char *filename, bool loop_mode);
     ~looper();
     stereo_val genNext() override;
     std::string Status() override;
@@ -140,7 +140,7 @@ class looper : public SoundGenerator
     envelope_generator m_eg1; // start/stop amp
     envelope_generator m_eg2; // unused so far
 
-    unsigned int loop_mode;
+    unsigned int loop_mode_;
     double loop_len; // bars
     int loop_counter;
 
