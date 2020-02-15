@@ -229,6 +229,7 @@ void PatternMask::TransformPattern(
         }
     }
 }
+
 std::string PatternMask::String() const
 {
 
@@ -318,5 +319,71 @@ std::string PatternArp::String() const
 
     std::stringstream ss;
     ss << "arp";
+    return ss.str();
+}
+
+void PatternBrak::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (events[i].size() > 0)
+            new_events[i / 2] = events[i];
+    }
+    std::rotate(new_events.begin(), new_events.begin() + ((PPBAR / 2) - PPQN),
+                new_events.end());
+    events = new_events;
+}
+
+std::string PatternBrak::String() const
+{
+
+    std::stringstream ss;
+    ss << "brak";
+    return ss.str();
+}
+
+void PatternFast::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (events[i].size() > 0)
+            new_events[i / 2] = events[i];
+    }
+
+    for (int i = 0; i < PPBAR / 2; i++)
+    {
+        if (new_events[i].size() > 0)
+            std::copy(new_events[i].begin(), new_events[i].end(),
+                      std::back_inserter(new_events[i + (PPBAR / 2)]));
+    }
+
+    events = new_events;
+}
+
+std::string PatternFast::String() const
+{
+
+    std::stringstream ss;
+    ss << "fast";
+    return ss.str();
+}
+
+void PatternSlow::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+}
+
+std::string PatternSlow::String() const
+{
+
+    std::stringstream ss;
+    ss << "slow";
     return ss.str();
 }

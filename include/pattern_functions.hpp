@@ -129,3 +129,39 @@ class PatternArp : public PatternFunction
     ArpDirection direction_{ArpDirection::ARP_UP};
     ArpSpeed speed_{ArpSpeed::ARP_16};
 };
+
+class PatternBrak : public PatternFunction
+{
+  public:
+    PatternBrak(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+};
+
+class PatternFast : public PatternFunction
+{
+  public:
+    PatternFast(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+};
+
+class PatternSlow : public PatternFunction
+{
+  public:
+    PatternSlow(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+};

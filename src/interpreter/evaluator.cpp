@@ -925,6 +925,11 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         }
         return arp_func;
     }
+    else if (func->token_.literal_ == "brak")
+    {
+        std::cout << "BRRRRAk!!\n";
+        return std::make_shared<PatternBrak>();
+    }
     else if (func->token_.literal_ == "every")
     {
         std::cout << "EVEYRRRR!\n";
@@ -957,6 +962,11 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
                 return p_every;
             }
         }
+    }
+    else if (func->token_.literal_ == "fast")
+    {
+        std::cout << "FAST!!\n";
+        return std::make_shared<PatternFast>();
     }
     else if (func->token_.literal_ == "mask")
     {
@@ -999,6 +1009,11 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             return std::make_shared<PatternRotate>(LEFT, num_sixteenth_steps);
         else
             return std::make_shared<PatternRotate>(RIGHT, num_sixteenth_steps);
+    }
+    else if (func->token_.literal_ == "slow")
+    {
+        std::cout << "SLOW!!\n";
+        return std::make_shared<PatternSlow>();
     }
     else if (func->token_.literal_ == "swing")
     {
