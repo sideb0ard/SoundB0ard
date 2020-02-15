@@ -11,22 +11,17 @@
 
 #include <ableton_link_wrapper.h>
 #include <audio_action_queue.h>
-#include <bitshift.h>
 #include <defjams.h>
 #include <digisynth.h>
 #include <drumsampler.h>
 #include <drumsynth.h>
 #include <dxsynth.h>
-#include <euclidean.h>
 #include <event_queue.h>
 #include <fx/envelope.h>
 #include <fx/fx.h>
-#include <intdiv.h>
 #include <interpreter/object.hpp>
 #include <interpreter/sound_cmds.hpp>
-#include <juggler.h>
 #include <looper.h>
-#include <markov.h>
 #include <minisynth.h>
 #include <mixer.h>
 #include <sbmsg.h>
@@ -111,12 +106,6 @@ mixer *new_mixer(double output_latency)
     mixr->timing_info.is_quarter = true;
     mixr->timing_info.is_third = true;
 
-    mixr->scene_mode = false;
-    mixr->scene_start_pending = false;
-    mixr->scenes[0].num_bars_to_play = 4;
-    mixr->num_scenes = 1;
-    mixr->current_scene = -1;
-
     mixr->active_midi_soundgen_num = -99;
 
     mixr->timing_info.key = C;
@@ -125,12 +114,6 @@ mixer *new_mixer(double output_latency)
     mixer_set_chord_progression(mixr, 1);
     mixr->bars_per_chord = 4;
     mixr->should_progress_chords = false;
-
-    // mixr->worker.running = true;
-    // mixr->worker.have_midi_tick = true;
-    // pthread_mutex_init(&mixr->worker.midi_tick_mutex, NULL);
-    // pthread_cond_init(&mixr->worker.midi_tick_cond, NULL);
-    // mixr->processing_addr = lo_address_new(NULL, "7770");
 
     return mixr;
 }
@@ -440,14 +423,7 @@ void mixer_midi_tick(mixer *mixr)
     mixer_check_for_midi_messages(mixr); // from external
 
     if (mixr->timing_info.midi_tick % PPBAR == 0)
-    {
         mixr->timing_info.is_start_of_loop = true;
-        if (mixr->scene_start_pending)
-        {
-            mixer_play_scene(mixr, mixr->current_scene);
-            mixr->scene_start_pending = false;
-        }
-    }
 
     if (mixr->timing_info.midi_tick % 120 == 0)
     {
@@ -572,76 +548,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
     return 0;
 }
 
-void mixer_play_scene(mixer *mixr, int scene_num)
-{
-    scene *s = &mixr->scenes[scene_num];
-    for (int i = 0; i < mixr->soundgen_num; i++)
-    {
-        if (!mixer_is_soundgen_in_scene(i, s) &&
-            mixer_is_valid_soundgen_num(mixr, i))
-        {
-            mixr->SoundGenerators[i]->stop();
-        }
-    }
-
-    for (int i = 0; i < s->num_tracks; i++)
-    {
-        int soundgen_num = s->soundgen_tracks[i].soundgen_num;
-        if (soundgen_num == -1)
-        {
-            continue;
-        }
-        if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
-        {
-            mixr->SoundGenerators[soundgen_num]->start();
-        }
-        else
-        {
-            printf("Oh, a deleted soundgen, better remove that from "
-                   "the scene\n");
-            s->soundgen_tracks[i].soundgen_num = -1;
-        }
-    }
-}
-
-void update_environment(char *key, int val)
-{
-    int env_item_index = 0;
-    bool is_update = false;
-    for (int i = 0; i < mixr->env_var_count; i++)
-    {
-        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0)
-        {
-            is_update = true;
-            env_item_index = i;
-        }
-    }
-    if (is_update)
-    {
-        mixr->environment[env_item_index].val = val;
-    }
-    else
-    {
-        strncpy((char *)&mixr->environment[mixr->env_var_count].key, key,
-                ENVIRONMENT_KEY_SIZE);
-        mixr->environment[mixr->env_var_count].val = val;
-        mixr->env_var_count++;
-    }
-}
-
-int get_environment_val(char *key, int *return_val)
-{
-    for (int i = 0; i < mixr->env_var_count; i++)
-    {
-        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0)
-        {
-            *return_val = mixr->environment[i].val;
-            return 1;
-        }
-    }
-    return 0;
-}
-
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
 {
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
@@ -677,214 +583,6 @@ bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
     }
     return false;
 }
-
-bool mixer_is_valid_env_var(mixer *mixr, char *key)
-{
-    for (int i = 0; i < mixr->env_var_count; i++)
-        if (strncmp(key, mixr->environment[i].key, ENVIRONMENT_KEY_SIZE) == 0)
-            return true;
-    return false;
-}
-
-bool mixer_is_valid_pattern_gen_num(mixer *mixr, int sgnum)
-{
-    if (sgnum >= 0 && sgnum < mixr->pattern_gen_num &&
-        mixr->pattern_generators[sgnum] != NULL)
-        return true;
-    return false;
-}
-
-bool mixer_is_valid_value_gen_num(mixer *mixr, int vgnum)
-{
-    if (vgnum >= 0 && vgnum < mixr->value_gen_num &&
-        mixr->value_generators[vgnum] != NULL)
-        return true;
-    return false;
-}
-
-bool mixer_is_valid_scene_num(mixer *mixr, int scene_num)
-{
-    if (mixr->num_scenes > 0 && scene_num < mixr->num_scenes)
-        return true;
-    return false;
-}
-
-bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
-                                       int track_num)
-{
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num) && track_num >= 0 &&
-        track_num < sequence_engine_get_num_patterns(
-                        &mixr->SoundGenerators[soundgen_num]->engine))
-        return true;
-
-    return false;
-}
-
-int mixer_add_scene(mixer *mixr, int num_bars)
-{
-    if (mixr->num_scenes >= MAX_SCENES)
-    {
-        printf("Dingie mate\n");
-        return false;
-    }
-    printf("NUM BARSZZ! %d\n", num_bars);
-
-    mixr->scenes[mixr->num_scenes].num_bars_to_play = num_bars;
-
-    return mixr->num_scenes++;
-}
-
-bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
-                                       int soundgen_num, int soundgen_track)
-{
-    if (!mixer_is_valid_scene_num(mixr, scene_num))
-    {
-        printf("%d is not a valid scene number\n", scene_num);
-        return false;
-    }
-    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num, soundgen_track))
-    {
-        printf("%d is not a valid soundgen number\n", soundgen_num);
-        return false;
-    }
-
-    if (mixr->scenes[scene_num].num_tracks >= MAX_TRACKS_PER_SCENE)
-    {
-        printf("Too many tracks for this scene\n");
-        return false;
-    }
-
-    scene *s = &mixr->scenes[scene_num];
-    s->soundgen_tracks[s->num_tracks].soundgen_num = soundgen_num;
-    s->soundgen_tracks[s->num_tracks].soundgen_track_num = soundgen_track;
-
-    s->num_tracks++;
-
-    return true;
-}
-
-bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
-                                        int soundgen_num, int soundgen_track)
-{
-    if (!mixer_is_valid_scene_num(mixr, scene_num))
-    {
-        printf("%d is not a valid scene number\n", scene_num);
-        return false;
-    }
-    if (!mixer_is_valid_soundgen_track_num(mixr, soundgen_num, soundgen_track))
-    {
-        printf("%d is not a valid soundgen number\n", soundgen_num);
-        return false;
-    }
-
-    scene *s = &mixr->scenes[scene_num];
-    for (int i = 0; i < s->num_tracks; i++)
-    {
-        if (s->soundgen_tracks[i].soundgen_num == soundgen_num &&
-            s->soundgen_tracks[i].soundgen_track_num == soundgen_track)
-        {
-            s->soundgen_tracks[i].soundgen_num = -1;
-            return true;
-        }
-    }
-
-    return false;
-}
-bool mixer_is_soundgen_in_scene(int soundgen_num, scene *s)
-{
-    for (int i = 0; i < s->num_tracks; i++)
-    {
-        if (soundgen_num == s->soundgen_tracks[i].soundgen_num)
-            return true;
-    }
-    return false;
-}
-
-bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to)
-{
-    if (!mixer_is_valid_scene_num(mixr, scene_num_from))
-    {
-        printf("%d is not a valid scene number\n", scene_num_from);
-        return false;
-    }
-    if (!mixer_is_valid_scene_num(mixr, scene_num_to))
-    {
-        printf("%d is not a valid scene number\n", scene_num_from);
-        return false;
-    }
-
-    mixr->scenes[scene_num_to] = mixr->scenes[scene_num_from];
-
-    return true;
-}
-
-// void synth_handle_midi_note(SoundGenerator *sg, int note, int velocity,
-//                            bool update_last_midi)
-//{
-//    sequence_engine *engine = get_sequence_engine(sg);
-//    bool is_chord_mode = engine->chord_mode;
-//
-//    int midi_notes[3] = {note, 0, 0};
-//    int midi_notes_len = 1; // default single note
-//    if (is_chord_mode)
-//    {
-//        midi_notes_len = 3;
-//        if (mixr->chord_type == MAJOR_CHORD)
-//            midi_notes[1] = note + 4;
-//        else
-//            midi_notes[1] = note + 3;
-//        midi_notes[2] = note + 7;
-//    }
-//
-//    for (int i = 0; i < midi_notes_len; i++)
-//    {
-//        int note = midi_notes[i];
-//        printf("Adding NOTE %d\n", note);
-//
-//        if (sg->type == MINISYNTH_TYPE)
-//        {
-//            minisynth *ms = (minisynth *)sg;
-//            minisynth_midi_note_on(ms, note, velocity);
-//        }
-//        else if (sg->type == DIGISYNTH_TYPE)
-//        {
-//            digisynth *ds = (digisynth *)sg;
-//            digisynth_midi_note_on(ds, note, velocity);
-//        }
-//        else if (sg->type == DXSYNTH_TYPE)
-//        {
-//            dxsynth *dx = (dxsynth *)sg;
-//            dxsynth_midi_note_on(dx, note, velocity);
-//        }
-//
-//        int sustain_time_in_ticks =
-//            engine->sustain_note_ms * mixr->timing_info.ms_per_midi_tick;
-//        int note_off_tick =
-//            (mixr->timing_info.midi_tick + sustain_time_in_ticks) % PPBAR;
-//
-//        midi_event off_event = new_midi_event(128, note, velocity);
-//        ////////////////////////
-//
-//        if (engine->recording)
-//        {
-//            printf("Recording note!\n");
-//            int note_on_tick = mixr->timing_info.midi_tick % PPBAR;
-//            midi_event on_event = new_midi_event(144, note, velocity);
-//
-//            sequence_engine_add_event(engine, engine->cur_pattern,
-//                                      note_off_tick, off_event);
-//            sequence_engine_add_event(engine, engine->cur_pattern,
-//            note_on_tick,
-//                                      on_event);
-//        }
-//        else
-//        {
-//            off_event.delete_after_use = true; // _THIS_ is the magic
-//            sequence_engine_add_event(engine, engine->cur_pattern,
-//                                      note_off_tick, off_event);
-//        }
-//    }
-//}
 
 void mixer_set_notes(mixer *mixr)
 {

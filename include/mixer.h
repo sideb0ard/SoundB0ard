@@ -12,7 +12,6 @@
 #include <dxsynth.h>
 #include <fx/fx.h>
 #include <minisynth.h>
-#include <pattern_generator.h>
 #include <process.hpp>
 #include <sbmsg.h>
 #include <soundgenerator.h>
@@ -23,7 +22,6 @@
 #define MAX_TRACKS_PER_SCENE 100
 #define MAX_NUM_PROC 100
 #define MAX_NUM_SOUND_GENERATORS 100
-#define MAX_NUM_PATTERN_GENERATORS 100
 #define MAX_NUM_VALUE_GENERATORS 100
 #define NUM_PROGRESSIONS 4
 
@@ -85,12 +83,6 @@ struct mixer
     std::shared_ptr<SoundGenerator> SoundGenerators[MAX_NUM_SOUND_GENERATORS];
     std::atomic_int soundgen_num; // actual number of SGs
 
-    pattern_generator *pattern_generators[MAX_NUM_PATTERN_GENERATORS];
-    int pattern_gen_num; // actual number of PGs
-
-    value_generator *value_generators[MAX_NUM_VALUE_GENERATORS];
-    int value_gen_num; // actual number of VGs
-
     AbletonLink *m_ableton_link;
 
     stereo_val
@@ -106,11 +98,6 @@ struct mixer
     int env_var_count;
 
     bool debug_mode;
-
-    scene scenes[MAX_SCENES];
-    int num_scenes; // actual amount of scenes
-    int current_scene;
-    int current_scene_bar_count;
 
     PortMidiStream *midi_stream;
     bool have_midi_controller;
@@ -159,7 +146,6 @@ void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
 void mixer_midi_tick(mixer *mixr);
 void mixer_emit_event(mixer *mixr, broadcast_event event);
 bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
-void mixer_generate_pattern(mixer *mixr, int synthnum, int pattern_num);
 
 void mixer_preview_audio(mixer *mixr, char *filename);
 
@@ -172,9 +158,6 @@ int add_digisynth(mixer *mixr, char *filename);
 int add_looper(mixer *mixr, std::string filename, bool loop_mode);
 
 int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg);
-// int add_pattern_generator(mixer *mixr, pattern_generator *sg);
-// int add_value_generator(mixer *mixr, value_generator *vg);
-// int add_effect(mixer *mixr);
 
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);
@@ -184,30 +167,12 @@ void mixer_toggle_midi_mode(mixer *mixr);
 void mixer_toggle_key_mode(mixer *mixr);
 void mixer_play_scene(mixer *mixr, int scene_num);
 
-void update_environment(char *key, int val);
-
-int get_environment_val(char *key, int *return_val);
-
 void mixer_update_timing_info(mixer *mixr, long long int frame_time);
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
 
 bool mixer_is_valid_process(mixer *mixr, int proc_num);
-bool mixer_is_valid_env_var(mixer *mixr, char *key);
-bool mixer_is_valid_pattern_gen_num(mixer *mixr, int sgnum);
-bool mixer_is_valid_value_gen_num(mixer *mixr, int sgnum);
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
-bool mixer_is_valid_soundgen_track_num(mixer *mixr, int soundgen_num,
-                                       int track_num);
-bool mixer_is_valid_scene_num(mixer *mixr, int scene_num);
 bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num);
-bool mixer_is_soundgen_in_scene(int soundgen_num, scene *scene_num);
-
-int mixer_add_scene(mixer *mixr, int num_bars);
-bool mixer_add_soundgen_track_to_scene(mixer *mixr, int scene_num,
-                                       int soundgen_num, int soundgen_track);
-bool mixer_rm_soundgen_track_from_scene(mixer *mixr, int scene_num,
-                                        int soundgen_num, int soundgen_track);
-bool mixer_cp_scene(mixer *mixr, int scene_num_from, int scene_num_to);
 
 void mixer_set_notes(mixer *mixr);
 void mixer_set_octave(mixer *mixr, int octave);

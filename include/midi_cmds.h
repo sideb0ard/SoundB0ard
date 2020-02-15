@@ -3,6 +3,5 @@
 #include <defjams.h>
 #include <mixer.h>
 
-bool parse_midi_cmd(int num_wurds, char wurds[][SIZE_OF_WURD]);
 void midi_launch_init(mixer *mixr);
 void midi_set_destination(mixer *mixr, int soundgen_num);

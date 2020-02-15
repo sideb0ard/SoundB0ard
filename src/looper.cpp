@@ -869,7 +869,6 @@ void looper::SetParam(std::string name, double val)
         looper_set_grain_pitch(this, val);
     else if (name == "mode")
     {
-        std::cout << "Setting grain mode to " << val << std::endl;
         looper_set_loop_mode(this, val);
     }
     else if (name == "gate_mode")

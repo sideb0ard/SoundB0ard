@@ -5,9 +5,7 @@
 #include <iostream>
 
 #include "SequenceEngine.h"
-#include "bitshift.h"
 #include "defjams.h"
-#include "euclidean.h"
 #include "mixer.h"
 #include "utils.h"
 #include <drumsampler.h>

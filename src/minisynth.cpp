@@ -4,7 +4,6 @@
 
 #include <iostream>
 
-#include "bitshift.h"
 #include "midi_freq_table.h"
 #include "minisynth.h"
 #include "mixer.h"
@@ -1747,12 +1746,6 @@ void minisynth_print_patterns(MiniSynth *ms)
 void minisynth_print_modulation_routings(MiniSynth *ms)
 {
     print_modulation_matrix(&ms->m_ms_modmatrix);
-}
-
-void minisynth_set_generate_src(MiniSynth *ms, int src)
-{
-    if (mixer_is_valid_pattern_gen_num(mixr, src))
-        ms->m_settings.m_generate_src = src;
 }
 
 void minisynth_set_filter_mod(MiniSynth *ms, double mod)

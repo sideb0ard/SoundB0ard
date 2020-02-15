@@ -17,7 +17,6 @@
 #include <mixer_cmds.h>
 #include <new_item_cmds.h>
 #include <obliquestrategies.h>
-#include <pattern_generator_cmds.h>
 #include <stepper_cmds.h>
 #include <synth_cmds.h>
 #include <tsqueue.hpp>
