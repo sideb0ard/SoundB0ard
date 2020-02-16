@@ -794,7 +794,8 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         process->process_type_ = PATTERN_PROCESS;
         process->target_type_ = ProcessPatternTarget::ENV;
 
-        process->pattern_ = ParseStringLiteral();
+        // process->pattern_ = ParseStringLiteral();
+        process->pattern_ = ParseExpression(Precedence::PREFIX);
         NextToken();
     }
     else if (PeekTokenIs(token::SLANG_HASH))
@@ -805,7 +806,8 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         process->process_type_ = PATTERN_PROCESS;
         process->target_type_ = ProcessPatternTarget::VALUES;
 
-        process->pattern_ = ParseStringLiteral();
+        // process->pattern_ = ParseStringLiteral();
+        process->pattern_ = ParseExpression(Precedence::PREFIX);
 
         if (!ExpectPeek(token::SLANG_IDENT))
         {
@@ -864,7 +866,8 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         NextToken();
 
         std::cout << "EYE I GOT : " << cur_token_ << std::endl;
-        process->pattern_ = ParseStringLiteral();
+        // process->pattern_ = ParseStringLiteral();
+        process->pattern_ = ParseExpression(Precedence::PREFIX);
         NextToken();
         std::cout << "NOW EYE I GOT : " << cur_token_ << std::endl;
         process->command_ = cur_token_.literal_;

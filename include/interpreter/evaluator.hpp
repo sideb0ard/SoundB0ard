@@ -33,7 +33,8 @@ std::shared_ptr<PatternFunction>
 EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> func);
 
 std::shared_ptr<object::Object>
-EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc);
+EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
+                     std::shared_ptr<object::Environment> env);
 
 std::shared_ptr<object::Object>
 EvalPrefixExpression(std::string op, std::shared_ptr<object::Object> obj);

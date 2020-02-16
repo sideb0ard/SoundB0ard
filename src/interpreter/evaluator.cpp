@@ -469,7 +469,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     std::shared_ptr<ast::ProcessStatement> proc =
         std::dynamic_pointer_cast<ast::ProcessStatement>(node);
     if (proc)
-        return EvalProcessStatement(proc);
+        return EvalProcessStatement(proc, env);
 
     return NULLL;
 }
@@ -1054,13 +1054,14 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
 }
 
 std::shared_ptr<object::Object>
-EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
+EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
+                     std::shared_ptr<object::Environment> env)
 {
-    std::shared_ptr<ast::StringLiteral> pattern =
-        std::dynamic_pointer_cast<ast::StringLiteral>(proc->pattern_);
-    std::cout << "EVAL PROCESS STATEMENT\n";
-    if (pattern)
+    auto pattern_obj = Eval(proc->pattern_, env);
+    if (pattern_obj->Type() == "STRING")
     {
+        auto pattern = std::dynamic_pointer_cast<object::String>(pattern_obj);
+
         std::vector<std::shared_ptr<PatternFunction>> process_funcz;
 
         for (auto &f : proc->functions_)
@@ -1085,7 +1086,7 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc)
         g_event_queue.push(ev);
     }
     else
-        std::cout << "Nae PATTERMN!!\n";
+        std::cout << "Nae PATTERMN!! gotz" << proc->pattern_->String() << "\n";
 
     return NULLL;
 } // namespace evaluator

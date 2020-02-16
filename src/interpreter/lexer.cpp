@@ -203,7 +203,6 @@ token::Token Lexer::NextToken()
         if (current_char_ == 'p' && IsDigit(PeekChar()))
         {
             tok.literal_ = ReadProcId();
-            std::cout << "PROC IDzz!! " << tok.literal_ << "\n";
             tok.type_ = token::SLANG_PROC_ID;
             return tok;
         }
