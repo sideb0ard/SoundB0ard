@@ -40,7 +40,12 @@ stereo_val Distortion::Process(stereo_val input)
     return out;
 }
 
-void Distortion::SetParam(std::string name, double val) {}
+void Distortion::SetParam(std::string name, double val)
+{
+    if (name == "threshold")
+        SetThreshold(val);
+}
+
 double Distortion::GetParam(std::string name) { return 0; }
 
 void Distortion::SetThreshold(double val)

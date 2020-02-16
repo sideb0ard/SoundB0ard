@@ -29,7 +29,18 @@ stereo_val WaveShaper::Process(stereo_val input)
     return out;
 }
 
-void WaveShaper::SetParam(std::string name, double val) {}
+void WaveShaper::SetParam(std::string name, double val)
+{
+    if (name == "k_pos")
+        SetArcTanKPos(val);
+    else if (name == "k_neg")
+        SetArcTanKNeg(val);
+    else if (name == "stages")
+        SetStages(val);
+    else if (name == "invert")
+        SetInvertStages(val);
+}
+
 double WaveShaper::GetParam(std::string name) { return 0; }
 
 void WaveShaper::Init()

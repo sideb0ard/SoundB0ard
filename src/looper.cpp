@@ -15,7 +15,8 @@ extern mixer *mixr;
 extern char *s_lfo_mode_names;
 
 static char *s_env_names[] = {(char *)"PARABOLIC", (char *)"TRAPEZOIDAL",
-                              (char *)"TUKEY", (char *)"GENERATOR"};
+                              (char *)"TUKEY",     (char *)"GENERATOR",
+                              (char *)"EXP_CURVE", (char *)"LOG_CURVE"};
 static char *s_loop_mode_names[] = {(char *)"LOOP", (char *)"STATIC",
                                     (char *)"SMUDGE"};
 static char *s_external_mode_names[] = {(char *)"FOLLOW", (char *)"CAPTURE"};
@@ -32,7 +33,7 @@ looper::looper(char *filename, bool loop_mode)
     quasi_grain_fudge = 220;
     selection_mode = GRAIN_SELECTION_STATIC;
     // envelope_mode = LOOPER_ENV_GENERATOR;
-    envelope_mode = LOOPER_ENV_PARABOLIC;
+    envelope_mode = LOOPER_ENV_LOGARITHMIC_CURVE;
     envelope_taper_ratio = 0.5;
     reverse_mode = 0; // bool
     external_source_sg = -1;
@@ -70,15 +71,11 @@ looper::looper(char *filename, bool loop_mode)
     gate_mode = false;
 
     if (loop_mode)
-    {
-        std::cout << "ITS LOOP MODE " << loop_mode << "\n";
-        loop_mode_ = LOOPER_LOOP_MODE;
-    }
+        looper_set_loop_mode(this, LOOPER_LOOP_MODE);
     else
     {
-        loop_mode_ = LOOPER_SMUDGE_MODE;
+        looper_set_loop_mode(this, LOOPER_SMUDGE_MODE);
         volume = 0.2;
-        std::cout << "Setting VOLUME! " << volume << "\n";
     }
 
     start();
@@ -293,7 +290,8 @@ stereo_val looper::genNext()
                                              .pitch = grain_pitch,
                                              .num_channels = num_channels,
                                              .degrade_by = degrade_by,
-                                             .debug = enable_debug};
+                                             .debug = enable_debug,
+                                             .envelope_mode = envelope_mode};
 
                 sound_grain_init(&m_grains[cur_grain_num], params);
                 num_active_grains = looper_count_active_grains(this);
@@ -306,10 +304,10 @@ stereo_val looper::genNext()
                 sound_grain *sgr = &m_grains[i];
                 stereo_val tmp =
                     sound_grain_generate(sgr, audio_buffer, audio_buffer_len);
-                double env = sound_grain_env(sgr, envelope_mode);
+                // double env = sound_grain_env(sgr, envelope_mode);
 
-                val.left += tmp.left * env;
-                val.right += tmp.right * env;
+                val.left += tmp.left;
+                val.right += tmp.right;
             }
             if (pthread_mutex_unlock(&extsource_lock) != 0)
                 printf("Youch, couldn't unlock mutex!\n");
@@ -358,7 +356,15 @@ std::string looper::Info()
     std::stringstream ss;
     ss << ANSI_COLOR_WHITE << filename << INSTRUMENT_COLOR << " vol:" << volume
        << " pan:" << pan << " pitch:" << grain_pitch
-       << " mode:" << s_loop_mode_names[loop_mode_] << "\n";
+       << " mode:" << s_loop_mode_names[loop_mode_]
+       << " env_mode:" << s_env_names[envelope_mode] << "(" << envelope_mode
+       << ") "
+       << "\ngrain_dur_ms:" << grain_duration_ms
+       << " grains_per_sec:" << grains_per_sec
+       << " density_dur_sync:" << density_duration_sync
+       << " quasi_grain_fudge:" << quasi_grain_fudge
+       << " fill_factor:" << fill_factor
+       << "\ngrain_spray_ms:" << granular_spray_frames / 44.1 << "\n";
 
     //        %d mode:%s\n"
     //"gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
@@ -421,11 +427,20 @@ looper::~looper()
 
 void sound_grain_init(sound_grain *g, sound_grain_params params)
 {
+    g->amp = 0;
     g->audiobuffer_start_idx = params.starting_idx;
     g->grain_len_frames = params.dur;
     g->grain_counter_frames = 0;
+
     g->attack_time_pct = params.attack_pct;
     g->release_time_pct = params.release_pct;
+
+    g->attack_time_samples = params.dur / 100. * params.attack_pct;
+    g->attack_to_sustain_boundary_sample_idx = g->attack_time_samples;
+    g->release_time_samples = params.dur / 100. * params.release_pct;
+    g->sustain_to_decay_boundary_sample_idx =
+        params.dur - g->release_time_samples;
+
     g->audiobuffer_num_channels = params.num_channels;
     g->degrade_by = params.degrade_by;
     g->debug = params.debug;
@@ -443,8 +458,30 @@ void sound_grain_init(sound_grain *g, sound_grain_params params)
         g->incr = params.pitch;
     }
 
-    g->attack_time_samples = params.dur / 100. * params.attack_pct;
-    g->release_time_samples = params.dur / 100. * params.release_pct;
+    switch (g->envelope_mode)
+    {
+    case (LOOPER_ENV_PARABOLIC):
+    {
+        double rdur = 1.0 / g->grain_len_frames;
+        double rdur2 = rdur * rdur;
+        g->slope = 4.0 * 1.0 * (rdur - rdur2);
+        g->curve = -8.0 * 1.0 * rdur2;
+        break;
+    }
+    case (LOOPER_ENV_TRAPEZOIDAL):
+        g->amplitude_increment = 1.0 / g->attack_time_samples;
+        break;
+    case (LOOPER_ENV_EXPONENTIAL_CURVE):
+        g->exp_mul =
+            pow((g->exp_min + 1.0) / g->exp_min, 1.0 / g->attack_time_samples);
+        g->exp_now = g->exp_min;
+        break;
+    case (LOOPER_ENV_LOGARITHMIC_CURVE):
+        g->exp_mul =
+            pow(g->exp_min / (g->exp_min + 1), 1.0 / g->attack_time_samples);
+        g->exp_now = g->exp_min + 1;
+        break;
+    }
 
     g->amp = 0;
     double rdur = 1.0 / params.dur;
@@ -499,6 +536,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
         sound_grain_check_idx(&read_next_idx, audio_buffer_len);
         out.left = lin_terp(0, 1, audio_buffer[read_idx],
                             audio_buffer[read_next_idx], frac);
+        out.left *= g->amp;
         out.right = out.left;
     }
     else if (num_channels == 2)
@@ -507,6 +545,7 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
         sound_grain_check_idx(&read_next_idx, audio_buffer_len);
         out.left = lin_terp(0, 1, audio_buffer[read_idx],
                             audio_buffer[read_next_idx], frac);
+        out.left *= g->amp;
 
         int read_idx_right = read_idx + 1;
         sound_grain_check_idx(&read_idx_right, audio_buffer_len);
@@ -514,9 +553,101 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
         sound_grain_check_idx(&read_next_idx_right, audio_buffer_len);
         out.right = lin_terp(0, 1, audio_buffer[read_idx_right],
                              audio_buffer[read_next_idx_right], frac);
+        out.right *= g->amp;
     }
 
     g->audiobuffer_cur_pos += (g->incr * num_channels);
+    double one_percent = g->grain_len_frames / 100.0;
+    double percent_pos = g->grain_counter_frames / one_percent;
+
+    switch (g->envelope_mode)
+    {
+    case (LOOPER_ENV_PARABOLIC):
+        g->amp = g->amp + g->slope;
+        g->slope = g->slope + g->curve;
+        if (g->amp < 0)
+            g->amp = 0;
+        if (g->amp > 1.0)
+            g->amp = 1.0;
+        break;
+    case (LOOPER_ENV_TRAPEZOIDAL):
+        if (g->grain_counter_frames < g->attack_to_sustain_boundary_sample_idx)
+            g->amp += g->amplitude_increment;
+        else if (g->grain_counter_frames ==
+                 g->attack_to_sustain_boundary_sample_idx)
+            g->amp = 1.0;
+        else if (g->grain_counter_frames ==
+                 g->sustain_to_decay_boundary_sample_idx)
+            g->amplitude_increment = -1. / g->release_time_samples;
+        break;
+    case (LOOPER_ENV_TUKEY_WINDOW):
+        if (percent_pos < g->attack_time_pct)
+        {
+            g->amp = (1.0 + cos(M_PI + (M_PI *
+                                        ((double)g->grain_counter_frames /
+                                         g->attack_time_samples) *
+                                        (1.0 / 2.0))));
+        }
+        else if (percent_pos > (100 - g->release_time_pct))
+        {
+            double attack_and_sustain_len_frames =
+                g->grain_len_frames - g->release_time_samples;
+
+            g->amp =
+                cos(M_PI *
+                    ((g->grain_counter_frames - attack_and_sustain_len_frames) /
+                     g->release_time_samples) *
+                    (1.0 / 2.0));
+        }
+        break;
+    case (LOOPER_ENV_GENERATOR):
+        g->amp = eg_do_envelope(&g->eg, NULL);
+        if (percent_pos > (100 - g->release_time_pct))
+            eg_note_off(&g->eg);
+        break;
+    case (LOOPER_ENV_EXPONENTIAL_CURVE):
+        if (g->grain_counter_frames <
+                g->attack_to_sustain_boundary_sample_idx ||
+            g->grain_counter_frames > g->sustain_to_decay_boundary_sample_idx)
+        {
+            g->exp_now *= g->exp_mul;
+            g->amp = (g->exp_now - g->exp_min);
+        }
+        else if (g->grain_counter_frames ==
+                 g->attack_to_sustain_boundary_sample_idx)
+        {
+            g->amp = 1.;
+        }
+        else if (g->grain_counter_frames ==
+                 g->sustain_to_decay_boundary_sample_idx)
+        {
+            g->exp_now = 1 + g->exp_min;
+            g->exp_mul =
+                pow(g->exp_min / (1 + g->exp_min), 1 / g->release_time_samples);
+        }
+        break;
+    case (LOOPER_ENV_LOGARITHMIC_CURVE):
+        if (g->grain_counter_frames <
+                g->attack_to_sustain_boundary_sample_idx ||
+            g->grain_counter_frames > g->sustain_to_decay_boundary_sample_idx)
+        {
+            g->exp_now *= g->exp_mul;
+            g->amp = (1 - (g->exp_now - g->exp_min));
+        }
+        else if (g->grain_counter_frames ==
+                 g->attack_to_sustain_boundary_sample_idx)
+        {
+            g->amp = 1.;
+        }
+        else if (g->grain_counter_frames ==
+                 g->sustain_to_decay_boundary_sample_idx)
+        {
+            g->exp_now = g->exp_min;
+            g->exp_mul =
+                pow((g->exp_min + 1) / g->exp_min, 1 / g->release_time_samples);
+        }
+        break;
+    }
 
     g->grain_counter_frames++;
     if (g->grain_counter_frames > g->grain_len_frames)
@@ -527,66 +658,61 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
     return out;
 }
 
-double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
-{
-    if (!g->active)
-        return 0.;
-
-    double amp = 1;
-    double one_percent = g->grain_len_frames / 100.0;
-    double percent_pos = g->grain_counter_frames / one_percent;
-
-    switch (envelope_mode)
-    {
-    case (LOOPER_ENV_PARABOLIC):
-        g->amp = g->amp + g->slope;
-        g->slope = g->slope + g->curve;
-        amp = g->amp;
-        break;
-    case (LOOPER_ENV_TRAPEZOIDAL):
-        if (percent_pos < g->attack_time_pct)
-            amp *= (percent_pos / g->attack_time_pct);
-        else if (percent_pos > (100 - g->release_time_pct))
-            amp *= (100 - percent_pos) / g->release_time_pct;
-        break;
-    case (LOOPER_ENV_TUKEY_WINDOW):
-        // amp = 0.5 * (1 - cos(2 * M_PI * g->grain_counter_frames /
-        //                     g->attack_time_samples));
-        if (percent_pos < g->attack_time_pct)
-        {
-            amp = (1.0 + cos(M_PI + (M_PI *
-                                     ((double)g->grain_counter_frames /
-                                      g->attack_time_samples) *
-                                     (1.0 / 2.0))));
-        }
-        else if (percent_pos > (100 - g->release_time_pct))
-        {
-            double attack_and_sustain_len_frames =
-                g->grain_len_frames - g->release_time_samples;
-
-            amp =
-                cos(M_PI *
-                    ((g->grain_counter_frames - attack_and_sustain_len_frames) /
-                     g->release_time_samples) *
-                    (1.0 / 2.0));
-        }
-        break;
-    case (LOOPER_ENV_GENERATOR):
-        amp = eg_do_envelope(&g->eg, NULL);
-        // printf("PCT:%f FRAME:%d AMP is %f\n", percent_pos,
-        //      g->grain_counter_frames, amp);
-        if (percent_pos > (100 - g->release_time_pct))
-        {
-            eg_note_off(&g->eg);
-        }
-        break;
-    }
-
-    if (g->debug)
-        printf("%f\n", amp);
-
-    return amp;
-}
+// double sound_grain_env(sound_grain *g, unsigned int envelope_mode)
+//{
+//    if (!g->active)
+//        return 0.;
+//
+//    double amp = 1;
+//    double one_percent = g->grain_len_frames / 100.0;
+//    double percent_pos = g->grain_counter_frames / one_percent;
+//
+//    switch (envelope_mode)
+//    {
+//    case (LOOPER_ENV_PARABOLIC):
+//        g->amp = g->amp + g->slope;
+//        g->slope = g->slope + g->curve;
+//        amp = g->amp;
+//        break;
+//    case (LOOPER_ENV_TRAPEZOIDAL):
+//        if (percent_pos < g->attack_time_pct)
+//            amp *= (percent_pos / g->attack_time_pct);
+//        else if (percent_pos > (100 - g->release_time_pct))
+//            amp *= (100 - percent_pos) / g->release_time_pct;
+//        break;
+//    case (LOOPER_ENV_TUKEY_WINDOW):
+//        if (percent_pos < g->attack_time_pct)
+//        {
+//            amp = (1.0 + cos(M_PI + (M_PI *
+//                                     ((double)g->grain_counter_frames /
+//                                      g->attack_time_samples) *
+//                                     (1.0 / 2.0))));
+//        }
+//        else if (percent_pos > (100 - g->release_time_pct))
+//        {
+//            double attack_and_sustain_len_frames =
+//                g->grain_len_frames - g->release_time_samples;
+//
+//            amp =
+//                cos(M_PI *
+//                    ((g->grain_counter_frames - attack_and_sustain_len_frames)
+//                    /
+//                     g->release_time_samples) *
+//                    (1.0 / 2.0));
+//        }
+//        break;
+//    case (LOOPER_ENV_GENERATOR):
+//        amp = eg_do_envelope(&g->eg, NULL);
+//        if (percent_pos > (100 - g->release_time_pct))
+//            eg_note_off(&g->eg);
+//        break;
+//    }
+//
+//    if (g->debug)
+//        printf("%f\n", amp);
+//
+//    return amp;
+//}
 
 //////////////////////////// end of grain stuff //////////////////////////
 

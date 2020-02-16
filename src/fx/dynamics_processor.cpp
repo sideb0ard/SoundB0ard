@@ -299,5 +299,32 @@ void DynamicsProcessor::SetDefaultSidechainParams()
     SetReleaseMs(55);
     SetRatio(2.5);
 }
-void DynamicsProcessor::SetParam(std::string name, double val) {}
+void DynamicsProcessor::SetParam(std::string name, double val)
+{
+    if (name == "inputgain")
+        SetInputGainDb(val);
+    else if (name == "threshold")
+        SetThreshold(val);
+    else if (name == "attackms")
+        SetAttackMs(val);
+    else if (name == "releasems")
+        SetReleaseMs(val);
+    else if (name == "ratio")
+        SetRatio(val);
+    else if (name == "outputgain")
+        SetOutputGainDb(val);
+    else if (name == "kneewidth")
+        SetKneeWidth(val);
+    else if (name == "lookahead")
+        SetLookaheadDelayMs(val);
+    else if (name == "stereolink")
+        SetStereoLink(val);
+    else if (name == "type")
+        SetProcessorType(val);
+    else if (name == "mode")
+        SetTimeConstant(val);
+    else if (name == "extsource")
+        SetExternalSource(val);
+}
+
 double DynamicsProcessor::GetParam(std::string name) { return 0; }

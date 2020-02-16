@@ -11,7 +11,6 @@
 
 #include <algo_cmds.h>
 #include <cmdloop.h>
-#include <looper_cmds.h>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <mixer_cmds.h>

@@ -20,6 +20,7 @@ struct sound_grain_params
     int num_channels;
     int degrade_by;
     bool debug;
+    unsigned int envelope_mode;
 };
 
 struct sound_grain
@@ -36,15 +37,35 @@ struct sound_grain
     int degrade_by;
 
     int attack_time_pct; // percent of grain_len_frames
-    int attack_time_samples;
+    // int attack_time_samples;
     int release_time_pct; // percent of grain_len_frames
-    int release_time_samples;
+    // int release_time_samples;
     bool active;
     double amp;
-    double slope;
-    double curve;
+    // double slope;
+    // double curve;
     bool reverse_mode;
     bool debug;
+
+    unsigned int envelope_mode;
+
+    // Parabolic Env vars
+    float slope;
+    float curve;
+
+    int attack_time_samples;
+    int release_time_samples;
+    int attack_to_sustain_boundary_sample_idx;
+    int sustain_to_decay_boundary_sample_idx;
+    float previous_amplitude;
+
+    // Trapezoidal Env vars
+    float amplitude_increment;
+
+    // Exponential / Logarithmic
+    float exp_min = 0.2;
+    float exp_mul = 0;
+    float exp_now = 0;
 
     envelope_generator eg;
 };
@@ -62,6 +83,8 @@ enum
     LOOPER_ENV_TRAPEZOIDAL,
     LOOPER_ENV_TUKEY_WINDOW,
     LOOPER_ENV_GENERATOR,
+    LOOPER_ENV_EXPONENTIAL_CURVE,
+    LOOPER_ENV_LOGARITHMIC_CURVE,
     LOOPER_ENV_NUM
 };
 
