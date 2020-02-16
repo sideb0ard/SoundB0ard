@@ -106,8 +106,12 @@ stereo_val DrumSampler::genNext()
 std::string DrumSampler::Status()
 {
     std::stringstream ss;
+    if (!active || volume == 0)
+        ss << ANSI_COLOR_RESET;
+    else
+        ss << COOL_COLOR_PINK;
 
-    ss << COOL_COLOR_PINK "Sampler(" << filename << ")"
+    ss << "Sampler(" << filename << ")"
        << " vol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch
        << ANSI_COLOR_RESET;
 

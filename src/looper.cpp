@@ -334,7 +334,11 @@ stereo_val looper::genNext()
 std::string looper::Status()
 {
     std::stringstream ss;
-    ss << ANSI_COLOR_RED << filename << " vol:" << volume << " pan:" << pan
+    if (!active || volume == 0)
+        ss << ANSI_COLOR_RESET;
+    else
+        ss << ANSI_COLOR_RED;
+    ss << filename << " vol:" << volume << " pan:" << pan
        << " pitch:" << grain_pitch
        << " idx:" << (int)(100. / audio_buffer_len * audio_buffer_read_idx)
        << " mode:" << s_loop_mode_names[loop_mode_] << "(" << loop_mode_ << ")"

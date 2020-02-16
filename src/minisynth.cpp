@@ -112,7 +112,11 @@ stereo_val MiniSynth::genNext()
 std::string MiniSynth::Status()
 {
     std::stringstream ss;
-    ss << ANSI_COLOR_CYAN << "Moog(" << m_settings.m_settings_name << ")"
+    if (!active || volume == 0)
+        ss << ANSI_COLOR_RESET;
+    else
+        ss << ANSI_COLOR_CYAN;
+    ss << "Moog(" << m_settings.m_settings_name << ")"
        << " vol:" << volume << " pan:" << pan
        << " voice:" << S_VOICES[m_settings.m_voice_mode] << "("
        << m_settings.m_voice_mode << ")" << ANSI_COLOR_RESET;
@@ -134,9 +138,9 @@ std::string MiniSynth::Info()
     // char *INSTRUMENT_PINK = (char *)ANSI_COLOR_RESET;
     // if (active)
     //{
-    //    INSTRUMENT_YELLOW = (char *)COOL_COLOR_YELLOW;
-    //    INSTRUMENT_ORANGE = (char *)COOL_COLOR_ORANGE;
-    //    INSTRUMENT_PINK = (char *)COOL_COLOR_PINK;
+    char *INSTRUMENT_YELLOW = (char *)COOL_COLOR_YELLOW;
+    char *INSTRUMENT_ORANGE = (char *)COOL_COLOR_ORANGE;
+    char *INSTRUMENT_PINK = (char *)COOL_COLOR_PINK;
     //}
 
     //// clang-format off
