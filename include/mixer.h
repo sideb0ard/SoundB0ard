@@ -61,7 +61,7 @@ typedef unsigned int compat_key_list[6];
 typedef struct preview_buffer
 {
     char filename[512];
-    double *audio_buffer;
+    double *audio_buffer = nullptr;
     int num_channels;
     int audio_buffer_len;
     int audio_buffer_read_idx;

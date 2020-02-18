@@ -1086,7 +1086,7 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
         g_event_queue.push(ev);
     }
     else
-        std::cout << "Nae PATTERMN!! gotz" << proc->pattern_->String() << "\n";
+        std::cout << "Nae PATTERMN!!\n";
 
     return NULLL;
 } // namespace evaluator

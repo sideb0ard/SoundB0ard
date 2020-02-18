@@ -124,7 +124,7 @@ class looper : public SoundGenerator
     bool have_active_buffer;
 
     char filename[512];
-    double *audio_buffer;
+    double *audio_buffer = nullptr;
     int num_channels;
     int audio_buffer_len;
     int size_of_sixteenth;
