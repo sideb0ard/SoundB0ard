@@ -124,7 +124,7 @@ class looper : public SoundGenerator
     bool have_active_buffer;
 
     char filename[512];
-    double *audio_buffer = nullptr;
+    double *audio_buffer{nullptr};
     int num_channels;
     int audio_buffer_len;
     int size_of_sixteenth;
@@ -189,7 +189,6 @@ class looper : public SoundGenerator
 };
 
 void looper_import_file(looper *g, char *filename);
-void looper_set_external_source(looper *g, int sound_gen_num);
 void looper_set_gate_mode(looper *g, bool b);
 
 int looper_calculate_grain_spacing(looper *g);

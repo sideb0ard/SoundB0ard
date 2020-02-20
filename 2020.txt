@@ -1,0 +1,51 @@
+
+let rb = loop(loops/scuddubraggableep.aiff); set rb:len 4
+
+kicks/dm02_909_kickdrum_006_drive.wav
+notes/FoolishBackGRan.aiff
+hh and sh
+
+d1 fm for a while
+
+dloops/SUNUN.aiff
+// sidechain //
+
+strings/elbtimeout.aiff
+
+toms -
+dloops/autechreBeat.aiff
+
+aesamples -- perc
+inc - aesamples/SH09_ACID.WAV
+
+
+d1
+
+
+loops/stereoLabVOICE.aiff // len 16
+
+dloops/ralfiRiTMO.aiff
+
+dloops//garageDrumx.aiff // len 2
+
+loops/wonkykeys.aiff
+
+p3 < every 4 "<0 10 20 30 40 70 50>"  "set wk:idx %"
+
+aesamples//steeldif09.WAV
+aesamples//steelxif08.WAV
+
+legowelt//Synth-TriffidPartyChord.wav
+loops/SEEFEEL.aiff
+
+loops/pumpUpDaJAM.aiff
+dloops//garageDrumx.aiff
+
+dloops/aciiiidBeat.aiff // len 2
+
+dloops/PARANOIDlondon2TRIM.aiff // len 0.5 // NOT WITH TRIIFFD
+
+dloops/EKSIbeat.aiff
+dloops/ESKIClip.aiff
+
+let zb = loop(dloops/ZeigenBOCK.aiff); addFx(zb, "sidechain", bd)

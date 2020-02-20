@@ -2,7 +2,7 @@
 
 typedef struct wtable
 {
-    double *table;
+    double *table{nullptr};
     unsigned long length;
 } wtable;
 

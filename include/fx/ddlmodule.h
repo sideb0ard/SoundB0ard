@@ -7,7 +7,7 @@ typedef struct ddlmodule
     double m_feedback;
     double m_wet_level;
 
-    double *m_buffer;
+    double *m_buffer{nullptr};
     int m_read_index;
     int m_write_index;
     int m_buffer_size;

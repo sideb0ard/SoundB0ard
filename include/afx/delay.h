@@ -3,11 +3,11 @@
 #include <math.h>
 #include <stdbool.h>
 
-typedef struct delay
+struct delay
 {
     double m_delay_in_samples;
     double m_output_attenuation;
-    double *m_buffer;
+    double *m_buffer{nullptr};
 
     int m_read_index;
     int m_write_index;
@@ -15,7 +15,7 @@ typedef struct delay
 
     double m_delay_ms;
     double m_output_attenuation_db;
-} delay;
+};
 
 void delay_init(delay *d, int delay_len);
 void delay_cook_variables(delay *d);

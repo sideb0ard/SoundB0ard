@@ -120,8 +120,8 @@ typedef struct
 {
     unsigned m_source_index;
     unsigned m_destination_index;
-    double *m_mod_intensity;
-    double *m_mod_range;
+    double *m_mod_intensity{nullptr};
+    double *m_mod_range{nullptr};
     unsigned m_source_transform;
     bool m_enable;
 } matrixrow;

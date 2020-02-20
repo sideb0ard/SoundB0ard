@@ -741,38 +741,6 @@ void looper_import_file(looper *g, char *filename)
         printf("Youch, couldn't unlock mutex!\n");
 }
 
-void looper_set_external_source(looper *g, int sound_gen_num)
-{
-    if (mixer_is_valid_soundgen_num(mixr, sound_gen_num))
-    {
-        g->external_source_sg = sound_gen_num;
-        int looplen = mixr->timing_info.loop_len_in_frames * 2; // stereo
-        double *buffer = (double *)calloc(looplen, sizeof(double));
-        if (buffer)
-        {
-            if (pthread_mutex_lock(&g->extsource_lock) == 0)
-            {
-                if (g->audio_buffer)
-                    free(g->audio_buffer);
-
-                g->audio_buffer = buffer;
-                g->audio_buffer_len = looplen;
-                g->num_channels = 2;
-                g->have_active_buffer = true;
-                g->size_of_sixteenth = g->audio_buffer_len / 16;
-                g->record_pending = true; // reset
-            }
-            else
-            {
-                printf("Couldn't lock buffer!\n");
-                free(buffer);
-            }
-            if (pthread_mutex_unlock(&g->extsource_lock) != 0)
-                printf("Youch, couldn't unlock mutex!\n");
-        }
-    }
-}
-
 int looper_calculate_grain_spacing(looper *g)
 {
     int looplen_in_seconds =

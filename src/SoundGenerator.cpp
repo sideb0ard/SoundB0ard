@@ -225,9 +225,6 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
                 tries++;
             }
 
-            if (engine.cur_step >= 16 || engine.cur_step < 0)
-                printf("UGH! still out of bounds! %d\n", engine.cur_step);
-
             engine.range_counter++;
             if (engine.range_counter % engine.range_len == 0)
             {

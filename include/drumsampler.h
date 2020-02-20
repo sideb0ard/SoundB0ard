@@ -55,7 +55,7 @@ class DrumSampler : public SoundGenerator
     envelope_generator eg;
     bool envelope_enabled;
 
-    double *buffer;
+    double *buffer{nullptr};
     int bufsize;
     int buf_end_pos; // this will always be shorter than bufsize for cutting off
                      // sample earlier

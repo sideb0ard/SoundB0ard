@@ -16,10 +16,10 @@ typedef struct wt_oscillator
     double m_wt_inc2;
 
     double m_sine_table[WT_LENGTH];
-    double *m_saw_tables[NUM_TABLES];
-    double *m_tri_tables[NUM_TABLES];
+    double *m_saw_tables[NUM_TABLES]{nullptr};
+    double *m_tri_tables[NUM_TABLES]{nullptr};
 
-    double *m_current_table;
+    double *m_current_table{nullptr};
     int m_current_table_idx;
 
     // correction factor
