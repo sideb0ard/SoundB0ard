@@ -29,6 +29,9 @@ struct audio_action_queue_item
     // ADD varz
     std::shared_ptr<SoundGenerator> sg{nullptr};
 
+    // STATUS varz
+    bool status_all{false};
+
     // UPDATE varz
     int fx_id{0};
     std::string param_name{};

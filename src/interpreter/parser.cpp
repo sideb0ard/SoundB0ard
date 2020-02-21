@@ -297,6 +297,13 @@ std::shared_ptr<ast::PsStatement> Parser::ParsePsStatement()
     std::shared_ptr<ast::PsStatement> stmt =
         std::make_shared<ast::PsStatement>(cur_token_);
 
+    if (PeekTokenIs(token::SLANG_IDENT) && peek_token_.literal_ == "all")
+    {
+        std::cout << "MEEp!\n";
+        stmt->all_ = true;
+        NextToken();
+    }
+
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
 

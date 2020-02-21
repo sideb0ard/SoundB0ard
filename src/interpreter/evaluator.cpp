@@ -256,6 +256,42 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                            .param_val = set_stmt->value_};
             g_audio_action_queue.push(action);
         }
+        else if (target->Type() == "ERROR")
+        {
+            auto ident_sound_gen =
+                std::dynamic_pointer_cast<ast::Identifier>(set_stmt->target_);
+            if (ident_sound_gen)
+            {
+                std::string &sound_gen_ident = ident_sound_gen->value_;
+                if (sound_gen_ident.size() >= 2)
+                {
+                    if (sound_gen_ident[0] == 's' &&
+                        IsDigit(sound_gen_ident[1]))
+                    {
+                        std::stringstream ss;
+                        int len_ident = sound_gen_ident.size();
+                        for (int i = 1; i < len_ident; i++)
+                        {
+                            if (IsDigit(sound_gen_ident[i]))
+                            {
+                                ss << sound_gen_ident[i];
+                            }
+                            else
+                            {
+                                return NULLL;
+                            }
+                        }
+                        audio_action_queue_item action{
+                            .type = AudioAction::UPDATE,
+                            .mixer_soundgen_idx = std::stoi(ss.str()),
+                            .fx_id = set_stmt->fx_num_,
+                            .param_name = set_stmt->param_,
+                            .param_val = set_stmt->value_};
+                        g_audio_action_queue.push(action);
+                    }
+                }
+            }
+        }
     }
 
     std::shared_ptr<ast::PanStatement> pan_stmt =
@@ -294,7 +330,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::PsStatement>(node);
     if (ps_expr)
     {
-        audio_action_queue_item action_req{.type = AudioAction::STATUS};
+        audio_action_queue_item action_req{.type = AudioAction::STATUS,
+                                           .status_all = ps_expr->all_};
         g_audio_action_queue.push(action_req);
     }
 

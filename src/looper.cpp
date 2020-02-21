@@ -92,10 +92,6 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 
     SoundGenerator::eventNotify(event, tinfo);
 
-    if (!engine.started)
-        return;
-    started = true;
-
     if (tinfo.is_start_of_loop)
     {
         loop_counter++;
@@ -166,28 +162,6 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
             audio_buffer_read_idx = new_read_idx;
     }
 
-    // step sequencer as env generator
-    // if (engine.patterns[engine.cur_pattern][cur_midi_idx].event_type ==
-    // MIDI_ON)
-    //{
-    //    eg_start_eg(&m_eg1);
-
-    //    midi_event *pattern = engine.patterns[engine.cur_pattern];
-    //    int off_tick =
-    //        (int)(cur_midi_idx +
-    //              ((m_eg1.m_attack_time_msec + m_eg1.m_decay_time_msec +
-    //                engine.sustain_note_ms) *
-    //               mixr->timing_info.ms_per_midi_tick)) %
-    //        PPBAR;
-    //    midi_event off_event = new_midi_event(MIDI_OFF, 0, 128);
-    //    midi_pattern_add_event(pattern, off_tick, off_event);
-    //}
-
-    // printf(
-    //    "LOOP NUM:%f cur_sixteenth:%d cur_16th_midi_base:%d
-    //    midi_idx:%d\n", loop_num, engine.cur_step,
-    //    cur_sixteenth_midi_base, cur_midi_idx);
-
     if (tinfo.is_sixteenth)
     {
         if (scramble_mode)
@@ -213,6 +187,9 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
                 stutter_idx = 0;
         }
     }
+    if (!engine.started)
+        return;
+    started = true;
 }
 
 stereo_val looper::genNext()
@@ -963,7 +940,12 @@ void looper::noteOff(midi_event ev)
 
 void looper::SetParam(std::string name, double val)
 {
-    if (name == "pitch")
+    if (name == "active")
+    {
+        std::cout << "ACTIVE! " << val << std::endl;
+        this->active = val;
+    }
+    else if (name == "pitch")
         looper_set_grain_pitch(this, val);
     else if (name == "mode")
     {

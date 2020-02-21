@@ -219,8 +219,8 @@ std::string mixer_status_sgz(mixer *mixr, bool all)
                     all)
                 {
 
-                    ss << WCOOL_COLOR_GREEN << "[" << WANSI_COLOR_WHITE << "s"
-                       << i << WCOOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
+                    ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s"
+                       << i << COOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
                     ss << mixr->SoundGenerators[i]->Info() << ANSI_COLOR_RESET
                        << "\n";
 
@@ -258,9 +258,10 @@ void mixer_ps(mixer *mixr, bool all)
     ss << mixer_status_procz(mixr, false);
     ss << ANSI_COLOR_RESET;
 
-    g_reply_queue.push(ss.str());
+    if (all)
+        ss << mixer_status_sgz(mixr, all);
 
-    // mixer_status_sgz(mixr, all);
+    g_reply_queue.push(ss.str());
 }
 
 // static void mixer_print_notes(mixer *mixr)
@@ -786,7 +787,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
         if (action)
         {
             if (action->type == AudioAction::STATUS)
-                mixer_ps(mixr, true);
+                mixer_ps(mixr, action->status_all);
             else if (action->type == AudioAction::ADD)
                 mixr->SoundGenerators[action->mixer_soundgen_idx] = action->sg;
             else if (action->type == AudioAction::ADD_FX)
@@ -891,6 +892,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                         }
                         else // must be a SoundGenerator param
                         {
+                            std::cout << "SET YO\n";
                             sg->SetParam(action->param_name, action->param_val);
                         }
                     }

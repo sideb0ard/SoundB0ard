@@ -26,8 +26,6 @@ loops/stereoLabVOICE.aiff // len 16
 
 dloops/ralfiRiTMO.aiff
 
-dloops//garageDrumx.aiff // len 2
-
 loops/wonkykeys.aiff
 
 p3 < every 4 "<0 10 20 30 40 70 50>"  "set wk:idx %"
@@ -36,16 +34,24 @@ aesamples//steeldif09.WAV
 aesamples//steelxif08.WAV
 
 legowelt//Synth-TriffidPartyChord.wav
-loops/SEEFEEL.aiff
 
+kicks/808kick.aif
+
+// no wonkykeys
 loops/pumpUpDaJAM.aiff
-dloops//garageDrumx.aiff
+dloops//garageDrumx.aiff // len 2
 
 dloops/aciiiidBeat.aiff // len 2
 
-dloops/PARANOIDlondon2TRIM.aiff // len 0.5 // NOT WITH TRIIFFD
+// dloops/PARANOIDlondon2TRIM.aiff // len 0.5 // NOT WITH TRIIFFD
 
+BPM 120
+
+loops/GURLblunt.aiff // bpm 120ishh
 dloops/EKSIbeat.aiff
 dloops/ESKIClip.aiff
+
+loops/ACiiiiidBassSquelch.aiff
+loops/ACiiiiidBassSquelch2.aiff
 
 let zb = loop(dloops/ZeigenBOCK.aiff); addFx(zb, "sidechain", bd)
