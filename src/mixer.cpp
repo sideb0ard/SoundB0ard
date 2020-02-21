@@ -892,7 +892,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                         }
                         else // must be a SoundGenerator param
                         {
-                            std::cout << "SET YO\n";
                             sg->SetParam(action->param_name, action->param_val);
                         }
                     }

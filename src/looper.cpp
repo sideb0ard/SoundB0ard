@@ -942,7 +942,6 @@ void looper::SetParam(std::string name, double val)
 {
     if (name == "active")
     {
-        std::cout << "ACTIVE! " << val << std::endl;
         this->active = val;
     }
     else if (name == "pitch")

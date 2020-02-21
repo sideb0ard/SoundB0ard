@@ -17,14 +17,17 @@ dloops/autechreBeat.aiff
 
 aesamples -- perc
 inc - aesamples/SH09_ACID.WAV
+aesamples/shstr_03.WAV
 
 
 d1
 
-
 loops/stereoLabVOICE.aiff // len 16
+--
+loops/ONETIMECHILL.aiff // len 8
 
-dloops/ralfiRiTMO.aiff
+loops/UMFRANGloop.aiff // len 2
+loops/PALSTUTTERPiano.aiff // len 2
 
 loops/wonkykeys.aiff
 
@@ -33,6 +36,8 @@ p3 < every 4 "<0 10 20 30 40 70 50>"  "set wk:idx %"
 aesamples//steeldif09.WAV
 aesamples//steelxif08.WAV
 
+// no wonkykeys
+
 legowelt//Synth-TriffidPartyChord.wav
 
 kicks/808kick.aif
@@ -40,6 +45,8 @@ kicks/808kick.aif
 // no wonkykeys
 loops/pumpUpDaJAM.aiff
 dloops//garageDrumx.aiff // len 2
+dloops/ralfiRiTMO.aiff
+
 
 dloops/aciiiidBeat.aiff // len 2
 
