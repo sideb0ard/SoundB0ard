@@ -189,6 +189,9 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     }
     if (!engine.started)
         return;
+    if (!started)
+        std::cout << "Setting STARTED = true! Midi Idx:" << cur_midi_idx
+                  << " REAd Idx: " << audio_buffer_read_idx << std::endl;
     started = true;
 }
 
@@ -201,30 +204,6 @@ stereo_val looper::genNext()
 
     if (stop_pending && m_eg1.m_state == OFFF)
         active = false;
-
-    if (external_source_sg != -1)
-    {
-        if (recording)
-        {
-            if (mixer_is_valid_soundgen_num(mixr, external_source_sg))
-            {
-                audio_buffer[audio_buffer_write_idx] =
-                    mixr->soundgen_cur_val[external_source_sg].left;
-                audio_buffer[audio_buffer_write_idx + 1] =
-                    mixr->soundgen_cur_val[external_source_sg].right;
-                audio_buffer_write_idx = audio_buffer_write_idx + 2;
-
-                if (audio_buffer_write_idx >= audio_buffer_len)
-                {
-                    audio_buffer_write_idx = 0;
-
-                    if (external_source_mode ==
-                        LOOPER_EXTERNAL_MODE_CAPTURE_ONCE)
-                        recording = false;
-                }
-            }
-        }
-    }
 
     if (have_active_buffer) // file buffer or external in
     {

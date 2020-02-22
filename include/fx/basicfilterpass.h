@@ -34,8 +34,8 @@ class FilterPass : Fx
     filter_moogladder m_filter_;
 
     lfo m_lfo1_; // route to freq
-    bool m_lfo1_active_;
+    bool m_lfo1_active_{true};
 
     lfo m_lfo2_; // route to qv
-    bool m_lfo2_active_;
+    bool m_lfo2_active_{false};
 };
