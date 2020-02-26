@@ -48,6 +48,8 @@
 
 constexpr int kMaxNumSoundGenFx = 20;
 
+constexpr float kMaxDelayLenSecs = 30.0;
+
 // #define sparkchars L"\u2581\u2582\u2583\u2585\u2586\u2587"
 
 #define ANSI_COLOR_BLUE "\x1b[34m"

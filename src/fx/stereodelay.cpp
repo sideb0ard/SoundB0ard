@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <wchar.h>
 
+#include <iostream>
+
 #include <fx/stereodelay.h>
 
 extern mixer *mixr;
@@ -63,8 +65,8 @@ void StereoDelay::Reset()
 void StereoDelay::PrepareForPlay()
 {
     // delay line memory allocated here
-    delayline_init(&m_left_delay_, 2.0 * SAMPLE_RATE);
-    delayline_init(&m_right_delay_, 2.0 * SAMPLE_RATE);
+    delayline_init(&m_left_delay_, kMaxDelayLenSecs * SAMPLE_RATE);
+    delayline_init(&m_right_delay_, kMaxDelayLenSecs * SAMPLE_RATE);
     Reset();
 }
 
@@ -78,13 +80,14 @@ void StereoDelay::SetMode(unsigned mode)
 
 void StereoDelay::SetDelayTimeMs(double delay_ms)
 {
-    if (delay_ms >= 0 && delay_ms <= 2000)
+    if (delay_ms >= 0 && delay_ms <= kMaxDelayLenSecs * 1000)
     {
         m_delay_time_ms_ = delay_ms;
         Update();
     }
     else
-        printf("Delay time ms must be between 0 and 2000\n");
+        std::cerr << "Delay time ms must be between 0 and "
+                  << kMaxDelayLenSecs * 1000 << std::endl;
 }
 
 void StereoDelay::SetFeedbackPercent(double feedback_percent)

@@ -177,6 +177,8 @@ std::string mixer_status_env(mixer *mixr)
         if (mixer_is_valid_soundgen_num(mixr, sg_idx))
         {
             auto sg = mixr->SoundGenerators[sg_idx];
+            if (!sg->active)
+                continue;
             ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
                << sg->Status() << ANSI_COLOR_RESET << std::endl;
 
@@ -886,8 +888,11 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                     mixr, action->mixer_soundgen_idx, fx_num))
                             {
                                 Fx *f = sg->effects[fx_num];
-                                f->SetParam(action->param_name,
-                                            action->param_val);
+                                if (action->param_name == "active")
+                                    f->enabled_ = action->param_val;
+                                else
+                                    f->SetParam(action->param_name,
+                                                action->param_val);
                             }
                         }
                         else // must be a SoundGenerator param

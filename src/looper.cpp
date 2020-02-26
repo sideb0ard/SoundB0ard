@@ -189,9 +189,6 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     }
     if (!engine.started)
         return;
-    if (!started)
-        std::cout << "Setting STARTED = true! Midi Idx:" << cur_midi_idx
-                  << " REAd Idx: " << audio_buffer_read_idx << std::endl;
     started = true;
 }
 

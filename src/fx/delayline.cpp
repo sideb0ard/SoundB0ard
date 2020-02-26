@@ -29,12 +29,26 @@ void delayline_reset(delayline *dl)
 
 void delayline_set_delay_ms(delayline *dl, double delay_ms)
 {
+    int max_delay_ms = kMaxDelayLenSecs * 1000;
+    if (delay_ms > max_delay_ms)
+    {
+        std::cerr << "DELAY MS:" << delay_ms
+                  << " LARGER THAN MAX MS:" << max_delay_ms << std::endl;
+        return;
+    }
     dl->m_delay_ms = delay_ms;
     delayline_cook_variables(dl);
 }
 
 void delayline_cook_variables(delayline *dl)
 {
+    if (dl->m_delay_ms > kMaxDelayLenSecs * 1000)
+    {
+        std::cout << "OOFT, DELAY TOO BIG:" << dl->m_delay_ms
+                  << "ms is bigger than " << kMaxDelayLenSecs << " seconds"
+                  << std::endl;
+        return;
+    }
     dl->m_delay_in_samples = dl->m_delay_ms * ((double)SAMPLE_RATE / 1000.0);
     dl->m_read_index = dl->m_write_index - (int)dl->m_delay_in_samples;
     if (dl->m_read_index < 0)
@@ -56,6 +70,9 @@ double delayline_read_delay(delayline *dl)
 
 double delayline_read_delay_at(delayline *dl, double ms)
 {
+    if (ms > kMaxDelayLenSecs * 1000)
+        return 0;
+
     double delay_in_samples = ms * ((float)SAMPLE_RATE) / 1000.0;
     int read_index = dl->m_write_index - (int)delay_in_samples;
 
