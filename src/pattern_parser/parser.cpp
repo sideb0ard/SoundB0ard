@@ -82,12 +82,14 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             auto ev_group = std::make_shared<pattern_parser::PatternGroup>();
             for (int i = 0; i < mod_value; ++i)
                 ev_group->event_groups_[0].push_back(return_node);
-            return ev_group;
+            std::cout << "MULTIPLIER TO\n";
+            return_node = ev_group;
         }
         else
             return_node->divisor_value_ = mod_value;
     }
-    else if (PeekTokenIs(pattern_parser::PATTERN_OPEN_PAREN))
+
+    if (PeekTokenIs(pattern_parser::PATTERN_OPEN_PAREN))
     {
         std::cout << "GOT EUCLIDEAN!" << std::endl;
         // Euclidean e.g. '(3,8)'
