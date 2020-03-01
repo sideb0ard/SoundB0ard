@@ -849,8 +849,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                 note_duration_ms = intr_obj->value_;
                             }
 
-                            // call noteOn after ensuring we got duration for
-                            // noteOff, otherwise we could have a stuck note.
                             sg->noteOn(event_on);
 
                             int duration_in_midi_ticks =

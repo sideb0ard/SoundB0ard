@@ -309,10 +309,24 @@ struct MusicalEvent
 {
     MusicalEvent() = default;
     MusicalEvent(std::string value, ProcessPatternTarget target_type)
-        : value_{value}, target_type_{target_type}
+        : MusicalEvent(value, /* midi velocity */ 127, /* duration in ms */ 300,
+                       target_type)
+    {
+    }
+    MusicalEvent(std::string value, float velocity,
+                 ProcessPatternTarget target_type)
+        : MusicalEvent(value, velocity, /* duration in ms */ 300, target_type)
+    {
+    }
+    MusicalEvent(std::string value, float velocity, float duration,
+                 ProcessPatternTarget target_type)
+        : value_{value}, velocity_{velocity}, duration_{duration},
+          target_type_{target_type}
     {
     }
     std::string value_;
+    float velocity_;
+    float duration_;
     ProcessPatternTarget target_type_;
 };
 

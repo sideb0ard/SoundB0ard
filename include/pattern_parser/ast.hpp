@@ -22,7 +22,11 @@ class PatternNode
     int divisor_value_{0}; // only set when a divisor is present
     int euclidean_hits_{0};
     int euclidean_steps_{0};
-    bool randomize{false};
+    bool randomize_{false};
+    std::vector<float> amplitude_{};
+    int amplitude_idx_{0};
+    std::vector<float> duration_{};
+    int duration_idx_{0};
 };
 
 class PatternLeaf : public PatternNode

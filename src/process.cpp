@@ -111,11 +111,12 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     {
                         if (e->value_ == "~") // skip blank markers
                             continue;
-                        std::string cmd =
-                            std::string("noteOn(") + e->value_ + "," +
-                            /*velocity + hold_time_ms **/ "127, 250)";
+                        std::stringstream ss;
+                        ss << "noteOn(" << e->value_ << ","
+                           << /* midi middle C */ 60 << "," << e->velocity_
+                           << "," << e->duration_ << ")";
 
-                        g_command_queue.push(cmd);
+                        g_command_queue.push(ss.str());
                     }
                 }
                 else if (target_type_ == ProcessPatternTarget::VALUES)
@@ -126,10 +127,11 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             continue;
                         for (auto t : targets_)
                         {
-                            std::string cmd = std::string("noteOn(") + t + "," +
-                                              e->value_ + ", 127, 250)";
+                            std::stringstream ss;
+                            ss << "noteOn(" << t << "," << e->value_ << ","
+                               << e->velocity_ << "," << e->duration_ << ")";
 
-                            g_command_queue.push(cmd);
+                            g_command_queue.push(ss.str());
                         }
                     }
                 }
@@ -296,6 +298,21 @@ void Process::EvalPattern(
         }
     }
 
+    float amp = 0;
+    if (node->amplitude_.size() > 0)
+    {
+        amp = node->amplitude_[node->amplitude_idx_];
+        if (++(node->amplitude_idx_) == (int)node->amplitude_.size())
+            node->amplitude_idx_ = 0;
+    }
+    float dur = 0;
+    if (node->duration_.size() > 0)
+    {
+        dur = node->duration_[node->duration_idx_];
+        if (++(node->duration_idx_) == (int)node->duration_.size())
+            node->duration_idx_ = 0;
+    }
+
     std::shared_ptr<pattern_parser::PatternLeaf> leaf_node =
         std::dynamic_pointer_cast<pattern_parser::PatternLeaf>(node);
     if (leaf_node)
@@ -306,7 +323,7 @@ void Process::EvalPattern(
                       << " Is >0 PPBAR:" << PPBAR << std::endl;
             return;
         }
-        if (leaf_node->randomize)
+        if (leaf_node->randomize_)
         {
             if (rand() % 100 < 50)
                 return;
@@ -314,8 +331,20 @@ void Process::EvalPattern(
         std::string value = leaf_node->value_;
         if (value != "~")
         {
-            pattern_events_[target_start].push_back(
-                std::make_shared<MusicalEvent>(value, target_type_));
+            if (amp)
+            {
+                if (dur)
+                    pattern_events_[target_start].push_back(
+                        std::make_shared<MusicalEvent>(value, amp, dur,
+                                                       target_type_));
+                else
+                    pattern_events_[target_start].push_back(
+                        std::make_shared<MusicalEvent>(value, amp,
+                                                       target_type_));
+            }
+            else
+                pattern_events_[target_start].push_back(
+                    std::make_shared<MusicalEvent>(value, target_type_));
         }
         return;
     }
@@ -341,6 +370,17 @@ void Process::EvalPattern(
             {
                 std::shared_ptr<pattern_parser::PatternNode> sub_node =
                     events[event_idx];
+                if (amp)
+                {
+                    sub_node->amplitude_.clear();
+                    sub_node->amplitude_.push_back(amp);
+                }
+                if (dur)
+                {
+                    sub_node->duration_.clear();
+                    sub_node->duration_.push_back(dur);
+                }
+
                 EvalPattern(sub_node, j, j + spacing);
             }
         }
@@ -353,6 +393,16 @@ void Process::EvalPattern(
         int idx = multi_node->current_val_idx_++ % multi_node->values_.size();
         std::shared_ptr<pattern_parser::PatternNode> sub_node =
             multi_node->values_[idx];
+        if (amp)
+        {
+            sub_node->amplitude_.clear();
+            sub_node->amplitude_.push_back(amp);
+        }
+        if (dur)
+        {
+            sub_node->duration_.clear();
+            sub_node->duration_.push_back(dur);
+        }
         EvalPattern(sub_node, target_start, target_end);
     }
 }

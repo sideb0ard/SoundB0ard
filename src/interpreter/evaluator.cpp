@@ -390,7 +390,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
 
         auto builtin_func = std::dynamic_pointer_cast<object::BuiltIn>(fun);
         if (builtin_func)
+        {
             return ApplyFunction(builtin_func, args);
+        }
 
         return NewError("Not a function object, mate:%s!", fun->Type());
     }
@@ -873,7 +875,9 @@ ApplyFunction(std::shared_ptr<object::Object> callable,
     std::shared_ptr<object::BuiltIn> builtin =
         std::dynamic_pointer_cast<object::BuiltIn>(callable);
     if (builtin)
+    {
         return builtin->func_(args);
+    }
 
     return NewError("Something stinky wit yer functions, mate!");
 }

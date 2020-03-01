@@ -122,9 +122,54 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     }
     else if (PeekTokenIs(pattern_parser::PATTERN_QUESTIONMARK))
     {
-        return_node->randomize = true;
+        return_node->randomize_ = true;
         NextToken();
     }
+    else if (PeekTokenIs(pattern_parser::PATTERN_COLON))
+    {
+        int iter = 0; // 0 = Amp/Vel 1 = Duration // ignore anything esle
+        while (PeekTokenIs(pattern_parser::PATTERN_COLON))
+        {
+            NextToken();
+            if (PeekTokenIs(pattern_parser::PATTERN_NUMBER))
+            {
+                std::cout << "GOT A NUM:" << peek_token_.literal_ << std::endl;
+                if (iter == 0)
+                    return_node->amplitude_.push_back(
+                        std::stof(peek_token_.literal_));
+                else if (iter == 1)
+                    return_node->duration_.push_back(
+                        std::stof(peek_token_.literal_));
+                NextToken();
+            }
+            else if (PeekTokenIs(pattern_parser::PATTERN_OPEN_ANGLE_BRACKET))
+            {
+                std::cout << "GOT A PATTERN:" << peek_token_.literal_
+                          << std::endl;
+                NextToken();
+                while (PeekTokenIs(pattern_parser::PATTERN_NUMBER))
+                {
+                    std::cout << "GOT A NUM:" << peek_token_.literal_
+                              << std::endl;
+                    if (iter == 0)
+                        return_node->amplitude_.push_back(
+                            std::stof(peek_token_.literal_));
+                    else if (iter == 1)
+                        return_node->duration_.push_back(
+                            std::stof(peek_token_.literal_));
+                    NextToken();
+                }
+                if (!ExpectPeek(pattern_parser::PATTERN_CLOSE_ANGLE_BRACKET))
+                {
+                    std::cerr << "Can't find end of PATTERN - nae '>' - wtf?\n";
+                    return nullptr;
+                }
+            }
+            iter++;
+        }
+    }
+    std::cout << "RETURN NODE HAS NUM AMP:" << return_node->amplitude_.size()
+              << std::endl;
 
     return return_node;
 }
@@ -141,6 +186,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
 {
 
+    std::cout << "PARSE MULTI YO!\n";
     std::shared_ptr<pattern_parser::PatternMultiStep> node =
         std::make_shared<pattern_parser::PatternMultiStep>();
 
@@ -154,6 +200,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
     }
 
     NextToken();
+    std::cout << "RETURNING MULTI STEP\n";
 
     return node;
 }

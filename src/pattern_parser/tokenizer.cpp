@@ -114,10 +114,15 @@ pattern_parser::Token Tokenizer::NextToken()
         tok.type_ = pattern_parser::PATTERN_QUESTIONMARK;
         tok.literal_ = current_char_;
         break;
+    case (':'):
+        tok.type_ = pattern_parser::PATTERN_COLON;
+        tok.literal_ = current_char_;
+        break;
     case (0):
         tok.type_ = pattern_parser::PATTERN_EOF;
         break;
     default:
+        // var name can't start with a digit
         if (IsValidIdentifier(current_char_) && !IsDigit(current_char_))
         {
             tok.literal_ = ReadIdentifier();
