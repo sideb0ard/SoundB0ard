@@ -840,7 +840,6 @@ void dxsynth::randomize()
     m_settings.m_op4_output_lvl = (rand() % 55) + 15;
     m_settings.m_op4_feedback = rand() % 70;
 
-    printf("UPDATE!\n");
     dxsynth_update(this);
     // dxsynth_print_settings(dx);
 }

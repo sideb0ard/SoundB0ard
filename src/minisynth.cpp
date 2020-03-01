@@ -2340,7 +2340,6 @@ void minisynth_set_hard_sync(MiniSynth *ms, bool val)
 
 void MiniSynth::SetParam(std::string name, double val)
 {
-    std::cout << "SET PARAM:" << name << " :" << val << std::endl;
     if (name == "vol")
         SetVolume(val);
     else if (name == "pan")
