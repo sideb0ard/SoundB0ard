@@ -1,4 +1,30 @@
 
+[Env]
+mo = Moog(shirpyyy) vol:0 pan:0 voice:SQR3(1)
+     fx0 Distortion! threshold:0.10
+bl = glitchz//BLURP.aiff vol:0 pan:0 pitch:1 idx:0 mode:SMUDGE(2) step:0 len:1
+bd = Sampler(kicks/808Kkick.wav) vol:1 pan:0 pitch:1
+bz = Sampler(perc/bzzt.aiff) vol:1 pan:0 pitch:1
+     fx0 Distortion! threshold:0.71
+bw = Sampler(perc/bahWic.aiff) vol:1 pan:0 pitch:2
+     fx0 Distortion! threshold:0.40
+sf = Sampler(perc/surfaceFalle.aiff) vol:1 pan:0 pitch:1
+     fx0 Distortion! threshold:0.20
+was = pads//washey.aiff vol:0.6 pan:0 pitch:2 idx:89 mode:SMUDGE(2) step:0 len:1
+      fx0 predelayms:40.00 reverbtime:587 wetmx:44.7
+mac = Sampler(claps/mawOW.aiff) vol:0 pan:0 pitch:1
+
+[Procz]
+p1 # "g1 g1:<100 127 90>:<300 500 100> [a1 c1]:127:500 [a1 <c2 g2>]:127:1000" mo,bd | every 3 rotl 4 | every 2 mask "f0f0"
+p2 < osc 13 "500 15000"  "set mo:fc %"
+p3 < every 3 "<0.5 1 2>"  "set bd:pitch %"
+p4 $ "[~ <sf bz bz bw mac>] ~ [ ~ <sf mac sf bz>] ~"
+p5 < every 8 "<1 2>"  "set was:pitch %"
+p6 < osc 13 "20 70"  "set was:fx0:wetmx %"
+p7 < osc 14 "100 1000"  "set was:fx0:reverbtime %"
+
+
+
 let rb = loop(loops/scuddubraggableep.aiff); set rb:len 4
 
 kicks/dm02_909_kickdrum_006_drive.wav

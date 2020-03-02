@@ -221,7 +221,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::InfoStatement>(node);
     if (info_stmt)
     {
-        std::cout << "INFO, YO!\n";
         auto soundgen_var_name = std::dynamic_pointer_cast<ast::Identifier>(
             info_stmt->soundgen_identifier_);
         if (soundgen_var_name)
