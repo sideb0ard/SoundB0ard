@@ -193,11 +193,11 @@ int get_midi_note_from_string(char *string)
         return -1;
     }
     char note[3] = {0};
-    int octave = -1;
+    int octave = 4; // default if none provided
     sscanf(string, "%[a-z#]%d", note, &octave);
-    if (octave == -1)
-        return -1;
+    note[2] = 0; // safety
 
+    // convert octave to midi semitones
     octave = 12 + (octave * 12);
 
     // printf("MIDI NOTE:%s %d \n", note, octave);

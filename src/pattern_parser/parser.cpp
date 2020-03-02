@@ -170,8 +170,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             iter++;
         }
     }
-    std::cout << "RETURN NODE HAS NUM AMP:" << return_node->amplitude_.size()
-              << std::endl;
 
     return return_node;
 }
@@ -188,7 +186,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternLeaf()
 std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
 {
 
-    std::cout << "PARSE MULTI YO!\n";
     std::shared_ptr<pattern_parser::PatternMultiStep> node =
         std::make_shared<pattern_parser::PatternMultiStep>();
 
@@ -202,7 +199,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternMultiStep()
     }
 
     NextToken();
-    std::cout << "RETURNING MULTI STEP\n";
 
     return node;
 }

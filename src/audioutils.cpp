@@ -138,3 +138,17 @@ bool is_midi_note_in_key(unsigned int note, unsigned int key)
         return true;
     return false;
 }
+
+bool IsNote(std::string input)
+{
+    if (input.size() > 0)
+    {
+        char firstchar = ::tolower(input[0]);
+        if (firstchar == 'a' || firstchar == 'b' || firstchar == 'c' ||
+            firstchar == 'd' || firstchar == 'e' || firstchar == 'f' ||
+            firstchar == 'g')
+            return true;
+    }
+
+    return false;
+}

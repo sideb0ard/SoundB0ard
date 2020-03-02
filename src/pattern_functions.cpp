@@ -3,6 +3,8 @@
 #include <iostream>
 #include <sstream>
 
+#include <audioutils.h>
+#include <midimaaan.h>
 #include <pattern_functions.hpp>
 #include <utils.h>
 
@@ -82,7 +84,11 @@ void PatternTranspose::TransformPattern(
             {
                 if (e->target_type_ == ProcessPatternTarget::VALUES)
                 {
-                    int str_to_val = std::stoi(e->value_);
+                    int str_to_val = 60;
+                    if (IsNote(e->value_))
+                        str_to_val = get_midi_note_from_string(&e->value_[0]);
+                    else
+                        str_to_val = std::stoi(e->value_);
                     if (direction_ == UP)
                         str_to_val += num_midi_notes_to_adjust;
                     else
@@ -254,7 +260,11 @@ void PatternArp::TransformPattern(
                 auto midi_event = mevents[0];
                 if (midi_event->target_type_ == ProcessPatternTarget::VALUES)
                 {
-                    last_midi_note_ = std::stoi(midi_event->value_);
+                    if (IsNote(midi_event->value_))
+                        last_midi_note_ =
+                            get_midi_note_from_string(&midi_event->value_[0]);
+                    else
+                        last_midi_note_ = std::stoi(midi_event->value_);
                     counter = 0;
                 }
             }

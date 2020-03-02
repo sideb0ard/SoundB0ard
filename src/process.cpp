@@ -6,13 +6,15 @@
 #include <iostream>
 #include <sstream>
 
-#include "cmdloop.h"
-#include "mixer.h"
-#include "process.hpp"
-#include "utils.h"
+#include <audioutils.h>
+#include <cmdloop.h>
 #include <looper.h>
+#include <midimaaan.h>
+#include <mixer.h>
 #include <pattern_utils.h>
+#include <process.hpp>
 #include <tsqueue.hpp>
+#include <utils.h>
 
 #include <pattern_parser/euclidean.hpp>
 #include <pattern_parser/tokenizer.hpp>
@@ -127,8 +129,15 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             continue;
                         for (auto t : targets_)
                         {
+                            std::string midistring = e->value_;
+                            if (IsNote(e->value_))
+                            {
+                                midistring = std::to_string(
+                                    get_midi_note_from_string(&e->value_[0]));
+                            }
+
                             std::stringstream ss;
-                            ss << "noteOn(" << t << "," << e->value_ << ","
+                            ss << "noteOn(" << t << "," << midistring << ","
                                << e->velocity_ << "," << e->duration_ << ")";
 
                             g_command_queue.push(ss.str());
