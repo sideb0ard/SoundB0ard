@@ -1,4 +1,10 @@
 
+
+
+sbarkey
+p1 # "g2 <g g2*2> <~ gm2 em5>  <gm2 gm? [~ gm]>" mo,bd | down 2
+
+
 [Env]
 mo = Moog(shirpyyy) vol:0 pan:0 voice:SQR3(1)
      fx0 Distortion! threshold:0.10

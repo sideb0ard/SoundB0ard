@@ -18,5 +18,9 @@ typedef struct audio_buffer_details
 int get_chord_type(unsigned int scale_degree);
 void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
                                int octave, chord_midi_notes *chnotes);
-bool is_midi_note_in_key(unsigned int midi_note, unsigned int key);
+
+int GetScaleIndex(int note, int key);
+int GetStepsToNextDegree(int scale_index);
+int GetNthDegree(int note, int degree, int key);
+bool IsMidiNoteInKey(unsigned int midi_note, unsigned int key);
 bool IsNote(std::string input);

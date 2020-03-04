@@ -115,11 +115,76 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
     chnotes->fifth = fifth_midi;
 }
 
-bool is_midi_note_in_key(unsigned int note, unsigned int key)
+int GetScaleIndex(int note, int key)
+{
+    if (!IsMidiNoteInKey(note, key))
+        return -1;
+    note = note % 12;
+    key = key % 12;
+    if (note == key)
+        return 0;
+    else if (note == key + 2)
+        return 1;
+    else if (note == key + 4)
+        return 2;
+    else if (note == key + 5)
+        return 3;
+    else if (note == key + 7)
+        return 5;
+    else if (note == key + 9)
+        return 6;
+    else if (note == key + 11)
+        return 7;
+    return -1;
+}
+
+int GetStepsToNextDegree(int scale_index)
+{
+    if (scale_index > 7)
+        return -1;
+    switch (scale_index)
+    {
+    case (0):
+        return 2;
+    case (1):
+        return 2;
+    case (2):
+        return 1;
+    case (3):
+        return 2;
+    case (4):
+        return 2;
+    case (5):
+        return 2;
+    case (6):
+        return 1;
+    case (7):
+        return 2;
+    }
+    return -1;
+}
+
+// returns an int to indicate midi num representing n'th
+// degree from input note
+int GetNthDegree(int note, int degree, int key)
+{
+    if (!IsMidiNoteInKey(note, key))
+        return -1;
+    int scale_index = GetScaleIndex(note, key);
+    int return_midi_num = note;
+    for (int i = 0; i < degree; i++)
+    {
+        return_midi_num += GetStepsToNextDegree(scale_index);
+    }
+    return return_midi_num;
+}
+
+bool IsMidiNoteInKey(unsigned int note, unsigned int key)
 {
     // printf("NOTE is %d and KEY is %d\n", note, key);
     // western scale is 2 2 1 2 2 2 1
     note = note % 12;
+    key = key % 12;
     if (note == key)
         return true;
     else if (note == key + 2)
