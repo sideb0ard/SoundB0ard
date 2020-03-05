@@ -1,3 +1,4 @@
+#include <iostream>
 #include <portaudio.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -6,6 +7,81 @@
 #include <audioutils.h>
 #include <midimaaan.h>
 #include <utils.h>
+
+// used by GetNthDegree
+namespace
+{
+int GetMidiNumForKey(char c)
+{
+    char lc_c = tolower(c);
+    switch (lc_c)
+    {
+    case ('c'):
+        return 0;
+    case ('d'):
+        return 2;
+    case ('e'):
+        return 4;
+    case ('f'):
+        return 5;
+    case ('g'):
+        return 7;
+    case ('a'):
+        return 9;
+    case ('b'):
+        return 11;
+    default:
+        return -1;
+    }
+}
+int GetScaleIndex(int note, char key)
+{
+    if (!IsMidiNoteInKey(note, key))
+        return -1;
+    note = note % 12;
+    int key_midi_num = GetMidiNumForKey(key);
+    if (note == key_midi_num)
+        return 0;
+    else if (note == key_midi_num + 2)
+        return 1;
+    else if (note == key_midi_num + 4)
+        return 2;
+    else if (note == key_midi_num + 5)
+        return 3;
+    else if (note == key_midi_num + 7)
+        return 5;
+    else if (note == key_midi_num + 9)
+        return 6;
+    else if (note == key_midi_num + 11)
+        return 7;
+    return -1;
+}
+
+int GetStepsToNextDegree(int scale_index)
+{
+    if (scale_index > 7)
+        return -1;
+    switch (scale_index)
+    {
+    case (0):
+        return 2;
+    case (1):
+        return 2;
+    case (2):
+        return 1;
+    case (3):
+        return 2;
+    case (4):
+        return 2;
+    case (5):
+        return 2;
+    case (6):
+        return 1;
+    }
+    return -1;
+}
+
+} // namespace
 
 double pa_setup(void)
 {
@@ -115,91 +191,47 @@ void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
     chnotes->fifth = fifth_midi;
 }
 
-int GetScaleIndex(int note, int key)
-{
-    if (!IsMidiNoteInKey(note, key))
-        return -1;
-    note = note % 12;
-    key = key % 12;
-    if (note == key)
-        return 0;
-    else if (note == key + 2)
-        return 1;
-    else if (note == key + 4)
-        return 2;
-    else if (note == key + 5)
-        return 3;
-    else if (note == key + 7)
-        return 5;
-    else if (note == key + 9)
-        return 6;
-    else if (note == key + 11)
-        return 7;
-    return -1;
-}
-
-int GetStepsToNextDegree(int scale_index)
-{
-    if (scale_index > 7)
-        return -1;
-    switch (scale_index)
-    {
-    case (0):
-        return 2;
-    case (1):
-        return 2;
-    case (2):
-        return 1;
-    case (3):
-        return 2;
-    case (4):
-        return 2;
-    case (5):
-        return 2;
-    case (6):
-        return 1;
-    case (7):
-        return 2;
-    }
-    return -1;
-}
-
 // returns an int to indicate midi num representing n'th
 // degree from input note
-int GetNthDegree(int note, int degree, int key)
+int GetNthDegree(int note, int degree, char key)
 {
     if (!IsMidiNoteInKey(note, key))
+    {
+        std::cout << "NOT IN KEY KEY YO\n";
         return -1;
+    }
     int scale_index = GetScaleIndex(note, key);
     int return_midi_num = note;
     for (int i = 0; i < degree; i++)
     {
         return_midi_num += GetStepsToNextDegree(scale_index);
+        scale_index = ++scale_index % 7; // 7 distinct notes in scale
     }
     return return_midi_num;
 }
 
-bool IsMidiNoteInKey(unsigned int note, unsigned int key)
+int GetThird(int note, char key) { return GetNthDegree(note, 2, key); }
+int GetFifth(int note, char key) { return GetNthDegree(note, 4, key); }
+
+bool IsMidiNoteInKey(int note, char key)
 {
-    // printf("NOTE is %d and KEY is %d\n", note, key);
-    // western scale is 2 2 1 2 2 2 1
     note = note % 12;
-    key = key % 12;
-    if (note == key)
+    int key_midi_num = GetMidiNumForKey(key);
+    if (note == key_midi_num)
         return true;
-    else if (note == key + 2)
+    else if (note == key_midi_num + 2)
         return true;
-    else if (note == key + 4)
+    else if (note == key_midi_num + 4)
         return true;
-    else if (note == key + 5)
+    else if (note == key_midi_num + 5)
         return true;
-    else if (note == key + 7)
+    else if (note == key_midi_num + 7)
         return true;
-    else if (note == key + 9)
+    else if (note == key_midi_num + 9)
         return true;
-    else if (note == key + 11)
+    else if (note == key_midi_num + 11)
         return true;
-    else if (note == key + 12)
+    else if (note == key_midi_num + 12)
         return true;
     return false;
 }
