@@ -165,3 +165,27 @@ class PatternSlow : public PatternFunction
 
   public:
 };
+
+class PatternChord : public PatternFunction
+{
+  public:
+    PatternChord(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+};
+
+class PatternPowerChord : public PatternFunction
+{
+  public:
+    PatternPowerChord(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+};

@@ -970,6 +970,11 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         std::cout << "BRRRRAk!!\n";
         return std::make_shared<PatternBrak>();
     }
+    else if (func->token_.literal_ == "chord")
+    {
+        std::cout << "CHOOOORD!!\n";
+        return std::make_shared<PatternChord>();
+    }
     else if (func->token_.literal_ == "every")
     {
         std::cout << "EVEYRRRR!\n";
@@ -1027,6 +1032,11 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
                 }
             }
         }
+    }
+    else if (func->token_.literal_ == "power")
+    {
+        std::cout << "POWERRRRR!!\n";
+        return std::make_shared<PatternPowerChord>();
     }
     else if (func->token_.literal_ == "rev")
     {

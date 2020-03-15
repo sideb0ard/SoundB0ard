@@ -67,24 +67,76 @@ TEST_F(AudioUtilsTest, TestDDegrees)
     EXPECT_EQ(74, midi_next_D);
 }
 
-TEST_F(AudioUtilsTest, TestPerfectFifth)
+TEST_F(AudioUtilsTest, TestPerfectFifthC)
 {
 
-    int midi_F = 65;
-    int perfect_fifth = GetNthDegree(midi_F, 4, 'c');
+    // c
+    int perfect_fifth = GetNthDegree(60, 4, 'c');
+    EXPECT_EQ(67, perfect_fifth);
+
+    // d
+    perfect_fifth = GetNthDegree(62, 4, 'c');
+    EXPECT_EQ(69, perfect_fifth);
+
+    // e
+    perfect_fifth = GetNthDegree(64, 4, 'c');
+    EXPECT_EQ(71, perfect_fifth);
+
+    // f
+    perfect_fifth = GetNthDegree(65, 4, 'c');
     EXPECT_EQ(72, perfect_fifth);
 
-    int midi_C = 72;
-    perfect_fifth = GetNthDegree(midi_C, 4, 'c');
+    // g
+    perfect_fifth = GetNthDegree(67, 4, 'c');
+    EXPECT_EQ(74, perfect_fifth);
+
+    // a
+    perfect_fifth = GetNthDegree(69, 4, 'c');
+    EXPECT_EQ(76, perfect_fifth);
+
+    // b
+    perfect_fifth = GetNthDegree(71, 4, 'c');
+    EXPECT_EQ(77, perfect_fifth);
+
+    // c
+    perfect_fifth = GetNthDegree(72, 4, 'c');
+    EXPECT_EQ(79, perfect_fifth);
+}
+
+TEST_F(AudioUtilsTest, TestPerfectFifthD)
+{
+
+    //  d
+    int perfect_fifth = GetNthDegree(62, 4, 'd');
+    EXPECT_EQ(69, perfect_fifth);
+
+    // e
+    perfect_fifth = GetFifth(64, 'd');
+    EXPECT_EQ(71, perfect_fifth);
+
+    // f#
+    perfect_fifth = GetFifth(66, 'd');
+    EXPECT_EQ(73, perfect_fifth);
+
+    // g
+    perfect_fifth = GetFifth(67, 'd');
+    EXPECT_EQ(74, perfect_fifth);
+
+    // a
+    perfect_fifth = GetFifth(69, 'd');
+    EXPECT_EQ(76, perfect_fifth);
+
+    // b
+    perfect_fifth = GetFifth(71, 'd');
+    EXPECT_EQ(78, perfect_fifth);
+
+    // c#
+    perfect_fifth = GetFifth(73, 'd');
     EXPECT_EQ(79, perfect_fifth);
 
-    // key of 'D'
-    int midi_Csharp = 73;
-    perfect_fifth = GetNthDegree(midi_Csharp, 4, 'd');
-    EXPECT_EQ(79, perfect_fifth);
-
-    perfect_fifth = GetFifth(midi_Csharp, 'd');
-    EXPECT_EQ(79, perfect_fifth);
+    // d
+    // perfect_fifth = GetFifth(74, 'd');
+    // EXPECT_EQ(81, perfect_fifth);
 }
 
 } // namespace

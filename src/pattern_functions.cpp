@@ -17,7 +17,19 @@ void PrintPattern(
     for (int i = 0; i < PPBAR; i++)
     {
         if (pattern[i].size() > 0)
-            std::cout << i << std::endl;
+        {
+            std::cout << "[" << i << "] ";
+            for (auto &e : pattern[i])
+            {
+                int str_to_val = 0;
+                if (IsNote(e->value_))
+                    str_to_val = get_midi_note_from_string(&e->value_[0]);
+                else
+                    str_to_val = std::stoi(e->value_);
+                std::cout << str_to_val << " ";
+            }
+            std::cout << std::endl;
+        }
     }
 }
 
@@ -395,5 +407,100 @@ std::string PatternSlow::String() const
 
     std::stringstream ss;
     ss << "slow";
+    return ss.str();
+}
+
+void PatternChord::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (events[i].size() > 0)
+        {
+            std::vector<std::shared_ptr<MusicalEvent>> &mevents = events[i];
+            std::vector<std::shared_ptr<MusicalEvent>> new_events;
+            for (auto &e : mevents)
+            {
+                if (e->target_type_ == ProcessPatternTarget::VALUES)
+                {
+                    new_events.push_back(e);
+                    std::string midistring = e->value_;
+                    if (IsNote(e->value_))
+                    {
+                        midistring = std::to_string(
+                            get_midi_note_from_string(&e->value_[0]));
+                    }
+                    int third = GetThird(std::stoi(midistring), 'c');
+
+                    std::shared_ptr<MusicalEvent> new_ev =
+                        std::make_shared<MusicalEvent>(
+                            std::to_string(third), e->velocity_, e->duration_,
+                            e->target_type_);
+                    new_events.push_back(new_ev);
+
+                    int fifth = GetFifth(std::stoi(midistring), 'c');
+
+                    new_ev = std::make_shared<MusicalEvent>(
+                        std::to_string(fifth), e->velocity_, e->duration_,
+                        e->target_type_);
+                    new_events.push_back(new_ev);
+                }
+            }
+            events[i] = new_events;
+        }
+    }
+    // PrintPattern(events);
+}
+
+std::string PatternChord::String() const
+{
+
+    std::stringstream ss;
+    ss << "chord";
+    return ss.str();
+}
+
+void PatternPowerChord::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+    for (int i = 0; i < PPBAR; i++)
+    {
+        if (events[i].size() > 0)
+        {
+            std::vector<std::shared_ptr<MusicalEvent>> &mevents = events[i];
+            std::vector<std::shared_ptr<MusicalEvent>> new_events;
+            for (auto &e : mevents)
+            {
+                if (e->target_type_ == ProcessPatternTarget::VALUES)
+                {
+                    new_events.push_back(e);
+                    std::string midistring = e->value_;
+                    if (IsNote(e->value_))
+                    {
+                        midistring = std::to_string(
+                            get_midi_note_from_string(&e->value_[0]));
+                    }
+                    int fifth = GetFifth(std::stoi(midistring), 'c');
+
+                    std::shared_ptr<MusicalEvent> new_ev =
+                        std::make_shared<MusicalEvent>(
+                            std::to_string(fifth), e->velocity_, e->duration_,
+                            e->target_type_);
+                    new_events.push_back(new_ev);
+                }
+            }
+            events[i] = new_events;
+        }
+    }
+    // PrintPattern(events);
+}
+
+std::string PatternPowerChord::String() const
+{
+
+    std::stringstream ss;
+    ss << "power";
     return ss.str();
 }
