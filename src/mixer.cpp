@@ -24,6 +24,7 @@
 #include <looper.h>
 #include <minisynth.h>
 #include <mixer.h>
+#include <obliquestrategies.h>
 #include <sbmsg.h>
 #include <soundgenerator.h>
 #include <tsqueue.hpp>
@@ -264,6 +265,12 @@ void mixer_ps(mixer *mixr, bool all)
         ss << mixer_status_sgz(mixr, all);
 
     g_reply_queue.push(ss.str());
+}
+
+void mixer_help(mixer *mixr)
+{
+    std::string strategy = oblique_strategy();
+    g_reply_queue.push(strategy);
 }
 
 // static void mixer_print_notes(mixer *mixr)
@@ -790,6 +797,8 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
         {
             if (action->type == AudioAction::STATUS)
                 mixer_ps(mixr, action->status_all);
+            else if (action->type == AudioAction::HELP)
+                mixer_help(mixr);
             else if (action->type == AudioAction::ADD)
                 mixr->SoundGenerators[action->mixer_soundgen_idx] = action->sg;
             else if (action->type == AudioAction::ADD_FX)

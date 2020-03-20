@@ -15,6 +15,7 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"fn", SLANG_FUNCTION},
     {"for", SLANG_FOR},
     {"granular", SLANG_GRANULAR},
+    {"help", SLANG_HELP},
     {"grain", SLANG_GRAIN},
     {"loop", SLANG_LOOP},
     {"if", SLANG_IF},

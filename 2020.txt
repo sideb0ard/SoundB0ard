@@ -1,8 +1,107 @@
+let rb = loop(loops/scuddubraggableep.aiff); set rb:len 4
+
+let bd = sample(kicks/dm02_909_kickdrum_006_drive.wav)
+p1 $ "<[bd [~ bd] ~ ~] [ bd [~ bd] [~ ~ ~ bd] [~ bd]  ] >"
+
+let cp = sample(claps/tripClap.aiff)
+let sd = sample(snrs/angelSnare.aiff)
+snrs/AbraSnare.aiff
+p2 $ "~ ~ [sd,cp] ~"
+
+let fg = sample(notes/FoolishBackGRan.aiff)
+p4 $ "<[~ fg] ~ ~ ~ ~ ~ ~ ~>"
+vol fg 0.4
+
+hh1 = Sampler(hats/LOUhat.aiff) vol:0.7 pan:0 pitch:1
+hh2 = Sampler(hats/timbaHat1.aiff) vol:0.7 pan:0 pitch:1
+p2 $ "[~ hh1 hh2 ~]  [~ ~ hh2 ~] [hh1 hh1 hh2 ~] [~ hh2 hh2 ~]" | swing 3 | every 8 swing 11
+
+hh and sh
+let hh = sample(hats/cloeyhatz.aiff)
+let sh = sample(perc/chezShaker.aiff)
+ps
+vol sh 0.2; vol hh 0.3;
+p6 $"[sh [sh hh]] [sh [sh hh]] [~ [hh sh]] [hh*2 sh]" | swing 3  | every 8 mask "ffff"
+
+p7 # "<[<44 ~ ~ 32> [ ~ <40 44 44*2 40 32 ~>] ~ ~] [ <40? 44 44 ~> [~ <32 44>] ~ ~  ]>" d1 | every 8 fast | every 7 down 1 | every 4 mask "ff00"
+
+d1 fm for a while
 
 
+p1 $ "bd [sd,cp] [~ bd] [sd,cp]"
+p3 $ "~ [~ ~ ~ sn] ~ ~"
+p5 # "<[20 [ ~ 20] ~ ~] [20 [~ 20] [~ ~ ~ 22] [~ 20]] >" d1 | every 8 brak | every 7 fast
 
+loops/techNsaehats.aiff
+
+dloops/SUNUN.aiff
+// sidechain //
+
+let sun = loop(dloops/SUNUN.aiff); addFx(sun, "sidechain", bd); vol d1 0
+p8 < every 4 "1" "set sun:stutter %"
+
+vol bd 0; let elb = grain(strings/elbtimeout.aiff)
+
+toms -
+let lt = sample(toms/DR660LoTom.aif)
+let mt = sample(toms/DR660MidTom.aif)
+let ht = sample(toms/DR660808HighTom.aif)
+
+p11 $ "[~ <ht lt mt>] [mt <lt ht>] [~ ht ht*2 ht*3] [~ ht mt]"
+dloops/autechreBeat.aiff
+
+aesamples -- perc
+inc - aesamples/SH09_ACID.WAV
+aesamples/shstr_03.WAV
+
+p14 $ "~ ~ ~ [~ <aed aes ~ ~ ~ ~>]"
+
+
+d1
+
+loops/stereoLabVOICE.aiff // len 16
+--
+loops/ONETIMECHILL.aiff // len 8
+
+
+loops/UMFRANGloop.aiff // len 2
+loops/PALSTUTTERPiano.aiff // len 2
+
+loops/wonkykeys.aiff
+
+p3 < every 4 "<0 10 20 30 40 70 50>"  "set wk:idx %"
+
+aesamples//steeldif09.WAV
+aesamples//steelxif08.WAV
+
+p2 $ "<[~ ae1] ae2 ae2(3,8) ~>" | every 8 fast
+
+// no wonkykeys
+
+let lg = grain(legowelt//Synth-TriffidPartyChord.wav)
+
+dloops//garageDrumx.aiff // len 2
+// dloops/ralfiRiTMO.aiff
+
+dloops/aciiiidBeat.aiff // len 2
+
+BPM 120
+only Triffid
+
+p15 < every 3 "<0 10 70 40 50>" "set lg:idx %"
+
+mo -
 sbarkey
 p1 # "g2 <g g2*2> <~ gm2 em5>  <gm2 gm? [~ gm]>" mo,bd | down 2
+
+//  loops/GURLblunt.aiff // bpm 120ishh
+dloops/EKSIbeat.aiff
+dloops/ESKIClip.aiff
+
+// loops/ACiiiiidBassSquelch.aiff
+// loops/ACiiiiidBassSquelch2.aiff
+
+let zb = loop(dloops/ZeigenBOCK.aiff); addFx(zb, "sidechain", bd)
 
 
 [Env]
@@ -21,6 +120,7 @@ was = pads//washey.aiff vol:0.6 pan:0 pitch:2 idx:89 mode:SMUDGE(2) step:0 len:1
 mac = Sampler(claps/mawOW.aiff) vol:0 pan:0 pitch:1
 
 [Procz]
+mo = Moog(shirpyyy) vol:0 pan:0 voice:SQR3(1)
 p1 # "g1 g1:<100 127 90>:<300 500 100> [a1 c1]:127:500 [a1 <c2 g2>]:127:1000" mo,bd | every 3 rotl 4 | every 2 mask "f0f0"
 p2 < osc 13 "500 15000"  "set mo:fc %"
 p3 < every 3 "<0.5 1 2>"  "set bd:pitch %"
@@ -31,66 +131,3 @@ p7 < osc 14 "100 1000"  "set was:fx0:reverbtime %"
 
 
 
-let rb = loop(loops/scuddubraggableep.aiff); set rb:len 4
-
-kicks/dm02_909_kickdrum_006_drive.wav
-notes/FoolishBackGRan.aiff
-hh and sh
-
-d1 fm for a while
-
-dloops/SUNUN.aiff
-// sidechain //
-
-strings/elbtimeout.aiff
-
-toms -
-dloops/autechreBeat.aiff
-
-aesamples -- perc
-inc - aesamples/SH09_ACID.WAV
-aesamples/shstr_03.WAV
-
-
-d1
-
-loops/stereoLabVOICE.aiff // len 16
---
-loops/ONETIMECHILL.aiff // len 8
-
-loops/UMFRANGloop.aiff // len 2
-loops/PALSTUTTERPiano.aiff // len 2
-
-loops/wonkykeys.aiff
-
-p3 < every 4 "<0 10 20 30 40 70 50>"  "set wk:idx %"
-
-aesamples//steeldif09.WAV
-aesamples//steelxif08.WAV
-
-// no wonkykeys
-
-legowelt//Synth-TriffidPartyChord.wav
-
-kicks/808kick.aif
-
-// no wonkykeys
-loops/pumpUpDaJAM.aiff
-dloops//garageDrumx.aiff // len 2
-dloops/ralfiRiTMO.aiff
-
-
-dloops/aciiiidBeat.aiff // len 2
-
-// dloops/PARANOIDlondon2TRIM.aiff // len 0.5 // NOT WITH TRIIFFD
-
-BPM 120
-
-loops/GURLblunt.aiff // bpm 120ishh
-dloops/EKSIbeat.aiff
-dloops/ESKIClip.aiff
-
-loops/ACiiiiidBassSquelch.aiff
-loops/ACiiiiidBassSquelch2.aiff
-
-let zb = loop(dloops/ZeigenBOCK.aiff); addFx(zb, "sidechain", bd)

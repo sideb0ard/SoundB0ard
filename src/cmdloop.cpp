@@ -58,7 +58,8 @@ void *loopy()
             if ((strlen(line) == 2 && strncmp(line, "ps", 2) == 0) ||
                 (strlen(line) == 6 && strncmp(line, "ps all", 6) == 0) ||
                 (strlen(line) == 2 && strncmp(line, "ls", 2) == 0) ||
-                (strncmp(line, "ls ", 3) == 0))
+                (strncmp(line, "ls ", 3) == 0) || strncmp(line, "help", 4) ||
+                strncmp(line, "help ", 5))
             {
                 auto reply = g_reply_queue.pop();
                 if (reply)

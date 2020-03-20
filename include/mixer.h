@@ -192,4 +192,6 @@ void mixer_set_should_progress_chords(mixer *mixr, bool b);
 bool should_progress_chords(mixer *mixr, int tick);
 void mixer_next_chord(mixer *mixr);
 
+void mixer_help(mixer *mixr);
+
 #endif // MIXER_H

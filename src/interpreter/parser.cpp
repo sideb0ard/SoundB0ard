@@ -44,6 +44,8 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
         return ParseLsStatement();
     else if (cur_token_.type_.compare(token::SLANG_PS) == 0)
         return ParsePsStatement();
+    else if (cur_token_.type_.compare(token::SLANG_HELP) == 0)
+        return ParseHelpStatement();
     else if (cur_token_.type_.compare(token::SLANG_FOR) == 0)
         return ParseForStatement();
     else if (cur_token_.type_.compare(token::SLANG_PAN) == 0)
@@ -284,6 +286,17 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement()
         return nullptr;
     }
     stmt->value_ = std::stod(cur_token_.literal_);
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
+
+    return stmt;
+}
+std::shared_ptr<ast::HelpStatement> Parser::ParseHelpStatement()
+{
+
+    std::shared_ptr<ast::HelpStatement> stmt =
+        std::make_shared<ast::HelpStatement>(cur_token_);
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();

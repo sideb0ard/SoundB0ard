@@ -62,6 +62,7 @@ const TokenType SLANG_RAMP = "RAMP";
 const TokenType SLANG_OSC = "OSCILLATE";
 const TokenType SLANG_PS = "PS";
 const TokenType SLANG_LS = "LS";
+const TokenType SLANG_HELP = "HELP";
 const TokenType SLANG_SET = "SET";
 const TokenType SLANG_PAN = "PAN";
 const TokenType SLANG_PLAY = "PLAY";

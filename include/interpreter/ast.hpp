@@ -464,6 +464,13 @@ class PsStatement : public Statement
     bool all_{false};
 };
 
+class HelpStatement : public Statement
+{
+  public:
+    explicit HelpStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+};
+
 class VolumeStatement : public Statement
 {
   public:

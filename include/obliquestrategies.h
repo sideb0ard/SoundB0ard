@@ -1,6 +1,5 @@
-#ifndef OBLIQUE_STRATEGIES_H_
-#define OBLIQUE_STRATEGIES_H_
+#pragma once
 
-void oblique_strategy(void);
+#include <string>
 
-#endif // OBLIQUE_STRATEGIES_H_
+std::string oblique_strategy(void);

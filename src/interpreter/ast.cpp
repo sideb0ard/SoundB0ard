@@ -85,6 +85,16 @@ std::string PsStatement::String() const
 
     return ss.str();
 }
+
+std::string HelpStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << ";";
+
+    return ss.str();
+}
+
 std::string SetStatement::String() const
 {
     std::stringstream ss;

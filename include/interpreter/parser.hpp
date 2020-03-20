@@ -53,6 +53,7 @@ class Parser
     std::shared_ptr<ast::LetStatement> ParseLetStatement();
     std::shared_ptr<ast::ReturnStatement> ParseReturnStatement();
     std::shared_ptr<ast::ForStatement> ParseForStatement();
+    std::shared_ptr<ast::HelpStatement> ParseHelpStatement();
     std::shared_ptr<ast::LsStatement> ParseLsStatement();
     std::shared_ptr<ast::InfoStatement> ParseInfoStatement();
     std::shared_ptr<ast::BpmStatement> ParseBpmStatement();

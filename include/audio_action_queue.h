@@ -11,6 +11,7 @@ enum AudioAction
     ADD_FX,
     BPM,
     INFO,
+    HELP,
     LOAD_PRESET,
     MIDI_INIT,
     NOTE_ON,
