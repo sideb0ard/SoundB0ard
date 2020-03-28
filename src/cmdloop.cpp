@@ -38,6 +38,20 @@ char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 static char last_line[MAXLINE] = {};
 static bool active{true};
 
+int event_hook()
+{
+    while (auto reply = g_reply_queue.try_pop())
+    {
+        if (reply)
+        {
+            std::cout << reply->data();
+            rl_line_buffer[0] = '\0';
+            rl_done = 1;
+        }
+    }
+    return 0;
+}
+
 void *loopy()
 {
     std::cout << get_string_logo();
@@ -45,6 +59,8 @@ void *loopy()
     setlocale(LC_ALL, "");
 
     char *line;
+    rl_event_hook = event_hook;
+    rl_set_keyboard_input_timeout(500);
     while ((line = readline(prompt)) != NULL && active)
     {
         if (line && *line)
@@ -55,16 +71,6 @@ void *loopy()
                 strncpy(last_line, line, MAXLINE);
             }
             g_command_queue.push(line);
-            if ((strlen(line) == 2 && strncmp(line, "ps", 2) == 0) ||
-                (strlen(line) == 6 && strncmp(line, "ps all", 6) == 0) ||
-                (strlen(line) == 2 && strncmp(line, "ls", 2) == 0) ||
-                (strncmp(line, "ls ", 3) == 0) || strncmp(line, "help", 4) ||
-                strncmp(line, "help ", 5))
-            {
-                auto reply = g_reply_queue.pop();
-                if (reply)
-                    std::cout << *reply << std::endl;
-            }
         }
         free(line);
     }

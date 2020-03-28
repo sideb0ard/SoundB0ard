@@ -647,7 +647,25 @@ double mixer_get_hz_per_bar(mixer *mixr)
 {
 
     double hz_per_beat = (60. / mixr->bpm);
-    return hz_per_beat;
+    return hz_per_beat / 4;
+}
+
+double mixer_get_hz_per_timing_unit(mixer *mixr, unsigned int timing_unit)
+{
+    double return_val = 0;
+    double hz_per_beat = (60. / mixr->bpm);
+    if (timing_unit == Q2)
+        return_val = hz_per_beat / 2.;
+    if (timing_unit == Q4)
+        return_val = hz_per_beat;
+    else if (timing_unit == Q8)
+        return_val = hz_per_beat * 2;
+    else if (timing_unit == Q16)
+        return_val = hz_per_beat * 4;
+    else if (timing_unit == Q32)
+        return_val = hz_per_beat * 8;
+
+    return return_val;
 }
 
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
@@ -880,11 +898,26 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 if (mixer_is_valid_soundgen_num(mixr,
                                                 action->mixer_soundgen_idx))
                 {
+                    double param_val = 0.;
+
+                    if (action->param_val == "sync32")
+                        param_val = mixer_get_hz_per_timing_unit(mixr, Q32);
+                    if (action->param_val == "sync16")
+                        param_val = mixer_get_hz_per_timing_unit(mixr, Q16);
+                    else if (action->param_val == "sync8")
+                        param_val = mixer_get_hz_per_timing_unit(mixr, Q8);
+                    else if (action->param_val == "sync4")
+                        param_val = mixer_get_hz_per_timing_unit(mixr, Q4);
+                    else if (action->param_val == "sync2")
+                        param_val = mixer_get_hz_per_timing_unit(mixr, Q2);
+                    else
+                        param_val = std::stod(action->param_val);
+
                     auto sg = mixr->SoundGenerators[action->mixer_soundgen_idx];
                     if (action->param_name == "volume")
-                        sg->SetVolume(action->param_val);
+                        sg->SetVolume(param_val);
                     else if (action->param_name == "pan")
-                        sg->SetPan(action->param_val);
+                        sg->SetPan(param_val);
                     else
                     {
                         // first check if we're setting an FX param
@@ -896,15 +929,14 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             {
                                 Fx *f = sg->effects[fx_num];
                                 if (action->param_name == "active")
-                                    f->enabled_ = action->param_val;
+                                    f->enabled_ = param_val;
                                 else
-                                    f->SetParam(action->param_name,
-                                                action->param_val);
+                                    f->SetParam(action->param_name, param_val);
                             }
                         }
                         else // must be a SoundGenerator param
                         {
-                            sg->SetParam(action->param_name, action->param_val);
+                            sg->SetParam(action->param_name, param_val);
                         }
                     }
                 }
@@ -915,9 +947,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                                 action->mixer_soundgen_idx))
                 {
                     auto sg = mixr->SoundGenerators[action->mixer_soundgen_idx];
-
-                    std::cout << action->param_name << "\n";
-                    std::cout << sg->Info() << std::endl;
+                    g_reply_queue.push(sg->Info());
                 }
             }
             else if (action->type == AudioAction ::SAVE_PRESET ||

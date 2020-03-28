@@ -30,7 +30,8 @@ typedef enum
     Q32,
     Q16,
     Q8,
-    Q4
+    Q4,
+    Q2
 } quantize_size;
 
 typedef struct environment_variable
@@ -179,6 +180,7 @@ void mixer_set_octave(mixer *mixr, int octave);
 void mixer_set_bars_per_chord(mixer *mixr, int bars);
 
 double mixer_get_hz_per_bar(mixer *mixr);
+double mixer_get_hz_per_timing_unit(mixer *mixr, unsigned int timing_unit);
 int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
 void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num);
 void mixer_change_chord(mixer *mixr, unsigned int root,

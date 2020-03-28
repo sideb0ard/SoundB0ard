@@ -198,13 +198,22 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
     }
     stmt->param_ = cur_token_.literal_;
 
-    if (!ExpectPeek(token::SLANG_NUMBER))
+    if (PeekTokenIs(token::SLANG_IDENT))
+    {
+        NextToken();
+        stmt->value_ = cur_token_.literal_;
+    }
+    else if (PeekTokenIs(token::SLANG_NUMBER))
+    {
+        NextToken();
+        stmt->value_ = cur_token_.literal_;
+    }
+    else
     {
         std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
-    stmt->value_ = std::stod(cur_token_.literal_);
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -258,7 +267,7 @@ std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
                   << std::endl;
         return nullptr;
     }
-    stmt->value_ = std::stod(cur_token_.literal_);
+    stmt->value_ = cur_token_.literal_;
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -285,13 +294,14 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement()
                   << std::endl;
         return nullptr;
     }
-    stmt->value_ = std::stod(cur_token_.literal_);
+    stmt->value_ = cur_token_.literal_;
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
 
     return stmt;
 }
+
 std::shared_ptr<ast::HelpStatement> Parser::ParseHelpStatement()
 {
 

@@ -257,6 +257,9 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         }
         else if (target->Type() == "ERROR")
         {
+            // this section allows use of sX type identifier e.g. 's0' - needed
+            // to address and disable a sound generator when i accidentally
+            // create one without assigning it to a variable
             auto ident_sound_gen =
                 std::dynamic_pointer_cast<ast::Identifier>(set_stmt->target_);
             if (ident_sound_gen)

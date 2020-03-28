@@ -411,7 +411,7 @@ class SetStatement : public Statement
   public:
     std::shared_ptr<Expression> target_{nullptr};
     std::string param_;
-    double value_;
+    std::string value_;
 
     int fx_num_ = -1;
 };
@@ -479,7 +479,7 @@ class VolumeStatement : public Statement
 
   public:
     std::shared_ptr<Expression> target_{nullptr};
-    double value_;
+    std::string value_;
 };
 
 class PanStatement : public Statement
@@ -490,7 +490,7 @@ class PanStatement : public Statement
 
   public:
     std::shared_ptr<Expression> target_{nullptr};
-    double value_;
+    std::string value_;
 };
 
 // ROOT //////////////////////

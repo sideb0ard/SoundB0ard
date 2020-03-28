@@ -36,7 +36,7 @@ struct audio_action_queue_item
     // UPDATE varz
     int fx_id{0};
     std::string param_name{};
-    double param_val{0};
+    std::string param_val{0};
 
     // NOTE_ON varz
     std::vector<std::shared_ptr<object::Object>> args;
