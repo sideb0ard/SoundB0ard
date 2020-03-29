@@ -692,7 +692,6 @@ void sequence_engine_set_count_by(SequenceEngine *engine, int count_by)
 
 void sequence_engine_reset_step(SequenceEngine *engine)
 {
-    printf("STEP RESET!\n");
     engine->count_by = 1;
     engine->cur_step = -1;
     engine->range_start = 0;

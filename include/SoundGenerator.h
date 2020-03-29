@@ -17,7 +17,7 @@ class SoundGenerator
 
     virtual stereo_val genNext() = 0;
 
-    virtual std::string Info() = 1;
+    virtual std::string Info() = 0;
     virtual std::string Status() = 0;
 
     virtual void SetParam(std::string name, double val) = 0;

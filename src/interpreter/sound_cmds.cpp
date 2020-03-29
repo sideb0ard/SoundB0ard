@@ -22,8 +22,6 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                 std::dynamic_pointer_cast<object::String>(args[1]);
             if (str_obj)
             {
-                std::cout << "Adding a " << str_obj->value_ << std::endl;
-
                 if (str_obj->value_ == "bitcrush")
                     sg->AddBitcrush();
                 else if (str_obj->value_ == "compressor")

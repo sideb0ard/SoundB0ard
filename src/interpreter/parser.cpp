@@ -779,13 +779,11 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
         return nullptr;
     NextToken();
 
-    std::cout << "Cur token is " << cur_token_ << std::endl;
     sample->path_ = ParseStringLiteral();
 
     if (!ExpectPeek(token::SLANG_RPAREN))
         return nullptr;
 
-    std::cout << "AST SAMPLE EXPRESSION ALL GOOD!\n";
     return sample;
 }
 

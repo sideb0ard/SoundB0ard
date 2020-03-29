@@ -382,38 +382,36 @@ int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
 
 int add_minisynth(mixer *mixr)
 {
-    printf("Adding a MINISYNTH!!...\n");
+    g_reply_queue.push("Adding a MINISYNTH!\n");
     auto ms = std::make_shared<MiniSynth>();
     return add_sound_generator(mixr, ms);
 }
 
 int add_sample(mixer *mixr, std::string sample_path)
 {
-    std::cout << "Adding a SAMPLE!! " << sample_path << std::endl;
+    g_reply_queue.push("Adding a SAMPLE!\n");
     auto ds = std::make_shared<DrumSampler>(sample_path.data());
     return add_sound_generator(mixr, ds);
 }
 
 int add_digisynth(mixer *mixr, char *filename)
 {
-    printf("Adding a DIGISYNTH!!...\n");
+    g_reply_queue.push("Adding a DIGISYNTH!\n");
     auto ds = std::make_shared<digisynth>(filename);
     return add_sound_generator(mixr, ds);
 }
 
 int add_dxsynth(mixer *mixr)
 {
-    printf("Adding a DXSYNTH!!...\n");
+    g_reply_queue.push("Adding a DXSYNTH!\n");
     auto dx = std::make_shared<dxsynth>();
-    printf("GOT NEW  DXSYNTH!!...\n");
     return add_sound_generator(mixr, dx);
 }
 
 int add_looper(mixer *mixr, std::string filename, bool loop_mode)
 {
-    std::cout << "ADDING A GRANNY! loop mode is : " << loop_mode << "\n";
+    g_reply_queue.push("Adding a Granular Looper!\n");
     auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
-    printf("GOT A GRAANY\n");
     return add_sound_generator(mixr, loopr);
 }
 

@@ -29,13 +29,13 @@ bool TestNumberObject(std::shared_ptr<object::Object> obj, int64_t expected)
         std::dynamic_pointer_cast<object::Number>(obj);
     if (!io)
     {
-        std::cerr << "NOT AN INTEGER OBJECT\n";
+        std::cerr << "NOT AN NUMBER OBJECT\n";
         return false;
     }
 
     if (io->value_ != expected)
     {
-        std::cerr << "TEST INTEGER OBJECT - val not correct - actual:"
+        std::cerr << "TEST NUMBER OBJECT - val not correct - actual:"
                   << io->value_ << " // expected:" << expected << std::endl;
         return false;
     }
@@ -234,8 +234,8 @@ TEST_F(EvaluatorTest, TestErrorHandling)
         std::string expected;
     };
     std::vector<TestCase> tests{
-        {"5 + true;", "type mismatch: INTEGER + BOOLEAN"},
-        {"5 + true; 5", "type mismatch: INTEGER + BOOLEAN"},
+        {"5 + true;", "type mismatch: NUMBER + BOOLEAN"},
+        {"5 + true; 5", "type mismatch: NUMBER + BOOLEAN"},
         {"-true", "unknown operator: -BOOLEAN"},
         {"true + false;", "unknown operator: BOOLEAN + BOOLEAN"},
         {"5; true + false; 5", "unknown operator: BOOLEAN + BOOLEAN"},
@@ -446,12 +446,12 @@ TEST_F(EvaluatorTest, TestBuiltInFunctions)
     };
 
     std::vector<TestCaseString> teststrings{
-        {R"(len(1))", "argument to `len` not supported, got INTEGER"},
+        {R"(len(1))", "argument to `len` not supported, got NUMBER"},
         {R"(len("one", "two"))",
          "Too many arguments for len - can only accept one"},
-        {R"(head(1))", "argument to `head` must be an array - got INTEGER"},
-        {R"(last(1))", "argument to `last` must be an array - got INTEGER"},
-        {R"(push(1, 1))", "argument to `push` must be an array - got INTEGER"},
+        {R"(head(1))", "argument to `head` must be an array - got NUMBER"},
+        {R"(last(1))", "argument to `last` must be an array - got NUMBER"},
+        {R"(push(1, 1))", "argument to `push` must be an array - got NUMBER"},
     };
 
     for (auto &tt : teststrings)

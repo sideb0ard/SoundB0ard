@@ -451,7 +451,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::SynthExpression>(node);
     if (synth)
     {
-        std::cout << "SYNTH EXPRESSION!: " << synth->token_.type_ << "\n ";
         if (synth->token_.type_ == token::SLANG_MOOG_SYNTH)
             return std::make_shared<object::MoogSynth>();
         else if (synth->token_.type_ == token::SLANG_FM_SYNTH)
@@ -462,27 +461,22 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::SynthPresetExpression>(node);
     if (synth_preset)
     {
-        std::cout << "SYNTH PRESET EXPRESSION!: " << synth_preset->token_.type_
-                  << "\n ";
         if (synth_preset->token_.type_ == token::SLANG_MOOG_SYNTH)
         {
-            std::cout << "MINISYNTH TYPE!\n";
             sequence_engine_list_presets(MINISYNTH_TYPE);
         }
         else if (synth_preset->token_.type_ == token::SLANG_FM_SYNTH)
         {
-            std::cout << "DX TYPE!\n";
             sequence_engine_list_presets(DXSYNTH_TYPE);
         }
         else
-            std::cout << "NOT A SYNTH TYPE!\n";
+            std::cerr << "NOT A SYNTH TYPE!\n";
     }
 
     std::shared_ptr<ast::SampleExpression> sample =
         std::dynamic_pointer_cast<ast::SampleExpression>(node);
     if (sample)
     {
-        std::cout << "SAMPLE EXPRESSIOn!\n";
         std::shared_ptr<ast::StringLiteral> spath =
             std::dynamic_pointer_cast<ast::StringLiteral>(sample->path_);
         if (spath)
@@ -490,29 +484,26 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             return std::make_shared<object::Sample>(spath->value_);
         }
         else
-            std::cout << "Nae sample path!!\n";
+            std::cerr << "Nae sample path!!\n";
     }
 
     std::shared_ptr<ast::GranularExpression> gran =
         std::dynamic_pointer_cast<ast::GranularExpression>(node);
     if (gran)
     {
-        std::cout << "GRANULAR EXPRESSIOn!\n";
         std::shared_ptr<ast::StringLiteral> spath =
             std::dynamic_pointer_cast<ast::StringLiteral>(gran->path_);
         if (spath)
         {
-            std::cout << "GOT SPATH!\n";
             if (gran->loop_mode_)
             {
-                std::cout << "Got LOOOOP mode\n";
                 return std::make_shared<object::Granular>(spath->value_, true);
             }
             else
                 return std::make_shared<object::Granular>(spath->value_, false);
         }
         else
-            std::cout << "Nae sample path!!\n";
+            std::cerr << "Nae sample path!!\n";
     }
 
     std::shared_ptr<ast::ProcessStatement> proc =
@@ -927,7 +918,6 @@ UnwrapReturnValue(std::shared_ptr<object::Object> obj)
 std::shared_ptr<PatternFunction>
 EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
 {
-    std::cout << "EvalPatternFunctionExpression!!\n";
     auto func =
         std::dynamic_pointer_cast<ast::PatternFunctionExpression>(funct);
 
@@ -940,8 +930,6 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     if (func->token_.literal_ == "arp")
     {
         auto arp_func = std::make_shared<PatternArp>();
-        int args_size = func->arguments_.size();
-        std::cout << "ARPP! with " << args_size << " args\n";
         for (auto a : func->arguments_)
         {
             auto speedliteral =
