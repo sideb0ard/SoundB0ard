@@ -959,7 +959,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
             }
             else if (action->type == AudioAction::PREVIEW)
             {
-
                 char *fname = action->preview_filename.data();
                 mixer_preview_audio(mixr, fname);
             }

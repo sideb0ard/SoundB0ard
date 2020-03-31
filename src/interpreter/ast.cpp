@@ -1,3 +1,4 @@
+#include <iostream>
 #include <numeric>
 #include <sstream>
 #include <string>
@@ -22,6 +23,7 @@ std::string Program::String() const
 {
     std::stringstream ss;
 
+    std::cout << "PROSTR PRING!\n";
     for (auto s : statements_)
         ss << s->String();
 
@@ -158,7 +160,10 @@ std::string ExpressionStatement::String() const
 {
     std::stringstream ss;
     if (expression_)
+    {
+        std::cout << "EXPRESTATEMNT:" << expression_->String() << "\n";
         ss << expression_->String();
+    }
 
     return ss.str();
 }

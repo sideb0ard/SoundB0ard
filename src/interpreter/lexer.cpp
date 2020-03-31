@@ -103,12 +103,13 @@ token::Token Lexer::NextToken()
             tok.type_ = token::SLANG_DECREMENT;
             tok.literal_ = "--";
         }
-        else if (IsDigit(PeekChar()))
-        {
-            tok.type_ = token::SLANG_NUMBER;
-            tok.literal_ = ReadNumber();
-            return tok;
-        }
+        // else if (IsDigit(PeekChar()))
+        //{
+        //    tok.type_ = token::SLANG_NUMBER;
+        //    tok.literal_ = ReadNumber();
+        //    std::cout << "MINUSSSSSS AND NUM\n";
+        //    return tok;
+        //}
         else
         {
             tok.type_ = token::SLANG_MINUS;

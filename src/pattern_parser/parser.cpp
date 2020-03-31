@@ -60,6 +60,7 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER) ||
         PeekTokenIs(pattern_parser::PATTERN_DIVISOR))
     {
+        std::cout << "YO GOT MULTI OR DIV!\n";
         bool is_multiplier{false};
         if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER))
             is_multiplier = true;

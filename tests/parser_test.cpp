@@ -621,7 +621,7 @@ TEST_F(ParserTest, TestOperatorPrecedence)
         EXPECT_FALSE(parsley->CheckErrors());
 
         auto actual = program->String();
-        std::cout << program->String() << std::endl;
+        std::cout << actual << std::endl;
         ASSERT_EQ(actual, tt.expected);
     }
 }

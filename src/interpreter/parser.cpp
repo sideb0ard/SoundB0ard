@@ -123,7 +123,6 @@ std::shared_ptr<ast::LsStatement> Parser::ParseLsStatement()
     if (!PeekTokenIs(token::SLANG_SEMICOLON))
     {
         NextToken();
-        std::cout << "Cur token is " << cur_token_ << std::endl;
         stmt->path_ = ParseStringLiteral();
     }
 
@@ -138,14 +137,16 @@ std::shared_ptr<ast::PlayStatement> Parser::ParsePlayStatement()
     std::shared_ptr<ast::PlayStatement> stmt =
         std::make_shared<ast::PlayStatement>(cur_token_);
 
-    if (!PeekTokenIs(token::SLANG_SEMICOLON))
-    {
-        NextToken();
-        stmt->path_ = ParseStringLiteral();
-    }
+    NextToken();
 
-    if (PeekTokenIs(token::SLANG_SEMICOLON))
+    std::stringstream ss;
+    while (!CurTokenIs(token::SLANG_EOFF) &&
+           !CurTokenIs(token::SLANG_SEMICOLON))
+    {
+        ss << cur_token_.literal_;
         NextToken();
+    }
+    stmt->path_ = ss.str();
 
     return stmt;
 }
@@ -198,17 +199,7 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
     }
     stmt->param_ = cur_token_.literal_;
 
-    if (PeekTokenIs(token::SLANG_IDENT))
-    {
-        NextToken();
-        stmt->value_ = cur_token_.literal_;
-    }
-    else if (PeekTokenIs(token::SLANG_NUMBER))
-    {
-        NextToken();
-        stmt->value_ = cur_token_.literal_;
-    }
-    else
+    if (!ParseSetStatementValue(stmt->value_))
     {
         std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
                   << std::endl;
@@ -235,17 +226,36 @@ std::shared_ptr<ast::BpmStatement> Parser::ParseBpmStatement()
 
 std::shared_ptr<ast::InfoStatement> Parser::ParseInfoStatement()
 {
-    std::cout << "HINFO!\n";
     std::shared_ptr<ast::InfoStatement> stmt =
         std::make_shared<ast::InfoStatement>(cur_token_);
 
     NextToken();
-    std::cout << "CURT TOKENN is " << cur_token_ << std::endl;
     stmt->soundgen_identifier_ = ParseExpression(Precedence::LOWEST);
     if (!stmt->soundgen_identifier_)
         return nullptr;
 
     return stmt;
+}
+
+bool Parser::ParseSetStatementValue(std::string &value)
+{
+    if (PeekTokenIs(token::SLANG_IDENT) || PeekTokenIs(token::SLANG_NUMBER))
+    {
+        NextToken();
+        value = cur_token_.literal_;
+        return true;
+    }
+    else if (PeekTokenIs(token::SLANG_MINUS))
+    {
+        NextToken();
+        if (PeekTokenIs(token::SLANG_NUMBER))
+        {
+            NextToken();
+            value = "-" + cur_token_.literal_;
+            return true;
+        }
+    }
+    return false;
 }
 
 std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
@@ -261,13 +271,22 @@ std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
     }
     stmt->target_ = ParseIdentifier();
 
-    if (!ExpectPeek(token::SLANG_NUMBER))
+    if (PeekTokenIs(token::SLANG_NUMBER))
     {
-        std::cout << "NOT GOT NU<M ! Peek token is " << peek_token_
+        NextToken();
+        stmt->value_ = cur_token_.literal_;
+    }
+    else if (PeekTokenIs(token::SLANG_MINUS))
+    {
+        NextToken();
+        stmt->value_ = "-" + cur_token_.literal_;
+    }
+    else
+    {
+        std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
-    stmt->value_ = cur_token_.literal_;
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -288,13 +307,23 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement()
     }
     stmt->target_ = ParseIdentifier();
 
-    if (!ExpectPeek(token::SLANG_NUMBER))
+    if (PeekTokenIs(token::SLANG_NUMBER))
     {
-        std::cout << "NOT GOT NU<M ! Peek token is " << peek_token_
+        NextToken();
+        stmt->value_ = cur_token_.literal_;
+    }
+    else if (PeekTokenIs(token::SLANG_MINUS))
+    {
+        NextToken();
+        NextToken();
+        stmt->value_ = "-" + cur_token_.literal_;
+    }
+    else
+    {
+        std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
-    stmt->value_ = cur_token_.literal_;
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -322,7 +351,6 @@ std::shared_ptr<ast::PsStatement> Parser::ParsePsStatement()
 
     if (PeekTokenIs(token::SLANG_IDENT) && peek_token_.literal_ == "all")
     {
-        std::cout << "MEEp!\n";
         stmt->all_ = true;
         NextToken();
     }
@@ -501,6 +529,7 @@ static bool IsInfixOperator(token::TokenType type)
 
 std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
 {
+
     // these are the 'nuds' (null detontations) in the Vaughan Pratt paper
     // 'top down operator precedence'.
     std::shared_ptr<ast::Expression> left_expr = ParseForPrefixExpression();
@@ -779,10 +808,22 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
         return nullptr;
     NextToken();
 
-    sample->path_ = ParseStringLiteral();
+    std::stringstream ss;
+    while (!CurTokenIs(token::SLANG_EOFF) && !CurTokenIs(token::SLANG_RPAREN))
+    {
+        ss << cur_token_.literal_;
+        NextToken();
+    }
+    sample->path_ = ss.str();
 
-    if (!ExpectPeek(token::SLANG_RPAREN))
+    if (!CurTokenIs(token::SLANG_RPAREN))
+    {
+        std::cout << "OOFT! where ya PAREN?\n";
         return nullptr;
+    }
+
+    if (PeekTokenIs(token::SLANG_SEMICOLON))
+        NextToken();
 
     return sample;
 }
@@ -867,8 +908,8 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         NextToken();
         if (!PeekTokenIsPatternCommandTimerType())
         {
-            std::cerr
-                << "Need a Pattern Command TYpe! Over, Every, Osc or Ramp!\n";
+            std::cerr << "Need a Pattern Command TYpe! Over, Every, Osc or "
+                         "Ramp!\n";
             return nullptr;
         }
         NextToken();
@@ -916,6 +957,7 @@ std::shared_ptr<ast::Expression> Parser::ParseStringLiteral()
 
 std::shared_ptr<ast::Expression> Parser::ParsePrefixExpression()
 {
+    std::cout << "YOYOYOY PREFIX!\n";
     auto expression = std::make_shared<ast::PrefixExpression>(
         cur_token_, cur_token_.literal_);
 

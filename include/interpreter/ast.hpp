@@ -218,7 +218,7 @@ class SampleExpression : public Expression
     std::string String() const override;
 
   public:
-    std::shared_ptr<Expression> path_;
+    std::string path_;
 };
 
 class GranularExpression : public Expression
@@ -453,7 +453,7 @@ class PlayStatement : public Statement
     std::string String() const override;
 
   public:
-    std::shared_ptr<Expression> path_;
+    std::string path_;
 };
 
 class PsStatement : public Statement

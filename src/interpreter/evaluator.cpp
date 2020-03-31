@@ -247,6 +247,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
+            std::cout << "SETTT! val:" << set_stmt->value_ << std::endl;
             audio_action_queue_item action{.type = AudioAction::UPDATE,
                                            .mixer_soundgen_idx =
                                                soundgen->soundgen_id_,
@@ -303,6 +304,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         auto target = Eval(pan_stmt->target_, env);
         auto soundgen =
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
+        std::cout << "PAN! val:" << pan_stmt->value_ << std::endl;
+        std::cout << "BOOP\n";
         if (soundgen)
         {
             audio_action_queue_item action{.type = AudioAction::UPDATE,
@@ -318,12 +321,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::PlayStatement>(node);
     if (play_expr)
     {
-        std::shared_ptr<ast::StringLiteral> fpath =
-            std::dynamic_pointer_cast<ast::StringLiteral>(play_expr->path_);
-        if (fpath)
+        if (!play_expr->path_.empty())
         {
             audio_action_queue_item action{.type = AudioAction::PREVIEW,
-                                           .preview_filename = fpath->value_};
+                                           .preview_filename =
+                                               play_expr->path_};
             g_audio_action_queue.push(action);
         }
     }
@@ -477,12 +479,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::SampleExpression>(node);
     if (sample)
     {
-        std::shared_ptr<ast::StringLiteral> spath =
-            std::dynamic_pointer_cast<ast::StringLiteral>(sample->path_);
-        if (spath)
-        {
-            return std::make_shared<object::Sample>(spath->value_);
-        }
+        if (!sample->path_.empty())
+            return std::make_shared<object::Sample>(sample->path_);
         else
             std::cerr << "Nae sample path!!\n";
     }
