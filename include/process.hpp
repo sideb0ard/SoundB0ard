@@ -5,7 +5,7 @@
 
 #include <array>
 
-#include <SequenceEngine.h>
+#include <sequenceengine.h>
 #include <defjams.h>
 #include <pattern_functions.hpp>
 #include <pattern_parser/ast.hpp>

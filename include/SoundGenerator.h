@@ -7,7 +7,7 @@
 #include <fx/envelope.h>
 #include <fx/fx.h>
 
-#include "SequenceEngine.h"
+#include "sequenceengine.h"
 
 class SoundGenerator
 {
@@ -50,7 +50,7 @@ class SoundGenerator
   public:
     sound_generator_type type;
 
-    SequenceEngine engine;
+    sequenceengine engine;
 
     int mixer_idx;
     //  int num_patterns;

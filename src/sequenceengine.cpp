@@ -4,7 +4,7 @@
 
 #include <iostream>
 
-#include "SequenceEngine.h"
+#include "sequenceengine.h"
 #include "defjams.h"
 #include "mixer.h"
 #include "utils.h"
@@ -21,7 +21,7 @@ const char *s_arp_speed[] = {"32", "24", "16", "12", "8", "6", "4", "3"};
 
 extern mixer *mixr;
 
-SequenceEngine::SequenceEngine()
+sequenceengine::sequenceengine()
 {
     num_patterns = 1;
     multi_pattern_mode = true;
@@ -55,7 +55,7 @@ SequenceEngine::SequenceEngine()
     midi_pattern_print(patterns[cur_pattern]);
 }
 
-void sequence_engine_set_pattern_to_riff(SequenceEngine *engine)
+void sequence_engine_set_pattern_to_riff(sequenceengine *engine)
 {
     midi_event *midi_pattern = engine->patterns[engine->cur_pattern];
     for (int i = 0; i < PPBAR; i++)
@@ -73,7 +73,7 @@ void sequence_engine_set_pattern_to_riff(SequenceEngine *engine)
     }
 }
 
-void sequence_engine_set_pattern_to_current_key(SequenceEngine *engine)
+void sequence_engine_set_pattern_to_current_key(sequenceengine *engine)
 {
     midi_event *midi_pattern = engine->patterns[engine->cur_pattern];
 
@@ -117,7 +117,7 @@ void sequence_engine_set_pattern_to_current_key(SequenceEngine *engine)
     }
 }
 
-void sequence_engine_set_sample_rate(SequenceEngine *engine, int sample_rate)
+void sequence_engine_set_sample_rate(sequenceengine *engine, int sample_rate)
 {
     // does sample and hold to sample down
     printf("Chh-ch-changing SAMPLE_RATE!: %d\n", sample_rate);
@@ -126,20 +126,20 @@ void sequence_engine_set_sample_rate(SequenceEngine *engine, int sample_rate)
     engine->sample_rate_counter = 0;
 }
 
-void sequence_engine_set_multi_pattern_mode(SequenceEngine *ms,
+void sequence_engine_set_multi_pattern_mode(sequenceengine *ms,
                                             bool pattern_mode)
 {
     ms->multi_pattern_mode = pattern_mode;
     ms->cur_pattern_iteration = ms->pattern_multiloop_count[ms->cur_pattern];
 }
 
-void sequence_engine_set_pattern_loop_num(SequenceEngine *self, int pattern_num,
+void sequence_engine_set_pattern_loop_num(sequenceengine *self, int pattern_num,
                                           int loop_num)
 {
     self->pattern_multiloop_count[pattern_num] = loop_num;
 }
 
-int sequence_engine_add_pattern(SequenceEngine *ms)
+int sequence_engine_add_pattern(sequenceengine *ms)
 {
     return ms->num_patterns++;
 }
@@ -150,14 +150,14 @@ void sequence_engine_dupe_pattern(midi_pattern *from, midi_pattern *to)
         (*to)[i] = (*from)[i];
 }
 
-void sequence_engine_switch_pattern(SequenceEngine *ms,
+void sequence_engine_switch_pattern(sequenceengine *ms,
                                     unsigned int pattern_num)
 {
     if (pattern_num < (unsigned)ms->num_patterns)
         ms->cur_pattern = pattern_num;
 }
 
-void sequence_engine_reset_pattern_all(SequenceEngine *ms)
+void sequence_engine_reset_pattern_all(sequenceengine *ms)
 {
     for (int i = 0; i < MAX_NUM_MIDI_LOOPS; i++)
     {
@@ -165,7 +165,7 @@ void sequence_engine_reset_pattern_all(SequenceEngine *ms)
     }
 }
 
-void sequence_engine_reset_pattern(SequenceEngine *engine,
+void sequence_engine_reset_pattern(sequenceengine *engine,
                                    unsigned int pattern_num)
 {
     if (pattern_num < MAX_NUM_MIDI_LOOPS)
@@ -175,7 +175,7 @@ void sequence_engine_reset_pattern(SequenceEngine *engine,
 }
 
 // sound generator interface //////////////
-void sequence_engine_status(SequenceEngine *engine, wchar_t *status_string)
+void sequence_engine_status(sequenceengine *engine, wchar_t *status_string)
 {
     wchar_t scratch[256] = {0};
     wchar_t patternstr[33] = {0};
@@ -212,26 +212,26 @@ void sequence_engine_status(SequenceEngine *engine, wchar_t *status_string)
     wcscat(status_string, WANSI_COLOR_RESET);
 }
 
-void sequence_engine_add_event(SequenceEngine *engine, int pattern_num,
+void sequence_engine_add_event(sequenceengine *engine, int pattern_num,
                                int midi_tick, midi_event ev)
 {
     midi_event *pattern = engine->patterns[pattern_num];
     midi_pattern_add_event(pattern, midi_tick, ev);
 }
 
-void sequence_engine_add_temporal_event(SequenceEngine *engine, int midi_tick,
+void sequence_engine_add_temporal_event(sequenceengine *engine, int midi_tick,
                                         midi_event ev)
 {
     midi_pattern_add_event(engine->temporal_events, midi_tick, ev);
 }
 
-void sequence_engine_clear_pattern_ready_for_new_one(SequenceEngine *ms,
+void sequence_engine_clear_pattern_ready_for_new_one(sequenceengine *ms,
                                                      int pattern_num)
 {
     clear_midi_pattern(ms->patterns[pattern_num]);
 }
 
-void sequence_engine_nudge_pattern(SequenceEngine *ms, int pattern_num,
+void sequence_engine_nudge_pattern(sequenceengine *ms, int pattern_num,
                                    int sixteenth)
 {
     if (sixteenth >= 16)
@@ -256,7 +256,7 @@ void sequence_engine_nudge_pattern(SequenceEngine *ms, int pattern_num,
     sequence_engine_set_pattern(ms, pattern_num, change_info, new_loop);
 }
 
-bool sequence_engine_is_valid_pattern(SequenceEngine *engine, int pattern_num)
+bool sequence_engine_is_valid_pattern(sequenceengine *engine, int pattern_num)
 {
     if (pattern_num >= 0 && pattern_num < MAX_NUM_MIDI_LOOPS)
     {
@@ -267,17 +267,17 @@ bool sequence_engine_is_valid_pattern(SequenceEngine *engine, int pattern_num)
     return false;
 }
 
-void sequence_engine_set_single_note_mode(SequenceEngine *engine, bool b)
+void sequence_engine_set_single_note_mode(sequenceengine *engine, bool b)
 {
     engine->single_note_mode = b;
 }
 
-void sequence_engine_set_chord_mode(SequenceEngine *engine, bool b)
+void sequence_engine_set_chord_mode(sequenceengine *engine, bool b)
 {
     engine->chord_mode = b;
 }
 
-void sequence_engine_set_backup_mode(SequenceEngine *engine, bool b)
+void sequence_engine_set_backup_mode(sequenceengine *engine, bool b)
 {
     if (b)
     {
@@ -296,7 +296,7 @@ void sequence_engine_set_backup_mode(SequenceEngine *engine, bool b)
     }
 }
 
-int sequence_engine_get_num_notes(SequenceEngine *ms)
+int sequence_engine_get_num_notes(sequenceengine *ms)
 {
     int notecount = 0;
     for (int i = 0; i < ms->num_patterns; i++)
@@ -327,12 +327,12 @@ int sequence_engine_get_notes_from_pattern(midi_pattern loop,
     return idx; // num notes
 }
 
-int sequence_engine_get_num_patterns(SequenceEngine *engine)
+int sequence_engine_get_num_patterns(sequenceengine *engine)
 {
     return engine->num_patterns;
 }
 
-void sequence_engine_set_num_patterns(SequenceEngine *engine, int num_patterns)
+void sequence_engine_set_num_patterns(sequenceengine *engine, int num_patterns)
 {
     if (num_patterns > 0 && num_patterns < MAX_NUM_MIDI_LOOPS)
     {
@@ -341,19 +341,19 @@ void sequence_engine_set_num_patterns(SequenceEngine *engine, int num_patterns)
     }
 }
 
-void sequence_engine_make_active_pattern(SequenceEngine *engine,
+void sequence_engine_make_active_pattern(sequenceengine *engine,
                                          int pattern_num)
 {
     engine->cur_pattern = pattern_num;
 }
 
-void sequence_engine_print_patterns(SequenceEngine *ms)
+void sequence_engine_print_patterns(sequenceengine *ms)
 {
     for (int i = 0; i < ms->num_patterns; i++)
         midi_pattern_print(ms->patterns[i]);
 }
 
-void sequence_engine_add_note(SequenceEngine *engine, int pattern_num, int step,
+void sequence_engine_add_note(sequenceengine *engine, int pattern_num, int step,
                               int midi_note, int amp, bool keep_note)
 {
     int mstep = step * PPSIXTEENTH;
@@ -361,7 +361,7 @@ void sequence_engine_add_note(SequenceEngine *engine, int pattern_num, int step,
                                    keep_note);
 }
 
-void sequence_engine_add_micro_note(SequenceEngine *engine, int pattern_num,
+void sequence_engine_add_micro_note(sequenceengine *engine, int pattern_num,
                                     int mstep, int midi_note, int amp,
                                     bool keep_note)
 {
@@ -384,13 +384,13 @@ void sequence_engine_add_micro_note(SequenceEngine *engine, int pattern_num,
     }
 }
 
-void sequence_engine_rm_note(SequenceEngine *ms, int pattern_num, int step)
+void sequence_engine_rm_note(sequenceengine *ms, int pattern_num, int step)
 {
     int mstep = step * PPSIXTEENTH;
     sequence_engine_rm_micro_note(ms, pattern_num, mstep);
 }
 
-void sequence_engine_rm_micro_note(SequenceEngine *ms, int pat_num, int tick)
+void sequence_engine_rm_micro_note(sequenceengine *ms, int pat_num, int tick)
 {
     if (sequence_engine_is_valid_pattern(ms, pat_num) && tick < PPBAR)
     {
@@ -402,7 +402,7 @@ void sequence_engine_rm_micro_note(SequenceEngine *ms, int pat_num, int tick)
     }
 }
 
-void sequence_engine_mv_note(SequenceEngine *ms, int pattern_num, int fromstep,
+void sequence_engine_mv_note(sequenceengine *ms, int pattern_num, int fromstep,
                              int tostep)
 {
     int mfromstep = fromstep * PPSIXTEENTH;
@@ -410,7 +410,7 @@ void sequence_engine_mv_note(SequenceEngine *ms, int pattern_num, int fromstep,
     sequence_engine_mv_micro_note(ms, pattern_num, mfromstep, mtostep);
 }
 
-void sequence_engine_mv_micro_note(SequenceEngine *ms, int pattern_num,
+void sequence_engine_mv_micro_note(sequenceengine *ms, int pattern_num,
                                    int fromstep, int tostep)
 {
     if (sequence_engine_is_valid_pattern(ms, pattern_num))
@@ -420,7 +420,7 @@ void sequence_engine_mv_micro_note(SequenceEngine *ms, int pattern_num,
     }
 }
 
-void sequence_engine_import_midi_from_file(SequenceEngine *engine,
+void sequence_engine_import_midi_from_file(sequenceengine *engine,
                                            char *filename)
 {
     printf("Importing MIDI from %s\n", filename);
@@ -483,7 +483,7 @@ void sequence_engine_import_midi_from_file(SequenceEngine *engine,
     fclose(fp);
 }
 
-int sequence_engine_change_octave_pattern(SequenceEngine *engine,
+int sequence_engine_change_octave_pattern(sequenceengine *engine,
                                           int pattern_num, int direction)
 {
     // printf("Changing octave of %d - direction: %s\n", pattern_num,
@@ -508,14 +508,14 @@ int sequence_engine_change_octave_pattern(SequenceEngine *engine,
     return 0;
 }
 
-void sequence_engine_set_sustain_note_ms(SequenceEngine *engine,
+void sequence_engine_set_sustain_note_ms(sequenceengine *engine,
                                          int sustain_note_ms)
 {
     if (sustain_note_ms > 0)
         engine->sustain_note_ms = sustain_note_ms;
 }
 
-void sequence_engine_set_midi_note(SequenceEngine *engine, int midi_note_num,
+void sequence_engine_set_midi_note(sequenceengine *engine, int midi_note_num,
                                    int note)
 {
     switch (midi_note_num)
@@ -532,14 +532,14 @@ void sequence_engine_set_midi_note(SequenceEngine *engine, int midi_note_num,
     }
 }
 
-midi_event *sequence_engine_get_pattern(SequenceEngine *engine, int pattern_num)
+midi_event *sequence_engine_get_pattern(sequenceengine *engine, int pattern_num)
 {
     if (sequence_engine_is_valid_pattern(engine, pattern_num))
         return engine->patterns[pattern_num];
     return NULL;
 }
 
-void sequence_engine_set_pattern(SequenceEngine *engine, int pattern_num,
+void sequence_engine_set_pattern(sequenceengine *engine, int pattern_num,
                                  pattern_change_info change_info,
                                  midi_event *pattern)
 {
@@ -609,18 +609,18 @@ bool sequence_engine_list_presets(unsigned int synthtype)
     return true;
 }
 
-void sequence_engine_set_octave(SequenceEngine *engine, int octave)
+void sequence_engine_set_octave(sequenceengine *engine, int octave)
 {
     if (octave >= -1 && octave < 10)
         engine->octave = octave;
 }
 
-int sequence_engine_get_octave(SequenceEngine *engine)
+int sequence_engine_get_octave(sequenceengine *engine)
 {
     return engine->octave;
 }
 
-void sequence_engine_change_octave_midi_notes(SequenceEngine *engine,
+void sequence_engine_change_octave_midi_notes(sequenceengine *engine,
                                               unsigned int direction)
 {
     if (direction == UP)
@@ -637,25 +637,25 @@ void sequence_engine_change_octave_midi_notes(SequenceEngine *engine,
     }
 }
 
-void sequence_engine_set_event_mask(SequenceEngine *engine, uint16_t mask,
+void sequence_engine_set_event_mask(sequenceengine *engine, uint16_t mask,
                                     int apply_mask_every_n)
 {
     engine->event_mask = mask;
     engine->apply_mask_every_n = apply_mask_every_n;
 }
 
-void sequence_engine_set_enable_event_mask(SequenceEngine *engine, bool b)
+void sequence_engine_set_enable_event_mask(sequenceengine *engine, bool b)
 {
     engine->enable_event_mask = b;
 }
 
-void sequence_engine_set_mask_every(SequenceEngine *engine,
+void sequence_engine_set_mask_every(sequenceengine *engine,
                                     int apply_mask_every_n)
 {
     engine->apply_mask_every_n = apply_mask_every_n;
 }
 
-bool sequence_engine_is_masked(SequenceEngine *engine)
+bool sequence_engine_is_masked(sequenceengine *engine)
 {
     bool is_masked = false;
     if (engine->event_mask_counter % engine->apply_mask_every_n == 0)
@@ -668,29 +668,29 @@ bool sequence_engine_is_masked(SequenceEngine *engine)
     return is_masked;
 }
 
-void sequence_engine_set_swing_setting(SequenceEngine *engine,
+void sequence_engine_set_swing_setting(sequenceengine *engine,
                                        int swing_setting)
 {
     engine->swing_setting = swing_setting;
 }
-void sequence_engine_set_follow_mixer_chords(SequenceEngine *engine, bool b)
+void sequence_engine_set_follow_mixer_chords(sequenceengine *engine, bool b)
 {
     engine->follow_mixer_chord_changes = b;
 }
 
-void sequence_engine_set_transpose(SequenceEngine *engine, int transpose)
+void sequence_engine_set_transpose(sequenceengine *engine, int transpose)
 {
     if (transpose > -128 && transpose < 128)
         engine->transpose = transpose;
 }
 
-void sequence_engine_set_count_by(SequenceEngine *engine, int count_by)
+void sequence_engine_set_count_by(sequenceengine *engine, int count_by)
 {
     engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
     engine->count_by = count_by;
 }
 
-void sequence_engine_reset_step(SequenceEngine *engine)
+void sequence_engine_reset_step(sequenceengine *engine)
 {
     engine->count_by = 1;
     engine->cur_step = -1;
@@ -699,34 +699,34 @@ void sequence_engine_reset_step(SequenceEngine *engine)
     engine->fold = 0;
 }
 
-void sequence_engine_set_increment_by(SequenceEngine *engine, int incr)
+void sequence_engine_set_increment_by(sequenceengine *engine, int incr)
 {
     engine->increment_by = incr;
 }
 
-void sequence_engine_set_range_len(SequenceEngine *engine, int range)
+void sequence_engine_set_range_len(sequenceengine *engine, int range)
 {
     engine->range_len = range;
 }
 
-void sequence_engine_set_fold(SequenceEngine *engine, bool b)
+void sequence_engine_set_fold(sequenceengine *engine, bool b)
 {
     engine->fold = b;
     engine->fold_direction = FOLD_FWD;
 }
 
-void sequence_engine_set_debug(SequenceEngine *engine, bool b)
+void sequence_engine_set_debug(sequenceengine *engine, bool b)
 {
     engine->debug = b;
 }
 
-void sequence_engine_reset(SequenceEngine *engine)
+void sequence_engine_reset(sequenceengine *engine)
 {
     engine->started = false;
     sequence_engine_reset_step(engine);
 }
 
-void sequence_engine_pattern_to_half_speed(SequenceEngine *engine, int pat_num)
+void sequence_engine_pattern_to_half_speed(sequenceengine *engine, int pat_num)
 {
     if (sequence_engine_is_valid_pattern(engine, pat_num))
     {
@@ -752,7 +752,7 @@ void sequence_engine_pattern_to_half_speed(SequenceEngine *engine, int pat_num)
     }
 }
 
-void sequence_engine_pattern_to_double_speed(SequenceEngine *engine,
+void sequence_engine_pattern_to_double_speed(sequenceengine *engine,
                                              int pat_num)
 {
     if (sequence_engine_is_valid_pattern(engine, pat_num))
@@ -775,7 +775,7 @@ void sequence_engine_pattern_to_double_speed(SequenceEngine *engine,
     }
 }
 
-void sequence_engine_set_pct_play(SequenceEngine *engine, int pct)
+void sequence_engine_set_pct_play(sequenceengine *engine, int pct)
 {
     if (pct >= 0 && pct <= 100)
         engine->pct_play = pct;
