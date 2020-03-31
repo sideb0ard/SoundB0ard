@@ -1,10 +1,10 @@
 #pragma once
 
-#include "audioutils.h"
-#include "defjams.h"
-#include "sbmsg.h"
 #include <stdbool.h>
 #include <stdint.h>
+
+#include <audioutils.h>
+#include <defjams.h>
 
 void get_full_filename(char *basename, char *destination_fullname);
 

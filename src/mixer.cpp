@@ -25,7 +25,6 @@
 #include <minisynth.h>
 #include <mixer.h>
 #include <obliquestrategies.h>
-#include <sbmsg.h>
 #include <soundgenerator.h>
 #include <tsqueue.hpp>
 #include <utils.h>

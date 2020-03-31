@@ -13,7 +13,6 @@
 #include <fx/fx.h>
 #include <minisynth.h>
 #include <process.hpp>
-#include <sbmsg.h>
 #include <soundgenerator.h>
 #include <table.h>
 #include <value_generator.h>
