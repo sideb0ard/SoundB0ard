@@ -230,9 +230,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                 std::dynamic_pointer_cast<object::SoundGenerator>(target);
             if (soundgen)
             {
-                audio_action_queue_item action{.type = AudioAction::INFO,
-                                               .param_name =
-                                                   soundgen_var_name->value_};
+                audio_action_queue_item action{
+                    .type = AudioAction::INFO,
+                    .param_name = soundgen_var_name->value_,
+                    .mixer_soundgen_idx = soundgen->soundgen_id_};
+
                 g_audio_action_queue.push(action);
             }
         }
@@ -247,7 +249,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
         {
-            std::cout << "SETTT! val:" << set_stmt->value_ << std::endl;
             audio_action_queue_item action{.type = AudioAction::UPDATE,
                                            .mixer_soundgen_idx =
                                                soundgen->soundgen_id_,

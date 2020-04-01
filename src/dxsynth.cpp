@@ -95,11 +95,72 @@ std::string dxsynth::Status()
 std::string dxsynth::Info()
 {
     std::stringstream ss;
-    // char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
-    // if (active)
-    //    INSTRUMENT_COLOR = (char *)ANSI_COLOR_CYAN;
+    char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
+    if (active)
+        INSTRUMENT_COLOR = (char *)ANSI_COLOR_CYAN;
+
+    ss << ANSI_COLOR_WHITE << "FM (";
+
+    ss << m_settings.m_settings_name << ")";
+    ss << INSTRUMENT_COLOR;
+    ss << " algo:" << m_settings.m_voice_mode << " vol:" << volume
+       << " pan:" << pan << " midi_osc:" << active_midi_osc
+       << " porta:" << m_settings.m_portamento_time_ms
+       << " pitchrange:" << m_settings.m_pitchbend_range << "\n";
+    ss << "op4fb:" << m_settings.m_op4_feedback
+       << " vel2att:" << m_settings.m_velocity_to_attack_scaling
+       << " note2dec:" << m_settings.m_note_number_to_decay_scaling
+       << " reset2zero:" << m_settings.m_reset_to_zero;
+
+    //    legato:%d l1_wav:%d l1_int:%.2f l1_rate:%0.2f\n" "l1_dest1:%s
+    //    l1_dest2:%s\nl1_dest3:%s l1_dest4:%s\n" "o1wav:%d o1rat:%.2f
+    //    o1det:%.2f e1att:%.2f e1dec:%.2f e1sus:%.2f e1rel:%.2f\n" "o2wav:%d
+    //    o2rat:%.2f o2det:%.2f e2att:%.2f e2dec:%.2f e2sus:%.2f e2rel:%.2f\n"
+    //    "o3wav:%d o3rat:%.2f o3det:%.2f e3att:%.2f e3dec:%.2f e3sus:%.2f
+    //    e3rel:%.2f\n" "o4wav:%d o4rat:%.2f o4det:%.2f e4att:%.2f e4dec:%.2f
+    //    e4sus:%.2f e4rel:%.2f\n" "op1out:%.2f op2out:%.2f op3out:%.2f
+    //    op4out:%.2f",
+
+    //    m_settings.m_legato_mode,
+
+    //    m_settings.m_lfo1_waveform,
+    //    m_settings.m_lfo1_intensity,
+    //    m_settings.m_lfo1_rate,
+    //    s_dx_dest_names[m_settings.m_lfo1_mod_dest1],
+    //    s_dx_dest_names[m_settings.m_lfo1_mod_dest2],
+    //    s_dx_dest_names[m_settings.m_lfo1_mod_dest3],
+    //    s_dx_dest_names[m_settings.m_lfo1_mod_dest4],
+
+    //    m_settings.m_op1_waveform, m_settings.m_op1_ratio,
+    //    m_settings.m_op1_detune_cents, m_settings.m_eg1_attack_ms,
+    //    m_settings.m_eg1_decay_ms, m_settings.m_eg1_sustain_lvl,
+    //    m_settings.m_eg1_release_ms,
+
+    //    m_settings.m_op2_waveform, m_settings.m_op2_ratio,
+    //    m_settings.m_op2_detune_cents, m_settings.m_eg2_attack_ms,
+    //    m_settings.m_eg2_decay_ms, m_settings.m_eg2_sustain_lvl,
+    //    m_settings.m_eg2_release_ms,
+
+    //    m_settings.m_op3_waveform, m_settings.m_op3_ratio,
+    //    m_settings.m_op3_detune_cents, m_settings.m_eg3_attack_ms,
+    //    m_settings.m_eg3_decay_ms, m_settings.m_eg3_sustain_lvl,
+    //    m_settings.m_eg3_release_ms,
+
+    //    m_settings.m_op4_waveform, m_settings.m_op4_ratio,
+    //    m_settings.m_op4_detune_cents, m_settings.m_eg4_attack_ms,
+    //    m_settings.m_eg4_decay_ms, m_settings.m_eg4_sustain_lvl,
+    //    m_settings.m_eg4_release_ms,
+    //    m_settings.m_op1_output_lvl,
+    //    m_settings.m_op2_output_lvl,
+    //    m_settings.m_op3_output_lvl,
+    //    m_settings.m_op4_output_lvl
 
     //// clang-format off
+    //
+    //
+    //
+    //
+    //
     // swprintf(
     //    status_string, MAX_STATIC_STRING_SZ,
     //    WANSI_COLOR_WHITE
