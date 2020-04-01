@@ -957,7 +957,6 @@ std::shared_ptr<ast::Expression> Parser::ParseStringLiteral()
 
 std::shared_ptr<ast::Expression> Parser::ParsePrefixExpression()
 {
-    std::cout << "YOYOYOY PREFIX!\n";
     auto expression = std::make_shared<ast::PrefixExpression>(
         cur_token_, cur_token_.literal_);
 
