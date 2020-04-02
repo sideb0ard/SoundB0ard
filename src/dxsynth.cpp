@@ -20,7 +20,6 @@ static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
 
 dxsynth::dxsynth()
 {
-    std::cout << "NEW DX\n";
     type = DXSYNTH_TYPE;
     active_midi_osc = 1;
 
@@ -36,27 +35,22 @@ dxsynth::dxsynth()
                                              &m_global_synth_params);
     }
 
-    std::cout << "DX PREP \n";
     dxsynth_prepare_for_play(this);
 
-    std::cout << "DX INIT MODMATRIX\n";
     // use first voice to setup global
     dxsynth_voice_initialize_modmatrix(m_voices[0], &m_global_modmatrix);
 
-    std::cout << "VOICE SET CORE DX\n";
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         voice_set_modmatrix_core(&m_voices[i]->m_voice,
                                  get_matrix_core(&m_global_modmatrix));
     }
-    std::cout << "UPDATE DX\n";
     dxsynth_update(this);
 
     m_last_note_frequency = -1.0;
 
     Load("RAVER");
     active = true;
-    printf("BOOM!\n");
 }
 
 dxsynth::~dxsynth()

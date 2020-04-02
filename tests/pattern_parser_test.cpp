@@ -357,4 +357,48 @@ TEST_F(PatternParserTest, TestFloatsInPattern)
     EXPECT_EQ(2, multi->values_.size());
 }
 
+TEST_F(PatternParserTest, TestCaretSimplePattern)
+{
+
+    std::string pattern{"c0^3 d0"};
+    std::cout << "Testing: " << pattern << std::endl;
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
+
+    std::shared_ptr<pattern_parser::PatternGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(4, events->event_groups_[0].size());
+    for (auto &e : events->event_groups_[0])
+        std::cout << e->String() << std::endl;
+}
+
+TEST_F(PatternParserTest, TestCaretNestedPattern)
+{
+
+    std::string pattern{"<[c0 f0]^3 [f1 g2]>"};
+    std::cout << "Testing: " << pattern << std::endl;
+    auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern);
+    auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
+    std::shared_ptr<pattern_parser::PatternNode> pattern_root =
+        pattern_parzer->ParsePattern();
+
+    std::shared_ptr<pattern_parser::PatternGroup> events =
+        std::dynamic_pointer_cast<pattern_parser::PatternGroup>(pattern_root);
+    if (!events)
+        FAIL() << "Cannot cast pattern_root to PatternGroup!";
+    EXPECT_EQ(1, events->event_groups_[0].size());
+    for (auto &e : events->event_groups_[0])
+        std::cout << e->String() << std::endl;
+
+    auto multi = std::dynamic_pointer_cast<pattern_parser::PatternMultiStep>(
+        events->event_groups_[0][0]);
+    if (!multi)
+        FAIL() << "Cannot cast events->event_groups[0][0] to PatternMultiStep!";
+    EXPECT_EQ(4, multi->values_.size());
+}
+
 } // namespace

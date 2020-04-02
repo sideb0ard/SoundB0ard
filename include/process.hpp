@@ -5,12 +5,12 @@
 
 #include <array>
 
-#include <sequenceengine.h>
 #include <defjams.h>
 #include <pattern_functions.hpp>
 #include <pattern_parser/ast.hpp>
 #include <pattern_parser/parser.hpp>
 #include <pattern_parser/tokenizer.hpp>
+#include <sequenceengine.h>
 
 class Process
 {

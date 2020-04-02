@@ -12,7 +12,6 @@ namespace pattern_parser
 std::string PatternLeaf::String() const
 {
 
-    std::cout << "IT ME, LEAF! Address:" << this << std::endl;
     std::stringstream ss;
     ss << value_;
     if (divisor_value_)

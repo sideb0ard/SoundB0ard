@@ -89,7 +89,6 @@ void *command_queue_thread()
 
 void *process_worker_thread()
 {
-    // while (auto const timing_info = g_event_queue.pop())
     while (auto const event = g_event_queue.pop())
     {
         if (event)
@@ -161,10 +160,13 @@ int main()
         exit(-1);
     }
 
+    // Cmd loop
     std::thread input_thread(loopy);
 
+    // Processes
     std::thread worker_thread(process_worker_thread);
 
+    // Interpreter
     std::thread command_thread(command_queue_thread);
 
     //////////////// shutdown
