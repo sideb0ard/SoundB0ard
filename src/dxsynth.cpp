@@ -91,15 +91,19 @@ std::string dxsynth::Info()
 {
     std::stringstream ss;
     ss << std::setprecision(2) << std::fixed;
-    char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
+    char *INSTRUMENT_COLOR_A = (char *)ANSI_COLOR_RESET;
+    char *INSTRUMENT_COLOR_B = (char *)ANSI_COLOR_RESET;
     if (active)
-        INSTRUMENT_COLOR = (char *)ANSI_COLOR_CYAN;
+    {
+        INSTRUMENT_COLOR_A = (char *)ANSI_COLOR_MAGENTA;
+        INSTRUMENT_COLOR_B = (char *)COOL_COLOR_PINK;
+    }
 
     ss << "\n" << ANSI_COLOR_WHITE << "FM (";
 
     ss << m_settings.m_settings_name << ")";
-    ss << INSTRUMENT_COLOR;
-    ss << " algo:" << m_settings.m_voice_mode << " vol:" << volume
+    ss << INSTRUMENT_COLOR_B;
+    ss << "\nalgo:" << m_settings.m_voice_mode << " vol:" << volume
        << " pan:" << pan << "\n";
 
     ss << "midi_osc:" << active_midi_osc
@@ -112,7 +116,7 @@ std::string dxsynth::Info()
        << " reset2zero:" << m_settings.m_reset_to_zero
        << " legato:" << m_settings.m_legato_mode << "\n";
 
-    ss << " l1_wav:" << m_settings.m_lfo1_waveform
+    ss << INSTRUMENT_COLOR_A << "l1_wav:" << m_settings.m_lfo1_waveform
        << " l1_int:" << m_settings.m_lfo1_intensity
        << " l1_rate:" << m_settings.m_lfo1_rate << "\n";
 
@@ -121,39 +125,39 @@ std::string dxsynth::Info()
     ss << "l1_dest3:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest3] << "\n";
     ss << "l1_dest4:" << s_dx_dest_names[m_settings.m_lfo1_mod_dest4] << "\n";
 
-    ss << "o1wav: " << m_settings.m_op1_waveform
+    ss << INSTRUMENT_COLOR_B << "o1wav: " << m_settings.m_op1_waveform
        << " o1rat:" << m_settings.m_op1_ratio
        << " o1det:" << m_settings.m_op1_detune_cents
-       << " e1att:" << m_settings.m_eg1_attack_ms
+       << "\ne1att:" << m_settings.m_eg1_attack_ms
        << " e1dec:" << m_settings.m_eg1_decay_ms
        << " e1sus:" << m_settings.m_eg1_sustain_lvl
        << " e1rel:" << m_settings.m_eg1_release_ms << "\n";
 
-    ss << "o2wav:" << m_settings.m_op2_waveform
+    ss << INSTRUMENT_COLOR_A << "o2wav:" << m_settings.m_op2_waveform
        << " o2rat:" << m_settings.m_op2_ratio
        << " o2det:" << m_settings.m_op2_detune_cents
-       << " e2att:" << m_settings.m_eg2_attack_ms
+       << "\ne2att:" << m_settings.m_eg2_attack_ms
        << " e2dec:" << m_settings.m_eg2_decay_ms
        << " e2sus:" << m_settings.m_eg2_sustain_lvl
        << " e2rel:" << m_settings.m_eg2_release_ms << "\n";
 
-    ss << "o3wav:" << m_settings.m_op3_waveform
+    ss << INSTRUMENT_COLOR_B << "o3wav:" << m_settings.m_op3_waveform
        << " o3rat:" << m_settings.m_op3_ratio
        << " o3det:" << m_settings.m_op3_detune_cents
-       << " e3att:" << m_settings.m_eg3_attack_ms
+       << "\ne3att:" << m_settings.m_eg3_attack_ms
        << " e3dec:" << m_settings.m_eg3_decay_ms
        << " e3sus:" << m_settings.m_eg3_sustain_lvl
        << " e3rel:" << m_settings.m_eg3_release_ms << "\n";
 
-    ss << "o4wav:" << m_settings.m_op4_waveform
+    ss << INSTRUMENT_COLOR_A << "o4wav:" << m_settings.m_op4_waveform
        << " o4rat:" << m_settings.m_op4_ratio
        << " o4det:" << m_settings.m_op4_detune_cents
-       << " e4att:" << m_settings.m_eg4_attack_ms
+       << "\ne4att:" << m_settings.m_eg4_attack_ms
        << " e4dec:" << m_settings.m_eg4_decay_ms
        << " e4sus:" << m_settings.m_eg4_sustain_lvl
        << " e4rel:" << m_settings.m_eg4_release_ms << "\n";
 
-    ss << "op1out:" << m_settings.m_op1_output_lvl
+    ss << INSTRUMENT_COLOR_B << "op1out:" << m_settings.m_op1_output_lvl
        << " op2out:" << m_settings.m_op2_output_lvl
        << " op3out:" << m_settings.m_op3_output_lvl
        << " op4out:" << m_settings.m_op4_output_lvl << std::endl;
@@ -1677,6 +1681,93 @@ void dxsynth::SetParam(std::string name, double val)
         dxsynth_set_lfo1_intensity(this, val);
     else if (name == "l1_rate")
         dxsynth_set_lfo1_rate(this, val);
+
+    else if (name == "l1_dest1")
+        dxsynth_set_lfo1_mod_dest(this, 1, val);
+    else if (name == "l1_dest2")
+        dxsynth_set_lfo1_mod_dest(this, 2, val);
+    else if (name == "l1_dest3")
+        dxsynth_set_lfo1_mod_dest(this, 3, val);
+    else if (name == "l1_dest4")
+        dxsynth_set_lfo1_mod_dest(this, 4, val);
+
+    ///// OP11111111111111111
+    else if (name == "o1wav")
+        dxsynth_set_op_waveform(this, 1, val);
+    else if (name == "o1rat")
+        dxsynth_set_op_ratio(this, 1, val);
+    else if (name == "o1rat")
+        dxsynth_set_op_detune(this, 1, val);
+
+    else if (name == "e1att")
+        dxsynth_set_eg_attack_ms(this, 1, val);
+    else if (name == "e1dec")
+        dxsynth_set_eg_decay_ms(this, 1, val);
+    else if (name == "e1sus")
+        dxsynth_set_eg_sustain_lvl(this, 1, val);
+    else if (name == "e1rel")
+        dxsynth_set_eg_release_ms(this, 1, val);
+
+    ///// OP2222222222222222222222
+    else if (name == "o2wav")
+        dxsynth_set_op_waveform(this, 2, val);
+    else if (name == "o2rat")
+        dxsynth_set_op_ratio(this, 2, val);
+    else if (name == "o2rat")
+        dxsynth_set_op_detune(this, 2, val);
+
+    else if (name == "e2att")
+        dxsynth_set_eg_attack_ms(this, 2, val);
+    else if (name == "e2dec")
+        dxsynth_set_eg_decay_ms(this, 2, val);
+    else if (name == "e2sus")
+        dxsynth_set_eg_sustain_lvl(this, 2, val);
+    else if (name == "e2rel")
+        dxsynth_set_eg_release_ms(this, 2, val);
+
+    ///// 33333333333333333
+    else if (name == "o3wav")
+        dxsynth_set_op_waveform(this, 3, val);
+    else if (name == "o3rat")
+        dxsynth_set_op_ratio(this, 3, val);
+    else if (name == "o3rat")
+        dxsynth_set_op_detune(this, 3, val);
+
+    else if (name == "e3att")
+        dxsynth_set_eg_attack_ms(this, 3, val);
+    else if (name == "e3dec")
+        dxsynth_set_eg_decay_ms(this, 3, val);
+    else if (name == "e3sus")
+        dxsynth_set_eg_sustain_lvl(this, 3, val);
+    else if (name == "e3rel")
+        dxsynth_set_eg_release_ms(this, 3, val);
+
+    ///// 44444444444444444
+    else if (name == "o4wav")
+        dxsynth_set_op_waveform(this, 4, val);
+    else if (name == "o4rat")
+        dxsynth_set_op_ratio(this, 4, val);
+    else if (name == "o4rat")
+        dxsynth_set_op_detune(this, 4, val);
+
+    else if (name == "e4att")
+        dxsynth_set_eg_attack_ms(this, 4, val);
+    else if (name == "e4dec")
+        dxsynth_set_eg_decay_ms(this, 4, val);
+    else if (name == "e4sus")
+        dxsynth_set_eg_sustain_lvl(this, 4, val);
+    else if (name == "e4rel")
+        dxsynth_set_eg_release_ms(this, 4, val);
+
+    /// OUTZZZ
+    else if (name == "op1out")
+        dxsynth_set_op_output_lvl(this, 1, val);
+    else if (name == "op2out")
+        dxsynth_set_op_output_lvl(this, 2, val);
+    else if (name == "op3out")
+        dxsynth_set_op_output_lvl(this, 3, val);
+    else if (name == "op4out")
+        dxsynth_set_op_output_lvl(this, 4, val);
 
     dxsynth_update(this);
 }
