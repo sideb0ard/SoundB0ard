@@ -790,11 +790,19 @@ std::shared_ptr<ast::Expression> Parser::ParseGranularExpression()
         return nullptr;
     NextToken();
 
-    std::cout << "Cur token is " << cur_token_ << std::endl;
-    granular->path_ = ParseStringLiteral();
+    std::stringstream ss;
+    while (!CurTokenIs(token::SLANG_EOFF) && !CurTokenIs(token::SLANG_RPAREN))
+    {
+        ss << cur_token_.literal_;
+        NextToken();
+    }
+    granular->path_ = ss.str();
 
-    if (!ExpectPeek(token::SLANG_RPAREN))
+    if (!CurTokenIs(token::SLANG_RPAREN))
+    {
+        std::cout << "OOFT! where ya PAREN?\n";
         return nullptr;
+    }
 
     std::cout << "AST Granular EXPRESSION ALL GOOD!\n";
     return granular;

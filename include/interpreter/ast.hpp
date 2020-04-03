@@ -229,7 +229,7 @@ class GranularExpression : public Expression
     std::string String() const override;
 
   public:
-    std::shared_ptr<Expression> path_;
+    std::string path_;
     bool loop_mode_{false};
 };
 

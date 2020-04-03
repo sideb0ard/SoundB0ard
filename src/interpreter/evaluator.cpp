@@ -487,16 +487,14 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::GranularExpression>(node);
     if (gran)
     {
-        std::shared_ptr<ast::StringLiteral> spath =
-            std::dynamic_pointer_cast<ast::StringLiteral>(gran->path_);
-        if (spath)
+        if (!gran->path_.empty())
         {
             if (gran->loop_mode_)
             {
-                return std::make_shared<object::Granular>(spath->value_, true);
+                return std::make_shared<object::Granular>(gran->path_, true);
             }
             else
-                return std::make_shared<object::Granular>(spath->value_, false);
+                return std::make_shared<object::Granular>(gran->path_, false);
         }
         else
             std::cerr << "Nae sample path!!\n";

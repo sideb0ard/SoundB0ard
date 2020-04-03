@@ -1696,7 +1696,7 @@ void dxsynth::SetParam(std::string name, double val)
         dxsynth_set_op_waveform(this, 1, val);
     else if (name == "o1rat")
         dxsynth_set_op_ratio(this, 1, val);
-    else if (name == "o1rat")
+    else if (name == "o1det")
         dxsynth_set_op_detune(this, 1, val);
 
     else if (name == "e1att")
@@ -1713,7 +1713,7 @@ void dxsynth::SetParam(std::string name, double val)
         dxsynth_set_op_waveform(this, 2, val);
     else if (name == "o2rat")
         dxsynth_set_op_ratio(this, 2, val);
-    else if (name == "o2rat")
+    else if (name == "o2det")
         dxsynth_set_op_detune(this, 2, val);
 
     else if (name == "e2att")
@@ -1730,7 +1730,7 @@ void dxsynth::SetParam(std::string name, double val)
         dxsynth_set_op_waveform(this, 3, val);
     else if (name == "o3rat")
         dxsynth_set_op_ratio(this, 3, val);
-    else if (name == "o3rat")
+    else if (name == "o3det")
         dxsynth_set_op_detune(this, 3, val);
 
     else if (name == "e3att")
@@ -1747,7 +1747,7 @@ void dxsynth::SetParam(std::string name, double val)
         dxsynth_set_op_waveform(this, 4, val);
     else if (name == "o4rat")
         dxsynth_set_op_ratio(this, 4, val);
-    else if (name == "o4rat")
+    else if (name == "o4det")
         dxsynth_set_op_detune(this, 4, val);
 
     else if (name == "e4att")
