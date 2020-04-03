@@ -78,7 +78,6 @@ bool IsValidHex(const std::string &mask)
         return false;
     for (auto c : mask)
     {
-        std::cout << "Looking at " << c << std::endl;
         if (!('a' <= c && c <= 'f') && !('A' <= c && c <= 'Z') && !IsDigit(c))
             return false;
     }
@@ -305,8 +304,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         auto target = Eval(pan_stmt->target_, env);
         auto soundgen =
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
-        std::cout << "PAN! val:" << pan_stmt->value_ << std::endl;
-        std::cout << "BOOP\n";
         if (soundgen)
         {
             audio_action_queue_item action{.type = AudioAction::UPDATE,
@@ -584,8 +581,6 @@ std::shared_ptr<object::Object>
 EvalForStatement(std::shared_ptr<ast::ForStatement> for_loop,
                  std::shared_ptr<object::Environment> env)
 {
-    std::cout << "I'm A FOR LOOPO!\n";
-
     std::shared_ptr<object::Environment> new_env =
         std::make_shared<object::Environment>(env);
 
@@ -965,17 +960,14 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     }
     else if (func->token_.literal_ == "brak")
     {
-        std::cout << "BRRRRAk!!\n";
         return std::make_shared<PatternBrak>();
     }
     else if (func->token_.literal_ == "chord")
     {
-        std::cout << "CHOOOORD!!\n";
         return std::make_shared<PatternChord>();
     }
     else if (func->token_.literal_ == "every")
     {
-        std::cout << "EVEYRRRR!\n";
         auto intval =
             std::dynamic_pointer_cast<ast::NumberLiteral>(func->arguments_[0]);
         if (!intval)
@@ -983,7 +975,6 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             std::cerr << "NAE NAE!\n";
             return nullptr;
         }
-        std::cout << "EVERRRRY " << intval->value_ << "!\n";
 
         auto func_arg_ast = std::make_shared<ast::PatternFunctionExpression>(
             func->arguments_[1]->token_);
@@ -993,7 +984,6 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             int args_size = func->arguments_.size();
             if (args_size > 2)
             {
-                std::cout << "GOTZ " << args_size << " args\n";
                 for (int i = 2; i < args_size; i++)
                     func_arg_ast->arguments_.push_back(func->arguments_[i]);
             }
@@ -1008,24 +998,19 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     }
     else if (func->token_.literal_ == "fast")
     {
-        std::cout << "FAST!!\n";
         return std::make_shared<PatternFast>();
     }
     else if (func->token_.literal_ == "mask")
     {
-        std::cout << "MASK!\n";
         if (func->arguments_.size() == 1)
         {
-            std::cout << "GOT A MASK!: " << func->arguments_[0] << std::endl;
             auto mask_string = std::dynamic_pointer_cast<ast::StringLiteral>(
                 func->arguments_[0]);
             if (mask_string)
             {
-                std::cout << "IDENT IS " << mask_string->value_ << std::endl;
                 auto mask = mask_string->value_;
                 if (IsValidHex(mask))
                 {
-                    std::cout << "VALID HEX!\n";
                     return std::make_shared<PatternMask>(mask);
                 }
             }
@@ -1033,17 +1018,14 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     }
     else if (func->token_.literal_ == "power")
     {
-        std::cout << "POWERRRRR!!\n";
         return std::make_shared<PatternPowerChord>();
     }
     else if (func->token_.literal_ == "rev")
     {
-        std::cout << "REV!\n";
         return std::make_shared<PatternReverse>();
     }
     else if (func->token_.literal_ == "rotl" || func->token_.literal_ == "rotr")
     {
-        std::cout << "ROTATE!\n";
         int num_sixteenth_steps = 1;
         if (func->arguments_.size() > 0)
         {
@@ -1060,12 +1042,10 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     }
     else if (func->token_.literal_ == "slow")
     {
-        std::cout << "SLOW!!\n";
         return std::make_shared<PatternSlow>();
     }
     else if (func->token_.literal_ == "swing")
     {
-        std::cout << "SWING!\n";
         int swing_setting = 50;
         if (func->arguments_.size() > 0)
         {
@@ -1074,12 +1054,10 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             if (intval)
                 swing_setting = intval->value_;
         }
-        std::cout << "SWING SETTING:" << swing_setting << std::endl;
         return std::make_shared<PatternSwing>(swing_setting);
     }
     else if (func->token_.literal_ == "up" || func->token_.literal_ == "down")
     {
-        std::cout << "UP OR DOWN YO!\n";
         int num_octaves = 1;
         if (func->arguments_.size() > 0)
         {
@@ -1114,7 +1092,6 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
 
         for (auto &f : proc->functions_)
         {
-            std::cout << "GOT FUNCTUIN\n";
             auto funcy = EvalPatternFunctionExpression(f);
             if (funcy)
                 process_funcz.push_back(funcy);

@@ -60,7 +60,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
     if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER) ||
         PeekTokenIs(pattern_parser::PATTERN_DIVISOR))
     {
-        std::cout << "YO GOT MULTI OR DIV!\n";
         bool is_multiplier{false};
         if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER))
             is_multiplier = true;
@@ -83,7 +82,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             auto ev_group = std::make_shared<pattern_parser::PatternGroup>();
             for (int i = 0; i < mod_value; ++i)
                 ev_group->event_groups_[0].push_back(return_node);
-            std::cout << "MULTIPLIER TO\n";
             return_node = ev_group;
         }
         else
@@ -92,7 +90,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 
     if (PeekTokenIs(pattern_parser::PATTERN_OPEN_PAREN))
     {
-        std::cout << "GOT EUCLIDEAN!" << std::endl;
         // Euclidean e.g. '(3,8)'
         // discard open paren
         NextToken();
@@ -120,8 +117,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
 
         return_node->euclidean_hits_ = num_hits;
         return_node->euclidean_steps_ = num_steps;
-
-        std::cout << "ALL GOOD!\n";
     }
     else if (PeekTokenIs(pattern_parser::PATTERN_QUESTIONMARK))
     {
@@ -136,7 +131,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             NextToken();
             if (PeekTokenIs(pattern_parser::PATTERN_NUMBER))
             {
-                std::cout << "GOT A NUM:" << peek_token_.literal_ << std::endl;
                 if (iter == 0)
                     return_node->amplitude_.push_back(
                         std::stof(peek_token_.literal_));
@@ -147,13 +141,9 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             }
             else if (PeekTokenIs(pattern_parser::PATTERN_OPEN_ANGLE_BRACKET))
             {
-                std::cout << "GOT A PATTERN:" << peek_token_.literal_
-                          << std::endl;
                 NextToken();
                 while (PeekTokenIs(pattern_parser::PATTERN_NUMBER))
                 {
-                    std::cout << "GOT A NUM:" << peek_token_.literal_
-                              << std::endl;
                     if (iter == 0)
                         return_node->amplitude_.push_back(
                             std::stof(peek_token_.literal_));
