@@ -1,0 +1,21 @@
+d1 = DxSynth(wuurpr) vol:1 pan:0 algo:4
+esk2 = dloops/ESKIClip.aiff vol:1 pan:0 pitch:1 idx:35 mode:LOOP(0) step:0 len:2
+sl = dloops/sadLIB.aiff vol:1 pan:0 pitch:2 idx:70 mode:LOOP(0) step:0 len:1
+hh = Sampler(hats/dr606closedhh.aif) vol:0.3 pan:0 pitch:1
+     fx0 delayms:94 fb:72.23 ratio:0.20 wetmx:0.70 mode:TAP2(1) sync:1 synclen:16TH(2)
+esk1 = dloops/EKSIbeat.aiff vol:1 pan:0 pitch:1 idx:70 mode:LOOP(0) step:0 len:1
+
+[Procz]
+p1 # "<c0*12 c0*12 c0*13 a0*4>" d1 | every 5 down 2
+p2 < osc 12 "80 95"  "set d1:op2out %"
+p3 < osc 18 "60 94"  "set d1:op4out %"
+p4 < osc 13 "1 300"  "set d1:e2att %"
+p5 < every 8 "<3 4>"  "set d1:algo %"
+p6 < every 4 "1"  "set sl:stutter %"
+p7 $ "<hh*16 hh*8 hh*4>" | swing 11
+p8 < every 7 "<1 2>"  "set sl:pitch %"
+p9 < osc 17 "2 74"  "set hh:fx0:fb %"
+p10 < every 3 "1"  "set esk1:stutter %; set esk2:stutter %"
+p11 < every 8 "<1 2>"  "set esk1:pitch %; set esk2:pitch %"
+p12 < every 7 "<0 2>"  "set esk2:mode %"
+p13 < every 2 "<1 2 16 32 127>"  "set esk2:len %"
