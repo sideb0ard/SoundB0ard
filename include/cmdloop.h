@@ -13,8 +13,6 @@
 
 void *loopy();
 
-int stacksize(void);
-
 int exxit(void);
 int parse_wurds_from_cmd(char wurds[][SIZE_OF_WURD], char *line);
 bool parse_minisynth_settings_change(MiniSynth *ms, char wurds[][SIZE_OF_WURD]);

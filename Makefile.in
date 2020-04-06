@@ -1,6 +1,6 @@
 CC = clang++
 
-GTEST_DIR =  /Users/sideboard/Code/googletest/googletest
+GTEST_DIR =  ${HOME}/Code/googletest/googletest
 
 SRC = $(shell find src -type f -name '*.cpp')
 OBJDIR = obj
@@ -8,12 +8,23 @@ OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
 
 LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
 
-ABLETONASIOINC=/Users/sideboard/Code/link/modules/asio-standalone/asio/include
-READLINEINCDIR=/Users/sideboard/homebrew/opt/readline/include
-INCDIRS=-I/usr/local/include -Iinclude/interpreter -Iinclude -Iinclude/afx -Iinclude/stack -I/Users/sideboard/Code/link/include -I/Users/sideboard/homebrew/include -I${HOME}/Code/range-v3/include/ -I${ABLETONASIOINC} -I${READLINEINCDIR}
+ABLETONASIOINCDIR=${HOME}/Code/link/modules/asio-standalone/asio/include
+READLINEINCDIR=${HOME}/homebrew/opt/readline/include
+RANGE3INCDIR=${HOME}/Code/range-v3/include/
+HOMEBREWINCDIR=${HOME}/homebrew/include
 
-HOMEBREWLIBDIR=/Users/sideboard/homebrew/lib
-READLINELIBDIR=/Users/sideboard/homebrew/opt/readline/lib
+INCDIRS=-I/usr/local/include \
+		-Iinclude \
+		-I${HOME}/Code/link/include \
+		-I${HOMEBREWINCDIR} \
+		-I${RANGE3INCDIR} \
+		-I${ABLETONASIOINCDIR} \
+		-I${READLINEINCDIR}
+
+
+HOMEBREWLIBDIR=${HOME}/homebrew/lib
+READLINELIBDIR=${HOME}/homebrew/opt/readline/lib
+
 LIBDIRS=-L/usr/local/lib -L${HOMEBREWLIBDIR} -L${READLINELIBDIR}
 
 WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants

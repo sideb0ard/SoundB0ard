@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <strings.h>
 
-#include "defjams.h"
-#include "utils.h"
-#include "afx/delay.h"
+#include <afx/delay.h>
+#include <defjams.h>
+#include <utils.h>
 
 void delay_init(delay *d, int delay_length)
 {
@@ -17,7 +17,7 @@ void delay_init(delay *d, int delay_length)
     d->m_read_index = 0;
 
     d->m_buffer_size = delay_length;
-    d->m_buffer = (double*) calloc(d->m_buffer_size, sizeof(double));
+    d->m_buffer = (double *)calloc(d->m_buffer_size, sizeof(double));
 }
 
 void delay_reset_delay(delay *d)

@@ -1,4 +1,4 @@
-#include "onepolelpf.h"
+#include <afx/onepolelpf.h>
 #include <stdbool.h>
 
 void one_pole_lpf_set_lpf_g(one_pole_lpf *o, double g) { o->m_lpf_g = g; }

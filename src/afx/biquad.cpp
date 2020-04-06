@@ -1,5 +1,6 @@
-#include "biquad.h"
 #include <stdio.h>
+
+#include <afx/biquad.h>
 
 void biquad_flush_delays(biquad *b)
 {

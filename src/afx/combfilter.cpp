@@ -1,5 +1,5 @@
-#include "combfilter.h"
-#include "../defjams.h"
+#include <afx/combfilter.h>
+#include <defjams.h>
 
 void comb_filter_init(comb_filter *c, int delay_len)
 {
