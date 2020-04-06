@@ -2,11 +2,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "defjams.h"
-#include "filter.h"
-#include "filter_moogladder.h"
-#include "filter_onepole.h"
-#include "utils.h"
+#include <defjams.h>
+#include <filter.h>
+#include <filter_moogladder.h>
+#include <filter_onepole.h>
+#include <utils.h>
 
 filter_moog *new_filter_moog()
 {
