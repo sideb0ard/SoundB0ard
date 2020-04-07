@@ -1,7 +1,6 @@
 #ifndef MIXER_H
 #define MIXER_H
 
-#include <lo/lo.h>
 #include <portaudio.h>
 #include <portmidi.h>
 #include <pthread.h>
@@ -129,8 +128,6 @@ struct mixer
     int prog_degrees_idx;
     unsigned int progression_type;
     bool should_progress_chords;
-
-    lo_address processing_addr;
 };
 
 mixer *new_mixer(double output_latency);

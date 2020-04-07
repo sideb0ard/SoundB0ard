@@ -3,11 +3,12 @@
 #include <stdbool.h>
 #include <wchar.h>
 
+#include <atomic>
+
 #include <defjams.h>
 #include <fx/envelope.h>
 #include <fx/fx.h>
-
-#include "sequenceengine.h"
+#include <sequenceengine.h>
 
 class SoundGenerator
 {
