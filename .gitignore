@@ -18,11 +18,12 @@ libgtest.a
 libgtest_main.a
 sbsh_test
 sbsh_test.dSYM/
+!configure.ac
 
-# autotoolzz #########
-
-# http://www.gnu.org/software/automake
-# Makefile.in
+## autotoolzz #########
+#
+## http://www.gnu.org/software/automake
+Makefile.in
 /ar-lib
 /mdate-sh
 /py-compile
@@ -30,8 +31,8 @@ sbsh_test.dSYM/
 /ylwrap
 .deps/
 .dirstamp
-
-# http://www.gnu.org/software/autoconf
+#
+## http://www.gnu.org/software/autoconf
 autom4te.cache
 /autoscan.log
 /autoscan-*.log
@@ -43,7 +44,7 @@ autom4te.cache
 /config.log
 /config.status
 /config.sub
-/configure
+#configure
 /configure.scan
 /depcomp
 /install-sh
