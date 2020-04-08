@@ -1681,52 +1681,6 @@ fi
 
 } # ac_fn_cxx_try_compile
 
-# ac_fn_c_try_link LINENO
-# -----------------------
-# Try to link conftest.$ac_ext, and return whether this succeeded.
-ac_fn_c_try_link ()
-{
-  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
-  rm -f conftest.$ac_objext conftest$ac_exeext
-  if { { ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
-$as_echo "$ac_try_echo"; } >&5
-  (eval "$ac_link") 2>conftest.err
-  ac_status=$?
-  if test -s conftest.err; then
-    grep -v '^ *+' conftest.err >conftest.er1
-    cat conftest.er1 >&5
-    mv -f conftest.er1 conftest.err
-  fi
-  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
-  test $ac_status = 0; } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 test -x conftest$ac_exeext
-       }; then :
-  ac_retval=0
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_retval=1
-fi
-  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
-  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
-  # interfere with the next link command; also delete a directory that is
-  # left behind by Apple's compiler.  We do this before executing the actions.
-  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
-  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
-  as_fn_set_status $ac_retval
-
-} # ac_fn_c_try_link
-
 # ac_fn_c_check_type LINENO TYPE VAR INCLUDES
 # -------------------------------------------
 # Tests whether TYPE exists after having included INCLUDES, setting cache
@@ -1910,6 +1864,52 @@ $as_echo "$ac_res" >&6; }
   eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
 
 } # ac_fn_c_find_uintX_t
+
+# ac_fn_c_try_link LINENO
+# -----------------------
+# Try to link conftest.$ac_ext, and return whether this succeeded.
+ac_fn_c_try_link ()
+{
+  as_lineno=${as_lineno-"$1"} as_lineno_stack=as_lineno_stack=$as_lineno_stack
+  rm -f conftest.$ac_objext conftest$ac_exeext
+  if { { ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:${as_lineno-$LINENO}: $ac_try_echo\""
+$as_echo "$ac_try_echo"; } >&5
+  (eval "$ac_link") 2>conftest.err
+  ac_status=$?
+  if test -s conftest.err; then
+    grep -v '^ *+' conftest.err >conftest.er1
+    cat conftest.er1 >&5
+    mv -f conftest.er1 conftest.err
+  fi
+  $as_echo "$as_me:${as_lineno-$LINENO}: \$? = $ac_status" >&5
+  test $ac_status = 0; } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 test -x conftest$ac_exeext
+       }; then :
+  ac_retval=0
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_retval=1
+fi
+  # Delete the IPA/IPO (Inter Procedural Analysis/Optimization) information
+  # created by the PGI compiler (conftest_ipa8_conftest.oo), as it would
+  # interfere with the next link command; also delete a directory that is
+  # left behind by Apple's compiler.  We do this before executing the actions.
+  rm -rf conftest.dSYM conftest_ipa8_conftest.oo
+  eval $as_lineno_stack; ${as_lineno_stack:+:} unset as_lineno
+  as_fn_set_status $ac_retval
+
+} # ac_fn_c_try_link
 
 # ac_fn_c_check_func LINENO FUNC VAR
 # ----------------------------------
@@ -4534,318 +4534,14 @@ fi
 
 
 # Checks for libraries.
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lgtest" >&5
-$as_echo_n "checking for main in -lgtest... " >&6; }
-if ${ac_cv_lib_gtest_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgtest  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_gtest_main=yes
-else
-  ac_cv_lib_gtest_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gtest_main" >&5
-$as_echo "$ac_cv_lib_gtest_main" >&6; }
-if test "x$ac_cv_lib_gtest_main" = xyes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Looking for GTest." >&5
-$as_echo "$as_me: Looking for GTest." >&6;}
-else
-  as_fn_error $? "cannot find GTest" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lm" >&5
-$as_echo_n "checking for main in -lm... " >&6; }
-if ${ac_cv_lib_m_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lm  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_m_main=yes
-else
-  ac_cv_lib_m_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_m_main" >&5
-$as_echo "$ac_cv_lib_m_main" >&6; }
-if test "x$ac_cv_lib_m_main" = xyes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Looking for Math." >&5
-$as_echo "$as_me: Looking for Math." >&6;}
-else
-  as_fn_error $? "cannot find Math" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for Pa_CountDevices in -lportaudio" >&5
-$as_echo_n "checking for Pa_CountDevices in -lportaudio... " >&6; }
-if ${ac_cv_lib_portaudio_Pa_CountDevices+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lportaudio  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char Pa_CountDevices ();
-int
-main ()
-{
-return Pa_CountDevices ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_portaudio_Pa_CountDevices=yes
-else
-  ac_cv_lib_portaudio_Pa_CountDevices=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_portaudio_Pa_CountDevices" >&5
-$as_echo "$ac_cv_lib_portaudio_Pa_CountDevices" >&6; }
-if test "x$ac_cv_lib_portaudio_Pa_CountDevices" = xyes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Looking for PortAudio." >&5
-$as_echo "$as_me: Looking for PortAudio." >&6;}
-else
-  as_fn_error $? "cannot find PortAudio" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lportmidi" >&5
-$as_echo_n "checking for main in -lportmidi... " >&6; }
-if ${ac_cv_lib_portmidi_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lportmidi  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_portmidi_main=yes
-else
-  ac_cv_lib_portmidi_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_portmidi_main" >&5
-$as_echo "$ac_cv_lib_portmidi_main" >&6; }
-if test "x$ac_cv_lib_portmidi_main" = xyes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Looking for PortMidi." >&5
-$as_echo "$as_me: Looking for PortMidi." >&6;}
-else
-  as_fn_error $? "cannot find PortMidi" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lprofiler" >&5
-$as_echo_n "checking for main in -lprofiler... " >&6; }
-if ${ac_cv_lib_profiler_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lprofiler  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_profiler_main=yes
-else
-  ac_cv_lib_profiler_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_profiler_main" >&5
-$as_echo "$ac_cv_lib_profiler_main" >&6; }
-if test "x$ac_cv_lib_profiler_main" = xyes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Looking for Profiler." >&5
-$as_echo "$as_me: Looking for Profiler." >&6;}
-else
-  as_fn_error $? "cannot find Profiler" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lpthread" >&5
-$as_echo_n "checking for main in -lpthread... " >&6; }
-if ${ac_cv_lib_pthread_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpthread  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_pthread_main=yes
-else
-  ac_cv_lib_pthread_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_pthread_main" >&5
-$as_echo "$ac_cv_lib_pthread_main" >&6; }
-if test "x$ac_cv_lib_pthread_main" = xyes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Looking for PThread." >&5
-$as_echo "$as_me: Looking for PThread." >&6;}
-else
-  as_fn_error $? "cannot find PThread" "$LINENO" 5
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main in -lreadline" >&5
-$as_echo_n "checking for main in -lreadline... " >&6; }
-if ${ac_cv_lib_readline_main+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lreadline  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-
-int
-main ()
-{
-return main ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  ac_cv_lib_readline_main=yes
-else
-  ac_cv_lib_readline_main=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_readline_main" >&5
-$as_echo "$ac_cv_lib_readline_main" >&6; }
-if test "x$ac_cv_lib_readline_main" = xyes; then :
-  { $as_echo "$as_me:${as_lineno-$LINENO}: Looking for Readline." >&5
-$as_echo "$as_me: Looking for Readline." >&6;}
-else
-  as_fn_error $? "cannot find Readline" "$LINENO" 5
-fi
-
-as_ac_Lib=`$as_echo "ac_cv_lib_sndfile_main{ $as_echo "$as_me:${as_lineno-$LINENO}: Looking for SndFile." >&5
-$as_echo "$as_me: Looking for SndFile." >&6;}" | $as_tr_sh`
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for main{ $as_echo \"$as_me:${as_lineno-$LINENO}: Looking for SndFile.\" >&5
-$as_echo \"$as_me: Looking for SndFile.\" >&6;} in -lsndfile" >&5
-$as_echo_n "checking for main{ $as_echo \"$as_me:${as_lineno-$LINENO}: Looking for SndFile.\" >&5
-$as_echo \"$as_me: Looking for SndFile.\" >&6;} in -lsndfile... " >&6; }
-if eval \${$as_ac_Lib+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsndfile  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char main{ $as_echo "$as_me:${as_lineno-$LINENO}: Looking for SndFile." >&5
-$as_echo "$as_me: Looking for SndFile." >&6;} ();
-int
-main ()
-{
-return main{ $as_echo "$as_me:${as_lineno-$LINENO}: Looking for SndFile." >&5
-$as_echo "$as_me: Looking for SndFile." >&6;} ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_c_try_link "$LINENO"; then :
-  eval "$as_ac_Lib=yes"
-else
-  eval "$as_ac_Lib=no"
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-eval ac_res=\$$as_ac_Lib
-	       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_res" >&5
-$as_echo "$ac_res" >&6; }
-if eval test \"x\$"$as_ac_Lib"\" = x"yes"; then :
-  as_fn_error $? "cannot find SndFile" "$LINENO" 5
-fi
-
+#AC_CHECK_LIB([gtest], [main], AC_MSG_NOTICE(Looking for GTest.), AC_MSG_ERROR(cannot find GTest))
+#AC_CHECK_LIB([m], [main], AC_MSG_NOTICE(Looking for Math.), AC_MSG_ERROR(cannot find Math))
+#AC_CHECK_LIB([portaudio], [Pa_CountDevices], AC_MSG_NOTICE(Looking for PortAudio.), AC_MSG_ERROR(cannot find PortAudio))
+#AC_CHECK_LIB([portmidi], [main],AC_MSG_NOTICE(Looking for PortMidi.), AC_MSG_ERROR(cannot find PortMidi))
+#AC_CHECK_LIB([profiler], [main],AC_MSG_NOTICE(Looking for Profiler.), AC_MSG_ERROR(cannot find Profiler))
+#AC_CHECK_LIB([pthread], [main],AC_MSG_NOTICE(Looking for PThread.), AC_MSG_ERROR(cannot find PThread))
+#AC_CHECK_LIB([readline], [main],AC_MSG_NOTICE(Looking for Readline.), AC_MSG_ERROR(cannot find Readline))
+#AC_CHECK_LIB([sndfile], [main]AC_MSG_NOTICE(Looking for SndFile.), AC_MSG_ERROR(cannot find SndFile))
 
 # Checks for header files.
 for ac_header in locale.h stdint.h stdlib.h string.h strings.h sys/time.h termios.h unistd.h wchar.h

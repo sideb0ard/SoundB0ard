@@ -1,59 +1,33 @@
 d1 = DxSynth(wuurpr) vol:1 pan:0 algo:4
-esk2 = dloops/ESKIClip.aiff vol:1 pan:0 pitch:1 idx:35 mode:LOOP(0) step:0 len:2
-sl = dloops/sadLIB.aiff vol:1 pan:0 pitch:2 idx:70 mode:LOOP(0) step:0 len:1
-hh = Sampler(hats/dr606closedhh.aif) vol:0.3 pan:0 pitch:1
-     fx0 delayms:94 fb:72.23 ratio:0.20 wetmx:0.70 mode:TAP2(1) sync:1 synclen:16TH(2)
-esk1 = dloops/EKSIbeat.aiff vol:1 pan:0 pitch:1 idx:70 mode:LOOP(0) step:0 len:1
 
 [Procz]
-p1 # "<c0*12 c0*12 c0*13 a0*4>" d1 | every 5 down 2
+p1 # "<c0>
+p1 # "<c0*12>
+bpm 160
+p1 # "<c0*12 c0*12 c0*12 a0*4>" d1 | every 5 down 2
 p2 < osc 12 "80 95"  "set d1:op2out %"
 p3 < osc 18 "60 94"  "set d1:op4out %"
 p4 < osc 13 "1 300"  "set d1:e2att %"
 p5 < every 8 "<3 4>"  "set d1:algo %"
-p6 < every 4 "1"  "set sl:stutter %"
+
+mk = Sampler(kicks/mkKick.aiff)
+hh = Sampler(hats/dr606closedhh.aif)
+
 p7 $ "<hh*16 hh*8 hh*4>" | swing 11
-p8 < every 7 "<1 2>"  "set sl:pitch %"
 p9 < osc 17 "2 74"  "set hh:fx0:fb %"
-p10 < every 3 "1"  "set esk1:stutter %; set esk2:stutter %"
-p11 < every 8 "<1 2>"  "set esk1:pitch %; set esk2:pitch %"
-p12 < every 7 "<0 2>"  "set esk2:mode %"
 p13 < every 2 "<1 2 16 32 127>"  "set esk2:len %"
 
 
 ##################
-
 d1 = DxSynth(RAVER) vol:0.7 pan:0 algo:4
-bd = Sampler(kicks/ruffR.aiff) vol:0.7 pan:0 pitch:1
-     fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
-bd2 = Sampler(kicks/ruffR.aiff) vol:0.7 pan:0 pitch:1
-      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
-bd1 = Sampler(kicks/AbraKick.aiff) vol:0.7 pan:0 pitch:1
-      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
 hh = Sampler(hats/angelHat.aiff) vol:0.7 pan:0 pitch:1
 
 [Procz]
 p1 # "<c0*4 e0*4 a0*4>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,bd | every 3 down 1 | every 7 up 1
-p2 < every 3 "<1 2 3 4>"  "set d1:algo %"
-p3 < every 4 "<bd1 bd2>"  "let bd = %"
 p4 $ "hh*16"
 
 
 d1 = DxSynth(RAVER) vol:0.7 pan:0 algo:1
-bd = Sampler(kicks/AbraKick.aiff) vol:0 pan:0 pitch:1
-     fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
-bd2 = Sampler(kicks/ruffR.aiff) vol:0 pan:0 pitch:1
-      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
-bd1 = Sampler(kicks/AbraKick.aiff) vol:0 pan:0 pitch:1
-      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
-     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
-hh = Sampler(hats/angelHat.aiff) vol:0 pan:0 pitch:1
-     fx0 delayms:107 fb:2.00 ratio:0.20 wetmx:0.70 mode:TAP2(1) sync:1 synclen:16TH(2)
 mo = Moog(flipzz) vol:1 pan:0 voice:SQR3(1)
 cp = Sampler(claps/front2WestClap.aiff) vol:0.7 pan:0 pitch:1
 esk2 = dloops/ESKIClip.aiff vol:0.5 pan:0 pitch:1 idx:2 mode:LOOP(0) step:0 len:1
@@ -61,8 +35,6 @@ esk2 = dloops/ESKIClip.aiff vol:0.5 pan:0 pitch:1 idx:2 mode:LOOP(0) step:0 len:
 [Procz]
 p1 # "<c0*4 e0*4 a0*4 e0? c0>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,bd | every 3 down 1 | every 7 up 1
 p2 < every 3 "<1 2 3 4>"  "set d1:algo %"
-p3 < every 4 "<bd1 bd2>"  "let bd = %"
-p4 $ "hh*16"
 p5 < osc 17 "1.8 7"  "set d1:o1rat %"
 p6 $ "[~ <cp cp? cp cp*3 cp(3,8) cp? cp*2>]*2" | every 3 mask "fff0"
 p7 # "~ ~ [~ <e2 a1 c2*2 c2>] <~ ~ a1 a1(3,8)>" mo

@@ -15,14 +15,14 @@ AC_PROG_INSTALL
 AC_PROG_MAKE_SET
 
 # Checks for libraries.
-AC_CHECK_LIB([gtest], [main], AC_MSG_NOTICE(Looking for GTest.), AC_MSG_ERROR(cannot find GTest))
-AC_CHECK_LIB([m], [main], AC_MSG_NOTICE(Looking for Math.), AC_MSG_ERROR(cannot find Math))
-AC_CHECK_LIB([portaudio], [Pa_CountDevices], AC_MSG_NOTICE(Looking for PortAudio.), AC_MSG_ERROR(cannot find PortAudio))
-AC_CHECK_LIB([portmidi], [main],AC_MSG_NOTICE(Looking for PortMidi.), AC_MSG_ERROR(cannot find PortMidi))
-AC_CHECK_LIB([profiler], [main],AC_MSG_NOTICE(Looking for Profiler.), AC_MSG_ERROR(cannot find Profiler))
-AC_CHECK_LIB([pthread], [main],AC_MSG_NOTICE(Looking for PThread.), AC_MSG_ERROR(cannot find PThread))
-AC_CHECK_LIB([readline], [main],AC_MSG_NOTICE(Looking for Readline.), AC_MSG_ERROR(cannot find Readline))
-AC_CHECK_LIB([sndfile], [main]AC_MSG_NOTICE(Looking for SndFile.), AC_MSG_ERROR(cannot find SndFile))
+#AC_CHECK_LIB([gtest], [main], AC_MSG_NOTICE(Looking for GTest.), AC_MSG_ERROR(cannot find GTest))
+#AC_CHECK_LIB([m], [main], AC_MSG_NOTICE(Looking for Math.), AC_MSG_ERROR(cannot find Math))
+#AC_CHECK_LIB([portaudio], [Pa_CountDevices], AC_MSG_NOTICE(Looking for PortAudio.), AC_MSG_ERROR(cannot find PortAudio))
+#AC_CHECK_LIB([portmidi], [main],AC_MSG_NOTICE(Looking for PortMidi.), AC_MSG_ERROR(cannot find PortMidi))
+#AC_CHECK_LIB([profiler], [main],AC_MSG_NOTICE(Looking for Profiler.), AC_MSG_ERROR(cannot find Profiler))
+#AC_CHECK_LIB([pthread], [main],AC_MSG_NOTICE(Looking for PThread.), AC_MSG_ERROR(cannot find PThread))
+#AC_CHECK_LIB([readline], [main],AC_MSG_NOTICE(Looking for Readline.), AC_MSG_ERROR(cannot find Readline))
+#AC_CHECK_LIB([sndfile], [main]AC_MSG_NOTICE(Looking for SndFile.), AC_MSG_ERROR(cannot find SndFile))
 
 # Checks for header files.
 AC_CHECK_HEADERS([locale.h stdint.h stdlib.h string.h strings.h sys/time.h termios.h unistd.h wchar.h])
