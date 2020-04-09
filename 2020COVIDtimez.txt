@@ -17,6 +17,10 @@ p7 $ "<hh*16 hh*8 hh*4>" | swing 11
 p9 < osc 17 "2 74"  "set hh:fx0:fb %"
 p13 < every 2 "<1 2 16 32 127>"  "set esk2:len %"
 
+d2 -- ZApzz
+p7 # "<~ e2*4> <c1*8 ~ c0*4 a1(3,8)>" d2
+
+BD!
 
 ##################
 d1 = DxSynth(RAVER) vol:0.7 pan:0 algo:4
