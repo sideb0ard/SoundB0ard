@@ -128,15 +128,15 @@ std::string MiniSynth::Info()
 {
     std::stringstream ss;
 
-    ss << COOL_COLOR_YELLOW << "Moog(" << m_settings.m_settings_name << ")"
+    ss << COOL_COLOR_YELLOW << "\nMoog(" << m_settings.m_settings_name << ")"
        << " vol:" << volume << " pan:" << pan
        << " voice:" << S_VOICES[m_settings.m_voice_mode] << "("
-       << m_settings.m_voice_mode << ") mono:" << m_settings.m_monophonic
+       << m_settings.m_voice_mode << ")\nmono:" << m_settings.m_monophonic
        << " hard_sync:" << m_settings.hard_sync
        << " detune:" << m_settings.m_detune_cents
        << " legato:" << m_settings.m_legato_mode
        << " kt:" << m_settings.m_filter_keytrack
-       << " ndscale:" << m_settings.m_note_number_to_decay_scaling << "osc1:"
+       << " ndscale:" << m_settings.m_note_number_to_decay_scaling << "\nosc1:"
        << s_waveform_names[m_global_synth_params.osc1_params.waveform] << "("
        << m_global_synth_params.osc1_params.waveform << ")"
        << " o1amp:" << m_global_synth_params.osc1_params.amplitude
@@ -173,7 +173,7 @@ std::string MiniSynth::Info()
        << " pitchrange:" << m_settings.m_pitchbend_range
        << " porta:" << m_settings.m_portamento_time_msec
        << " pw:" << m_settings.m_pulse_width_pct
-       << " subosc:" << m_settings.m_sub_osc_db
+       << "\nsubosc:" << m_settings.m_sub_osc_db
        << " vascale:" << m_settings.m_velocity_to_attack_scaling
        << " zero:" << m_settings.m_reset_to_zero << "\n"
 
@@ -186,10 +186,10 @@ std::string MiniSynth::Info()
        << " l1amp:" << m_settings.m_lfo1_amplitude << "\n"
        << "l1_filter_en:" << m_settings.m_lfo1_filter_fc_enabled
        << " l1_osc_en:" << m_settings.m_lfo1_osc_pitch_enabled
-       << "l1_pan_en:" << m_settings.m_lfo1_pan_enabled
+       << " l1_pan_en:" << m_settings.m_lfo1_pan_enabled
        << " l1_amp_en:" << m_settings.m_lfo1_amp_enabled
-       << " l1_pw_en:" << m_settings.m_lfo1_pulsewidth_enabled << "\n"
-       << "l1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
+       << " l1_pw_en:" << m_settings.m_lfo1_pulsewidth_enabled
+       << "\nl1_filter_int:" << m_settings.m_lfo1_filter_fc_intensity
        << " l1_osc_int:" << m_settings.m_lfo1_osc_pitch_intensity
        << " l1_pan_int:" << m_settings.m_lfo1_pan_intensity
        << " l1_amp_int:" << m_settings.m_lfo1_amp_intensity
@@ -218,7 +218,7 @@ std::string MiniSynth::Info()
        << " eg1_osc_en:" << m_settings.m_eg1_osc_enabled
        << " eg1_dca_en:" << m_settings.m_eg1_dca_enabled
        << " eg1_sustain:" << m_settings.m_eg1_sustain_override
-       << " eg1_filter_int:" << m_settings.m_eg1_filter_intensity
+       << "\neg1_filter_int:" << m_settings.m_eg1_filter_intensity
        << " eg1_osc_int:" << m_settings.m_eg1_osc_intensity
        << " eg1_dca_int:" << m_settings.m_eg1_dca_intensity
        << " eg1_sustainlvl:" << m_settings.m_eg1_sustain_level << "\n"
@@ -230,7 +230,7 @@ std::string MiniSynth::Info()
        << " eg2_osc_en:" << m_settings.m_eg2_osc_enabled
        << " eg2_dca_en:" << m_settings.m_eg2_dca_enabled
        << " eg2_sustain:" << m_settings.m_eg2_sustain_override
-       << " eg2_filter_int:" << m_settings.m_eg2_filter_intensity
+       << "\neg2_filter_int:" << m_settings.m_eg2_filter_intensity
        << " eg2_osc_int:" << m_settings.m_eg2_osc_intensity
        << " eg2_dca_int:" << m_settings.m_eg2_dca_intensity
        << " eg2_sustainlvl:" << m_settings.m_eg2_sustain_level << "\n"

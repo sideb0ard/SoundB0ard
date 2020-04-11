@@ -4,50 +4,108 @@ d1 = DxSynth(wuurpr) vol:1 pan:0 algo:4
 p1 # "<c0>
 p1 # "<c0*12>
 bpm 160
-p1 # "<c0*12 c0*12 c0*12 a0*4>" d1 | every 5 down 2
 p2 < osc 12 "80 95"  "set d1:op2out %"
 p3 < osc 18 "60 94"  "set d1:op4out %"
 p4 < osc 13 "1 300"  "set d1:e2att %"
 p5 < every 8 "<3 4>"  "set d1:algo %"
+p1 # "<c0*12 c0*12 c0*12 a0*4>" d1 | every 5 down 2
 
 mk = Sampler(kicks/mkKick.aiff)
 hh = Sampler(hats/dr606closedhh.aif)
 
-p7 $ "<hh*16 hh*8 hh*4>" | swing 11
-p9 < osc 17 "2 74"  "set hh:fx0:fb %"
-p13 < every 2 "<1 2 16 32 127>"  "set esk2:len %"
+p7 $ "hh*16" | swing 11 | every 8 mask "f0f0"
 
 d2 -- ZApzz
 p7 # "<~ e2*4> <c1*8 ~ c0*4 a1(3,8)>" d2
 
 BD!
+ESK1
 
-##################
-d1 = DxSynth(RAVER) vol:0.7 pan:0 algo:4
-hh = Sampler(hats/angelHat.aiff) vol:0.7 pan:0 pitch:1
+ESK2
+p11 < every 3 "<1 2 1 3 16 1 127>"  "set esk2:len %"
+p13 < every 2 "<1 2 16 32 127>"  "set esk2:len %"
 
-[Procz]
-p1 # "<c0*4 e0*4 a0*4>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,bd | every 3 down 1 | every 7 up 1
-p4 $ "hh*16"
+###############################################################
+
+PIERRE HOUSE - len 2
+prr = dloops/pierrehouse.aiff vol:1 pan:0 pitch:1 idx:71 mode:LOOP(0) step:0 len:2
+sb2 = dloops/scudBeat2.aiff vol:0.7 pan:0 pitch:1 idx:71 mode:LOOP(0) step:0 len:2
+p12 < every 2 "<2 16 2 8>"  "set sb2:len %"
+
+^ FILTER?
+
+p1 # "<c0*4 e0*4 a0*4>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,prr | every 3 down 1 | every 7 up 1
+p1 # "<c0*4 c0(3,8) c0>" d1,prr,bd
 
 
-d1 = DxSynth(RAVER) vol:0.7 pan:0 algo:1
+###############################################################
+
 mo = Moog(flipzz) vol:1 pan:0 voice:SQR3(1)
-cp = Sampler(claps/front2WestClap.aiff) vol:0.7 pan:0 pitch:1
-esk2 = dloops/ESKIClip.aiff vol:0.5 pan:0 pitch:1 idx:2 mode:LOOP(0) step:0 len:1
-
-[Procz]
-p1 # "<c0*4 e0*4 a0*4 e0? c0>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,bd | every 3 down 1 | every 7 up 1
-p2 < every 3 "<1 2 3 4>"  "set d1:algo %"
-p5 < osc 17 "1.8 7"  "set d1:o1rat %"
-p6 $ "[~ <cp cp? cp cp*3 cp(3,8) cp? cp*2>]*2" | every 3 mask "fff0"
 p7 # "~ ~ [~ <e2 a1 c2*2 c2>] <~ ~ a1 a1(3,8)>" mo
 p8 < osc 21 "130 13000"  "set mo:fc %"
 p9 < osc 3 "2 7"  "set mo:fq %"
-p10 < every 3 "1"  "set esk2:stutter %"
+
+p1 # "<c0*4 e0*4 a0*4 e0? c0>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,bd | every 3 down 1 | every 7 up 1
+p2 < every 3 "<1 2 3 4>"  "set d1:algo %"
+p5 < osc 17 "1.8 7"  "set d1:o1rat %"
 
 p1 # "<b0(3,8) b0> <[d0(3,8) gm0] gm0*7 ~>" d1 | down
 
-p11 < every 4 "<1 2>"  "set rb:pitch %"
+ZApzz
 p12 # "[~ <b2*3 b1*2>]" d2 | every 7 rev | every 2 swing 11 | every 8 down 1 | every 6 mask "f0f0"
 
+###############################################################
+
+hh = Sampler(hats/acidHat3.aiff) vol:0.7 pan:0 pitch:1
+bd = Sampler(kicks/dm02_909_kickdrum_003_drive.wav) vol:0.7 pan:0 pitch:1
+cp = Sampler(claps/djkhaledClap.aiff) vol:1 pan:0 pitch:1
+
+[Procz]
+d1 = DxSynth(muffin) vol:1 pan:0 algo:1
+p1 # "[[~ ~ e0 ~] [~ e0 ~ ~]]*2" d1 | every 7 fast | every 12 mask "ff0f"
+
+p3 $ "[~ hh]*4"
+p4 $ "[bd ~ ~ bd] [~ ~ cp ~] [bd <[~ bd?] [bd? ~]> [~ ~ <cp cp cp?> ~]"
+
+
+d1 = DxSynth(muffin) vol:0.7 pan:0 algo:1
+
+[Procz]
+p1 # "a0*4 [a0*4 <c0*4 e0(3,8)>]" d1 | every 7 mask "f0f0"
+p2 # "<~ e0*4> a1(3,8)" d2
+p3 < osc 16 "10 62"  "set d2:op2out %"
+p4 $ "[bd ~ ~ bd] [~ ~ cp ~] [bd <[~ bd?] [bd? ~]> [~ ~ <cp cp cp?> ~]"
+p5 $ "[~ hh]*4"
+
+dloops/ZeigenBOCK.aiff
+
+
+
+## approx 17mins
+
+
+
+
+
+d1 = DxSynth(rasppp) vol:0.6 pan:0 algo:3
+d2 = DxSynth(nrth) vol:0.5 pan:0 algo:0
+
+hh = Sampler(hats/dr606closedhh.aif) vol:0 pan:0 pitch:1
+     fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
+     lfo1_rate:0.38 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
+cp = Sampler(claps/djkhaledClap.aiff) vol:0.7 pan:0 pitch:1
+
+[Procz]
+p1 # "a0*4 [a0*4 <c0*4 e0(3,8)>]" d1 | every 7 mask "f0f0"
+p2 # "<~ e0*4> a1(3,8)" d2 | every 2 mask "ff00" | every 5 down 1
+
+
+
+
+pu = loops/pumpUpDaJAM.aiff vol:0 pan:0 pitch:1 idx:40 mode:LOOP(0) step:0 len:4
+mk = Sampler(kicks/mkKick.aiff) vol:0.7 pan:0 pitch:1
+qs = loops/queasyStabs.aiff vol:1 pan:0 pitch:1 idx:80 mode:LOOP(0) step:0 len:2
+bd = Sampler(kicks/dm02_909_kickdrum_006_drive.wav) vol:0.7 pan:0 pitch:1
+tb = loops/technoRaveBass.aiff vol:0 pan:0 pitch:1 idx:80 mode:LOOP(0) step:0 len:2
+bc = loops/bassDubC1bar.aiff vol:0.7 pan:0 pitch:1 idx:61 mode:LOOP(0) step:0 len:1
+ss = loops/soulsoulstrings2bar.aiff vol:0 pan:0 pitch:1 idx:80 mode:LOOP(0) step:0 len:2
