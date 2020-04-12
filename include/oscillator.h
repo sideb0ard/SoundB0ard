@@ -86,7 +86,7 @@ struct oscillator
     double m_inc;    // phase inc = Freq/SR
 
     // --- more pitch mods
-    double m_octave;    // octave tweak
+    int m_octave;       // octave tweak
     double m_semitones; // semitones tweak
     double m_cents;     // cents tweak
 

@@ -289,7 +289,6 @@ void minisynth_set_note_to_decay_scaling(MiniSynth *ms, unsigned int val);
 void minisynth_set_noise_osc_db(MiniSynth *ms, double val);
 void minisynth_set_octave(MiniSynth *ms, int val);
 void minisynth_set_osc_type(MiniSynth *ms, int osc, unsigned int osc_type);
-void minisynth_set_osc_cents(MiniSynth *ms, unsigned int osc_num, double val);
 void minisynth_set_osc_amp(MiniSynth *ms, unsigned int osc_num, double val);
 void minisynth_set_pitchbend_range(MiniSynth *ms, int val);
 void minisynth_set_portamento_time_ms(MiniSynth *ms, double val);

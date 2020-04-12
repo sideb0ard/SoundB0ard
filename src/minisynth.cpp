@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include <iomanip>
 #include <iostream>
 
 #include "midi_freq_table.h"
@@ -127,6 +128,7 @@ std::string MiniSynth::Status()
 std::string MiniSynth::Info()
 {
     std::stringstream ss;
+    ss << std::setprecision(2) << std::fixed;
 
     ss << COOL_COLOR_YELLOW << "\nMoog(" << m_settings.m_settings_name << ")"
        << " vol:" << volume << " pan:" << pan
@@ -136,13 +138,15 @@ std::string MiniSynth::Info()
        << " detune:" << m_settings.m_detune_cents
        << " legato:" << m_settings.m_legato_mode
        << " kt:" << m_settings.m_filter_keytrack
-       << " ndscale:" << m_settings.m_note_number_to_decay_scaling << "\nosc1:"
+       << " ndscale:" << m_settings.m_note_number_to_decay_scaling << "\n"
+
+       << "osc1:"
        << s_waveform_names[m_global_synth_params.osc1_params.waveform] << "("
        << m_global_synth_params.osc1_params.waveform << ")"
        << " o1amp:" << m_global_synth_params.osc1_params.amplitude
        << " o1oct:" << m_global_synth_params.osc1_params.octave
        << " o1semi:" << m_global_synth_params.osc1_params.semitones
-       << "o1cents:" << m_global_synth_params.osc1_params.cents << "\n"
+       << " o1cents:" << m_global_synth_params.osc1_params.cents << "\n"
 
        << "osc2:"
        << s_waveform_names[m_global_synth_params.osc2_params.waveform] << "("
@@ -150,7 +154,7 @@ std::string MiniSynth::Info()
        << " o2amp:" << m_global_synth_params.osc2_params.amplitude
        << " o2oct:" << m_global_synth_params.osc2_params.octave
        << " o2semi:" << m_global_synth_params.osc2_params.semitones
-       << "o2cents:" << m_global_synth_params.osc2_params.cents << "\n"
+       << " o2cents:" << m_global_synth_params.osc2_params.cents << "\n"
 
        << "osc3:"
        << s_waveform_names[m_global_synth_params.osc3_params.waveform] << "("
@@ -158,7 +162,7 @@ std::string MiniSynth::Info()
        << " o3amp:" << m_global_synth_params.osc3_params.amplitude
        << " o3oct:" << m_global_synth_params.osc3_params.octave
        << " o3semi:" << m_global_synth_params.osc3_params.semitones
-       << "o3cents:" << m_global_synth_params.osc3_params.cents << "\n"
+       << " o3cents:" << m_global_synth_params.osc3_params.cents << "\n"
 
        << "osc4:"
        << s_waveform_names[m_global_synth_params.osc4_params.waveform] << "("
@@ -166,7 +170,7 @@ std::string MiniSynth::Info()
        << " o4amp:" << m_global_synth_params.osc4_params.amplitude
        << " o4oct:" << m_global_synth_params.osc4_params.octave
        << " o4semi:" << m_global_synth_params.osc4_params.semitones
-       << "o4cents:" << m_global_synth_params.osc4_params.cents << "\n"
+       << " o4cents:" << m_global_synth_params.osc4_params.cents << "\n"
 
        << "noisedb:" << m_settings.m_noise_osc_db
        << " octave:" << m_settings.m_octave
@@ -605,12 +609,10 @@ void minisynth_update(MiniSynth *ms)
     ms->m_global_synth_params.osc1_params.amplitude = ms->m_settings.osc1_amp;
     ms->m_global_synth_params.osc1_params.octave = ms->m_settings.osc1_oct;
     ms->m_global_synth_params.osc1_params.semitones = ms->m_settings.osc1_semis;
-    ms->m_global_synth_params.osc1_params.cents = ms->m_settings.osc1_cents;
 
     ms->m_global_synth_params.osc2_params.amplitude = ms->m_settings.osc2_amp;
     ms->m_global_synth_params.osc2_params.octave = ms->m_settings.osc2_oct;
     ms->m_global_synth_params.osc2_params.semitones = ms->m_settings.osc2_semis;
-    ms->m_global_synth_params.osc2_params.cents = ms->m_settings.osc2_cents;
 
     double noise_amplitude =
         ms->m_settings.m_noise_osc_db == -96.0
@@ -1751,35 +1753,9 @@ void minisynth_set_osc_amp(MiniSynth *ms, unsigned int osc_num, double val)
         }
     }
     else
-        printf("val must be between -100 and 100\n");
+        printf("val must be between -1 and 1\n");
 }
 
-void minisynth_set_osc_cents(MiniSynth *ms, unsigned int osc_num, double val)
-{
-    if (osc_num == 0 || osc_num > 4)
-        return;
-
-    if (val >= -100 && val <= 100)
-    {
-        switch (osc_num)
-        {
-        case (1):
-            ms->m_settings.osc1_cents = val;
-            break;
-        case (2):
-            ms->m_settings.osc2_cents = val;
-            break;
-        case (3):
-            ms->m_settings.osc3_cents = val;
-            break;
-        case (4):
-            ms->m_settings.osc4_cents = val;
-            break;
-        }
-    }
-    else
-        printf("val must be between -100 and 100\n");
-}
 void minisynth_set_detune(MiniSynth *ms, double val)
 {
     if (val >= -100 && val <= 100)
@@ -2365,9 +2341,9 @@ void MiniSynth::SetParam(std::string name, double val)
     else if (name == "o1oct")
         minisynth_set_octave(this, val);
     else if (name == "o1semi")
-        minisynth_set_osc_cents(this, 1, val);
+        std::cout << "Not implemented.\n";
     else if (name == "o1cents")
-        minisynth_set_osc_cents(this, 1, val);
+        std::cout << "Use detune setting to adjust cents..\n";
 
     else if (name == "osc2")
         minisynth_set_lfo_wave(this, 2, val);
@@ -2376,9 +2352,9 @@ void MiniSynth::SetParam(std::string name, double val)
     else if (name == "o2oct")
         minisynth_set_octave(this, val);
     else if (name == "o2semi")
-        minisynth_set_osc_cents(this, 2, val);
+        std::cout << "Not implemented.\n";
     else if (name == "o2cents")
-        minisynth_set_osc_cents(this, 2, val);
+        std::cout << "Use detune setting to adjust cents..\n";
 
     else if (name == "osc3")
         minisynth_set_lfo_wave(this, 3, val);
@@ -2387,9 +2363,7 @@ void MiniSynth::SetParam(std::string name, double val)
     else if (name == "o3oct")
         minisynth_set_octave(this, val);
     else if (name == "o3semi")
-        minisynth_set_osc_cents(this, 3, val);
-    else if (name == "o3cents")
-        minisynth_set_osc_cents(this, 3, val);
+        std::cout << "Not implemented.\n";
 
     else if (name == "osc4")
         minisynth_set_lfo_wave(this, 4, val);
@@ -2398,9 +2372,7 @@ void MiniSynth::SetParam(std::string name, double val)
     else if (name == "o4oct")
         minisynth_set_octave(this, val);
     else if (name == "o4semi")
-        minisynth_set_osc_cents(this, 4, val);
-    else if (name == "o4cents")
-        minisynth_set_osc_cents(this, 4, val);
+        std::cout << "Not implemented.\n";
 
     else if (name == "noisedb")
         minisynth_set_noise_osc_db(this, val);

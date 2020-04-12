@@ -786,6 +786,8 @@ void dxsynth::randomize()
     // return;
     // printf("Randomizing DXSYNTH!\n");
 
+    strncpy(m_settings.m_settings_name, "-- random UNSAVED--", 256);
+
     m_settings.m_voice_mode = rand() % 8;
     m_settings.m_portamento_time_ms = rand() % 5000;
     m_settings.m_pitchbend_range = (rand() % 12) + 1;

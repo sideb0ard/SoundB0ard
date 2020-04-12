@@ -84,7 +84,10 @@ dloops/ZeigenBOCK.aiff
 ## approx 17mins
 
 
+BPM120:0
 
+d1 (fboom)
+p1 # "[~ g0] [~ d0 ~ ~] [b0 ~ ~ b0] [~ <g0 b0>]" d1 | down 2
 
 
 d1 = DxSynth(rasppp) vol:0.6 pan:0 algo:3
