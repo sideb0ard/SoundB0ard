@@ -243,6 +243,15 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::SetStatement>(node);
     if (set_stmt)
     {
+
+        if (set_stmt->target_->token_.literal_ == ("mixer"))
+        {
+            audio_action_queue_item action{.type = AudioAction::MIXER_UPDATE,
+                                           .param_name = set_stmt->param_,
+                                           .param_val = set_stmt->value_};
+            g_audio_action_queue.push(action);
+            return NULLL;
+        }
         auto target = Eval(set_stmt->target_, env);
         auto soundgen =
             std::dynamic_pointer_cast<object::SoundGenerator>(target);

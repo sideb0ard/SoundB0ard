@@ -702,6 +702,46 @@ void mixer_set_bars_per_chord(mixer *mixr, int bars)
         mixr->bars_per_chord = bars;
 }
 
+void mixer_set_key(mixer *mixr, unsigned int key)
+{
+    if (key < NUM_KEYS)
+        mixr->timing_info.key = key;
+}
+
+void mixer_set_key(mixer *mixr, std::string str_key)
+{
+    str_lower(str_key);
+
+    int key = -1;
+    if (str_key == "c")
+        key = 0;
+    else if (str_key == "c#" || str_key == "dm")
+        key = 1;
+    else if (str_key == "d")
+        key = 2;
+    else if (str_key == "d#" || str_key == "em")
+        key = 4;
+    else if (str_key == "e")
+        key = 5;
+    else if (str_key == "f")
+        key = 6;
+    else if (str_key == "f#" || str_key == "gm")
+        key = 7;
+    else if (str_key == "g")
+        key = 8;
+    else if (str_key == "g#" || str_key == "am")
+        key = 9;
+    else if (str_key == "a")
+        key = 10;
+    else if (str_key == "a#" || str_key == "bm")
+        key = 11;
+    else if (str_key == "b")
+        key = 12;
+
+    if (key != -1)
+        mixer_set_key(mixr, key);
+}
+
 void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num)
 {
     if (prog_num < NUM_PROGRESSIONS)
@@ -820,6 +860,14 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 interpreter_sound_cmds::ParseFXCmd(action->args);
             else if (action->type == AudioAction::BPM)
                 mixer_update_bpm(mixr, action->new_bpm);
+            else if (action->type == AudioAction::MIXER_UPDATE)
+            {
+                if (action->param_name == "key")
+                    mixer_set_key(mixr, action->param_val);
+                else if (action->param_name == "prog")
+                    mixer_set_chord_progression(
+                        mixr, std::stoi(action->param_val, nullptr, 0));
+            }
             else if (action->type == AudioAction::NOTE_ON)
             {
                 auto args = action->args;

@@ -1073,3 +1073,12 @@ bool IsBalanced(std::string &input)
 
     return num_braces == 0;
 }
+void str_upper(std::string &data)
+{
+    std::for_each(data.begin(), data.end(), [](char &c) { c = ::toupper(c); });
+}
+
+void str_lower(std::string &data)
+{
+    std::for_each(data.begin(), data.end(), [](char &c) { c = ::tolower(c); });
+}

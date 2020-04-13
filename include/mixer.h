@@ -171,6 +171,8 @@ bool mixer_is_valid_process(mixer *mixr, int proc_num);
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
 bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num);
 
+void mixer_set_key(mixer *mixr, unsigned int key);
+void mixer_set_key(mixer *mixr, std::string str_key);
 void mixer_set_notes(mixer *mixr);
 void mixer_set_octave(mixer *mixr, int octave);
 void mixer_set_bars_per_chord(mixer *mixr, int bars);

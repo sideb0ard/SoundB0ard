@@ -20,6 +20,7 @@ enum AudioAction
     SAVE_PRESET,
     STATUS,
     UPDATE,
+    MIXER_UPDATE,
 };
 
 struct audio_action_queue_item

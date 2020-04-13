@@ -34,6 +34,8 @@ double scaleybum(double cur_min, double cur_max, double new_min, double new_max,
 
 void itoa(int n, char s[]);
 void reverse_string(char s[]);
+void str_upper(std::string &input);
+void str_lower(std::string &input);
 
 double unipolar_to_bipolar(double value);
 double bipolar_to_unipolar(double value);
