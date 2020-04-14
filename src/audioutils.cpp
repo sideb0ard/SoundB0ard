@@ -11,6 +11,7 @@
 // used by GetNthDegree
 namespace
 {
+
 int GetMidiNumForKey(char c)
 {
     char lc_c = tolower(c);
@@ -34,6 +35,7 @@ int GetMidiNumForKey(char c)
         return -1;
     }
 }
+
 int GetScaleIndex(int note, char key)
 {
     if (!IsMidiNoteInKey(note, key))
@@ -82,6 +84,70 @@ int GetStepsToNextDegree(int scale_index)
 }
 
 } // namespace
+
+int GetMidiNumFromNote(std::string note)
+{
+    if (note == "c")
+        return 0;
+    else if (note == "c#")
+        return 1;
+    else if (note == "d")
+        return 2;
+    else if (note == "d#")
+        return 3;
+    else if (note == "e")
+        return 4;
+    else if (note == "f")
+        return 5;
+    else if (note == "f#")
+        return 6;
+    else if (note == "g")
+        return 7;
+    else if (note == "g#")
+        return 8;
+    else if (note == "a")
+        return 9;
+    else if (note == "a#")
+        return 10;
+    else if (note == "b")
+        return 11;
+    else
+        return -1;
+}
+
+std::string GetNoteFromMidiNum(int midi_num)
+{
+    int base_midi_num = midi_num % 12;
+    switch (base_midi_num)
+    {
+    case (0):
+        return "c";
+    case (1):
+        return "c#";
+    case (2):
+        return "d";
+    case (3):
+        return "d#";
+    case (4):
+        return "e";
+    case (5):
+        return "f";
+    case (6):
+        return "f#";
+    case (7):
+        return "g";
+    case (8):
+        return "g#";
+    case (9):
+        return "a";
+    case (10):
+        return "a#";
+    case (11):
+        return "b";
+    default:
+        return "error";
+    }
+}
 
 double pa_setup(void)
 {

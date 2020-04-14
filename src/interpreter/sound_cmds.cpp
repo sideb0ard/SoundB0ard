@@ -1,5 +1,6 @@
 #include <iostream>
 
+#include <audioutils.h>
 #include <fx/dynamics_processor.h>
 #include <interpreter/sound_cmds.hpp>
 #include <mixer.h>
@@ -89,6 +90,27 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
             }
         }
     }
+}
+
+std::string GenerateMelody()
+{
+
+    std::stringstream ss;
+    // TODO - tests - i think this is brittle, especially getting this key_str
+    std::string key_str = GetNoteFromMidiNum(mixr->timing_info.key);
+    for (int i = 0; i < mixr->prog_len; i++)
+    {
+        int root_note = GetNthDegree(mixr->timing_info.key,
+                                     mixr->prog_degrees[i], key_str[0]);
+
+        int third = GetThird(root_note, key_str[0]);
+        int fifth = GetFifth(root_note, key_str[0]);
+
+        ss << GetNoteFromMidiNum(root_note) << ", " << GetNoteFromMidiNum(third)
+           << ", " << GetNoteFromMidiNum(fifth) << std::endl;
+    }
+
+    return ss.str();
 }
 
 } // namespace interpreter_sound_cmds

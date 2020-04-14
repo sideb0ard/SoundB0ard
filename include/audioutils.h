@@ -19,6 +19,8 @@ int get_chord_type(unsigned int scale_degree);
 void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
                                int octave, chord_midi_notes *chnotes);
 
+int GetMidNumFromNote(std::string note);
+std::string GetNoteFromMidiNum(int midi_num);
 int GetThird(int midi_note, char key);
 int GetFifth(int midi_note, char key);
 int GetNthDegree(int midi_note, int degree, char key);

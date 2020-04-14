@@ -240,6 +240,38 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       }
                       return evaluator::NULLL;
                   })},
+    {"gen", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> args)
+                    -> std::shared_ptr<object::Object> {
+                    int args_size = args.size();
+                    std::cout << "GEN! with num args:" << args_size
+                              << std::endl;
+                    if (args_size >= 1)
+                    {
+                        std::shared_ptr<object::String> str_obj =
+                            std::dynamic_pointer_cast<object::String>(args[0]);
+                        if (str_obj)
+                        {
+                            if (str_obj->value_ == "melody")
+                            {
+                                auto melody =
+                                    interpreter_sound_cmds::GenerateMelody();
+                                return std::make_shared<object::String>(melody);
+                            }
+                            else if (str_obj->value_ == "bass")
+                            {
+                                std::cout << "YO GEN A BASS YO\n";
+                            }
+                        }
+                        // auto cmd_name =
+                        // std::make_shared<object::String>("save");
+                        // args.push_back(cmd_name);
+                        // audio_action_queue_item action_req{
+                        //    .type = AudioAction::SAVE_PRESET, .args = args};
+                        // g_audio_action_queue.push(action_req);
+                    }
+                    return evaluator::NULLL;
+                })},
     {"loadPreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

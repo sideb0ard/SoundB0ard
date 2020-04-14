@@ -13,4 +13,6 @@ namespace interpreter_sound_cmds
 void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args);
 void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args);
 
+std::string GenerateMelody();
+
 } // namespace interpreter_sound_cmds

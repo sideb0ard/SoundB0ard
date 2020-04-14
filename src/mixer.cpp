@@ -713,30 +713,30 @@ void mixer_set_key(mixer *mixr, std::string str_key)
     str_lower(str_key);
 
     int key = -1;
-    if (str_key == "c")
-        key = 0;
-    else if (str_key == "c#" || str_key == "dm")
+    if (str_key == "c#" || str_key == "dm")
         key = 1;
+    else if (str_key == "d#" || str_key == "em")
+        key = 3;
+    else if (str_key == "f#" || str_key == "gm")
+        key = 6;
+    else if (str_key == "g#" || str_key == "am")
+        key = 8;
+    else if (str_key == "a#" || str_key == "bm")
+        key = 10;
+    else if (str_key == "c")
+        key = 0;
     else if (str_key == "d")
         key = 2;
-    else if (str_key == "d#" || str_key == "em")
-        key = 4;
     else if (str_key == "e")
-        key = 5;
+        key = 4;
     else if (str_key == "f")
-        key = 6;
-    else if (str_key == "f#" || str_key == "gm")
-        key = 7;
+        key = 5;
     else if (str_key == "g")
-        key = 8;
-    else if (str_key == "g#" || str_key == "am")
-        key = 9;
+        key = 7;
     else if (str_key == "a")
-        key = 10;
-    else if (str_key == "a#" || str_key == "bm")
-        key = 11;
+        key = 9;
     else if (str_key == "b")
-        key = 12;
+        key = 11;
 
     if (key != -1)
         mixer_set_key(mixr, key);
