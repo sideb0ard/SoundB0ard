@@ -1,19 +1,11 @@
-CC = clang++
-
-GTEST_DIR =  ${HOME}/Code/googletest/googletest
-
-SRC = $(shell find src -type f -name '*.cpp')
-OBJDIR = obj
-OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
-
-LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
-
 ## CHANGE THESE FOR YOUR OWN USE:
+
 ABLETONASIOINCDIR=${HOME}/Code/link/modules/asio-standalone/asio/include
 READLINEINCDIR=${HOME}/homebrew/opt/readline/include
 RANGE3INCDIR=${HOME}/Code/range-v3/include/
 HOMEBREWINCDIR=${HOME}/homebrew/include
 
+GTEST_DIR =  ${HOME}/Code/googletest/googletest
 INCDIRS=-I/usr/local/include \
 		-Iinclude \
 		-I${HOME}/Code/link/include \
@@ -29,6 +21,15 @@ READLINELIBDIR=${HOME}/homebrew/opt/readline/lib
 LIBDIRS=-L/usr/local/lib -L${HOMEBREWLIBDIR} -L${READLINELIBDIR}
 
 ## I THINK THATS THE END OF THINGS YOU NEED TO CHANGE
+
+CC = clang++
+
+
+SRC = $(shell find src -type f -name '*.cpp')
+OBJDIR = obj
+OBJ = $(patsubst %.cpp, $(OBJDIR)/%.o, $(SRC))
+
+LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -llo
 
 WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants
 CPPFLAGS = -isystem $(GTEST_DIR)/include
