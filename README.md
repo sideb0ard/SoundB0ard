@@ -23,9 +23,10 @@ http://www.mega-nerd.com/libsndfile/
 https://github.com/radarsat1/liblo
 http://ctags.sourceforge.net/
 
-You'll need to edit the Makefile, there's some hardcoded pathnames with my username, and also my homebrew dir is under ~
+I still need to do some more work to make it portable. For the moment I've only been developing on OSX. In the Makefile there are a few lib paths and include dirs that you'll need to amend, but I believe it should compile cleanly for others with those changes. (Pull requests welcome!)
 
-Once all these are installed..
+
+Once all these are installed and the Makefile updated ..
 
 `git clone git@github.com:sideb0ard/SBShell.git`,
 run `make`
@@ -33,4 +34,8 @@ and if all is successful, you should have a new `sbsh` command in your directory
 
 Load it up:
 `./sbsh`
+
+Demo here --
+
+[![Alt text](https://img.youtube.com/vi/wNFlijArs2g/0.jpg)](https://www.youtube.com/watch?v=wNFlijArs2g)
 

@@ -1,4 +1,9 @@
+
+let d1 = fm(); loadPreset(d1, "wuurpr")
+
 d1 = DxSynth(wuurpr) vol:1 pan:0 algo:4
+
+
 
 [Procz]
 p1 # "<c0>
@@ -15,10 +20,11 @@ hh = Sampler(hats/dr606closedhh.aif)
 
 p7 $ "hh*16" | swing 11 | every 8 mask "f0f0"
 
+let d2 = fm(); loadPreset(d2, "ZApzz")
 d2 -- ZApzz
 p7 # "<~ e2*4> <c1*8 ~ c0*4 a1(3,8)>" d2
 
-BD!
+BD!  kicks/dm02_909_kickdrum_006_drive.wav
 ESK1
 
 ESK2
@@ -26,6 +32,8 @@ p11 < every 3 "<1 2 1 3 16 1 127>"  "set esk2:len %"
 p13 < every 2 "<1 2 16 32 127>"  "set esk2:len %"
 
 ###############################################################
+
+bpm 140
 
 PIERRE HOUSE - len 2
 prr = dloops/pierrehouse.aiff vol:1 pan:0 pitch:1 idx:71 mode:LOOP(0) step:0 len:2
@@ -58,17 +66,10 @@ p12 # "[~ <b2*3 b1*2>]" d2 | every 7 rev | every 2 swing 11 | every 8 down 1 | e
 
 hh = Sampler(hats/acidHat3.aiff) vol:0.7 pan:0 pitch:1
 bd = Sampler(kicks/dm02_909_kickdrum_003_drive.wav) vol:0.7 pan:0 pitch:1
-cp = Sampler(claps/djkhaledClap.aiff) vol:1 pan:0 pitch:1
 
 [Procz]
 d1 = DxSynth(muffin) vol:1 pan:0 algo:1
 p1 # "[[~ ~ e0 ~] [~ e0 ~ ~]]*2" d1 | every 7 fast | every 12 mask "ff0f"
-
-p3 $ "[~ hh]*4"
-p4 $ "[bd ~ ~ bd] [~ ~ cp ~] [bd <[~ bd?] [bd? ~]> [~ ~ <cp cp cp?> ~]"
-
-
-d1 = DxSynth(muffin) vol:0.7 pan:0 algo:1
 
 [Procz]
 p1 # "a0*4 [a0*4 <c0*4 e0(3,8)>]" d1 | every 7 mask "f0f0"
@@ -77,17 +78,124 @@ p3 < osc 16 "10 62"  "set d2:op2out %"
 p4 $ "[bd ~ ~ bd] [~ ~ cp ~] [bd <[~ bd?] [bd? ~]> [~ ~ <cp cp cp?> ~]"
 p5 $ "[~ hh]*4"
 
-dloops/ZeigenBOCK.aiff
+
+mo - slurpyee
+p1 # "<e0*4 a1*4 a0*4 c0*3> <a0(3,8) a0*2 e0*3>" mo,d2
+p8 < osc 21 "130 13000"  "set mo:fc %"
+p9 < osc 3 "2 7"  "set mo:fq %"
 
 
+let rb = loop(loops/scuddubraggableep.aiff); set rb:len 4
 
-## approx 17mins
 
+BD
+p1 $ "<[bd [~ bd] ~ ~] [ bd [~ bd] [~ ~ ~ bd] [~ bd]  ] >"
+cp = Sampler(claps/djkhaledClap.aiff) vol:1 pan:0 pitch:1
+sn = sample(snrs/AbraSnare.aiff)
 
-BPM120:0
+hh1 = Sampler(hats/LOUhat.aiff) vol:0.7 pan:0 pitch:1
+hh2 = Sampler(hats/timbaHat1.aiff) vol:0.7 pan:0 pitch:1
+p2 $ "[~ hh1 hh2 ~]  [~ ~ hh2 ~] [hh1 hh1 hh2 ~] [~ hh2 hh2 ~]" | swing 3 | every 8 swing 11
 
+hh and sh
+let hh = sample(hats/cloeyhatz.aiff)
+let sh = sample(perc/chezShaker.aiff)
+ps
+vol sh 0.2; vol hh 0.3;
+p6 $"[sh [sh hh]] [sh [sh hh]] [~ [hh sh]] [hh*2 sh]" | swing 3  | every 8 mask "ffff"
 d1 (fboom)
 p1 # "[~ g0] [~ d0 ~ ~] [b0 ~ ~ b0] [~ <g0 b0>]" d1 | down 2
+p7 # "<[<44 ~ ~ 32> [ ~ <40 44 44*2 40 32 ~>] ~ ~] [ <40? 44 44 ~> [~ <32 44>] ~ ~  ]>" d1 | every 8 fast | down 2 | every 4 mask "ff00"
+
+let fg = sample(notes/FoolishBackGRan.aiff)
+p5 $ "<[~ [~ fg]] ~ ~ ~ ~ ~ ~ ~>"
+
+toms -
+let lt = sample(toms/DR660LoTom.aif)
+let mt = sample(toms/DR660MidTom.aif)
+let ht = sample(toms/DR660808HighTom.aif)
+
+p11 $ "[~ <ht lt mt>] [mt <lt ht>] [~ ht ht*2 ht*3] [~ ht mt]"
+dloops/ZeigenBOCK.aiff
+dloops/autechreBeat.aiff
+
+stop d1
+let aed = sample(aesamples/SH09_ACID.WAV)
+let aes = sample(aesamples/shstr_03.WAV)
+p14 $ "~ ~ ~ [~ <aes aed ~ ~ ~ ~>]"
+
+
+loops/stereoLabVOICE.aiff // len 16
+--
+loops/ONETIMECHILL.aiff // len 8
+
+
+loops/UMFRANGloop.aiff // len 2
+loops/PALSTUTTERPiano.aiff // len 2
+
+
+vol bd 0; let elb = grain(strings/elbtimeout.aiff)
+
+##############################
+
+[Env]
+d1 = DxSynth(RAVER) vol:0 pan:0 algo:1
+d2 = DxSynth(ZApzz) vol:0 pan:0 algo:4
+     fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
+     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
+mk = Sampler(kicks/mkKick.aiff) vol:0 pan:0 pitch:1
+hh2 = Sampler(hats/timbaHat1.aiff) vol:0.7 pan:0 pitch:1
+mo = Moog(reece) vol:0 pan:0 voice:SQR3(1)
+prr = dloops/pierrehouse.aiff vol:0.7 pan:0 pitch:1 idx:79 mode:LOOP(0) step:0 len:1
+esk1 = dloops/EKSIbeat.aiff vol:0 pan:0 pitch:1 idx:79 mode:LOOP(0) step:0 len:1
+bd = Sampler(kicks/dm02_909_kickdrum_006_drive.wav) vol:1 pan:0 pitch:1
+hh = Sampler(hats/cloeyhatz.aiff) vol:0.3 pan:0 pitch:1
+cp = Sampler(claps/djkhaledClap.aiff) vol:0.6 pan:0 pitch:1
+sn = Sampler(snrs/AbraSnare.aiff) vol:0.7 pan:0 pitch:1
+hh1 = Sampler(hats/LOUhat.aiff) vol:0.7 pan:0 pitch:1
+sb2 = dloops/scudBeat2.aiff vol:0 pan:0 pitch:1 idx:89 mode:LOOP(0) step:0 len:2
+      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
+     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
+zb = dloops/ZeigenBOCK.aiff vol:0.7 pan:0 pitch:1 idx:79 mode:LOOP(0) step:0 len:1
+     fx0 inputgain:0.00 threshold:-36.00 attackms:1.00 releasems:55.00 ratio:2.50
+outputgain:0.00 kneewidth:0.00 lookahead:0.00 sterolink:ON(1869374508)
+type:COMP(0) mode:ANALOG(0) extsource:on(5)
+aes = Sampler(aesamples/SH09_ACID.WAV) vol:0.7 pan:0 pitch:1
+mt = Sampler(toms/DR660MidTom.aif) vol:0 pan:0 pitch:1
+aed = Sampler(aesamples/shstr_03.WAV) vol:0.7 pan:0 pitch:1
+lt = Sampler(toms/DR660LoTom.aif) vol:0 pan:0 pitch:1
+ht = Sampler(toms/DR660808CongaHigh.aif) vol:0 pan:0 pitch:1
+rb = loops/scuddubraggableep.aiff vol:0 pan:0 pitch:1 idx:39 mode:LOOP(0) step:0 len:2
+fg = Sampler(notes/FoolishBackGRan.aiff) vol:0.4 pan:0 pitch:1
+ab = dloops/autechreBeat.aiff vol:0.7 pan:0 pitch:1 idx:79 mode:LOOP(0) step:0 len:1
+esk2 = dloops/ESKIClip.aiff vol:0 pan:0 pitch:1 idx:39 mode:LOOP(0) step:0 len:2
+       fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
+     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
+sh = Sampler(perc/chezShaker.aiff) vol:0.2 pan:0 pitch:1
+sv = loops/stereoLabVOICE.aiff vol:0.7 pan:0 pitch:1 idx:42 mode:LOOP(0) step:0 len:16
+
+[Procz]
+p1 # "<e0*4 a1*4 a0*4 c0*3> <a0(3,8) a0*2 e0*3>" mo,d2
+p2 $ "[~ hh1 hh2 ~]  [~ ~ hh2 ~] [hh1 hh1 hh2 ~] [~ hh2 hh2 ~]" | swing 3 | every 8 swing 11
+p3 $ "<[bd [~ bd] ~ ~ ] [[bd ~ ~ bd] [ ~ bd?] [~ ~ bd ~][ ~ bd?]]> "
+p4 $ "[sh [sh hh]] [sh [sh hh]] [~ [hh sh]] [hh*2 sh]" | swing 3 | every 8 mask "ffff"
+p5 $ "<[~ [~ fg]] ~ ~ ~ ~ ~ ~ ~>"
+p6 # "<[<44 ~ ~ 32> [ ~ <40 44 44*2 40 32 ~>] ~ ~] [ <40? 44 44 ~> [~ <32 44>] ~ ~  ]>" d1 | every 8 fast | every 2 down 1 | every 4 mask "ff0f"
+p7 $ ""
+p8 < osc 21 "130 13000"  "set mo:fc %"
+p9 < osc 3 "2 7"  "set mo:fq %"
+p10 < every 3 "1"  "set esk1:stutter %; "
+p11 $ "[~ <ht lt mt>] [mt <lt ht>] [~ ht ht*2 ht*3] [~ ht mt]"
+p12 # "[~ <b2*3 b1*2>]" d2 | every 7 rev | every 2 swing 11 | every 8 down 1 | every 6 mask "f0f0"
+p13 < every 2 "<2 16 2 8 1>"  "set sb2:len %"
+p14 $ "~ ~ ~ [~ <aed aes ~ ~ ~ ~>]"
+p15 < every 3 "<0 2>"  "set rb:mode %"
+
+
+
+
+
+
 
 
 d1 = DxSynth(rasppp) vol:0.6 pan:0 algo:3
@@ -97,6 +205,8 @@ hh = Sampler(hats/dr606closedhh.aif) vol:0 pan:0 pitch:1
      fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
      lfo1_rate:0.38 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
 cp = Sampler(claps/djkhaledClap.aiff) vol:0.7 pan:0 pitch:1
+
+p1 # "[e0 ~ ~ e0] [~ e0] [~ e0] e0" mo, d1
 
 [Procz]
 p1 # "a0*4 [a0*4 <c0*4 e0(3,8)>]" d1 | every 7 mask "f0f0"
@@ -112,3 +222,21 @@ bd = Sampler(kicks/dm02_909_kickdrum_006_drive.wav) vol:0.7 pan:0 pitch:1
 tb = loops/technoRaveBass.aiff vol:0 pan:0 pitch:1 idx:80 mode:LOOP(0) step:0 len:2
 bc = loops/bassDubC1bar.aiff vol:0.7 pan:0 pitch:1 idx:61 mode:LOOP(0) step:0 len:1
 ss = loops/soulsoulstrings2bar.aiff vol:0 pan:0 pitch:1 idx:80 mode:LOOP(0) step:0 len:2
+
+
+CRAZY SOUND
+p1 # "<e0*4 a1*4 a0*4 c0*3> <a0(3,8) a0*2 e0*3>" mo,d2
+mo - slurpyee
+
+d1 = DxSynth(nast0r) vol:0.5 pan:0 algo:5
+d2 = DxSynth(lowx0r) vol:0.4 pan:0 algo:1
+
+addFx(d1, "filter")
+p2 # "[e1 ~ ~ e1] [~ e1] [~ e1] e1" d1
+p3 # "~ <c0 a0>" d2
+
+
+mo - slurpyee
+p1 # "<e0*4 a1*4 a0*4 c0*3> <a0(3,8) a0*2 e0*3>" mo,d2
+p8 < osc 21 "130 13000"  "set mo:fc %"
+p9 < osc 3 "2 7"  "set mo:fq %"

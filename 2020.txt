@@ -23,7 +23,7 @@ ps
 vol sh 0.2; vol hh 0.3;
 p6 $"[sh [sh hh]] [sh [sh hh]] [~ [hh sh]] [hh*2 sh]" | swing 3  | every 8 mask "ffff"
 
-p7 # "<[<44 ~ ~ 32> [ ~ <40 44 44*2 40 32 ~>] ~ ~] [ <40? 44 44 ~> [~ <32 44>] ~ ~  ]>" d1 | every 8 fast | every 7 down 1 | every 4 mask "ff00"
+p7 # "<[<44 ~ ~ 32> [ ~ <40 44 44*2 40 32 ~>] ~ ~] [ <40? 44 44 ~> [~ <32 44>] ~ ~  ]>" d1 | every 8 fast | down 2 | every 4 mask "ff00"
 
 d1 fm for a while
 
