@@ -207,8 +207,16 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 switch (timer_type_)
                 {
                 case ProcessTimerType::OSCILLATE:
-                    if (current_val_ < start_ || current_val_ > end_)
+                    if (current_val_ < start_)
+                    {
+                        current_val_ = start_;
                         incr_ *= -1;
+                    }
+                    else if (current_val_ > end_)
+                    {
+                        current_val_ = end_;
+                        incr_ *= -1;
+                    }
                     break;
                 case ProcessTimerType::OVER:
                     if ((incr_ < 0 && current_val_ < end_) ||

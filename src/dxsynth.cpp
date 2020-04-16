@@ -1464,7 +1464,8 @@ void dxsynth_set_eg_attack_ms(dxsynth *d, unsigned int eg, double val)
 {
     if (val < EG_MINTIME_MS || val > EG_MAXTIME_MS)
     {
-        printf("val has to be [%d - %d]\n", EG_MINTIME_MS, EG_MAXTIME_MS);
+        printf("val has to be [%d - %d] - you've given me %f\n", EG_MINTIME_MS,
+               EG_MAXTIME_MS, val);
         return;
     }
     switch (eg)
