@@ -37,21 +37,17 @@ bpm 140
 
 PIERRE HOUSE - len 2
 prr = dloops/pierrehouse.aiff vol:1 pan:0 pitch:1 idx:71 mode:LOOP(0) step:0 len:2
-sb2 = dloops/scudBeat2.aiff vol:0.7 pan:0 pitch:1 idx:71 mode:LOOP(0) step:0 len:2
-p12 < every 2 "<2 16 2 8>"  "set sb2:len %"
+
+nae DRUMS!
 
 ^ FILTER?
 
 p1 # "<c0*4 e0*4 a0*4>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,prr | every 3 down 1 | every 7 up 1
 p1 # "<c0*4 c0(3,8) c0>" d1,prr,bd
 
-
 ###############################################################
 
-mo = Moog(flipzz) vol:1 pan:0 voice:SQR3(1)
-p7 # "~ ~ [~ <e2 a1 c2*2 c2>] <~ ~ a1 a1(3,8)>" mo
-p8 < osc 21 "130 13000"  "set mo:fc %"
-p9 < osc 3 "2 7"  "set mo:fq %"
+// clear other algoszz
 
 p1 # "<c0*4 e0*4 a0*4 e0? c0>  <a0(3,8) e0(3,8) a0(3,8) c0(3,8)>" d1,bd | every 3 down 1 | every 7 up 1
 p2 < every 3 "<1 2 3 4>"  "set d1:algo %"
@@ -64,25 +60,14 @@ p12 # "[~ <b2*3 b1*2>]" d2 | every 7 rev | every 2 swing 11 | every 8 down 1 | e
 
 ###############################################################
 
-hh = Sampler(hats/acidHat3.aiff) vol:0.7 pan:0 pitch:1
-bd = Sampler(kicks/dm02_909_kickdrum_003_drive.wav) vol:0.7 pan:0 pitch:1
-
-[Procz]
-d1 = DxSynth(muffin) vol:1 pan:0 algo:1
-p1 # "[[~ ~ e0 ~] [~ e0 ~ ~]]*2" d1 | every 7 fast | every 12 mask "ff0f"
 
 [Procz]
 p1 # "a0*4 [a0*4 <c0*4 e0(3,8)>]" d1 | every 7 mask "f0f0"
-p2 # "<~ e0*4> a1(3,8)" d2
-p3 < osc 16 "10 62"  "set d2:op2out %"
-p4 $ "[bd ~ ~ bd] [~ ~ cp ~] [bd <[~ bd?] [bd? ~]> [~ ~ <cp cp cp?> ~]"
-p5 $ "[~ hh]*4"
 
 
-mo - slurpyee
-p1 # "<e0*4 a1*4 a0*4 c0*3> <a0(3,8) a0*2 e0*3>" mo,d2
-p8 < osc 21 "130 13000"  "set mo:fc %"
-p9 < osc 3 "2 7"  "set mo:fq %"
+p1 # "< [<b0(3,8) b0> <[d0(3,8) gm0] gm0*7 ~>]   [a0*4 [a0*4 <c0*4 e0(3,8)>]]>" d1 | every 7 mask "f0f0"
+
+
 
 
 let rb = loop(loops/scuddubraggableep.aiff); set rb:len 4
@@ -106,6 +91,7 @@ p6 $"[sh [sh hh]] [sh [sh hh]] [~ [hh sh]] [hh*2 sh]" | swing 3  | every 8 mask 
 d1 (fboom)
 p1 # "[~ g0] [~ d0 ~ ~] [b0 ~ ~ b0] [~ <g0 b0>]" d1 | down 2
 p7 # "<[<44 ~ ~ 32> [ ~ <40 44 44*2 40 32 ~>] ~ ~] [ <40? 44 44 ~> [~ <32 44>] ~ ~  ]>" d1 | every 8 fast | down 2 | every 4 mask "ff00"
+d1(RAVER)
 
 let fg = sample(notes/FoolishBackGRan.aiff)
 p5 $ "<[~ [~ fg]] ~ ~ ~ ~ ~ ~ ~>"
@@ -116,7 +102,6 @@ let mt = sample(toms/DR660MidTom.aif)
 let ht = sample(toms/DR660808HighTom.aif)
 
 p11 $ "[~ <ht lt mt>] [mt <lt ht>] [~ ht ht*2 ht*3] [~ ht mt]"
-dloops/ZeigenBOCK.aiff
 dloops/autechreBeat.aiff
 
 stop d1
@@ -124,6 +109,7 @@ let aed = sample(aesamples/SH09_ACID.WAV)
 let aes = sample(aesamples/shstr_03.WAV)
 p14 $ "~ ~ ~ [~ <aes aed ~ ~ ~ ~>]"
 
+dloops/ZeigenBOCK.aiff
 
 loops/stereoLabVOICE.aiff // len 16
 --
