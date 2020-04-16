@@ -46,6 +46,12 @@ class Process
         ProcessPatternTarget::NO_PROCESS_PATTERN_TARGET};
     std::vector<std::string> targets_;
 
+    // Timer vars
+    float start_{0};
+    float end_{0};
+    float incr_{0};
+    float current_val_{0};
+
     std::string pattern_;
 
     bool active_;

@@ -47,9 +47,7 @@ void Process::ParsePattern()
     auto tokenizer = std::make_shared<pattern_parser::Tokenizer>(pattern_);
     auto pattern_parzer = std::make_shared<pattern_parser::Parser>(tokenizer);
     auto new_pattern_root = pattern_parzer->ParsePattern();
-    // try lock
     pattern_root_ = new_pattern_root;
-    // unlock
 }
 
 void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
@@ -69,6 +67,24 @@ void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
 
     ParsePattern();
 
+    if (timer_type_ == ProcessTimerType::RAMP ||
+        timer_type_ == ProcessTimerType::OVER ||
+        timer_type_ == ProcessTimerType::OSCILLATE)
+    {
+        sscanf(pattern_.c_str(), "%f %f", &start_, &end_);
+        current_val_ = start_;
+        float diff = std::abs(start_ - end_);
+        incr_ = diff / (loop_len_ * PPBAR);
+        if (incr_ == 0)
+        {
+            std::cout << "Nah mate, nae zeros allowed!\n";
+            return;
+        }
+
+        if (start_ > end_)
+            incr_ *= -1;
+    }
+
     for (auto &oldfz : pattern_functions_)
         oldfz->active_ = false;
     for (auto fz : funcz)
@@ -83,6 +99,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
     if (!active_)
         return;
 
+    // PATTERN_PROCESS i.e. '#' or '$'
     if (process_type_ == PATTERN_PROCESS)
     {
         if (tinfo.is_start_of_loop)
@@ -147,6 +164,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
             }
         }
     }
+    // COMMAND_PROCESS i.e. '<'
     else if (process_type_ == COMMAND_PROCESS)
     {
         if (tinfo.is_midi_tick)
@@ -182,81 +200,35 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     }
                 }
             }
-            else if (timer_type_ == ProcessTimerType::OSCILLATE)
+            else
             {
-                float low_target_range{0};
-                float hi_target_range{0};
-                sscanf(pattern_.c_str(), "%f %f", &low_target_range,
-                       &hi_target_range);
-                if (low_target_range < hi_target_range)
+                current_val_ += incr_;
+
+                switch (timer_type_)
                 {
-                    float lower_source_range = 0;
-                    float higher_source_range = loop_len_ * PPBAR;
-                    float half_source_range = higher_source_range / 2;
-                    int cur_tick = tinfo.midi_tick % (int)higher_source_range;
-                    float scaled_val{0};
-                    if (cur_tick < (higher_source_range / 2))
+                case ProcessTimerType::OSCILLATE:
+                    if (current_val_ < start_ || current_val_ > end_)
+                        incr_ *= -1;
+                    break;
+                case ProcessTimerType::OVER:
+                    if ((incr_ < 0 && current_val_ < end_) ||
+                        (incr_ > 0 && current_val_ > end_))
+                        current_val_ = start_;
+                    break;
+                case ProcessTimerType::RAMP:
+                default:
+                    if ((incr_ < 0 && current_val_ < end_) ||
+                        (incr_ > 0 && current_val_ > end_))
                     {
-                        scaled_val = scaleybum(
-                            lower_source_range, half_source_range,
-                            low_target_range, hi_target_range, cur_tick);
-                    }
-                    else
-                    {
-                        int local_tick =
-                            half_source_range - (cur_tick - half_source_range);
-
-                        scaled_val = scaleybum(
-                            lower_source_range, half_source_range,
-                            low_target_range, hi_target_range, local_tick);
-                    }
-                    std::string new_cmd = ReplaceString(
-                        command_, "%", std::to_string(scaled_val));
-
-                    g_command_queue.push(new_cmd);
-                }
-            }
-            else if (timer_type_ == ProcessTimerType::OVER)
-            {
-                float low_target_range{0};
-                float hi_target_range{0};
-                sscanf(pattern_.c_str(), "%f %f", &low_target_range,
-                       &hi_target_range);
-                if (low_target_range < hi_target_range)
-                {
-                    float lower_source_range = 0;
-                    float higher_source_range = loop_len_ * PPBAR;
-                    int cur_tick = tinfo.midi_tick % (int)higher_source_range;
-                    float scaled_val =
-                        scaleybum(lower_source_range, higher_source_range,
-                                  low_target_range, hi_target_range, cur_tick);
-                    std::string new_cmd = ReplaceString(
-                        command_, "%", std::to_string(scaled_val));
-
-                    g_command_queue.push(new_cmd);
-                }
-            }
-            else if (timer_type_ == ProcessTimerType::RAMP)
-            {
-                float low_target_range{0};
-                float hi_target_range{0};
-                sscanf(pattern_.c_str(), "%f %f", &low_target_range,
-                       &hi_target_range);
-                if (low_target_range != hi_target_range)
-                {
-                    float lower_source_range = 0;
-                    float higher_source_range = loop_len_ * PPBAR;
-                    int cur_tick = tinfo.midi_tick % (int)higher_source_range;
-                    float scaled_val =
-                        scaleybum(lower_source_range, higher_source_range,
-                                  low_target_range, hi_target_range, cur_tick);
-                    if (cur_tick == higher_source_range - 1)
+                        current_val_ = end_;
                         active_ = false;
-                    std::string new_cmd = ReplaceString(
-                        command_, "%", std::to_string(scaled_val));
-
-                    g_command_queue.push(new_cmd);
+                    }
                 }
+
+                std::string new_cmd =
+                    ReplaceString(command_, "%", std::to_string(current_val_));
+
+                g_command_queue.push(new_cmd);
             }
         }
     }
