@@ -193,7 +193,7 @@ int get_midi_note_from_string(char *string)
         return -1;
     }
     char note[3] = {0};
-    int octave = 4; // default if none provided
+    int octave = 0; // default if none provided
     sscanf(string, "%[a-z#]%d", note, &octave);
     note[2] = 0; // safety
 

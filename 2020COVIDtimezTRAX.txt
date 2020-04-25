@@ -3,22 +3,31 @@ let d1 = fm(); loadPreset(d1, "wuurpr")
 
 d1 = DxSynth(wuurpr) vol:1 pan:0 algo:4
 
-
-
-[Procz]
-p1 # "<c0>
-p1 # "<c0*12>
-bpm 160
 p2 < osc 12 "80 95"  "set d1:op2out %"
 p3 < osc 18 "60 94"  "set d1:op4out %"
 p4 < osc 13 "1 300"  "set d1:e2att %"
 p5 < every 8 "<3 4>"  "set d1:algo %"
 p1 # "<c0*12 c0*12 c0*12 a0*4>" d1 | every 5 down 2
 
-mk = Sampler(kicks/mkKick.aiff)
-hh  // hats/hh8.aif
 
-p7 $ "hh*16" | swing 11 | every 8 mask "f0f0"
+let lc = sample(perc/nord808_loc.aif)
+let nh = sample(perc/nord808_oh.aif)
+p8 $ "~ [~ <lc nh nh*2>] ~ < ~ ~ nh lc>"
+
+let cp = sample(claps/distCllap.aiff)
+addFx(cp, "distort")
+
+let tr = sample(perc/triangle.aiff)
+let cw = sample(perc/hes23cow.aif)
+let bw = sample(perc/bahWic.aiff)
+let cl = sample(perc/808clave.aif)
+vol cl 0.2
+
+p10 $ "< [ [~ <tr cw bw cl cl(3,8)>] <~ [~ ~ cl]>       ] [  < [~ cl] [~ cl] cl(3,8)> tr   ] [ ~ [cw, bw] cl(3,8)   ] >"
+
+let td = sample(kicks/technotronBD.aiff)
+p5 $ "[td ~ ~ td?] [~ td?] [~ td?] [~ ~ ~ td?]"
+
 
 let d2 = fm(); loadPreset(d2, "ZApzz")
 d2 -- ZApzz
