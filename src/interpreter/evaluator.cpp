@@ -1047,6 +1047,10 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
         else
             return std::make_shared<PatternRotate>(RIGHT, num_sixteenth_steps);
     }
+    else if (func->token_.literal_ == "scramble")
+    {
+        return std::make_shared<PatternScramble>();
+    }
     else if (func->token_.literal_ == "slow")
     {
         return std::make_shared<PatternSlow>();

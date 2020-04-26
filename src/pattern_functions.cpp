@@ -1,6 +1,8 @@
 #include <algorithm>
 #include <array>
+#include <chrono> // std::chrono::system_clock
 #include <iostream>
+#include <random> // std::default_random_engine
 #include <sstream>
 
 #include <audioutils.h>
@@ -502,5 +504,37 @@ std::string PatternPowerChord::String() const
 
     std::stringstream ss;
     ss << "power";
+    return ss.str();
+}
+
+void PatternScramble::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+    std::array<int, 16> shuffled_order{0, 1, 2,  3,  4,  5,  6,  7,
+                                       8, 9, 10, 11, 12, 13, 14, 15};
+
+    // obtain a time-based seed:
+    unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+
+    shuffle(shuffled_order.begin(), shuffled_order.end(),
+            std::default_random_engine(seed));
+
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
+    for (int i = 0; i < 16; i++)
+    {
+        int original_start_idx = PPSIXTEENTH * i;
+        int shuffled_start_idx = PPSIXTEENTH * shuffled_order[i];
+        for (int j = 0; j < PPSIXTEENTH; j++)
+            new_events[shuffled_start_idx + j] = events[original_start_idx + j];
+    }
+    events = new_events;
+}
+
+std::string PatternScramble::String() const
+{
+
+    std::stringstream ss;
+    ss << "scramble";
     return ss.str();
 }

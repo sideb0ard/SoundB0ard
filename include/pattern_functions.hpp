@@ -189,3 +189,15 @@ class PatternPowerChord : public PatternFunction
 
   public:
 };
+
+class PatternScramble : public PatternFunction
+{
+  public:
+    PatternScramble(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+};
