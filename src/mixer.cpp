@@ -176,7 +176,7 @@ std::string mixer_status_env(mixer *mixr)
     {
         if (mixer_is_valid_soundgen_num(mixr, sg_idx))
         {
-            auto sg = mixr->SoundGenerators[sg_idx];
+            auto sg = mixr->sound_generators_[sg_idx];
             if (!sg->active)
                 continue;
             ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
@@ -214,25 +214,25 @@ std::string mixer_status_sgz(mixer *mixr, bool all)
            << "sound generators" << COOL_COLOR_GREEN << "]\n";
         for (int i = 0; i < mixr->soundgen_num; i++)
         {
-            if (mixr->SoundGenerators[i] != NULL)
+            if (mixr->sound_generators_[i] != NULL)
             {
-                if ((mixr->SoundGenerators[i]->active &&
-                     mixr->SoundGenerators[i]->GetVolume() > 0.0) ||
+                if ((mixr->sound_generators_[i]->active &&
+                     mixr->sound_generators_[i]->GetVolume() > 0.0) ||
                     all)
                 {
 
                     ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s"
                        << i << COOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
-                    ss << mixr->SoundGenerators[i]->Info() << ANSI_COLOR_RESET
+                    ss << mixr->sound_generators_[i]->Info() << ANSI_COLOR_RESET
                        << "\n";
 
-                    if (mixr->SoundGenerators[i]->effects_num > 0)
+                    if (mixr->sound_generators_[i]->effects_num > 0)
                     {
                         ss << "      ";
                         for (int j = 0;
-                             j < mixr->SoundGenerators[i]->effects_num; j++)
+                             j < mixr->sound_generators_[i]->effects_num; j++)
                         {
-                            Fx *f = mixr->SoundGenerators[i]->effects[j];
+                            Fx *f = mixr->sound_generators_[i]->effects[j];
                             if (f->enabled_)
                                 ss << COOL_COLOR_YELLOW;
                             else
@@ -292,7 +292,7 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
-        std::shared_ptr<SoundGenerator> sg = mixr->SoundGenerators[i];
+        std::shared_ptr<SoundGenerator> sg = mixr->sound_generators_[i];
         if (sg != NULL)
         {
             sg->eventNotify(event, mixr->timing_info);
@@ -349,7 +349,7 @@ void vol_change(mixer *mixr, int sg, float vol)
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->SoundGenerators[sg]->SetVolume(vol);
+    mixr->sound_generators_[sg]->SetVolume(vol);
 }
 
 void pan_change(mixer *mixr, int sg, float val)
@@ -359,7 +359,7 @@ void pan_change(mixer *mixr, int sg, float val)
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->SoundGenerators[sg]->SetPan(val);
+    mixr->sound_generators_[sg]->SetPan(val);
 }
 
 int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
@@ -368,10 +368,6 @@ int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
         return -1;
 
     sg->mixer_idx = mixr->soundgen_num;
-    // new message - idx is mixer_idx + shared_ptr is sg - add to mixer action
-    // queue return incr atomic soundgen_num
-    // mixr->SoundGenerators[mixr->soundgen_num] = sg;
-    // mixer_ps(mixr, true);
     audio_action_queue_item action_req{.type = AudioAction::ADD,
                                        .mixer_soundgen_idx = mixr->soundgen_num,
                                        .sg = sg};
@@ -505,7 +501,6 @@ bool should_progress_chords(mixer *mixr, int tick)
     return false;
 }
 
-// static bool first_run = true;
 int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
 {
 
@@ -538,10 +533,10 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
         {
             for (int i = 0; i < mixr->soundgen_num; i++)
             {
-                if (mixr->SoundGenerators[i] != NULL)
+                if (mixr->sound_generators_[i] != NULL)
                 {
                     mixr->soundgen_cur_val[i] =
-                        mixr->SoundGenerators[i]->genNext();
+                        mixr->sound_generators_[i]->genNext();
                     output_left += mixr->soundgen_cur_val[i].left;
                     output_right += mixr->soundgen_cur_val[i].right;
                 }
@@ -561,12 +556,12 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
     {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
         std::shared_ptr<SoundGenerator> sg =
-            mixr->SoundGenerators[soundgen_num];
+            mixr->sound_generators_[soundgen_num];
 
         if (mixr->active_midi_soundgen_num == soundgen_num)
             mixr->active_midi_soundgen_num = -99;
 
-        mixr->SoundGenerators[soundgen_num] = nullptr;
+        mixr->sound_generators_[soundgen_num] = nullptr;
     }
     return true;
 }
@@ -574,7 +569,7 @@ bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
 bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
 {
     if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num &&
-        mixr->SoundGenerators[soundgen_num] != NULL)
+        mixr->sound_generators_[soundgen_num] != NULL)
         return true;
     return false;
 }
@@ -584,7 +579,7 @@ bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
     if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
     {
         std::shared_ptr<SoundGenerator> sg =
-            mixr->SoundGenerators[soundgen_num];
+            mixr->sound_generators_[soundgen_num];
         if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
             return true;
     }
@@ -855,7 +850,8 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
             else if (action->type == AudioAction::HELP)
                 mixer_help(mixr);
             else if (action->type == AudioAction::ADD)
-                mixr->SoundGenerators[action->mixer_soundgen_idx] = action->sg;
+                mixr->sound_generators_[action->mixer_soundgen_idx] =
+                    action->sg;
             else if (action->type == AudioAction::ADD_FX)
                 interpreter_sound_cmds::ParseFXCmd(action->args);
             else if (action->type == AudioAction::BPM)
@@ -906,7 +902,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                                         soundgen->soundgen_id_))
                         {
                             auto sg =
-                                mixr->SoundGenerators[soundgen->soundgen_id_];
+                                mixr->sound_generators_[soundgen->soundgen_id_];
                             // sg->parseMidiEvent(event_on, mixr->timing_info);
 
                             int note_duration_ms = sg->note_duration_ms_;
@@ -958,7 +954,8 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                     else
                         param_val = std::stod(action->param_val);
 
-                    auto sg = mixr->SoundGenerators[action->mixer_soundgen_idx];
+                    auto sg =
+                        mixr->sound_generators_[action->mixer_soundgen_idx];
                     if (action->param_name == "volume")
                         sg->SetVolume(param_val);
                     else if (action->param_name == "pan")
@@ -991,7 +988,8 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 if (mixer_is_valid_soundgen_num(mixr,
                                                 action->mixer_soundgen_idx))
                 {
-                    auto sg = mixr->SoundGenerators[action->mixer_soundgen_idx];
+                    auto sg =
+                        mixr->sound_generators_[action->mixer_soundgen_idx];
                     g_reply_queue.push(sg->Info());
                 }
             }
@@ -1002,7 +1000,8 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
             }
             else if (action->type == AudioAction::RAND)
             {
-                mixr->SoundGenerators[action->mixer_soundgen_idx]->randomize();
+                mixr->sound_generators_[action->mixer_soundgen_idx]
+                    ->randomize();
             }
             else if (action->type == AudioAction::PREVIEW)
             {
@@ -1048,7 +1047,7 @@ void mixer_check_for_midi_messages(mixer *mixr)
             {
 
                 std::shared_ptr<SoundGenerator> sg =
-                    mixr->SoundGenerators[mixr->active_midi_soundgen_num];
+                    mixr->sound_generators_[mixr->active_midi_soundgen_num];
 
                 midi_event ev = new_midi_event(status, data1, data2);
 

@@ -76,10 +76,11 @@ struct mixer
     preview_buffer preview;
 
     // std::vector<std::shared_ptr<Process>> processes;
-    std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_;
+    std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_ = {};
     bool proc_initialized_{false};
 
-    std::shared_ptr<SoundGenerator> SoundGenerators[MAX_NUM_SOUND_GENERATORS];
+    std::shared_ptr<SoundGenerator>
+        sound_generators_[MAX_NUM_SOUND_GENERATORS] = {};
     std::atomic_int soundgen_num; // actual number of SGs
 
     AbletonLink *m_ableton_link;

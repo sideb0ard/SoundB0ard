@@ -32,7 +32,7 @@ void keys(int soundgen_num)
     new_info.c_cc[VTIME] = 0;
     tcsetattr(0, TCSANOW, &new_info);
 
-    auto sg = mixr->SoundGenerators[soundgen_num];
+    auto sg = mixr->sound_generators_[soundgen_num];
 
     int ch = 0;
     int quit = 0;

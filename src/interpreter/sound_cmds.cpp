@@ -17,7 +17,7 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
     {
         if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
         {
-            auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
+            auto sg = mixr->sound_generators_[soundgen->soundgen_id_];
 
             std::shared_ptr<object::String> str_obj =
                 std::dynamic_pointer_cast<object::String>(args[1]);
@@ -76,7 +76,7 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
     {
         if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
         {
-            auto sg = mixr->SoundGenerators[soundgen->soundgen_id_];
+            auto sg = mixr->sound_generators_[soundgen->soundgen_id_];
             std::shared_ptr<object::String> str_obj =
                 std::dynamic_pointer_cast<object::String>(args[1]);
             if (str_obj)

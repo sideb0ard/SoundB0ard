@@ -1,6 +1,5 @@
 
-[Env]
-let d1 = DxSynth(timeLLy)
+let d1 = fm(); loadPreset(d1, "timeLLy")
 let bd = sample(kicks/LOUkick.aiff)
 let cp = sample(claps/mawClapDelayed.aiff)
 let cr = sample(noises/crnchHar.aiff)
@@ -8,9 +7,10 @@ let cp2 = sample(claps/mawOW.aiff)
 let snd = sample(noises/SNDwhooshHit.aiff)
 let acd = sample(noises/acidMan.aiff)
 
-[Procz]
+
 p1 # "<e*3 g*4> <e g*3 g*2>" d1 | every 7 mask "ff00"
 p2 < every 3 "<3 4 5 4>"  "set d1:algo %"
 p3 $ "bd ~ [~ <bd bd*2>] [~ bd?]"
 p4 $ "[~ <cp cp cp? cp*2 cp2>]*2"
 p5 $ "[~ <cr snd acd?>] ~ ~ [~ ~ ~ <snd cr? cr>]"
+
