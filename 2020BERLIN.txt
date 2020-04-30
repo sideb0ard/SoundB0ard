@@ -14,3 +14,7 @@ p3 $ "bd ~ [~ <bd bd*2>] [~ bd?]"
 p4 $ "[~ <cp cp cp? cp*2 cp2>]*2"
 p5 $ "[~ <cr snd acd?>] ~ ~ [~ ~ ~ <snd cr? cr>]"
 
+
+p1 # "<d*3 a*4> <f f2*3 d2*2>" d1
+p1 # "f*3 a*4 c [~ c*2]" d1
+p1 # "<a1*2 f1*3> <a*4 [~ a]> <c? a?> [~ c*2]" d1

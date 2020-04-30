@@ -969,6 +969,22 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     {
         return std::make_shared<PatternBrak>();
     }
+    else if (func->token_.literal_ == "bump")
+    {
+        auto bump_func = std::make_shared<PatternBump>();
+        if (func->arguments_.size() == 1)
+        {
+            auto bump_literal = std::dynamic_pointer_cast<ast::NumberLiteral>(
+                func->arguments_[0]);
+            if (bump_literal)
+            {
+                if (bump_literal->value_ >= 0 &&
+                    bump_literal->value_ < PPSIXTEENTH)
+                    bump_func->bump_amount_ = bump_literal->value_;
+            }
+            return bump_func;
+        }
+    }
     else if (func->token_.literal_ == "chord")
     {
         return std::make_shared<PatternChord>();

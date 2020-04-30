@@ -201,3 +201,16 @@ class PatternScramble : public PatternFunction
 
   public:
 };
+
+class PatternBump : public PatternFunction
+{
+  public:
+    PatternBump(){};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num) override;
+    std::string String() const override;
+
+  public:
+    int bump_amount_{PPSIXTEENTH / 2}; // range - 0 to PPSIXTEENTH (260)
+};

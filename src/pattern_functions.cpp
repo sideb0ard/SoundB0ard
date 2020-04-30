@@ -538,3 +538,38 @@ std::string PatternScramble::String() const
     ss << "scramble";
     return ss.str();
 }
+
+void PatternBump::TransformPattern(
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+    int loop_num)
+{
+    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
+    for (int i = 0; i < 16; i++)
+    {
+        int cur_sixteenth_idx = PPSIXTEENTH * i;
+
+        int bump = rand() % bump_amount_;
+        int shift_direction = rand() % 2;
+        if (!shift_direction) // backwards. arbitrary choice.
+            bump *= -1;
+
+        if (i % 4 == 0) // first kick and snare
+            bump = 0;
+
+        for (int j = 0; j < PPSIXTEENTH; j++)
+        {
+            int cur_index = cur_sixteenth_idx + j;
+            if (events[cur_index].size() != 0)
+                new_events[cur_index + bump] = events[cur_index];
+        }
+    }
+    events = new_events;
+}
+
+std::string PatternBump::String() const
+{
+
+    std::stringstream ss;
+    ss << "bump " << bump_amount_;
+    return ss.str();
+}
