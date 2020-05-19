@@ -111,7 +111,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
             for (auto &f : pattern_functions_)
             {
                 if (f->active_)
-                    f->TransformPattern(pattern_events_, loop_counter_);
+                    f->TransformPattern(pattern_events_, loop_counter_, tinfo);
             }
         }
 

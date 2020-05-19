@@ -18,3 +18,34 @@ p5 $ "[~ <cr snd acd?>] ~ ~ [~ ~ ~ <snd cr? cr>]"
 p1 # "<d*3 a*4> <f f2*3 d2*2>" d1
 p1 # "f*3 a*4 c [~ c*2]" d1
 p1 # "<a1*2 f1*3> <a*4 [~ a]> <c? a?> [~ c*2]" d1
+o
+
+
+[Env]
+d1 = DxSynth(timeLLy) vol:0.7 pan:0 algo:4
+d2 = DxSynth(RAVER) vol:0.7 pan:0 algo:1
+kr = dloops/krushSnareRoll.aiff vol:0.7 pan:0 pitch:1 idx:87 mode:LOOP(0) step:0 len:1
+     fx0 freq:12000.00 q:1.00 type:LPF4 lfo1_active:1 lfo1_type:0 lfo1_amp:1.00
+     lfo1_rate:0.50 lfo2_active:0 lfo2_type:0 lfo2_amp:1.00 lfo2_rate:0.50
+bd = Sampler(kicks/wuk77.aiff) vol:0.7 pan:0 pitch:1
+cw = Sampler(perc/hes23cow.aif) vol:0.7 pan:0 pitch:1
+cp2 = Sampler(claps/mawOW.aiff) vol:0.7 pan:0 pitch:1
+cpc = Sampler(claps/clipClap.aiff) vol:0.7 pan:0 pitch:1
+cr = Sampler(noises/crnchHar.aiff) vol:0.7 pan:0 pitch:1
+snd = Sampler(noises/SNDwhooshHit.aiff) vol:0.7 pan:0 pitch:1
+cp = Sampler(claps/mawClapDelayed.aiff) vol:0.7 pan:0 pitch:1
+bw = Sampler(perc/bahWic.aiff) vol:0.7 pan:0 pitch:2
+lp = Sampler(perc/lazerPerc.aiff) vol:0.7 pan:0 pitch:2
+gs = Sampler(perc/gltchString.aiff) vol:0.7 pan:0 pitch:2
+acd = Sampler(noises/acidMan.aiff) vol:0.7 pan:0 pitch:1
+
+[Procz]
+p1 # "<e*3 g*4> <e g*3 g*2>" d1 | every 7 mask "ff00"
+p2 < every 3 "<3 4 5 4>"  "set d1:algo %"
+p3 $ "bd ~ [~ <bd bd*2>] [~ bd?]"
+p4 $ "[~ <cp cp cp? cp*2 cp2>]*2"
+p5 $ "[~ <cr snd acd?>] ~ ~ [~ ~ ~ <snd cr? cr>]"
+p6 # "<[~ g]*2 [~ g] g(3,8)>" d2 | every 4 bump 120 | every 7 scramble | every 9 brak | every 6 mask "ff00"
+p7 $ "[~ <gs bw lp lp*2>] ~ [~ <bw bw*2 lp>] <~ <gs bw>>" | every 3 scramble | every 4 bump 120 | every 6 mask "ffff" | every 7 brak
+p8 < every 3 "1"  "set kr:stutter %"
+p9 $ "[~ cpc]*2"

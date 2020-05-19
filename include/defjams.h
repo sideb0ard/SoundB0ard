@@ -195,9 +195,11 @@ typedef struct mixer_timing_info
 {
     int frames_per_midi_tick;
     double ms_per_midi_tick;
+    double midi_ticks_per_ms;
 
     double time_of_next_midi_tick;
 
+    // perpetually incrementing counters
     int sixteenth_note_tick;
     int midi_tick;
 
@@ -216,6 +218,7 @@ typedef struct mixer_timing_info
     // informational for other sound generators
     unsigned int loop_len_in_frames;
     unsigned int loop_len_in_ticks;
+    // these are in frames
     unsigned int size_of_thirtysecond_note;
     unsigned int size_of_sixteenth_note;
     unsigned int size_of_eighth_note;

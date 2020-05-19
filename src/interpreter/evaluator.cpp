@@ -982,8 +982,8 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
                     bump_literal->value_ < PPSIXTEENTH)
                     bump_func->bump_amount_ = bump_literal->value_;
             }
-            return bump_func;
         }
+        return bump_func;
     }
     else if (func->token_.literal_ == "chord")
     {
@@ -1066,6 +1066,21 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     else if (func->token_.literal_ == "scramble")
     {
         return std::make_shared<PatternScramble>();
+    }
+    else if (func->token_.literal_ == "speed")
+    {
+        if (func->arguments_.size() == 1)
+        {
+            auto multi = std::dynamic_pointer_cast<ast::NumberLiteral>(
+                func->arguments_[0]);
+            if (multi)
+            {
+                double speed_multi = multi->value_;
+
+                return std::make_shared<PatternSpeed>(speed_multi);
+            }
+        }
+        std::cerr << "Need a speed adjustment (in ms)" << std::endl;
     }
     else if (func->token_.literal_ == "slow")
     {

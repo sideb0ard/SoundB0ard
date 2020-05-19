@@ -27,7 +27,7 @@ class PatternFunction
     virtual std::string String() const = 0;
     virtual void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) = 0;
+        int loop_num, mixer_timing_info tinfo) = 0;
     bool active_{true};
 };
 
@@ -40,7 +40,7 @@ class PatternEvery : public PatternFunction
     }
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   private:
@@ -54,7 +54,7 @@ class PatternReverse : public PatternFunction
     PatternReverse() = default;
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 };
 
@@ -65,7 +65,7 @@ class PatternRotate : public PatternFunction
         : direction_{direction}, num_sixteenth_steps_{num_sixteenth_steps} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   private:
@@ -80,7 +80,7 @@ class PatternTranspose : public PatternFunction
         : direction_{direction}, num_octaves_{num_octaves} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   private:
@@ -94,7 +94,7 @@ class PatternSwing : public PatternFunction
     PatternSwing(int swing_setting) : swing_setting_{swing_setting} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   private:
@@ -107,7 +107,7 @@ class PatternMask : public PatternFunction
     PatternMask(std::string mask);
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   private:
@@ -121,7 +121,7 @@ class PatternArp : public PatternFunction
     PatternArp(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
@@ -136,7 +136,7 @@ class PatternBrak : public PatternFunction
     PatternBrak(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
@@ -148,7 +148,7 @@ class PatternFast : public PatternFunction
     PatternFast(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
@@ -160,7 +160,7 @@ class PatternSlow : public PatternFunction
     PatternSlow(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
@@ -172,7 +172,7 @@ class PatternChord : public PatternFunction
     PatternChord(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
@@ -184,7 +184,7 @@ class PatternPowerChord : public PatternFunction
     PatternPowerChord(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
@@ -196,7 +196,7 @@ class PatternScramble : public PatternFunction
     PatternScramble(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
@@ -208,9 +208,23 @@ class PatternBump : public PatternFunction
     PatternBump(){};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num) override;
+        int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
     int bump_amount_{PPSIXTEENTH / 2}; // range - 0 to PPSIXTEENTH (260)
+};
+
+class PatternSpeed : public PatternFunction
+{
+  public:
+    PatternSpeed(double speed) : speed_multiplier{speed} {};
+    void TransformPattern(
+        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
+        int loop_num, mixer_timing_info tinfo) override;
+    std::string String() const override;
+
+  public:
+    double speed_multiplier{0};
+    double cur_index{0};
 };
