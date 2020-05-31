@@ -46,6 +46,23 @@
 
 #define NUM_COMPAT_NOTES 6
 
+// previously defined in mixer.h
+#define MAX_SCENES 100
+#define MAX_TRACKS_PER_SCENE 100
+#define MAX_NUM_PROC 100
+#define MAX_NUM_SOUND_GENERATORS 100
+#define MAX_NUM_VALUE_GENERATORS 100
+#define NUM_PROGRESSIONS 4
+
+// previously in sequenceengine.h -why?!
+#define MAX_NUM_MIDI_LOOPS 64
+#define MAX_VOICES 3
+#define DEFAULT_LEGATO_MODE 0
+#define DEFAULT_RESET_TO_ZERO 0
+#define DEFAULT_FILTER_KEYTRACK 0
+#define DEFAULT_FILTER_KEYTRACK_INTENSITY 0.5
+#define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
+
 constexpr int kMaxNumSoundGenFx = 20;
 
 constexpr float kMaxDelayLenSecs = 30.0;
@@ -235,6 +252,9 @@ typedef struct mixer_timing_info
     bool is_quarter;
     bool is_third;
     bool is_midi_tick;
+
+    int sound_gen_cur_positions[MAX_NUM_SOUND_GENERATORS] = {0};
+
 } mixer_timing_info;
 
 typedef struct chord_midi_notes

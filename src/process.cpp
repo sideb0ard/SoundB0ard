@@ -4,6 +4,7 @@
 #include <string.h>
 
 #include <iostream>
+#include <set>
 #include <sstream>
 
 #include <audioutils.h>
@@ -110,8 +111,55 @@ void Process::EventNotify(mixer_timing_info tinfo)
 
             for (auto &f : pattern_functions_)
             {
-                if (f->active_)
+                if (f->func_type_ == PatternFunctionType::PATTERN_OP &&
+                    f->active_)
+                {
                     f->TransformPattern(pattern_events_, loop_counter_, tinfo);
+                }
+                else if (f->func_type_ ==
+                             PatternFunctionType::SOUNDGENERATOR_OP &&
+                         f->active_)
+                {
+                    auto speed_func =
+                        std::dynamic_pointer_cast<PatternSpeed>(f);
+                    if (speed_func)
+                    {
+                        float multiplier = speed_func->speed_multiplier_;
+                        std::cout << "SPEEEEED! MULTIPLIER - " << multiplier
+                                  << "\n";
+                        std::set<std::string> targets;
+                        if (target_type_ == ProcessPatternTarget::ENV)
+                        {
+                            for (int i = 0; i < PPBAR; i++)
+                            {
+                                if (pattern_events_[i].size() > 0)
+                                {
+                                    std::vector<std::shared_ptr<MusicalEvent>>
+                                        &events = pattern_events_[i];
+                                    for (auto e : events)
+                                    {
+                                        if (e->value_ ==
+                                            "~") // skip blank markers
+                                            continue;
+                                        targets.insert(e->value_);
+                                    }
+                                }
+                            }
+                        }
+                        else if (target_type_ == ProcessPatternTarget::VALUES)
+                        {
+                            for (auto t : targets_)
+                                targets.insert(t);
+                        }
+                        for (auto t : targets)
+                        {
+                            std::cout << "GOT TARGET " << t << std::endl;
+                            std::stringstream ss;
+                            ss << "speed(" << t << "," << multiplier << ")";
+                            g_command_queue.push(ss.str());
+                        }
+                    }
+                }
             }
         }
 

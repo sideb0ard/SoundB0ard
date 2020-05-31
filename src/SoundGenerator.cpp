@@ -144,36 +144,14 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         return;
 
     if (tinfo.is_start_of_loop)
-    {
         engine.started = true;
-        engine.event_mask_counter++;
-        if (engine.restore_pending)
-        {
-            sequence_engine_dupe_pattern(
-                &engine.backup_pattern_while_getting_crazy,
-                &engine.patterns[engine.cur_pattern]);
-            engine.restore_pending = false;
-        }
-        else if (engine.multi_pattern_mode && engine.num_patterns > 1)
-        {
-            engine.cur_pattern_iteration--;
-            if (engine.cur_pattern_iteration <= 0)
-            {
-                int next_pattern =
-                    (engine.cur_pattern + 1) % engine.num_patterns;
 
-                engine.cur_pattern = next_pattern;
-                engine.cur_pattern_iteration =
-                    engine.pattern_multiloop_count[engine.cur_pattern];
-            }
-        }
-    }
     if (engine.started)
     {
         if (tinfo.is_sixteenth)
         {
             if (engine.debug)
-                printf("CUR_STEP:%d range_start:%d len:%d\n", engine.cur_step,
+                printf("CUR_STEP:%f range_start:%d len:%d\n", engine.cur_step,
                        engine.range_start, engine.range_len);
 
             if (engine.fold_direction == FOLD_FWD)
@@ -236,7 +214,7 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
             }
         }
 
-        int idx = ((engine.cur_step * PPSIXTEENTH) +
+        int idx = ((int)(engine.cur_step * PPSIXTEENTH) +
                    (tinfo.midi_tick % PPSIXTEENTH)) %
                   PPBAR;
 
@@ -247,14 +225,7 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         {
             midi_event ev = engine.patterns[engine.cur_pattern][idx];
             if (rand() % 100 < engine.pct_play)
-            {
-                // if (ev->event_type == MIDI_ON)
-                //    mixer_emit_event(mixr, (broadcast_event){
-                //                               .type = SEQUENCER_NOTE,
-                //                               .sequencer_src =
-                //                               mixer_idx});
                 parseMidiEvent(ev, tinfo);
-            }
         }
 
     } // end if engine.started
@@ -391,3 +362,14 @@ bool SoundGenerator::IsStepper()
         return true;
     return false;
 }
+
+int SoundGenerator::GetCurrentStep() { return engine.cur_step; }
+
+void SoundGenerator::SetSpeed(double val)
+{
+    std::cout << "SETTING SPEED TO " << val << std::endl;
+    sequence_engine_set_count_by(&engine, val);
+}
+
+double SoundGenerator::GetSpeed() { return engine.count_by; }
+

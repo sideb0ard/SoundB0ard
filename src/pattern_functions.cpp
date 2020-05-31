@@ -368,49 +368,6 @@ std::string PatternBrak::String() const
     return ss.str();
 }
 
-void PatternFast::TransformPattern(
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num, mixer_timing_info tinfo)
-{
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
-    for (int i = 0; i < PPBAR; i++)
-    {
-        if (events[i].size() > 0)
-            new_events[i / 2] = events[i];
-    }
-
-    for (int i = 0; i < PPBAR / 2; i++)
-    {
-        if (new_events[i].size() > 0)
-            std::copy(new_events[i].begin(), new_events[i].end(),
-                      std::back_inserter(new_events[i + (PPBAR / 2)]));
-    }
-
-    events = new_events;
-}
-
-std::string PatternFast::String() const
-{
-
-    std::stringstream ss;
-    ss << "fast";
-    return ss.str();
-}
-
-void PatternSlow::TransformPattern(
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-    int loop_num, mixer_timing_info tinfo)
-{
-}
-
-std::string PatternSlow::String() const
-{
-
-    std::stringstream ss;
-    ss << "slow";
-    return ss.str();
-}
-
 void PatternChord::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
     int loop_num, mixer_timing_info tinfo)
@@ -578,23 +535,16 @@ void PatternSpeed::TransformPattern(
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
     int loop_num, mixer_timing_info tinfo)
 {
-    std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> new_events;
-    for (int i = 0; i < PPBAR; i++)
-    {
-        int ev_idx = (int)cur_index % PPBAR;
-
-        if (events[ev_idx].size() > 0)
-            new_events[i] = events[ev_idx];
-        cur_index += speed_multiplier;
-    }
-    events = new_events;
-    // PrintPattern(events);
+    (void)events;
+    (void)loop_num;
+    (void)tinfo;
+    // no-op
 }
 
 std::string PatternSpeed::String() const
 {
 
     std::stringstream ss;
-    ss << "speed " << speed_multiplier;
+    ss << "speed " << speed_multiplier_;
     return ss.str();
 }

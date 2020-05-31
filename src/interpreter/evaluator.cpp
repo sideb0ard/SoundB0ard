@@ -1019,10 +1019,6 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             }
         }
     }
-    else if (func->token_.literal_ == "fast")
-    {
-        return std::make_shared<PatternFast>();
-    }
     else if (func->token_.literal_ == "mask")
     {
         if (func->arguments_.size() == 1)
@@ -1076,15 +1072,10 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             if (multi)
             {
                 double speed_multi = multi->value_;
-
                 return std::make_shared<PatternSpeed>(speed_multi);
             }
         }
-        std::cerr << "Need a speed adjustment (in ms)" << std::endl;
-    }
-    else if (func->token_.literal_ == "slow")
-    {
-        return std::make_shared<PatternSlow>();
+        std::cerr << "Need a speed adjustment multiplier.." << std::endl;
     }
     else if (func->token_.literal_ == "swing")
     {
@@ -1112,6 +1103,10 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             return std::make_shared<PatternTranspose>(UP, num_octaves);
         else
             return std::make_shared<PatternTranspose>(DOWN, num_octaves);
+    }
+    else if (func->token_.literal_ == "while")
+    {
+        std::cout << "WHILE!!\n";
     }
     else
     {

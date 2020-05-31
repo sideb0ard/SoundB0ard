@@ -11,6 +11,7 @@
 #include "mixer.h"
 #include "utils.h"
 
+#include <iomanip>
 #include <iostream>
 
 extern wchar_t *sparkchars;
@@ -121,32 +122,14 @@ std::string DrumSampler::Status()
 std::string DrumSampler::Info()
 {
     std::stringstream ss;
-
-    // char *INSTRUMENT_COLOR = (char *)ANSI_COLOR_RESET;
-    // if (active)
-    //{
-    //    INSTRUMENT_COLOR = (char *)ANSI_COLOR_BLUE;
-    //}
-
-    // wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
-    // swprintf(local_status_string, MAX_STATIC_STRING_SZ,
-    //         WANSI_COLOR_WHITE
-    //         "%s %s vol:%.2lf pan:%.2lf pitch:%.2f triplets:%d end_pos:%d\n"
-    //         "eg:%d attack_ms:%.0f decay_ms:%.0f sustain:%.2f "
-    //         "release_ms:%.0f glitch:%d gpct:%d\n"
-    //         "multi:%d num_patterns:%d",
-    //         filename, INSTRUMENT_COLOR, volume, pan, buffer_pitch,
-    //         engine.allow_triplets, buf_end_pos, envelope_enabled,
-    //         eg.m_attack_time_msec, eg.m_decay_time_msec, eg.m_sustain_level,
-    //         eg.m_release_time_msec, glitch_mode, glitch_rand_factor,
-    //         engine.multi_pattern_mode, engine.num_patterns);
-
-    // wcscat(status_string, local_status_string);
-
-    // wmemset(local_status_string, 0, MAX_STATIC_STRING_SZ);
-    // sequence_engine_status(&engine, local_status_string);
-    // wcscat(status_string, local_status_string);
-    // wcscat(status_string, WANSI_COLOR_RESET);
+    ss << std::setprecision(2) << std::fixed;
+    ss << ANSI_COLOR_BLUE << "\nSample ";
+    ss << ANSI_COLOR_WHITE << filename << ANSI_COLOR_BLUE;
+    ss << "\nvol:" << volume << " pan:" << pan << " pitch:" << buffer_pitch;
+    ss << "eg:" << envelope_enabled << " attack_ms:" << eg.m_attack_time_msec;
+    ss << " decay_ms:" << eg.m_decay_time_msec
+       << " sustain: " << eg.m_sustain_level;
+    ss << " playback speed:" << engine.count_by;
     return ss.str();
 }
 

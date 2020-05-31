@@ -4,9 +4,8 @@
 
 #include <iostream>
 
-#include "sequenceengine.h"
-#include "defjams.h"
 #include "mixer.h"
+#include "sequenceengine.h"
 #include "utils.h"
 #include <drumsampler.h>
 #include <drumsynth.h>
@@ -36,6 +35,7 @@ sequenceengine::sequenceengine()
     midi_note_2 = 32; // G#0
     midi_note_3 = 31; // G0
 
+    // TODO - am i still using these chord and note modes?
     octave = 1;
 
     sustain_note_ms = 500;
@@ -44,6 +44,7 @@ sequenceengine::sequenceengine()
     follow_mixer_chord_changes = true;
     started = false;
 
+    // TODO - and these?
     enable_event_mask = false;
     event_mask = 0;
     apply_mask_every_n = 1;
@@ -186,7 +187,7 @@ void sequence_engine_status(sequenceengine *engine, wchar_t *status_string)
         L"debug:%d\n"
         L"num_patterns:%d midi_note_1:%d midi_note_2:%d midi_note_3:%d "
         L"follow:%d\n"
-        L"count_by:%d cur_step:%d incr:%d range:%d fold:%d pct_play:%d\n"
+        L"count_by:%f cur_step:%f incr:%d range:%d fold:%d pct_play:%d\n"
         L"swing:%d transpose:%d",
         engine->single_note_mode, engine->chord_mode, engine->octave,
         engine->sustain_note_ms, engine->debug, engine->num_patterns,
@@ -684,7 +685,7 @@ void sequence_engine_set_transpose(sequenceengine *engine, int transpose)
         engine->transpose = transpose;
 }
 
-void sequence_engine_set_count_by(sequenceengine *engine, int count_by)
+void sequence_engine_set_count_by(sequenceengine *engine, float count_by)
 {
     engine->cur_step = mixr->timing_info.sixteenth_note_tick % 16;
     engine->count_by = count_by;

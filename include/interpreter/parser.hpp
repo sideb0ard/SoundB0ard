@@ -78,7 +78,6 @@ class Parser
     ParseInfixExpression(std::shared_ptr<ast::Expression> left);
     std::shared_ptr<ast::Expression> ParseGroupedExpression();
     std::shared_ptr<ast::Expression> ParseIfExpression();
-    std::shared_ptr<ast::Expression> ParseEveryExpression();
 
     std::shared_ptr<ast::Expression>
     ParseIndexExpression(std::shared_ptr<ast::Expression> left);

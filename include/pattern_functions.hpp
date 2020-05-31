@@ -19,6 +19,12 @@ enum ArpSpeed
     ARP_4,
 };
 
+enum PatternFunctionType
+{
+    PATTERN_OP,
+    SOUNDGENERATOR_OP,
+};
+
 class PatternFunction
 {
   public:
@@ -29,6 +35,10 @@ class PatternFunction
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
         int loop_num, mixer_timing_info tinfo) = 0;
     bool active_{true};
+    PatternFunctionType func_type_{PatternFunctionType::PATTERN_OP};
+
+  protected:
+    PatternFunction(PatternFunctionType func_type) : func_type_{func_type} {};
 };
 
 class PatternEvery : public PatternFunction
@@ -142,30 +152,6 @@ class PatternBrak : public PatternFunction
   public:
 };
 
-class PatternFast : public PatternFunction
-{
-  public:
-    PatternFast(){};
-    void TransformPattern(
-        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num, mixer_timing_info tinfo) override;
-    std::string String() const override;
-
-  public:
-};
-
-class PatternSlow : public PatternFunction
-{
-  public:
-    PatternSlow(){};
-    void TransformPattern(
-        std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
-        int loop_num, mixer_timing_info tinfo) override;
-    std::string String() const override;
-
-  public:
-};
-
 class PatternChord : public PatternFunction
 {
   public:
@@ -218,13 +204,14 @@ class PatternBump : public PatternFunction
 class PatternSpeed : public PatternFunction
 {
   public:
-    PatternSpeed(double speed) : speed_multiplier{speed} {};
+    PatternSpeed(double speed)
+        : PatternFunction(PatternFunctionType::SOUNDGENERATOR_OP),
+          speed_multiplier_{speed} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,
         int loop_num, mixer_timing_info tinfo) override;
     std::string String() const override;
 
   public:
-    double speed_multiplier{0};
-    double cur_index{0};
+    double speed_multiplier_{0};
 };

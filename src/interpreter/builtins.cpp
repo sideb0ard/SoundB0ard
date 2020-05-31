@@ -228,6 +228,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        g_audio_action_queue.push(action_req);
                        return evaluator::NULLL;
                    })},
+    {"speed", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> args)
+                      -> std::shared_ptr<object::Object> {
+                      std::cout << "INBUILT SPEED CALLED!" << std::endl;
+                      audio_action_queue_item action_req{
+                          .type = AudioAction::SPEED, .args = args};
+                      g_audio_action_queue.push(action_req);
+                      return evaluator::NULLL;
+                  })},
     {"addFx", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {

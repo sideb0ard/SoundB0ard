@@ -540,6 +540,9 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                         mixr->sound_generators_[i]->genNext();
                     output_left += mixr->soundgen_cur_val[i].left;
                     output_right += mixr->soundgen_cur_val[i].right;
+
+                    mixr->timing_info.sound_gen_cur_positions[i] =
+                        mixr->sound_generators_[i]->GetCurrentStep();
                 }
             }
         }
@@ -1008,6 +1011,38 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
             {
                 char *fname = action->preview_filename.data();
                 mixer_preview_audio(mixr, fname);
+            }
+            else if (action->type == AudioAction ::SPEED)
+            {
+                std::cout << "YO - MIXER DEALING WITH SPEED!\n";
+                auto args = action->args;
+                int args_size = args.size();
+                if (args_size == 2)
+                {
+                    std::cout << "WE GOOD!\n";
+                    auto soundgen =
+                        std::dynamic_pointer_cast<object::SoundGenerator>(
+                            args[0]);
+                    if (soundgen)
+                    {
+                        if (mixer_is_valid_soundgen_num(mixr,
+                                                        soundgen->soundgen_id_))
+                        {
+                            auto sg =
+                                mixr->sound_generators_[soundgen->soundgen_id_];
+                            auto val_object =
+                                std::dynamic_pointer_cast<object::Number>(
+                                    args[1]);
+
+                            if (!val_object)
+                                return;
+
+                            auto speed_multi = val_object->value_;
+
+                            sg->SetSpeed(speed_multi);
+                        }
+                    }
+                }
             }
         }
     }

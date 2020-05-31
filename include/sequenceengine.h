@@ -6,36 +6,6 @@
 #include <defjams.h>
 #include <midimaaan.h>
 
-#define MAX_NUM_MIDI_LOOPS 64
-#define MAX_VOICES 3
-
-#define MIN_DETUNE_CENTS -50.0
-#define MAX_DETUNE_CENTS 50.0
-#define DEFAULT_DETUNE_CENTS 0.0
-
-#define MIN_PULSE_WIDTH_PCT 1.0
-#define MAX_PULSE_WIDTH_PCT 99.0
-#define DEFAULT_PULSE_WIDTH_PCT 50.0
-#define MIN_NOISE_OSC_AMP_DB -96.0
-#define MAX_NOISE_OSC_AMP_DB 0.0
-#define DEFAULT_NOISE_OSC_AMP_DB -96.0
-#define MIN_SUB_OSC_AMP_DB -96.0
-#define MAX_SUB_OSC_AMP_DB 0.0
-#define DEFAULT_SUB_OSC_AMP_DB -96.0
-
-#define DEFAULT_LEGATO_MODE 0
-#define DEFAULT_RESET_TO_ZERO 0
-#define DEFAULT_FILTER_KEYTRACK 0
-#define DEFAULT_FILTER_KEYTRACK_INTENSITY 0.5
-#define DEFAULT_VELOCITY_TO_ATTACK 0
-#define DEFAULT_NOTE_TO_DECAY 0
-#define DEFAULT_MIDI_PITCHBEND 0
-#define DEFAULT_MIDI_MODWHEEL 0
-#define DEFAULT_MIDI_VOLUME 127
-#define DEFAULT_MIDI_PAN 64
-#define DEFAULT_MIDI_EXPRESSION 0
-#define DEFAULT_PORTAMENTO_TIME_MSEC 0.0
-
 enum
 {
     FOLD_FWD,
@@ -68,8 +38,8 @@ class sequenceengine
     // end of pattern state management
 
     // these used to traverse the pattern in fun ways
-    int count_by;
-    int cur_step;
+    float count_by;
+    float cur_step;
 
     int increment_by;
     int range_start;
@@ -210,7 +180,7 @@ void sequence_engine_set_enable_event_mask(sequenceengine *engine, bool b);
 bool sequence_engine_is_masked(sequenceengine *engine);
 void sequence_engine_set_swing_setting(sequenceengine *engine,
                                        int swing_setting);
-void sequence_engine_set_count_by(sequenceengine *engine, int count_by);
+void sequence_engine_set_count_by(sequenceengine *engine, float count_by);
 void sequence_engine_reset_step(sequenceengine *engine);
 void sequence_engine_set_increment_by(sequenceengine *engine, int incr);
 void sequence_engine_set_range_len(sequenceengine *engine, int range);
