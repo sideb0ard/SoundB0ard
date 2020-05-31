@@ -216,7 +216,6 @@ minisynth_voice *minisynth_get_oldest_voice_with_note(MiniSynth *ms,
 void minisynth_reset_voices(MiniSynth *ms);
 
 void minisynth_print_settings(MiniSynth *ms);
-void minisynth_print_patterns(MiniSynth *ms);
 void minisynth_print_modulation_routings(MiniSynth *ms);
 void minisynth_print_lfo1_routing_info(MiniSynth *ms, wchar_t *scratch);
 void minisynth_print_lfo2_routing_info(MiniSynth *ms, wchar_t *scratch);

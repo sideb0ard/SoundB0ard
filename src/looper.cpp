@@ -61,8 +61,6 @@ looper::looper(char *filename, bool loop_mode)
     if (strncmp(filename, "none", 4) != 0)
         looper_import_file(this, filename);
 
-    engine.sustain_note_ms = 500;
-
     envelope_generator_init(&m_eg1); // start/stop env
     m_eg1.m_attack_time_msec = 10;
     m_eg1.m_release_time_msec = 50;
@@ -323,41 +321,7 @@ std::string looper::Info()
        << " fill_factor:" << fill_factor
        << "\ngrain_spray_ms:" << granular_spray_frames / 44.1 << "\n";
 
-    //        %d mode:%s\n"
-    //"gate_mode:%d idx:%.0f buf_len:%d atk:%d rel:%d\n"
-    //"len:%.2f scramble:%d stutter:%d step:%d reverse:%d\n"
-    //"xsrc:%d rec:%d widx:%d xmode:%s(%d) degrade:%d\n "
-    //"grain_dur_ms:" "%s" "%d" "%s "
-    //"grains_per_sec:" "%s" "%d" "%s "
-    //"density_dur_sync:%d "
-    //"quasi_grain_fudge:%d\n"
-    //"fill_factor:%.2f grain_spray_ms:%.2f selection_mode:%d env_mode:%s\n"
-
-    //"[" "%s" "Envelope Generator" "%s" "]\n"
-    //"eg_attack_ms:%.2f eg_release_ms:%.2f eg_state:%d",
-    //// clang-format on
-
-    // num_channels > 1 ? 1 : 0, s_loop_mode_names[loop_mode], gate_mode,
-    // audio_buffer_read_idx, audio_buffer_len, grain_attack_time_pct,
-    // grain_release_time_pct, loop_len, scramble_mode, stutter_mode,
-    // step_mode, reverse_mode, external_source_sg, recording,
-    // audio_buffer_write_idx, s_external_mode_names[external_source_mode],
-    // external_source_mode, degrade_by,
-
-    // ANSI_COLOR_WHITE, grain_duration_ms, INSTRUMENT_COLOR, ANSI_COLOR_WHITE,
-    // grains_per_sec, INSTRUMENT_COLOR, density_duration_sync,
-    // quasi_grain_fudge, fill_factor, granular_spray_frames / 44.1,
-    // selection_mode, s_env_names[envelope_mode],
-
-    // ANSI_COLOR_WHITE, INSTRUMENT_COLOR, m_eg1.m_attack_time_msec,
-    // m_eg1.m_release_time_msec, m_eg1.m_state);
-
     return ss.str();
-    // wchar_t local_status_string[MAX_STATIC_STRING_SZ] = {};
-    // sequence_engine_status(&engine, local_status_string);
-    // wcscat(status_string, local_status_string);
-
-    // wcscat(status_string, WANSI_COLOR_RESET);
 }
 
 void looper::start()
@@ -365,7 +329,7 @@ void looper::start()
     eg_start_eg(&m_eg1);
     active = true;
     stop_pending = false;
-    sequence_engine_reset(&engine);
+    engine.started = false;
 }
 
 void looper::stop()

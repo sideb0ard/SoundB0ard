@@ -1322,11 +1322,6 @@ void dxsynth_print_settings(dxsynth *ms)
     printf(ANSI_COLOR_RESET);
 }
 
-void dxsynth_print_patterns(dxsynth *ms)
-{
-    sequence_engine_print_patterns(&ms->engine);
-}
-
 void dxsynth_print_modulation_routings(dxsynth *ms)
 {
     print_modulation_matrix(&ms->m_global_modmatrix);

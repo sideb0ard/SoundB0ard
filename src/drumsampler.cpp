@@ -129,7 +129,6 @@ std::string DrumSampler::Info()
     ss << "eg:" << envelope_enabled << " attack_ms:" << eg.m_attack_time_msec;
     ss << " decay_ms:" << eg.m_decay_time_msec
        << " sustain: " << eg.m_sustain_level;
-    ss << " playback speed:" << engine.count_by;
     return ss.str();
 }
 

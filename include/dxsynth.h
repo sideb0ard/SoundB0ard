@@ -142,7 +142,6 @@ dxsynth_voice *dxsynth_get_oldest_voice_with_note(dxsynth *synth,
 void dxsynth_reset_voices(dxsynth *self);
 
 void dxsynth_print_settings(dxsynth *ms);
-void dxsynth_print_patterns(dxsynth *ms);
 void dxsynth_print_modulation_routings(dxsynth *ms);
 void dxsynth_print_lfo1_routing_info(dxsynth *ms, wchar_t *scratch);
 void dxsynth_print_lfo2_routing_info(dxsynth *ms, wchar_t *scratch);

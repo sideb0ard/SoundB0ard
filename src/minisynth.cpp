@@ -374,7 +374,6 @@ void minisynth_load_defaults(MiniSynth *ms)
     ///////////////////////////////////////////////////
 
     ms->m_settings.m_pulse_width_pct = OSC_PULSEWIDTH_DEFAULT;
-    ms->m_settings.m_octave = ms->engine.octave;
     ms->m_settings.m_portamento_time_msec = DEFAULT_PORTAMENTO_TIME_MSEC;
     ms->m_settings.m_sub_osc_db = -96.000000;
 
@@ -1665,11 +1664,6 @@ void minisynth_print_settings(MiniSynth *ms)
     // TODO - where's type? // whats NLP?
 
     printf(ANSI_COLOR_RESET);
-}
-
-void minisynth_print_patterns(MiniSynth *ms)
-{
-    sequence_engine_print_patterns(&ms->engine);
 }
 
 void minisynth_print_modulation_routings(MiniSynth *ms)

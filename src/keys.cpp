@@ -73,11 +73,6 @@ void keys(int soundgen_num)
                 printf("Up an octave...\n");
                 s_keys_octave++;
                 break;
-            case 114:
-                sg->engine.recording = 1 - sg->engine.recording;
-                printf("Toggling REC to %s\n",
-                       sg->engine.recording ? "true" : "false");
-                break;
             // mixer_toggle_key_mode(mixr);
             // printf("Switching KEY mode -- %d\n",
             //       mixr->m_key_controller_mode);

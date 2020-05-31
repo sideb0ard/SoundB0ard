@@ -49,57 +49,19 @@ void SoundGenerator::parseMidiEvent(midi_event ev, mixer_timing_info tinfo)
     int cur_midi_tick = tinfo.midi_tick % PPBAR;
     int midi_note = ev.data1;
 
-    if (engine.transpose != 0)
-        midi_note += engine.transpose;
-
     int midi_notes[3] = {midi_note, 0, 0};
     int midi_notes_len = 1; // default single note
-    if (engine.chord_mode)
-    {
-        midi_notes_len = 3;
-        if (tinfo.chord_type == MAJOR_CHORD)
-            midi_notes[1] = midi_note + 4;
-        else
-            midi_notes[1] = midi_note + 3;
-        midi_notes[2] = midi_note + 7;
-    }
 
     switch (ev.event_type)
     {
     case (MIDI_ON):
     { // Hex 0x80
-        if (!sequence_engine_is_masked(&engine))
-        {
-
-            for (int i = 0; i < midi_notes_len; i++)
-            {
-                int note = midi_notes[i];
-
-                noteOn(ev);
-
-                if (ev.source != EXTERNAL_DEVICE) // artificial note-off
-                {
-                    int sustain_ms = ev.hold ? ev.hold : engine.sustain_note_ms;
-                    int sustain_time_in_ticks =
-                        sustain_ms * tinfo.ms_per_midi_tick;
-
-                    int note_off_tick =
-                        (cur_midi_tick + sustain_time_in_ticks) % PPBAR;
-                    midi_event off = new_midi_event(MIDI_OFF, note, 128);
-                    off.delete_after_use = true;
-                    sequence_engine_add_temporal_event(&engine, note_off_tick,
-                                                       off);
-                }
-            }
-        }
+        noteOn(ev);
         break;
     }
     case (MIDI_OFF):
     { // Hex 0x90
-        for (int i = 0; i < midi_notes_len; i++)
-        {
-            noteOff(ev);
-        }
+        noteOff(ev);
         break;
     }
     case (MIDI_CONTROL):
@@ -148,72 +110,6 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 
     if (engine.started)
     {
-        if (tinfo.is_sixteenth)
-        {
-            if (engine.debug)
-                printf("CUR_STEP:%f range_start:%d len:%d\n", engine.cur_step,
-                       engine.range_start, engine.range_len);
-
-            if (engine.fold_direction == FOLD_FWD)
-                engine.cur_step += engine.count_by;
-            else
-                engine.cur_step -= engine.count_by;
-
-            if (engine.cur_step < engine.range_start || engine.cur_step < 0)
-            {
-                int over_by = engine.range_start - engine.cur_step;
-                if (engine.fold)
-                {
-                    engine.cur_step = engine.range_start + over_by;
-                    engine.fold_direction = FOLD_FWD;
-                }
-                else
-                    engine.cur_step =
-                        (engine.range_start + engine.range_len) - over_by - 1;
-            }
-            else if (engine.cur_step >= 16 ||
-                     engine.cur_step >= (engine.range_start + engine.range_len))
-            {
-                int over_by = 0;
-                if (engine.cur_step >= 16)
-                    over_by = engine.cur_step - 16;
-                else
-                    over_by = engine.cur_step -
-                              (engine.range_start + engine.range_len);
-
-                if (engine.fold)
-                {
-                    engine.cur_step =
-                        (engine.range_start + engine.range_len) - over_by - 1;
-                    engine.fold_direction = FOLD_BAK;
-                }
-                else
-                    engine.cur_step = engine.range_start + over_by;
-            }
-
-            int tries = 0;
-            while (engine.cur_step >= 16 && tries < 5)
-            {
-                engine.cur_step -= 16;
-                tries++;
-            }
-            while (engine.cur_step < 0 && tries < 5)
-            {
-                engine.cur_step += 16;
-                tries++;
-            }
-
-            engine.range_counter++;
-            if (engine.range_counter % engine.range_len == 0)
-            {
-                engine.range_start += engine.increment_by;
-                if (engine.range_start >= 16)
-                    engine.range_start -= 16;
-                else if (engine.range_start < 0)
-                    engine.range_start += 16;
-            }
-        }
-
         int idx = ((int)(engine.cur_step * PPSIXTEENTH) +
                    (tinfo.midi_tick % PPSIXTEENTH)) %
                   PPBAR;
@@ -221,14 +117,19 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         if (idx < 0 || idx >= PPBAR)
             printf("YOUHC! idx out of bounds: %d\n", idx);
 
-        if (engine.patterns[engine.cur_pattern][idx].event_type)
+        if (engine.pattern[idx].event_type)
         {
-            midi_event ev = engine.patterns[engine.cur_pattern][idx];
-            if (rand() % 100 < engine.pct_play)
-                parseMidiEvent(ev, tinfo);
+            midi_event ev = engine.pattern[idx];
+            parseMidiEvent(ev, tinfo);
         }
 
-    } // end if engine.started
+        if (tinfo.is_sixteenth)
+        {
+            engine.cur_step++;
+            if (engine.cur_step == 16)
+                engine.cur_step = 0;
+        }
+    }
 }
 
 void SoundGenerator::noteOffDelayed(midi_event ev, int event_off_tick)
@@ -364,12 +265,3 @@ bool SoundGenerator::IsStepper()
 }
 
 int SoundGenerator::GetCurrentStep() { return engine.cur_step; }
-
-void SoundGenerator::SetSpeed(double val)
-{
-    std::cout << "SETTING SPEED TO " << val << std::endl;
-    sequence_engine_set_count_by(&engine, val);
-}
-
-double SoundGenerator::GetSpeed() { return engine.count_by; }
-

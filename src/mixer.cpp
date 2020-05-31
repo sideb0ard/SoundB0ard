@@ -1038,8 +1038,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                 return;
 
                             auto speed_multi = val_object->value_;
-
-                            sg->SetSpeed(speed_multi);
                         }
                     }
                 }
@@ -1086,13 +1084,6 @@ void mixer_check_for_midi_messages(mixer *mixr)
                     mixr->sound_generators_[mixr->active_midi_soundgen_num];
 
                 midi_event ev = new_midi_event(status, data1, data2);
-
-                if (sg->engine.recording)
-                {
-                    int tick = mixr->timing_info.midi_tick % PPBAR;
-                    sequence_engine_add_event(&sg->engine,
-                                              sg->engine.cur_pattern, tick, ev);
-                }
 
                 ev.source = EXTERNAL_DEVICE;
                 ev.delete_after_use = false;
