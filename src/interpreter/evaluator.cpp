@@ -17,9 +17,9 @@
 #include <interpreter/object.hpp>
 #include <tsqueue.hpp>
 
-extern Tsqueue<event_queue_item> g_event_queue;
-extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
-extern Tsqueue<std::string> g_reply_queue;
+extern Tsqueue<event_queue_item> process_event_queue;
+extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<std::string> repl_queue;
 
 namespace
 {
@@ -199,7 +199,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         if (lspath)
             lspath_string = lspath->value_;
         std::string listing = list_sample_dir(lspath_string);
-        g_reply_queue.push(listing);
+        repl_queue.push(listing);
     }
 
     std::shared_ptr<ast::BpmStatement> bpm_stmt =
@@ -212,7 +212,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         {
             audio_action_queue_item action{.type = AudioAction::BPM,
                                            .new_bpm = bpm->value_};
-            g_audio_action_queue.push(action);
+            audio_queue.push(action);
         }
     }
 
@@ -234,7 +234,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                     .param_name = soundgen_var_name->value_,
                     .mixer_soundgen_idx = soundgen->soundgen_id_};
 
-                g_audio_action_queue.push(action);
+                audio_queue.push(action);
             }
         }
     }
@@ -249,7 +249,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             audio_action_queue_item action{.type = AudioAction::MIXER_UPDATE,
                                            .param_name = set_stmt->param_,
                                            .param_val = set_stmt->value_};
-            g_audio_action_queue.push(action);
+            audio_queue.push(action);
             return NULLL;
         }
         auto target = Eval(set_stmt->target_, env);
@@ -263,7 +263,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                            .fx_id = set_stmt->fx_num_,
                                            .param_name = set_stmt->param_,
                                            .param_val = set_stmt->value_};
-            g_audio_action_queue.push(action);
+            audio_queue.push(action);
         }
         else if (target->Type() == "ERROR")
         {
@@ -299,7 +299,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                             .fx_id = set_stmt->fx_num_,
                             .param_name = set_stmt->param_,
                             .param_val = set_stmt->value_};
-                        g_audio_action_queue.push(action);
+                        audio_queue.push(action);
                     }
                 }
             }
@@ -320,7 +320,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                                soundgen->soundgen_id_,
                                            .param_name = "pan",
                                            .param_val = pan_stmt->value_};
-            g_audio_action_queue.push(action);
+            audio_queue.push(action);
         }
     }
 
@@ -333,7 +333,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             audio_action_queue_item action{.type = AudioAction::PREVIEW,
                                            .preview_filename =
                                                play_expr->path_};
-            g_audio_action_queue.push(action);
+            audio_queue.push(action);
         }
     }
 
@@ -343,7 +343,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     {
         audio_action_queue_item action_req{.type = AudioAction::STATUS,
                                            .status_all = ps_expr->all_};
-        g_audio_action_queue.push(action_req);
+        audio_queue.push(action_req);
     }
 
     std::shared_ptr<ast::HelpStatement> help_expr =
@@ -351,7 +351,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     if (help_expr)
     {
         audio_action_queue_item action_req{.type = AudioAction::HELP};
-        g_audio_action_queue.push(action_req);
+        audio_queue.push(action_req);
     }
 
     std::shared_ptr<ast::VolumeStatement> vol_stmt =
@@ -368,7 +368,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                                soundgen->soundgen_id_,
                                            .param_name = "volume",
                                            .param_val = vol_stmt->value_};
-            g_audio_action_queue.push(action);
+            audio_queue.push(action);
         }
     }
 
@@ -1145,7 +1145,7 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
         ev.targets = proc->targets_;
         ev.pattern = pattern->value_;
         ev.funcz = process_funcz;
-        g_event_queue.push(ev);
+        process_event_queue.push(ev);
     }
     else
         std::cout << "Nae PATTERMN!!\n";

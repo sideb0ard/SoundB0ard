@@ -31,9 +31,9 @@
 
 mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
-extern Tsqueue<event_queue_item> g_event_queue;
-extern Tsqueue<std::string> g_reply_queue;
-extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
+extern Tsqueue<event_queue_item> process_event_queue;
+extern Tsqueue<std::string> repl_queue;
+extern Tsqueue<audio_action_queue_item> audio_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -263,13 +263,13 @@ void mixer_ps(mixer *mixr, bool all)
     if (all)
         ss << mixer_status_sgz(mixr, all);
 
-    g_reply_queue.push(ss.str());
+    repl_queue.push(ss.str());
 }
 
 void mixer_help(mixer *mixr)
 {
     std::string strategy = oblique_strategy();
-    g_reply_queue.push(strategy);
+    repl_queue.push(strategy);
 }
 
 // static void mixer_print_notes(mixer *mixr)
@@ -288,7 +288,7 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
     event_queue_item ev;
     ev.type = Event::TIMING_EVENT;
     ev.timing_info = mixr->timing_info;
-    g_event_queue.push(ev);
+    process_event_queue.push(ev);
 
     for (int i = 0; i < mixr->soundgen_num; ++i)
     {
@@ -372,41 +372,41 @@ int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
     audio_action_queue_item action_req{.type = AudioAction::ADD,
                                        .mixer_soundgen_idx = mixr->soundgen_num,
                                        .sg = sg};
-    g_audio_action_queue.push(action_req);
+    audio_queue.push(action_req);
     return mixr->soundgen_num++;
 }
 
 int add_minisynth(mixer *mixr)
 {
-    g_reply_queue.push("Adding a MINISYNTH!\n");
+    repl_queue.push("Adding a MINISYNTH!\n");
     auto ms = std::make_shared<MiniSynth>();
     return add_sound_generator(mixr, ms);
 }
 
 int add_sample(mixer *mixr, std::string sample_path)
 {
-    g_reply_queue.push("Adding a SAMPLE!\n");
+    repl_queue.push("Adding a SAMPLE!\n");
     auto ds = std::make_shared<DrumSampler>(sample_path.data());
     return add_sound_generator(mixr, ds);
 }
 
 int add_digisynth(mixer *mixr, char *filename)
 {
-    g_reply_queue.push("Adding a DIGISYNTH!\n");
+    repl_queue.push("Adding a DIGISYNTH!\n");
     auto ds = std::make_shared<digisynth>(filename);
     return add_sound_generator(mixr, ds);
 }
 
 int add_dxsynth(mixer *mixr)
 {
-    g_reply_queue.push("Adding a DXSYNTH!\n");
+    repl_queue.push("Adding a DXSYNTH!\n");
     auto dx = std::make_shared<dxsynth>();
     return add_sound_generator(mixr, dx);
 }
 
 int add_looper(mixer *mixr, std::string filename, bool loop_mode)
 {
-    g_reply_queue.push("Adding a Granular Looper!\n");
+    repl_queue.push("Adding a Granular Looper!\n");
     auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
     return add_sound_generator(mixr, loopr);
 }
@@ -845,7 +845,7 @@ void mixer_enable_print_midi(mixer *mixr, bool b)
 
 void mixer_check_for_audio_action_queue_messages(mixer *mixr)
 {
-    while (auto action = g_audio_action_queue.try_pop())
+    while (auto action = audio_queue.try_pop())
     {
         if (action)
         {
@@ -994,7 +994,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 {
                     auto sg =
                         mixr->sound_generators_[action->mixer_soundgen_idx];
-                    g_reply_queue.push(sg->Info());
+                    repl_queue.push(sg->Info());
                 }
             }
             else if (action->type == AudioAction ::SAVE_PRESET ||

@@ -21,7 +21,7 @@
 #include <pattern_parser/tokenizer.hpp>
 
 extern mixer *mixr;
-extern Tsqueue<std::string> g_command_queue;
+extern Tsqueue<std::string> interpret_command_queue;
 
 namespace
 {
@@ -156,7 +156,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             std::cout << "GOT TARGET " << t << std::endl;
                             std::stringstream ss;
                             ss << "speed(" << t << "," << multiplier << ")";
-                            g_command_queue.push(ss.str());
+                            interpret_command_queue.push(ss.str());
                         }
                     }
                 }
@@ -183,7 +183,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                            << /* midi middle C */ 60 << "," << e->velocity_
                            << "," << e->duration_ << ")";
 
-                        g_command_queue.push(ss.str());
+                        interpret_command_queue.push(ss.str());
                     }
                 }
                 else if (target_type_ == ProcessPatternTarget::VALUES)
@@ -205,7 +205,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             ss << "noteOn(" << t << "," << midistring << ","
                                << e->velocity_ << "," << e->duration_ << ")";
 
-                            g_command_queue.push(ss.str());
+                            interpret_command_queue.push(ss.str());
                         }
                     }
                 }
@@ -243,7 +243,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             std::string new_cmd =
                                 ReplaceString(command_, "%", events[0]->value_);
 
-                            g_command_queue.push(new_cmd);
+                            interpret_command_queue.push(new_cmd);
                         }
                     }
                 }
@@ -284,7 +284,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 std::string new_cmd =
                     ReplaceString(command_, "%", std::to_string(current_val_));
 
-                g_command_queue.push(new_cmd);
+                interpret_command_queue.push(new_cmd);
             }
         }
     }

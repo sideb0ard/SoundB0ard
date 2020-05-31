@@ -27,10 +27,10 @@
 
 extern mixer *mixr;
 
-Tsqueue<audio_action_queue_item> g_audio_action_queue;
-Tsqueue<std::string> g_command_queue;
-Tsqueue<std::string> g_reply_queue;
-Tsqueue<event_queue_item> g_event_queue;
+Tsqueue<audio_action_queue_item> audio_queue;
+Tsqueue<std::string> interpret_command_queue;
+Tsqueue<std::string> repl_queue;
+Tsqueue<event_queue_item> process_event_queue;
 
 auto global_env = std::make_shared<object::Environment>();
 
@@ -77,7 +77,7 @@ void Interpret(char *line, std::shared_ptr<object::Environment> env)
 
 void *command_queue_thread()
 {
-    while (auto cmd = g_command_queue.pop())
+    while (auto cmd = interpret_command_queue.pop())
     {
         if (cmd)
         {
@@ -89,7 +89,7 @@ void *command_queue_thread()
 
 void *process_worker_thread()
 {
-    while (auto const event = g_event_queue.pop())
+    while (auto const event = process_event_queue.pop())
     {
         if (event)
         {
@@ -173,10 +173,10 @@ int main()
 
     input_thread.join();
 
-    g_event_queue.close();
+    process_event_queue.close();
     worker_thread.join();
 
-    g_command_queue.close();
+    interpret_command_queue.close();
     command_thread.join();
 
     // all done, time to go home

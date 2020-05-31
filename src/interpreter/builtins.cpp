@@ -19,7 +19,7 @@
 #include <utils.h>
 
 extern mixer *mixr;
-extern Tsqueue<audio_action_queue_item> g_audio_action_queue;
+extern Tsqueue<audio_action_queue_item> audio_queue;
 
 namespace builtin
 {
@@ -225,7 +225,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        -> std::shared_ptr<object::Object> {
                        audio_action_queue_item action_req{
                            .type = AudioAction::NOTE_ON, .args = args};
-                       g_audio_action_queue.push(action_req);
+                       audio_queue.push(action_req);
                        return evaluator::NULLL;
                    })},
     {"speed", std::make_shared<object::BuiltIn>(
@@ -234,7 +234,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       std::cout << "INBUILT SPEED CALLED!" << std::endl;
                       audio_action_queue_item action_req{
                           .type = AudioAction::SPEED, .args = args};
-                      g_audio_action_queue.push(action_req);
+                      audio_queue.push(action_req);
                       return evaluator::NULLL;
                   })},
     {"addFx", std::make_shared<object::BuiltIn>(
@@ -245,7 +245,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       {
                           audio_action_queue_item action_req{
                               .type = AudioAction::ADD_FX, .args = args};
-                          g_audio_action_queue.push(action_req);
+                          audio_queue.push(action_req);
                       }
                       return evaluator::NULLL;
                   })},
@@ -277,7 +277,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         // args.push_back(cmd_name);
                         // audio_action_queue_item action_req{
                         //    .type = AudioAction::SAVE_PRESET, .args = args};
-                        // g_audio_action_queue.push(action_req);
+                        // audio_queue.push(action_req);
                     }
                     return evaluator::NULLL;
                 })},
@@ -292,7 +292,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  args.push_back(cmd_name);
                  audio_action_queue_item action_req{
                      .type = AudioAction::LOAD_PRESET, .args = args};
-                 g_audio_action_queue.push(action_req);
+                 audio_queue.push(action_req);
              }
              return evaluator::NULLL;
          })},
@@ -307,7 +307,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  args.push_back(cmd_name);
                  audio_action_queue_item action_req{
                      .type = AudioAction::SAVE_PRESET, .args = args};
-                 g_audio_action_queue.push(action_req);
+                 audio_queue.push(action_req);
              }
              return evaluator::NULLL;
          })},
@@ -327,7 +327,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  audio_action_queue_item action_req{.mixer_soundgen_idx =
                                                         soundgen->soundgen_id_,
                                                     .type = AudioAction::RAND};
-                 g_audio_action_queue.push(action_req);
+                 audio_queue.push(action_req);
                  return evaluator::NULLL;
              }
 

@@ -23,8 +23,8 @@
 #include <value_generator_cmds.h>
 
 extern mixer *mixr;
-extern Tsqueue<std::string> g_command_queue;
-extern Tsqueue<std::string> g_reply_queue;
+extern Tsqueue<std::string> interpret_command_queue;
+extern Tsqueue<std::string> repl_queue;
 
 extern char *key_names[NUM_KEYS];
 
@@ -40,7 +40,7 @@ static bool active{true};
 
 int event_hook()
 {
-    while (auto reply = g_reply_queue.try_pop())
+    while (auto reply = repl_queue.try_pop())
     {
         if (reply)
         {
@@ -70,7 +70,7 @@ void *loopy()
                 add_history(line);
                 strncpy(last_line, line, MAXLINE);
             }
-            g_command_queue.push(line);
+            interpret_command_queue.push(line);
         }
         free(line);
     }
