@@ -146,6 +146,19 @@ class IfExpression : public Expression
     std::shared_ptr<BlockStatement> alternative_;
 };
 
+class EveryExpression : public Expression
+{
+  public:
+    EveryExpression() {}
+    explicit EveryExpression(Token token) : Expression{token} {}
+    std::string String() const override;
+
+  public:
+    ast::TimingEventType event_type_;
+    int64_t frequency_;
+    std::shared_ptr<BlockStatement> body_;
+};
+
 class FunctionLiteral : public Expression
 {
   public:

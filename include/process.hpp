@@ -27,7 +27,8 @@ class Process
                 float loop_len, std::string command,
                 ProcessPatternTarget target_type,
                 std::vector<std::string> targets, std::string pattern,
-                std::vector<std::shared_ptr<PatternFunction>> funcz);
+                std::vector<std::shared_ptr<PatternFunction>> funcz,
+                mixer_timing_info tinfo);
     void
     EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
                 int target_start, int target_end);
@@ -54,6 +55,9 @@ class Process
 
     std::string pattern_;
 
+    bool started_;
+    bool reached_start_;
+    bool reached_end_;
     bool active_;
     bool debug_;
 
@@ -61,6 +65,10 @@ class Process
     std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
         pattern_events_;
+    std::array<bool, PPBAR> pattern_events_played_ = {}; // for slow speed
+    float cur_event_idx_ = 0;
+    float event_incr_speed_ = 1;
+
     std::vector<std::shared_ptr<PatternFunction>> pattern_functions_;
     int loop_counter_;
 };

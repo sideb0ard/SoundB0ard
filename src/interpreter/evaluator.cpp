@@ -991,6 +991,7 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
     }
     else if (func->token_.literal_ == "every")
     {
+        std::cout << "EVERY YO!\n";
         auto intval =
             std::dynamic_pointer_cast<ast::NumberLiteral>(func->arguments_[0]);
         if (!intval)
@@ -1001,9 +1002,12 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
 
         auto func_arg_ast = std::make_shared<ast::PatternFunctionExpression>(
             func->arguments_[1]->token_);
+        std::cout << "MY ARGS[1] TOPKEN is " << func->arguments_[1]->token_
+                  << std::endl;
 
         if (func_arg_ast)
         {
+            std::cout << "GOT A FUNC ARG FOR MY EVERY FUNC!\n";
             int args_size = func->arguments_.size();
             if (args_size > 2)
             {
@@ -1013,6 +1017,7 @@ EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> funct)
             auto func_arg = EvalPatternFunctionExpression(func_arg_ast);
             if (func_arg)
             {
+                std::cout << "MA EVERY IS HAPPY, GOT A VAL AND A FUNC\n";
                 auto p_every =
                     std::make_shared<PatternEvery>(intval->value_, func_arg);
                 return p_every;

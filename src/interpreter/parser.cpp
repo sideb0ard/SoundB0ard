@@ -596,6 +596,12 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseArrayLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACE)
         return ParseHashLiteral();
+    else if (cur_token_.type_ == token::SLANG_EVERY)
+        return ParseEveryExpression();
+    else if (cur_token_.type_ == token::SLANG_REV ||
+             cur_token_.type_ == token::SLANG_ROTATE_LEFT ||
+             cur_token_.type_ == token::SLANG_ROTATE_RIGHT)
+        return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
 
     return nullptr;
 }
@@ -684,6 +690,15 @@ std::shared_ptr<ast::Expression> Parser::ParseIfExpression()
 
         expression->alternative_ = ParseBlockStatement();
     }
+
+    return expression;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseEveryExpression()
+{
+    std::cout << "Parse EVERY\n";
+    ShowTokens();
+    auto expression = std::make_shared<ast::EveryExpression>(cur_token_);
 
     return expression;
 }

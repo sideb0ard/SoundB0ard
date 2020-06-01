@@ -208,6 +208,14 @@ std::string IfExpression::String() const
     return ss.str();
 }
 
+std::string EveryExpression::String() const
+{
+    std::stringstream ss;
+    ss << "every " << frequency_ << " " << (int)event_type_ << body_->String();
+
+    return ss.str();
+}
+
 std::string FunctionLiteral::String() const
 {
     std::stringstream ss;

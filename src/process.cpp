@@ -55,9 +55,12 @@ void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
                      float loop_len, std::string command,
                      ProcessPatternTarget target_type,
                      std::vector<std::string> targets, std::string pattern,
-                     std::vector<std::shared_ptr<PatternFunction>> funcz)
+                     std::vector<std::shared_ptr<PatternFunction>> funcz,
+                     mixer_timing_info tinfo)
 {
     active_ = false;
+    started_ = false;
+    reached_end_ = false;
     process_type_ = process_type;
     timer_type_ = timer_type;
     loop_len_ = loop_len;
@@ -105,8 +108,16 @@ void Process::EventNotify(mixer_timing_info tinfo)
     {
         if (tinfo.is_start_of_loop)
         {
+            if (!started_)
+            {
+                started_ = true;
+                cur_event_idx_ = 0;
+            }
+
             for (int i = 0; i < PPBAR; i++)
+            {
                 pattern_events_[i].clear();
+            }
             EvalPattern(pattern_root_, 0, PPBAR);
 
             for (auto &f : pattern_functions_)
@@ -116,8 +127,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 {
                     f->TransformPattern(pattern_events_, loop_counter_, tinfo);
                 }
-                else if (f->func_type_ ==
-                             PatternFunctionType::SOUNDGENERATOR_OP &&
+                else if (f->func_type_ == PatternFunctionType::PROCESS_OP &&
                          f->active_)
                 {
                     auto speed_func =
@@ -127,37 +137,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                         float multiplier = speed_func->speed_multiplier_;
                         std::cout << "SPEEEEED! MULTIPLIER - " << multiplier
                                   << "\n";
-                        std::set<std::string> targets;
-                        if (target_type_ == ProcessPatternTarget::ENV)
-                        {
-                            for (int i = 0; i < PPBAR; i++)
-                            {
-                                if (pattern_events_[i].size() > 0)
-                                {
-                                    std::vector<std::shared_ptr<MusicalEvent>>
-                                        &events = pattern_events_[i];
-                                    for (auto e : events)
-                                    {
-                                        if (e->value_ ==
-                                            "~") // skip blank markers
-                                            continue;
-                                        targets.insert(e->value_);
-                                    }
-                                }
-                            }
-                        }
-                        else if (target_type_ == ProcessPatternTarget::VALUES)
-                        {
-                            for (auto t : targets_)
-                                targets.insert(t);
-                        }
-                        for (auto t : targets)
-                        {
-                            std::cout << "GOT TARGET " << t << std::endl;
-                            std::stringstream ss;
-                            ss << "speed(" << t << "," << multiplier << ")";
-                            interpret_command_queue.push(ss.str());
-                        }
+                        event_incr_speed_ = multiplier;
                     }
                 }
             }
@@ -165,47 +145,83 @@ void Process::EventNotify(mixer_timing_info tinfo)
 
         if (tinfo.is_midi_tick)
         {
-            int cur_tick = tinfo.midi_tick % PPBAR;
-            if (pattern_events_[cur_tick].size() > 0)
+            if (!started_)
+                return;
+            // int cur_tick = tinfo.midi_tick % PPBAR;
+
+            int cur_tick = (int)cur_event_idx_;
+            // increment for next step
+            cur_event_idx_ = fmodf(cur_event_idx_ + event_incr_speed_, PPBAR);
+
+            if (cur_tick % PPQN == 0 && started_)
             {
+                std::cout << "ORIG_TICK:" << tinfo.midi_tick % PPBAR
+                          << " NEW_IDX:" << cur_tick
+                          << " NEXT_IDX:" << cur_event_idx_ << std::endl;
+            }
 
-                std::vector<std::shared_ptr<MusicalEvent>> &events =
-                    pattern_events_[cur_tick];
-
-                if (target_type_ == ProcessPatternTarget::ENV)
+            for (int i = cur_tick; i < cur_event_idx_; i++)
+            {
+                int next_idx = (int)cur_event_idx_;
+                if (i == 0)
                 {
-                    for (auto e : events)
+                    if ((next_idx - i) >= 1)
                     {
-                        if (e->value_ == "~") // skip blank markers
-                            continue;
-                        std::stringstream ss;
-                        ss << "noteOn(" << e->value_ << ","
-                           << /* midi middle C */ 60 << "," << e->velocity_
-                           << "," << e->duration_ << ")";
-
-                        interpret_command_queue.push(ss.str());
+                        std::cout << "TIME TO RESET:" << next_idx << "\n";
+                        for (int j = 0; j < PPBAR; j++)
+                            pattern_events_played_[j] = false;
+                    }
+                    else
+                    {
+                        std::cout << "next ios?:" << next_idx << std::endl;
                     }
                 }
-                else if (target_type_ == ProcessPatternTarget::VALUES)
-                {
-                    for (auto e : events)
-                    {
-                        if (e->value_ == "~") // skip blank markers
-                            continue;
-                        for (auto t : targets_)
-                        {
-                            std::string midistring = e->value_;
-                            if (IsNote(e->value_))
-                            {
-                                midistring = std::to_string(
-                                    get_midi_note_from_string(&e->value_[0]));
-                            }
 
+                if (pattern_events_[i].size() > 0 && !pattern_events_played_[i])
+                {
+                    pattern_events_played_[i] = true;
+                    std::cout << "BOOM!\n";
+
+                    std::vector<std::shared_ptr<MusicalEvent>> &events =
+                        pattern_events_[i];
+
+                    if (target_type_ == ProcessPatternTarget::ENV)
+                    {
+                        for (auto e : events)
+                        {
+                            if (e->value_ == "~") // skip blank markers
+                                continue;
                             std::stringstream ss;
-                            ss << "noteOn(" << t << "," << midistring << ","
-                               << e->velocity_ << "," << e->duration_ << ")";
+                            ss << "noteOn(" << e->value_ << ","
+                               << /* midi middle C */ 60 << "," << e->velocity_
+                               << "," << e->duration_ << ")";
 
                             interpret_command_queue.push(ss.str());
+                        }
+                    }
+                    else if (target_type_ == ProcessPatternTarget::VALUES)
+                    {
+                        for (auto e : events)
+                        {
+                            if (e->value_ == "~") // skip blank markers
+                                continue;
+                            for (auto t : targets_)
+                            {
+                                std::string midistring = e->value_;
+                                if (IsNote(e->value_))
+                                {
+                                    midistring = std::to_string(
+                                        get_midi_note_from_string(
+                                            &e->value_[0]));
+                                }
+
+                                std::stringstream ss;
+                                ss << "noteOn(" << t << "," << midistring << ","
+                                   << e->velocity_ << "," << e->duration_
+                                   << ")";
+
+                                interpret_command_queue.push(ss.str());
+                            }
                         }
                     }
                 }

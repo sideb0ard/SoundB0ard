@@ -28,7 +28,8 @@ TEST_F(PatternFunctionsTest, Test)
     std::cout << "[BEFORE] Size of EVENTS:" << events[0].size() << std::endl;
 
     PatternPowerChord pfunk;
-    pfunk.TransformPattern(events, 1);
+    mixer_timing_info tinfo;
+    pfunk.TransformPattern(events, 1, tinfo);
 
     EXPECT_EQ(2, events[0].size());
 

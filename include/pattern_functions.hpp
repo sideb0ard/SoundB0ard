@@ -22,7 +22,7 @@ enum ArpSpeed
 enum PatternFunctionType
 {
     PATTERN_OP,
-    SOUNDGENERATOR_OP,
+    PROCESS_OP,
 };
 
 class PatternFunction
@@ -205,7 +205,7 @@ class PatternSpeed : public PatternFunction
 {
   public:
     PatternSpeed(double speed)
-        : PatternFunction(PatternFunctionType::SOUNDGENERATOR_OP),
+        : PatternFunction(PatternFunctionType::PROCESS_OP),
           speed_multiplier_{speed} {};
     void TransformPattern(
         std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR> &events,

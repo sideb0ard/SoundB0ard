@@ -114,7 +114,7 @@ void *process_worker_thread()
                     mixr->processes_[event->target_process_id]->Update(
                         event->process_type, event->timer_type, event->loop_len,
                         event->command, event->target_type, event->targets,
-                        event->pattern, event->funcz);
+                        event->pattern, event->funcz, event->timing_info);
                 }
                 else
                 {
