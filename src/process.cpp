@@ -60,6 +60,8 @@ void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
 {
     active_ = false;
     started_ = false;
+    for (int j = 0; j < PPBAR; j++)
+        pattern_events_played_[j] = true;
     reached_end_ = false;
     process_type_ = process_type;
     timer_type_ = timer_type;
@@ -135,8 +137,6 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     if (speed_func)
                     {
                         float multiplier = speed_func->speed_multiplier_;
-                        std::cout << "SPEEEEED! MULTIPLIER - " << multiplier
-                                  << "\n";
                         event_incr_speed_ = multiplier;
                     }
                 }
@@ -145,20 +145,12 @@ void Process::EventNotify(mixer_timing_info tinfo)
 
         if (tinfo.is_midi_tick)
         {
-            if (!started_)
-                return;
-            // int cur_tick = tinfo.midi_tick % PPBAR;
+            // if (!started_)
+            //    return;
 
             int cur_tick = (int)cur_event_idx_;
             // increment for next step
             cur_event_idx_ = fmodf(cur_event_idx_ + event_incr_speed_, PPBAR);
-
-            if (cur_tick % PPQN == 0 && started_)
-            {
-                std::cout << "ORIG_TICK:" << tinfo.midi_tick % PPBAR
-                          << " NEW_IDX:" << cur_tick
-                          << " NEXT_IDX:" << cur_event_idx_ << std::endl;
-            }
 
             for (int i = cur_tick; i < cur_event_idx_; i++)
             {
@@ -167,20 +159,14 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 {
                     if ((next_idx - i) >= 1)
                     {
-                        std::cout << "TIME TO RESET:" << next_idx << "\n";
                         for (int j = 0; j < PPBAR; j++)
                             pattern_events_played_[j] = false;
-                    }
-                    else
-                    {
-                        std::cout << "next ios?:" << next_idx << std::endl;
                     }
                 }
 
                 if (pattern_events_[i].size() > 0 && !pattern_events_played_[i])
                 {
                     pattern_events_played_[i] = true;
-                    std::cout << "BOOM!\n";
 
                     std::vector<std::shared_ptr<MusicalEvent>> &events =
                         pattern_events_[i];

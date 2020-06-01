@@ -66,8 +66,8 @@ class Process
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
         pattern_events_;
     std::array<bool, PPBAR> pattern_events_played_ = {}; // for slow speed
-    float cur_event_idx_ = 0;
-    float event_incr_speed_ = 1;
+    float cur_event_idx_{0};
+    float event_incr_speed_{1};
 
     std::vector<std::shared_ptr<PatternFunction>> pattern_functions_;
     int loop_counter_;
