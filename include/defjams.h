@@ -253,8 +253,6 @@ typedef struct mixer_timing_info
     bool is_third;
     bool is_midi_tick;
 
-    int sound_gen_cur_positions[MAX_NUM_SOUND_GENERATORS] = {0};
-
 } mixer_timing_info;
 
 typedef struct chord_midi_notes

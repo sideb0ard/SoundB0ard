@@ -540,9 +540,6 @@ int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
                         mixr->sound_generators_[i]->genNext();
                     output_left += mixr->soundgen_cur_val[i].left;
                     output_right += mixr->soundgen_cur_val[i].right;
-
-                    mixr->timing_info.sound_gen_cur_positions[i] =
-                        mixr->sound_generators_[i]->GetCurrentStep();
                 }
             }
         }
