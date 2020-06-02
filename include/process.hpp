@@ -22,6 +22,7 @@ class Process
     void Stop();
     void EventNotify(mixer_timing_info);
     void SetDebug(bool b);
+    void SetSpeed(float val);
     void ParsePattern();
     void Update(ProcessType process_type, ProcessTimerType timer_type,
                 float loop_len, std::string command,

@@ -500,6 +500,7 @@ void Process::Start() { active_ = true; }
 void Process::Stop() { active_ = false; }
 
 void Process::SetDebug(bool b) { debug_ = b; }
+void Process::SetSpeed(float val) { event_incr_speed_ = val; }
 
 void Process::AppendPatternFunction(std::shared_ptr<PatternFunction> func)
 {

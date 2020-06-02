@@ -1009,36 +1009,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 char *fname = action->preview_filename.data();
                 mixer_preview_audio(mixr, fname);
             }
-            else if (action->type == AudioAction ::SPEED)
-            {
-                std::cout << "YO - MIXER DEALING WITH SPEED!\n";
-                auto args = action->args;
-                int args_size = args.size();
-                if (args_size == 2)
-                {
-                    std::cout << "WE GOOD!\n";
-                    auto soundgen =
-                        std::dynamic_pointer_cast<object::SoundGenerator>(
-                            args[0]);
-                    if (soundgen)
-                    {
-                        if (mixer_is_valid_soundgen_num(mixr,
-                                                        soundgen->soundgen_id_))
-                        {
-                            auto sg =
-                                mixr->sound_generators_[soundgen->soundgen_id_];
-                            auto val_object =
-                                std::dynamic_pointer_cast<object::Number>(
-                                    args[1]);
-
-                            if (!val_object)
-                                return;
-
-                            auto speed_multi = val_object->value_;
-                        }
-                    }
-                }
-            }
         }
     }
 }

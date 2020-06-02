@@ -18,7 +18,6 @@ enum AudioAction
     PREVIEW,
     RAND,
     SAVE_PRESET,
-    SPEED,
     STATUS,
     UPDATE,
     MIXER_UPDATE,
