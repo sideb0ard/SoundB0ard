@@ -263,5 +263,3 @@ bool SoundGenerator::IsStepper()
         return true;
     return false;
 }
-
-int SoundGenerator::GetCurrentStep() { return engine.cur_step; }

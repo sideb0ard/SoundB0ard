@@ -48,10 +48,6 @@ class SoundGenerator
     void SetPan(double val);
     double GetPan();
 
-    // index of pattern array - actually from sequence engine
-    // using it for Steve Reichian phase so i know when to stop
-    int GetCurrentStep();
-
   public:
     sound_generator_type type;
 
