@@ -114,12 +114,11 @@ void Process::EventNotify(mixer_timing_info tinfo)
             {
                 started_ = true;
                 cur_event_idx_ = 0;
+                event_incr_speed_ = 1;
             }
 
             for (int i = 0; i < PPBAR; i++)
-            {
                 pattern_events_[i].clear();
-            }
             EvalPattern(pattern_root_, 0, PPBAR);
 
             for (auto &f : pattern_functions_)
@@ -135,18 +134,15 @@ void Process::EventNotify(mixer_timing_info tinfo)
                     auto speed_func =
                         std::dynamic_pointer_cast<PatternSpeed>(f);
                     if (speed_func)
-                    {
-                        float multiplier = speed_func->speed_multiplier_;
-                        event_incr_speed_ = multiplier;
-                    }
+                        event_incr_speed_ = speed_func->speed_multiplier_;
                 }
             }
         }
 
         if (tinfo.is_midi_tick)
         {
-            // if (!started_)
-            //    return;
+            if (!started_)
+                return;
 
             int cur_tick = (int)cur_event_idx_;
             // increment for next step
