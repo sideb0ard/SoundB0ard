@@ -596,12 +596,9 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseArrayLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACE)
         return ParseHashLiteral();
-    else if (cur_token_.type_ == token::SLANG_EVERY)
-        return ParseEveryExpression();
-    else if (cur_token_.type_ == token::SLANG_REV ||
-             cur_token_.type_ == token::SLANG_ROTATE_LEFT ||
-             cur_token_.type_ == token::SLANG_ROTATE_RIGHT)
+    {
         return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
+    }
 
     return nullptr;
 }
@@ -839,7 +836,6 @@ std::shared_ptr<ast::Expression> Parser::ParseSampleExpression()
 void Parser::ConsumePatternFunctions(
     std::shared_ptr<ast::ProcessStatement> proc)
 {
-
     // discard pipe '|'
     NextToken();
 
@@ -855,7 +851,6 @@ void Parser::ConsumePatternFunctions(
             func->arguments_.push_back(expr);
         NextToken();
     }
-
     proc->functions_.push_back(func);
 }
 
@@ -888,7 +883,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
         if (!ExpectPeek(token::SLANG_IDENT))
         {
-            std::cout << "NO IDENT! - returning nullptr \n";
+            std::cerr << "NO IDENT! - returning nullptr \n";
             return nullptr;
         }
         auto target =
@@ -911,7 +906,6 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
     }
     else if (PeekTokenIs(token::SLANG_LT))
     {
-        std::cout << "COMMAND PROCESS!!\n";
         process->process_type_ = COMMAND_PROCESS;
         NextToken();
         if (!PeekTokenIsPatternCommandTimerType())
@@ -929,24 +923,21 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
             process->process_timer_type_ = ProcessTimerType::OVER;
         else if (cur_token_.type_ == token::SLANG_RAMP)
             process->process_timer_type_ = ProcessTimerType::RAMP;
+        // else is checked for above in the PeekTokenIsPatternCommandTimerType()
+
         NextToken();
-        std::cout << " I GOT : " << cur_token_ << std::endl;
         if (!CurTokenIs(token::SLANG_NUMBER))
         {
             std::cerr << "Need a NUMBER after timer type\n";
             return nullptr;
         }
-        std::cout << "LITERAL:" << std::stod(cur_token_.literal_) << std::endl;
 
         process->loop_len_ = std::stof(cur_token_.literal_);
-        std::cout << "NOW SET: " << process->loop_len_ << std::endl;
         NextToken();
 
-        std::cout << "EYE I GOT : " << cur_token_ << std::endl;
-        // process->pattern_ = ParseStringLiteral();
         process->pattern_ = ParseExpression(Precedence::PREFIX);
         NextToken();
-        std::cout << "NOW EYE I GOT : " << cur_token_ << std::endl;
+
         process->command_ = cur_token_.literal_;
         NextToken();
     }

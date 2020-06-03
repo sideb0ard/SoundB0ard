@@ -85,10 +85,6 @@ const TokenType SLANG_DOLLAR = "$"; // environment vars in pattern
 const TokenType SLANG_HASH = "#";   // values in pattern, targets follow
 
 const TokenType SLANG_PIPE = "|"; // separtes pattern functions from pattern
-// pattern functions
-const TokenType SLANG_REV = "REVERSE";
-const TokenType SLANG_ROTATE_LEFT = "ROTATE LEFT";
-const TokenType SLANG_ROTATE_RIGHT = "ROTATE RIGHT";
 
 class Token
 {
