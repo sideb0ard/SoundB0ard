@@ -23,6 +23,7 @@
 
 #include <audio_action_queue.h>
 #include <event_queue.h>
+#include <process.hpp>
 #include <tsqueue.hpp>
 
 extern mixer *mixr;
@@ -111,10 +112,15 @@ void *process_worker_thread()
                 if (event->target_process_id >= 0 &&
                     event->target_process_id < MAX_NUM_PROC)
                 {
-                    mixr->processes_[event->target_process_id]->Update(
-                        event->process_type, event->timer_type, event->loop_len,
-                        event->command, event->target_type, event->targets,
-                        event->pattern, event->funcz, event->timing_info);
+                    ProcessConfig config = {
+                        event->process_type, event->timer_type,
+                        event->loop_len,     event->command,
+                        event->target_type,  event->targets,
+                        event->pattern,      event->funcz,
+                        event->timing_info};
+
+                    mixr->processes_[event->target_process_id]->EnqueueUpdate(
+                        config);
                 }
                 else
                 {

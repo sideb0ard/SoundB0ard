@@ -12,6 +12,19 @@
 #include <pattern_parser/tokenizer.hpp>
 #include <sequenceengine.h>
 
+struct ProcessConfig
+{
+    ProcessType process_type;
+    ProcessTimerType timer_type;
+    float loop_len;
+    std::string command;
+    ProcessPatternTarget target_type;
+    std::vector<std::string> targets;
+    std::string pattern;
+    std::vector<std::shared_ptr<PatternFunction>> funcz;
+    mixer_timing_info tinfo;
+};
+
 class Process
 {
   public:
@@ -24,18 +37,17 @@ class Process
     void SetDebug(bool b);
     void SetSpeed(float val);
     void ParsePattern();
-    void Update(ProcessType process_type, ProcessTimerType timer_type,
-                float loop_len, std::string command,
-                ProcessPatternTarget target_type,
-                std::vector<std::string> targets, std::string pattern,
-                std::vector<std::shared_ptr<PatternFunction>> funcz,
-                mixer_timing_info tinfo);
+    void EnqueueUpdate(ProcessConfig config);
+    void Update();
     void
     EvalPattern(std::shared_ptr<pattern_parser::PatternNode> const &pattern,
                 int target_start, int target_end);
     void AppendPatternFunction(std::shared_ptr<PatternFunction> func);
 
   public:
+    ProcessConfig pending_config_;
+    bool update_pending_;
+
     ProcessType process_type_{ProcessType::NO_PROCESS_TYPE};
 
     // Command Process Vars
@@ -57,8 +69,6 @@ class Process
     std::string pattern_;
 
     bool started_;
-    bool reached_start_;
-    bool reached_end_;
     bool active_;
     bool debug_;
 

@@ -51,25 +51,28 @@ void Process::ParsePattern()
     pattern_root_ = new_pattern_root;
 }
 
-void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
-                     float loop_len, std::string command,
-                     ProcessPatternTarget target_type,
-                     std::vector<std::string> targets, std::string pattern,
-                     std::vector<std::shared_ptr<PatternFunction>> funcz,
-                     mixer_timing_info tinfo)
+void Process::EnqueueUpdate(ProcessConfig config)
+{
+    active_ = true;
+    pending_config_ = config;
+    update_pending_ = true;
+}
+
+void Process::Update()
 {
     active_ = false;
     started_ = false;
+
     for (int j = 0; j < PPBAR; j++)
         pattern_events_played_[j] = true;
-    reached_end_ = false;
-    process_type_ = process_type;
-    timer_type_ = timer_type;
-    loop_len_ = loop_len;
-    command_ = command;
-    target_type_ = target_type;
-    targets_ = targets;
-    pattern_ = pattern;
+
+    process_type_ = pending_config_.process_type;
+    timer_type_ = pending_config_.timer_type;
+    loop_len_ = pending_config_.loop_len;
+    command_ = pending_config_.command;
+    target_type_ = pending_config_.target_type;
+    targets_ = pending_config_.targets;
+    pattern_ = pending_config_.pattern;
 
     ParsePattern();
 
@@ -93,7 +96,7 @@ void Process::Update(ProcessType process_type, ProcessTimerType timer_type,
 
     for (auto &oldfz : pattern_functions_)
         oldfz->active_ = false;
-    for (auto fz : funcz)
+    for (auto fz : pending_config_.funcz)
         pattern_functions_.push_back(fz);
     active_ = true;
 }
@@ -104,6 +107,12 @@ void Process::EventNotify(mixer_timing_info tinfo)
 {
     if (!active_)
         return;
+
+    if (tinfo.is_start_of_loop && update_pending_)
+    {
+        Update();
+        update_pending_ = false;
+    }
 
     // PATTERN_PROCESS i.e. '#' or '$'
     if (process_type_ == PATTERN_PROCESS)
