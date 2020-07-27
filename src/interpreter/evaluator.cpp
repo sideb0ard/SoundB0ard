@@ -464,6 +464,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             return std::make_shared<object::MoogSynth>();
         else if (synth->token_.type_ == token::SLANG_FM_SYNTH)
             return std::make_shared<object::FMSynth>();
+        else if (synth->token_.type_ == token::SLANG_DRUM_SYNTH)
+            return std::make_shared<object::DrumSynth>();
     }
 
     std::shared_ptr<ast::SynthPresetExpression> synth_preset =
@@ -1121,7 +1123,8 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
                      std::shared_ptr<object::Environment> env)
 {
     auto pattern_obj = Eval(proc->pattern_, env);
-    if (pattern_obj->Type() == "STRING")
+    if (pattern_obj->Type() == "STRING" ||
+        proc->process_timer_type_ == ProcessTimerType::WHILE)
     {
         auto pattern = std::dynamic_pointer_cast<object::String>(pattern_obj);
 
@@ -1144,11 +1147,14 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
         ev.target_type = proc->target_type_;
         ev.targets = proc->targets_;
         ev.pattern = pattern->value_;
+        ev.while_condition = proc->while_condition_;
+        ev.while_body = proc->while_body_;
+        ev.while_then_body = proc->while_then_body_;
         ev.funcz = process_funcz;
         process_event_queue.push(ev);
     }
     else
-        std::cout << "Nae PATTERMN!!\n";
+        std::cout << "Nae PATTERMN!! its a " << pattern_obj->Type() << "\n";
 
     return NULLL;
 } // namespace evaluator

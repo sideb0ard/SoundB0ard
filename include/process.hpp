@@ -72,10 +72,18 @@ class Process
     bool active_;
     bool debug_;
 
+    // While varz
+    std::string while_condition_;
+    std::string while_body_;
+    std::string while_then_body_;
+    // Expression
+
   private:
     std::shared_ptr<pattern_parser::PatternNode> pattern_root_;
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>
         pattern_events_;
+
+    // speed controls
     std::array<bool, PPBAR> pattern_events_played_ = {}; // for slow speed
     float cur_event_idx_{0};
     float event_incr_speed_{1};

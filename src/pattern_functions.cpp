@@ -514,9 +514,9 @@ void PatternBump::TransformPattern(
 
         for (int j = 0; j < PPSIXTEENTH; j++)
         {
-            int cur_index = cur_sixteenth_idx + j;
+            int cur_index = (cur_sixteenth_idx + j) % PPBAR;
             if (events[cur_index].size() != 0)
-                new_events[cur_index + bump] = events[cur_index];
+                new_events[(cur_index + bump) % PPBAR] = events[cur_index];
         }
     }
     events = new_events;

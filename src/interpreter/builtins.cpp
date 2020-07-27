@@ -14,7 +14,6 @@
 #include <keys.h>
 #include <midi_cmds.h>
 #include <mixer.h>
-#include <mixer_cmds.h>
 #include <tsqueue.hpp>
 #include <utils.h>
 

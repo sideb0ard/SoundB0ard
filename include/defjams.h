@@ -192,6 +192,7 @@ enum ProcessTimerType
     OSCILLATE,
     OVER,
     RAMP,
+    WHILE,
 };
 
 enum ProcessPatternTarget

@@ -13,7 +13,6 @@
 #include <cmdloop.h>
 #include <midi_cmds.h>
 #include <mixer.h>
-#include <mixer_cmds.h>
 #include <new_item_cmds.h>
 #include <obliquestrategies.h>
 #include <stepper_cmds.h>

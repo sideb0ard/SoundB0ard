@@ -89,6 +89,10 @@ MoogSynth::MoogSynth() { soundgen_id_ = add_minisynth(mixr); }
 std::string MoogSynth::Inspect() { return "Moog synth."; }
 ObjectType MoogSynth::Type() { return SYNTH_OBJ; }
 
+DrumSynth::DrumSynth() { soundgen_id_ = add_drumsynth(mixr); }
+std::string DrumSynth::Inspect() { return "Drum synth."; }
+ObjectType DrumSynth::Type() { return SYNTH_OBJ; }
+
 Sample::Sample(std::string sample_path)
 {
     soundgen_id_ = add_sample(mixr, sample_path);

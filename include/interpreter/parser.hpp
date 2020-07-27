@@ -63,6 +63,8 @@ class Parser
     std::shared_ptr<ast::PanStatement> ParsePanStatement();
     std::shared_ptr<ast::PlayStatement> ParsePlayStatement();
     std::shared_ptr<ast::ProcessStatement> ParseProcessStatement();
+    std::shared_ptr<ast::ProcessStatement>
+    ParseWhileProcess(std::shared_ptr<ast::ProcessStatement> proc);
     void ConsumePatternFunctions(std::shared_ptr<ast::ProcessStatement> proc);
     std::shared_ptr<ast::VolumeStatement> ParseVolumeStatement();
 
