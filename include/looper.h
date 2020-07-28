@@ -185,6 +185,10 @@ class looper : public SoundGenerator
 
     int cur_sixteenth; // used to track scramble
 
+    // TODO - need a reset i would guess
+    double incr_speed_{1};
+    double cur_midi_idx_{0};
+
     bool debug_pending;
 };
 
@@ -193,6 +197,7 @@ void looper_set_gate_mode(looper *g, bool b);
 
 int looper_calculate_grain_spacing(looper *g);
 void looper_set_grain_pitch(looper *g, double pitch);
+void looper_set_incr_speed(looper *g, double speed);
 void looper_set_grain_duration(looper *g, int dur);
 void looper_set_grain_density(looper *g, int gps);
 void looper_set_grain_attack_size_pct(looper *g, int att);

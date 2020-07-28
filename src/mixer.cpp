@@ -376,6 +376,13 @@ int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
     return mixr->soundgen_num++;
 }
 
+int add_drumsynth(mixer *mixr)
+{
+    repl_queue.push("Adding a DRUM SYNTH!\n");
+    auto ds = std::make_shared<DrumSynth>();
+    return add_sound_generator(mixr, ds);
+}
+
 int add_minisynth(mixer *mixr)
 {
     repl_queue.push("Adding a MINISYNTH!\n");

@@ -82,16 +82,29 @@ looper::looper(char *filename, bool loop_mode)
 void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
 {
     // need to read cur_step before calling SoundGenerator::eventNotify
-    int cur_sixteenth_midi_base = engine.cur_step * PPSIXTEENTH;
-    if (cur_sixteenth_midi_base < 0)
-        cur_sixteenth_midi_base = 0;
-    int cur_midi_idx =
-        (cur_sixteenth_midi_base + (mixr->timing_info.midi_tick % PPSIXTEENTH));
+    //  int cur_sixteenth_midi_base = engine.cur_step * PPSIXTEENTH;
+    //  if (cur_sixteenth_midi_base < 0)
+    //      cur_sixteenth_midi_base = 0;
+    //  int cur_midi_idx =
+    //      (cur_sixteenth_midi_base + (mixr->timing_info.midi_tick %
+    //      PPSIXTEENTH));
 
-    SoundGenerator::eventNotify(event, tinfo);
+    //  SoundGenerator::eventNotify(event, tinfo);
+
+    if (tinfo.is_midi_tick)
+    {
+        if (started)
+        {
+            // increment for next step
+            cur_midi_idx_ = fmodf(cur_midi_idx_ + incr_speed_, PPBAR);
+            // std::cout << "CUR+IDX:" << cur_midi_idx_ << std::endl;
+        }
+    }
 
     if (tinfo.is_start_of_loop)
     {
+        // std::cout << "START OF LOOP< YO\n";
+        started = true;
         loop_counter++;
 
         if (scramble_pending)
@@ -116,16 +129,15 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
             record_pending = false;
         }
     }
-
     // used to track which 16th we're on if loop != 1 bar
     float loop_num = fmod(loop_counter, loop_len);
     if (loop_num < 0)
         loop_num = 0;
 
-    int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx;
-    double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
-    normalized_audio_buffer_read_idx =
-        decimal_percent_of_loop * audio_buffer_len;
+    // int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx_;
+    // double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
+    // normalized_audio_buffer_read_idx =
+    //    decimal_percent_of_loop * audio_buffer_len;
 
     if (loop_mode_ == LOOPER_LOOP_MODE)
     {
@@ -134,7 +146,7 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         if (loop_num < 0)
             loop_num = 0;
 
-        int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx;
+        int relative_midi_idx = (loop_num * PPBAR) + cur_midi_idx_;
         double decimal_percent_of_loop = relative_midi_idx / (PPBAR * loop_len);
         double new_read_idx = decimal_percent_of_loop * audio_buffer_len;
         if (reverse_mode)
@@ -310,7 +322,7 @@ std::string looper::Info()
 
     std::stringstream ss;
     ss << ANSI_COLOR_WHITE << filename << INSTRUMENT_COLOR << " vol:" << volume
-       << " pan:" << pan << " pitch:" << grain_pitch
+       << " pan:" << pan << " pitch:" << grain_pitch << " speed:" << incr_speed_
        << " mode:" << s_loop_mode_names[loop_mode_]
        << " env_mode:" << s_env_names[envelope_mode] << "(" << envelope_mode
        << ") "
@@ -413,7 +425,8 @@ void sound_grain_init(sound_grain *g, sound_grain_params params)
     double loop_len_ms = 1000. * params.dur / SAMPLE_RATE;
     double attack_time_ms = loop_len_ms / 100. * params.attack_pct;
     double release_time_ms = loop_len_ms / 100. * params.release_pct;
-    // printf("ATTACKMS: %f RELEASEMS: %f\n", attack_time_ms, release_time_ms);
+    // printf("ATTACKMS: %f RELEASEMS: %f\n", attack_time_ms,
+    // release_time_ms);
 
     envelope_generator_init(&g->eg);
     eg_set_attack_time_msec(&g->eg, attack_time_ms);
@@ -616,7 +629,8 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
 //
 //            amp =
 //                cos(M_PI *
-//                    ((g->grain_counter_frames - attack_and_sustain_len_frames)
+//                    ((g->grain_counter_frames -
+//                    attack_and_sustain_len_frames)
 //                    /
 //                     g->release_time_samples) *
 //                    (1.0 / 2.0));
@@ -719,6 +733,7 @@ void looper_set_quasi_grain_fudge(looper *g, int fudgefactor)
 }
 
 void looper_set_grain_pitch(looper *g, double pitch) { g->grain_pitch = pitch; }
+void looper_set_incr_speed(looper *g, double speed) { g->incr_speed_ = speed; }
 
 void looper_set_selection_mode(looper *g, unsigned int mode)
 {
@@ -886,6 +901,8 @@ void looper::SetParam(std::string name, double val)
     }
     else if (name == "pitch")
         looper_set_grain_pitch(this, val);
+    else if (name == "speed")
+        looper_set_incr_speed(this, val);
     else if (name == "mode")
     {
         looper_set_loop_mode(this, val);

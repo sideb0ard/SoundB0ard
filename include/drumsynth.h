@@ -10,18 +10,15 @@
 static const char DRUMSYNTH_SAVED_SETUPS_FILENAME[512] =
     "settings/drumsynthpatches.dat";
 
-class drumsynth : public SoundGenerator
+class DrumSynth : public SoundGenerator
 {
   public:
-    drumsynth();
-
-    stereo_val genNext() override;
-
+    DrumSynth();
+    ~DrumSynth() = default;
     std::string Info() override;
     std::string Status() override;
-
+    stereo_val genNext() override;
     void noteOn(midi_event ev) override;
-
     void SetParam(std::string name, double val) override;
     double GetParam(std::string name) override;
 
@@ -68,24 +65,24 @@ class drumsynth : public SoundGenerator
     bool debug;
 };
 
-bool drumsynth_save_patch(drumsynth *ds, char *name);
-bool drumsynth_open_patch(drumsynth *ds, char *name);
+bool drumsynth_save_patch(DrumSynth *ds, char *name);
+bool drumsynth_open_patch(DrumSynth *ds, char *name);
 bool drumsynth_list_patches(void);
-void drumsynth_set_osc_wav(drumsynth *ds, int osc_num, unsigned int wave);
-void drumsynth_set_osc_fo(drumsynth *ds, int osc_num, double freq);
-void drumsynth_set_reset_osc(drumsynth *ds, bool b);
-void drumsynth_set_eg_attack(drumsynth *ds, int eg_num, double val);
-void drumsynth_set_eg_decay(drumsynth *ds, int eg_num, double val);
-void drumsynth_set_eg_sustain_lvl(drumsynth *ds, int eg_num, double val);
-void drumsynth_set_eg_release(drumsynth *ds, int eg_num, double val);
-void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc, double val);
-void drumsynth_set_osc_amp(drumsynth *ds, int osc_num, double val);
-void drumsynth_set_distortion_threshold(drumsynth *ds, double val);
-void drumsynth_set_filter_freq(drumsynth *ds, double val);
-void drumsynth_set_filter_q(drumsynth *ds, double val);
-void drumsynth_set_filter_type(drumsynth *ds, unsigned int val);
-void drumsynth_set_mod_semitones_range(drumsynth *ds, int val);
+void drumsynth_set_osc_wav(DrumSynth *ds, int osc_num, unsigned int wave);
+void drumsynth_set_osc_fo(DrumSynth *ds, int osc_num, double freq);
+void drumsynth_set_reset_osc(DrumSynth *ds, bool b);
+void drumsynth_set_eg_attack(DrumSynth *ds, int eg_num, double val);
+void drumsynth_set_eg_decay(DrumSynth *ds, int eg_num, double val);
+void drumsynth_set_eg_sustain_lvl(DrumSynth *ds, int eg_num, double val);
+void drumsynth_set_eg_release(DrumSynth *ds, int eg_num, double val);
+void drumsynth_set_eg_osc_intensity(DrumSynth *ds, int eg, int osc, double val);
+void drumsynth_set_osc_amp(DrumSynth *ds, int osc_num, double val);
+void drumsynth_set_distortion_threshold(DrumSynth *ds, double val);
+void drumsynth_set_filter_freq(DrumSynth *ds, double val);
+void drumsynth_set_filter_q(DrumSynth *ds, double val);
+void drumsynth_set_filter_type(DrumSynth *ds, unsigned int val);
+void drumsynth_set_mod_semitones_range(DrumSynth *ds, int val);
 
-void drumsynth_randomize(drumsynth *ds);
+void drumsynth_randomize(DrumSynth *ds);
 
-void drumsynth_set_debug(drumsynth *ds, bool debug);
+void drumsynth_set_debug(DrumSynth *ds, bool debug);

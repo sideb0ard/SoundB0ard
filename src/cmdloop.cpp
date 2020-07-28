@@ -15,7 +15,6 @@
 #include <mixer.h>
 #include <new_item_cmds.h>
 #include <obliquestrategies.h>
-#include <stepper_cmds.h>
 #include <synth_cmds.h>
 #include <tsqueue.hpp>
 #include <utils.h>

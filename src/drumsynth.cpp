@@ -15,7 +15,7 @@ const char *s_synth_waves[] = {"SINE", "SAW1",   "SAW2",  "SAW3",
 const char *s_ds_eg_state[] = {"OFF",     "ATTACK",  "DECAY",
                                "SUSTAIN", "RELEASE", "SHUTDOWN"};
 
-drumsynth::drumsynth()
+DrumSynth::DrumSynth()
 {
     printf("New Drum Synth!\n");
     started = false;
@@ -70,7 +70,7 @@ drumsynth::drumsynth()
     start();
 }
 
-stereo_val drumsynth::genNext()
+stereo_val DrumSynth::genNext()
 {
     stereo_val out = {0, 0};
 
@@ -120,7 +120,7 @@ stereo_val drumsynth::genNext()
     return out;
 }
 
-std::string drumsynth::Info()
+std::string DrumSynth::Info()
 {
     std::stringstream ss;
 
@@ -184,14 +184,14 @@ std::string drumsynth::Info()
     return ss.str();
 }
 
-std::string drumsynth::Status()
+std::string DrumSynth::Status()
 {
     std::stringstream ss;
     ss << "TODO";
     return ss.str();
 }
 
-void drumsynth::noteOn(midi_event ev)
+void DrumSynth::noteOn(midi_event ev)
 {
     (void)ev;
     if (reset_osc)
@@ -207,7 +207,7 @@ void drumsynth::noteOn(midi_event ev)
     eg_start_eg(&m_eg2);
 }
 
-void drumsynth_randomize(drumsynth *ds)
+void drumsynth_randomize(DrumSynth *ds)
 {
 
     ds->m_osc1.osc.m_waveform = rand() % MAX_OSC;
@@ -245,7 +245,7 @@ void drumsynth_randomize(drumsynth *ds)
     ds->m_distortion_threshold = ((float)rand()) / RAND_MAX;
 }
 
-bool drumsynth_save_patch(drumsynth *ds, char *name)
+bool drumsynth_save_patch(DrumSynth *ds, char *name)
 {
     if (strlen(name) == 0)
     {
@@ -304,7 +304,7 @@ bool drumsynth_save_patch(drumsynth *ds, char *name)
     return true;
 }
 
-bool drumsynth_open_patch(drumsynth *ds, char *name)
+bool drumsynth_open_patch(DrumSynth *ds, char *name)
 {
     FILE *fp = fopen(DRUMSYNTH_SAVED_SETUPS_FILENAME, "r");
     if (fp == NULL)
@@ -400,7 +400,7 @@ bool drumsynth_list_patches()
     return true;
 }
 
-void drumsynth_set_osc_wav(drumsynth *ds, int osc_num, unsigned int wave)
+void drumsynth_set_osc_wav(DrumSynth *ds, int osc_num, unsigned int wave)
 {
     if (!(wave < MAX_OSC))
     {
@@ -417,7 +417,7 @@ void drumsynth_set_osc_wav(drumsynth *ds, int osc_num, unsigned int wave)
         break;
     }
 }
-void drumsynth_set_osc_fo(drumsynth *ds, int osc_num, double freq)
+void drumsynth_set_osc_fo(DrumSynth *ds, int osc_num, double freq)
 {
     if (freq >= OSC_FO_MIN && freq <= OSC_FO_MAX)
     {
@@ -439,7 +439,7 @@ void drumsynth_set_osc_fo(drumsynth *ds, int osc_num, double freq)
     }
 }
 
-void drumsynth_set_eg_attack(drumsynth *ds, int eg_num, double val)
+void drumsynth_set_eg_attack(DrumSynth *ds, int eg_num, double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
     {
@@ -457,7 +457,7 @@ void drumsynth_set_eg_attack(drumsynth *ds, int eg_num, double val)
         printf("Val has to be between %d and %d\n", EG_MINTIME_MS,
                EG_MAXTIME_MS);
 }
-void drumsynth_set_eg_decay(drumsynth *ds, int eg_num, double val)
+void drumsynth_set_eg_decay(DrumSynth *ds, int eg_num, double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
     {
@@ -476,7 +476,7 @@ void drumsynth_set_eg_decay(drumsynth *ds, int eg_num, double val)
                EG_MAXTIME_MS);
 }
 
-void drumsynth_set_eg_sustain_lvl(drumsynth *ds, int eg_num, double val)
+void drumsynth_set_eg_sustain_lvl(DrumSynth *ds, int eg_num, double val)
 {
     if (val >= 0. && val <= 1.)
     {
@@ -494,7 +494,7 @@ void drumsynth_set_eg_sustain_lvl(drumsynth *ds, int eg_num, double val)
         printf("Val has to be between 0 and 1\n");
 }
 
-void drumsynth_set_eg_release(drumsynth *ds, int eg_num, double val)
+void drumsynth_set_eg_release(DrumSynth *ds, int eg_num, double val)
 {
     if (val >= EG_MINTIME_MS && val <= EG_MAXTIME_MS)
     {
@@ -513,7 +513,7 @@ void drumsynth_set_eg_release(drumsynth *ds, int eg_num, double val)
                EG_MAXTIME_MS);
 }
 
-void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc, double val)
+void drumsynth_set_eg_osc_intensity(DrumSynth *ds, int eg, int osc, double val)
 {
     (void)osc;
     if (val >= -1 && val <= 1)
@@ -532,7 +532,7 @@ void drumsynth_set_eg_osc_intensity(drumsynth *ds, int eg, int osc, double val)
         printf("Val has to be between -1 and 1\n");
 }
 
-void drumsynth_set_osc_amp(drumsynth *ds, int osc_num, double val)
+void drumsynth_set_osc_amp(DrumSynth *ds, int osc_num, double val)
 {
     if (val >= 0 && val <= 1.0)
     {
@@ -550,7 +550,7 @@ void drumsynth_set_osc_amp(drumsynth *ds, int osc_num, double val)
         printf("Val must be between 0 and 1\n");
 }
 
-void drumsynth_set_distortion_threshold(drumsynth *ds, double val)
+void drumsynth_set_distortion_threshold(DrumSynth *ds, double val)
 {
     if (val >= 0 && val <= 1)
         ds->m_distortion_threshold = val;
@@ -558,28 +558,28 @@ void drumsynth_set_distortion_threshold(drumsynth *ds, double val)
         printf("Val must be between 0 and 1\n");
 }
 
-void drumsynth_set_filter_freq(drumsynth *ds, double val)
+void drumsynth_set_filter_freq(DrumSynth *ds, double val)
 {
     ds->m_filter_fc = val;
     filter_set_fc_control((filter *)&ds->m_filter, val);
 }
-void drumsynth_set_filter_q(drumsynth *ds, double val)
+void drumsynth_set_filter_q(DrumSynth *ds, double val)
 {
     ds->m_filter_q = val;
     moog_set_qcontrol((filter *)&ds->m_filter, val);
 }
-void drumsynth_set_filter_type(drumsynth *ds, unsigned int val)
+void drumsynth_set_filter_type(DrumSynth *ds, unsigned int val)
 {
     ds->m_filter_type = val;
     filter_set_type((filter *)&ds->m_filter, val);
 }
-void drumsynth_set_mod_semitones_range(drumsynth *ds, int val)
+void drumsynth_set_mod_semitones_range(DrumSynth *ds, int val)
 {
     ds->mod_semitones_range = val;
 }
 
-void drumsynth_set_reset_osc(drumsynth *ds, bool b) { ds->reset_osc = b; }
-void drumsynth_set_debug(drumsynth *ds, bool debug) { ds->debug = debug; }
+void drumsynth_set_reset_osc(DrumSynth *ds, bool b) { ds->reset_osc = b; }
+void drumsynth_set_debug(DrumSynth *ds, bool debug) { ds->debug = debug; }
 
-void drumsynth::SetParam(std::string name, double val) {}
-double drumsynth::GetParam(std::string name) { return 0; }
+void DrumSynth::SetParam(std::string name, double val) {}
+double DrumSynth::GetParam(std::string name) { return 0; }
