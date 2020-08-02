@@ -13,7 +13,7 @@ typedef struct digisynth_voice
 
 } digisynth_voice;
 
-void digisynth_voice_init(digisynth_voice *dv, char *filename);
-void digisynth_voice_open_wav(digisynth_voice *dv, char *filename);
+void digisynth_voice_init(digisynth_voice *dv, std::string filename);
+void digisynth_voice_open_wav(digisynth_voice *dv, std::string filename);
 bool digisynth_voice_gennext(digisynth_voice *dv, double *out_left,
                              double *out_right);

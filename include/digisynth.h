@@ -6,11 +6,11 @@
 #include "digisynth_voice.h"
 #include "soundgenerator.h"
 
-class digisynth : public SoundGenerator
+class DigiSynth : public SoundGenerator
 {
   public:
-    digisynth(char *filename);
-    ~digisynth() {}
+    DigiSynth(std::string sample_path);
+    ~DigiSynth() {}
     stereo_val genNext() override;
     std::string Info() override;
     std::string Status() override;
@@ -22,15 +22,14 @@ class digisynth : public SoundGenerator
     double GetParam(std::string name) override;
 
   public:
-    char audiofile[1024];
+    std::string sample_path_;
     digisynth_voice m_voices[MAX_VOICES];
 
     double m_last_note_frequency;
 };
 
-void digisynth_load_wav(digisynth *ds, char *filename);
-
-void digisynth_update(digisynth *ds);
+void digisynth_load_wav(DigiSynth *ds, std::string filename);
+void digisynth_update(DigiSynth *ds);
 
 ////////////////////////////////////
 

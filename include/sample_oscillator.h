@@ -24,7 +24,7 @@ typedef struct sample_oscillator
 
 } sample_oscillator;
 
-void sampleosc_init(sampleosc *sosc, char *filename);
+void sampleosc_init(sampleosc *sosc, std::string filename);
 
 void sampleosc_set_oscillator_interface(sampleosc *self);
 

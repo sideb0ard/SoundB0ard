@@ -6,26 +6,28 @@
 #include "mixer.h"
 #include "utils.h"
 
+#include <iostream>
+
 extern mixer *mixr;
 
-digisynth::digisynth(char *filename)
+DigiSynth::DigiSynth(std::string sample_path)
 {
-    printf("NEW DIGI SYNTH!\n");
+    std::cout << "NEW DIGI SYNTH! - " << sample_path << " \n ";
 
-    strncpy(audiofile, filename, 1023);
+    sample_path_ = sample_path;
 
     type = DIGISYNTH_TYPE;
     active = true;
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
-        digisynth_voice_init(&m_voices[i], filename);
+        digisynth_voice_init(&m_voices[i], sample_path);
     }
 
     m_last_note_frequency = -1.0;
 }
 
-stereo_val digisynth::genNext()
+stereo_val DigiSynth::genNext()
 {
     if (!active)
         return (stereo_val){0, 0};
@@ -56,7 +58,7 @@ stereo_val digisynth::genNext()
     return return_val;
 }
 
-std::string digisynth::Info()
+std::string DigiSynth::Info()
 {
     std::stringstream ss;
 
@@ -75,27 +77,27 @@ std::string digisynth::Info()
     return ss.str();
 }
 
-std::string digisynth::Status()
+std::string DigiSynth::Status()
 {
     std::stringstream ss;
     ss << "TODO";
     return ss.str();
 }
 
-void digisynth::start()
+void DigiSynth::start()
 {
     active = true;
     engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
-void digisynth::stop()
+void DigiSynth::stop()
 {
     active = false;
     noteOff({});
 }
 
-void digisynth_load_wav(digisynth *ds, char *filename)
+void digisynth_load_wav(DigiSynth *ds, std::string filename)
 {
-    strncpy(ds->audiofile, filename, 1023);
+    ds->sample_path_ = filename;
     for (int i = 0; i < MAX_VOICES; i++)
     {
         audiofile_data_import_file_contents(&ds->m_voices[i].m_osc1.afd,
@@ -104,7 +106,7 @@ void digisynth_load_wav(digisynth *ds, char *filename)
     }
 }
 
-void digisynth::noteOn(midi_event ev)
+void DigiSynth::noteOn(midi_event ev)
 {
     unsigned int midinote = ev.data1;
     unsigned int velocity = ev.data2;
@@ -121,7 +123,7 @@ void digisynth::noteOn(midi_event ev)
     }
 }
 
-void digisynth::noteOff(midi_event ev)
+void DigiSynth::noteOff(midi_event ev)
 {
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -129,6 +131,6 @@ void digisynth::noteOff(midi_event ev)
     }
 }
 
-void digisynth_update(digisynth *ds) { (void)ds; }
-void digisynth::SetParam(std::string name, double val) {}
-double digisynth::GetParam(std::string name) { return 0; }
+void digisynth_update(DigiSynth *ds) { (void)ds; }
+void DigiSynth::SetParam(std::string name, double val) {}
+double DigiSynth::GetParam(std::string name) { return 0; }

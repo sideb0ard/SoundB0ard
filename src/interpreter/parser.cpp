@@ -588,6 +588,7 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseGranularExpression();
     else if (cur_token_.type_ == token::SLANG_FM_SYNTH ||
              cur_token_.type_ == token::SLANG_MOOG_SYNTH ||
+             cur_token_.type_ == token::SLANG_DIGI_SYNTH ||
              cur_token_.type_ == token::SLANG_DRUM_SYNTH)
         return ParseSynthExpression();
     else if (cur_token_.type_ == token::SLANG_SAMPLE)
@@ -721,6 +722,8 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral()
 
 std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 {
+
+    std::cout << "SYNTH EXPRESSION!\n";
     auto synth = std::make_shared<ast::SynthExpression>(cur_token_);
 
     if (PeekTokenIs(token::SLANG_IDENT))
@@ -767,10 +770,29 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 
     if (!ExpectPeek(token::SLANG_LPAREN))
         return nullptr;
+    NextToken();
 
-    if (!ExpectPeek(token::SLANG_RPAREN))
+    std::cout << "CUR TOKEN IS " << cur_token_ << " AND NEXT IS " << peek_token_
+              << std::endl;
+    if (synth->token_.literal_ == "digi")
+    {
+        std::cout << "DIGI SYNTH YO!!\n";
+        std::stringstream ss;
+        while (!CurTokenIs(token::SLANG_EOFF) &&
+               !CurTokenIs(token::SLANG_RPAREN))
+        {
+            ss << cur_token_.literal_;
+            NextToken();
+        }
+        synth->sample_path_ = ss.str();
+        std::cout << "SAMPLE PATH: " << synth->sample_path_ << std::endl;
+    }
+
+    if (!CurTokenIs(token::SLANG_RPAREN))
+    {
+        std::cout << "OOFT! where ya PAREN?\n";
         return nullptr;
-
+    }
     std::cout << "AST SYNTH EXPRESSION ALL GOOD!\n";
     return synth;
 }

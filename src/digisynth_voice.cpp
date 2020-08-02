@@ -1,9 +1,11 @@
 #include "digisynth_voice.h"
 #include <stdio.h>
 
-void digisynth_voice_init(digisynth_voice *dv, char *filename)
+#include <iostream>
+
+void digisynth_voice_init(digisynth_voice *dv, std::string filename)
 {
-    printf("DIGISYNTH VOICE INNNNIT!\n");
+    std::cout << "DIGISYNTH VOICE INNNNIT!" << filename << std::endl;
 
     // initializes 4 x envelope generators and
     // 2 x lfos, and dca in base class

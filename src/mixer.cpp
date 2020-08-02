@@ -397,10 +397,10 @@ int add_sample(mixer *mixr, std::string sample_path)
     return add_sound_generator(mixr, ds);
 }
 
-int add_digisynth(mixer *mixr, char *filename)
+int add_digisynth(mixer *mixr, std::string sample_path)
 {
     repl_queue.push("Adding a DIGISYNTH!\n");
-    auto ds = std::make_shared<digisynth>(filename);
+    auto ds = std::make_shared<DigiSynth>(sample_path);
     return add_sound_generator(mixr, ds);
 }
 

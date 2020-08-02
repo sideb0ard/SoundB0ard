@@ -6,7 +6,7 @@
 #include "sample_oscillator.h"
 #include "utils.h"
 
-void sampleosc_init(sampleosc *sosc, char *filename)
+void sampleosc_init(sampleosc *sosc, std::string filename)
 {
     audiofile_data_import_file_contents(&sosc->afd, filename);
     sampleosc_set_oscillator_interface(sosc);

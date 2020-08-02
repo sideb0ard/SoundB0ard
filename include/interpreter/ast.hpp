@@ -178,6 +178,9 @@ class SynthExpression : public Expression
     SynthExpression() {}
     explicit SynthExpression(Token token) : Expression{token} {}
     std::string String() const override;
+
+  public:
+    std::string sample_path_{}; // used in digi synth
 };
 
 class SynthPresetExpression : public Expression
