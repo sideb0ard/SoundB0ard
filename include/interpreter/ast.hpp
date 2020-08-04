@@ -464,6 +464,16 @@ class PlayStatement : public Statement
     std::string path_;
 };
 
+class PitchStatement : public Statement
+{
+  public:
+    explicit PitchStatement(Token toke) : Statement(toke) {}
+    std::string String() const override;
+
+  public:
+    std::string path_;
+};
+
 class PsStatement : public Statement
 {
   public:

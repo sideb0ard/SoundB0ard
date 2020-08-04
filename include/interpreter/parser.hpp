@@ -62,6 +62,7 @@ class Parser
     bool ParseSetStatementValue(std::string &value_result);
     std::shared_ptr<ast::PanStatement> ParsePanStatement();
     std::shared_ptr<ast::PlayStatement> ParsePlayStatement();
+    std::shared_ptr<ast::PitchStatement> ParsePitchStatement();
     std::shared_ptr<ast::ProcessStatement> ParseProcessStatement();
     std::shared_ptr<ast::ProcessStatement>
     ParseWhileProcess(std::shared_ptr<ast::ProcessStatement> proc);

@@ -17,12 +17,12 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"moog", SLANG_MOOG_SYNTH}, {"osc", SLANG_OSC},
     {"drum", SLANG_DRUM_SYNTH}, {"digi", SLANG_DIGI_SYNTH},
     {"over", SLANG_OVER},       {"pan", SLANG_PAN},
-    {"play", SLANG_PLAY},       {"proc", SLANG_PROC},
-    {"ps", SLANG_PS},           {"ramp", SLANG_RAMP},
-    {"return", SLANG_RETURN},   {"sample", SLANG_SAMPLE},
-    {"set", SLANG_SET},         {"true", SLANG_TRUE},
-    {"vol", SLANG_VOLUME},      {"while", SLANG_WHILE},
-    {"info", SLANG_INFO},
+    {"play", SLANG_PLAY},       {"pitch", SLANG_PITCH},
+    {"proc", SLANG_PROC},       {"ps", SLANG_PS},
+    {"ramp", SLANG_RAMP},       {"return", SLANG_RETURN},
+    {"sample", SLANG_SAMPLE},   {"set", SLANG_SET},
+    {"true", SLANG_TRUE},       {"vol", SLANG_VOLUME},
+    {"while", SLANG_WHILE},     {"info", SLANG_INFO},
 };
 
 TokenType LookupIdent(std::string ident)

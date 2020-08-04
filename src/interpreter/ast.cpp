@@ -79,6 +79,15 @@ std::string PlayStatement::String() const
     return ss.str();
 }
 
+std::string PitchStatement::String() const
+{
+    std::stringstream ss;
+    ss << TokenLiteral();
+    ss << ";";
+
+    return ss.str();
+}
+
 std::string PsStatement::String() const
 {
     std::stringstream ss;

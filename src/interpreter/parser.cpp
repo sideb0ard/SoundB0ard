@@ -53,6 +53,8 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
         return ParsePanStatement();
     else if (cur_token_.type_.compare(token::SLANG_PLAY) == 0)
         return ParsePlayStatement();
+    else if (cur_token_.type_.compare(token::SLANG_PITCH) == 0)
+        return ParsePitchStatement();
     else if (cur_token_.type_.compare(token::SLANG_PROC_ID) == 0)
         return ParseProcessStatement();
     else if (cur_token_.type_.compare(token::SLANG_SET) == 0)
@@ -137,6 +139,25 @@ std::shared_ptr<ast::PlayStatement> Parser::ParsePlayStatement()
 {
     std::shared_ptr<ast::PlayStatement> stmt =
         std::make_shared<ast::PlayStatement>(cur_token_);
+
+    NextToken();
+
+    std::stringstream ss;
+    while (!CurTokenIs(token::SLANG_EOFF) &&
+           !CurTokenIs(token::SLANG_SEMICOLON))
+    {
+        ss << cur_token_.literal_;
+        NextToken();
+    }
+    stmt->path_ = ss.str();
+
+    return stmt;
+}
+
+std::shared_ptr<ast::PitchStatement> Parser::ParsePitchStatement()
+{
+    std::shared_ptr<ast::PitchStatement> stmt =
+        std::make_shared<ast::PitchStatement>(cur_token_);
 
     NextToken();
 
