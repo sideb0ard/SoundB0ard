@@ -16,12 +16,14 @@ Soundb0ard is an interactive music making environment, with which you interact v
 
 It uses Ableton Link to sync with other running apps on the same local network. Follow install instructions for Link first - https://github.com/Ableton/link
 
-Other libraries needed are PortAudio, PortMidi, Exuberant Ctags, gperf, Cscope, and libsndfile:  
+Other libraries needed are PortAudio, PortMidi, Exuberant Ctags, gperf, Cscope, FFTS, mplack, armadillo and libsndfile:  
 
 http://www.portaudio.com/  
 http://portmedia.sourceforge.net/portmidi/  
 http://www.mega-nerd.com/libsndfile/  
+https://github.com/anthonix/ffts  
 http://ctags.sourceforge.net/  
+https://www.mlpack.org/  
 
 I still need to do some more work to make it portable. For the moment I've only been developing on OSX. In the Makefile there are a few lib paths and include dirs that you'll need to amend, but I believe it should compile cleanly for others with those changes. (Pull requests welcome!)
 
