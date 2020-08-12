@@ -1,4 +1,5 @@
 #include <cfloat>
+
 #include <cmath>
 #include <iostream>
 #include <sstream>
@@ -6,6 +7,7 @@
 
 #include <audiofile_data.h>
 #include <defjams.h>
+#include <midi_freq_table.h>
 #include <pitch_detection.hpp>
 
 constexpr double ktimeslice = 0.1;
@@ -66,6 +68,7 @@ std::vector<int> PeakPicking(const std::vector<float> &nsdf)
             if (cur_max_pos > 0)
             {
                 max_positions.push_back(cur_max_pos);
+                // std::cout << "PUSHING BACK " << cur_max_pos << std::endl;
                 cur_max_pos = 0;
             }
             while (pos < size - 1 && nsdf[pos] <= 0.0)
@@ -104,6 +107,27 @@ std::pair<float, float> ParabolicInterpolation(const std::vector<float> &array,
                                        array[x] - delta * delta / (8 * den));
     }
     return std::make_pair(x_adjusted, array[x_adjusted]);
+}
+
+float GetClosestFrequence(float freq_estimate)
+{
+
+    float real_freq = -1;
+    // TODO - magic number bad, mmmkay.
+    for (int i = 0; i < 128 - 1; i++)
+    {
+        if (freq_estimate >= midi_freq_table[i] &&
+            freq_estimate < midi_freq_table[i + 1])
+        {
+            if (abs(midi_freq_table[i] - freq_estimate) <
+                abs(midi_freq_table[i + 1] - freq_estimate))
+                real_freq = midi_freq_table[i];
+            else
+                real_freq = midi_freq_table[i + 1];
+        }
+    }
+
+    return real_freq;
 }
 
 } //  namespace
@@ -275,12 +299,8 @@ std::string DetectPitch(std::string sample_path)
     std::stringstream ss;
     ss << "Pitch of " << sample_path << " is - FAKED!";
 
-    // 1. Open file - save as mono buffer
     audiofile_data afd;
     audiofile_data_import_file_contents(&afd, sample_path);
-
-    std::cout << "Opened file: " << afd.filename << " which has "
-              << afd.channels << " channels" << std::endl;
 
     std::vector<float> audio;
 
@@ -295,22 +315,34 @@ std::string DetectPitch(std::string sample_path)
         for (int i = 0; i < afd.samplecount; i++)
             audio.push_back(afd.filecontents[i]);
     }
+    // i have no idea why i'm multiplying this by 10,000!
+    // this code is pinched from
+    // https://github.com/sevagh/pitch-detection/blob/master/wav_analyzer/wav_analyzer.cpp
+    // (pinched sounds so much more polite than stolen!)
+    // without doing it, my pitch calculations were off by a large factor, so
+    // it's necessary for the computation at some stage.
+    std::transform(
+        audio.begin(), audio.end(), audio.begin(),
+        std::bind(std::multiplies<float>(), std::placeholders::_1, 10000));
 
     auto chunk_size = size_t(SAMPLE_RATE * ktimeslice);
     auto chunks = GetChunks(audio, chunk_size);
 
-    std::cout << "Slicing buffer of size :" << audio.size() << " into "
-              << chunks.size() << " chunks of size " << chunk_size << std::endl;
-
     double t = 0.;
 
+    std::vector<float> pitches;
     for (auto chunk : chunks)
     {
         MPMPitchDetector mpmd(chunk.size());
         auto pitch_mpm = mpmd.GetPitch(chunk);
-        std::cout << "At t: " << t << " : " << pitch_mpm << std::endl;
         t += ktimeslice;
+        if (pitch_mpm != -1)
+            pitches.push_back(pitch_mpm);
     }
+    for (auto p : pitches)
+        std::cout << "PITCHES ARE:" << p << " normD:" << GetClosestFrequence(p)
+                  << std::endl;
+
     return ss.str();
 }
 
