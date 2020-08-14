@@ -344,8 +344,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     {
         if (!pitch_expr->path_.empty())
         {
-            auto pitch = DetectPitch(pitch_expr->path_);
-            repl_queue.push(pitch);
+            auto pitch = DetectMidiPitch(pitch_expr->path_);
+            repl_queue.push(std::to_string(pitch));
         }
     }
 

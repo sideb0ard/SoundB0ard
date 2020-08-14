@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "midi_freq_table.h"
-#include "sample_oscillator.h"
-#include "utils.h"
+#include <midi_freq_table.h>
+#include <pitch_detection.hpp>
+#include <sample_oscillator.h>
+#include <utils.h>
 
 void sampleosc_init(sampleosc *sosc, std::string filename)
 {
@@ -13,6 +14,9 @@ void sampleosc_init(sampleosc *sosc, std::string filename)
     sosc->is_single_cycle = false;
     sosc->is_pitchless = false;
     sosc->loop_mode = SAMPLE_ONESHOT;
+    // TODO - this duplicates the reading of the file data
+    sosc->orig_pitch_midi_ = DetectMidiPitch(filename);
+
     osc_new_settings(&sosc->osc);
     sampleosc_reset_oscillator(&sosc->osc);
 }
@@ -101,7 +105,7 @@ void sampleosc_update(oscillator *self)
     double unity_freq = sosc->is_single_cycle
                             ? (SAMPLE_RATE / ((float)sosc->afd.samplecount /
                                               (float)sosc->afd.channels))
-                            : get_midi_freq(36); // c
+                            : get_midi_freq(sosc->orig_pitch_midi_);
 
     double length = SAMPLE_RATE / unity_freq;
 

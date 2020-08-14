@@ -3,6 +3,7 @@
 #include <cmath>
 #include <iostream>
 #include <sstream>
+#include <utility>
 #include <vector>
 
 #include <audiofile_data.h>
@@ -109,10 +110,28 @@ std::pair<float, float> ParabolicInterpolation(const std::vector<float> &array,
     return std::make_pair(x_adjusted, array[x_adjusted]);
 }
 
-float GetClosestFrequence(float freq_estimate)
+int SelectMostCommonMidi(std::vector<int> &midi_numbers)
+{
+    std::unordered_map<int, int> counts;
+    for (auto m : midi_numbers)
+        counts[m]++;
+    int highest_count = 0;
+    int selected_midi_num = 0;
+    for (auto &[k, v] : counts)
+    {
+        if (v > highest_count)
+        {
+            highest_count = v;
+            selected_midi_num = k;
+        }
+    }
+
+    return selected_midi_num;
+}
+
+int GetMidi(float freq_estimate)
 {
 
-    float real_freq = -1;
     // TODO - magic number bad, mmmkay.
     for (int i = 0; i < 128 - 1; i++)
     {
@@ -121,13 +140,13 @@ float GetClosestFrequence(float freq_estimate)
         {
             if (abs(midi_freq_table[i] - freq_estimate) <
                 abs(midi_freq_table[i + 1] - freq_estimate))
-                real_freq = midi_freq_table[i];
+                return i;
             else
-                real_freq = midi_freq_table[i + 1];
+                return i + 1;
         }
     }
 
-    return real_freq;
+    return -1;
 }
 
 } //  namespace
@@ -294,10 +313,11 @@ mlpack::hmm::HMM<mlpack::distribution::DiscreteDistribution> BuildHmm()
 
 ///////////////////////////////////////////
 //
-std::string DetectPitch(std::string sample_path)
+int DetectMidiPitch(std::string sample_path)
 {
+    // uses MPM method to detect pitch, and returns the MIDI number of the
+    // guessed pitch.
     std::stringstream ss;
-    ss << "Pitch of " << sample_path << " is - FAKED!";
 
     audiofile_data afd;
     audiofile_data_import_file_contents(&afd, sample_path);
@@ -339,10 +359,17 @@ std::string DetectPitch(std::string sample_path)
         if (pitch_mpm != -1)
             pitches.push_back(pitch_mpm);
     }
-    for (auto p : pitches)
-        std::cout << "PITCHES ARE:" << p << " normD:" << GetClosestFrequence(p)
-                  << std::endl;
+    std::vector<int> midi_numbers;
 
-    return ss.str();
+    for (auto p : pitches)
+    {
+        auto ans = GetMidi(p);
+        midi_numbers.push_back(ans);
+    }
+
+    int selected_ans = SelectMostCommonMidi(midi_numbers);
+    std::cout << "SELECTED MIDI:" << selected_ans << std::endl;
+
+    return selected_ans;
 }
 

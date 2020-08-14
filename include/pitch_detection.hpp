@@ -31,7 +31,7 @@
 
 const double Apitch = std::pow(2.0, 1.0 / 12.0);
 
-std::string DetectPitch(std::string sample_path);
+int DetectMidiPitch(std::string sample_path);
 
 std::vector<size_t>
 BinPitches(const std::vector<std::pair<float, float>> pitch_candidates);

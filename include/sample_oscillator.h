@@ -14,6 +14,7 @@ typedef struct sample_oscillator
 {
     oscillator osc;
     audiofile_data afd;
+    int orig_pitch_midi_{36}; // default is C2
 
     bool is_single_cycle;
     bool is_pitchless;
