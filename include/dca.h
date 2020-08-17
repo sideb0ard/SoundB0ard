@@ -9,14 +9,13 @@
 typedef struct dca
 {
 
-    modmatrix *m_v_modmatrix;
+    modmatrix *m_v_modmatrix = {nullptr};
+    global_dca_params *m_global_dca_params = {nullptr};
 
     unsigned m_mod_source_eg;
     unsigned m_mod_source_amp_db;
     unsigned m_mod_source_velocity;
     unsigned m_mod_source_pan;
-
-    global_dca_params *m_global_dca_params;
 
     double m_gain;
 

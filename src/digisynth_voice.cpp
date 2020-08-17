@@ -15,13 +15,6 @@ void digisynth_voice_init(digisynth_voice *dv, std::string filename)
     // attach oscillators to my base class
     dv->m_voice.m_osc1 = (oscillator *)&dv->m_osc1;
 
-    //// initialize my filter
-    // filter_moog_init(&dv->m_moog_ladder_filter);
-
-    //// attach to base class
-    // dv->m_voice.m_filter1 = (filter *)&dv->m_moog_ladder_filter;
-    // dv->m_voice.m_filter2 = NULL;
-
     eg_set_eg_mode(&dv->m_voice.m_eg1, ANALOG);
     dv->m_voice.m_eg1.m_output_eg = true;
 

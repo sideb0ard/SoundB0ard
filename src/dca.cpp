@@ -31,7 +31,8 @@ void dca_initialize(dca *d)
     d->m_pan_mod = 0.0;
     d->m_midi_velocity = 127;
 
-    d->m_v_modmatrix = NULL;
+    d->m_v_modmatrix = nullptr;
+    d->m_global_dca_params = nullptr;
 
     d->m_mod_source_eg = DEST_NONE;
     d->m_mod_source_amp_db = DEST_NONE;

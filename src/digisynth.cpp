@@ -17,7 +17,6 @@ DigiSynth::DigiSynth(std::string sample_path)
     sample_path_ = sample_path;
 
     type = DIGISYNTH_TYPE;
-    active = true;
 
     for (int i = 0; i < MAX_VOICES; i++)
     {
@@ -25,6 +24,8 @@ DigiSynth::DigiSynth(std::string sample_path)
     }
 
     m_last_note_frequency = -1.0;
+
+    active = true;
 }
 
 stereo_val DigiSynth::genNext()
