@@ -9,6 +9,7 @@
 #include <vector>
 
 #include <audio_action_queue.h>
+#include <filereader.hpp>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/sound_cmds.hpp>
 #include <keys.h>
@@ -277,6 +278,24 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
+    {"import",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 std::shared_ptr<object::String> filename =
+                     std::dynamic_pointer_cast<object::String>(args[0]);
+
+                 std::cout << "Opening " << filename->value_ << std::endl;
+                 std::string contents = ReadFileContents(filename->value_);
+                 std::cout << "Contents are: " << contents << std::endl;
+             }
+             else
+                 std::cout << "ARGS SIZE IS " << args_size << std::endl;
+             return evaluator::NULLL;
+         })},
     {"loadPreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

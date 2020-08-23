@@ -4,7 +4,7 @@
 
 #include <memory>
 
-#include <lo/lo.h>
+// #include <lo/lo.h>
 
 #include "audioutils.h"
 #include "digisynth.h"
