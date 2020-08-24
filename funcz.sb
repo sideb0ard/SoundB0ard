@@ -1,1 +1,8 @@
-let add = fn(x) { return x + 3}
+let add = fn(x) {
+    return x + 3
+}
+
+
+let poop = fn() {
+    return "bd sn"
+}

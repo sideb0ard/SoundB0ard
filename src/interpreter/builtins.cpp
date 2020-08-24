@@ -20,6 +20,7 @@
 
 extern mixer *mixr;
 extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<std::string> interpret_command_queue;
 
 namespace builtin
 {
@@ -288,12 +289,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  std::shared_ptr<object::String> filename =
                      std::dynamic_pointer_cast<object::String>(args[0]);
 
-                 std::cout << "Opening " << filename->value_ << std::endl;
                  std::string contents = ReadFileContents(filename->value_);
-                 std::cout << "Contents are: " << contents << std::endl;
+                 interpret_command_queue.push(contents);
              }
              else
-                 std::cout << "ARGS SIZE IS " << args_size << std::endl;
+                 std::cerr << "BARF! ARG SIZE SHOULD BE 1 -  SIZE IS "
+                           << args_size << std::endl;
              return evaluator::NULLL;
          })},
     {"loadPreset",
