@@ -247,6 +247,28 @@ std::string FunctionLiteral::String() const
     return ss.str();
 }
 
+std::string GeneratorLiteral::String() const
+{
+    std::stringstream ss;
+
+    std::vector<std::string> params;
+    for (auto p : parameters_)
+        params.push_back(p->String());
+
+    ss << TokenLiteral() << "("
+       << std::accumulate(params.begin(), params.end(), std::string(),
+                          [](const std::string &lhs, const std::string &rhs) {
+                              std::string ret{lhs};
+                              if (!lhs.empty() && !rhs.empty())
+                                  ret += ", ";
+                              ret += rhs;
+                              return ret;
+                          })
+       << ")" << setup_->String() << run_->String();
+
+    return ss.str();
+}
+
 std::string SynthExpression::String() const
 {
     std::stringstream ss;

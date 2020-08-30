@@ -39,6 +39,9 @@ const TokenType SLANG_RBRACKET = "]";
 
 const TokenType SLANG_FOR = "FOR";
 const TokenType SLANG_FUNCTION = "FUNCTION";
+const TokenType SLANG_GENERATOR = "GENERATOR";
+const TokenType SLANG_GENERATOR_SETUP = "GENERATOR_SETUP";
+const TokenType SLANG_GENERATOR_RUN = "GENERATOR_RUN";
 const TokenType SLANG_LET = "LET";
 const TokenType SLANG_TRUE = "TRUE";
 const TokenType SLANG_FALSE = "FALSE";

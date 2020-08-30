@@ -397,15 +397,31 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::FunctionLiteral>(node);
     if (fn)
     {
+        std::cout << "OOOH, a func!\n";
         auto params = fn->parameters_;
         auto body = fn->body_;
         return std::make_shared<object::Function>(params, env, body);
+    }
+
+    std::shared_ptr<ast::GeneratorLiteral> gn =
+        std::dynamic_pointer_cast<ast::GeneratorLiteral>(node);
+    if (gn)
+    {
+        auto params = gn->parameters_;
+        auto setup = gn->setup_;
+        auto run = gn->run_;
+        auto new_env = std::make_shared<object::Environment>(env);
+        auto gen =
+            std::make_shared<object::Generator>(params, new_env, setup, run);
+        Eval(gen->setup_, gen->env_);
+        return gen;
     }
 
     std::shared_ptr<ast::CallExpression> call_expr =
         std::dynamic_pointer_cast<ast::CallExpression>(node);
     if (call_expr)
     {
+
         auto fun = Eval(call_expr->function_, env);
         if (IsError(fun))
             return fun;
@@ -418,6 +434,10 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         auto func_obj = std::dynamic_pointer_cast<object::Function>(fun);
         if (func_obj)
             return ApplyFunction(func_obj, args);
+
+        auto gen_obj = std::dynamic_pointer_cast<object::Generator>(fun);
+        if (gen_obj)
+            return ApplyGeneratorRun(gen_obj);
 
         auto builtin_func = std::dynamic_pointer_cast<object::BuiltIn>(fun);
         if (builtin_func)
@@ -881,6 +901,21 @@ EvalExpressions(std::vector<std::shared_ptr<ast::Expression>> exps,
 }
 
 std::shared_ptr<object::Object>
+ApplyGeneratorRun(std::shared_ptr<object::Object> callable)
+{
+    std::shared_ptr<object::Generator> gen =
+        std::dynamic_pointer_cast<object::Generator>(callable);
+    if (gen)
+    {
+        // func->env_ = ExtendFunctionEnv(func, args);
+        auto evaluated = Eval(gen->run_, gen->env_);
+        return UnwrapReturnValue(evaluated);
+    }
+
+    return NewError("Something stinky wit yer GENERaTOR , mate!");
+}
+
+std::shared_ptr<object::Object>
 ApplyFunction(std::shared_ptr<object::Object> callable,
               std::vector<std::shared_ptr<object::Object>> args)
 {
@@ -888,8 +923,11 @@ ApplyFunction(std::shared_ptr<object::Object> callable,
         std::dynamic_pointer_cast<object::Function>(callable);
     if (func)
     {
-        auto extended_env = ExtendFunctionEnv(func, args);
-        auto evaluated = Eval(func->body_, extended_env);
+        // TODO - is this a good idea, updating the internal ENV?
+        // auto extended_env = ExtendFunctionEnv(func, args);
+        // auto evaluated = Eval(func->body_, extended_env);
+        func->env_ = ExtendFunctionEnv(func, args);
+        auto evaluated = Eval(func->body_, func->env_);
         return UnwrapReturnValue(evaluated);
     }
 
@@ -1140,10 +1178,30 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
                      std::shared_ptr<object::Environment> env)
 {
     auto pattern_obj = Eval(proc->pattern_, env);
-    if (pattern_obj->Type() == "STRING" ||
+    if (pattern_obj->Type() == "STRING" || pattern_obj->Type() == "GENERATOR" ||
         proc->process_timer_type_ == ProcessTimerType::WHILE)
     {
-        auto pattern = std::dynamic_pointer_cast<object::String>(pattern_obj);
+        std::shared_ptr<object::String> pattern;
+
+        if (pattern_obj->Type() == "GENERATOR")
+        {
+            auto gen_obj =
+                std::dynamic_pointer_cast<object::Generator>(pattern_obj);
+            if (gen_obj)
+            {
+                auto ret = ApplyGeneratorRun(gen_obj);
+                if (ret->Type() == "STRING")
+                {
+                    pattern = std::dynamic_pointer_cast<object::String>(ret);
+                    std::cout << "APPLY GEN - Ret val:" << pattern->value_
+                              << std::endl;
+                }
+            }
+        }
+        else
+        {
+            pattern = std::dynamic_pointer_cast<object::String>(pattern_obj);
+        }
 
         std::vector<std::shared_ptr<PatternFunction>> process_funcz;
 

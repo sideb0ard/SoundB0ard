@@ -143,6 +143,27 @@ std::string Function::Inspect()
     return return_val.str();
 }
 
+ObjectType Generator::Type() { return GENERATOR_OBJ; }
+std::string Generator::Inspect()
+{
+    std::stringstream params;
+    int len = parameters_.size();
+    int i = 0;
+    for (auto &p : parameters_)
+    {
+        params << p->String();
+        if (i < len - 1)
+            params << ", ";
+        i++;
+    }
+    std::stringstream return_val;
+    return_val << "gn(" << params.str() << ") \n";
+    return_val << "setup() { " << setup_->String() << "\n}\n";
+    return_val << "run() { " << run_->String() << "\n}\n";
+
+    return return_val.str();
+}
+
 std::string Array::Inspect()
 {
     std::stringstream elems;

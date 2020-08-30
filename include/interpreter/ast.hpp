@@ -172,6 +172,20 @@ class FunctionLiteral : public Expression
     std::shared_ptr<BlockStatement> body_{nullptr};
 };
 
+class GeneratorLiteral : public Expression
+{
+  public:
+    GeneratorLiteral() {}
+    explicit GeneratorLiteral(Token token) : Expression{token} {}
+
+    std::string String() const override;
+
+  public:
+    std::vector<std::shared_ptr<Identifier>> parameters_;
+    std::shared_ptr<BlockStatement> setup_{nullptr};
+    std::shared_ptr<BlockStatement> run_{nullptr};
+};
+
 class SynthExpression : public Expression
 {
   public:

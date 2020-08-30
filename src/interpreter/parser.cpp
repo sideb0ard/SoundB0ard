@@ -603,6 +603,8 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseIfExpression();
     else if (cur_token_.type_ == token::SLANG_FUNCTION)
         return ParseFunctionLiteral();
+    else if (cur_token_.type_ == token::SLANG_GENERATOR)
+        return ParseGeneratorLiteral();
     else if (cur_token_.type_ == token::SLANG_GRANULAR ||
              cur_token_.type_ == token::SLANG_GRAIN ||
              cur_token_.type_ == token::SLANG_LOOP)
@@ -737,6 +739,55 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral()
         return nullptr;
 
     lit->body_ = ParseBlockStatement();
+
+    return lit;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral()
+{
+    // std::cout << "\nPARSING GENERATOR LITERAL - cur token is " << cur_token_
+    //          << "\n";
+    auto lit = std::make_shared<ast::GeneratorLiteral>(cur_token_);
+
+    if (!ExpectPeek(token::SLANG_LPAREN))
+        return nullptr;
+
+    // (currently) unused parens
+    lit->parameters_ = ParseFunctionParameters();
+
+    if (!ExpectPeek(token::SLANG_LBRACE))
+        return nullptr;
+
+    if (!ExpectPeek(token::SLANG_GENERATOR_SETUP))
+        return nullptr;
+
+    // Discard (currently) unused parens
+    if (!ExpectPeek(token::SLANG_LPAREN))
+        return nullptr;
+    if (!ExpectPeek(token::SLANG_RPAREN))
+        return nullptr;
+    if (!ExpectPeek(token::SLANG_LBRACE))
+        return nullptr;
+    // std::cout << "PARSED SETUP TOKEN - cur token is: " << cur_token_
+    //          << " Next token is: " << peek_token_ << std::endl;
+
+    lit->setup_ = ParseBlockStatement();
+
+    if (!ExpectPeek(token::SLANG_GENERATOR_RUN))
+        return nullptr;
+
+    // Discard (currently) unused parens
+    if (!ExpectPeek(token::SLANG_LPAREN))
+        return nullptr;
+    if (!ExpectPeek(token::SLANG_RPAREN))
+        return nullptr;
+    if (!ExpectPeek(token::SLANG_LBRACE))
+        return nullptr;
+
+    lit->run_ = ParseBlockStatement();
+
+    // std::cout << "PARSED RUN!\n";
+    // std::cout << "AH YEAH< PARSED A GENERATOR!!\n";
 
     return lit;
 }

@@ -1,8 +1,14 @@
-let add = fn(x) {
-    return x + 3
-}
+let rotrrr = gen() {
+	setup() {
+	  let pat = ["b3", "c4", "c5", "c6"]
+	  let idx = 0
+	}
 
+	run() {
+	  let ret = pat[idx]
+	  let idx = idx + 1
+	  if (idx > len(pat) - 1) { let idx = 0}
 
-let poop = fn() {
-    return "bd sn"
+          return "bd sn*3"
+	}
 }

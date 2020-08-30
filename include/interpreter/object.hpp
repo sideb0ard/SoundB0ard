@@ -22,6 +22,7 @@ constexpr char BOOLEAN_OBJ[] = "BOOLEAN";
 constexpr char RETURN_VALUE_OBJ[] = "RETURN_VALUE";
 
 constexpr char FUNCTION_OBJ[] = "FUNCTION";
+constexpr char GENERATOR_OBJ[] = "GENERATOR";
 
 constexpr char STRING_OBJ[] = "STRING";
 
@@ -182,6 +183,25 @@ class Function : public Object
     std::vector<std::shared_ptr<ast::Identifier>> parameters_;
     std::shared_ptr<Environment> env_;
     std::shared_ptr<ast::BlockStatement> body_;
+};
+
+class Generator : public Object
+{
+  public:
+    Generator(std::vector<std::shared_ptr<ast::Identifier>> parameters,
+              std::shared_ptr<Environment> env,
+              std::shared_ptr<ast::BlockStatement> setup,
+              std::shared_ptr<ast::BlockStatement> run)
+        : parameters_{parameters}, env_{env}, setup_{setup}, run_{run} {};
+    ~Generator() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    std::vector<std::shared_ptr<ast::Identifier>> parameters_;
+    std::shared_ptr<Environment> env_;
+    std::shared_ptr<ast::BlockStatement> setup_;
+    std::shared_ptr<ast::BlockStatement> run_;
 };
 
 using BuiltInFunc = std::function<std::shared_ptr<object::Object>(
