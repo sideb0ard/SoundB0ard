@@ -9,6 +9,7 @@
 
 #include <audioutils.h>
 #include <cmdloop.h>
+#include <interpreter/evaluator.hpp>
 #include <looper.h>
 #include <midimaaan.h>
 #include <mixer.h>
@@ -73,6 +74,7 @@ void Process::Update()
     target_type_ = pending_config_.target_type;
     targets_ = pending_config_.targets;
     pattern_ = pending_config_.pattern;
+    generator_ = pending_config_.generator;
 
     ParsePattern();
 
@@ -112,6 +114,22 @@ void Process::EventNotify(mixer_timing_info tinfo)
     {
         Update();
         update_pending_ = false;
+    }
+
+    if (tinfo.is_start_of_loop && generator_)
+    {
+        auto gen_obj = std::dynamic_pointer_cast<object::Generator>(generator_);
+        if (gen_obj)
+        {
+            auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
+            auto pattern_string =
+                std::dynamic_pointer_cast<object::String>(pattern_obj);
+            if (pattern_string)
+            {
+                pattern_ = pattern_string->value_;
+                ParsePattern();
+            }
+        }
     }
 
     // PATTERN_PROCESS i.e. '#' or '$'

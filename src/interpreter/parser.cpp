@@ -745,8 +745,6 @@ std::shared_ptr<ast::Expression> Parser::ParseFunctionLiteral()
 
 std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral()
 {
-    // std::cout << "\nPARSING GENERATOR LITERAL - cur token is " << cur_token_
-    //          << "\n";
     auto lit = std::make_shared<ast::GeneratorLiteral>(cur_token_);
 
     if (!ExpectPeek(token::SLANG_LPAREN))
@@ -964,6 +962,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
         // process->pattern_ = ParseStringLiteral();
         process->pattern_ = ParseExpression(Precedence::PREFIX);
+        std::cout << process->pattern_->String() << "YYUP YUP\n";
         NextToken();
     }
     else if (PeekTokenIs(token::SLANG_HASH))

@@ -116,8 +116,8 @@ void *process_worker_thread()
                         event->process_type, event->timer_type,
                         event->loop_len,     event->command,
                         event->target_type,  event->targets,
-                        event->pattern,      event->funcz,
-                        event->timing_info};
+                        event->pattern,      event->generator,
+                        event->funcz,        event->timing_info};
 
                     mixr->processes_[event->target_process_id]->EnqueueUpdate(
                         config);

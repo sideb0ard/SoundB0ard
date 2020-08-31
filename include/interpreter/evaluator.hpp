@@ -6,6 +6,7 @@
 
 #include "ast.hpp"
 #include "object.hpp"
+#include <pattern_functions.hpp>
 
 namespace evaluator
 {

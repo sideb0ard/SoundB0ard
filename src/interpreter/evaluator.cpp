@@ -1182,25 +1182,34 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
         proc->process_timer_type_ == ProcessTimerType::WHILE)
     {
         std::shared_ptr<object::String> pattern;
+        event_queue_item ev;
 
         if (pattern_obj->Type() == "GENERATOR")
         {
-            auto gen_obj =
-                std::dynamic_pointer_cast<object::Generator>(pattern_obj);
-            if (gen_obj)
-            {
-                auto ret = ApplyGeneratorRun(gen_obj);
-                if (ret->Type() == "STRING")
-                {
-                    pattern = std::dynamic_pointer_cast<object::String>(ret);
-                    std::cout << "APPLY GEN - Ret val:" << pattern->value_
-                              << std::endl;
-                }
-            }
+            std::cout << "GENERATOR YO!\n";
+            ev.generator = pattern_obj;
+            ev.pattern = "";
+            // auto gen_obj =
+            //    std::dynamic_pointer_cast<object::Generator>(pattern_obj);
+            // if (gen_obj)
+            //{
+            //    std::cout << "GOT AN OBJECT!!\n";
+            //    //        auto ret = ApplyGeneratorRun(gen_obj);
+            //    //        if (ret->Type() == "STRING")
+            //    //        {
+            //    //            pattern =
+            //    // std::dynamic_pointer_cast<object::String>(ret);
+            //    //            std::cout << "APPLY GEN - Ret val:" <<
+            //    //            pattern->value_
+            //    //                      << std::endl;
+            //    //        }
+            //}
         }
         else
+        // if (pattern_obj->Type() == "STRING")
         {
             pattern = std::dynamic_pointer_cast<object::String>(pattern_obj);
+            ev.pattern = pattern->value_;
         }
 
         std::vector<std::shared_ptr<PatternFunction>> process_funcz;
@@ -1211,8 +1220,8 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
             if (funcy)
                 process_funcz.push_back(funcy);
         }
+        std::cout << "EVAL PATTERN FUNCSz is done\n";
 
-        event_queue_item ev;
         ev.type = Event::PROCESS_UPDATE_EVENT;
         ev.target_process_id = proc->mixer_process_id_;
         ev.process_type = proc->process_type_;
@@ -1221,11 +1230,11 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
         ev.command = proc->command_;
         ev.target_type = proc->target_type_;
         ev.targets = proc->targets_;
-        ev.pattern = pattern->value_;
         ev.while_condition = proc->while_condition_;
         ev.while_body = proc->while_body_;
         ev.while_then_body = proc->while_then_body_;
         ev.funcz = process_funcz;
+        std::cout << "PUSGING EVENET\n";
         process_event_queue.push(ev);
     }
     else

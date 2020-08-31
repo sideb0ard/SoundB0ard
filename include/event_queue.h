@@ -1,6 +1,7 @@
 #include <string>
 #include <vector>
 
+#include <interpreter/object.hpp>
 #include <pattern_functions.hpp>
 
 enum Event
@@ -21,6 +22,7 @@ struct event_queue_item
     ProcessTimerType timer_type;
     float loop_len;
     std::string command;
+    std::shared_ptr<object::Object> generator;
     ProcessPatternTarget target_type;
     std::vector<std::string> targets;
     std::string pattern;

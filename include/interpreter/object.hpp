@@ -8,7 +8,6 @@
 #include <vector>
 
 #include <interpreter/ast.hpp>
-#include <mixer.h>
 
 namespace object
 {
