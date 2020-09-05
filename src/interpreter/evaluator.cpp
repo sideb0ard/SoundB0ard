@@ -1177,68 +1177,37 @@ std::shared_ptr<object::Object>
 EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
                      std::shared_ptr<object::Environment> env)
 {
-    auto pattern_obj = Eval(proc->pattern_, env);
-    if (pattern_obj->Type() == "STRING" || pattern_obj->Type() == "GENERATOR" ||
-        proc->process_timer_type_ == ProcessTimerType::WHILE)
+    event_queue_item ev;
+
+    ev.pattern_expression = proc->pattern_expression_;
+
+    std::vector<std::shared_ptr<PatternFunction>> process_funcz;
+
+    for (auto &f : proc->functions_)
     {
-        std::shared_ptr<object::String> pattern;
-        event_queue_item ev;
-
-        if (pattern_obj->Type() == "GENERATOR")
-        {
-            std::cout << "GENERATOR YO!\n";
-            ev.generator = pattern_obj;
-            ev.pattern = "";
-            // auto gen_obj =
-            //    std::dynamic_pointer_cast<object::Generator>(pattern_obj);
-            // if (gen_obj)
-            //{
-            //    std::cout << "GOT AN OBJECT!!\n";
-            //    //        auto ret = ApplyGeneratorRun(gen_obj);
-            //    //        if (ret->Type() == "STRING")
-            //    //        {
-            //    //            pattern =
-            //    // std::dynamic_pointer_cast<object::String>(ret);
-            //    //            std::cout << "APPLY GEN - Ret val:" <<
-            //    //            pattern->value_
-            //    //                      << std::endl;
-            //    //        }
-            //}
-        }
-        else
-        // if (pattern_obj->Type() == "STRING")
-        {
-            pattern = std::dynamic_pointer_cast<object::String>(pattern_obj);
-            ev.pattern = pattern->value_;
-        }
-
-        std::vector<std::shared_ptr<PatternFunction>> process_funcz;
-
-        for (auto &f : proc->functions_)
-        {
-            auto funcy = EvalPatternFunctionExpression(f);
-            if (funcy)
-                process_funcz.push_back(funcy);
-        }
-        std::cout << "EVAL PATTERN FUNCSz is done\n";
-
-        ev.type = Event::PROCESS_UPDATE_EVENT;
-        ev.target_process_id = proc->mixer_process_id_;
-        ev.process_type = proc->process_type_;
-        ev.timer_type = proc->process_timer_type_;
-        ev.loop_len = proc->loop_len_;
-        ev.command = proc->command_;
-        ev.target_type = proc->target_type_;
-        ev.targets = proc->targets_;
-        ev.while_condition = proc->while_condition_;
-        ev.while_body = proc->while_body_;
-        ev.while_then_body = proc->while_then_body_;
-        ev.funcz = process_funcz;
-        std::cout << "PUSGING EVENET\n";
-        process_event_queue.push(ev);
+        auto funcy = EvalPatternFunctionExpression(f);
+        if (funcy)
+            process_funcz.push_back(funcy);
     }
-    else
-        std::cout << "Nae PATTERMN!! its a " << pattern_obj->Type() << "\n";
+    std::cout << "EVAL PATTERN FUNCSz is done\n";
+
+    ev.type = Event::PROCESS_UPDATE_EVENT;
+    ev.target_process_id = proc->mixer_process_id_;
+    ev.process_type = proc->process_type_;
+    ev.timer_type = proc->process_timer_type_;
+    ev.loop_len = proc->loop_len_;
+    ev.command = proc->command_;
+    ev.target_type = proc->target_type_;
+    ev.targets = proc->targets_;
+    ev.while_condition = proc->while_condition_;
+    ev.while_body = proc->while_body_;
+    ev.while_then_body = proc->while_then_body_;
+    ev.funcz = process_funcz;
+    std::cout << "PUSGING EVENET\n";
+    process_event_queue.push(ev);
+    //}
+    // else
+    //    std::cout << "Nae PATTERMN!! its a " << pattern_obj->Type() << "\n";
 
     return NULLL;
 } // namespace evaluator

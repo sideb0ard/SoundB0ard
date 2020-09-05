@@ -6,7 +6,7 @@
 #include <array>
 
 #include <defjams.h>
-#include <interpreter/object.hpp>
+#include <interpreter/ast.hpp>
 #include <pattern_functions.hpp>
 #include <pattern_parser/ast.hpp>
 #include <pattern_parser/parser.hpp>
@@ -21,8 +21,8 @@ struct ProcessConfig
     std::string command;
     ProcessPatternTarget target_type;
     std::vector<std::string> targets;
+    std::shared_ptr<ast::Expression> pattern_expression;
     std::string pattern;
-    std::shared_ptr<object::Object> generator;
     std::vector<std::shared_ptr<PatternFunction>> funcz;
     mixer_timing_info tinfo;
 };
@@ -68,8 +68,9 @@ class Process
     float incr_{0};
     float current_val_{0};
 
+    // std::shared_ptr<object::Object> generator_;
+    std::shared_ptr<ast::Expression> pattern_expression_;
     std::string pattern_;
-    std::shared_ptr<object::Object> generator_;
 
     bool started_;
     bool active_;

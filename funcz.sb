@@ -1,20 +1,21 @@
 let rotrrr = gen() {
 	setup() {
-	  let pat = ["b1", "d1", "e1", "f1", "g2"]
-          let countz = ["3", "4", "7", "2"]
+	  let notes = ["c3", "g2" , "c2", "f0" ]
 	  let idx = 0
+
+ 	  let counts = ["3", "12", "4", "13", "7"]
 	  let count_idx = 0
+
 	}
 
 	run() {
-	  let note = pat[idx]
+	  let note = notes[idx]
 	  let idx = idx + 1
-	  if (idx > len(pat) - 1) { let idx = 0}
+	  if (idx > len(notes) - 1) { let idx = 0}
 
-          let count = countz[count_idx]
-          let count_idx = count_idx + 1
-	  if (count_idx > len(countz) - 1) { let count_idx = 0}
-      
+	  let count = counts[count_idx]
+	  let count_idx = count_idx + 1
+	  if (count_idx > len(counts) - 1) { let count_idx = 0}
 
           return note + "*" + count
 

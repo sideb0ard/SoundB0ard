@@ -23,6 +23,7 @@
 
 extern mixer *mixr;
 extern Tsqueue<std::string> interpret_command_queue;
+extern std::shared_ptr<object::Environment> global_env;
 
 namespace
 {
@@ -74,9 +75,9 @@ void Process::Update()
     target_type_ = pending_config_.target_type;
     targets_ = pending_config_.targets;
     pattern_ = pending_config_.pattern;
-    generator_ = pending_config_.generator;
+    pattern_expression_ = pending_config_.pattern_expression;
 
-    ParsePattern();
+    // ParsePattern();
 
     if (timer_type_ == ProcessTimerType::RAMP ||
         timer_type_ == ProcessTimerType::OVER ||
@@ -116,19 +117,36 @@ void Process::EventNotify(mixer_timing_info tinfo)
         update_pending_ = false;
     }
 
-    if (tinfo.is_start_of_loop && generator_)
+    if (tinfo.is_start_of_loop && pattern_expression_)
     {
-        auto gen_obj = std::dynamic_pointer_cast<object::Generator>(generator_);
-        if (gen_obj)
+        auto pattern_obj = evaluator::Eval(pattern_expression_, global_env);
+        if (pattern_obj->Type() == "STRING" ||
+            pattern_obj->Type() == "GENERATOR")
         {
-            auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
-            auto pattern_string =
-                std::dynamic_pointer_cast<object::String>(pattern_obj);
-            if (pattern_string)
+            std::shared_ptr<object::String> pattern;
+
+            if (pattern_obj->Type() == "GENERATOR")
             {
-                pattern_ = pattern_string->value_;
-                ParsePattern();
+                auto gen_obj =
+                    std::dynamic_pointer_cast<object::Generator>(pattern_obj);
+                if (gen_obj)
+                {
+                    auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
+                    auto pattern_string =
+                        std::dynamic_pointer_cast<object::String>(pattern_obj);
+                    if (pattern_string)
+                    {
+                        pattern_ = pattern_string->value_;
+                    }
+                }
             }
+            else if (pattern_obj->Type() == "STRING")
+            {
+                pattern =
+                    std::dynamic_pointer_cast<object::String>(pattern_obj);
+                pattern_ = pattern->value_;
+            }
+            ParsePattern();
         }
     }
 

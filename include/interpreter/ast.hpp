@@ -384,7 +384,7 @@ class ProcessStatement : public Statement
     std::vector<std::string> targets_;
     std::vector<std::shared_ptr<Expression>> functions_;
 
-    std::shared_ptr<Expression> pattern_;
+    std::shared_ptr<Expression> pattern_expression_;
 };
 
 class ExpressionStatement : public Statement

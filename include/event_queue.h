@@ -22,10 +22,9 @@ struct event_queue_item
     ProcessTimerType timer_type;
     float loop_len;
     std::string command;
-    std::shared_ptr<object::Object> generator;
+    std::shared_ptr<ast::Expression> pattern_expression;
     ProcessPatternTarget target_type;
     std::vector<std::string> targets;
-    std::string pattern;
     std::string while_condition;
     std::string while_body;
     std::string while_then_body;

@@ -113,11 +113,17 @@ void *process_worker_thread()
                     event->target_process_id < MAX_NUM_PROC)
                 {
                     ProcessConfig config = {
-                        event->process_type, event->timer_type,
-                        event->loop_len,     event->command,
-                        event->target_type,  event->targets,
-                        event->pattern,      event->generator,
-                        event->funcz,        event->timing_info};
+
+                        .process_type = event->process_type,
+                        .timer_type = event->timer_type,
+                        .loop_len = event->loop_len,
+                        .command = event->command,
+                        .target_type = event->target_type,
+                        .targets = event->targets,
+                        .pattern_expression = event->pattern_expression,
+                        .pattern = "",
+                        .funcz = event->funcz,
+                        .tinfo = event->timing_info};
 
                     mixr->processes_[event->target_process_id]->EnqueueUpdate(
                         config);
