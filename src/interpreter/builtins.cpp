@@ -9,7 +9,7 @@
 #include <vector>
 
 #include <audio_action_queue.h>
-#include <filereader.hpp>
+#include <filesystem>
 #include <interpreter/evaluator.hpp>
 #include <interpreter/sound_cmds.hpp>
 #include <keys.h>
@@ -18,9 +18,12 @@
 #include <tsqueue.hpp>
 #include <utils.h>
 
+namespace fs = std::filesystem;
+
 extern mixer *mixr;
 extern Tsqueue<audio_action_queue_item> audio_queue;
 extern Tsqueue<std::string> interpret_command_queue;
+extern Tsqueue<std::string> repl_queue;
 
 namespace builtin
 {
@@ -279,24 +282,27 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
-    {"import",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
-             int args_size = args.size();
-             if (args_size == 1)
-             {
-                 std::shared_ptr<object::String> filename =
-                     std::dynamic_pointer_cast<object::String>(args[0]);
+    {"import", std::make_shared<object::BuiltIn>(
+                   [](std::vector<std::shared_ptr<object::Object>> args)
+                       -> std::shared_ptr<object::Object> {
+                       int args_size = args.size();
+                       if (args_size == 1)
+                       {
+                           std::shared_ptr<object::String> filename =
+                               std::dynamic_pointer_cast<object::String>(
+                                   args[0]);
+                           auto cwd = fs::current_path();
+                           std::string filepath =
+                               cwd.generic_string() + "/" + filename->value_;
 
-                 std::string contents = ReadFileContents(filename->value_);
-                 interpret_command_queue.push(contents);
-             }
-             else
-                 std::cerr << "BARF! ARG SIZE SHOULD BE 1 -  SIZE IS "
-                           << args_size << std::endl;
-             return evaluator::NULLL;
-         })},
+                           mixr_set_file_to_monitor(mixr, filepath);
+                           repl_queue.push("Monitoring " + filepath);
+                       }
+                       else
+                           std::cerr << "BARF! ARG SIZE SHOULD BE 1 -  SIZE IS "
+                                     << args_size << std::endl;
+                       return evaluator::NULLL;
+                   })},
     {"loadPreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

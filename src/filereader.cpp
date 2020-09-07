@@ -6,18 +6,29 @@
 
 #include <filereader.hpp>
 
-std::string ReadFileContents(std::string filename)
+bool starts_with_comment(std::string line)
 {
-    char cwd[1024];
-    getcwd(cwd, 1023);
-    std::string full_filename = std::string(cwd) + "/" + filename;
-    std::cout << "Opening " << full_filename << std::endl;
+    std::size_t first_char_pos = line.find_first_not_of(" \t");
 
-    std::ifstream ifs(full_filename);
+    if (line[first_char_pos] == '#')
+        return true;
+
+    return false;
+}
+
+std::string ReadFileContents(std::string filepath)
+{
+    std::ifstream ifs(filepath);
     if (ifs.is_open())
     {
         std::stringstream buffer;
-        buffer << ifs.rdbuf();
+
+        std::string line;
+        while (getline(ifs, line))
+        {
+            if (!starts_with_comment(line))
+                buffer << line;
+        }
 
         return buffer.str();
     }

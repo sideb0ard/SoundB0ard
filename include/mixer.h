@@ -68,6 +68,10 @@ struct mixer
 
     preview_buffer preview;
 
+    // for importing functions - monitor this file for changes
+    std::string function_file_filepath;
+    std::time_t function_file_filepath_last_write_time{0};
+
     // std::vector<std::shared_ptr<Process>> processes;
     std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_ = {};
     bool proc_initialized_{false};
@@ -188,5 +192,6 @@ bool should_progress_chords(mixer *mixr, int tick);
 void mixer_next_chord(mixer *mixr);
 
 void mixer_help(mixer *mixr);
+void mixr_set_file_to_monitor(mixer *mixr, std::string filepath);
 
 #endif // MIXER_H

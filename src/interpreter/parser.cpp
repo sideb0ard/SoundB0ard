@@ -961,8 +961,8 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         process->target_type_ = ProcessPatternTarget::ENV;
 
         // process->pattern_ = ParseStringLiteral();
-        process->pattern_ = ParseExpression(Precedence::PREFIX);
-        std::cout << process->pattern_->String() << "YYUP YUP\n";
+        process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
+        std::cout << process->pattern_expression_->String() << "YYUP YUP\n";
         NextToken();
     }
     else if (PeekTokenIs(token::SLANG_HASH))
@@ -974,7 +974,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         process->target_type_ = ProcessPatternTarget::VALUES;
 
         // process->pattern_ = ParseStringLiteral();
-        process->pattern_ = ParseExpression(Precedence::PREFIX);
+        process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
 
         if (!ExpectPeek(token::SLANG_IDENT))
         {
@@ -1038,7 +1038,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         process->loop_len_ = std::stof(cur_token_.literal_);
         NextToken();
 
-        process->pattern_ = ParseExpression(Precedence::PREFIX);
+        process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
         NextToken();
 
         process->command_ = cur_token_.literal_;

@@ -7,10 +7,12 @@
 #include <readline/history.h>
 #include <readline/readline.h>
 
+#include <filesystem>
 #include <iostream>
 
 #include <algo_cmds.h>
 #include <cmdloop.h>
+#include <filereader.hpp>
 #include <midi_cmds.h>
 #include <mixer.h>
 #include <new_item_cmds.h>
@@ -19,6 +21,8 @@
 #include <tsqueue.hpp>
 #include <utils.h>
 #include <value_generator_cmds.h>
+
+namespace fs = std::filesystem;
 
 extern mixer *mixr;
 extern Tsqueue<std::string> interpret_command_queue;
@@ -35,6 +39,7 @@ extern wtable *wave_tables[5];
 char const *prompt = READLINE_SAFE_MAGENTA "SB#> " READLINE_SAFE_RESET;
 static char last_line[MAXLINE] = {};
 static bool active{true};
+const std::string tick("tick");
 
 int event_hook()
 {
@@ -42,9 +47,42 @@ int event_hook()
     {
         if (reply)
         {
-            std::cout << reply->data();
-            rl_line_buffer[0] = '\0';
-            rl_done = 1;
+            // TODO - this is a bit of a fudged way to signal a midi tick
+            if (tick.compare(reply->data()) == 0)
+            {
+                if (!mixr->function_file_filepath.empty())
+                {
+                    // std::cout << "GOT A FILE TO MONITOR!\n";
+                    fs::path func_path = mixr->function_file_filepath;
+                    if (fs::exists(func_path))
+                    {
+                        auto ftime = fs::last_write_time(func_path);
+                        std::time_t cftime =
+                            decltype(ftime)::clock::to_time_t(ftime);
+                        if (cftime >
+                            mixr->function_file_filepath_last_write_time)
+                        {
+                            std::string contents =
+                                ReadFileContents(mixr->function_file_filepath);
+                            interpret_command_queue.push(contents);
+                            mixr->function_file_filepath_last_write_time =
+                                cftime;
+                            std::cout << "NEWER TIME!\n";
+                            rl_line_buffer[0] = '\0';
+                            rl_done = 1;
+                        }
+                    }
+                    // read last modified date.
+                    // if data is > mixers saved modified date
+                    // import data and push to queue
+                }
+            }
+            else
+            {
+                std::cout << reply->data();
+                rl_line_buffer[0] = '\0';
+                rl_done = 1;
+            }
         }
     }
     return 0;

@@ -480,6 +480,7 @@ void mixer_midi_tick(mixer *mixr)
     //          mixr->timing_info.is_start_of_loop
     //          << std::endl;
 
+    repl_queue.push("tick");
     mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
     // lo_send(mixr->processing_addr, "/bpm", NULL);
 }
@@ -1091,4 +1092,9 @@ void mixer_next_chord(mixer *mixr)
     unsigned int root = mixr->timing_info.notes[scale_degree];
     unsigned int chord_type = get_chord_type(scale_degree);
     mixer_change_chord(mixr, root, chord_type);
+}
+
+void mixr_set_file_to_monitor(mixer *mixr, std::string filepath)
+{
+    mixr->function_file_filepath = filepath;
 }
