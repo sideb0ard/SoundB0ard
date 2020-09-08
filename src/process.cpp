@@ -79,24 +79,6 @@ void Process::Update()
 
     // ParsePattern();
 
-    if (timer_type_ == ProcessTimerType::RAMP ||
-        timer_type_ == ProcessTimerType::OVER ||
-        timer_type_ == ProcessTimerType::OSCILLATE)
-    {
-        sscanf(pattern_.c_str(), "%f %f", &start_, &end_);
-        current_val_ = start_;
-        float diff = std::abs(start_ - end_);
-        incr_ = diff / (loop_len_ * PPBAR);
-        if (incr_ == 0)
-        {
-            std::cout << "Nah mate, nae zeros allowed!\n";
-            return;
-        }
-
-        if (start_ > end_)
-            incr_ *= -1;
-    }
-
     for (auto &oldfz : pattern_functions_)
         oldfz->active_ = false;
     for (auto fz : pending_config_.funcz)
@@ -145,6 +127,24 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 pattern =
                     std::dynamic_pointer_cast<object::String>(pattern_obj);
                 pattern_ = pattern->value_;
+
+                if (timer_type_ == ProcessTimerType::RAMP ||
+                    timer_type_ == ProcessTimerType::OVER ||
+                    timer_type_ == ProcessTimerType::OSCILLATE)
+                {
+                    sscanf(pattern_.c_str(), "%f %f", &start_, &end_);
+                    current_val_ = start_;
+                    float diff = std::abs(start_ - end_);
+                    incr_ = diff / (loop_len_ * PPBAR);
+                    if (incr_ == 0)
+                    {
+                        std::cout << "Nah mate, nae zeros allowed!\n";
+                        return;
+                    }
+
+                    if (start_ > end_)
+                        incr_ *= -1;
+                }
             }
             ParsePattern();
         }

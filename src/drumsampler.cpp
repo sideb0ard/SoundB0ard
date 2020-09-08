@@ -107,6 +107,7 @@ stereo_val DrumSampler::genNext()
 std::string DrumSampler::Status()
 {
     std::stringstream ss;
+    ss << std::setprecision(2) << std::fixed;
     if (!active || volume == 0)
         ss << ANSI_COLOR_RESET;
     else

@@ -77,6 +77,7 @@ void dxsynth::stop()
 std::string dxsynth::Status()
 {
     std::stringstream ss;
+    ss << std::setprecision(2) << std::fixed;
     if (!active || volume == 0)
         ss << ANSI_COLOR_RESET;
     else
