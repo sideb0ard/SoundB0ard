@@ -200,10 +200,8 @@ int get_midi_note_from_string(char *string)
     // convert octave to midi semitones
     octave = 12 + (octave * 12);
 
-    // printf("MIDI NOTE:%s %d \n", note, octave);
     //// twelve semitones:
     //// C C#/Db D D#/Eb E F F#/Gb G G#/Ab A A#/Bb B
-    ////
     int midinotenum = -1;
     if (!strcasecmp("c", note))
         midinotenum = 0 + octave;

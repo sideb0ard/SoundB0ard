@@ -1,33 +1,24 @@
 let rotrrr = gen() {
 	setup() {
-	  let notes = ["f", "g", "bm", "a" ]
-	  let note_idx = 0
 
-	  let octaves = ["1", "0", "2", "1", "3", "2"]
-          let oct_idx = 0
-
- 	  let counts = ["30", "13", "4", "47", "2"]
-	  let count_idx = 0
-
-          #let JOBBIE = true
+	  let melody = compose("melody")
+	  let melody_idx = 0
 
 
 	}
 
 	run() {
-	  let note = notes[note_idx]
-	  let note_idx = note_idx + 1
-	  if (note_idx > len(notes) - 1) { let note_idx = 0}
 
-          let oct = octaves[oct_idx]
-          let oct_idx = oct_idx + 1
-	  if (oct_idx > len(octaves) - 1) { let oct_idx = 0}
+	  let cur_mel = melody[melody_idx]
+	  let melody_idx = melody_idx + 1
+	  if (melody_idx == len(melody))  { let melody_idx = 0 }
 
-	  let count = counts[count_idx]
-	  let count_idx = count_idx + 1
-	  if (count_idx > len(counts) - 1) { let count_idx = 0}
-
-          return note + oct + "*" + count
+	  let melody_string = ""
+	  for (i = 0; i == len(cur_mel) ; i+1) { 
+              let melody_string = melody_string + cur_mel[i] + "*" + (rand(10)+1) + " " ; 
+          }
+         
+          return melody_string 
 
 	}
 }

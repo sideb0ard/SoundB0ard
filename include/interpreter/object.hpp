@@ -20,6 +20,7 @@ constexpr char BOOLEAN_OBJ[] = "BOOLEAN";
 
 constexpr char RETURN_VALUE_OBJ[] = "RETURN_VALUE";
 
+constexpr char FORLOOP_OBJ[] = "FOR LOOP";
 constexpr char FUNCTION_OBJ[] = "FUNCTION";
 constexpr char GENERATOR_OBJ[] = "GENERATOR";
 
@@ -201,6 +202,35 @@ class Generator : public Object
     std::shared_ptr<Environment> env_;
     std::shared_ptr<ast::BlockStatement> setup_;
     std::shared_ptr<ast::BlockStatement> run_;
+};
+
+class ForLoop : public Object
+{
+  public:
+    ForLoop(std::shared_ptr<Environment> env,
+            std::shared_ptr<ast::Identifier> it,
+            std::shared_ptr<ast::Expression> iterator_value,
+            std::shared_ptr<ast::Expression> termination_condition,
+            std::shared_ptr<ast::Expression> increment,
+            std::shared_ptr<ast::BlockStatement> body)
+        : env_{env}, iterator_{it}, iterator_value_{iterator_value},
+          termination_condition_{termination_condition},
+          increment_{increment}, body_{body} {};
+    ~ForLoop() = default;
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    std::shared_ptr<Environment> env_;
+
+    std::shared_ptr<ast::Identifier> iterator_{nullptr};
+    std::shared_ptr<ast::Expression> iterator_value_{nullptr};
+
+    std::shared_ptr<ast::Expression> termination_condition_{nullptr};
+
+    std::shared_ptr<ast::Expression> increment_{nullptr};
+
+    std::shared_ptr<ast::BlockStatement> body_;
 };
 
 using BuiltInFunc = std::function<std::shared_ptr<object::Object>(

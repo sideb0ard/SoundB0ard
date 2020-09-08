@@ -164,6 +164,9 @@ std::string Generator::Inspect()
     return return_val.str();
 }
 
+ObjectType ForLoop::Type() { return FORLOOP_OBJ; }
+std::string ForLoop::Inspect() { return "FOR LOOP"; }
+
 std::string Array::Inspect()
 {
     std::stringstream elems;

@@ -85,6 +85,13 @@ bool IsValidHex(const std::string &mask)
     return true;
 }
 
+std::shared_ptr<object::String>
+NumberToString(std::shared_ptr<object::Number> num_obj)
+{
+    auto string_value = std::to_string(num_obj->value_);
+    return std::make_shared<object::String>(string_value);
+}
+
 } // namespace
 
 namespace evaluator
@@ -107,12 +114,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return EvalBlockStatement(block_statement_node, env);
     }
 
-    std::shared_ptr<ast::ForStatement> for_statement_node =
-        std::dynamic_pointer_cast<ast::ForStatement>(node);
-    if (for_statement_node)
-    {
-        return EvalForStatement(for_statement_node, env);
-    }
+    // std::shared_ptr<ast::ForStatement> for_statement_node =
+    //    std::dynamic_pointer_cast<ast::ForStatement>(node);
+    // if (for_statement_node)
+    //{
+    //    return EvalForStatement(for_statement_node, env);
+    //}
 
     std::shared_ptr<ast::ExpressionStatement> expr_statement_node =
         std::dynamic_pointer_cast<ast::ExpressionStatement>(node);
@@ -403,6 +410,22 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return std::make_shared<object::Function>(params, env, body);
     }
 
+    std::shared_ptr<ast::ForStatement> forloop =
+        std::dynamic_pointer_cast<ast::ForStatement>(node);
+    if (forloop)
+    {
+        auto it = forloop->iterator_;
+        auto iterator_value = forloop->iterator_value_;
+        auto termination_condition = forloop->termination_condition_;
+        auto increment = forloop->increment_;
+        auto body = forloop->body_;
+        auto new_env = std::make_shared<object::Environment>(env);
+        auto forloop_obj = std::make_shared<object::ForLoop>(
+            env, it, iterator_value, termination_condition, increment, body);
+
+        EvalForLoop(forloop_obj);
+    }
+
     std::shared_ptr<ast::GeneratorLiteral> gn =
         std::dynamic_pointer_cast<ast::GeneratorLiteral>(node);
     if (gn)
@@ -624,32 +647,25 @@ EvalPrefixExpression(std::string op, std::shared_ptr<object::Object> right)
 }
 
 std::shared_ptr<object::Object>
-EvalForStatement(std::shared_ptr<ast::ForStatement> for_loop,
-                 std::shared_ptr<object::Environment> env)
+EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
 {
-    std::shared_ptr<object::Environment> new_env =
-        std::make_shared<object::Environment>(env);
-
-    auto val = Eval(for_loop->iterator_value_, env);
+    auto val = Eval(for_loop->iterator_value_, for_loop->env_);
     if (IsError(val))
     {
+        std::cout << "OOPS< ERR!\n";
         return val;
     }
-    new_env->Set(for_loop->iterator_->value_, val);
-
-    std::cout << "SET " << for_loop->iterator_->String() << " with "
-              << val->Inspect() << std::endl;
+    for_loop->env_->Set(for_loop->iterator_->value_, val);
 
     std::shared_ptr<object::Object> result;
-    while (IsTruthy(Eval(for_loop->termination_condition_, new_env)))
+    while (!IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
     {
-        std::cout << "TRUTHY\n";
-        result = Eval(for_loop->body_, new_env);
-        std::cout << "RESULT? " << result << std::endl;
-        Eval(for_loop->increment_, new_env);
+        result = Eval(for_loop->body_, for_loop->env_);
+        auto val = Eval(for_loop->increment_, for_loop->env_);
+        for_loop->env_->Set(for_loop->iterator_->value_, val);
     }
 
-    return result;
+    return evaluator::NULLL;
 }
 
 std::shared_ptr<object::Object>
@@ -688,6 +704,20 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
         auto leftie = std::dynamic_pointer_cast<object::String>(left);
         auto rightie = std::dynamic_pointer_cast<object::String>(right);
         return EvalStringInfixExpression(op, leftie, rightie);
+    }
+    else if (left->Type() == object::STRING_OBJ &&
+             right->Type() == object::NUMBER_OBJ)
+    {
+        auto leftie = std::dynamic_pointer_cast<object::String>(left);
+        auto rightie = std::dynamic_pointer_cast<object::Number>(right);
+        return EvalStringInfixExpression(op, leftie, NumberToString(rightie));
+    }
+    else if (left->Type() == object::NUMBER_OBJ &&
+             right->Type() == object::STRING_OBJ)
+    {
+        auto leftie = std::dynamic_pointer_cast<object::Number>(left);
+        auto rightie = std::dynamic_pointer_cast<object::String>(right);
+        return EvalStringInfixExpression(op, NumberToString(leftie), rightie);
     }
     else if (op.compare("==") == 0)
         return NativeBoolToBooleanObject(left == right);

@@ -27,8 +27,7 @@ EvalBlockStatement(std::shared_ptr<ast::BlockStatement> block,
                    std::shared_ptr<object::Environment> env);
 
 std::shared_ptr<object::Object>
-EvalForStatement(std::shared_ptr<ast::ForStatement> for_loop,
-                 std::shared_ptr<object::Environment> env);
+EvalForLoop(std::shared_ptr<object::ForLoop> for_loop);
 
 std::shared_ptr<PatternFunction>
 EvalPatternFunctionExpression(std::shared_ptr<ast::Expression> func);

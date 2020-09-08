@@ -250,38 +250,51 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       }
                       return evaluator::NULLL;
                   })},
-    {"gen", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
-                    -> std::shared_ptr<object::Object> {
-                    int args_size = args.size();
-                    std::cout << "GEN! with num args:" << args_size
-                              << std::endl;
-                    if (args_size >= 1)
-                    {
-                        std::shared_ptr<object::String> str_obj =
-                            std::dynamic_pointer_cast<object::String>(args[0]);
-                        if (str_obj)
-                        {
-                            if (str_obj->value_ == "melody")
-                            {
-                                auto melody =
-                                    interpreter_sound_cmds::GenerateMelody();
-                                return std::make_shared<object::String>(melody);
-                            }
-                            else if (str_obj->value_ == "bass")
-                            {
-                                std::cout << "YO GEN A BASS YO\n";
-                            }
-                        }
-                        // auto cmd_name =
-                        // std::make_shared<object::String>("save");
-                        // args.push_back(cmd_name);
-                        // audio_action_queue_item action_req{
-                        //    .type = AudioAction::SAVE_PRESET, .args = args};
-                        // audio_queue.push(action_req);
-                    }
-                    return evaluator::NULLL;
-                })},
+    {"compose",
+     std::make_shared<
+         object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
+                              -> std::shared_ptr<object::Object> {
+         int args_size = args.size();
+         std::cout << "COMPOSE! with num args:" << args_size << std::endl;
+         if (args_size >= 1)
+         {
+             std::shared_ptr<object::String> str_obj =
+                 std::dynamic_pointer_cast<object::String>(args[0]);
+             if (str_obj)
+             {
+                 if (str_obj->value_ == "melody")
+                 {
+                     auto melody_obj = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
+                     auto melody = interpreter_sound_cmds::GenerateMelody();
+                     for (size_t i = 0; i < melody.size(); i++)
+                     {
+                         auto chord_obj = std::make_shared<object::Array>(
+                             std::vector<std::shared_ptr<object::Object>>());
+                         for (size_t j = 0; j < melody[i].size(); j++)
+                         {
+                             chord_obj->elements_.push_back(
+                                 std::make_shared<object::String>(
+                                     melody[i][j]));
+                         }
+                         melody_obj->elements_.push_back(chord_obj);
+                     }
+                     return melody_obj;
+                 }
+                 else if (str_obj->value_ == "bass")
+                 {
+                     std::cout << "YO GEN A BASS YO\n";
+                 }
+             }
+             // auto cmd_name =
+             // std::make_shared<object::String>("save");
+             // args.push_back(cmd_name);
+             // audio_action_queue_item action_req{
+             //    .type = AudioAction::SAVE_PRESET, .args = args};
+             // audio_queue.push(action_req);
+         }
+         return evaluator::NULLL;
+     })},
     {"import", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {
@@ -338,8 +351,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
              if (args.size() != 1)
-                 return evaluator::NewError(
-                     "`rand` requires a single synth argument.");
+                 return evaluator::NewError("`rand` requires a single argument "
+                                            "- either a synth, array or num.");
 
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
@@ -363,6 +376,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      int idx = rand() % len_elems;
                      return array_obj->elements_[idx];
                  }
+             }
+
+             auto number = std::dynamic_pointer_cast<object::Number>(args[0]);
+             if (number)
+             {
+                 auto rand_number = rand() % (int)number->value_;
+                 return std::make_shared<object::Number>(rand_number);
              }
 
              return evaluator::NULLL;

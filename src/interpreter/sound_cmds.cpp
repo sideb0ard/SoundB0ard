@@ -92,25 +92,30 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
     }
 }
 
-std::string GenerateMelody()
+std::vector<std::vector<std::string>> GenerateMelody()
 {
 
-    std::stringstream ss;
+    std::vector<std::vector<std::string>> melody;
     // TODO - tests - i think this is brittle, especially getting this key_str
     std::string key_str = GetNoteFromMidiNum(mixr->timing_info.key);
     for (int i = 0; i < mixr->prog_len; i++)
     {
+        std::vector<std::string> chord;
+
         int root_note = GetNthDegree(mixr->timing_info.key,
                                      mixr->prog_degrees[i], key_str[0]);
+        chord.push_back(GetNoteFromMidiNum(root_note));
 
         int third = GetThird(root_note, key_str[0]);
-        int fifth = GetFifth(root_note, key_str[0]);
+        chord.push_back(GetNoteFromMidiNum(third));
 
-        ss << GetNoteFromMidiNum(root_note) << ", " << GetNoteFromMidiNum(third)
-           << ", " << GetNoteFromMidiNum(fifth) << std::endl;
+        int fifth = GetFifth(root_note, key_str[0]);
+        chord.push_back(GetNoteFromMidiNum(fifth));
+
+        melody.push_back(chord);
     }
 
-    return ss.str();
+    return melody;
 }
 
 } // namespace interpreter_sound_cmds
