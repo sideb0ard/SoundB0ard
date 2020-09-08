@@ -13,10 +13,11 @@ let rotrrr = gen() {
 	  let melody_idx = melody_idx + 1
 	  if (melody_idx == len(melody))  { let melody_idx = 0 }
 
-	  let melody_string = ""
+	  let melody_string = "["
 	  for (i = 0; i == len(cur_mel) ; i+1) { 
-              let melody_string = melody_string + cur_mel[i] + "*" + (rand(10)+1) + " " ; 
+              let melody_string = melody_string + cur_mel[i] + ",";
           }
+	  let melody_string = melody_string + "]" + "*" + (rand(100) + 1)
          
           return melody_string 
 
