@@ -193,7 +193,8 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
         return nullptr;
     }
 
-    if (!ExpectPeek(token::SLANG_IDENT))
+    if (!ExpectPeek(token::SLANG_IDENT) && !ExpectPeek(token::SLANG_PITCH) &&
+        !ExpectPeek(token::SLANG_VOLUME))
     {
         std::cerr << "NOT GOT PARAM ! Peek token is " << peek_token_
                   << std::endl;
