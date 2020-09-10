@@ -514,9 +514,10 @@ static bool IsInfixOperator(token::TokenType type)
 {
     if (type == token::SLANG_PLUS || type == token::SLANG_MINUS ||
         type == token::SLANG_SLASH || type == token::SLANG_ASTERISK ||
-        type == token::SLANG_EQ || type == token::SLANG_NOT_EQ ||
-        type == token::SLANG_LT || type == token::SLANG_GT ||
-        type == token::SLANG_LPAREN || type == token::SLANG_LBRACKET)
+        type == token::SLANG_MODULO || type == token::SLANG_EQ ||
+        type == token::SLANG_NOT_EQ || type == token::SLANG_LT ||
+        type == token::SLANG_GT || type == token::SLANG_LPAREN ||
+        type == token::SLANG_LBRACKET)
     {
         return true;
     }

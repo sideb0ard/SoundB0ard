@@ -1,6 +1,6 @@
 
 let incrrr = fn(num, min, max) {
-	let num = num + 1
+	let num = ++num
 	if (num == max) { let num = 0 + min; } 
 	return num
 } 
@@ -13,8 +13,8 @@ let rotrrr = gen() {
 	  let octz = ["0", "1", "3", "2"]
           let oct_idx = 0
 
-	  let start_mult = 13
-	  let max_mult = 23
+	  let start_mult = 23
+	  let max_mult = 37
 	  let mult = start_mult
 
 	}
@@ -24,8 +24,9 @@ let rotrrr = gen() {
 	  let cur_mel = melody[melody_idx]
 	  let melody_idx = incrrr(melody_idx, 0, len(melody))
 
+	  if (rand(3) == 0) { reverse(cur_mel) }
 	  let melody_string = "["
-	  for (i = 0; i == len(cur_mel) ; i+1) { 
+	  for (i = 0; i == len(cur_mel) ; ++i) { 
               let melody_string = melody_string 
 				+ cur_mel[i] + octz[oct_idx] + " ";
           }

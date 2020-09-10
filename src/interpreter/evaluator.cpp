@@ -747,6 +747,9 @@ EvalNumberInfixExpression(std::string op, std::shared_ptr<object::Number> left,
         return std::make_shared<object::Number>(left->value_ * right->value_);
     else if (op.compare("/") == 0)
         return std::make_shared<object::Number>(left->value_ / right->value_);
+    else if (op.compare("%") == 0)
+        return std::make_shared<object::Number>(
+            fmod(left->value_, right->value_));
     else if (op.compare("<") == 0)
         return NativeBoolToBooleanObject(left->value_ < right->value_);
     else if (op.compare(">") == 0)
@@ -1219,7 +1222,6 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
         if (funcy)
             process_funcz.push_back(funcy);
     }
-    std::cout << "EVAL PATTERN FUNCSz is done\n";
 
     ev.type = Event::PROCESS_UPDATE_EVENT;
     ev.target_process_id = proc->mixer_process_id_;
@@ -1233,11 +1235,8 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
     ev.while_body = proc->while_body_;
     ev.while_then_body = proc->while_then_body_;
     ev.funcz = process_funcz;
-    std::cout << "PUSGING EVENET\n";
+
     process_event_queue.push(ev);
-    //}
-    // else
-    //    std::cout << "Nae PATTERMN!! its a " << pattern_obj->Type() << "\n";
 
     return NULLL;
 } // namespace evaluator

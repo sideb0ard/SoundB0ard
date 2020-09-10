@@ -1,0 +1,76 @@
+let drumgen = gen() {
+	setup() {
+	}
+
+	run() {
+	
+	let rhythm_string = ""
+	for (i = 0; i == 16; ++i) {
+	  if ( i == 0 ) {
+	    if (rand(100) < 90) { let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 1 ) {
+	    if (rand(100) < 5) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 2 ) {
+	    if (rand(100) < 5) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 3 ) {
+	    if (rand(100) < 90) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 4 ) {
+	    if (rand(100) < 5) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 5 ) {
+	    if (rand(100) < 20) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 6 ) {
+	    if (rand(100) < 80) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 7 ) {
+	    if (rand(100) < 5) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 8 ) {
+	    if (rand(100) < 90) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 9 ) {
+	    if (rand(100) < 20) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 10 ) {
+	    if (rand(100) < 50) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 11 ) {
+	    if (rand(100) < 60) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 12 ) {
+	    if (rand(100) < 5) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 13 ) {
+	    if (rand(100) < 30) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 14 ) {
+	    if (rand(100) < 60) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	  if ( i == 15 ) {
+	    if (rand(100) < 9) {let rhythm_string = rhythm_string + "1 "}
+	    else { let rhythm_string = rhythm_string + "~ " }
+	  }
+	}
+	return rhythm_string
+    }
+}

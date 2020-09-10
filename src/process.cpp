@@ -101,7 +101,8 @@ void Process::EventNotify(mixer_timing_info tinfo)
 
     if (tinfo.is_start_of_loop && pattern_expression_)
     {
-        auto pattern_obj = evaluator::Eval(pattern_expression_, global_env);
+        auto new_env = std::make_shared<object::Environment>(global_env);
+        auto pattern_obj = evaluator::Eval(pattern_expression_, new_env);
         if (pattern_obj->Type() == "STRING" ||
             pattern_obj->Type() == "GENERATOR")
         {

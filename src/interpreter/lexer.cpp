@@ -145,6 +145,10 @@ token::Token Lexer::NextToken()
         tok.type_ = token::SLANG_SLASH;
         tok.literal_ = current_char_;
         break;
+    case ('%'):
+        tok.type_ = token::SLANG_MODULO;
+        tok.literal_ = current_char_;
+        break;
     case ('<'):
         tok.type_ = token::SLANG_LT;
         tok.literal_ = current_char_;
