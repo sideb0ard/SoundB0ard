@@ -39,18 +39,18 @@ typedef struct soundgen_track
     int soundgen_track_num;
 } soundgen_track;
 
-typedef struct scene
+struct scene
 {
     int num_bars_to_play;
     int num_tracks;
     soundgen_track soundgen_tracks[MAX_TRACKS_PER_SCENE];
-} scene;
+};
 
 typedef unsigned int compat_key_list[6];
 
 // struct AbletonLink AbletonLink;
 
-typedef struct preview_buffer
+struct preview_buffer
 {
     char filename[512];
     double *audio_buffer{nullptr};
@@ -58,7 +58,7 @@ typedef struct preview_buffer
     int audio_buffer_len;
     int audio_buffer_read_idx;
     bool enabled;
-} preview_buffer;
+};
 
 stereo_val preview_buffer_generate(preview_buffer *buffy);
 void preview_buffer_import_file(preview_buffer *buffy, char *filename);

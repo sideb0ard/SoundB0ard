@@ -1,13 +1,16 @@
 let drumgen = gen() {
 	setup() {
+	  let notes = ["c1", "f1", "gm2", "g3"]
+	  let note_idx = 0;
 	}
 
 	run() {
 	
 	let rhythm_string = ""
+	if (rand(10) < 2) { return rhythm_string }
 	for (i = 0; i == 16; ++i) {
 	  if ( i == 0 ) {
-	    if (rand(100) < 90) { let rhythm_string = rhythm_string + "1 "}
+	    if (rand(100) < 90) { let rhythm_string = rhythm_string + note_id "1 "}
 	    else { let rhythm_string = rhythm_string + "~ " }
 	  }
 	  if ( i == 1 ) {

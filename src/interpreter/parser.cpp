@@ -937,9 +937,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         process->process_type_ = PATTERN_PROCESS;
         process->target_type_ = ProcessPatternTarget::ENV;
 
-        // process->pattern_ = ParseStringLiteral();
         process->pattern_expression_ = ParseExpression(Precedence::PREFIX);
-        std::cout << process->pattern_expression_->String() << "YYUP YUP\n";
         NextToken();
     }
     else if (PeekTokenIs(token::SLANG_HASH))
