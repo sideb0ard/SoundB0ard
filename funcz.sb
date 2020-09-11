@@ -3,6 +3,7 @@ let incrrr = fn(num, min, max) {
 	let num = ++num
 	if (num == max) { let num = 0 + min; } 
 	return num
+
 } 
 
 let rotrrr = gen() {

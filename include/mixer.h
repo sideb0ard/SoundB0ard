@@ -63,14 +63,19 @@ struct preview_buffer
 stereo_val preview_buffer_generate(preview_buffer *buffy);
 void preview_buffer_import_file(preview_buffer *buffy, char *filename);
 
+struct file_monitor
+{
+    std::string function_file_filepath;
+    std::time_t function_file_filepath_last_write_time{0};
+};
+
 struct mixer
 {
 
     preview_buffer preview;
 
-    // for importing functions - monitor this file for changes
-    std::string function_file_filepath;
-    std::time_t function_file_filepath_last_write_time{0};
+    // for importing functions - monitor these files for changes
+    std::vector<file_monitor> file_monitors;
 
     // std::vector<std::shared_ptr<Process>> processes;
     std::array<std::shared_ptr<Process>, MAX_NUM_PROC> processes_ = {};
@@ -192,6 +197,6 @@ bool should_progress_chords(mixer *mixr, int tick);
 void mixer_next_chord(mixer *mixr);
 
 void mixer_help(mixer *mixr);
-void mixr_set_file_to_monitor(mixer *mixr, std::string filepath);
+void mixr_add_file_to_monitor(mixer *mixr, std::string filepath);
 
 #endif // MIXER_H

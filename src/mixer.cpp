@@ -1094,7 +1094,8 @@ void mixer_next_chord(mixer *mixr)
     mixer_change_chord(mixr, root, chord_type);
 }
 
-void mixr_set_file_to_monitor(mixer *mixr, std::string filepath)
+void mixr_add_file_to_monitor(mixer *mixr, std::string filepath)
 {
-    mixr->function_file_filepath = filepath;
+    mixr->file_monitors.push_back(
+        file_monitor{.function_file_filepath = filepath});
 }

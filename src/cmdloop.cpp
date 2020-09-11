@@ -50,31 +50,35 @@ int event_hook()
             // TODO - this is a bit of a fudged way to signal a midi tick
             if (tick.compare(reply->data()) == 0)
             {
-                if (!mixr->function_file_filepath.empty())
+                for (auto &f : mixr->file_monitors)
                 {
-                    // std::cout << "GOT A FILE TO MONITOR!\n";
-                    fs::path func_path = mixr->function_file_filepath;
-                    if (fs::exists(func_path))
+                    if (!f.function_file_filepath.empty())
                     {
-                        auto ftime = fs::last_write_time(func_path);
-                        std::time_t cftime =
-                            decltype(ftime)::clock::to_time_t(ftime);
-                        if (cftime >
-                            mixr->function_file_filepath_last_write_time)
+                        //    // std::cout << "GOT A FILE TO MONITOR!\n";
+                        fs::path func_path = f.function_file_filepath;
+                        if (fs::exists(func_path))
                         {
-                            std::string contents =
-                                ReadFileContents(mixr->function_file_filepath);
-                            interpret_command_queue.push(contents);
-                            mixr->function_file_filepath_last_write_time =
-                                cftime;
-                            std::cout << "NEWER TIME!\n";
-                            rl_line_buffer[0] = '\0';
-                            rl_done = 1;
+                            auto ftime = fs::last_write_time(func_path);
+                            std::time_t cftime =
+                                decltype(ftime)::clock::to_time_t(ftime);
+                            if (cftime >
+                                f.function_file_filepath_last_write_time)
+                            {
+                                std::string contents =
+                                    ReadFileContents(f.function_file_filepath);
+                                interpret_command_queue.push(contents);
+
+                                std::cout << "UPdatin' "
+                                          << f.function_file_filepath
+                                          << std::endl;
+
+                                f.function_file_filepath_last_write_time =
+                                    cftime;
+                                rl_line_buffer[0] = '\0';
+                                rl_done = 1;
+                            }
                         }
                     }
-                    // read last modified date.
-                    // if data is > mixers saved modified date
-                    // import data and push to queue
                 }
             }
             else
@@ -118,7 +122,8 @@ void *loopy()
 int exxit()
 {
     printf(COOL_COLOR_PINK
-           "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET); // Thrashin' reference
+           "\nBeat it, ya val jerk!\n" ANSI_COLOR_RESET); // Thrashin'
+                                                          // reference
     write_history(NULL);
 
     pa_teardown();

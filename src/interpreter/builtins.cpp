@@ -308,7 +308,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                            std::string filepath =
                                cwd.generic_string() + "/" + filename->value_;
 
-                           mixr_set_file_to_monitor(mixr, filepath);
+                           mixr_add_file_to_monitor(mixr, filepath);
                            repl_queue.push("Monitoring " + filepath);
                        }
                        else
