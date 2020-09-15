@@ -495,9 +495,7 @@ TEST_F(EvaluatorTest, TestBuiltInFunctions)
     /////////////////////////////
 
     std::vector<std::string> nullTests{
-        R"(head([]))",
-        R"(tail([]))",
-        R"(last([]))",
+        R"(head([]))", R"(tail([]))", R"(last([]))",
         // R"(puts("hello", "world!"))",
     };
 
@@ -518,18 +516,12 @@ TEST_F(EvaluatorTest, TestForLoop)
     };
 
     std::vector<TestCase> tests{
-        {R"(for (i = 0; i < 5; ++i) { puts(i); i; })", "5"},
-        {R"(for (i = 5; i > 0; --i) { puts(i); i; })", "0"},
         {R"(let i = 7; let x = 10; for (i = 5; i > 0; --i) { let x = x +
-        i; puts(x); }; i)",
+         i; puts(x); }; i)",
          "7"},
-        {R"(let x = 10; for (i = 5; i > 0; --i) { let x = x + i; puts(x);
-        i;
-        }; i;)",
+        {R"(let x = 10; for (i = 5; i > 0; --i) { let x = x + i; puts(x); i; }; i;)",
          "ERROR: identifier not found: i"},
-        {R"(let x = 10; for (i = 5; i > 0; --i) { let x = x + x; puts(x);
-        x;
-        })",
+        {R"(let x = 10; for (i = 5; i > 0; --i) { let x = x + x; puts(x); x; })",
          "320"},
     };
 

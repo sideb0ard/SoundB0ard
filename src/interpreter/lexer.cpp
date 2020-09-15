@@ -194,8 +194,29 @@ token::Token Lexer::NextToken()
         tok.literal_ = current_char_;
         break;
     case ('|'):
-        tok.type_ = token::SLANG_PIPE;
-        tok.literal_ = current_char_;
+        if (PeekChar() == '|')
+        {
+            ReadChar();
+            tok.type_ = token::SLANG_OR;
+            tok.literal_ = "||";
+        }
+        else
+        {
+            tok.type_ = token::SLANG_PIPE;
+            tok.literal_ = current_char_;
+        }
+        break;
+    case ('&'):
+        if (PeekChar() == '&')
+        {
+            ReadChar();
+            tok.type_ = token::SLANG_AND;
+            tok.literal_ = "&&";
+        }
+        else
+        {
+            // something here?
+        }
         break;
     case ('"'):
         tok.type_ = token::SLANG_STRING;

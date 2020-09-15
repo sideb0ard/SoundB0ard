@@ -1104,10 +1104,11 @@ TEST_F(ParserTest, TestParsingProcessDollarStatement)
     EXPECT_EQ(stmt->target_type_, ProcessPatternTarget::ENV);
 
     std::shared_ptr<ast::StringLiteral> pattern =
-        std::dynamic_pointer_cast<ast::StringLiteral>(stmt->pattern_);
+        std::dynamic_pointer_cast<ast::StringLiteral>(
+            stmt->pattern_expression_);
     if (!pattern)
         FAIL() << "process pattern_ is not a StringLiteral. Got "
-               << typeid(&stmt->pattern_).name();
+               << typeid(&stmt->pattern_expression_).name();
     EXPECT_EQ(pattern->value_, "bd*3 sd");
 }
 
@@ -1131,10 +1132,11 @@ TEST_F(ParserTest, TestParsingProcessHashStatement)
     EXPECT_EQ(stmt->target_type_, ProcessPatternTarget::VALUES);
 
     std::shared_ptr<ast::StringLiteral> pattern =
-        std::dynamic_pointer_cast<ast::StringLiteral>(stmt->pattern_);
+        std::dynamic_pointer_cast<ast::StringLiteral>(
+            stmt->pattern_expression_);
     if (!pattern)
         FAIL() << "process pattern_ is not a StringLiteral. Got "
-               << typeid(&stmt->pattern_).name();
+               << typeid(&stmt->pattern_expression_).name();
     EXPECT_EQ(pattern->value_, "34 <44 47>");
 
     EXPECT_EQ(4, stmt->targets_.size());
@@ -1167,6 +1169,8 @@ TEST_F(ParserTest, TestEveryNPatternFunction)
         FAIL()
             << "proc->functions_[0] is not a PatternFunctionExpression - got "
             << proc->functions_[0]->String();
+    std::cout << "ALL GOOD, YO! For a Pattern Funky Expression:"
+              << func_every_n->String() << std::endl;
 
     ASSERT_EQ(2, func_every_n->arguments_.size());
 
@@ -1176,13 +1180,15 @@ TEST_F(ParserTest, TestEveryNPatternFunction)
     if (!every_n)
         FAIL() << "func_every_n->arguments_[0] is not an NumberLiteral - got "
                << func_every_n->arguments_[0]->String();
+    std::cout << "ALL GOOD, YO! For an N value of:" << every_n->String()
+              << std::endl;
 
-    auto func_arg = std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
-        func_every_n->arguments_[1]);
+    auto func_arg =
+        std::dynamic_pointer_cast<ast::Identifier>(func_every_n->arguments_[1]);
 
     if (!func_arg)
         FAIL() << "func_every_n->arguments_[1] is not a "
-                  "PatternFunctionExpression - got "
+                  "Identifier - got "
                << func_every_n->arguments_[1]->String();
 }
 
@@ -1223,12 +1229,12 @@ TEST_F(ParserTest, TestHashEveryNPatternFunction)
         FAIL() << "func_every_n->arguments_[0] is not an NumberLiteral - got "
                << func_every_n->arguments_[0]->String();
 
-    auto func_arg = std::dynamic_pointer_cast<ast::PatternFunctionExpression>(
-        func_every_n->arguments_[1]);
+    auto func_arg =
+        std::dynamic_pointer_cast<ast::Identifier>(func_every_n->arguments_[1]);
 
     if (!func_arg)
         FAIL() << "func_every_n->arguments_[1] is not a "
-                  "PatternFunctionExpression - got "
+                  "Identifier - got "
                << func_every_n->arguments_[1]->String();
 }
 

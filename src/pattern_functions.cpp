@@ -68,7 +68,6 @@ void PatternEvery::TransformPattern(
 std::string PatternEvery::String() const
 {
     std::stringstream ss;
-    ss << "every " << every_n_ << " " << func_->String();
     return ss.str();
 }
 

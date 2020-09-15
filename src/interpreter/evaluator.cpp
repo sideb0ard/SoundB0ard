@@ -114,13 +114,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return EvalBlockStatement(block_statement_node, env);
     }
 
-    // std::shared_ptr<ast::ForStatement> for_statement_node =
-    //    std::dynamic_pointer_cast<ast::ForStatement>(node);
-    // if (for_statement_node)
-    //{
-    //    return EvalForStatement(for_statement_node, env);
-    //}
-
     std::shared_ptr<ast::ExpressionStatement> expr_statement_node =
         std::dynamic_pointer_cast<ast::ExpressionStatement>(node);
     if (expr_statement_node)
@@ -421,9 +414,10 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         auto body = forloop->body_;
         auto new_env = std::make_shared<object::Environment>(env);
         auto forloop_obj = std::make_shared<object::ForLoop>(
-            env, it, iterator_value, termination_condition, increment, body);
+            new_env, it, iterator_value, termination_condition, increment,
+            body);
 
-        EvalForLoop(forloop_obj);
+        return EvalForLoop(forloop_obj);
     }
 
     std::shared_ptr<ast::GeneratorLiteral> gn =
@@ -649,23 +643,22 @@ EvalPrefixExpression(std::string op, std::shared_ptr<object::Object> right)
 std::shared_ptr<object::Object>
 EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
 {
-    auto val = Eval(for_loop->iterator_value_, for_loop->env_);
-    if (IsError(val))
+    auto initial_iterator_val = Eval(for_loop->iterator_value_, for_loop->env_);
+    if (IsError(initial_iterator_val))
     {
-        std::cout << "OOPS< ERR!\n";
-        return val;
+        std::cerr << "OOPS< ERR!\n";
+        return initial_iterator_val;
     }
-    for_loop->env_->Set(for_loop->iterator_->value_, val);
+    for_loop->env_->Set(for_loop->iterator_->value_, initial_iterator_val);
 
     std::shared_ptr<object::Object> result;
-    while (!IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
+    while (IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
     {
         result = Eval(for_loop->body_, for_loop->env_);
-        auto val = Eval(for_loop->increment_, for_loop->env_);
-        for_loop->env_->Set(for_loop->iterator_->value_, val);
+        Eval(for_loop->increment_, for_loop->env_);
     }
 
-    return evaluator::NULLL;
+    return result;
 }
 
 std::shared_ptr<object::Object>

@@ -517,6 +517,7 @@ static bool IsInfixOperator(token::TokenType type)
         type == token::SLANG_MODULO || type == token::SLANG_EQ ||
         type == token::SLANG_NOT_EQ || type == token::SLANG_LT ||
         type == token::SLANG_GT || type == token::SLANG_LPAREN ||
+        type == token::SLANG_AND || type == token::SLANG_OR ||
         type == token::SLANG_LBRACKET)
     {
         return true;
@@ -559,7 +560,9 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
 std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
 {
     if (cur_token_.type_ == token::SLANG_IDENT)
+    {
         return ParseIdentifier();
+    }
     else if (cur_token_.type_ == token::SLANG_NUMBER)
         return ParseNumberLiteral();
     else if (cur_token_.type_ == token::SLANG_INCREMENT)
@@ -599,9 +602,9 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseArrayLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACE)
         return ParseHashLiteral();
-    {
-        return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
-    }
+    //{
+    //    return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
+    //}
 
     return nullptr;
 }
@@ -917,9 +920,9 @@ void Parser::ConsumePatternFunctions(
     // the rest are arguments
     while (!CurTokenIs(token::SLANG_PIPE) && !CurTokenIs(token::SLANG_EOFF))
     {
-        auto expr = ParseExpression(Precedence::LOWEST);
-        if (expr)
-            func->arguments_.push_back(expr);
+        auto arg = ParseExpression(Precedence::LOWEST);
+        if (arg)
+            func->arguments_.push_back(arg);
         NextToken();
     }
     proc->functions_.push_back(func);

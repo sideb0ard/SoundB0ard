@@ -56,6 +56,9 @@ const TokenType SLANG_NOT_EQ = "!=";
 const TokenType SLANG_INCREMENT = "++";
 const TokenType SLANG_DECREMENT = "--";
 
+const TokenType SLANG_AND = "&&";
+const TokenType SLANG_OR = "||";
+
 // Soundb0ard specific //////////////////
 // /////////////////////////
 
