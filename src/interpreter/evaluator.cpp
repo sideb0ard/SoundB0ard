@@ -716,6 +716,22 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
         return NativeBoolToBooleanObject(left == right);
     else if (op.compare("!=") == 0)
         return NativeBoolToBooleanObject(left != right);
+    else if (op.compare("&&") == 0 || op.compare("||") == 0)
+    {
+        if (left->Type() == object::BOOLEAN_OBJ &&
+            right->Type() == object::BOOLEAN_OBJ)
+        {
+            auto leftie = std::dynamic_pointer_cast<object::Boolean>(left);
+            auto rightie = std::dynamic_pointer_cast<object::Boolean>(right);
+
+            if (op.compare("&&") == 0)
+                return NativeBoolToBooleanObject(leftie->value_ &&
+                                                 rightie->value_);
+            else
+                return NativeBoolToBooleanObject(leftie->value_ ||
+                                                 rightie->value_);
+        }
+    }
     else if (left->Type() != right->Type())
     {
         std::cerr << "LEFT AND  RIGHT AIN'T CORRECT!\n";

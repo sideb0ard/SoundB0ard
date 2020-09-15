@@ -519,9 +519,7 @@ static bool IsInfixOperator(token::TokenType type)
         type == token::SLANG_GT || type == token::SLANG_LPAREN ||
         type == token::SLANG_AND || type == token::SLANG_OR ||
         type == token::SLANG_LBRACKET)
-    {
         return true;
-    }
     return false;
 }
 
@@ -602,9 +600,6 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParseArrayLiteral();
     else if (cur_token_.type_ == token::SLANG_LBRACE)
         return ParseHashLiteral();
-    //{
-    //    return std::make_shared<ast::PatternFunctionExpression>(cur_token_);
-    //}
 
     return nullptr;
 }

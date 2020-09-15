@@ -636,4 +636,27 @@ TEST_F(EvaluatorTest, TestIncrementOperators)
     }
 }
 
+TEST_F(EvaluatorTest, TestLogicalOperators)
+{
+    struct TestCase
+    {
+        std::string input;
+        int64_t expected;
+    };
+    std::vector<TestCase> tests{
+        {"true && true", true},           {"true && false", false},
+        {"false && false", false},        {"false && true", false},
+        {"true || true", true},           {"true || false", true},
+        {"false || false", false},        {"false || true", true},
+        {"10 > 1 && 10 > 2", true},       {"10 < 1 || 10 > 2", true},
+        {"10 > 1 && 10 > 12", false},     {"10 < 1 || 10 < 12", true},
+        {"true && true && false", false}, {"true && true && true", true},
+    };
+
+    for (auto tt : tests)
+    {
+        EXPECT_TRUE(TestBooleanObject(TestEval(tt.input), tt.expected));
+    }
+}
+
 } // namespace

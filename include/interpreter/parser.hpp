@@ -18,6 +18,7 @@ enum class Precedence
 {
     _,
     LOWEST,
+    LOGICALANDOR,
     EQUALS,
     LESSGREATER,
     SUM,
@@ -28,6 +29,8 @@ enum class Precedence
 };
 
 const std::unordered_map<token::TokenType, Precedence> precedences{
+    {token::SLANG_AND, Precedence::LOGICALANDOR},
+    {token::SLANG_OR, Precedence::LOGICALANDOR},
     {token::SLANG_EQ, Precedence::EQUALS},
     {token::SLANG_NOT_EQ, Precedence::EQUALS},
     {token::SLANG_LT, Precedence::LESSGREATER},
