@@ -6,41 +6,23 @@ let incrrr = fn(num, min, max)
     return num
 }
 
-let rotrrr = gen()
-{
-    setup(){
-	let melody = compose("melody");
-	let melody_idx = 0;
 
-        let octz = [ "0", "1", "3", "2" ];
-	let oct_idx = 0
+let simple = gen() {
+	setup() {
+		let notes = ["c0", "d0", "f0", "g0"];
+		let idx = 0;
+	}
 
-        let start_mult = 23;
-	let max_mult = 37;
-	let mult = start_mult
+	run() {
+		let pattern = "";
+		for (i = 0 ; i < 3; ++i) {
+			pattern = pattern + notes[idx] + "*3 ";
+			idx = incrrr(idx, 0, len(notes));
+		}
+		if (rand(10) > 2) {
+			pattern = pattern + "f1*13 ";
+		}
 
-    }
-
-    run()
-    {
-
-        let cur_mel = melody[melody_idx];
-	let melody_idx = incrrr(melody_idx, 0, len(melody));
-
-        if (rand(3) == 0){
-		reverse(cur_mel);
-	} 
-	let melody_string = "["; 
-	for (i = 0; i < len(cur_mel); ++i)
-        {
-            melody_string = melody_string + cur_mel[i] + octz[oct_idx] + " ";
-        }
-
-        melody_string = melody_string + "]" + "*" + mult;
-
-	oct_idx = incrrr(oct_idx, 0, len(octz))
-        mult = incrrr(mult, start_mult, max_mult)
-
-        return melody_string
-    }
+		return pattern;
+	}
 }
