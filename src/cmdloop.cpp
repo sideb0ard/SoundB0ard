@@ -58,24 +58,33 @@ int event_hook()
                         fs::path func_path = f.function_file_filepath;
                         if (fs::exists(func_path))
                         {
-                            auto ftime = fs::last_write_time(func_path);
-                            std::time_t cftime =
-                                decltype(ftime)::clock::to_time_t(ftime);
-                            if (cftime >
-                                f.function_file_filepath_last_write_time)
+                            std::error_code ec;
+                            auto ftime = fs::last_write_time(func_path, ec);
+                            if (!ec)
                             {
-                                std::string contents =
-                                    ReadFileContents(f.function_file_filepath);
-                                interpret_command_queue.push(contents);
+                                std::time_t cftime =
+                                    decltype(ftime)::clock::to_time_t(ftime);
+                                if (cftime >
+                                    f.function_file_filepath_last_write_time)
+                                {
+                                    std::string contents = ReadFileContents(
+                                        f.function_file_filepath);
+                                    interpret_command_queue.push(contents);
 
-                                std::cout << "UPdatin' "
-                                          << f.function_file_filepath
+                                    std::cout << "UPdatin' "
+                                              << f.function_file_filepath
+                                              << std::endl;
+
+                                    f.function_file_filepath_last_write_time =
+                                        cftime;
+                                    rl_line_buffer[0] = '\0';
+                                    rl_done = 1;
+                                }
+                            }
+                            else
+                            {
+                                std::cerr << "Error opening file:" << ec
                                           << std::endl;
-
-                                f.function_file_filepath_last_write_time =
-                                    cftime;
-                                rl_line_buffer[0] = '\0';
-                                rl_done = 1;
                             }
                         }
                     }

@@ -1,23 +1,24 @@
-
-let incrrr = fn(num, min, max)
+let incr = fn(num, min, max)
 {
     let num = ++num; 
-    if (num == max) { let num = 0 + min; }
+    if (num == max || num > max) { num = 0 + min; }
     return num
 }
 
 
 let simple = gen() {
 	setup() {
-		let notes = ["c0", "d0", "f0", "g0"];
+		#let notes = ["b2", "a0", "f0", "g0"];
+		let notes = ["c2", "c0", "c1", "g0"];
 		let idx = 0;
+
 	}
 
 	run() {
 		let pattern = "";
 		for (i = 0 ; i < 3; ++i) {
 			pattern = pattern + notes[idx] + "*3 ";
-			idx = incrrr(idx, 0, len(notes));
+			idx = incr(idx, 0, len(notes));
 		}
 		if (rand(10) > 2) {
 			pattern = pattern + "f1*13 ";

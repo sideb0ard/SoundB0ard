@@ -2,7 +2,8 @@ let drumgen = gen()
 {
     setup()
     { 
-        let notes = [ "c3", "f1", "gm4", "g3" ];
+        #let notes = [ "c3", "f1", "gm4", "g3" ];
+	let notes = ["e4", "gm4", "b4", "dm5", "d5", "gm4", "e4", "dm5", "b4", "gm4", "d5", "dm5"]
 	let note_idx = 0;
         let beat_probability = [90, 5, 5, 90, 4, 20, 80, 5, 90, 20, 50, 60, 5, 30, 60, 9];
     }
