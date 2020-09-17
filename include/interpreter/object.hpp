@@ -157,7 +157,8 @@ class Environment
         : outer_env_{outer_env} {};
     ~Environment() = default;
     std::shared_ptr<Object> Get(std::string key);
-    std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val);
+    std::shared_ptr<Object> Set(std::string key, std::shared_ptr<Object> val,
+                                bool create = true);
     std::string Debug();
     std::unordered_map<std::string, int> GetSoundGenerators();
 

@@ -659,4 +659,24 @@ TEST_F(EvaluatorTest, TestLogicalOperators)
     }
 }
 
+TEST_F(EvaluatorTest, TestEnvironmentLookup)
+{
+    struct TestCase
+    {
+        std::string input;
+        std::string expected;
+    };
+
+    std::vector<TestCase> tests{
+        {R"(let bob = 10; for (i = 0; i < 5; ++i) { bob = bob + i }; bob)",
+         "20"},
+        {R"(let x = 10; x = 12; x)", "12"},
+    };
+
+    for (auto &tt : tests)
+    {
+        std::shared_ptr<object::Object> evaluated = TestEval(tt.input);
+        EXPECT_EQ(evaluated->Inspect(), tt.expected);
+    }
+}
 } // namespace

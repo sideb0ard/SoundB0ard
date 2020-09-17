@@ -227,10 +227,28 @@ std::shared_ptr<Object> Environment::Get(std::string name)
     return entry->second;
 }
 
-std::shared_ptr<Object> Environment::Set(std::string key,
-                                         std::shared_ptr<Object> val)
+std::shared_ptr<Object>
+Environment::Set(std::string key, std::shared_ptr<Object> val, bool create)
 {
-    store_[key] = val;
+    if (create)
+    {
+        store_[key] = val;
+    }
+    else
+    {
+        auto entry = store_.find(key);
+        if (entry != store_.end())
+        {
+            store_[key] = val;
+        }
+        else
+        {
+            if (outer_env_)
+                return outer_env_->Set(key, val, create);
+            std::cerr << key << " not found.\n";
+            return nullptr;
+        }
+    }
     return val;
 }
 

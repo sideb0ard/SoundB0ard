@@ -340,6 +340,7 @@ class LetStatement : public Statement
   public:
     explicit LetStatement(Token toke) : Statement(toke) {}
     std::string String() const override;
+    bool is_new_item{false};
 
   public:
     std::shared_ptr<Identifier> name_{nullptr};

@@ -72,8 +72,8 @@ std::shared_ptr<ast::Statement> Parser::ParseStatement()
 std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
 {
 
-    std::shared_ptr<ast::LetStatement> stmt =
-        std::make_shared<ast::LetStatement>(cur_token_);
+    auto stmt = std::make_shared<ast::LetStatement>(cur_token_);
+    stmt->is_new_item = true;
 
     if (!ExpectPeek(token::SLANG_IDENT))
     {
@@ -444,11 +444,34 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
     return stmt;
 }
 
-std::shared_ptr<ast::ExpressionStatement> Parser::ParseExpressionStatement()
+std::shared_ptr<ast::Statement> Parser::ParseExpressionStatement()
 {
     std::shared_ptr<ast::ExpressionStatement> stmt =
         std::make_shared<ast::ExpressionStatement>(cur_token_);
     stmt->expression_ = ParseExpression(Precedence::LOWEST);
+
+    // if expression_ == IDENTIFIER && PeekToken is ASSIGN
+    // convert to Let Statement
+    auto ident = std::dynamic_pointer_cast<ast::Identifier>(stmt->expression_);
+    if (ident)
+    {
+        if (PeekTokenIs(token::SLANG_ASSIGN))
+        {
+            NextToken();
+            Token let_toke(token::SLANG_LET, "let");
+            auto stmt = std::make_shared<ast::LetStatement>(let_toke);
+            stmt->is_new_item = false;
+            stmt->name_ = ident;
+
+            NextToken();
+            stmt->value_ = ParseExpression(Precedence::LOWEST);
+
+            if (PeekTokenIs(token::SLANG_SEMICOLON))
+                NextToken();
+
+            return stmt;
+        }
+    }
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -527,7 +550,6 @@ static bool IsInfixOperator(token::TokenType type)
 
 std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
 {
-
     // these are the 'nuds' (null detontations) in the Vaughan Pratt paper
     // 'top down operator precedence'.
     std::shared_ptr<ast::Expression> left_expr = ParseForPrefixExpression();
@@ -558,9 +580,7 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
 std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
 {
     if (cur_token_.type_ == token::SLANG_IDENT)
-    {
         return ParseIdentifier();
-    }
     else if (cur_token_.type_ == token::SLANG_NUMBER)
         return ParseNumberLiteral();
     else if (cur_token_.type_ == token::SLANG_INCREMENT)

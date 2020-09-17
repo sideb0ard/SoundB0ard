@@ -187,7 +187,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         {
             return val;
         }
-        env->Set(let_expr->name_->value_, val);
+        env->Set(let_expr->name_->value_, val, let_expr->is_new_item);
     }
 
     std::shared_ptr<ast::LsStatement> ls_stmt =
@@ -734,7 +734,9 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
     }
     else if (left->Type() != right->Type())
     {
-        std::cerr << "LEFT AND  RIGHT AIN'T CORRECT!\n";
+        std::cerr << "LEFT AND  RIGHT AIN'T CORRECT! - LEFT IS:" << left->Type()
+                  << "(" << left->Inspect() << ")"
+                  << " and RIGHT is " << right->Type() << "\n";
         return NewError("type mismatch: %s %s %s", left->Type(), op,
                         right->Type());
     }

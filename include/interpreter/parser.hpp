@@ -73,7 +73,7 @@ class Parser
     void ConsumePatternFunctions(std::shared_ptr<ast::ProcessStatement> proc);
     std::shared_ptr<ast::VolumeStatement> ParseVolumeStatement();
 
-    std::shared_ptr<ast::ExpressionStatement> ParseExpressionStatement();
+    std::shared_ptr<ast::Statement> ParseExpressionStatement();
 
     std::shared_ptr<ast::Expression> ParseExpression(Precedence p);
     std::shared_ptr<ast::Expression> ParseIdentifier();
