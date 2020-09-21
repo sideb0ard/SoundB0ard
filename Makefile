@@ -34,10 +34,10 @@ LIBS=-lportaudio -lportmidi -lreadline -lm -lpthread -lsndfile -lprofiler -lffts
 
 WARNFLAGS = -Wall -Wextra -pedantic -Wstrict-prototypes -Wmissing-prototypes -Wno-variadic-macros -Wno-c99-extensions -Wno-vla-extension -Wno-unused-parameter -Wno-four-char-constants
 CPPFLAGS = -isystem $(GTEST_DIR)/include
-#CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O0 -fsanitize=address -fno-omit-frame-pointer
+#CXXFLAGS += -std=c++17 $(WARNFLAGS) -glldb -O3 -fsanitize=address -fno-omit-frame-pointer -fno-optimize-sibling-calls
 #CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O1 -fsanitize=thread -fno-omit-frame-pointer
 #CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O1 -fsanitize=thread -fno-omit-frame-pointer
-CXXFLAGS += -std=c++17 $(WARNFLAGS) -ggdb -O3 -fno-omit-frame-pointer
+CXXFLAGS += -std=c++17 $(WARNFLAGS) -glldb -O3 -fno-omit-frame-pointer
 
 
 $(OBJDIR)/%.o: %.cpp

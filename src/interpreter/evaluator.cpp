@@ -967,11 +967,8 @@ ApplyFunction(std::shared_ptr<object::Object> callable,
         std::dynamic_pointer_cast<object::Function>(callable);
     if (func)
     {
-        // TODO - is this a good idea, updating the internal ENV?
-        // auto extended_env = ExtendFunctionEnv(func, args);
-        // auto evaluated = Eval(func->body_, extended_env);
-        func->env_ = ExtendFunctionEnv(func, args);
-        auto evaluated = Eval(func->body_, func->env_);
+        auto extended_env = ExtendFunctionEnv(func, args);
+        auto evaluated = Eval(func->body_, extended_env);
         return UnwrapReturnValue(evaluated);
     }
 

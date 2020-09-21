@@ -679,4 +679,23 @@ TEST_F(EvaluatorTest, TestEnvironmentLookup)
         EXPECT_EQ(evaluated->Inspect(), tt.expected);
     }
 }
+TEST_F(EvaluatorTest, TestParseFuncArgs)
+{
+    struct TestCase
+    {
+        std::string input;
+        std::string expected;
+    };
+
+    std::vector<TestCase> tests{
+        {R"(let testfunc = fn(x) { puts(x); x }; testfunc(2+1);)", "3"},
+        {R"(let testfunc = fn(x) { puts(x); x }; testfunc(3-1);)", "2"},
+    };
+
+    for (auto &tt : tests)
+    {
+        std::shared_ptr<object::Object> evaluated = TestEval(tt.input);
+        EXPECT_EQ(evaluated->Inspect(), tt.expected);
+    }
+}
 } // namespace

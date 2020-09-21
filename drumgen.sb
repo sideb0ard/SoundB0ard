@@ -25,7 +25,7 @@ let drumgen = gen()
             if (prob < beat_probability[i])
             {
                 rhythm_string = rhythm_string + notes[note_idx] + " ";
-                note_idx = incrrr(note_idx, 0, len(notes))
+                note_idx = incr(note_idx, 0, len(notes))
             }
             else
             {

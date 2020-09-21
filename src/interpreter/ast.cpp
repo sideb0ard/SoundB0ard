@@ -170,7 +170,6 @@ std::string ExpressionStatement::String() const
     std::stringstream ss;
     if (expression_)
     {
-        std::cout << "EXPRESTATEMNT:" << expression_->String() << "\n";
         ss << expression_->String();
     }
 

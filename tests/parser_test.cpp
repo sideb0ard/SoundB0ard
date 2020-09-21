@@ -1298,4 +1298,44 @@ TEST_F(ParserTest, TestRotateLeftFunction)
     ASSERT_EQ(1, func_rotl->arguments_.size());
 }
 
+TEST_F(ParserTest, TestCallExpressionArgs)
+{
+    std::string input = "add(x - 11);";
+    std::cout << "CALL EXPRESSION ARGGGz! -- " << input << std::endl;
+    std::unique_ptr<lexer::Lexer> lex = std::make_unique<lexer::Lexer>(input);
+    std::unique_ptr<parser::Parser> parsley =
+        std::make_unique<parser::Parser>(std::move(lex));
+    std::shared_ptr<ast::Program> program = parsley->ParseProgram();
+    EXPECT_FALSE(parsley->CheckErrors());
+    EXPECT_EQ(1, program->statements_.size());
+    if (program->statements_.size() != 1)
+    {
+        for (auto s : program->statements_)
+            std::cout << s->String() << std::endl;
+    }
+
+    std::shared_ptr<ast::ExpressionStatement> stmt =
+        std::dynamic_pointer_cast<ast::ExpressionStatement>(
+            program->statements_[0]);
+    if (!stmt)
+        FAIL() << "program->statements_[0] is not an ExpressionStatement";
+
+    std::shared_ptr<ast::CallExpression> expr =
+        std::dynamic_pointer_cast<ast::CallExpression>(stmt->expression_);
+    if (!expr)
+        FAIL() << "Not an FunctionLiteral - got "
+               << typeid(&stmt->expression_).name();
+
+    EXPECT_TRUE(TestIdentifier(expr->function_, "add"));
+
+    EXPECT_EQ(1, expr->arguments_.size());
+
+    std::cout << "EXPRESSION TOKEN IS :" << expr->arguments_[0]->String()
+              << std::endl;
+
+    // EXPECT_TRUE(
+    //    TestInfixExpression(expr->arguments_[0], (int64_t)2, "*",
+    //    (int64_t)3));
+}
+
 } // namespace

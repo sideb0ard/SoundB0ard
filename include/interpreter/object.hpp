@@ -164,7 +164,7 @@ class Environment
 
   private:
     std::unordered_map<std::string, std::shared_ptr<Object>> store_;
-    std::shared_ptr<Environment> outer_env_;
+    std::shared_ptr<Environment> outer_env_{nullptr};
 };
 
 /////////////////////////////////////////////////
