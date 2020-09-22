@@ -77,7 +77,33 @@ void Process::Update()
     pattern_ = pending_config_.pattern;
     pattern_expression_ = pending_config_.pattern_expression;
 
-    // ParsePattern();
+    auto new_env = std::make_shared<object::Environment>(global_env);
+    auto pattern_obj = evaluator::Eval(pattern_expression_, new_env);
+    if (pattern_obj->Type() == "STRING")
+    {
+        std::shared_ptr<object::String> pattern =
+            std::dynamic_pointer_cast<object::String>(pattern_obj);
+        pattern_ = pattern->value_;
+
+        if (timer_type_ == ProcessTimerType::RAMP ||
+            timer_type_ == ProcessTimerType::OVER ||
+            timer_type_ == ProcessTimerType::OSCILLATE)
+        {
+            sscanf(pattern_.c_str(), "%f %f", &start_, &end_);
+            current_val_ = start_;
+            float diff = std::abs(start_ - end_);
+            incr_ = diff / (loop_len_ * PPBAR);
+            if (incr_ == 0)
+            {
+                std::cout << "Nah mate, nae zeros allowed!\n";
+                return;
+            }
+
+            if (start_ > end_)
+                incr_ *= -1;
+        }
+        ParsePattern();
+    }
 
     for (auto &oldfz : pattern_functions_)
         oldfz->active_ = false;
@@ -103,51 +129,21 @@ void Process::EventNotify(mixer_timing_info tinfo)
     {
         auto new_env = std::make_shared<object::Environment>(global_env);
         auto pattern_obj = evaluator::Eval(pattern_expression_, new_env);
-        if (pattern_obj->Type() == "STRING" ||
-            pattern_obj->Type() == "GENERATOR")
+        if (pattern_obj->Type() == "GENERATOR")
         {
-            std::shared_ptr<object::String> pattern;
-
-            if (pattern_obj->Type() == "GENERATOR")
+            auto gen_obj =
+                std::dynamic_pointer_cast<object::Generator>(pattern_obj);
+            if (gen_obj)
             {
-                auto gen_obj =
-                    std::dynamic_pointer_cast<object::Generator>(pattern_obj);
-                if (gen_obj)
-                {
-                    auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
-                    auto pattern_string =
-                        std::dynamic_pointer_cast<object::String>(pattern_obj);
-                    if (pattern_string)
-                    {
-                        pattern_ = pattern_string->value_;
-                    }
-                }
-            }
-            else if (pattern_obj->Type() == "STRING")
-            {
-                pattern =
+                auto pattern_obj = evaluator::ApplyGeneratorRun(gen_obj);
+                auto pattern_string =
                     std::dynamic_pointer_cast<object::String>(pattern_obj);
-                pattern_ = pattern->value_;
-
-                if (timer_type_ == ProcessTimerType::RAMP ||
-                    timer_type_ == ProcessTimerType::OVER ||
-                    timer_type_ == ProcessTimerType::OSCILLATE)
+                if (pattern_string)
                 {
-                    sscanf(pattern_.c_str(), "%f %f", &start_, &end_);
-                    current_val_ = start_;
-                    float diff = std::abs(start_ - end_);
-                    incr_ = diff / (loop_len_ * PPBAR);
-                    if (incr_ == 0)
-                    {
-                        std::cout << "Nah mate, nae zeros allowed!\n";
-                        return;
-                    }
-
-                    if (start_ > end_)
-                        incr_ *= -1;
+                    pattern_ = pattern_string->value_;
+                    ParsePattern();
                 }
             }
-            ParsePattern();
         }
     }
 
