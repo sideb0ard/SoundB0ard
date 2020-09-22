@@ -257,7 +257,7 @@ void mixer_ps(mixer *mixr, bool all)
     ss << get_string_logo();
     ss << mixer_status_mixr(mixr);
     ss << mixer_status_env(mixr);
-    ss << mixer_status_procz(mixr, false);
+    ss << mixer_status_procz(mixr, all);
     ss << ANSI_COLOR_RESET;
 
     if (all)

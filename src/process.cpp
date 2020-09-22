@@ -317,7 +317,8 @@ void Process::EventNotify(mixer_timing_info tinfo)
                         (incr_ > 0 && current_val_ > end_))
                     {
                         current_val_ = end_;
-                        active_ = false;
+                        if (!update_pending_)
+                            active_ = false;
                     }
                 }
 
