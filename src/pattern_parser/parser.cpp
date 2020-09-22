@@ -57,37 +57,6 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
         return nullptr;
     }
 
-    if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER) ||
-        PeekTokenIs(pattern_parser::PATTERN_DIVISOR))
-    {
-        bool is_multiplier{false};
-        if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER))
-            is_multiplier = true;
-
-        NextToken();
-        if (!ExpectPeek(pattern_parser::PATTERN_NUMBER))
-        {
-            std::cerr << "NEED A NUMBER FOR A MODIFIER!!\n";
-            return nullptr;
-        }
-        int mod_value = std::stoi(cur_token_.literal_);
-        if (mod_value == 0)
-        {
-            std::cerr << "MODIFIER can't be 0!!\n";
-            return nullptr;
-        }
-
-        if (is_multiplier)
-        {
-            auto ev_group = std::make_shared<pattern_parser::PatternGroup>();
-            for (int i = 0; i < mod_value; ++i)
-                ev_group->event_groups_[0].push_back(return_node);
-            return_node = ev_group;
-        }
-        else
-            return_node->divisor_value_ = mod_value;
-    }
-
     if (PeekTokenIs(pattern_parser::PATTERN_OPEN_PAREN))
     {
         // Euclidean e.g. '(3,8)'
@@ -160,6 +129,36 @@ std::shared_ptr<pattern_parser::PatternNode> Parser::ParsePatternNode()
             }
             iter++;
         }
+    }
+    if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER) ||
+        PeekTokenIs(pattern_parser::PATTERN_DIVISOR))
+    {
+        bool is_multiplier{false};
+        if (PeekTokenIs(pattern_parser::PATTERN_MULTIPLIER))
+            is_multiplier = true;
+
+        NextToken();
+        if (!ExpectPeek(pattern_parser::PATTERN_NUMBER))
+        {
+            std::cerr << "NEED A NUMBER FOR A MODIFIER!!\n";
+            return nullptr;
+        }
+        int mod_value = std::stoi(cur_token_.literal_);
+        if (mod_value == 0)
+        {
+            std::cerr << "MODIFIER can't be 0!!\n";
+            return nullptr;
+        }
+
+        if (is_multiplier)
+        {
+            auto ev_group = std::make_shared<pattern_parser::PatternGroup>();
+            for (int i = 0; i < mod_value; ++i)
+                ev_group->event_groups_[0].push_back(return_node);
+            return_node = ev_group;
+        }
+        else
+            return_node->divisor_value_ = mod_value;
     }
 
     return return_node;
