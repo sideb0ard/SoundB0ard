@@ -36,6 +36,32 @@ int GetMidiNumForKey(char c)
     }
 }
 
+} // namespace
+
+int GetRootNote(int key, int index)
+{
+    index = index % 7;
+    switch (index)
+    {
+    case (0):
+        return key;
+    case (1):
+        return (key + 2) % 12;
+    case (2):
+        return (key + 4) % 12;
+    case (3):
+        return (key + 5) % 12;
+    case (4):
+        return (key + 7) % 12;
+    case (5):
+        return (key + 9) % 12;
+    case (6):
+        return (key + 11) % 12;
+    default:
+        return index;
+    }
+}
+
 int GetScaleIndex(int note, char key)
 {
     if (!IsMidiNoteInKey(note, key))
@@ -82,8 +108,6 @@ int GetStepsToNextDegree(int scale_index)
     }
     return -1;
 }
-
-} // namespace
 
 int GetMidiNumFromNote(std::string note)
 {

@@ -190,17 +190,17 @@ std::string list_sample_dir(std::string indir)
         while ((ep = readdir(dp)))
         {
             char *filename = (char *)calloc(1, MAX_STATIC_STRING_SZ);
+            strcat(filename, ANSI_COLOR_CYAN);
             if (ep->d_type == DT_DIR)
             {
                 // strcat(filename, "\x1b[34m");
-                strcat(filename, ANSI_COLOR_BLUE);
                 strcat(filename, ep->d_name);
                 strcat(filename, "/");
                 strcat(filename, ANSI_COLOR_RESET);
             }
             else
             {
-                strcat(filename, ANSI_COLOR_BLUE);
+                // strcat(filename, ANSI_COLOR_BLUE);
                 if (have_subdir)
                 {
                     strcat(filename, dir);
@@ -526,7 +526,8 @@ bool is_valid_file(char *filename)
 // https://martin.ankerl.com/2012/01/25/optimized-approximative-pow-in-c-and-cpp/
 double fast_pow(double a, double b)
 {
-    union {
+    union
+    {
         double d;
         int x[2];
     } u = {a};
@@ -833,11 +834,13 @@ float fasttanh(float p) { return p / (fabs(2 * p) + 3 / (2 + 2 * p * 2 * p)); }
 // no idea! taken from Will Pirkle books
 float fastlog2(float x)
 {
-    union {
+    union
+    {
         float f;
         unsigned int i;
     } vx = {x};
-    union {
+    union
+    {
         unsigned int i;
         float f;
     } mx = {(vx.i & 0x007FFFFF) | 0x3f000000};

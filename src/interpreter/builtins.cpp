@@ -295,6 +295,62 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          }
          return evaluator::NULLL;
      })},
+    {"gimmeNotes", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object> {
+                           std::cout << "GIMME NOTES YO!!" << std::endl;
+                           auto melody_obj = std::make_shared<object::Array>(
+                               std::vector<std::shared_ptr<object::Object>>());
+                           auto notes =
+                               interpreter_sound_cmds::GetNotesInCurrentChord();
+                           for (size_t i = 0; i < notes.size(); i++)
+                           {
+                               melody_obj->elements_.push_back(
+                                   std::make_shared<object::String>(notes[i]));
+                           }
+                           return melody_obj;
+                       })},
+    {"setKey",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             std::cout << "SET KEY! with num args:" << args_size << std::endl;
+             if (args_size >= 1)
+             {
+                 std::shared_ptr<object::String> str_obj =
+                     std::dynamic_pointer_cast<object::String>(args[0]);
+                 if (str_obj)
+                 {
+                     mixer_set_key(mixr, str_obj->value_);
+                 }
+             }
+             return evaluator::NULLL;
+         })},
+    {"setProg",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             std::cout << "SET PROG! with num args:" << args_size << std::endl;
+             if (args_size >= 1)
+             {
+                 auto number =
+                     std::dynamic_pointer_cast<object::Number>(args[0]);
+                 if (number)
+                 {
+                     mixer_set_chord_progression(mixr, number->value_);
+                 }
+             }
+             return evaluator::NULLL;
+         })},
+    {"progChord", std::make_shared<object::BuiltIn>(
+                      [](std::vector<std::shared_ptr<object::Object>> args)
+                          -> std::shared_ptr<object::Object> {
+                          std::cout << "PROG CHORD! " << std::endl;
+                          mixer_next_chord(mixr);
+                          return evaluator::NULLL;
+                      })},
     {"import", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {

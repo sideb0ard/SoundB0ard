@@ -227,6 +227,7 @@ typedef struct mixer_timing_info
     int cur_sample; // inverse of SAMPLE RATE
 
     unsigned int key;
+    unsigned int chord_progression_index;
     unsigned int chord;
     unsigned int chord_type;
     unsigned int octave;

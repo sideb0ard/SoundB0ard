@@ -118,4 +118,22 @@ std::vector<std::vector<std::string>> GenerateMelody()
     return melody;
 }
 
+std::vector<std::string> GetNotesInCurrentChord()
+{
+    std::vector<std::string> notes;
+
+    mixer_timing_info my_info = mixr->timing_info;
+    std::cout << "Mixer key is " << my_info.key << " Chord is " << my_info.chord
+              << std::endl;
+
+    auto root_note = GetRootNote(my_info.key, my_info.chord);
+    std::cout << "NOte is " << root_note << std::endl;
+
+    // get_chord_type(
+    // get Mixer Key
+    // get Mixer Chord
+
+    return notes;
+}
+
 } // namespace interpreter_sound_cmds
