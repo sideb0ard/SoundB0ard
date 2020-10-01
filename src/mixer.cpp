@@ -133,7 +133,7 @@ std::string mixer_status_mixr(mixer *mixr)
     << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
     << "::::::::::\n"
     << ":::::::::: key:" << key_names[mixr->timing_info.key]
-    << " chord:" << key_names[mixr->timing_info.chord]
+    << " chord:" << key_names[mixr->timing_info.chord] // TODO - fix - this is wrong - its not the chord its the chord progression index
     << " type:"<< chord_type_names[mixr->timing_info.chord_type]
     << " octave:" << mixr->timing_info.octave << " bars_per_chord:"<< mixr->bars_per_chord
     << " move:" << mixr->should_progress_chords << " prog:("<< mixr->progression_type << ")"
@@ -784,6 +784,9 @@ void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num)
             mixr->prog_degrees[3] = 0; // I
             break;
         }
+        mixr->prog_degrees_idx = 0;
+        mixr->timing_info.chord_progression_index = mixr->prog_degrees_idx;
+        mixr->timing_info.chord = mixr->prog_degrees[mixr->prog_degrees_idx];
     }
 }
 void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
@@ -1088,12 +1091,12 @@ void mixer_set_should_progress_chords(mixer *mixr, bool b)
 void mixer_next_chord(mixer *mixr)
 {
     std::cout << "NEXT CHORD!\n";
-    unsigned int scale_degree = mixr->prog_degrees[mixr->prog_degrees_idx];
     mixr->prog_degrees_idx = (mixr->prog_degrees_idx + 1) % mixr->prog_len;
     mixr->timing_info.chord_progression_index = mixr->prog_degrees_idx;
     mixr->timing_info.chord = mixr->prog_degrees[mixr->prog_degrees_idx];
     std::cout << "SETTING CHORD TO " << mixr->timing_info.chord << std::endl;
     // TODO - are these used?
+    // unsigned int scale_degree = mixr->prog_degrees[mixr->prog_degrees_idx];
     //  unsigned int root = mixr->timing_info.notes[scale_degree];
     //  unsigned int chord_type = get_chord_type(scale_degree);
     //  mixer_change_chord(mixr, root, chord_type);

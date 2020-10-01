@@ -223,6 +223,25 @@ int get_chord_type(unsigned int scale_degree)
         return -1;
 }
 
+std::vector<int> GetMidiNotesInChord(unsigned int root_note,
+                                     unsigned int chord_type)
+{
+    std::vector<int> notes_in_chord{};
+    notes_in_chord.push_back(root_note);
+
+    if (chord_type == MAJOR_CHORD)
+        notes_in_chord.push_back(root_note + 4);
+    else
+        notes_in_chord.push_back(root_note + 3);
+
+    if (chord_type == DIMINISHED_CHORD)
+        notes_in_chord.push_back(root_note + 6);
+    else
+        notes_in_chord.push_back(root_note + 7);
+
+    return notes_in_chord;
+}
+
 void get_midi_notes_from_chord(unsigned int note, unsigned int chord_type,
                                int octave, chord_midi_notes *chnotes)
 {
