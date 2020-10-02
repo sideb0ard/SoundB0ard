@@ -139,4 +139,6 @@ TEST_F(AudioUtilsTest, TestPerfectFifthD)
     // EXPECT_EQ(81, perfect_fifth);
 }
 
+TEST_F(AudioUtilsTest, TestNotesInChord) {}
+
 } // namespace

@@ -12,6 +12,7 @@ let drumgen = gen()
     {
 
         let rhythm_string = ""
+	notes = gimmeNotes()
 
         #random miss a bar
         if (rand(10) < 2)

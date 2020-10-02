@@ -255,8 +255,8 @@ std::string Lexer::ReadIdentifier()
 std::string Lexer::ReadNumber()
 {
     int position = current_position_;
-    while (IsDigit(current_char_) || current_char_ == '.' ||
-           current_char_ == '-')
+    // current_char_ == '-')
+    while (IsDigit(current_char_) || current_char_ == '.')
         ReadChar();
     return input_.substr(position, current_position_ - position);
 }

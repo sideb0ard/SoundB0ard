@@ -77,7 +77,7 @@ std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
 
     if (!ExpectPeek(token::SLANG_IDENT))
     {
-        std::cout << "NO IDENT! - returning nullptr \n";
+        std::cerr << "NO IDENT! - returning nullptr \n";
         return nullptr;
     }
 
@@ -86,7 +86,7 @@ std::shared_ptr<ast::LetStatement> Parser::ParseLetStatement()
 
     if (!ExpectPeek(token::SLANG_ASSIGN))
     {
-        std::cout << "NO ASSIGN! - returning nullopt \n";
+        std::cerr << "NO ASSIGN! - returning nullopt \n";
         return nullptr;
     }
 
@@ -288,7 +288,7 @@ std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
 
     if (!ExpectPeek(token::SLANG_IDENT))
     {
-        std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
+        std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
@@ -324,7 +324,7 @@ std::shared_ptr<ast::PanStatement> Parser::ParsePanStatement()
 
     if (!ExpectPeek(token::SLANG_IDENT))
     {
-        std::cout << "NOT GOT TARGET ! Peek token is " << peek_token_
+        std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_
                   << std::endl;
         return nullptr;
     }
@@ -451,7 +451,8 @@ std::shared_ptr<ast::Statement> Parser::ParseExpressionStatement()
     stmt->expression_ = ParseExpression(Precedence::LOWEST);
 
     // if expression_ == IDENTIFIER && PeekToken is ASSIGN
-    // convert to Let Statement
+    // convert to Let Statement with is_new_item=false - i.e. assign to
+    // existing variable
     auto ident = std::dynamic_pointer_cast<ast::Identifier>(stmt->expression_);
     if (ident)
     {
@@ -761,8 +762,6 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral()
         return nullptr;
     if (!ExpectPeek(token::SLANG_LBRACE))
         return nullptr;
-    // std::cout << "PARSED SETUP TOKEN - cur token is: " << cur_token_
-    //          << " Next token is: " << peek_token_ << std::endl;
 
     lit->setup_ = ParseBlockStatement();
 
@@ -778,9 +777,6 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral()
         return nullptr;
 
     lit->run_ = ParseBlockStatement();
-
-    // std::cout << "PARSED RUN!\n";
-    // std::cout << "AH YEAH< PARSED A GENERATOR!!\n";
 
     return lit;
 }
@@ -1164,6 +1160,8 @@ std::shared_ptr<ast::Expression> Parser::ParsePrefixExpression()
         cur_token_, cur_token_.literal_);
 
     NextToken();
+
+    std::cout << "PREFIX YO\n";
 
     expression->right_ = ParseExpression(Precedence::PREFIX);
 

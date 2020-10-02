@@ -298,7 +298,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"gimmeNotes", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object> {
-                           std::cout << "GIMME NOTES YO!!" << std::endl;
                            auto melody_obj = std::make_shared<object::Array>(
                                std::vector<std::shared_ptr<object::Object>>());
                            auto notes =

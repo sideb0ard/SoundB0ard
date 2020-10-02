@@ -542,17 +542,20 @@ TEST_F(ParserTest, TestInfixExpressions)
         std::string op;
         std::variant<int64_t, std::string, bool> right_value;
     };
-    std::vector<TestCase> infix_tests{{"5+5", (int64_t)5, "+", (int64_t)5},
-                                      {"5 - 5", (int64_t)5, "-", (int64_t)5},
-                                      {"5 * 5", (int64_t)5, "*", (int64_t)5},
-                                      {"5 / 5", (int64_t)5, "/", (int64_t)5},
-                                      {"5 > 5", (int64_t)5, ">", (int64_t)5},
-                                      {"5 < 5", (int64_t)5, "<", (int64_t)5},
-                                      {"5 == 5", (int64_t)5, "==", (int64_t)5},
-                                      {"5 != 5", (int64_t)5, "!=", (int64_t)5},
-                                      {"true == true", true, "==", true},
-                                      {"true != false", true, "!=", false},
-                                      {"false == false", false, "==", false}};
+    std::vector<TestCase> infix_tests{
+        //{"5+5", (int64_t)5, "+", (int64_t)5},
+        {"5 - 5", (int64_t)5, "-", (int64_t)5},
+        {"3-2", (int64_t)3, "-", (int64_t)2},
+        //{"5 * 5", (int64_t)5, "*", (int64_t)5},
+        //{"5 / 5", (int64_t)5, "/", (int64_t)5},
+        //{"5 > 5", (int64_t)5, ">", (int64_t)5},
+        //{"5 < 5", (int64_t)5, "<", (int64_t)5},
+        //{"5 == 5", (int64_t)5, "==", (int64_t)5},
+        //{"5 != 5", (int64_t)5, "!=", (int64_t)5},
+        //{"true == true", true, "==", true},
+        //{"true != false", true, "!=", false},
+        //{"false == false", false, "==", false}
+    };
 
     for (auto tt : infix_tests)
     {

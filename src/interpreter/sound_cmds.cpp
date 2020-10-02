@@ -125,20 +125,12 @@ std::vector<std::string> GetNotesInCurrentChord()
     mixer_timing_info my_info = mixr->timing_info;
 
     auto root_note = GetRootNote(my_info.key, my_info.chord);
-    std::cout << "Mixer Key is " << my_info.key << ". NOte is " << root_note
-              << "(" << GetNoteFromMidiNum(root_note)
-              << (get_chord_type(my_info.chord) == MAJOR_CHORD ? "M" : "m")
-              << ")" << std::endl;
 
     auto notes_in_chord =
         GetMidiNotesInChord(root_note, get_chord_type(my_info.chord));
 
     for (auto n : notes_in_chord)
         notes.push_back(GetNoteFromMidiNum(n));
-    std::cout << "Notes in CHORD:";
-    for (auto n : notes)
-        std::cout << n << " ";
-    std::cout << std::endl;
 
     return notes;
 }

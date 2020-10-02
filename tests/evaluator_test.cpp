@@ -698,4 +698,5 @@ TEST_F(EvaluatorTest, TestParseFuncArgs)
         EXPECT_EQ(evaluated->Inspect(), tt.expected);
     }
 }
+
 } // namespace
