@@ -34,6 +34,7 @@ extern std::shared_ptr<object::Environment> global_env;
 extern Tsqueue<event_queue_item> process_event_queue;
 extern Tsqueue<std::string> repl_queue;
 extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<int> audio_reply_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -363,59 +364,55 @@ void pan_change(mixer *mixr, int sg, float val)
     mixr->sound_generators_[sg]->SetPan(val);
 }
 
-int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
+void add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
 {
     if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)
-        return -1;
+        audio_reply_queue.push(-1);
 
-    sg->mixer_idx = mixr->soundgen_num;
-    audio_action_queue_item action_req{.type = AudioAction::ADD,
-                                       .mixer_soundgen_idx = mixr->soundgen_num,
-                                       .sg = sg};
-    audio_queue.push(action_req);
-    return mixr->soundgen_num++;
+    mixr->sound_generators_[mixr->soundgen_num] = sg;
+    audio_reply_queue.push(mixr->soundgen_num++);
 }
 
-int add_drumsynth(mixer *mixr)
+void add_drumsynth(mixer *mixr)
 {
     repl_queue.push("Adding a DRUM SYNTH!\n");
     auto ds = std::make_shared<DrumSynth>();
-    return add_sound_generator(mixr, ds);
+    add_sound_generator(mixr, ds);
 }
 
-int add_minisynth(mixer *mixr)
+void add_minisynth(mixer *mixr)
 {
     repl_queue.push("Adding a MINISYNTH!\n");
     auto ms = std::make_shared<MiniSynth>();
-    return add_sound_generator(mixr, ms);
+    add_sound_generator(mixr, ms);
 }
 
-int add_sample(mixer *mixr, std::string sample_path)
+void add_sample(mixer *mixr, std::string sample_path)
 {
     repl_queue.push("Adding a SAMPLE!\n");
     auto ds = std::make_shared<DrumSampler>(sample_path.data());
-    return add_sound_generator(mixr, ds);
+    add_sound_generator(mixr, ds);
 }
 
-int add_digisynth(mixer *mixr, std::string sample_path)
+void add_digisynth(mixer *mixr, std::string sample_path)
 {
     repl_queue.push("Adding a DIGISYNTH!\n");
     auto ds = std::make_shared<DigiSynth>(sample_path);
-    return add_sound_generator(mixr, ds);
+    add_sound_generator(mixr, ds);
 }
 
-int add_dxsynth(mixer *mixr)
+void add_dxsynth(mixer *mixr)
 {
     repl_queue.push("Adding a DXSYNTH!\n");
     auto dx = std::make_shared<dxsynth>();
-    return add_sound_generator(mixr, dx);
+    add_sound_generator(mixr, dx);
 }
 
-int add_looper(mixer *mixr, std::string filename, bool loop_mode)
+void add_looper(mixer *mixr, std::string filename, bool loop_mode)
 {
     repl_queue.push("Adding a Granular Looper!\n");
     auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
-    return add_sound_generator(mixr, loopr);
+    add_sound_generator(mixr, loopr);
 }
 
 void mixer_midi_tick(mixer *mixr)
@@ -862,8 +859,30 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
             else if (action->type == AudioAction::HELP)
                 mixer_help(mixr);
             else if (action->type == AudioAction::ADD)
-                mixr->sound_generators_[action->mixer_soundgen_idx] =
-                    action->sg;
+            {
+                std::cout << "ADD SOUNDGEN YO!\n";
+                switch (action->soundgenerator_type)
+                {
+                case (MINISYNTH_TYPE):
+                    add_minisynth(mixr);
+                    break;
+                case (DXSYNTH_TYPE):
+                    add_dxsynth(mixr);
+                    break;
+                case (DIGISYNTH_TYPE):
+                    add_digisynth(mixr, action->filepath);
+                    break;
+                case (LOOPER_TYPE):
+                    add_looper(mixr, action->filepath, action->loop_mode);
+                    break;
+                case (DRUMSAMPLER_TYPE):
+                    add_sample(mixr, action->filepath);
+                    break;
+                case (DRUMSYNTH_TYPE):
+                    add_drumsynth(mixr);
+                    break;
+                }
+            }
             else if (action->type == AudioAction::ADD_FX)
                 interpreter_sound_cmds::ParseFXCmd(action->args);
             else if (action->type == AudioAction::BPM)

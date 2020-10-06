@@ -29,6 +29,7 @@
 extern mixer *mixr;
 
 Tsqueue<audio_action_queue_item> audio_queue;
+Tsqueue<int> audio_reply_queue; // for reply from adding SoundGenerator
 Tsqueue<std::string> interpret_command_queue;
 Tsqueue<std::string> repl_queue;
 Tsqueue<event_queue_item> process_event_queue;

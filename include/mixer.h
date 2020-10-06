@@ -151,14 +151,14 @@ void mixer_preview_audio(mixer *mixr, char *filename);
 
 int mixer_print_timing_info(mixer *mixr);
 
-int add_minisynth(mixer *mixr);
-int add_dxsynth(mixer *mixr);
-int add_drumsynth(mixer *mixr);
-int add_sample(mixer *mixr, std::string sample_path);
-int add_digisynth(mixer *mixr, std::string sample_path);
-int add_looper(mixer *mixr, std::string filename, bool loop_mode);
+void add_minisynth(mixer *mixr);
+void add_dxsynth(mixer *mixr);
+void add_drumsynth(mixer *mixr);
+void add_sample(mixer *mixr, std::string sample_path);
+void add_digisynth(mixer *mixr, std::string sample_path);
+void add_looper(mixer *mixr, std::string filename, bool loop_mode);
 
-int add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg);
+void add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg);
 
 void mixer_vol_change(mixer *mixr, float vol);
 void vol_change(mixer *mixr, int sig, float vol);

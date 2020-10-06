@@ -6,10 +6,15 @@
 #include <string>
 #include <vector>
 
+#include <audio_action_queue.h>
+#include <defjams.h>
 #include <mixer.h>
 #include <process.hpp>
+#include <tsqueue.hpp>
 
 extern mixer *mixr;
+extern Tsqueue<audio_action_queue_item> audio_queue;
+extern Tsqueue<int> audio_reply_queue;
 
 namespace
 {
@@ -20,6 +25,24 @@ bool IsSoundGenerator(object::ObjectType type)
         return true;
     return false;
 }
+
+int AddSoundGenerator(unsigned int type, std::string filepath = "",
+                      bool loop_mode = false)
+{
+    audio_action_queue_item action_req{.type = AudioAction::ADD,
+                                       .soundgenerator_type = type,
+                                       .filepath = filepath,
+                                       .loop_mode = loop_mode};
+    audio_queue.push(action_req);
+    auto sg_index = audio_reply_queue.pop();
+    if (sg_index)
+    {
+        return sg_index.value();
+    }
+    else
+        return -1;
+}
+
 } // namespace
 
 namespace object
@@ -81,29 +104,29 @@ object::HashKey String::HashKey()
 std::string Null::Inspect() { return "null"; }
 ObjectType Null::Type() { return NULL_OBJ; }
 
-FMSynth::FMSynth() { soundgen_id_ = add_dxsynth(mixr); }
+FMSynth::FMSynth() { soundgen_id_ = AddSoundGenerator(DXSYNTH_TYPE); }
 std::string FMSynth::Inspect() { return "FM synth."; }
 ObjectType FMSynth::Type() { return SYNTH_OBJ; }
 
-MoogSynth::MoogSynth() { soundgen_id_ = add_minisynth(mixr); }
+MoogSynth::MoogSynth() { soundgen_id_ = AddSoundGenerator(MINISYNTH_TYPE); }
 std::string MoogSynth::Inspect() { return "Moog synth."; }
 ObjectType MoogSynth::Type() { return SYNTH_OBJ; }
 
-DrumSynth::DrumSynth() { soundgen_id_ = add_drumsynth(mixr); }
+DrumSynth::DrumSynth() { soundgen_id_ = AddSoundGenerator(DRUMSYNTH_TYPE); }
 std::string DrumSynth::Inspect() { return "Drum synth."; }
 ObjectType DrumSynth::Type() { return SYNTH_OBJ; }
 
 DigiSynth::DigiSynth(std::string sample_path)
 {
     std::cout << "SKELP ME - PATH:" << sample_path << std::endl;
-    soundgen_id_ = add_digisynth(mixr, sample_path);
+    soundgen_id_ = AddSoundGenerator(DIGISYNTH_TYPE, sample_path);
 }
 std::string DigiSynth::Inspect() { return "Digi synth."; }
 ObjectType DigiSynth::Type() { return SYNTH_OBJ; }
 
 Sample::Sample(std::string sample_path)
 {
-    soundgen_id_ = add_sample(mixr, sample_path);
+    soundgen_id_ = AddSoundGenerator(DRUMSAMPLER_TYPE, sample_path);
 }
 std::string Sample::Inspect() { return "sample."; }
 ObjectType Sample::Type() { return SAMPLE_OBJ; }
@@ -111,7 +134,7 @@ ObjectType Sample::Type() { return SAMPLE_OBJ; }
 Granular::Granular(std::string sample_path, bool loop_mode)
 {
     std::cout << "OBJECT! LOOPM ODE IS " << loop_mode << std::endl;
-    soundgen_id_ = add_looper(mixr, sample_path, loop_mode);
+    soundgen_id_ = AddSoundGenerator(LOOPER_TYPE, sample_path, loop_mode);
 }
 std::string Granular::Inspect() { return "Granular."; }
 ObjectType Granular::Type() { return GRANULAR_OBJ; }

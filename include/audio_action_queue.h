@@ -29,7 +29,10 @@ struct audio_action_queue_item
     int mixer_soundgen_idx{0};
 
     // ADD varz
-    std::shared_ptr<SoundGenerator> sg{nullptr};
+    // std::shared_ptr<SoundGenerator> sg{nullptr};
+    unsigned int soundgenerator_type;
+    std::string filepath; // used for sample and digisynth
+    bool loop_mode;       // for looper
 
     // STATUS varz
     bool status_all{false};

@@ -21,6 +21,7 @@
 extern Tsqueue<event_queue_item> process_event_queue;
 extern Tsqueue<audio_action_queue_item> audio_queue;
 extern Tsqueue<std::string> repl_queue;
+extern Tsqueue<int> audio_reply_queue;
 
 namespace
 {
