@@ -1,0 +1,12 @@
+sl = TTUnreleaseProject/StabzSnareroool.wav vol:0.7 pan:0 pitch:1 idx:76 mode:LOOP(0) step:0 len:1
+kd = Sampler(TTUnreleaseProject/kickDistor.wav) vol:0.70 pan:0.00 pitch:1.00
+sn = Sampler(TTUnreleaseProject/Snare2.wav) vol:1.00 pan:0.00 pitch:1.50
+ob = TTUnreleaseProject/OWENBeat.wav vol:0 pan:0 pitch:1 idx:76 mode:LOOP(0) step:0 len:1
+dx = DxSynth(RAVER) vol:0.70 pan:0.00 algo:1
+
+[Procz]
+p1 # "" sn
+p2 < every 2 "<1 0.25 0.5 2 1.25 1.5>"  "set s1:pitch %"
+p3 < every 4 "1"  "set ob:stutter 1"
+p4 $ "kd*4"
+p5 # "c:127:100*4.000000 e:127:200*5.000000 g:127:500*6.000000 " dx

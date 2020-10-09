@@ -36,3 +36,32 @@ let drumgen = gen()
         return rhythm_string
     }
 }
+
+let rhythms = [
+							  #shiko
+								"1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+								#son
+								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+								#rumba
+								"1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
+								#soukous
+								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
+								#gahu
+								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
+								#bossa-nova
+								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
+							]
+
+let distrhythms = gen()
+{
+	setup() {}
+
+	run() {
+			let idx = rand(len(rhythms))
+			#puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
+			return rhythms[idx]
+	}
+}
+		
+	
+

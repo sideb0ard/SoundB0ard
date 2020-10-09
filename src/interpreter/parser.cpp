@@ -1161,8 +1161,6 @@ std::shared_ptr<ast::Expression> Parser::ParsePrefixExpression()
 
     NextToken();
 
-    std::cout << "PREFIX YO\n";
-
     expression->right_ = ParseExpression(Precedence::PREFIX);
 
     return expression;

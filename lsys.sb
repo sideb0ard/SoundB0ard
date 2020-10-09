@@ -1,0 +1,79 @@
+let lrhythms = [
+  ["1", "~", "~", "~", "1", "~", "1", "~", "~", "~", "1", "~", "1", "~", "~", "~"],
+  ["1", "~", "~", "1", "~", "~", "1", "~", "~", "~", "1", "~", "1", "~", "~", "~"],
+  ["1", "~", "~", "1", "~", "~", "~", "1", "~", "~", "1", "~", "1", "~", "~", "~"],
+  ["1", "~", "~", "1", "~", "~", "1", "~", "~", "~", "1", "1", "~", "~", "~", "~"],
+  ["1", "~", "~", "1", "~", "~", "1", "~", "~", "~", "1", "~", "~", "~", "1", "~"],
+  ["1", "~", "~", "1", "~", "~", "1", "~", "~", "~", "1", "~", "~", "1", "~", "~"]
+]
+
+let lsystem = gen()
+{
+  setup()
+  {
+    let cur_output = ["a"] 
+  }
+
+  run()
+  {
+    let new_output = []
+    for (i = 0; i < len(cur_output) ; ++i) {
+      if (cur_output[i] == "a")	 {
+        new_output = push(new_output, "a");
+        new_output = push(new_output, "b");
+      } else {
+        new_output = push(new_output, "a");
+      }
+    }
+    cur_output = new_output;
+    return new_output;
+  }
+}
+
+let replacerrr = fn(note, depth)
+{
+    if (depth == 1) {
+      return " " + note
+    }
+    else {
+      let randy = rand(10);
+      if (randy > 7) {
+        let rh = lrhythms[rand(len(lrhythms))]
+        let pat = ""
+        for (i = 0; i < len(rh); ++i) {
+          if (rh[i] == "1") {
+             pat = pat + " " + note;
+          } else {
+             pat = pat + " ~"
+          }
+        }
+        return pat
+      } else {
+        return " " + note
+      }
+    }
+}
+
+let patsy = gen()
+{
+  setup()
+  {
+  }
+
+  run()
+  {
+     let notes = gimmeNotes();
+     let notes_idx = 0;
+     let pat = ""
+     let rh = lrhythms[rand(len(lrhythms))]
+     for (i = 0; i < len(rh); ++i) {
+       if (rh[i] == "1") {
+          pat = pat + "[" +  replacerrr(notes[notes_idx], 0) + "]"
+          notes_idx = incr(notes_idx, 0, len(notes));
+       } else {
+          pat = pat + " ~"
+       }
+     }
+     return pat
+  }
+}

@@ -779,11 +779,15 @@ std::shared_ptr<object::Object>
 EvalStringInfixExpression(std::string op, std::shared_ptr<object::String> left,
                           std::shared_ptr<object::String> right)
 {
-    if (op.compare("+") != 0)
-        return NewError("unknown operator: %s %s %s", left->Type(), op,
-                        right->Type());
+    if (op.compare("+") == 0)
+        return std::make_shared<object::String>(left->value_ + right->value_);
+    else if (op.compare("==") == 0)
+        return NativeBoolToBooleanObject(left->value_ == right->value_);
+    else if (op.compare("!=") == 0)
+        return NativeBoolToBooleanObject(left->value_ != right->value_);
 
-    return std::make_shared<object::String>(left->value_ + right->value_);
+    return NewError("unknown operator: %s %s %s", left->Type(), op,
+                    right->Type());
 }
 
 std::shared_ptr<object::Object>

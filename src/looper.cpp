@@ -89,7 +89,7 @@ void looper::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     //      (cur_sixteenth_midi_base + (mixr->timing_info.midi_tick %
     //      PPSIXTEENTH));
 
-    //  SoundGenerator::eventNotify(event, tinfo);
+    SoundGenerator::eventNotify(event, tinfo);
 
     if (tinfo.is_midi_tick)
     {
