@@ -4,6 +4,7 @@ ABLETONASIOINCDIR=${HOME}/Code/link/modules/asio-standalone/asio/include
 READLINEINCDIR=${HOME}/homebrew/opt/readline/include
 RANGE3INCDIR=${HOME}/Code/range-v3/include/
 HOMEBREWINCDIR=${HOME}/homebrew/include
+PERLININCDIR=${HOME}/Code/PerlinNoise/
 
 GTEST_DIR =  ${HOME}/Code/googletest/googletest
 INCDIRS=-I/usr/local/include \
@@ -12,7 +13,8 @@ INCDIRS=-I/usr/local/include \
 		-I${HOMEBREWINCDIR} \
 		-I${RANGE3INCDIR} \
 		-I${ABLETONASIOINCDIR} \
-		-I${READLINEINCDIR}
+		-I${READLINEINCDIR} \
+		-I${PERLININCDIR}
 
 
 HOMEBREWLIBDIR=${HOME}/homebrew/lib

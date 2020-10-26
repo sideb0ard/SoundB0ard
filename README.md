@@ -24,6 +24,7 @@ http://www.mega-nerd.com/libsndfile/
 https://github.com/anthonix/ffts  
 http://ctags.sourceforge.net/  
 https://www.mlpack.org/  
+https://github.com/Reputeless/PerlinNoise
 
 I still need to do some more work to make it portable. For the moment I've only been developing on OSX. In the Makefile there are a few lib paths and include dirs that you'll need to amend, but I believe it should compile cleanly for others with those changes. (Pull requests welcome!)
 

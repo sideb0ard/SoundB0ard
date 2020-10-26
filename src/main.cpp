@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+#include "PerlinNoise.hpp"
+
 #include "ableton_link_wrapper.h"
 #include "audioutils.h"
 #include "cmdloop.h"
@@ -33,6 +35,8 @@ Tsqueue<int> audio_reply_queue; // for reply from adding SoundGenerator
 Tsqueue<std::string> interpret_command_queue;
 Tsqueue<std::string> repl_queue;
 Tsqueue<event_queue_item> process_event_queue;
+
+siv::PerlinNoise perlinGenerator; // only for use by eval thread
 
 auto global_env = std::make_shared<object::Environment>();
 
