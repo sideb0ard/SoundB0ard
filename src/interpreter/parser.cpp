@@ -222,12 +222,14 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
     }
     stmt->param_ = cur_token_.literal_;
 
-    if (!ParseSetStatementValue(stmt->value_))
-    {
-        std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
-                  << std::endl;
-        return nullptr;
-    }
+    NextToken();
+    stmt->value_ = ParseExpression(Precedence::LOWEST);
+    // if (!ParseSetStatementValue(stmt->value_))
+    // {
+    //     std::cerr << "NOT GOT NU<M ! Peek token is " << peek_token_
+    //               << std::endl;
+    //     return nullptr;
+    // }
 
     if (PeekTokenIs(token::SLANG_SEMICOLON))
         NextToken();
@@ -260,26 +262,26 @@ std::shared_ptr<ast::InfoStatement> Parser::ParseInfoStatement()
     return stmt;
 }
 
-bool Parser::ParseSetStatementValue(std::string &value)
-{
-    if (PeekTokenIs(token::SLANG_IDENT) || PeekTokenIs(token::SLANG_NUMBER))
-    {
-        NextToken();
-        value = cur_token_.literal_;
-        return true;
-    }
-    else if (PeekTokenIs(token::SLANG_MINUS))
-    {
-        NextToken();
-        if (PeekTokenIs(token::SLANG_NUMBER))
-        {
-            NextToken();
-            value = "-" + cur_token_.literal_;
-            return true;
-        }
-    }
-    return false;
-}
+// bool Parser::ParseSetStatementValue(std::string &value)
+//{
+//    if (PeekTokenIs(token::SLANG_IDENT) || PeekTokenIs(token::SLANG_NUMBER))
+//    {
+//        NextToken();
+//        value = cur_token_.literal_;
+//        return true;
+//    }
+//    else if (PeekTokenIs(token::SLANG_MINUS))
+//    {
+//        NextToken();
+//        if (PeekTokenIs(token::SLANG_NUMBER))
+//        {
+//            NextToken();
+//            value = "-" + cur_token_.literal_;
+//            return true;
+//        }
+//    }
+//    return false;
+//}
 
 std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
 {
@@ -967,23 +969,26 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
         if (!ExpectPeek(token::SLANG_IDENT))
         {
-            std::cerr << "NO IDENT! - returning nullptr \n";
-            return nullptr;
+            std::cerr << "btw - Nae IDENTs!\n";
+            // return nullptr;
         }
-        auto target =
-            std::make_shared<ast::Identifier>(cur_token_, cur_token_.literal_);
-        if (target)
-            process->targets_.push_back(target->value_);
-        while (PeekTokenIs(token::SLANG_COMMA))
+        else
         {
-            NextToken();
-            NextToken();
-            if (CurTokenIs(token::SLANG_IDENT))
+            auto target = std::make_shared<ast::Identifier>(
+                cur_token_, cur_token_.literal_);
+            if (target)
+                process->targets_.push_back(target->value_);
+            while (PeekTokenIs(token::SLANG_COMMA))
             {
-                auto target = std::make_shared<ast::Identifier>(
-                    cur_token_, cur_token_.literal_);
-                if (target)
-                    process->targets_.push_back(target->value_);
+                NextToken();
+                NextToken();
+                if (CurTokenIs(token::SLANG_IDENT))
+                {
+                    auto target = std::make_shared<ast::Identifier>(
+                        cur_token_, cur_token_.literal_);
+                    if (target)
+                        process->targets_.push_back(target->value_);
+                }
             }
         }
         NextToken();

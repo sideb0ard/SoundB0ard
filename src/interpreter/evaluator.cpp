@@ -246,11 +246,19 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     if (set_stmt)
     {
 
+        auto eval_val = Eval(set_stmt->value_, env);
+        if (eval_val->Type() == "ERROR")
+        {
+            std::cerr << "COuldn't EVAL your statement value!!\n";
+            return NULLL;
+        }
+        auto val = eval_val->Inspect();
         if (set_stmt->target_->token_.literal_ == ("mixer"))
         {
             audio_action_queue_item action{.type = AudioAction::MIXER_UPDATE,
                                            .param_name = set_stmt->param_,
-                                           .param_val = set_stmt->value_};
+                                           //.param_val = set_stmt->value_};
+                                           .param_val = val};
             audio_queue.push(action);
             return NULLL;
         }
@@ -264,7 +272,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                                soundgen->soundgen_id_,
                                            .fx_id = set_stmt->fx_num_,
                                            .param_name = set_stmt->param_,
-                                           .param_val = set_stmt->value_};
+                                           .param_val = val};
             audio_queue.push(action);
         }
         else if (target->Type() == "ERROR")
@@ -300,7 +308,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                             .mixer_soundgen_idx = std::stoi(ss.str()),
                             .fx_id = set_stmt->fx_num_,
                             .param_name = set_stmt->param_,
-                            .param_val = set_stmt->value_};
+                            .param_val = val};
                         audio_queue.push(action);
                     }
                 }

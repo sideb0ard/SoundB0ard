@@ -434,7 +434,8 @@ class SetStatement : public Statement
   public:
     std::shared_ptr<Expression> target_{nullptr};
     std::string param_;
-    std::string value_;
+    std::shared_ptr<Expression> value_{nullptr};
+    // std::string value_;
 
     int fx_num_ = -1;
 };

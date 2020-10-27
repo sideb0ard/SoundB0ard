@@ -1,14 +1,14 @@
 
 let sperl = gen() {
 	setup() {
-     let idx = 0;
+     let n = 0.01;
 	}
 
 	run() {
 		let pattern = "";
-    let p = perlin(idx)
-		puts(map(p, -1, 1, 0, 100))
-    idx = idx + 0.1
+    let p = perlin(n)
+    let idx = map(p, -1, 1, 0, 50)
+    n = n + 0.1
 
     set lp:idx idx
 		return pattern;
