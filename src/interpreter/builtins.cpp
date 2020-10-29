@@ -349,7 +349,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"progChord", std::make_shared<object::BuiltIn>(
                       [](std::vector<std::shared_ptr<object::Object>> args)
                           -> std::shared_ptr<object::Object> {
-                          std::cout << "PROG CHORD! " << std::endl;
                           mixer_next_chord(mixr);
                           return evaluator::NULLL;
                       })},
@@ -359,6 +358,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        int args_size = args.size();
                        if (args_size == 1)
                        {
+                           std::cout << "YOIMPORT\n";
                            std::shared_ptr<object::String> filename =
                                std::dynamic_pointer_cast<object::String>(
                                    args[0]);

@@ -1109,16 +1109,9 @@ void mixer_set_should_progress_chords(mixer *mixr, bool b)
 
 void mixer_next_chord(mixer *mixr)
 {
-    std::cout << "NEXT CHORD!\n";
     mixr->prog_degrees_idx = (mixr->prog_degrees_idx + 1) % mixr->prog_len;
     mixr->timing_info.chord_progression_index = mixr->prog_degrees_idx;
     mixr->timing_info.chord = mixr->prog_degrees[mixr->prog_degrees_idx];
-    std::cout << "SETTING CHORD TO " << mixr->timing_info.chord << std::endl;
-    // TODO - are these used?
-    // unsigned int scale_degree = mixr->prog_degrees[mixr->prog_degrees_idx];
-    //  unsigned int root = mixr->timing_info.notes[scale_degree];
-    //  unsigned int chord_type = get_chord_type(scale_degree);
-    //  mixer_change_chord(mixr, root, chord_type);
 }
 
 void mixr_add_file_to_monitor(mixer *mixr, std::string filepath)

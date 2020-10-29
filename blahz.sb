@@ -1,16 +1,59 @@
 
-let sperl = gen() {
+let midee_note = 47
+let dre = gen() {
 	setup() {
-     let n = 0.01;
+     midee_note = 47
 	}
 
 	run() {
 		let pattern = "";
-    let p = perlin(n)
-    let idx = map(p, -1, 1, 0, 50)
-    n = n + 0.1
+    puts("RHYTHM:", rhythms[0])
+    for (i = 0; i < 16; ++i)
+    {
+        # let prob = rand(100)
+        # if (prob < beat_probability[i])
+        # {
+        #     rhythm_string = rhythm_string + notes[note_idx] + " ";
+        #     note_idx = incr(note_idx, 0, len(notes))
+        # }
+        # else
+        # {
+        #     rhythm_string = rhythm_string + "~ "
+        # }
+    }
 
-    set lp:idx idx
 		return pattern;
 	}
 }
+
+let toms = [tm1, tm2, tm3]
+let toms_idx = 0
+let toms_active = toms[toms_idx]
+let chordrrr = gen() {
+	setup() {
+		 let bars_counter = 3
+     let i = 0
+	}
+
+	run() {
+    
+    # puts("AYYYE:", i, " BARSCOUNT:", bars_counter, " MOD:", i % bars_counter)
+    if ( i % bars_counter == 0)
+    {
+      progChord()
+      #puts("INCR:", len(toms))
+      toms_idx  = incr(toms_idx, 0, len(toms))
+			toms_active = toms[toms_idx]
+      # puts("IDX:", toms_idx)
+			# puts("igg")
+      
+    }
+
+	  i = i + 1;
+
+		let pattern = "";
+		return pattern;
+	}
+}
+
+
