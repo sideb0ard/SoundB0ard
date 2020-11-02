@@ -1,0 +1,7 @@
+puts("ELLO")
+import("funcz.sb")
+import("drumgen.sb")
+# puts("EdrrumLLO")
+import("blahz.sb")
+# puts("E blahhh LLO")
+# puts("ELLO funcyz")

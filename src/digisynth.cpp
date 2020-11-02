@@ -55,7 +55,7 @@ stereo_val DigiSynth::genNext()
     stereo_val return_val = {.left = accum_out_left * volume * pan_left,
                              .right = accum_out_right * volume * pan_right};
 
-    // return_val = effector(this, return_val);
+    return_val = Effector(return_val);
     return return_val;
 }
 
@@ -81,7 +81,7 @@ std::string DigiSynth::Info()
 std::string DigiSynth::Status()
 {
     std::stringstream ss;
-    ss << "TODO";
+    ss << "DIGI! Vol" << volume;
     return ss.str();
 }
 

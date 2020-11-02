@@ -1,5 +1,6 @@
 
 let midee_note = 47
+
 let dre = gen() {
 	setup() {
      midee_note = 47
@@ -7,21 +8,15 @@ let dre = gen() {
 
 	run() {
 		let pattern = "";
-    puts("RHYTHM:", rhythms[0])
-    for (i = 0; i < 16; ++i)
+    for (i = 0; i < len(rhythms[0]); ++i)
     {
-        # let prob = rand(100)
-        # if (prob < beat_probability[i])
-        # {
-        #     rhythm_string = rhythm_string + notes[note_idx] + " ";
-        #     note_idx = incr(note_idx, 0, len(notes))
-        # }
-        # else
-        # {
-        #     rhythm_string = rhythm_string + "~ "
-        # }
-    }
-
+       if (rhythms[0][i] == "1")
+       {
+    			pattern = pattern + midee_note
+       } else {
+    			pattern = pattern + rhythms[0][i]
+       }
+		}
 		return pattern;
 	}
 }
@@ -51,8 +46,6 @@ let chordrrr = gen() {
 
 	  i = i + 1;
 
-		let pattern = "";
-		return pattern;
 	}
 }
 

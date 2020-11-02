@@ -1,0 +1,10 @@
+let example = gen()
+{
+    setup()
+    { 
+    }
+
+    run()
+    {
+    }
+}

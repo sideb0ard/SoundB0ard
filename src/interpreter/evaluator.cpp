@@ -1,3 +1,4 @@
+#include <cstring>
 #include <iostream>
 #include <map>
 #include <memory>
@@ -591,6 +592,9 @@ EvalIndexExpression(std::shared_ptr<object::Object> left,
         return EvalArrayIndexExpression(left, index);
     else if (left->Type() == object::HASH_OBJ)
         return EvalHashIndexExpression(left, index);
+    else if (left->Type() == object::STRING_OBJ &&
+             index->Type() == object::NUMBER_OBJ)
+        return EvalStringIndexExpression(left, index);
 
     return NewError("index operation not supported: %s", left->Type());
 }
@@ -614,6 +618,29 @@ EvalArrayIndexExpression(std::shared_ptr<object::Object> array_obj,
             return NULLL;
     }
     return NewError("Couldn't unpack yer Array OBJ!");
+}
+
+std::shared_ptr<object::Object>
+EvalStringIndexExpression(std::shared_ptr<object::Object> string_obj,
+                          std::shared_ptr<object::Object> index)
+{
+    std::shared_ptr<object::String> my_string =
+        std::dynamic_pointer_cast<object::String>(string_obj);
+
+    std::shared_ptr<object::Number> int_obj =
+        std::dynamic_pointer_cast<object::Number>(index);
+    if (my_string && int_obj)
+    {
+        int idx = int_obj->value_;
+        int str_len = my_string->value_.length();
+        if (idx < str_len)
+        {
+            return std::make_shared<object::String>(
+                std::string(1, my_string->value_[idx]));
+        }
+    }
+
+    return evaluator::NULLL;
 }
 
 std::shared_ptr<object::Object>

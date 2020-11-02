@@ -1,32 +1,112 @@
-let drumgen = gen()
+let rhythms = [
+  #shiko
+  "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #son
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #rumba
+  "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
+  #soukous
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
+  #gahu
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
+  #bossa-nova
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
+]
+
+let distrhythms = gen()
+{
+  setup() {}
+  
+  run() {
+    let idx = rand(len(rhythms))
+    #puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
+    return rhythms[idx]
+  }
+}
+    
+let rotr = gen()
+{
+  setup() {
+    let rhythm = ["1", "~", "~", "~", "1", "~", "1", "~", "~", "~", "1", "~", "1", "~", "~", "~"]
+  }
+  
+  run() {
+    let pattern = ""
+    for (i = 0; i < len(rhythm); ++i) {
+      if (rhythm[i] == "1") {
+         pattern = pattern + "1";
+      } else {
+         pattern = pattern + rhythm[i];
+      }
+      pattern = pattern + " "
+    }
+    rhythm = rotate(rhythm, 4)
+    return pattern;
+  }
+}
+    
+  
+
+let higen = gen()
 {
     setup()
-    { 
-        #let notes = [ "c3", "f1", "gm4", "g3" ];
-	let notes = ["e4", "gm4", "b4", "dm5", "d5", "gm4", "e4", "dm5", "b4", "gm4", "d5", "dm5"]
-	let note_idx = 0;
-        let beat_probability = [90, 5, 5, 90, 4, 20, 80, 5, 90, 20, 50, 60, 5, 30, 60, 9];
+    {
+       let skip_prob = 3
+       let hat_probs = [90, 80, 70, 60, 10]
+       let hat_prob_idx = 0
+       let hat_prob_num = 2
     }
 
     run()
     {
-
-        let rhythm_string = ""
-	notes = gimmeNotes()
-
-        #random miss a bar
-        if (rand(10) < 2)
-        {
-            return rhythm_string
+        if (count % hat_prob_num == 0) {
+          hat_prob_idx = incr(hat_prob_idx, 0, len(hat_probs));
         }
+        let rhythm_string = ""
+
+        for (i = 0; i < 16; ++i)
+        {
+            let prob = rand(100)
+            if (prob < hat_probs[hat_prob_idx])
+            {
+                if (prob < skip_prob) {
+                   rhythm_string = rhythm_string + "[ ~ ";
+                } 
+                rhythm_string = rhythm_string + "1 ";
+                if (prob < skip_prob) {
+                   rhythm_string = rhythm_string + "] ";
+                } 
+            }
+            else
+            {
+                rhythm_string = rhythm_string + "~ "
+            }
+        }
+        return rhythm_string
+  
+    }
+}
+
+let sngen = gen()
+{
+    setup()
+    { 
+        let beat_probability = [0, 0, 0, 0,
+                                90, 0, 0, 0,
+                                0, 0, 0, 0,
+                                90, 0, 0, 0];
+
+    }
+
+    run()
+    {
 
         for (i = 0; i < 16; ++i)
         {
             let prob = rand(100)
             if (prob < beat_probability[i])
             {
-                rhythm_string = rhythm_string + notes[note_idx] + " ";
-                note_idx = incr(note_idx, 0, len(notes))
+                rhythm_string = rhythm_string + "1 ";
             }
             else
             {
@@ -37,31 +117,47 @@ let drumgen = gen()
     }
 }
 
-let rhythms = [
-							  #shiko
-								"1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-								#son
-								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-								#rumba
-								"1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
-								#soukous
-								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
-								#gahu
-								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
-								#bossa-nova
-								"1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
-							]
-
-let distrhythms = gen()
+let drumgen = gen()
 {
-	setup() {}
+    setup()
+    { 
+        let beat_probability = [90, 5, 5, 90,
+                                4, 20, 80, 5,
+                                90, 20, 50, 60,
+                                5, 30, 60, 9];
 
-	run() {
-			let idx = rand(len(rhythms))
-			#puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
-			return rhythms[idx]
-	}
+         #let ths = [th1, th2]
+         #let th_idx = 0;
+         #let th_num = 3;
+    }
+
+    run()
+    {
+
+        #th = ths[th_idx]
+        #if (count % th_num == 0) {
+        #  th_idx = incr(th_idx, 0, len(ths));
+        #}
+
+        let rhythm_string = ""
+
+        for (i = 0; i < 16; ++i)
+        {
+            let prob = rand(100)
+            if (prob < beat_probability[i])
+            {
+		if (count % 3 == 0 && prob > 80) {
+                  rhythm_string = rhythm_string + "1(3,8) ";
+                } else {
+                  rhythm_string = rhythm_string + "1 ";
+                }
+            }
+            else
+            {
+                rhythm_string = rhythm_string + "~ "
+            }
+        }
+        return rhythm_string
+    }
 }
-		
-	
 

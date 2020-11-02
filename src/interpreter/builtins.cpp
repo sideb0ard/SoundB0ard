@@ -201,6 +201,44 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return return_array;
          })},
+    {"rotate",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object> {
+             if (input.size() != 2)
+                 return evaluator::NewError(
+                     "`rotate` requires two args - an array or "
+                     "string plus a num of positions to rotate.");
+
+             auto number = std::dynamic_pointer_cast<object::Number>(input[1]);
+
+             std::shared_ptr<object::Array> array_obj =
+                 std::dynamic_pointer_cast<object::Array>(input[0]);
+             if (array_obj && number)
+             {
+                 auto return_array =
+                     std::make_shared<object::Array>(array_obj->elements_);
+
+                 std::rotate(return_array->elements_.begin(),
+                             return_array->elements_.begin() + number->value_,
+                             return_array->elements_.end());
+
+                 return return_array;
+             }
+
+             std::shared_ptr<object::String> string_obj =
+                 std::dynamic_pointer_cast<object::String>(input[0]);
+             if (string_obj && number)
+             {
+                 std::string rotated_string = string_obj->value_;
+                 std::rotate(rotated_string.begin(),
+                             rotated_string.begin() + number->value_,
+                             rotated_string.end());
+                 return std::make_shared<object::String>(rotated_string);
+             }
+
+             return evaluator::NULLL;
+         })},
     // TODO - fix for many synth types
     //{"keys",
     // std::make_shared<object::BuiltIn>(

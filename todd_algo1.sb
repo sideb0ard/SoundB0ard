@@ -1,0 +1,106 @@
+let count = 0;
+
+let counter = gen()
+{
+  setup()
+  {
+     let dummy = 1;
+  }
+  run()
+  {
+    count = count + 1;
+    if (count % 4 == 0 )
+    {
+      progChord();
+    }
+    return ""
+  }
+}
+
+let todd1 = gen()
+{
+    setup()
+    { 
+      let melody = gimmeNotes()
+      let melody_repeat = 1
+      let melody_repeat_counter = 1
+
+      let rhythm = distrhythms()
+      puts("RHYTHM IS ", rhythm)
+      let rhythm_counter = 3;
+      let rhythm_counter_max = 7;
+    }
+
+    run()
+    {
+      melody = gimmeNotes()
+      if ( count % 4 == 0 )
+      {
+        rhythm = distrhythms();
+      }
+      let brak = 0;
+      if (count % 3 == 0) {
+        #puts("DOING MA THANG");
+        brak = 1;
+      }
+  
+      let pattern = apply_melody_to_rhythm(melody, rhythm, (count % 3) + rhythm_counter, brak);
+
+      rhythm_counter = incr(rhythm_counter, 3, rhythm_counter_max)
+
+      return pattern
+    }
+}
+
+
+let apply_melody_to_rhythm = fn(melody, rhythm, num_times, brak)
+{
+    let pattern = ""
+    let melody_len = len(melody);
+    let melody_idx = 0;
+    let num_times_idx = 0
+
+
+    for (i = 0; i < len(rhythm); ++i)
+    {
+       if (rhythm[i] == "1")
+       {
+          let addition =  melody[melody_idx] + "*" + num_times;
+          if (brak == 1  && i != 0)  
+          {
+            brak = 0;
+            let wee = get_four_beat();
+            addition = "[" + apply_melody_to_rhythm(melody[melody_idx], wee, 1, 0) + "]"; 
+          } 
+
+          if (rand(10) > 8) {
+	     addition = melody[melody_idx] + "(3,8)"
+          }
+
+          pattern = pattern + addition;
+
+          if ( count % 2 == 0 ) {
+            melody_idx = incr(melody_idx, 0, melody_len);
+          }
+       } else {
+          pattern = pattern + rhythm[i]
+       }
+    }
+    if (count % 3 == 0) {
+      return pattern + rotate(pattern, 4)
+    }
+    return pattern;
+}
+
+let get_four_beat = fn()
+{
+    let rhythm = distrhythms()
+    rhythm = rotate(rhythm, count % 4); 
+    let wee_pattern = ""
+    
+    for (i = 0; i < len(rhythm)/4; ++i)
+    {
+       wee_pattern = wee_pattern + rhythm[i];
+    }
+    return wee_pattern;
+}

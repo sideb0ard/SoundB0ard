@@ -89,6 +89,10 @@ std::shared_ptr<object::Object>
 EvalArrayIndexExpression(std::shared_ptr<object::Object> left,
                          std::shared_ptr<object::Object> index);
 
+std::shared_ptr<object::Object>
+EvalStringIndexExpression(std::shared_ptr<object::Object> left,
+                          std::shared_ptr<object::Object> index);
+
 std::vector<std::shared_ptr<object::Object>>
 EvalExpressions(std::vector<std::shared_ptr<ast::Expression>> exps,
                 std::shared_ptr<object::Environment> env);
