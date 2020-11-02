@@ -161,7 +161,8 @@ void Process::EventNotify(mixer_timing_info tinfo)
 
             for (int i = 0; i < PPBAR; i++)
                 pattern_events_[i].clear();
-            EvalPattern(pattern_root_, 0, PPBAR);
+            if (pattern_root_)
+                EvalPattern(pattern_root_, 0, PPBAR);
 
             for (auto &f : pattern_functions_)
             {
