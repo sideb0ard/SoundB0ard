@@ -205,24 +205,30 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              -> std::shared_ptr<object::Object> {
              if (input.size() != 1)
                  return evaluator::NewError(
-                     "`reverse` requires a single array argument.");
+                     "`reverse` requires a single array or string argument.");
 
              std::shared_ptr<object::Array> array_obj =
                  std::dynamic_pointer_cast<object::Array>(input[0]);
-             if (!array_obj)
+             if (array_obj)
              {
-                 return evaluator::NewError(
-                     "argument to `reverse` must be an array - got %s",
-                     input[0]->Type());
+                 auto return_array =
+                     std::make_shared<object::Array>(array_obj->elements_);
+
+                 std::reverse(return_array->elements_.begin(),
+                              return_array->elements_.end());
+                 return return_array;
              }
 
-             auto return_array =
-                 std::make_shared<object::Array>(array_obj->elements_);
+             std::shared_ptr<object::String> string_obj =
+                 std::dynamic_pointer_cast<object::String>(input[0]);
+             if (string_obj)
+             {
+                 std::string reversed_string = string_obj->value_;
+                 reverse(reversed_string.begin(), reversed_string.end());
+                 return std::make_shared<object::String>(reversed_string);
+             }
 
-             std::reverse(return_array->elements_.begin(),
-                          return_array->elements_.end());
-
-             return return_array;
+             return evaluator::NULLL;
          })},
     {"rotate",
      std::make_shared<object::BuiltIn>(

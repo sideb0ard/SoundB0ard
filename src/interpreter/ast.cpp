@@ -333,7 +333,10 @@ std::string CallExpression::String() const
 
     std::vector<std::string> arguments;
     for (auto a : arguments_)
-        arguments.push_back(a->String());
+    {
+        if (a)
+            arguments.push_back(a->String());
+    }
 
     ss << function_->String() << "("
        << std::accumulate(arguments.begin(), arguments.end(), std::string(),
