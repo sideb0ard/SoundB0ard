@@ -1,9 +1,9 @@
-let incr = fn(num, min, max)
-{
-    let num = ++num; 
-    if (num == max || num > max) { num = 0 + min; }
-    return num
-}
+# let incr = fn(num, min, max)
+# {
+#     let num = ++num; 
+#     if (num == max || num > max) { num = 0 + min; }
+#     return num
+# }
 
 let simple = gen() {
 	setup() {

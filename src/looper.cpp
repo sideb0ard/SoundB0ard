@@ -449,6 +449,11 @@ stereo_val sound_grain_generate(sound_grain *g, double *audio_buffer,
                                 int audio_buffer_len)
 {
     stereo_val out = {0., 0.};
+    if (!g)
+    {
+        std::cerr << "NAE GRAIN YA NUMPTY!!\n";
+        return out;
+    }
     if (!g->active)
         return out;
 

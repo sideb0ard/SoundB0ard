@@ -81,6 +81,29 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
+    {"incr",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             if (args.size() != 3)
+                 return evaluator::NewError(
+                     "Too many arguments for incr - need three - number to "
+                     "incr, min and max");
+             auto number = std::dynamic_pointer_cast<object::Number>(args[0]);
+             auto min = std::dynamic_pointer_cast<object::Number>(args[1]);
+             auto max = std::dynamic_pointer_cast<object::Number>(args[2]);
+             if (number && min && max)
+             {
+                 int incr_num = number->value_;
+                 incr_num++;
+                 if (incr_num >= max->value_)
+                 {
+                     incr_num = 0 + min->value_;
+                 }
+                 return std::make_shared<object::Number>(incr_num);
+             }
+             return evaluator::NULLL;
+         })},
     {"tail",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)

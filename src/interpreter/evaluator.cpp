@@ -26,6 +26,7 @@ extern Tsqueue<int> audio_reply_queue;
 
 namespace
 {
+
 bool IsTruthy(std::shared_ptr<object::Object> obj)
 {
     if (obj == evaluator::NULLL)
@@ -102,6 +103,10 @@ namespace evaluator
 std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
                                      std::shared_ptr<object::Environment> env)
 {
+    if (!node)
+    {
+        return NULLL;
+    }
     std::shared_ptr<ast::Program> prog_node =
         std::dynamic_pointer_cast<ast::Program>(node);
     if (prog_node)
@@ -254,11 +259,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
             return NULLL;
         }
         auto val = eval_val->Inspect();
+
         if (set_stmt->target_->token_.literal_ == ("mixer"))
         {
             audio_action_queue_item action{.type = AudioAction::MIXER_UPDATE,
                                            .param_name = set_stmt->param_,
-                                           //.param_val = set_stmt->value_};
                                            .param_val = val};
             audio_queue.push(action);
             return NULLL;
@@ -687,7 +692,7 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
     }
     for_loop->env_->Set(for_loop->iterator_->value_, initial_iterator_val);
 
-    std::shared_ptr<object::Object> result;
+    std::shared_ptr<object::Object> result = evaluator::NULLL;
     while (IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
     {
         result = Eval(for_loop->body_, for_loop->env_);
@@ -904,7 +909,7 @@ std::shared_ptr<object::Object>
 EvalBlockStatement(std::shared_ptr<ast::BlockStatement> block,
                    std::shared_ptr<object::Environment> env)
 {
-    std::shared_ptr<object::Object> result;
+    std::shared_ptr<object::Object> result = evaluator::NULLL;
     for (auto &s : block->statements_)
     {
         result = Eval(s, env);
@@ -1287,7 +1292,7 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
     process_event_queue.push(ev);
 
     return NULLL;
-} // namespace evaluator
+}
 
 //////////// Error shizzle below
 
