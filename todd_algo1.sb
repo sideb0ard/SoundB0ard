@@ -1,22 +1,129 @@
 # # let count = 0;
 # 
+#
+
+# SB#> loadPreset(dxx, "TONIC")
+# SB#> loadPreset(dxx, "siiiiney")
+#  loadPreset(dxx, "rocktagon")"rocktagon"
+
+# inclusive of lower and upper vals
+let randy_array = fn(alen, lower, upper)
+{
+    let array = []
+    blah = alen
+    if (alen > 0 && lower < upper) {
+    for (i = 0; i < alen; ++i)
+    {
+       let randy = rand(upper+1) + lower;
+       if ( randy > upper) {
+         puts("RANDY is:", randy, " more than ", upper);
+         randy = (randy % (upper - lower)) + lower;
+       }
+       array = push(array, randy);
+    }
+    } else {
+      puts("YO, SORT IT!");
+    }
+    return array;
+}
+
 let counter = gen()
 {
   setup()
   {
-     let dummy = 1;
   }
   run()
   {
     count = count + 1;
-    if (count % 4 == 0 )
+    let 
+    if (count % 16 == 0 )
     {
-      progChord();
+      
     }
     return ""
   }
 }
- 
+
+let jobbie = 10
+# 
+let flipz = gen()
+{
+  setup()
+  {
+    let samplez = ["raw", "slowah", "wah", "~", "~", "~"];
+    let pat = randy_array(8, 0, len(samplez));
+  }
+  run()
+  {
+     pat = randy_array(blah, 0, len(samplez) - 1);
+     let rhythm = "";
+     for (i = 0; i < len(pat); ++i)
+     {
+       if (samplez[pat[i]]) {
+         rhythm = rhythm + samplez[pat[i]];
+       } else {
+         puts("NO GOT ", pat[i]);
+       }
+       rhythm = rhythm + " ";
+      }
+      return rhythm;
+   }
+}
+
+
+let nmapr = gen()
+{
+  setup()
+  {
+    let notes = gimmeNotes();
+  }
+  run()
+  {
+    let rhythm = "";
+    for (i = 0; i < len(pat); ++i)
+    {
+      #puts("PAT[", i, "] is ", pat[i]);
+      if (notes[pat[i]]) 
+      {
+        #puts("MAPPED TO ", mmmap[pat[i]]);
+        let numz = rand(4) + 1;
+        rhythm = rhythm + notes[pat[i]] + "*" + numz;
+      }
+      rhythm = rhythm + " ";
+     }
+    return rhythm;
+  }
+}
+
+# p2 < every 3 "1"  "pat = reverse(pat)"
+# p3 < every 4 "1"  "pat = rotate(pat, 3)"
+# p4 < every 8 "1"  "pat = randy_array(16, 0, 2)"
+# p5 < every 7 "1"  "pat = randy_array(8, 0, 2)"
+# p6 < every 13 "1"  "pat = randy_array(11, 0, 2)"
+
+let mapr = gen()
+{
+  setup()
+  {
+    let mmmap = ["bd", "cp", "sn"];
+  }
+  run()
+  {
+    let rhythm = "";
+    for (i = 0; i < len(pat); ++i)
+    {
+      #puts("PAT[", i, "] is ", pat[i]);
+      if (mmmap[pat[i]]) 
+      {
+        #puts("MAPPED TO ", mmmap[pat[i]]);
+        rhythm = rhythm + mmmap[pat[i]];
+      }
+      rhythm = rhythm + " ";
+     }
+    return rhythm;
+  }
+}
+
 let synco = gen()
 {
   setup()
