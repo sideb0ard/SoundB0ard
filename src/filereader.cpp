@@ -31,7 +31,6 @@ std::string ReadFileContents(std::string filepath)
         {
             if (!starts_with_comment(line))
             {
-                std::cout << line << std::endl;
                 buffer << line;
             }
         }
