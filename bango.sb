@@ -1,0 +1,179 @@
+#let tm = sample(TT-BANGO/TOM.wav)
+#let tm2 = sample(TT-BANGO/TOM3.wav)
+#let tm3 = sample(TT-BANGO/TOMLONG.wav)
+#let bongos = [tm, tm2, tm3]
+#let sn = sample(TT-BANGO/SNARE2.wav)
+#let bd = sample(TT-BANGO/bd.wav)
+#let back = sample(TT-BANGO/back.wav)
+#let tothe = sample(TT-BANGO/TOTHE.wav)
+#let hh3 = sample(TT-BANGO/hat.wav)
+#let hh2 = sample(TT-BANGO/hatty.wav)
+#let hh = sample(TT-BANGO/HATish.wav)
+#let oh = sample(TT-BANGO/OH.wav)
+#let hatz = [hh, hh2, hh3, oh]
+#let sn = sample(TT-BANGO/snare.wav)
+#let sn2 = sample(TT-BANGO/SNARE2HIT.wav)
+#let sn3 = sample(TT-BANGO/howyeSNARE.wav)
+#let sn4 = sample(TT-BANGO/KRK.wav)
+#let snrz = [sn, sn2, sn3, sn4]
+
+let bango_hatz = gen()
+{
+    setup()
+    { 
+       let bob= 5
+       let arr_sizes = [4, 8, 16, 6, 8, 12, 4, 16]
+       let arr_idx = 0;
+       let hat_idx = 0;
+    }
+
+    run()
+    {
+      let arr = randy_array(arr_sizes[arr_idx], 0, len(hatz))
+      arr_idx = incr(arr_idx, 0, len(arr_sizes))
+
+      let inc = 3840 / len(arr);
+      for ( i = 0 ; i < len(arr) ;  ++i ) {
+        let randy = rand(10);
+        if ( randy < 8 ) { 
+          noteOnDelayed(hatz[hat_idx], 1, i*inc)
+        }
+        hat_idx = incr(hat_idx, 0, len(hatz))
+			}
+    }
+}
+
+let bango_bongoz = gen()
+{
+    setup()
+    { 
+       let arr_sizes = [4, 8, 16, 8, 12, 4, 16]
+       let arr_idx = 0;
+       let bongo_idx = 0;
+       let pitchz = [1, 1.5, 2]
+       let pitch_idx = 0
+       let counter = 0
+       let bongoz = ["tm", "tm2", "tm3"]
+    }
+
+    run()
+    {
+      let arr = randy_array(arr_sizes[arr_idx], 0, len(bongos))
+      arr_idx = incr(arr_idx, 0, len(arr_sizes))
+
+      let inc = 3840 / len(arr);
+      # puts("Setting ", bongoz[bongo_idx], " to pitch ", pitchz[pitch_idx])
+      let cmd = "set " + bongoz[bongo_idx] + ":pitch " + pitchz[pitch_idx]
+      if (counter % 3 == 0){
+        set tm:pitch pitchz[pitch_idx]
+      }
+      if (counter % 4 == 0){
+        set tm2:pitch pitchz[pitch_idx]
+      }
+      if (counter % 7 == 0){
+        set tm3:pitch pitchz[pitch_idx]
+      }
+      # set bongoz[bongo_idx]:pitch pitchz[pitch_idx]
+      pitch_idx = incr(pitch_idx, 0, len(pitchz))
+      for ( i = 0 ; i < len(arr) ;  ++i ) {
+        let randy = rand(10);
+        if ( randy < 8 ) { 
+          noteOnDelayed(bongos[bongo_idx], 1, i*inc)
+        }
+        bongo_idx = incr(bongo_idx, 0, len(bongos))
+			}
+      ++counter
+    }
+}
+
+
+let bango_batz = gen()
+{
+    setup()
+    { 
+       let counter = 0;
+    }
+
+    run()
+    {
+      let pat = ""
+      if (counter % 4 == 0) {
+        let arr = randy_array(3, 0, 2)
+        pat = "~ ~ ["
+        for (i = 0; i < len(arr); ++i) {
+           if (arr[i] == 0) {
+             pat = pat + "~ ";
+           }
+           if (arr[i] == 1) {
+             pat = pat + "back "
+           }
+           if (arr[i] == 2) {
+             pat = pat + "tothe "
+           }
+        }
+        pat = pat + "] ~";
+      }
+      ++counter;
+      return pat
+    }
+}
+
+let bango_snarez = gen()
+{
+    setup()
+    { 
+       let counter = 0;
+       let roll_len = 3
+    }
+
+    run()
+    {
+      let pat = ""
+      if (counter % 3 == 0) {
+        let arr = randy_array(roll_len, 0, len(snrz) + 1)
+        roll_len = rand(4) + 3
+        pat = "~ ~ ~ ["
+        for (i = 0; i < len(arr); ++i) {
+           if (arr[i] == 0) {
+             pat = pat + "~ ";
+           }
+           if (arr[i] == 1) {
+             pat = pat + "sn "
+           }
+           if (arr[i] == 2) {
+             pat = pat + "sn2 "
+           }
+           if (arr[i] == 3) {
+             pat = pat + "sn3 "
+           }
+           if (arr[i] == 4) {
+             pat = pat + "sn4 "
+           }
+        }
+        pat = pat + "]";
+      }
+      ++counter;
+      return pat
+    }
+}
+
+
+let randy_array = fn(alen, lower, upper)
+{
+     let array = []
+     # blah = alen
+     if (alen > 0 && lower < upper) {
+     for (i = 0; i < alen; ++i)
+     {
+        let randy = rand(upper+1) + lower;
+        if ( randy > upper) {
+          puts("RANDY is:", randy, " more than ", upper);
+          randy = (randy % (upper - lower)) + lower;
+        }
+        array = push(array, randy);
+     }
+     } else {
+       puts("YO, SORT IT!");
+     }
+     return array;
+}

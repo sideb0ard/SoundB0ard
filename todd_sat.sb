@@ -1,0 +1,136 @@
+#let one = sample(TT-BANGO/1.wav)
+#let two = sample(TT-BANGO/2.wav)
+#let three = sample(TT-BANGO/3.wav)
+#let four = sample(TT-BANGO/4.wav)
+#let five = sample(TT-BANGO/5.wav)
+#let six = sample(TT-BANGO/6.wav)
+#let seven = sample(TT-BANGO/7.wav)
+#let eight = sample(TT-BANGO/8.wav)
+#let nine = sample(TT-BANGO/9.wav)
+#let ten = sample(TT-BANGO/10.wav)
+#let eleven = sample(TT-BANGO/11.wav)
+#let twelve = sample(TT-BANGO/12.wav)
+#let thirteen = sample(TT-BANGO/13.wav)
+#let fourteen = sample(TT-BANGO/14.wav)
+#let fifteen = sample(TT-BANGO/15.wav)
+#let sixteen = sample(TT-BANGO/16.wav)
+#let bong1 = sample(TT-BANGO/bingoBON.wav)
+#let bong2 = sample(TT-BANGO/HAHSLIDE.wav)
+#let bong3 = sample(TT-BANGO/bingoBanog.wav)
+#let dum = sample(TT-BANGO/dum.wav)
+#let hh = sample(TT-BANGO/hat.wav)
+#let kd = sample(TT-BANGO/kickPHAT.wav)
+#let kd2 = sample(TT-BANGO/kickMELODY.wav)
+#let kick = sample(TT-BANGO/kiCK.wav)
+# let sqk = sample(TT-BANGO/laugsqeeuk.wav)
+# let aigh = sample(TT-BANGO/AIIGH.wav)
+# let scrm = sample(TT-BANGO/scream.wav)
+# let feel = sample(TT-BANGO/feel3.wav)
+# let zt = sample(TT-BANGO/zoot.wav)
+
+let numz = ["one", "two", "three", "four", "five","six","seven","eight", "nine","ten","eleven", "twelve", "thirteen", "fourteen", "fifteen", "sixteen", "~"]
+
+let rhythms = [
+  #shiko
+  "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #son
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #rumba
+  "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
+  #soukous
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
+  #gahu
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
+  #bossa-nova
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
+]
+
+let distrhythms = gen()
+{
+  setup() {}
+  
+  run() {
+    let idx = rand(len(rhythms))
+    #puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
+    return rhythms[idx]
+  }
+}
+    
+let mapz = gen()
+{
+    setup()
+    { 
+      let count = 0;
+      let beat_count = 4;
+    }
+
+    run()
+    {
+      let pat = ""
+      let arr = rand_array(16,1,beat_count)
+      for (i = 0; i < len(arr); ++i) {
+        # puts("i is ", i, " arr[i] is ", arr[i], " and numz[arr[i]] is ", numz[arr[i]])
+        if (count % 4 == 0) {
+          pat = pat + numz[i] + " "
+        } else {
+          pat = pat + numz[arr[i] - 1] + " "
+        }
+      }
+      
+      ++count
+		  beat_count = incr(beat_count, 4, 18)
+      return pat
+    }
+}
+
+let pitchz = gen()
+{
+    setup()
+    { 
+      let count = 0;
+      let pitvch = 1;
+    }
+
+    run()
+    {
+      if (count % 3 == 0) { set one:pitch pitvch }
+      if (count % 4 == 0) { set two:pitch pitvch }
+      if (count % 5 == 0) { set three:pitch pitvch }
+      if (count % 6 == 0) { set twelve:pitch pitvch }
+      if (count % 7 == 0) { set eight:pitch pitvch }
+				
+      if ( pitvch == 1) { pitvch = 2 } 
+      else { pitvch = 1 }
+
+      ++count;
+    }
+}
+
+let bongz = gen()
+{
+    setup()
+    { 
+      let pattern = ""
+      let count = 0;
+      let pit = 1;
+    }
+
+    run()
+    {
+      
+      p4 # distrhythms() bong1;
+      p5 # distrhythms() bong2;
+      p6 # distrhythms() dum;
+
+      if (count % 3 == 0) { set bong1:pitch pit }
+      if (count % 7 == 0) { set bong2:pitch pit }
+      if (count % 5 == 0) { set dum:pitch pit }
+
+      #puts("COUNT:", count, " PITCH:", pit)
+
+      if ( pit == 1 ) { pit = 2 }
+      else { pit = 1 }
+
+      ++count
+    }
+}
