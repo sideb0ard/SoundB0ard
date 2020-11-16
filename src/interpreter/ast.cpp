@@ -33,8 +33,10 @@ std::string Program::String() const
 std::string LetStatement::String() const
 {
     std::stringstream ss;
+    if (is_new_item)
+        ss << TokenLiteral() << " ";
     if (name_)
-        ss << TokenLiteral() << " " << name_->String() << " = ";
+        ss << name_->String() << " = ";
     if (value_)
         ss << value_->String();
     ss << ";";
@@ -193,7 +195,7 @@ std::string BlockStatement::String() const
 {
     std::stringstream ss;
     for (auto &s : statements_)
-        ss << s->String();
+        ss << s->String() << '\n';
 
     return ss.str();
 }
@@ -202,7 +204,7 @@ std::string IfExpression::String() const
 {
     std::stringstream ss;
     ss << "if ";
-    if (!condition_)
+    if (condition_)
         ss << condition_->String();
     ss << " ";
     if (consequence_)
@@ -320,7 +322,18 @@ ProcessStatement::ProcessStatement(Token token) : Statement(token)
 std::string ProcessStatement::String() const
 {
     std::stringstream ss;
-    ss << "Process:" << token_.literal_;
+    ss << "p" << token_.literal_;
+    if (process_type_ == PATTERN_PROCESS)
+    {
+        if (target_type_ == ENV)
+            ss << " $ ";
+        else
+            ss << " # ";
+    }
+    ss << command_ << " ";
+    for (auto &t : targets_)
+        ss << t << ",";
+    ss << " ";
     for (auto &f : functions_)
         ss << f->String();
 

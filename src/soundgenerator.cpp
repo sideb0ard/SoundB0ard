@@ -98,7 +98,14 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     if (engine.temporal_events[idx].event_type)
     {
         midi_event ev = engine.temporal_events[idx];
-        noteOff(ev);
+        if (ev.event_type == MIDI_ON)
+        {
+            noteOn(ev);
+        }
+        else
+        {
+            noteOff(ev);
+        }
         midi_event_clear(&engine.temporal_events[idx]);
     }
 

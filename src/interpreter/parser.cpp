@@ -442,7 +442,6 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
         NextToken();
 
     stmt->body_ = ParseBlockStatement();
-
     return stmt;
 }
 
@@ -562,6 +561,7 @@ std::shared_ptr<ast::Expression> Parser::ParseExpression(Precedence p)
 
     while (!PeekTokenIs(token::SLANG_SEMICOLON) && p < PeekPrecedence())
     {
+
         if (IsInfixOperator(peek_token_.type_))
         {
             NextToken();

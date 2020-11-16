@@ -696,7 +696,13 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
     while (IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
     {
         result = Eval(for_loop->body_, for_loop->env_);
-        Eval(for_loop->increment_, for_loop->env_);
+        auto new_iterator_val = Eval(for_loop->increment_, for_loop->env_);
+        if (IsError(new_iterator_val))
+        {
+            std::cerr << "OOPS< ERR!\n";
+            return new_iterator_val;
+        }
+        for_loop->env_->Set(for_loop->iterator_->value_, new_iterator_val);
     }
 
     return result;

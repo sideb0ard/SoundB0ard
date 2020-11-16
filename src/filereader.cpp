@@ -6,6 +6,8 @@
 
 #include <filereader.hpp>
 
+namespace
+{
 bool starts_with_comment(std::string line)
 {
     std::size_t first_char_pos = line.find_first_not_of(" \t");
@@ -15,6 +17,7 @@ bool starts_with_comment(std::string line)
 
     return false;
 }
+} // namespace
 
 std::string ReadFileContents(std::string filepath)
 {
@@ -27,7 +30,10 @@ std::string ReadFileContents(std::string filepath)
         while (getline(ifs, line))
         {
             if (!starts_with_comment(line))
+            {
+                std::cout << line << std::endl;
                 buffer << line;
+            }
         }
 
         return buffer.str();

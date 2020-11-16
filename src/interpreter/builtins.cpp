@@ -298,10 +298,19 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object> {
                        audio_action_queue_item action_req{
-                           .type = AudioAction::NOTE_ON, .args = args};
+                           .type = AudioAction::MIDI_EVENT_ADD, .args = args};
                        audio_queue.push(action_req);
                        return evaluator::NULLL;
                    })},
+    {"noteOnDelayed", std::make_shared<object::BuiltIn>(
+                          [](std::vector<std::shared_ptr<object::Object>> args)
+                              -> std::shared_ptr<object::Object> {
+                              audio_action_queue_item action_req{
+                                  .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
+                                  .args = args};
+                              audio_queue.push(action_req);
+                              return evaluator::NULLL;
+                          })},
     {"speed", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {
@@ -558,6 +567,42 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
+    {"rand_array",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             if (args_size == 3)
+             {
+                 auto length =
+                     std::dynamic_pointer_cast<object::Number>(args[0]);
+                 auto lower_val =
+                     std::dynamic_pointer_cast<object::Number>(args[1]);
+                 auto upper_val =
+                     std::dynamic_pointer_cast<object::Number>(args[2]);
+                 if (length && lower_val && upper_val)
+                 {
+                     // not dealing with error, just return
+                     if (lower_val->value_ >= upper_val->value_)
+                         return evaluator::NULLL;
+
+                     auto return_array = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
+                     for (int i = 0; i < length->value_; i++)
+                     {
+                         auto rand_number =
+                             rand() % (int)(upper_val->value_ -
+                                            lower_val->value_ + 1) +
+                             lower_val->value_;
+                         auto num_obj =
+                             std::make_shared<object::Number>(rand_number);
+                         return_array->elements_.push_back(num_obj);
+                     }
+                     return return_array;
+                 }
+             }
+             return evaluator::NULLL;
+         })},
 };
 
 } // namespace builtin

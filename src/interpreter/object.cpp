@@ -181,8 +181,8 @@ std::string Generator::Inspect()
     }
     std::stringstream return_val;
     return_val << "gn(" << params.str() << ") \n";
-    return_val << "setup() { " << setup_->String() << "\n}\n";
-    return_val << "run() { " << run_->String() << "\n}\n";
+    return_val << "setup() {\n" << setup_->String() << "}\n";
+    return_val << "run() {\n" << run_->String() << "}\n";
 
     return return_val.str();
 }
