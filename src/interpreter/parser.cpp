@@ -184,7 +184,7 @@ std::shared_ptr<ast::SetStatement> Parser::ParseSetStatement()
                   << std::endl;
         return nullptr;
     }
-    stmt->target_ = ParseIdentifier();
+    stmt->target_ = ParseExpression(Precedence::LOWEST);
 
     if (!ExpectPeek(token::SLANG_COLON))
     {

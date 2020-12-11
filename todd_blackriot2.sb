@@ -1,0 +1,135 @@
+#let kdc = sample(TT-BLACKRIOT-DAYINLIFE/KDclip.wav)
+#let oh = sample(TT-BLACKRIOT-DAYINLIFE/OH.wav)
+#let uh1 = sample(TT-BLACKRIOT-DAYINLIFE/UH1.wav)
+#let uh2 = sample(TT-BLACKRIOT-DAYINLIFE/UH2.wav)
+#let uh3 = sample(TT-BLACKRIOT-DAYINLIFE/UH3.wav)
+#let ap = sample(TT-BLACKRIOT-DAYINLIFE/ap.wav)
+#let bd = sample(TT-BLACKRIOT-DAYINLIFE/bd.wav)
+#let bd2 = sample(TT-BLACKRIOT-DAYINLIFE/bd2.wav)
+#let bdf = sample(TT-BLACKRIOT-DAYINLIFE/bdflange.wav)
+#let bng = sample(TT-BLACKRIOT-DAYINLIFE/bongo.wav)
+#let cp = sample(TT-BLACKRIOT-DAYINLIFE/clap.wav)
+#let clk = sample(TT-BLACKRIOT-DAYINLIFE/click.wav)
+#let clpvo = sample(TT-BLACKRIOT-DAYINLIFE/clipVOC.wav)
+#let cp2 = sample(TT-BLACKRIOT-DAYINLIFE/cp2.wav)
+#let co = sample(TT-BLACKRIOT-DAYINLIFE/crashopen.wav)
+#let deh = sample(TT-BLACKRIOT-DAYINLIFE/deh.wav)
+#let endloop = sample(TT-BLACKRIOT-DAYINLIFE/endloop.wav)
+#let he = sample(TT-BLACKRIOT-DAYINLIFE/hateeit.wav)
+#let hw = sample(TT-BLACKRIOT-DAYINLIFE/hatwump.wav)
+#let hh = sample(TT-BLACKRIOT-DAYINLIFE/hh.wav)
+#let hhs = sample(TT-BLACKRIOT-DAYINLIFE/hhish.wav)
+#let intro = sample(TT-BLACKRIOT-DAYINLIFE/introloop.wav)
+#let kcw = sample(TT-BLACKRIOT-DAYINLIFE/kcikWIMP.wav)
+#let perc1 = sample(TT-BLACKRIOT-DAYINLIFE/perc1.wav)
+#let perc2 = sample(TT-BLACKRIOT-DAYINLIFE/perc2.wav)
+#let perc3 = sample(TT-BLACKRIOT-DAYINLIFE/perc3.wav)
+#let sn = sample(TT-BLACKRIOT-DAYINLIFE/sn.wav)
+#let snw = sample(TT-BLACKRIOT-DAYINLIFE/snarewump.wav)
+#let snc = sample(TT-BLACKRIOT-DAYINLIFE/sncp.wav)
+#let stb = sample(TT-BLACKRIOT-DAYINLIFE/stab.wav)
+#let tic = sample(TT-BLACKRIOT-DAYINLIFE/tic.wav)
+#let tom = sample(TT-BLACKRIOT-DAYINLIFE/tom.wav)
+#let tom2 = sample(TT-BLACKRIOT-DAYINLIFE/tom2.wav)
+#let tom3 = sample(TT-BLACKRIOT-DAYINLIFE/tom3.wav)
+#let toml = sample(TT-BLACKRIOT-DAYINLIFE/tomlow.wav)
+#let wh = sample(TT-BLACKRIOT-DAYINLIFE/whistle.wav)
+#let bwoc = sample(TT-BLACKRIOT-WARLOCK/bwoc.wav)
+# let hhclean = sample(TT-BLACKRIOT-WARLOCK/hhclean.wav)
+
+# let loo = loop(TT-BLACKRIOT-WARLOCK/pianobassloo.wav)
+# let endl = loop(TT-BLACKRIOT-DAYINLIFE/endloop.wav)
+# p1 # ""
+# p2 $ "kdc*4" |
+# p3 < every 4 "<1 1.5 2>"  "set kcw:pitch %"
+# p4 $ "[~ snc]*2"
+# p5 < every 2 "1"  "set loo:stutter %"
+# p6 < every 3 "1"  "set loo2:stutter %"
+# p7 < every 1 "<0.5 0 0 0>"  "vol endl %"
+
+let perc = gen()
+{
+    setup()
+    { 
+       # let lenz = [4, 6, 8, 3, 8]
+       let lenz = [4, 8, 4, 8, 4, 16]
+       let lenz_idx = 0
+       let sampz1 = [bwoc, perc1, perc2, perc3, tom, kcw]
+       let sampz2 = [bng, clk, deh, cp]
+       let sampz3 = [clpvo]
+       let sampz4 = [uh2, uh3, uh1]
+       
+       let allsampz = [sampz1, sampz2, sampz3, sampz4]
+       let allsampz_idx = 0
+
+       let sampz = allsampz[allsampz_idx]
+        
+       # let sampz_idx = 0
+       let sampzz = [snc, tic, tom, hh, hhs, wh, hhclean]
+       let sampzz_idx = 0
+
+       let delayz = [0, 120, 240, 5, 10, 15, 20, 25, 30, 35, 60] 
+       let del_idx = 0
+
+       let count = 0
+    }
+
+    run()
+    {
+       let arr = rand_array(lenz[lenz_idx], 0, len(sampz))
+       let inc = 3840 / len(arr);
+       for ( i = 0; i < len(arr) ;  ++i ) {
+         let rnd = rand(100)
+         if (rnd < 70) {
+           noteOnDelayed(sampz[arr[i]], 1, i*inc)
+         }
+         if (rnd < 40) {
+           noteOnDelayed(sampz[arr[i]], 1, i*inc + delayz[del_idx])
+         }
+         # sampz_idx = incr(sampz_idx, 0, len(sampz))
+
+         del_idx = incr(del_idx, 0, len(delayz))
+
+         if (count % 2 == 0) {
+           noteOnDelayed(sampzz[sampzz_idx], 1, i*inc)
+           if (rnd < 30) {
+             noteOnDelayed(sampzz[sampzz_idx], 1, i*inc + delayz[del_idx])
+           }
+           sampzz_idx = incr(sampzz_idx, 0, len(sampzz))
+         }
+       }
+       if (count % 3 == 0) {
+         lenz_idx = incr(lenz_idx, 0, len(lenz))
+         # puts("LEN is ", lenz[lenz_idx])
+         sampz = allsampz[allsampz_idx]
+         allsampz_idx = incr(allsampz_idx, 0, len(allsampz))
+       }
+       ++count
+    }
+}
+
+let rhythms = [
+  #shiko
+  "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #son
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #rumba
+  "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
+  #soukous
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
+  #gahu
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
+  #bossa-nova
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
+]
+
+let distrhythms = gen()
+{
+  setup() {}
+
+  run() {
+    let idx = rand(len(rhythms))
+    #puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
+    return rhythms[idx]
+  }
+}
