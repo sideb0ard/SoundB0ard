@@ -439,13 +439,15 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::GeneratorLiteral>(node);
     if (gn)
     {
+        std::cout << "YO, GEN LITERAl! I GOT parsm - " << size(gn->parameters_)
+                  << std::endl;
         auto params = gn->parameters_;
         auto setup = gn->setup_;
         auto run = gn->run_;
         auto new_env = std::make_shared<object::Environment>(env);
         auto gen =
             std::make_shared<object::Generator>(params, new_env, setup, run);
-        Eval(gen->setup_, gen->env_);
+        // Eval(gen->setup_, gen->env_);
         return gen;
     }
 
@@ -469,7 +471,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
 
         auto gen_obj = std::dynamic_pointer_cast<object::Generator>(fun);
         if (gen_obj)
-            return ApplyGeneratorRun(gen_obj);
+            return ApplyGeneratorStartup(gen_obj, args);
 
         auto builtin_func = std::dynamic_pointer_cast<object::BuiltIn>(fun);
         if (builtin_func)
@@ -1002,12 +1004,50 @@ ApplyGeneratorRun(std::shared_ptr<object::Object> callable)
         std::dynamic_pointer_cast<object::Generator>(callable);
     if (gen)
     {
-        // func->env_ = ExtendFunctionEnv(func, args);
+
         auto evaluated = Eval(gen->run_, gen->env_);
         return UnwrapReturnValue(evaluated);
     }
 
     return NewError("Something stinky wit yer GENERaTOR , mate!");
+}
+
+std::shared_ptr<object::Object>
+ApplyGeneratorStartup(std::shared_ptr<object::Object> callable,
+                      std::vector<std::shared_ptr<object::Object>> args)
+{
+    std::shared_ptr<object::Generator> gen =
+        std::dynamic_pointer_cast<object::Generator>(callable);
+    if (gen)
+    {
+        gen->env_ = ExtendGeneratorEnv(gen, args);
+        auto evaluated = Eval(gen->setup_, gen->env_);
+        return gen;
+    }
+
+    return NewError("Something stinky wit yer GENERaTOR , mate!");
+}
+
+std::shared_ptr<object::Environment>
+ExtendGeneratorEnv(std::shared_ptr<object::Generator> gen,
+                   std::vector<std::shared_ptr<object::Object>> const &args)
+{
+    std::shared_ptr<object::Environment> new_env =
+        std::make_shared<object::Environment>(gen->env_);
+    if (gen->parameters_.size() != args.size())
+    {
+        std::cerr << "Function Eval - args and params not same size, ya "
+                     "numpty!\n";
+        return new_env;
+    }
+
+    int args_len = args.size();
+    for (int i = 0; i < args_len; i++)
+    {
+        auto param = gen->parameters_[i];
+        new_env->Set(param->value_, args[i]);
+    }
+    return new_env;
 }
 
 std::shared_ptr<object::Object>
