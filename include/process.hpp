@@ -76,12 +76,6 @@ class Process
     bool active_;
     bool debug_;
 
-    // While varz
-    std::string while_condition_;
-    std::string while_body_;
-    std::string while_then_body_;
-    // Expression
-
   private:
     std::shared_ptr<pattern_parser::PatternNode> pattern_root_{nullptr};
     std::array<std::vector<std::shared_ptr<MusicalEvent>>, PPBAR>

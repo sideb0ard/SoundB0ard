@@ -374,11 +374,6 @@ class ProcessStatement : public Statement
     float loop_len_;
     std::string command_;
 
-    // While Process Vars
-    std::string while_condition_ = {};
-    std::string while_body_ = {};
-    std::string while_then_body_ = {};
-
     // Pattern Process Vars
     ProcessPatternTarget target_type_{
         ProcessPatternTarget::NO_PROCESS_PATTERN_TARGET};

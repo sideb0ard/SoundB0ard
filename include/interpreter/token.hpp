@@ -64,7 +64,6 @@ const TokenType SLANG_OR = "||";
 
 const TokenType SLANG_BPM = "BPM";
 const TokenType SLANG_EVERY = "EVERY";
-const TokenType SLANG_WHILE = "WHILE";
 const TokenType SLANG_OVER = "OVER";
 const TokenType SLANG_RAMP = "RAMP";
 const TokenType SLANG_OSC = "OSCILLATE";

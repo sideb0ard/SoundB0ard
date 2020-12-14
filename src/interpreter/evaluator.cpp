@@ -1330,9 +1330,6 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
     ev.command = proc->command_;
     ev.target_type = proc->target_type_;
     ev.targets = proc->targets_;
-    ev.while_condition = proc->while_condition_;
-    ev.while_body = proc->while_body_;
-    ev.while_then_body = proc->while_then_body_;
     ev.funcz = process_funcz;
 
     process_event_queue.push(ev);

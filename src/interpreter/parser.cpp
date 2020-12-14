@@ -1013,13 +1013,6 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
             process->process_timer_type_ = ProcessTimerType::OVER;
         else if (cur_token_.type_ == token::SLANG_RAMP)
             process->process_timer_type_ = ProcessTimerType::RAMP;
-        else if (cur_token_.type_ == token::SLANG_WHILE)
-        {
-            // TODO - this is too specific - need to refactor and generalize
-            // possible create Process subclasses for Timer Types?
-            process->process_timer_type_ = ProcessTimerType::WHILE;
-            return ParseWhileProcess(process);
-        }
         // else is checked for above in the PeekTokenIsPatternCommandTimerType()
 
         NextToken();
@@ -1043,114 +1036,6 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
         ConsumePatternFunctions(process);
 
     return process;
-}
-
-std::shared_ptr<ast::ProcessStatement>
-Parser::ParseWhileProcess(std::shared_ptr<ast::ProcessStatement> proc)
-{
-    std::cout << "PARSE WHILE!\n";
-
-    //////////////////////////// WHILE CONDITION CAPTURE //////////////////
-
-    if (!ExpectPeek(token::SLANG_LPAREN))
-    {
-        std::cerr << "NO LEFT PAREN! - returning nullptr \n";
-        return nullptr;
-    }
-    NextToken();
-
-    std::stringstream ss;
-    while (!CurTokenIs(token::SLANG_RPAREN) && !CurTokenIs(token::SLANG_EOFF))
-    {
-        ss << cur_token_.literal_;
-        NextToken();
-        if (!CurTokenIs(token::SLANG_RPAREN) && !CurTokenIs(token::SLANG_EOFF))
-            ss << " ";
-    }
-
-    if (!CurTokenIs(token::SLANG_RPAREN))
-    {
-        std::cerr << "Ooh, not a RPAREN\n";
-        return nullptr;
-    }
-    NextToken();
-
-    proc->while_condition_ = ss.str();
-    std::cout << "WHILE CONDITION IS " << proc->while_condition_ << std::endl;
-
-    //////////////////////////// BODY CAPTURE //////////////////
-
-    if (!CurTokenIs(token::SLANG_LBRACE))
-    {
-        std::cout << "NEED A BRACE, YA BRACKET!\n";
-        return nullptr;
-    }
-    NextToken();
-    std::stringstream body_ss;
-    while (!CurTokenIs(token::SLANG_RBRACE) && !CurTokenIs(token::SLANG_EOFF))
-    {
-        std::cout << "BOADY CAPTURING " << cur_token_.literal_ << std::endl;
-        body_ss << cur_token_.literal_;
-        NextToken();
-        if (!CurTokenIs(token::SLANG_RBRACE) && !CurTokenIs(token::SLANG_EOFF))
-            ss << " ";
-    }
-    if (!CurTokenIs(token::SLANG_RBRACE))
-    {
-        std::cout << "Ooh, not a RBRRRACE, ya BRACKET\n";
-        return nullptr;
-    }
-    NextToken();
-    proc->while_body_ = body_ss.str();
-
-    std::cout << "GOT A BOADY - " << proc->while_body_ << std::endl;
-
-    //////////////////////////// THEN CAPTURE //////////////////
-    if (cur_token_.literal_.compare("then") == 0)
-    {
-        std::cout << "THEN!\n";
-        NextToken();
-        if (!CurTokenIs(token::SLANG_LBRACE))
-        {
-            std::cout << "NEED A BRACE, YA BRACKET!\n";
-            return nullptr;
-        }
-        NextToken();
-
-        std::stringstream then_ss;
-        while (!CurTokenIs(token::SLANG_RBRACE) &&
-               !CurTokenIs(token::SLANG_EOFF))
-        {
-            std::cout << "TRHEN CAPTURING " << cur_token_.literal_ << std::endl;
-            then_ss << cur_token_.literal_;
-            NextToken();
-            if (!CurTokenIs(token::SLANG_RBRACE) &&
-                !CurTokenIs(token::SLANG_EOFF))
-                ss << " ";
-        }
-        if (!CurTokenIs(token::SLANG_RBRACE))
-        {
-            std::cout << "Ooh, not a RBRRRACE, ya BRACKET2\n";
-            return nullptr;
-        }
-        NextToken();
-        proc->while_then_body_ = then_ss.str();
-    }
-
-    if (!CurTokenIs(token::SLANG_EOFF))
-    {
-        std::cout << "NAE GOOD GOOD HERE - still got ...\n";
-        std::cout << "CUR TOKEN IS " << cur_token_ << std::endl;
-        return nullptr;
-    }
-    std::cout << "WE BACK!\n";
-    // std::cout << "CONDITIONAL:" << proc->while_condition_;
-    std::cout << "BODY:" << proc->while_body_ << std::endl;
-    ;
-    // if (!proc->while_then_body_.empty())
-    //    std::cout << "THEN BODY:" << proc->while_then_body_;
-    std::cout << "WE OUTTA HERE\n";
-    return proc;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseStringLiteral()
@@ -1317,8 +1202,7 @@ void Parser::ShowTokens()
 bool Parser::PeekTokenIsPatternCommandTimerType()
 {
     if (PeekTokenIs(token::SLANG_EVERY) || PeekTokenIs(token::SLANG_OVER) ||
-        PeekTokenIs(token::SLANG_RAMP) || PeekTokenIs(token::SLANG_OSC) ||
-        PeekTokenIs(token::SLANG_WHILE))
+        PeekTokenIs(token::SLANG_RAMP) || PeekTokenIs(token::SLANG_OSC))
         return true;
     return false;
 }

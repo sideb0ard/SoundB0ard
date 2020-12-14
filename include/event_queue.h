@@ -25,8 +25,5 @@ struct event_queue_item
     std::shared_ptr<ast::Expression> pattern_expression;
     ProcessPatternTarget target_type;
     std::vector<std::string> targets;
-    std::string while_condition;
-    std::string while_body;
-    std::string while_then_body;
     std::vector<std::shared_ptr<PatternFunction>> funcz;
 };

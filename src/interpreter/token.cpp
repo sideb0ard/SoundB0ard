@@ -40,7 +40,6 @@ const std::unordered_map<std::string, TokenType> keywords{
     {"set", SLANG_SET},
     {"true", SLANG_TRUE},
     {"vol", SLANG_VOLUME},
-    {"while", SLANG_WHILE},
     {"info", SLANG_INFO},
 };
 
