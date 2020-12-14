@@ -412,7 +412,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::FunctionLiteral>(node);
     if (fn)
     {
-        std::cout << "OOOH, a func!\n";
         auto params = fn->parameters_;
         auto body = fn->body_;
         return std::make_shared<object::Function>(params, env, body);
@@ -439,15 +438,12 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::GeneratorLiteral>(node);
     if (gn)
     {
-        std::cout << "YO, GEN LITERAl! I GOT parsm - " << size(gn->parameters_)
-                  << std::endl;
         auto params = gn->parameters_;
         auto setup = gn->setup_;
         auto run = gn->run_;
         auto new_env = std::make_shared<object::Environment>(env);
         auto gen =
             std::make_shared<object::Generator>(params, new_env, setup, run);
-        // Eval(gen->setup_, gen->env_);
         return gen;
     }
 
@@ -471,13 +467,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
 
         auto gen_obj = std::dynamic_pointer_cast<object::Generator>(fun);
         if (gen_obj)
-            return ApplyGeneratorStartup(gen_obj, args);
+            return NewGenerator(gen_obj, args);
 
         auto builtin_func = std::dynamic_pointer_cast<object::BuiltIn>(fun);
         if (builtin_func)
-        {
             return ApplyFunction(builtin_func, args);
-        }
 
         return NewError("Not a function object, mate:%s!", fun->Type());
     }
@@ -998,34 +992,37 @@ EvalExpressions(std::vector<std::shared_ptr<ast::Expression>> exps,
 }
 
 std::shared_ptr<object::Object>
+NewGenerator(std::shared_ptr<object::Object> callable,
+             std::vector<std::shared_ptr<object::Object>> args)
+{
+    std::shared_ptr<object::Generator> gen =
+        std::dynamic_pointer_cast<object::Generator>(callable);
+    if (gen)
+    {
+
+        auto new_gen = std::make_shared<object::Generator>(
+            gen->parameters_, gen->env_, gen->setup_, gen->run_);
+        new_gen->env_ = ExtendGeneratorEnv(new_gen, args);
+        Eval(new_gen->setup_, new_gen->env_);
+
+        return new_gen;
+    }
+
+    return NewError("NEW FUNC - something stinky wit yer GENERaTOR , mate!");
+}
+
+std::shared_ptr<object::Object>
 ApplyGeneratorRun(std::shared_ptr<object::Object> callable)
 {
     std::shared_ptr<object::Generator> gen =
         std::dynamic_pointer_cast<object::Generator>(callable);
     if (gen)
     {
-
         auto evaluated = Eval(gen->run_, gen->env_);
         return UnwrapReturnValue(evaluated);
     }
 
-    return NewError("Something stinky wit yer GENERaTOR , mate!");
-}
-
-std::shared_ptr<object::Object>
-ApplyGeneratorStartup(std::shared_ptr<object::Object> callable,
-                      std::vector<std::shared_ptr<object::Object>> args)
-{
-    std::shared_ptr<object::Generator> gen =
-        std::dynamic_pointer_cast<object::Generator>(callable);
-    if (gen)
-    {
-        gen->env_ = ExtendGeneratorEnv(gen, args);
-        auto evaluated = Eval(gen->setup_, gen->env_);
-        return gen;
-    }
-
-    return NewError("Something stinky wit yer GENERaTOR , mate!");
+    return NewError("APPLY RUN - Something stinky wit yer GENERaTOR , mate!");
 }
 
 std::shared_ptr<object::Environment>
