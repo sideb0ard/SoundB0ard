@@ -1,32 +1,29 @@
-# let uh1 = sample(TT-BLACKRIOT-DAYINLIFE/UH1.wav)
-# let uh2 = sample(TT-BLACKRIOT-DAYINLIFE/UH2.wav)
-# let uh3 = sample(TT-BLACKRIOT-DAYINLIFE/UH3.wav)
-# let uhz = [uh1, uh2, uh3]
-# 
-# let pia1 = sample(TT-BLACKRIOT-WARLOCK/piano1.wav)
-# let pia2 = sample(TT-BLACKRIOT-WARLOCK/piano2.wav)
-# let pia3 = sample(TT-BLACKRIOT-WARLOCK/piano3.wav)
-# let pia4 = sample(TT-BLACKRIOT-WARLOCK/piano4.wav)
-# let pianoz = [pia1, pia2, pia3, pia4]
-# #
-# ## let sn = sample(TT-BLACKRIOT-WARLOCK/snclean.wav)
-# ## let bg = sample(TT-BLACKRIOT-WARLOCK/bong3.wav)
-# ## let drw = sample(TT-BLACKRIOT-WARLOCK/drwop.wav)
-# let tom1 = sample(TT-BLACKRIOT-DAYINLIFE/tom.wav);
-# let tom2 = sample(TT-BLACKRIOT-DAYINLIFE/tom2.wav)
-# let tom3 = sample(TT-BLACKRIOT-DAYINLIFE/tom3.wav)
-# let tomz = [tom1, tom2, tom3]
-# ## let wh = sample(TT-BLACKRIOT-DAYINLIFE/whistle.wav)
-# ## # let percz = [drw]
-# ## let bd = sample(TT-BLACKRIOT-WARLOCK/bd1.wav)
-# ## let bdz = [bd]
+let uh1 = sample(TT-BLACKRIOT-DAYINLIFE/UH1.wav)
+let uh2 = sample(TT-BLACKRIOT-DAYINLIFE/UH2.wav)
+let uh3 = sample(TT-BLACKRIOT-DAYINLIFE/UH3.wav)
+let uhz = [uh1, uh2, uh3]
 
-# #
-# let too = sample(TT-BLACKRIOT-WARLOCK/too.wav)
-# let snp = sample(TT-BLACKRIOT-WARLOCK/snp.wav)
-# let clip = sample(TT-BLACKRIOT-WARLOCK/clip.wav)
-# let bw = sample(TT-BLACKRIOT-WARLOCK/bwoc.wav)
-# let percz = [bw, too, snp, clip]
+let pia1 = sample(TT-BLACKRIOT-WARLOCK/piano1.wav)
+let pia2 = sample(TT-BLACKRIOT-WARLOCK/piano2.wav)
+let pia3 = sample(TT-BLACKRIOT-WARLOCK/piano3.wav)
+let pia4 = sample(TT-BLACKRIOT-WARLOCK/piano4.wav)
+let pianoz = [pia1, pia2, pia3, pia4]
+#
+## let sn = sample(TT-BLACKRIOT-WARLOCK/snclean.wav)
+## let bg = sample(TT-BLACKRIOT-WARLOCK/bong3.wav)
+## let drw = sample(TT-BLACKRIOT-WARLOCK/drwop.wav)
+## let tom2 = sample(TT-BLACKRIOT-DAYINLIFE/tom2.wav)
+## let tom3 = sample(TT-BLACKRIOT-DAYINLIFE/tom3.wav)
+## let wh = sample(TT-BLACKRIOT-DAYINLIFE/whistle.wav)
+## # let percz = [drw]
+## let bd = sample(TT-BLACKRIOT-WARLOCK/bd1.wav)
+## let bdz = [bd]
+#
+let too = sample(TT-BLACKRIOT-WARLOCK/too.wav)
+let snp = sample(TT-BLACKRIOT-WARLOCK/snp.wav)
+let clip = sample(TT-BLACKRIOT-WARLOCK/clip.wav)
+let bw = sample(TT-BLACKRIOT-WARLOCK/bwoc.wav)
+let percz = [bw, too, snp, clip]
 
 let rhythms_string = [
   #shiko

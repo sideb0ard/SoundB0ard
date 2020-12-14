@@ -105,8 +105,8 @@ std::shared_ptr<object::Object>
 ApplyGeneratorRun(std::shared_ptr<object::Object> callable);
 
 std::shared_ptr<object::Object>
-NewGenerator(std::shared_ptr<object::Object> callable,
-             std::vector<std::shared_ptr<object::Object>> args);
+ApplyGeneratorStartup(std::shared_ptr<object::Object> callable,
+                      std::vector<std::shared_ptr<object::Object>> args);
 
 std::shared_ptr<object::Environment>
 ExtendGeneratorEnv(std::shared_ptr<object::Generator> gen,
