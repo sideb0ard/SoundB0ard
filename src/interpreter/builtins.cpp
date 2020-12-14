@@ -603,16 +603,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"GenRun", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
-                       -> std::shared_ptr<object::Object> {
-                       std::cout << "GENR RUN YO\n";
-                       int args_size = args.size();
-                       if (args_size > 0)
-                           return evaluator::ApplyGeneratorRun(args[0]);
-
-                       return evaluator::NULLL;
-                   })},
 };
 
 } // namespace builtin
