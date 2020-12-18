@@ -1,6 +1,7 @@
 #include <interpreter/builtins.hpp>
 
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -484,9 +485,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
-             if (args.size() != 1)
-                 return evaluator::NewError("`rand` requires a single argument "
-                                            "- either a synth, array or num.");
+             if (args.size() == 0)
+             {
+                 auto rand_number =
+                     static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+                 return std::make_shared<object::Number>(rand_number);
+             }
 
              auto soundgen =
                  std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
@@ -538,6 +542,24 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    {"sin", std::make_shared<object::BuiltIn>(
+                [](std::vector<std::shared_ptr<object::Object>> args)
+                    -> std::shared_ptr<object::Object> {
+                    int args_size = args.size();
+                    if (args_size == 1)
+                    {
+                        auto x =
+                            std::dynamic_pointer_cast<object::Number>(args[0]);
+                        if (x)
+                        {
+                            auto val = sin(x->value_);
+                            auto number_obj =
+                                std::make_shared<object::Number>(val);
+                            return number_obj;
+                        }
+                    }
+                    return evaluator::NULLL;
+                })},
     {"map", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
                     -> std::shared_ptr<object::Object> {

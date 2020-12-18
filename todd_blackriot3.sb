@@ -2,14 +2,14 @@
 # let uh2 = sample(TT-BLACKRIOT-DAYINLIFE/UH2.wav)
 # let uh3 = sample(TT-BLACKRIOT-DAYINLIFE/UH3.wav)
 # let uhz = [uh1, uh2, uh3]
-
+#
 # let pia1 = sample(TT-BLACKRIOT-WARLOCK/piano1.wav)
 # let pia2 = sample(TT-BLACKRIOT-WARLOCK/piano2.wav)
 # let pia3 = sample(TT-BLACKRIOT-WARLOCK/piano3.wav)
 # let pia4 = sample(TT-BLACKRIOT-WARLOCK/piano4.wav)
 # 
 # let pianoz = [pia1, pia2, pia3, pia4]
-
+#
 # let sn = sample(TT-BLACKRIOT-WARLOCK/snclean.wav)
 # let bg = sample(TT-BLACKRIOT-WARLOCK/bong3.wav)
 # let drw = sample(TT-BLACKRIOT-WARLOCK/drwop.wav)
@@ -19,7 +19,7 @@
 # # let percz = [drw]
 # let bd = sample(TT-BLACKRIOT-WARLOCK/bd1.wav)
 # let bdz = [bd]
-
+#
 #let too = sample(TT-BLACKRIOT-WARLOCK/too.wav)
 #let snp = sample(TT-BLACKRIOT-WARLOCK/snp.wav)
 #let clip = sample(TT-BLACKRIOT-WARLOCK/clip.wav)
@@ -86,7 +86,7 @@ let piano_rhythm2 = gen()
          rhythms_int = distrhythms_int()
        }
 
-       if (counter % 5 == 0) {
+       if (counter % 3 == 0) {
          let midi_incr = midi_hits_per_cycle / len(rhythms_int)
          for ( i = 0; i < len(rhythms_int); ++i ) {
            if (rhythms_int[i] == 1) {
@@ -125,6 +125,7 @@ let piano_rhythm = gen()
 
        let midi_incr_incr = 1
        let rhythms_int = []
+       let midi_incr = midi_hits_per_cycle / len(rhythms_int)
     }
 
     run()
@@ -132,20 +133,20 @@ let piano_rhythm = gen()
        
        if (counter % 4 == 0) {
          rhythms_int = distrhythms_int()
+         midi_incr = midi_hits_per_cycle / len(rhythms_int)
        }
 
        if (counter % 1 == 0) {
-         let midi_incr = midi_hits_per_cycle / len(rhythms_int)
          for ( i = 0; i < len(rhythms_int); ++i ) {
            if (rhythms_int[i] == 1) {
              noteOnDelayed(pianoz[pianoz_idx], 1, i*midi_incr)
              for ( j = 0; j < midi_incr_incr; ++j ) {
                noteOnDelayed(pianoz[pianoz_idx], 1, i*midi_incr + (midi_incr / midi_incr_incr))
              }
-             # midi_incr_incr = incr(midi_incr_incr, 17, 23)
+             midi_incr_incr = incr(midi_incr_incr, 17, 23)
              pianoz_idx = incr(pianoz_idx,0,len(pianoz))
            }
-           midi_incr_incr = incr(midi_incr_incr, 3, 7)
+           # piano_rhythmmidi_incr_incr = incr(midi_incr_incr, 3, 7)
          }
        }
        ++counter
@@ -162,6 +163,7 @@ let perc_beat = gen()
 
        let midi_incr_incr = 1
        let rhythms_int = []
+       let midi_incr = midi_hits_per_cycle / len(rhythms_int)
     }
 
     run()
@@ -169,20 +171,20 @@ let perc_beat = gen()
        
        if (counter % 4 == 0) {
          rhythms_int = distrhythms_int()
+         midi_incr = midi_hits_per_cycle / len(rhythms_int)
        }
 
        if (counter % 2 == 0) {
-         let midi_incr = midi_hits_per_cycle / len(rhythms_int)
          for ( i = 0; i < len(rhythms_int); ++i ) {
            if (rhythms_int[i] == 1) {
              noteOnDelayed(percz[perc_idx], 1, i*midi_incr)
              for ( j = 0; j < midi_incr_incr; ++j ) {
                noteOnDelayed(percz[perc_idx], 1, i*midi_incr + (midi_incr / midi_incr_incr))
-               midi_incr_incr = incr(midi_incr_incr, 7, 13)
              }
              perc_idx = incr(perc_idx,0,len(percz))
+             midi_incr_incr = incr(midi_incr_incr, 7, 23)
            }
-           midi_incr_incr = incr(midi_incr_incr, 17, 23)
+           #midi_incr_incr = incr(midi_incr_incr, 17, 23)
          }
        }
        ++counter
@@ -198,8 +200,6 @@ let uh_beat = gen()
        let midi_hits_per_cycle = 3840
 
        let midi_incr_incr = 1
-
-
     }
 
     run()
