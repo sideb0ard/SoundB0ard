@@ -140,7 +140,7 @@ class looper : public SoundGenerator
     int num_active_grains;
     int highest_grain_num;
     int cur_grain_num;
-    sound_grain m_grains[MAX_CONCURRENT_GRAINS];
+    sound_grain m_grains[MAX_CONCURRENT_GRAINS] = {};
 
     int granular_spray_frames; // random off-set from starting idx
     int quasi_grain_fudge;     // random variation from length of grain

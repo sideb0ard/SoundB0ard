@@ -1008,6 +1008,11 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
 
                     auto sg =
                         mixr->sound_generators_[action->mixer_soundgen_idx];
+                    if (!sg)
+                    {
+                        std::cerr << "WHOE NELLY! Naw SG! bailing out!\n";
+                        return;
+                    }
                     if (action->param_name == "volume")
                         sg->SetVolume(param_val);
                     else if (action->param_name == "pan")

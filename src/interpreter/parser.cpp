@@ -426,6 +426,8 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
 
     // Termination Condition /////////////
     stmt->termination_condition_ = ParseExpression(Precedence::LOWEST);
+    std::cout << "TERM CONDITION is " << stmt->termination_condition_->String()
+              << std::endl;
 
     NextToken();
     NextToken();
@@ -1160,8 +1162,16 @@ Parser::ParseIndexExpression(std::shared_ptr<ast::Expression> left)
     expr->index_ = ParseExpression(Precedence::LOWEST);
     if (!ExpectPeek(token::SLANG_RBRACKET))
     {
+        std::cerr << "OOGT< NOT GOT RIGHT BRACKET\n";
         return nullptr;
     }
+    if (PeekTokenIs(token::SLANG_ASSIGN))
+    {
+        NextToken();
+        NextToken();
+        expr->new_value_ = ParseExpression(Precedence::LOWEST);
+    }
+
     return expr;
 }
 

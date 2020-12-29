@@ -29,11 +29,8 @@ namespace
 
 bool IsTruthy(std::shared_ptr<object::Object> obj)
 {
-    if (obj == evaluator::NULLL)
-        return false;
-    else if (obj == evaluator::TTRUE)
-        return true;
-    else if (obj == evaluator::FFALSE)
+    if (obj == evaluator::NULLL || obj == evaluator::FFALSE ||
+        obj->Type() == object::ERROR_OBJ)
         return false;
 
     return true;
@@ -107,6 +104,7 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     {
         return NULLL;
     }
+    std::cout << "EVALing " << node->String() << std::endl;
     std::shared_ptr<ast::Program> prog_node =
         std::dynamic_pointer_cast<ast::Program>(node);
     if (prog_node)
@@ -510,6 +508,15 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         if (IsError(index))
             return index;
 
+        if (index_x->new_value_)
+        {
+            std::shared_ptr<object::Object> new_value =
+                Eval(index_x->new_value_, env);
+            if (IsError(new_value))
+                return new_value;
+            EvalIndexExpressionUpdate(left, index, new_value);
+        }
+
         return EvalIndexExpression(left, index);
     }
 
@@ -586,6 +593,104 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         return EvalProcessStatement(proc, env);
 
     return NULLL;
+}
+
+std::shared_ptr<object::Object>
+EvalIndexExpressionUpdate(std::shared_ptr<object::Object> left,
+                          std::shared_ptr<object::Object> index,
+                          std::shared_ptr<object::Object> new_value)
+{
+    if (left->Type() == object::ARRAY_OBJ &&
+        index->Type() == object::NUMBER_OBJ)
+        return EvalArrayIndexExpressionUpdate(left, index, new_value);
+    else if (left->Type() == object::HASH_OBJ)
+        return EvalHashIndexExpressionUpdate(left, index, new_value);
+    else if (left->Type() == object::STRING_OBJ &&
+             index->Type() == object::NUMBER_OBJ)
+        return EvalStringIndexExpressionUpdate(left, index, new_value);
+
+    return NewError("index UPDATE operation not supported: %s", left->Type());
+}
+
+std::shared_ptr<object::Object>
+EvalHashIndexExpressionUpdate(std::shared_ptr<object::Object> hash_obj,
+                              std::shared_ptr<object::Object> key,
+                              std::shared_ptr<object::Object> new_value)
+{
+    std::cout << "YO< UPDATEING HASH!\n";
+    std::shared_ptr<object::Hash> my_hash =
+        std::dynamic_pointer_cast<object::Hash>(hash_obj);
+
+    if (!IsHashable(key))
+        return NewError("Unusable as hash key: %s", key->Type());
+
+    object::HashKey hashed = MakeHashKey(key);
+    auto hpair_it = my_hash->pairs_.find(hashed);
+    if (hpair_it != my_hash->pairs_.end())
+        hpair_it->second.value_ = new_value;
+
+    return NULLL;
+}
+
+std::shared_ptr<object::Object>
+EvalArrayIndexExpressionUpdate(std::shared_ptr<object::Object> array_obj,
+                               std::shared_ptr<object::Object> index,
+                               std::shared_ptr<object::Object> new_value)
+{
+    std::shared_ptr<object::Array> my_array =
+        std::dynamic_pointer_cast<object::Array>(array_obj);
+
+    std::shared_ptr<object::Number> int_obj =
+        std::dynamic_pointer_cast<object::Number>(index);
+    if (my_array && int_obj)
+    {
+        int idx = int_obj->value_;
+        int num_elems = my_array->elements_.size();
+        if (idx >= 0 && idx < num_elems)
+            my_array->elements_[idx] = new_value;
+        return NULLL;
+    }
+    return NewError("Couldn't unpack yer Array OBJ to UPDATE IT!");
+}
+
+std::shared_ptr<object::Object>
+EvalStringIndexExpressionUpdate(std::shared_ptr<object::Object> string_obj,
+                                std::shared_ptr<object::Object> index,
+                                std::shared_ptr<object::Object> new_value)
+{
+    std::shared_ptr<object::String> my_string =
+        std::dynamic_pointer_cast<object::String>(string_obj);
+
+    std::shared_ptr<object::Number> int_obj =
+        std::dynamic_pointer_cast<object::Number>(index);
+    if (my_string && int_obj)
+    {
+        int idx = int_obj->value_;
+        int str_len = my_string->value_.length();
+        if (idx < str_len)
+        {
+            std::shared_ptr<object::String> my_new_string_index_value =
+                std::dynamic_pointer_cast<object::String>(new_value);
+
+            if (my_new_string_index_value)
+            {
+                std::string begin = "";
+                if (idx > 0)
+                {
+                    begin = my_string->value_.substr(0, idx);
+                }
+                std::string end = my_string->value_.substr(idx + 1);
+
+                std::string updated_string =
+                    begin + my_new_string_index_value->value_ + end;
+
+                my_string->value_ = updated_string;
+            }
+
+            return evaluator::NULLL;
+        }
+    }
+    return NewError("Couldn't unpack yer STRING OBJ to UPDATE IT!");
 }
 
 std::shared_ptr<object::Object>
@@ -690,9 +795,18 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
         std::cerr << "OOPS< ERR!\n";
         return initial_iterator_val;
     }
-    for_loop->env_->Set(for_loop->iterator_->value_, initial_iterator_val);
+    auto initial_val =
+        std::dynamic_pointer_cast<object::Number>(initial_iterator_val);
+    if (!initial_val)
+    {
+        std::cerr << "DUH! Need a NUMBER for Iterator value!!\n";
+        return evaluator::NULLL;
+    }
+    for_loop->env_->Set(for_loop->iterator_->value_, initial_val);
 
     std::shared_ptr<object::Object> result = evaluator::NULLL;
+    std::cout << "EVALFORLOOOP: term condition:"
+              << for_loop->termination_condition_->String() << std::endl;
     while (IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
     {
         result = Eval(for_loop->body_, for_loop->env_);
@@ -702,6 +816,8 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
             std::cerr << "OOPS< ERR!\n";
             return new_iterator_val;
         }
+        std::cout << "SETTING NEW ITER VAL: " << new_iterator_val->Inspect()
+                  << std::endl;
         for_loop->env_->Set(for_loop->iterator_->value_, new_iterator_val);
     }
 
@@ -731,6 +847,7 @@ std::shared_ptr<object::Object>
 EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
                     std::shared_ptr<object::Object> right)
 {
+    std::cout << "EVAL INFIX! " << op << "\n";
     if (left->Type() == object::NUMBER_OBJ &&
         right->Type() == object::NUMBER_OBJ)
     {
@@ -765,6 +882,7 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
         return NativeBoolToBooleanObject(left != right);
     else if (op.compare("&&") == 0 || op.compare("||") == 0)
     {
+        std::cout << "AMPERSAND!\n";
         if (left->Type() == object::BOOLEAN_OBJ &&
             right->Type() == object::BOOLEAN_OBJ)
         {
@@ -772,11 +890,16 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
             auto rightie = std::dynamic_pointer_cast<object::Boolean>(right);
 
             if (op.compare("&&") == 0)
+            {
+                std::cout << " YO, BOOLEAN AND\n";
                 return NativeBoolToBooleanObject(leftie->value_ &&
                                                  rightie->value_);
+            }
             else
+            {
                 return NativeBoolToBooleanObject(leftie->value_ ||
                                                  rightie->value_);
+            }
         }
     }
     else if (left->Type() != right->Type())

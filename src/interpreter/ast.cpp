@@ -23,7 +23,6 @@ std::string Program::String() const
 {
     std::stringstream ss;
 
-    std::cout << "PROSTR PRING!\n";
     for (auto s : statements_)
         ss << s->String();
 

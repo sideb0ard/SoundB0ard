@@ -314,6 +314,8 @@ class IndexExpression : public Expression
   public:
     std::shared_ptr<Expression> left_{nullptr};
     std::shared_ptr<Expression> index_{nullptr};
+
+    std::shared_ptr<Expression> new_value_{nullptr};
 };
 
 class PatternFunctionExpression : public Expression

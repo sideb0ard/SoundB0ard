@@ -3,6 +3,8 @@
 #include <iostream>
 #include <tsqueue.hpp>
 
+#include "PerlinNoise.hpp"
+
 #include "gtest/gtest.h"
 
 auto global_env = std::make_shared<object::Environment>();
@@ -10,6 +12,9 @@ Tsqueue<audio_action_queue_item> audio_queue;
 Tsqueue<std::string> interpret_command_queue;
 Tsqueue<std::string> repl_queue;
 Tsqueue<event_queue_item> process_event_queue;
+Tsqueue<int> audio_reply_queue;
+
+siv::PerlinNoise perlinGenerator;
 
 int main(int argc, char **argv)
 {

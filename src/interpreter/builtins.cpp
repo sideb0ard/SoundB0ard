@@ -303,6 +303,33 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        audio_queue.push(action_req);
                        return evaluator::NULLL;
                    })},
+    {"setPitch",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             if (args_size == 2)
+             {
+                 auto soundgen =
+                     std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+                 if (soundgen)
+                 {
+                     auto number =
+                         std::dynamic_pointer_cast<object::Number>(args[1]);
+                     if (number)
+                     {
+                         audio_action_queue_item action{
+                             .type = AudioAction::UPDATE,
+                             .mixer_soundgen_idx = soundgen->soundgen_id_,
+                             .fx_id = -1,
+                             .param_name = "pitch",
+                             .param_val = std::to_string(number->value_)};
+                         audio_queue.push(action);
+                     }
+                 }
+             }
+             return evaluator::NULLL;
+         })},
     {"noteOnDelayed", std::make_shared<object::BuiltIn>(
                           [](std::vector<std::shared_ptr<object::Object>> args)
                               -> std::shared_ptr<object::Object> {

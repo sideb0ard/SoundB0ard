@@ -8,13 +8,13 @@ PERLININCDIR=${HOME}/Code/PerlinNoise/
 
 GTEST_DIR =  ${HOME}/Code/googletest/googletest
 INCDIRS=-I/usr/local/include \
-		-Iinclude \
-		-I${HOME}/Code/link/include \
-		-I${HOMEBREWINCDIR} \
-		-I${RANGE3INCDIR} \
-		-I${ABLETONASIOINCDIR} \
-		-I${READLINEINCDIR} \
-		-I${PERLININCDIR}
+				-Iinclude \
+				-I${HOME}/Code/link/include \
+				-I${HOMEBREWINCDIR} \
+				-I${RANGE3INCDIR} \
+				-I${ABLETONASIOINCDIR} \
+				-I${READLINEINCDIR} \
+				-I${PERLININCDIR}
 
 
 HOMEBREWLIBDIR=${HOME}/homebrew/lib
@@ -22,7 +22,7 @@ READLINELIBDIR=${HOME}/homebrew/opt/readline/lib
 
 LIBDIRS=-L/usr/local/lib -L${HOMEBREWLIBDIR} -L${READLINELIBDIR}
 
-## I THINK THATS THE END OF THINGS YOU NEED TO CHANGE
+## I *THINK* THATS THE END OF THINGS YOU NEED TO CHANGE!
 
 CC = clang++
 
@@ -85,17 +85,17 @@ $(TEST_TARGET): $(TESTS) $(GTEST_LIBS) $(OBJ_MINUS_MAIN)
 	$(CC) $(CPPFLAGS) $(INCDIRS) $(CXXFLAGS) $(LIBDIRS) $(LIBS) -L$(GTEST_LIB_DIR) -lgtest $^ -o $@
 
 GTEST_HEADERS = $(GTEST_DIR)/include/gtest/*.h \
-                $(GTEST_DIR)/include/gtest/internal/*.h
+								$(GTEST_DIR)/include/gtest/internal/*.h
 
 GTEST_SRCS_ = $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
 
 gtest-all.o : $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
-            $(GTEST_DIR)/src/gtest-all.cc
+		$(GTEST_DIR)/src/gtest-all.cc
 
 gtest_main.o : $(GTEST_SRCS_)
 	$(CXX) $(CPPFLAGS) -I$(GTEST_DIR) $(CXXFLAGS) -c \
-            $(GTEST_DIR)/src/gtest_main.cc
+		$(GTEST_DIR)/src/gtest_main.cc
 
 libgtest.a : gtest-all.o
 	$(AR) $(ARFLAGS) $@ $^

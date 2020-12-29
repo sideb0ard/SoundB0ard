@@ -253,6 +253,21 @@ std::shared_ptr<Object> Environment::Get(std::string name)
 std::shared_ptr<Object>
 Environment::Set(std::string key, std::shared_ptr<Object> val, bool create)
 {
+    if (val->Type() == "NUMBER")
+    {
+        // make copy of value
+        auto num_obj = std::dynamic_pointer_cast<object::Number>(val);
+        if (!num_obj)
+        {
+            std::cerr << "OOFt, SOMETHING UP\n";
+            return nullptr;
+        }
+        // make a copy - don't want to change original val
+        auto num_copy = std::make_shared<object::Number>(num_obj->value_);
+
+        val = num_copy;
+    }
+
     if (create)
     {
         store_[key] = val;

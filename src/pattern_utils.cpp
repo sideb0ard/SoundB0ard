@@ -21,15 +21,14 @@ void clear_midi_pattern(midi_event *pattern)
 
 void midi_pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
 {
-    int target_tick = midi_tick;
+    int target_tick = midi_tick % PPBAR;
     int attempt_no = 0;
     while (pattern[target_tick].event_type && attempt_no < MAX_ADD_ATTEMPTS)
     {
         if (mixr->debug_mode)
             printf("Gotsz a tick already - bump!\n");
         target_tick++;
-        if (target_tick == PPBAR) // wrap around
-            target_tick = 0;
+        target_tick = target_tick % PPBAR; // wrap around
         attempt_no++;
     }
     if (attempt_no < MAX_ADD_ATTEMPTS)
