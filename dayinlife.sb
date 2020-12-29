@@ -1,0 +1,289 @@
+# let bd = sample(TT-BLACKRIOT-DAYINLIFE/bd.wav);
+# let piano1 = sample(TT-BLACKRIOT-WARLOCK/piano1.wav);
+# let hh = sample(TT-BLACKRIOT-DAYINLIFE/hhish.wav);
+# let hh2 = sample(TT-BLACKRIOT-DAYINLIFE/hh.wav);
+# let sn = sample(TT-BLACKRIOT-DAYINLIFE/sn.wav);
+# let sncp = sample(TT-BLACKRIOT-WARLOCK/sncp.wav);
+# let cp2 = sample(TT-BLACKRIOT-DAYINLIFE/cp2.wav);
+# let too = sample(TT-BLACKRIOT-WARLOCK/too.wav);
+# let hh = sample(TT-BLACKRIOT-WARLOCK/hhclean.wav);
+# let hh2 = sample(TT-NOCERA/TICt.wav);
+# let kw = sample(TT-BLACKRIOT-DAYINLIFE/kcikWIMP.wav);
+# let bw = sample(TT-BLACKRIOT-WARLOCK/bwom.wav);
+# let wo = sample(TT-NOCERA/weeOOH.wav);
+# let hat = sample(TTFUNKYG/hat.wav);
+# let oh = sample(TT-NOCERA/oh.wav);
+# let bdc = sample(TT-BLACKRIOT-WARLOCK/bdclean.wav);
+# let pc1 = sample(TT-BLACKRIOT-DAYINLIFE/perc2.wav);
+# let pc2 = sample(TT-BLACKRIOT-DAYINLIFE/perc3.wav);
+# let pc = sample(TT-BLACKRIOT-WARLOCK/perc.wav);
+# let bdf = sample(TT-BLACKRIOT-DAYINLIFE/bdflange.wav);
+# let bdw = sample(TT-BLACKRIOT-WARLOCK/bdWAh.wav);
+# let tl = sample(TT-BLACKRIOT-DAYINLIFE/tomlow.wav);
+#
+# let bg1 = sample(TT-BLACKRIOT-WARLOCK/bongo.wav);
+# let bg2 = sample(TT-BLACKRIOT-WARLOCK/bong2.wav);
+# let bg3 = sample(TT-BLACKRIOT-WARLOCK/bong3.wav);
+# let bg4 = sample(TT-BLACKRIOT-DAYINLIFE/bongo.wav);
+
+# let intr = loop(TT-BLACKRIOT-DAYINLIFE/introloop.wav)
+
+# let bw1 = sample(TT-BLACKRIOT-WARLOCK/bdWAh.wav);
+# let bw2 = sample(TT-BLACKRIOT-WARLOCK/bwah.wav);
+# let bw3 = sample(TT-BLACKRIOT-WARLOCK/bwah2.wav);
+# let bw4 = sample(TT-BLACKRIOT-WARLOCK/bwah3.wav);
+# let bw5 = sample(TT-BLACKRIOT-WARLOCK/bwom.wav);
+# let bw6 = sample(TT-BLACKRIOT-WARLOCK/bwoc.wav);
+
+# p3 < every 3 "<1 2 0.8 1.4>"  "set bw:pitch %";
+# p4 < every 2 "<2 1 0.8 1.4>"  "set piano1:pitch %";
+
+#let piano2 = sample(TT-BLACKRIOT-WARLOCK/piano2.wav);
+#let piano3 = sample(TT-BLACKRIOT-WARLOCK/piano3.wav);
+
+let count = 0;
+let num_hitz = 8;
+let ppbar = 3840;
+
+let updatrrr  = gen()
+{
+  setup()
+  {
+    let moddy = 0;
+    let hit_countz = [8, 8, 6, 8, 12, 8, 4, 8];
+    let hit_idx = 0;
+  }
+  run()
+  {
+    moddy = incr(moddy, 0, 6);
+
+    if (count % 3 == 0) {
+      num_hitz = hit_countz[hit_idx];
+      hit_idx = incr(hit_idx, 0, len(hit_countz));
+      # puts("NUM HITZ is ", num_hitz);
+    } else {
+      num_hitz = incr(num_hitz, 4, 13);
+    }
+
+    ++count;
+  }
+}
+
+
+let kickrrr = gen()
+{
+  setup() {
+    let pitchz = [2, 1, 1.5, 2, 1];
+    let pitch_idx = 0;
+
+    let snrz= [sn, sncp, cp2];
+    let snrz_idx = 0;
+    let sn_inc = 2;
+
+    let bdz = [bd, bdc, piano1, bdf];
+    let bd_idx = 0;
+    let bdz_len = 1;
+  }
+
+  run()
+  {
+    if (count % 8 == 0) {
+      vol bd 0;
+    } else {
+      vol bd 1;
+    }
+    let mod = ppbar / num_hitz;
+    for (i = 0 ; i < num_hitz; ++i) {
+      if (i % sn_inc == 0) {
+        noteOnDelayed(snrz[snrz_idx], 1, i* mod);
+        setPitch(snrz[snrz_idx], pitchz[pitch_idx]);
+        snrz_idx = incr(snrz_idx, 0, len(snrz));
+      }
+      if (i % 1 == 0) {
+        let randy = rand(100);
+        if ( randy < 90) {
+          noteOnDelayed(bdz[bd_idx], 1, i * mod);
+          # noteOnDelayed(piano1, 1, i* mod);
+          bd_idx = incr(bd_idx, 0, bdz_len);
+        }
+
+        setPitch(bdz[bd_idx], pitchz[pitch_idx]);
+        pitch_idx = incr(pitch_idx, 0, len(pitchz));
+      }
+    }
+    bdz_len = incr(bdz_len, 1, len(bdz)+1);
+    sn_inc = incr(sn_inc, 4, 7);
+  }
+}
+
+let perc = gen()
+{
+  setup()
+  {
+    # let hhz = [hh, hh2];
+    let hhz = [hh2, pc, tl];
+    let hh_idx = 0;
+  }
+  run()
+  {
+    # puts("YO");
+    if ( count % 2 == 0) {
+      puts("YOz");
+      let mod = ppbar / num_hitz;
+      for (i = num_hitz / 3 ; i < num_hitz - 1; ++i) {
+        puts("YOz");
+        # noteOnDelayed(hhz[hh_idx], 1, i * mod);
+        noteOnDelayed(hhz[hh_idx], 1, i * mod + 240);
+        hh_idx = incr(hh_idx, 0, len(hhz));
+      }
+    } else if ( count % 3 == 0)  {
+      let mod = ppbar / num_hitz / 2;
+      for (i = 0  ; i < num_hitz*2; ++i) {
+        # noteOnDelayed(hhz[hh_idx], 1, i * mod);
+        noteOnDelayed(hhz[hh_idx], 1, i * mod);
+      }
+    }
+  }
+}
+
+
+let hatz = gen()
+{
+  setup()
+  {
+    let samplz = [hat, wo, oh, bdw];
+    let samp_idx = 0;
+    let counter =0;
+  }
+  run()
+  {
+    if ( counter % 3 == 0) {
+      let mod = ppbar / num_hitz
+        for (i = 0; i < num_hitz; ++i) {
+          noteOnDelayed(samplz[samp_idx], 1, i * mod);
+          samp_idx = incr(samp_idx, 0, 3);
+        }
+    }
+    ++counter;
+  }
+}
+
+let bongoz = gen()
+{
+  setup() {
+    let bongoz = ["bg1", "bg3", "bg4"];
+    let bongoz_obj = [bg1, bg3, bg4];
+    let bg_pitchz = [2, 1, 2, 1.2, 0.8, 1, 1.5];
+    let bg_pitch_idx = 0;
+  }
+  run()
+  {
+    let pat = rand_array(num_hitz/2, 0, len(bongoz));
+    let spat = "";
+    for (i = 0; i < len(pat); ++i) {
+      if (pat[i] < len(bongoz)) {
+        let loc_rand = rand(100);
+        if (loc_rand < 40) {
+          spat = spat + "~ ";
+        } else  {
+          if (loc_rand < 90) {
+            spat = spat + bongoz[pat[i]] + " ";
+          } else {
+            spat = spat + bongoz[pat[i]] + "(3,8) ";
+          }
+          # setPitch(bongoz_obj[pat[i]], bg_pitchz[bg_pitch_idx]);
+          # bg_pitch_idx = incr(bg_pitch_idx, 0, len(bg_pitchz));
+        }
+      } else {
+        spat = spat + "~ ";
+      }
+    }
+    let rpat = "~ [" + spat + "] ~ [" + spat + "]*2";
+    return rpat
+  }
+}
+
+let voicrrr = gen()
+{
+  setup()
+  {
+    let lenz = [1, 4, 8, 12];
+    let len_idx = 0;
+  }
+  run()
+  {
+    set intr:speed 1/num_hitz;
+    set intr:len lenz[len_idx];
+    len_idx = incr(len_idx, 0, len(lenz));
+    if (count % 4 == 0) {
+      vol intr 0.8;
+    } else {
+      vol intr 0;
+    }
+    if (count % 3 == 0) {
+      set intr:pitch 2;
+    } else {
+      set intr:pitch 1;
+    }
+  }
+}
+
+let speedymid = gen()
+{
+  setup()
+  {
+    let bwz = ["bw", "bw3", "bw4"];
+    let bwz_o = [bw, bw3, bw4];
+    let bwz_idx = 0;
+    let pitchz = [1, 2, 1];
+    let pitch_idx = 0;
+  }
+  run()
+  {
+    if (count % 5 == 0) {
+
+      setPitch(bwz_o[bwz_idx], pitchz[pitch_idx]);
+      bwz_idx = incr(bwz_idx,0,len(bwz_o));
+      pitch_idx = incr(pitch_idx,0,len(pitchz));
+
+      let pat = rand_array(num_hitz, 0, len(bwz)+1);
+      let spat = "~ ~ [";
+      for (i = 0 ; i < len(pat); ++i) {
+        # puts ("PAT :", pat[i]);
+        if (pat[i] < len(bwz)) {
+          spat = spat + bwz[pat[i]] + " ";
+        } else {
+          spat = spat + "~ ";
+        }
+      }
+      spat = spat + "] ~";
+      # puts ("SPAT:", spat);
+      return spat;
+    }
+    return "";
+  }
+}
+
+let pianoz = gen()
+{
+  setup()
+  {
+    let piaz = [stab];
+    let pia_idx = 0;
+    let pia_pitchz = [0.2, 0.2, 0.4, 0.3, 0.7, 1, 1.3];
+  }
+  run()
+  {
+    if ( count % 3 == 0) {
+      let mod = ppbar / num_hitz*2;
+      for (i = 0; i < num_hitz*2; ++i) {
+        noteOnDelayed(piaz[pia_idx], 1, i * mod);
+        pia_idx = incr(pia_idx, 0, len(piaz));
+      }
+      let rand_pitch = pia_pitchz[rand(len(pia_pitchz))];
+      #puts("RAND PITCH:", rand_pitch);
+      setPitch(stab, rand_pitch);
+    }
+  }
+}
+
