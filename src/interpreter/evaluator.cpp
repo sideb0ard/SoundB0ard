@@ -104,7 +104,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     {
         return NULLL;
     }
-    std::cout << "EVALing " << node->String() << std::endl;
     std::shared_ptr<ast::Program> prog_node =
         std::dynamic_pointer_cast<ast::Program>(node);
     if (prog_node)
@@ -168,6 +167,11 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         auto left = Eval(ie->left_, env);
         if (IsError(left))
             return left;
+
+        if (ie->operator_ == "&&" && !IsTruthy(left))
+        {
+            return FFALSE;
+        }
 
         auto right = Eval(ie->right_, env);
         if (IsError(right))
@@ -805,8 +809,6 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
     for_loop->env_->Set(for_loop->iterator_->value_, initial_val);
 
     std::shared_ptr<object::Object> result = evaluator::NULLL;
-    std::cout << "EVALFORLOOOP: term condition:"
-              << for_loop->termination_condition_->String() << std::endl;
     while (IsTruthy(Eval(for_loop->termination_condition_, for_loop->env_)))
     {
         result = Eval(for_loop->body_, for_loop->env_);
@@ -816,8 +818,6 @@ EvalForLoop(std::shared_ptr<object::ForLoop> for_loop)
             std::cerr << "OOPS< ERR!\n";
             return new_iterator_val;
         }
-        std::cout << "SETTING NEW ITER VAL: " << new_iterator_val->Inspect()
-                  << std::endl;
         for_loop->env_->Set(for_loop->iterator_->value_, new_iterator_val);
     }
 
@@ -847,7 +847,6 @@ std::shared_ptr<object::Object>
 EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
                     std::shared_ptr<object::Object> right)
 {
-    std::cout << "EVAL INFIX! " << op << "\n";
     if (left->Type() == object::NUMBER_OBJ &&
         right->Type() == object::NUMBER_OBJ)
     {
@@ -882,7 +881,6 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
         return NativeBoolToBooleanObject(left != right);
     else if (op.compare("&&") == 0 || op.compare("||") == 0)
     {
-        std::cout << "AMPERSAND!\n";
         if (left->Type() == object::BOOLEAN_OBJ &&
             right->Type() == object::BOOLEAN_OBJ)
         {
@@ -891,7 +889,6 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
 
             if (op.compare("&&") == 0)
             {
-                std::cout << " YO, BOOLEAN AND\n";
                 return NativeBoolToBooleanObject(leftie->value_ &&
                                                  rightie->value_);
             }
@@ -904,9 +901,6 @@ EvalInfixExpression(std::string op, std::shared_ptr<object::Object> left,
     }
     else if (left->Type() != right->Type())
     {
-        std::cerr << "LEFT AND  RIGHT AIN'T CORRECT! - LEFT IS:" << left->Type()
-                  << "(" << left->Inspect() << ")"
-                  << " and RIGHT is " << right->Type() << "\n";
         return NewError("type mismatch: %s %s %s", left->Type(), op,
                         right->Type());
     }

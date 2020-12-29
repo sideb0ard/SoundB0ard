@@ -1,49 +1,100 @@
+#let bd = sample(TT-ROYALHOUSE/bd.wav);
+#let bd2 = sample(TT-ROYALHOUSE/bdork.wav);
+#let bd3 = sample(TT-ROYALHOUSE/bdvocwah.wav);
+#let bd4 = sample(TT-ROYALHOUSE/beet.wav);
+#let bd5 = sample(TT-ROYALHOUSE/blah.wav);
 
-# let bd = sample(TT-ROYALHOUSE/bd.wav);
-# let bd2 = sample(TT-ROYALHOUSE/bdork.wav);
-# let bd3 = sample(TT-ROYALHOUSE/bdvocwah.wav);
-# let bd4 = sample(TT-ROYALHOUSE/beet.wav);
-# let bd5 = sample(TT-ROYALHOUSE/blah.wav);
+#let ch = sample(TT-ROYALHOUSE/chewit.wav);
+#let wh = sample(TT-ROYALHOUSE/whft.wav);
+#let yv = sample(TT-ROYALHOUSE/youv.wav);
+#let ec = sample(TT-ROYALHOUSE/ech.wav);
+#let cn = sample(TT-ROYALHOUSE/canu.wav);
+#let sw = sample(TT-ROYALHOUSE/schwip.wav);
 
 let PP16 = 240;
+
+let num_rests = 7;
+let array_sizez = [8, 4, 12, 16];
+let array_sizez_idx = 0;
+
+let insert_sort = fn(rhythm, sorted_idx)
+{
+  let cur_val = rhythm[sorted_idx];
+  let rev_idx = sorted_idx;
+  for ( i = sorted_idx; i > 0 && rhythm[i - 1] > cur_val ; --i) {
+    rhythm[i] = rhythm[i - 1];
+    --rev_idx;
+  }
+  rhythm[rev_idx] = cur_val;
+
+  return rhythm;
+}
+
+
+let incky = gen()
+{
+  setup() {}
+  run()
+  {
+    num_rests = incr(num_rests, 0, 7);
+    array_sizez_idx = incr(array_sizez_idx, 0 ,len(array_sizez));
+  }
+}
 
 let bdz = gen()
 {
   setup()
   {
-    #let bdz = [bd, bd2, bd3, bd4, bd5];
-    let bdzs = ["bd", "bd2", "bd3", "bd4", "bd5"];
+    # let bdz = [bd, bd2, bd3, bd4, bd5];
+    let bdz = [bd, bd2, bd4];
     let bd_idx = 0;
-    let num_rests = 1;
-    #let rhythm = rand_array(16, 0, len(bdzs) + num_rests);
-    let rhythm = [4, 3, 2, 1];
+    let rhythm = rand_array(array_sizez[array_sizez_idx], 0, len(bdz) + num_rests);
     let sorted_idx = 1;
-    puts("STARTINGYP");
   }
-  run()
-  {
 
-    puts("RHTYHM:", rhythm);
-    if (sorted_idx < len(rhythm)) {
-      puts("-1 is ", rhythm[sorted_idx -1], " and cur is ", rhythm[sorted_idx]);
-      if (rhythm[sorted_idx -1] > rhythm[sorted_idx]) {
-        puts("-1 val:", rhythm[sorted_idx -1], " is > than current:", rhythm[sorted_idx]);
-        let cur_val = rhythm[sorted_idx];
-        let rev_idx = sorted_idx;
-        for ( i = sorted_idx; i > 0 && rhythm[i - 1] > cur_val ; --i) {
-          puts("I:", i, " SORTED IDX:", sorted_idx);
-          rhythm[i] = rhythm[i - 1];
-          --rev_idx;
-          puts("REVIDX:", rev_idx, " SORTED_IDX:", sorted_idx);
-          puts("FOR RHTYHM:", rhythm);
-        }
-        rhythm[rev_idx] = cur_val;
+  run() {
+    for (i = 0; i < len(rhythm); ++i) {
+      if (rhythm[i] < len(bdz)) {
+        noteOnDelayed(bdz[rhythm[i]], 1, i * PP16);
       }
-      puts("now RHTYHM:", rhythm);
-      ++sorted_idx;
     }
 
-
+    if (sorted_idx < len(rhythm)) {
+      rhythm = insert_sort(rhythm, sorted_idx);
+      ++sorted_idx;
+    } else {
+      rhythm = rand_array(array_sizez[array_sizez_idx], 0, len(bdz) + num_rests);
+      sorted_idx = 1;
+      puts("RHYTHM:", rhythm);
+    }
   }
 }
 
+let percz = gen()
+{
+  setup()
+  {
+    #let samplz = [ch, wh, yv, ec, sw];
+    let samplz = [ch, wh];
+    let smp_idx = 0;
+    let rhythm = rand_array(array_sizez[array_sizez_idx], 0, len(samplz) + num_rests);
+    let sorted_idx = 1;
+  }
+
+  run() {
+    for (i = 0; i < len(rhythm); ++i) {
+      if (rhythm[i] < len(samplz)) {
+        noteOnDelayed(samplz[rhythm[i]], 1, i * PP16);
+      }
+    }
+
+    if (sorted_idx < len(rhythm)) {
+      rhythm = insert_sort(rhythm, sorted_idx);
+      ++sorted_idx;
+    } else {
+      rhythm = rand_array(array_sizez[array_sizez_idx], 0, len(samplz) + num_rests);
+      sorted_idx = 1;
+      puts("RHYTHM:", rhythm);
+    }
+  }
+}

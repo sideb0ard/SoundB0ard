@@ -426,8 +426,6 @@ std::shared_ptr<ast::ForStatement> Parser::ParseForStatement()
 
     // Termination Condition /////////////
     stmt->termination_condition_ = ParseExpression(Precedence::LOWEST);
-    std::cout << "TERM CONDITION is " << stmt->termination_condition_->String()
-              << std::endl;
 
     NextToken();
     NextToken();
