@@ -1,7 +1,51 @@
-puts("ELLO")
-import("funcz.sb")
-import("drumgen.sb")
-# puts("EdrrumLLO")
-import("blahz.sb")
-# puts("E blahhh LLO")
-# puts("ELLO funcyz")
+let rhythms_string = [
+  #shiko
+  "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #son
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
+  #rumba
+  "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
+  #soukous
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
+  #gahu
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
+  #bossa-nova
+  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
+]
+
+let rhythms_int = [
+  #shiko
+  [1, ~, ~, ~, 1, ~, 1, ~, ~, ~, 1, ~, 1, ~, ~, ~],
+  #son
+  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, ~, 1, ~, ~, ~],
+  #rumba
+  [1, ~, ~, 1, ~, ~, ~, 1, ~, ~, 1, ~, 1, ~, ~, ~],
+  #soukous
+  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, 1, ~, ~, ~, ~],
+  #gahu
+  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, ~, ~, ~, 1, ~],
+  #bossa-nova
+  [1, ~, ~, 1, ~, ~, 1, ~, ~, ~, 1, ~, ~, 1, ~, ~]
+]
+
+let distrhythms_string = gen()
+{
+  setup() {}
+
+  run() {
+    let idx = rand(len(rhythms_string))
+      #puts("IDX is ", idx, " - pattern is: ", rhythms_string[idx])
+      return rhythms_string[idx]
+  }
+}
+
+let distrhythms_int = gen()
+{
+  setup() {}
+
+  run() {
+    let idx = rand(len(rhythms_int))
+      #puts("IDX is ", idx, " - pattern is: ", rhythms_int[idx])
+      return rhythms_int[idx]
+  }
+}

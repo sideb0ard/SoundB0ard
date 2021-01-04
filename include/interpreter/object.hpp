@@ -305,6 +305,7 @@ class Sample : public SoundGenerator
     ~Sample() = default;
     ObjectType Type() override;
     std::string Inspect() override;
+    std::string sample_path_{};
 };
 
 class Granular : public SoundGenerator

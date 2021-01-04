@@ -17,6 +17,7 @@
 #include <drumsynth.h>
 #include <dxsynth.h>
 #include <event_queue.h>
+#include <filereader.hpp>
 #include <fx/envelope.h>
 #include <fx/fx.h>
 #include <interpreter/object.hpp>
@@ -35,6 +36,7 @@ extern Tsqueue<event_queue_item> process_event_queue;
 extern Tsqueue<std::string> repl_queue;
 extern Tsqueue<audio_action_queue_item> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
+extern Tsqueue<std::string> interpret_command_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -115,6 +117,9 @@ mixer *new_mixer(double output_latency)
     mixer_set_chord_progression(mixr, 1);
     mixr->bars_per_chord = 4;
     mixr->should_progress_chords = false;
+
+    std::string contents = ReadFileContents(kStartupConfigFile);
+    interpret_command_queue.push(contents);
 
     return mixr;
 }

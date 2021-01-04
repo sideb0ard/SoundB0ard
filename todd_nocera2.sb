@@ -1,216 +1,223 @@
-#let an = sample(TT-NOCERA/AHNAH.wav)
-#let oh = sample(TT-NOCERA/OOHlong.wav)
-#let tic = sample(TT-NOCERA/TICt.wav)
-#let wu = sample(TT-NOCERA/WUMP.wav)
-#let bad = sample(TT-NOCERA/badum.wav)
-#let dd = sample(TT-NOCERA/dudam.wav)
-#let df = sample(TT-NOCERA/dumf.wav)
-#let gl= sample(TT-NOCERA/grainnyloop.wav)
-#let gl2 = sample(TT-NOCERA/grainyloop2.wav)
-#let kr = sample(TT-NOCERA/kickr.wav)
-#let kkl = sample(TT-NOCERA/klickKICK.wav)
-#let bd = sample(TT-BANGO/kiCK.wav)
-#let ooh = sample(TT-NOCERA/ooh.wav)
-#let pah = sample(TT-NOCERA/pah.wav)
-#let sn = sample(TT-NOCERA/snarey.wav)
-#let sn2 = sample(TT-NOCERA/snarez.wav)
-#let stb = sample(TT-NOCERA/stab.wav)
-#let sumr = sample(TT-NOCERA/sumr.wav)
-#vol sumr 0.5
-#let tme = sample(TT-NOCERA/timeee.wav)
-#let tom = sample(TT-NOCERA/tom.wav)
-#let tom2 = sample(TT-NOCERA/tom2.wav)
-#let tom3 = sample(TT-NOCERA/tom3.wav)
-#let tom4 = sample(TT-NOCERA/tom4.wav)
-#let tsck = sample(TT-NOCERA/tsck.wav)
-#vol tsck 0.4
-#let ump = sample(TT-NOCERA/umPIAN.wav)
-#let wwhm = sample(TT-NOCERA/whhhum.wav)
-#let wumpa = sample(TT-NOCERA/wumpAH.wav)
-#vol wumpa 0.4
+let an = sample(TT-NOCERA/AHNAH.wav);
+let oh = sample(TT-NOCERA/OOHlong.wav);
+let tic = sample(TT-NOCERA/TICt.wav);
+let wu = sample(TT-NOCERA/WUMP.wav);
+let bad = sample(TT-NOCERA/badum.wav);
+let dd = sample(TT-NOCERA/dudam.wav);
+let df = sample(TT-NOCERA/dumf.wav);
+let gl= sample(TT-NOCERA/grainnyloop.wav);
+let gl2 = sample(TT-NOCERA/grainyloop2.wav);
+let kr = sample(TT-NOCERA/kickr.wav);
+vol kr 0.5
+let kkl = sample(TT-NOCERA/klickKICK.wav);
+let bd = sample(TT-BANGO/kiCK.wav);
+let ooh = sample(TT-NOCERA/ooh.wav);
+let pah = sample(TT-NOCERA/pah.wav);
+let sn = sample(TT-NOCERA/snarey.wav);
+let sn2 = sample(TT-NOCERA/snarez.wav);
+let stb = sample(TT-NOCERA/stab.wav);
+let sumr = sample(TT-NOCERA/sumr.wav);
+vol sumr 0.5;
+let tme = sample(TT-NOCERA/timeee.wav);
+vol tme 0.2;
+let tom = sample(TT-NOCERA/tom.wav);
+let tom2 = sample(TT-NOCERA/tom2.wav);
+let tom3 = sample(TT-NOCERA/tom3.wav);
+let tom4 = sample(TT-NOCERA/tom4.wav);
+let tsck = sample(TT-NOCERA/tsck.wav);
+vol tsck 0.4;
+let ump = sample(TT-NOCERA/umPIAN.wav);
+vol ump 0.3;
+let wwhm = sample(TT-NOCERA/whhhum.wav);
+let wumpa = sample(TT-NOCERA/wumpAH.wav);
+vol wumpa 0.4;
 
-let kicksz = [kr, bd, bad, wumpa, wu ]
-let kicksz_names = ["kr", "bd", "bad", "wumpa"]
+let kicksz = [kr, bd, bad, wumpa, wu ];
+let kicksz_names = ["kr", "bd", "bad", "wumpa"];
 
-let hatz = [tic, tsck, wwhm]
-let pianoz = [ pah, sumr, oh ]
-let piano_namez = [ "pah", "sumr", "pah", "pah", "oh", "oh", "~", "~", "~", "oh" ]
-# let pianoz = [ ump, tme, sumr]
-# let piano_namez = [ "ump", "tme", "sumr"]
+let hatz = [tic, tsck, wwhm];
+#let pianoz = [ pah, sumr, oh ];
+#let piano_namez = [ "pah", "sumr", "pah", "pah", "oh", "oh", "~", "~", "~", "oh" ];
+let pianoz = [ ump, tme, pah];
+let piano_namez = [ "ump", "tme", "pah", "oh"];
 
-let tomz = [ sn, sn2, tom]
-let tomz_namez = [ "sn", "sn2", "tom"]
+let tomz = [ sn, sn2, tom];
+let tomz_namez = [ "sn", "sn2", "tom"];
+
+let gl = grain(TT-NOCERA/grainyloop2.wav);
+p4 < over 128 "1 100" "set gl:idx %";
 
 let kickrr = gen()
 {
-    setup()
-    { 
-      let arr_sizes = [4, 8, 8, 4, 2]
+  setup()
+  {
+    let arr_sizes = [4, 8, 8, 4, 2]
       let kick_idx = 0
       let kicks_num = 1
       let kicks_max = len(kicksz)
       let count = 0
       let pitch_idx = 0
       let pitch_val = 1
+  }
+
+  run()
+  {
+
+    if (count % 2 == 0 ) {
+      set bd:pitch 2
+    } else {
+      set bd:pitch 1
+    }
+    if (count % 3 == 0 ) {
+      set kr:pitch 2
+    } else {
+      set kr:pitch 1
     }
 
-    run()
-    {
-
-      if (count % 2 == 0 ) {
-       set bd:pitch 2
-      } else {
-        set bd:pitch 1
-      }
-      if (count % 3 == 0 ) {
-       set kr:pitch 2
-      } else {
-        set kr:pitch 1
-      }
-      
-      if (count % 4 == 0) {
-          #puts("OD$!")
-      } else {
-        if (count % 7 == 0) {
-          # puts("BOOGIE!")
-          let rh = distrhythms()
+    if (count % 4 == 0) {
+      #puts("OD$!")
+    } else {
+      if (count % 7 == 0) {
+        # puts("BOOGIE!")
+        let rh = distrhythms_string()
           let inc = 3840 / 16;
-          let pos = 0
+        let pos = 0
           for (i = 0; i < len(rh); ++i) {
             if ( rh[i] == "1" || rh[i] == "~") {
               if (rh[i] == "1") {
                 noteOnDelayed(kicksz[kick_idx], 1, pos*inc)
-                kick_idx = incr(kick_idx, 0, kicks_num)
+                  kick_idx = incr(kick_idx, 0, kicks_num)
               }
               ++pos
             }
           }
-        } else {
-          let pat_len = arr_sizes[rand(len(arr_sizes))]
+      } else {
+        let pat_len = arr_sizes[rand(len(arr_sizes))]
           let inc = 3840 / pat_len;
-          for ( i = 0 ; i < pat_len ;  ++i ) {
-            let randy = rand(10);
-            if ( randy < 6 ) {
-              noteOnDelayed(kicksz[kick_idx], 1, i*inc)
-            }
-            if (randy < 6) {
-              kick_idx = incr(kick_idx, 0, kicks_num)
-            }
+        for ( i = 0 ; i < pat_len ;  ++i ) {
+          let randy = rand(10);
+          if ( randy < 6 ) {
+            noteOnDelayed(kicksz[kick_idx], 1, i*inc)
+          }
+          if (randy < 6) {
+            kick_idx = incr(kick_idx, 0, kicks_num)
           }
         }
       }
-      kicks_num = incr(kicks_num, 1, kicks_max + 1)
-      ++count
     }
+    kicks_num = incr(kicks_num, 1, kicks_max + 1);
+    ++count
+  }
 }
-#
+
 let nocera_hatz = gen()
 {
-    setup()
-    {
-       let arr_sizes = [16 ]
-       let arr_idx = 0;
-       let hatz_idx = 0;
-       let len_hatz = 2;
-       let count = 0
-    }
+  setup()
+  {
+    let arr_sizes = [16 ]
+      let arr_idx = 0;
+    let hatz_idx = 0;
+    let len_hatz = 2;
+    let count = 0
+  }
 
-    run()
-    {
-      if (count % 2 == 0 ) {
-       set tsck:pitch 2
-      } else {
-        set tsck:pitch 1
-      }
-      if (count % 3 == 0 ) {
-       set tic:pitch 2
-      } else {
-        set tic:pitch 1
-      }
-      let arr = rand_array(arr_sizes[arr_idx], 0, len_hatz)
+  run()
+  {
+    if (count % 2 == 0 ) {
+      set tsck:pitch 2
+    } else {
+      set tsck:pitch 1
+    }
+    if (count % 3 == 0 ) {
+      set tic:pitch 2
+    } else {
+      set tic:pitch 1
+    }
+    let arr = rand_array(arr_sizes[arr_idx], 0, len_hatz)
       arr_idx = incr(arr_idx, 0, len(arr_sizes))
 
       let inc = 3840 / len(arr);
-      for ( i = 0 ; i < len(arr) ;  ++i ) {
-        let randy = rand(10);
-        if ( randy < 8 ) {
-          noteOnDelayed(hatz[hatz_idx], 1, i*inc)
-        }
-        if (randy < 6) {
-          hatz_idx = incr(hatz_idx, 0, len_hatz)
-        }
+    for ( i = 0 ; i < len(arr) ;  ++i ) {
+      let randy = rand(10);
+      if ( randy < 8 ) {
+        noteOnDelayed(hatz[hatz_idx], 1, i*inc)
       }
-      len_hatz = incr(len_hatz, 2, len(hatz) + 1)
-      ++count;
+      if (randy < 6) {
+        hatz_idx = incr(hatz_idx, 0, len_hatz)
+      }
     }
+    len_hatz = incr(len_hatz, 2, len(hatz) + 1)
+      ++count;
+  }
 }
-#
+
 let nocera_tomz = gen()
 {
-    setup()
-    {
-       let rhythm = ""
-       let tom_idx = 0;
-    }
+  setup()
+  {
+    let rhythm = ""
+      let tom_idx = 0;
+  }
 
-    run()
-    {
+  run()
+  {
 
-      rhythm = distrhythms()
-      rhythm = rotate(rhythm, 4)
+    rhythm = distrhythms_string();
+    rhythm = rotate(rhythm, 4)
       let trhythm = ""
       for (i = 0; i < len(rhythm); ++i) {
         if (rhythm[i] == "1") {
-           trhythm = trhythm + tomz_namez[tom_idx];
+          trhythm = trhythm + tomz_namez[tom_idx];
         } else {
-           trhythm = trhythm + rhythm[i];
+          trhythm = trhythm + rhythm[i];
         }
         tom_idx = incr(tom_idx, 0, len(tomz));
       }
-      return trhythm
-    }
+    return trhythm
+  }
 }
+
 let nocera_pianoz = gen()
 {
-    setup()
-    {
-       let count = 0
-       let rhythm = ""
-       let piano_idx = 0;
-    }
+  setup()
+  {
+    let count = 0
+      let rhythm = ""
+      let piano_idx = 0;
+  }
 
-    run()
-    {
-      # if (count % 2 == 0 ) {
+  run()
+  {
+    # if (count % 2 == 0 ) {
       #  set tme:pitch 2
       # } else {
-      #   set tme:pitch 1
-      # }
-      # if (count % 3 == 0 ) {
+        #   set tme:pitch 1
+        # }
+    # if (count % 3 == 0 ) {
       #  set ump:pitch 2
       # } else {
-      #   set ump:pitch 1
-      # }
-      rhythm = distrhythms()
+        #   set ump:pitch 1
+        # }
+    rhythm = distrhythms_string()
       rhythm = rotate(rhythm, 8)
       let trhythm = ""
       for (i = 0; i < len(rhythm); ++i) {
         if (rhythm[i] == "1") {
-           trhythm = trhythm + piano_namez[piano_idx];
+          trhythm = trhythm + piano_namez[piano_idx];
         } else {
-           trhythm = trhythm + rhythm[i];
+          trhythm = trhythm + rhythm[i];
         }
         piano_idx = incr(piano_idx, 0, len(piano_namez));
       }
-      return trhythm
-    }
+    return trhythm
+  }
 }
 #
 #
 #let snarrr = gen()
 #{
 #    setup()
-#    { 
+#    {
 #    }
 #
 #    run()
@@ -219,7 +226,7 @@ let nocera_pianoz = gen()
 #       let pat = ""
 #       if (nom < 4) {
 #         pat =  "[~ sn]*2";
-#       } 
+#       }
 #       if (nom > 3 && nom < 7) {
 #         pat =  "[~ sn2]*2";
 #       }
@@ -230,31 +237,3 @@ let nocera_pianoz = gen()
 #    }
 #}
 #
-## sound effects
-## toms
-##z piano
-let rhythms = [
-  #shiko
-  "1 ~ ~ ~ 1 ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-  #son
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ 1 ~ ~ ~",
-  #rumba
-  "1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ 1 ~ ~ ~",
-  #soukous
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 1 ~ ~ ~ ~",
-  #gahu
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ ~ 1 ~",
-  #bossa-nova
-  "1 ~ ~ 1 ~ ~ 1 ~ ~ ~ 1 ~ ~ 1 ~ ~"
-]
-
-let distrhythms = gen()
-{
-  setup() {}
-
-  run() {
-    let idx = rand(len(rhythms))
-    #puts("IDX is ", idx, " - pattern is: ", rhythms[idx])
-    return rhythms[idx]
-  }
-}

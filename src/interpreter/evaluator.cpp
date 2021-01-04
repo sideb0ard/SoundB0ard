@@ -191,6 +191,24 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::LetStatement>(node);
     if (let_expr)
     {
+        // first check if its a sample expression with same path and if so, do
+        // nothing so we don't keep reloading same sample
+        auto sample_expression =
+            std::dynamic_pointer_cast<ast::SampleExpression>(let_expr->value_);
+        if (sample_expression)
+        {
+            auto sample = env->Get(let_expr->name_->value_);
+            if (sample && sample->Type() == "SAMPLE")
+            {
+                auto sample_obj =
+                    std::dynamic_pointer_cast<object::Sample>(sample);
+                if (sample_obj)
+                    if (sample_obj->sample_path_.compare(
+                            sample_expression->path_) == 0)
+                        return NULLL;
+            }
+        }
+
         auto val = Eval(let_expr->value_, env);
         if (IsError(val))
         {

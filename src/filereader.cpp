@@ -37,8 +37,5 @@ std::string ReadFileContents(std::string filepath)
 
         return buffer.str();
     }
-    else
-    {
-        return "File didnae open!";
-    }
+    return "";
 }

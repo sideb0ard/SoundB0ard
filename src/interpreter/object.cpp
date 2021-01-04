@@ -126,6 +126,7 @@ ObjectType DigiSynth::Type() { return SYNTH_OBJ; }
 
 Sample::Sample(std::string sample_path)
 {
+    sample_path_ = sample_path;
     soundgen_id_ = AddSoundGenerator(DRUMSAMPLER_TYPE, sample_path);
 }
 std::string Sample::Inspect() { return "sample."; }
