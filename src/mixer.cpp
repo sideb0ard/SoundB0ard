@@ -907,6 +907,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 // args[1] is midi_note
                 // args[2] is delay in midi ticks if present and type ==
                 // MIDI_EVENT_ADD_DELAYED
+                // args[3] if present is velocity
                 auto args = action->args;
                 int args_size = args.size();
                 if (args_size >= 2)
@@ -932,7 +933,29 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
 
                             auto midinum = int_object->value_;
 
+                            // optional value
                             int velocity = 127;
+                            if ((action->type ==
+                                     AudioAction::MIDI_EVENT_ADD_DELAYED &&
+                                 args_size == 4) ||
+                                args_size == 3)
+                            {
+                                std::cout << "VELOCOIIITY present!"
+                                          << std::endl;
+                                int pos =
+                                    action->type ==
+                                            AudioAction::MIDI_EVENT_ADD_DELAYED
+                                        ? 3
+                                        : 2;
+                                auto velocity_obj =
+                                    std::dynamic_pointer_cast<object::Number>(
+                                        args[pos]);
+
+                                if (velocity_obj)
+                                    velocity = velocity_obj->value_;
+                                std::cout << "VELOCOIIITY!:" << velocity
+                                          << std::endl;
+                            }
                             midi_event event_on =
                                 new_midi_event(MIDI_ON, midinum, velocity);
                             event_on.source = EXTERNAL_OSC;
@@ -959,13 +982,13 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
 
                                     // TODO - update Function name to
                                     // AddDelayedAction
-                                    sg->noteOffDelayed(event, delay_time);
+                                    sg->noteOffDelayed(event, delay_tick);
                                 }
                                 else
                                 {
-                                    std::cerr
-                                        << "NEED A DELAY SIZE IN MIDI TICKS"
-                                        << std::endl;
+                                    std::cerr << "NEED A DELAY SIZE IN "
+                                                 "MIDI TICKS"
+                                              << std::endl;
                                 }
                             }
                             else

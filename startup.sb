@@ -49,3 +49,16 @@ let distrhythms_int = gen()
       return rhythms_int[idx]
   }
 }
+
+let count = 0;
+
+let countr = gen()
+{
+  setup() {}
+  run()
+  {
+    ++count;
+  }
+}
+
+p0 # countr
