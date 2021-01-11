@@ -938,13 +938,16 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             if ((action->type ==
                                      AudioAction::MIDI_EVENT_ADD_DELAYED &&
                                  args_size == 4) ||
-                                args_size == 3)
+                                (action->type !=
+                                     AudioAction::MIDI_EVENT_ADD_DELAYED &&
+                                 args_size == 3))
                             {
                                 int pos =
                                     action->type ==
                                             AudioAction::MIDI_EVENT_ADD_DELAYED
                                         ? 3
                                         : 2;
+
                                 auto velocity_obj =
                                     std::dynamic_pointer_cast<object::Number>(
                                         args[pos]);
