@@ -940,8 +940,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                  args_size == 4) ||
                                 args_size == 3)
                             {
-                                std::cout << "VELOCOIIITY present!"
-                                          << std::endl;
                                 int pos =
                                     action->type ==
                                             AudioAction::MIDI_EVENT_ADD_DELAYED
@@ -953,9 +951,8 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
 
                                 if (velocity_obj)
                                     velocity = velocity_obj->value_;
-                                std::cout << "VELOCOIIITY!:" << velocity
-                                          << std::endl;
                             }
+
                             midi_event event_on =
                                 new_midi_event(MIDI_ON, midinum, velocity);
                             event_on.source = EXTERNAL_OSC;
