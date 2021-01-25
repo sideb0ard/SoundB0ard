@@ -235,7 +235,7 @@ let htz = gen()
   {
     if ( count % 2 == 0) {
       for (i = 0; i < 16; ++i) {
-        puts("i:", i* pulses_per, " smp_idx:", smp_idx);
+        # puts("i:", i* pulses_per, " smp_idx:", smp_idx);
         let s = smp[smp_idx];
         noteOnDelayed(s, 1, i * pulses_per, 127);
         # smp_idx = incr(smp_idx, 0, len(smp));
