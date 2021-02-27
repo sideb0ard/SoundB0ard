@@ -1014,6 +1014,36 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                     }
                 }
             }
+            else if (action->type == AudioAction::MIDI_EVENT_CLEAR)
+            {
+                // args[0] is sound generator
+                auto args = action->args;
+                int args_size = args.size();
+                if (args_size == 2)
+                {
+                    auto soundgen =
+                        std::dynamic_pointer_cast<object::SoundGenerator>(
+                            args[0]);
+                    if (soundgen)
+                    {
+                        if (mixer_is_valid_soundgen_num(mixr,
+                                                        soundgen->soundgen_id_))
+                        {
+                            auto sg =
+                                mixr->sound_generators_[soundgen->soundgen_id_];
+                            auto int_object =
+                                std::dynamic_pointer_cast<object::Number>(
+                                    args[1]);
+
+                            if (!int_object)
+                                return;
+
+                            auto start_idx = int_object->value_;
+                            sg->clearQueue(start_idx);
+                        }
+                    }
+                }
+            }
             else if (action->type == AudioAction::UPDATE)
             {
                 if (mixer_is_valid_soundgen_num(mixr,

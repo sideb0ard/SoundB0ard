@@ -70,3 +70,7 @@ bool sequence_engine_list_presets(unsigned int synthtype)
     return true;
 }
 
+void sequence_engine_clear_events_from(sequenceengine *self, int start_idx)
+{
+    midi_pattern_clear_events_from(self->temporal_events, start_idx);
+}

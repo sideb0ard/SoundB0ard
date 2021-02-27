@@ -339,6 +339,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                               audio_queue.push(action_req);
                               return evaluator::NULLL;
                           })},
+    {"clearQueue", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object> {
+                           audio_action_queue_item action_req{
+                               .type = AudioAction::MIDI_EVENT_CLEAR,
+                               .args = args};
+                           audio_queue.push(action_req);
+                           return evaluator::NULLL;
+                       })},
     {"speed", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object> {
@@ -648,6 +657,24 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          return_array->elements_.push_back(num_obj);
                      }
                      return return_array;
+                 }
+             }
+             return evaluator::NULLL;
+         })},
+    {"loadDir",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object> {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 std::shared_ptr<object::String> str_obj =
+                     std::dynamic_pointer_cast<object::String>(args[0]);
+                 if (str_obj)
+                 {
+                     auto dirname = str_obj->value_;
+
+                     std::cout << "Loading samples in " << dirname << std::endl;
                  }
              }
              return evaluator::NULLL;

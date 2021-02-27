@@ -1,0 +1,134 @@
+let bd = sample(TT-ROYALHOUSE/bd.wav);
+set bd:pitch 2
+let bd2 = sample(TT-ROYALHOUSE/bdork.wav);
+let bd3 = sample(TT-ROYALHOUSE/bdvocwah.wav);
+let bd4 = sample(TT-ROYALHOUSE/beet.wav);
+let bd5 = sample(TT-ROYALHOUSE/blah.wav);
+let bt = sample(TT-ROYALHOUSE/bdtail.wav);
+
+let chw = sample(TT-ROYALHOUSE/chewit.wav);
+let ch = sample(TT-ROYALHOUSE/ch.wav);
+set ch:pitch 2
+let uh = sample(TTUnreleaseProject/UHhat.wav);
+let ch2 = sample(TTUnreleaseProject/ch.wav);
+let che = sample(TT-ROYALHOUSE/che.wav);
+vol che 0.5
+let wh = sample(TT-ROYALHOUSE/whft.wav);
+let yv = sample(TT-ROYALHOUSE/youv.wav);
+let yek = sample(TT-ROYALHOUSE/yek.wav);
+let ec = sample(TT-ROYALHOUSE/ech.wav);
+let cn = sample(TT-ROYALHOUSE/canu.wav);
+let sw = sample(TT-ROYALHOUSE/schwip.wav);
+
+let teh = sample(TT-ROYALHOUSE/teh.wav);
+let not = sample(TT-ROYALHOUSE/not.wav);
+vol not 0.3;
+let it = sample(TT-ROYALHOUSE/it.wav);
+vol it 0.2;
+
+let mfa = sample(TT-ROYALHOUSE/mfa.wav);
+
+let sn = sample(TT-ROYALHOUSE/sn.wav);
+let sn2 = sample(TT-ROYALHOUSE/sn2.wav);
+let ehit  = sample(TT-ROYALHOUSE/ehit.wav);
+
+let bgn = sample(TT-ROYALHOUSE/bng.wav);
+let bgn1 = sample(TT-ROYALHOUSE/bgn1.wav);
+let bgn2 = sample(TT-ROYALHOUSE/bgn2.wav);
+let bgn3 = sample(TT-ROYALHOUSE/bgn3.wav);
+let bgn4 = sample(TT-ROYALHOUSE/bgn4.wav);
+
+let tth = sample(TT-NOCERA/tth.wav);
+
+let PPBAR = 3840;
+let PPSWING = 19;
+
+let bdz = gen()
+{
+  setup()
+  {
+    let offset = 0;
+  }
+  run()
+  {
+    let pp = PPBAR / 16;
+    for (i = 0; i < 16; ++i) {
+      if (i == 0 || i == 10) {
+        noteOnDelayed(bd, 1, i*pp + offset);
+      }
+    }
+
+    if (count % 3 == 0)  {
+      offset = offset + 10;
+      if (offset > 200) { offset = 0; };
+    }
+
+  }
+}
+
+
+let snz = gen()
+{
+  setup()
+  {
+    let offset = 0;
+    let percz = [ec, it];
+    let perc_idx = 0;
+  }
+  run()
+  {
+    let pp = PPBAR / 16;
+    for (i = 0; i < 16; ++i) {
+      if (i == 4 || i == 12) {
+        noteOnDelayed(sn, 1, i*pp);
+      }
+      if (i == 7 || i == 9) {
+        if (rand(100) > 40) {
+          noteOnDelayed(percz[perc_idx], 1, i*pp);
+          perc_idx = incr(perc_idx, 0, len(percz));
+        }
+      }
+    }
+    if (count % 2 == 0)  {
+      offset = offset + 10;
+      if (offset > 200) { offset = 0; };
+    }
+  }
+}
+
+let htz = gen()
+{
+  setup()
+  {
+    let hatz = [ch, teh];
+    let htz_idx = 0;
+    let lenz = [8];
+    let len_idx = 0;
+    let mo_hatz = [0,1,0,0, 0, 0, 0, 1, 0, 1, 0, 0, 0, 1, 0, 0];
+    let offset = 0;
+  }
+  run()
+  {
+    let lenny = lenz[len_idx];
+    let pp = PPBAR / lenny;
+    for (i = 0; i < lenny; ++i) {
+      noteOnDelayed(hatz[htz_idx], 1, i*pp + offset);
+      htz_idx = incr(htz_idx, 0, len(hatz));
+    }
+    for (i = 0; i < 16; ++i) {
+      let swing_off = 0;
+      if (i % 0 == 1) {
+        swing_off = PPSWING;
+      }
+      if (mo_hatz[i]) {
+        noteOnDelayed(ch, 1, i*pp + swing_off + offset, 80);
+      }
+    }
+    len_idx = incr(len_idx, 0, len(lenz));
+    if (count % 2 == 0)  {
+      offset = offset + 13;
+      if (offset > 200) { offset = 0; };
+    }
+  }
+}
+

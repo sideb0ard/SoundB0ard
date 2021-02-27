@@ -41,6 +41,7 @@ class SoundGenerator
     virtual void eventNotify(broadcast_event event, mixer_timing_info tinfo);
 
     void parseMidiEvent(midi_event ev, mixer_timing_info tinfo);
+    void clearQueue(int start_idx);
 
     void SetVolume(double val);
     double GetVolume();

@@ -16,6 +16,7 @@ enum AudioAction
     MIDI_INIT,
     MIDI_EVENT_ADD,
     MIDI_EVENT_ADD_DELAYED,
+    MIDI_EVENT_CLEAR,
     PREVIEW,
     RAND,
     SAVE_PRESET,

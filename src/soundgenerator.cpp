@@ -144,6 +144,11 @@ void SoundGenerator::noteOffDelayed(midi_event ev, int event_off_tick)
     sequence_engine_add_temporal_event(&engine, event_off_tick, ev);
 }
 
+void SoundGenerator::clearQueue(int start_idx)
+{
+    sequence_engine_clear_events_from(&engine, start_idx);
+}
+
 double SoundGenerator::GetPan() { return pan; }
 
 void SoundGenerator::SetPan(double val)

@@ -19,6 +19,15 @@ void clear_midi_pattern(midi_event *pattern)
     memset(pattern, 0, sizeof(midi_event) * PPBAR);
 }
 
+void midi_pattern_clear_events_from(midi_event *pattern, int start_tick)
+{
+    if (start_tick < PPBAR)
+    {
+        int num_ticks = PPBAR - start_tick;
+        memset(&pattern[start_tick], 0, sizeof(midi_event) * num_ticks);
+    }
+}
+
 void midi_pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev)
 {
     int target_tick = midi_tick % PPBAR;

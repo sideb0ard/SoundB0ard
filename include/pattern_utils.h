@@ -12,6 +12,7 @@ void midi_pattern_add_event(midi_event *pattern, int midi_tick, midi_event ev);
 bool is_midi_event_in_pattern_range(int start_tick, int end_tick,
                                     midi_pattern pattern);
 void midi_pattern_add_triplet(midi_event *pattern, unsigned int quarter);
+void midi_pattern_clear_events_from(midi_event *pattern, int start_tick);
 // void print_pattern(int *pattern_array, int len_pattern_array);
 
 // TRANSFORMS
