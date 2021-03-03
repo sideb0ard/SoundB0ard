@@ -673,8 +673,24 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  if (str_obj)
                  {
                      auto dirname = str_obj->value_;
+                     auto fulldirname = "wavs/" + dirname;
+                     for (auto &p : fs::directory_iterator(fulldirname))
+                     {
+                         auto pathname = p.path().string();
+                         pathname.erase(0, 5);
 
-                     std::cout << "Loading samples in " << dirname << std::endl;
+                         std::string base_filename =
+                             pathname.substr(pathname.find_last_of("/\\") + 1);
+
+                         std::string::size_type const dot(
+                             base_filename.find_last_of('.'));
+                         std::string file_without_extension =
+                             base_filename.substr(0, dot);
+
+                         std::string cmd = "let " + file_without_extension +
+                                           " = sample(" + pathname + ")";
+                         interpret_command_queue.push(cmd);
+                     }
                  }
              }
              return evaluator::NULLL;
