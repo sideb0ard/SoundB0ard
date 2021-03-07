@@ -1,14 +1,124 @@
 loadDir("TT-SWAN-LAKE/");
 
+let ppn = 3840 / 16;
+let lenz = ["16", "16", "8", "4", "12"];
+let len_numz = [16, 16, 8, 4, 12];
+let len_idx = 0;
 
 
-let blah_gen = gen()
+let len_gen = gen()
 {
   setup()
   {
   }
   run()
   {
+    len_idx = incr(len_idx, 0, len(lenz));
+  }
+}
+
+let rht = gen()
+{
+  setup()
+  {
+
+    let rhym = rand_array(len_numz[len_idx], 0, 5);
+    let sounds1 = [brk, dun, luu];
+    let sounds2 = [ieee, dub, spinback, inthe];
+    let sounds = [sounds1, sounds2];
+    let sound_idx = 0;
+    let drift = 13;
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      rhym = rand_array(len_numz[len_idx], 0, 5);
+      #puts(rhym);
+    }
+
+    if (count % 3 == 0) {
+      sound_idx = incr(sound_idx, 0, len(sounds));
+      drift = drift + 23;
+      if (drift > 1023) {
+        drift = 0;
+      }
+    }
+
+    if (count % 8 < 7) {
+      for (i = 0; i < len(lenz); ++i) {
+        if (rhym[i] < len(sounds)) {
+          noteOnDelayed(sounds[sound_idx][rhym[i]], 1, i * ppn) + drift;
+        }
+      }
+    }
+  }
+}
+
+let bd_gen = gen()
+{
+  setup()
+  {
+    let bdz = distrhythms_int();
+  }
+  run()
+  {
+    if (count % 7 == 0) {
+      bdz = distrhytms_int();
+    }
+
+    for (i = 0; i < 16 ; ++i ) {
+      if (bdz[i] == 1) {
+        #puts("bD!!");
+        if (rand(100) > 30) {
+          noteOnDelayed(vm, 1, i*ppn);
+        }
+      }
+    }
+  }
+}
+
+
+let bass_gen = gen()
+{
+  setup()
+  {
+    let pat = "vm*";
+    let pitchz = [1, 1, 0.7, 2, 0.8];
+    let p_idx = 0;
+
+  }
+  run()
+  {
+    let ret_pat =  pat + lenz[len_idx];
+
+    if (count % 3 == 0) {
+      setPitch(vm, pitchz[p_idx]);
+      p_idx = incr(p_idx, 0, len(pitchz));
+    }
+
+    return ret_pat;
+  }
+}
+
+let bass2_gen = gen()
+{
+  setup()
+  {
+    let drift = 10;
+
+  }
+  run()
+  {
+    let mod = 16 / len_numz[len_idx];
+    for (i = 0; i < 16; ++i) {
+      if (i % mod == 0) {
+        noteOnDelayed(vm, 1, i*ppn + drift);
+      }
+    }
+    drift = drift + 23;
+    if (drift > 1100) {
+      drift = 0;
+    }
   }
 }
 
