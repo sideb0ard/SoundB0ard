@@ -154,6 +154,12 @@ void DrumSampler::noteOn(midi_event ev)
     eg_start_eg(&eg);
 }
 
+void DrumSampler::pitchBend(midi_event ev)
+{
+    float pitch_val = ev.data1 / 10.;
+    drumsampler_set_pitch(this, pitch_val);
+}
+
 void drumsampler_import_file(DrumSampler *ds, char *filename)
 {
     audio_buffer_details deetz = import_file_contents(&ds->buffer, filename);

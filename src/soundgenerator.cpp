@@ -102,6 +102,10 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
         {
             noteOn(ev);
         }
+        else if (ev.event_type == MIDI_PITCHBEND)
+        {
+            pitchBend(ev);
+        }
         else
         {
             noteOff(ev);

@@ -308,7 +308,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object> {
              int args_size = args.size();
-             if (args_size == 2)
+             if (args_size >= 2)
              {
                  auto soundgen =
                      std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
@@ -318,9 +318,19 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          std::dynamic_pointer_cast<object::Number>(args[1]);
                      if (number)
                      {
+                         int delayed_by = 0;
+                         if (args_size == 3)
+                         {
+                             auto delayed_time =
+                                 std::dynamic_pointer_cast<object::Number>(
+                                     args[2]);
+                             if (delayed_time)
+                                 delayed_by = delayed_time->value_;
+                         }
                          audio_action_queue_item action{
                              .type = AudioAction::UPDATE,
                              .mixer_soundgen_idx = soundgen->soundgen_id_,
+                             .delayed_by = delayed_by,
                              .fx_id = -1,
                              .param_name = "pitch",
                              .param_val = std::to_string(number->value_)};

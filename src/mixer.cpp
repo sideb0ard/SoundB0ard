@@ -1071,8 +1071,13 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                     }
                     if (action->delayed_by > 0)
                     {
-                        std::cout << "DELATED UPDATE!\n";
-                        // sg->addDelayedEvent(event, delay_tick);
+                        // TODO - this is hardcoded for pitch - should add an
+                        // ENUM to be able to do others
+                        midi_event event =
+                            new_midi_event(MIDI_PITCHBEND, param_val * 10, 0);
+                        event.delete_after_use = true;
+                        sg->addDelayedEvent(event, action->delayed_by);
+                        return;
                     }
                     if (action->param_name == "volume")
                         sg->SetVolume(param_val);

@@ -37,6 +37,7 @@ class DrumSampler : public SoundGenerator
     void start() override;
     void noteOn(midi_event ev) override;
     void SetParam(std::string name, double val) override;
+    void pitchBend(midi_event ev) override;
     double GetParam(std::string name) override;
 
   public:
