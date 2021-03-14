@@ -980,9 +980,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                         MIDI_ON, midinum, velocity);
                                     event.delete_after_use = true;
 
-                                    // TODO - update Function name to
-                                    // AddDelayedAction
-                                    sg->noteOffDelayed(event, delay_tick);
+                                    sg->addDelayedEvent(event, delay_tick);
                                 }
                                 else
                                 {
@@ -1008,7 +1006,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                 midi_event event_off =
                                     new_midi_event(MIDI_OFF, midinum, velocity);
                                 event_off.delete_after_use = true;
-                                sg->noteOffDelayed(event_off, midi_off_tick);
+                                sg->addDelayedEvent(event_off, midi_off_tick);
                             }
                         }
                     }
@@ -1070,6 +1068,11 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                     {
                         std::cerr << "WHOE NELLY! Naw SG! bailing out!\n";
                         return;
+                    }
+                    if (action->delayed_by > 0)
+                    {
+                        std::cout << "DELATED UPDATE!\n";
+                        // sg->addDelayedEvent(event, delay_tick);
                     }
                     if (action->param_name == "volume")
                         sg->SetVolume(param_val);

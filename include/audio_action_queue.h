@@ -30,6 +30,8 @@ struct audio_action_queue_item
     AudioAction type;
     int mixer_soundgen_idx{0};
 
+    int delayed_by{0}; // in midi ticks
+
     // ADD varz
     // std::shared_ptr<SoundGenerator> sg{nullptr};
     unsigned int soundgenerator_type;

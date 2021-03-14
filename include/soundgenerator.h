@@ -31,7 +31,7 @@ class SoundGenerator
     virtual void noteOff(midi_event ev) { (void)ev; };
     virtual void Load(std::string preset_name);
     virtual void Save(std::string preset_name);
-    void noteOffDelayed(midi_event ev, int event_off_tick);
+    void addDelayedEvent(midi_event ev, int tick);
 
     virtual void control(midi_event ev) { (void)ev; };
     virtual void pitchBend(midi_event ev) { (void)ev; };

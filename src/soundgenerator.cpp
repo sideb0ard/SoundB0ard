@@ -139,9 +139,9 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     }
 }
 
-void SoundGenerator::noteOffDelayed(midi_event ev, int event_off_tick)
+void SoundGenerator::addDelayedEvent(midi_event ev, int tick)
 {
-    sequence_engine_add_temporal_event(&engine, event_off_tick, ev);
+    sequence_engine_add_temporal_event(&engine, tick, ev);
 }
 
 void SoundGenerator::clearQueue(int start_idx)
