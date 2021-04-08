@@ -82,6 +82,20 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
+    {"floor", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> args)
+                      -> std::shared_ptr<object::Object> {
+                      if (args.size() != 1)
+                          return evaluator::NewError("Need WAN arg for floor!");
+                      auto number =
+                          std::dynamic_pointer_cast<object::Number>(args[0]);
+                      if (number)
+                      {
+                          int floor_num = floor(number->value_);
+                          return std::make_shared<object::Number>(floor_num);
+                      }
+                      return evaluator::NULLL;
+                  })},
     {"incr",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

@@ -1,0 +1,161 @@
+loadDir("TT-PARTYPEOPLE/");
+
+let pitchz = [1, 2, 1.5, 0.7];
+let pidx = 0;
+
+let qt = 3840 / 4;
+let qtq = qt / 4;
+let qtf = qt / 3;
+let qts = qt / 6;
+let qtt = qt / 12;
+let qtsx = qt / 16;
+
+let hatz = [ittt, hh2, hhish];
+let hix = 0;
+
+let plen = 16;
+let plenz = [32, 16, 6, 8, 32, 4, 3, 8, 12];
+let plidx = 0;
+let lpp = 3840 / plen;
+
+let vocz = gen()
+{
+  setup()
+  {
+    let wurds = [waht, we, gon, do, votit, right, here, gon, back, orchordd];
+    let wurds_idx = 0;
+    let beat = distrhythms_int();
+
+  }
+  run()
+  {
+
+    if (count % 3 == 0 || count % 7 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          noteOnDelayed(wurds[wurds_idx], 1, i*pp);
+        }
+        if (rand(100) > 70) {
+          wurds_idx = incr(wurds_idx, 0, len(wurds));
+          if (wurds_idx == 0) {
+            beat = distrhythms_int();
+          }
+        }
+      }
+    }
+  }
+}
+
+
+let beat_gen = gen()
+{
+  setup()
+  {
+    let wahz = [ahkick, dubub, hhchord];
+    let widx = 0;
+  }
+  run()
+  {
+    if (rand(100) > 70) {
+      let thh = 3840 / 2 / 3;
+      let drift = rand(lpp);
+      noteOnDelayed(hatz[hix], 1, 3840 / 2 + 0);
+      noteOnDelayed(hatz[hix], 1, 3840 / 2 + thh + drift);
+      noteOnDelayed(hatz[hix], 1, 3840 / 2 + thh*2 + drift);
+      setPitch(hatz[hix], pitchz[pidx]);
+      setPitch(hhish, pitchz[pidx]);
+      setPitch(wahz[widx], pitchz[pidx]);
+      pidx = incr(pidx, 0, len(pitchz));
+      hix = incr(hidx, 0, len(hatz));
+    }
+
+    for (i = 0; i < plen; ++i) {
+
+      if (i % 2 == 0) {
+        if (rand(100) > 80) {
+          noteOnDelayed(hatz[hix], 1, i * lpp);
+        } else {
+          noteOnDelayed(hhish, 1, i * lpp);
+        }
+      }
+
+      if ( i == 0 ) {
+        noteOnDelayed(bdd2, 1, i * lpp);
+      }
+      if ( i == 2 && rand(100) > 80 ) {
+        let vel = 90 + rand(38);
+        noteOnDelayed(bdd2, 1, i * lpp, vel);
+      }
+      if ( i == plen / 2 && rand(100) > 80 ) {
+        let vel = 90 + rand(38);
+        noteOnDelayed(bdd2, 1, i * lpp, vel);
+      }
+      if ( i == plen - 2  && rand(100) > 80 ) {
+        let vel = 50 + rand(38);
+        noteOnDelayed(bdd2, 1, i * lpp, vel);
+      }
+
+      let divv = plen / 4;
+      if (i  == divv || i == divv *3) {
+        #puts("SNAREME:", i , " divv:", divv, " plen:", plen, " i:", i);
+        if (rand(100) > 10) {
+          # triplet
+          let lllp = lpp / 3;
+          for (j = 0; j < 3; ++j) {
+            let vel = 90 + rand(38);
+            let t = i * lpp + j * lllp;
+            noteOnDelayed(sn2, 1, i * lpp + lllp * j, vel);
+            noteOnDelayed(sn, 1, i * lpp + lllp * j, vel);
+            if (count % 7 == 0) {
+              noteOnDelayed(wahz[widx], 1, i * lpp, vel);
+              widx = incr(widx, 0, len(wahz));
+            }
+          }
+        } else {
+          let vel = 90 + rand(38);
+          noteOnDelayed(sn2, 1, i * lpp, vel);
+        }
+      }
+    }
+
+    if (count % 3 == 0 && rand(100) > 60) {
+      plidx = incr(plidx, 0, len(plenz));
+      plen = plenz[plidx];
+      lpp = 3840 / plen;
+    }
+  }
+}
+
+let mel_gen = gen()
+{
+  setup()
+  {
+    let chordzzz = [wah, waht, right, we, orchordd, hhchord];
+    let cidx = 0;
+  }
+  run()
+  {
+    if (count % 4 == 0 )  {
+      let thrd = floor(plen / 3);
+      for (i = 0; i < plen; ++i) {
+        if (i % thrd == 0 ) {
+          noteOnDelayed(chordzzz[cidx], 1, i * lpp);
+          cidx = incr(cidx, 0, len(chordzzz));
+          noteOnDelayed(chordzzz[cidx], 1, i * lpp + rand(100));
+          setPitch(chordzzz[cidx], pitchz[pidx]);
+        }
+      }
+    }
+  }
+}
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+  }
+}
+

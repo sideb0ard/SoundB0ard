@@ -58,6 +58,9 @@ let vel = 128;
 let rot = 1;
 let putch = 1;
 
+let pitchx = [0.5, 1, 0.8, 1.2, 1.8, 2];
+let pitch_idx = 0;
+
 let play_notes_fn = fn(tick)
 {
   noteOnDelayed(bdz[bd_idx],1,  tick, vel + 10);
@@ -69,7 +72,7 @@ let play_notes_fn = fn(tick)
       vel = 128;
     }
     notes_len = incr(notes_len, 1, len(notes));
-    noteOnDelayed(notes[notes_idx], 1,  tick, vel);
+    # noteOnDelayed(notes[notes_idx], 1,  tick, vel);
     bd_idx = incr(bd_idx, 0, len(bdz) + 1);
   }
 }
@@ -126,8 +129,6 @@ let kick_pat = gen()
 
     #if (count % 2 == 0) {
       #  setPitch(bdz[bd_idx], putch);
-      #  setPitch(notes[notes_idx], putch);
-      #  putch = incr(putch, 1, 3);
       #}
 
     if (count % 32 == 0) {
@@ -137,35 +138,83 @@ let kick_pat = gen()
   }
 }
 
+set ch:pitch 2;
+set hht:pitch 2;
+
+let hatz = [ch];
+let hat_idx = 0;
+let play_pat = fn(pat, ppn, offset)
+{
+  for (i = 0; i < 16; ++i) {
+    if (pat[i] == 1) {
+      #puts(i*ppn + offset);
+      noteOnDelayed(hatz[hat_idx], 1, i*ppn + offset);
+      noteOnDelayed(notes[notes_idx], 1, i*ppn + offset);
+      # if (count % 3 == 0 && count > 24) {
+        #   noteOnDelayed(nzsn, 1, i*ppn + offset);
+        #   if (rand(10) > 5) {
+          #     noteOnDelayed(bass2, 1, i*ppn + offset);
+          #   }
+        # }
+    }
+  }
+}
+
+let haf_gen = gen()
+{
+  setup()
+  {
+    let pat = distrhythms_int();
+  }
+  run()
+  {
+    if (count % 8 > 3) {
+    } else {
+      let div = count % 4 + 1;
+      let ppn = pp / div;
+      let offset_multi = 3840 / div;
+      for (i = 0; i < div; ++i) {
+        let offset = i * offset_multi;
+        play_pat(pat, ppn, offset);
+      }
+
+      if (count % 7 == 0) {
+        pat = distrhythms_int();
+      }
+    }
+  }
+}
 let hatz_gen = gen()
 {
   setup()
   {
     # let hatz = [htj, ch2, htj, tom, pc, snphah];
     #let hatz = [tom, snphah, bng];
-    let hatz = [ch, ht, hatnote2];
-    let hat_idx = 0;
+    #let hatz = [ch, ht, hatnote2];
     let hat_len = 1;
     let vel = 70;
   }
   run()
   {
-    for (i = 0; i < 16; ++i) {
-      if (rand(100) > randy) {
-        if (i % 2 == 0) {
-          noteOnDelayed(hatz[hat_idx], 1, pp*i, vel);
-        }
-        else {
-          noteOnDelayed(hatz[hat_idx], 1, pp*i + swing, vel);
-        }
-        vel = vel + 13;
-        if (vel > 128){
-          vel = 70;
+    if (count % 3 == 0) {
+      for (i = 0; i < 16; ++i) {
+        hat_idx = incr(hat_idx, 0, hat_len);
+        setPitch(hatz[hat_idx], pitchx[pitch_idx]);
+        if (rand(100) > randy) {
+          if (i % 2 == 0) {
+            noteOnDelayed(hatz[hat_idx], 1, pp*i, vel);
+          }
+          else {
+            noteOnDelayed(hatz[hat_idx], 1, pp*i + swing, vel);
+          }
+          vel = vel + 13;
+          if (vel > 128){
+            vel = 70;
+          }
         }
       }
-      hat_idx = incr(hat_idx, 0, hat_len);
     }
-    if (count % 3 == 0) {
+    if (count % 2 == 0) {
       # hatz = rotate(hatz, 3);
       hat_len = incr(hat_len, 1, len(hatz) + 1);
     }
@@ -218,7 +267,7 @@ let melody = gen()
 {
   setup()
   {
-    let ntz = [note, note2, note3, note4, foo];
+    let ntz = [note, note2, note3, note4];
     let nt_idx = 0;
     let ppp = pp / 2;
     let halfp = 3840 / 2 ;
@@ -229,20 +278,23 @@ let melody = gen()
   run()
   {
 
-    for (i = 0; i < 16; ++i) {
-      if (pat[i] == 1) {
-        noteOnDelayed(ntz[nt_idx], 1, i * pp, vel);
-        nt_idx = incr(nt_idx, 0, len(ntz) + 1);
-        noteOnDelayed(ntz[nt_idx], 1, i * pp + swing*3, vel);
-        setPitch(ntz[nt_idx], putch);
-        if (rand(100) > 70) {
-          noteOnDelayed(ntz[nt_idx], 1, i * ppp + halfp, vel);
+    if (count % 3 == 2)  {
+      for (i = 0; i < 16; ++i) {
+        if (pat[i] == 1) {
+          noteOnDelayed(ntz[nt_idx], 1, i * pp, vel);
+          nt_idx = incr(nt_idx, 0, len(ntz) + 1);
+          noteOnDelayed(ntz[nt_idx], 1, i * pp + swing*3, vel);
+          setPitch(ntz[nt_idx], pitchx[putch], i * pp);
+          putch = incr(putch, 1, len(pitchx));
+          if (rand(100) > 70) {
+            noteOnDelayed(ntz[nt_idx], 1, i * ppp + halfp, vel);
+          }
         }
       }
-    }
-    vel = vel + swing;
-    if (vel > 108) {
-      vel = 40;
+      vel = vel + swing;
+      if (vel > 108) {
+        vel = 40;
+      }
     }
 
     if (count % 3 == 0) {
@@ -260,33 +312,33 @@ let bass_gen = gen()
   setup()
   {
     # let ntz = [hatnote, gp, git2, brap];
-    let ntz = [brap];
+    let ntz = [brap, git2];
     let nt_idx = 0;
     let nt_len = 1;
     let pp_third  = pp / 3;
-    let pitchx = [0.5, 1, 0.8, 1.2, 1.8, 2];
-    let pitch_idx = 0;
   }
   run()
   {
-    let pat = distrhythms_int();
-    for (i = 0; i < 16; ++i) {
-      #puts("I", i);
-      if (pat[i] == 1) {
-        noteOnDelayed(ntz[nt_idx], 1, pp * i);
-        if (i == 4 || i == 12)
-        {
-          pitch_idx = incr(pitch_idx, 0, len(pitchx) + 1);
-          setPitch(ntz[nt_idx], pitchx[pitch_idx]);
-          if (rand(100) > 80) {
-            noteOnDelayed(ntz[nt_idx], 1, pp * i + pp_third);
-            noteOnDelayed(ntz[nt_idx], 1, pp * i + pp_third*2);
+    if (count % 2 == 0) {
+      let pat = distrhythms_int();
+      for (i = 0; i < 16; ++i) {
+        #puts("I", i);
+        if (pat[i] == 1) {
+          noteOnDelayed(ntz[nt_idx], 1, pp * i);
+          if (i == 4 || i == 12)
+          {
+            pitch_idx = incr(pitch_idx, 0, len(pitchx) + 1);
+            setPitch(ntz[nt_idx], pitchx[pitch_idx]);
+            if (rand(100) > 80) {
+              noteOnDelayed(ntz[nt_idx], 1, pp * i + pp_third);
+              noteOnDelayed(ntz[nt_idx], 1, pp * i + pp_third*2);
+            }
+            nt_idx = incr(nt_idx, 0, nt_len);
           }
-          nt_idx = incr(nt_idx, 0, nt_len);
         }
       }
+      nt_len = incr(nt_len, 1, len(ntz) + 1);
     }
-    nt_len = incr(nt_len, 1, len(ntz) + 1);
   }
 }
 
@@ -295,7 +347,7 @@ let hilit_gen = gen()
 {
   setup()
   {
-    let smap = [tom, pc, clvc, clng2];
+    let smap = [eh, foo, am, gltch];
     let sidx = 0;
     let ppp = pp / 4;
     let third = (3840 / 4) * 2;
@@ -307,9 +359,11 @@ let hilit_gen = gen()
     for (i = 0; i < 16; ++i) {
       if (pat[i] == 1)
       {
-        noteOnDelayed(smap[sidx], 1, ppp + i*ppp);
+        # noteOnDelayed(smap[sidx], 1, pp * i);
+        noteOnDelayed(smap[sidx], 1, ppp * i + third);
+        noteOnDelayed(smap[sidx], 1, ppp * i + third + ppp) ;
+        sidx = incr(sidx, 0, len(smap) + 1);
       }
-      sidx = incr(sidx, 0, len(smap) + 1);
     }
 
   }
