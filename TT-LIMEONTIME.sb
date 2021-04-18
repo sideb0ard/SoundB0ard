@@ -1,0 +1,102 @@
+loadDir("TT-LIMELIFE-RIGHTONTIME/");
+
+let blah_gen = gen()
+{
+  setup()
+  {
+    let bdz = [bd, kdclean, coskd];
+    let bidx = 0;
+  }
+  run()
+  {
+    if (rand(100) > 90) {
+      let beat = distrhythms_int();
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          noteOnDelayed(bdz[bidx], 1, pp* i);
+        }
+      }
+    } else {
+      for (i = 0; i < 16; ++i) {
+        if (i % 4 == 0 && rand(100) > 20) {
+          noteOnDelayed(bdz[bidx], 1, pp* i);
+          if (rand(100) > 70) {
+            bidx = incr(bidx, 0, len(bdz));
+          }
+        }
+      }
+    }
+  }
+}
+
+let hhah_gen = gen()
+{
+  setup()
+  {
+    let hatz = [hh, hhstr, hhskuff, oh, orch];
+    let hix = 0;
+    let swing = 50;
+  }
+  run()
+  {
+    if (count % 7 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (i % 2 == 1) {
+          noteOnDelayed(hatz[hix], 1, pp*i + swing);
+          swing = incr(swing, 0, 100);
+        } else {
+          noteOnDelayed(hatz[hix], 1, pp*i);
+        }
+      }
+    } else {
+      for (i = 0; i < 16; ++i) {
+        if (i % 4 == 2) {
+          noteOnDelayed(hatz[hix], 1, pp*i);
+          hix = incr(hix, 0,len(hatz));
+        }
+      }
+    }
+  }
+}
+
+let perc_gen = gen()
+{
+  setup()
+  {
+    let percz = [uhbass, uhstrlastbeat];
+    let pix = 0;
+    let beat = distrhythms_int();
+  }
+  run()
+  {
+    if (count % 4 == 0) {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          noteOnDelayed(percz[pix], 1, i * pp);
+        }
+      }
+      pix = incr(pix, 0, len(percz));
+    }
+    if (count % 8 == 0) {
+      beat = distrhythms_int();
+    }
+  }
+}
+
+let sn_gen = gen()
+{
+  setup()
+  {
+    let snz = [snbl];
+    let sidx = 0;
+  }
+  run()
+  {
+    for (i = 0; i < 16; ++i) {
+      if (i % 8 == 4) {
+        noteOnDelayed(snz[sidx], 1, pp*i);
+      }
+    }
+  }
+}
+
