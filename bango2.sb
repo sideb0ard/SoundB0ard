@@ -1,3 +1,4 @@
+loadDir("TT-BANGO");
 # let sn = sample(TT-BANGO/snare.wav)
 # let bd = sample(TT-BANGO/bd.wav)
 # let sh = sample(TT-BANGO/SNARE2HIT.wav)

@@ -10,6 +10,7 @@
 #include <time.h>
 #include <unistd.h>
 
+#include <filesystem>
 #include <iostream>
 
 #include "cmdloop.h"
@@ -122,34 +123,6 @@ void get_random_sample_from_dir(char *dir, char *return_file_name)
     strcat(return_file_name, ep->d_name);
 }
 
-static void switch_wurds(char **wurds, int idx_1, int idx_2)
-{
-    char *scratch = wurds[idx_1];
-    wurds[idx_1] = wurds[idx_2];
-    wurds[idx_2] = scratch;
-}
-
-static bool first_wurd_before_second(char *first_wurd, char *second_wurd)
-{
-    if (strncmp(first_wurd, second_wurd, MAX_STATIC_STRING_SZ) > 0)
-        return true;
-    return false;
-}
-
-static int sort_char_array(char **wurds, int start_idx, int end_idx)
-{
-    (void)start_idx;
-    for (int i = 1; i < end_idx; i++)
-    {
-        for (int j = i;
-             j > 0 && first_wurd_before_second(wurds[j - 1], wurds[j]); j--)
-        {
-            switch_wurds(wurds, j - 1, j);
-        }
-    }
-    return 0;
-}
-
 // static void qsort_char_array(char **wurds, int lower_idx, int upper_idx)
 //{
 //    if (lower_idx >= upper_idx)
@@ -167,64 +140,28 @@ std::string list_sample_dir(std::string indir)
 {
 
     std::stringstream ss;
-
-    char const *dir = indir.c_str();
-    char dirname[MAX_STATIC_STRING_SZ] = "./";
-    strncat(dirname, SAMPLE_DIR, MAX_STATIC_STRING_SZ - strlen(dirname) - 1);
-
-    bool have_subdir = false;
-    if (0 != strcmp(dir, ""))
-        have_subdir = true;
-
-    if (have_subdir)
-        strcat(dirname, dir);
-
-    char *dirfiles[MAX_DIR_ENTRIES] = {};
-    int dirfiles_idx = 0;
-
-    DIR *dp;
-    struct dirent *ep;
-    dp = opendir(dirname);
-    if (dp != NULL)
+    std::vector<std::string> listing{};
+    std::string dirpath = ".";
+    dirpath.append(SAMPLE_DIR);
+    dirpath += indir;
+    try
     {
-        while ((ep = readdir(dp)))
+        for (const auto &p : std::filesystem::directory_iterator(dirpath))
         {
-            char *filename = (char *)calloc(1, MAX_STATIC_STRING_SZ);
-            strcat(filename, ANSI_COLOR_CYAN);
-            if (ep->d_type == DT_DIR)
-            {
-                // strcat(filename, "\x1b[34m");
-                strcat(filename, ep->d_name);
-                strcat(filename, "/");
-                strcat(filename, ANSI_COLOR_RESET);
-            }
-            else
-            {
-                // strcat(filename, ANSI_COLOR_BLUE);
-                if (have_subdir)
-                {
-                    strcat(filename, dir);
-                    strcat(filename, "/");
-                }
-                strcat(filename, ANSI_COLOR_RESET);
-                strcat(filename, ep->d_name);
-            }
-
-            if (strncmp(ep->d_name, ".", 1) != 0)
-                dirfiles[dirfiles_idx++] = filename;
+            auto pathname = p.path().string();
+            pathname.erase(0, 7);
+            listing.push_back(pathname);
         }
-        (void)closedir(dp);
-
-        sort_char_array(dirfiles, 0, dirfiles_idx);
-        for (int i = 0; i < dirfiles_idx; i++)
-            ss << dirfiles[i] << "\n";
-        for (int i = 0; i < dirfiles_idx; i++)
-            free(dirfiles[i]);
     }
-    else
+    catch (std::filesystem::filesystem_error e)
     {
-        perror("Couldn't open wavs dir\n");
+        std::cerr << "nope.\n";
     }
+
+    std::sort(listing.begin(), listing.end());
+    for (auto l : listing)
+        ss << l << "\n";
+
     return ss.str();
 }
 
