@@ -1,0 +1,31 @@
+loadDir("aesamples");
+
+
+let kick_gen = gen()
+{
+  setup()
+  {
+    let bdz = [SH09_KIK];
+    let bx = 0;
+    let beat = distrhythms_int();
+  }
+  run()
+  {
+    if (count % 3 == 0) {
+      beat = distrhythms_int();
+    }
+
+    if (count % 8 < 7) {
+      for (i = 0; i < 16; ++i) {
+        if (beat[i] == 1) {
+          noteOnDelayed(bdz[bx], 1, pp*i);
+          if (rand(100) > 70) {
+            bx = incr(bx, 0, len(bdz));
+          }
+        }
+      }
+    }
+
+  }
+}
+

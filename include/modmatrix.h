@@ -116,7 +116,7 @@ typedef enum
     MAX_TRANSFORMS /* not needed? */
 } matrix_transformations;
 
-typedef struct
+typedef struct matrixrow
 {
     unsigned m_source_index;
     unsigned m_destination_index;
@@ -126,7 +126,7 @@ typedef struct
     bool m_enable;
 } matrixrow;
 
-typedef struct
+typedef struct modmatrix
 {
     matrixrow **m_matrix_core;
     int m_num_rows_in_matrix_core;

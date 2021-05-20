@@ -8,6 +8,9 @@
 
 #include <iostream>
 
+#include <lo/lo.h>
+#include <lo/lo_cpp.h>
+
 #include "PerlinNoise.hpp"
 
 #include "ableton_link_wrapper.h"
@@ -144,6 +147,26 @@ void *process_worker_thread()
     return nullptr;
 }
 
+/* catch any incoming messages and display them. returning 1 means that the
+ * message has not been fully handled and the server should try other methods */
+int generic_handler(const char *path, const char *types, lo_arg **argv,
+                    int argc, lo_message data, void *user_data)
+{
+    int i;
+
+    printf("generic handler; path: <%s>\n", path);
+    for (i = 0; i < argc; i++)
+    {
+        printf("arg %d '%c' ", i, types[i]);
+        lo_arg_pp((lo_type)types[i], argv[i]);
+        printf("\n");
+    }
+    printf("\n");
+    fflush(stdout);
+
+    return 1;
+}
+
 int main()
 {
 
@@ -185,6 +208,54 @@ int main()
 
     // Interpreter
     std::thread command_thread(command_queue_thread);
+
+    // OSC Server
+    lo::ServerThread st(9000);
+    if (!st.is_valid())
+    {
+        std::cout << "Nope." << std::endl;
+        return 1;
+    }
+
+    /* Set some lambdas to be called when the thread starts and
+     * ends. Here we demonstrate capturing a reference to the server
+     * thread. */
+    st.set_callbacks([&st]() { printf("Thread init: %p.\n", &st); },
+                     []() { printf("Thread cleanup.\n"); });
+
+    std::cout << "URL: " << st.url() << std::endl;
+
+    std::atomic<int> received(0);
+
+    /*
+     * Add a method handler for "/example,i" using a C++11 lambda to
+     * keep it succinct.  We capture a reference to the `received'
+     * count and modify it atomatically.
+     *
+     * You can also pass in a normal function, or a callable function
+     * object.
+     *
+     * Note: If the lambda doesn't specify a return value, the default
+     *       is `return 0', meaning "this message has been handled,
+     *       don't continue calling the method chain."  If this is not
+     *       the desired behaviour, add `return 1' to your method
+     *       handlers.
+     */
+    lo_server_thread_add_method(st, NULL, NULL, generic_handler, NULL);
+    st.add_method("noteOn", "si", [&received](lo_arg **argv, int) {
+        std::cout << "noteOn (" << (++received) << "): " << &argv[0]->s << " "
+                  << argv[1]->i << std::endl;
+        std::stringstream ss;
+        ss << "noteOn(" << &argv[0]->s << ", " << argv[1]->i << ");";
+        std::cout << "CMD is " << ss.str();
+
+        interpret_command_queue.push(ss.str());
+    });
+
+    /*
+     * Start the server.
+     */
+    st.start();
 
     //////////////// shutdown
 
