@@ -229,20 +229,20 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                      return return_array;
                  })},
-    {"puts", std::make_shared<object::BuiltIn>(
-                 [](std::vector<std::shared_ptr<object::Object>> args)
-                     -> std::shared_ptr<object::Object>
-                 {
-                     std::stringstream out;
-                     for (auto &o : args)
-                     {
-                         out << o->Inspect();
-                     }
+    {"print", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> args)
+                      -> std::shared_ptr<object::Object>
+                  {
+                      std::stringstream out;
+                      for (auto &o : args)
+                      {
+                          out << o->Inspect();
+                      }
 
-                     std::cout << out.str() << std::endl;
+                      std::cout << out.str() << std::endl;
 
-                     return evaluator::NULLL;
-                 })},
+                      return evaluator::NULLL;
+                  })},
     {"reverse",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
@@ -336,7 +336,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     //         }
     //         return evaluator::NULLL;
     //     })},
-    {"midiInit", std::make_shared<object::BuiltIn>(
+    {"MidiInit", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object>
                      {
@@ -344,7 +344,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          midi_launch_init(mixr);
                          return evaluator::NULLL;
                      })},
-    {"noteOn", std::make_shared<object::BuiltIn>(
+    {"NoteOn", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
                        -> std::shared_ptr<object::Object>
                    {
@@ -353,7 +353,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        audio_queue.push(action_req);
                        return evaluator::NULLL;
                    })},
-    {"setPitch",
+    {"SetPitch",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -391,7 +391,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"noteOnAt", std::make_shared<object::BuiltIn>(
+    {"NoteOnAt", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
                          -> std::shared_ptr<object::Object>
                      {
@@ -401,7 +401,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                          audio_queue.push(action_req);
                          return evaluator::NULLL;
                      })},
-    {"clearQueue", std::make_shared<object::BuiltIn>(
+    {"ClearQueue", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object>
                        {
@@ -411,14 +411,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                            audio_queue.push(action_req);
                            return evaluator::NULLL;
                        })},
-    {"speed", std::make_shared<object::BuiltIn>(
+    {"Speed", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object>
                   {
                       std::cout << "INBUILT SPEED CALLED!" << std::endl;
                       return evaluator::NULLL;
                   })},
-    {"addFx", std::make_shared<object::BuiltIn>(
+    {"AddFx", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object>
                   {
@@ -431,7 +431,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       }
                       return evaluator::NULLL;
                   })},
-    {"compose",
+    {"Compose",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -479,7 +479,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"gimmeNotes", std::make_shared<object::BuiltIn>(
+    {"GimmeNotes", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object>
                        {
@@ -494,7 +494,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                            }
                            return melody_obj;
                        })},
-    {"setKey",
+    {"SetKey",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -512,7 +512,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"setProg",
+    {"SetProg",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -530,37 +530,37 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"progChord", std::make_shared<object::BuiltIn>(
+    {"ProgChord", std::make_shared<object::BuiltIn>(
                       [](std::vector<std::shared_ptr<object::Object>> args)
                           -> std::shared_ptr<object::Object>
                       {
                           mixer_next_chord(mixr);
                           return evaluator::NULLL;
                       })},
-    {"import", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
-                       -> std::shared_ptr<object::Object>
-                   {
-                       int args_size = args.size();
-                       if (args_size == 1)
-                       {
-                           std::cout << "YOIMPORT\n";
-                           std::shared_ptr<object::String> filename =
-                               std::dynamic_pointer_cast<object::String>(
-                                   args[0]);
-                           auto cwd = fs::current_path();
-                           std::string filepath =
-                               cwd.generic_string() + "/" + filename->value_;
+    {"Monitor",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 1)
+             {
+                 std::cout << "YOIMPORT\n";
+                 std::shared_ptr<object::String> filename =
+                     std::dynamic_pointer_cast<object::String>(args[0]);
+                 auto cwd = fs::current_path();
+                 std::string filepath =
+                     cwd.generic_string() + "/" + filename->value_;
 
-                           mixr_add_file_to_monitor(mixr, filepath);
-                           repl_queue.push("Monitoring " + filepath);
-                       }
-                       else
-                           std::cerr << "BARF! ARG SIZE SHOULD BE 1 -  SIZE IS "
-                                     << args_size << std::endl;
-                       return evaluator::NULLL;
-                   })},
-    {"loadPreset",
+                 mixr_add_file_to_monitor(mixr, filepath);
+                 repl_queue.push("Monitoring " + filepath);
+             }
+             else
+                 std::cerr << "BARF! ARG SIZE SHOULD BE 1 -  SIZE IS "
+                           << args_size << std::endl;
+             return evaluator::NULLL;
+         })},
+    {"LoadPreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -576,7 +576,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"savePreset",
+    {"SavePreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -592,7 +592,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"rand",
+    {"Rand",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -637,7 +637,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
-    {"perlin",
+    {"Perlin",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -655,7 +655,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"sin", std::make_shared<object::BuiltIn>(
+    {"Sin", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
                     -> std::shared_ptr<object::Object>
                 {
@@ -674,7 +674,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
-    {"map", std::make_shared<object::BuiltIn>(
+    {"Map", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
                     -> std::shared_ptr<object::Object>
                 {
@@ -704,7 +704,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
-    {"rand_array",
+    {"RandArray",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -741,7 +741,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"loadDir",
+    {"LoadDir",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
