@@ -29,16 +29,35 @@ extern Tsqueue<std::string> interpret_command_queue;
 extern Tsqueue<std::string> repl_queue;
 extern siv::PerlinNoise perlinGenerator;
 
+const std::vector<std::string> FILES_TO_IGNORE = {".DS_Store"};
+
+namespace
+{
+bool ShouldIgnore(std::string filename)
+{
+    auto result =
+        std::find(begin(FILES_TO_IGNORE), end(FILES_TO_IGNORE), filename);
+    if (result == std::end(FILES_TO_IGNORE))
+    {
+        return false;
+    }
+    std::cout << "IGNORING " << filename << std::endl;
+    return true;
+}
+} // namespace
+
 namespace builtin
 {
 
 std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"len", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> input)
-                    -> std::shared_ptr<object::Object> {
+                    -> std::shared_ptr<object::Object>
+                {
                     if (input.size() != 1)
                         return evaluator::NewError(
-                            "Too many arguments for len - can only accept one");
+                            "Too many arguments for len - can only accept "
+                            "one");
 
                     std::shared_ptr<object::String> str_obj =
                         std::dynamic_pointer_cast<object::String>(input[0]);
@@ -60,31 +79,33 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         "argument to `len` not supported, got %s",
                         input[0]->Type());
                 })},
-    {"head",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> input)
-             -> std::shared_ptr<object::Object> {
-             if (input.size() != 1)
-                 return evaluator::NewError(
-                     "Too many arguments for len - can only accept one");
+    {"head", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> input)
+                     -> std::shared_ptr<object::Object>
+                 {
+                     if (input.size() != 1)
+                         return evaluator::NewError(
+                             "Too many arguments for len - can only accept "
+                             "one");
 
-             std::shared_ptr<object::Array> array_obj =
-                 std::dynamic_pointer_cast<object::Array>(input[0]);
-             if (!array_obj)
-             {
-                 return evaluator::NewError(
-                     "argument to `head` must be an array - got %s",
-                     input[0]->Type());
-             }
+                     std::shared_ptr<object::Array> array_obj =
+                         std::dynamic_pointer_cast<object::Array>(input[0]);
+                     if (!array_obj)
+                     {
+                         return evaluator::NewError(
+                             "argument to `head` must be an array - got %s",
+                             input[0]->Type());
+                     }
 
-             if (array_obj->elements_.size() > 0)
-                 return array_obj->elements_[0];
+                     if (array_obj->elements_.size() > 0)
+                         return array_obj->elements_[0];
 
-             return evaluator::NULLL;
-         })},
+                     return evaluator::NULLL;
+                 })},
     {"floor", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
-                      -> std::shared_ptr<object::Object> {
+                      -> std::shared_ptr<object::Object>
+                  {
                       if (args.size() != 1)
                           return evaluator::NewError("Need WAN arg for floor!");
                       auto number =
@@ -99,10 +120,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"incr",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              if (args.size() != 3)
                  return evaluator::NewError(
-                     "Too many arguments for incr - need three - number to "
+                     "Too many arguments for incr - need three - "
+                     "number to "
                      "incr, min and max");
              auto number = std::dynamic_pointer_cast<object::Number>(args[0]);
              auto min = std::dynamic_pointer_cast<object::Number>(args[1]);
@@ -119,91 +142,97 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"tail",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> input)
-             -> std::shared_ptr<object::Object> {
-             if (input.size() != 1)
-                 return evaluator::NewError(
-                     "Too many arguments for `tail` - can only accept one");
+    {"tail", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> input)
+                     -> std::shared_ptr<object::Object>
+                 {
+                     if (input.size() != 1)
+                         return evaluator::NewError(
+                             "Too many arguments for `tail` - can only "
+                             "accept one");
 
-             std::shared_ptr<object::Array> array_obj =
-                 std::dynamic_pointer_cast<object::Array>(input[0]);
-             if (!array_obj)
-             {
-                 return evaluator::NewError(
-                     "argument to `tail` must be an array - got %s",
-                     input[0]->Type());
-             }
+                     std::shared_ptr<object::Array> array_obj =
+                         std::dynamic_pointer_cast<object::Array>(input[0]);
+                     if (!array_obj)
+                     {
+                         return evaluator::NewError(
+                             "argument to `tail` must be an array - got %s",
+                             input[0]->Type());
+                     }
 
-             int len_elems = array_obj->elements_.size();
-             if (len_elems > 0)
-             {
-                 auto return_array = std::make_shared<object::Array>(
-                     std::vector<std::shared_ptr<object::Object>>());
+                     int len_elems = array_obj->elements_.size();
+                     if (len_elems > 0)
+                     {
+                         auto return_array = std::make_shared<object::Array>(
+                             std::vector<std::shared_ptr<object::Object>>());
 
-                 for (int i = 1; i < len_elems; i++)
-                     return_array->elements_.push_back(array_obj->elements_[i]);
-                 return return_array;
-             }
-             return evaluator::NULLL;
-         })},
-    {"last",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> input)
-             -> std::shared_ptr<object::Object> {
-             if (input.size() != 1)
-                 return evaluator::NewError(
-                     "Too many arguments for `last` - can only accept one");
+                         for (int i = 1; i < len_elems; i++)
+                             return_array->elements_.push_back(
+                                 array_obj->elements_[i]);
+                         return return_array;
+                     }
+                     return evaluator::NULLL;
+                 })},
+    {"last", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> input)
+                     -> std::shared_ptr<object::Object>
+                 {
+                     if (input.size() != 1)
+                         return evaluator::NewError(
+                             "Too many arguments for `last` - can only "
+                             "accept one");
 
-             std::shared_ptr<object::Array> array_obj =
-                 std::dynamic_pointer_cast<object::Array>(input[0]);
-             if (!array_obj)
-             {
-                 return evaluator::NewError(
-                     "argument to `last` must be an array - got %s",
-                     input[0]->Type());
-             }
+                     std::shared_ptr<object::Array> array_obj =
+                         std::dynamic_pointer_cast<object::Array>(input[0]);
+                     if (!array_obj)
+                     {
+                         return evaluator::NewError(
+                             "argument to `last` must be an array - got %s",
+                             input[0]->Type());
+                     }
 
-             int len_elems = array_obj->elements_.size();
-             if (len_elems > 0)
-             {
-                 return array_obj->elements_[len_elems - 1];
-             }
+                     int len_elems = array_obj->elements_.size();
+                     if (len_elems > 0)
+                     {
+                         return array_obj->elements_[len_elems - 1];
+                     }
 
-             return evaluator::NULLL;
-         })},
-    {"push",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> input)
-             -> std::shared_ptr<object::Object> {
-             if (input.size() != 2)
-                 return evaluator::NewError(
-                     "`push` requires two arguments - array and object");
+                     return evaluator::NULLL;
+                 })},
+    {"push", std::make_shared<object::BuiltIn>(
+                 [](std::vector<std::shared_ptr<object::Object>> input)
+                     -> std::shared_ptr<object::Object>
+                 {
+                     if (input.size() != 2)
+                         return evaluator::NewError(
+                             "`push` requires two arguments - array and "
+                             "object");
 
-             std::shared_ptr<object::Array> array_obj =
-                 std::dynamic_pointer_cast<object::Array>(input[0]);
-             if (!array_obj)
-             {
-                 return evaluator::NewError(
-                     "argument to `push` must be an array - got %s",
-                     input[0]->Type());
-             }
+                     std::shared_ptr<object::Array> array_obj =
+                         std::dynamic_pointer_cast<object::Array>(input[0]);
+                     if (!array_obj)
+                     {
+                         return evaluator::NewError(
+                             "argument to `push` must be an array - got %s",
+                             input[0]->Type());
+                     }
 
-             auto return_array = std::make_shared<object::Array>(
-                 std::vector<std::shared_ptr<object::Object>>());
+                     auto return_array = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
 
-             int len_elems = array_obj->elements_.size();
-             for (int i = 0; i < len_elems; i++)
-                 return_array->elements_.push_back(array_obj->elements_[i]);
+                     int len_elems = array_obj->elements_.size();
+                     for (int i = 0; i < len_elems; i++)
+                         return_array->elements_.push_back(
+                             array_obj->elements_[i]);
 
-             return_array->elements_.push_back(input[1]);
+                     return_array->elements_.push_back(input[1]);
 
-             return return_array;
-         })},
+                     return return_array;
+                 })},
     {"puts", std::make_shared<object::BuiltIn>(
                  [](std::vector<std::shared_ptr<object::Object>> args)
-                     -> std::shared_ptr<object::Object> {
+                     -> std::shared_ptr<object::Object>
+                 {
                      std::stringstream out;
                      for (auto &o : args)
                      {
@@ -217,10 +246,12 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"reverse",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              if (input.size() != 1)
                  return evaluator::NewError(
-                     "`reverse` requires a single array or string argument.");
+                     "`reverse` requires a single array or string "
+                     "argument.");
 
              std::shared_ptr<object::Array> array_obj =
                  std::dynamic_pointer_cast<object::Array>(input[0]);
@@ -248,7 +279,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"rotate",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              if (input.size() != 2)
                  return evaluator::NewError(
                      "`rotate` requires two args - an array or "
@@ -291,12 +323,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     //         if (args.size() == 1)
     //         {
     //             auto synth =
-    //             std::dynamic_pointer_cast<object::Synth>(args[0]); if (synth)
+    //             std::dynamic_pointer_cast<object::Synth>(args[0]);
+    //             if (synth)
     //             {
     //                 if (mixer_is_valid_soundgen_num(mixr,
     //                 synth->soundgen_id_))
     //                 {
-    //                     midi_set_destination(mixr, synth->soundgen_id_);
+    //                     midi_set_destination(mixr,
+    //                     synth->soundgen_id_);
     //                 }
     //             }
     //         }
@@ -304,14 +338,16 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     //     })},
     {"midiInit", std::make_shared<object::BuiltIn>(
                      [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object> {
+                         -> std::shared_ptr<object::Object>
+                     {
                          (void)args;
                          midi_launch_init(mixr);
                          return evaluator::NULLL;
                      })},
     {"noteOn", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
-                       -> std::shared_ptr<object::Object> {
+                       -> std::shared_ptr<object::Object>
+                   {
                        audio_action_queue_item action_req{
                            .type = AudioAction::MIDI_EVENT_ADD, .args = args};
                        audio_queue.push(action_req);
@@ -320,7 +356,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"setPitch",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              if (args_size >= 2)
              {
@@ -354,18 +391,20 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"noteOnDelayed", std::make_shared<object::BuiltIn>(
-                          [](std::vector<std::shared_ptr<object::Object>> args)
-                              -> std::shared_ptr<object::Object> {
-                              audio_action_queue_item action_req{
-                                  .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
-                                  .args = args};
-                              audio_queue.push(action_req);
-                              return evaluator::NULLL;
-                          })},
+    {"noteOnAt", std::make_shared<object::BuiltIn>(
+                     [](std::vector<std::shared_ptr<object::Object>> args)
+                         -> std::shared_ptr<object::Object>
+                     {
+                         audio_action_queue_item action_req{
+                             .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
+                             .args = args};
+                         audio_queue.push(action_req);
+                         return evaluator::NULLL;
+                     })},
     {"clearQueue", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object> {
+                           -> std::shared_ptr<object::Object>
+                       {
                            audio_action_queue_item action_req{
                                .type = AudioAction::MIDI_EVENT_CLEAR,
                                .args = args};
@@ -374,13 +413,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        })},
     {"speed", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
-                      -> std::shared_ptr<object::Object> {
+                      -> std::shared_ptr<object::Object>
+                  {
                       std::cout << "INBUILT SPEED CALLED!" << std::endl;
                       return evaluator::NULLL;
                   })},
     {"addFx", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
-                      -> std::shared_ptr<object::Object> {
+                      -> std::shared_ptr<object::Object>
+                  {
                       int args_size = args.size();
                       if (args_size >= 2)
                       {
@@ -391,53 +432,57 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                       return evaluator::NULLL;
                   })},
     {"compose",
-     std::make_shared<
-         object::BuiltIn>([](std::vector<std::shared_ptr<object::Object>> args)
-                              -> std::shared_ptr<object::Object> {
-         int args_size = args.size();
-         std::cout << "COMPOSE! with num args:" << args_size << std::endl;
-         if (args_size >= 1)
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
          {
-             std::shared_ptr<object::String> str_obj =
-                 std::dynamic_pointer_cast<object::String>(args[0]);
-             if (str_obj)
+             int args_size = args.size();
+             std::cout << "COMPOSE! with num args:" << args_size << std::endl;
+             if (args_size >= 1)
              {
-                 if (str_obj->value_ == "melody")
+                 std::shared_ptr<object::String> str_obj =
+                     std::dynamic_pointer_cast<object::String>(args[0]);
+                 if (str_obj)
                  {
-                     auto melody_obj = std::make_shared<object::Array>(
-                         std::vector<std::shared_ptr<object::Object>>());
-                     auto melody = interpreter_sound_cmds::GenerateMelody();
-                     for (size_t i = 0; i < melody.size(); i++)
+                     if (str_obj->value_ == "melody")
                      {
-                         auto chord_obj = std::make_shared<object::Array>(
+                         auto melody_obj = std::make_shared<object::Array>(
                              std::vector<std::shared_ptr<object::Object>>());
-                         for (size_t j = 0; j < melody[i].size(); j++)
+                         auto melody = interpreter_sound_cmds::GenerateMelody();
+                         for (size_t i = 0; i < melody.size(); i++)
                          {
-                             chord_obj->elements_.push_back(
-                                 std::make_shared<object::String>(
-                                     melody[i][j]));
+                             auto chord_obj = std::make_shared<object::Array>(
+                                 std::vector<
+                                     std::shared_ptr<object::Object>>());
+                             for (size_t j = 0; j < melody[i].size(); j++)
+                             {
+                                 chord_obj->elements_.push_back(
+                                     std::make_shared<object::String>(
+                                         melody[i][j]));
+                             }
+                             melody_obj->elements_.push_back(chord_obj);
                          }
-                         melody_obj->elements_.push_back(chord_obj);
+                         return melody_obj;
                      }
-                     return melody_obj;
+                     else if (str_obj->value_ == "bass")
+                     {
+                         std::cout << "YO GEN A BASS YO\n";
+                     }
                  }
-                 else if (str_obj->value_ == "bass")
-                 {
-                     std::cout << "YO GEN A BASS YO\n";
-                 }
+                 // auto cmd_name =
+                 // std::make_shared<object::String>("save");
+                 // args.push_back(cmd_name);
+                 // audio_action_queue_item action_req{
+                 //    .type = AudioAction::SAVE_PRESET, .args =
+                 //    args};
+                 // audio_queue.push(action_req);
              }
-             // auto cmd_name =
-             // std::make_shared<object::String>("save");
-             // args.push_back(cmd_name);
-             // audio_action_queue_item action_req{
-             //    .type = AudioAction::SAVE_PRESET, .args = args};
-             // audio_queue.push(action_req);
-         }
-         return evaluator::NULLL;
-     })},
+             return evaluator::NULLL;
+         })},
     {"gimmeNotes", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object> {
+                           -> std::shared_ptr<object::Object>
+                       {
                            auto melody_obj = std::make_shared<object::Array>(
                                std::vector<std::shared_ptr<object::Object>>());
                            auto notes =
@@ -452,7 +497,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"setKey",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              std::cout << "SET KEY! with num args:" << args_size << std::endl;
              if (args_size >= 1)
@@ -469,7 +515,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"setProg",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              std::cout << "SET PROG! with num args:" << args_size << std::endl;
              if (args_size >= 1)
@@ -485,13 +532,15 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"progChord", std::make_shared<object::BuiltIn>(
                       [](std::vector<std::shared_ptr<object::Object>> args)
-                          -> std::shared_ptr<object::Object> {
+                          -> std::shared_ptr<object::Object>
+                      {
                           mixer_next_chord(mixr);
                           return evaluator::NULLL;
                       })},
     {"import", std::make_shared<object::BuiltIn>(
                    [](std::vector<std::shared_ptr<object::Object>> args)
-                       -> std::shared_ptr<object::Object> {
+                       -> std::shared_ptr<object::Object>
+                   {
                        int args_size = args.size();
                        if (args_size == 1)
                        {
@@ -514,7 +563,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"loadPreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              if (args_size >= 2)
              {
@@ -529,7 +579,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"savePreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              if (args_size >= 2)
              {
@@ -544,7 +595,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"rand",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              if (args.size() == 0)
              {
                  auto rand_number =
@@ -588,7 +640,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"perlin",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              if (args_size == 1)
              {
@@ -604,7 +657,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
          })},
     {"sin", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
-                    -> std::shared_ptr<object::Object> {
+                    -> std::shared_ptr<object::Object>
+                {
                     int args_size = args.size();
                     if (args_size == 1)
                     {
@@ -622,7 +676,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                 })},
     {"map", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
-                    -> std::shared_ptr<object::Object> {
+                    -> std::shared_ptr<object::Object>
+                {
                     int args_size = args.size();
                     if (args_size == 5)
                     {
@@ -652,7 +707,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"rand_array",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              if (args_size == 3)
              {
@@ -688,7 +744,8 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     {"loadDir",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object> {
+             -> std::shared_ptr<object::Object>
+         {
              int args_size = args.size();
              if (args_size == 1)
              {
@@ -705,6 +762,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                          std::string base_filename =
                              pathname.substr(pathname.find_last_of("/\\") + 1);
+
+                         if (ShouldIgnore(base_filename))
+                             continue;
+                         std::cout << "BASE FILENAME:" << base_filename
+                                   << std::endl;
 
                          std::string::size_type const dot(
                              base_filename.find_last_of('.'));
