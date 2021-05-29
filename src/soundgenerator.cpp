@@ -91,28 +91,6 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
     (void)event;
     int idx = tinfo.midi_tick % PPBAR;
 
-    // this temporal_events table is my first pass at a solution to
-    // ensure note off events still happen, even when i'm using the
-    // above count_by which ends up not reaching note off events
-    // sometimes.
-    if (engine.temporal_events[idx].event_type)
-    {
-        midi_event ev = engine.temporal_events[idx];
-        if (ev.event_type == MIDI_ON)
-        {
-            noteOn(ev);
-        }
-        else if (ev.event_type == MIDI_PITCHBEND)
-        {
-            pitchBend(ev);
-        }
-        else
-        {
-            noteOff(ev);
-        }
-        midi_event_clear(&engine.temporal_events[idx]);
-    }
-
     if (!active)
         return;
 
@@ -141,16 +119,6 @@ void SoundGenerator::eventNotify(broadcast_event event, mixer_timing_info tinfo)
                 engine.cur_step = 0;
         }
     }
-}
-
-void SoundGenerator::addDelayedEvent(midi_event ev, int tick)
-{
-    sequence_engine_add_temporal_event(&engine, tick, ev);
-}
-
-void SoundGenerator::clearQueue(int start_idx)
-{
-    sequence_engine_clear_events_from(&engine, start_idx);
 }
 
 double SoundGenerator::GetPan() { return pan; }

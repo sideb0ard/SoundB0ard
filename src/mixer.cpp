@@ -380,48 +380,43 @@ void add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
 
 void add_drumsynth(mixer *mixr)
 {
-    repl_queue.push("Adding a DRUM SYNTH!\n");
     auto ds = std::make_shared<DrumSynth>();
     add_sound_generator(mixr, ds);
 }
 
 void add_minisynth(mixer *mixr)
 {
-    repl_queue.push("Adding a MINISYNTH!\n");
     auto ms = std::make_shared<MiniSynth>();
     add_sound_generator(mixr, ms);
 }
 
 void add_sample(mixer *mixr, std::string sample_path)
 {
-    repl_queue.push("Adding a SAMPLE!\n");
     auto ds = std::make_shared<DrumSampler>(sample_path.data());
     add_sound_generator(mixr, ds);
 }
 
 void add_digisynth(mixer *mixr, std::string sample_path)
 {
-    repl_queue.push("Adding a DIGISYNTH!\n");
     auto ds = std::make_shared<DigiSynth>(sample_path);
     add_sound_generator(mixr, ds);
 }
 
 void add_dxsynth(mixer *mixr)
 {
-    repl_queue.push("Adding a DXSYNTH!\n");
     auto dx = std::make_shared<dxsynth>();
     add_sound_generator(mixr, dx);
 }
 
 void add_looper(mixer *mixr, std::string filename, bool loop_mode)
 {
-    repl_queue.push("Adding a Granular Looper!\n");
     auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
     add_sound_generator(mixr, loopr);
 }
 
 void mixer_midi_tick(mixer *mixr)
 {
+
     mixr->timing_info.is_thirtysecond = false;
     mixr->timing_info.is_twentyfourth = false;
     mixr->timing_info.is_sixteenth = false;
@@ -485,6 +480,7 @@ void mixer_midi_tick(mixer *mixr)
     repl_queue.push("tick");
     mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
     // lo_send(mixr->processing_addr, "/bpm", NULL);
+    mixr->CheckForDelayedEvents();
 }
 
 bool should_progress_chords(mixer *mixr, int tick)
@@ -865,7 +861,6 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 mixer_help(mixr);
             else if (action->type == AudioAction::ADD)
             {
-                std::cout << "ADD SOUNDGEN YO!\n";
                 switch (action->soundgenerator_type)
                 {
                 case (MINISYNTH_TYPE):
@@ -960,6 +955,9 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                 new_midi_event(MIDI_ON, midinum, velocity);
                             event_on.source = EXTERNAL_OSC;
 
+                            // used later for MIDI OFF MESSAGE
+                            int midi_note_on_time = mixr->timing_info.midi_tick;
+
                             if (action->type ==
                                 AudioAction::MIDI_EVENT_ADD_DELAYED)
                             {
@@ -974,13 +972,19 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                     int delay_time = delay_time_obj->value_;
                                     int delay_tick =
                                         (mixr->timing_info.midi_tick +
-                                         delay_time) %
-                                        PPBAR;
+                                         delay_time);
+
+                                    // this is delayed - save for OFF EVENT
+                                    // below
+                                    midi_note_on_time = delay_tick;
+
                                     midi_event event = new_midi_event(
                                         MIDI_ON, midinum, velocity);
                                     event.delete_after_use = true;
 
-                                    sg->addDelayedEvent(event, delay_tick);
+                                    auto ev =
+                                        DelayedMidiEvent(delay_tick, event, sg);
+                                    mixr->_action_items.push_back(ev);
                                 }
                                 else
                                 {
@@ -993,51 +997,24 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             {
 
                                 sg->noteOn(event_on);
-
-                                int note_duration_ms = sg->note_duration_ms_;
-                                int duration_in_midi_ticks =
-                                    note_duration_ms /
-                                    mixr->timing_info.ms_per_midi_tick;
-                                int midi_off_tick =
-                                    (mixr->timing_info.midi_tick +
-                                     duration_in_midi_ticks) %
-                                    PPBAR;
-
-                                midi_event event_off =
-                                    new_midi_event(MIDI_OFF, midinum, velocity);
-                                event_off.delete_after_use = true;
-                                sg->addDelayedEvent(event_off, midi_off_tick);
                             }
-                        }
-                    }
-                }
-            }
-            else if (action->type == AudioAction::MIDI_EVENT_CLEAR)
-            {
-                // args[0] is sound generator
-                auto args = action->args;
-                int args_size = args.size();
-                if (args_size == 2)
-                {
-                    auto soundgen =
-                        std::dynamic_pointer_cast<object::SoundGenerator>(
-                            args[0]);
-                    if (soundgen)
-                    {
-                        if (mixer_is_valid_soundgen_num(mixr,
-                                                        soundgen->soundgen_id_))
-                        {
-                            auto sg =
-                                mixr->sound_generators_[soundgen->soundgen_id_];
-                            auto int_object =
-                                std::dynamic_pointer_cast<object::Number>(
-                                    args[1]);
 
-                            if (!int_object)
-                                return;
+                            int note_duration_ms = sg->note_duration_ms_;
+                            int duration_in_midi_ticks =
+                                note_duration_ms /
+                                mixr->timing_info.ms_per_midi_tick;
 
-                            auto start_idx = int_object->value_;
-                            sg->clearQueue(start_idx);
+                            int midi_off_tick =
+                                midi_note_on_time + duration_in_midi_ticks;
+
+                            midi_event event_off =
+                                new_midi_event(MIDI_OFF, midinum, velocity);
+
+                            event_off.delete_after_use = true;
+                            auto ev =
+                                DelayedMidiEvent(midi_off_tick, event_off, sg);
+
+                            mixr->_action_items.push_back(ev);
                         }
                     }
                 }
@@ -1076,7 +1053,10 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                         midi_event event =
                             new_midi_event(MIDI_PITCHBEND, param_val * 10, 0);
                         event.delete_after_use = true;
-                        sg->addDelayedEvent(event, action->delayed_by);
+
+                        mixr->_action_items.push_back(DelayedMidiEvent(
+                            mixr->timing_info.midi_tick + action->delayed_by,
+                            event, sg));
                         return;
                     }
                     if (action->param_name == "volume")
@@ -1210,4 +1190,24 @@ void mixr_add_file_to_monitor(mixer *mixr, std::string filepath)
 {
     mixr->file_monitors.push_back(
         file_monitor{.function_file_filepath = filepath});
+}
+
+void mixer::CheckForDelayedEvents()
+{
+    auto it = _action_items.begin();
+    while (it != _action_items.end())
+    {
+        if (it->target_tick == timing_info.midi_tick)
+        {
+            // TODO - push to action queue not call function
+            if (it->sg)
+                it->sg->parseMidiEvent(it->event, timing_info);
+            // `erase()` invalidates the iterator, use returned iterator
+            it = _action_items.erase(it);
+        }
+        else
+        {
+            ++it;
+        }
+    }
 }

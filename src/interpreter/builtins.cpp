@@ -41,7 +41,6 @@ bool ShouldIgnore(std::string filename)
     {
         return false;
     }
-    std::cout << "IGNORING " << filename << std::endl;
     return true;
 }
 } // namespace
@@ -243,6 +242,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                       return evaluator::NULLL;
                   })},
+    {"timing_info", std::make_shared<object::BuiltIn>(
+                        [](std::vector<std::shared_ptr<object::Object>> args)
+                            -> std::shared_ptr<object::Object>
+                        {
+                            mixer_print_timing_info(mixr);
+                            return evaluator::NULLL;
+                        })},
     {"reverse",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> input)
@@ -512,7 +518,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"SetProg",
+    {"setProg",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -530,14 +536,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"ProgChord", std::make_shared<object::BuiltIn>(
+    {"progChord", std::make_shared<object::BuiltIn>(
                       [](std::vector<std::shared_ptr<object::Object>> args)
                           -> std::shared_ptr<object::Object>
                       {
                           mixer_next_chord(mixr);
                           return evaluator::NULLL;
                       })},
-    {"Monitor",
+    {"monitor",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -545,7 +551,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              int args_size = args.size();
              if (args_size == 1)
              {
-                 std::cout << "YOIMPORT\n";
                  std::shared_ptr<object::String> filename =
                      std::dynamic_pointer_cast<object::String>(args[0]);
                  auto cwd = fs::current_path();
@@ -560,7 +565,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                            << args_size << std::endl;
              return evaluator::NULLL;
          })},
-    {"LoadPreset",
+    {"loadPreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -576,7 +581,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"SavePreset",
+    {"savePreset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -592,7 +597,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"Rand",
+    {"rand",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -765,8 +770,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                          if (ShouldIgnore(base_filename))
                              continue;
-                         std::cout << "BASE FILENAME:" << base_filename
-                                   << std::endl;
 
                          std::string::size_type const dot(
                              base_filename.find_last_of('.'));

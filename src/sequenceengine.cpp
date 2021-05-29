@@ -20,12 +20,6 @@ const char *s_arp_speed[] = {"32", "24", "16", "12", "8", "6", "4", "3"};
 
 extern mixer *mixr;
 
-void sequence_engine_add_temporal_event(sequenceengine *engine, int midi_tick,
-                                        midi_event ev)
-{
-    midi_pattern_add_event(engine->temporal_events, midi_tick, ev);
-}
-
 bool sequence_engine_list_presets(unsigned int synthtype)
 {
     std::cout << "IT ME!\n";
@@ -68,9 +62,4 @@ bool sequence_engine_list_presets(unsigned int synthtype)
     fclose(presetzzz);
 
     return true;
-}
-
-void sequence_engine_clear_events_from(sequenceengine *self, int start_idx)
-{
-    midi_pattern_clear_events_from(self->temporal_events, start_idx);
 }

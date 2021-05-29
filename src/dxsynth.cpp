@@ -204,6 +204,7 @@ stereo_val dxsynth::genNext()
 void dxsynth::noteOn(midi_event ev)
 {
 
+    std::cout << "NOTE ON! " << ev.data1 << std::endl;
     bool steal_note = true;
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
@@ -212,6 +213,7 @@ void dxsynth::noteOn(midi_event ev)
             return; // should never happen
         if (!msv->m_voice.m_note_on)
         {
+            std::cout << "Found a voice to use:" << i << std::endl;
             dxsynth_increment_voice_timestamps(this);
             voice_note_on(&msv->m_voice, ev.data1, ev.data2,
                           get_midi_freq(ev.data1), m_last_note_frequency);
@@ -221,11 +223,13 @@ void dxsynth::noteOn(midi_event ev)
             break;
         }
     }
+    // std::cout << "STEAL NOTE! " << (steal_note ? "true" : "false") <<
+    // std::endl;
 
     if (steal_note)
     {
-        if (mixr->debug_mode)
-            printf("STEAL NOTE\n");
+        // if (mixr->debug_mode)
+        // std::cout << "STEAL NOTE\n";
         dxsynth_voice *msv = dxsynth_get_oldest_voice(this);
         if (msv)
         {
@@ -250,6 +254,7 @@ void dxsynth::allNotesOff()
 void dxsynth::noteOff(midi_event ev)
 {
 
+    std::cout << "NOTE OFF! " << ev.data1 << std::endl;
     for (int i = 0; i < MAX_DX_VOICES; i++)
     {
         dxsynth_voice *dxv = dxsynth_get_oldest_voice_with_note(this, ev.data1);

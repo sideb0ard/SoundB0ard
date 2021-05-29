@@ -969,7 +969,7 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
 
         if (!ExpectPeek(token::SLANG_IDENT))
         {
-            std::cerr << "btw - Nae IDENTs!\n";
+            // std::cerr << "btw - Nae IDENTs!\n";
             // return nullptr;
         }
         else

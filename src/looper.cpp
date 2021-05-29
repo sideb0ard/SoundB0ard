@@ -307,11 +307,6 @@ std::string looper::Status()
        << " mode:" << s_loop_mode_names[loop_mode_] << "(" << loop_mode_ << ")"
        << " step:" << step_mode << " len:" << loop_len << ANSI_COLOR_RESET;
 
-    for (int i = 0; i < PPBAR; i++)
-    {
-        if (engine.temporal_events[i].event_type)
-            std::cout << engine.temporal_events[i].event_type << std::endl;
-    }
     return ss.str();
 }
 std::string looper::Info()

@@ -69,6 +69,19 @@ struct file_monitor
     std::time_t function_file_filepath_last_write_time{0};
 };
 
+struct DelayedMidiEvent
+{
+    DelayedMidiEvent() = default;
+    DelayedMidiEvent(int target_tick, midi_event event,
+                     std::shared_ptr<SoundGenerator> sg)
+        : target_tick{target_tick}, event{event}, sg{sg}
+    {
+    }
+    int target_tick{0};
+    midi_event event{};
+    std::shared_ptr<SoundGenerator> sg{};
+};
+
 struct mixer
 {
 
@@ -84,6 +97,8 @@ struct mixer
     std::shared_ptr<SoundGenerator>
         sound_generators_[MAX_NUM_SOUND_GENERATORS] = {};
     std::atomic_int soundgen_num; // actual number of SGs
+
+    std::vector<DelayedMidiEvent> _action_items;
 
     AbletonLink *m_ableton_link;
 
@@ -131,6 +146,8 @@ struct mixer
     int prog_degrees_idx;
     unsigned int progression_type;
     bool should_progress_chords;
+
+    void CheckForDelayedEvents();
 };
 
 mixer *new_mixer(double output_latency);
