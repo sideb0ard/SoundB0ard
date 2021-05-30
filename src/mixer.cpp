@@ -36,7 +36,7 @@ extern Tsqueue<event_queue_item> process_event_queue;
 extern Tsqueue<std::string> repl_queue;
 extern Tsqueue<audio_action_queue_item> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
-extern Tsqueue<std::string> interpret_command_queue;
+extern Tsqueue<std::string> eval_command_queue;
 
 const char *key_names[] = {"C", "C_SHARP", "D", "D_SHARP", "E", "F", "F_SHARP",
                            "G", "G_SHARP", "A", "A_SHARP", "B"};
@@ -119,7 +119,7 @@ mixer *new_mixer(double output_latency)
     mixr->should_progress_chords = false;
 
     std::string contents = ReadFileContents(kStartupConfigFile);
-    interpret_command_queue.push(contents);
+    eval_command_queue.push(contents);
 
     return mixr;
 }
@@ -176,8 +176,7 @@ std::string mixer_status_env(mixer *mixr)
 
     ss << global_env->Debug();
 
-    std::unordered_map<std::string, int> soundgens =
-        global_env->GetSoundGenerators();
+    std::map<std::string, int> soundgens = global_env->GetSoundGenerators();
     for (auto &[var_name, sg_idx] : soundgens)
     {
         if (mixer_is_valid_soundgen_num(mixr, sg_idx))
@@ -213,6 +212,7 @@ std::string mixer_status_env(mixer *mixr)
 
 std::string mixer_status_sgz(mixer *mixr, bool all)
 {
+    std::cout << "MIXER STATUS SGZ!\n";
     std::stringstream ss;
     if (mixr->soundgen_num > 0)
     {
@@ -259,9 +259,10 @@ std::string mixer_status_sgz(mixer *mixr, bool all)
 
 void mixer_ps(mixer *mixr, bool all)
 {
+    std::cout << "MIXER_PS YOOOO " << (all ? "ALL" : "FALSE") << "\n";
     std::stringstream ss;
     ss << get_string_logo();
-    ss << mixer_status_mixr(mixr);
+    // ss << mixer_status_mixr(mixr);
     ss << mixer_status_env(mixr);
     ss << mixer_status_procz(mixr, all);
     ss << ANSI_COLOR_RESET;
@@ -859,6 +860,10 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                 mixer_ps(mixr, action->status_all);
             else if (action->type == AudioAction::HELP)
                 mixer_help(mixr);
+            else if (action->type == AudioAction::MONITOR)
+            {
+                mixr_add_file_to_monitor(mixr, action->filepath);
+            }
             else if (action->type == AudioAction::ADD)
             {
                 switch (action->soundgenerator_type)

@@ -25,7 +25,7 @@ namespace fs = std::filesystem;
 
 extern mixer *mixr;
 extern Tsqueue<audio_action_queue_item> audio_queue;
-extern Tsqueue<std::string> interpret_command_queue;
+extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
 extern siv::PerlinNoise perlinGenerator;
 
@@ -342,24 +342,24 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
     //         }
     //         return evaluator::NULLL;
     //     })},
-    {"MidiInit", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object>
-                     {
-                         (void)args;
-                         midi_launch_init(mixr);
-                         return evaluator::NULLL;
-                     })},
-    {"NoteOn", std::make_shared<object::BuiltIn>(
-                   [](std::vector<std::shared_ptr<object::Object>> args)
-                       -> std::shared_ptr<object::Object>
-                   {
-                       audio_action_queue_item action_req{
-                           .type = AudioAction::MIDI_EVENT_ADD, .args = args};
-                       audio_queue.push(action_req);
-                       return evaluator::NULLL;
-                   })},
-    {"SetPitch",
+    {"midi_init", std::make_shared<object::BuiltIn>(
+                      [](std::vector<std::shared_ptr<object::Object>> args)
+                          -> std::shared_ptr<object::Object>
+                      {
+                          (void)args;
+                          midi_launch_init(mixr);
+                          return evaluator::NULLL;
+                      })},
+    {"note_on", std::make_shared<object::BuiltIn>(
+                    [](std::vector<std::shared_ptr<object::Object>> args)
+                        -> std::shared_ptr<object::Object>
+                    {
+                        audio_action_queue_item action_req{
+                            .type = AudioAction::MIDI_EVENT_ADD, .args = args};
+                        audio_queue.push(action_req);
+                        return evaluator::NULLL;
+                    })},
+    {"set_pitch",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -397,47 +397,37 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"NoteOnAt", std::make_shared<object::BuiltIn>(
-                     [](std::vector<std::shared_ptr<object::Object>> args)
-                         -> std::shared_ptr<object::Object>
-                     {
-                         audio_action_queue_item action_req{
-                             .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
-                             .args = args};
-                         audio_queue.push(action_req);
-                         return evaluator::NULLL;
-                     })},
-    {"ClearQueue", std::make_shared<object::BuiltIn>(
+    {"note_on_at", std::make_shared<object::BuiltIn>(
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object>
                        {
                            audio_action_queue_item action_req{
-                               .type = AudioAction::MIDI_EVENT_CLEAR,
+                               .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
                                .args = args};
                            audio_queue.push(action_req);
                            return evaluator::NULLL;
                        })},
-    {"Speed", std::make_shared<object::BuiltIn>(
+    {"speed", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object>
                   {
                       std::cout << "INBUILT SPEED CALLED!" << std::endl;
                       return evaluator::NULLL;
                   })},
-    {"AddFx", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
-                      -> std::shared_ptr<object::Object>
-                  {
-                      int args_size = args.size();
-                      if (args_size >= 2)
-                      {
-                          audio_action_queue_item action_req{
-                              .type = AudioAction::ADD_FX, .args = args};
-                          audio_queue.push(action_req);
-                      }
-                      return evaluator::NULLL;
-                  })},
-    {"Compose",
+    {"add_fx", std::make_shared<object::BuiltIn>(
+                   [](std::vector<std::shared_ptr<object::Object>> args)
+                       -> std::shared_ptr<object::Object>
+                   {
+                       int args_size = args.size();
+                       if (args_size >= 2)
+                       {
+                           audio_action_queue_item action_req{
+                               .type = AudioAction::ADD_FX, .args = args};
+                           audio_queue.push(action_req);
+                       }
+                       return evaluator::NULLL;
+                   })},
+    {"compose",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -485,22 +475,22 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"GimmeNotes", std::make_shared<object::BuiltIn>(
-                       [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object>
-                       {
-                           auto melody_obj = std::make_shared<object::Array>(
-                               std::vector<std::shared_ptr<object::Object>>());
-                           auto notes =
-                               interpreter_sound_cmds::GetNotesInCurrentChord();
-                           for (size_t i = 0; i < notes.size(); i++)
-                           {
-                               melody_obj->elements_.push_back(
-                                   std::make_shared<object::String>(notes[i]));
-                           }
-                           return melody_obj;
-                       })},
-    {"SetKey",
+    {"gimme_notes",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             auto melody_obj = std::make_shared<object::Array>(
+                 std::vector<std::shared_ptr<object::Object>>());
+             auto notes = interpreter_sound_cmds::GetNotesInCurrentChord();
+             for (size_t i = 0; i < notes.size(); i++)
+             {
+                 melody_obj->elements_.push_back(
+                     std::make_shared<object::String>(notes[i]));
+             }
+             return melody_obj;
+         })},
+    {"set_key",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -518,7 +508,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"setProg",
+    {"set_prog",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -536,13 +526,13 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"progChord", std::make_shared<object::BuiltIn>(
-                      [](std::vector<std::shared_ptr<object::Object>> args)
-                          -> std::shared_ptr<object::Object>
-                      {
-                          mixer_next_chord(mixr);
-                          return evaluator::NULLL;
-                      })},
+    {"prog_chord", std::make_shared<object::BuiltIn>(
+                       [](std::vector<std::shared_ptr<object::Object>> args)
+                           -> std::shared_ptr<object::Object>
+                       {
+                           mixer_next_chord(mixr);
+                           return evaluator::NULLL;
+                       })},
     {"monitor",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -557,7 +547,10 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  std::string filepath =
                      cwd.generic_string() + "/" + filename->value_;
 
-                 mixr_add_file_to_monitor(mixr, filepath);
+                 // mixr_add_file_to_monitor(mixr, filepath);
+                 audio_action_queue_item action_req{
+                     .type = AudioAction::MONITOR, .filepath = filepath};
+                 audio_queue.push(action_req);
                  repl_queue.push("Monitoring " + filepath);
              }
              else
@@ -565,7 +558,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                            << args_size << std::endl;
              return evaluator::NULLL;
          })},
-    {"loadPreset",
+    {"load_preset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -581,7 +574,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"savePreset",
+    {"save_preset",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -642,7 +635,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
-    {"Perlin",
+    {"perlin",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -660,7 +653,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"Sin", std::make_shared<object::BuiltIn>(
+    {"sin", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
                     -> std::shared_ptr<object::Object>
                 {
@@ -679,7 +672,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
-    {"Map", std::make_shared<object::BuiltIn>(
+    {"map", std::make_shared<object::BuiltIn>(
                 [](std::vector<std::shared_ptr<object::Object>> args)
                     -> std::shared_ptr<object::Object>
                 {
@@ -709,7 +702,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
-    {"RandArray",
+    {"rand_array",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -746,7 +739,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"LoadDir",
+    {"load_dir",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
              -> std::shared_ptr<object::Object>
@@ -778,7 +771,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                          std::string cmd = "let " + file_without_extension +
                                            " = sample(" + pathname + ")";
-                         interpret_command_queue.push(cmd);
+                         eval_command_queue.push(cmd);
                      }
                  }
              }

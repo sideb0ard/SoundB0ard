@@ -221,9 +221,9 @@ std::string Environment::Debug()
     return ss.str();
 }
 
-std::unordered_map<std::string, int> Environment::GetSoundGenerators()
+std::map<std::string, int> Environment::GetSoundGenerators()
 {
-    std::unordered_map<std::string, int> soundgens;
+    std::map<std::string, int> soundgens;
     for (const auto &it : store_)
     {
         if (IsSoundGenerator(it.second->Type()))

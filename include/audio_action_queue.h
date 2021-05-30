@@ -6,23 +6,24 @@
 
 enum AudioAction
 {
-    NO_ACTION,
     ADD,
     ADD_FX,
     BPM,
-    INFO,
     HELP,
+    INFO,
     LOAD_PRESET,
-    MIDI_INIT,
     MIDI_EVENT_ADD,
     MIDI_EVENT_ADD_DELAYED,
     MIDI_EVENT_CLEAR,
+    MIDI_INIT,
+    MIXER_UPDATE,
+    MONITOR,
+    NO_ACTION,
     PREVIEW,
     RAND,
     SAVE_PRESET,
     STATUS,
     UPDATE,
-    MIXER_UPDATE,
 };
 
 struct audio_action_queue_item

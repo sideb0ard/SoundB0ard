@@ -25,7 +25,7 @@
 namespace fs = std::filesystem;
 
 extern mixer *mixr;
-extern Tsqueue<std::string> interpret_command_queue;
+extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
 
 extern char *key_names[NUM_KEYS];
@@ -69,7 +69,7 @@ int event_hook()
                                 {
                                     std::string contents = ReadFileContents(
                                         f.function_file_filepath);
-                                    interpret_command_queue.push(contents);
+                                    eval_command_queue.push(contents);
 
                                     std::cout << "UPdatin' "
                                               << f.function_file_filepath
@@ -119,7 +119,7 @@ void *loopy()
                 add_history(line);
                 strncpy(last_line, line, MAXLINE);
             }
-            interpret_command_queue.push(line);
+            eval_command_queue.push(line);
         }
         free(line);
     }

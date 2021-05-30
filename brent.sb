@@ -1,4 +1,4 @@
-#LoadDir("aesamples");
+load_dir("aesamples");
 
 
 let kick_gen = gen()
@@ -7,19 +7,19 @@ let kick_gen = gen()
   {
     let bdz = [SH09_KIK];
     let bx = 0;
-    let beat = RandBeat();
+    let beat = rand_beat();
     print("BEAT IS ", beat);
   }
   run()
   {
     if (count % 3 == 0) {
-      beat = RandBeat();
+      beat = rand_beat();
     }
 
     if (count % 8 < 7) {
       for (i = 0; i < 16; ++i) {
         if (beat[i] == 1) {
-          NoteOnAt(bdz[bx], 1, pp*i);
+          note_on_at(bdz[bx], 1, pp*i);
           if (rand(100) > 70) {
             bx = incr(bx, 0, len(bdz));
           }
@@ -47,7 +47,7 @@ let perc_gen = gen()
     }
     for (i = 0; i < 16; ++i) {
       if (pattern[i] < plen) {
-        NoteOnAt(percz[pattern[i]], 1, i*pp);
+        note_on_at(percz[pattern[i]], 1, i*pp);
       }
     }
     plen = incr(plen, 1, len(percz));
@@ -65,7 +65,7 @@ let noise_gen = gen()
   run()
   {
     if (count % 3 == 0) {
-      NoteOn(noizes[nidx], 1);
+      note_on(noizes[nidx], 1);
       nidx = incr(nidx, 0, len(noizes));
     }
   }
@@ -76,7 +76,7 @@ let melo_gen = gen()
   setup()
   {
     let notes = [23, 14, 19, 7, 2, 37];
-    let rhythm = RandBeat();
+    let rhythm = rand_beat();
   }
   run()
   {
@@ -84,7 +84,7 @@ let melo_gen = gen()
       for (i = 0; i < 16; ++i) {
         if (rhythm[i] == 1) {
           # print("MUSIC SENDING NOTE ON AT");
-          NoteOnAt(dxx, notes[rand(len(notes))], pp*i);
+          note_on_at(dxx, notes[rand(len(notes))], pp*i);
         }
       }
     }

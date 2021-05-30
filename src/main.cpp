@@ -35,7 +35,7 @@ extern mixer *mixr;
 
 Tsqueue<audio_action_queue_item> audio_queue;
 Tsqueue<int> audio_reply_queue; // for reply from adding SoundGenerator
-Tsqueue<std::string> interpret_command_queue;
+Tsqueue<std::string> eval_command_queue;
 Tsqueue<std::string> repl_queue;
 Tsqueue<event_queue_item> process_event_queue;
 
@@ -65,7 +65,7 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     return ret;
 }
 
-void Interpret(char *line, std::shared_ptr<object::Environment> env)
+void Eval(char *line, std::shared_ptr<object::Environment> env)
 {
     auto lex = std::make_shared<lexer::Lexer>();
     lex->ReadInput(line);
@@ -84,13 +84,13 @@ void Interpret(char *line, std::shared_ptr<object::Environment> env)
     }
 }
 
-void *command_queue_thread()
+void *eval_queue()
 {
-    while (auto cmd = interpret_command_queue.pop())
+    while (auto cmd = eval_command_queue.pop())
     {
         if (cmd)
         {
-            Interpret(cmd->data(), global_env);
+            Eval(cmd->data(), global_env);
         }
     }
     return nullptr;
@@ -200,14 +200,14 @@ int main()
         exit(-1);
     }
 
-    // Cmd loop
-    std::thread input_thread(loopy);
+    // REPL
+    std::thread repl_thread(loopy);
 
     // Processes
     std::thread worker_thread(process_worker_thread);
 
-    // Interpreter
-    std::thread command_thread(command_queue_thread);
+    // Eval loop
+    std::thread eval_thread(eval_queue);
 
     // OSC Server
     lo::ServerThread st(9000);
@@ -242,15 +242,19 @@ int main()
      *       handlers.
      */
     lo_server_thread_add_method(st, NULL, NULL, generic_handler, NULL);
-    st.add_method("noteOn", "si", [&received](lo_arg **argv, int) {
-        std::cout << "noteOn (" << (++received) << "): " << &argv[0]->s << " "
-                  << argv[1]->i << std::endl;
-        std::stringstream ss;
-        ss << "noteOn(" << &argv[0]->s << ", " << argv[1]->i << ");";
-        std::cout << "CMD is " << ss.str();
+    st.add_method("noteOn", "si",
+                  [&received](lo_arg **argv, int)
+                  {
+                      std::cout << "noteOn (" << (++received)
+                                << "): " << &argv[0]->s << " " << argv[1]->i
+                                << std::endl;
+                      std::stringstream ss;
+                      ss << "noteOn(" << &argv[0]->s << ", " << argv[1]->i
+                         << ");";
+                      std::cout << "CMD is " << ss.str();
 
-        interpret_command_queue.push(ss.str());
-    });
+                      eval_command_queue.push(ss.str());
+                  });
 
     /*
      * Start the server.
@@ -259,13 +263,13 @@ int main()
 
     //////////////// shutdown
 
-    input_thread.join();
+    repl_thread.join();
 
     process_event_queue.close();
     worker_thread.join();
 
-    interpret_command_queue.close();
-    command_thread.join();
+    eval_command_queue.close();
+    eval_thread.join();
 
     // all done, time to go home
     pa_teardown();

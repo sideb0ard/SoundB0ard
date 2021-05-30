@@ -22,7 +22,7 @@
 #include <pattern_parser/tokenizer.hpp>
 
 extern mixer *mixr;
-extern Tsqueue<std::string> interpret_command_queue;
+extern Tsqueue<std::string> eval_command_queue;
 extern std::shared_ptr<object::Environment> global_env;
 
 namespace
@@ -217,11 +217,11 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             if (e->value_ == "~") // skip blank markers
                                 continue;
                             std::stringstream ss;
-                            ss << "noteOn(" << e->value_ << ","
+                            ss << "note_on(" << e->value_ << ","
                                << /* midi middle C */ 60 << "," << e->velocity_
                                << "," << e->duration_ << ")";
 
-                            interpret_command_queue.push(ss.str());
+                            eval_command_queue.push(ss.str());
                         }
                     }
                     else if (target_type_ == ProcessPatternTarget::VALUES)
@@ -241,11 +241,11 @@ void Process::EventNotify(mixer_timing_info tinfo)
                                 }
 
                                 std::stringstream ss;
-                                ss << "noteOn(" << t << "," << midistring << ","
-                                   << e->velocity_ << "," << e->duration_
+                                ss << "note_on(" << t << "," << midistring
+                                   << "," << e->velocity_ << "," << e->duration_
                                    << ")";
 
-                                interpret_command_queue.push(ss.str());
+                                eval_command_queue.push(ss.str());
                             }
                         }
                     }
@@ -284,7 +284,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                             std::string new_cmd =
                                 ReplaceString(command_, "%", events[0]->value_);
 
-                            interpret_command_queue.push(new_cmd);
+                            eval_command_queue.push(new_cmd);
                         }
                     }
                 }
@@ -326,7 +326,7 @@ void Process::EventNotify(mixer_timing_info tinfo)
                 std::string new_cmd =
                     ReplaceString(command_, "%", std::to_string(current_val_));
 
-                interpret_command_queue.push(new_cmd);
+                eval_command_queue.push(new_cmd);
             }
         }
     }
