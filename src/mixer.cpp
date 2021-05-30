@@ -262,7 +262,7 @@ void mixer_ps(mixer *mixr, bool all)
     std::cout << "MIXER_PS YOOOO " << (all ? "ALL" : "FALSE") << "\n";
     std::stringstream ss;
     ss << get_string_logo();
-    // ss << mixer_status_mixr(mixr);
+    ss << mixer_status_mixr(mixr);
     ss << mixer_status_env(mixr);
     ss << mixer_status_procz(mixr, all);
     ss << ANSI_COLOR_RESET;

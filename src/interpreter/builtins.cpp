@@ -486,7 +486,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              for (size_t i = 0; i < notes.size(); i++)
              {
                  melody_obj->elements_.push_back(
-                     std::make_shared<object::String>(notes[i]));
+                     std::make_shared<object::Number>(notes[i]));
              }
              return melody_obj;
          })},

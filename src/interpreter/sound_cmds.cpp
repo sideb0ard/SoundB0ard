@@ -118,7 +118,7 @@ std::vector<std::vector<std::string>> GenerateMelody()
     return melody;
 }
 
-std::vector<std::string> GetNotesInCurrentChord()
+std::vector<int> GetNotesInCurrentChord()
 {
     std::vector<std::string> notes;
 
@@ -129,10 +129,10 @@ std::vector<std::string> GetNotesInCurrentChord()
     auto notes_in_chord =
         GetMidiNotesInChord(root_note, get_chord_type(my_info.chord));
 
-    for (auto n : notes_in_chord)
-        notes.push_back(GetNoteFromMidiNum(n));
+    // for (auto n : notes_in_chord)
+    // notes.push_back(GetNoteFromMidiNum(n));
 
-    return notes;
+    return notes_in_chord;
 }
 
 } // namespace interpreter_sound_cmds
