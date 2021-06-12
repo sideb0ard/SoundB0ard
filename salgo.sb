@@ -1,0 +1,29 @@
+let notz_gen = gen()
+{
+  setup()
+  {
+    let numz = [44, 43, 47];
+    let numz_idx = 0;
+    let drumz = [bd];
+    let dix = 0;
+    let delay_enum = 0;
+  }
+  run()
+  {
+    let beatz = rand_beat();
+
+    print("BEATZ:", beatz);
+    for (i = 0; i < 16; ++i) {
+      if ( beatz[i] == 1) {
+        print("BEAT YO!");
+        if (count % 3 == 0) {
+          note_on_at(dxx, numz[numz_idx], i * pp);
+          numz_idx = incr(numz_idx, 0, len(numz));
+        }
+        note_on_at(drumz[dix], 1, i * pp);
+        dix = incr(dix, 0, len(drumz));
+      }
+      set bd:fx0:synclen delay_enum;
+      delay_enum = incr(delay_enum, 0, 3);
+    }
+
