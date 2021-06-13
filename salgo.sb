@@ -1,29 +1,58 @@
-let notz_gen = gen()
+
+
+
+
+let euclgen = gen()
 {
   setup()
   {
-    let numz = [44, 43, 47];
-    let numz_idx = 0;
-    let drumz = [bd];
-    let dix = 0;
-    let delay_enum = 0;
+    let bidx = 3;
+    let tresillo = bjork(3, 8);
+    let inv = invert(tresillo);
+    let cinq = bjork(5, 8);
+    let ppe = 3840 / 8;
+
+    let vel = 128;
+
+    let inz = [bd, hh];
+    let inzx = 0;
+
+    let pitchz = [1, 2, 1.2, 0.7, 1.5];
+    let pix = 0;
   }
   run()
   {
-    let beatz = rand_beat();
-
-    print("BEATZ:", beatz);
-    for (i = 0; i < 16; ++i) {
-      if ( beatz[i] == 1) {
-        print("BEAT YO!");
-        if (count % 3 == 0) {
-          note_on_at(dxx, numz[numz_idx], i * pp);
-          numz_idx = incr(numz_idx, 0, len(numz));
-        }
-        note_on_at(drumz[dix], 1, i * pp);
-        dix = incr(dix, 0, len(drumz));
+    #print("TRES", tresillo);
+    #print("INV", inv);
+    for (i = 0; i < 8; ++i) {
+      if (tresillo[i] == 1) {
+        # print("PLAY", ppe * i);
+        note_on_at(bd, 1, ppe * i, vel);
       }
-      set bd:fx0:synclen delay_enum;
-      delay_enum = incr(delay_enum, 0, 3);
+      if (inv[i] == 1) {
+        note_on_at(hh, 20, ppe * i, vel);
+        note_on_at(dxx, 20, ppe * i, vel);
+      }
     }
+
+    if (count % 3 == 0) {
+      tresillo = rotate(tresillo, 3);
+      inv = invert(tresillo);
+
+      vel = vel + 10;
+      if (vel > 128) {
+        vel = 74;
+      }
+      set_pitch(inz[inzx], pitchz[pix]);
+      inzx = incr(inzx, 0, len(inz));
+      pix = incr(pix, 0, len(pitchz));
+    }
+
+    if (count % 4 == 0) {
+      bidx = incr(bidx, 3, 7);
+      tresillo = bjork(bidx, 8);
+      inv = invert(tresillo);
+    }
+  }
+}
 

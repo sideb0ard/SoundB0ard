@@ -321,6 +321,47 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
              return evaluator::NULLL;
          })},
+    {"invert",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> input)
+             -> std::shared_ptr<object::Object>
+         {
+             if (input.size() != 1)
+                 return evaluator::NewError(
+                     "`invert` requires a single args - an array");
+
+             std::shared_ptr<object::Array> array_obj =
+                 std::dynamic_pointer_cast<object::Array>(input[0]);
+             if (array_obj)
+             {
+                 auto return_array = std::make_shared<object::Array>(
+                     std::vector<std::shared_ptr<object::Object>>());
+
+                 for (auto e : array_obj->elements_)
+                 {
+                     std::shared_ptr<object::Number> num_obj =
+                         std::dynamic_pointer_cast<object::Number>(e);
+                     if (num_obj)
+                     {
+                         // std::cout << "VAL:" << num_obj->value_ << std::endl;
+                         // std::cout << "NOTVAL:" << !num_obj->value_
+                         //          << std::endl;
+                         auto new_num_obj =
+                             std::make_shared<object::Number>(!num_obj->value_);
+                         return_array->elements_.push_back(new_num_obj);
+                     }
+                     else
+                     {
+                         auto new_num_obj = std::make_shared<object::Number>(0);
+                         return_array->elements_.push_back(new_num_obj);
+                     }
+                 }
+
+                 return return_array;
+             }
+
+             return evaluator::NULLL;
+         })},
     // TODO - fix for many synth types
     //{"keys",
     // std::make_shared<object::BuiltIn>(

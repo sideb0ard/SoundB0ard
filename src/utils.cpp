@@ -70,7 +70,6 @@ void print_vec_of_vec(std::vector<std::vector<int>> &vec)
 {
     for (auto s : vec)
     {
-        std::cout << "VECTOR: ";
         for (auto n : s)
             std::cout << n;
         std::cout << std::endl;
@@ -1077,8 +1076,8 @@ std::vector<int> GenerateBjork(int num_pulses, int seq_length)
     for (int i = 0; i < seq_length - num_pulses; i++)
         _remainder.push_back(std::vector<int>(1, 0));
 
-    print_vec_of_vec(_seqs);
-    print_vec_of_vec(_remainder);
+    // print_vec_of_vec(_seqs);
+    // print_vec_of_vec(_remainder);
 
     bjork(_seqs, _remainder);
 
