@@ -739,6 +739,51 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    {"bjork",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 2)
+             {
+                 auto num_pulses_num =
+                     std::dynamic_pointer_cast<object::Number>(args[0]);
+                 auto seq_length_num =
+                     std::dynamic_pointer_cast<object::Number>(args[1]);
+                 if (num_pulses_num && seq_length_num)
+                 {
+                     auto return_array = std::make_shared<object::Array>(
+                         std::vector<std::shared_ptr<object::Object>>());
+
+                     int num_pulses = num_pulses_num->value_;
+                     int seq_length = seq_length_num->value_;
+
+                     // not dealing with error, just return empty
+                     if (num_pulses >= seq_length)
+                         return return_array;
+
+                     std::vector<int> bjork_num =
+                         GenerateBjork(num_pulses, seq_length);
+
+                     if (static_cast<int>(bjork_num.size()) < seq_length)
+                         return return_array;
+
+                     for (int i = 0; i < seq_length; i++)
+                     {
+                         std::shared_ptr<object::Number> num_obj;
+                         if (bjork_num[i] == 1)
+                             num_obj = std::make_shared<object::Number>(1);
+                         else
+                             num_obj = std::make_shared<object::Number>(0);
+
+                         return_array->elements_.push_back(num_obj);
+                     }
+                     return return_array;
+                 }
+             }
+             return evaluator::NULLL;
+         })},
     {"load_dir",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)

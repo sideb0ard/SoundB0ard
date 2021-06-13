@@ -79,3 +79,5 @@ uint16_t mask_from_string(char *stringey_mask);
 bool IsDigit(char c);
 bool IsValidIdentifier(char c);
 bool IsBalanced(std::string &input);
+
+std::vector<int> GenerateBjork(int num_pulses, int seq_length);

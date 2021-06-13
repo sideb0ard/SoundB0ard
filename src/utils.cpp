@@ -36,6 +36,48 @@ const double blep_table_center = 4096 / 2.0 - 1;
 #define EXTRACT_BITS(the_val, bits_start, bits_len)                            \
     ((the_val >> (bits_start - 1)) & ((1 << bits_len) - 1))
 
+namespace
+{
+void bjork(std::vector<std::vector<int>> &seqs,
+           std::vector<std::vector<int>> &remainders)
+{
+    int i = 0;
+    auto r_it = remainders.begin();
+    while (r_it != remainders.end())
+    {
+        i = 0;
+        for (auto &s : seqs)
+        {
+            s.insert(s.end(), r_it->begin(), r_it->end());
+            r_it = remainders.erase(r_it);
+            if (r_it == remainders.end())
+            {
+                break;
+            }
+            i++;
+        }
+    }
+    int new_idx = i + 1;
+    std::copy(seqs.begin() + new_idx, seqs.end(),
+              std::back_inserter(remainders));
+    seqs.erase(seqs.begin() + new_idx, seqs.end());
+
+    if (remainders.size() > 1)
+        bjork(seqs, remainders);
+}
+
+void print_vec_of_vec(std::vector<std::vector<int>> &vec)
+{
+    for (auto s : vec)
+    {
+        std::cout << "VECTOR: ";
+        for (auto n : s)
+            std::cout << n;
+        std::cout << std::endl;
+    }
+}
+} // namespace
+
 audio_buffer_details import_file_contents(double **buffer, char *filename)
 {
     SNDFILE *snd_file;
@@ -1021,4 +1063,36 @@ void str_upper(std::string &data)
 void str_lower(std::string &data)
 {
     std::for_each(data.begin(), data.end(), [](char &c) { c = ::tolower(c); });
+}
+
+std::vector<int> GenerateBjork(int num_pulses, int seq_length)
+{
+    if (!num_pulses)
+        return std::vector(seq_length, 0);
+
+    std::vector<std::vector<int>> _seqs;
+    for (int i = 0; i < num_pulses; i++)
+        _seqs.push_back(std::vector<int>(1, 1));
+    std::vector<std::vector<int>> _remainder;
+    for (int i = 0; i < seq_length - num_pulses; i++)
+        _remainder.push_back(std::vector<int>(1, 0));
+
+    print_vec_of_vec(_seqs);
+    print_vec_of_vec(_remainder);
+
+    bjork(_seqs, _remainder);
+
+    std::vector<int> bjorks;
+    for (auto s : _seqs)
+    {
+        for (auto n : s)
+            bjorks.push_back(n);
+    }
+    for (auto r : _remainder)
+    {
+        for (auto n : r)
+            bjorks.push_back(n);
+    }
+
+    return bjorks;
 }
