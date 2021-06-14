@@ -780,6 +780,23 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
+    {"notes", std::make_shared<object::BuiltIn>(
+                  [](std::vector<std::shared_ptr<object::Object>> args)
+                      -> std::shared_ptr<object::Object>
+                  {
+                      auto return_array = std::make_shared<object::Array>(
+                          std::vector<std::shared_ptr<object::Object>>());
+                      std::vector<int> notez =
+                          interpreter_sound_cmds::GetNotesInCurrentKey();
+
+                      for (int i = 0; i < notez.size(); i++)
+                      {
+
+                          return_array->elements_.push_back(
+                              std::make_shared<object::Number>(notez[i]));
+                      }
+                      return return_array;
+                  })},
     {"bjork",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -812,13 +829,14 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
 
                      for (int i = 0; i < seq_length; i++)
                      {
-                         std::shared_ptr<object::Number> num_obj;
-                         if (bjork_num[i] == 1)
-                             num_obj = std::make_shared<object::Number>(1);
-                         else
-                             num_obj = std::make_shared<object::Number>(0);
+                         // std::shared_ptr<object::Number> num_obj;
+                         // if (bjork_num[i] == 1)
+                         //    num_obj = std::make_shared<object::Number>(1);
+                         // else
+                         //    num_obj = std::make_shared<object::Number>(0);
 
-                         return_array->elements_.push_back(num_obj);
+                         return_array->elements_.push_back(
+                             std::make_shared<object::Number>(bjork_num[i]));
                      }
                      return return_array;
                  }

@@ -118,6 +118,23 @@ std::vector<std::vector<std::string>> GenerateMelody()
     return melody;
 }
 
+std::vector<int> GetNotesInCurrentKey()
+{
+    std::vector<int> notes;
+
+    mixer_timing_info my_info = mixr->timing_info;
+
+    notes.push_back(my_info.key);
+    notes.push_back(my_info.key + 2);
+    notes.push_back(my_info.key + 4);
+    notes.push_back(my_info.key + 5);
+    notes.push_back(my_info.key + 7);
+    notes.push_back(my_info.key + 9);
+    notes.push_back(my_info.key + 11);
+
+    return notes;
+}
+
 std::vector<int> GetNotesInCurrentChord()
 {
     std::vector<std::string> notes;

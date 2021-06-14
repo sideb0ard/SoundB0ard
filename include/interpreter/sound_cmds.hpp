@@ -17,5 +17,6 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args);
 std::vector<std::vector<std::string>> GenerateMelody();
 
 std::vector<int> GetNotesInCurrentChord();
+std::vector<int> GetNotesInCurrentKey();
 
 } // namespace interpreter_sound_cmds
