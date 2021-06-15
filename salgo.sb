@@ -1,7 +1,7 @@
 
 let riff = fn()
 {
-  let valid_notes = notes();
+  let valid_notes = notes_in_key();
   #print("VALLEYNOTES:", valid_notes);
   let beat = bjork(rand(11), 16);
   for ( i = 0; i < 16; ++i) {
@@ -42,6 +42,48 @@ let nn_gen = gen()
   }
 }
 
+let arp_play = fn(sound_generator_target, root_note, speed, chord_type)
+{
+  let pulseper = 3860 / speed;
+  let notes = notes_in_chord(root_note, chord_type);
+  let notesidx = 0;
+
+  for (i = 0; i < speed; ++i) {
+    note_on_at(sound_generator_target, notes[notesidx], i*pulseper);
+    notesidx = incr(notesidx, 0, len(notes));
+  }
+}
+
+let arp_gen = gen()
+{
+  setup()
+  {
+    # I-V-vi-IV
+    let chordz = [ 0, 5, 4, 6];
+    let chidx = 0;
+
+    let arp_speeds = [8, 4, 2];
+    let arp_idx = 0;
+  }
+  run()
+  {
+    let chord_type = 0;
+    if (chordz[chidx] == 4) {
+      chord_type = 1;
+    }
+
+    arp_play(dxx, chordz[chidx], arp_speeds[arp_idx], chord_type);
+
+    if (count % 3 == 0) {
+      if (rand(100) > 60) {
+        chidx = incr(chidx, 0, len(chordz));
+      }
+    }
+    if (count % 4 == 0) {
+      arp_idx = incr(arp_idx, 0, len(arp_speeds));
+    }
+  }
+}
 
 
 let euclgen = gen()

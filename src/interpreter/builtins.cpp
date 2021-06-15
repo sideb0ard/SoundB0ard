@@ -780,23 +780,54 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"notes", std::make_shared<object::BuiltIn>(
-                  [](std::vector<std::shared_ptr<object::Object>> args)
-                      -> std::shared_ptr<object::Object>
-                  {
-                      auto return_array = std::make_shared<object::Array>(
-                          std::vector<std::shared_ptr<object::Object>>());
-                      std::vector<int> notez =
-                          interpreter_sound_cmds::GetNotesInCurrentKey();
+    {"notes_in_key",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             auto return_array = std::make_shared<object::Array>(
+                 std::vector<std::shared_ptr<object::Object>>());
+             std::vector<int> notez =
+                 interpreter_sound_cmds::GetNotesInCurrentKey();
 
-                      for (int i = 0; i < notez.size(); i++)
-                      {
+             for (int i = 0; i < notez.size(); i++)
+             {
 
-                          return_array->elements_.push_back(
-                              std::make_shared<object::Number>(notez[i]));
-                      }
-                      return return_array;
-                  })},
+                 return_array->elements_.push_back(
+                     std::make_shared<object::Number>(notez[i]));
+             }
+             return return_array;
+         })},
+    {"notes_in_chord",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 2)
+             {
+                 auto root_note =
+                     std::dynamic_pointer_cast<object::Number>(args[0]);
+
+                 // can be MAJOR (0), MINOR (1) or DIMINISHED (2)
+                 auto chord_type =
+                     std::dynamic_pointer_cast<object::Number>(args[1]);
+
+                 auto return_array = std::make_shared<object::Array>(
+                     std::vector<std::shared_ptr<object::Object>>());
+                 std::vector<int> notez =
+                     GetMidiNotesInChord(root_note->value_, chord_type->value_);
+
+                 for (int i = 0; i < notez.size(); i++)
+                 {
+
+                     return_array->elements_.push_back(
+                         std::make_shared<object::Number>(notez[i]));
+                 }
+                 return return_array;
+             }
+             return evaluator::NULLL;
+         })},
     {"bjork",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
