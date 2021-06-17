@@ -1,0 +1,37 @@
+
+let add_fn = fn(val, num_to_add)
+{
+  return val + num_to_add;
+}
+
+let add_fiv = fn(val){
+  return add_fn(val, 5);
+}
+
+let bassrrr = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    if ( count % 2 == 0) {
+      play_array(dxx, rf);
+    }
+    if (count % 3 == 0 ) {
+      rf = riff();
+    }
+  }
+}
+
+let mooggen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+
+  }
+}
+

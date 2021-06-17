@@ -39,6 +39,44 @@ let distrhythms_string = gen()
   }
 }
 
+let riff = fn()
+{
+  let valid_notes = notes_in_key();
+  #print("VALLEYNOTES:", valid_notes);
+  let beat = bjork(rand(11), 16);
+  for ( i = 0; i < 16; ++i) {
+    if (beat[i] == 1) {
+      beat[i] = valid_notes[rand(len(valid_notes))] + 12;
+    }
+  }
+  return beat;
+}
+
+let map = fn(arrray, fooonction)
+{
+  let mapduh = [];
+  for (i = 0; i < len(arrray); ++i)
+  {
+    mapduh = push(mapduh, fooonction(arrray[i]));
+  }
+  return mapduh;
+}
+
+
+let play_array = fn(sound_generator_target, note_seq)
+{
+  let nlen = len(note_seq);
+  let pulses_per = 3840 / nlen;
+  # print("NLEN", nlen, " PULSESPER:", pulses_per);
+
+  for (i = 0; i < nlen; ++i) {
+    if (note_seq[i] > 0) {
+      note_on_at(sound_generator_target, note_seq[i], i * pulses_per);
+    }
+  }
+}
+
+
 let rand_beat = gen()
 {
   setup() {}
@@ -63,5 +101,6 @@ let countr = gen()
 
 p0 # countr ;
 
+# i.e. 3840 / 16 == 240 midi Pulses Per 16th
 let pp = 240;
 

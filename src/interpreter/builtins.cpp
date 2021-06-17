@@ -713,36 +713,36 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                     }
                     return evaluator::NULLL;
                 })},
-    {"map", std::make_shared<object::BuiltIn>(
-                [](std::vector<std::shared_ptr<object::Object>> args)
-                    -> std::shared_ptr<object::Object>
-                {
-                    int args_size = args.size();
-                    if (args_size == 5)
-                    {
-                        auto x =
-                            std::dynamic_pointer_cast<object::Number>(args[0]);
-                        auto min_in =
-                            std::dynamic_pointer_cast<object::Number>(args[1]);
-                        auto max_in =
-                            std::dynamic_pointer_cast<object::Number>(args[2]);
-                        auto min_out =
-                            std::dynamic_pointer_cast<object::Number>(args[3]);
-                        auto max_out =
-                            std::dynamic_pointer_cast<object::Number>(args[4]);
-                        if (x && min_in && max_in && min_out && max_out)
-                        {
-                            auto ret_val = scaleybum(
-                                min_in->value_, max_in->value_, min_out->value_,
-                                max_out->value_, x->value_);
-                            auto number_obj =
-                                std::make_shared<object::Number>(ret_val);
+    {"scale",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             int args_size = args.size();
+             if (args_size == 5)
+             {
+                 auto x = std::dynamic_pointer_cast<object::Number>(args[0]);
+                 auto min_in =
+                     std::dynamic_pointer_cast<object::Number>(args[1]);
+                 auto max_in =
+                     std::dynamic_pointer_cast<object::Number>(args[2]);
+                 auto min_out =
+                     std::dynamic_pointer_cast<object::Number>(args[3]);
+                 auto max_out =
+                     std::dynamic_pointer_cast<object::Number>(args[4]);
+                 if (x && min_in && max_in && min_out && max_out)
+                 {
+                     auto ret_val =
+                         scaleybum(min_in->value_, max_in->value_,
+                                   min_out->value_, max_out->value_, x->value_);
+                     auto number_obj =
+                         std::make_shared<object::Number>(ret_val);
 
-                            return number_obj;
-                        }
-                    }
-                    return evaluator::NULLL;
-                })},
+                     return number_obj;
+                 }
+             }
+             return evaluator::NULLL;
+         })},
     {"rand_array",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
