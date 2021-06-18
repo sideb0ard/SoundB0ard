@@ -138,12 +138,11 @@ std::string mixer_status_mixr(mixer *mixr)
     << " phase:" << ANSI_COLOR_WHITE << data.phase << COOL_COLOR_GREEN
     << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
     << "::::::::::\n"
-    << ":::::::::: key:" << key_names[mixr->timing_info.key]
-    << " chord:" << key_names[mixr->timing_info.chord] // TODO - fix - this is wrong - its not the chord its the chord progression index
-    << " type:"<< chord_type_names[mixr->timing_info.chord_type]
-    << " octave:" << mixr->timing_info.octave << " bars_per_chord:"<< mixr->bars_per_chord
-    << " move:" << mixr->should_progress_chords << " prog:("<< mixr->progression_type << ")"
-    << s_progressions[mixr->progression_type] << "\n";
+    << ":::::::::: key:" << ANSI_COLOR_WHITE <<  key_names[mixr->timing_info.key] << COOL_COLOR_GREEN
+    << " type:"<< ANSI_COLOR_WHITE << chord_type_names[mixr->timing_info.chord_type] << COOL_COLOR_GREEN
+    << " octave:" << ANSI_COLOR_WHITE << mixr->timing_info.octave << COOL_COLOR_GREEN << " bars_per_chord:"<< ANSI_COLOR_WHITE << mixr->bars_per_chord << COOL_COLOR_GREEN
+    << " move:" << ANSI_COLOR_WHITE << mixr->should_progress_chords << COOL_COLOR_GREEN << " prog:("<< ANSI_COLOR_WHITE << mixr->progression_type << COOL_COLOR_GREEN << ")"
+    << ANSI_COLOR_WHITE << s_progressions[mixr->progression_type] << "\n";
     // clang-format on
 
     return ss.str();
@@ -174,7 +173,7 @@ std::string mixer_status_env(mixer *mixr)
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Env"
        << COOL_COLOR_GREEN << "]" << std::endl;
 
-    ss << global_env->Debug();
+    // ss << global_env->Debug();
 
     std::map<std::string, int> soundgens = global_env->GetSoundGenerators();
     for (auto &[var_name, sg_idx] : soundgens)
@@ -259,12 +258,11 @@ std::string mixer_status_sgz(mixer *mixr, bool all)
 
 void mixer_ps(mixer *mixr, bool all)
 {
-    std::cout << "MIXER_PS YOOOO " << (all ? "ALL" : "FALSE") << "\n";
     std::stringstream ss;
     ss << get_string_logo();
     ss << mixer_status_mixr(mixr);
     ss << mixer_status_env(mixr);
-    ss << mixer_status_procz(mixr, all);
+    // ss << mixer_status_procz(mixr, all);
     ss << ANSI_COLOR_RESET;
 
     if (all)
