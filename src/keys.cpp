@@ -16,7 +16,7 @@
 #include "mixer.h"
 #include "utils.h"
 
-extern mixer *mixr;
+extern Mixer *mixr;
 static int s_keys_octave = 2;
 
 void keys(int soundgen_num)

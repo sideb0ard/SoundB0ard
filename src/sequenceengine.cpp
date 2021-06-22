@@ -18,7 +18,7 @@ extern const compat_key_list compat_keys[NUM_KEYS];
 const char *s_arp_mode[] = {"UP", "DOWN", "UPDOWN", "RAND"};
 const char *s_arp_speed[] = {"32", "24", "16", "12", "8", "6", "4", "3"};
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 bool sequence_engine_list_presets(unsigned int synthtype)
 {

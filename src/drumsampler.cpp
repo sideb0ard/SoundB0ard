@@ -15,7 +15,7 @@
 #include <iostream>
 
 extern wchar_t *sparkchars;
-extern mixer *mixr;
+extern Mixer *mixr;
 
 DrumSampler::DrumSampler(char *filename)
 {

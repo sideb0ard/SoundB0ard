@@ -7,7 +7,7 @@
 #include "utils.h"
 
 extern char *state_strings;
-extern mixer *mixr;
+extern Mixer *mixr;
 
 // this must be a dupe - sure i already have this..
 const char *s_synth_waves[] = {"SINE", "SAW1",   "SAW2",  "SAW3",

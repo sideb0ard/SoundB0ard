@@ -5,7 +5,7 @@
 #include <fx/envelope.h>
 #include <mixer.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 const char *s_eg_state[] = {"OFF",     "ATTACK",  "DECAY",
                             "SUSTAIN", "RELEASE", "SHUTDOWN"};

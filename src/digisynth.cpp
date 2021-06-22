@@ -8,7 +8,7 @@
 
 #include <iostream>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 DigiSynth::DigiSynth(std::string sample_path)
 {

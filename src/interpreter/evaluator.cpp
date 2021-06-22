@@ -397,8 +397,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::HelpStatement>(node);
     if (help_expr)
     {
-        audio_action_queue_item action_req{.type = AudioAction::HELP};
-        audio_queue.push(action_req);
+        // get help
+        // push to repl queue
     }
 
     std::shared_ptr<ast::VolumeStatement> vol_stmt =

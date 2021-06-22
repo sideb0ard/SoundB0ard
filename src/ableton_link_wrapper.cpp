@@ -11,7 +11,7 @@
 #include "ableton_link_wrapper.h"
 #include "mixer.h"
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 const auto MICROS_PER_SAMPLE = 1e6 / (double)SAMPLE_RATE;
 const auto MIDI_TICK_FRAC_OF_BEAT = 1. / 960;

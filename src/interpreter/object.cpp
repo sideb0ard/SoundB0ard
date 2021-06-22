@@ -12,7 +12,7 @@
 #include <process.hpp>
 #include <tsqueue.hpp>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern Tsqueue<audio_action_queue_item> audio_queue;
 extern Tsqueue<int> audio_reply_queue;
 

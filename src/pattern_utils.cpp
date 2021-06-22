@@ -9,7 +9,7 @@
 #include <utils.h>
 #include <value_generator.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern const wchar_t *sparkchars;
 
 const int MAX_ADD_ATTEMPTS = 5;

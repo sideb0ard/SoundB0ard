@@ -10,7 +10,7 @@
 #include <mixer.h>
 #include <utils.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern const wchar_t *sparkchars;
 extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];

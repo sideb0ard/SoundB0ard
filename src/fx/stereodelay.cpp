@@ -7,7 +7,7 @@
 
 #include <fx/stereodelay.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 StereoDelay::StereoDelay(double duration) : m_delay_time_ms_{duration}
 {

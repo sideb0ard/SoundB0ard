@@ -31,7 +31,7 @@
 #include <process.hpp>
 #include <tsqueue.hpp>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 Tsqueue<audio_action_queue_item> audio_queue;
 Tsqueue<int> audio_reply_queue; // for reply from adding SoundGenerator
@@ -58,9 +58,9 @@ static int paCallback(const void *input_buffer, void *output_buffer,
     (void)status_flags;
 
     float *out = (float *)output_buffer;
-    mixer *mixr = (mixer *)user_data;
+    Mixer *mixr = (Mixer *)user_data;
 
-    int ret = mixer_gennext(mixr, out, frames_per_buffer);
+    int ret = mixr->GenNext(out, frames_per_buffer);
 
     return ret;
 }
@@ -174,7 +174,7 @@ int main()
     signal(SIGINT, SIG_IGN);
 
     double output_latency = pa_setup();
-    mixr = new_mixer(output_latency);
+    mixr = new Mixer(output_latency);
 
     PaStream *output_stream;
     PaError err;

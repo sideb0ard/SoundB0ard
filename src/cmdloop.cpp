@@ -24,7 +24,7 @@
 
 namespace fs = std::filesystem;
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
 

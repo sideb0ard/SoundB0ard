@@ -5,9 +5,9 @@
 #include <midi_cmds.h>
 #include <midimaaan.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
-void midi_launch_init(mixer *mixr)
+void midi_launch_init(Mixer *mixr)
 {
     if (!mixr->have_midi_controller)
     {
@@ -20,9 +20,9 @@ void midi_launch_init(mixer *mixr)
     }
 }
 
-void midi_set_destination(mixer *mixr, int soundgen_num)
+void midi_set_destination(Mixer *mixr, int soundgen_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+    if (mixr->IsValidSoundgenNum(soundgen_num))
     {
         if (mixr->sound_generators_[soundgen_num]->IsSynth())
         {

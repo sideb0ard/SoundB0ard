@@ -19,7 +19,7 @@
 #include "utils.h"
 //#include "lookuptables.h"
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern const wchar_t *sparkchars;
 extern char *strategies[NUM_STATEGIES];
 

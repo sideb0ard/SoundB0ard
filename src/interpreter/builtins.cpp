@@ -23,7 +23,7 @@
 
 namespace fs = std::filesystem;
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern Tsqueue<audio_action_queue_item> audio_queue;
 extern Tsqueue<std::string> eval_command_queue;
 extern Tsqueue<std::string> repl_queue;
@@ -246,7 +246,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                         [](std::vector<std::shared_ptr<object::Object>> args)
                             -> std::shared_ptr<object::Object>
                         {
-                            mixer_print_timing_info(mixr);
+                            mixr->PrintTimingInfo();
                             return evaluator::NULLL;
                         })},
     {"reverse",
@@ -544,7 +544,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      std::dynamic_pointer_cast<object::String>(args[0]);
                  if (str_obj)
                  {
-                     mixer_set_key(mixr, str_obj->value_);
+                     mixr->SetKey(str_obj->value_);
                  }
              }
              return evaluator::NULLL;
@@ -562,7 +562,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                      std::dynamic_pointer_cast<object::Number>(args[0]);
                  if (number)
                  {
-                     mixer_set_chord_progression(mixr, number->value_);
+                     mixr->SetChordProgression(number->value_);
                  }
              }
              return evaluator::NULLL;
@@ -571,7 +571,7 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                        [](std::vector<std::shared_ptr<object::Object>> args)
                            -> std::shared_ptr<object::Object>
                        {
-                           mixer_next_chord(mixr);
+                           mixr->NextChord();
                            return evaluator::NULLL;
                        })},
     {"monitor",

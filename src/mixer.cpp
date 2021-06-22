@@ -30,7 +30,7 @@
 #include <tsqueue.hpp>
 #include <utils.h>
 
-mixer *mixr;
+Mixer *mixr;
 extern std::shared_ptr<object::Environment> global_env;
 extern Tsqueue<event_queue_item> process_event_queue;
 extern Tsqueue<std::string> repl_queue;
@@ -63,92 +63,84 @@ const char *s_midi_control_type_name[] = {"NONE", "SYNTH", "DRUMSYNTH"};
 
 const char *s_sg_names[] = {"MOOG", "DIGI", "DX", "LOOP", "STEP", "STEP"};
 
-mixer *new_mixer(double output_latency)
+Mixer::Mixer(double output_latency)
 {
-    mixer *mixr = (mixer *)calloc(1, sizeof(mixer));
-    if (mixr == NULL)
-    {
-        printf("Nae mixer, fucked up!\n");
-        return NULL;
-    }
-    mixr->m_ableton_link = new_ableton_link(DEFAULT_BPM);
-    if (!mixr->m_ableton_link)
+    m_ableton_link = new_ableton_link(DEFAULT_BPM);
+    if (!m_ableton_link)
     {
         printf("Something fucked up with yer Ableton link, mate."
                " ye wanna get that seen tae\n");
-        return NULL;
+        return;
     }
-    link_set_latency(mixr->m_ableton_link, output_latency);
+    link_set_latency(m_ableton_link, output_latency);
 
-    mixr->volume = 0.7;
-    mixer_update_bpm(mixr, DEFAULT_BPM);
-    mixr->m_midi_controller_mode =
+    volume = 0.7;
+    UpdateBpm(DEFAULT_BPM);
+    m_midi_controller_mode =
         KEY_MODE_ONE; // dunno whether this should be on mixer or synth
-    mixr->midi_control_destination = NONE;
+    midi_control_destination = NONE;
 
     for (int i = 0; i < MAX_NUM_PROC; i++)
-        mixr->processes_[i] = std::make_shared<Process>();
-    mixr->proc_initialized_ = true;
+        processes_[i] = std::make_shared<Process>();
+    proc_initialized_ = true;
 
     // the lifetime of these booleans is a single sample
 
-    mixr->timing_info.cur_sample = -1;
-    mixr->timing_info.midi_tick = -1;
-    mixr->timing_info.sixteenth_note_tick = -1;
-    mixr->timing_info.loop_beat = 0;
-    mixr->timing_info.time_of_next_midi_tick = 0;
-    mixr->timing_info.has_started = false;
-    mixr->timing_info.is_midi_tick = true;
-    mixr->timing_info.is_start_of_loop = true;
-    mixr->timing_info.is_thirtysecond = true;
-    mixr->timing_info.is_twentyfourth = true;
-    mixr->timing_info.is_sixteenth = true;
-    mixr->timing_info.is_twelth = true;
-    mixr->timing_info.is_eighth = true;
-    mixr->timing_info.is_sixth = true;
-    mixr->timing_info.is_quarter = true;
-    mixr->timing_info.is_third = true;
+    timing_info.cur_sample = -1;
+    timing_info.midi_tick = -1;
+    timing_info.sixteenth_note_tick = -1;
+    timing_info.loop_beat = 0;
+    timing_info.time_of_next_midi_tick = 0;
+    timing_info.has_started = false;
+    timing_info.is_midi_tick = true;
+    timing_info.is_start_of_loop = true;
+    timing_info.is_thirtysecond = true;
+    timing_info.is_twentyfourth = true;
+    timing_info.is_sixteenth = true;
+    timing_info.is_twelth = true;
+    timing_info.is_eighth = true;
+    timing_info.is_sixth = true;
+    timing_info.is_quarter = true;
+    timing_info.is_third = true;
 
-    mixr->active_midi_soundgen_num = -99;
+    active_midi_soundgen_num = -99;
 
-    mixr->timing_info.key = C;
-    mixr->timing_info.octave = 3;
-    mixer_set_notes(mixr);
-    mixer_set_chord_progression(mixr, 1);
-    mixr->bars_per_chord = 4;
-    mixr->should_progress_chords = false;
+    timing_info.key = C;
+    timing_info.octave = 3;
+    SetNotes();
+    SetChordProgression(1);
+    bars_per_chord = 4;
+    should_progress_chords = false;
 
     std::string contents = ReadFileContents(kStartupConfigFile);
     eval_command_queue.push(contents);
-
-    return mixr;
 }
 
-std::string mixer_status_mixr(mixer *mixr)
+std::string Mixer::StatusMixr()
 {
-    LinkData data = link_get_timing_data_for_display(mixr->m_ableton_link);
+    LinkData data = link_get_timing_data_for_display(m_ableton_link);
     // clang-format off
     std::stringstream ss;
     ss << COOL_COLOR_GREEN << "\n"
     << "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::\n"
-    << ":::::::::: vol:" << ANSI_COLOR_WHITE << mixr->volume << COOL_COLOR_GREEN
+    << ":::::::::: vol:" << ANSI_COLOR_WHITE << volume << COOL_COLOR_GREEN
     << " bpm:" << ANSI_COLOR_WHITE <<data.tempo << COOL_COLOR_GREEN
     << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
     << " beat:" << ANSI_COLOR_WHITE << data.beat << COOL_COLOR_GREEN
     << " phase:" << ANSI_COLOR_WHITE << data.phase << COOL_COLOR_GREEN
     << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
     << "::::::::::\n"
-    << ":::::::::: key:" << ANSI_COLOR_WHITE <<  key_names[mixr->timing_info.key] << COOL_COLOR_GREEN
-    << " type:"<< ANSI_COLOR_WHITE << chord_type_names[mixr->timing_info.chord_type] << COOL_COLOR_GREEN
-    << " octave:" << ANSI_COLOR_WHITE << mixr->timing_info.octave << COOL_COLOR_GREEN << " bars_per_chord:"<< ANSI_COLOR_WHITE << mixr->bars_per_chord << COOL_COLOR_GREEN
-    << " move:" << ANSI_COLOR_WHITE << mixr->should_progress_chords << COOL_COLOR_GREEN << " prog:("<< ANSI_COLOR_WHITE << mixr->progression_type << COOL_COLOR_GREEN << ")"
-    << ANSI_COLOR_WHITE << s_progressions[mixr->progression_type] << "\n";
+    << ":::::::::: key:" << ANSI_COLOR_WHITE <<  key_names[timing_info.key] << COOL_COLOR_GREEN
+    << " type:"<< ANSI_COLOR_WHITE << chord_type_names[timing_info.chord_type] << COOL_COLOR_GREEN
+    << " octave:" << ANSI_COLOR_WHITE << timing_info.octave << COOL_COLOR_GREEN << " bars_per_chord:"<< ANSI_COLOR_WHITE << bars_per_chord << COOL_COLOR_GREEN
+    << " move:" << ANSI_COLOR_WHITE << should_progress_chords << COOL_COLOR_GREEN << " prog:("<< ANSI_COLOR_WHITE << progression_type << COOL_COLOR_GREEN << ")"
+    << ANSI_COLOR_WHITE << s_progressions[progression_type] << "\n";
     // clang-format on
 
     return ss.str();
 }
 
-std::string mixer_status_procz(mixer *mixr, bool all)
+std::string Mixer::StatusProcz(bool all)
 {
     std::stringstream ss;
     ss << COOL_COLOR_ORANGE << "\n[" << ANSI_COLOR_WHITE << "Procz"
@@ -156,7 +148,7 @@ std::string mixer_status_procz(mixer *mixr, bool all)
 
     for (int i = 0; i < MAX_NUM_PROC; i++)
     {
-        auto &p = mixr->processes_[i];
+        auto &p = processes_[i];
         if (p->active_ || all)
         {
             ss << ANSI_COLOR_WHITE << "p" << i << ANSI_COLOR_RESET << " "
@@ -167,7 +159,7 @@ std::string mixer_status_procz(mixer *mixr, bool all)
     return ss.str();
 }
 
-std::string mixer_status_env(mixer *mixr)
+std::string Mixer::StatusEnv()
 {
     std::stringstream ss;
     ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Env"
@@ -178,9 +170,9 @@ std::string mixer_status_env(mixer *mixr)
     std::map<std::string, int> soundgens = global_env->GetSoundGenerators();
     for (auto &[var_name, sg_idx] : soundgens)
     {
-        if (mixer_is_valid_soundgen_num(mixr, sg_idx))
+        if (IsValidSoundgenNum(sg_idx))
         {
-            auto sg = mixr->sound_generators_[sg_idx];
+            auto sg = sound_generators_[sg_idx];
             if (!sg->active)
                 continue;
             ss << ANSI_COLOR_WHITE << var_name << ANSI_COLOR_RESET " = "
@@ -209,35 +201,35 @@ std::string mixer_status_env(mixer *mixr)
     return ss.str();
 }
 
-std::string mixer_status_sgz(mixer *mixr, bool all)
+std::string Mixer::StatusSgz(bool all)
 {
     std::cout << "MIXER STATUS SGZ!\n";
     std::stringstream ss;
-    if (mixr->soundgen_num > 0)
+    if (soundgen_num > 0)
     {
         ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE
            << "sound generators" << COOL_COLOR_GREEN << "]\n";
-        for (int i = 0; i < mixr->soundgen_num; i++)
+        for (int i = 0; i < soundgen_num; i++)
         {
-            if (mixr->sound_generators_[i] != NULL)
+            if (sound_generators_[i] != NULL)
             {
-                if ((mixr->sound_generators_[i]->active &&
-                     mixr->sound_generators_[i]->GetVolume() > 0.0) ||
+                if ((sound_generators_[i]->active &&
+                     sound_generators_[i]->GetVolume() > 0.0) ||
                     all)
                 {
 
                     ss << COOL_COLOR_GREEN << "[" << ANSI_COLOR_WHITE << "s"
                        << i << COOL_COLOR_GREEN << "] " << ANSI_COLOR_RESET;
-                    ss << mixr->sound_generators_[i]->Info() << ANSI_COLOR_RESET
+                    ss << sound_generators_[i]->Info() << ANSI_COLOR_RESET
                        << "\n";
 
-                    if (mixr->sound_generators_[i]->effects_num > 0)
+                    if (sound_generators_[i]->effects_num > 0)
                     {
                         ss << "      ";
-                        for (int j = 0;
-                             j < mixr->sound_generators_[i]->effects_num; j++)
+                        for (int j = 0; j < sound_generators_[i]->effects_num;
+                             j++)
                         {
-                            Fx *f = mixr->sound_generators_[i]->effects[j];
+                            Fx *f = sound_generators_[i]->effects[j];
                             if (f->enabled_)
                                 ss << COOL_COLOR_YELLOW;
                             else
@@ -256,51 +248,51 @@ std::string mixer_status_sgz(mixer *mixr, bool all)
     return ss.str();
 }
 
-void mixer_ps(mixer *mixr, bool all)
+void Mixer::Ps(bool all)
 {
     std::stringstream ss;
     ss << get_string_logo();
-    ss << mixer_status_mixr(mixr);
-    ss << mixer_status_env(mixr);
+    ss << StatusMixr();
+    ss << StatusEnv();
     // ss << mixer_status_procz(mixr, all);
     ss << ANSI_COLOR_RESET;
 
     if (all)
-        ss << mixer_status_sgz(mixr, all);
+        ss << StatusSgz(all);
 
     repl_queue.push(ss.str());
 }
 
-void mixer_help(mixer *mixr)
+void Mixer::Help()
 {
     std::string strategy = oblique_strategy();
     repl_queue.push(strategy);
 }
 
-// static void mixer_print_notes(mixer *mixr)
+// static void mixer_print_notes()
 //{
 //    printf("Current KEY is %s. Compat NOTEs are:",
-//           key_names[mixr->timing_info.key]);
+//           key_names[timing_info.key]);
 //    // for (int i = 0; i < 6; ++i)
 //    //{
-//    //    printf("%s ", key_names[compat_keys[mixr->key][i]]);
+//    //    printf("%s ", key_names[compat_keys[key][i]]);
 //    //}
 //    printf("\n");
 //}
 
-void mixer_emit_event(mixer *mixr, broadcast_event event)
+void Mixer::EmitEvent(broadcast_event event)
 {
     event_queue_item ev;
     ev.type = Event::TIMING_EVENT;
-    ev.timing_info = mixr->timing_info;
+    ev.timing_info = timing_info;
     process_event_queue.push(ev);
 
-    for (int i = 0; i < mixr->soundgen_num; ++i)
+    for (int i = 0; i < soundgen_num; ++i)
     {
-        std::shared_ptr<SoundGenerator> sg = mixr->sound_generators_[i];
+        std::shared_ptr<SoundGenerator> sg = sound_generators_[i];
         if (sg != NULL)
         {
-            sg->eventNotify(event, mixr->timing_info);
+            sg->eventNotify(event, timing_info);
             if (sg->effects_num > 0)
             {
                 for (int j = 0; j < sg->effects_num; j++)
@@ -316,176 +308,173 @@ void mixer_emit_event(mixer *mixr, broadcast_event event)
     }
 }
 
-void mixer_update_bpm(mixer *mixr, int bpm)
+void Mixer::UpdateBpm(int new_bpm)
 {
-    mixr->bpm = bpm;
-    mixr->timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
-    mixr->timing_info.loop_len_in_frames =
-        mixr->timing_info.frames_per_midi_tick * PPBAR;
-    mixr->timing_info.loop_len_in_ticks = PPBAR;
+    bpm = new_bpm;
+    timing_info.frames_per_midi_tick = (60.0 / bpm * SAMPLE_RATE) / PPQN;
+    timing_info.loop_len_in_frames = timing_info.frames_per_midi_tick * PPBAR;
+    timing_info.loop_len_in_ticks = PPBAR;
 
-    mixr->timing_info.ms_per_midi_tick = 60000.0 / (bpm * PPQN);
-    mixr->timing_info.midi_ticks_per_ms = PPQN / (60000.0 / bpm);
+    timing_info.ms_per_midi_tick = 60000.0 / (bpm * PPQN);
+    timing_info.midi_ticks_per_ms = PPQN / (60000.0 / bpm);
 
-    mixr->timing_info.size_of_thirtysecond_note =
-        (PPSIXTEENTH / 2) * mixr->timing_info.frames_per_midi_tick;
-    mixr->timing_info.size_of_sixteenth_note =
-        mixr->timing_info.size_of_thirtysecond_note * 2;
-    mixr->timing_info.size_of_eighth_note =
-        mixr->timing_info.size_of_sixteenth_note * 2;
-    mixr->timing_info.size_of_quarter_note =
-        mixr->timing_info.size_of_eighth_note * 2;
+    timing_info.size_of_thirtysecond_note =
+        (PPSIXTEENTH / 2) * timing_info.frames_per_midi_tick;
+    timing_info.size_of_sixteenth_note =
+        timing_info.size_of_thirtysecond_note * 2;
+    timing_info.size_of_eighth_note = timing_info.size_of_sixteenth_note * 2;
+    timing_info.size_of_quarter_note = timing_info.size_of_eighth_note * 2;
 
-    mixer_emit_event(mixr, (broadcast_event){.type = TIME_BPM_CHANGE});
-    link_set_bpm(mixr->m_ableton_link, bpm);
+    EmitEvent((broadcast_event){.type = TIME_BPM_CHANGE});
+    link_set_bpm(m_ableton_link, bpm);
 }
 
-void mixer_vol_change(mixer *mixr, float vol)
+void Mixer::VolChange(float vol)
 {
     if (vol >= 0.0 && vol <= 1.0)
     {
-        mixr->volume = vol;
+        volume = vol;
     }
 }
 
-void vol_change(mixer *mixr, int sg, float vol)
+void Mixer::VolChange(int sg, float vol)
 {
-    if (!mixer_is_valid_soundgen_num(mixr, sg))
+    if (!IsValidSoundgenNum(sg))
     {
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->sound_generators_[sg]->SetVolume(vol);
+    sound_generators_[sg]->SetVolume(vol);
 }
 
-void pan_change(mixer *mixr, int sg, float val)
+void Mixer::PanChange(int sg, float val)
 {
-    if (!mixer_is_valid_soundgen_num(mixr, sg))
+    if (!IsValidSoundgenNum(sg))
     {
         printf("Nah mate, returning\n");
         return;
     }
-    mixr->sound_generators_[sg]->SetPan(val);
+    sound_generators_[sg]->SetPan(val);
 }
 
-void add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg)
+void Mixer::AddSoundGenerator(std::shared_ptr<SoundGenerator> sg)
 {
-    if (mixr->soundgen_num == MAX_NUM_SOUND_GENERATORS)
+    if (soundgen_num == MAX_NUM_SOUND_GENERATORS)
         audio_reply_queue.push(-1);
 
-    mixr->sound_generators_[mixr->soundgen_num] = sg;
-    audio_reply_queue.push(mixr->soundgen_num++);
+    sound_generators_[soundgen_num] = sg;
+    audio_reply_queue.push(soundgen_num++);
 }
 
-void add_drumsynth(mixer *mixr)
+void Mixer::AddDrumsynth()
 {
     auto ds = std::make_shared<DrumSynth>();
-    add_sound_generator(mixr, ds);
+    AddSoundGenerator(ds);
 }
 
-void add_minisynth(mixer *mixr)
+void Mixer::AddMinisynth()
 {
     auto ms = std::make_shared<MiniSynth>();
-    add_sound_generator(mixr, ms);
+    AddSoundGenerator(ms);
 }
 
-void add_sample(mixer *mixr, std::string sample_path)
+void Mixer::AddSample(std::string sample_path)
 {
     auto ds = std::make_shared<DrumSampler>(sample_path.data());
-    add_sound_generator(mixr, ds);
+    AddSoundGenerator(ds);
 }
 
-void add_digisynth(mixer *mixr, std::string sample_path)
+void Mixer::AddDigisynth(std::string sample_path)
 {
     auto ds = std::make_shared<DigiSynth>(sample_path);
-    add_sound_generator(mixr, ds);
+    AddSoundGenerator(ds);
 }
 
-void add_dxsynth(mixer *mixr)
+void Mixer::AddDxsynth()
 {
     auto dx = std::make_shared<dxsynth>();
-    add_sound_generator(mixr, dx);
+    AddSoundGenerator(dx);
 }
 
-void add_looper(mixer *mixr, std::string filename, bool loop_mode)
+void Mixer::AddLooper(std::string filename, bool loop_mode)
 {
     auto loopr = std::make_shared<looper>(filename.data(), loop_mode);
-    add_sound_generator(mixr, loopr);
+    AddSoundGenerator(loopr);
 }
 
-void mixer_midi_tick(mixer *mixr)
+void Mixer::MidiTick()
 {
 
-    mixr->timing_info.is_thirtysecond = false;
-    mixr->timing_info.is_twentyfourth = false;
-    mixr->timing_info.is_sixteenth = false;
-    mixr->timing_info.is_twelth = false;
-    mixr->timing_info.is_eighth = false;
-    mixr->timing_info.is_sixth = false;
-    mixr->timing_info.is_quarter = false;
-    mixr->timing_info.is_third = false;
-    mixr->timing_info.is_start_of_loop = false;
+    timing_info.is_thirtysecond = false;
+    timing_info.is_twentyfourth = false;
+    timing_info.is_sixteenth = false;
+    timing_info.is_twelth = false;
+    timing_info.is_eighth = false;
+    timing_info.is_sixth = false;
+    timing_info.is_quarter = false;
+    timing_info.is_third = false;
+    timing_info.is_start_of_loop = false;
 
-    mixer_check_for_audio_action_queue_messages(mixr);
-    mixer_check_for_midi_messages(mixr); // from external
+    CheckForAudioActionQueueMessages();
+    CheckForMidiMessages(); // from external
 
-    if (mixr->timing_info.midi_tick % PPBAR == 0)
-        mixr->timing_info.is_start_of_loop = true;
+    if (timing_info.midi_tick % PPBAR == 0)
+        timing_info.is_start_of_loop = true;
 
-    if (mixr->timing_info.midi_tick % 120 == 0)
+    if (timing_info.midi_tick % 120 == 0)
     {
-        mixr->timing_info.is_thirtysecond = true;
+        timing_info.is_thirtysecond = true;
 
-        if (mixr->timing_info.midi_tick % 240 == 0)
+        if (timing_info.midi_tick % 240 == 0)
         {
-            mixr->timing_info.is_sixteenth = true;
-            mixr->timing_info.sixteenth_note_tick++;
+            timing_info.is_sixteenth = true;
+            timing_info.sixteenth_note_tick++;
 
-            if (mixr->timing_info.midi_tick % 480 == 0)
+            if (timing_info.midi_tick % 480 == 0)
             {
-                mixr->timing_info.is_eighth = true;
+                timing_info.is_eighth = true;
 
-                if (mixr->timing_info.midi_tick % PPQN == 0)
-                    mixr->timing_info.is_quarter = true;
+                if (timing_info.midi_tick % PPQN == 0)
+                    timing_info.is_quarter = true;
             }
         }
     }
 
     // so far only used for ARP engines
-    if (mixr->timing_info.midi_tick % 160 == 0)
+    if (timing_info.midi_tick % 160 == 0)
     {
-        mixr->timing_info.is_twentyfourth = true;
+        timing_info.is_twentyfourth = true;
 
-        if (mixr->timing_info.midi_tick % 320 == 0)
+        if (timing_info.midi_tick % 320 == 0)
         {
-            mixr->timing_info.is_twelth = true;
+            timing_info.is_twelth = true;
 
-            if (mixr->timing_info.midi_tick % 640 == 0)
+            if (timing_info.midi_tick % 640 == 0)
             {
-                mixr->timing_info.is_sixth = true;
+                timing_info.is_sixth = true;
 
-                if (mixr->timing_info.midi_tick % 1280 == 0)
-                    mixr->timing_info.is_third = true;
+                if (timing_info.midi_tick % 1280 == 0)
+                    timing_info.is_third = true;
             }
         }
     }
 
-    // std::cout << "Mixer -- midi_tick:" << mixr->timing_info.midi_tick
-    //          << " 16th:" << mixr->timing_info.sixteenth_note_tick
+    // std::cout << "Mixer -- midi_tick:" << timing_info.midi_tick
+    //          << " 16th:" << timing_info.sixteenth_note_tick
     //          << " Start of Loop:" <<
-    //          mixr->timing_info.is_start_of_loop
+    //          timing_info.is_start_of_loop
     //          << std::endl;
 
     repl_queue.push("tick");
-    mixer_emit_event(mixr, (broadcast_event){.type = TIME_MIDI_TICK});
-    // lo_send(mixr->processing_addr, "/bpm", NULL);
-    mixr->CheckForDelayedEvents();
+    EmitEvent((broadcast_event){.type = TIME_MIDI_TICK});
+    // lo_send(processing_addr, "/bpm", NULL);
+    CheckForDelayedEvents();
 }
 
-bool should_progress_chords(mixer *mixr, int tick)
+bool Mixer::ShouldProgressChords(int tick)
 {
     int chance = rand() % 100;
-    if (mixr->should_progress_chords == false)
+    if (should_progress_chords == false)
         return false;
 
     if (tick == 0)
@@ -507,113 +496,103 @@ bool should_progress_chords(mixer *mixr, int tick)
     return false;
 }
 
-int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer)
+int Mixer::GenNext(float *out, int frames_per_buffer)
 {
 
-    link_update_from_main_callback(mixr->m_ableton_link, frames_per_buffer);
+    link_update_from_main_callback(m_ableton_link, frames_per_buffer);
 
     for (int i = 0, j = 0; i < frames_per_buffer; i++, j += 2)
     {
         double output_left = 0.0;
         double output_right = 0.0;
 
-        mixr->timing_info.cur_sample++;
+        timing_info.cur_sample++;
 
-        if (mixr->preview.enabled)
+        if (preview.enabled)
         {
-            stereo_val preview_audio = preview_buffer_generate(&mixr->preview);
+            stereo_val preview_audio = preview_buffer_generate(&preview);
             output_left += preview_audio.left * 0.6;
             output_right += preview_audio.right * 0.6;
         }
 
-        if (link_is_midi_tick(mixr->m_ableton_link, &mixr->timing_info, i))
+        if (link_is_midi_tick(m_ableton_link, &timing_info, i))
         {
-            int current_tick_within_bar = mixr->timing_info.midi_tick % PPBAR;
-            if (should_progress_chords(mixr, current_tick_within_bar))
-                mixer_next_chord(mixr);
+            int current_tick_within_bar = timing_info.midi_tick % PPBAR;
+            if (ShouldProgressChords(current_tick_within_bar))
+                NextChord();
 
-            mixer_midi_tick(mixr);
+            MidiTick();
         }
 
-        if (mixr->soundgen_num > 0)
+        if (soundgen_num > 0)
         {
-            for (int i = 0; i < mixr->soundgen_num; i++)
+            for (int i = 0; i < soundgen_num; i++)
             {
-                if (mixr->sound_generators_[i] != NULL)
+                if (sound_generators_[i] != NULL)
                 {
-                    mixr->soundgen_cur_val[i] =
-                        mixr->sound_generators_[i]->genNext();
-                    output_left += mixr->soundgen_cur_val[i].left;
-                    output_right += mixr->soundgen_cur_val[i].right;
+                    soundgen_cur_val[i] = sound_generators_[i]->genNext();
+                    output_left += soundgen_cur_val[i].left;
+                    output_right += soundgen_cur_val[i].right;
                 }
             }
         }
 
-        out[j] = mixr->volume * (output_left / 1.53);
-        out[j + 1] = mixr->volume * (output_right / 1.53);
+        out[j] = volume * (output_left / 1.53);
+        out[j + 1] = volume * (output_right / 1.53);
     }
 
     return 0;
 }
 
-bool mixer_del_soundgen(mixer *mixr, int soundgen_num)
+bool Mixer::DelSoundgen(int soundgen_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+    if (IsValidSoundgenNum(soundgen_num))
     {
         printf("MIXR!! Deleting SOUND GEN %d\n", soundgen_num);
-        std::shared_ptr<SoundGenerator> sg =
-            mixr->sound_generators_[soundgen_num];
+        std::shared_ptr<SoundGenerator> sg = sound_generators_[soundgen_num];
 
-        if (mixr->active_midi_soundgen_num == soundgen_num)
-            mixr->active_midi_soundgen_num = -99;
+        if (active_midi_soundgen_num == soundgen_num)
+            active_midi_soundgen_num = -99;
 
-        mixr->sound_generators_[soundgen_num] = nullptr;
+        sound_generators_[soundgen_num] = nullptr;
     }
     return true;
 }
 
-bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num)
+bool Mixer::IsValidSoundgenNum(int sg_num)
 {
-    if (soundgen_num >= 0 && soundgen_num < mixr->soundgen_num &&
-        mixr->sound_generators_[soundgen_num] != NULL)
+    if (sg_num >= 0 && sg_num < soundgen_num &&
+        sound_generators_[sg_num] != NULL)
         return true;
     return false;
 }
 
-bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num)
+bool Mixer::IsValidFx(int soundgen_num, int fx_num)
 {
-    if (mixer_is_valid_soundgen_num(mixr, soundgen_num))
+    if (IsValidSoundgenNum(soundgen_num))
     {
-        std::shared_ptr<SoundGenerator> sg =
-            mixr->sound_generators_[soundgen_num];
+        std::shared_ptr<SoundGenerator> sg = sound_generators_[soundgen_num];
         if (fx_num >= 0 && fx_num < sg->effects_num && sg->effects[fx_num])
             return true;
     }
     return false;
 }
 
-void mixer_set_notes(mixer *mixr)
+void Mixer::SetNotes()
 {
-    mixr->timing_info.notes[0] = mixr->timing_info.key;
-    mixr->timing_info.notes[1] =
-        (mixr->timing_info.key + 2) % NUM_KEYS; // W step
-    mixr->timing_info.notes[2] =
-        (mixr->timing_info.key + 4) % NUM_KEYS; // W step
-    mixr->timing_info.notes[3] =
-        (mixr->timing_info.key + 5) % NUM_KEYS; // H step
-    mixr->timing_info.notes[4] =
-        (mixr->timing_info.key + 7) % NUM_KEYS; // W step
-    mixr->timing_info.notes[5] =
-        (mixr->timing_info.key + 9) % NUM_KEYS; // W step
-    mixr->timing_info.notes[6] =
-        (mixr->timing_info.key + 11) % NUM_KEYS; // W step
-    mixr->timing_info.notes[7] =
-        (mixr->timing_info.key + 12) % NUM_KEYS; // H step
+    timing_info.notes[0] = timing_info.key;
+    timing_info.notes[1] = (timing_info.key + 2) % NUM_KEYS;  // W step
+    timing_info.notes[2] = (timing_info.key + 4) % NUM_KEYS;  // W step
+    timing_info.notes[3] = (timing_info.key + 5) % NUM_KEYS;  // H step
+    timing_info.notes[4] = (timing_info.key + 7) % NUM_KEYS;  // W step
+    timing_info.notes[5] = (timing_info.key + 9) % NUM_KEYS;  // W step
+    timing_info.notes[6] = (timing_info.key + 11) % NUM_KEYS; // W step
+    timing_info.notes[7] = (timing_info.key + 12) % NUM_KEYS; // H step
 }
 
-int mixer_print_timing_info(mixer *mixr)
+int Mixer::PrintTimingInfo()
 {
-    mixer_timing_info *info = &mixr->timing_info;
+    mixer_timing_info *info = &timing_info;
     printf("TIMING INFO!\n");
     printf("============\n");
     printf("FRAMES per midi tick:%d\n", info->frames_per_midi_tick);
@@ -641,17 +620,17 @@ int mixer_print_timing_info(mixer *mixr)
     return 0;
 }
 
-double mixer_get_hz_per_bar(mixer *mixr)
+double Mixer::GetHzPerBar()
 {
 
-    double hz_per_beat = (60. / mixr->bpm);
+    double hz_per_beat = (60. / bpm);
     return hz_per_beat / 4;
 }
 
-double mixer_get_hz_per_timing_unit(mixer *mixr, unsigned int timing_unit)
+double Mixer::GetHzPerTimingUnit(unsigned int timing_unit)
 {
     double return_val = 0;
-    double hz_per_beat = (60. / mixr->bpm);
+    double hz_per_beat = (60. / bpm);
     if (timing_unit == Q2)
         return_val = hz_per_beat / 2.;
     if (timing_unit == Q4)
@@ -666,13 +645,13 @@ double mixer_get_hz_per_timing_unit(mixer *mixr, unsigned int timing_unit)
     return return_val;
 }
 
-int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
+int Mixer::GetTicksPerCycleUnit(unsigned int event_type)
 {
     int ticks = 0;
     switch (event_type)
     {
     case (TIME_START_OF_LOOP_TICK):
-        ticks = mixr->timing_info.loop_len_in_ticks;
+        ticks = timing_info.loop_len_in_ticks;
         break;
     case (TIME_MIDI_TICK):
         ticks = 1;
@@ -692,24 +671,24 @@ int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type)
     }
     return ticks;
 }
-void mixer_set_octave(mixer *mixr, int octave)
+void Mixer::SetOctave(int octave)
 {
     if (octave > -10 && octave < 10)
-        mixr->timing_info.octave = octave;
+        timing_info.octave = octave;
 }
-void mixer_set_bars_per_chord(mixer *mixr, int bars)
+void Mixer::SetBarsPerChord(int bars)
 {
     if (bars > 0 && bars < 32)
-        mixr->bars_per_chord = bars;
+        bars_per_chord = bars;
 }
 
-void mixer_set_key(mixer *mixr, unsigned int key)
+void Mixer::SetKey(unsigned int key)
 {
     if (key < NUM_KEYS)
-        mixr->timing_info.key = key;
+        timing_info.key = key;
 }
 
-void mixer_set_key(mixer *mixr, std::string str_key)
+void Mixer::SetKey(std::string str_key)
 {
     str_lower(str_key);
 
@@ -740,73 +719,73 @@ void mixer_set_key(mixer *mixr, std::string str_key)
         key = 11;
 
     if (key != -1)
-        mixer_set_key(mixr, key);
+        SetKey(key);
 }
 
-void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num)
+void Mixer::SetChordProgression(unsigned int prog_num)
 {
     if (prog_num < NUM_PROGRESSIONS)
     {
         switch (prog_num)
         {
         case (0):
-            mixr->progression_type = 0;
-            mixr->prog_len = 3;
-            mixr->prog_degrees[0] = 0; // I
-            mixr->prog_degrees[1] = 3; // IV
-            mixr->prog_degrees[2] = 4; // V
+            progression_type = 0;
+            prog_len = 3;
+            prog_degrees[0] = 0; // I
+            prog_degrees[1] = 3; // IV
+            prog_degrees[2] = 4; // V
             break;
         case (1):
-            mixr->progression_type = 1;
-            mixr->prog_len = 4;
-            mixr->prog_degrees[0] = 0; // I
-            mixr->prog_degrees[1] = 4; // V
-            mixr->prog_degrees[2] = 5; // vi
-            mixr->prog_degrees[3] = 3; // IV
+            progression_type = 1;
+            prog_len = 4;
+            prog_degrees[0] = 0; // I
+            prog_degrees[1] = 4; // V
+            prog_degrees[2] = 5; // vi
+            prog_degrees[3] = 3; // IV
             break;
         case (2):
-            mixr->progression_type = 2;
-            mixr->prog_len = 4;
-            mixr->prog_degrees[0] = 0; // I
-            mixr->prog_degrees[1] = 5; // vi
-            mixr->prog_degrees[2] = 3; // IV
-            mixr->prog_degrees[3] = 4; // V
+            progression_type = 2;
+            prog_len = 4;
+            prog_degrees[0] = 0; // I
+            prog_degrees[1] = 5; // vi
+            prog_degrees[2] = 3; // IV
+            prog_degrees[3] = 4; // V
             break;
         case (3):
-            mixr->progression_type = 3;
-            mixr->prog_len = 4;
-            mixr->prog_degrees[0] = 5; // vi
-            mixr->prog_degrees[1] = 1; // ii
-            mixr->prog_degrees[2] = 4; // V
-            mixr->prog_degrees[3] = 0; // I
+            progression_type = 3;
+            prog_len = 4;
+            prog_degrees[0] = 5; // vi
+            prog_degrees[1] = 1; // ii
+            prog_degrees[2] = 4; // V
+            prog_degrees[3] = 0; // I
             break;
         }
-        mixr->prog_degrees_idx = 0;
-        mixr->timing_info.chord_progression_index = mixr->prog_degrees_idx;
-        mixr->timing_info.chord = mixr->prog_degrees[mixr->prog_degrees_idx];
+        prog_degrees_idx = 0;
+        timing_info.chord_progression_index = prog_degrees_idx;
+        timing_info.chord = prog_degrees[prog_degrees_idx];
     }
 }
-void mixer_change_chord(mixer *mixr, unsigned int root, unsigned int chord_type)
+void Mixer::ChangeChord(unsigned int root, unsigned int chord_type)
 {
     if (root < NUM_KEYS && chord_type < NUM_CHORD_TYPES)
     {
-        mixr->timing_info.chord = root;
-        mixr->timing_info.chord_type = chord_type;
-        mixer_emit_event(mixr, (broadcast_event){.type = TIME_CHORD_CHANGE});
+        timing_info.chord = root;
+        timing_info.chord_type = chord_type;
+        EmitEvent((broadcast_event){.type = TIME_CHORD_CHANGE});
     }
 }
 
-int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree)
+int Mixer::GetKeyFromDegree(unsigned int scale_degree)
 {
-    return mixr->timing_info.key + scale_degree;
+    return timing_info.key + scale_degree;
 }
 
-void mixer_preview_audio(mixer *mixr, char *filename)
+void Mixer::PreviewAudio(char *filename)
 {
     if (is_valid_file(filename))
     {
-        mixr->preview.enabled = false;
-        preview_buffer_import_file(&mixr->preview, filename);
+        preview.enabled = false;
+        preview_buffer_import_file(&preview, filename);
     }
 }
 
@@ -843,60 +822,55 @@ stereo_val preview_buffer_generate(preview_buffer *buffy)
     return ret;
 }
 
-void mixer_enable_print_midi(mixer *mixr, bool b)
-{
-    mixr->midi_print_notes = b;
-}
+void Mixer::EnablePrintMidi(bool b) { midi_print_notes = b; }
 
-void mixer_check_for_audio_action_queue_messages(mixer *mixr)
+void Mixer::CheckForAudioActionQueueMessages()
 {
     while (auto action = audio_queue.try_pop())
     {
         if (action)
         {
             if (action->type == AudioAction::STATUS)
-                mixer_ps(mixr, action->status_all);
-            else if (action->type == AudioAction::HELP)
-                mixer_help(mixr);
+                Ps(action->status_all);
             else if (action->type == AudioAction::MONITOR)
             {
-                mixr_add_file_to_monitor(mixr, action->filepath);
+                AddFileToMonitor(action->filepath);
             }
             else if (action->type == AudioAction::ADD)
             {
                 switch (action->soundgenerator_type)
                 {
                 case (MINISYNTH_TYPE):
-                    add_minisynth(mixr);
+                    AddMinisynth();
                     break;
                 case (DXSYNTH_TYPE):
-                    add_dxsynth(mixr);
+                    AddDxsynth();
                     break;
                 case (DIGISYNTH_TYPE):
-                    add_digisynth(mixr, action->filepath);
+                    AddDigisynth(action->filepath);
                     break;
                 case (LOOPER_TYPE):
-                    add_looper(mixr, action->filepath, action->loop_mode);
+                    AddLooper(action->filepath, action->loop_mode);
                     break;
                 case (DRUMSAMPLER_TYPE):
-                    add_sample(mixr, action->filepath);
+                    AddSample(action->filepath);
                     break;
                 case (DRUMSYNTH_TYPE):
-                    add_drumsynth(mixr);
+                    AddDrumsynth();
                     break;
                 }
             }
             else if (action->type == AudioAction::ADD_FX)
                 interpreter_sound_cmds::ParseFXCmd(action->args);
             else if (action->type == AudioAction::BPM)
-                mixer_update_bpm(mixr, action->new_bpm);
+                UpdateBpm(action->new_bpm);
             else if (action->type == AudioAction::MIXER_UPDATE)
             {
                 if (action->param_name == "key")
-                    mixer_set_key(mixr, action->param_val);
+                    SetKey(action->param_val);
                 else if (action->param_name == "prog")
-                    mixer_set_chord_progression(
-                        mixr, std::stoi(action->param_val, nullptr, 0));
+                    SetChordProgression(
+                        std::stoi(action->param_val, nullptr, 0));
             }
             else if (action->type == AudioAction::MIDI_EVENT_ADD ||
                      action->type == AudioAction::MIDI_EVENT_ADD_DELAYED)
@@ -915,12 +889,10 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             args[0]);
                     if (soundgen)
                     {
-                        if (mixer_is_valid_soundgen_num(mixr,
-                                                        soundgen->soundgen_id_))
+                        if (IsValidSoundgenNum(soundgen->soundgen_id_))
                         {
-                            auto sg =
-                                mixr->sound_generators_[soundgen->soundgen_id_];
-                            // sg->parseMidiEvent(event_on, mixr->timing_info);
+                            auto sg = sound_generators_[soundgen->soundgen_id_];
+                            // sg->parseMidiEvent(event_on, timing_info);
 
                             auto int_object =
                                 std::dynamic_pointer_cast<object::Number>(
@@ -959,7 +931,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             event_on.source = EXTERNAL_OSC;
 
                             // used later for MIDI OFF MESSAGE
-                            int midi_note_on_time = mixr->timing_info.midi_tick;
+                            int midi_note_on_time = timing_info.midi_tick;
 
                             if (action->type ==
                                 AudioAction::MIDI_EVENT_ADD_DELAYED)
@@ -974,8 +946,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                                         return;
                                     int delay_time = delay_time_obj->value_;
                                     int delay_tick =
-                                        (mixr->timing_info.midi_tick +
-                                         delay_time);
+                                        (timing_info.midi_tick + delay_time);
 
                                     // this is delayed - save for OFF EVENT
                                     // below
@@ -987,7 +958,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
 
                                     auto ev =
                                         DelayedMidiEvent(delay_tick, event, sg);
-                                    mixr->_action_items.push_back(ev);
+                                    _action_items.push_back(ev);
                                 }
                                 else
                                 {
@@ -1004,8 +975,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
 
                             int note_duration_ms = sg->note_duration_ms_;
                             int duration_in_midi_ticks =
-                                note_duration_ms /
-                                mixr->timing_info.ms_per_midi_tick;
+                                note_duration_ms / timing_info.ms_per_midi_tick;
 
                             int midi_off_tick =
                                 midi_note_on_time + duration_in_midi_ticks;
@@ -1017,33 +987,31 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             auto ev =
                                 DelayedMidiEvent(midi_off_tick, event_off, sg);
 
-                            mixr->_action_items.push_back(ev);
+                            _action_items.push_back(ev);
                         }
                     }
                 }
             }
             else if (action->type == AudioAction::UPDATE)
             {
-                if (mixer_is_valid_soundgen_num(mixr,
-                                                action->mixer_soundgen_idx))
+                if (IsValidSoundgenNum(action->mixer_soundgen_idx))
                 {
                     double param_val = 0.;
 
                     if (action->param_val == "sync32")
-                        param_val = mixer_get_hz_per_timing_unit(mixr, Q32);
+                        param_val = GetHzPerTimingUnit(Q32);
                     if (action->param_val == "sync16")
-                        param_val = mixer_get_hz_per_timing_unit(mixr, Q16);
+                        param_val = GetHzPerTimingUnit(Q16);
                     else if (action->param_val == "sync8")
-                        param_val = mixer_get_hz_per_timing_unit(mixr, Q8);
+                        param_val = GetHzPerTimingUnit(Q8);
                     else if (action->param_val == "sync4")
-                        param_val = mixer_get_hz_per_timing_unit(mixr, Q4);
+                        param_val = GetHzPerTimingUnit(Q4);
                     else if (action->param_val == "sync2")
-                        param_val = mixer_get_hz_per_timing_unit(mixr, Q2);
+                        param_val = GetHzPerTimingUnit(Q2);
                     else
                         param_val = std::stod(action->param_val);
 
-                    auto sg =
-                        mixr->sound_generators_[action->mixer_soundgen_idx];
+                    auto sg = sound_generators_[action->mixer_soundgen_idx];
                     if (!sg)
                     {
                         std::cerr << "WHOE NELLY! Naw SG! bailing out!\n";
@@ -1057,9 +1025,9 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                             new_midi_event(MIDI_PITCHBEND, param_val * 10, 0);
                         event.delete_after_use = true;
 
-                        mixr->_action_items.push_back(DelayedMidiEvent(
-                            mixr->timing_info.midi_tick + action->delayed_by,
-                            event, sg));
+                        _action_items.push_back(DelayedMidiEvent(
+                            timing_info.midi_tick + action->delayed_by, event,
+                            sg));
                         return;
                     }
                     if (action->param_name == "volume")
@@ -1072,8 +1040,7 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
                         if (action->fx_id != -1)
                         {
                             int fx_num = action->fx_id;
-                            if (mixer_is_valid_fx(
-                                    mixr, action->mixer_soundgen_idx, fx_num))
+                            if (IsValidFx(action->mixer_soundgen_idx, fx_num))
                             {
                                 Fx *f = sg->effects[fx_num];
                                 if (action->param_name == "active")
@@ -1091,11 +1058,9 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
             }
             else if (action->type == AudioAction ::INFO)
             {
-                if (mixer_is_valid_soundgen_num(mixr,
-                                                action->mixer_soundgen_idx))
+                if (IsValidSoundgenNum(action->mixer_soundgen_idx))
                 {
-                    auto sg =
-                        mixr->sound_generators_[action->mixer_soundgen_idx];
+                    auto sg = sound_generators_[action->mixer_soundgen_idx];
                     repl_queue.push(sg->Info());
                 }
             }
@@ -1106,24 +1071,23 @@ void mixer_check_for_audio_action_queue_messages(mixer *mixr)
             }
             else if (action->type == AudioAction::RAND)
             {
-                mixr->sound_generators_[action->mixer_soundgen_idx]
-                    ->randomize();
+                sound_generators_[action->mixer_soundgen_idx]->randomize();
             }
             else if (action->type == AudioAction::PREVIEW)
             {
                 char *fname = action->preview_filename.data();
-                mixer_preview_audio(mixr, fname);
+                PreviewAudio(fname);
             }
         }
     }
 }
 
-void mixer_check_for_midi_messages(mixer *mixr)
+void Mixer::CheckForMidiMessages()
 {
     PmEvent msg[32];
-    if (Pm_Poll(mixr->midi_stream))
+    if (Pm_Poll(midi_stream))
     {
-        int cnt = Pm_Read(mixr->midi_stream, msg, 32);
+        int cnt = Pm_Read(midi_stream, msg, 32);
         for (int i = 0; i < cnt; i++)
         {
             int status = Pm_MessageStatus(msg[i].message);
@@ -1133,34 +1097,33 @@ void mixer_check_for_midi_messages(mixer *mixr)
             if (status == 176)
             {
                 if (data1 == 9)
-                    mixer_set_midi_bank(mixr, 0);
+                    SetMidiBank(0);
                 if (data1 == 10)
-                    mixer_set_midi_bank(mixr, 1);
+                    SetMidiBank(1);
                 if (data1 == 11)
-                    mixer_set_midi_bank(mixr, 2);
+                    SetMidiBank(2);
                 if (data1 == 12)
-                    mixer_set_midi_bank(mixr, 3);
+                    SetMidiBank(3);
             }
 
-            if (mixr->midi_print_notes)
+            if (midi_print_notes)
                 printf("[MIDI message] status:%d data1:%d "
                        "data2:%d\n",
                        status, data1, data2);
 
-            if (mixr->midi_control_destination != NONE &&
-                mixer_is_valid_soundgen_num(mixr,
-                                            mixr->active_midi_soundgen_num))
+            if (midi_control_destination != NONE &&
+                IsValidSoundgenNum(active_midi_soundgen_num))
             {
 
                 std::shared_ptr<SoundGenerator> sg =
-                    mixr->sound_generators_[mixr->active_midi_soundgen_num];
+                    sound_generators_[active_midi_soundgen_num];
 
                 midi_event ev = new_midi_event(status, data1, data2);
 
                 ev.source = EXTERNAL_DEVICE;
                 ev.delete_after_use = false;
 
-                sg->parseMidiEvent(ev, mixr->timing_info);
+                sg->parseMidiEvent(ev, timing_info);
             }
             else
             {
@@ -1171,31 +1134,27 @@ void mixer_check_for_midi_messages(mixer *mixr)
     }
 }
 
-void mixer_set_midi_bank(mixer *mixr, int num)
+void Mixer::SetMidiBank(int num)
 {
     if (num >= 0 && num < 4)
-        mixr->midi_bank_num = num;
+        midi_bank_num = num;
 }
 
-void mixer_set_should_progress_chords(mixer *mixr, bool b)
+void Mixer::SetShouldProgressChords(bool b) { should_progress_chords = b; }
+
+void Mixer::NextChord()
 {
-    mixr->should_progress_chords = b;
+    prog_degrees_idx = (prog_degrees_idx + 1) % prog_len;
+    timing_info.chord_progression_index = prog_degrees_idx;
+    timing_info.chord = prog_degrees[prog_degrees_idx];
 }
 
-void mixer_next_chord(mixer *mixr)
+void Mixer::AddFileToMonitor(std::string filepath)
 {
-    mixr->prog_degrees_idx = (mixr->prog_degrees_idx + 1) % mixr->prog_len;
-    mixr->timing_info.chord_progression_index = mixr->prog_degrees_idx;
-    mixr->timing_info.chord = mixr->prog_degrees[mixr->prog_degrees_idx];
+    file_monitors.push_back(file_monitor{.function_file_filepath = filepath});
 }
 
-void mixr_add_file_to_monitor(mixer *mixr, std::string filepath)
-{
-    mixr->file_monitors.push_back(
-        file_monitor{.function_file_filepath = filepath});
-}
-
-void mixer::CheckForDelayedEvents()
+void Mixer::CheckForDelayedEvents()
 {
     auto it = _action_items.begin();
     while (it != _action_items.end())

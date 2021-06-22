@@ -5,7 +5,7 @@
 #include <interpreter/sound_cmds.hpp>
 #include <mixer.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 namespace interpreter_sound_cmds
 {
@@ -15,7 +15,7 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
     if (soundgen)
     {
-        if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
+        if (mixr->IsValidSoundgenNum(soundgen->soundgen_id_))
         {
             auto sg = mixr->sound_generators_[soundgen->soundgen_id_];
 
@@ -44,8 +44,8 @@ void ParseFXCmd(std::vector<std::shared_ptr<object::Object>> &args)
                             std::dynamic_pointer_cast<object::SoundGenerator>(
                                 args[2]);
                         if (soundgen_sidechain_src &&
-                            mixer_is_valid_soundgen_num(
-                                mixr, soundgen_sidechain_src->soundgen_id_))
+                            mixr->IsValidSoundgenNum(
+                                soundgen_sidechain_src->soundgen_id_))
                         {
                             int fx_num = sg->AddCompressor();
                             DynamicsProcessor *dp =
@@ -74,7 +74,7 @@ void ParseSynthCmd(std::vector<std::shared_ptr<object::Object>> &args)
     auto soundgen = std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
     if (soundgen)
     {
-        if (mixer_is_valid_soundgen_num(mixr, soundgen->soundgen_id_))
+        if (mixr->IsValidSoundgenNum(soundgen->soundgen_id_))
         {
             auto sg = mixr->sound_generators_[soundgen->soundgen_id_];
             std::shared_ptr<object::String> str_obj =

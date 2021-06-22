@@ -4,7 +4,7 @@
 #include <mixer.h>
 #include <utils.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 const char *dynamics_processor_type_to_char[] = {"COMP", "LIMIT", "EXPAND",
                                                  "GATE"};
@@ -285,7 +285,7 @@ void DynamicsProcessor::SetExternalSource(unsigned int val)
 {
     if (val < 99)
     {
-        if (mixer_is_valid_soundgen_num(mixr, val))
+        if (mixr->IsValidSoundgenNum(val))
             m_external_source_ = val;
     }
     else

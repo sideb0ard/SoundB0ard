@@ -18,8 +18,6 @@
 
 SoundGenerator::SoundGenerator(){};
 
-// extern mixer *mixr;
-
 double SoundGenerator::GetVolume() { return volume; }
 
 void SoundGenerator::SetVolume(double val)

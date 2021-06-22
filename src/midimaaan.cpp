@@ -18,7 +18,7 @@
 #include <mixer.h>
 #include <utils.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 extern char *s_synth_waves[6];
 

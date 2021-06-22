@@ -5,7 +5,7 @@
 #include <fx/distortion.h>
 #include <mixer.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 
 Distortion::Distortion()
 {

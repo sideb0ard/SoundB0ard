@@ -11,7 +11,7 @@
 #include <pattern_utils.h>
 #include <utils.h>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern char *s_lfo_mode_names;
 
 static char *s_env_names[] = {(char *)"PARABOLIC", (char *)"TRAPEZOIDAL",

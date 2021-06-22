@@ -82,8 +82,11 @@ struct DelayedMidiEvent
     std::shared_ptr<SoundGenerator> sg{};
 };
 
-struct mixer
+struct Mixer
 {
+
+  public:
+    Mixer(double output_latency);
 
     preview_buffer preview;
 
@@ -148,72 +151,70 @@ struct mixer
     bool should_progress_chords;
 
     void CheckForDelayedEvents();
+
+    void Help();
+    void Ps(bool all);
+
+    std::string StatusEnv();
+    std::string StatusMixr();
+    std::string StatusProcz(bool all);
+    std::string StatusSgz(bool all);
+
+    void UpdateBpm(int bpm);
+    void UpdateTimeUnit(unsigned int time_type, int val);
+    void MidiTick();
+    void EmitEvent(broadcast_event event);
+    bool DelSoundgen(int soundgen_num);
+
+    void PreviewAudio(char *filename);
+
+    int PrintTimingInfo();
+
+    void AddMinisynth();
+    void AddDxsynth();
+    void AddDrumsynth();
+    void AddSample(std::string sample_path);
+    void AddDigisynth(std::string sample_path);
+    void AddLooper(std::string filename, bool loop_mode);
+
+    void AddSoundGenerator(std::shared_ptr<SoundGenerator> sg);
+
+    void VolChange(float vol);
+    void VolChange(int sig, float vol);
+    void PanChange(int sig, float vol);
+
+    void ToggleMidiMode();
+    void ToggleKeyMode();
+    void PlayScene(int scene_num);
+
+    void UpdateTimingInfo(long long int frame_time);
+    int GenNext(float *out, int frames_per_buffer);
+
+    bool IsValidProcess(int proc_num);
+    bool IsValidSoundgenNum(int soundgen_num);
+    bool IsValidFx(int soundgen_num, int fx_num);
+
+    void SetKey(unsigned int key);
+    void SetKey(std::string str_key);
+    void SetNotes();
+    void SetOctave(int octave);
+    void SetBarsPerChord(int bars);
+
+    double GetHzPerBar();
+    double GetHzPerTimingUnit(unsigned int timing_unit);
+    int GetTicksPerCycleUnit(unsigned int event_type);
+    void SetChordProgression(unsigned int prog_num);
+    void ChangeChord(unsigned int root, unsigned int chord_type);
+    int GetKeyFromDegree(unsigned int scale_degree);
+    void EnablePrintMidi(bool b);
+    void CheckForMidiMessages();
+    void CheckForAudioActionQueueMessages();
+    void SetMidiBank(int num);
+    void SetShouldProgressChords(bool b);
+    bool ShouldProgressChords(int tick);
+    void NextChord();
+
+    void AddFileToMonitor(std::string filepath);
 };
-
-mixer *new_mixer(double output_latency);
-
-void mixer_ps(mixer *mixr, bool all);
-std::string mixer_status_env(mixer *mixr);
-std::string mixer_status_mixr(mixer *mixr);
-std::string mixer_status_procz(mixer *mixr, bool all);
-std::string mixer_status_sgz(mixer *mixr, bool all);
-
-void mixer_update_bpm(mixer *mixr, int bpm);
-void mixer_update_time_unit(mixer *mixr, unsigned int time_type, int val);
-void mixer_midi_tick(mixer *mixr);
-void mixer_emit_event(mixer *mixr, broadcast_event event);
-bool mixer_del_soundgen(mixer *mixr, int soundgen_num);
-
-void mixer_preview_audio(mixer *mixr, char *filename);
-
-int mixer_print_timing_info(mixer *mixr);
-
-void add_minisynth(mixer *mixr);
-void add_dxsynth(mixer *mixr);
-void add_drumsynth(mixer *mixr);
-void add_sample(mixer *mixr, std::string sample_path);
-void add_digisynth(mixer *mixr, std::string sample_path);
-void add_looper(mixer *mixr, std::string filename, bool loop_mode);
-
-void add_sound_generator(mixer *mixr, std::shared_ptr<SoundGenerator> sg);
-
-void mixer_vol_change(mixer *mixr, float vol);
-void vol_change(mixer *mixr, int sig, float vol);
-void pan_change(mixer *mixr, int sig, float vol);
-
-void mixer_toggle_midi_mode(mixer *mixr);
-void mixer_toggle_key_mode(mixer *mixr);
-void mixer_play_scene(mixer *mixr, int scene_num);
-
-void mixer_update_timing_info(mixer *mixr, long long int frame_time);
-int mixer_gennext(mixer *mixr, float *out, int frames_per_buffer);
-
-bool mixer_is_valid_process(mixer *mixr, int proc_num);
-bool mixer_is_valid_soundgen_num(mixer *mixr, int soundgen_num);
-bool mixer_is_valid_fx(mixer *mixr, int soundgen_num, int fx_num);
-
-void mixer_set_key(mixer *mixr, unsigned int key);
-void mixer_set_key(mixer *mixr, std::string str_key);
-void mixer_set_notes(mixer *mixr);
-void mixer_set_octave(mixer *mixr, int octave);
-void mixer_set_bars_per_chord(mixer *mixr, int bars);
-
-double mixer_get_hz_per_bar(mixer *mixr);
-double mixer_get_hz_per_timing_unit(mixer *mixr, unsigned int timing_unit);
-int mixer_get_ticks_per_cycle_unit(mixer *mixr, unsigned int event_type);
-void mixer_set_chord_progression(mixer *mixr, unsigned int prog_num);
-void mixer_change_chord(mixer *mixr, unsigned int root,
-                        unsigned int chord_type);
-int mixer_get_key_from_degree(mixer *mixr, unsigned int scale_degree);
-void mixer_enable_print_midi(mixer *mixr, bool b);
-void mixer_check_for_midi_messages(mixer *mixr);
-void mixer_check_for_audio_action_queue_messages(mixer *mixr);
-void mixer_set_midi_bank(mixer *mixr, int num);
-void mixer_set_should_progress_chords(mixer *mixr, bool b);
-bool should_progress_chords(mixer *mixr, int tick);
-void mixer_next_chord(mixer *mixr);
-
-void mixer_help(mixer *mixr);
-void mixr_add_file_to_monitor(mixer *mixr, std::string filepath);
 
 #endif // MIXER_H

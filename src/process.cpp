@@ -21,7 +21,7 @@
 #include <pattern_parser/euclidean.hpp>
 #include <pattern_parser/tokenizer.hpp>
 
-extern mixer *mixr;
+extern Mixer *mixr;
 extern Tsqueue<std::string> eval_command_queue;
 extern std::shared_ptr<object::Environment> global_env;
 
