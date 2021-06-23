@@ -220,10 +220,10 @@ int main()
     /* Set some lambdas to be called when the thread starts and
      * ends. Here we demonstrate capturing a reference to the server
      * thread. */
-    st.set_callbacks([&st]() { printf("Thread init: %p.\n", &st); },
-                     []() { printf("Thread cleanup.\n"); });
+    // st.set_callbacks([&st]() { printf("Thread init: %p.\n", &st); },
+    //                 []() { printf("Thread cleanup.\n"); });
 
-    std::cout << "URL: " << st.url() << std::endl;
+    // std::cout << "URL: " << st.url() << std::endl;
 
     std::atomic<int> received(0);
 

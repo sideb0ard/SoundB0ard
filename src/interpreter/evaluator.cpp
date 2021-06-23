@@ -397,8 +397,8 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::HelpStatement>(node);
     if (help_expr)
     {
-        // get help
-        // push to repl queue
+        audio_action_queue_item action_req{.type = AudioAction::HELP};
+        audio_queue.push(action_req);
     }
 
     std::shared_ptr<ast::VolumeStatement> vol_stmt =
@@ -432,7 +432,6 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::FunctionLiteral>(node);
     if (fn)
     {
-        std::cout << "OOOH, a func!\n";
         auto params = fn->parameters_;
         auto body = fn->body_;
         return std::make_shared<object::Function>(params, env, body);

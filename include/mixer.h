@@ -168,7 +168,8 @@ struct Mixer
 
     void PreviewAudio(char *filename);
 
-    int PrintTimingInfo();
+    void PrintTimingInfo();
+    void PrintMidiInfo();
 
     void AddMinisynth();
     void AddDxsynth();

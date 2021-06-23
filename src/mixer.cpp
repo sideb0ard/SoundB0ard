@@ -1,4 +1,5 @@
 #include <math.h>
+#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -265,8 +266,60 @@ void Mixer::Ps(bool all)
 
 void Mixer::Help()
 {
-    std::string strategy = oblique_strategy();
-    repl_queue.push(strategy);
+    std::string reply;
+    if (rand() % 100 > 90)
+    {
+        reply = oblique_strategy();
+    }
+    else
+    {
+        std::stringstream ss;
+        ss << ANSI_COLOR_WHITE;
+        ss << ":::::: Cmd List ::::::::::::::::::::::::::::::::\n";
+        ss << COOL_COLOR_MAUVE << "rand_array(array_len, low, high);"
+           << ANSI_COLOR_RESET << " // returns array of\n";
+        ss << "                                  // array_len, with\n";
+        ss << "                                  // rand numbers between\n";
+        ss << "                                  //low and high inclusive\n";
+        ss << COOL_COLOR_MAUVE << "notes_in_key();" << ANSI_COLOR_RESET
+           << " // returns array of midi notes in scale of\n";
+        ss << "                // current key (see ps for key)\n";
+        ss << COOL_COLOR_MAUVE << "ps();" << ANSI_COLOR_RESET
+           << " // show Program Status i.e. vars, bpm, key etc.\n";
+        ss << COOL_COLOR_MAUVE << "notes_in_chord(midi_num_root, chord_type);"
+           << ANSI_COLOR_RESET << " // chord_type is\n";
+        ss << "                                           //0:MAJOR\n";
+        ss << "                                           //1:MINOR\n";
+        ss << "                                           //2:DIM\n";
+        ss << COOL_COLOR_MAUVE << "bjork(n, m);" << ANSI_COLOR_RESET
+           << " // return array of bjorklund rhythm with n hits over m slots\n";
+        ss << COOL_COLOR_MAUVE << "let dx100 = fm();" << ANSI_COLOR_RESET
+           << " // create an instance of FM Synth assigned to var dx100\n";
+        ss << COOL_COLOR_MAUVE << "midi_info();" << ANSI_COLOR_RESET
+           << " // tells you how many midi ticks in a loop, and pitchs -> midi "
+              "ref\n";
+        ss << COOL_COLOR_MAUVE << "note_on(dx100, 45);" << ANSI_COLOR_RESET
+           << " // play an 'A2' on the 'dx100'\n";
+        ss << COOL_COLOR_MAUVE << "note_on_at(dx100, 45, 104);"
+           << ANSI_COLOR_RESET
+           << " // play 'A2' at 104 midi ticks from now()\n";
+        ss << COOL_COLOR_MAUVE << "rand_beat();" << ANSI_COLOR_RESET
+           << " // random 16 hit beat, one of shiko, son, rumba,\n";
+        ss << "             // soukous, gahu, or bossa-nova\n";
+        ss << COOL_COLOR_MAUVE << "riff();" << ANSI_COLOR_RESET
+           << " // returns array of 16 hits with random riff taken\n";
+        ss << "        // from notes_in_key()\n";
+        ss << COOL_COLOR_MAUVE << "play_array(soundgen, array_of_midi_nums);"
+           << ANSI_COLOR_RESET << " // plays the array\n";
+        ss << "                                          // spaced evenly\n";
+        ss << "                                          // over one loop on\n";
+        ss << "                                          // 'soundgen'\n";
+
+        ss << ANSI_COLOR_RESET;
+
+        reply = ss.str();
+    }
+    repl_queue.push(reply);
 }
 
 // static void mixer_print_notes()
@@ -590,7 +643,18 @@ void Mixer::SetNotes()
     timing_info.notes[7] = (timing_info.key + 12) % NUM_KEYS; // H step
 }
 
-int Mixer::PrintTimingInfo()
+void Mixer::PrintMidiInfo()
+{
+
+    std::stringstream ss;
+    ss << "Midi Notes:\n";
+    ss << "C:0 C#:1 D:2 D#:3 E:4 F:5 F#:6 G:7 G#:8 A:9 A#:10 B:11\n";
+    ss << "(For other octaves, add 12)\n";
+
+    repl_queue.push(ss.str());
+}
+
+void Mixer::PrintTimingInfo()
 {
     mixer_timing_info *info = &timing_info;
     printf("TIMING INFO!\n");
@@ -617,7 +681,6 @@ int Mixer::PrintTimingInfo()
     printf("Is 1/8:%d\n", info->is_eighth);
     printf("Is 1/4:%d\n", info->is_quarter);
     printf("Is midi_tick:%d\n", info->is_midi_tick);
-    return 0;
 }
 
 double Mixer::GetHzPerBar()
@@ -832,6 +895,8 @@ void Mixer::CheckForAudioActionQueueMessages()
         {
             if (action->type == AudioAction::STATUS)
                 Ps(action->status_all);
+            else if (action->type == AudioAction::HELP)
+                mixr->Help();
             else if (action->type == AudioAction::MONITOR)
             {
                 AddFileToMonitor(action->filepath);
