@@ -275,17 +275,41 @@ void Mixer::Help()
     {
         std::stringstream ss;
         ss << ANSI_COLOR_WHITE;
-        ss << ":::::: Cmd List ::::::::::::::::::::::::::::::::\n";
+        ss << ":::::: Haaaalp! ::::::::::::::::::::::::::::::::\n";
+        ss << COOL_COLOR_MAUVE << "ps" << ANSI_COLOR_RESET
+           << " // show Program Status i.e. vars, bpm, key etc.\n";
+        ss << COOL_COLOR_MAUVE << "ls" << ANSI_COLOR_RESET
+           << " // list sample directory\n";
+        ss << COOL_COLOR_MAUVE << "midi_info();" << ANSI_COLOR_RESET
+           << " // tells you how many midi ticks in a loop, and pitchs -> midi "
+              "ref\n";
+        ss << COOL_COLOR_MAUVE << "timing_info();" << ANSI_COLOR_RESET
+           << " // tells you various timing data\n";
+        ss << COOL_COLOR_MAUVE << "let x = 4;" << ANSI_COLOR_RESET
+           << " // create a var named 'x' with val 1\n";
+        ss << COOL_COLOR_MAUVE << "let add1 = fn(val) { return val + 1; };";
+        ss << ANSI_COLOR_RESET << " // create function and assign to a var\n";
+        ss << COOL_COLOR_MAUVE << "let dx100 = fm();" << ANSI_COLOR_RESET
+           << " // create an instance of FM Synth assigned to var dx100\n";
+        ss << COOL_COLOR_MAUVE << "note_on(dx100, 45);" << ANSI_COLOR_RESET
+           << " // play an 'A2' on the 'dx100'\n";
+        ss << COOL_COLOR_MAUVE << "note_on_at(dx100, 45, 104);"
+           << ANSI_COLOR_RESET
+           << " // play 'A2' at 104 midi ticks from now()\n";
+        ss << COOL_COLOR_MAUVE << "notes_in_key();" << ANSI_COLOR_RESET
+           << " // returns array of midi notes in scale of\n";
+        ss << "                // current key (see ps for key)\n";
+        ss << COOL_COLOR_MAUVE << "play_array(soundgen, array_of_midi_nums);"
+           << ANSI_COLOR_RESET << " // plays the array\n";
+        ss << "                                          // spaced evenly\n";
+        ss << "                                          // over one loop on\n";
+        ss << "                                          // 'soundgen'\n";
+        ss << "   // e.g. play_array(dx100, notes_in_key());\n";
         ss << COOL_COLOR_MAUVE << "rand_array(array_len, low, high);"
            << ANSI_COLOR_RESET << " // returns array of\n";
         ss << "                                  // array_len, with\n";
         ss << "                                  // rand numbers between\n";
         ss << "                                  //low and high inclusive\n";
-        ss << COOL_COLOR_MAUVE << "notes_in_key();" << ANSI_COLOR_RESET
-           << " // returns array of midi notes in scale of\n";
-        ss << "                // current key (see ps for key)\n";
-        ss << COOL_COLOR_MAUVE << "ps();" << ANSI_COLOR_RESET
-           << " // show Program Status i.e. vars, bpm, key etc.\n";
         ss << COOL_COLOR_MAUVE << "notes_in_chord(midi_num_root, chord_type);"
            << ANSI_COLOR_RESET << " // chord_type is\n";
         ss << "                                           //0:MAJOR\n";
@@ -293,27 +317,15 @@ void Mixer::Help()
         ss << "                                           //2:DIM\n";
         ss << COOL_COLOR_MAUVE << "bjork(n, m);" << ANSI_COLOR_RESET
            << " // return array of bjorklund rhythm with n hits over m slots\n";
-        ss << COOL_COLOR_MAUVE << "let dx100 = fm();" << ANSI_COLOR_RESET
-           << " // create an instance of FM Synth assigned to var dx100\n";
-        ss << COOL_COLOR_MAUVE << "midi_info();" << ANSI_COLOR_RESET
-           << " // tells you how many midi ticks in a loop, and pitchs -> midi "
-              "ref\n";
-        ss << COOL_COLOR_MAUVE << "note_on(dx100, 45);" << ANSI_COLOR_RESET
-           << " // play an 'A2' on the 'dx100'\n";
-        ss << COOL_COLOR_MAUVE << "note_on_at(dx100, 45, 104);"
-           << ANSI_COLOR_RESET
-           << " // play 'A2' at 104 midi ticks from now()\n";
         ss << COOL_COLOR_MAUVE << "rand_beat();" << ANSI_COLOR_RESET
            << " // random 16 hit beat, one of shiko, son, rumba,\n";
         ss << "             // soukous, gahu, or bossa-nova\n";
         ss << COOL_COLOR_MAUVE << "riff();" << ANSI_COLOR_RESET
            << " // returns array of 16 hits with random riff taken\n";
         ss << "        // from notes_in_key()\n";
-        ss << COOL_COLOR_MAUVE << "play_array(soundgen, array_of_midi_nums);"
-           << ANSI_COLOR_RESET << " // plays the array\n";
-        ss << "                                          // spaced evenly\n";
-        ss << "                                          // over one loop on\n";
-        ss << "                                          // 'soundgen'\n";
+        ss << COOL_COLOR_MAUVE << "map(array_name, func);" << ANSI_COLOR_RESET
+           << " // returns array containing each element from array_name after "
+              "applying func to their value\n";
 
         ss << ANSI_COLOR_RESET;
 
