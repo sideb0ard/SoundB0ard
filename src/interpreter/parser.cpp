@@ -853,7 +853,7 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 
     if (!CurTokenIs(token::SLANG_RPAREN))
     {
-        std::cout << "OOFT! where ya PAREN?\n";
+        std::cerr << "OOFT! where ya PAREN?\n";
         return nullptr;
     }
     std::cout << "AST SYNTH EXPRESSION ALL GOOD!\n";

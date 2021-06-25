@@ -133,7 +133,7 @@ std::string Mixer::StatusMixr()
     << "::::::::::\n"
     << ":::::::::: key:" << ANSI_COLOR_WHITE <<  key_names[timing_info.key] << COOL_COLOR_GREEN
     << " type:"<< ANSI_COLOR_WHITE << chord_type_names[timing_info.chord_type] << COOL_COLOR_GREEN
-    << " octave:" << ANSI_COLOR_WHITE << timing_info.octave << COOL_COLOR_GREEN << " bars_per_chord:"<< ANSI_COLOR_WHITE << bars_per_chord << COOL_COLOR_GREEN
+    << " octave:" << ANSI_COLOR_WHITE << timing_info.octave << COOL_COLOR_GREEN << " soundgen_num:"<< ANSI_COLOR_WHITE << soundgen_num << COOL_COLOR_GREEN
     << " move:" << ANSI_COLOR_WHITE << should_progress_chords << COOL_COLOR_GREEN << " prog:("<< ANSI_COLOR_WHITE << progression_type << COOL_COLOR_GREEN << ")"
     << ANSI_COLOR_WHITE << s_progressions[progression_type] << "\n";
     // clang-format on
@@ -424,11 +424,16 @@ void Mixer::PanChange(int sg, float val)
 
 void Mixer::AddSoundGenerator(std::shared_ptr<SoundGenerator> sg)
 {
-    if (soundgen_num == MAX_NUM_SOUND_GENERATORS)
+    if (soundgen_num < MAX_NUM_SOUND_GENERATORS)
+    {
+        sound_generators_[soundgen_num] = sg;
+        audio_reply_queue.push(soundgen_num++);
+    }
+    else
+    {
+        std::cerr << "BARF - HIT MAX!\n";
         audio_reply_queue.push(-1);
-
-    sound_generators_[soundgen_num] = sg;
-    audio_reply_queue.push(soundgen_num++);
+    }
 }
 
 void Mixer::AddDrumsynth()

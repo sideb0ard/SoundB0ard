@@ -99,7 +99,7 @@ struct Mixer
 
     std::shared_ptr<SoundGenerator>
         sound_generators_[MAX_NUM_SOUND_GENERATORS] = {};
-    std::atomic_int soundgen_num; // actual number of SGs
+    std::atomic_int soundgen_num{0}; // actual number of SGs
 
     std::vector<DelayedMidiEvent> _action_items;
 
