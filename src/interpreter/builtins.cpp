@@ -523,21 +523,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"gimme_notes",
-     std::make_shared<object::BuiltIn>(
-         [](std::vector<std::shared_ptr<object::Object>> args)
-             -> std::shared_ptr<object::Object>
-         {
-             auto melody_obj = std::make_shared<object::Array>(
-                 std::vector<std::shared_ptr<object::Object>>());
-             auto notes = interpreter_sound_cmds::GetNotesInCurrentChord();
-             for (size_t i = 0; i < notes.size(); i++)
-             {
-                 melody_obj->elements_.push_back(
-                     std::make_shared<object::Number>(notes[i]));
-             }
-             return melody_obj;
-         })},
     {"set_key",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -811,19 +796,23 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              -> std::shared_ptr<object::Object>
          {
              int args_size = args.size();
-             if (args_size == 2)
+             if (args_size >= 2)
              {
                  auto root_note =
                      std::dynamic_pointer_cast<object::Number>(args[0]);
 
-                 // can be MAJOR (0), MINOR (1) or DIMINISHED (2)
+                 // can be MAJOR (0), MINOR (1), DIMINISHED (2)
                  auto chord_type =
                      std::dynamic_pointer_cast<object::Number>(args[1]);
 
                  auto return_array = std::make_shared<object::Array>(
                      std::vector<std::shared_ptr<object::Object>>());
-                 std::vector<int> notez =
-                     GetMidiNotesInChord(root_note->value_, chord_type->value_);
+
+                 bool seventh = false;
+                 if (args_size == 3)
+                     seventh = true;
+                 std::vector<int> notez = GetMidiNotesInChord(
+                     root_note->value_, chord_type->value_, seventh);
 
                  for (int i = 0; i < notez.size(); i++)
                  {

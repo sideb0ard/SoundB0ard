@@ -29,7 +29,7 @@ enum AudioAction
 struct audio_action_queue_item
 {
     AudioAction type;
-    int mixer_soundgen_idx{0};
+    int mixer_soundgen_idx{-1};
 
     int delayed_by{0}; // in midi ticks
 

@@ -76,6 +76,15 @@ let play_array = fn(sound_generator_target, note_seq)
   }
 }
 
+let play_chord = fn(sound_generator_target, note_seq)
+{
+  let nlen = len(note_seq);
+  for (i = 0; i < nlen; ++i) {
+    if (note_seq[i] > 0) {
+      note_on(sound_generator_target, note_seq[i]);
+    }
+  }
+}
 
 let rand_beat = gen()
 {

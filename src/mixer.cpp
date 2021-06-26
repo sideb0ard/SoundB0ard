@@ -1,14 +1,14 @@
 #include <math.h>
-#include <sstream>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <wchar.h>
 
+#include <iomanip>
 #include <iostream>
-
 #include <portaudio.h>
+#include <sstream>
 
 #include <ableton_link_wrapper.h>
 #include <audio_action_queue.h>
@@ -127,8 +127,8 @@ std::string Mixer::StatusMixr()
     << ":::::::::: vol:" << ANSI_COLOR_WHITE << volume << COOL_COLOR_GREEN
     << " bpm:" << ANSI_COLOR_WHITE <<data.tempo << COOL_COLOR_GREEN
     << " quantum:" << ANSI_COLOR_WHITE << data.quantum << COOL_COLOR_GREEN
-    << " beat:" << ANSI_COLOR_WHITE << data.beat << COOL_COLOR_GREEN
-    << " phase:" << ANSI_COLOR_WHITE << data.phase << COOL_COLOR_GREEN
+    << " beat:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.beat << COOL_COLOR_GREEN
+    << " phase:" << ANSI_COLOR_WHITE << std::setprecision(2) << data.phase << COOL_COLOR_GREEN
     << " num_peers:" << ANSI_COLOR_WHITE << data.num_peers << COOL_COLOR_GREEN
     << "::::::::::\n"
     << ":::::::::: key:" << ANSI_COLOR_WHITE <<  key_names[timing_info.key] << COOL_COLOR_GREEN
@@ -958,7 +958,7 @@ void Mixer::CheckForAudioActionQueueMessages()
                      action->type == AudioAction::MIDI_EVENT_ADD_DELAYED)
             {
                 // args[0] is sound generator
-                // args[1] is midi_note
+                // args[1] is midi_note or array of midi_notes
                 // args[2] is delay in midi ticks if present and type ==
                 // MIDI_EVENT_ADD_DELAYED
                 // args[3] if present is velocity
@@ -976,100 +976,123 @@ void Mixer::CheckForAudioActionQueueMessages()
                             auto sg = sound_generators_[soundgen->soundgen_id_];
                             // sg->parseMidiEvent(event_on, timing_info);
 
+                            std::vector<int> midi_nums{};
                             auto int_object =
                                 std::dynamic_pointer_cast<object::Number>(
                                     args[1]);
-
-                            if (!int_object)
-                                return;
-
-                            auto midinum = int_object->value_;
-
-                            // optional value
-                            int velocity = 127;
-                            if ((action->type ==
-                                     AudioAction::MIDI_EVENT_ADD_DELAYED &&
-                                 args_size == 4) ||
-                                (action->type !=
-                                     AudioAction::MIDI_EVENT_ADD_DELAYED &&
-                                 args_size == 3))
+                            if (int_object)
                             {
-                                int pos =
-                                    action->type ==
-                                            AudioAction::MIDI_EVENT_ADD_DELAYED
-                                        ? 3
-                                        : 2;
-
-                                auto velocity_obj =
-                                    std::dynamic_pointer_cast<object::Number>(
-                                        args[pos]);
-
-                                if (velocity_obj)
-                                    velocity = velocity_obj->value_;
+                                midi_nums.push_back(int_object->value_);
                             }
 
-                            midi_event event_on =
-                                new_midi_event(MIDI_ON, midinum, velocity);
-                            event_on.source = EXTERNAL_OSC;
-
-                            // used later for MIDI OFF MESSAGE
-                            int midi_note_on_time = timing_info.midi_tick;
-
-                            if (action->type ==
-                                AudioAction::MIDI_EVENT_ADD_DELAYED)
+                            auto array_object =
+                                std::dynamic_pointer_cast<object::Array>(
+                                    args[1]);
+                            if (array_object)
                             {
-                                if (args_size >= 3)
+
+                                for (auto e : array_object->elements_)
                                 {
-                                    auto delay_time_obj =
+                                    auto int_object = std::dynamic_pointer_cast<
+                                        object::Number>(e);
+                                    if (int_object)
+                                    {
+                                        midi_nums.push_back(int_object->value_);
+                                    }
+                                }
+                            }
+
+                            for (auto midinum : midi_nums)
+                            {
+
+                                // optional value
+                                int velocity = 127;
+                                if ((action->type ==
+                                         AudioAction::MIDI_EVENT_ADD_DELAYED &&
+                                     args_size == 4) ||
+                                    (action->type !=
+                                         AudioAction::MIDI_EVENT_ADD_DELAYED &&
+                                     args_size == 3))
+                                {
+                                    int pos = action->type ==
+                                                      AudioAction::
+                                                          MIDI_EVENT_ADD_DELAYED
+                                                  ? 3
+                                                  : 2;
+
+                                    auto velocity_obj =
                                         std::dynamic_pointer_cast<
-                                            object::Number>(args[2]);
+                                            object::Number>(args[pos]);
 
-                                    if (!delay_time_obj)
-                                        return;
-                                    int delay_time = delay_time_obj->value_;
-                                    int delay_tick =
-                                        (timing_info.midi_tick + delay_time);
+                                    if (velocity_obj)
+                                        velocity = velocity_obj->value_;
+                                }
 
-                                    // this is delayed - save for OFF EVENT
-                                    // below
-                                    midi_note_on_time = delay_tick;
+                                midi_event event_on =
+                                    new_midi_event(MIDI_ON, midinum, velocity);
+                                event_on.source = EXTERNAL_OSC;
 
-                                    midi_event event = new_midi_event(
-                                        MIDI_ON, midinum, velocity);
-                                    event.delete_after_use = true;
+                                // used later for MIDI OFF MESSAGE
+                                int midi_note_on_time = timing_info.midi_tick;
 
-                                    auto ev =
-                                        DelayedMidiEvent(delay_tick, event, sg);
-                                    _action_items.push_back(ev);
+                                if (action->type ==
+                                    AudioAction::MIDI_EVENT_ADD_DELAYED)
+                                {
+                                    if (args_size >= 3)
+                                    {
+                                        auto delay_time_obj =
+                                            std::dynamic_pointer_cast<
+                                                object::Number>(args[2]);
+
+                                        if (!delay_time_obj)
+                                            return;
+                                        int delay_time = delay_time_obj->value_;
+                                        int delay_tick =
+                                            (timing_info.midi_tick +
+                                             delay_time);
+
+                                        // this is delayed - save for OFF EVENT
+                                        // below
+                                        midi_note_on_time = delay_tick;
+
+                                        midi_event event = new_midi_event(
+                                            MIDI_ON, midinum, velocity);
+                                        event.delete_after_use = true;
+
+                                        auto ev = DelayedMidiEvent(delay_tick,
+                                                                   event, sg);
+                                        _action_items.push_back(ev);
+                                    }
+                                    else
+                                    {
+                                        std::cerr << "NEED A DELAY SIZE IN "
+                                                     "MIDI TICKS"
+                                                  << std::endl;
+                                    }
                                 }
                                 else
                                 {
-                                    std::cerr << "NEED A DELAY SIZE IN "
-                                                 "MIDI TICKS"
-                                              << std::endl;
+
+                                    sg->noteOn(event_on);
                                 }
+
+                                int note_duration_ms = sg->note_duration_ms_;
+                                int duration_in_midi_ticks =
+                                    note_duration_ms /
+                                    timing_info.ms_per_midi_tick;
+
+                                int midi_off_tick =
+                                    midi_note_on_time + duration_in_midi_ticks;
+
+                                midi_event event_off =
+                                    new_midi_event(MIDI_OFF, midinum, velocity);
+
+                                event_off.delete_after_use = true;
+                                auto ev = DelayedMidiEvent(midi_off_tick,
+                                                           event_off, sg);
+
+                                _action_items.push_back(ev);
                             }
-                            else
-                            {
-
-                                sg->noteOn(event_on);
-                            }
-
-                            int note_duration_ms = sg->note_duration_ms_;
-                            int duration_in_midi_ticks =
-                                note_duration_ms / timing_info.ms_per_midi_tick;
-
-                            int midi_off_tick =
-                                midi_note_on_time + duration_in_midi_ticks;
-
-                            midi_event event_off =
-                                new_midi_event(MIDI_OFF, midinum, velocity);
-
-                            event_off.delete_after_use = true;
-                            auto ev =
-                                DelayedMidiEvent(midi_off_tick, event_off, sg);
-
-                            _action_items.push_back(ev);
                         }
                     }
                 }
@@ -1136,6 +1159,13 @@ void Mixer::CheckForAudioActionQueueMessages()
                             sg->SetParam(action->param_name, param_val);
                         }
                     }
+                }
+                else
+                {
+                    // no soundgen - must be mixer
+                    float param_val = std::stod(action->param_val);
+                    if (action->param_name == "volume")
+                        VolChange(param_val);
                 }
             }
             else if (action->type == AudioAction ::INFO)

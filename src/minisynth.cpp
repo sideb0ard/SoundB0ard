@@ -10,8 +10,6 @@
 #include "mixer.h"
 #include "utils.h"
 
-extern Mixer *mixr;
-extern const wchar_t *sparkchars;
 extern const char *s_source_enum_to_name[];
 extern const char *s_dest_enum_to_name[];
 
@@ -255,7 +253,7 @@ std::string MiniSynth::Info()
 void MiniSynth::start()
 {
     active = true;
-    engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
+    // engine.cur_step = mixr->timing_info.sixteenth_note_tick % 16;
 }
 
 void MiniSynth::stop()
@@ -474,8 +472,8 @@ void MiniSynth::noteOn(midi_event ev)
 
     if (steal_note)
     {
-        if (mixr->debug_mode)
-            printf("STEAL NOTE\n");
+        // if (mixr->debug_mode)
+        //    printf("STEAL NOTE\n");
         minisynth_voice *msv = minisynth_get_oldest_voice(this);
         if (msv)
         {
@@ -2329,7 +2327,7 @@ void MiniSynth::SetParam(std::string name, double val)
     else if (name == "ndscale")
         minisynth_set_note_to_decay_scaling(this, val);
     else if (name == "osc1")
-        minisynth_set_lfo_wave(this, 1, val);
+        minisynth_set_osc_type(this, 1, val);
     else if (name == "o1amp")
         minisynth_set_osc_amp(this, 1, val);
     else if (name == "o1oct")
@@ -2340,7 +2338,7 @@ void MiniSynth::SetParam(std::string name, double val)
         std::cout << "Use detune setting to adjust cents..\n";
 
     else if (name == "osc2")
-        minisynth_set_lfo_wave(this, 2, val);
+        minisynth_set_osc_type(this, 2, val);
     else if (name == "o2amp")
         minisynth_set_osc_amp(this, 2, val);
     else if (name == "o2oct")
@@ -2351,7 +2349,7 @@ void MiniSynth::SetParam(std::string name, double val)
         std::cout << "Use detune setting to adjust cents..\n";
 
     else if (name == "osc3")
-        minisynth_set_lfo_wave(this, 3, val);
+        minisynth_set_osc_type(this, 2, val);
     else if (name == "o3amp")
         minisynth_set_osc_amp(this, 3, val);
     else if (name == "o3oct")
@@ -2360,7 +2358,7 @@ void MiniSynth::SetParam(std::string name, double val)
         std::cout << "Not implemented.\n";
 
     else if (name == "osc4")
-        minisynth_set_lfo_wave(this, 4, val);
+        minisynth_set_osc_type(this, 4, val);
     else if (name == "o4amp")
         minisynth_set_osc_amp(this, 4, val);
     else if (name == "o4oct")

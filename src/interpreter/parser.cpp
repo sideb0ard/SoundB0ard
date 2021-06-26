@@ -288,23 +288,16 @@ std::shared_ptr<ast::VolumeStatement> Parser::ParseVolumeStatement()
     std::shared_ptr<ast::VolumeStatement> stmt =
         std::make_shared<ast::VolumeStatement>(cur_token_);
 
-    if (!ExpectPeek(token::SLANG_IDENT))
+    if (PeekTokenIs(token::SLANG_IDENT))
     {
-        std::cerr << "NOT GOT TARGET ! Peek token is " << peek_token_
-                  << std::endl;
-        return nullptr;
+        NextToken();
+        stmt->target_ = ParseIdentifier();
     }
-    stmt->target_ = ParseIdentifier();
 
     if (PeekTokenIs(token::SLANG_NUMBER))
     {
         NextToken();
         stmt->value_ = cur_token_.literal_;
-    }
-    else if (PeekTokenIs(token::SLANG_MINUS))
-    {
-        NextToken();
-        stmt->value_ = "-" + cur_token_.literal_;
     }
     else
     {

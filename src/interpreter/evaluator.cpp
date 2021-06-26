@@ -405,18 +405,16 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
         std::dynamic_pointer_cast<ast::VolumeStatement>(node);
     if (vol_stmt)
     {
+        audio_action_queue_item action{.type = AudioAction::UPDATE,
+                                       .param_name = "volume",
+                                       .param_val = vol_stmt->value_};
         auto target = Eval(vol_stmt->target_, env);
         auto soundgen =
             std::dynamic_pointer_cast<object::SoundGenerator>(target);
         if (soundgen)
-        {
-            audio_action_queue_item action{.type = AudioAction::UPDATE,
-                                           .mixer_soundgen_idx =
-                                               soundgen->soundgen_id_,
-                                           .param_name = "volume",
-                                           .param_val = vol_stmt->value_};
-            audio_queue.push(action);
-        }
+            action.mixer_soundgen_idx = soundgen->soundgen_id_;
+
+        audio_queue.push(action);
     }
 
     ///////////////////////////////////////////////////////////////
