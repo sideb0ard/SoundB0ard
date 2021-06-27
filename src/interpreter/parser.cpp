@@ -589,6 +589,10 @@ std::shared_ptr<ast::Expression> Parser::ParseForPrefixExpression()
         return ParsePrefixExpression();
     else if (cur_token_.type_ == token::SLANG_TRUE)
         return ParseBoolean();
+    else if (cur_token_.type_ == token::SLANG_DURATION)
+        return ParseDurationExpression();
+    else if (cur_token_.type_ == token::SLANG_VELOCITY)
+        return ParseVelocityExpression();
     else if (cur_token_.type_ == token::SLANG_FALSE)
         return ParseBoolean();
     else if (cur_token_.type_ == token::SLANG_LPAREN)
@@ -675,6 +679,28 @@ std::shared_ptr<ast::Expression> Parser::ParseNumberLiteral()
     double val = std::stod(cur_token_.literal_);
     literal->value_ = val;
     return literal;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseDurationExpression()
+{
+    auto dur = std::make_shared<ast::DurationExpression>(cur_token_);
+    if (!ExpectPeek(token::SLANG_ASSIGN))
+        return nullptr;
+
+    NextToken();
+    dur->duration_val = std::stod(cur_token_.literal_);
+    return dur;
+}
+
+std::shared_ptr<ast::Expression> Parser::ParseVelocityExpression()
+{
+    auto vel = std::make_shared<ast::VelocityExpression>(cur_token_);
+    if (!ExpectPeek(token::SLANG_ASSIGN))
+        return nullptr;
+
+    NextToken();
+    vel->velocity_val = std::stod(cur_token_.literal_);
+    return vel;
 }
 
 std::shared_ptr<ast::Expression> Parser::ParseIfExpression()
@@ -779,12 +805,10 @@ std::shared_ptr<ast::Expression> Parser::ParseGeneratorLiteral()
 std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
 {
 
-    std::cout << "SYNTH EXPRESSION!\n";
     auto synth = std::make_shared<ast::SynthExpression>(cur_token_);
 
     if (PeekTokenIs(token::SLANG_IDENT))
     {
-        std::cout << "IDENT!\n";
         if (peek_token_.literal_ == "presets")
         {
             std::cout << "PRESETS!\n";
@@ -828,8 +852,6 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
         return nullptr;
     NextToken();
 
-    std::cout << "CUR TOKEN IS " << cur_token_ << " AND NEXT IS " << peek_token_
-              << std::endl;
     if (synth->token_.literal_ == "digi")
     {
         std::cout << "DIGI SYNTH YO!!\n";
@@ -849,7 +871,6 @@ std::shared_ptr<ast::Expression> Parser::ParseSynthExpression()
         std::cerr << "OOFT! where ya PAREN?\n";
         return nullptr;
     }
-    std::cout << "AST SYNTH EXPRESSION ALL GOOD!\n";
     return synth;
 }
 

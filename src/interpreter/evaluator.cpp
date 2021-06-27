@@ -611,6 +611,16 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     if (proc)
         return EvalProcessStatement(proc, env);
 
+    std::shared_ptr<ast::DurationExpression> dur_exp =
+        std::dynamic_pointer_cast<ast::DurationExpression>(node);
+    if (dur_exp)
+        return std::make_shared<object::Duration>(dur_exp->duration_val);
+
+    std::shared_ptr<ast::VelocityExpression> vel_exp =
+        std::dynamic_pointer_cast<ast::VelocityExpression>(node);
+    if (vel_exp)
+        return std::make_shared<object::Velocity>(vel_exp->velocity_val);
+
     return NULLL;
 }
 

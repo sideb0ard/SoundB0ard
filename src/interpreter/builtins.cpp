@@ -43,6 +43,31 @@ bool ShouldIgnore(std::string filename)
     }
     return true;
 }
+
+std::vector<int> GetMidiNotes(std::shared_ptr<object::Object> &numz)
+{
+    std::vector<int> midi_nums{};
+    auto int_object = std::dynamic_pointer_cast<object::Number>(numz);
+    if (int_object)
+    {
+        midi_nums.push_back(int_object->value_);
+    }
+
+    auto array_object = std::dynamic_pointer_cast<object::Array>(numz);
+    if (array_object)
+    {
+
+        for (auto e : array_object->elements_)
+        {
+            auto int_object = std::dynamic_pointer_cast<object::Number>(e);
+            if (int_object)
+            {
+                midi_nums.push_back(int_object->value_);
+            }
+        }
+    }
+    return midi_nums;
+}
 } // namespace
 
 namespace builtin
@@ -398,15 +423,97 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                           midi_launch_init(mixr);
                           return evaluator::NULLL;
                       })},
-    {"note_on", std::make_shared<object::BuiltIn>(
-                    [](std::vector<std::shared_ptr<object::Object>> args)
-                        -> std::shared_ptr<object::Object>
-                    {
-                        audio_action_queue_item action_req{
-                            .type = AudioAction::MIDI_EVENT_ADD, .args = args};
-                        audio_queue.push(action_req);
-                        return evaluator::NULLL;
-                    })},
+    {"note_on",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen)
+             {
+                 int sgid = soundgen->soundgen_id_;
+                 std::vector<int> midi_nums = GetMidiNotes(args[1]);
+                 int vel = 128;
+                 int dur = 240;
+
+                 for (auto a : args)
+                 {
+                     if (a->Type() == object::DURATION_OBJ)
+                     {
+                         auto dur_obj =
+                             std::dynamic_pointer_cast<object::Duration>(a);
+                         dur = dur_obj->value_;
+                     }
+                     else if (a->Type() == object::VELOCITY_OBJ)
+                     {
+                         auto vel_obj =
+                             std::dynamic_pointer_cast<object::Velocity>(a);
+                         vel = vel_obj->value_;
+                     }
+                 }
+
+                 audio_action_queue_item action_req{
+                     .type = AudioAction::MIDI_EVENT_ADD,
+                     .soundgen_num = sgid,
+                     .notes = midi_nums,
+                     .velocity = vel,
+                     .duration = dur};
+                 audio_queue.push(action_req);
+             }
+
+             return evaluator::NULLL;
+         })},
+    {"note_on_at",
+     std::make_shared<object::BuiltIn>(
+         [](std::vector<std::shared_ptr<object::Object>> args)
+             -> std::shared_ptr<object::Object>
+         {
+             auto soundgen =
+                 std::dynamic_pointer_cast<object::SoundGenerator>(args[0]);
+             if (soundgen)
+             {
+                 int sgid = soundgen->soundgen_id_;
+                 std::vector<int> midi_nums = GetMidiNotes(args[1]);
+
+                 auto num_obj =
+                     std::dynamic_pointer_cast<object::Number>(args[2]);
+
+                 if (!num_obj)
+                     return evaluator::NULLL;
+
+                 int vel = 128;
+                 int dur = 240;
+                 int note_start_time = num_obj->value_;
+
+                 for (auto a : args)
+                 {
+                     if (a->Type() == object::DURATION_OBJ)
+                     {
+                         auto dur_obj =
+                             std::dynamic_pointer_cast<object::Duration>(a);
+                         dur = dur_obj->value_;
+                     }
+                     else if (a->Type() == object::VELOCITY_OBJ)
+                     {
+                         auto vel_obj =
+                             std::dynamic_pointer_cast<object::Velocity>(a);
+                         vel = vel_obj->value_;
+                     }
+                 }
+
+                 audio_action_queue_item action_req{
+                     .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
+                     .soundgen_num = sgid,
+                     .notes = midi_nums,
+                     .velocity = vel,
+                     .duration = dur,
+                     .note_start_time = note_start_time};
+                 audio_queue.push(action_req);
+             }
+
+             return evaluator::NULLL;
+         })},
     {"set_pitch",
      std::make_shared<object::BuiltIn>(
          [](std::vector<std::shared_ptr<object::Object>> args)
@@ -445,16 +552,6 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
              }
              return evaluator::NULLL;
          })},
-    {"note_on_at", std::make_shared<object::BuiltIn>(
-                       [](std::vector<std::shared_ptr<object::Object>> args)
-                           -> std::shared_ptr<object::Object>
-                       {
-                           audio_action_queue_item action_req{
-                               .type = AudioAction::MIDI_EVENT_ADD_DELAYED,
-                               .args = args};
-                           audio_queue.push(action_req);
-                           return evaluator::NULLL;
-                       })},
     {"speed", std::make_shared<object::BuiltIn>(
                   [](std::vector<std::shared_ptr<object::Object>> args)
                       -> std::shared_ptr<object::Object>

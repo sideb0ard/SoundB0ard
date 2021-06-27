@@ -21,6 +21,7 @@ static const char *s_dx_dest_names[] = {"dx_dest_none", "dx_dest_amp_mod",
 dxsynth::dxsynth()
 {
     type = DXSYNTH_TYPE;
+    std::cout << "Added, FM Synth, yo!\n";
     active_midi_osc = 1;
 
     dxsynth_reset(this);

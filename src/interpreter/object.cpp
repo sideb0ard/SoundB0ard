@@ -187,6 +187,22 @@ std::string Generator::Inspect()
     return return_val.str();
 }
 
+std::string Duration::Inspect()
+{
+    std::stringstream val;
+    val << value_;
+    return val.str();
+}
+ObjectType Duration::Type() { return DURATION_OBJ; }
+
+std::string Velocity::Inspect()
+{
+    std::stringstream val;
+    val << value_;
+    return val.str();
+}
+ObjectType Velocity::Type() { return VELOCITY_OBJ; }
+
 ObjectType ForLoop::Type() { return FORLOOP_OBJ; }
 std::string ForLoop::Inspect() { return "FOR LOOP"; }
 

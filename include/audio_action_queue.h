@@ -34,7 +34,6 @@ struct audio_action_queue_item
     int delayed_by{0}; // in midi ticks
 
     // ADD varz
-    // std::shared_ptr<SoundGenerator> sg{nullptr};
     unsigned int soundgenerator_type;
     std::string filepath; // used for sample and digisynth
     bool loop_mode;       // for looper
@@ -49,6 +48,11 @@ struct audio_action_queue_item
 
     // NOTE_ON varz
     std::vector<std::shared_ptr<object::Object>> args;
+    int soundgen_num;
+    std::vector<int> notes;
+    int velocity;
+    int duration;
+    int note_start_time;
 
     // PREVIEW varz
     std::string preview_filename;

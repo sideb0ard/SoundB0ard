@@ -35,6 +35,7 @@ const char *s_filter_type_names[] = {"lpf1", "hpf1", "lpf2", "hpf2", "bpf2",
 MiniSynth::MiniSynth()
 {
     type = MINISYNTH_TYPE;
+    std::cout << "Added, MiniMoog, yo!\n";
 
     for (int i = 0; i < MAX_VOICES; i++)
     {

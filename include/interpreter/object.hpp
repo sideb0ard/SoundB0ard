@@ -38,6 +38,9 @@ constexpr char SYNTH_OBJ[] = "SYNTH";
 constexpr char SAMPLE_OBJ[] = "SAMPLE";
 constexpr char GRANULAR_OBJ[] = "GRANULAR";
 
+constexpr char DURATION_OBJ[] = "DURATION";
+constexpr char VELOCITY_OBJ[] = "VELOCITY";
+
 using ObjectType = std::string;
 
 class HashKey
@@ -78,6 +81,28 @@ class Number : public Object
     ObjectType Type() override;
     std::string Inspect() override;
     HashKey HashKey();
+
+  public:
+    double value_;
+};
+
+class Duration : public Object
+{
+  public:
+    explicit Duration(double val) : value_{val} {};
+    ObjectType Type() override;
+    std::string Inspect() override;
+
+  public:
+    double value_;
+};
+
+class Velocity : public Object
+{
+  public:
+    explicit Velocity(double val) : value_{val} {};
+    ObjectType Type() override;
+    std::string Inspect() override;
 
   public:
     double value_;

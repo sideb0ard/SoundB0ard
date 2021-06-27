@@ -328,6 +328,26 @@ class PatternFunctionExpression : public Expression
     std::vector<std::shared_ptr<Expression>> arguments_;
 };
 
+class DurationExpression : public Expression
+{
+  public:
+    explicit DurationExpression(Token toke) : Expression(toke) {}
+    std::string String() const override;
+
+  public:
+    int duration_val;
+};
+
+class VelocityExpression : public Expression
+{
+  public:
+    explicit VelocityExpression(Token toke) : Expression(toke) {}
+    std::string String() const override;
+
+  public:
+    int velocity_val;
+};
+
 ///////////////////////////////////////////////////////////////
 //////////////////////// STATEMENTS............. //////////////
 

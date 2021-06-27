@@ -75,6 +75,8 @@ const TokenType SLANG_PAN = "PAN";
 const TokenType SLANG_PLAY = "PLAY";
 const TokenType SLANG_PITCH = "PITCH";
 const TokenType SLANG_VOLUME = "VOLUME";
+const TokenType SLANG_DURATION = "DURATION";
+const TokenType SLANG_VELOCITY = "VELOCITY";
 const TokenType SLANG_INFO = "INFO";
 
 // instruments

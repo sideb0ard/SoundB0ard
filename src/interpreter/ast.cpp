@@ -29,6 +29,28 @@ std::string Program::String() const
     return ss.str();
 }
 
+std::string VelocityExpression::String() const
+{
+    std::stringstream ss;
+
+    if (velocity_val)
+        ss << velocity_val;
+    ss << ";";
+
+    return ss.str();
+}
+
+std::string DurationExpression::String() const
+{
+    std::stringstream ss;
+
+    if (duration_val)
+        ss << duration_val;
+    ss << ";";
+
+    return ss.str();
+}
+
 std::string LetStatement::String() const
 {
     std::stringstream ss;
@@ -235,7 +257,8 @@ std::string FunctionLiteral::String() const
 
     ss << TokenLiteral() << "("
        << std::accumulate(params.begin(), params.end(), std::string(),
-                          [](const std::string &lhs, const std::string &rhs) {
+                          [](const std::string &lhs, const std::string &rhs)
+                          {
                               std::string ret{lhs};
                               if (!lhs.empty() && !rhs.empty())
                                   ret += ", ";
@@ -257,7 +280,8 @@ std::string GeneratorLiteral::String() const
 
     ss << TokenLiteral() << "("
        << std::accumulate(params.begin(), params.end(), std::string(),
-                          [](const std::string &lhs, const std::string &rhs) {
+                          [](const std::string &lhs, const std::string &rhs)
+                          {
                               std::string ret{lhs};
                               if (!lhs.empty() && !rhs.empty())
                                   ret += ", ";
@@ -352,7 +376,8 @@ std::string CallExpression::String() const
 
     ss << function_->String() << "("
        << std::accumulate(arguments.begin(), arguments.end(), std::string(),
-                          [](const std::string &lhs, const std::string &rhs) {
+                          [](const std::string &lhs, const std::string &rhs)
+                          {
                               std::string ret{lhs};
                               if (!lhs.empty() && !rhs.empty())
                                   ret += ", ";
