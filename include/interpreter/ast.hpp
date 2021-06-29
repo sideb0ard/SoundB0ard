@@ -335,7 +335,7 @@ class DurationExpression : public Expression
     std::string String() const override;
 
   public:
-    int duration_val;
+    std::shared_ptr<Expression> duration_val{nullptr};
 };
 
 class VelocityExpression : public Expression
@@ -345,7 +345,7 @@ class VelocityExpression : public Expression
     std::string String() const override;
 
   public:
-    int velocity_val;
+    std::shared_ptr<Expression> velocity_val{nullptr};
 };
 
 ///////////////////////////////////////////////////////////////

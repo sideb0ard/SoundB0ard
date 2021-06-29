@@ -34,7 +34,7 @@ std::string VelocityExpression::String() const
     std::stringstream ss;
 
     if (velocity_val)
-        ss << velocity_val;
+        ss << velocity_val->String();
     ss << ";";
 
     return ss.str();
@@ -45,7 +45,7 @@ std::string DurationExpression::String() const
     std::stringstream ss;
 
     if (duration_val)
-        ss << duration_val;
+        ss << duration_val->String();
     ss << ";";
 
     return ss.str();

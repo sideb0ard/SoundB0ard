@@ -614,12 +614,26 @@ std::shared_ptr<object::Object> Eval(std::shared_ptr<ast::Node> node,
     std::shared_ptr<ast::DurationExpression> dur_exp =
         std::dynamic_pointer_cast<ast::DurationExpression>(node);
     if (dur_exp)
-        return std::make_shared<object::Duration>(dur_exp->duration_val);
+    {
+        auto val = Eval(dur_exp->duration_val, env);
+        auto int_obj = std::dynamic_pointer_cast<object::Number>(val);
+        if (int_obj)
+        {
+            return std::make_shared<object::Duration>(int_obj->value_);
+        }
+    }
 
     std::shared_ptr<ast::VelocityExpression> vel_exp =
         std::dynamic_pointer_cast<ast::VelocityExpression>(node);
     if (vel_exp)
-        return std::make_shared<object::Velocity>(vel_exp->velocity_val);
+    {
+        auto val = Eval(vel_exp->velocity_val, env);
+        auto int_obj = std::dynamic_pointer_cast<object::Number>(val);
+        if (int_obj)
+        {
+            return std::make_shared<object::Velocity>(int_obj->value_);
+        }
+    }
 
     return NULLL;
 }

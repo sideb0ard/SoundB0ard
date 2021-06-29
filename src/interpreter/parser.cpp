@@ -688,7 +688,7 @@ std::shared_ptr<ast::Expression> Parser::ParseDurationExpression()
         return nullptr;
 
     NextToken();
-    dur->duration_val = std::stod(cur_token_.literal_);
+    dur->duration_val = ParseExpression(Precedence::LOWEST);
     return dur;
 }
 
@@ -699,7 +699,7 @@ std::shared_ptr<ast::Expression> Parser::ParseVelocityExpression()
         return nullptr;
 
     NextToken();
-    vel->velocity_val = std::stod(cur_token_.literal_);
+    vel->velocity_val = ParseExpression(Precedence::LOWEST);
     return vel;
 }
 
