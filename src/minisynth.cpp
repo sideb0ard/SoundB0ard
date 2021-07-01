@@ -47,9 +47,6 @@ MiniSynth::MiniSynth()
                                                &m_global_synth_params);
     }
 
-    // clears out modmatrix sources and resets all oscs, lfos, eg's etc.
-    minisynth_prepare_for_play(this);
-
     // use first voice to setup global
     minisynth_voice_initialize_modmatrix(m_voices[0], &m_ms_modmatrix);
 
@@ -60,7 +57,8 @@ MiniSynth::MiniSynth()
     }
 
     minisynth_load_defaults(this);
-    minisynth_update(this);
+    minisynth_prepare_for_play(this);
+
     active = true;
 }
 

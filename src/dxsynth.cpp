@@ -36,8 +36,6 @@ dxsynth::dxsynth()
                                              &m_global_synth_params);
     }
 
-    dxsynth_prepare_for_play(this);
-
     // use first voice to setup global
     dxsynth_voice_initialize_modmatrix(m_voices[0], &m_global_modmatrix);
 
@@ -46,11 +44,13 @@ dxsynth::dxsynth()
         voice_set_modmatrix_core(&m_voices[i]->m_voice,
                                  get_matrix_core(&m_global_modmatrix));
     }
-    dxsynth_update(this);
 
     m_last_note_frequency = -1.0;
 
+    dxsynth_prepare_for_play(this);
+
     Load("RAVER");
+
     active = true;
 }
 
