@@ -276,7 +276,7 @@ void Mixer::Help()
     {
         std::stringstream ss;
         ss << ANSI_COLOR_WHITE;
-        ss << ":::::: Haaaalp! ::::::::::::::::::::::::::::::::\n";
+        ss << "###### Haaaalp! ################################\n";
         ss << COOL_COLOR_MAUVE << "ps" << ANSI_COLOR_RESET
            << " // show Program Status i.e. vars, bpm, key etc.\n";
         ss << COOL_COLOR_MAUVE << "ls" << ANSI_COLOR_RESET
@@ -290,13 +290,25 @@ void Mixer::Help()
            << " // create a var named 'x' with val 1\n";
         ss << COOL_COLOR_MAUVE << "let add1 = fn(val) { return val + 1; };";
         ss << ANSI_COLOR_RESET << " // create function and assign to a var\n";
+        ss << ANSI_COLOR_WHITE;
+        ss << "######## Add Sound Generators ########################\n";
+        ss << ANSI_COLOR_RESET;
         ss << COOL_COLOR_MAUVE << "let dx100 = fm();" << ANSI_COLOR_RESET
            << " // create an instance of FM Synth assigned to var dx100\n";
+        ss << COOL_COLOR_MAUVE << "let mo = moog();" << ANSI_COLOR_RESET
+           << " // create an instance of a MiniMoog Synth assigned to var mo\n";
+        ss << COOL_COLOR_MAUVE << "let bd = sample(kicks/808kick.aif);"
+           << ANSI_COLOR_RESET
+           << " // create an instance of an 808 kick sample assigned to var "
+              "bd\n";
         ss << COOL_COLOR_MAUVE << "note_on(dx100, 45);" << ANSI_COLOR_RESET
            << " // play an 'A2' on the 'dx100'\n";
         ss << COOL_COLOR_MAUVE << "note_on_at(dx100, 45, 104);"
            << ANSI_COLOR_RESET
            << " // play 'A2' at 104 midi ticks from now()\n";
+        ss << ANSI_COLOR_WHITE;
+        ss << "######## Array Value generators and modifiers "
+              "###################\n";
         ss << COOL_COLOR_MAUVE << "notes_in_key();" << ANSI_COLOR_RESET
            << " // returns array of midi notes in scale of\n";
         ss << "                // current key (see ps for key)\n";
@@ -327,6 +339,18 @@ void Mixer::Help()
         ss << COOL_COLOR_MAUVE << "map(array_name, func);" << ANSI_COLOR_RESET
            << " // returns array containing each element from array_name after "
               "applying func to their value\n";
+        ss << COOL_COLOR_MAUVE << "incr(starting_val, min_val, max_val);"
+           << ANSI_COLOR_RESET
+           << " // returns number one more than starting_val, modulo max_val "
+              "plus min_val\n";
+        ss << COOL_COLOR_MAUVE << "push(src_array, val));" << ANSI_COLOR_RESET
+           << " // returns a new array, with val appended to copy of "
+              "src_array\n";
+        ss << COOL_COLOR_MAUVE << "reverse(src);" << ANSI_COLOR_RESET
+           << " // returns a (copy of) reversed string or array\n";
+        ss << COOL_COLOR_MAUVE << "rotate(src_array, num_pos);"
+           << ANSI_COLOR_RESET
+           << " // returns a (copy of) src_array, rotated left by num_pos\n";
 
         ss << ANSI_COLOR_RESET;
 
