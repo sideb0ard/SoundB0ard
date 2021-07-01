@@ -1,0 +1,91 @@
+
+let blah_gen = gen()
+{
+  setup()
+  {
+  }
+  run()
+  {
+    play_array(dx100, [50, 0, 53, 52, 0, 55, 0, 48, 0, 48, 0, 50, 53, 0, 53, 0]);
+  }
+}
+
+
+
+let mut = fn(val, scl) {
+  return val + 12 * scl;
+}
+
+let rescale = fn(vals, rescaler) {
+  # takes an array and returns a newly resized/rescaled version.
+  let new_size = len(vals) * rescaler;
+  let rescaled_vals = [];
+
+  for (i = 0; i < new_size; ++i) {
+    rescaled_vals = push(rescaled_vals,0);
+  }
+
+  for (i = 0; i < len(vals); ++i) {
+    rescaled_vals[i*rescaler] = vals[i];
+  }
+
+  return rescaled_vals;
+}
+
+let melod = gen()
+{
+  setup()
+  {
+    let notes = [5, 7, 0, 2];
+    let nidx = 0;
+    let durz = [3840/2, 3840/3, 3840/4];
+    let dix = 0;
+    let velz = [128, 120, 110, 80, 50];
+    let vix = 0;
+    let rf = riff();
+    let rescaler = 2;
+  }
+  run()
+  {
+
+    for (i = 0; i < 16; ++i) {
+      if (rf[i] > 0) {
+        note_on_at(mo, notes_in_chord(mut(rf[i], 3), 0, true), pp*i, dur = durz[dix], vel=velz[vix] );
+        dix = incr(dix, 0, len(durz));
+        vix = incr(vix, 0, len(velz));
+        note_on_at(dx100, notes_in_chord(mut(rf[i], 2), 0, true), pp*i, dur = durz[dix], vel=velz[vix] );
+      }
+    }
+    if (count % 8 == 0) {
+      rf = riff();
+    }
+    if (count % rescaler == 0) {
+      let myr = rescale(rf, rescaler);
+      #print("SCLAED:", myr);
+      #play_array(dx100, myr);
+      for (i = 0; i < 16 * rescaler; ++i) {
+        if (myr[i] > 0) {
+          #note_on_at(dx100, notes_in_chord(mut(myr[i]), 0, true), pp*i*rescaler );
+          #note_on_at(mo, rf[i], i * pp * rescaler);
+        }
+      }
+    }
+
+    # if (count % 7 == 0) {
+      #   let rf = rescale(rf, rescaler);
+      #   for (i = 0; i < 16 * rescaler; ++i) {
+        #     if (rf[i] > 0) {
+          #       note_on_at(mo, notes_in_chord(mut(rf[i]), 0, true), pp*i );
+          #       #note_on_at(mo, rf[i], i * pp * rescaler);
+          #     }
+        #   }
+      # }
+    # else {
+      #   note_on(mo, notes_in_chord(mut(notes[nidx]), 0, true), dur=durz[dix] );
+      #   #note_on(mo, notes_in_chord(mut(notes[nidx]), 0));
+      #   nidx = incr(nidx, 0, len(notes));
+      #   dix = incr(dix, 0, len(durz));
+      # }
+  }
+}
+
