@@ -122,6 +122,7 @@ void *process_worker_thread()
                 {
                     ProcessConfig config = {
 
+                        .name = event->process_name,
                         .process_type = event->process_type,
                         .timer_type = event->timer_type,
                         .loop_len = event->loop_len,

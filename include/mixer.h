@@ -157,7 +157,7 @@ struct Mixer
 
     std::string StatusEnv();
     std::string StatusMixr();
-    std::string StatusProcz(bool all);
+    std::string StatusProcz(bool all = false);
     std::string StatusSgz(bool all);
 
     void UpdateBpm(int bpm);

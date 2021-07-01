@@ -1049,6 +1049,8 @@ std::shared_ptr<ast::ProcessStatement> Parser::ParseProcessStatement()
     while (CurTokenIs(token::SLANG_PIPE))
         ConsumePatternFunctions(process);
 
+    process->name = process->pattern_expression_->String();
+
     return process;
 }
 

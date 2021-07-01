@@ -163,7 +163,7 @@ std::string Mixer::StatusProcz(bool all)
 std::string Mixer::StatusEnv()
 {
     std::stringstream ss;
-    ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Env"
+    ss << COOL_COLOR_GREEN << "\n[" << ANSI_COLOR_WHITE << "Varz"
        << COOL_COLOR_GREEN << "]" << std::endl;
 
     // ss << global_env->Debug();
@@ -255,6 +255,7 @@ void Mixer::Ps(bool all)
     ss << get_string_logo();
     ss << StatusMixr();
     ss << StatusEnv();
+    ss << StatusProcz();
     // ss << mixer_status_procz(mixr, all);
     ss << ANSI_COLOR_RESET;
 

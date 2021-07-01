@@ -386,6 +386,8 @@ class ProcessStatement : public Statement
     std::string String() const override;
 
   public:
+    std::string name;
+
     int mixer_process_id_{-1};
 
     ProcessType process_type_{ProcessType::NO_PROCESS_TYPE};

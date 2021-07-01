@@ -68,6 +68,7 @@ void Process::Update()
     for (int j = 0; j < PPBAR; j++)
         pattern_events_played_[j] = true;
 
+    name = pending_config_.name;
     process_type_ = pending_config_.process_type;
     timer_type_ = pending_config_.timer_type;
     loop_len_ = pending_config_.loop_len;
@@ -509,11 +510,11 @@ std::string Process::Status()
     {
         if (target_type_ == ProcessPatternTarget::ENV)
         {
-            ss << "$ \"" << pattern_ << "\"";
+            ss << "$ \"" << name << "\"";
         }
         else if (target_type_ == ProcessPatternTarget::VALUES)
         {
-            ss << "# \"" << pattern_ << "\" ";
+            ss << "# \"" << name << "\" ";
             bool firscht = true;
             for (auto &t : targets_)
             {
@@ -536,6 +537,8 @@ std::string Process::Status()
         if (f->active_)
             ss << " | " << f->String();
     }
+
+    ss << ANSI_COLOR_RESET;
 
     return ss.str();
 }

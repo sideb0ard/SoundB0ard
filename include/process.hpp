@@ -15,6 +15,7 @@
 
 struct ProcessConfig
 {
+    std::string name;
     ProcessType process_type;
     ProcessTimerType timer_type;
     float loop_len;
@@ -47,6 +48,8 @@ class Process
     void AppendPatternFunction(std::shared_ptr<PatternFunction> func);
 
   public:
+    std::string name;
+
     ProcessConfig pending_config_;
     bool update_pending_;
 

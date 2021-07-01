@@ -1440,6 +1440,7 @@ EvalProcessStatement(std::shared_ptr<ast::ProcessStatement> proc,
 
     ev.type = Event::PROCESS_UPDATE_EVENT;
     ev.target_process_id = proc->mixer_process_id_;
+    ev.process_name = proc->name;
     ev.process_type = proc->process_type_;
     ev.timer_type = proc->process_timer_type_;
     ev.loop_len = proc->loop_len_;

@@ -17,6 +17,7 @@ struct event_queue_item
     // timing info
     mixer_timing_info timing_info;
     // process update
+    std::string process_name;
     int target_process_id;
     ProcessType process_type;
     ProcessTimerType timer_type;
