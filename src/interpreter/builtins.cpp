@@ -333,8 +333,11 @@ std::unordered_map<std::string, std::shared_ptr<object::BuiltIn>> built_ins = {
                  auto return_array =
                      std::make_shared<object::Array>(array_obj->elements_);
 
+                 auto rotate_by =
+                     (int)number->value_ % return_array->elements_.size();
+
                  std::rotate(return_array->elements_.begin(),
-                             return_array->elements_.begin() + number->value_,
+                             return_array->elements_.begin() + rotate_by,
                              return_array->elements_.end());
 
                  return return_array;

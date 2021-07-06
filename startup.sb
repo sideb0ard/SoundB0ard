@@ -46,7 +46,8 @@ let riff = fn()
   let beat = bjork(rand(9) + 2, 16);
   for ( i = 0; i < 16; ++i) {
     if (beat[i] == 1) {
-      beat[i] = valid_notes[rand(len(valid_notes))] + 12;
+      let multi = rand(4) + 1;
+      beat[i] = valid_notes[rand(len(valid_notes))] + 12*multi;
     }
   }
   return beat;

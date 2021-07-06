@@ -591,13 +591,15 @@ void MiniSynth::Update()
                                : pow(10.0, m_settings.m_sub_osc_db / 20.0);
 
     // --- osc3 is sub osc
-    m_global_synth_params.osc3_params.amplitude = sub_amplitude;
+    // m_global_synth_params.osc3_params.amplitude = sub_amplitude;
+    m_global_synth_params.osc3_params.amplitude = m_settings.osc3_amp;
     m_global_synth_params.osc3_params.octave = m_settings.osc3_oct;
     m_global_synth_params.osc3_params.semitones = m_settings.osc3_semis;
     m_global_synth_params.osc3_params.cents = m_settings.osc3_cents;
 
     // --- osc4 is noise osc
-    m_global_synth_params.osc4_params.amplitude = noise_amplitude;
+    // m_global_synth_params.osc4_params.amplitude = noise_amplitude;
+    m_global_synth_params.osc4_params.amplitude = m_settings.osc4_amp;
     m_global_synth_params.osc4_params.octave = m_settings.osc4_oct;
     m_global_synth_params.osc4_params.semitones = m_settings.osc4_semis;
     m_global_synth_params.osc4_params.cents = m_settings.osc4_cents;
@@ -1554,6 +1556,7 @@ void MiniSynth::SetOscAmp(unsigned int osc_num, double val)
             m_settings.osc2_amp = val;
             break;
         case (3):
+            std::cout << "SET OSC3 amp to " << val << std::endl;
             m_settings.osc3_amp = val;
             break;
         case (4):
